@@ -72,6 +72,7 @@ public:
   }
 
   virtual bool GetAttribute(const std::string& name, std::string& value) const = 0;
+  virtual bool GetBoolAttribute(const std::string& name, bool& value) const = 0;
 
   virtual const std::vector<IConfigurationElement::Pointer> GetChildren() const = 0;
   virtual const std::vector<IConfigurationElement::Pointer> GetChildren(const std::string& name) const = 0;

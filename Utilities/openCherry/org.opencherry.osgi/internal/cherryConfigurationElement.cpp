@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryConfigurationElement.h"
@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/DOM/NamedNodeMap.h"
 #include "Poco/DOM/NodeList.h"
+#include "Poco/String.h"
 
 namespace cherry {
 
-ConfigurationElement::ConfigurationElement(BundleLoader* loader, Poco::XML::Node* config, 
+ConfigurationElement::ConfigurationElement(BundleLoader* loader, Poco::XML::Node* config,
                                         std::string contributor, Extension::Pointer extension,
                                         const ConfigurationElement* parent)
   : m_ConfigurationNode(config), m_Parent(parent), m_Extension(extension)
@@ -31,7 +32,7 @@ ConfigurationElement::ConfigurationElement(BundleLoader* loader, Poco::XML::Node
   IConfigurationElement::m_ClassLoader = loader;
   IConfigurationElement::m_Contributor = contributor;
 }
-  
+
 bool
 ConfigurationElement::GetAttribute(const std::string& name, std::string& value) const
 {
@@ -44,16 +45,33 @@ ConfigurationElement::GetAttribute(const std::string& name, std::string& value) 
     attributes->release();
     return true;
   }
-  
+
   return false;
 }
-  
+
+bool
+ConfigurationElement::GetBoolAttribute(const std::string& name, bool& value) const
+{
+  std::string val;
+  if (this->GetAttribute(name, val))
+  {
+    Poco::toUpperInPlace(val);
+    if (val == "1" || val == "TRUE")
+      value = true;
+    else
+      value = false;
+    return true;
+  }
+
+  return false;
+}
+
 const std::vector<IConfigurationElement::Pointer>
 ConfigurationElement
 ::GetChildren() const
 {
   std::vector<IConfigurationElement::Pointer> children;
-  
+
   if (m_ConfigurationNode->hasChildNodes())
   {
     Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
@@ -64,16 +82,16 @@ ConfigurationElement
     }
     ch->release();
   }
-  
+
   return children;
 }
-  
+
 const std::vector<IConfigurationElement::Pointer>
 ConfigurationElement
 ::GetChildren(const std::string& name) const
 {
   std::vector<IConfigurationElement::Pointer> children;
-  
+
   if (m_ConfigurationNode->hasChildNodes())
   {
     Poco::XML::NodeList* ch = m_ConfigurationNode->childNodes();
@@ -87,29 +105,29 @@ ConfigurationElement
     }
     ch->release();
   }
-  
+
   return children;
 }
-  
-std::string 
+
+std::string
 ConfigurationElement::GetValue() const
 {
   return m_ConfigurationNode->nodeValue();
 }
-  
-std::string 
+
+std::string
 ConfigurationElement::GetName() const
 {
   return m_ConfigurationNode->nodeName();
 }
-  
+
 const IConfigurationElement*
 ConfigurationElement::GetParent() const
 {
   return m_Parent;
 }
-  
-const std::string& 
+
+const std::string&
 ConfigurationElement::GetContributor() const
 {
   return m_Contributor;
@@ -120,10 +138,10 @@ ConfigurationElement::GetDeclaringExtension() const
 {
   return m_Extension;
 }
-  
+
 ConfigurationElement::~ConfigurationElement()
-{ 
-  
+{
+
 }
 
 }

@@ -18,11 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIWORKBENCH_H_
 #define CHERRYIWORKBENCH_H_
 
-#include "cherryMacros.h"
+#include <cherryMacros.h>
 
+#include "services/cherryIServiceLocator.h"
 #include "dialogs/cherryIDialog.h"
 #include "cherryIViewRegistry.h"
 #include "cherryIEditorRegistry.h"
+#include "cherryIPerspectiveRegistry.h"
 #include "cherryIWorkbenchWindow.h"
 #include "cherryIWorkbenchListener.h"
 #include "cherryIWindowListener.h"
@@ -79,24 +81,7 @@ struct IWorkbenchPage;
  * @see PlatformUI#getWorkbench
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_UI IWorkbench {
-
-  struct WorkbenchEvents {
-    typedef Message2<IWorkbench*, bool, bool> PreShutdownEvent;
-    typedef Message1<IWorkbench*> PostShutdownEvent;
-
-    PreShutdownEvent preShutdown;
-    PostShutdownEvent postShutdown;
-  };
-
-  struct WindowEvents {
-    typedef Message1<IWorkbenchWindow::Pointer> WindowEvent;
-
-    WindowEvent windowActivated;
-    WindowEvent windowDeactivated;
-    WindowEvent windowClosed;
-    WindowEvent windowOpened;
-  };
+struct CHERRY_UI IWorkbench : public IServiceLocator {
 
   virtual ~IWorkbench() {}
 
@@ -121,7 +106,7 @@ struct CHERRY_UI IWorkbench {
   /**
    * Returns the workbench events object
    */
-  virtual WorkbenchEvents& GetWorkbenchEvents() = 0;
+  virtual IWorkbenchListener::Events& GetWorkbenchEvents() = 0;
 
   /**
    * Adds a window listener.
@@ -145,7 +130,7 @@ struct CHERRY_UI IWorkbench {
    * Returns the window events object
    *
    */
-  virtual WindowEvents& GetWindowEvents() = 0;
+  virtual IWindowListener::Events& GetWindowEvents() = 0;
 
   /**
    * Closes this workbench and all its open windows.
@@ -168,6 +153,13 @@ struct CHERRY_UI IWorkbench {
    *         no active workbench window or if called from a non-UI thread
    */
   virtual IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() = 0;
+
+  /**
+   * Returns the perspective registry for the workbench.
+   *
+   * @return the workbench perspective registry
+   */
+  virtual IPerspectiveRegistry* GetPerspectiveRegistry() = 0;
 
   /**
    * Returns the view registry for the workbench.

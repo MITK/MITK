@@ -35,7 +35,7 @@ namespace cherry {
  * perspective and a custom perspective.  
  * <ul>
  *   <li>A predefined perspective is defined by an extension to the workbench's 
- *     perspective extension point (<code>"org.eclipse.ui.perspectives"</code>).
+ *     perspective extension point (<code>"org.opencherry.ui.perspectives"</code>).
  *     The extension defines a id, label, and <code>IPerspectiveFactory</code>.
  *     A perspective factory is used to define the initial layout for a page.
  *     </li>

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYPARTSITE_H_
@@ -20,12 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <service/cherryIConfigurationElement.h>
 
+#include "cherryServiceLocator.h"
+
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryISelectionProvider.h"
-
-//TODO should be removed
-#include "../cherryUiDll.h"
 
 namespace cherry {
 
@@ -36,15 +35,15 @@ class  PartPane;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * <code>PartSite</code> is the general implementation for an
  * <code>IWorkbenchPartSite</code>. A site maintains the context for a part,
  * including the part, its pane, active contributions, selection provider, etc.
  * Together, these components make up the complete behavior for a part as if it
  * was implemented by one person.
- * 
+ *
  * The <code>PartSite</code> lifecycle is as follows ..
- * 
+ *
  * <ol>
  * <li>a site is constructed </li>
  * <li>a part is constructed and stored in the part </li>
@@ -56,17 +55,17 @@ class  PartPane;
  * <li>the site is activated, causing the actions to become visible </li>
  * </ol>
  */
-class CHERRY_UI PartSite : public virtual IWorkbenchPartSite {
+class PartSite : public virtual IWorkbenchPartSite {
 
 public:
   cherryClassMacro(PartSite);
-  
+
   /**
    * This is a helper method for the register context menu functionality. It
    * is provided so that different implementations of the
    * <code>IWorkbenchPartSite</code> interface don't have to worry about how
    * context menus should work.
-   * 
+   *
    * @param menuId
    *            the menu id
    * @param menuManager
@@ -90,7 +89,7 @@ public:
 //      const Collection menuExtenders);
 
 private:
-  
+
   IWorkbenchPartReference::Pointer partReference;
   SmartPointer<IWorkbenchPart> part;
   SmartPointer<IWorkbenchPage> page;
@@ -103,11 +102,23 @@ private:
   //ArrayList menuExtenders;
   //WorkbenchSiteProgressService progressService;
 
-//protected: const ServiceLocator serviceLocator;
+  struct ServiceLocatorOwner : public IDisposable
+  {
+    ServiceLocatorOwner(PartSite* site);
+
+    PartSite* site;
+
+    void Dispose();
+  };
+
+  ServiceLocatorOwner serviceLocatorOwner;
+
+protected:
+  ServiceLocator* serviceLocator;
 
   /**
    * Build the part site.
-   * 
+   *
    * @param ref
    *            the part reference
    * @param part
@@ -138,14 +149,14 @@ public: ~PartSite();
 
   /**
    * Returns the part registry extension ID.
-   * 
+   *
    * @return the registry extension ID
    */
 public: virtual std::string GetId();
 
   /**
    * Returns the page containing this workbench site's part.
-   * 
+   *
    * @return the page containing this part
    */
 public: virtual SmartPointer<IWorkbenchPage> GetPage();
@@ -167,7 +178,7 @@ public: virtual IWorkbenchPartReference::Pointer GetPartReference();
 
   /**
    * Returns the part registry plugin ID. It cannot be <code>null</code>.
-   * 
+   *
    * @return the registry plugin ID
    */
 public: virtual std::string GetPluginId();
@@ -185,7 +196,7 @@ public: virtual ISelectionProvider::Pointer GetSelectionProvider();
 
   /**
    * Returns the workbench window containing this part.
-   * 
+   *
    * @return the workbench window containing this part
    */
 public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
@@ -193,7 +204,7 @@ public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
   /**
    * Register a popup menu for extension.
    */
-//public: virtual void RegisterContextMenu(const std::string& menuID, 
+//public: virtual void RegisterContextMenu(const std::string& menuID,
 //      MenuManager menuMgr,
 //      ISelectionProvider selProvider);
 
@@ -223,7 +234,7 @@ protected: virtual void SetPluginId(const std::string& pluginId);
 
   /**
    * Sets the part registry extension ID.
-   * 
+   *
    * @param id
    *            the registry extension ID
    */
@@ -236,7 +247,7 @@ public: virtual void SetPart(SmartPointer<IWorkbenchPart> newPart);
 
   /**
    * Sets the registered name for this part.
-   * 
+   *
    * @param name
    *            the registered name
    */
@@ -249,7 +260,7 @@ public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider);
 
   /*
    * @see IWorkbenchPartSite#getKeyBindingService()
-   * 
+   *
    * TODO deprecated: use IHandlerService instead
    */
 //public: virtual  IKeyBindingService GetKeyBindingService();
@@ -258,7 +269,7 @@ protected: virtual std::string GetInitialScopeId();
 
   /**
    * Get an adapter for this type.
-   * 
+   *
    * @param adapter
    * @return
    */
@@ -270,19 +281,19 @@ public: Object::Pointer GetAdapter(const std::type_info& adapter);
 
   /**
    * Get a progress service for the receiver.
-   * 
+   *
    * @return WorkbenchSiteProgressService
    */
 //public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-//public: Object GetService(const Class key);
+public: Object::Pointer GetService(const std::string& api) const;
 
-//public: bool HasService(const Class key);
+public: bool HasService(const std::string& api) const;
 
   /**
    * Prints out the identifier, the plug-in identifier and the registered
    * name. This is for debugging purposes only.
-   * 
+   *
    * @since 3.2
    */
 public: virtual std::string ToString();

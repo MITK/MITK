@@ -37,11 +37,11 @@ namespace cherry {
  * tester extension point. For the following property test extension
  * <pre>
  *   &lt;propertyTester
- *       namespace="org.eclipse.jdt.core"
- *       id="org.eclipse.jdt.core.IPackageFragmentTester"
+ *       namespace="org.opencherry.jdt.core"
+ *       id="org.opencherry.jdt.core.IPackageFragmentTester"
  *       properties="isDefaultPackage"
- *       type="org.eclipse.jdt.core.IPackageFragment"
- *       class="org.eclipse.demo.MyPackageFragmentTester"&gt;
+ *       type="org.opencherry.jdt.core.IPackageFragment"
+ *       class="org.opencherry.demo.MyPackageFragmentTester"&gt;
  *     &lt;/propertyTester&gt;
  * </pre>
  * the corresponding implementation class looks like:
@@ -61,8 +61,8 @@ namespace cherry {
  * </pre>
  * The property can then be used in a test expression as follows:
  * <pre>
- *   &lt;instanceof value="org.eclipse.core.IPackageFragment"/&gt;
- *   &lt;test property="org.eclipse.jdt.core.isDefaultPackage"/&gt;
+ *   &lt;instanceof value="org.opencherry.core.IPackageFragment"/&gt;
+ *   &lt;test property="org.opencherry.jdt.core.isDefaultPackage"/&gt;
  * </pre>
  * </p>
  * <p>

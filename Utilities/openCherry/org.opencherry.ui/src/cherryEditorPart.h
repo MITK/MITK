@@ -37,7 +37,7 @@ namespace cherry {
  * editor extension point (named <code>"org.mitk.ui.editors"</code>).
  * For example, the plug-in's XML markup might contain:
  * <pre>
- * &LT;extension point="org.eclipse.ui.editors"&GT;
+ * &LT;extension point="org.opencherry.ui.editors"&GT;
  *      &LT;editor id="com.example.myplugin.ed"
  *         name="My Editor"
  *         icon="./images/cedit.gif"
@@ -132,12 +132,12 @@ protected:
     virtual void SetInputWithNotify(IEditorInput::Pointer input);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
+     * @see org.opencherry.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
      */
     virtual void SetContentDescription(const std::string& description);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.part.WorkbenchPart#setPartName(java.lang.String)
+     * @see org.opencherry.ui.part.WorkbenchPart#setPartName(java.lang.String)
      */
     virtual void SetPartName(const std::string& partName);
     

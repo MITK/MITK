@@ -26,7 +26,7 @@ class AdapterManager;
  * The callback interface for the elements desiring to lazily supply
  * information to the adapter manager.
  * 
- * @since org.eclipse.core.runtime 3.2
+ * @since org.opencherry.core.runtime 3.2
  */
 struct IAdapterManagerProvider {
 

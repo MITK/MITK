@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryPageSelectionService.h"
@@ -28,7 +28,7 @@ ISelectionService::SelectionEvents& PageSelectionService::GetSelectionEvents(con
   {
     return selectionEvents;
   }
-  
+
   return this->GetPerPartTracker(partId)->GetSelectionEvents();
 }
 
@@ -63,7 +63,8 @@ void PageSelectionService::PostSelectionListener::SelectionChanged(
 
 void PageSelectionService::AddSelectionListener(ISelectionListener::Pointer l)
 {
-  selectionEvents.selectionChanged.AddListener(l.GetPointer(),
+  selectionEvents.selectionChanged +=
+    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
       &ISelectionListener::SelectionChanged);
 }
 
@@ -76,7 +77,8 @@ void PageSelectionService::AddSelectionListener(const std::string& partId,
 void PageSelectionService::AddPostSelectionListener(
     ISelectionListener::Pointer l)
 {
-  selectionEvents.postSelectionChanged.AddListener(l.GetPointer(),
+  selectionEvents.postSelectionChanged +=
+    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
       &ISelectionListener::SelectionChanged);
 }
 
@@ -88,7 +90,8 @@ void PageSelectionService::AddPostSelectionListener(const std::string& partId,
 
 void PageSelectionService::RemoveSelectionListener(ISelectionListener::Pointer l)
 {
-  selectionEvents.selectionChanged.RemoveListener(l.GetPointer(),
+  selectionEvents.selectionChanged -=
+    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
       &ISelectionListener::SelectionChanged);
 }
 
@@ -101,7 +104,8 @@ void PageSelectionService::RemovePostSelectionListener(
 void PageSelectionService::RemovePostSelectionListener(
     ISelectionListener::Pointer l)
 {
-  selectionEvents.postSelectionChanged.RemoveListener(l.GetPointer(),
+  selectionEvents.postSelectionChanged -=
+    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
       &ISelectionListener::SelectionChanged);
 }
 
@@ -130,7 +134,7 @@ void PageSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
 
 PagePartSelectionTracker::Pointer PageSelectionService::GetPerPartTracker(
     const std::string& partId)
-{ 
+{
   PagePartSelectionTracker::Pointer tracker;
   std::map<std::string, PagePartSelectionTracker::Pointer>::iterator res = perPartTrackers.find(partId);
   if (res == perPartTrackers.end())
@@ -142,7 +146,7 @@ PagePartSelectionTracker::Pointer PageSelectionService::GetPerPartTracker(
   {
     tracker = res->second;
   }
-  
+
   return tracker;
 }
 

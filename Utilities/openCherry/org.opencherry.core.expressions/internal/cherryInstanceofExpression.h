@@ -47,7 +47,7 @@ public:
 	InstanceofExpression(const std::string& typeName);
 	
 	/* (non-Javadoc)
-	 * @see org.eclipse.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
+	 * @see org.opencherry.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
 	 */
 	EvaluationResult Evaluate(IEvaluationContext* context);
 	

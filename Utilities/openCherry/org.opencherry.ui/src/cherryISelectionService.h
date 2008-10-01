@@ -40,17 +40,19 @@ namespace cherry {
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * @see org.eclipse.ui.ISelectionListener
- * @see org.eclipse.ui.INullSelectionListener
+ * @see org.opencherry.ui.ISelectionListener
+ * @see org.opencherry.ui.INullSelectionListener
  */
 struct CHERRY_UI ISelectionService {
 
   struct SelectionEvents {
 
     typedef Message2<IWorkbenchPart::Pointer, ISelection::Pointer> SelectionEvent;
+    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer, ISelection::Pointer> Delegate;
 
     SelectionEvent selectionChanged;
     SelectionEvent postSelectionChanged;
+
   };
 
   virtual ~ISelectionService() {}

@@ -1,24 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIPARTLISTENER_H_
 #define CHERRYIPARTLISTENER_H_
 
 #include <cherryMacros.h>
+#include <cherryMessage.h>
 
 #include "cherryUiDll.h"
 #include "cherryIWorkbenchPartReference.h"
@@ -27,17 +28,37 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Interface for listening to part lifecycle events.
- * <p> 
+ * <p>
  * This interface may be implemented by clients.
  * </p>
  *
  * @see IPartService#AddPartListener(IPartListener)
  */
 struct CHERRY_UI IPartListener : public virtual Object {
-  
+
   cherryClassMacro(IPartListener);
+
+  struct Events {
+
+    typedef Message1<IWorkbenchPartReference::Pointer> PartEvent;
+
+    PartEvent partActivated;
+    PartEvent partBroughtToTop;
+    PartEvent partClosed;
+    PartEvent partDeactivated;
+    PartEvent partOpened;
+    PartEvent partHidden;
+    PartEvent partVisible;
+    PartEvent partInputChanged;
+
+    void AddListener(IPartListener::Pointer listener);
+    void RemoveListener(IPartListener::Pointer listener);
+
+  private:
+    typedef MessageDelegate1<IPartListener, IWorkbenchPartReference::Pointer> Delegate;
+  };
 
     /**
      * Notifies this listener that the given part has been activated.
@@ -45,14 +66,14 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was activated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartActivated(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartActivated(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part has been brought to the top.
      * <p>
      * These events occur when an editor is brought to the top in the editor area,
      * or when a view is brought to the top in a page book with multiple views.
-     * They are normally only sent when a part is brought to the top 
+     * They are normally only sent when a part is brought to the top
      * programmatically (via <code>IPerspective.bringToTop</code>). When a part is
      * activated by the user clicking on it, only <code>partActivated</code> is sent.
      * </p>
@@ -60,7 +81,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was surfaced
      * @see IWorkbenchPage#bringToTop
      */
-    virtual void PartBroughtToTop(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartBroughtToTop(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part has been closed.
@@ -73,7 +94,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was closed
      * @see IWorkbenchPage#hideView
      */
-    virtual void PartClosed(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartClosed(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part has been deactivated.
@@ -81,7 +102,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was deactivated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartDeactivated(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartDeactivated(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part has been opened.
@@ -94,28 +115,28 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was opened
      * @see IWorkbenchPage#showView
      */
-    virtual void PartOpened(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartOpened(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part is hidden or obscured by another part.
      *
      * @param partRef the part that is hidden or obscured by another part
      */
-    virtual void PartHidden(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartHidden(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part is visible.
      *
      * @param partRef the part that is visible
      */
-    virtual void PartVisible(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartVisible(IWorkbenchPartReference::Pointer partRef) {};
 
     /**
      * Notifies this listener that the given part's input was changed.
      *
      * @param partRef the part whose input was changed
      */
-    virtual void PartInputChanged(IWorkbenchPartReference::Pointer partRef) = 0;
+    virtual void PartInputChanged(IWorkbenchPartReference::Pointer partRef) {};
 };
 
 }  // namespace cherry

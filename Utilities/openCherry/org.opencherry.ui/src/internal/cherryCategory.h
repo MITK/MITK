@@ -165,7 +165,7 @@ public:
   bool HasElements() const;
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+   * @see org.opencherry.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
    */
   ElementType* GetParent(const ElementType& o);
 

@@ -19,7 +19,11 @@
 #define CHERRYISELECTIONCHANGEDLISTENER_H_
 
 #include "cherryUiDll.h"
-#include "cherryMacros.h"
+
+#include <cherryMacros.h>
+#include <cherryMessage.h>
+
+#include "cherrySelectionChangedEvent.h"
 
 namespace cherry
 {
@@ -39,12 +43,24 @@ struct CHERRY_UI ISelectionChangedListener : public virtual Object {
 
   cherryInterfaceMacro(ISelectionChangedListener, cherry);
 
+  struct Events {
+
+    Message1<SelectionChangedEvent::Pointer > selectionChanged;
+
+    void AddListener(ISelectionChangedListener::Pointer listener);
+    void RemoveListener(ISelectionChangedListener::Pointer listener);
+
+  private:
+
+    typedef MessageDelegate1<ISelectionChangedListener, SelectionChangedEvent::Pointer> Delegate;
+  };
+
     /**
      * Notifies that the selection has changed.
      *
      * @param event event object describing the change
      */
-  virtual void SelectionChanged(SmartPointer<SelectionChangedEvent> event) = 0;
+  virtual void SelectionChanged(SelectionChangedEvent::Pointer event) = 0;
 };
 
 }

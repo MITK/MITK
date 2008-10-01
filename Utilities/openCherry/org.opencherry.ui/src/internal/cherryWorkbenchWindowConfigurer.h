@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYWORKBENCHWINDOWCONFIGURER_H_
@@ -36,14 +36,14 @@ class WorkbenchWindow;
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- * 
+ *
  * @since 3.0
  */
 class WorkbenchWindowConfigurer : public IWorkbenchWindowConfigurer {
 
 public:
   cherryClassMacro(WorkbenchWindowConfigurer);
-  
+
     /**
      * The workbench window associated with this configurer.
      */
@@ -114,7 +114,7 @@ public:
      */
     private: Point initialSize;
 
-    
+
     /**
      * Action bar configurer that changes this workbench window.
      * This implementation keeps track of of cool bar items
@@ -123,26 +123,26 @@ public:
 
         private: IActionBarConfigurer::Pointer proxy;
         private: SmartPointer<WorkbenchWindow> window;
-        
+
         public: cherryClassMacro(WindowActionBarConfigurer);
-        
+
         public: WindowActionBarConfigurer(SmartPointer<WorkbenchWindow> wnd);
-        
+
         /**
          * Sets the proxy to use, or <code>null</code> for none.
-         * 
+         *
          * @param proxy the proxy
          */
         public: void SetProxy(IActionBarConfigurer::Pointer proxy);
-        
+
         /* (non-Javadoc)
-         * @see org.eclipse.ui.application.IActionBarConfigurer#getWindowConfigurer()
+         * @see org.opencherry.ui.application.IActionBarConfigurer#getWindowConfigurer()
          */
         public: IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer();
-        
+
         /**
          * Returns whether the given id is for a cool item.
-         * 
+         *
          * @param the item id
          * @return <code>true</code> if it is a cool item,
          * and <code>false</code> otherwise
@@ -161,7 +161,7 @@ public:
 //        }
 
         /* (non-Javadoc)
-         * @see org.eclipse.ui.application.IActionBarConfigurer
+         * @see org.opencherry.ui.application.IActionBarConfigurer
          */
 //        public: IStatusLineManager getStatusLineManager() {
 //            if (proxy != null) {
@@ -171,12 +171,12 @@ public:
 //        }
 
         /* (non-Javadoc)
-         * @see org.eclipse.ui.application.IActionBarConfigurer
+         * @see org.opencherry.ui.application.IActionBarConfigurer
          */
         public: void* GetMenuManager();
 
         /* (non-Javadoc)
-         * @see org.eclipse.ui.internal.AbstractActionBarConfigurer
+         * @see org.opencherry.ui.internal.AbstractActionBarConfigurer
          */
 //        public: ICoolBarManager getCoolBarManager() {
 //            if (proxy != null) {
@@ -186,7 +186,7 @@ public:
 //        }
 
         /* (non-Javadoc)
-         * @see org.eclipse.ui.application.IActionBarConfigurer
+         * @see org.opencherry.ui.application.IActionBarConfigurer
          */
 //        public: void registerGlobalAction(IAction action) {
 //            if (proxy != null) {
@@ -195,10 +195,10 @@ public:
 //            window.registerGlobalAction(action);
 //        }
 
-    
+
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IActionBarConfigurer#createToolBarManager()
+     * @see org.opencherry.ui.application.IActionBarConfigurer#createToolBarManager()
      */
 //    public: IToolBarManager createToolBarManager() {
 //      if (proxy != null) {
@@ -208,7 +208,7 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IActionBarConfigurer#createToolBarContributionItem(org.eclipse.jface.action.IToolBarManager, java.lang.String)
+     * @see org.opencherry.ui.application.IActionBarConfigurer#createToolBarContributionItem(org.opencherry.jface.action.IToolBarManager, java.lang.String)
      */
 //    public: IToolBarContributionItem createToolBarContributionItem(IToolBarManager toolBarManager, String id) {
 //      if (proxy != null) {
@@ -217,9 +217,9 @@ public:
 //      return getActionBarPresentationFactory().createToolBarContributionItem(toolBarManager, id);
 //    }
     };
-    
+
     /**
-      * Object for configuring this workbench window's action bars. 
+      * Object for configuring this workbench window's action bars.
       * Lazily initialized to an instance unique to this window.
       */
      private: WindowActionBarConfigurer::Pointer actionBarConfigurer;
@@ -228,94 +228,94 @@ public:
      * Creates a new workbench window configurer.
      * <p>
      * This method is declared package-private:. Clients obtain instances
-     * via {@link WorkbenchAdvisor#getWindowConfigurer 
+     * via {@link WorkbenchAdvisor#getWindowConfigurer
      * WorkbenchAdvisor.getWindowConfigurer}
      * </p>
-     * 
+     *
      * @param window the workbench window that this object configures
      * @see WorkbenchAdvisor#getWindowConfigurer
      */
      public: WorkbenchWindowConfigurer(SmartPointer<WorkbenchWindow> window);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getWindow
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getWindow
      */
     public: IWorkbenchWindow::Pointer GetWindow();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getWorkbenchConfigurer()
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getWorkbenchConfigurer()
      */
     public: IWorkbenchConfigurer::Pointer GetWorkbenchConfigurer();
 
     /**
      * Returns the title as set by <code>setTitle</code>, without consulting the shell.
-     * 
+     *
      * @return the window title as set, or <code>null</code> if not set
      */
     /* package */std::string BasicGetTitle();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getTitle
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getTitle
      */
     public: std::string GetTitle();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#setTitle
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#setTitle
      */
     public: void SetTitle(const std::string& title);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getShowMenuBar
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getShowMenuBar
      */
     public: bool GetShowMenuBar();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#setShowMenuBar
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#setShowMenuBar
      */
     public: void SetShowMenuBar(bool show);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getShowToolBar
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getShowToolBar
      */
     public: bool GetShowCoolBar();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: void SetShowCoolBar(bool show);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: bool GetShowPerspectiveBar();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: void SetShowPerspectiveBar(bool show);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getShowStatusLine
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getShowStatusLine
      */
     public: bool GetShowStatusLine();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#setShowStatusLine
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#setShowStatusLine
      */
     public: void SetShowStatusLine(bool show);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: bool GetShowProgressIndicator();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: void SetShowProgressIndicator(bool show);
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#getData
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#getData
      */
 //    public: Object getData(String key) {
 //        if (key == null) {
@@ -325,7 +325,7 @@ public:
 //    }
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#setData
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#setData
      */
 //    public: void setData(String key, Object data) {
 //        if (key == null) {
@@ -339,7 +339,7 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#addEditorAreaTransfer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#addEditorAreaTransfer
      */
 //    public: void addEditorAreaTransfer(Transfer tranfer) {
 //        if (tranfer != null && !transferTypes.contains(tranfer)) {
@@ -360,7 +360,7 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
 //    public: void configureEditorAreaDropListener(
 //            DropTargetListener dropTargetListener) {
@@ -396,13 +396,13 @@ public:
 //    }
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: IActionBarConfigurer::Pointer GetActionBarConfigurer();
 
     /**
      * Returns whether the given id is for a cool item.
-     * 
+     *
      * @param the item id
      * @return <code>true</code> if it is a cool item,
      * and <code>false</code> otherwise
@@ -414,41 +414,41 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: int GetShellStyle();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: void SetShellStyle(int shellStyle);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: Point GetInitialSize();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
     public: void SetInitialSize(Point size);
 
     /**
      * Creates the default window contents.
-     * 
+     *
      * @param shell the shell
      */
-    public: void CreateDefaultContents(void* shell);
+    public: void CreateDefaultContents(Shell::Pointer shell);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
 //    public: Menu createMenuBar() {
 //        return window.getMenuManager().createMenuBar(window.getShell());
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
 //    public: Control createCoolBarControl(Composite parent) {
 //      ICoolBarManager coolBarManager = window.getCoolBarManager2();
@@ -464,21 +464,19 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
 //    public: Control createStatusLineControl(Composite parent) {
 //        return window.getStatusLineManager().createControl(parent);
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer
      */
-//    public: Control createPageComposite(Composite parent) {
-//        return window.createPageComposite(parent);
-//    }
-  
+    public: void* CreatePageComposite(void* parent);
+
   /* (non-Javadoc)
-   * @see org.eclipse.ui.application.IWorkbenchWindowConfigurer#saveState(org.eclipse.ui.IMemento)
+   * @see org.opencherry.ui.application.IWorkbenchWindowConfigurer#saveState(org.opencherry.ui.IMemento)
    */
   public: bool SaveState(IMemento::Pointer memento) ;
 

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryWorkbenchPagePartList.h"
@@ -33,7 +33,7 @@ void WorkbenchPagePartList::FirePartClosed(IWorkbenchPartReference::Pointer part
 
 void WorkbenchPagePartList::FirePartAdded(IWorkbenchPartReference::Pointer part)
 {
-  // TODO: There is no listener for workbench page additions yet 
+  // TODO: There is no listener for workbench page additions yet
 }
 
 void WorkbenchPagePartList::FirePartRemoved(
@@ -57,8 +57,8 @@ void WorkbenchPagePartList::FireActivePartChanged(
 {
   partService.SetActivePart(newRef);
 
-  //IWorkbenchPart realPart = newRef == null? null : newRef.getPart(false);
-  //selectionService.setActivePart(realPart);
+  IWorkbenchPart::Pointer realPart = newRef == 0 ? 0 : newRef->GetPart(false);
+  selectionService->SetActivePart(realPart);
 }
 
 void WorkbenchPagePartList::FirePartHidden(IWorkbenchPartReference::Pointer ref)
@@ -77,10 +77,10 @@ void WorkbenchPagePartList::FirePartInputChanged(
   partService.FirePartInputChanged(ref);
 }
 
-WorkbenchPagePartList::WorkbenchPagePartList(/*PageSelectionService selectionService*/) :
-  partService("", "")
+WorkbenchPagePartList::WorkbenchPagePartList(PageSelectionService* selService) :
+  selectionService(selService), partService("", "")
 {
-  //this.selectionService = selectionService;
+
 }
 
 IPartService* WorkbenchPagePartList::GetPartService()

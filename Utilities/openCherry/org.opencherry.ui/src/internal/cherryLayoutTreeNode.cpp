@@ -1,76 +1,95 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryLayoutTreeNode.h"
 
+#include "../cherryConstants.h"
+#include "../cherryIPageLayout.h"
+
+#include <sstream>
+
 namespace cherry
 {
 
-LayoutTreeNode::LayoutTreeNode(LayoutPartSash::Pointer sash)
+LayoutTreeNode::ChildSizes::ChildSizes (int l, int r, bool resize)
 {
-  super(sash);
+  left = l;
+  right = r;
+  resizable = resize;
+}
+
+LayoutTreeNode::LayoutTreeNode(LayoutPartSash::Pointer sash)
+ : LayoutTree(sash)
+{
+  children[0] = 0;
+  children[1] = 0;
+}
+
+LayoutTreeNode::~LayoutTreeNode()
+{
+
 }
 
 void LayoutTreeNode::FlushChildren()
 {
-  super.flushChildren();
+  LayoutTree::FlushChildren();
 
-  children[0].flushChildren();
-  children[1].flushChildren();
+  children[0]->FlushChildren();
+  children[1]->FlushChildren();
 }
 
-LayoutPart::Pointer LayoutTreeNode::FindPart(int x, int y)
+LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
 {
-  if (!children[0].isVisible())
+  if (!children[0]->IsVisible())
   {
-    if (!children[1].isVisible())
+    if (!children[1]->IsVisible())
     {
-      return null;
+      return 0;
     }
 
-    return children[1].findPart(toFind);
+    return children[1]->FindPart(toFind);
   }
   else
   {
-    if (!children[1].isVisible())
+    if (!children[1]->IsVisible())
     {
-      return children[0].findPart(toFind);
+      return children[0]->FindPart(toFind);
     }
   }
 
-  LayoutPartSash sash = getSash();
+  LayoutPartSash::Pointer sash = this->GetSash();
 
-  Rectangle bounds = sash.getBounds();
+  Rectangle bounds = sash->GetBounds();
 
-  if (sash.isVertical())
+  if (sash->IsVertical())
   {
     if (toFind.x < bounds.x + (bounds.width / 2))
     {
-      return children[0].findPart(toFind);
+      return children[0]->FindPart(toFind);
     }
-    return children[1].findPart(toFind);
+    return children[1]->FindPart(toFind);
   }
   else
   {
     if (toFind.y < bounds.y + (bounds.height / 2))
     {
-      return children[0].findPart(toFind);
+      return children[0]->FindPart(toFind);
     }
-    return children[1].findPart(toFind);
+    return children[1]->FindPart(toFind);
   }
 }
 
@@ -78,107 +97,107 @@ LayoutPart::Pointer LayoutTreeNode::ComputeRelation(
     std::list<PartSashContainer::RelationshipInfo>& relations)
 {
   PartSashContainer::RelationshipInfo r =
-      new PartSashContainer::RelationshipInfo();
-  r.relative = children[0].computeRelation(relations);
-  r.part = children[1].computeRelation(relations);
-  r.left = getSash().getLeft();
-  r.right = getSash().getRight();
-  r.relationship = getSash().isVertical() ? IPageLayout.RIGHT : IPageLayout.BOTTOM;
-  relations.add(0, r);
+      PartSashContainer::RelationshipInfo();
+  r.relative = children[0]->ComputeRelation(relations);
+  r.part = children[1]->ComputeRelation(relations);
+  r.left = this->GetSash()->GetLeft();
+  r.right = this->GetSash()->GetRight();
+  r.relationship = this->GetSash()->IsVertical() ? IPageLayout::RIGHT : IPageLayout::BOTTOM;
+  relations.push_front(r);
   return r.relative;
 }
 
 void LayoutTreeNode::DisposeSashes()
 {
-  children[0].disposeSashes();
-  children[1].disposeSashes();
-  getSash().dispose();
+  children[0]->DisposeSashes();
+  children[1]->DisposeSashes();
+  this->GetSash()->Dispose();
 }
 
-LayoutTree* LayoutTreeNode::Find(LayoutPart::Pointer child)
+LayoutTree::Pointer LayoutTreeNode::Find(LayoutPart::Pointer child)
 {
-  LayoutTree node = children[0].find(child);
-  if (node != null)
+  LayoutTree::Pointer node = children[0]->Find(child);
+  if (node != 0)
   {
     return node;
   }
-  node = children[1].find(child);
+  node = children[1]->Find(child);
   return node;
 }
 
 LayoutPart::Pointer LayoutTreeNode::FindBottomRight()
 {
-  if (children[1].isVisible())
+  if (children[1]->IsVisible())
   {
-    return children[1].findBottomRight();
+    return children[1]->FindBottomRight();
   }
-  return children[0].findBottomRight();
+  return children[0]->FindBottomRight();
 }
 
 LayoutTreeNode* LayoutTreeNode::FindCommonParent(LayoutPart::Pointer child1,
-    LayoutPart::Pointer child2, bool foundChild1 = false,
-    bool foundChild2 = false)
+    LayoutPart::Pointer child2, bool foundChild1,
+    bool foundChild2)
 {
   if (!foundChild1)
   {
-    foundChild1 = find(child1) != null;
+    foundChild1 = this->Find(child1) != 0;
   }
   if (!foundChild2)
   {
-    foundChild2 = find(child2) != null;
+    foundChild2 = this->Find(child2) != 0;
   }
   if (foundChild1 && foundChild2)
   {
     return this;
   }
-  if (parent == null)
+  if (parent == 0)
   {
-    return null;
+    return 0;
   }
   return parent
-  .findCommonParent(child1, child2, foundChild1, foundChild2);
+  ->FindCommonParent(child1, child2, foundChild1, foundChild2);
 }
 
-LayoutTreeNode* LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
+LayoutTreeNode::Pointer LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
 {
-  if (this.getSash() == sash)
+  if (this->GetSash() == sash)
   {
     return this;
   }
-  LayoutTreeNode node = children[0].findSash(sash);
-  if (node != null)
+  LayoutTreeNode::Pointer node = children[0]->FindSash(sash);
+  if (node != 0)
   {
     return node;
   }
-  node = children[1].findSash(sash);
-  if (node != null)
+  node = children[1]->FindSash(sash);
+  if (node != 0)
   {
     return node;
   }
-  return null;
+  return 0;
 }
 
-void LayoutTreeNode::FindSashes(LayoutTree* child, PartPane::Sashes sashes)
+void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sashes)
 {
-  Sash sash = (Sash) getSash().getControl();
-  boolean leftOrTop = children[0] == child;
-  if (sash != null)
+  void* sash = this->GetSash()->GetControl();
+  bool leftOrTop = children[0] == child;
+  if (sash != 0)
   {
-    LayoutPartSash partSash = getSash();
-    //If the child is in the left, the sash 
+    LayoutPartSash::Pointer partSash = this->GetSash();
+    //If the child is in the left, the sash
     //is in the rigth and so on.
     if (leftOrTop)
     {
-      if (partSash.isVertical())
+      if (partSash->IsVertical())
       {
-        if (sashes.right == null)
+        if (sashes.right == 0)
         {
           sashes.right = sash;
         }
       }
       else
       {
-        if (sashes.bottom == null)
+        if (sashes.bottom == 0)
         {
           sashes.bottom = sash;
         }
@@ -186,71 +205,71 @@ void LayoutTreeNode::FindSashes(LayoutTree* child, PartPane::Sashes sashes)
     }
     else
     {
-      if (partSash.isVertical())
+      if (partSash->IsVertical())
       {
-        if (sashes.left == null)
+        if (sashes.left == 0)
         {
           sashes.left = sash;
         }
       }
       else
       {
-        if (sashes.top == null)
+        if (sashes.top == 0)
         {
           sashes.top = sash;
         }
       }
     }
   }
-  if (getParent() != null)
+  if (this->GetParent() != 0)
   {
-    getParent().findSashes(this, sashes);
+    this->GetParent()->FindSashes(this, sashes);
   }
 }
 
-LayoutPartSash::Poiter LayoutTreeNode::GetSash()
+LayoutPartSash::Pointer LayoutTreeNode::GetSash() const
 {
-  return (LayoutPartSash) part;
+  return part.Cast<LayoutPartSash>();
 }
 
-int LayoutTreeNode::GetSashSize()
+int LayoutTreeNode::GetSashSize() const
 {
-  return getSash().getSashSize();
+  return this->GetSash()->GetSashSize();
 }
 
 bool LayoutTreeNode::IsVisible()
 {
-  return children[0].isVisible() || children[1].isVisible();
+  return children[0]->IsVisible() || children[1]->IsVisible();
 }
 
-LayoutTree* LayoutTreeNode::Remove(LayoutTree* child)
+LayoutTree::Pointer LayoutTreeNode::Remove(LayoutTree::Pointer child)
 {
-  getSash().dispose();
-  if (parent == null)
+  this->GetSash()->Dispose();
+  if (parent == 0)
   {
     //This is the root. Return the other child to be the new root.
     if (children[0] == child)
     {
-      children[1].setParent(null);
+      children[1]->SetParent(0);
       return children[1];
     }
-    children[0].setParent(null);
+    children[0]->SetParent(0);
     return children[0];
   }
 
-  LayoutTreeNode oldParent = parent;
+  LayoutTreeNode* oldParent = parent;
   if (children[0] == child)
   {
-    oldParent.replaceChild(this, children[1]);
+    oldParent->ReplaceChild(this, children[1]);
   }
   else
   {
-    oldParent.replaceChild(this, children[0]);
+    oldParent->ReplaceChild(this, children[0]);
   }
   return oldParent;
 }
 
-void LayoutTreeNode::ReplaceChild(LayoutTree* oldChild, LayoutTree* newChild)
+void LayoutTreeNode::ReplaceChild(LayoutTree::Pointer oldChild, LayoutTree::Pointer newChild)
 {
   if (children[0] == oldChild)
   {
@@ -260,36 +279,36 @@ void LayoutTreeNode::ReplaceChild(LayoutTree* oldChild, LayoutTree* newChild)
   {
     children[1] = newChild;
   }
-  newChild.setParent(this);
-  if (!children[0].isVisible() || !children[0].isVisible())
+  newChild->SetParent(this);
+  if (!children[0]->IsVisible() || !children[0]->IsVisible())
   {
-    getSash().dispose();
+    this->GetSash()->Dispose();
   }
 
-  flushCache();
+  this->FlushCache();
 }
 
-bool LayoutTreeNode::SameDirection(bool isVertical, LayoutTreeNode* subTree)
+bool LayoutTreeNode::SameDirection(bool isVertical, LayoutTreeNode::Pointer subTree)
 {
-  boolean treeVertical = getSash().isVertical();
+  bool treeVertical = this->GetSash()->IsVertical();
   if (treeVertical != isVertical)
   {
     return false;
   }
-  while (subTree != null)
+  while (subTree != 0)
   {
     if (this == subTree)
     {
       return true;
     }
-    if (subTree.children[0].isVisible() && subTree.children[1].isVisible())
+    if (subTree->children[0]->IsVisible() && subTree->children[1]->IsVisible())
     {
-      if (subTree.getSash().isVertical() != isVertical)
+      if (subTree->GetSash()->IsVertical() != isVertical)
       {
         return false;
       }
     }
-    subTree = subTree.getParent();
+    subTree = subTree->GetParent();
   }
   return true;
 }
@@ -297,20 +316,20 @@ bool LayoutTreeNode::SameDirection(bool isVertical, LayoutTreeNode* subTree)
 int LayoutTreeNode::DoComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
-  assertValidSize(availablePerpendicular);
-  assertValidSize(availableParallel);
-  assertValidSize(preferredParallel);
+  this->AssertValidSize(availablePerpendicular);
+  this->AssertValidSize(availableParallel);
+  this->AssertValidSize(preferredParallel);
 
   // If one child is invisible, defer to the other child
-  if (!children[0].isVisible())
+  if (!children[0]->IsVisible())
   {
-    return children[1].computePreferredSize(width, availableParallel,
+    return children[1]->ComputePreferredSize(width, availableParallel,
         availablePerpendicular, preferredParallel);
   }
 
-  if (!children[1].isVisible())
+  if (!children[1]->IsVisible())
   {
-    return children[0].computePreferredSize(width, availableParallel,
+    return children[0]->ComputePreferredSize(width, availableParallel,
         availablePerpendicular, preferredParallel);
   }
 
@@ -320,32 +339,32 @@ int LayoutTreeNode::DoComputePreferredSize(bool width, int availableParallel,
   }
 
   // If computing the dimension perpendicular to our sash
-  if (width == getSash().isVertical())
+  if (width == this->GetSash()->IsVertical())
   {
     // Compute the child sizes
-    ChildSizes sizes = computeChildSizes(availableParallel,
-        availablePerpendicular, getSash().getLeft(), getSash().getRight(), preferredParallel);
+    ChildSizes sizes = this->ComputeChildSizes(availableParallel,
+        availablePerpendicular,
+        GetSash()->GetLeft(), GetSash()->GetRight(), preferredParallel);
 
     // Return the sum of the child sizes plus the sash size
-    return add(sizes.left, add(sizes.right, getSashSize()));
+    return this->Add(sizes.left, this->Add(sizes.right, this->GetSashSize()));
   }
   else
   {
     // Computing the dimension parallel to the sash. We will compute and return the preferred size
     // of whichever child is closest to the ideal size.
 
-    ChildSizes sizes;
     // First compute the dimension of the child sizes perpendicular to the sash
-    sizes = computeChildSizes(availablePerpendicular, availableParallel,
-        getSash().getLeft(), getSash().getRight(), availablePerpendicular);
+    ChildSizes sizes = this->ComputeChildSizes(availablePerpendicular, availableParallel,
+        GetSash()->GetLeft(), GetSash()->GetRight(), availablePerpendicular);
 
     // Use this information to compute the dimension of the child sizes parallel to the sash.
     // Return the preferred size of whichever child is largest
-    int leftSize = children[0].computePreferredSize(width, availableParallel,
+    int leftSize = children[0]->ComputePreferredSize(width, availableParallel,
         sizes.left, preferredParallel);
 
     // Compute the preferred size of the right child
-    int rightSize = children[1].computePreferredSize(width, availableParallel,
+    int rightSize = children[1]->ComputePreferredSize(width, availableParallel,
         sizes.right, preferredParallel);
 
     // Return leftSize or rightSize: whichever one is largest
@@ -355,43 +374,43 @@ int LayoutTreeNode::DoComputePreferredSize(bool width, int availableParallel,
       result = leftSize;
     }
 
-    assertValidSize(result);
+    this->AssertValidSize(result);
 
     return result;
   }
 }
 
-ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int height, int left,
+LayoutTreeNode::ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int height, int left,
     int right, int preferredWidth)
 {
-  Assert.isTrue(children[0].isVisible());
-  Assert.isTrue(children[1].isVisible());
-  assertValidSize(width);
-  assertValidSize(height);
-  assertValidSize(preferredWidth);
-  Assert.isTrue(left >= 0);
-  Assert.isTrue(right >= 0);
-  Assert.isTrue(preferredWidth >= 0);
-  Assert.isTrue(preferredWidth <= width);
-  boolean vertical = getSash().isVertical();
+  poco_assert(children[0]->IsVisible());
+  poco_assert(children[1]->IsVisible());
+  this->AssertValidSize(width);
+  this->AssertValidSize(height);
+  this->AssertValidSize(preferredWidth);
+  poco_assert(left >= 0);
+  poco_assert(right >= 0);
+  poco_assert(preferredWidth >= 0);
+  poco_assert(preferredWidth <= width);
+  bool vertical = this->GetSash()->IsVertical();
 
-  if (width <= getSashSize())
+  if (width <= this->GetSashSize())
   {
-    return new ChildSizes(0,0, false);
+    return ChildSizes(0,0, false);
   }
 
   if (width == INFINITE)
   {
     if (preferredWidth == INFINITE)
     {
-      return new ChildSizes(children[0].computeMaximumSize(vertical, height),
-          children[1].computeMaximumSize(vertical, height), false);
+      return ChildSizes(children[0]->ComputeMaximumSize(vertical, height),
+          children[1]->ComputeMaximumSize(vertical, height), false);
     }
 
     if (preferredWidth == 0)
     {
-      return new ChildSizes(children[0].computeMinimumSize(vertical, height),
-          children[1].computeMinimumSize(vertical, height), false);
+      return ChildSizes(children[0]->ComputeMinimumSize(vertical, height),
+          children[1]->ComputeMinimumSize(vertical, height), false);
     }
   }
 
@@ -399,7 +418,7 @@ ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int height, int left,
 
   // Use all-or-none weighting
   double wLeft = left, wRight = right;
-  switch (getCompressionBias())
+  switch (this->GetCompressionBias())
   {
   case -1:
     wLeft = 0.0;
@@ -414,142 +433,142 @@ ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int height, int left,
 
   // Subtract the SASH_WIDTH from preferredWidth and width. From here on, we'll deal with the
   // width available to the controls and neglect the space used by the sash.
-  preferredWidth = Math.max(0, subtract(preferredWidth, getSashSize()));
-  width = Math.max(0, subtract(width, getSashSize()));
+  preferredWidth = std::max(0, this->Subtract(preferredWidth, this->GetSashSize()));
+  width = std::max(0, this->Subtract(width, this->GetSashSize()));
 
-  int redistribute = subtract(preferredWidth, total);
+  int redistribute = this->Subtract(preferredWidth, total);
 
   // Compute the minimum and maximum sizes for each child
-  int leftMinimum = children[0].computeMinimumSize(vertical, height);
-  int rightMinimum = children[1].computeMinimumSize(vertical, height);
-  int leftMaximum = children[0].computeMaximumSize(vertical, height);
-  int rightMaximum = children[1].computeMaximumSize(vertical, height);
+  int leftMinimum = children[0]->ComputeMinimumSize(vertical, height);
+  int rightMinimum = children[1]->ComputeMinimumSize(vertical, height);
+  int leftMaximum = children[0]->ComputeMaximumSize(vertical, height);
+  int rightMaximum = children[1]->ComputeMaximumSize(vertical, height);
 
   // Keep track of the available space for each child, given the minimum size of the other child
-  int leftAvailable = Math.min(leftMaximum, Math.max(0, subtract(width,
+  int leftAvailable = std::min(leftMaximum, std::max(0, this->Subtract(width,
       rightMinimum)));
-  int rightAvailable = Math.min(rightMaximum, Math.max(0, subtract(width,
+  int rightAvailable = std::min(rightMaximum, std::max(0, this->Subtract(width,
       leftMinimum)));
 
   // Figure out the ideal size of the left child
-  int idealLeft = Math.max(leftMinimum, Math.min(preferredWidth, left
-      + (int) Math.round(redistribute * wLeft / wTotal)));
+  int idealLeft = std::max(leftMinimum, std::min(preferredWidth, left
+      + (int)(redistribute * wLeft / wTotal)));
 
   // If the right child can't use all its available space, let the left child fill it in
-  idealLeft = Math.max(idealLeft, preferredWidth - rightAvailable);
+  idealLeft = std::max(idealLeft, preferredWidth - rightAvailable);
   // Ensure the left child doesn't get larger than its available space
-  idealLeft = Math.min(idealLeft, leftAvailable);
+  idealLeft = std::min(idealLeft, leftAvailable);
 
-  // Check if the left child would prefer to be a different size 
-  idealLeft = children[0].computePreferredSize(vertical, leftAvailable, height,
+  // Check if the left child would prefer to be a different size
+  idealLeft = children[0]->ComputePreferredSize(vertical, leftAvailable, height,
       idealLeft);
 
   // Ensure that the left child is larger than its minimum size
-  idealLeft = Math.max(idealLeft, leftMinimum);
-  idealLeft = Math.min(idealLeft, leftAvailable);
+  idealLeft = std::max(idealLeft, leftMinimum);
+  idealLeft = std::min(idealLeft, leftAvailable);
 
   // Compute the right child width
-  int idealRight = Math.max(rightMinimum, preferredWidth - idealLeft);
+  int idealRight = std::max(rightMinimum, preferredWidth - idealLeft);
 
-  rightAvailable = Math.max(0, Math.min(rightAvailable, subtract(width,
+  rightAvailable = std::max(0, std::min(rightAvailable, this->Subtract(width,
       idealLeft)));
-  idealRight = Math.min(idealRight, rightAvailable);
-  idealRight = children[1].computePreferredSize(vertical, rightAvailable,
+  idealRight = std::min(idealRight, rightAvailable);
+  idealRight = children[1]->ComputePreferredSize(vertical, rightAvailable,
       height, idealRight);
-  idealRight = Math.max(idealRight, rightMinimum);
+  idealRight = std::max(idealRight, rightMinimum);
 
-  return new ChildSizes(idealLeft, idealRight, leftMaximum> leftMinimum
+  return ChildSizes(idealLeft, idealRight, leftMaximum> leftMinimum
       && rightMaximum> rightMinimum
       && leftMinimum + rightMinimum < width);
 }
 
 int LayoutTreeNode::DoGetSizeFlags(bool width)
 {
-  if (!children[0].isVisible())
+  if (!children[0]->IsVisible())
   {
-    return children[1].getSizeFlags(width);
+    return children[1]->GetSizeFlags(width);
   }
 
-  if (!children[1].isVisible())
+  if (!children[1]->IsVisible())
   {
-    return children[0].getSizeFlags(width);
+    return children[0]->GetSizeFlags(width);
   }
 
-  int leftFlags = children[0].getSizeFlags(width);
-  int rightFlags = children[1].getSizeFlags(width);
+  int leftFlags = children[0]->GetSizeFlags(width);
+  int rightFlags = children[1]->GetSizeFlags(width);
 
-  return ((leftFlags | rightFlags) & ~SWT.MAX) | (leftFlags & rightFlags
-      & SWT.MAX);
+  return ((leftFlags | rightFlags) & ~Constants::MAX) | (leftFlags & rightFlags
+      & Constants::MAX);
 }
 
-void LayoutTreeNode::DoSetBounds(const Rectangle& bounds)
+void LayoutTreeNode::DoSetBounds(const Rectangle& b)
 {
-  if (!children[0].isVisible())
+  if (!children[0]->IsVisible())
   {
-    children[1].setBounds(bounds);
-    getSash().setVisible(false);
+    children[1]->SetBounds(b);
+    this->GetSash()->SetVisible(false);
     return;
   }
-  if (!children[1].isVisible())
+  if (!children[1]->IsVisible())
   {
-    children[0].setBounds(bounds);
-    getSash().setVisible(false);
+    children[0]->SetBounds(b);
+    this->GetSash()->SetVisible(false);
     return;
   }
 
-  bounds = Geometry.copy(bounds);
+  Rectangle bounds = b;
 
-  boolean vertical = getSash().isVertical();
+  bool vertical = this->GetSash()->IsVertical();
 
-  // If this is a horizontal sash, flip coordinate systems so 
+  // If this is a horizontal sash, flip coordinate systems so
   // that we can eliminate special cases
   if (!vertical)
   {
-    Geometry.flipXY(bounds);
+    bounds.FlipXY();
   }
 
-  ChildSizes childSizes = computeChildSizes(bounds.width, bounds.height,
-      getSash().getLeft(), getSash().getRight(), bounds.width);
+  ChildSizes childSizes = this->ComputeChildSizes(bounds.width, bounds.height,
+      this->GetSash()->GetLeft(), this->GetSash()->GetRight(), bounds.width);
 
-  getSash().setVisible(true);
-  getSash().setEnabled(childSizes.resizable);
+  this->GetSash()->SetVisible(true);
+  this->GetSash()->SetEnabled(childSizes.resizable);
 
-  Rectangle leftBounds = new Rectangle(bounds.x, bounds.y, childSizes.left, bounds.height);
-  Rectangle sashBounds = new Rectangle(leftBounds.x + leftBounds.width, bounds.y, this.getSashSize(), bounds.height);
+  Rectangle leftBounds = Rectangle(bounds.x, bounds.y, childSizes.left, bounds.height);
+  Rectangle sashBounds = Rectangle(leftBounds.x + leftBounds.width, bounds.y, this->GetSashSize(), bounds.height);
   Rectangle
       rightBounds =
-          new Rectangle(sashBounds.x + sashBounds.width, bounds.y, childSizes.right, bounds.height);
+          Rectangle(sashBounds.x + sashBounds.width, bounds.y, childSizes.right, bounds.height);
 
   if (!vertical)
   {
-    Geometry.flipXY(leftBounds);
-    Geometry.flipXY(sashBounds);
-    Geometry.flipXY(rightBounds);
+    leftBounds.FlipXY();
+    sashBounds.FlipXY();
+    rightBounds.FlipXY();
   }
 
-  getSash().setBounds(sashBounds);
-  children[0].setBounds(leftBounds);
-  children[1].setBounds(rightBounds);
+  this->GetSash()->SetBounds(sashBounds);
+  children[0]->SetBounds(leftBounds);
+  children[1]->SetBounds(rightBounds);
 }
 
 void LayoutTreeNode::CreateControl(void* parent)
 {
-  children[0].createControl(parent);
-  children[1].createControl(parent);
-  getSash().createControl(parent);
+  children[0]->CreateControl(parent);
+  children[1]->CreateControl(parent);
+  this->GetSash()->CreateControl(parent);
 
-  super.createControl(parent);
+  LayoutTree::CreateControl(parent);
 }
 
 bool LayoutTreeNode::IsCompressible()
 {
-  return children[0].isCompressible() || children[1].isCompressible();
+  return children[0]->IsCompressible() || children[1]->IsCompressible();
 }
 
 int LayoutTreeNode::GetCompressionBias()
 {
-  boolean left = children[0].isCompressible();
-  boolean right = children[1].isCompressible();
+  bool left = children[0]->IsCompressible();
+  bool right = children[1]->IsCompressible();
   if (left == right)
   {
     return 0;
@@ -561,12 +580,12 @@ int LayoutTreeNode::GetCompressionBias()
   return 1;
 }
 
-bool LayoutTreeNode::IsLeftChild(LayoutTree* toTest)
+bool LayoutTreeNode::IsLeftChild(LayoutTree::ConstPointer toTest)
 {
   return children[0] == toTest;
 }
 
-LayoutTree* LayoutTreeNode::GetChild(bool left)
+LayoutTree::Pointer LayoutTreeNode::GetChild(bool left)
 {
   int index = left ? 0 : 1;
   return (children[index]);
@@ -574,72 +593,85 @@ LayoutTree* LayoutTreeNode::GetChild(bool left)
 
 void LayoutTreeNode::SetChild(bool left, LayoutPart::Pointer part)
 {
-  LayoutTree child = new LayoutTree(part);
-  setChild(left, child);
-  flushCache();
+  LayoutTree::Pointer child = new LayoutTree(part);
+  this->SetChild(left, child);
+  this->FlushCache();
 }
 
-void LayoutTreeNode::SetChild(bool left, LayoutTree* child)
+void LayoutTreeNode::SetChild(bool left, LayoutTree::Pointer child)
 {
   int index = left ? 0 : 1;
   children[index] = child;
-  child.setParent(this);
-  flushCache();
+  child->SetParent(this);
+  this->FlushCache();
 }
 
 std::string LayoutTreeNode::ToString()
 {
-  String s = "<null>\n";//$NON-NLS-1$
-  if (part.getControl() != null)
+  std::stringstream s;
+  s << "<null>\n";
+  if (part->GetControl() != 0)
   {
-    s = "<@" + part.getControl().hashCode() + ">\n";//$NON-NLS-2$//$NON-NLS-1$
+    s << "<@" << part->GetControl() << ">\n";//$NON-NLS-2$//$NON-NLS-1$
   }
-  String result = "["; //$NON-NLS-1$
-  if (children[0].getParent() != this)
+  std::stringstream result;
+  result << "["; //$NON-NLS-1$
+  if (children[0]->GetParent() != this)
   {
-    result = result + "{" + children[0] + "}" + s;//$NON-NLS-2$//$NON-NLS-1$
+    result << result.str() << "{" << children[0] << "}" << s.str();//$NON-NLS-2$//$NON-NLS-1$
   }
   else
   {
-    result = result + children[0] + s;
+    result << result.str() << children[0] << s.str();
   }
 
-  if (children[1].getParent() != this)
+  if (children[1]->GetParent() != this)
   {
-    result = result + "{" + children[1] + "}]";//$NON-NLS-2$//$NON-NLS-1$
+    result << result.str() << "{" << children[1] << "}]";//$NON-NLS-2$//$NON-NLS-1$
   }
   else
   {
-    result = result + children[1] + "]";//$NON-NLS-1$
+    result << result.str() << children[1] << "]";//$NON-NLS-1$
   }
-  return result;
+  return result.str();
 }
 
-void LayoutTreeNode::DescribeLayout(std::string& buf)
+//void LayoutTreeNode::UpdateSashes(void* parent) {
+//        if (parent == 0)
+//            return;
+//        children[0]->UpdateSashes(parent);
+//        children[1]->UpdateSashes(parent);
+//        if (children[0]->IsVisible() && children[1]->IsVisible())
+//            this->GetSash()->CreateControl(parent);
+//        else
+//            this->GetSash()->Dispose();
+//    }
+
+void LayoutTreeNode::DescribeLayout(std::string& buf) const
 {
-  if (!(children[0].isVisible()))
+  if (!(children[0]->IsVisible()))
   {
-    if (!children[1].isVisible())
+    if (!children[1]->IsVisible())
     {
       return;
     }
 
-    children[1].describeLayout(buf);
+    children[1]->DescribeLayout(buf);
     return;
   }
 
-  if (!children[1].isVisible())
+  if (!children[1]->IsVisible())
   {
-    children[0].describeLayout(buf);
+    children[0]->DescribeLayout(buf);
     return;
   }
 
   buf.append("("); //$NON-NLS-1$
-  children[0].describeLayout(buf);
+  children[0]->DescribeLayout(buf);
 
-  buf.append(getSash().isVertical() ? "|" : "-"); //$NON-NLS-1$ //$NON-NLS-2$
+  buf.append(this->GetSash()->IsVertical() ? "|" : "-"); //$NON-NLS-1$ //$NON-NLS-2$
 
-  children[1].describeLayout(buf);
+  children[1]->DescribeLayout(buf);
   buf.append(")"); //$NON-NLS-1$
 }
 

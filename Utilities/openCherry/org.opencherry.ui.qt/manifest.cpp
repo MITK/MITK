@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtWorkbenchTweaklet.h"
 #include "cherryQtWorkbenchPageTweaklet.h"
+#include "internal/cherryQtWidgetsTweaklet.h"
+#include "internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
 
 #include <cherryIViewPart.h>
 #include "cherryLogView.h"
@@ -29,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
   POCO_EXPORT_CLASS(cherry::QtUIPlugin)
 POCO_END_MANIFEST
+
+//****  Tweaklets  ****************
 
 POCO_BEGIN_NAMED_MANIFEST(cherryWorkbenchTweaklet, cherry::WorkbenchTweaklet)
   POCO_EXPORT_CLASS(cherry::QtWorkbenchTweaklet)
@@ -38,6 +42,17 @@ POCO_BEGIN_NAMED_MANIFEST(cherryWorkbenchPageTweaklet, cherry::WorkbenchPageTwea
   POCO_EXPORT_CLASS(cherry::QtWorkbenchPageTweaklet)
 POCO_END_MANIFEST
 
+POCO_BEGIN_NAMED_MANIFEST(cherryGuiWidgetsTweaklet, cherry::GuiWidgetsTweaklet)
+  POCO_EXPORT_CLASS(cherry::QtWidgetsTweaklet)
+POCO_END_MANIFEST
+
+
+//**** Views  **********************
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
   POCO_EXPORT_CLASS(cherry::LogView)
+POCO_END_MANIFEST
+
+//**** Presentation Factories *********
+POCO_BEGIN_NAMED_MANIFEST(cherryIPresentationFactory, cherry::IPresentationFactory)
+  POCO_EXPORT_CLASS(cherry::QtWorkbenchPresentationFactory)
 POCO_END_MANIFEST

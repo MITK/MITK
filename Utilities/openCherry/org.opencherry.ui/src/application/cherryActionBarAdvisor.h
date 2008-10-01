@@ -159,7 +159,7 @@ public:
      * <p>
      * In order to participate in key bindings, the action must have an action
      * definition id (aka command id), and a corresponding command extension.
-     * See the <code>org.eclipse.ui.commands</code> extension point documentation
+     * See the <code>org.opencherry.ui.commands</code> extension point documentation
      * for more details. 
      * </p>
      * 

@@ -66,7 +66,7 @@ public:
    * The default implementation does nothing. Subclasses who attach listeners
    * to other objects are encouraged to detach them in this method.
    * 
-   * @see org.eclipse.core.commands.IHandler#dispose()
+   * @see org.opencherry.core.commands.IHandler#dispose()
    */
   ~AbstractHandler() {
     // Do nothing.
@@ -109,7 +109,7 @@ protected:
    * Subclasses may extend the definition of this method (i.e., if a different
    * type of listener can be attached to a subclass). This is used primarily
    * for support of <code>AbstractHandler</code> in
-   * <code>org.eclipse.ui.workbench</code>, and clients should be wary of
+   * <code>org.opencherry.ui.workbench</code>, and clients should be wary of
    * overriding this behaviour. If this method is overridden, then the first
    * line of the method should be "<code>super.fireHandlerChanged(handlerEvent);</code>".
    * </p>
@@ -153,7 +153,7 @@ protected:
    * Subclasses may extend the definition of this method (i.e., if a different
    * type of listener can be attached to a subclass). This is used primarily
    * for support of <code>AbstractHandler</code> in
-   * <code>org.eclipse.ui.workbench</code>, and clients should be wary of
+   * <code>org.opencherry.ui.workbench</code>, and clients should be wary of
    * overriding this behaviour. If this method is overridden, then the return
    * value should include "<code>super.hasListeners() ||</code>".
    * </p>

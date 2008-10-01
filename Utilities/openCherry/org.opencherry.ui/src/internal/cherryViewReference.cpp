@@ -20,7 +20,7 @@
 #include <service/cherryIConfigurationElement.h>
 
 #include "../cherryUIException.h"
-#include "../tweaklets/cherryWorkbenchTweaklet.h"
+#include "../tweaklets/cherryWorkbenchPageTweaklet.h"
 #include "../cherryPlatformUI.h"
 
 #include "cherryWorkbenchPage.h"
@@ -186,7 +186,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
 
     IViewPart::Pointer part =
-        Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorViewPart(label, exception.displayText());
+        Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorViewPart(label, exception.displayText());
 
     if (part.IsNotNull())
     {
@@ -230,7 +230,9 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
 PartPane::Pointer ViewReference::CreatePane()
 {
-  return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateViewPane(this, this->factory->GetWorkbenchPage());
+  PartPane::Pointer pane = new PartPane(this, this->factory->GetWorkbenchPage());
+  return pane;
+  //return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateViewPane(this, this->factory->GetWorkbenchPage());
 }
 
 IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
@@ -273,9 +275,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
 
     view = desc->CreateView();
 
-    //      if (view instanceof IWorkbenchPart3) {
-    //        createPartProperties((IWorkbenchPart3)view);
-    //      }
+    this->CreatePartProperties(view);
+
     // Create site
     site = new ViewSite(this, view, factory->GetWorkbenchPage(), desc);
     //actionBars = new ViewActionBars(factory.page.getActionBars(), site,

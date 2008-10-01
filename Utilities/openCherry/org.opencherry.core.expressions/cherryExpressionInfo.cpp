@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExpressionInfo.h"
@@ -22,11 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 bool
-ExpressionInfo::HasDefaultVariableAccess() 
+ExpressionInfo::HasDefaultVariableAccess() const
 {
     return fHasDefaultVariableAccess;
   }
-  
+
 void
 ExpressionInfo::MarkDefaultVariableAccessed()
 {
@@ -34,55 +34,55 @@ ExpressionInfo::MarkDefaultVariableAccessed()
   }
 
 bool
-ExpressionInfo::HasSystemPropertyAccess() 
+ExpressionInfo::HasSystemPropertyAccess() const
 {
     return fHasSystemPropertyAccess;
   }
-  
-void 
-ExpressionInfo::MarkSystemPropertyAccessed() 
+
+void
+ExpressionInfo::MarkSystemPropertyAccessed()
 {
     fHasSystemPropertyAccess= true;
   }
 
-void
-ExpressionInfo::GetAccessedVariableNames(std::set<std::string>& names) 
+std::set<std::string>
+ExpressionInfo::GetAccessedVariableNames() const
 {
-  names = fAccessedVariableNames;
+  return fAccessedVariableNames;
 }
-  
-void 
-ExpressionInfo::AddVariableNameAccess(const std::string& name) 
+
+void
+ExpressionInfo::AddVariableNameAccess(const std::string& name)
 {
     fAccessedVariableNames.insert(name);
 }
-  
-void
-ExpressionInfo::GetAccessedPropertyNames(std::set<std::string>& names) 
+
+std::set<std::string>
+ExpressionInfo::GetAccessedPropertyNames() const
 {
-  names = fAccessedPropertyNames;
+  return fAccessedPropertyNames;
 }
 
-void 
-ExpressionInfo::AddAccessedPropertyName(const std::string& name) 
+void
+ExpressionInfo::AddAccessedPropertyName(const std::string& name)
 {
   fAccessedPropertyNames.insert(name);
 }
 
-void 
-ExpressionInfo::GetMisbehavingExpressionTypes(std::set<std::string>& types) 
+std::set<std::string>
+ExpressionInfo::GetMisbehavingExpressionTypes() const
 {
-  types = fMisbehavingExpressionTypes;
+  return fMisbehavingExpressionTypes;
 }
-  
-void 
-ExpressionInfo::AddMisBehavingExpressionType(const std::type_info& clazz) 
+
+void
+ExpressionInfo::AddMisBehavingExpressionType(const std::type_info& clazz)
 {
   fMisbehavingExpressionTypes.insert(clazz.name());
 }
-  
+
 void
-ExpressionInfo::Merge(ExpressionInfo* other) 
+ExpressionInfo::Merge(ExpressionInfo* other)
 {
   this->MergeDefaultVariableAccess(other);
   this->MergeSystemPropertyAccess(other);
@@ -92,8 +92,8 @@ ExpressionInfo::Merge(ExpressionInfo* other)
   this->MergeMisbehavingExpressionTypes(other);
 }
 
-void 
-ExpressionInfo::MergeExceptDefaultVariable(ExpressionInfo* other) 
+void
+ExpressionInfo::MergeExceptDefaultVariable(ExpressionInfo* other)
 {
   this->MergeSystemPropertyAccess(other);
 
@@ -103,40 +103,40 @@ ExpressionInfo::MergeExceptDefaultVariable(ExpressionInfo* other)
 }
 
 void
-ExpressionInfo::MergeDefaultVariableAccess(ExpressionInfo* other) 
+ExpressionInfo::MergeDefaultVariableAccess(ExpressionInfo* other)
 {
   fHasDefaultVariableAccess= fHasDefaultVariableAccess || other->fHasDefaultVariableAccess;
 }
 
-void 
-ExpressionInfo::MergeSystemPropertyAccess(ExpressionInfo* other) 
+void
+ExpressionInfo::MergeSystemPropertyAccess(ExpressionInfo* other)
 {
   fHasSystemPropertyAccess= fHasSystemPropertyAccess || other->fHasSystemPropertyAccess;
 }
 
-void 
-ExpressionInfo::MergeAccessedVariableNames(ExpressionInfo* other) 
+void
+ExpressionInfo::MergeAccessedVariableNames(ExpressionInfo* other)
 {
   if (fAccessedVariableNames.size() == 0) {
     fAccessedVariableNames= other->fAccessedVariableNames;
-  } 
-  else 
+  }
+  else
   {
-    for (std::set<std::string>::iterator iter = other->fAccessedVariableNames.begin(); iter != other->fAccessedVariableNames.end(); ++iter) 
+    for (std::set<std::string>::iterator iter = other->fAccessedVariableNames.begin(); iter != other->fAccessedVariableNames.end(); ++iter)
     {
       fAccessedVariableNames.insert(*iter);
     }
   }
 }
 
-void 
-ExpressionInfo::MergeAccessedPropertyNames(ExpressionInfo* other) 
+void
+ExpressionInfo::MergeAccessedPropertyNames(ExpressionInfo* other)
 {
-  if (fAccessedPropertyNames.size() == 0) 
+  if (fAccessedPropertyNames.size() == 0)
   {
     fAccessedPropertyNames = other->fAccessedPropertyNames;
-  } 
-  else 
+  }
+  else
   {
     for (std::set<std::string>::iterator iter = other->fAccessedPropertyNames.begin(); iter != other->fAccessedPropertyNames.end(); ++iter)
     {
@@ -145,14 +145,14 @@ ExpressionInfo::MergeAccessedPropertyNames(ExpressionInfo* other)
   }
 }
 
-void 
-ExpressionInfo::MergeMisbehavingExpressionTypes(ExpressionInfo* other) 
+void
+ExpressionInfo::MergeMisbehavingExpressionTypes(ExpressionInfo* other)
 {
-  if (fMisbehavingExpressionTypes.size() == 0) 
+  if (fMisbehavingExpressionTypes.size() == 0)
   {
     fMisbehavingExpressionTypes= other->fMisbehavingExpressionTypes;
-  } 
-  else  
+  }
+  else
   {
     for (std::set<std::string>::iterator iter= other->fMisbehavingExpressionTypes.begin(); iter != other->fMisbehavingExpressionTypes.end(); ++iter)
     {

@@ -49,7 +49,7 @@ namespace cherry {
  * This interface is not intended to be implemented by clients.
  * </p>
  * 
- * @see org.eclipse.ui.IWorkbench#getEditorRegistry()
+ * @see org.opencherry.ui.IWorkbench#getEditorRegistry()
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct CHERRY_UI IEditorRegistry {
@@ -63,7 +63,7 @@ struct CHERRY_UI IEditorRegistry {
      * The identifier for the system external editor descriptor. This descriptor 
      * is always present in the registry on all platforms.
      * This editor requires an input which implements
-     * {@link org.eclipse.ui.IPathEditorInput IPathEditorInput}.
+     * {@link org.opencherry.ui.IPathEditorInput IPathEditorInput}.
      * Use {@link #findEditor findEditor} to access the editor descriptor for
      * this identifier.
      * 
@@ -75,7 +75,7 @@ struct CHERRY_UI IEditorRegistry {
      * The identifier for the system in-place editor descriptor. This descriptor 
      * is only present in the registry on platforms that support in-place editing
      * (for example Win32). This editor requires an input which implements
-     * {@link org.eclipse.ui.IInPlaceEditorInput IInPlaceEditorInput}. Use 
+     * {@link org.opencherry.ui.IInPlaceEditorInput IInPlaceEditorInput}. Use 
      * {@link #findEditor findEditor} to access the editor descriptor for this
      * identifier.
      * 

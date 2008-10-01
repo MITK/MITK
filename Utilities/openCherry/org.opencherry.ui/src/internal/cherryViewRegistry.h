@@ -72,22 +72,22 @@ private:
     ViewCategoryProxy(IViewDescriptorCategoryPtr rawCategory);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.views.IViewCategory#getViews()
+     * @see org.opencherry.ui.views.IViewCategory#getViews()
      */
     const std::vector<IViewDescriptor::Pointer>& GetViews() const;
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.views.IViewCategory#getId()
+     * @see org.opencherry.ui.views.IViewCategory#getId()
      */
     const std::string& GetId() const;
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.views.IViewCategory#getPath()
+     * @see org.opencherry.ui.views.IViewCategory#getPath()
      */
     std::vector<std::string> GetPath() const;
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.views.IViewCategory#getLabel()
+     * @see org.opencherry.ui.views.IViewCategory#getLabel()
      */
     std::string GetLabel() const;
 
@@ -198,7 +198,7 @@ public:
   void MapViewsToCategories();
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+   * @see org.opencherry.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.opencherry.core.runtime.dynamicHelpers.IExtensionTracker, org.opencherry.core.runtime.IExtension)
    */
   //void AddExtension(IExtensionTracker tracker, IExtension addedExtension);
 

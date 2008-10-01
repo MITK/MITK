@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef __CHERRY_WORKBENCH_REGISTRY_CONSTANTS__
@@ -24,9 +24,9 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * Interface containing various registry constants (tag and attribute names).
- * 
+ *
  */
 struct WorkbenchRegistryConstants {
 
@@ -80,7 +80,7 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * Sticky view closable attribute. Value <code>closable</code>.
 	 */
-	static const std::string ATT_CLOSEABLE; // "closeable"; //$NON-NLS-1$    
+	static const std::string ATT_CLOSEABLE; // "closeable"; //$NON-NLS-1$
 
 	/**
 	 * Color factory attribute. Value <code>colorFactory</code>.
@@ -107,7 +107,7 @@ struct WorkbenchRegistryConstants {
 	 * Intro content detector class attribute (optional). Value <code>contentDetector</code>.
 	 */
 	static const std::string ATT_CONTENT_DETECTOR; // "contentDetector"; //$NON-NLS-1$
-	
+
 	/**
 	 * Editor content type id binding attribute. Value
 	 * <code>contentTypeId</code>.
@@ -471,10 +471,10 @@ struct WorkbenchRegistryConstants {
 	 * Perspective singleton attribute. Value <code>singleton</code>.
 	 */
 	static const std::string ATT_SINGLETON; // "singleton";//$NON-NLS-1$
-	
+
 	/**
 	 * Splash id attribute.  Value <code>splashId</code>.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	static const std::string ATT_SPLASH_ID; // "splashId"; //$NON-NLS-1$
@@ -553,21 +553,21 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a key
 	 * binding scheme.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_ACCELERATOR_CONFIGURATIONS; // "acceleratorConfigurations"; //$NON-NLS-1$
 
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a context.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_ACCELERATOR_SCOPES; // "acceleratorScopes"; //$NON-NLS-1$
 
 	/**
 	 * The legacy extension point (2.1.x and earlier) for specifying a command.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_ACTION_DEFINITIONS; // "actionDefinitions"; //$NON-NLS-1$
@@ -583,7 +583,7 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * The extension point (3.1 and later) for specifying bindings, such as
 	 * keyboard shortcuts.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_BINDINGS; // "bindings"; //$NON-NLS-1$
@@ -594,7 +594,7 @@ struct WorkbenchRegistryConstants {
 
 	/**
 	 * The extension point (3.2 and later) for associating images with commands.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static const std::string PL_COMMAND_IMAGES; // "commandImages"; //$NON-NLS-1$
@@ -603,14 +603,14 @@ struct WorkbenchRegistryConstants {
 	 * The extension point (2.1.x and later) for specifying a command. A lot of
 	 * other things have appeared first in this extension point and then been
 	 * moved to their own extension point.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_COMMANDS; // "commands"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.0 and later) for specifying a context.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_CONTEXTS; // "contexts"; //$NON-NLS-1$
@@ -636,7 +636,7 @@ struct WorkbenchRegistryConstants {
 
 	/**
 	 * The extension point (3.1 and later) for specifying handlers.
-	 * 
+	 *
 	 * @since 3.1.1
 	 */
 	static const std::string PL_HANDLERS; // "handlers"; //$NON-NLS-1$
@@ -649,21 +649,21 @@ struct WorkbenchRegistryConstants {
 
 	/**
 	 * The extension point for keyword definitions.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	static const std::string PL_KEYWORDS; // "keywords"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.2 and later) for specifying menu contributions.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	static const std::string PL_MENUS; // "menus"; //$NON-NLS-1$
 
 	/**
 	 * The extension point (3.3 and later) for specifying menu contributions.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	static const std::string PL_MENU_CONTRIBUTION; // "menuContribution"; //$NON-NLS-1$
@@ -685,7 +685,7 @@ struct WorkbenchRegistryConstants {
 	static const std::string PL_PROPERTY_PAGES; // "propertyPages"; //$NON-NLS-1$
 
 	static const std::string PL_STARTUP; // "startup"; //$NON-NLS-1$
-	
+
 	/**
 	 * @since 3.3
 	 */
@@ -704,75 +704,75 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * The name of the deprecated accelerator configurations extension point.
 	 */
-	static const std::string EXTENSION_ACCELERATOR_CONFIGURATIONS; 
+	static const std::string EXTENSION_ACCELERATOR_CONFIGURATIONS;
 
 	/**
 	 * The name of the accelerator scopes extension point.
 	 */
-	static const std::string EXTENSION_ACCELERATOR_SCOPES; 
+	static const std::string EXTENSION_ACCELERATOR_SCOPES;
 
 	/**
 	 * The name of the action definitions extension point.
 	 */
-	static const std::string EXTENSION_ACTION_DEFINITIONS; 
+	static const std::string EXTENSION_ACTION_DEFINITIONS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.actionSets</code> extension point.
+	 * The name of the <code>org.opencherry.ui.actionSets</code> extension point.
 	 */
-	static const std::string EXTENSION_ACTION_SETS; 
+	static const std::string EXTENSION_ACTION_SETS;
 
 	/**
 	 * The name of the bindings extension point.
 	 */
-	static const std::string EXTENSION_BINDINGS; 
+	static const std::string EXTENSION_BINDINGS;
 
 	/**
 	 * The name of the commands extension point.
 	 */
-	static const std::string EXTENSION_COMMAND_IMAGES; 
+	static const std::string EXTENSION_COMMAND_IMAGES;
 
 	/**
 	 * The name of the commands extension point, and the name of the key for the
 	 * commands preferences.
 	 */
-	static const std::string EXTENSION_COMMANDS; 
+	static const std::string EXTENSION_COMMANDS;
 
 	/**
 	 * The name of the contexts extension point.
 	 */
-	static const std::string EXTENSION_CONTEXTS; 
+	static const std::string EXTENSION_CONTEXTS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.editorActions</code> extension
+	 * The name of the <code>org.opencherry.ui.editorActions</code> extension
 	 * point.
 	 */
-	static const std::string EXTENSION_EDITOR_ACTIONS; 
+	static const std::string EXTENSION_EDITOR_ACTIONS;
 
 	/**
 	 * The name of the commands extension point.
 	 */
-	static const std::string EXTENSION_HANDLERS; 
+	static const std::string EXTENSION_HANDLERS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.menus</code> extension point.
+	 * The name of the <code>org.opencherry.ui.menus</code> extension point.
 	 */
-	static const std::string EXTENSION_MENUS; 
+	static const std::string EXTENSION_MENUS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.menus2</code> extension point.
+	 * The name of the <code>org.opencherry.ui.menus2</code> extension point.
 	 */
-	static const std::string COMMON_MENU_ADDITIONS; 
+	static const std::string COMMON_MENU_ADDITIONS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.popupMenus</code> extension point.
+	 * The name of the <code>org.opencherry.ui.popupMenus</code> extension point.
 	 */
-	static const std::string EXTENSION_POPUP_MENUS; 
+	static const std::string EXTENSION_POPUP_MENUS;
 
 	/**
-	 * The name of the <code>org.eclipse.ui.viewActions</code> extension
+	 * The name of the <code>org.opencherry.ui.viewActions</code> extension
 	 * point.
 	 */
-	static const std::string EXTENSION_VIEW_ACTIONS; 
+	static const std::string EXTENSION_VIEW_ACTIONS;
 
 	/**
 	 * The constant for the position attribute corresponding to
@@ -907,7 +907,7 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * Color override tag. Value <code>colorOverride</code>.
 	 */
-	static const std::string TAG_COLOROVERRIDE; // "colorOverride"; //$NON-NLS-1$    
+	static const std::string TAG_COLOROVERRIDE; // "colorOverride"; //$NON-NLS-1$
 
 	/**
 	 * Color value tag. Value <code>colorValue</code>.
@@ -1012,7 +1012,7 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * The name of the element storing a group.
 	 */
-	static const std::string TAG_GROUP; // "group"; //$NON-NLS-1$ 
+	static const std::string TAG_GROUP; // "group"; //$NON-NLS-1$
 
 	/**
 	 * Group marker tag. Value <code>groupMarker</code>.
@@ -1064,7 +1064,7 @@ struct WorkbenchRegistryConstants {
 	/**
 	 * The name of the element defining the insertion point for menu
 	 * additions.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	static const std::string TAG_LOCATION_URI; // "locationURI"; //$NON-NLS-1$
@@ -1153,8 +1153,8 @@ struct WorkbenchRegistryConstants {
 	 * Separator tag. Value <code>separator</code>.
 	 */
 	static const std::string TAG_SEPARATOR; // "separator"; //$NON-NLS-1$
-	
-	
+
+
 	/**
 	 * Tag for the settings transfer entry.
 	 */
@@ -1169,15 +1169,15 @@ struct WorkbenchRegistryConstants {
 	 * The name of the element storing some state.
 	 */
 	static const std::string TAG_STATE; // "state"; //$NON-NLS-1$
-	
-	
+
+
 	/**
 	 * The name of the element describing splash handlers. Value
 	 * <code>splashHandler</code>.
 	 * @since 3.3
 	 */
 	static const std::string TAG_SPLASH_HANDLER; // "splashHandler"; //$NON-NLS-1$
-	
+
 
 	/**
 	 * The name of the element describing splash handler product bindings. Value
@@ -1185,7 +1185,7 @@ struct WorkbenchRegistryConstants {
 	 * @since 3.3
 	 */
 	static const std::string TAG_SPLASH_HANDLER_PRODUCT_BINDING; // "splashHandlerProductBinding"; //$NON-NLS-1$
-	
+
 	/**
 	 * Sticky view tag. Value <code>stickyView</code>.
 	 */
@@ -1287,14 +1287,24 @@ struct WorkbenchRegistryConstants {
 	static const std::string TYPE_WIDGET; // "widget"; //$NON-NLS-1$
 
 	static const std::string TAG_TOOLBAR; // "toolbar"; //$NON-NLS-1$
-	
+
 	static const std::string TAG_SERVICE_FACTORY; // "serviceFactory"; //$NON-NLS-1$
-	
+
 	static const std::string TAG_SERVICE; // "service"; //$NON-NLS-1$
-	
+
 	static const std::string ATTR_FACTORY_CLASS; // "factoryClass"; //$NON-NLS-1$
 
 	static const std::string ATTR_SERVICE_CLASS; // "serviceClass"; //$NON-NLS-1$
+
+	static const std::string TAG_SOURCE_PROVIDER; // "sourceProvider"; //$NON-NLS-1$
+
+  static const std::string ATTR_PROVIDER; // "provider"; //$NON-NLS-1$
+
+  static const std::string TAG_VARIABLE; // "variable"; //$NON-NLS-1$
+
+  static const std::string ATT_PRIORITY_LEVEL; // "priorityLevel"; //$NON-NLS-1$
+
+  static const std::string ATT_MODE; // "mode"; //$NON-NLS-1$
 
 };
 

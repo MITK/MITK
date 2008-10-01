@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryObject.h"
@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <memory>
 #include <exception>
 
-// Better name demanging for gcc
+// Better name demangling for gcc
 #if __GNUC__ > 3 || ( __GNUC__ == 3 && __GNUC_MINOR__ > 0 )
 #define GCC_USEDEMANGLE
 #endif
@@ -29,20 +29,20 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef GCC_USEDEMANGLE
 #include <cstdlib>
 #include <cxxabi.h>
-#endif 
+#endif
 
 namespace cherry
 {
 
 
 /**
- * Delete a itk object. This method should always be used to delete an object 
+ * Delete a itk object. This method should always be used to delete an object
  * when the new operator was used to create it. Using the C++ delete method
  * will not work with reference counting.
  */
-void 
+void
 Object
-::Delete() 
+::Delete()
 {
   this->UnRegister();
 }
@@ -79,7 +79,7 @@ Object
 {
   delete [] (char*)m;
 }
-#endif 
+#endif
 
 
 /**
@@ -87,32 +87,32 @@ Object
  * header/self/trailer virtual print methods, which can be overriden by
  * subclasses (any itk object).
  */
-void 
+void
 Object
 ::Print(std::ostream& os, Indent indent) const
 {
-  this->PrintHeader(os, indent); 
+  this->PrintHeader(os, indent);
   this->PrintSelf(os, indent.GetNextIndent());
   this->PrintTrailer(os, indent);
 }
 
 
 /**
- * This method is called when itkExceptionMacro executes. It allows 
+ * This method is called when itkExceptionMacro executes. It allows
  * the debugger to break on error.
  */
-void 
+void
 Object
 ::BreakOnError()
 {
-  ;  
+  ;
 }
 
 
 /**
  * Increase the reference count (mark as used by another object).
  */
-void 
+void
 Object
 ::Register() const
 {
@@ -124,14 +124,14 @@ Object
 /**
  * Decrease the reference count (release by another object).
  */
-void 
+void
 Object
 ::UnRegister() const
 {
   m_ReferenceCountLock.lock();
   int tmpReferenceCount = --m_ReferenceCount;
   m_ReferenceCountLock.unlock();
-  
+
   // ReferenceCount in now unlocked.  We may have a race condition
   // to delete the object.
   if ( tmpReferenceCount <= 0)
@@ -158,7 +158,7 @@ Object
     }
 }
 
-bool 
+bool
 Object::operator==(const Object* o) const
 {
   return this == o;
@@ -174,7 +174,7 @@ Object
    * exception if one has been thrown already. This is likely to
    * happen when a subclass constructor (say B) is throwing an exception: at
    * that point, the stack unwinds by calling all superclass destructors back
-   * to this method (~Object): since the ref count is still 1, an 
+   * to this method (~Object): since the ref count is still 1, an
    * exception would be thrown again, causing the system to abort()!
    */
   if(m_ReferenceCount > 0 && !std::uncaught_exception())
@@ -271,13 +271,13 @@ New()
 {
   return new Self;
 }
-  
-  
+
+
 /**
- * Determine the next Indentation level. Keep Indenting by two until the 
+ * Determine the next Indentation level. Keep Indenting by two until the
  * max of forty.
  */
-Indent 
+Indent
 Indent
 ::GetNextIndent()
 {
@@ -288,11 +288,11 @@ Indent
     }
   return Indent;
 }
- 
+
 /**
  * Print out the Indentation. Basically output a bunch of spaces.
  */
-std::ostream& 
+std::ostream&
 operator<<(std::ostream& os, const Indent& ind)
 {
   os << blanks + (40-ind.m_Indent) ;

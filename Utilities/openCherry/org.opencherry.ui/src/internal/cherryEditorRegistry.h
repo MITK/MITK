@@ -523,21 +523,21 @@ private: void SortInternalEditors();
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
+   * @see org.opencherry.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
    */
 public: bool IsSystemInPlaceEditorAvailable(const std::string& filename);
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
+   * @see org.opencherry.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
    */
 public: bool IsSystemExternalEditorAvailable(const std::string& filename);
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IEditorRegistry#getSystemExternalEditorImageDescriptor(java.lang.String)
+   * @see org.opencherry.ui.IEditorRegistry#getSystemExternalEditorImageDescriptor(java.lang.String)
    */
   //    public: ImageDescriptor GetSystemExternalEditorImageDescriptor(
   //            const std::string& filename) {
@@ -569,7 +569,7 @@ private: void RemoveEditorFromMapping(std::map<std::string, FileEditorMapping::P
 private: const IExtensionPoint* GetExtensionPointFilter();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorRegistry#getDefaultEditor(java.lang.String, org.eclipse.core.runtime.content.IContentType)
+   * @see org.opencherry.ui.IEditorRegistry#getDefaultEditor(java.lang.String, org.opencherry.core.runtime.content.IContentType)
    */
   //  public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& fileName, IContentType contentType) {
   //        return getEditorForContentType(fileName, contentType);
@@ -587,14 +587,14 @@ private: const IExtensionPoint* GetExtensionPointFilter();
         /*IContentType contentType*/);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorRegistry#getEditors(java.lang.String, org.eclipse.core.runtime.content.IContentType)
+   * @see org.opencherry.ui.IEditorRegistry#getEditors(java.lang.String, org.opencherry.core.runtime.content.IContentType)
    */
   //  public: std::vector<IEditorDescriptor::Pointer> GetEditors(const std::string& fileName, IContentType contentType) {
   //    return findRelatedObjects(contentType, fileName, relatedRegistry);
   //  }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorRegistry#getImageDescriptor(java.lang.String, org.eclipse.core.runtime.content.IContentType)
+   * @see org.opencherry.ui.IEditorRegistry#getImageDescriptor(java.lang.String, org.opencherry.core.runtime.content.IContentType)
    */
   //  public: ImageDescriptor GetImageDescriptor(const std::string filename, IContentType contentType) {
   //        if (filename == null) {

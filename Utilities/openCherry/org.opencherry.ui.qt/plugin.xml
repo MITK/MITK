@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension point="org.opencherry.ui.workbench">
-      <workbench 
-         id="org.opencherry.ui.qtworkbench"
-         name="Qt Workbench"
-         class="cherry::QtWorkbench" />
-   </extension>
- 
    <extension point="org.opencherry.ui.views"> 
       <category 
          id="org.opencherry.views.general" 
@@ -33,5 +26,21 @@
          description="Qt specific WorkbenchPage tweaks" 
          definition="cherryWorkbenchPageTweaklet" 
          implementation="cherry::QtWorkbenchPageTweaklet" />
-   </extension> 
+         
+      <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.GuiWidgetsTweaklet" 
+         name="Qt Widgets Tweaklet" 
+         description="Qt specific widget tweaks" 
+         definition="cherryGuiWidgetsTweaklet" 
+         implementation="cherry::QtWidgetsTweaklet" />
+   </extension>
+   
+   <extension
+         point="org.opencherry.ui.presentationFactories">
+      <factory
+            name="Default"
+            class="cherry::QtWorkbenchPresentationFactory"
+            id="org.opencherry.ui.presentations.default">
+      </factory>
+   </extension>
 </plugin>

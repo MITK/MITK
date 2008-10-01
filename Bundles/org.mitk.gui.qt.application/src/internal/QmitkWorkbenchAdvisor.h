@@ -24,6 +24,8 @@ class QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
 {
 public:
 
+  static const std::string DEFAULT_PERSP_ID;
+
   void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
 
   cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(

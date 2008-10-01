@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYQTPLATFORMLOGMODEL_H_
@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtCore/QDateTime>
 
 #include "event/cherryPlatformEvent.h"
+#include "cherryMessage.h"
 
 #include <vector>
 #include <ctime>
@@ -30,20 +31,22 @@ namespace cherry {
 
 class QtPlatformLogModel : public QAbstractTableModel
 {
-  
+
 public:
-  
+
   QtPlatformLogModel(QObject* parent = 0);
-  
+
   int rowCount(const QModelIndex&) const;
   int columnCount(const QModelIndex&) const;
   QVariant data(const QModelIndex& index, int) const;
-  
+
   QVariant headerData(int section, Qt::Orientation orientation, int) const;
-  
-  
+
+
 private:
-  
+
+  typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
+
   void addLogEntry(const PlatformEvent& event);
 
   struct LogEntry {

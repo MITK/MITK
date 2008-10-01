@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYEDITORREFERENCE_H_
@@ -23,24 +23,21 @@
 #include "../cherryIEditorInput.h"
 #include "../cherryIMemento.h"
 #include "../cherryIWorkbenchPart.h"
-#include "../cherryPartPane.h"
 #include "../cherryIEditorPart.h"
-
-//TODO should be removed
-#include "../cherryUiDll.h"
 
 namespace cherry
 {
 
 class EditorManager;
 class EditorDescriptor;
+class PartPane;
 struct IWorkbenchPage;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
-class CHERRY_UI EditorReference : public WorkbenchPartReference, public IEditorReference
+class EditorReference : public WorkbenchPartReference, public IEditorReference
 {
 
 private:
@@ -89,9 +86,9 @@ private:
    *            propogate state from another editor. Can be <code>null</code>.
    */
 public:
-  
+
   cherryClassMacro(EditorReference)
-  
+
   EditorReference(EditorManager* manager, IEditorInput::Pointer input,
       SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = 0);
 
@@ -120,7 +117,7 @@ private:
   void InitListenersAndHandlers();
 
 protected:
-  PartPane::Pointer CreatePane();
+  SmartPointer<PartPane> CreatePane();
 
   /**
    * This method is called when there should be a change in the editor pin
@@ -159,7 +156,7 @@ private:
   IEditorInput::Pointer GetRestoredInput();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IWorkbenchPartReference#getTitleImage()
+   * @see org.opencherry.ui.IWorkbenchPartReference#getTitleImage()
    * This method will append a pin to the icon of the editor
    * if the "automatically close editors" option in the
    * preferences is enabled and the editor has been pinned.
@@ -200,14 +197,14 @@ protected:
   IWorkbenchPart::Pointer CreatePart();
 
   //protected: void PartPropertyChanged(Object source, int propId) {
-  //        
+  //
   //        // Detect badly behaved editors that don't fire PROP_INPUT events
   //        // when they're supposed to. This branch is only needed to handle
   //        // malfunctioning editors.
   //        if (propId == IWorkbenchPartConstants.PROP_INPUT) {
   //            expectingInputChange = false;
   //        }
-  //        
+  //
   //        super.partPropertyChanged(source, propId);
   //    }
 
@@ -215,7 +212,7 @@ protected:
    * Attempts to set the input of the editor to the given input. Note that the input
    * can't always be changed for an editor. Editors that don't implement IReusableEditor
    * can't have their input changed once they've been materialized.
-   * 
+   *
    * @since 3.1
    *
    * @param input new input
@@ -228,7 +225,7 @@ public:
    * Reports a recoverable malfunction in the system log. A recoverable malfunction would be
    * something like failure to fire an expected property change. Only the first malfunction is
    * recorded to avoid spamming the system log with repeated failures in the same editor.
-   * 
+   *
    * @since 3.1
    *
    * @param string
@@ -241,7 +238,7 @@ private:
 
   /**
    * Creates and returns an empty editor (<code>ErrorEditorPart</code>).
-   * 
+   *
    * @param descr the editor descriptor
    * @return the empty editor part or <code>null</code> in case of an exception
    */

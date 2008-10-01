@@ -301,7 +301,7 @@ public:
    * Returns the unmodified, original command line arguments
    *
    */
-  static int& GetRawApplicationArgs(char** argv);
+  static int& GetRawApplicationArgs(char**& argv);
 
   /**
    * Returns the applications command line arguments which

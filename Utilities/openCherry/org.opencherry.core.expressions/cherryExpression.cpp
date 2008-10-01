@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExpression.h"
@@ -34,7 +34,7 @@ Expression::Expression()
 
 Expression::~Expression()
 {
-  
+
 }
 
 bool Expression::Equals(std::vector<Expression::Pointer>& leftArray,
@@ -91,7 +91,7 @@ bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
   return true;
 }
 
-int 
+int
 Expression::HashCode(Expression* object)
 {
   return object != 0 ? object->HashCode() : 0;
@@ -123,28 +123,28 @@ Expression::HashCode(std::vector<ExpressionVariable::Pointer>& array)
   return hashCode;
 }
 
-const ExpressionInfo* 
-Expression::ComputeExpressionInfo() 
+const ExpressionInfo*
+Expression::ComputeExpressionInfo() const
 {
   ExpressionInfo* result= new ExpressionInfo();
   this->CollectExpressionInfo(result);
   return result;
 }
 
-void 
-Expression::CollectExpressionInfo(ExpressionInfo* info) 
+void
+Expression::CollectExpressionInfo(ExpressionInfo* info) const
 {
   info->AddMisBehavingExpressionType(typeid(this));
 }
 
 intptr_t
-Expression::ComputeHashCode() 
+Expression::ComputeHashCode()
 {
   return reinterpret_cast<intptr_t>(this);
 }
 
-int 
-Expression::HashCode() 
+int
+Expression::HashCode()
 {
   if (fHashCode != HASH_CODE_NOT_COMPUTED)
     return fHashCode;
@@ -154,7 +154,7 @@ Expression::HashCode()
   return fHashCode;
 }
 
-bool 
+bool
 Expression::operator==(Expression& object)
 {
   return this->HashCode() == object.HashCode();

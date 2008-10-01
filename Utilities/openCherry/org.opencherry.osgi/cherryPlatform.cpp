@@ -159,7 +159,7 @@ bool Platform::IsRunning()
   return InternalPlatform::GetInstance()->IsRunning();
 }
 
-int& Platform::GetRawApplicationArgs(char** argv)
+int& Platform::GetRawApplicationArgs(char**& argv)
 {
   return InternalPlatform::GetInstance()->GetRawApplicationArgs(argv);
 }

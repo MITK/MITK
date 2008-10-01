@@ -14,7 +14,7 @@ class PartService : public IPartService
 private:
 
   //PartListenerList listeners = new PartListenerList();
-  PartEvents partEvents;
+  IPartListener::Events partEvents;
 
   IWorkbenchPartReference::Pointer activePart;
 
@@ -36,8 +36,8 @@ public:
   PartService(const std::string& debugListenersKey,
       const std::string& debugListeners2Key);
 
-  PartEvents& GetPartEvents();
-  
+  IPartListener::Events& GetPartEvents();
+
   /*
    * (non-Javadoc)
    * Method declared on IPartService

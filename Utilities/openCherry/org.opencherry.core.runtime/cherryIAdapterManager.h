@@ -39,7 +39,7 @@ namespace cherry {
  * <p>
  * Adapter factories can be registered programmatically using the <code>registerAdapters</code>
  * method.  Alternatively, they can be registered declaratively using the 
- * <code>org.eclipse.core.runtime.adapters</code> extension point.  Factories registered
+ * <code>org.opencherry.core.runtime.adapters</code> extension point.  Factories registered
  * with this extension point will not be able to provide adapters until their
  * corresponding plugin has been activated.
  * <p>
@@ -87,20 +87,20 @@ struct IAdapterManager : public Object {
   /**
    * This value can be returned to indicate that no applicable adapter factory 
    * was found. 
-   * @since org.eclipse.equinox.common 3.3
+   * @since org.opencherry.equinox.common 3.3
    */
   static CHERRY_RUNTIME const int NONE;
 
   /**
    * This value can be returned to indicate that an adapter factory was found, 
    * but has not been loaded.
-   * @since org.eclipse.equinox.common 3.3
+   * @since org.opencherry.equinox.common 3.3
    */
   static CHERRY_RUNTIME const int NOT_LOADED;
 
   /**
    * This value can be returned to indicate that an adapter factory is loaded.
-   * @since org.eclipse.equinox.common 3.3
+   * @since org.opencherry.equinox.common 3.3
    */
   static CHERRY_RUNTIME const int LOADED;
 
@@ -206,16 +206,16 @@ struct IAdapterManager : public Object {
    * to convert <code>adaptable</code> to an object of type <code>adapterTypeName</code>.
    * <p>
    * One of the following values can be returned:<ul>
-   * <li>{@link org.eclipse.core.runtime.IAdapterManager#NONE} if no applicable adapter factory was found;</li>
-   * <li>{@link org.eclipse.core.runtime.IAdapterManager#NOT_LOADED} if an adapter factory was found, but has not been loaded;</li>
-   * <li>{@link org.eclipse.core.runtime.IAdapterManager#LOADED} if an adapter factory was found, and it is loaded.</li>
+   * <li>{@link org.opencherry.core.runtime.IAdapterManager#NONE} if no applicable adapter factory was found;</li>
+   * <li>{@link org.opencherry.core.runtime.IAdapterManager#NOT_LOADED} if an adapter factory was found, but has not been loaded;</li>
+   * <li>{@link org.opencherry.core.runtime.IAdapterManager#LOADED} if an adapter factory was found, and it is loaded.</li>
    * </ul></p>
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified class name of an adapter to
    * look up
    * @return a status of the adapter 
-   * @since org.eclipse.equinox.common 3.3
+   * @since org.opencherry.equinox.common 3.3
    */
   virtual int QueryAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterType) = 0;
 

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYRECTANGLE_H_
@@ -37,10 +37,10 @@ namespace cherry
  * of (x, y) coordinates rather than the strict mathematical one.
  * </p>
  * <p>
- * The hashCode() method in this class uses the values of the  
+ * The hashCode() method in this class uses the values of the
  * fields to compute the hash value. When storing instances of the
  * class in hashed collections, do not modify these fields after the
- * object has been inserted.  
+ * object has been inserted.
  * </p>
  * <p>
  * Application code does <em>not</em> need to explicitly release the
@@ -78,9 +78,9 @@ struct CHERRY_UI Rectangle
    * x, y, width and height values set to zero.
    */
   Rectangle();
-  
+
   /**
-   * Construct a new instance of this class given the 
+   * Construct a new instance of this class given the
    * x, y, width and height values.
    *
    * @param x the x coordinate of the origin of the rectangle
@@ -120,6 +120,13 @@ struct CHERRY_UI Rectangle
   bool Contains(int x, int y) const;
 
   /**
+   * Flips the x and y coordinates, i.e. rotates the rectangle about 90 degrees.
+   *
+   * @return the flipped rectangle
+   */
+  Rectangle& FlipXY();
+
+  /**
    * Compares the argument to the receiver, and returns true
    * if they represent the <em>same</em> object using a class
    * specific comparison.
@@ -132,8 +139,8 @@ struct CHERRY_UI Rectangle
   bool operator==(const Rectangle& object) const;
 
   /**
-   * Returns an integer hash code for the receiver. Any two 
-   * objects that return <code>true</code> when passed to 
+   * Returns an integer hash code for the receiver. Any two
+   * objects that return <code>true</code> when passed to
    * <code>equals</code> must return the same value for this
    * method.
    *
@@ -153,14 +160,14 @@ struct CHERRY_UI Rectangle
    * @exception IllegalArgumentException <ul>
    *    <li>ERROR_NULL_ARGUMENT - if the argument is null</li>
    * </ul>
-   * 
+   *
    * since 3.0
    */
   void Intersect(const Rectangle& rect);
 
   /**
    * Returns a new rectangle which represents the intersection
-   * of the receiver and the given rectangle. 
+   * of the receiver and the given rectangle.
    * <p>
    * The intersection of two rectangles is the rectangle that
    * covers the area which is contained within both rectangles.
@@ -196,7 +203,7 @@ struct CHERRY_UI Rectangle
    *
    * @see #intersection(Rectangle)
    * @see #isEmpty()
-   * 
+   *
    * @since 3.0
    */
   bool Intersects(int x, int y, int width, int height) const;
@@ -222,12 +229,21 @@ struct CHERRY_UI Rectangle
   bool Intersects(const Rectangle& rect) const;
 
   /**
+   * Returns the height or width
+   *
+   * @param width returns the width if true, and the height if false
+   * @return the width or height of the reciever
+   * @since 3.0
+   */
+  int GetDimension(bool width) const;
+
+  /**
    * Returns <code>true</code> if the receiver does not cover any
    * area in the (x, y) coordinate plane, and <code>false</code> if
    * the receiver does cover some area in the plane.
    * <p>
-   * A rectangle is considered to <em>cover area</em> in the 
-   * (x, y) coordinate plane if both its width and height are 
+   * A rectangle is considered to <em>cover area</em> in the
+   * (x, y) coordinate plane if both its width and height are
    * non-zero.
    * </p>
    *

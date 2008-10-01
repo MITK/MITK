@@ -146,7 +146,7 @@ public:
     /**
    * Utility for extracting the value of a class attribute or a nested class
    * element that follows the pattern set forth by
-   * {@link org.eclipse.core.runtime.IExecutableExtension}.
+   * {@link org.opencherry.core.runtime.IExecutableExtension}.
    * 
    * @param configElement
    *            the element

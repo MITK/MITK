@@ -61,12 +61,12 @@ public:
   ViewDescriptor(IConfigurationElement::Pointer e);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.internal.registry.IViewDescriptor#createView()
+   * @see org.opencherry.ui.internal.registry.IViewDescriptor#createView()
    */
   IViewPart::Pointer CreateView();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.internal.registry.IViewDescriptor#getCategoryPath()
+   * @see org.opencherry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
   const std::vector<std::string>& GetCategoryPath();
 
@@ -78,22 +78,22 @@ public:
   IConfigurationElement::Pointer GetConfigurationElement();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.internal.registry.IViewDescriptor#getDescription()
+   * @see org.opencherry.ui.internal.registry.IViewDescriptor#getDescription()
    */
   std::string GetDescription();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IWorkbenchPartDescriptor#getId()
+   * @see org.opencherry.ui.IWorkbenchPartDescriptor#getId()
    */
   std::string GetId() const;
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IWorkbenchPartDescriptor#getImageDescriptor()
+   * @see org.opencherry.ui.IWorkbenchPartDescriptor#getImageDescriptor()
    */
   //ImageDescriptor GetImageDescriptor();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IWorkbenchPartDescriptor#getLabel()
+   * @see org.opencherry.ui.IWorkbenchPartDescriptor#getLabel()
    */
   std::string GetLabel();
 
@@ -105,14 +105,14 @@ public:
   std::string GetAccelerator();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.internal.registry.IViewDescriptor#getAllowMultiple()
+   * @see org.opencherry.ui.internal.registry.IViewDescriptor#getAllowMultiple()
    */
   bool GetAllowMultiple();
   
   bool operator==(const IViewDescriptor*) const;
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+   * @see org.opencherry.core.runtime.IAdaptable#getAdapter(java.lang.Class)
    */
   void* GetAdapter(const std::type_info& adapter);
 

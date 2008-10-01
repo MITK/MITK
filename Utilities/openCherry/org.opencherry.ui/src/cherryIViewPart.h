@@ -67,7 +67,7 @@ namespace cherry {
  * </p>
  *
  * @see IWorkbenchPage#showView
- * @see org.eclipse.ui.part.ViewPart
+ * @see org.opencherry.ui.part.ViewPart
  * @see ISizeProvider
  */
 struct CHERRY_UI IViewPart : public virtual IWorkbenchPart {

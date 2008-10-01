@@ -1,15 +1,16 @@
 #ifndef CHERRYSELECTIONCHANGEDEVENT_H_
 #define CHERRYSELECTIONCHANGEDEVENT_H_
 
-#include "cherryISelectionProvider.h"
 #include "cherryISelection.h"
 
 namespace cherry
 {
 
+class ISelectionProvider;
+
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Event object describing a selection change. The source of these
  * events is a selection provider.
  *
@@ -30,10 +31,10 @@ public:
    * @param source the selection provider
    * @param selection the selection
    */
-  SelectionChangedEvent(ISelectionProvider::Pointer source,
+  SelectionChangedEvent(SmartPointer<ISelectionProvider> source,
       ISelection::Pointer selection);
 
-  ISelectionProvider::Pointer GetSource();
+  SmartPointer<ISelectionProvider> GetSource();
 
   /**
    * Returns the selection.
@@ -47,7 +48,7 @@ public:
    *
    * @return the originating selection provider
    */
-  ISelectionProvider::Pointer GetSelectionProvider();
+  SmartPointer<ISelectionProvider> GetSelectionProvider();
 
 protected:
 
@@ -58,7 +59,7 @@ protected:
 
 private:
 
-  ISelectionProvider::Pointer source;
+  SmartPointer<ISelectionProvider> source;
 };
 
 }

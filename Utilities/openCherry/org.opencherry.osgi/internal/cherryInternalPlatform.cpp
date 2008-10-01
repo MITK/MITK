@@ -68,7 +68,7 @@ void InternalPlatform::Initialize(int& argc, char** argv)
   // initialization
   Poco::Mutex::ScopedLock lock(m_Mutex);
 
-  m_Argc = argc;
+  m_Argc = &argc;
   m_Argv = argv;
 
 //  try
@@ -274,10 +274,10 @@ std::vector<std::string> InternalPlatform::GetApplicationArgs() const
   return m_FilteredArgs;
 }
 
-int& InternalPlatform::GetRawApplicationArgs(char** argv)
+int& InternalPlatform::GetRawApplicationArgs(char**& argv)
 {
   argv = m_Argv;
-  return m_Argc;
+  return *m_Argc;
 }
 
 void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)

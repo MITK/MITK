@@ -33,6 +33,8 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   char** argv;
   int& argc = Platform::GetRawApplicationArgs(argv);
 
+  std::cout << "QtWorkbenchAdvisor::Initialize argv[0] = " << argv[0] << " argv[1] = " << argv[1] << std::endl;
+
 //  const std::vector<std::string> args = Platform::GetApplicationArgs();
 //  int* argc = new int;
 //  *argc = args.size();

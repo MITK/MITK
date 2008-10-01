@@ -26,7 +26,7 @@ namespace cherry {
  * A variable resolver can be used to add additional variable resolving
  * strategies to an {@link EvaluationContext}.
  * 
- * @see org.eclipse.core.expressions.EvaluationContext#resolveVariable(String, Object[])
+ * @see org.opencherry.core.expressions.EvaluationContext#resolveVariable(String, Object[])
  * 
  * @since 3.0
  */

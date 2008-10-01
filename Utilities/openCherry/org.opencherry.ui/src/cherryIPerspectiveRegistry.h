@@ -31,7 +31,7 @@ namespace cherry {
  * <p>
  * This registry contains a descriptor for each perspectives in the workbench.
  * It is initially populated with stock perspectives from the workbench's 
- * perspective extension point (<code>"org.eclipse.ui.perspectives"</code>) and 
+ * perspective extension point (<code>"org.opencherry.ui.perspectives"</code>) and 
  * with custom perspectives defined by the user.
  * </p><p>
  * This interface is not intended to be implemented by clients.

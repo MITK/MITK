@@ -69,7 +69,7 @@ private:
   PlatformEvents m_Events;
   PlatformEvent m_EventStarted;
 
-  int m_Argc;
+  int* m_Argc;
   char** m_Argv;
 
   //std::map<std::string, std::string> m_ArgMap;
@@ -122,7 +122,7 @@ public:
 
   std::vector<std::string> GetApplicationArgs() const;
 
-  int& GetRawApplicationArgs(char** argv);
+  int& GetRawApplicationArgs(char**& argv);
 
   IBundle::Pointer GetBundle(const std::string& id);
 };

@@ -35,10 +35,10 @@ namespace cherry {
  * This class should be subclassed by clients wishing to define new views.
  * The name of the subclass should be given as the <code>"class"</code> 
  * attribute in a <code>view</code> extension contributed to the workbench's
- * view extension point (named <code>"org.eclipse.ui.views"</code>).
+ * view extension point (named <code>"org.opencherry.ui.views"</code>).
  * For example, the plug-in's XML markup might contain:
  * <pre>
- * &LT;extension point="org.eclipse.ui.views"&GT;
+ * &LT;extension point="org.opencherry.ui.views"&GT;
  *      &LT;view id="com.example.myplugin.view"
  *         name="My View"
  *         class="com.example.myplugin.MyView"

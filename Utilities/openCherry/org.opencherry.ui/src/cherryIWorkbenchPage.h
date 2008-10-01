@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIWORKBENCHPAGE_H_
@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryIEditorReference.h"
 #include "cherryIViewReference.h"
+#include "cherryIPerspectiveDescriptor.h"
 #include "cherryIEditorPart.h"
 #include "cherryIViewPart.h"
 #include "cherryIEditorInput.h"
@@ -35,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  */
 namespace cherry {
 
@@ -60,20 +61,20 @@ namespace cherry {
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * 
+ *
  * @see IPerspectiveDescriptor
  * @see IEditorPart
  * @see IViewPart
  */
 struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, public Object {
-  
+
   cherryClassMacro(IWorkbenchPage);
-  
+
   /**
    * An optional attribute within a workspace marker (<code>IMarker</code>)
    * which identifies the preferred editor type to be opened when
    * <code>openEditor</code> is called.
-   * 
+   *
    * @see #openEditor(IEditorInput, String)
    * @see #openEditor(IEditorInput, String, boolean)
    * @deprecated in 3.0 since the notion of markers this is not generally
@@ -84,7 +85,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Change event id when the perspective is reset to its original state.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_RESET; // = "reset"; //$NON-NLS-1$
@@ -92,7 +93,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Change event id when the perspective has completed a reset to its
    * original state.
-   * 
+   *
    * @since 3.0
    * @see IPerspectiveListener
    */
@@ -100,56 +101,56 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Change event id when one or more views are shown in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_VIEW_SHOW; // = "viewShow"; //$NON-NLS-1$
 
   /**
    * Change event id when one or more views are hidden in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_VIEW_HIDE; // = "viewHide"; //$NON-NLS-1$
 
   /**
    * Change event id when one or more editors are opened in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_EDITOR_OPEN; // = "editorOpen"; //$NON-NLS-1$
 
   /**
    * Change event id when one or more editors are closed in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_EDITOR_CLOSE; // = "editorClose"; //$NON-NLS-1$
 
   /**
    * Change event id when the editor area is shown in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_EDITOR_AREA_SHOW; // = "editorAreaShow"; //$NON-NLS-1$
 
   /**
    * Change event id when the editor area is hidden in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_EDITOR_AREA_HIDE; // = "editorAreaHide"; //$NON-NLS-1$
 
   /**
    * Change event id when an action set is shown in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_ACTION_SET_SHOW; // = "actionSetShow"; //$NON-NLS-1$
 
   /**
    * Change event id when an action set is hidden in a perspective.
-   * 
+   *
    * @see IPerspectiveListener
    */
   static const std::string CHANGE_ACTION_SET_HIDE; // = "actionSetHide"; //$NON-NLS-1$
@@ -158,7 +159,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Show view mode that indicates the view should be made visible and
    * activated. Use of this mode has the same effect as calling
    * {@link #showView(String)}.
-   * 
+   *
    * @since 3.0
    */
   static const int VIEW_ACTIVATE; // = 1;
@@ -167,7 +168,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Show view mode that indicates the view should be made visible. If the
    * view is opened in the container that contains the active view then this
    * has the same effect as <code>VIEW_CREATE</code>.
-   * 
+   *
    * @since 3.0
    */
   static const int VIEW_VISIBLE; // = 2;
@@ -177,7 +178,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * necessarily be made visible. It will only be made visible in the event
    * that it is opened in its own container. In other words, only if it is not
    * stacked with another view.
-   * 
+   *
    * @since 3.0
    */
   static const int VIEW_CREATE; // = 3;
@@ -185,7 +186,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Editor opening match mode specifying that no matching against existing
    * editors should be done.
-   * 
+   *
    * @since 3.2
    */
   static const int MATCH_NONE; // = 0;
@@ -193,7 +194,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Editor opening match mode specifying that the editor input should be
    * considered when matching against existing editors.
-   * 
+   *
    * @since 3.2
    */
   static const int MATCH_INPUT; // = 1;
@@ -201,7 +202,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Editor opening match mode specifying that the editor id should be
    * considered when matching against existing editors.
-   * 
+   *
    * @since 3.2
    */
   static const int MATCH_ID; // = 2;
@@ -210,7 +211,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Activates the given part. The part will be brought to the front and given
    * focus. The part must belong to this page.
-   * 
+   *
    * @param part
    *            the part to activate
    */
@@ -218,7 +219,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Adds a property change listener.
-   * 
+   *
    * @param listener
    *            the property change listener to add
    * @since 2.0
@@ -229,7 +230,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Moves the given part forward in the Z order of this page so as to make it
    * visible, without changing which part has focus. The part must belong to
    * this page.
-   * 
+   *
    * @param part
    *            the part to bring forward
    */
@@ -242,7 +243,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * If the page has an open editor with unsaved content, the user will be
    * given the opportunity to save it.
    * </p>
-   * 
+   *
    * @return <code>true</code> if the page was successfully closed, and
    *         <code>false</code> if it is still open
    */
@@ -255,9 +256,9 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * is <code>true</code>, the user will be given the opportunity to save
    * them.
    * </p>
-   * 
+   *
    * @param save
-   * 
+   *
    * @return <code>true</code> if all editors were successfully closed, and
    *         <code>false</code> if at least one is still open
    */
@@ -271,7 +272,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * <code>true</code>, the user will be given the opportunity to save
    * them.
    * </p>
-   * 
+   *
    * @param editorRefs
    *            the editors to close
    * @param save
@@ -282,7 +283,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    *         <code>false</code> if the editors are still open
    * @since 3.0
    */
-  virtual bool CloseEditors(const std::vector<IEditorReference::Pointer>& editorRefs, bool save) = 0;
+  virtual bool CloseEditors(const std::list<IEditorReference::Pointer>& editorRefs, bool save) = 0;
 
   /**
    * Closes the given editor. The editor must belong to this workbench page.
@@ -290,7 +291,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * If the editor has unsaved content and <code>save</code> is
    * <code>true</code>, the user will be given the opportunity to save it.
    * </p>
-   * 
+   *
    * @param editor
    *            the editor to close
    * @param save
@@ -305,7 +306,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the view in this page with the specified id. There is at most one
    * view in the page with the specified id.
-   * 
+   *
    * @param viewId
    *            the id of the view extension to use
    * @return the view, or <code>null</code> if none is found
@@ -314,7 +315,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Returns the view reference with the specified id.
-   * 
+   *
    * @param viewId
    *            the id of the view extension to use
    * @return the view reference, or <code>null</code> if none is found
@@ -324,7 +325,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Returns the view reference with the specified id and secondary id.
-   * 
+   *
    * @param viewId
    *            the id of the view extension to use
    * @param secondaryId
@@ -341,7 +342,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * This is the visible editor on the page, or, if there is more than one
    * visible editor, this is the one most recently brought to top.
    * </p>
-   * 
+   *
    * @return the active editor, or <code>null</code> if no editor is active
    */
   virtual IEditorPart::Pointer GetActiveEditor() = 0;
@@ -349,7 +350,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the editor with the specified input. Returns null if there is no
    * opened editor with that input.
-   * 
+   *
    * @param input
    *            the editor input
    * @return an editor with input equals to <code>input</code>
@@ -360,7 +361,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Returns an array of editor references that match the given input and/or
    * editor id, as specified by the given match flags. Returns an empty array
    * if there are no matching editors, or if matchFlags is MATCH_NONE.
-   * 
+   *
    * @param input
    *            the editor input, or <code>null</code> if MATCH_INPUT is not
    *            specified in matchFlags
@@ -371,7 +372,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    *            a bit mask consisting of zero or more of the MATCH_* constants
    *            OR-ed together
    * @return the references for the matching editors
-   * 
+   *
    * @see #MATCH_NONE
    * @see #MATCH_INPUT
    * @see #MATCH_ID
@@ -386,9 +387,9 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Note that each page has its own editors; editors are never shared between
    * pages.
    * </p>
-   * 
+   *
    * @return a list of open editors
-   * 
+   *
    * @deprecated use #getEditorReferences() instead
    */
   virtual std::vector<IEditorPart::Pointer> GetEditors() = 0;
@@ -399,21 +400,21 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Note that each page has its own editors; editors are never shared between
    * pages.
    * </p>
-   * 
+   *
    * @return a list of open editors
    */
   virtual std::list<IEditorReference::Pointer> GetEditorReferences() = 0;
 
   /**
    * Returns a list of dirty editors in this page.
-   * 
+   *
    * @return a list of dirty editors
    */
   virtual std::vector<IEditorPart::Pointer> GetDirtyEditors() = 0;
 
   /**
    * Returns the input for this page.
-   * 
+   *
    * @return the input for this page, or <code>null</code> if none
    */
   //virtual IAdaptable* GetInput();
@@ -421,7 +422,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the page label. This will be a unique identifier within the
    * containing workbench window.
-   * 
+   *
    * @return the page label
    */
   virtual std::string GetLabel() = 0;
@@ -429,12 +430,12 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the current perspective descriptor for this page, or
    * <code>null</code> if there is no current perspective.
-   * 
+   *
    * @return the current perspective descriptor or <code>null</code>
    * @see #setPerspective
    * @see #savePerspective
    */
-  //virtual IPerspectiveDescriptor::Pointer GetPerspective();
+  virtual IPerspectiveDescriptor::Pointer GetPerspective() = 0;
 
   /**
    * Returns a list of the reference to views visible on this page.
@@ -442,7 +443,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Note that each page has its own views; views are never shared between
    * pages.
    * </p>
-   * 
+   *
    * @return a list of references to visible views
    */
   virtual std::vector<IViewReference::Pointer> GetViewReferences() = 0;
@@ -453,23 +454,23 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Note that each page has its own views; views are never shared between
    * pages.
    * </p>
-   * 
+   *
    * @return a list of visible views
-   * 
+   *
    * @deprecated use #getViewReferences() instead.
    */
   virtual std::vector<IViewPart::Pointer> GetViews() = 0;
 
   /**
    * Returns the workbench window of this page.
-   * 
+   *
    * @return the workbench window
    */
   virtual IWorkbenchWindow::Pointer GetWorkbenchWindow() = 0;
 
   /**
    * Hides the given view. The view must belong to this page.
-   * 
+   *
    * @param view
    *            the view to hide
    */
@@ -477,7 +478,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Hides the given view that belongs to the reference, if any.
-   * 
+   *
    * @param view
    *            the references whos view is to be hidden
    * @since 3.0
@@ -486,7 +487,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Returns whether the specified part is visible.
-   * 
+   *
    * @param part
    *            the part to test
    * @return boolean <code>true</code> if part is visible
@@ -495,7 +496,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Reuses the specified editor by setting its new input.
-   * 
+   *
    * @param editor
    *            the editor to be reused
    * @param input
@@ -509,7 +510,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * If this page already has an editor open on the target input that editor
    * is activated; otherwise, a new editor is opened. Two editor inputs,
    * input1 and input2, are considered the same if
-   * 
+   *
    * <pre>
    * input1.equals(input2) == true
    * </pre>.
@@ -522,7 +523,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * lifecycle for editors, regardless of whether they are created by the user
    * or restored from saved data.
    * </p>
-   * 
+   *
    * @param input
    *            the editor input
    * @param editorId
@@ -542,16 +543,16 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * inputs are considered the same if they equal. See
    * <code>Object.equals(Object)<code>
    * and <code>IEditorInput</code>. If <code>activate == true</code> the editor
-   * will be activated.  
+   * will be activated.
    * </p><p>
    * The editor type is determined by mapping <code>editorId</code> to an editor
    * extension registered with the workbench.  An editor id is passed rather than
    * an editor object to prevent the accidental creation of more than one editor
    * for the same input. It also guarantees a consistent lifecycle for editors,
-   * regardless of whether they are created by the user or restored from saved 
+   * regardless of whether they are created by the user or restored from saved
    * data.
    * </p>
-   * 
+   *
    * @param input the editor input
    * @param editorId the id of the editor extension to use
    * @param activate if <code>true</code> the editor will be activated
@@ -570,23 +571,23 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * inputs are considered the same if they equal. See
    * <code>Object.equals(Object)<code>
    * and <code>IEditorInput</code>. If <code>activate == true</code> the editor
-   * will be activated.  
+   * will be activated.
    * </p><p>
    * The editor type is determined by mapping <code>editorId</code> to an editor
    * extension registered with the workbench.  An editor id is passed rather than
    * an editor object to prevent the accidental creation of more than one editor
    * for the same input. It also guarantees a consistent lifecycle for editors,
-   * regardless of whether they are created by the user or restored from saved 
+   * regardless of whether they are created by the user or restored from saved
    * data.
    * </p>
-   * 
+   *
    * @param input the editor input
    * @param editorId the id of the editor extension to use
    * @param activate if <code>true</code> the editor will be activated
    * @param matchFlags a bit mask consisting of zero or more of the MATCH_* constants OR-ed together
    * @return an open editor, or <code>null</code> if an external editor was opened
    * @exception PartInitException if the editor could not be created or initialized
-   * 
+   *
    * @see #MATCH_NONE
    * @see #MATCH_INPUT
    * @see #MATCH_ID
@@ -597,7 +598,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
 
   /**
    * Removes the property change listener.
-   * 
+   *
    * @param listener
    *            the property change listener to remove
    * @since 2.0
@@ -627,7 +628,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * Note that as of 3.2, this method also saves views that implement
    * ISaveablePart and are dirty.
    * </p>
-   * 
+   *
    * @param confirm <code>true</code> to ask the user before saving unsaved
    *            changes (recommended), and <code>false</code> to save
    *            unsaved changes without asking
@@ -647,7 +648,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * <p>
    * The editor must belong to this workbench page.
    * </p>
-   * 
+   *
    * @param editor
    *            the editor to close
    * @param confirm
@@ -671,11 +672,11 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * this page to the given perspective descriptor. The contents of the given
    * perspective descriptor are overwritten and it is made the current one for
    * this page.
-   * 
+   *
    * @param perspective
    *            the perspective descriptor to save to
    */
-  //virtual void SavePerspectiveAs(IPerspectiveDescriptor::Pointer perspective);
+  virtual void SavePerspectiveAs(IPerspectiveDescriptor::Pointer perspective) = 0;
 
 
   /**
@@ -707,17 +708,17 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * <p>
    * The open editors are not modified by this method.
    * </p>
-   * 
+   *
    * @param perspective
    *            the perspective descriptor
    */
-  //virtual void SetPerspective(IPerspectiveDescriptor::Pointer perspective);
+  virtual void SetPerspective(IPerspectiveDescriptor::Pointer perspective) = 0;
 
   /**
    * Shows the view identified by the given view id in this page and gives it
    * focus. If there is a view identified by the given view id (and with no
    * secondary id) already open in this page, it is given focus.
-   * 
+   *
    * @param viewId
    *            the id of the view extension to use
    * @return the shown view
@@ -740,7 +741,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * view must allow multiple instances by having specified
    * allowMultiple="true" in its extension.
    * </p>
-   * 
+   *
    * @param viewId
    *            the id of the view extension to use
    * @param secondaryId
@@ -761,7 +762,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns <code>true</code> if the editor is pinned and should not be
    * reused.
-   * 
+   *
    * @param editor
    *            the editor to test
    * @return boolean whether the editor is pinned
@@ -771,7 +772,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the perspective shortcuts associated with the current
    * perspective. Returns an empty array if there is no current perspective.
-   * 
+   *
    * @see IPageLayout#addPerspectiveShortcut(String)
    * @return an array of perspective identifiers
    * @since 3.1
@@ -781,7 +782,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the show view shortcuts associated with the current perspective.
    * Returns an empty array if there is no current perspective.
-   * 
+   *
    * @see IPageLayout#addShowViewShortcut(String)
    * @return an array of view identifiers
    * @since 3.1
@@ -791,20 +792,20 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Returns the descriptors for the perspectives that are open in this page,
    * in the order in which they were opened.
-   * 
+   *
    * @return the open perspective descriptors, in order of opening
    * @since 3.1
    */
-  //virtual std::vector<IPerspectiveDescriptor::Pointer> GetOpenPerspectives();
+  virtual std::vector<IPerspectiveDescriptor::Pointer> GetOpenPerspectives() = 0;
 
   /**
    * Returns the descriptors for the perspectives that are open in this page,
    * in the order in which they were activated (oldest first).
-   * 
+   *
    * @return the open perspective descriptors, in order of activation
    * @since 3.1
    */
-  //virtual std::vector<IPerspectiveDescriptor::Pointer> GetSortedPerspectives();
+  virtual std::vector<IPerspectiveDescriptor::Pointer> GetSortedPerspectives() = 0;
 
   /**
    * Closes the specified perspective in this page. If the last perspective in
@@ -813,7 +814,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    * is <code>true</code>, the user will be prompted to save any unsaved
    * changes for parts that are being closed. The page itself is closed if
    * <code>closePage</code> is <code>true</code>.
-   * 
+   *
    * @param desc
    *            the descriptor of the perspective to be closed
    * @param saveParts
@@ -822,15 +823,15 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    *            whether the page itself should be closed if last perspective
    * @since 3.1
    */
-  //virtual void ClosePerspective(IPerspectiveDescriptor::Pointer desc,
-  //    bool saveParts, bool closePage);
+  virtual void ClosePerspective(IPerspectiveDescriptor::Pointer desc,
+      bool saveParts, bool closePage) = 0;
 
   /**
    * Closes all perspectives in this page. All editors are closed, prompting
    * to save any unsaved changes if <code>saveEditors</code> is
    * <code>true</code>. The page itself is closed if <code>closePage</code>
    * is <code>true</code>.
-   * 
+   *
    * @param saveEditors
    *            whether the page's editors should be saved
    * @param closePage
@@ -842,7 +843,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
   /**
    * Find the part reference for the given part. A convenience method to
    * quickly go from part to part reference.
-   * 
+   *
    * @param part
    *            The part to search for. It can be <code>null</code>.
    * @return The reference for the given part, or <code>null</code> if no

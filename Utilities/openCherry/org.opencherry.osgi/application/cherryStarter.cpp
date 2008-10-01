@@ -31,8 +31,9 @@ namespace cherry {
 
 const std::string Starter::XP_APPLICATIONS = "org.opencherry.osgi.applications";
 
-int Starter::Run(int argc, char**& argv)
+int Starter::Run(int& argc, char** argv)
 {
+
   // startup the internal platform
   InternalPlatform* platform = InternalPlatform::GetInstance();
   platform->Initialize(argc, argv);

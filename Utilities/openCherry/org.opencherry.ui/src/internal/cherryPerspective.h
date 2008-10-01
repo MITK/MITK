@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYPERSPECTIVE_H_
@@ -25,11 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryViewLayoutRec.h"
 #include "cherryWorkbenchPage.h"
 #include "cherryLayoutPart.h"
+#include "cherryPageLayout.h"
 
+#include "../cherryPartPane.h"
 #include "../cherryIWorkbenchPartReference.h"
 #include "../cherryIViewReference.h"
 #include "../cherryIViewPart.h"
-#include "../cherryIViewPane.h"
 
 #include <map>
 #include <vector>
@@ -42,19 +43,21 @@ class PerspectiveHelper;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
 class Perspective : public Object {
-  
+
 public:
-  
+
   cherryClassMacro(Perspective);
-  
+
+  friend class WorkbenchPage;
+
 private:
-  
+
   ViewFactory* viewFactory;
   std::map<std::string, ViewLayoutRec::Pointer> mapIDtoViewLayoutRec;
-  
+
   static const std::string VERSION_STRING; // = "0.016";//$NON-NLS-1$
 
   /**
@@ -62,16 +65,16 @@ private:
    * when this perspective was deactivated.
    */
   IWorkbenchPartReference::Pointer oldPartRef;
-  
+
 protected:
-  
+
   PerspectiveDescriptor::Pointer descriptor;
 
   WorkbenchPage::Pointer page;
 
     // Editor Area management
     LayoutPart::Pointer editorArea;
-    PartPlaceholder::Pointer editorHolder;
+    ContainerPlaceholder::Pointer editorHolder;
     bool editorHidden;
     int editorAreaState;
 
@@ -79,15 +82,15 @@ protected:
 
     //ArrayList alwaysOffActionSets;
 
-    ArrayList showViewShortcuts;
+    std::vector<std::string> showViewShortcuts;
 
-    ArrayList perspectiveShortcuts;
+    std::vector<std::string> perspectiveShortcuts;
 
     bool fixed;
 
-    ArrayList showInPartIds;
+    std::vector<std::string> showInPartIds;
 
-    HashMap showInTimes;
+    //HashMap showInTimes;
 
     IMemento::Pointer memento;
 
@@ -97,7 +100,7 @@ protected:
 
     PageLayout::Pointer layout;
 
-    
+
     /**
      * ViewManager constructor comment.
      */
@@ -107,8 +110,8 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * ViewManager constructor comment.
      */
     protected: Perspective(WorkbenchPage::Pointer page);
-    
-    protected: Init(WorkbenchPage::Pointer page);
+
+    protected: void Init(WorkbenchPage::Pointer page);
 
 
     /**
@@ -155,15 +158,15 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Finds the view with the given ID that is open in this page, or <code>null</code>
      * if not found.
-     * 
+     *
      * @param viewId the view ID
      */
     public: IViewReference::Pointer FindView(const std::string& viewId);
 
     /**
-     * Finds the view with the given id and secondary id that is open in this page, 
+     * Finds the view with the given id and secondary id that is open in this page,
      * or <code>null</code> if not found.
-     * 
+     *
      * @param viewId the view ID
      * @param secondaryId the secondary ID
      */
@@ -173,9 +176,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Returns the window's client composite widget
      * which views and editor area will be parented.
      */
-//    public: Composite getClientComposite() {
-//        return page.getClientComposite();
-//    }
+    public: void* GetClientComposite();
 
     /**
      * Returns the perspective.
@@ -186,11 +187,11 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Returns the pane for a view reference.
      */
-    protected: IViewPane::Pointer GetPane(IViewReference::Pointer ref);
+    protected: PartPane::Pointer GetPane(IViewReference::Pointer ref);
 
     /**
      * Returns the perspective shortcuts associated with this perspective.
-     * 
+     *
      * @return an array of perspective identifiers
      */
     public: std::vector<std::string> GetPerspectiveShortcuts();
@@ -198,11 +199,11 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Returns the presentation.
      */
-    public: PerspectiveHelper* GetPresentation();
+    public: PerspectiveHelper* GetPresentation() const;
 
     /**
      * Returns the show view shortcuts associated with this perspective.
-     * 
+     *
      * @return an array of view identifiers
      */
     public: std::vector<std::string> GetShowViewShortcuts();
@@ -258,7 +259,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 
     /**
      * Returns true if a view is standalone.
-     * 
+     *
      * @since 3.0
      */
     public: bool IsStandaloneView(IViewReference::Pointer ref);
@@ -266,7 +267,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Returns whether the title for a view should
      * be shown.  This applies only to standalone views.
-     * 
+     *
      * @since 3.0
      */
     public: bool GetShowTitleView(IViewReference::Pointer ref);
@@ -278,7 +279,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     private: void LoadCustomPersp(PerspectiveDescriptor::Pointer persp);
 
     private: void UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
-            IStatus status);
+            const std::string& status);
 
     /**
      * Create a presentation for a perspective.
@@ -293,13 +294,13 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //        if (!alwaysOnActionSets.contains(descriptor)) {
 //            return;
 //        }
-//        
+//
 //        alwaysOnActionSets.remove(descriptor);
 //        if (page != null) {
 //            page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_HIDE);
 //        }
 //    }
-    
+
 //    protected: void AddAlwaysOff(IActionSetDescriptor descriptor) {
 //        if (descriptor == null) {
 //            return;
@@ -313,7 +314,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //        }
 //        removeAlwaysOn(descriptor);
 //    }
-    
+
 //    protected: void AddAlwaysOn(IActionSetDescriptor descriptor) {
 //        if (descriptor == null) {
 //            return;
@@ -327,7 +328,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //        }
 //        removeAlwaysOff(descriptor);
 //    }
-    
+
 //    private: void RemoveAlwaysOff(IActionSetDescriptor descriptor) {
 //        if (descriptor == null) {
 //            return;
@@ -340,7 +341,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //            page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_UNMASK);
 //        }
 //    }
-    
+
     /**
      * activate.
      */
@@ -362,7 +363,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     public: void PerformedShowIn(const std::string& partId);
 
- 
+
     /**
      * Fills a presentation with layout data.
      * Note: This method should not modify the current state of the perspective.
@@ -377,9 +378,9 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     public: bool RestoreState();
 
-    
+
     /**
-     * Returns the ActionSets read from perspectiveExtensions in the registry.  
+     * Returns the ActionSets read from perspectiveExtensions in the registry.
      */
 //    protected: ArrayList GetPerspectiveExtensionActionSets() {
 //        PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
@@ -391,7 +392,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //    }
 
     /**
-     * Returns the Show In... part ids read from the registry.  
+     * Returns the Show In... part ids read from the registry.
      */
     protected: std::vector<std::string> GetShowInIdsFromRegistry();
 
@@ -399,7 +400,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Save the layout.
      */
     public: void SaveDesc();
-    
+
     /**
      * Save the layout.
      */
@@ -415,19 +416,19 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     private: bool SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
             bool saveInnerViewState);
-    
+
 //    public: void turnOnActionSets(IActionSetDescriptor[] newArray) {
 //        for (int i = 0; i < newArray.length; i++) {
 //            IActionSetDescriptor descriptor = newArray[i];
-//            
+//
 //            addAlwaysOn(descriptor);
 //        }
 //    }
-    
+
 //    public: void turnOffActionSets(IActionSetDescriptor[] toDisable) {
 //        for (int i = 0; i < toDisable.length; i++) {
 //            IActionSetDescriptor descriptor = toDisable[i];
-//            
+//
 //            turnOffActionSet(descriptor);
 //        }
 //    }
@@ -435,7 +436,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //    public: void turnOffActionSet(IActionSetDescriptor toDisable) {
 //        addAlwaysOff(toDisable);
 //    }
-    
+
 
 
     /**
@@ -454,7 +455,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Sets the ids of the views to list in the Show View shortcuts.
      * This is a List of Strings.
      */
-    public: void setShowViewActionIds(const std::vector<std::string>& list);
+    public: void SetShowViewActionIds(const std::vector<std::string>& list);
 
 
     /**
@@ -466,13 +467,13 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * Show the editor area if not visible
      */
     protected: void ShowEditorAreaLocal();
-    
+
     public: void SetEditorAreaState(int newState);
-    
+
     public: int GetEditorAreaState();
-    
+
     /**
-   * 
+   *
    */
   public: void RefreshEditorAreaVisibility();
 
@@ -480,17 +481,17 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Resolves a view's id into its reference, creating the
      * view if necessary.
-     * 
+     *
      * @param viewId The primary id of the view (must not be
      * <code>null</code>
      * @param secondaryId The secondary id of a multiple-instance view
      * (may be <code>null</code>).
-     * 
+     *
      * @return The reference to the specified view. This may be null if the
      * view fails to create (i.e. thrown a PartInitException)
      */
     public: IViewReference::Pointer GetViewReference(const std::string& viewId, const std::string& secondaryId);
-    
+
     /**
      * Shows the view with the given id and secondary id.
      */
@@ -500,14 +501,14 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
     /**
      * Returns the old part reference.
      * Returns null if there was no previously active part.
-     * 
+     *
      * @return the old part reference or <code>null</code>
      */
     public: IWorkbenchPartReference::Pointer GetOldPartRef();
 
     /**
      * Sets the old part reference.
-     * 
+     *
      * @param oldPartRef The old part reference to set, or <code>null</code>
      */
     public: void SetOldPartRef(IWorkbenchPartReference::Pointer oldPartRef);
@@ -558,7 +559,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //        service.activateContext(ContextAuthority.SEND_EVENTS);
 //      }
 //    }
-    
+
 //    void removeActionSet(IActionSetDescriptor toRemove) {
 //        removeAlwaysOn(toRemove);
 //        removeAlwaysOff(toRemove);
@@ -567,14 +568,14 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 
     /**
      * Returns whether the given view is closeable in this perspective.
-     * 
+     *
      * @since 3.0
      */
     public: bool IsCloseable(IViewReference::Pointer reference);
 
     /**
      * Returns whether the given view is moveable in this perspective.
-     * 
+     *
      * @since 3.0
      */
     public: bool IsMoveable(IViewReference::Pointer reference);
@@ -589,10 +590,10 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      * <p>
      * This is only intended for use by test suites.
      * </p>
-     * 
+     *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf);
+    public: void DescribeLayout(std::string& buf) const;
 
     /**
      * Sanity-checks the LayoutParts in this perspective. Throws an Assertation exception
@@ -603,7 +604,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
 //    public: IActionSetDescriptor[] getAlwaysOnActionSets() {
 //        return (IActionSetDescriptor[]) alwaysOnActionSets.toArray(new IActionSetDescriptor[alwaysOnActionSets.size()]);
 //    }
-    
+
 //    public: IActionSetDescriptor[] getAlwaysOffActionSets() {
 //        return (IActionSetDescriptor[]) alwaysOffActionSets.toArray(new IActionSetDescriptor[alwaysOffActionSets.size()]);
 //    }
@@ -612,13 +613,13 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
   /**
    * Used to restrict the use of the new min/max behavior to envoronments
    * in which it has a chance of working...
-   * 
+   *
    * @param activePerspective We pass this in as an arg so others won't have
    * to check it for 'null' (which is one of the failure cases)
-   * 
+   *
    */
   public: static bool UseNewMinMax(Perspective::Pointer activePerspective);
-  
+
 };
 
 }

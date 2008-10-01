@@ -1,105 +1,138 @@
 /*=========================================================================
- 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
- 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
- 
-=========================================================================*/
+
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
+
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
+
+ =========================================================================*/
 
 #include "cherryContainerPlaceholder.h"
 
-namespace cherry {
+#include "cherryPartPlaceholder.h"
+#include "cherryILayoutContainer.h"
+
+namespace cherry
+{
 
 int ContainerPlaceholder::nextId = 0;
 
-ContainerPlaceholder::ContainerPlaceholder(const std::string& id) {
-        super(((id == null) ? "Container Placeholder " + nextId++ : id)); //$NON-NLS-1$
-    }
+ContainerPlaceholder::ContainerPlaceholder(const std::string& id) :
+  LayoutPart(id == "" ? "Container Placeholder " + nextId++ : id)
+{
 
-    void ContainerPlaceholder::Add(LayoutPart::Pointer child) {
-        if (!(child instanceof PartPlaceholder)) {
-      return;
-    }
-        realContainer.add(child);
-    }
+}
 
-    bool ContainerPlaceholder::AllowsBorder() {
-        return true;
-    }
+void ContainerPlaceholder::CreateControl(void* parent)
+{
 
-    std::vector<LayoutPart::Pointer> ContainerPlaceholder::GetChildren() {
-        return realContainer.getChildren();
-    }
+}
 
-    LayoutPart::Pointer ContainerPlaceholder::GetFocus() {
-        return null;
-    }
+void* ContainerPlaceholder::GetControl()
+{
+  return 0;
+}
 
-    LayoutPart::Pointer ContainerPlaceholder::GetRealContainer() {
-        return (LayoutPart) realContainer;
-    }
+void ContainerPlaceholder::Add(StackablePart::Pointer child)
+{
+  if (child.Cast<PartPlaceholder>() == 0)
+  {
+    return;
+  }
+  realContainer->Add(child);
+}
 
-    bool ContainerPlaceholder::IsChildVisible(LayoutPart::Pointer child) {
-        return false;
-    }
+bool ContainerPlaceholder::AllowsAdd(StackablePart::Pointer toAdd)
+{
+  return false;
+}
 
-    void ContainerPlaceholder::Remove(LayoutPart::Pointer child) {
-        if (!(child instanceof PartPlaceholder)) {
-      return;
-    }
-        realContainer.remove(child);
-    }
+std::list<StackablePart::Pointer> ContainerPlaceholder::GetChildren() const
+{
+  return realContainer->GetChildren();
+}
 
-    void ContainerPlaceholder::Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild) {
-        if (!(oldChild instanceof PartPlaceholder)
-                && !(newChild instanceof PartPlaceholder)) {
-      return;
-    }
-        realContainer.replace(oldChild, newChild);
-    }
+IStackableContainer::Pointer ContainerPlaceholder::GetRealContainer()
+{
+  return realContainer;
+}
 
-    void ContainerPlaceholder::SetChildVisible(LayoutPart::Pointer child, bool visible) {
+void ContainerPlaceholder::Remove(StackablePart::Pointer child)
+{
+  if (child.Cast<PartPlaceholder> () == 0)
+  {
+    return;
+  }
+  realContainer->Remove(child);
+}
+
+void ContainerPlaceholder::Replace(StackablePart::Pointer oldChild,
+    StackablePart::Pointer newChild)
+{
+  if (oldChild.Cast<PartPlaceholder>() == 0 && newChild.Cast<PartPlaceholder>()
+      == 0)
+  {
+    return;
+  }
+  realContainer->Replace(oldChild, newChild);
+}
+
+void ContainerPlaceholder::SetRealContainer(
+    IStackableContainer::Pointer container)
+{
+
+  if (container == 0)
+  {
+    // set the parent container of the children back to the real container
+    if (realContainer != 0)
+    {
+      std::list<StackablePart::Pointer> children = realContainer->GetChildren();
+      for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
+          != children.end(); ++iter)
+      {
+        (*iter)->SetContainer(realContainer);
+      }
     }
-
-    void ContainerPlaceholder::SetFocus(LayoutPart::Pointer child) {
+  }
+  else
+  {
+    // replace the real container with this place holder
+    std::list<StackablePart::Pointer> children = container->GetChildren();
+    for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
+        != children.end(); ++iter)
+    {
+      (*iter)->SetContainer(this);
     }
+  }
 
-    void ContainerPlaceholder::SetRealContainer(ILayoutContainer::Pointer container) {
+  this->realContainer = container;
+}
 
-        if (container == null) {
-            // set the parent container of the children back to the real container
-            if (realContainer != null) {
-                LayoutPart[] children = realContainer.getChildren();
-                if (children != null) {
-                    for (int i = 0, length = children.length; i < length; i++) {
-                        children[i].setContainer(realContainer);
-                    }
-                }
-            }
-        } else {
-            // replace the real container with this place holder
-            LayoutPart[] children = container.getChildren();
-            if (children != null) {
-                for (int i = 0, length = children.length; i < length; i++) {
-                    children[i].setContainer(this);
-                }
-            }
-        }
+void ContainerPlaceholder::FindSashes(PartPane::Sashes& sashes)
+{
+  ILayoutContainer::Pointer container = this->GetContainer();
 
-        this.realContainer = container;
-    }
+  if (container != 0) {
+      container->FindSashes(this, sashes);
+  }
+}
 
-    bool ContainerPlaceholder::AllowsAutoFocus() {
-        return false;
-    }
+void ContainerPlaceholder::ResizeChild(StackablePart::Pointer childThatChanged)
+{
+
+}
+
+bool ContainerPlaceholder::AllowsAutoFocus()
+{
+  return false;
+}
 
 }

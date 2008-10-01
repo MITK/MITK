@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIWORKBENCHWINDOWCONFIGURER_H_
@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryUiDll.h"
 
+#include "../cherryShell.h"
 #include "../cherryIMemento.h"
 #include "../cherryPoint.h"
 
@@ -45,26 +46,26 @@ struct IWorkbenchWindow;
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * 
+ *
  * @see IWorkbenchConfigurer#getWindowConfigurer
  * @see WorkbenchAdvisor#preWindowOpen
  * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
-  
+
   cherryClassMacro(IWorkbenchWindowConfigurer);
-  
+
   /**
      * Returns the underlying workbench window.
-     * 
+     *
      * @return the workbench window
      */
     virtual SmartPointer<IWorkbenchWindow> GetWindow() = 0;
 
     /**
      * Returns the workbench configurer.
-     * 
+     *
      * @return the workbench configurer
      */
     virtual SmartPointer<IWorkbenchConfigurer> GetWorkbenchConfigurer() = 0;
@@ -72,21 +73,21 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
     /**
      * Returns the action bar configurer for this workbench
      * window.
-     * 
+     *
      * @return the action bar configurer
      */
     //virtual IActionBarConfigurer GetActionBarConfigurer() = 0;
 
     /**
      * Returns the title of the underlying workbench window.
-     * 
+     *
      * @return the window title
      */
     virtual std::string GetTitle() = 0;
 
     /**
      * Sets the title of the underlying workbench window.
-     * 
+     *
      * @param title the window title
      */
     virtual void SetTitle(const std::string& title) = 0;
@@ -96,7 +97,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <p>
      * The initial value is <code>true</code>.
      * </p>
-     * 
+     *
      * @return <code>true</code> for a menu bar, and <code>false</code>
      * for no menu bar
      */
@@ -104,7 +105,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Sets whether the underlying workbench window has a menu bar.
-     * 
+     *
      * @param show <code>true</code> for a menu bar, and <code>false</code>
      * for no menu bar
      */
@@ -115,7 +116,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <p>
      * The initial value is <code>true</code>.
      * </p>
-     * 
+     *
      * @return <code>true</code> for a cool bar, and <code>false</code>
      * for no cool bar
      */
@@ -123,7 +124,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Sets whether the underlying workbench window has a cool bar.
-     * 
+     *
      * @param show <code>true</code> for a cool bar, and <code>false</code>
      * for no cool bar
      */
@@ -134,7 +135,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <p>
      * The initial value is <code>true</code>.
      * </p>
-     * 
+     *
      * @return <code>true</code> for a status line, and <code>false</code>
      * for no status line
      */
@@ -142,7 +143,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Sets whether the underlying workbench window has a status line.
-     * 
+     *
      * @param show <code>true</code> for a status line, and <code>false</code>
      * for no status line
      */
@@ -154,16 +155,16 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <p>
      * The initial value is <code>false</code>.
      * </p>
-     * 
+     *
      * @return <code>true</code> for a perspective bar, and <code>false</code>
      * for no perspective bar
      */
     virtual bool GetShowPerspectiveBar() = 0;
 
     /**
-     * Sets whether the underlying workbench window has a perspective bar (the 
+     * Sets whether the underlying workbench window has a perspective bar (the
      * perspective bar provides buttons to quickly switch between perspectives).
-     * 
+     *
      * @param show <code>true</code> for a perspective bar, and
      * <code>false</code> for no perspective bar
      */
@@ -174,7 +175,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <p>
      * The initial value is <code>false</code>.
      * </p>
-     * 
+     *
      * @return <code>true</code> for a progress indicator, and <code>false</code>
      * for no progress indicator
      */
@@ -182,7 +183,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Sets whether the underlying workbench window has a progress indicator.
-     * 
+     *
      * @param show <code>true</code> for a progress indicator, and <code>false</code>
      * for no progress indicator
      */
@@ -203,7 +204,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * callback on <code>WorkbenchAdvisor</code>.
      * <p>
      * For more details on the applicable shell style bits, see the
-     * documentation for {@link org.eclipse.swt.widgets.Shell}.
+     * documentation for {@link org.opencherry.swt.widgets.Shell}.
      * </p>
      *
      * @param shellStyle the shell style bits
@@ -229,7 +230,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Returns the data associated with this workbench window at the given key.
-     * 
+     *
      * @param key the key
      * @return the data, or <code>null</code> if there is no data at the given
      * key
@@ -238,7 +239,7 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
     /**
      * Sets the data associated with this workbench window at the given key.
-     * 
+     *
      * @param key the key
      * @param data the data, or <code>null</code> to delete existing data
      */
@@ -252,19 +253,19 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * <code>preWindowOpen</code> callback.
      * A newly-created workbench window supports no drag and drop transfer
      * types. Adding <code>EditorInputTransfer.getInstance()</code>
-     * enables <code>IEditorInput</code>s to be transferred. 
+     * enables <code>IEditorInput</code>s to be transferred.
      * </p>
      * <p>
      * Note that drag and drop to the editor area requires adding one or more
-     * transfer types (using <code>addEditorAreaTransfer</code>) and 
+     * transfer types (using <code>addEditorAreaTransfer</code>) and
      * configuring a drop target listener
      * (with <code>configureEditorAreaDropListener</code>)
      * capable of handling any of those transfer types.
      * </p>
-     * 
+     *
      * @param transfer a drag and drop transfer object
      * @see #configureEditorAreaDropListener
-     * @see org.eclipse.ui.part.EditorInputTransfer
+     * @see org.opencherry.ui.part.EditorInputTransfer
      */
     //virtual void addEditorAreaTransfer(Transfer transfer);
 
@@ -278,21 +279,21 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * </p>
      * <p>
      * Note that drag and drop to the editor area requires adding one or more
-     * transfer types (using <code>addEditorAreaTransfer</code>) and 
+     * transfer types (using <code>addEditorAreaTransfer</code>) and
      * configuring a drop target listener
      * (with <code>configureEditorAreaDropListener</code>)
      * capable of handling any of those transfer types.
      * </p>
-     * 
+     *
      * @param dropTargetListener the drop target listener that will handle
      * requests to drop an object on to the editor area of this window
-     * 
+     *
      * @see #addEditorAreaTransfer
      */
     //virtual void configureEditorAreaDropListener(
     //        DropTargetListener dropTargetListener);
 
-  
+
     /**
      * Creates the menu bar for the window's shell.
      * <p>
@@ -300,48 +301,48 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * in <code>createWindowContents</code>, and may only be called once.
      * The caller must set it in the shell using <code>Shell.setMenuBar(Menu)</code>
      * but must not make add, remove or change items in the result.
-     * The menu bar is populated by the window's menu manager.  
-     * The application can add to the menu manager in the advisor's 
+     * The menu bar is populated by the window's menu manager.
+     * The application can add to the menu manager in the advisor's
      * <code>fillActionBars</code> method instead.
      * </p>
-     * 
+     *
      * @return the menu bar, suitable for setting in the shell
      */
     //virtual Menu createMenuBar();
 
     /**
-     * Creates the cool bar control. 
+     * Creates the cool bar control.
      * <p>
      * This should only be called if the advisor is defining custom window contents
      * in <code>createWindowContents</code>, and may only be called once.
      * The caller must lay out the cool bar appropriately within the parent,
      * but must not add, remove or change items in the result (hence the
      * return type of <code>Control</code>).
-     * The cool bar is populated by the window's cool bar manager.  
-     * The application can add to the cool bar manager in the advisor's 
+     * The cool bar is populated by the window's cool bar manager.
+     * The application can add to the cool bar manager in the advisor's
      * <code>fillActionBars</code> method instead.
      * </p>
-     * 
+     *
      * @param parent the parent composite
-     * @return the cool bar control, suitable for laying out in the parent 
+     * @return the cool bar control, suitable for laying out in the parent
      */
     //virtual Control createCoolBarControl(Composite parent);
 
     /**
-     * Creates the status line control. 
+     * Creates the status line control.
      * <p>
      * This should only be called if the advisor is defining custom window contents
      * in <code>createWindowContents</code>, and may only be called once.
      * The caller must lay out the status line appropriately within the parent,
      * but must not add, remove or change items in the result (hence the
      * return type of <code>Control</code>).
-     * The status line is populated by the window's status line manager.  
-     * The application can add to the status line manager in the advisor's 
+     * The status line is populated by the window's status line manager.
+     * The application can add to the status line manager in the advisor's
      * <code>fillActionBars</code> method instead.
      * </p>
-     * 
+     *
      * @param parent the parent composite
-     * @return the status line control, suitable for laying out in the parent 
+     * @return the status line control, suitable for laying out in the parent
      */
     //virtual Control createStatusLineControl(Composite parent);
 
@@ -354,17 +355,17 @@ struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
      * The caller must lay out the page composite appropriately within the parent,
      * but must not add, remove or change items in the result (hence the
      * return type of <code>Control</code>).
-     * The page composite is populated by the workbench.  
+     * The page composite is populated by the workbench.
      * </p>
-     * 
+     *
      * @param parent the parent composite
-     * @return the page composite, suitable for laying out in the parent 
+     * @return the page composite, suitable for laying out in the parent
      */
-    //virtual Control createPageComposite(Composite parent);
-  
+    virtual void* CreatePageComposite(void* parent) = 0;
+
   /**
    * Saves the current state of the window using the specified memento.
-   * 
+   *
    * @param memento the memento in which to save the window's state
    * @return a status object indicating whether the save was successful
      * @see IWorkbenchConfigurer#restoreWorkbenchWindow(IMemento)

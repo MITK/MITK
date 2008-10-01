@@ -23,6 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "cherryIPageService.h"
+#include "cherryShell.h"
+
+#include "services/cherryIServiceLocator.h"
+
 namespace cherry {
 
 struct IPartService;
@@ -63,7 +68,7 @@ struct IWorkbench;
  * @noimplement This interface is not intended to be implemented by clients.
  *
  */
-struct CHERRY_UI IWorkbenchWindow : public Object
+struct CHERRY_UI IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
 {
 
   cherryClassMacro(IWorkbenchWindow);
@@ -110,6 +115,14 @@ struct CHERRY_UI IWorkbenchWindow : public Object
    * @return the selection service
    */
   virtual ISelectionService* GetSelectionService() = 0;
+
+  /**
+   * Returns this workbench window's shell.
+   *
+   * @return the shell containing this window's controls or <code>null</code>
+   *   if the shell has not been created yet or if the window has been closed
+   */
+  virtual Shell::Pointer GetShell() = 0;
 
   /**
    * Returns the workbench for this window.

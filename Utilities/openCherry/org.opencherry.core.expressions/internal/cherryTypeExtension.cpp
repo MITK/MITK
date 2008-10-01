@@ -48,7 +48,7 @@ TypeExtension::TypeExtension(ExpressionVariable::ExtTypeInfo typeInfo)
       // There is no need to check for an active plug-in here. If a plug-in
       // gets uninstalled we receive an registry event which will flush the whole
       // type extender cache and will reinstantiate the testers. However Bundle#stop
-      // isn't handled by this. According to bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=130338
+      // isn't handled by this. According to bug https://bugs.opencherry.org/bugs/show_bug.cgi?id=130338
       // we don't have to support stop in 3.2. If we have to in the future we have to
       // reactivate the stopped plug-in if we are in forcePluginActivation mode.
       return extender;

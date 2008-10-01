@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define cherryManifestMacro(className, namespaze) \
   static const char* GetManifestName() \
-  { std::string str = #namespaze; str.append(#className); return str.c_str(); } \
+  { return #namespaze #className; } \
 
 #define cherryInterfaceMacro(className, namespaze) \
   cherryClassMacro(className) \

@@ -27,7 +27,7 @@ namespace cherry {
 /**
  * \ingroup org_opencherry_ui
  *
- * Abstract base class for plug-ins that integrate with the Eclipse platform UI.
+ * Abstract base class for plug-ins that integrate with the openCherry platform UI.
  * <p>
  * Subclasses obtain the following capabilities:
  * </p>
@@ -35,9 +35,9 @@ namespace cherry {
  * Preferences
  * <ul>
  * <li> The platform core runtime contains general support for plug-in
- *      preferences (<code>org.eclipse.core.runtime.Preferences</code>).
+ *      preferences (<code>org.opencherry.core.runtime.Preferences</code>).
  *      This class provides appropriate conversion to the older JFace preference
- *      API (<code>org.eclipse.jface.preference.IPreferenceStore</code>).</li>
+ *      API (<code>org.opencherry.jface.preference.IPreferenceStore</code>).</li>
  * <li> The method <code>getPreferenceStore</code> returns the JFace preference
  *      store (cf. <code>Plugin.getPluginPreferences</code> which returns
  *      a core runtime preferences object.</li>

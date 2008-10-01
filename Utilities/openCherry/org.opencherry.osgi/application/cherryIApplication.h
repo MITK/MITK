@@ -50,8 +50,8 @@ struct CHERRY_OSGI IApplication {
 
     /**
      * Exit object requesting that the command passed back be executed.  Typically
-     * this is used to relaunch Eclipse with different command line arguments.  When the executable is
-     * relaunched the command line will be retrieved from the <code>eclipse.exitdata</code> system property.
+     * this is used to relaunch openCherry with different command line arguments.  When the executable is
+     * relaunched the command line will be retrieved from the <code>openCherry.exitdata</code> system property.
      */
     static const int EXIT_RELAUNCH;
 
@@ -62,7 +62,7 @@ struct CHERRY_OSGI IApplication {
      * the application being invoked.<p>
      *
      * Applications can return any object they like.  If an <code>Integer</code> is returned
-     * it is treated as the program exit code if Eclipse is exiting.
+     * it is treated as the program exit code if openCherry is exiting.
      * <p>
      * Note: This method is called by the platform; it is not intended
      * to be called directly by clients.

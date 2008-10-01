@@ -19,14 +19,17 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYWORKBENCH_H_
 
 #include "../cherryIViewPart.h"
-#include "../cherryPartPane.h"
-
 #include "../cherryIWorkbench.h"
+#include "../cherryIWorkbenchPage.h"
 #include "../cherryIWorkbenchPartReference.h"
-#include "../cherryIEditorAreaHelper.h"
+
+#include "../cherryPartPane.h"
+#include "cherryEditorAreaHelper.h"
 #include "cherryWindowManager.h"
 #include "cherryWorkbenchConfigurer.h"
 #include "../application/cherryWorkbenchAdvisor.h"
+
+#include "cherryServiceLocator.h"
 
 #include <Poco/Exception.h>
 
@@ -34,11 +37,12 @@ namespace cherry {
 
 class ViewRegistry;
 class EditorRegistry;
+class WorkbenchWindow;
 
 /**
  * \ingroup org_opencherry_ui
  *
- * The workbench class represents the top of the Eclipse user interface. Its
+ * The workbench class represents the top of the openCherry user interface. Its
  * primary responsability is the management of workbench windows, dialogs,
  * wizards, and other workbench-related windows.
  * <p>
@@ -83,6 +87,20 @@ public:
   virtual ~Workbench();
 
   /*
+   * (non-Javadoc)
+   *
+   * @see org.opencherry.ui.services.IServiceLocator#getService(java.lang.Object)
+   */
+  Object::Pointer GetService(const std::string& key) const;
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see org.opencherry.ui.services.IServiceLocator#hasService(java.lang.Object)
+   */
+  bool HasService(const std::string& key) const;
+
+  /*
    * Method declared on IWorkbench.
    */
   bool Close();
@@ -100,7 +118,7 @@ public:
   /*
    * Method declared on IWorkbench.
    */
-  IWorkbench::WorkbenchEvents& GetWorkbenchEvents();
+  IWorkbenchListener::Events& GetWorkbenchEvents();
 
   /*
    * Method declared on IWorkbench.
@@ -115,12 +133,13 @@ public:
   /*
    * Method declared on IWorkbench.
    */
-  IWorkbench::WindowEvents& GetWindowEvents();
+  IWindowListener::Events& GetWindowEvents();
 
   IWorkbenchWindow::Pointer GetActiveWorkbenchWindow();
 
   IViewRegistry* GetViewRegistry();
   IEditorRegistry* GetEditorRegistry();
+  IPerspectiveRegistry* GetPerspectiveRegistry();
 
   int GetWorkbenchWindowCount();
   std::vector<IWorkbenchWindow::Pointer> GetWorkbenchWindows();
@@ -156,11 +175,55 @@ public:
   bool IsClosing();
 
   /**
+   * Returns the default perspective id, which may be <code>null</code>.
+   *
+   * @return the default perspective id, or <code>null</code>
+   */
+  std::string GetDefaultPerspectiveId();
+
+  /**
    * Returns the default workbench window page input.
    *
    * @return the default window page input or <code>null</code> if none
    */
   IAdaptable* GetDefaultPageInput();
+
+  /**
+   * Return the presentation ID specified by the preference or the default ID
+   * if undefined.
+   *
+   * @return the presentation ID
+   * @see IWorkbenchPreferenceConstants#PRESENTATION_FACTORY_ID
+   */
+  std::string GetPresentationId();
+
+  /**
+   * <p>
+   * Indicates the start of a large update within the workbench. This is used
+   * to disable CPU-intensive, change-sensitive services that were temporarily
+   * disabled in the midst of large changes. This method should always be
+   * called in tandem with <code>largeUpdateEnd</code>, and the event loop
+   * should not be allowed to spin before that method is called.
+   * </p>
+   * <p>
+   * Important: always use with <code>largeUpdateEnd</code>!
+   * </p>
+   */
+  void LargeUpdateStart();
+
+  /**
+   * <p>
+   * Indicates the end of a large update within the workbench. This is used to
+   * re-enable services that were temporarily disabled in the midst of large
+   * changes. This method should always be called in tandem with
+   * <code>largeUpdateStart</code>, and the event loop should not be
+   * allowed to spin before this method is called.
+   * </p>
+   * <p>
+   * Important: always protect this call by using <code>finally</code>!
+   * </p>
+   */
+  void LargeUpdateEnd();
 
 
 protected:
@@ -228,13 +291,13 @@ protected:
    * Returns the workbench window which was last known being the active one,
    * or <code> null </code> .
    */
-  WorkbenchWindow::Pointer GetActivatedWindow();
+  SmartPointer<WorkbenchWindow> GetActivatedWindow();
 
   /*
    * Sets the workbench window which was last known being the active one, or
    * <code> null </code> .
    */
-  void SetActivatedWindow(WorkbenchWindow::Pointer window);
+  void SetActivatedWindow(SmartPointer<WorkbenchWindow> window);
 
   /**
    * Fire workbench preShutdown event, stopping at the first one to veto
@@ -296,19 +359,51 @@ private:
    */
   static Workbench* instance;
 
-  IWorkbench::WorkbenchEvents workbenchEvents;
-  IWorkbench::WindowEvents windowEvents;
+  IWorkbenchListener::Events workbenchEvents;
+  IWindowListener::Events windowEvents;
 
   WorkbenchAdvisor* advisor;
   WorkbenchConfigurer::Pointer workbenchConfigurer;
 
+  /**
+   * The service locator maintained by the workbench. These services are
+   * initialized during workbench during the <code>init</code> method.
+   */
+  ServiceLocator* serviceLocator;
+
+  struct ServiceLocatorOwner : public IDisposable
+  {
+    ServiceLocatorOwner(Workbench* workbench);
+
+    void Dispose();
+
+  private:
+    Workbench* workbench;
+  };
+
+  friend class ServiceLocatorOwner;
+
+  ServiceLocatorOwner serviceLocatorOwner;
+
+  /**
+   * A count of how many large updates are going on. This tracks nesting of
+   * requests to disable services during a large update -- similar to the
+   * <code>setRedraw</code> functionality on <code>Control</code>. When
+   * this value becomes greater than zero, services are disabled. When this
+   * value becomes zero, services are enabled. Please see
+   * <code>largeUpdateStart()</code> and <code>largeUpdateEnd()</code>.
+   */
+  int largeUpdates;
+
   WindowManager windowManager;
-  WorkbenchWindow::Pointer activatedWindow;
+  SmartPointer<WorkbenchWindow> activatedWindow;
 
   bool isStarting;
   bool isClosing;
 
   int returnCode;
+
+  std::string factoryID;
 
   /**
    * Creates a new workbench.
@@ -324,13 +419,20 @@ private:
    *
    * @return the new workbench window
    */
-  WorkbenchWindow::Pointer NewWorkbenchWindow();
+  SmartPointer<WorkbenchWindow> NewWorkbenchWindow();
 
   /*
    * Returns the number for a new window. This will be the first number > 0
    * which is not used to identify another window in the workbench.
    */
   int GetNewWindowNumber();
+
+  /**
+   * Initializes all of the default services for the workbench. For
+   * initializing the command-based services, this also parses the registry
+   * and hooks up all the required listeners.
+   */
+  void InitializeDefaultServices();
 
   /**
    * Closes the workbench. Assumes that the busy cursor is active.

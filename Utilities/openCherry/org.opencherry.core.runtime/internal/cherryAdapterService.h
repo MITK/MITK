@@ -125,7 +125,7 @@ private: void* /*Class*/ CachedClassForName(IAdapterFactory* factory, const std:
 private: void* /*Class*/ ClassForName(IAdapterFactory* factory, const std::string& typeName);
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdapterManager#getAdapterTypes(java.lang.Class)
+   * @see org.opencherry.core.runtime.IAdapterManager#getAdapterTypes(java.lang.Class)
    */
 public: void ComputeAdapterTypes(std::vector<std::string>& types, const std::type_info& adaptable);
 
@@ -164,12 +164,12 @@ private: void GetFactories(std::map<std::string, IAdapterFactory*> table, const 
 public:  void FlushLookup();
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdapterManager#getAdapter(java.lang.Object, java.lang.Class)
+   * @see org.opencherry.core.runtime.IAdapterManager#getAdapter(java.lang.Object, java.lang.Class)
    */
 public: ExpressionVariable::Ptr GetAdapter(ExpressionVariable::Ptr adaptable, const std::type_info& adapterType);
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdapterManager#getAdapter(java.lang.Object, java.lang.Class)
+   * @see org.opencherry.core.runtime.IAdapterManager#getAdapter(java.lang.Object, java.lang.Class)
    */
 public: ExpressionVariable::Ptr GetAdapter(ExpressionVariable::Ptr adaptable, const std::string& adapterType);
 
@@ -186,12 +186,12 @@ private: ExpressionVariable::Ptr GetAdapter(ExpressionVariable::Ptr adaptable, c
 public: bool HasAdapter(ExpressionVariable::Ptr adaptable, const std::string& adapterTypeName);
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdapterManager#queryAdapter(java.lang.Object, java.lang.String)
+   * @see org.opencherry.core.runtime.IAdapterManager#queryAdapter(java.lang.Object, java.lang.String)
    */
 public: int QueryAdapter(ExpressionVariable::Ptr adaptable, const std::string& adapterTypeName);
 
   /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdapterManager#loadAdapter(java.lang.Object, java.lang.String)
+   * @see org.opencherry.core.runtime.IAdapterManager#loadAdapter(java.lang.Object, java.lang.String)
    */
 public: ExpressionVariable::Ptr LoadAdapter(ExpressionVariable::Ptr adaptable, const std::string& adapterTypeName);
 

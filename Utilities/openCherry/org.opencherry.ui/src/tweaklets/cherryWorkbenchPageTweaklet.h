@@ -31,7 +31,12 @@ struct CHERRY_UI WorkbenchPageTweaklet : public Object
 
   static Tweaklets::TweakKey<WorkbenchPageTweaklet> KEY;
 
-  virtual void* CreateClientComposite(IWorkbenchPage::Pointer page) = 0;
+  virtual void* CreateClientComposite(void* pageControl) = 0;
+  virtual void* CreatePaneControl(void* parent) = 0;
+
+  virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "") = 0;
+  virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "") = 0;
+
 };
 
 }

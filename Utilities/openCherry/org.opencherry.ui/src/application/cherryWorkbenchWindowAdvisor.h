@@ -1,27 +1,29 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYWORKBENCHWINDOWADVISOR_H_
 #define CHERRYWORKBENCHWINDOWADVISOR_H_
 
 #include "../cherryIMemento.h"
+#include "../cherryShell.h"
 
 #include "cherryActionBarAdvisor.h"
 #include "cherryIActionBarConfigurer.h"
+
 
 namespace cherry
 {
@@ -39,11 +41,11 @@ namespace cherry
  * </p>
  * <p>
  * The following advisor methods are called at strategic points in the
- * workbench window's lifecycle (as with the workbench advisor, all occur 
- * within the dynamic scope of the call to 
+ * workbench window's lifecycle (as with the workbench advisor, all occur
+ * within the dynamic scope of the call to
  * {@link PlatformUI#createAndRunWorkbench PlatformUI.createAndRunWorkbench}):
  * <ul>
- * <li><code>preWindowOpen</code> - called as the window is being opened; 
+ * <li><code>preWindowOpen</code> - called as the window is being opened;
  *  use to configure aspects of the window other than actions bars</li>
  * <li><code>postWindowRestore</code> - called after the window has been
  * recreated from a previously saved state; use to adjust the restored
@@ -59,35 +61,35 @@ namespace cherry
  * is closed by the user; use to pre-screen window closings</li>
  * </ul>
  * </p>
- * 
+ *
  * @since 3.1
  */
 class CHERRY_UI WorkbenchWindowAdvisor {
 
 private:
-  
+
   IWorkbenchWindowConfigurer::Pointer windowConfigurer;
 
 protected:
-  
+
   /**
    * Returns the workbench window configurer.
-   * 
+   *
    * @return the workbench window configurer
    */
   IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer();
-  
+
 public:
-  
+
     /**
      * Creates a new workbench window advisor for configuring a workbench
      * window via the given workbench window configurer.
-     * 
+     *
      * @param configurer an object for configuring the workbench window
      */
     WorkbenchWindowAdvisor(IWorkbenchWindowConfigurer::Pointer configurer);
 
-    
+
     /**
      * Performs arbitrary actions before the window is opened.
      * <p>
@@ -96,7 +98,7 @@ public:
      * The default implementation does nothing. Subclasses may override.
      * Typical clients will use the window configurer to tweak the
      * workbench window in an application-specific way; however, filling the
-     * window's menu bar, tool bar, and status line must be done in 
+     * window's menu bar, tool bar, and status line must be done in
      * {@link ActionBarAdvisor#fillActionBars}, which is called immediately
      * after this method is called.
      * </p>
@@ -107,14 +109,14 @@ public:
      * Creates a new action bar advisor to configure the action bars of the window
      * via the given action bar configurer.
      * The default implementation returns a new instance of {@link ActionBarAdvisor}.
-     * 
+     *
      * @param configurer the action bar configurer for the window
      * @return the action bar advisor for the window
      */
     virtual ActionBarAdvisor::Pointer CreateActionBarAdvisor(IActionBarConfigurer::Pointer configurer);
-    
+
     /**
-     * Performs arbitrary actions after the window has been restored, 
+     * Performs arbitrary actions after the window has been restored,
      * but before it is opened.
      * <p>
      * This method is called after a previously-saved window has been
@@ -125,32 +127,32 @@ public:
      * The default implementation does nothing. Subclasses may override.
      * It is okay to call <code>IWorkbench.close()</code> from this method.
      * </p>
-     * 
+     *
      * @exception WorkbenchException thrown if there are any errors to report
      *   from post-restoration of the window
      */
     virtual void PostWindowRestore();
 
     /**
-     * Opens the introduction componenet.  
+     * Opens the introduction componenet.
      * <p>
      * Clients must not call this method directly (although super calls are okay).
      * The default implementation opens the intro in the first window provided
-     * if the preference IWorkbenchPreferences.SHOW_INTRO is <code>true</code>.  If 
-     * an intro is shown then this preference will be set to <code>false</code>.  
-     * Subsequently, and intro will be shown only if 
-     * <code>WorkbenchConfigurer.getSaveAndRestore()</code> returns 
-     * <code>true</code> and the introduction was visible on last shutdown.  
+     * if the preference IWorkbenchPreferences.SHOW_INTRO is <code>true</code>.  If
+     * an intro is shown then this preference will be set to <code>false</code>.
+     * Subsequently, and intro will be shown only if
+     * <code>WorkbenchConfigurer.getSaveAndRestore()</code> returns
+     * <code>true</code> and the introduction was visible on last shutdown.
      * Subclasses may override.
      * </p>
      */
     virtual void OpenIntro();
 
     /**
-     * Performs arbitrary actions after the window has been created (possibly 
+     * Performs arbitrary actions after the window has been created (possibly
      * after being restored), but has not yet been opened.
      * <p>
-     * This method is called after the window has been created from scratch, 
+     * This method is called after the window has been created from scratch,
      * or when it has been restored from a previously-saved window.  In the latter case,
      * this method is called after <code>postWindowRestore</code>.
      * Clients must not call this method directly (although super calls are okay).
@@ -160,10 +162,10 @@ public:
     virtual void PostWindowCreate();
 
     /**
-     * Performs arbitrary actions after the window has been opened (possibly 
+     * Performs arbitrary actions after the window has been opened (possibly
      * after being restored).
      * <p>
-     * This method is called after the window has been opened. This method is 
+     * This method is called after the window has been opened. This method is
      * called after the window has been created from scratch, or when
      * it has been restored from a previously-saved window.
      * Clients must not call this method directly (although super calls are okay).
@@ -186,10 +188,10 @@ public:
    * an opportunity to query the user and/or veto the closing of a window
    * under some circumstances.
    * </p>
-   * 
+   *
    * @return <code>true</code> to allow the window to close, and
    *         <code>false</code> to prevent the window from closing
-   * @see org.eclipse.ui.IWorkbenchWindow#close
+   * @see org.opencherry.ui.IWorkbenchWindow#close
    * @see WorkbenchAdvisor#preShutdown()
    */
   virtual bool PreWindowShellClose();
@@ -203,11 +205,11 @@ public:
    * </p>
    */
     virtual void PostWindowClose();
-    
+
     /**
      * Creates the contents of the window.
      * <p>
-     * The default implementation adds a menu bar, a cool bar, a status line, 
+     * The default implementation adds a menu bar, a cool bar, a status line,
      * a perspective bar, and a fast view bar.  The visibility of these controls
      * can be configured using the <code>setShow*</code> methods on
      * <code>IWorkbenchWindowConfigurer</code>.
@@ -215,15 +217,15 @@ public:
      * <p>
      * Subclasses may override to define custom window contents and layout,
      * but must call <code>IWorkbenchWindowConfigurer.createPageComposite</code>.
-     * </p> 
-     * 
+     * </p>
+     *
      * @param shell the window's shell
      * @see IWorkbenchWindowConfigurer#createMenuBar
      * @see IWorkbenchWindowConfigurer#createCoolBarControl
      * @see IWorkbenchWindowConfigurer#createStatusLineControl
      * @see IWorkbenchWindowConfigurer#createPageComposite
      */
-    virtual void CreateWindowContents(void* shell);
+    virtual void CreateWindowContents(Shell::Pointer shell);
 
     /**
      * Creates and returns the control to be shown when the window has no open pages.
@@ -232,25 +234,26 @@ public:
      * The default implementation returns <code>null</code>.
      * Subclasses may override.
      * </p>
-     * 
+     *
      * @param parent the parent composite
      * @return the control or <code>null</code>
      */
     virtual void* CreateEmptyWindowContents(void* parent);
 
-  
+
+
   /**
    * Saves arbitrary application specific state information.
-   * 
+   *
    * @param memento the storage area for object's state
    * @return a status object indicating whether the save was successful
    * @since 3.1
    */
   virtual bool SaveState(IMemento::Pointer memento) ;
-  
+
   /**
    * Restores arbitrary application specific state information.
-   * 
+   *
    * @param memento the storage area for object's state
    * @return a status object indicating whether the restore was successful
    * @since 3.1

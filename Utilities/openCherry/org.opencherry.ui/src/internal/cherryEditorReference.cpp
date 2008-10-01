@@ -21,11 +21,12 @@
 #include "cherryEditorDescriptor.h"
 #include "cherryEditorRegistry.h"
 #include "cherryEditorSite.h"
+#include "cherryEditorAreaHelper.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchPage.h"
 #include "cherryNullEditorInput.h"
 #include "cherryPartTester.h"
-#include "../tweaklets/cherryWorkbenchTweaklet.h"
+#include "../tweaklets/cherryWorkbenchPageTweaklet.h"
 
 #include "../cherryPlatformUI.h"
 
@@ -138,9 +139,10 @@ void EditorReference::InitListenersAndHandlers()
 
 PartPane::Pointer EditorReference::CreatePane()
 {
-  //return new EditorPane(this, this.manager.page, this.manager.editorPresentation.getActiveWorkbook());
-  return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateEditorPane(this,
-      this->manager->page);
+  PartPane::Pointer pane = new PartPane(this, this->manager->page);
+  return pane;
+  //return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateEditorPane(this,
+  //    this->manager->page);
 }
 
 void EditorReference::PinStatusUpdated()
@@ -308,7 +310,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
       label = descr->GetLabel();
 
     IEditorPart::Pointer part =
-        Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorEditorPart(label,
+        Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart(label,
             e.displayText());
     if (part.IsNotNull())
     {
@@ -445,7 +447,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
       // Create an editor instance.
       part = manager->CreatePart(desc);
 
-      //this->CreatePartProperties(part);
+      this->CreatePartProperties(part);
 
     }
     //    else if (desc->GetId() == IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID)
@@ -502,7 +504,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     EditorDescriptor::Pointer descr)
 {
   IEditorPart::Pointer part =
-      Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateErrorEditorPart("(Empty)");
+      Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart("(Empty)");
 
   IEditorInput::Pointer input;
   try

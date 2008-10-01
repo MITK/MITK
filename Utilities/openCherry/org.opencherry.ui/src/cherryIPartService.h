@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIPARTSERVICE_H_
@@ -24,13 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchPartReference.h"
 #include "cherryIPartListener.h"
 
-#include <cherryMessage.h>
-
 namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * A part service tracks the creation and activation of parts within a
  * workbench page.
  * <p>
@@ -40,30 +38,15 @@ namespace cherry {
  * @see IWorkbenchPage
  */
 struct CHERRY_UI IPartService {
-  
-  struct PartEvents {
-    
-    typedef Message1<IWorkbenchPartReference::Pointer> PartEvent;
-    
-    PartEvent partActivated;
-    PartEvent partBroughtToTop;
-    PartEvent partClosed;
-    PartEvent partDeactivated;
-    PartEvent partOpened;
-    PartEvent partHidden;
-    PartEvent partVisible;
-    PartEvent partInputChanged;
-  };
-  
-  
+
   /**
    * Returns the PartEvents object containing all possible events.
    * This is used to register for individual events, instead of
    * adding a whole class implementing IPartObserver.
-   * 
+   *
    * @return the PartEvents object containing all possible events
    */
-  virtual PartEvents& GetPartEvents() = 0;
+  virtual IPartListener::Events& GetPartEvents() = 0;
 
   /**
    * Adds the given observer for part lifecycle events.

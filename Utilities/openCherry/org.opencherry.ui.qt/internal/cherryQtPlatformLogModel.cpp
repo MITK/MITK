@@ -1,38 +1,36 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryQtPlatformLogModel.h"
 
 #include "cherryPlatform.h"
 #include "event/cherryPlatformEvents.h"
-#include "event/cherryPlatformEvent.h"
 
-#include "Poco/Delegate.h"
-#include "Poco/Message.h"
+#include <Poco/Message.h>
 
 namespace cherry {
 
 QtPlatformLogModel::QtPlatformLogModel(QObject* parent)
  : QAbstractTableModel(parent)
 {
-  Platform::GetEvents().logged.AddListener(this, &QtPlatformLogModel::addLogEntry);
+  Platform::GetEvents().logged += PlatformEventDelegate(this, &QtPlatformLogModel::addLogEntry);
 }
-  
-void 
+
+void
 QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
 {
 
@@ -41,25 +39,25 @@ QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
   this->beginInsertRows(QModelIndex(), m_Entries.size(), m_Entries.size());
 
 
-  m_Entries.push_back(LogEntry(entry.getText(), entry.getSource(), 
+  m_Entries.push_back(LogEntry(entry.getText(), entry.getSource(),
       entry.getTime().epochTime()));
 
   this->endInsertRows();
 }
 
-int 
+int
 QtPlatformLogModel::rowCount(const QModelIndex&) const
 {
   return m_Entries.size();
 }
-  
-int 
+
+int
 QtPlatformLogModel::columnCount(const QModelIndex&) const
 {
   return 3;
 }
-  
-QVariant 
+
+QVariant
 QtPlatformLogModel::data(const QModelIndex& index, int role) const
 {
   if (role == Qt::DisplayRole)
@@ -81,8 +79,8 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
 
   return QVariant();
 }
-  
-QVariant 
+
+QVariant
 QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (role == Qt::DisplayRole && orientation == Qt::Horizontal)
@@ -96,6 +94,6 @@ QtPlatformLogModel::headerData(int section, Qt::Orientation orientation, int rol
 
   return QVariant();
 }
-  
+
 
 }

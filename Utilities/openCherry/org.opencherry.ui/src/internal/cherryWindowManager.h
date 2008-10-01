@@ -22,11 +22,12 @@
 #include <vector>
 
 #include <cherrySmartPointer.h>
+#include <list>
 
 namespace cherry
 {
 
-struct IWorkbenchWindow;
+class Window;
 
 /**
  * A manager for a group of windows. Window managers are an optional JFace
@@ -53,13 +54,21 @@ private:
      * List of windows managed by this window manager
      * (element type: <code>Window</code>).
      */
-    std::vector<SmartPointer<IWorkbenchWindow> > windows;
+    std::vector<SmartPointer<Window> > windows;
 
     /**
      * List of window managers who have this window manager
      * as their parent (element type: <code>WindowManager</code>).
      */
-    //private List subManagers;
+    std::list<WindowManager*> subManagers;
+
+    /**
+     * Adds the given window manager to the list of
+     * window managers that have this one as a parent.
+     * </p>
+     * @param wm the child window manager
+     */
+    void AddWindowManager(WindowManager* wm);
 
 
 public:
@@ -76,10 +85,7 @@ public:
      *
      * @param parent the parent window manager
      */
-//    public WindowManager(WindowManager parent) {
-//        Assert.isNotNull(parent);
-//        parent.addWindowManager(this);
-//    }
+    WindowManager(WindowManager* parent);
 
     /**
      * Adds the given window to the set of windows managed by
@@ -88,22 +94,7 @@ public:
      *
      * @param window the window
      */
-    void Add(SmartPointer<IWorkbenchWindow> window);
-
-    /**
-     * Adds the given window manager to the list of
-     * window managers that have this one as a parent.
-     * </p>
-     * @param wm the child window manager
-     */
-//    private void addWindowManager(WindowManager wm) {
-//        if (subManagers == null) {
-//      subManagers = new ArrayList();
-//    }
-//        if (!subManagers.contains(wm)) {
-//            subManagers.add(wm);
-//        }
-//    }
+    void Add(SmartPointer<Window> window);
 
     /**
      * Attempts to close all windows managed by this window manager,
@@ -127,7 +118,7 @@ public:
      *
      * @return a possibly empty list of window
      */
-    std::vector<SmartPointer<IWorkbenchWindow> > GetWindows();
+    std::vector<SmartPointer<Window> > GetWindows();
 
     /**
      * Removes the given window from the set of windows managed by
@@ -136,7 +127,7 @@ public:
      *
      * @param window the window
      */
-    void Remove(SmartPointer<IWorkbenchWindow> window);
+    void Remove(SmartPointer<Window> window);
 };
 
 }

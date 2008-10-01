@@ -1,21 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryPerspectiveDescriptor.h"
+
+#include "cherryWorkbenchRegistryConstants.h"
+#include "cherryWorkbenchPlugin.h"
+#include "cherryPerspectiveRegistry.h"
 
 namespace cherry
 {
@@ -23,12 +27,12 @@ namespace cherry
 PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     const std::string& label, PerspectiveDescriptor::Pointer originalDescriptor)
 {
-  this.id = id;
-  this.label = label;
-  if (originalDescriptor != null)
+  this->id = id;
+  this->label = label;
+  if (originalDescriptor != 0)
   {
-    this.originalId = originalDescriptor.getOriginalId();
-    this.image = originalDescriptor.image;
+    this->originalId = originalDescriptor->GetOriginalId();
+    //this.image = originalDescriptor.image;
 
     // This perspective is based on a perspective in some bundle -- if
     // that
@@ -61,78 +65,74 @@ PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     // the registry will remove the entire list of objects. So if this
     // desc
     // has been put into that list -- it will go away.
-    this.pluginId = originalDescriptor.getPluginId();
+    this->pluginId = originalDescriptor->GetPluginId();
   }
 }
 
 PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     IConfigurationElement::Pointer configElement)
 {
-  this.configElement = configElement;
-  this.id = id;
+  this->configElement = configElement;
+  this->id = id;
   // Sanity check.
-  if ((getId() == null) || (getLabel() == null) || (getClassName() == null))
+  if ((this->GetId() == "") || (this->GetLabel() == "") || (this->GetClassName() == ""))
   {
-    throw new CoreException(
-        new Status(
-            IStatus.ERROR,
-            WorkbenchPlugin.PI_WORKBENCH,
-            0,
-            "Invalid extension (missing label, id or class name): " + getId(),//$NON-NLS-1$
-            null));
+    throw CoreException(
+        "Invalid extension (missing label, id or class name): " + this->GetId());
   }
 }
 
-IPerspectiveFactory::Pointer CreateFactory()
+IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
 {
   // if there is an originalId, then use that descriptor instead
-  if (originalId != null)
+  if (originalId != "")
   {
     // Get the original descriptor to create the factory. If the
     // original is gone then nothing can be done.
-    IPerspectiveDescriptor target = ((PerspectiveRegistry) WorkbenchPlugin
-        .getDefault().getPerspectiveRegistry())
-    .findPerspectiveWithId(originalId);
+    IPerspectiveDescriptor::Pointer target = dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin
+        ::GetDefault()->GetPerspectiveRegistry())
+    ->FindPerspectiveWithId(originalId);
 
-    return target == null ? null : ((PerspectiveDescriptor) target)
-    .createFactory();
+    return target == 0 ? 0 : target.Cast<PerspectiveDescriptor>()->CreateFactory();
   }
 
   // otherwise try to create the executable extension
-  if (configElement != null)
+  if (configElement != 0)
   {
     try
     {
-      return (IPerspectiveFactory) configElement
-      .createExecutableExtension(IWorkbenchRegistryConstants.ATT_CLASS);
+      IPerspectiveFactory::Pointer factory = configElement
+      ->CreateExecutableExtension<IPerspectiveFactory>(WorkbenchRegistryConstants::ATT_CLASS);
+      return factory;
     }
-    catch (CoreException e)
+    catch (CoreException& e)
     {
       // do nothing
     }
   }
 
-  return null;
+  return 0;
 }
 
 void PerspectiveDescriptor::DeleteCustomDefinition()
 {
-  ((PerspectiveRegistry) WorkbenchPlugin.getDefault()
-      .getPerspectiveRegistry()).deleteCustomDefinition(this);
+  dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
+      ->GetPerspectiveRegistry())->DeleteCustomDefinition(this);
 }
 
 std::string PerspectiveDescriptor::GetDescription()
 {
-  return configElement == null ? description : RegistryReader
-  .getDescription(configElement);
+  return configElement == 0 ? description : RegistryReader
+  ::GetDescription(configElement);
 }
 
 bool PerspectiveDescriptor::GetFixed()
 {
-  return configElement == null ? fixed : Boolean.valueOf(
-      configElement
-      .getAttribute(IWorkbenchRegistryConstants.ATT_FIXED))
-  .booleanValue();
+  if (configElement == 0) return fixed;
+
+  bool val = false;
+  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_FIXED, val);
+  return val;
 }
 
 std::string PerspectiveDescriptor::GetId()
@@ -140,101 +140,114 @@ std::string PerspectiveDescriptor::GetId()
   return id;
 }
 
+std::string PerspectiveDescriptor::GetPluginId()
+{
+  return configElement == 0 ? pluginId : configElement->GetContributor();
+}
+
 std::string PerspectiveDescriptor::GetLabel()
 {
-  return configElement == null ? label : configElement
-  .getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
+  if (configElement == 0) return label;
+
+  std::string val;
+  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
+  return val;
 }
 
 std::string PerspectiveDescriptor::GetOriginalId()
 {
-  if (originalId == null)
+  if (originalId == "")
   {
-    return getId();
+    return this->GetId();
   }
   return originalId;
 }
 
 bool PerspectiveDescriptor::HasCustomDefinition()
 {
-  return ((PerspectiveRegistry) WorkbenchPlugin.getDefault()
-      .getPerspectiveRegistry()).hasCustomDefinition(this);
+  return dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
+      ->GetPerspectiveRegistry())->HasCustomDefinition(this);
 }
 
 bool PerspectiveDescriptor::HasDefaultFlag()
 {
-  if (configElement == null)
+  if (configElement == 0)
   {
     return false;
   }
 
-  return Boolean.valueOf(
-      configElement
-      .getAttribute(IWorkbenchRegistryConstants.ATT_DEFAULT))
-  .booleanValue();
+  bool val = false;
+  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_DEFAULT, val);
+  return val;
 }
 
 bool PerspectiveDescriptor::IsPredefined()
 {
-  return getClassName() != null && configElement != null;
+  return this->GetClassName() != "" && configElement != 0;
 }
 
 bool PerspectiveDescriptor::IsSingleton()
 {
-  return configElement == null ? singleton : configElement
-  .getAttributeAsIs(IWorkbenchRegistryConstants.ATT_SINGLETON) != null;
+  if (configElement == 0)
+    return singleton;
+
+  bool val = false;
+  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_SINGLETON, val);
+  return val;
 }
 
 bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
 {
-  IMemento childMem = memento
-  .getChild(IWorkbenchConstants.TAG_DESCRIPTOR);
-  if (childMem != null)
-  {
-    id = childMem.getString(IWorkbenchConstants.TAG_ID);
-    originalId = childMem.getString(IWorkbenchConstants.TAG_DESCRIPTOR);
-    label = childMem.getString(IWorkbenchConstants.TAG_LABEL);
-    className = childMem.getString(IWorkbenchConstants.TAG_CLASS);
-    singleton
-        = (childMem.getInteger(IWorkbenchConstants.TAG_SINGLETON) != null);
-
-    // Find a descriptor in the registry.
-    IPerspectiveDescriptor descriptor = WorkbenchPlugin.getDefault()
-    .getPerspectiveRegistry().findPerspectiveWithId(getOriginalId());
-
-    if (descriptor != null)
-    {
-      // Copy the state from the registred descriptor.
-      image = descriptor.getImageDescriptor();
-    }
-  }
-  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+//  IMemento childMem = memento
+//  .getChild(IWorkbenchConstants.TAG_DESCRIPTOR);
+//  if (childMem != null)
+//  {
+//    id = childMem.getString(IWorkbenchConstants.TAG_ID);
+//    originalId = childMem.getString(IWorkbenchConstants.TAG_DESCRIPTOR);
+//    label = childMem.getString(IWorkbenchConstants.TAG_LABEL);
+//    className = childMem.getString(IWorkbenchConstants.TAG_CLASS);
+//    singleton
+//        = (childMem.getInteger(IWorkbenchConstants.TAG_SINGLETON) != null);
+//
+//    // Find a descriptor in the registry.
+//    IPerspectiveDescriptor descriptor = WorkbenchPlugin.getDefault()
+//    .getPerspectiveRegistry().findPerspectiveWithId(getOriginalId());
+//
+//    if (descriptor != null)
+//    {
+//      // Copy the state from the registred descriptor.
+//      image = descriptor.getImageDescriptor();
+//    }
+//  }
+//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+  return true;
 }
 
 void PerspectiveDescriptor::RevertToPredefined()
 {
-  if (isPredefined())
+  if (this->IsPredefined())
   {
-    deleteCustomDefinition();
+    this->DeleteCustomDefinition();
   }
 }
 
 bool PerspectiveDescriptor::SaveState(IMemento::Pointer memento)
 {
-  IMemento childMem = memento
-  .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
-  childMem.putString(IWorkbenchConstants.TAG_ID, getId());
-  if (originalId != null)
-  {
-    childMem.putString(IWorkbenchConstants.TAG_DESCRIPTOR, originalId);
-  }
-  childMem.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
-  childMem.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
-  if (singleton)
-  {
-    childMem.putInteger(IWorkbenchConstants.TAG_SINGLETON, 1);
-  }
-  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+//  IMemento childMem = memento
+//  .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
+//  childMem.putString(IWorkbenchConstants.TAG_ID, getId());
+//  if (originalId != null)
+//  {
+//    childMem.putString(IWorkbenchConstants.TAG_DESCRIPTOR, originalId);
+//  }
+//  childMem.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
+//  childMem.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
+//  if (singleton)
+//  {
+//    childMem.putInteger(IWorkbenchConstants.TAG_SINGLETON, 1);
+//  }
+//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+  return true;
 }
 
 IConfigurationElement::Pointer PerspectiveDescriptor::GetConfigElement()
@@ -244,8 +257,8 @@ IConfigurationElement::Pointer PerspectiveDescriptor::GetConfigElement()
 
 std::string PerspectiveDescriptor::GetClassName()
 {
-  return configElement == null ? className : RegistryReader
-  .getClassValue(configElement, IWorkbenchRegistryConstants.ATT_CLASS);
+  return configElement == 0 ? className : RegistryReader
+  ::GetClassValue(configElement, WorkbenchRegistryConstants::ATT_CLASS);
 }
 
 }

@@ -5,23 +5,23 @@
 
 #include <mitkDataStorage.h>
 
-class QmitkViewPart : cherry::QtViewPart
+class QmitkViewPart : public cherry::QtViewPart
 {
-  
+
 public:
   cherryClassMacro(QmitkViewPart)
-  
+
   QmitkViewPart();
-  
+
 protected:
-  
+
   void SetHandleMultipleDataStorages(bool multiple);
   bool HandlesMultipleDataStorages() const;
-  
+
   mitk::DataStorage::Pointer GetDataStorage() const;
-  
+
 private:
-  
+
   bool m_HandlesMultipleDataStorages;
 };
 

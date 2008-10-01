@@ -31,6 +31,7 @@ SET(CPP_FILES
   cherryIBundleManifest.cpp
   cherryBundleLoader.cpp
   cherryObject.cpp
+  cherryObjects.cpp
   cherryPlatform.cpp
   cherryPlatformException.cpp
   cherryPlugin.cpp

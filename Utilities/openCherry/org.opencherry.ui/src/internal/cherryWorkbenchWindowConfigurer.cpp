@@ -46,7 +46,9 @@ void* WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetMenuManager()
   {
     return proxy->GetMenuManager();
   }
-  return window->GetMenuManager();
+  //TODO window menu manager
+  //return window->GetMenuManager();
+  return 0;
 }
 
 WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(WorkbenchWindow::Pointer window)
@@ -200,9 +202,14 @@ void WorkbenchWindowConfigurer::SetInitialSize(Point size)
   initialSize = size;
 }
 
-void WorkbenchWindowConfigurer::CreateDefaultContents(void* shell)
+void WorkbenchWindowConfigurer::CreateDefaultContents(Shell::Pointer shell)
 {
   window->CreateDefaultContents(shell);
+}
+
+void* WorkbenchWindowConfigurer::CreatePageComposite(void* parent)
+{
+  return window->CreatePageComposite(parent);
 }
 
 bool WorkbenchWindowConfigurer::SaveState(IMemento::Pointer memento)

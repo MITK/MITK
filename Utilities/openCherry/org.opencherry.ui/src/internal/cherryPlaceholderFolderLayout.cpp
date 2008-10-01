@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryPlaceholderFolderLayout.h"
@@ -23,60 +23,57 @@ namespace cherry
 PlaceholderFolderLayout::PlaceholderFolderLayout(
     PageLayout::Pointer pageLayout, ContainerPlaceholder::Pointer folder)
 {
-  super();
-  this.placeholder = folder;
-  this.pageLayout = pageLayout;
+  this->placeholder = folder;
+  this->pageLayout = pageLayout;
 }
 
 void PlaceholderFolderLayout::AddPlaceholder(const std::string& viewId)
 {
-  if (!pageLayout.checkValidPlaceholderId(viewId))
+  if (!pageLayout->CheckValidPlaceholderId(viewId))
   {
     return;
   }
 
   // Create the placeholder.
-  LayoutPart newPart = new PartPlaceholder(viewId);
+  StackablePart::Pointer newPart = new PartPlaceholder(viewId);
 
-  linkPartToPageLayout(viewId, newPart);
+  this->LinkPartToPageLayout(viewId, newPart);
 
   // Add it to the placeholder layout.
-  placeholder.add(newPart);
+  placeholder->Add(newPart);
 }
 
 std::string PlaceholderFolderLayout::GetProperty(const std::string& id)
 {
-  LayoutPart folder = placeholder.getRealContainer();
-  if (folder instanceof PartStack)
+  IStackableContainer::Pointer folder = placeholder->GetRealContainer();
+  if (folder.Cast<PartStack>() != 0)
   {
-    PartStack stack = (PartStack)folder;
-    return stack.getProperty(id);
+    return folder.Cast<PartStack>()->GetProperty(id);
   }
   //throw not supported?
-  return null;
+  return "";
 }
 
 void PlaceholderFolderLayout::SetProperty(const std::string& id,
     const std::string& value)
 {
-  LayoutPart folder = placeholder.getRealContainer();
-  if (folder instanceof PartStack)
+  IStackableContainer::Pointer folder = placeholder->GetRealContainer();
+  if (folder.Cast<PartStack>() != 0)
   {
-    PartStack stack = (PartStack)folder;
-    stack.setProperty(id, value);
+    folder.Cast<PartStack>()->SetProperty(id, value);
   }
   //throw not supported?
 }
 
 void PlaceholderFolderLayout::LinkPartToPageLayout(const std::string& viewId,
-    LayoutPart::Pointer newPart)
+    StackablePart::Pointer newPart)
 {
-  pageLayout.setRefPart(viewId, newPart);
+  pageLayout->SetRefPart(viewId, newPart);
   // force creation of the view layout rec
-  pageLayout.getViewLayoutRec(viewId, true);
+  pageLayout->GetViewLayoutRec(viewId, true);
 
-  pageLayout.setFolderPart(viewId, placeholder);
-  newPart.setContainer(placeholder);
+  pageLayout->SetFolderPart(viewId, placeholder);
+  newPart->SetContainer(placeholder);
 }
 
 }

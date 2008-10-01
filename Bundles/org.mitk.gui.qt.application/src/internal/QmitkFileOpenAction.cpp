@@ -26,11 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../QmitkStdMultiWidgetEditor.h"
 
-QmitkFileOpenAction::QmitkFileOpenAction(cherry::QtWorkbenchWindow::Pointer window)
+QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
  : QAction(0)
 {
   m_Window = window;
-  this->setParent(m_Window);
+  this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Open...");
 
   m_Window = window;
@@ -40,7 +40,7 @@ QmitkFileOpenAction::QmitkFileOpenAction(cherry::QtWorkbenchWindow::Pointer wind
 
 void QmitkFileOpenAction::Run()
 {
-  QFileDialog dialog(m_Window);
+  QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   dialog.setFileMode(QFileDialog::ExistingFiles);
   QStringList filters;
   filters << "Images (*.pic *.pic.gz)" << "All Files (*.*)";
@@ -74,7 +74,10 @@ void QmitkFileOpenAction::Run()
     {
       nodeReader->SetFileName(fileName->toStdString());
       nodeReader->Update();
-      dataStorage->Add(nodeReader->GetOutput());
+      mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
+      std::cout << "node name on line 78: " << node->GetName() << std::endl;
+      dataStorage->Add(node);
+      std::cout << "node name on line 80: " << node->GetName() << std::endl;
     }
     catch(...)
     {

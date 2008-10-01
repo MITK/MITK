@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYILAYOUTCONTAINER_H_
@@ -20,22 +20,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryLayoutPart.h"
 
-#include <vector>
+#include "../cherryPartPane.h"
+
+#include <list>
 
 namespace cherry {
 
+
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
 struct ILayoutContainer : virtual public Object {
-  
+
   cherryClassMacro(ILayoutContainer);
-  
-  virtual ~ILayoutContainer() {}
-  
+
+  typedef std::list<LayoutPart::Pointer> ChildrenType;
+
   virtual bool AllowsAdd(LayoutPart::Pointer toAdd) = 0;
-    
+
     /**
      * Add a child to the container.
      */
@@ -44,7 +47,7 @@ struct ILayoutContainer : virtual public Object {
     /**
      * Returns a list of layout children.
      */
-  virtual std::vector<LayoutPart::Pointer> GetChildren() = 0;
+  virtual ChildrenType GetChildren() = 0;
 
     /**
      * Remove a child from the container.
@@ -55,48 +58,48 @@ struct ILayoutContainer : virtual public Object {
      * Replace one child with another
      */
   virtual void Replace(LayoutPart::Pointer oldPart, LayoutPart::Pointer newPart) = 0;
-    
-    //public void findSashes(LayoutPart toFind, PartPane.Sashes result);
+
+  virtual void FindSashes(LayoutPart::Pointer toFind, PartPane::Sashes& result) = 0;
 
     /**
      * When a layout part closes, focus will return to the previously active part.
      * This method determines whether the parts in this container should participate
      * in this behavior. If this method returns true, its parts may automatically be
-     * given focus when another part is closed. 
-     * 
+     * given focus when another part is closed.
+     *
      * @return true iff the parts in this container may be given focus when the active
      * part is closed
      */
   virtual bool AllowsAutoFocus() = 0;
 
     /**
-     * Called by child parts to request a zoom in, given an immediate child 
-     * 
+     * Called by child parts to request a zoom in, given an immediate child
+     *
      * @param toZoom
      * @since 3.1
      */
     //public void childRequestZoomIn(LayoutPart toZoom);
-    
+
     /**
      * Called by child parts to request a zoom out
-     * 
+     *
      * @since 3.1
      */
     //public void childRequestZoomOut();
-    
+
     /**
      * Returns true iff the given child is obscured due to the fact that the container is zoomed into
-     * another part. 
-     * 
+     * another part.
+     *
      * @param toTest
      * @return
      * @since 3.1
      */
     //public boolean childObscuredByZoom(LayoutPart toTest);
-    
+
     /**
      * Returns true iff we are zoomed into the given part, given an immediate child of this container.
-     * 
+     *
      * @param toTest
      * @return
      * @since 3.1
@@ -106,7 +109,7 @@ struct ILayoutContainer : virtual public Object {
     /**
      * Called when the preferred size of the given child has changed, requiring a
      * layout to be triggered.
-     * 
+     *
      * @param childThatChanged the child that triggered the new layout
      */
     virtual void ResizeChild(LayoutPart::Pointer childThatChanged) = 0;

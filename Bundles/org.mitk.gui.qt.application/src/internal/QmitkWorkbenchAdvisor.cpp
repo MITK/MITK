@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkWorkbenchWindowAdvisor.h"
 
+const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSP_ID = "org.mitk.perspectives.default";
+
 void
 QmitkWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)
 {
@@ -39,5 +41,5 @@ QmitkWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
 std::string
 QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
-  return "";
+  return DEFAULT_PERSP_ID;
 }

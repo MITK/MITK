@@ -22,6 +22,8 @@
 #include "cherryUiDll.h"
 #include "cherryMacros.h"
 
+#include <cherryMessage.h>
+
 namespace cherry
 {
 
@@ -40,6 +42,22 @@ struct IWorkbench;
 struct CHERRY_UI IWorkbenchListener : public virtual Object {
 
   cherryInterfaceMacro(IWorkbenchListener, cherry);
+
+  struct Events {
+      typedef Message2<IWorkbench*, bool, bool> PreShutdownEvent;
+      typedef Message1<IWorkbench*> PostShutdownEvent;
+
+      PreShutdownEvent preShutdown;
+      PostShutdownEvent postShutdown;
+
+      void AddListener(IWorkbenchListener::Pointer listener);
+      void RemoveListener(IWorkbenchListener::Pointer listener);
+
+  private:
+
+    typedef MessageDelegate2<IWorkbenchListener, IWorkbench*, bool, bool> Delegate2;
+    typedef MessageDelegate1<IWorkbenchListener, IWorkbench*> Delegate1;
+  };
 
   /**
    * Notifies that the workbench is about to shut down.
@@ -63,7 +81,7 @@ struct CHERRY_UI IWorkbenchListener : public virtual Object {
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    *   <code>false</code> to veto a non-forced shutdown
    */
-  virtual bool PreShutdown(IWorkbench* workbench, bool forced) = 0;
+  virtual bool PreShutdown(IWorkbench* workbench, bool forced) { return true; };
 
   /**
    * Performs arbitrary finalization after the workbench stops running.
@@ -74,7 +92,7 @@ struct CHERRY_UI IWorkbenchListener : public virtual Object {
    *
    * @param workbench the workbench
    */
-  virtual void PostShutdown(IWorkbench* workbench);
+  virtual void PostShutdown(IWorkbench* workbench) {};
 
 };
 

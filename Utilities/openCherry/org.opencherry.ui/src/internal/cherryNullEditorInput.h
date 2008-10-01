@@ -47,24 +47,24 @@ public:
   NullEditorInput(EditorReference::Pointer editorReference);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorInput#exists()
+     * @see org.opencherry.ui.IEditorInput#exists()
      */
    bool Exists() const;
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+     * @see org.opencherry.ui.IEditorInput#getImageDescriptor()
      */
 //   ImageDescriptor getImageDescriptor() {
 //        return ImageDescriptor.getMissingImageDescriptor();
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorInput#getName()
+     * @see org.opencherry.ui.IEditorInput#getName()
      */
     std::string GetName() const;
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.IEditorInput#getToolTipText()
+     * @see org.opencherry.ui.IEditorInput#getToolTipText()
      */
     std::string GetToolTipText() const;
     

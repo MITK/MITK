@@ -1,24 +1,24 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryWorkbenchPlugin.h"
 
 #include "cherryWorkbenchRegistryConstants.h"
-
+#include "cherryWorkbench.h"
 #include "cherryPlatform.h"
 
 #include <Poco/String.h>
@@ -36,11 +36,13 @@ WorkbenchPlugin::WorkbenchPlugin()
  : AbstractUIPlugin()
 {
   inst = this;
+  presentationFactory = 0;
+  perspRegistry = 0;
 }
 
 WorkbenchPlugin::~WorkbenchPlugin()
 {
-  
+
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
@@ -77,7 +79,7 @@ IBundle::Pointer WorkbenchPlugin::GetBundleForExecutableExtension(
     IConfigurationElement::Pointer element, const std::string& extensionName)
 {
   // this code is derived heavily from
-  // ConfigurationElement.createExecutableExtension.  
+  // ConfigurationElement.createExecutableExtension.
   std::string prop;
   std::string executable;
   std::string contributorName;
@@ -128,36 +130,30 @@ WorkbenchPlugin* WorkbenchPlugin::GetDefault()
   return inst;
 }
 
-//    IEditorRegistry getEditorRegistry() {
-//        if (editorRegistry == null) {
-//            editorRegistry = new EditorRegistry();
-//        }
-//        return editorRegistry;
-//    }
-
 
 //    ImageRegistry createImageRegistry() {
 //        return WorkbenchImages.getImageRegistry();
 //    }
 
 
-//    IPerspectiveRegistry GetPerspectiveRegistry() {
-//        if (perspRegistry == null) {
-//            perspRegistry = new PerspectiveRegistry();
-//            // the load methods can touch on WorkbenchImages if an image is
-//      // missing so we need to wrap the call in
-//      // a startup block for the case where a custom descriptor exists on
-//      // startup that does not have an image
-//      // associated with it. See bug 196352.
-//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//        public void runWithException() throws Throwable {
-//          perspRegistry.load();
-//        }
-//      });
-//            
-//        }
-//        return perspRegistry;
-//    }
+IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry() {
+  if (perspRegistry == 0) {
+    perspRegistry = new PerspectiveRegistry();
+
+  // the load methods can touch on WorkbenchImages if an image is
+  // missing so we need to wrap the call in
+  // a startup block for the case where a custom descriptor exists on
+  // startup that does not have an image
+  // associated with it. See bug 196352.
+  //StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //  public void runWithException() throws Throwable {
+      perspRegistry->Load();
+  //  }
+  //});
+
+  }
+  return perspRegistry;
+}
 
 
 //    PreferenceManager getPreferenceManager() {
@@ -171,7 +167,7 @@ WorkbenchPlugin* WorkbenchPlugin::GetDefault()
 //            registryReader
 //                    .loadFromRegistry(Platform.getExtensionRegistry());
 //            preferenceManager.addPages(registryReader.getTopLevelNodes());
-//           
+//
 //        }
 //        return preferenceManager;
 //    }
@@ -195,27 +191,41 @@ IEditorRegistry* WorkbenchPlugin::GetEditorRegistry()
   return &editorRegistry;
 }
 
+IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
+  if (presentationFactory != 0) return presentationFactory;
+
+  std::string targetID = Workbench::GetInstance()->GetPresentationId();
+  presentationFactory = this->CreateExtension<IPresentationFactory>(
+          WorkbenchRegistryConstants::PL_PRESENTATION_FACTORIES,
+          "factory", targetID);
+  if (presentationFactory == 0)
+    WorkbenchPlugin::Log("Error creating presentation factory: " +
+        targetID + " -- class is not an IPresentationFactory");
+
+  return presentationFactory;
+}
+
 void WorkbenchPlugin::Log(const std::string& message)
 {
   std::cout << "LOG: " << message << std::endl;
   //inst->GetLog().log(message);
 }
 
-void WorkbenchPlugin::Log(const PlatformException& exc)
+void WorkbenchPlugin::Log(const Poco::RuntimeException& exc)
 {
   std::cout << "LOG: " << exc.message() << std::endl;
   //inst->GetLog().log(exc);
 }
 
 
-void WorkbenchPlugin::Log(const std::string& message, const PlatformException& t)
+void WorkbenchPlugin::Log(const std::string& message, const Poco::RuntimeException& t)
 {
   PlatformException exc(message, t);
   WorkbenchPlugin::Log(exc);
 }
 
 void WorkbenchPlugin::Log(const std::string& clazz,
-    const std::string& methodName, const PlatformException& t)
+    const std::string& methodName, const Poco::RuntimeException& t)
 {
   std::string msg = "Exception in " + clazz + "." + methodName + ": "
       + t.what();
@@ -270,6 +280,8 @@ IBundleContext::Pointer WorkbenchPlugin::GetBundleContext()
 void WorkbenchPlugin::Stop(IBundleContext::Pointer context)
 {
   AbstractUIPlugin::Stop(context);
+
+  delete perspRegistry;
 }
 
 Poco::Path* WorkbenchPlugin::GetDataPath()

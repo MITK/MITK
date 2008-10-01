@@ -142,7 +142,7 @@ public: EditorDescriptor();
 
   /**
    * Return the program called programName. Return null if it is not found.
-   * @return org.eclipse.swt.program.Program
+   * @return org.opencherry.swt.program.Program
    */
   //private: static Program FindProgram(const std::string& programName) {
   //
@@ -289,17 +289,17 @@ public: std::string GetPluginID();
   //    }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorDescriptor#isInternal
+   * @see org.opencherry.ui.IEditorDescriptor#isInternal
    */
 public: bool IsInternal();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorDescriptor#isOpenInPlace
+   * @see org.opencherry.ui.IEditorDescriptor#isOpenInPlace
    */
 public: bool IsOpenInPlace();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorDescriptor#isOpenExternal
+   * @see org.opencherry.ui.IEditorDescriptor#isOpenExternal
    */
 public: bool IsOpenExternal();
 
@@ -408,17 +408,17 @@ public: void SetOpenMode(int mode);
 public: std::string ToString();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
+   * @see org.opencherry.ui.activities.support.IPluginContribution#getLocalId()
    */
 public: std::string GetLocalId();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
+   * @see org.opencherry.ui.activities.support.IPluginContribution#getPluginId()
    */
 public: std::string GetPluginId();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IEditorDescriptor#getEditorManagementPolicy()
+   * @see org.opencherry.ui.IEditorDescriptor#getEditorManagementPolicy()
    */
 public: IEditorMatchingStrategy::Pointer GetEditorMatchingStrategy();
 

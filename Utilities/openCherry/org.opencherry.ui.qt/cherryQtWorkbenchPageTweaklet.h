@@ -33,7 +33,11 @@ public:
 
   cherryClassMacro(QtWorkbenchPageTweaklet);
 
-  void* CreateClientComposite(IWorkbenchPage::Pointer page);
+  void* CreateClientComposite(void* pageControl);
+  void* CreatePaneControl(void* parent);
+
+  IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "");
+  IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "");
 
 };
 

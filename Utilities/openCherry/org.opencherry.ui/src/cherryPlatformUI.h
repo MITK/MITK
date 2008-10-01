@@ -96,7 +96,7 @@ public:
    * </p>
    * <p>
    * Note that this method is intended to be called by the application
-   * (<code>org.eclipse.core.boot.IPlatformRunnable</code>). It must be
+   * (<code>org.opencherry.core.boot.IPlatformRunnable</code>). It must be
    * called exactly once, and early on before anyone else asks
    * <code>getWorkbench()</code> for the workbench.
    * </p>

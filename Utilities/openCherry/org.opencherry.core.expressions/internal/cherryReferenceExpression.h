@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 /**
- * This class makes use of the <b>org.eclipse.core.expressions.definitions</b>
+ * This class makes use of the <b>org.opencherry.core.expressions.definitions</b>
  * extension point to evaluate the current context against pre-defined
  * expressions. It provides core expression re-use.
  * 

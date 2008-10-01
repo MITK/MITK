@@ -1,5 +1,6 @@
 SET(SRC_CPP_FILES
   QmitkApplication.cpp
+  QmitkDefaultPerspective.cpp
   QmitkStdMultiWidgetEditor.cpp
 )
 

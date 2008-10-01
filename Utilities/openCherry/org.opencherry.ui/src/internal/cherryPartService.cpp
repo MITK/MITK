@@ -22,7 +22,7 @@ void PartService::FirePartDeactivated(IWorkbenchPartReference::Pointer ref)
   partEvents.partDeactivated(ref);
 }
 
-PartService::PartEvents& PartService::GetPartEvents()
+IPartListener::Events& PartService::GetPartEvents()
 {
   return partEvents;
 }
@@ -36,32 +36,12 @@ PartService::PartService(const std::string& debugListenersKey,
 
 void PartService::AddPartListener(IPartListener::Pointer l)
 {
-  if (l.IsNull()) return;
-  
-  //listeners.addPartListener(l);
-  partEvents.partActivated.AddListener(l.GetPointer(), &IPartListener::PartActivated);
-  partEvents.partBroughtToTop.AddListener(l.GetPointer(), &IPartListener::PartBroughtToTop);
-  partEvents.partClosed.AddListener(l.GetPointer(), &IPartListener::PartClosed);
-  partEvents.partDeactivated.AddListener(l.GetPointer(), &IPartListener::PartDeactivated);
-  partEvents.partOpened.AddListener(l.GetPointer(), &IPartListener::PartOpened);
-  partEvents.partHidden.AddListener(l.GetPointer(), &IPartListener::PartHidden);
-  partEvents.partVisible.AddListener(l.GetPointer(), &IPartListener::PartVisible);
-  partEvents.partInputChanged.AddListener(l.GetPointer(), &IPartListener::PartInputChanged);
+  partEvents.AddListener(l);
 }
 
 void PartService::RemovePartListener(IPartListener::Pointer l)
 {
-  if (l.IsNull()) return;
-  
-  //listeners.removePartListener(l);
-  partEvents.partActivated.RemoveListener(l.GetPointer(), &IPartListener::PartActivated);
-  partEvents.partBroughtToTop.RemoveListener(l.GetPointer(), &IPartListener::PartBroughtToTop);
-  partEvents.partClosed.RemoveListener(l.GetPointer(), &IPartListener::PartClosed);
-  partEvents.partDeactivated.RemoveListener(l.GetPointer(), &IPartListener::PartDeactivated);
-  partEvents.partOpened.RemoveListener(l.GetPointer(), &IPartListener::PartOpened);
-  partEvents.partHidden.RemoveListener(l.GetPointer(), &IPartListener::PartHidden);
-  partEvents.partVisible.RemoveListener(l.GetPointer(), &IPartListener::PartVisible);
-  partEvents.partInputChanged.RemoveListener(l.GetPointer(), &IPartListener::PartInputChanged);
+  partEvents.RemoveListener(l);
 }
 
 void PartService::FirePartBroughtToTop(IWorkbenchPartReference::Pointer ref)

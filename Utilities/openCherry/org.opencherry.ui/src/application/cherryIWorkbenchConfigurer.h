@@ -110,10 +110,10 @@ struct CHERRY_UI IWorkbenchConfigurer : public Object {
      * For "shared" images, the workbench remembers the image descriptor and
      * will manages the image object create from it; clients retrieve "shared"
      * images via
-     * {@link org.eclipse.ui.ISharedImages#getImage ISharedImages.getImage()}.
+     * {@link org.opencherry.ui.ISharedImages#getImage ISharedImages.getImage()}.
      * For the other, "non-shared" images, the workbench remembers only the
      * image descriptor; clients retrieve the image descriptor via
-     * {@link org.eclipse.ui.ISharedImages#getImageDescriptor
+     * {@link org.opencherry.ui.ISharedImages#getImageDescriptor
      * ISharedImages.getImageDescriptor()} and are entirely
      * responsible for managing the image objects they create from it.
      * (This is made confusing by the historical fact that the API interface
@@ -124,8 +124,8 @@ struct CHERRY_UI IWorkbenchConfigurer : public Object {
      * @param descriptor the image descriptor
      * @param shared <code>true</code> if this is a shared image, and
      * <code>false</code> if this is not a shared image
-     * @see org.eclipse.ui.ISharedImages#getImage
-     * @see org.eclipse.ui.ISharedImages#getImageDescriptor
+     * @see org.opencherry.ui.ISharedImages#getImage
+     * @see org.opencherry.ui.ISharedImages#getImageDescriptor
      */
 //    virtual void declareImage(String symbolicName, ImageDescriptor descriptor,
 //            boolean shared);

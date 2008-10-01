@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryWorkbenchRegistryConstants.h"
@@ -39,7 +39,7 @@ namespace cherry {
 
   const std::string WorkbenchRegistryConstants::ATT_CLASS = "class"; //$NON-NLS-1$
 
-  const std::string WorkbenchRegistryConstants::ATT_CLOSEABLE = "closeable"; //$NON-NLS-1$    
+  const std::string WorkbenchRegistryConstants::ATT_CLOSEABLE = "closeable"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_COLORFACTORY = "colorFactory"; //$NON-NLS-1$
 
@@ -50,7 +50,7 @@ namespace cherry {
   const std::string WorkbenchRegistryConstants::ATT_CONFIGURATION = "configuration"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR = "contentDetector"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::ATT_CONTENT_TYPE_ID = "contentTypeId"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_CONTEXT_ID = "contextId"; //$NON-NLS-1$
@@ -188,7 +188,7 @@ namespace cherry {
   const std::string WorkbenchRegistryConstants::ATT_SHOW_TITLE = "showTitle";//$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_SINGLETON = "singleton";//$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::ATT_SPLASH_ID = "splashId"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_STANDALONE = "standalone";//$NON-NLS-1$
@@ -290,7 +290,7 @@ namespace cherry {
   const std::string WorkbenchRegistryConstants::PL_PROPERTY_PAGES = "propertyPages"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::PL_STARTUP = "startup"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::PL_SPLASH_HANDLERS = "splashHandlers"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::PL_SYSTEM_SUMMARY_SECTIONS = "systemSummarySections"; //$NON-NLS-1$
@@ -393,7 +393,7 @@ namespace cherry {
 
   const std::string WorkbenchRegistryConstants::TAG_COLORDEFINITION = "colorDefinition"; //$NON-NLS-1$
 
-  const std::string WorkbenchRegistryConstants::TAG_COLOROVERRIDE = "colorOverride"; //$NON-NLS-1$    
+  const std::string WorkbenchRegistryConstants::TAG_COLOROVERRIDE = "colorOverride"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_COLORVALUE = "colorValue"; //$NON-NLS-1$
 
@@ -433,7 +433,7 @@ namespace cherry {
 
   const std::string WorkbenchRegistryConstants::TAG_FONTVALUE = "fontValue"; //$NON-NLS-1$
 
-  const std::string WorkbenchRegistryConstants::TAG_GROUP = "group"; //$NON-NLS-1$ 
+  const std::string WorkbenchRegistryConstants::TAG_GROUP = "group"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_GROUP_MARKER = "groupMarker"; //$NON-NLS-1$
 
@@ -488,17 +488,17 @@ namespace cherry {
   const std::string WorkbenchRegistryConstants::TAG_SELECTION = "selection"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_SEPARATOR = "separator"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_SETTINGS_TRANSFER = "settingsTransfer"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_SHOW_IN_PART = "showInPart";//$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_STATE = "state"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_SPLASH_HANDLER = "splashHandler"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_SPLASH_HANDLER_PRODUCT_BINDING = "splashHandlerProductBinding"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_STICKYVIEW = "stickyView";//$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_SUPPORT = "support"; //$NON-NLS-1$
@@ -540,13 +540,23 @@ namespace cherry {
   const std::string WorkbenchRegistryConstants::TYPE_WIDGET = "widget"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::TAG_TOOLBAR = "toolbar"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_SERVICE_FACTORY = "serviceFactory"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::TAG_SERVICE = "service"; //$NON-NLS-1$
-  
+
   const std::string WorkbenchRegistryConstants::ATTR_FACTORY_CLASS = "factoryClass"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATTR_SERVICE_CLASS = "serviceClass"; //$NON-NLS-1$
+
+  const std::string WorkbenchRegistryConstants::TAG_SOURCE_PROVIDER = "sourceProvider"; //$NON-NLS-1$
+
+  const std::string WorkbenchRegistryConstants::ATTR_PROVIDER = "provider"; //$NON-NLS-1$
+
+  const std::string WorkbenchRegistryConstants::TAG_VARIABLE = "variable"; //$NON-NLS-1$
+
+  const std::string WorkbenchRegistryConstants::ATT_PRIORITY_LEVEL = "priorityLevel"; //$NON-NLS-1$
+
+  const std::string WorkbenchRegistryConstants::ATT_MODE = "mode";
 
 } // namespace cherry

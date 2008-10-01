@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYLAYOUTTREENODE_H_
@@ -20,48 +20,52 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryLayoutTree.h"
 
+#include "cherryLayoutPartSash.h"
+
 namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * Implementation of a tree node. The node represents a
  * sash and it allways has two children.
  */
 class LayoutTreeNode : public LayoutTree {
-  
-  static class ChildSizes {
+
+public:
+
+  cherryClassMacro(LayoutTreeNode);
+
+  struct ChildSizes {
     int left;
     int right;
-    bool resizable = true;
-    
-  public: ChildSizes (int l, int r, bool resize) {
-      left = l;
-      right = r;
-      resizable = resize;
-    }
+    bool resizable;
+
+  ChildSizes (int l, int r, bool resize);
   };
-  
+
     /* The node children witch may be another node or a leaf */
-    private: LayoutTree* children[2];
+    private: LayoutTree::Pointer children[2];
 
     /**
      * Initialize this tree with its sash.
      */
     public: LayoutTreeNode(LayoutPartSash::Pointer sash);
 
+    public: ~LayoutTreeNode();
+
     /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.LayoutTree#flushChildren()
+     * @see org.opencherry.ui.internal.LayoutTree#flushChildren()
      */
     public: void FlushChildren();
-    
+
     /**
      * Traverses the tree to find the part that intersects the given point
-     * 
+     *
      * @param toFind
      * @return the part that intersects the given point
      */
-    public: LayoutPart::Pointer FindPart(int x, int y);
+    public: LayoutPart::Pointer FindPart(const Point& toFind);
 
     /**
      * Add the relation ship between the children in the list
@@ -78,7 +82,7 @@ class LayoutTreeNode : public LayoutTree {
      * Find a LayoutPart in the tree and return its sub-tree. Returns
      * null if the child is not found.
      */
-    public: LayoutTree* Find(LayoutPart::Pointer child);
+    public: SmartPointer<LayoutTree> Find(LayoutPart::Pointer child);
 
     /**
      * Find the part that is in the bottom right position.
@@ -96,7 +100,7 @@ class LayoutTreeNode : public LayoutTree {
      * Find a sash in the tree and return its sub-tree. Returns
      * null if the sash is not found.
      */
-    public: LayoutTreeNode* FindSash(LayoutPartSash::Pointer sash);
+    public: SmartPointer<LayoutTreeNode> FindSash(LayoutPartSash::Pointer sash);
 
     /**
      * Sets the elements in the array of sashes with the
@@ -104,14 +108,14 @@ class LayoutTreeNode : public LayoutTree {
      * may be null depending whether there is a shash
      * beside the <code>part</code>
      */
-    void FindSashes(LayoutTree* child, PartPane::Sashes sashes);
+    void FindSashes(SmartPointer<LayoutTree> child, PartPane::Sashes sashes);
 
     /**
      * Returns the sash of this node.
      */
-    public: LayoutPartSash::Poiter GetSash();
-    
-    private: int GetSashSize();
+    public: LayoutPartSash::Pointer GetSash() const;
+
+    private: int GetSashSize() const;
 
     /**
      * Returns true if this tree has visible parts otherwise returns false.
@@ -121,27 +125,27 @@ class LayoutTreeNode : public LayoutTree {
     /**
      * Remove the child and this node from the tree
      */
-    LayoutTree* Remove(LayoutTree* child);
+    SmartPointer<LayoutTree> Remove(SmartPointer<LayoutTree> child);
 
     /**
      * Replace a child with a new child and sets the new child's parent.
      */
-    void ReplaceChild(LayoutTree* oldChild, LayoutTree* newChild);
+    void ReplaceChild(SmartPointer<LayoutTree> oldChild, SmartPointer<LayoutTree> newChild);
 
     /**
-     * Go up from the subtree and return true if all the sash are 
+     * Go up from the subtree and return true if all the sash are
      * in the direction specified by <code>isVertical</code>
      */
-    public: bool SameDirection(bool isVertical, LayoutTreeNode* subTree);
-    
+    public: bool SameDirection(bool isVertical, SmartPointer<LayoutTreeNode> subTree);
+
     public: int DoComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel);
-  
+
     /**
      * Computes the pixel sizes of this node's children, given the available
      * space for this node. Note that "width" and "height" actually refer
      * to the distance perpendicular and parallel to the sash respectively.
-     * That is, their meaning is reversed when computing a horizontal sash. 
-     * 
+     * That is, their meaning is reversed when computing a horizontal sash.
+     *
      * @param width the pixel width of a vertical node, or the pixel height
      * of a horizontal node (INFINITE if unbounded)
      * @param height the pixel height of a vertical node, or the pixel width
@@ -150,19 +154,19 @@ class LayoutTreeNode : public LayoutTree {
      * (this is a width for horizontal nodes and a height for vertical nodes)
      */
     ChildSizes ComputeChildSizes(int width, int height, int left, int right, int preferredWidth);
-    
+
     protected: int DoGetSizeFlags(bool width);
-  
+
     /**
      * Resize the parts on this tree to fit in <code>bounds</code>.
      */
     public: void DoSetBounds(const Rectangle& bounds);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.LayoutTree#createControl(org.eclipse.swt.widgets.Composite)
+     * @see org.opencherry.ui.internal.LayoutTree#createControl(org.opencherry.swt.widgets.Composite)
      */
     public: void CreateControl(void* parent);
-    
+
     //Added by hudsonr@us.ibm.com - bug 19524
 
     public: bool IsCompressible();
@@ -174,10 +178,10 @@ class LayoutTreeNode : public LayoutTree {
      * @return the bias
      */
     public: int GetCompressionBias();
-  
-    bool IsLeftChild(LayoutTree* toTest);
 
-    LayoutTree* GetChild(bool left);
+    bool IsLeftChild(SmartPointer<const LayoutTree> toTest);
+
+    SmartPointer<LayoutTree> GetChild(bool left);
 
     /**
      * Sets a child in this node
@@ -187,27 +191,18 @@ class LayoutTreeNode : public LayoutTree {
     /**
      * Sets a child in this node
      */
-    void SetChild(bool left, LayoutTree* child);
+    void SetChild(bool left, SmartPointer<LayoutTree> child);
 
     /**
      * Returns a string representation of this object.
      */
     public: std::string ToString();
-    
+
     /**
      * Create the sashes if the children are visible
      * and dispose it if they are not.
      */
-//    public: void updateSashes(Composite parent) {
-//        if (parent == null)
-//            return;
-//        children[0].updateSashes(parent);
-//        children[1].updateSashes(parent);
-//        if (children[0].isVisible() && children[1].isVisible())
-//            getSash().createControl(parent);
-//        else
-//            getSash().dispose();
-//    }
+    //public: void UpdateSashes(void* parent);
 
     /**
      * Writes a description of the layout to the given string buffer.
@@ -216,10 +211,10 @@ class LayoutTreeNode : public LayoutTree {
      * layouts are the same. However, it should be user-readable in order to
      * help debug failed tests. Although these are english readable strings,
      * they should not be translated or equality tests will fail.
-     * 
+     *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf);
+    public: void DescribeLayout(std::string& buf) const;
 
 };
 

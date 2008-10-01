@@ -51,35 +51,35 @@ public: ViewReference(ViewFactory* factory, const std::string& id,
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.internal.WorkbenchPartReference#dispose()
+   * @see org.opencherry.ui.internal.WorkbenchPartReference#dispose()
    */
 protected: virtual void DoDisposePart();
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IWorkbenchPartReference#getPage()
+   * @see org.opencherry.ui.IWorkbenchPartReference#getPage()
    */
 public: virtual SmartPointer<IWorkbenchPage> GetPage();
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.internal.WorkbenchPartReference#getRegisteredName()
+   * @see org.opencherry.ui.internal.WorkbenchPartReference#getRegisteredName()
    */
 public: virtual std::string GetRegisteredName();
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IViewReference
+   * @see org.opencherry.ui.IViewReference
    */
 public: virtual std::string GetSecondaryId();
 
   /*
    * (non-Javadoc)
    * 
-   * @see org.eclipse.ui.IViewReference#getView(boolean)
+   * @see org.opencherry.ui.IViewReference#getView(boolean)
    */
 public: virtual IViewPart::Pointer GetView(bool restore);
 

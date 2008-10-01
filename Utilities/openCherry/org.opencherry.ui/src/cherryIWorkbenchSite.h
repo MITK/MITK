@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIWORKBENCHSITE_H_
@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "services/cherryIServiceLocator.h"
+
 namespace cherry {
 
 struct IWorkbenchPage;
@@ -30,7 +32,7 @@ struct IWorkbenchWindow;
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * The common interface between the workbench and its parts, including pages
  * within parts.
  * <p>
@@ -50,42 +52,42 @@ struct IWorkbenchWindow;
  * <p>
  * This interface is not intended to be implemented or extended by clients.
  * </p>
- * 
- * @see org.eclipse.ui.IWorkbenchPartSite
- * @see org.eclipse.ui.part.IPageSite
+ *
+ * @see org.opencherry.ui.IWorkbenchPartSite
+ * @see org.opencherry.ui.part.IPageSite
  * @since 2.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_UI IWorkbenchSite : public Object { // IAdaptable, IShellProvider, IServiceLocator {
+struct CHERRY_UI IWorkbenchSite : public IServiceLocator, public Object { // IAdaptable, IShellProvider {
 
   cherryClassMacro(IWorkbenchSite);
-  
+
   virtual ~IWorkbenchSite() {}
-  
+
   /**
    * Returns the page containing this workbench site.
-   * 
+   *
    * @return the page containing this workbench site
    */
   virtual SmartPointer<IWorkbenchPage> GetPage() = 0;
 
   /**
    * Returns the selection provider for this workbench site.
-   * 
+   *
    * @return the selection provider, or <code>null</code> if none
    */
   virtual SmartPointer<ISelectionProvider> GetSelectionProvider() = 0;
 
   /**
    * Returns the workbench window containing this workbench site.
-   * 
+   *
    * @return the workbench window containing this workbench site
    */
   virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() = 0;
 
   /**
    * Sets the selection provider for this workbench site.
-   * 
+   *
    * @param provider
    *            the selection provider, or <code>null</code> to clear it
    */

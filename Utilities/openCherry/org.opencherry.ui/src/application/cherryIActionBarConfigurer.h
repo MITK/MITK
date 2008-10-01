@@ -38,7 +38,7 @@ namespace cherry
  * This interface is not intended to be implemented by clients.
  * </p>
  * 
- * @see org.eclipse.ui.application.WorkbenchAdvisor#fillActionBars
+ * @see org.opencherry.ui.application.WorkbenchAdvisor#fillActionBars
  * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -82,14 +82,14 @@ struct CHERRY_UI IActionBarConfigurer : public Object {
      * window.
      * <p>
      * For a workbench retarget action 
-     * ({@link org.eclipse.ui.actions.RetargetAction RetargetAction})
+     * ({@link org.opencherry.ui.actions.RetargetAction RetargetAction})
      * to work, it must be registered.
      * You should also register actions that will participate
      * in custom key bindings.
      * </p>
      *  
      * @param action the global action
-     * @see org.eclipse.ui.actions.RetargetAction
+     * @see org.opencherry.ui.actions.RetargetAction
      */
     //virtual void RegisterGlobalAction(IAction action) = 0;
 

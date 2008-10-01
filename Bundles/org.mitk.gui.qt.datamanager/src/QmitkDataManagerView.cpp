@@ -3,12 +3,16 @@
 #include <QPushButton>
 #include <QDockWidget>
 #include <QVBoxLayout>
+#include <QAbstractItemView>
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageReference.h>
 
-#include "QmitkStdMultiWidget.h"
-#include "QmitkDataTreeComboBox.h"
+#include <mitkNodePredicateDataType.h>
+
+#include <QmitkStdMultiWidget.h>
+#include <QmitkDataTreeComboBox.h>
+#include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>
 
@@ -19,11 +23,11 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   QVBoxLayout* layout = new QVBoxLayout(parent);
   layout->setContentsMargins(0,0,0,0);
-  
-  cherry::IEditorPart::Pointer editor = 
+
+  cherry::IEditorPart::Pointer editor =
       this->GetSite()->GetPage()->GetActiveEditor();
-  
-  // To get hold of the DataStorage hold by the MultiWidget editor, 
+
+  // To get hold of the DataStorage hold by the MultiWidget editor,
   // you can do the following:
   //
   // cherry::IEditorInput::Pointer input = editor->GetEditorInput();
@@ -33,14 +37,14 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //   DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
   //   ...
   // }
-  
+
   // If you do not have a part instance to do GetSite(), you can call
   // cherry::PlatforumUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()
   // in order to get an IWorkbenchPage object
 
-  
+
   mitk::DataTree::Pointer dataTree;
-  
+
   if (editor.IsNotNull())
   {
     cherry::IEditorInput::Pointer input = editor->GetEditorInput();
@@ -50,22 +54,29 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       dataTree = dataStorageRef->GetDataTree();
     }
   }
-  
-  QmitkDataTreeComboBox* comboBox = new QmitkDataTreeComboBox(dataTree, parent);
+
+  //QmitkDataTreeComboBox* comboBox = new QmitkDataTreeComboBox(dataTree, parent);
+  QComboBox* comboBox = new QComboBox(parent);
+  QmitkDataStorageListModel* comboModel =
+    new QmitkDataStorageListModel(new mitk::NodePredicateDataType("Image"),
+                                  comboBox);
+  comboModel->SetDataStorage(this->GetDataStorage());
+  comboBox->setModel(comboModel);
+  //comboBox->view()->setModel(comboModel);
   layout->addWidget(comboBox);
-    
+
   QmitkStandardViews* stdViews = new QmitkStandardViews(parent);
   layout->addWidget(stdViews);
-  
+
   m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
   m_MultiWidgetListener->SetStdMultiWidget(editor.Cast<IWorkbenchPart>());
   this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
-  
+
 }
-  
+
 void QmitkDataManagerView::SetFocus()
 {
-  
+
 }
 
 QmitkDataManagerView::~QmitkDataManagerView()
@@ -77,10 +88,10 @@ QmitkDataManagerView::
 StdMultiWidgetListener::StdMultiWidgetListener(QmitkStandardViews* standardViews)
 : m_StandardViewsWidget(standardViews)
 {
-  
+
 }
-    
-void 
+
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartActivated(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -88,7 +99,7 @@ StdMultiWidgetListener::PartActivated(cherry::IWorkbenchPartReference::Pointer p
   this->SetStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartBroughtToTop(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -96,7 +107,7 @@ StdMultiWidgetListener::PartBroughtToTop(cherry::IWorkbenchPartReference::Pointe
   this->SetStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartClosed(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -104,7 +115,7 @@ StdMultiWidgetListener::PartClosed(cherry::IWorkbenchPartReference::Pointer part
   this->ClearStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -112,14 +123,14 @@ StdMultiWidgetListener::PartDeactivated(cherry::IWorkbenchPartReference::Pointer
   //this->ClearStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartOpened(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartOpened\n";
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartHidden(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -127,7 +138,7 @@ StdMultiWidgetListener::PartHidden(cherry::IWorkbenchPartReference::Pointer part
   this->ClearStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartVisible(cherry::IWorkbenchPartReference::Pointer partRef)
 {
@@ -135,36 +146,36 @@ StdMultiWidgetListener::PartVisible(cherry::IWorkbenchPartReference::Pointer par
   this->SetStdMultiWidget(partRef);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::PartInputChanged(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   std::cout << "PartInputChanged\n";
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   if (partRef.IsNull()) return;
-      
+
   cherry::IWorkbenchPart::Pointer part = partRef->GetPart(false);
   this->SetStdMultiWidget(part);
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPart::Pointer part)
 {
   if (part.IsNull()) return;
-  
+
   QmitkStdMultiWidget* multiWidget = 0;
   if (part.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
     std::cout << "getting multi-widget...\n";
     multiWidget = part.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
-  
+
   if (multiWidget != 0)
   {
     std::cout << "setting camera controller\n";
@@ -172,12 +183,12 @@ StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPart::Pointer part)
   }
 }
 
-void 
+void
 QmitkDataManagerView::
 StdMultiWidgetListener::ClearStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
 {
   if (partRef.IsNull()) return;
-  
+
   if (partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
     m_StandardViewsWidget->SetCameraController(0);
 }

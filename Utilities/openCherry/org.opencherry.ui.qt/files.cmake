@@ -1,14 +1,13 @@
 SET(CPP_FILES
   manifest.cpp
   cherryLogView.cpp
+  cherryQtControlWidget.cpp
   cherryQtEditorPart.cpp
   cherryQtLogView.cpp
   cherryQtUIPlugin.cpp
   cherryQtViewPart.cpp
   cherryQtWorkbenchPageTweaklet.cpp
   cherryQtWorkbenchTweaklet.cpp
-  #cherryQtWorkbenchWindow.cpp
-  cherryQtSimpleWorkbenchWindow.cpp
   
   # application
   application/cherryQtActionBarAdvisor.cpp
@@ -16,19 +15,38 @@ SET(CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryQtEditorPane.cpp
+
+  defaultpresentation/cherryEmptyTabFolder.cpp
+  defaultpresentation/cherryEmptyTabItem.cpp
+  defaultpresentation/cherryNativeTabFolder.cpp
+  defaultpresentation/cherryNativeTabItem.cpp
+  defaultpresentation/cherryQCTabBar.cpp
+  defaultpresentation/cherryQtWorkbenchPresentationFactory.cpp
+  
+  util/cherryAbstractTabFolder.cpp
+  util/cherryLeftToRightTabOrder.cpp
+  util/cherryPartInfo.cpp
+  util/cherryPresentablePartFolder.cpp
+  util/cherryTabbedStackPresentation.cpp
+  util/cherryTabFolderEvent.cpp
+
   cherryQtErrorView.cpp
+  cherryQtMainWindowShell.cpp
   cherryQtShowViewAction.cpp
-  cherryQtViewPane.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
-  cherryQtSimpleEditorAreaHelper.cpp
+  cherryQtWidgetsTweaklet.cpp
 )
 
 SET(MOC_H_FILES
-  cherryQtSimpleWorkbenchWindow.h
+  cherryQtControlWidget.h
+  
+  internal/defaultpresentation/cherryNativeTabFolder.h
+  internal/defaultpresentation/cherryQCTabBar.h
+  
+  internal/cherryQtMainWindowShell.h
   internal/cherryQtShowViewAction.h
-  internal/cherryQtViewPane.h
+  internal/cherryQtWidgetsTweaklet.h
 )
 
 SET(UI_FILES

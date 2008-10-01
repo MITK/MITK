@@ -58,9 +58,9 @@ namespace cherry
  * </p>
  *
  *
- * @see org.eclipse.ui.IEditorPart
- * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
- * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)
+ * @see org.opencherry.ui.IEditorPart
+ * @see org.opencherry.ui.IWorkbenchPage#openEditor(IEditorInput, String)
+ * @see org.opencherry.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)
  */
 struct CHERRY_UI IEditorInput : public Object // public IAdaptable
 {

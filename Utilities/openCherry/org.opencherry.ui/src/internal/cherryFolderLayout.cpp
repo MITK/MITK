@@ -1,24 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryFolderLayout.h"
 #include "cherryPartPlaceholder.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryPageLayout.h"
+#include "cherryLayoutHelper.h"
 
 #include "../cherryUIException.h"
 
@@ -28,10 +29,9 @@ namespace cherry
 FolderLayout::FolderLayout(PageLayout::Pointer pageLayout, PartStack::Pointer folder,
     ViewFactory* viewFactory)
 {
-  super();
-  this.folder = folder;
-  this.viewFactory = viewFactory;
-  this.pageLayout = pageLayout;
+  this->folder = folder;
+  this->viewFactory = viewFactory;
+  this->pageLayout = pageLayout;
 }
 
 void FolderLayout::AddPlaceholder(const std::string& viewId)
@@ -42,11 +42,11 @@ void FolderLayout::AddPlaceholder(const std::string& viewId)
   }
 
   // Create the placeholder.
-  PartPlaceholder::Pointer newPart = new PartPlaceholder(viewId);
+  StackablePart::Pointer newPart = new PartPlaceholder(viewId);
   this->LinkPartToPageLayout(viewId, newPart);
 
   // Add it to the folder layout.
-  folder-Add(newPart);
+  folder->Add(newPart);
 }
 
 void FolderLayout::AddView(const std::string& viewId)
@@ -60,19 +60,19 @@ void FolderLayout::AddView(const std::string& viewId)
   {
     IViewDescriptor::Pointer descriptor = viewFactory->GetViewRegistry()->Find(
         ViewFactory::ExtractPrimaryId(viewId));
-    if (descriptor.IsNull())
+    if (descriptor == 0)
     {
       throw PartInitException("View descriptor not found: " + viewId); //$NON-NLS-1$
     }
-    
-      ViewPane newPart = LayoutHelper.createView(pageLayout->GetViewFactory(), viewId);
-      linkPartToPageLayout(viewId, newPart);
-      folder.add(newPart);
+
+      PartPane::Pointer newPart = LayoutHelper::CreateView(pageLayout->GetViewFactory(), viewId);
+      this->LinkPartToPageLayout(viewId, newPart);
+      folder->Add(newPart);
   }
   catch (PartInitException& e)
   {
     // cannot safely open the dialog so log the problem
-    WorkbenchPlugin::Log(this->GetNameOfClass(), "addView(String)", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetNameOfClass(), "AddView(const std::string&)", e); //$NON-NLS-1$
   }
 }
 
@@ -87,7 +87,7 @@ void FolderLayout::SetProperty(const std::string& id, const std::string& value)
 }
 
 void FolderLayout::LinkPartToPageLayout(const std::string& viewId,
-    LayoutPart::Pointer newPart)
+    StackablePart::Pointer newPart)
 {
   pageLayout->SetRefPart(viewId, newPart);
   pageLayout->SetFolderPart(viewId, folder);

@@ -20,15 +20,16 @@
 #define CHERRYWORKBENCHTWEAKLET_H_
 
 #include "../internal/cherryTweaklets.h"
-#include "../cherryWorkbenchWindow.h"
-#include "../cherryIEditorAreaHelper.h"
-#include "../cherryIWorkbenchPage.h"
-#include "../cherryPartPane.h"
+
+#include "../cherryShell.h"
+#include "../dialogs/cherryIDialog.h"
 
 namespace cherry
 {
 
-struct WorkbenchTweaklet : public Object
+class WorkbenchWindow;
+
+struct CHERRY_UI WorkbenchTweaklet : public Object
 {
   cherryInterfaceMacro(WorkbenchTweaklet, cherry);
 
@@ -40,22 +41,25 @@ struct WorkbenchTweaklet : public Object
 
   virtual bool IsRunning() = 0;
 
-  virtual WorkbenchWindow::Pointer CreateWorkbenchWindow(int newWindowNumber) = 0;
+  /**
+   * Creates the default contents and layout of the workbench window shell.
+   * Returns the GUI dependent parent widget under which the workbench pages
+   * create their contents.
+   *
+   * @param shell
+   *            the shell
+   */
+  //virtual void* CreateDefaultWindowContents(Shell::Pointer shell) = 0;
 
-  virtual IEditorAreaHelper* CreateEditorPresentation(IWorkbenchPage::Pointer page) = 0;
+  /**
+   * Creates the client composite, under which workbench pages
+   * create their controls.
+   *
+   */
+  virtual void* CreatePageComposite(void* parent) = 0;
 
   virtual IDialog::Pointer CreateStandardDialog(const std::string& id) = 0;
 
-  virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "") = 0;
-  virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "") = 0;
-
-  virtual PartPane::Pointer CreateViewPane(IWorkbenchPartReference::Pointer partReference,
-      WorkbenchPage::Pointer workbenchPage) = 0;
-  virtual PartPane::Pointer CreateEditorPane(IWorkbenchPartReference::Pointer partReference,
-      WorkbenchPage::Pointer workbenchPage) = 0;
-
-  // Hack for DummyWorkbenchPage
-  virtual void AddViewPane(IWorkbenchWindow::Pointer window, PartPane::Pointer pane) = 0;
 };
 
 }

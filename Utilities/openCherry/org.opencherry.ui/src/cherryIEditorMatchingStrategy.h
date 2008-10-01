@@ -31,8 +31,8 @@ namespace cherry {
  * An editor matching strategy allows editor extensions to provide their own
  * algorithm for matching the input of an open editor of that type to a
  * given editor input.  This is used to find a matching editor during
- * {@link org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)} and
- * {@link org.eclipse.ui.IWorkbenchPage#findEditor(IEditorInput)}.
+ * {@link org.opencherry.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)} and
+ * {@link org.opencherry.ui.IWorkbenchPage#findEditor(IEditorInput)}.
  *
  * @since 3.1
  */

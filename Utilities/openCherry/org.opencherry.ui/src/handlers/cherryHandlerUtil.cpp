@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryHandlerUtil.h"
@@ -76,7 +76,7 @@ ObjectVector::Pointer HandlerUtil::GetActiveContexts(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o(HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_CONTEXT_NAME));
+      ISources::ACTIVE_CONTEXT_NAME()));
   return o.Cast<ObjectVector>();
 }
 
@@ -84,10 +84,10 @@ ObjectVector::Pointer HandlerUtil::GetActiveContextsChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o(HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_CONTEXT_NAME));
+      ISources::ACTIVE_CONTEXT_NAME()));
   if (o.Cast<ObjectVector>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_CONTEXT_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_CONTEXT_NAME(),
         "ObjectVector", o->GetNameOfClass());
   }
   return o.Cast<ObjectVector>();
@@ -116,7 +116,7 @@ ObjectVector::Pointer HandlerUtil::GetActiveContextsChecked(
 ObjectString::Pointer HandlerUtil::GetActiveEditorId(ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_EDITOR_ID_NAME);
+      ISources::ACTIVE_EDITOR_ID_NAME());
   return o.Cast<ObjectString>();
 }
 
@@ -124,10 +124,10 @@ ObjectString::Pointer HandlerUtil::GetActiveEditorIdChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_EDITOR_ID_NAME);
+      ISources::ACTIVE_EDITOR_ID_NAME());
   if (o.Cast<ObjectString>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_EDITOR_ID_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_EDITOR_ID_NAME(),
         "std::string", o->GetNameOfClass());
   }
   return o.Cast<ObjectString>();
@@ -136,7 +136,7 @@ ObjectString::Pointer HandlerUtil::GetActiveEditorIdChecked(
 IWorkbenchPart::Pointer HandlerUtil::GetActivePart(ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_PART_NAME);
+      ISources::ACTIVE_PART_NAME());
   return o.Cast<IWorkbenchPart>();
 }
 
@@ -144,10 +144,10 @@ IWorkbenchPart::Pointer HandlerUtil::GetActivePartChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_PART_NAME);
+      ISources::ACTIVE_PART_NAME());
   if (o.Cast<IWorkbenchPart>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_NAME(),
         "IWorkbenchPart", o->GetNameOfClass());
   }
   return o.Cast<IWorkbenchPart>();
@@ -156,7 +156,7 @@ IWorkbenchPart::Pointer HandlerUtil::GetActivePartChecked(
 ObjectString::Pointer HandlerUtil::GetActivePartId(ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_PART_ID_NAME);
+      ISources::ACTIVE_PART_ID_NAME());
   return o.Cast<ObjectString>();
 }
 
@@ -164,10 +164,10 @@ ObjectString::Pointer HandlerUtil::GetActivePartIdChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_PART_ID_NAME);
+      ISources::ACTIVE_PART_ID_NAME());
   if (o.Cast<ObjectString>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_ID_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_ID_NAME(),
         "std::string", o->GetNameOfClass());
   }
   return o.Cast<ObjectString>();
@@ -177,7 +177,7 @@ IWorkbenchPartSite::Pointer HandlerUtil::GetActiveSite(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_SITE_NAME);
+      ISources::ACTIVE_SITE_NAME());
   return o.Cast<IWorkbenchPartSite>();
 }
 
@@ -185,10 +185,10 @@ IWorkbenchPartSite::Pointer HandlerUtil::GetActiveSiteChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_SITE_NAME);
+      ISources::ACTIVE_SITE_NAME());
   if (o.Cast<IWorkbenchPartSite>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_SITE_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_SITE_NAME(),
         "IWorkbenchSitePart", o->GetNameOfClass());
   }
   return o.Cast<IWorkbenchPartSite>();
@@ -198,7 +198,7 @@ ISelection::Pointer HandlerUtil::GetCurrentSelection(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_CURRENT_SELECTION_NAME);
+      ISources::ACTIVE_CURRENT_SELECTION_NAME());
   return o.Cast<ISelection>();
 }
 
@@ -206,11 +206,11 @@ ISelection::Pointer HandlerUtil::GetCurrentSelectionChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_CURRENT_SELECTION_NAME);
+      ISources::ACTIVE_CURRENT_SELECTION_NAME());
   if (o.Cast<ISelection>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event,
-        ISources::ACTIVE_CURRENT_SELECTION_NAME, "ISelection",
+        ISources::ACTIVE_CURRENT_SELECTION_NAME(), "ISelection",
         o->GetNameOfClass());
   }
   return o.Cast<ISelection>();
@@ -220,7 +220,7 @@ ObjectVector::Pointer HandlerUtil::GetActiveMenus(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_MENU_NAME);
+      ISources::ACTIVE_MENU_NAME());
   return o.Cast<ObjectVector>();
 }
 
@@ -228,10 +228,10 @@ ObjectVector::Pointer HandlerUtil::GetActiveMenusChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_MENU_NAME);
+      ISources::ACTIVE_MENU_NAME());
   if (o.Cast<ObjectVector>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_MENU_NAME,
+    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_MENU_NAME(),
         "ObjectVector", o->GetNameOfClass());
   }
   return o.Cast<ObjectVector>();
@@ -241,7 +241,7 @@ ISelection::Pointer HandlerUtil::GetActiveMenuSelection(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_MENU_SELECTION_NAME);
+      ISources::ACTIVE_MENU_SELECTION_NAME());
   return o.Cast<ISelection>();
 }
 
@@ -249,11 +249,11 @@ ISelection::Pointer HandlerUtil::GetActiveMenuSelectionChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_MENU_SELECTION_NAME);
+      ISources::ACTIVE_MENU_SELECTION_NAME());
   if (o.Cast<ISelection>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event,
-        ISources::ACTIVE_MENU_SELECTION_NAME, "ISelection", o->GetNameOfClass());
+        ISources::ACTIVE_MENU_SELECTION_NAME(), "ISelection", o->GetNameOfClass());
   }
   return o.Cast<ISelection>();
 }
@@ -262,7 +262,7 @@ IWorkbenchWindow::Pointer HandlerUtil::GetActiveWorkbenchWindow(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_WORKBENCH_WINDOW_NAME);
+      ISources::ACTIVE_WORKBENCH_WINDOW_NAME());
   return o.Cast<IWorkbenchWindow>();
 }
 
@@ -270,11 +270,11 @@ IWorkbenchWindow::Pointer HandlerUtil::GetActiveWorkbenchWindowChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_WORKBENCH_WINDOW_NAME);
+      ISources::ACTIVE_WORKBENCH_WINDOW_NAME());
   if (o.Cast<IWorkbenchWindow>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event,
-        ISources::ACTIVE_WORKBENCH_WINDOW_NAME, "IWorkbenchWindow",
+        ISources::ACTIVE_WORKBENCH_WINDOW_NAME(), "IWorkbenchWindow",
         o->GetNameOfClass());
   }
   return o.Cast<IWorkbenchWindow>();
@@ -284,7 +284,7 @@ ISelection::Pointer HandlerUtil::GetActiveMenuEditorInput(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::ACTIVE_MENU_EDITOR_INPUT_NAME);
+      ISources::ACTIVE_MENU_EDITOR_INPUT_NAME());
   return o.Cast<ISelection>();
 }
 
@@ -292,11 +292,11 @@ ISelection::Pointer HandlerUtil::GetActiveMenuEditorInputChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::ACTIVE_MENU_EDITOR_INPUT_NAME);
+      ISources::ACTIVE_MENU_EDITOR_INPUT_NAME());
   if (o.Cast<ISelection>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event,
-        ISources::ACTIVE_MENU_EDITOR_INPUT_NAME, "ISelection",
+        ISources::ACTIVE_MENU_EDITOR_INPUT_NAME(), "ISelection",
         o->GetNameOfClass());
   }
   return o.Cast<ISelection>();
@@ -306,7 +306,7 @@ ISelection::Pointer HandlerUtil::GetShowInSelection(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
-      ISources::SHOW_IN_SELECTION);
+      ISources::SHOW_IN_SELECTION());
   return o.Cast<ISelection>();
 }
 
@@ -314,10 +314,10 @@ ISelection::Pointer HandlerUtil::GetShowInSelectionChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
-      ISources::SHOW_IN_SELECTION);
+      ISources::SHOW_IN_SELECTION());
   if (o.Cast<ISelection>().IsNull())
   {
-    HandlerUtil::IncorrectTypeFound(event, ISources::SHOW_IN_SELECTION,
+    HandlerUtil::IncorrectTypeFound(event, ISources::SHOW_IN_SELECTION(),
         "ISelection", o->GetNameOfClass());
   }
   return o.Cast<ISelection>();
@@ -327,7 +327,7 @@ Object::Pointer HandlerUtil::GetShowInInput(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer var = HandlerUtil::GetVariable(event,
-      ISources::SHOW_IN_INPUT);
+      ISources::SHOW_IN_INPUT());
   //    if (var == IEvaluationContext.UNDEFINED_VARIABLE) {
   //      return null;
   //    }
@@ -338,7 +338,7 @@ Object::Pointer HandlerUtil::GetShowInInputChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer var = HandlerUtil::GetVariableChecked(event,
-      ISources::SHOW_IN_INPUT);
+      ISources::SHOW_IN_INPUT());
   //    if (var == IEvaluationContext.UNDEFINED_VARIABLE) {
   //      HandlerUtil::IncorrectTypeFound(event, ISources::SHOW_IN_INPUT, Object.class, var
   //          .getClass());

@@ -1,0 +1,54 @@
+/*=========================================================================
+
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
+
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
+
+ =========================================================================*/
+
+#include "cherryIPartListener.h"
+
+namespace cherry {
+
+void
+IPartListener::Events
+::AddListener(IPartListener::Pointer l)
+{
+  if (l.IsNull()) return;
+
+  partActivated += Delegate(l.GetPointer(), &IPartListener::PartActivated);
+  partBroughtToTop += Delegate(l.GetPointer(), &IPartListener::PartBroughtToTop);
+  partClosed += Delegate(l.GetPointer(), &IPartListener::PartClosed);
+  partDeactivated += Delegate(l.GetPointer(), &IPartListener::PartDeactivated);
+  partOpened += Delegate(l.GetPointer(), &IPartListener::PartOpened);
+  partHidden += Delegate(l.GetPointer(), &IPartListener::PartHidden);
+  partVisible += Delegate(l.GetPointer(), &IPartListener::PartVisible);
+  partInputChanged += Delegate(l.GetPointer(), &IPartListener::PartInputChanged);
+}
+
+void
+IPartListener::Events
+::RemoveListener(IPartListener::Pointer l)
+{
+  if (l.IsNull()) return;
+
+  partActivated -= Delegate(l.GetPointer(), &IPartListener::PartActivated);
+  partBroughtToTop -= Delegate(l.GetPointer(), &IPartListener::PartBroughtToTop);
+  partClosed -= Delegate(l.GetPointer(), &IPartListener::PartClosed);
+  partDeactivated -= Delegate(l.GetPointer(), &IPartListener::PartDeactivated);
+  partOpened -= Delegate(l.GetPointer(), &IPartListener::PartOpened);
+  partHidden -= Delegate(l.GetPointer(), &IPartListener::PartHidden);
+  partVisible -= Delegate(l.GetPointer(), &IPartListener::PartVisible);
+  partInputChanged -= Delegate(l.GetPointer(), &IPartListener::PartInputChanged);
+}
+
+}

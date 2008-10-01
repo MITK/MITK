@@ -89,10 +89,13 @@ public:
   /** Returns a unique name which can be used to name
      * library manifests for dynamic class loading. Used in the
      * extension point mechanism.
+     *
+     * This method will be declared by using the cherryInterfaceMacro or
+     * cherryManifestMacro macros.
      */
-  static const char *GetManifestName() {
-    return "cherry::Object";
-  }
+//  static const char *GetManifestName() {
+//    return "cherry::Object";
+//  }
 
 #ifdef _WIN32
   /** Used to avoid dll boundary problems.  */

@@ -1,104 +1,148 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryPartPane.h"
+
+#include "internal/cherryWorkbenchPage.h"
+#include "internal/cherryPartStack.h"
+#include "internal/cherryEditorAreaHelper.h"
+#include "internal/cherryPerspective.h"
+#include "tweaklets/cherryGuiWidgetsTweaklet.h"
+#include "tweaklets/cherryWorkbenchPageTweaklet.h"
 
 namespace cherry
 {
 
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage::Pointer workbenchPage)
- : control(0), inLayout(true)
+ : StackablePart(partReference->GetId()),
+   control(0), inLayout(true)
 {
   //super(partReference.getId());
   this->partReference = partReference;
   this->page = workbenchPage;
 }
 
-//void PartPane::CreateControl(void* parent)
-//{
-//  if (this->GetControl() != 0)
-//  {
-//    return;
-//  }
-//
-//  //partReference.addPropertyListener(this);
-//  //partReference.addPartPropertyListener(this);
-//  
-//  // Create view form.  
-//  control = new Composite(parent, SWT.NONE);
-//  control.setLayout(new FillLayout());
-//  // the part should never be visible by default.  It will be made visible 
-//  // by activation.  This allows us to have views appear in tabs without 
-//  // becoming active by default.
-//  control.setVisible(false);
-//  control.moveAbove(null);
-//  // Create a title bar.
-//  createTitleBar();
-//
-//  // When the pane or any child gains focus, notify the workbench.
-//  control.addListener(SWT.Activate, this);
-//
-//  control.addTraverseListener(traverseListener);
-//}
+void PartPane::CreateControl(void* parent) {
+  if (this->GetControl() != 0)
+  {
+    return;
+  }
+
+  partReference->AddPropertyListener(this);
+
+  // Create view form.
+  control = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreatePaneControl(parent);
+
+  // the part should never be visible by default.  It will be made visible
+  // by activation.  This allows us to have views appear in tabs without
+  // becoming active by default.
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(control, false);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveAbove(control, 0);
+
+  // Create a title bar.
+  //this->CreateTitleBar();
+
+
+  // When the pane or any child gains focus, notify the workbench.
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(control, this);
+
+  //control.addTraverseListener(traverseListener);
+}
+
+bool PartPane::IsPlaceHolder()
+{
+  return false;
+}
 
 PartPane::~PartPane()
 {
 //  super.dispose();
 //
-//  if ((control != null) && (!control.isDisposed()))
-//  {
-//    control.removeListener(SWT.Activate, this);
+  if (control != 0)
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, this);
 //    control.removeTraverseListener(traverseListener);
-//    control.dispose();
-//    control = null;
-//  }
+    control = 0;
+  }
 //  if ((paneMenuManager != null))
 //  {
 //    paneMenuManager.dispose();
 //    paneMenuManager = null;
 //  }
 //
-//  partReference.removePropertyListener(this);
+  partReference->RemovePropertyListener(this);
 //  partReference.removePartPropertyListener(this);
 }
 
-//Rectangle PartPane::GetBounds()
-//{
-//  return getControl().getBounds();
-//}
+void PartPane::DoHide()
+{
+  if (partReference.Cast<IViewReference>() != 0)
+  {
+    this->GetPage()->HideView(partReference.Cast<IViewReference>());
+  }
+  else if (partReference.Cast<IEditorReference>() != 0)
+  {
+    this->GetPage()->CloseEditor(partReference.Cast<IEditorReference>(), true);
+  }
+}
+
+Rectangle PartPane::GetParentBounds()
+{
+  void* ctrl = this->GetControl();
+
+  if (this->GetContainer() != 0 && this->GetContainer().Cast<LayoutPart>() != 0) {
+      LayoutPart::Pointer part = this->GetContainer().Cast<LayoutPart>();
+
+      if (part->GetControl() != 0) {
+          ctrl = part->GetControl();
+      }
+  }
+
+  //TODO DND
+  //return DragUtil.getDisplayBounds(ctrl);
+  return this->GetBounds();
+}
 
 void* PartPane::GetControl()
 {
   return control;
 }
 
-IWorkbenchPartReference::Pointer PartPane::GetPartReference()
+IWorkbenchPartReference::Pointer PartPane::GetPartReference() const
 {
   return partReference;
 }
 
-//void PartPane::MoveAbove(void* refControl)
-//{
-//  if (getControl() != null)
-//  {
-//    getControl().moveAbove(refControl);
-//  }
-//}
+void PartPane::ControlActivated(GuiTk::ControlEvent::Pointer /*e*/)
+{
+  if (inLayout)
+  {
+    this->RequestActivation();
+  }
+}
+
+void PartPane::MoveAbove(void* refControl)
+{
+  if (this->GetControl() != 0)
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveAbove(this->GetControl(), refControl);
+  }
+}
 
 void PartPane::RequestActivation()
 {
@@ -107,26 +151,97 @@ void PartPane::RequestActivation()
   this->page->RequestActivation(part);
 }
 
-void PartPane::SetContainer(ILayoutContainer::Pointer container)
+//PartStack::Pointer PartPane::GetStack()
+//{
+//  return partStack;
+//}
+
+PartPane::Sashes PartPane::FindSashes()
+{
+  Sashes result;
+
+  IStackableContainer::Pointer container = this->GetContainer();
+
+  if (container == 0) {
+      return result;
+  }
+
+  container->FindSashes(result);
+  return result;
+}
+
+WorkbenchPage::Pointer PartPane::GetPage()
+{
+  return page;
+}
+
+void PartPane::SetContainer(IStackableContainer::Pointer container)
 {
 
-//  if (container.Cast<LayoutPart>().IsNotNull())
-//  {
-//    LayoutPart part = (LayoutPart) container;
-//
-//    Control containerControl = part.getControl();
-//
-//    if (containerControl != null)
-//    {
-//      Control control = getControl();
-//      Composite newParent = containerControl.getParent();
-//      if (control != null && newParent != control.getParent())
-//      {
-//        reparent(newParent);
-//      }
-//    }
-//  }
-//  super.setContainer(container);
+  void* containerControl = container.Cast<LayoutPart>()->GetControl();
+
+  if (containerControl != 0)
+  {
+    void* control = this->GetControl();
+    void* newParent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(containerControl);
+    if (control != 0 && newParent != Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(control))
+    {
+      this->Reparent(newParent);
+    }
+  }
+
+  StackablePart::SetContainer(container);
+}
+
+void PartPane::Reparent(void* newParent)
+{
+  void* control = this->GetControl();
+
+  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
+  {
+    return;
+  }
+
+  if (guiTweaklet->IsReparentable(control))
+  {
+    // make control small in case it is not resized with other controls
+    //control.setBounds(0, 0, 0, 0);
+    // By setting the control to disabled before moving it,
+    // we ensure that the focus goes away from the control and its children
+    // and moves somewhere else
+    bool enabled = guiTweaklet->GetEnabled(control);
+    guiTweaklet->SetEnabled(control, false);
+    guiTweaklet->SetParent(control, newParent);
+    guiTweaklet->SetEnabled(control, enabled);
+    guiTweaklet->MoveAbove(control, 0);
+  }
+}
+
+void PartPane::ShowFocus(bool inFocus)
+{
+  if (this->GetContainer().Cast<PartStack>() == 0)
+    return;
+
+  PartStack::Pointer stack = this->GetContainer().Cast<PartStack>();
+
+  if (partReference.Cast<IViewReference>() != 0)
+  {
+    stack->SetActive(inFocus ? StackPresentation::AS_ACTIVE_FOCUS
+                            : StackPresentation::AS_INACTIVE);
+  }
+  else if (partReference.Cast<IEditorReference>() != 0)
+  {
+    if (inFocus)
+    {
+      page->GetEditorPresentation()->SetActiveWorkbook(stack, true);
+    }
+    else
+    {
+      stack->SetActive(page->GetEditorPresentation()->GetActiveWorkbook() == stack ?
+          StackPresentation::AS_ACTIVE_NOFOCUS : StackPresentation::AS_INACTIVE);
+    }
+  }
 }
 
 void PartPane::SetVisible(bool makeVisible)
@@ -142,14 +257,17 @@ void PartPane::SetVisible(bool makeVisible)
     partReference->GetPart(true);
   }
 
-  this->SetControlVisible(makeVisible);
+  if (this->GetControl() != 0)
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(this->GetControl(), makeVisible);
 
-  //((WorkbenchPartReference) partReference).fireVisibilityChange();
+  partReference.Cast<WorkbenchPartReference>()->FireVisibilityChange();
 }
 
 bool PartPane::GetVisible()
 {
-  return this->GetControlVisible();
+  if (this->GetControl() != 0)
+    return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(this->GetControl());
+  return false;
 }
 
 void PartPane::SetFocus()
@@ -207,7 +325,7 @@ bool PartPane::IsBusy()
   return busy;
 }
 
-void PartPane::DescribeLayout(std::string& buf)
+void PartPane::DescribeLayout(std::string& buf) const
 {
 
   IWorkbenchPartReference::Pointer part = this->GetPartReference();
@@ -217,6 +335,22 @@ void PartPane::DescribeLayout(std::string& buf)
     buf.append(part->GetPartName());
     return;
   }
+}
+
+bool PartPane::IsCloseable()
+{
+  if (partReference.Cast<IViewReference>() != 0)
+  {
+    Perspective::Pointer perspective = page->GetActivePerspective();
+    if (perspective == 0) {
+        // Shouldn't happen -- can't have a ViewStack without a
+        // perspective
+        return true;
+    }
+    return perspective->IsCloseable(partReference.Cast<IViewReference>());
+  }
+
+  return true;
 }
 
 void PartPane::SetInLayout(bool inLayout)
@@ -245,6 +379,26 @@ void PartPane::RemoveContributions()
 
 }
 
+void PartPane::AddPropertyListener(IPropertyChangeListener::Pointer listener)
+{
+  propertyChangeEvents.AddListener(listener);
+}
+
+void PartPane::RemovePropertyListener(IPropertyChangeListener::Pointer listener)
+{
+  propertyChangeEvents.RemoveListener(listener);
+}
+
+void PartPane::FirePropertyChange(PropertyChangeEvent::Pointer event)
+{
+  propertyChangeEvents.propertyChange(event);
+}
+
+void PartPane::PropertyChange(PropertyChangeEvent::Pointer event)
+{
+  this->FirePropertyChange(event);
+}
+
 int PartPane::ComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
@@ -256,6 +410,16 @@ int PartPane::ComputePreferredSize(bool width, int availableParallel,
 int PartPane::GetSizeFlags(bool horizontal)
 {
   return partReference.Cast<WorkbenchPartReference>()->GetSizeFlags(horizontal);
+}
+
+void PartPane::ShellActivated()
+{
+
+}
+
+void PartPane::ShellDeactivated()
+{
+
 }
 
 }

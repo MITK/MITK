@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYPAGELAYOUT_H_
@@ -22,40 +22,45 @@
 
 #include "cherryViewLayoutRec.h"
 #include "cherryContainerPlaceholder.h"
+#include "cherryViewSashContainer.h"
+#include "cherryPartStack.h"
 
 namespace cherry
 {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * This factory is used to define the initial layout of a part sash container.
  * <p>
- * Design notes: The design of <code>IPageLayout</code> is a reflection of 
+ * Design notes: The design of <code>IPageLayout</code> is a reflection of
  * three requirements:
  * <ol>
  *   <li>A mechanism is required to define the initial layout for a page. </li>
- *   <li>The views and editors within a page will be persisted between 
+ *   <li>The views and editors within a page will be persisted between
  *     sessions.</li>
  *   <li>The view and editor lifecycle for (1) and (2) should be identical.</li>
  * </ol>
  * </p>
  * <p>
- * In reflection of these requirements, the following strategy has been 
+ * In reflection of these requirements, the following strategy has been
  * implemented for layout definition.
  * <ol>
- *   <li>A view extension is added to the workbench registry for the view. 
+ *   <li>A view extension is added to the workbench registry for the view.
  *     This extension defines the extension id and extension class.  </li>
  *   <li>A view is added to a page by invoking one of the add methods
- *     in <code>IPageLayout</code>. The type of view is passed as an 
- *     extension id, rather than a handle. The page layout will map 
- *     the extension id to a view class, create an instance of the class, 
+ *     in <code>IPageLayout</code>. The type of view is passed as an
+ *     extension id, rather than a handle. The page layout will map
+ *     the extension id to a view class, create an instance of the class,
  *     and then add the view to the page.</li>
  * </ol>
  * </p>
  */
 class PageLayout : public IPageLayout
 {
+
+public:
+  cherryClassMacro(PageLayout);
 
 private:
 
@@ -69,13 +74,17 @@ private:
 
   bool fixed;
 
-  std::map<std::string, LayoutPart::Pointer> mapIDtoFolder;
+  typedef std::map<std::string, IStackableContainer::Pointer> IDToFolderMap;
+  IDToFolderMap mapIDtoFolder;
 
-  std::map<std::string, LayoutPart::Pointer> mapIDtoPart;
+  typedef std::map<std::string, StackablePart::Pointer> IDToPartMap;
+  IDToPartMap mapIDtoPart;
 
-  std::map<std::string, ViewLayoutRec> mapIDtoViewLayoutRec;
+  typedef std::map<std::string, ViewLayoutRec::Pointer> IDToViewLayoutRecMap;
+  IDToViewLayoutRecMap mapIDtoViewLayoutRec;
 
-  std::map<Object, Object> mapFolderToFolderLayout;
+  typedef std::map<IStackableContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
+  FolderToFolderLayoutMap mapFolderToFolderLayout;
 
   std::vector<std::string> perspectiveShortcuts;
 
@@ -109,7 +118,7 @@ private:
 
   /**
    * Adds an action set to the page.
-   * 
+   *
    * @param actionSetID Identifies the action set extension to use. It must
    *            exist within the workbench registry.
    */
@@ -120,14 +129,14 @@ private:
   //    }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addFastView(java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addFastView(java.lang.String)
    */
   //    public: void addFastView(String id) {
   //        addFastView(id, INVALID_RATIO);
   //    }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addFastView(java.lang.String, float)
+   * @see org.opencherry.ui.IPageLayout#addFastView(java.lang.String, float)
    */
   //    public: void addFastView(String id, float ratio) {
   //        if (checkPartInLayout(id)) {
@@ -160,7 +169,7 @@ private:
 
   /**
    * Check to see if the partId represents a fast view's id.
-   * 
+   *
    * @param partId
    *            The part's id.
    * @return true if the partId is a fast view id.
@@ -182,16 +191,16 @@ private:
    * Returns the view layout record for the given view id, or null if not
    * found. If create is true, the record is created if it doesn't already
    * exist.
-   * 
+   *
    * @since 3.0
    */
 public:
-  ViewLayoutRec GetViewLayoutRec(const std::string& id, bool create);
+  ViewLayoutRec::Pointer GetViewLayoutRec(const std::string& id, bool create);
 
   /**
    * Adds a creation wizard to the File New menu.
-   * The id must name a new wizard extension contributed to the 
-   * workbench's extension point (named <code>"org.eclipse.ui.newWizards"</code>).
+   * The id must name a new wizard extension contributed to the
+   * workbench's extension point (named <code>"org.opencherry.ui.newWizards"</code>).
    *
    * @param id the wizard id
    */
@@ -205,13 +214,13 @@ public:
    * Add the layout part to the page's layout
    */
 private:
-  void AddPart(LayoutPart::Pointer newPart, const std::string& partId,
-      int relationship, float ratio, const std::string& refId);
+  void AddStack(IStackableContainer::Pointer newPart, const std::string& partId,
+        int relationship, float ratio, const std::string& refId);
 
   /**
    * Adds a perspective shortcut to the Perspective menu.
-   * The id must name a perspective extension contributed to the 
-   * workbench's extension point (named <code>"org.eclipse.ui.perspectives"</code>).
+   * The id must name a perspective extension contributed to the
+   * workbench's extension point (named <code>"org.opencherry.ui.perspectives"</code>).
    *
    * @param id the perspective id
    */
@@ -219,7 +228,7 @@ public:
   void AddPerspectiveShortcut(const std::string& id);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addPlaceholder(java.lang.String, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addPlaceholder(java.lang.String, int, float, java.lang.String)
    */
 public:
   void AddPlaceholder(const std::string& viewId, int relationship, float ratio,
@@ -228,29 +237,29 @@ public:
   /**
    * Checks whether the given id is a valid placeholder id.
    * A placeholder id may be simple or compound, and can optionally contain a wildcard.
-   * 
+   *
    * @param id the placeholder id
    * @return <code>true</code> if the given id is a valid placeholder id, <code>false</code> otherwise
    */
   bool CheckValidPlaceholderId(const std::string& id);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addShowInPart(java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addShowInPart(java.lang.String)
    */
 public:
   void AddShowInPart(const std::string& id);
 
   /**
    * Adds a view to the Show View menu. The id must name a view extension
-   * contributed to the workbench's extension point (named <code>"org.eclipse.ui.views"</code>).
-   * 
+   * contributed to the workbench's extension point (named <code>"org.opencherry.ui.views"</code>).
+   *
    * @param id the view id
    */
 public:
   void AddShowViewShortcut(const std::string& id);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
 public:
   void AddView(const std::string& viewId, int relationship, float ratio,
@@ -260,7 +269,7 @@ public:
    * Convenience method to allow setting the initial minimized
    * state if a new stack is created. Used by the 'perspectiveExtension'
    * reader.
-   * 
+   *
    *  @since 3.3
    */
 public:
@@ -268,7 +277,7 @@ public:
       const std::string& refId, bool minimized);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
 private:
   void
@@ -288,14 +297,14 @@ public:
   bool CheckPartInLayout(const std::string& partId);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#createFolder(java.lang.String, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#createFolder(java.lang.String, int, float, java.lang.String)
    */
 public:
   IFolderLayout::Pointer CreateFolder(const std::string& folderId,
       int relationship, float ratio, const std::string& refId);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#createPlaceholderFolder(java.lang.String, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#createPlaceholderFolder(java.lang.String, int, float, java.lang.String)
    */
 public:
   IPlaceholderFolderLayout::Pointer CreatePlaceholderFolder(
@@ -304,17 +313,17 @@ public:
 
   /**
    * Create a new <code>LayoutPart</code>.
-   * 
+   *
    * @param partID the id of the part to create.
    * @return the <code>LayoutPart</code>, or <code>null</code> if it should not be
    * created because of activity filtering.
    * @throws PartInitException thrown if there is a problem creating the part.
    */
 private:
-  LayoutPart::Pointer CreateView(const std::string& partID);
+  StackablePart::Pointer CreateView(const std::string& partID);
 
   /**
-   * @return the action set list for the page. This is <code>List</code> of 
+   * @return the action set list for the page. This is <code>List</code> of
    * <code>String</code>s.
    */
   //    public: ArrayList getActionSets() {
@@ -322,7 +331,7 @@ private:
   //    }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#getDescriptor()
+   * @see org.opencherry.ui.IPageLayout#getDescriptor()
    */
 public:
   IPerspectiveDescriptor::Pointer GetDescriptor();
@@ -336,7 +345,7 @@ public:
   std::string GetEditorArea();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#getEditorReuseThreshold()
+   * @see org.opencherry.ui.IPageLayout#getEditorReuseThreshold()
    */
   //    public: int getEditorReuseThreshold() {
   //        return -1;
@@ -354,10 +363,10 @@ public:
    * if none (i.e. part of the page layout instead of a folder layout).
    */
 private:
-  PartStack::Pointer GetFolderPart(const std::string& viewId);
+  IStackableContainer::Pointer GetFolderPart(const std::string& viewId);
 
   /**
-   * @return the new wizard shortcuts associated with the page. This is a <code>List</code> of 
+   * @return the new wizard shortcuts associated with the page. This is a <code>List</code> of
    * <code>String</code>s.
    */
   //    public: ArrayList getNewWizardShortcuts() {
@@ -371,7 +380,7 @@ private:
   int GetPartSashConst(int nRelationship);
 
   /**
-   * @return the perspective shortcuts associated with the page. This is a <code>List</code> of 
+   * @return the perspective shortcuts associated with the page. This is a <code>List</code> of
    * <code>String</code>s.
    */
 public:
@@ -381,13 +390,13 @@ public:
    * @return the part for a given ID.
    */
   /*package*/
-  LayoutPart::Pointer GetRefPart(const std::string& partID);
+  StackablePart::Pointer GetRefPart(const std::string& partID);
 
   /**
    * @return the top level layout container.
    */
 public:
-  ViewSashContainer::Pointer GetRootLayoutContainer();
+  PartSashContainer::Pointer GetRootLayoutContainer();
 
   /**
    * @return the ids of the parts to list in the Show In... prompter. This is
@@ -397,7 +406,7 @@ public:
   std::vector<std::string> GetShowInPartIds();
 
   /**
-   * @return the show view shortcuts associated with the page. This is a <code>List</code> of 
+   * @return the show view shortcuts associated with the page. This is a <code>List</code> of
    * <code>String</code>s.
    */
 public:
@@ -411,14 +420,14 @@ public:
   ViewFactory* GetViewFactory();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#isEditorAreaVisible()
+   * @see org.opencherry.ui.IPageLayout#isEditorAreaVisible()
    */
 public:
   bool IsEditorAreaVisible();
 
   /**
    * Trim the ratio so that direct manipulation of parts is easy.
-   * 
+   *
    * @param in the initial ratio.
    * @return the normalized ratio.
    */
@@ -432,33 +441,33 @@ private:
   void Prefill();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#setEditorAreaVisible(boolean)
+   * @see org.opencherry.ui.IPageLayout#setEditorAreaVisible(boolean)
    */
 public:
   void SetEditorAreaVisible(bool showEditorArea);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#setEditorReuseThreshold(int)
+   * @see org.opencherry.ui.IPageLayout#setEditorReuseThreshold(int)
    */
   //    public: void setEditorReuseThreshold(int openEditors) {
   //        //no-op
   //    }
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#setFixed(boolean)
+   * @see org.opencherry.ui.IPageLayout#setFixed(boolean)
    */
 public:
   void SetFixed(bool fixed);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#getFixed()
+   * @see org.opencherry.ui.IPageLayout#getFixed()
    */
 public:
   bool IsFixed();
 
   /**
    * Map the folder part containing the given view ID.
-   * 
+   *
    * @param viewId the part ID.
    * @param container the <code>ContainerPlaceholder</code>.
    */
@@ -468,38 +477,38 @@ public:
 
   /**
    * Map the folder part containing the given view ID.
-   * 
+   *
    * @param viewId the part ID.
    * @param folder the <code>ViewStack</code>.
    */
   /*package*/
   void SetFolderPart(const std::string& viewId, PartStack::Pointer folder);
 
+  void SetFolderPart(const std::string& viewId, IStackableContainer::Pointer folder);
+
   /**
    * Map an ID to a part.
-   * 
+   *
    * @param partId the part ID.
    * @param part the <code>LayoutPart</code>.
    */
   /*package*/
-  void SetRefPart(const std::string& partID, LayoutPart::Pointer part);
+  void SetRefPart(const std::string& partID, StackablePart::Pointer part);
 
-  // stackPart(Layoutpart, String, String) added by dan_rubel@instantiations.com
   /**
    * Stack a part on top of another.
-   * 
+   *
    * @param newPart the new part.
    * @param viewId the view ID.
    * @param refId the reference ID.
    */
 private:
-  void StackPart(LayoutPart::Pointer newPart, const std::string& viewId,
+  void StackPart(StackablePart::Pointer newPart, const std::string& viewId,
       const std::string& refId);
 
-  // stackPlaceholder(String, String) added by dan_rubel@instantiations.com
   /**
    * Stack a placeholder on top of another.
-   * 
+   *
    * @param viewId the view ID.
    * @param refId the reference ID.
    */
@@ -509,7 +518,7 @@ public:
   // stackView(String, String) modified by dan_rubel@instantiations.com
   /**
    * Stack one view on top of another.
-   * 
+   *
    * @param viewId the view ID.
    * @param refId the reference ID.
    */
@@ -517,31 +526,18 @@ public:
   void StackView(const std::string& viewId, const std::string& refId);
 
   /**
-   * Converts SWT position constants into layout position constants.
-   * 
-   * @param swtConstant one of SWT.TOP, SWT.BOTTOM, SWT.LEFT, or SWT.RIGHT
-   * @return one of IPageLayout.TOP, IPageLayout.BOTTOM, IPageLayout.LEFT, IPageLayout.RIGHT, or -1 indicating an
+   * Converts common position constants into layout position constants.
+   *
+   * @param one of Constants::TOP, Constants::BOTTOM, Constants::LEFT, or Constants::RIGHT
+   * @return one of IPageLayout::TOP, IPageLayout::BOTTOM, IPageLayout::LEFT, IPageLayout::RIGHT, or -1 indicating an
    * invalid input
-   * 
+   *
    * @since 3.0
    */
-  //    public: static int swtConstantToLayoutPosition(int swtConstant) {
-  //        switch (swtConstant) {
-  //        case SWT.TOP:
-  //            return IPageLayout.TOP;
-  //        case SWT.BOTTOM:
-  //            return IPageLayout.BOTTOM;
-  //        case SWT.RIGHT:
-  //            return IPageLayout.RIGHT;
-  //        case SWT.LEFT:
-  //            return IPageLayout.LEFT;
-  //        }
-  //
-  //        return -1;
-  //    }
+  public: static int ConstantToLayoutPosition(int constant);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addStandaloneView(java.lang.String, boolean, int, float, java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#addStandaloneView(java.lang.String, boolean, int, float, java.lang.String)
    * @since 3.0
    */
 public:
@@ -549,7 +545,7 @@ public:
       int relationship, float ratio, const std::string& refId);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#addStandaloneViewPlaceholder(java.lang.String, int, float, java.lang.String, boolean)
+   * @see org.opencherry.ui.IPageLayout#addStandaloneViewPlaceholder(java.lang.String, int, float, java.lang.String, boolean)
    */
 public:
   void AddStandaloneViewPlaceholder(const std::string& viewId,
@@ -557,8 +553,8 @@ public:
 
   /*
    * (non-Javadoc)
-   * 
-   * @see org.eclipse.ui.IPageLayout#getViewLayout(java.lang.String)
+   *
+   * @see org.opencherry.ui.IPageLayout#getViewLayout(java.lang.String)
    * @since 3.0
    */
 public:
@@ -568,11 +564,11 @@ public:
    * @since 3.0
    */
 public:
-  std::map<std::string, ViewLayoutRec> GetIDtoViewLayoutRecMap();
+  std::map<std::string, ViewLayoutRec::Pointer> GetIDtoViewLayoutRecMap();
 
   /**
    * Removes any existing placeholder with the given id.
-   * 
+   *
    * @param id the id for the placeholder
    * @since 3.1
    */
@@ -580,7 +576,7 @@ public:
   void RemovePlaceholder(const std::string& id);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.IPageLayout#getFolderForView(java.lang.String)
+   * @see org.opencherry.ui.IPageLayout#getFolderForView(java.lang.String)
    */
 public:
   IPlaceholderFolderLayout::Pointer GetFolderForView(const std::string& viewId);

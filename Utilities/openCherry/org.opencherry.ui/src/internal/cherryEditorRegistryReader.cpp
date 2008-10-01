@@ -109,19 +109,7 @@ bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
   }
 
   // Is this the default editor?
-  std::string def;
-  if (element->GetAttribute(WorkbenchRegistryConstants::ATT_DEFAULT, def))
-  {
-    Poco::trimInPlace(def);
-    if (def == "1")
-      defaultEditor = true;
-    else
-    {
-      Poco::toUpperInPlace(def);
-      if (def == "TRUE")
-        defaultEditor = true;
-    }
-  }
+  element->GetBoolAttribute(WorkbenchRegistryConstants::ATT_DEFAULT, defaultEditor);
 
   // Add the editor to the manager.
   editorRegistry->AddEditorFromPlugin(editor, extensionsVector,

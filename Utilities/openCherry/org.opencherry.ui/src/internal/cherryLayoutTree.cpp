@@ -1,30 +1,53 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryLayoutTree.h"
 
 #include "cherryLayoutTreeNode.h"
+#include "cherryLayoutPartSash.h"
+#include "cherryPartPlaceholder.h"
+
+#include "../cherryConstants.h"
 
 namespace cherry
 {
 
+int LayoutTree::minCacheHits = 0;
+int LayoutTree::minCacheMisses = 0;
+int LayoutTree::maxCacheHits = 0;
+int LayoutTree::maxCacheMisses = 0;
+
 LayoutTree::LayoutTree(LayoutPart::Pointer part)
+ : parent(0),
+ cachedMinimumWidthHint(Constants::DEFAULT),
+ cachedMinimumWidth(Constants::DEFAULT),
+ cachedMinimumHeightHint(Constants::DEFAULT),
+ cachedMinimumHeight(Constants::DEFAULT),
+ cachedMaximumWidthHint(Constants::DEFAULT),
+ cachedMaximumWidth(Constants::DEFAULT),
+ cachedMaximumHeightHint(Constants::DEFAULT),
+ cachedMaximumHeight(Constants::DEFAULT),
+
+ forceLayout(true),
+ sizeFlagsDirty(true),
+ widthSizeFlags(0),
+ heightSizeFlags(0)
 {
-  this.part = part;
+  this->part = part;
 }
 
 LayoutPart::Pointer LayoutTree::ComputeRelation(
@@ -33,7 +56,7 @@ LayoutPart::Pointer LayoutTree::ComputeRelation(
   return part;
 }
 
-LayoutPart::Pointer LayoutTree::FindPart(int x, int y)
+LayoutPart::Pointer LayoutTree::FindPart(const Point& toFind)
 {
   return part;
 }
@@ -42,22 +65,22 @@ void LayoutTree::DisposeSashes()
 {
 }
 
-LayoutTree* LayoutTree::Find(LayoutPart::Pointer child)
+LayoutTree::Pointer LayoutTree::Find(LayoutPart::Pointer child)
 {
   if (part != child)
   {
-    return null;
+    return 0;
   }
   return this;
 }
 
 void LayoutTree::FindSashes(PartPane::Sashes sashes)
 {
-  if (getParent() == null)
+  if (this->GetParent() == 0)
   {
     return;
   }
-  getParent().findSashes(this, sashes);
+  this->GetParent()->FindSashes(this, sashes);
 }
 
 LayoutPart::Pointer LayoutTree::FindBottomRight()
@@ -65,24 +88,24 @@ LayoutPart::Pointer LayoutTree::FindBottomRight()
   return part;
 }
 
-LayoutTreeNode* LayoutTree::FindSash(LayoutPartSash::Pointer sash)
+LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer sash)
 {
-  return null;
+  return 0;
 }
 
 Rectangle LayoutTree::GetBounds()
 {
-  return Geometry.copy(currentBounds);
+  return currentBounds;
 }
 
-static int LayoutTree::Subtract(int a, int b)
+int LayoutTree::Subtract(int a, int b)
 {
-  Assert.isTrue(b >= 0 && b < INFINITE);
+  poco_assert(b >= 0 && b < INFINITE);
 
-  return add(a, -b);
+  return Add(a, -b);
 }
 
-static int LayoutTree::Add(int a, int b)
+int LayoutTree::Add(int a, int b)
 {
   if (a == INFINITE || b == INFINITE)
   {
@@ -92,19 +115,19 @@ static int LayoutTree::Add(int a, int b)
   return a + b;
 }
 
-static void LayoutTree::AssertValidSize(int toCheck)
+void LayoutTree::AssertValidSize(int toCheck)
 {
-  Assert.isTrue(toCheck >= 0 && (toCheck == INFINITE || toCheck < INFINITE / 2));
+  poco_assert(toCheck >= 0 && (toCheck == INFINITE || toCheck < INFINITE / 2));
 }
 
 int LayoutTree::ComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
-  assertValidSize(availableParallel);
-  assertValidSize(availablePerpendicular);
-  assertValidSize(preferredParallel);
+  this->AssertValidSize(availableParallel);
+  this->AssertValidSize(availablePerpendicular);
+  this->AssertValidSize(preferredParallel);
 
-  if (!isVisible())
+  if (!this->IsVisible())
   {
     return 0;
   }
@@ -116,22 +139,22 @@ int LayoutTree::ComputePreferredSize(bool width, int availableParallel,
 
   if (preferredParallel == 0)
   {
-    return Math.min(availableParallel, computeMinimumSize(width,
+    return std::min(availableParallel, this->ComputeMinimumSize(width,
         availablePerpendicular));
   }
   else if (preferredParallel == INFINITE && availableParallel == INFINITE)
   {
-    return computeMaximumSize(width, availablePerpendicular);
+    return this->ComputeMaximumSize(width, availablePerpendicular);
   }
 
   // Optimization: if this subtree doesn't have any size preferences beyond its minimum and maximum
   // size, simply return the preferred size
-  if (!hasSizeFlag(width, SWT.FILL))
+  if (!this->HasSizeFlag(width, Constants::FILL))
   {
     return preferredParallel;
   }
 
-  int result = doComputePreferredSize(width, availableParallel,
+  int result = this->DoComputePreferredSize(width, availableParallel,
       availablePerpendicular, preferredParallel);
 
   return result;
@@ -139,26 +162,26 @@ int LayoutTree::ComputePreferredSize(bool width, int availableParallel,
 
 int LayoutTree::DoGetSizeFlags(bool width)
 {
-  return part.getSizeFlags(width);
+  return part->GetSizeFlags(width);
 }
 
 int LayoutTree::DoComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
-  int result = Math.min(availableParallel, part.computePreferredSize(width,
+  int result = std::min(availableParallel, part->ComputePreferredSize(width,
       availableParallel, availablePerpendicular, preferredParallel));
 
-  assertValidSize(result);
+  this->AssertValidSize(result);
   return result;
 }
 
 int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
 {
-  assertValidSize(availablePerpendicular);
+  this->AssertValidSize(availablePerpendicular);
 
   // Optimization: if this subtree has no minimum size, then always return 0 as its
   // minimum size.
-  if (!hasSizeFlag(width, SWT.MIN))
+  if (!this->HasSizeFlag(width, Constants::MIN))
   {
     return 0;
   }
@@ -167,7 +190,7 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
   // about their perpendicular size) then force the perpendicular
   // size to be INFINITE. This ensures that we will get a cache hit
   // every time for non-wrapping controls.
-  if (!hasSizeFlag(width, SWT.WRAP))
+  if (!this->HasSizeFlag(width, Constants::WRAP))
   {
     availablePerpendicular = INFINITE;
   }
@@ -186,7 +209,7 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
 
     minCacheMisses++;
 
-    int result = doComputeMinimumSize(width, availablePerpendicular);
+    int result = this->DoComputeMinimumSize(width, availablePerpendicular);
     cachedMinimumWidth = result;
     cachedMinimumWidthHint = availablePerpendicular;
     return result;
@@ -205,7 +228,7 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
     // Recompute the minimum width and store it in the cache
     minCacheMisses++;
 
-    int result = doComputeMinimumSize(width, availablePerpendicular);
+    int result = this->DoComputeMinimumSize(width, availablePerpendicular);
     cachedMinimumHeight = result;
     cachedMinimumHeightHint = availablePerpendicular;
     return result;
@@ -213,29 +236,29 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
 }
 void LayoutTree::PrintCacheStatistics()
 {
-  System.out.println("minimize cache " + minCacheHits + " / " + (minCacheHits
-      + minCacheMisses) + " hits " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      minCacheHits * 100 / (minCacheHits + minCacheMisses) + "%"); //$NON-NLS-1$
-  System.out.println("maximize cache " + maxCacheHits + " / " + (maxCacheHits
-      + maxCacheMisses) + " hits" + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      maxCacheHits * 100 / (maxCacheHits + maxCacheMisses) + "%"); //$NON-NLS-1$
+  std::cout << "minimize cache " << minCacheHits << " / " << (minCacheHits
+      + minCacheMisses) << " hits " <<
+      (minCacheHits * 100 / (minCacheHits + minCacheMisses)) << "%\n";
+  std::cout  << "maximize cache " << maxCacheHits << " / " << (maxCacheHits
+      + maxCacheMisses) << " hits" <<
+      (maxCacheHits * 100 / (maxCacheHits + maxCacheMisses)) << "%\n";
 }
 
-int LayoutTree::DoComputeMinimumSize(boolean width, int availablePerpendicular)
+int LayoutTree::DoComputeMinimumSize(bool width, int availablePerpendicular)
 {
-  int result = doComputePreferredSize(width, INFINITE, availablePerpendicular,
+  int result = this->DoComputePreferredSize(width, INFINITE, availablePerpendicular,
       0);
-  assertValidSize(result);
+  this->AssertValidSize(result);
   return result;
 }
 
-int LayoutTree::ComputeMaximumSize(boolean width, int availablePerpendicular)
+int LayoutTree::ComputeMaximumSize(bool width, int availablePerpendicular)
 {
-  assertValidSize(availablePerpendicular);
+  this->AssertValidSize(availablePerpendicular);
 
   // Optimization: if this subtree has no maximum size, then always return INFINITE as its
   // maximum size.
-  if (!hasSizeFlag(width, SWT.MAX))
+  if (!this->HasSizeFlag(width, Constants::MAX))
   {
     return INFINITE;
   }
@@ -244,7 +267,7 @@ int LayoutTree::ComputeMaximumSize(boolean width, int availablePerpendicular)
   // about their perpendicular size) then force the perpendicular
   // size to be INFINITE. This ensures that we will get a cache hit
   // every time.
-  if (!hasSizeFlag(width, SWT.WRAP))
+  if (!this->HasSizeFlag(width, Constants::WRAP))
   {
     availablePerpendicular = INFINITE;
   }
@@ -262,7 +285,7 @@ int LayoutTree::ComputeMaximumSize(boolean width, int availablePerpendicular)
     maxCacheMisses++;
 
     // Recompute the maximum width and store it in the cache
-    int result = doComputeMaximumSize(width, availablePerpendicular);
+    int result = this->DoComputeMaximumSize(width, availablePerpendicular);
     cachedMaximumWidth = result;
     cachedMaximumWidthHint = availablePerpendicular;
     return result;
@@ -280,7 +303,7 @@ int LayoutTree::ComputeMaximumSize(boolean width, int availablePerpendicular)
     maxCacheMisses++;
 
     // Recompute the maximum height and store it in the cache
-    int result = doComputeMaximumSize(width, availablePerpendicular);
+    int result = this->DoComputeMaximumSize(width, availablePerpendicular);
     cachedMaximumHeight = result;
     cachedMaximumHeightHint = availablePerpendicular;
     return result;
@@ -289,7 +312,7 @@ int LayoutTree::ComputeMaximumSize(boolean width, int availablePerpendicular)
 
 int LayoutTree::DoComputeMaximumSize(bool width, int availablePerpendicular)
 {
-  return doComputePreferredSize(width, INFINITE, availablePerpendicular,
+  return this->DoComputePreferredSize(width, INFINITE, availablePerpendicular,
       INFINITE);
 }
 
@@ -297,14 +320,14 @@ void LayoutTree::FlushNode()
 {
 
   // Clear cached sizes
-  cachedMinimumWidthHint = SWT.DEFAULT;
-  cachedMinimumWidth = SWT.DEFAULT;
-  cachedMinimumHeightHint = SWT.DEFAULT;
-  cachedMinimumHeight = SWT.DEFAULT;
-  cachedMaximumWidthHint = SWT.DEFAULT;
-  cachedMaximumWidth = SWT.DEFAULT;
-  cachedMaximumHeightHint = SWT.DEFAULT;
-  cachedMaximumHeight = SWT.DEFAULT;
+  cachedMinimumWidthHint = Constants::DEFAULT;
+  cachedMinimumWidth = Constants::DEFAULT;
+  cachedMinimumHeightHint = Constants::DEFAULT;
+  cachedMinimumHeight = Constants::DEFAULT;
+  cachedMaximumWidthHint = Constants::DEFAULT;
+  cachedMaximumWidth = Constants::DEFAULT;
+  cachedMaximumHeightHint = Constants::DEFAULT;
+  cachedMaximumHeight = Constants::DEFAULT;
 
   // Flags may have changed. Ensure that they are recomputed the next time around
   sizeFlagsDirty = true;
@@ -316,16 +339,16 @@ void LayoutTree::FlushNode()
 
 void LayoutTree::FlushChildren()
 {
-  flushNode();
+  this->FlushNode();
 }
 
 void LayoutTree::FlushCache()
 {
-  flushNode();
+  this->FlushNode();
 
-  if (parent != null)
+  if (parent != 0)
   {
-    parent.flushCache();
+    parent->FlushCache();
   }
 }
 
@@ -333,42 +356,42 @@ int LayoutTree::GetSizeFlags(bool width)
 {
   if (sizeFlagsDirty)
   {
-    widthSizeFlags = doGetSizeFlags(true);
-    heightSizeFlags = doGetSizeFlags(false);
+    widthSizeFlags = this->DoGetSizeFlags(true);
+    heightSizeFlags = this->DoGetSizeFlags(false);
     sizeFlagsDirty = false;
   }
 
   return width ? widthSizeFlags : heightSizeFlags;
 }
 
-LayoutTreeNode* LayoutTree::GetParent()
+LayoutTreeNode* LayoutTree::GetParent() const
 {
   return parent;
 }
 
-LayoutTree* LayoutTree::Insert(LayoutPart::Pointer child, bool left,
+LayoutTree::Pointer LayoutTree::Insert(LayoutPart::Pointer child, bool left,
     LayoutPartSash::Pointer sash, LayoutPart::Pointer relative)
 {
-  LayoutTree relativeChild = find(relative);
-  LayoutTreeNode node = new LayoutTreeNode(sash);
-  if (relativeChild == null)
+  LayoutTree::Pointer relativeChild = this->Find(relative);
+  LayoutTreeNode::Pointer node = new LayoutTreeNode(sash);
+  if (relativeChild == 0)
   {
     //Did not find the relative part. Insert beside the root.
-    node.setChild(left, child);
-    node.setChild(!left, this);
+    node->SetChild(left, child);
+    node->SetChild(!left, this);
     return node;
   }
   else
   {
-    LayoutTreeNode oldParent = relativeChild.getParent();
-    node.setChild(left, child);
-    node.setChild(!left, relativeChild);
-    if (oldParent == null)
+    LayoutTreeNode* oldParent = relativeChild->GetParent();
+    node->SetChild(left, child);
+    node->SetChild(!left, relativeChild);
+    if (oldParent == 0)
     {
       //It was the root. Return a new root.
       return node;
     }
-    oldParent.replaceChild(relativeChild, node);
+    oldParent->ReplaceChild(relativeChild, node);
     return this;
   }
 }
@@ -376,7 +399,7 @@ LayoutTree* LayoutTree::Insert(LayoutPart::Pointer child, bool left,
 bool LayoutTree::IsCompressible()
 {
   //Added for bug 19524
-  return part.isCompressible();
+  return part->IsCompressible();
 }
 
 bool LayoutTree::IsVisible()
@@ -388,72 +411,72 @@ void LayoutTree::RecomputeRatio()
 {
 }
 
-LayoutTree* LayoutTree::Remove(LayoutPart::Pointer child)
+LayoutTree::Pointer LayoutTree::Remove(LayoutPart::Pointer child)
 {
-  LayoutTree tree = find(child);
-  if (tree == null)
+  LayoutTree::Pointer tree = this->Find(child);
+  if (tree == 0)
   {
     return this;
   }
-  LayoutTreeNode oldParent = tree.getParent();
-  if (oldParent == null)
+  LayoutTreeNode::Pointer oldParent = tree->GetParent();
+  if (oldParent == 0)
   {
     //It was the root and the only child of this tree
-    return null;
+    return 0;
   }
-  if (oldParent.getParent() == null)
+  if (oldParent->GetParent() == 0)
   {
-    return oldParent.remove(tree);
+    return oldParent->Remove(tree);
   }
 
-  oldParent.remove(tree);
+  oldParent->Remove(tree);
   return this;
 }
 
 void LayoutTree::SetBounds(const Rectangle& bounds)
 {
-  if (!bounds.equals(currentBounds) || forceLayout)
+  if (!(bounds == currentBounds) || forceLayout)
   {
-    currentBounds = Geometry.copy(bounds);
+    currentBounds = bounds;
 
-    doSetBounds(currentBounds);
+    this->DoSetBounds(currentBounds);
     forceLayout = false;
   }
 }
 
 void LayoutTree::DoSetBounds(const Rectangle& bounds)
 {
-  part.setBounds(bounds);
+  part->SetBounds(bounds);
 }
 
 void LayoutTree::SetParent(LayoutTreeNode* parent)
 {
-  this.parent = parent;
+  this->parent = parent;
 }
 
 void LayoutTree::SetPart(LayoutPart::Pointer part)
 {
-  this.part = part;
-  flushCache();
+  this->part = part;
+  this->FlushCache();
 }
 
 std::string LayoutTree::ToString()
 {
-  return "(" + part.toString() + ")";//$NON-NLS-2$//$NON-NLS-1$
+  return "(" + part->ToString() + ")";//$NON-NLS-2$//$NON-NLS-1$
 }
 
 void LayoutTree::CreateControl(void* parent)
 {
 }
 
-void LayoutTree::DescribeLayout(std::string& buf)
+void LayoutTree::DescribeLayout(std::string& buf) const
 {
-  part.describeLayout(buf);
+  part->DescribeLayout(buf);
 }
 
 bool LayoutTree::HasSizeFlag(bool width, int flag)
 {
-  return (getSizeFlags(width) & flag) != 0;
+  return (this->GetSizeFlags(width) & flag) != 0;
 }
 
 }

@@ -108,12 +108,9 @@ std::string ViewDescriptor::GetAccelerator()
 
 bool ViewDescriptor::GetAllowMultiple()
 {
-  std::string string;
-  configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ALLOW_MULTIPLE, string);
-  if (string == "1") return true;
-  Poco::toUpperInPlace(string);
-  if (string == "TRUE") return true;
-  return false;
+  bool allow = false;
+  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_ALLOW_MULTIPLE, allow);
+  return allow;
 }
 
 void* ViewDescriptor::GetAdapter(const std::type_info& adapter)

@@ -42,7 +42,7 @@ namespace cherry {
  * extensions are managed by the platform's adapter manager.
  * </p>
  *
- * @see org.eclipse.core.runtime.IPath
+ * @see org.opencherry.core.runtime.IPath
  * @since 3.0
  */
 struct CHERRY_UI IPathEditorInput : public IEditorInput {

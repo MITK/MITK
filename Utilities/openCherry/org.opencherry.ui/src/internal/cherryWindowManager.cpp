@@ -17,29 +17,44 @@
 
 #include "cherryWindowManager.h"
 
-#include "../cherryWorkbenchWindow.h"
+#include "../cherryWindow.h"
 
 namespace cherry
 {
+
+void WindowManager::AddWindowManager(WindowManager* wm)
+{
+  if (std::find(subManagers.begin(), subManagers.end(), wm)
+      == subManagers.end())
+  {
+    subManagers.push_back(wm);
+  }
+}
 
 WindowManager::WindowManager()
 {
 }
 
-void WindowManager::Add(IWorkbenchWindow::Pointer window)
+WindowManager::WindowManager(WindowManager* parent)
+{
+  poco_assert(parent != 0);
+  parent->AddWindowManager(this);
+}
+
+void WindowManager::Add(Window::Pointer window)
 {
   if (std::find(windows.begin(), windows.end(), window) == windows.end())
   {
     windows.push_back(window);
-    window.Cast<WorkbenchWindow>()->SetWindowManager(this);
+    window->SetWindowManager(this);
   }
 }
 
 bool WindowManager::Close()
 {
-  std::vector<IWorkbenchWindow::Pointer> t = windows; // make iteration robust
-  for (std::vector<IWorkbenchWindow::Pointer>::iterator iter = t.begin();
-       iter != t.end(); ++iter)
+  std::vector<Window::Pointer> t = windows; // make iteration robust
+  for (std::vector<Window::Pointer>::iterator iter = t.begin();
+      iter != t.end(); ++iter)
   {
     bool closed = (*iter)->Close();
     if (!closed)
@@ -47,19 +62,20 @@ bool WindowManager::Close()
       return false;
     }
   }
-//  if (subManagers != null)
-//  {
-//    e = subManagers.iterator();
-//    while (e.hasNext())
-//    {
-//      WindowManager wm = (WindowManager) e.next();
-//      boolean closed = wm.close();
-//      if (!closed)
-//      {
-//        return false;
-//      }
-//    }
-//  }
+
+  if (!subManagers.empty())
+  {
+    for (std::list<WindowManager*>::iterator iter = subManagers.begin();
+        iter != subManagers.end(); ++iter)
+    {
+      WindowManager* wm = *iter;
+      bool closed = wm->Close();
+      if (!closed)
+      {
+        return false;
+      }
+    }
+  }
   return true;
 }
 
@@ -68,18 +84,18 @@ int WindowManager::GetWindowCount()
   return windows.size();
 }
 
-std::vector<SmartPointer<IWorkbenchWindow> > WindowManager::GetWindows()
+std::vector<Window::Pointer> WindowManager::GetWindows()
 {
   return windows;
 }
 
-void WindowManager::Remove(SmartPointer<IWorkbenchWindow> window)
+void WindowManager::Remove(Window::Pointer window)
 {
-  std::vector<IWorkbenchWindow::Pointer>::iterator iter = std::find(windows.begin(), windows.end(), window);
+  std::vector<Window::Pointer>::iterator iter = std::find(windows.begin(), windows.end(), window);
   if (iter != windows.end())
   {
     windows.erase(iter);
-    window.Cast<WorkbenchWindow>()->SetWindowManager(0);
+    window->SetWindowManager(0);
   }
 }
 

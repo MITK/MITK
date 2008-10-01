@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #include "cherryPartSite.h"
@@ -22,12 +22,13 @@
 #include "../cherryIWorkbenchWindow.h"
 #include "../cherryPartPane.h"
 
+#include "cherryIServiceLocatorCreator.h"
 #include "cherryWorkbenchPartReference.h"
 
 namespace cherry
 {
 
-//void 
+//void
 //PartSite::RegisterContextMenu(const std::string& menuId,
 //      const MenuManager menuManager,
 //      const ISelectionProvider selectionProvider,
@@ -58,25 +59,40 @@ namespace cherry
 
 PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
     IWorkbenchPart::Pointer _part, IWorkbenchPage::Pointer _page) :
-  partReference(ref), part(_part), page(_page)
+  partReference(ref), part(_part), page(_page),
+  serviceLocatorOwner(this)
 {
 
   extensionID = "org.opencherry.ui.UnknownID"; //$NON-NLS-1$
   extensionName = "Unknown Name"; //$NON-NLS-1$
 
   // Initialize the service locator.
-  //final IServiceLocator parentServiceLocator = page.getWorkbenchWindow();
-  //IServiceLocatorCreator slc = (IServiceLocatorCreator) parentServiceLocator
-  //    .getService(IServiceLocatorCreator.class);
-  //this.serviceLocator = (ServiceLocator) slc.createServiceLocator(
-  //    parentServiceLocator, null);
+  IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow();
+  IServiceLocatorCreator::Pointer slc = parentServiceLocator
+      ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<IServiceLocatorCreator>();
+  this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(
+      parentServiceLocator, 0, &serviceLocatorOwner));
 
   //initializeDefaultServices();
 }
 
 PartSite::~PartSite()
 {
+  delete serviceLocator;
+}
 
+PartSite::ServiceLocatorOwner::ServiceLocatorOwner(PartSite* s)
+ : site(s)
+ {
+
+}
+
+void PartSite::ServiceLocatorOwner::Dispose()
+{
+  void* control = site->GetPane()->GetControl();
+  if (control != 0) {
+    site->GetPane()->DoHide();
+  }
 }
 
 void PartSite::InitializeDefaultServices()
@@ -98,7 +114,7 @@ void PartSite::InitializeDefaultServices()
   //    serviceLocator.registerService(ICommandService.class, commandService);
 }
 
-//IActionBars 
+//IActionBars
 //PartSite::GetActionBars() {
 //    return actionBars;
 //  }
@@ -138,8 +154,8 @@ std::string PartSite::GetRegisteredName()
   return extensionName;
 }
 
-ISelectionProvider::Pointer 
-PartSite::GetSelectionProvider() 
+ISelectionProvider::Pointer
+PartSite::GetSelectionProvider()
 {
   return selectionProvider;
 }
@@ -150,8 +166,8 @@ IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
   return page->GetWorkbenchWindow();
 }
 
-// void 
-// PartSite::RegisterContextMenu(const std::string& menuID, 
+// void
+// PartSite::RegisterContextMenu(const std::string& menuID,
 //      MenuManager menuMgr,
 //      ISelectionProvider selProvider) {
 //    if (menuExtenders == null) {
@@ -162,13 +178,13 @@ IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
 //        menuExtenders);
 //  }
 
-//void 
+//void
 //PartSite::RegisterContextMenu(MenuManager menuMgr,
 //      ISelectionProvider selProvider) {
 //    registerContextMenu(getId(), menuMgr, selProvider);
 //  }
 
-//void 
+//void
 //PartSite::GetContextMenuIds(std::vector<std::string>& menuIds) {
 //    if (menuExtenders == null) {
 //      return new String[0];
@@ -181,7 +197,7 @@ IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
 //    return (String[]) menuIds.toArray(new String[menuIds.size()]);
 //  }
 
-//void 
+//void
 //PartSite::SetActionBars(SubActionBars bars) {
 //    actionBars = bars;
 //  }
@@ -225,17 +241,17 @@ void PartSite::SetRegisteredName(const std::string& name)
   extensionName = name;
 }
 
-void PartSite::SetSelectionProvider(ISelectionProvider::Pointer provider) 
+void PartSite::SetSelectionProvider(ISelectionProvider::Pointer provider)
 {
   selectionProvider = provider;
 }
 
 /*
  * @see IWorkbenchPartSite#getKeyBindingService()
- * 
+ *
  * TODO deprecated: use IHandlerService instead
  */
-//IKeyBindingService 
+//IKeyBindingService
 //PartSite::GetKeyBindingService() {
 //    if (keyBindingService == null) {
 //      keyBindingService = new KeyBindingService(this);
@@ -283,7 +299,7 @@ Object::Pointer PartSite::GetAdapter(const std::type_info& /*adapter*/)
   //    if (IWorkbenchSiteProgressService.class == adapter) {
   //      return getSiteProgressService();
   //    }
-  //    
+  //
   //    if (IWorkbenchPartTestable.class == adapter) {
   //      return new WorkbenchPartTestable(this);
   //    }
@@ -292,21 +308,21 @@ Object::Pointer PartSite::GetAdapter(const std::type_info& /*adapter*/)
   return 0;
 }
 
-//void 
+//void
 //PartSite::ActivateActionBars(bool forceVisibility) {
 //    if (actionBars != null) {
 //      actionBars.activate(forceVisibility);
 //    }
 //  }
 
-//void 
+//void
 //PartSite::DeactivateActionBars(bool forceHide) {
 //    if (actionBars != null) {
 //      actionBars.deactivate(forceHide);
 //    }
 //  }
 
-//WorkbenchSiteProgressService 
+//WorkbenchSiteProgressService
 //PartSite::GetSiteProgressService() {
 //    if (progressService == null) {
 //      progressService = new WorkbenchSiteProgressService(this);
@@ -314,15 +330,15 @@ Object::Pointer PartSite::GetAdapter(const std::type_info& /*adapter*/)
 //    return progressService;
 //  }
 
-//Object 
-//PartSite::GetService(const Class key) {
-//    return serviceLocator.getService(key);
-//  }
+Object::Pointer
+PartSite::GetService(const std::string& api) const {
+  return serviceLocator->GetService(api);
+}
 
-//bool 
-//PartSite::HasService(const Class key) {
-//    return serviceLocator.hasService(key);
-//  }
+bool
+PartSite::HasService(const std::string& api) const {
+  return serviceLocator->HasService(api);
+}
 
 std::string PartSite::ToString()
 {

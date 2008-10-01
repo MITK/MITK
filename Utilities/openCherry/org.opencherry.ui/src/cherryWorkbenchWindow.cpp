@@ -15,6 +15,7 @@
 
  =========================================================================*/
 
+#include "cherryIWorkbenchPage.h"
 #include "cherryWorkbenchWindow.h"
 #include "cherryIPerspectiveDescriptor.h"
 #include "cherryUIException.h"
@@ -22,6 +23,11 @@
 #include "internal/cherryWorkbenchPlugin.h"
 #include "internal/cherryWorkbenchPage.h"
 #include "internal/cherryWorkbench.h"
+#include "internal/cherryPartSite.h"
+#include "internal/cherryIServiceLocatorCreator.h"
+
+#include "tweaklets/cherryGuiWidgetsTweaklet.h"
+#include "tweaklets/cherryWorkbenchTweaklet.h"
 
 #include "cherryPlatformUI.h"
 
@@ -33,21 +39,26 @@ const int WorkbenchWindow::FILL_ALL_ACTION_BARS =
         | ActionBarAdvisor::FILL_STATUS_LINE;
 
 WorkbenchWindow::WorkbenchWindow(int number) :
-  windowAdvisor(0), actionBarAdvisor(0), windowManager(0), closing(false), updateDisabled(true)
+  Window(Shell::Pointer(0)), pageComposite(0), windowAdvisor(0),
+      actionBarAdvisor(0), largeUpdates(0), closing(false),
+      shellActivated(false),
+      updateDisabled(true), emptyWindowContentsCreated(false),
+      emptyWindowContents(0),
+      asMaximizedState(false),
+      serviceLocatorOwner(this)
 {
   this->number = number;
   // Make sure there is a workbench. This call will throw
   // an exception if workbench not created yet.
-  PlatformUI::GetWorkbench();
-  //  IServiceLocatorCreator slc = (IServiceLocatorCreator) workbench
-  //      .getService(IServiceLocatorCreator.class);
-  //  this.serviceLocator = (ServiceLocator) slc
-  //      .createServiceLocator(workbench, null);
+  IWorkbench* workbench = PlatformUI::GetWorkbench();
+  IServiceLocatorCreator::Pointer slc =
+      workbench ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<
+          IServiceLocatorCreator> ();
+  this->serviceLocator
+      = dynamic_cast<ServiceLocator*> (slc ->CreateServiceLocator(workbench, 0,
+          &serviceLocatorOwner));
   //  initializeDefaultServices();
-}
 
-void WorkbenchWindow::Init()
-{
   // Add contribution managers that are exposed to other plugins.
   //addMenuBar();
   //addCoolBar(SWT.NONE);  // style is unused
@@ -59,36 +70,258 @@ void WorkbenchWindow::Init()
   this->FillActionBars(FILL_ALL_ACTION_BARS);
 }
 
-void WorkbenchWindow::FireWindowOpening() {
+WorkbenchWindow::~WorkbenchWindow()
+{
+  delete serviceLocator;
+}
+
+Object::Pointer WorkbenchWindow::GetService(const std::string& key) const
+{
+  return serviceLocator->GetService(key);
+}
+
+bool WorkbenchWindow::HasService(const std::string& key) const
+{
+  return serviceLocator->HasService(key);
+}
+
+Shell::Pointer WorkbenchWindow::GetShell()
+{
+  return Window::GetShell();
+}
+
+bool WorkbenchWindow::ClosePage(IWorkbenchPage::Pointer in, bool save)
+{
+  // Validate the input.
+  if (!pageList.Contains(in))
+  {
+    return false;
+  }
+  WorkbenchPage::Pointer oldPage = in.Cast<WorkbenchPage> ();
+
+  // Save old perspective.
+  if (save && oldPage->IsSaveNeeded())
+  {
+    if (!oldPage->SaveAllEditors(true))
+    {
+      return false;
+    }
+  }
+
+  // If old page is activate deactivate.
+  bool oldIsActive = (oldPage == this->GetActivePage());
+  if (oldIsActive)
+  {
+    this->SetActivePage(0);
+  }
+
+  // Close old page.
+  pageList.Remove(oldPage);
+  //this->FirePageClosed(oldPage);
+  //oldPage->Dispose();
+
+  // Activate new page.
+  if (oldIsActive)
+  {
+    IWorkbenchPage::Pointer newPage = pageList.GetNextActive();
+    if (newPage != 0)
+    {
+      this->SetActivePage(newPage);
+    }
+  }
+  if (!closing && pageList.IsEmpty())
+  {
+    this->ShowEmptyWindowContents();
+  }
+  return true;
+}
+
+void WorkbenchWindow::AddPerspectiveListener(IPerspectiveListener::Pointer l)
+{
+  perspectiveEvents.AddListener(l);
+}
+
+void WorkbenchWindow::RemovePerspectiveListener(IPerspectiveListener::Pointer l)
+{
+  perspectiveEvents.RemoveListener(l);
+}
+
+IPerspectiveListener::Events& WorkbenchWindow::GetPerspectiveEvents()
+{
+  return perspectiveEvents;
+}
+
+void WorkbenchWindow::FireWindowOpening()
+{
   // let the application do further configuration
   this->GetWindowAdvisor()->PreWindowOpen();
 }
 
-void WorkbenchWindow::FireWindowRestored() {
+void WorkbenchWindow::FireWindowRestored()
+{
   //StartupThreading.runWithWorkbenchExceptions(new StartupRunnable() {
   //  public void runWithException() throws Throwable {
-      this->GetWindowAdvisor()->PostWindowRestore();
+  this->GetWindowAdvisor()->PostWindowRestore();
   //  }
   //});
 }
 
-void WorkbenchWindow::FireWindowCreated() {
+void WorkbenchWindow::FireWindowCreated()
+{
   this->GetWindowAdvisor()->PostWindowCreate();
 }
 
-void WorkbenchWindow::FireWindowOpened() {
+void WorkbenchWindow::FireWindowOpened()
+{
   this->GetWorkbenchImpl()->FireWindowOpened(this);
   this->GetWindowAdvisor()->PostWindowOpen();
 }
 
-bool WorkbenchWindow::FireWindowShellClosing() {
+bool WorkbenchWindow::FireWindowShellClosing()
+{
   return this->GetWindowAdvisor()->PreWindowShellClose();
 }
 
-void WorkbenchWindow::FireWindowClosed() {
+void WorkbenchWindow::FireWindowClosed()
+{
   // let the application do further deconfiguration
   this->GetWindowAdvisor()->PostWindowClose();
   this->GetWorkbenchImpl()->FireWindowClosed(this);
+}
+
+///**
+// * Fires page activated
+// */
+//void WorkbenchWindow::FirePageActivated(IWorkbenchPage::Pointer page) {
+////  String label = null; // debugging only
+////  if (UIStats.isDebugging(UIStats.NOTIFY_PAGE_LISTENERS)) {
+////    label = "activated " + page.getLabel(); //$NON-NLS-1$
+////  }
+////  try {
+////    UIStats.start(UIStats.NOTIFY_PAGE_LISTENERS, label);
+////    UIListenerLogging.logPageEvent(this, page,
+////        UIListenerLogging.WPE_PAGE_ACTIVATED);
+//    pageEvents.FirePageActivated(page);
+//    partService.pageActivated(page);
+////  } finally {
+////    UIStats.end(UIStats.NOTIFY_PAGE_LISTENERS, page.getLabel(), label);
+////  }
+//}
+//
+///**
+// * Fires page closed
+// */
+//void WorkbenchWindow::FirePageClosed(IWorkbenchPage::Pointer page) {
+//  String label = null; // debugging only
+//  if (UIStats.isDebugging(UIStats.NOTIFY_PAGE_LISTENERS)) {
+//    label = "closed " + page.getLabel(); //$NON-NLS-1$
+//  }
+//  try {
+//    UIStats.start(UIStats.NOTIFY_PAGE_LISTENERS, label);
+//    UIListenerLogging.logPageEvent(this, page,
+//        UIListenerLogging.WPE_PAGE_CLOSED);
+//    pageListeners.firePageClosed(page);
+//    partService.pageClosed(page);
+//  } finally {
+//    UIStats.end(UIStats.NOTIFY_PAGE_LISTENERS, page.getLabel(), label);
+//  }
+//
+//}
+//
+///**
+// * Fires page opened
+// */
+//void WorkbenchWindow::FirePageOpened(IWorkbenchPage::Pointer page) {
+//  String label = null; // debugging only
+//  if (UIStats.isDebugging(UIStats.NOTIFY_PAGE_LISTENERS)) {
+//    label = "opened " + page.getLabel(); //$NON-NLS-1$
+//  }
+//  try {
+//    UIStats.start(UIStats.NOTIFY_PAGE_LISTENERS, label);
+//    UIListenerLogging.logPageEvent(this, page,
+//        UIListenerLogging.WPE_PAGE_OPENED);
+//    pageListeners.firePageOpened(page);
+//    partService.pageOpened(page);
+//  } finally {
+//    UIStats.end(UIStats.NOTIFY_PAGE_LISTENERS, page.getLabel(), label);
+//  }
+//}
+
+void WorkbenchWindow::FirePerspectiveActivated(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective)
+{
+  //  UIListenerLogging.logPerspectiveEvent(this, page, perspective,
+  //      UIListenerLogging.PLE_PERSP_ACTIVATED);
+  perspectiveEvents.perspectiveActivated(page, perspective);
+}
+
+void WorkbenchWindow::FirePerspectivePreDeactivate(
+    IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective)
+{
+  //  UIListenerLogging.logPerspectiveEvent(this, page, perspective,
+  //      UIListenerLogging.PLE_PERSP_PRE_DEACTIVATE);
+  perspectiveEvents.perspectivePreDeactivate(page, perspective);
+}
+
+void WorkbenchWindow::FirePerspectiveDeactivated(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective)
+{
+  //  UIListenerLogging.logPerspectiveEvent(this, page, perspective,
+  //      UIListenerLogging.PLE_PERSP_DEACTIVATED);
+  perspectiveEvents.perspectiveDeactivated(page, perspective);
+}
+
+void WorkbenchWindow::FirePerspectiveChanged(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective, const std::string& changeId)
+{
+  // Some callers call this even when there is no active perspective.
+  // Just ignore this case.
+  if (perspective != 0)
+  {
+    //    UIListenerLogging.logPerspectiveChangedEvent(this, page,
+    //        perspective, null, changeId);
+    perspectiveEvents.perspectiveChanged(page, perspective, changeId);
+  }
+}
+
+void WorkbenchWindow::FirePerspectiveChanged(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective,
+    IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
+{
+  // Some callers call this even when there is no active perspective.
+  // Just ignore this case.
+  if (perspective != 0)
+  {
+    //    UIListenerLogging.logPerspectiveChangedEvent(this, page,
+    //        perspective, partRef, changeId);
+    perspectiveEvents.perspectivePartChanged(page, perspective, partRef,
+        changeId);
+  }
+}
+
+void WorkbenchWindow::FirePerspectiveClosed(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective)
+{
+  //  UIListenerLogging.logPerspectiveEvent(this, page, perspective,
+  //      UIListenerLogging.PLE_PERSP_CLOSED);
+  perspectiveEvents.perspectiveClosed(page, perspective);
+}
+
+void WorkbenchWindow::FirePerspectiveOpened(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer perspective)
+{
+  //  UIListenerLogging.logPerspectiveEvent(this, page, perspective,
+  //      UIListenerLogging.PLE_PERSP_OPENED);
+  perspectiveEvents.perspectiveOpened(page, perspective);
+}
+
+void WorkbenchWindow::FirePerspectiveSavedAs(IWorkbenchPage::Pointer page,
+    IPerspectiveDescriptor::Pointer oldPerspective,
+    IPerspectiveDescriptor::Pointer newPerspective)
+{
+  //  UIListenerLogging.logPerspectiveSavedAs(this, page, oldPerspective,
+  //      newPerspective);
+  perspectiveEvents.perspectiveSavedAs(page, oldPerspective, newPerspective);
 }
 
 void WorkbenchWindow::FillActionBars(int flags)
@@ -149,11 +382,8 @@ bool WorkbenchWindow::BusyClose()
     int count = workbench->GetWorkbenchWindowCount();
     // also check for starting - if the first window dies on startup
     // then we'll need to open a default window.
-    if (!workbench->IsStarting()
-        && !workbench->IsClosing()
-        && count <= 1
-        && workbench->GetWorkbenchConfigurer()
-        ->GetExitOnLastWindowClose())
+    if (!workbench->IsStarting() && !workbench->IsClosing() && count <= 1
+        && workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose())
     {
       windowClosed = workbench->Close();
     }
@@ -164,8 +394,7 @@ bool WorkbenchWindow::BusyClose()
         windowClosed = this->HardClose();
       }
     }
-  }
-  catch (std::exception& exc)
+  } catch (std::exception& exc)
   {
     if (!windowClosed)
     {
@@ -184,29 +413,37 @@ bool WorkbenchWindow::BusyClose()
   return windowClosed;
 }
 
-bool WorkbenchWindow::OkToClose() {
+bool WorkbenchWindow::OkToClose()
+{
   // Save all of the editors.
-  if (!this->GetWorkbenchImpl()->IsClosing()) {
-    if (!this->SaveAllPages(true)) {
+  if (!this->GetWorkbenchImpl()->IsClosing())
+  {
+    if (!this->SaveAllPages(true))
+    {
       return false;
     }
   }
   return true;
 }
 
-bool WorkbenchWindow::SaveAllPages(bool bConfirm) {
-    bool bRet = true;
-    PageList::iterator itr = pageList.Begin();
-    while (bRet && itr != pageList.End()) {
-      bRet = (*itr)->SaveAllEditors(bConfirm);
-      ++itr;
-    }
-    return bRet;
+bool WorkbenchWindow::SaveAllPages(bool bConfirm)
+{
+  bool bRet = true;
+  PageList::iterator itr = pageList.Begin();
+  while (bRet && itr != pageList.End())
+  {
+    bRet = (*itr)->SaveAllEditors(bConfirm);
+    ++itr;
   }
+  return bRet;
+}
 
 bool WorkbenchWindow::HardClose()
 {
   bool result;
+  std::exception exc;
+  bool exceptionOccured;
+
   try
   {
     // Clear the action sets, fix for bug 27416.
@@ -276,35 +513,43 @@ bool WorkbenchWindow::HardClose()
      trimContributionMgr = null;
      }
      */
-  }
-  catch (std::exception& exc)
+  } catch (std::exception& e)
   {
-    // Bring down all of the services ... after the window goes away
-    //serviceLocator.dispose();
-    //menuRestrictions.clear();
-    throw exc;
+    exc = e;
   }
+
+  Window::Close();
+  // Bring down all of the services ... after the window goes away
+  serviceLocator->Dispose();
+  //menuRestrictions.clear();
+
+  if (exceptionOccured)
+    throw exc;
+
   return result;
 }
 
-void WorkbenchWindow::CloseAllPages() {
-    // Deactivate active page.
-    this->SetActivePage(0);
+void WorkbenchWindow::CloseAllPages()
+{
+  // Deactivate active page.
+  this->SetActivePage(0);
 
-    // Clone and deref all so that calls to getPages() returns
-    // empty list (if called by pageClosed event handlers)
-    PageList oldList = pageList;
-    pageList.Clear();
+  // Clone and deref all so that calls to getPages() returns
+  // empty list (if called by pageClosed event handlers)
+  PageList oldList = pageList;
+  pageList.Clear();
 
-    // Close all.
-    for (PageList::iterator itr = oldList.Begin(); itr != oldList.End(); ++itr) {
-      //(*itr)->FirePageClosed(page);
-      //page.dispose();
-    }
-    if (!closing) {
-      //this->ShowEmptyWindowContents();
-    }
+  // Close all.
+  for (PageList::iterator itr = oldList.Begin(); itr != oldList.End(); ++itr)
+  {
+    //(*itr)->FirePageClosed(page);
+    //page.dispose();
   }
+  if (!closing)
+  {
+    //this->ShowEmptyWindowContents();
+  }
+}
 
 IWorkbenchPage::Pointer WorkbenchWindow::GetActivePage()
 {
@@ -331,14 +576,15 @@ bool WorkbenchWindow::IsClosing()
   return closing || this->GetWorkbenchImpl()->IsClosing();
 }
 
-int WorkbenchWindow::Open() {
-//  if (getPages().length == 0) {
-//    showEmptyWindowContents();
-//  }
+int WorkbenchWindow::Open()
+{
+  //  if (getPages().length == 0) {
+  //    showEmptyWindowContents();
+  //  }
   this->FireWindowCreated();
   this->GetWindowAdvisor()->OpenIntro();
 
-  int result = this->OpenImpl();
+  int result = Window::Open();
 
   // It's time for a layout ... to insure that if TrimLayout
   // is in play, it updates all of the trim it's responsible
@@ -347,449 +593,483 @@ int WorkbenchWindow::Open() {
   //getShell().layout();
 
   this->FireWindowOpened();
-//  if (perspectiveSwitcher != null) {
-//    perspectiveSwitcher.updatePerspectiveBar();
-//    perspectiveSwitcher.updateBarParent();
-//  }
+  //  if (perspectiveSwitcher != null) {
+  //    perspectiveSwitcher.updatePerspectiveBar();
+  //    perspectiveSwitcher.updateBarParent();
+  //  }
 
   return result;
 }
 
+void* WorkbenchWindow::GetPageComposite()
+{
+  return pageComposite;
+}
+
+void* WorkbenchWindow::CreatePageComposite(void* parent)
+{
+  pageComposite = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreatePageComposite(
+      parent);
+  return pageComposite;
+}
+
+void* WorkbenchWindow::CreateContents(Shell::Pointer parent)
+{
+  // we know from Window.create that the parent is a Shell.
+  this->GetWindowAdvisor()->CreateWindowContents(parent);
+  // the page composite must be set by createWindowContents
+  poco_assert(pageComposite != 0); // "createWindowContents must call configurer.createPageComposite"); //$NON-NLS-1$
+  return pageComposite;
+}
+
+void WorkbenchWindow::CreateDefaultContents(Shell::Pointer shell)
+{
+  //pageComposite = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateDefaultWindowContents(shell);
+  this->CreatePageComposite(shell->GetControl());
+}
+
 bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
-    IPerspectiveDescriptor::Pointer activeDescriptor) {
-//  Assert.isNotNull(getShell());
-//
+    IPerspectiveDescriptor::Pointer activeDescriptor)
+{
+  //TODO WorkbenchWindow restore state
+  //  Assert.isNotNull(getShell());
+  //
   bool result = true;
-//  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-//      WorkbenchMessages.WorkbenchWindow_problemsRestoringWindow, null);
-//
-//  // Restore the window advisor state.
-//  IMemento windowAdvisorState = memento
-//      .getChild(IWorkbenchConstants.TAG_WORKBENCH_WINDOW_ADVISOR);
-//  if (windowAdvisorState != null) {
-//    result.add(getWindowAdvisor().restoreState(windowAdvisorState));
-//  }
-//
-//  // Restore actionbar advisor state.
-//  IMemento actionBarAdvisorState = memento
-//      .getChild(IWorkbenchConstants.TAG_ACTION_BAR_ADVISOR);
-//  if (actionBarAdvisorState != null) {
-//    result.add(getActionBarAdvisor()
-//        .restoreState(actionBarAdvisorState));
-//  }
-//
-//  // Read window's bounds and state.
-//  final Rectangle [] displayBounds = new Rectangle[1];
-//  StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//    public void runWithException() {
-//      displayBounds[0] = getShell().getDisplay().getBounds();
-//
-//    }});
-//  final Rectangle shellBounds = new Rectangle(0, 0, 0, 0);
-//
-//  final IMemento fastViewMem = memento
-//      .getChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
-//  if (fastViewMem != null) {
-//    if (fastViewBar != null) {
-//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//        public void runWithException() {
-//          fastViewBar.restoreState(fastViewMem);
-//        }});
-//
-//    }
-//  }
-//  Integer bigInt = memento.getInteger(IWorkbenchConstants.TAG_X);
-//  shellBounds.x = bigInt == null ? 0 : bigInt.intValue();
-//  bigInt = memento.getInteger(IWorkbenchConstants.TAG_Y);
-//  shellBounds.y = bigInt == null ? 0 : bigInt.intValue();
-//  bigInt = memento.getInteger(IWorkbenchConstants.TAG_WIDTH);
-//  shellBounds.width = bigInt == null ? 0 : bigInt.intValue();
-//  bigInt = memento.getInteger(IWorkbenchConstants.TAG_HEIGHT);
-//  shellBounds.height = bigInt == null ? 0 : bigInt.intValue();
-//  if (!shellBounds.isEmpty()) {
-//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//      public void runWithException() {
-//        if (!shellBounds.intersects(displayBounds[0])) {
-//          Rectangle clientArea = getShell().getDisplay().getClientArea();
-//          shellBounds.x = clientArea.x;
-//          shellBounds.y = clientArea.y;
-//        }
-//        getShell().setBounds(shellBounds);
-//      }});
-//  }
-//  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MAXIMIZED))) { //$NON-NLS-1$
-//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//      public void runWithException() {
-//        getShell().setMaximized(true);
-//      }});
-//
-//  }
-//  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MINIMIZED))) { //$NON-NLS-1$
-//    // getShell().setMinimized(true);
-//  }
-//
-//  // restore the width of the perspective bar
-//  if (perspectiveSwitcher != null) {
-//    perspectiveSwitcher.restoreState(memento);
-//  }
-//
-//  // Restore the cool bar order by creating all the tool bar contribution
-//  // items
-//  // This needs to be done before pages are created to ensure proper
-//  // canonical creation
-//  // of cool items
-//  final ICoolBarManager2 coolBarMgr = (ICoolBarManager2) getCoolBarManager2();
-//      if (coolBarMgr != null) {
-//    IMemento coolBarMem = memento
-//        .getChild(IWorkbenchConstants.TAG_COOLBAR_LAYOUT);
-//    if (coolBarMem != null) {
-//      // Check if the layout is locked
-//      final Integer lockedInt = coolBarMem
-//          .getInteger(IWorkbenchConstants.TAG_LOCKED);
-//      StartupThreading.runWithoutExceptions(new StartupRunnable(){
-//
-//        public void runWithException() {
-//          if ((lockedInt != null) && (lockedInt.intValue() == 1)) {
-//            coolBarMgr.setLockLayout(true);
-//          } else {
-//            coolBarMgr.setLockLayout(false);
-//          }
-//        }});
-//
-//      // The new layout of the cool bar manager
-//      ArrayList coolBarLayout = new ArrayList();
-//      // Traverse through all the cool item in the memento
-//      IMemento contributionMems[] = coolBarMem
-//          .getChildren(IWorkbenchConstants.TAG_COOLITEM);
-//      for (int i = 0; i < contributionMems.length; i++) {
-//        IMemento contributionMem = contributionMems[i];
-//        String type = contributionMem
-//            .getString(IWorkbenchConstants.TAG_ITEM_TYPE);
-//        if (type == null) {
-//          // Do not recognize that type
-//          continue;
-//        }
-//        String id = contributionMem
-//            .getString(IWorkbenchConstants.TAG_ID);
-//
-//        // Prevent duplicate items from being read back in.
-//        IContributionItem existingItem = coolBarMgr.find(id);
-//        if ((id != null) && (existingItem != null)) {
-//          if (Policy.DEBUG_TOOLBAR_DISPOSAL) {
-//            System.out
-//                .println("Not loading duplicate cool bar item: " + id); //$NON-NLS-1$
-//          }
-//          coolBarLayout.add(existingItem);
-//          continue;
-//        }
-//        IContributionItem newItem = null;
-//        if (type.equals(IWorkbenchConstants.TAG_TYPE_SEPARATOR)) {
-//          if (id != null) {
-//            newItem = new Separator(id);
-//          } else {
-//            newItem = new Separator();
-//          }
-//        } else if (id != null) {
-//          if (type
-//              .equals(IWorkbenchConstants.TAG_TYPE_GROUPMARKER)) {
-//            newItem = new GroupMarker(id);
-//
-//          } else if (type
-//              .equals(IWorkbenchConstants.TAG_TYPE_TOOLBARCONTRIBUTION)
-//              || type
-//                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
-//
-//            // Get Width and height
-//            Integer width = contributionMem
-//                .getInteger(IWorkbenchConstants.TAG_ITEM_X);
-//            Integer height = contributionMem
-//                .getInteger(IWorkbenchConstants.TAG_ITEM_Y);
-//            // Look for the object in the current cool bar
-//            // manager
-//            IContributionItem oldItem = coolBarMgr.find(id);
-//            // If a tool bar contribution item already exists
-//            // for this id then use the old object
-//            if (oldItem != null) {
-//              newItem = oldItem;
-//            } else {
-//              IActionBarPresentationFactory actionBarPresentation = getActionBarPresentationFactory();
-//              newItem = actionBarPresentation.createToolBarContributionItem(
-//                  actionBarPresentation.createToolBarManager(), id);
-//              if (type
-//                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
-//                IToolBarContributionItem newToolBarItem = (IToolBarContributionItem) newItem;
-//                if (height != null) {
-//                  newToolBarItem.setCurrentHeight(height
-//                      .intValue());
-//                }
-//                if (width != null) {
-//                  newToolBarItem.setCurrentWidth(width
-//                      .intValue());
-//                }
-//                newItem = new PlaceholderContributionItem(
-//                    newToolBarItem);
-//              }
-//              // make it invisible by default
-//              newItem.setVisible(false);
-//              // Need to add the item to the cool bar manager
-//              // so that its canonical order can be preserved
-//              IContributionItem refItem = findAlphabeticalOrder(
-//                  IWorkbenchActionConstants.MB_ADDITIONS,
-//                  id, coolBarMgr);
-//              if (refItem != null) {
-//                coolBarMgr.insertAfter(refItem.getId(),
-//                    newItem);
-//              } else {
-//                coolBarMgr.add(newItem);
-//              }
-//            }
-//            // Set the current height and width
-//            if ((width != null)
-//                && (newItem instanceof IToolBarContributionItem)) {
-//              ((IToolBarContributionItem) newItem)
-//                  .setCurrentWidth(width.intValue());
-//            }
-//            if ((height != null)
-//                && (newItem instanceof IToolBarContributionItem)) {
-//              ((IToolBarContributionItem) newItem)
-//                  .setCurrentHeight(height.intValue());
-//            }
-//          }
-//        }
-//        // Add new item into cool bar manager
-//        if (newItem != null) {
-//          coolBarLayout.add(newItem);
-//          newItem.setParent(coolBarMgr);
-//          coolBarMgr.markDirty();
-//        }
-//      }
-//
-//      // We need to check if we have everything we need in the layout.
-//      boolean newlyAddedItems = false;
-//      IContributionItem[] existingItems = coolBarMgr.getItems();
-//      for (int i = 0; i < existingItems.length && !newlyAddedItems; i++) {
-//        IContributionItem existingItem = existingItems[i];
-//
-//        /*
-//         * This line shouldn't be necessary, but is here for
-//         * robustness.
-//         */
-//        if (existingItem == null) {
-//          continue;
-//        }
-//
-//        boolean found = false;
-//        Iterator layoutItemItr = coolBarLayout.iterator();
-//        while (layoutItemItr.hasNext()) {
-//          IContributionItem layoutItem = (IContributionItem) layoutItemItr
-//              .next();
-//          if ((layoutItem != null)
-//              && (layoutItem.equals(existingItem))) {
-//            found = true;
-//            break;
-//          }
-//        }
-//
-//        if (!found) {
-//          if (existingItem != null) {
-//            newlyAddedItems = true;
-//          }
-//        }
-//      }
-//
-//      // Set the cool bar layout to the given layout.
-//      if (!newlyAddedItems) {
-//        final IContributionItem[] itemsToSet = new IContributionItem[coolBarLayout
-//            .size()];
-//        coolBarLayout.toArray(itemsToSet);
-//        StartupThreading
-//            .runWithoutExceptions(new StartupRunnable() {
-//
-//              public void runWithException() {
-//                coolBarMgr.setItems(itemsToSet);
-//              }
-//            });
-//      }
-//
-//    } else {
-//      // For older workbenchs
-//      coolBarMem = memento
-//          .getChild(IWorkbenchConstants.TAG_TOOLBAR_LAYOUT);
-//      if (coolBarMem != null) {
-//        // Restore an older layout
-//        restoreOldCoolBar(coolBarMem);
-//      }
-//    }
-//  }
-//
-//  // Recreate each page in the window.
-    IWorkbenchPage::Pointer newActivePage;
-//  IMemento[] pageArray = memento
-//      .getChildren(IWorkbenchConstants.TAG_PAGE);
-//  for (int i = 0; i < pageArray.length; i++) {
-//    final IMemento pageMem = pageArray[i];
-//    String strFocus = pageMem.getString(IWorkbenchConstants.TAG_FOCUS);
-//    if (strFocus == null || strFocus.length() == 0) {
-//      continue;
-//    }
-//
-//    // Get the input factory.
-//    final IAdaptable [] input = new IAdaptable[1];
-//    final IMemento inputMem = pageMem.getChild(IWorkbenchConstants.TAG_INPUT);
-//    if (inputMem != null) {
-//      final String factoryID = inputMem
-//          .getString(IWorkbenchConstants.TAG_FACTORY_ID);
-//      if (factoryID == null) {
-//        WorkbenchPlugin
-//            .log("Unable to restore page - no input factory ID."); //$NON-NLS-1$
-//        result.add(unableToRestorePage(pageMem));
-//        continue;
-//      }
-//      try {
-//        UIStats.start(UIStats.RESTORE_WORKBENCH,
-//            "WorkbenchPageFactory"); //$NON-NLS-1$
-//        StartupThreading
-//            .runWithoutExceptions(new StartupRunnable() {
-//
-//              public void runWithException() throws Throwable {
-//                IElementFactory factory = PlatformUI
-//                    .getWorkbench().getElementFactory(
-//                        factoryID);
-//                if (factory == null) {
-//                  WorkbenchPlugin
-//                      .log("Unable to restore page - cannot instantiate input factory: " + factoryID); //$NON-NLS-1$
-//                  result
-//                      .add(unableToRestorePage(pageMem));
-//                  return;
-//                }
-//
-//                // Get the input element.
-//                input[0] = factory.createElement(inputMem);
-//              }
-//            });
-//
-//        if (input[0] == null) {
-//          WorkbenchPlugin
-//              .log("Unable to restore page - cannot instantiate input element: " + factoryID); //$NON-NLS-1$
-//          result.add(unableToRestorePage(pageMem));
-//          continue;
-//        }
-//      } finally {
-//        UIStats.end(UIStats.RESTORE_WORKBENCH, factoryID,
-//            "WorkbenchPageFactory"); //$NON-NLS-1$
-//      }
-//    }
-//    // Open the perspective.
-//    final IAdaptable finalInput = input[0];
-//    final WorkbenchPage [] newPage = new WorkbenchPage[1];
-//    try {
-//      StartupThreading.runWithWorkbenchExceptions(new StartupRunnable(){
-//
-//        public void runWithException() throws WorkbenchException {
-//          newPage[0] = ((WorkbenchImplementation) Tweaklets
-//              .get(WorkbenchImplementation.KEY)).createWorkbenchPage(WorkbenchWindow.this, finalInput);
-//        }});
-//
-//      result.add(newPage[0].restoreState(pageMem, activeDescriptor));
-//      pageList.add(newPage[0]);
-//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//        public void runWithException() throws Throwable {
-//          firePageOpened(newPage[0]);
-//        }});
-//
-//    } catch (WorkbenchException e) {
-//      WorkbenchPlugin
-//          .log(
-//              "Unable to restore perspective - constructor failed.", e); //$NON-NLS-1$
-//      result.add(e.getStatus());
-//      continue;
-//    }
-//
-//    if (strFocus != null && strFocus.length() > 0) {
-//      newActivePage = newPage[0];
-//    }
-//  }
+  //  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
+  //      WorkbenchMessages.WorkbenchWindow_problemsRestoringWindow, null);
+  //
+  //  // Restore the window advisor state.
+  //  IMemento windowAdvisorState = memento
+  //      .getChild(IWorkbenchConstants.TAG_WORKBENCH_WINDOW_ADVISOR);
+  //  if (windowAdvisorState != null) {
+  //    result.add(getWindowAdvisor().restoreState(windowAdvisorState));
+  //  }
+  //
+  //  // Restore actionbar advisor state.
+  //  IMemento actionBarAdvisorState = memento
+  //      .getChild(IWorkbenchConstants.TAG_ACTION_BAR_ADVISOR);
+  //  if (actionBarAdvisorState != null) {
+  //    result.add(getActionBarAdvisor()
+  //        .restoreState(actionBarAdvisorState));
+  //  }
+  //
+  //  // Read window's bounds and state.
+  //  final Rectangle [] displayBounds = new Rectangle[1];
+  //  StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //    public void runWithException() {
+  //      displayBounds[0] = getShell().getDisplay().getBounds();
+  //
+  //    }});
+  //  final Rectangle shellBounds = new Rectangle(0, 0, 0, 0);
+  //
+  //  final IMemento fastViewMem = memento
+  //      .getChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
+  //  if (fastViewMem != null) {
+  //    if (fastViewBar != null) {
+  //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //        public void runWithException() {
+  //          fastViewBar.restoreState(fastViewMem);
+  //        }});
+  //
+  //    }
+  //  }
+  //  Integer bigInt = memento.getInteger(IWorkbenchConstants.TAG_X);
+  //  shellBounds.x = bigInt == null ? 0 : bigInt.intValue();
+  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_Y);
+  //  shellBounds.y = bigInt == null ? 0 : bigInt.intValue();
+  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_WIDTH);
+  //  shellBounds.width = bigInt == null ? 0 : bigInt.intValue();
+  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_HEIGHT);
+  //  shellBounds.height = bigInt == null ? 0 : bigInt.intValue();
+  //  if (!shellBounds.isEmpty()) {
+  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //      public void runWithException() {
+  //        if (!shellBounds.intersects(displayBounds[0])) {
+  //          Rectangle clientArea = getShell().getDisplay().getClientArea();
+  //          shellBounds.x = clientArea.x;
+  //          shellBounds.y = clientArea.y;
+  //        }
+  //        getShell().setBounds(shellBounds);
+  //      }});
+  //  }
+  //  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MAXIMIZED))) { //$NON-NLS-1$
+  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //      public void runWithException() {
+  //        getShell().setMaximized(true);
+  //      }});
+  //
+  //  }
+  //  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MINIMIZED))) { //$NON-NLS-1$
+  //    // getShell().setMinimized(true);
+  //  }
+  //
+  //  // restore the width of the perspective bar
+  //  if (perspectiveSwitcher != null) {
+  //    perspectiveSwitcher.restoreState(memento);
+  //  }
+  //
+  //  // Restore the cool bar order by creating all the tool bar contribution
+  //  // items
+  //  // This needs to be done before pages are created to ensure proper
+  //  // canonical creation
+  //  // of cool items
+  //  final ICoolBarManager2 coolBarMgr = (ICoolBarManager2) getCoolBarManager2();
+  //      if (coolBarMgr != null) {
+  //    IMemento coolBarMem = memento
+  //        .getChild(IWorkbenchConstants.TAG_COOLBAR_LAYOUT);
+  //    if (coolBarMem != null) {
+  //      // Check if the layout is locked
+  //      final Integer lockedInt = coolBarMem
+  //          .getInteger(IWorkbenchConstants.TAG_LOCKED);
+  //      StartupThreading.runWithoutExceptions(new StartupRunnable(){
+  //
+  //        public void runWithException() {
+  //          if ((lockedInt != null) && (lockedInt.intValue() == 1)) {
+  //            coolBarMgr.setLockLayout(true);
+  //          } else {
+  //            coolBarMgr.setLockLayout(false);
+  //          }
+  //        }});
+  //
+  //      // The new layout of the cool bar manager
+  //      ArrayList coolBarLayout = new ArrayList();
+  //      // Traverse through all the cool item in the memento
+  //      IMemento contributionMems[] = coolBarMem
+  //          .getChildren(IWorkbenchConstants.TAG_COOLITEM);
+  //      for (int i = 0; i < contributionMems.length; i++) {
+  //        IMemento contributionMem = contributionMems[i];
+  //        String type = contributionMem
+  //            .getString(IWorkbenchConstants.TAG_ITEM_TYPE);
+  //        if (type == null) {
+  //          // Do not recognize that type
+  //          continue;
+  //        }
+  //        String id = contributionMem
+  //            .getString(IWorkbenchConstants.TAG_ID);
+  //
+  //        // Prevent duplicate items from being read back in.
+  //        IContributionItem existingItem = coolBarMgr.find(id);
+  //        if ((id != null) && (existingItem != null)) {
+  //          if (Policy.DEBUG_TOOLBAR_DISPOSAL) {
+  //            System.out
+  //                .println("Not loading duplicate cool bar item: " + id); //$NON-NLS-1$
+  //          }
+  //          coolBarLayout.add(existingItem);
+  //          continue;
+  //        }
+  //        IContributionItem newItem = null;
+  //        if (type.equals(IWorkbenchConstants.TAG_TYPE_SEPARATOR)) {
+  //          if (id != null) {
+  //            newItem = new Separator(id);
+  //          } else {
+  //            newItem = new Separator();
+  //          }
+  //        } else if (id != null) {
+  //          if (type
+  //              .equals(IWorkbenchConstants.TAG_TYPE_GROUPMARKER)) {
+  //            newItem = new GroupMarker(id);
+  //
+  //          } else if (type
+  //              .equals(IWorkbenchConstants.TAG_TYPE_TOOLBARCONTRIBUTION)
+  //              || type
+  //                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
+  //
+  //            // Get Width and height
+  //            Integer width = contributionMem
+  //                .getInteger(IWorkbenchConstants.TAG_ITEM_X);
+  //            Integer height = contributionMem
+  //                .getInteger(IWorkbenchConstants.TAG_ITEM_Y);
+  //            // Look for the object in the current cool bar
+  //            // manager
+  //            IContributionItem oldItem = coolBarMgr.find(id);
+  //            // If a tool bar contribution item already exists
+  //            // for this id then use the old object
+  //            if (oldItem != null) {
+  //              newItem = oldItem;
+  //            } else {
+  //              IActionBarPresentationFactory actionBarPresentation = getActionBarPresentationFactory();
+  //              newItem = actionBarPresentation.createToolBarContributionItem(
+  //                  actionBarPresentation.createToolBarManager(), id);
+  //              if (type
+  //                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
+  //                IToolBarContributionItem newToolBarItem = (IToolBarContributionItem) newItem;
+  //                if (height != null) {
+  //                  newToolBarItem.setCurrentHeight(height
+  //                      .intValue());
+  //                }
+  //                if (width != null) {
+  //                  newToolBarItem.setCurrentWidth(width
+  //                      .intValue());
+  //                }
+  //                newItem = new PlaceholderContributionItem(
+  //                    newToolBarItem);
+  //              }
+  //              // make it invisible by default
+  //              newItem.setVisible(false);
+  //              // Need to add the item to the cool bar manager
+  //              // so that its canonical order can be preserved
+  //              IContributionItem refItem = findAlphabeticalOrder(
+  //                  IWorkbenchActionConstants.MB_ADDITIONS,
+  //                  id, coolBarMgr);
+  //              if (refItem != null) {
+  //                coolBarMgr.insertAfter(refItem.getId(),
+  //                    newItem);
+  //              } else {
+  //                coolBarMgr.add(newItem);
+  //              }
+  //            }
+  //            // Set the current height and width
+  //            if ((width != null)
+  //                && (newItem instanceof IToolBarContributionItem)) {
+  //              ((IToolBarContributionItem) newItem)
+  //                  .setCurrentWidth(width.intValue());
+  //            }
+  //            if ((height != null)
+  //                && (newItem instanceof IToolBarContributionItem)) {
+  //              ((IToolBarContributionItem) newItem)
+  //                  .setCurrentHeight(height.intValue());
+  //            }
+  //          }
+  //        }
+  //        // Add new item into cool bar manager
+  //        if (newItem != null) {
+  //          coolBarLayout.add(newItem);
+  //          newItem.setParent(coolBarMgr);
+  //          coolBarMgr.markDirty();
+  //        }
+  //      }
+  //
+  //      // We need to check if we have everything we need in the layout.
+  //      boolean newlyAddedItems = false;
+  //      IContributionItem[] existingItems = coolBarMgr.getItems();
+  //      for (int i = 0; i < existingItems.length && !newlyAddedItems; i++) {
+  //        IContributionItem existingItem = existingItems[i];
+  //
+  //        /*
+  //         * This line shouldn't be necessary, but is here for
+  //         * robustness.
+  //         */
+  //        if (existingItem == null) {
+  //          continue;
+  //        }
+  //
+  //        boolean found = false;
+  //        Iterator layoutItemItr = coolBarLayout.iterator();
+  //        while (layoutItemItr.hasNext()) {
+  //          IContributionItem layoutItem = (IContributionItem) layoutItemItr
+  //              .next();
+  //          if ((layoutItem != null)
+  //              && (layoutItem.equals(existingItem))) {
+  //            found = true;
+  //            break;
+  //          }
+  //        }
+  //
+  //        if (!found) {
+  //          if (existingItem != null) {
+  //            newlyAddedItems = true;
+  //          }
+  //        }
+  //      }
+  //
+  //      // Set the cool bar layout to the given layout.
+  //      if (!newlyAddedItems) {
+  //        final IContributionItem[] itemsToSet = new IContributionItem[coolBarLayout
+  //            .size()];
+  //        coolBarLayout.toArray(itemsToSet);
+  //        StartupThreading
+  //            .runWithoutExceptions(new StartupRunnable() {
+  //
+  //              public void runWithException() {
+  //                coolBarMgr.setItems(itemsToSet);
+  //              }
+  //            });
+  //      }
+  //
+  //    } else {
+  //      // For older workbenchs
+  //      coolBarMem = memento
+  //          .getChild(IWorkbenchConstants.TAG_TOOLBAR_LAYOUT);
+  //      if (coolBarMem != null) {
+  //        // Restore an older layout
+  //        restoreOldCoolBar(coolBarMem);
+  //      }
+  //    }
+  //  }
+  //
+  //  // Recreate each page in the window.
+  IWorkbenchPage::Pointer newActivePage;
+  //  IMemento[] pageArray = memento
+  //      .getChildren(IWorkbenchConstants.TAG_PAGE);
+  //  for (int i = 0; i < pageArray.length; i++) {
+  //    final IMemento pageMem = pageArray[i];
+  //    String strFocus = pageMem.getString(IWorkbenchConstants.TAG_FOCUS);
+  //    if (strFocus == null || strFocus.length() == 0) {
+  //      continue;
+  //    }
+  //
+  //    // Get the input factory.
+  //    final IAdaptable [] input = new IAdaptable[1];
+  //    final IMemento inputMem = pageMem.getChild(IWorkbenchConstants.TAG_INPUT);
+  //    if (inputMem != null) {
+  //      final String factoryID = inputMem
+  //          .getString(IWorkbenchConstants.TAG_FACTORY_ID);
+  //      if (factoryID == null) {
+  //        WorkbenchPlugin
+  //            .log("Unable to restore page - no input factory ID."); //$NON-NLS-1$
+  //        result.add(unableToRestorePage(pageMem));
+  //        continue;
+  //      }
+  //      try {
+  //        UIStats.start(UIStats.RESTORE_WORKBENCH,
+  //            "WorkbenchPageFactory"); //$NON-NLS-1$
+  //        StartupThreading
+  //            .runWithoutExceptions(new StartupRunnable() {
+  //
+  //              public void runWithException() throws Throwable {
+  //                IElementFactory factory = PlatformUI
+  //                    .getWorkbench().getElementFactory(
+  //                        factoryID);
+  //                if (factory == null) {
+  //                  WorkbenchPlugin
+  //                      .log("Unable to restore page - cannot instantiate input factory: " + factoryID); //$NON-NLS-1$
+  //                  result
+  //                      .add(unableToRestorePage(pageMem));
+  //                  return;
+  //                }
+  //
+  //                // Get the input element.
+  //                input[0] = factory.createElement(inputMem);
+  //              }
+  //            });
+  //
+  //        if (input[0] == null) {
+  //          WorkbenchPlugin
+  //              .log("Unable to restore page - cannot instantiate input element: " + factoryID); //$NON-NLS-1$
+  //          result.add(unableToRestorePage(pageMem));
+  //          continue;
+  //        }
+  //      } finally {
+  //        UIStats.end(UIStats.RESTORE_WORKBENCH, factoryID,
+  //            "WorkbenchPageFactory"); //$NON-NLS-1$
+  //      }
+  //    }
+  //    // Open the perspective.
+  //    final IAdaptable finalInput = input[0];
+  //    final WorkbenchPage [] newPage = new WorkbenchPage[1];
+  //    try {
+  //      StartupThreading.runWithWorkbenchExceptions(new StartupRunnable(){
+  //
+  //        public void runWithException() throws WorkbenchException {
+  //          newPage[0] = ((WorkbenchImplementation) Tweaklets
+  //              .get(WorkbenchImplementation.KEY)).createWorkbenchPage(WorkbenchWindow.this, finalInput);
+  //        }});
+  //
+  //      result.add(newPage[0].restoreState(pageMem, activeDescriptor));
+  //      pageList.add(newPage[0]);
+  //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //        public void runWithException() throws Throwable {
+  //          firePageOpened(newPage[0]);
+  //        }});
+  //
+  //    } catch (WorkbenchException e) {
+  //      WorkbenchPlugin
+  //          .log(
+  //              "Unable to restore perspective - constructor failed.", e); //$NON-NLS-1$
+  //      result.add(e.getStatus());
+  //      continue;
+  //    }
+  //
+  //    if (strFocus != null && strFocus.length() > 0) {
+  //      newActivePage = newPage[0];
+  //    }
+  //  }
 
   // If there are no pages create a default.
-  if (pageList.IsEmpty()) {
-    try {
+  if (pageList.IsEmpty())
+  {
+    try
+    {
       //TODO perspective
-//      final String defPerspID = getWorkbenchImpl().getPerspectiveRegistry()
-//          .getDefaultPerspective();
+      //      final String defPerspID = getWorkbenchImpl().getPerspectiveRegistry()
+      //          .getDefaultPerspective();
       std::string defPerspID = "";
       //if (defPerspID != null) {
-        WorkbenchPage::Pointer newPage;
-        //StartupThreading.runWithWorkbenchExceptions(new StartupRunnable() {
+      WorkbenchPage::Pointer newPage;
+      //StartupThreading.runWithWorkbenchExceptions(new StartupRunnable() {
 
-        //  public void runWithException() throws Throwable {
-            newPage = new WorkbenchPage(this, defPerspID,
-                    this->GetDefaultPageInput());
-        //  }});
+      //  public void runWithException() throws Throwable {
+      newPage = new WorkbenchPage(this, defPerspID,
+          this->GetDefaultPageInput());
+      //  }});
 
-        pageList.Add(newPage);
-        //StartupThreading.runWithoutExceptions(new StartupRunnable() {
+      pageList.Add(newPage);
+      //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
-        //  public void runWithException() throws Throwable {
-        //    firePageOpened(newPage[0]);
-        //  }});
+      //  public void runWithException() throws Throwable {
+      //    firePageOpened(newPage[0]);
+      //  }});
       //}
-    } catch (WorkbenchException& e) {
+    }
+    catch (WorkbenchException& e)
+    {
       WorkbenchPlugin
-          ::Log(
-              "Unable to create default perspective - constructor failed.", e); //$NON-NLS-1$
+      ::Log(
+          "Unable to create default perspective - constructor failed.", e); //$NON-NLS-1$
       result = false;
-//      String productName = WorkbenchPlugin.getDefault()
-//          .getProductName();
-//      if (productName == null) {
-//        productName = ""; //$NON-NLS-1$
-//      }
-//      getShell().setText(productName);
+      //      String productName = WorkbenchPlugin.getDefault()
+      //          .getProductName();
+      //      if (productName == null) {
+      //        productName = ""; //$NON-NLS-1$
+      //      }
+      //      getShell().setText(productName);
     }
   }
 
   // Set active page.
-  if (newActivePage.IsNull()) {
+  if (newActivePage.IsNull())
+  {
     newActivePage = pageList.GetNextActive().Cast<IWorkbenchPage>();
   }
 
   //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
   //  public void runWithException() throws Throwable {
-      this->SetActivePage(newActivePage);
+  this->SetActivePage(newActivePage);
   //  }});
 
 
-//  final IMemento introMem = memento.getChild(IWorkbenchConstants.TAG_INTRO);
-//  if (introMem != null) {
-//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-//
-//      public void runWithException() throws Throwable {
-//        getWorkbench()
-//            .getIntroManager()
-//            .showIntro(
-//                WorkbenchWindow.this,
-//                Boolean
-//                    .valueOf(
-//                        introMem
-//                            .getString(IWorkbenchConstants.TAG_STANDBY))
-//                    .booleanValue());
-//      }
-//    });
-//
-//  }
-//
-//  // Only restore the trim state if we're using the default layout
-//  if (defaultLayout != null) {
-//    // Restore the trim state. We pass in the 'root'
-//    // memento since we have to check for pre-3.2
-//    // state.
-//    result.add(restoreTrimState(memento));
-//  }
+  //  final IMemento introMem = memento.getChild(IWorkbenchConstants.TAG_INTRO);
+  //  if (introMem != null) {
+  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+  //
+  //      public void runWithException() throws Throwable {
+  //        getWorkbench()
+  //            .getIntroManager()
+  //            .showIntro(
+  //                WorkbenchWindow.this,
+  //                Boolean
+  //                    .valueOf(
+  //                        introMem
+  //                            .getString(IWorkbenchConstants.TAG_STANDBY))
+  //                    .booleanValue());
+  //      }
+  //    });
+  //
+  //  }
+  //
+  //  // Only restore the trim state if we're using the default layout
+  //  if (defaultLayout != null) {
+  //    // Restore the trim state. We pass in the 'root'
+  //    // memento since we have to check for pre-3.2
+  //    // state.
+  //    result.add(restoreTrimState(memento));
+  //  }
 
   return result;
 }
@@ -815,10 +1095,8 @@ IWorkbenchPage::Pointer WorkbenchWindow::OpenPage(
 
 SmartPointer<IWorkbenchPage> WorkbenchWindow::OpenPage(IAdaptable* input)
 {
-  //TODO perspective
-  //std::string perspId = this->GetWorkbenchImpl()->GetPerspectiveRegistry()
-  //->GetDefaultPerspective();
-  return this->OpenPage("", input);
+  std::string perspId = this->GetWorkbenchImpl()->GetDefaultPerspectiveId();
+  return this->OpenPage(perspId, input);
 }
 
 IWorkbenchPage::Pointer WorkbenchWindow::BusyOpenPage(
@@ -842,36 +1120,25 @@ IWorkbenchPage::Pointer WorkbenchWindow::BusyOpenPage(
   return newPage;
 }
 
-void WorkbenchWindow::SetWindowManager(WindowManager* manager) {
-  windowManager = manager;
-
-  // Code to detect invalid usage
-
-  if (manager != 0) {
-    std::vector<IWorkbenchWindow::Pointer> windows = manager->GetWindows();
-    if (std::find(windows.begin(), windows.end(), this) != windows.end())
-      return;
-
-    manager->Add(this);
-  }
-}
-
-WindowManager* WorkbenchWindow::GetWindowManager() {
-  return windowManager;
-}
-
 int WorkbenchWindow::GetNumber()
 {
   return number;
 }
 
-/**
- * Sets the active page within the window.
- *
- * @param in
- *            identifies the new active page, or <code>null</code> for no
- *            active page
- */
+void WorkbenchWindow::LargeUpdateStart()
+{
+  largeUpdates++;
+}
+
+void WorkbenchWindow::LargeUpdateEnd()
+{
+  if (--largeUpdates == 0)
+  {
+    //TODO WorkbenchWindow update action bars after large update
+    //this->UpdateActionBars();
+  }
+}
+
 void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
 {
   if (this->GetActivePage() == in)
@@ -901,15 +1168,14 @@ void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
   {
     //layout.topControl = newPage.getClientComposite();
     //parent.layout();
-    //hideEmptyWindowContents();
+    this->HideEmptyWindowContents();
     newPage->OnActivate();
     //this->FirePageActivated(newPage);
     //TODO perspective
-//    if (newPage->GetPerspective().IsNotNull())
-//    {
-//      this->FirePerspectiveActivated(newPage, newPage
-//      ->GetPerspective());
-//    }
+    if (newPage->GetPerspective() != 0)
+    {
+      this->FirePerspectiveActivated(newPage, newPage->GetPerspective());
+    }
   }
   else
   {
@@ -941,7 +1207,7 @@ void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
 
 bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
 {
-
+  //TODO WorkbenchWindow save state
   //  IWorkbenchPage activePage = getActivePage();
   //  if (activePage != null
   //      && activePage.findView(IIntroConstants.INTRO_VIEW_ID) != null) {
@@ -1028,6 +1294,30 @@ WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()
   return windowConfigurer;
 }
 
+void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
+{
+  Window::ConfigureShell(shell);
+
+  //    detachedWindowShells = new ShellPool(shell, SWT.TOOL | SWT.TITLE
+  //        | SWT.MAX | SWT.RESIZE | getDefaultOrientation());
+
+  std::string title = this->GetWindowConfigurer()->BasicGetTitle();
+  if (title != "")
+  {
+    shell->SetText(title);
+  }
+
+//  final IWorkbench workbench = getWorkbench();
+//  workbench.getHelpSystem().setHelp(shell,
+//      IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
+
+  //    final IContextService contextService = (IContextService) getWorkbench().getService(IContextService.class);
+  //    contextService.registerShell(shell, IContextService.TYPE_WINDOW);
+
+  this->TrackShellActivation(shell);
+  this->TrackShellResize(shell);
+}
+
 WorkbenchAdvisor* WorkbenchWindow::GetAdvisor()
 {
   return this->GetWorkbenchImpl()->GetAdvisor();
@@ -1056,6 +1346,49 @@ ActionBarAdvisor::Pointer WorkbenchWindow::GetActionBarAdvisor()
 Workbench* WorkbenchWindow::GetWorkbenchImpl()
 {
   return dynamic_cast<Workbench*>(this->GetWorkbench());
+}
+
+void WorkbenchWindow::ShowEmptyWindowContents()
+{
+  if (!emptyWindowContentsCreated)
+  {
+    void* parent = this->GetPageComposite();
+    emptyWindowContents = this->GetWindowAdvisor()->CreateEmptyWindowContents(
+        parent);
+    emptyWindowContentsCreated = true;
+    //    // force the empty window composite to be layed out
+    //    ((StackLayout) parent.getLayout()).topControl = emptyWindowContents;
+    //    parent.layout();
+  }
+}
+
+void WorkbenchWindow::HideEmptyWindowContents()
+{
+  if (emptyWindowContentsCreated)
+  {
+    if (emptyWindowContents != 0)
+    {
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(emptyWindowContents);
+      emptyWindowContents = 0;
+      //this->GetPageComposite().layout();
+    }
+    emptyWindowContentsCreated = false;
+  }
+}
+
+WorkbenchWindow::ServiceLocatorOwner::ServiceLocatorOwner(WorkbenchWindow* wnd)
+: window(wnd)
+{
+
+}
+
+void WorkbenchWindow::ServiceLocatorOwner::Dispose()
+{
+  Shell::Pointer shell = window->GetShell();
+  if (shell != 0)
+  {
+    window->Close();
+  }
 }
 
 bool WorkbenchWindow::PageList::Add(IWorkbenchPage::Pointer object)
@@ -1150,8 +1483,115 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   }
 
   std::list<IWorkbenchPage::Pointer>::reverse_iterator riter =
-      pagesInActivationOrder.rbegin();
+  pagesInActivationOrder.rbegin();
   return (++riter)->Cast<WorkbenchPage>();
+}
+
+WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow* w) :
+window(w)
+{
+}
+
+void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointer event)
+{
+  window->shellActivated = true;
+  window->serviceLocator->Activate();
+  window->GetWorkbenchImpl()->SetActivatedWindow(window);
+  WorkbenchPage::Pointer currentPage = window->GetActivePage().Cast<WorkbenchPage>();
+  if (currentPage != 0)
+  {
+    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
+    if (part != 0)
+    {
+      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellActivated();
+    }
+    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
+    if (editor != 0)
+    {
+      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellActivated();
+    }
+    window->GetWorkbenchImpl()->FireWindowActivated(window);
+  }
+  //liftRestrictions();
+}
+
+void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Pointer event)
+{
+  window->shellActivated = false;
+  //imposeRestrictions();
+  window->serviceLocator->Deactivate();
+  WorkbenchPage::Pointer currentPage = window->GetActivePage().Cast<WorkbenchPage>();
+  if (currentPage != 0)
+  {
+    IWorkbenchPart::Pointer part = currentPage->GetActivePart();
+    if (part != 0)
+    {
+      PartSite::Pointer site = part->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellDeactivated();
+    }
+    IEditorPart::Pointer editor = currentPage->GetActiveEditor();
+    if (editor != 0)
+    {
+      PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
+      site->GetPane()->ShellDeactivated();
+    }
+    window->GetWorkbenchImpl()->FireWindowDeactivated(window);
+  }
+}
+
+void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
+{
+  shellActivationListener = new ShellActivationListener(this);
+  shell->AddShellListener(shellActivationListener);
+}
+
+WorkbenchWindow::ControlResizeListener::ControlResizeListener(WorkbenchWindow* w)
+: window(w)
+{
+}
+
+void WorkbenchWindow::
+ControlResizeListener::ControlMoved(GuiTk::ControlEvent::Pointer e)
+{
+  this->SaveBounds();
+}
+
+void WorkbenchWindow::
+ControlResizeListener::ControlResized(GuiTk::ControlEvent::Pointer e)
+{
+  this->SaveBounds();
+}
+
+void WorkbenchWindow::ControlResizeListener::SaveBounds()
+{
+  Shell::Pointer shell = window->GetShell();
+  if (shell == 0)
+  {
+    return;
+  }
+//  if (shell->IsDisposed())
+//  {
+//    return;
+//  }
+  if (shell->GetMinimized())
+  {
+    return;
+  }
+  if (shell->GetMaximized())
+  {
+    window->asMaximizedState = true;
+    return;
+  }
+  window->asMaximizedState = false;
+  window->normalBounds = shell->GetBounds();
+}
+
+void WorkbenchWindow::TrackShellResize(Shell::Pointer newShell)
+{
+  controlResizeListener = new ControlResizeListener(this);
+  newShell->AddControlListener(controlResizeListener);
 }
 
 }

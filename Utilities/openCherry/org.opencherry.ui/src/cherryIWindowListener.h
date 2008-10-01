@@ -21,6 +21,11 @@
 
 #include "cherryUiDll.h"
 
+#include <cherryMacros.h>
+#include <cherryMessage.h>
+
+#include "cherryIWorkbenchWindow.h"
+
 namespace cherry
 {
 
@@ -34,7 +39,21 @@ struct CHERRY_UI IWindowListener : public virtual Object {
 
   cherryInterfaceMacro(IWindowListener, cherry);
 
-  virtual ~IWindowListener() {}
+  struct Events {
+    typedef Message1<IWorkbenchWindow::Pointer> WindowEvent;
+
+    WindowEvent windowActivated;
+    WindowEvent windowDeactivated;
+    WindowEvent windowClosed;
+    WindowEvent windowOpened;
+
+    void AddListener(IWindowListener::Pointer listener);
+    void RemoveListener(IWindowListener::Pointer listener);
+
+  private:
+
+    typedef MessageDelegate1<IWindowListener, IWorkbenchWindow::Pointer> Delegate;
+  };
 
   /**
    * Notifies this listener that the given window has been activated.
@@ -45,7 +64,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowActivated(IWorkbenchWindow::Pointer window) = 0;
+  virtual void WindowActivated(IWorkbenchWindow::Pointer window) {};
 
   /**
    * Notifies this listener that the given window has been deactivated.
@@ -56,7 +75,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowDeactivated(IWorkbenchWindow::Pointer window) = 0;
+  virtual void WindowDeactivated(IWorkbenchWindow::Pointer window) {};
 
   /**
    * Notifies this listener that the given window has been closed.
@@ -64,7 +83,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    * @param window the window that was closed
    * @see IWorkbenchWindow#close
    */
-  virtual void WindowClosed(IWorkbenchWindow::Pointer window) = 0;
+  virtual void WindowClosed(IWorkbenchWindow::Pointer window) {};
 
   /**
    * Notifies this listener that the given window has been opened.
@@ -72,7 +91,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    * @param window the window that was opened
    * @see IWorkbench#openWorkbenchWindow
    */
-  virtual void WindowOpened(IWorkbenchWindow::Pointer window) = 0;
+  virtual void WindowOpened(IWorkbenchWindow::Pointer window) {};
 
 };
 

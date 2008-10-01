@@ -1,0 +1,235 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.ui" id="services" name="Services"/>
+      </appinfo>
+      <documentation>
+         Define service factories so that services can be contributed declaratively and will be available through &lt;code&gt;IServiceLocator#getService(Class)&lt;/code&gt;.  The implementation of &lt;code&gt;AbstractServiceFactory&lt;/code&gt; must be able to return a global service and multiple child services (if applicable).
+&lt;p&gt;
+Services must follow a general contract:
+&lt;ul&gt;
+&lt;li&gt;The top level service has no parent.&lt;/li&gt;
+&lt;li&gt;The child service may use the supplied parent, which can be cast to the service interface.&lt;/li&gt;
+&lt;li&gt;Any other services needed for initialization should be retrieved from the &lt;code&gt;IServiceLocator&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;If the service needs to clean up any state (like listeners) it should implement &lt;code&gt;IDisposable&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Services should clearly specify when they perform cleanup for clients, such as removing listeners automatically on disposal.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <documentation>
+            Contribute services to the workbench.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="serviceFactory" minOccurs="0" maxOccurs="1"/>
+            <element ref="sourceProvider" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="serviceFactory">
+      <annotation>
+         <documentation>
+            Match a service interface to a factory that can supply a hierachical implementation of that service.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="service" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="factoryClass" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The factory that extends &lt;code&gt;AbstractServiceFactory&lt;/code&gt; and can create the implementation for the serviceClass.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.services.AbstractServiceFactory:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="service">
+      <annotation>
+         <documentation>
+            A service this factory can provide.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="serviceClass" type="string">
+            <annotation>
+               <documentation>
+                  The interface that represents a service contract.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="sourceProvider">
+      <annotation>
+         <documentation>
+            A Source Provider supplies source variables to the IEvaluationService.  It can also notify the IEvaluationService when one or more of the variables change.
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="variable" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="provider" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This class must provide variables and call the appropriate fireSourceChanged(*) method when any of the variables change.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.AbstractSourceProvider:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="variable">
+      <annotation>
+         <documentation>
+            A source variable from this provider.  A source provider must declare all variables that it provides.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of a contributed source variable.  It is a good practice to prepend the plugin id to the variable name to avoid collisions with other source providers.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priorityLevel" use="required">
+            <annotation>
+               <documentation>
+                  For conflict resolution used by services like the IHandlerService, contributed source variables must assign a priority.  &lt;b&gt;workbench&lt;/b&gt; is the global default priority.  See &lt;code&gt;ISources&lt;/code&gt; for relative priority information.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="workbench">
+                  </enumeration>
+                  <enumeration value="activeContexts">
+                  </enumeration>
+                  <enumeration value="activeShell">
+                  </enumeration>
+                  <enumeration value="activeWorkbenchWindow">
+                  </enumeration>
+                  <enumeration value="activeEditorId">
+                  </enumeration>
+                  <enumeration value="activePartId">
+                  </enumeration>
+                  <enumeration value="activeSite">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         3.4
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+Here is a basic definition:
+&lt;pre&gt;
+   &lt;extension
+         point=&quot;org.eclipse.ui.services&quot;&gt;
+      &lt;serviceFactory
+            factoryClass=&quot;org.eclipse.ui.tests.services.LevelServiceFactory&quot;&gt;
+         &lt;service
+               serviceClass=&quot;org.eclipse.ui.tests.services.ILevelService&quot;&gt;
+         &lt;/service&gt;
+      &lt;/serviceFactory&gt;
+   &lt;/extension&gt;
+&lt;/pre&gt;&lt;/p&gt;
+&lt;p&gt;
+The &lt;code&gt;LevelServiceFactory&lt;/code&gt; can return an &lt;code&gt;ILevelService&lt;/code&gt; when it is requested from the &lt;code&gt;IServiceLocator&lt;/code&gt;:
+&lt;pre&gt;
+   ILevelService s = (ILevelService) getSite().getService(ILevelService.class);
+   System.out.println(s.getLevel());
+&lt;/pre&gt;
+&lt;/p&gt;
+&lt;p&gt;
+In this test example, the factory would instantiate three &lt;code&gt;ILevelService&lt;/code&gt; implementations during the first call to &lt;code&gt;getSite().getService(*)&lt;/code&gt;.  The global one in the workbench, one for the workbench window, and one for the site.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         &lt;p&gt;
+Please see &lt;code&gt;org.eclipse.ui.services.AbstractServiceFactory&lt;/code&gt;, &lt;code&gt;org.eclipse.ui.services.IDisposable&lt;/code&gt;, and &lt;code&gt;org.eclipse.ui.services.IServiceWithSources&lt;/code&gt; for more information.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

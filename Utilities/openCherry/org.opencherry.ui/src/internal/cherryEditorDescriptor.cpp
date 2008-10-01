@@ -246,7 +246,7 @@ void EditorDescriptor::SaveValues(IMemento::Pointer memento)
 //  memento.putString(IWorkbenchConstants.TAG_PLUGIN, getPluginId());
 //
 //  memento.putInteger(IWorkbenchConstants.TAG_OPEN_MODE, getOpenMode());
-//  // legacy: handle the older attribute names, needed to allow reading of workspace by pre-3.0-RCP eclipses
+//  // legacy: handle the older attribute names, needed to allow reading of workspace by pre-3.0-RCP
 //  memento.putString(IWorkbenchConstants.TAG_INTERNAL, String
 //  .valueOf(isInternal()));
 //  memento.putString(IWorkbenchConstants.TAG_OPEN_IN_PLACE, String

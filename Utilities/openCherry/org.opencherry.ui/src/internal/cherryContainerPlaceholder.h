@@ -1,46 +1,48 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYCONTAINERPLACEHOLDER_H_
 #define CHERRYCONTAINERPLACEHOLDER_H_
 
-#include "cherryILayoutContainer.h"
-#include "cherryPartPlaceholder.h"
+#include "cherryIStackableContainer.h"
+#include "cherryLayoutPart.h"
 
 #include <Poco/SharedPtr.h>
+
+#include <list>
 
 namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
-class ContainerPlaceholder : public PartPlaceholder, public ILayoutContainer {
-    
+class ContainerPlaceholder : public LayoutPart, public IStackableContainer {
+
 private:
-  
+
   static int nextId;
 
-  Poco::SharedPtr<ILayoutContainer> realContainer;
+  IStackableContainer::Pointer realContainer;
 
 public:
-  
+
   cherryClassMacro(ContainerPlaceholder);
-  
+
     /**
      * ContainerPlaceholder constructor comment.
      * @param id java.lang.String
@@ -49,72 +51,55 @@ public:
     ContainerPlaceholder(const std::string& id);
 
     /**
-     * add method comment.
+     * Creates the SWT control
      */
-    void Add(LayoutPart::Pointer child);
+    void CreateControl(void* parent);
 
     /**
-     * See ILayoutContainer::allowBorder
+     * Get the part control.  This method may return null.
      */
-    bool AllowsBorder();
+    void* GetControl();
+
+    /**
+     * add method comment.
+     */
+    void Add(StackablePart::Pointer child);
+
+    bool AllowsAdd(StackablePart::Pointer toAdd);
 
     /**
      * getChildren method comment.
      */
-    std::vector<LayoutPart::Pointer> GetChildren();
+    std::list<StackablePart::Pointer> GetChildren() const;
 
     /**
      * getFocus method comment.
      */
-    LayoutPart::Pointer GetFocus();
-
-    /**
-     * getFocus method comment.
-     */
-    LayoutPart::Pointer GetRealContainer();
-
-    /**
-     * isChildVisible method comment.
-     */
-    bool IsChildVisible(LayoutPart::Pointer child);
+    IStackableContainer::Pointer GetRealContainer();
 
     /**
      * remove method comment.
      */
-    void Remove(LayoutPart::Pointer child);
+    void Remove(StackablePart::Pointer child);
 
     /**
      * replace method comment.
      */
-    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
+    void Replace(StackablePart::Pointer oldChild, StackablePart::Pointer newChild);
 
-    /**
-     * setChildVisible method comment.
-     */
-    void SetChildVisible(LayoutPart::Pointer child, bool visible);
+    void SetRealContainer(IStackableContainer::Pointer container);
 
-    /**
-     * setFocus method comment.
-     */
-    void SetFocus(LayoutPart::Pointer child);
+    void FindSashes(PartPane::Sashes& sashes);
 
-    void SetRealContainer(Poco::SharedPtr<ILayoutContainer> container);
-
-//    void FindSashes(LayoutPart::Pointer part, PartPane.Sashes sashes) {
-//        ILayoutContainer container = getContainer();
-//
-//        if (container != null) {
-//            container.findSashes(this, sashes);
-//        }
-//    }
+    void ResizeChild(StackablePart::Pointer childThatChanged);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.ILayoutContainer#allowsAutoFocus()
+     * @see org.opencherry.ui.internal.ILayoutContainer#allowsAutoFocus()
      */
     bool AllowsAutoFocus();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.ILayoutContainer#isZoomed(org.eclipse.ui.internal.LayoutPart)
+     * @see org.opencherry.ui.internal.ILayoutContainer#isZoomed(org.opencherry.ui.internal.LayoutPart)
      */
 //    bool childIsZoomed(LayoutPart toTest) {
 //        return false;

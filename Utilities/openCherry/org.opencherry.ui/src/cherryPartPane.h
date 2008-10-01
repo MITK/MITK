@@ -1,57 +1,78 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYPARTPANE_H_
 #define CHERRYPARTPANE_H_
 
 #include "internal/cherryWorkbenchPartReference.h"
-#include "internal/cherryILayoutContainer.h"
-#include "internal/cherryWorkbenchPage.h"
+#include "internal/cherryStackablePart.h"
 
 #include "cherryUiDll.h"
 #include "cherryRectangle.h"
+#include "cherryIPropertyChangeListener.h"
+
+#include "guitk/cherryGuiTkIControlListener.h"
 
 namespace cherry {
+
+class WorkbenchPage;
+struct IStackableContainer;
 
 /**
  * Provides the common behavior for both views
  * and editor panes.
- * 
+ *
  */
-class CHERRY_UI PartPane : public Object { // implements IPropertyListener, Listener, IPropertyChangeListener {
+class CHERRY_UI PartPane : public StackablePart,
+                           public IPropertyChangeListener,
+                           public GuiTk::IControlListener
+{
 
-public: 
+public:
   cherryClassMacro(PartPane);
+
+  friend class PartSashContainer;
+  friend class EditorSashContainer;
+  friend class WorkbenchPage;
+  friend struct IStackableContainer;
+  friend struct ILayoutContainer;
+  friend class PartStack;
+  friend class ContainerPlaceholder;
+  friend class LayoutTree;
+  friend class LayoutTreeNode;
+  friend class DetachedPlaceHolder;
+  friend class PerspectiveHelper;
 
 //    private: MenuManager paneMenuManager;
 //    private: ListenerList listeners = new ListenerList();
 //    private: ListenerList partListeners = new ListenerList();
+  private: IPropertyChangeListener::Events propertyChangeEvents;
 
     protected: IWorkbenchPartReference::Pointer partReference;
 
-    protected: WorkbenchPage::Pointer page;
+    protected: SmartPointer<WorkbenchPage> page;
 
     protected: void* control;
 
     private: bool inLayout;
-    
+
 //    private: TraverseListener traverseListener = new TraverseListener() {
 //        /* (non-Javadoc)
-//         * @see org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse.swt.events.TraverseEvent)
+//         * @see org.opencherry.swt.events.TraverseListener#keyTraversed(org.opencherry.swt.events.TraverseEvent)
 //         */
 //        public: void keyTraversed(TraverseEvent e) {
 //            // Hack: Currently, SWT sets focus whenever we call Control.traverse. This doesn't
@@ -79,22 +100,22 @@ public:
 
   private: bool busy;
 
-//   /*static*/ class Sashes {
-//        public: 
-//          Sash left;
-//
-//          Sash right;
-//
-//          Sash top;
-//
-//         Sash bottom;
-//    };
+  //private: SmartPointer<PartStack> partStack;
+
+  protected:
+   /*static*/ class Sashes {
+        public:
+          /*Sash*/ void* left;
+          /*Sash*/ void* right;
+          /*Sash*/ void* top;
+          /*Sash*/ void* bottom;
+    };
 
     /**
      * Construct a pane for a part.
      */
     public: PartPane(IWorkbenchPartReference::Pointer partReference,
-            WorkbenchPage::Pointer workbenchPage);
+            SmartPointer<WorkbenchPage> workbenchPage);
 
 //    public: void addSizeMenuItem(Menu menu, int index) {
 //        //Add size menu
@@ -106,19 +127,21 @@ public:
 //    }
 
     /**
-     * 
+     *
      * Creates the GUI-dependent container control
      * for the part widgets. This is passed to
      * IWorkbenchPart::CreatePartControl(void*)
      */
-    public: virtual void CreateControl(void* parent) = 0;
+    public: virtual void CreateControl(void* parent);
 
-    public: virtual void SetControlEnabled(bool enabled) = 0;
+    //public: virtual void SetControlEnabled(bool enabled) = 0;
+
     /**
      * Create a title bar for the pane if required.
      */
-    protected: virtual void CreateTitleBar() = 0;
+   // protected: virtual void CreateTitleBar() = 0;
 
+    public: bool IsPlaceHolder();
     /**
      * @private:
      */
@@ -128,13 +151,9 @@ public:
      * User has requested to close the pane.
      * Take appropriate action depending on type.
      */
-    public: virtual void DoHide() = 0;
+    public: void DoHide();
 
-
-    /**
-     * Gets the presentation bounds.
-     */
-    public: virtual Rectangle GetBounds() = 0;
+    protected: Rectangle GetParentBounds();
 
     /**
      * Get the control.
@@ -144,24 +163,18 @@ public:
     /**
      * Answer the part child.
      */
-    public: IWorkbenchPartReference::Pointer GetPartReference();
+    public: IWorkbenchPartReference::Pointer GetPartReference() const;
 
     /**
-     * @see Listener
+     * @see GuiTk::IControlListener
      */
-//    public: void handleEvent(Event event) {
-//        if (event.type == SWT.Activate) {
-//            if (inLayout) {
-//                requestActivation();
-//            }
-//        }
-//    }
+    public: void ControlActivated(GuiTk::ControlEvent::Pointer e);
 
 
     /**
      * Move the control over another one.
      */
-    public: virtual void MoveAbove(void* refControl) = 0;
+    public: void MoveAbove(void* refControl);
 
     /**
      * Notify the workbook page that the part pane has
@@ -170,30 +183,23 @@ public:
     public: void RequestActivation();
 
     /**
-     * Sets the parent for this part.
-     */
-    public: void SetContainer(ILayoutContainer::Pointer container);
-
-    /**
      * Shows the receiver if <code>visible</code> is true otherwise hide it.
      */
-    public: virtual void SetVisible(bool makeVisible);
-    public: virtual void SetControlVisible(bool makeVisible) = 0;
-    
+    public: void SetVisible(bool makeVisible);
     public: virtual bool GetVisible();
-    public: virtual bool GetControlVisible() = 0;
-    
+
     /**
      * Sets focus to this part.
      */
     public: void SetFocus();
 
     /**
-     * Sets the workbench page of the view. 
+     * Sets the workbench page of the view.
      */
-    public: void SetWorkbenchPage(WorkbenchPage::Pointer workbenchPage);
+    public: void SetWorkbenchPage(SmartPointer<WorkbenchPage> workbenchPage);
 
-       
+    public: void Reparent(void* newParent);
+
     /**
      * Informs the pane that it's window shell has
      * been activated.
@@ -209,7 +215,7 @@ public:
     /**
      * Indicate focus in part.
      */
-    public: virtual void ShowFocus(bool inFocus) = 0;
+    public: void ShowFocus(bool inFocus);
 
     /**
      * @see IPartDropTarget::targetPartFor
@@ -220,17 +226,12 @@ public:
 
     /**
      * Returns the PartStack that contains this PartPane, or null if none.
-     * 
+     *
      * @return
      */
-//    public: PartStack GetStack() {
-//        ILayoutContainer container = getContainer();
-//        if (container.Cast<PartStack>().IsNotNull()) {
-//            return (PartStack) container;
-//        }
-//
-//        return null;
-//    }
+    //public: SmartPointer<PartStack> GetStack();
+
+    public: void SetContainer(SmartPointer<IStackableContainer> stack);
 
     /**
      * Show a title label menu for this pane.
@@ -257,18 +258,7 @@ public:
     /**
      * Finds and return the sashes around this part.
      */
-//    protected: Sashes findSashes() {
-//        Sashes result = new Sashes();
-//
-//        ILayoutContainer container = getContainer();
-//
-//        if (container == null) {
-//            return result;
-//        }
-//
-//        container.findSashes(this, result);
-//        return result;
-//    }
+    protected: Sashes FindSashes();
 
     /**
      * Enable the user to resize this part using
@@ -323,7 +313,7 @@ public:
     /**
      * Returns the workbench page of this pane.
      */
-    public: WorkbenchPage::Pointer GetPage();
+    public: SmartPointer<WorkbenchPage> GetPage();
 
     /**
      * Add the Left,Right,Up,Botton menu items to the Size menu.
@@ -333,9 +323,9 @@ public:
 //        addSizeItem(sizeMenu,
 //                WorkbenchMessages.PartPane_sizeLeft, sashes.left);
 //        addSizeItem(sizeMenu,
-//                WorkbenchMessages.PartPane_sizeRight, sashes.right); 
+//                WorkbenchMessages.PartPane_sizeRight, sashes.right);
 //        addSizeItem(sizeMenu,
-//                WorkbenchMessages.PartPane_sizeTop, sashes.top); 
+//                WorkbenchMessages.PartPane_sizeTop, sashes.top);
 //        addSizeItem(sizeMenu, WorkbenchMessages.PartPane_sizeBottom, sashes.bottom);
 //    }
 
@@ -350,7 +340,7 @@ public:
     public: virtual void SetBusy(bool isBusy);
 
     /**
-     * Show a highlight for the receiver if it is 
+     * Show a highlight for the receiver if it is
      * not currently the part in the front of its
      * presentation.
      *
@@ -373,7 +363,7 @@ public:
 //    public: void ShowViewMenu(Point location) {
 //
 //    }
-    
+
     public: bool IsBusy();
 
     /**
@@ -383,21 +373,21 @@ public:
      * layouts are the same. However, it should be user-readable in order to
      * help debug failed tests. Although these are english readable strings,
      * they do not need to be translated.
-     * 
+     *
      * @param buf
      */
-    public: void DescribeLayout(std::string& buf);
-    
+    public: void DescribeLayout(std::string& buf) const;
+
     /**
      * @return
      * @since 3.1
      */
-    public: virtual bool IsCloseable() = 0;
-    
+    public: bool IsCloseable();
+
     public: void SetInLayout(bool inLayout);
-    
+
     public: bool GetInLayout();
-        
+
     public: bool AllowsAutoFocus();
 
     /**
@@ -409,58 +399,41 @@ public:
      */
   public: virtual void RemoveContributions();
 
-//    public: void addPropertyListener(IPropertyListener listener) {
-//        listeners.add(listener);
-//    }
-//
-//    public: void removePropertyListener(IPropertyListener listener) {
-//        listeners.remove(listener);
-//    }
-// 
-//    public: void firePropertyChange(int propertyId) {
-//        Object listeners[] = this.listeners.getListeners();
-//        for (int i = 0; i < listeners.length; i++) {
-//            ((IPropertyListener) listeners[i]).propertyChanged(this, propertyId);
-//        }
-//    }
-//    
-//    public: void propertyChanged(Object source, int propId) {
-//        firePropertyChange(propId);
-//    }
-//    
-//    public: void addPartPropertyListener(IPropertyChangeListener listener) {
-//      partListeners.add(listener);
-//    }
-//    
-//    public: void removePartPropertyListener(IPropertyChangeListener listener) {
-//      partListeners.remove(listener);
-//    }
-//    
-//    public: void firePartPropertyChange(PropertyChangeEvent event) {
-//      Object[] l = partListeners.getListeners();
-//      for (int i = 0; i < l.length; i++) {
-//      ((IPropertyChangeListener)l[i]).propertyChange(event);
-//    }
-//    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-     */
-//    public: void propertyChange(PropertyChangeEvent event) {
-//      firePartPropertyChange(event);
-//    }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.LayoutPart#computePreferredSize(boolean, int, int, int)
-     */
-    public: int ComputePreferredSize(bool width, int availableParallel,
-            int availablePerpendicular, int preferredParallel);
+  public: void AddPropertyListener(IPropertyChangeListener::Pointer listener);
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.LayoutPart#getSizeFlags(boolean)
-     */
-    public: int GetSizeFlags(bool horizontal);
-    
+  public: void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
+
+  public: void FirePropertyChange(PropertyChangeEvent::Pointer event);
+
+
+  /* (non-Javadoc)
+   * @see IPropertyChangeListener#PropertyChange(PropertyChangeEvent::Pointer)
+   */
+  public: void PropertyChange(PropertyChangeEvent::Pointer event);
+
+  /* (non-Javadoc)
+   * @see org.opencherry.ui.internal.LayoutPart#computePreferredSize(boolean, int, int, int)
+   */
+  public: int ComputePreferredSize(bool width, int availableParallel,
+          int availablePerpendicular, int preferredParallel);
+
+  /* (non-Javadoc)
+   * @see org.opencherry.ui.internal.LayoutPart#getSizeFlags(boolean)
+   */
+  public: int GetSizeFlags(bool horizontal);
+
+  /**
+   * Informs the pane that it's window shell has
+   * been activated.
+   */
+  public: virtual void ShellActivated();
+
+  /**
+   * Informs the pane that it's window shell has
+   * been deactivated.
+   */
+  public: virtual void ShellDeactivated();
+
 };
 
 }

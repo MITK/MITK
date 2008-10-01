@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryRectangle.h"
@@ -25,7 +25,7 @@ namespace cherry
 Rectangle::Rectangle()
 : x(0), y(0), width(0), height(0)
 {
-  
+
 }
 
 Rectangle::Rectangle(int x_, int y_, int w, int h) :
@@ -54,6 +54,19 @@ bool Rectangle::Contains(int x, int y) const
 {
   return (x >= this->x) && (y >= this->y) && ((x - this->x) < width) && ((y
       - this->y) < height);
+}
+
+Rectangle& Rectangle::FlipXY()
+{
+  int tmp = x;
+  x = y;
+  y = tmp;
+
+  tmp = width;
+  width = height;
+  height = tmp;
+
+  return *this;
 }
 
 bool Rectangle::operator==(const Rectangle& r) const
@@ -111,6 +124,14 @@ bool Rectangle::Intersects(int x, int y, int width, int height) const
 bool Rectangle::Intersects(const Rectangle& rect) const
 {
   return &rect == this || this->Intersects(rect.x, rect.y, rect.width, rect.height);
+}
+
+int Rectangle::GetDimension(bool width) const
+{
+  if (width) {
+    return this->width;
+  }
+  return this->height;
 }
 
 bool Rectangle::IsEmpty () const

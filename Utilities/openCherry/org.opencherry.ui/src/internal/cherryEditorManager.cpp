@@ -1,33 +1,35 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryEditorManager.h"
 
 #include "../cherryIWorkbenchPart.h"
 #include "../cherryIWorkbenchWindow.h"
+#include "../cherryIEditorRegistry.h"
+#include "../cherryUIException.h"
+
 #include "../cherryWorkbenchWindow.h"
 #include "cherryWorkbenchPage.h"
 #include "cherryEditorSite.h"
 #include "cherryEditorReference.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryNullEditorInput.h"
-#include "../cherryIEditorRegistry.h"
-#include "../cherryIEditorAreaHelper.h"
-#include "../cherryUIException.h"
+#include "cherryEditorAreaHelper.h"
+
 
 #include <Poco/Bugcheck.h>
 
@@ -40,12 +42,12 @@ const std::string EditorManager::SAVE_RESOURCES_TITLE = "Save Resources";
 
 EditorManager::EditorManager(WorkbenchWindow::Pointer wind,
     WorkbenchPage::Pointer workbenchPage,
-    IEditorAreaHelper* pres)
+    EditorAreaHelper* pres)
  : editorPresentation(pres), window(wind), page(workbenchPage) {
   poco_check_ptr(editorPresentation);
   poco_assert(window.IsNotNull());
   poco_assert(page.IsNotNull());
-  
+
   //page.getExtensionTracker().registerHandler(this, null);
 }
 
@@ -135,7 +137,7 @@ void EditorManager::CheckDeleteEditorResources()
 //    // Assign the handler for the pin editor keyboard shortcut.
 //    final IHandlerService handlerService = (IHandlerService) window.getWorkbench().getService(IHandlerService.class);
 //    pinEditorHandlerActivation = handlerService.activateHandler(
-//        "org.eclipse.ui.window.pinEditor", pinEditorHandler, //$NON-NLS-1$
+//        "org.opencherry.ui.window.pinEditor", pinEditorHandler, //$NON-NLS-1$
 //        new ActiveShellExpression(shell));
 //  }
 //}
@@ -353,7 +355,7 @@ void EditorManager::FindEditors(
   // delaying plug-in activation further by only restoring the editor
   // input
   // if the editor reference's factory id and name match.
-  
+
 //  std::string name = input->GetName();
 //  IPersistableElement persistable = input.getPersistable();
 //  if (name == null || persistable == null)
@@ -502,7 +504,7 @@ IEditorReference::Pointer EditorManager::OpenEditorFromDescriptor(
 
   if (result.IsNotNull())
   {
-    this->CreateEditorTab(result.Cast<EditorReference>()); //$NON-NLS-1$
+    this->CreateEditorTab(result.Cast<EditorReference>(), ""); //$NON-NLS-1$
   }
 
 //  Workbench wb = (Workbench) window.getWorkbench();
@@ -566,9 +568,9 @@ IEditorReference::Pointer EditorManager::OpenEditorFromDescriptor(
 //  return null;
 //}
 
-void EditorManager::CreateEditorTab(EditorReference::Pointer ref)
+void EditorManager::CreateEditorTab(EditorReference::Pointer ref, const std::string& workbookId)
 {
-  editorPresentation->AddEditor(ref);
+  editorPresentation->AddEditor(ref, workbookId);
 }
 
 EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
@@ -588,7 +590,7 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
   try
   {
     part->Init(site, input);
-    
+
     // Sanity-check the site
     if (!(part->GetSite() == site) || !(part->GetEditorSite() == site))
     {
@@ -897,7 +899,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //            }
 //
 //                  modelsToSave = convertToSaveables(dirtyParts, closing, addNonPartSources);
-//                  
+//
 //                  // If nothing to save, return.
 //                  if (modelsToSave.isEmpty()) {
 //              return true;
@@ -915,7 +917,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //              MessageDialog d = new MessageDialog(
 //                shellProvider.getShell(), WorkbenchMessages.Save_Resource,
 //                null, message, MessageDialog.QUESTION, buttons, 0);
-//              
+//
 //              int choice = SaveableHelper.testGetAutomatedResponse();
 //              if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
 //                choice = d.open();
@@ -941,7 +943,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //                            new WorkbenchPartLabelProvider(), RESOURCES_TO_SAVE_MESSAGE);
 //                    dlg.setInitialSelections(modelsToSave.toArray());
 //                    dlg.setTitle(SAVE_RESOURCES_TITLE);
-//        
+//
 //                    // this "if" statement aids in testing.
 //                    if (SaveableHelper.testGetAutomatedResponse()==SaveableHelper.USER_RESPONSE) {
 //                      int result = dlg.open();
@@ -949,7 +951,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //                        if (result == IDialogConstants.CANCEL_ID) {
 //                  return false;
 //                }
-//        
+//
 //                        modelsToSave = Arrays.asList(dlg.getResult());
 //                    }
 //                  }
@@ -962,7 +964,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //              if (modelsToSave.isEmpty()) {
 //            return true;
 //          }
-//          
+//
 //          // Create save block.
 //              final List finalModels = modelsToSave;
 //          IRunnableWithProgress progressOp = new IRunnableWithProgress() {
@@ -992,8 +994,9 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       return true;
     }
 
-    bool EditorManager::SavePart(IEditorPart::Pointer part, bool confirm)
+    bool EditorManager::SavePart(ISaveablePart::Pointer saveable, IWorkbenchPart::Pointer part, bool confirm)
     {
+      //TODO EditorManager save part (SaveableHelper)
       //return SaveableHelper.savePart(saveable, part, window, confirm);
       return true;
     }
@@ -1074,7 +1077,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
         std::vector<IEditorReference::Pointer>& activeEditor)
     {
       // MultiStatus result) {
-      
+
       // String strFocus = editorMem.getString(IWorkbenchConstants.TAG_FOCUS);
       // boolean visibleEditor = "true".equals(strFocus); //$NON-NLS-1$
 //      EditorReference::Pointer e = new EditorReference(this, editorMem);
@@ -1258,7 +1261,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       EditorReference::Pointer result = new EditorReference(this, input, desc);
       try
       {
-        this->CreateEditorTab(result); //$NON-NLS-1$
+        this->CreateEditorTab(result, ""); //$NON-NLS-1$
         return result;
       }
       catch (PartInitException e)

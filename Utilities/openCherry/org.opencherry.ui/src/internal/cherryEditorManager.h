@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYEDITORMANAGER_H_
@@ -39,17 +39,17 @@ class WorkbenchPage;
 class EditorSite;
 class EditorReference;
 struct IEditorRegistry;
-struct IEditorAreaHelper;
+class EditorAreaHelper;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * Manage a group of element editors. Prevent the creation of two editors on the
  * same element.
- * 
+ *
  * 06/12/00 - DS - Given the ambiguous editor input type, the manager delegates
  * a number of responsibilities to the editor itself.
- * 
+ *
  * <ol>
  * <li>The editor should determine its own title.</li>
  * <li>The editor should listen to resource deltas and close itself if the
@@ -63,8 +63,8 @@ class EditorManager
 
   friend class EditorReference;
 
-  IEditorAreaHelper* editorPresentation;
-  
+  EditorAreaHelper* editorPresentation;
+
   SmartPointer<WorkbenchWindow> window;
 
   SmartPointer<WorkbenchPage> page;
@@ -93,7 +93,7 @@ public:
    */
   EditorManager(SmartPointer<WorkbenchWindow> window,
       SmartPointer<WorkbenchPage> workbenchPage,
-      IEditorAreaHelper* pres);
+      EditorAreaHelper* pres);
 
 protected:
 
@@ -118,7 +118,7 @@ protected:
 
   /**
    * Method to create the editor's pin ImageDescriptor
-   * 
+   *
    * @return the single image descriptor for the editor's pin icon
    */
   //  ImageDescriptor GetEditorPinImageDesc() {
@@ -171,7 +171,7 @@ protected:
   /**
    * Returns an open editor matching the given editor input. If none match,
    * returns <code>null</code>.
-   * 
+   *
    * @param input
    *            the editor input
    * @return the matching editor, or <code>null</code> if no match fond
@@ -182,7 +182,7 @@ public:
   /**
    * Returns an open editor matching the given editor input and/or editor id,
    * as specified by matchFlags. If none match, returns <code>null</code>.
-   * 
+   *
    * @param editorId
    *            the editor id
    * @param input
@@ -200,7 +200,7 @@ public:
    * Returns the open editor references matching the given editor input and/or
    * editor id, as specified by matchFlags. If none match, returns an empty
    * array.
-   * 
+   *
    * @param editorId
    *            the editor id
    * @param input
@@ -217,7 +217,7 @@ public:
   /**
    * Returns an open editor matching the given editor id and/or editor input.
    * Returns <code>null</code> if none match.
-   * 
+   *
    * @param editorId
    *            the editor id
    * @param input
@@ -308,11 +308,11 @@ public:
 //private:
 //  IEditorReference::Pointer OpenExternalEditor(EditorDescriptor::Pointer desc,
 //      IEditorInput::Pointer input);
-  
+
   /*
    * Opens an editor part.
    */
-private: void CreateEditorTab(SmartPointer<EditorReference> ref);
+private: void CreateEditorTab(SmartPointer<EditorReference> ref, const std::string& workbookId);
 
   /*
    * Create the site and initialize it with its action bars.
@@ -342,7 +342,7 @@ protected:
   //ImageDescriptor FindImage(EditorDescriptor::Pointer desc, Poco::Path path);
 
   /**
-   * @see org.eclipse.ui.IPersistable
+   * @see org.opencherry.ui.IPersistable
    */
 public:
   /*IStatus*/bool RestoreState(IMemento::Pointer memento);
@@ -360,7 +360,7 @@ public:
 
   /**
    * Saves the given dirty editors and views, optionally prompting the user.
-   * 
+   *
    * @param dirtyParts
    *            the dirty views and editors
    * @param confirm
@@ -384,8 +384,7 @@ public:
    * Saves the workbench part.
    */
 public:
-  bool SavePart(/*ISaveablePart::Pointer saveable,*/ SmartPointer<IEditorPart> part,
-      bool confirm);
+  bool SavePart(ISaveablePart::Pointer saveable, IWorkbenchPart::Pointer part, bool confirm);
 
   /**
    * @see IPersistablePart
@@ -396,7 +395,7 @@ public:
   /**
    * Shows an editor. If <code>setFocus == true</code> then give it focus,
    * too.
-   * 
+   *
    * @return true if the active editor was changed, false if not.
    */
 public:
@@ -422,11 +421,6 @@ protected:
 public:
   IMemento::Pointer GetMemento(IEditorReference::Pointer e);
 
-  /**
-   * @return
-   */
-  /*package*/
-protected:
   IEditorReference::Pointer OpenEmptyTab();
 
 public:

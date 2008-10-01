@@ -6,6 +6,14 @@
       <run class="QmitkApplication"/>
     </application>
   </extension>
+  
+  <extension point="org.opencherry.ui.perspectives">
+    <perspective
+      id="org.mitk.perspectives.default"
+      name="Default Perspective"
+      class="QmitkDefaultPerspective">
+    </perspective>
+  </extension>
    
   <extension point="org.opencherry.ui.editors">
     <editor

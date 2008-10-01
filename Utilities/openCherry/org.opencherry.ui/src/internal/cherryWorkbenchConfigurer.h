@@ -84,13 +84,13 @@ public:
     WorkbenchConfigurer();
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#getWorkbench
      */
     IWorkbench* GetWorkbench();
 
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#declareImage
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#declareImage
      */
 //    void declareImage(String symbolicName, ImageDescriptor descriptor,
 //            boolean shared) {
@@ -101,22 +101,22 @@ public:
 //    }
 
     /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#getWindowConfigurer
      */
     IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer(IWorkbenchWindow::Pointer window);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
      */
     bool GetSaveAndRestore();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#setSaveAndRestore(boolean)
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#setSaveAndRestore(boolean)
      */
     void SetSaveAndRestore(bool enabled);
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getData
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#getData
      */
 //    Object getData(String key) {
 //        if (key == null) {
@@ -126,7 +126,7 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#setData(String, Object)
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#setData(String, Object)
      */
 //    void setData(String key, Object data) {
 //        if (key == null) {
@@ -140,37 +140,37 @@ public:
 //    }
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClose()
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#emergencyClose()
      */
     void EmergencyClose();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClosing()
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#emergencyClosing()
      */
     bool EmergencyClosing();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreState()
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#restoreState()
      */
     bool RestoreState();
 
     /* (non-Javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#openFirstTimeWindow()
+     * @see org.opencherry.ui.application.IWorkbenchConfigurer#openFirstTimeWindow()
      */
     void OpenFirstTimeWindow();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreWorkbenchWindow(org.eclipse.ui.IMemento)
+   * @see org.opencherry.ui.application.IWorkbenchConfigurer#restoreWorkbenchWindow(org.opencherry.ui.IMemento)
    */
   IWorkbenchWindowConfigurer::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento);
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.application.IWorkbenchConfigurer#getExitOnLastWindowClose()
+   * @see org.opencherry.ui.application.IWorkbenchConfigurer#getExitOnLastWindowClose()
    */
   bool GetExitOnLastWindowClose();
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.application.IWorkbenchConfigurer#setExitOnLastWindowClose(boolean)
+   * @see org.opencherry.ui.application.IWorkbenchConfigurer#setExitOnLastWindowClose(boolean)
    */
   void SetExitOnLastWindowClose(bool enabled);
 };

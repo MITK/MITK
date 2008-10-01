@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.ui">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.ui" id="perspective" name="Perspectives"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to add perspective factories to the workbench.  A perspective factory is used to define the initial layout and visible action sets for a perspective.  The user can select a perspective by invoking the &quot;Open Perspective&quot; submenu of the &quot;Window&quot; menu.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="perspective" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="perspective">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="name" icon="icon"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="description" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a unique name that will be used to identify this perspective.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a translatable name that will be used in the workbench window menu bar to represent this perspective.
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified name of the class that implements 
+&lt;samp&gt;org.eclipse.ui.IPerspectiveFactory&lt;/samp&gt; interface.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IPerspectiveFactory"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  a relative name of the icon that will be associated 
+with this perspective.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="fixed" type="boolean">
+            <annotation>
+               <documentation>
+                  indicates whether the layout of the perspective is fixed.  If true, then views created by the perspective factory are not closeable, and cannot be moved.  The default is false.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="description" type="string">
+      <annotation>
+         <appInfo>
+            <meta.element translatable="true"/>
+         </appInfo>
+         <documentation>
+            an optional subelement whose body should contain text providing a short description of the perspective.
+         </documentation>
+      </annotation>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         The following is an example of a perspective extension: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension 
+        point=&quot;org.eclipse.ui.perspectives&quot;&gt; 
+        &lt;perspective 
+            id=&quot;org.eclipse.ui.resourcePerspective&quot; 
+            name=&quot;Resource&quot; 
+            class=&quot;org.eclipse.ui.internal.ResourcePerspective&quot; 
+            icon=&quot;icons/MyIcon.gif&quot;&gt; 
+        &lt;/perspective&gt; 
+    &lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be the 
+fully qualified name of a class that implements 
+&lt;samp&gt;org.eclipse.ui.IPerspectiveFactory&lt;/samp&gt;. 
+The class must supply the initial layout for a 
+perspective when asked by the workbench.
+&lt;p&gt;
+The &lt;samp&gt;plugin_customization.ini&lt;/samp&gt; file is used to define the default perspective.  The &lt;i&gt;default perspective&lt;/i&gt; is the first perspective which appears when the product is launched after install.  It is also used when the user opens a page or window with no specified perspective.  The default perspective is defined as a property within the plugin_customization.ini, as shown below.  The user may also override this perspective from the workbench perspectives preference page. 
+&lt;pre&gt;
+    defaultPerspectiveId = org.eclipse.ui.resourcePerspective 
+&lt;/pre&gt;
+The perspectives which appear in the &quot;Open Perspective&quot; menu are shortcuts for perspective selection.  This set is defined by the active perspective itself, and extensions made through the perspectiveExtensions extension point.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         The workbench provides a &quot;Resource Perspective&quot;.  
+Additional perspectives may be added by plug-ins. 
+They are selected using the &quot;Open Perspective&quot; submenu of the &quot;Window&quot; menu.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

@@ -32,7 +32,7 @@ std::map<std::string, Expression::Pointer>& DefinitionRegistry::GetCache()
 
 DefinitionRegistry::DefinitionRegistry()
 {
-  //Platform.getExtensionRegistry().addRegistryChangeListener(this, "org.eclipse.core.expressions"); //$NON-NLS-1$
+  //Platform.getExtensionRegistry().addRegistryChangeListener(this, "org.opencherry.core.expressions"); //$NON-NLS-1$
 }
 
 Expression::Pointer DefinitionRegistry::GetExpression(const std::string& id)

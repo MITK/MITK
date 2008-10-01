@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef IWORKBENCHPART_H_
@@ -20,8 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "cherryIPropertyChangeListener.h"
+
 #include <cherryMacros.h>
 
+#include <map>
 
 namespace cherry {
 
@@ -30,17 +33,17 @@ struct IWorkbenchPartSite;
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * A workbench part is a visual component within a workbench page.  There
  * are two subtypes: view and editor, as defined by <code>IViewPart</code> and
- * <code>IEditorPart</code>.  
+ * <code>IEditorPart</code>.
  * <p>
- * A view is typically used to navigate a hierarchy of information (like the 
- * workspace), open an editor, or display properties for the active editor.  
- * Modifications made in a view are saved immediately.  
+ * A view is typically used to navigate a hierarchy of information (like the
+ * workspace), open an editor, or display properties for the active editor.
+ * Modifications made in a view are saved immediately.
  * </p><p>
- * An editor is typically used to edit or browse a document or input object. 
- * The input is identified using an <code>IEditorInput</code>.  Modifications made 
+ * An editor is typically used to edit or browse a document or input object.
+ * The input is identified using an <code>IEditorInput</code>.  Modifications made
  * in an editor part follow an open-save-close lifecycle model.
  * </p><p>
  * This interface may be implemented directly.  For convenience, a base
@@ -55,8 +58,8 @@ struct IWorkbenchPartSite;
  *    <li>call <code>part.init(site)</code></li>
  *    </ul>
  *  <li>When a part becomes visible in the workbench:
- *    <ul> 
- *    <li>add part to presentation by calling 
+ *    <ul>
+ *    <li>add part to presentation by calling
  *        <code>part.createControl(parent)</code> to create actual widgets</li>
  *    <li>fire <code>partOpened</code> event to all listeners</li>
  *    </ul>
@@ -80,21 +83,21 @@ struct IWorkbenchPartSite;
  * </ul>
  * </p>
  * <p>
- * After <code>createPartControl</code> has been called, the implementor may 
- * safely reference the controls created.  When the part is closed 
+ * After <code>createPartControl</code> has been called, the implementor may
+ * safely reference the controls created.  When the part is closed
  * these controls will be disposed as part of an SWT composite.  This
  * occurs before the <code>IWorkbenchPart.dispose</code> method is called.
- * If there is a need to free SWT resources the part should define a dispose 
+ * If there is a need to free SWT resources the part should define a dispose
  * listener for its own control and free those resources from the dispose
- * listener.  If the part invokes any method on the disposed SWT controls 
- * after this point an <code>SWTError</code> will be thrown.  
+ * listener.  If the part invokes any method on the disposed SWT controls
+ * after this point an <code>SWTError</code> will be thrown.
  * </p>
  * <p>
- * The last method called on <code>IWorkbenchPart</code> is <code>dispose</code>.  
+ * The last method called on <code>IWorkbenchPart</code> is <code>dispose</code>.
  * This signals the end of the part lifecycle.
  * </p>
  * <p>
- * An important point to note about this lifecycle is that following 
+ * An important point to note about this lifecycle is that following
  * a call to init, createControl may never be called. Thus in the dispose
  * method, implementors must not assume controls were created.
  * </p>
@@ -106,12 +109,12 @@ struct IWorkbenchPartSite;
  * @see IViewPart
  * @see IEditorPart
  */
-struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
+struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
 
   cherryClassMacro(IWorkbenchPart)
-  
+
   virtual ~IWorkbenchPart() {}
-  
+
     /**
      * The property id for <code>getTitle</code>, <code>getTitleImage</code>
      * and <code>getTitleToolTip</code>.
@@ -127,7 +130,7 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
      *
      * @param listener a property listener
      */
-    //virtual void AddPropertyListener(IPropertyListener listener) = 0;
+    virtual void AddPropertyListener(IPropertyChangeListener::Pointer listener) = 0;
 
     /**
      * Creates the controls for this workbench part.
@@ -142,7 +145,7 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
      *   <li>Set the parent layout as needed.</li>
      *   <li>Register any global actions with the site's <code>IActionBars</code>.</li>
      *   <li>Register any context menus with the site.</li>
-     *   <li>Register a selection provider with the site, to make it available to 
+     *   <li>Register a selection provider with the site, to make it available to
      *     the workbench's <code>ISelectionService</code> (optional). </li>
      * </ol>
      * </p>
@@ -156,17 +159,17 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
      * <code>null</code> while the workbench part is being initialized. After
      * the initialization is complete, this value must be non-<code>null</code>
      * for the remainder of the part's life cycle.
-     * 
+     *
      * @return The part site; this value may be <code>null</code> if the part
      *         has not yet been initialized
      */
     virtual SmartPointer<IWorkbenchPartSite> GetSite() = 0;
 
-    
+
     /**
      * Returns the name of this part. If this value changes the part must fire a
      * property listener event with {@link IWorkbenchPartConstants#PROP_PART_NAME}.
-     * 
+     *
      * @return the name of this view, or the empty string if the name is being managed
      * by the workbench (not <code>null</code>)
      */
@@ -174,20 +177,20 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
 
     /**
      * Returns the content description of this part. The content description is an optional
-     * user-readable string that describes what is currently being displayed in the part. 
+     * user-readable string that describes what is currently being displayed in the part.
      * By default, the workbench will display the content description in a line
      * near the top of the view or editor.
      * An empty string indicates no content description
      * text. If this value changes the part must fire a property listener event
      * with {@link IWorkbenchPartConstants#PROP_CONTENT_DESCRIPTION}.
-     * 
+     *
      * @return the content description of this part (not <code>null</code>)
      */
     virtual std::string GetContentDescription() = 0;
 
     /**
-     * Returns the title image of this workbench part.  If this value changes 
-     * the part must fire a property listener event with 
+     * Returns the title image of this workbench part.  If this value changes
+     * the part must fire a property listener event with
      * <code>PROP_TITLE</code>.
      * <p>
      * The title image is usually used to populate the title bar of this part's
@@ -200,13 +203,13 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
     //virtual Image GetTitleImage() = 0;
 
     /**
-     * Returns the title tool tip text of this workbench part. 
+     * Returns the title tool tip text of this workbench part.
      * An empty string result indicates no tool tip.
-     * If this value changes the part must fire a property listener event with 
+     * If this value changes the part must fire a property listener event with
      * <code>PROP_TITLE</code>.
      * <p>
-     * The tool tip text is used to populate the title bar of this part's 
-     * visual container.  
+     * The tool tip text is used to populate the title bar of this part's
+     * visual container.
      * </p>
      *
      * @return the workbench part title tool tip (not <code>null</code>)
@@ -219,7 +222,39 @@ struct CHERRY_UI IWorkbenchPart : public Object { // public IAdaptable {
      *
      * @param listener a property listener
      */
-    //virtual void RemovePropertyListener(IPropertyListener listener) = 0;
+    virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener) = 0;
+
+    /**
+     * Return the value for the arbitrary property key, or <code>null</code>.
+     *
+     * @param key
+     *            the arbitrary property. Must not be <code>null</code>.
+     * @return the property value, or <code>null</code>.
+     */
+    virtual std::string GetPartProperty(const std::string& key) = 0;
+
+    /**
+     * Set an arbitrary property on the part. It is the implementor's
+     * responsibility to fire the corresponding PropertyChangeEvent.
+     * <p>
+     * A default implementation has been added to WorkbenchPart.
+     * </p>
+     *
+     * @param key
+     *            the arbitrary property. Must not be <code>null</code>.
+     * @param value
+     *            the property value. A <code>null</code> value will remove
+     *            that property.
+     */
+    virtual void SetPartProperty(const std::string& key, const std::string& value) = 0;
+
+    /**
+     * Return an unmodifiable map of the arbitrary properties. This method can
+     * be used to save the properties during workbench save/restore.
+     *
+     * @return A Map of the properties. Must not be <code>null</code>.
+     */
+    virtual const std::map<std::string, std::string>& GetPartProperties() = 0;
 
     /**
      * Asks this part to take focus within the workbench.

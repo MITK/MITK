@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYWORKBENCHPAGEPARTLIST_H_
@@ -22,22 +22,26 @@
 
 #include "cherryPartList.h"
 #include "cherryPartService.h"
+#include "cherryPageSelectionService.h"
 
 namespace cherry
 {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
 class WorkbenchPagePartList : public PartList
 {
+public:
+
+  cherryClassMacro(WorkbenchPagePartList);
 
 private:
 
-  //PageSelectionService selectionService;
+  PageSelectionService* selectionService;
 
-  PartService partService; // = new PartService(UIListenerLogging.PAGE_PARTLISTENER_EVENTS, 
+  PartService partService; // = new PartService(UIListenerLogging.PAGE_PARTLISTENER_EVENTS,
   //UIListenerLogging.PAGE_PARTLISTENER2_EVENTS);
 
 
@@ -64,7 +68,7 @@ protected:
 
 public:
 
-  WorkbenchPagePartList(/*PageSelectionService selectionService*/);
+  WorkbenchPagePartList(PageSelectionService* selectionService);
 
   IPartService* GetPartService();
 

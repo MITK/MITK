@@ -19,10 +19,15 @@
 
 #include "../tweaklets/cherryWorkbenchTweaklet.h"
 
+#include "cherrySaveablesList.h"
 #include "cherryViewRegistry.h"
 #include "cherryEditorRegistry.h"
+#include "cherryServiceLocatorCreator.h"
+#include "../dialogs/cherryMessageDialog.h"
+#include "../cherryWorkbenchWindow.h"
 
 #include "cherryWorkbenchPlugin.h"
+#include "cherryWorkbenchConstants.h"
 
 #include <Poco/Bugcheck.h>
 
@@ -41,13 +46,32 @@ int Workbench::CreateAndRunWorkbench(WorkbenchAdvisor* advisor)
   return returnCode;
 }
 
+Workbench::ServiceLocatorOwner::ServiceLocatorOwner(Workbench* wb)
+ : workbench(wb)
+ {
+
+ }
+
+void Workbench::ServiceLocatorOwner::Dispose() {
+  MessageDialog::OpenInformation(
+              0,
+              "Restart needed",
+              "A required plug-in is no longer available and the Workbench needs to be restarted. You will be prompted to save if there is any unsaved work.");
+  workbench->Close(PlatformUI::RETURN_RESTART, true);
+}
+
+
 Workbench::Workbench(WorkbenchAdvisor* advisor)
+ : serviceLocatorOwner(this), largeUpdates(0)
 {
   poco_check_ptr(advisor);
 
   this->advisor = advisor;
   Workbench::instance = this;
 
+  IServiceLocatorCreator::Pointer slc = new ServiceLocatorCreator();
+  this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(0, 0, &serviceLocatorOwner));
+  serviceLocator->RegisterService(IServiceLocatorCreator::GetManifestName(), slc);
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
 
@@ -58,7 +82,17 @@ Workbench* Workbench::GetInstance()
 
 Workbench::~Workbench()
 {
+  delete serviceLocator;
+}
 
+Object::Pointer Workbench::GetService(const std::string& key) const
+{
+return serviceLocator->GetService(key);
+}
+
+bool Workbench::HasService(const std::string& key) const
+{
+  return serviceLocator->HasService(key);
 }
 
 bool Workbench::Init()
@@ -88,7 +122,7 @@ bool Workbench::Init()
   //workbenchActivitySupport = new WorkbenchActivitySupport();
   //activityHelper = ActivityPersistanceHelper.getInstance();
 
-  //    initializeDefaultServices();
+  this->InitializeDefaultServices();
   //    initializeFonts();
   //    initializeColors();
   //    initializeApplicationColors();
@@ -115,6 +149,170 @@ bool Workbench::Init()
   return true;
 }
 
+void Workbench::InitializeDefaultServices()
+{
+
+//    final IContributionService contributionService = new ContributionService(
+//        getAdvisor());
+//    serviceLocator.registerService(IContributionService.class,
+//        contributionService);
+//
+//    // TODO Correctly order service initialization
+//    // there needs to be some serious consideration given to
+//    // the services, and hooking them up in the correct order
+//    final IEvaluationService evaluationService =
+//      (IEvaluationService) serviceLocator.getService(IEvaluationService.class);
+//
+//
+//
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+        serviceLocator->RegisterService(ISaveablesLifecycleListener::GetManifestName(),
+            new SaveablesList());
+//      }});
+//
+//    /*
+//     * Phase 1 of the initialization of commands. When this phase completes,
+//     * all the services and managers will exist, and be accessible via the
+//     * getService(Object) method.
+//     */
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        Command.DEBUG_COMMAND_EXECUTION = Policy.DEBUG_COMMANDS;
+//        commandManager = new CommandManager();
+//      }});
+//
+//    final CommandService [] commandService = new CommandService[1];
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        commandService[0] = new CommandService(commandManager);
+//        commandService[0].readRegistry();
+//        serviceLocator.registerService(ICommandService.class, commandService[0]);
+//
+//      }});
+//
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        ContextManager.DEBUG = Policy.DEBUG_CONTEXTS;
+//        contextManager = new ContextManager();
+//        }});
+//
+//    final IContextService contextService = new ContextService(
+//        contextManager);
+//
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        contextService.readRegistry();
+//        }});
+//
+//    serviceLocator.registerService(IContextService.class, contextService);
+//
+//
+//    final IBindingService [] bindingService = new BindingService[1];
+//
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        BindingManager.DEBUG = Policy.DEBUG_KEY_BINDINGS;
+//        bindingManager = new BindingManager(contextManager, commandManager);
+//        bindingService[0] = new BindingService(
+//            bindingManager, commandService[0], Workbench.this);
+//
+//      }});
+//
+//    bindingService[0].readRegistryAndPreferences(commandService[0]);
+//    serviceLocator.registerService(IBindingService.class, bindingService[0]);
+//
+//    final CommandImageManager commandImageManager = new CommandImageManager();
+//    final CommandImageService commandImageService = new CommandImageService(
+//        commandImageManager, commandService[0]);
+//    commandImageService.readRegistry();
+//    serviceLocator.registerService(ICommandImageService.class,
+//        commandImageService);
+//
+//    final WorkbenchMenuService menuService = new WorkbenchMenuService(serviceLocator);
+//
+//    serviceLocator.registerService(IMenuService.class, menuService);
+//    // the service must be registered before it is initialized - its
+//    // initialization uses the service locator to address a dependency on
+//    // the menu service
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        menuService.readRegistry();
+//      }});
+//
+//    /*
+//     * Phase 2 of the initialization of commands. The source providers that
+//     * the workbench provides are creating and registered with the above
+//     * services. These source providers notify the services when particular
+//     * pieces of workbench state change.
+//     */
+//    final SourceProviderService sourceProviderService = new SourceProviderService(serviceLocator);
+//    serviceLocator.registerService(ISourceProviderService.class,
+//        sourceProviderService);
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        // this currently instantiates all players ... sigh
+//        sourceProviderService.readRegistry();
+//        ISourceProvider[] sp = sourceProviderService.getSourceProviders();
+//        for (int i = 0; i < sp.length; i++) {
+//          evaluationService.addSourceProvider(sp[i]);
+//          if (!(sp[i] instanceof ActiveContextSourceProvider)) {
+//            contextService.addSourceProvider(sp[i]);
+//          }
+//        }
+//      }});
+//
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        // these guys are need to provide the variables they say
+//        // they source
+//        actionSetSourceProvider = (ActionSetSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_ACTION_SETS_NAME);
+//
+//        FocusControlSourceProvider focusControl = (FocusControlSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_FOCUS_CONTROL_ID_NAME);
+//        serviceLocator.registerService(IFocusService.class,
+//            focusControl);
+//
+//        menuSourceProvider = (MenuSourceProvider) sourceProviderService
+//            .getSourceProvider(ISources.ACTIVE_MENU_NAME);
+//      }});
+//
+//    /*
+//     * Phase 3 of the initialization of commands. This handles the creation
+//     * of wrappers for legacy APIs. By the time this phase completes, any
+//     * code trying to access commands through legacy APIs should work.
+//     */
+//    final IHandlerService[] handlerService = new IHandlerService[1];
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+//        handlerService[0] = (IHandlerService) serviceLocator
+//            .getService(IHandlerService.class);
+//      }
+//    });
+//    workbenchContextSupport = new WorkbenchContextSupport(this,
+//        contextManager);
+//    workbenchCommandSupport = new WorkbenchCommandSupport(bindingManager,
+//        commandManager, contextManager, handlerService[0]);
+//    initializeCommandResolver();
+//
+//    addWindowListener(windowListener);
+//    bindingManager.addBindingManagerListener(bindingManagerListener);
+//
+//    serviceLocator.registerService(ISelectionConversionService.class,
+//        new SelectionConversionService());
+  }
+
 int Workbench::RunUI()
 {
 
@@ -136,9 +334,64 @@ int Workbench::RunUI()
   return Tweaklets::Get(WorkbenchTweaklet::KEY)->RunEventLoop();
 }
 
+std::string Workbench::GetDefaultPerspectiveId()
+{
+  return this->GetAdvisor()->GetInitialWindowPerspectiveId();
+}
+
 IAdaptable* Workbench::GetDefaultPageInput()
 {
   return this->GetAdvisor()->GetDefaultPageInput();
+}
+
+std::string Workbench::GetPresentationId() {
+    if (factoryID != "") {
+      return factoryID;
+    }
+
+    //factoryID = PrefUtil.getAPIPreferenceStore().getString(
+    //    IWorkbenchPreferenceConstants.PRESENTATION_FACTORY_ID);
+
+    // Workaround for bug 58975 - New preference mechanism does not properly
+    // initialize defaults
+    // Ensure that the UI plugin has started too.
+    factoryID = WorkbenchConstants::DEFAULT_PRESENTATION_ID;
+
+    return factoryID;
+  }
+
+void Workbench::LargeUpdateStart() {
+  if (largeUpdates++ == 0) {
+    // TODO Consider whether these lines still need to be here.
+    // workbenchCommandSupport.setProcessing(false);
+    // workbenchContextSupport.setProcessing(false);
+
+    std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
+    for (unsigned int i = 0; i < windows.size(); i++) {
+      IWorkbenchWindow::Pointer window = windows[i];
+      if (window.Cast<WorkbenchWindow>() != 0) {
+        window.Cast<WorkbenchWindow>()->LargeUpdateStart();
+      }
+    }
+  }
+}
+
+
+void Workbench::LargeUpdateEnd() {
+  if (--largeUpdates == 0) {
+    // TODO Consider whether these lines still need to be here.
+    // workbenchCommandSupport.setProcessing(true);
+    // workbenchContextSupport.setProcessing(true);
+
+    // Perform window-specific blocking.
+    std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
+    for (unsigned int i = 0; i < windows.size(); i++) {
+      IWorkbenchWindow::Pointer window = windows[i];
+      if (window.Cast<WorkbenchWindow>() != 0) {
+        window.Cast<WorkbenchWindow>()->LargeUpdateEnd();
+      }
+    }
+  }
 }
 
 void Workbench::OpenFirstTimeWindow()
@@ -152,10 +405,7 @@ void Workbench::OpenFirstTimeWindow()
     input = this->GetDefaultPageInput();
     //  }});
 
-    //TODO perspective
-    //this->BusyOpenWorkbenchWindow(getPerspectiveRegistry()
-    //    .getDefaultPerspective(), input[0]);
-    this->BusyOpenWorkbenchWindow("bla", input);
+    this->BusyOpenWorkbenchWindow(this->GetPerspectiveRegistry()->GetDefaultPerspective(), input);
   } catch (WorkbenchException& e)
   {
     // Don't use the window's shell as the dialog parent,
@@ -167,7 +417,7 @@ void Workbench::OpenFirstTimeWindow()
     //        WorkbenchMessages.Problems_Opening_Page, e.getMessage(), e
     //            .getStatus());
     //  }});
-    std::cout << "Error: Problems opening page. " << e.what() << std::endl;
+    std::cout << "Error: Problems opening page. " << e.displayText() << std::endl;
   }
 }
 
@@ -193,6 +443,11 @@ IViewRegistry* Workbench::GetViewRegistry()
 IEditorRegistry* Workbench::GetEditorRegistry()
 {
   return WorkbenchPlugin::GetDefault()->GetEditorRegistry();
+}
+
+IPerspectiveRegistry* Workbench::GetPerspectiveRegistry()
+{
+  return WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry();
 }
 
 bool Workbench::Close()
@@ -321,7 +576,15 @@ int Workbench::GetWorkbenchWindowCount()
 
 std::vector<IWorkbenchWindow::Pointer> Workbench::GetWorkbenchWindows()
 {
-  return windowManager.GetWindows();
+  std::vector<Window::Pointer> windows = windowManager.GetWindows();
+  std::vector<IWorkbenchWindow::Pointer> result;
+  for (std::vector<Window::Pointer>::iterator iter = windows.begin();
+       iter != windows.end(); ++iter)
+  {
+    result.push_back(iter->Cast<WorkbenchWindow>());
+  }
+
+  return result;
 }
 
 IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(
@@ -634,17 +897,15 @@ void Workbench::SetActivatedWindow(WorkbenchWindow::Pointer window)
 
 WorkbenchWindow::Pointer Workbench::NewWorkbenchWindow()
 {
-  WorkbenchWindow::Pointer wbw =
-      Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateWorkbenchWindow(
-          this->GetNewWindowNumber());
-  wbw->Init();
+  WorkbenchWindow::Pointer wbw = new WorkbenchWindow(this->GetNewWindowNumber());
+  //wbw->Init();
   return wbw;
 }
 
 int Workbench::GetNewWindowNumber()
 {
   // Get window list.
-  std::vector<IWorkbenchWindow::Pointer> windows = windowManager.GetWindows();
+  std::vector<Window::Pointer> windows = windowManager.GetWindows();
   int count = windows.size();
 
   // Create an array of booleans (size = window count).
@@ -696,7 +957,7 @@ IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(
   //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
   //  public void runWithException() {
-  //    newWindow.create(); // must be created before adding to window
+      newWindow->Create(); // must be created before adding to window
   // manager
   //  }
   //});
@@ -711,7 +972,7 @@ IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(
     try
     {
       newWindow->BusyOpenPage(perspID, input);
-    } catch (WorkbenchException e)
+    } catch (WorkbenchException& e)
     {
       windowManager.Remove(newWindow);
       throw e;
@@ -731,51 +992,31 @@ IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(
 
 void Workbench::AddWorkbenchListener(IWorkbenchListener::Pointer listener)
 {
-  workbenchEvents.postShutdown.AddListener(listener.GetPointer(),
-      &IWorkbenchListener::PostShutdown);
-  workbenchEvents.preShutdown.AddListener(listener.GetPointer(),
-        &IWorkbenchListener::PreShutdown);
+  workbenchEvents.AddListener(listener);
 }
 
 void Workbench::RemoveWorkbenchListener(IWorkbenchListener::Pointer listener)
 {
-  workbenchEvents.postShutdown.RemoveListener(listener.GetPointer(),
-      &IWorkbenchListener::PostShutdown);
-  workbenchEvents.preShutdown.RemoveListener(listener.GetPointer(),
-        &IWorkbenchListener::PreShutdown);
+  workbenchEvents.RemoveListener(listener);
 }
 
-IWorkbench::WorkbenchEvents& Workbench::GetWorkbenchEvents()
+IWorkbenchListener::Events& Workbench::GetWorkbenchEvents()
 {
   return workbenchEvents;
 }
 
 void Workbench::AddWindowListener(IWindowListener::Pointer l)
 {
-  windowEvents.windowActivated.AddListener(l.GetPointer(),
-      &IWindowListener::WindowActivated);
-  windowEvents.windowDeactivated.AddListener(l.GetPointer(),
-        &IWindowListener::WindowDeactivated);
-  windowEvents.windowClosed.AddListener(l.GetPointer(),
-        &IWindowListener::WindowClosed);
-  windowEvents.windowOpened.AddListener(l.GetPointer(),
-        &IWindowListener::WindowOpened);
+  windowEvents.AddListener(l);
 }
 
 
 void Workbench::RemoveWindowListener(IWindowListener::Pointer l)
 {
-  windowEvents.windowActivated.RemoveListener(l.GetPointer(),
-        &IWindowListener::WindowActivated);
-    windowEvents.windowDeactivated.RemoveListener(l.GetPointer(),
-          &IWindowListener::WindowDeactivated);
-    windowEvents.windowClosed.RemoveListener(l.GetPointer(),
-          &IWindowListener::WindowClosed);
-    windowEvents.windowOpened.RemoveListener(l.GetPointer(),
-          &IWindowListener::WindowOpened);
+  windowEvents.RemoveListener(l);
 }
 
-IWorkbench::WindowEvents& Workbench::GetWindowEvents()
+IWindowListener::Events& Workbench::GetWindowEvents()
 {
   return windowEvents;
 }
@@ -784,7 +1025,7 @@ bool Workbench::FirePreShutdown(bool forced) {
 
   //SafeRunnable.run(new SafeRunnable() {
   //  public void run() {
-  typedef WorkbenchEvents::PreShutdownEvent::ListenerList ListenerList;
+  typedef IWorkbenchListener::Events::PreShutdownEvent::ListenerList ListenerList;
   const ListenerList& listeners = workbenchEvents.preShutdown.GetListeners();
   for ( ListenerList::const_iterator iter = listeners.begin();
               iter != listeners.end(); ++iter )

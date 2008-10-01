@@ -81,7 +81,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
   IShowViewDialog::Pointer dialog = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateStandardDialog(WorkbenchTweaklet::DIALOG_ID_SHOW_VIEW).Cast<IShowViewDialog>();
   if (dialog.IsNull()) return;
 
-  int returnCode = dialog->Exec();
+  int returnCode = dialog->Open();
 
   if (returnCode == IDialog::CANCEL)
   {
@@ -89,7 +89,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
   }
 
   const std::vector<IViewDescriptor::Pointer> descriptors =
-      dialog.Cast<IShowViewDialog>()->GetSelection();
+      dialog->GetSelection();
   for (unsigned int i = 0; i < descriptors.size(); ++i)
   {
     try

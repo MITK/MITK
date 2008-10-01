@@ -54,7 +54,7 @@ struct CHERRY_UI IPlaceholderFolderLayout : public Object {
      * it is replaced by the view.
      * If the primary id of the placeholder has no wildcards, it must refer to a view 
      * contributed to the workbench's view extension point 
-     * (named <code>"org.eclipse.ui.views"</code>).
+     * (named <code>"org.opencherry.ui.views"</code>).
      *
      * @param viewId the compound view id (wildcards allowed)
      */

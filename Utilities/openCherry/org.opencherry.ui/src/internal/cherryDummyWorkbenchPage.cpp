@@ -20,6 +20,7 @@
 #include "cherryViewSite.h"
 #include "cherryWorkbenchRegistryConstants.h"
 #include "cherryWorkbenchPlugin.h"
+#include "cherryPerspectiveHelper.h"
 
 #include "../cherryUIException.h"
 #include "../cherryPlatformUI.h"
@@ -113,6 +114,11 @@ void WorkbenchPage::ActionSwitcher::DeactivateContributions(
 }
 
 IExtensionPoint* WorkbenchPage::GetPerspectiveExtensionPoint()
+{
+  return 0;
+}
+
+Perspective::Pointer WorkbenchPage::GetActivePerspective()
 {
   return 0;
 }
@@ -535,7 +541,7 @@ IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow()
 /*
  * (non-Javadoc)
  *
- * @see org.eclipse.ui.IWorkbenchPage#hideView(org.eclipse.ui.IViewReference)
+ * @see org.opencherry.ui.IWorkbenchPage#hideView(org.opencherry.ui.IViewReference)
  */
 void WorkbenchPage::HideView(IViewReference::Pointer ref)
 {
@@ -875,7 +881,7 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
 
 }
 
-IPartService::PartEvents& WorkbenchPage::GetPartEvents()
+IPartListener::Events& WorkbenchPage::GetPartEvents()
 {
   return partList.GetPartService()->GetPartEvents();
 }
@@ -959,8 +965,8 @@ IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,
   Tweaklets::Get(WorkbenchTweaklet::KEY)->AddViewPane(this->GetWorkbenchWindow(), pane);
 
   // Ensure that the newly showing part is enabled
-  if (pane.IsNotNull())
-    pane->SetControlEnabled(true);
+//  if (pane.IsNotNull())
+//    pane->SetControlEnabled(true);
 
   this->BusyShowView(view, mode);
 

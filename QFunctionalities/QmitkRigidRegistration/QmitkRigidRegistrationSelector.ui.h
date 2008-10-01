@@ -1907,6 +1907,11 @@ void QmitkRigidRegistrationSelector::LoadRigidRegistrationParameter()
   {
     presets.push_back( (*iter).first );
   }
+  if (presets.empty())
+  {
+    QMessageBox::warning( NULL, "RigidRegistrationParameters.xml", "RigidRegistrationParameters.xml is empty/does not exist. There are no presets to select.");
+    return;
+  }
   presets.sort();
   // ask about the name to load a preset
   QmitkLoadPresetDialog dialog( this, "Load Preset", presets ); // needs a QWidget as parent

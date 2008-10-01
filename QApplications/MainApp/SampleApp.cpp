@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkSelectableGLWidget.h"
 #include "QmitkCommonFunctionality.h"
+#include "QmitkRenderingManager.h"
 
 #include "QmitkFunctionality.h"
 #include "QmitkFunctionalityFactory.h"
@@ -64,9 +65,15 @@ SampleApp::~SampleApp()
   // Make sure that all pending events are processed to avoid dangling
   // RenderingRequestEvents that would otherwise lead to an application
   // crash
+  /*
   while ( qApp->hasPendingEvents() )
+    {
+      qApp->processEvents();
+    }*/
+  QmitkRenderingManager* renderingManager = dynamic_cast<QmitkRenderingManager*>(mitk::RenderingManager::GetInstance());
+  if(renderingManager != NULL)
   {
-    qApp->processEvents();
+    qApp->removePostedEvents(renderingManager);
   }
   // no need to delete child widgets, Qt does it all for us
 }

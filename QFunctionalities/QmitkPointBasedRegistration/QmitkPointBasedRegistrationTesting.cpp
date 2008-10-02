@@ -801,7 +801,6 @@ void QmitkPointBasedRegistration::ClearPointSetDialogFound( QWidget* widget )
   if (!widget) return;
 
   // close message box
-  QMessageBox msgBox = (QMessageBox*)(widget);
   QmitkUserInputSimulation::KeyboardTypeKey( widget, Qt::Key_Return );
   std::cout<<"Message box closed!"<<std::endl;
   m_MessageBox = true;

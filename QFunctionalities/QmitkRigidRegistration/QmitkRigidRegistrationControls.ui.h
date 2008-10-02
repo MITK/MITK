@@ -92,6 +92,7 @@ void QmitkRigidRegistrationControls::RedoTransformationClicked()
 void QmitkRigidRegistrationControls::SetUndoEnabled( bool enable )
 {
   m_UndoTransformation->setEnabled(enable);
+  m_SaveModel->setEnabled(enable);
 }
 
 void QmitkRigidRegistrationControls::SetRedoEnabled( bool enable )
@@ -239,6 +240,7 @@ void QmitkRigidRegistrationControls::Calculate()
   qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingSelector->GetSelectedNode());
   this->frame4->setEnabled(false);
   this->m_StopOptimization->setEnabled(true);
+  this->m_SaveModel->setEnabled(false);
   if (m_RigidTransform->label(m_RigidTransform->currentPageIndex()) == "Automatic")
   {
     emit calculateRigidRegistration();
@@ -246,6 +248,7 @@ void QmitkRigidRegistrationControls::Calculate()
   this->m_StopOptimization->setEnabled(false);
   emit (stopOptimization(false));
   this->frame4->setEnabled(true);
+  this->m_SaveModel->setEnabled(true);
 }
 
 void QmitkRigidRegistrationControls::AutomaticAlignCenters()

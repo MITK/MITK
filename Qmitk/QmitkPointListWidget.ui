@@ -108,7 +108,7 @@
                         <iconset>image0</iconset>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Set Points</string>
+                        <string>Set Points (Shift + Left Mouse Button)</string>
                     </property>
                 </widget>
                 <widget class="QToolButton">
@@ -236,12 +236,15 @@
     <variable>mitk::PointSet::Pointer m_PointSet;</variable>
     <variable>std::string prefix;</variable>
     <variable>unsigned long m_CurrentObserverID;</variable>
-    <variable>mitk::Point3D m_Color;</variable>
+    <variable>mitk::Color m_Color;</variable>
     <variable>std::string m_Label;</variable>
     <variable>std::string m_Name;</variable>
     <variable>int m_NumberOfPoints;</variable>
     <variable>mitk::DataTreeNode::Pointer m_PointSetNode;</variable>
 </variables>
+<signals>
+    <signal>PointListChanged()</signal>
+</signals>
 <slots>
     <slot>PointSelect( int ItemIndex )</slot>
     <slot>OnSetPointsToggled(bool setPoints)</slot>
@@ -253,7 +256,7 @@
     <slot access="private">AddInteraction()</slot>
     <slot>Reinitialize( bool disableInteraction )</slot>
     <slot>keyPressEvent( QKeyEvent * e )</slot>
-    <slot access="private">DeactivateInteractor()</slot>
+    <slot access="private">DeactivateInteractor(bool removeInteractor)</slot>
     <slot>ShowPointSetActionButtons(bool show)</slot>
 </slots>
 <functions>
@@ -261,7 +264,7 @@
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
     <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
-    <function> SetPointColor(mitk::Point3D color)</function>
+    <function> SetPointColor(mitk::Color color)</function>
     <function> SetLabel(std::string label)</function>
     <function> SetName(std::string name)</function>
     <function> SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)</function>

@@ -40,9 +40,9 @@ void QmitkPointListWidget::init()
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
   m_CurrentPolygonInteraction = NULL;
-  m_Color[0] = 1;
-  m_Color[1] = 0;
-  m_Color[2] = 0;
+  m_Color[0] = (0.0f);
+  m_Color[1] = (1.0f);
+  m_Color[2] = (1.0f);
   m_Label = "";
   m_Name = "PointSet";
   m_PointSetNode = NULL;
@@ -59,6 +59,7 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 //TODO: change the event EIDLEFTMOUSEBTN to something more defined, cause when user interaction changes in xml-file, 
 //then this don't work anymore (then change the event here too)
 {  
+  this->m_SetPoints->setOn(true);
   assert(m_PointSet.IsNotNull());
   mitk::PointSet::PointType ppt;
 
@@ -102,12 +103,18 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 
 void QmitkPointListWidget::ItemsOfListUpdate()
 {
+  emit PointListChanged();
   if (m_PointSetNode.IsNull())
   {
     m_NumberOfPointsLabel->setText(QString::number(0));
     InteractivePointList->clear();
     return;
   }
+
+  mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+  mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
+  m_PointSetNode->SetProperty("label",label);
+  m_PointSetNode->SetProperty("color",color);
 
   int lastSelectedPoint = InteractivePointList->currentItem();
 
@@ -190,13 +197,15 @@ void QmitkPointListWidget::AddInteraction()
     mitk::PointSetInteractor::Pointer sop;
     mitk::PointSet::Pointer pointset;
 
+    mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+    mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
+
     sop = dynamic_cast<mitk::PointSetInteractor*>( m_PointSetNode->GetInteractor());
     if (sop.IsNull())
     {
 
       //new layer property
       mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
-      mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0],m_Color[1],m_Color[2]);
 
       mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
       mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
@@ -220,10 +229,12 @@ void QmitkPointListWidget::AddInteraction()
       m_PointSetNode->SetProperty("color",color);
       m_PointSetNode->SetProperty("contour",contour);
       m_PointSetNode->SetProperty("close",close);
-      m_PointSetNode->SetProperty("label",label);
+      
       m_PointSetNode->SetInteractor(sop);
       m_PointSetNode->SetProperty("name", name);
     }
+    m_PointSetNode->SetProperty("label",label);
+    m_PointSetNode->SetProperty("color",color);
     if (m_CurrentInteraction.IsNotNull())
     {
       //remove last Interactor
@@ -535,7 +546,7 @@ void QmitkPointListWidget::OnSavePointSet()
   writer->Update();
 }
 
-void QmitkPointListWidget::SetPointColor(mitk::Point3D color)
+void QmitkPointListWidget::SetPointColor(mitk::Color color)
 {
   // the color for the points to be shown in render windows, has to be set before adding a new point set node
   m_Color = color;
@@ -591,11 +602,14 @@ void QmitkPointListWidget::SetNumberOfPoints(int numberOfPoints)
   m_NumberOfPoints = numberOfPoints;
 }
 
-void QmitkPointListWidget::DeactivateInteractor()
+void QmitkPointListWidget::DeactivateInteractor(bool removeInteractor)
 {
-  // deactivates the interactor
-  this->RemoveInteraction();
-  this->m_SetPoints->setOn(false);
+  if (removeInteractor)
+  {
+    // deactivates the interactor
+    this->RemoveInteraction();
+    this->m_SetPoints->setOn(false);
+  }
 }
 
 void QmitkPointListWidget::ShowPointSetActionButtons(bool show)

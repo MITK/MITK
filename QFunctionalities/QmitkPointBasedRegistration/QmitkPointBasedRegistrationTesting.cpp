@@ -32,15 +32,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "qpushbutton.h"
 #include "qslider.h"
 #include "qcheckbox.h"
-#include "qtable.h"
+#include "qlistbox.h"
 #include <qcombobox.h>
 #include <qapplication.h>
 #include "QmitkMessageBoxHelper.h"
+#include "QmitkPointListWidget.h"
 
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 
 #include <ctime>
+
 
 int QmitkPointBasedRegistration::TestYourself()
 {
@@ -105,27 +107,39 @@ int QmitkPointBasedRegistration::TestYourself()
   std::cout << " [PASSED]" << std::endl;
 
   // test for Select model
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedSelected, Qt::LeftButton );
-  m_Controls->m_FixedSelected->animateClick();
-  if (!m_Controls->m_FixedSelected->isEnabled())
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedPointListWidget->m_SetPoints, Qt::LeftButton );
+  if (!m_Controls->m_FixedPointListWidget->m_SetPoints->isOn())
   {
-    std::cerr << "Select Fixed Image was not enabled (l. " << __LINE__ << ")" << std::endl;
+    std::cerr << "Select Fixed Image was not toggled (l. " << __LINE__ << ")" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (m_Controls->m_MovingPointListWidget->m_SetPoints->isOn())
+  {
+    std::cerr << "Select Moving Image was toggled (l. " << __LINE__ << ")" << std::endl;
     return EXIT_FAILURE;
   }
   
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingSelected, Qt::LeftButton );
-  m_Controls->m_MovingSelected->animateClick();
-  if (!m_Controls->m_MovingSelected->isEnabled())
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
+  if (!m_Controls->m_MovingPointListWidget->m_SetPoints->isOn())
   {
-    std::cerr << "Select Moving Image was not enabled (l. " << __LINE__ << ")" << std::endl;
+    std::cerr << "Select Moving Image was not toggled (l. " << __LINE__ << ")" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (m_Controls->m_FixedPointListWidget->m_SetPoints->isOn())
+  {
+    std::cerr << "Select Fixed Image was toggled (l. " << __LINE__ << ")" << std::endl;
     return EXIT_FAILURE;
   }
   
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_NoModelSelected, Qt::LeftButton );
-  m_Controls->m_NoModelSelected->animateClick();
-  if (!m_Controls->m_NoModelSelected->isEnabled())
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
+  if (m_Controls->m_MovingPointListWidget->m_SetPoints->isOn())
   {
-    std::cerr << "Select Both was not enabled (l. " << __LINE__ << ")" << std::endl;
+    std::cerr << "Select Moving Image was toggled (l. " << __LINE__ << ")" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (m_Controls->m_FixedPointListWidget->m_SetPoints->isOn())
+  {
+    std::cerr << "Select Fixed Image was toggled (l. " << __LINE__ << ")" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -145,9 +159,9 @@ int QmitkPointBasedRegistration::TestYourself()
 
   // test reinit buttons
   std::cout << "Test reinit buttons:" << std::endl;
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedReinit, Qt::LeftButton );
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingReinit, Qt::LeftButton );
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_GlobalReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_ReinitFixedButton, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_ReinitMovingButton, Qt::LeftButton );
+  m_Controls->globalReinitClicked();
   std::cout << " [PASSED]" << std::endl;
 
   // test opacity slider
@@ -161,16 +175,12 @@ int QmitkPointBasedRegistration::TestYourself()
   // clean up
   if (node.IsNotNull())
   {
-    mitk::DataTreeIteratorClone it = mitk::DataTree::GetIteratorToNode( GetDataTreeIterator()->GetTree(), node );
-    m_MovingNode = NULL;
-    it->Remove();
+    mitk::DataStorage::GetInstance()->Remove(node);
     node = NULL;
-    mitk::DataTreeIteratorClone it2 = mitk::DataTree::GetIteratorToNode( GetDataTreeIterator()->GetTree(), m_FixedPointSetNode );
-    it2->Remove();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+  
   // recenter all remaining datatreenodes
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_GlobalReinit, Qt::LeftButton );
+  m_Controls->globalReinitClicked();
   
   if (testOK)
   {
@@ -182,7 +192,6 @@ int QmitkPointBasedRegistration::TestYourself()
     std::cout << "Whole functionality testing [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  
 }
 
 bool QmitkPointBasedRegistration::TestAllTools()
@@ -191,10 +200,7 @@ bool QmitkPointBasedRegistration::TestAllTools()
   m_MultiWidget->changeLayoutToDefault();
   
   std::cout << "Creating landmarks:" << std::endl;
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedSelected, Qt::LeftButton );
-  m_Controls->m_FixedSelected->animateClick();
-  addFixedInteractor();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedPointListWidget->m_SetPoints, Qt::LeftButton );
 
   for (unsigned int window = 1; window < 4; ++window)
   {
@@ -227,10 +233,7 @@ bool QmitkPointBasedRegistration::TestAllTools()
     }
   }
 
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingSelected, Qt::LeftButton );
-  m_Controls->m_MovingSelected->animateClick();
-  addMovingInteractor();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
 
   for (unsigned int window = 1; window < 4; ++window)
   {
@@ -261,64 +264,62 @@ bool QmitkPointBasedRegistration::TestAllTools()
       QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
     }
   }
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_NoModelSelected, Qt::LeftButton );  
-  m_Controls->m_NoModelSelected->animateClick();
-  bothSelected();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_GlobalReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
   std::cout << " [PASSED]" << std::endl;
 
-/////// test for deleting points from table
+/////// test for deleting points from fixed point list
   std::cout << "Delete Landmarks out of order:" << std::endl;
-  m_Controls->m_PointsetTable->setCurrentCell(4,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(4, true);
+  QmitkUserInputSimulation::KeyboardTypeKey( m_Controls->m_FixedPointListWidget->InteractivePointList, Qt::Key_Return );
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(8,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(8,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(13,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(13,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(0,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(0,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(7,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(7,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(7,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(7,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(3,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(3,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(4,0);
+  m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(4,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
   for (int i = 0; i < 7; i++)
   {
-    m_Controls->m_PointsetTable->setCurrentCell(0,0);
+    m_Controls->m_FixedPointListWidget->InteractivePointList->setSelected(0,true);
     QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
   }
-  m_Controls->m_PointsetTable->setCurrentCell(0,1);
+  /////// test for deleting points from moving point list
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(0,true);
+  QmitkUserInputSimulation::KeyboardTypeKey( m_Controls->m_MovingPointListWidget->InteractivePointList, Qt::Key_Return );
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(14,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(14,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(11,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(11,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(8,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(8,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(6,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(6,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(2,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(2,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(2,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(2,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
-  m_Controls->m_PointsetTable->setCurrentCell(2,1);
+  m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(2,true);
   QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
   for (int i = 0; i < 7; i++)
   {
-    m_Controls->m_PointsetTable->setCurrentCell(0,1);
+    m_Controls->m_MovingPointListWidget->InteractivePointList->setSelected(0,true);
     QmitkUserInputSimulation::KeyboardTypeKey( sliceWidget, Qt::Key_Delete );
   }
   std::cout << " [PASSED]" << std::endl;
 
 ////// create new points
   std::cout << "Create new landmarks:" << std::endl;
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedSelected, Qt::LeftButton );
-  m_Controls->m_FixedSelected->animateClick();
-  addFixedInteractor();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedReinit, Qt::LeftButton );
+  std::cout << "Creating landmarks:" << std::endl;
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedPointListWidget->m_SetPoints, Qt::LeftButton );
 
   for (unsigned int window = 1; window < 4; ++window)
   {
@@ -351,10 +352,7 @@ bool QmitkPointBasedRegistration::TestAllTools()
     }
   }
 
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingSelected, Qt::LeftButton );
-  m_Controls->m_MovingSelected->animateClick();
-  addMovingInteractor();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
 
   for (unsigned int window = 1; window < 4; ++window)
   {
@@ -385,10 +383,7 @@ bool QmitkPointBasedRegistration::TestAllTools()
       QmitkUserInputSimulation::MouseRelease( sliceWidget, (int)x, (int)y, Qt::LeftButton, Qt::ShiftButton );
     }
   }
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_NoModelSelected, Qt::LeftButton );  
-  m_Controls->m_NoModelSelected->animateClick();
-  bothSelected();
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_GlobalReinit, Qt::LeftButton );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_SetPoints, Qt::LeftButton );
   std::cout << " [PASSED]" << std::endl;
 
 //// Rigid with ICP
@@ -767,7 +762,26 @@ bool QmitkPointBasedRegistration::TestAllTools()
 
 //// end registrationmethods test
 
-  QmitkUserInputSimulation::MouseClick( m_Controls->m_ResetPointsets, Qt::LeftButton );
+  QmitkMessageBoxHelper* helper7 = new QmitkMessageBoxHelper(m_Controls);
+  connect( helper7, SIGNAL(DialogFound(QWidget*)), this, SLOT(ClearPointSetDialogFound(QWidget*)) );
+  helper7->WaitForDialogAndCallback( "QMessageBox" );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_FixedPointListWidget->m_ClearPointSet, Qt::LeftButton );
+
+  QmitkMessageBoxHelper* helper8 = new QmitkMessageBoxHelper(m_Controls);
+  connect( helper8, SIGNAL(DialogFound(QWidget*)), this, SLOT(ClearPointSetDialogFound(QWidget*)) );
+  helper8->WaitForDialogAndCallback( "QMessageBox" );
+  QmitkUserInputSimulation::MouseClick( m_Controls->m_MovingPointListWidget->m_ClearPointSet, Qt::LeftButton );
+
+  if(this->m_FixedLandmarks->GetSize() > 0)
+  {
+    std::cout << "Not all fixed points are deleted! [FAILED]" << std::endl;
+    return false;
+  }
+  if(m_MovingLandmarks->GetSize() > 0)
+  {
+    std::cout << "Not all moving points are deleted! [FAILED]" << std::endl;
+    return false;
+  }
 
   return true;
 }
@@ -781,5 +795,17 @@ void QmitkPointBasedRegistration::RegistrationErrorDialogFound( QWidget* widget 
   std::cout<<"Message box closed!"<<std::endl;
   m_MessageBox = true;
 }
+
+void QmitkPointBasedRegistration::ClearPointSetDialogFound( QWidget* widget )
+{
+  if (!widget) return;
+
+  // close message box
+  QMessageBox msgBox = (QMessageBox*)(widget);
+  QmitkUserInputSimulation::KeyboardTypeKey( widget, Qt::Key_Return );
+  std::cout<<"Message box closed!"<<std::endl;
+  m_MessageBox = true;
+}
+
 
 #endif

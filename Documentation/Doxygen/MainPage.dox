@@ -9,30 +9,30 @@
 Welcome to the Medical Imaging Interaction Toolkit (MITK). 
 Currently under active development, MITK aims at supporting the 
 development of leading-edge medical imaging software 
-with a high degree of interaction. It combines <a href="http://www.vtk.org">vtk</a>, 
-<a href="http://www.itk.org">itk</a> and the pic-based-libraries of the 
+with a high degree of interaction. It combines <a href="http://www.vtk.org">VTK</a>, 
+<a href="http://www.itk.org">ITK</a> and the pic-based-libraries of the 
 <a href="http://mbi.dkfz-heidelberg.de">Div. Medical and Biological Informatics </a> 
 of the <a href="http://www.dkfz.de">DKFZ</a> and adds those features that are most important 
-for developing interactive medical imaging software covered neither by vtk nor itk, i.e:
+for developing interactive medical imaging software covered neither by VTK nor ITK, i.e:
 \li multiple, consistent views on the same data. For example, when you have three orthogonal
 2D-views and a 3D view and data consisting of a green surface, the surface will be visible and green 
 in all views (as contour lines in 2D, as a surface in 3D), and when you move the surface, it will 
-move in all views. When you try to realize this with basic vtk, you will need to coordinate the 
-position/orientation/color/... of all the views somewhere in your program - exactly this can mitk 
+move in all views. When you try to realize this with basic VTK, you will need to coordinate the 
+position/orientation/color/... of all the views somewhere in your program - exactly this can MITK 
 do for you.
-\li interactions that create and/or modify data (not only actors as in basic vtk) 
+\li interactions that create and/or modify data (not only actors as in basic VTK) 
 \li complex interactions with multiple states, e.g., for interaction with active contours
 \li undo/redo of interactions
 \li organization of data objects in a tree at run-time, e.g., to represent logical dependencies (e.g.,
 a heart cavity is a part of the heart) or to control the rendering process
 \li additional properties of arbitrary type can be assigned to data objects contained in the data tree
-\li visualization and interaction with 3D+t data (basic vtk can handle only 3D data and itk is not 
+\li visualization and interaction with 3D+t data (basic VTK can handle only 3D data and ITK is not 
 for visualization and interaction)
-\li although mitk is mainly a toolkit and not an application, it offers some support on the 
+\li although MITK is mainly a toolkit and not an application, it offers some support on the 
 application-level, e.g, for structured combination of modules (so-called functionalities), e.g., for 
 combining and switching between one functionality for segmentation and another for registration.
 
-MITK re-uses virtually anything from vtk and itk. Thus, it is not at all a competitor to vtk or itk, but 
+MITK re-uses virtually anything from VTK and ITK. Thus, it is not at all a competitor to VTK or ITK, but 
 an extension, which tries to ease the combination of both and to add the features outlined above.
 
 \section FurtherReading Further Reading

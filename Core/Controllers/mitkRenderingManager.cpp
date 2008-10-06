@@ -50,6 +50,13 @@ RenderingManager
 RenderingManager
 ::~RenderingManager()
 {
+  // Decrease reference counts of all registered vtkRenderWindows for 
+  // proper destruction
+  RenderWindowVector::iterator it;
+  for ( it = m_AllRenderWindows.begin(); it != m_AllRenderWindows.end(); ++it )
+  {
+    (*it)->UnRegister( NULL );
+  }
 }
 
 
@@ -131,6 +138,9 @@ RenderingManager
     m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
     m_AllRenderWindows.push_back( renderWindow );
 
+    // Register vtkRenderWindow instance
+    renderWindow->Register( NULL );
+
     typedef itk::MemberCommand< RenderingManager > MemberCommandType;
 
     // Add callbacks for rendering abort mechanism
@@ -159,10 +169,14 @@ RenderingManager
 {
   m_RenderWindowList.erase( renderWindow );
 
-  RenderWindowVector::iterator thisRenderWindowsPosition = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
-  if ( thisRenderWindowsPosition != m_AllRenderWindows.end() )
+  RenderWindowVector::iterator it = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
+  if ( it != m_AllRenderWindows.end() )
   {
-    m_AllRenderWindows.erase( thisRenderWindowsPosition );
+    vtkRenderWindow *renderWindow = *it;
+    m_AllRenderWindows.erase( it );
+
+    // Decrease reference count for proper destruction
+    renderWindow->UnRegister( NULL );
   }
 }
 

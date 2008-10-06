@@ -59,8 +59,7 @@ void
 QmitkRenderingManager
 ::GenerateRenderingRequestEvent()
 {
-  QmitkRenderingRequestEvent *event = new QmitkRenderingRequestEvent;
-  QApplication::postEvent( this, event );
+  QApplication::postEvent( this, new QmitkRenderingRequestEvent );
 }
 
 

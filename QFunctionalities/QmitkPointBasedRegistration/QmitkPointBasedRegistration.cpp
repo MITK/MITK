@@ -56,6 +56,8 @@ QmitkPointBasedRegistration::QmitkPointBasedRegistration(QObject *parent, const 
 
 QmitkPointBasedRegistration::~QmitkPointBasedRegistration()
 {
+  m_Controls->m_FixedPointListWidget->SetPointSetNode(NULL);
+  m_Controls->m_MovingPointListWidget->SetPointSetNode(NULL);
 }
 
 QWidget * QmitkPointBasedRegistration::CreateMainWidget(QWidget* /*parent*/)
@@ -216,6 +218,8 @@ void QmitkPointBasedRegistration::Activated()
 
 void QmitkPointBasedRegistration::Deactivated()
 {
+  m_Controls->m_FixedPointListWidget->SetPointSetNode(NULL);
+  m_Controls->m_MovingPointListWidget->SetPointSetNode(NULL);
   // reset previous invisible nodes to invisible and previous visible nodes to visible
   mitk::DataTreeIteratorClone iter = this->GetDataTreeIterator();
   iter->GoToBegin();
@@ -337,15 +341,25 @@ void QmitkPointBasedRegistration::FixedSelected(mitk::DataTreeIteratorClone /*im
       it->Add(m_FixedPointSetNode);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
-    if (!m_HideFixedImage)
+    if (!m_HideFixedImage && m_FixedNode != NULL && m_FixedPointSetNode.IsNotNull())
     {
-      m_FixedNode->SetVisibility(true);
-      m_FixedPointSetNode->SetVisibility(true);
+      if (m_FixedNode != NULL)
+        m_FixedNode->SetVisibility(true);
+      if (m_FixedPointSetNode.IsNotNull())
+        m_FixedPointSetNode->SetVisibility(true);
     }
     else
     {
-      m_FixedNode->SetVisibility(false);
+      if (m_FixedNode != NULL)
+        m_FixedNode->SetVisibility(false);
     }
+  }
+  else
+  {
+    m_FixedNode = NULL;
+    m_FixedPointSetNode = NULL;
+    m_FixedLandmarks = NULL;
+    m_Controls->m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
   }
 }
 
@@ -423,13 +437,23 @@ void QmitkPointBasedRegistration::MovingSelected(mitk::DataTreeIteratorClone /*i
     }
     if (!m_HideMovingImage)
     {
-      m_MovingNode->SetVisibility(true);
-      m_MovingPointSetNode->SetVisibility(true);
+      if (m_MovingNode != NULL)
+        m_MovingNode->SetVisibility(true);
+      if (m_MovingPointSetNode.IsNotNull())
+        m_MovingPointSetNode->SetVisibility(true);
     }
     else
     {
-      m_MovingNode->SetVisibility(false);
+      if (m_MovingNode != NULL)
+        m_MovingNode->SetVisibility(false);
     }
+  }
+  else
+  {
+    m_MovingNode = NULL;
+    m_MovingPointSetNode = NULL;
+    m_MovingLandmarks = NULL;
+    m_Controls->m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
   }
 }
 

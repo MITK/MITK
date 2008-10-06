@@ -173,10 +173,16 @@ int QmitkPointBasedRegistration::TestYourself()
   bool testOK = this->TestAllTools();
 
   // clean up
+  if (m_FixedPointSetNode.IsNotNull())
+  {
+    mitk::DataStorage::GetInstance()->Remove(m_FixedPointSetNode);
+    m_FixedPointSetNode = NULL;
+  }
+  if (m_MovingPointSetNode)
   if (node.IsNotNull())
   {
-    mitk::DataStorage::GetInstance()->Remove(node);
-    node = NULL;
+    mitk::DataStorage::GetInstance()->Remove(m_MovingPointSetNode);
+    m_MovingPointSetNode = NULL;
   }
   
   // recenter all remaining datatreenodes

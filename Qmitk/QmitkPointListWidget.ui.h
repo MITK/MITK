@@ -206,9 +206,6 @@ void QmitkPointListWidget::AddInteraction()
 
       //new layer property
       mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
-
-      mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
-      mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
       mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
       mitk::StringProperty::Pointer name = mitk::StringProperty::New(m_Name);
 
@@ -227,8 +224,6 @@ void QmitkPointListWidget::AddInteraction()
       m_PointSetNode->SetData(m_PointSet);
       m_PointSetNode->SetProperty("layer",layer);
       m_PointSetNode->SetProperty("color",color);
-      m_PointSetNode->SetProperty("contour",contour);
-      m_PointSetNode->SetProperty("close",close);
       
       m_PointSetNode->SetInteractor(sop);
       m_PointSetNode->SetProperty("name", name);
@@ -288,13 +283,13 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     else   //unlimited number of points
       *sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
 
-    //datatreenode: and give set the data, layer and Interactor
-    dataTreeNode->SetData(pointset);
-    dataTreeNode->SetProperty("layer",layer);
-    dataTreeNode->SetProperty("color",color);
-    dataTreeNode->SetProperty("show contour",contour);
-    dataTreeNode->SetProperty("close contour",close);
-    dataTreeNode->SetInteractor(*sop);
+    //m_PointSetNode: and set the data, layer and Interactor
+    m_PointSetNode->SetData(pointset);
+    m_PointSetNode->SetProperty("layer",layer);
+    m_PointSetNode->SetProperty("color",color);
+    m_PointSetNode->SetProperty("contour",contour);
+    m_PointSetNode->SetProperty("close",close);
+    m_PointSetNode->SetInteractor(*sop);
 
     *node = m_PointSetNode;
 
@@ -335,9 +330,6 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
-
-    //mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
-    //mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
     mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
     mitk::StringProperty::Pointer name = mitk::StringProperty::New(l);
     //create a DataElement that holds the points
@@ -351,16 +343,14 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     *sop = mitk::PolygonInteractor::New("polygoninteractor", m_PointSetNode);
 
 
-    //datatreenode: and give set the data, layer and Interactor
-    dataTreeNode->SetData(meshpointset);
-    dataTreeNode->SetProperty("layer",layer);
-    dataTreeNode->SetProperty("color",color);
-    //dataTreeNode->SetProperty("show contour",contour);
-    //dataTreeNode->SetProperty("close contour",close);
-    dataTreeNode->SetProperty("label",label);
-    dataTreeNode->SetInteractor(*sop);
-    dataTreeNode->SetProperty("name", name); /// name is identical with label????
-    *node = dataTreeNode;
+    //m_PointSetNode: and set the data, layer and Interactor
+    m_PointSetNode->SetData(meshpointset);
+    m_PointSetNode->SetProperty("layer",layer);
+    m_PointSetNode->SetProperty("color",color);
+    m_PointSetNode->SetProperty("label",label);
+    m_PointSetNode->SetInteractor(*sop);
+    m_PointSetNode->SetProperty("name", name); /// name is identical with label????
+    *node = m_PointSetNode;
 
     ////then add it to the existing DataTree
     //m_DataTreeIterator->add(m_PointSetNode);

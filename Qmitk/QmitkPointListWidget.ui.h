@@ -111,9 +111,9 @@ void QmitkPointListWidget::ItemsOfListUpdate()
     return;
   }
 
-  mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+  //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
   mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
-  m_PointSetNode->SetProperty("label",label);
+  //m_PointSetNode->SetProperty("label",label);
   m_PointSetNode->SetProperty("color",color);
 
   int lastSelectedPoint = InteractivePointList->currentItem();
@@ -197,7 +197,7 @@ void QmitkPointListWidget::AddInteraction()
     mitk::PointSetInteractor::Pointer sop;
     mitk::PointSet::Pointer pointset;
 
-    mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+    //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
 
     sop = dynamic_cast<mitk::PointSetInteractor*>( m_PointSetNode->GetInteractor());
@@ -206,7 +206,7 @@ void QmitkPointListWidget::AddInteraction()
 
       //new layer property
       mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
-      mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+      //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
       mitk::StringProperty::Pointer name = mitk::StringProperty::New(m_Name);
 
 
@@ -228,7 +228,7 @@ void QmitkPointListWidget::AddInteraction()
       m_PointSetNode->SetInteractor(sop);
       m_PointSetNode->SetProperty("name", name);
     }
-    m_PointSetNode->SetProperty("label",label);
+    //m_PointSetNode->SetProperty("label",label);
     m_PointSetNode->SetProperty("color",color);
     if (m_CurrentInteraction.IsNotNull())
     {
@@ -330,7 +330,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
-    mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
+    //mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
     mitk::StringProperty::Pointer name = mitk::StringProperty::New(l);
     //create a DataElement that holds the points
     mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
@@ -347,9 +347,9 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     m_PointSetNode->SetData(meshpointset);
     m_PointSetNode->SetProperty("layer",layer);
     m_PointSetNode->SetProperty("color",color);
-    m_PointSetNode->SetProperty("label",label);
+    //m_PointSetNode->SetProperty("label",label);
     m_PointSetNode->SetInteractor(*sop);
-    m_PointSetNode->SetProperty("name", name); /// name is identical with label????
+    //m_PointSetNode->SetProperty("name", name); /// name is identical with label????
     *node = m_PointSetNode;
 
     ////then add it to the existing DataTree

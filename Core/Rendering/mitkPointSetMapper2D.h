@@ -37,7 +37,7 @@ class PointSet;
  * between adjacent points. Here is a complete list of boolean properties, 
  * which might be of interest:
  *
- * - \b "contour": Draw not only the points but also the connections between 
+ * - \b "show contour": Draw not only the points but also the connections between 
  *     them (default false)
  * - \b "line width": IntProperty which gives the width of the contour lines
  * - \b "show points": Wheter or not to draw the actual points (default true)

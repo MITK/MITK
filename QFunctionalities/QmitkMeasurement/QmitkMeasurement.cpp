@@ -84,7 +84,7 @@ void QmitkMeasurement::AddDistanceMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
   pointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
   pointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
 
@@ -100,7 +100,7 @@ void QmitkMeasurement::AddAngleMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
   pointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
   pointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
@@ -116,7 +116,7 @@ void QmitkMeasurement::AddPathMeasurement()
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
-  pointSetNode->SetProperty("contour", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
   pointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
   pointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
   pointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));

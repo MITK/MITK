@@ -590,9 +590,9 @@ void mitk::DataTreeNodeFactory::SetDefaultPointSetProperties(mitk::DataTreeNode:
   node->SetProperty( "pointsize", mitk::FloatProperty::New(1.0));
   node->SetProperty( "unselectedcolor", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f));//yellow
   node->SetProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f));//red
-  node->SetProperty( "contour", mitk::BoolProperty::New(false) );
+  node->SetProperty( "show contour", mitk::BoolProperty::New(false) );
   node->SetProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f));
-  node->SetProperty( "close", mitk::BoolProperty::New(false) );
+  node->SetProperty( "close contour", mitk::BoolProperty::New(false) );
 
   //node->SetProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node.GetPointer() ) );
   node->SetVisibility(true);

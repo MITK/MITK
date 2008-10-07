@@ -288,13 +288,13 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     else   //unlimited number of points
       *sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
 
-    //m_PointSetNode: and set the data, layer and Interactor
-    m_PointSetNode->SetData(pointset);
-    m_PointSetNode->SetProperty("layer",layer);
-    m_PointSetNode->SetProperty("color",color);
-    m_PointSetNode->SetProperty("contour",contour);
-    m_PointSetNode->SetProperty("close",close);
-    m_PointSetNode->SetInteractor(*sop);
+    //datatreenode: and give set the data, layer and Interactor
+    dataTreeNode->SetData(pointset);
+    dataTreeNode->SetProperty("layer",layer);
+    dataTreeNode->SetProperty("color",color);
+    dataTreeNode->SetProperty("show contour",contour);
+    dataTreeNode->SetProperty("close contour",close);
+    dataTreeNode->SetInteractor(*sop);
 
     *node = m_PointSetNode;
 
@@ -351,16 +351,16 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     *sop = mitk::PolygonInteractor::New("polygoninteractor", m_PointSetNode);
 
 
-    //m_PointSetNode: and set the data, layer and Interactor
-    m_PointSetNode->SetData(meshpointset);
-    m_PointSetNode->SetProperty("layer",layer);
-    m_PointSetNode->SetProperty("color",color);
-    //m_PointSetNode->SetProperty("contour",contour);
-    //m_PointSetNode->SetProperty("close",close);
-    m_PointSetNode->SetProperty("label",label);
-    m_PointSetNode->SetInteractor(*sop);
-    m_PointSetNode->SetProperty("name", name); /// name is identical with label????
-    *node = m_PointSetNode;
+    //datatreenode: and give set the data, layer and Interactor
+    dataTreeNode->SetData(meshpointset);
+    dataTreeNode->SetProperty("layer",layer);
+    dataTreeNode->SetProperty("color",color);
+    //dataTreeNode->SetProperty("show contour",contour);
+    //dataTreeNode->SetProperty("close contour",close);
+    dataTreeNode->SetProperty("label",label);
+    dataTreeNode->SetInteractor(*sop);
+    dataTreeNode->SetProperty("name", name); /// name is identical with label????
+    *node = dataTreeNode;
 
     ////then add it to the existing DataTree
     //m_DataTreeIterator->add(m_PointSetNode);

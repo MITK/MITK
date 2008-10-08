@@ -225,7 +225,9 @@ IF(WIN32 AND NOT UNIX)
   ############################# INSTALL TARGETS ########################## 
   INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico DESTINATION bin)
   INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
-   
+  IF(EXISTS ${MITK_HELPPAGES_OUTPUT_DIR}/html)
+    INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
+  ENDIF(EXISTS ${MITK_HELPPAGES_OUTPUT_DIR}/html)
   #OPENCV DLLs may be added elsewhere to install target
   
   #QT

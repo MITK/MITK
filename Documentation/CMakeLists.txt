@@ -35,6 +35,7 @@ ENDIF(match)
 ENDFOREACH(entry)
 ENDFOREACH(kit)
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
+SET(MITK_HELPPAGES_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )
 
 IF(USE_QT)
   IF(DESIRED_QT_VERSION EQUAL 3)
@@ -47,6 +48,8 @@ ENDIF(USE_QT)
 
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+CONFIGURE_FILE(helpPages.conf.in
+               ${CMAKE_CURRENT_BINARY_DIR}/helpPages.conf)
 
 # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
 #                ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf)
@@ -60,9 +63,15 @@ ADD_CUSTOM_TARGET(doc
                   ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf
                   )
 
+ADD_CUSTOM_TARGET(helpPages
+                  ${DOXYGEN} 
+                  ${PROJECT_BINARY_DIR}/Documentation/helpPages.conf
+                  )
+
 # make sure the main app is built already so we get documentation for 
 # the Qt generated files 
 IF(DESIRED_QT_VERSION EQUAL 3)
 ADD_DEPENDENCIES(doc MainApp)
+ADD_DEPENDENCIES(helpPages MainApp)
 ENDIF(DESIRED_QT_VERSION EQUAL 3)
 

@@ -20,54 +20,57 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionality.h"
 
+#include <mitkPointSetInteractor.h>
+
 class QmitkStdMultiWidget;
 class QmitkMeasurementControls;
 
 /*!
-\brief Measurement 
+\brief Measurement
 Allows to measure distances, angles, etc.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
 class QmitkMeasurement : public QmitkFunctionality
-{  
+{
   Q_OBJECT
-  
-  public:  
-  /*!  
-  \brief default constructor  
-  */  
+
+  public:
+  /*!
+  \brief default constructor
+  */
   QmitkMeasurement(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
-  /*!  
-  \brief default destructor  
-  */  
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkMeasurement();
 
-  /*!  
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
-  */  
+  /*!
+  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
+  */
   virtual QWidget * CreateControlWidget(QWidget *parent);
 
-  /*!  
-  \brief method for creating the applications main widget  
-  */  
+  /*!
+  \brief method for creating the applications main widget
+  */
   virtual QWidget * CreateMainWidget(QWidget * parent);
 
-  /*!  
-  \brief method for creating the connections of main and control widget  
-  */  
+  /*!
+  \brief method for creating the connections of main and control widget
+  */
   virtual void CreateConnections();
 
-  /*!  
-  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-  */  
+  /*!
+  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+  */
   virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
+  virtual void Deactivated();
 
-protected slots:  
+protected slots:
   void TreeChanged();
 
   void AddDistanceMeasurement();
@@ -76,17 +79,22 @@ protected slots:
 
   void AddPathMeasurement();
 
-protected:  
-  /*!  
-  * default main widget containing 4 windows showing 3   
-  * orthogonal slices of the volume and a 3d render window  
-  */  
+protected:
+  /*!
+  * default main widget containing 4 windows showing 3
+  * orthogonal slices of the volume and a 3d render window
+  */
   QmitkStdMultiWidget * m_MultiWidget;
 
-  /*!  
-  * controls containing sliders for scrolling through the slices  
-  */  
+  /*!
+  * controls containing sliders for scrolling through the slices
+  */
   QmitkMeasurementControls * m_Controls;
 
+  /*
+   * Interactor for performing the measurements.
+   */
+  mitk::PointSetInteractor::Pointer m_PointSetInteractor;
 };
+
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

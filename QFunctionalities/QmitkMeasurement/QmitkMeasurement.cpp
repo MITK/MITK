@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkMeasurement.h"
@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 
 #include <mitkPointSet.h>
-#include <mitkPointSetInteractor.h>
 
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
@@ -76,11 +75,30 @@ void QmitkMeasurement::TreeChanged()
 
 void QmitkMeasurement::Activated()
 {
+  m_PointSetInteractor = 0u;
   QmitkFunctionality::Activated();
+}
+
+void QmitkMeasurement::Deactivated()
+{
+  if (m_PointSetInteractor.IsNotNull())
+  {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+  }
+
+  QmitkFunctionality::Deactivated();
 }
 
 void QmitkMeasurement::AddDistanceMeasurement()
 {
+  /*
+   * make sure the last interactor that has been used is removed
+   */
+  if (m_PointSetInteractor.IsNotNull())
+  {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+  }
+
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
@@ -90,13 +108,20 @@ void QmitkMeasurement::AddDistanceMeasurement()
 
   m_DataTreeIterator->Add(pointSetNode);
 
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,2)
-  );
+  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,2);
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
 void QmitkMeasurement::AddAngleMeasurement()
 {
+  /*
+   * make sure the last interactor that has been used is removed
+   */
+  if (m_PointSetInteractor.IsNotNull())
+  {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+  }
+
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
@@ -106,13 +131,20 @@ void QmitkMeasurement::AddAngleMeasurement()
 
   m_DataTreeIterator->Add(pointSetNode);
 
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,3)
-  );
+  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode,3);
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
 void QmitkMeasurement::AddPathMeasurement()
 {
+  /*
+   * make sure the last interactor that has been used is removed
+   */
+  if (m_PointSetInteractor.IsNotNull())
+  {
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+  }
+
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(pointSet);
@@ -123,7 +155,6 @@ void QmitkMeasurement::AddPathMeasurement()
 
   m_DataTreeIterator->Add(pointSetNode);
 
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(
-    mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
-  );
+  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode);
+  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }

@@ -11,7 +11,6 @@ of release notes for the next release.
 ======== New stuff only in the SVN trunk ========
 
 - a PointListWidget
-- compatibility with VTK 5.2
 
 
 ======== Changes in release 0.10 (2008-Oct-??) ========
@@ -32,14 +31,22 @@ Application changes:
 Under-the-hood changes:
 
 - compatibility with ITK 3.8
-- experimental Qt4 application framework
 - build system now produces shared libraries (smaller packages, faster linking)
+- support for UnstructuredGrid VTK data
 - reworked rendering mechanism
   - rendering Requests are now directly issued via Qt events instead of
     delayed QTimer calls
   - easier integration of standard VTK-props with mitk
   - Added properties for annotating and clipping datasets in 3D windows
 - several bug fixes, more testing and minor improvements
+- EXPERIMENTAL: Qt4 based application platform based on OSGi and the Eclipse RCP,
+    called openCherry. If you want to build modular, service oriented applications
+    you can use openCherry as your application platform. Build the platform by
+    setting "BUILD_OPENCHERRY=TRUE" (default is FALSE). You are strongly advised
+    to regularly update to the SVN HEAD revision since the platform is
+    experimental and is being intensively worked on. Use the mitk mailinglist for
+    questions - tutorials and documentation will be provided in the near future.
+- EXPERIMENTAL: compatibility with VTK 5.2
 
 
 

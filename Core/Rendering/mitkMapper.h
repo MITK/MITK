@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkWeakPointer.h"
 #include "mitkXMLIO.h"
 
+//Just included to get VTK version
+#include <vtkConfigure.h>
+
 class vtkWindow;
 
 namespace mitk {
@@ -103,6 +106,10 @@ namespace mitk {
     virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer) = 0;
     virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) = 0;
     virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) = 0;
+    
+    #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+      virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer) = 0;
+    #endif
 
     /** 
     * \brief Returns whether this is an vtk-based mapper

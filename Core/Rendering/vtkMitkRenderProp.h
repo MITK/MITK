@@ -44,7 +44,7 @@ class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
     void SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer);
 
     int RenderOpaqueGeometry(vtkViewport* viewport);
-    int RenderTranslucentGeometry(vtkViewport* viewport);
+    
     int RenderOverlay(vtkViewport* viewport);
 
     double *GetBounds();
@@ -62,6 +62,16 @@ class MITK_CORE_EXPORT vtkMitkRenderProp : public vtkProp
      * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
      */
     virtual vtkAssemblyPath* GetNextPath();
+ 
+    //BUG (#1551) added method for depth peeling support
+    #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+      virtual int HasTranslucentPolygonalGeometry();
+      virtual int RenderTranslucentPolygonalGeometry( vtkViewport *);
+      virtual int RenderVolumetricGeometry( vtkViewport *);
+    #else
+      int RenderTranslucentGeometry(vtkViewport* viewport);
+    #endif
+    
 
   protected:
     vtkMitkRenderProp();

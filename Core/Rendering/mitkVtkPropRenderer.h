@@ -57,9 +57,16 @@ public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
   mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow *);
+  
+  typedef std::map<int,Mapper*> MappersMapType;
 
   // Render - called by vtkMitkRenderProp, returns the number of props rendered
-  enum RenderType{Opaque,Translucent,Overlay};
+  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+    enum RenderType{Opaque,Translucent,Overlay,Volumetric};
+  #else
+    enum RenderType{Opaque,Translucent,Overlay};
+  #endif
+
   int Render(RenderType type);
 
   // Active current renderwindow
@@ -119,6 +126,9 @@ public:
   */
   virtual void ReleaseGraphicsResources(vtkWindow *renWin);
 
+  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+  MappersMapType GetMappersMap() const;
+  #endif
 protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL);
   virtual ~VtkPropRenderer();
@@ -148,7 +158,6 @@ private:
   vtkLightKit* m_LightKit;
 
   // sorted list of mappers
-  typedef std::map<int,Mapper*> MappersMapType;
   MappersMapType m_MappersMap;
 
   // rendering of text

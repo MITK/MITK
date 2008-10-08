@@ -95,6 +95,11 @@ protected:
    * Interactor for performing the measurements.
    */
   mitk::PointSetInteractor::Pointer m_PointSetInteractor;
+
+  /*
+   * Node representing the PointSet last created. It is used to delete empty point sets.
+   */
+  mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
 };
 
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

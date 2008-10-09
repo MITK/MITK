@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>222</width>
+            <width>227</width>
             <height>605</height>
         </rect>
     </property>
@@ -25,12 +25,55 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel1_3_2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>150</width>
+                    <height>25</height>
+                </size>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="lineWidth">
+                <number>1</number>
+            </property>
+            <property name="text">
+                <string>&lt;p align="center"&gt;Select one option&lt;/p&gt;</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter</set>
+            </property>
+        </widget>
         <widget class="QPushButton">
             <property name="name">
                 <cstring>pbDistance</cstring>
             </property>
             <property name="text">
                 <string>Distance</string>
+            </property>
+            <property name="toggleButton">
+                <bool>false</bool>
+            </property>
+            <property name="flat">
+                <bool>false</bool>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>calculates the distance between two points</string>
             </property>
         </widget>
         <widget class="QPushButton">
@@ -40,13 +83,83 @@
             <property name="text">
                 <string>Angle</string>
             </property>
+            <property name="toggleButton">
+                <bool>false</bool>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>calculates the angle between two lines</string>
+            </property>
         </widget>
         <widget class="QPushButton">
             <property name="name">
                 <cstring>pbPath</cstring>
             </property>
+            <property name="cursor">
+                <cursor>0</cursor>
+            </property>
+            <property name="acceptDrops">
+                <bool>false</bool>
+            </property>
+            <property name="autoMask">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Path</string>
+            </property>
+            <property name="toggleButton">
+                <bool>false</bool>
+            </property>
+            <property name="on">
+                <bool>false</bool>
+            </property>
+            <property name="autoRepeat">
+                <bool>false</bool>
+            </property>
+            <property name="autoDefault">
+                <bool>false</bool>
+            </property>
+            <property name="default">
+                <bool>false</bool>
+            </property>
+            <property name="flat">
+                <bool>false</bool>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>calculates the distance between two or more points</string>
+            </property>
+        </widget>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel1_3</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="minimumSize">
+                <size>
+                    <width>150</width>
+                    <height>65</height>
+                </size>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="lineWidth">
+                <number>1</number>
+            </property>
+            <property name="text">
+                <string>&lt;p align="center"&gt;Hold &lt;i&gt;shift + click&lt;/i&gt;&lt;br&gt;to insert a point&lt;/p&gt;</string>
+            </property>
+            <property name="alignment">
+                <set>AlignVCenter</set>
             </property>
         </widget>
         <spacer>
@@ -62,7 +175,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>80</height>
+                    <height>390</height>
                 </size>
             </property>
         </spacer>

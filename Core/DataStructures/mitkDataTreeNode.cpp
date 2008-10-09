@@ -362,7 +362,7 @@ void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* rendere
   bool defaultRendererUsed = false;
   mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer, &defaultRendererUsed));
 
-  if (prop && defaultRendererUsed)
+  if (prop && !defaultRendererUsed)
     prop->SetValue(visible);
   else
     GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(visible));

@@ -82,6 +82,7 @@
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpContentsAction"/>
+        <action name="helpActiveFunctionalityAction"/>
     </item>
 </menubar>
 <toolbars>
@@ -651,6 +652,17 @@
         <property name="menuText">
             <string>&amp;Contents...</string>
         </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>helpActiveFunctionalityAction</cstring>
+        </property>
+        <property name="text">
+            <string>Active functionality</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Active functionality...</string>
+        </property>
         <property name="accel">
             <string>F1</string>
         </property>
@@ -1186,6 +1198,12 @@
         <slot>helpContents()</slot>
     </connection>
     <connection>
+        <sender>helpActiveFunctionalityAction</sender>
+        <signal>activated()</signal>
+        <receiver>QmitkMainTemplate</receiver>
+        <slot>helpActiveFunctionality()</slot>
+    </connection>
+    <connection>
         <sender>optionsShow_OptionsAction</sender>
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
@@ -1375,6 +1393,7 @@
     <slot>editRedo()</slot>
     <slot>viewReinitMultiWidget()</slot>
     <slot>helpContents()</slot>
+    <slot>helpActiveFunctionality()</slot>
     <slot>optionsShow_OptionsAction_activated()</slot>
     <slot>viewShowPlanesAction_toggled( bool on )</slot>
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
@@ -1400,6 +1419,7 @@
 <functions>
     <function>fileOpen( const char * fileName )</function>
     <function access="protected">fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory &amp; factory )</function>
+    <function access="protected">displayHelpPage( const QString&amp; helppage )</function>
     <function access="private" specifier="non virtual">init()</function>
     <function>Initialize()</function>
     <function>RaiseDialogBars()</function>

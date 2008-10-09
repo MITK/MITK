@@ -751,12 +751,14 @@ void QmitkMainTemplate::init()
   // create the DataStorage
   mitk::DataStorage::CreateInstance(m_Tree);
 
+  // this creates some default values for application options. 
+  // Lateron (somewhere) options are loaded from a file -- defaults are overridden
   m_Options = mitk::PropertyList::New();
   m_Options->SetProperty( "Use gradient background", mitk::BoolProperty::New(true) );
   m_Options->SetProperty( "Gradient color 1", mitk::ColorProperty::New( 0.0f, 0.1f, 0.3f ) );
   m_Options->SetProperty( "Gradient color 2", mitk::ColorProperty::New( 0.7f, 0.7f, 0.8f ) );
   m_Options->SetProperty( "Background color", mitk::ColorProperty::New(0.0f,0.0f,0.0f) );
-  m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New("/local/ip++bin/Documentations/Doxygen/html/") );
+
   m_Options->SetProperty( "Use dark palette", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Department logo visible", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Department logo path", mitk::StringProperty::New("") );
@@ -778,6 +780,38 @@ void QmitkMainTemplate::init()
   // Set option for zoom factor
   m_Options->SetProperty( "Standard views zoom factor", mitk::FloatProperty::New(1.0f) );
 
+  // find location of help pages
+  // search logic:
+  //   * use location of running application as root directory for search
+  //   * attempt to locate MITKSampleAppUserManual.html in these dirs (looking from search root dir):
+  //     * doc/html/                 (sampleapp-dist.sh)
+  //     * ../doc/html/              (NSIS installer)
+  //     * MITK_HELPPAGES_OUTPUT_DIR (set during compilation)
+  std::cout << "Trying to find help pages..." << std::endl;
+  QString searchRoot( qApp->applicationDirPath() + "/" );
+  
+  QString goodDirectory( MITK_HELPPAGES_OUTPUT_DIR "/html/" );  // default location from MITK build
+  QFile file( goodDirectory + "MITKSampleAppUserManual.html" );
+  if ( !file.exists() )
+  {
+    std::cout << "  .. not found in " << goodDirectory.ascii() << std::endl;
+    goodDirectory = searchRoot + "doc/html/";  // probable location with Linux tarball
+    file.setName( goodDirectory + "MITKSampleAppUserManual.html" );
+    if ( !file.exists() )
+    {
+      std::cout << "  .. not found in " << goodDirectory.ascii() << std::endl;
+      goodDirectory = searchRoot + "../doc/html/"; // probable location with Windows installer
+      file.setName( goodDirectory + "MITKSampleAppUserManual.html" );
+      if ( !file.exists() )
+      {
+        std::cout << "  .. not found in " << goodDirectory.ascii() << std::endl;
+        goodDirectory = "Point to path of MITKSampleAppUserManual.html"; // this could be useful to users who read carefully
+      }
+    }
+  }
+  std::cout << "  Will load from '" << goodDirectory.ascii() << "' ($MITKCONF/MITKOptions.xml overrides)" << std::endl;
+  
+  m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New( goodDirectory.ascii() ) );
 
   //create a couple of additional connections to allow the right-click show/hide to connect with the
   //options menu actions
@@ -1371,36 +1405,49 @@ void QmitkMainTemplate::viewReinitMultiWidget()
   mitk::RenderingManager::GetInstance()->InitializeViews( &it );
 }
 
-void QmitkMainTemplate::helpContents()
+void QmitkMainTemplate::displayHelpPage(const QString& helppage)
 {
   mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
   mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
+  if (!pathproperty) return;
 
   QDir homedir( pathproperty->GetValueAsString().c_str() );
   QString home( homedir.absPath() + "/" );
-  QString firstpage = home;
+  QString firstpage = home + helppage;
 
+  QFile file(firstpage);
+  if ( !file.exists() ) 
+  {
+    firstpage = home + "MITKSampleAppUserManual.html";
+  }
+
+  QmitkHelpBrowser* browser = new QmitkHelpBrowser( firstpage, ".", NULL, "Online help");
+  browser->setCaption("MITK documentation");
+  browser->showMaximized();
+}
+
+void QmitkMainTemplate::helpContents()
+{
+  this->displayHelpPage( "MITKSampleAppUserManual.html" );
+}
+
+void QmitkMainTemplate::helpActiveFunctionality()
+{
   if (qfm)
   {
+    QString firstpage("");
+
     // try to find documentation of the active functionality
     QmitkFunctionality* f = qfm->GetActiveFunctionality();
     if (f)
     {
       firstpage += f->metaObject()->className();
       firstpage += "UserManual.html";
+      this->displayHelpPage( firstpage );
     }
-
-    // fallback to SampleApp index page
-    if (!QFile::exists( firstpage ))
-    {
-      firstpage = home + "MITKSampleApp";
-      firstpage += "UserManual.html";
-
-    }
+    else helpContents();
   }
-  QmitkHelpBrowser* browser = new QmitkHelpBrowser( firstpage, ".", NULL, "Online help");
-  browser->setCaption("MITK documentation");
-  browser->showMaximized();
+  else helpContents();
 }
 
 void QmitkMainTemplate::optionsShow_OptionsAction_activated()

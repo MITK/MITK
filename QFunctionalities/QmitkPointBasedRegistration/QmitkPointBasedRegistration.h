@@ -276,5 +276,9 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     int m_Transformation;
     bool m_HideFixedImage;
     bool m_HideMovingImage;
+    std::string m_OldFixedLabel;
+    std::string m_OldMovingLabel;
+    bool m_Deactivated;
+
 };
 #endif // !defined(QMITK_POINTBASEDREGISTRATION_H__INCLUDED)

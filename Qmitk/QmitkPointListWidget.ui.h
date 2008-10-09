@@ -197,7 +197,6 @@ void QmitkPointListWidget::AddInteraction()
     mitk::PointSetInteractor::Pointer sop;
     mitk::PointSet::Pointer pointset;
 
-    //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
 
     sop = dynamic_cast<mitk::PointSetInteractor*>( m_PointSetNode->GetInteractor());
@@ -206,7 +205,6 @@ void QmitkPointListWidget::AddInteraction()
 
       //new layer property
       mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
-      //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
       mitk::StringProperty::Pointer name = mitk::StringProperty::New(m_Name);
 
 
@@ -228,7 +226,6 @@ void QmitkPointListWidget::AddInteraction()
       m_PointSetNode->SetInteractor(sop);
       m_PointSetNode->SetProperty("name", name);
     }
-    //m_PointSetNode->SetProperty("label",label);
     m_PointSetNode->SetProperty("color",color);
     if (m_CurrentInteraction.IsNotNull())
     {
@@ -540,12 +537,6 @@ void QmitkPointListWidget::SetPointColor(mitk::Color color)
 {
   // the color for the points to be shown in render windows, has to be set before adding a new point set node
   m_Color = color;
-}
-
-void QmitkPointListWidget::SetLabel(std::string label)
-{
-  // the label to be shown next to the points in the render window, has to be set before adding a new point set node
-  m_Label = label;
 }
 
 void QmitkPointListWidget::SetName(std::string name)

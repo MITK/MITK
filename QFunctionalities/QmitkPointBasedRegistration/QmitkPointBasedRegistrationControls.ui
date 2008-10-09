@@ -262,32 +262,45 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QCheckBox">
+        <widget class="QGroupBox">
             <property name="name">
-                <cstring>m_SetInvisible</cstring>
+                <cstring>groupBox4</cstring>
             </property>
-            <property name="text">
-                <string>Set All Other Invisible</string>
+            <property name="title">
+                <string>Display Options</string>
             </property>
-            <property name="checked">
-                <bool>true</bool>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>m_ShowRedGreenValues</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>1</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Show Images Red/Green</string>
-            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_SetInvisible</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Set All Other Invisible</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>m_ShowRedGreenValues</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Show Images Red/Green</string>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QGroupBox">
             <property name="name">
@@ -530,7 +543,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>1</height>
+                    <height>16</height>
                 </size>
             </property>
         </spacer>

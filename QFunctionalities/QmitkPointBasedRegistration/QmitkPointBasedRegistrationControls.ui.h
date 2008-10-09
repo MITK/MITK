@@ -35,7 +35,6 @@ void QmitkPointBasedRegistrationControls::init()
   fixedColor[2] = (1.0f);
   m_FixedPointListWidget->SetPointColor(fixedColor);
   m_FixedPointListWidget->SetName("PointBasedRegistrationNode");
-  m_FixedPointListWidget->SetLabel("F ");
   m_MovingPointListWidget->ShowPointSetActionButtons(true);
   mitk::Color movingColor;
   movingColor[0] = (1.0f);
@@ -43,7 +42,6 @@ void QmitkPointBasedRegistrationControls::init()
   movingColor[2] = (0.0f);
   m_MovingPointListWidget->SetPointColor(movingColor);
   m_MovingPointListWidget->SetName("PointBasedRegistrationNode");
-  m_MovingPointListWidget->SetLabel("M ");
 }
 
 void QmitkPointBasedRegistrationControls::calculate()

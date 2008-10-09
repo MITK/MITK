@@ -265,7 +265,6 @@
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
     <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function> SetPointColor(mitk::Color color)</function>
-    <function> SetLabel(std::string label)</function>
     <function> SetName(std::string name)</function>
     <function> SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)</function>
     <function> SetNumberOfPoints(int numberOfPoints)</function>

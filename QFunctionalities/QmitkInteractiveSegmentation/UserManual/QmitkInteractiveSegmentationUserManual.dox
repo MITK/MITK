@@ -1,0 +1,86 @@
+/**
+\page QmitkInteractiveSegmentationUserManual Interactive Segmentation
+
+Available sections:
+  - \ref QmitkInteractiveSegmentationUserManualOverview 
+  - \ref QmitkInteractiveSegmentationUserManualFeatures 
+  - \ref QmitkInteractiveSegmentationUserManualUsage 
+    - \ref QmitkInteractiveSegmentationUserManualUsageUserInterface
+    - \ref QmitkInteractiveSegmentationUserManualUsageOriginalImage
+    - \ref QmitkInteractiveSegmentationUserManualUsageWorkingImage
+    - \ref QmitkInteractiveSegmentationUserManualUsageTools
+    - \ref QmitkInteractiveSegmentationUserManualUsageInterpolation
+
+\section QmitkInteractiveSegmentationUserManualOverview Overview
+
+"Interactive segmentation" is a program module for interactive (manual) segmentation of images.
+
+  \li <b>Segmentation</b> means a binary image. Each voxel must be either part of the object or background.
+  \li <b>Images</b> mean 2D, 3D or 3D+t images, where each voxel must have exactly one channel. Color images are not supported.
+
+There are several tools to create, edit and postprocess segmentations. For the programmers among us, QmitkInteractiveSegmentation
+demonstrates how to use the mitk::Tool framework (see \ref QmitkInteractiveSegmentationTechnicalPage).
+
+\section QmitkInteractiveSegmentationUserManualFeatures Features
+
+  
+<ul>
+  <li> Managing segmentations:
+  <ul>
+    <li> Creating new segmentations (also by applying a global threshold)
+    <li> Deleting segmentation
+    <li> Loading segmentations from file (all MITK image formats)
+    <li> Saving segmentations to file (all MITK image formats)
+    <li> Changing segmentation properties like name, color, and opacity (context-menu)
+  </ul>
+  <li> Interactive tools to edit segmetations slice by slice (full undo support):
+  <ul>
+    <li> Contouring
+    <li> Interactive region growing with leakage detection
+    <li> Correction tool
+    <li> Filling holes
+    <li> Erasing islands
+  </ul>
+  <li> Interpolation of missing segmentation slices from neighboring slices:
+  <ul>
+    <li> supported in all three image directions
+    <li> full undo support
+  </ul>
+  <li> Postprocessing methods for segmentations:
+  <ul>
+    <li> cropping of a segmentation: image size is reduced to the necessary minimum, empty borders are removed 
+    <li> surface creation: marching cubes surface generation, done in the background, not very fast 
+    <li> volumetry: calculated the volume in milliliters, this number is not permanently updated when more changes are done to the segmentation
+    <li> histogram: a histogram and simple statistics are calculated for the segmented part of an image
+  </ul>
+</ul>
+    
+\section QmitkInteractiveSegmentationUserManualUsage Usage
+
+\todo This must still written (some images already here)
+
+\subsection QmitkInteractiveSegmentationUserManualUsageUserInterface The user interface
+\image html interactive_segmentation_UI_all.png "User interface of the functionality"
+
+\subsection QmitkInteractiveSegmentationUserManualUsageOriginalImage Original image selection
+\image html interactive_segmentation_UI_reference_image.png "Original image selection"
+
+\subsection QmitkInteractiveSegmentationUserManualUsageWorkingImage Segmentation list and operations
+\image html interactive_segmentation_UI_working_image.png "Segmentation list and operations"
+\image html interactive_segmentation_UI_working_image_list.png "Selection of an active segmentation"
+\image html interactive_segmentation_UI_working_image_tools.png "Postprocessing tools"
+
+\subsection QmitkInteractiveSegmentationUserManualUsageTools Editing Tools
+\image html interactive_segmentation_UI_tools.png "The editing tools"
+\image html interactive_segmentation_UI_tool_add.png "The 'Add' tool"
+\image html interactive_segmentation_UI_tool_correction.png "The 'Correction' tool"
+\image html interactive_segmentation_UI_tool_erase.png "The 'Erase' tool"
+\image html interactive_segmentation_UI_tool_fill.png "The 'Fill' tool"
+\image html interactive_segmentation_UI_tool_regiongrowing.png "The 'Region growing' tool"
+\image html interactive_segmentation_UI_tool_subtract.png "The 'Subtract' tool"
+
+\subsection QmitkInteractiveSegmentationUserManualUsageInterpolation Interpolation of missing slices
+\image html interactive_segmentation_UI_interpolation.png "Shape based interpolation"
+
+
+*/

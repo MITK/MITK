@@ -1,0 +1,81 @@
+================================================================================
+====        Medical Imaging Interaction Toolkit (MITK) Changelog            ====
+================================================================================
+
+This document should be updated with every release. Major changes
+in the trunk version can be listed right on top to simplify creation
+of release notes for the next release.
+
+
+
+======== New stuff only in the SVN trunk ========
+
+- a PointListWidget
+
+
+======== Changes in release 0.10 (2008-Oct-??) ========
+
+Application changes:
+
+- application modules for image-based rigid and landmarked-based registration
+- optional splash screen
+- new level-window widget behaviour (reacts to 2D mouse movements now)
+- interactive segmentation tool set now easily extensible by plugins
+  (see http://docs.mitk.org/nightly/toolextensions.html)
+- Rendering changes:
+  - Improved Volume-Rendering: Level-of-Detail Mechanism now works 
+    for multiple simultaneous 3D RenderWindows and datasets
+  - Experimental: user interaction during volume rendering 
+    (enable by setting flag "LOD abort mechanism" in Global Options)
+
+Under-the-hood changes:
+
+- compatibility with ITK 3.8
+- build system now produces shared libraries (smaller packages, faster linking)
+- support for UnstructuredGrid VTK data
+- reworked rendering mechanism
+  - rendering Requests are now directly issued via Qt events instead of
+    delayed QTimer calls
+  - easier integration of standard VTK-props with mitk
+  - Added properties for annotating and clipping datasets in 3D windows
+- several bug fixes, more testing and minor improvements
+- EXPERIMENTAL: Qt4 based application platform based on OSGi and the Eclipse RCP,
+    called openCherry. If you want to build modular, service oriented applications
+    you can use openCherry as your application platform. Build the platform by
+    setting "BUILD_OPENCHERRY=TRUE" (default is FALSE). You are strongly advised
+    to regularly update to the SVN HEAD revision since the platform is
+    experimental and is being intensively worked on. Use the mitk mailinglist for
+    questions - tutorials and documentation will be provided in the near future.
+- EXPERIMENTAL: compatibility with VTK 5.2
+
+
+
+======== Changes in release 0.8 (2007-Dec-19) ========
+
+- Subversion!
+- functionality for slice-by-slice segmentation including interpolation between segmented slices (QmitkInteractiveSegmentation). 
+  For more information see http://www.mitk.org/slicebasedsegmentation.html
+  - example code for 
+    - use of zlib for image compression ( mitk::CompressedImageContainer )
+    - observe changes in the slicer/MPR ( QmitkSlicesInterpolator )
+    - how to safely implement undo
+- MPR planes rotatable
+- improved level-window slider including scale marks, definable presets, selection of image to work on, etc.
+- additional tutorial step describing functionality creation, see http://www.mitk.org/documentation/doxygen/Step9Page.html
+- better build system, esp. those cmake files that need to be changed to add sources are much simpler
+- GUI for basic RAW image import (contribution - Xabier ...)
+- DataStorage -- needs explanation!
+- Progress bar
+- always-available modules for standard views and selection of slices
+- Level-Of-Detail mechanism for volume rendering
+- Textual volume annotation in 2D views
+- Two plane rotation modes: axis rotation and swivel rotation
+- Rendering of multiple overlapping/semi-transparent image-slices in 3D
+- Unified properties for plane reslicing / rendering interpolation modes
+- Improved 3D+t concepts; 3D+t support for Surfaces and PointSets
+- support for "Connexion 3D SpaceNavigator (TM) Mouse": Activate option MITK_USE_TD_MOUSE in cmake to enable interaction with a connexion 3D mouse in 3D widget.
+
+Minor interface changes to lower command complexibility (-classes::method):
+- mitkDataTreeNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkDataTreeNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 

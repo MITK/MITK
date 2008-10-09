@@ -44,7 +44,9 @@ class MITK_CORE_EXPORT GLMapper2D : public Mapper2D
     void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
     void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
     void MitkRenderOverlay(mitk::BaseRenderer* renderer);
-
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+    void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+#endif
   protected:
     GLMapper2D();
     virtual ~GLMapper2D();    

@@ -566,7 +566,13 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                   imageActor = m_ImageActors[imageMapper].m_Actor;
                   dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
                   texture = imageActor->GetTexture();
+
+                  //BUG (#1551) added dynamic cast for VTK5.2 support
+                  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+                  lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
+                  #else
                   lookupTable = texture->GetLookupTable();
+                  #endif
                 }
 
                 // Set poly data new each time its object changes (e.g. when

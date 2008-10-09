@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = mitk
 PROJECT_NUMBER         = @MITK_VERSION_STRING@
-OUTPUT_DIRECTORY       = @MITK_DOXYGEN_OUTPUT_DIR@
+OUTPUT_DIRECTORY       = @MITK_HELPPAGES_OUTPUT_DIR@
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
@@ -35,9 +35,9 @@ INLINE_INFO            = YES
 SORT_MEMBER_DOCS       = YES
 DISTRIBUTE_GROUP_DOC   = NO
 TAB_SIZE               = 8
-GENERATE_TODOLIST      = YES
-GENERATE_TESTLIST      = YES
-GENERATE_BUGLIST       = YES
+GENERATE_TODOLIST      = NO
+GENERATE_TESTLIST      = NO
+GENERATE_BUGLIST       = NO
 GENERATE_DEPRECATEDLIST= YES
 ALIASES                = "FIXME=\par Fix Me's:\n"
 ENABLED_SECTIONS       = 
@@ -57,12 +57,9 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ./ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/MainPage.dox \
+INPUT                  = @MITK_SOURCE_DIR@/Documentation/Doxygen/MainPage.dox \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
-                         @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
-                         @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \
-                         @FUNCTIONALITY_DIRS@
+                         @USERMANUAL_DIRS@
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
@@ -73,6 +70,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Testing/ \
+                         @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial \
                          @MITK_SOURCE_DIR@/CMake/QmitkFunctionalityTemplate/ \
                          @QT_DOCUMENTATION_EXCLUDE_DIRS@
 EXCLUDE_SYMLINKS       = NO

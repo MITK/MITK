@@ -778,6 +778,7 @@ void QmitkMainTemplate::init()
   // Set option for zoom factor
   m_Options->SetProperty( "Standard views zoom factor", mitk::FloatProperty::New(1.0f) );
 
+
   //create a couple of additional connections to allow the right-click show/hide to connect with the
   //options menu actions
   connect(FunctionalityToolbar, SIGNAL(visibilityChanged ( bool )), options_ShowDropdownToolbarAction, SLOT(setOn(bool)));

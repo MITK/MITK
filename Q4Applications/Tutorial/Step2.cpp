@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   mitk::RenderingManager::GetInstance()->InitializeViews( storage );
 
   // Select a slice
-  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 0 );
+  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 2 );
 
 
   //*************************************************************************

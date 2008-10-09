@@ -44,7 +44,12 @@ void mitk::GLMapper2D::MitkRenderOverlay(mitk::BaseRenderer* /*renderer*/)
 {
  
 }
-
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+void mitk::GLMapper2D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* /*renderer*/)
+{
+ 
+}
+#endif
 void mitk::GLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
     float rgba[4]={1.0f,1.0f,1.0f,1.0f};

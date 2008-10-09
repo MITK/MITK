@@ -100,7 +100,8 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   }*/
   
   if ( this->GetProp()->GetVisibility() )
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=3)  )
+//BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     this->GetProp()->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
 #else
     this->GetProp()->RenderTranslucentGeometry(renderer->GetVtkRenderer());
@@ -108,6 +109,27 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 }
 
+//for VTK 5.2 support
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+void BaseVtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false) 
+    return;
+
+  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
+  {
+  if(  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+  GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
+  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+  GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false)    
+  return;
+  }*/
+
+  if ( GetProp()->GetVisibility() )
+    GetProp()->RenderVolumetricGeometry(renderer->GetVtkRenderer());
+
+}
+#endif
 
 void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 {

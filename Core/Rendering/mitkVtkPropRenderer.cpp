@@ -200,6 +200,10 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       case mitk::VtkPropRenderer::Opaque:        mapper->MitkRenderOpaqueGeometry(this); break;
       case mitk::VtkPropRenderer::Translucent:   mapper->MitkRenderTranslucentGeometry(this); break;
       case mitk::VtkPropRenderer::Overlay:       mapper->MitkRenderOverlay(this); break;
+        //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
+      #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+      case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
+      #endif
     }
   }
   
@@ -628,5 +632,9 @@ vtkPointPicker* mitk::VtkPropRenderer::GetPointPicker()
 {
   return m_PointPicker;
 }
-
-
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() const
+{
+  return m_MappersMap;
+}
+#endif

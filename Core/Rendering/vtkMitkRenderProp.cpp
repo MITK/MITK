@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkObjectFactory.h"
 #include "vtkLODProp3D.h"
 
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+#include "mitkBaseVtkMapper3D.h"
+#endif
+
 vtkStandardNewMacro(vtkMitkRenderProp);
 
 vtkMitkRenderProp::vtkMitkRenderProp()
@@ -43,10 +47,7 @@ int vtkMitkRenderProp::RenderOpaqueGeometry(vtkViewport* /*viewport*/)
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Opaque); 
 }
-int vtkMitkRenderProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
-{
-  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
-}
+
 int vtkMitkRenderProp::RenderOverlay(vtkViewport* /*viewport*/)
 {
   return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Overlay);
@@ -66,5 +67,39 @@ vtkAssemblyPath* vtkMitkRenderProp::GetNextPath()
 {
   return m_VtkPropRenderer->GetNextPath();
 }
+//BUG (#1551) added method depth peeling
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
+{
+  typedef std::map<int,mitk::Mapper*> MappersMapType;
+  MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
+  for(MappersMapType::iterator it = mappersMap.begin(); it != mappersMap.end(); it++)
+  {
+    mitk::Mapper * mapper = (*it).second;
+    mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
+    if(vtkMapper)
+    {    
+      if (vtkMapper->GetProp()->HasTranslucentPolygonalGeometry()==1)
+        return 1;
+    }
+
+  }
+  return 0;
+}
+
+int vtkMitkRenderProp::RenderTranslucentPolygonalGeometry( vtkViewport * )
+{
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
+}
+int vtkMitkRenderProp::RenderVolumetricGeometry( vtkViewport * )
+{
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Volumetric);
+}
+#else
+int vtkMitkRenderProp::RenderTranslucentGeometry(vtkViewport* /*viewport*/)
+{
+  return m_VtkPropRenderer->Render(mitk::VtkPropRenderer::Translucent);
+}
 
 
+#endif

@@ -49,7 +49,10 @@ public:
   void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
   void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
   void MitkRenderOverlay(mitk::BaseRenderer* renderer);
-
+  
+  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+    void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+  #endif
   //##Documentation
   //## @brief Set the vtkTransform of the m_Prop3D for
   //## the current time step of \a renderer

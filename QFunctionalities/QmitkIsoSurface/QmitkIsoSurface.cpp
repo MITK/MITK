@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcursor.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
+#include <qmessagebox.h>
 
 #include <string.h>
 
@@ -132,6 +133,18 @@ void QmitkIsoSurface::CreateSurface()
 
     filter->SetTargetReduction( targetReduction );
 
+
+    int numOfPolys = filter->GetOutput()->GetVtkPolyData()->GetNumberOfPolys();
+    if(numOfPolys>2000000)
+    {
+      QApplication::restoreOverrideCursor();
+      if(QMessageBox::question(NULL, "CAUTION!!!", "The number of polygons is greater than 2 000 000. If you continue, the program might crash. How do you want to go on?", "Proceed anyway!", "Cancel immediately! (maybe you want to insert an other threshold)!",QString::null,0 ,1)==1)
+      {
+        
+        return;
+      }
+          QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+    }
     mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
     surfaceNode->SetData( filter->GetOutput() );
 

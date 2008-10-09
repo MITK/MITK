@@ -1,0 +1,32 @@
+/**
+\page QmitkRegionGrowingUserManual Region growing
+
+Available sections:
+  - \ref QmitkRegionGrowingUserManualOverview 
+  - \ref QmitkRegionGrowingUserManualFeatures 
+  - \ref QmitkRegionGrowingUserManualUsage 
+
+\section QmitkRegionGrowingUserManualOverview Overview
+
+RegionGrowing is a functionality for ...
+
+\section QmitkRegionGrowingUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkRegionGrowingUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

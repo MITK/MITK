@@ -1,0 +1,32 @@
+/**
+\page QmitkMovieMakerUserManual Movie maker
+
+Available sections:
+  - \ref QmitkMovieMakerUserManualOverview 
+  - \ref QmitkMovieMakerUserManualFeatures 
+  - \ref QmitkMovieMakerUserManualUsage 
+
+\section QmitkMovieMakerUserManualOverview Overview
+
+MovieMaker is a functionality for ...
+
+\section QmitkMovieMakerUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkMovieMakerUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

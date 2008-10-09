@@ -1,0 +1,32 @@
+/**
+\page QmitkDataManagerUserManual Data manager
+
+Available sections:
+  - \ref QmitkDataManagerUserManualOverview 
+  - \ref QmitkDataManagerUserManualFeatures 
+  - \ref QmitkDataManagerUserManualUsage 
+
+\section QmitkDataManagerUserManualOverview Overview
+
+DataManager is a functionality for ...
+
+\section QmitkDataManagerUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkDataManagerUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

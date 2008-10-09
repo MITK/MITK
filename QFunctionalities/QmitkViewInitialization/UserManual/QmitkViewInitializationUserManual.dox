@@ -1,0 +1,32 @@
+/**
+\page QmitkViewInitializationUserManual View Initialization
+
+Available sections:
+  - \ref QmitkViewInitializationUserManualOverview 
+  - \ref QmitkViewInitializationUserManualFeatures 
+  - \ref QmitkViewInitializationUserManualUsage 
+
+\section QmitkViewInitializationUserManualOverview Overview
+
+ViewInitialization is a functionality for ...
+
+\section QmitkViewInitializationUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkViewInitializationUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

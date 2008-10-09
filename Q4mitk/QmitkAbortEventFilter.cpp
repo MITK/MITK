@@ -191,11 +191,11 @@ QmitkAbortEventFilter
         return true;
       }
 
-    case QEvent::ChildInserted: //change Layout (Big3D, 2D images up, etc.)	 
+	case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)	 
     {	 
       QChildEvent* ce = ( QChildEvent* )( event );	 
       QChildEvent* newEvent = new QChildEvent(	 
-        QEvent::ChildInserted, ce->child() );	 
+        QEvent::ChildAdded, ce->child() );	 
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;	 
     }	 

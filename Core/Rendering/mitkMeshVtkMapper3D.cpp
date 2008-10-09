@@ -197,7 +197,7 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   bool makeContour = false;
-  this->GetDataTreeNode()->GetBoolProperty("contour", makeContour);
+  this->GetDataTreeNode()->GetBoolProperty("show contour", makeContour);
 
   if (makeContour)
   {

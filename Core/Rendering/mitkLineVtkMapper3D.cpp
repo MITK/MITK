@@ -64,10 +64,10 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
 	int j;
   bool makeContour;
-	if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer()) == NULL)
+	if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer()) == NULL)
 		makeContour = false;
 	else
-		makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("contour").GetPointer())->GetValue();
+		makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer())->GetValue();
 
   vtkPoints *points = vtkPoints::New();
   vtkCellArray *polys = vtkCellArray::New();
@@ -81,10 +81,10 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
 
   bool close;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close contour").GetPointer()) == NULL)
     close = false;
   else
-    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close").GetPointer())->GetValue();
+    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close contour").GetPointer())->GetValue();
 
   if (close) 
   {

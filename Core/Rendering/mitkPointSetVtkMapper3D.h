@@ -54,8 +54,8 @@ namespace mitk {
   * object is returned in GetProp() and so hooked up into the rendering 
   * pipeline. Other properties looked for are:
   *
-  *   - \b "contour": if set to on, lines between the points are shown
-  *   - \b "close": if set to on, the open strip is closed (first point 
+  *   - \b "show contour": if set to on, lines between the points are shown
+  *   - \b "close contour": if set to on, the open strip is closed (first point 
   *       connected with last point)
   *   - \b "pointsize": size of the points mapped
   *   - \b "label": text of the Points to show besides points

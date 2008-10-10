@@ -40,15 +40,26 @@ void QmitkPointListWidget::init()
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
   m_CurrentPolygonInteraction = NULL;
+  m_Color[0] = (0.0f);
+  m_Color[1] = (1.0f);
+  m_Color[2] = (1.0f);
+  m_Label = "";
+  m_Name = "PointSet";
+  m_PointSetNode = NULL;
+  m_NumberOfPoints = UNLIMITED;
+  this->m_SetPoints->setEnabled(false);
+  this->m_ClearPointSet->setEnabled(false);
+  this->m_LoadPointSet->setEnabled(false);
+  this->m_SavePointSet->setEnabled(false);
+  this->ShowPointSetActionButtons(false);
 }
-
-
 
 void QmitkPointListWidget::PointSelect( int ItemIndex )
 //when a point is selected in the widget, then an event equal to an user event gets sent to the global interaction so that the data (point) is selected
 //TODO: change the event EIDLEFTMOUSEBTN to something more defined, cause when user interaction changes in xml-file, 
 //then this don't work anymore (then change the event here too)
 {  
+  this->m_SetPoints->setOn(true);
   assert(m_PointSet.IsNotNull());
   mitk::PointSet::PointType ppt;
   
@@ -92,13 +103,23 @@ void QmitkPointListWidget::PointSelect( int ItemIndex )
 
 void QmitkPointListWidget::ItemsOfListUpdate()
 {
-  if (m_DatatreeNode.IsNull())
+  emit PointListChanged();
+  if (m_PointSetNode.IsNull())
+  {
+    m_NumberOfPointsLabel->setText(QString::number(0));
+    InteractivePointList->clear();
     return;
+  }
+
+  //mitk::StringProperty::Pointer label = mitk::StringProperty::New(m_Label);
+  mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
+  //m_PointSetNode->SetProperty("label",label);
+  m_PointSetNode->SetProperty("color",color);
   
   int lastSelectedPoint = InteractivePointList->currentItem();
   
   InteractivePointList->clear();
-  m_PointSet = (mitk::PointSet*)(m_DatatreeNode->GetData());
+  m_PointSet = (mitk::PointSet*)(m_PointSetNode->GetData());
   int size =m_PointSet->GetSize();
   m_NumberOfPointsLabel->setText(QString::number(size));
   if (size!=0)
@@ -161,12 +182,71 @@ void QmitkPointListWidget::RemoveInteraction()
       //remove last Interactor
       mitk::GlobalInteraction::GetInstance()
         ->RemoveInteractor( m_CurrentInteraction );
-
-      pointset = dynamic_cast<mitk::PointSet*>(m_DatatreeNode->GetData());
+    pointset = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
       assert(pointset.IsNotNull());
       pointset->RemoveObserver(m_CurrentObserverID);
+    m_CurrentInteraction = NULL;
+  }
+}
+
+void QmitkPointListWidget::AddInteraction()
+{
+  this->RemoveInteraction();
+  if (m_PointSetNode.IsNotNull())
+  {
+    mitk::PointSetInteractor::Pointer sop;
+    mitk::PointSet::Pointer pointset;
+
+    mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(m_Color[0], m_Color[1], m_Color[2]);
+
+    sop = dynamic_cast<mitk::PointSetInteractor*>( m_PointSetNode->GetInteractor());
+    if (sop.IsNull())
+    {
+
+      //new layer property
+      mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
+      mitk::StringProperty::Pointer name = mitk::StringProperty::New(m_Name);
+
+
+      //if necessary create a DataElement that holds the points
+      if(m_PointSet.IsNull())
+        m_PointSet = mitk::PointSet::New();
+
+      //declaring a new Interactor
+      if (m_NumberOfPoints!=UNLIMITED)//limited number of points
+        sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode, m_NumberOfPoints);
+      else   //unlimited number of points
+        sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+
+      //m_PointSetNode: and set the data, layer and Interactor
+      m_PointSetNode->SetData(m_PointSet);
+      m_PointSetNode->SetProperty("layer",layer);
+      m_PointSetNode->SetProperty("color",color);
+      
+      m_PointSetNode->SetInteractor(sop);
+      m_PointSetNode->SetProperty("name", name);
+    }
+    m_PointSetNode->SetProperty("color",color);
+    if (m_CurrentInteraction.IsNotNull())
+    {
+      //remove last Interactor
+      mitk::GlobalInteraction::GetInstance()
+        ->RemoveInteractor(m_CurrentInteraction);
+
+      assert(m_PointSet.IsNotNull());
+      m_PointSet->RemoveObserver(m_CurrentObserverID);
     }
   
+    assert(m_PointSet.IsNotNull());
+    m_CurrentObserverID = m_PointSet->AddObserver(itk::EndEvent(), m_DataChangedCommand);
+
+    //new Interactor
+    m_CurrentInteraction = sop;
+    prefix= m_Label;
+    //tell the global Interactor, that there is another one to ask if it can handle the event
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_CurrentInteraction);
+  }
+  ItemsOfListUpdate();
 }
 
 void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
@@ -183,33 +263,32 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
 
 
     //if necessary create a TreeNode, to connect the data to...
-    mitk::DataTreeNode::Pointer dataTreeNode;
     if((*node).IsNull())
-      dataTreeNode = mitk::DataTreeNode::New();
+      m_PointSetNode = mitk::DataTreeNode::New();
     else
-      dataTreeNode = *node;
+      m_PointSetNode = *node;
 
     //if necessary create a DataElement that holds the points
-    if(dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData()) == NULL)
+    if(dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData()) == NULL)
       pointset = mitk::PointSet::New();
     else
-      pointset = dynamic_cast<mitk::PointSet*>(dataTreeNode->GetData());
+      pointset = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
 
     //declaring a new Interactor
     if (numberOfPoints!=UNLIMITED)//limited number of points
-      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode, numberOfPoints);
+      *sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode, numberOfPoints);
     else   //unlimited number of points
-      *sop = mitk::PointSetInteractor::New("pointsetinteractor", dataTreeNode);
+      *sop = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
 
-    //datatreenode: and give set the data, layer and Interactor
-    dataTreeNode->SetData(pointset);
-    dataTreeNode->SetProperty("layer",layer);
-    dataTreeNode->SetProperty("color",color);
-    dataTreeNode->SetProperty("contour",contour);
-    dataTreeNode->SetProperty("close",close);
-    dataTreeNode->SetInteractor(*sop);
+    //m_PointSetNode: and set the data, layer and Interactor
+    m_PointSetNode->SetData(pointset);
+    m_PointSetNode->SetProperty("layer",layer);
+    m_PointSetNode->SetProperty("color",color);
+    m_PointSetNode->SetProperty("contour",contour);
+    m_PointSetNode->SetProperty("close",close);
+    m_PointSetNode->SetInteractor(*sop);
 
-    *node = dataTreeNode;
+    *node = m_PointSetNode;
 
 
   }
@@ -220,7 +299,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
     mitk::GlobalInteraction::GetInstance()
       ->RemoveInteractor(m_CurrentInteraction);
 
-    pointset = dynamic_cast<mitk::PointSet*>(m_DatatreeNode->GetData());
+    pointset = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
     assert(pointset.IsNotNull());
     pointset->RemoveObserver(m_CurrentObserverID);
   }
@@ -233,7 +312,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   //new Interactor
   m_CurrentInteraction = *sop;
   prefix= l;
-  m_DatatreeNode= *node;
+  m_PointSetNode= *node;
   //tell the global Interactor, that there is another one to ask if it can handle the event
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_CurrentInteraction);
   ItemsOfListUpdate();
@@ -248,10 +327,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
-
-    //mitk::BoolProperty::Pointer contour = mitk::BoolProperty::New(false);
-    //mitk::BoolProperty::Pointer close = mitk::BoolProperty::New(true);
-    mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
+    //mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
     mitk::StringProperty::Pointer name = mitk::StringProperty::New(l);
     //create a DataElement that holds the points
     mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
@@ -260,23 +336,21 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     meshpointset->AddObserver(itk::EndEvent(), m_DataChangedCommand);
 
     //then crate a TreeNode, to connect the data to...
-    mitk::DataTreeNode::Pointer dataTreeNode = mitk::DataTreeNode::New();
-    *sop = mitk::PolygonInteractor::New("polygoninteractor", dataTreeNode);
+    m_PointSetNode = mitk::DataTreeNode::New();
+    *sop = mitk::PolygonInteractor::New("polygoninteractor", m_PointSetNode);
 
 
-    //datatreenode: and give set the data, layer and Interactor
-    dataTreeNode->SetData(meshpointset);
-    dataTreeNode->SetProperty("layer",layer);
-    dataTreeNode->SetProperty("color",color);
-    //dataTreeNode->SetProperty("contour",contour);
-    //dataTreeNode->SetProperty("close",close);
-    dataTreeNode->SetProperty("label",label);
-    dataTreeNode->SetInteractor(*sop);
-    dataTreeNode->SetProperty("name", name); /// name is identical with label????
-    *node = dataTreeNode;
+    //m_PointSetNode: and set the data, layer and Interactor
+    m_PointSetNode->SetData(meshpointset);
+    m_PointSetNode->SetProperty("layer",layer);
+    m_PointSetNode->SetProperty("color",color);
+    //m_PointSetNode->SetProperty("label",label);
+    m_PointSetNode->SetInteractor(*sop);
+    //m_PointSetNode->SetProperty("name", name); /// name is identical with label????
+    *node = m_PointSetNode;
 
     ////then add it to the existing DataTree
-    //m_DataTreeIterator->add(dataTreeNode);
+    //m_DataTreeIterator->add(m_PointSetNode);
   }
 
   if (m_CurrentPolygonInteraction.IsNotNull())
@@ -289,7 +363,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
   //new Interactor
   m_CurrentPolygonInteraction = *sop;
   prefix= l;
-  m_DatatreeNode= *node;
+  m_PointSetNode= *node;
   //tell the global Interactor, that there is another one to ask if it can handle the event
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_CurrentPolygonInteraction);
   ItemsOfListUpdate();
@@ -298,7 +372,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
 mitk::DataTreeNode* QmitkPointListWidget::GetDataTreeNode()
 {
-  return m_DatatreeNode.GetPointer();
+  return m_PointSetNode.GetPointer();
 }
 
 
@@ -316,7 +390,7 @@ void QmitkPointListWidget::Reinitialize( bool disableInteraction )
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
   m_CurrentPolygonInteraction = NULL;
-  m_DatatreeNode = NULL;
+  m_PointSetNode = NULL;
   m_PointSet = NULL;
   
   // reset gui
@@ -352,4 +426,188 @@ void QmitkPointListWidget::keyPressEvent( QKeyEvent * e )
 
   }
 
+}
+
+void QmitkPointListWidget::OnSetPointsToggled(bool setPoints)
+{
+  if (setPoints == false)
+    this->RemoveInteraction();
+  else
+  {
+    if (m_PointSetNode.IsNotNull())
+      this->AddInteraction();
+  }
+}
+
+void QmitkPointListWidget::OnClearPointSetClicked()
+{
+  switch( QMessageBox::question(this, "Clear current pointset...", "Do you really want do clear the current point set?",
+    QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape)) 
+  {
+  case QMessageBox::Yes: 
+    {
+      mitk::PointSet::DataType::PointsContainer::Pointer pointsContainer = m_PointSet->GetPointSet()->GetPoints();
+      pointsContainer->Initialize(); // a call to initialize results in clearing the points container
+      this->ItemsOfListUpdate();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  default: 
+    return;
+  }
+}
+
+void QmitkPointListWidget::OnLoadPointSetClicked()
+{
+  //Ask for a file name
+  //read the file by the data tree node factory
+  //add an interactor to the point set
+  //add it to the data tree
+  //register it with the poitn list widget
+
+  //
+  // get the name of the file to load
+  //
+  QString filename = QFileDialog::getOpenFileName( QString::null, "MITK Point-Sets (*.mps)", NULL );
+  if ( filename.isEmpty() )
+    return ;
+
+  //
+  // instantiate a reader and load the file
+  //
+  mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
+  reader->SetFileName( filename.latin1() );
+  reader->Update();
+
+  mitk::PointSet::Pointer pointSet = reader->GetOutput();
+  if ( pointSet.IsNull() )
+  {
+    QMessageBox::warning( this, "Load point set", "Something went wront during loading file..." );
+    return;
+  }
+
+  //
+  // fill the data tree node with the appropriate information
+  //
+  if(m_PointSetNode.IsNotNull() && m_PointSet.IsNotNull())
+  {
+    this->RemoveInteraction();
+    m_PointSet = pointSet;
+    m_PointSetNode->SetData( m_PointSet );
+    if (this->m_SetPoints->isOn())
+    {
+      this->AddInteraction();
+    }
+    else
+    {
+      this->ItemsOfListUpdate();
+    }
+  }  
+}
+
+void QmitkPointListWidget::OnSavePointSet()
+{
+  if (m_PointSet.IsNull())
+  {
+    QMessageBox::warning( this, "Save point set", "A valid point set has to be selected first..." );
+    return;
+  }
+
+  //
+  // let the user choose a file
+  //
+  std::string name = "";
+
+  QString fileNameProposal = "PointSet";
+  fileNameProposal.replace(' ','_');
+  fileNameProposal.append(".mps");
+  QString aFilename = QFileDialog::getSaveFileName( fileNameProposal.latin1() );
+  if ( !aFilename )
+    return ;
+
+  //
+  // instantiate the writer and add the point-sets to write
+  //
+  mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
+  writer->SetInput( m_PointSet );
+  writer->SetFileName( aFilename.latin1() );
+  writer->Update();
+}
+
+void QmitkPointListWidget::SetPointColor(mitk::Color color)
+{
+  // the color for the points to be shown in render windows, has to be set before adding a new point set node
+  m_Color = color;
+}
+
+void QmitkPointListWidget::SetName(std::string name)
+{
+  // the name of the point set, has to be set before adding a new point set node
+  m_Name = name;
+}
+
+void QmitkPointListWidget::SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)
+{
+  // has to be called to change the point set shown in the list view, controls the interaction process
+  this->RemoveInteraction();
+  m_PointSetNode = pointSetNode;
+  m_PointSet = NULL;
+  if(m_PointSetNode.IsNotNull())
+  {
+    m_PointSet = (mitk::PointSet*)(m_PointSetNode->GetData());
+    this->m_SetPoints->setEnabled(true);
+    this->m_ClearPointSet->setEnabled(true);
+    this->m_LoadPointSet->setEnabled(true);
+    this->m_SavePointSet->setEnabled(true);
+  }
+  else
+  {
+    this->m_SetPoints->setEnabled(false);
+    this->m_SetPoints->setOn(false);
+    this->m_ClearPointSet->setEnabled(false);
+    this->m_LoadPointSet->setEnabled(false);
+    this->m_SavePointSet->setEnabled(false);
+  }
+  if (this->m_SetPoints->isOn())
+  {
+    this->AddInteraction();
+  }
+  else
+  {
+    this->ItemsOfListUpdate();
+  }
+}
+
+void QmitkPointListWidget::SetNumberOfPoints(int numberOfPoints)
+{
+  // the maximum number of points for the point set, has to be set before adding a new point set node
+  m_NumberOfPoints = numberOfPoints;
+}
+
+void QmitkPointListWidget::DeactivateInteractor(bool removeInteractor)
+{
+  if (removeInteractor)
+  {
+    // deactivates the interactor
+    this->RemoveInteraction();
+    this->m_SetPoints->setOn(false);
+  }
+}
+
+void QmitkPointListWidget::ShowPointSetActionButtons(bool show)
+{
+  // show buttons for special point set functions, to make them available
+  if (show)
+  {
+    this->m_SetPoints->show();
+    this->m_ClearPointSet->show();
+    this->m_LoadPointSet->show();
+    this->m_SavePointSet->show();
+  }
+  else
+  {
+    this->m_SetPoints->hide();
+    this->m_ClearPointSet->hide();
+    this->m_LoadPointSet->hide();
+    this->m_SavePointSet->hide();
+  }
 }

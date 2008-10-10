@@ -108,6 +108,11 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     */
     void RegistrationErrorDialogFound( QWidget* widget );
 
+    /**
+    \brief Helper method for testing
+    */
+    void ClearPointSetDialogFound( QWidget* widget );
+
   private:
     bool m_MessageBox;
 
@@ -116,6 +121,8 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
 #else
     // slot function is needed, because moc ignores our #ifdefs
     void RegistrationErrorDialogFound( QWidget* widget ) {}
+    // slot function is needed, because moc ignores our #ifdefs
+    void ClearPointSetDialogFound(QWidget* widget){}
 #endif
 
   protected slots:  
@@ -151,16 +158,14 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     void calculateLandmarkbasedWithICP(PointBasedRegistrationControlParameters* params);
     
     /*!  
-    \brief Adds mitk::PointSetInteractor for the moving image and removes mitk::PointSetInteractor from the fixed image, 
-    lets the fixed image become invisible and the moving image visible
+    \brief lets the fixed image become invisible and the moving image visible
     */
-    void addMovingInteractor();
+    void HideMovingImage(bool hide);
     
     /*!  
-    \brief Adds mitk::PointSetInteractor for the fixed image  and removes mitk::PointSetInteractor from the fixed image, 
-    lets the moving image become invisible and the fixed image visible
+    \brief lets the moving image become invisible and the fixed image visible
     */
-    void addFixedInteractor();
+    void HideFixedImage(bool hide);
 
     /*!  
     \brief Checks if registration is possible
@@ -183,21 +188,11 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     void RedoTransformation();
 
     /*!  
-    \brief Removes all points from fixed and moving pointset
-    */
-    void ResetPointsets();
-
-    /*!  
     \brief Stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
 
     @param if true, then images will be shown in red and green
     */
     void showRedGreen(bool show);
-
-    /*!  
-    \brief Removes mitk::PointSetInteractor from both images and let both images become visible
-    */
-    void bothSelected();
 
     /*!  
     \brief Sets the selected opacity for moving image
@@ -207,28 +202,14 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     void OpacityUpdate(float opacity);
 
     /*!  
-    \brief Updates the moving landmarks in QmitkPointBasedRegistrationControls widget 
+    \brief Updates the moving landmarks 
     */
     void updateMovingLandmarksList();
 
     /*!  
-    \brief Updates the fixed landmarks in QmitkPointBasedRegistrationControls widget 
+    \brief Updates the fixed landmarks
     */
     void updateFixedLandmarksList();
-
-    /*!  
-    \brief Sets the point to be selected and jumps to the position in moving image according to this point
-    
-    @param pointID the point ID of the selected point set point
-    */
-    void movingLandmarkSelected(int pointID);
-    
-    /*!  
-    \brief Sets the point to be selected and jumps to the position in fixed image according to this point
-    
-    @param pointID the point ID of the selected point set point
-    */
-    void fixedLandmarkSelected(int pointID);
 
     /*!  
     \brief Sets the images to gray values or fixed image to red and moving image to green
@@ -236,26 +217,6 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     @param if true, then images will be shown in red and green
     */
     void setImageColor(bool redGreen);
-
-    /*!  
-    \brief Removes the fixed mitk::PointSetInteractor
-    */
-    void removeFixedInteractor();
-
-    /*!  
-    \brief Removes the fixed PointSetObserver
-    */
-    void removeFixedObserver();
-
-    /*!  
-    \brief Removes the moving mitk::PointSetInteractor
-    */
-    void removeMovingInteractor();
-
-    /*!  
-    \brief Removes the moving PointSetObserver
-    */
-    void removeMovingObserver();
 
     /*!  
     \brief Clears the undo and redo transformation lists.
@@ -279,81 +240,7 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     */
     void setInvisible(bool invisible);
 
-    /*!  
-    \brief Opens a dialog box to select a file containing a point set for the fixed image.
-    */
-    void loadFixedPointSet();
-
-    /*!  
-    \brief Opens a dialog box to select a file containing a point set for the moving image.
-    */
-    void loadMovingPointSet();
-
-    /*!  
-    \brief Opens a dialog box to save the fixed image point set.
-    */
-    void saveFixedPointSet();
-
-    /*!  
-    \brief Opens a dialog box to save the moving image point set.
-    */
-    void saveMovingPointSet();
-
   protected:
-
-    // observer class to react on changes on point set nodes
-    class PointSetObserver : public itk::Command 
-    {
-    public:
-      typedef  PointSetObserver         Self;
-      typedef  itk::Command             Superclass;
-      typedef  itk::SmartPointer<Self>  Pointer;
-
-      itkNewMacro( Self );
-
-    protected:
-      PointSetObserver()  { };
-
-    public:
-
-      void Execute(itk::Object *object, const itk::EventObject & event)
-      {
-        Execute( (const itk::Object*) object, event );
-      }
-    
-      // if landmarks were added or removed, then update landmark lists
-      void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
-      {
-        if (m_FixedImage)
-        {
-          m_Parent->updateFixedLandmarksList();
-        }
-        else
-        {
-          m_Parent->updateMovingLandmarksList();
-        }
-      }
-
-      // @param parent the parent QmitkPointBasedRegistration class
-      void SetParent(QmitkPointBasedRegistration* parent)
-      {
-        m_Parent = parent;
-      }
-
-      // @param fixed if true, this observer belongs to the fixed point set, otherwise to the moving point set
-      void SetFixed(bool fixed)
-      {
-        m_FixedImage = fixed;
-      }
-
-    private: 
-      
-      // holds the QmitkPointBasedRegistration class to call function for updates on landmarks
-      QmitkPointBasedRegistration*  m_Parent;
-
-      // stores the information whether this observer belongs to the fixed point set or to the moving point set
-      bool m_FixedImage;
-    };
 
     /*!  
     * default main widget containing 4 windows showing 3   
@@ -367,40 +254,31 @@ class QmitkPointBasedRegistration : public QmitkFunctionality
     QmitkPointBasedRegistrationControls * m_Controls;
     mitk::PointSet::Pointer m_FixedLandmarks;
     mitk::PointSet::Pointer m_MovingLandmarks;
-    PointSetObserver::Pointer m_FixedLandmarkObserver;
-    PointSetObserver::Pointer m_MovingLandmarkObserver;
-    mitk::PointSetInteractor::Pointer m_FixedInteractor;
-    mitk::PointSetInteractor::Pointer m_MovingInteractor;
-    mitk::GlobalInteraction::Pointer m_GlobalInteraction;
     mitk::DataTreeNode::Pointer m_MovingPointSetNode;
     mitk::DataTreeNode::Pointer m_FixedPointSetNode;
     mitk::DataTreeNode* m_MovingNode;
     mitk::DataTreeNode* m_FixedNode;
-    mitk::AffineInteractor::Pointer m_AffineInteractor;
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_UndoPointsGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoPointsGeometryList;
     bool m_SetInvisible;
     bool m_ShowRedGreen;
-    bool m_WorkWithFixed;
-    bool m_WorkWithMoving;
-    bool m_WorkWithBoth;
     float m_Opacity;
     float m_OriginalOpacity;
     int m_OldMovingLayer;
     int m_NewMovingLayer;
-    bool m_FixedLandmarkObserverSet;
-    bool m_MovingLandmarkObserverSet;
     bool m_OldMovingLayerSet;
     bool m_NewMovingLayerSet;
-    unsigned long m_FixedLandmarkAddedObserver;
-    unsigned long m_FixedLandmarkRemovedObserver;
-    unsigned long m_MovingLandmarkAddedObserver;
-    unsigned long m_MovingLandmarkRemovedObserver;
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
     invisibleNodesList m_InvisibleNodesList;
     int m_Transformation;
+    bool m_HideFixedImage;
+    bool m_HideMovingImage;
+    std::string m_OldFixedLabel;
+    std::string m_OldMovingLabel;
+    bool m_Deactivated;
+
 };
 #endif // !defined(QMITK_POINTBASEDREGISTRATION_H__INCLUDED)

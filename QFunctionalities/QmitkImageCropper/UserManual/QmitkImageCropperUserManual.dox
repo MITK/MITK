@@ -1,0 +1,32 @@
+/**
+\page QmitkImageCropperUserManual Image cropper
+
+Available sections:
+  - \ref QmitkImageCropperUserManualOverview 
+  - \ref QmitkImageCropperUserManualFeatures 
+  - \ref QmitkImageCropperUserManualUsage 
+
+\section QmitkImageCropperUserManualOverview Overview
+
+ImageCropper is a functionality for ...
+
+\section QmitkImageCropperUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkImageCropperUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

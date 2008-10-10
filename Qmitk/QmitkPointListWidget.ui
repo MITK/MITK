@@ -86,8 +86,91 @@
                 <enum>Sunken</enum>
             </property>
         </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>m_SetPoints</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image0</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Set Points (Shift + Left Mouse Button)</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>m_ClearPointSet</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image1</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Clear Point Set</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>m_LoadPointSet</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image2</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Load Points</string>
+                    </property>
+                </widget>
+                <widget class="QToolButton">
+                    <property name="name">
+                        <cstring>m_SavePointSet</cstring>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                    <property name="iconSet">
+                        <iconset>image3</iconset>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Save Points</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
     </vbox>
 </widget>
+<images>
+    <image name="image0">
+        <data format="XPM.GZ" length="2028">789cddd24b4f1a5118c6f13d9f62e2d9996664ee3369ba400505517010459b2e66ce051146918b084dbf7b791edb264d1cba68d245cf9f59fc923767ce010ef6ad41f7dcda3fa8cc17d962242d799fcdac7db52c8af5e72f9fbe56f6bcaab5fd84bee5ec7da8eca596b444950bbc231d04de902e026ba487c036e923f08c0c10d82343043a6484c080cc10e8838e87c02aa911d8005d85c073d07311382003049e90b9a7bc1c14a0cf059e920102bb6488c06b52f9dae78b5e41de805f4e486296c387648ec039a91138042307812b3244a02113043e932ad211dffb00c60e029fc8200e639ef9f20755ccadfa64b68dc73826f3c479e3119878087c24a32449f82b4cc80c8139a910284983c011983908bc277d04ba64b88d3b4724168ff102e64afa39bf9c19285d042ec8406692175c93a134925b35c94805320633d2205081fc6b70ab16e96b5771ab3a99e850f182176486c02bd22070f3469d69fedcb7a08e10e891310297a434ae966087e40213d038089c92ae090d0fa9490f8163324060414626337c6f4cc608b4492e72e7facf27c45f4f64b9906ac78436c37b311a3e8c4b278693a21045f168ca26e4d3743a15dbe7795632315f2c974bb17d5e56ef4e88dfd7bb7bbcae379b8dd8d4362f87256f393aaed7eba2de38b1272513fab4d96a89d659fbfca2ecb69dee6553346b694f5c954cd8e3feb5b8aea537edc16dc904ae64f7d25a3b6d74764ea477695add3171e6f452b7e3954ed8b6ffd00f063f8ffaeec4c8b6c3348a774c709f55f287895feb1f4d7cfb58f90eb516a00f</data>
+    </image>
+    <image name="image1">
+        <data format="PNG" length="138">89504e470d0a1a0a0000000d494844520000000d000000100806000000cda3f5390000005149444154789ced93b10dc03008c07095abf85f7e8b4e44999a74ac544f0c1879013532b362834acf4444553d3b30f743e558aaaa295fbbac953e3e4e8535f1485af3817779cd2f7d431a2ac0f6351a951b1cd01f6fda48acc80000000049454e44ae426082</data>
+    </image>
+    <image name="image2">
+        <data format="PNG" length="160">89504e470d0a1a0a0000000d494844520000000f0000000c0806000000bd42e7e40000006749444154789c9d91c10dc0200c03cf88a9d85f5e2bfd14442988164bf9e57c11c83600a594a08b6db149ae60c4834552ec0a04bcc01b9e027de1125edaa456f08257c6d905796cfd7a85a44827604ddaaf4cadd8563ab536f3e96b37f35f1020b53f93b633e602141237d29ad782bc0000000049454e44ae426082</data>
+    </image>
+    <image name="image3">
+        <data format="PNG" length="185">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000008049444154789cc592510ac3300c439f4bef7f2c5d4bfb9947d63976d93e2608042414c90e9200fccd914400b60d404490f71d564d4470ee442b6c6fcd4b834ab84bd626c8973b9331c13493a3656fe06783b70ad7ce15ae953e6630756e1324ba146382fc30eb2a2b3ef1ff2d1c92a2ea6cfbd6404f80a7c94b3dad327949f1005f4f57b1731361950000000049454e44ae426082</data>
+    </image>
+</images>
 <connections>
     <connection>
         <sender>InteractivePointList</sender>
@@ -95,8 +178,31 @@
         <receiver>QmitkPointListWidget</receiver>
         <slot>PointSelect(int)</slot>
     </connection>
+    <connection>
+        <sender>m_SetPoints</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkPointListWidget</receiver>
+        <slot>OnSetPointsToggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_ClearPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointListWidget</receiver>
+        <slot>OnClearPointSetClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_LoadPointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointListWidget</receiver>
+        <slot>OnLoadPointSetClicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_SavePointSet</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkPointListWidget</receiver>
+        <slot>OnSavePointSet()</slot>
+    </connection>
 </connections>
-<exportmacro>QMITK_EXPORT</exportmacro>
 <includes>
     <include location="local" impldecl="in declaration">mitkCommon.h</include>
     <include location="local" impldecl="in declaration">mitkPointSet.h</include>
@@ -115,7 +221,11 @@
     <include location="global" impldecl="in declaration">string</include>
     <include location="local" impldecl="in declaration">mitkPolygonInteractor.h</include>
     <include location="local" impldecl="in declaration">mitkMesh.h</include>
-    <include location="local" impldecl="in implementation">QmitkPointListWidget.ui.h</include>
+    <include location="local" impldecl="in declaration">qmessagebox.h</include>
+    <include location="local" impldecl="in declaration">qfiledialog.h</include>
+    <include location="local" impldecl="in declaration">mitkPointSetReader.h</include>
+    <include location="local" impldecl="in declaration">mitkPointSetWriter.h</include>
+    <include location="local" impldecl="in declaration">itksys/SystemTools.hxx</include>
 </includes>
 <variables>
     <variable>mitk::PolygonInteractor::Pointer m_CurrentPolygonInteraction;</variable>
@@ -126,20 +236,39 @@
     <variable>mitk::PointSet::Pointer m_PointSet;</variable>
     <variable>std::string prefix;</variable>
     <variable>unsigned long m_CurrentObserverID;</variable>
+    <variable>mitk::Color m_Color;</variable>
+    <variable>std::string m_Label;</variable>
+    <variable>std::string m_Name;</variable>
+    <variable>int m_NumberOfPoints;</variable>
+    <variable>mitk::DataTreeNode::Pointer m_PointSetNode;</variable>
 </variables>
+<signals>
+    <signal>PointListChanged()</signal>
+</signals>
 <slots>
     <slot>PointSelect( int ItemIndex )</slot>
+    <slot>OnSetPointsToggled(bool setPoints)</slot>
+    <slot>OnClearPointSetClicked()</slot>
+    <slot>OnLoadPointSetClicked()</slot>
+    <slot>OnSavePointSet()</slot>
     <slot>ItemsOfListUpdate()</slot>
     <slot>RemoveInteraction()</slot>
+    <slot access="private">AddInteraction()</slot>
     <slot>Reinitialize( bool disableInteraction )</slot>
     <slot>keyPressEvent( QKeyEvent * e )</slot>
-    
+    <slot access="private">DeactivateInteractor(bool removeInteractor)</slot>
+    <slot>ShowPointSetActionButtons(bool show)</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
     <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
+    <function> SetPointColor(mitk::Color color)</function>
+    <function> SetName(std::string name)</function>
+    <function> SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)</function>
+    <function> SetNumberOfPoints(int numberOfPoints)</function>
 </functions>
+<exportmacro>QMITK_EXPORT</exportmacro>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

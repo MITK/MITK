@@ -5,7 +5,7 @@ Available sections:
   - \ref QmitkVolumeVisualizationUserManualOverview 
 
 
-\section QmitkVolumeVisualizationOverview Overview
+\section QmitkVolumeVisualizationUserManualOverview Overview
 
 A functionality to create and edit piecewise linear transfer functions for direct volume rendering,
 including color, scalar and gradient opacity functions.

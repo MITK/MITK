@@ -1,0 +1,32 @@
+/**
+\page QmitkVolumetryUserManual Volumetry
+
+Available sections:
+  - \ref QmitkVolumetryUserManualOverview 
+  - \ref QmitkVolumetryUserManualFeatures 
+  - \ref QmitkVolumetryUserManualUsage 
+
+\section QmitkVolumetryUserManualOverview Overview
+
+Volumetry is a functionality for ...
+
+\section QmitkVolumetryUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkVolumetryUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

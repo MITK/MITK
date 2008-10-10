@@ -1,0 +1,32 @@
+/**
+\page QmitkMeasurementUserManual Measurement
+
+Available sections:
+  - \ref QmitkMeasurementUserManualOverview 
+  - \ref QmitkMeasurementUserManualFeatures 
+  - \ref QmitkMeasurementUserManualUsage 
+
+\section QmitkMeasurementUserManualOverview Overview
+
+Measurement is a functionality for ...
+
+\section QmitkMeasurementUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkMeasurementUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

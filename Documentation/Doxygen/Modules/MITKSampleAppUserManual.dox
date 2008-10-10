@@ -1,18 +1,167 @@
 /**
-\page MITKSampleAppUserManual Sampleapp User Manual
+\page MITKSampleAppUserManual MainApp User Manual
 
-Some introductory words. There are functionalities.
+MainApp is the application that accompanies the Medical Imaging Interaction Toolkit (MITK). 
+If you are a developer, do not think that MainApp is the only MITK application -- it is rather
+a commonly used example of how to create an application with the MITK toolkit.
 
-Your typical SampleApp will look like this:
+MainApp can load several kinds of medical data like images and surface models. The application 
+visualizes this data and makes them available to program modules called "functionalities". MainApp
+itself does not offer any kind of image processing functions, but it is merely a host to a number of
+functionalities. The exact choice of functionalities that is available in your version of MainApp is
+determined by the developer who created your version of MainApp.
 
-\image html MITKSampleAppScreenShot.png "The MITKSampleApp"
+This page will describe the functions of MainApp that are independent of functionalities. After reading
+this page, you should be able to
+<ul>
+  <li> Load data like images and polygon surfaces
+  <li> Visualize data in 2D cuts and as a 3D rendering
+  <li> Use the buttons in the MainApp toolbar
+  <li> Switch between functionalities
+</ul>
 
-The image/scene control that takes up most of your screen is documented here: \ref QmitkStdMultiWidgetUserManual.
+Available sections:
+  \li \ref MITKSampleAppUserManualUserInterface
+  \li \ref MITKSampleAppUserManualLoading
+  \li \ref MITKSampleAppUserManualUndoRedo
+  \li \ref MITKSampleAppUserManualRenderWindows
+  \li \ref MITKSampleAppUserManualDialogBars
+  \li \ref MITKSampleAppUserManualFunctionalities
 
-Since they differ much in what they do, each functionality has its own documentation:
+\section MITKSampleAppUserManualUserInterface The user interface
 
- - \ref QmitkEasySegmentationUserManual
+Your typical MainApp will look like this:
 
-If your functionality is not listed here, ask the author to provide a user manual: mitk@dkfz-heidelberg.de
+\image html MITKSampleAppScreenShot.png User interface of MainApp
+
+Most of the space is used for the four "render windows" on the left, which visualize loaded images and polygon
+surfaces. By default these will display transversal, sagittal and frontal reconstructions of all loaded data, as
+well as a 3D representation of this data.
+
+On the right side of the render windows there is a scale, which can be used to change image contrast (level-window).
+
+The area on the very right is called "controls area". The contents of this area changes with the active functionality
+and provides the user interface for functionality specific image processing functions.
+
+The toolbar at the top of the screen is divided into four areas:
+<ul>
+  <li> Loading, undo, and redo
+  <li> Changing layout of the renderwindows and its behaviour to mouse clicks
+  <li> Switches for "dialog bars", little helper windows which are displayed in parallel with functionalities
+  <li> Switches for selection of the active functionality
+</ul>
+
+\section MITKSampleAppUserManualLoading Loading data into the application
+
+MITK is able to process different kind of 2D and 3D datasets:
+
+<ul>
+  <li> Images
+  <ul>
+    <li> DICOM format (*.dcm, *.dc3, *.gdcm, *)
+    <li> MetaImage (*.hdr)
+    <li> Analyze (*.nhdr)
+    <li> VTK images (*.vti)
+    <li> DKFZ PIC format (*.pic, *.pic.gz)
+    <li> Set of slices (*.pic, *.pic.gz, *.bmp, *.png, *.dcm, *.gdcm, *.tiff)
+  </ul>
+  <li> Polygon surfaces
+  <ul>
+    <li> STL (*.stl)
+    <li> VTK surfaces (*.vtk, *.vtp)
+    <li> *.obj
+  </ul>
+  <li> Point sets
+  <ul>
+    <li> DKFZ MPS format (*.mps)
+
+To load data into MainApp, you can
+<ul>
+  <li> drag and drop a file from Explorer/Nautilus/etc. into the application
+  <li> choose "File/Open..." and select the file (in case of <i>a series of slices</i>, select only the first slice)
+</ul>
+
+\image html MITKSampleAppLoadDragDrop.png Drag and drop files into MainApp to load data
+
+\section MITKSampleAppUserManualUndoRedo Undo and redo
+
+Some parts of MITK support undo and redo. Examples are the render windows (changing the viewport, zooming), the "Image cropper" and "Interactive Segmentation" functionalities. In these cases you can undo your last action by clicking the toolbar buttons (see image below) or selecting "Edit/Undo".
+
+\image html undoredobutton.png Undo and redo buttons
+
+\section MITKSampleAppUserManualRenderWindows Render windows (configuration and navigation)
+
+
+When MainApp has loaded data, this data is displayed in four render windows: three 2D slices, which by default display a transversal (red), sagittal (green), and frontal (blue) cut through all images, surfaces, etc. The fourth windows displays the three 2D slices in a 3D scene, together will all other data that can be rendered in 3D, e.g. polygon surface, volume rendered images, or points sets.
+
+\image html renderwindows.png Three connected slices through your data are moved by clicking the mouse. The green-blue bar right of the render windows controls the image contrast.
+
+\section MITKSampleAppUserManualRenderWindowsNavigation Navigating through your data
+
+You can move the three 2D views through your data by clicking and dragging the mouse inside the window:
+<ul>
+  <li> You <b>move slices</b> by dragging the crosshair in any of the 2D views. Alternatively you can use the mouse wheel to scroll through the slices of a 2D view.
+  <li> You <b>zoom</b> by holding down the right mouse button and then moving the cursor up and down.
+  <li> You <b>pan</b> the current view by dragging inside a renderwindow with the middle mouse button.
+<ul>
+
+In 3D, the left mouse button function changes to rotation of the whole scene.
+
+\subsection MITKSampleAppUserManualRenderWindowsOptions More options for render windows
+
+A couple of toolbar buttons (as well as menu entries) allow to configure the layout of the four render windows. 
+
+\image html renderwindowOptions.png Several buttons influence layout and behavior of the render windows
+
+The combobox (reading "standard layout" by default) offers several arrangements of the render windows. By selecting
+these you can work on a maximized transversal slice, or display only a 3D scene, etc.
+
+The buttons right of the combobox provide these functions:
+<ul>
+  <li> Fullscreen mode: uses up most of the screen space for MainApp.
+  <li> Plane visibility: show or hide the crosshairs in 2D and the planes in 3D.
+  <li> Plane locking: lock crosshair positions, do not move them on mouse clicks.
+  <li> Rotation off: crosshairs can be moved but not rotated.
+  <li> Rotation on: crosshairs can be rotated by moving the mouse near plane in 2D and then dragging them.
+  <li> Swivel mode: hard to describe rotation mode. By clicking and dragging inside a 2D render window, you rotate this plane around the center of all crosshairs. Just try it and watch the effect in the 3D render window -- you'll get an idea.
+</ul>
+
+\section MITKSampleAppUserManualDialogBars Dialog bars
+
+There are some widgets that provide useful functions, but which should not always be visible to save screen space. We call these widgets dialog bars. They can be turned on or off by toggling these buttons in the toolbar:
+
+\image html dialogbarbuttons.png Toggling dialog bars on/off
+
+The functions provided by these widgets are as follows:
+
+\image html dialogbarSlicer.png Changing 2D slice positions
+\image html dialogbarStandardViews.png Setting standard view points in 3D
+\image html dialogbarStereoOptions.png Enabling 3D stereo mode rendering
+
+
+\section MITKSampleAppUserManualFunctionalities Functionalities (program modules)
+
+With a standard MainApp, you will see these buttons in you toolbar:
+
+\image html functionalityButtons.png These buttons change the active functionality
+
+Clicking them activates the corresponding functionality and will change the contents of the controls area at the right side of the screen.
+Documentation for these functionalities can be found here:
+<ul>
+  <li> \ref QmitkDataManagerUserManual
+  <li> \ref QmitkImageCropperUserManual
+  <li> \ref QmitkInteractiveSegmentationUserManual
+  <li> \ref QmitkIsoSurfaceUserManual
+  <li> \ref QmitkMeasurementUserManual
+  <li> \ref QmitkMovieMakerUserManual
+  <li> \ref QmitkPointBasedRegistrationUserManual
+  <li> \ref QmitkRegionGrowingUserManual
+  <li> \ref QmitkRigidRegistrationUserManual
+  <li> \ref QmitkSimpleExampleFunctionalityUserManual
+  <li> \ref QmitkViewInitializationUserManual
+  <li> \ref QmitkVolumetryUserManual
+  <li> \ref QmitkVolumeVisualizationUserManual
+</ul>
 
 */
+

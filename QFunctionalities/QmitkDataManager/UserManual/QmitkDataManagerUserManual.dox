@@ -8,20 +8,34 @@ Available sections:
 
 \section QmitkDataManagerUserManualOverview Overview
 
-DataManager is a functionality for ...
+DataManager is a functionality which gives the user a view on the data tree and allows simple operations like loading, saving and removing
+nodes of the tree. It was created for developers use to be able to do simple debugging during runtime.
+
+A more detailed description of the provided features can be found below.
+
+\image html DataManager.png "DataManager graphical user interface"
 
 \section QmitkDataManagerUserManualFeatures Features
 
 <ul>
-  <li> This
+  <li> <b>Standard</b>
   <ul>
-    <li> thing
-    <li> stuff
+    <li> <b>Load:</b> Load any kind of data supported by MITK and add it to the data tree
+    <li> <b>Save:</b> Save the data of the selected node
+    <li> <b>Remove:</b> Remove the selected node from the data tree
+    <li> <b>Global Reinit:</b> Reinitializes the view on the scene so that all objects are included in the field of view.
+    <li> <b>Reinit:</b> Reinitializes the view of the current selected data tree node and adapts the field of view to its geometry
+    <li> <b>Info:</b> Shows technical informations of the current selected data tree node like origin, transformation, bounding box. 
+					  This is useful for debugging purposes
+    <li> <b>Properties:</b> All Properties defined for the selected data tree node and its data are defined in this property list.
+    <ul>
+		<li>They can be enabled/disabled with the button behind each property
+		<li>They can be set individually for each render window by chosing the render window from the render window list on top of the properties
+    </ul>
   </ul>
-  <li> and that
-  <ul>
-    <li> to be replaced
-  </ul>
+  <li> <b>Multimode:</b> Allows to change the properties "name", "visible", "color" and "opacity" for all objects of the data tree. This can
+  also be done individually for the different render windows.
+  
 </ul>
     
 \section QmitkDataManagerUserManualUsage Usage

@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>260</width>
+            <width>310</width>
             <height>651</height>
         </rect>
     </property>
@@ -43,7 +43,7 @@
                 <cstring>m_EnableSurroundingCheckBox</cstring>
             </property>
             <property name="text">
-                <string>Set corner voxels to specific value</string>
+                <string>Set border voxels to specific value after cropping</string>
             </property>
         </widget>
         <widget class="QLabel">
@@ -51,7 +51,7 @@
                 <cstring>m_TLGrayvalue</cstring>
             </property>
             <property name="text">
-                <string>Select grayvalue of the corner voxels</string>
+                <string>Select grayvalue of the border voxels</string>
             </property>
         </widget>
         <widget class="QLayoutWidget">

@@ -50,6 +50,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "vtkRenderWindowInteractor.h"
+#include <qradiobutton.h>
+
 
 
 QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
@@ -82,6 +84,7 @@ QmitkMovieMaker::QmitkMovieMaker( QObject *parent, const char *name,
     std::cerr << " platform or an error occurred during";
     std::cerr << " mitk::MovieGenerator::New()" << std::endl;
   }
+  
 }
 
 QmitkMovieMaker::~QmitkMovieMaker()
@@ -90,6 +93,7 @@ QmitkMovieMaker::~QmitkMovieMaker()
   delete m_Timer;
   delete m_Time;
   //delete m_RecordingRenderer;
+  
 }
 
 mitk::BaseController* QmitkMovieMaker::GetSpatialController()
@@ -226,8 +230,17 @@ void QmitkMovieMaker::Activated()
 {
   QmitkFunctionality::Activated();
   
-  m_FocusManagerObserverTag = mitk::GlobalInteraction::GetInstance()->GetFocusManager()->AddObserver( mitk::FocusEvent(), m_FocusManagerCallback);
+	// create a member command that will be executed from the observer
+  itk::SimpleMemberCommand<QmitkMovieMaker>::Pointer stepperChangedCommand;
+  stepperChangedCommand = itk::SimpleMemberCommand<QmitkMovieMaker>::New();
+  // set the callback function of the member command
+  stepperChangedCommand->SetCallbackFunction(this, &QmitkMovieMaker::UpdateGUI);
+  // add an observer to the data tree node pointer connected to the above member command
+  std::cout<<"Add observer on insertion point node in NavigationPathController::AddObservers"<<std::endl;
+  m_StepperObserverTag = this->GetTemporalController()->GetTime()->AddObserver(itk::ModifiedEvent(),stepperChangedCommand);
 
+  m_FocusManagerObserverTag = mitk::GlobalInteraction::GetInstance()->GetFocusManager()->AddObserver( mitk::FocusEvent(), m_FocusManagerCallback);
+  this->UpdateGUI();
   // Initialize steppers etc.
   this->FocusChange();
 }
@@ -235,7 +248,7 @@ void QmitkMovieMaker::Activated()
 void QmitkMovieMaker::Deactivated()
 {
   QmitkFunctionality::Deactivated();
-
+  this->GetTemporalController()->GetTime()->RemoveObserver(m_StepperObserverTag);
   mitk::GlobalInteraction::GetInstance()->GetFocusManager()->RemoveObserver( m_FocusManagerObserverTag ); // remove (if tag is invalid, nothing is removed)
 }
 
@@ -516,3 +529,23 @@ void QmitkMovieMaker::GenerateScreenshot()
     emit EndBlockControlsMovieDeactive();
 }
 
+void QmitkMovieMaker::UpdateGUI()
+{
+	int bla = this->GetTemporalController()->GetTime()->GetSteps();
+	if ( bla < 2 ) {
+		m_Controls->rbtnTemporal->setEnabled(false);
+		m_Controls->rbtnCombined->setEnabled(false);
+		m_Controls->spatialTimeRelation->setEnabled(false);
+	}
+	else {
+		m_Controls->rbtnTemporal->setEnabled(true);
+		m_Controls->rbtnCombined->setEnabled(true);
+		m_Controls->spatialTimeRelation->setEnabled(true);
+	}
+
+}
+
+void QmitkMovieMaker::TreeChanged()
+{
+//  UpdateGUI();
+}

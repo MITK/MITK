@@ -169,6 +169,8 @@ public:
   /** \brief Called when another window receives the focus. */
   void FocusChange();
 
+  virtual void TreeChanged();
+
 signals:
   void StartBlockControls();
   void EndBlockControls();
@@ -237,6 +239,8 @@ private:
   void UpdateLooping();
   
   void UpdateDirection();
+
+  void UpdateGUI();
   
   mitk::Stepper* GetAspectStepper();
 
@@ -259,6 +263,9 @@ private:
   mitk::MovieGenerator::Pointer m_movieGenerator;
 
   unsigned long m_FocusManagerObserverTag;
+  unsigned long m_StepperObserverTag;
+
+  
 
 };
 #endif // !defined(QMITK_MOVIEMAKER_H__INCLUDED)

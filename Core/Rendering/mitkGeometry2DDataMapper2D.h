@@ -41,16 +41,16 @@ class MITK_CORE_EXPORT Geometry2DDataMapper2D : public GLMapper2D
 {
 
 public:
-  mitkClassMacro(Geometry2DDataMapper2D, Mapper2D);
+  mitkClassMacro(Geometry2DDataMapper2D, GLMapper2D);
 
   itkNewMacro(Self);
 
   /**
     * \brief Get the Geometry2DData to map
     */
-  const mitk::Geometry2DData * GetInput(void);
+  const Geometry2DData *GetInput();
 
-  virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint( BaseRenderer *renderer );
 
   /**
     * \brief Leave a little gap when crossing other nodes containing 
@@ -58,7 +58,10 @@ public:
     *
     * \note works currently for PlaneGeometry only
     */
-  virtual void SetDataIteratorToOtherGeometry2Ds(const mitk::DataTreeIteratorBase* iterator);
+  virtual void SetDataIteratorToOtherGeometry2Ds(const DataTreeIteratorBase *iterator);
+
+  /** Applies properties specific to this mapper */
+  virtual void ApplyProperties( BaseRenderer *renderer );
 
 
 protected:
@@ -68,6 +71,12 @@ protected:
 
   virtual void GenerateData();
 
+  void DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
+    const PlaneGeometry *planeGeometry, 
+    const PlaneGeometry *rendererPlaneGeometry, 
+    const DisplayGeometry *displayGeometry,
+    bool positiveOrientation = true );
+
   SurfaceMapper2D::Pointer m_SurfaceMapper;
 
   /**
@@ -76,10 +85,13 @@ protected:
     *
     * \note works currently for PlaneGeometry only
     */
-  mitk::DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
+  DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
 
-  typedef std::vector<mitk::DataTreeNode*> NodesVectorType;
+  typedef std::vector<DataTreeNode*> NodesVectorType;
   NodesVectorType m_OtherGeometry2Ds;
+
+  bool m_RenderOrientationArrows;
+  bool m_ArrowOrientationPositive;
 };
 
 } // namespace mitk

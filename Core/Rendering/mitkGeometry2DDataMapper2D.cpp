@@ -23,31 +23,39 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
+#include "mitkPlaneDecorationProperty.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkSurfaceMapper2D.h"
 #include "mitkLine.h"
 
-mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
-: m_SurfaceMapper(NULL)
+
+namespace mitk
+{
+
+
+Geometry2DDataMapper2D::Geometry2DDataMapper2D()
+: m_SurfaceMapper( NULL ),
+  m_RenderOrientationArrows( false ),
+  m_ArrowOrientationPositive( true )
 {
 }
 
 
-mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
+Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 {
 }
 
 
-const mitk::Geometry2DData *
-mitk::Geometry2DDataMapper2D::GetInput(void)
+const Geometry2DData *
+Geometry2DDataMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::Geometry2DData * > ( GetData() );
+  return static_cast<const Geometry2DData * > ( GetData() );
 }
 
 
 void 
-mitk::Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(
-  const mitk::DataTreeIteratorBase *iterator )
+Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(
+  const DataTreeIteratorBase *iterator )
 {
   if (m_IteratorToOtherGeometry2Ds != iterator)
   {
@@ -58,27 +66,27 @@ mitk::Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(
 
 
 void 
-mitk::Geometry2DDataMapper2D::GenerateData()
+Geometry2DDataMapper2D::GenerateData()
 {
   // collect all Geometry2DDatas accessible by traversing
   // m_IteratorToOtherGeometry2Ds
   m_OtherGeometry2Ds.clear();
   if(m_IteratorToOtherGeometry2Ds.IsNull()) return;
 
-  mitk::DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
+  DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
   while(!it->IsAtEnd())
   {
     if(it->Get().IsNotNull())
     {
-      mitk::BaseData* data = it->Get()->GetData();
+      BaseData* data = it->Get()->GetData();
       if(data != NULL)
       {
-        mitk::Geometry2DData* geometry2dData = 
-          dynamic_cast<mitk::Geometry2DData*>(data);
+        Geometry2DData* geometry2dData = 
+          dynamic_cast<Geometry2DData*>(data);
         if(geometry2dData!=NULL)
         {
-          mitk::PlaneGeometry* planegeometry = 
-            dynamic_cast<mitk::PlaneGeometry*>(geometry2dData->GetGeometry2D());
+          PlaneGeometry* planegeometry = 
+            dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
 
           if(planegeometry!=NULL)
             m_OtherGeometry2Ds.push_back(it->Get());
@@ -91,15 +99,15 @@ mitk::Geometry2DDataMapper2D::GenerateData()
 
 
 void 
-mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
+Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 {
   if ( !this->IsVisible(renderer) )
   {
     return;
   }
   
-  mitk::Geometry2DData::Pointer input =
-    const_cast< mitk::Geometry2DData * >(this->GetInput());
+  Geometry2DData::Pointer input =
+    const_cast< Geometry2DData * >(this->GetInput());
 
   // intersecting with ourself?
   if ( input.IsNull() || (this->GetInput()->GetGeometry2D() == 
@@ -141,7 +149,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     if ( worldPlaneGeometry->IntersectionLine( 
           inputPlaneGeometry, crossLine ) )
     {
-      mitk::BoundingBox::PointType boundingBoxMin, boundingBoxMax;
+      BoundingBox::PointType boundingBoxMin, boundingBoxMax;
       boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();
       boundingBoxMax = referenceGeometry->GetBoundingBox()->GetMaximum();
       if(referenceGeometry->GetImageGeometry())
@@ -154,7 +162,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
       }
 
       crossLine.Transform( *inverseTransform );
-      mitk::Point3D point1, point2;
+      Point3D point1, point2;
 
       // Then, clip this line with the (transformed) bounding box of the 
       // reference geometry.
@@ -171,7 +179,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         worldPlaneGeometry->Map( 
           transform->TransformPoint( point2 ), lineTo );
 
-        mitk::Line< ScalarType, 2 > line, otherLine;
+        Line< ScalarType, 2 > line, otherLine;
         line.SetPoints( lineFrom, lineTo );
 
         displayGeometry->WorldToDisplay( lineFrom, lineFrom );
@@ -231,7 +239,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
               t = ( otherLine.GetPoint1() - line.GetPoint1() ) * dOrth;
               norm = line.GetDirection() * dOrth;
 
-              if ( fabs( norm ) > mitk::eps )
+              if ( fabs( norm ) > eps )
               {
                 t /= norm;
                 if ( (t > 0.0) && (t < 1.0) )
@@ -279,6 +287,14 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
             glVertex2f(p1[0],p1[1]);
             glVertex2f(p2[0],p2[1]);
             glEnd ();
+
+            if ( (i == 1) && (m_RenderOrientationArrows) )
+            {
+              // Draw orientation arrow for first line segment
+              this->DrawOrientationArrow( p1, p2, 
+                inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+                m_ArrowOrientationPositive );
+            }
           }
 
           p1Param = p2Param + gapSizeInParamUnits;
@@ -294,25 +310,41 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
         glVertex2f( p1[0], p1[1] );
         glVertex2f( p2[0], p2[1] );
         glEnd();
+
+
+        // Draw orientation arrows
+        if ( m_RenderOrientationArrows )
+        {
+          this->DrawOrientationArrow( p2, p1, 
+            inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+            m_ArrowOrientationPositive );
+          if ( preLastLineParam < 2 )
+          {
+            // If we only have one line segment, draw other arrow, too
+            this->DrawOrientationArrow( p1, p2, 
+              inputPlaneGeometry, worldPlaneGeometry, displayGeometry,
+              m_ArrowOrientationPositive );
+          }
+        }
       }
     }
   }
   else
   {
-    mitk::Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
-    mitk::SmartPointerProperty::Pointer surfacecreatorprop;
-    surfacecreatorprop = dynamic_cast< mitk::SmartPointerProperty * >(
+    Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
+    SmartPointerProperty::Pointer surfacecreatorprop;
+    surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(
       GetDataTreeNode()->GetProperty(
         "surfacegeometry", renderer));
 
     if( (surfacecreatorprop.IsNull()) || 
         (surfacecreatorprop->GetSmartPointer().IsNull()) ||
-        ((surfaceCreator = dynamic_cast< mitk::Geometry2DDataToSurfaceFilter * >(
+        ((surfaceCreator = dynamic_cast< Geometry2DDataToSurfaceFilter * >(
           surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull())
       )
     {
-      surfaceCreator = mitk::Geometry2DDataToSurfaceFilter::New();
-      surfacecreatorprop = mitk::SmartPointerProperty::New(surfaceCreator);
+      surfaceCreator = Geometry2DDataToSurfaceFilter::New();
+      surfacecreatorprop = SmartPointerProperty::New(surfaceCreator);
       surfaceCreator->PlaceByGeometryOn();
       GetDataTreeNode()->SetProperty( "surfacegeometry", surfacecreatorprop );
     }
@@ -346,7 +378,7 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     
     if (m_SurfaceMapper.IsNull())
     {
-      m_SurfaceMapper=mitk::SurfaceMapper2D::New();
+      m_SurfaceMapper=SurfaceMapper2D::New();
     }
     m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
     m_SurfaceMapper->SetDataTreeNode(GetDataTreeNode());
@@ -354,3 +386,77 @@ mitk::Geometry2DDataMapper2D::Paint(mitk::BaseRenderer * renderer)
     m_SurfaceMapper->Paint(renderer);
   }
 }
+
+void 
+Geometry2DDataMapper2D
+::DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
+  const PlaneGeometry *planeGeometry,
+  const PlaneGeometry *rendererPlaneGeometry,
+  const DisplayGeometry *displayGeometry,
+  bool positiveOrientation )
+{
+  // Draw arrows to indicate plane orientation
+  // Vector along line
+  Vector2D v1 = innerPoint - outerPoint;
+  v1.Normalize();
+  v1 *= 7.0;
+
+  // Orthogonal vector
+  Vector2D v2;
+  v2[0] = v1[1];
+  v2[1] = -v1[0];
+
+  // Calculate triangle tip for one side and project it back into world
+  // coordinates to determine whether it is above or below the plane
+  Point2D worldPoint2D;
+  Point3D worldPoint;
+  displayGeometry->DisplayToWorld( outerPoint + v1 + v2, worldPoint2D );
+  rendererPlaneGeometry->Map( worldPoint2D, worldPoint );
+
+  // Initialize remaining triangle coordinates accordingly
+  // (above/below state is XOR'ed with orientation flag)
+  Point2D p1 = outerPoint + v1 * 2.0;
+  Point2D p2 = outerPoint + v1 
+    + ((positiveOrientation ^ planeGeometry->IsAbove( worldPoint )) 
+    ? v2 : -v2);
+
+  // Draw the arrow (triangle)
+  glBegin( GL_TRIANGLES );
+  glVertex2f( outerPoint[0], outerPoint[1] );
+  glVertex2f( p1[0], p1[1] );
+  glVertex2f( p2[0], p2[1] );
+  glEnd();
+}
+
+void 
+Geometry2DDataMapper2D
+::ApplyProperties( BaseRenderer *renderer )
+{
+  Superclass::ApplyProperties(renderer);
+
+  PlaneDecorationProperty* decorationProperty;
+  this->GetDataTreeNode()->GetProperty( decorationProperty, "decoration", renderer );
+  if ( decorationProperty != NULL )
+  {
+    if ( decorationProperty->GetPlaneDecoration() == 
+      PlaneDecorationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
+    {
+      m_RenderOrientationArrows = true;
+      m_ArrowOrientationPositive = true;
+    }
+    else if ( decorationProperty->GetPlaneDecoration() == 
+      PlaneDecorationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
+    {
+      m_RenderOrientationArrows = true;
+      m_ArrowOrientationPositive = false;
+    }
+    else
+    {
+      m_RenderOrientationArrows = false;
+    }
+  }
+}
+
+
+
+} // namespace

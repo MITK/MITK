@@ -83,6 +83,7 @@ SET(CPP_FILES
   mitkPlaneGeometry.cpp
   mitkPlaneLandmarkProjector.cpp
   mitkPlaneOperation.cpp
+  mitkPlaneDecorationProperty.cpp
   mitkPointData.cpp
   mitkPointOperation.cpp
   mitkPointSet.cpp

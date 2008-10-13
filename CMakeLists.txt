@@ -225,9 +225,12 @@ IF(WIN32 AND NOT UNIX)
   ############################# INSTALL TARGETS ########################## 
   INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico DESTINATION bin)
   INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
-  IF(EXISTS ${MITK_HELPPAGES_OUTPUT_DIR}/html)
-    INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
-  ENDIF(EXISTS ${MITK_HELPPAGES_OUTPUT_DIR}/html)
+  
+  # directory has to be created to make sure the installer does not report
+  # an error if doxygen was not invoked before.
+  FILE(MAKE_DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html)
+  INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
+  
   #OPENCV DLLs may be added elsewhere to install target
   
   #QT

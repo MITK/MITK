@@ -48,14 +48,7 @@ containing the specified BaseData just created with New() without any initializa
 QmitkMainTemplate supports a very basic help system. If the users presses F1 or chooses Help/Content from the menu,
 QmitkMainTemplate opens a QmitkHelpBrowser to display a HTML page that should explain the currently active functionality.
 
-The intelligence behind finding the correct help page is not very sophisticated: from the application options, the value
-of "HTML documentation path" is read. It is expected that there are HTML pages in this directory. To this path is added
-"FUNCTIONALITY_CLASS_NAMEUserManual.html", where FUNCTIONALITY_CLASS_NAME is the class name of a concrete functionality.
-
-<b>Example</b>: Your functionality class is called "QmitkSimpleExampleFunctionality", and in the application options you chose
-"HTML documentation path" to point to "~/mitk/doxygen/". The help browser will then try to open
-~/mitk/doxygen/QmitkSimpleExampleFunctionalityUserManual.html
-
+The location of the help pages is specified by the MITK_HELPPAGES_OUTPUT_DIR CMake variable.
 
 \subsection QmitkMainTemplateHelpBrowserSub2 How to create the help page
 
@@ -811,7 +804,7 @@ void QmitkMainTemplate::init()
   }
   std::cout << "  Will load from '" << goodDirectory.ascii() << "' ($MITKCONF/MITKOptions.xml overrides)" << std::endl;
   
-  m_Options->SetProperty( "HTML documentation path", mitk::StringProperty::New( goodDirectory.ascii() ) );
+  m_HelpPagesPath = goodDirectory.ascii();
 
   //create a couple of additional connections to allow the right-click show/hide to connect with the
   //options menu actions
@@ -1407,11 +1400,8 @@ void QmitkMainTemplate::viewReinitMultiWidget()
 
 void QmitkMainTemplate::displayHelpPage(const QString& helppage)
 {
-  mitk::BaseProperty::Pointer bp = m_Options->GetProperty("HTML documentation path");
-  mitk::StringProperty* pathproperty = dynamic_cast<mitk::StringProperty*>( bp.GetPointer() );
-  if (!pathproperty) return;
 
-  QDir homedir( pathproperty->GetValueAsString().c_str() );
+  QDir homedir( m_HelpPagesPath.c_str() );
   QString home( homedir.absPath() + "/" );
   QString firstpage = home + helppage;
 

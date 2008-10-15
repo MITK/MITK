@@ -54,7 +54,7 @@ int mitkRigidRegistrationPresetTest(int /*argc*/, char* /*argv*/[])
   // Testing if a save operation can be performed.
   std::cout<<"Testing if saving is possible...\n";
   if (!rrp->newPresets( rrp->getTransformValuesPresets(), rrp->getMetricValuesPresets(), 
-    rrp->getOptimizerValuesPresets(), rrp->getInterpolatorValuesPresets() ))
+    rrp->getOptimizerValuesPresets(), rrp->getInterpolatorValuesPresets(), "TestPresets.xml" ))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -69,7 +69,7 @@ int mitkRigidRegistrationPresetTest(int /*argc*/, char* /*argv*/[])
 
   // Check if the default presets (in the Functionality directory) can be loaded.
   std::cout<<"Testing default parameter loading, second time...\n";
-  if(!rrp2->LoadPreset())
+  if(!rrp2->LoadPreset("TestPresets.xml"))
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

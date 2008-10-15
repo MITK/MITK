@@ -215,8 +215,12 @@ namespace mitk {
   }
 
   bool RigidRegistrationPreset::newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
-                                            std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues)
+    std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues, std::string fileName)
   {
+    if ( !fileName.empty() )
+    {
+      m_XmlFileName = fileName;
+    }
     m_TransformValues = newTransformValues;
     m_MetricValues = newMetricValues;
     m_OptimizerValues = newOptimizerValues;

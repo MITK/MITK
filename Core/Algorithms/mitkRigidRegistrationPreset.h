@@ -86,13 +86,16 @@ namespace mitk {
     */
     std::map<std::string, itk::Array<double> >& getInterpolatorValuesPresets();
     /**
-    * \brief Saves new presets in the previous opened xml file.
+    * \brief Saves new presets in the previous opened xml file or in the new fileName location.
     *
     * Every old entry will be removed from the xml file and replaced by the ones stored in the parameter maps. Make sure you have the 
     * old presets as well as the new ones within the maps.
     */
-    bool newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
-                                            std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues);  
+    bool newPresets(std::map<std::string, itk::Array<double> > newTransformValues, 
+                    std::map<std::string, itk::Array<double> > newMetricValues,
+                    std::map<std::string, itk::Array<double> > newOptimizerValues, 
+                    std::map<std::string, itk::Array<double> > newInterpolatorValues,
+                    std::string fileName = "");  
 
     private:
 

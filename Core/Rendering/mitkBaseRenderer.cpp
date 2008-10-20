@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
+#include "mitkVtkInteractorCameraController.h"
 
 #ifdef MITK_USE_TD_MOUSE
   #include "mitkTDMouseVtkCameraController.h"
@@ -673,7 +674,9 @@ Sets the new camera controller and deletes the vtkRenderWindowInteractor in case
 */
 void mitk::BaseRenderer::SetCameraController(CameraController* cameraController)
 {
-  std::cout<<"!!!WARNING!!!: RenderWindow interaction events are no longer handled via CameraController (See Bug #954)."<<std::endl;
+  mitk::VtkInteractorCameraController::Pointer vtkInteractorCameraController = dynamic_cast<mitk::VtkInteractorCameraController*>(cameraController);
+  if (vtkInteractorCameraController.IsNotNull())
+    std::cout<<"!!!WARNING!!!: RenderWindow interaction events are no longer handled via CameraController (See Bug #954)."<<std::endl;
   m_CameraController->SetRenderer(NULL);
   m_CameraController = NULL;
   m_CameraController = cameraController;

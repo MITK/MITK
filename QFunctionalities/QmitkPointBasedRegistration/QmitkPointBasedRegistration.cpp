@@ -59,10 +59,8 @@ QmitkPointBasedRegistration::~QmitkPointBasedRegistration()
 {
   if (m_FixedPointSetNode.IsNotNull())
     m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
-  m_Controls->m_FixedPointListWidget->SetPointSetNode(NULL);
   if (m_MovingPointSetNode.IsNotNull())
     m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
-  m_Controls->m_MovingPointListWidget->SetPointSetNode(NULL);
 }
 
 QWidget * QmitkPointBasedRegistration::CreateMainWidget(QWidget* /*parent*/)

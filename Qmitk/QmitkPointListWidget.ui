@@ -234,11 +234,7 @@
     <variable>mitk::PointSetInteractor::Pointer m_CurrentInteraction;</variable>
     <variable>itk::SimpleMemberCommand&lt;QmitkPointListWidget&gt;::Pointer m_DataChangedCommand;</variable>
     <variable>mitk::PointSet::Pointer m_PointSet;</variable>
-    <variable>std::string prefix;</variable>
     <variable>unsigned long m_CurrentObserverID;</variable>
-    <variable>mitk::Color m_Color;</variable>
-    <variable>std::string m_Label;</variable>
-    <variable>std::string m_Name;</variable>
     <variable>int m_NumberOfPoints;</variable>
     <variable>mitk::DataTreeNode::Pointer m_PointSetNode;</variable>
 </variables>
@@ -264,8 +260,6 @@
     <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
     <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
-    <function> SetPointColor(mitk::Color color)</function>
-    <function> SetName(std::string name)</function>
     <function> SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)</function>
     <function> SetNumberOfPoints(int numberOfPoints)</function>
 </functions>

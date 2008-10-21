@@ -355,9 +355,11 @@ void QmitkPointBasedRegistration::FixedSelected(mitk::DataTreeIteratorClone /*im
         m_FixedLandmarks = mitk::PointSet::New();
         m_FixedPointSetNode = mitk::DataTreeNode::New();
         m_FixedPointSetNode->SetData(m_FixedLandmarks);
+        m_FixedPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
       }
       m_FixedPointSetNode->GetStringProperty("label", m_OldFixedLabel);
       m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New("F "));
+      m_FixedPointSetNode->SetProperty("color", mitk::ColorProperty::New(0.0f, 1.0f, 1.0f));
       m_Controls->m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
       it->Add(m_FixedPointSetNode);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -453,11 +455,13 @@ void QmitkPointBasedRegistration::MovingSelected(mitk::DataTreeIteratorClone /*i
         m_MovingLandmarks = mitk::PointSet::New();
         m_MovingPointSetNode = mitk::DataTreeNode::New();
         m_MovingPointSetNode->SetData(m_MovingLandmarks);
+        m_MovingPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
       }
       it->Add(m_MovingPointSetNode);
       m_MovingPointSetNode->SetVisibility(true);
       m_MovingPointSetNode->GetStringProperty("label", m_OldMovingLabel);
       m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New("M "));
+      m_MovingPointSetNode->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f));
       m_MovingPointSetNode->SetProperty("layer",mitk::IntProperty::New(m_NewMovingLayer+1));
       if (m_FixedPointSetNode.IsNotNull())
         m_FixedPointSetNode->SetProperty("layer",mitk::IntProperty::New(m_NewMovingLayer+1));

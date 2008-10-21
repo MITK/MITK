@@ -29,19 +29,7 @@ void QmitkPointBasedRegistrationControls::init()
   m_MeanError->hide();
   m_Params=new PointBasedRegistrationControlParameters();
   m_FixedPointListWidget->ShowPointSetActionButtons(true);
-  mitk::Color fixedColor;
-  fixedColor[0] = (0.0f);
-  fixedColor[1] = (1.0f);
-  fixedColor[2] = (1.0f);
-  m_FixedPointListWidget->SetPointColor(fixedColor);
-  m_FixedPointListWidget->SetName("PointBasedRegistrationNode");
   m_MovingPointListWidget->ShowPointSetActionButtons(true);
-  mitk::Color movingColor;
-  movingColor[0] = (1.0f);
-  movingColor[1] = (1.0f);
-  movingColor[2] = (0.0f);
-  m_MovingPointListWidget->SetPointColor(movingColor);
-  m_MovingPointListWidget->SetName("PointBasedRegistrationNode");
 }
 
 void QmitkPointBasedRegistrationControls::calculate()

@@ -225,7 +225,7 @@ void QmitkPointListWidget::AddInteraction()
   ItemsOfListUpdate();
 }
 
-void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )
+void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string )
 {
   mitk::PointSet::Pointer pointset;
   if ((*sop).IsNull())
@@ -293,7 +293,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PointSetInteractor::Pointer 
   ItemsOfListUpdate();
 }
 
-void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int itkNotUsed(numberOfPoints), mitk::Point3D c, std::string l )
+void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *sop, mitk::DataTreeNode::Pointer * node, int itkNotUsed(numberOfPoints), mitk::Point3D c, std::string )
 {
   if ((*sop).IsNull())
   {
@@ -302,8 +302,6 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
 
     mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1);
     mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(c[0],c[1],c[2]);
-    //mitk::StringProperty::Pointer label = mitk::StringProperty::New(l);
-    mitk::StringProperty::Pointer name = mitk::StringProperty::New(l);
     //create a DataElement that holds the points
     mitk::Mesh::Pointer meshpointset = mitk::Mesh::New();
 
@@ -319,9 +317,7 @@ void QmitkPointListWidget::SwitchInteraction( mitk::PolygonInteractor::Pointer *
     m_PointSetNode->SetData(meshpointset);
     m_PointSetNode->SetProperty("layer",layer);
     m_PointSetNode->SetProperty("color",color);
-    //m_PointSetNode->SetProperty("label",label);
     m_PointSetNode->SetInteractor(*sop);
-    //m_PointSetNode->SetProperty("name", name); /// name is identical with label????
     *node = m_PointSetNode;
 
     ////then add it to the existing DataTree

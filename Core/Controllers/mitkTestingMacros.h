@@ -119,7 +119,7 @@ namespace mitk {
     MITK_TEST_OUTPUT( << "Expected an " << #EXCEPTIONCLASS << "exception. [FAILED]") \
   } \
   catch (EXCEPTIONCLASS) { \
-    MITK_TEST_OUTPUT( << "Catched an expected " << #EXCEPTIONCLASS << "exception. [PASSED]") \
+    MITK_TEST_OUTPUT( << "Caught an expected " << #EXCEPTIONCLASS << "exception. [PASSED]") \
     mitk::TestManager::GetInstance()->TestPassed(); \
   }
 

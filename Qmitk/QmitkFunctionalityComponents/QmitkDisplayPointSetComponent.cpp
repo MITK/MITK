@@ -240,17 +240,12 @@ void QmitkDisplayPointSetComponent::CreatePointSetNode()
         m_PointSetNode = mitk::DataTreeNode::New();
         m_PointSetNode->SetData(m_Seeds);
         mitk::ColorProperty::Pointer color = mitk::ColorProperty::New(0.2, 0.0, 0.8);
-        mitk::Point3D colorTwo; 
-        mitk::FillVector3D(colorTwo, 0.2, 0.0, 0.8);
         m_PointSetInteractor = mitk::DisplayPointSetInteractor::New("pointsetinteractor", m_PointSetNode, 2);
         m_PointSetInteractor->DebugOn();
-        mitk::PointSetInteractor::Pointer tmpPointSetInteractor = m_PointSetInteractor.GetPointer(); // point list widget expects an mitk::PointSetInteractor::Pointer*, 
-                                                                                                     // not an mitk::DisplayPointSetInteractor::Pointer. Thus, an
-                                                                                                     // appropriate smart pointer is instantiated here. It seems that 
-                                                                                                     // the point list widget makes a copy of the smart pointer, so
-                                                                                                     // I think there should be no problem, when execution leaves the
-                                                                                                     // scope of tmpPointSetInteractor.
-        m_PointSetComponentGUI->GetPointListWidget()->SwitchInteraction(&tmpPointSetInteractor, &m_PointSetNode, -1, colorTwo,"Points ");  //-1 for unlimited points
+        m_PointSetNode->SetInteractor(m_PointSetInteractor);
+        m_PointSetComponentGUI->GetPointListWidget()->SetNumberOfPoints(2);
+        m_PointSetComponentGUI->GetPointListWidget()->SetPointSetNode(m_PointSetNode);
+        m_PointSetNode->SetStringProperty("label", "Point ");
         m_PointSetNode->SetProperty("color",color);
         m_PointSetNode->SetInteractor(m_PointSetInteractor);
         m_PointSetNode->SetIntProperty("layer", 101);

@@ -236,6 +236,7 @@
     <variable>mitk::PointSet::Pointer m_PointSet;</variable>
     <variable>unsigned long m_CurrentObserverID;</variable>
     <variable>int m_NumberOfPoints;</variable>
+    <variable>bool m_ButtonsVisible;</variable>
     <variable>mitk::DataTreeNode::Pointer m_PointSetNode;</variable>
 </variables>
 <signals>
@@ -257,9 +258,7 @@
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
-    <function>SwitchInteraction( mitk::PointSetInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function returnType="mitk::DataTreeNode *">GetDataTreeNode()</function>
-    <function>SwitchInteraction( mitk::PolygonInteractor::Pointer * sop, mitk::DataTreeNode::Pointer * node, int numberOfPoints, mitk::Point3D c, std::string l )</function>
     <function> SetPointSetNode(mitk::DataTreeNode::Pointer pointSetNode)</function>
     <function> SetNumberOfPoints(int numberOfPoints)</function>
 </functions>

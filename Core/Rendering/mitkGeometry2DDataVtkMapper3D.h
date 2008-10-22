@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 
 #include <vtkSystemIncludes.h>
+#include <vtkCleanPolyData.h>
 
 class vtkActor;
 class vtkPolyDataMapper;
@@ -47,7 +48,7 @@ class DataStorage;
  *  \brief Vtk-based mapper to display a Geometry2D in a 3D window
  *  \ingroup Mapper
  *
- *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given Geometry2D instance. 
+ *  Uses a Geometry2DDataToSurfaceFilter object to create a vtkPolyData representation of a given Geometry2D instance.
  *  Geometry2D may either contain a common flat plane or a curved plane (ThinPlateSplineCurvedGeometry).
  *
  *  The vtkPolyData object is then decorated by a colored tube on the edges and by image textures if possible
@@ -108,7 +109,7 @@ protected:
   /*
    * \brief Construct an extended lookup table from the given one.
    *
-   * In order to overlay differently sized images over each other, it is 
+   * In order to overlay differently sized images over each other, it is
    * necessary to have a special translucent value, so that the empty
    * surroundings of the smaller image do not occlude the bigger image.
    *
@@ -126,7 +127,7 @@ protected:
    * not rendered with translucent "holes", a black background plane is first
    * rendered under all other planes.
    */
-  //virtual void BuildPaddedLookupTable( 
+  //virtual void BuildPaddedLookupTable(
   //  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
   //  vtkFloatingPointType min, vtkFloatingPointType max );
 
@@ -166,7 +167,7 @@ protected:
 
   /** \brief Actor for black plane background */
   vtkActor *m_BackgroundActor;
-  
+
   /** \brief Transforms the suface before applying the glyph filter */
   vtkTransformPolyDataFilter* m_NormalsTransformer;
 
@@ -177,14 +178,17 @@ protected:
   /** \brief  Generates lines for surface normals */
   vtkHedgeHog* m_FrontHedgeHog;
   vtkHedgeHog* m_BackHedgeHog;
-  
+
   /** \brief Actor to hold the normals arrows */
   vtkActor* m_FrontNormalsActor;
   vtkActor* m_BackNormalsActor;
 
+  /** Cleans the polyline in order to avoid phantom boundaries */
+  vtkCleanPolyData *m_Cleaner;
+
   /** \brief Whether or not to display normals */
   bool m_DisplayNormals;
-  
+
   /** \brief Whether to color front and back */
   bool m_ColorTwoSides;
 
@@ -217,8 +221,8 @@ protected:
     ~ActorInfo();
   };
 
-  /** \brief List holding the vtkActor to map the image into 3D for each 
-   * ImageMapper 
+  /** \brief List holding the vtkActor to map the image into 3D for each
+   * ImageMapper
    */
   typedef std::map< ImageMapper2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
@@ -235,7 +239,7 @@ protected:
     vtkFloatingPointType windowMax;
   };
 
-  typedef std::map< ImageMapper2D *, LookupTableProperties > 
+  typedef std::map< ImageMapper2D *, LookupTableProperties >
     LookupTablePropertiesList;
 
   /** \brief List holding some lookup table properties of the previous pass */

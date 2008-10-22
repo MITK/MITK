@@ -1,4 +1,4 @@
-/*========================================================================= 
+/*=========================================================================
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
@@ -58,6 +58,12 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_SurfaceCreatorBoundingBox = BoundingBox::New();
   m_SurfaceCreatorPointsContainer = BoundingBox::PointsContainer::New();
   m_Edges = vtkFeatureEdges::New();
+
+  m_Edges->BoundaryEdgesOn();
+  m_Edges->FeatureEdgesOff();
+  m_Edges->NonManifoldEdgesOff();
+  m_Edges->ManifoldEdgesOff();
+
   m_EdgeTransformer = vtkTransformPolyDataFilter::New();
   m_NormalsTransformer = vtkTransformPolyDataFilter::New();
   m_EdgeActor = vtkActor::New();
@@ -68,12 +74,21 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
   m_SurfaceCreatorBoundingBox->SetPoints( m_SurfaceCreatorPointsContainer );
 
+  m_Cleaner = vtkCleanPolyData::New();
+
+  m_Cleaner->PieceInvariantOn();
+  m_Cleaner->ConvertLinesToPointsOn();
+  m_Cleaner->ConvertPolysToLinesOn();
+  m_Cleaner->ConvertStripsToPolysOn();
+  m_Cleaner->PointMergingOn();
+
   // Make sure that the FeatureEdge algorithm is initialized with a "valid"
   // (though empty) input
   vtkPolyData *emptyPolyData = vtkPolyData::New();
-  m_Edges->SetInput( emptyPolyData );
-  emptyPolyData->Delete(); 
+  m_Cleaner->SetInput( emptyPolyData );
+  emptyPolyData->Delete();
 
+  m_Edges->SetInput(m_Cleaner->GetOutput());
   m_EdgeTransformer->SetInput( m_Edges->GetOutput() );
 
   m_EdgeTuber->SetInput( m_EdgeTransformer->GetOutput() );
@@ -114,7 +129,7 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 
   m_Prop3DAssembly->AddPart( m_EdgeActor );
   m_Prop3DAssembly->AddPart( m_ImageAssembly );
-  
+
   m_Prop3D = m_Prop3DAssembly;
   m_Prop3D->Register(NULL);
 
@@ -141,6 +156,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_EdgeTuber->Delete();
   m_EdgeMapper->Delete();
   m_EdgeTransformer->Delete();
+  m_Cleaner->Delete();
   m_Edges->Delete();
   m_NormalsTransformer->Delete();
   m_EdgeActor->Delete();
@@ -173,8 +189,8 @@ vtkProp *
 Geometry2DDataVtkMapper3D::GetProp()
 {
   if ( (this->GetDataTreeNode() != NULL )
-       && (m_Prop3D != NULL) 
-       && (m_ImageAssembly != NULL) ) 
+       && (m_Prop3D != NULL)
+       && (m_ImageAssembly != NULL) )
   {
     // Do not transform the entire Prop3D assembly, but only the image part
     // here. The colored frame is transformed elsewhere (via m_EdgeTransformer),
@@ -182,13 +198,13 @@ Geometry2DDataVtkMapper3D::GetProp()
     // itself, to avoid distortion for anisotropic datasets.
     m_ImageAssembly->SetUserTransform( this->GetDataTreeNode()->GetVtkTransform() );
   }
- 
+
   return m_Prop3D;
 }
 
 void Geometry2DDataVtkMapper3D::UpdateVtkTransform()
 {
-  m_ImageAssembly->SetUserTransform( 
+  m_ImageAssembly->SetUserTransform(
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 }
 
@@ -199,7 +215,7 @@ Geometry2DDataVtkMapper3D::GetInput()
 }
 
 
-void 
+void
 Geometry2DDataVtkMapper3D
 ::SetDataIteratorForTexture(const DataTreeIteratorBase* iterator)
 {
@@ -210,7 +226,7 @@ Geometry2DDataVtkMapper3D
   }
 }
 
-void 
+void
 Geometry2DDataVtkMapper3D
 ::SetDataIteratorForTexture(DataStorage* storage)
 {
@@ -225,7 +241,7 @@ Geometry2DDataVtkMapper3D
 // METHOD COMMENTED OUT SINCE IT IS CURRENTLY UNUSED
 //
 //void
-//Geometry2DDataVtkMapper3D::BuildPaddedLookupTable( 
+//Geometry2DDataVtkMapper3D::BuildPaddedLookupTable(
 //  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
 //  vtkFloatingPointType min, vtkFloatingPointType max )
 //{
@@ -247,8 +263,8 @@ Geometry2DDataVtkMapper3D
 //  unsigned char *outputPtr = outputTable->WritePointer( 0, 0 );
 //
 //  // Initialize the first (translucent) bin.
-//  *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; 
-//  
+//  *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0;
+//
 //  int i;
 //  for ( i = 1; i < tableSize; ++i )
 //  {
@@ -286,9 +302,9 @@ Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
 }
 
 void
-Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback( 
+Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
   itk::Object *caller, const itk::EventObject& /*event*/ )
-{ 
+{
   ImageMapper2D *imageMapper = dynamic_cast< ImageMapper2D * >( caller );
   if ( (imageMapper != NULL) )
   {
@@ -305,10 +321,10 @@ Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
   }
 }
 
-void 
+void
 Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 {
-  // Remove all actors from the assembly, and re-initialize it with the 
+  // Remove all actors from the assembly, and re-initialize it with the
   // edge actor
   m_ImageAssembly->GetParts()->RemoveAllItems();
 
@@ -316,18 +332,18 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
   {
     // visibility has explicitly to be set in the single actors
     // due to problems when using cell picking:
-    // even if the assembly is invisible, the renderer contains 
+    // even if the assembly is invisible, the renderer contains
     // references to the assemblies parts. During picking the
     // visibility of each part is checked, and not only for the
     // whole assembly.
     m_ImageAssembly->VisibilityOff();
-    m_EdgeActor->VisibilityOff(); 
+    m_EdgeActor->VisibilityOff();
     return;
   }
 
   // visibility has explicitly to be set in the single actors
   // due to problems when using cell picking:
-  // even if the assembly is invisible, the renderer contains 
+  // even if the assembly is invisible, the renderer contains
   // references to the assemblies parts. During picking the
   // visibility of each part is checked, and not only for the
   // whole assembly.
@@ -366,11 +382,11 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     {
       m_SurfaceCreator->SetYResolution(res);
     }
-    
+
     // Clip the Geometry2D with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
     {
-      Geometry3D *referenceGeometry = 
+      Geometry3D *referenceGeometry =
         input->GetGeometry2D()->GetReferenceGeometry();
 
       BoundingBox::PointType boundingBoxMin, boundingBoxMax;
@@ -433,13 +449,13 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       if ( m_DisplayNormals )
       {
         m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
-        m_NormalsTransformer->SetTransform( 
+        m_NormalsTransformer->SetTransform(
           node->GetVtkTransform(this->GetTimestep()) );
 
         m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
         m_FrontHedgeHog->SetVectorModeToUseNormal();
         m_FrontHedgeHog->SetScaleFactor( m_InvertNormals ? 1.0 : -1.0 );
-        
+
         m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
 
         m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
@@ -554,9 +570,9 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                   lookupTable->UnRegister( NULL );
                   dataSetMapper->UnRegister( NULL );
                   texture->UnRegister( NULL );
-                  
+
                   // Store the actor so that it may be accessed in following
-                  // passes.                  
+                  // passes.
                   m_ImageActors[imageMapper].Initialize(imageActor, imageMapper, m_ImageMapperDeletedCommand);
                 }
                 else
@@ -597,7 +613,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                 imageMapper->GetRendererInfo( planeRenderer );
 
                 imageMapper->GenerateAllData();
-                
+
                 // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
                 renderer->GetRenderWindow()->MakeCurrent();
 
@@ -625,7 +641,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                     windowMax = 1;
                   }
                   else
-                  if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" ) 
+                  if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
                     || node->GetLevelWindow( levelWindow, planeRenderer ) )
                   {
                     windowMin = levelWindow.GetMin();
@@ -645,7 +661,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                   {
                     useColor = true;
                   }
-                  
+
                   // check for LookupTable
                   LookupTableProperty::Pointer lookupTableProp;
                   lookupTableProp = dynamic_cast< LookupTableProperty * >(
@@ -664,7 +680,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                     lookupTableSource = m_DefaultLookupTable;
                   }
 
-                  LookupTableProperties &lutProperties = 
+                  LookupTableProperties &lutProperties =
                     m_LookupTableProperties[imageMapper];
 
                   // If there has been some change since the last pass which
@@ -673,7 +689,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                     || (lutProperties.windowMin != windowMin)
                     || (lutProperties.windowMax != windowMax) )
                   {
-                    // Note the values for the next pass (lutProperties is a 
+                    // Note the values for the next pass (lutProperties is a
                     // reference to the list entry!)
                     if ( lutProperties.LookupTableSource != NULL )
                     {
@@ -683,7 +699,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                     lutProperties.LookupTableSource->Register( NULL );
                     lutProperties.windowMin = windowMin;
                     lutProperties.windowMax = windowMax;
-                    
+
                     lookupTable->DeepCopy( lookupTableSource );
                     lookupTable->SetRange( windowMin, windowMax );
                   }
@@ -708,7 +724,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
                   // by layer
                   int layer = 1;
                   node->GetIntProperty( "layer", layer );
-                  layerSortedActors.insert( 
+                  layerSortedActors.insert(
                     std::pair< int, vtkActor * >( layer, imageActor ) );
                 }
               }
@@ -718,12 +734,12 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
         ++it;
       }
     }
-              
 
-    // Add all image actors to the assembly, sorted according to 
+
+    // Add all image actors to the assembly, sorted according to
     // layer property
     LayerSortedActorList::iterator actorIt;
-    for ( actorIt = layerSortedActors.begin(); 
+    for ( actorIt = layerSortedActors.begin();
           actorIt != layerSortedActors.end();
           ++actorIt )
     {
@@ -735,9 +751,9 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     // bounds, color as specified in the plane's properties
     vtkPolyData *surfacePolyData = surface->GetVtkPolyData();
 
-    m_Edges->SetInput( surfacePolyData );
+    m_Cleaner->SetInput(surfacePolyData);
 
-    m_EdgeTransformer->SetTransform( 
+    m_EdgeTransformer->SetTransform(
       this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
 
     // Determine maximum extent
@@ -745,7 +761,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     vtkFloatingPointType extent = surfaceBounds[1] - surfaceBounds[0];
     vtkFloatingPointType extentY = surfaceBounds[3] - surfaceBounds[2];
     vtkFloatingPointType extentZ = surfaceBounds[5] - surfaceBounds[4];
-    
+
     if ( extent < extentY ) extent = extentY;
     if ( extent < extentZ ) extent = extentZ;
 
@@ -769,7 +785,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       m_EdgeActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
     }
 
-    m_ImageAssembly->SetUserTransform( 
+    m_ImageAssembly->SetUserTransform(
       this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
     }
 
@@ -780,7 +796,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 }
 
-void 
+void
 Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
 {
   m_Actor = actor;

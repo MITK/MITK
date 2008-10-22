@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <time.h>
 
 /**
- *  Simple example for a test for the (non-existent) class "ClassName".
+ *  Test for the class "mitkPointSetFileWriter".
  *  
  *  argc and argv are the command line parameters which were passed to 
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
@@ -62,12 +62,19 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION_REQUIRED(pointSet.IsNotNull(),"PointSet creation")
 
-  // test for exception handling
-  MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-  myPointSetWriter->SetInput(pointSet);
-  myPointSetWriter->SetFileName("/usr/bin");
-  myPointSetWriter->Update();
-  MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+    try{  
+      // test for exception handling
+      MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+      myPointSetWriter->SetInput(pointSet);
+      myPointSetWriter->SetFileName("/usr/bin");
+      myPointSetWriter->Update(); 
+      MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  }
+  catch(...) {
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
+    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
   
   // always end with this!
   MITK_TEST_END()

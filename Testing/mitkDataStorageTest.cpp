@@ -749,8 +749,6 @@ void TestDataStorage( mitk::DataStorage* ds )
 //## Test DataTreeStorage specific behavior
 void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree)
 {
-  int objectsInTree = tree->Count();
-  
   /* Adding a node directly to the tree to test if the DataStorage can handle that */
   mitk::DataTreePreOrderIterator it(tree);
   mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();   // node with image and name property

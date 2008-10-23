@@ -74,7 +74,7 @@ public:
 //## main testing method
 //## NOTE: the current Singleton implementation of DataTreeStorage will lead to crashes if a testcase fails 
 //##       and therefore mitk::DataStorage::ShutdownSingleton() is not called.
-int mitkDataStorageTest(int /*argc*/, char* /*argv[]*/)
+int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("DataStorageTest");
 

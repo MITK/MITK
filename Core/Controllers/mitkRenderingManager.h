@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkDataTree.h"
-#include "mitkDataStorage.h"
+
 
 #include <string>
 #include <itkObject.h>
@@ -37,6 +37,7 @@ class RenderingManager;
 class RenderingManagerFactory;
 class Geometry3D;
 class SliceNavigationController;
+class DataStorage;
 
 /**
  * \brief Manager for coordinating the rendering process.

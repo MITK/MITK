@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
 
+#include "mitkDataTreeStorage.h"
 #include "mitkDataStorage.h"
 #include "mitkImageMapper2D.h"
 #include "mitkLookupTableProperty.h"
@@ -232,7 +233,7 @@ Geometry2DDataVtkMapper3D
 {
   if (storage != NULL)
   {
-    DataTreePreOrderIterator poi( storage->m_DataTree );
+    DataTreePreOrderIterator poi( (dynamic_cast<mitk::DataTreeStorage*>(storage))->m_DataTree );
     this->SetDataIteratorForTexture( &poi );
   }
 }

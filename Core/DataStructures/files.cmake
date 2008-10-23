@@ -29,6 +29,8 @@ SET(CPP_FILES
   mitkCuboid.cpp
   mitkCylinder.cpp
   mitkDataStorage/mitkDataStorage.cpp
+  mitkDataStorage/mitkDataTreeStorage.cpp
+  mitkDataStorage/mitkStandaloneDataStorage.cpp
   mitkDataStorage/mitkNodePredicateAND.cpp
   mitkDataStorage/mitkNodePredicateBase.cpp
   mitkDataStorage/mitkNodePredicateCompositeBase.cpp

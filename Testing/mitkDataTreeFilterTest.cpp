@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkImage.h>
 #include <mitkDataTree.h>
+#include <mitkDataTreeStorage.h>
 #include <mitkImageMapper2D.h>
 #include <mitkProperties.h>
 
@@ -684,7 +685,7 @@ int testDataStorageCompliance()
 
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
   mitk::DataStorage::Pointer ds = mitk::DataStorage::CreateInstance(tree);
-  ds->SetManageCompleteTree(false);
+  (dynamic_cast<mitk::DataTreeStorage*>(ds.GetPointer()))->SetManageCompleteTree(false);
   mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
 
   /* create some objects and add them to the datastorage. */

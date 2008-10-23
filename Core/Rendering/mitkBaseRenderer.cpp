@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
+#include "mitkDataTreeStorage.h"
 #include "mitkDataStorage.h"
 
 // VTK
@@ -247,7 +248,7 @@ void mitk::BaseRenderer::SetData(DataStorage* storage)
 {
   if (storage != NULL)
   {
-    DataTreePreOrderIterator poi( storage->m_DataTree );
+    DataTreePreOrderIterator poi( (dynamic_cast<mitk::DataTreeStorage*>(storage))->m_DataTree );
     this->SetData( &poi );
   }
 }

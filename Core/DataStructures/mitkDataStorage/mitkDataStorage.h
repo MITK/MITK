@@ -38,9 +38,10 @@ namespace mitk {
   //##
   //## The DataStorage provides data storage and management functionality.
   //## It handles a 'was created by' relation by associating each data object with a
-  //## set of source objects, that this object was created from. The DataStorage
-  //## class does not yet provide an observer mechanism to notify on changes in the data
-  //## objects that it manages. This is planned for a future version.
+  //## set of source objects, that this object was created from. 
+  //## Thus, nodes are stored in a noncyclical directed graph data structure.
+  //## If a new node is added to the DataStorage, AddNodeEvent is emitted. 
+  //## If a node is removed, RemoveNodeEvent is emitted. 
   //## Currently, DataStorage uses an underlying mitk::DataTree. Therefore a DataStorage object
   //## must be initialized with a DataTree before it can be used by calling ->Initialize(myTree).
   //## @warning DataStorage methods will raise exceptions if called before the DataStorage is initialized.
@@ -67,7 +68,7 @@ namespace mitk {
     static void ShutdownSingleton();
 
     //##Documentation
-    //## @brief A Container of objects that is used as a resultset of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
+    //## @brief A Container of objects that is used as a result set of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
     typedef itk::VectorContainer<unsigned int, mitk::DataTreeNode::Pointer> SetOfObjects;
 
     //##Documentation
@@ -80,7 +81,7 @@ namespace mitk {
     //## the addition of a new object will fire the notification mechanism.
     //## If the node parameter is NULL or if the DataTreeNode has already been added,
     //## an exception will be thrown.
-    void Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL);
+    virtual void Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) = 0;
 
     //##Documentation
     //## @brief Convenience method to add a node that has one parent
@@ -90,7 +91,7 @@ namespace mitk {
     //##Documentation
     //## @brief Removes node from the DataStorage
     //##
-    void Remove(const mitk::DataTreeNode* node);
+    virtual void Remove(const mitk::DataTreeNode* node) = 0;
 
     //##Documentation
     //## @brief Removes a set of nodes from the DataStorage
@@ -98,57 +99,9 @@ namespace mitk {
     void Remove(const mitk::DataStorage::SetOfObjects* nodes);
 
     //##Documentation
-    //## @brief Register an observer for AddEvent 
-    //##
-    //## AddEvent is a mitk::Message that will notify all registered observers whenever a new data object
-    //## has been added to the DataStorage. Observers should register to this event by calling 
-    //## myDataStorage->RegisterAddNodeObserver(this, &myClass::myNotifyMethod);
-    //## Whenever a new data object is added to the DataStorage, myNotifyMethod will be called with a pointer 
-    //## to the new data object as parameter. Notification occurs directly after the data object was added to the DataStorage.
-    //template <class R>
-    //void RegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
-
-    //##Documentation
-    //## @brief Unregister an observer for AddEvent 
-    //##
-    //## Remove an registered observer for the AddEvent.
-    //template <class R>
-    //void UnRegisterAddNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
-
-    //##Documentation
-    //## @brief Register an observer for RemoveEvent 
-    //##
-    //## RemoveEvent is a mitk::Message that will notify all registered observers whenever a data object
-    //## will be removed from the DataStorage. Observers should register to this event by calling 
-    //## myDataStorage->RegisterRemoveNodeObserver(this, &myClass::myNotifyMethod);
-    //## Whenever a data object is removed from the DataStorage, myNotifyMethod will be called with a pointer 
-    //## to the data object as parameter. Notification occurs directly before the data object is removed from the DataStorage.
-    //template <class R>
-    //void RegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
-
-    //##Documentation
-    //## @brief Unregister an observer for RemoveEvent 
-    //##
-    //## Remove an registered observer for the RemoveEvent.
-    //template <class R>
-    //void UnRegisterRemoveNodeObserver(R* const receiver, void(R::*fnptr)(const mitk::DataTreeNode*));
-
-
-    //##Documentation
-    //## @brief Notifies the DataStorage that the object in node has been modified
-    //##
-    //## Calling the Update() method will start the notification mechanism that will notify
-    //## all registered agents that the object has been updated. Depending on the registered
-    //## agents, this could lead to an update of other objects, like surfaces that were created
-    //## from segmentations.
-    //## If the node parameter is NULL or if the DataTreeNode is not contained in the
-    //## DataStorage, an exception will be thrown.
-    //void Update(mitk::DataTreeNode* node);
-
-    //##Documentation
     //## @brief returns a set of data objects that meet the given condition(s)
     //##
-    //## GetSubset returns a set of objects  with a specific datatype that meet the condition(s)
+    //## GetSubset returns a set of objects  with a specific data type that meet the condition(s)
     //## specified in the condition parameter. Conditions can be
     //##  - data type of the data object
     //##  - is source object of specific object (e.g. all source objects of node x)
@@ -165,7 +118,7 @@ namespace mitk {
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
-    SetOfObjects::ConstPointer GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const;
+    virtual SetOfObjects::ConstPointer GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const = 0;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
@@ -177,12 +130,12 @@ namespace mitk {
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
-    SetOfObjects::ConstPointer GetDerivations(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const;
+    virtual SetOfObjects::ConstPointer GetDerivations(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const = 0;
 
     //##Documentation
-    //## @brief returns a set of all dataobjects that are stored in the data storage
+    //## @brief returns a set of all data objects that are stored in the data storage
     //##
-    SetOfObjects::ConstPointer GetAll() const;
+    virtual SetOfObjects::ConstPointer GetAll() const = 0;
 
     //##Documentation
     //## @brief Convenience method to get the first node that matches the predicate condition
@@ -201,7 +154,7 @@ namespace mitk {
     mitk::DataTreeNode* GetNamedDerivedNode(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations = true) const;
 
     //##Documentation
-    //## @brief Convenience method to get the first data object of a given datatype with a given name
+    //## @brief Convenience method to get the first data object of a given data type with a given name
     //##
     template <class DataType>
     DataType* GetNamedObject(const char* name) const
@@ -216,7 +169,7 @@ namespace mitk {
     }
 
     //##Documentation
-    //## @brief Convenience method to get the first data object of a given datatype with a given name that is derived from a specific node
+    //## @brief Convenience method to get the first data object of a given data type with a given name that is derived from a specific node
     //##
     template <class DataType>
     DataType* GetNamedDerivedObject(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations = true) const
@@ -235,25 +188,8 @@ namespace mitk {
     //##
     const DataTreeNode::GroupTagList GetGroupTags() const;
 
-
-    //##Documentation
-    //## @brief Initializes the class by providing the data tree that should be used for data storage
-    //##
-    void Initialize(mitk::DataTree* tree);
-
-    //##Documentation
-    //## @brief Callback method to get notified, if a node in the underlying DataTree gets removed
-    //##
-    void NodeDeletedInTree(const itk::EventObject & treeChangedEvent);
-
-    //##Documentation
-    //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
-    itkSetMacro(ManageCompleteTree, bool);
-    itkGetMacro(ManageCompleteTree, bool);
-    itkBooleanMacro(ManageCompleteTree);
-
     /* Public Events */
-
+    typedef Message1<const mitk::DataTreeNode*> DataStorageEvent;
     //##Documentation
     //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage. 
     //##
@@ -261,7 +197,7 @@ namespace mitk {
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
     //## Observers should unregister by calling myDataStorage->AddNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Note: AddEvents are _not_ emitted if a node is added to DataStorage by adding it to the the underlying DataTree!
-    Message1<const mitk::DataTreeNode*> AddNodeEvent;
+    DataStorageEvent AddNodeEvent;
 
     //##Documentation
     //## @brief RemoveEvent is emitted directly before a node is removed from the DataStorage. 
@@ -270,7 +206,7 @@ namespace mitk {
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
     //## Observers should unregister by calling myDataStorage->RemoveNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Note: RemoveEvents are also emitted if a node was removed from the DataStorage by deleting it from the underlying DataTree
-    Message1<const mitk::DataTreeNode*> RemoveNodeEvent;
+    DataStorageEvent RemoveNodeEvent;
 
   protected:
 
@@ -280,9 +216,17 @@ namespace mitk {
     friend class Geometry2DDataVtkMapper3D;
     friend class RenderingManager;
 
-    itkNewMacro(Self);    // New Macro is protected, because we use Singleton pattern for DataStorage
+    //##Documentation
+    //## @brief  EmitAddNodeEvent emits the AddNodeEvent
+    //##
+    //## This method should be called by subclasses to emit the AddNodeEvent
+    void EmitAddNodeEvent(const mitk::DataTreeNode* node);
 
-    typedef std::map<mitk::DataTreeNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;
+    //##Documentation
+    //## @brief  EmitRemoveNodeEvent emits the RemoveNodeEvent
+    //##
+    //## This method should be called by subclasses to emit the RemoveNodeEvent
+    void EmitRemoveNodeEvent(const mitk::DataTreeNode* node);
 
     //##Documentation
     //## @brief Standard Constructor for ::New() instantiation
@@ -292,46 +236,14 @@ namespace mitk {
     virtual ~DataStorage();
 
     //##Documentation
-    //## @brief convenience method to check if the object has been initialized (i.e. a data tree has been set)
-    bool IsInitialized() const;
-
-    //##Documentation
     //## @brief Filters a SetOfObjects by the condition. If no condition is provided, the original set is returned
     SetOfObjects::ConstPointer FilterSetOfObjects(const SetOfObjects* set, const NodePredicateBase* condition) const;
-
-    //##Documentation
-    //## @brief Traverses the Relation graph and extracts a list of related elements (e.g. Sources or Derivations)
-    SetOfObjects::ConstPointer GetRelations(const mitk::DataTreeNode* node, const AdjacencyList& relation, const NodePredicateBase* condition = NULL, bool onlyDirectlyRelated = true) const;
-
-    //##Documentation
-    //## @brief deletes all references to a node in a given relation (used in Remove() and TreeListener)
-    void RemoveFromRelation(const mitk::DataTreeNode* node, AdjacencyList& relation);
 
     //##Documentation
     //## @brief Prints the contents of the DataStorage to os. Do not call directly, call ->Print() instead
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-
-    //##Documentation
-    //## @brief holds the data tree that is encapsulated by this class
-    mitk::DataTree::Pointer m_DataTree;
-
-    //##Documentation
-    //## @brief If true, the DataStorage object manages all objects in the dataTree, not only the ones added by it
-    bool m_ManageCompleteTree;
-
-    //##Documentation
-    //## @brief Flag that is set in Remove() method to prevent tree notification mechanism from deleting the same object we are just about to delete
-    bool m_DuringRemove;
-
-    AdjacencyList m_SourceNodes;
-    AdjacencyList m_DerivedNodes;
-
-    unsigned long m_DeleteInTreeObserverTag;
-
     static mitk::DataStorage::Pointer s_Instance;
-
-
   };
 } // namespace mitk
 

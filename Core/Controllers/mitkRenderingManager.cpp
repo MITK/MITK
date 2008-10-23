@@ -20,6 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManagerFactory.h"
 #include "mitkBaseRenderer.h"
 
+#include "mitkDataTreeStorage.h"
+#include "mitkDataStorage.h"
+
+
 #include <vtkRenderWindow.h>
 #include <vtkCallbackCommand.h>
 
@@ -314,7 +318,7 @@ RenderingManager
 ::InitializeViews( const DataStorage * storage, RequestType type )
 {
   //TODO native DataStorage code
-  mitk::DataTreePreOrderIterator it(storage->m_DataTree);
+  mitk::DataTreePreOrderIterator it((dynamic_cast<const mitk::DataTreeStorage*>(storage))->m_DataTree);
   return this->InitializeViews(&it, type);
 }
 

@@ -791,6 +791,9 @@ int testDataStorageCompliance()
     std::cout << "[FAILED]" << std::endl;
     returnValue = EXIT_FAILURE;
   }
+  /* cleanup DataStorage (only needed until singleton pattern is gone) */
+  ds = NULL;
+  mitk::DataStorage::ShutdownSingleton();
 
   return returnValue;
 }
@@ -820,10 +823,13 @@ int mitkDataTreeFilterTest(int argc, char ** const /*argv*/)
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "[TEST DONE]" << std::endl;
+  
 
   /* now test the compliance to mitk::DataStorage */
   int result = testDataStorageCompliance();
+
+  std::cout << "[TEST DONE]" << std::endl;
+
   return result;
 
   //return EXIT_SUCCESS;

@@ -93,5 +93,6 @@ int mitkLevelWindowManagerTest(int, char* [])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
+  mitk::DataStorage::ShutdownSingleton();  // Cleanup
   return EXIT_SUCCESS;
 }

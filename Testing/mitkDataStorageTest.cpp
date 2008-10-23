@@ -74,7 +74,7 @@ public:
 //## main testing method
 //## NOTE: the current Singleton implementation of DataTreeStorage will lead to crashes if a testcase fails 
 //##       and therefore mitk::DataStorage::ShutdownSingleton() is not called.
-int mitkDataStorageTest(int argc, char* argv[])
+int mitkDataStorageTest(int /*argc*/, char* /*argv[]*/)
 {
   MITK_TEST_BEGIN("DataStorageTest");
 
@@ -750,7 +750,6 @@ void TestDataStorage( mitk::DataStorage* ds )
 void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree)
 {
   int objectsInTree = tree->Count();
-  int initialObjectsInTree = objectsInTree;
   
   /* Adding a node directly to the tree to test if the DataStorage can handle that */
   mitk::DataTreePreOrderIterator it(tree);
@@ -763,7 +762,7 @@ void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree)
   n1->SetName("n1");
   ds->Add(n1);
   ds->SetManageCompleteTree(true);
-  MITK_TEST_CONDITION(ds->GetAll()->Size() == tree->Count(), "Testing SetManageCompleteTree(true): same number of objects in tree and dts");
+  MITK_TEST_CONDITION(ds->GetAll()->Size() == static_cast<unsigned int>(tree->Count()), "Testing SetManageCompleteTree(true): same number of objects in tree and dts");
   
   ds->SetManageCompleteTree(false);
   MITK_TEST_CONDITION(ds->GetAll()->Size() == 1, "Testing SetManageCompleteTree(false) different number of objects in tree and dts");

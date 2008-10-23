@@ -103,9 +103,6 @@ protected:
   typedef std::vector<VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
   RenderWindowVectorInfoType      m_renderWindowVectorInfo;
  
-  vtkImageActor*              m_Actor;
-  vtkImageImport*             m_VtkImageImport;
- 
   //for framegrabbing
   QTimer*                     m_QTimer;
 

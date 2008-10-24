@@ -6,7 +6,7 @@
 namespace cherry
 {
 
-class ISelectionProvider;
+struct ISelectionProvider;
 
 /**
  * \ingroup org_opencherry_ui

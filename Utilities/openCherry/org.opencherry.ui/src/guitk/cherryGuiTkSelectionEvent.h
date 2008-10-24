@@ -20,7 +20,7 @@
 
 #include <cherryMacros.h>
 
-#include <cherryMacros.h>
+#include "../cherryUiDll.h"
 
 namespace cherry
 {
@@ -39,7 +39,7 @@ namespace GuiTk
  * @see <a href="http://www.opencherry.org/swt/">Sample code and further information</a>
  */
 
-class SelectionEvent: public Object
+class CHERRY_UI SelectionEvent: public Object
 {
 
 public:

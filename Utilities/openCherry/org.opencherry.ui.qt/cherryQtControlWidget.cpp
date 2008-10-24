@@ -17,6 +17,8 @@
 
 #include "cherryQtControlWidget.h"
 
+#include <algorithm>
+
 namespace cherry {
 
 QtControlWidget::QtControlWidget(QWidget* parent, Qt::WindowFlags f)

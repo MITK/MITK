@@ -19,6 +19,8 @@
 
 #include "../cherryWindow.h"
 
+#include <algorithm>
+
 namespace cherry
 {
 

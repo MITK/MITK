@@ -147,9 +147,9 @@ public:
      * That is, their meaning is reversed when computing a horizontal sash.
      *
      * @param width the pixel width of a vertical node, or the pixel height
-     * of a horizontal node (INFINITE if unbounded)
+     * of a horizontal node (INF if unbounded)
      * @param height the pixel height of a vertical node, or the pixel width
-     * of a horizontal node (INFINITE if unbounded)
+     * of a horizontal node (INF if unbounded)
      * @return a struct describing the pixel sizes of the left and right children
      * (this is a width for horizontal nodes and a height for vertical nodes)
      */

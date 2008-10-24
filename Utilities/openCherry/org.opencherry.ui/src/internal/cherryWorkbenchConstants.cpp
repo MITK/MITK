@@ -344,7 +344,7 @@ const std::string WorkbenchConstants::TAG_TRIM_ITEM = "trimItem"; //$NON-NLS-1$
 const std::string WorkbenchConstants::SMALL_FONT = "org.opencherry.ui.smallFont"; //$NON-NLS-1$
 
 //Colors
-const std::string WorkbenchConstants::COLOR_HIGHLIGHT =
+const std::string WorkbenchConstants::COLOR_HIGHLIGHT_ =
     "org.opencherry.ui.highlight"; //$NON-NLS-1$
 
 }

@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "cherryIShellListener.h"
+#include "cherryShell.h"
 
 namespace cherry {
 
@@ -44,5 +45,16 @@ IShellListener::Events
   shellDeiconified -= Delegate(listener.GetPointer(), &IShellListener::ShellDeiconified);
   shellIconified -= Delegate(listener.GetPointer(), &IShellListener::ShellIconified);
 }
+
+void IShellListener::ShellActivated(ShellEvent::Pointer e) 
+{}
+void IShellListener::ShellClosed(ShellEvent::Pointer e) 
+{}
+void IShellListener::ShellDeactivated(ShellEvent::Pointer e) 
+{}
+void IShellListener::ShellDeiconified(ShellEvent::Pointer e) 
+{}
+void IShellListener::ShellIconified(ShellEvent::Pointer e) 
+{}
 
 }

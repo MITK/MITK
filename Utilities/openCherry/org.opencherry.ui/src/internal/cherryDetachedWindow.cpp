@@ -303,8 +303,8 @@ void DetachedWindow::UpdateMinimumSize()
 //    if (stack->GetPartList().size() == 1)
 //    {
 //      // Get the minimum space required for the part
-//      int width = stack->ComputePreferredSize(true, Constants::INFINITE, Constants::INFINITE, 0);
-//      int height = stack->ComputePreferredSize(false, Constants::INFINITE, Constants::INFINITE, 0);
+//      int width = stack->ComputePreferredSize(true, Constants::INF, Constants::INF, 0);
+//      int height = stack->ComputePreferredSize(false, Constants::INF, Constants::INF, 0);
 //
 //      // Take the current shell 'trim' into account
 //      int shellHeight = windowShell->GetBounds().height - windowShell->GetClientArea().height;

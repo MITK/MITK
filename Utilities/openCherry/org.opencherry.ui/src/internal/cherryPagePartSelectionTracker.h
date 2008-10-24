@@ -78,7 +78,7 @@ private:
     PagePartSelectionTracker* m_Tracker;
   };
 
-  friend class PostSelectionListener;
+  friend struct PostSelectionListener;
 
   ISelectionChangedListener::Pointer postSelectionListener;
 

@@ -93,7 +93,7 @@ private:
       PageSelectionService* m_SelectionService;
     };
     
-    friend class PostSelectionListener;
+    friend struct PostSelectionListener;
     
     /**
      * The JFace selection listener to hook on the active part's selection provider.

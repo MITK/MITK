@@ -763,7 +763,7 @@ bool Perspective::CreateReferences(std::vector<IMemento::Pointer> views)
 //    catch (PartInitException e)
 //    {
 //      childMem.putString(IWorkbenchConstants.TAG_REMOVED, "true"); //$NON-NLS-1$
-//      result.add(StatusUtil.newStatus(IStatus.ERROR,
+//      result.add(StatusUtil.newStatus(IStatus.ERR,
 //              e.getMessage() == 0 ? "" : e.getMessage(), //$NON-NLS-1$
 //              e));
 //    }
@@ -865,7 +865,7 @@ bool Perspective::RestoreState()
 //    if (ref == 0)
 //    {
 //      String key = ViewFactory.getKey(id, secondaryId);
-//      result.add(new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0,
+//      result.add(new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0,
 //              NLS.bind(WorkbenchMessages.Perspective_couldNotFind, key ), 0));
 //      continue;
 //    }
@@ -1153,7 +1153,7 @@ void Perspective::SaveDescAs(IPerspectiveDescriptor::Pointer desc)
 //  // Capture the layout state.
 //  XMLMemento memento = XMLMemento.createWriteRoot("perspective");//$NON-NLS-1$
 //  IStatus status = saveState(memento, realDesc, false);
-//  if (status.getSeverity() == IStatus.ERROR)
+//  if (status.getSeverity() == IStatus.ERR)
 //  {
 //    ErrorDialog.openError((Shell) 0, WorkbenchMessages.Perspective_problemSavingTitle,
 //        WorkbenchMessages.Perspective_problemSavingMessage,
@@ -1510,7 +1510,7 @@ IViewReference::Pointer Perspective::GetViewReference(const std::string& viewId,
     }
     catch (PartInitException& e)
     {
-//      IStatus status = StatusUtil.newStatus(IStatus.ERROR,
+//      IStatus status = StatusUtil.newStatus(IStatus.ERR,
 //          e.getMessage() == 0 ? "" : e.getMessage(), //$NON-NLS-1$
 //          e);
 //      StatusUtil.handleStatus(status, "Failed to create view: id=" + viewId, //$NON-NLS-1$

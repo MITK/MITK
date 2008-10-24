@@ -74,7 +74,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @see IWorkbenchPage#setPerspective
    */
   virtual void PerspectiveActivated(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective) {}
+          IPerspectiveDescriptor::Pointer perspective);
 
   /**
    * Notifies this listener that a perspective has changed in some way
@@ -86,7 +86,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @param changeId one of the <code>CHANGE_*</code> constants on IWorkbenchPage
    */
   virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective, const std::string& changeId) {};
+          IPerspectiveDescriptor::Pointer perspective, const std::string& changeId);
 
   /**
    * Notifies this listener that a part in the given page's perspective
@@ -99,7 +99,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    */
   virtual void PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
           IPerspectiveDescriptor::Pointer perspective,
-          IWorkbenchPartReference::Pointer partRef, const std::string& changeId) {}
+          IWorkbenchPartReference::Pointer partRef, const std::string& changeId);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -112,7 +112,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
   virtual void PerspectiveOpened(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective) {}
+          IPerspectiveDescriptor::Pointer perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -126,7 +126,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
    */
   virtual void PerspectiveClosed(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective) {}
+          IPerspectiveDescriptor::Pointer perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -139,7 +139,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
   virtual void PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page,
-          IPerspectiveDescriptor::Pointer perspective) {}
+          IPerspectiveDescriptor::Pointer perspective);
 
   /**
    * Notifies this listener that a perspective in the given page has been
@@ -155,7 +155,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    */
   virtual void PerspectiveSavedAs(SmartPointer<IWorkbenchPage> page,
           IPerspectiveDescriptor::Pointer oldPerspective,
-          IPerspectiveDescriptor::Pointer newPerspective) {};
+          IPerspectiveDescriptor::Pointer newPerspective);
 
   /**
    * <p>
@@ -173,7 +173,7 @@ struct CHERRY_UI IPerspectiveListener : public Object {
    * @see IWorkbenchPage#setPerspective(IPerspectiveDescriptor)
    */
   virtual void PerspectivePreDeactivate(SmartPointer<IWorkbenchPage> page,
-      IPerspectiveDescriptor::Pointer perspective) {}
+      IPerspectiveDescriptor::Pointer perspective);
 };
 
 }

@@ -20,13 +20,14 @@
 #define CHERRYDRAGUTIL_H_
 
 #include "../cherryRectangle.h"
+#include "../cherryUiDll.h"
 
 namespace cherry {
 
 /**
  * Provides the methods for attaching drag-and-drop listeners to SWT controls.
  */
-class DragUtil {
+class CHERRY_UI DragUtil {
 
 private:
 //

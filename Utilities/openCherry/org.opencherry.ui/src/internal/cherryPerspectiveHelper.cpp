@@ -785,8 +785,8 @@ void PerspectiveHelper::Detach(LayoutPart::Pointer part, int x, int y)
       size = container.Cast<LayoutPart>()->GetSize();
     }
   }
-  int width = std::max(size.x, MIN_DETACH_WIDTH);
-  int height = std::max(size.y, MIN_DETACH_HEIGHT);
+  int width = std::max<int>(size.x, MIN_DETACH_WIDTH);
+  int height = std::max<int>(size.y, MIN_DETACH_HEIGHT);
 
   // Create detached window.
   DetachedWindow::Pointer window = new DetachedWindow(page);
@@ -845,8 +845,8 @@ void PerspectiveHelper::DetachPart(StackablePart::Pointer part, int x, int y)
       size = container.Cast<LayoutPart>()->GetSize();
     }
   }
-  int width = std::max(size.x, MIN_DETACH_WIDTH);
-  int height = std::max(size.y, MIN_DETACH_HEIGHT);
+  int width = std::max<int>(size.x, MIN_DETACH_WIDTH);
+  int height = std::max<int>(size.y, MIN_DETACH_HEIGHT);
 
   // Create detached window.
   DetachedWindow::Pointer window = new DetachedWindow(page);

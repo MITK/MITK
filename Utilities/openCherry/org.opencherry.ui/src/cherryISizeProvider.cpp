@@ -17,10 +17,10 @@
 
 #include "cherryISizeProvider.h"
 
-#include <numeric>
+#include <limits>
 
 namespace cherry {
 
-const int ISizeProvider::INFINITE = std::numeric_limits<int>::max();
+const int ISizeProvider::INF = std::numeric_limits<int>::max();
 
 }

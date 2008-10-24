@@ -137,30 +137,30 @@ public:
   Rectangle GetBounds();
 
   /**
-   * Subtracts two integers. If a is INFINITE, this is treated as
+   * Subtracts two integers. If a is INF, this is treated as
    * positive infinity.
    *
-   * @param a a positive integer or INFINITE indicating positive infinity
-   * @param b a positive integer (may not be INFINITE)
-   * @return a - b, or INFINITE if a == INFINITE
+   * @param a a positive integer or INF indicating positive infinity
+   * @param b a positive integer (may not be INF)
+   * @return a - b, or INF if a == INF
    * @since 3.1
    */
   static int Subtract(int a, int b);
 
   /**
-   * Adds two positive integers. Treates INFINITE as positive infinity.
+   * Adds two positive integers. Treates INF as positive infinity.
    *
    * @param a a positive integer
    * @param b a positive integer
-   * @return a + b, or INFINITE if a or b are positive infinity
+   * @return a + b, or INF if a or b are positive infinity
    * @since 3.1
    */
   static int Add(int a, int b);
 
   /**
-   * Asserts that toCheck is a positive integer less than INFINITE / 2 or equal
-   * to INFINITE. Many of the methods of this class use positive integers as sizes,
-   * with INFINITE indicating positive infinity. This picks up accidental addition or
+   * Asserts that toCheck is a positive integer less than INF / 2 or equal
+   * to INF. Many of the methods of this class use positive integers as sizes,
+   * with INF indicating positive infinity. This picks up accidental addition or
    * subtraction from infinity.
    *
    * @param toCheck integer to validate
@@ -206,7 +206,7 @@ public:
 
   /**
    * Returns the minimum size for this subtree. Equivalent to calling
-   * computePreferredSize(width, INFINITE, availablePerpendicular, 0).
+   * computePreferredSize(width, INF, availablePerpendicular, 0).
    * Returns a cached value if possible or defers to doComputeMinimumSize otherwise.
    * Subclasses should overload doComputeMinimumSize if they want to specialize the
    * return value.

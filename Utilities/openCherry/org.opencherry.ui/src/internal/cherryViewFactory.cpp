@@ -241,7 +241,7 @@ IMemento::Pointer ViewFactory::SaveViewState(IMemento::Pointer memento,
 //          {
 //            result
 //            .add(new Status(
-//                    IStatus.ERROR,
+//                    IStatus.ERR,
 //                    PlatformUI.PLUGIN_ID,
 //                    0,
 //                    NLS.bind(WorkbenchMessages.ViewFactory_couldNotSave, viewRef.getTitle() ),

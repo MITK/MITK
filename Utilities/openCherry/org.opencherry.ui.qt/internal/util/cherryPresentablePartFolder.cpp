@@ -237,7 +237,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
     return;
   }
 
-  idx = std::min(idx, folder->GetItemCount());
+  idx = std::min<int>(idx, folder->GetItemCount());
 
   AbstractTabItem* item = 0;
 

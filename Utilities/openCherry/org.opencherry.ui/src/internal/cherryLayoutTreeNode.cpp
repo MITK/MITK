@@ -399,9 +399,9 @@ LayoutTreeNode::ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int heig
     return ChildSizes(0,0, false);
   }
 
-  if (width == INFINITE)
+  if (width == INF)
   {
-    if (preferredWidth == INFINITE)
+    if (preferredWidth == INF)
     {
       return ChildSizes(children[0]->ComputeMaximumSize(vertical, height),
           children[1]->ComputeMaximumSize(vertical, height), false);
@@ -433,8 +433,8 @@ LayoutTreeNode::ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int heig
 
   // Subtract the SASH_WIDTH from preferredWidth and width. From here on, we'll deal with the
   // width available to the controls and neglect the space used by the sash.
-  preferredWidth = std::max(0, this->Subtract(preferredWidth, this->GetSashSize()));
-  width = std::max(0, this->Subtract(width, this->GetSashSize()));
+  preferredWidth = std::max<int>(0, this->Subtract(preferredWidth, this->GetSashSize()));
+  width = std::max<int>(0, this->Subtract(width, this->GetSashSize()));
 
   int redistribute = this->Subtract(preferredWidth, total);
 
@@ -445,37 +445,37 @@ LayoutTreeNode::ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int heig
   int rightMaximum = children[1]->ComputeMaximumSize(vertical, height);
 
   // Keep track of the available space for each child, given the minimum size of the other child
-  int leftAvailable = std::min(leftMaximum, std::max(0, this->Subtract(width,
+  int leftAvailable = std::min<int>(leftMaximum, std::max<int>(0, this->Subtract(width,
       rightMinimum)));
-  int rightAvailable = std::min(rightMaximum, std::max(0, this->Subtract(width,
+  int rightAvailable = std::min<int>(rightMaximum, std::max<int>(0, this->Subtract(width,
       leftMinimum)));
 
   // Figure out the ideal size of the left child
-  int idealLeft = std::max(leftMinimum, std::min(preferredWidth, left
+  int idealLeft = std::max<int>(leftMinimum, std::min<int>(preferredWidth, left
       + (int)(redistribute * wLeft / wTotal)));
 
   // If the right child can't use all its available space, let the left child fill it in
-  idealLeft = std::max(idealLeft, preferredWidth - rightAvailable);
+  idealLeft = std::max<int>(idealLeft, preferredWidth - rightAvailable);
   // Ensure the left child doesn't get larger than its available space
-  idealLeft = std::min(idealLeft, leftAvailable);
+  idealLeft = std::min<int>(idealLeft, leftAvailable);
 
   // Check if the left child would prefer to be a different size
   idealLeft = children[0]->ComputePreferredSize(vertical, leftAvailable, height,
       idealLeft);
 
   // Ensure that the left child is larger than its minimum size
-  idealLeft = std::max(idealLeft, leftMinimum);
-  idealLeft = std::min(idealLeft, leftAvailable);
+  idealLeft = std::max<int>(idealLeft, leftMinimum);
+  idealLeft = std::min<int>(idealLeft, leftAvailable);
 
   // Compute the right child width
-  int idealRight = std::max(rightMinimum, preferredWidth - idealLeft);
+  int idealRight = std::max<int>(rightMinimum, preferredWidth - idealLeft);
 
-  rightAvailable = std::max(0, std::min(rightAvailable, this->Subtract(width,
+  rightAvailable = std::max<int>(0, std::min<int>(rightAvailable, this->Subtract(width,
       idealLeft)));
-  idealRight = std::min(idealRight, rightAvailable);
+  idealRight = std::min<int>(idealRight, rightAvailable);
   idealRight = children[1]->ComputePreferredSize(vertical, rightAvailable,
       height, idealRight);
-  idealRight = std::max(idealRight, rightMinimum);
+  idealRight = std::max<int>(idealRight, rightMinimum);
 
   return ChildSizes(idealLeft, idealRight, leftMaximum> leftMinimum
       && rightMaximum> rightMinimum

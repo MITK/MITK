@@ -21,6 +21,7 @@
 #include <cherryMacros.h>
 #include <cherryMessage.h>
 
+#include "cherryUiDll.h"
 #include "cherryPropertyChangeEvent.h"
 
 namespace cherry
@@ -43,7 +44,7 @@ namespace cherry
  * </pre>
  * </p>
  */
-struct IPropertyChangeListener: public virtual Object
+struct CHERRY_UI IPropertyChangeListener: public virtual Object
 {
 
   cherryClassMacro(IPropertyChangeListener);

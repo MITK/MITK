@@ -331,7 +331,7 @@ struct WorkbenchConstants
   static const std::string SMALL_FONT; // = "org.opencherry.ui.smallFont"; //$NON-NLS-1$
 
   //Colors
-  static const std::string COLOR_HIGHLIGHT; // = "org.opencherry.ui.highlight"; //$NON-NLS-1$
+  static const std::string COLOR_HIGHLIGHT_; // = "org.opencherry.ui.highlight"; //$NON-NLS-1$
 
 };
 

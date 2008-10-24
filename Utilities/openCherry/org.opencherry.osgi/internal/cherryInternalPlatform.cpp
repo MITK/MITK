@@ -42,7 +42,6 @@ InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
   m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
   m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
-
 }
 
 InternalPlatform::~InternalPlatform()
@@ -320,15 +319,21 @@ void InternalPlatform::PrintHelp(const std::string&, const std::string&)
   for (Poco::Util::OptionSet::Iterator option = opts.begin();
        option != opts.end(); ++option)
   {
+#ifdef CHERRY_OS_FAMILY_WINDOWS
+    std::string optionPostFix = "/";
+#else
+    std::string optionPostFix = "-";
+#endif
+
     std::cout.width(35);
     std::cout.setf(std::ios_base::left, std::ios_base::adjustfield);
     if (option->takesArgument())
     {
-      std::cout << ("  -" + option->fullName() + "=<value>");
+      std::cout << (" " + optionPostFix + option->fullName() + "=<value>");
     }
     else
     {
-      std::cout << ("  -" + option->fullName());
+      std::cout << (" " + optionPostFix + option->fullName());
     }
 
     std::cout << option->description() << std::endl;

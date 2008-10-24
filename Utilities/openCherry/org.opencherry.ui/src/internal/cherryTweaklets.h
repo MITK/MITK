@@ -27,10 +27,12 @@
 #include <service/cherryIExtensionPointService.h>
 #include <cherryPlatform.h>
 
+#include "../cherryUiDll.h"
+
 namespace cherry
 {
 
-class Tweaklets
+class CHERRY_UI Tweaklets
 {
 
 public:
@@ -163,7 +165,7 @@ private:
         catch (CoreException e)
         {
           //StatusManager.getManager().handle(
-          //    StatusUtil.newStatus(IStatus.ERROR,
+          //    StatusUtil.newStatus(IStatus.ERR,
           std::cout << "Error with extension " << elements[i] << e.what();
           //    StatusManager.LOG);
         }

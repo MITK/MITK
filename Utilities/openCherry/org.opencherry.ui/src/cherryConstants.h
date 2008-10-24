@@ -19,10 +19,12 @@
 #ifndef CHERRYCONSTANTS_H_
 #define CHERRYCONSTANTS_H_
 
+#include "cherryUiDll.h"
+
 namespace cherry
 {
 
-struct Constants
+struct CHERRY_UI Constants
 {
 
   static const int DEFAULT; // = -1

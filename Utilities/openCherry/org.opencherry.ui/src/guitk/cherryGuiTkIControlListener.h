@@ -20,6 +20,7 @@
 
 #include <cherryMacros.h>
 
+#include "../cherryUiDll.h"
 #include "cherryGuiTkControlEvent.h"
 
 namespace cherry
@@ -44,7 +45,7 @@ namespace GuiTk
  * @see ControlAdapter
  * @see ControlEvent
  */
-struct IControlListener: public virtual Object
+struct CHERRY_UI IControlListener: public virtual Object
 {
 
   cherryClassMacro(IControlListener)

@@ -440,9 +440,8 @@ bool WorkbenchWindow::SaveAllPages(bool bConfirm)
 
 bool WorkbenchWindow::HardClose()
 {
-  bool result;
   std::exception exc;
-  bool exceptionOccured;
+  bool exceptionOccured = false;
 
   try
   {
@@ -516,9 +515,10 @@ bool WorkbenchWindow::HardClose()
   } catch (std::exception& e)
   {
     exc = e;
+    exceptionOccured = true;
   }
 
-  Window::Close();
+  bool result = Window::Close();
   // Bring down all of the services ... after the window goes away
   serviceLocator->Dispose();
   //menuRestrictions.clear();

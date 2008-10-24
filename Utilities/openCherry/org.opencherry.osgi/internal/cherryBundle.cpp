@@ -41,7 +41,7 @@ Bundle::Bundle(BundleLoader& loader, IBundleStorage::Pointer storage) :
     this->LoadManifest();
     m_State = BUNDLE_INSTALLED;
   }
-  catch (Poco::FileNotFoundException exc)
+  catch (Poco::FileException& exc)
   {
     std::cout << "Exception: " << exc.displayText() << std::endl;
     m_State = BUNDLE_UNINSTALLED;

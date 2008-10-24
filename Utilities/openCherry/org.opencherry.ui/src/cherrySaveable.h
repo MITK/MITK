@@ -28,8 +28,8 @@
 
 namespace cherry {
 
-class IWorkbenchPage;
-class IWorkbenchPart;
+struct IWorkbenchPage;
+struct IWorkbenchPart;
 
 /**
  * A <code>Saveable</code> represents a unit of saveability, e.g. an editable

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "event/cherryBundleEvents.h"
 
 #include "internal/cherryDefaultActivator.h"
+#include "internal/cherrySystemBundleActivator.h"
 #include "internal/cherryCodeCache.h"
 
 #include "cherryPlugin.h"
@@ -135,14 +136,14 @@ BundleLoader::LoadBundle(Bundle::Pointer bundle)
 Poco::Path
 BundleLoader::GetPathForLibrary(const std::string& libraryName)
 {
-  return m_CodeCache->GetPathFor(libraryName);
+  return m_CodeCache->GetPathForLibName(libraryName);
 }
 
 Poco::Path
 BundleLoader::GetLibraryPathFor(IBundle* bundle)
 {
   std::string libName = bundle->GetActivatorLibrary();
-  if (libName == "") libName = "lib" + bundle->GetSymbolicName();
+  if (libName.empty()) libName = /*"lib" +*/ bundle->GetSymbolicName();
   return this->GetPathForLibrary(libName);
 }
 
@@ -190,14 +191,23 @@ BundleLoader::ResolveAllBundles()
 void
 BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list)
 {
-  bundle->GetStorage().List("bin/", list);
+  std::string libDir = "bin/" CMAKE_INTDIR "/";
+  bundle->GetStorage().List(libDir, list);
   
-  int suf = Poco::SharedLibrary::suffix().size();
+  /*int suf = Poco::SharedLibrary::suffix().size();
   std::vector<std::string>::iterator iter;
-  for (iter = list.begin(); iter != list.end(); ++iter)
+  for (iter = list.begin(); iter != list.end(); )
   {
-    iter->erase(iter->size() - suf);
-  }
+    if (iter->substr(iter->size() - suf) == Poco::SharedLibrary::suffix())
+    {
+      iter->erase(iter->size() - suf);
+      ++iter;
+    }
+    else
+    {
+      iter = list.erase(iter);
+    }
+  }*/
 }
 
 void
@@ -209,10 +219,13 @@ BundleLoader::InstallLibraries(IBundle* bundle)
   std::vector<std::string>::iterator iter;
   for (iter = libraries.begin(); iter != libraries.end(); ++iter)
   {
+    if (iter->empty()) continue;
+
     std::cout << "Testing CodeCache for: " << *iter << std::endl;
     if (!m_CodeCache->HasLibrary(*iter))
     {
-      std::istream* istr = bundle->GetResource("bin/" + (*iter) + Poco::SharedLibrary::suffix());
+      std::string libDir = "bin/" CMAKE_INTDIR "/";
+      std::istream* istr = bundle->GetResource(libDir + (*iter)); // + Poco::SharedLibrary::suffix());
       m_CodeCache->InstallLibrary(*iter, *istr);
       delete istr;
     }
@@ -303,7 +316,8 @@ BundleLoader::StartSystemBundle(SystemBundle* bundle)
   if (bundle->IsStarted()) return;
 
   BundleInfo info = m_BundleMap[bundle->GetSymbolicName()];
-  IBundleActivator* activator = this->LoadActivator(info);
+  //IBundleActivator* activator = this->LoadActivator(info);
+  IBundleActivator* activator = new SystemBundleActivator();
 
   bundle->SetActivator(activator);
 

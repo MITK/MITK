@@ -261,7 +261,7 @@ class CHERRY_UI WorkbenchAdvisor {
 //
 //    try {
 //      StatusManager.getManager().handle(
-//          new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
+//          new Status(IStatus.ERR, WorkbenchPlugin.PI_WORKBENCH,
 //              "Unhandled event loop exception", exception)); //$NON-NLS-1$
 //
 //      if (WorkbenchPlugin.DEBUG) {

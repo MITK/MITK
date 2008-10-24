@@ -100,16 +100,16 @@ Rectangle LayoutTree::GetBounds()
 
 int LayoutTree::Subtract(int a, int b)
 {
-  poco_assert(b >= 0 && b < INFINITE);
+  poco_assert(b >= 0 && b < INF);
 
   return Add(a, -b);
 }
 
 int LayoutTree::Add(int a, int b)
 {
-  if (a == INFINITE || b == INFINITE)
+  if (a == INF || b == INF)
   {
-    return INFINITE;
+    return INF;
   }
 
   return a + b;
@@ -117,7 +117,7 @@ int LayoutTree::Add(int a, int b)
 
 void LayoutTree::AssertValidSize(int toCheck)
 {
-  poco_assert(toCheck >= 0 && (toCheck == INFINITE || toCheck < INFINITE / 2));
+  poco_assert(toCheck >= 0 && (toCheck == INF || toCheck < INF / 2));
 }
 
 int LayoutTree::ComputePreferredSize(bool width, int availableParallel,
@@ -139,10 +139,10 @@ int LayoutTree::ComputePreferredSize(bool width, int availableParallel,
 
   if (preferredParallel == 0)
   {
-    return std::min(availableParallel, this->ComputeMinimumSize(width,
+    return std::min<int>(availableParallel, this->ComputeMinimumSize(width,
         availablePerpendicular));
   }
-  else if (preferredParallel == INFINITE && availableParallel == INFINITE)
+  else if (preferredParallel == INF && availableParallel == INF)
   {
     return this->ComputeMaximumSize(width, availablePerpendicular);
   }
@@ -168,7 +168,7 @@ int LayoutTree::DoGetSizeFlags(bool width)
 int LayoutTree::DoComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
-  int result = std::min(availableParallel, part->ComputePreferredSize(width,
+  int result = std::min<int>(availableParallel, part->ComputePreferredSize(width,
       availableParallel, availablePerpendicular, preferredParallel));
 
   this->AssertValidSize(result);
@@ -188,11 +188,11 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
 
   // If this subtree doesn't contain any wrapping controls (ie: they don't care
   // about their perpendicular size) then force the perpendicular
-  // size to be INFINITE. This ensures that we will get a cache hit
+  // size to be INF. This ensures that we will get a cache hit
   // every time for non-wrapping controls.
   if (!this->HasSizeFlag(width, Constants::WRAP))
   {
-    availablePerpendicular = INFINITE;
+    availablePerpendicular = INF;
   }
 
   if (width)
@@ -246,7 +246,7 @@ void LayoutTree::PrintCacheStatistics()
 
 int LayoutTree::DoComputeMinimumSize(bool width, int availablePerpendicular)
 {
-  int result = this->DoComputePreferredSize(width, INFINITE, availablePerpendicular,
+  int result = this->DoComputePreferredSize(width, INF, availablePerpendicular,
       0);
   this->AssertValidSize(result);
   return result;
@@ -256,20 +256,20 @@ int LayoutTree::ComputeMaximumSize(bool width, int availablePerpendicular)
 {
   this->AssertValidSize(availablePerpendicular);
 
-  // Optimization: if this subtree has no maximum size, then always return INFINITE as its
+  // Optimization: if this subtree has no maximum size, then always return INF as its
   // maximum size.
   if (!this->HasSizeFlag(width, Constants::MAX))
   {
-    return INFINITE;
+    return INF;
   }
 
   // If this subtree doesn't contain any wrapping controls (ie: they don't care
   // about their perpendicular size) then force the perpendicular
-  // size to be INFINITE. This ensures that we will get a cache hit
+  // size to be INF. This ensures that we will get a cache hit
   // every time.
   if (!this->HasSizeFlag(width, Constants::WRAP))
   {
-    availablePerpendicular = INFINITE;
+    availablePerpendicular = INF;
   }
 
   if (width)
@@ -312,8 +312,8 @@ int LayoutTree::ComputeMaximumSize(bool width, int availablePerpendicular)
 
 int LayoutTree::DoComputeMaximumSize(bool width, int availablePerpendicular)
 {
-  return this->DoComputePreferredSize(width, INFINITE, availablePerpendicular,
-      INFINITE);
+  return this->DoComputePreferredSize(width, INF, availablePerpendicular,
+      INF);
 }
 
 void LayoutTree::FlushNode()

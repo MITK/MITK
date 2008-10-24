@@ -122,7 +122,7 @@ struct MessageDialog
   *            <ul>
   *            <li><code>IDialog::NONE</code> for a dialog with no
   *            image</li>
-  *            <li><code>IDialog::ERROR</code> for a dialog with an
+  *            <li><code>IDialog::ERR</code> for a dialog with an
   *            error image</li>
   *            <li><code>IDialog::INFORMATION</code> for a dialog
   *            with an information image</li>

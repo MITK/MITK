@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "cherryTabbedStackPresentation.h"
-
+#include "cherryAbstractTabItem.h"
 #include "cherryLeftToRightTabOrder.h"
 
 #include <cherryConstants.h>
@@ -29,7 +29,7 @@ int TabbedStackPresentation::ComputePreferredMinimumSize(bool width,
 {
   int minSize;
   int hint =
-          availablePerpendicular == std::numeric_limits<int>::infinity() ? Constants::DEFAULT
+          availablePerpendicular == INF ? Constants::DEFAULT
               : availablePerpendicular;
   if (width)
   {
@@ -247,7 +247,7 @@ int TabbedStackPresentation::ComputePreferredSize(bool width,
     int partSize = parts.front()->ComputePreferredSize(width, availableParallel,
         availablePerpendicular, preferredResult);
 
-    if (partSize == std::numeric_limits<int>::infinity())
+    if (partSize == INF)
       return partSize;
 
     // Adjust preferred size to take into account tab and border trim.
@@ -255,19 +255,19 @@ int TabbedStackPresentation::ComputePreferredSize(bool width,
     if (width)
     {
       // PaneFolder adds some bogus tab spacing, so just find the maximum width.
-      partSize = std::max(minSize, partSize);
+      partSize = std::max<int>(minSize, partSize);
     }
     else
     {
       // Add them (but only if there's enough room)
-      if (std::numeric_limits<int>::infinity() - minSize > partSize)
+      if (INF - minSize > partSize)
         partSize += minSize;
     }
 
     return partSize;
   }
 
-  if (preferredResult != std::numeric_limits<int>::infinity() || this->GetSite()->GetState()
+  if (preferredResult != INF || this->GetSite()->GetState()
       == IStackPresentationSite::STATE_MINIMIZED)
   {
     int minSize = this->ComputePreferredMinimumSize(width, availablePerpendicular);
@@ -277,10 +277,10 @@ int TabbedStackPresentation::ComputePreferredSize(bool width,
       return minSize;
     }
 
-    return std::max(minSize, preferredResult);
+    return std::max<int>(minSize, preferredResult);
   }
 
-  return std::numeric_limits<int>::infinity();
+  return INF;
 }
 
 int TabbedStackPresentation::GetSizeFlags(bool width)

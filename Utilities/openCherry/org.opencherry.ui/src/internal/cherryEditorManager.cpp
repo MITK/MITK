@@ -770,7 +770,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //        // The exception is already logged.
 //        result
 //        .add(new Status(
-//                IStatus.ERROR,
+//                IStatus.ERR,
 //                PlatformUI.PLUGIN_ID,
 //                0,
 //                WorkbenchMessages.EditorManager_exceptionRestoringEditor,
@@ -1232,7 +1232,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //            {
 //              result
 //              .add(new Status(
-//                      IStatus.ERROR,
+//                      IStatus.ERR,
 //                      PlatformUI.PLUGIN_ID,
 //                      0,
 //                      NLS

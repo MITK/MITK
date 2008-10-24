@@ -105,6 +105,8 @@ public:
   protected:
    /*static*/ class Sashes {
         public:
+          Sashes();
+
           /*Sash*/ void* left;
           /*Sash*/ void* right;
           /*Sash*/ void* top;

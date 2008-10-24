@@ -27,6 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+PartPane::Sashes::Sashes() : 
+  left(0), right(0), top(0), bottom(0)
+{
+}
+
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage::Pointer workbenchPage)
  : StackablePart(partReference->GetId()),

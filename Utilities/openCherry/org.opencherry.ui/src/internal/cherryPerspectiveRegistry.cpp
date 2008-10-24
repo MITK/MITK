@@ -543,7 +543,7 @@ void PerspectiveRegistry::UnableToLoadPerspective(const std::string& status)
   {
     WorkbenchPlugin::Log(msg);
     //IStatus errStatus =
-    //    new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, msg);
+    //    new Status(IStatus.ERR, WorkbenchPlugin.PI_WORKBENCH, msg);
     //StatusManager.getManager().handle(errStatus, StatusManager.SHOW);
   }
   else

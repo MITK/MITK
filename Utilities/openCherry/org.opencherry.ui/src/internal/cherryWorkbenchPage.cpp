@@ -2715,7 +2715,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer /*memento*/,
   //        if (activePerspective == 0)
   //        {
   //          result .merge(
-  //              new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
+  //              new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
   //                  WorkbenchMessages.Workbench_showPerspectiveError,
   //                  activeDescriptor.getId()), 0));
   //        }

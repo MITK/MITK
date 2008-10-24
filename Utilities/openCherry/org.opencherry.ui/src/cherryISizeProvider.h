@@ -19,6 +19,8 @@
 #ifndef CHERRYISIZEPROVIDER_H_
 #define CHERRYISIZEPROVIDER_H_
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
 /**
@@ -28,13 +30,13 @@ namespace cherry {
  * @since 3.1
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct ISizeProvider {
+struct CHERRY_UI ISizeProvider {
 
     /**
      * Constant used to indicate infinite size. This is equal to Integer.MAX_VALUE, ensuring
      * that it is greater than any other integer.
      */
-   static const int INFINITE;
+   static const int INF;
 
     /**
      * Returns a bitwise combination of flags indicating how and when computePreferredSize should
@@ -50,12 +52,12 @@ struct ISizeProvider {
      *
      * <ul>
      * <li>SWT.MAX: The part has a maximum size that will be returned by computePreferredSize(horizontal,
-     *     INFINITE, someWidth, INFINITE)</li>
+     *     INF, someWidth, INF)</li>
      * <li>SWT.MIN: The part has a minimum size that will be returned by computePreferredSize(horizontal,
-     *     INFINITE, someWidth, 0)</li>
+     *     INF, someWidth, 0)</li>
      * <li>SWT.WRAP: Indicates that computePreferredSize makes use of the availablePerpendicular argument. If this
      *     flag is not specified, then the third argument to computePreferredSize will always be set to
-     *     INFINITE. The perpendicular size is expensive to compute, and it is usually only used
+     *     INF. The perpendicular size is expensive to compute, and it is usually only used
      *     for wrapping parts.
      * <li>SWT.FILL: The part may not return the preferred size verbatim when computePreferredSize is
      *     is given a value between the minimum and maximum sizes. This is commonly used if the part
@@ -98,9 +100,9 @@ struct ISizeProvider {
      * <p>
      * The getSizeFlags method controls how frequently this method will be called and what information
      * will be available when it is. Any subclass that specializes this method should also specialize
-     * getSizeFlags. computePreferredSize(width, INFINITE, someSize, 0) returns
-     * the minimum size of the control (if any). computePreferredSize(width, INFINITE, someSize,
-     * INFINITE) returns the maximum size of the control.
+     * getSizeFlags. computePreferredSize(width, INF, someSize, 0) returns
+     * the minimum size of the control (if any). computePreferredSize(width, INF, someSize,
+     * INF) returns the maximum size of the control.
      * </p>
      *
      * <p>
@@ -112,7 +114,7 @@ struct ISizeProvider {
      * <li>To enforce a width that is always a multiple of 100 pixels, to a minimum of 100 pixels:
      *    <code>
      *        {
-     *              if (width && preferredResult != INFINITE) {
+     *              if (width && preferredResult != INF) {
      *                  int result = preferredResult - ((preferredResult + 50) % 100) + 50;
      *                  result = Math.max(100, Math.min(result, availableParallel - (availableParallel % 100)));
      *
@@ -135,15 +137,15 @@ struct ISizeProvider {
      * @param availableParallel available space. This is a width (pixels) if width == true, and a height (pixels)
      *  if width == false. A return value larger than this will be ignored.
      * @param availablePerpendicular available space perpendicular to the direction being measured
-     * or INFINITE if unbounded (pixels). This
+     * or INF if unbounded (pixels). This
      * is a height if width == true, or a height if width == false. Implementations will generally ignore this
      * argument unless they contain wrapping widgets. Note this argument will only contain meaningful information
      * if the part returns the SWT.WRAP flag from getSizeFlags(width)
      * @param preferredResult preferred size of the control (pixels, <= availableParallel). Set to
-     * INFINITE if unknown or unbounded.
+     * INF if unknown or unbounded.
      * @return returns the preferred size of the control (pixels). This is a width if width == true or a height
      * if width == false. Callers are responsible for rounding down the return value if it is larger than
-     * availableParallel. If availableParallel is INFINITE, then a return value of INFINITE
+     * availableParallel. If availableParallel is INF, then a return value of INF
      * is permitted, indicating that the preferred size of the control is unbounded.
      *
      * @see ISizeProvider#getSizeFlags(boolean)

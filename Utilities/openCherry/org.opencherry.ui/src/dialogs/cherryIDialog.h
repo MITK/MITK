@@ -40,7 +40,7 @@ struct CHERRY_UI IDialog : public virtual Object
   /**
    * Constant for a dialog with an error image (value 1).
    */
-  const static int ERROR; // = 1;
+  const static int ERR; // = 1;
 
   /**
    * Constant for a dialog with an info image (value 2).
@@ -63,4 +63,5 @@ struct CHERRY_UI IDialog : public virtual Object
 };
 
 }
+
 #endif /*CHERRYIDIALOG_H_*/

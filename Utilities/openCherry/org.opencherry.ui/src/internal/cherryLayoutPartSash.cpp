@@ -74,8 +74,8 @@ void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
   }
 
   int eventX = eventRect.x;
-  int left = std::max(0, eventX - nodeBounds.x);
-  left = std::min(left, nodeBounds.width - this->GetSashSize());
+  int left = std::max<int>(0, eventX - nodeBounds.x);
+  left = std::min<int>(left, nodeBounds.width - this->GetSashSize());
   int right = nodeBounds.width - left - this->GetSashSize();
 
   LayoutTreeNode::ChildSizes sizes = node->ComputeChildSizes(nodeBounds.width, nodeBounds.height, left, right, nodeBounds.width);

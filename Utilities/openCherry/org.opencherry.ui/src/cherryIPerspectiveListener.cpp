@@ -53,4 +53,31 @@ IPerspectiveListener::Events
   this->perspectivePreDeactivate -= Delegate2(listener.GetPointer(), &IPerspectiveListener::PerspectivePreDeactivate);
 }
 
+void IPerspectiveListener::PerspectiveActivated(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective)
+{}
+void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective, const std::string& changeId) 
+{}
+void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective,
+          IWorkbenchPartReference::Pointer partRef, const std::string& changeId) 
+{}
+void IPerspectiveListener::PerspectiveOpened(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective) 
+{}
+void IPerspectiveListener::PerspectiveClosed(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective) 
+{}
+void IPerspectiveListener::PerspectiveDeactivated(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer perspective) 
+{}
+void IPerspectiveListener::PerspectiveSavedAs(SmartPointer<IWorkbenchPage> page,
+          IPerspectiveDescriptor::Pointer oldPerspective,
+          IPerspectiveDescriptor::Pointer newPerspective) 
+{};
+void IPerspectiveListener::PerspectivePreDeactivate(SmartPointer<IWorkbenchPage> page,
+      IPerspectiveDescriptor::Pointer perspective) 
+{}
+
 }

@@ -381,7 +381,7 @@ private:
     Workbench* workbench;
   };
 
-  friend class ServiceLocatorOwner;
+  friend struct ServiceLocatorOwner;
 
   ServiceLocatorOwner serviceLocatorOwner;
 

@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "cherryISelectionChangedListener.h"
+#include "cherryISelectionProvider.h"
 
 namespace cherry {
 

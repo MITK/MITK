@@ -17,6 +17,8 @@
 
 #include "cherryQCTabBar.h"
 
+#include <algorithm>
+
 namespace cherry
 {
 

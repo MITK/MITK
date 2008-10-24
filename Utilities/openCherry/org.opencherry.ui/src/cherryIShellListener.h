@@ -68,35 +68,35 @@ struct CHERRY_UI IShellListener : public virtual Object {
  *
  * @param e an event containing information about the activation
  */
-virtual void ShellActivated(ShellEvent::Pointer e) {};
+virtual void ShellActivated(ShellEvent::Pointer e);
 
 /**
  * Sent when a shell is closed.
  *
  * @param e an event containing information about the close
  */
-virtual void ShellClosed(ShellEvent::Pointer e) {};
+virtual void ShellClosed(ShellEvent::Pointer e);
 
 /**
  * Sent when a shell stops being the active window.
  *
  * @param e an event containing information about the deactivation
  */
-virtual void ShellDeactivated(ShellEvent::Pointer e) {};
+virtual void ShellDeactivated(ShellEvent::Pointer e);
 
 /**
  * Sent when a shell is un-minimized.
  *
  * @param e an event containing information about the un-minimization
  */
-virtual void ShellDeiconified(ShellEvent::Pointer e) {};
+virtual void ShellDeiconified(ShellEvent::Pointer e);
 
 /**
  * Sent when a shell is minimized.
  *
  * @param e an event containing information about the minimization
  */
-virtual void ShellIconified(ShellEvent::Pointer e) {};
+virtual void ShellIconified(ShellEvent::Pointer e);
 };
 
 }

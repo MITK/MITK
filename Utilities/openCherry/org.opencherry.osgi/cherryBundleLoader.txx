@@ -44,7 +44,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   Poco::SharedPtr<Poco::ClassLoader<C> >& cl =
     Poco::RefAnyCast<Poco::SharedPtr<Poco::ClassLoader<C> > >(*any);
 
-  std::string libName = "lib" + bundleInfo.m_Bundle->GetSymbolicName();
+  std::string libName = /*"lib" +*/ bundleInfo.m_Bundle->GetSymbolicName();
   Poco::Path libPath(bundleInfo.m_Context->GetPathForLibrary(libName));
 
   if (!cl->isLibraryLoaded(libPath.toString()))

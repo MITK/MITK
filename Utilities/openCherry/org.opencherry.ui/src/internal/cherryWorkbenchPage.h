@@ -1192,7 +1192,7 @@ private:
    *            identifies the new perspective.
    */
 public:
-  void SetPerspective(const IPerspectiveDescriptor::Pointer desc);
+  void SetPerspective(IPerspectiveDescriptor::Pointer desc);
 
   /**
    * Can be used to get hold of a IPartListener::Events object

@@ -36,6 +36,8 @@ void SystemBundle::Start()
 
 void SystemBundle::Resume()
 {
+  m_State = BUNDLE_ACTIVE;
+
   // read the plugin.xml file from the resolved plugins
   try
   {

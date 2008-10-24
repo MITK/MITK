@@ -18,6 +18,7 @@
 #include "cherryPresentationSerializer.h"
 
 #include <Poco/NumberParser.h>
+#include <algorithm>
 
 namespace cherry
 {

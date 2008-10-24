@@ -44,6 +44,7 @@ CodeCache::~CodeCache()
 void 
 CodeCache::Clear()
 {
+  std::cout << "Clearing code cache\n";
   std::vector<Poco::File> files;
   m_CachePath.list(files);
   for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
@@ -59,7 +60,7 @@ CodeCache::HasLibrary(const std::string& name)
   m_CachePath.list(files);
 
   std::string libName(name);
-  libName.append(Poco::SharedLibrary::suffix());
+  //libName.append(Poco::SharedLibrary::suffix());
   
   std::vector<std::string>::iterator iter;
   for (iter = files.begin(); iter != files.end(); iter++)
@@ -73,8 +74,8 @@ CodeCache::HasLibrary(const std::string& name)
 void
 CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 {
-  std::cout << "Installing library " << name << " to " << this->GetPathFor(name).toString() << std::endl;
-  std::ofstream ostr(this->GetPathFor(name).toString().c_str(), std::ios::binary | std::ios::trunc);
+  std::cout << "Installing library " << name << " to " << this->GetPathForFileName(name).toString() << std::endl;
+  std::ofstream ostr(this->GetPathForFileName(name).toString().c_str(), std::ios::binary | std::ios::trunc);
   
   ostr << istr.rdbuf();
 }
@@ -82,11 +83,11 @@ CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 void
 CodeCache::UnInstallLibrary(const std::string& name)
 {
-  Poco::File(this->GetPathFor(name)).remove();
+  Poco::File(this->GetPathForFileName(name)).remove();
 }
   
 Poco::Path
-CodeCache::GetPathFor(const std::string& name)
+CodeCache::GetPathForLibName(const std::string& name)
 {
   // We instructed cmake to replace "." with "_" in library names
   // since they are also used for defines (for Windows dll import/export
@@ -96,6 +97,12 @@ CodeCache::GetPathFor(const std::string& name)
   std::replace(libName.begin(), libName.end(), '.', '_');
   libName += Poco::SharedLibrary::suffix();
   return Poco::Path(m_CachePath.path(), libName).toString();
+}
+
+Poco::Path
+CodeCache::GetPathForFileName(const std::string& name)
+{
+  return Poco::Path(m_CachePath.path(), name).toString();
 }
 
 }

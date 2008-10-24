@@ -91,7 +91,7 @@ private:
 
   };
 
-  friend class PropertyListenerProxy;
+  friend struct PropertyListenerProxy;
 
   IPropertyChangeListener::Pointer GetPropertyListenerProxy();
 

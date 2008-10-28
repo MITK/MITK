@@ -102,7 +102,6 @@ SET(Poco_FOUND 0)
 
 # Now try to get the include and library path.
 IF(Poco_INCLUDE_DIR)
-
   IF(EXISTS "${Poco_INCLUDE_DIR}/Foundation")
     SET(Poco_INCLUDE_DIRS
       ${Poco_INCLUDE_DIR}/CppUnit/include
@@ -116,6 +115,7 @@ IF(Poco_INCLUDE_DIR)
     SET(Poco_INCLUDE_DIRS
       ${Poco_INCLUDE_DIR}
     )
+    SET(Poco_FOUND 1)
   ENDIF(EXISTS "${Poco_INCLUDE_DIR}/Foundation")
 
   FIND_LIBRARY(Poco_FOUNDATION_LIB NAMES PocoFoundation PocoFoundationd  PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS
@@ -142,10 +142,10 @@ ENDIF(Poco_INCLUDE_DIR)
 
 IF(NOT Poco_FOUND)
   IF(Poco_FIND_QUIETLY)
-    MESSAGE(STATUS "Poco was not found. ${POCO_DIR_MESSAGE}")
+    MESSAGE(STATUS "Poco was not found. ${POCO_INCLUDE_DIR_MESSAGE}")
   ELSE(Poco_FIND_QUIETLY)
     IF(Poco_FIND_REQUIRED)
-      MESSAGE(FATAL_ERROR "Poco was not found. ${POCO_DIR_MESSAGE}")
+      MESSAGE(FATAL_ERROR "Poco was not found. ${POCO_INCLUDE_DIR_MESSAGE}")
     ENDIF(Poco_FIND_REQUIRED)
   ENDIF(Poco_FIND_QUIETLY)
 ENDIF(NOT Poco_FOUND)

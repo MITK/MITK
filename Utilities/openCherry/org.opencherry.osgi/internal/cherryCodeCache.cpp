@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryCodeCache.h"
@@ -33,15 +33,15 @@ CodeCache::CodeCache(const std::string& path) : m_CachePath(path)
   {
     m_CachePath.createDirectory();
   }
-  
+
 }
 
 CodeCache::~CodeCache()
 {
-  
+
 }
-  
-void 
+
+void
 CodeCache::Clear()
 {
   std::cout << "Clearing code cache\n";
@@ -56,38 +56,60 @@ CodeCache::Clear()
 bool
 CodeCache::HasLibrary(const std::string& name)
 {
+  std::cout << "HasLibrary checks for: " << name;
+
   std::vector<std::string> files;
   m_CachePath.list(files);
 
   std::string libName(name);
   //libName.append(Poco::SharedLibrary::suffix());
-  
+
   std::vector<std::string>::iterator iter;
   for (iter = files.begin(); iter != files.end(); iter++)
   {
-    if ((*iter) == libName) return true;
+    if ((*iter) == libName) {
+      std::cout << " FOUND\n";
+      return true;
+    }
   }
-  
+
+  std::cout << " NOT FOUND\n";
   return false;
 }
-  
+
 void
 CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 {
-  std::cout << "Installing library " << name << " to " << this->GetPathForFileName(name).toString() << std::endl;
-  std::ofstream ostr(this->GetPathForFileName(name).toString().c_str(), std::ios::binary | std::ios::trunc);
-  
+  std::cout << "Installing library " << name << " to " << this->GetPathForLibrary(name).toString() << std::endl;
+  std::ofstream ostr(this->GetPathForLibrary(name).toString().c_str(), std::ios::binary | std::ios::trunc);
+
   ostr << istr.rdbuf();
+}
+
+void
+CodeCache::InstallLibrary(const std::string& name, const Poco::File& path)
+{
+  std::cout << "Registering library " << name << " in " << path.path() << std::endl;
+  m_LibPaths.insert(std::make_pair(name, path));
 }
 
 void
 CodeCache::UnInstallLibrary(const std::string& name)
 {
-  Poco::File(this->GetPathForFileName(name)).remove();
+  std::map<std::string, Poco::File>::iterator iter = m_LibPaths.find(name);
+
+  if (iter == m_LibPaths.end())
+  {
+    Poco::File(this->GetPathForLibrary(name)).remove();
+  }
+  else
+  {
+    m_LibPaths.erase(name);
+  }
 }
-  
+
 Poco::Path
-CodeCache::GetPathForLibName(const std::string& name)
+CodeCache::GetPathForLibrary(const std::string& name)
 {
   // We instructed cmake to replace "." with "_" in library names
   // since they are also used for defines (for Windows dll import/export
@@ -95,14 +117,22 @@ CodeCache::GetPathForLibName(const std::string& name)
   // Hence we must replace all "." with "_" here too
   std::string libName(name);
   std::replace(libName.begin(), libName.end(), '.', '_');
-  libName += Poco::SharedLibrary::suffix();
-  return Poco::Path(m_CachePath.path(), libName).toString();
+
+  std::cout << "Getting path for library: " << libName << std::endl;
+  if (m_LibPaths.find(libName) != m_LibPaths.end())
+  {
+    return Poco::Path(m_LibPaths[libName].path(), libName + Poco::SharedLibrary::suffix());
+  }
+  else
+  {
+    return Poco::Path(m_CachePath.path(), libName + Poco::SharedLibrary::suffix());
+  }
 }
 
-Poco::Path
-CodeCache::GetPathForFileName(const std::string& name)
-{
-  return Poco::Path(m_CachePath.path(), name).toString();
-}
+//Poco::Path
+//CodeCache::GetPathForFileName(const std::string& name)
+//{
+//  return Poco::Path(m_CachePath.path(), name).toString();
+//}
 
 }

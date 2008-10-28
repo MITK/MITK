@@ -100,7 +100,7 @@ public:
   void ReadDependentContributions(IBundle* bundle);
 
   void ListLibraries(IBundle* bundle, std::vector<std::string>& list);
-  void InstallLibraries(IBundle* bundle);
+  void InstallLibraries(IBundle* bundle, bool copy = false);
 
   // start all resolved bundles, except the system bundle
   // (it is assumed, that the system bundle has already

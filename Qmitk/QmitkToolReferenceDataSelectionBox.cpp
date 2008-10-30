@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkToolReferenceDataSelectionBox.h"
@@ -41,21 +41,21 @@ QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* 
   connect( m_ReferenceDataSelectionBox, SIGNAL(activated(const mitk::DataTreeFilter::Item*)),
            this, SLOT(OnReferenceDataSelected(const mitk::DataTreeFilter::Item*)) );
 
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
 
 QmitkToolReferenceDataSelectionBox::~QmitkToolReferenceDataSelectionBox()
 {
-  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
 
 void QmitkToolReferenceDataSelectionBox::Initialize(mitk::DataTreeBase* tree )
 {
   m_ReferenceDataSelectionBox->SetDataTree( tree );
-  
+
   UpdateDataDisplay();
 }
-    
+
 mitk::ToolManager* QmitkToolReferenceDataSelectionBox::GetToolManager()
 {
   return m_ToolManager;
@@ -63,17 +63,17 @@ mitk::ToolManager* QmitkToolReferenceDataSelectionBox::GetToolManager()
 
 void QmitkToolReferenceDataSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 
   m_ToolManager = &newManager;
 
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 
   UpdateDataDisplay();
 }
-     
+
 void QmitkToolReferenceDataSelectionBox::UpdateDataDisplay()
-{ 
+{
   m_ReferenceDataSelectionBox->GetFilter()->SetDataStorageResultset( GetAllPossibleReferenceImages() ); /// \todo Also forward the current selected. Perhaps wait for new combobox.
   if (! m_ReferenceDataSelectionBox->GetFilter()->GetSelectMostRecentItemMode() )
   {
@@ -127,7 +127,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
-  /** 
+  /**
    * Build up predicate:
    *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
    *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
@@ -158,7 +158,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
       const mitk::Tool* tool = *iter;
 
       if ( (m_ToolGroupsForFiltering.empty()) || ( m_ToolGroupsForFiltering.find( tool->GetGroup() ) != std::string::npos ) ||
-                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos ) 
+                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
          )
       {
         if (completePredicate)
@@ -184,8 +184,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   // TODO delete all m_Predicates
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
 
-  /** 
-   *  display everything matching the predicate 
+  /**
+   *  display everything matching the predicate
    */
   if (completePredicate)
   {

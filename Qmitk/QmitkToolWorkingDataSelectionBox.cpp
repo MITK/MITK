@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkToolWorkingDataSelectionBox.h"
@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateAND.h"
- 
+
 class QmitkToolWorkingDataSelectionBoxUpdateDataEvent : public QCustomEvent
 {
   public:
@@ -45,7 +45,7 @@ class QmitkToolWorkingDataSelectionBoxUpdateDataEvent : public QCustomEvent
     {
     }
 };
-   
+
 
 QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, const char* name)
 :QListView(parent, name),
@@ -68,12 +68,12 @@ QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* pare
 
   connect( this, SIGNAL(rightButtonClicked( QListViewItem*, const QPoint&, int )),
                this, SLOT(itemRightClicked( QListViewItem*, const QPoint&, int )) );
-  
+
   connect( this, SIGNAL(selectionChanged()),
            this, SLOT(OnWorkingDataSelectionChanged()) );
-  
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 }
 
 QmitkToolWorkingDataSelectionBox::~QmitkToolWorkingDataSelectionBox()
@@ -92,17 +92,17 @@ void QmitkToolWorkingDataSelectionBox::SetFirstColumnTitle(const QString& title)
 
 void QmitkToolWorkingDataSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 
   m_ToolManager = &newManager;
 
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
 
   UpdateDataDisplay();
 }
-     
+
 void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
 {
   static mitk::ToolManager::DataVectorType previouslySelectedNodes;
@@ -110,7 +110,7 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
   mitk::ToolManager::DataVectorType selection = this->GetSelectedNodes();
   ///if ( selection == previouslySelectedNodes ) return;
   previouslySelectedNodes = selection;
- 
+
   if (selection.size() >0)
   {
     const mitk::DataTreeNode* node = selection[0];
@@ -120,7 +120,7 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
   {
     emit WorkingNodeSelected(NULL);
   }
- 
+
   m_SelfCall = true;
   m_ToolManager->SetWorkingData( selection ); // maybe empty
   m_SelfCall = false;
@@ -149,7 +149,7 @@ void QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified()
     m_LastSelectedReferenceData = m_ToolManager->GetReferenceData(0);
   }
 }
-  
+
 void QmitkToolWorkingDataSelectionBox::UpdateDataDisplayLater()
 {
   qApp->postEvent( this, new QmitkToolWorkingDataSelectionBoxUpdateDataEvent() ); // one round through the event loop
@@ -162,10 +162,10 @@ void QmitkToolWorkingDataSelectionBox::customEvent(QCustomEvent* e)
     UpdateDataDisplay();
   }
 }
- 
+
 void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
 {
-  
+
   // get old/correct selection
   mitk::ToolManager::DataVectorType oldSelectedNodes = m_ToolManager->GetWorkingData(); // maybe empty
 
@@ -191,7 +191,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
     {
       QListView::removeColumn(col);
     }
-    
+
     columnAdjustingNeccessary = true;
   }
 
@@ -205,7 +205,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
       QListView::setColumnText(col, colIter->second.c_str());
     }
   }
-    
+
   // rebuild contents
   mitk::ToolManager::DataVectorType allObjects = GetAllNodes( m_DisplayOnlyDerivedNodes );
   unsigned int laufendeNummer(1);
@@ -215,14 +215,14 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
         ++objectIter, ++laufendeNummer )
   {
     mitk::DataTreeNode* node = *objectIter;
-      
+
     if (node) // delete this check when datastorage is really used
     {
       // get name
       std::string name("???"); // should be white, red, blue
       node->GetName(name);
 
-      // Do some pretty pixmap filling (background in the node's color, foreground readable, indicating the index of the item and the hotkey 
+      // Do some pretty pixmap filling (background in the node's color, foreground readable, indicating the index of the item and the hotkey
       // get color, convert it to Qt's color system
       float rgb[3]; rgb[0] = 1.0; rgb[1] = 0.0; rgb[2] = 0.0;
       node->GetColor(rgb);
@@ -236,7 +236,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
       QPen pen = painter.pen();
       int ha,es,vau;
       qtcolor.getHsv(ha,es,vau);
-      if ( vau < 160  ) 
+      if ( vau < 160  )
         pen.setColor ( Qt::white );
       else
         pen.setColor ( Qt::black );
@@ -293,17 +293,17 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
     for (unsigned int col = 1; col < (unsigned) QListView::columns(); ++col)
     {
       if (col>1) QListView::setColumnWidthMode(col, QListView::Maximum);
-      QListView::header()->setStretchEnabled(true, col); 
+      QListView::header()->setStretchEnabled(true, col);
     }
-    
+
     for (unsigned int col = 1; col < (unsigned) QListView::columns(); ++col)
       QListView::adjustColumn(col);
-    
+
     QListView::setResizeMode( QListView::LastColumn ); // stretch to fill whole width of box
-    QListView::header()->adjustHeaderSize(); 
+    QListView::header()->adjustHeaderSize();
   }
 }
-    
+
 mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetSelectedNodes()
 {
   mitk::ToolManager::DataVectorType result;
@@ -351,7 +351,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
 {
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
-  /** 
+  /**
    * Build up predicate:
    *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
    *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
@@ -382,7 +382,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
       const mitk::Tool* tool = *iter;
 
       if ( (m_ToolGroupsForFiltering.empty()) || ( m_ToolGroupsForFiltering.find( tool->GetGroup() ) != std::string::npos ) ||
-                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos ) 
+                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
          )
       {
         if (completePredicate)
@@ -408,7 +408,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   // TODO delete all m_Predicates
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
 
-  /** 
+  /**
    * Two modes here:
    *  - display only nodes below reference data from ToolManager (onlyDerivedFromOriginal == true)
    *  - display everything matching the predicate (else)
@@ -447,7 +447,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
     resultVector.push_back( node );
   }
 
-  return resultVector; 
+  return resultVector;
 }
 
 void QmitkToolWorkingDataSelectionBox::itemRightClicked( QListViewItem* item, const QPoint& p, int )
@@ -489,7 +489,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateNodeVisibility()
   {
     (*objectIter)->SetVisibility(!m_ShowOnlySelected);
   }
- 
+
   if (m_ShowOnlySelected)
   {
     // show all selected nodes
@@ -501,10 +501,10 @@ void QmitkToolWorkingDataSelectionBox::UpdateNodeVisibility()
       (*iter)->SetVisibility(true);
     }
   }
-      
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-    
+
 void QmitkToolWorkingDataSelectionBox::SetAdditionalColumns(const std::string& columns)
 {
   m_AdditionalColumns.clear();

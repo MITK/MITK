@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkToolManager.h"
@@ -42,8 +42,8 @@ mitk::ToolManager::ToolManager()
     if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
     {
       tool->SetToolManager(this); // important to call right after instantiation
-      tool->ErrorMessage.AddListener(   this, &ToolManager::OnToolErrorMessage );
-      tool->GeneralMessage.AddListener( this, &ToolManager::OnGeneralToolMessage );
+      tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
+      tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
       m_Tools.push_back( tool );
     }
   }
@@ -57,7 +57,7 @@ mitk::ToolManager::~ToolManager()
   {
     m_ActiveTool->Deactivated();
     GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
-    
+
     m_ActiveTool = NULL;
     m_ActiveToolID = -1; // no tool active
 
@@ -116,13 +116,13 @@ bool mitk::ToolManager::ActivateTool(int id)
   //std::cout << "ToolManager::ActivateTool("<<id<<"): nextTool = "<<nextTool<<std::endl;
 
   static bool inActivateTool = false;
-  if (inActivateTool) 
+  if (inActivateTool)
   {
     //std::cout << "ToolManager::ActivateTool("<<id<<"): already inside ActivateTool somehow, returning now "<<std::endl;
     return true;
   }
   inActivateTool = true;
- 
+
   while ( nextTool != m_ActiveToolID )
   {
     //std::cout <<"ToolManager::ActivateTool: nextTool = " << nextTool << " (active tool = " << m_ActiveToolID<<")"<<std::endl;
@@ -325,7 +325,7 @@ mitk::DataTreeNode* mitk::ToolManager::GetWorkingData(int idx)
     return NULL;
   }
 }
-    
+
 int mitk::ToolManager::GetActiveToolID()
 {
   return m_ActiveToolID;
@@ -346,7 +346,7 @@ void mitk::ToolManager::RegisterClient()
       GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
     }
   }
-  
+
   ++m_RegisteredClients;
 }
 

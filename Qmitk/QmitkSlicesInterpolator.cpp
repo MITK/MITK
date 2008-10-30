@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkSlicesInterpolator.h"
@@ -59,11 +59,11 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   m_BtnAcceptInterpolation = new QPushButton("Accept", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
-  
+
   m_BtnAcceptAllInterpolations = new QPushButton("Accept all interpolations", this);
   m_BtnAcceptAllInterpolations->setEnabled( false );
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
-  
+
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnInterpolationInfoChanged );
   InterpolationInfoChangedObserverTag = m_Interpolator->AddObserver( itk::ModifiedEvent(), command );
@@ -81,7 +81,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 }
-    
+
 void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkStdMultiWidget* multiWidget)
 {
   if (m_Initialized)
@@ -91,8 +91,8 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
     // remove old observers
     if (m_ToolManager)
     {
-      m_ToolManager->WorkingDataChanged.RemoveListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
-      m_ToolManager->ReferenceDataChanged.RemoveListener( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
+      m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
+      m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
     }
 
     if (m_MultiWidget)
@@ -110,14 +110,14 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
 
   m_MultiWidget = multiWidget;
   m_ToolManager = toolManager;
- 
+
   // set enabled only if a segmentation is selected
   mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
   QVBox::setEnabled( node != NULL );
 
   // react whenever the set of selected segmentation changes
-  m_ToolManager->WorkingDataChanged.AddListener( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
-  m_ToolManager->ReferenceDataChanged.AddListener( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
   mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
@@ -200,7 +200,7 @@ void QmitkSlicesInterpolator::OnSagittalTimeChanged(itk::Object* sender, const i
 {
   const mitk::SliceNavigationController::GeometryTimeEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent&>(e);
   m_TimeStep[0] = event.GetPos();
-  
+
   if (m_LastSliceDimension == 0)
   {
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
@@ -213,7 +213,7 @@ void QmitkSlicesInterpolator::OnFrontalTimeChanged(itk::Object* sender, const it
 {
   const mitk::SliceNavigationController::GeometryTimeEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometryTimeEvent&>(e);
   m_TimeStep[1] = event.GetPos();
-  
+
   if (m_LastSliceDimension == 1)
   {
     mitk::SliceNavigationController* snc = dynamic_cast<mitk::SliceNavigationController*>( sender );
@@ -222,7 +222,7 @@ void QmitkSlicesInterpolator::OnFrontalTimeChanged(itk::Object* sender, const it
   }
 }
 
-    
+
 void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 2 ) )
@@ -235,7 +235,7 @@ void QmitkSlicesInterpolator::OnSagittalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 0 ) )
   {
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate();    
+    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate();
   }
 }
 
@@ -293,8 +293,8 @@ void QmitkSlicesInterpolator::Interpolate( unsigned int sliceDimension, mitk::Pl
 
       imageGeometry->WorldToIndex( projectedPoint, indexPoint );
       unsigned int sliceIndex = ROUND( indexPoint[sliceDimension] );
- 
-      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep ); 
+
+      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep );
       m_FeedbackNode->SetData( interpolation );
       m_LastSliceDimension = sliceDimension;
       m_LastSliceIndex = sliceIndex;
@@ -306,14 +306,14 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
   if (m_Segmentation && m_FeedbackNode->GetData())
   {
-    mitk::UndoStackItem::IncCurrObjectEventId(); 
-    mitk::UndoStackItem::IncCurrGroupEventId(); 
+    mitk::UndoStackItem::IncCurrObjectEventId();
+    mitk::UndoStackItem::IncCurrGroupEventId();
     mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
 
     mitk::OverwriteSliceImageFilter::Pointer slicewriter = mitk::OverwriteSliceImageFilter::New();
     slicewriter->SetInput( m_Segmentation );
     slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData()) ); 
+    slicewriter->SetSliceImage( dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData()) );
     slicewriter->SetSliceDimension( m_LastSliceDimension );
     slicewriter->SetSliceIndex( m_LastSliceIndex );
     slicewriter->SetTimeStep( m_TimeStep[m_LastSliceDimension] );
@@ -328,8 +328,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
   // first creates a 3D diff image, then applies this diff to the segmentation
   if (m_Segmentation)
   {
-    mitk::UndoStackItem::IncCurrObjectEventId(); 
-    mitk::UndoStackItem::IncCurrGroupEventId(); 
+    mitk::UndoStackItem::IncCurrObjectEventId();
+    mitk::UndoStackItem::IncCurrGroupEventId();
     mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
 
     // create a diff image for the undo operation
@@ -337,7 +337,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
     diffImage->Initialize( m_Segmentation );
     mitk::PixelType pixelType( typeid(short signed int) );
     diffImage->Initialize( pixelType, 3, m_Segmentation->GetDimensions() );
- 
+
     memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
     // now the diff image is all 0
 
@@ -355,7 +355,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
     mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
     for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
     {
-      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep ); 
+      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep );
       if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_Interpolator does
       {
         diffslicewriter->SetSliceImage( interpolation );
@@ -375,16 +375,16 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
         mitk::ApplyDiffImageOperation* doOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
         mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
         undoOp->SetFactor( -1.0 );
-        std::stringstream comment; 
+        std::stringstream comment;
         comment << "Accept all interpolations (" << totalChangedSlices << ")";
-        mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() ); 
+        mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() );
         mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
         // acutally apply the changes here
         mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation( doOp );
       }
     }
-    
+
     m_FeedbackNode->SetData(NULL);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -410,7 +410,7 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(int sliceDimension)
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 {
   m_InterpolationEnabled = on;
-  
+
   try
   {
     if (on)
@@ -430,12 +430,12 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
   mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
   QVBox::setEnabled( workingNode != NULL );
-  
+
   m_BtnAcceptAllInterpolations->setEnabled( on );
   m_BtnAcceptInterpolation->setEnabled( on );
   m_FeedbackNode->SetVisibility( on );
-  
-  if (!on) 
+
+  if (!on)
   {
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     return;
@@ -448,7 +448,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     if (segmentation)
     {
       m_Interpolator->SetSegmentationVolume( segmentation );
-     
+
       if (referenceNode)
       {
         mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
@@ -459,7 +459,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
   UpdateVisibleSuggestion();
 }
-   
+
 void QmitkSlicesInterpolator::EnableInterpolation(bool on)
 {
   // only to be called from the outside world
@@ -496,7 +496,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
       }
     }
 
-  } 
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

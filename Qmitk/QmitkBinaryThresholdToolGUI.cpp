@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkBinaryThresholdToolGUI.h"
@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qslider.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-  
+
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
  m_Slider(NULL)
@@ -55,8 +55,8 @@ QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
   // !!!
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged.RemoveListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged.RemoveListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
 
 }
@@ -65,16 +65,16 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool* tool)
 {
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged.RemoveListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged.RemoveListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
 
   m_BinaryThresholdTool = dynamic_cast<mitk::BinaryThresholdTool*>( tool );
 
   if (m_BinaryThresholdTool.IsNotNull())
   {
-    m_BinaryThresholdTool->IntervalBordersChanged.AddListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
-    m_BinaryThresholdTool->ThresholdingValueChanged.AddListener( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
+    m_BinaryThresholdTool->IntervalBordersChanged += mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, int, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged );
+    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, int>( this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged );
   }
 }
 

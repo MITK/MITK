@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkMessage.h"
@@ -60,7 +60,7 @@ class MessageSenderClass
 
     // message without any parameters, pure notification
     Message WaveHand;
-    
+
     // message without any parameters, pure notification
     Message ShowFinger;
 
@@ -72,18 +72,18 @@ class MessageSenderClass
 
     // message with one parameter of class type Package
     Message1<const Package&> GivePackage;
-    
+
     // message with two parameters of type int and float
     Message2<int, float> ShoutAgeAndFootSize;
 
-    void DoShowFinger() 
-    { 
+    void DoShowFinger()
+    {
       ShowFinger.Send();
       // ShowFinger() does the same
     }
 
-    void DoWaveHand() 
-    { 
+    void DoWaveHand()
+    {
       WaveHand();
       // WaveHand.Send() does the same
     }
@@ -110,17 +110,17 @@ class MessageSenderClass
 };
 
 
-// Receiver class remembers events received. 
+// Receiver class remembers events received.
 // Will tell about received events when asked.
 class MessageReceiverClass
 {
   public:
-      
+
     MessageReceiverClass()
     {
       Amnesia();
     }
-   
+
     void OnWaveHand()
     {
       m_HandWaved = true;
@@ -189,15 +189,15 @@ class MessageReceiverClass
 
     void RegisterObservers(MessageSenderClass& sender)
     {
-      sender.WaveHand.AddListener( this, &MessageReceiverClass::OnWaveHand );
-      sender.ShowFinger.AddListener( this, &MessageReceiverClass::OnWaveHand ); // we cannot see clearly, misinterpret this
+      sender.WaveHand += MessageDelegate<MessageReceiverClass>( this, &MessageReceiverClass::OnWaveHand );
+      sender.ShowFinger += MessageDelegate<MessageReceiverClass>( this, &MessageReceiverClass::OnWaveHand ); // we cannot see clearly, misinterpret this
 
-      sender.Say.AddListener( this, &MessageReceiverClass::OnSay );
-      sender.WalkMeters.AddListener( this, &MessageReceiverClass::OnWalk );
-      sender.GivePackage.AddListener( this, &MessageReceiverClass::OnGivePackage );
-      sender.ShoutAgeAndFootSize.AddListener( this, &MessageReceiverClass::OnShoutAgeAndFootSize );
+      sender.Say += MessageDelegate1<MessageReceiverClass, const std::string&>( this, &MessageReceiverClass::OnSay );
+      sender.WalkMeters += MessageDelegate1<MessageReceiverClass, double>( this, &MessageReceiverClass::OnWalk );
+      sender.GivePackage += MessageDelegate1<MessageReceiverClass, const Package&>( this, &MessageReceiverClass::OnGivePackage );
+      sender.ShoutAgeAndFootSize += MessageDelegate2<MessageReceiverClass, int, float>( this, &MessageReceiverClass::OnShoutAgeAndFootSize );
     }
- 
+
   private:
 
     bool m_HandWaved;
@@ -221,45 +221,45 @@ int mitkMessageTest(int /* argc */, char* /*argv*/[])
   mitk::mitkMessageTestTestClass::MessageReceiverClass receiver;
 
   MITK_TEST_CONDITION_REQUIRED(true, "Testing instantiation");
-  
+
   receiver.RegisterObservers(sender);
-  
+
   MITK_TEST_CONDITION_REQUIRED(true, "Testing registration to messages");
 
   MITK_TEST_CONDITION_REQUIRED(
       (sender.DoWaveHand(),  // This is called "comma operator". Don't ask, read!
-       receiver.HandWaved()), 
+       receiver.HandWaved()),
       "Message without parameters");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoShowFinger(), 
-       receiver.HandWaved()), 
+      (sender.DoShowFinger(),
+       receiver.HandWaved()),
       "Message without parameters");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoSay("Blooodworsch"), 
-       receiver.WordsSaid() == "Blooodworsch"), 
+      (sender.DoSay("Blooodworsch"),
+       receiver.WordsSaid() == "Blooodworsch"),
       "Message with std::string parameter");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoWalk(2.67), 
-       (receiver.MetersWalked() - 2.67) < 0.0001 ), 
+      (sender.DoWalk(2.67),
+       (receiver.MetersWalked() - 2.67) < 0.0001 ),
       "Message with double parameter");
   receiver.Amnesia();
-  
+
   mitk::mitkMessageTestTestClass::Package package(8);
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoGivePackage(package), 
-       receiver.PackageReceived() == package), 
+      (sender.DoGivePackage(package),
+       receiver.PackageReceived() == package),
       "Message with class parameter");
   receiver.Amnesia();
-  
+
   MITK_TEST_CONDITION_REQUIRED(
-      (sender.DoShoutAgeAndFootSize(46, 30.5), 
-       (receiver.Age() == 46 && (receiver.FootSize() - 30.5 < 0.0001))), 
+      (sender.DoShoutAgeAndFootSize(46, 30.5),
+       (receiver.Age() == 46 && (receiver.FootSize() - 30.5 < 0.0001))),
       "Message with int AND loat parameter");
   receiver.Amnesia();
 

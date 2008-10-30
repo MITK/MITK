@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkInteractiveSegmentation.h"
@@ -43,8 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 
 QmitkInteractiveSegmentation::QmitkInteractiveSegmentation(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-: QmitkFunctionality(parent, name, it), 
-  m_MultiWidget(mitkStdMultiWidget), 
+: QmitkFunctionality(parent, name, it),
+  m_MultiWidget(mitkStdMultiWidget),
   m_Controls(NULL)
 {
   SetAvailability(true);
@@ -104,17 +104,17 @@ QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
 
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
 
-    toolManager->NodePropertiesChanged.AddListener( this, &QmitkInteractiveSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
-    toolManager->NewNodesGenerated.AddListener( this, &QmitkInteractiveSegmentation::OnNewNodesGenerated );          // update the list of segmentations
+    toolManager->NodePropertiesChanged += mitk::MessageDelegate<QmitkInteractiveSegmentation>( this, &QmitkInteractiveSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
+    toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkInteractiveSegmentation>( this, &QmitkInteractiveSegmentation::OnNewNodesGenerated );          // update the list of segmentations
   }
   return m_Controls;
 }
-    
+
 void QmitkInteractiveSegmentation::OnNodePropertiesChanged()
 {
   m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
 }
-  
+
 void QmitkInteractiveSegmentation::OnNewNodesGenerated()
 {
   m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
@@ -133,7 +133,7 @@ void QmitkInteractiveSegmentation::CreateConnections()
     connect( m_Controls->m_ToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
     connect( m_Controls->grpInterpolation, SIGNAL(toggled(bool)), m_Controls->m_SlicesInterpolator, SLOT(EnableInterpolation(bool)) );
     connect( m_Controls->chkPixelSmoothing, SIGNAL(toggled(bool)), this, SLOT(SetReferenceImagePixelSmoothing(bool)) );
-    
+
     connect( m_Controls->m_ToolReferenceDataSelectionBox, SIGNAL(ReferenceNodeSelected (const mitk::DataTreeNode*)), this, SLOT(OnReferenceNodeSelected(const mitk::DataTreeNode*)) );
   }
 }
@@ -161,17 +161,17 @@ void QmitkInteractiveSegmentation::Activated()
 
   m_Controls->m_ToolSelectionBox->setEnabled( true );
   m_Controls->m_PostProcessingToolSelectionBox->setEnabled( true );
-    
+
   m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
 }
 
 void QmitkInteractiveSegmentation::Deactivated()
 {
   QmitkFunctionality::Deactivated();
-  
+
   m_Controls->m_ToolSelectionBox->setEnabled( false );
   m_Controls->m_PostProcessingToolSelectionBox->setEnabled( false );
-  
+
   m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( NULL );
 }
 
@@ -196,7 +196,7 @@ void QmitkInteractiveSegmentation::CreateNewSegmentation()
       mitk::Tool* firstTool = toolManager->GetToolById(0);
       if (firstTool)
       {
-        mitk::DataTreeNode::Pointer emptySegmentation = 
+        mitk::DataTreeNode::Pointer emptySegmentation =
           firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
         if (!emptySegmentation) return; // could be aborted by user
@@ -207,7 +207,7 @@ void QmitkInteractiveSegmentation::CreateNewSegmentation()
       }
     }
   }
-  
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -220,9 +220,9 @@ void QmitkInteractiveSegmentation::DeleteSegmentation()
 
   if (nodes.empty()) return;
 
-  if ( QMessageBox::question( NULL, tr("MITK"), 
+  if ( QMessageBox::question( NULL, tr("MITK"),
                                 QString("Do you really want to delete the selected segmentations?"),
-                                QMessageBox::Yes | QMessageBox::Default, 
+                                QMessageBox::Yes | QMessageBox::Default,
                                 QMessageBox::No  | QMessageBox::Escape
                               ) == QMessageBox::No )
   {
@@ -256,7 +256,7 @@ void QmitkInteractiveSegmentation::DeleteSegmentation()
   }
 
   toolManager->SetWorkingData(NULL); // unselect everything
-      
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -283,7 +283,7 @@ void QmitkInteractiveSegmentation::LoadSegmentation()
       }
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (automaticNode->GetData());
-       
+
       if (    image.IsNull()
            || image->GetDimension() < 3
            || image->GetDimension() > 4
@@ -304,7 +304,7 @@ void QmitkInteractiveSegmentation::LoadSegmentation()
         mitk::Tool* firstTool = toolManager->GetToolById(0);
         if (firstTool)
         {
-          mitk::DataTreeNode::Pointer segmentationNode = 
+          mitk::DataTreeNode::Pointer segmentationNode =
             firstTool->CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
           mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
@@ -315,7 +315,7 @@ void QmitkInteractiveSegmentation::LoadSegmentation()
         }
       }
     }
-    else 
+    else
     {
       QMessageBox::information(NULL, "MITK", QString("The selected file does not contain a segmentation, sorry."), QMessageBox::Ok);
       return;
@@ -337,16 +337,16 @@ void QmitkInteractiveSegmentation::SaveSegmentation()
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
   if (!toolManager) return;
 
-  mitk::DataTreeNode::Pointer node = toolManager->GetWorkingData(0); 
+  mitk::DataTreeNode::Pointer node = toolManager->GetWorkingData(0);
   if (node.IsNull()) return;
-  
-  mitk::DataTreeNode::Pointer node2 = toolManager->GetWorkingData(1); 
-  if (node2.IsNotNull()) 
+
+  mitk::DataTreeNode::Pointer node2 = toolManager->GetWorkingData(1);
+  if (node2.IsNotNull())
   {
     QMessageBox::information(NULL, "MITK", QString("You can only save one segmentation at a time. Please change your selection."), QMessageBox::Ok);
     return;
   }
-  
+
   try
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
@@ -429,7 +429,7 @@ void QmitkInteractiveSegmentation::CheckImageAlignment(mitk::Image* image)
     if (renderWindow)
     {
       // for all 2D renderwindows of m_MultiWidget check alignment
-      mitk::PlaneGeometry::ConstPointer displayPlane 
+      mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
       if (displayPlane.IsNotNull())
       {
@@ -447,7 +447,7 @@ void QmitkInteractiveSegmentation::CheckImageAlignment(mitk::Image* image)
     if (renderWindow)
     {
       // for all 2D renderwindows of m_MultiWidget check alignment
-      mitk::PlaneGeometry::ConstPointer displayPlane 
+      mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
       if (displayPlane.IsNotNull())
       {
@@ -465,7 +465,7 @@ void QmitkInteractiveSegmentation::CheckImageAlignment(mitk::Image* image)
     if (renderWindow)
     {
       // for all 2D renderwindows of m_MultiWidget check alignment
-      mitk::PlaneGeometry::ConstPointer displayPlane 
+      mitk::PlaneGeometry::ConstPointer displayPlane
         = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
       if (displayPlane.IsNotNull())
       {

@@ -374,6 +374,7 @@ class Message
       {
         if ((*iter)->operator==(msgCmd)) {
           delete msgCmd;
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -397,6 +398,7 @@ class Message
         {
           delete *iter;
           m_Listeners.erase( iter );
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -486,6 +488,7 @@ class Message1
       {
         if ((*iter)->operator==(msgCmd)) {
           delete msgCmd;
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -509,6 +512,7 @@ class Message1
         {
           delete *iter;
           m_Listeners.erase( iter );
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -586,6 +590,7 @@ class Message2
       {
         if ((*iter)->operator==(msgCmd)) {
           delete msgCmd;
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -609,6 +614,7 @@ class Message2
         {
           delete *iter;
           m_Listeners.erase( iter );
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -686,6 +692,7 @@ class Message3
       {
         if ((*iter)->operator==(msgCmd)) {
           delete msgCmd;
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -709,6 +716,7 @@ class Message3
         {
           delete *iter;
           m_Listeners.erase( iter );
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -786,6 +794,7 @@ class Message4
       {
         if ((*iter)->operator==(msgCmd)) {
           delete msgCmd;
+          m_Mutex.Unlock();
           return;
         }
       }
@@ -809,6 +818,7 @@ class Message4
         {
           delete *iter;
           m_Listeners.erase( iter );
+          m_Mutex.Unlock();
           return;
         }
       }

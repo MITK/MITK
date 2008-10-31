@@ -33,6 +33,8 @@
 
 #include "kd_tree.h"					// kd-tree declarations
 #include "bd_tree.h"					// bd-tree declarations
+#include <cstring>
+#include <cstdlib>
 
 using namespace std;					// make std:: available
 

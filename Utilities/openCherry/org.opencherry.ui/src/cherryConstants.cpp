@@ -20,8 +20,10 @@
 namespace cherry
 {
 
+const int Constants::NONE = 0;
 const int Constants::DEFAULT = -1;
 const int Constants::DRAG = 1;
+const int Constants::CENTER = 1 << 24;
 const int Constants::HORIZONTAL = 1 << 8;
 const int Constants::VERTICAL = 1 << 9;
 const int Constants::MIN = 1 << 7;

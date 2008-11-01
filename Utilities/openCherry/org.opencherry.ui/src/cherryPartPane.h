@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 class WorkbenchPage;
+class PartStack;
 struct IStackableContainer;
 
 /**
@@ -203,18 +204,6 @@ public:
     public: void Reparent(void* newParent);
 
     /**
-     * Informs the pane that it's window shell has
-     * been activated.
-     */
-   // /* package */virtual void shellActivated() = 0;
-
-    /**
-     * Informs the pane that it's window shell has
-     * been deactivated.
-     */
-   // /* package */virtual void shellDeactivated() = 0;
-
-    /**
      * Indicate focus in part.
      */
     public: void ShowFocus(bool inFocus);
@@ -231,7 +220,7 @@ public:
      *
      * @return
      */
-    //public: SmartPointer<PartStack> GetStack();
+    public: SmartPointer<PartStack> GetStack();
 
     public: void SetContainer(SmartPointer<IStackableContainer> stack);
 

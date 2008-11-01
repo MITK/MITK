@@ -56,6 +56,11 @@ bool Rectangle::Contains(int x, int y) const
       - this->y) < height);
 }
 
+bool Rectangle::Contains(const Point& point) const
+{
+  return this->Contains(point.x, point.y);
+}
+
 Rectangle& Rectangle::FlipXY()
 {
   int tmp = x;

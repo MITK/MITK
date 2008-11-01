@@ -20,73 +20,99 @@
 
 #include "../cherryQtControlWidget.h"
 #include "cherryQtMainWindowShell.h"
+#include "cherryQtSash.h"
 
 #include <QApplication>
 #include <QAbstractButton>
+#include <QCursor>
 #include <QRect>
+#include <QVariant>
 
 namespace cherry
 {
 
 std::list<Shell::Pointer> QtWidgetsTweaklet::shellList = std::list<Shell::Pointer>();
 
-QtSelectionListenerWrapper::QtSelectionListenerWrapper(QObject* w, GuiTk::ISelectionListener::Pointer l)
- : widget(w), listener(l)
+QtSelectionListenerWrapper::QtSelectionListenerWrapper(QWidget* w)
+ : widget(w)
+{
+
+}
+
+void QtSelectionListenerWrapper::AddListener(GuiTk::ISelectionListener::Pointer listener)
 {
   QAbstractButton* button = qobject_cast<QAbstractButton*>(widget);
   if (button != 0)
   {
     this->connect(button, "clicked(bool)", this, "QAbstractButtonClicked(bool)");
+    selectionEvents.AddListener(listener);
   }
 
   std::cout << "WARNING: QtWidgetsTweaklet: no suitable type for listening for selections found!\n";
+
+}
+
+int QtSelectionListenerWrapper::RemoveListener(GuiTk::ISelectionListener::Pointer listener)
+{
+  selectionEvents.RemoveListener(listener);
+  return std::max(selectionEvents.selected.GetListeners().size(),
+                  selectionEvents.defaultSelected.GetListeners().size());
 }
 
 void QtSelectionListenerWrapper::QAbstractButtonClicked(bool /*checked*/)
 {
   GuiTk::SelectionEvent::Pointer event = new GuiTk::SelectionEvent(widget);
-  listener->WidgetSelected(event);
-}
-
-bool QtWidgetsTweaklet::ContainsSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener) const
-{
-  SelectionListenerMap::const_iterator iter = selectionListenerMap.find(widget);
-  if (iter == selectionListenerMap.end()) return false;
-
-  for (std::list<QtSelectionListenerWrapper*>::const_iterator wrapper = iter->second.begin();
-       wrapper != iter->second.end(); ++wrapper)
-  {
-    if ((*wrapper)->widget == widget && (*wrapper)->listener == listener) return true;
-  }
-
-  return false;
+  selectionEvents.selected(event);
 }
 
 void QtWidgetsTweaklet::AddSelectionListener(void* widget,
     GuiTk::ISelectionListener::Pointer listener)
 {
-  if (this->ContainsSelectionListener(widget, listener)) return;
+  QWidget* qwidget = static_cast<QWidget*>(widget);
+  if (qwidget == 0) return;
 
-  QObject* qobject = static_cast<QObject*>(widget);
-  QtSelectionListenerWrapper* selectionWrapper = new QtSelectionListenerWrapper(qobject, listener);
-  selectionListenerMap[widget].push_back(selectionWrapper);
+  // special handling for cherry::QtSash
+  QtSash* sash = qobject_cast<QtSash*>(qwidget);
+  if (sash != 0)
+  {
+    sash->AddSelectionListener(listener);
+    return;
+  }
+
+
+  // "normal" Qt widgets get wrapped
+  QtSelectionListenerWrapper* wrapper = selectionListenerMap[widget];
+  if (wrapper == 0)
+  {
+    wrapper = new QtSelectionListenerWrapper(qwidget);
+    selectionListenerMap[widget] = wrapper;
+  }
+
+  wrapper->AddListener(listener);
 }
 
 void QtWidgetsTweaklet::RemoveSelectionListener(void* widget,
     GuiTk::ISelectionListener::Pointer listener)
 {
-  SelectionListenerMap::iterator iter = selectionListenerMap.find(widget);
-  if (iter == selectionListenerMap.end()) return;
+  QWidget* qwidget = static_cast<QWidget*>(widget);
+  if (qwidget == 0) return;
 
-  for (std::list<QtSelectionListenerWrapper*>::iterator wrapper = iter->second.begin();
-       wrapper != iter->second.end(); ++wrapper)
+  // special handling for cherry::QtSash
+  QtSash* sash = qobject_cast<QtSash*>(qwidget);
+  if (sash != 0)
   {
-    if ((*wrapper)->widget == widget && (*wrapper)->listener == listener)
-    {
-    iter->second.erase(wrapper);
-    delete *wrapper;
+    sash->RemoveSelectionListener(listener);
     return;
-    }
+  }
+
+
+  QtSelectionListenerWrapper* wrapper = selectionListenerMap[widget];
+  if (wrapper == 0) return;
+
+  if (wrapper->RemoveListener(listener) == 0)
+  {
+    selectionListenerMap.erase(wrapper);
+    delete wrapper;
   }
 }
 
@@ -119,12 +145,6 @@ void QtWidgetsTweaklet::SetEnabled(void* widget, bool enabled)
 void QtWidgetsTweaklet::SetBounds(void* widget, const Rectangle& bounds)
 {
   QWidget* qwidget = static_cast<QWidget*>(widget);
-  std::cout << "Setting bounds for object " << qwidget->metaObject()->className() << " with name " << qPrintable(qwidget->objectName()) << ": x = " << bounds.x << ", y = " << bounds.y << ", width = " << bounds.width << ", height = " << bounds.height << std::endl;
-  if (qwidget->objectName() == "Client Composite")
-  {
-    int i = 0;
-    i++;
-  }
   qwidget->setGeometry(bounds.x, bounds.y, bounds.width, bounds.height);
 }
 
@@ -179,6 +199,55 @@ bool QtWidgetsTweaklet::SetParent(void* widget, void* parent)
     return true;
   }
   return false;
+}
+
+void QtWidgetsTweaklet::SetData(void* widget, const std::string& id, Object::Pointer data)
+{
+  QObject* qobject = static_cast<QObject*>(widget);
+  if (qobject == 0) return;
+
+  QVariant variant;
+  if (data != 0)
+    variant.setValue(data);
+
+  qobject->setProperty(id.c_str(), variant);
+}
+
+Object::Pointer QtWidgetsTweaklet::GetData(void* widget, const std::string& id)
+{
+  QObject* qobject = static_cast<QObject*>(widget);
+  if (qobject == 0) return 0;
+
+  QVariant variant = qobject->property(id.c_str());
+  if (variant.isValid())
+  {
+    return variant.value<Object::Pointer>();
+  }
+  return 0;
+}
+
+Point QtWidgetsTweaklet::GetCursorLocation()
+{
+  QPoint qpoint = QCursor::pos();
+  return Point(qpoint.x(), qpoint.y());
+}
+
+void* QtWidgetsTweaklet::GetCursorControl()
+{
+  return QApplication::widgetAt(QCursor::pos());
+}
+
+void* QtWidgetsTweaklet::FindControl(const std::vector<Shell::Pointer>& shells, const Point& location)
+{
+  for (std::vector<Shell::Pointer>::const_iterator iter = shells.begin();
+      iter != shells.end(); ++iter)
+  {
+    QWidget* shellWidget = static_cast<QWidget*>((*iter)->GetControl());
+    QWidget* control = shellWidget->childAt(location.x, location.y);
+    if (control) return control;
+  }
+
+  return 0;
 }
 
 bool QtWidgetsTweaklet::IsChild(void* parentToTest, void* childToTest)
@@ -259,7 +328,6 @@ Shell::Pointer QtWidgetsTweaklet::GetShell(void* widget)
 {
   QWidget* qwidget = static_cast<QWidget*>(widget);
   QWidget* qwindow = qwidget->window();
-  std::cout << qwindow->metaObject()->className() << std::endl;
   QtMainWindowShell* window = dynamic_cast<QtMainWindowShell*>(qwindow);
   Shell::Pointer shell = window;
   return shell;
@@ -286,6 +354,16 @@ Rectangle QtWidgetsTweaklet::ToControl(void* coordinateSystem,
             lowerRight.y() - upperLeft.y());
 }
 
+Point QtWidgetsTweaklet::ToControl(void* coordinateSystem,
+          const Point& toConvert)
+{
+  QWidget* widget = static_cast<QWidget*>(coordinateSystem);
+  QPoint displayPoint(toConvert.x, toConvert.y);
+
+  QPoint localPoint = widget->mapFromGlobal(displayPoint);
+  return Point(localPoint.x(), localPoint.y());
+}
+
 Rectangle QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
         const Rectangle& toConvert)
 {
@@ -298,6 +376,16 @@ Rectangle QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
 
   return Rectangle(globalUpperLeft.x(), globalUpperLeft.y(), globalLowerRight.x() - globalUpperLeft.x(),
             globalLowerRight.y() - globalUpperLeft.y());
+}
+
+Point QtWidgetsTweaklet::ToDisplay(void* coordinateSystem,
+        const Point& toConvert)
+{
+  QWidget* widget = static_cast<QWidget*>(coordinateSystem);
+  QPoint localPoint(toConvert.x, toConvert.y);
+  QPoint displayPoint = widget->mapToGlobal(localPoint);
+
+  return Point(displayPoint.x(), displayPoint.y());
 }
 
 }

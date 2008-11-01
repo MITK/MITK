@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYRECTANGLE_H_
 
 #include "cherryUiDll.h"
+#include "cherryPoint.h"
 
 #include <string>
 
@@ -118,6 +119,16 @@ struct CHERRY_UI Rectangle
    * @return <code>true</code> if the rectangle contains the point and <code>false</code> otherwise
    */
   bool Contains(int x, int y) const;
+
+  /**
+   * Returns <code>true</code> if the point specified by the
+   * arguments is inside the area specified by the receiver,
+   * and <code>false</code> otherwise.
+   *
+   * @param the point to test for containment
+   * @return <code>true</code> if the rectangle contains the point and <code>false</code> otherwise
+   */
+  bool Contains(const Point& point) const;
 
   /**
    * Flips the x and y coordinates, i.e. rotates the rectangle about 90 degrees.

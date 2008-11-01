@@ -270,7 +270,7 @@ void ViewSashContainer::DisposeParent()
   // do nothing
 }
 
-float ViewSashContainer::GetDockingRatio(StackablePart::Pointer dragged,
+float ViewSashContainer::GetDockingRatio(Object::Pointer dragged,
     IStackableContainer::Pointer target)
 {
   if (this->IsStackType(target))

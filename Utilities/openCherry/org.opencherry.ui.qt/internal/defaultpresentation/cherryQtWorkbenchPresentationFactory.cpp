@@ -23,6 +23,7 @@
 #include "../util/cherryPresentablePartFolder.h"
 #include "../util/cherryTabbedStackPresentation.h"
 
+#include "../cherryQtSash.h"
 #include "../../cherryQtControlWidget.h"
 
 namespace cherry
@@ -120,11 +121,10 @@ std::string QtWorkbenchPresentationFactory::GetId()
 
 void* QtWorkbenchPresentationFactory::CreateSash(void* parent, int style)
 {
-  int orientation = style & (SASHORIENTATION_HORIZONTAL
-      | SASHORIENTATION_VERTICAL);
-  QWidget* sash = new QtControlWidget(static_cast<QWidget*>(parent));
+  Qt::Orientation orientation = style & SASHORIENTATION_HORIZONTAL ? Qt::Horizontal : Qt::Vertical;
+  QWidget* sash = new QtSash(orientation, static_cast<QWidget*>(parent));
   sash->setObjectName("Sash widget");
-  if (orientation == SASHORIENTATION_HORIZONTAL)
+  if (orientation == Qt::Horizontal)
     sash->setFixedHeight(this->GetSashSize(style));
   else
     sash->setFixedWidth(this->GetSashSize(style));

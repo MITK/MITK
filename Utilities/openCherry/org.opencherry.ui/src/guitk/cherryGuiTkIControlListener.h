@@ -19,6 +19,7 @@
 #define CHERRYGUITKICONTROLLISTENER_H_
 
 #include <cherryMacros.h>
+#include <cherryMessage.h>
 
 #include "../cherryUiDll.h"
 #include "cherryGuiTkControlEvent.h"
@@ -48,8 +49,22 @@ namespace GuiTk
 struct CHERRY_UI IControlListener: public virtual Object
 {
 
-  cherryClassMacro(IControlListener)
-  ;
+  cherryClassMacro(IControlListener);
+
+  struct Events {
+
+    typedef Message1<ControlEvent::Pointer> EventType;
+
+    EventType movedEvent;
+    EventType resizedEvent;
+    EventType activatedEvent;
+
+    void AddListener(IControlListener::Pointer listener);
+    void RemoveListener(IControlListener::Pointer listener);
+
+  private:
+    typedef MessageDelegate1<IControlListener, ControlEvent::Pointer> Delegate;
+  };
 
   virtual ~IControlListener()
   {

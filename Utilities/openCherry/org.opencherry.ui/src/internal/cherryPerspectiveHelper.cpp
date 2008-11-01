@@ -20,6 +20,7 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "cherryLayoutTree.h"
 #include "cherryEditorSashContainer.h"
+#include "cherryDragUtil.h"
 
 #include <Poco/RegularExpression.h>
 
@@ -29,6 +30,128 @@ namespace cherry
 const int PerspectiveHelper::MIN_DETACH_WIDTH = 150;
 const int PerspectiveHelper::MIN_DETACH_HEIGHT = 250;
 
+PerspectiveHelper::DragOverListener::DragOverListener(PerspectiveHelper* perspHelper) :
+  perspHelper(perspHelper)
+{
+
+}
+
+IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
+    void* currentControl, Object::Pointer draggedObject, const Point& position,
+    const Rectangle& dragRectangle)
+{
+
+  if (draggedObject.Cast<PartPane>() != 0)
+  {
+    PartPane::Pointer part = draggedObject.Cast<PartPane>();
+    if (part->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
+      return 0;
+
+    if (perspHelper->dropTarget == 0)
+      perspHelper->dropTarget = new ActualDropTarget(perspHelper, part, dragRectangle);
+    else
+      perspHelper->dropTarget->SetTarget(part, dragRectangle);
+  }
+  else if (draggedObject.Cast<PartStack>() != 0)
+  {
+    PartStack::Pointer stack = draggedObject.Cast<PartStack>();
+    if (stack->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
+      return 0;
+
+    if (perspHelper->dropTarget == 0)
+      perspHelper->dropTarget = new ActualDropTarget(perspHelper, stack, dragRectangle);
+    else
+      perspHelper->dropTarget->SetTarget(stack, dragRectangle);
+  }
+  else return 0;
+
+  return perspHelper->dropTarget;
+}
+
+void PerspectiveHelper::ActualDropTarget::SetTarget(PartPane::Pointer part,
+    const Rectangle& dragRectangle)
+{
+  this->stack = 0;
+  this->part = part;
+  this->dragRectangle = dragRectangle;
+}
+
+void PerspectiveHelper::ActualDropTarget::SetTarget(PartStack::Pointer stack,
+    const Rectangle& dragRectangle)
+{
+  this->stack = stack;
+  this->part = 0;
+  this->dragRectangle = dragRectangle;
+}
+
+PerspectiveHelper::ActualDropTarget::ActualDropTarget(PerspectiveHelper* perspHelper, PartPane::Pointer part,
+    const Rectangle& dragRectangle)
+: AbstractDropTarget(), perspHelper(perspHelper)
+{
+  this->SetTarget(part, dragRectangle);
+}
+
+PerspectiveHelper::ActualDropTarget::ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer stack,
+    const Rectangle& dragRectangle)
+: AbstractDropTarget(), perspHelper(perspHelper)
+{
+  this->SetTarget(stack, dragRectangle);
+}
+
+void PerspectiveHelper::ActualDropTarget::Drop()
+{
+
+  if (part != 0)
+  {
+  Shell::Pointer shell = part->GetShell();
+  if (shell->GetData().Cast<DetachedWindow> () != 0)
+  {
+    // if only one view in tab folder then do a window move
+    IStackableContainer::Pointer container = part->GetContainer();
+    if (container.Cast<PartStack> () != 0)
+    {
+      if (container.Cast<PartStack>()->GetItemCount() == 1)
+      {
+        shell->SetLocation(dragRectangle.x, dragRectangle.y);
+        return;
+      }
+    }
+  }
+
+//  // If layout is modified always zoom out.
+//  if (isZoomed())
+//  {
+//    zoomOut();
+//  }
+  // do a normal part detach
+  perspHelper->DetachPart(part, dragRectangle.x, dragRectangle.y);
+  }
+  else if (stack != 0)
+  {
+    Shell::Pointer shell = stack->GetShell();
+  if (shell->GetData().Cast<DetachedWindow> () != 0)
+  {
+    // only one tab folder in a detach window, so do window
+    // move
+     shell->SetLocation(dragRectangle.x, dragRectangle.y);
+      return;
+  }
+
+//  // If layout is modified always zoom out.
+//  if (isZoomed())
+//  {
+//    zoomOut();
+//  }
+  // do a normal part detach
+  perspHelper->Detach(stack, dragRectangle.x, dragRectangle.y);
+  }
+}
+
+DnDTweaklet::CursorType PerspectiveHelper::ActualDropTarget::GetCursor()
+{
+  return DnDTweaklet::CURSOR_OFFSCREEN;
+}
+
 PerspectiveHelper::MatchingPart::MatchingPart(const std::string& pid,
     const std::string& sid, StackablePart::Pointer part)
 {
@@ -36,8 +159,9 @@ PerspectiveHelper::MatchingPart::MatchingPart(const std::string& pid,
   this->sid = sid;
   this->part = part;
   this->len = pid.size() + sid.size();
-  this->hasWildcard
-      = (pid.find_first_of(PartPlaceholder::WILD_CARD) != std::string::npos) || (sid.find_first_of(PartPlaceholder::WILD_CARD) != std::string::npos);
+  this->hasWildcard = (pid.find_first_of(PartPlaceholder::WILD_CARD)
+      != std::string::npos) || (sid.find_first_of(PartPlaceholder::WILD_CARD)
+      != std::string::npos);
 }
 
 bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1, const MatchingPart& m2) const
@@ -57,22 +181,21 @@ bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1,
 
 PerspectiveHelper::PerspectiveHelper(WorkbenchPage::Pointer workbenchPage,
     ViewSashContainer::Pointer mainLayout, Perspective::Pointer persp)
- : page(workbenchPage), perspective(persp),
-   mainLayout(mainLayout),
-   detachable(false), active(false)
+: page(workbenchPage), perspective(persp),
+mainLayout(mainLayout),
+detachable(false), active(false)
 {
-  //  this.page = workbenchPage;
-  //  this.mainLayout = mainLayout;
-  //  this.perspective = perspective;
 
   // Views can be detached if the feature is enabled (true by default,
   // use the plug-in customization file to disable), and if the platform
   // supports detaching.
 
+  this->dragTarget = new DragOverListener(this);
+
   //TODO preference store
-//  IPreferenceStore store = PlatformUI.getPreferenceStore();
-//  this.detachable = store.getBoolean(
-//      IWorkbenchPreferenceConstants.ENABLE_DETACHED_VIEWS);
+  //  IPreferenceStore store = PlatformUI.getPreferenceStore();
+  //  this.detachable = store.getBoolean(
+  //      IWorkbenchPreferenceConstants.ENABLE_DETACHED_VIEWS);
   this->detachable = true;
 
   if (this->detachable)
@@ -109,7 +232,7 @@ void PerspectiveHelper::Activate(void* parent)
   std::vector<PartPane::Pointer> children;
   this->CollectViewPanes(children, mainLayout->GetChildren());
   for (std::vector<PartPane::Pointer>::iterator iter = children.begin();
-       iter != children.end(); ++iter)
+      iter != children.end(); ++iter)
   {
     PartPane::Pointer part = *iter;
     part->Reparent(parent);
@@ -117,13 +240,9 @@ void PerspectiveHelper::Activate(void* parent)
   mainLayout->CreateControl(parent);
   mainLayout->SetActive(true);
 
-  std::string layoutDescr;
-  mainLayout->DescribeLayout(layoutDescr);
-  std::cout << "LAYOUT: " << layoutDescr << std::endl;
-
   // Open the detached windows.
   for (DetachedWindowsType::iterator iter = detachedWindowList.begin();
-       iter != detachedWindowList.end(); ++iter)
+      iter != detachedWindowList.end(); ++iter)
   {
     (*iter)->Open();
   }
@@ -166,7 +285,7 @@ void PerspectiveHelper::AddPart(StackablePart::Pointer part)
     PartPane::Pointer pane = part.Cast<PartPane> ();
     ref = pane->GetPartReference().Cast<IViewReference> ();
     if (ref != 0)
-      secondaryId = ref->GetSecondaryId();
+    secondaryId = ref->GetSecondaryId();
   }
   if (secondaryId != "")
   {
@@ -192,7 +311,7 @@ void PerspectiveHelper::AddPart(StackablePart::Pointer part)
     if (relative != 0 && relative.Cast<IStackableContainer>() != 0)
     {
       IStackableContainer::Pointer stack =
-          relative.Cast<IStackableContainer> ();
+      relative.Cast<IStackableContainer> ();
       if (stack->AllowsAdd(part))
       {
         mainLayout->Stack(part, stack);
@@ -230,7 +349,7 @@ void PerspectiveHelper::AddPart(StackablePart::Pointer part)
         window->Add(pane);
         std::list<StackablePart::Pointer> otherChildren = holder->GetChildren();
         for (std::list<StackablePart::Pointer>::iterator iter = otherChildren.begin();
-             iter != otherChildren.end(); ++iter)
+            iter != otherChildren.end(); ++iter)
         {
           part->GetContainer()->Add(*iter);
         }
@@ -241,9 +360,9 @@ void PerspectiveHelper::AddPart(StackablePart::Pointer part)
         if (container.Cast<ContainerPlaceholder> () != 0)
         {
           ContainerPlaceholder::Pointer containerPlaceholder =
-              container.Cast<ContainerPlaceholder>();
+          container.Cast<ContainerPlaceholder>();
           ILayoutContainer::Pointer parentContainer =
-              containerPlaceholder->GetContainer();
+          containerPlaceholder->GetContainer();
           container = containerPlaceholder->GetRealContainer();
           if (container.Cast<LayoutPart> () != 0)
           {
@@ -290,10 +409,10 @@ void PerspectiveHelper::AttachPart(IViewReference::Pointer ref)
 
   // Restore any maximized part before re-attaching.
   // Note that 'getMaximizedStack != 0' implies 'useNewMinMax'
-//  if (getMaximizedStack() != 0)
-//  {
-//    getMaximizedStack().setState(IStackPresentationSite.STATE_RESTORED);
-//  }
+  //  if (getMaximizedStack() != 0)
+  //  {
+  //    getMaximizedStack().setState(IStackPresentationSite.STATE_RESTORED);
+  //  }
 
   this->DerefPart(pane);
   this->AddPart(pane);
@@ -379,7 +498,7 @@ bool PerspectiveHelper::WillPartBeVisible(const std::string& partId,
   if (container != 0 && container.Cast<ContainerPlaceholder> () != 0)
   {
     container
-        = container.Cast<ContainerPlaceholder>()->GetRealContainer();
+    = container.Cast<ContainerPlaceholder>()->GetRealContainer();
   }
 
   if (container != 0 && container.Cast<PartStack> () != 0)
@@ -404,17 +523,17 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders()
   if (detachable)
   {
     for (DetachedWindowsType::iterator winIter = detachedWindowList.begin();
-         winIter != detachedWindowList.end(); ++winIter)
+        winIter != detachedWindowList.end(); ++winIter)
     {
       DetachedWindow::Pointer win = *winIter;
       std::list<StackablePart::Pointer> moreResults = win->GetChildren();
-      if (moreResults.size() > 0)
+      if (moreResults.size()> 0)
       {
         for (std::list<StackablePart::Pointer>::iterator iter = moreResults.begin();
-             iter != moreResults.end(); ++iter)
+            iter != moreResults.end(); ++iter)
         {
           if (iter->Cast<PartPlaceholder>() != 0)
-            results.push_back(iter->Cast<PartPlaceholder>());
+          results.push_back(iter->Cast<PartPlaceholder>());
         }
       }
     }
@@ -428,7 +547,7 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
   std::vector<PartPlaceholder::Pointer> result;
 
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     if (part.Cast<ILayoutContainer> () != 0)
@@ -444,10 +563,10 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
     {
       std::list<StackablePart::Pointer> children = part.Cast<IStackableContainer>()->GetChildren();
       for (std::list<StackablePart::Pointer>::iterator partIter = children.begin();
-           partIter != children.end(); ++partIter)
+          partIter != children.end(); ++partIter)
       {
         if (partIter->Cast<PartPlaceholder>() != 0)
-          result.push_back(partIter->Cast<PartPlaceholder>());
+        result.push_back(partIter->Cast<PartPlaceholder>());
       }
     }
   }
@@ -464,15 +583,15 @@ void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result)
   if (detachable)
   {
     for (DetachedWindowsType::iterator winIter = detachedWindowList.begin();
-         winIter != detachedWindowList.end(); ++winIter)
+        winIter != detachedWindowList.end(); ++winIter)
     {
       DetachedWindow::Pointer win = *winIter;
       std::list<StackablePart::Pointer> moreResults = win->GetChildren();
       for (std::list<StackablePart::Pointer>::iterator iter = moreResults.begin();
-           iter != moreResults.end(); ++iter)
+          iter != moreResults.end(); ++iter)
       {
         if (iter->Cast<PartPane>() != 0)
-          result.push_back(iter->Cast<PartPane>());
+        result.push_back(iter->Cast<PartPane>());
       }
     }
   }
@@ -482,17 +601,17 @@ void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result,
     const std::list<LayoutPart::Pointer>& parts)
 {
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     if (part.Cast<IStackableContainer> () != 0)
     {
       std::list<StackablePart::Pointer> children = part.Cast<IStackableContainer>()->GetChildren();
       for (std::list<StackablePart::Pointer>::iterator partIter = children.begin();
-           partIter != children.end(); ++partIter)
+          partIter != children.end(); ++partIter)
       {
         if (partIter->Cast<PartPane>() != 0)
-          result.push_back(partIter->Cast<PartPane>());
+        result.push_back(partIter->Cast<PartPane>());
       }
     }
     else if (part.Cast<ILayoutContainer> () != 0)
@@ -517,21 +636,21 @@ void PerspectiveHelper::Deactivate()
   this->CollectViewPanes(children, mainLayout->GetChildren());
 
   for (DetachedWindowsType::iterator winIter = detachedWindowList.begin();
-       winIter != detachedWindowList.end(); ++winIter)
+      winIter != detachedWindowList.end(); ++winIter)
   {
     DetachedWindow::Pointer window = *winIter;
     std::list<StackablePart::Pointer> moreResults = window->GetChildren();
     for (std::list<StackablePart::Pointer>::iterator iter = moreResults.begin();
-         iter != moreResults.end(); ++iter)
+        iter != moreResults.end(); ++iter)
     {
       if (iter->Cast<PartPane>() != 0)
-        children.push_back(iter->Cast<PartPane>());
+      children.push_back(iter->Cast<PartPane>());
     }
   }
 
   // *** Do we even need to do this if detached windows not supported?
   for (std::vector<PartPane::Pointer>::iterator itr = children.begin();
-       itr != children.end(); ++itr)
+      itr != children.end(); ++itr)
   {
     PartPane::Pointer part = *itr;
     part->Reparent(parent);
@@ -543,7 +662,7 @@ void PerspectiveHelper::Deactivate()
 
   // Dispose the detached windows
   for (DetachedWindowsType::iterator iter = detachedWindowList.begin();
-       iter != detachedWindowList.end(); ++iter)
+      iter != detachedWindowList.end(); ++iter)
   {
     (*iter)->Close();
   }
@@ -566,7 +685,7 @@ void PerspectiveHelper::DescribeLayout(std::string& buf) const
       buf.append("detachedWindows ("); //$NON-NLS-1$
 
       for (DetachedWindowsType::const_iterator winIter = detachedWindowList.begin();
-           winIter != detachedWindowList.end(); ++winIter)
+          winIter != detachedWindowList.end(); ++winIter)
       {
         DetachedWindow::ConstPointer window = *winIter;
         std::list<StackablePart::Pointer> children = window->GetChildren();
@@ -575,12 +694,12 @@ void PerspectiveHelper::DescribeLayout(std::string& buf) const
         {
           buf.append("dWindow ("); //$NON-NLS-1$
           for (std::list<StackablePart::Pointer>::iterator partIter = children.begin();
-               partIter != children.end(); ++partIter, ++j)
+              partIter != children.end(); ++partIter, ++j)
           {
             if (partIter->Cast<PartPlaceholder>() != 0)
-              buf.append(partIter->Cast<PartPlaceholder>()->GetPlaceHolderId());
+            buf.append(partIter->Cast<PartPlaceholder>()->GetPlaceHolderId());
             else if (partIter->Cast<PartPane>() != 0)
-              buf.append(
+            buf.append(
                 partIter->Cast<PartPane>()->GetPartReference()->GetPartName());
 
             if (j < (children.size() - 1))
@@ -601,34 +720,34 @@ void PerspectiveHelper::DescribeLayout(std::string& buf) const
 
 void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
 {
-//  if (part.Cast<PartPane> () != 0)
-//  {
-//    IViewReference::Pointer ref = ((ViewPane) part).getViewReference();
-//    if (perspective.isFastView(ref))
-//    {
-//      // Special check: if it's a fast view then it's actual ViewStack
-//      // may only contain placeholders and the stack is represented in
-//      // the presentation by a container placeholder...make sure the
-//      // PartPlaceHolder for 'ref' is removed from the ViewStack
-//      String id = perspective.getFastViewManager().getIdForRef(ref);
-//      LayoutPart parentPart = findPart(id, 0);
-//      if (parentPart.Cast<ContainerPlaceholder> () != 0)
-//      {
-//        ViewStack vs =
-//            (ViewStack) ((ContainerPlaceholder) parentPart).getRealContainer();
-//        std::vector<LayoutPart::Pointer> kids = vs.getChildren();
-//        for (int i = 0; i < kids.length; i++)
-//        {
-//          if (kids[i].Cast<PartPlaceholder> () != 0)
-//          {
-//            if (ref.getId().equals(kids[i].id))
-//              vs.remove(kids[i]);
-//          }
-//        }
-//      }
-//      perspective.getFastViewManager().removeViewReference(ref, true, true);
-//    }
-//  }
+  //  if (part.Cast<PartPane> () != 0)
+  //  {
+  //    IViewReference::Pointer ref = ((ViewPane) part).getViewReference();
+  //    if (perspective.isFastView(ref))
+  //    {
+  //      // Special check: if it's a fast view then it's actual ViewStack
+  //      // may only contain placeholders and the stack is represented in
+  //      // the presentation by a container placeholder...make sure the
+  //      // PartPlaceHolder for 'ref' is removed from the ViewStack
+  //      String id = perspective.getFastViewManager().getIdForRef(ref);
+  //      LayoutPart parentPart = findPart(id, 0);
+  //      if (parentPart.Cast<ContainerPlaceholder> () != 0)
+  //      {
+  //        ViewStack vs =
+  //            (ViewStack) ((ContainerPlaceholder) parentPart).getRealContainer();
+  //        std::vector<LayoutPart::Pointer> kids = vs.getChildren();
+  //        for (int i = 0; i < kids.length; i++)
+  //        {
+  //          if (kids[i].Cast<PartPlaceholder> () != 0)
+  //          {
+  //            if (ref.getId().equals(kids[i].id))
+  //              vs.remove(kids[i]);
+  //          }
+  //        }
+  //      }
+  //      perspective.getFastViewManager().removeViewReference(ref, true, true);
+  //    }
+  //  }
 
   // Get vital part stats before reparenting.
   IStackableContainer::Pointer oldContainer = part->GetContainer();
@@ -649,13 +768,13 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
   IStackableContainer::ChildrenType children = oldContainer->GetChildren();
   if (wasDocked)
   {
-    bool hasChildren = (children.size() > 0);
+    bool hasChildren = (children.size()> 0);
     if (hasChildren)
     {
       // make sure one is at least visible
       int childVisible = 0;
       for (IStackableContainer::ChildrenType::iterator iter = children.begin();
-           iter != children.end(); ++iter)
+          iter != children.end(); ++iter)
       {
         if ((*iter)->GetControl() != 0)
         {
@@ -670,16 +789,16 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
 
         // Is the part in the trim?
         bool inTrim = false;
-//        // Safety check...there may be no FastViewManager
-//        if (perspective.getFastViewManager() != 0)
-//          inTrim
-//              = perspective.getFastViewManager().getFastViews(folder.getID()).size()
-//                  > 0;
+        //        // Safety check...there may be no FastViewManager
+        //        if (perspective.getFastViewManager() != 0)
+        //          inTrim
+        //              = perspective.getFastViewManager().getFastViews(folder.getID()).size()
+        //                  > 0;
 
         if (childVisible == 0 && !inTrim)
         {
           ILayoutContainer::Pointer parentContainer = folder->GetContainer();
-          hasChildren = folder->GetChildren().size() > 0;
+          hasChildren = folder->GetChildren().size()> 0;
 
           // We maintain the stack as a place-holder if it has children
           // (which at this point would represent view place-holders)
@@ -689,7 +808,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
 
             // replace the real container with a ContainerPlaceholder
             ContainerPlaceholder::Pointer placeholder =
-                new ContainerPlaceholder(folder->GetID());
+            new ContainerPlaceholder(folder->GetID());
             placeholder->SetRealContainer(folder);
             parentContainer->Replace(folder, placeholder);
           }
@@ -709,11 +828,15 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
       // it
       if (oldContainer.Cast<LayoutPart> () != 0)
       {
+        std::cout << "No children left, removing container\n";
+
         LayoutPart::Pointer parent = oldContainer.Cast<LayoutPart>();
         ILayoutContainer::Pointer parentContainer = parent->GetContainer();
         if (parentContainer != 0)
         {
+          std::cout << "Calling remove of parent container\n";
           parentContainer->Remove(parent);
+          std::cout << "container ref count: " << oldContainer->GetReferenceCount() << ", part ref count: " << part->GetReferenceCount() << std::endl;
           //parent->Dispose();
         }
       }
@@ -737,7 +860,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
       // window.
       bool allInvisible = true;
       for (IStackableContainer::ChildrenType::iterator iter = children.begin();
-           iter != children.end(); ++iter)
+          iter != children.end(); ++iter)
       {
         if (iter->Cast<PartPlaceholder> () == 0)
         {
@@ -748,9 +871,9 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
       if (allInvisible)
       {
         DetachedPlaceHolder::Pointer placeholder = new DetachedPlaceHolder("",
-           oldShell->GetBounds());
+            oldShell->GetBounds());
         for (IStackableContainer::ChildrenType::iterator iter = children.begin();
-             iter != children.end(); ++iter)
+            iter != children.end(); ++iter)
         {
           oldContainer->Remove(*iter);
           (*iter)->SetContainer(placeholder);
@@ -805,7 +928,7 @@ void PerspectiveHelper::Detach(LayoutPart::Pointer part, int x, int y)
     StackablePart::Pointer visiblePart = stack->GetSelection();
     IStackableContainer::ChildrenType children = stack->GetChildren();
     for (IStackableContainer::ChildrenType::iterator iter = children.begin();
-         iter != children.end(); ++iter)
+        iter != children.end(); ++iter)
     {
       if (!(*iter)->IsPlaceHolder())
       {
@@ -870,8 +993,8 @@ void PerspectiveHelper::DetachPart(IViewReference::Pointer ref)
   PartPane::Pointer pane = ref.Cast<WorkbenchPartReference>()->GetPane();
   if (this->CanDetach() && pane != 0)
   {
-//    if (getMaximizedStack() != 0)
-//      getMaximizedStack().setState(IStackPresentationSite.STATE_RESTORED);
+    //    if (getMaximizedStack() != 0)
+    //      getMaximizedStack().setState(IStackPresentationSite.STATE_RESTORED);
 
     Rectangle bounds = pane->GetParentBounds();
     this->DetachPart(pane, bounds.x, bounds.y);
@@ -917,14 +1040,12 @@ void PerspectiveHelper::AddDetachedPart(StackablePart::Pointer part,
 
 void PerspectiveHelper::DisableAllDrag()
 {
-  //TODO DND
-  //DragUtil.removeDragTarget(0, dragTarget);
+  DragUtil::RemoveDragTarget(0, dragTarget);
 }
 
 void PerspectiveHelper::EnableAllDrag()
 {
-  //TODO DND
-  //DragUtil.addDragTarget(0, dragTarget);
+  DragUtil::AddDragTarget(0, dragTarget);
 }
 
 StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id)
@@ -935,6 +1056,9 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id)
 StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     const std::string& secondaryId)
 {
+
+  std::cout << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
+
   // check main window.
   std::vector<MatchingPart> matchingParts;
   StackablePart::Pointer part = (secondaryId != "") ? this->FindPart(primaryId, secondaryId,
@@ -947,7 +1071,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
 
   // check each detached windows.
   for (DetachedWindowsType::iterator iter = detachedWindowList.begin();
-       iter != detachedWindowList.end(); ++iter)
+      iter != detachedWindowList.end(); ++iter)
   {
     DetachedWindow::Pointer window = *iter;
     part = (secondaryId != "") ? this->FindPart(primaryId, secondaryId,
@@ -958,8 +1082,9 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
       return part;
     }
   }
+
   for (DetachedPlaceHoldersType::iterator iter = detachedPlaceHolderList.begin();
-       iter != detachedPlaceHolderList.end(); ++iter)
+      iter != detachedPlaceHolderList.end(); ++iter)
   {
     DetachedPlaceHolder::Pointer holder = *iter;
     part = (secondaryId != "") ? this->FindPart(primaryId, secondaryId,
@@ -971,8 +1096,10 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     }
   }
 
+  std::cout << "Looking through the matched parts (count: " << matchingParts.size() << ")\n";
+
   // sort the matching parts
-  if (matchingParts.size() > 0)
+  if (matchingParts.size()> 0)
   {
     std::partial_sort(matchingParts.begin(), (matchingParts.begin()), matchingParts.end(), CompareMatchingParts());
     const MatchingPart& mostSignificantPart = matchingParts.front();
@@ -987,23 +1114,26 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     const std::list<LayoutPart::Pointer>& parts,
     std::vector<MatchingPart>& matchingParts)
 {
+
+  std::cout << "Looking for part " << id << " in a list of layout parts with size " << parts.size() << std::endl;
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     if (part.Cast<ILayoutContainer> () != 0)
     {
       StackablePart::Pointer result = this->FindPart(id, part.Cast<ILayoutContainer>()->GetChildren(),
           matchingParts);
-      return result;
+      if (result != 0) return result;
     }
     else if (part.Cast<IStackableContainer>() != 0)
     {
       StackablePart::Pointer result = this->FindPart(id, part.Cast<IStackableContainer>()->GetChildren(),
           matchingParts);
-      return result;
+      if (result != 0) return result;
     }
   }
+  std::cout << "Returning 0\n";
   return 0;
 }
 
@@ -1012,7 +1142,7 @@ LayoutPart::Pointer PerspectiveHelper::FindLayoutPart(const std::string& id,
     std::vector<MatchingPart>& matchingParts)
 {
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     // check for part equality, parts with secondary ids fail
@@ -1038,8 +1168,9 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     const std::list<StackablePart::Pointer>& parts,
     std::vector<MatchingPart>& matchingParts)
 {
+  std::cout << "Looking for part " << id << " in a list of stackable parts with size " << parts.size() << std::endl;
   for (std::list<StackablePart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     StackablePart::Pointer part = *iter;
     // check for part equality, parts with secondary ids fail
@@ -1066,13 +1197,15 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
       {
         matchingParts.push_back(MatchingPart(part->GetId(), "", part));
       }
-//      StringMatcher sm = new StringMatcher(part.getID(), true, false);
-//      if (sm.match(id))
-//      {
-//        matchingParts .add(new MatchingPart(part.getID(), 0, part));
-//      }
+      //      StringMatcher sm = new StringMatcher(part.getID(), true, false);
+      //      if (sm.match(id))
+      //      {
+      //        matchingParts .add(new MatchingPart(part.getID(), 0, part));
+      //      }
     }
   }
+
+  std::cout << "Returning 0\n";
   return 0;
 }
 
@@ -1082,7 +1215,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     std::vector<MatchingPart>& matchingParts)
 {
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
     // check containers first
@@ -1109,7 +1242,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     std::vector<MatchingPart>& matchingParts)
 {
   for (std::list<StackablePart::Pointer>::const_iterator iter = parts.begin();
-       iter != parts.end(); ++iter)
+      iter != parts.end(); ++iter)
   {
     StackablePart::Pointer part = *iter;
     // check for view part equality
@@ -1123,6 +1256,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
       }
     }
     // check placeholders
+
     else if (part.Cast<PartPlaceholder> () != 0)
     {
       std::string id = part->GetId();
@@ -1215,19 +1349,19 @@ void PerspectiveHelper::RemovePart(StackablePart::Pointer part)
     std::string placeHolderId = part->GetPlaceHolderId();
     container->Replace(part, new PartPlaceholder(placeHolderId));
 
-//    // If the parent is root we're done. Do not try to replace
-//    // it with placeholder.
-//    if (container == mainLayout)
-//    {
-//      return;
-//    }
+    //    // If the parent is root we're done. Do not try to replace
+    //    // it with placeholder.
+    //    if (container == mainLayout)
+    //    {
+    //      return;
+    //    }
 
     // If the parent is empty replace it with a placeholder.
     std::list<StackablePart::Pointer> children = container->GetChildren();
 
     bool allInvisible = true;
     for (std::list<StackablePart::Pointer>::iterator childIter = children.begin();
-         childIter != children.end(); ++childIter)
+        childIter != children.end(); ++childIter)
     {
       if (childIter->Cast<PartPlaceholder> () == 0)
       {
@@ -1245,18 +1379,18 @@ void PerspectiveHelper::RemovePart(StackablePart::Pointer part)
       if (wasDocked)
       {
 
-//        // PR 1GDFVBY: ViewStack not disposed when page
-//        // closed.
-//        if (container.Cast<PartStack> () != 0)
-//        {
-//          container.Cast<PartStack>()->Dispose();
-//        }
+        //        // PR 1GDFVBY: ViewStack not disposed when page
+        //        // closed.
+        //        if (container.Cast<PartStack> () != 0)
+        //        {
+        //          container.Cast<PartStack>()->Dispose();
+        //        }
 
         // replace the real container with a
         // ContainerPlaceholder
         ILayoutContainer::Pointer parentContainer = cPart->GetContainer();
         ContainerPlaceholder::Pointer placeholder =
-            new ContainerPlaceholder(cPart->GetID());
+        new ContainerPlaceholder(cPart->GetID());
         placeholder->SetRealContainer(container);
         parentContainer->Replace(cPart, placeholder);
 
@@ -1264,9 +1398,9 @@ void PerspectiveHelper::RemovePart(StackablePart::Pointer part)
       else
       {
         DetachedPlaceHolder::Pointer placeholder =
-            new DetachedPlaceHolder("", oldShell->GetBounds()); //$NON-NLS-1$
+        new DetachedPlaceHolder("", oldShell->GetBounds()); //$NON-NLS-1$
         for (std::list<StackablePart::Pointer>::iterator childIter2 = children.begin();
-             childIter2 != children.end(); ++childIter2)
+            childIter2 != children.end(); ++childIter2)
         {
           (*childIter2)->GetContainer()->Remove(*childIter2);
           (*childIter2)->SetContainer(placeholder);
@@ -1302,11 +1436,11 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(StackablePart::Pointer part)
           // One of the children is now visible so replace the
           // ContainerPlaceholder with the real container
           ContainerPlaceholder::Pointer containerPlaceholder =
-              container.Cast<ContainerPlaceholder>();
+          container.Cast<ContainerPlaceholder>();
           ILayoutContainer::Pointer parentContainer =
-              containerPlaceholder->GetContainer();
+          containerPlaceholder->GetContainer();
           container
-              = containerPlaceholder->GetRealContainer();
+          = containerPlaceholder->GetRealContainer();
           if (container.Cast<LayoutPart> () != 0)
           {
             parentContainer->Replace(containerPlaceholder,
@@ -1325,79 +1459,79 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(StackablePart::Pointer part)
 bool PerspectiveHelper::RestoreState(IMemento::Pointer memento)
 {
   //TODO PerspectiveHelper restore state
-//  // Restore main window.
-//  IMemento::Pointer childMem = memento .getChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
-//  IStatus r = mainLayout.restoreState(childMem);
-//
-//  // Restore each floating window.
-//  if (detachable)
-//  {
-//    IMemento detachedWindows[] = memento .getChildren(
-//        IWorkbenchConstants.TAG_DETACHED_WINDOW);
-//    for (int nX = 0; nX < detachedWindows.length; nX++)
-//    {
-//      DetachedWindow win = new DetachedWindow(page);
-//      detachedWindowList.add(win);
-//      win.restoreState(detachedWindows[nX]);
-//    }
-//    IMemento childrenMem[] = memento .getChildren(
-//        IWorkbenchConstants.TAG_HIDDEN_WINDOW);
-//    for (int i = 0, length = childrenMem.length; i < length; i++)
-//    {
-//      DetachedPlaceHolder holder =
-//          new DetachedPlaceHolder("", new Rectangle(0, 0, 0, 0)); //$NON-NLS-1$
-//      holder.restoreState(childrenMem[i]);
-//      detachedPlaceHolderList.add(holder);
-//    }
-//  }
-//
-//  // Get the cached id of the currently maximized stack
-//  maximizedStackId = childMem.getString(IWorkbenchConstants.TAG_MAXIMIZED);
-//
-//  return r;
+  //  // Restore main window.
+  //  IMemento::Pointer childMem = memento .getChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
+  //  IStatus r = mainLayout.restoreState(childMem);
+  //
+  //  // Restore each floating window.
+  //  if (detachable)
+  //  {
+  //    IMemento detachedWindows[] = memento .getChildren(
+  //        IWorkbenchConstants.TAG_DETACHED_WINDOW);
+  //    for (int nX = 0; nX < detachedWindows.length; nX++)
+  //    {
+  //      DetachedWindow win = new DetachedWindow(page);
+  //      detachedWindowList.add(win);
+  //      win.restoreState(detachedWindows[nX]);
+  //    }
+  //    IMemento childrenMem[] = memento .getChildren(
+  //        IWorkbenchConstants.TAG_HIDDEN_WINDOW);
+  //    for (int i = 0, length = childrenMem.length; i < length; i++)
+  //    {
+  //      DetachedPlaceHolder holder =
+  //          new DetachedPlaceHolder("", new Rectangle(0, 0, 0, 0)); //$NON-NLS-1$
+  //      holder.restoreState(childrenMem[i]);
+  //      detachedPlaceHolderList.add(holder);
+  //    }
+  //  }
+  //
+  //  // Get the cached id of the currently maximized stack
+  //  maximizedStackId = childMem.getString(IWorkbenchConstants.TAG_MAXIMIZED);
+  //
+  //  return r;
   return true;
 }
 
 bool PerspectiveHelper::SaveState(IMemento::Pointer memento)
 {
   //TODO PerspectiveHelper save state
-//  // Persist main window.
-//  IMemento childMem = memento .createChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
-//  IStatus r = mainLayout.saveState(childMem);
-//
-//  if (detachable)
-//  {
-//    // Persist each detached window.
-//    for (int i = 0, length = detachedWindowList.size(); i < length; i++)
-//    {
-//      DetachedWindow window = (DetachedWindow) detachedWindowList .get(i);
-//      childMem = memento .createChild(IWorkbenchConstants.TAG_DETACHED_WINDOW);
-//      window.saveState(childMem);
-//    }
-//    for (int i = 0, length = detachedPlaceHolderList.size(); i < length; i++)
-//    {
-//      DetachedPlaceHolder holder =
-//          (DetachedPlaceHolder) detachedPlaceHolderList .get(i);
-//      childMem = memento .createChild(IWorkbenchConstants.TAG_HIDDEN_WINDOW);
-//      holder.saveState(childMem);
-//    }
-//  }
-//
-//  // Write out the id of the maximized (View) stack (if any)
-//  // NOTE: we only write this out if it's a ViewStack since the
-//  // Editor Area is handled by the perspective
-//  if (maximizedStack.Cast<PartStack> () != 0)
-//  {
-//    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED,
-//        maximizedStack.getID());
-//  }
-//  else if (maximizedStackId != 0)
-//  {
-//    // Maintain the cache if the perspective has never been activated
-//    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED, maximizedStackId);
-//  }
-//
-//  return r;
+  //  // Persist main window.
+  //  IMemento childMem = memento .createChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
+  //  IStatus r = mainLayout.saveState(childMem);
+  //
+  //  if (detachable)
+  //  {
+  //    // Persist each detached window.
+  //    for (int i = 0, length = detachedWindowList.size(); i < length; i++)
+  //    {
+  //      DetachedWindow window = (DetachedWindow) detachedWindowList .get(i);
+  //      childMem = memento .createChild(IWorkbenchConstants.TAG_DETACHED_WINDOW);
+  //      window.saveState(childMem);
+  //    }
+  //    for (int i = 0, length = detachedPlaceHolderList.size(); i < length; i++)
+  //    {
+  //      DetachedPlaceHolder holder =
+  //          (DetachedPlaceHolder) detachedPlaceHolderList .get(i);
+  //      childMem = memento .createChild(IWorkbenchConstants.TAG_HIDDEN_WINDOW);
+  //      holder.saveState(childMem);
+  //    }
+  //  }
+  //
+  //  // Write out the id of the maximized (View) stack (if any)
+  //  // NOTE: we only write this out if it's a ViewStack since the
+  //  // Editor Area is handled by the perspective
+  //  if (maximizedStack.Cast<PartStack> () != 0)
+  //  {
+  //    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED,
+  //        maximizedStack.getID());
+  //  }
+  //  else if (maximizedStackId != 0)
+  //  {
+  //    // Maintain the cache if the perspective has never been activated
+  //    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED, maximizedStackId);
+  //  }
+  //
+  //  return r;
   return true;
 }
 
@@ -1409,7 +1543,7 @@ void PerspectiveHelper::UpdateBoundsMap()
   // and the editor area
   std::list<LayoutPart::Pointer> kids = mainLayout->GetChildren();
   for (std::list<LayoutPart::Pointer>::iterator iter = kids.begin();
-       iter != kids.end(); ++iter)
+      iter != kids.end(); ++iter)
   {
     if (iter->Cast<PartStack> () != 0)
     {

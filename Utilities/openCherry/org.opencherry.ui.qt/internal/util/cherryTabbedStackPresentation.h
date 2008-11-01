@@ -23,6 +23,7 @@
 
 #include "cherryPresentablePartFolder.h"
 #include "cherryTabOrder.h"
+#include "cherryTabDragHandler.h"
 
 namespace cherry {
 
@@ -43,8 +44,7 @@ private:
 
   TabOrder* tabs;
 
-  //TODO Drag Drop
-  //TabDragHandler dragBehavior;
+  TabDragHandler* dragBehavior;
 
     bool initializing;
     int ignoreSelectionChanges;
@@ -82,10 +82,10 @@ public:
    * Creates a TabbedStackPresentation. The created object will take ownership of the PresentablePartFolder and the TabOrder pointer.
    */
     TabbedStackPresentation(IStackPresentationSite::Pointer site,
-            PresentablePartFolder* newFolder, TabOrder* tabs /*, TabDragHandler dragBehavior, ISystemMenu systemMenu*/);
+            PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/);
 
     void Init(IStackPresentationSite::Pointer site,
-            PresentablePartFolder* newFolder, TabOrder* tabs /*, TabDragHandler dragBehavior, ISystemMenu systemMenu*/);
+            PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/);
     /**
      * Restores a presentation from a previously stored state
      *
@@ -177,13 +177,10 @@ public:
      */
     void SelectPart(IPresentablePart::Pointer toSelect);
 
-    //TODO DnD
-//    /* (non-Javadoc)
-//     * @see org.opencherry.ui.presentations.StackPresentation#dragOver(org.opencherry.swt.widgets.Control, org.opencherry.swt.graphics.Point)
-//     */
-//    StackDropResult dragOver(Control currentControl, Point location) {
-//        return dragBehavior.dragOver(currentControl, location, dragStart);
-//    }
+    /* (non-Javadoc)
+     * @see org.opencherry.ui.presentations.StackPresentation#DragOver(void*, const Point&)
+     */
+    StackDropResult::Pointer DragOver(void* currentControl, const Point& location);
 
 //    void showSystemMenu() {
 //        showSystemMenu(folder.getTabFolder().getSystemMenuLocation(), getSite().getSelectedPart());

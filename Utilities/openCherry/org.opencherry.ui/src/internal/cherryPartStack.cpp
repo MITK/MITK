@@ -21,11 +21,12 @@
 #include "cherryPresentationFactoryUtil.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryPresentationSerializer.h"
-
+#include "cherryDragUtil.h"
 #include "cherryEditorAreaHelper.h"
 #include "cherryPerspectiveHelper.h"
 
 #include "../cherryIWorkbenchPartConstants.h"
+#include "../cherryGeometry.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
@@ -36,6 +37,84 @@ namespace cherry
 {
 
 const int PartStack::PROP_SELECTION = 0x42;
+PartStack::PartStackDropResult::Pointer PartStack::dropResult =
+    new PartStack::PartStackDropResult();
+
+void PartStack::PartStackDropResult::SetTarget(PartStack::Pointer stack,
+    PartPane::Pointer pane, StackDropResult::Pointer result)
+{
+  this->pane = pane;
+  this->dropResult = result;
+  this->stack = stack;
+}
+
+void PartStack::PartStackDropResult::Drop()
+{
+  // If we're dragging a pane over itself do nothing
+  //if (dropResult.getInsertionPoint() == pane.getPresentablePart()) { return; };
+
+  Object::Pointer cookie;
+  if (dropResult != 0)
+  {
+    cookie = dropResult->GetCookie();
+  }
+
+  // Handle cross window drops by opening a new editor
+  if (pane->GetPartReference().Cast<IEditorReference> () != 0)
+  {
+    IEditorReference::Pointer editorRef = pane->GetPartReference().Cast<
+        IEditorReference> ();
+    if (pane->GetWorkbenchWindow() != stack->GetWorkbenchWindow())
+    {
+      try
+      {
+        IEditorInput::Pointer input = editorRef->GetEditorInput();
+
+        // Close the old editor and capture the actual closed state incase of a 'cancel'
+        bool editorClosed = pane->GetPage()->CloseEditor(editorRef, true);
+
+        // Only open open the new editor if the old one closed
+        if (editorClosed)
+          stack->GetPage()->OpenEditor(input, editorRef->GetId());
+        return;
+      } catch (PartInitException& e)
+      {
+        //e.printStackTrace();
+        std::cout << e.displayText();
+      }
+
+    }
+  }
+
+  if (pane->GetContainer() != stack)
+  {
+    // Moving from another stack
+    stack->DerefPart(pane);
+    pane->Reparent(stack->GetParent());
+    stack->Add(pane, cookie);
+    stack->SetSelection(pane);
+    pane->SetFocus();
+  }
+  else if (cookie != 0)
+  {
+    // Rearranging within this stack
+    stack->GetPresentation()->MovePart(stack->GetPresentablePart(pane), cookie);
+  }
+}
+
+DnDTweaklet::CursorType PartStack::PartStackDropResult::GetCursor()
+{
+  return DnDTweaklet::CURSOR_CENTER;
+}
+
+Rectangle PartStack::PartStackDropResult::GetSnapRectangle()
+{
+  if (dropResult == 0)
+  {
+    return DragUtil::GetDisplayBounds(stack->GetControl());
+  }
+  return dropResult->GetSnapRectangle();
+}
 
 PartStack::MyStackPresentationSite::MyStackPresentationSite(PartStack* stack) :
   partStack(stack)
@@ -55,16 +134,16 @@ void PartStack::MyStackPresentationSite::Close(
 }
 
 void PartStack::MyStackPresentationSite::DragStart(
-    IPresentablePart::Pointer beingDragged, const Point& initialLocation,
+    IPresentablePart::Pointer beingDragged, Point& initialLocation,
     bool keyboard)
 {
-  //partStack->DragStart(beingDragged, initialLocation, keyboard);
+  partStack->DragStart(beingDragged, initialLocation, keyboard);
 }
 
-void PartStack::MyStackPresentationSite::DragStart(
-    const Point& initialLocation, bool keyboard)
+void PartStack::MyStackPresentationSite::DragStart(Point& initialLocation,
+    bool keyboard)
 {
-  //partStack->DragStart(0, initialLocation, keyboard);
+  partStack->DragStart(0, initialLocation, keyboard);
 }
 
 bool PartStack::MyStackPresentationSite::IsPartMoveable(
@@ -119,17 +198,11 @@ std::string PartStack::MyStackPresentationSite::GetProperty(
   return partStack->GetProperty(id);
 }
 
-PartStack::PartStack(WorkbenchPage::Pointer p,
-                     bool allowsStateChanges,
-                     int appear,
-                     IPresentationFactory* fac)
- : LayoutPart("PartStack"),
-   page(p),
-   isActive(true),
-   allowStateChanges(allowsStateChanges),
-   appearance(appear),
-   ignoreSelectionChanges(false),
-   factory(fac)
+PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
+    int appear, IPresentationFactory* fac) :
+  LayoutPart("PartStack"), page(p), isActive(true), allowStateChanges(
+      allowsStateChanges), appearance(appear), ignoreSelectionChanges(false),
+      factory(fac)
 {
   std::stringstream buf;
   buf << "PartStack@" << this;
@@ -149,8 +222,8 @@ bool PartStack::IsMoveable(IPresentablePart::Pointer part)
     return true;
   }
   IWorkbenchPartReference::Pointer partRef = pane->GetPartReference();
-  if (partRef.Cast<IViewReference>() != 0)
-    return perspective->IsMoveable(partRef.Cast<IViewReference>());
+  if (partRef.Cast<IViewReference> () != 0)
+    return perspective->IsMoveable(partRef.Cast<IViewReference> ());
 
   return true;
 }
@@ -172,7 +245,8 @@ bool PartStack::CanMoveFolder()
 
   Perspective::Pointer perspective = this->GetPage()->GetActivePerspective();
 
-  if (perspective == 0) {
+  if (perspective == 0)
+  {
     // Shouldn't happen -- can't have a ViewStack without a
     // perspective
     return false;
@@ -182,12 +256,14 @@ bool PartStack::CanMoveFolder()
   // if that's the case the whole folder should not be moveable
   IStackPresentationSite::Pointer presenationSite;
 
-  if( (presenationSite = this->GetPresentationSite()) != 0 ) {
+  if ((presenationSite = this->GetPresentationSite()) != 0)
+  {
     std::list<IPresentablePart::Pointer> parts = presenationSite->GetPartList();
-    for(std::list<IPresentablePart::Pointer>::iterator iter = parts.begin();
-        iter != parts.end(); ++iter)
+    for (std::list<IPresentablePart::Pointer>::iterator iter = parts.begin(); iter
+        != parts.end(); ++iter)
     {
-      if( !presenationSite->IsPartMoveable(*iter) ) {
+      if (!presenationSite->IsPartMoveable(*iter))
+      {
         return false;
       }
     }
@@ -201,12 +277,13 @@ void PartStack::DerefPart(StackablePart::Pointer toDeref)
   if (appearance == PresentationFactoryUtil::ROLE_EDITOR)
     EditorAreaHelper::DerefPart(toDeref);
   else
-    this->GetPage()->GetActivePerspective()->GetPresentation()->DerefPart(toDeref);
+    this->GetPage()->GetActivePerspective()->GetPresentation()->DerefPart(
+        toDeref);
 }
 
 bool PartStack::AllowsDrop(PartPane::Pointer part)
 {
-  PartStack::Pointer stack = part->GetContainer().Cast<PartStack>();
+  PartStack::Pointer stack = part->GetContainer().Cast<PartStack> ();
   if (stack != 0)
   {
     if (stack->appearance == this->appearance)
@@ -239,7 +316,7 @@ bool PartStack::IsStandalone()
 
 IPresentablePart::Pointer PartStack::GetSelectedPart()
 {
-  return presentationCurrent.Cast<IPresentablePart>();
+  return presentationCurrent.Cast<IPresentablePart> ();
 }
 
 IStackPresentationSite::Pointer PartStack::GetPresentationSite()
@@ -427,14 +504,16 @@ void PartStack::Close(IPresentablePart::Pointer part)
   }
 }
 
-IPresentationFactory* PartStack::GetFactory() {
+IPresentationFactory* PartStack::GetFactory()
+{
 
-        if (factory != 0) {
-            return factory;
-        }
+  if (factory != 0)
+  {
+    return factory;
+  }
 
-        return WorkbenchPlugin::GetDefault()->GetPresentationFactory();
-    }
+  return WorkbenchPlugin::GetDefault()->GetPresentationFactory();
+}
 
 void PartStack::CreateControl(void* parent)
 {
@@ -457,12 +536,54 @@ void PartStack::CreateControl(void* parent)
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveBelow(this->GetControl(), 0);
 }
 
+IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, const Point& position)
+{
+
+  if (draggedObject.Cast<PartPane>() == 0)
+  {
+    return 0;
+  }
+
+  PartPane::Pointer pane = draggedObject.Cast<PartPane>();
+  if (this->IsStandalone()
+      || !this->AllowsDrop(pane))
+  {
+    return 0;
+  }
+
+  // Don't allow views to be dragged between windows
+  bool differentWindows = pane->GetWorkbenchWindow() != this->GetWorkbenchWindow();
+  bool editorDropOK = ((pane->GetPartReference().Cast<IEditorReference>() != 0) &&
+      pane->GetWorkbenchWindow()->GetWorkbench() ==
+      this->GetWorkbenchWindow()->GetWorkbench());
+  if (differentWindows && !editorDropOK)
+  {
+    return 0;
+  }
+
+  StackDropResult::Pointer dropResult = this->GetPresentation()->DragOver(
+      this->GetControl(), position);
+
+  if (dropResult == 0)
+  {
+    return 0;
+  }
+
+  return this->CreateDropTarget(pane, dropResult);
+}
+
 void PartStack::SetBounds(const Rectangle& r)
 {
   if (this->GetPresentation() != 0)
   {
     this->GetPresentation()->SetBounds(r);
   }
+}
+
+IDropTarget::Pointer PartStack::CreateDropTarget(PartPane::Pointer pane, StackDropResult::Pointer result)
+{
+  dropResult->SetTarget(this, pane, result);
+  return dropResult;
 }
 
 void PartStack::SetActive(bool isActive)
@@ -476,7 +597,7 @@ void PartStack::SetActive(bool isActive)
   }
 
   for (PresentableVector::iterator iter = presentableParts.begin();
-       iter != presentableParts.end(); ++iter)
+      iter != presentableParts.end(); ++iter)
   {
     PresentablePart::Pointer next = iter->Cast<PresentablePart>();
 
@@ -485,7 +606,8 @@ void PartStack::SetActive(bool isActive)
   }
 }
 
-void PartStack::CreateControl(void* parent, StackPresentation::Pointer presentation) {
+void PartStack::CreateControl(void* parent, StackPresentation::Pointer presentation)
+{
 
   poco_assert(this->GetPresentation() == 0);
 
@@ -530,28 +652,31 @@ void PartStack::CreateControl(void* parent, StackPresentation::Pointer presentat
 
 void PartStack::SavePresentationState()
 {
-  if (this->GetPresentation() == 0) {
-      return;
+  if (this->GetPresentation() == 0)
+  {
+    return;
   }
 
   //TODO Save Presentation State
-//  {// Save the presentation's state before disposing it
-//      XMLMemento memento = XMLMemento
-//              .createWriteRoot(IWorkbenchConstants.TAG_PRESENTATION);
-//      memento.putString(IWorkbenchConstants.TAG_ID, getFactory().getId());
-//
-//      PresentationSerializer serializer = new PresentationSerializer(
-//              getPresentableParts());
-//
-//      getPresentation().saveState(serializer, memento);
-//
-//      // Store the memento in savedPresentationState
-//      savedPresentationState = memento;
-//  }
+  //  {// Save the presentation's state before disposing it
+  //      XMLMemento memento = XMLMemento
+  //              .createWriteRoot(IWorkbenchConstants.TAG_PRESENTATION);
+  //      memento.putString(IWorkbenchConstants.TAG_ID, getFactory().getId());
+  //
+  //      PresentationSerializer serializer = new PresentationSerializer(
+  //              getPresentableParts());
+  //
+  //      getPresentation().saveState(serializer, memento);
+  //
+  //      // Store the memento in savedPresentationState
+  //      savedPresentationState = memento;
+  //  }
 }
 
 PartStack::~PartStack()
 {
+
+  std::cout << "DELETING PARTSTACK\n";
 
   if (this->GetPresentation() == 0)
   {
@@ -585,7 +710,6 @@ Rectangle PartStack::GetBounds()
   }
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl());
 }
-
 
 std::list<StackablePart::Pointer> PartStack::GetChildren() const
 {
@@ -766,17 +890,18 @@ void PartStack::Replace(StackablePart::Pointer oldChild, StackablePart::Pointer 
 }
 
 int PartStack::ComputePreferredSize(bool width, int availableParallel,
-      int availablePerpendicular, int preferredParallel)
+    int availablePerpendicular, int preferredParallel)
 {
   return this->GetPresentation()->ComputePreferredSize(width, availableParallel,
-        availablePerpendicular, preferredParallel);
+      availablePerpendicular, preferredParallel);
 }
 
 int PartStack::GetSizeFlags(bool horizontal)
 {
   StackPresentation::Pointer presentation = this->GetPresentation();
 
-  if (presentation != 0) {
+  if (presentation != 0)
+  {
     return presentation->GetSizeFlags(horizontal);
   }
 
@@ -786,93 +911,93 @@ int PartStack::GetSizeFlags(bool horizontal)
 bool PartStack::RestoreState(IMemento::Pointer memento)
 {
   //TODO restore state (PartStack)
-//  // Read the active tab.
-//  std::string activeTabID = memento
-//  .getString(IWorkbenchConstants.TAG_ACTIVE_PAGE_ID);
-//
-//  // Read the page elements.
-//  std::vector<IMemento::Pointer> children = memento.getChildren(IWorkbenchConstants.TAG_PAGE);
-//  if (children != 0)
-//  {
-//    // Loop through the page elements.
-//    for (int i = 0; i < children.length; i++)
-//    {
-//      // Get the info details.
-//      IMemento childMem = children[i];
-//      String partID = childMem
-//      .getString(IWorkbenchConstants.TAG_CONTENT);
-//
-//      // Create the part.
-//      LayoutPart part = new PartPlaceholder(partID);
-//      part.setContainer(this);
-//      add(part);
-//      //1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
-//      //part.setContainer(this);
-//      if (partID.equals(activeTabID))
-//      {
-//        setSelection(part);
-//        // Mark this as the active part.
-//        //current = part;
-//      }
-//    }
-//  }
-//
-//  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
-//  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
-//  const Integer expanded = memento.getInteger(IWorkbenchConstants.TAG_EXPANDED);
-//  if (useNewMinMax && expanded != 0)
-//  {
-//    //StartupThreading.runWithoutExceptions(new StartupRunnable()
-//    //    {
-//    //      void runWithException() throws Throwable
-//    //      {
-//    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
-//        : IStackPresentationSite.STATE_MINIMIZED);
-//    //      }
-//    //    });
-//  }
-//  else
-//  {
-//    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
-//        : IStackPresentationSite.STATE_MINIMIZED);
-//  }
-//
-//  Integer appearance = memento
-//  .getInteger(IWorkbenchConstants.TAG_APPEARANCE);
-//  if (appearance != 0)
-//  {
-//    this.appearance = appearance.intValue();
-//  }
-//
-//  // Determine if the presentation has saved any info here
-//  savedPresentationState = 0;
-//  std::vector<IMemento::Pointer> presentationMementos = memento
-//  .getChildren(IWorkbenchConstants.TAG_PRESENTATION);
-//
-//  for (int idx = 0; idx < presentationMementos.length; idx++)
-//  {
-//    IMemento child = presentationMementos[idx];
-//
-//    String id = child.getString(IWorkbenchConstants.TAG_ID);
-//
-//    if (Util.equals(id, getFactory().getId()))
-//    {
-//      savedPresentationState = child;
-//      break;
-//    }
-//  }
-//
-//  IMemento propertiesState = memento.getChild(IWorkbenchConstants.TAG_PROPERTIES);
-//  if (propertiesState != 0)
-//  {
-//    std::vector<IMemento::Pointer> props = propertiesState.getChildren(IWorkbenchConstants.TAG_PROPERTY);
-//    for (int i = 0; i < props.length; i++)
-//    {
-//      properties.put(props[i].getID(), props[i].getTextData());
-//    }
-//  }
-//
-//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
+  //  // Read the active tab.
+  //  std::string activeTabID = memento
+  //  .getString(IWorkbenchConstants.TAG_ACTIVE_PAGE_ID);
+  //
+  //  // Read the page elements.
+  //  std::vector<IMemento::Pointer> children = memento.getChildren(IWorkbenchConstants.TAG_PAGE);
+  //  if (children != 0)
+  //  {
+  //    // Loop through the page elements.
+  //    for (int i = 0; i < children.length; i++)
+  //    {
+  //      // Get the info details.
+  //      IMemento childMem = children[i];
+  //      String partID = childMem
+  //      .getString(IWorkbenchConstants.TAG_CONTENT);
+  //
+  //      // Create the part.
+  //      LayoutPart part = new PartPlaceholder(partID);
+  //      part.setContainer(this);
+  //      add(part);
+  //      //1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
+  //      //part.setContainer(this);
+  //      if (partID.equals(activeTabID))
+  //      {
+  //        setSelection(part);
+  //        // Mark this as the active part.
+  //        //current = part;
+  //      }
+  //    }
+  //  }
+  //
+  //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
+  //  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
+  //  const Integer expanded = memento.getInteger(IWorkbenchConstants.TAG_EXPANDED);
+  //  if (useNewMinMax && expanded != 0)
+  //  {
+  //    //StartupThreading.runWithoutExceptions(new StartupRunnable()
+  //    //    {
+  //    //      void runWithException() throws Throwable
+  //    //      {
+  //    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
+  //        : IStackPresentationSite.STATE_MINIMIZED);
+  //    //      }
+  //    //    });
+  //  }
+  //  else
+  //  {
+  //    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
+  //        : IStackPresentationSite.STATE_MINIMIZED);
+  //  }
+  //
+  //  Integer appearance = memento
+  //  .getInteger(IWorkbenchConstants.TAG_APPEARANCE);
+  //  if (appearance != 0)
+  //  {
+  //    this.appearance = appearance.intValue();
+  //  }
+  //
+  //  // Determine if the presentation has saved any info here
+  //  savedPresentationState = 0;
+  //  std::vector<IMemento::Pointer> presentationMementos = memento
+  //  .getChildren(IWorkbenchConstants.TAG_PRESENTATION);
+  //
+  //  for (int idx = 0; idx < presentationMementos.length; idx++)
+  //  {
+  //    IMemento child = presentationMementos[idx];
+  //
+  //    String id = child.getString(IWorkbenchConstants.TAG_ID);
+  //
+  //    if (Util.equals(id, getFactory().getId()))
+  //    {
+  //      savedPresentationState = child;
+  //      break;
+  //    }
+  //  }
+  //
+  //  IMemento propertiesState = memento.getChild(IWorkbenchConstants.TAG_PROPERTIES);
+  //  if (propertiesState != 0)
+  //  {
+  //    std::vector<IMemento::Pointer> props = propertiesState.getChildren(IWorkbenchConstants.TAG_PROPERTY);
+  //    for (int i = 0; i < props.length; i++)
+  //    {
+  //      properties.put(props[i].getID(), props[i].getTextData());
+  //    }
+  //  }
+  //
+  //  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
   return true;
 }
 
@@ -893,7 +1018,7 @@ void PartStack::SetVisible(bool makeVisible)
   if (makeVisible)
   {
     for (PresentableVector::iterator iter = presentableParts.begin();
-         iter != presentableParts.end(); ++iter)
+        iter != presentableParts.end(); ++iter)
     {
       PresentablePart::Pointer next = iter->Cast<PresentablePart>();
 
@@ -914,7 +1039,7 @@ void PartStack::SetVisible(bool makeVisible)
   if (!makeVisible)
   {
     for (PresentableVector::iterator iter = presentableParts.begin();
-         iter != presentableParts.end(); ++iter)
+        iter != presentableParts.end(); ++iter)
     {
       PresentablePart::Pointer next = iter->Cast<PresentablePart>();
 
@@ -927,125 +1052,125 @@ bool PartStack::SaveState(IMemento::Pointer memento)
 {
 
   //TODO save state (PartStack)
-//  // Save the active tab.
-//  if (requestedCurrent != 0)
-//  {
-//    memento.putString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, requestedCurrent
-//        .getCompoundId());
-//  }
-//
-//  // Write out the presentable parts (in order)
-//  Set cachedIds = new HashSet();
-//  Iterator ppIter = getPresentableParts().iterator();
-//  while (ppIter.hasNext())
-//  {
-//    PresentablePart presPart = (PresentablePart) ppIter.next();
-//
-//    IMemento childMem = memento
-//    .createChild(IWorkbenchConstants.TAG_PAGE);
-//    PartPane part = presPart.getPane();
-//    String tabText = part.getPartReference().getPartName();
-//
-//    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
-//    childMem.putString(IWorkbenchConstants.TAG_CONTENT, presPart.getPane().getPlaceHolderId());
-//
-//    // Cache the id so we don't write it out later
-//    cachedIds.add(presPart.getPane().getPlaceHolderId());
-//  }
-//
-//  Iterator iter = children.iterator();
-//  while (iter.hasNext())
-//  {
-//    LayoutPart next = (LayoutPart) iter.next();
-//
-//    PartPane part = 0;
-//    if (next.Cast<PartPane>() != 0)
-//    {
-//      // Have we already written it out?
-//      if (cachedIds.contains(((PartPane)next).getPlaceHolderId()))
-//      continue;
-//
-//      part = (PartPane)next;
-//    }
-//
-//    IMemento childMem = memento
-//    .createChild(IWorkbenchConstants.TAG_PAGE);
-//
-//    String tabText = "LabelNotFound"; //$NON-NLS-1$
-//    if (part != 0)
-//    {
-//      tabText = part.getPartReference().getPartName();
-//    }
-//    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
-//    childMem.putString(IWorkbenchConstants.TAG_CONTENT, next
-//        .getCompoundId());
-//  }
-//
-//  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
-//  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
-//  if (useNewMinMax)
-//  {
-//    memento.putInteger(IWorkbenchConstants.TAG_EXPANDED, presentationSite.getState());
-//  }
-//  else
-//  {
-//    memento
-//    .putInteger(
-//        IWorkbenchConstants.TAG_EXPANDED,
-//        (presentationSite.getState() == IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_MINIMIZED
-//        : IStackPresentationSite.STATE_RESTORED);
-//  }
-//
-//  memento.putInteger(IWorkbenchConstants.TAG_APPEARANCE, appearance);
-//
-//  savePresentationState();
-//
-//  if (savedPresentationState != 0)
-//  {
-//    IMemento presentationState = memento
-//    .createChild(IWorkbenchConstants.TAG_PRESENTATION);
-//    presentationState.putMemento(savedPresentationState);
-//  }
-//
-//  if (!properties.isEmpty())
-//  {
-//    IMemento propertiesState = memento.createChild(IWorkbenchConstants.TAG_PROPERTIES);
-//    Set ids = properties.keySet();
-//    for (Iterator iterator = ids.iterator(); iterator.hasNext();)
-//    {
-//      String id = (String)iterator.next();
-//
-//      if (properties.get(id) == 0) continue;
-//
-//      IMemento prop = propertiesState.createChild(IWorkbenchConstants.TAG_PROPERTY, id);
-//      prop.putTextData((String)properties.get(id));
-//    }
-//  }
-//
-//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
+  //  // Save the active tab.
+  //  if (requestedCurrent != 0)
+  //  {
+  //    memento.putString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, requestedCurrent
+  //        .getCompoundId());
+  //  }
+  //
+  //  // Write out the presentable parts (in order)
+  //  Set cachedIds = new HashSet();
+  //  Iterator ppIter = getPresentableParts().iterator();
+  //  while (ppIter.hasNext())
+  //  {
+  //    PresentablePart presPart = (PresentablePart) ppIter.next();
+  //
+  //    IMemento childMem = memento
+  //    .createChild(IWorkbenchConstants.TAG_PAGE);
+  //    PartPane part = presPart.getPane();
+  //    String tabText = part.getPartReference().getPartName();
+  //
+  //    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
+  //    childMem.putString(IWorkbenchConstants.TAG_CONTENT, presPart.getPane().getPlaceHolderId());
+  //
+  //    // Cache the id so we don't write it out later
+  //    cachedIds.add(presPart.getPane().getPlaceHolderId());
+  //  }
+  //
+  //  Iterator iter = children.iterator();
+  //  while (iter.hasNext())
+  //  {
+  //    LayoutPart next = (LayoutPart) iter.next();
+  //
+  //    PartPane part = 0;
+  //    if (next.Cast<PartPane>() != 0)
+  //    {
+  //      // Have we already written it out?
+  //      if (cachedIds.contains(((PartPane)next).getPlaceHolderId()))
+  //      continue;
+  //
+  //      part = (PartPane)next;
+  //    }
+  //
+  //    IMemento childMem = memento
+  //    .createChild(IWorkbenchConstants.TAG_PAGE);
+  //
+  //    String tabText = "LabelNotFound"; //$NON-NLS-1$
+  //    if (part != 0)
+  //    {
+  //      tabText = part.getPartReference().getPartName();
+  //    }
+  //    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
+  //    childMem.putString(IWorkbenchConstants.TAG_CONTENT, next
+  //        .getCompoundId());
+  //  }
+  //
+  //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
+  //  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
+  //  if (useNewMinMax)
+  //  {
+  //    memento.putInteger(IWorkbenchConstants.TAG_EXPANDED, presentationSite.getState());
+  //  }
+  //  else
+  //  {
+  //    memento
+  //    .putInteger(
+  //        IWorkbenchConstants.TAG_EXPANDED,
+  //        (presentationSite.getState() == IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_MINIMIZED
+  //        : IStackPresentationSite.STATE_RESTORED);
+  //  }
+  //
+  //  memento.putInteger(IWorkbenchConstants.TAG_APPEARANCE, appearance);
+  //
+  //  savePresentationState();
+  //
+  //  if (savedPresentationState != 0)
+  //  {
+  //    IMemento presentationState = memento
+  //    .createChild(IWorkbenchConstants.TAG_PRESENTATION);
+  //    presentationState.putMemento(savedPresentationState);
+  //  }
+  //
+  //  if (!properties.isEmpty())
+  //  {
+  //    IMemento propertiesState = memento.createChild(IWorkbenchConstants.TAG_PROPERTIES);
+  //    Set ids = properties.keySet();
+  //    for (Iterator iterator = ids.iterator(); iterator.hasNext();)
+  //    {
+  //      String id = (String)iterator.next();
+  //
+  //      if (properties.get(id) == 0) continue;
+  //
+  //      IMemento prop = propertiesState.createChild(IWorkbenchConstants.TAG_PROPERTY, id);
+  //      prop.putTextData((String)properties.get(id));
+  //    }
+  //  }
+  //
+  //  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
   return true;
 }
 
 WorkbenchPage::Pointer PartStack::GetPage()
 {
-//  WorkbenchWindow::Pointer window = this->GetWorkbenchWindow().Cast<WorkbenchWindow>();
-//
-//  if (window == 0)
-//  {
-//    return 0;
-//  }
-//
-//  return window->GetActivePage().Cast<WorkbenchPage>();
+  //  WorkbenchWindow::Pointer window = this->GetWorkbenchWindow().Cast<WorkbenchWindow>();
+  //
+  //  if (window == 0)
+  //  {
+  //    return 0;
+  //  }
+  //
+  //  return window->GetActivePage().Cast<WorkbenchPage>();
   return page;
 }
 
 void PartStack::SetActive(int activeState)
 {
 
-//  if (activeState == StackPresentation::AS_ACTIVE_FOCUS && isMinimized)
-//  {
-//    setMinimized(false);
-//  }
+  //  if (activeState == StackPresentation::AS_ACTIVE_FOCUS && isMinimized)
+  //  {
+  //    setMinimized(false);
+  //  }
 
   presentationSite->SetActive(activeState);
 }
@@ -1136,82 +1261,82 @@ void PartStack::SetState(const int newState)
     return;
   }
 
-//  WorkbenchWindow::Pointer wbw = this->GetPage()->GetWorkbenchWindow().Cast<WorkbenchWindow>();
-//  if (wbw == 0 || wbw->GetShell() == 0 || wbw->GetActivePage() == 0)
-//    return;
-//
-//  WorkbenchPage::Pointer page = wbw->GetActivePage();
-//
-//  bool useNewMinMax = Perspective::UseNewMinMax(page->GetActivePerspective());
-//
-//  // we have to fiddle with the zoom behavior to satisfy Intro req's
-//  // by usning the old zoom behavior for its stack
-//  if (newState == IStackPresentationSite::STATE_MAXIMIZED)
-//    useNewMinMax = useNewMinMax; // && !this->IsIntroInStack();
-//  else if (newState == IStackPresentationSite::STATE_RESTORED)
-//  {
-//    PartStack::Pointer maxStack = page->GetActivePerspective()->GetPresentation()->GetMaximizedStack();
-//    useNewMinMax = useNewMinMax && maxStack == this;
-//  }
-//
-//  if (useNewMinMax)
-//  {
-//    //StartupThreading.runWithoutExceptions(new StartupRunnable()
-//    //    {
-//    //      void runWithException() throws Throwable
-//    //      {
-//    wbw->GetPageComposite()->SetRedraw(false);
-//    try
-//    {
-//      if (newState == IStackPresentationSite::STATE_MAXIMIZED)
-//      {
-//        smartZoom();
-//      }
-//      else if (oldState == IStackPresentationSite::STATE_MAXIMIZED)
-//      {
-//        smartUnzoom();
-//      }
-//
-//      if (newState == IStackPresentationSite::STATE_MINIMIZED)
-//      {
-//        setMinimized(true);
-//      }
-//
-//      wbw.getPageComposite().setRedraw(true);
-//
-//      // Force a redraw (fixes Mac refresh)
-//      wbw.getShell().redraw();
-//
-//    }
-//    catch (...)
-//    {
-//      wbw.getPageComposite().setRedraw(true);
-//
-//      // Force a redraw (fixes Mac refresh)
-//      wbw.getShell().redraw();
-//    }
-//
-//    this->SetPresentationState(newState);
-//    //     }
-//    //   });
-//  }
-//  else
-//  {
-////    bool minimized = (newState == IStackPresentationSite::STATE_MINIMIZED);
-////    this->SetMinimized(minimized);
-////
-////    if (newState == IStackPresentationSite::STATE_MAXIMIZED)
-////    {
-////      requestZoomIn();
-////    }
-////    else if (oldState == IStackPresentationSite::STATE_MAXIMIZED)
-////    {
-////      requestZoomOut();
-////
-////      if (newState == IStackPresentationSite::STATE_MINIMIZED)
-////      setMinimized(true);
-////    }
-//  }
+  //  WorkbenchWindow::Pointer wbw = this->GetPage()->GetWorkbenchWindow().Cast<WorkbenchWindow>();
+  //  if (wbw == 0 || wbw->GetShell() == 0 || wbw->GetActivePage() == 0)
+  //    return;
+  //
+  //  WorkbenchPage::Pointer page = wbw->GetActivePage();
+  //
+  //  bool useNewMinMax = Perspective::UseNewMinMax(page->GetActivePerspective());
+  //
+  //  // we have to fiddle with the zoom behavior to satisfy Intro req's
+  //  // by usning the old zoom behavior for its stack
+  //  if (newState == IStackPresentationSite::STATE_MAXIMIZED)
+  //    useNewMinMax = useNewMinMax; // && !this->IsIntroInStack();
+  //  else if (newState == IStackPresentationSite::STATE_RESTORED)
+  //  {
+  //    PartStack::Pointer maxStack = page->GetActivePerspective()->GetPresentation()->GetMaximizedStack();
+  //    useNewMinMax = useNewMinMax && maxStack == this;
+  //  }
+  //
+  //  if (useNewMinMax)
+  //  {
+  //    //StartupThreading.runWithoutExceptions(new StartupRunnable()
+  //    //    {
+  //    //      void runWithException() throws Throwable
+  //    //      {
+  //    wbw->GetPageComposite()->SetRedraw(false);
+  //    try
+  //    {
+  //      if (newState == IStackPresentationSite::STATE_MAXIMIZED)
+  //      {
+  //        smartZoom();
+  //      }
+  //      else if (oldState == IStackPresentationSite::STATE_MAXIMIZED)
+  //      {
+  //        smartUnzoom();
+  //      }
+  //
+  //      if (newState == IStackPresentationSite::STATE_MINIMIZED)
+  //      {
+  //        setMinimized(true);
+  //      }
+  //
+  //      wbw.getPageComposite().setRedraw(true);
+  //
+  //      // Force a redraw (fixes Mac refresh)
+  //      wbw.getShell().redraw();
+  //
+  //    }
+  //    catch (...)
+  //    {
+  //      wbw.getPageComposite().setRedraw(true);
+  //
+  //      // Force a redraw (fixes Mac refresh)
+  //      wbw.getShell().redraw();
+  //    }
+  //
+  //    this->SetPresentationState(newState);
+  //    //     }
+  //    //   });
+  //  }
+  //  else
+  //  {
+  ////    bool minimized = (newState == IStackPresentationSite::STATE_MINIMIZED);
+  ////    this->SetMinimized(minimized);
+  ////
+  ////    if (newState == IStackPresentationSite::STATE_MAXIMIZED)
+  ////    {
+  ////      requestZoomIn();
+  ////    }
+  ////    else if (oldState == IStackPresentationSite::STATE_MAXIMIZED)
+  ////    {
+  ////      requestZoomOut();
+  ////
+  ////      if (newState == IStackPresentationSite::STATE_MINIMIZED)
+  ////      setMinimized(true);
+  ////    }
+  //  }
 }
 
 void PartStack::ShowPart(StackablePart::Pointer part, Object::Pointer cookie)
@@ -1255,10 +1380,10 @@ void PartStack::ShowPart(StackablePart::Pointer part, Object::Pointer cookie)
     this->SetSelection(pane);
   }
 
-//  if (childObscuredByZoom(part))
-//  {
-//    presentablePart.enableInputs(false);
-//  }
+  //  if (childObscuredByZoom(part))
+  //  {
+  //    presentablePart.enableInputs(false);
+  //  }
 }
 
 void PartStack::UpdateContainerVisibleTab()
@@ -1279,7 +1404,7 @@ void PartStack::UpdateContainerVisibleTab()
   {
     std::vector<IWorkbenchPartReference::Pointer> sortedParts = page->GetSortedParts();
     for (ChildVector::iterator partIter = parts.begin();
-         partIter != parts.end(); ++partIter)
+        partIter != parts.end(); ++partIter)
     {
       if (partIter->Cast<PartPane>() != 0)
       {
@@ -1341,6 +1466,86 @@ std::vector<void*> PartStack::GetTabList(StackablePart::Pointer part)
   return std::vector<void*>();
 }
 
+void PartStack::DragStart(IPresentablePart::Pointer beingDragged, Point& initialLocation,
+    bool keyboard)
+{
+  if (beingDragged == 0)
+  {
+    this->PaneDragStart(0, initialLocation, keyboard);
+  }
+  else
+  {
+    if (presentationSite->IsPartMoveable(beingDragged))
+    {
+      PartPane::Pointer pane = this->GetPaneFor(beingDragged);
+
+      if (pane != 0)
+      {
+        this->PaneDragStart(pane, initialLocation, keyboard);
+      }
+    }
+  }
+}
+
+void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
+    bool keyboard)
+{
+  if (pane == 0)
+  {
+    if (this->CanMoveFolder())
+    {
+      if (presentationSite->GetState() == IStackPresentationSite::STATE_MAXIMIZED)
+      {
+        // Calculate where the initial location was BEFORE the 'restore'...as a percentage
+        Rectangle bounds = Geometry::ToDisplay(this->GetParent(),
+            Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
+        float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
+        float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
+
+        // Only restore if we're dragging views/view stacks
+        if (this->GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
+        this->SetState(IStackPresentationSite::STATE_RESTORED);
+
+        // Now, adjust the initial location to be within the bounds of the restored rect
+        bounds = Geometry::ToDisplay(this->GetParent(),
+            Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
+        initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
+        initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
+      }
+
+      DragUtil::PerformDrag(this, Geometry::ToDisplay(this->GetParent(),
+              Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl())),
+          initialLocation, !keyboard);
+    }
+  }
+  else
+  {
+    if (presentationSite->GetState() == IStackPresentationSite::STATE_MAXIMIZED)
+    {
+      // Calculate where the initial location was BEFORE the 'restore'...as a percentage
+      Rectangle bounds = Geometry::ToDisplay(this->GetParent(),
+          Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
+      float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
+      float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
+
+      // Only restore if we're dragging views/view stacks
+      if (this->GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
+      this->SetState(IStackPresentationSite::STATE_RESTORED);
+
+      // Now, adjust the initial location to be within the bounds of the restored rect
+      // See bug 100908
+      bounds = Geometry::ToDisplay(this->GetParent(),
+          Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl()));
+      initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
+      initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
+    }
+
+    DragUtil::PerformDrag(pane, Geometry::ToDisplay(this->GetParent(),
+            Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl())),
+        initialLocation, !keyboard);
+  }
+}
+
 IMemento::Pointer PartStack::GetSavedPresentationState()
 {
   return savedPresentationState;
@@ -1377,7 +1582,7 @@ void PartStack::CopyAppearanceProperties(PartStack::Pointer copyTo)
   if (!properties.empty())
   {
     for (std::map<std::string, std::string>::iterator iter = properties.begin();
-         iter != properties.end(); ++iter)
+        iter != properties.end(); ++iter)
     {
       copyTo->SetProperty(iter->first, iter->second);
     }

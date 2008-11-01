@@ -44,6 +44,8 @@ public:
   void SetBounds(const Rectangle& bounds);
   Rectangle GetBounds() const;
 
+  void SetLocation(int x, int y);
+
   Point ComputeSize(int wHint, int hHint, bool changed);
 
   void SetText(const std::string& text);

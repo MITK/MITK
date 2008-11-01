@@ -77,6 +77,13 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
   virtual void* GetParent(void* widget) = 0;
   virtual bool SetParent(void* widget, void* parent) = 0;
 
+  virtual void SetData(void* widget, const std::string& id, Object::Pointer data) = 0;
+  virtual Object::Pointer GetData(void* widget, const std::string& id) = 0;
+
+  virtual Point GetCursorLocation() = 0;
+  virtual void* GetCursorControl() = 0;
+  virtual void* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location) = 0;
+
   /**
    * Determines if one control is a child of another. Returns true iff the second
    * argument is a child of the first (or the same object).
@@ -126,6 +133,18 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
           const Rectangle& toConvert) = 0;
 
   /**
+   * Converts the given point from display coordinates to the local coordinate system
+   * of the given object
+   *
+   * @param coordinateSystem local coordinate system (widget) being converted to
+   * @param toConvert point to convert
+   * @return a point in control coordinates
+   * @since 3.0
+   */
+  virtual Point ToControl(void* coordinateSystem,
+          const Point& toConvert) = 0;
+
+  /**
    * Converts the given rectangle from the local coordinate system of the given object
    * into display coordinates.
    *
@@ -136,6 +155,18 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
    */
   virtual Rectangle ToDisplay(void* coordinateSystem,
           const Rectangle& toConvert) = 0;
+
+  /**
+   * Converts the given point from the local coordinate system of the given object
+   * into display coordinates.
+   *
+   * @param coordinateSystem local coordinate system (widget) being converted from
+   * @param toConvert point to convert
+   * @return a point in display coordinates
+   * @since 3.0
+   */
+  virtual Point ToDisplay(void* coordinateSystem,
+          const Point& toConvert) = 0;
 };
 
 }

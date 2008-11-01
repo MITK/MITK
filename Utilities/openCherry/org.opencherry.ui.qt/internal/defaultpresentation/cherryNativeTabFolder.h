@@ -40,12 +40,6 @@ private:
   //    ProxyControl topCenter;
   //    SizeCache topCenterCache;
 
-  //    Listener selectionListener = new Listener() {
-  //        public void handleEvent(Event e) {
-  //            fireEvent(TabFolderEvent.EVENT_TAB_SELECTED, getTab(e.item));
-  //        }
-  //    };
-
   //    IPropertyListener systemToolbarListener = new IPropertyListener() {
   //
   //        public void propertyChanged(Object source, int propId) {
@@ -72,6 +66,7 @@ AbstractTabItem  * GetTab(int index);
 private slots:
 
   void TabSelectionChanged(int index);
+  void DragStarted(const QPoint& location);
 
 public:
 

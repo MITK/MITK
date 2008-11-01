@@ -72,7 +72,7 @@ public:
    * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(org.opencherry.ui.internal.skins.IPresentablePart, boolean)
    */
   void DragStart(IPresentablePart::Pointer beingDragged,
-      const Point& initialPosition, bool keyboard);
+      Point& initialPosition, bool keyboard);
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.skins.IPresentationSite#close(org.opencherry.ui.internal.skins.IPresentablePart)
@@ -82,7 +82,7 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(boolean)
    */
-  void DragStart(const Point& initialPosition, bool keyboard);
+  void DragStart(Point& initialPosition, bool keyboard);
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IStackPresentationSite#supportsState(int)

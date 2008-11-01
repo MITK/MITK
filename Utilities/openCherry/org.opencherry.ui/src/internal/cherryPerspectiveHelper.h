@@ -25,6 +25,8 @@
 #include "cherryPartPlaceholder.h"
 #include "cherryDetachedWindow.h"
 #include "cherryDetachedPlaceHolder.h"
+#include "cherryIDragOverListener.h"
+#include "cherryAbstractDropTarget.h"
 #include "../cherryPartPane.h"
 
 namespace cherry
@@ -105,90 +107,60 @@ private:
 private:
   static const int MIN_DETACH_HEIGHT;
 
-  //TODO DND
-  //protected: ActualDropTarget dropTarget;
+  struct DragOverListener: public IDragOverListener
+  {
 
-  //TODO DND
-  //    private: IDragOverListener dragTarget = new IDragOverListener() {
-  //
-  //        public: IDropTarget drag(Control currentControl, Object draggedObject,
-  //                Point position, final Rectangle dragRectangle) {
-  //
-  //            if (!(draggedObject instanceof ViewPane || draggedObject instanceof ViewStack)) {
-  //                return null;
-  //            }
-  //            final LayoutPart part = (LayoutPart) draggedObject;
-  //
-  //            if (part.getWorkbenchWindow() != page.getWorkbenchWindow()) {
-  //                return null;
-  //            }
-  //
-  //            if (dropTarget == null) {
-  //                dropTarget = new ActualDropTarget(part, dragRectangle);
-  //            } else {
-  //                dropTarget.setTarget(part, dragRectangle);
-  //            }
-  //
-  //            return dropTarget;
-  //        }
-  //
-  //    };
+    DragOverListener(PerspectiveHelper* perspHelper);
 
-  //TODO DND
-  //    private: final class ActualDropTarget extends AbstractDropTarget {
-  //        private: LayoutPart part;
-  //
-  //        private: Rectangle dragRectangle;
-  //
-  //        private: ActualDropTarget(LayoutPart part, Rectangle dragRectangle) {
-  //            super();
-  //            setTarget(part, dragRectangle);
-  //        }
-  //
-  //        /**
-  //         * @param part
-  //         * @param dragRectangle
-  //         * @since 3.1
-  //         */
-  //        private: void setTarget(LayoutPart part, Rectangle dragRectangle) {
-  //            this.part = part;
-  //            this.dragRectangle = dragRectangle;
-  //        }
-  //
-  //        public: void drop() {
-  //
-  //            Shell shell = part.getShell();
-  //            if (shell.getData() instanceof DetachedWindow) {
-  //                // only one tab folder in a detach window, so do window
-  //                // move
-  //                if (part instanceof ViewStack) {
-  //                    shell.setLocation(dragRectangle.x,
-  //                            dragRectangle.y);
-  //                    return;
-  //                }
-  //                // if only one view in tab folder then do a window move
-  //                ILayoutContainer container = part.getContainer();
-  //                if (container instanceof ViewStack) {
-  //                    if (((ViewStack) container).getItemCount() == 1) {
-  //                        shell.setLocation(dragRectangle.x,
-  //                                dragRectangle.y);
-  //                        return;
-  //                    }
-  //                }
-  //            }
-  //
-  //            // If layout is modified always zoom out.
-  //            if (isZoomed()) {
-  //        zoomOut();
-  //      }
-  //            // do a normal part detach
-  //            detach(part, dragRectangle.x, dragRectangle.y);
-  //        }
-  //
-  //        public: Cursor getCursor() {
-  //            return DragCursors.getCursor(DragCursors.OFFSCREEN);
-  //        }
-  //    }
+    IDropTarget::Pointer Drag(void* currentControl,
+        Object::Pointer draggedObject, const Point& position,
+        const Rectangle& dragRectangle);
+
+  private:
+    PerspectiveHelper* perspHelper;
+
+  };
+
+  IDragOverListener::Pointer dragTarget;
+
+  struct ActualDropTarget: public AbstractDropTarget
+  {
+
+    cherryClassMacro(ActualDropTarget)
+
+    /**
+     * @param part
+     * @param dragRectangle
+     * @since 3.1
+     */
+    void SetTarget(PartPane::Pointer part, const Rectangle& dragRectangle);
+
+    /**
+     * @param part
+     * @param dragRectangle
+     * @since 3.1
+     */
+    void SetTarget(PartStack::Pointer part, const Rectangle& dragRectangle);
+
+    ActualDropTarget(PerspectiveHelper* perspHelper, PartPane::Pointer part, const Rectangle& dragRectangle);
+
+    ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer part, const Rectangle& dragRectangle);
+
+    void Drop();
+
+    DnDTweaklet::CursorType GetCursor();
+
+  private:
+
+    PartPane::Pointer part;
+    PartStack::Pointer stack;
+
+    Rectangle dragRectangle;
+
+    PerspectiveHelper* perspHelper;
+  };
+
+  ActualDropTarget::Pointer dropTarget;
 
 private:
   struct MatchingPart
@@ -205,7 +177,8 @@ private:
 
   };
 
-  struct CompareMatchingParts : public std::binary_function<MatchingPart, MatchingPart, bool> {
+  struct CompareMatchingParts: public std::binary_function<MatchingPart, MatchingPart, bool>
+  {
     bool operator()(const MatchingPart& m1, const MatchingPart& m2) const;
   };
 
@@ -387,7 +360,8 @@ private:
    * are supported.
    */
 public:
-  StackablePart::Pointer FindPart(const std::string& primaryId, const std::string& secondaryId);
+  StackablePart::Pointer FindPart(const std::string& primaryId,
+      const std::string& secondaryId);
 
   /**
    * Find the first part with a given ID in the presentation.
@@ -398,12 +372,12 @@ private:
       std::vector<MatchingPart>& matchingParts);
 
   LayoutPart::Pointer FindLayoutPart(const std::string& id,
-        const std::list<LayoutPart::Pointer>& parts,
-        std::vector<MatchingPart>& matchingParts);
+      const std::list<LayoutPart::Pointer>& parts,
+      std::vector<MatchingPart>& matchingParts);
 
   StackablePart::Pointer FindPart(const std::string& id,
-        const std::list<StackablePart::Pointer>& parts,
-        std::vector<MatchingPart>& matchingParts);
+      const std::list<StackablePart::Pointer>& parts,
+      std::vector<MatchingPart>& matchingParts);
 
   /**
    * Find the first part that matches the specified
@@ -417,9 +391,9 @@ private:
       std::vector<MatchingPart>& matchingParts);
 
   StackablePart::Pointer FindPart(const std::string& primaryId,
-        const std::string& secondaryId,
-        const std::list<StackablePart::Pointer>& parts,
-        std::vector<MatchingPart>& matchingParts);
+      const std::string& secondaryId,
+      const std::list<StackablePart::Pointer>& parts,
+      std::vector<MatchingPart>& matchingParts);
 
   /**
    * Returns true if a placeholder exists for a given ID.

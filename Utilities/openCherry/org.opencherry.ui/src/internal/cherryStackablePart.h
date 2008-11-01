@@ -31,6 +31,7 @@
 namespace cherry {
 
 struct IStackableContainer;
+struct IWorkbenchWindow;
 
 class StackablePart : public virtual Object
 {
@@ -70,6 +71,8 @@ public:
   virtual bool IsDocked();
 
   virtual Shell::Pointer GetShell();
+
+  SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
 
   /**
    * Returns the compound ID for this part.

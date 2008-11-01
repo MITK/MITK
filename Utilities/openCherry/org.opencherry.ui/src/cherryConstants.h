@@ -27,6 +27,12 @@ namespace cherry
 struct CHERRY_UI Constants
 {
 
+  /**
+   * A constant known to be zero (0), typically used in operations
+   * which take bit flags to indicate that "no bits are set".
+   */
+  static const int NONE; // = 0;
+
   static const int DEFAULT; // = -1
 
   /**
@@ -34,6 +40,17 @@ struct CHERRY_UI Constants
    * for example dragging the thumb of a scroll bar (value is 1).
    */
   static const int DRAG; // = 1;
+
+  /**
+   * Style constant for align center behavior (value is 1&lt;&lt;24).
+   * <p><b>Used By:</b><ul>
+   * <li><code>Button</code></li>
+   * <li><code>Label</code></li>
+   * <li><code>TableColumn</code></li>
+   * <li><code>FormAttachment</code> in a <code>FormLayout</code></li>
+   * </ul></p>
+   */
+  static const int CENTER; // = 1 << 24;
 
   /**
    * Style constant for horizontal alignment or orientation behavior (value is 1&lt;&lt;8).

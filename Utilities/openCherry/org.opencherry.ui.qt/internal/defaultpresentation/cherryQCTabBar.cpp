@@ -17,6 +17,9 @@
 
 #include "cherryQCTabBar.h"
 
+#include <QApplication>
+#include <QMouseEvent>
+
 #include <algorithm>
 
 namespace cherry
@@ -43,6 +46,32 @@ void QCTabBar::tabRemoved(int index)
   std::advance(iter, index);
   tabItemList.erase(iter);
   delete *iter;
+}
+
+void QCTabBar::mousePressEvent(QMouseEvent* event)
+{
+  if (event->button() == Qt::LeftButton)
+     dragStartPosition = event->pos();
+
+  QTabBar::mousePressEvent(event);
+}
+
+void QCTabBar::mouseMoveEvent(QMouseEvent* event)
+{
+  if (!(event->buttons() & Qt::LeftButton))
+  {
+    QTabBar::mouseMoveEvent(event);
+    return;
+  }
+
+   if ((event->pos() - dragStartPosition).manhattanLength()
+        < QApplication::startDragDistance())
+   {
+     QTabBar::mouseMoveEvent(event);
+     return;
+   }
+
+   emit dragStarted(event->globalPos());
 }
 
 AbstractTabItem* QCTabBar::getTab(int index) const

@@ -88,7 +88,7 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
    /* (non-Javadoc)
     * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(org.opencherry.ui.internal.skins.IPresentablePart, boolean)
     */
-   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer beingDragged, const Point& initialPosition,
+   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer beingDragged, Point& initialPosition,
            bool keyboard) {
    }
 
@@ -101,7 +101,7 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
    /* (non-Javadoc)
     * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(boolean)
     */
-   void DefaultStackPresentationSite::DragStart(const Point& initialPosition, bool keyboard) {
+   void DefaultStackPresentationSite::DragStart(Point& initialPosition, bool keyboard) {
    }
 
    /* (non-Javadoc)

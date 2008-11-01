@@ -144,6 +144,8 @@ public:
   virtual void SetBounds(const Rectangle& bounds) = 0;
   virtual Rectangle GetBounds() const = 0;
 
+  virtual void SetLocation(int x, int y) = 0;
+
   virtual Point ComputeSize(int wHint, int hHint, bool changed) = 0;
 
   virtual void SetText(const std::string& text) = 0;

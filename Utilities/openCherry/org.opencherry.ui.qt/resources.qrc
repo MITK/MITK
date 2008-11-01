@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>resources/cursor_bottom.xpm</file>
+     <file>resources/cursor_center.xpm</file>
+     <file>resources/cursor_left.xpm</file>
+     <file>resources/cursor_offscreen.xpm</file>
+     <file>resources/cursor_right.xpm</file>
+     <file>resources/cursor_top.xpm</file>
+ </qresource>
+ </RCC>

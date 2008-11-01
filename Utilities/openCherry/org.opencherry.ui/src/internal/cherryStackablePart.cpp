@@ -18,6 +18,7 @@
 #include "cherryStackablePart.h"
 
 #include "cherryIStackableContainer.h"
+#include "cherryDetachedWindow.h"
 #include "../cherryIWorkbenchWindow.h"
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
@@ -129,6 +130,26 @@ Shell::Pointer StackablePart::GetShell()
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(ctrl);
   }
+  return 0;
+}
+
+IWorkbenchWindow::Pointer StackablePart::GetWorkbenchWindow()
+{
+  Shell::Pointer s = this->GetShell();
+  if (s == 0)
+  {
+    return 0;
+  }
+  Object::Pointer data = s->GetData();
+  if (data.Cast<IWorkbenchWindow>() != 0)
+  {
+    return data.Cast<IWorkbenchWindow>();
+  }
+  else if (data.Cast<DetachedWindow>() != 0)
+  {
+    return data.Cast<DetachedWindow>()->GetWorkbenchPage()->GetWorkbenchWindow();
+  }
+
   return 0;
 }
 

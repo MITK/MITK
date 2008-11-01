@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryPartPlaceholder.h"
 #include "cherryDefaultStackPresentationSite.h"
 #include "cherryPresentationFactoryUtil.h"
+#include "cherryAbstractDropTarget.h"
 
 #include "../cherryPartPane.h"
 #include "../cherryIMemento.h"
@@ -48,6 +49,7 @@ namespace cherry {
 class PartStack : public LayoutPart, public IStackableContainer {
 
   friend class EditorSashContainer;
+  friend class PartSashContainer;
 
 public: cherryClassMacro(PartStack);
 
@@ -117,9 +119,9 @@ public: cherryClassMacro(PartStack);
          void Close(const std::vector<IPresentablePart::Pointer>& parts);
 
          void DragStart(IPresentablePart::Pointer beingDragged,
-                const Point& initialLocation, bool keyboard);
+                Point& initialLocation, bool keyboard);
 
-         void DragStart(const Point& initialLocation, bool keyboard);
+         void DragStart(Point& initialLocation, bool keyboard);
 
          bool IsPartMoveable(IPresentablePart::Pointer part);
 
@@ -146,86 +148,43 @@ public: cherryClassMacro(PartStack);
 
       DefaultStackPresentationSite::Pointer presentationSite;
 
-//    private: static final class PartStackDropResult extends AbstractDropTarget {
-//        private: PartPane pane;
-//
-//        // Result of the presentation's dragOver method or null if we are stacking over the
-//        // client area of the pane.
-//        private: StackDropResult dropResult;
-//        private: PartStack stack;
-//
-//        /**
-//         * Resets the target of this drop result (allows the same drop result object to be
-//         * reused)
-//         *
-//         * @param stack
-//         * @param pane
-//         * @param result result of the presentation's dragOver method, or null if we are
-//         * simply stacking anywhere.
-//         * @since 3.1
-//         */
-//        public: void setTarget(PartStack stack, PartPane pane, StackDropResult result) {
-//            this.pane = pane;
-//            this.dropResult = result;
-//            this.stack = stack;
-//        }
-//
-//        public: void drop() {
-//            // If we're dragging a pane over itself do nothing
-//            //if (dropResult.getInsertionPoint() == pane.getPresentablePart()) { return; };
-//
-//            Object cookie = null;
-//            if (dropResult != null) {
-//                cookie = dropResult.getCookie();
-//            }
-//
-//            // Handle cross window drops by opening a new editor
-//            if (pane instanceof EditorPane) {
-//              if (pane.getWorkbenchWindow() != stack.getWorkbenchWindow()) {
-//                EditorPane editor = (EditorPane) pane;
-//                try {
-//            IEditorInput input = editor.getEditorReference().getEditorInput();
-//
-//            // Close the old editor and capture the actual closed state incase of a 'cancel'
-//            boolean editorClosed = editor.getPage().closeEditor(editor.getEditorReference(), true);
-//
-//            // Only open open the new editor if the old one closed
-//            if (editorClosed)
-//              stack.getPage().openEditor(input, editor.getEditorReference().getId());
-//            return;
-//          } catch (PartInitException e) {
-//            e.printStackTrace();
-//          }
-//
-//              }
-//            }
-//
-//            if (pane.getContainer() != stack) {
-//                // Moving from another stack
-//                stack.derefPart(pane);
-//                pane.reparent(stack.getParent());
-//                stack.add(pane, cookie);
-//                stack.setSelection(pane);
-//                pane.setFocus();
-//            } else if (cookie != null) {
-//                // Rearranging within this stack
-//                stack.getPresentation().movePart(stack.getPresentablePart(pane), cookie);
-//            }
-//        }
-//
-//        public: Cursor getCursor() {
-//            return DragCursors.getCursor(DragCursors.CENTER);
-//        }
-//
-//        public: Rectangle getSnapRectangle() {
-//            if (dropResult == null) {
-//                return DragUtil.getDisplayBounds(stack.getControl());
-//            }
-//            return dropResult.getSnapRectangle();
-//        }
-//    }
+    private:
 
-//    private: static final PartStackDropResult dropResult = new PartStackDropResult();
+      class PartStackDropResult : public AbstractDropTarget {
+
+        private:
+
+          PartPane::Pointer pane;
+
+        // Result of the presentation's dragOver method or null if we are stacking over the
+        // client area of the pane.
+         StackDropResult::Pointer dropResult;
+         PartStack::Pointer stack;
+
+        public:
+
+          cherryClassMacro(PartStackDropResult);
+
+        /**
+         * Resets the target of this drop result (allows the same drop result object to be
+         * reused)
+         *
+         * @param stack
+         * @param pane
+         * @param result result of the presentation's dragOver method, or null if we are
+         * simply stacking anywhere.
+         * @since 3.1
+         */
+        void SetTarget(PartStack::Pointer stack, PartPane::Pointer pane, StackDropResult::Pointer result);
+
+        void Drop();
+
+        DnDTweaklet::CursorType GetCursor();
+
+        Rectangle GetSnapRectangle();
+    };
+
+    private: static PartStackDropResult::Pointer dropResult;
 
 //    protected: bool isMinimized;
 
@@ -341,44 +300,11 @@ public: cherryClassMacro(PartStack);
     /* (non-Javadoc)
      * @see org.opencherry.ui.internal.LayoutPart#getDropTarget(java.lang.Object, org.opencherry.swt.graphics.Point)
      */
-//    public: IDropTarget getDropTarget(Object draggedObject, Point position) {
-//
-//        if (!(draggedObject instanceof PartPane)) {
-//            return null;
-//        }
-//
-//        final PartPane pane = (PartPane) draggedObject;
-//        if (isStandalone()
-//                || !allowsDrop(pane)) {
-//            return null;
-//        }
-//
-//        // Don't allow views to be dragged between windows
-//        boolean differentWindows = pane.getWorkbenchWindow() != getWorkbenchWindow();
-//        boolean editorDropOK = ((pane instanceof EditorPane) &&
-//            pane.getWorkbenchWindow().getWorkbench() ==
-//              getWorkbenchWindow().getWorkbench());
-//        if (differentWindows && !editorDropOK) {
-//            return null;
-//        }
-//
-//        StackDropResult dropResult = getPresentation().dragOver(
-//                getControl(), position);
-//
-//        if (dropResult == null) {
-//          return null;
-//        }
-//
-//        return createDropTarget(pane, dropResult);
-//    }
+    public: IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const Point& position);
 
     public: void SetActive(bool isActive);
 
-
-//    public: IDropTarget createDropTarget(PartPane pane, StackDropResult result) {
-//        dropResult.setTarget(this, pane, result);
-//        return dropResult;
-//    }
+    public: IDropTarget::Pointer CreateDropTarget(PartPane::Pointer pane, StackDropResult::Pointer result);
 
     /**
      * Saves the current state of the presentation to savedPresentationState, if the
@@ -785,68 +711,11 @@ public: cherryClassMacro(PartStack);
      * @param initialLocation
      * @param keyboard
      */
-//    private: void dragStart(IPresentablePart beingDragged, Point initialLocation,
-//            boolean keyboard) {
-//        if (beingDragged == null) {
-//            paneDragStart((LayoutPart)null, initialLocation, keyboard);
-//        } else {
-//            if (presentationSite.isPartMoveable(beingDragged)) {
-//                LayoutPart pane = getPaneFor(beingDragged);
-//
-//                if (pane != null) {
-//                    paneDragStart(pane, initialLocation, keyboard);
-//                }
-//            }
-//        }
-//    }
+    private: void DragStart(IPresentablePart::Pointer beingDragged, Point& initialLocation,
+            bool keyboard);
 
-//    public: void paneDragStart(LayoutPart pane, Point initialLocation,
-//            boolean keyboard) {
-//        if (pane == null) {
-//            if (canMoveFolder()) {
-//                if (presentationSite.getState() == IStackPresentationSite.STATE_MAXIMIZED) {
-//                  // Calculate where the initial location was BEFORE the 'restore'...as a percentage
-//                  Rectangle bounds = Geometry.toDisplay(getParent(), getPresentation().getControl().getBounds());
-//                  float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
-//                  float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
-//
-//                  // Only restore if we're dragging views/view stacks
-//                  if (this instanceof ViewStack)
-//                    setState(IStackPresentationSite.STATE_RESTORED);
-//
-//                  // Now, adjust the initial location to be within the bounds of the restored rect
-//                  bounds = Geometry.toDisplay(getParent(), getPresentation().getControl().getBounds());
-//                  initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
-//                  initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
-//                }
-//
-//                DragUtil.performDrag(PartStack.this, Geometry
-//                        .toDisplay(getParent(), getPresentation().getControl()
-//                                .getBounds()), initialLocation, !keyboard);
-//            }
-//        } else {
-//            if (presentationSite.getState() == IStackPresentationSite.STATE_MAXIMIZED) {
-//              // Calculate where the initial location was BEFORE the 'restore'...as a percentage
-//              Rectangle bounds = Geometry.toDisplay(getParent(), getPresentation().getControl().getBounds());
-//              float xpct = (initialLocation.x - bounds.x) / (float)(bounds.width);
-//              float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
-//
-//              // Only restore if we're dragging views/view stacks
-//              if (this instanceof ViewStack)
-//                setState(IStackPresentationSite.STATE_RESTORED);
-//
-//              // Now, adjust the initial location to be within the bounds of the restored rect
-//              // See bug 100908
-//              bounds = Geometry.toDisplay(getParent(), getPresentation().getControl().getBounds());
-//              initialLocation.x = (int) (bounds.x + (xpct * bounds.width));
-//              initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
-//            }
-//
-//            DragUtil.performDrag(pane, Geometry.toDisplay(getParent(),
-//                    getPresentation().getControl().getBounds()),
-//                    initialLocation, !keyboard);
-//        }
-//    }
+    public: void PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
+            bool keyboard);
 
     /**
      * @return Returns the savedPresentationState.

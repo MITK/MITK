@@ -82,7 +82,7 @@ struct CHERRY_UI IStackPresentationSite : public Object
    * and false if the drag may be using the keyboard
    */
   virtual void DragStart(IPresentablePart::Pointer beingDragged,
-      const Point& initialPosition, bool keyboard) = 0;
+      Point& initialPosition, bool keyboard) = 0;
 
   /**
    * Closes the given set of parts.
@@ -99,7 +99,7 @@ struct CHERRY_UI IStackPresentationSite : public Object
    * @param keyboard true iff the drag was initiated via mouse dragging,
    * and false if the drag may be using the keyboard
    */
-  virtual void DragStart(const Point& initialPosition, bool keyboard) = 0;
+  virtual void DragStart(Point& initialPosition, bool keyboard) = 0;
 
   /**
    * Returns true iff this site will allow the given part to be closed

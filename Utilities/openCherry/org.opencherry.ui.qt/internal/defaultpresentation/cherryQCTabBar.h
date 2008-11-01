@@ -35,9 +35,13 @@ private:
   // maps the index in the tabbar to the AbstractTabItem
   std::deque<AbstractTabItem*> tabItemList;
 
+  QPoint dragStartPosition;
+
 protected:
 
   void tabRemoved(int index);
+  void mousePressEvent(QMouseEvent* event);
+  void mouseMoveEvent(QMouseEvent* event);
 
 public:
 
@@ -56,6 +60,10 @@ public:
 
   void setCurrentTab(AbstractTabItem* item);
   AbstractTabItem* getCurrentTab();
+
+signals:
+
+  void dragStarted(const QPoint& location);
 };
 
 }

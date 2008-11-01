@@ -327,6 +327,20 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
     A (R::*m_MemberFunctionPointer)(T, U, V, W);   // pointer to member function
 };
 
+/**
+ * \brief Event/message/notification class.
+ *
+ * This class
+ * allows one class to send out messages and another class to
+ * receive these message. There are subclasses for sending
+ * parameters along with the messages.
+ *
+ * This is an implementation of the Observer pattern.
+ *
+ * \li There is no guarantee about the order of which observer is notified first. At the moment the observers which register first will be notified first.
+ * \li Notifications are <b>synchronous</b>, by direct method calls. There is no support for asynchronous messages.
+ *
+ */
 // message without parameters (pure signals)
 class Message
 {
@@ -412,6 +426,23 @@ class Message
 
   protected:
 
+    /**
+     * \brief List of listeners.
+     *
+     * This is declared mutable for a reason: Imagine an object that sends out notifications, e.g.
+     *
+     * \code
+class Database {
+  public:
+    Message Modified;
+};
+     * \endcode
+     *
+     * Now imaginge someone gets a <tt>const Database</tt> object, because he/she should not write to the
+     * database. He/she should anyway be able to register for notifications about changes in the database
+     * -- this is why AddListener and RemoveListener are declared <tt>const</tt>. m_Listeners must be
+     *  mutable so that AddListener and RemoveListener can modify it regardless of the object's constness.
+     */
     mutable ListenerList m_Listeners;
     mutable Poco::FastMutex m_Mutex;
 

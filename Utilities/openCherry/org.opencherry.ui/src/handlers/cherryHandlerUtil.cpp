@@ -72,25 +72,25 @@ Object::Pointer HandlerUtil::GetVariable(
   return Object::Pointer(0);
 }
 
-ObjectVector::Pointer HandlerUtil::GetActiveContexts(
+HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveContexts(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o(HandlerUtil::GetVariable(event,
       ISources::ACTIVE_CONTEXT_NAME()));
-  return o.Cast<ObjectVector>();
+  return o.Cast<StringVectorType>();
 }
 
-ObjectVector::Pointer HandlerUtil::GetActiveContextsChecked(
+HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveContextsChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o(HandlerUtil::GetVariableChecked(event,
       ISources::ACTIVE_CONTEXT_NAME()));
-  if (o.Cast<ObjectVector>().IsNull())
+  if (o.Cast<StringVectorType>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_CONTEXT_NAME(),
-        "ObjectVector", o->GetNameOfClass());
+        "StringVectorType", o->GetNameOfClass());
   }
-  return o.Cast<ObjectVector>();
+  return o.Cast<StringVectorType>();
 }
 
 //IEditorPart::Pointer HandlerUtil::GetActiveEditor(ExecutionEvent::Pointer event)
@@ -216,25 +216,25 @@ ISelection::Pointer HandlerUtil::GetCurrentSelectionChecked(
   return o.Cast<ISelection>();
 }
 
-ObjectVector::Pointer HandlerUtil::GetActiveMenus(
+HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveMenus(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariable(event,
       ISources::ACTIVE_MENU_NAME());
-  return o.Cast<ObjectVector>();
+  return o.Cast<StringVectorType>();
 }
 
-ObjectVector::Pointer HandlerUtil::GetActiveMenusChecked(
+HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveMenusChecked(
     ExecutionEvent::Pointer event)
 {
   Object::Pointer o = HandlerUtil::GetVariableChecked(event,
       ISources::ACTIVE_MENU_NAME());
-  if (o.Cast<ObjectVector>().IsNull())
+  if (o.Cast<StringVectorType>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_MENU_NAME(),
-        "ObjectVector", o->GetNameOfClass());
+        "StringVectorType", o->GetNameOfClass());
   }
-  return o.Cast<ObjectVector>();
+  return o.Cast<StringVectorType>();
 }
 
 ISelection::Pointer HandlerUtil::GetActiveMenuSelection(

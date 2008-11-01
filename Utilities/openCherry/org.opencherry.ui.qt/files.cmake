@@ -27,12 +27,16 @@ SET(INTERNAL_CPP_FILES
   util/cherryLeftToRightTabOrder.cpp
   util/cherryPartInfo.cpp
   util/cherryPresentablePartFolder.cpp
+  util/cherryReplaceDragHandler.cpp
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
 
+  cherryQtDnDTweaklet.cpp
   cherryQtErrorView.cpp
   cherryQtMainWindowShell.cpp
+  cherryQtSash.cpp
   cherryQtShowViewAction.cpp
+  cherryQtTracker.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
   cherryQtWidgetsTweaklet.cpp
@@ -45,13 +49,19 @@ SET(MOC_H_FILES
   internal/defaultpresentation/cherryQCTabBar.h
   
   internal/cherryQtMainWindowShell.h
+  internal/cherryQtSash.h
   internal/cherryQtShowViewAction.h
+  internal/cherryQtTracker.h
   internal/cherryQtWidgetsTweaklet.h
 )
 
 SET(UI_FILES
   internal/cherryQtShowViewDialog.ui
   cherryQtLogView.ui
+)
+
+SET(RES_FILES
+  resources.qrc
 )
 
 foreach(file ${INTERNAL_CPP_FILES})

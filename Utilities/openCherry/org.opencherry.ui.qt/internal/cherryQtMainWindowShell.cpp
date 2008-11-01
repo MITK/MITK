@@ -45,6 +45,11 @@ Rectangle QtMainWindowShell::GetBounds() const
   return rect;
 }
 
+void QtMainWindowShell::SetLocation(int x, int y)
+{
+  this->move(x, y);
+}
+
 Point QtMainWindowShell::ComputeSize(int wHint, int hHint, bool changed)
 {
   if (changed) this->updateGeometry();

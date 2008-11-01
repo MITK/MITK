@@ -46,8 +46,7 @@ protected:
 
 private:
 
-  typedef std::list<GuiTk::IControlListener::Pointer> ListenersListType;
-  ListenersListType controlListeners;
+  GuiTk::IControlListener::Events controlEvents;
 };
 
 }

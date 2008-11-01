@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtWorkbenchTweaklet.h"
 #include "cherryQtWorkbenchPageTweaklet.h"
+#include "internal/cherryQtDnDTweaklet.h"
 #include "internal/cherryQtWidgetsTweaklet.h"
 #include "internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
 
@@ -44,6 +45,10 @@ POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(cherryGuiWidgetsTweaklet, cherry::GuiWidgetsTweaklet)
   POCO_EXPORT_CLASS(cherry::QtWidgetsTweaklet)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(cherryDnDTweaklet, cherry::DnDTweaklet)
+  POCO_EXPORT_CLASS(cherry::QtDnDTweaklet)
 POCO_END_MANIFEST
 
 

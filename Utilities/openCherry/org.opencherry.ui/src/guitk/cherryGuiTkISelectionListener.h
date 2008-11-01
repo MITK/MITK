@@ -19,6 +19,7 @@
 #define CHERRYGUITKISELECTIONLISTENER_H_
 
 #include <cherryMacros.h>
+#include <cherryMessage.h>
 
 #include "cherryGuiTkSelectionEvent.h"
 
@@ -48,6 +49,20 @@ struct ISelectionListener: public virtual Object
 {
 
   cherryClassMacro(ISelectionListener);
+
+  struct Events {
+
+    typedef Message1<SelectionEvent::Pointer> EventType;
+
+    EventType selected;
+    EventType defaultSelected;
+
+    void AddListener(ISelectionListener::Pointer listener);
+    void RemoveListener(ISelectionListener::Pointer listener);
+
+  private:
+    typedef MessageDelegate1<ISelectionListener, SelectionEvent::Pointer> Delegate;
+  };
 
   virtual ~ISelectionListener() {}
 

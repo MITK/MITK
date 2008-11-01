@@ -41,7 +41,37 @@ public:
 
   cherryClassMacro(ControlEvent);
 
-  ControlEvent()
+  /**
+   * The item that was moved, resized, or activated.
+   */
+  void* item;
+
+  /**
+   * The new x location
+   */
+  int x;
+
+  /**
+   * The new y location
+   */
+  int y;
+
+  /**
+   * The new width
+   */
+  int width;
+
+  /**
+   * The new height
+   */
+  int height;
+
+  ControlEvent() : item(0), x(0), y(0), width(0), height(0)
+  {
+  }
+
+  ControlEvent(void* item, int x, int y, int width, int height) :
+    item(item), x(x), y(y), width(width), height(height)
   {
   }
 

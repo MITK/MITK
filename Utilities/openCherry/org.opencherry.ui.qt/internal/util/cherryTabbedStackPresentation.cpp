@@ -18,6 +18,7 @@
 #include "cherryTabbedStackPresentation.h"
 #include "cherryAbstractTabItem.h"
 #include "cherryLeftToRightTabOrder.h"
+#include "cherryReplaceDragHandler.h"
 
 #include <cherryConstants.h>
 
@@ -92,24 +93,24 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
   else if (type == TabFolderEvent::EVENT_DRAG_START)
   {
     AbstractTabItem* beingDragged = e->tab;
-    QPoint initialLocation(e->x, e->y);
+    Point initialLocation(e->x, e->y);
 
     if (beingDragged == 0)
     {
-      //TODO DND
-      //this->GetSite()->DragStart(initialLocation, false);
+      this->GetSite()->DragStart(initialLocation, false);
     }
     else
     {
       IPresentablePart::Pointer part = folder->GetPartForTab(beingDragged);
 
-      //TODO DND
-      //                        try {
-      //                            dragStart = folder.indexOf(part);
-      //                            getSite().dragStart(part, initialLocation, false);
-      //                        } finally {
-      //                            dragStart = -1;
-      //                        }
+      try {
+          dragStart = folder->IndexOf(part);
+          this->GetSite()->DragStart(part, initialLocation, false);
+          dragStart = -1;
+      } catch(std::exception& exc) {
+          dragStart = -1;
+          throw exc;
+      }
     }
   }
   else if (type == TabFolderEvent::EVENT_TAB_SELECTED)
@@ -163,27 +164,28 @@ TabbedStackPresentation::TabbedStackPresentation(
  : StackPresentation(site)
 {
   PresentablePartFolder* folder = new PresentablePartFolder(widget);
-  this->Init(site, folder, new LeftToRightTabOrder(folder)); // systemMenu);
+  this->Init(site, folder, new LeftToRightTabOrder(folder),
+      new ReplaceDragHandler(widget)); // systemMenu);
 }
 
 TabbedStackPresentation::TabbedStackPresentation(
     IStackPresentationSite::Pointer site, PresentablePartFolder* folder/*, ISystemMenu systemMenu*/)
  : StackPresentation(site)
 {
-  this->Init(site, folder, new LeftToRightTabOrder(folder));
-      //new ReplaceDragHandler(folder.getTabFolder()), systemMenu);
+  this->Init(site, folder, new LeftToRightTabOrder(folder),
+      new ReplaceDragHandler(folder->GetTabFolder())); //, systemMenu);
 }
 
 TabbedStackPresentation::TabbedStackPresentation(
     IStackPresentationSite::Pointer site, PresentablePartFolder* newFolder,
-    TabOrder* tabs /*, TabDragHandler dragBehavior, ISystemMenu systemMenu*/)
+    TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/)
  : StackPresentation(site)
 {
-  this->Init(site, newFolder, tabs);
+  this->Init(site, newFolder, tabs, dragBehavior);
 }
 
 void TabbedStackPresentation::Init(IStackPresentationSite::Pointer site,
-            PresentablePartFolder* newFolder, TabOrder* tabs /*, TabDragHandler dragBehavior, ISystemMenu systemMenu*/)
+            PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/)
 {
   //this->systemMenu = systemMenu;
 
@@ -193,7 +195,7 @@ void TabbedStackPresentation::Init(IStackPresentationSite::Pointer site,
 
   this->folder = newFolder;
   this->tabs = tabs;
-  //this->dragBehavior = dragBehavior;
+  this->dragBehavior = dragBehavior;
 
   //        // Add a dispose listener. This will call the presentationDisposed()
   //        // method when the widget is destroyed.
@@ -316,6 +318,7 @@ TabbedStackPresentation::~TabbedStackPresentation()
 //  folder.getTabFolder().getControl().dispose();
 
   delete tabs;
+  delete dragBehavior;
   delete folder;
 }
 
@@ -366,13 +369,11 @@ void TabbedStackPresentation::AddPart(IPresentablePart::Pointer newPart,
       {
         tabs->Add(newPart);
       }
-      //TODO DnD
-//      else
-//      {
-//        int insertionPoint = dragBehavior->GetInsertionPosition(cookie);
-//
-//        tabs.insert(newPart, insertionPoint);
-//      }
+      else
+      {
+        int insertionPoint = dragBehavior->GetInsertionPosition(cookie);
+        tabs->Insert(newPart, insertionPoint);
+      }
     }
 
     --ignoreSelectionChanges;
@@ -397,8 +398,7 @@ void TabbedStackPresentation::MovePart(IPresentablePart::Pointer toMove,
   ++ignoreSelectionChanges;
   try
   {
-    //TODO DnD
-    int insertionPoint = 0; //dragBehavior.getInsertionPosition(cookie);
+    int insertionPoint = dragBehavior->GetInsertionPosition(cookie);
 
     if (insertionPoint == folder->IndexOf(toMove))
     {
@@ -435,6 +435,12 @@ void TabbedStackPresentation::SelectPart(IPresentablePart::Pointer toSelect)
   initializing = false;
 
   tabs->Select(toSelect);
+}
+
+StackDropResult::Pointer TabbedStackPresentation::DragOver(void* currentControl, const Point& location)
+{
+  QWidget* currentWidget = static_cast<QWidget*>(currentControl);
+  return dragBehavior->DragOver(currentWidget, location, dragStart);
 }
 
 std::vector<void*> TabbedStackPresentation::GetTabList(

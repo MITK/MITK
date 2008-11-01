@@ -91,7 +91,7 @@ protected:
     /* (non-Javadoc)
      * @see org.opencherry.ui.internal.PartSashContainer#getDockingRatio(org.opencherry.ui.internal.LayoutPart, org.opencherry.ui.internal.LayoutPart)
      */
-    float GetDockingRatio(StackablePart::Pointer dragged, IStackableContainer::Pointer target);
+    float GetDockingRatio(Object::Pointer dragged, IStackableContainer::Pointer target);
 
     /* (non-Javadoc)
      * @see org.opencherry.ui.internal.PartSashContainer#createStack(org.opencherry.ui.internal.LayoutPart)

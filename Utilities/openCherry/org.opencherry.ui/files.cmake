@@ -3,6 +3,7 @@ SET(SRC_CPP_FILES
   cherryAbstractUIPlugin.cpp
   cherryConstants.cpp
   cherryEditorPart.cpp
+  cherryGeometry.cpp
   cherryIEditorRegistry.cpp
   cherryIPageLayout.cpp
   cherryIPartListener.cpp
@@ -47,9 +48,12 @@ SET(SRC_CPP_FILES
   dialogs/cherryMessageDialog.cpp
   
   #guitk
+  guitk/cherryGuiTkIControlListener.cpp
+  guitk/cherryGuiTkISelectionListener.cpp
   guitk/cherryGuiTkSelectionEvent.cpp
   
   #tweaklets
+  tweaklets/cherryDnDTweaklet.cpp
   tweaklets/cherryGuiWidgetsTweaklet.cpp
   tweaklets/cherryMessageDialogTweaklet.cpp
   tweaklets/cherryWorkbenchPageTweaklet.cpp
@@ -59,6 +63,7 @@ SET(SRC_CPP_FILES
   presentations/cherryIPresentablePart.cpp
   presentations/cherryIPresentationFactory.cpp
   presentations/cherryIStackPresentationSite.cpp
+  presentations/cherryStackDropResult.cpp
   presentations/cherryStackPresentation.cpp
 )
 
@@ -84,6 +89,7 @@ SET(INTERNAL_CPP_FILES
   cherryEditorSite.cpp
   cherryFileEditorMapping.cpp
   cherryFolderLayout.cpp
+  cherryIDragOverListener.cpp
   cherryLayoutHelper.cpp
   cherryLayoutPart.cpp
   cherryLayoutPartSash.cpp

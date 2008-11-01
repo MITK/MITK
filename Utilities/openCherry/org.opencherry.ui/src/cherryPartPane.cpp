@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/cherryPartStack.h"
 #include "internal/cherryEditorAreaHelper.h"
 #include "internal/cherryPerspective.h"
+#include "internal/cherryPartStack.h"
+#include "internal/cherryDragUtil.h"
+
 #include "tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "tweaklets/cherryWorkbenchPageTweaklet.h"
 
@@ -118,9 +121,7 @@ Rectangle PartPane::GetParentBounds()
       }
   }
 
-  //TODO DND
-  //return DragUtil.getDisplayBounds(ctrl);
-  return this->GetBounds();
+  return DragUtil::GetDisplayBounds(ctrl);
 }
 
 void* PartPane::GetControl()
@@ -183,7 +184,7 @@ WorkbenchPage::Pointer PartPane::GetPage()
 void PartPane::SetContainer(IStackableContainer::Pointer container)
 {
 
-  void* containerControl = container.Cast<LayoutPart>()->GetControl();
+  void* containerControl = container == 0 ? 0 : container.Cast<LayoutPart>()->GetControl();
 
   if (containerControl != 0)
   {
@@ -247,6 +248,12 @@ void PartPane::ShowFocus(bool inFocus)
           StackPresentation::AS_ACTIVE_NOFOCUS : StackPresentation::AS_INACTIVE);
     }
   }
+}
+
+PartStack::Pointer PartPane::GetStack()
+{
+  IStackableContainer::Pointer container = this->GetContainer();
+  return container.Cast<PartStack>();
 }
 
 void PartPane::SetVisible(bool makeVisible)

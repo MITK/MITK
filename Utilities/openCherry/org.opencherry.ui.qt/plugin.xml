@@ -33,6 +33,13 @@
          description="Qt specific widget tweaks" 
          definition="cherryGuiWidgetsTweaklet" 
          implementation="cherry::QtWidgetsTweaklet" />
+         
+       <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.DnDTweaklet" 
+         name="Qt DnD Tweaklet" 
+         description="Qt specific DnD tweaks" 
+         definition="cherryDnDTweaklet" 
+         implementation="cherry::QtDnDTweaklet" />
    </extension>
    
    <extension

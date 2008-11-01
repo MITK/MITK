@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYHANDLERUTIL_H_
@@ -34,29 +34,31 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Some common utilities for working with handlers in Platform UI.
  * <p>
  * <b>Note</b>: this class should not be instantiated or extended by clients.
  * </p>
- * 
+ *
  * @since 3.3
  */
 class CHERRY_UI HandlerUtil {
-  
+
 private:
-  
+
   static void NoVariableFound(ExecutionEvent::Pointer event, const std::string& name);
 
   static void IncorrectTypeFound(ExecutionEvent::Pointer event, const std::string& name,
       const std::string& expectedType, const std::string& wrongType);
 
-  
+
 public:
-  
+
+  typedef ObjectVector<ObjectString::Pointer> StringVectorType;
+
   /**
    * Extract the variable.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @param name
@@ -68,7 +70,7 @@ public:
 
   /**
    * Extract the variable.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @param name
@@ -82,7 +84,7 @@ public:
 
   /**
    * Extract the variable.
-   * 
+   *
    * @param context
    *            The IEvaluationContext or <code>null</code>
    * @param name
@@ -95,16 +97,16 @@ public:
 
   /**
    * Return the active contexts.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return a collection of String contextIds, or <code>null</code>.
    */
-  static ObjectVector::Pointer GetActiveContexts(ExecutionEvent::Pointer event);
+  static StringVectorType::Pointer GetActiveContexts(ExecutionEvent::Pointer event);
 
   /**
    * Return the active contexts.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return a collection of String contextIds. Will not return
@@ -112,12 +114,12 @@ public:
    * @throws ExecutionException
    *             If the context variable is not found.
    */
-  static ObjectVector::Pointer GetActiveContextsChecked(ExecutionEvent::Pointer event);
+  static StringVectorType::Pointer GetActiveContextsChecked(ExecutionEvent::Pointer event);
 
   /**
    * Return the active shell. Is not necessarily the active workbench window
    * shell.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active shell, or <code>null</code>.
@@ -133,7 +135,7 @@ public:
   /**
    * Return the active shell. Is not necessarily the active workbench window
    * shell.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active shell. Will not return <code>null</code>.
@@ -152,7 +154,7 @@ public:
 
   /**
      * Return the active workbench window.
-     * 
+     *
      * @param event
      *            The execution event that contains the application context
      * @return the active workbench window, or <code>null</code>.
@@ -161,7 +163,7 @@ public:
 
     /**
      * Return the active workbench window.
-     * 
+     *
      * @param event
      *            The execution event that contains the application context
      * @return the active workbench window. Will not return <code>null</code>.
@@ -173,7 +175,7 @@ public:
 
   /**
    * Return the active editor.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active editor, or <code>null</code>.
@@ -182,7 +184,7 @@ public:
 
   /**
    * Return the active editor.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active editor. Will not return <code>null</code>.
@@ -193,7 +195,7 @@ public:
 
   /**
    * Return the part id of the active editor.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the part id of the active editor, or <code>null</code>.
@@ -202,7 +204,7 @@ public:
 
   /**
    * Return the part id of the active editor.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the part id of the active editor. Will not return
@@ -214,7 +216,7 @@ public:
 
   /**
    * Return the active part.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active part, or <code>null</code>.
@@ -223,7 +225,7 @@ public:
 
   /**
    * Return the active part.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active part. Will not return <code>null</code>.
@@ -234,7 +236,7 @@ public:
 
   /**
    * Return the part id of the active part.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the part id of the active part, or <code>null</code>.
@@ -243,7 +245,7 @@ public:
 
   /**
    * Return the part id of the active part.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the part id of the active part. Will not return <code>null</code>.
@@ -254,7 +256,7 @@ public:
 
   /**
    * Return the active part site.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active part site, or <code>null</code>.
@@ -263,7 +265,7 @@ public:
 
   /**
    * Return the active part site.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active part site. Will not return <code>null</code>.
@@ -274,7 +276,7 @@ public:
 
   /**
    * Return the current selection.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the current selection, or <code>null</code>.
@@ -283,7 +285,7 @@ public:
 
   /**
    * Return the current selection.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the current selection. Will not return <code>null</code>.
@@ -295,29 +297,29 @@ public:
   /**
    * Return the menu IDs that were applied to the registered context menu. For
    * example, #CompilationUnitEditorContext.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the menu IDs, or <code>null</code>.
    */
-  static ObjectVector::Pointer GetActiveMenus(ExecutionEvent::Pointer event);
+  static StringVectorType::Pointer GetActiveMenus(ExecutionEvent::Pointer event);
 
   /**
    * Return the menu IDs that were applied to the registered context menu. For
    * example, #CompilationUnitEditorContext.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the menu IDs. Will not return <code>null</code>.
    * @throws ExecutionException
    *             If the active menus variable is not found.
    */
-  static ObjectVector::Pointer GetActiveMenusChecked(ExecutionEvent::Pointer event);
+  static StringVectorType::Pointer GetActiveMenusChecked(ExecutionEvent::Pointer event);
 
   /**
    * Return the active menu selection. The active menu is a registered context
    * menu.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active menu selection, or <code>null</code>.
@@ -327,7 +329,7 @@ public:
   /**
    * Return the active menu selection. The active menu is a registered context
    * menu.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active menu selection. Will not return <code>null</code>.
@@ -339,7 +341,7 @@ public:
   /**
    * Return the active menu editor input, if available. The active menu is a
    * registered context menu.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active menu editor, or <code>null</code>.
@@ -350,7 +352,7 @@ public:
    * Return the active menu editor input. The active menu is a registered
    * context menu. Some context menus do not include the editor input which
    * will throw an exception.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the active menu editor input. Will not return <code>null</code>.
@@ -362,7 +364,7 @@ public:
 
   /**
    * Return the ShowInContext selection.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the show in selection, or <code>null</code>.
@@ -372,7 +374,7 @@ public:
 
   /**
    * Return the ShowInContext selection. Will not return <code>null</code>.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the show in selection, or <code>null</code>.
@@ -384,7 +386,7 @@ public:
 
   /**
    * Return the ShowInContext input.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the show in input, or <code>null</code>.
@@ -394,7 +396,7 @@ public:
 
   /**
    * Return the ShowInContext input. Will not return <code>null</code>.
-   * 
+   *
    * @param event
    *            The execution event that contains the application context
    * @return the show in input, or <code>null</code>.

@@ -25,6 +25,7 @@
 
 #include "cherryIStackPresentationSite.h"
 #include "cherryIPresentationSerializer.h"
+#include "cherryStackDropResult.h"
 
 #include "../cherryISizeProvider.h"
 #include "../cherryIMemento.h"
@@ -222,9 +223,7 @@ public:
      * @return a StackDropResult or null if the presentation does not have
      * a drop target in this location.
      */
-    //TODO DnD
-//    virtual StackDropResult DragOver(void* currentControl,
-//            Point location) = 0;
+    virtual StackDropResult::Pointer DragOver(void* currentControl, const Point& location) = 0;
 
     /**
      * Instructs the presentation to display the system menu

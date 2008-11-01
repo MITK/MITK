@@ -90,6 +90,11 @@ int LayoutPart::ComputePreferredSize(bool width, int availableParallel,
   return preferredParallel;
 }
 
+IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer draggedObject, const Point& displayCoordinates)
+{
+  return 0;
+}
+
 bool LayoutPart::IsDocked()
 {
   Shell::Pointer s = this->GetShell();

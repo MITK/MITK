@@ -35,6 +35,12 @@ void NativeTabFolder::TabSelectionChanged(int index)
   this->FireEvent(TabFolderEvent::EVENT_TAB_SELECTED, tabControl->getTab(index));
 }
 
+void NativeTabFolder::DragStarted(const QPoint& location)
+{
+  Point point(location.x(), location.y());
+  this->HandleDragStarted(location);
+}
+
 NativeTabFolder::NativeTabFolder(QWidget* parent)
 {
   content = 0;
@@ -49,6 +55,9 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   this->connect(tabControl, SIGNAL(currentChanged(int)), this,
       SLOT(TabSelectionChanged(int)));
 
+  this->connect(tabControl, SIGNAL(dragStarted(const QPoint&)), this,
+      SLOT(DragStarted(const QPoint&)));
+
 
   std::cout << "Created: viewForm <-- " << qPrintable(parent->objectName());
   for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
@@ -62,8 +71,6 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   std::cout << std::endl;
 
   //attachListeners(control, false);
-
-
 
   //        viewForm = new ViewForm(control, SWT.FLAT);
   //        attachListeners(viewForm, false);
@@ -81,7 +88,7 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 
 QSize NativeTabFolder::ComputeSize(int widthHint, int heightHint)
 {
-  return viewForm->minimumSize();
+  return QSize(50,50);
 }
 
 AbstractTabItem* NativeTabFolder::Add(int index, int flags)
@@ -95,10 +102,10 @@ void NativeTabFolder::Layout(bool flushCache)
 {
   AbstractTabFolder::Layout(flushCache);
 
-  QRect rect1 = tabControl->geometry();
-  QRect rect2 = viewForm->geometry();
-  std::cout << "QCTabBar geometry is: x=" << rect1.x() << ", y=" << rect1.y() << ", width=" << rect1.width() << ", height=" << rect1.height() << std::endl;
-  std::cout << "ViewForm geometry is: " << rect2.x() << ", y=" << rect2.y() << ", width=" << rect2.width() << ", height=" << rect2.height() << std::endl;
+//  QRect rect1 = tabControl->geometry();
+//  QRect rect2 = viewForm->geometry();
+//  std::cout << "QCTabBar geometry is: x=" << rect1.x() << ", y=" << rect1.y() << ", width=" << rect1.width() << ", height=" << rect1.height() << std::endl;
+//  std::cout << "ViewForm geometry is: " << rect2.x() << ", y=" << rect2.y() << ", width=" << rect2.width() << ", height=" << rect2.height() << std::endl;
 
 //  Rectangle oldBounds = viewForm.getBounds();
 //  Rectangle newBounds = control.getClientArea();
@@ -227,9 +234,10 @@ void NativeTabFolder::SetSelectedImage(const QPixmap* image)
 
 AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
 {
-  int index = tabControl->tabAt(toFind);
-  if (index < 0) return 0;
-  return tabControl->getTab(index);
+//  int index = tabControl->tabAt(toFind);
+//  if (index < 0) return 0;
+//  return tabControl->getTab(index);
+  return this->GetSelection();
 }
 
 void NativeTabFolder::EnablePaneMenu(bool enabled)

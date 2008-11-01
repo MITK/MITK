@@ -22,7 +22,10 @@
 #include <tweaklets/cherryGuiWidgetsTweaklet.h>
 
 #include <list>
-#include <QObject>
+#include <QWidget>
+#include <QMetaType>
+
+Q_DECLARE_METATYPE(cherry::Object::Pointer)
 
 namespace cherry {
 
@@ -33,30 +36,20 @@ class QtSelectionListenerWrapper : public QObject
 
 public:
 
-  QtSelectionListenerWrapper(QObject* widget, GuiTk::ISelectionListener::Pointer listener);
+  QtSelectionListenerWrapper(QWidget* widget);
 
-  QObject* widget;
-  GuiTk::ISelectionListener::Pointer listener;
+  QWidget* widget;
+
+  void AddListener(GuiTk::ISelectionListener::Pointer listener);
+  int RemoveListener(GuiTk::ISelectionListener::Pointer listener);
 
 protected slots:
 
   void QAbstractButtonClicked(bool checked);
 
-};
+private:
 
-class QtControlListenerWrapper : public QObject
-{
-  Q_OBJECT
-
-public:
-
-  QtControlListenerWrapper(QObject* widget, GuiTk::IControlListener::Pointer listener);
-
-  QObject* widget;
-  GuiTk::IControlListener::Pointer listener;
-
-  protected slots:
-
+  GuiTk::ISelectionListener::Events selectionEvents;
 
 };
 
@@ -85,6 +78,13 @@ public:
 
   void* GetParent(void* widget);
   bool SetParent(void* widget, void* parent);
+
+  void SetData(void* widget, const std::string& id, Object::Pointer data);
+  Object::Pointer GetData(void* widget, const std::string& id);
+
+  Point GetCursorLocation();
+  void* GetCursorControl();
+  void* FindControl(const std::vector<Shell::Pointer>& shells, const Point& location);
 
   /**
    * Determines if one control is a child of another. Returns true iff the second
@@ -125,15 +125,19 @@ public:
   Rectangle ToControl(void* coordinateSystem,
           const Rectangle& toConvert);
 
+  Point ToControl(void* coordinateSystem,
+          const Point& toConvert);
+
   Rectangle ToDisplay(void* coordinateSystem,
           const Rectangle& toConvert);
 
+  Point ToDisplay(void* coordinateSystem,
+          const Point& toConvert);
+
 private:
 
-  typedef std::map<void*, std::list<QtSelectionListenerWrapper*> > SelectionListenerMap;
+  typedef std::map<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
   SelectionListenerMap selectionListenerMap;
-
-  bool ContainsSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer) const;
 
   static std::list<Shell::Pointer> shellList;
 

@@ -38,7 +38,7 @@ struct IWorkbenchPage;
  * @see IPageService#addPerspectiveListener(IPerspectiveListener)
  * @see PerspectiveAdapter
  */
-struct CHERRY_UI IPerspectiveListener : public Object {
+struct CHERRY_UI IPerspectiveListener : public virtual Object {
 
   cherryClassMacro(IPerspectiveListener);
 

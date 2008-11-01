@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryMacros.h>
 
+#include "cherryIDropTarget.h"
+
 #include "../cherryISizeProvider.h"
 #include "../cherryRectangle.h"
 #include "../cherryPoint.h"
@@ -134,6 +136,8 @@ protected: SmartPointer<ILayoutContainer> container;
      * @since 3.1
      */
     public: virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel);
+
+    public: virtual IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const Point& displayCoordinates);
 
     public: bool IsDocked();
 

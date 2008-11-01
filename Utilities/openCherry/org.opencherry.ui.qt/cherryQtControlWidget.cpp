@@ -29,52 +29,30 @@ QtControlWidget::QtControlWidget(QWidget* parent, Qt::WindowFlags f)
 
 void QtControlWidget::AddControlListener(GuiTk::IControlListener::Pointer listener)
 {
-  ListenersListType::iterator iter = std::find(controlListeners.begin(), controlListeners.end(), listener);
-  if (iter != controlListeners.end()) return;
-
-  controlListeners.push_back(listener);
+  controlEvents.AddListener(listener);
 }
 
 void QtControlWidget::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
 {
-  controlListeners.remove(listener);
+  controlEvents.RemoveListener(listener);
 }
 
 void QtControlWidget::moveEvent(QMoveEvent* event)
 {
-  if (controlListeners.empty()) return;
-
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
-  for (ListenersListType::iterator listener = controlListeners.begin();
-       listener != controlListeners.end(); ++listener)
-  {
-    (*listener)->ControlMoved(controlEvent);
-  }
+  controlEvents.movedEvent(controlEvent);
 }
 
 void QtControlWidget::resizeEvent(QResizeEvent* event)
 {
-  if (controlListeners.empty()) return;
-
-  std::cout << "RESIZE EVENT in QtControlWidget " << qPrintable(this->objectName()) << std::endl;
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
-  for (ListenersListType::iterator listener = controlListeners.begin();
-       listener != controlListeners.end(); ++listener)
-  {
-    (*listener)->ControlResized(controlEvent);
-  }
+  controlEvents.resizedEvent(controlEvent);
 }
 
 void QtControlWidget::showEvent(QShowEvent* event)
 {
-  if (controlListeners.empty()) return;
-
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
-  for (ListenersListType::iterator listener = controlListeners.begin();
-       listener != controlListeners.end(); ++listener)
-  {
-    (*listener)->ControlActivated(controlEvent);
-  }
+  controlEvents.activatedEvent(controlEvent);
 }
 
 }

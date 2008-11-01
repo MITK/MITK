@@ -21,7 +21,10 @@
 #include "cherryLayoutPart.h"
 #include "cherryILayoutContainer.h"
 #include "cherryIStackableContainer.h"
+#include "cherryIDragOverListener.h"
+#include "cherryAbstractDropTarget.h"
 
+#include "../tweaklets/cherryDnDTweaklet.h"
 #include "../cherryRectangle.h"
 
 #include "../guitk/cherryGuiTkIControlListener.h"
@@ -49,8 +52,7 @@ class PartStack;
  * <ul>
  * <li>PartSashContainer
  */
-class PartSashContainer: public LayoutPart, public ILayoutContainer
-{ //, IDragOverListener {
+class PartSashContainer: public LayoutPart, public ILayoutContainer, public IDragOverListener {
 
 public:
   cherryClassMacro(PartSashContainer);
@@ -85,10 +87,8 @@ protected:
   /* Array of LayoutPart */
   ILayoutContainer::ChildrenType children;
 
-  //TODO DND
-  //private: SashContainerDropTarget dropTarget;
-
 protected:
+
   struct RelationshipInfo
   {
     LayoutPart::Pointer part;
@@ -110,67 +110,40 @@ protected:
     int right;
   };
 
-  // TODO DND
-  //    private: class SashContainerDropTarget extends AbstractDropTarget {
-  //        private: int side;
-  //
-  //        private: int cursor;
-  //
-  //        private: LayoutPart targetPart;
-  //
-  //        private: LayoutPart sourcePart;
-  //
-  //        public: SashContainerDropTarget(LayoutPart sourcePart, int side, int cursor, LayoutPart targetPart) {
-  //            this.setTarget(sourcePart, side, cursor, targetPart);
-  //        }
-  //
-  //        public: void setTarget(LayoutPart sourcePart, int side, int cursor, LayoutPart targetPart) {
-  //            this.side = side;
-  //            this.targetPart = targetPart;
-  //            this.sourcePart = sourcePart;
-  //            this.cursor = cursor;
-  //        }
-  //
-  //        public: void drop() {
-  //            if (side != SWT.NONE) {
-  //                LayoutPart visiblePart = sourcePart;
-  //
-  //                if (sourcePart instanceof PartStack) {
-  //                    visiblePart = getVisiblePart((PartStack) sourcePart);
-  //                }
-  //
-  //                dropObject(getVisibleParts(sourcePart), visiblePart,
-  //                        targetPart, side);
-  //            }
-  //        }
-  //
-  //        public: Cursor getCursor() {
-  //            return DragCursors.getCursor(DragCursors
-  //                    .positionToDragCursor(cursor));
-  //        }
-  //
-  //        public: Rectangle getSnapRectangle() {
-  //            Rectangle targetBounds;
-  //
-  //            if (targetPart != null) {
-  //                targetBounds = DragUtil.getDisplayBounds(targetPart
-  //                        .getControl());
-  //            } else {
-  //                targetBounds = DragUtil.getDisplayBounds(getParent());
-  //            }
-  //
-  //            if (side == SWT.CENTER || side == SWT.NONE) {
-  //                return targetBounds;
-  //            }
-  //
-  //            int distance = Geometry.getDimension(targetBounds, !Geometry
-  //                    .isHorizontal(side));
-  //
-  //            return Geometry.getExtrudedEdge(targetBounds,
-  //                    (int) (distance * getDockingRatio(sourcePart, targetPart)),
-  //                    side);
-  //        }
-  //    }
+private:
+
+  class SashContainerDropTarget : public AbstractDropTarget {
+    private:
+
+      int side;
+    int cursor;
+
+    // This is a IStackablePart or IStackableContainer
+    Object::Pointer targetPart;
+
+    // This is a IStackablePart or IStackableContainer
+    Object::Pointer sourcePart;
+
+    PartSashContainer* partSashContainer;
+
+    public:
+
+      cherryClassMacro(SashContainerDropTarget);
+
+      SashContainerDropTarget(PartSashContainer* partSashContainer, Object::Pointer sourcePart,
+          int side, int cursor, Object::Pointer targetPart);
+
+    void SetTarget(Object::Pointer sourcePart, int side, int cursor, Object::Pointer targetPart);
+
+     void Drop();
+
+    DnDTweaklet::CursorType GetCursor();
+
+    Rectangle GetSnapRectangle();
+};
+
+
+  SashContainerDropTarget::Pointer dropTarget;
 
 public:
 
@@ -205,7 +178,7 @@ public:
    * @return
    */
 private:
-  std::vector<SmartPointer<PartPane> > GetVisibleParts(LayoutPart::Pointer pane);
+  std::vector<SmartPointer<PartPane> > GetVisibleParts(Object::Pointer pane);
 
   /**
    * Find the sashs around the specified part.
@@ -235,6 +208,11 @@ public:
   virtual void Add(LayoutPart::Pointer child, int relationship, float ratio,
           LayoutPart::Pointer relative);
 
+
+protected:
+  virtual void DropObject(const std::vector<PartPane::Pointer>& toDrop,
+        StackablePart::Pointer visiblePart,
+            Object::Pointer targetPart, int side);
   /**
    * Add a new part relative to another. This should be used in place of <code>add</code>.
    * It differs as follows:
@@ -590,145 +568,9 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.dnd.IDragOverListener#drag(org.opencherry.swt.widgets.Control, java.lang.Object, org.opencherry.swt.graphics.Point, org.opencherry.swt.graphics.Rectangle)
    */
-  //TODO DND
-  //    public: IDropTarget drag(Control currentControl, Object draggedObject,
-  //            Point position, Rectangle dragRectangle) {
-  //        if (!(draggedObject instanceof LayoutPart)) {
-  //            return null;
-  //        }
-  //
-  //        final LayoutPart sourcePart = (LayoutPart) draggedObject;
-  //
-  //        if (!isStackType(sourcePart) && !isPaneType(sourcePart)) {
-  //            return null;
-  //        }
-  //
-  //        boolean differentWindows = sourcePart.getWorkbenchWindow() != getWorkbenchWindow();
-  //        boolean editorDropOK = ((sourcePart instanceof EditorPane) &&
-  //                      sourcePart.getWorkbenchWindow().getWorkbench() ==
-  //                      getWorkbenchWindow().getWorkbench());
-  //        if (differentWindows && !editorDropOK) {
-  //            return null;
-  //        }
-  //
-  //        Rectangle containerBounds = DragUtil.getDisplayBounds(parent);
-  //        LayoutPart targetPart = null;
-  //        ILayoutContainer sourceContainer = isStackType(sourcePart) ? (ILayoutContainer) sourcePart
-  //                : sourcePart.getContainer();
-  //
-  //        // If this container has no visible children
-  //        if (getVisibleChildrenCount(this) == 0) {
-  //            return createDropTarget(sourcePart, SWT.CENTER, SWT.CENTER, null);
-  //        }
-  //
-  //        if (containerBounds.contains(position)) {
-  //
-  //            if (root != null) {
-  //                targetPart = root.findPart(parent.toControl(position));
-  //            }
-  //
-  //            if (targetPart != null) {
-  //                final Control targetControl = targetPart.getControl();
-  //
-  //                final Rectangle targetBounds = DragUtil
-  //                        .getDisplayBounds(targetControl);
-  //
-  //                int side = Geometry.getClosestSide(targetBounds, position);
-  //                int distance = Geometry.getDistanceFromEdge(targetBounds, position, side);
-  //
-  //                // is the source coming from a standalone part
-  //                boolean standalone = (isStackType(sourcePart)
-  //                    && ((PartStack) sourcePart).isStandalone())
-  //                  || (isPaneType(sourcePart)
-  //                      && ((PartPane) sourcePart).getStack()!=null
-  //                      && ((PartPane) sourcePart).getStack().isStandalone());
-  //
-  //                // Only allow dropping onto an existing stack from different windows
-  //                if (differentWindows && targetPart instanceof EditorStack) {
-  //                    IDropTarget target = targetPart.getDropTarget(draggedObject, position);
-  //                    return target;
-  //                }
-  //
-  //                // Reserve the 5 pixels around the edge of the part for the drop-on-edge cursor
-  //                if (distance >= 5 && !standalone) {
-  //                    // Otherwise, ask the part if it has any special meaning for this drop location
-  //                    IDropTarget target = targetPart.getDropTarget(draggedObject, position);
-  //                    if (target != null) {
-  //                        return target;
-  //                    }
-  //                }
-  //
-  //                if (distance > 30 && isStackType(targetPart) && !standalone) {
-  //                    if (targetPart instanceof ILayoutContainer) {
-  //                        ILayoutContainer targetContainer = (ILayoutContainer)targetPart;
-  //                        if (targetContainer.allowsAdd(sourcePart)) {
-  //                            side = SWT.CENTER;
-  //                        }
-  //                    }
-  //                }
-  //
-  //                // If the part doesn't want to override this drop location then drop on the edge
-  //
-  //                // A "pointless drop" would be one that will put the dragged object back where it started.
-  //                // Note that it should be perfectly valid to drag an object back to where it came from -- however,
-  //                // the drop should be ignored.
-  //
-  //                boolean pointlessDrop = isZoomed();
-  //
-  //                if (sourcePart == targetPart) {
-  //                    pointlessDrop = true;
-  //                }
-  //
-  //                if ((sourceContainer != null)
-  //                        && (sourceContainer == targetPart)
-  //                        && getVisibleChildrenCount(sourceContainer) <= 1) {
-  //                    pointlessDrop = true;
-  //                }
-  //
-  //                if (side == SWT.CENTER
-  //                        && sourcePart.getContainer() == targetPart) {
-  //                    pointlessDrop = true;
-  //                }
-  //
-  //                int cursor = side;
-  //
-  //                if (pointlessDrop) {
-  //                    side = SWT.NONE;
-  //                    cursor = SWT.CENTER;
-  //                }
-  //
-  //                return createDropTarget(sourcePart, side, cursor, targetPart);
-  //            }
-  //        } else {
-  //          // We only allow dropping into a stack, not creating one
-  //          if (differentWindows)
-  //            return null;
-  //
-  //            int side = Geometry.getClosestSide(containerBounds, position);
-  //
-  //            boolean pointlessDrop = isZoomed();
-  //
-  //            if ((isStackType(sourcePart) && sourcePart.getContainer() == this)
-  //                    || (sourcePart.getContainer() != null
-  //                       && isPaneType(sourcePart)
-  //                       && getVisibleChildrenCount(sourcePart.getContainer()) <= 1)
-  //                       && ((LayoutPart)sourcePart.getContainer()).getContainer() == this) {
-  //                if (root == null || getVisibleChildrenCount(this) <= 1) {
-  //                    pointlessDrop = true;
-  //                }
-  //            }
-  //
-  //            int cursor = Geometry.getOppositeSide(side);
-  //
-  //            if (pointlessDrop) {
-  //                side = SWT.NONE;
-  //            }
-  //
-  //            return createDropTarget(sourcePart, side, cursor, null);
-  //        }
-  //
-  //        return null;
-  //    }
+public:
+  IDropTarget::Pointer Drag(void* currentControl, Object::Pointer draggedObject,
+             const Point& position, const Rectangle& dragRectangle);
 
   /**
    * @param sourcePart
@@ -738,16 +580,8 @@ public:
    * @return
    * @since 3.1
    */
-  // TODO DND
-  //    private: SashContainerDropTarget createDropTarget(final LayoutPart sourcePart, int side, int cursor, LayoutPart targetPart) {
-  //        if (dropTarget == null) {
-  //            dropTarget = new SashContainerDropTarget(sourcePart, side, cursor,
-  //                targetPart);
-  //        } else {
-  //            dropTarget.setTarget(sourcePart, side, cursor, targetPart);
-  //        }
-  //        return dropTarget;
-  //    }
+private:
+  SashContainerDropTarget::Pointer CreateDropTarget(Object::Pointer sourcePart, int side, int cursor, Object::Pointer targetPart);
 
   /**
    * Returns true iff this PartSashContainer allows its parts to be stacked onto the given
@@ -761,61 +595,6 @@ public:
 
 public:
   virtual bool IsPaneType(StackablePart::Pointer toTest) = 0;
-
-  /* (non-Javadoc)
-   * @see org.opencherry.ui.internal.PartSashContainer#dropObject(org.opencherry.ui.internal.LayoutPart, org.opencherry.ui.internal.LayoutPart, int)
-   */
-  //TODO DND
-  //    protected: void dropObject(PartPane[] toDrop, LayoutPart visiblePart,
-  //            LayoutPart targetPart, int side) {
-  //        getControl().setRedraw(false);
-  //
-  //        // Targetpart is null if there isn't a part under the cursor (all the parts are
-  //        // hidden or the container is empty). In this case, the actual side doesn't really
-  //        // since we'll be the only visible container and will fill the entire space. However,
-  //        // we can't leave it as SWT.CENTER since we can't stack if we don't have something
-  //        // to stack on. In this case, we pick SWT.BOTTOM -- this will insert the new pane
-  //        // below any currently-hidden parts.
-  //        if (targetPart == null && side == SWT.CENTER) {
-  //            side = SWT.BOTTOM;
-  //        }
-  //
-  //        if (side == SWT.CENTER) {
-  //            if (isStackType(targetPart)) {
-  //                PartStack stack = (PartStack) targetPart;
-  //                for (int idx = 0; idx < toDrop.length; idx++) {
-  //                    PartPane next = toDrop[idx];
-  //                    stack(next, stack);
-  //                }
-  //            }
-  //        } else {
-  //            PartStack newPart = createStack();
-  //
-  //            // if the toDrop array has 1 item propogate the stack
-  //            // appearance
-  //            if (toDrop.length == 1 && toDrop[0].getStack()!=null) {
-  //                toDrop[0].getStack().copyAppearanceProperties(newPart);
-  //            }
-  //
-  //            for (int idx = 0; idx < toDrop.length; idx++) {
-  //                PartPane next = toDrop[idx];
-  //                stack(next, newPart);
-  //            }
-  //
-  //            addEnhanced(newPart, side, getDockingRatio(newPart, targetPart),
-  //                    targetPart);
-  //        }
-  //
-  //        if (visiblePart != null) {
-  //            setVisiblePart(visiblePart.getContainer(), visiblePart);
-  //        }
-  //
-  //        getControl().setRedraw(true);
-  //
-  //        if (visiblePart != null) {
-  //            visiblePart.setFocus();
-  //        }
-  //    }
 
 protected:
   virtual SmartPointer<PartStack> CreateStack() = 0;
@@ -847,10 +626,11 @@ protected:
 
 protected:
   virtual int GetVisibleChildrenCount(IStackableContainer::Pointer container);
+  virtual int GetVisibleChildrenCount(ILayoutContainer::Pointer container);
 
 protected:
   virtual float
-      GetDockingRatio(StackablePart::Pointer dragged, IStackableContainer::Pointer target);
+      GetDockingRatio(Object::Pointer dragged, IStackableContainer::Pointer target);
 
   /**
    * Writes a description of the layout to the given string buffer.

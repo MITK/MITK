@@ -15,6 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifdef _WIN32
+#define _WIN32_WINNT 0x0502
+#include <windows.h>
+#endif
+
 #include "cherryBundleLoader.h"
 
 #include "internal/cherryBundleContext.h"
@@ -38,7 +43,7 @@ namespace cherry {
 BundleLoader::BundleLoader(CodeCache* codeCache, Poco::Logger& logger) //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
  : m_CodeCache(codeCache), m_Logger(logger)
 {
-
+ 
 }
 
 BundleLoader::~BundleLoader()
@@ -190,32 +195,34 @@ BundleLoader::ResolveAllBundles()
 }
 
 void
-BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list)
+BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list, const std::string& baseDir)
 {
-  std::string libDir = "bin/";
   std::vector<std::string> tmpList;
-  bundle->GetStorage().List(libDir, tmpList);
+  bundle->GetStorage().List(baseDir, tmpList);
 
   int suf = Poco::SharedLibrary::suffix().size();
   std::vector<std::string>::iterator iter;
   for (iter = tmpList.begin(); iter != tmpList.end(); )
   {
-    if (bundle->GetStorage().IsDirectory("bin/" + *iter))
+    if (bundle->GetStorage().IsDirectory(baseDir + *iter))
     {
-      std::cout << "Found directory: " << ("bin/" + *iter) << std::endl;
-      this->ListLibraries(bundle, list);
+      //std::cout << "Found directory: " << (baseDir + *iter) << std::endl;
+      this->ListLibraries(bundle, list, baseDir + *iter + "/");
+      iter = tmpList.erase(iter);
     }
     else
     {
       if (iter->substr(iter->size() - suf) == Poco::SharedLibrary::suffix())
       {
         iter->erase(iter->size() - suf);
+        iter->insert(0, baseDir);
         ++iter;
       }
       else
       {
         iter = tmpList.erase(iter);
       }
+     
     }
   }
 
@@ -233,7 +240,7 @@ BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
   {
     if (iter->empty()) continue;
 
-    std::cout << "Testing CodeCache for: " << *iter << std::endl;
+    //std::cout << "Testing CodeCache for: " << *iter << std::endl;
 
     std::size_t separator = iter->find_last_of("/");
     std::string libFileName = *iter;
@@ -242,9 +249,9 @@ BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
 
     if (!m_CodeCache->HasLibrary(libFileName))
     {
-      std::string libDir = "bin/";
+      std::string libDir = "";
       if (separator != std::string::npos)
-          libDir += libFileName.substr(0, separator);
+          libDir += iter->substr(0, separator);
 
       // Check if we should copy the dll (from a ZIP file for example)
       if (copy)
@@ -272,7 +279,30 @@ BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
       else
       {
         Poco::Path bundlePath = bundle->GetStorage().GetPath();
-        bundlePath.append(libDir);
+        bundlePath.append(Poco::Path::forDirectory(libDir));
+
+        // On Windows, we set the path environment variable to include
+        // the path to the library, so the loader can find it. We do this
+        // programmatically because otherwise, a user would have to edit
+        // a batch file every time he adds a new plugin from outside the 
+        // build system.
+        #ifdef CHERRY_OS_FAMILY_WINDOWS
+        DWORD size = GetEnvironmentVariableA("path", 0, 0);
+        char* currPath = new char[size];
+        DWORD currSize = GetEnvironmentVariableA("path", currPath, size);
+        //std::cout << "Current path: " << currPath << std::endl;
+        char* newPath = new char[currSize + bundlePath.toString().length() + 2];
+        std::memcpy(newPath, currPath, currSize);
+        newPath[currSize] = ';';
+        std::memcpy(newPath + currSize + 1, bundlePath.toString().c_str(), bundlePath.toString().length());
+        newPath[currSize+bundlePath.toString().length()+1] = '\0';
+        //std::cout << "Setting additional path: " << newPath;
+        bool success = SetEnvironmentVariableA("path", newPath);
+        //std::cout << " " << (success ? "SUCCESS" : "FAILED") << std::endl;
+
+        delete[] newPath;
+        delete[] currPath;
+        #endif
 
         m_CodeCache->InstallLibrary(libFileName, bundlePath);
       }
@@ -400,6 +430,11 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
   std::cout << "Loading activator library: " << strLibPath << std::endl;
   try
   {
+#ifdef CHERRY_OS_FAMILY_WINDOWS
+    char cDllPath[512];
+    GetDllDirectory(512, cDllPath);
+    std::cout << "Dll Path: " << cDllPath << std::endl;
+#endif
     bundleInfo.m_ClassLoader->loadLibrary(strLibPath);
     return bundleInfo.m_ClassLoader->create(activator);
   }

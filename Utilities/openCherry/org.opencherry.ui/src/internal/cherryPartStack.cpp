@@ -689,7 +689,11 @@ PartStack::~PartStack()
 
   presentationCurrent = 0;
   current = 0;
+  this->Register(); // need to increment the reference count
+  // so the PartStack is not deleted recursively because of 
+  // the creation/desctruction of temporary SmartPointers
   this->FireInternalPropertyChange(PROP_SELECTION);
+  this->m_ReferenceCount -= 1;
 }
 
 void PartStack::FindSashes(PartPane::Sashes& sashes)

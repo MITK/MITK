@@ -72,7 +72,6 @@ public:
   void UnInstallLibrary(const std::string& name);
 
   Poco::Path GetPathForLibrary(const std::string& name);
-  //Poco::Path GetPathForFileName(const std::string& name);
 
 private:
   Poco::File m_CachePath;

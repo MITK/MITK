@@ -45,12 +45,12 @@ namespace GuiTk
  * @see SelectionAdapter
  * @see SelectionEvent
  */
-struct ISelectionListener: public virtual Object
+struct CHERRY_UI ISelectionListener: public virtual Object
 {
 
   cherryClassMacro(ISelectionListener);
 
-  struct Events {
+  struct CHERRY_UI Events {
 
     typedef Message1<SelectionEvent::Pointer> EventType;
 

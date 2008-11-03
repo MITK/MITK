@@ -56,7 +56,7 @@ CodeCache::Clear()
 bool
 CodeCache::HasLibrary(const std::string& name)
 {
-  std::cout << "HasLibrary checks for: " << name;
+  //std::cout << "HasLibrary checks for: " << name;
 
   std::vector<std::string> files;
   m_CachePath.list(files);
@@ -68,19 +68,19 @@ CodeCache::HasLibrary(const std::string& name)
   for (iter = files.begin(); iter != files.end(); iter++)
   {
     if ((*iter) == libName) {
-      std::cout << " FOUND\n";
+      //std::cout << " FOUND\n";
       return true;
     }
   }
 
-  std::cout << " NOT FOUND\n";
+  //std::cout << " NOT FOUND\n";
   return false;
 }
 
 void
 CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 {
-  std::cout << "Installing library " << name << " to " << this->GetPathForLibrary(name).toString() << std::endl;
+  //std::cout << "Installing library " << name << " to " << this->GetPathForLibrary(name).toString() << std::endl;
   std::ofstream ostr(this->GetPathForLibrary(name).toString().c_str(), std::ios::binary | std::ios::trunc);
 
   ostr << istr.rdbuf();
@@ -89,7 +89,7 @@ CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 void
 CodeCache::InstallLibrary(const std::string& name, const Poco::File& path)
 {
-  std::cout << "Registering library " << name << " in " << path.path() << std::endl;
+  //std::cout << "Registering library " << name << " in " << path.path() << std::endl;
   m_LibPaths.insert(std::make_pair(name, path));
 }
 
@@ -118,7 +118,7 @@ CodeCache::GetPathForLibrary(const std::string& name)
   std::string libName(name);
   std::replace(libName.begin(), libName.end(), '.', '_');
 
-  std::cout << "Getting path for library: " << libName << std::endl;
+  //std::cout << "Getting path for library: " << libName << std::endl;
   if (m_LibPaths.find(libName) != m_LibPaths.end())
   {
     return Poco::Path(m_LibPaths[libName].path(), libName + Poco::SharedLibrary::suffix());
@@ -128,11 +128,5 @@ CodeCache::GetPathForLibrary(const std::string& name)
     return Poco::Path(m_CachePath.path(), libName + Poco::SharedLibrary::suffix());
   }
 }
-
-//Poco::Path
-//CodeCache::GetPathForFileName(const std::string& name)
-//{
-//  return Poco::Path(m_CachePath.path(), name).toString();
-//}
 
 }

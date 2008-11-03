@@ -24,6 +24,5 @@ ENDIF(DESIRED_QT_VERSION EQUAL 4)
 IF(BUILD_OPENCHERRY)       
   ADD_SUBDIRECTORY(openCherry)
   SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
-  MESSAGE("openCherry_DIR is now ${openCherry_DIR}")
 ENDIF(BUILD_OPENCHERRY)
 

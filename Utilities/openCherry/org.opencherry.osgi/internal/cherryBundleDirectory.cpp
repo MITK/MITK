@@ -68,7 +68,9 @@ bool BundleDirectory::IsDirectory(const std::string& path) const
 {
   Poco::Path fullPath(m_RootPath);
   fullPath.append(path);
-  return fullPath.isDirectory();
+  Poco::File file(fullPath.makeDirectory());
+  std::cout << "Testing " << file.path() << " for directory: " << (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
+  return file.exists() && file.isDirectory();
 }
 
 Path

@@ -254,8 +254,6 @@ void QtMainWindowShell::moveEvent(QMoveEvent* event)
 
 void QtMainWindowShell::resizeEvent(QResizeEvent* event)
 {
-  this->dumpObjectTree();
-
   if (controlListeners.empty()) return;
 
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
@@ -268,8 +266,6 @@ void QtMainWindowShell::resizeEvent(QResizeEvent* event)
 
 void QtMainWindowShell::showEvent(QShowEvent* event)
 {
-  this->dumpObjectTree();
-
   if (controlListeners.empty()) return;
 
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();

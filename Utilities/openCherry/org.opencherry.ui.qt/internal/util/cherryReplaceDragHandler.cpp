@@ -129,7 +129,7 @@ int ReplaceDragHandler::GetInsertionPosition(Object::Pointer cookie)
 {
   if (cookie.Cast<DragCookie>() != 0)
   {
-    return std::min(tabFolder->GetItemCount(),
+    return std::min<int>(tabFolder->GetItemCount(),
         cookie.Cast<DragCookie>()->insertPosition);
   }
 

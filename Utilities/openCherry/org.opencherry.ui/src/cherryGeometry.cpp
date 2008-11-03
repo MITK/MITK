@@ -15,10 +15,17 @@
 
  =========================================================================*/
 
+// needed under windows to suppress the definition of the
+// min/max macros in windows.h, which would clash with
+// std::numeric_limits<>::max()
+#define NOMINMAX
+
 #include "cherryGeometry.h"
 #include "cherryConstants.h"
 
 #include "tweaklets/cherryGuiWidgetsTweaklet.h"
+
+#include <limits>
 
 namespace cherry
 {

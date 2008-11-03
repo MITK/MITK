@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include "cherryIBundleContext.h"
 
+
 namespace cherry {
 
 template<class C>
@@ -51,6 +52,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   {
     m_Logger.information("Loading library: " + libPath.toString());
     std::cout << "Loading library: " << libPath.toString() << std::endl;
+    
     cl->loadLibrary(libPath.toString(), C::GetManifestName());
   }
   else {

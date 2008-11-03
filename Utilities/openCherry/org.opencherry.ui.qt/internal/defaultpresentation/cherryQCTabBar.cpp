@@ -86,10 +86,10 @@ std::vector<AbstractTabItem*> QCTabBar::getTabs() const
 
 void QCTabBar::insertTab(int index, AbstractTabItem* item)
 {
-  int realIndex = QTabBar::insertTab(index, QString());
   std::deque<AbstractTabItem*>::iterator iter = tabItemList.begin();
-  std::advance(iter, realIndex);
+  std::advance(iter, index);
   tabItemList.insert(iter, item);
+  QTabBar::insertTab(index, QString());
 }
 
 void QCTabBar::setCurrentTab(AbstractTabItem* item)

@@ -51,7 +51,7 @@ struct CHERRY_UI IControlListener: public virtual Object
 
   cherryClassMacro(IControlListener);
 
-  struct Events {
+  struct CHERRY_UI Events {
 
     typedef Message1<ControlEvent::Pointer> EventType;
 

@@ -99,7 +99,7 @@ public:
   void ReadContributions(IBundle* bundle);
   void ReadDependentContributions(IBundle* bundle);
 
-  void ListLibraries(IBundle* bundle, std::vector<std::string>& list);
+  void ListLibraries(IBundle* bundle, std::vector<std::string>& list, const std::string& baseDir = "bin/");
   void InstallLibraries(IBundle* bundle, bool copy = false);
 
   // start all resolved bundles, except the system bundle

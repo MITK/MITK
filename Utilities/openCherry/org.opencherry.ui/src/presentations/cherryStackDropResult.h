@@ -30,7 +30,7 @@ namespace cherry {
  * to be stacked in a position currently occupied by another part.
  *
  */
-class StackDropResult : public Object {
+class CHERRY_UI StackDropResult : public Object {
 
 public:
 

@@ -24,7 +24,7 @@
 
 namespace cherry {
 
-struct Geometry
+struct CHERRY_UI Geometry
 {
 
   /**

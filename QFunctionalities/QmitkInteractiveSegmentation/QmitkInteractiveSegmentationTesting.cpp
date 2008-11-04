@@ -186,10 +186,31 @@ bool QmitkInteractiveSegmentation::TestAllTools()
   QObjectList* childList = widget->queryList( "QToolButton" );
   QObjectListIt childIter( *childList ); 
 
+  // whitelist for tested open-source/reliver tools
+  QStringList whitelist;
+  whitelist.push_back("&Add");
+  whitelist.push_back("&Subtract");
+  whitelist.push_back("&Region growing");
+  whitelist.push_back("&Correction");
+  whitelist.push_back("&Fill");
+  whitelist.push_back("&Erase");
+
   QObject* child;
   while ( (child = childIter.current()) )
   {
+
     QToolButton* button = static_cast<QToolButton*>(child);
+    std::cout << "Next tool is named '" << button->textLabel() << "'" << std::endl;
+    if ( whitelist.find( button->textLabel() ) != whitelist.end() )
+    { 
+      std::cout <<"Tool in whitelist. Will be tested." << std::endl;
+    }
+    else
+    {
+      std::cout <<"Tool NOT in whitelist. Will be skipped." << std::endl;
+      ++childIter;
+      continue;
+    }
 
     std::cout << "Using '" << button->textLabel().ascii() << "' tool..." << std::flush;
     if (!button->isOn()) // if not yet pressed, then press it now (otherwise, DONT press because that would deactivate the tool)

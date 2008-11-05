@@ -107,6 +107,9 @@ protected slots:
   */
   void generateMovie();
 
+  /*!
+  return the renderwindow of which the movie shall be created, what depends on the toggled button
+  */
   QmitkRenderWindow* GetMovieRenderWindow();
 
 protected:

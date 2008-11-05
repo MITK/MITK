@@ -71,3 +71,58 @@ QWidget* QmitkSimpleExampleControls::getMovieNavigatorTime()
 {
     return movieNavigatorTime;
 }
+
+QPushButton*  QmitkSimpleExampleControls::GetRenderWindow1Button()
+{
+    return m_RenderWindow1Button;
+}
+
+QPushButton*  QmitkSimpleExampleControls::GetRenderWindow2Button()
+{
+    return m_RenderWindow2Button;
+}
+
+QPushButton*  QmitkSimpleExampleControls::GetRenderWindow3Button()
+{
+    return m_RenderWindow3Button;
+}
+
+QPushButton*  QmitkSimpleExampleControls::GetRenderWindow4Button()
+{
+    return m_RenderWindow4Button;
+}
+
+void QmitkSimpleExampleControls::RenderWindow1Toggled( )
+{
+    m_RenderWindow1Button->setOn(true);
+    m_RenderWindow2Button->setOn(false);
+    m_RenderWindow3Button->setOn(false);
+    m_RenderWindow4Button->setOn(false);
+}
+
+
+void QmitkSimpleExampleControls::RenderWindow2Toggled()
+{
+    m_RenderWindow1Button->setOn(false);
+    m_RenderWindow2Button->setOn(true);
+    m_RenderWindow3Button->setOn(false);
+    m_RenderWindow4Button->setOn(false);
+}
+
+
+void QmitkSimpleExampleControls::RenderWindow3Toggled()
+{
+    m_RenderWindow1Button->setOn(false);
+    m_RenderWindow2Button->setOn(false);
+    m_RenderWindow3Button->setOn(true);
+    m_RenderWindow4Button->setOn(false);
+}
+
+
+void QmitkSimpleExampleControls::RenderWindow4Toggled()
+{
+    m_RenderWindow1Button->setOn(false);
+    m_RenderWindow2Button->setOn(false);
+    m_RenderWindow3Button->setOn(false);
+    m_RenderWindow4Button->setOn(true);
+}

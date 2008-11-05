@@ -96,6 +96,8 @@ void QmitkSimpleExampleFunctionality::CreateConnections()
   }
 }
 
+
+
 QAction * QmitkSimpleExampleFunctionality::CreateAction(QActionGroup *parent)
 {
     QAction* action;
@@ -111,11 +113,13 @@ void QmitkSimpleExampleFunctionality::initNavigators()
 
 void QmitkSimpleExampleFunctionality::generateMovie()
 {
-  mitk::Stepper::Pointer stepper = multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice();
+  QmitkRenderWindow* movieRenderWindow = GetMovieRenderWindow();
+  //mitk::Stepper::Pointer stepper = multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice();
+  mitk::Stepper::Pointer stepper = movieRenderWindow->GetSliceNavigationController()->GetSlice();
   mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
   if (movieGenerator.IsNotNull()) {
     movieGenerator->SetStepper( stepper );
-    movieGenerator->SetRenderer( mitk::BaseRenderer::GetInstance(multiWidget->mitkWidget1->GetRenderWindow()) );
+    movieGenerator->SetRenderer( mitk::BaseRenderer::GetInstance(movieRenderWindow->GetRenderWindow()) );
     QString movieFileName = QFileDialog::getSaveFileName( QString::null, "Movie (*.avi)", 0, "movie file dialog", "Choose a file name" );
     if (!movieFileName.isEmpty()) {
       movieGenerator->SetFileName( movieFileName.ascii() );
@@ -171,4 +175,30 @@ void QmitkSimpleExampleFunctionality::stereoSelectionChanged( int id )
   
   mitk::BaseRenderer::GetInstance(multiWidget->mitkWidget4->GetRenderWindow())->SetMapperID(2);
   multiWidget->RequestUpdate();
+}
+
+QmitkRenderWindow* QmitkSimpleExampleFunctionality::GetMovieRenderWindow()
+{
+  //check which RenderWindow should be used to generate the movie, e.g. which button is toggled
+   if(controls->GetRenderWindow1Button()->isOn())
+   {
+    return multiWidget->mitkWidget1;
+   }
+   else if(controls->GetRenderWindow2Button()->isOn())
+   {
+     return multiWidget->mitkWidget2;
+   }
+   else if(controls->GetRenderWindow3Button()->isOn())
+   {
+     return multiWidget->mitkWidget3;
+   }
+   else if(controls->GetRenderWindow4Button()->isOn())
+   {
+     return multiWidget->mitkWidget4;
+   }
+   else //as default take widget1
+   {
+     return multiWidget->mitkWidget1;
+   }
+
 }

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_)
 #define AFX_QMITKSIMPLEEXAMPLEFUNCTIONALITY_H__1DC0BA6E_9B8D_4D63_8A63_5B661CE33712__INCLUDED_
 
-
+ 
 #include "QmitkFunctionality.h"
 
 #include <mitkOperationActor.h>
@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QmitkStdMultiWidget;
 class QmitkSimpleExampleControls;
+class QmitkRenderWindow;
 namespace mitk { class DisplayInteractor; }
 
 /*!
@@ -80,6 +81,9 @@ public:
   */
   virtual QAction * CreateAction(QActionGroup *parent);
 
+  /*!
+  do everything that is neccessary if the functionality was activated.
+  */
   virtual void Activated();
 
 protected slots:
@@ -88,11 +92,22 @@ protected slots:
   */
   void stereoSelectionChanged(int id);
 
+  /*!
+  update the datatree
+  */
   void TreeChanged();
 
+  /*!
+  initialize the transversal, sagittal, coronal and temporal slider according to the image dimensions
+  */
   void initNavigators();
 
+  /*!
+  generate a movie as *.avi from the active render window 
+  */
   void generateMovie();
+
+  QmitkRenderWindow* GetMovieRenderWindow();
 
 protected:
 

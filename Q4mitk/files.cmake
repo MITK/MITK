@@ -26,17 +26,21 @@ SET(CPP_FILES
  
  QmitkEventAdapter.cpp
  
+ QmitkColorTransferFunctionCanvas.cpp
  QmitkStandardViews.cpp
  QmitkStepperAdapter.cpp
  QmitkLineEditLevelWindowWidget.cpp
  QmitkSliderLevelWindowWidget.cpp
  QmitkLevelWindowWidget.cpp
+ QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
+ QmitkTransferFunctionCanvas.cpp
  QmitkLevelWindowRangeChangeDialog.cpp
  QmitkLevelWindowPresetDefinitionDialog.cpp
  QmitkLevelWindowWidgetContextMenu.cpp
  QmitkSliceWidget.cpp
  QmitkStdMultiWidget.cpp
+ QmitkTransferFunctionWidget.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
@@ -72,6 +76,10 @@ SET(MOC_H_FILES
  QmitkLevelWindowWidgetContextMenu.h
  QmitkSliceWidget.h
  QmitkStdMultiWidget.h
+ QmitkColorTransferFunctionCanvas.h
+ QmitkPiecewiseFunctionCanvas.h
+ QmitkTransferFunctionCanvas.h
+ QmitkTransferFunctionWidget.h
 )
 
 SET(UI_FILES
@@ -81,4 +89,5 @@ SET(UI_FILES
   QmitkLevelWindowWidget.ui
   QmitkSliceWidget.ui
   QmitkStdMultiWidget.ui
+  QmitkTransferFunctionWidget.ui
 )

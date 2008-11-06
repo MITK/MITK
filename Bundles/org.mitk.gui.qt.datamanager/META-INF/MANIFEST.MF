@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: MITK Standard Views
+Bundle-SymbolicName: org.mitk.gui.qt.stdviews
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.opencherry.ui.qt

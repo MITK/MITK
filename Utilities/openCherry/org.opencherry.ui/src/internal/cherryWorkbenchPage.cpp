@@ -3292,7 +3292,7 @@ void WorkbenchPage::ResetToolBarLayout()
 
 IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID)
 {
-  return this->ShowView(viewID, 0, VIEW_ACTIVATE);
+  return this->ShowView(viewID, "", VIEW_ACTIVATE);
 }
 
 IViewPart::Pointer WorkbenchPage::ShowView(const std::string& viewID,

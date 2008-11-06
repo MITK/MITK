@@ -10,7 +10,6 @@ SET(CPP_FILES
   cherryQtWorkbenchTweaklet.cpp
   
   # application
-  application/cherryQtActionBarAdvisor.cpp
   application/cherryQtWorkbenchAdvisor.cpp
 )
 

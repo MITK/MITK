@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkStdMultiWidgetEditor.h"
@@ -30,7 +30,7 @@ const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmu
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
  : m_StdMultiWidget(0)
 {
-  
+
 }
 
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
@@ -48,7 +48,7 @@ void QmitkStdMultiWidgetEditor::Init(cherry::IEditorSite::Pointer site, cherry::
 {
   if (input.Cast<mitk::DataStorageEditorInput>().IsNull())
      throw cherry::PartInitException("Invalid Input: Must be IFileEditorInput");
-  
+
   this->SetSite(site);
   this->SetInput(input);
 }
@@ -58,11 +58,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   if (m_StdMultiWidget == 0)
   {
     m_StdMultiWidget = new QmitkStdMultiWidget(parent);
-    parent->layout()->addWidget(m_StdMultiWidget);
-    
+    QVBoxLayout* layout = new QVBoxLayout(parent);
+    layout->addWidget(m_StdMultiWidget);
+
     mitk::DataTree::Pointer dataTree = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
       ->GetDataStorageReference()->GetDataTree();
-    
+
     // Create an iterator on the tree
     mitk::DataTreePreOrderIterator it(dataTree);
 
@@ -83,16 +84,16 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Add the displayed views to the tree to see their positions
     // in 2D and 3D
     m_StdMultiWidget->AddDisplayPlaneSubTree(&it);
-    
+
     m_StdMultiWidget->EnableNavigationControllerEventListening();
-    
+
     mitk::GlobalInteraction::GetInstance()->AddListener(
         m_StdMultiWidget->GetMoveAndZoomInteractor()
       );
   }
-  
+
 }
-  
+
 void QmitkStdMultiWidgetEditor::SetFocus()
 {
   if (m_StdMultiWidget != 0)

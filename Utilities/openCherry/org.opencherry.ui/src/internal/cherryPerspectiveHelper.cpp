@@ -604,7 +604,7 @@ void PerspectiveHelper::CollectViewPanes(std::vector<PartPane::Pointer>& result,
       iter != parts.end(); ++iter)
   {
     LayoutPart::Pointer part = *iter;
-    if (part.Cast<IStackableContainer> () != 0)
+    if (part.Cast<PartStack> () != 0 && part.Cast<PartStack>()->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
     {
       std::list<StackablePart::Pointer> children = part.Cast<IStackableContainer>()->GetChildren();
       for (std::list<StackablePart::Pointer>::iterator partIter = children.begin();

@@ -84,6 +84,7 @@ QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
 
     m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
     m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
+    m_Controls->m_ToolSelectionBox->SetToolGUIArea( m_Controls->m_ToolGUIContainer );
 
     m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
     m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);                 // TODO these 'no border' settings could be moved into the widget

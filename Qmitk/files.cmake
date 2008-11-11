@@ -77,6 +77,7 @@ SET(CPP_FILES
   QmitkStepperAdapter.cpp
   QmitkToolGUI.cpp
   QmitkToolGUIArea.cpp
+  QmitkPaintbrushToolGUI.cpp
   QmitkToolReferenceDataSelectionBox.cpp  
   QmitkToolSelectionBox.cpp  
   QmitkToolWorkingDataSelectionBox.cpp  
@@ -193,6 +194,7 @@ SET(MOC_H_FILES
   QmitkStepperAdapter.h
   QmitkToolGUI.h
   QmitkToolGUIArea.h
+  QmitkPaintbrushToolGUI.h
   QmitkToolReferenceDataSelectionBox.h  
   QmitkToolSelectionBox.h  
   QmitkToolWorkingDataSelectionBox.h  
@@ -204,5 +206,7 @@ SET(MOC_H_FILES
 
 SET(TOOL_QT3GUI_FILES
   QmitkBinaryThresholdToolGUI.cpp
+  QmitkDrawPaintbrushToolGUI.cpp
+  QmitkErasePaintbrushToolGUI.cpp
   QmitkCalculateGrayValueStatisticsToolGUI.cpp
 )

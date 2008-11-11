@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>232</width>
-            <height>444</height>
+            <height>304</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -278,6 +278,15 @@
                 <cstring>m_ToolSelectionBox</cstring>
             </property>
         </widget>
+        <widget class="QmitkToolGUIArea">
+            <property name="name">
+                <cstring>m_ToolGUIContainer</cstring>
+            </property>
+            <property name="font">
+                <font>
+                </font>
+            </property>
+        </widget>
         <widget class="QGroupBox">
             <property name="name">
                 <cstring>grpInterpolation</cstring>
@@ -325,7 +334,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>240</height>
+                    <height>120</height>
                 </size>
             </property>
         </spacer>
@@ -351,22 +360,6 @@
     <customwidget>
         <class>QmitkSlicesInterpolator</class>
         <header location="global">QmitkSlicesInterpolator.h</header>
-        <sizehint>
-            <width>-1</width>
-            <height>-1</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>5</hordata>
-            <verdata>5</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image5</pixmap>
-    </customwidget>
-    <customwidget>
-        <class>QmitkToolWorkingDataSelectionBox</class>
-        <header location="global">QmitkToolWorkingDataSelectionBox.h</header>
         <sizehint>
             <width>-1</width>
             <height>-1</height>
@@ -412,6 +405,22 @@
         </sizepolicy>
         <pixmap>image6</pixmap>
     </customwidget>
+    <customwidget>
+        <class>QmitkToolWorkingDataSelectionBox</class>
+        <header location="global">QmitkToolWorkingDataSelectionBox.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image5</pixmap>
+    </customwidget>
 </customwidgets>
 <images>
     <image name="image0">
@@ -445,6 +454,7 @@
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
+    <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkSlicesInterpolator.h</includehint>
 </includehints>
 </UI>

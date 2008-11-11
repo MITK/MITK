@@ -20,16 +20,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkColorProperty.h"
-#include "mitkCone.h" 
-#include "mitkContour.h" 
+#include "mitkCone.h"
+#include "mitkContour.h"
 #include "mitkContourMapper2D.h"
 #include "mitkContourSetMapper2D.h"
 #include "mitkContourSetVtkMapper3D.h"
 #include "mitkContourVtkMapper3D.h"
-#include "mitkCuboid.h" 
-#include "mitkCylinder.h" 
+#include "mitkCuboid.h"
+#include "mitkCylinder.h"
 #include "mitkDataTreeNode.h"
-#include "mitkEllipsoid.h" 
+#include "mitkEllipsoid.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkGeometry2DData.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -58,7 +58,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSmartPointerProperty.h"
 #include "mitkStringProperty.h"
 #include "mitkSurface.h"
-#include "mitkSurface.h" 
+#include "mitkSurface.h"
 #include "mitkSurfaceMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkTimeSlicedGeometry.h"
@@ -97,6 +97,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCreateSurfaceToolFactory.h"
 #include "mitkBinaryThresholdToolFactory.h"
 #include "mitkCalculateGrayValueStatisticsToolFactory.h"
+#include "mitkDrawPaintbrushToolFactory.h"
+#include "mitkErasePaintbrushToolFactory.h"
 
 
 #include "mitkUnstructuredGrid.h"
@@ -107,8 +109,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
-itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className ) 
-{  
+itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className )
+{
   itk::Object::Pointer pointer;
 
   if ( className == "" )
@@ -137,7 +139,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( GeometryData, "GeometryData" )
     CREATE_ITK( Contour, "Contour" )
     CREATE_ITK( Surface, "Surface" )
-    CREATE_ITK( Ellipsoid, "Ellipsoid" ) 
+    CREATE_ITK( Ellipsoid, "Ellipsoid" )
     CREATE_ITK( Cylinder, "Cylinder" )
     CREATE_ITK( Cuboid, "Cuboid" )
     CREATE_ITK( Cone, "Cone" )
@@ -164,7 +166,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     std::cout << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
 
   return pointer;
-}  
+}
 
 mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
@@ -176,25 +178,25 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
         instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
       }
       ++factoryIt;
-    } 
-    factoryIt = allobjects.begin(); 
+    }
+    factoryIt = allobjects.begin();
     while (instance.IsNull() && factoryIt != allobjects.end() ) {
       if ( std::string("QMCoreObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
         instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
       }
       ++factoryIt;
-    } 
+    }
     if (instance.IsNull()) {
       instance = mitk::CoreObjectFactory::New();
     }
     std::cout << "CoreObjectFactory: created instance of " << instance->GetNameOfClass() << std::endl;
-  } 
+  }
   return instance;
 }
 
 #include <mitkDataTreeNodeFactory.h>
 
-void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node) 
+void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
 {
   if(node==NULL)
     return;
@@ -223,7 +225,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
   }
 }
 
-mitk::CoreObjectFactory::CoreObjectFactory() 
+mitk::CoreObjectFactory::CoreObjectFactory()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -248,11 +250,13 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 
     itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( SubtractContourToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( DrawPaintbrushToolFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( ErasePaintbrushToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( RegionGrowingToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( CorrectorTool2DFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( FillRegionToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( EraseRegionToolFactory::New() );
-    
+
     itk::ObjectFactoryBase::RegisterFactory( AutoCropToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( CalculateVolumetryToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( CreateSurfaceToolFactory::New() );
@@ -403,13 +407,13 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg)"
 
-const char* mitk::CoreObjectFactory::GetFileExtensions() 
+const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
   return EXTERNAL_FILE_EXTENSIONS;
 };
 
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
-  return SAVE_FILE_EXTENSIONS; 
+  return SAVE_FILE_EXTENSIONS;
 };
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {

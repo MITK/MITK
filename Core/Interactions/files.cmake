@@ -61,6 +61,9 @@ SET( TOOL_FILES
   mitkFillRegionTool.cpp
   mitkRegionGrowingTool.cpp
   mitkSubtractContourTool.cpp
+  mitkPaintbrushTool.cpp
+  mitkDrawPaintbrushTool.cpp
+  mitkErasePaintbrushTool.cpp
 )
 
 IF(MITK_USE_TD_MOUSE)

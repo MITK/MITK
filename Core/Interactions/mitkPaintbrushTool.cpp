@@ -243,7 +243,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* sta
 }
 
 
-bool mitk::PaintbrushTool::OnMouseReleased(Action* action, const StateEvent* stateEvent)
+bool mitk::PaintbrushTool::OnMouseReleased(Action* /*action*/, const StateEvent* /*stateEvent*/)
 {
   FeedbackContourTool::SetFeedbackContourVisible(false);
 

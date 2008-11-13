@@ -1,5 +1,9 @@
 PROJECT(MITK)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+# this should be set to NEW at some point, see bug #1402
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 OLD)
+endif(COMMAND cmake_policy)
 
 # only configure dart here if not already configured in the 
 # parent directory

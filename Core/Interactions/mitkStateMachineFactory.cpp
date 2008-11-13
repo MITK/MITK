@@ -208,7 +208,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
   {
     //searched through the States and Connects all Transitions
     bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
-    if ( tempbool = false )
+    if ( tempbool == false )
     {
       mitk::StatusBar::GetInstance()->DisplayText("Warning: The connection of the states was not successful!");    
       return false;//abort!

@@ -32,7 +32,7 @@ class MITK_CORE_EXPORT UndoController
 {
   public:
   //different UndoModels:
-  typedef enum UndoType{LIMITEDLINEARUNDO=10, VERBOSE_LIMITEDLINEARUNDO=11, TREEUNDO=20};
+  enum UndoType{LIMITEDLINEARUNDO=10, VERBOSE_LIMITEDLINEARUNDO=11, TREEUNDO=20};
 
   typedef std::map<UndoType, UndoModel::Pointer> UndoModelMap;
   typedef std::map<UndoType, UndoModel::Pointer>::iterator UndoModelMapIter;

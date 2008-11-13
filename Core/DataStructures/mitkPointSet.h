@@ -102,7 +102,7 @@ public:
   /**
    * \brief struct for data of a point
    */
-  typedef struct PointDataType 
+  struct PointDataType 
   {
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
@@ -117,7 +117,7 @@ public:
    */
   typedef std::vector<unsigned int> SelectedLinesType;
   typedef SelectedLinesType::iterator SelectedLinesIter;
-  typedef struct CellDataType 
+  struct CellDataType 
   {
     //used to set the whole cell on selected
     bool selected;

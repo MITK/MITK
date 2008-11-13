@@ -22,8 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataTreeFilter::Item;
-  
 //------ TreeFilterUpdateAllEvent --------------------------------------------------------
 
 itkEventMacro( TreeFilterUpdateAllEvent, itk::ModifiedEvent );

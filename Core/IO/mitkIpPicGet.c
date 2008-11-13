@@ -291,7 +291,7 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
     
   if ( bytes_read != number_of_bytes )
-    fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), bytes_read, feof(infile) );
+    fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), (long unsigned int)bytes_read, feof(infile) );
 
   /* convert to the new pic3 format */
 
@@ -618,7 +618,7 @@ MITKipPicGet( char *infile_name, ipPicDescriptor *pic )
     
   if ( bytes_read != number_of_bytes )
   {
-    fprintf( stderr, "Error while reading, only %lu bytes were read! Eof indicator is %u.\n", bytes_read, mitkIpPicFEOF(infile) );
+    fprintf( stderr, "Error while reading, only %lu bytes were read! Eof indicator is %u.\n", (long unsigned int)bytes_read, mitkIpPicFEOF(infile) );
 #ifndef USE_ZLIB
     fprintf( stderr, "(ferror indicates %u).\n", ferror(infile));    
 #endif

@@ -38,7 +38,7 @@ Key_ = Keys like in QT
 namespace mitk{
 
 //Constants for EventIds; use the according constant to through an event in the code
-typedef enum EEventIds
+enum EEventIds
 {
   EIDNULLEVENT = 0,
   EIDLEFTMOUSEBTN = 1,
@@ -137,7 +137,7 @@ typedef enum EEventIds
 
 //##Constants for Operations
 //## xomments are always examples of the usage
-typedef enum EOperations
+enum EOperations
 {
   OpNOTHING = 0,
   OpTEST = 1,
@@ -200,7 +200,7 @@ typedef enum EOperations
 //##within one statemachine the choice of the actionconstants is freely
 //##
 //## ActionId
-typedef enum EActions
+enum EActions
 {
   AcDONOTHING = 0,
   AcINITNEWOBJECT = 5,
@@ -359,7 +359,7 @@ typedef enum EActions
 */
 
 //Type of an Event;
-typedef enum EEventType
+enum EEventType
 {
   Type_None = 0,				// invalid event
   Type_Timer = 1,				// timer event
@@ -439,7 +439,7 @@ typedef enum EEventType
 //##ButtonState
 // mouse/keyboard state values
 //QT combinations if MOUSEBUTTONRelease: left MouseButton + ControlButton: 0x201
-typedef enum EButtonStates
+enum EButtonStates
 {
   BS_NoButton        = 0x0000,
   BS_LeftButton      = 0x0001,
@@ -454,7 +454,7 @@ typedef enum EButtonStates
   BS_Keypad          = 0x4000
 };
 //##Key
-typedef enum EKeys
+enum EKeys
 {
   Key_Escape = 0x1000,           // misc keys
   Key_Tab = 0x1001,

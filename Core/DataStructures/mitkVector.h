@@ -52,7 +52,7 @@ typedef vnl_quaternion<ScalarType> Quaternion;
 
 //##Documentation
 //##@brief enumeration of the type a point can be
-typedef enum PointSpecificationType
+enum PointSpecificationType
 {
   PTUNDEFINED = 0,
   PTSTART,

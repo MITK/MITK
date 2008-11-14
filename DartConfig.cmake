@@ -24,9 +24,8 @@ IF(USE_KITWARE_DARTBOARD)
 
     SET(CTEST_NIGHTLY_START_TIME "21:00 CET")
     SET (NIGHTLY_START_TIME "21:00:00 CET")	
-#
-#    SET (CVS_WEB_URL "http://mbi-srv/docs/programming/cvs/viewcvs/cgi/viewcvs.cgi/ip%2b%2b/")
-#    SET (DOXYGEN_URL "http://mbi-srv.inet.dkfz-heidelberg.de/docs/image_processing/mitk/doxygen/" )
+    
+    SET (DOXYGEN_URL "http://docs.mitk.org/nightly/" )
         
 ENDIF(USE_KITWARE_DARTBOARD)
 

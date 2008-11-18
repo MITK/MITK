@@ -36,6 +36,7 @@
 
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
+#include <mitkIDataStorageService.h>
 
 
 void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -44,19 +45,22 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls = new Ui::QmitkInteractiveSegmentationControls;
   m_Controls->setupUi(parent);
+  mitk::DataTree::Pointer dataTree;
+
+  mitk::IDataStorageService::Pointer service = 
+   cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  if (service.IsNotNull())
+  {
+    dataTree = service->GetDefaultDataStorage()->GetDataTree();
+  }
+  
   cherry::IEditorPart::Pointer editor =
       this->GetSite()->GetPage()->GetActiveEditor();
 
-  mitk::DataTree::Pointer dataTree;
-
-  if (editor.IsNotNull())
+  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
-    cherry::IEditorInput::Pointer input = editor->GetEditorInput();
-    if (input.Cast<mitk::DataStorageEditorInput>().IsNotNull())
-    {
-      mitk::IDataStorageReference::Pointer dataStorageRef = input.Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference();
-      dataTree = dataStorageRef->GetDataTree();
-    }
+    m_MultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
@@ -65,7 +69,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->lblAlignmentWarning->hide();
 
-  //m_Controls->m_ToolReferenceDataSelectionBox->Initialize( dataTree );
+  m_Controls->m_ToolReferenceDataSelectionBox->Initialize( dataTree );
 
   m_Controls->m_ToolWorkingDataSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_ToolWorkingDataSelectionBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
@@ -93,12 +97,13 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing");    // show only tools which are marked with "segmentationProcessing"
   m_Controls->m_PostProcessingToolSelectionBox->SetToolGUIArea( m_Controls->m_PostProcessingToolGUIContainer );
 
-  //m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
+  m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
 
   toolManager->NodePropertiesChanged += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNodePropertiesChanged );  // update e.g. the volume overview
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
   this->CreateConnections();
   this->Activated();
+
   /*QVBoxLayout* layout = new QVBoxLayout(parent);
   layout->setContentsMargins(0,0,0,0);
 

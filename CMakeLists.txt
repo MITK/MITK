@@ -147,6 +147,7 @@ ENDIF(BUILD_TESTING)
 
 IF(USE_QT)
   SET(QT_MT_REQUIRED 1)
+  SET(QT_USE_QT3SUPPORT 1)
   # setting this to 3 since Qt4 support is in a very early stage of 
   # development. If you want to use Qt4, please create an initial cache with
   # a line  
@@ -165,8 +166,9 @@ IF(USE_QT)
     SET(LIBS_FOR_QFUNCTIONALITY "Qmitk")
     SUBDIRS(Qmitk QFunctionalities QApplications)
   ELSE(DESIRED_QT_VERSION EQUAL 4)
+    INCLUDE(${QT_USE_FILE})
     SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk ${PROJECT_BINARY_DIR}/Q4mitk ${QT_INCLUDES})
-    FOREACH(dir QmitkModels QmitkPropertyObservers) 
+    FOREACH(dir QmitkApplicationBase QmitkModels QmitkPropertyObservers) 
       SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk/${dir})
     ENDFOREACH(dir)
     ADD_SUBDIRECTORY(Q4mitk)

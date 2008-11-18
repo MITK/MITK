@@ -1,0 +1,315 @@
+<ui version="4.0" >
+ <class>QmitkInteractiveSegmentationControls</class>
+ <widget class="QWidget" name="QmitkInteractiveSegmentationControls" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>352</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>QmitkInteractiveSegmentation</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="Q3GroupBox" name="grpReferenceData" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title" >
+      <string>Patient image</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QmitkToolReferenceDataSelectionBox" native="1" name="m_ToolReferenceDataSelectionBox" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QToolButton" name="btnReinit" >
+        <property name="toolTip" >
+         <string>Reorientate view on image</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset>
+          <normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image0</normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image0</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2" >
+       <widget class="QmitkToolGUIArea" native="1" name="m_AutoSegmentationToolGUIContainer" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2" >
+       <widget class="QmitkToolSelectionBox" native="1" name="m_AutoSegmentationToolSelectionBox" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QCheckBox" name="chkPixelSmoothing" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="toolTip" >
+         <string>Whether or not the pixels should be smoothed</string>
+        </property>
+        <property name="text" >
+         <string>Smooth pixels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QLabel" name="lblAlignmentWarning" >
+        <property name="toolTip" >
+         <string>Press the small button right of the selection box!</string>
+        </property>
+        <property name="text" >
+         <string>Image is not aligned!</string>
+        </property>
+        <property name="alignment" >
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap" >
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Q3GroupBox" name="groupBox3" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title" >
+      <string>Segmentations</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="1" column="1" >
+       <widget class="QToolButton" name="btnDeleteSegmentation" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="text" >
+         <string>Delete selected segmentations</string>
+        </property>
+        <property name="icon" >
+         <iconset>
+          <normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image1</normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image1</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QToolButton" name="btnNewSegmentation" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="text" >
+         <string>New segmentation</string>
+        </property>
+        <property name="icon" >
+         <iconset>
+          <normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image2</normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image2</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" >
+       <widget class="QToolButton" name="btnSaveSegmentation" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="toolTip" >
+         <string>Save segmentation to file</string>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="icon" >
+         <iconset>
+          <normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image3</normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image3</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QToolButton" name="btnLoadSegmentation" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="text" >
+         <string>Load segmentation from file</string>
+        </property>
+        <property name="icon" >
+         <iconset>
+          <normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image4</normaloff>../../../QFunctionalities/QmitkInteractiveSegmentation/image4</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4" >
+       <widget class="QmitkToolWorkingDataSelectionBox" native="1" name="m_ToolWorkingDataSelectionBox" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="4" >
+       <widget class="Line" name="line1" >
+        <property name="frameShape" >
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="4" >
+       <widget class="QmitkToolGUIArea" native="1" name="m_PostProcessingToolGUIContainer" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4" >
+       <widget class="QmitkToolSelectionBox" native="1" name="m_PostProcessingToolSelectionBox" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkToolSelectionBox" native="1" name="m_ToolSelectionBox" />
+   </item>
+   <item>
+    <widget class="QmitkToolGUIArea" native="1" name="m_ToolGUIContainer" >
+     <property name="font" >
+      <font/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Q3GroupBox" name="grpInterpolation" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title" >
+      <string>Interpolation</string>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="checked" >
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QmitkSlicesInterpolator" native="1" name="m_SlicesInterpolator" >
+        <property name="font" >
+         <font/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer2_2" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>120</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>Q3GroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>Qt3Support/Q3GroupBox</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolSelectionBox</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkToolSelectionBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSlicesInterpolator</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkSlicesInterpolator.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolReferenceDataSelectionBox</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkToolReferenceDataSelectionBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolGUIArea</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkToolGUIArea.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolWorkingDataSelectionBox</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkToolWorkingDataSelectionBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="local" >QmitkToolReferenceDataSelectionBox.h</include>
+  <include location="local" >QmitkToolGUIArea.h</include>
+  <include location="local" >QmitkToolSelectionBox.h</include>
+  <include location="local" >QmitkToolWorkingDataSelectionBox.h</include>
+  <include location="local" >QmitkToolGUIArea.h</include>
+  <include location="local" >QmitkToolSelectionBox.h</include>
+  <include location="local" >QmitkToolSelectionBox.h</include>
+  <include location="local" >QmitkToolGUIArea.h</include>
+  <include location="local" >QmitkSlicesInterpolator.h</include>
+ </includes>
+ <resources/>
+ <connections/>
+</ui>

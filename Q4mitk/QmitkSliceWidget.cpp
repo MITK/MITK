@@ -54,7 +54,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name, Qt::Window
 
   // create widget
   QString composedName("QmitkSliceWidget::");
-  if(this->objectName()!=0)
+  if(!this->objectName().isEmpty())
     composedName+=this->objectName();
   else
     composedName+="QmitkGLWidget";

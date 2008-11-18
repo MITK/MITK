@@ -1,5 +1,7 @@
 SET(CPP_FILES
 
+ QmitkApplicationBase/QmitkCommonFunctionality.cpp
+ 
  QmitkModels/QmitkDataStorageListModel.cpp
 
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
@@ -27,6 +29,7 @@ SET(CPP_FILES
  QmitkEventAdapter.cpp
  
  QmitkColorTransferFunctionCanvas.cpp
+ QmitkSlicesInterpolator.cpp
  QmitkStandardViews.cpp
  QmitkStepperAdapter.cpp
  QmitkLineEditLevelWindowWidget.cpp
@@ -41,13 +44,21 @@ SET(CPP_FILES
  QmitkSliceWidget.cpp
  QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
+ QmitkSelectableGLWidget.cpp
+ QmitkToolReferenceDataSelectionBox.cpp
+ QmitkToolGUIArea.cpp
+ QmitkToolWorkingDataSelectionBox.cpp
+ QmitkToolSelectionBox.cpp
+ #QmitkPropertyListPopup.cpp
+ QmitkToolGUI.cpp
+ QmitkNewSegmentationDialog.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
 
 
 SET(MOC_H_FILES
-
+ 
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyEditor.h
  QmitkPropertyObservers/QmitkBoolPropertyView.h
@@ -75,11 +86,20 @@ SET(MOC_H_FILES
  QmitkLevelWindowPresetDefinitionDialog.h
  QmitkLevelWindowWidgetContextMenu.h
  QmitkSliceWidget.h
+ QmitkSlicesInterpolator.h
  QmitkStdMultiWidget.h
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h
+ QmitkToolGUIArea.h
+ QmitkToolGUI.h
+ QmitkToolReferenceDataSelectionBox.h  
+ QmitkToolSelectionBox.h  
+ QmitkToolWorkingDataSelectionBox.h  
+ QmitkSelectableGLWidget.h  
+ QmitkSlicesInterpolator.h
+ QmitkNewSegmentationDialog.h
 )
 
 SET(UI_FILES
@@ -90,4 +110,5 @@ SET(UI_FILES
   QmitkSliceWidget.ui
   QmitkStdMultiWidget.ui
   QmitkTransferFunctionWidget.ui
+  QmitkSelectableGLWidget.ui
 )

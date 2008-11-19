@@ -186,7 +186,7 @@
     <variable>int m_Layout;</variable>
     <variable>mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;</variable>
     <variable>mitk::DataTreeIteratorClone planesIterator;</variable>
-    <variable>mitk::SliceNavigationController::Pointer timeNavigationController;</variable>
+    <variable>mitk::SliceNavigationController::Pointer m_TimeNavigationController;</variable>
     <variable>mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;</variable>
     <variable>mitk::PositionTracker::Pointer m_PositionTracker;</variable>
     <variable>mitk::DataTreeNode::Pointer m_PositionTrackerNode;</variable>

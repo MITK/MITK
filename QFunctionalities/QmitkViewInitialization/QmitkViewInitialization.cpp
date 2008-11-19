@@ -94,7 +94,7 @@ void QmitkViewInitialization::Apply()
   vtkRenderWindow* renderwindow = m_Controls->m_RenderWindowSelector->GetSelectedRenderWindow();
   if(renderwindow != NULL)
   {
-    mitk::BaseRenderer::GetInstance(renderwindow)->GetSliceNavigationController()->Update(viewDirection, 
+    dynamic_cast<mitk::SliceNavigationController*>(mitk::BaseRenderer::GetInstance(renderwindow)->GetNavigationController())->Update(viewDirection, 
       m_Controls->cbTop->isChecked(), 
       m_Controls->cbFrontSide->isChecked(), 
       m_Controls->cbRotated->isChecked()

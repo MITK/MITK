@@ -181,7 +181,7 @@ public:
 
   /** Sets the (global) SliceNavigationController responsible for
    * time-slicing. */
-  void SetTimeNavigationController( SliceNavigationController *snc );
+  void SetTimeNavigationController( SliceNavigationController *nc );
 
   /** Gets the (global) SliceNavigationController responsible for
    * time-slicing. */

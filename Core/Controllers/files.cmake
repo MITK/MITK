@@ -10,6 +10,8 @@ SET(CPP_FILES
   mitkProgressBar.cpp
   mitkRenderingManager.cpp
   mitkSegmentationInterpolationController.cpp
+  mitkNavigationController.cpp
+  mitkPointNavigationController.cpp
   mitkSliceNavigationController.cpp
   mitkSlicesCoordinator.cpp
   mitkSlicesRotator.cpp
@@ -31,4 +33,3 @@ ENDIF(WIN32)
 IF(MITK_USE_TD_MOUSE)
   SET(CPP_FILES ${CPP_FILES}  mitkTDMouseVtkCameraController.cpp)
 ENDIF(MITK_USE_TD_MOUSE)
-

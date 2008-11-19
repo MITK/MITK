@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkPropRenderer.h"
 #include "vtkMitkRenderProp.h"
-#include "mitkSliceNavigationController.h"
+#include "mitkNavigationController.h"
 #include "mitkCameraRotationController.h"
 
 /**
@@ -43,7 +43,7 @@ public:
 
   void InitRenderer();
   
-  virtual mitk::SliceNavigationController * GetSliceNavigationController(); 
+  virtual mitk::NavigationController * GetNavigationController(); 
   virtual mitk::CameraRotationController * GetCameraRotationController();
   virtual mitk::BaseController * GetController();
   virtual mitk::VtkPropRenderer* GetRenderer();
@@ -65,6 +65,9 @@ public:
    * If you don't want this behaviour, call SetResendQtEvents(true) on your render window.
    */
   virtual void SetResendQtEvents(bool resend);
+
+signals: 
+  //void WheelScrolled();
   
 protected:    
   

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 class SliceNavigationController;
+class NavigationController;
 
 /** \brief Describes the geometry of a data object consisting of slices.
  *
@@ -143,9 +144,9 @@ public:
    * The SNC needs to be informed when the number of slices in the geometry
    * changes, which can occur whenthe slices are re-oriented by rotation.
    */
-  virtual void SetSliceNavigationController(
-    mitk::SliceNavigationController *snc );
-  mitk::SliceNavigationController *GetSliceNavigationController();
+  virtual void SetNavigationController(
+    mitk::NavigationController *nc );
+  mitk::NavigationController *GetNavigationController();
 
   /**
    * \brief Set/Get whether the SlicedGeometry3D is evenly-spaced
@@ -324,6 +325,7 @@ protected:
 
   /** SNC correcsponding to this geometry; used to reflect changes in the
    * number of slices due to rotation. */
+  mitk::NavigationController *m_NavigationController;
   mitk::SliceNavigationController *m_SliceNavigationController;
 };
 

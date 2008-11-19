@@ -312,7 +312,7 @@ bool SlicesSwiveller
         const PlaneGeometry *planeGeometry = (*iter)->GetCurrentPlaneGeometry();
         if ( !planeGeometry ) continue;
 
-        if ( *iter == renderer->GetSliceNavigationController() )
+        if ( *iter == renderer->GetNavigationController() )
         {
           clickedGeometry = planeGeometry;
           m_SNCsToBeRotated.push_back(*iter);

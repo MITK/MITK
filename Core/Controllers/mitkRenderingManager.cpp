@@ -344,9 +344,10 @@ RenderingManager
     mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( it->first );
     int id = baseRenderer->GetMapperID();
-    if ( (type == REQUEST_UPDATE_ALL)
+    if ( ((type == REQUEST_UPDATE_ALL)
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2))) 
+      )
     {
       this->InternalViewInitialization( baseRenderer, geometry,
         boundingBoxInitialized, id );
@@ -388,14 +389,16 @@ RenderingManager
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
-      mitk::SliceNavigationController *snc =
-        baseRenderer->GetSliceNavigationController();
+
+      mitk::NavigationController *nc =
+
+      baseRenderer->GetNavigationController();
 
       // Re-initialize view direction
-      snc->SetViewDirectionToDefault();
+      nc->SetViewDirectionToDefault();
 
       // Update the SNC
-      snc->Update();
+      nc->Update();
     }
   }
 
@@ -492,14 +495,14 @@ RenderingManager
   mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( renderWindow );
 
-  mitk::SliceNavigationController *snc =
-    baseRenderer->GetSliceNavigationController();
+  mitk::NavigationController *nc =
+    baseRenderer->GetNavigationController();
 
   // Re-initialize view direction
-  snc->SetViewDirectionToDefault();
+  nc->SetViewDirectionToDefault();
 
   // Update the SNC
-  snc->Update();
+  nc->Update();
 
   this->RequestUpdate( renderWindow );
 
@@ -512,23 +515,23 @@ RenderingManager
   mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
   bool boundingBoxInitialized, int mapperID )
 {
-  mitk::SliceNavigationController *snc =
-    baseRenderer->GetSliceNavigationController();
+  mitk::NavigationController *nc =
+    baseRenderer->GetNavigationController();
 
   // Re-initialize view direction
-  snc->SetViewDirectionToDefault();
+  nc->SetViewDirectionToDefault();
 
   if ( boundingBoxInitialized )
   {
-    // Set geometry for SNC
-    snc->SetInputWorldGeometry( geometry );
-    snc->Update();
+    // Set geometry for NC
+    nc->SetInputWorldGeometry( geometry );
+    nc->Update();
 
     if ( mapperID == 1 )
     {
       // For 2D SNCs, steppers are set so that the cross is centered
       // in the image
-      snc->GetSlice()->SetPos( snc->GetSlice()->GetSteps() / 2 );
+      nc->GetSlice()->SetPos( nc->GetSlice()->GetSteps() / 2 );
     }
 
     // Fit the render window DisplayGeometry
@@ -536,20 +539,26 @@ RenderingManager
 
     vtkRenderer *renderer = baseRenderer->GetVtkRenderer();
 
-    if ( renderer != NULL ) renderer->ResetCamera();
+    /*
+      the LocalizerWidget's camera must not be resetted, because it's interaction is disabled and the cameraposition cannot be changed manually
+    */
+    if ( (std::string) renderer->GetRenderWindow()->GetWindowName() != "LocalizerRenderWindow")
+    {
+      if ( renderer != NULL ) renderer->ResetCamera();
+    }
   }
   else
   {
-    snc->Update();
+    nc->Update();
   }
 }
 
 
 void
 RenderingManager
-::SetTimeNavigationController( SliceNavigationController *snc )
+::SetTimeNavigationController( SliceNavigationController *nc )
 {
-  m_TimeNavigationController = snc;
+  m_TimeNavigationController = nc;
 }
 
 

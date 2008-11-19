@@ -81,7 +81,10 @@ int main(int argc, char* argv[])
   mitk::RenderingManager::GetInstance()->InitializeViews( mitk::DataStorage::GetInstance() );
 
   // Select a slice
-  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 0 );
+  mitk::SliceNavigationController::Pointer sliceNaviController = dynamic_cast<mitk::SliceNavigationController*>(renderWindow.GetNavigationController());
+  if (sliceNaviController)
+    sliceNaviController->GetSlice()->SetPos( 0 );
+
 
   //*************************************************************************
   // Part V: Qt-specific initialization

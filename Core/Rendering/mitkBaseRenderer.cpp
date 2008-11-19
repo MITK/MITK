@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Controllers
 #include "mitkCameraController.h"
-#include "mitkSliceNavigationController.h"
+#include "mitkNavigationController.h"
 #include "mitkCameraRotationController.h"
 #include "mitkVtkInteractorCameraController.h"
 
@@ -178,11 +178,12 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();
 
 
-  m_SliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
-  m_SliceNavigationController->SetRenderer( this );
-  m_SliceNavigationController->ConnectGeometrySliceEvent( this );
-  m_SliceNavigationController->ConnectGeometryUpdateEvent( this );
-  m_SliceNavigationController->ConnectGeometryTimeEvent( this, false );
+  mitk::SliceNavigationController::Pointer sliceNavigationController = mitk::SliceNavigationController::New( "navigation" );
+  sliceNavigationController->SetRenderer( this );
+  sliceNavigationController->ConnectGeometrySliceEvent( this );
+  sliceNavigationController->ConnectGeometryUpdateEvent( this );
+  sliceNavigationController->ConnectGeometryTimeEvent( this, false );
+  m_NavigationController = sliceNavigationController;
 
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow( m_RenderWindow );
@@ -668,6 +669,36 @@ unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
   return m_NumberOfVisibleLODEnabledMappers;
 }
 
+/*!
+Sets the new Navigation controller 
+*/
+void mitk::BaseRenderer::SetNavigationController(mitk::NavigationController *navigationController)
+{
+  if (navigationController == NULL)
+    return;
+
+  //disconnect old from globalinteraction
+  mitk::GlobalInteraction::GetInstance()->RemoveListener(m_NavigationController);
+  
+  //copy worldgeometry
+  navigationController->SetInputWorldGeometry( m_NavigationController->GetCreatedWorldGeometry() );
+  navigationController->Update();
+
+    
+  //set new 
+  m_NavigationController = navigationController;
+  m_NavigationController->SetRenderer( this );
+  
+  mitk::SliceNavigationController::Pointer controller = dynamic_cast<mitk::SliceNavigationController*>(navigationController);
+  if (controller)
+  {  
+    controller->ConnectGeometrySliceEvent( this );
+    controller->ConnectGeometryUpdateEvent( this );
+    controller->ConnectGeometryTimeEvent( this, false );
+  }
+
+ 
+}
 
 
 /*!

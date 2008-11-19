@@ -85,13 +85,13 @@ void QmitkStdMultiWidget::init()
   m_PlaneMode = PLANE_MODE_SLICING;
 
   // Set default view directions for SNCs
-  mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
+  mitkWidget1->GetNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Transversal );
-  mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
+  mitkWidget2->GetNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Sagittal );
-  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
+  mitkWidget3->GetNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Frontal );
-  mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
+  mitkWidget4->GetNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
 
   // create a slice rotator
@@ -99,49 +99,49 @@ void QmitkStdMultiWidget::init()
   // @TODO next line causes sure memory leak
   // rotator will be created nonetheless (will be switched on and off)
   m_SlicesRotator = mitk::SlicesRotator::New("slices-rotator");
-  m_SlicesRotator->AddSliceController( 
-    mitkWidget1->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController( 
-    mitkWidget2->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController(
-    mitkWidget3->GetSliceNavigationController() );
+  m_SlicesRotator->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget1->GetNavigationController() ));
+  m_SlicesRotator->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget2->GetNavigationController() ));
+  m_SlicesRotator->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget3->GetNavigationController() ));
 
   // create a slice swiveller (using the same state-machine as SlicesRotator)
   m_SlicesSwiveller = mitk::SlicesSwiveller::New("slices-rotator");
-  m_SlicesSwiveller->AddSliceController( 
-    mitkWidget1->GetSliceNavigationController() );
-  m_SlicesSwiveller->AddSliceController( 
-    mitkWidget2->GetSliceNavigationController() );
-  m_SlicesSwiveller->AddSliceController(
-    mitkWidget3->GetSliceNavigationController() );
+  m_SlicesSwiveller->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget1->GetNavigationController() ));
+  m_SlicesSwiveller->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget2->GetNavigationController() ));
+  m_SlicesSwiveller->AddSliceController( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget3->GetNavigationController() ));
 
   //initialize timeNavigationController: send time via sliceNavigationControllers
-  timeNavigationController = mitk::SliceNavigationController::New(NULL);
-  timeNavigationController->ConnectGeometryTimeEvent(
-    mitkWidget1->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(
-    mitkWidget2->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(
-    mitkWidget3->GetSliceNavigationController(), false);
-  timeNavigationController->ConnectGeometryTimeEvent(
-    mitkWidget4->GetSliceNavigationController(), false);
-  mitkWidget1->GetSliceNavigationController()
+  m_TimeNavigationController = mitk::SliceNavigationController::New(NULL);
+  m_TimeNavigationController->ConnectGeometryTimeEvent( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget1->GetNavigationController() ), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget2->GetNavigationController() ), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget3->GetNavigationController() ), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent( dynamic_cast<mitk::SliceNavigationController*>(
+    mitkWidget4->GetNavigationController() ), false);
+  dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController())
     ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
   // Set TimeNavigationController to RenderingManager 
   // (which uses it internally for views initialization!)
   mitk::RenderingManager::GetInstance()->SetTimeNavigationController(
-    timeNavigationController );
+    m_TimeNavigationController);
 
   //reverse connection between sliceNavigationControllers and timeNavigationController
-  mitkWidget1->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget2->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget3->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
-  mitkWidget4->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(timeNavigationController.GetPointer(), false);
+  dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController())
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+ dynamic_cast<mitk::SliceNavigationController*>(mitkWidget2->GetNavigationController())
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+  dynamic_cast<mitk::SliceNavigationController*>(mitkWidget3->GetNavigationController())
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
+  dynamic_cast<mitk::SliceNavigationController*>(mitkWidget4->GetNavigationController())
+    ->ConnectGeometryTimeEvent(m_TimeNavigationController.GetPointer(), false);
 
   // instantiate display interactor
   m_MoveAndZoomInteractor = mitk::DisplayVectorInteractor::New(
@@ -713,7 +713,7 @@ void QmitkStdMultiWidget
 mitk::SliceNavigationController* 
 QmitkStdMultiWidget::GetTimeNavigationController()
 {
-  return timeNavigationController.GetPointer();
+  return m_TimeNavigationController.GetPointer();
 }
 
 
@@ -806,11 +806,11 @@ const mitk::Point3D
 QmitkStdMultiWidget::GetCrossPosition() const
 {
   const mitk::PlaneGeometry *plane1 = 
-    mitkWidget1->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController())->GetCurrentPlaneGeometry();
   const mitk::PlaneGeometry *plane2 = 
-    mitkWidget2->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget2->GetNavigationController())->GetCurrentPlaneGeometry();
   const mitk::PlaneGeometry *plane3 = 
-    mitkWidget3->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget3->GetNavigationController())->GetCurrentPlaneGeometry();
 
   mitk::Line3D line;
   if ( (plane1 != NULL) && (plane2 != NULL)
@@ -909,15 +909,15 @@ void QmitkStdMultiWidget::MoveCrossToPosition(
   {
   default:
   case PLANE_MODE_SLICING:
-    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent );
-    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent );
-    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent );
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController())->HandleEvent( &stateEvent );
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget2->GetNavigationController())->HandleEvent( &stateEvent );
+    dynamic_cast<mitk::SliceNavigationController*>(mitkWidget3->GetNavigationController())->HandleEvent( &stateEvent );
     
     // just in case SNCs will develop something that depends on the mouse
     // button being released again
-    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
+   dynamic_cast<mitk::SliceNavigationController*> (mitkWidget1->GetNavigationController())->HandleEvent( &stateEvent2 );
+   dynamic_cast<mitk::SliceNavigationController*> (mitkWidget2->GetNavigationController())->HandleEvent( &stateEvent2 );
+   dynamic_cast<mitk::SliceNavigationController*> (mitkWidget3->GetNavigationController())->HandleEvent( &stateEvent2 );
     break;
 
   case PLANE_MODE_ROTATION:
@@ -959,10 +959,10 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
   {
   default:
   case PLANE_MODE_SLICING:
-    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
+    gi->AddListener( mitkWidget1->GetNavigationController() );
+    gi->AddListener( mitkWidget2->GetNavigationController() );
+    gi->AddListener( mitkWidget3->GetNavigationController() );
+    gi->AddListener( mitkWidget4->GetNavigationController() );
     break;
 
   case PLANE_MODE_ROTATION:
@@ -974,7 +974,7 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
     break;
   }
 
-  gi->AddListener( timeNavigationController );
+  gi->AddListener( m_TimeNavigationController );
 }
 
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
@@ -986,10 +986,10 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
   {
   default:
   case PLANE_MODE_SLICING:
-    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+    gi->RemoveListener( mitkWidget1->GetNavigationController() );
+    gi->RemoveListener( mitkWidget2->GetNavigationController() );
+    gi->RemoveListener( mitkWidget3->GetNavigationController() );
+    gi->RemoveListener( mitkWidget4->GetNavigationController() );
     break;
 
   case PLANE_MODE_ROTATION:
@@ -1001,7 +1001,7 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
     break;
   }
 
-  gi->RemoveListener( timeNavigationController );
+  gi->RemoveListener( m_TimeNavigationController );
 }
 
 int QmitkStdMultiWidget::GetLayout() const
@@ -1079,9 +1079,9 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility( bool visible, mitk::BaseRen
 void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
 {
   //do your job and lock or unlock slices.
-  GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(locked);
-  GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(locked);
-  GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow1()->GetNavigationController())->SetSliceLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow2()->GetNavigationController())->SetSliceLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow3()->GetNavigationController())->SetSliceLocked(locked);
   
   emit WidgetPlanesLockedChanged(locked);
 }
@@ -1089,9 +1089,9 @@ void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
 {
   //do your job and lock or unlock slices.
-  GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-  GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-  GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow1()->GetNavigationController())->SetSliceRotationLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow2()->GetNavigationController())->SetSliceRotationLocked(locked);
+  dynamic_cast<mitk::SliceNavigationController*>(GetRenderWindow3()->GetNavigationController())->SetSliceRotationLocked(locked);
 
   emit WidgetPlanesRotationLockedChanged(locked);
 }
@@ -1121,10 +1121,10 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     // Notify MainTemplate GUI that this mode has been deselected
     emit WidgetPlaneModeSlicing( false );
 
-    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
+    gi->RemoveListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController()) );
+    gi->RemoveListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget2->GetNavigationController()) );
+    gi->RemoveListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget3->GetNavigationController()) );
+    gi->RemoveListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget4->GetNavigationController()) );
     break;
 
   case PLANE_MODE_ROTATION:
@@ -1154,10 +1154,10 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     emit WidgetPlaneModeSlicing( true );
 
     // Add listeners
-    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
+    gi->AddListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget1->GetNavigationController()) );
+    gi->AddListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget2->GetNavigationController()) );
+    gi->AddListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget3->GetNavigationController()) );
+    gi->AddListener( dynamic_cast<mitk::SliceNavigationController*>(mitkWidget4->GetNavigationController()) );
 
     mitk::RenderingManager::GetInstance()->InitializeViews();
     break;

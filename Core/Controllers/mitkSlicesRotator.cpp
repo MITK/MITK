@@ -484,7 +484,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
           ++numNearPlanes; // count this one as a plane near to the cursor
         }
        
-        if ( *iter == renderer->GetSliceNavigationController() ) // don't rotate the one where the user clicked
+        if ( *iter == renderer->GetNavigationController() ) // don't rotate the one where the user clicked
         {
           clickedGeometry = geometry2D;
           clickedSlicedGeometry = const_cast<SlicedGeometry3D*>(slicedGeometry);

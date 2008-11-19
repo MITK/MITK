@@ -97,11 +97,11 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
 
     if (m_MultiWidget)
     {
-      mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+      mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget1->GetNavigationController());
       slicer->RemoveObserver( TSliceObserverTag );
-      slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+      slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget2->GetNavigationController());
       slicer->RemoveObserver( SSliceObserverTag );
-      slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+      slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget3->GetNavigationController());
       slicer->RemoveObserver( FSliceObserverTag );
     }
 
@@ -120,7 +120,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+  mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget1->GetNavigationController());
   m_TimeStep.resize(3);
   m_TimeStep[2] = slicer->GetTime()->GetPos();
   {
@@ -136,7 +136,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   }
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+  slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget2->GetNavigationController());
   m_TimeStep[0] = slicer->GetTime()->GetPos();
   {
   itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
@@ -151,7 +151,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   }
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+  slicer = dynamic_cast<mitk::SliceNavigationController*>(m_MultiWidget->mitkWidget3->GetNavigationController());
   m_TimeStep[1] = slicer->GetTime()->GetPos();
   {
   itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();

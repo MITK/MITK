@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEventTypedefs.h"
 
 #include "mitkSliceNavigationController.h"
+#include "mitkNavigationController.h"
 #include "mitkCameraController.h"
 #include "mitkCameraRotationController.h"
 
@@ -40,6 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+class NavigationController;
 class SliceNavigationController;
 class CameraRotationController;
 class CameraController;
@@ -298,9 +300,10 @@ public:
 
   itkGetMacro(Size, int*);
 
+  void SetNavigationController(NavigationController* navigationController);
   void SetCameraController(CameraController* cameraController);
   itkGetObjectMacro(CameraController, CameraController);
-  itkGetObjectMacro(SliceNavigationController, SliceNavigationController);
+  itkGetObjectMacro(NavigationController, NavigationController);
   itkGetObjectMacro(CameraRotationController, CameraRotationController);
 
   itkGetMacro(EmptyWorldGeometry, bool);
@@ -385,7 +388,7 @@ protected:
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
   CameraController::Pointer           m_CameraController;
-  SliceNavigationController::Pointer  m_SliceNavigationController;
+  NavigationController::Pointer       m_NavigationController;
   CameraRotationController::Pointer   m_CameraRotationController;
 
 

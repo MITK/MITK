@@ -485,17 +485,11 @@ void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
   node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
-  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
-  node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite );
-  node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite );
-  node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite );
-  node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite );
-
-  //node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
-  //node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
-  //node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
-  //node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
-  //node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
+  node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points 
+  node->AddProperty( "show distances", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide distance measure (not always available)
+  node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown
+  node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide angle measurement (not always available)
+  node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite ); //show the line between to points from a distant view (equals "always on top" option)
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

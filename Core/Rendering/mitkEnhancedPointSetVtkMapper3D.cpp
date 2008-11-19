@@ -66,7 +66,7 @@ mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
   // Clean up all remaining actors and poly-data sources
   //std::for_each(m_PointActors.begin(), m_PointActors.end(), &mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject);
 
-//  std::for_each(m_SphereSources.begin(), m_SphereSources.end(), &mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject);
+//  std::for_each(m_SphereSources.begin(), m_SphereSources.end(), &mitk::EnhancedPointSetVtgkMapper3D::DeleteVtkObject);
 //  std::for_each(m_CubeSources.begin(), m_CubeSources.end(), &mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject);
 //  std::for_each(m_ConeSources.begin(), m_ConeSources.end(), &mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject);
 //  std::for_each(m_CylinderSources.begin(), m_CylinderSources.end(), &mitk::EnhancedPointSetVtkMapper3D::DeleteVtkObject);
@@ -104,7 +104,9 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       this->RemoveEntryFromSourceMaps(id);
       if (it->second.first != NULL)
         it->second.first->Delete(); // Delete actor, which deletes mapper too (reference count)
-      it = m_PointActors.erase(it); // erase element from map, get pointer to following element  // TODO: does this compile everywhere? standard return value of erase seems to be void!
+      ActorMap::iterator er = it;
+      ++it;
+      m_PointActors.erase(er); // erase element from map, get pointer to following element
     }
     else
       ++it;

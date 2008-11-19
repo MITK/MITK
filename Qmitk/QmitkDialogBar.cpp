@@ -99,7 +99,16 @@ QmitkDialogBar
     m_GlobalOptions->SetProperty( 
       dialogBarStateName, mitk::BoolProperty::New( visible ) );
   }
+  if (visible)
+  {
+    Activated();
+  }
+  else 
+  {
+    Deactivated();
+  }
 }
+
 
 const std::string &
 QmitkDialogBar
@@ -120,4 +129,16 @@ QmitkDialogBar
 ::SetGlobalOptions( mitk::PropertyList::Pointer options )
 {
   m_GlobalOptions = options;
+}
+
+void QmitkDialogBar::Activated()
+{
+}
+
+void QmitkDialogBar::Deactivated()
+{
+}
+
+void QmitkDialogBar::TreeChanged()
+{
 }

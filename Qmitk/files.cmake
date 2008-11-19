@@ -24,6 +24,7 @@ SET(CPP_FILES
   QmitkDialogBars/QmitkSliderDialogBar.cpp
   QmitkDialogBars/QmitkStandardViewsDialogBar.cpp
   QmitkDialogBars/QmitkStereoOptionsDialogBar.cpp
+  QmitkDialogBars/QmitkLocalizerDialogBar.cpp
   QmitkFctCompMediator.cpp
   QmitkFunctionalityComponentContainer.cpp
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
@@ -46,8 +47,8 @@ SET(CPP_FILES
   QmitkPiecewiseFunctionCanvas.cpp
   QmitkPluginListViewItem.cpp
   QmitkProgressBar.cpp
-  QmitkPropertyListPopup.cpp           
-  QmitkPropertyListPopupProvider.cpp           
+  QmitkPropertyListPopup.cpp
+  QmitkPropertyListPopupProvider.cpp
   QmitkPropertyListViewItem.cpp
   QmitkPropertyListViewItemFactory.cpp
   QmitkPropertyObservers/PropertyViewTestWidget.cpp
@@ -148,6 +149,7 @@ SET(MOC_H_FILES
   QmitkDialogBars/QmitkSliderDialogBar.h
   QmitkDialogBars/QmitkStandardViewsDialogBar.h
   QmitkDialogBars/QmitkStereoOptionsDialogBar.h
+  QmitkDialogBars/QmitkLocalizerDialogBar.h
   QmitkFctCompMediator.h
   QmitkFunctionalityComponentContainer.h
   QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
@@ -169,7 +171,7 @@ SET(MOC_H_FILES
   QmitkNewSegmentationDialog.h
   QmitkPiecewiseFunctionCanvas.h
   QmitkProgressBar.h
-  QmitkPropertyListPopup.h           
+  QmitkPropertyListPopup.h
   QmitkPropertyListViewItem.h
   QmitkPropertyObservers/PropertyViewTestWidget.h
   QmitkPropertyObservers/QmitkBasePropertyView.h

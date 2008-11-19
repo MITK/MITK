@@ -76,11 +76,20 @@ public:
 
   void SetGlobalOptions( mitk::PropertyList::Pointer options );
 
+  void Activated();
+
+  void Deactivated();
+
+  virtual void TreeChanged();
+
 public slots:
   virtual void ToggleVisible( bool on );
 
+  
+
 protected:
   virtual QWidget *CreateDialogBar( QWidget *parent ) = 0;
+
 
   QGroupBox *m_GroupBox;
 

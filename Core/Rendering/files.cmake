@@ -6,6 +6,7 @@ SET(CPP_FILES
   mitkContourSetMapper2D.cpp
   mitkContourSetVtkMapper3D.cpp
   mitkContourVtkMapper3D.cpp
+  mitkEnhancedPointSetVtkMapper3D.cpp
   mitkGeometry2DDataMapper2D.cpp
   mitkGeometry2DDataVtkMapper3D.cpp
   mitkGLMapper2D.cpp
@@ -20,7 +21,7 @@ SET(CPP_FILES
   mitkMapper.cpp
   mitkMeshMapper2D.cpp
   mitkMeshVtkMapper3D.cpp
-  mitkNativeRenderWindowInteractor.cpp
+  mitkNativeRenderWindowInteractor.cpp  
   mitkPointDataVtkMapper3D.cpp
   mitkPointSetMapper2D.cpp
   mitkPointSetSliceMapper2D.cpp

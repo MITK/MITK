@@ -238,7 +238,7 @@ protected:
   bool m_DecimateFlag;
 
 
-mitk::DataTreeNode::Pointer getSurfaceNode();
+mitk::DataTreeNode::Pointer GetSurfaceNode();
 
 
 private:

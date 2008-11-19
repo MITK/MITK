@@ -741,10 +741,10 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
     m_MultiWidget->RequestUpdate();
 }
 
-mitk::DataTreeNode::Pointer QmitkSurfaceCreatorComponent::getSurfaceNode()
+mitk::DataTreeNode::Pointer QmitkSurfaceCreatorComponent::GetSurfaceNode()
 {
   return m_SurfaceNode;
-}//end of getSurfaceNode()
+}//end of GetSurfaceNode()
 
 //*****************************************SHOW SURFACE CONTUR******************************
 //
@@ -752,18 +752,18 @@ void QmitkSurfaceCreatorComponent::ShowSurfaceContour()
 {  
   if(m_SurfaceCreatorComponentGUI->GetShowSurfaceContourCheckBox()->isChecked() == true)
   {
-    if(getSurfaceNode())
+    if(GetSurfaceNode())
     {
-      getSurfaceNode()->SetVisibility(true);
+      GetSurfaceNode()->SetVisibility(true);
     }
   }
 
   if(m_SurfaceCreatorComponentGUI->GetShowSurfaceContourCheckBox()->isChecked()== false)
   {
-    if(getSurfaceNode())
+    if(GetSurfaceNode())
     {
-      getSurfaceNode()->SetVisibility(false, NULL);
-      getSurfaceNode()->SetVisibility( true, mitk::BaseRenderer::GetInstance( m_MultiWidget->mitkWidget4->GetRenderWindow() ) );
+      GetSurfaceNode()->SetVisibility(false, NULL);
+      GetSurfaceNode()->SetVisibility( true, mitk::BaseRenderer::GetInstance( m_MultiWidget->mitkWidget4->GetRenderWindow() ) );
     }
   }
   m_MultiWidget->RequestUpdate();

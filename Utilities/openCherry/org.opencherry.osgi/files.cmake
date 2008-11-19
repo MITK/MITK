@@ -30,11 +30,13 @@ SET(CPP_FILES
   manifest.cpp
   cherryIBundleManifest.cpp
   cherryBundleLoader.cpp
+  cherryDebugUtil.cpp
   cherryObject.cpp
   cherryObjects.cpp
   cherryPlatform.cpp
   cherryPlatformException.cpp
   cherryPlugin.cpp
+  cherryStackTrace.cpp
   
   # application
   application/cherryIApplication.cpp

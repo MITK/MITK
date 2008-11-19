@@ -30,6 +30,11 @@ void EmptyTabItem::SetInfo(const PartInfo& info)
 
 }
 
+void EmptyTabItem::Dispose()
+{
+
+}
+
 Object::Pointer EmptyTabItem::GetData()
 {
   return 0;

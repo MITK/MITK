@@ -22,6 +22,8 @@
 #include "cherryEditorSashContainer.h"
 #include "cherryDragUtil.h"
 
+#include <cherryDebugUtil.h>
+
 #include <Poco/RegularExpression.h>
 
 namespace cherry
@@ -836,7 +838,15 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
         {
           std::cout << "Calling remove of parent container\n";
           parentContainer->Remove(parent);
-          std::cout << "container ref count: " << oldContainer->GetReferenceCount() << ", part ref count: " << part->GetReferenceCount() << std::endl;
+          parent->Print(std::cout);
+#if defined(CHERRY_DEBUG_SMARTPOINTER)
+          std::cout << "Parent container traceid: " << parent->GetTraceId() << std::endl;
+          std::list<int> knownIDs;
+          //knownIDs.push_back(oldContainer.GetId());
+          //knownIDs.push_back(parent.GetId());
+          DebugUtil::PrintSmartPointerIDs(oldContainer.GetPointer(), std::cout, knownIDs);
+          std::cout << "Known pointer: " << oldContainer.GetId() << ", " << parent.GetId() << std::endl;
+#endif
           //parent->Dispose();
         }
       }

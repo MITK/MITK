@@ -3047,6 +3047,8 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
     //    UIStats.end(UIStats.ACTIVATE_PART, blame, label);
     throw e;
   }
+
+  partBeingActivated = 0;
 }
 
 void WorkbenchPage::SetEditorAreaVisible(bool showEditorArea)

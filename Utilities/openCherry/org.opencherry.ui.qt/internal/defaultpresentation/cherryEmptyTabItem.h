@@ -36,6 +36,11 @@ struct EmptyTabItem : public AbstractTabItem {
     void SetInfo(const PartInfo& info);
 
     /* (non-Javadoc)
+     * @see AbstractTabItem#Dispose()
+     */
+    void Dispose();
+
+    /* (non-Javadoc)
      * @see org.opencherry.ui.internal.presentations.util.AbstractTabItem#getData()
      */
     Object::Pointer GetData();

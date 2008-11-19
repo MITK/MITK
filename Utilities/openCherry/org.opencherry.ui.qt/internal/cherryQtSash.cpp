@@ -37,6 +37,11 @@ QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool opaque) :
     this->setCursor(Qt::SplitHCursor);
 }
 
+QtSash::~QtSash()
+{
+  std::cout << "DELETING Sash Widget\n";
+}
+
 void QtSash::AddSelectionListener(GuiTk::ISelectionListener::Pointer listener)
 {
   selectionEvents.AddListener(listener);

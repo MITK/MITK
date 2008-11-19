@@ -31,6 +31,7 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
 #include <cherryObjects.h>
+#include <cherryDebugUtil.h>
 #include <sstream>
 
 namespace cherry
@@ -209,6 +210,8 @@ PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
   this->SetID(buf.str());
 
   presentationSite = new MyStackPresentationSite(this);
+
+  DebugUtil::TraceObject(this);
 }
 
 bool PartStack::IsMoveable(IPresentablePart::Pointer part)
@@ -690,7 +693,7 @@ PartStack::~PartStack()
   presentationCurrent = 0;
   current = 0;
   this->Register(); // need to increment the reference count
-  // so the PartStack is not deleted recursively because of 
+  // so the PartStack is not deleted recursively because of
   // the creation/desctruction of temporary SmartPointers
   this->FireInternalPropertyChange(PROP_SELECTION);
   this->m_ReferenceCount -= 1;

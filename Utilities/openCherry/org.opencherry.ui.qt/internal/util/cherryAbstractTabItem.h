@@ -32,6 +32,7 @@ struct AbstractTabItem {
 
     virtual QRect GetBounds() = 0;
     virtual void SetInfo(const PartInfo& info) = 0;
+    virtual void Dispose() = 0;
 
     virtual void SetBusy(bool busy) {}
     virtual void SetBold(bool bold) {}

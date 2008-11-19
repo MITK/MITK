@@ -94,6 +94,12 @@ void PresentablePartFolder::LayoutContent()
 
 void PresentablePartFolder::InternalRemove(IPresentablePart::Pointer toRemove)
 {
+  AbstractTabItem* item = this->GetTab(toRemove);
+  if (item != 0) {
+      item->Dispose();
+  }
+  // do not use item anymore!
+
   if (std::find(partList.begin(), partList.end(), toRemove) != partList.end())
   {
     toRemove->RemovePropertyListener(childPropertyChangeListener);

@@ -24,7 +24,7 @@ namespace cherry {
 QtControlWidget::QtControlWidget(QWidget* parent, Qt::WindowFlags f)
  : QFrame(parent, f)
 {
-  this->setFrameStyle(QFrame::Box | QFrame::Plain);
+  this->setFrameStyle(QFrame::NoFrame);
 }
 
 void QtControlWidget::AddControlListener(GuiTk::IControlListener::Pointer listener)
@@ -49,7 +49,7 @@ void QtControlWidget::resizeEvent(QResizeEvent* event)
   controlEvents.resizedEvent(controlEvent);
 }
 
-void QtControlWidget::showEvent(QShowEvent* event)
+void QtControlWidget::focusInEvent(QFocusEvent* event)
 {
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
   controlEvents.activatedEvent(controlEvent);

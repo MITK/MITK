@@ -45,14 +45,9 @@ void LayoutPartSash::SelectionListener::WidgetSelected(GuiTk::SelectionEvent::Po
 }
 
 LayoutPartSash::LayoutPartSash(PartSashContainer* rootContainer, int style)
- : LayoutPart(""), sash(0), enabled(false)
+ : LayoutPart(""), sash(0), enabled(false), rootContainer(rootContainer),
+   style(style), left(300), right(300), presFactory(0), isVisible(false)
 {
-  this->style = style;
-  this->rootContainer = rootContainer;
-
-  left = 300;
-  right = 300;
-
   selectionListener = new SelectionListener(this);
 }
 

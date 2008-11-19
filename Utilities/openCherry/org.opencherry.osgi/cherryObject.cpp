@@ -164,6 +164,28 @@ Object::operator==(const Object* o) const
   return this == o;
 }
 
+#ifdef CHERRY_DEBUG_SMARTPOINTER
+unsigned long Object::GetTraceId() const
+{
+  return m_TraceId;
+}
+
+unsigned long& Object::GetTraceIdCounter() const
+{
+  static unsigned long traceId = 0;
+  return traceId;
+}
+#endif
+
+Object::Object()
+  :m_ReferenceCount(0)
+{
+#ifdef CHERRY_DEBUG_SMARTPOINTER
+  unsigned long& id = GetTraceIdCounter();
+  m_TraceId = ++id;
+#endif
+}
+
 Object
 ::~Object()
 {

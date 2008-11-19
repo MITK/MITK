@@ -42,7 +42,7 @@ protected:
 
   void moveEvent(QMoveEvent* event);
   void resizeEvent(QResizeEvent* event);
-  void showEvent(QShowEvent* event);
+  void focusInEvent(QFocusEvent* event);
 
 private:
 

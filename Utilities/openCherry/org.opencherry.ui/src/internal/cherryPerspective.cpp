@@ -649,6 +649,8 @@ void Perspective::OnActivate()
 //    if (useNewMinMax)
 //    setEditorAreaTrimVisibility(editorAreaState == IStackPresentationSite.STATE_MINIMIZED);
   }
+
+  layout = 0;
 }
 
 void Perspective::OnDeactivate()

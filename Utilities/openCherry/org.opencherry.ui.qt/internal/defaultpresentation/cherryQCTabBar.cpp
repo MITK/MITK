@@ -44,8 +44,12 @@ void QCTabBar::tabRemoved(int index)
 {
   std::deque<AbstractTabItem*>::iterator iter = tabItemList.begin();
   std::advance(iter, index);
-  tabItemList.erase(iter);
-  delete *iter;
+  if (iter != tabItemList.end())
+  {
+    AbstractTabItem* item = *iter;
+    tabItemList.erase(iter);
+    delete item;
+  }
 }
 
 void QCTabBar::mousePressEvent(QMouseEvent* event)
@@ -76,6 +80,7 @@ void QCTabBar::mouseMoveEvent(QMouseEvent* event)
 
 AbstractTabItem* QCTabBar::getTab(int index) const
 {
+  if (index < 0 || index >= tabItemList.size()) return 0;
   return tabItemList[index];
 }
 

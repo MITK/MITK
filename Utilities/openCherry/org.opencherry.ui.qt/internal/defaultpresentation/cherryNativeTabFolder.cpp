@@ -45,8 +45,10 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 {
   content = 0;
   viewForm = new QtControlWidget(parent);
+  qobject_cast<QFrame*>(viewForm)->setFrameStyle(QFrame::Box | QFrame::Plain);
   viewForm->setObjectName("ViewForm");
   QVBoxLayout* layout = new QVBoxLayout(viewForm);
+  layout->setContentsMargins(0,0,0,0);
   viewForm->setLayout(layout);
 
   tabControl = new QCTabBar(viewForm);

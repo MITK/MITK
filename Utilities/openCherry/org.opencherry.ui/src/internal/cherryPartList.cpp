@@ -116,7 +116,7 @@ void PartList::SetActivePart(IWorkbenchPartReference::Pointer ref)
   IWorkbenchPartReference::Pointer oldPart = activePartReference;
 
   // A part can't be activated until it is added
-  poco_assert(ref == 0 || this->Contains(ref));
+  //poco_assert(ref == 0 || this->Contains(ref));
 
   std::remove(parts.begin(), parts.end(), ref);
   parts.push_front(ref);
@@ -134,7 +134,7 @@ void PartList::SetActiveEditor(IEditorReference::Pointer ref)
   }
 
   // A part can't be activated until it is added
-  poco_assert(ref == 0 || this->Contains(ref));
+  //poco_assert(ref == 0 || this->Contains(ref));
 
   activeEditorReference = ref;
   std::remove(parts.begin(), parts.end(), ref);
@@ -147,7 +147,7 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
 {
   poco_assert(ref.IsNotNull());
   // It is an error to remove a part that isn't in the list
-  poco_assert(this->Contains(ref));
+  //poco_assert(this->Contains(ref));
   // We're not allowed to remove the active part. We must deactivate it
   // first.
   poco_assert(activePartReference != ref);
@@ -276,7 +276,7 @@ void PartList::PartHidden(WorkbenchPartReference::Pointer ref)
   poco_assert(!ref->GetVisible());
   // We shouldn't be receiving events from parts until they are in the
   // list
-  poco_assert(this->Contains(ref));
+  //poco_assert(this->Contains(ref));
 
   this->FirePartHidden(ref);
 }
@@ -290,7 +290,7 @@ void PartList::PartOpened(WorkbenchPartReference::Pointer ref)
   // there better be a part there.
   poco_assert(actualPart.IsNotNull());
   // Must be called after the part is inserted into the part list
-  poco_assert(this->Contains(ref));
+  //poco_assert(this->Contains(ref));
   // The active part must be opened before it is activated, so we should
   // never get an open event for a part that is already active.
   // (This either indicates that a redundant

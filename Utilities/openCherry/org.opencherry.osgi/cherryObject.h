@@ -128,8 +128,16 @@ public:
 
   virtual bool operator==(const Object*) const;
 
+#ifdef CHERRY_DEBUG_SMARTPOINTER
+  unsigned long GetTraceId() const;
+private:
+  unsigned long m_TraceId;
+  unsigned long& GetTraceIdCounter() const;
+public:
+#endif
+
 protected:
-  Object():m_ReferenceCount(0) {}
+  Object();
   virtual ~Object();
 
   /** Methods invoked by Print() to print information about the object

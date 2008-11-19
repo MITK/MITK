@@ -34,7 +34,8 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
   client->setObjectName("Client Composite");
   parent->layout()->addWidget(client);
 
-  client->setGeometry(0,0,1024,768);
+  client->resize(1024,768);
+  client->move(0,0);
 
   QRect parentRect = parent->geometry();
   std::cout << "client composite parent geom: x = " << parentRect.x() << ", y = " << parentRect.y() << ", width = " << parentRect.width() << ", height = " << parentRect.height() << std::endl;

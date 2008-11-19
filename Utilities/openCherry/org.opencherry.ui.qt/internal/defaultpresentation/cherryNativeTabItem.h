@@ -44,6 +44,8 @@ public:
 
   void SetInfo(const PartInfo& info);
 
+  void Dispose();
+
   /* (non-Javadoc)
    * @see AbstractTabItem#getData()
    */

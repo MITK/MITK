@@ -49,6 +49,13 @@ void NativeTabItem::SetInfo(const PartInfo& info)
   }
 }
 
+void NativeTabItem::Dispose()
+{
+  QTabBar* widget = parent->GetTabFolder();
+  int index = parent->IndexOf(this);
+  widget->removeTab(index); // this calls QCTabBar::tabRemoved
+}
+
 Object::Pointer NativeTabItem::GetData()
 {
   return data;

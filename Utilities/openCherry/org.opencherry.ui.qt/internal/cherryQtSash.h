@@ -32,6 +32,8 @@ class QtSash : public QWidget
 
 public:
     QtSash(Qt::Orientation o, QWidget* parent = 0, bool opaque = true);
+    ~QtSash();
+
     //void setOrientation(Qt::Orientation o);
     Qt::Orientation GetOrientation() const;
     bool OpaqueResize() const;

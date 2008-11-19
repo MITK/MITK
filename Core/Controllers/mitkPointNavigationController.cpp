@@ -296,8 +296,8 @@ PointNavigationController
 void PointNavigationController::setSphere(const Point3D &point)
 {
   //@todo add time to PositionEvent and use here!!
-  SlicedGeometry3D* slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
-    m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos()) );
+  //SlicedGeometry3D* slicedWorldGeometry = dynamic_cast< SlicedGeometry3D * >(
+  //  m_CreatedWorldGeometry->GetGeometry3D( this->GetTime()->GetPos()) );
 
   
   DataTreeNode::Pointer node = mitk::DataStorage::GetInstance()->GetNamedNode("Localizer");

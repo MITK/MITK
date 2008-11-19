@@ -45,6 +45,11 @@ void mitk::PicFileWriter::GenerateData()
     itkWarningMacro( << "Sorry, filename has not been set!" );
     return ;
   }
+  if (fopen(m_FileName.c_str(),"w")==NULL)
+  {
+    itkExceptionMacro(<<"File location not writeable");
+    return;
+  }
 
   Image::Pointer input = const_cast<Image*>(this->GetInput());
 

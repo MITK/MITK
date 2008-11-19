@@ -107,6 +107,12 @@ void mitk::ImageWriter::GenerateData()
     return ;
   }
 
+  if (fopen(m_FileName.c_str(),"w")==NULL)
+  {
+    itkExceptionMacro(<<"File location not writeable");
+    return;
+  }
+
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
 
 #if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))

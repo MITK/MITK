@@ -5,7 +5,7 @@ ENABLE_TESTING()
 
 # tests with no extra command line parameter
 SET(${KITNAME}_TESTS
-  #mitkPointSetWriterTest.cpp
+  mitkPointSetWriterTest.cpp
   mitkMaterialPropertyTest.cpp
   mitkDataTreeNodeTest.cpp
   mitkAbstractTransformGeometryTest.cpp
@@ -56,8 +56,8 @@ SET(${KITNAME}_TESTS
 
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS
-  #mitkPicFileWriterTest.cpp
-  #mitkImageWriterTest.cpp
+  mitkPicFileWriterTest.cpp
+  mitkImageWriterTest.cpp
   mitkCompressedImageContainerTest.cpp  
   mitkCylindricToCartesianFilterTest.cpp
   mitkExtractImageFilterTest.cpp  

@@ -39,8 +39,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkCommand.h>
 
-#include <QCheckbox>
-#include <QPushbutton>
+#include <QCheckBox>
+#include <QPushButton>
 #include <QMenu>
 #include <QCursor>
 

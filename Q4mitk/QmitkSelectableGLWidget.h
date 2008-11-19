@@ -10,7 +10,9 @@
 #include <mitkCommon.h>
 
 #include <QWidget>
+
 class QmitkRenderWindow;
+
 class QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidget
 {
   public:

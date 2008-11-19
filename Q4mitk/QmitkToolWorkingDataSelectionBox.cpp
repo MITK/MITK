@@ -239,7 +239,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
       // Qt4 mmueller
       ha = qtcolor.hue();
       es = qtcolor.saturation();
-      vau = qtcolor.value();        
+      vau = qtcolor.value();
       // Qt4
       qtcolor.setHsv(ha,es,vau);
       if ( vau < 160  )
@@ -263,7 +263,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
       for (ColumnsList::iterator colIter = m_AdditionalColumns.begin();
            colIter != m_AdditionalColumns.end();
            ++colIter, ++col)
-      {        
+      {
         mitk::FloatProperty::Pointer floatProperty = dynamic_cast<mitk::FloatProperty*>( node->GetProperty( colIter->first.c_str() ));
         if (floatProperty.IsNotNull())
         {
@@ -676,13 +676,14 @@ bool QmitkToolWorkingDataSelectionBox::eventFilter( QObject *o, QEvent *e )
 
 void QmitkToolWorkingDataSelectionBox::InstallKeyFilterOn( QObject* object )
 {
-  if (m_LastKeyFilterObject)
-    m_LastKeyFilterObject->removeEventFilter(this);
-
-  if (!object) return;
-  m_LastKeyFilterObject = object;
-
-  object->installEventFilter( this );
+  //TODO crashes under linux in eventFilter(o,e), Q3ListView::eventFilter(o,e)
+//  if (m_LastKeyFilterObject)
+//    m_LastKeyFilterObject->removeEventFilter(this);
+//
+//  if (!object) return;
+//  m_LastKeyFilterObject = object;
+//
+//  object->installEventFilter( this );
 }
 
 void QmitkToolWorkingDataSelectionBox::SetToolGroupsForFiltering(const std::string& groups)

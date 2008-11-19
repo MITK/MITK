@@ -329,7 +329,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   */
 
   // mmueller Qt4 impl
-  QList<QAbstractButton *> l = this->findChildren<QAbstractButton *>("QButton");
+  QList<QAbstractButton *> l = this->findChildren<QAbstractButton *>();
   // remove all buttons that are there
   QList<QAbstractButton *>::iterator it;
   QAbstractButton * button;
@@ -430,6 +430,7 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     ++currentToolID;
   }
+
 }
 
 void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()

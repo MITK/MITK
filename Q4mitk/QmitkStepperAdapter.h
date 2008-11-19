@@ -19,8 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 #define QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 
-#include <QObject>
-
+#include "qobject.h"
 #include "mitkStepper.h"
 #include "itkObject.h"
 #include "itkCommand.h"
@@ -41,7 +40,7 @@ class QMITK_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
-  QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper );
+  QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper, const char * name );
   virtual ~QmitkStepperAdapter();
 
   void SetStepper( mitk::Stepper* stepper )

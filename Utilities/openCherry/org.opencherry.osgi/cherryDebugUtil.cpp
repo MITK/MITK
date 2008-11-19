@@ -28,23 +28,32 @@ std::set<unsigned long> DebugUtil::m_TracedObjects;
 
 void DebugUtil::TraceObject(const Object* object)
 {
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   std::cout << "Tracing enabled for: " << object->GetTraceId() << std::endl;
   m_TracedObjects.insert(object->GetTraceId());
+#endif
 }
 
 bool DebugUtil::IsTraced(const Object* object)
 {
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   return m_TracedObjects.find(object->GetTraceId()) != m_TracedObjects.end();
+#else
+  return false;
+#endif
 }
 
 std::list<int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer, const std::list<int>& excludeList)
 {
   poco_assert(objectPointer != 0);
+  std::list<int> ids;
 
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   std::list<int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (std::list<int>::const_iterator iter = excludeList.begin();
        iter != excludeList.end(); ++iter)
     ids.remove(*iter);
+#endif
 
   return ids;
 }
@@ -69,17 +78,21 @@ int& DebugUtil::GetSmartPointerCounter()
 
 void DebugUtil::UnregisterSmartPointer(int smartPointerId, const Object* objectPointer)
 {
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   if (objectPointer != 0)
   {
     m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()].remove(smartPointerId);
   }
+#endif
 }
 
 void DebugUtil::RegisterSmartPointer(int smartPointerId, const Object* objectPointer, bool recordStack)
 {
   poco_assert(objectPointer != 0);
 
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()].push_back(smartPointerId);
+#endif
 }
 
 }

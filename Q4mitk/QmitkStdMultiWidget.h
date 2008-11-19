@@ -198,7 +198,7 @@ protected:
   int m_Layout;
   mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
   mitk::DataTreeIteratorClone planesIterator;
-  mitk::SliceNavigationController::Pointer timeNavigationController;
+  mitk::SliceNavigationController::Pointer m_TimeNavigationController;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
   mitk::PositionTracker::Pointer m_PositionTracker;
   mitk::DataTreeNode::Pointer m_PositionTrackerNode;

@@ -52,15 +52,15 @@ QmitkRenderWindow* QmitkSelectableGLWidget::GetRenderWindow() const
 
 void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
 {
-  if ( m_RenderWindow->GetSliceNavigationController()->GetSliceLocked() )
+  if ( m_RenderWindow->GetNavigationController()->GetSliceLocked() )
     return;
   
   mitk::Stepper* stepper = m_RenderWindow
-    ->GetSliceNavigationController()->GetSlice();
+    ->GetNavigationController()->GetSlice();
   
   if (stepper->GetSteps() <= 1)
   {
-    stepper = m_RenderWindow->GetSliceNavigationController()->GetTime();
+    stepper = m_RenderWindow->GetNavigationController()->GetTime();
   }
 
   if (e->orientation() * e->delta()  > 0) 
@@ -74,11 +74,11 @@ void QmitkSelectableGLWidget::wheelEvent( QWheelEvent * e )
 }
 
 
-mitk::SliceNavigationController*
+mitk::NavigationController*
 QmitkSelectableGLWidget
-::GetSliceNavigationController() const
+::GetNavigationController() const
 {
-  return m_RenderWindow->GetSliceNavigationController();
+  return m_RenderWindow->GetNavigationController();
 }
 
 

@@ -47,14 +47,14 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->setupUi(parent);
   mitk::DataTree::Pointer dataTree;
 
-  mitk::IDataStorageService::Pointer service = 
+  mitk::IDataStorageService::Pointer service =
    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   if (service.IsNotNull())
   {
     dataTree = service->GetDefaultDataStorage()->GetDataTree();
   }
-  
+
   cherry::IEditorPart::Pointer editor =
       this->GetSite()->GetPage()->GetActiveEditor();
 
@@ -91,7 +91,8 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->m_PostProcessingToolSelectionBox->setTitle("");
   m_Controls->m_PostProcessingToolSelectionBox->setInsideMargin(0);
-  m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::NoFrame );
+  m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::Box );
+  //m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::NoFrame );
   m_Controls->m_PostProcessingToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_PostProcessingToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing");    // show only tools which are marked with "segmentationProcessing"

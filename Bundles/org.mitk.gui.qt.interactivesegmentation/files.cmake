@@ -14,6 +14,10 @@ SET(MOC_H_FILES
   src/QmitkInteractiveSegmentationView.h
 )
 
+SET(RES_FILES
+  resources.qrc
+)
+
 
 SET(CPP_FILES manifest.cpp)
 

@@ -79,7 +79,7 @@ namespace mitk {
 
     //overwritten from BaseVtkMapper3D to be able to return a 
     //m_PointsAssembly which is much faster than a vtkAssembly
-    virtual vtkProp* GetProp();
+    //virtual vtkProp* GetProp();
     virtual void UpdateVtkTransform();
 
     static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);

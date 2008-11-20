@@ -98,6 +98,7 @@
 
 #include "mitkIpPic.h"
 
+
 void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
 {
   ipPicDescriptor *pic_in;
@@ -159,22 +160,22 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
   if( slice > pic_in->n[pic_in->dim-1] )
     pic_in->n[pic_in->dim-1] += 1;
 
-  /* write oufile */
+  /* write outfile */
   /*fseek( outfile, 0, SEEK_SET );*/
   rewind( outfile );
-  size_t ignored = fwrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  fwrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
 
   fseek( outfile, sizeof(ipUInt4_t), SEEK_CUR ); /* skip tags_len */
 
-  ignored = mitkIpFWriteLE( &(pic_in->type), sizeof(ipUInt4_t), 1, outfile );
-  ignored = mitkIpFWriteLE( &(pic_in->bpe), sizeof(ipUInt4_t), 1, outfile );
-  ignored = mitkIpFWriteLE( &(pic_in->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic_in->type), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic_in->bpe), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic_in->dim), sizeof(ipUInt4_t), 1, outfile );
 
-  ignored = mitkIpFWriteLE( pic_in->n, sizeof(ipUInt4_t), pic_in->dim, outfile );
+  mitkIpFWriteLE( pic_in->n, sizeof(ipUInt4_t), pic_in->dim, outfile );
 
   fseek( outfile, pic_in->info->pixel_start_in_file + _ipPicSize(pic) * (slice - 1), SEEK_SET );
 
-  ignored = mitkIpFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+  mitkIpFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
 
   /*fseek( outfile, 0, SEEK_END );*/
 

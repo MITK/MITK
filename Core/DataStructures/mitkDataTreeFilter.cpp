@@ -652,44 +652,46 @@ void DataTreeFilter::GenerateModelFromTree()
   Consideration of m_HierarchyHandling adds one branch
   */
   if (!treeIter->IsAtEnd()) // do nothing if the tree is empty!
-  if ( (*m_Filter)( treeIter->Get() ) )
   {
-    m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
-    Item* newItem = m_Items->ElementAt(0); 
-
-    // restore selection state for this new item
-    for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
-         siter != m_LastSelectedNodes.end();
-         ++siter)
+    if ( (*m_Filter)( treeIter->Get() ) )
     {
-      if ( *siter == newItem->GetNode() )
+      m_Items->CreateElementAt(0) = Item::New( treeIter->Get(), this, 0, 0 ); // 0 = first item, 0 = no parent
+      Item* newItem = m_Items->ElementAt(0); 
+
+      // restore selection state for this new item
+      for (DataTreeNodeSet::iterator siter = m_LastSelectedNodes.begin();
+           siter != m_LastSelectedNodes.end();
+           ++siter)
       {
-        m_SelectedItems.insert(newItem);
-        newItem->m_Selected = true;
+        if ( *siter == newItem->GetNode() )
+        {
+          m_SelectedItems.insert(newItem);
+          newItem->m_Selected = true;
+        }
       }
-    }
 
-    if ( m_LastSelectedNode == newItem->GetNode() )
-    {
-      m_LastSelectedItem = newItem;
-      newItem->m_Selected = true; // probably not neccessary
-    }
+      if ( m_LastSelectedNode == newItem->GetNode() )
+      {
+        m_LastSelectedItem = newItem;
+        newItem->m_Selected = true; // probably not neccessary
+      }
 
-    if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
-    {
-      AddMatchingChildren( treeIter,
-                          m_Items->ElementAt(0)->m_Children,
-                          m_Items->ElementAt(0).GetPointer(),
-                          false );
+      if ( m_HierarchyHandling == DataTreeFilter::PRESERVE_HIERARCHY )
+      {
+        AddMatchingChildren( treeIter,
+                            m_Items->ElementAt(0)->m_Children,
+                            m_Items->ElementAt(0).GetPointer(),
+                            false );
+      }
+      else
+      {
+        AddMatchingChildren( treeIter, m_Items, 0, false );
+      }
     }
     else
     {
       AddMatchingChildren( treeIter, m_Items, 0, false );
     }
-  }
-  else
-  {
-    AddMatchingChildren( treeIter, m_Items, 0, false );
   }
   
   delete treeIter; // release data tree iterator

@@ -240,18 +240,18 @@ ipPicDescriptor * _MITKipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   }
 
   /* read infile */
-  mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  size_t ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
+  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       fseek( infile, old_pic.ltxt, SEEK_CUR );
@@ -343,18 +343,18 @@ _MITKipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *st
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
-      mitkIpPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
+      size_t ignored = mitkIpPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
       strncpy( tsv->tag, tag_name, _mitkIpPicTAGLEN );
       tsv->tag[_mitkIpPicTAGLEN] = '\0';
 
-      mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
 
-      mitkIpPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
-      mitkIpPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      mitkIpPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
 
 
-      mitkIpPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
 
       if( tsv->type == ipPicTSV )
         {

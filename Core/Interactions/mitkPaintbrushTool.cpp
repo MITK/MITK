@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "ipSegmentation.h"
 
+#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
+
 int mitk::PaintbrushTool::m_Size = 10;
 
 mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
@@ -132,13 +134,14 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
     newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
     newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
     newPoint[2] = 0;
+    //std::cout << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
     contourInImageIndexCoordinates->AddVertex( newPoint );
   }
 
   free(contourPoints);
 
-  m_MasterContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice, contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
+  m_MasterContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice, contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correction
 
   ipPicFree( stupidClone );
 }
@@ -172,6 +175,7 @@ bool mitk::PaintbrushTool::OnMousePressed (Action* action, const StateEvent* sta
 bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* stateEvent)
 {
   if (!FeedbackContourTool::OnMouseMoved( action, stateEvent )) return false;
+  if ( m_MasterContour.IsNull() || m_MasterContour->GetNumberOfPoints() == 0 ) return false;
 
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -187,29 +191,81 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* sta
   int affectedSlice( -1 );
   if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
+    Point3D pos = positionEvent->GetWorldPosition() - image->GetGeometry()->GetOrigin().GetVectorFromOrigin();
+
+    // round mouse cursor position to the nearest pixel center
+    switch(affectedDimension)
+    {
+      case 2:
+        pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
+        pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
+        break;
+      case 1:
+        pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
+        pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
+        break;
+      case 0:
+        pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
+        pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
+        break;
+    }
+
+    // Remember last value of pos; if this hasn't changed here, abort! This reduces the number of painting operations
+    static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
+    if ( fabs(pos[0] - lastPos[0]) > mitk::eps ||
+         fabs(pos[1] - lastPos[1]) > mitk::eps ||
+         fabs(pos[2] - lastPos[2]) > mitk::eps )
+     {
+       lastPos = pos;
+       //std::cout << "paint" << std::endl;
+     }
+     else
+     {
+       //std::cout << "." << std::flush;
+       return false;
+     }
+
     // copy the master contour, but center it around current pixel
     Contour* contour = FeedbackContourTool::GetFeedbackContour();
     contour->Initialize();
-
-    Point3D pos = positionEvent->GetWorldPosition();
     for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
     {
       Point3D point = m_MasterContour->GetPoints()->ElementAt(index);
       switch(affectedDimension)
       {
         case 2:
-          point[0] += pos[0] + image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
-          point[1] += pos[1] + image->GetGeometry()->GetSpacing()[1] / 2.0;
+          point[0] += pos[0];
+          point[1] += pos[1];
           break;
         case 1:
-          point[0] += pos[0] + image->GetGeometry()->GetSpacing()[0] / 2.0;
-          point[2] += pos[2] + image->GetGeometry()->GetSpacing()[2] / 2.0;
+          point[0] += pos[0];
+          point[2] += pos[2];
           break;
         case 0:
-          point[1] += pos[1] + image->GetGeometry()->GetSpacing()[1] / 2.0;
-          point[2] += pos[2] + image->GetGeometry()->GetSpacing()[2] / 2.0;
+          point[1] += pos[1];
+          point[2] += pos[2];
           break;
       }
+
+      if (m_Size % 2 != 0)
+      {
+        switch(affectedDimension)
+        {
+          case 2:
+            point[0] +=image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
+            point[1] +=image->GetGeometry()->GetSpacing()[1] / 2.0;
+            break;
+          case 1:
+            point[0] +=image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
+            point[2] +=image->GetGeometry()->GetSpacing()[2] / 2.0;
+            break;
+          case 0:
+            point[1] +=image->GetGeometry()->GetSpacing()[1] / 2.0;
+            point[2] +=image->GetGeometry()->GetSpacing()[2] / 2.0; /* plus half a pixel's spacing */
+            break;
+        }
+      }
+
 
       contour->AddVertex( point );
     }

@@ -10,7 +10,11 @@ of release notes for the next release.
 
 ======== New stuff only in the SVN trunk ========
 
+- Paintbrush tool in InteractiveSegmentation
+- localizer widget in MainApp
 - a PointListWidget
+- gcc 4.3 compatibility (Ubuntu 8.10, Fedora 9)
+- VTK 5.2 compatibility
 
 
 ======== Changes in release 0.10 (2008-Oct-??) ========

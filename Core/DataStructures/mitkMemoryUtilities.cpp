@@ -86,7 +86,8 @@ int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared
 	FILE* f;
 	f = fopen( "/proc/self/statm", "r" );
 	if( f ) {
-		fscanf( f, "%d %d %d %d %d %d %d", size, res, shared, text, sharedLibs, stack, dirtyPages );
+		size_t ignored = fscanf( f, "%d %d %d %d %d %d %d", size, res, shared, text, sharedLibs, stack, dirtyPages );
+                ++ignored;
 		fclose( f );
 	} else {
 		ret = -1;

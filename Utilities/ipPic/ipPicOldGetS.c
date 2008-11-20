@@ -105,22 +105,22 @@ ipPicDescriptor * _ipPicOldGetSlice( FILE *infile, ipPicDescriptor *pic, ipUInt4
   unsigned long int elements;
 
   /* read infile */
-  mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  size_t ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
+  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       /*text = (unsigned char *)malloc( old_pic.ltxt );
-      mitkIpFReadLE( text, 1, old_pic.ltxt, infile );*/
+      ignored = mitkIpFReadLE( text, 1, old_pic.ltxt, infile );*/
       fseek( infile, old_pic.ltxt, SEEK_CUR );
     }
 
@@ -134,7 +134,7 @@ ipPicDescriptor * _ipPicOldGetSlice( FILE *infile, ipPicDescriptor *pic, ipUInt4
 
   buff = malloc( elements * old_pic.type );
 
-  mitkIpFReadLE( buff, old_pic.type, elements, infile );
+  ignored = mitkIpFReadLE( buff, old_pic.type, elements, infile );
 
   /* convert to the new pic3 format */
 

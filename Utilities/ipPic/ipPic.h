@@ -632,7 +632,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #  define mitkIpFReadBE ipFReadCvt
 #else
 #  define mitkIpFReadLE ipFReadCvt
-#  define mitkIpFReadBE fread
+#  define mitkIpFReadBE  fread
 #endif
 
 #ifdef _mitkIpENDIAN_IS_LITTLE

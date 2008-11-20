@@ -101,7 +101,7 @@ QmitkLocalizerDialogBar
 ::CreateDialogBar( QWidget *parent )
 {
           
-  QVBox* layout = new QVBox( parent );
+  new QVBox( parent );
 
   QGrid *grid = new QGrid( 5, Qt::Vertical, parent );
 

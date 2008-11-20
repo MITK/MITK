@@ -1,5 +1,5 @@
 /* XPM */
-static char * QmitkLocalizerDialogBar_xpm[] = {
+static const char * QmitkLocalizerDialogBar_xpm[] = {
 "11 11 3 1",
 " 	c None",
 ".	c #000000",

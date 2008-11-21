@@ -97,6 +97,8 @@
 #endif
 
 #include "mitkIpPic.h"
+#include <stdio.h>
+#include <stddef.h>
 
 
 void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
@@ -104,6 +106,8 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
   ipPicDescriptor *pic_in;
 
   FILE *outfile;
+  
+  size_t ignored;
 
   size_t ignored;
 

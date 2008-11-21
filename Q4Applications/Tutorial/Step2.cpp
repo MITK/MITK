@@ -85,7 +85,9 @@ int main(int argc, char* argv[])
   mitk::RenderingManager::GetInstance()->InitializeViews( storage );
 
   // Select a slice
-  renderWindow.GetSliceNavigationController()->GetSlice()->SetPos( 2 );
+  mitk::SliceNavigationController::Pointer sliceNaviController = dynamic_cast<mitk::SliceNavigationController*>(renderWindow.GetNavigationController());
+  if (sliceNaviController)
+    sliceNaviController->GetSlice()->SetPos( 2 );
 
 
   //*************************************************************************

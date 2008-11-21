@@ -98,7 +98,6 @@ SET(MOC_H_FILES
  QmitkToolSelectionBox.h  
  QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
- QmitkSlicesInterpolator.h
  QmitkNewSegmentationDialog.h
 )
 

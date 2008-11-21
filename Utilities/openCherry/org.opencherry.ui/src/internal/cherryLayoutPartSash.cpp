@@ -51,6 +51,11 @@ LayoutPartSash::LayoutPartSash(PartSashContainer* rootContainer, int style)
   selectionListener = new SelectionListener(this);
 }
 
+LayoutPartSash::~LayoutPartSash()
+{
+  this->Dispose();
+}
+
 void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
 {
   LayoutTree::Pointer root = rootContainer->GetLayoutTree();

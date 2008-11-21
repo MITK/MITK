@@ -288,8 +288,10 @@ void QtWidgetsTweaklet::MoveBelow(void* widgetToMove, void* widget)
   qwidget->lower();
 }
 
-void QtWidgetsTweaklet::Dispose(void* /*widget*/)
+void QtWidgetsTweaklet::Dispose(void* widget)
 {
+  QObject* obj = static_cast<QObject*>(widget);
+  delete obj;
 }
 
 Shell::Pointer QtWidgetsTweaklet::CreateShell(Shell::Pointer parent, int style)

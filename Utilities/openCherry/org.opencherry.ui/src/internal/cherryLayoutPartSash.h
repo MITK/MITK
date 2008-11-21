@@ -41,6 +41,7 @@ public:
   cherryClassMacro(LayoutPartSash);
 
   LayoutPartSash(PartSashContainer* rootContainer, int style);
+  ~LayoutPartSash();
 
 private:
 

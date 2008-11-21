@@ -52,7 +52,7 @@ public:
   *
   * \sa GetItkTypeId
   */
-  inline const std::type_info * const GetTypeId() const
+  inline const std::type_info * GetTypeId() const
   {
     return m_TypeId;
   }
@@ -61,7 +61,7 @@ public:
   *
   * \sa GetTypeId
   */
-  inline const std::type_info * const GetItkTypeId() const
+  inline const std::type_info * GetItkTypeId() const
   {
     return m_ItkTypeId;
   }

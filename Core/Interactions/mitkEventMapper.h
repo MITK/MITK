@@ -136,7 +136,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief converts the strings given by the XML-Behaviour-File to int
-    inline const int convertConstString2ConstInt(std::string input);
+    inline int convertConstString2ConstInt(std::string input);
 //    static std::string Convert2String(int input);
 //    static std::string Convert2String(double input);
 //    static std::string Convert2String(float input);

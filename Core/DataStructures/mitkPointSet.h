@@ -198,7 +198,7 @@ public:
   virtual bool GetSelectInfo( int position, int t = 0 );
 
   /** \brief returns the number of selected points */
-  virtual const int GetNumberOfSelected( int t = 0 );
+  virtual int GetNumberOfSelected( int t = 0 );
 
   /**
    * \brief searches a point in the list == point +/- distance

@@ -524,13 +524,13 @@ protected:
 
   void ComputeOffsetTable();
 
-  virtual const void Expand( int timeSteps ) const;
+  virtual void Expand( int timeSteps ) const;
 
-  virtual const bool IsValidTimeStep(int t) const;
+  virtual bool IsValidTimeStep(int t) const;
 
-  virtual const void ResetImageStatistics() const;
+  virtual void ResetImageStatistics() const;
 
-  virtual const void ComputeImageStatistics(int t=0) const;
+  virtual void ComputeImageStatistics(int t=0) const;
 
   virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 

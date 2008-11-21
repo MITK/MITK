@@ -208,7 +208,7 @@ void QmitkLocalizerDialogBar::Activated()
   }
 }
 
-void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* n)
+void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* /*n*/)
 {
   m_TreeNodeSelector->UpdateContent();
 }
@@ -328,12 +328,12 @@ void QmitkLocalizerDialogBar::SetSeeker(mitk::Ellipsoid::Pointer m_Punkt){
 }
 
 
-void QmitkLocalizerDialogBar::SetSeeker(QWheelEvent* e)
+void QmitkLocalizerDialogBar::SetSeeker(QWheelEvent* /*e*/)
 {
   SetSeeker(m_Punkt);
 }
 
-void QmitkLocalizerDialogBar::ImageSelected(mitk::DataTreeIteratorClone imageIt)
+void QmitkLocalizerDialogBar::ImageSelected(mitk::DataTreeIteratorClone /*imageIt*/)
 {
   if (m_TreeNodeSelector->GetSelectedNode()->GetName().c_str() != m_FileUsed)
   {

@@ -308,7 +308,7 @@ bool mitk::PointSet::GetSelectInfo( int position, int t )
 }
 
 
-const int mitk::PointSet::GetNumberOfSelected( int t )
+int mitk::PointSet::GetNumberOfSelected( int t )
 {
   if ( (unsigned int) t >= m_PointSetSeries.size() )
   {

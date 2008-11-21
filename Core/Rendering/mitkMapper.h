@@ -139,7 +139,7 @@ namespace mitk {
     static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
-    const int GetTimestep() const {return m_TimeStep;}; 
+    int GetTimestep() const {return m_TimeStep;}; 
 
     
     /** Returns true if this Mapper currently allows for Level-of-Detail rendering.

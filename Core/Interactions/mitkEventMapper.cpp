@@ -576,7 +576,7 @@ bool mitk::EventMapper::LoadStandardBehavior()
 //##Documentation
 //## @brief converts the given const String declared in the xml-file
 //## to the defined const int
-inline const int mitk::EventMapper::convertConstString2ConstInt(std::string input)
+inline int mitk::EventMapper::convertConstString2ConstInt(std::string input)
 {
   ConstMapIter tempIt  = m_EventConstMap.find(input.c_str());
   if (tempIt != m_EventConstMap.end())

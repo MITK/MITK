@@ -73,7 +73,7 @@ mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
 //
 }
 
-void mitk::EnhancedPointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
+void mitk::EnhancedPointSetVtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
 {
   // TODO: Do we have to call this for all actors??
   //m_Actor->ReleaseGraphicsResources(renWin);
@@ -197,7 +197,7 @@ void mitk::EnhancedPointSetVtkMapper3D::GenerateData()
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * /*renderer*/ )
 {
 
 //// just for testing, always call CreateVTKRenderObjects()
@@ -285,7 +285,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform()
   //m_ContourActor->SetUserTransform(vtktransform);
 }
 
-void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* /*renderer*/)
 {
   ////check for color props and use it for rendering of selected/unselected points and contour 
   ////due to different params in VTK (double/float) we have to convert!
@@ -395,7 +395,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* rend
 
 }
 
-void mitk::EnhancedPointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
+void mitk::EnhancedPointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* /*renderer*/)
 {
   //vtkAppendPolyData* vtkContourPolyData = vtkAppendPolyData::New();
   //vtkPolyDataMapper* vtkContourPolyDataMapper = vtkPolyDataMapper::New(); 

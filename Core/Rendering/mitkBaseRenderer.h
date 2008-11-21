@@ -340,7 +340,7 @@ public:
   //##Documentation
   //## @brief get the x_size of the RendererWindow
   //## @note
-  const int GetSizeX() const
+  int GetSizeX() const
   {
     return m_Size[0];
   }
@@ -348,7 +348,7 @@ public:
   //##Documentation
   //## @brief get the y_size of the RendererWindow
   //## @note
-  const int GetSizeY() const
+  int GetSizeY() const
   {
     return m_Size[1];
   }

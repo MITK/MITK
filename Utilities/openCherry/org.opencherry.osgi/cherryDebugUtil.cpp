@@ -46,16 +46,16 @@ bool DebugUtil::IsTraced(const Object* object)
 std::list<int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer, const std::list<int>& excludeList)
 {
   poco_assert(objectPointer != 0);
-  std::list<int> ids;
 
 #ifdef CHERRY_DEBUG_SMARTPOINTER
   std::list<int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (std::list<int>::const_iterator iter = excludeList.begin();
        iter != excludeList.end(); ++iter)
     ids.remove(*iter);
-#endif
-
   return ids;
+#elif
+  return std::list<int>();
+#endif
 }
 
 void DebugUtil::PrintSmartPointerIDs(const Object* objectPointer, std::ostream& stream, const std::list<int>& excludeList)
@@ -86,7 +86,7 @@ void DebugUtil::UnregisterSmartPointer(int smartPointerId, const Object* objectP
 #endif
 }
 
-void DebugUtil::RegisterSmartPointer(int smartPointerId, const Object* objectPointer, bool recordStack)
+void DebugUtil::RegisterSmartPointer(int smartPointerId, const Object* objectPointer, bool /*recordStack*/)
 {
   poco_assert(objectPointer != 0);
 

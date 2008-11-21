@@ -109,8 +109,6 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
   
   size_t ignored;
 
-  size_t ignored;
-
   pic_in = ipPicGetHeader( outfile_name,
                            NULL );
 

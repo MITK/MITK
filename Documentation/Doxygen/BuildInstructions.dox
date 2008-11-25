@@ -5,7 +5,7 @@
 
 Since MITK is under active development we recommend to use subversion to get
 the most recent version. To make sure you get a stable tree, check the <a
-href="http://public.kitware.com/MITK/Dashboard/MostRecentResults-Nightly/Dashboard.html">MITK
+href="http://my.cdash.org/index.php?project=MITK">MITK
 dashboard</a> at Kitware before checking out. If the build tree is not clean, you can specify an older revision for the checkout or get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
 
 To checkout MITK's current subversion repository do:

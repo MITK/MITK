@@ -18,10 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkEvent.h>
 #include <mitkVtkPropRenderer.h>
+#include <mitkTestingMacros.h>
 
-#include <fstream>
+
 int mitkEventTest(int /*argc*/, char* /*argv*/[])
 {
+  MITK_TEST_BEGIN("Event")
+
   vtkRenderWindow* renWin = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
 
@@ -29,22 +32,19 @@ int mitkEventTest(int /*argc*/, char* /*argv*/[])
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);
 
   //check Get...
-  std::cout << "check the get methods of the Event";
-  if (event->GetSender() != renderer ||
-    event->GetType() != 0 ||
-    event->GetButton() != 1 ||
-    event->GetButtonState() != 2 ||
-    event->GetKey() != 3)
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-
-  //well done!!! Passed!
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(
+    event->GetSender() == renderer ||
+    event->GetType() == 0 ||
+    event->GetButton() == 1 ||
+    event->GetButtonState() == 2 ||
+    event->GetKey() == 3
+    , "Checking Get methods of mitk::Event");
 
   renWin->Delete();
+  delete event;
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  // always end with this!
+  MITK_TEST_END()
+
+
 }

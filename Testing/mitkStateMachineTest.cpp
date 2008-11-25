@@ -16,17 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkStateMachineFactory.h>
-#include <mitkState.h>
 #include <mitkEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkStateEvent.h>
 
-#include "mitkStateMachine.h"
-
-#include "mitkTestingMacros.h"
-
-#include <iostream>
+#include <mitkStateMachine.h>
+#include <mitkTestingMacros.h>
 
 /**
  *  Simple example for a test for the (non-existent) class "StateMachine".
@@ -63,7 +58,12 @@ int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(myStateMachine->HandleEvent(nextStateEvent) ,"Testing HandleEvent returning to startstate") 
 
   myStateMachine = NULL;
-  MITK_TEST_CONDITION_REQUIRED(myStateMachine.IsNull(),"Testing setting pointer to NULL") 
+  MITK_TEST_CONDITION_REQUIRED(myStateMachine.IsNull(),"Testing setting pointer to NULL")
+
+  // Clean up...
+  delete event;
+  delete stateEvent;
+  delete nextStateEvent;
 
   // always end with this!
   MITK_TEST_END()

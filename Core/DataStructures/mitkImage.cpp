@@ -1191,6 +1191,7 @@ const mitk::Image::HistogramType* mitk::Image::GetScalarHistogram(int t) const
     timeSelector->UpdateLargestPossibleRegion();
 
     mitk::HistogramGenerator* generator = static_cast<mitk::HistogramGenerator*>(m_HistogramGeneratorObject.GetPointer());
+    generator->SetImage(timeSelector->GetOutput());
     generator->ComputeHistogram();
     return static_cast<const mitk::Image::HistogramType*>(generator->GetHistogram());
   }

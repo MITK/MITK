@@ -40,6 +40,7 @@ public:
   
   enum State { BUNDLE_INSTALLED, BUNDLE_UNINSTALLED, BUNDLE_RESOLVED,
                 BUNDLE_STARTING, BUNDLE_ACTIVE, BUNDLE_STOPPING };
+
   
   virtual ~IBundle() {};
   
@@ -50,7 +51,7 @@ public:
   virtual const std::string& GetCopyright() const = 0;
   virtual const std::string& GetVendor() const = 0;
   
-  virtual bool GetLazyStart() const = 0;
+  virtual IBundleManifest::ActivationPolicy GetActivationPolicy() const = 0;
   virtual bool IsSystemBundle() const = 0;
   
   virtual std::istream* GetLocalizedResource(const std::string& name) const = 0;

@@ -22,7 +22,7 @@ namespace cherry {
 
 const std::string IBundleManifest::BUNDLE_ACTIVATOR = "Bundle-Activator";
 const std::string IBundleManifest::BUNDLE_COPYRIGHT = "Bundle-Copyright";
-const std::string IBundleManifest::BUNDLE_LAZYSTART = "Bundle-LazyStart";
+const std::string IBundleManifest::BUNDLE_ACTIVATION_POLICY = "Bundle-ActivationPolicy";
 const std::string IBundleManifest::BUNDLE_NAME = "Bundle-Name";
 const std::string IBundleManifest::BUNDLE_SYMBOLICNAME = "Bundle-SymbolicName";
 const std::string IBundleManifest::BUNDLE_VENDOR = "Bundle-Vendor";
@@ -30,6 +30,8 @@ const std::string IBundleManifest::BUNDLE_VERSION = "Bundle-Version";
 const std::string IBundleManifest::MANIFEST_VERSION = "Manifest-Version";
 const std::string IBundleManifest::SYSTEM_BUNDLE = "Cherry-SystemBundle";
 const std::string IBundleManifest::REQUIRE_BUNDLE = "Require-Bundle";
+
+ 
 
 const std::string IBundleManifest::VERSION = "1.0";
 

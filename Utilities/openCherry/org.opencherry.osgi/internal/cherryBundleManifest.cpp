@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 BundleManifest::BundleManifest(std::istream* istr)
+: POLICY_EAGER("eager"), POLICY_LAZY("lazy")
 {
   this->ParseManifest(istr);
 }
@@ -61,10 +62,10 @@ BundleManifest::GetCopyright() const
   return m_Copyright;
 }
  
-bool 
-BundleManifest::GetLazyStart() const
+IBundleManifest::ActivationPolicy 
+BundleManifest::GetActivationPolicy() const
 {
-  return m_LazyStart;
+  return m_ActivationPolicy;
 }
 
 bool
@@ -137,7 +138,7 @@ BundleManifest::ParseManifest(std::istream* istr)
 
     
   m_Copyright = config->getString(BUNDLE_COPYRIGHT, "");
-  m_LazyStart = config->getBool(BUNDLE_LAZYSTART, true);
+  m_ActivationPolicy = (config->getString(BUNDLE_ACTIVATION_POLICY, POLICY_LAZY) == POLICY_EAGER) ? EAGER : LAZY ;
   m_Name = config->getString(BUNDLE_NAME, "");
   m_SymbolicName = config->getString(BUNDLE_SYMBOLICNAME, "");
   m_Vendor = config->getString(BUNDLE_VENDOR, "");

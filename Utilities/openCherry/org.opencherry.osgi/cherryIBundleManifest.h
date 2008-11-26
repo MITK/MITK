@@ -24,13 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+
 struct CHERRY_OSGI IBundleManifest : public Object
 {
   cherryClassMacro(IBundleManifest);
   
   static const std::string BUNDLE_ACTIVATOR;
   static const std::string BUNDLE_COPYRIGHT;
-  static const std::string BUNDLE_LAZYSTART;
+  static const std::string BUNDLE_ACTIVATION_POLICY;
   static const std::string BUNDLE_NAME;
   static const std::string BUNDLE_SYMBOLICNAME;
   static const std::string BUNDLE_VENDOR;
@@ -39,6 +40,9 @@ struct CHERRY_OSGI IBundleManifest : public Object
   static const std::string REQUIRE_BUNDLE;
   static const std::string SYSTEM_BUNDLE;
   static const std::string VERSION;
+
+  enum ActivationPolicy { LAZY, EAGER };
+  
   
   
   struct Dependency {
@@ -53,7 +57,7 @@ struct CHERRY_OSGI IBundleManifest : public Object
   virtual const std::string& GetActivatorClass() const = 0;
   virtual const std::string& GetActivatorLibrary() const = 0;
   virtual const std::string& GetCopyright() const = 0;
-  virtual bool GetLazyStart() const = 0;
+  virtual ActivationPolicy GetActivationPolicy() const = 0;
   virtual bool IsSystemBundle() const = 0;
   virtual const std::string& GetName() const = 0;
   virtual const Dependencies& GetRequiredBundles() const = 0;

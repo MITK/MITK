@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYBUNDLEMANIFEST_H_
 #define CHERRYBUNDLEMANIFEST_H_
 
-
 #include "cherryIBundleManifest.h"
+
 
 namespace cherry {
 
@@ -36,7 +36,7 @@ public:
   const std::string& GetActivatorClass() const;
   const std::string& GetActivatorLibrary() const;
   const std::string& GetCopyright() const;
-  bool GetLazyStart() const;
+  ActivationPolicy GetActivationPolicy() const;
   bool IsSystemBundle() const;
   const std::string& GetName() const;
   const IBundleManifest::Dependencies& GetRequiredBundles() const;
@@ -47,6 +47,9 @@ public:
   bool operator==(const Object* o) const;
   
 private:
+
+  const std::string POLICY_EAGER;
+  const std::string POLICY_LAZY;
   
   void ParseActivator(const std::string& activator);
   void ParseManifest(std::istream* istr);
@@ -57,7 +60,7 @@ private:
   
   std::string m_Activator;
   std::string m_Copyright;
-  bool m_LazyStart;
+  ActivationPolicy m_ActivationPolicy;
   std::string m_Name;
   std::string m_SymbolicName;
   std::string m_Vendor;

@@ -95,10 +95,10 @@ Bundle::GetVendor() const
   return m_Manifest->GetVendor();
 }
 
-bool
-Bundle::GetLazyStart() const
+IBundleManifest::ActivationPolicy
+Bundle::GetActivationPolicy() const
 {
-  return m_Manifest->GetLazyStart();
+	return m_Manifest->GetActivationPolicy(); 
 }
   
 std::istream* 

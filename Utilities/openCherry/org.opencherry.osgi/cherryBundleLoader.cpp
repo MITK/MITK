@@ -297,7 +297,7 @@ BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
         std::memcpy(newPath + currSize + 1, bundlePath.toString().c_str(), bundlePath.toString().length());
         newPath[currSize+bundlePath.toString().length()+1] = '\0';
         //std::cout << "Setting additional path: " << newPath;
-        bool success = SetEnvironmentVariableA("path", newPath);
+        /*bool success =*/ SetEnvironmentVariableA("path", newPath);
         //std::cout << " " << (success ? "SUCCESS" : "FAILED") << std::endl;
 
         delete[] newPath;
@@ -360,9 +360,9 @@ BundleLoader::StartAllBundles()
   BundleMap::iterator iter;
   for (iter = m_BundleMap.begin(); iter != m_BundleMap.end(); ++iter)
   {
-    if (!iter->second.m_Bundle->GetLazyStart() &&
+	  if  (iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
         !iter->second.m_Bundle->IsSystemBundle())
-      this->StartBundle(iter->second.m_Bundle);
+     this->StartBundle(iter->second.m_Bundle);
   }
 }
 

@@ -45,7 +45,7 @@ public:
   const std::string& GetCopyright() const;
   const std::string& GetVendor() const;
   
-  bool GetLazyStart() const;
+  IBundleManifest::ActivationPolicy GetActivationPolicy() const;
   
   std::istream* GetLocalizedResource(const std::string& name) const;
   std::istream* GetResource(const std::string& name) const;

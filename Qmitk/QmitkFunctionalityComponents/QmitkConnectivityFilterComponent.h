@@ -113,6 +113,7 @@ public slots:
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   virtual void ImageSelected(const mitk::DataTreeFilter::Item * imageIt);
+  virtual void SecondSurfaceSelected(const mitk::DataTreeFilter::Item * imageIt);
 
   /** \brief Method to set the Image Selector visible or invisible */
   void SetContentContainerVisibility(bool visible);
@@ -188,6 +189,9 @@ private:
   a reference to the visible multiwidget
   */
   QmitkStdMultiWidget* m_MultiWidget;
+
+  /** \brief Item on the selected second Surface in the TreeNodeSelector if one surface shall be append to another*/
+  const mitk::DataTreeFilter::Item * m_SecondSelectedItem;
 
 
 

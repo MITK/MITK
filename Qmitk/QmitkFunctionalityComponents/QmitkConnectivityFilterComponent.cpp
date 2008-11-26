@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 
 #include <mitkDataTreeNodeFactory.h>
+#include <mitkDataTreeHelper.h>
 #include "mitkDisplayCoordinateOperation.h"
 #include <mitkVtkPropRenderer.h>
 #include "mitkProperties.h"
@@ -42,25 +43,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderer.h>
 #include <vtkUnsignedIntArray.h>
 
+#include <vtkAppendPolyData.h>
 
-//#include "QmitkDisplayPointSetComponent.h"
-
-//#include <vtkImageGaussianSmooth.h>
 #include <vtkPolyDataConnectivityFilter.h>
-//#include <vtkRenderer.h>
-//#include <vtkRenderWindow.h>
-//#include <vtkRenderWindowInteractor.h>
-//#include <vtkImageShrink3D.h>
 #include <vtkPolyDataMapper.h>
-//#include <vtkActor.h>
-//#include <vtkMarchingCubes.h>
-//#include <vtkSmoothPolyDataFilter.h>
 #include <vtkPolyDataNormals.h>
-//#include <vtkImageGaussianSmooth.h>
-//#include <vtkImageThreshold.h>
-//#include <mitkOpenGLRenderer.h>
-//#include <mitkVtkRenderWindow.h>
-//#include <vtkRenderWindow.h>
 #include <vtkSTLWriter.h>
 
 #include <qlayout.h>
@@ -92,12 +79,6 @@ QmitkConnectivityFilterComponent::~QmitkConnectivityFilterComponent()
 
 }
 
-///*************** GET DATA TREE ITERATOR ***************/
-//mitk::DataTreeIteratorBase* QmitkPixelGreyValueManipulatorComponent::GetDataTreeIterator()
-//{
-//  return m_DataTreeIterator.GetPointer();
-//}
-
 /*************** SET DATA TREE ITERATOR ***************/
 void QmitkConnectivityFilterComponent::SetDataTreeIterator(mitk::DataTreeIteratorBase* it)
 {
@@ -109,12 +90,6 @@ QmitkDataTreeComboBox* QmitkConnectivityFilterComponent::GetTreeNodeSelector()
 {
   return m_ConnectivityFilterComponentGUI->GetTreeNodeSelector();
 }
-
-/***************   GET POINT SET NODE   ***************/
-//mitk::DataTreeNode::Pointer QmitkConnectivityFilterComponent::GetPointSetNode()
-//{
-// return  m_ConnectivityNode;
-//}
 
 /***************   GET IMAGE CONTENT   ***************/
 QGroupBox*  QmitkConnectivityFilterComponent::GetImageContent()
@@ -128,6 +103,7 @@ void QmitkConnectivityFilterComponent::UpdateDataTreeComboBoxes()
   if(GetTreeNodeSelector() != NULL)
   {
     GetTreeNodeSelector()->Update();
+    m_ConnectivityFilterComponentGUI->GetSecondSurfaceComboBox()->Update();
   }
 }
 
@@ -145,8 +121,8 @@ void QmitkConnectivityFilterComponent::CreateConnections()
     //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
     connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetShowComponent()),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
 
-    //to watch wether a mouse-click is important or not
-    //connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()), SIGNAL(activated(int)), (QObject*) this, SLOT(TextBoxChanged(int)));
+    //select second surface if they shall be connected 
+    connect( (QObject*)(m_ConnectivityFilterComponentGUI->GetSecondSurfaceComboBox()), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(SecondSurfaceSelected(const mitk::DataTreeFilter::Item *)));
   }
 }
 
@@ -185,6 +161,35 @@ void QmitkConnectivityFilterComponent::ImageSelected(const mitk::DataTreeFilter:
   TreeChanged();
 }
 
+void QmitkConnectivityFilterComponent::SecondSurfaceSelected(const mitk::DataTreeFilter::Item * imageIt)
+{
+  //mitk::DataTreeFilter::Item* secondSurface(NULL);
+  //if(m_ConnectivityFilterComponentGUI)
+  //{
+  //  if(mitk::DataTreeFilter* filter = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter())
+  //  {
+  //    if(imageIt)
+  //    {
+  //      secondSurface = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+  //    }
+  //  }
+  //}
+m_SecondSelectedItem = imageIt;
+//mitk::DataTreeFilter::Item* currentItem(NULL);
+//if(m_ConnectivityFilterComponentGUI)
+//{
+//  if(mitk::DataTreeFilter* filter = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter())
+//  {
+//    if(imageIt)
+//    {
+//      currentItem = const_cast <mitk::DataTreeFilter::Item*> ( filter->FindItem( imageIt->GetNode() ) );
+//    }
+//  }
+//}
+
+}
+
+
 /*************** CREATE CONTAINER WIDGET **************/
 QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 {
@@ -193,15 +198,18 @@ QWidget* QmitkConnectivityFilterComponent::CreateControlWidget(QWidget* parent)
 
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
   m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
+  m_ConnectivityFilterComponentGUI->GetSecondSurfaceComboBox()->SetDataTree(GetDataTreeIterator());
+  m_ConnectivityFilterComponentGUI->GetSecondSurfaceComboBox()->GetFilter()->SetFilter(mitk::IsBaseDataType<mitk::Surface>());
 
-  if(m_ShowSelector)
-  {
-    m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
-  }
-  else
-  {
-    m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
-  }
+  m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(true);
+  //if(m_ShowSelector)
+  //{
+  //  m_ConnectivityFilterComponentGUI->GetImageContent()->setShown(m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->isChecked());
+  //}
+  //else
+  //{
+  //  m_ConnectivityFilterComponentGUI->GetShowTreeNodeSelectorGroupBox()->setShown(m_ShowSelector);
+  //}
 
   //vtkRenderer* renderer = (vtkRenderer*)m_MultiWidget->GetRenderWindow4()->GetRenderer();
 
@@ -421,26 +429,19 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
   // 1 show all Regions
   // 2 showClosestPointRegion
   // 3 delete Point Marked Region
+  // 4 append Surface
 
 
   int filterMode = m_ConnectivityFilterComponentGUI->GetFilterModeComboBox()->currentItem();
   int fm = filterMode;
 
-  //for(int modulus = 0; modulus <2; modulus++)
-  //{
-  //  if(filterMode == 3)
-  //  {
-  //    if(fm == 3)
-  //    {
-  //      fm = 1;
-  //    }
-  //    else
-  //    {
-  //      fm = 3;
-  //    }
-  //  }
   vtkPolyDataConnectivityFilter* pdConnectivity = vtkPolyDataConnectivityFilter::New();
+  vtkPolyData* connectedPoly = vtkPolyData::New();
+  vtkAppendPolyData* appendPolyData = vtkAppendPolyData::New();
+
   m_SelectedItem = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetSelectedItem();
+  m_SecondSelectedItem = m_ConnectivityFilterComponentGUI->GetSecondSurfaceComboBox()->GetFilter()->GetSelectedItem();
+
   if(m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetItems()->Size() > 0)//if itemSelector is not empty
   {
     mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SelectedItem->GetNode()->GetData());
@@ -598,6 +599,25 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         }
       }
       break;
+      case 4: /*Append Surface*/
+        {
+
+          std::cout<<"Append Surface"<<std::endl;
+          mitk::Surface* oldsurface = dynamic_cast<mitk::Surface*>(m_SelectedItem->GetNode()->GetData());
+          mitk::Surface* appendingSurface = dynamic_cast<mitk::Surface*>(m_SecondSelectedItem->GetNode()->GetData());
+        
+          //vtkAppendPolyData* appendPolyData = vtkAppendPolyData::New();
+
+          appendPolyData->AddInput( oldsurface->GetVtkPolyData() );
+          appendPolyData->AddInput( appendingSurface->GetVtkPolyData() );
+          appendPolyData->Update();
+
+          connectedPoly = appendPolyData->GetOutput();
+
+          //pdConnectivity->SetInput(appendPolyData->GetOutput());
+          //pdConnectivity->Update();
+        }
+        break;
 
     default: ; break; 
     }
@@ -627,7 +647,16 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
         if (sf.IsNotNull())
         {
           mitk::DataTreeNode::Pointer connectivityNode = mitk::DataTreeNode::New();
-          vtkPolyData* connected = pdConnectivity->GetOutput();
+
+          vtkPolyData* connected;// = new vtkPolyData();
+          if(fm == 4)//if surfaces schall be connected
+          {
+            connected = connectedPoly;
+          }
+          else
+          {
+            connected = pdConnectivity->GetOutput();
+          }
           sf->SetVtkPolyData(connected, 0);
           connectivityNode->SetData(sf);
 
@@ -677,16 +706,20 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
               if(iteratorConnectivity->Get() == m_SelectedItem->GetNode())
               {
 
-                //std::cout <<"Gleicher Knoten"<<std::endl;
-                if(filterMode==2)
-                {
-                  iteratorConnectivity->Add(connectivityNode);
+                ////std::cout <<"Gleicher Knoten"<<std::endl;
+                //if(filterMode==2)
+                //{
+                	mitk::DataTreeNode::Pointer imageNode = iteratorConnectivity->Get();
+                  mitk::DataStorage::GetInstance()->Add( connectivityNode, imageNode );
+                  //iteratorConnectivity->Add(connectivityNode);
                   emit nodeExported( connectivityNode );
-                }
-                else
-                {
-                  iteratorConnectivity->Set(connectivityNode);
-                }
+                //}
+                //else
+                //{
+                //  mitk::DataStorage::GetInstance()->Remove(connectivityNode);
+                //  mitk::DataStorage::GetInstance()->Add( connectivityNode );
+                //  //iteratorConnectivity->Set(connectivityNode);
+                //}
                 //mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
                 iteratorConnectivity->GetTree()->Modified();
                 //std::cout <<"SET"<<std::endl;

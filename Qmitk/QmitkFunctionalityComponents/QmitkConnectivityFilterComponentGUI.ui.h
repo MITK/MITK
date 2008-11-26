@@ -81,3 +81,9 @@ QCheckBox* QmitkConnectivityFilterComponentGUI::GetReplaceSurfaceCheckBox()
 {
   return m_ReplaceSurfaceCheckBox;
 }
+
+
+QmitkDataTreeComboBox* QmitkConnectivityFilterComponentGUI::GetSecondSurfaceComboBox()
+{
+  return m_SelectSecondSurfaceComboBox;
+}

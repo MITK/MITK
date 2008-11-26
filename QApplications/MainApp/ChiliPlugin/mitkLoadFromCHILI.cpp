@@ -412,9 +412,9 @@ mitk::DataTreeNode::Pointer mitk::LoadFromCHILI::LoadSingleText( QcPlugin* insta
   initSeriesStruct( &series );
   text.oid = strdup( textOID.c_str() );
 
-  if( pQueryText( instance, &text, &series, NULL, NULL ) )
-    resultNode = LoadSingleText( instance, series.oid, text.oid, text.chiliText, tmpDirectory );
-  else
+  //if( pQueryText( instance, &text, &series, NULL, NULL ) )
+  //  resultNode = LoadSingleText( instance, series.oid, text.oid, text.chiliText, tmpDirectory );
+  //else
     std::cout << "LoadFromCHILI (LoadSingleText): pQueryText() failed. Abort." << std::endl;
 
   clearTextStruct( &text );

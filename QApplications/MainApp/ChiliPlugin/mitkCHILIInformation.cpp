@@ -32,6 +32,7 @@ mitk::CHILIInformation::~CHILIInformation()
 
 mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( QcPlugin* instance, const std::string& seriesOID)
 {
+  std::cout << "In GetStudyInformation(" << (void*)instance << ", '" <<  seriesOID << "'" << std::endl;
   PACSPlugin::StudyInformation resultInformation;
   resultInformation.OID = "";
 
@@ -57,7 +58,8 @@ mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( 
   {
     //let CHILI search
     series.oid = strdup( seriesOID.c_str() );
-    if( !pQuerySeries( instance, &series, &study, NULL ) )
+    std::cout << "pQuerySeries(" << (void*)instance << ", " << series.oid << ")" << std::endl;
+    //if( !pQuerySeries( instance, &series, &study, NULL ) )
     {
       clearStudyStruct( &study );
       clearSeriesStruct( &series );
@@ -118,7 +120,7 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
   {
     //let CHILI search
     series.oid = strdup( seriesOID.c_str() );
-    if( !pQuerySeries( instance, &series, &study, &patient ) )
+    //if( !pQuerySeries( instance, &series, &study, &patient ) )
     {
       clearPatientStruct( &patient );
       clearStudyStruct( &study );
@@ -167,7 +169,7 @@ mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation
   {
     //let CHILI search
     series.oid = strdup( seriesOID.c_str() );
-    if( !pQuerySeries( instance, &series, NULL, NULL ) )
+    //if( !pQuerySeries( instance, &series, NULL, NULL ) )
     {
       clearSeriesStruct( &series );
       std::cout << "CHILIInformation (GetSeriesInformation): pQuerySeries() failed. Abort." << std::endl;
@@ -246,7 +248,7 @@ mitk::PACSPlugin::TextInformation mitk::CHILIInformation::GetTextInformation( Qc
 
   //let CHILI search
   text.oid = strdup( textOID.c_str() );
-  if( !pQueryText( instance, &text, NULL, NULL, NULL ) )
+  //if( !pQueryText( instance, &text, NULL, NULL, NULL ) )
   {
     clearTextStruct( &text );
     std::cout << "CHILIInformation (GetTextInformation): pQueryText() failed. Abort." << std::endl;

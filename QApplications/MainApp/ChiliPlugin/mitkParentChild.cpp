@@ -575,8 +575,8 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudy
     initStudyStruct( &study );
     initPatientStruct( &patient );
 
-    if( pQueryStudy( instance, &study, &patient ) )
-      InitParentChild( instance, study.oid, study.instanceUID, patient.oid, tmpDirectory );
+    //if( pQueryStudy( instance, &study, &patient ) )
+    //  InitParentChild( instance, study.oid, study.instanceUID, patient.oid, tmpDirectory );
 
     clearStudyStruct( &study );
     clearPatientStruct( &patient );

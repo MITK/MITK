@@ -112,7 +112,7 @@ void mitk::SaveToCHILI::SaveAsNewSeries( QcPlugin* instance, DataStorage::SetOfO
   study_t study;
   initStudyStruct( &study );
   study.oid = strdup( studyOID.c_str() );
-
+/*
   if( pQueryStudy( instance, &study, NULL ) )  //test if study exist
   {
     //create new series
@@ -126,6 +126,7 @@ void mitk::SaveToCHILI::SaveAsNewSeries( QcPlugin* instance, DataStorage::SetOfO
       std::cout << "SaveToCHILI (SaveAsNewSeries): Can not create a new Series." << std::endl;
     free( newSeries );
   }
+*/
   else
     std::cout << "SaveToCHILI (SaveAsNewSeries): Study not exist. Abort." << std::endl;
   clearStudyStruct( &study );
@@ -144,7 +145,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
   initSeriesStruct( &series );
 
   series.oid = strdup( seriesOID.c_str() );
-  if( !pQuerySeries( instance, &series, &study, &patient ) )
+  //if( !pQuerySeries( instance, &series, &study, &patient ) )
   {
     std::cout << "SaveToCHILI (SaveToSeries): Series not exist. Abort." << std::endl;
     clearStudyStruct( &study );
@@ -274,6 +275,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
             initSeriesStruct( &series );
 
             text.oid = strdup( currentTextOID->GetValueAsString().c_str() );
+            /*
             if( pQueryText( instance, &text, &series, NULL, NULL ) )
             {
               if( strcmp( series.oid, seriesOID.c_str() ) == 0 )  //the SERIESOID from text and aim to save are equal
@@ -290,6 +292,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance, DataStorage::SetOfObje
               else  //the SERIESOIDs are different
                 textOID = pGetNewOID();
             }
+            */
             clearTextStruct( &text );
             clearSeriesStruct( &series );
             textOID = pGetNewOID();

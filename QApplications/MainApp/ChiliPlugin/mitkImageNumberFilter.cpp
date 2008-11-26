@@ -334,6 +334,9 @@ void mitk::ImageNumberFilter::SeparateBySpacing()
       }
       else
       {
+        firstSlice = sliceIter; // remember correct slice for next distance calculation
+        continue;
+        /*
         std::cout << "Splitting group '" << m_GroupList[n].seriesDescription 
                   << "' into two because slice distance is not consistent" << std::endl;
         std::cout << "   slice distance before was: " << lastDistance << std::endl;
@@ -352,6 +355,7 @@ void mitk::ImageNumberFilter::SeparateBySpacing()
         m_GroupList.push_back( newGroup );
         std::cout << "." << std::flush;
         break; // continue outer for-groups loop
+        */
       }
     }
 

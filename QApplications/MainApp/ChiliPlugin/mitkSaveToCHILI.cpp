@@ -126,8 +126,8 @@ void mitk::SaveToCHILI::SaveAsNewSeries( QcPlugin* instance, DataStorage::SetOfO
       std::cout << "SaveToCHILI (SaveAsNewSeries): Can not create a new Series." << std::endl;
     free( newSeries );
   }
-*/
   else
+*/
     std::cout << "SaveToCHILI (SaveAsNewSeries): Study not exist. Abort." << std::endl;
   clearStudyStruct( &study );
   #endif

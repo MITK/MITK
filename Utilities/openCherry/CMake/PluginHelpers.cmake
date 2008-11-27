@@ -99,7 +99,7 @@ FOREACH(dir_entry ${all_dirs})
 ENDFOREACH(dir_entry ${all_dirs})
 
 INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
+LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
 
 FOREACH(plugin_dir ${plugin_dirs}) 
       MESSAGE(STATUS "Processing ${plugin_dir}")

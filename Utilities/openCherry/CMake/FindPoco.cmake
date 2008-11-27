@@ -24,8 +24,8 @@
 #
 # Note:
 #  1) If you are just using the poco headers, then you do not need to use
-#     Poco_LIBRARY_DIRS in your CMakeLists.txt file.
-#  2) If Poco has not been installed, then when setting Poco_LIBRARY_DIRS
+#     Poco_LIBRARY_DIR in your CMakeLists.txt file.
+#  2) If Poco has not been installed, then when setting Poco_LIBRARY_DIR
 #     the script will look for /lib first and, if this fails, then for /stage/lib.
 #
 # Usage:
@@ -35,7 +35,7 @@
 # FIND_PACKAGE(Poco)
 # ...
 # INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
-# LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
+# LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
 #
 # In Windows, we make the assumption that, if the Poco files are installed, the default directory
 # will be C:\poco or C:\Program Files\Poco or C:\Programme\Poco.
@@ -118,25 +118,27 @@ IF(Poco_INCLUDE_DIR)
     SET(Poco_FOUND 1)
   ENDIF(EXISTS "${Poco_INCLUDE_DIR}/Foundation")
 
-  FIND_LIBRARY(Poco_FOUNDATION_LIB NAMES PocoFoundation PocoFoundationd  PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS
+  IF(NOT Poco_LIBRARY_DIR)
+    FIND_LIBRARY(Poco_FOUNDATION_LIB NAMES PocoFoundation PocoFoundationd  PATH_SUFFIXES ${SUFFIX_FOR_LIBRARY_PATH} PATHS
 
-    # Look in other places.
-    ${Poco_INCLUDE_DIR}
-    ${POCO_DIR_SEARCH}
+      # Look in other places.
+      ${Poco_INCLUDE_DIR}
+      ${POCO_DIR_SEARCH}
 
-    # Help the user find it if we cannot.
-    DOC "The ${POCO_LIBRARY_PATH_DESCRIPTION}"
-  )
-  GET_FILENAME_COMPONENT(Poco_LIBRARY_DIR ${Poco_FOUNDATION_LIB} PATH)
-  IF(Poco_LIBRARY_DIR)
-    SET(Poco_LIBRARY_DIRS ${Poco_LIBRARY_DIR})
+      # Help the user find it if we cannot.
+      DOC "The ${POCO_LIBRARY_PATH_DESCRIPTION}"
+    )
+    SET(Poco_LIBRARY_DIR "" CACHE PATH POCO_LIBARARY_PATH_DESCRIPTION)
+    GET_FILENAME_COMPONENT(Poco_LIBRARY_DIR ${Poco_FOUNDATION_LIB} PATH)
+    IF(Poco_LIBRARY_DIR)
+      # Look for the poco binary path.
+      SET(Poco_BINARY_DIR ${Poco_INCLUDE_DIR})
+      IF(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
+        SET(Poco_BINARY_DIRS ${Poco_BINARY_DIR}/bin CACHE)
+      ENDIF(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
+    ENDIF(Poco_LIBRARY_DIR)
 
-    # Look for the poco binary path.
-    SET(Poco_BINARY_DIR ${Poco_INCLUDE_DIR})
-    IF(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
-      SET(Poco_BINARY_DIRS ${Poco_BINARY_DIR}/bin)
-    ENDIF(Poco_BINARY_DIR AND EXISTS "${Poco_BINARY_DIR}/bin")
-  ENDIF(Poco_LIBRARY_DIR)
+  ENDIF(NOT Poco_LIBRARY_DIR)
 
 ENDIF(Poco_INCLUDE_DIR)
 

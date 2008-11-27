@@ -4,7 +4,7 @@
 #include "ui_QmitkSelectableGLWidget.h"
 #include "mitkCameraRotationController.h"
 #include "mitkCommon.h"
-#include "mitkNavigationController.h"
+#include "mitkSliceNavigationController.h"
 #include "mitkVtkPropRenderer.h"
 
 #include <mitkCommon.h>
@@ -19,7 +19,7 @@ class QmitkSelectableGLWidget : public QWidget, public Ui::QmitkSelectableGLWidg
 	QmitkSelectableGLWidget(QWidget* parent=0);
 	mitk::VtkPropRenderer* GetRenderer();
 	QmitkRenderWindow* GetRenderWindow() const;
-	mitk::NavigationController*  GetNavigationController() const;
+	mitk::SliceNavigationController*  GetSliceNavigationController() const;
 	mitk::CameraRotationController* GetCameraRotationController() const;
 	mitk::BaseController* GetController() const;
   protected:

@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
-#include "mitkPointNavigationController.h"
 
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
@@ -52,12 +51,12 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   m_RenderProp = vtkMitkRenderProp::New();
   m_RenderProp->SetPropRenderer(m_Renderer);
   m_Renderer->GetVtkRenderer()->AddViewProp(m_RenderProp);
-  
-  if((this->GetRenderWindow()->GetSize()[0] > 10) 
+
+  if((this->GetRenderWindow()->GetSize()[0] > 10)
       && (this->GetRenderWindow()->GetSize()[1] > 10))
     m_Renderer->InitSize(this->GetRenderWindow()->GetSize()[0], this->GetRenderWindow()->GetSize()[1]);
 
-  
+
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
 
@@ -71,18 +70,18 @@ QmitkRenderWindow::~QmitkRenderWindow()
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();
 }
-  
-mitk::VtkPropRenderer* QmitkRenderWindow::GetRenderer() 
-{ 
-  return m_Renderer; 
+
+mitk::VtkPropRenderer* QmitkRenderWindow::GetRenderer()
+{
+  return m_Renderer;
 }
-  
+
 void QmitkRenderWindow::SetResendQtEvents(bool resend)
 {
   m_ResendQtEvents = resend;
 }
 
-void QmitkRenderWindow::mousePressEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
   QVTKWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
@@ -90,23 +89,23 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MousePressEvent(&event);
   }
-  
+
   if (m_ResendQtEvents) me->ignore();
 }
 
-void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
   QVTKWidget::mouseReleaseEvent(me);
-  if (m_Renderer.IsNotNull()) 
+  if (m_Renderer.IsNotNull())
   {
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MouseReleaseEvent(&event);
   }
-  
+
   if (m_ResendQtEvents) me->ignore();
 }
 
-void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me) 
+void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   QVTKWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
@@ -120,18 +119,18 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   QVTKWidget::wheelEvent(we);
-  
-  if ( GetNavigationController()->GetSliceLocked() )
+
+  if ( GetSliceNavigationController()->GetSliceLocked() )
     return;
-  
-  mitk::Stepper* stepper = GetNavigationController()->GetSlice();
-  
+
+  mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
+
   if (stepper->GetSteps() <= 1)
   {
-    stepper = GetNavigationController()->GetTime();
+    stepper = GetSliceNavigationController()->GetTime();
   }
 
-  if (we->orientation() * we->delta()  > 0) 
+  if (we->orientation() * we->delta()  > 0)
   {
     stepper->Next();
   }
@@ -139,11 +138,11 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   {
     stepper->Previous();
   }
-  
+
   if (m_ResendQtEvents) we->ignore();
 }
 
-void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke) 
+void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 {
   QVTKWidget::keyPressEvent(ke);
   if (m_Renderer.IsNotNull())
@@ -154,18 +153,18 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     if(mke.isAccepted())
       ke->accept();
   }
-  
+
   if (m_ResendQtEvents) ke->ignore();
 }
 
 void QmitkRenderWindow::InitRenderer()
-{ 
+{
 }
 
 void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
 {
   QVTKWidget::resizeEvent(event);
-  
+
   if(m_InResize) //@FIXME CRITICAL probably related to VtkSizeBug
     return;
   m_InResize = true;
@@ -180,14 +179,15 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
     //this->update();
     //updateGL();
   }
-  
+
   m_InResize = false;
 }
 
-mitk::NavigationController * QmitkRenderWindow::GetNavigationController()
+mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
 {
-  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetNavigationController();
+  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetSliceNavigationController();
 }
+
 mitk::CameraRotationController * QmitkRenderWindow::GetCameraRotationController()
 {
   return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetCameraRotationController();
@@ -199,13 +199,13 @@ mitk::BaseController * QmitkRenderWindow::GetController()
   switch ( renderer->GetMapperID() )
   {
     case mitk::BaseRenderer::Standard2D:
-      return GetNavigationController();
+      return GetSliceNavigationController();
 
     case mitk::BaseRenderer::Standard3D:
       return GetCameraRotationController();
 
     default:
-      return GetNavigationController();
+      return GetSliceNavigationController();
   }
 }
 

@@ -11,11 +11,23 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # like #include <ipPic/ipPic.h>
 INCLUDE_DIRECTORIES(.)
 
-SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml)
+SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml) # Poco)
 # IF(NOT MITK_CHILI_PLUGIN)
 SUBDIRS(ipPic ipFunc)
 
 # ENDIF(NOT MITK_CHILI_PLUGIN)
+
+SET(Poco_INCLUDE_DIR 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Poco 
+    CACHE PATH 
+    "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2"
+)
+
+SET(Poco_LIBRARY_DIR 
+    ${LIBRARY_OUTPUT_PATH}
+    CACHE PATH 
+    "top-level directory containing the poco libraries."
+)
 
 IF(DESIRED_QT_VERSION EQUAL 4)
   OPTION(BUILD_OPENCHERRY "EXPERIMENTAL! Build the openCherry platform" OFF)

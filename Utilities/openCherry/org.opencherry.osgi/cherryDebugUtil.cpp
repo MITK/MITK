@@ -53,7 +53,7 @@ std::list<int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer, const 
        iter != excludeList.end(); ++iter)
     ids.remove(*iter);
   return ids;
-#elif
+#else
   return std::list<int>();
 #endif
 }

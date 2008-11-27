@@ -27,7 +27,7 @@
 #include "cherryRectangle.h"
 #include "cherryPoint.h"
 
-#include <vector>
+#include <map>
 
 namespace cherry {
 
@@ -136,8 +136,8 @@ public:
 
   cherryClassMacro(Shell);
 
-  Object::Pointer GetData() const;
-  void SetData(Object::Pointer data);
+  Object::Pointer GetData(const std::string& id = "") const;
+  void SetData(Object::Pointer data, const std::string& id = "");
 
   void SetBounds(int x, int y, int width, int height);
 
@@ -323,7 +323,7 @@ public:
 
 private:
 
-  Object::Pointer data;
+  std::map<std::string, Object::Pointer> data;
 
 };
 

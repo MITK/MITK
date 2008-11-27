@@ -50,6 +50,7 @@ class PartStack : public LayoutPart, public IStackableContainer {
 
   friend class EditorSashContainer;
   friend class PartSashContainer;
+  friend class DetachedWindow;
 
 public: cherryClassMacro(PartStack);
 

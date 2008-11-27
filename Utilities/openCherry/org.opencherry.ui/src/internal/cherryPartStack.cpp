@@ -31,8 +31,6 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
 #include <cherryObjects.h>
-#include <cherryDebugUtil.h>
-#include <sstream>
 
 namespace cherry
 {
@@ -210,8 +208,6 @@ PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
   this->SetID(buf.str());
 
   presentationSite = new MyStackPresentationSite(this);
-
-  DebugUtil::TraceObject(this);
 }
 
 bool PartStack::IsMoveable(IPresentablePart::Pointer part)

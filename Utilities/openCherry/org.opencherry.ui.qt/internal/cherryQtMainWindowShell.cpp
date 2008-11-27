@@ -22,6 +22,8 @@
 #include <cherryConstants.h>
 
 #include <QEvent>
+#include <QMoveEvent>
+#include <QResizeEvent>
 #include <QWindowStateChangeEvent>
 
 namespace cherry
@@ -244,7 +246,7 @@ void QtMainWindowShell::moveEvent(QMoveEvent* event)
 {
   if (controlListeners.empty()) return;
 
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, event->pos().x(), event->pos().y());
   for (ControlListenersList::iterator listener = controlListeners.begin();
        listener != controlListeners.end(); ++listener)
   {
@@ -256,7 +258,7 @@ void QtMainWindowShell::resizeEvent(QResizeEvent* event)
 {
   if (controlListeners.empty()) return;
 
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, 0, 0, event->size().width(), event->size().height());
   for (ControlListenersList::iterator listener = controlListeners.begin();
        listener != controlListeners.end(); ++listener)
   {
@@ -264,11 +266,11 @@ void QtMainWindowShell::resizeEvent(QResizeEvent* event)
   }
 }
 
-void QtMainWindowShell::showEvent(QShowEvent* event)
+void QtMainWindowShell::inFocusEvent(QFocusEvent* /*event*/)
 {
   if (controlListeners.empty()) return;
 
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this);
   for (ControlListenersList::iterator listener = controlListeners.begin();
        listener != controlListeners.end(); ++listener)
   {

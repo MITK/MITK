@@ -25,7 +25,7 @@
 #include "cherryWindow.h"
 
 #include "internal/cherryWorkbenchWindowConfigurer.h"
-
+#include "internal/cherryShellPool.h"
 #include "internal/cherryServiceLocator.h"
 
 #include "application/cherryWorkbenchAdvisor.h"
@@ -167,6 +167,7 @@ protected:
   friend class Workbench;
   friend class LayoutPartSash;
   friend class WorkbenchPage;
+  friend class DetachedWindow;
 
   /**
    * Returns the GUI dependent page composite, under which the window's
@@ -215,6 +216,8 @@ protected:
    * @see cherry::Window#configureShell(Shell::Pointer)
    */
   void ConfigureShell(Shell::Pointer shell);
+
+  ShellPool::Pointer GetDetachedWindowPool();
 
   /**
    * Fills the window's real action bars.
@@ -272,6 +275,8 @@ private:
    * @since 3.0
    */
   void* pageComposite;
+
+  ShellPool::Pointer detachedWindowShells;
 
   /**
    * Object for configuring this workbench window. Lazily initialized to an

@@ -21,6 +21,9 @@
 #include "cherryPartStack.h"
 #include "cherryWorkbenchPage.h"
 #include "cherryLayoutPart.h"
+#include "cherryIDragOverListener.h"
+#include "../cherryIShellListener.h"
+#include "../guitk/cherryGuiTkIControlListener.h"
 
 #include "../cherryRectangle.h"
 #include "../cherryShell.h"
@@ -33,7 +36,8 @@ namespace cherry
  *
  * @since 3.1
  */
-class DetachedWindow : public IPropertyChangeListener, public virtual Object //: public IDragOverListener
+class DetachedWindow: public IPropertyChangeListener,
+    public IDragOverListener
 {
 
 public:
@@ -50,41 +54,43 @@ private:
 
   bool hideViewsOnClose;
 
-  //    ShellListener shellListener = new ShellAdapter() {
-  //        public void shellClosed(ShellEvent e) {
-  //          // only continue to close if the handleClose
-  //          // wasn't canceled
-  //            e.doit = handleClose();
-  //        }
-  //    };
-  //
-  //    Listener resizeListener = new Listener() {
-  //        public void handleEvent(Event event) {
-  //            Shell shell = (Shell) event.widget;
-  //            folder.setBounds(shell.getClientArea());
-  //        }
-  //    };
-  //
-  //    Listener activationListener = new Listener() {
-  //        public void handleEvent(Event event) {
-  //          switch (event.type) {
-  //          case SWT.Activate:
-  //            page.window.liftRestrictions();
-  //            break;
-  //          case SWT.Deactivate:
-  //            page.window.imposeRestrictions();
-  //            break;
-  //          }
-  //        }
-  //    };
-  //
-  //    IPropertyListener propertyListener = new IPropertyListener() {
-  //        public void propertyChanged(Object source, int propId) {
-  //            if (propId == PartStack.PROP_SELECTION) {
-  //                activePartChanged(getPartReference(folder.getSelection()));
+  struct ShellListener: public IShellListener
+  {
+    ShellListener(DetachedWindow* wnd);
+
+    void ShellClosed(ShellEvent::Pointer e);
+
+  private:
+    DetachedWindow* window;
+  };
+
+  IShellListener::Pointer shellListener;
+
+  struct ShellControlListener: public GuiTk::IControlListener
+  {
+
+    ShellControlListener(DetachedWindow* wnd);
+
+    void ControlResized(GuiTk::ControlEvent::Pointer e);
+
+  private:
+    DetachedWindow* window;
+  };
+
+  GuiTk::IControlListener::Pointer resizeListener;
+
+  //      Listener activationListener = new Listener() {
+  //          public void handleEvent(Event event) {
+  //            switch (event.type) {
+  //            case SWT.Activate:
+  //              page.window.liftRestrictions();
+  //              break;
+  //            case SWT.Deactivate:
+  //              page.window.imposeRestrictions();
+  //              break;
   //            }
-  //        }
-  //    };
+  //          }
+  //      };
 
   IWorkbenchPartReference::Pointer activePart;
 
@@ -111,40 +117,12 @@ public:
 
   bool Close();
 
-  //TODO DND
-  /* (non-Javadoc)
-   * @see org.opencherry.ui.internal.dnd.IDragOverListener#drag(org.opencherry.swt.widgets.Control, java.lang.Object, org.opencherry.swt.graphics.Point, org.opencherry.swt.graphics.Rectangle)
+  /*
+   * @see org.opencherry.ui.internal.IDragOverListener#Drag(void*, Object::Pointer, const Point&, const Rectangle& )
    */
-  //        IDropTarget drag(Control currentControl, Object draggedObject,
-  //                Point position, Rectangle dragRectangle) {
-  //
-  //            if (!(draggedObject instanceof PartPane)) {
-  //                return null;
-  //            }
-  //
-  //            final PartPane sourcePart = (PartPane) draggedObject;
-  //
-  //            if (sourcePart.getWorkbenchWindow() != page.getWorkbenchWindow()) {
-  //                return null;
-  //            }
-  //
-  //            // Only handle the event if the source part is acceptable to the particular PartStack
-  //            IDropTarget target = null;
-  //            if (folder.allowsDrop(sourcePart)) {
-  //              target = folder.getDropTarget(draggedObject, position);
-  //
-  //              if (target == null) {
-  //                Rectangle displayBounds = DragUtil.getDisplayBounds(folder.getControl());
-  //                if (displayBounds.contains(position)) {
-  //                    target = folder.createDropTarget(sourcePart, new StackDropResult(displayBounds, null));
-  //                } else {
-  //                    return null;
-  //                }
-  //              }
-  //            }
-  //
-  //            return target;
-  //        }
+  IDropTarget::Pointer Drag(void* currentControl,
+      Object::Pointer draggedObject, const Point& position,
+      const Rectangle& dragRectangle);
 
   IStackableContainer::ChildrenType GetChildren() const;
 
@@ -160,9 +138,6 @@ public:
    */
   void SaveState(IMemento::Pointer memento);
 
-  /* (non-Javadoc)
-   * @see org.opencherry.ui.internal.IWorkbenchDragDropPart#getControl()
-   */
   void* GetControl();
 
   /**
@@ -195,7 +170,7 @@ private:
   void UpdateMinimumSize();
 
   static IWorkbenchPartReference::Pointer GetPartReference(
-      PartPane::Pointer pane);
+      StackablePart::Pointer pane);
 
   /**
    * Closes this window and disposes its shell.

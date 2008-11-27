@@ -120,6 +120,7 @@ SET(INTERNAL_CPP_FILES
   cherrySaveablesList.cpp
   cherryServiceLocator.cpp
   cherryServiceLocatorCreator.cpp
+  cherryShellPool.cpp
   cherrySourcePriorityNameMapping.cpp
   cherryStackablePart.cpp
   cherryTweaklets.cpp
@@ -132,7 +133,6 @@ SET(INTERNAL_CPP_FILES
   cherryViewSashContainer.cpp
   cherryViewSite.cpp
   cherryWorkbenchPage.cpp
-  #cherryDummyWorkbenchPage.cpp
   cherryWindowManager.cpp
   cherryWorkbench.cpp
   cherryWorkbenchConfigurer.cpp

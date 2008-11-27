@@ -31,6 +31,7 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "../cherryConstants.h"
 
+
 namespace cherry
 {
 
@@ -99,22 +100,27 @@ void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
     side = Constants::BOTTOM;
   }
 
-  PartStack::Pointer stack = targetPart.Cast<PartStack> ();
-  if (stack == 0 && targetPart.Cast<PartPane>() != 0)
+  PartStack::Pointer targetStack = targetPart.Cast<PartStack> ();
+  if (targetStack == 0 && targetPart.Cast<PartPane>() != 0)
   {
-    stack = targetPart.Cast<PartPane> ()->GetStack();
+    targetStack = targetPart.Cast<PartPane> ()->GetStack();
   }
+  LayoutPart::Pointer targetLayoutPart = targetStack;
+
+  // if targetLayoutPart == 0 then we normally got a EditorSashContainer
+  if (targetLayoutPart == 0)
+    targetLayoutPart = targetPart.Cast<LayoutPart>();
 
   if (side == Constants::CENTER)
   {
 
-    if (this->IsStackType(stack))
+    if (this->IsStackType(targetStack))
     {
 
       for (unsigned int idx = 0; idx < toDrop.size(); idx++)
       {
         StackablePart::Pointer next = toDrop[idx];
-        this->Stack(next, stack);
+        this->Stack(next, targetStack);
       }
     }
   }
@@ -135,8 +141,8 @@ void PartSashContainer::DropObject(const std::vector<PartPane::Pointer>& toDrop,
       this->Stack(next, newPart);
     }
 
-    this->AddEnhanced(newPart, side, this->GetDockingRatio(newPart, stack),
-        stack);
+    this->AddEnhanced(newPart, side, this->GetDockingRatio(newPart, targetStack),
+        targetLayoutPart);
   }
 
   if (visiblePart != 0)

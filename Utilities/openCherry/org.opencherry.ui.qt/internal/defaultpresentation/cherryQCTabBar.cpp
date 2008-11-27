@@ -55,7 +55,7 @@ void QCTabBar::tabRemoved(int index)
 void QCTabBar::mousePressEvent(QMouseEvent* event)
 {
   if (event->button() == Qt::LeftButton)
-     dragStartPosition = event->pos();
+     dragStartPosition = event->globalPos();
 
   QTabBar::mousePressEvent(event);
 }
@@ -68,14 +68,14 @@ void QCTabBar::mouseMoveEvent(QMouseEvent* event)
     return;
   }
 
-   if ((event->pos() - dragStartPosition).manhattanLength()
+   if ((event->globalPos() - dragStartPosition).manhattanLength()
         < QApplication::startDragDistance())
    {
      QTabBar::mouseMoveEvent(event);
      return;
    }
 
-   emit dragStarted(event->globalPos());
+   emit dragStarted(dragStartPosition);
 }
 
 AbstractTabItem* QCTabBar::getTab(int index) const

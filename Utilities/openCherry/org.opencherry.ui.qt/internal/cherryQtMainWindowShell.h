@@ -88,7 +88,7 @@ protected:
 
   void moveEvent(QMoveEvent* event);
   void resizeEvent(QResizeEvent* event);
-  void showEvent(QShowEvent* event);
+  void inFocusEvent(QFocusEvent* event);
 
 };
 

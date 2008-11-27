@@ -19,6 +19,7 @@
 #include "cherryWorkbenchWindow.h"
 #include "cherryIPerspectiveDescriptor.h"
 #include "cherryUIException.h"
+#include "cherryConstants.h"
 
 #include "internal/cherryWorkbenchPlugin.h"
 #include "internal/cherryWorkbenchPage.h"
@@ -1298,8 +1299,8 @@ void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
 {
   Window::ConfigureShell(shell);
 
-  //    detachedWindowShells = new ShellPool(shell, SWT.TOOL | SWT.TITLE
-  //        | SWT.MAX | SWT.RESIZE | getDefaultOrientation());
+  detachedWindowShells = new ShellPool(shell, Constants::TITLE
+          | Constants::MAX | Constants::RESIZE );
 
   std::string title = this->GetWindowConfigurer()->BasicGetTitle();
   if (title != "")
@@ -1316,6 +1317,11 @@ void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
 
   this->TrackShellActivation(shell);
   this->TrackShellResize(shell);
+}
+
+ShellPool::Pointer WorkbenchWindow::GetDetachedWindowPool()
+{
+  return detachedWindowShells;
 }
 
 WorkbenchAdvisor* WorkbenchWindow::GetAdvisor()

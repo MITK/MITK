@@ -19,14 +19,16 @@
 
 namespace cherry {
 
-Object::Pointer Shell::GetData() const
+Object::Pointer Shell::GetData(const std::string& id) const
 {
-  return data;
+  std::map<std::string, Object::Pointer>::const_iterator iter = data.find(id);
+  if (iter == data.end()) return 0;
+  return iter->second;
 }
 
-void Shell::SetData(Object::Pointer data)
+void Shell::SetData(Object::Pointer data, const std::string& id)
 {
-  this->data = data;
+  this->data[id] = data;
 }
 
 void Shell::SetBounds(int x, int y, int width, int height)

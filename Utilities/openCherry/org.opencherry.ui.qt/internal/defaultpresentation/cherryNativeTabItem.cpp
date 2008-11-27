@@ -30,7 +30,18 @@ NativeTabItem::NativeTabItem(NativeTabFolder* _parent, int index) :
 
 QRect NativeTabItem::GetBounds()
 {
-  return QRect();
+  int index = parent->IndexOf(this);
+
+  QTabBar* folder = parent->GetTabFolder();
+  QRect localRect = folder->tabRect(index);
+
+  QPoint topLeft = localRect.topLeft();
+  QPoint bottomRight = localRect.bottomRight();
+
+  QPoint globalTopLeft = folder->mapToGlobal(topLeft);
+  QPoint globalBottomRight = folder->mapToGlobal(bottomRight);
+
+  return QRect(globalTopLeft, globalBottomRight);
 }
 
 void NativeTabItem::SetInfo(const PartInfo& info)

@@ -236,10 +236,11 @@ void NativeTabFolder::SetSelectedImage(const QPixmap* image)
 
 AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
 {
-//  int index = tabControl->tabAt(toFind);
-//  if (index < 0) return 0;
-//  return tabControl->getTab(index);
-  return this->GetSelection();
+  QPoint localPoint = tabControl->mapFromGlobal(toFind);
+  int index = tabControl->tabAt(localPoint);
+  if (index < 0)
+    return 0;
+  return tabControl->getTab(index);
 }
 
 void NativeTabFolder::EnablePaneMenu(bool enabled)

@@ -17,6 +17,9 @@
 
 #include "cherryQtControlWidget.h"
 
+#include <QMoveEvent>
+#include <QResizeEvent>
+
 #include <algorithm>
 
 namespace cherry {
@@ -39,19 +42,21 @@ void QtControlWidget::RemoveControlListener(GuiTk::IControlListener::Pointer lis
 
 void QtControlWidget::moveEvent(QMoveEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, event->pos().x(), event->pos().y(),
+      0, 0);
   controlEvents.movedEvent(controlEvent);
 }
 
 void QtControlWidget::resizeEvent(QResizeEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, 0, 0,
+      event->size().width(), event->size().height());
   controlEvents.resizedEvent(controlEvent);
 }
 
-void QtControlWidget::focusInEvent(QFocusEvent* event)
+void QtControlWidget::focusInEvent(QFocusEvent* /*event*/)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent();
+  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, 0, 0, 0, 0);
   controlEvents.activatedEvent(controlEvent);
 }
 

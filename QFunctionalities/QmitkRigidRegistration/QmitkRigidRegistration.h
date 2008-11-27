@@ -215,6 +215,7 @@ class QmitkRigidRegistration : public QmitkFunctionality
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
     invisibleNodesList m_InvisibleNodesList;
+    int m_TranslateSliderPos[3];
 };
 
 #endif //QMITKRigidREGISTRATION_H

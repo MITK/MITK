@@ -37,6 +37,10 @@ QmitkRigidRegistration::QmitkRigidRegistration(QObject *parent, const char *name
   m_ShowRedGreen(false), m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0),
   m_NewMovingLayer(0), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false)
 {
+  m_TranslateSliderPos[0] = 0;
+  m_TranslateSliderPos[1] = 0;
+  m_TranslateSliderPos[2] = 0;
+
   SetAvailability(true);
 }
 
@@ -546,16 +550,16 @@ void QmitkRigidRegistration::Translate(int* translateVector)
 { 
   if (m_MovingNode != NULL)
   {
-    float* oldPos = new float[3];
-
-    oldPos[0] = m_MovingNode->GetVtkTransform()->GetMatrix()->GetElement(0,3);
-    oldPos[1] = m_MovingNode->GetVtkTransform()->GetMatrix()->GetElement(1,3);
-    oldPos[2] = m_MovingNode->GetVtkTransform()->GetMatrix()->GetElement(2,3);
-
     mitk::Vector3D translateVec; 
-    translateVec[0] = translateVector[0] - oldPos[0];
-    translateVec[1] = translateVector[1] - oldPos[1];
-    translateVec[2] = translateVector[2] - oldPos[2];
+
+    translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
+    translateVec[1] = translateVector[1] - m_TranslateSliderPos[1];
+    translateVec[2] = translateVector[2] - m_TranslateSliderPos[2];
+
+    m_TranslateSliderPos[0] = translateVector[0];
+    m_TranslateSliderPos[1] = translateVector[1];
+    m_TranslateSliderPos[2] = translateVector[2];
+
     m_MovingNode->GetData()->GetGeometry()->Translate( translateVec );
 
     m_MovingNode->GetData()->Modified();

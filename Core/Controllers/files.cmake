@@ -10,8 +10,6 @@ SET(CPP_FILES
   mitkProgressBar.cpp
   mitkRenderingManager.cpp
   mitkSegmentationInterpolationController.cpp
-  mitkNavigationController.cpp
-  mitkPointNavigationController.cpp
   mitkSliceNavigationController.cpp
   mitkSlicesCoordinator.cpp
   mitkSlicesRotator.cpp

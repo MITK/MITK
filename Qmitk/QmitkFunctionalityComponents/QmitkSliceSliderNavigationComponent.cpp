@@ -180,9 +180,9 @@ QWidget* QmitkSliceSliderNavigationComponent::CreateControlWidget(QWidget* paren
 	m_SliceSliderComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
 
 
-	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetTransversalSlider(), m_MultiWidget->mitkWidget1->GetNavigationController()->GetSlice(), "sliceNavigatorTransversal");
-	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetSagittalSlider(), m_MultiWidget->mitkWidget2->GetNavigationController()->GetSlice(), "sliceNavigatorSagittal");
-	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetCoronalSlider(), m_MultiWidget->mitkWidget3->GetNavigationController()->GetSlice(), "sliceNavigatorCoronal");
+	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetTransversalSlider(), m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversal");
+	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetSagittalSlider(), m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittal");
+	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetCoronalSlider(), m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorCoronal");
 	new QmitkStepperAdapter((QObject*)m_SliceSliderComponentGUI->GetTemporalSlider(), m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTemporal");
 
 	SetContentContainerVisibility(GetMainCheckBoxContainer()->isChecked());

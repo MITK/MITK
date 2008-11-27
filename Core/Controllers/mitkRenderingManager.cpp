@@ -390,9 +390,9 @@ RenderingManager
       || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)) )
     {
 
-      mitk::NavigationController *nc =
+      mitk::SliceNavigationController *nc =
 
-      baseRenderer->GetNavigationController();
+      baseRenderer->GetSliceNavigationController();
 
       // Re-initialize view direction
       nc->SetViewDirectionToDefault();
@@ -495,8 +495,8 @@ RenderingManager
   mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( renderWindow );
 
-  mitk::NavigationController *nc =
-    baseRenderer->GetNavigationController();
+  mitk::SliceNavigationController *nc =
+    baseRenderer->GetSliceNavigationController();
 
   // Re-initialize view direction
   nc->SetViewDirectionToDefault();
@@ -515,8 +515,8 @@ RenderingManager
   mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
   bool boundingBoxInitialized, int mapperID )
 {
-  mitk::NavigationController *nc =
-    baseRenderer->GetNavigationController();
+  mitk::SliceNavigationController *nc =
+    baseRenderer->GetSliceNavigationController();
 
   // Re-initialize view direction
   nc->SetViewDirectionToDefault();

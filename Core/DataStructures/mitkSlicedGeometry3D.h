@@ -144,9 +144,9 @@ public:
    * The SNC needs to be informed when the number of slices in the geometry
    * changes, which can occur whenthe slices are re-oriented by rotation.
    */
-  virtual void SetNavigationController(
-    mitk::NavigationController *nc );
-  mitk::NavigationController *GetNavigationController();
+  virtual void SetSliceNavigationController(
+    mitk::SliceNavigationController *snc );
+  mitk::SliceNavigationController *GetSliceNavigationController();
 
   /**
    * \brief Set/Get whether the SlicedGeometry3D is evenly-spaced
@@ -325,7 +325,7 @@ protected:
 
   /** SNC correcsponding to this geometry; used to reflect changes in the
    * number of slices due to rotation. */
-  mitk::NavigationController *m_NavigationController;
+  //mitk::NavigationController *m_NavigationController;
   mitk::SliceNavigationController *m_SliceNavigationController;
 };
 

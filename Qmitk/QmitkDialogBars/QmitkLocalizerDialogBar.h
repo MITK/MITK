@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderWindow.h"
 #include <QmitkTreeNodeSelector.h>
-#include <mitkPointNavigationController.h> 
 
 #include <mitkEllipsoid.h>
 
@@ -32,6 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
  * \brief DialogBar that shows the current position in a MIP-volume of a chosen picture
+ *
+ *  The LoclizerDialogBar is a widget, that when enabled shows the current planes position in a small renderwindow containing 
+ *  a MIP-volume of the currently chosen picture. It is connected to the geometryupdateevent of the MultiWidgets 3 major renderwindows,
+ *  so when the geometry has changed, e.g. by clicking in one of the renderwindows, the LocalizerDialogBar's UpdateGeometry() is called.
  *
  * \ingroup Functionalities
  */
@@ -81,12 +84,15 @@ public:
   */
   void SetViewProperties(QmitkRenderWindow *renderwindow);
 
+  /**
+    \brief is called whenever the SliceNavigationController emits an geometryupdateevent and sets the Point to the right position
+  */
+  void UpdateGeometry(const itk::EventObject &geometryUpdateEvent);
+
 protected:
   QmitkTreeNodeSelector* m_TreeNodeSelector;
 
   QmitkRenderWindow* m_LocalizerRenderWindow;
-
-  mitk::PointNavigationController::Pointer m_PointNavigationController;
 
   mitk::Ellipsoid::Pointer m_Punkt;
   

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
 
 #include "mitkCommon.h"
-#include "mitkNavigationController.h"
+#include "mitkBaseController.h"
 #include "mitkRenderingManager.h"
 #include "mitkTimeSlicedGeometry.h"
 #include <itkEventObject.h>
@@ -135,26 +135,31 @@ class BaseRenderer;
  * \todo implement for non-evenly-timed geometry!
  * \ingroup NavigationControl
  */
-class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
+class MITK_CORE_EXPORT SliceNavigationController : public BaseController
 {
   public:
-    mitkClassMacro(SliceNavigationController,NavigationController);
+    mitkClassMacro(SliceNavigationController,BaseController);
     itkNewMacro(Self);
     mitkNewMacro1Param(Self, const char *);
   
     /**
+     * \brief Possible view directions, \a Original will uses 
+     * the Geometry2D instances in a SlicedGeometry3D provided
+     * as input world geometry (by SetInputWorldGeometry).
+     */
+    enum ViewDirection{Transversal, Sagittal, Frontal, Original};
+
+    /**
      * \brief Set the input world geometry out of which the
      * geometries for slicing will be created.
      */
-
-    //void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
-    //itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
+    void SetInputWorldGeometry(const mitk::Geometry3D* geometry);
+    itkGetConstObjectMacro(InputWorldGeometry, mitk::Geometry3D);
 
     /**
      * \brief Access the created geometry
      */
-    
-    //itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
+    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::Geometry3D);
 
     /**
      * \brief Set the desired view directions
@@ -163,8 +168,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    //itkSetMacro(ViewDirection, ViewDirection);
-    //itkGetMacro(ViewDirection, ViewDirection);
+    itkSetMacro(ViewDirection, ViewDirection);
+    itkGetMacro(ViewDirection, ViewDirection);
 
     /**
      * \brief Set the default view direction
@@ -176,10 +181,10 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * \sa Update(ViewDirection viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    //itkSetMacro(DefaultViewDirection, ViewDirection);
-    //itkGetMacro(DefaultViewDirection, ViewDirection);
+    itkSetMacro(DefaultViewDirection, ViewDirection);
+    itkGetMacro(DefaultViewDirection, ViewDirection);
 
- //   virtual void SetViewDirectionToDefault();
+    virtual void SetViewDirectionToDefault();
 
     /**
      * \brief Do the actual creation and send it to the connected 
@@ -232,10 +237,10 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * 
      * If \a NULL, the default RenderingManager will be used.
      */
- /*   itkSetObjectMacro(RenderingManager, RenderingManager);
-    mitk::RenderingManager* GetRenderingManager() const;*/
+    itkSetObjectMacro(RenderingManager, RenderingManager);
+    mitk::RenderingManager* GetRenderingManager() const;
 
-    //itkEventMacro( UpdateEvent, itk::AnyEvent );
+    itkEventMacro( UpdateEvent, itk::AnyEvent );
 
     class MITK_CORE_EXPORT TimeSlicedGeometryEvent : public itk::AnyEvent 
     { 
@@ -343,7 +348,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * act as an observer ourselves: implemented interface
      * \warning not implemented
      */
-    //virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
+    virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
 
     /**
      * \brief To connect multiple SliceNavigationController, we can 
@@ -363,28 +368,28 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
 
 
     /** \brief Returns the TimeSlicedGeometry created by the SNC. */
-    //const mitk::TimeSlicedGeometry *GetCreatedWorldGeometry();
+    const mitk::TimeSlicedGeometry *GetCreatedWorldGeometry();
 
 
     /** \brief Returns the Geometry3D of the currently selected time step. */
-    //const mitk::Geometry3D *GetCurrentGeometry3D();
+    const mitk::Geometry3D *GetCurrentGeometry3D();
 
     
     /** \brief Returns the currently selected Plane in the current
      * Geometry3D (if existent).
      */
-    //const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
+    const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
 
     /** \brief Sets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
      * method to enable BaseRenderer access via the SNC. */
-    //void SetRenderer( BaseRenderer *renderer );
+    void SetRenderer( BaseRenderer *renderer );
 
     /** \brief Gets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
      * method to enable BaseRenderer access via the SNC. Returns NULL if no
      * BaseRenderer has been specified*/
-    //BaseRenderer *GetRenderer() const;
+    BaseRenderer *GetRenderer() const;
 
     /** \brief Re-orients the slice stack to include the plane specified by
      * the given point an normal vector. 
@@ -393,8 +398,8 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
       const mitk::Point3D &point, const mitk::Vector3D &normal );
 
 
-  /*  virtual bool ExecuteAction( 
-      Action* action, mitk::StateEvent const* stateEvent);*/
+    virtual bool ExecuteAction( 
+      Action* action, mitk::StateEvent const* stateEvent);
 
     void ExecuteOperation(Operation* operation);
 
@@ -403,9 +408,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * This option flag disables the mouse event which causes the center
      * cross to move near by.
      */
-  /*  itkSetMacro(SliceLocked, bool);
+    itkSetMacro(SliceLocked, bool);
     itkGetMacro(SliceLocked, bool);
-    itkBooleanMacro(SliceLocked);*/
+    itkBooleanMacro(SliceLocked);
     
     /**
      * \brief Feature option to lock slice rotation.
@@ -413,54 +418,54 @@ class MITK_CORE_EXPORT SliceNavigationController : public NavigationController
      * This option flag disables separately the rotation of a slice which is 
      * implemented in mitkSliceRotator.
      */
-    //itkSetMacro(SliceRotationLocked, bool);
-    //itkGetMacro(SliceRotationLocked, bool);
-    //itkBooleanMacro(SliceRotationLocked);
+    itkSetMacro(SliceRotationLocked, bool);
+    itkGetMacro(SliceRotationLocked, bool);
+    itkBooleanMacro(SliceRotationLocked);
 
     /** 
      * \brief Adjusts the numerical range of the slice stepper according to
      * the current geometry orientation of this SNC's SlicedGeometry.
      */
-    //void AdjustSliceStepperRange();
+    void AdjustSliceStepperRange();
 
 
   protected:
     SliceNavigationController(const char * type = NULL);
     virtual ~SliceNavigationController();
 
-  //  mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
-  //  mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
+    mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
+    mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;
 
-  //  mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
+    mitk::TimeSlicedGeometry::Pointer m_CreatedWorldGeometry;
 
-  //  ViewDirection m_ViewDirection;
-  //  ViewDirection m_DefaultViewDirection;
+    ViewDirection m_ViewDirection;
+    ViewDirection m_DefaultViewDirection;
 
-  //  mitk::RenderingManager::Pointer m_RenderingManager;
+    mitk::RenderingManager::Pointer m_RenderingManager;
 
-  //  mitk::BaseRenderer *m_Renderer;
+    mitk::BaseRenderer *m_Renderer;
 
-  //  itkSetMacro(Top, bool);
-  //  itkGetMacro(Top, bool);
-  //  itkBooleanMacro(Top);
+    itkSetMacro(Top, bool);
+    itkGetMacro(Top, bool);
+    itkBooleanMacro(Top);
 
-  //  itkSetMacro(FrontSide, bool);
-  //  itkGetMacro(FrontSide, bool);
-  //  itkBooleanMacro(FrontSide);
+    itkSetMacro(FrontSide, bool);
+    itkGetMacro(FrontSide, bool);
+    itkBooleanMacro(FrontSide);
 
-  //  itkSetMacro(Rotated, bool);
-  //  itkGetMacro(Rotated, bool);
-  //  itkBooleanMacro(Rotated);
+    itkSetMacro(Rotated, bool);
+    itkGetMacro(Rotated, bool);
+    itkBooleanMacro(Rotated);
 
-  //  bool m_Top;
-  //  bool m_FrontSide;
-  //  bool m_Rotated;
+    bool m_Top;
+    bool m_FrontSide;
+    bool m_Rotated;
 
-  //  bool m_BlockUpdate;
+    bool m_BlockUpdate;
 
-  //  bool m_SliceLocked;
-  //  bool m_SliceRotationLocked;
-  //  unsigned int m_OldPos;
+    bool m_SliceLocked;
+    bool m_SliceRotationLocked;
+    unsigned int m_OldPos;
 };
 
 } // namespace mitk

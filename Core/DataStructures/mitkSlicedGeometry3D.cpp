@@ -38,7 +38,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D()
 : m_EvenlySpaced( true ),
   m_Slices( 0 ),
   m_ReferenceGeometry( NULL ),
-  m_NavigationController( NULL )
+  m_SliceNavigationController( NULL )
 {
   this->Initialize( m_Slices );
 }
@@ -406,7 +406,7 @@ mitk::SlicedGeometry3D
   }
 
   // Reinitialize SNC with new number of slices
-  m_NavigationController->GetSlice()->SetSteps( m_Slices );
+  m_SliceNavigationController->GetSlice()->SetSteps( m_Slices );
 
   this->Modified();
 }
@@ -565,16 +565,16 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
 
 void
 mitk::SlicedGeometry3D
-::SetNavigationController( NavigationController *nc )
+::SetSliceNavigationController( SliceNavigationController *snc )
 {
-  m_NavigationController = nc;
+  m_SliceNavigationController = snc;
 }
 
 
-mitk::NavigationController *
-mitk::SlicedGeometry3D::GetNavigationController()
+mitk::SliceNavigationController *
+mitk::SlicedGeometry3D::GetSliceNavigationController()
 {
-  return m_NavigationController;
+  return m_SliceNavigationController;
 }
 
 void
@@ -640,7 +640,7 @@ mitk::SlicedGeometry3D::InitializeGeometry( Self *newGeometry ) const
   newGeometry->SetSpacing( this->GetSpacing() );
   newGeometry->SetDirectionVector( this->GetDirectionVector() );
 
-  newGeometry->SetNavigationController( m_NavigationController );
+  newGeometry->SetSliceNavigationController( m_SliceNavigationController );
   newGeometry->m_ReferenceGeometry = m_ReferenceGeometry;
 
   if ( m_EvenlySpaced )
@@ -821,7 +821,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // ReinitializePlanes)
         this->ReinitializePlanes( center, rotOp->GetCenterOfRotation() );
 
-        mitk::SliceNavigationController::Pointer m_SliceNavigationController = dynamic_cast<mitk::SliceNavigationController*>(m_NavigationController);
+        mitk::SliceNavigationController::Pointer m_SliceNavigationController = m_SliceNavigationController;
         if ( m_SliceNavigationController )
         {
           m_SliceNavigationController->SelectSliceByPoint(
@@ -891,7 +891,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // rotation and plane position (see documentation of ReinitializePlanes)
         this->ReinitializePlanes( center, planeOp->GetPoint() );
 
-        mitk::SliceNavigationController::Pointer m_SliceNavigationController = dynamic_cast<mitk::SliceNavigationController*>(m_NavigationController);
+        mitk::SliceNavigationController::Pointer m_SliceNavigationController = m_SliceNavigationController;
         if ( m_SliceNavigationController )
         {
           m_SliceNavigationController->SelectSliceByPoint( planeOp->GetPoint() );

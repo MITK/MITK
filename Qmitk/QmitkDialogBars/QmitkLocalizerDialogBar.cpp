@@ -49,7 +49,6 @@ QmitkLocalizerDialogBar
 {
   m_Storage = mitk::DataStorage::GetInstance();
 
-  m_PointNavigationController = mitk::PointNavigationController::New( "navigation" );
   m_Punkt = mitk::Ellipsoid::New();
 
   node = mitk::DataTreeNode::New();
@@ -107,7 +106,7 @@ QmitkLocalizerDialogBar
 
   grid->setSpacing(7);
 
-  QLabel *fileLabel = new QLabel(grid, "Picturechooser");
+  QLabel *fileLabel = new QLabel(grid, "choose a picture");
   fileLabel->setText(fileLabel->name());
 
   m_TreeNodeSelector = new QmitkTreeNodeSelector(grid, "LocalizerFileChooser");
@@ -117,7 +116,7 @@ QmitkLocalizerDialogBar
   m_LocalizerRenderWindow->GetRenderWindow()->SetWindowName("LocalizerRenderWindow");
   m_LocalizerRenderWindow->GetRenderWindow()->GetInteractor()->Disable();
 
-  QLabel *viewLabel = new QLabel(grid, "Viewchooser");
+  QLabel *viewLabel = new QLabel(grid, "choose a view");
   viewLabel->setText(viewLabel->name());
   
   QComboBox *m_ViewChooser = new QComboBox(grid, "LocalizerViewChooser");
@@ -162,9 +161,11 @@ void QmitkLocalizerDialogBar::DrawVolume()
           SetViewProperties(m_LocalizerRenderWindow);
 
           CreateNode();
-          m_LocalizerRenderWindow->repaint();
+          
         }
   }
+  m_LocalizerRenderWindow->repaint();
+  SetSeeker(m_Punkt);
 }
 
 void QmitkLocalizerDialogBar::CreateNode()
@@ -183,12 +184,20 @@ void QmitkLocalizerDialogBar::CreateNode()
   m_Storage->Add(node);
 }
 
+void QmitkLocalizerDialogBar::UpdateGeometry(const itk::EventObject &geometryUpdateEvent)
+{
+  SetSeeker(m_Punkt);
+}
+
 
 void QmitkLocalizerDialogBar::Activated()
 {
   m_TreeNodeSelector->UpdateContent();
-  mitk::BaseRenderer::GetInstance(m_LocalizerRenderWindow->GetRenderWindow())->SetNavigationController(m_PointNavigationController);
-  mitk::GlobalInteraction::GetInstance()->AddListener(m_PointNavigationController);
+
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->GetRenderWindow1()->GetRenderWindow())->GetSliceNavigationController()->ConnectGeometryUpdateEvent(this);
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->GetRenderWindow2()->GetRenderWindow())->GetSliceNavigationController()->ConnectGeometryUpdateEvent(this);
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->GetRenderWindow3()->GetRenderWindow())->GetSliceNavigationController()->ConnectGeometryUpdateEvent(this);
+  
 
   m_Storage->AddNodeEvent += mitk::MessageDelegate1<QmitkLocalizerDialogBar, const mitk::DataTreeNode*>(this, &QmitkLocalizerDialogBar::OnNewNode);
   m_Storage->RemoveNodeEvent += mitk::MessageDelegate1<QmitkLocalizerDialogBar, const mitk::DataTreeNode*>(this, &QmitkLocalizerDialogBar::OnNewNode);
@@ -206,6 +215,9 @@ void QmitkLocalizerDialogBar::Activated()
   {
     MakeClean();
   }
+ 
+  SetSeeker(m_Punkt);
+  m_LocalizerRenderWindow->repaint();
 }
 
 void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* /*n*/)
@@ -215,7 +227,6 @@ void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* /*n*/)
 
 void QmitkLocalizerDialogBar::Deactivated()
 {
-  mitk::GlobalInteraction::GetInstance()->RemoveListener(m_PointNavigationController);
   m_Storage->Remove(mitk::DataStorage::GetInstance()->GetNamedNode("Localizer"));
 
   m_Storage->AddNodeEvent -= mitk::MessageDelegate1<QmitkLocalizerDialogBar, const mitk::DataTreeNode*>(this, &QmitkLocalizerDialogBar::OnNewNode);
@@ -296,7 +307,6 @@ vtkVolume* QmitkLocalizerDialogBar::createVolume(vtkImageData* vtkImage)
   thresh->Delete();
   volumeMapper->Delete();
   volumeProperty->Delete();
-
 
   return m_Volume;
 }

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkPropRenderer.h"
 #include "vtkMitkRenderProp.h"
-#include "mitkNavigationController.h"
+#include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
 
 /**
@@ -43,7 +43,7 @@ public:
 
   void InitRenderer();
   
-  virtual mitk::NavigationController * GetNavigationController(); 
+  virtual mitk::SliceNavigationController * GetSliceNavigationController(); 
   virtual mitk::CameraRotationController * GetCameraRotationController();
   virtual mitk::BaseController * GetController();
   virtual mitk::VtkPropRenderer* GetRenderer();

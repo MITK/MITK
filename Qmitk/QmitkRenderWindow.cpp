@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
-#include "mitkPointNavigationController.h"
 
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const char *name, mitk::VtkPropRenderer* renderer)
@@ -119,14 +118,14 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   QVTKWidget::wheelEvent(we);
   
-  if ( GetNavigationController()->GetSliceLocked() )
+  if ( GetSliceNavigationController()->GetSliceLocked() )
     return;
   
-  mitk::Stepper* stepper = GetNavigationController()->GetSlice();
+  mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
   
   if (stepper->GetSteps() <= 1)
   {
-    stepper = GetNavigationController()->GetTime();
+    stepper = GetSliceNavigationController()->GetTime();
   }
 
   if (we->orientation() * we->delta()  > 0) 
@@ -137,7 +136,7 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   {
     stepper->Previous();
   }
-
+  
   if (m_ResendQtEvents) we->ignore();
 }
 
@@ -182,15 +181,11 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
   m_InResize = false;
 }
 
-mitk::NavigationController * QmitkRenderWindow::GetNavigationController()
-{
-  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetNavigationController();
-}
 
-//mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
-//{
-//  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetSliceNavigationController();
-//}
+mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
+{
+  return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetSliceNavigationController();
+}
 mitk::CameraRotationController * QmitkRenderWindow::GetCameraRotationController()
 {
   return mitk::BaseRenderer::GetInstance(this->GetRenderWindow())->GetCameraRotationController();
@@ -202,15 +197,13 @@ mitk::BaseController * QmitkRenderWindow::GetController()
   switch ( renderer->GetMapperID() )
   {
     case mitk::BaseRenderer::Standard2D:
-      return GetNavigationController();
+      return GetSliceNavigationController();
 
     case mitk::BaseRenderer::Standard3D:
       return GetCameraRotationController();
 
     default:
-      return GetNavigationController();
+      return GetSliceNavigationController();
   }
 }
-
-
 

@@ -77,9 +77,9 @@ QWidget * QmitkSimpleExampleFunctionality::CreateControlWidget(QWidget *parent)
     if (controls == NULL)
     {
         controls = new QmitkSimpleExampleControls(parent);        
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget1->GetNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget2->GetNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget3->GetNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
+        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
+        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
+        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
         new QmitkStepperAdapter(controls->getMovieNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "movieNavigatorTimeFromSimpleExample");
     }
@@ -115,7 +115,7 @@ void QmitkSimpleExampleFunctionality::generateMovie()
 {
   QmitkRenderWindow* movieRenderWindow = GetMovieRenderWindow();
   //mitk::Stepper::Pointer stepper = multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice();
-  mitk::Stepper::Pointer stepper = movieRenderWindow->GetNavigationController()->GetSlice();
+  mitk::Stepper::Pointer stepper = movieRenderWindow->GetSliceNavigationController()->GetSlice();
   mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
   if (movieGenerator.IsNotNull()) {
     movieGenerator->SetStepper( stepper );

@@ -63,7 +63,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name, Qt::Window
   hlayout->addWidget(m_RenderWindow);
 
   new QmitkStepperAdapter( m_NavigatorWidget,
-   dynamic_cast<mitk::SliceNavigationController*>(m_RenderWindow->GetNavigationController())->GetSlice(), "navigation"
+   m_RenderWindow->GetNavigationController()->GetSlice(), "navigation"
   );
 
   SetLevelWindowEnabled(true);
@@ -142,7 +142,7 @@ void QmitkSliceWidget::InitWidget( mitk::SliceNavigationController::ViewDirectio
   m_View = viewDirection;
 
   mitk::SliceNavigationController* controller =
-    dynamic_cast<mitk::SliceNavigationController*>(m_RenderWindow->GetNavigationController());
+    m_RenderWindow->GetNavigationController();
 
   if (viewDirection == mitk::SliceNavigationController::Transversal)
   {
@@ -325,7 +325,7 @@ mitk::SliceNavigationController*
 QmitkSliceWidget
 ::GetSliceNavigationController() const
 {
-    return dynamic_cast<mitk::SliceNavigationController*>(m_RenderWindow->GetNavigationController());
+    return m_RenderWindow->GetNavigationController();
 }
 
 

@@ -11,7 +11,7 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # like #include <ipPic/ipPic.h>
 INCLUDE_DIRECTORIES(.)
 
-SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml) # Poco)
+SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco)
 # IF(NOT MITK_CHILI_PLUGIN)
 SUBDIRS(ipPic ipFunc)
 

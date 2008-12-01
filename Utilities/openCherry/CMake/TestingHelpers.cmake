@@ -12,6 +12,7 @@ MACRO(OPENCHERRY_CREATE_TESTS)
   STRING(REPLACE . _ plugin_target ${plugin_name})
   
   INCLUDE_DIRECTORIES(${OPENCHERRY_BASE_DIR}/Testing)
+  INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
   
   #
   # Create the TestDriver binary which contains all the tests.

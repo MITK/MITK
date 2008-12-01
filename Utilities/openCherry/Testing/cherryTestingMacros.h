@@ -98,12 +98,10 @@ namespace cherry {
  * to test whether a code block throws an expected exception. The test FAILS if the exception is NOT thrown. A simple example:
  *
 
- CHERRY_TEST_FOR_EXCEPTION_BEGIN(itk::ImageFileReaderException)
-    typedef itk::ImageFileReader< itk::Image<unsigned char,2> > ReaderType;
-    ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFileName("/tmp/not-existing");
-    reader->Update();
- CHERRY_TEST_FOR_EXCEPTION_END(itk::ImageFileReaderException)
+ CHERRY_TEST_FOR_EXCEPTION_BEGIN(std::bad_typeid)
+    int* i = 0;
+    typeid(*i) == typeid(int)
+ CHERRY_TEST_FOR_EXCEPTION_END(std::bad_typeid)
 
  *
  */

@@ -21,12 +21,14 @@
 #include "../cherryQtControlWidget.h"
 #include "cherryQtMainWindowShell.h"
 #include "cherryQtSash.h"
+#include "cherryRectangle.h"
 
 #include <QApplication>
 #include <QAbstractButton>
 #include <QCursor>
 #include <QRect>
 #include <QVariant>
+#include <QDesktopWidget>
 
 namespace cherry
 {
@@ -114,6 +116,30 @@ void QtWidgetsTweaklet::RemoveSelectionListener(void* widget,
     selectionListenerMap.erase(wrapper);
     delete wrapper;
   }
+}
+
+Rectangle QtWidgetsTweaklet::GetScreenSize(unsigned int i)
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  QRect screenGeometry = desktop->screenGeometry(i);
+  return (Rectangle(screenGeometry.x(), screenGeometry.y()
+    , screenGeometry.width(), screenGeometry.height()));
+}
+
+unsigned int QtWidgetsTweaklet::GetScreenNumber()
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  // get the primary screen
+  unsigned int numScreens = desktop->numScreens();
+  return numScreens;
+}
+
+unsigned int QtWidgetsTweaklet::GetPrimaryScreenNumber()
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  // get the primary screen
+  unsigned int primaryScreenNr = desktop->primaryScreen();
+  return primaryScreenNr;
 }
 
 void QtWidgetsTweaklet::AddControlListener(void* widget,

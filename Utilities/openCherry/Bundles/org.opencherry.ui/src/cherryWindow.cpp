@@ -270,17 +270,20 @@ Point Window::GetInitialLocation(const Point& initialSize)
 //
 //  Rectangle monitorBounds = monitor.getClientArea();
   Point centerPoint(0,0);
+  Rectangle parentBounds(0,0,0,0);
   if (parent != 0)
   {
-    Rectangle parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(parent);
+    parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(parent);
     centerPoint.x = parentBounds.x + parentBounds.width/2;
     centerPoint.y = parentBounds.y - parentBounds.height/2;
   }
   else
   {
     //centerPoint = Geometry.centerPoint(monitorBounds);
-    centerPoint.x = 500;
-    centerPoint.y = 400;
+    parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)
+      ->GetScreenSize(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetPrimaryScreenNumber());
+    centerPoint.x = parentBounds.width/2;
+    centerPoint.y = parentBounds.height/2;
   }
 
   return Point(centerPoint.x - (initialSize.x / 2), centerPoint.y - (initialSize.y * 2 / 3));

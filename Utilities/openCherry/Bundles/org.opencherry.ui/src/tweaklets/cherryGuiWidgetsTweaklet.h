@@ -121,6 +121,31 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
   virtual Shell::Pointer GetActiveShell() = 0;
 
   /**
+   * @brief returns the coordinates of the center point of the primary screen 
+   * (where the application starts) of the current desktop.
+   *
+   * @param i the number of the screen (if there are multiple).
+   * @return the screen Geometry.
+   * @see GetScreenNumber()
+   * @see GetPrimaryScreenNumber()
+   */
+  virtual Rectangle GetScreenSize(unsigned int i = 0) = 0;
+
+  /**
+   * @brief Gets the number of available screens in a multi-screen environment.
+   *
+   * @return the number of available screens in a multi-screen environment.
+   */
+  virtual unsigned int GetScreenNumber() = 0;
+
+  /**
+   * @brief Gets the number of the primary screen.
+   *
+   * @return the number of the primary screen.
+   */
+  virtual unsigned int GetPrimaryScreenNumber() = 0;
+
+  /**
    * Converts the given rectangle from display coordinates to the local coordinate system
    * of the given object
    *

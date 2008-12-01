@@ -14,7 +14,7 @@ IF(DOT)
 ENDIF(DOT)
 
 
-SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${OPENCHERRY_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
+SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
@@ -26,5 +26,5 @@ GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH CACHE)
 
 ADD_CUSTOM_TARGET(openCherryDoc 
                   ${DOXYGEN} 
-                  ${OPENCHERRY_BINARY_DIR}/Documentation/doxygen.conf
+                  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                   )

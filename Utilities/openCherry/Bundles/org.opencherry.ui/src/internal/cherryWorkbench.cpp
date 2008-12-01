@@ -62,7 +62,7 @@ void Workbench::ServiceLocatorOwner::Dispose() {
 
 
 Workbench::Workbench(WorkbenchAdvisor* advisor)
- : serviceLocatorOwner(this), largeUpdates(0)
+ : serviceLocatorOwner(this), largeUpdates(0), isStarting(true), isClosing(false)
 {
   poco_check_ptr(advisor);
 

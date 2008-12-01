@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+template<typename A = void>
 class MessageAbstractDelegate
 {
   public:
@@ -48,7 +49,7 @@ class MessageAbstractDelegate
     {
     }
 
-    virtual void Execute() = 0;
+    virtual A Execute() = 0;
     virtual bool operator==(const MessageAbstractDelegate* cmd) = 0;
     virtual MessageAbstractDelegate* Clone() const = 0;
 };
@@ -110,14 +111,14 @@ class MessageAbstractDelegate4
     virtual MessageAbstractDelegate4* Clone() const = 0;
 };
 
-template <class R>
-class MessageDelegate : public MessageAbstractDelegate
+template <class R, typename A = void>
+class MessageDelegate : public MessageAbstractDelegate<A>
 {
   public:
 
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
-    MessageDelegate(R* object, void(R::*memberFunctionPointer)())
+    MessageDelegate(R* object, A(R::*memberFunctionPointer)())
     :m_Object(object),
     m_MemberFunctionPointer(memberFunctionPointer)
     {
@@ -128,14 +129,14 @@ class MessageDelegate : public MessageAbstractDelegate
     }
 
     // override function "Call"
-    virtual void Execute()
+    virtual A Execute()
     {
       return (m_Object->*m_MemberFunctionPointer)();    // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate* c)
+    bool operator==(const MessageAbstractDelegate<A>* c)
     {
-      const MessageDelegate<R>* cmd = dynamic_cast<const MessageDelegate<R>* >(c);
+      const MessageDelegate<R,A>* cmd = dynamic_cast<const MessageDelegate<R,A>* >(c);
       if (!cmd) return false;
 
       if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
@@ -143,14 +144,14 @@ class MessageDelegate : public MessageAbstractDelegate
       return true;
     }
 
-    MessageAbstractDelegate* Clone() const
+    MessageAbstractDelegate<A>* Clone() const
     {
       return new MessageDelegate(m_Object, m_MemberFunctionPointer);
     }
 
   private:
     R* m_Object;                            // pointer to object
-    void (R::*m_MemberFunctionPointer)();   // pointer to member function
+    A (R::*m_MemberFunctionPointer)();   // pointer to member function
 };
 
 
@@ -342,16 +343,17 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
  *
  */
 // message without parameters (pure signals)
+template<typename A = void>
 class Message
 {
   public:
 
     typedef Message Self;
-    typedef MessageAbstractDelegate AbstractDelegate;
+    typedef MessageAbstractDelegate<A> AbstractDelegate;
     typedef std::vector<AbstractDelegate* > ListenerList;
 
     ~Message() {
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end(); ++iter )
       {
         delete *iter;
@@ -363,7 +365,7 @@ class Message
       AbstractDelegate* msgCmd = delegate.Clone();
 
       Poco::FastMutex::ScopedLock lock(m_Mutex);
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -383,7 +385,7 @@ class Message
     void RemoveListener( const AbstractDelegate& delegate ) const
     {
       Poco::FastMutex::ScopedLock lock(m_Mutex);
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -410,7 +412,7 @@ class Message
         listeners.assign(m_Listeners.begin(), m_Listeners.end());
       }
 
-      for ( ListenerList::iterator iter = listeners.begin();
+      for (typename ListenerList::iterator iter = listeners.begin();
             iter != listeners.end();
             ++iter )
       {
@@ -422,6 +424,11 @@ class Message
     void operator()()
     {
       this->Send();
+    }
+
+    const ListenerList& GetListeners()
+    {
+      return m_Listeners;
     }
 
   protected:

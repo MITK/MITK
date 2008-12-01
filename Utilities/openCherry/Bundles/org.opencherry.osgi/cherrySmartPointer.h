@@ -19,12 +19,12 @@
 #define CHERRYOSGISMARTPOINTER_H_
 
 #include <iostream>
+#include <exception>
 
 #include "cherryOSGiDll.h"
 
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
 #include "cherryDebugUtil.h"
-//#include "cherryPlatform.h"
 #include <Poco/Mutex.h>
 #endif
 
@@ -140,14 +140,17 @@ public:
   }
 
   template<typename R>
-  bool operator ==(SmartPointer<R> r) const
+  bool operator ==(const SmartPointer<R>& r) const
   {
     return (m_Pointer == static_cast<const ObjectType*> (r.GetPointer()));
   }
 
   bool operator ==(int r) const
   {
-    return (r == 0 ? m_Pointer == 0 : false);
+    if (r == 0)
+      return m_Pointer == 0;
+
+    throw std::invalid_argument("Can only compare to 0");
   }
 
   template<typename R>
@@ -157,22 +160,31 @@ public:
   }
 
   template<typename R>
-  bool operator !=(SmartPointer<R> r) const
+  bool operator !=(const SmartPointer<R>& r) const
   {
     return (m_Pointer != static_cast<const ObjectType*> (r.GetPointer()));
   }
 
   bool operator !=(int r) const
   {
-    return (r == 0 ? m_Pointer != 0 : false);
+    if (r == 0)
+      return m_Pointer != 0;
+
+    throw std::invalid_argument("Can only compare to 0");
   }
 
   /** Template comparison operators using operator==. */
   template<typename R>
+  bool CompareTo(const SmartPointer<R>& r) const
+  {
+    return m_Pointer == 0 ? r == 0 : r.GetPointer() && m_Pointer->operator==(r.GetPointer());
+  }
+
+  template<typename R>
   bool CompareTo(R r) const
   {
-    const ObjectType* o = static_cast<const ObjectType*> (r);
-    return m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o));
+    //const ObjectType* o = static_cast<const ObjectType*> (r);
+    return m_Pointer == 0 ? r == 0 : (r && m_Pointer->operator==(r));
   }
 
   /** Access function to pointer. */
@@ -207,6 +219,13 @@ public:
 
   /** Overload operator assignment.  */
   SmartPointer &operator =(const SmartPointer &r)
+  {
+    return this->operator =(r.GetPointer());
+  }
+
+  /** Overload operator assignment. */
+  template<typename R>
+  SmartPointer &operator =(const SmartPointer<R>& r)
   {
     return this->operator =(r.GetPointer());
   }

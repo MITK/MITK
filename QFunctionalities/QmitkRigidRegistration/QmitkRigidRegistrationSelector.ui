@@ -799,38 +799,6 @@
                                                                                     </widget>
                                                                                     <widget class="QLabel">
                                                                                         <property name="name">
-                                                                                            <cstring>textLabel7_4</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>Scale 10:</string>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLabel">
-                                                                                        <property name="name">
-                                                                                            <cstring>textLabel8_4</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>Scale 11:</string>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLabel">
-                                                                                        <property name="name">
-                                                                                            <cstring>textLabel9_4</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>Scale 12:</string>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLabel">
-                                                                                        <property name="name">
-                                                                                            <cstring>textLabel10_3</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>Scale 13:</string>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLabel">
-                                                                                        <property name="name">
                                                                                             <cstring>textLabel11_3</cstring>
                                                                                         </property>
                                                                                         <property name="text">
@@ -954,50 +922,6 @@
                                                                                     <widget class="QLineEdit">
                                                                                         <property name="name">
                                                                                             <cstring>m_ScalesAffineTransformScale9</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>1.0</string>
-                                                                                        </property>
-                                                                                        <property name="alignment">
-                                                                                            <set>AlignRight</set>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLineEdit">
-                                                                                        <property name="name">
-                                                                                            <cstring>m_ScalesAffineTransformScale10</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>1.0</string>
-                                                                                        </property>
-                                                                                        <property name="alignment">
-                                                                                            <set>AlignRight</set>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLineEdit">
-                                                                                        <property name="name">
-                                                                                            <cstring>m_ScalesAffineTransformScale11</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>1.0</string>
-                                                                                        </property>
-                                                                                        <property name="alignment">
-                                                                                            <set>AlignRight</set>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLineEdit">
-                                                                                        <property name="name">
-                                                                                            <cstring>m_ScalesAffineTransformScale12</cstring>
-                                                                                        </property>
-                                                                                        <property name="text">
-                                                                                            <string>1.0</string>
-                                                                                        </property>
-                                                                                        <property name="alignment">
-                                                                                            <set>AlignRight</set>
-                                                                                        </property>
-                                                                                    </widget>
-                                                                                    <widget class="QLineEdit">
-                                                                                        <property name="name">
-                                                                                            <cstring>m_ScalesAffineTransformScale13</cstring>
                                                                                         </property>
                                                                                         <property name="text">
                                                                                             <string>1.0</string>
@@ -1239,38 +1163,6 @@
                                                                             </widget>
                                                                             <widget class="QLabel">
                                                                                 <property name="name">
-                                                                                    <cstring>textLabel7_4_2_2</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>Scale 10:</string>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLabel">
-                                                                                <property name="name">
-                                                                                    <cstring>textLabel8_4_2_2</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>Scale 11:</string>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLabel">
-                                                                                <property name="name">
-                                                                                    <cstring>textLabel9_4_2_2</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>Scale 12:</string>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLabel">
-                                                                                <property name="name">
-                                                                                    <cstring>textLabel10_3_2_2</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>Scale 13:</string>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLabel">
-                                                                                <property name="name">
                                                                                     <cstring>textLabel11_3_2_2</cstring>
                                                                                 </property>
                                                                                 <property name="text">
@@ -1394,50 +1286,6 @@
                                                                             <widget class="QLineEdit">
                                                                                 <property name="name">
                                                                                     <cstring>m_ScalesFixedCenterOfRotationAffineTransformScale9</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>1.0</string>
-                                                                                </property>
-                                                                                <property name="alignment">
-                                                                                    <set>AlignRight</set>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLineEdit">
-                                                                                <property name="name">
-                                                                                    <cstring>m_ScalesFixedCenterOfRotationAffineTransformScale10</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>1.0</string>
-                                                                                </property>
-                                                                                <property name="alignment">
-                                                                                    <set>AlignRight</set>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLineEdit">
-                                                                                <property name="name">
-                                                                                    <cstring>m_ScalesFixedCenterOfRotationAffineTransformScale11</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>1.0</string>
-                                                                                </property>
-                                                                                <property name="alignment">
-                                                                                    <set>AlignRight</set>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLineEdit">
-                                                                                <property name="name">
-                                                                                    <cstring>m_ScalesFixedCenterOfRotationAffineTransformScale12</cstring>
-                                                                                </property>
-                                                                                <property name="text">
-                                                                                    <string>1.0</string>
-                                                                                </property>
-                                                                                <property name="alignment">
-                                                                                    <set>AlignRight</set>
-                                                                                </property>
-                                                                            </widget>
-                                                                            <widget class="QLineEdit">
-                                                                                <property name="name">
-                                                                                    <cstring>m_ScalesFixedCenterOfRotationAffineTransformScale13</cstring>
                                                                                 </property>
                                                                                 <property name="text">
                                                                                     <string>1.0</string>
@@ -7541,14 +7389,6 @@
                                                                     </widget>
                                                                     <widget class="QLabel">
                                                                         <property name="name">
-                                                                            <cstring>m_SimplexDeltaAmoebaLabel16</cstring>
-                                                                        </property>
-                                                                        <property name="text">
-                                                                            <string>Simplex Delta 16:</string>
-                                                                        </property>
-                                                                    </widget>
-                                                                    <widget class="QLabel">
-                                                                        <property name="name">
                                                                             <cstring>textLabel22</cstring>
                                                                         </property>
                                                                         <property name="text">
@@ -7738,17 +7578,6 @@
                                                                     <widget class="QLineEdit">
                                                                         <property name="name">
                                                                             <cstring>m_SimplexDeltaAmoeba15</cstring>
-                                                                        </property>
-                                                                        <property name="text">
-                                                                            <string>5.0</string>
-                                                                        </property>
-                                                                        <property name="alignment">
-                                                                            <set>AlignRight</set>
-                                                                        </property>
-                                                                    </widget>
-                                                                    <widget class="QLineEdit">
-                                                                        <property name="name">
-                                                                            <cstring>m_SimplexDeltaAmoeba16</cstring>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>5.0</string>

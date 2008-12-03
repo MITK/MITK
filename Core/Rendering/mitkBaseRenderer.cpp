@@ -688,13 +688,12 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
   //set new 
   m_SliceNavigationController = SlicenavigationController;
   m_SliceNavigationController->SetRenderer( this );
-  
-  mitk::SliceNavigationController::Pointer controller = SlicenavigationController;
-  if (controller)
+
+  if (m_SliceNavigationController.IsNotNull())
   {  
-    controller->ConnectGeometrySliceEvent( this );
-    controller->ConnectGeometryUpdateEvent( this );
-    controller->ConnectGeometryTimeEvent( this, false );
+    m_SliceNavigationController->ConnectGeometrySliceEvent( this );
+    m_SliceNavigationController->ConnectGeometryUpdateEvent( this );
+    m_SliceNavigationController->ConnectGeometryTimeEvent( this, false );
   }
 
  

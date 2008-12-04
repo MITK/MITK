@@ -58,7 +58,7 @@ public:
 
     inline Flags &operator=(const Flags &f) { i = f.i; return *this; }
     inline Flags &operator&=(int mask) { i &= mask; return *this; }
-    inline Flags &operator&=(uint mask) { i &= mask; return *this; }
+    inline Flags &operator&=(unsigned int mask) { i &= mask; return *this; }
     inline Flags &operator|=(Flags f) { i |= f.i; return *this; }
     inline Flags &operator|=(Enum f) { i |= f; return *this; }
     inline Flags &operator^=(Flags f) { i ^= f.i; return *this; }
@@ -71,7 +71,7 @@ public:
     inline Flags operator^(Flags f) const { Flags g; g.i = i ^ f.i; return g; }
     inline Flags operator^(Enum f) const { Flags g; g.i = i ^ f; return g; }
     inline Flags operator&(int mask) const { Flags g; g.i = i & mask; return g; }
-    inline Flags operator&(uint mask) const { Flags g; g.i = i & mask; return g; }
+    inline Flags operator&(unsigned int mask) const { Flags g; g.i = i & mask; return g; }
     inline Flags operator&(Enum f) const { Flags g; g.i = i & f; return g; }
     inline Flags operator~() const { Flags g; g.i = ~i; return g; }
 

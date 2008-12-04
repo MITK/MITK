@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<mitkRigidRegistrationPresets FILE_VERSION="0.1" >
+<mitkRigidRegistrationPresets FILE_VERSION="0.1"  >
   <preset NAME="Affine Regular Step GradDesc" >
     <transform TRANSFORM="3" USESCALES="1" SCALE1="0.1" SCALE2="0.1" SCALE3="0.1" SCALE4="0.1" SCALE5="0.1" SCALE6="0.1" SCALE7="0.1" SCALE8="0.1" SCALE9="0.1" SCALE10="0.01" SCALE11="0.01" USEINITIALIZER="0" USEMOMENTS="0" />
     <metric METRIC="0" COMPUTEGRADIENT="1" />

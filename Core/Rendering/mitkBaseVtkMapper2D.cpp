@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::BaseVtkMapper2D::BaseVtkMapper2D()
 {
+  m_VtkBased = true;
 }
 
 

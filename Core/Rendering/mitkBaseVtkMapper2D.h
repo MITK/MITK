@@ -34,7 +34,8 @@ namespace mitk {
   class MITK_CORE_EXPORT BaseVtkMapper2D : public Mapper2D
   {
   public:
-    virtual vtkProp* GetProp() = 0;
+    mitkClassMacro(BaseVtkMapper2D,Mapper2D);
+    virtual vtkProp* GetProp(mitk::BaseRenderer* renderer) = 0;
 
   protected:
     BaseVtkMapper2D();

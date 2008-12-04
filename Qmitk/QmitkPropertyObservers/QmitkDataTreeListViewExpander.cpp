@@ -163,7 +163,7 @@ int QmitkListViewItemIndex::rowAt(int y)
 {
   // y coordinate -> row index
   int r = -1;
-  if ( m_Grid->numRows() > 0)
+  if ( m_Grid && m_Grid->numRows() > 0)
     for (int row = 0; row < m_Grid->numRows(); ++row)
     {
       QRect cell( m_Grid->cellGeometry(row, m_Grid->numCols()-1) );

@@ -46,7 +46,7 @@ bool mitk::NodePredicateAND::CheckNode(const mitk::DataTreeNode* node) const
     throw 1;  // Insert Exception Handling here
 
   // return the conjunction of the child predicate. If any predicate returns false, we return false too
-  for (ChildPredicates::const_iterator it = m_ChildPredicates.begin(); it != m_ChildPredicates.end(); ++it)
+  for (ChildPredicates::const_iterator it = m_ChildPredicates.begin();  ( it != m_ChildPredicates.end() ); ++it)
     if ((*it)->CheckNode(node) == false)
       return false;   // if one element of the conjunction is false, the whole conjunction gets false
   return true;  // none of the childs was false, so return true

@@ -41,6 +41,7 @@ SET(CPP_FILES
   mitkDataStorage/mitkNodePredicateOR.cpp
   mitkDataStorage/mitkNodePredicateProperty.cpp
   mitkDataStorage/mitkNodePredicateSource.cpp
+  mitkDataStorage/mitkNodePredicateFirstLevel.cpp
   mitkDataTree.cpp
   mitkDataTreeFilter.cpp
   mitkDataTreeFilterFunctions.cpp

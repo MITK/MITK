@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkBaseRenderer.h"
+#include "mitkDataStorage.h"
 
 #include "mitkDataTreeStorage.h"
 #include "mitkDataStorage.h"
@@ -315,11 +316,45 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( const DataStorage * storage, RequestType type )
+::InitializeViews( const mitk::DataStorage * storage, RequestType type )
 {
-  //TODO native DataStorage code
   mitk::DataTreePreOrderIterator it((dynamic_cast<const mitk::DataTreeStorage*>(storage))->m_DataTree);
   return this->InitializeViews(&it, type);
+  
+
+// following lines of code are never reached
+// and may be used to generate native datastorage code later
+
+    mitk::Geometry3D::Pointer geometry;
+	if ( storage != NULL )
+	{
+//		geometry = mitk::DataStorage::ComputeVisibleBoundingGeometry3D(
+//			*storage, "visible", NULL, "includeInBoundingBox" );
+
+		if ( geometry.IsNotNull() )
+		{
+			// let's see if we have data with a limited live-span ...
+			mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+			if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+			{
+				mitk::ScalarType duration = timebounds[1]-timebounds[0];
+
+				mitk::TimeSlicedGeometry::Pointer timegeometry =
+					mitk::TimeSlicedGeometry::New();
+				timegeometry->InitializeEvenlyTimed(
+					geometry, (unsigned int) duration );
+				timegeometry->SetTimeBounds( timebounds );
+
+				timebounds[1] = timebounds[0] + 1.0;
+				geometry->SetTimeBounds( timebounds );
+
+				geometry = timegeometry;
+			}
+		}
+	}
+
+	// Use geometry for initialization
+	return this->InitializeViews( geometry.GetPointer(), type );
 }
 
 

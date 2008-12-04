@@ -12,7 +12,7 @@
             <height>607</height>
         </rect>
     </property>
-    <property name="caption">
+    <property name="caption" >
         <string>RigidRegistrationControls</string>
     </property>
     <vbox>

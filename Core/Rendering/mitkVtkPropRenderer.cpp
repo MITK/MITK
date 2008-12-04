@@ -265,9 +265,6 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     if ( mapper.IsNull() )
       continue;
 
-    if ( m_MapperID == 1 && mapper->IsVtkBased() )
-      continue; //B/ no vtk mappers in 2D windows 
-
     // The information about LOD-enabled mappers is required by RenderingManager
     if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
     {

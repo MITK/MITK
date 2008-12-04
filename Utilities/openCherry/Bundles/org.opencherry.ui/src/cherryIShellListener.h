@@ -49,6 +49,19 @@ struct CHERRY_UI IShellListener : public virtual Object {
   struct Events {
     typedef Message1<ShellEvent::Pointer> ShellEventType;
 
+    enum Type {
+     NONE        = 0x00000000,
+     ACTIVATED   = 0x00000001,
+     CLOSED      = 0x00000002,
+     DEACTIVATED = 0x00000004,
+     DEICONIFIED = 0x00000008,
+     ICONIFIED   = 0x00000010,
+
+     ALL         = 0xffffffff
+    };
+
+    CHERRY_DECLARE_FLAGS(Types, Type)
+
     ShellEventType shellActivated;
     ShellEventType shellClosed;
     ShellEventType shellDeactivated;
@@ -100,5 +113,7 @@ virtual void ShellIconified(ShellEvent::Pointer e);
 };
 
 }
+
+CHERRY_DECLARE_OPERATORS_FOR_FLAGS(cherry::IShellListener::Events::Types)
 
 #endif /* CHERRYISHELLLISTENER_H_ */

@@ -313,10 +313,12 @@ public: cherryClassMacro(PartStack);
      */
     protected: void SavePresentationState();
 
-    /**
-     * See LayoutPart#dispose
-     */
     public: ~PartStack();
+
+    /**
+     * See LayoutPart#Dispose
+     */
+    public: void Dispose();
 
     public: void FindSashes(PartPane::Sashes& sashes);
 

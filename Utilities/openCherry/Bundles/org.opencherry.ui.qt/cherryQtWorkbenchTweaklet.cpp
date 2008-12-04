@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "cherryQtWorkbenchTweaklet.h"
-#include "cherryQtControlWidget.h"
+#include "internal/cherryQtControlWidget.h"
 
 #include <QApplication>
 #include <QMainWindow>
@@ -33,10 +33,8 @@ namespace cherry {
 int
 QtWorkbenchTweaklet::RunEventLoop()
 {
-
   // spin Qt event loop
   return QApplication::instance()->exec();
-
 }
 
 bool QtWorkbenchTweaklet::IsRunning()
@@ -47,7 +45,6 @@ bool QtWorkbenchTweaklet::IsRunning()
 void* QtWorkbenchTweaklet::CreatePageComposite(void* p)
 {
   QWidget* parent = static_cast<QWidget*>(p);
-  std::cout << "CreatePageComposite: parent is " << parent->metaObject()->className() << " with name " << qPrintable(parent->objectName()) << std::endl;
   QtControlWidget* pageArea = new QtControlWidget(parent);
   pageArea->setObjectName("Page Composite");
   new QHBoxLayout(pageArea);
@@ -56,13 +53,8 @@ void* QtWorkbenchTweaklet::CreatePageComposite(void* p)
   else
     parent->layout()->addWidget(pageArea);
 
-  parent->layout()->update();
-
-  QRect parentRect = parent->geometry();
-  std::cout << "page composite parent geom: x = " << parentRect.x() << ", y = " << parentRect.y() << ", width = " << parentRect.width() << ", height = " << parentRect.height() << std::endl;
-  parentRect = pageArea->geometry();
-  std::cout << "page composite geom: x = " << parentRect.x() << ", y = " << parentRect.y() << ", width = " << parentRect.width() << ", height = " << parentRect.height() << std::endl;
-
+  // we have to enable visibility to get a proper layout (see bug #1654)
+  pageArea->setVisible(true);
 
   return pageArea;
 }

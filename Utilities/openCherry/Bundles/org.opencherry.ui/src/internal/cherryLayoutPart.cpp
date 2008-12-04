@@ -24,7 +24,6 @@
 #include "../cherryIWorkbenchWindow.h"
 #include "../cherryConstants.h"
 
-#include <cherryDebugUtil.h>
 
 namespace cherry
 {
@@ -35,7 +34,7 @@ const std::string LayoutPart::PROP_VISIBILITY = "PROP_VISIBILITY"; //$NON-NLS-1$
 LayoutPart::LayoutPart(const std::string& id_) :
   id(id_), deferCount(0)
 {
-  DebugUtil::TraceObject(this);
+
 }
 
 LayoutPart::~LayoutPart()
@@ -49,6 +48,11 @@ bool LayoutPart::AllowsAutoFocus()
     return container->AllowsAutoFocus();
   }
   return true;
+}
+
+void LayoutPart::Dispose()
+{
+
 }
 
 Rectangle LayoutPart::GetBounds()

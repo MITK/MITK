@@ -36,13 +36,42 @@ PURPOSE.  See the above copyright notices for more information.
   cherryClassMacro(className) \
   cherryManifestMacro(className, namespaze) \
 
-
-
 #define cherryNewMacro(x) \
 static Pointer New(void) \
 { \
   Pointer smartPtr = new x; \
   return smartPtr; \
 } \
+
+
+#ifndef CHERRY_NO_TYPESAFE_FLAGS
+
+#include "cherryFlags.h"
+
+#define CHERRY_DECLARE_FLAGS(_Flags, _Enum)\
+typedef cherry::Flags<_Enum> _Flags;
+
+#if defined _MSC_VER && _MSC_VER < 1300
+# define CHERRY_DECLARE_INCOMPATIBLE_FLAGS(_Flags)
+#else
+# define CHERRY_DECLARE_INCOMPATIBLE_FLAGS(_Flags) \
+inline cherry::IncompatibleFlag operator|(_Flags::enum_type f1, int f2) \
+{ return cherry::IncompatibleFlag(int(f1) | f2); }
+#endif
+
+#define CHERRY_DECLARE_OPERATORS_FOR_FLAGS(_Flags) \
+inline cherry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, _Flags::enum_type f2) \
+{ return cherry::Flags<_Flags::enum_type>(f1) | f2; } \
+inline cherry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, cherry::Flags<_Flags::enum_type> f2) \
+{ return f2 | f1; } CHERRY_DECLARE_INCOMPATIBLE_FLAGS(_Flags)
+
+#else /* CHERRY_NO_TYPESAFE_FLAGS */
+
+#define CHERRY_DECLARE_FLAGS(_Flags, _Enum)\
+typedef uint _Flags;
+#define CHERRY_DECLARE_OPERATORS_FOR_FLAGS(_Flags)
+
+#endif /* CHERRY_NO_TYPESAFE_FLAGS */
+
 
 #endif /*__CHERRY_MACROS_H__*/

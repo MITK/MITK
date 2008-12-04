@@ -18,7 +18,7 @@
 #include "cherryNativeTabFolder.h"
 #include "cherryNativeTabItem.h"
 
-#include "../../cherryQtControlWidget.h"
+#include "../cherryQtControlWidget.h"
 
 #include <QVBoxLayout>
 

@@ -264,6 +264,7 @@ void EditorSashContainer::RemoveAllEditors()
     if (workbook != currentWorkbook)
     {
       this->Remove(workbook);
+      workbook->Dispose();
     }
   }
 }
@@ -292,6 +293,7 @@ void EditorSashContainer::RemoveEditor(PartPane::Pointer pane)
     //    }
 
     this->Remove(workbook);
+    workbook->Dispose();
   }
 }
 

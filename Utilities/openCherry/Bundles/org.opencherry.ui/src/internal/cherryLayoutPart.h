@@ -79,9 +79,19 @@ protected: SmartPointer<ILayoutContainer> container;
 
 
     /**
-     * Creates the SWT control
+     * Creates the GUI control
      */
     public: virtual void CreateControl(void* parent) = 0;
+
+    /**
+     * Disposes the GUI control
+     *
+     * This can be used to execute cleanup code or notify listeners
+     * when a LayoutPart is no longer used, but is still referenced
+     * by a SmartPointer (instead of putting the code in the LayoutPart
+     * destructor).
+     */
+    public: virtual void Dispose();
 
     /**
      * Gets the presentation bounds.

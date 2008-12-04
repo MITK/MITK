@@ -433,7 +433,7 @@ const IExtensionPoint* WorkbenchPage::GetPerspectiveExtensionPoint()
           + WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
 }
 
-WorkbenchPage::WorkbenchPage(WorkbenchWindow::Pointer w,
+WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
     const std::string& layoutID, IAdaptable* input)
 {
   if (layoutID == "")
@@ -443,7 +443,7 @@ WorkbenchPage::WorkbenchPage(WorkbenchWindow::Pointer w,
   this->Init(w, layoutID, input, true);
 }
 
-WorkbenchPage::WorkbenchPage(WorkbenchWindow::Pointer w, IAdaptable* input)
+WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, IAdaptable* input)
 {
   this->Init(w, "", input, false);
 }
@@ -1960,7 +1960,7 @@ void WorkbenchPage::HideView(IViewPart::Pointer view)
   this->HideView(this->GetReference(view).Cast<IViewReference> ());
 }
 
-void WorkbenchPage::Init(WorkbenchWindow::Pointer w,
+void WorkbenchPage::Init(WorkbenchWindow* w,
     const std::string& layoutID, IAdaptable* input, bool openExtras)
 {
   // Save args.

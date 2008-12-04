@@ -317,6 +317,8 @@ TabbedStackPresentation::~TabbedStackPresentation()
 //  // Dispose the tab folder's widgetry
 //  folder.getTabFolder().getControl().dispose();
 
+  std::cout << "DELETING TabbedStackPresentation\n";
+
   delete tabs;
   delete dragBehavior;
   delete folder;

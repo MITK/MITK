@@ -17,8 +17,7 @@
 
 #include "cherryQtWorkbenchPageTweaklet.h"
 
-#include "cherryQtControlWidget.h"
-
+#include "internal/cherryQtControlWidget.h"
 #include "internal/cherryQtErrorView.h"
 
 #include <QWidget>
@@ -34,17 +33,9 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
   client->setObjectName("Client Composite");
   parent->layout()->addWidget(client);
 
-  QRect parentRect = parent->geometry();
-  std::cout << "client composite parent geom: x = " << parentRect.x() << ", y = " << parentRect.y() << ", width = " << parentRect.width() << ", height = " << parentRect.height() << std::endl;
-  parentRect = client->geometry();
-  std::cout << "client composite geom: x = " << parentRect.x() << ", y = " << parentRect.y() << ", width = " << parentRect.width() << ", height = " << parentRect.height() << std::endl;
+  // we have to enable visibility to get a proper layout (see bug #1654)
+  client->setVisible(true);
 
-  std::cout << "CreateClientComposite: client composite <-- " << qPrintable(parent->objectName());
-  for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
-    std::cout << " <-- " << qPrintable(parent->objectName());
-  std::cout << std::endl;
-
-  //new QHBoxLayout(client);
   return client;
 }
 
@@ -53,12 +44,6 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
   QWidget* qParent = static_cast<QWidget*>(parent);
   QtControlWidget* control = new QtControlWidget(qParent);
   control->setObjectName("Pane Control");
-  //qParent->layout()->addWidget(control);
-
-  std::cout << "CreatePaneControl: Pane Control <--" << qPrintable(qParent->objectName());
-  for (qParent = qParent->parentWidget(); qParent != 0; qParent = qParent->parentWidget())
-    std::cout << " <-- " << qPrintable(qParent->objectName());
-  std::cout << std::endl;
 
   return control;
 }

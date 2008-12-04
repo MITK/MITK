@@ -97,7 +97,7 @@ void EditorAreaHelper::DerefPart(StackablePart::Pointer part)
       if (parentContainer != 0)
       {
         parentContainer->Remove(parent);
-        //parent->Dispose();
+        parent->Dispose();
       }
     }
   }

@@ -24,7 +24,7 @@
 #include "../util/cherryTabbedStackPresentation.h"
 
 #include "../cherryQtSash.h"
-#include "../../cherryQtControlWidget.h"
+#include "../cherryQtControlWidget.h"
 
 namespace cherry
 {

@@ -20,25 +20,22 @@
 #define CHERRYQTMAINWINDOWSHELL_H_
 
 #include <cherryShell.h>
+#include <cherryPoint.h>
 
-#include <QMainWindow>
+#include <QWidget>
 
 namespace cherry {
 
-class QtMainWindowShell : public QMainWindow, public Shell
+class QtAbstractControlWidget;
+
+class QtShell : public Shell
 {
-  Q_OBJECT
-
-private:
-
-  std::list<IShellListener::Pointer> shellListeners;
-
-  typedef std::list<GuiTk::IControlListener::Pointer> ControlListenersList;
-  ControlListenersList controlListeners;
 
 public:
 
-  QtMainWindowShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  QtShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+
+  ~QtShell();
 
   // cherry::Shell
   void SetBounds(const Rectangle& bounds);
@@ -63,11 +60,9 @@ public:
   void SetMinimized(bool minimized);
 
   void AddShellListener(IShellListener::Pointer listener);
-
   void RemoveShellListener(IShellListener::Pointer listener);
 
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
-
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
 
   void Open(bool block = false);
@@ -78,17 +73,12 @@ public:
 
   int GetStyle ();
 
-protected:
+  QWidget* GetWidget();
 
-  // QMainWindow
+private:
 
-  void changeEvent(QEvent* event);
-
-  void closeEvent(QCloseEvent* closeEvent);
-
-  void moveEvent(QMoveEvent* event);
-  void resizeEvent(QResizeEvent* event);
-  void inFocusEvent(QFocusEvent* event);
+  QWidget* widget;
+  bool updatesDisabled;
 
 };
 

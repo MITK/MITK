@@ -32,6 +32,8 @@
 
 #include "cherryPlatformUI.h"
 
+#include "cherryDebugUtil.h"
+
 namespace cherry
 {
 
@@ -74,6 +76,12 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 WorkbenchWindow::~WorkbenchWindow()
 {
   delete serviceLocator;
+
+  Shell::Pointer shell = detachedWindowShells->availableShells.front();
+
+  std::cout << "Detached shell pointers: ";
+  DebugUtil::PrintSmartPointerIDs(shell.GetPointer());
+  std::cout << " Known pointer: " << shell.GetId() << std::endl;
 }
 
 Object::Pointer WorkbenchWindow::GetService(const std::string& key) const
@@ -1300,7 +1308,7 @@ void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
   Window::ConfigureShell(shell);
 
   detachedWindowShells = new ShellPool(shell, Constants::TITLE
-          | Constants::MAX | Constants::RESIZE );
+          | Constants::MAX | Constants::RESIZE | Constants::BORDER );
 
   std::string title = this->GetWindowConfigurer()->BasicGetTitle();
   if (title != "")

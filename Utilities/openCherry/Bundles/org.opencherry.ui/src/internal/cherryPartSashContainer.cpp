@@ -618,16 +618,16 @@ void PartSashContainer::Dispose()
     return;
   }
 
-  //  for (int i = 0, length = children.size(); i < length; i++)
-  //  {
-  //
-  //    // In PartSashContainer dispose really means deactivate, so we
-  //    // only dispose PartTabFolders.
-  //    if (children[i].Cast<PartStack> ().IsNotNull())
-  //    {
-  //      children[i]->Dispose();
-  //    }
-  //  }
+  for (ILayoutContainer::ChildrenType::iterator iter = children.begin();
+       iter != children.end(); ++iter)
+  {
+    // In PartSashContainer dispose really means deactivate, so we
+    // only dispose PartTabFolders.
+    if (iter->Cast<PartStack>() != 0)
+    {
+      (*iter)->Dispose();
+    }
+  }
 
   this->DisposeParent();
   this->parent = 0;
@@ -1115,9 +1115,10 @@ void PartSashContainer::DerefPart(StackablePart::Pointer sourcePart)
       std::cout << "LayoutPart container size: " << container->GetChildren().size() << std::endl;
       if (container->GetChildren().size() == 0)
       {
-        this->Remove(container.Cast<LayoutPart> ());
+        LayoutPart::Pointer stack = container.Cast<LayoutPart> ();
+        this->Remove(stack);
         std::cout << "IN DerefPart: stack reference count : " << container->GetReferenceCount() << std::endl;
-        //stack->Dispose();
+        stack->Dispose();
       }
     }
   }

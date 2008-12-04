@@ -18,8 +18,11 @@
 
 #include "cherryQtWidgetsTweaklet.h"
 
-#include "../cherryQtControlWidget.h"
-#include "cherryQtMainWindowShell.h"
+#include <cherryConstants.h>
+
+#include "cherryQtControlWidget.h"
+#include "cherryQtMainWindowControl.h"
+#include "cherryQtShell.h"
 #include "cherryQtSash.h"
 #include "cherryRectangle.h"
 
@@ -118,10 +121,13 @@ void QtWidgetsTweaklet::RemoveSelectionListener(void* widget,
   }
 }
 
-Rectangle QtWidgetsTweaklet::GetScreenSize(unsigned int i)
+Rectangle QtWidgetsTweaklet::GetScreenSize(int i)
 {
   QDesktopWidget *desktop = QApplication::desktop();
-  QRect screenGeometry = desktop->screenGeometry(i);
+  QRect screenGeometry;
+  if (i < 0) screenGeometry = desktop->screen()->geometry();
+  else screenGeometry = desktop->screenGeometry(i);
+
   return (Rectangle(screenGeometry.x(), screenGeometry.y()
     , screenGeometry.width(), screenGeometry.height()));
 }
@@ -134,11 +140,11 @@ unsigned int QtWidgetsTweaklet::GetScreenNumber()
   return numScreens;
 }
 
-unsigned int QtWidgetsTweaklet::GetPrimaryScreenNumber()
+int QtWidgetsTweaklet::GetPrimaryScreenNumber()
 {
   QDesktopWidget *desktop = QApplication::desktop();
   // get the primary screen
-  unsigned int primaryScreenNr = desktop->primaryScreen();
+  int primaryScreenNr = desktop->primaryScreen();
   return primaryScreenNr;
 }
 
@@ -323,12 +329,29 @@ void QtWidgetsTweaklet::Dispose(void* widget)
 Shell::Pointer QtWidgetsTweaklet::CreateShell(Shell::Pointer parent, int style)
 {
   Qt::WindowFlags qtFlags;
+
+  if (style & Constants::MAX)
+    qtFlags |= Qt::WindowMaximizeButtonHint;
+  if (style & Constants::MIN)
+    qtFlags |= Qt::WindowMinimizeButtonHint;
+  if (style & Constants::CLOSE)
+    qtFlags |= Qt::WindowSystemMenuHint;
+  if (!(style & Constants::BORDER))
+    qtFlags |= Qt::FramelessWindowHint;
+  if (style & Constants::TITLE)
+    qtFlags |= Qt::WindowTitleHint;
+
   QWidget* parentWidget = 0;
   if (parent != 0)
     parentWidget = static_cast<QWidget*>(parent->GetControl());
 
-  Shell::Pointer shell = new QtMainWindowShell(parentWidget, qtFlags & Qt::WA_DeleteOnClose);
+  QtShell* qtshell = new QtShell(parentWidget, qtFlags);
+  Shell::Pointer shell(qtshell);
   shellList.push_back(shell);
+
+  if ((style & Constants::APPLICATION_MODAL)
+      || (style & Constants::SYSTEM_MODAL)) qtshell->GetWidget()->setWindowModality(Qt::ApplicationModal);
+  if (style & Constants::PRIMARY_MODAL) qtshell->GetWidget()->setWindowModality(Qt::WindowModal);
 
   return shell;
 }
@@ -356,15 +379,22 @@ Shell::Pointer QtWidgetsTweaklet::GetShell(void* widget)
 {
   QWidget* qwidget = static_cast<QWidget*>(widget);
   QWidget* qwindow = qwidget->window();
-  QtMainWindowShell* window = dynamic_cast<QtMainWindowShell*>(qwindow);
-  Shell::Pointer shell = window;
+  QtAbstractControlWidget* window = dynamic_cast<QtMainWindowControl*>(qwindow);
+  if (window == 0)
+    window = dynamic_cast<QtControlWidget*>(qwindow);
+
+  Shell::Pointer shell = window->GetShell();
   return shell;
 }
 
 Shell::Pointer QtWidgetsTweaklet::GetActiveShell()
 {
-  QtMainWindowShell* window = dynamic_cast<QtMainWindowShell*>(QApplication::activeWindow());
-  Shell::Pointer shell = window;
+  QWidget* qwidget = QApplication::activeWindow();
+  QtAbstractControlWidget* window = dynamic_cast<QtMainWindowControl*>(qwidget);
+  if (window == 0)
+    window = dynamic_cast<QtControlWidget*>(QApplication::activeWindow());
+
+  Shell::Pointer shell = window ? window->GetShell() : 0;
   return shell;
 }
 

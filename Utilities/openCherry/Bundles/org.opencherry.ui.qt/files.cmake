@@ -1,7 +1,6 @@
 SET(CPP_FILES
   manifest.cpp
   cherryLogView.cpp
-  cherryQtControlWidget.cpp
   cherryQtEditorPart.cpp
   cherryQtLogView.cpp
   cherryQtUIPlugin.cpp
@@ -30,10 +29,13 @@ SET(INTERNAL_CPP_FILES
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
 
+  cherryQtAbstractControlWidget.cpp
+  cherryQtControlWidget.cpp
   cherryQtDnDTweaklet.cpp
   cherryQtErrorView.cpp
-  cherryQtMainWindowShell.cpp
+  cherryQtMainWindowControl.cpp
   cherryQtSash.cpp
+  cherryQtShell.cpp
   cherryQtShowViewAction.cpp
   cherryQtTracker.cpp
   cherryQtPlatformLogModel.cpp
@@ -42,12 +44,11 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
-  cherryQtControlWidget.h
-  
   internal/defaultpresentation/cherryNativeTabFolder.h
   internal/defaultpresentation/cherryQCTabBar.h
   
-  internal/cherryQtMainWindowShell.h
+  internal/cherryQtControlWidget.h
+  internal/cherryQtMainWindowControl.h
   internal/cherryQtSash.h
   internal/cherryQtShowViewAction.h
   internal/cherryQtTracker.h

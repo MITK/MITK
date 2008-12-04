@@ -31,6 +31,7 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
 #include <cherryObjects.h>
+#include <cherryDebugUtil.h>
 
 namespace cherry
 {
@@ -206,6 +207,8 @@ PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
   std::stringstream buf;
   buf << "PartStack@" << this;
   this->SetID(buf.str());
+
+  DebugUtil::TraceObject(this);
 
   presentationSite = new MyStackPresentationSite(this);
 }
@@ -674,9 +677,11 @@ void PartStack::SavePresentationState()
 
 PartStack::~PartStack()
 {
-
   std::cout << "DELETING PARTSTACK\n";
+}
 
+void PartStack::Dispose()
+{
   if (this->GetPresentation() == 0)
   {
     return;
@@ -684,15 +689,17 @@ PartStack::~PartStack()
 
   this->SavePresentationState();
 
+//  for (PresentableVector::iterator iter = presentableParts.begin();
+//       iter != presentableParts.end(); ++iter)
+//  {
+//    iter->Cast<PresentablePart>()->Dispose();
+//  }
   presentableParts.clear();
 
   presentationCurrent = 0;
   current = 0;
-  this->Register(); // need to increment the reference count
-  // so the PartStack is not deleted recursively because of
-  // the creation/desctruction of temporary SmartPointers
+
   this->FireInternalPropertyChange(PROP_SELECTION);
-  this->m_ReferenceCount -= 1;
 }
 
 void PartStack::FindSashes(PartPane::Sashes& sashes)

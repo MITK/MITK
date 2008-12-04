@@ -314,8 +314,10 @@ Shell::Pointer Window::GetParentShell()
 
 IShellListener::Pointer Window::GetShellListener()
 {
-  IShellListener::Pointer listener = new WindowShellListener(this);
-  return listener;
+  if (windowShellListener == 0)
+    windowShellListener = new WindowShellListener(this);
+
+  return windowShellListener;
 }
 
 int Window::GetShellStyle()

@@ -81,10 +81,10 @@ public:
 
   void SetData(void* widget, const std::string& id, Object::Pointer data);
   Object::Pointer GetData(void* widget, const std::string& id);
-  
-  Rectangle GetScreenSize(unsigned int i = 0);
+
+  Rectangle GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
-  unsigned int GetPrimaryScreenNumber();
+  int GetPrimaryScreenNumber();
 
   Point GetCursorLocation();
   void* GetCursorControl();
@@ -145,7 +145,7 @@ private:
 
   static std::list<Shell::Pointer> shellList;
 
-  friend class QtMainWindowShell;
+  friend class QtShell;
 
 };
 

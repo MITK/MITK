@@ -54,6 +54,7 @@ class ShellPool: public IShellListener
   //        }
   //    };
 
+  friend class WorkbenchWindow;
 
 public:
 

@@ -19,7 +19,7 @@
 #define CHERRYOSGISMARTPOINTER_H_
 
 #include <iostream>
-#include <exception>
+#include <stdexcept>
 
 #include "cherryOSGiDll.h"
 

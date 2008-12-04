@@ -674,6 +674,7 @@ void PerspectiveHelper::Deactivate()
 
 PerspectiveHelper::~PerspectiveHelper()
 {
+  mainLayout->Dispose();
   mainLayout->DisposeSashes();
 }
 
@@ -806,7 +807,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
           // (which at this point would represent view place-holders)
           if (hasChildren)
           {
-            //folder->Dispose();
+            folder->Dispose();
 
             // replace the real container with a ContainerPlaceholder
             ContainerPlaceholder::Pointer placeholder =
@@ -847,7 +848,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
           DebugUtil::PrintSmartPointerIDs(oldContainer.GetPointer(), std::cout, knownIDs);
           std::cout << "Known pointer: " << oldContainer.GetId() << ", " << parent.GetId() << std::endl;
 #endif
-          //parent->Dispose();
+          parent->Dispose();
         }
       }
     }

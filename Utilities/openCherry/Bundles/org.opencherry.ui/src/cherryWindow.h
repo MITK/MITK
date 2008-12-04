@@ -139,6 +139,8 @@ private:
     Window* window;
   };
 
+  IShellListener::Pointer windowShellListener;
+
   /**
    * Defines a default exception handler.
    */

@@ -19,7 +19,7 @@
 #include "cherryAbstractTabItem.h"
 
 #include "../cherryQtWidgetsTweaklet.h"
-#include "../../cherryQtControlWidget.h"
+#include "../cherryQtControlWidget.h"
 
 #include <cherryConstants.h>
 #include <internal/cherryDragUtil.h>
@@ -171,7 +171,10 @@ PresentablePartFolder::~PresentablePartFolder()
     (*iter)->RemovePropertyListener(childPropertyChangeListener);
   }
 
+  std::cout << "DELETING PresentablePartFolder and contentProxy\n";
+
   delete folder;
+  delete contentProxy;
 }
 
 void PresentablePartFolder::InitTab(AbstractTabItem* item,

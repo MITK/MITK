@@ -15,40 +15,28 @@
 
  =========================================================================*/
 
-
-#ifndef CHERRYQTCONTROLWIDGET_H_
-#define CHERRYQTCONTROLWIDGET_H_
-
-#include <QFrame>
-
-#include <list>
-
-#include <guitk/cherryGuiTkIControlListener.h>
+#include "cherryQtAbstractControlWidget.h"
 
 namespace cherry {
 
-class QtControlWidget : public QFrame
+void QtAbstractControlWidget::AddControlListener(GuiTk::IControlListener::Pointer listener)
 {
-  Q_OBJECT
-
-public:
-
-  QtControlWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-
-  void AddControlListener(GuiTk::IControlListener::Pointer listener);
-  void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
-
-protected:
-
-  void moveEvent(QMoveEvent* event);
-  void resizeEvent(QResizeEvent* event);
-  void focusInEvent(QFocusEvent* event);
-
-private:
-
-  GuiTk::IControlListener::Events controlEvents;
-};
-
+  controlEvents.AddListener(listener);
 }
 
-#endif /* CHERRYQTCONTROLWIDGET_H_ */
+void QtAbstractControlWidget::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
+{
+  controlEvents.RemoveListener(listener);
+}
+
+void QtAbstractControlWidget::AddShellListener(IShellListener::Pointer listener)
+{
+  shellEvents.AddListener(listener);
+}
+
+void QtAbstractControlWidget::RemoveShellListener(IShellListener::Pointer listener)
+{
+  shellEvents.RemoveListener(listener);
+}
+
+}

@@ -89,6 +89,7 @@ void DetachedWindow::Create()
 
   windowShell = page->GetWorkbenchWindow().Cast<WorkbenchWindow>()
        ->GetDetachedWindowPool()->AllocateShell(shellListener);
+  std::cout << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
   windowShell->SetData(this);
   windowShell->SetText(""); //$NON-NLS-1$
 
@@ -102,16 +103,16 @@ void DetachedWindow::Create()
     bounds = Rectangle(center.x - 150, center.y + 100, 300, 200);
   }
 
-  //  // Force the rect into the current display
-  //  Rectangle dispBounds = this->GetShell().getDisplay().getBounds();
-  //  if (bounds.width > dispBounds.width)
-  //    bounds.width = dispBounds.width;
-  //  if (bounds.height > dispBounds.height)
-  //    bounds.height = dispBounds.height;
-  //  if (bounds.x + bounds.width > dispBounds.width)
-  //    bounds.x = dispBounds.width - bounds.width;
-  //  if (bounds.y + bounds.height > dispBounds.height)
-  //    bounds.y = dispBounds.height - bounds.height;
+  // Force the rect into the current display
+  Rectangle dispBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetScreenSize();
+  if (bounds.width > dispBounds.width)
+    bounds.width = dispBounds.width;
+  if (bounds.height > dispBounds.height)
+    bounds.height = dispBounds.height;
+  if (bounds.x + bounds.width > dispBounds.width)
+    bounds.x = dispBounds.width - bounds.width;
+  if (bounds.y + bounds.height > dispBounds.height)
+    bounds.y = dispBounds.height - bounds.height;
 
   this->GetShell()->SetBounds(bounds);
 
@@ -119,7 +120,7 @@ void DetachedWindow::Create()
 
   this->CreateContents(windowShell->GetControl());
   //windowShell->Layout(true);
-  //folder->SetBounds(windowShell->GetClientArea());
+  //folder->SetBounds(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetClientArea(windowShell->GetControl()));
 }
 
 void DetachedWindow::Add(StackablePart::Pointer part)
@@ -443,10 +444,10 @@ bool DetachedWindow::HandleClose()
     }
   }
 
-  //  if (folder != 0)
-  //  {
-  //    folder->Dispose();
-  //  }
+  if (folder != 0)
+  {
+    folder->Dispose();
+  }
 
   if (windowShell != 0)
   {

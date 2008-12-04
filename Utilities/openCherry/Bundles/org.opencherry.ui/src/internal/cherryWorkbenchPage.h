@@ -65,7 +65,7 @@ public:
 
 protected:
 
-  SmartPointer<WorkbenchWindow> window;
+  WorkbenchWindow* window;
 
   friend class ViewFactory;
   friend class WorkbenchWindow;
@@ -312,7 +312,7 @@ public:
    * @throws WorkbenchException
    *             on null layout id
    */
-  WorkbenchPage(SmartPointer<WorkbenchWindow> w, const std::string& layoutID,
+  WorkbenchPage(WorkbenchWindow* w, const std::string& layoutID,
       IAdaptable* input);
 
   /**
@@ -325,7 +325,7 @@ public:
    *            the page input
    * @throws WorkbenchException
    */
-  WorkbenchPage(SmartPointer<WorkbenchWindow> w, IAdaptable* input);
+  WorkbenchPage(WorkbenchWindow* w, IAdaptable* input);
 
   ~WorkbenchPage();
 
@@ -874,7 +874,7 @@ public:
    *            whether to process the perspective extras preference
    */
 private:
-  void Init(SmartPointer<WorkbenchWindow> w, const std::string& layoutID,
+  void Init(WorkbenchWindow* w, const std::string& layoutID,
       IAdaptable* input, bool openExtras);
 
   /**

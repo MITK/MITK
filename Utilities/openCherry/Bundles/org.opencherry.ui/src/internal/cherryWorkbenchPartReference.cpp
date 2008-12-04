@@ -500,14 +500,14 @@ void WorkbenchPartReference::Dispose()
   }
 
   // Disposing the pane disposes the part's widgets. The part's widgets need to be disposed before the part itself.
-  //        if (pane != null) {
-  //            // Remove the dispose listener since this is the correct place for the widgets to get disposed
-  //            Control targetControl = getPane().getControl();
-  //            if (targetControl != null) {
-  //                targetControl.removeDisposeListener(prematureDisposeListener);
-  //            }
-  //            pane.dispose();
-  //        }
+//  if (pane != 0) {
+//      // Remove the dispose listener since this is the correct place for the widgets to get disposed
+//      Control targetControl = getPane().getControl();
+//      if (targetControl != null) {
+//          targetControl.removeDisposeListener(prematureDisposeListener);
+//      }
+//      pane->Dispose();
+//  }
 
 
   if (!pane.IsNull())

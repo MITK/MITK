@@ -140,17 +140,18 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTID3*,  itk::Sma
 
 // allow for fixed-size vectors of specific length
 // (inspired by itkPointshell.cpp, precompiled q-ball configs)
-CAST_TEN_VECS(0)
-CAST_N_VEC(11)
-CAST_N_VEC(12)
+//CAST_TEN_VECS(0)
+//CAST_N_VEC(11)
+//CAST_N_VEC(12)
+CAST_N_VEC(3)
 CAST_N_VEC(42)
 CAST_N_VEC(92)
 CAST_N_VEC(162)
 CAST_N_VEC(252)
 CAST_N_VEC(362)
-CAST_N_VEC(492)
-CAST_N_VEC(642)
-CAST_N_VEC(812)
-CAST_N_VEC(1002)
+//CAST_N_VEC(492)
+//CAST_N_VEC(642)
+//CAST_N_VEC(812)
+//CAST_N_VEC(1002)
 
 }

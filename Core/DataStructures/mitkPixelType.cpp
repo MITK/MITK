@@ -247,18 +247,19 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
 
      // allow for fixed-size vectors of specific length
      // (inspired by itkPointshell.cpp, precompiled q-ball configs)
-     TEN_VECS(0)
-     N_VEC(11)
-     N_VEC(12)
+     //TEN_VECS(0)
+     //N_VEC(11)
+     //N_VEC(12)
+     N_VEC(3)
      N_VEC(42)
      N_VEC(92)
      N_VEC(162)
      N_VEC(252)
      N_VEC(362)
-     N_VEC(492)
-     N_VEC(642)
-     N_VEC(812)
-     N_VEC(1002)
+     //N_VEC(492)
+     //N_VEC(642)
+     //N_VEC(812)
+     //N_VEC(1002)
 
      if(!found)
        itkExceptionMacro( "Pixel type currently not supported." );

@@ -183,18 +183,19 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageCDTID3>(const mitk::Ima
 
 // allow for fixed-size vectors of specific length
 // (inspired by itkPointshell.cpp, precompiled q-ball configs)
-TYPE_TEN_VECS(0)
-TYPE_N_VEC(11)
-TYPE_N_VEC(12)
+//TYPE_TEN_VECS(0)
+//TYPE_N_VEC(11)
+//TYPE_N_VEC(12)
+TYPE_N_VEC(3)
 TYPE_N_VEC(42)
 TYPE_N_VEC(92)
 TYPE_N_VEC(162)
 TYPE_N_VEC(252)
 TYPE_N_VEC(362)
-TYPE_N_VEC(492)
-TYPE_N_VEC(642)
-TYPE_N_VEC(812)
-TYPE_N_VEC(1002)
+//TYPE_N_VEC(492)
+//TYPE_N_VEC(642)
+//TYPE_N_VEC(812)
+//TYPE_N_VEC(1002)
 
 #ifndef DOXYGEN_SKIP
 //// Extension for RGB (and maybe also for vector types)

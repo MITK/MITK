@@ -591,7 +591,7 @@ void QmitkSurfaceCreatorComponent::CreateSurface()
     //image from that the surface shall be created
     filter->SetInput( m_MitkImage ); 
 
-    //GAUSS FILTER (must be set befor threshold)
+    //GAUSS FILTER (must be set before threshold)
     filter->SetUseGaussianImageSmooth( m_GaussFlag );
     if(m_GaussFlag)
     {

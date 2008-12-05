@@ -250,6 +250,7 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      //TEN_VECS(0)
      //N_VEC(11)
      //N_VEC(12)
+     if(false){}
      N_VEC(3)
      N_VEC(42)
      N_VEC(92)

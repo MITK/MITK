@@ -81,7 +81,9 @@ WorkbenchWindow::~WorkbenchWindow()
 
   std::cout << "Detached shell pointers: ";
   DebugUtil::PrintSmartPointerIDs(shell.GetPointer());
+#ifdef CHERRY_DEBUG_SMARTPOINTER
   std::cout << " Known pointer: " << shell.GetId() << std::endl;
+#endif
 }
 
 Object::Pointer WorkbenchWindow::GetService(const std::string& key) const

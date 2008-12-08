@@ -21,6 +21,8 @@ SET(CPP_FILES
   mitkHistogramGenerator.cpp
   mitkImageCastPart1.cpp
   mitkImageCastPart2.cpp
+  mitkImageCastPart3.cpp
+  mitkImageCastPart4.cpp
   mitkImageChannelSelector.cpp
   mitkImageRegistrationMethod.cpp
   mitkImageSliceSelector.cpp

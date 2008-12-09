@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.mitk.gui.qt.helloworld">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.mitk.gui.qt.helloworld" id="org.mitk.gui.qt.helloworld.dialogs" name="Dialogs"/>
+      </appInfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+ 
+   <element name="dialog">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                 
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                 
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.mitk.gui.qt.helloworld.IDialog"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+</schema>

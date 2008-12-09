@@ -4,22 +4,28 @@
 #include <cherryIPartListener.h>
 
 #include <QmitkViewPart.h>
+#include <QPushButton>
 #include <QmitkStandardViews.h>
 
 #include "mitkQtHelloWorldDll.h"
 
-class MITK_QT_HELLOWORLD QmitkHelloWorldView : public QmitkViewPart
+class MITK_QT_HELLOWORLD QmitkHelloWorldView : public QObject, public QmitkViewPart
 {
+  Q_OBJECT;
 
 public:
 
   void SetFocus();
 
   ~QmitkHelloWorldView();
+protected slots:
+    void buttonClicked();
 
 protected:
 
   void CreateQtPartControl(QWidget* parent);
+  QPushButton* m_ButtonHelloWorld;
+  QWidget* m_Parent;
 
 };
 

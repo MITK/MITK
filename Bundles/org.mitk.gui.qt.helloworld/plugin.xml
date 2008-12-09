@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+   <extension-point id="org.mitk.gui.qt.helloworld.dialogs" name="Dialogs" schema="schema/dialogs.exsd"/>
+
   <extension point="org.opencherry.ui.views">
     <category 
       id="org.mitk.views.general" 
@@ -11,4 +13,10 @@
       category="org.mitk.views.general" 
       class="QmitkHelloWorldView" />
   </extension>
+  
+  <extension point="org.mitk.gui.qt.helloworld.dialogs"> 
+    <dialog 
+      id="helloworlddialog" 
+      class="HelloWorldDialog" />
+  </extension>  
 </plugin>

@@ -19,7 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryIViewPart.h>
 #include "src/QmitkHelloWorldView.h"
+#include "src/IDialog.h"
+#include "src/HelloWorldDialog.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
   POCO_EXPORT_CLASS(QmitkHelloWorldView)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(IDialog, IDialog)
+  POCO_EXPORT_CLASS(HelloWorldDialog)
 POCO_END_MANIFEST

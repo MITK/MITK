@@ -1,5 +1,9 @@
 SET(SRC_CPP_FILES
   QmitkHelloWorldView.cpp
+  HelloWorldDialog.cpp
+)
+SET(MOC_H_FILES
+  src/QmitkHelloWorldView.h
 )
 
 SET(INTERNAL_CPP_FILES

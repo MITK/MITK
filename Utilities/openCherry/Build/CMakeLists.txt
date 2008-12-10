@@ -1,0 +1,45 @@
+PROJECT(FunctionalityGeneratorQT4)
+
+SET(GENERATE_NEW_VIEW ON CACHE BOOL "Turn this on for final generation of functionality")
+SET(PLUGIN_ID "" CACHE STRING "unique plugin id")
+SET(PLUGIN_NAME "" CACHE STRING "")
+SET(PLUGIN_VERSION "" CACHE STRING "Version of the functionality")
+SET(PLUGIN_VENDOR "" CACHE STRING "Vendor of the functionality")
+
+SET(GENERATE_ACTIVATOR_CLASS "" CACHE STRING "")
+SET(GENERATE_VIEW_CLASS "" CACHE STRING "Name of the new view (functionality)")
+
+SET(GENERATE_VIEW_TYPE "" CACHE STRING "")
+
+SET(GENERATE_EDITOR "" CACHE STRING "")
+SET(GENERATE_EDITOR_CLASS "" CACHE STRING "")
+SET(GENERATE_EDITOR_TYPE "" CACHE STRING "")
+
+SET(GENERATE_SERVICE "" CACHE STRING "")
+SET(GENERATE_SERVICE_CLASS "" CACHE STRING "")
+
+FIND_FILE(PLUGIN_TEMPLATE BundleTemplate 
+  ${PROJECT_SOURCE_DIR}/../../../CMake
+  DOC "Path to the plugin templates") 
+SET(PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${GENERATE_VIEW_CLASS})
+
+IF(GENERATE_NEW_VIEW)
+  IF(PLUGIN_TEMPLATE)
+    MESSAGE("Generating ${GENERATE_VIEW_CLASS} from template ${PLUGIN_TEMPLATE} in directory ${PLUGIN_DIR} ...")
+    FILE(GLOB_RECURSE TEMPLATE_FILES RELATIVE ${PLUGIN_TEMPLATE} ${PLUGIN_TEMPLATE}/*)
+    FOREACH(F ${TEMPLATE_FILES})
+      IF(NOT F MATCHES ".svn/")
+      STRING(REPLACE QmitkPluginTemplate ${GENERATE_VIEW_CLASS} NEW_RELPATH ${F})
+      MESSAGE(STATUS "Generating ${PLUGIN_DIR}/${NEW_RELPATH}")
+      IF(EXISTS ${PLUGIN_DIR}/${NEW_RELPATH})
+        MESSAGE(FATAL_ERROR "Won't overwrite existing file. Please remove all files from ${PLUGIN_DIR}!") 
+      ENDIF(EXISTS ${PLUGIN_DIR}/${NEW_RELPATH})
+      CONFIGURE_FILE(${PLUGIN_TEMPLATE}/${F} ${PLUGIN_DIR}/${NEW_RELPATH} @ONLY)
+      ENDIF(NOT F MATCHES ".svn/")
+    ENDFOREACH(F)
+    SET(GENERATE_NEW_VIEW OFF CACHE BOOL "Turn this on for final generation of functionality" FORCE)
+    MESSAGE("New view \"${GENERATE_VIEW_CLASS}\" has been generated in \"${PLUGIN_DIR}\"."
+            "Add this directory to QFunctionalities to add it to the MainApp!")
+  ENDIF(PLUGIN_TEMPLATE)
+ENDIF(GENERATE_NEW_VIEW)
+

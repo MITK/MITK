@@ -28,7 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkActor.h>
 
-#include <vtkPropAssembly.h>
+#include <vtkAssembly.h>
+#include <vtkProp3DCollection.h>
 #include <vtkTubeFilter.h>
 
 #include <vtkSphereSource.h>
@@ -51,16 +52,17 @@ mitk::EnhancedPointSetVtkMapper3D::EnhancedPointSetVtkMapper3D()
 {
   m_Contour = vtkActor::New();
   m_ContourSource = vtkTubeFilter::New();
-  m_PropAssembly = vtkPropAssembly::New();
-
+  m_PropAssembly = vtkAssembly::New();
+  m_Prop3D = m_PropAssembly;
 }
 
 mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
 {
+  m_Prop3D = NULL;
   m_Contour->Delete();
   m_ContourSource->Delete();
   m_PropAssembly->Delete();
-
+  
   // TODO: do cleanup correctly
 
   // Clean up all remaining actors and poly-data sources
@@ -99,20 +101,21 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
   for (ActorMap::iterator it = m_PointActors.begin(); it != m_PointActors.end(); )
   {
     PointIdentifier id = it->first;
-    if (points->IndexExists(id))
+    if (!points->IndexExists(id))
     {
       this->RemoveEntryFromSourceMaps(id);
+      m_PropAssembly->GetParts()->RemoveItem(it->second.first); // remove from prop assembly
       if (it->second.first != NULL)
         it->second.first->Delete(); // Delete actor, which deletes mapper too (reference count)
-      ActorMap::iterator er = it;
-      ++it;
-      m_PointActors.erase(er); // erase element from map, get pointer to following element
+      ActorMap::iterator er = it; // save iterator for deleting
+      ++it;  // advance iterator to next object
+      m_PointActors.erase(er); // erase element from map. This invalidates er, therefore we had to advance it before deletion.
     }
     else
       ++it;
   }
-
-  /* iterate over each point in the pointset and create/update polydata and its properties */
+  
+  /* iterate over each point in the pointset and create corresponding vtk objects */
   for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)
   {
     PointIdentifier pointID = pIt->Index();
@@ -120,20 +123,22 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
 
     mitk::PointSet::PointType point = pIt->Value();
     mitk::PointSet::PointDataType data = pdIt->Value();
-    ActorMap::iterator aIt = m_PointActors.find(pointID);
+    
+    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
 
     /* Create/Update sources for the point */
     vtkActor* a = NULL;
     bool newPoint = (aIt == m_PointActors.end()); // current point is new
-    bool specChanged = (aIt != m_PointActors.end());  // point spec of current point has changed
+    bool specChanged = (!newPoint && data.pointSpec != aIt->second.second); // point spec of current point has changed
 
-    if (newPoint)  // point non-existing
+    if (newPoint)  // point did not exist before, we have to create vtk objects for it
     { // create actor and mapper for the new point
       a = vtkActor::New();
       vtkPolyDataMapper* m = vtkPolyDataMapper::New();
       a->SetMapper(m);
       m->UnRegister( NULL );
-      m_PointActors[pointID] = std::make_pair(a, data.pointSpec);
+      aIt = m_PointActors.insert(std::make_pair(pointID, std::make_pair(a, data.pointSpec))).first;  // insert element and update actormap iterator to point to new element
+      m_PropAssembly->AddPart(a);
     }
     else
     {
@@ -143,8 +148,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
         this->RemoveEntryFromSourceMaps( pointID );
       }
     }
-    if (  newPoint   // new point 
-       || (!newPoint && specChanged) ) // OR existing point but point spec changed
+    if ( newPoint || specChanged ) // new point OR existing point but point spec changed
     {
       vtkPolyDataAlgorithm* source = NULL;  // works only in VTK 5+
       switch (data.pointSpec)  // add to new map
@@ -173,105 +177,116 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkObjects()
       m->SetInput(source->GetOutput());
       aIt->second.second = data.pointSpec; // update point spec in actormap
     }
-
-    /* update properties */
-      // visibility
-    bool vis = true;
-    this->GetDataTreeNode()->GetBoolProperty("visibility", vis /*, renderer*/);  //TODO look for visibility lookup table for pointwise visibility, TODO2: get the property from the correct renderer!
-    // TODO apply visibility to vtkProperty of the actor a.
-    // TODO continue with all other properties
-  } // for each point 
+  } // for each point  
 }
 
 
 
 void mitk::EnhancedPointSetVtkMapper3D::GenerateData()
 {
-  ////create new vtk render objects (e.g. sphere for a point)
-  //this->CreateVTKRenderObjects();
-
-  //apply props
-  //Superclass::ApplyProperties( m_ContourActor, NULL );
-  //this->ApplyProperties(NULL);
-
+  this->UpdateVtkObjects();
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * /*renderer*/ )
+void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * renderer )
 {
+  /* iterate over all points in pointset and apply properties to coresponding vtk objects */
+  // get and update the PointSet
+  const mitk::PointSet* pointset = this->GetInput();
+  int timestep = this->GetTimestep();
+  mitk::PointSet::DataType* itkPointSet = pointset->GetPointSet( timestep );
+  mitk::PointSet::PointsContainer* points = itkPointSet->GetPoints();
+  mitk::PointSet::PointDataContainer* pointData = itkPointSet->GetPointData();
+  assert(points->Size() == pointData->Size());
+  mitk::PointSet::PointsIterator pIt;
+  mitk::PointSet::PointDataIterator pdIt;
+  mitk::DataTreeNode* n = this->GetDataTreeNode();
+  assert(n != NULL);
 
-//// just for testing, always call CreateVTKRenderObjects()
-//  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
-//  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize"));
-//  // only create new vtk render objects if property values were changed
-//  if ( pointSizeProp.IsNotNull() &&  contourSizeProp.IsNotNull() )
-//  {
-//    if (m_PointSize!=pointSizeProp->GetValue() || m_ContourRadius!= contourSizeProp->GetValue())
-//    {
-//      this->CreateVTKRenderObjects();
-//    }
-//  }
-//  //this->CreateVTKRenderObjects();  //just for testing
-//
-//  Superclass::ApplyProperties( m_ContourActor, renderer );
-//  this->ApplyProperties(renderer);
-//
-//  if(IsVisible(renderer)==false)
-//  {
-//    m_UnselectedActor->VisibilityOff();
-//    m_SelectedActor->VisibilityOff();
-//    m_ContourActor->VisibilityOff();
-//    return;
-//  }
-//
-//  bool showPoints = true;
-//  this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
-//  if(showPoints)
-//  {
-//    m_UnselectedActor->VisibilityOn();
-//    m_SelectedActor->VisibilityOn();
-//  }
-//  else
-//  {
-//    m_UnselectedActor->VisibilityOff();
-//    m_SelectedActor->VisibilityOff();
-//  }
-//
-//  if(dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity")) != NULL)
-//  {  
-//    mitk::FloatProperty::Pointer pointOpacity =dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity"));
-//    float opacity = pointOpacity->GetValue();
-//    m_ContourActor->GetProperty()->SetOpacity(opacity);
-//    m_UnselectedActor->GetProperty()->SetOpacity(opacity);
-//    m_SelectedActor->GetProperty()->SetOpacity(opacity);
-//  }
-//
-//  bool makeContour = false;
-//  this->GetDataTreeNode()->GetBoolProperty("show contour", makeContour);
-//  if (makeContour)
-//  {
-//    m_ContourActor->VisibilityOn();
-//  }
-//  else
-//  {
-//    m_ContourActor->VisibilityOff();
-//  }
-//
-//
-//  // Get the TimeSlicedGeometry of the input object
-//  mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-//  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-//  if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ))
-//  {
-//    m_PointsAssembly->VisibilityOff();
-//    return;
-//  }
-//
-//  if ( inputTimeGeometry->IsValidTime( this->GetTimestep() ) == false )
-//  {
-//    m_PointsAssembly->VisibilityOff();
-//    return;
-//  }
+  for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)
+  {
+    PointIdentifier pointID = pIt->Index();
+    assert (pointID == pdIt->Index());
+
+    mitk::PointSet::PointType point = pIt->Value();
+    mitk::PointSet::PointDataType data = pdIt->Value();
+
+    ActorMap::iterator aIt = m_PointActors.find(pointID); // Does an actor exist for the point?
+    assert(aIt != m_PointActors.end()); // UpdateVtkObjects() must ensure that actor exists
+    
+    vtkActor* a = aIt->second.first;
+    assert(a != NULL);
+
+    /* update properties */
+    // visibility
+    a->SetVisibility(n->IsVisible(renderer, "show points"));  //TODO look for visibility lookup table for point wise visibility instead of global visibility property
+
+    // opacity
+    float opacity = 1.0;
+    n->GetOpacity(opacity, renderer);
+    a->GetProperty()->SetOpacity(opacity); // TODO use opacity lookup table
+
+    // pointsize & point position
+    float pointSize = 1.0;
+    n->GetFloatProperty( "pointsize", pointSize, renderer);
+    switch (data.pointSpec)
+    {                                               //TODO: look up representation in a representationlookuptable
+    case PTSTART:        //cube
+      m_CubeSources[pointID]->SetXLength(pointSize);
+      m_CubeSources[pointID]->SetYLength(pointSize);
+      m_CubeSources[pointID]->SetZLength(pointSize);
+      //m_CubeSources[pointID]->SetCenter(pos[0], pos[1], pos[2]);
+      break;
+    case PTCORNER:          //cone
+      m_ConeSources[pointID]->SetRadius(pointSize/2);
+      m_ConeSources[pointID]->SetHeight(pointSize);
+      m_ConeSources[pointID]->SetResolution(2); // two crossed triangles. Maybe introduce an extra property for 
+      //m_ConeSources[pointID]->SetCenter(pos[0], pos[1], pos[2]);
+      break;
+    case PTEDGE:          // cylinder
+      m_CylinderSources[pointID]->SetRadius(pointSize/2);
+      m_CylinderSources[pointID]->SetHeight(pointSize);
+      m_CylinderSources[pointID]->CappingOn();
+      m_CylinderSources[pointID]->SetResolution(6);
+      //m_CylinderSources[pointID]->SetCenter(pos[0], pos[1], pos[2]);
+      break;
+    case PTUNDEFINED:     // sphere
+    case PTEND:
+    default:
+      m_SphereSources[pointID]->SetRadius(pointSize/2);
+      m_SphereSources[pointID]->SetThetaResolution(10);
+      m_SphereSources[pointID]->SetPhiResolution(10);
+      //m_SphereSources[pointID]->SetCenter(pos[0], pos[1], pos[2]);
+      break;
+    }
+
+    // set position
+    mitk::Point3D pos = pIt->Value();
+    aIt->second.first->SetPosition(pos[0], pos[1], pos[2]);
+
+    // selectedcolor & color
+    float color[3];
+    if (data.selected)
+      n->GetColor(color, renderer, "selectedcolor");
+    else
+      n->GetColor(color, renderer, "unselectedcolor");  // TODO: What about "color" property? 2D Mapper only uses unselected and selected color properties
+    a->GetProperty()->SetColor(color[0], color[1], color[2]);
+
+    // TODO: label property
+  }
+  //TODO test different pointSpec
+  // TODO "line width" "show contour" "contourcolor" "contoursize" "close contour" "show label", "label"
+  // TODO "show points" vs "visibility"  - is visibility evaluated at all? in a superclass maybe? 
+  // TODO create lookup tables for all properties that should be evaluated per point. also create editor widgets for these lookup tables!
+  // TODO check if property changes and pointset changes are reflected in the renderwindow immediately.
+  // TODO check behaviour with large pointsets
+  // TODO check for memory leaks on adding/deleting points
+}
+
+
+void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * renderer )
+{
+  ApplyProperties(renderer);
 }
 
 
@@ -284,9 +299,9 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform()
   //m_UnselectedActor->SetUserTransform(vtktransform);
   //m_ContourActor->SetUserTransform(vtktransform);
 }
-
-void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* /*renderer*/)
-{
+//
+//void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* /*renderer*/)
+//{
   ////check for color props and use it for rendering of selected/unselected points and contour 
   ////due to different params in VTK (double/float) we have to convert!
 
@@ -393,7 +408,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties(mitk::BaseRenderer* /*re
   //m_UnselectedActor->GetProperty()->SetColor(unselectedColor);
   //m_UnselectedActor->GetProperty()->SetOpacity(opacity);
 
-}
+//}
 
 void mitk::EnhancedPointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* /*renderer*/)
 {

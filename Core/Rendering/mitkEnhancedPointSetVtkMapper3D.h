@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 
 class vtkActor;
-class vtkPropAssembly;
+class vtkAssembly;
 class vtkSphereSource;
 class vtkCubeSource;
 class vtkConeSource;
@@ -98,7 +98,7 @@ namespace mitk {
 
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer);    
     virtual void CreateContour(mitk::BaseRenderer* renderer);
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;
@@ -119,7 +119,7 @@ namespace mitk {
     vtkActor* m_Contour;
     vtkTubeFilter* m_ContourSource;
 
-    vtkPropAssembly* m_PropAssembly;  // this contains everything, this will be returned by GetProp()
+    vtkAssembly* m_PropAssembly;  // this contains everything, this will be returned by GetProp()
   };
 } // namespace mitk
 

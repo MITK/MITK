@@ -78,8 +78,8 @@ QWidget * QmitkSimpleExampleFunctionality::CreateControlWidget(QWidget *parent)
     {
         controls = new QmitkSimpleExampleControls(parent);        
         new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
-        new QmitkStepperAdapter(controls->getSliceNavigatorTransversal(), multiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
+        new QmitkStepperAdapter(controls->getSliceNavigatorSagittal(), multiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
+        new QmitkStepperAdapter(controls->getSliceNavigatorFrontal(), multiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
         new QmitkStepperAdapter(controls->getSliceNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
         new QmitkStepperAdapter(controls->getMovieNavigatorTime(), multiWidget->GetTimeNavigationController()->GetTime(), "movieNavigatorTimeFromSimpleExample");
     }

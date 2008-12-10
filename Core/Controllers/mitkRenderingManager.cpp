@@ -24,11 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeStorage.h"
 #include "mitkDataStorage.h"
 
-
 #include <vtkRenderWindow.h>
 #include <vtkCallbackCommand.h>
 
 #include <itkCommand.h>
+#include "mitkVector.h"
+#include <itkAffineGeometryFrame.h>
+#include <itkScalableAffineTransform.h>
+
 #include <algorithm>
 
 namespace mitk
@@ -279,7 +282,7 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( DataTreeIteratorBase * dataIt, RequestType type )
+::InitializeViews( DataTreeIteratorBase * dataIt, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
   mitk::Geometry3D::Pointer geometry;
   if ( dataIt != NULL )
@@ -310,16 +313,16 @@ RenderingManager
   }
 
   // Use geometry for initialization
-  return this->InitializeViews( geometry.GetPointer(), type );
+  return this->InitializeViews( geometry.GetPointer(), type, preserveRoughOrientationInWorldSpace );
 }
 
 
 bool
 RenderingManager
-::InitializeViews( const mitk::DataStorage * storage, RequestType type )
+::InitializeViews( const mitk::DataStorage * storage, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
   mitk::DataTreePreOrderIterator it((dynamic_cast<const mitk::DataTreeStorage*>(storage))->m_DataTree);
-  return this->InitializeViews(&it, type);
+  return this->InitializeViews(&it, type, preserveRoughOrientationInWorldSpace);
   
 
 // following lines of code are never reached
@@ -360,14 +363,110 @@ RenderingManager
 
 bool
 RenderingManager
-::InitializeViews( const Geometry3D * geometry, RequestType type )
+::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
   bool boundingBoxInitialized = false;
+
+  Geometry3D::ConstPointer geometry = dataGeometry;
+
+  if (dataGeometry && preserveRoughOrientationInWorldSpace)
+  {
+
+    // clone the input geometry
+    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
+    assert(modifiedGeometry.IsNotNull());
+
+    // construct an affine transform from it
+    AffineGeometryFrame3D::TransformType::Pointer transform = AffineGeometryFrame3D::TransformType::New();
+    assert( modifiedGeometry->GetIndexToWorldTransform() );
+    transform->SetMatrix( modifiedGeometry->GetIndexToWorldTransform()->GetMatrix() );
+    transform->SetOffset( modifiedGeometry->GetIndexToWorldTransform()->GetOffset() );
+
+    // get transform matrix
+    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix = 
+      const_cast< AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
+    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
+
+    // get offset and bound
+    Vector3D offset = modifiedGeometry->GetIndexToWorldTransform()->GetOffset();
+    Geometry3D::BoundsArrayType oldBounds = modifiedGeometry->GetBounds();
+    Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetBounds();
+
+    // get rid of rotation other than pi/2 degree
+    for ( unsigned int i = 0; i < 3; ++i )
+    {
+
+      // i-th column of the direction matrix
+      Vector3D currentVector;
+      currentVector[0] = oldMatrix(0,i);
+      currentVector[1] = oldMatrix(1,i);
+      currentVector[2] = oldMatrix(2,i);
+
+      // matchingRow will store the row that holds the biggest
+      // value in the column
+      unsigned int matchingRow = 0;
+
+      // maximum value in the column
+      float max = std::numeric_limits<float>::min();
+
+      // sign of the maximum value (-1 or 1)
+      int sign = 1;
+
+      // iterate through the column vector
+      for (unsigned int dim = 0; dim < 3; ++dim)
+      {
+        if ( fabs(currentVector[dim]) > max )
+        {
+          matchingRow = dim;
+          max = fabs(currentVector[dim]);
+          if(currentVector[dim]<0)
+            sign = -1;
+          else
+            sign = 1;
+        }
+      }
+
+      // in case we found a negative maximum,
+      // we negate the column and adjust the offset
+      // (in order to run through the dimension in the opposite direction)
+      if(sign == -1)
+      {
+        currentVector *= sign;
+        offset += modifiedGeometry->GetAxisVector(i);
+      }
+
+      
+      // matchingRow is now used as column index to place currentVector
+      // correctly in the new matrix
+      vnl_vector<ScalarType> newMatrixColumn(3);
+      newMatrixColumn[0] = currentVector[0];
+      newMatrixColumn[1] = currentVector[1];
+      newMatrixColumn[2] = currentVector[2];
+      newMatrix.set_column( matchingRow, newMatrixColumn );
+
+      // if a column is moved, we also have to adjust the bounding
+      // box accordingly, this is done here
+      newBounds[2*matchingRow  ] = oldBounds[2*i  ];
+      newBounds[2*matchingRow+1] = oldBounds[2*i+1];
+    }
+
+    // set the newly calculated bounds array
+    modifiedGeometry->SetBounds(newBounds);
+
+    // set new offset and direction matrix
+    AffineGeometryFrame3D::TransformType::MatrixType newMatrixITK( newMatrix );
+    transform->SetMatrix( newMatrixITK );
+    transform->SetOffset( offset );
+    modifiedGeometry->SetIndexToWorldTransform( transform );
+    geometry = modifiedGeometry;
+
+  }
+
 
   int warningLevel = vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
 
-  if ( (geometry != NULL ) && (const_cast< mitk::BoundingBox * >(
+  if ( (geometry.IsNotNull() ) && (const_cast< mitk::BoundingBox * >(
     geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
   {
     boundingBoxInitialized = true;

@@ -143,18 +143,18 @@ public:
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataTreeNode. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( DataTreeIteratorBase *dataIt,
-    RequestType type = REQUEST_UPDATE_ALL );
+    RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
 
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataStorage. */
   virtual bool InitializeViews( const DataStorage *storage,
-     RequestType type = REQUEST_UPDATE_ALL );
+     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. */
   virtual bool InitializeViews( const Geometry3D *geometry,
-    RequestType type = REQUEST_UPDATE_ALL );
+    RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
 
   /** Initializes the windows to the default viewing direction

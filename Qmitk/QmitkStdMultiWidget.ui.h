@@ -1159,7 +1159,6 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     gi->AddListener( mitkWidget3->GetSliceNavigationController() );
     gi->AddListener( mitkWidget4->GetSliceNavigationController() );
 
-    mitk::RenderingManager::GetInstance()->InitializeViews();
     break;
 
   case PLANE_MODE_ROTATION:

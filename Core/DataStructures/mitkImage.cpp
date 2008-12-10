@@ -1312,29 +1312,32 @@ void mitk::Image::ResetImageStatistics() const
 
 void mitk::Image::ComputeImageStatistics(int t) const
 {
-  // timestep valid?
-  if (!IsValidTimeStep(t)) return;
-
-  // image modified?
-  if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
-    this->ResetImageStatistics();
-
-  // adapt vector length
-  this->Expand(t+1);
-
-  // do we have valid information already?
-  if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 
-    m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
-
-  // recompute
-  mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
-  if(timeSelector!=NULL)
+  if(this->m_PixelType.GetNumberOfComponents() == 1)
   {
-    timeSelector->SetTimeNr(t);
-    timeSelector->UpdateLargestPossibleRegion();
-    mitk::Image* image = timeSelector->GetOutput();
-    mitk::Image* thisImage = const_cast<Image*>(this);
-    AccessByItk_2( image, _ComputeExtremaInItkImage, thisImage, t );
+    // timestep valid?
+    if (!IsValidTimeStep(t)) return;
+
+    // image modified?
+    if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
+      this->ResetImageStatistics();
+
+    // adapt vector length
+    this->Expand(t+1);
+
+    // do we have valid information already?
+    if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 
+      m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
+
+    // recompute
+    mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
+    if(timeSelector!=NULL)
+    {
+      timeSelector->SetTimeNr(t);
+      timeSelector->UpdateLargestPossibleRegion();
+      mitk::Image* image = timeSelector->GetOutput();
+      mitk::Image* thisImage = const_cast<Image*>(this);
+      AccessByItk_2( image, _ComputeExtremaInItkImage, thisImage, t );
+    }
   }
 }
 

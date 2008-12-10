@@ -401,7 +401,7 @@ void QmitkInteractiveSegmentation::ReinitializeToImage()
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())
     {
-      mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::RequestType::REQUEST_UPDATE_ALL, true );
+      mitk::RenderingManager::GetInstance()->InitializeViews( basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       m_Controls->lblAlignmentWarning->hide();
     }

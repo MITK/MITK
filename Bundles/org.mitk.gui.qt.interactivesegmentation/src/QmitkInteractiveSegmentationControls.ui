@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>488</width>
+    <width>626</width>
     <height>598</height>
    </rect>
   </property>
@@ -15,6 +15,17 @@
     <height>0</height>
    </size>
   </property>
+  <property name="font" >
+   <font>
+    <family>MS Shell Dlg 2</family>
+    <pointsize>8</pointsize>
+    <weight>50</weight>
+    <italic>false</italic>
+    <bold>false</bold>
+    <underline>false</underline>
+    <strikeout>false</strikeout>
+   </font>
+  </property>
   <property name="windowTitle" >
    <string>QmitkInteractiveSegmentation</string>
   </property>
@@ -23,9 +34,13 @@
     <widget class="Q3GroupBox" name="grpReferenceData" >
      <property name="font" >
       <font>
-       <pointsize>10</pointsize>
+       <family>MS Shell Dlg 2</family>
+       <pointsize>8</pointsize>
        <weight>75</weight>
+       <italic>false</italic>
        <bold>true</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
@@ -54,7 +69,8 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="../resources.qrc" >:/resources/btnReinit.xpm</iconset>
+         <iconset resource="../resources.qrc" >
+          <normaloff>:/resources/btnReinit.xpm</normaloff>:/resources/btnReinit.xpm</iconset>
         </property>
        </widget>
       </item>
@@ -172,9 +188,13 @@
     <widget class="Q3GroupBox" name="groupBox3" >
      <property name="font" >
       <font>
-       <pointsize>10</pointsize>
+       <family>MS Shell Dlg 2</family>
+       <pointsize>8</pointsize>
        <weight>75</weight>
+       <italic>false</italic>
        <bold>true</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
@@ -208,7 +228,8 @@
            <string>New segmentation</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >:/resources/btnNew.xpm</iconset>
+           <iconset resource="../resources.qrc" >
+            <normaloff>:/resources/btnNew.xpm</normaloff>:/resources/btnNew.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -230,7 +251,8 @@
            <string>Delete selected segmentations</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >:/resources/btnDelete.xpm</iconset>
+           <iconset resource="../resources.qrc" >
+            <normaloff>:/resources/btnDelete.xpm</normaloff>:/resources/btnDelete.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -252,7 +274,8 @@
            <string>Load segmentation from file</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >:/resources/btnLoad.xpm</iconset>
+           <iconset resource="../resources.qrc" >
+            <normaloff>:/resources/btnLoad.xpm</normaloff>:/resources/btnLoad.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -274,7 +297,8 @@
            <string/>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >:/resources/btnSave.xpm</iconset>
+           <iconset resource="../resources.qrc" >
+            <normaloff>:/resources/btnSave.xpm</normaloff>:/resources/btnSave.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -333,9 +357,13 @@
     <widget class="Q3GroupBox" name="grpInterpolation" >
      <property name="font" >
       <font>
-       <pointsize>10</pointsize>
+       <family>MS Shell Dlg 2</family>
+       <pointsize>8</pointsize>
        <weight>75</weight>
+       <italic>false</italic>
        <bold>true</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
@@ -366,7 +394,7 @@
      <property name="sizeType" >
       <enum>QSizePolicy::Expanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>20</width>
        <height>120</height>
@@ -422,6 +450,7 @@
   <include location="local" >QmitkSlicesInterpolator.h</include>
  </includes>
  <resources>
+  <include location="../resources.qrc" />
   <include location="../resources.qrc" />
  </resources>
  <connections/>

@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkApplicationCursor.h"
 #include "QmitkCallbackFromGUIThread.h"
 #include "QmitkRenderingManagerFactory.h"
+//#include "QmitkBinaryThresholdToolGUIFactory.h"
+//#include "QmitkCalculateGrayValueStatisticsToolGUIFactory.h"
+//#include "QmitkDrawPaintbrushToolGUIFactory.h"
+//#include "QmitkErasePaintbrushToolGUIFactory.h"
 
 #include <iostream>
 
@@ -30,6 +34,11 @@ void QmitkRegisterClasses()
   if (!alreadyDone)
   {
     std::cout << "QmitkRegisterClasses()" << std::endl;
+  
+  //itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
+  //itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
+  //itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
+  //itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
 
   //We have to put this in a file containing a class that is directly used
   //somewhere. Otherwise, e.g. when put in VtkRenderWindowInteractor.cpp, 

@@ -22,9 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 
-#include <Q3ButtonGroup>
+#include <QGroupBox>
+#include <QButtonGroup>
+#include <QGridLayout>
 
 #include <map>
+
+//! mmueller
+#include "mitkQtInteractiveSegmentationDll.h"
+//!
 
 class QmitkToolGUI;
 
@@ -51,7 +57,11 @@ class QmitkToolGUI;
 
   Last contributor: $Author: maleike $
 */
-class QMITK_EXPORT QmitkToolSelectionBox : public Q3ButtonGroup
+//! mmueller
+//class QMITK_EXPORT QmitkToolSelectionBox : public QGroupBox
+//#changed
+class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
+//!
 {
   Q_OBJECT
 
@@ -127,6 +137,10 @@ class QMITK_EXPORT QmitkToolSelectionBox : public Q3ButtonGroup
 
     QWidget* m_ToolGUIWidget;
     QmitkToolGUI* m_LastToolGUI;
+    
+    // store buttons in this group
+    QButtonGroup* m_ToolButtonGroup;
+    QGridLayout* m_ButtonLayout;
 
     EnabledMode m_EnabledMode;
 };

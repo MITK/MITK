@@ -19,7 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryIViewPart.h>
 #include "src/QmitkInteractiveSegmentationView.h"
+#include "src/QmitkToolGUI.h"
+#include "src/QmitkBinaryThresholdToolGUI.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
   POCO_EXPORT_CLASS(QmitkInteractiveSegmentationView)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(QmitkToolGUI, QmitkToolGUI)
+  POCO_EXPORT_CLASS(QmitkBinaryThresholdToolGUI)
 POCO_END_MANIFEST

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.mitk.gui.qt.interactivesegmentation">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.mitk.gui.qt.interactivesegmentation" id="org.mitk.gui.qt.interactivesegmentation.qmitktoolguis" name="QmitkToolGUIs"/>
+      </appInfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+ 
+   <element name="qmitktoolgui">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                 
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                 
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.mitk.gui.qt.interactivesegmentation.QmitkToolGUI"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+</schema>

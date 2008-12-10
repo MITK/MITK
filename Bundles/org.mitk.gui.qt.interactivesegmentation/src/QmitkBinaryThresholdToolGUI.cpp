@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkBinaryThresholdToolGUI.h"
-
+#define QMITK_EXPORT __declspec(dllimport)
 #include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>

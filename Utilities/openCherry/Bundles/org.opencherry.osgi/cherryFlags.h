@@ -45,7 +45,7 @@ inline IncompatibleFlag::IncompatibleFlag(int ai) : i(ai) {}
 
 
 template<typename Enum>
-class Flags
+class CHERRY_OSGI Flags
 {
     typedef void **Zero;
     int i;

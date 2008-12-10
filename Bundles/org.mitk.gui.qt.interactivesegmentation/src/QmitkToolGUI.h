@@ -20,10 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolGUI_h_Included
 
 #include <qwidget.h>
-#include <itkObject.h>
+//!mm
+//#include <itkObject.h>
+#include <cherryMacros.h>
+//!
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
+#include "mitkQtInteractiveSegmentationDll.h"
 
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
@@ -32,20 +36,29 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkToolGUI : public QWidget, public itk::Object
+//!mm
+//class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public itk::Object
+class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public virtual cherry::Object
+//!
 {
   Q_OBJECT
 
   public:
-    
-    mitkClassMacro(QmitkToolGUI, itk::Object);
+    //!mm
+    // class has now a cherryInterfaceMacro
+    //mitkClassMacro(QmitkToolGUI, itk::Object);
+    cherryInterfaceMacro(QmitkToolGUI, )
+    //!
 
     void SetTool( mitk::Tool* tool );
 
+    //!mm
+    // commented out
     /// just make sure ITK won't take care of anything (especially not destruction)
-    virtual void Register() const;
-    virtual void UnRegister() const;
-    virtual void SetReferenceCount(int);
+    //virtual void Register() const;
+    //virtual void UnRegister() const;
+    //virtual void SetReferenceCount(int);
+    //!
     
     virtual ~QmitkToolGUI();
 

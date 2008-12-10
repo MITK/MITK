@@ -1,5 +1,10 @@
 SET(SRC_CPP_FILES
   QmitkInteractiveSegmentationView.cpp
+  QmitkToolGUI.cpp
+  QmitkBinaryThresholdToolGUI.cpp
+  #QmitkNewSegmentationDialog.cpp
+  QmitkToolSelectionBox.cpp
+  #QmitkToolGUIArea.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -12,6 +17,11 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/QmitkInteractiveSegmentationView.h
+  src/QmitkToolGUI.h
+  src/QmitkBinaryThresholdToolGUI.h
+  #src/QmitkNewSegmentationDialog.h
+  src/QmitkToolSelectionBox.h
+  #src/QmitkToolGUIArea.h
 )
 
 SET(RES_FILES

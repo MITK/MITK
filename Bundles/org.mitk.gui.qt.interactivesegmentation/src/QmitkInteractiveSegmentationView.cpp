@@ -4,6 +4,7 @@
 #include "QmitkToolReferenceDataSelectionBox.h"
 #include "QmitkToolWorkingDataSelectionBox.h"
 #include "QmitkToolSelectionBox.h"
+#define QMITK_EXPORT __declspec(dllimport)
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
@@ -81,8 +82,9 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ToolSelectionBox->SetToolGUIArea( m_Controls->m_ToolGUIContainer );
 
   m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
-  m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);                 // TODO these 'no border' settings could be moved into the widget
-  m_Controls->m_AutoSegmentationToolSelectionBox->setFrameStyle( QFrame::NoFrame );
+  //m_Controls->m_AutoSegmentationToolSelectionBox->setInsideMargin(0);                 // TODO these 'no border' settings could be moved into the widget
+  //m_Controls->m_AutoSegmentationToolSelectionBox->setFrameStyle( QFrame::NoFrame );
+  m_Controls->m_AutoSegmentationToolSelectionBox->setFlat( true );
   m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");         // display only tools of group "autoSegmentation"
@@ -90,8 +92,8 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );  // be enabled whenever there is a reference data object selected
 
   m_Controls->m_PostProcessingToolSelectionBox->setTitle("");
-  m_Controls->m_PostProcessingToolSelectionBox->setInsideMargin(0);
-  m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::Box );
+  //m_Controls->m_PostProcessingToolSelectionBox->layout()->setInsideMargin(0);
+  //m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::Box );
   //m_Controls->m_PostProcessingToolSelectionBox->setFrameStyle( QFrame::NoFrame );
   m_Controls->m_PostProcessingToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_PostProcessingToolSelectionBox->SetToolManager( *toolManager );
@@ -103,12 +105,12 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   toolManager->NodePropertiesChanged += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNodePropertiesChanged );  // update e.g. the volume overview
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
   this->CreateConnections();
-  this->Activated();
 
   /*QVBoxLayout* layout = new QVBoxLayout(parent);
   layout->setContentsMargins(0,0,0,0);
 
   layout->addWidget(new QPushButton("Hello World", parent));*/
+  this->Activated();
 }
 
 void QmitkInteractiveSegmentationView::SetFocus()

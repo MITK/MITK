@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToolGUI.h"
 #include "mitkBinaryThresholdTool.h"
+//! mmueller
+#include "mitkQtInteractiveSegmentationDll.h"
+//!
 
 class QSlider;
 
@@ -31,15 +34,22 @@ class QSlider;
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
+class MITK_QT_INTERACTIVESEGMENTATION QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
+    //!mm   
+    //mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
+    //itkNewMacro(QmitkBinaryThresholdToolGUI);
+    //#changed
+    cherryClassMacro(QmitkBinaryThresholdToolGUI);
+    //!
     
-    mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkBinaryThresholdToolGUI);
-    
+    //!mm
+    //#add
+    QmitkBinaryThresholdToolGUI();
+    //!
     virtual ~QmitkBinaryThresholdToolGUI();
 
     void OnThresholdingIntervalBordersChanged(int lower, int upper);
@@ -57,8 +67,10 @@ class QMITK_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
     void OnAcceptThresholdPreview();
 
   protected:
-
-    QmitkBinaryThresholdToolGUI();
+    //!mm
+    //#del
+    //QmitkBinaryThresholdToolGUI();
+    //!
 
     QSlider* m_Slider;
 

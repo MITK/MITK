@@ -48,10 +48,13 @@ SET(CPP_FILES
  QmitkToolReferenceDataSelectionBox.cpp
  QmitkToolGUIArea.cpp
  QmitkToolWorkingDataSelectionBox.cpp
- QmitkToolSelectionBox.cpp
+ #QmitkToolSelectionBox.cpp
  #QmitkPropertyListPopup.cpp
- QmitkToolGUI.cpp
+ #QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
+ #QmitkBinaryThresholdToolGUI.cpp
+ #QmitkCalculateGrayValueStatisticsToolGUI.cpp
+ #QmitkCopyToClipBoardDialog.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
@@ -93,12 +96,16 @@ SET(MOC_H_FILES
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h
  QmitkToolGUIArea.h
- QmitkToolGUI.h
+ #QmitkToolGUI.h
  QmitkToolReferenceDataSelectionBox.h  
- QmitkToolSelectionBox.h  
+ #QmitkToolSelectionBox.h  
+ #QmitkPropertyListPopup.h
  QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h
+ #QmitkBinaryThresholdToolGUI.h
+ #QmitkCalculateGrayValueStatisticsToolGUI.h
+ #QmitkCopyToClipBoardDialog.h
 )
 
 SET(UI_FILES

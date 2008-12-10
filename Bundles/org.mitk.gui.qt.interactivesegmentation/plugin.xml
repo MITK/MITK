@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
+  <extension-point id="qmitktoolguis" name="QmitkToolGUIs" schema="schema/qmitktoolguis.exsd"/>
+
   <extension point="org.opencherry.ui.views">
     <category 
       id="org.mitk.views.general" 
@@ -11,4 +13,10 @@
       category="org.mitk.views.general" 
       class="QmitkInteractiveSegmentationView" />
   </extension>
+  
+   <extension point="org.mitk.gui.qt.interactivesegmentation.qmitktoolguis">
+		<qmitktoolgui 
+			id="QmitkBinaryThresholdToolGUI"
+			class="QmitkBinaryThresholdToolGUI" />
+   </extension>
 </plugin>

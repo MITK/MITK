@@ -46,7 +46,7 @@ struct CHERRY_UI IShellListener : public virtual Object {
 
   cherryClassMacro(IShellListener);
 
-  struct Events {
+  struct CHERRY_UI Events {
     typedef Message1<ShellEvent::Pointer> ShellEventType;
 
     enum Type {

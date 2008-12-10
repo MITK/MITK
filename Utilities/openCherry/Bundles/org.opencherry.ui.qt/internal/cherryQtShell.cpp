@@ -34,7 +34,7 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
   {
     widget = new QtMainWindowControl(parent, this, flags);
     // we have to enable visibility to get a proper layout (see bug #1654)
-    widget->setVisible(true);
+    //widget->setVisible(true);
     widget->setUpdatesEnabled(false);
     updatesDisabled = true;
 

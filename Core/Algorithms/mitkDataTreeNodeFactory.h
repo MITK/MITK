@@ -120,6 +120,12 @@ public:
    */
   void SetImageSerie(bool serie);
 
+  itkGetMacro( UseSeriesDetails, bool );
+  itkSetMacro( UseSeriesDetails, bool );
+
+  void AddSeriesRestriction(const std::string &tag)
+  {m_SeriesRestrictions.push_back(tag);}
+
   static bool m_TextureInterpolationActive;
   
 protected:
@@ -196,6 +202,10 @@ protected:
   virtual void ReadFileSeriesTypeDCM();
 
   virtual void ReadFileSeriesTypeITKImageSeriesReader();
+
+  bool m_UseSeriesDetails;
+  std::vector<std::string> m_SeriesRestrictions;
+
 };
 
 }

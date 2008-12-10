@@ -257,6 +257,16 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
   nameGenerator->SetDirectory( dir.c_str() );
 
+  // add more criteria to distinguish between different series
+  nameGenerator->SetUseSeriesDetails( m_UseSeriesDetails );
+
+  // add series restrictions
+  std::vector<std::string>::const_iterator it;
+  for(it=m_SeriesRestrictions.begin(); it!=m_SeriesRestrictions.end(); it++)
+  {
+    nameGenerator->AddSeriesRestriction( *it );
+  }
+
   const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
   StringContainer::const_iterator seriesItr = seriesUID.begin();
   StringContainer::const_iterator seriesEnd = seriesUID.end();

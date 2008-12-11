@@ -191,24 +191,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* sta
   int affectedSlice( -1 );
   if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
-    Point3D pos = positionEvent->GetWorldPosition() - image->GetGeometry()->GetOrigin().GetVectorFromOrigin();
+    Image::Pointer workingSlice = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
+    Point3D pos = positionEvent->GetWorldPosition() - workingSlice->GetGeometry()->GetOrigin().GetVectorFromOrigin();
 
     // round mouse cursor position to the nearest pixel center
-    switch(affectedDimension)
-    {
-      case 2:
-        pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
-        pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
-        break;
-      case 1:
-        pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
-        pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
-        break;
-      case 0:
-        pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
-        pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
-        break;
-    }
+    pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
+    pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
+    pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
 
     // Remember last value of pos; if this hasn't changed here, abort! This reduces the number of painting operations
     static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
@@ -231,39 +220,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* sta
     for (unsigned int index = 0; index < m_MasterContour->GetNumberOfPoints(); ++index)
     {
       Point3D point = m_MasterContour->GetPoints()->ElementAt(index);
-      switch(affectedDimension)
-      {
-        case 2:
-          point[0] += pos[0];
-          point[1] += pos[1];
-          break;
-        case 1:
-          point[0] += pos[0];
-          point[2] += pos[2];
-          break;
-        case 0:
-          point[1] += pos[1];
-          point[2] += pos[2];
-          break;
-      }
+      point += pos.GetVectorFromOrigin();
 
       if (m_Size % 2 != 0)
       {
-        switch(affectedDimension)
-        {
-          case 2:
-            point[0] +=image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
-            point[1] +=image->GetGeometry()->GetSpacing()[1] / 2.0;
-            break;
-          case 1:
-            point[0] +=image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
-            point[2] +=image->GetGeometry()->GetSpacing()[2] / 2.0;
-            break;
-          case 0:
-            point[1] +=image->GetGeometry()->GetSpacing()[1] / 2.0;
-            point[2] +=image->GetGeometry()->GetSpacing()[2] / 2.0; /* plus half a pixel's spacing */
-            break;
-        }
+        point[0] +=image->GetGeometry()->GetSpacing()[0] / 2.0; /* plus half a pixel's spacing */
+        point[1] +=image->GetGeometry()->GetSpacing()[1] / 2.0;
+        point[2] +=image->GetGeometry()->GetSpacing()[2] / 2.0;
       }
 
 

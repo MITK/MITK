@@ -157,7 +157,7 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming( itk::Image<TPixel
   typedef itk::MapContainer<TPixel, long int> HistogramType;
   TPixel minimum = std::numeric_limits<TPixel>::max();
   TPixel maximum = std::numeric_limits<TPixel>::min();
-  HistogramType histogram;
+  typename HistogramType::Pointer histogram = HistogramType::New();
     
   double mean(0.0);
   double sd(0.0);
@@ -179,7 +179,8 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming( itk::Image<TPixel
 
       if ( segmentationIterator.Get() > 0 )
       {
-        ++histogram[referenceIterator.Get()];
+        //++(*histogram)[referenceIterator.Get()];
+        ++(histogram->ElementAt( referenceIterator.Get() ));
         if (referenceIterator.Get() < minimum) minimum = referenceIterator.Get();
         if (referenceIterator.Get() > maximum) maximum = referenceIterator.Get();
       
@@ -224,8 +225,8 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming( itk::Image<TPixel
   // evaluate histogram, generate quantiles
   long int totalCount(0);
 
-  for ( typename HistogramType::iterator iter = histogram.begin();
-        iter != histogram.end();
+  for ( typename HistogramType::iterator iter = histogram->begin();
+        iter != histogram->end();
         ++iter )
   {
     totalCount += iter->second;
@@ -242,8 +243,8 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming( itk::Image<TPixel
 
   double relativeCurrentCount(0.0);
 
-  for ( typename HistogramType::iterator iter = histogram.begin();
-        iter != histogram.end();
+  for ( typename HistogramType::iterator iter = histogram->begin();
+        iter != histogram->end();
         ++iter )
   {
     TPixel grayvalue = iter->first;
@@ -261,13 +262,13 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming( itk::Image<TPixel
   }
 
   // report histogram values
-  report << "      Minimum: " << minimum
-         << "\n  5% quantile: " << histogramQuantileValues[5]
-         << "\n 25% quantile: " << histogramQuantileValues[25]
-         << "\n 50% quantile: " << histogramQuantileValues[50]
-         << "\n 75% quantile: " << histogramQuantileValues[75]
-         << "\n 95% quantile: " << histogramQuantileValues[95]
-         << "\n      Maximum: " << maximum
+  report << "        Minimum: " << (double)minimum
+         << "\n  5% quantile: " << (double)histogramQuantileValues[5]
+         << "\n 25% quantile: " << (double)histogramQuantileValues[25]
+         << "\n 50% quantile: " << (double)histogramQuantileValues[50]
+         << "\n 75% quantile: " << (double)histogramQuantileValues[75]
+         << "\n 95% quantile: " << (double)histogramQuantileValues[95]
+         << "\n      Maximum: " << (double)maximum
          << "\n         Mean: " << mean
          << "\n           SD: " << sd
          << "\n";

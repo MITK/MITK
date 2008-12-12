@@ -32,6 +32,7 @@
 #include <QRect>
 #include <QVariant>
 #include <QDesktopWidget>
+#include <QLayout>
 
 namespace cherry
 {
@@ -183,6 +184,8 @@ void QtWidgetsTweaklet::SetBounds(void* widget, const Rectangle& bounds)
 Rectangle QtWidgetsTweaklet::GetBounds(void* widget)
 {
   QWidget* qwidget = static_cast<QWidget*>(widget);
+  std::cout << qwidget << std::endl;
+  
   const QRect& geometry = qwidget->geometry();
   Rectangle rect(geometry.x(), geometry.y(), geometry.width(), geometry.height());
   return rect;
@@ -352,6 +355,9 @@ Shell::Pointer QtWidgetsTweaklet::CreateShell(Shell::Pointer parent, int style)
   if ((style & Constants::APPLICATION_MODAL)
       || (style & Constants::SYSTEM_MODAL)) qtshell->GetWidget()->setWindowModality(Qt::ApplicationModal);
   if (style & Constants::PRIMARY_MODAL) qtshell->GetWidget()->setWindowModality(Qt::WindowModal);
+    
+  // we have to enable visibility to get a proper layout (see bug #1654)
+  qtshell->SetVisible(true);
 
   return shell;
 }

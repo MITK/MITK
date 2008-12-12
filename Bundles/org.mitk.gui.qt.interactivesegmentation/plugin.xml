@@ -18,5 +18,17 @@
 		<qmitktoolgui 
 			id="QmitkBinaryThresholdToolGUI"
 			class="QmitkBinaryThresholdToolGUI" />
+		<qmitktoolgui 
+			id="QmitkCalculateGrayValueStatisticsToolGUI"
+			class="QmitkCalculateGrayValueStatisticsToolGUI" />
+		<qmitktoolgui 
+			id="QmitkDrawPaintbrushToolGUI"
+			class="QmitkDrawPaintbrushToolGUI" />	
+		<qmitktoolgui 
+			id="QmitkPaintbrushToolGUI"
+			class="QmitkPaintbrushToolGUI" />	
+		<qmitktoolgui 
+			id="QmitkErasePaintbrushToolGUI"
+			class="QmitkErasePaintbrushToolGUI" />		
    </extension>
 </plugin>

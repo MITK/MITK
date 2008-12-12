@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
-Date:      $Date: 2008-08-01 14:25:23 +0200 (Fr, 01 Aug 2008) $
+Date:      $Date$
 Version:   $Revision: 1.0 $
  
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkToolGUI.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
+//!mm,added
+#include "mitkQtInteractiveSegmentationDll.h"
+//!
 
 /**
   \brief GUI for mitk::CalculateGrayValueStatisticsTool.
@@ -30,14 +33,26 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+//!mm
+//class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+//#changed
+class MITK_QT_INTERACTIVESEGMENTATION QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+//!
 {
   Q_OBJECT
 
   public:
+    //!mm   
+    //mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
+    //itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
+    //#changed
+    cherryClassMacro(QmitkCalculateGrayValueStatisticsToolGUI);
+    //!
     
-    mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
-    itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
+    //!mm
+    //#add    
+    QmitkCalculateGrayValueStatisticsToolGUI();
+    //!
     
     virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
 
@@ -55,7 +70,10 @@ class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGU
 
   protected:
 
-    QmitkCalculateGrayValueStatisticsToolGUI();
+    //!mm
+    //#del
+    //QmitkCalculateGrayValueStatisticsToolGUI();
+    //!
 
     mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
 };

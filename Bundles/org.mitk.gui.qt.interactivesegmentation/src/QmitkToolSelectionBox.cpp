@@ -222,16 +222,16 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       cherry::IConfigurationElement::vector ces(
         service->GetConfigurationElementsFor("org.mitk.gui.qt.interactivesegmentation.qmitktoolguis"));
 
+      // name of gui class
+      std::string nameOfPossibleGUI = "Qmitk";
+      nameOfPossibleGUI.append(tool->GetNameOfClass());
+      nameOfPossibleGUI.append("GUI");
       QmitkToolGUI* gui = 0;
       for (cherry::IConfigurationElement::vector::iterator i= ces.begin(); i != ces.end(); ++i)
       {
         std::string cid;
         if ((*i)->GetAttribute("id", cid))
         {
-          std::string nameOfPossibleGUI = "Qmitk";
-          nameOfPossibleGUI.append(tool->GetNameOfClass());
-          nameOfPossibleGUI.append("GUI");
-
           if (cid == nameOfPossibleGUI)
           {
             gui = (*i)->CreateExecutableExtension<QmitkToolGUI>("class");

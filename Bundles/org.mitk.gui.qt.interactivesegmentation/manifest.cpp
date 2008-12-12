@@ -21,6 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/QmitkInteractiveSegmentationView.h"
 #include "src/QmitkToolGUI.h"
 #include "src/QmitkBinaryThresholdToolGUI.h"
+#include "src/QmitkCalculateGrayValueStatisticsToolGUI.h"
+#include "src/QmitkDrawPaintbrushToolGUI.h"
+#include "src/QmitkPaintbrushToolGUI.h"
+#include "src/QmitkErasePaintbrushToolGUI.h"
+
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
   POCO_EXPORT_CLASS(QmitkInteractiveSegmentationView)
@@ -28,4 +33,8 @@ POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(QmitkToolGUI, QmitkToolGUI)
   POCO_EXPORT_CLASS(QmitkBinaryThresholdToolGUI)
+  POCO_EXPORT_CLASS(QmitkCalculateGrayValueStatisticsToolGUI)
+  POCO_EXPORT_CLASS(QmitkDrawPaintbrushToolGUI)
+  POCO_EXPORT_CLASS(QmitkPaintbrushToolGUI)
+  POCO_EXPORT_CLASS(QmitkErasePaintbrushToolGUI)
 POCO_END_MANIFEST

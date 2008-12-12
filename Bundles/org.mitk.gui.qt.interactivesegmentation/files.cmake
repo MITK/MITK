@@ -4,6 +4,10 @@ SET(SRC_CPP_FILES
   QmitkBinaryThresholdToolGUI.cpp
   #QmitkNewSegmentationDialog.cpp
   QmitkToolSelectionBox.cpp
+  QmitkCalculateGrayValueStatisticsToolGUI.cpp
+  QmitkDrawPaintbrushToolGUI.cpp
+  QmitkPaintbrushToolGUI.cpp
+  QmitkErasePaintbrushToolGUI.cpp
   #QmitkToolGUIArea.cpp
 )
 
@@ -19,9 +23,11 @@ SET(MOC_H_FILES
   src/QmitkInteractiveSegmentationView.h
   src/QmitkToolGUI.h
   src/QmitkBinaryThresholdToolGUI.h
-  #src/QmitkNewSegmentationDialog.h
   src/QmitkToolSelectionBox.h
-  #src/QmitkToolGUIArea.h
+  src/QmitkCalculateGrayValueStatisticsToolGUI.h
+  src/QmitkDrawPaintbrushToolGUI.h
+  src/QmitkPaintbrushToolGUI.h
+  src/QmitkErasePaintbrushToolGUI.h
 )
 
 SET(RES_FILES

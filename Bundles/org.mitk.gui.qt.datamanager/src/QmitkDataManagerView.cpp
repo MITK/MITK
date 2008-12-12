@@ -22,6 +22,8 @@
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   QVBoxLayout* layout = new QVBoxLayout(parent);
+  //!mm
+  //parent->setMinimumSize(QSize(600, 600));
   layout->setContentsMargins(0,0,0,0);
 
   cherry::IEditorPart::Pointer editor =

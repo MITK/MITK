@@ -49,7 +49,7 @@ SET(CPP_FILES
  QmitkToolGUIArea.cpp
  QmitkToolWorkingDataSelectionBox.cpp
  #QmitkToolSelectionBox.cpp
- QmitkPropertyListPopup.cpp
+ #QmitkPropertyListPopup.cpp
  #QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
  #QmitkBinaryThresholdToolGUI.cpp
@@ -99,7 +99,7 @@ SET(MOC_H_FILES
  #QmitkToolGUI.h
  QmitkToolReferenceDataSelectionBox.h  
  #QmitkToolSelectionBox.h  
- QmitkPropertyListPopup.h
+ #QmitkPropertyListPopup.h
  QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h

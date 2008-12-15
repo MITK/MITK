@@ -180,7 +180,7 @@ void QmitkDataManagerControls::ReInitButton_clicked()
       if (basedata.IsNotNull())
       {
         mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry() );
+          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }

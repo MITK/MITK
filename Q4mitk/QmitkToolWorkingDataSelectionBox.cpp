@@ -478,6 +478,10 @@ void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, c
         delete popup;
 
         UpdateDataDisplayLater();
+        //!mm
+        // why not update it now?
+        UpdateDataDisplay();
+        //!
       }
     }
   }

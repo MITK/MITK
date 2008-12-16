@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkToolWorkingDataSelectionBox.h"
-//#include "QmitkPropertyListPopup.h"
+#include "QmitkPropertyListPopup.h"
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
@@ -66,8 +66,13 @@ QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* pare
   Q3ListView::setSelectionMode( Q3ListView::Extended );
   Q3ListView::setAllColumnsShowFocus( true );
 
-  /*connect( this, SIGNAL(rightButtonClicked( QListViewItem*, const QPoint&, int )),
-               this, SLOT(itemRightClicked( QListViewItem*, const QPoint&, int )) );*/
+  //!mm
+  //connect( this, SIGNAL(rightButtonClicked( QListViewItem*, const QPoint&, int )),
+  //             this, SLOT(itemRightClicked( QListViewItem*, const QPoint&, int )) );
+
+  connect( this, SIGNAL(rightButtonClicked( Q3ListViewItem*, const QPoint&, int )),
+    this, SLOT(itemRightClicked( Q3ListViewItem*, const QPoint&, int )) );
+  //mm
 
   connect( this, SIGNAL(selectionChanged()),
            this, SLOT(OnWorkingDataSelectionChanged()) );
@@ -456,8 +461,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   return resultVector;
 }
 
-/*
-void QmitkToolWorkingDataSelectionBox::itemRightClicked( QListViewItem* item, const QPoint& p, int )
+void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, const QPoint& p, int )
 {
   if (item)
   {
@@ -478,7 +482,6 @@ void QmitkToolWorkingDataSelectionBox::itemRightClicked( QListViewItem* item, co
     }
   }
 }
-*/
 
 void QmitkToolWorkingDataSelectionBox::SetShowOnlySelected(bool on)
 {

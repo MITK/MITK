@@ -16,6 +16,7 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkStringPropertyEditor.cpp
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
  QmitkPropertyObservers/QmitkStringPropertyView.cpp
+ QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
 
  qclickablelabel.cpp
  QmitkAbortEventFilter.cpp
@@ -49,12 +50,14 @@ SET(CPP_FILES
  QmitkToolGUIArea.cpp
  QmitkToolWorkingDataSelectionBox.cpp
  #QmitkToolSelectionBox.cpp
- #QmitkPropertyListPopup.cpp
+ QmitkPropertyListPopup.cpp
  #QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
  #QmitkBinaryThresholdToolGUI.cpp
  #QmitkCalculateGrayValueStatisticsToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
+ QmitkMaterialEditor.cpp
+ QmitkMaterialShowcase.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
@@ -74,6 +77,7 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyEditor.h
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
  QmitkPropertyObservers/QmitkStringPropertyView.h
+ QmitkPropertyObservers/QmitkNumberPropertySlider.h
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
@@ -99,13 +103,15 @@ SET(MOC_H_FILES
  #QmitkToolGUI.h
  QmitkToolReferenceDataSelectionBox.h  
  #QmitkToolSelectionBox.h  
- #QmitkPropertyListPopup.h
+ QmitkPropertyListPopup.h
  QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h
  #QmitkBinaryThresholdToolGUI.h
  #QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
+ QmitkMaterialEditor.h
+ QmitkMaterialShowcase.h
 )
 
 SET(UI_FILES
@@ -117,4 +123,6 @@ SET(UI_FILES
   QmitkStdMultiWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
+  QmitkMaterialEditor.ui
+  QmitkMaterialShowcase.ui
 )

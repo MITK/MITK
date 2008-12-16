@@ -177,9 +177,11 @@ class QMITK_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
   protected slots:
     
     void OnWorkingDataSelectionChanged();
-    // mmueller
-    // TODO
+
+    //!mm
     //void itemRightClicked( QListViewItem*, const QPoint&, int );
+    void itemRightClicked( Q3ListViewItem*, const QPoint&, int );
+    //!
 
   protected:
 

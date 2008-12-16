@@ -18,7 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkPropertyListPopuph_included_dingeling
 #define QmitkPropertyListPopuph_included_dingeling
 
-#include <Q3PopupMenu>
+//!mm,update: QPopupMenu is deprecated, use QtMenu in Qt4
+//#include <Q3PopupMenu>
+#include <QMenu>
+//!
 
 #include "QmitkMaterialEditor.h" // by Max
 #include "mitkMaterialProperty.h"
@@ -51,7 +54,10 @@ class QMITK_EXPORT QmitkPropertyListPopup : public QObject
     
     virtual ~QmitkPropertyListPopup();
     
-    void popup( const QPoint& pos, int indexAtPoint = -1 );
+    //!mm
+    //void popup( const QPoint& pos, int indexAtPoint = -1 );
+    void popup( const QPoint& pos, QAction* action = 0 );
+    //!
 
     void fillPopup();
 
@@ -67,27 +73,45 @@ class QMITK_EXPORT QmitkPropertyListPopup : public QObject
     void onBoolPropertyClicked(int);
     virtual void MaterialEditorChangesAccepted(QmitkMaterialEditor* ed);
     virtual void popupAboutToHide();
-    void popupMenuItemHighlighted(int id);
+    //!mm
+    //void popupMenuItemHighlighted(int id);
+    void popupMenuItemHovered(QAction* action);
+    //!
 
   protected:
 
     virtual bool AddMaterialPopup();
     virtual void UpdateNodeMaterialOnPopupHiding( bool& changes );
-
-    Q3PopupMenu* m_PopupMenu;
+    //!mm
+    QIcon createColorIcon(QColor color);
+    //!
+    //!mm,update: QPopupMenu is deprecated, use QtMenu in Qt4
+    //Q3PopupMenu* m_PopupMenu;
+    QMenu* m_PopupMenu;
+    //!
 
     mitk::PropertyList::Pointer m_PropertyList;
     std::vector<mitk::BoolProperty::Pointer> m_BoolProperties;
     
-    Q3PopupMenu* m_InfoPopup;
+    //!mm,update: QPopupMenu is deprecated, use QtMenu in Qt4
+    //Q3PopupMenu* m_PopupMenu;
+    QMenu* m_InfoPopup;
+    //!
 
     QmitkMaterialEditor* m_MaterialEditor;
     
-    int m_NameMenuID;
-    int m_VisibleMenuID;
-    int m_ColorMenuID;
-    int m_MaterialMenuID;
-    int m_OpacityMenuID;
+    //!mm
+    //int m_NameMenuID;
+    //int m_VisibleMenuID;
+    //int m_ColorMenuID;
+    //int m_MaterialMenuID;
+    //int m_OpacityMenuID;
+    QAction* m_NameMenuAction;
+    QAction* m_VisibleMenuAction;
+    QAction* m_ColorMenuAction;
+    QAction* m_MaterialMenuAction;
+    QAction* m_OpacityMenuAction;
+    //!
 
     bool m_AcceptOnHide;
 

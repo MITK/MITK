@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef QmitkQmitkToolSelectionBox_h_Included
-#define QmitkQmitkToolSelectionBox_h_Included
+#ifndef QmitkToolSelectionBox_h_Included
+#define QmitkToolSelectionBox_h_Included
 
 #include "QmitkToolGUIArea.h"
 

@@ -38,7 +38,7 @@ public:
 
   protected slots:  
 
-    void TreeChanged();
+    void TreeChanged(const itk::EventObject &);
 
     void ReinitializeToImage();
     void CreateNewSegmentation();
@@ -59,6 +59,10 @@ public:
     QWidget* m_Parent;
 
     Ui::QmitkInteractiveSegmentationControls * m_Controls;
+    unsigned long m_ObserverTag;
+    mitk::DataTree::Pointer m_DataTree;
+
+
   /// from QmitkInteractiveSegmentation
 
 };

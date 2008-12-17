@@ -39,6 +39,8 @@
 #include <cherryIWorkbenchPage.h>
 #include <mitkIDataStorageService.h>
 
+#include "itkTreeChangeEvent.h"
+
 
 void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 {
@@ -46,14 +48,17 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls = new Ui::QmitkInteractiveSegmentationControls;
   m_Controls->setupUi(parent);
-  mitk::DataTree::Pointer dataTree;
 
   mitk::IDataStorageService::Pointer service =
    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   if (service.IsNotNull())
   {
-    dataTree = service->GetDefaultDataStorage()->GetDataTree();
+    m_DataTree = service->GetDefaultDataStorage()->GetDataTree();
+    itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::Pointer command 
+      = itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::New();
+    command->SetCallbackFunction(this, &QmitkInteractiveSegmentationView::TreeChanged);
+    m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
   }
 
   cherry::IEditorPart::Pointer editor =
@@ -70,7 +75,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->lblAlignmentWarning->hide();
 
-  m_Controls->m_ToolReferenceDataSelectionBox->Initialize( dataTree );
+  m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataTree );
 
   m_Controls->m_ToolWorkingDataSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_ToolWorkingDataSelectionBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
@@ -120,6 +125,7 @@ void QmitkInteractiveSegmentationView::SetFocus()
 
 QmitkInteractiveSegmentationView::~QmitkInteractiveSegmentationView()
 {
+  m_DataTree->RemoveObserver(m_ObserverTag);
   this->Deactivated();
   delete m_Controls;
 }
@@ -152,7 +158,7 @@ void QmitkInteractiveSegmentationView::CreateConnections()
   }
 }
 
-void QmitkInteractiveSegmentationView::TreeChanged()
+void QmitkInteractiveSegmentationView::TreeChanged( const itk::EventObject & )
 {
   m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
   m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();

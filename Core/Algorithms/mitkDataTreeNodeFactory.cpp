@@ -526,12 +526,13 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "eye",                 "0xe38686") );
     s_ColorMap.insert( std::make_pair( "fallopian tube",      "0xe38686") );
     s_ColorMap.insert( std::make_pair( "hand",                "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "gall bladder",        "0x567f18") );
     s_ColorMap.insert( std::make_pair( "heart",               "0xeb1d32") );
     s_ColorMap.insert( std::make_pair( "hip",                 "0xe38686") );
     s_ColorMap.insert( std::make_pair( "kidney",              "0xd33f00") );
     s_ColorMap.insert( std::make_pair( "knee",                "0xe38686") );
     s_ColorMap.insert( std::make_pair( "larynx",              "0xe38686") );
-    s_ColorMap.insert( std::make_pair( "liver",               "0x99380f") );
+    s_ColorMap.insert( std::make_pair( "liver",               "0xffcc3d") );
     s_ColorMap.insert( std::make_pair( "lung",                "0x6bdcff") );
     s_ColorMap.insert( std::make_pair( "lymph node",          "0xff0000") );
     s_ColorMap.insert( std::make_pair( "muscle",              "0xff456a") );
@@ -555,7 +556,7 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "testicles",           "0xe38686") );
     s_ColorMap.insert( std::make_pair( "thyroid",             "0xfff694") );
     s_ColorMap.insert( std::make_pair( "tongue",              "0xe38686") );
-    s_ColorMap.insert( std::make_pair( "tumor",               "0xfa1d33") );
+    s_ColorMap.insert( std::make_pair( "tumor",               "0x937011") );
     s_ColorMap.insert( std::make_pair( "urethra",             "0xf8ff32") );
     s_ColorMap.insert( std::make_pair( "urinary bladder",     "0xf8ff32") );
     s_ColorMap.insert( std::make_pair( "uterus",              "0xe38686") );

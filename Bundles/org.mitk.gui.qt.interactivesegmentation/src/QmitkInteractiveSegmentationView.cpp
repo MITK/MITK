@@ -4,7 +4,6 @@
 #include "QmitkToolReferenceDataSelectionBox.h"
 #include "QmitkToolWorkingDataSelectionBox.h"
 #include "QmitkToolSelectionBox.h"
-#define QMITK_EXPORT __declspec(dllimport)
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"

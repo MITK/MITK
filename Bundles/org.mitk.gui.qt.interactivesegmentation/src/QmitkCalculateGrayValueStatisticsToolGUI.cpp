@@ -18,10 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCalculateGrayValueStatisticsToolGUI.h"
 
-//!mm
-//#add:import the class from Qmitk.dll
-#define QMITK_EXPORT __declspec(dllimport)
-//!
 #include "QmitkCopyToClipBoardDialog.h"
 
 QmitkCalculateGrayValueStatisticsToolGUI::QmitkCalculateGrayValueStatisticsToolGUI()

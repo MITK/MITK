@@ -21,37 +21,10 @@
 
 #include <tweaklets/cherryGuiWidgetsTweaklet.h>
 
-#include <list>
-#include <QWidget>
-#include <QMetaType>
-
-Q_DECLARE_METATYPE(cherry::Object::Pointer)
+#include "cherryQtWidgetsTweakletImpl.h"
 
 namespace cherry {
 
-class QtSelectionListenerWrapper : public QObject
-{
-
-  Q_OBJECT
-
-public:
-
-  QtSelectionListenerWrapper(QWidget* widget);
-
-  QWidget* widget;
-
-  void AddListener(GuiTk::ISelectionListener::Pointer listener);
-  int RemoveListener(GuiTk::ISelectionListener::Pointer listener);
-
-protected slots:
-
-  void QAbstractButtonClicked(bool checked);
-
-private:
-
-  GuiTk::ISelectionListener::Events selectionEvents;
-
-};
 
 class QtWidgetsTweaklet : public GuiWidgetsTweaklet
 {
@@ -140,12 +113,7 @@ public:
 
 private:
 
-  typedef std::map<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
-  SelectionListenerMap selectionListenerMap;
-
-  static std::list<Shell::Pointer> shellList;
-
-  friend class QtShell;
+  QtWidgetsTweakletImpl impl;
 
 };
 

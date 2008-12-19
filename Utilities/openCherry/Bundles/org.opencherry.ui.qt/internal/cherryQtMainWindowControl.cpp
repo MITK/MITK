@@ -27,25 +27,25 @@
 namespace cherry {
 
 QtMainWindowControl::QtMainWindowControl(QWidget* parent, Shell* shell, Qt::WindowFlags flags)
- : QMainWindow(parent, flags), shell(shell)
+ : QMainWindow(parent, flags)
 {
+  controller = new QtWidgetController(shell);
 
-}
-
-Shell* QtMainWindowControl::GetShell()
-{
-  return shell;
+  // TODO WeakPointer: QVariant should hold a weak pointer
+  QVariant variant(QVariant::UserType);
+  variant.setValue(controller);
+  this->setProperty(QtWidgetController::PROPERTY_ID, variant);
 }
 
 void QtMainWindowControl::changeEvent(QEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
-  ShellEvent::Pointer shellEvent = new ShellEvent(shell);
+  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
   switch (event->type())
   {
   case QEvent::WindowActivate:
   {
-    ListenerList activatedListeners(shellEvents.shellActivated.GetListeners());
+    ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
     for (ListenerList::iterator listener = activatedListeners.begin();
          listener != activatedListeners.end(); ++listener)
     {
@@ -59,7 +59,7 @@ void QtMainWindowControl::changeEvent(QEvent* event)
     break;
   case QEvent::WindowDeactivate:
   {
-    ListenerList deactivatedListeners(shellEvents.shellDeactivated.GetListeners());
+    ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
     for (ListenerList::iterator listener = deactivatedListeners.begin();
          listener != deactivatedListeners.end(); ++listener)
     {
@@ -77,7 +77,7 @@ void QtMainWindowControl::changeEvent(QEvent* event)
     Qt::WindowStates oldState = stateEvent->oldState();
     if (this->isMinimized() && !(oldState & Qt::WindowMinimized))
     {
-      ListenerList iconifiedListeners(shellEvents.shellIconified.GetListeners());
+      ListenerList iconifiedListeners(controller->shellEvents.shellIconified.GetListeners());
       for (ListenerList::iterator listener = iconifiedListeners.begin();
          listener != iconifiedListeners.end(); ++listener)
       {
@@ -90,7 +90,7 @@ void QtMainWindowControl::changeEvent(QEvent* event)
     }
     else if (oldState & Qt::WindowMinimized && !this->isMinimized())
     {
-      ListenerList deiconifiedListeners(shellEvents.shellDeiconified.GetListeners());
+      ListenerList deiconifiedListeners(controller->shellEvents.shellDeiconified.GetListeners());
       for (ListenerList::iterator listener = deiconifiedListeners.begin();
          listener != deiconifiedListeners.end(); ++listener)
       {
@@ -111,9 +111,9 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
-  ShellEvent::Pointer shellEvent = new ShellEvent(shell);
+  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
 
-  ListenerList closedListeners(shellEvents.shellClosed.GetListeners());
+  ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();
        listener != closedListeners.end(); ++listener)
   {
@@ -130,19 +130,19 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 void QtMainWindowControl::moveEvent(QMoveEvent* event)
 {
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, event->pos().x(), event->pos().y());
-  controlEvents.movedEvent(controlEvent);
+  controller->controlEvents.movedEvent(controlEvent);
 }
 
 void QtMainWindowControl::resizeEvent(QResizeEvent* event)
 {
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, 0, 0, event->size().width(), event->size().height());
-  controlEvents.resizedEvent(controlEvent);
+  controller->controlEvents.resizedEvent(controlEvent);
 }
 
 void QtMainWindowControl::inFocusEvent(QFocusEvent* /*event*/)
 {
   GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this);
-  controlEvents.activatedEvent(controlEvent);
+  controller->controlEvents.activatedEvent(controlEvent);
 }
 
 }

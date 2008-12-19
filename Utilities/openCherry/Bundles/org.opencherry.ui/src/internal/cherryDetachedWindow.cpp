@@ -303,7 +303,7 @@ void DetachedWindow::ConfigureShell(Shell::Pointer shell)
 {
   this->UpdateTitle();
 
-  shell->AddControlListener(resizeListener);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(shell->GetControl(), resizeListener);
   //shell.addListener(SWT.Activate, activationListener);
   //shell.addListener(SWT.Deactivate, activationListener);
 
@@ -453,7 +453,7 @@ bool DetachedWindow::HandleClose()
 
   if (windowShell != 0)
   {
-    windowShell->RemoveControlListener(resizeListener);
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(windowShell->GetControl(), resizeListener);
     //    windowShell.removeListener(SWT.Activate, activationListener);
     //    windowShell.removeListener(SWT.Deactivate, activationListener);
 

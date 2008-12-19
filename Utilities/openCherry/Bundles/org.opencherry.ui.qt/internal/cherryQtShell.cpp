@@ -17,13 +17,15 @@
 
 #include "cherryQtShell.h"
 
-#include "cherryQtWidgetsTweaklet.h"
+#include "cherryQtWidgetsTweakletImpl.h"
 #include "cherryQtMainWindowControl.h"
 #include "cherryQtControlWidget.h"
 
 #include <cherryConstants.h>
 #include <cherryDebugUtil.h>
+
 #include <QApplication>
+#include <QVariant>
 
 namespace cherry
 {
@@ -34,8 +36,6 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
   if (parent == 0 || flags.testFlag(Qt::Window))
   {
     widget = new QtMainWindowControl(parent, this, flags);
-    // we have to enable visibility to get a proper layout (see bug #1654)
-    // widget->setVisible(true);
     widget->setUpdatesEnabled(false);
     updatesDisabled = true;
 
@@ -127,22 +127,22 @@ void QtShell::SetMinimized(bool minimized)
 
 void QtShell::AddShellListener(IShellListener::Pointer listener)
 {
-  dynamic_cast<QtAbstractControlWidget*>(widget)->AddShellListener(listener);
+  QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
+  poco_assert(variant.isValid());
+  QtWidgetController::Pointer controller = variant.value<QtWidgetController::Pointer>();
+  poco_assert(controller != 0);
+  controller->AddShellListener(listener);
 }
 
 void QtShell::RemoveShellListener(IShellListener::Pointer listener)
 {
-  dynamic_cast<QtAbstractControlWidget*>(widget)->RemoveShellListener(listener);
-}
-
-void QtShell::AddControlListener(GuiTk::IControlListener::Pointer listener)
-{
-  dynamic_cast<QtAbstractControlWidget*>(widget)->AddControlListener(listener);
-}
-
-void QtShell::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
-{
-  dynamic_cast<QtAbstractControlWidget*>(widget)->RemoveControlListener(listener);
+  QVariant variant = widget->property(QtWidgetController::PROPERTY_ID);
+  if (variant.isValid())
+  {
+    QtWidgetController::Pointer controller = variant.value<QtWidgetController::Pointer>();
+    if (controller != 0)
+      controller->RemoveShellListener(listener);
+  }
 }
 
 void QtShell::Open(bool block)
@@ -163,8 +163,8 @@ void QtShell::Close()
 
 std::vector<Shell::Pointer> QtShell::GetShells()
 {
-  return std::vector<Shell::Pointer>(QtWidgetsTweaklet::shellList.begin(),
-                                     QtWidgetsTweaklet::shellList.end());
+  return std::vector<Shell::Pointer>(QtWidgetsTweakletImpl::shellList.begin(),
+                                     QtWidgetsTweakletImpl::shellList.end());
 }
 
 int QtShell::GetStyle()

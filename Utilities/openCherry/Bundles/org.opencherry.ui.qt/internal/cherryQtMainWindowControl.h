@@ -21,11 +21,11 @@
 
 #include <QMainWindow>
 
-#include "cherryQtAbstractControlWidget.h"
+#include "cherryQtWidgetController.h"
 
 namespace cherry {
 
-class QtMainWindowControl : public QMainWindow, public QtAbstractControlWidget
+class QtMainWindowControl : public QMainWindow
 {
 
   Q_OBJECT
@@ -33,8 +33,6 @@ class QtMainWindowControl : public QMainWindow, public QtAbstractControlWidget
 public:
 
   QtMainWindowControl(QWidget* parent = 0, Shell* shell = 0, Qt::WindowFlags flags = 0);
-
-  Shell* GetShell();
 
 protected:
 
@@ -49,7 +47,8 @@ protected:
 
 private:
 
-  Shell* shell;
+  QtWidgetController::Pointer controller;
+
 };
 
 }

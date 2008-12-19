@@ -15,26 +15,41 @@
 
  =========================================================================*/
 
-#include "cherryQtAbstractControlWidget.h"
+#include "cherryQtWidgetController.h"
+
+#include <cherryShell.h>
 
 namespace cherry {
 
-void QtAbstractControlWidget::AddControlListener(GuiTk::IControlListener::Pointer listener)
+const char QtWidgetController::PROPERTY_ID[] = "QtWidgetController_property";
+
+QtWidgetController::QtWidgetController(Shell* shell)
+ : shell(shell)
+{
+
+}
+
+Shell* QtWidgetController::GetShell()
+{
+  return shell;
+}
+
+void QtWidgetController::AddControlListener(GuiTk::IControlListener::Pointer listener)
 {
   controlEvents.AddListener(listener);
 }
 
-void QtAbstractControlWidget::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
+void QtWidgetController::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
 {
   controlEvents.RemoveListener(listener);
 }
 
-void QtAbstractControlWidget::AddShellListener(IShellListener::Pointer listener)
+void QtWidgetController::AddShellListener(IShellListener::Pointer listener)
 {
   shellEvents.AddListener(listener);
 }
 
-void QtAbstractControlWidget::RemoveShellListener(IShellListener::Pointer listener)
+void QtWidgetController::RemoveShellListener(IShellListener::Pointer listener)
 {
   shellEvents.RemoveListener(listener);
 }

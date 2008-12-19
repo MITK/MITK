@@ -62,9 +62,6 @@ public:
   void AddShellListener(IShellListener::Pointer listener);
   void RemoveShellListener(IShellListener::Pointer listener);
 
-  void AddControlListener(GuiTk::IControlListener::Pointer listener);
-  void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
-
   void Open(bool block = false);
 
   void Close();

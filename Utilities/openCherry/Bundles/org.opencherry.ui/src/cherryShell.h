@@ -244,30 +244,6 @@ public:
   virtual void RemoveShellListener(IShellListener::Pointer listener) = 0;
 
   /**
-   * Adds the listener to the collection of listeners who will
-   * be notified when the shell is moved or resized, by sending
-   * it one of the messages defined in the <code>IControlListener</code>
-   * interface.
-   *
-   * @param listener the listener which should be notified
-   *
-   * @see IControlListener
-   * @see #RemoveControlListener
-   */
-  virtual void AddControlListener(GuiTk::IControlListener::Pointer listener) = 0;
-
-  /**
-   * Removes the listener from the collection of listeners who will
-   * be notified when the shell is moved or resized.
-   *
-   * @param listener the listener which should no longer be notified
-   *
-   * @see IControlListener
-   * @see #AddControlListener
-   */
-  virtual void RemoveControlListener (GuiTk::IControlListener::Pointer listener) = 0;
-
-  /**
    * Moves the receiver to the top of the drawing order for
    * the display on which it was created (so that all other
    * shells on that display, which are not the receiver's

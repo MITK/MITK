@@ -1607,7 +1607,7 @@ void WorkbenchWindow::ControlResizeListener::SaveBounds()
 void WorkbenchWindow::TrackShellResize(Shell::Pointer newShell)
 {
   controlResizeListener = new ControlResizeListener(this);
-  newShell->AddControlListener(controlResizeListener);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(newShell->GetControl(), controlResizeListener);
 }
 
 }

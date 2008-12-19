@@ -29,7 +29,6 @@ SET(INTERNAL_CPP_FILES
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
 
-  cherryQtAbstractControlWidget.cpp
   cherryQtControlWidget.cpp
   cherryQtDnDTweaklet.cpp
   cherryQtErrorView.cpp
@@ -40,7 +39,9 @@ SET(INTERNAL_CPP_FILES
   cherryQtTracker.cpp
   cherryQtPlatformLogModel.cpp
   cherryQtShowViewDialog.cpp
+  cherryQtWidgetController.cpp
   cherryQtWidgetsTweaklet.cpp
+  cherryQtWidgetsTweakletImpl.cpp
 )
 
 SET(MOC_H_FILES
@@ -52,7 +53,7 @@ SET(MOC_H_FILES
   internal/cherryQtSash.h
   internal/cherryQtShowViewAction.h
   internal/cherryQtTracker.h
-  internal/cherryQtWidgetsTweaklet.h
+  internal/cherryQtWidgetsTweakletImpl.h
 )
 
 SET(UI_FILES

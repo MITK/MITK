@@ -21,11 +21,11 @@
 
 #include <QFrame>
 
-#include "cherryQtAbstractControlWidget.h"
+#include "cherryQtWidgetController.h"
 
 namespace cherry {
 
-class QtControlWidget : public QFrame, public QtAbstractControlWidget
+class QtControlWidget : public QFrame
 {
   Q_OBJECT
 
@@ -34,8 +34,6 @@ public:
   QtControlWidget(QWidget* parent = 0, Shell* shell = 0, Qt::WindowFlags f = 0);
 
   ~QtControlWidget();
-
-  Shell* GetShell();
 
 protected:
 
@@ -50,8 +48,7 @@ protected:
 
 private:
 
-  Shell* shell;
-
+  QtWidgetController::Pointer controller;
 };
 
 }

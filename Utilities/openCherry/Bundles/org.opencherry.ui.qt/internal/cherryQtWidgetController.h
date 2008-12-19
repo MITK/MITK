@@ -22,14 +22,22 @@
 #include <guitk/cherryGuiTkIControlListener.h>
 #include <cherryIShellListener.h>
 
+#include <QMetaType>
+
 namespace cherry {
 
 class Shell;
 
-class QtAbstractControlWidget
+class QtWidgetController : public Object
 {
 
 public:
+
+  cherryClassMacro(QtWidgetController)
+
+  static const char PROPERTY_ID[];
+
+  QtWidgetController(Shell* shell);
 
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
@@ -37,15 +45,23 @@ public:
   void AddShellListener(IShellListener::Pointer listener);
   void RemoveShellListener(IShellListener::Pointer listener);
 
-  virtual Shell* GetShell() = 0;
+  Shell* GetShell();
 
 protected:
+
+  friend class QtControlWidget;
+  friend class QtMainWindowControl;
 
   GuiTk::IControlListener::Events controlEvents;
   IShellListener::Events shellEvents;
 
+  Shell* shell;
+
 };
 
 }
+
+//TODO WeakPointer: register a weak pointer as metatype
+Q_DECLARE_METATYPE(cherry::QtWidgetController::Pointer)
 
 #endif /* CHERRYIQTCONTROLWIDGET_H_ */

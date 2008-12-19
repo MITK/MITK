@@ -119,7 +119,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkInteractiveSegmentationView::SetFocus()
 {
-
+  //QMessageBox::information(m_Parent, "SetFocus", "Focus gained");
 }
 
 QmitkInteractiveSegmentationView::~QmitkInteractiveSegmentationView()

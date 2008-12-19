@@ -24,6 +24,9 @@
 
 #include "mitkQtCommonDll.h"
 
+//!mm-added
+class QmitkStdMultiWidget;
+
 class MITK_QT_COMMON QmitkViewPart : public cherry::QtViewPart
 {
 
@@ -38,7 +41,10 @@ protected:
   bool HandlesMultipleDataStorages() const;
 
   mitk::DataStorage::Pointer GetDataStorage() const;
-
+  //!mm-added
+  QmitkStdMultiWidget * m_MultiWidget;
+  unsigned long m_ObserverTag;
+  //!
 private:
 
   bool m_HandlesMultipleDataStorages;

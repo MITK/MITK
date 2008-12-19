@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 ** These will automatically be called by the form's constructor and
 ** destructor.
 *****************************************************************************/
-#include "QmitMaterialShowcase.h"
+#include "QmitkMaterialShowcase.h"
 #include <vtkSphereSource.h>
 #include <vtkPolyData.h>
 #include <vtkCamera.h>
@@ -55,14 +55,14 @@ QmitkMaterialShowcase::QmitkMaterialShowcase(QWidget* parent, const char* name, 
   vtkPolyData* sphere = sphereSource->GetOutput();
   m_Surface = mitk::Surface::New();
   m_Surface->SetVtkPolyData( sphere );
-  m_DataTreeNode = mitk::DataTreeNode::New();                                
+  m_DataTreeNode = mitk::DataTreeNode::New();
   m_DataTreeNode->SetData( m_Surface );
   m_DataTree = mitk::DataTree::New();
-  mitk::DataTreePreOrderIterator it( m_DataTree );    
+  mitk::DataTreePreOrderIterator it( m_DataTree );
   it.Add( m_DataTreeNode );
   m_RenderWindow->GetRenderer()->SetData( &it );
   m_RenderWindow->GetRenderer()->SetMapperID( 2 );
-  sphereSource->Delete();    
+  sphereSource->Delete();
 
   m_TextActor = vtkTextActor::New();
   m_TextActor->SetAlignmentPoint( 2);
@@ -112,7 +112,7 @@ void  QmitkMaterialShowcase::SetColor( vtkFloatingPointType red, vtkFloatingPoin
 {
   m_MaterialProperty->SetColor( red, green, blue );
   m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
-  this->UpdateRenderWindow(); 
+  this->UpdateRenderWindow();
 }
 
 void  QmitkMaterialShowcase::SetColorCoefficient( vtkFloatingPointType coefficient )
@@ -186,7 +186,7 @@ void QmitkMaterialShowcase::SetRepresentation( mitk::MaterialProperty::Represent
 }
 
 
-void QmitkMaterialShowcase::SetInterpolation( mitk::MaterialProperty::InterpolationType interpolation ) 
+void QmitkMaterialShowcase::SetInterpolation( mitk::MaterialProperty::InterpolationType interpolation )
 {
   m_MaterialProperty->SetInterpolation( interpolation );
   m_DataTreeNode->SetProperty( "material", m_MaterialProperty );
@@ -197,7 +197,7 @@ void QmitkMaterialShowcase::SetInterpolation( mitk::MaterialProperty::Interpolat
 void QmitkMaterialShowcase::mousePressEvent( QMouseEvent * e )
 {
   QWidget::mousePressEvent( e );
-  emit Selected( this );  
+  emit Selected( this );
 }
 
 

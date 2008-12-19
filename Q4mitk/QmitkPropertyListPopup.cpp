@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-04-14 19:45:53 +0200 (Mo, 14 Apr 2008) $
 Version:   $Revision: 14081 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkPropertyListPopup.h"
@@ -54,7 +54,7 @@ class QFontMenuItem : public QCustomMenuItem
       p->setBackgroundMode ( Qt::OpaqueMode );
       int ha,es,vau;
       color.getHsv(ha,es,vau);
-      if ( es < 60 && vau > 200 ) 
+      if ( es < 60 && vau > 200 )
         p->setBackgroundColor ( Qt::black );
       else
         p->setBackgroundColor ( Qt::white );
@@ -83,14 +83,14 @@ m_PopupMenu( new QMenu( name, dynamic_cast<QWidget*>(parent) ) ),
 //!
 m_PropertyList(list),
 m_MaterialEditor(NULL),
-m_AcceptOnHide(false),
-m_DisableBoolProperties(disableBoolProperties),
 //!mm,init QAction ptrs with 0
 m_NameMenuAction(0),
 m_VisibleMenuAction(0),
 m_ColorMenuAction(0),
 m_MaterialMenuAction(0),
-m_OpacityMenuAction(0)
+m_OpacityMenuAction(0),
+m_AcceptOnHide(false),
+m_DisableBoolProperties(disableBoolProperties)
 //!
 {
   if (!parent)
@@ -191,7 +191,7 @@ void QmitkPropertyListPopup::fillPopup()
 
       //m_OpacityMenuAction = m_PopupMenu->insertItem("Opacity", opacityPopup);
       //m_PopupMenu->setItemEnabled( m_OpacityMenuAction, true );
-      QWidgetAction* opacityMenuAction = new QWidgetAction(opacityPopup);      
+      QWidgetAction* opacityMenuAction = new QWidgetAction(opacityPopup);
       opacityMenuAction->setDefaultWidget(npe);
       m_OpacityMenuAction = opacityMenuAction;
       opacityPopup->addAction(m_OpacityMenuAction);
@@ -245,7 +245,7 @@ void QmitkPropertyListPopup::fillPopup()
     mitk::BoolProperty* visibleProperty = dynamic_cast<mitk::BoolProperty*>( m_PropertyList->GetProperty("visible"));
     m_VisibleMenuAction->setEnabled( visibleProperty != NULL );
     if (visibleProperty)
-    {      
+    {
       m_VisibleMenuAction->setChecked( visibleProperty->GetValue() );
       connect( m_VisibleMenuAction, SIGNAL(triggered()), this, SLOT(onVisibleClicked()) );
     }
@@ -263,14 +263,14 @@ void QmitkPropertyListPopup::fillPopup()
 
       //m_PopupMenu->insertSeparator();
       m_InfoPopup = m_PopupMenu->addMenu("Information");
-      //m_InfoPopup->setCheckable(true); // bool properties are checked      
+      //m_InfoPopup->setCheckable(true); // bool properties are checked
 
       m_PopupMenu->addSeparator();
       //!
 
       QFont boldFont = m_PopupMenu->font();
       boldFont.setBold( true );
-     
+
       // first all bool properties
       for ( mitk::PropertyList::PropertyMap::const_iterator propertyIter = map->begin();
             propertyIter != map->end();
@@ -297,7 +297,7 @@ void QmitkPropertyListPopup::fillPopup()
       }
 
       boldFont = m_InfoPopup->font();
-    
+
       // then all non-bool properties
       for ( mitk::PropertyList::PropertyMap::const_iterator propertyIter = map->begin();
             propertyIter != map->end();
@@ -329,7 +329,7 @@ bool QmitkPropertyListPopup::AddMaterialPopup()
     //Q3PopupMenu* materialPopup = new Q3PopupMenu( m_PopupMenu );
     QMenu* materialPopup = new QMenu( m_PopupMenu );
     //!
-  
+
     m_MaterialEditor = new QmitkMaterialEditor( m_PopupMenu );
     m_MaterialEditor->setInline(true); // important to call this first :(
     m_MaterialEditor->Initialize( materialProperty );
@@ -355,7 +355,7 @@ bool QmitkPropertyListPopup::AddMaterialPopup()
 
   return false;
 }
-    
+
 QmitkPropertyListPopup::~QmitkPropertyListPopup()
 {
   delete m_MaterialEditor;
@@ -378,25 +378,25 @@ void QmitkPropertyListPopup::onNameClicked()
   if (nameProperty)
   {
     bool ok;
-    QString newName = QInputDialog::getText( tr("Change object name"), 
-                                             QString(tr("Enter a new name for \"%1\"")).arg(nameProperty->GetValue()), 
-                                             QLineEdit::Normal, 
-                                             QString(nameProperty->GetValue()), 
+    QString newName = QInputDialog::getText( tr("Change object name"),
+                                             QString(tr("Enter a new name for \"%1\"")).arg(nameProperty->GetValue()),
+                                             QLineEdit::Normal,
+                                             QString(nameProperty->GetValue()),
                                              &ok,
                                              m_PopupMenu );
-    if ( ok && !newName.isEmpty() ) 
+    if ( ok && !newName.isEmpty() )
     {
       // user entered something and pressed OK
       nameProperty->SetValue( newName.ascii() );
       nameProperty->Modified();
       emit propertyListChangesDone();
-    } 
+    }
     else if (ok)
-    { 
+    {
       // user entered nothing or pressed Cancel
-       if ( QMessageBox::question( m_PopupMenu, 
-                                   tr("Change object name"), 
-                                   tr("Do you really want to assign an empty name to '%1'?").arg( nameProperty->GetValue() ), 
+       if ( QMessageBox::question( m_PopupMenu,
+                                   tr("Change object name"),
+                                   tr("Do you really want to assign an empty name to '%1'?").arg( nameProperty->GetValue() ),
                                    QMessageBox::Yes,
                                    QMessageBox::No )
             == QMessageBox::Yes )
@@ -454,9 +454,9 @@ void QmitkPropertyListPopup::onBoolPropertyClicked(int param)
 {
   int item = m_PopupMenu->idAt(param+6); // plus number of items before all the boolean properties (excluding separator)
   bool on( !m_PopupMenu->isItemChecked(item) );
-  
+
   m_PopupMenu->setItemChecked( item, on ); // toggle
-  
+
   try
   {
     mitk::BoolProperty* boolProperty = m_BoolProperties.at( param-1 );

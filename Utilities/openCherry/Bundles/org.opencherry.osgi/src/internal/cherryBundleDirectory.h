@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/Path.h"
 
-#include "cherryIBundleStorage.h"
+#include "../cherryIBundleStorage.h"
 
 
 namespace cherry {

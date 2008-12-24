@@ -18,16 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/ClassLibrary.h"
 
 #include <cherryIBundleActivator.h>
-#include "internal/cherryQtUIPlugin.h"
+#include "src/internal/cherryQtUIPlugin.h"
 
-#include "internal/cherryQtWorkbenchTweaklet.h"
-#include "internal/cherryQtWorkbenchPageTweaklet.h"
-#include "internal/cherryQtDnDTweaklet.h"
-#include "internal/cherryQtWidgetsTweaklet.h"
-#include "internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
+#include "src/internal/cherryQtWorkbenchTweaklet.h"
+#include "src/internal/cherryQtWorkbenchPageTweaklet.h"
+#include "src/internal/cherryQtDnDTweaklet.h"
+#include "src/internal/cherryQtWidgetsTweaklet.h"
+#include "src/internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
 
 #include <cherryIViewPart.h>
-#include "internal/cherryLogView.h"
+#include "src/internal/cherryLogView.h"
 
 POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
   POCO_EXPORT_CLASS(cherry::QtUIPlugin)

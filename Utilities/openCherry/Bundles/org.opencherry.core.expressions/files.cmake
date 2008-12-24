@@ -1,4 +1,4 @@
-SET(CPP_FILES
+SET(SRC_CPP_FILES
   cherryElementHandler.cpp
   cherryEvaluationContext.cpp
   cherryEvaluationResult.cpp
@@ -35,6 +35,10 @@ SET(INTERNAL_CPP_FILES
   cherryWithExpression.cpp
 )
 
+foreach(file ${SRC_CPP_FILES})
+  SET(CPP_FILES ${CPP_FILES} src/${file})
+endforeach(file ${SRC_CPP_FILES})
+
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} internal/${file})
+  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

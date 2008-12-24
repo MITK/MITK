@@ -26,8 +26,7 @@ SET(SERVICE_CPP_FILES
   cherryServiceRegistry.cpp
 )
 
-SET(CPP_FILES
-  manifest.cpp
+SET(SRC_CPP_FILES
   cherryIBundleManifest.cpp
   cherryBundleLoader.cpp
   cherryDebugUtil.cpp
@@ -43,15 +42,20 @@ SET(CPP_FILES
   application/cherryStarter.cpp
 )
 
+SET(CPP_FILES manifest.cpp)
+
+foreach(file ${SRC_CPP_FILES})
+  SET(CPP_FILES ${CPP_FILES} src/${file})
+endforeach(file ${SRC_CPP_FILES})
 
 foreach(file ${EVENT_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} event/${file})
+  SET(CPP_FILES ${CPP_FILES} src/event/${file})
 endforeach(file ${EVENT_CPP_FILES})
 
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} internal/${file})
+  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
 
 foreach(file ${SERVICE_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} service/${file})
+  SET(CPP_FILES ${CPP_FILES} src/service/${file})
 endforeach(file ${SERVICE_CPP_FILES})

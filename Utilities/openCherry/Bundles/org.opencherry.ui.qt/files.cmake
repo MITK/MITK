@@ -1,6 +1,4 @@
-SET(CPP_FILES
-  manifest.cpp
-  
+SET(SRC_CPP_FILES
   cherryQtEditorPart.cpp
   cherryQtViewPart.cpp
   
@@ -47,26 +45,32 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
-  internal/defaultpresentation/cherryNativeTabFolder.h
-  internal/defaultpresentation/cherryQCTabBar.h
+  src/internal/defaultpresentation/cherryNativeTabFolder.h
+  src/internal/defaultpresentation/cherryQCTabBar.h
   
-  internal/cherryQtControlWidget.h
-  internal/cherryQtMainWindowControl.h
-  internal/cherryQtSash.h
-  internal/cherryQtShowViewAction.h
-  internal/cherryQtTracker.h
-  internal/cherryQtWidgetsTweakletImpl.h
+  src/internal/cherryQtControlWidget.h
+  src/internal/cherryQtMainWindowControl.h
+  src/internal/cherryQtSash.h
+  src/internal/cherryQtShowViewAction.h
+  src/internal/cherryQtTracker.h
+  src/internal/cherryQtWidgetsTweakletImpl.h
 )
 
 SET(UI_FILES
-  internal/cherryQtShowViewDialog.ui
-  internal/cherryQtLogView.ui
+  src/internal/cherryQtShowViewDialog.ui
+  src/internal/cherryQtLogView.ui
 )
 
 SET(RES_FILES
   resources.qrc
 )
 
+SET(CPP_FILES manifest.cpp)
+
+foreach(file ${SRC_CPP_FILES})
+  SET(CPP_FILES ${CPP_FILES} src/${file})
+endforeach(file ${SRC_CPP_FILES})
+
 foreach(file ${INTERNAL_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} internal/${file})
+  SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})

@@ -17,12 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "cherryQtWorkbenchTweaklet.h"
-#include "internal/cherryQtControlWidget.h"
+#include "cherryQtControlWidget.h"
 
 #include <QApplication>
 #include <QMainWindow>
 
-#include "internal/cherryQtShowViewDialog.h"
+#include "cherryQtShowViewDialog.h"
 
 #include <cherryPlatform.h>
 #include <cherryPlatformUI.h>

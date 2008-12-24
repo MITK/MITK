@@ -17,8 +17,8 @@
 
 #include "cherryQtWorkbenchPageTweaklet.h"
 
-#include "internal/cherryQtControlWidget.h"
-#include "internal/cherryQtErrorView.h"
+#include "cherryQtControlWidget.h"
+#include "cherryQtErrorView.h"
 
 #include <QWidget>
 #include <QHBoxLayout>

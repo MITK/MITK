@@ -15,31 +15,28 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef CHERRYQTWORKBENCHTWEAKLET_H_
-#define CHERRYQTWORKBENCHTWEAKLET_H_
+#ifndef CHERRYQTLOGVIEW_H
+#define CHERRYQTLOGVIEW_H
 
-#include <tweaklets/cherryWorkbenchTweaklet.h>
+#include <QtGui/QWidget>
 
-#include "cherryUiQtDll.h"
+#include "../cherryUiQtDll.h"
+
+#include "ui_cherryQtLogView.h"
 
 namespace cherry {
 
-class CHERRY_UI_QT QtWorkbenchTweaklet : public WorkbenchTweaklet
+class CHERRY_UI_QT QtLogView : public QWidget
 {
 
 public:
+    QtLogView(QWidget *parent = 0);
+    ~QtLogView();
 
-  cherryClassMacro(QtWorkbenchTweaklet);
-
-  int RunEventLoop();
-  bool IsRunning();
-
-  void* CreatePageComposite(void* parent);
-
-  IDialog::Pointer CreateStandardDialog(const std::string& id);
-
+private:
+    Ui::QtLogViewClass ui;
 };
 
-} // namespace cherry
+}
 
-#endif /*CHERRYQTWORKBENCHTWEAKLET_H_*/
+#endif // CHERRYQTLOGVIEW_H

@@ -21,7 +21,7 @@
 
 #include <tweaklets/cherryWorkbenchPageTweaklet.h>
 
-#include "cherryUiQtDll.h"
+#include "../cherryUiQtDll.h"
 
 namespace cherry
 {

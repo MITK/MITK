@@ -1,42 +1,43 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
-#ifndef CHERRYQTLOGVIEW_H
-#define CHERRYQTLOGVIEW_H
+#ifndef CHERRYLOGVIEW_H_
+#define CHERRYLOGVIEW_H_
 
 #include <QtGui/QWidget>
 
-#include "cherryUiQtDll.h"
+#include "../cherryQtViewPart.h"
 
-#include "ui_cherryQtLogView.h"
+#include "../cherryUiQtDll.h"
 
 namespace cherry {
 
-class CHERRY_UI_QT QtLogView : public QWidget
+class CHERRY_UI_QT LogView : public QtViewPart
 {
-
 public:
-    QtLogView(QWidget *parent = 0);
-    ~QtLogView();
 
-private:
-    Ui::QtLogViewClass ui;
+  void SetFocus();
+
+protected:
+
+  void CreateQtPartControl(QWidget* parent);
+
 };
 
-}
+} // namespace cherry
 
-#endif // CHERRYQTLOGVIEW_H
+#endif /*CHERRYLOGVIEW_H_*/

@@ -29,9 +29,7 @@ SET(Poco_LIBRARY_DIR
     "top-level directory containing the poco libraries."
 )
 
-IF(DESIRED_QT_VERSION EQUAL 4)
-  OPTION(BUILD_OPENCHERRY "EXPERIMENTAL! Build the openCherry platform" OFF)
-ENDIF(DESIRED_QT_VERSION EQUAL 4)
+OPTION(BUILD_OPENCHERRY "EXPERIMENTAL! Build the openCherry platform" OFF)
 
 IF(BUILD_OPENCHERRY)       
   ADD_SUBDIRECTORY(openCherry)

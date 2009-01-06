@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkSegTool2D.h"
 #include "mitkContour.h"
+#include "mitkContourUtils.h"
 #include "mitkImage.h"
 
 #include "mitkDataTreeNode.h"
@@ -43,6 +44,8 @@ namespace mitk
   Implements helper methods, that might be of use to all kind of 2D segmentation tools that use a contour for user feedback. 
    - Providing a feedback contour that might be added or removed from the visible scene (SetFeedbackContourVisible).
    - Filling of a contour into a 2D slice
+
+   These helper methods are actually implemented in ContourUtils now. FeedbackContourTool only forwards such requests.
 
   \warning Only to be instantiated by mitk::ToolManager.
 
@@ -82,15 +85,6 @@ class MITK_CORE_EXPORT FeedbackContourTool : public SegTool2D
     */
     Contour::Pointer BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool correctionForIpSegmentation = false);
 
-
-    /**
-      \brief Paint a filled contour (e.g. of an ipSegmentation pixel type) into a mitk::Image (or arbitraty pixel type).
-      Will not copy the whole filledContourSlice, but only set those pixels in originalSlice to overwritevalue, where the corresponding pixel
-      in filledContourSlice is non-zero.
-    */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkCopyFilledContourToSlice( itk::Image<TPixel,VImageDimension>* originalSlice, const Image* filledContourSlice, int overwritevalue = 1 );
-
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
     */
@@ -102,6 +96,7 @@ class MITK_CORE_EXPORT FeedbackContourTool : public SegTool2D
     DataTreeNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
+    ContourUtils::Pointer m_ContourUtils;
 };
 
 } // namespace

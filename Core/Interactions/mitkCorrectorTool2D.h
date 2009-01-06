@@ -21,8 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkFeedbackContourTool.h"
 
-#include "ipSegmentation.h"
-
 namespace mitk
 {
 
@@ -42,6 +40,8 @@ class Image;
   tests if the line begins and ends inside or outside a segmentation and either adds or subtracts a piece of
   segmentation.
 
+  Algorithm is implemented in CorrectorAlgorithm (so that it could be reimplemented in a more modern fashion some time).
+
   \warning Only to be instantiated by mitk::ToolManager.
 
   $Author$
@@ -58,14 +58,6 @@ class MITK_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
 
   protected:
     
-    typedef struct 
-    {
-      int  lineStart;
-      int lineEnd;
-      bool modified;
-    } 
-    TSegData;
-
     CorrectorTool2D(int paintingPixelValue = 1); // purposely hidden
     virtual ~CorrectorTool2D();
 
@@ -75,16 +67,6 @@ class MITK_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
     virtual bool OnMousePressed (Action*, const StateEvent*);
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
-
-    /**
-      \brief The algorithm is described in full length in Tobias Heimann's diploma thesis.
-    */
-    void TobiasHeimannCorrectionAlgorithm(ipPicDescriptor* pic);
-
-    /**
-      \brief helper for TobiasHeimannCorrectionAlgorithm
-    */
-    bool modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, ipPicDescriptor *pic, int* _ofsArray );
 
     int m_PaintingPixelValue;
 

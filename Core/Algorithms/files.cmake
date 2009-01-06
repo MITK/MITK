@@ -6,7 +6,9 @@ SET(CPP_FILES
   mitkBoundingObjectCutter.cpp
   mitkCalculateSegmentationVolume.cpp
   mitkCallbackFromGUIThread.cpp
+  mitkCorrectorAlgorithm.cpp
   mitkContourSetToPointSetFilter.cpp
+  mitkContourUtils.cpp
   mitkCoreObjectFactory.cpp
   mitkCylindricToCartesianFilter.cpp
   mitkDataTreeNodeFactory.cpp

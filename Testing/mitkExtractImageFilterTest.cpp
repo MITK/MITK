@@ -100,14 +100,34 @@ static void Test3D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
 
       if (output->GetDimension() == 2)
       {
-        if (!CompareImageSliceTestHelper::CompareSlice( image, sliceDimension , sliceIndex , output ))
+        try
         {
-          ++numberFailed;
-          std::cerr << "  (EE) Extracting extracted the wrong pixels or somehow messed up with a " 
-                    << image->GetDimension() 
-                    << "-dimensional image, sliceDimension " 
-                    << sliceDimension 
-                    << " sliceIndex " << sliceIndex << "." << "(l. " << __LINE__ << ")" << std::endl;
+          if (!CompareImageSliceTestHelper::CompareSlice( image, sliceDimension , sliceIndex , output ))
+          {
+            ++numberFailed;
+            std::cerr << "  (EE) Extracting extracted the wrong pixels or somehow messed up with a " 
+                      << image->GetDimension() 
+                      << "-dimensional image, sliceDimension " 
+                      << sliceDimension 
+                      << " sliceIndex " << sliceIndex << "." << "(l. " << __LINE__ << ")" << std::endl;
+          }
+          else
+          {
+            std::cerr << "  :-) Extracting extracted somehow correct pixels with a " 
+                      << image->GetDimension() 
+                      << "-dimensional image, sliceDimension " 
+                      << sliceDimension 
+                      << " sliceIndex " << sliceIndex << "." << "(l. " << __LINE__ << ")" << std::endl;
+          }
+        }
+        catch(std::exception& e)
+        {
+            ++numberFailed;
+            std::cerr << "  (EE) Extracting extracted the wrong pixels or somehow SEVERELY messed up with a " 
+                      << image->GetDimension() 
+                      << "-dimensional image, sliceDimension " 
+                      << sliceDimension 
+                      << " sliceIndex " << sliceIndex << "." << "(l. " << __LINE__ << ")" << std::endl;
         }
       }
       else

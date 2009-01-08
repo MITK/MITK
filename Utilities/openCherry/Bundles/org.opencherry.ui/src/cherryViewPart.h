@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYVIEWPART_H_
@@ -29,11 +29,11 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Abstract base implementation of all workbench views.
  * <p>
  * This class should be subclassed by clients wishing to define new views.
- * The name of the subclass should be given as the <code>"class"</code> 
+ * The name of the subclass should be given as the <code>"class"</code>
  * attribute in a <code>view</code> extension contributed to the workbench's
  * view extension point (named <code>"org.opencherry.ui.views"</code>).
  * For example, the plug-in's XML markup might contain:
@@ -59,7 +59,7 @@ namespace cherry {
  * <p>
  * Subclasses may extend or reimplement the following methods as required:
  * <ul>
- *   <li><code>setInitializationData</code> - extend to provide additional 
+ *   <li><code>setInitializationData</code> - extend to provide additional
  *       initialization when view extension is instantiated</li>
  *   <li><code>init(IWorkbenchPartSite)</code> - extend to provide additional
  *       initialization when view is assigned its site</li>
@@ -70,28 +70,28 @@ namespace cherry {
  */
 class CHERRY_UI ViewPart : public WorkbenchPart, public IViewPart
 {
-  
+
 protected:
   ViewPart();
-      
+
   /**
    * Checks that the given site is valid for this type of part.
    * The site for a view must be an <code>IViewSite</code>.
-   * 
+   *
    * @param site the site to check
    * @since 3.1
    */
   void CheckSite(IWorkbenchPartSite::Pointer site);
-  
+
 public:
- 
+
   cherryClassMacro(ViewPart);
-  
-  void Init(IViewSite::Pointer site, IMemento::Pointer memento = 0);
+
+  void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(0));
 
   void SaveState(IMemento::Pointer memento);
-  
-  /* 
+
+  /*
    * Method declared on IViewPart.
    */
   IViewSite::Pointer GetViewSite();

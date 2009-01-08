@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryEqualsExpression.h"
@@ -30,11 +30,11 @@ const intptr_t EqualsExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry
 
 EqualsExpression::EqualsExpression(ExpressionVariable::Pointer expectedValue) {
   poco_assert(expectedValue.IsNotNull());
-  
+
   fExpectedValue = expectedValue;
 }
 
-EqualsExpression::EqualsExpression(IConfigurationElement* element) {
+EqualsExpression::EqualsExpression(IConfigurationElement::Pointer element) {
   std::string value;
   bool result = element->GetAttribute(ATT_VALUE, value);
   Expressions::CheckAttribute(ATT_VALUE, result);
@@ -47,20 +47,20 @@ EqualsExpression::EqualsExpression(Poco::XML::Element* element) {
   fExpectedValue = Expressions::ConvertArgument(value);
 }
 
-EvaluationResult 
+EvaluationResult
 EqualsExpression::Evaluate(IEvaluationContext* context) {
   ExpressionVariable::Pointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(element == fExpectedValue);
 }
 
-void 
+void
 EqualsExpression::CollectExpressionInfo(ExpressionInfo* info) {
   info->MarkDefaultVariableAccessed();
 }
 
-bool 
+bool
 EqualsExpression::operator==(Expression& object) {
-  
+
   try {
     EqualsExpression& that = dynamic_cast<EqualsExpression&>(object);
     return this->fExpectedValue == that.fExpectedValue;
@@ -71,7 +71,7 @@ EqualsExpression::operator==(Expression& object) {
   }
 }
 
-intptr_t 
+intptr_t
 EqualsExpression::ComputeHashCode() {
   return HASH_INITIAL * HASH_FACTOR + fExpectedValue->HashCode();
 }

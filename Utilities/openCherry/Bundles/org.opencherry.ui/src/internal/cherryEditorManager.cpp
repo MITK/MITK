@@ -414,7 +414,7 @@ IEditorPart::Pointer EditorManager::GetVisibleEditor()
   IEditorReference::Pointer ref = editorPresentation->GetVisibleEditor();
   if (ref.IsNull())
   {
-    return 0;
+    return IEditorPart::Pointer(0);
   }
   return ref->GetPart(true).Cast<IEditorPart>();
 }
@@ -437,7 +437,7 @@ IEditorReference::Pointer EditorManager::FindReusableEditor(
     EditorDescriptor::Pointer desc)
 {
   //return ((TabBehaviour)Tweaklets.get(TabBehaviour.KEY)).findReusableEditor(page);
-  return 0;
+  return IEditorReference::Pointer(0);
 }
 
 IEditorReference::Pointer EditorManager::OpenEditor(
@@ -577,7 +577,7 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
     IEditorPart::Pointer part, EditorDescriptor::Pointer desc,
     IEditorInput::Pointer input) const
 {
-  EditorSite::Pointer site = new EditorSite(ref, part, page, desc);
+  EditorSite::Pointer site(new EditorSite(ref, part, page, desc));
   if (desc.IsNotNull())
   {
     //site.setActionBars(createEditorActionBars(desc, site));
@@ -623,7 +623,7 @@ IEditorReference::Pointer EditorManager::ReuseInternalEditor(
 //    return this->ReuseInternalEditor(page, this, editorPresentation, desc, input,
 //        reusableEditorRef);
 //  }
-  return 0;
+  return IEditorReference::Pointer(0);
 }
 
 IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) const
@@ -1069,7 +1069,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 
 //      return (IPathEditorInput)
 //      Util.getAdapter(input, IPathEditorInput.class);
-      return 0;
+      return IPathEditorInput::Pointer(0);
     }
 
     void EditorManager::RestoreEditorState(IMemento::Pointer editorMem,
@@ -1250,15 +1250,15 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       {
         return e.Cast<EditorReference>()->GetMemento();
       }
-      return 0;
+      return IMemento::Pointer(0);
     }
 
     IEditorReference::Pointer EditorManager::OpenEmptyTab()
     {
-      IEditorInput::Pointer input = new NullEditorInput();
+      IEditorInput::Pointer input(new NullEditorInput());
       EditorDescriptor::Pointer desc = (dynamic_cast<EditorRegistry*>(this->GetEditorRegistry()))
       ->FindEditor(EditorRegistry::EMPTY_EDITOR_ID).Cast<EditorDescriptor>();
-      EditorReference::Pointer result = new EditorReference(this, input, desc);
+      EditorReference::Pointer result(new EditorReference(this, input, desc));
       try
       {
         this->CreateEditorTab(result, ""); //$NON-NLS-1$
@@ -1270,7 +1270,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //            StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
         std::cout << e.displayText() << std::endl;
       }
-      return 0;
+      return IEditorReference::Pointer(0);
     }
 
     bool EditorManager::UseIPersistableEditor()

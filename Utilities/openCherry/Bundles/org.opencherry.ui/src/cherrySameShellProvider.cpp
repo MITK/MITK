@@ -41,7 +41,7 @@ Shell::Pointer SameShellProvider::GetShell()
     return shell;
   }
 
-  return targetControl == 0 ? 0
+  return targetControl == 0 ? Shell::Pointer(0)
       : Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(targetControl);
 }
 

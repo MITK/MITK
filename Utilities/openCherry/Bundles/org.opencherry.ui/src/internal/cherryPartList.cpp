@@ -55,13 +55,13 @@ IEditorReference::Pointer PartList::GetActiveEditorReference()
 
 IEditorPart::Pointer PartList::GetActiveEditor()
 {
-  return activeEditorReference.IsNull() ? 0 : activeEditorReference->GetEditor(
+  return activeEditorReference.IsNull() ? IEditorPart::Pointer(0) : activeEditorReference->GetEditor(
       false);
 }
 
 IWorkbenchPart::Pointer PartList::GetActivePart()
 {
-  return activePartReference == 0 ? 0 : activePartReference->GetPart(false);
+  return activePartReference == 0 ? IWorkbenchPart::Pointer(0) : activePartReference->GetPart(false);
 }
 
 std::vector<IEditorReference::Pointer> PartList::GetEditors()
@@ -81,7 +81,7 @@ void PartList::AddPart(WorkbenchPartReference::Pointer ref)
 {
   poco_assert(ref.IsNotNull());
 
-  ref->AddPropertyListener(this);
+  ref->AddPropertyListener(IPropertyChangeListener::Pointer(this));
 
   if (!this->Contains(ref))
   {
@@ -168,7 +168,7 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
   }
 
   std::remove(parts.begin(), parts.end(), ref);
-  ref->RemovePropertyListener(this);
+  ref->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
 
   this->FirePartRemoved(ref);
 }

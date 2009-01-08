@@ -65,8 +65,10 @@ class EditorManager
 
   EditorAreaHelper* editorPresentation;
 
+  //TODO WeakPointer
   SmartPointer<WorkbenchWindow> window;
 
+  //TODO WeakPointer
   SmartPointer<WorkbenchPage> page;
 
   //std::map<std::string, EditorActionBars::Pointer> actionCache = new HashMap();

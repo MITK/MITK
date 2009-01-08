@@ -59,7 +59,7 @@ LayoutPartSash::~LayoutPartSash()
 void LayoutPartSash::CheckDragLimit(GuiTk::SelectionEvent::Pointer event)
 {
   LayoutTree::Pointer root = rootContainer->GetLayoutTree();
-  LayoutTreeNode::Pointer node = root->FindSash(this);
+  LayoutTreeNode::Pointer node = root->FindSash(LayoutPartSash::Pointer(this));
   Rectangle nodeBounds = node->GetBounds();
   Rectangle eventRect(event->x, event->y, event->width, event->height);
 
@@ -255,7 +255,7 @@ void LayoutPartSash::FlushCache()
 
   if (root != 0)
   {
-    LayoutTreeNode::Pointer node = root->FindSash(this);
+    LayoutTreeNode::Pointer node = root->FindSash(LayoutPartSash::Pointer(this));
     if (node != 0)
     {
       node->FlushCache();
@@ -271,7 +271,7 @@ void LayoutPartSash::WidgetSelected(int x, int y, int width, int height)
   }
 
   LayoutTree::Pointer root = rootContainer->GetLayoutTree();
-  LayoutTreeNode::Pointer node = root->FindSash(this);
+  LayoutTreeNode::Pointer node = root->FindSash(LayoutPartSash::Pointer(this));
   Rectangle nodeBounds = node->GetBounds();
   //Recompute ratio
   x -= nodeBounds.x;

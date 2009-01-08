@@ -20,6 +20,7 @@
 #define CHERRYSAVEABLE_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 #include <cherryIAdaptable.h>
 #include <set>
 #include <vector>

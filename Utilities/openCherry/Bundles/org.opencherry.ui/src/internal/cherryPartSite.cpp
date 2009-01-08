@@ -67,7 +67,7 @@ PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
   extensionName = "Unknown Name"; //$NON-NLS-1$
 
   // Initialize the service locator.
-  IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow();
+  IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow().GetPointer();
   IServiceLocatorCreator::Pointer slc = parentServiceLocator
       ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<IServiceLocatorCreator>();
   this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(
@@ -293,7 +293,7 @@ std::string PartSite::GetInitialScopeId()
   return "";
 }
 
-Object::Pointer PartSite::GetAdapter(const std::type_info& /*adapter*/)
+void* PartSite::GetAdapterImpl(const std::type_info& /*adapter*/) const
 {
 
   //    if (IWorkbenchSiteProgressService.class == adapter) {

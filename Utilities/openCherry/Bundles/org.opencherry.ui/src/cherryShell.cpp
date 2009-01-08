@@ -22,7 +22,7 @@ namespace cherry {
 Object::Pointer Shell::GetData(const std::string& id) const
 {
   std::map<std::string, Object::Pointer>::const_iterator iter = data.find(id);
-  if (iter == data.end()) return 0;
+  if (iter == data.end()) return Object::Pointer(0);
   return iter->second;
 }
 

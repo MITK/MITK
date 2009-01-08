@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-PartPane::Sashes::Sashes() : 
+PartPane::Sashes::Sashes() :
   left(0), right(0), top(0), bottom(0)
 {
 }
@@ -51,7 +51,7 @@ void PartPane::CreateControl(void* parent) {
     return;
   }
 
-  partReference->AddPropertyListener(this);
+  partReference->AddPropertyListener(IPropertyChangeListener::Pointer(this));
 
   // Create view form.
   control = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreatePaneControl(parent);
@@ -67,7 +67,7 @@ void PartPane::CreateControl(void* parent) {
 
 
   // When the pane or any child gains focus, notify the workbench.
-  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(control, this);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(control, GuiTk::IControlListener::Pointer(this));
 
   //control.addTraverseListener(traverseListener);
 }
@@ -83,7 +83,7 @@ PartPane::~PartPane()
 //
   if (control != 0)
   {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, this);
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, GuiTk::IControlListener::Pointer(this));
 //    control.removeTraverseListener(traverseListener);
     control = 0;
   }
@@ -93,7 +93,7 @@ PartPane::~PartPane()
 //    paneMenuManager = null;
 //  }
 //
-  partReference->RemovePropertyListener(this);
+  partReference->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
 //  partReference.removePartPropertyListener(this);
 }
 
@@ -203,7 +203,7 @@ void PartPane::Reparent(void* newParent)
 {
   void* control = this->GetControl();
 
-  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet::Pointer guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;

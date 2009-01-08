@@ -131,7 +131,7 @@ WorkbenchServiceRegistry::ServiceFactoryHandle* WorkbenchServiceRegistry::LoadFr
 
 const IExtensionPoint* WorkbenchServiceRegistry::GetExtensionPoint()
 {
-  IExtensionPointService* reg = Platform::GetExtensionPointService();
+  IExtensionPointService::Pointer reg = Platform::GetExtensionPointService();
   const IExtensionPoint* ep = reg->GetExtensionPoint(EXT_ID_SERVICES);
   return ep;
 }
@@ -178,7 +178,7 @@ void WorkbenchServiceRegistry::ProcessVariables(
 Object::Pointer WorkbenchServiceRegistry::GlobalParentLocator::GetService(
     const std::string& api) const
 {
-  return 0;
+  return Object::Pointer(0);
 }
 
 bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
@@ -213,7 +213,7 @@ Object::Pointer WorkbenchServiceRegistry::GetService(const std::string& key,
       return result;
     }
   }
-  return 0;
+  return Object::Pointer(0);
 }
 
 std::vector<ISourceProvider*> WorkbenchServiceRegistry::GetSourceProviders()

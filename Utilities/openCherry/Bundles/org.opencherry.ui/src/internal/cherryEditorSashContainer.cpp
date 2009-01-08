@@ -57,7 +57,7 @@ void EditorSashContainer::ChildRemoved(LayoutPart::Pointer child)
     editorWorkbooks.remove(child.Cast<PartStack>());
     if (activeEditorWorkbook == child)
     {
-      this->SetActiveWorkbook(0, false);
+      this->SetActiveWorkbook(PartStack::Pointer(0), false);
     }
 
     this->UpdateStackButtons();
@@ -74,7 +74,7 @@ PartStack::Pointer EditorSashContainer::CreateDefaultWorkbook()
 
 PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 {
-  PartStack::Pointer newWorkbook = new PartStack(page, true, PresentationFactoryUtil::ROLE_EDITOR);
+  PartStack::Pointer newWorkbook(new PartStack(page, true, PresentationFactoryUtil::ROLE_EDITOR));
   std::stringstream buf;
   buf << newWorkbook->GetNameOfClass() << newWorkbook.GetPointer();
   newWorkbook->SetID(buf.str());
@@ -175,7 +175,7 @@ PartStack::Pointer EditorSashContainer::GetUpperRightEditorStack(
 {
 
   // Find the upper Right editor stack
-  PartStack::Pointer winner = 0;
+  PartStack::Pointer winner;
   Rectangle winnerRect;
 
   for (ILayoutContainer::ChildrenType::const_iterator iter = stacks.begin();
@@ -240,7 +240,7 @@ void EditorSashContainer::FindSashes(LayoutPart::Pointer pane,
   ILayoutContainer::Pointer container = this->GetContainer();
   if (container != 0)
   {
-    container->FindSashes(this, sashes);
+    container->FindSashes(LayoutPart::Pointer(this), sashes);
   }
 }
 
@@ -539,7 +539,7 @@ PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const std::string& id)
     }
   }
 
-  return 0;
+  return PartStack::Pointer(0);
 }
 
 void EditorSashContainer::UpdateTabList()

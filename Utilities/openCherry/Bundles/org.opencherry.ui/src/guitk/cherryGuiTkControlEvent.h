@@ -19,6 +19,7 @@
 #define CHERRYGUITKCONTROLEVENT_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 
 namespace cherry
 {

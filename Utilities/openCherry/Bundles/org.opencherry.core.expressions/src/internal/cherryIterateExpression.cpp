@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryIterateExpression.h"
@@ -30,7 +30,7 @@ const int IterateExpression::AND= 2;
 
 const intptr_t IterateExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::IterateExpression");
 
-IterateExpression::IterateExpression(IConfigurationElement* configElement)
+IterateExpression::IterateExpression(IConfigurationElement::Pointer configElement)
 {
   std::string opValue = "";
   configElement->GetAttribute(ATT_OPERATOR, opValue);
@@ -72,7 +72,7 @@ IterateExpression::InitializeOperatorValue(const std::string& opValue)
     fValidOperators.push_back("and");
     fValidOperators.push_back("or");
     Expressions::CheckAttribute(ATT_OPERATOR, true, opValue, fValidOperators);
-    
+
     if ("and" == opValue)
     {
       fOperator= AND;
@@ -144,10 +144,10 @@ IterateExpression::Evaluate(IEvaluationContext* context)
   }
   else
   {
-    IIterable::Pointer iterable= Expressions::GetAsIIterable(var, this);
+    IIterable::Pointer iterable= Expressions::GetAsIIterable(var, Expression::Pointer(this));
     if (iterable.IsNull())
       return EvaluationResult::NOT_LOADED;
-    
+
     int count= 0;
     IteratePool iter(context, iterable->begin(), iterable->end());
     EvaluationResult result = fOperator == AND ? EvaluationResult::TRUE_EVAL : EvaluationResult::FALSE_EVAL;
@@ -207,7 +207,7 @@ IterateExpression::operator==(Expression& object)
   catch (std::bad_cast)
   {
     return false;
-  }  
+  }
 }
 
 intptr_t

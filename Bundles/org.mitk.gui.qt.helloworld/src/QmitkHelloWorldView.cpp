@@ -46,7 +46,7 @@ void QmitkHelloWorldView::SetFocus()
 
 void QmitkHelloWorldView::buttonClicked()
 {
-  IExtensionPointService* service = Platform::GetExtensionPointService();
+  IExtensionPointService::Pointer service = Platform::GetExtensionPointService();
   IConfigurationElement::vector ces(
     service->GetConfigurationElementsFor("org.mitk.gui.qt.helloworld.dialogs"));
 

@@ -24,7 +24,20 @@
 class TestObject : public cherry::Object
 {
 public:
-  TestObject() : Object() {}
+  TestObject() : Object(), m_Val(0) {}
+  TestObject(int value) : m_Val(value) {}
+
+  bool operator==(const Object* o) const
+  {
+    if (const TestObject* to = dynamic_cast<const TestObject*>(o))
+      return m_Val == to->m_Val;
+
+    return false;
+  }
+
+private:
+
+  int m_Val;
 };
 
 
@@ -58,7 +71,7 @@ int cherrySmartPointerTest(int /*argc*/, char* /*argv*/[])
 
   // cast tests
   {
-    cherry::SmartPointer<cherry::Object> obj = new TestObject();
+    cherry::SmartPointer<cherry::Object> obj(new TestObject());
     CHERRY_TEST_CONDITION_REQUIRED(obj.GetPointer() != 0 && obj->GetReferenceCount() == 1, "Implicit template cast constructor")
     cherry::SmartPointer<TestObject> testobj = obj.Cast<TestObject>();
     CHERRY_TEST_CONDITION(testobj.GetPointer() != 0 && testobj->GetReferenceCount() == 2 && testobj.GetPointer() == obj.GetPointer(), "Casting")
@@ -66,7 +79,7 @@ int cherrySmartPointerTest(int /*argc*/, char* /*argv*/[])
 
   // reference count tests
   {
-    cherry::SmartPointer<cherry::Object> obj = new TestObject();
+    cherry::SmartPointer<cherry::Object> obj(new TestObject());
     {
       cherry::SmartPointer<cherry::Object> tmpobj = obj;
     }
@@ -75,12 +88,15 @@ int cherrySmartPointerTest(int /*argc*/, char* /*argv*/[])
 
   // operator tests
   {
-    cherry::SmartPointer<cherry::Object> obj = new TestObject();
-    cherry::SmartPointer<TestObject> testobj = new TestObject();
+    cherry::SmartPointer<cherry::Object> obj(new TestObject(1));
+    cherry::SmartPointer<TestObject> testobj(new TestObject(2));
     cherry::SmartPointer<cherry::Object> nullobj;
 
+    // boolean conversions
     CHERRY_TEST_CONDITION(obj.IsNotNull(), "IsNotNull()")
     CHERRY_TEST_CONDITION(obj.IsNull() == false, "IsNull()")
+    CHERRY_TEST_CONDITION(obj, "bool conversion")
+    CHERRY_TEST_CONDITION((!obj) == false, "bool conversion")
 
     // != operators
     CHERRY_TEST_CONDITION(obj != 0, "operator!=(int)")
@@ -96,17 +112,17 @@ int cherrySmartPointerTest(int /*argc*/, char* /*argv*/[])
       obj == 1;
     CHERRY_TEST_FOR_EXCEPTION_END(std::invalid_argument)
     CHERRY_TEST_CONDITION((obj == testobj.GetPointer()) == false, "operator==(R)")
+    CHERRY_TEST_CONDITION(obj == obj.GetPointer(), "operator==(R)")
+    CHERRY_TEST_CONDITION((obj == nullobj.GetPointer()) == false, "operator==(R)")
     CHERRY_TEST_CONDITION((obj == testobj) == false, "operator==(const cherry::SmartPointer<R>&)")
-
-    CHERRY_TEST_CONDITION(nullobj.CompareTo(testobj) == false, "CompareTo()")
-    CHERRY_TEST_CONDITION(obj.CompareTo(testobj) == false, "CompareTo()")
-    CHERRY_TEST_CONDITION(testobj.CompareTo(nullobj) == false, "CompareTo()")
+    CHERRY_TEST_CONDITION(obj == obj, "operator==(const cherry::SmartPointer<R>&)")
+    CHERRY_TEST_CONDITION((obj == nullobj) == false, "operator==(const cherry::SmartPointer<R>&)")
   }
 
   {
     // = operators
-    cherry::SmartPointer<cherry::Object> obj = new TestObject();
-    cherry::SmartPointer<TestObject> testobj = new TestObject();
+    cherry::SmartPointer<cherry::Object> obj(new TestObject(1));
+    cherry::SmartPointer<TestObject> testobj(new TestObject(2));
 
     obj = testobj;
     CHERRY_TEST_CONDITION(obj == testobj && obj->GetReferenceCount() == 2, "operator=(const cherry::SmartPointer<R>&)")

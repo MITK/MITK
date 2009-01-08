@@ -42,7 +42,7 @@ void FolderLayout::AddPlaceholder(const std::string& viewId)
   }
 
   // Create the placeholder.
-  StackablePart::Pointer newPart = new PartPlaceholder(viewId);
+  StackablePart::Pointer newPart(new PartPlaceholder(viewId));
   this->LinkPartToPageLayout(viewId, newPart);
 
   // Add it to the folder layout.

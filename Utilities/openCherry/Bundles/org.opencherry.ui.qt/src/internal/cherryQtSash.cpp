@@ -163,7 +163,7 @@ void QtSash::mouseMoveEvent(QMouseEvent *e)
     return;
   drawRubberBand(lastX, lastY, width, height);
 
-  GuiTk::SelectionEvent::Pointer event = new GuiTk::SelectionEvent(this);
+  GuiTk::SelectionEvent::Pointer event(new GuiTk::SelectionEvent(this));
   event->x = newX;
   event->y = newY;
   event->width = width;
@@ -204,7 +204,7 @@ void QtSash::mousePressEvent(QMouseEvent *e)
 
     lastX = startRect.x();
     lastY = startRect.y();
-    GuiTk::SelectionEvent::Pointer event = new GuiTk::SelectionEvent(this);
+    GuiTk::SelectionEvent::Pointer event(new GuiTk::SelectionEvent(this));
     event->x = lastX;
     event->y = lastY;
     event->width = startRect.width();
@@ -246,7 +246,7 @@ void QtSash::mouseReleaseEvent(QMouseEvent *e)
     const QRect& rect = this->geometry();
     int width = rect.width();
     int height = rect.height();
-    GuiTk::SelectionEvent::Pointer event = new GuiTk::SelectionEvent(this);
+    GuiTk::SelectionEvent::Pointer event(new GuiTk::SelectionEvent(this));
     event->x = lastX;
     event->y = lastY;
     event->width = width;

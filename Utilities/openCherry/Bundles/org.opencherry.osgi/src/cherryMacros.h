@@ -18,13 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __CHERRY_MACROS_H__
 #define __CHERRY_MACROS_H__
 
-#include "cherryObject.h"
 #include "cherrySmartPointer.h"
 
 #define cherryClassMacro(className) \
   typedef className       Self; \
   typedef cherry::SmartPointer<Self> Pointer; \
   typedef cherry::SmartPointer<const Self>  ConstPointer; \
+  /* TODO Weakpointer */ \
+  typedef cherry::SmartPointer<Self> WeakPointer; \
+  typedef cherry::SmartPointer<const Self> ConstWeakPointer; \
   virtual const char* GetNameOfClass() const \
   { return #className; }\
 

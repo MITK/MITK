@@ -383,8 +383,9 @@ void WorkbenchPartReference::FirePropertyChange(int id) {
 
 void WorkbenchPartReference::ImmediateFirePropertyChange(int id) {
   //UIListenerLogging.logPartReferencePropertyChange(this, id);
-  ObjectInt::Pointer value = new ObjectInt(id);
-  PropertyChangeEvent::Pointer event = new PropertyChangeEvent(this, IWorkbenchPartConstants::INTEGER_PROPERTY, value, value);
+  ObjectInt::Pointer value(new ObjectInt(id));
+  Object::Pointer source(this);
+  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, value, value));
   propChangeEvents.propertyChange(event);
 }
 
@@ -392,7 +393,7 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
 {
   if (this->IsDisposed())
   {
-    return 0;
+    return IWorkbenchPart::Pointer(0);
   }
 
   if (part.IsNull() && restore)
@@ -406,7 +407,7 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
       WorkbenchPlugin::Log("Warning: Detected recursive attempt by part "
           + GetId()
           + " to create itself (this is probably, but not necessarily, a bug)");
-      return 0;
+      return IWorkbenchPart::Pointer(0);
     }
 
     try

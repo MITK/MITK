@@ -123,7 +123,7 @@ bool WorkbenchWindow::ClosePage(IWorkbenchPage::Pointer in, bool save)
   bool oldIsActive = (oldPage == this->GetActivePage());
   if (oldIsActive)
   {
-    this->SetActivePage(0);
+    this->SetActivePage(IWorkbenchPage::Pointer(0));
   }
 
   // Close old page.
@@ -184,7 +184,7 @@ void WorkbenchWindow::FireWindowCreated()
 
 void WorkbenchWindow::FireWindowOpened()
 {
-  this->GetWorkbenchImpl()->FireWindowOpened(this);
+  this->GetWorkbenchImpl()->FireWindowOpened(IWorkbenchWindow::Pointer(this));
   this->GetWindowAdvisor()->PostWindowOpen();
 }
 
@@ -197,7 +197,7 @@ void WorkbenchWindow::FireWindowClosed()
 {
   // let the application do further deconfiguration
   this->GetWindowAdvisor()->PostWindowClose();
-  this->GetWorkbenchImpl()->FireWindowClosed(this);
+  this->GetWorkbenchImpl()->FireWindowClosed(IWorkbenchWindow::Pointer(this));
 }
 
 ///**
@@ -543,7 +543,7 @@ bool WorkbenchWindow::HardClose()
 void WorkbenchWindow::CloseAllPages()
 {
   // Deactivate active page.
-  this->SetActivePage(0);
+  this->SetActivePage(IWorkbenchPage::Pointer(0));
 
   // Clone and deref all so that calls to getPages() returns
   // empty list (if called by pageClosed event handlers)
@@ -574,12 +574,12 @@ IWorkbench* WorkbenchWindow::GetWorkbench()
 
 IPartService* WorkbenchWindow::GetPartService()
 {
-  return this->GetActivePage();
+  return this->GetActivePage().GetPointer();
 }
 
 ISelectionService* WorkbenchWindow::GetSelectionService()
 {
-  return this->GetActivePage();
+  return this->GetActivePage().GetPointer();
 }
 
 bool WorkbenchWindow::IsClosing()
@@ -1300,7 +1300,7 @@ WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()
   if (windowConfigurer.IsNull())
   {
     // lazy initialize
-    windowConfigurer = new WorkbenchWindowConfigurer(this);
+    windowConfigurer = new WorkbenchWindowConfigurer(WorkbenchWindow::WeakPointer(this));
   }
   return windowConfigurer;
 }
@@ -1487,7 +1487,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   {
     if (pagesInActivationOrder.empty())
     {
-      return 0;
+      return WorkbenchPage::Pointer(0);
     }
 
     return pagesInActivationOrder.back().Cast<WorkbenchPage>();
@@ -1495,7 +1495,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
 
   if (pagesInActivationOrder.size() < 2)
   {
-    return 0;
+    return WorkbenchPage::Pointer(0);
   }
 
   std::list<IWorkbenchPage::Pointer>::reverse_iterator riter =
@@ -1503,7 +1503,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   return (++riter)->Cast<WorkbenchPage>();
 }
 
-WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow* w) :
+WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow::WeakPointer w) :
 window(w)
 {
 }
@@ -1559,7 +1559,7 @@ void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Poin
 
 void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
 {
-  shellActivationListener = new ShellActivationListener(this);
+  shellActivationListener = new ShellActivationListener(WorkbenchWindow::WeakPointer(this));
   shell->AddShellListener(shellActivationListener);
 }
 

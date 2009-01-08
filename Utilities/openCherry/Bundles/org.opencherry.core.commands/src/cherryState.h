@@ -1,24 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYSTATE_H_
 #define CHERRYSTATE_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 #include "cherryCommandsDll.h"
 
 namespace cherry {
@@ -38,17 +39,17 @@ namespace cherry {
  * <p>
  * Clients may instantiate or extend this class.
  * </p>
- * 
+ *
  * @since 3.2
  */
 class CHERRY_COMMANDS State : public Object { // extends EventManager {
 
 public:
-  
+
   cherryClassMacro(State)
-  
+
 private:
-  
+
   /**
    * The identifier of the state; may be <code>null</code> if it has not
    * been initialized.
@@ -60,12 +61,12 @@ private:
    */
   Object::Pointer value;
 
-  
+
 public:
-  
+
   /**
    * Adds a listener to changes for this state.
-   * 
+   *
    * @param listener
    *            The listener to add; must not be <code>null</code>.
    */
@@ -73,12 +74,12 @@ public:
 //    addListenerObject(listener);
 //  }
 
-  
+
 protected:
-  
+
   /**
    * Notifies listeners to this state that it has changed in some way.
-   * 
+   *
    * @param oldValue
    *            The old value; may be anything.
    */
@@ -90,12 +91,12 @@ protected:
 //    }
 //  }
 
-  
+
 public:
-  
+
   /**
    * Returns the identifier for this state.
-   * 
+   *
    * @return The id; may be <code>null</code>.
    */
    std::string GetId();
@@ -104,7 +105,7 @@ public:
    * The current value associated with this state. This can be any type of
    * object, but implementations will usually restrict this value to a
    * particular type.
-   * 
+   *
    * @return The current value; may be anything.
    */
 
@@ -112,7 +113,7 @@ public:
 
   /**
    * Removes a listener to changes from this state.
-   * 
+   *
    * @param listener
    *            The listener to remove; must not be <code>null</code>.
    */
@@ -123,7 +124,7 @@ public:
   /**
    * Sets the identifier for this object.  This method should only be called
    * by the command framework.  Clients should not call this method.
-   * 
+   *
    * @param id
    *            The id; must not be <code>null</code>.
    */
@@ -131,7 +132,7 @@ public:
 
   /**
    * Sets the value for this state object.
-   * 
+   *
    * @param value
    *            The value to set; may be anything.
    */

@@ -58,7 +58,7 @@ LayoutPart::Pointer LayoutTreeNode::FindPart(const Point& toFind)
   {
     if (!children[1]->IsVisible())
     {
-      return 0;
+      return LayoutPart::Pointer(0);
     }
 
     return children[1]->FindPart(toFind);
@@ -162,7 +162,7 @@ LayoutTreeNode::Pointer LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
 {
   if (this->GetSash() == sash)
   {
-    return this;
+    return LayoutTreeNode::Pointer(this);
   }
   LayoutTreeNode::Pointer node = children[0]->FindSash(sash);
   if (node != 0)
@@ -174,7 +174,7 @@ LayoutTreeNode::Pointer LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
   {
     return node;
   }
-  return 0;
+  return LayoutTreeNode::Pointer(0);
 }
 
 void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sashes)
@@ -223,7 +223,7 @@ void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sash
   }
   if (this->GetParent() != 0)
   {
-    this->GetParent()->FindSashes(this, sashes);
+    this->GetParent()->FindSashes(LayoutTree::Pointer(this), sashes);
   }
 }
 
@@ -257,14 +257,14 @@ LayoutTree::Pointer LayoutTreeNode::Remove(LayoutTree::Pointer child)
     return children[0];
   }
 
-  LayoutTreeNode* oldParent = parent;
+  LayoutTreeNode::Pointer oldParent(parent);
   if (children[0] == child)
   {
-    oldParent->ReplaceChild(this, children[1]);
+    oldParent->ReplaceChild(LayoutTree::Pointer(this), children[1]);
   }
   else
   {
-    oldParent->ReplaceChild(this, children[0]);
+    oldParent->ReplaceChild(LayoutTree::Pointer(this), children[0]);
   }
   return oldParent;
 }
@@ -297,7 +297,7 @@ bool LayoutTreeNode::SameDirection(bool isVertical, LayoutTreeNode::Pointer subT
   }
   while (subTree != 0)
   {
-    if (this == subTree)
+    if (this == subTree.GetPointer())
     {
       return true;
     }
@@ -593,7 +593,7 @@ LayoutTree::Pointer LayoutTreeNode::GetChild(bool left)
 
 void LayoutTreeNode::SetChild(bool left, LayoutPart::Pointer part)
 {
-  LayoutTree::Pointer child = new LayoutTree(part);
+  LayoutTree::Pointer child(new LayoutTree(part));
   this->SetChild(left, child);
   this->FlushCache();
 }

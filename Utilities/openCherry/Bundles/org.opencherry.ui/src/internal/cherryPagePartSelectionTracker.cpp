@@ -52,7 +52,7 @@ PagePartSelectionTracker::PagePartSelectionTracker(
   this->SetPartId(partId);
   this->SetPage(page);
 
-  page->AddPartListener(this);
+  page->AddPartListener(IPartListener::Pointer(this));
   std::string secondaryId;
   std::string primaryId = partId;
   std::string::size_type indexOfColon;
@@ -80,7 +80,7 @@ void PagePartSelectionTracker::PartClosed(IWorkbenchPartReference::Pointer partR
 {
   if (this->GetPartId(partRef->GetPart(false)) == this->GetPartId())
   {
-    this->SetPart(0, true);
+    this->SetPart(IWorkbenchPart::Pointer(0), true);
   }
 }
 
@@ -136,7 +136,7 @@ ISelection::Pointer PagePartSelectionTracker::GetSelection()
       return sp->GetSelection();
     }
   }
-  return 0;
+  return ISelection::Pointer(0);
 }
 
 void PagePartSelectionTracker::RemoveSelectionListener(
@@ -155,8 +155,8 @@ void PagePartSelectionTracker::RemovePostSelectionListener(
 
 PagePartSelectionTracker::~PagePartSelectionTracker()
 {
-  this->SetPart(0, false);
-  this->SetPage(0);
+  this->SetPart(IWorkbenchPart::Pointer(0), false);
+  this->SetPage(IWorkbenchPage::Pointer(0));
 }
 
 void PagePartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
@@ -193,7 +193,7 @@ ISelectionProvider::Pointer PagePartSelectionTracker::GetSelectionProvider()
   {
     return part->GetSite()->GetSelectionProvider();
   }
-  return 0;
+  return ISelectionProvider::Pointer(0);
 }
 
 void PagePartSelectionTracker::SetPartId(const std::string& partId)
@@ -229,7 +229,7 @@ void PagePartSelectionTracker::SetPart(IWorkbenchPart::Pointer part, bool notify
     ISelectionProvider::Pointer sp = fPart->GetSite()->GetSelectionProvider();
     if (sp.IsNotNull())
     {
-      sp->RemoveSelectionChangedListener(this);
+      sp->RemoveSelectionChangedListener(ISelectionChangedListener::Pointer(this));
       if (sp.Cast<IPostSelectionProvider>().IsNotNull())
       {
         sp.Cast<IPostSelectionProvider>()
@@ -248,7 +248,7 @@ void PagePartSelectionTracker::SetPart(IWorkbenchPart::Pointer part, bool notify
     ISelectionProvider::Pointer sp = part->GetSite()->GetSelectionProvider();
     if (sp.IsNotNull())
     {
-      sp->AddSelectionChangedListener(this);
+      sp->AddSelectionChangedListener(ISelectionChangedListener::Pointer(this));
       if (sp.Cast<IPostSelectionProvider>().IsNotNull())
       {
         sp.Cast<IPostSelectionProvider>()

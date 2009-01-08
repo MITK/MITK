@@ -37,8 +37,8 @@ namespace cherry
 {
 
 const int PartStack::PROP_SELECTION = 0x42;
-PartStack::PartStackDropResult::Pointer PartStack::dropResult =
-    new PartStack::PartStackDropResult();
+PartStack::PartStackDropResult::Pointer PartStack::dropResult(
+    new PartStack::PartStackDropResult());
 
 void PartStack::PartStackDropResult::SetTarget(PartStack::Pointer stack,
     PartPane::Pointer pane, StackDropResult::Pointer result)
@@ -143,7 +143,7 @@ void PartStack::MyStackPresentationSite::DragStart(
 void PartStack::MyStackPresentationSite::DragStart(Point& initialLocation,
     bool keyboard)
 {
-  partStack->DragStart(0, initialLocation, keyboard);
+  partStack->DragStart(IPresentablePart::Pointer(0), initialLocation, keyboard);
 }
 
 bool PartStack::MyStackPresentationSite::IsPartMoveable(
@@ -450,7 +450,7 @@ void PartStack::DescribeLayout(std::string& buf) const
 
 void PartStack::Add(StackablePart::Pointer child)
 {
-  this->Add(child, 0);
+  this->Add(child, Object::Pointer(0));
 }
 
 void PartStack::Add(StackablePart::Pointer newChild, Object::Pointer cookie)
@@ -460,7 +460,7 @@ void PartStack::Add(StackablePart::Pointer newChild, Object::Pointer cookie)
   // Fix for bug 78470:
   if(newChild->GetContainer().Cast<ContainerPlaceholder>() == 0)
   {
-    newChild->SetContainer(this);
+    newChild->SetContainer(IStackableContainer::Pointer(this));
   }
 
   this->ShowPart(newChild, cookie);
@@ -543,14 +543,14 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
 
   if (draggedObject.Cast<PartPane>() == 0)
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   PartPane::Pointer pane = draggedObject.Cast<PartPane>();
   if (this->IsStandalone()
       || !this->AllowsDrop(pane))
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   // Don't allow views to be dragged between windows
@@ -560,7 +560,7 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
       this->GetWorkbenchWindow()->GetWorkbench());
   if (differentWindows && !editorDropOK)
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   StackDropResult::Pointer dropResult = this->GetPresentation()->DragOver(
@@ -568,7 +568,7 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
 
   if (dropResult == 0)
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   return this->CreateDropTarget(pane, dropResult);
@@ -584,7 +584,7 @@ void PartStack::SetBounds(const Rectangle& r)
 
 IDropTarget::Pointer PartStack::CreateDropTarget(PartPane::Pointer pane, StackDropResult::Pointer result)
 {
-  dropResult->SetTarget(this, pane, result);
+  dropResult->SetTarget(PartStack::Pointer(this), pane, result);
   return dropResult;
 }
 
@@ -595,7 +595,7 @@ void PartStack::SetActive(bool isActive)
   // Add all visible children to the presentation
   for(ChildVector::iterator iter = children.begin(); iter != children.end(); ++iter)
   {
-    (*iter)->SetContainer(isActive ? this : 0);
+    (*iter)->SetContainer(isActive ? IStackableContainer::Pointer(this) : IStackableContainer::Pointer(0));
   }
 
   for (PresentableVector::iterator iter = presentableParts.begin();
@@ -626,7 +626,7 @@ void PartStack::CreateControl(void* parent, StackPresentation::Pointer presentat
   ChildVector childParts(children);
   for (ChildVector::iterator iter = childParts.begin(); iter != childParts.end(); ++iter)
   {
-    this->ShowPart(*iter, 0);
+    this->ShowPart(*iter, Object::Pointer(0));
   }
 
   if (savedPresentationState != 0)
@@ -708,7 +708,7 @@ void PartStack::FindSashes(PartPane::Sashes& sashes)
 
   if (container != 0)
   {
-    container->FindSashes(this, sashes);
+    container->FindSashes(LayoutPart::Pointer(this), sashes);
   }
 }
 
@@ -754,7 +754,7 @@ PartPane::Pointer PartStack::GetPaneFor(IPresentablePart::Pointer part)
 {
   if (part == 0 || part.Cast<PresentablePart>() == 0)
   {
-    return 0;
+    return PartPane::Pointer(0);
   }
 
   return part.Cast<PresentablePart>()->GetPane();
@@ -782,7 +782,7 @@ PresentablePart::Pointer PartStack::GetPresentablePart(StackablePart::Pointer pa
     }
   }
 
-  return 0;
+  return PresentablePart::Pointer(0);
 }
 
 StackPresentation::Pointer PartStack::GetPresentation()
@@ -843,7 +843,7 @@ void PartStack::Remove(StackablePart::Pointer child)
 
   if (this->GetPresentation() != 0)
   {
-    child->SetContainer(0);
+    child->SetContainer(IStackableContainer::Pointer(0));
   }
 
   if (child == requestedCurrent)
@@ -856,7 +856,7 @@ void PartStack::Reparent(void* newParent)
 {
 
   void* control = this->GetControl();
-  GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet::Pointer tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (tweaklet->GetParent(control) == newParent)
       || !tweaklet->IsReparentable(control))
   {
@@ -886,7 +886,7 @@ void PartStack::Replace(StackablePart::Pointer oldChild, StackablePart::Pointer 
       numPlaceholders++;
     }
   }
-  ObjectInt::Pointer cookie = new ObjectInt(idx - numPlaceholders);
+  ObjectInt::Pointer cookie(new ObjectInt(idx - numPlaceholders));
   children.insert(loc, newChild);
 
   this->ShowPart(newChild, cookie);
@@ -1241,7 +1241,7 @@ void PartStack::RefreshPresentationSelection()
     if (presentationCurrent != 0 && presentation != 0)
     {
       requestedCurrent->CreateControl(this->GetParent());
-      GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+      GuiWidgetsTweaklet::Pointer tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
       if (tweaklet->GetParent(requestedCurrent->GetControl()) !=
           tweaklet->GetParent(this->GetControl()))
       {
@@ -1359,7 +1359,7 @@ void PartStack::ShowPart(StackablePart::Pointer part, Object::Pointer cookie)
 
   if (part->IsPlaceHolder())
   {
-    part->SetContainer(this);
+    part->SetContainer(IStackableContainer::Pointer(this));
     return;
   }
 
@@ -1371,12 +1371,12 @@ void PartStack::ShowPart(StackablePart::Pointer part, Object::Pointer cookie)
 
   PartPane::Pointer pane = part.Cast<PartPane>();
 
-  PresentablePart::Pointer presentablePart = new PresentablePart(pane, Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(this->GetControl()));
+  PresentablePart::Pointer presentablePart(new PresentablePart(pane, Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(this->GetControl())));
   presentableParts.push_back(presentablePart);
 
   if (isActive)
   {
-    part->SetContainer(this);
+    part->SetContainer(IStackableContainer::Pointer(this));
 
     // The active part should always be enabled
     if (part->GetControl() != 0)
@@ -1402,11 +1402,11 @@ void PartStack::UpdateContainerVisibleTab()
 
   if (parts.size() < 1)
   {
-    this->SetSelection(0);
+    this->SetSelection(StackablePart::Pointer(0));
     return;
   }
 
-  PartPane::Pointer selPart = 0;
+  PartPane::Pointer selPart;
   int topIndex = 0;
   WorkbenchPage::Pointer page = this->GetPage();
 
@@ -1481,7 +1481,7 @@ void PartStack::DragStart(IPresentablePart::Pointer beingDragged, Point& initial
 {
   if (beingDragged == 0)
   {
-    this->PaneDragStart(0, initialLocation, keyboard);
+    this->PaneDragStart(PartPane::Pointer(0), initialLocation, keyboard);
   }
   else
   {
@@ -1523,7 +1523,7 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
         initialLocation.y = (int) (bounds.y + (ypct * bounds.height));
       }
 
-      DragUtil::PerformDrag(this, Geometry::ToDisplay(this->GetParent(),
+      DragUtil::PerformDrag(Object::Pointer(this), Geometry::ToDisplay(this->GetParent(),
               Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetPresentation()->GetControl())),
           initialLocation, !keyboard);
     }
@@ -1563,9 +1563,10 @@ IMemento::Pointer PartStack::GetSavedPresentationState()
 
 void PartStack::FireInternalPropertyChange(int id)
 {
-  ObjectInt::Pointer val = new ObjectInt(id);
-  PropertyChangeEvent::Pointer event = new PropertyChangeEvent(this,
-      IWorkbenchPartConstants::INTEGER_PROPERTY, val, val);
+  ObjectInt::Pointer val(new ObjectInt(id));
+  Object::Pointer source(this);
+  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(source,
+      IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
   propEvents.propertyChange(event);
 }
 

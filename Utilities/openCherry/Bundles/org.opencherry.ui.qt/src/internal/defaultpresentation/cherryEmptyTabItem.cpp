@@ -37,7 +37,7 @@ void EmptyTabItem::Dispose()
 
 Object::Pointer EmptyTabItem::GetData()
 {
-  return 0;
+  return Object::Pointer(0);
 }
 
 void EmptyTabItem::SetData(Object::Pointer data)

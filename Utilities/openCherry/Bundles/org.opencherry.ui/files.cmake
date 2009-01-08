@@ -43,6 +43,11 @@ SET(SRC_CPP_FILES
   application/cherryWorkbenchAdvisor.cpp
   application/cherryWorkbenchWindowAdvisor.cpp
   
+  #commands
+  #commands/cherryContributionItem.cpp
+  #commands/cherryContributionManager.cpp
+  #commands/cherryIContributionManagerOverrides.cpp
+  
   #dialogs
   dialogs/cherryIDialog.cpp
   dialogs/cherryMessageDialog.cpp
@@ -51,6 +56,10 @@ SET(SRC_CPP_FILES
   guitk/cherryGuiTkIControlListener.cpp
   guitk/cherryGuiTkISelectionListener.cpp
   guitk/cherryGuiTkSelectionEvent.cpp
+  
+  #handlers
+  handlers/cherryHandlerUtil.cpp
+  handlers/cherryShowViewHandler.cpp
   
   #tweaklets
   tweaklets/cherryDnDTweaklet.cpp
@@ -67,10 +76,6 @@ SET(SRC_CPP_FILES
   presentations/cherryStackPresentation.cpp
 )
 
-SET(HANDLERS_CPP_FILES
-  cherryHandlerUtil.cpp
-  cherryShowViewHandler.cpp
-)
 
 SET(INTERNAL_CPP_FILES
   cherryContainerPlaceholder.cpp
@@ -154,7 +159,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-
-foreach(file ${HANDLERS_CPP_FILES})
-  SET(CPP_FILES ${CPP_FILES} src/handlers/${file})
-endforeach(file ${HANDLERS_CPP_FILES})

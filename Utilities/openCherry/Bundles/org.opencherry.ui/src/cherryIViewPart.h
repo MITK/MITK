@@ -106,7 +106,7 @@ struct CHERRY_UI IViewPart : public virtual IWorkbenchPart {
      * @param memento the IViewPart state or null if there is no previous saved state
      * @exception PartInitException if this view was not initialized successfully
      */
-    virtual void Init(IViewSite::Pointer site, IMemento::Pointer memento = 0) = 0;
+    virtual void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(0)) = 0;
 
     /**
      * Saves the object state within a memento.

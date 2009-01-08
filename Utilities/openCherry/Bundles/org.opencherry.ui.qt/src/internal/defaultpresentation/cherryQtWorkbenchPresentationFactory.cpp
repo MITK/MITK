@@ -54,8 +54,8 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentat
 
   PresentablePartFolder* partFolder = new PresentablePartFolder(folder);
 
-  StackPresentation::Pointer result =
-          new TabbedStackPresentation(site, partFolder); //, new StandardEditorSystemMenu(site));
+  StackPresentation::Pointer result(
+          new TabbedStackPresentation(site, partFolder)); //, new StandardEditorSystemMenu(site));
 
 //  DefaultThemeListener themeListener =
 //      new DefaultThemeListener(folder, result.getTheme());
@@ -87,8 +87,8 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
   //folder->SetUnselectedCloseVisible(false);
   //folder->SetUnselectedImageVisible(true);
 
-  StackPresentation::Pointer result =
-          new TabbedStackPresentation(site, partFolder); //, new StandardViewSystemMenu(site));
+  StackPresentation::Pointer result(
+          new TabbedStackPresentation(site, partFolder)); //, new StandardViewSystemMenu(site));
 
 //  DefaultThemeListener themeListener =
 //      new DefaultThemeListener(folder, result.getTheme());
@@ -108,8 +108,8 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateStandaloneViewP
     return this->CreateViewPresentation(parent, site);
   }
   EmptyTabFolder* folder = new EmptyTabFolder(static_cast<QWidget*>(parent), true);
-  StackPresentation::Pointer presentation =
-          new TabbedStackPresentation(site, folder); //, new StandardViewSystemMenu(site));
+  StackPresentation::Pointer presentation(
+          new TabbedStackPresentation(site, folder)); //, new StandardViewSystemMenu(site));
 
   return presentation;
 }

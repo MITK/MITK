@@ -93,7 +93,7 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
         ::GetDefault()->GetPerspectiveRegistry())
     ->FindPerspectiveWithId(originalId);
 
-    return target == 0 ? 0 : target.Cast<PerspectiveDescriptor>()->CreateFactory();
+    return target == 0 ? IPerspectiveFactory::Pointer(0) : target.Cast<PerspectiveDescriptor>()->CreateFactory();
   }
 
   // otherwise try to create the executable extension
@@ -101,8 +101,8 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
   {
     try
     {
-      IPerspectiveFactory::Pointer factory = configElement
-      ->CreateExecutableExtension<IPerspectiveFactory>(WorkbenchRegistryConstants::ATT_CLASS);
+      IPerspectiveFactory::Pointer factory(configElement
+      ->CreateExecutableExtension<IPerspectiveFactory>(WorkbenchRegistryConstants::ATT_CLASS));
       return factory;
     }
     catch (CoreException& e)
@@ -111,13 +111,13 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
     }
   }
 
-  return 0;
+  return IPerspectiveFactory::Pointer(0);
 }
 
 void PerspectiveDescriptor::DeleteCustomDefinition()
 {
   dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
-      ->GetPerspectiveRegistry())->DeleteCustomDefinition(this);
+      ->GetPerspectiveRegistry())->DeleteCustomDefinition(PerspectiveDescriptor::Pointer(this));
 }
 
 std::string PerspectiveDescriptor::GetDescription()
@@ -166,7 +166,7 @@ std::string PerspectiveDescriptor::GetOriginalId()
 bool PerspectiveDescriptor::HasCustomDefinition()
 {
   return dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
-      ->GetPerspectiveRegistry())->HasCustomDefinition(this);
+      ->GetPerspectiveRegistry())->HasCustomDefinition(PerspectiveDescriptor::Pointer(this));
 }
 
 bool PerspectiveDescriptor::HasDefaultFlag()

@@ -22,6 +22,7 @@
 #include "cherryUiDll.h"
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 
 namespace cherry {
 

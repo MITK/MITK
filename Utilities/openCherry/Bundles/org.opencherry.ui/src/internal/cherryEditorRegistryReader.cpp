@@ -49,7 +49,7 @@ bool EditorRegistryReader::ReadElement(IConfigurationElement::Pointer element)
     return true;
   }
 
-  EditorDescriptor::Pointer editor = new EditorDescriptor(id, element);
+  EditorDescriptor::Pointer editor(new EditorDescriptor(id, element));
 
   std::vector<std::string> extensionsVector;
   std::vector<std::string> filenamesVector;

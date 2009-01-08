@@ -20,6 +20,7 @@
 #define CHERRYSTACKDROPRESULT_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 
 #include "../cherryRectangle.h"
 

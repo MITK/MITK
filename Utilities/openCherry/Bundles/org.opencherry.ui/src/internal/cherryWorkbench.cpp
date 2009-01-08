@@ -54,7 +54,7 @@ Workbench::ServiceLocatorOwner::ServiceLocatorOwner(Workbench* wb)
 
 void Workbench::ServiceLocatorOwner::Dispose() {
   MessageDialog::OpenInformation(
-              0,
+              Shell::Pointer(0),
               "Restart needed",
               "A required plug-in is no longer available and the Workbench needs to be restarted. You will be prompted to save if there is any unsaved work.");
   workbench->Close(PlatformUI::RETURN_RESTART, true);
@@ -69,7 +69,7 @@ Workbench::Workbench(WorkbenchAdvisor* advisor)
   this->advisor = advisor;
   Workbench::instance = this;
 
-  IServiceLocatorCreator::Pointer slc = new ServiceLocatorCreator();
+  IServiceLocatorCreator::Pointer slc(new ServiceLocatorCreator());
   this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(0, 0, &serviceLocatorOwner));
   serviceLocator->RegisterService(IServiceLocatorCreator::GetManifestName(), slc);
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
@@ -168,8 +168,9 @@ void Workbench::InitializeDefaultServices()
 //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
 //
 //      public void runWithException() {
+        Object::Pointer service(new SaveablesList());
         serviceLocator->RegisterService(ISaveablesLifecycleListener::GetManifestName(),
-            new SaveablesList());
+            service);
 //      }});
 //
 //    /*
@@ -638,7 +639,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
     }
   }
 
-  return 0;
+  return IWorkbenchPage::Pointer(0);
 
   // If another window that has the workspace root as input and the
   // requested
@@ -732,7 +733,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
     const std::string& perspectiveId, IWorkbenchWindow::Pointer window,
     IAdaptable* input)
 {
-  return 0;
+  return IWorkbenchPage::Pointer(0);
   //    // If the specified window has the requested perspective open and the
   //    // same requested
   //    // input, then the window is given focus and the perspective is shown.
@@ -897,7 +898,7 @@ void Workbench::SetActivatedWindow(WorkbenchWindow::Pointer window)
 
 WorkbenchWindow::Pointer Workbench::NewWorkbenchWindow()
 {
-  WorkbenchWindow::Pointer wbw = new WorkbenchWindow(this->GetNewWindowNumber());
+  WorkbenchWindow::Pointer wbw(new WorkbenchWindow(this->GetNewWindowNumber()));
   //wbw->Init();
   return wbw;
 }
@@ -1106,7 +1107,7 @@ IWorkbenchWindow::Pointer Workbench::RestoreWorkbenchWindow(IMemento::Pointer me
 
   try
   {
-    newWindow->RestoreState(memento, 0);
+    newWindow->RestoreState(memento, IPerspectiveDescriptor::Pointer(0));
     newWindow->FireWindowRestored();
     newWindow->Open();
     opened = true;

@@ -20,8 +20,9 @@
 #define CHERRYIWORKBENCHLISTENER_H_
 
 #include "cherryUiDll.h"
-#include "cherryMacros.h"
 
+#include <cherryMacros.h>
+#include <cherryObject.h>
 #include <cherryMessage.h>
 
 namespace cherry

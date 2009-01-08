@@ -39,7 +39,7 @@ cherry::ActionBarAdvisor::Pointer
 QmitkWorkbenchWindowAdvisor::CreateActionBarAdvisor(
     cherry::IActionBarConfigurer::Pointer configurer)
 {
-  cherry::ActionBarAdvisor::Pointer actionBarAdvisor = new QmitkActionBarAdvisor(configurer);
+  cherry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkActionBarAdvisor(configurer));
   return actionBarAdvisor;
 }
 

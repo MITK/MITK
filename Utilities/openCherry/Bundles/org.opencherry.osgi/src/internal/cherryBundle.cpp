@@ -204,7 +204,7 @@ Bundle::Start()
 //    BundleEvent starting(this, BundleEvent::EV_BUNDLE_STARTING);
 //    this->GetEvents().bundleStarting(this, starting);
 
-    m_Activator->Start(m_BundleLoader.GetContextForBundle(this));
+    m_Activator->Start(m_BundleLoader.GetContextForBundle(IBundle::Pointer(this)));
 
     std::cout << "Activator started!\n";
     m_State = BUNDLE_ACTIVE;

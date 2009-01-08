@@ -43,7 +43,7 @@ namespace cherry {
 BundleLoader::BundleLoader(CodeCache* codeCache, Poco::Logger& logger) //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
  : m_CodeCache(codeCache), m_Logger(logger)
 {
- 
+
 }
 
 BundleLoader::~BundleLoader()
@@ -146,7 +146,7 @@ BundleLoader::GetPathForLibrary(const std::string& libraryName)
 }
 
 Poco::Path
-BundleLoader::GetLibraryPathFor(IBundle* bundle)
+BundleLoader::GetLibraryPathFor(IBundle::Pointer bundle)
 {
   std::string libName = bundle->GetActivatorLibrary();
   if (libName.empty()) libName = "lib" + bundle->GetSymbolicName();
@@ -154,13 +154,13 @@ BundleLoader::GetLibraryPathFor(IBundle* bundle)
 }
 
 std::string
-BundleLoader::GetContributionsPathFor(IBundle* /*bundle*/)
+BundleLoader::GetContributionsPathFor(IBundle::Pointer /*bundle*/)
 {
   return "plugin.xml";
 }
 
 void
-BundleLoader::ResolveBundle(IBundle* bundle)
+BundleLoader::ResolveBundle(IBundle::Pointer bundle)
 {
   try
   {
@@ -195,7 +195,7 @@ BundleLoader::ResolveAllBundles()
 }
 
 void
-BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list, const std::string& baseDir)
+BundleLoader::ListLibraries(IBundle::Pointer bundle, std::vector<std::string>& list, const std::string& baseDir)
 {
   std::vector<std::string> tmpList;
   bundle->GetStorage().List(baseDir, tmpList);
@@ -222,7 +222,7 @@ BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list, con
       {
         iter = tmpList.erase(iter);
       }
-     
+
     }
   }
 
@@ -230,7 +230,7 @@ BundleLoader::ListLibraries(IBundle* bundle, std::vector<std::string>& list, con
 }
 
 void
-BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
+BundleLoader::InstallLibraries(IBundle::Pointer bundle, bool copy)
 {
   std::vector<std::string> libraries;
   this->ListLibraries(bundle, libraries);
@@ -284,7 +284,7 @@ BundleLoader::InstallLibraries(IBundle* bundle, bool copy)
         // On Windows, we set the path environment variable to include
         // the path to the library, so the loader can find it. We do this
         // programmatically because otherwise, a user would have to edit
-        // a batch file every time he adds a new plugin from outside the 
+        // a batch file every time he adds a new plugin from outside the
         // build system.
         #ifdef CHERRY_OS_FAMILY_WINDOWS
         DWORD size = GetEnvironmentVariableA("path", 0, 0);
@@ -321,11 +321,11 @@ void BundleLoader::ReadAllContributions()
   }
 }
 
-void BundleLoader::ReadContributions(IBundle* bundle)
+void BundleLoader::ReadContributions(IBundle::Pointer bundle)
 {
   this->ReadDependentContributions(bundle);
 
-  IExtensionPointService* service = Platform::GetExtensionPointService();
+  IExtensionPointService::Pointer service = Platform::GetExtensionPointService();
   if (service->HasContributionFrom(bundle->GetSymbolicName())) return;
 
   try
@@ -340,7 +340,7 @@ void BundleLoader::ReadContributions(IBundle* bundle)
   }
 }
 
-void BundleLoader::ReadDependentContributions(IBundle* bundle)
+void BundleLoader::ReadDependentContributions(IBundle::Pointer bundle)
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
   const IBundleManifest::Dependencies& deps = bundle->GetRequiredBundles();
@@ -367,7 +367,7 @@ BundleLoader::StartAllBundles()
 }
 
 void
-BundleLoader::StartBundle(Bundle* bundle)
+BundleLoader::StartBundle(Bundle::Pointer bundle)
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
 
@@ -387,7 +387,7 @@ BundleLoader::StartBundle(Bundle* bundle)
 }
 
 void
-BundleLoader::StartSystemBundle(SystemBundle* bundle)
+BundleLoader::StartSystemBundle(SystemBundle::Pointer bundle)
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
 
@@ -403,7 +403,7 @@ BundleLoader::StartSystemBundle(SystemBundle* bundle)
 }
 
 void
-BundleLoader::StartDependencies(Bundle* bundle)
+BundleLoader::StartDependencies(Bundle::Pointer bundle)
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
 

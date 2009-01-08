@@ -220,7 +220,7 @@ public:
   static std::string ARG_PLUGIN_CACHE;
   static std::string ARG_PLUGIN_DIRS;
 
-  static IExtensionPointService* GetExtensionPointService();
+  static SmartPointer<IExtensionPointService> GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();
 
   static PlatformEvents& GetEvents();
@@ -271,7 +271,7 @@ public:
    * @return a local file system path
    * TODO Investigate the usage of a service factory
    */
-  static Poco::Path GetStatePath(IBundle* bundle);
+  static Poco::Path GetStatePath(SmartPointer<IBundle> bundle);
 
   /**
    * Returns the path of the platform's user data area.  The user data area is a location on the system

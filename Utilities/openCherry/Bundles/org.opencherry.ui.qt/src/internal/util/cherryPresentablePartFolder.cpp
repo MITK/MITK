@@ -150,8 +150,8 @@ void PresentablePartFolder::ChildPropertyChanged(
   }
   else if (property == IPresentablePart::PROP_PREFERRED_SIZE)
   {
-    TabFolderEvent::Pointer event =
-        new TabFolderEvent(TabFolderEvent::EVENT_PREFERRED_SIZE, tab, 0, 0);
+    TabFolderEvent::Pointer event(
+        new TabFolderEvent(TabFolderEvent::EVENT_PREFERRED_SIZE, tab, 0, 0));
     folder->FireEvent(event);
   }
   else
@@ -210,7 +210,7 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
 
   // NOTE: if the shape of contentProxy changes, the fix for bug 85899 in EmptyTabFolder.computeSize may need adjustment.
   contentListener = new ContentProxyListener(this);
-  contentProxy = new QtControlWidget(folder->GetContentParent());
+  contentProxy = new QtControlWidget(folder->GetContentParent(), Shell::Pointer(0));
   //contentProxy->setVisible(false);
   int i = 0;
   for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
@@ -271,7 +271,7 @@ void PresentablePartFolder::Remove(IPresentablePart::Pointer toRemove)
 {
   if (toRemove == current)
   {
-    this->Select(0);
+    this->Select(IPresentablePart::Pointer(0));
   }
 
   this->InternalRemove(toRemove);
@@ -361,7 +361,7 @@ IPresentablePart::Pointer PresentablePartFolder::GetPartForTab(
 {
   if (tab == 0)
   {
-    return 0;
+    return IPresentablePart::Pointer(0);
   }
 
   IPresentablePart::Pointer part = tab->GetData().Cast<IPresentablePart> ();

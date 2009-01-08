@@ -19,6 +19,8 @@
 #define CHERRYIEDITORINPUT_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
+
 #include "cherryUiDll.h"
 
 namespace cherry
@@ -32,7 +34,7 @@ namespace cherry
  * the model source for an <code>IEditorPart</code>.
  * <p>
  * Clients implementing this editor input interface must override
- * <code>IEditorInput#operator==(const IEditorInput*)</code> to answer true
+ * <code>Object#operator==(const Object*)</code> to answer true
  * for two inputs that are
  * the same. The <code>IWorbenchPage.openEditor</code> APIs are dependent on
  * this to find an editor with the same input.
@@ -132,7 +134,7 @@ struct CHERRY_UI IEditorInput : public Object // public IAdaptable
    * Returns true if two editor inputs are the same
    *
    */
-  virtual bool operator==(const IEditorInput* o) const = 0;
+  virtual bool operator==(const Object* o) const = 0;
 };
 
 }

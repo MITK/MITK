@@ -38,12 +38,12 @@ std::string DataStorageEditorInput::GetToolTipText() const
   return "";
 }
 
-bool DataStorageEditorInput::operator==(const cherry::IEditorInput* o) const
+bool DataStorageEditorInput::operator==(const cherry::Object* o) const
 {
-  const DataStorageEditorInput* input = dynamic_cast<const DataStorageEditorInput*>(o);
-  if (input == 0) return false;
+  if (const DataStorageEditorInput* input = dynamic_cast<const DataStorageEditorInput*>(o))
+    return this->GetName() == input->GetName();
 
-  return this->GetName() == input->GetName();
+  return false;
 }
 
 IDataStorageReference::Pointer
@@ -53,7 +53,7 @@ DataStorageEditorInput::GetDataStorageReference()
   {
     cherry::ServiceRegistry& serviceRegistry = cherry::Platform::GetServiceRegistry();
     IDataStorageService::Pointer dataService = serviceRegistry.GetServiceById<IDataStorageService>(IDataStorageService::ID);
-    if (dataService.IsNull()) return 0;
+    if (!dataService) return IDataStorageReference::Pointer(0);
     m_DataStorageRef = dataService->GetDefaultDataStorage();
   }
 

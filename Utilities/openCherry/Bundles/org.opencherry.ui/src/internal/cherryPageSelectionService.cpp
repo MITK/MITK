@@ -153,7 +153,7 @@ PagePartSelectionTracker::Pointer PageSelectionService::GetPerPartTracker(
 PagePartSelectionTracker::Pointer PageSelectionService::CreatePartTracker(
     const std::string& partId)
 {
-  PagePartSelectionTracker::Pointer tracker = new PagePartSelectionTracker(this->GetPage(), partId);
+  PagePartSelectionTracker::Pointer tracker(new PagePartSelectionTracker(this->GetPage(), partId));
   return tracker;
 }
 
@@ -165,7 +165,7 @@ ISelection::Pointer PageSelectionService::GetSelection()
   }
   else
   {
-    return 0;
+    return ISelection::Pointer(0);
   }
 }
 
@@ -241,8 +241,8 @@ void PageSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
   }
   else
   {
-    this->FireSelection(0, 0);
-    this->FirePostSelection(0, 0);
+    this->FireSelection(IWorkbenchPart::Pointer(0), ISelection::Pointer(0));
+    this->FirePostSelection(IWorkbenchPart::Pointer(0), ISelection::Pointer(0));
   }
 }
 

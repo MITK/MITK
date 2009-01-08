@@ -109,7 +109,7 @@ void ContainerPlaceholder::SetRealContainer(
     for (std::list<StackablePart::Pointer>::iterator iter = children.begin(); iter
         != children.end(); ++iter)
     {
-      (*iter)->SetContainer(this);
+      (*iter)->SetContainer(IStackableContainer::Pointer(this));
     }
   }
 
@@ -121,7 +121,7 @@ void ContainerPlaceholder::FindSashes(PartPane::Sashes& sashes)
   ILayoutContainer::Pointer container = this->GetContainer();
 
   if (container != 0) {
-      container->FindSashes(this, sashes);
+      container->FindSashes(LayoutPart::Pointer(this), sashes);
   }
 }
 

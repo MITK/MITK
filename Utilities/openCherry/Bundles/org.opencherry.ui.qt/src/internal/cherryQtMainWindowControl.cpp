@@ -26,7 +26,7 @@
 
 namespace cherry {
 
-QtMainWindowControl::QtMainWindowControl(QWidget* parent, Shell* shell, Qt::WindowFlags flags)
+QtMainWindowControl::QtMainWindowControl(Shell::Pointer shell, QWidget* parent, Qt::WindowFlags flags)
  : QMainWindow(parent, flags)
 {
   controller = new QtWidgetController(shell);
@@ -40,7 +40,7 @@ QtMainWindowControl::QtMainWindowControl(QWidget* parent, Shell* shell, Qt::Wind
 void QtMainWindowControl::changeEvent(QEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
-  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
+  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
   switch (event->type())
   {
   case QEvent::WindowActivate:
@@ -111,7 +111,7 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
-  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
+  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
 
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();
@@ -129,19 +129,19 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 
 void QtMainWindowControl::moveEvent(QMoveEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, event->pos().x(), event->pos().y());
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(this, event->pos().x(), event->pos().y()));
   controller->controlEvents.movedEvent(controlEvent);
 }
 
 void QtMainWindowControl::resizeEvent(QResizeEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this, 0, 0, event->size().width(), event->size().height());
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(this, 0, 0, event->size().width(), event->size().height()));
   controller->controlEvents.resizedEvent(controlEvent);
 }
 
 void QtMainWindowControl::inFocusEvent(QFocusEvent* /*event*/)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(this);
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(this));
   controller->controlEvents.activatedEvent(controlEvent);
 }
 

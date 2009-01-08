@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
 Date:      $Date: 2008-04-24 18:31:42 +0200 (Do, 24 Apr 2008) $
 Version:   $Revision: 1.0 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QmitkToolGUI_h_Included
@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 //!mm
 //#include <itkObject.h>
 #include <cherryMacros.h>
+#include <cherryObject.h>
 //!
 
 #include "mitkCommon.h"
@@ -59,15 +60,15 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public virt
     //virtual void UnRegister() const;
     //virtual void SetReferenceCount(int);
     //!
-    
+
     virtual ~QmitkToolGUI();
 
   signals:
-    
+
     void NewToolAssociated( mitk::Tool* );
 
   public slots:
-  
+
   protected slots:
 
   protected:

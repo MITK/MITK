@@ -44,7 +44,7 @@ void WorkbenchWindowAdvisor::PreWindowOpen()
 ActionBarAdvisor::Pointer WorkbenchWindowAdvisor::CreateActionBarAdvisor(
     IActionBarConfigurer::Pointer configurer)
 {
-  ActionBarAdvisor::Pointer actionBarAdvisor = new ActionBarAdvisor(configurer);
+  ActionBarAdvisor::Pointer actionBarAdvisor(new ActionBarAdvisor(configurer));
   return actionBarAdvisor;
 }
 

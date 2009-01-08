@@ -69,9 +69,9 @@ LayoutTree::Pointer LayoutTree::Find(LayoutPart::Pointer child)
 {
   if (part != child)
   {
-    return 0;
+    return LayoutTree::Pointer(0);
   }
-  return this;
+  return LayoutTree::Pointer(this);
 }
 
 void LayoutTree::FindSashes(PartPane::Sashes sashes)
@@ -80,7 +80,7 @@ void LayoutTree::FindSashes(PartPane::Sashes sashes)
   {
     return;
   }
-  this->GetParent()->FindSashes(this, sashes);
+  this->GetParent()->FindSashes(LayoutTree::Pointer(this), sashes);
 }
 
 LayoutPart::Pointer LayoutTree::FindBottomRight()
@@ -90,7 +90,7 @@ LayoutPart::Pointer LayoutTree::FindBottomRight()
 
 LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer sash)
 {
-  return 0;
+  return LayoutTreeNode::Pointer(0);
 }
 
 Rectangle LayoutTree::GetBounds()
@@ -373,12 +373,12 @@ LayoutTree::Pointer LayoutTree::Insert(LayoutPart::Pointer child, bool left,
     LayoutPartSash::Pointer sash, LayoutPart::Pointer relative)
 {
   LayoutTree::Pointer relativeChild = this->Find(relative);
-  LayoutTreeNode::Pointer node = new LayoutTreeNode(sash);
+  LayoutTreeNode::Pointer node(new LayoutTreeNode(sash));
   if (relativeChild == 0)
   {
     //Did not find the relative part. Insert beside the root.
     node->SetChild(left, child);
-    node->SetChild(!left, this);
+    node->SetChild(!left, LayoutTree::Pointer(this));
     return node;
   }
   else
@@ -392,7 +392,7 @@ LayoutTree::Pointer LayoutTree::Insert(LayoutPart::Pointer child, bool left,
       return node;
     }
     oldParent->ReplaceChild(relativeChild, node);
-    return this;
+    return LayoutTree::Pointer(this);
   }
 }
 
@@ -416,13 +416,13 @@ LayoutTree::Pointer LayoutTree::Remove(LayoutPart::Pointer child)
   LayoutTree::Pointer tree = this->Find(child);
   if (tree == 0)
   {
-    return this;
+    return LayoutTree::Pointer(this);
   }
-  LayoutTreeNode::Pointer oldParent = tree->GetParent();
+  LayoutTreeNode::Pointer oldParent(tree->GetParent());
   if (oldParent == 0)
   {
     //It was the root and the only child of this tree
-    return 0;
+    return LayoutTree::Pointer(0);
   }
   if (oldParent->GetParent() == 0)
   {
@@ -430,7 +430,7 @@ LayoutTree::Pointer LayoutTree::Remove(LayoutPart::Pointer child)
   }
 
   oldParent->Remove(tree);
-  return this;
+  return LayoutTree::Pointer(this);
 }
 
 void LayoutTree::SetBounds(const Rectangle& bounds)

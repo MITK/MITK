@@ -273,7 +273,7 @@ protected: virtual std::string GetInitialScopeId();
    * @param adapter
    * @return
    */
-public: Object::Pointer GetAdapter(const std::type_info& adapter);
+protected: void* GetAdapterImpl(const std::type_info& adapter) const;
 
 //public: virtual void ActivateActionBars(bool forceVisibility);
 

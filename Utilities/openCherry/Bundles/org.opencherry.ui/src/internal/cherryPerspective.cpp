@@ -125,7 +125,7 @@ IViewReference::Pointer Perspective::FindView(const std::string& id, const std::
       return ref;
     }
   }
-  return 0;
+  return IViewReference::Pointer(0);
 }
 
 void* Perspective::GetClientComposite()
@@ -208,7 +208,7 @@ void Perspective::HideEditorArea()
   }
 
   // Show the editor in the appropriate location
-  if (this->UseNewMinMax(this))
+  if (this->UseNewMinMax(Perspective::Pointer(this)))
   {
     // If it's the currently maximized part we have to restore first
 //    if (this->GetPresentation().getMaximizedStack().Cast<EditorStack>() != 0)
@@ -386,7 +386,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   }
 
   // Create layout factory.
-  ViewSashContainer::Pointer container = new ViewSashContainer(page, this->GetClientComposite());
+  ViewSashContainer::Pointer container(new ViewSashContainer(page, this->GetClientComposite()));
   layout = new PageLayout(container, this->GetViewFactory(),
       editorArea, descriptor);
   layout->SetFixed(descriptor->GetFixed());
@@ -510,7 +510,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   fixed = layout->IsFixed();
 
   // Create presentation.
-  presentation = new PerspectiveHelper(page, container, this);
+  presentation = new PerspectiveHelper(page, container, Perspective::Pointer(this));
 
   // Hide editor area if requested by factory
   if (!layout->IsEditorAreaVisible())
@@ -557,7 +557,7 @@ void Perspective::OnActivate()
 //  setAllPinsVisible(true);
 
   // Trim Stack Support
-  bool useNewMinMax = Perspective::UseNewMinMax(this);
+  bool useNewMinMax = Perspective::UseNewMinMax(Perspective::Pointer(this));
   bool hideEditorArea = shouldHideEditorsOnActivate || (editorHidden && editorHolder == 0);
 
   // We have to set the editor area's stack state -before-
@@ -1135,7 +1135,7 @@ std::vector<std::string> Perspective::GetShowInIdsFromRegistry()
   PerspectiveExtensionReader reader;
   //reader.setIncludeOnlyTags(new String[]
   //    { IWorkbenchRegistryConstants.TAG_SHOW_IN_PART});
-  PageLayout::Pointer layout = new PageLayout();
+  PageLayout::Pointer layout(new PageLayout());
   reader.ExtendLayout(descriptor->GetOriginalId(), layout);
   return layout->GetShowInPartIds();
 }
@@ -1414,7 +1414,7 @@ void Perspective::ShowEditorArea()
   editorHidden = false;
 
   // Show the editor in the appropriate location
-  if (this->UseNewMinMax(this))
+  if (this->UseNewMinMax(Perspective::Pointer(this)))
   {
     bool isMinimized = editorAreaState == IStackPresentationSite::STATE_MINIMIZED;
     if (!isMinimized)
@@ -1554,7 +1554,7 @@ IViewPart::Pointer Perspective::ShowView(const std::string& viewId, const std::s
 //  }
 //  else
 //  {
-    if (this->UseNewMinMax(this))
+    if (this->UseNewMinMax(Perspective::Pointer(this)))
     {
       // Is this view going to show in the trim?
  //     LayoutPart vPart = presentation.findPart(viewId, secondaryId);

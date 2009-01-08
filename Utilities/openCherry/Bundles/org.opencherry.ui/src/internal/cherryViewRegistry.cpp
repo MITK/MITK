@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include <service/cherryIExtensionPointService.h>
@@ -49,7 +49,7 @@ std::vector<std::string> ViewRegistry::ViewCategoryProxy::GetPath() const
   std::vector<std::string> path;
   std::string rawParentPath = rawCategory->GetRawParentPath();
   // nested categories are not supported yet
-  // assume an empty raw parent path 
+  // assume an empty raw parent path
   path.push_back(rawParentPath);
   return path;
 }
@@ -59,9 +59,12 @@ std::string ViewRegistry::ViewCategoryProxy::GetLabel() const
   return rawCategory->GetLabel();
 }
 
-bool ViewRegistry::ViewCategoryProxy::operator==(const IViewCategory* o) const
+bool ViewRegistry::ViewCategoryProxy::operator==(const Object* o) const
 {
-  return this->GetId() == o->GetId();
+  if (const IViewCategory* other = dynamic_cast<const IViewCategory*>(o))
+    return this->GetId() == other->GetId();
+
+  return false;
 }
 
 int ViewRegistry::ViewCategoryProxy::HashCode()
@@ -71,7 +74,7 @@ int ViewRegistry::ViewCategoryProxy::HashCode()
 }
 
 std::string ViewRegistry::EXTENSIONPOINT_UNIQUE_ID = "org.opencherry.ui.views";
-    // PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_VIEWS; 
+    // PlatformUI::PLUGIN_ID + "." + WorkbenchRegistryConstants::PL_VIEWS;
 
 
 Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::InternalFindCategory(const std::string& id)
@@ -99,7 +102,7 @@ ViewRegistry::ViewRegistry() :
 {
   miscCategory = new IViewDescriptorCategory();
   this->Add(miscCategory);
-  
+
   //PlatformUI.getWorkbench().getExtensionTracker().registerHandler(this,
   //    ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
   reader.ReadViews(this);
@@ -134,7 +137,7 @@ void ViewRegistry::Add(ViewDescriptor::Pointer desc)
   {
     if (desc.GetPointer() == itr->GetPointer()) return;
   }
-  
+
   views.push_back(desc);
   dirtyViewCategoryMappings = true;
   //desc.activateHandler();
@@ -153,7 +156,7 @@ IViewDescriptor::Pointer ViewRegistry::Find(const std::string& id) const
   return IViewDescriptor::Pointer(0);
 }
 
-IViewCategory::Pointer ViewRegistry::FindCategory(const std::string& id) 
+IViewCategory::Pointer ViewRegistry::FindCategory(const std::string& id)
 {
   this->MapViewsToCategories();
   IViewDescriptorCategoryPtr category(this->InternalFindCategory(id));
@@ -172,7 +175,7 @@ std::vector<IViewCategory::Pointer> ViewRegistry::GetCategories()
   for (std::vector<IViewDescriptorCategoryPtr>::iterator itr = categories.begin();
        itr != categories.end(); ++itr)
   {
-    retArray.push_back(new ViewCategoryProxy(*itr));
+    retArray.push_back(IViewCategory::Pointer(new ViewCategoryProxy(*itr)));
   }
   return retArray;
 }
@@ -196,7 +199,7 @@ void ViewRegistry::MapViewsToCategories()
     for (std::vector<IViewDescriptorCategoryPtr>::iterator i = categories.begin();
          i != categories.end(); ++i)
     {
-      (*i)->Clear(); // this is bad        
+      (*i)->Clear(); // this is bad
     }
 
     miscCategory->Clear();
@@ -224,7 +227,7 @@ void ViewRegistry::MapViewsToCategories()
         {
           // If we get here, this view specified a category which
           // does not exist. Add this view to the 'Other' category
-          // but give out a message (to the log only) indicating 
+          // but give out a message (to the log only) indicating
           // this has been done.
           std::string fmt(Poco::Logger::format(
               "Category $0 not found for view $1.  This view added to ''$2'' category.",

@@ -211,7 +211,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     }
 
     toolButton->setChecked(true);
-    
+
     if (m_ToolGUIWidget && tool)
     {
       // create and reparent new GUI (if any)
@@ -219,7 +219,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
       //itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
       //QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
       //#changed:
-      cherry::IExtensionPointService* service = cherry::Platform::GetExtensionPointService();
+      cherry::IExtensionPointService::Pointer service = cherry::Platform::GetExtensionPointService();
       cherry::IConfigurationElement::vector ces(
         service->GetConfigurationElementsFor("org.mitk.gui.qt.interactivesegmentation.qmitktoolguis"));
 
@@ -430,7 +430,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       ++column;
       // new line if we are at the maximum columns
       if(column == m_LayoutColumns)
-      {        
+      {
         ++row;
         column = 0;
       }

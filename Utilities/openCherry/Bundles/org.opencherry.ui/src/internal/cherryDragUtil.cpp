@@ -28,7 +28,7 @@ namespace cherry
 const std::string DragUtil::DROP_TARGET_ID =
     "org.opencherry.ui.internal.dropTarget";
 
-TestDropLocation::Pointer DragUtil::forcedDropTarget = 0;
+TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 
 std::list<IDragOverListener::Pointer> DragUtil::defaultTargets =
     std::list<IDragOverListener::Pointer>();
@@ -122,7 +122,7 @@ IDropTarget::Pointer DragUtil::GetDropTarget(
     }
   }
 
-  return 0;
+  return IDropTarget::Pointer(0);
 }
 
 void DragUtil::AddDragTarget(void* control, IDragOverListener::Pointer target)
@@ -161,7 +161,7 @@ void DragUtil::RemoveDragTarget(void* control,
       if (targetList->empty())
       {
         Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetData(control,
-            DROP_TARGET_ID, 0);
+            DROP_TARGET_ID, Object::Pointer(0));
       }
     }
   }
@@ -227,8 +227,8 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   ITracker* tracker = Tweaklets::Get(DnDTweaklet::KEY)->CreateTracker();
   //tracker.setStippled(true);
 
-  GuiTk::IControlListener::Pointer trackerListener = new TrackerMoveListener(draggedItem,
-      sourceBounds, initialLocation, allowSnapping);
+  GuiTk::IControlListener::Pointer trackerListener(new TrackerMoveListener(draggedItem,
+      sourceBounds, initialLocation, allowSnapping));
 
   tracker->AddControlListener(trackerListener);
 
@@ -309,7 +309,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
     dropTarget->DragFinished(false);
   }
 
-  return 0;
+  return IDropTarget::Pointer(0);
 }
 
 IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,

@@ -119,7 +119,7 @@ void DetachedPlaceHolder::FindSashes(LayoutPart::Pointer part,
 
   if (container != 0)
   {
-    container->FindSashes(this, sashes);
+    container->FindSashes(LayoutPart::Pointer(this), sashes);
   }
 }
 

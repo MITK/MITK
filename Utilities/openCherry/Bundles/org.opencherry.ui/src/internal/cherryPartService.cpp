@@ -94,7 +94,7 @@ void PartService::FirePartOpened(IWorkbenchPartReference::Pointer ref)
 
 IWorkbenchPart::Pointer PartService::GetActivePart()
 {
-  return activePart.IsNull() ? 0 : activePart->GetPart(false);
+  return activePart.IsNull() ? IWorkbenchPart::Pointer(0) : activePart->GetPart(false);
 }
 
 IWorkbenchPartReference::Pointer PartService::GetActivePartReference()

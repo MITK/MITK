@@ -46,6 +46,7 @@ class SmartPointer
 {
 public:
   typedef TObjectType ObjectType;
+  typedef SmartPointer Self;
 
   /** Constructor  */
   SmartPointer()
@@ -82,7 +83,7 @@ public:
   }
 
   /** Constructor to pointer p  */
-  SmartPointer(ObjectType *p) :
+  explicit SmartPointer(ObjectType *p) :
     m_Pointer(p)
   {
     this->Register();
@@ -116,10 +117,16 @@ public:
     return m_Pointer;
   }
 
-  /** Return pointer to object.  */
-  operator ObjectType *() const
+//  /** Return pointer to object.  */
+//  operator ObjectType *() const
+//  {
+//    return m_Pointer;
+//  }
+
+  ObjectType & operator*() const
   {
-    return m_Pointer;
+    poco_assert( m_Pointer != 0 );
+    return *m_Pointer;
   }
 
   /** Test if the pointer has been initialized */
@@ -132,17 +139,25 @@ public:
     return m_Pointer == 0;
   }
 
+  typedef ObjectType * Self::*unspecified_bool_type;
+
+  operator unspecified_bool_type () const
+  {
+    return m_Pointer == 0 ? 0: &Self::m_Pointer;
+  }
+
   /** Template comparison operators. */
   template<typename R>
-  bool operator ==(R r) const
+  bool operator ==(const R* o) const
   {
-    return (m_Pointer == static_cast<const ObjectType*> (r));
+    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
   }
 
   template<typename R>
   bool operator ==(const SmartPointer<R>& r) const
   {
-    return (m_Pointer == static_cast<const ObjectType*> (r.GetPointer()));
+    const R* o = r.GetPointer();
+    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
   }
 
   bool operator ==(int r) const
@@ -154,15 +169,15 @@ public:
   }
 
   template<typename R>
-  bool operator !=(R r) const
+  bool operator !=(const R* r) const
   {
-    return (m_Pointer != static_cast<const ObjectType*> (r));
+    return !(this->operator==(r));
   }
 
   template<typename R>
   bool operator !=(const SmartPointer<R>& r) const
   {
-    return (m_Pointer != static_cast<const ObjectType*> (r.GetPointer()));
+    return !(this->operator==(r));
   }
 
   bool operator !=(int r) const
@@ -173,19 +188,19 @@ public:
     throw std::invalid_argument("Can only compare to 0");
   }
 
-  /** Template comparison operators using operator==. */
-  template<typename R>
-  bool CompareTo(const SmartPointer<R>& r) const
-  {
-    return m_Pointer == 0 ? r == 0 : r.GetPointer() && m_Pointer->operator==(r.GetPointer());
-  }
+//  /** Template comparison operators using operator==. */
+//  template<typename R>
+//  bool CompareTo(const SmartPointer<R>& r) const
+//  {
+//    return m_Pointer == 0 ? r == 0 : r.GetPointer() && m_Pointer->operator==(r.GetPointer());
+//  }
 
-  template<typename R>
-  bool CompareTo(R r) const
-  {
-    //const ObjectType* o = static_cast<const ObjectType*> (r);
-    return m_Pointer == 0 ? r == 0 : (r && m_Pointer->operator==(r));
-  }
+//  template<typename R>
+//  bool CompareTo(R r) const
+//  {
+//    //const ObjectType* o = static_cast<const ObjectType*> (r);
+//    return m_Pointer == 0 ? r == 0 : (r && m_Pointer->operator==(r));
+//  }
 
   /** Access function to pointer. */
   ObjectType *GetPointer() const
@@ -258,6 +273,7 @@ public:
   }
 
 private:
+
   /** The pointer to the object referrred to by this smart pointer. */
   ObjectType* m_Pointer;
 

@@ -37,8 +37,9 @@ ViewDescriptor::ViewDescriptor(IConfigurationElement::Pointer e)
 
 IViewPart::Pointer ViewDescriptor::CreateView()
 {
-  return configElement->CreateExecutableExtension<IViewPart>(
-      WorkbenchRegistryConstants::ATT_CLASS);
+  IViewPart::Pointer part(configElement->CreateExecutableExtension<IViewPart>(
+      WorkbenchRegistryConstants::ATT_CLASS));
+  return part;
 }
 
 const std::vector<std::string>& ViewDescriptor::GetCategoryPath()
@@ -46,7 +47,7 @@ const std::vector<std::string>& ViewDescriptor::GetCategoryPath()
   return categoryPath;
 }
 
-IConfigurationElement::Pointer ViewDescriptor::GetConfigurationElement()
+IConfigurationElement::Pointer ViewDescriptor::GetConfigurationElement() const
 {
   return configElement;
 }
@@ -61,9 +62,12 @@ std::string ViewDescriptor::GetId() const
   return id;
 }
 
-bool ViewDescriptor::operator==(const IViewDescriptor* o) const
+bool ViewDescriptor::operator==(const Object* o) const
 {
-  return this->GetId() == o->GetId();
+  if (const IViewDescriptor* other = dynamic_cast<const IViewDescriptor*>(o))
+    return this->GetId() == other->GetId();
+
+  return false;
 }
 
 //ImageDescriptor ViewDescriptor::GetImageDescriptor()
@@ -113,11 +117,11 @@ bool ViewDescriptor::GetAllowMultiple()
   return allow;
 }
 
-void* ViewDescriptor::GetAdapter(const std::type_info& adapter)
+void* ViewDescriptor::GetAdapterImpl(const std::type_info& adapter) const
 {
   if (adapter == typeid(IConfigurationElement))
   {
-    return GetConfigurationElement();
+    return GetConfigurationElement().GetPointer();
   }
   return 0;
 }

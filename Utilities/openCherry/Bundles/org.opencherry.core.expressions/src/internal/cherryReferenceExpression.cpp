@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryReferenceExpression.h"
@@ -23,12 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const std::string ReferenceExpression::ATT_DEFINITION_ID= "definitionId"; 
+const std::string ReferenceExpression::ATT_DEFINITION_ID= "definitionId";
 const intptr_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::ReferenceExpression");
 
 DefinitionRegistry ReferenceExpression::fgDefinitionRegistry = DefinitionRegistry();
 
-DefinitionRegistry& 
+DefinitionRegistry&
 ReferenceExpression::GetDefinitionRegistry()
 {
   return fgDefinitionRegistry;
@@ -39,7 +39,7 @@ ReferenceExpression::ReferenceExpression(const std::string& definitionId)
   fDefinitionId= definitionId;
 }
 
-ReferenceExpression::ReferenceExpression(IConfigurationElement* element)
+ReferenceExpression::ReferenceExpression(IConfigurationElement::Pointer element)
 {
   bool result = element->GetAttribute(ATT_DEFINITION_ID, fDefinitionId);
   Expressions::CheckAttribute(ATT_DEFINITION_ID, result);
@@ -85,7 +85,7 @@ ReferenceExpression::operator==(Expression& object)
   catch (std::bad_cast)
   {
     return false;
-  }  
+  }
 }
 
 intptr_t

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryPartTester.h"
@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-void PartTester::TestEditor(IEditorPart* part)
+void PartTester::TestEditor(IEditorPart::Pointer part)
 {
 
   TestWorkbenchPart(part);
@@ -45,7 +45,7 @@ void PartTester::TestEditor(IEditorPart* part)
   part->IsSaveOnCloseNeeded();
 }
 
-void PartTester::TestEditorInput(IEditorInput* /*input*/)
+void PartTester::TestEditorInput(IEditorInput::Pointer /*input*/)
 {
 
   //input.getAdapter(Object.class);
@@ -64,11 +64,11 @@ void PartTester::TestEditorInput(IEditorInput* /*input*/)
   //        }
 }
 
-void PartTester::TestWorkbenchPart(IWorkbenchPart* part)
+void PartTester::TestWorkbenchPart(IWorkbenchPart::Pointer part)
 {
   //        IPropertyListener testListener = new IPropertyListener() {
   //            public void propertyChanged(Object source, int propId) {
-  //                
+  //
   //            }
   //        };
 
@@ -79,13 +79,13 @@ void PartTester::TestWorkbenchPart(IWorkbenchPart* part)
   //part.removePropertyListener(testListener);
 
   // Test equals
-  if (!(part->operator==(part)))
+  if (part != part)
     throw Poco::AssertionViolationException("A part must be equal to itself"); //$NON-NLS-1$
-  Object::Pointer obj = new ObjectString("jo");
-  if (part->operator==(obj))
+  Object::Pointer obj(new ObjectString("jo"));
+  if (part == obj)
     throw Poco::AssertionViolationException("A part must have a meaningful operator== method"); //$NON-NLS-1$
 
-  // Test getAdapter   
+  // Test getAdapter
   //Object partAdapter = part.getAdapter(part.getClass());
   //Assert.isTrue(partAdapter == null || partAdapter == part,
   //"A part must adapter to itself or return null"); //$NON-NLS-1$
@@ -99,7 +99,7 @@ void PartTester::TestWorkbenchPart(IWorkbenchPart* part)
 
 }
 
-void PartTester::TestView(IViewPart* part)
+void PartTester::TestView(IViewPart::Pointer part)
 {
   if (!(part->GetSite() == part->GetViewSite().GetPointer()))
     throw Poco::AssertionViolationException(

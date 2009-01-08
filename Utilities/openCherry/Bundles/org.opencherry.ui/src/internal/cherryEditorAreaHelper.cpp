@@ -137,7 +137,7 @@ IEditorReference::Pointer EditorAreaHelper::GetVisibleEditor()
     IEditorReference::Pointer result = pane->GetPartReference().Cast<IEditorReference>();
     return result;
   }
-  return 0;
+  return IEditorReference::Pointer(0);
 }
 
 void EditorAreaHelper::MoveEditor(IEditorPart::Pointer part, int position)
@@ -207,7 +207,7 @@ bool EditorAreaHelper::SetVisibleEditor(IEditorReference::Pointer ref, bool setF
   if (ref != visibleEditor)
   {
     IWorkbenchPart::Pointer part = ref->GetPart(true);
-    PartPane::Pointer pane = 0;
+    PartPane::Pointer pane;
     if (part != 0)
     {
       pane = part->GetSite().Cast<PartSite>()->GetPane();

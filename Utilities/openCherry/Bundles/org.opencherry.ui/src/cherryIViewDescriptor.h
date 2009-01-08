@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIVIEWDESCRIPTOR_H_
@@ -34,7 +34,7 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * This is a view descriptor. It provides a "description" of a given
  * given view so that the view can later be constructed.
  * <p>
@@ -44,17 +44,17 @@ namespace cherry
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * 
+ *
  * @see org.opencherry.ui.IViewRegistry
  */
 struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
 
   cherryClassMacro(IViewDescriptor);
-  
+
   /**
    * Creates an instance of the view defined in the descriptor.
-   * 
+   *
    * @return the view part
    * @throws CoreException thrown if there is a problem creating the part
    */
@@ -85,12 +85,12 @@ struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdap
 
   /**
    * Returns whether this view allows multiple instances.
-   * 
+   *
    * @return whether this view allows multiple instances
    */
   virtual bool GetAllowMultiple() = 0;
 
-  virtual bool operator==(const IViewDescriptor*) const = 0;
+  virtual bool operator==(const Object*) const = 0;
 };
 
 }

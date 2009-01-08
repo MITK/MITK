@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryCountExpression.h"
@@ -59,7 +59,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
     }
   }
 
-  CountExpression::CountExpression(IConfigurationElement* configElement)
+  CountExpression::CountExpression(IConfigurationElement::Pointer configElement)
   {
     std::string size;
     if (!configElement->GetAttribute(ATT_VALUE, size))
@@ -84,11 +84,11 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
   {
     ExpressionVariable::Pointer var(context->GetDefaultVariable());
     int size;
-    
+
     VectorExpressionVariable::Pointer coll = var.Cast<VectorExpressionVariable>();
     if (coll.IsNull())
     {
-      ICountable* countable= Expressions::GetAsICountable(var, this);
+      ICountable::Pointer countable= Expressions::GetAsICountable(var, Expression::Pointer(this));
       if (countable == 0)
       return EvaluationResult::NOT_LOADED;
       size = countable->Count();
@@ -97,7 +97,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
     {
       size = coll->GetVariable().size();
     }
-    
+
     switch (fMode)
     {
       case UNKNOWN:
@@ -113,7 +113,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
       case ANY_NUMBER:
       return EvaluationResult::TRUE_EVAL;
     }
-    
+
     return EvaluationResult::FALSE_EVAL;
   }
 
@@ -135,7 +135,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
     {
       return false;
     }
-    
+
   }
 
   intptr_t
@@ -143,5 +143,5 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
   {
     return HASH_INITIAL * HASH_FACTOR + fMode * HASH_FACTOR + fSize;
   }
-  
+
 }  // namespace cherry

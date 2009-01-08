@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryViewFactory.h"
@@ -97,18 +97,18 @@ IViewReference::Pointer ViewFactory::CreateView(const std::string& id,
     counter.Put(key, ref);
     this->GetWorkbenchPage()->PartAdded(ref.Cast<ViewReference>());
   }
-  else 
+  else
   {
     counter.AddRef(key);
   }
-  
+
   return ref;
 }
 
 std::vector<IViewReference::Pointer> ViewFactory::GetViewReferences()
 {
   std::vector<IViewReference::Pointer> values(counter.Values());
-  
+
   return values;
 }
 
@@ -283,7 +283,7 @@ IMemento::Pointer ViewFactory::SaveViewState(IMemento::Pointer memento,
 //    }
 //  }
 //  return viewMemento;
-  return 0;
+  return IMemento::Pointer(0);
 }
 
 // for dynamic UI
@@ -303,7 +303,7 @@ IMemento::Pointer ViewFactory::GetViewState(const std::string& key)
 //  }
 //
 //  return memento.getChild(IWorkbenchConstants.TAG_VIEW_STATE);
-  return 0;
+  return IMemento::Pointer(0);
 }
 
 }

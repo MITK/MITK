@@ -61,7 +61,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
       // Can't drag to end unless you can see the end
       if (!lastTab->IsShowing())
       {
-        return 0;
+        return StackDropResult::Pointer(0);
       }
 
       // If we are unable to compute the bounds for this tab, then ignore the drop
@@ -69,14 +69,14 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
       Rectangle lastTabBounds(qlastTabBounds.x(), qlastTabBounds.y(), qlastTabBounds.width(), qlastTabBounds.height());
       if (qlastTabBounds.isEmpty())
       {
-        return 0;
+        return StackDropResult::Pointer(0);
       }
 
       if (dragStart >= 0)
       {
         dragOverIndex--;
-
-        StackDropResult::Pointer result = new StackDropResult(lastTabBounds, new DragCookie(dragOverIndex));
+        Object::Pointer cookie(new DragCookie(dragOverIndex));
+        StackDropResult::Pointer result(new StackDropResult(lastTabBounds, cookie));
         return result;
       }
 
@@ -87,7 +87,8 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
 
       dropRectangle.x = lastTabBounds.x + lastTabBounds.width;
       dropRectangle.width = 3 * dropRectangle.height;
-      StackDropResult::Pointer result = new StackDropResult(dropRectangle, new DragCookie(dragOverIndex));
+      Object::Pointer cookie(new DragCookie(dragOverIndex));
+      StackDropResult::Pointer result(new StackDropResult(dropRectangle, cookie));
       return result;
     }
     else
@@ -99,17 +100,17 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
       int closestSide = Geometry::GetClosestSide(displayBounds, location);
       if (closestSide == tabFolder->GetTabPosition())
       {
-        StackDropResult::Pointer result = new StackDropResult(displayBounds, 0);
+        StackDropResult::Pointer result(new StackDropResult(displayBounds, Object::Pointer(0)));
         return result;
       }
 
-      return 0;
+      return StackDropResult::Pointer(0);
     }
   }
 
   if (!tabUnderPointer->IsShowing())
   {
-    return 0;
+    return StackDropResult::Pointer(0);
   }
 
   QRect qtabBounds = tabUnderPointer->GetBounds();
@@ -117,11 +118,11 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
 
   if (qtabBounds.isEmpty())
   {
-    return 0;
+    return StackDropResult::Pointer(0);
   }
 
-  StackDropResult::Pointer result = new StackDropResult(tabBounds, new DragCookie(tabFolder->IndexOf(
-      tabUnderPointer)));
+  Object::Pointer cookie(new DragCookie(tabFolder->IndexOf(tabUnderPointer)));
+  StackDropResult::Pointer result(new StackDropResult(tabBounds, cookie));
   return result;
 }
 

@@ -31,7 +31,7 @@ ViewSashContainer::ViewSashContainer(WorkbenchPage::Pointer page, void* parent) 
 
 ViewSashContainer::Pointer ViewSashContainer::GetRootContainer()
 {
-  return this;
+  return ViewSashContainer::Pointer(this);
 }
 
 void* ViewSashContainer::GetControl()
@@ -285,7 +285,7 @@ float ViewSashContainer::GetDockingRatio(Object::Pointer dragged,
 
 PartStack::Pointer ViewSashContainer::CreateStack()
 {
-  PartStack::Pointer result = new PartStack(page);
+  PartStack::Pointer result(new PartStack(page));
   return result;
 }
 

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYPAGESELECTIONSERVICE_H_
@@ -30,34 +30,34 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * The selection service for a page
  */
 class PageSelectionService : public ISelectionService {
 
 private:
-  
-    IWorkbenchPage::Pointer page;
-  
-    /** 
+
+    IWorkbenchPage::WeakPointer page;
+
+    /**
      * The list of selection listeners (not per-part).
      */
     //private ListenerList listeners = new ListenerList();
 
-    /** 
+    /**
      * The list of post selection listeners (not per-part).
      */
     //private ListenerList postListeners = new ListenerList();
 
     ISelectionService::SelectionEvents selectionEvents;
-  
+
     /**
      * The currently active part.
      */
     IWorkbenchPart::Pointer activePart;
 
     /**
-     * The active part's selection provider, remembered in case the part 
+     * The active part's selection provider, remembered in case the part
      * replaces its selection provider after we hooked a listener.
      */
     ISelectionProvider::Pointer activeProvider;
@@ -66,35 +66,35 @@ private:
      * Map from part id (String) to per-part tracker (AbstractPartSelectionTracker).
      */
     std::map<std::string, PagePartSelectionTracker::Pointer> perPartTrackers;
-    
+
     /**
      * Sets the page.
      */
     void SetPage(IWorkbenchPage::Pointer p);
-    
+
     struct SelectionListener : public ISelectionChangedListener
     {
       SelectionListener(PageSelectionService* tracker);
-      
+
       void SelectionChanged(SelectionChangedEvent::Pointer event);
-      
+
       PageSelectionService* m_SelectionService;
     };
-    
+
     friend class PostSelectionListener;
-    
-    
+
+
     struct PostSelectionListener : public ISelectionChangedListener
     {
       PostSelectionListener(PageSelectionService* tracker);
-      
+
       void SelectionChanged(SelectionChangedEvent::Pointer event);
-      
+
       PageSelectionService* m_SelectionService;
     };
-    
+
     friend struct PostSelectionListener;
-    
+
     /**
      * The JFace selection listener to hook on the active part's selection provider.
      */
@@ -104,14 +104,14 @@ private:
      * The JFace post selection listener to hook on the active part's selection provider.
      */
     ISelectionChangedListener::Pointer postSelListener;
-    
+
 public:
-  
+
     /**
      * Creates a new SelectionService.
      */
     PageSelectionService(IWorkbenchPage::Pointer p);
-    
+
     SelectionEvents& GetSelectionEvents(const std::string& partId = "");
 
     /* (non-Javadoc)
@@ -159,17 +159,17 @@ public:
     void RemoveSelectionListener(const std::string& partId,
             ISelectionListener::Pointer listener);
 
-    
+
 protected:
-  
+
   /**
    * Returns the page.
    */
   IWorkbenchPage::Pointer GetPage();
-  
+
     /**
      * Fires a selection event to the given listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
@@ -177,7 +177,7 @@ protected:
 
     /**
      * Fires a selection event to the given listeners.
-     * 
+     *
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
@@ -186,7 +186,7 @@ protected:
 
     /**
      * Returns the per-part selection tracker for the given part id.
-     * 
+     *
      * @param partId part identifier
      * @return per-part selection tracker
      */
@@ -194,16 +194,16 @@ protected:
 
     /**
      * Creates a new per-part selection tracker for the given part id.
-     * 
+     *
      * @param partId part identifier
      * @return per-part selection tracker
      */
     PagePartSelectionTracker::Pointer CreatePartTracker(
             const std::string& partId);
 
-    
+
 public:
-  
+
     /**
      * Returns the selection.
      */
@@ -216,13 +216,13 @@ public:
 
     /**
      * Sets the current-active part (or null if none)
-     * 
-     * @since 3.1 
+     *
+     * @since 3.1
      *
      * @param newPart the new active part (or null if none)
      */
     void SetActivePart(IWorkbenchPart::Pointer newPart);
-    
+
 //    /**
 //     * Notifies the listener that a part has been activated.
 //     */

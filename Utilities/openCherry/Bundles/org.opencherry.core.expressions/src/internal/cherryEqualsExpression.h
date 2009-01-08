@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef __CHERRY_EQUALS_EXPRESSION_H__
@@ -33,16 +33,16 @@ class EqualsExpression : public Expression {
 	 * The seed for the hash code for all equals expressions.
 	 */
 private:
-  
+
   static const intptr_t HASH_INITIAL;
 
-	ExpressionVariable::Pointer fExpectedValue; 
-	
+	ExpressionVariable::Pointer fExpectedValue;
+
 public:
-  
+
   EqualsExpression(const ExpressionVariable::Pointer expectedValue);
-	
-	EqualsExpression(IConfigurationElement* element);
+
+	EqualsExpression(SmartPointer<IConfigurationElement> element);
 
 	EqualsExpression(Poco::XML::Element* element);
 
@@ -51,9 +51,9 @@ public:
 	void CollectExpressionInfo(ExpressionInfo* info);
 
 	bool operator==(Expression& object);
-	
+
 protected:
-  
+
   intptr_t ComputeHashCode();
 };
 

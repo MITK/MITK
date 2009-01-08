@@ -353,7 +353,7 @@ int PartSashContainer::MeasureTree(const Rectangle& outerBounds,
 
   if (parent->GetSash()->IsHorizontal() == horizontal)
   {
-    return MeasureTree(outerBounds, parent, horizontal);
+    return MeasureTree(outerBounds, LayoutTree::ConstPointer(parent), horizontal);
   }
 
   bool isLeft = parent->IsLeftChild(toMeasure);
@@ -383,16 +383,16 @@ int PartSashContainer::MeasureTree(const Rectangle& outerBounds,
 
       // If the other child is fixed, return the size of the parent minus the fixed size of the
       // other child
-      return MeasureTree(outerBounds, parent, horizontal) - (left + right
+      return MeasureTree(outerBounds, LayoutTree::ConstPointer(parent), horizontal) - (left + right
           - childSize);
     }
 
     // Else return the size of the parent, scaled appropriately
-    return MeasureTree(outerBounds, parent, horizontal) * childSize / (left
+    return MeasureTree(outerBounds, LayoutTree::ConstPointer(parent), horizontal) * childSize / (left
         + right);
   }
 
-  return MeasureTree(outerBounds, parent, horizontal);
+  return MeasureTree(outerBounds, LayoutTree::ConstPointer(parent), horizontal);
 }
 
 void PartSashContainer::AddChild(const RelationshipInfo& info)
@@ -412,7 +412,7 @@ void PartSashContainer::AddChild(const RelationshipInfo& info)
         == IPageLayout::RIGHT) ? Constants::VERTICAL : Constants::HORIZONTAL;
     bool left = info.relationship == IPageLayout::LEFT || info.relationship
         == IPageLayout::TOP;
-    LayoutPartSash::Pointer sash = new LayoutPartSash(this, vertical);
+    LayoutPartSash::Pointer sash(new LayoutPartSash(this, vertical));
     sash->SetSizes(info.left, info.right);
     if ((parent != 0) && child.Cast<PartPlaceholder> ().IsNull())
     {
@@ -429,7 +429,7 @@ void PartSashContainer::AddChild(const RelationshipInfo& info)
   {
     child->CreateControl(parent);
     child->SetVisible(true);
-    child->SetContainer(this);
+    child->SetContainer(ILayoutContainer::Pointer(this));
     this->ResizeChild(child);
   }
 
@@ -530,15 +530,15 @@ void PartSashContainer::SetActive(bool isActive)
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(parent,
         resizeListener);
 
-    DragUtil::AddDragTarget(parent, this);
-    DragUtil::AddDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), this);
+    DragUtil::AddDragTarget(parent, IDragOverListener::Pointer(this));
+    DragUtil::AddDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), IDragOverListener::Pointer(this));
 
     ILayoutContainer::ChildrenType children = this->children;
     for (ILayoutContainer::ChildrenType::iterator childIter = children.begin(); childIter
         != children.end(); ++childIter)
     {
       LayoutPart::Pointer child = *childIter;
-      child->SetContainer(this);
+      child->SetContainer(ILayoutContainer::Pointer(this));
       child->SetVisible(true); //zoomedPart == null || child == zoomedPart);
       if (child.Cast<PartStack> ().IsNull())
       {
@@ -566,8 +566,8 @@ void PartSashContainer::SetActive(bool isActive)
   }
   else
   {
-    DragUtil::RemoveDragTarget(parent, this);
-    DragUtil::RemoveDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), this);
+    DragUtil::RemoveDragTarget(parent, IDragOverListener::Pointer(this));
+    DragUtil::RemoveDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), IDragOverListener::Pointer(this));
 
     // remove all Listeners
     if (resizeListener != 0 && parent != 0)
@@ -580,7 +580,7 @@ void PartSashContainer::SetActive(bool isActive)
         != children.end(); ++iter)
     {
       LayoutPart::Pointer child = *iter;
-      child->SetContainer(0);
+      child->SetContainer(ILayoutContainer::Pointer(0));
       if (child.Cast<PartStack> ().IsNotNull())
       {
         child->SetVisible(false);
@@ -667,7 +667,7 @@ LayoutPart::Pointer PartSashContainer::FindBottomRight()
 {
   if (root == 0)
   {
-    return 0;
+    return LayoutPart::Pointer(0);
   }
   return root->FindBottomRight();
 }
@@ -746,7 +746,7 @@ void PartSashContainer::Remove(LayoutPart::Pointer child)
   {
     std::cout << "Setting container of child to 0\n";
     child->SetVisible(false);
-    child->SetContainer(0);
+    child->SetContainer(ILayoutContainer::Pointer(0));
     this->FlushLayout();
   }
 }
@@ -805,9 +805,9 @@ void PartSashContainer::Replace(LayoutPart::Pointer oldChild,
   if (active)
   {
     oldChild->SetVisible(false);
-    oldChild->SetContainer(0);
+    oldChild->SetContainer(ILayoutContainer::Pointer(0));
     newChild->CreateControl(parent);
-    newChild->SetContainer(this);
+    newChild->SetContainer(ILayoutContainer::Pointer(this));
     newChild->SetVisible(true); //zoomedPart == null || zoomedPart == newChild);
     this->ResizeChild(newChild);
   }
@@ -880,7 +880,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
   if (!(draggedObject.Cast<PartStack> () != 0
       || draggedObject.Cast<PartPane> () != 0))
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
@@ -892,7 +892,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
 
   if (!this->IsStackType(sourceContainer) && !this->IsPaneType(sourcePart))
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   bool differentWindows = sourcePart->GetWorkbenchWindow()
@@ -903,17 +903,17 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
           == this->GetWorkbenchWindow()->GetWorkbench());
   if (differentWindows && !editorDropOK)
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   Rectangle containerBounds = DragUtil::GetDisplayBounds(parent);
   LayoutPart::Pointer targetPart;
 
   // If this container has no visible children
-  if (this->GetVisibleChildrenCount(this) == 0)
+  if (this->GetVisibleChildrenCount(ILayoutContainer::Pointer(this)) == 0)
   {
     return this->CreateDropTarget(draggedObject, Constants::CENTER,
-        Constants::CENTER, 0);
+        Constants::CENTER, Object::Pointer(0));
   }
 
   if (containerBounds.Contains(position))
@@ -1011,7 +1011,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
   {
     // We only allow dropping into a stack, not creating one
     if (differentWindows)
-      return 0;
+      return IDropTarget::Pointer(0);
 
     int side = Geometry::GetClosestSide(containerBounds, position);
 
@@ -1021,7 +1021,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
         ||*/ (this->IsPaneType(sourcePart) && this->GetVisibleChildrenCount(
             sourceContainer.Cast<IStackableContainer>()) <= 1) && sourceContainer->GetContainer() == this)
     {
-      if (root == 0 || this->GetVisibleChildrenCount(this) <= 1)
+      if (root == 0 || this->GetVisibleChildrenCount(ILayoutContainer::Pointer(this)) <= 1)
       {
         pointlessDrop = true;
       }
@@ -1034,10 +1034,10 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
       side = Constants::NONE;
     }
 
-    return this->CreateDropTarget(sourcePart, side, cursor, 0);
+    return this->CreateDropTarget(sourcePart, side, cursor, Object::Pointer(0));
   }
 
-  return 0;
+  return IDropTarget::Pointer(0);
 }
 
 PartSashContainer::SashContainerDropTarget::Pointer

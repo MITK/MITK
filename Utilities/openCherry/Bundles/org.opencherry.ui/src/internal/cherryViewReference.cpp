@@ -191,8 +191,9 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     if (part.IsNotNull())
     {
       //PartPane pane = getPane();
-      ViewSite::Pointer site = new ViewSite(this, part, factory->GetWorkbenchPage(), GetId(),
-          PlatformUI::PLUGIN_ID, label);
+      IViewReference::Pointer viewRef(this);
+      ViewSite::Pointer site(new ViewSite(viewRef, part, factory->GetWorkbenchPage(), GetId(),
+          PlatformUI::PLUGIN_ID, label));
       //site.setActionBars(new ViewActionBars(factory.page.getActionBars(),
       //    site, (ViewPane) pane));
       try
@@ -204,7 +205,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
         std::cout << e.displayText();
         //StatusUtil.handleStatus(e, StatusManager.SHOW
         //    | StatusManager.LOG);
-        return 0;
+        return IWorkbenchPart::Pointer(0);
       }
 
       void* parent = pane->GetControl();
@@ -218,7 +219,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
         std::cout << "Error creating view: " << e.what() << std::endl;
         //          StatusUtil.handleStatus(e, StatusManager.SHOW
         //              | StatusManager.LOG);
-        return 0;
+        return IWorkbenchPart::Pointer(0);
       }
 
       result = part.Cast<IWorkbenchPart>();
@@ -230,7 +231,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
 PartPane::Pointer ViewReference::CreatePane()
 {
-  PartPane::Pointer pane = new PartPane(this, this->factory->GetWorkbenchPage());
+  IWorkbenchPartReference::Pointer partRef(this);
+  PartPane::Pointer pane(new PartPane(partRef, this->factory->GetWorkbenchPage()));
   return pane;
   //return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateViewPane(this, this->factory->GetWorkbenchPage());
 }
@@ -278,7 +280,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     this->CreatePartProperties(view);
 
     // Create site
-    site = new ViewSite(this, view, factory->GetWorkbenchPage(), desc);
+    IViewReference::Pointer viewRef(this);
+    site = new ViewSite(viewRef, view, factory->GetWorkbenchPage(), desc);
     //actionBars = new ViewActionBars(factory.page.getActionBars(), site,
     //    (ViewPane) pane);
     //site.setActionBars(actionBars);
@@ -290,7 +293,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     // we've initialized the view in case an exception is thrown.
     initializedView = view;
 
-    if (!view->GetSite().CompareTo(site))
+    if (view->GetSite() != site)
     {
       throw PartInitException("View initialization failed. Site is incorrect.");
     }

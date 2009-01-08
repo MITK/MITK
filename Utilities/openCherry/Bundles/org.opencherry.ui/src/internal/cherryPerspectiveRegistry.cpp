@@ -57,11 +57,11 @@ PerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std:
   // Sanity check to avoid invalid or duplicate labels.
   if (!this->ValidateLabel(label))
   {
-    return 0;
+    return PerspectiveDescriptor::Pointer(0);
   }
   if (this->FindPerspectiveWithLabel(label) != 0)
   {
-    return 0;
+    return PerspectiveDescriptor::Pointer(0);
   }
 
   // Calculate ID.
@@ -70,8 +70,8 @@ PerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const std:
   Poco::trimInPlace(id);
 
   // Create descriptor.
-  PerspectiveDescriptor::Pointer desc =
-      new PerspectiveDescriptor(id, label, originalDescriptor);
+  PerspectiveDescriptor::Pointer desc(
+      new PerspectiveDescriptor(id, label, originalDescriptor));
   this->Add(desc);
   return desc;
 }
@@ -128,7 +128,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const
     }
   }
 
-  return 0;
+  return IPerspectiveDescriptor::Pointer(0);
 }
 
 IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
@@ -147,7 +147,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
       return desc;
     }
   }
-  return 0;
+  return IPerspectiveDescriptor::Pointer(0);
 }
 
 std::string PerspectiveRegistry::GetDefaultPerspective()
@@ -220,7 +220,7 @@ IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const std::string& id)
 //  XMLMemento memento = XMLMemento.createReadRoot(reader);
 //  reader.close();
 //  return memento;
-  return 0;
+  return IMemento::Pointer(0);
 }
 
 void PerspectiveRegistry::SetDefaultPerspective(const std::string& id)

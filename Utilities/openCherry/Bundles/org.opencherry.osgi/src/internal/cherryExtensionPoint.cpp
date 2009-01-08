@@ -71,7 +71,12 @@ ExtensionPoint::GetExtensions() const
     extensions.push_back(iter->second.GetPointer());
   }
 
-  extensions.insert(extensions.end(), m_UnnamedExtensions.begin(), m_UnnamedExtensions.end());
+  for (std::vector<Extension::Pointer>::const_iterator iter = m_UnnamedExtensions.begin();
+       iter != m_UnnamedExtensions.end(); ++iter)
+  {
+    extensions.push_back(iter->GetPointer());
+  }
+  //extensions.insert(extensions.end(), m_UnnamedExtensions.begin(), m_UnnamedExtensions.end());
 
   return extensions;
 }

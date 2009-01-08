@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIDIALOG_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 
 #include "../cherryUiDll.h"
 

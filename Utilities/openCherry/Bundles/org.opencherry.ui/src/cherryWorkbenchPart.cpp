@@ -133,10 +133,11 @@ void WorkbenchPart::SetContentDescription(const std::string& description)
 void WorkbenchPart::FirePropertyChanged(const std::string& key,
     const std::string& oldValue, const std::string& newValue)
 {
-  ObjectString::Pointer objOldVal = new ObjectString(oldValue);
-  ObjectString::Pointer objNewVal = new ObjectString(newValue);
-  PropertyChangeEvent::Pointer event =
-      new PropertyChangeEvent(this, key, objOldVal, objNewVal);
+  ObjectString::Pointer objOldVal(new ObjectString(oldValue));
+  ObjectString::Pointer objNewVal(new ObjectString(newValue));
+  Object::Pointer source(this);
+  PropertyChangeEvent::Pointer event(
+      new PropertyChangeEvent(source, key, objOldVal, objNewVal));
   typedef IPropertyChangeListener::Events::EventType::ListenerList ListenerList;
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();
@@ -155,10 +156,11 @@ void WorkbenchPart::FirePropertyChanged(const std::string& key,
 
 void WorkbenchPart::FirePropertyChange(int propertyId)
 {
-  ObjectInt::Pointer val = new ObjectInt(propertyId);
+  ObjectInt::Pointer val(new ObjectInt(propertyId));
+  Object::Pointer source(this);
 
-  PropertyChangeEvent::Pointer event =
-      new PropertyChangeEvent(this, IWorkbenchPartConstants::INTEGER_PROPERTY, val, val);
+  PropertyChangeEvent::Pointer event(
+      new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
   typedef IPropertyChangeListener::Events::EventType::ListenerList ListenerList;
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();

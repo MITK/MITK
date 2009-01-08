@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryFileEditorMapping.h"
@@ -20,23 +20,23 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-const std::string FileEditorMapping::STAR = "*"; //$NON-NLS-1$ 
-const std::string FileEditorMapping::DOT = "."; //$NON-NLS-1$ 
+const std::string FileEditorMapping::STAR = "*"; //$NON-NLS-1$
+const std::string FileEditorMapping::DOT = "."; //$NON-NLS-1$
 
-bool FileEditorMapping::CompareList(
+bool FileEditorMapping::CompareList (
     const std::list<IEditorDescriptor::Pointer>& l1,
-    const std::list<IEditorDescriptor::Pointer>& l2)
+    const std::list<IEditorDescriptor::Pointer>& l2) const
 {
   if (l1.size() != l2.size())
   {
     return false;
   }
-  
+
   std::list<IEditorDescriptor::Pointer>::const_iterator iter1, iter2;
   for (iter1 = l1.begin(), iter2 = l2.begin(); iter1 != l1.end() && iter2 != l2.end();
        ++iter1, ++iter2)
   {
-    if (!(iter1->IsNull() ? iter2->IsNull() : iter1->CompareTo(*iter2)))
+    if (!(iter1->IsNull() ? iter2->IsNull() : *iter1 == *iter2))
     {
       return false;
     }
@@ -56,7 +56,7 @@ FileEditorMapping::FileEditorMapping(const std::string& extension, const std::st
   {
     this->SetName(name);
   }
-  
+
   this->SetExtension(extension);
 }
 
@@ -66,19 +66,15 @@ void FileEditorMapping::AddEditor(EditorDescriptor::Pointer editor)
   deletedEditors.remove(editor);
 }
 
-bool FileEditorMapping::operator==(const Object* obj)
+bool FileEditorMapping::operator==(const Object* obj) const
 {
-  if (this == obj)
+  if (const FileEditorMapping* mapping = dynamic_cast<const FileEditorMapping*>(obj))
+  {
+    if (this == obj)
   {
     return true;
   }
-  
-  if (!dynamic_cast<const FileEditorMapping*>(obj))
-  {
-    return false;
-  }
-  
-  const FileEditorMapping* mapping = dynamic_cast<const FileEditorMapping*>(obj);
+
   if (this->name != mapping->GetName())
   {
     return false;
@@ -92,8 +88,11 @@ bool FileEditorMapping::operator==(const Object* obj)
   {
     return false;
   }
-  
+
   return this->CompareList(this->deletedEditors, mapping->deletedEditors);
+  }
+
+  return false;
 }
 
 IEditorDescriptor::Pointer FileEditorMapping::GetDefaultEditor()
@@ -101,7 +100,7 @@ IEditorDescriptor::Pointer FileEditorMapping::GetDefaultEditor()
 
   if (editors.size() == 0) // || WorkbenchActivityHelper.restrictUseOf(editors.get(0)))
   {
-    return 0;
+    return IEditorDescriptor::Pointer(0);
   }
 
   return editors.front();
@@ -124,7 +123,7 @@ std::string FileEditorMapping::GetExtension() const
 
 std::string FileEditorMapping::GetLabel() const
 {
-  return name + (extension.empty() ? "" : DOT + extension); //$NON-NLS-1$  
+  return name + (extension.empty() ? "" : DOT + extension); //$NON-NLS-1$
 }
 
 std::string FileEditorMapping::GetName() const
@@ -178,9 +177,9 @@ bool FileEditorMapping::IsDeclaredDefaultEditor(IEditorDescriptor::Pointer edito
   for (std::list<IEditorDescriptor::Pointer>::iterator iter = declaredDefaultEditors.begin();
        iter != declaredDefaultEditors.end(); ++iter)
   {
-    if (iter->CompareTo(editor)) return true;
+    if (*iter == editor) return true;
   }
-  
+
   return false;
 }
 

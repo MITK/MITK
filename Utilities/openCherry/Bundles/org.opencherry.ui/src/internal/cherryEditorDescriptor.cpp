@@ -92,8 +92,8 @@ IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement()
 
 IEditorPart::Pointer EditorDescriptor::CreateEditor()
 {
-  IEditorPart::Pointer extension = configurationElement->CreateExecutableExtension<IEditorPart>(
-      WorkbenchRegistryConstants::ATT_CLASS);
+  IEditorPart::Pointer extension(configurationElement->CreateExecutableExtension<IEditorPart>(
+      WorkbenchRegistryConstants::ATT_CLASS));
   return extension;
 }
 

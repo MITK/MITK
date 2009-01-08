@@ -45,7 +45,7 @@ void StackablePart::Reparent(void* newParent)
 {
   void* control = this->GetControl();
 
-  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet::Pointer guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;
@@ -130,7 +130,7 @@ Shell::Pointer StackablePart::GetShell()
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(ctrl);
   }
-  return 0;
+  return Shell::Pointer(0);
 }
 
 IWorkbenchWindow::Pointer StackablePart::GetWorkbenchWindow()
@@ -138,7 +138,7 @@ IWorkbenchWindow::Pointer StackablePart::GetWorkbenchWindow()
   Shell::Pointer s = this->GetShell();
   if (s == 0)
   {
-    return 0;
+    return IWorkbenchWindow::Pointer(0);
   }
   Object::Pointer data = s->GetData();
   if (data.Cast<IWorkbenchWindow>() != 0)
@@ -150,7 +150,7 @@ IWorkbenchWindow::Pointer StackablePart::GetWorkbenchWindow()
     return data.Cast<DetachedWindow>()->GetWorkbenchPage()->GetWorkbenchWindow();
   }
 
-  return 0;
+  return IWorkbenchWindow::Pointer(0);
 }
 
 std::string StackablePart::GetCompoundId()

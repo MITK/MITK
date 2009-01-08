@@ -70,7 +70,7 @@ private:
    * The hash code for this object. This value is computed lazily.  If it is
    * not yet computed, it is equal to {@link #HASH_CODE_NOT_COMPUTED}.
    */
-  int fHashCode;
+  mutable int fHashCode;
 
 protected:
 
@@ -120,7 +120,7 @@ protected:
    *
    * @since 3.2
    */
-   static int HashCode(Expression* object);
+   static int HashCode(Expression::Pointer object);
 
     /**
    * Returns the hash code for the given array. This method handles
@@ -149,7 +149,7 @@ protected:
      *
      * @since 3.2
      */
-    virtual intptr_t ComputeHashCode();
+    virtual intptr_t ComputeHashCode() const;
 
 
 public:
@@ -168,7 +168,7 @@ public:
   virtual ~Expression();
 
 
-  virtual int HashCode();
+  virtual int HashCode() const;
 
   /**
    * Evaluates this expression.
@@ -210,8 +210,7 @@ public:
 
   virtual std::string ToString();
 
-  virtual bool operator==(Expression& object);
-  virtual bool operator==(Expression* object);
+  virtual bool operator==(const Object* object) const;
 
 };
 

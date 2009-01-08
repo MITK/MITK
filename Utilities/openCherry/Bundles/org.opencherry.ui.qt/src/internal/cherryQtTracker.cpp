@@ -240,9 +240,8 @@ void QtTracker::RemoveControlListener(GuiTk::IControlListener::Pointer listener)
 
 void QtTracker::HandleMove(const QPoint& globalPoint)
 {
-  GuiTk::ControlEvent::Pointer
-      event =
-          new GuiTk::ControlEvent(this, globalPoint.x(), globalPoint.y(), 0, 0);
+  GuiTk::ControlEvent::Pointer event(
+          new GuiTk::ControlEvent(this, globalPoint.x(), globalPoint.y(), 0, 0));
 
   controlEvents.movedEvent(event);
 }

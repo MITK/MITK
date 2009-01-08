@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExpressions.h"
@@ -44,13 +44,13 @@ namespace cherry
     // null isn't an instanceof of anything.
     if (element.IsNull())
       return false;
-    
+
     const std::deque<std::string> types = element->GetExtTypeInfo().m_TypeNames;
     for (std::deque<std::string>::const_iterator i = types.begin(); i != types.end(); ++i)
     {
       if (*i == type) return true;
     }
-    
+
     return true;
   }
 
@@ -101,7 +101,7 @@ namespace cherry
         iterable = result.Cast<IIterable>();
         return iterable;
       }
-      
+
       if (manager->QueryAdapter(var, typeid(IIterable).name()) == IAdapterManager::NOT_LOADED)
       return IIterable::Pointer();
 
@@ -134,12 +134,12 @@ namespace cherry
   }
 
   bool
-  Expressions::GetOptionalBooleanAttribute(IConfigurationElement* element, const std::string& attributeName)
+  Expressions::GetOptionalBooleanAttribute(IConfigurationElement::Pointer element, const std::string& attributeName)
   {
     std::string value;
     if (element->GetAttribute(attributeName, value))
       return Poco::toLower<std::string>(value) == "true";
-    
+
     return false;
   }
 
@@ -149,12 +149,12 @@ namespace cherry
     std::string value = element->getAttribute(attributeName);
     if (value.size() == 0)
       return false;
-    
+
     return Poco::toLower<std::string>(value) == "true";
   }
 
   void
-  Expressions::GetArguments(std::vector<ExpressionVariable::Pointer>& args, IConfigurationElement* element, const std::string& attributeName)
+  Expressions::GetArguments(std::vector<ExpressionVariable::Pointer>& args, IConfigurationElement::Pointer element, const std::string& attributeName)
   {
     std::string value;
     if (element->GetAttribute(attributeName, value))

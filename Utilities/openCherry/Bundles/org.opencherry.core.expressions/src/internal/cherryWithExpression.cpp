@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryWithExpression.h"
@@ -26,7 +26,7 @@ const std::string WithExpression::ATT_VARIABLE= "variable";
 
 const intptr_t WithExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::WithExpression");
 
-WithExpression::WithExpression(IConfigurationElement* configElement)
+WithExpression::WithExpression(IConfigurationElement::Pointer configElement)
 {
   bool result = configElement->GetAttribute(ATT_VARIABLE, fVariable);
   Expressions::CheckAttribute(ATT_VARIABLE, result);
@@ -41,7 +41,7 @@ WithExpression::WithExpression(Poco::XML::Element* element)
 WithExpression::WithExpression(const std::string& variable)
  : fVariable(variable)
 {
- 
+
 }
 
 bool
@@ -50,7 +50,7 @@ WithExpression::operator==(Expression& object)
   try
   {
     WithExpression& that = dynamic_cast<WithExpression&>(object);
-    return this->fVariable == that.fVariable && 
+    return this->fVariable == that.fVariable &&
             this->Equals(this->fExpressions, that.fExpressions);
   }
   catch (std::bad_cast)

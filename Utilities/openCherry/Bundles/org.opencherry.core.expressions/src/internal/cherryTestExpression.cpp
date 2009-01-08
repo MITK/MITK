@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryTestExpression.h"
@@ -33,7 +33,7 @@ TypeExtensionManager TestExpression::fgTypeExtensionManager("propertyTesters");
 const intptr_t TestExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::TextExpression");
 
 
-TestExpression::TestExpression(IConfigurationElement* element)
+TestExpression::TestExpression(IConfigurationElement::Pointer element)
 {
   std::string property;
   element->GetAttribute(ATT_PROPERTY, property);
@@ -76,7 +76,7 @@ TestExpression::TestExpression(const std::string& namespaze, const std::string& 
  : fNamespace(namespaze), fProperty(property), fArgs(args),
    fExpectedValue(expectedValue), fForcePluginActivation(forcePluginActivation)
 {
-  
+
 }
 
 EvaluationResult
@@ -90,14 +90,14 @@ TestExpression::Evaluate(IEvaluationContext* context)
     {
       return EvaluationResult::FALSE_EVAL;
     }
-    
+
     StringExpressionVariable::Pointer var = fArgs[0].Cast<StringExpressionVariable>();
     if (!var.IsNull())
       return EvaluationResult::ValueOf(str == var->GetVariable());
-    
+
     return EvaluationResult::FALSE_EVAL;
   }
-  
+
   Property::Pointer property= fgTypeExtensionManager.GetProperty(element, fNamespace, fProperty, context->GetAllowPluginActivation() && fForcePluginActivation);
   if (!property->IsInstantiated())
     return EvaluationResult::NOT_LOADED;
@@ -116,17 +116,17 @@ TestExpression::operator==(Expression& object)
 {
   try {
     TestExpression& that = dynamic_cast<TestExpression&>(object);
-    return this->fNamespace == that.fNamespace && 
-            this->fProperty == that.fProperty && 
-            this->fForcePluginActivation == that.fForcePluginActivation && 
-            this->Equals(this->fArgs, that.fArgs) && 
+    return this->fNamespace == that.fNamespace &&
+            this->fProperty == that.fProperty &&
+            this->fForcePluginActivation == that.fForcePluginActivation &&
+            this->Equals(this->fArgs, that.fArgs) &&
             this->fExpectedValue == that.fExpectedValue;
   }
   catch (std::bad_cast)
   {
     return false;
   }
-  
+
 }
 
 intptr_t
@@ -160,11 +160,11 @@ TestExpression::ToString()
     if (i < fArgs.size() - 1)
     args.append(", "); //$NON-NLS-1$
   }
-  
-  return "<test property=\"" + fProperty + 
-  (fArgs.size() != 0 ? "\" args=\"" + args + "\"" : "\"") + 
-  (!fExpectedValue.IsNull() ? "\" value=\"" + fExpectedValue->ToString() + "\"" : "\"") + 
-  " plug-in activation: " + (fForcePluginActivation ? "eager" : "lazy") + 
+
+  return "<test property=\"" + fProperty +
+  (fArgs.size() != 0 ? "\" args=\"" + args + "\"" : "\"") +
+  (!fExpectedValue.IsNull() ? "\" value=\"" + fExpectedValue->ToString() + "\"" : "\"") +
+  " plug-in activation: " + (fForcePluginActivation ? "eager" : "lazy") +
   "/>"; //$NON-NLS-1$
 }
 

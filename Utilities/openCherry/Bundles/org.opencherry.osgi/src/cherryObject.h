@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Mutex.h>
 
 #include "cherryOSGiDll.h"
-#include "cherrySmartPointer.h"
+#include "cherryMacros.h"
 
 namespace cherry {
 
@@ -69,22 +69,14 @@ private:
 class CHERRY_OSGI Object
 {
 public:
-  /** Standard clas typedefs. */
-  typedef Object         Self;
-  typedef SmartPointer<Self>  Pointer;
-  typedef SmartPointer<const Self>  ConstPointer;
 
+  cherryClassMacro(Object)
 
   /** Delete an itk object.  This method should always be used to delete an
    * object when the new operator was used to create it. Using the C
    *  delete method will not work with reference counting.  */
   virtual void Delete();
 
-  /** Return the name of this class as a string. Used by the object factory
-   * (implemented in New()) to instantiate objects of a named type. Also
-   * used for debugging and other output information.  */
-  virtual const char *GetNameOfClass() const
-    {return "Object";}
 
   /** Returns a unique name which can be used to name
      * library manifests for dynamic class loading. Used in the

@@ -22,6 +22,7 @@
 #include <sstream>
 #include "cherryOSGiDll.h"
 #include "cherryMacros.h"
+#include "cherryObject.h"
 
 namespace cherry {
 
@@ -50,12 +51,12 @@ class CHERRY_OSGI ObjectGeneric : public Object
       return m_Value;
     }
 
-    virtual bool operator==(Object::ConstPointer other) const
+    bool operator==(const Object* o) const
     {
+      if(const Self* other = dynamic_cast<const Self*>(o))
+        return (this->m_Value == other->m_Value);
 
-        typename Self::ConstPointer specOther = other.Cast<const Self>();
-        if(specOther == 0) return false;
-        return (this->m_Value == specOther->m_Value);
+      return false;
     }
 
     virtual std::string GetValueAsString() const
@@ -70,16 +71,14 @@ class CHERRY_OSGI ObjectGeneric : public Object
       return other.Cast<const Self>() != 0;
     }
 
-    virtual Object::Pointer operator=(const Object* other)
+    virtual void Assign(Object::ConstPointer other)
     {
-      const Self* specOther( dynamic_cast<const Self*>(other) );
+      ConstPointer specOther = other.Cast<const Self>();
 
       if (specOther && this->m_Value != specOther->m_Value)
       {
         this->m_Value = specOther->m_Value;
       }
-
-      return this;
     }
 
   protected:

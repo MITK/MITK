@@ -37,7 +37,7 @@ public:
 
   static const char PROPERTY_ID[];
 
-  QtWidgetController(Shell* shell);
+  QtWidgetController(SmartPointer<Shell> shell);
 
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
@@ -45,7 +45,7 @@ public:
   void AddShellListener(IShellListener::Pointer listener);
   void RemoveShellListener(IShellListener::Pointer listener);
 
-  Shell* GetShell();
+  SmartPointer<Shell> GetShell();
 
 protected:
 
@@ -55,7 +55,8 @@ protected:
   GuiTk::IControlListener::Events controlEvents;
   IShellListener::Events shellEvents;
 
-  Shell* shell;
+  //TODO WeakPointer
+  SmartPointer<Shell> shell;
 
 };
 

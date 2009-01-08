@@ -37,7 +37,7 @@ BundleContext::~BundleContext()
 bool BundleContext::operator==(const Object* o) const
 {
   if (const IBundleContext* context = dynamic_cast<const IBundleContext*>(o))
-    return this->GetThisBundle().CompareTo(context->GetThisBundle());
+    return this->GetThisBundle() == context->GetThisBundle();
 
   return false;
 }

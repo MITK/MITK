@@ -146,8 +146,9 @@ void SaveablesList::RemoveModels(Object::Pointer source,
   }
   if (removed.size() > 0)
   {
-    SaveablesLifecycleEvent::Pointer event = new SaveablesLifecycleEvent(this,
-        SaveablesLifecycleEvent::POST_OPEN, removed, false);
+    Object::Pointer source(this);
+    SaveablesLifecycleEvent::Pointer event(new SaveablesLifecycleEvent(source,
+        SaveablesLifecycleEvent::POST_OPEN, removed, false));
     this->FireModelLifecycleEvent(event);
   }
 }
@@ -166,8 +167,9 @@ void SaveablesList::AddModels(Object::Pointer source,
   }
   if (added.size() > 0)
   {
-    SaveablesLifecycleEvent::Pointer event = new SaveablesLifecycleEvent(this,
-        SaveablesLifecycleEvent::POST_OPEN, added, false);
+    Object::Pointer source(this);
+    SaveablesLifecycleEvent::Pointer event(new SaveablesLifecycleEvent(source,
+        SaveablesLifecycleEvent::POST_OPEN, added, false));
     this->FireModelLifecycleEvent(event);
   }
 }
@@ -241,7 +243,7 @@ std::vector<Saveable::Pointer> SaveablesList::GetSaveables(
   else if (part.Cast<ISaveablePart> () != 0)
   {
     std::vector<Saveable::Pointer> result;
-    Saveable::Pointer defaultSaveable = new DefaultSaveable(part);
+    Saveable::Pointer defaultSaveable(new DefaultSaveable(part));
     result.push_back(defaultSaveable);
     return result;
   }
@@ -301,8 +303,9 @@ void SaveablesList::HandleLifecycleEvent(SaveablesLifecycleEvent::Pointer event)
   }
   else if (eventType == SaveablesLifecycleEvent::DIRTY_CHANGED)
   {
-    SaveablesLifecycleEvent::Pointer event =
-      new SaveablesLifecycleEvent(this, event->GetEventType(), event->GetSaveables(), false);
+    Object::Pointer source(this);
+    SaveablesLifecycleEvent::Pointer event(
+      new SaveablesLifecycleEvent(source, event->GetEventType(), event->GetSaveables(), false));
     this->FireModelLifecycleEvent(event);
   }
 }
@@ -375,7 +378,7 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 //    }
 //  }
 //  return postCloseInfo;
-  return 0;
+  return PostCloseInfo::Pointer(0);
 }
 
 bool SaveablesList::PromptForSaving(
@@ -583,8 +586,9 @@ void SaveablesList::DirtyChanged(IWorkbenchPart::Pointer part)
 {
   std::vector<Saveable::Pointer> saveables = this->GetSaveables(part);
   if (saveables.size() > 0) {
-    SaveablesLifecycleEvent::Pointer event = new SaveablesLifecycleEvent(this,
-        SaveablesLifecycleEvent::DIRTY_CHANGED, saveables, false);
+    Object::Pointer source(this);
+    SaveablesLifecycleEvent::Pointer event(new SaveablesLifecycleEvent(source,
+        SaveablesLifecycleEvent::DIRTY_CHANGED, saveables, false));
     this->FireModelLifecycleEvent(event);
   }
 }

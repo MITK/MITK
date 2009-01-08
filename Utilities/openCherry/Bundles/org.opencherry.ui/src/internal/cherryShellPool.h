@@ -42,7 +42,7 @@ class ShellPool: public IShellListener
   /**
    * Parent shell (or null if none)
    */
-  Shell* parentShell;
+  Shell::Pointer parentShell;
 
   std::list<Shell::Pointer> availableShells;
 

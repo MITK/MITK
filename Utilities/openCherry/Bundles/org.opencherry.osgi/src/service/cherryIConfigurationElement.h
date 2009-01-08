@@ -55,7 +55,7 @@ public:
         // check if we have extension adapter and initialize
         if (dynamic_cast<IExecutableExtension*>(cl) != 0) {
           // make the call even if the initialization string is null
-          dynamic_cast<IExecutableExtension*>(cl)->SetInitializationData(this, propertyName, 0);
+          dynamic_cast<IExecutableExtension*>(cl)->SetInitializationData(Pointer(this), propertyName, Object::Pointer(0));
 
         }
 

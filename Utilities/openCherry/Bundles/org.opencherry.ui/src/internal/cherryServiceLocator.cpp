@@ -38,7 +38,7 @@ Object::Pointer ServiceLocator::ParentLocator::GetService(
   {
     return locator->GetService(key);
   }
-  return 0;
+  return Object::Pointer(0);
 }
 
 bool ServiceLocator::ParentLocator::HasService(const std::string& api) const
@@ -120,7 +120,7 @@ Object::Pointer ServiceLocator::GetService(const std::string& key) const
 {
   if (disposed)
   {
-    return 0;
+    return Object::Pointer(0);
   }
 
   KeyToServiceMapType::const_iterator iter = services.find(key);

@@ -98,7 +98,7 @@ int LayoutPart::ComputePreferredSize(bool width, int availableParallel,
 
 IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer draggedObject, const Point& displayCoordinates)
 {
-  return 0;
+  return IDropTarget::Pointer(0);
 }
 
 bool LayoutPart::IsDocked()
@@ -118,7 +118,7 @@ Shell::Pointer LayoutPart::GetShell()
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(ctrl);
   }
-  return 0;
+  return Shell::Pointer(0);
 }
 
 IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
@@ -126,7 +126,7 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
   Shell::Pointer s = this->GetShell();
   if (s == 0)
   {
-    return 0;
+    return IWorkbenchWindow::Pointer(0);
   }
   Object::Pointer data = s->GetData();
   if (data.Cast<IWorkbenchWindow>() != 0)
@@ -138,7 +138,7 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
     return data.Cast<DetachedWindow>()->GetWorkbenchPage()->GetWorkbenchWindow();
   }
 
-  return 0;
+  return IWorkbenchWindow::Pointer(0);
 
 }
 
@@ -150,7 +150,7 @@ void LayoutPart::Reparent(void* newParent)
 {
   void* control = this->GetControl();
 
-  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet::Pointer guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;
@@ -256,7 +256,7 @@ void LayoutPart::SetID(const std::string& str)
 
 LayoutPart::Pointer LayoutPart::GetPart()
 {
-  return this;
+  return LayoutPart::Pointer(this);
 }
 
 void LayoutPart::DeferUpdates(bool shouldDefer)
@@ -317,7 +317,7 @@ void LayoutPart::FlushLayout()
   ILayoutContainer::Pointer container = this->GetContainer();
   if (container != 0)
   {
-    container->ResizeChild(this);
+    container->ResizeChild(LayoutPart::Pointer(this));
   }
 }
 

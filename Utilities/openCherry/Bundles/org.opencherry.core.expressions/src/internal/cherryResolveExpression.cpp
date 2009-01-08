@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryResolveExpression.h"
@@ -28,7 +28,7 @@ const std::string ResolveExpression::ATT_VARIABLE= "variable";
 const std::string ResolveExpression::ATT_ARGS= "args";
 const intptr_t ResolveExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::ResolveExpression");
 
-ResolveExpression::ResolveExpression(IConfigurationElement* configElement)
+ResolveExpression::ResolveExpression(IConfigurationElement::Pointer configElement)
 {
   bool result = configElement->GetAttribute(ATT_VARIABLE, fVariable);
   Expressions::CheckAttribute(ATT_VARIABLE, result);
@@ -45,7 +45,7 @@ ResolveExpression::ResolveExpression(Poco::XML::Element* element)
 ResolveExpression::ResolveExpression(const std::string& variable, std::vector<ExpressionVariable::Pointer>& args)
  : fVariable(variable), fArgs(args)
 {
-  
+
 }
 
 EvaluationResult

@@ -29,7 +29,7 @@ namespace cherry
 void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);
-  QtControlWidget* client = new QtControlWidget(parent);
+  QtControlWidget* client = new QtControlWidget(parent, Shell::Pointer(0));
   client->setObjectName("Client Composite");
   parent->layout()->addWidget(client);
 
@@ -42,7 +42,7 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
 {
   QWidget* qParent = static_cast<QWidget*>(parent);
-  QtControlWidget* control = new QtControlWidget(qParent);
+  QtControlWidget* control = new QtControlWidget(qParent, Shell::Pointer(0));
   control->setObjectName("Pane Control");
 
   return control;
@@ -50,7 +50,7 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
 
 IViewPart::Pointer QtWorkbenchPageTweaklet::CreateErrorViewPart(const std::string& partName, const std::string& msg)
 {
-  QtErrorView::Pointer part = new QtErrorView();
+  QtErrorView::Pointer part(new QtErrorView());
   //part->SetPartName(partName);
   part->SetErrorMsg(msg);
   return part;
@@ -58,7 +58,7 @@ IViewPart::Pointer QtWorkbenchPageTweaklet::CreateErrorViewPart(const std::strin
 
 IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const std::string& partName, const std::string& msg)
 {
-  return 0;
+  return IEditorPart::Pointer(0);
 }
 
 }

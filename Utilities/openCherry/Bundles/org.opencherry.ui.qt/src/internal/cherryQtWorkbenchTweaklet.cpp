@@ -45,7 +45,7 @@ bool QtWorkbenchTweaklet::IsRunning()
 void* QtWorkbenchTweaklet::CreatePageComposite(void* p)
 {
   QWidget* parent = static_cast<QWidget*>(p);
-  QtControlWidget* pageArea = new QtControlWidget(parent);
+  QtControlWidget* pageArea = new QtControlWidget(parent, Shell::Pointer(0));
   pageArea->setObjectName("Page Composite");
   new QHBoxLayout(pageArea);
   if (qobject_cast<QMainWindow*>(parent) != 0)
@@ -64,9 +64,9 @@ IDialog::Pointer
 QtWorkbenchTweaklet::CreateStandardDialog(const std::string& dialogid)
 {
   if (dialogid == DIALOG_ID_SHOW_VIEW)
-    return new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry());
+    return IDialog::Pointer(new QtShowViewDialog(PlatformUI::GetWorkbench()->GetViewRegistry()));
   else
-    return 0;
+    return IDialog::Pointer(0);
 }
 
 

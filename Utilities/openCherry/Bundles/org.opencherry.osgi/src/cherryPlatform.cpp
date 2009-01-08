@@ -64,7 +64,7 @@ const Poco::Path& Platform::GetConfigurationPath()
   return InternalPlatform::GetInstance()->GetConfigurationPath();
 }
 
-IExtensionPointService* Platform::GetExtensionPointService()
+SmartPointer<IExtensionPointService> Platform::GetExtensionPointService()
 {
   return InternalPlatform::GetInstance()->GetExtensionPointService();
 }
@@ -139,7 +139,7 @@ bool Platform::IsVMS()
 #endif
 }
 
-Poco::Path Platform::GetStatePath(IBundle* bundle)
+Poco::Path Platform::GetStatePath(IBundle::Pointer bundle)
 {
   return InternalPlatform::GetInstance()->GetStatePath(bundle);
 }

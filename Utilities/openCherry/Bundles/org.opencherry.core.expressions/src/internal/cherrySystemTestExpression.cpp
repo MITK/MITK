@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherrySystemTestExpression.h"
@@ -25,11 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const std::string SystemTestExpression::ATT_PROPERTY= "property"; 
+const std::string SystemTestExpression::ATT_PROPERTY= "property";
 
 const intptr_t SystemTestExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::SystemTestExpression");
 
-SystemTestExpression::SystemTestExpression(IConfigurationElement* element)
+SystemTestExpression::SystemTestExpression(IConfigurationElement::Pointer element)
 {
   bool result = element->GetAttribute(ATT_PROPERTY, fProperty);
   Expressions::CheckAttribute(ATT_PROPERTY, result);
@@ -48,7 +48,7 @@ SystemTestExpression::SystemTestExpression(Poco::XML::Element* element)
 SystemTestExpression::SystemTestExpression(const std::string& property, const std::string& expectedValue)
  : fProperty(property), fExpectedValue(expectedValue)
 {
-  
+
 }
 
 EvaluationResult
@@ -57,7 +57,7 @@ SystemTestExpression::Evaluate(IEvaluationContext* context)
   std::string str = Platform::GetProperty(fProperty);
   if (str.size() == 0)
     return EvaluationResult::FALSE_EVAL;
-  
+
   return EvaluationResult::ValueOf(str == fExpectedValue);
 }
 
@@ -79,7 +79,7 @@ SystemTestExpression::operator==(Expression& object)
   {
     return false;
   }
-  
+
 }
 
 intptr_t

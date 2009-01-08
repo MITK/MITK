@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryAdaptExpression.h"
@@ -38,38 +38,38 @@ const std::string AdaptExpression::ATT_TYPE= "type"; //$NON-NLS-1$
  */
 const intptr_t AdaptExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::AdaptExpression");
 
-AdaptExpression::AdaptExpression(IConfigurationElement* configElement)
+AdaptExpression::AdaptExpression(IConfigurationElement::Pointer configElement)
 {
   bool attr = configElement->GetAttribute(ATT_TYPE, fTypeName);
   Expressions::CheckAttribute(ATT_TYPE, attr);
 }
 
-AdaptExpression::AdaptExpression(Poco::XML::Node* /*element*/) 
+AdaptExpression::AdaptExpression(Poco::XML::Node* /*element*/)
 {
   throw Poco::NotImplementedException();
   //fTypeName = element->GetAttribute(ATT_TYPE);
   //Expressions::CheckAttribute(ATT_TYPE, fTypeName.length() > 0 ? fTypeName : null);
 }
 
-AdaptExpression::AdaptExpression(const std::string& typeName) 
+AdaptExpression::AdaptExpression(const std::string& typeName)
 {
   poco_assert(typeName.size() != 0);
   fTypeName= typeName;
 }
 
 //bool
-//AdaptExpression::equals(final Object object) 
+//AdaptExpression::equals(final Object object)
 //{
 //  if (!(object instanceof AdaptExpression))
 //    return FALSE_EVAL;
-//  
+//
 //  final AdaptExpression that= (AdaptExpression)object;
 //  return this.fTypeName.equals(that.fTypeName)
 //      && equals(this.fExpressions, that.fExpressions);
 //}
 
-intptr_t 
-AdaptExpression::ComputeHashCode() 
+intptr_t
+AdaptExpression::ComputeHashCode()
 {
   throw Poco::NotImplementedException("ComputeHashCode not implemented");
   //return HASH_INITIAL * HASH_FACTOR + HashCode(fExpressions)
@@ -79,7 +79,7 @@ AdaptExpression::ComputeHashCode()
 /* (non-Javadoc)
  * @see Expression#evaluate(IVariablePool)
  */
-EvaluationResult 
+EvaluationResult
 AdaptExpression::Evaluate(IEvaluationContext* context)
 {
   if (fTypeName.size() == 0)
@@ -92,7 +92,7 @@ AdaptExpression::Evaluate(IEvaluationContext* context)
   } else {
     if (!manager->HasAdapter(var, fTypeName))
       return EvaluationResult::FALSE_EVAL;
-  
+
     adapted = manager->GetAdapter(var, fTypeName);
   }
   // the adapted result is null but hasAdapter returned TRUE_EVAL check
@@ -107,14 +107,14 @@ AdaptExpression::Evaluate(IEvaluationContext* context)
   return this->EvaluateAnd(new DefaultVariable(context, adapted));
 }
 
-void 
-AdaptExpression::CollectExpressionInfo(ExpressionInfo* info) 
+void
+AdaptExpression::CollectExpressionInfo(ExpressionInfo* info)
 {
   // Although the default variable is passed to the children of this
   // expression as an instance of the adapted type it is OK to only
   // mark a default variable access.
   info->MarkDefaultVariableAccessed();
   CompositeExpression::CollectExpressionInfo(info);
-} 
+}
 
 }  // namespace cherry

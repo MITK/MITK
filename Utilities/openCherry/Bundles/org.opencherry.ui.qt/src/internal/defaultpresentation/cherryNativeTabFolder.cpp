@@ -20,6 +20,8 @@
 
 #include "../cherryQtControlWidget.h"
 
+#include <cherryShell.h>
+
 #include <QVBoxLayout>
 
 namespace cherry
@@ -44,7 +46,7 @@ void NativeTabFolder::DragStarted(const QPoint& location)
 NativeTabFolder::NativeTabFolder(QWidget* parent)
 {
   content = 0;
-  viewForm = new QtControlWidget(parent);
+  viewForm = new QtControlWidget(parent, Shell::Pointer(0));
   qobject_cast<QFrame*>(viewForm)->setFrameStyle(QFrame::Box | QFrame::Plain);
   viewForm->setObjectName("ViewForm");
   QVBoxLayout* layout = new QVBoxLayout(viewForm);

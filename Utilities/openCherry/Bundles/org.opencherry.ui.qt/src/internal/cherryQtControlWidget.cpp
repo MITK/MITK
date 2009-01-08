@@ -26,7 +26,7 @@
 
 namespace cherry {
 
-QtControlWidget::QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f)
+QtControlWidget::QtControlWidget(QWidget* parent, Shell::Pointer shell, Qt::WindowFlags f)
  : QFrame(parent, f)
 {
   this->setFrameStyle(QFrame::NoFrame);
@@ -47,7 +47,7 @@ QtControlWidget::~QtControlWidget()
 void QtControlWidget::changeEvent(QEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
-  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
+  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
   switch (event->type())
   {
   case QEvent::WindowActivate:
@@ -118,7 +118,7 @@ void QtControlWidget::closeEvent(QCloseEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
-  ShellEvent::Pointer shellEvent = new ShellEvent(controller->shell);
+  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
 
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();
@@ -136,19 +136,19 @@ void QtControlWidget::closeEvent(QCloseEvent* event)
 
 void QtControlWidget::moveEvent(QMoveEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(static_cast<QWidget*>(this), event->pos().x(), event->pos().y());
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this), event->pos().x(), event->pos().y()));
   controller->controlEvents.movedEvent(controlEvent);
 }
 
 void QtControlWidget::resizeEvent(QResizeEvent* event)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(static_cast<QWidget*>(this), 0, 0, event->size().width(), event->size().height());
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this), 0, 0, event->size().width(), event->size().height()));
   controller->controlEvents.resizedEvent(controlEvent);
 }
 
 void QtControlWidget::inFocusEvent(QFocusEvent* /*event*/)
 {
-  GuiTk::ControlEvent::Pointer controlEvent = new GuiTk::ControlEvent(static_cast<QWidget*>(this));
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this)));
   controller->controlEvents.activatedEvent(controlEvent);
 }
 

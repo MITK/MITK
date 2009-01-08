@@ -40,7 +40,7 @@ int Starter::Run(int& argc, char** argv)
   platform->Launch();
 
   // run the application
-  IExtensionPointService* service = platform->GetExtensionPointService();
+  IExtensionPointService::Pointer service = platform->GetExtensionPointService();
   IConfigurationElement::vector extensions(
     service->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
   IConfigurationElement::vector::iterator iter;

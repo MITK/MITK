@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExecutionEvent.h"
@@ -26,7 +26,7 @@ namespace cherry
 
 ExecutionEvent::ExecutionEvent()
 {
-  
+
 }
 
 ExecutionEvent::ExecutionEvent(const Command::ConstPointer cmd,
@@ -73,7 +73,7 @@ const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
 //          "Command does not have a value converter"); //$NON-NLS-1$
 //    }
     const std::string stringValue = this->GetParameter(parameterId);
-    ObjectString::Pointer objectValue = new ObjectString(stringValue);
+    ObjectString::Pointer objectValue(new ObjectString(stringValue));
 //    const Object objectValue = valueConverter
 //    .convertToObject(stringValue);
     return objectValue;

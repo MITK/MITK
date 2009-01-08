@@ -35,7 +35,7 @@ void ShellPool::ShellClosed(ShellEvent::Pointer e)
 
     if (l != 0)
     {
-      s->SetData(0, CLOSE_LISTENER);
+      s->SetData(Object::Pointer(0), CLOSE_LISTENER);
       l->ShellClosed(e);
 
       // The shell can 'cancel' the close by setting
@@ -73,7 +73,7 @@ Shell::Pointer ShellPool::AllocateShell(IShellListener::Pointer closeListener)
   {
     result = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateShell(parentShell,
         flags);
-    result->AddShellListener(this);
+    result->AddShellListener(IShellListener::Pointer(this));
     //result.addDisposeListener(disposeListener);
   }
 

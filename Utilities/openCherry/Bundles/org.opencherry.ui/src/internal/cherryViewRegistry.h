@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYVIEWREGISTRY_H_
@@ -37,14 +37,14 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * The central manager for view descriptors.
  */
 class ViewRegistry : public IViewRegistry
 {
-  
+
 public:
-  
+
   typedef Category<IViewDescriptor::Pointer> IViewDescriptorCategory;
   typedef IViewDescriptorCategory::Pointer IViewDescriptorCategoryPtr;
 
@@ -52,20 +52,20 @@ private:
 
   /**
    * Proxies a Category implementation.
-   * 
+   *
    */
   class ViewCategoryProxy : public IViewCategory
   {
 
   private:
-    
+
     typedef Category<IViewDescriptor::Pointer> IViewDescriptorCategory;
-    
+
     IViewDescriptorCategoryPtr rawCategory;
 
     /**
      * Create a new instance of this class
-     * 
+     *
      * @param rawCategory the category
      */
   public:
@@ -94,7 +94,7 @@ private:
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    bool operator==(const IViewCategory* o) const;
+    bool operator==(const Object* o) const;
 
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
@@ -113,7 +113,7 @@ private:
   //    public int compare(Object o1, Object o2) {
   //      String id1 = ((ViewDescriptor) o1).getId();
   //      String id2 = ((ViewDescriptor) o2).getId();
-  //      
+  //
   //      return id1.compareTo(id2);
   //    }});
 
@@ -147,14 +147,14 @@ public:
 
   /**
    * Add a category to the registry.
-   * 
+   *
    * @param desc the descriptor to add
    */
   void Add(IViewDescriptorCategoryPtr desc);
 
   /**
    * Add a descriptor to the registry.
-   * 
+   *
    * @param desc the descriptor to add
    */
   void Add(ViewDescriptor::Pointer desc);
@@ -166,7 +166,7 @@ public:
 
   /**
    * Find a category with a given name.
-   * 
+   *
    * @param id the id to search for
    * @return the category or <code>null</code>
    */
@@ -180,7 +180,7 @@ public:
   /**
    * Returns the Misc category. This may be <code>null</code> if there are
    * no miscellaneous views.
-   * 
+   *
    * @return the misc category or <code>null</code>
    */
   IViewDescriptorCategoryPtr GetMiscCategory() const;

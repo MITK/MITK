@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryIBundle.h"
 #include "cherryCodeCache.h"
 #include "../cherryBundleLoader.h"
+#include "cherrySystemBundle.h"
 
 namespace cherry {
 
@@ -227,7 +228,7 @@ const Poco::Path& InternalPlatform::GetInstancePath()
   return m_InstancePath;
 }
 
-Poco::Path InternalPlatform::GetStatePath(IBundle* bundle)
+Poco::Path InternalPlatform::GetStatePath(IBundle::Pointer bundle)
 {
   Poco::Path statePath(m_BaseStatePath);
   statePath.pushDirectory(bundle->GetSymbolicName());
@@ -301,7 +302,7 @@ int InternalPlatform::main(const std::vector<std::string>& args)
   m_FilteredArgs = args;
   m_FilteredArgs.insert(m_FilteredArgs.begin(), this->config().getString("application.argv[0]"));
 
-  SystemBundle* systemBundle = m_BundleLoader->FindBundle("system.bundle").Cast<SystemBundle>();
+  SystemBundle::Pointer systemBundle = m_BundleLoader->FindBundle("system.bundle").Cast<SystemBundle>();
   if (systemBundle == 0)
     throw PlatformException("Could not find the system bundle");
   m_BundleLoader->StartSystemBundle(systemBundle);

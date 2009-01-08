@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExtension.h"
@@ -26,9 +26,12 @@ Extension::Extension(const std::string& ns)
 
 }
 
-bool Extension::operator==(const Extension* em) const
+bool Extension::operator==(const Object* em) const
 {
-  return (id == em->id) && (extensionPoint == em->extensionPoint);
+  if (const Extension* other = dynamic_cast<const Extension*>(em))
+    return (id == other->id) && (extensionPoint == other->extensionPoint);
+
+  return false;
 }
 
 std::string Extension::GetNamespace() const

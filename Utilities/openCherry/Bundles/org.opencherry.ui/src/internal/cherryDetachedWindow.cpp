@@ -85,17 +85,17 @@ Shell::Pointer DetachedWindow::GetShell()
 
 void DetachedWindow::Create()
 {
-  folder->AddListener(this);
+  folder->AddListener(IPropertyChangeListener::Pointer(this));
 
   windowShell = page->GetWorkbenchWindow().Cast<WorkbenchWindow>()
        ->GetDetachedWindowPool()->AllocateShell(shellListener);
 #ifdef CHERRY_DEBUG_SMARTPOINTER
   std::cout << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
 #endif
-  windowShell->SetData(this);
+  windowShell->SetData(Object::Pointer(this));
   windowShell->SetText(""); //$NON-NLS-1$
 
-  DragUtil::AddDragTarget(windowShell->GetControl(), this);
+  DragUtil::AddDragTarget(windowShell->GetControl(), IDragOverListener::Pointer(this));
   hideViewsOnClose = true;
   if (bounds.IsEmpty())
   {
@@ -160,14 +160,14 @@ IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
 
   if (draggedObject.Cast<PartPane> () == 0)
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
 
   if (sourcePart->GetWorkbenchWindow() != page->GetWorkbenchWindow())
   {
-    return 0;
+    return IDropTarget::Pointer(0);
   }
 
   // Only handle the event if the source part is acceptable to the particular PartStack
@@ -182,13 +182,12 @@ IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
           DragUtil::GetDisplayBounds(folder->GetControl());
       if (displayBounds.Contains(position))
       {
-        StackDropResult::Pointer stackDropResult =
-            new StackDropResult(displayBounds, 0);
+        StackDropResult::Pointer stackDropResult(new StackDropResult(displayBounds, Object::Pointer(0)));
         target = folder->CreateDropTarget(sourcePart, stackDropResult);
       }
       else
       {
-        return 0;
+        return IDropTarget::Pointer(0);
       }
     }
   }
@@ -289,12 +288,12 @@ void DetachedWindow::ActivePartChanged(
 
   if (activePart != 0)
   {
-    activePart->RemovePropertyListener(this);
+    activePart->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
   }
   activePart = partReference;
   if (partReference != 0)
   {
-    partReference->AddPropertyListener(this);
+    partReference->AddPropertyListener(IPropertyChangeListener::Pointer(this));
   }
   this->UpdateTitle();
 }
@@ -404,7 +403,7 @@ IWorkbenchPartReference::Pointer DetachedWindow::GetPartReference(
 
   if (pane == 0 || pane.Cast<PartPane> () == 0)
   {
-    return 0;
+    return IWorkbenchPartReference::Pointer(0);
   }
 
   return pane.Cast<PartPane> ()->GetPartReference();
@@ -457,7 +456,7 @@ bool DetachedWindow::HandleClose()
     //    windowShell.removeListener(SWT.Activate, activationListener);
     //    windowShell.removeListener(SWT.Deactivate, activationListener);
 
-    DragUtil::RemoveDragTarget(windowShell->GetControl(), this);
+    DragUtil::RemoveDragTarget(windowShell->GetControl(), IDragOverListener::Pointer(this));
     bounds = windowShell->GetBounds();
 
     //TODO DetachedWindow unregister key bindings
@@ -465,7 +464,7 @@ bool DetachedWindow::HandleClose()
     //    final IContextService contextService = (IContextService) getWorkbenchPage().getWorkbenchWindow().getWorkbench().getService(IContextService.class);
     //    contextService.unregisterShell(windowShell);
 
-    windowShell->SetData(0);
+    windowShell->SetData(Object::Pointer(0));
     windowShell = 0;
   }
 

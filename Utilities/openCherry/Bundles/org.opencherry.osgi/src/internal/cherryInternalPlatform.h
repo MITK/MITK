@@ -18,17 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYINTERNALPLATFORM_H_
 #define CHERRYINTERNALPLATFORM_H_
 
-#include "Poco/Path.h"
-#include "Poco/Mutex.h"
-#include "Poco/AutoPtr.h"
-#include "Poco/Logger.h"
-#include "Poco/Util/Application.h"
+#include <Poco/Path.h>
+#include <Poco/Mutex.h>
+#include <Poco/AutoPtr.h>
+#include <Poco/Logger.h>
+#include <Poco/Util/Application.h>
 
 #include "../event/cherryPlatformEvents.h"
 #include "../service/cherryServiceRegistry.h"
 #include "cherryExtensionPointService.h"
-
-#include "cherrySystemBundle.h"
 
 #include <map>
 
@@ -38,6 +36,7 @@ struct IBundle;
 class CodeCache;
 class BundleLoader;
 class PlatformLogChannel;
+class SystemBundle;
 
 class CHERRY_OSGI InternalPlatform : private Poco::Util::Application
 {
@@ -110,7 +109,7 @@ public:
 
   const Poco::Path& GetInstancePath();
 
-  Poco::Path GetStatePath(IBundle* bundle);
+  Poco::Path GetStatePath(SmartPointer<IBundle> bundle);
 
   const Poco::Path& GetUserPath();
 

@@ -71,7 +71,7 @@ private:
   IBundleActivator* LoadActivator(BundleInfo& bundleInfo);
 
   friend class InternalPlatform;
-  void StartSystemBundle(SystemBundle* bundle);
+  void StartSystemBundle(SmartPointer<SystemBundle> bundle);
 
 public:
   BundleLoader(CodeCache* codeCache, Poco::Logger& logger); //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
@@ -87,27 +87,27 @@ public:
   void LoadBundle(Bundle::Pointer bundle);
 
   Poco::Path GetPathForLibrary(const std::string& libraryName);
-  Poco::Path GetLibraryPathFor(IBundle* bundle);
-  std::string GetContributionsPathFor(IBundle* bundle);
+  Poco::Path GetLibraryPathFor(SmartPointer<IBundle> bundle);
+  std::string GetContributionsPathFor(SmartPointer<IBundle> bundle);
 
   Poco::Logger& GetLogger() const;
 
-  void ResolveBundle(IBundle* bundle);
+  void ResolveBundle(SmartPointer<IBundle> bundle);
   void ResolveAllBundles();
 
   void ReadAllContributions();
-  void ReadContributions(IBundle* bundle);
-  void ReadDependentContributions(IBundle* bundle);
+  void ReadContributions(SmartPointer<IBundle> bundle);
+  void ReadDependentContributions(SmartPointer<IBundle> bundle);
 
-  void ListLibraries(IBundle* bundle, std::vector<std::string>& list, const std::string& baseDir = "bin/");
-  void InstallLibraries(IBundle* bundle, bool copy = false);
+  void ListLibraries(SmartPointer<IBundle> bundle, std::vector<std::string>& list, const std::string& baseDir = "bin/");
+  void InstallLibraries(SmartPointer<IBundle> bundle, bool copy = false);
 
   // start all resolved bundles, except the system bundle
   // (it is assumed, that the system bundle has already
   //  been started)
   void StartAllBundles();
-  void StartBundle(Bundle* bundle);
-  void StartDependencies(Bundle* bundle);
+  void StartBundle(SmartPointer<Bundle> bundle);
+  void StartDependencies(SmartPointer<Bundle> bundle);
 
   template<class C>
   C* LoadClass(const std::string& bundleName, const std::string& className);

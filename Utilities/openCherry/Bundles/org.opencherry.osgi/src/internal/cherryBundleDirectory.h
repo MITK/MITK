@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYBUNDLEDIRECTORY_H_
 #define CHERRYBUNDLEDIRECTORY_H_
 
-#include "Poco/Path.h"
+#include <Poco/Path.h>
 
 #include "../cherryIBundleStorage.h"
 

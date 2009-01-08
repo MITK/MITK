@@ -17,10 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryConfigurationElement.h"
 #include "cherryExtension.h"
+#include "../cherryBundleLoader.h"
 
-#include "Poco/DOM/NamedNodeMap.h"
-#include "Poco/DOM/NodeList.h"
-#include "Poco/String.h"
+#include <Poco/DOM/NamedNodeMap.h>
+#include <Poco/DOM/NodeList.h>
+#include <Poco/String.h>
 
 namespace cherry {
 
@@ -136,7 +137,7 @@ ConfigurationElement::GetContributor() const
 const IExtension*
 ConfigurationElement::GetDeclaringExtension() const
 {
-  return m_Extension;
+  return m_Extension.GetPointer();
 }
 
 ConfigurationElement::~ConfigurationElement()

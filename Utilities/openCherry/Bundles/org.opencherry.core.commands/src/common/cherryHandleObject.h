@@ -1,24 +1,25 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYHANDLEOBJECT_H_
 #define CHERRYHANDLEOBJECT_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 #include "../cherryCommandsDll.h"
 
 namespace cherry {
@@ -44,23 +45,23 @@ namespace cherry {
  * example, there should only ever be one instance of <code>Command</code>
  * with a given identifier.
  * </p>
- * 
+ *
  * @since 3.1
  */
 class CHERRY_COMMANDS HandleObject : public Object { // extends EventManager implements IIdentifiable {
 
 public:
-  
+
   cherryClassMacro(HandleObject)
-  
+
 private:
-  
+
   /**
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
    //static const int HASH_CODE_NOT_COMPUTED = -1;
-  
+
     /**
      * A factor for computing the hash code for all schemes.
      */
@@ -80,7 +81,7 @@ private:
 
 
 protected:
-  
+
     /**
      * Whether this object is defined. A defined object is one that has been
      * fully initialized. By default, all objects start as undefined.
@@ -104,31 +105,31 @@ protected:
 
     /**
      * Constructs a new instance of <code>HandleObject</code>.
-     * 
+     *
      * @param id
      *            The id of this handle; must not be <code>null</code>.
      */
     HandleObject(const std::string& id);
 
-    
+
 public:
-  
+
     /**
      * Tests whether this object is equal to another object. A handle object is
      * only equal to another handle object with the same id and the same class.
-     * 
+     *
      * @param object
      *            The object with which to compare; may be <code>null</code>.
      * @return <code>true</code> if the objects are equal; <code>false</code>
      *         otherwise.
      */
-   bool operator==(const Object* object);
-   
+   bool operator==(const Object* object) const;
+
    virtual std::string GetId() const;
 
     /**
      * Computes the hash code for this object based on the id.
-     * 
+     *
      * @return The hash code for this object.
      */
 //    virtual int HashCode() {
@@ -145,7 +146,7 @@ public:
      * Whether this instance is defined. A defined instance is one that has been
      * fully initialized. This allows objects to effectively disappear even
      * though other objects may still have references to them.
-     * 
+     *
      * @return <code>true</code> if this object is defined; <code>false</code>
      *         otherwise.
      */

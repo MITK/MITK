@@ -60,8 +60,9 @@ void PresentablePart::FirePropertyChange(PropertyChangeEvent::Pointer event)
 
 void PresentablePart::FirePropertyChange(int propId)
 {
-  ObjectInt::Pointer val = new ObjectInt(propId);
-  PropertyChangeEvent::Pointer event = new PropertyChangeEvent(this, IWorkbenchPartConstants::INTEGER_PROPERTY, val, val);
+  ObjectInt::Pointer val(new ObjectInt(propId));
+  Object::Pointer source(this);
+  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
   this->FirePropertyChange(event);
 }
 

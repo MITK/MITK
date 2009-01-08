@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryExpressionConverter.h"
@@ -25,8 +25,8 @@ namespace cherry {
 
 ExpressionConverter* ExpressionConverter::INSTANCE = 0;
 
-ExpressionConverter* 
-ExpressionConverter::GetDefault() 
+ExpressionConverter*
+ExpressionConverter::GetDefault()
 {
   if (INSTANCE) return INSTANCE;
 
@@ -37,13 +37,13 @@ ExpressionConverter::GetDefault()
   return INSTANCE;
 }
 
-ExpressionConverter::ExpressionConverter(std::vector<ElementHandler::Pointer>& handlers) 
+ExpressionConverter::ExpressionConverter(std::vector<ElementHandler::Pointer>& handlers)
 {
   fHandlers = handlers;
 }
 
 Expression::Pointer
-ExpressionConverter::Perform(IConfigurationElement* root)
+ExpressionConverter::Perform(IConfigurationElement::Pointer root)
 {
   for (unsigned int i = 0; i < fHandlers.size(); i++) {
     ElementHandler::Pointer handler = fHandlers[i];
@@ -66,37 +66,37 @@ ExpressionConverter::Perform(Poco::XML::Element* root)
   return Expression::Pointer();
 }
 
-void 
-ExpressionConverter::ProcessChildren(IConfigurationElement* element, CompositeExpression* result) 
+void
+ExpressionConverter::ProcessChildren(IConfigurationElement::Pointer element, CompositeExpression::Pointer result)
 {
   IConfigurationElement::vector children(element->GetChildren());
-  
+
   IConfigurationElement::vector::iterator iter;
-    for (iter = children.begin(); iter != children.end(); ++iter) 
+    for (iter = children.begin(); iter != children.end(); ++iter)
     {
       Expression::Pointer child = this->Perform(*iter);
       if (child.IsNull())
         throw new CoreException("Unknown element", GetDebugPath(*iter));
-      
+
       result->Add(child);
     }
-  
+
 }
 
-std::string 
-ExpressionConverter::GetDebugPath(IConfigurationElement* configurationElement) 
+std::string
+ExpressionConverter::GetDebugPath(IConfigurationElement::Pointer configurationElement)
 {
   std::string buf = "";
   buf.append(configurationElement->GetName());
   const IConfigurationElement* parent= configurationElement->GetParent();
   while (parent) {
-    if (parent->GetParent()) 
+    if (parent->GetParent())
     {
       buf.append(" > ");
       buf.append(parent->GetName());
       parent = parent->GetParent();
-    } 
-    else 
+    }
+    else
     {
       buf.append(" : "); //$NON-NLS-1$
       std::string point;
@@ -110,8 +110,8 @@ ExpressionConverter::GetDebugPath(IConfigurationElement* configurationElement)
   return buf;
 }
 
-void 
-ExpressionConverter::ProcessChildren(Poco::XML::Element* element, CompositeExpression* result) 
+void
+ExpressionConverter::ProcessChildren(Poco::XML::Element* element, CompositeExpression::Pointer result)
 {
   Poco::XML::Node* child = element->firstChild();
   while (child != 0) {
@@ -120,7 +120,7 @@ ExpressionConverter::ProcessChildren(Poco::XML::Element* element, CompositeExpre
       Expression::Pointer exp = this->Perform(elem);
       if (exp.IsNull())
         throw CoreException("org.opencherry.core.expressions unknown element", elem->nodeName());
-      
+
       result->Add(exp);
     }
     child = child->nextSibling();

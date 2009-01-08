@@ -29,9 +29,8 @@ const int Window::CANCEL = 1;
 
 std::vector<void*> Window::defaultImages = std::vector<void*>();
 
-Window::IExceptionHandler::Pointer Window::exceptionHandler =
-    new DefaultExceptionHandler();
-IShellProvider::Pointer Window::defaultModalParent = new DefaultModalParent();
+Window::IExceptionHandler::Pointer Window::exceptionHandler(new DefaultExceptionHandler());
+IShellProvider::Pointer Window::defaultModalParent(new DefaultModalParent());
 
 Window::WindowShellListener::WindowShellListener(Window* wnd)
  : window(wnd)
@@ -100,7 +99,7 @@ Shell::Pointer Window::GetModalChild(const std::vector<Shell::Pointer>& toSearch
     }
   }
 
-  return 0;
+  return Shell::Pointer(0);
 }
 
 //void Window::RunEventLoop()
@@ -212,7 +211,7 @@ void* Window::CreateContents(Shell::Pointer parent)
 {
   // by default, just create a composite
   //return new Composite(parent, SWT.NONE);
-  return parent;
+  return parent->GetControl();
 }
 
 Shell::Pointer Window::CreateShell()
@@ -235,7 +234,7 @@ Shell::Pointer Window::CreateShell()
   //    };
 
   //newShell.addListener(SWT.Resize, resizeListener);
-  newShell->SetData(this);
+  newShell->SetData(Object::Pointer(this));
 
   //Add a listener
   newShell->AddShellListener(this->GetShellListener());
@@ -376,7 +375,7 @@ bool Window::Close()
   // remove this window from a window manager if it has one
   if (windowManager != 0)
   {
-    windowManager->Remove(this);
+    windowManager->Remove(Window::Pointer(this));
     windowManager = 0;
   }
 
@@ -487,7 +486,7 @@ void Window::SetWindowManager(WindowManager* manager)
         return;
       }
     }
-    manager->Add(this);
+    manager->Add(Window::Pointer(this));
   }
 }
 

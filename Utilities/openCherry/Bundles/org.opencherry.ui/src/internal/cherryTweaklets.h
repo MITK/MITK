@@ -135,7 +135,7 @@ private:
   {
     TweakletMap::const_iterator iter = defaults.find(definition);
     if (iter == defaults.end())
-    return 0;
+    return typename I::Pointer(0);
 
     return iter->second.Cast<I>();
   }
@@ -158,7 +158,7 @@ private:
       {
         try
         {
-          typename I::Pointer tweaklet = elements[i]->CreateExecutableExtension<I>("implementation"); //$NON-NLS-1$
+          typename I::Pointer tweaklet(elements[i]->CreateExecutableExtension<I>("implementation")); //$NON-NLS-1$
           tweaklets.insert(std::make_pair(definition, tweaklet));
           return tweaklet;
         }
@@ -171,7 +171,7 @@ private:
         }
       }
     }
-    return 0;
+    return typename I::Pointer(0);
   }
 
 };

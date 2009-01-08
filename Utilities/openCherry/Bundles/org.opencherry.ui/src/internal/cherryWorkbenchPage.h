@@ -65,6 +65,7 @@ public:
 
 protected:
 
+  //TODO Weakpointer
   WorkbenchWindow* window;
 
   friend class ViewFactory;

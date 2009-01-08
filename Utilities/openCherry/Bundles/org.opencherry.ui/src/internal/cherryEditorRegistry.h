@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYEDITORREGISTRY_H_
@@ -37,7 +37,7 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * Provides access to the collection of defined editors for resource types.
  */
 class EditorRegistry : public IEditorRegistry
@@ -49,11 +49,11 @@ class EditorRegistry : public IEditorRegistry
   public: RelatedRegistry(EditorRegistry* editorRegistry);
     /**
      * Return the objects related to the type.
-     * 
+     *
      * @param type
      * @return the objects related to the type
      */
-    //  public: std::vector<IEditorDescriptor::Pointer> GetRelatedObjects(IContentType type) {     
+    //  public: std::vector<IEditorDescriptor::Pointer> GetRelatedObjects(IContentType type) {
     //      IEditorDescriptor[] relatedObjects = (IEditorDescriptor[]) contentTypeToEditorMappings.get(type);
     //      if (relatedObjects == null) {
     //        return EMPTY;
@@ -72,9 +72,9 @@ public:
 
 private: EditorRegistry* editorRegistry;
   };
-  
+
   friend class RelatedRegistry;
-  
+
   /**
     * Map of FileEditorMapping (extension to FileEditorMapping) Uses two
     * java.util.HashMap: one keeps the default which are set by the plugins and
@@ -87,10 +87,10 @@ private: EditorRegistry* editorRegistry;
      static std::map<std::string, FileEditorMapping::Pointer> map;
 
  public: void Clear();
-     
+
      /**
       * Put a default mapping into the editor map.
-      * 
+      *
       * @param key the key to set
       * @param value the value to associate
       */
@@ -98,7 +98,7 @@ private: EditorRegistry* editorRegistry;
 
      /**
       * Put a mapping into the user editor map.
-      * 
+      *
       * @param key the key to set
       * @param value the value to associate
       */
@@ -108,7 +108,7 @@ private: EditorRegistry* editorRegistry;
       * Return the mapping associated to the key. First searches user
       * map, and then falls back to the default map if there is no match. May
       * return <code>null</code>
-      * 
+      *
       * @param key
       *            the key to search for
       * @return the mapping associated to the key or <code>null</code>
@@ -118,14 +118,14 @@ private: EditorRegistry* editorRegistry;
      /**
       * Return all mappings. This will return default mappings overlayed with
       * user mappings.
-      * 
+      *
       * @return the mappings
       */
    public: std::vector<FileEditorMapping::Pointer> AllMappings();
 
      /**
       * Return all user mappings.
-      * 
+      *
       * @return the mappings
       */
    public: std::vector<FileEditorMapping::Pointer> UserMappings();
@@ -140,7 +140,7 @@ private: EditorRegistry* editorRegistry;
      return x->GetLabel() < y->GetLabel();
    }
  };
- 
+
  struct CmpIEditorDescriptor : public std::binary_function<IEditorDescriptor::Pointer,
                                                       IEditorDescriptor::Pointer,
                                                       bool>
@@ -150,7 +150,7 @@ private: EditorRegistry* editorRegistry;
       return x->GetLabel() < y->GetLabel();
     }
   };
- 
+
  struct CmpEditorDescriptor : public std::binary_function<EditorDescriptor::Pointer,
                                                        EditorDescriptor::Pointer,
                                                        bool>
@@ -173,9 +173,9 @@ private: EditorRegistry* editorRegistry;
   /**
    * Vector of EditorDescriptor - all the editors loaded from plugin files.
    * The list is kept in order to be able to show in the editor selection
-   * dialog of the resource associations page.  This list is sorted based on the 
+   * dialog of the resource associations page.  This list is sorted based on the
    * human readable label of the editor descriptor.
-   * 
+   *
    * @see #comparer
    */
 private:
@@ -218,7 +218,7 @@ public: EditorRegistry();
   /**
    * Add an editor for the given extensions with the specified (possibly null)
    * extended type. The editor is being registered from a plugin
-   * 
+   *
    * @param editor
    *            The description of the editor (as obtained from the plugin
    *            file and built by the registry reader)
@@ -226,16 +226,16 @@ public: EditorRegistry();
    *            Collection of file extensions the editor applies to
    * @param filenames
    *            Collection of filenames the editor applies to
-   * @param contentTypeVector 
+   * @param contentTypeVector
    * @param bDefault
    *            Indicates whether the editor should be made the default editor
    *            and hence appear first inside a FileEditorMapping
-   * 
+   *
    * This method is not API and should not be called outside the workbench
    * code.
    */
 public: void AddEditorFromPlugin(EditorDescriptor::Pointer editor, const std::vector<std::string>& extensions,
-      const std::vector<std::string>& filenames, 
+      const std::vector<std::string>& filenames,
       const std::vector<std::string>& contentTypeVector,
       bool bDefault);
 
@@ -258,7 +258,7 @@ public: IEditorDescriptor::Pointer FindEditor(const std::string& id);
 
   /**
    * Fires a property changed event to all registered listeners.
-   * 
+   *
    * @param type the type of event
    * @see IEditorRegistry#PROP_CONTENTS
    */
@@ -276,7 +276,7 @@ public: IEditorDescriptor::Pointer FindEditor(const std::string& id);
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
-   * 
+   *
    * @deprecated
    */
 public: IEditorDescriptor::Pointer GetDefaultEditor();
@@ -288,7 +288,7 @@ public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& filename)
 
   /**
    * Return the (approximated) content type for a file with the given name.
-   * 
+   *
    * @param filename the filename
    * @return the content type or <code>null</code> if it could not be determined
    * @since 3.1
@@ -299,7 +299,7 @@ public: IEditorDescriptor::Pointer GetDefaultEditor(const std::string& filename)
 
   /**
    * Returns the default file image descriptor.
-   * 
+   *
    * @return the image descriptor
    */
   //    private: ImageDescriptor GetDefaultImage() {
@@ -327,7 +327,7 @@ public: std::vector<IFileEditorMapping::Pointer> GetFileEditorMappings();
   /**
    * Find the file editor mapping for the file extension. Returns
    * <code>null</code> if not found.
-   * 
+   *
    * @param ext
    *            the file extension
    * @return the mapping, or <code>null</code>
@@ -341,8 +341,8 @@ private: FileEditorMapping::Pointer GetMappingFor(const std::string& ext);
    * is for the entire filename, and the second mapping is for the filename's
    * extension only. These items can be null if no mapping exist on the
    * filename and/or filename's extension.</p>
-   * 
-   * @param filename the filename 
+   *
+   * @param filename the filename
    * @return the mappings
    */
 private: std::vector<FileEditorMapping::Pointer> GetMappingForFilename(const std::string& filename);
@@ -361,7 +361,7 @@ private: std::vector<FileEditorMapping::Pointer> GetMappingForFilename(const std
 
   /**
    * Return the editors loaded from plugins.
-   * 
+   *
    * @return the sorted array of editors declared in plugins
    * @see #comparer
    */
@@ -370,7 +370,7 @@ public: std::list<IEditorDescriptor::Pointer> GetSortedEditorsFromPlugins();
   /**
    * Answer an intial id to editor map. This will create a new map and
    * populate it with the default system editors.
-   * 
+   *
    * @param initialSize
    *            the initial size of the map
    * @return the new map
@@ -382,7 +382,7 @@ private: void InitialIdToEditorMap(std::map<std::string, EditorDescriptor::Point
    * editor with an id of {@link #SYSTEM_EXTERNAL_EDITOR_ID} and may also add
    * an editor with id of {@link #SYSTEM_INPLACE_EDITOR_ID} if the system
    * configuration supports it.
-   * 
+   *
    * @param map the map to augment
    */
 private: void AddSystemEditors(std::map<std::string, EditorDescriptor::Pointer>& map);
@@ -395,18 +395,18 @@ private: void InitializeFromStorage();
 
   /**
    * Set the default editors according to the preference store which can be
-   * overwritten in the file properties.ini.  In the form: 
+   * overwritten in the file properties.ini.  In the form:
    * <p>
    * <code>ext1:id1;ext2:id2;...</code>
    * </p>
-   * 
+   *
    * @param defaultEditors the default editors to set
    */
 private: void SetProductDefaults(const std::string& defaultEditors);
 
   /**
    * Read the editors defined in the preferences store.
-   * 
+   *
    * @param editorTable
    *            Editor table to store the editor definitions.
    * @return true if the table is built succesfully.
@@ -415,19 +415,19 @@ private: bool ReadEditors(std::map<std::string, EditorDescriptor::Pointer>& edit
 
   /**
    * Read the file types and associate them to their defined editor(s).
-   * 
+   *
    * @param editorTable
    *            The editor table containing the defined editors.
    * @param reader
    *            Reader containing the preferences content for the resources.
-   * 
+   *
    * @throws WorkbenchException
    */
 public: void ReadResources(std::map<std::string, EditorDescriptor::Pointer>& editorTable, std::ostream& reader);
 
   /**
    * Determine if the editors list contains the editor descriptor.
-   * 
+   *
    * @param editorsArray
    *      The list of editors
    * @param editorDescriptor
@@ -440,7 +440,7 @@ private: bool Contains(const std::vector<IEditorDescriptor::Pointer>& editorsArr
   /**
    * Creates the reader for the resources preferences defined in the
    * preference store.
-   * 
+   *
    * @param editorTable
    *            The editor table containing the defined editors.
    * @return true if the resources are read succesfully.
@@ -462,7 +462,7 @@ private: std::string MappingKeyFor(const std::string& type);
   /**
    * Return a key that combines the file's name and extension of the given
    * mapping
-   * 
+   *
    * @param mapping the mapping to generate a key for
    */
 private: std::string MappingKeyFor(FileEditorMapping::Pointer mapping);
@@ -495,7 +495,7 @@ public: void SaveAssociations();
    * converted into the internal hash table for faster lookup Each mapping
    * goes from an extension to the collection of editors that work on it. This
    * operation will rebuild the internal editor mappings.
-   * 
+   *
    * @param newResourceTypes
    *            te new file editor mappings.
    */
@@ -508,35 +508,35 @@ public: void SetDefaultEditor(const std::string& fileName, const std::string& ed
 
   /**
    * Alphabetically sort the internal editors.
-   * 
+   *
    * @see #comparer
    */
 private: std::vector<IEditorDescriptor::Pointer> SortEditors(const std::vector<IEditorDescriptor::Pointer>& unsortedList);
 
   /**
    * Alphabetically sort the internal editors.
-   * 
+   *
    * @see #comparer
    */
 private: void SortInternalEditors();
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencherry.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
    */
 public: bool IsSystemInPlaceEditorAvailable(const std::string& filename);
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencherry.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
    */
 public: bool IsSystemExternalEditorAvailable(const std::string& filename);
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.opencherry.ui.IEditorRegistry#getSystemExternalEditorImageDescriptor(java.lang.String)
    */
   //    public: ImageDescriptor GetSystemExternalEditorImageDescriptor(
@@ -549,8 +549,8 @@ public: bool IsSystemExternalEditorAvailable(const std::string& filename);
   //        }
   //        if (externalProgram == null) {
   //            return null;
-  //        } 
-  //        
+  //        }
+  //
   //        return new ExternalProgramImageDescriptor(externalProgram);
   //    }
 
@@ -558,7 +558,7 @@ public: bool IsSystemExternalEditorAvailable(const std::string& filename);
    * Removes the entry with the value of the editor descriptor from the given
    * map. If the descriptor is the last descriptor in a given
    * FileEditorMapping then the mapping is removed from the map.
-   * 
+   *
    * @param map
    *            the map to search
    * @param desc
@@ -577,7 +577,7 @@ private: const IExtensionPoint* GetExtensionPointFilter();
 
   /**
    * Return the editor for a file with a given content type.
-   * 
+   *
    * @param filename the file name
    * @param contentType the content type
    * @return the editor for a file with a given content type
@@ -604,13 +604,13 @@ private: const IExtensionPoint* GetExtensionPointFilter();
   //    if (contentType != null) {
   //      IEditorDescriptor desc = getEditorForContentType(filename, contentType);
   //      if (desc != null) {
-  //        ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(desc);  
+  //        ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(desc);
   //        if (anImage != null) {
   //          return anImage;
   //        }
   //        anImage = desc.getImageDescriptor();
   //        extensionImages.put(desc, anImage);
-  //        return anImage;       
+  //        return anImage;
   //      }
   //    }
   //        // Lookup in the cache first...
@@ -654,10 +654,10 @@ private: const IExtensionPoint* GetExtensionPointFilter();
 
   /**
    * Find objects related to the content type.
-   * 
+   *
    * This method is temporary and exists only to back us off of the
    * soon-to-be-removed IContentTypeManager.IRelatedRegistry API.
-   * 
+   *
    * @param type
    * @param fileName
    * @param registry
@@ -668,7 +668,7 @@ private: const IExtensionPoint* GetExtensionPointFilter();
 
   /**
    * Return the editors bound to this content type, either directly or indirectly.
-   * 
+   *
    * @param type the content type to check
    * @return the editors
    * @since 3.1
@@ -680,20 +680,20 @@ private: const IExtensionPoint* GetExtensionPointFilter();
   //    if (type == null) {
   //      return new IEditorDescriptor [0];
   //    }
-  //    
+  //
   //    Object [] related = relatedRegistry.getRelatedObjects(type);
-  //    for (int i = 0; i < related.length; i++) {  
+  //    for (int i = 0; i < related.length; i++) {
   //      // we don't want to return duplicates
   //      if (!allRelated.contains(related[i])) {
   //        // if it's not filtered, add it to the list
   //        if (!WorkbenchActivityHelper.filterItem(related[i])) {
   //          allRelated.add(related[i]);
   //        }
-  //        
+  //
   //      }
   //    }
-  //    
-  //    // now add any indirectly related objects, walking up the content type hierarchy 
+  //
+  //    // now add any indirectly related objects, walking up the content type hierarchy
   //    while ((type = type.getBaseType()) != null) {
   //      related = relatedRegistry.getRelatedObjects(type);
   //      for (int i = 0; i < related.length; i++) {
@@ -706,13 +706,13 @@ private: const IExtensionPoint* GetExtensionPointFilter();
   //        }
   //      }
   //    }
-  //    
+  //
   //    return (IEditorDescriptor[]) allRelated.toArray(new IEditorDescriptor[allRelated.size()]);
   //  }
 
   /**
    * Get filemappings for all defined filetypes, including those defined by content type.
-   * 
+   *
    * @return the filetypes
    * @since 3.1
    */
@@ -764,7 +764,7 @@ public:
    * @see java.lang.Object#equals(java.lang.Object)
    */
 public:
-  bool operator==(const MockMapping* obj);
+  bool operator==(const Object* obj) const;
 };
 
 }

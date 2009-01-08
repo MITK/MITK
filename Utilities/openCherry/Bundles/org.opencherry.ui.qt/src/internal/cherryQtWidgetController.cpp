@@ -23,13 +23,13 @@ namespace cherry {
 
 const char QtWidgetController::PROPERTY_ID[] = "QtWidgetController_property";
 
-QtWidgetController::QtWidgetController(Shell* shell)
+QtWidgetController::QtWidgetController(Shell::Pointer shell)
  : shell(shell)
 {
 
 }
 
-Shell* QtWidgetController::GetShell()
+Shell::Pointer QtWidgetController::GetShell()
 {
   return shell;
 }

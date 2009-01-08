@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIBUNDLESTORAGE_H_
 
 #include "cherryMacros.h"
+#include "cherryObject.h"
 
 #include "Poco/Path.h"
 

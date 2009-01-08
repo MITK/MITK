@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYNULLEDITORINPUT_H_
@@ -25,7 +25,7 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  */
 class NullEditorInput : public IEditorInput {
 
@@ -34,13 +34,13 @@ private: EditorReference::Pointer editorReference;
 public:
 
   cherryClassMacro(NullEditorInput)
-  
+
   NullEditorInput();
 
   /**
    * Creates a <code>NullEditorInput</code> for the
    * given editor reference.
-   * 
+   *
    * @param editorReference the editor reference
    * @since 3.4
    */
@@ -67,8 +67,8 @@ public:
      * @see org.opencherry.ui.IEditorInput#getToolTipText()
      */
     std::string GetToolTipText() const;
-    
-    bool operator==(const IEditorInput* o) const;
+
+    bool operator==(const Object* o) const;
 
 };
 

@@ -45,8 +45,8 @@ bool PerspectiveRegistryReader::ReadElement(IConfigurationElement::Pointer eleme
     {
       std::string id;
       element->GetAttribute(WorkbenchRegistryConstants::ATT_ID, id);
-      PerspectiveDescriptor::Pointer desc =
-          new PerspectiveDescriptor(id, element);
+      PerspectiveDescriptor::Pointer desc(
+          new PerspectiveDescriptor(id, element));
       registry->AddPerspective(desc);
     }
     catch (CoreException e)

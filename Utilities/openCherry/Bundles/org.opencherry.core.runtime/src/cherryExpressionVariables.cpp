@@ -29,10 +29,6 @@ namespace cherry {
       m_TypeNames.push_back(name);
   }
 
-  bool ExpressionVariable::operator==(ExpressionVariable* var) {
-    return this->operator==(*var);
-  }
-
   ExpressionVariable::ExpressionVariable() {
     m_TypeInfo.Add("cherry::ExpressionVariable", typeid(this));
   }
@@ -55,15 +51,11 @@ namespace cherry {
     m_TypeInfo.Add("cherry::StringExpressionVariable", typeid(this));
   }
 
-  bool StringExpressionVariable::operator==(ExpressionVariable& var) {
-    try {
-      StringExpressionVariable& that = dynamic_cast<StringExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
+  bool StringExpressionVariable::operator==(const Object* var) const {
+    if (const StringExpressionVariable* that = dynamic_cast<const StringExpressionVariable*>(var))
+      return this->m_Var == that->m_Var;
+
+    return false;
   }
 
   void StringExpressionVariable::SetVariable(const std::string& var) {
@@ -82,15 +74,11 @@ namespace cherry {
     m_TypeInfo.Add("cherry::VectorExpressionVariable", typeid(this));
   }
 
-  bool VectorExpressionVariable::operator==(ExpressionVariable& var) {
-    try {
-      VectorExpressionVariable& that = dynamic_cast<VectorExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
+  bool VectorExpressionVariable::operator==(const Object* var) const {
+    if (const VectorExpressionVariable* that = dynamic_cast<const VectorExpressionVariable*>(var))
+      return this->m_Var == that->m_Var;
+
+    return false;
   }
 
   VectorExpressionVariable::VectorType& VectorExpressionVariable::GetVariable() {
@@ -116,15 +104,11 @@ namespace cherry {
     m_TypeInfo.Add("cherry::BooleanExpressionVariable", typeid(this));
   }
 
-  bool BooleanExpressionVariable::operator==(ExpressionVariable& var) {
-    try {
-      BooleanExpressionVariable& that = dynamic_cast<BooleanExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
+  bool BooleanExpressionVariable::operator==(const Object* var) const {
+    if (const BooleanExpressionVariable* that = dynamic_cast<const BooleanExpressionVariable*>(var))
+      return this->m_Var == that->m_Var;
+
+    return false;
   }
 
   void BooleanExpressionVariable::SetVariable(bool var) {
@@ -145,15 +129,11 @@ namespace cherry {
     m_TypeInfo.Add("cherry::FloatExpressionVariable", typeid(this));
   }
 
-  bool FloatExpressionVariable::operator==(ExpressionVariable& var) {
-    try {
-      FloatExpressionVariable& that = dynamic_cast<FloatExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
+  bool FloatExpressionVariable::operator==(const Object* var) const {
+    if (const FloatExpressionVariable* that = dynamic_cast<const FloatExpressionVariable*>(var))
+      return this->m_Var == that->m_Var;
+
+    return false;
   }
 
   void FloatExpressionVariable::SetVariable(double var) {
@@ -174,15 +154,11 @@ namespace cherry {
     m_TypeInfo.Add("cherry::IntegerExpressionVariable", typeid(this));
   }
 
-  bool IntegerExpressionVariable::operator==(ExpressionVariable& var) {
-    try {
-      IntegerExpressionVariable& that = dynamic_cast<IntegerExpressionVariable&>(var);
-      return this->m_Var == that.m_Var;
-    }
-    catch (std::bad_cast e)
-    {
-      return false;
-    }
+  bool IntegerExpressionVariable::operator==(const Object* var) const {
+    if (const IntegerExpressionVariable* that = dynamic_cast<const IntegerExpressionVariable*>(var))
+      return this->m_Var == that->m_Var;
+
+    return false;
   }
 
   void IntegerExpressionVariable::SetVariable(int var) {

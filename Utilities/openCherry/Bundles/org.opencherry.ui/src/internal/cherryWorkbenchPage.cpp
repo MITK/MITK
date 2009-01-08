@@ -116,7 +116,7 @@ void WorkbenchPage::PerspectiveList::Reorder(
     IPerspectiveDescriptor::Pointer perspective, int newLoc)
 {
   PerspectiveListType::iterator oldLocation = openedList.end();
-  Perspective::Pointer movedPerspective = 0;
+  Perspective::Pointer movedPerspective;
   for (PerspectiveListType::iterator iterator = openedList.begin(); iterator
       != openedList.end(); ++iterator)
   {
@@ -174,7 +174,7 @@ bool WorkbenchPage::PerspectiveList::Remove(Perspective::Pointer perspective)
 {
   if (active == perspective)
   {
-    this->UpdateActionSets(active, 0);
+    this->UpdateActionSets(active, Perspective::Pointer(0));
     active = 0;
   }
   usedList.remove(perspective);
@@ -215,7 +215,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
   {
     if (usedList.empty())
     {
-      return 0;
+      return Perspective::Pointer(0);
     }
     else
     {
@@ -226,7 +226,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
   {
     if (usedList.size() < 2)
     {
-      return 0;
+      return Perspective::Pointer(0);
     }
     else
     {
@@ -528,7 +528,7 @@ IStackableContainer::Pointer WorkbenchPage::GetContainer(
   PartPane::Pointer pane = this->GetPane(part);
   if (pane == 0)
   {
-    return 0;
+    return IStackableContainer::Pointer(0);
   }
 
   return pane->GetContainer();
@@ -540,7 +540,7 @@ IStackableContainer::Pointer WorkbenchPage::GetContainer(
   PartPane::Pointer pane = this->GetPane(part);
   if (pane == 0)
   {
-    return 0;
+    return IStackableContainer::Pointer(0);
   }
 
   return pane->GetContainer();
@@ -550,7 +550,7 @@ PartPane::Pointer WorkbenchPage::GetPane(IWorkbenchPart::Pointer part)
 {
   if (part.IsNull())
   {
-    return 0;
+    return PartPane::Pointer(0);
   }
   return this->GetPane(this->GetReference(part));
 }
@@ -559,7 +559,7 @@ PartPane::Pointer WorkbenchPage::GetPane(IWorkbenchPartReference::Pointer part)
 {
   if (part.IsNull())
   {
-    return 0;
+    return PartPane::Pointer(0);
   }
 
   return part.Cast<WorkbenchPartReference> ()->GetPane();
@@ -648,7 +648,7 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
     }
     else
     {
-      this->MakeActiveEditor(0);
+      this->MakeActiveEditor(IEditorReference::Pointer(0));
     }
   }
   else
@@ -716,7 +716,7 @@ void WorkbenchPage::BusyResetPerspective()
   }
 
   // Notify listeners that we are doing a reset.
-  window->FirePerspectiveChanged(this, desc, CHANGE_RESET);
+  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET);
 
   // Create new persp from original template.
   // Suppress the perspectiveOpened and perspectiveClosed events otherwise it looks like two
@@ -725,7 +725,7 @@ void WorkbenchPage::BusyResetPerspective()
   if (newPersp == 0)
   {
     // We're not going through with the reset, so it is complete.
-    window->FirePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
+    window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET_COMPLETE);
     return;
   }
 
@@ -765,7 +765,7 @@ void WorkbenchPage::BusyResetPerspective()
   ////      }
   //    }
   // Notify listeners that we have completed our reset.
-  window->FirePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
+  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET_COMPLETE);
   //  }
   //  finally
   //  {
@@ -819,7 +819,7 @@ IViewPart::Pointer WorkbenchPage::BusyShowView(const std::string& viewID,
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
   {
-    return 0;
+    return IViewPart::Pointer(0);
   }
 
   // If this view is already visible just return.
@@ -845,9 +845,10 @@ IViewPart::Pointer WorkbenchPage::BusyShowView(const std::string& viewID,
     PartPane::Pointer partPane = this->GetPane(partReference);
     partPane->SetInLayout(true);
 
-    window->FirePerspectiveChanged(this, GetPerspective(), partReference,
+    IWorkbenchPage::Pointer thisPage(this);
+    window->FirePerspectiveChanged(thisPage, GetPerspective(), partReference,
         CHANGE_VIEW_SHOW);
-    window->FirePerspectiveChanged(this, GetPerspective(), CHANGE_VIEW_SHOW);
+    window->FirePerspectiveChanged(thisPage, GetPerspective(), CHANGE_VIEW_SHOW);
   }
   return view;
 }
@@ -917,7 +918,7 @@ bool WorkbenchPage::Close()
   //    {
   //    public void WorkbenchPage::run()
   //      {
-  ret = window->ClosePage(this, true);
+  ret = window->ClosePage(IWorkbenchPage::Pointer(this), true);
   //      }
   //    });
   return ret;
@@ -1012,14 +1013,14 @@ void WorkbenchPage::MakeActive(IWorkbenchPartReference::Pointer ref)
 {
   if (ref == 0)
   {
-    this->SetActivePart(0);
+    this->SetActivePart(IWorkbenchPart::Pointer(0));
   }
   else
   {
     IWorkbenchPart::Pointer newActive = ref->GetPart(true);
     if (newActive == 0)
     {
-      this->SetActivePart(0);
+      this->SetActivePart(IWorkbenchPart::Pointer(0));
     }
     else
     {
@@ -1035,7 +1036,7 @@ void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
     return;
   }
 
-  IEditorPart::Pointer part = (ref == 0) ? 0 : ref->GetEditor(true);
+  IEditorPart::Pointer part = (ref == 0) ? IEditorPart::Pointer(0) : ref->GetEditor(true);
 
   if (part != 0)
   {
@@ -1060,6 +1061,8 @@ bool WorkbenchPage::CloseEditors(
   {
     return true;
   }
+
+  IWorkbenchPage::Pointer thisPage(this);
 
   // Check if we're being asked to close any parts that are already closed or cannot
   // be closed at this time
@@ -1130,7 +1133,7 @@ bool WorkbenchPage::CloseEditors(
     IEditorReference::Pointer ref = editorRefs[i];
 
     // Notify interested listeners before the close
-    window->FirePerspectiveChanged(this, this->GetPerspective(), ref,
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(), ref,
         CHANGE_EDITOR_CLOSE);
 
   }
@@ -1159,7 +1162,7 @@ bool WorkbenchPage::CloseEditors(
   this->DeferUpdates(false);
 
   // Notify interested listeners after the close
-  window->FirePerspectiveChanged(this, this->GetPerspective(),
+  window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
       CHANGE_EDITOR_CLOSE);
 
   // Return true on success.
@@ -1290,7 +1293,7 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   }
   if (saveParts && !partsToSave.empty())
   {
-    if (!EditorManager::SaveAll(partsToSave, true, true, false, window))
+    if (!EditorManager::SaveAll(partsToSave, true, true, false, IWorkbenchWindow::Pointer(window)))
     {
       // user canceled
       return;
@@ -1396,11 +1399,12 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
   try
   {
     //UIStats.start(UIStats.CREATE_PERSPECTIVE, label);
-    Perspective::Pointer persp = new Perspective(desc, this);
+    WorkbenchPage::Pointer thisPage(this);
+    Perspective::Pointer persp(new Perspective(desc, thisPage));
     perspList.Add(persp);
     if (notify)
     {
-      window->FirePerspectiveOpened(this, desc);
+      window->FirePerspectiveOpened(thisPage, desc);
     }
     //if the perspective is fresh and uncustomzied then it is not dirty
     //no reset will be prompted for
@@ -1416,7 +1420,7 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
       MessageDialog::OpenError(window->GetShell(), "Error",
           "Problems opening perspective \"" + desc->GetId() + "\"");
     }
-    return 0;
+    return Perspective::Pointer(0);
   }
   //    finally
   //    {
@@ -1480,8 +1484,8 @@ void WorkbenchPage::AttachView(IViewReference::Pointer ref)
 WorkbenchPage::~WorkbenchPage()
 {
 
-  this->MakeActiveEditor(0);
-  this->MakeActive(0);
+  this->MakeActiveEditor(IEditorReference::Pointer(0));
+  this->MakeActive(IWorkbenchPartReference::Pointer(0));
 
   // Close and dispose the editors.
   this->CloseAllEditors(false);
@@ -1508,12 +1512,13 @@ WorkbenchPage::~WorkbenchPage()
           this->GetWorkbenchWindow());
   saveablesList->PostClose(postCloseInfo);
 
+  IWorkbenchPage::Pointer thisPage(this);
   // Get rid of perspectives. This will close the views
   for (PerspectiveList::iterator itr = perspList.Begin(); itr
       != perspList.End(); ++itr)
   {
     Perspective::Pointer perspective = *itr;
-    window->FirePerspectiveClosed(this, perspective->GetDesc());
+    window->FirePerspectiveClosed(thisPage, perspective->GetDesc());
     //perspective->Dispose();
   }
   perspList = PerspectiveList();
@@ -1578,7 +1583,8 @@ void WorkbenchPage::DisposePerspective(Perspective::Pointer persp, bool notify)
   perspList.Remove(persp);
   if (notify)
   {
-    window->FirePerspectiveClosed(this, persp->GetDesc());
+    IWorkbenchPage::Pointer thisPage(this);
+    window->FirePerspectiveClosed(thisPage, persp->GetDesc());
   }
   //persp->Dispose();
 
@@ -1597,7 +1603,7 @@ Perspective::Pointer WorkbenchPage::FindPerspective(
       return mgr;
     }
   }
-  return 0;
+  return Perspective::Pointer(0);
 }
 
 IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
@@ -1605,7 +1611,7 @@ IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
   IViewReference::Pointer ref = this->FindViewReference(id);
   if (ref == 0)
   {
-    return 0;
+    return IViewPart::Pointer(0);
   }
   return ref->GetView(true);
 }
@@ -1622,7 +1628,7 @@ IViewReference::Pointer WorkbenchPage::FindViewReference(
   Perspective::Pointer persp = this->GetActivePerspective();
   if (persp == 0)
   {
-    return 0;
+    return IViewReference::Pointer(0);
   }
   return persp->FindView(viewId, secondaryId);
 }
@@ -1785,7 +1791,7 @@ IPerspectiveDescriptor::Pointer WorkbenchPage::GetPerspective()
   }
   else
   {
-    return 0;
+    return IPerspectiveDescriptor::Pointer(0);
   }
 }
 
@@ -1808,8 +1814,9 @@ ViewFactory* WorkbenchPage::GetViewFactory()
 {
   if (viewFactory == 0)
   {
+    WorkbenchPage::Pointer thisPage(this);
     viewFactory
-        = new ViewFactory(this, WorkbenchPlugin::GetDefault()->GetViewRegistry());
+        = new ViewFactory(thisPage, WorkbenchPlugin::GetDefault()->GetViewRegistry());
   }
   return viewFactory;
 }
@@ -1829,7 +1836,7 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferences()
 
 std::vector<IViewPart::Pointer> WorkbenchPage::GetViews()
 {
-  return this->GetViews(0, true);
+  return this->GetViews(Perspective::Pointer(0), true);
 }
 
 std::vector<IViewPart::Pointer> WorkbenchPage::GetViews(
@@ -1858,7 +1865,7 @@ std::vector<IViewPart::Pointer> WorkbenchPage::GetViews(
 
 IWorkbenchWindow::Pointer WorkbenchPage::GetWorkbenchWindow()
 {
-  return window;
+  return IWorkbenchWindow::Pointer(window);
 }
 
 void WorkbenchPage::HideView(IViewReference::Pointer ref)
@@ -1909,7 +1916,7 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
   }
 
   int refCount = this->GetViewFactory()->GetReferenceCount(ref);
-  SaveablesList::Pointer saveablesList = 0;
+  SaveablesList::Pointer saveablesList;
   SaveablesList::PostCloseInfo::Pointer postCloseInfo;
   if (refCount == 1)
   {
@@ -1930,8 +1937,9 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
     }
   }
 
+  IWorkbenchPage::Pointer thisPage(this);
   // Notify interested listeners before the hide
-  window->FirePerspectiveChanged(this, persp->GetDesc(), ref, CHANGE_VIEW_HIDE);
+  window->FirePerspectiveChanged(thisPage, persp->GetDesc(), ref, CHANGE_VIEW_HIDE);
 
   PartPane::Pointer pane = this->GetPane(ref.Cast<IWorkbenchPartReference> ());
   pane->SetInLayout(false);
@@ -1947,7 +1955,7 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
   persp->HideView(ref);
 
   // Notify interested listeners after the hide
-  window->FirePerspectiveChanged(this, this->GetPerspective(), CHANGE_VIEW_HIDE);
+  window->FirePerspectiveChanged(thisPage, this->GetPerspective(), CHANGE_VIEW_HIDE);
 }
 
 void WorkbenchPage::RefreshActiveView()
@@ -1969,7 +1977,7 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
   this->composite = 0;
   this->viewFactory = 0;
 
-  this->selectionService = new PageSelectionService(this);
+  this->selectionService = new PageSelectionService(IWorkbenchPage::Pointer(this));
   this->partList = new WorkbenchPagePartList(this->selectionService);
 
   //actionSets = new ActionSetManager(w);
@@ -1978,8 +1986,8 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
 
   // Create presentation.
   this->CreateClientComposite();
-  editorPresentation = new EditorAreaHelper(this);
-  editorMgr = new EditorManager(window, this, editorPresentation);
+  editorPresentation = new EditorAreaHelper(WorkbenchPage::Pointer(this));
+  editorMgr = new EditorManager(WorkbenchWindow::Pointer(window), WorkbenchPage::Pointer(this), editorPresentation);
 
   //TODO WorkbenchPage perspective reorder listener?
   //    // add this page as a client to be notified when the UI has re-ordered perspectives
@@ -2017,7 +2025,7 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
       persp = this->CreatePerspective(desc, true);
     }
     perspList.SetActive(persp);
-    window->FirePerspectiveActivated(this, desc);
+    window->FirePerspectiveActivated(IWorkbenchPage::Pointer(this), desc);
   }
 
   //  getExtensionTracker() .registerHandler(perspectiveChangeHandler,
@@ -2134,14 +2142,14 @@ void WorkbenchPage::OnActivate()
   if (persp != 0)
   {
     persp->OnActivate();
-    this->UpdateVisibility(0, persp);
+    this->UpdateVisibility(Perspective::Pointer(0), persp);
   }
 }
 
 void WorkbenchPage::OnDeactivate()
 {
-  this->MakeActiveEditor(0);
-  this->MakeActive(0);
+  this->MakeActiveEditor(IEditorReference::Pointer(0));
+  this->MakeActive(IWorkbenchPartReference::Pointer(0));
   if (this->GetActivePerspective() != 0)
   {
     this->GetActivePerspective()->OnDeactivate();
@@ -2187,7 +2195,7 @@ IEditorPart::Pointer WorkbenchPage::OpenEditor(
     const IEditorInput::Pointer input, const std::string& editorID,
     bool activate, int matchFlags)
 {
-  return this->OpenEditor(input, editorID, activate, matchFlags, 0);
+  return this->OpenEditor(input, editorID, activate, matchFlags, IMemento::Pointer(0));
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(
@@ -2339,7 +2347,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
         }
         else if (saveFile == 2)
         {
-          return 0;
+          return IEditorPart::Pointer(0);
         }
       }
     }
@@ -2376,9 +2384,10 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
     {
       this->BringToTop(editor);
     }
-    window->FirePerspectiveChanged(this, this->GetPerspective(), ref,
+    IWorkbenchPage::Pointer thisPage(this);
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(), ref,
         CHANGE_EDITOR_OPEN);
-    window->FirePerspectiveChanged(this, this->GetPerspective(),
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
         CHANGE_EDITOR_OPEN);
   }
 
@@ -2394,7 +2403,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptorBatched(
     bool activate, IMemento::Pointer editorState)
 {
 
-  IEditorPart::Pointer editor = 0;
+  IEditorPart::Pointer editor;
   // Create a new one. This may cause the new editor to
   // become the visible (i.e top) editor.
   IEditorReference::Pointer ref;
@@ -2418,9 +2427,10 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptorBatched(
     {
       this->BringToTop(editor);
     }
-    window->FirePerspectiveChanged(this, this->GetPerspective(), ref,
+    IWorkbenchPage::Pointer thisPage(this);
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(), ref,
         CHANGE_EDITOR_OPEN);
-    window->FirePerspectiveChanged(this, this->GetPerspective(),
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
         CHANGE_EDITOR_OPEN);
   }
 
@@ -2444,9 +2454,10 @@ void WorkbenchPage::OpenEmptyTab()
   {
     this->SetEditorAreaVisible(true);
     this->Activate(editor);
-    window->FirePerspectiveChanged(this, this->GetPerspective(), ref,
+    IWorkbenchPage::Pointer thisPage(this);
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(), ref,
         CHANGE_EDITOR_OPEN);
-    window->FirePerspectiveChanged(this, this->GetPerspective(),
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
         CHANGE_EDITOR_OPEN);
   }
 }
@@ -2862,7 +2873,7 @@ void WorkbenchPage::SavePerspectiveAs(IPerspectiveDescriptor::Pointer newDesc)
   //    }
 
   persp->SaveDescAs(newDesc);
-  window->FirePerspectiveSavedAs(this, oldDesc, newDesc);
+  window->FirePerspectiveSavedAs(IWorkbenchPage::Pointer(this), oldDesc, newDesc);
 }
 
 /**
@@ -2999,7 +3010,7 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
   try
   {
     IWorkbenchPartReference::Pointer partref = this->GetReference(newPart);
-    IWorkbenchPartReference::Pointer realPartRef = 0;
+    IWorkbenchPartReference::Pointer realPartRef;
     if (newPart != 0)
     {
       IWorkbenchPartSite::Pointer site = newPart->GetSite();
@@ -3068,17 +3079,18 @@ void WorkbenchPage::SetEditorAreaVisible(bool showEditorArea)
   //    zoomOut();
   //  }
   // Update editor area visibility.
+  IWorkbenchPage::Pointer thisPage(this);
   if (showEditorArea)
   {
     persp->ShowEditorArea();
-    window->FirePerspectiveChanged(this, this->GetPerspective(),
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
         CHANGE_EDITOR_AREA_SHOW);
   }
   else
   {
     persp->HideEditorArea();
     this->UpdateActivePart();
-    window->FirePerspectiveChanged(this, this->GetPerspective(),
+    window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
         CHANGE_EDITOR_AREA_HIDE);
   }
 }
@@ -3102,10 +3114,11 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
   bool exceptionOccured = false;
   try
   {
+    IWorkbenchPage::Pointer thisPage(this);
     if (oldPersp != 0)
     {
       // fire the pre-deactivate
-      window->FirePerspectivePreDeactivate(this, oldPersp->GetDesc());
+      window->FirePerspectivePreDeactivate(thisPage, oldPersp->GetDesc());
     }
 
     if (newPersp != 0)
@@ -3126,7 +3139,7 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
       oldPersp->OnDeactivate();
 
       // Notify listeners of deactivation
-      window->FirePerspectiveDeactivated(this, oldPersp->GetDesc());
+      window->FirePerspectiveDeactivated(thisPage, oldPersp->GetDesc());
     }
 
     // Activate the new layout
@@ -3136,7 +3149,7 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
       newPersp->OnActivate();
 
       // Notify listeners of activation
-      window->FirePerspectiveActivated(this, newPersp->GetDesc());
+      window->FirePerspectiveActivated(thisPage, newPersp->GetDesc());
     }
 
     this->UpdateVisibility(oldPersp, newPersp);
@@ -3377,7 +3390,7 @@ Perspective::Pointer WorkbenchPage::GetFirstPerspectiveWithView(
     }
   }
   // we should never get here
-  return 0;
+  return Perspective::Pointer(0);
 }
 
 std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetSortedPerspectives()
@@ -3403,12 +3416,12 @@ IWorkbenchPartReference::Pointer WorkbenchPage::GetReference(
 {
   if (part == 0)
   {
-    return 0;
+    return IWorkbenchPartReference::Pointer(0);
   }
   IWorkbenchPartSite::Pointer site = part->GetSite();
   if (site.Cast<PartSite> () == 0)
   {
-    return 0;
+    return IWorkbenchPartReference::Pointer(0);
   }
   PartSite::Pointer partSite = site.Cast<PartSite> ();
   PartPane::Pointer pane = partSite->GetPane();
@@ -3420,7 +3433,8 @@ IWorkbenchPartReference::Pointer WorkbenchPage::GetReference(
 void WorkbenchPage::AddPerspective(Perspective::Pointer persp)
 {
   perspList.Add(persp);
-  window->FirePerspectiveOpened(this, persp->GetDesc());
+  IWorkbenchPage::Pointer thisPage(this);
+  window->FirePerspectiveOpened(thisPage, persp->GetDesc());
 }
 
 std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
@@ -3457,7 +3471,7 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
     }
 
     // sort the list by activation order (most recently activated first)
-    std::sort(list.begin(), list.end(), ActivationOrderPred(partList));
+    std::sort(list.begin(), list.end(), ActivationOrderPred(partList.GetPointer()));
 
     return list;
   }
@@ -3699,7 +3713,7 @@ void WorkbenchPage::SuggestReset()
   //        {
   //        public void WorkbenchPage::run()
   //          {
-  Shell::Pointer parentShell = 0;
+  Shell::Pointer parentShell;
 
   IWorkbenchWindow::Pointer window = workbench->GetActiveWorkbenchWindow();
   if (window == 0)

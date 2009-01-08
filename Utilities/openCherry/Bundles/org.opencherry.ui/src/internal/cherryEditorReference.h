@@ -90,7 +90,7 @@ public:
   cherryClassMacro(EditorReference)
 
   EditorReference(EditorManager* manager, IEditorInput::Pointer input,
-      SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = 0);
+      SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = IMemento::Pointer(0));
 
   /**
    * Constructs a new editor reference for use by editors being restored from

@@ -143,12 +143,12 @@ void PageLayout::AddPlaceholder(const std::string& viewId, int relationship,
   }
 
   // Create a folder.
-  ContainerPlaceholder::Pointer folder = new ContainerPlaceholder(viewId);
+  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(viewId));
   folder->SetContainer(rootLayoutContainer);
-  folder->SetRealContainer(new PartStack(rootLayoutContainer->page));
+  folder->SetRealContainer(PartStack::Pointer(new PartStack(rootLayoutContainer->page)));
   //folder->SetId(folderId);
   // Create the placeholder.
-  PartPlaceholder::Pointer newPart = new PartPlaceholder(viewId);
+  PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
   folder->Add(newPart);
   this->AddStack(folder, viewId, relationship, ratio, refId);
   // force creation of the view layout rec
@@ -246,8 +246,8 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
       }
 
       // PartStack for views
-      PartStack::Pointer newFolder = new PartStack(rootLayoutContainer->page,
-          true, appearance, 0);
+      PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page,
+          true, appearance, 0));
       newFolder->Add(newPart);
       this->SetFolderPart(viewId, newFolder);
       this->AddStack(newFolder, viewId, relationship, ratio, refId);
@@ -304,12 +304,12 @@ IFolderLayout::Pointer PageLayout::CreateFolder(const std::string& folderId,
   }
 
   // Create the folder.
-  PartStack::Pointer folder = new PartStack(rootLayoutContainer->page);
+  PartStack::Pointer folder(new PartStack(rootLayoutContainer->page));
   folder->SetID(folderId);
   this->AddStack(folder, folderId, relationship, ratio, refId);
 
   // Create a wrapper.
-  FolderLayout::Pointer layout = new FolderLayout(this, folder, viewFactory);
+  FolderLayout::Pointer layout(new FolderLayout(PageLayout::Pointer(this), folder, viewFactory));
 
   mapFolderToFolderLayout.insert(std::make_pair(folder, layout));
 
@@ -327,14 +327,14 @@ IPlaceholderFolderLayout::Pointer PageLayout::CreatePlaceholderFolder(
   }
 
   // Create the folder.
-  ContainerPlaceholder::Pointer folder = new ContainerPlaceholder("");
+  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(""));
   folder->SetContainer(rootLayoutContainer);
-  folder->SetRealContainer(new PartStack(rootLayoutContainer->page));
+  folder->SetRealContainer(IStackableContainer::Pointer(new PartStack(rootLayoutContainer->page)));
   folder->SetID(folderId);
   this->AddStack(folder, folderId, relationship, ratio, refId);
 
   // Create a wrapper.
-  IPlaceholderFolderLayout::Pointer layout = new PlaceholderFolderLayout(this, folder);
+  IPlaceholderFolderLayout::Pointer layout(new PlaceholderFolderLayout(PageLayout::Pointer(this), folder));
 
   mapFolderToFolderLayout.insert(std::make_pair(folder, layout));
 
@@ -508,7 +508,7 @@ void PageLayout::StackPart(StackablePart::Pointer newPart,
 //  StackablePart::Pointer refPart = this->GetRefPart(refId);
 //  if (refPart != 0) // && (refPart instanceof PartPane || refPart instanceof PartPlaceholder))
 //  {
-//    PartStack::Pointer newFolder = new PartStack(rootLayoutContainer->page);
+//    PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page));
 //    rootLayoutContainer->Replace(refPart, newFolder);
 //    newFolder->Add(refPart);
 //    newFolder->Add(newPart);
@@ -519,7 +519,7 @@ void PageLayout::StackPart(StackablePart::Pointer newPart,
 
   // If ref part is not found then just do add.
   WorkbenchPlugin::Log("Referenced part does not exist yet: " + refId);
-  PartStack::Pointer newFolder = new PartStack(rootLayoutContainer->page);
+  PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page));
   newFolder->Add(newPart);
   this->SetFolderPart(viewId, newFolder);
   rootLayoutContainer->Add(newFolder);
@@ -534,7 +534,7 @@ void PageLayout::StackPlaceholder(const std::string& viewId,
   }
 
   // Create the placeholder.
-  PartPlaceholder::Pointer newPart = new PartPlaceholder(viewId);
+  PartPlaceholder::Pointer newPart(new PartPlaceholder(viewId));
 
   StackablePart::Pointer refPart = this->GetRefPart(refId);
   if (refPart != 0)
@@ -559,7 +559,7 @@ void PageLayout::StackView(const std::string& viewId, const std::string& refId)
     if (newPart == 0)
     {
       this->StackPlaceholder(viewId, refId);
-      LayoutHelper::AddViewActivator(this, viewId);
+      LayoutHelper::AddViewActivator(PageLayout::Pointer(this), viewId);
     }
     else
     {
@@ -607,21 +607,21 @@ void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
   }
 
   // Create the folder.
-  ContainerPlaceholder::Pointer folder = new ContainerPlaceholder(0);
+  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(0));
   folder->SetContainer(rootLayoutContainer);
   int appearance = PresentationFactoryUtil::ROLE_STANDALONE;
   if (!showTitle)
   {
     appearance = PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE;
   }
-  folder->SetRealContainer(new PartStack(rootLayoutContainer->page, true,
-      appearance, 0));
+  folder->SetRealContainer(IStackableContainer::Pointer(new PartStack(rootLayoutContainer->page, true,
+      appearance, 0)));
   folder->SetID(stackId);
   this->AddStack(folder, stackId, relationship, ratio, refId);
 
   // Create a wrapper.
-  PlaceholderFolderLayout::Pointer placeHolder = new PlaceholderFolderLayout(this,
-      folder);
+  PlaceholderFolderLayout::Pointer placeHolder(new PlaceholderFolderLayout(PageLayout::Pointer(this),
+      folder));
 
   // Add the standalone view immediately
   placeHolder->AddPlaceholder(viewId);
@@ -636,9 +636,9 @@ IViewLayout::Pointer PageLayout::GetViewLayout(const std::string& viewId)
   ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
   if (rec == 0)
   {
-    return 0;
+    return IViewLayout::Pointer(0);
   }
-  return new ViewLayout(this, rec);
+  return IViewLayout::Pointer(new ViewLayout(PageLayout::Pointer(this), rec));
 }
 
 std::map<std::string, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
@@ -671,13 +671,13 @@ IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
     const std::string& viewId)
 {
   if (mapIDtoFolder[viewId] == 0)
-    return 0;
+    return IPlaceholderFolderLayout::Pointer(0);
 
   IStackableContainer::Pointer folder = mapIDtoFolder[viewId];
   IPlaceholderFolderLayout::Pointer layout;
   if (mapFolderToFolderLayout[folder] == 0)
   {
-    layout = new FolderLayout(this, folder.Cast<PartStack>(), viewFactory);
+    layout = new FolderLayout(PageLayout::Pointer(this), folder.Cast<PartStack>(), viewFactory);
     mapFolderToFolderLayout[folder] = layout;
   }
   else

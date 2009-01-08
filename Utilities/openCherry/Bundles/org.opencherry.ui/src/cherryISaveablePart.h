@@ -20,6 +20,7 @@
 #define CHERRYISAVEABLEPART_H_
 
 #include <cherryMacros.h>
+#include <cherryObject.h>
 
 #include "cherryUiDll.h"
 

@@ -164,19 +164,19 @@ void AbstractTabFolder::FireEvent(TabFolderEvent::Pointer e)
 
 void AbstractTabFolder::FireEvent(int id)
 {
-  TabFolderEvent::Pointer event = new TabFolderEvent(id);
+  TabFolderEvent::Pointer event(new TabFolderEvent(id));
   this->FireEvent(event);
 }
 
 void AbstractTabFolder::FireEvent(int id, AbstractTabItem* w)
 {
-  TabFolderEvent::Pointer event = new TabFolderEvent(id, w, 0, 0);
+  TabFolderEvent::Pointer event(new TabFolderEvent(id, w, 0, 0));
   this->FireEvent(event);
 }
 
 void AbstractTabFolder::FireEvent(int id, AbstractTabItem* w, const QPoint& pos)
 {
-  TabFolderEvent::Pointer event = new TabFolderEvent(id, w, pos);
+  TabFolderEvent::Pointer event(new TabFolderEvent(id, w, pos));
   this->FireEvent(event);
 }
 

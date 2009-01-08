@@ -54,7 +54,7 @@ bool Expression::Equals(std::vector<Expression::Pointer>& leftArray,
   {
     Expression::Pointer left= leftArray[i];
     Expression::Pointer right= rightArray[i];
-    const bool equal = (left.IsNull()) ? (right.IsNull()) : (*left == *right);
+    const bool equal = (left.IsNull()) ? (right.IsNull()) : (left == right);
     if (!equal)
     {
       return false;
@@ -81,7 +81,7 @@ bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
   {
     ExpressionVariable::Pointer left= leftArray[i];
     ExpressionVariable::Pointer right= rightArray[i];
-    const bool equal = (left.IsNull()) ? (right.IsNull()) : (*left == *right);
+    const bool equal = (left.IsNull()) ? (right.IsNull()) : (left == right);
     if (!equal)
     {
       return false;
@@ -92,7 +92,7 @@ bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
 }
 
 int
-Expression::HashCode(Expression* object)
+Expression::HashCode(Expression::Pointer object)
 {
   return object != 0 ? object->HashCode() : 0;
 }
@@ -138,13 +138,13 @@ Expression::CollectExpressionInfo(ExpressionInfo* info) const
 }
 
 intptr_t
-Expression::ComputeHashCode()
+Expression::ComputeHashCode() const
 {
   return reinterpret_cast<intptr_t>(this);
 }
 
 int
-Expression::HashCode()
+Expression::HashCode() const
 {
   if (fHashCode != HASH_CODE_NOT_COMPUTED)
     return fHashCode;
@@ -155,14 +155,12 @@ Expression::HashCode()
 }
 
 bool
-Expression::operator==(Expression& object)
+Expression::operator==(const Object* object) const
 {
-  return this->HashCode() == object.HashCode();
-}
+  if (const Expression* other = dynamic_cast<const Expression*>(object))
+    return this->HashCode() == other->HashCode();
 
-bool Expression::operator==(Expression* object)
-{
-  return this->operator==(*object);
+  return false;
 }
 
 std::string Expression::ToString()

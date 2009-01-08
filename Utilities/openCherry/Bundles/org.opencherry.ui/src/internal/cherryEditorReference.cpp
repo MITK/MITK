@@ -139,7 +139,8 @@ void EditorReference::InitListenersAndHandlers()
 
 PartPane::Pointer EditorReference::CreatePane()
 {
-  PartPane::Pointer pane = new PartPane(this, this->manager->page);
+  PartPane::Pointer pane(
+      new PartPane(IWorkbenchPartReference::Pointer(this), this->manager->page));
   return pane;
   //return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateEditorPane(this,
   //    this->manager->page);
@@ -320,7 +321,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
         input = this->GetEditorInput();
       } catch (PartInitException e1)
       {
-        input = new NullEditorInput(this);
+        input = new NullEditorInput(EditorReference::Pointer(this));
       }
 
       PartPane::Pointer pane = this->GetPane();
@@ -328,8 +329,8 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
       pane->CreateControl(
           manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
-      EditorSite::Pointer site =
-          new EditorSite(this, part, manager->page, descr);
+      EditorSite::Pointer site(
+          new EditorSite(IEditorReference::Pointer(this), part, manager->page, descr));
 
       //site.setActionBars(new EditorActionBars(manager.page, site.getWorkbenchWindow(), getId()));
 
@@ -344,7 +345,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
         //StatusUtil.handleStatus(e, StatusManager.SHOW
         //    | StatusManager.LOG);
         WorkbenchPlugin::Log("Error creating editor");
-        return 0;
+        return IWorkbenchPart::Pointer(0);
       }
 
       result = part.Cast<IWorkbenchPart> ();
@@ -472,7 +473,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
 
     // Link everything up to the part reference (the part reference itself should not have
     // been modified until this point)
-    site = manager->CreateSite(this, part, desc, editorInput);
+    site = manager->CreateSite(IEditorReference::Pointer(this), part, desc, editorInput);
 
     // if there is saved state that's appropriate, pass it on
     if (/*part instanceof IPersistableEditor &&*/editorState.IsNotNull())
@@ -512,7 +513,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     input = this->GetEditorInput();
   } catch (PartInitException e1)
   {
-    input = new NullEditorInput(this);
+    input = new NullEditorInput(EditorReference::Pointer(this));
   }
 
   PartPane::Pointer pane = this->GetPane();
@@ -520,7 +521,8 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   pane->CreateControl(
       manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
-  EditorSite::Pointer site = new EditorSite(this, part, manager->page, descr);
+  EditorSite::Pointer site(new EditorSite(IEditorReference::Pointer(this),
+                                          part, manager->page, descr));
 
   //site.setActionBars(new EditorActionBars(manager.page, site.getWorkbenchWindow(), getId()));
 
@@ -534,7 +536,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     //StatusManager.getManager().handle(
     //    StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
     std::cout << e.what() << std::endl;
-    return 0;
+    return IEditorPart::Pointer(0);
   }
 
   this->part = part.Cast<IWorkbenchPart> ();

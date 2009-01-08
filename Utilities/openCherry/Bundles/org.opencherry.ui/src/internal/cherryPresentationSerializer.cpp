@@ -53,7 +53,7 @@ IPresentablePart::Pointer PresentationSerializer::GetPart(const std::string& id)
   {
   }
 
-  return 0;
+  return IPresentablePart::Pointer(0);
 }
 
 }

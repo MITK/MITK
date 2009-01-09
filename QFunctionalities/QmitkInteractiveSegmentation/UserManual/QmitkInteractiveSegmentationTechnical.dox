@@ -9,7 +9,7 @@
 \section QmitkInteractiveSegmentationTechnicalPage2 Introduction
 
 QmitkInteractiveSegmentation was designed for the liver resection planning
-project "ReLiver", which is developed under quality management.
+project "ReLiver".
 The goal was a stable, well-documented, extensible, and testable
 re-implementation of a functionality called "ERIS", which was used for manual
 segmentation in 2D slices of 3D or 3D+t images.

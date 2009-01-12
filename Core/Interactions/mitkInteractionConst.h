@@ -193,6 +193,7 @@ enum EOperations
   OpSHORTESTPATHSEARCH = 2003,       //used in VesselGraphInteractor
   OpATTRIBUTATION = 2004,       //used in VesselGraphInteractor
   OpDEFAULT = 2006,                  //used in VesselGraphInteractor
+  OpSURFACECHANGED = 3000,	// used for changing polydata in surfaces
 };
 
 //##Constants for EventMapping...

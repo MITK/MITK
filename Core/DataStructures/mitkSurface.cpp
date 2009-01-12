@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceVtkWriter.h"
 #include "mitkDataTreeNodeFactory.h"
 #include <itkSmartPointerForwardReference.txx>
+#include "mitkInteractionConst.h"
+#include "mitkSurfaceOperation.h"
 
 mitk::Surface::Surface() : m_CalculateBoundingBox( false )
 {
@@ -313,4 +315,28 @@ bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
   }
 
   return true;
+}
+
+void mitk::Surface::ExecuteOperation(Operation *operation)
+{
+	switch ( operation->GetOperationType() )
+	{
+	case OpSURFACECHANGED:
+	
+		mitk::SurfaceOperation* surfOp = dynamic_cast<mitk::SurfaceOperation*>(operation);
+		if( ! surfOp ) break;
+
+		unsigned int time = surfOp->GetTimeStep();
+
+		if(m_PolyDataSeries[ time ] != NULL)
+		{
+			vtkPolyData* updatePoly = surfOp->GetVtkPolyData();
+			if( updatePoly ){
+				this->SetVtkPolyData( updatePoly, time );
+				this->CalculateBoundingBox();
+			}
+		}
+		break;
+	}
+	this->Modified();
 }

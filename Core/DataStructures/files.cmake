@@ -122,4 +122,5 @@ SET(CPP_FILES
   mitkVtkScalarModeProperty.cpp
   mitkWeakPointerProperty.cpp
   mitkXMLIO.cpp
+  mitkSurfaceOperation.cpp
 )

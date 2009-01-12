@@ -92,6 +92,8 @@ namespace mitk {
 
     void CalculateBoundingBox();
 
+	virtual void ExecuteOperation(Operation *operation);
+
   protected:
 
     typedef std::vector< vtkPolyData* > VTKPolyDataSeries;

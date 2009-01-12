@@ -17,8 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "vtkMitkRenderProp.h"
-#include "vtkObjectFactory.h"
-#include "vtkLODProp3D.h"
+
+#include <vtkObjectFactory.h>
+#include <vtkLODProp3D.h>
+#include <vtkPropAssembly.h>
 
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
 #include "mitkBaseVtkMapper3D.h"
@@ -79,6 +81,16 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
     mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
     if(vtkMapper)
     {    
+      // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly
+      // manually (see issue #8186 committed to VTK's Mantis issue tracker)
+      // --> VTK bug resolved on 2008-12-01
+      vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
+        vtkMapper->GetProp() );
+      if ( propAssembly )
+      {
+        propAssembly->InitPathTraversal();
+      }
+
       if (vtkMapper->GetProp()->HasTranslucentPolygonalGeometry()==1)
         return 1;
     }

@@ -3,7 +3,7 @@
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
-Version:   $Revision$
+Version:   $Revision: 14645 $
  
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -15,27 +15,12 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "cherryQtViewPart.h"
+#include <Poco/ClassLibrary.h>
 
-namespace cherry
-{
+#include <cherryIViewPart.h>
+#include "src/QmitkMeasurement.h"
 
-void QtViewPart::CreatePartControl(void* parent)
-{
-  this->BeforeCreateQtPartControl(static_cast<QWidget*>(parent));
-  this->CreateQtPartControl(static_cast<QWidget*>(parent));
-  this->AfterCreateQtPartControl(static_cast<QWidget*>(parent));
 
-}
-
-void QtViewPart::BeforeCreateQtPartControl(QWidget* parent)
-{
-
-}
-
-void QtViewPart::AfterCreateQtPartControl(QWidget* parent)
-{
-
-}
-
-}
+POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+  POCO_EXPORT_CLASS(QmitkMeasurement)
+POCO_END_MANIFEST

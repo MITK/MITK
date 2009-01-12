@@ -14,8 +14,9 @@ class MITK_QT_HELLOWORLD QmitkHelloWorldView : public QObject, public QmitkViewP
   Q_OBJECT;
 
 public:
-
   void SetFocus();
+  void StdMultiWidgetAvailable();
+  void StdMultiWidgetNotAvailable();
 
   ~QmitkHelloWorldView();
 protected slots:

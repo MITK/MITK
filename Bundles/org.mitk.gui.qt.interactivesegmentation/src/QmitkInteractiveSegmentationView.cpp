@@ -114,7 +114,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
 
   layout->addWidget(new QPushButton("Hello World", parent));*/
-  this->Activated();
+  //this->Activated();
 }
 
 void QmitkInteractiveSegmentationView::SetFocus()
@@ -165,6 +165,8 @@ void QmitkInteractiveSegmentationView::TreeChanged( const itk::EventObject & )
 
 void QmitkInteractiveSegmentationView::Activated()
 {
+  QMessageBox::information(m_Parent, "Activated", "Activated");
+
   m_MultiWidget->SetWidgetPlanesVisibility(false);
 
   m_Controls->m_ToolSelectionBox->setEnabled( true );
@@ -175,6 +177,7 @@ void QmitkInteractiveSegmentationView::Activated()
 
 void QmitkInteractiveSegmentationView::Deactivated()
 {
+  QMessageBox::information(m_Parent, "Deactivated", "Deactivated");
 
   m_Controls->m_ToolSelectionBox->setEnabled( false );
   m_Controls->m_PostProcessingToolSelectionBox->setEnabled( false );

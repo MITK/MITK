@@ -35,8 +35,17 @@ void QmitkHelloWorldView::CreateQtPartControl(QWidget* parent)
   QObject::connect(m_ButtonHelloWorld, SIGNAL(clicked()),
          this, SLOT(buttonClicked()));
   layout->addWidget(m_ButtonHelloWorld);
+}
 
 
+void QmitkHelloWorldView::StdMultiWidgetAvailable()
+{
+  m_ButtonHelloWorld->setEnabled(true);
+}
+
+void QmitkHelloWorldView::StdMultiWidgetNotAvailable()
+{
+  m_ButtonHelloWorld->setEnabled(false);
 }
 
 void QmitkHelloWorldView::SetFocus()

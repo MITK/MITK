@@ -1,0 +1,43 @@
+/**
+\image html MeasurementIcon.png 
+\page QmitkMeasurementUserManual Measurement
+
+Available sections:
+  - \ref QmitkMeasurementUserManualOverview 
+  - \ref QmitkMeasurementUserManualFeatures 
+  - \ref QmitkMeasurementUserManualUsage 
+
+\section QmitkMeasurementUserManualOverview Overview
+
+Measurement is a is a program module that allows to measure distances, angels and pathes on a dataset.
+
+\section QmitkMeasurementUserManualFeatures Features
+
+<ul>
+  <li> The Measurement Module is able to measure:
+  <ul>
+    <li> Distances between two points
+    <li> Angles between two lines (defined by three points) 
+    <li> Distances along a path 
+    </ul>
+</ul>
+    
+\section QmitkMeasurementUserManualUsage Usage
+To use the Measurement Module, at first a data set must be loaded. That can be done by drag & drop.
+Choose the measurement method you need by pressing the according button. 
+<ul>
+  <li>Points can be set by "shift-clicking" on the place in the data set. 
+  <li>Remove points by pressing the del-button on your keyboard. 
+  <li>You can mark a point by clickon it with the cursor and move it while the mouse button is still pressed. 
+</ul>
+What the different modes mean and how to use them:
+<ul>
+  <li> a) Distances: To measure the distance between two points, you have to set two points. The distance will be displayed on the line between the points.
+  <li> b) Angles: Angles can be measured between two lines. For that you have to set three points. The angle will be displayed between the two lines. 
+  <li> c) Path: Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer pathes) points. The distance and the angles for each part will be displayed next to the path.
+</ul>
+
+\image html MeasurementGUI.png Graphical User Interface of Measurement
+
+*/
+

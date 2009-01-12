@@ -38,7 +38,19 @@ public:
   
 protected:
   
+  ///
+  /// Called immediately before CreateQtPartControl().
+  /// Actions that should be taken before creating the controls are executed here. 
+  ///
+  virtual void BeforeCreateQtPartControl(QWidget* parent);
   virtual void CreateQtPartControl(QWidget* parent) = 0;
+
+  ///
+  /// Called immediately after CreateQtPartControl().
+  /// Actions that should be taken after creating the controls are executed here. 
+  ///
+  virtual void AfterCreateQtPartControl(QWidget* parent);
+
 };
 
 }

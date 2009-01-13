@@ -187,7 +187,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       //check if the given position lies inside the data-object
       if (bBox->IsInside(point))
       {
-        //mapped between 0,5 and 1
+        //mapped between 0.5 and 1
         returnvalueBB = 0.5 + (returnvalueBB/ 2);
       }
       else

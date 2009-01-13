@@ -40,6 +40,7 @@ SET(CPP_FILES
   mitkStateEvent.cpp
   mitkStateMachine.cpp
   mitkStateMachineFactory.cpp
+  mitkSurfaceInteractor.cpp
   mitkTool.cpp
   mitkTransition.cpp
 )

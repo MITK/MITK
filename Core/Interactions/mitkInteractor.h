@@ -88,7 +88,8 @@ public:
   //##Documentation
   //## @brief calculates how good the data, this statemachine handles, is hit by the event.
   //## 
-  //## Returns a value between 0 and 1.
+  //## Returns a value between 0 and 1 
+  //## where 0 represents not responsible and 1 represents definitive responsible!
   //## Standard function to override if needed.
   //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;

@@ -143,7 +143,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::MaterialProperty* materialProperty;
-  //first check render specific property, then the regulat one
+  //first check render specific property, then the regular one
   bool setMaterial = false;
   
   this->GetDataTreeNode()->GetProperty(materialProperty, "material", renderer);

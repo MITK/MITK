@@ -122,11 +122,11 @@ bool mitk::Interactor::OnModeSubSelect(Action* /*action*/, StateEvent const*)
 
 float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
-    //retunrValue for boundingbox
+    //return value for boundingbox
   float returnvalueBB = 0.0, 
-    //retunrvalue for a existing transition
+    //return value for a existing transition
     returnvalueTransition = 0.0, 
-    //returnvalue for an existing key transition
+    //return value for an existing key transition
     returnvalueKey = 0.0;
 
   //if it is a key event that can be handled in the current state
@@ -166,7 +166,7 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
     DisplayPositionEvent const  *event = dynamic_cast <const DisplayPositionEvent *> (stateEvent->GetEvent());
     if (event != NULL)
     {
-      //transforming the Worldposition to local coordinatesystem
+      //transforming the world position to local coordinate system
       Point3D point;
       GetData()->GetTimeSlicedGeometry()->WorldToIndex(event->GetWorldPosition(), point);
 
@@ -174,17 +174,21 @@ float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) cons
       BoundingBox::PointType center = bBox->GetCenter();
       returnvalueBB = point.EuclideanDistanceTo(center);
 
-      //now compared to size of boundingbox to get between 0 and 1;
-      returnvalueBB = returnvalueBB/( (bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() ) ) );
+      // now check if object bounding box has a non-zero size
+      float bBoxSize = bBox->GetMaximum().EuclideanDistanceTo(bBox->GetMinimum() );
+      if( bBoxSize < 0.00001 ) return 0;      // bounding box too small?
 
-      //safety: if by now returnvalue is not in 0 and 1, then return 1!
-      if (returnvalueBB>1 ||returnvalueBB<0)
+      //now compared to size of bounding box to get value between 0 and 1;
+      returnvalueBB = returnvalueBB/bBoxSize;
+
+      //safety: if by now return value is not in [0,1], then return 0!
+      if (returnvalueBB>1 || returnvalueBB<0)
         returnvalueBB = 0;
 
-      //shall be 1 if short length to center
+      // A return value of 1 is good, 0 is bad -> reverse value
       returnvalueBB = 1 - returnvalueBB;
 
-      //check if the given position lies inside the data-object
+      //check if the given position lies inside the data object
       if (bBox->IsInside(point))
       {
         //mapped between 0.5 and 1
@@ -230,7 +234,7 @@ void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
 {
   m_DataTreeNode = dataTreeNode;
   
-  //check for the number of timesteps and initialize the vector of CurrentStatePointer accordingly
+  //check for the number of time steps and initialize the vector of CurrentStatePointer accordingly
   if (m_DataTreeNode != NULL)
   {
     mitk::BaseData* data = dataTreeNode->GetData();

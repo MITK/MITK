@@ -91,11 +91,11 @@ public:
   //## Returns a value between 0 and 1 
   //## where 0 represents not responsible and 1 represents definitive responsible!
   //## Standard function to override if needed.
-  //## (Used by GlobalInteraction to descide which DESELECTED statemachine to send the event to.)
+  //## (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
   virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
 
   /**
-  * @brief Updates the current TimeStep according to the asociated data and calls Superclass::HandleEvent()
+  * @brief Updates the current TimeStep according to the associated data and calls Superclass::HandleEvent()
   **/
   bool HandleEvent(StateEvent const* stateEvent);
 
@@ -142,7 +142,7 @@ protected:
   virtual void SetDataTreeNode( DataTreeNode* dataTreeNode );
 
   /**
-  * @brief Derived from superclass to also cvheck if enough timesteps are instanciated in m_CurrentStateVector
+  * @brief Derived from superclass to also check if enough timesteps are instantiated in m_CurrentStateVector
   * The number of timesteps is read from the dedicated data.
   * @param[in] timeStep The timeStep that the statemachine has to be set to
   **/

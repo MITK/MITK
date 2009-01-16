@@ -44,7 +44,14 @@ namespace mitk {
     {
       itk::ExhaustiveOptimizer::Pointer OptimizerPointer = itk::ExhaustiveOptimizer::New();
       OptimizerPointer->SetStepLength( m_OptimizerParameters->GetStepLengthExhaustive() );
-      OptimizerPointer->SetNumberOfSteps( m_OptimizerParameters->GetNumberOfStepsExhaustive() );
+      itk::ExhaustiveOptimizer::StepsType steps( m_NumberTransformParameters );
+      for (int i = 0; i < m_NumberTransformParameters; i++)
+      {
+        steps[i] = m_OptimizerParameters->GetNumberOfStepsExhaustive();
+      }
+      
+      OptimizerPointer->SetNumberOfSteps( steps );
+
       return OptimizerPointer.GetPointer();
     }
     else if (optimizer == OptimizerParameters::GRADIENTDESCENTOPTIMIZER)

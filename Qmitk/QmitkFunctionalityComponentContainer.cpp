@@ -406,8 +406,13 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 
 		QWidget* componentWidget = component->CreateControlWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack()->currentPage());
 		AddComponentListener(component);
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->page(stackPage)->layout()->add(componentWidget);
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->setShown(true);
+		//QTabWidget* myTabWidget = 
+      m_FunctionalityComponentContainerGUI->GetWidgetStack()->page(stackPage)->layout()->add(componentWidget);
+//		QWidget* myWidget = myTabWidget->page(stackPage);
+  //  QLayout* myLayout = myWidget->layout();
+   // myWidget->layout()->add(componentWidget);
+
+    m_FunctionalityComponentContainerGUI->GetWidgetStack()->setShown(true);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->updateGeometry();
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout()->activate();
 		componentWidget->setShown(true);

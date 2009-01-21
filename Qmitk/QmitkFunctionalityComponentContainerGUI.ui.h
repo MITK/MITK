@@ -59,5 +59,5 @@ QGroupBox * QmitkFunctionalityComponentContainerGUI::GetImageContent()
 
 QTabWidget* QmitkFunctionalityComponentContainerGUI::GetWidgetStack()
 {
-  return m_WidgetStack;
+  return (QTabWidget*)m_WidgetStack;
 }

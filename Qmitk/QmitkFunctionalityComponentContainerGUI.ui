@@ -117,7 +117,7 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QWidgetStack">
+        <widget class="QTabWidget">
             <property name="name">
                 <cstring>m_WidgetStack</cstring>
             </property>
@@ -182,7 +182,7 @@
     <function returnType="QLayout *">GetContainerLayout()</function>
     <function returnType="QmitkDataTreeComboBox *">GetTreeNodeSelector()</function>
     <function returnType="QGroupBox *">GetImageContent()</function>
-    <function returnType="QWidgetStack *">GetWidgetStack()</function>
+    <function returnType="QTabWidget *">GetWidgetStack()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>

@@ -152,7 +152,7 @@ QPushButton* GetBackButton();
   virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer);
 
     /** \brief method to add components into this component. */
-  virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer, int stackPage);
+  virtual void AddComponent(QmitkBaseFunctionalityComponent* componentContainer, QString label, int stackPage);
 
   /*************** TREE CHANGED (       ) ***************/
   virtual void TreeChanged(const itk::EventObject & treeChangedEvent);

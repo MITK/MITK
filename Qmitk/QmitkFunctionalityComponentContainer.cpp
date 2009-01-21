@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobjectlist.h>
 #include <qcombobox.h>
 #include <qlabel.h>
+#include <qtabwidget.h>
 //#include <qlayout.h>
 
 #include <vector>
@@ -371,12 +372,12 @@ QPushButton* QmitkFunctionalityComponentContainer::GetBackButton()
 
 
 /***************      ADD COMPONENT     ***************/
-void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityComponent* component, int stackPage)
+void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityComponent* component, QString label, int stackPage)
 {  
 	if(component!=NULL)
 	{
-		QWidget* visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
-		int idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
+		QWidget* visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->currentPage();
+		int idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->indexOf(visibleWidget);
 		if(idVisibleWidget > m_MaximumWidgedStackSize)
 		{
 			m_MaximumWidgedStackSize = idVisibleWidget;
@@ -384,18 +385,18 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 		if(m_MaximumWidgedStackSize < stackPage)
 		{
 			QWidget* w = new QWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack());
-			m_FunctionalityComponentContainerGUI->GetWidgetStack()->addWidget(w, stackPage);
+			m_FunctionalityComponentContainerGUI->GetWidgetStack()->insertTab(w, label, stackPage);
 			m_MaximumWidgedStackSize++;
-			m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(w);
-			visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget();
-			idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->id(visibleWidget);
+			m_FunctionalityComponentContainerGUI->GetWidgetStack()->setCurrentPage(stackPage);
+			visibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->currentPage();
+			idVisibleWidget = m_FunctionalityComponentContainerGUI->GetWidgetStack()->indexOf(visibleWidget);
 			new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
 		}
 
 		QLayout* layout;
 		if(m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout() == 0)
 		{
-			layout = new QVBoxLayout(m_FunctionalityComponentContainerGUI->GetWidgetStack(), QBoxLayout::TopToBottom);
+			layout = new QVBoxLayout((QWidget*)(m_FunctionalityComponentContainerGUI->GetWidgetStack()), QBoxLayout::TopToBottom);
 		}
 		else 
 		{
@@ -403,9 +404,9 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkBaseFunctionalityCo
 		}
 
 
-		QWidget* componentWidget = component->CreateControlWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack()->visibleWidget());
+		QWidget* componentWidget = component->CreateControlWidget(m_FunctionalityComponentContainerGUI->GetWidgetStack()->currentPage());
 		AddComponentListener(component);
-		m_FunctionalityComponentContainerGUI->GetWidgetStack()->widget(stackPage)->layout()->add(componentWidget);
+		m_FunctionalityComponentContainerGUI->GetWidgetStack()->page(stackPage)->layout()->add(componentWidget);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->setShown(true);
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->updateGeometry();
 		m_FunctionalityComponentContainerGUI->GetWidgetStack()->layout()->activate();
@@ -448,7 +449,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 //	connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
 //	connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
 
-	m_FunctionalityComponentContainerGUI->GetWidgetStack()->raiseWidget(1);
+	m_FunctionalityComponentContainerGUI->GetWidgetStack()->setCurrentPage(1);
 	SetWizardText("");
 	GetImageContent()->updateGeometry();
 	if(m_Spacer != NULL)

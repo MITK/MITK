@@ -23,6 +23,7 @@
 #include "qinputdialog.h"
 #include "qmessagebox.h"
 #include "QmitkLoadPresetDialog.h"
+#include <itkArray.h>
 
 
 /// this method starts the registration process
@@ -33,10 +34,9 @@ void QmitkRigidRegistrationSelector::CalculateTransformation()
     emit AddNewTransformationToUndoList();
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
-    m_ImageGeometry = m_MovingNode->GetData()->GetGeometry()->Clone();
-
+    
     // Initial moving image geometry
-    mitk::AffineGeometryFrame3D::Pointer m_MovingGeometryCopy = m_MovingNode->GetData()->GetGeometry()->Clone();
+    m_ImageGeometry = m_MovingNode->GetData()->GetGeometry()->Clone();
     std::cout << "Moving Image Geometry (IndexToWorldTransform)"  << std::endl;
     std::cout << m_ImageGeometry->GetIndexToWorldTransform()->GetMatrix();
     mitk::Geometry3D::TransformType::InputPointType center = m_ImageGeometry->GetIndexToWorldTransform()->GetCenter();
@@ -97,7 +97,7 @@ void QmitkRigidRegistrationSelector::CalculateTransformation()
     registration->SetObserver(m_Observer);
     registration->SetInterpolator(m_InterpolatorBox->currentItem());
     registration->SetReferenceImage(fimage);
-    registration->SetInput(mimage);
+    registration->SetInput(mimage);    
     registration->SetTransformParameters(m_TransformParameters);
     registration->SetMetricParameters(m_MetricParameters);
     registration->SetOptimizerParameters(m_OptimizerParameters);
@@ -1160,9 +1160,66 @@ void QmitkRigidRegistrationSelector::MetricSelected( int metric )
 /// so that the desired transform can be build up with these parameters
 void QmitkRigidRegistrationSelector::setTransformParameters()
 {
-  itk::Array<double> m_Scales;
+  //Calculate an initial transform to give to m_TransformParameters
   m_TransformParameters = mitk::TransformParameters::New();
   m_TransformParameters->SetTransform(m_TransformBox->currentItem());
+
+  mitk::Geometry3D::TransformType::InputPointType center;
+  mitk::Geometry3D::TransformType::OutputVectorType offset;
+
+  std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
+  std::cout << m_GeometryWorldToItkPhysicalTransform->GetMatrix();
+  center = m_GeometryWorldToItkPhysicalTransform->GetCenter();
+  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+  offset = m_GeometryWorldToItkPhysicalTransform->GetOffset();
+  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "Fixed Image: ITK-physical to World transform" << std::endl;
+  std::cout << m_GeometryItkPhysicalToWorldTransform->GetMatrix();
+  center = m_GeometryItkPhysicalToWorldTransform->GetCenter();
+  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+  offset = m_GeometryItkPhysicalToWorldTransform->GetOffset();
+  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+  std::cout << std::endl;
+
+  //mitk::Geometry3D::TransformType::Pointer invWPm = mitk::Geometry3D::TransformType::New();
+  //m_GeometryWorldToItkPhysicalTransform->GetInverse(invWPm);
+
+  //mitk::Geometry3D::TransformType::Pointer WPf = mitk::Geometry3D::TransformType::New();
+  //m_GeometryItkPhysicalToWorldTransform->GetInverse(WPf);
+
+  //std::cout << "Moving Image: ITK-physical to World transform" << std::endl;
+  //std::cout << invWPm->GetMatrix();
+  //center = invWPm->GetCenter();
+  //std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+  //offset = invWPm->GetOffset();
+  //std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+  //std::cout << std::endl;
+
+  //std::cout << "Fixed Image:  World to ITK-physical transform" << std::endl;
+  //std::cout << WPf->GetMatrix();
+  //center = WPf->GetCenter();
+  //std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+  //offset = WPf->GetOffset();
+  //std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+  //std::cout << std::endl;
+
+  mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
+  initialTransform->SetIdentity();
+  initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
+  initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
+  
+  std::cout << "Initial transform" << std::endl;
+  std::cout << initialTransform->GetMatrix();
+  center = initialTransform->GetCenter();
+  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+  offset = initialTransform->GetOffset();
+  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+  std::cout << std::endl;
+
+  itk::Array<double> m_Scales;
+  
   if (m_TransformBox->currentItem() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
   {
     if (m_UseOptimizerScalesTranslation->isChecked())
@@ -1217,7 +1274,19 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
     }
     
     m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerAffine->isChecked());
+    //m_TransformParameters->SetTransformInitializerOn(true);
+
+    itk::MatrixOffsetTransformBase<float, 3, 3>::OutputVectorType offset;
+    //offset[0] = 500; offset[1] = 0; offset[2] = 0;
+    //invWPm->SetOffset(offset);  
+    
+         
+    //m_TransformParameters->SetInitialParameters(invWPm->GetParameters());
+    m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());
+
     m_TransformParameters->SetMomentsOn(m_MomentsAffine->isChecked());
+   
+  
   }
   else if (m_TransformBox->currentItem() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
   {
@@ -1511,6 +1580,8 @@ void QmitkRigidRegistrationSelector::setOptimizerParameters()
   m_OptimizerParameters->SetOptimizer(m_OptimizerBox->currentItem());
   m_OptimizerParameters->SetDimension(m_FixedDimension);
   m_OptimizerParameters->SetMaximize(m_Maximize->isOn());
+  
+
   if (m_OptimizerBox->currentItem() == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
   {
     m_OptimizerParameters->SetStepLengthExhaustive(m_StepLengthExhaustive->text().toFloat());

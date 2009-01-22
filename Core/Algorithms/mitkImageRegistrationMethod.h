@@ -79,7 +79,7 @@ namespace mitk
 
     void SetTransformParameters(TransformParameters::Pointer transformParameters)
     {
-      m_TransformParameters = transformParameters;
+      m_TransformParameters = transformParameters;      
     }
 
     TransformParameters::Pointer GetTransformParameters()

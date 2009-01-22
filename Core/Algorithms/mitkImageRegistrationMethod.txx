@@ -104,7 +104,25 @@ namespace mitk {
       registration->SetFixedImage(fixedImage);
       registration->SetMovingImage(movingImage);
       registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
-      registration->SetInitialTransformParameters( transform->GetParameters() );
+      //registration->SetInitialTransformParameters( transform->GetParameters() );
+      
+      
+      
+      //added code
+      
+      registration->SetInitialTransformParameters( transFac->GetTransformParameters()->GetInitialParameters() );
+      //registration->SetInitialTransformParameters( m_TransformParameters->GetInitialParameters() );
+      
+      /*
+	  RegistrationType::ParametersType params = registration->GetInitialTransformParameters();
+	  std::cout << "Initial parameters given to itk::ImageRegistrationMethod registration" << std::endl;
+	  for(int i=0; i<params.size(); i++)
+	  {
+	    std::cout << params[i] << std::endl;
+	  }*/
+	  
+      //end of added code
+      
       if (m_Interpolator == LINEARINTERPOLATOR)
       {
         typename InterpolatorType::Pointer interpolator = InterpolatorType::New();

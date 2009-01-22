@@ -14,29 +14,25 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
+#include <QPushButton>
+#include <QWidget>
+#include <QVBoxLayout>
 
-#ifndef (@UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED)
-#define @UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED
-
-@INCLUDE_DLL_H@
-#include <@VIEW_BASE_CLASS_H@>
-
-class QWidget;
-class QPushButton;
+#include "@VIEW_CLASS_H@"
 
 @BEGIN_NAMESPACE@
 
-class @DLL_DEFINE@ @VIEW_CLASS@ : public @VIEW_BASE_CLASS@
+void @VIEW_CLASS@::CreateQtPartControl(QWidget* parent)
 {
-public:
-  void SetFocus();
+  QVBoxLayout* layout = new QVBoxLayout(parent);
+  layout->setContentsMargins(0,0,0,0);
+  m_ButtonStart = new QPushButton("start", parent);
+  layout->addWidget(m_ButtonStart);
+}
 
-protected:
-  void CreateQtPartControl(QWidget* parent);
-
-  QPushButton* m_ButtonStart;
-};
+void @VIEW_CLASS@::SetFocus()
+{
+	m_ButtonStart->setFocus();
+}
 
 @END_NAMESPACE@
-
-#endif /*@UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED*/

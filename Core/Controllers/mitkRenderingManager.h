@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkDataTree.h"
 
+#include <vtkCallbackCommand.h>
 
 #include <string>
 #include <itkObject.h>
@@ -262,9 +263,9 @@ protected:
   typedef std::map< BaseRenderer *, unsigned int > RendererIntMap;
   typedef std::map< BaseRenderer *, bool > RendererBoolMap;
 
-  
+
   RendererBoolMap m_RenderingAbortedMap;
-  
+
   RendererIntMap m_NextLODMap;
 
   unsigned int m_MaxLOD;
@@ -290,6 +291,15 @@ protected:
 
   RenderWindowList m_RenderWindowList;
   RenderWindowVector m_AllRenderWindows;
+
+  struct RenderWindowCallbacks
+  {
+    vtkCallbackCommand* commands[3u];
+  };
+
+  typedef std::map<vtkRenderWindow*, RenderWindowCallbacks> RenderWindowCallbacksList;
+
+  RenderWindowCallbacksList m_RenderWindowCallbacksList;
 
   SliceNavigationController *m_TimeNavigationController;
 

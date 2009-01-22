@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 
 #include <vtkRenderWindow.h>
-#include <vtkCallbackCommand.h>
 
 #include <itkCommand.h>
 #include "mitkVector.h"
@@ -58,12 +57,18 @@ RenderingManager
 RenderingManager
 ::~RenderingManager()
 {
-  // Decrease reference counts of all registered vtkRenderWindows for 
+  // Decrease reference counts of all registered vtkRenderWindows for
   // proper destruction
   RenderWindowVector::iterator it;
   for ( it = m_AllRenderWindows.begin(); it != m_AllRenderWindows.end(); ++it )
   {
     (*it)->UnRegister( NULL );
+
+    RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(*it);
+
+    (*it)->RemoveObserver(callbacks_it->second.commands[0u]);
+    (*it)->RemoveObserver(callbacks_it->second.commands[1u]);
+    (*it)->RemoveObserver(callbacks_it->second.commands[2u]);
   }
 }
 
@@ -154,19 +159,26 @@ RenderingManager
     // Add callbacks for rendering abort mechanism
     //BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
     vtkCallbackCommand *startCallbackCommand = vtkCallbackCommand::New();
-    startCallbackCommand->SetCallback( 
+    startCallbackCommand->SetCallback(
       RenderingManager::RenderingStartCallback );
     renderWindow->AddObserver( vtkCommand::StartEvent, startCallbackCommand );
 
     vtkCallbackCommand *progressCallbackCommand = vtkCallbackCommand::New();
-    progressCallbackCommand->SetCallback( 
+    progressCallbackCommand->SetCallback(
       RenderingManager::RenderingProgressCallback );
     renderWindow->AddObserver( vtkCommand::AbortCheckEvent, progressCallbackCommand );
 
     vtkCallbackCommand *endCallbackCommand = vtkCallbackCommand::New();
-    endCallbackCommand->SetCallback( 
+    endCallbackCommand->SetCallback(
       RenderingManager::RenderingEndCallback );
     renderWindow->AddObserver( vtkCommand::EndEvent, endCallbackCommand );
+
+    RenderWindowCallbacks callbacks;
+
+    callbacks.commands[0u] = startCallbackCommand;
+    callbacks.commands[1u] = progressCallbackCommand;
+    callbacks.commands[2u] = endCallbackCommand;
+    this->m_RenderWindowCallbacksList[renderWindow] = callbacks;
   }
 }
 
@@ -175,16 +187,20 @@ void
 RenderingManager
 ::RemoveRenderWindow( vtkRenderWindow *renderWindow )
 {
-  m_RenderWindowList.erase( renderWindow );
-
-  RenderWindowVector::iterator it = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
-  if ( it != m_AllRenderWindows.end() )
+  if (m_RenderWindowList.erase( renderWindow ))
   {
-    vtkRenderWindow *renderWindow = *it;
-    m_AllRenderWindows.erase( it );
+    RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
+
+    renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
+    renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
+    renderWindow->RemoveObserver(callbacks_it->second.commands[2u]);
+    this->m_RenderWindowCallbacksList.erase(callbacks_it);
+
+    RenderWindowVector::iterator rw_it = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );
 
     // Decrease reference count for proper destruction
-    renderWindow->UnRegister( NULL );
+    (*rw_it)->UnRegister(NULL);
+    m_AllRenderWindows.erase( rw_it );
   }
 }
 
@@ -323,7 +339,7 @@ RenderingManager
 {
   mitk::DataTreePreOrderIterator it((dynamic_cast<const mitk::DataTreeStorage*>(storage))->m_DataTree);
   return this->InitializeViews(&it, type, preserveRoughOrientationInWorldSpace);
-  
+
 
 // following lines of code are never reached
 // and may be used to generate native datastorage code later
@@ -383,7 +399,7 @@ RenderingManager
     transform->SetOffset( modifiedGeometry->GetIndexToWorldTransform()->GetOffset() );
 
     // get transform matrix
-    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix = 
+    AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& oldMatrix =
       const_cast< AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType& > ( transform->GetMatrix().GetVnlMatrix() );
     AffineGeometryFrame3D::TransformType::MatrixType::InternalMatrixType newMatrix(oldMatrix);
 
@@ -435,7 +451,7 @@ RenderingManager
         offset += modifiedGeometry->GetAxisVector(i);
       }
 
-      
+
       // matchingRow is now used as column index to place currentVector
       // correctly in the new matrix
       vnl_vector<ScalarType> newMatrixColumn(3);
@@ -480,7 +496,7 @@ RenderingManager
     int id = baseRenderer->GetMapperID();
     if ( ((type == REQUEST_UPDATE_ALL)
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))
-      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2))) 
+      || ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
       )
     {
       this->InternalViewInitialization( baseRenderer, geometry,

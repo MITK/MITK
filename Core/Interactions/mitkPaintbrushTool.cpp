@@ -195,9 +195,9 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* action, const StateEvent* sta
     Point3D pos = positionEvent->GetWorldPosition() - workingSlice->GetGeometry()->GetOrigin().GetVectorFromOrigin();
 
     // round mouse cursor position to the nearest pixel center
-    pos[0] = ROUND(pos[0] / image->GetGeometry()->GetSpacing()[0]) * image->GetGeometry()->GetSpacing()[0];
-    pos[1] = ROUND(pos[1] / image->GetGeometry()->GetSpacing()[1]) * image->GetGeometry()->GetSpacing()[1];
-    pos[2] = ROUND(pos[2] / image->GetGeometry()->GetSpacing()[2]) * image->GetGeometry()->GetSpacing()[2];
+    pos[0] = ROUND((pos[0] / image->GetGeometry()->GetSpacing()[0])-.5) * image->GetGeometry()->GetSpacing()[0];
+    pos[1] = ROUND((pos[1] / image->GetGeometry()->GetSpacing()[1])-.5) * image->GetGeometry()->GetSpacing()[1];
+    pos[2] = ROUND((pos[2] / image->GetGeometry()->GetSpacing()[2])-.5) * image->GetGeometry()->GetSpacing()[2];
 
     // Remember last value of pos; if this hasn't changed here, abort! This reduces the number of painting operations
     static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me

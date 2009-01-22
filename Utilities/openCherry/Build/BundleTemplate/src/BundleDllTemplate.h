@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef @UBUNDLE_NAMESPACE@_@UNormalizedPluginID@_DLL.H
-#define @UBUNDLE_NAMESPACE@_@UNormalizedPluginID@_DLL.H
+#ifndef @DLL_DEFINE@_DLL.H
+#define @DLL_DEFINE@_DLL.H
 
 
 //
@@ -29,15 +29,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(@PROJECT_STATIC_VAR@)
   #if defined(@NormalizedPluginID@_EXPORTS)
-    #define @UBUNDLE_NAMESPACE@_@UDLL_EXPORT_IMPORT_DEFINE@ __declspec(dllexport)
+    #define @DLL_DEFINE@ __declspec(dllexport)
   #else
-    #define @UBUNDLE_NAMESPACE@_@UDLL_EXPORT_IMPORT_DEFINE@ __declspec(dllimport)  
+    #define @DLL_DEFINE@ __declspec(dllimport)  
   #endif
 #endif
 
 
-#if !defined(@UBUNDLE_NAMESPACE@_@UDLL_EXPORT_IMPORT_DEFINE@)
-  #define @UBUNDLE_NAMESPACE@_@UDLL_EXPORT_IMPORT_DEFINE@
+#if !defined(@DLL_DEFINE@)
+  #define @DLL_DEFINE@
 #endif
 
-#endif /*@UBUNDLE_NAMESPACE@_@UNormalizedPluginID@_DLL.H*/
+#endif /*@DLL_DEFINE@_DLL.H*/

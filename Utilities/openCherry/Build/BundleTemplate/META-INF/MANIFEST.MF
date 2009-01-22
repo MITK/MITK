@@ -3,5 +3,5 @@ Bundle-Name: @PLUGIN_NAME@
 Bundle-SymbolicName: @PLUGIN_ID@ 
 Bundle-Version: @PLUGIN_VERSION@
 Bundle-Vendor: @PLUGIN_VENDOR@
-Require-Bundle: org.opencherry.ui
-Bundle-Activator: @BUNDLE_NAMESPACE@::@GENERATE_ACTIVATOR_CLASS@
+Require-Bundle: @REQUIRED_BUNDLES@
+Bundle-Activator: @FQ_ACTIVATOR_CLASS@

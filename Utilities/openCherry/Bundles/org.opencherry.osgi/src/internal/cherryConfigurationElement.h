@@ -35,7 +35,7 @@ class ConfigurationElement : public IConfigurationElement
 
 public:
 
-  cherryClassMacro(ConfigurationElement);
+  cherryObjectMacro(ConfigurationElement);
 
   ConfigurationElement(BundleLoader* loader, Poco::XML::Node* config,
                      std::string contributor, SmartPointer<Extension> extension,

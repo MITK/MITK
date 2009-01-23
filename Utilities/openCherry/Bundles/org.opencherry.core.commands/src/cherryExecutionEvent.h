@@ -45,7 +45,7 @@ class CHERRY_COMMANDS ExecutionEvent : public Object {
 
 public:
 
-  cherryClassMacro(ExecutionEvent)
+  cherryObjectMacro(ExecutionEvent)
 
   typedef std::map<std::string, std::string> ParameterMap;
 

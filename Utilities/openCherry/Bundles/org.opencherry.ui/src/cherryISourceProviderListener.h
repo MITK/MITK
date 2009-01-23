@@ -43,7 +43,7 @@ namespace cherry {
  */
 struct CHERRY_UI ISourceProviderListener : public virtual Object {
 
-  cherryClassMacro(ISourceProviderListener);
+  cherryInterfaceMacro(ISourceProviderListener, cherry);
 
   struct Events {
     Message2<int, const std::map<std::string, Object::Pointer>& > multipleSourcesChanged;

@@ -40,7 +40,7 @@ struct IWorkbenchPage;
  */
 struct CHERRY_UI IPerspectiveListener : public virtual Object {
 
-  cherryClassMacro(IPerspectiveListener);
+  cherryInterfaceMacro(IPerspectiveListener, cherry);
 
   struct Events {
 

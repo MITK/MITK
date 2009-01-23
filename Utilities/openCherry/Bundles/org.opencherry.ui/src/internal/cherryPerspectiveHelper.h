@@ -126,7 +126,7 @@ private:
   struct ActualDropTarget: public AbstractDropTarget
   {
 
-    cherryClassMacro(ActualDropTarget)
+    cherryObjectMacro(ActualDropTarget)
 
     /**
      * @param part

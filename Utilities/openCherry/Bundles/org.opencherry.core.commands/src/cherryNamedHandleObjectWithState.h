@@ -41,7 +41,7 @@ class CHERRY_COMMANDS NamedHandleObjectWithState : public NamedHandleObject, pub
 
 public:
   
-  cherryClassMacro(NamedHandleObjectWithState);
+  cherryObjectMacro(NamedHandleObjectWithState);
   
   void AddState(const std::string& stateId, const State::ConstPointer state);
 

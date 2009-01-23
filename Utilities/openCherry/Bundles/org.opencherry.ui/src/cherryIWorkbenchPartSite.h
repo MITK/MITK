@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef IWORKBENCHPARTSITE_H_
@@ -27,7 +27,7 @@ struct IWorkbenchPart;
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * The primary interface between a workbench part and the workbench.
  * <p>
  * This interface is not intended to be implemented or extended by clients.
@@ -36,9 +36,9 @@ struct IWorkbenchPart;
  */
 struct CHERRY_UI IWorkbenchPartSite : public IWorkbenchSite
 {
-  
-  cherryClassMacro(IWorkbenchPartSite);
-  
+
+  cherryInterfaceMacro(IWorkbenchPartSite, cherry);
+
   /**
    * Returns the part registry extension id for this workbench site's part.
    * <p>
@@ -49,14 +49,14 @@ struct CHERRY_UI IWorkbenchPartSite : public IWorkbenchSite
    * @return the registry extension id
    */
   virtual std::string GetId() = 0;
-  
+
   /**
-   * Returns the part associated with this site 
+   * Returns the part associated with this site
    *
    * @return the part associated with this site
    */
   virtual SmartPointer<IWorkbenchPart> GetPart() = 0;
-  
+
   /**
    * Returns the unique identifier of the plug-in that defines this workbench
    * site's part.
@@ -64,7 +64,7 @@ struct CHERRY_UI IWorkbenchPartSite : public IWorkbenchSite
    * @return the unique identifier of the declaring plug-in
    */
   virtual std::string GetPluginId() = 0;
-  
+
   /**
    * Returns the registered name for this workbench site's part.
    * <p>
@@ -75,7 +75,7 @@ struct CHERRY_UI IWorkbenchPartSite : public IWorkbenchSite
    * @return the part name
    */
   virtual std::string GetRegisteredName() = 0;
-  
+
 };
 
 } // namespace cherry

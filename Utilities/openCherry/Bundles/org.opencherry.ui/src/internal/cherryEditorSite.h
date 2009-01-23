@@ -58,7 +58,7 @@ protected:
 
 public:
   
-  cherryClassMacro(EditorSite)
+  cherryObjectMacro(EditorSite)
   
     /**
      * Constructs an EditorSite for an editor.

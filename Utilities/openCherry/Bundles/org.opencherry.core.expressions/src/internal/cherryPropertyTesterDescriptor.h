@@ -32,7 +32,7 @@ namespace cherry
 class PropertyTesterDescriptor : public IPropertyTester {
   
 public:
-  cherryClassMacro(PropertyTesterDescriptor)
+  cherryObjectMacro(PropertyTesterDescriptor)
   
 private:
   

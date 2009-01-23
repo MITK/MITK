@@ -31,7 +31,7 @@ namespace cherry {
  */
 struct CHERRY_UI IShowViewDialog : public IDialog
 {
-  cherryClassMacro(IShowViewDialog);
+  cherryInterfaceMacro(IShowViewDialog, cherry);
 
 
   virtual std::vector<IViewDescriptor::Pointer> GetSelection() = 0;

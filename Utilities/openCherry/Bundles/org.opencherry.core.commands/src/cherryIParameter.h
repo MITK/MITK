@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIPARAMETER_H_
@@ -32,32 +32,32 @@ namespace cherry {
  * id of a view for display. This parameter also identifies possible values, for
  * display in the user interface.
  * </p>
- * 
+ *
  * @since 3.1
  */
 struct CHERRY_COMMANDS IParameter : public Object {
 
-  cherryClassMacro(IParameter);
-  
+  cherryInterfaceMacro(IParameter, cherry);
+
   typedef std::map<std::string, std::string> ParameterValues;
-  
+
   /**
    * Returns the identifier for this parameter.
-   * 
+   *
    * @return The identifier; never <code>null</code>.
    */
   virtual std::string GetId() const = 0;
 
   /**
    * Returns the human-readable name for this parameter.
-   * 
+   *
    * @return The parameter name; never <code>null</code>.
    */
   virtual std::string GetName() const = 0;
 
   /**
    * Returns the values associated with this parameter.
-   * 
+   *
    * @return The values associated with this parameter. This must not be
    *         <code>null</code>.
    * @throws ParameterValuesException
@@ -67,7 +67,7 @@ struct CHERRY_COMMANDS IParameter : public Object {
 
   /**
    * Returns whether parameter is optional. Otherwise, it is required.
-   * 
+   *
    * @return <code>true</code> if the parameter is optional;
    *         <code>false</code> if it is required.
    */

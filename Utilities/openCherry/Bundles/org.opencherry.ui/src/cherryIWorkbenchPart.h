@@ -111,7 +111,7 @@ struct IWorkbenchPartSite;
  */
 struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
 
-  cherryClassMacro(IWorkbenchPart)
+  cherryInterfaceMacro(IWorkbenchPart, cherry)
 
   virtual ~IWorkbenchPart() {}
 

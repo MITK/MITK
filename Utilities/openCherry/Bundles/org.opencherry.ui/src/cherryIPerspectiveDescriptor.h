@@ -61,7 +61,7 @@ namespace cherry {
  */
 struct CHERRY_UI IPerspectiveDescriptor : public Object {
 
-  cherryClassMacro(IPerspectiveDescriptor)
+  cherryInterfaceMacro(IPerspectiveDescriptor, cherry)
 
   virtual ~IPerspectiveDescriptor() {}
 

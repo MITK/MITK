@@ -71,7 +71,7 @@ struct IWorkbench;
 struct CHERRY_UI IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
 {
 
-  cherryClassMacro(IWorkbenchWindow);
+  cherryInterfaceMacro(IWorkbenchWindow, cherry);
 
   /**
    * Closes this workbench window.

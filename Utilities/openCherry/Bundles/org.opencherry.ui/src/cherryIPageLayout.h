@@ -87,7 +87,7 @@ namespace cherry {
  */
 struct CHERRY_UI IPageLayout : public Object {
 
-  cherryClassMacro(IPageLayout);
+  cherryInterfaceMacro(IPageLayout, cherry);
 
     /**
      * The part id for the workbench's editor area.  This may only be used

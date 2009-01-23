@@ -45,7 +45,7 @@ class PropertyChangeEvent : public Object {
 
 public:
 
-  cherryClassMacro(PropertyChangeEvent);
+  cherryObjectMacro(PropertyChangeEvent);
 
 private:
 

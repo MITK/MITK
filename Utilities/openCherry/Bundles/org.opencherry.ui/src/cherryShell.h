@@ -134,7 +134,7 @@ class CHERRY_UI Shell : public virtual Object
 {
 public:
 
-  cherryClassMacro(Shell);
+  cherryObjectMacro(Shell);
 
   Object::Pointer GetData(const std::string& id = "") const;
   void SetData(Object::Pointer data, const std::string& id = "");

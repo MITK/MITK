@@ -28,7 +28,7 @@ namespace cherry {
 
 struct CHERRY_OSGI IBundleManifest : public Object
 {
-  cherryClassMacro(IBundleManifest);
+  cherryInterfaceMacro(IBundleManifest, cherry);
 
   static const std::string BUNDLE_ACTIVATOR;
   static const std::string BUNDLE_COPYRIGHT;

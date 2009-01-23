@@ -40,7 +40,7 @@ class ControlEvent: public Object
 
 public:
 
-  cherryClassMacro(ControlEvent);
+  cherryObjectMacro(ControlEvent);
 
   /**
    * The item that was moved, resized, or activated.

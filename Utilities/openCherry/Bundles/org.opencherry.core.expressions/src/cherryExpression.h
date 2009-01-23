@@ -46,7 +46,7 @@ class CHERRY_EXPRESSIONS Expression : public Object {
 
 
 public:
-  cherryClassMacro(Expression)
+  cherryObjectMacro(Expression)
 
   /**
    * The constant integer hash code value meaning the hash code has not yet

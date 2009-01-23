@@ -47,7 +47,7 @@ class SaveablesList: public ISaveablesLifecycleListener
 
 public:
 
-  cherryClassMacro(SaveablesList);
+  cherryObjectMacro(SaveablesList);
 
 private:
 
@@ -215,7 +215,7 @@ public:
 
   struct PostCloseInfo : public Object
   {
-    cherryClassMacro(PostCloseInfo);
+    cherryObjectMacro(PostCloseInfo);
 
     std::list<SmartPointer<WorkbenchPart> > partsClosing;
 

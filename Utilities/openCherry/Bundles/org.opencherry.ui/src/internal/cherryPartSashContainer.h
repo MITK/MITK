@@ -55,7 +55,7 @@ class PartStack;
 class PartSashContainer: public LayoutPart, public ILayoutContainer, public IDragOverListener {
 
 public:
-  cherryClassMacro(PartSashContainer);
+  cherryObjectMacro(PartSashContainer);
 
   friend class LayoutTree;
   friend class LayoutTreeNode;
@@ -128,7 +128,7 @@ private:
 
     public:
 
-      cherryClassMacro(SashContainerDropTarget);
+      cherryObjectMacro(SashContainerDropTarget);
 
       SashContainerDropTarget(PartSashContainer* partSashContainer, Object::Pointer sourcePart,
           int side, int cursor, Object::Pointer targetPart);

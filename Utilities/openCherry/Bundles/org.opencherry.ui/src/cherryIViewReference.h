@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIVIEWREFERENCE_H_
@@ -25,7 +25,7 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Defines a reference to an IViewPart.
  * <p>
  * This interface is not intended to be implemented by clients.
@@ -33,11 +33,11 @@ namespace cherry {
  */
 struct CHERRY_UI IViewReference : virtual public IWorkbenchPartReference {
 
-  cherryClassMacro(IViewReference);
-  
+  cherryInterfaceMacro(IViewReference, cherry);
+
     /**
      * Returns the secondary ID for the view.
-     * 
+     *
      * @return the secondary ID, or <code>null</code> if there is no secondary id
      * @see IWorkbenchPage#showView(String, String, int)
      * @since 3.0

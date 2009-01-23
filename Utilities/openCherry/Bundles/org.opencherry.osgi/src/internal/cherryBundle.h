@@ -33,7 +33,7 @@ class Bundle : public IBundle
   
 public:
   
-  cherryClassMacro(Bundle);
+  cherryObjectMacro(Bundle);
   
   Bundle(BundleLoader& loader, IBundleStorage::Pointer storage);
    ~Bundle();

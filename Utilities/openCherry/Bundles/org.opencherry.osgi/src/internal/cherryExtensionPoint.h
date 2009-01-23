@@ -36,7 +36,7 @@ class ExtensionPoint : public IExtensionPoint, public Object
 
 public:
 
-  cherryClassMacro(ExtensionPoint);
+  cherryObjectMacro(ExtensionPoint);
 
   ExtensionPoint(const std::string& contributor);
 

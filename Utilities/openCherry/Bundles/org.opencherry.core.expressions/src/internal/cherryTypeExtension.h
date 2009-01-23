@@ -33,7 +33,7 @@ class END_POINT_;
 class TypeExtension : public Object {   
  
 public:
-  cherryClassMacro(TypeExtension);
+  cherryObjectMacro(TypeExtension);
   
 private:
     
@@ -61,7 +61,7 @@ protected:
      
    public:
      
-     cherryClassMacro(CONTINUE_)
+     cherryObjectMacro(CONTINUE_)
      
      bool Handles(const std::string& namespaze, const std::string& method) {
        return false;

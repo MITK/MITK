@@ -33,7 +33,7 @@ namespace cherry {
  */
 struct ILayoutContainer : virtual public Object {
 
-  cherryClassMacro(ILayoutContainer);
+  cherryObjectMacro(ILayoutContainer);
 
   typedef std::list<LayoutPart::Pointer> ChildrenType;
 

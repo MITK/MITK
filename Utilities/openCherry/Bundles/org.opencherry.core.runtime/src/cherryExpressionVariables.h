@@ -34,7 +34,7 @@ namespace cherry {
 
 struct CHERRY_RUNTIME ExpressionVariable : public Object
 {
-  cherryClassMacro(ExpressionVariable)
+  cherryObjectMacro(ExpressionVariable)
 
   typedef std::deque<std::string> TypeNames;
   typedef std::deque<const std::type_info*> TypeInfos;
@@ -69,7 +69,7 @@ protected:
 
 struct CHERRY_RUNTIME StringExpressionVariable : public ExpressionVariable
 {
-  cherryClassMacro(StringExpressionVariable)
+  cherryObjectMacro(StringExpressionVariable)
 
   StringExpressionVariable(const std::string& str);
 
@@ -88,7 +88,7 @@ private:
 
 struct CHERRY_RUNTIME VectorExpressionVariable : public ExpressionVariable
 {
-  cherryClassMacro(VectorExpressionVariable)
+  cherryObjectMacro(VectorExpressionVariable)
 
   typedef std::vector<ExpressionVariable::Pointer> VectorType;
 
@@ -108,7 +108,7 @@ private:
 
 struct CHERRY_RUNTIME BooleanExpressionVariable : public ExpressionVariable
 {
-  cherryClassMacro(BooleanExpressionVariable)
+  cherryObjectMacro(BooleanExpressionVariable)
 
   BooleanExpressionVariable(bool b);
 
@@ -128,7 +128,7 @@ private:
 
 struct CHERRY_RUNTIME FloatExpressionVariable : public ExpressionVariable
 {
-  cherryClassMacro(FloatExpressionVariable)
+  cherryObjectMacro(FloatExpressionVariable)
 
   FloatExpressionVariable(double d);
 
@@ -148,7 +148,7 @@ private:
 
 struct CHERRY_RUNTIME IntegerExpressionVariable : public ExpressionVariable
 {
-  cherryClassMacro(IntegerExpressionVariable)
+  cherryObjectMacro(IntegerExpressionVariable)
 
   IntegerExpressionVariable(int i);
 

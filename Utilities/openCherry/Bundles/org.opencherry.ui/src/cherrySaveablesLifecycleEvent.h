@@ -37,7 +37,7 @@ class CHERRY_UI SaveablesLifecycleEvent : public Object {
 
 public:
 
-  cherryClassMacro(SaveablesLifecycleEvent);
+  cherryObjectMacro(SaveablesLifecycleEvent);
 
   /**
    * Event type constant specifying that the given saveables have been opened.

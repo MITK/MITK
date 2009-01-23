@@ -51,7 +51,7 @@ class CHERRY_UI ActionBarAdvisor : public Object {
   
 public:
   
-  cherryClassMacro(ActionBarAdvisor);
+  cherryObjectMacro(ActionBarAdvisor);
 
     /**
      * Bit flag for {@link #fillActionBars fillActionBars} indicating that the

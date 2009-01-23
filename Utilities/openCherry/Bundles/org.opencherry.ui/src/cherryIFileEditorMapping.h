@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIFILEEDITORMAPPING_H_
@@ -30,8 +30,8 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
- * An association between a file name/extension and a list of known editors for 
+ *
+ * An association between a file name/extension and a list of known editors for
  * files of that type.
  * <p>
  * The name and extension can never empty or null. The name may contain
@@ -47,11 +47,11 @@ namespace cherry {
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct CHERRY_UI IFileEditorMapping : public Object {
-  
-  cherryClassMacro(IFileEditorMapping)
-  
+
+  cherryInterfaceMacro(IFileEditorMapping, cherry)
+
   virtual ~IFileEditorMapping() {}
-  
+
     /**
      * Returns the default editor registered for this type mapping.
      *

@@ -38,7 +38,7 @@ class ViewSite : public PartSite, public IViewSite {
     
 public:
   
-  cherryClassMacro(ViewSite)
+  cherryObjectMacro(ViewSite)
   
   ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view, 
            SmartPointer<WorkbenchPage> page,

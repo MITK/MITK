@@ -33,7 +33,7 @@ namespace cherry {
  */
 struct IStackableContainer : virtual public Object {
 
-  cherryClassMacro(IStackableContainer);
+  cherryObjectMacro(IStackableContainer);
 
   typedef std::list<StackablePart::Pointer> ChildrenType;
 

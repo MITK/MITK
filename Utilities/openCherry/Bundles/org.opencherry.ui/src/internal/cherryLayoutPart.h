@@ -42,7 +42,7 @@ class LayoutPart : virtual public Object { //, public ISizeProvider {
 
 public:
 
-  cherryClassMacro(LayoutPart);
+  cherryObjectMacro(LayoutPart);
 
 protected: SmartPointer<ILayoutContainer> container;
 

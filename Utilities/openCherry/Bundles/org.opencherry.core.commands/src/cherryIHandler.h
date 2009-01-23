@@ -38,7 +38,7 @@ class ExecutionEvent;
  */
 struct CHERRY_COMMANDS IHandler : public Object {
 
-  cherryClassMacro(IHandler)
+  cherryInterfaceMacro(IHandler, cherry)
 
   /**
    * Registers an instance of <code>IHandlerListener</code> to listen for

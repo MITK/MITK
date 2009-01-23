@@ -41,7 +41,7 @@ private:
 
 public:
 
-  cherryClassMacro(ContainerPlaceholder);
+  cherryObjectMacro(ContainerPlaceholder);
 
     /**
      * ContainerPlaceholder constructor comment.

@@ -40,7 +40,7 @@ class CHERRY_UI ShellEvent : public Object {
 
 public:
 
-  cherryClassMacro(ShellEvent);
+  cherryObjectMacro(ShellEvent);
 
   /**
    * A flag indicating whether the operation should be allowed.

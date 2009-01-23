@@ -37,7 +37,7 @@ class CHERRY_UI EditorDescriptor : public IEditorDescriptor
 { //, Serializable, IPluginContribution {
 
 public:
-  cherryClassMacro(EditorDescriptor)
+  cherryObjectMacro(EditorDescriptor)
 
   // @issue the following constants need not be public; see bug 47600
   /**

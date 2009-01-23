@@ -31,7 +31,7 @@ class CHERRY_OSGI ObjectGeneric : public Object
 {
   public:
 
-    cherryClassMacro(ObjectGeneric);
+    cherryObjectMacro(ObjectGeneric);
 
     typedef T ValueType;
 
@@ -100,7 +100,7 @@ class CHERRY_OSGI ObjectGeneric : public Object
 class CHERRY_OSGI ObjectName: public ::cherry::ObjectGeneric< Type >           \
 {                                                                    \
 public:                                                              \
-  cherryClassMacro(ObjectName);                                      \
+  cherryObjectMacro(ObjectName);                                      \
   ObjectName() : ::cherry::ObjectGeneric< Type >(DefaultValue) { }                           \
   ObjectName(Type x) : ::cherry::ObjectGeneric<Type>(x) {}                     \
   /*ObjectName(const ObjectName& o) : ObjectGeneric< Type >(o) {} */ \

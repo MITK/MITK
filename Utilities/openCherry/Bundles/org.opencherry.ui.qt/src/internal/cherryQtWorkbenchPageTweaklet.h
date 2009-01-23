@@ -31,7 +31,7 @@ class CHERRY_UI_QT QtWorkbenchPageTweaklet : public WorkbenchPageTweaklet
 
 public:
 
-  cherryClassMacro(QtWorkbenchPageTweaklet);
+  cherryObjectMacro(QtWorkbenchPageTweaklet);
 
   void* CreateClientComposite(void* pageControl);
   void* CreatePaneControl(void* parent);

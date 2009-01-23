@@ -31,7 +31,7 @@ struct IBundle;
 
 struct CHERRY_OSGI IExtensionPointService : public Service
 {
-  cherryClassMacro(IExtensionPointService);
+  cherryObjectMacro(IExtensionPointService);
   
 public:
   static std::string SERVICE_ID;

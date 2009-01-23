@@ -39,7 +39,7 @@ namespace cherry {
 class CHERRY_COMMANDS AbstractHandler : public IHandler { // ,public EventManager {
 
 public:
-  cherryClassMacro(AbstractHandler)
+  cherryObjectMacro(AbstractHandler)
   
 private:
   

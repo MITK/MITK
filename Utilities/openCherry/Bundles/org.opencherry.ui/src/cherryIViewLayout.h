@@ -36,7 +36,7 @@ namespace cherry {
  */
 struct CHERRY_UI IViewLayout : public Object {
 
-  cherryClassMacro(IViewLayout)
+  cherryInterfaceMacro(IViewLayout, cherry)
 
   virtual  ~IViewLayout() {}
 

@@ -48,7 +48,7 @@ namespace GuiTk
 struct CHERRY_UI ISelectionListener: public virtual Object
 {
 
-  cherryClassMacro(ISelectionListener);
+  cherryObjectMacro(ISelectionListener);
 
   struct CHERRY_UI Events {
 

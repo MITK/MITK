@@ -52,7 +52,7 @@ class CHERRY_COMMANDS HandleObject : public Object { // extends EventManager imp
 
 public:
 
-  cherryClassMacro(HandleObject)
+  cherryObjectMacro(HandleObject)
 
 private:
 

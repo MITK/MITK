@@ -29,7 +29,7 @@ class AbstractTabItem;
 
 struct TabFolderEvent : public Object
 {
-  cherryClassMacro(TabFolderEvent);
+  cherryObjectMacro(TabFolderEvent);
 
   static const int EVENT_PANE_MENU; // = 1;
   static const int EVENT_HIDE_TOOLBAR; // = 2;

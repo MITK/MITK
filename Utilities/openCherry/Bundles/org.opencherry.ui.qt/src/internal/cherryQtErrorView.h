@@ -30,7 +30,7 @@ class QtErrorView : public QtViewPart
 
 public:
 
-  cherryClassMacro(QtErrorView);
+  cherryObjectMacro(QtErrorView);
 
   QtErrorView();
 

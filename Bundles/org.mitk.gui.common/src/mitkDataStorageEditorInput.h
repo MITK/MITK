@@ -29,7 +29,7 @@ namespace mitk
 class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public cherry::IEditorInput
 {
 public:
-  cherryClassMacro(DataStorageEditorInput);
+  cherryObjectMacro(DataStorageEditorInput);
 
   bool Exists() const;
   std::string GetName() const;

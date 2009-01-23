@@ -41,7 +41,7 @@ class PlaceholderFolderLayout : public IPlaceholderFolderLayout
 {
 
 public:
-  cherryClassMacro(PlaceholderFolderLayout)
+  cherryObjectMacro(PlaceholderFolderLayout)
 
 private:
 

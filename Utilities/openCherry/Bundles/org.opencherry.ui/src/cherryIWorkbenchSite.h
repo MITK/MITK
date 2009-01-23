@@ -60,7 +60,7 @@ struct IWorkbenchWindow;
  */
 struct CHERRY_UI IWorkbenchSite : public IServiceLocator, public Object { // IAdaptable, IShellProvider {
 
-  cherryClassMacro(IWorkbenchSite);
+  cherryInterfaceMacro(IWorkbenchSite, cherry);
 
   virtual ~IWorkbenchSite() {}
 

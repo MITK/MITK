@@ -36,7 +36,7 @@ namespace cherry {
  */
 struct TestDropLocation : public Object {
 
-  cherryClassMacro(TestDropLocation);
+  cherryObjectMacro(TestDropLocation);
 
     /**
      * Location where the object should be dropped, in display coordinates

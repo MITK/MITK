@@ -84,7 +84,7 @@ class CHERRY_UI Window: public IShellProvider
 
 public:
 
-  cherryClassMacro(Window);
+  cherryObjectMacro(Window);
 
   /**
    * Standard return code constant (value 0) indicating that the window was
@@ -115,7 +115,7 @@ public:
   struct IExceptionHandler: public Object
   {
 
-    cherryClassMacro(IExceptionHandler)
+    cherryObjectMacro(IExceptionHandler)
     ;
 
     /**

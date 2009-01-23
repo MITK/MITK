@@ -60,7 +60,7 @@ class PageLayout : public IPageLayout
 {
 
 public:
-  cherryClassMacro(PageLayout);
+  cherryObjectMacro(PageLayout);
 
 private:
 

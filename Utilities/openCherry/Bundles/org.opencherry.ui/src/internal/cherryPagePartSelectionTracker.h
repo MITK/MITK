@@ -38,7 +38,7 @@ class PagePartSelectionTracker : public IPartListener,
 {
 
 public:
-  cherryClassMacro(PagePartSelectionTracker);
+  cherryObjectMacro(PagePartSelectionTracker);
 
 private:
 

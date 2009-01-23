@@ -41,7 +41,7 @@ namespace cherry
 struct CHERRY_UI IStackPresentationSite : public Object
 {
 
-  cherryClassMacro(IStackPresentationSite);
+  cherryInterfaceMacro(IStackPresentationSite, cherry);
 
   static int STATE_MINIMIZED; // = 0;
 

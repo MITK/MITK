@@ -73,8 +73,6 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public virt
 
   protected:
 
-    QmitkToolGUI();
-
     mitk::Tool::Pointer m_Tool;
 };
 

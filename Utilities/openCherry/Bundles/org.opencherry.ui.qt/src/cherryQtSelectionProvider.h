@@ -32,7 +32,7 @@ class CHERRY_UI_QT QtSelectionProvider : public ISelectionProvider
 {
 public:
 
-  cherryClassMacro(QtSelectionProvider);
+  cherryObjectMacro(QtSelectionProvider);
 
   QtSelectionProvider();
 

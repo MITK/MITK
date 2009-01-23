@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.0 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QmitkDrawPaintbrushToolGUI_h_Included
@@ -37,24 +37,24 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkDrawPaintbrushToolGUI : public QmitkP
   Q_OBJECT
 
   public:
-    //!mm   
+    //!mm
     //mitkClassMacro(QmitkDrawPaintbrushToolGUI, QmitkPaintbrushToolGUI);
     //itkNewMacro(QmitkDrawPaintbrushToolGUI);
     //#changed
-    cherryClassMacro(QmitkDrawPaintbrushToolGUI);
-    //!    
-    
+    cherryObjectMacro(QmitkDrawPaintbrushToolGUI);
+    //!
+
     //!mm
-    //#add    
+    //#add
     QmitkDrawPaintbrushToolGUI();
     //!
-    
+
     virtual ~QmitkDrawPaintbrushToolGUI();
 
   signals:
 
   public slots:
-  
+
   protected slots:
 
   protected:

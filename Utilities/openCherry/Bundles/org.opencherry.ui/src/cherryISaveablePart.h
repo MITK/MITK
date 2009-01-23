@@ -36,7 +36,7 @@ namespace cherry {
  */
 struct CHERRY_UI ISaveablePart : public virtual Object {
 
-  cherryClassMacro(ISaveablePart);
+  cherryInterfaceMacro(ISaveablePart, cherry);
 
     /**
      * The property id for <code>isDirty</code>.

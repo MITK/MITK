@@ -43,7 +43,7 @@ namespace cherry {
  */
 struct CHERRY_UI IWorkbenchConfigurer : public Object {
 
-  cherryClassMacro(IWorkbenchConfigurer);
+  cherryInterfaceMacro(IWorkbenchConfigurer, cherry);
 
     /**
      * Restore status code indicating that the saved state

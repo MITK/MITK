@@ -31,7 +31,7 @@ class ViewSashContainer : public PartSashContainer {
 
 public:
 
-  cherryClassMacro(ViewSashContainer);
+  cherryObjectMacro(ViewSashContainer);
 
   ViewSashContainer(WorkbenchPage::Pointer page, void* parent);
 

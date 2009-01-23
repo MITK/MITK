@@ -41,7 +41,7 @@ class PageLayout;
  */
 class FolderLayout : public IFolderLayout {
 
-public: cherryClassMacro(FolderLayout)
+public: cherryObjectMacro(FolderLayout)
 
 private:
 

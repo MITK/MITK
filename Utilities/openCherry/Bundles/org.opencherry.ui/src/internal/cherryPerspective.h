@@ -49,7 +49,7 @@ class Perspective : public Object {
 
 public:
 
-  cherryClassMacro(Perspective);
+  cherryObjectMacro(Perspective);
 
   friend class WorkbenchPage;
 

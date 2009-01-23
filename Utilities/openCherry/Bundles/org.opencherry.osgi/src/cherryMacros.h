@@ -20,13 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherrySmartPointer.h"
 
-#define cherryClassMacro(className) \
-  typedef className       Self; \
-  typedef cherry::SmartPointer<Self> Pointer; \
-  typedef cherry::SmartPointer<const Self>  ConstPointer; \
-  /* TODO Weakpointer */ \
-  typedef cherry::SmartPointer<Self> WeakPointer; \
-  typedef cherry::SmartPointer<const Self> ConstWeakPointer; \
+#define cherryNameMacro(className) \
   virtual const char* GetNameOfClass() const \
   { return #className; }\
 
@@ -34,8 +28,26 @@ PURPOSE.  See the above copyright notices for more information.
   static const char* GetManifestName() \
   { return #namespaze #className; } \
 
+#define cherryObjectMacro(className) \
+  typedef className       Self; \
+  typedef cherry::SmartPointer<Self> Pointer; \
+  typedef cherry::SmartPointer<const Self>  ConstPointer; \
+  /* TODO Weakpointer */ \
+  typedef cherry::SmartPointer<Self> WeakPointer; \
+  typedef cherry::SmartPointer<const Self> ConstWeakPointer; \
+  cherryNameMacro(className) \
+
+
 #define cherryInterfaceMacro(className, namespaze) \
-  cherryClassMacro(className) \
+  protected: className() {} \
+  public: \
+  cherryObjectMacro(className) \
+  cherryManifestMacro(className, namespaze) \
+
+#define cherrySimpleInterfaceMacro(className, namespaze) \
+  protected: className() {} \
+  public: \
+  cherryNameMacro(className) \
   cherryManifestMacro(className, namespaze) \
 
 #define cherryNewMacro(x) \

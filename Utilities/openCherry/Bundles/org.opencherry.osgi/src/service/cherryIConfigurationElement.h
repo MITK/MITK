@@ -36,7 +36,7 @@ struct IExtension;
 struct CHERRY_OSGI IConfigurationElement : public Object
 {
 
-  cherryClassMacro(IConfigurationElement);
+  cherryObjectMacro(IConfigurationElement);
 
 public:
 

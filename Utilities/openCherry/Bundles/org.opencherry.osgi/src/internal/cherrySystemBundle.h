@@ -29,7 +29,7 @@ class SystemBundle : public Bundle
   
 public:
  
-  cherryClassMacro(SystemBundle)
+  cherryObjectMacro(SystemBundle)
   
   SystemBundle(BundleLoader& loader, IBundleStorage::Pointer storage);
   

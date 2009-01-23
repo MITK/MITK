@@ -35,7 +35,7 @@ namespace cherry {
 class ObjectString : std::string, public Object
 {
 public:
-  cherryClassMacro(ObjectString);
+  cherryObjectMacro(ObjectString);
   
   ObjectString() {}
   ObjectString(const std::string& s) : std::string(s) {}

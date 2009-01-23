@@ -47,7 +47,7 @@ namespace cherry
 struct CHERRY_UI IPropertyChangeListener: public virtual Object
 {
 
-  cherryClassMacro(IPropertyChangeListener);
+  cherryInterfaceMacro(IPropertyChangeListener, cherry);
 
   virtual ~IPropertyChangeListener()
   {

@@ -58,7 +58,7 @@ class CHERRY_UI StackPresentation : public Object, public ISizeProvider {
 
 public:
 
-  cherryClassMacro(StackPresentation);
+  cherryObjectMacro(StackPresentation);
 
 private:
 

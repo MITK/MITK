@@ -31,7 +31,7 @@ namespace cherry {
  */
 struct ViewLayoutRec : public Object {
 
-  cherryClassMacro(ViewLayoutRec)
+  cherryObjectMacro(ViewLayoutRec)
 
     bool isCloseable;
 

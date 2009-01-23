@@ -44,9 +44,10 @@ SET(SRC_CPP_FILES
   application/cherryWorkbenchWindowAdvisor.cpp
   
   #commands
-  #commands/cherryContributionItem.cpp
-  #commands/cherryContributionManager.cpp
-  #commands/cherryIContributionManagerOverrides.cpp
+  commands/cherryContributionItem.cpp
+  commands/cherryContributionManager.cpp
+  commands/cherryIContributionManagerOverrides.cpp
+  commands/cherryIMenuListener.cpp
   
   #dialogs
   dialogs/cherryIDialog.cpp

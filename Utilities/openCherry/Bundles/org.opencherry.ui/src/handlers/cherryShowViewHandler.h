@@ -39,7 +39,7 @@ class CHERRY_UI ShowViewHandler : public AbstractHandler
 {
 
 public:
-  cherryClassMacro(ShowViewHandler)
+  cherryObjectMacro(ShowViewHandler)
 
 private:
 

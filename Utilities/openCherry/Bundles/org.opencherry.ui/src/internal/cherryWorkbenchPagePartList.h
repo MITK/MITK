@@ -35,7 +35,7 @@ class WorkbenchPagePartList : public PartList
 {
 public:
 
-  cherryClassMacro(WorkbenchPagePartList);
+  cherryObjectMacro(WorkbenchPagePartList);
 
 private:
 

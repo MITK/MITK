@@ -49,7 +49,7 @@ class CHERRY_UI WorkbenchPart : public virtual IWorkbenchPart,
 {
 
 public:
-  cherryClassMacro(WorkbenchPart);
+  cherryObjectMacro(WorkbenchPart);
 
 private:
   std::string m_Title;

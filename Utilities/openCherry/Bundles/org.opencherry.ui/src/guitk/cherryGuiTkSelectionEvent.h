@@ -45,7 +45,7 @@ class CHERRY_UI SelectionEvent: public Object
 
 public:
 
-  cherryClassMacro(SelectionEvent);
+  cherryObjectMacro(SelectionEvent);
 
   /**
    * The item that was selected.

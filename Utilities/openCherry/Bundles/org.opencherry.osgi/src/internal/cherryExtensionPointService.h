@@ -36,7 +36,7 @@ class BundleLoader;
 
 class ExtensionPointService : public IExtensionPointService
 {
-  cherryClassMacro(ExtensionPointService);
+  cherryObjectMacro(ExtensionPointService);
   
 public:
   

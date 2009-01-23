@@ -31,7 +31,7 @@ namespace cherry {
  */
 struct CHERRY_UI IDialog : public virtual Object
 {
-  cherryClassMacro(IDialog);
+  cherryInterfaceMacro(IDialog, cherry);
 
   /**
    * Constant for a dialog with no image (value 0).

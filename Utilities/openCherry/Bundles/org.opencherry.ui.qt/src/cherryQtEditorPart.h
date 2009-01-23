@@ -30,7 +30,7 @@ class CHERRY_UI_QT QtEditorPart : public EditorPart
 {
 public:
   
-  cherryClassMacro(QtEditorPart);
+  cherryObjectMacro(QtEditorPart);
   
   void CreatePartControl(void* parent);
   

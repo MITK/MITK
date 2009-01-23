@@ -33,7 +33,7 @@ private: EditorReference::Pointer editorReference;
 
 public:
 
-  cherryClassMacro(NullEditorInput)
+  cherryObjectMacro(NullEditorInput)
 
   NullEditorInput();
 

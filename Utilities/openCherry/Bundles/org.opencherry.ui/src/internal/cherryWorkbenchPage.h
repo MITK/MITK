@@ -60,7 +60,7 @@ class CHERRY_UI WorkbenchPage: public IWorkbenchPage
 {
 
 public:
-  cherryClassMacro(WorkbenchPage)
+  cherryObjectMacro(WorkbenchPage)
   ;
 
 protected:

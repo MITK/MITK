@@ -32,7 +32,7 @@ class CHERRY_UI_QT QtViewPart : public ViewPart
   
 public:
   
-  cherryClassMacro(QtViewPart);
+  cherryObjectMacro(QtViewPart);
   
   void CreatePartControl(void* parent);
   

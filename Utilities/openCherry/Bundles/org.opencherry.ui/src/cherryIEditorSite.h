@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIEDITORSITE_H_
@@ -24,18 +24,18 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * The primary interface between an editor part and the workbench.
  * <p>
- * The workbench exposes its implemention of editor part sites via this 
+ * The workbench exposes its implemention of editor part sites via this
  * interface, which is not intended to be implemented or extended by clients.
  * </p>
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct CHERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
-  
-  cherryClassMacro(IEditorSite);
-  
+
+  cherryInterfaceMacro(IEditorSite, cherry);
+
   virtual ~IEditorSite() {}
 
     /**
@@ -55,7 +55,7 @@ struct CHERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
    * Returns the action bars for this part site. Editors of the same type (and
    * in the same window) share the same action bars. Contributions to the
    * action bars are done by the <code>IEditorActionBarContributor</code>.
-   * 
+   *
    * @return the action bars
    * @since 2.1
    */
@@ -78,7 +78,7 @@ struct CHERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
      * For a detailed description of context menu registration see
      * {@link IWorkbenchPartSite#registerContextMenu(MenuManager, ISelectionProvider)}
      * </p>
-     * 
+     *
      * @param menuManager
      *            the menu manager; must not be <code>null</code>.
      * @param selectionProvider
@@ -111,7 +111,7 @@ struct CHERRY_UI IEditorSite : public virtual IWorkbenchPartSite {
      * For a detailed description of context menu registration see
      * {@link IWorkbenchPartSite#registerContextMenu(MenuManager, ISelectionProvider)}
      * </p>
-     * 
+     *
      * @param menuId
      *            the menu id; must not be <code>null</code>.
      * @param menuManager

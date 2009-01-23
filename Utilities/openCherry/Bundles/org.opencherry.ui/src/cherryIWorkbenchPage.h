@@ -68,7 +68,7 @@ namespace cherry {
  */
 struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService, public Object {
 
-  cherryClassMacro(IWorkbenchPage);
+  cherryInterfaceMacro(IWorkbenchPage, cherry);
 
   /**
    * An optional attribute within a workspace marker (<code>IMarker</code>)

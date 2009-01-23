@@ -28,7 +28,7 @@ template<typename T>
 class ObjectVector : public Object, public std::vector<T>
 {
 public:
-  cherryClassMacro(ObjectVector<T>);
+  cherryObjectMacro(ObjectVector<T>);
 };
 
 }

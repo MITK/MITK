@@ -70,7 +70,7 @@ class CHERRY_OSGI Object
 {
 public:
 
-  cherryClassMacro(Object)
+  cherryObjectMacro(Object)
 
   /** Delete an itk object.  This method should always be used to delete an
    * object when the new operator was used to create it. Using the C

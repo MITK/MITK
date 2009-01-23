@@ -52,7 +52,7 @@ class PartStack : public LayoutPart, public IStackableContainer {
   friend class PartSashContainer;
   friend class DetachedWindow;
 
-public: cherryClassMacro(PartStack);
+public: cherryObjectMacro(PartStack);
 
     public: static const int PROP_SELECTION; // = 0x42;
 
@@ -164,7 +164,7 @@ public: cherryClassMacro(PartStack);
 
         public:
 
-          cherryClassMacro(PartStackDropResult);
+          cherryObjectMacro(PartStackDropResult);
 
         /**
          * Resets the target of this drop result (allows the same drop result object to be

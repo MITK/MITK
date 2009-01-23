@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIVIEWSITE_H_
@@ -26,7 +26,7 @@ namespace cherry {
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * The primary interface between a view part and the workbench.
  * <p>
  * The workbench exposes its implemention of view part sites via this interface,
@@ -36,10 +36,10 @@ namespace cherry {
  */
 struct CHERRY_UI IViewSite : public virtual IWorkbenchPartSite {
 
-  cherryClassMacro(IViewSite)
-  
+  cherryInterfaceMacro(IViewSite, cherry)
+
   virtual ~IViewSite() {}
-  
+
     /**
      * Returns the action bars for this part site.
      * Views have exclusive use of their site's action bars.
@@ -51,7 +51,7 @@ struct CHERRY_UI IViewSite : public virtual IWorkbenchPartSite {
     /**
      * Returns the secondary id for this part site's part,
      * or <code>null</code> if it has none.
-     * 
+     *
      * @see IWorkbenchPage#showView(String, String, int)
      * @since 3.0
      */

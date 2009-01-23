@@ -28,7 +28,7 @@ template<typename T>
 class ObjectList : public Object, public std::list<T>
 {
 public:
-  cherryClassMacro(ObjectList<T>);
+  cherryObjectMacro(ObjectList<T>);
 };
 
 }

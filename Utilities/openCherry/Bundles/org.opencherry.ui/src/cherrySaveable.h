@@ -54,7 +54,7 @@ class CHERRY_UI Saveable : /*public InternalSaveable*/ public virtual Object, pu
 
 public:
 
-  cherryClassMacro(Saveable);
+  cherryObjectMacro(Saveable);
 
 private:
   //Cursor waitCursor;

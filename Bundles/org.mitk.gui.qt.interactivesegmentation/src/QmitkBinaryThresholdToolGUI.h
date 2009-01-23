@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
 Date:      $Date: 2008-08-01 14:25:23 +0200 (Fr, 01 Aug 2008) $
 Version:   $Revision: 1.0 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QmitkBinaryThresholdToolGUI_h_Included
@@ -39,13 +39,13 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkBinaryThresholdToolGUI : public Qmitk
   Q_OBJECT
 
   public:
-    //!mm   
+    //!mm
     //mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
     //itkNewMacro(QmitkBinaryThresholdToolGUI);
     //#changed
-    cherryClassMacro(QmitkBinaryThresholdToolGUI);
+    cherryObjectMacro(QmitkBinaryThresholdToolGUI);
     //!
-    
+
     //!mm
     //#add
     QmitkBinaryThresholdToolGUI();
@@ -58,7 +58,7 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkBinaryThresholdToolGUI : public Qmitk
   signals:
 
   public slots:
-  
+
   protected slots:
 
     void OnNewToolAssociated(mitk::Tool*);

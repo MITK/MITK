@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
  Program:   openCherry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
- 
+
  Copyright (c) German Cancer Research Center, Division of Medical and
  Biological Informatics. All rights reserved.
  See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
- 
+
  =========================================================================*/
 
 #ifndef CHERRYISELECTIONPROVIDER_H_
@@ -28,7 +28,7 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui
- * 
+ *
  * Interface common to all objects that provide a selection.
  *
  * @see ISelection
@@ -36,10 +36,10 @@ namespace cherry
  * @see SelectionChangedEvent
  */
 struct CHERRY_UI ISelectionProvider : public virtual Object {
-  
-  cherryClassMacro(ISelectionProvider);
-  
-    /** 
+
+  cherryInterfaceMacro(ISelectionProvider, cherry);
+
+    /**
      * Adds a listener for selection changes in this selection provider.
      * Has no effect if an identical listener is already registered.
      *
@@ -49,7 +49,7 @@ struct CHERRY_UI ISelectionProvider : public virtual Object {
 
     /**
      * Returns the current selection for this provider.
-     * 
+     *
      * @return the current selection
      */
     virtual ISelection::Pointer GetSelection() = 0;

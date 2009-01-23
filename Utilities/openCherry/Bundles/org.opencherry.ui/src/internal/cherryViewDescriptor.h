@@ -50,7 +50,7 @@ private:
 
 public:
 
-  cherryClassMacro(ViewDescriptor)
+  cherryObjectMacro(ViewDescriptor)
 
   /**
    * Create a new <code>ViewDescriptor</code> for an extension.

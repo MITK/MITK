@@ -43,7 +43,7 @@ private:
 
 public:
 
-  cherryClassMacro(DetachedPlaceHolder);
+  cherryObjectMacro(DetachedPlaceHolder);
 
     /**
      * DetachedPlaceHolder constructor comment.

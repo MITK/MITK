@@ -33,7 +33,7 @@ namespace cherry {
  **/
 struct CHERRY_UI IMemento : public Object
 {
-  cherryClassMacro(IMemento)
+  cherryInterfaceMacro(IMemento, cherry)
 
   virtual int GetInt(std::string key) = 0;
 

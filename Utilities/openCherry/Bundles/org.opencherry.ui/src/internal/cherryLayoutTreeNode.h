@@ -34,7 +34,7 @@ class LayoutTreeNode : public LayoutTree {
 
 public:
 
-  cherryClassMacro(LayoutTreeNode);
+  cherryObjectMacro(LayoutTreeNode);
 
   struct ChildSizes {
     int left;

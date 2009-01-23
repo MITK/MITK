@@ -77,7 +77,7 @@ namespace cherry {
 class CHERRY_UI EditorPart : public WorkbenchPart , public IEditorPart {
 
 public:
-  cherryClassMacro(EditorPart);
+  cherryObjectMacro(EditorPart);
   
 private:
   

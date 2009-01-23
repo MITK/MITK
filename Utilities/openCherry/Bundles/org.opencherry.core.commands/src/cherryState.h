@@ -46,7 +46,7 @@ class CHERRY_COMMANDS State : public Object { // extends EventManager {
 
 public:
 
-  cherryClassMacro(State)
+  cherryObjectMacro(State)
 
 private:
 

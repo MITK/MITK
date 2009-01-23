@@ -54,7 +54,7 @@ class CHERRY_UI Workbench : public IWorkbench
 
 public:
 
-  cherryClassMacro(Workbench);
+  cherryObjectMacro(Workbench);
 
   /**
    * Creates the workbench and associates it with the the given display and

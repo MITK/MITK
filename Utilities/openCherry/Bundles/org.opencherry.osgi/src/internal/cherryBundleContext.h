@@ -28,7 +28,7 @@ class BundleContext : public IBundleContext
 
 public:
 
-  cherryClassMacro(BundleContext);
+  cherryObjectMacro(BundleContext);
 
   BundleContext(BundleLoader& loader, SmartPointer<IBundle> bundle,
                   const Poco::Path& persistencyDir);

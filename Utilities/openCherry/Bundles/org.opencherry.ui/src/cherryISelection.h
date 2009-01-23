@@ -31,7 +31,7 @@ namespace cherry {
  **/
 struct CHERRY_UI ISelection : public Object
 {
-  cherryClassMacro(ISelection);
+  cherryInterfaceMacro(ISelection, cherry);
 
   virtual bool IsEmpty() const = 0;
 

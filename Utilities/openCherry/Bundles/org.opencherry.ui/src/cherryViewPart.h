@@ -85,7 +85,7 @@ protected:
 
 public:
 
-  cherryClassMacro(ViewPart);
+  cherryObjectMacro(ViewPart);
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(0));
 

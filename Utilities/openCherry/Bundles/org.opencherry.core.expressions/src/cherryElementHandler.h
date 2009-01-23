@@ -45,7 +45,7 @@ class CHERRY_EXPRESSIONS ElementHandler : public Object {
 
 public:
 
-  cherryClassMacro(ElementHandler)
+  cherryObjectMacro(ElementHandler)
 
   virtual ~ElementHandler() {}
 

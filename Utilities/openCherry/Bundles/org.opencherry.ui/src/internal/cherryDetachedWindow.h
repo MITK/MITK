@@ -41,7 +41,7 @@ class DetachedWindow: public IPropertyChangeListener,
 {
 
 public:
-  cherryClassMacro(DetachedWindow);
+  cherryObjectMacro(DetachedWindow);
 
 private:
   PartStack::Pointer folder;

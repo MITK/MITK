@@ -48,7 +48,7 @@ namespace cherry {
 class PerspectiveDescriptor : public IPerspectiveDescriptor {
 
 public:
-  cherryClassMacro(PerspectiveDescriptor)
+  cherryObjectMacro(PerspectiveDescriptor)
 
 private:
 

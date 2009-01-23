@@ -38,7 +38,7 @@ class FileEditorMapping : public IFileEditorMapping
 {
 
 public:
-  cherryClassMacro(FileEditorMapping)
+  cherryObjectMacro(FileEditorMapping)
 
 private:
   static const std::string STAR; // = "*"; //$NON-NLS-1$

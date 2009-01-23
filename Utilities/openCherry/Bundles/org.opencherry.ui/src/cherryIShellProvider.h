@@ -36,7 +36,7 @@ namespace cherry {
  */
 struct CHERRY_UI IShellProvider : public virtual Object {
 
-  cherryClassMacro(IShellProvider);
+  cherryInterfaceMacro(IShellProvider, cherry);
 
     /**
      * Returns the current shell (or null if none). This return value may

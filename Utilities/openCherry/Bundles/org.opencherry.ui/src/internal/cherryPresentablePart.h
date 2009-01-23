@@ -39,7 +39,7 @@ class PresentablePart: public IPresentablePart
 
 public:
 
-  cherryClassMacro(PresentablePart);
+  cherryObjectMacro(PresentablePart);
 
 private:
 

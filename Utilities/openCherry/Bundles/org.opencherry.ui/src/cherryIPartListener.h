@@ -38,7 +38,7 @@ namespace cherry {
  */
 struct CHERRY_UI IPartListener : public virtual Object {
 
-  cherryClassMacro(IPartListener);
+  cherryInterfaceMacro(IPartListener, cherry);
 
   struct Events {
 

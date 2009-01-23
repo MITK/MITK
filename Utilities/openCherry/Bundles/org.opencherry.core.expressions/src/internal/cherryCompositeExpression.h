@@ -32,7 +32,7 @@ class CompositeExpression : public Expression
 {
 
 public:
-  cherryClassMacro(CompositeExpression)
+  cherryObjectMacro(CompositeExpression)
   
 private:
 

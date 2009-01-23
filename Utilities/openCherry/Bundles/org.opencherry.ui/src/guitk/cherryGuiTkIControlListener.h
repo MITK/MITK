@@ -49,7 +49,7 @@ namespace GuiTk
 struct CHERRY_UI IControlListener: public virtual Object
 {
 
-  cherryClassMacro(IControlListener);
+  cherryObjectMacro(IControlListener);
 
   struct CHERRY_UI Events {
 

@@ -31,7 +31,7 @@ class CHERRY_OSGI Service : public Object
 
 public:
 
-  cherryClassMacro(Service);
+  cherryObjectMacro(Service);
 
   virtual ~Service();
 

@@ -44,7 +44,7 @@ private:
 
 public:
 
-  cherryClassMacro(SameShellProvider);
+  cherryObjectMacro(SameShellProvider);
 
   /**
    * Returns a shell provider that always returns the current

@@ -25,7 +25,7 @@ private:
 
   struct StdMultiWidgetListener : public cherry::IPartListener
   {
-    cherryClassMacro(StdMultiWidgetListener);
+    cherryObjectMacro(StdMultiWidgetListener);
 
     StdMultiWidgetListener(QmitkStandardViews* standardViews);
 

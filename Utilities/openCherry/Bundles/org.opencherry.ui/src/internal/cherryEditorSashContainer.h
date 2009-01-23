@@ -37,7 +37,7 @@ class EditorSashContainer: public PartSashContainer
 {
 
 public:
-  cherryClassMacro(EditorSashContainer);
+  cherryObjectMacro(EditorSashContainer);
 
 private:
 

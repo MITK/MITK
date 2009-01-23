@@ -40,7 +40,7 @@ namespace cherry
 struct CHERRY_UI IWorkbenchPartDescriptor : public Object
 {
 
-  cherryClassMacro(IWorkbenchPartDescriptor);
+  cherryInterfaceMacro(IWorkbenchPartDescriptor, cherry);
 
   /**
    * Returns the part id.

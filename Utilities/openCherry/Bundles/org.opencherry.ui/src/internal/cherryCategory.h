@@ -40,7 +40,7 @@ template<class T> class Category : /*IWorkbenchAdapter*/public IAdaptable, publi
 
 public:
   
-  cherryClassMacro(Category<T>);
+  cherryObjectMacro(Category<T>);
 
   typedef T ElementType;
 

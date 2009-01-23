@@ -39,7 +39,7 @@ class WorkbenchConfigurer : public IWorkbenchConfigurer {
 
 public:
 
-  cherryClassMacro(WorkbenchConfigurer);
+  cherryObjectMacro(WorkbenchConfigurer);
 
 private:
 

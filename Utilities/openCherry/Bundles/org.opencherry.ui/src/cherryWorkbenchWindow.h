@@ -53,7 +53,7 @@ class Workbench;
 class WorkbenchWindow: public Window, public IWorkbenchWindow
 {
 public:
-  cherryClassMacro(WorkbenchWindow)
+  cherryObjectMacro(WorkbenchWindow)
   ;
 
   WorkbenchWindow(int number);

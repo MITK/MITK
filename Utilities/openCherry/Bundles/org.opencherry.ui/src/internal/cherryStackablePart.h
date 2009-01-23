@@ -38,7 +38,7 @@ class StackablePart : public virtual Object
 
 public:
 
-  cherryClassMacro(StackablePart);
+  cherryObjectMacro(StackablePart);
 
   StackablePart(std::string id);
 

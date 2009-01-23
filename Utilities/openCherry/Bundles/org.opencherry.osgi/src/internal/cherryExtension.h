@@ -45,7 +45,7 @@ private:
 
 public:
 
-  cherryClassMacro(Extension);
+  cherryObjectMacro(Extension);
 
   Extension(const std::string& namespaze);
 

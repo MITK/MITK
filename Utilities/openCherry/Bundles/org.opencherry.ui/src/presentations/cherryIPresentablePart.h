@@ -40,7 +40,7 @@ namespace cherry {
  */
 struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
 
-  cherryClassMacro(IPresentablePart);
+  cherryInterfaceMacro(IPresentablePart, cherry);
 
     /**
      * The property id for <code>isDirty</code>.

@@ -58,7 +58,7 @@ class  PartPane;
 class PartSite : public virtual IWorkbenchPartSite {
 
 public:
-  cherryClassMacro(PartSite);
+  cherryObjectMacro(PartSite);
 
   /**
    * This is a helper method for the register context menu functionality. It

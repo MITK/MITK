@@ -31,7 +31,7 @@ class PartPlaceholder : public StackablePart {
 
 public:
 
-  cherryClassMacro(PartPlaceholder);
+  cherryObjectMacro(PartPlaceholder);
 
     /**
      * Placeholder ids may contain wildcards.  This is the wildcard string.

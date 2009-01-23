@@ -33,7 +33,7 @@ class MITK_QT_COMMON QmitkViewPart : public cherry::QtViewPart, virtual public c
 {
 
 public:
-  cherryClassMacro(QmitkViewPart)
+  cherryObjectMacro(QmitkViewPart)
 
   QmitkViewPart();
   virtual ~QmitkViewPart();

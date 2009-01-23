@@ -32,7 +32,7 @@ struct CHERRY_UI IStructuredSelection : public ISelection {
 
   typedef std::vector<T>::iterator iterator;
 
-  cherryClassMacro(IStructuredSelection<T>);
+  cherryInterfaceMacro(IStructuredSelection<T>, cherry);
 
   /**
    * Returns the first element in this selection, or <code>null</code>

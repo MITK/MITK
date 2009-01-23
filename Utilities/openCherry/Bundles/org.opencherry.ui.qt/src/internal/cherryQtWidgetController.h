@@ -33,7 +33,7 @@ class QtWidgetController : public Object
 
 public:
 
-  cherryClassMacro(QtWidgetController)
+  cherryObjectMacro(QtWidgetController)
 
   static const char PROPERTY_ID[];
 

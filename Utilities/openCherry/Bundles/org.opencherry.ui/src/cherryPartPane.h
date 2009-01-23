@@ -44,7 +44,7 @@ class CHERRY_UI PartPane : public StackablePart,
 {
 
 public:
-  cherryClassMacro(PartPane);
+  cherryObjectMacro(PartPane);
 
   friend class PartSashContainer;
   friend class EditorSashContainer;

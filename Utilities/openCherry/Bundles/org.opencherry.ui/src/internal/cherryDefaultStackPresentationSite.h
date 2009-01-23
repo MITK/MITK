@@ -37,7 +37,7 @@ private:
 
 public:
 
-  cherryClassMacro(DefaultStackPresentationSite);
+  cherryObjectMacro(DefaultStackPresentationSite);
 
   DefaultStackPresentationSite();
 

@@ -41,7 +41,7 @@ namespace cherry {
  */
 struct CHERRY_UI IPlaceholderFolderLayout : public Object {
 
-  cherryClassMacro(IPlaceholderFolderLayout)
+  cherryInterfaceMacro(IPlaceholderFolderLayout, cherry)
 
   virtual ~IPlaceholderFolderLayout() {}
 

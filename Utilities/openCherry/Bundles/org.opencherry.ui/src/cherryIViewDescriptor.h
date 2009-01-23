@@ -50,7 +50,7 @@ namespace cherry
 struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdaptable
 {
 
-  cherryClassMacro(IViewDescriptor);
+  cherryInterfaceMacro(IViewDescriptor, cherry);
 
   /**
    * Creates an instance of the view defined in the descriptor.

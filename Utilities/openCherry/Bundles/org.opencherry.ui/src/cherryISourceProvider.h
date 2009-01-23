@@ -46,7 +46,7 @@ namespace cherry {
  */
 struct CHERRY_UI ISourceProvider {
 
-  cherryManifestMacro(ISourceProvider, cherry);
+  cherrySimpleInterfaceMacro(ISourceProvider, cherry);
 
   typedef std::map<std::string, Object::Pointer> StateMapType;
 

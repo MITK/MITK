@@ -67,7 +67,7 @@ namespace cherry {
  */
 struct CHERRY_UI ISaveablesSource : public virtual Object {
 
-  cherryClassMacro(ISaveablesSource);
+  cherryInterfaceMacro(ISaveablesSource, cherry);
 
   /**
    * Returns the saveables presented by the workbench part. If the return

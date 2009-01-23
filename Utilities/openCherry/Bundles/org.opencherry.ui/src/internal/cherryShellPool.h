@@ -58,7 +58,7 @@ class ShellPool: public IShellListener
 
 public:
 
-  cherryClassMacro(ShellPool);
+  cherryObjectMacro(ShellPool);
 
   void ShellClosed(ShellEvent::Pointer e);
 

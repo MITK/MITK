@@ -33,7 +33,7 @@ class CHERRY_COMMANDS NamedHandleObject : public HandleObject {
 
 public:
   
-  cherryClassMacro(NamedHandleObject)
+  cherryObjectMacro(NamedHandleObject)
   
 protected:
   

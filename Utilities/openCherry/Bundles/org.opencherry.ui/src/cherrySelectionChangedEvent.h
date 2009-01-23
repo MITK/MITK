@@ -23,7 +23,7 @@ class CHERRY_UI SelectionChangedEvent : public Object
 
 public:
 
-  cherryClassMacro(SelectionChangedEvent);
+  cherryObjectMacro(SelectionChangedEvent);
 
   /**
    * Creates a new event for the given source and selection.

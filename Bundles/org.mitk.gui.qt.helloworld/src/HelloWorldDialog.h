@@ -6,7 +6,7 @@
 
 class MITK_QT_HELLOWORLD HelloWorldDialog: public IDialog
 {
-  cherryClassMacro(HelloWorldDialog)
+  cherryObjectMacro(HelloWorldDialog)
 
   public:
     virtual void show();

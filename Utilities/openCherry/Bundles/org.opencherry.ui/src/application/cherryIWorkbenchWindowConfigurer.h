@@ -54,7 +54,7 @@ struct IWorkbenchWindow;
  */
 struct CHERRY_UI IWorkbenchWindowConfigurer : public Object {
 
-  cherryClassMacro(IWorkbenchWindowConfigurer);
+  cherryInterfaceMacro(IWorkbenchWindowConfigurer, cherry);
 
   /**
      * Returns the underlying workbench window.

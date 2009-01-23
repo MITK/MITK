@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIADAPTERMANAGER_H_
@@ -38,7 +38,7 @@ namespace cherry {
  * method on one of the registered adapter factories.
  * <p>
  * Adapter factories can be registered programmatically using the <code>registerAdapters</code>
- * method.  Alternatively, they can be registered declaratively using the 
+ * method.  Alternatively, they can be registered declaratively using the
  * <code>org.opencherry.core.runtime.adapters</code> extension point.  Factories registered
  * with this extension point will not be able to provide adapters until their
  * corresponding plugin has been activated.
@@ -46,7 +46,7 @@ namespace cherry {
  * The following code snippet shows how one might register an adapter of type
  * <code>com.example.acme.Sticky</code> on resources in the workspace.
  * <p>
- * 
+ *
  * <pre>
  *  IAdapterFactory pr = new IAdapterFactory() {
  *    public Class[] getAdapterList() {
@@ -69,7 +69,7 @@ namespace cherry {
  *  }
  *  Platform.getAdapterManager().registerAdapters(pr, IResource.class);
  *   </pre>
- * 
+ *
  * </p><p>
  * This interface can be used without OSGi running.
  * </p><p>
@@ -80,19 +80,19 @@ namespace cherry {
  */
 struct IAdapterManager : public Object {
 
-  cherryClassMacro(IAdapterManager)
-  
+  cherryInterfaceMacro(IAdapterManager, cherry)
+
   virtual ~IAdapterManager() {}
-  
+
   /**
-   * This value can be returned to indicate that no applicable adapter factory 
-   * was found. 
+   * This value can be returned to indicate that no applicable adapter factory
+   * was found.
    * @since org.opencherry.equinox.common 3.3
    */
   static CHERRY_RUNTIME const int NONE;
 
   /**
-   * This value can be returned to indicate that an adapter factory was found, 
+   * This value can be returned to indicate that an adapter factory was found,
    * but has not been loaded.
    * @since org.opencherry.equinox.common 3.3
    */
@@ -105,7 +105,7 @@ struct IAdapterManager : public Object {
   static CHERRY_RUNTIME const int LOADED;
 
   /**
-   * Returns the types that can be obtained by converting <code>adaptableClass</code> 
+   * Returns the types that can be obtained by converting <code>adaptableClass</code>
    * via this manager. Converting means that subsequent calls to <code>getAdapter()</code>
    * or <code>loadAdapter()</code> could result in an adapted object.
    * <p>
@@ -115,16 +115,16 @@ struct IAdapterManager : public Object {
    * loaded, or if the factory itself returns <code>null</code>, then
    * <code>getAdapter</code> will still return <code>null</code>.
    * </p>
-   * @param adaptableClass the adaptable class being queried  
-   * @return an array of type names that can be obtained by converting 
-   * <code>adaptableClass</code> via this manager. An empty array 
+   * @param adaptableClass the adaptable class being queried
+   * @return an array of type names that can be obtained by converting
+   * <code>adaptableClass</code> via this manager. An empty array
    * is returned if there are none.
    * @since 3.1
    */
   virtual void ComputeAdapterTypes(std::vector<const std::type_info&>& types, const std::type_info& adaptableClass) = 0;
 
   /**
-   * Returns the class search order for a given class. The search order from a 
+   * Returns the class search order for a given class. The search order from a
    * class with the definition <br>
    * <code>class X extends Y implements A, B</code><br>
    * is as follows:
@@ -135,8 +135,8 @@ struct IAdapterManager : public Object {
    * order returned by <code>getInterfaces</code> (in the example, A and its
    * superinterfaces then B and its superinterfaces) </li>
    * </ul>
-   * 
-   * @param clazz the class for which to return the class order. 
+   *
+   * @param clazz the class for which to return the class order.
    * @return the class search order for the given class. The returned
    * search order will minimally  contain the target class.
    * @since 3.1
@@ -150,7 +150,7 @@ struct IAdapterManager : public Object {
    * <p>
    * Note that this method will never cause plug-ins to be loaded. If the
    * only suitable factory is not yet loaded, this method will return <code>null</code>.
-   * 
+   *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterType the type of adapter to look up
@@ -169,7 +169,7 @@ struct IAdapterManager : public Object {
    * only suitable factory is not yet loaded, this method will return <code>null</code>.
    * If activation of the plug-in providing the factory is required, use the
    * <code>loadAdapter</code> method instead.
-   * 
+   *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified name of the type of adapter to look up
@@ -189,7 +189,7 @@ struct IAdapterManager : public Object {
    * will return a non-null result. If the factory's plug-in has not yet been
    * loaded, or if the factory itself returns <code>null</code>, then
    * <code>getAdapter</code> will still return <code>null</code>.
-   * 
+   *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified class name of an adapter to
@@ -214,7 +214,7 @@ struct IAdapterManager : public Object {
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified class name of an adapter to
    * look up
-   * @return a status of the adapter 
+   * @return a status of the adapter
    * @since org.opencherry.equinox.common 3.3
    */
   virtual int QueryAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterType) = 0;
@@ -229,7 +229,7 @@ struct IAdapterManager : public Object {
    * if necessary. As such, this method should be used judiciously, in order
    * to avoid unnecessary plug-in activations. Most clients should avoid
    * activation by using <code>getAdapter</code> instead.
-   * 
+   *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified name of the type of adapter to look up
@@ -249,7 +249,7 @@ struct IAdapterManager : public Object {
    * an interface, the adapters are available to all classes that directly or
    * indirectly implement that interface.
    * </p>
-   * 
+   *
    * @param factory the adapter factory
    * @param adaptable the type being extended
    * @see #unregisterAdapters(IAdapterFactory)
@@ -262,7 +262,7 @@ struct IAdapterManager : public Object {
    * factories. Equivalent to calling <code>unregisterAdapters(IAdapterFactory,Class)</code>
    * on all classes against which it had been explicitly registered. Does
    * nothing if the given factory is not currently registered.
-   * 
+   *
    * @param factory the adapter factory to remove
    * @see #registerAdapters(IAdapterFactory, Class)
    */
@@ -272,7 +272,7 @@ struct IAdapterManager : public Object {
    * Removes the given adapter factory from the list of factories registered
    * as extending the given class. Does nothing if the given factory and type
    * combination is not registered.
-   * 
+   *
    * @param factory the adapter factory to remove
    * @param adaptable one of the types against which the given factory is
    * registered

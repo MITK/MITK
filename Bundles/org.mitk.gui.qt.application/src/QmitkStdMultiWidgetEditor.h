@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QMITKSTDMULTIWIDGETEDITOR_H_
@@ -27,30 +27,30 @@ PURPOSE.  See the above copyright notices for more information.
 class MITK_QT_APP QmitkStdMultiWidgetEditor : public cherry::QtEditorPart
 {
 public:
-  cherryClassMacro(QmitkStdMultiWidgetEditor);
-  
+  cherryObjectMacro(QmitkStdMultiWidgetEditor);
+
   static const std::string EDITOR_ID;
-  
+
   QmitkStdMultiWidgetEditor();
   ~QmitkStdMultiWidgetEditor();
-  
+
   QmitkStdMultiWidget* GetStdMultiWidget();
-  
+
   void Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input);
- 
+
   void SetFocus();
-  
+
   void DoSave() {}
   void DoSaveAs() {}
   bool IsDirty() { return false; }
   bool IsSaveAsAllowed() { return false; }
- 
+
 protected:
-  
+
   void CreateQtPartControl(QWidget* parent);
-  
+
 private:
-  
+
   QmitkStdMultiWidget* m_StdMultiWidget;
 };
 

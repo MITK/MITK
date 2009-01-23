@@ -35,7 +35,7 @@ class CHERRY_UI StackDropResult : public Object {
 
 public:
 
-  cherryClassMacro(StackDropResult);
+  cherryObjectMacro(StackDropResult);
 
 private:
 

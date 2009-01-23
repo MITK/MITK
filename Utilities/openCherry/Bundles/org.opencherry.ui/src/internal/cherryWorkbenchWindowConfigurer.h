@@ -42,7 +42,7 @@ class WorkbenchWindow;
 class WorkbenchWindowConfigurer : public IWorkbenchWindowConfigurer {
 
 public:
-  cherryClassMacro(WorkbenchWindowConfigurer);
+  cherryObjectMacro(WorkbenchWindowConfigurer);
 
     /**
      * The workbench window associated with this configurer.
@@ -124,7 +124,7 @@ public:
         private: IActionBarConfigurer::Pointer proxy;
         private: SmartPointer<WorkbenchWindow> window;
 
-        public: cherryClassMacro(WindowActionBarConfigurer);
+        public: cherryObjectMacro(WindowActionBarConfigurer);
 
         public: WindowActionBarConfigurer(SmartPointer<WorkbenchWindow> wnd);
 

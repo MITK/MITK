@@ -30,7 +30,7 @@ namespace cherry {
 class QtShowViewDialog : public QDialog, public IShowViewDialog
 {
 public:
-  cherryClassMacro(QtShowViewDialog);
+  cherryObjectMacro(QtShowViewDialog);
 
   QtShowViewDialog(IViewRegistry* registry, QWidget* parent = 0, Qt::WindowFlags f = 0);
 

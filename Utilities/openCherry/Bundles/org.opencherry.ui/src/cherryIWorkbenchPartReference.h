@@ -40,7 +40,7 @@ struct IWorkbenchPage;
  */
 struct CHERRY_UI IWorkbenchPartReference : public Object {
 
-  cherryClassMacro(IWorkbenchPartReference);
+  cherryInterfaceMacro(IWorkbenchPartReference, cherry);
 
     /**
      * Returns the IWorkbenchPart referenced by this object.

@@ -36,7 +36,7 @@ namespace cherry {
  */
 struct IDropTarget : public Object {
 
-  cherryClassMacro(IDropTarget);
+  cherryObjectMacro(IDropTarget);
 
   /**
    * Drops the object in this position

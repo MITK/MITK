@@ -39,7 +39,7 @@ class PartPane;
  */
 class CHERRY_UI WorkbenchPartReference : virtual public IWorkbenchPartReference, public ISizeProvider {
 
-public: cherryClassMacro(WorkbenchPartReference);
+public: cherryObjectMacro(WorkbenchPartReference);
 
 
     // State constants //////////////////////////////

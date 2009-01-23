@@ -28,7 +28,7 @@ class BundleManifest : public IBundleManifest
 
 public:
 
-  cherryClassMacro(BundleManifest);
+  cherryObjectMacro(BundleManifest);
 
   BundleManifest(std::istream* istr);
   ~BundleManifest();

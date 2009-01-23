@@ -35,7 +35,7 @@ private:
 
 public:
 
-  cherryClassMacro(BundleDirectory);
+  cherryObjectMacro(BundleDirectory);
 
   BundleDirectory(const Path& path);
   virtual ~BundleDirectory();

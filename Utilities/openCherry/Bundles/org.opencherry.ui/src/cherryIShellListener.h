@@ -44,7 +44,7 @@ namespace cherry {
  */
 struct CHERRY_UI IShellListener : public virtual Object {
 
-  cherryClassMacro(IShellListener);
+  cherryInterfaceMacro(IShellListener, cherry);
 
   struct CHERRY_UI Events {
     typedef Message1<ShellEvent::Pointer> ShellEventType;

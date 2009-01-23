@@ -35,7 +35,7 @@ namespace cherry {
  */
 struct IDragOverListener : public virtual Object {
 
-  cherryClassMacro(IDragOverListener);
+  cherryObjectMacro(IDragOverListener);
 
   struct Events {
 

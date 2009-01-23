@@ -38,7 +38,7 @@ class LayoutPartSash: public LayoutPart
 
 public:
 
-  cherryClassMacro(LayoutPartSash);
+  cherryObjectMacro(LayoutPartSash);
 
   LayoutPartSash(PartSashContainer* rootContainer, int style);
   ~LayoutPartSash();

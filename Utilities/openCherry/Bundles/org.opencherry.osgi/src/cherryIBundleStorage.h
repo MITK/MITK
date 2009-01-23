@@ -30,7 +30,7 @@ namespace cherry {
 
 struct CHERRY_OSGI IBundleStorage : public Object
 {
-  cherryClassMacro(IBundleStorage);
+  cherryInterfaceMacro(IBundleStorage, cherry);
 
   virtual std::istream* GetResource(const std::string& path) const = 0;
   virtual void List(const std::string& path, std::vector<std::string>& files) const = 0;

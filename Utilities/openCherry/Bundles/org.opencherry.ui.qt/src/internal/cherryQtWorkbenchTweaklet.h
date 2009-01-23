@@ -29,7 +29,7 @@ class CHERRY_UI_QT QtWorkbenchTweaklet : public WorkbenchTweaklet
 
 public:
 
-  cherryClassMacro(QtWorkbenchTweaklet);
+  cherryObjectMacro(QtWorkbenchTweaklet);
 
   int RunEventLoop();
   bool IsRunning();

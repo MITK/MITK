@@ -19,9 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_POINT_LOCATOR__H__
 
 #include <itkObject.h>
-#include <mitkPointSet.h>
-#include <vtkSystemIncludes.h>
-#include <vector>
+
+#include "mitkPointSet.h"
+
+#include <vtkPoints.h>
+
 
 //forward declarations
 class vtkPointSet;
@@ -129,10 +131,10 @@ protected:
   typedef std::vector<IdType> IdVectorType;
 
   //
-  // ANN related typedefs, to prevent ANN from beeing in the global include path.
+  // ANN related typedefs, to prevent ANN from being in the global include path.
   // Please note, that these line are prone to failure, if the point type in
   // ANN changes. Please note also, that these typedefs are only used in the header
-  // file. The implementeation always refers to the original types
+  // file. The implementation always refers to the original types
   //
   typedef float*      MyANNpoint;
   typedef int         MyANNidx;
@@ -185,6 +187,8 @@ protected:
   bool m_SearchTreeInitialized;
   
   IdVectorType m_IndexToPointIdContainer;
+
+  vtkPoints*       m_VtkPoints;
   
   
   //

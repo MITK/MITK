@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkPointLocator.h"
-#include <vtkPoints.h>
 #include <vtkPointSet.h>
 #include <ANN/ANN.h>
 
@@ -24,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PointLocator::PointLocator()
 {
   m_SearchTreeInitialized = false;
+  m_VtkPoints = NULL;
   m_ANNK = 1; 
   m_ANNDimension = 3;
   m_ANNEpsilon = 0;
@@ -52,6 +52,16 @@ void mitk::PointLocator::SetPoints( vtkPointSet* pointSet )
      return;
   }
   vtkPoints* points = pointSet->GetPoints();
+
+  if(m_VtkPoints)
+  {
+    if ( (m_VtkPoints == points) && (m_VtkPoints->GetMTime() == points->GetMTime()) )
+    {
+      return; //no need to recalculate search tree
+    }
+  }
+  m_VtkPoints = points;
+
   size_t size = points->GetNumberOfPoints();
   if ( m_ANNDataPoints != NULL )
     delete[] m_ANNDataPoints;

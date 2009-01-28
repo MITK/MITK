@@ -67,7 +67,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter
     itkExceptionMacro(<<"Error during surface writing.");
   }
   // check if file really was written, because vtkWriter doesn't check that
-  if ((!stat(m_FileName.c_str(),&fileStatus))||(timeBefore==fileStatus.st_mtime))
+  if (!stat(m_FileName.c_str(),&fileStatus)/*||(timeBefore==fileStatus.st_mtime)*/)
   {
     itkExceptionMacro(<<"Error during surface writing: file could not be written");
   }

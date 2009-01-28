@@ -67,11 +67,11 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter
     itkExceptionMacro(<<"Error during surface writing.");
   }
   // check if file can be written because vtkWriter doesn't check that
-  if (!fopen(m_FileName.c_str(),"w"))
+  /*if (!fopen(m_FileName.c_str(),"w"))
   {
     itkExceptionMacro(<<"Error during surface writing: file could not be written");
   }
-  remove(m_FileName.c_str());
+  remove(m_FileName.c_str());*/
 }
 
 template <class VTKWRITER>

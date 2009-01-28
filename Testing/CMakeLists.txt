@@ -57,7 +57,7 @@ SET(${KITNAME}_TESTS
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
-  mitkSurfaceVtkWriterTest.cpp
+#  mitkSurfaceVtkWriterTest.cpp
   mitkPicFileWriterTest.cpp
   mitkImageWriterTest.cpp
   mitkCompressedImageContainerTest.cpp  

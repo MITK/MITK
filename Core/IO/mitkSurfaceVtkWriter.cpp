@@ -51,7 +51,7 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkW
   if (!m_VtkWriter->Write())
   {
     transformPolyData->Delete();
-    throw std::ios_base::failure("Error during surface writing.");
+    itkExceptionMacro(<<"Error during surface writing.");
   }
 }
 

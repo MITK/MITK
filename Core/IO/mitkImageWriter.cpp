@@ -107,11 +107,14 @@ void mitk::ImageWriter::GenerateData()
     return ;
   }
 
-  if (fopen(m_FileName.c_str(),"w")==NULL)
+  FILE* tempFile = fopen(m_FileName.c_str(),"w");
+  if (tempFile==NULL)
   {
     itkExceptionMacro(<<"File location not writeable");
     return;
   }
+  fclose(tempFile);
+  remove(m_FileName.c_str());
 
   mitk::Image::Pointer input = const_cast<mitk::Image*>(this->GetInput());
 

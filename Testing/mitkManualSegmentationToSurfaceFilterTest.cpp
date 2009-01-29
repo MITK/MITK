@@ -145,7 +145,13 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
     else
     {
       std::cout<<"[PASSED]"<<std::endl;
-      writer->Write();
+      try {
+        writer->Write();
+      }
+      catch( itk::ExceptionObject e)
+      {
+        std::cout<<"caught exception: "<<e<<std::endl;
+      }
     }
   }
   else

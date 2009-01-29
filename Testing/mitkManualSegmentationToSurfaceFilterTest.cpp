@@ -106,43 +106,51 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   }
   
   std::cout << "Create surface with default settings: ";
-  filter->SetInput(image);
-  writer->SetInput(filter->GetOutput());
-  writer->Write();
-
-  if( writer->GetNumberOfInputs() < 1 )
+  if (image->GetDimension()==3)
   {
-     std::cout<<"[FAILED]"<<std::endl;
-     writer->Delete();
-     return EXIT_FAILURE;
+    filter->SetInput(image);
+    filter->Update();
+    writer->SetInput(filter->GetOutput());
+    writer->Write();
+
+    if( writer->GetNumberOfInputs() < 1 )
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      writer->Delete();
+      return EXIT_FAILURE;
+    }
+    else
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+    }
+
+    std::cout << "Create surface all optimised settings: ";
+    //configure ImageToSurfaceFilter
+    filter->MedianFilter3DOn();
+    filter->SetGaussianStandardDeviation(1.5);
+    filter->InterpolationOn();
+    filter->UseGaussianImageSmoothOn();
+    filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
+    filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
+    filter->SetTargetReduction(0.05f);
+    filter->SmoothOn();
+
+    //filter->Update();
+    writer->SetInput( filter->GetOutput() );
+    if( writer->GetNumberOfInputs() < 1 )
+    {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+    }
+    else
+    {
+      std::cout<<"[PASSED]"<<std::endl;
+      writer->Write();
+    }
   }
   else
   {
-     std::cout<<"[PASSED]"<<std::endl;
-  }
- 
-  std::cout << "Create surface all optimised settings: ";
-  //configure ImageToSurfaceFilter
-  filter->MedianFilter3DOn();
-  filter->SetGaussianStandardDeviation(1.5);
-  filter->InterpolationOn();
-  filter->UseGaussianImageSmoothOn();
-  filter->SetThreshold( 1 ); //if( Gauss ) --> TH manipulated for vtkMarchingCube
-  filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
-  filter->SetTargetReduction(0.05f);
-  filter->SmoothOn();
-
-  //filter->Update();
-  writer->SetInput( filter->GetOutput() );
-  if( writer->GetNumberOfInputs() < 1 )
-  {
-     std::cout<<"[FAILED]"<<std::endl;
-     return EXIT_FAILURE;
-  }
-  else
-  {
-     std::cout<<"[PASSED]"<<std::endl;
-     writer->Write();
+    std::cout<<"Image not suitable for filter: Dimension!=3"<<std::endl;
   }
 
   std::cout<<"[TEST DONE]"<<std::endl;

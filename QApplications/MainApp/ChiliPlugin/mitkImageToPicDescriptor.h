@@ -44,10 +44,17 @@ class ImageToPicDescriptor : public itk::Object
   public:
 
     /** Struct to transport the PicTags (with Description and Content ). */
-    struct TagInformationStruct
+    class TagInformationStruct
     {
-      std::string PicTagDescription;
-      std::string PicTagContent;
+      public:
+        std::string PicTagDescription;
+        std::string PicTagContent;
+
+        TagInformationStruct( const std::string& picTagDescription = "", const std::string picTagContent = "")
+        :PicTagDescription( picTagDescription ),
+         PicTagContent( picTagContent )
+        {
+        }
     };
 
     /** We need more than one PicTag. */

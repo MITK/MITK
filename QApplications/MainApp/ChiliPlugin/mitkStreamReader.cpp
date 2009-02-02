@@ -120,8 +120,9 @@ void mitk::StreamReader::Update()
       node->SetProperty( "name", StringProperty::New( m_SeriesDescription ) );
       node->SetProperty( "NumberOfSlices", IntProperty::New( 1 ) );
       node->SetProperty( "NumberOfTimeSlices", IntProperty::New( m_PicDescriptorList.size() ) );
+
       if( m_SeriesOID != "" )
-        node->SetProperty( "SeriesOID", StringProperty::New( m_SeriesOID ) );
+        node->SetProperty( "SeriesInstanceUID", StringProperty::New( m_SeriesOID ) );
 
       m_Output.push_back( node );
     }

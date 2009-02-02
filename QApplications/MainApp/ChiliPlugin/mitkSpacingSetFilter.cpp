@@ -136,9 +136,8 @@ void mitk::SpacingSetFilter::SortPicsToGroup()
       void* data = NULL;
       ipUInt4_t len = 0;
       tsv = mitkIpPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
-      if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
-        if( data != NULL )
-          currentSeriesDescription = (char*)data;
+      if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) && data != NULL )
+        currentSeriesDescription = (char*)data;
       else
         currentSeriesDescription = "no Description";
     }

@@ -19,17 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLOADFROMCHILI_H_HEADER_INCLUDED
 
 //MITK
-#include "mitkDataTree.h"
-#include "mitkParentChild.h"
 #include "mitkPACSPlugin.h"
-#include "mitkIpPic.h"
+
 //CHILI
 #include <chili/isg.h>  //geometry
-#include <chili/cdbTypes.h>  //series_t*, study_t*, ...
+#include <chili/cdbTypes.h>  //series_t, study_t, ...
 
-#ifndef WIN32  //TODO this function integrated to plugin.h at CHILI-Version 3.14 (current 3.12); at this time it ist possible to use this function for suse and windows -> change code
-extern "C" mitkIpPicDescriptor *ipPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );  // <= CHILI 3.12
-#endif
+extern "C" mitkIpPicDescriptor *ipPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );
 
 class QcLightbox;
 class QcPlugin;
@@ -41,7 +37,7 @@ class LoadFromCHILI: public itk::Object
   public:
 
     /*
-     0 for mitk::ImageNumberFilter
+     0 for ImageNumberFilter
      1 for SpacingSetFilter
      2 for SingleSpacingFilter
      */
@@ -49,6 +45,7 @@ class LoadFromCHILI: public itk::Object
 
     /*!
     \brief Should acquisition number be used to group images?
+
     If this flag is on, images are only grouped if they have an equal acquisition number.
     This is useful to separate images from the same series/lightbox that would
     otherwise be sorted into the same image.
@@ -59,36 +56,38 @@ class LoadFromCHILI: public itk::Object
     */
     void SetSeparateByAcquisitionNumber(bool on);
 
-    std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcPlugin* instance, QcLightbox* lightbox, const std::string& tmpDirectory );
+    std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcPlugin* instance, 
+                                                               QcLightbox* lightbox, 
+                                                               const std::string& tmpDirectory );
 
-    std::vector<DataTreeNode::Pointer> LoadFromSeries( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
+    std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( QcPlugin* instance, 
+                                                             const std::string& seriesInstanceUID, 
+                                                             const std::string& tmpDirectory );
 
-    std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
+    std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( QcPlugin* instance, 
+                                                            const std::string& seriesInstanceUID, 
+                                                            const std::string& tmpDirectory );
 
-    std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
-
-    DataTreeNode::Pointer LoadSingleText( QcPlugin* instance, const std::string& textOID, const std::string& tmpDirectory );
-
-    DataTreeNode::Pointer LoadSingleText( QcPlugin* instance, const std::string& seriesOID, const std::string& textOID, const std::string& textPath, const std::string& tmpDirectory );
-
-    DataTreeNode::Pointer LoadParentChildElement( QcPlugin* instance, const std::string& seriesOID, const std::string& label, const std::string& tmpDirectory );
-
-    PACSPlugin::ParentChildRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
-
-    PACSPlugin::ParentChildRelationInformationList GetStudyRelationInformation( QcPlugin* instance, const std::string& studyOID, const std::string& tmpDirectory );
+    DataTreeNode::Pointer LoadSingleText( QcPlugin* instance, 
+                                          const std::string& seriesInstanceUID, 
+                                          unsigned int instanceNumber, 
+                                          const std::string& tmpDirectory );
 
     mitkClassMacro( LoadFromCHILI, itk::Object );
     itkNewMacro( LoadFromCHILI );
-    virtual ~LoadFromCHILI();
 
   private:
 
     struct TextFilePathAndOIDStruct
     {
+      unsigned int instanceNumber;
       std::string TextFilePath;
       std::string TextFileOID;
     };
+
     std::list<TextFilePathAndOIDStruct> m_TextList;
+    unsigned int m_TextListCounter;
+    std::string m_SeriesInstanceUID;
 
     struct StreamImageStruct
     {
@@ -101,23 +100,26 @@ class LoadFromCHILI: public itk::Object
     std::list<StreamImageStruct> m_StreamImageList;
     std::list<std::string> m_UnknownImageFormatPath;
 
-    std::list<std::string> m_VolumeImageInstanceUIDs;
-
     std::string m_tmpDirectory;
     unsigned int m_UsedReader;
-    ParentChild::Pointer m_ParentChild;
+
+    DataTreeNode::Pointer LoadSingleText( QcPlugin* instance, 
+                                          const std::string& seriesInstanceUID, 
+                                          unsigned int instanceNumber, 
+                                          const std::string& textPath, 
+                                          const std::string& tmpDirectory );
 
     StreamImageStruct LoadStreamImage( mitkIpPicDescriptor* pic);
 
-    std::vector<DataTreeNode::Pointer> CreateNodesFromLists( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
+    std::vector<DataTreeNode::Pointer> CreateNodesFromLists( QcPlugin* instance, const std::string& seriesInstanceUID, const std::string& tmpDirectory );
 
     static ipBool_t GlobalIterateLoadImages( int rows, int row, image_t* image, void* user_data );
-    static ipBool_t GlobalIterateLoadSinglePics( int rows, int row, image_t* image, void* user_data );
     static ipBool_t GlobalIterateLoadTexts( int rows, int row, text_t *text, void *user_data );
 
   protected:
 
     LoadFromCHILI();
+    virtual ~LoadFromCHILI();
     
     bool m_GroupByAcquisitionNumber;
 };
@@ -125,3 +127,4 @@ class LoadFromCHILI: public itk::Object
 } // namespace mitk
 
 #endif
+

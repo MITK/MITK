@@ -18,40 +18,21 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 
-//ITK
-#include <itkObject.h>
-//MITK
-#include <mitkDataTree.h>
-#include <mitkDataStorage.h>
-
-#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
-
-class QcLightbox;
+#include "mitkDataStorage.h"
 
 namespace mitk {
 
-//TODO get used like this "mitk::m_QmitkChiliPluginConferenceID" in QmitkChili3ConferenceKit, not like this "GetConferenceID()"
-const int m_QmitkChiliPluginConferenceID = 5001;
+/** Documentation
+  \brief Interface for minimal PACS communication
+  \ingroup IO
+  \ingroup Chili
 
-typedef enum
-{
-  MITKc = 0,
-  QTc,
-  LAUNCHc,
-  ARRANGEc,
-  TOKENREQUESTc,
-  TOKENSETc,
-  TEXTc,
-  MOUSEMOVEc ,
-} ConfMsgType;
+  Defines some basic function for communication with a PACS.
+  Currently only really implemented for the CHILI Workstation (see CHILIPlugin),
+  but should be basic enough to work with differnt systems, too.
 
-  /** Documentation
-  @brief interface between Chili and MITK
-  @ingroup IO
-  @ingroup Chili
-
-  This is the default-implementation, for the real implementation look at mitkChiliPluginImpl.
-  */
+  \TODO The PatientInformation, StudyInformation, SeriesInformation structures should be classes able to contain any kind of tags
+*/
 class MITK_CORE_EXPORT PACSPlugin : public itk::Object
 {
   public:
@@ -59,315 +40,239 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /** This struct contain the plugin capabilities. */
     struct PACSPluginCapability
     {
-      bool isPlugin;
-      bool canLoad;
-      bool canSave;
+      bool IsPACSFunctional;  // is there actually a real PACS connectivity implemented, configured and working right now?
+      bool HasLoadCapability; // can the current implementation load data from a PACS?
+      bool HasSaveCapability; // can the current implementation save data into the PACS?
     };
 
-    /** This struct contain all possible informations about the studies. */
-    struct StudyInformation
+    /** Information about a patient in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.2 **/
+    class PatientInformation
     {
-      std::string OID;
-      std::string InstanceUID;
-      std::string ID;
-      std::string Date;
-      std::string Time;
-      std::string Modality;
-      std::string Manufacturer;
-      std::string ReferingPhysician;
-      std::string Description;
-      std::string ManufacturersModelName;
-      std::string AccessionNumber;
-      std::string InstitutionName;
-      std::string PerformingPhysician;
-      std::string ReportingPhysician;
-      std::string LastAccess;
-      int ImageCount;
+      public: 
+        std::string PatientsName;       // tag 0010,0010
+        std::string PatientID;          // tag 0010,0020
+        std::string PatientsBirthDate;  // tag 0010,0030
+        std::string PatientsBirthTime;  // tag 0010,0032
+        std::string PatientsSex;        // tag 0010,0040
+        std::string PatientComments;    // tag 0010,4000
     };
 
-    /** This struct contain all possible informations about the patient. */
-    struct PatientInformation
+    typedef std::list<PatientInformation> PatientInformationList;
+
+    /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.3 **/
+    class StudyInformation 
     {
-      std::string OID;
-      std::string Name;
-      std::string ID;
-      std::string BirthDate;
-      std::string BirthTime;
-      std::string Sex;
-      std::string MedicalRecordLocator;
-      std::string Comment;
+      public:
+        std::string StudyInstanceUID;   // tag 0020,000D
+        std::string StudyID;            // tag 0020,0010
+        std::string StudyDate;          // tag 0008,0020
+        std::string StudyTime;          // tag 0008,0030
+        std::string AccessionNumber;    // tag 0008,0050
+        std::string ModalitiesInStudy;  // tag 0008,0061
+        std::string ReferringPhysician; // tag 0008,0090
+        std::string StudyDescription;   // tag 0008,1030
     };
+    
+    typedef std::list<StudyInformation> StudyInformationList;
 
-    /** This struct contain all possible informations about the series. */
-    struct SeriesInformation
+    /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.4 **/
+    class SeriesInformation
     {
-      std::string OID;
-      std::string InstanceUID;
-      int Number;
-      int Acquisition;
-      int EchoNumber;
-      int TemporalPosition;
-      std::string Date;
-      std::string Time;
-      std::string Description;
-      std::string Contrast;
-      std::string BodyPartExamined;
-      std::string ScanningSequence;
-      std::string FrameOfReferenceUID;
-      int ImageCount;
+      public:
+        std::string SeriesInstanceUID;  // tag 0020,000E
+        int SeriesNumber;               // tag 0020,0011
+        std::string SeriesDate;         // tag 0008,0021 
+        std::string SeriesTime;         // tag 0008,0031
+        std::string SeriesDescription;  // tag 0008,103E
+        std::string BodyPartExamined;   // tag 0018,0015
+        std::string FrameOfReferenceUID;// tag 0020,0052 
+        int AcquisitionNumber;          // tag 0020,0012 image specific
+        std::string ContrastAgent;      // tag 0018,0010 image specific 
+        std::string ScanningSequence;   // tag 0018,0020 mr image specific
+        int EchoNumber;                 // tag 0018,0086 mr image specific
+        int TemporalPosition;           // tag 0020,0100 mr image specific
+
+        SeriesInformation()
+          : SeriesNumber(-1),
+            AcquisitionNumber(-1),
+            EchoNumber(-1),
+            TemporalPosition(-1)
+        {
+        }
     };
 
-    /** There can be lots of series to one study, so we need a list. */
     typedef std::list<SeriesInformation> SeriesInformationList;
 
-    /** This struct contain all possible informations about the TextFile (all other then PIC-Files). */
-    struct TextInformation
+    /** Information about a document in a series. Very roughly corresponds to DICOM PS 3.3-2008 Annex C.24 */
+    class DocumentInformation
     {
-      std::string OID;
-      std::string MimeType;
-      std::string ChiliText;
-      std::string Status;
-      std::string FrameOfReferenceUID;
-      std::string TextDate;
-      std::string Description;
+      public:
+        std::string SeriesInstanceUID;  // tag 0020,000E
+        unsigned int InstanceNumber;    // tag 0020,0013
+        std::string MimeType;           // tag 0042,0012
+        std::string ContentDate;        // tag 0008,0023
+        std::string DocumentTitle;      // tag 0042,0010
+
+        DocumentInformation()
+        :InstanceNumber( (unsigned int)-1 )
+        {
+        }
     };
 
     /** There can be lots of texts to one series, so we need a list. */
-    typedef std::list<TextInformation> TextInformationList;
+    typedef std::list<DocumentInformation> DocumentInformationList; 
 
-    /** The "parentchild.xml"-file is used to fill this struct. */
-    struct ParentChildRelationInformation
-    {
-      std::string Label;  //automatically generated string (distinct)
-      std::string ID;  //the file/node - name (ambiguous)
-      std::string OID;  //the seriesOID
-      std::list<std::string> ParentLabel;
-      std::list<std::string> ChildLabel;
-      bool Image;
-    };
-
-    typedef std::list<ParentChildRelationInformation> ParentChildRelationInformationList;
+    mitkClassMacro( PACSPlugin,itk::Object );
 
     /*!
-    \brief Return a mitk::PACSPlugin-Instance as singleton.
-    @param destroyInstance   Needed because of double inheritance of mitk::ChiliPlugin, both want to destroy the instance.
-    @returns The singleton PACSPlugin* - Instance.
-    */
-    static PACSPlugin* GetInstance( bool destroyInstance = false );
+     * \brief Return a singleton mitk::PACSPlugin-Instance
+     *
+     * \param destroyInstance Tell the specific implementation it should free/delete itself. 
+     * \warning Application should not use the instance after calling GetInstance(true);
+     * \TODO check deletion mechanism, should be done by the application, which knows about CHILI (because there is a QcMITK...
+     */
+    static PACSPlugin* GetInstance( bool destroyInstance = false ); 
 
     /*!
-    \brief Return the ConferenceID.
-    @returns m_QmitkChiliPluginConferenceID
-    */
-    virtual int GetConferenceID();
-
-    /*!
-    \brief This function return the Plugin-Capabilities like canSave, canWrite or isPlugin.
-    @returns Return the current CHILI-Plugin-Capabilities.
-    */
+     * \brief Information about capabilities of the current implementation.
+     */
     virtual PACSPluginCapability GetPluginCapabilities();
 
     /*!
-    \brief Return all parent-child-saved-volumes to a series.
-    @param seriesOID   This parameter have to be set. All volume-entries to this seriesOID get searched.
-    @returns All parent-child-saved-volumes with the overgiven seriesOID.
-    Return an empty list if no entrie found.
-    IMPORTANT: This function dont set the attributes "childLabel" and "parentLabel".
-    */
-    virtual ParentChildRelationInformationList GetSeriesRelationInformation( const std::string& seriesOID );
+     * \brief Get a list of all known patients
+     */
+    virtual PatientInformationList GetPatientInformationList();
 
     /*!
-    \brief Return all parent-child-saved-volumen to a study.
-    @param studyOID   The XML-File of the study get loaded and all volume-entries returned. If no OID set, the current selected study get used.
-    @returns All parent-child-saved-volumes.
-    Return an empty list if no entrie found.
-    */
-    virtual ParentChildRelationInformationList GetStudyRelationInformation( const std::string& studyOID = "" );
+     * \brief Get a list of all studies for a patient 
+     */
+    virtual StudyInformationList GetStudyInformationList( const PatientInformation& patient );
+ 
+    /*!
+     * \brief Get a list of all series for a study instance UID
+     */
+    virtual SeriesInformationList GetSeriesInformationList( const std::string& studyInstanceUID = "" );
 
     /*!
-    \brief Return the studyinformation to a series.
-    @param seriesOID   If no OID set, the current selected study get used.
-    @returns The current or specific studyinformation.
-    Return StudyInformation.OID == "" if no entry found.
-    */
-    virtual StudyInformation GetStudyInformation( const std::string& seriesOID = "" );
+     * \brief Get a list of all non-image documents for a series instance UID
+     */
+    virtual DocumentInformationList GetDocumentInformationList( const std::string& seriesInstanceUID = "" );
 
     /*!
-    \brief Return the patientinformation to a series.
-    @param seriesOID   If no OID set, the current selected series get used.
-    @returns The current or specific patientinformation.
-    Return PatientInformation.OID == "" if no entry found.
-    */
-    virtual PatientInformation GetPatientInformation( const std::string& seriesOID = "" );
+     * \brief Patient information for a given series instance UID
+     */
+    virtual PatientInformation GetPatientInformation( const std::string& seriesInstanceUID = "" );
 
     /*!
-    \brief Return the seriesinformation to a series.
-    @param seriesOID   If no OID set, the current selected series get used.
-    @returns The current or specific seriesinformation.
-    Return SeriesInformation.OID == "" if no entry found.
-    */
-    virtual SeriesInformation GetSeriesInformation( const std::string& seriesOID = "" );
+     * \brief Study information for a given series instance UID
+     */
+    virtual StudyInformation GetStudyInformation( const std::string& seriesInstanceUID = "" );
 
     /*!
-    \brief Return a list of all seriesinformation to a study.
-    @param studyOID   If no OID set, the current selected study get used.
-    @returns The current or specific seriesinformationlist.
-    Return an empty list if no entry found.
-    */
-    virtual SeriesInformationList GetSeriesInformationList( const std::string& studyOID = "" );
+     * \brief Series information for a given series instance UID
+     */
+    virtual SeriesInformation GetSeriesInformation( const std::string& seriesInstanceUID = "" );
 
     /*!
-    \brief Return the textinformation to the overgiven textOID.
-    @param textOID   This parameter have to be set.
-    @returns The textinformation.
-    Return TextInformation.OID == "" if no entry found.
-    */
-    virtual TextInformation GetTextInformation( const std::string& textOID );
+     * \brief Document information for a given series instance UID and a document instance number
+     */
+    virtual DocumentInformation GetDocumentInformation( const std::string& seriesInstanceUID, 
+                                                        unsigned int instanceNumber );
 
     /*!
-    \brief Return a list of all textinformation to a series.
-    @param seriesOID   Set the seriesOID to get the textList.
-    @returns A list of textinformation from one series.
-    If no texts could found, this function returns an empty list.
-    The parameter have to be set.
-    This function dont return the text which used to save and load the parent-child-relationship.
-    */
-    virtual TextInformationList GetTextInformationList( const std::string& seriesOID );
-
-    /*!
-    \brief Return the number of current shown lightboxes.
-    @returns The visible lightboxcount.
+     * \brief Number of image preview boxes (lightboxes)
+     *
+     * If the specific PACS implementation supports a kind of lightbox concept
+     * (a preview of all images from a selected series), then this function should
+     * return how many of such lightboxes there are.
     */
     virtual unsigned int GetLightboxCount();
 
     /*!
-    \brief Return the first empty Lightbox.
-    @returns An empty lightbox.
-    There are only four available lightboxes in chili, if all of them not empty the function return NULL and show a message.
+     * \brief Return the index of the active image preview box (lightbox)
+     *
+     * If the specific PACS implementation supports a kind of lightbox concept
+     * (a preview of all images from a selected series), then this function should
+     * return the index of the currently active lightbox (starting from 0).
+     *
+     * If no active lightbox exists (perhaps due to lack of such a concept), it
+     * is the calling object's duty to check if the returned index is larger than
+     * the number of existing lightboxes reported by GetLightboxCount().
     */
-    virtual QcLightbox* GetNewLightbox();
+    virtual unsigned int GetActiveLightbox();
 
     /*!
-    \brief Return the current selected Lightbox.
-    @returns The current lightbox.
-    If there is no current lightbox the function return NULL and show a message.
-    */
-    virtual QcLightbox* GetCurrentLightbox();
-
-    /*!
-    \brief Chili save all images as 2D images. While loading, they have to combined to volumes. Therefor actually three different readers available. The first one use the image number and the spacing between two slices.The second one use the most common spacing. The third one use the slice location and all possible spacing-combinations between the slices. Use this function to set the readers.
-    @param readerType   Actually 0 used for the ImageNumberFilter, 1 for the SingleSpacingFilter and 2 used for SpacingSetFilter.
-    If no parameter set, the ImageNumberFilter get used.
-    */
+     * Set type of "sorter" that stacks 2D images into 3D or 3D+t volumes
+     * \param readerType   0 used for the ImageNumberFilter, 1 for the SingleSpacingFilter and 2 used for SpacingSetFilter.
+     * \TODO this should take enum values
+     */
     virtual void SetReaderType( unsigned int readerType = 0 );
 
-    virtual void SendAbortFilterEvent();
+    virtual void AbortPACSImport(); 
 
     /*!
-    \brief This function load a single parent-child-volume.
-    @param seriesOID   This parameter specify the parent-child-volume.
-    @param label   This parameter specify the parent-child-volume.
-    @returns The searched volume as DataTreeNode.
-    Return NULL if no entry found.
-    */
-    virtual DataTreeNode::Pointer LoadParentChildElement( const std::string& seriesOID, const std::string& label );
+     *
+     * \brief Load all images from the given lightbox.
+     * \TODO rename to LoadLightboxContent and load all images and texts, ignoring the lightbox!! make it use LoadSeriesContent for all series UIDs found in lightbox
+     */
+    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( unsigned int lightboxIndex = 0 );
 
     /*!
-    \brief Load all images from the given lightbox.
-    @param inputLightbox   The lightbox to read. If no lightbox set, the current lightbox get used.
-    @returns Multiple mitk::DataTreeNodes as vector.
-    If no parameter set, the current selected Lightbox get used. Chili dont support text-access via lightbox. If you want to load them, use LoadAllTextsFromSeries(...). The slices get combined with the internal set ReaderType.
-    */
-    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );
+     * \brief Load all objects from a given series instance UID
+     * \TODO rename to LoadSeriesContent, make this take a list of UIDs
+     */
+    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesInstanceUID ); 
 
     /*!
-    \brief Load all Image- and Text-Files to a series.
-    @param seriesOID   Set the series to load from.
-    @returns Multiple mitk::DataTreeNodes as vector.
-    The seriesOID have to be set. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...).
-    */
-    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesOID );
+     * \brief Load all image objects from a given series instance UID
+     * \TODO rename to LoadSeriesImageContent, make this take a list of UIDs
+     */
+    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
 
     /*!
-    \brief Load all Images to a series.
-    @param seriesOID   Set the series to load from.
-    @returns Multiple mitk::DataTreeNodes as vector.
-    The parameter have to be set. This function load all files via FileDownload from chili. Chili save the files in the same file-format, like they saved on the server. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats should save, they get load from harddisk with the DataTreeNodeFactory.
-    */
-    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesOID );
+     * \brief Load all objects from a given series instance UID
+     * \TODO rename to LoadSeriesDocumentContent, make this take a list of UIDs
+     */
+    virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
 
     /*!
-    \brief Load all Text-entries to a series.
-    @param seriesOID   Set the series to load from.
-    @returns Multiple mitk::DataTreeNodes as vector.
-    Important: Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ).
-    The seriesOID have to be set.
-    */
-    virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesOID );
+     * \brief Load a given document object for a series instance UID and a document instance number
+     * \TODO rename to LoadDocument make it take a list of parameters
+     */
+    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber ); 
 
     /*!
-    \brief Load one Text-files.
-    @param textOID   Set the single text.
-    @returns one mitk::DataTreeNode
-    To load a single text-file, you need more than the textOID, this function search for the missing attributes with qTextQuery(...) and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ).
-    The textOID have to be set.
-    */
-    virtual DataTreeNode::Pointer LoadSingleText( const std::string& textOID );
+     * \brief Save given data as a new series
+     * \param studyInstanceUID save into this study
+     * \param seriesNumber a number identifying the new series
+     * \param seriesDescription a string description for the new series
+     */
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
+                                  const std::string& studyInstanceUID, 
+                                  int seriesNumber, 
+                                  const std::string& seriesDescription );
 
     /*!
-    \brief Load one Text-files.
-    @param seriesOID   Set the series to load from.
-    @param textOID   Set the single text.
-    @param textPath   The chili-database-path from the file which should read.
-    @returns one mitk::DataTreeNode
-    This function load from database. The file get saved to harddisk and readed via factory. The file get deleted if it could read.
-    All parameter have to be set.
-    */
-    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath );
-
-    /*!
-    \brief The result of all Load-Functions are DataTreeNodes. If you want to add them to the DataStorage with relations, use this function.
-    @param inputNodes   The DataTreeNodes to save.
-    */
-    virtual void SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> inputNodes );
-
-    /*!
-    \brief Save Images- and Texts-Files with User-Dialog to Chili via Fileupload.
-    @param inputNodes   The nodes to save.
-    This function provides a dialog where the user can select if he want to create a new series, save to series, override, ...
-    The nodes have to be set.
-    */
-    virtual void SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes );
-
-    /*!
-    \brief Save Images- and Texts-Files without User-Dialog as new series to Chili.
-    @param inputNodes   The nodes to save.
-    @param studyOID   The aim-study where the new series should created.
-    @param seriesNumber   The seriesNumber for the new series.
-    @param seriesDescription   The seriesDescription for the new series.
-    This function create a new series and save all nodes. No dialog is used.
-    */
-    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& studyOID, int seriesNumber, const std::string& seriesDescription );
-
-    /*!
-    \brief Save Images- and Texts-Files without User-Dialog to a series.
-    @param inputNodes   The nodes to save.
-    @param StudyOID   The aim-study where the nodes should saved.
-    @param SeriesOID   The aim-series where the nodes should saved.
-    @param overrideExistingSeries   Its possible that the nodes to save always exist. Set true if you want to override existing data.
-    Only data which are saved by MBI can be override.
-    */
-    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesOID, bool overrideExistingSeries );
-
-    mitkClassMacro( PACSPlugin,itk::Object );
-    itkNewMacro( PACSPlugin );
-    virtual ~PACSPlugin();
+     * \brief Save given data into an existing series
+     * \param seriesInstanceUID save into this series
+     * \param seriesNumber a number identifying the new series
+     * \param seriesDescription a string description for the new series
+     */
+    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
+                               const std::string& seriesInstanceUID, 
+                               bool overwriteExistingSeries );
 
   protected:
-
+    
+    // All this is hidden, should be instantiated through the GetInstance() method.
+    itkNewMacro( PACSPlugin );
     PACSPlugin();
+    virtual ~PACSPlugin();
+
+    int m_ReaderType;
 };
 
-}
+} // end namespace
 
 #endif
+

@@ -133,8 +133,10 @@ class QmitkInteractiveSegmentation : public QmitkFunctionality
     void ReinitializeToImage();
     void CreateNewSegmentation();
     void LoadSegmentation();
+    void LoadSegmentationPACS();
     void DeleteSegmentation();
     void SaveSegmentation();
+    void SaveSegmentationPACS();
     void SetReferenceImagePixelSmoothing(bool on);
 
     void OnToolSelected(int id);

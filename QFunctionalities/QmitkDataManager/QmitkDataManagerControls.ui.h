@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 *****************************************************************************/
 
 #include <QmitkCommonFunctionality.h>
+#include "QmitkPACSSaveDialog.h"
 #include <utility>
 
 #include <mitkFocusManager.h>
@@ -33,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkAffineInteractor.h>
 #include <QmitkSystemInfo.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkPACSPlugin.h>
 
 #include <mitkBaseRenderer.h>
 #include <vtkRenderWindow.h>
@@ -166,6 +168,46 @@ void QmitkDataManagerControls::SaveButton_clicked()
   }
 }
 
+void QmitkDataManagerControls::SaveToPACSButton_clicked()
+{
+  QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
+  if (selected != NULL)
+  {
+    std::string selectedItemsName = std::string(selected->text(0).ascii());
+
+    mitk::DataTreeIteratorBase* selectedIterator = selected->GetDataTreeIterator();
+    if (selectedIterator != NULL)
+    {
+      mitk::DataTreeNode* node = selectedIterator->Get();
+      if (node != NULL )
+      {
+        std::vector<mitk::DataTreeNode*> nodesToSave;
+        nodesToSave.clear();
+        nodesToSave.push_back( node );
+
+        QmitkPACSSaveDialog dialog(this);
+        dialog.SetDataTreeNodesToSave( nodesToSave );
+        dialog.setAllowSeveralObjectsIntoOneSeries(true); // just cannot select more than one object here :-(
+        dialog.exec();
+
+        if ( dialog.result() == QDialog::Accepted )
+        {
+          std::cout << "PACS export dialog reported success." << std::endl;
+        }
+        else
+        {
+          std::cout << "PACS export dialog cancelled by user." << std::endl;
+        }
+      }
+    }
+    else
+    {
+      std::cout << "logical error" << std::endl;
+    }
+  }
+}
+
+
 void QmitkDataManagerControls::ReInitButton_clicked()
 {
   QmitkDataTreeViewItem *selected = dynamic_cast<QmitkDataTreeViewItem*>(m_DataTreeView->selectedItem());
@@ -198,6 +240,7 @@ void QmitkDataManagerControls::TreeSelectionChanged( QListViewItem * item )
   } 
   bool buttonState = ! (dtvi == NULL || dtvi->GetDataTreeNode() == m_DataTreeIterator->Get());
   m_SaveButton->setEnabled(buttonState);
+  m_SaveToPACS->setEnabled(buttonState);
   m_RemoveButton->setEnabled(buttonState);    
 }
 
@@ -459,4 +502,15 @@ void QmitkDataManagerControls::init()
 #ifndef MBI_INTERNAL
   m_AffineInteraction->hide();
 #endif
+    
+  mitk::PACSPlugin::PACSPluginCapability pacsCapabilities = mitk::PACSPlugin::GetInstance()->GetPluginCapabilities();
+  if ( pacsCapabilities.IsPACSFunctional && pacsCapabilities.HasSaveCapability )
+  {
+    m_SaveToPACS->show();
+  }
+  else
+  {
+    m_SaveToPACS->hide();
+  }
 }
+

@@ -8,7 +8,6 @@ SET(CPP_FILES
   mitkCHILIInformation.cpp
   mitkLoadFromCHILI.cpp
   mitkSaveToCHILI.cpp
-  mitkParentChild.cpp
   # interfaces
   mitkImageToPicDescriptor.cpp
   mitkPicDescriptorToNode.cpp

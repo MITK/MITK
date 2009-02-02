@@ -17,12 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPACSPlugin.h"
 
-/** Return a singleton from the current ChiliPlugin. */
 mitk::PACSPlugin* mitk::PACSPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::PACSPlugin::Pointer s_Instance = mitk::PACSPlugin::New();
 
-  if( destroyInstance )  // needed because of double inheritance of mitk::ChiliPlugin
+  if( destroyInstance )
   {
     s_Instance = NULL;
   }
@@ -30,186 +29,166 @@ mitk::PACSPlugin* mitk::PACSPlugin::GetInstance(bool destroyInstance)
   return s_Instance;
 }
 
-/** DefaultImplementation */
+
 mitk::PACSPlugin::PACSPlugin()
+: m_ReaderType(0)
 {
 }
 
-/** DefaultImplementation */
+
 mitk::PACSPlugin::~PACSPlugin()
 {
 }
 
-/** DefaultImplementation */
-int mitk::PACSPlugin::GetConferenceID()
-{
-  return 0;
-}
 
-/** DefaultImplementation */
 mitk::PACSPlugin::PACSPluginCapability mitk::PACSPlugin::GetPluginCapabilities()
 {
   PACSPluginCapability result;
-  result.isPlugin = false;
-  result.canLoad = false;
-  result.canSave = false;
+  result.IsPACSFunctional = false;
+  result.HasLoadCapability = false;
+  result.HasSaveCapability = false;
   return result;
 }
 
-/** DefaultImplementation */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::PACSPlugin::GetSeriesRelationInformation( const std::string& )
+
+mitk::PACSPlugin::PatientInformationList mitk::PACSPlugin::GetPatientInformationList()
 {
-  ParentChildRelationInformationList emptyResult;
+  PatientInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }
 
-/** DefaultImplementation */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::PACSPlugin::GetStudyRelationInformation( const std::string& )
+
+mitk::PACSPlugin::StudyInformationList mitk::PACSPlugin::GetStudyInformationList( const PatientInformation& /* patient */ )
 {
-  ParentChildRelationInformationList emptyResult;
+  StudyInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }
 
-/** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadParentChildElement( const std::string&, const std::string& )
-{
-  return NULL;
-}
 
-/** DefaultImplementation */
-mitk::PACSPlugin::StudyInformation mitk::PACSPlugin::GetStudyInformation( const std::string& )
-{
-  StudyInformation emptyResult;
-  return emptyResult;
-}
-
-/** DefaultImplementation */
-mitk::PACSPlugin::PatientInformation mitk::PACSPlugin::GetPatientInformation( const std::string& )
-{
-  PatientInformation emptyResult;
-  return emptyResult;
-}
-
-/** DefaultImplementation */
-mitk::PACSPlugin::SeriesInformation mitk::PACSPlugin::GetSeriesInformation( const std::string& )
-{
-  SeriesInformation emptyResult;
-  return emptyResult;
-}
-
-/** DefaultImplementation */
-mitk::PACSPlugin::SeriesInformationList mitk::PACSPlugin::GetSeriesInformationList( const std::string& )
+mitk::PACSPlugin::SeriesInformationList mitk::PACSPlugin::GetSeriesInformationList( const std::string& /*studyInstanceUID*/ )
 {
   SeriesInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }
 
-/** DefaultImplementation */
-mitk::PACSPlugin::TextInformation mitk::PACSPlugin::GetTextInformation( const std::string& )
-{
-  TextInformation emptyResult;
-  return emptyResult;
-}
 
-/** DefaultImplementation */
-mitk::PACSPlugin::TextInformationList mitk::PACSPlugin::GetTextInformationList( const std::string& )
+mitk::PACSPlugin::DocumentInformationList mitk::PACSPlugin::GetDocumentInformationList( const std::string& /*seriesInstanceUID*/ )
 {
-  TextInformationList emptyResult;
+  DocumentInformationList emptyResult;
   emptyResult.clear();
   return emptyResult;
 }
 
-/** DefaultImplementation */
+
+mitk::PACSPlugin::PatientInformation mitk::PACSPlugin::GetPatientInformation( const std::string& )
+{
+  PatientInformation emptyResult;
+  emptyResult.PatientsSex = "O";
+  emptyResult.PatientComments = "No PACS connectivity implemented or configured. Cannot query patient";
+  return emptyResult;
+}
+
+
+mitk::PACSPlugin::StudyInformation mitk::PACSPlugin::GetStudyInformation( const std::string& )
+{
+  StudyInformation emptyResult;
+  emptyResult.StudyDescription  = "No PACS connectivity implemented or configured. Cannot query study";
+  return emptyResult;
+}
+
+
+mitk::PACSPlugin::SeriesInformation mitk::PACSPlugin::GetSeriesInformation( const std::string& )
+{
+  SeriesInformation emptyResult;
+  emptyResult.SeriesDescription = "No PACS connectivity implemented or configured. Cannot query series.";
+  return emptyResult;
+}
+
+
+mitk::PACSPlugin::DocumentInformation mitk::PACSPlugin::GetDocumentInformation( const std::string& seriesInstanceUID, 
+                                                                                unsigned int instanceNumber )
+{
+  DocumentInformation emptyResult;
+  return emptyResult;
+}
+
+
 unsigned int mitk::PACSPlugin::GetLightboxCount()
 {
   return 0;
 }
 
-/** DefaultImplementation */
-QcLightbox* mitk::PACSPlugin::GetNewLightbox()
+
+unsigned int mitk::PACSPlugin::GetActiveLightbox()
 {
-  return NULL;
+  return (unsigned int)-1; // user should check GetLightboxCount() first, unsensible values might tell him that his request is not sensible
 }
 
-/** DefaultImplementation */
-QcLightbox* mitk::PACSPlugin::GetCurrentLightbox()
+
+void mitk::PACSPlugin::SetReaderType( unsigned int readerType )
 {
-  return NULL;
+  m_ReaderType = readerType;
 }
 
-/** DefaultImplementation */
-void mitk::PACSPlugin::SetReaderType( unsigned int )
-{
-}
 
-/** DefaultImplementation */
-void mitk::PACSPlugin::SendAbortFilterEvent()
+void mitk::PACSPlugin::AbortPACSImport()
 {
 }
 
-/** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( QcLightbox* )
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( unsigned int lightboxIndex )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
-/** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadFromSeries( const std::string& )
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadFromSeries( const std::string& seriesInstanceUID )
+{
+  std::vector<DataTreeNode::Pointer> resultVector = this->LoadImagesFromSeries( seriesInstanceUID );
+  std::vector<DataTreeNode::Pointer> secondResultVector = this->LoadTextsFromSeries( seriesInstanceUID );
+  resultVector.insert( resultVector.end(), secondResultVector.begin(), secondResultVector.end() );
+  return resultVector;
+}
+
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( const std::string& /* seriesInstanceUID */ )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
-/** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( const std::string& )
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string&  /* seriesInstanceUID */ )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
-/** DefaultImplementation */
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string& )
-{
-  std::vector<DataTreeNode::Pointer> emptyVector;
-  emptyVector.clear();
-  return emptyVector;
-}
 
-/** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& )
+mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& /* seriesInstanceUID */ , unsigned int /* instanceNumber */ )
 {
   return NULL;
 }
 
-/** DefaultImplementation */
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& , const std::string& , const std::string& )
-{
-  return NULL;
-}
 
-/** DefaultImplementation */
-void mitk::PACSPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> )
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */, 
+                                        const std::string& /* studyInstanceUID */, 
+                                        int /* seriesNumber */, 
+                                        const std::string& /*seriesDescription */)
 {
 }
 
-/** DefaultImplementation */
-void mitk::PACSPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer )
+
+void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */, 
+                                     const std::string& /* seriesInstanceUID */,
+                                     bool /* overwriteExistingSeries */)
 {
 }
 
-/** DefaultImplementation */
-void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer, const std::string& , int , const std::string& )
-{
-}
-
-/** DefaultImplementation */
-void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer, const std::string& , bool )
-{
-}

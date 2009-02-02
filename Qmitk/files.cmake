@@ -16,7 +16,6 @@ SET(CPP_FILES
   QmitkBaseComponent.cpp
   QmitkBaseFunctionalityComponent.cpp
   QmitkCallbackFromGUIThread.cpp
-  QmitkChiliPluginSaveDialog.cpp
   QmitkColorTransferFunctionCanvas.cpp
   QmitkCopyToClipBoardDialog.cpp
   QmitkDataTreeViewItem.cpp  
@@ -44,6 +43,9 @@ SET(CPP_FILES
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMessageBoxHelper.cpp
   QmitkNewSegmentationDialog.cpp
+  QmitkPACSContentList.cpp
+  QmitkPACSLoadDialog.cpp
+  QmitkPACSSaveDialog.cpp
   QmitkPiecewiseFunctionCanvas.cpp
   QmitkPluginListViewItem.cpp
   QmitkProgressBar.cpp
@@ -142,7 +144,6 @@ SET(MOC_H_FILES
   QmitkBaseComponent.h
   QmitkBaseFunctionalityComponent.h
   QmitkCallbackFromGUIThread.h
-  QmitkChiliPluginSaveDialog.h
   QmitkColorTransferFunctionCanvas.h
   QmitkCopyToClipBoardDialog.h
   QmitkDialogBar.h
@@ -169,6 +170,9 @@ SET(MOC_H_FILES
   QmitkLineEditLevelWindowWidget.h
   QmitkMessageBoxHelper.h
   QmitkNewSegmentationDialog.h
+  QmitkPACSContentList.h
+  QmitkPACSLoadDialog.h
+  QmitkPACSSaveDialog.h
   QmitkPiecewiseFunctionCanvas.h
   QmitkProgressBar.h
   QmitkPropertyListPopup.h

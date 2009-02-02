@@ -35,7 +35,7 @@ class ParentChild: public itk::Object
 {
   public:
 
-    void InitParentChild( QcPlugin* instance, const std::string& studyOID, const std::string& instanceUID, const std::string& patientOID, const std::string& tmpDirectory );
+    void InitParentChild( QcPlugin* instance, const std::string& studyInstanceUID, const std::string& patientID, const std::string& tmpDirectory );
 
     void AddEntry( DataTreeNode::Pointer node, std::list< std::string > CurrentImageInstanceUIDs, const std::string& seriesOID );
 
@@ -43,7 +43,7 @@ class ParentChild: public itk::Object
 
     std::string GetLabel( std::list<std::string> ImageInstanceUIDs );
 
-    std::list<std::string> GetSlices( const std::string& label, const std::string& seriesOID );
+    std::list<std::string> GetSlices( const std::string& label, const std::string& seriesInstanceUID );
 
     PACSPlugin::ParentChildRelationInformationList GetSeriesRelationInformation( QcPlugin* instance, const std::string& seriesOID, const std::string& tmpDirectory );
 
@@ -57,9 +57,8 @@ class ParentChild: public itk::Object
 
     struct RelationCapabilityStruct
     {
-      std::string xmlStudyOID;
       std::string xmlStudyInstanceUID;
-      std::string xmlPatientOID;
+      std::string xmlPatientID;
       std::string xmlSeriesOID;
       std::string xmlTextOID;
       TiXmlDocument* xmlDocument;

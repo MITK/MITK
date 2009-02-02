@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>427</width>
+            <width>417</width>
             <height>999</height>
         </rect>
     </property>
@@ -60,7 +60,7 @@
                     </property>
                     <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>layout20</cstring>
+                            <cstring>layout5</cstring>
                         </property>
                         <hbox>
                             <property name="name">
@@ -105,6 +105,31 @@
                                 </property>
                                 <property name="text">
                                     <string>&amp;Save</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+S</string>
+                                </property>
+                                <property name="toolTip" stdset="0">
+                                    <string>Save selected node.</string>
+                                </property>
+                                <property name="whatsThis" stdset="0">
+                                    <string>Save selected node.</string>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>m_SaveToPACS</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Save to PACS</string>
                                 </property>
                                 <property name="accel">
                                     <string>Alt+S</string>
@@ -443,6 +468,12 @@
         <slot>SaveButton_clicked()</slot>
     </connection>
     <connection>
+        <sender>m_SaveToPACS</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkDataManagerControls</receiver>
+        <slot>SaveToPACSButton_clicked()</slot>
+    </connection>
+    <connection>
         <sender>m_ReInitButton</sender>
         <signal>clicked()</signal>
         <receiver>QmitkDataManagerControls</receiver>
@@ -533,6 +564,7 @@
     <slot>SetDataTreeIterator( mitk::DataTreeIteratorBase * it )</slot>
     <slot>RemoveButtonClicked()</slot>
     <slot>SaveButton_clicked()</slot>
+    <slot>SaveToPACSButton_clicked()</slot>
     <slot>ReInitButton_clicked()</slot>
     <slot access="protected">TreeSelectionChanged( QListViewItem * item )</slot>
     <slot>RenderWindowSelected( int id )</slot>

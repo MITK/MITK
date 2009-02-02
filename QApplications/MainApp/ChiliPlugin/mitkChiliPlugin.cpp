@@ -15,27 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define NUMBER_OF_THINKABLE_LIGHTBOXES 4
+
 #include "mitkChiliPlugin.h"
 
 //CHILI
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 #include <chili/qclightboxmanager.h>  //get newLightbox, currentLightbox
+
 //MITK-Plugin
-#include "mitkChiliPluginEvents.h"
+#include "mitkPACSPluginEvents.h"
 #include "mitkChiliPluginFactory.h"
+
 //teleconference
-#include <mitkConferenceToken.h>
-#include <mitkConferenceEventMapper.h>
-#include <QmitkChili3ConferenceKitFactory.h>
-//MITK
-#include <QmitkStdMultiWidget.h>
-#include <QmitkEventCollector.h>
-#include <QcMITKTask.h>
-#include <SampleApp.h>
-#include <mitkProgressBar.h>
-#include <mitkRenderingManager.h>
-#include <mitkIpPicUnmangle.h>
-//QT
+#include "mitkConferenceToken.h"
+#include "mitkConferenceEventMapper.h"
+#include "QmitkChili3ConferenceKitFactory.h"
+
+// Qmitk
+#include "QmitkStdMultiWidget.h"
+#include "QmitkEventCollector.h"
+#include "QcMITKTask.h"
+
+// MITK
+#include "SampleApp.h"
+#include "mitkProgressBar.h"
+#include "mitkRenderingManager.h"
+#include "mitkIpPicUnmangle.h"
+
+// Qt
 #include <qlayout.h>
 #include <qapplication.h>
 #include <qeventloop.h>
@@ -48,14 +56,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qprogressbar.h>
 #include <qsplitter.h>
 #include <qpopupmenu.h>
-//XPM
-#include <mitk_chili_plugin.xpm>
+
+//XPM images
+#include "mitk_chili_plugin.xpm"
 #include "chili_lightbox_import.xpm"
 #include "chili_restart_mitk.xpm"
 
 QWidget* mitk::ChiliPlugin::s_Parent = NULL;
 /** Create event-logging object (ConferenceKit). */
 Chili3ConferenceKitFactory chiliconferencekitfactory;
+
 
 /** Entry point for Chili. */
 extern "C"
@@ -70,34 +80,44 @@ QcEXPORT QObject* create( QWidget *parent )
   return mitk::ChiliPlugin::GetQcPluginInstance();
 }
 
+
 /** Constructor with hidden parameter s_Parent. */
 mitk::ChiliPlugin::ChiliPlugin()
 : QcPlugin( s_Parent ),
-  app( NULL ),
+  m_ChiliInformation( CHILIInformation::New() ),
+  m_LoadFromCHILI( LoadFromCHILI::New() ),
+  m_SaveToCHILI( SaveToCHILI::New() ),
+  m_MITKMainApp( NULL ),
   m_LightBoxCount( 0 ),
   m_InImporting (false)
 {
-  task = new QcMITKTask( xpm(), s_Parent, name() );
+  // contains the visible worktask button
+  m_Task = new QcMITKTask( xpm(), s_Parent, name() );
 
+  // somehow needed for the conference part
   EventCollector* logger = new EventCollector();
   qApp->installEventFilter(logger);
 
   m_tempDirectory = GetTempDirectory();
 
-  if( m_tempDirectory == "" )
-    QMessageBox::information( 0, "MITK", "MITK was not able to create a temporary directory.\nYou can only load data from CHILI using the yellow light box import buttons." );
+  if( m_tempDirectory.empty() )
+  {
+    QMessageBox::information( 0, 
+                              "MITK", 
+                              "MITK was not able to create a temporary directory.\n"
+                              "You can only load data from CHILI using the yellow light box import buttons." );
+  }
   else
+  {
     std::cout << "CHILIPlugin: Create and use directory "<< m_tempDirectory << std::endl;
-
-  m_ChiliInformation = CHILIInformation::New();
-  m_LoadFromCHILI = LoadFromCHILI::New();
-  m_SaveToCHILI = SaveToCHILI::New();
+  }
 }
+
 
 /** Destructor */
 mitk::ChiliPlugin::~ChiliPlugin()
 {
-  if( m_tempDirectory != "" )
+  if( !m_tempDirectory.empty() )
   {
     std::string removeDirectory = "";
 
@@ -112,35 +132,68 @@ mitk::ChiliPlugin::~ChiliPlugin()
     system( removeDirectory.c_str() );
   }
 
-  task->deleteLater();
+  //m_Task->deleteLater();
 
   // tricky tricky...
   m_ReferenceCountLock.Lock();
   ++m_ReferenceCount; // increase count, so the following notice to mitk::ChiliPlugin won't trigger another delete on "this"
   m_ReferenceCountLock.Unlock();
 
+  // remove ITK smart pointer references to "this" object (without actually deleting ourselves)
   PACSPlugin::GetInstance(true); // set internal s_Instance = NULL, so ITK won't have another SmartPointer to us (hopefully nobody else has)
+
+/*  desparate tries to fix DataStorage related crash on exit
+  // play deaf (concentrate on killing this, don't react to messages)
+  for ( std::vector<QObject*>::iterator iter = m_ObjectsConnectedTo.begin();
+        iter != m_ObjectsConnectedTo.end();
+        ++iter )
+  {
+    disconnect( *iter, 0, this, 0 );
+  }
+
+  QcLightboxManager* manager = lightboxManager();
+  QPtrList<QcLightbox>& lightboxes = manager->getLightboxes();
+  QcLightbox* current;
+  unsigned int activeLightboxIndex = 0;
+  for ( current = lightboxes.first(); current; current = lightboxes.next(), ++activeLightboxIndex )
+  {
+    disconnect( current, 0, this, 0 );
+  }
+ 
+  // try to delete MainApp (and erase it from CHILI's knowledge)
+  qApp->removePostedEvents(m_MITKMainApp);
+  m_MITKMainApp->parent()->removeChild( m_MITKMainApp );
+  m_MITKMainApp->reparent(NULL, 0, QPoint(0,0));
+  delete m_MITKMainApp;
+  
+  // delete DataStorage singleton
+  mitk::DataStorage::GetInstance()->ShutdownSingleton();
+*/
 
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0; // set count to 0, so itk::LightObject won't trigger another delete...
   m_ReferenceCountLock.Unlock();
 }
 
+
 QString mitk::ChiliPlugin::name()
 {
   return QString( "MITK" );
 }
+
 
 const char** mitk::ChiliPlugin::xpm()
 {
   return (const char **)mitk_chili_plugin_xpm;
 }
 
+
 /** Set the qtparent, needed for QObject* create(). */
 void mitk::ChiliPlugin::SetQtParent( QWidget* parent )
 {
   s_Parent = parent;
 }
+
 
 /** Create a new SampleApp. */
 void mitk::ChiliPlugin::CreateSampleApp()
@@ -149,13 +202,13 @@ void mitk::ChiliPlugin::CreateSampleApp()
   if( !done ) // this is done here, beause if it's done in the constructor, then many button labels get wrong... (qt names as labels)
   {
     // toplevel layout
-    horzlayout = new QHBoxLayout( task ); // member
-    QVBoxLayout* vertlayout = new QVBoxLayout( horzlayout );
+    m_ImportButtonLayout = new QHBoxLayout( m_Task ); // member
+    QVBoxLayout* vertlayout = new QVBoxLayout( m_ImportButtonLayout );
 
     // 4 lightbox import buttons
     for (unsigned int row = 0; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row)
     {
-      QIDToolButton* toolbutton = new QIDToolButton( row, task );
+      QIDToolButton* toolbutton = new QIDToolButton( row, m_Task );
       toolbutton->setUsesTextLabel( true );
       QToolTip::add( toolbutton, "Import this lightbox to MITK");
       toolbutton->setTextPosition( QToolButton::BelowIcon );
@@ -166,6 +219,7 @@ void mitk::ChiliPlugin::CreateSampleApp()
       toolbutton->setSizePolicy( policy );
 
       connect( toolbutton, SIGNAL(clicked(int)), this, SLOT(lightBoxImportButtonClicked(int)));
+      m_ObjectsConnectedTo.push_back( toolbutton );
 
       m_LightBoxImportButtons.push_back( toolbutton ); // we need to know these for import of lightboxes
       vertlayout->addWidget( toolbutton );
@@ -180,9 +234,8 @@ void mitk::ChiliPlugin::CreateSampleApp()
       }
     }
 
-
     // menu for plugin options
-    m_PopupMenu = new QPopupMenu(task);
+    m_PopupMenu = new QPopupMenu(m_Task);
     m_PopupMenu->setCheckable(true);
     m_PopupMenu->insertItem("Import using 'Image number' filter (default)", 0);
     m_PopupMenu->setItemChecked(0, true);
@@ -192,44 +245,43 @@ void mitk::ChiliPlugin::CreateSampleApp()
     m_PopupMenu->insertItem("Separate by acquisition number", this, SLOT(OnMenuSeparateByAcquisitionNumberClicked()), 0, 4);
     m_PopupMenu->setItemChecked(4, false);
     connect( m_PopupMenu, SIGNAL(activated(int)), this, SLOT(OnMenuImportFilterSelected(int)) );
+    m_ObjectsConnectedTo.push_back( m_PopupMenu );
 
     // button for plugin options
-    m_LightBoxImportToggleButton = new QToolButton( task );
+    m_LightBoxImportToggleButton = new QToolButton( m_Task );
     m_LightBoxImportToggleButton->setText(" "); // just some space that generates one short empty line of text
     m_LightBoxImportToggleButton->setPixmap( QPixmap(chili_restart_mitk_xpm) );
     m_LightBoxImportToggleButton->setAutoRaise(true);
     m_LightBoxImportToggleButton->setEnabled(true); //!! secret button to reinit application
-    //connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(OnApproachReinitializationOfWholeApplication()) );
+    //connect( m_LightBoxImportToggleButton, SIGNAL(clicked()), this, SLOT(ReinitMITKApplication()) );
     QSizePolicy policy = m_LightBoxImportToggleButton->sizePolicy();
     policy.setVerStretch( 1 );
     m_LightBoxImportToggleButton->setSizePolicy( m_LightBoxImportToggleButton->sizePolicy());
     m_LightBoxImportToggleButton->setPopup( m_PopupMenu );
     m_LightBoxImportToggleButton->setPopupDelay( 1 );
     vertlayout->addWidget( m_LightBoxImportToggleButton );
-  }
-
-  if (app)
-  {
-    // delete old application
-    horzlayout->remove(app);
-    delete app;
-  }
-
-  // create one instance of SampleApp
-  app = new SampleApp( task, "sample", 0 );
-  horzlayout->addWidget( app );
-  horzlayout->activate();
-  app->show();
-  app->SetDefaultWidgetSize();
-  app->viewReinitMultiWidget();
-
-  if (!done)
-  {
+    
     done = true;
   }
 
+  if (m_MITKMainApp)
+  {
+    // delete old application
+    m_ImportButtonLayout->remove(m_MITKMainApp);
+    delete m_MITKMainApp;
+  }
+
+  // create one instance of SampleApp
+  m_MITKMainApp = new SampleApp( m_Task, "sample", 0 );
+  m_ImportButtonLayout->addWidget( m_MITKMainApp );
+  m_ImportButtonLayout->activate();
+  m_MITKMainApp->show();
+  m_MITKMainApp->SetDefaultWidgetSize();
+  m_MITKMainApp->viewReinitMultiWidget();
+
   SendStudySelectedEvent();
 }
+
 
 /** Return the plugininstance. */
 QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
@@ -238,8 +290,9 @@ QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
   PACSPlugin::Pointer pluginInstance = PACSPlugin::GetInstance();
   ChiliPlugin::Pointer realPluginInstance = dynamic_cast<ChiliPlugin*>( pluginInstance.GetPointer() );
 
+  // create MainApp only after a small delay
+  // This was to avoid errors related to Qt translation attempts
   static bool done = false;
-
   if (!done)
   {
     QTimer* timer = new QTimer(realPluginInstance);
@@ -252,66 +305,62 @@ QcPlugin* mitk::ChiliPlugin::GetQcPluginInstance()
   return realPluginInstance.GetPointer();
 }
 
-/** Return the ConferenceID. */
+
+mitk::ChiliPlugin* mitk::ChiliPlugin::GetChiliPluginInstance()
+{
+  return static_cast<ChiliPlugin*>( GetQcPluginInstance() );
+}
+
+
 int mitk::ChiliPlugin::GetConferenceID()
 {
   return m_QmitkChiliPluginConferenceID;
 }
 
-/** Return the current CHILI-Plugin-Capabilities. */
+
 mitk::PACSPlugin::PACSPluginCapability mitk::ChiliPlugin::GetPluginCapabilities()
 {
   PACSPluginCapability result;
-  result.isPlugin = true;
-  result.canLoad = true;
-  #if CHILI_VERSION_CODE( 1, 1, 3 ) < CHILI_PLUGIN_VERSION_CODE //min. CHILI 3.12
-    result.canSave = true;
-  #else
-    result.canSave = false;
+  result.IsPACSFunctional = true;
+  result.HasLoadCapability = true;
+  result.HasSaveCapability = true;
+  
+  #if CHILI_PLUGIN_VERSION_CODE <= CHILI_VERSION_CODE( 1, 1, 3 ) // min CHILI 3.12 (plugin interface version 1.1.3)
+    result.HasSaveCapability = false;
   #endif
+
   return result;
 }
 
-/** Return the number of current shown lightboxes and set by lightboxTiles(). */
+
 unsigned int mitk::ChiliPlugin::GetLightboxCount()
 {
+  // set by lightboxTiles()
   return m_LightBoxCount;
 }
 
-/** Return the first found empty chililightbox, using the lightboxmanager therefore. */
-QcLightbox* mitk::ChiliPlugin::GetNewLightbox()
+
+unsigned int mitk::ChiliPlugin::GetActiveLightbox()
 {
-  QcLightbox* newLightbox;
-  // chili can show maximal four lightboxes
-  for( unsigned int i = 0; i < NUMBER_OF_THINKABLE_LIGHTBOXES; i++ )
+  QcLightboxManager* manager = lightboxManager();
+
+  QcLightbox* activeLightbox = manager->getActiveLightbox();
+
+  QPtrList<QcLightbox>& lightboxes = manager->getLightboxes();
+  QcLightbox* current;
+  unsigned int activeLightboxIndex = 0;
+  for ( current = lightboxes.first(); current; current = lightboxes.next(), ++activeLightboxIndex )
   {
-    newLightbox = lightboxManager()->getLightboxes().at(i);
-    //return the first empty lightbox
-    if( newLightbox->getFrames() == 0 )
-    {
-      newLightbox->activate();
-      newLightbox->show();
-      Modified();
-      return newLightbox;
-    }
+    if (current == activeLightbox) return activeLightboxIndex;
   }
-  QMessageBox::information( 0, "MITK", "Application asked for a new lightbox. CHILI cannot handle more than 4 lightboxes, so please close one first." );
-  return NULL;
+
+  return 0;
 }
 
-/** Return the current selected chililightbox, using the lightboxmanager therefore. */
-QcLightbox* mitk::ChiliPlugin::GetCurrentLightbox()
-{
-  QcLightbox* currentLightbox = lightboxManager()->getActiveLightbox();
-  if( currentLightbox == NULL)
-    QMessageBox::information( 0, "MITK", "Application asked for the currently active lightbox, but there is none." );
-  return currentLightbox;
-}
 
-/** Button to import the lightbox. */
 void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
 {
-  if( m_InImporting ) return;
+  if( m_InImporting ) return; // wait until completely loaded
 
   if( ChiliFillingLightbox() )
   {
@@ -335,32 +384,14 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
     else 
     {
       int answer = QMessageBox::question( 0, tr("MITK"), 
-             QString("MITK detected %1 distinct image volumes.\nDo you want to load all of them (might slow down MITK)?").arg(resultNodes.size()),
-             QString("Load all images"),
+             QString("MITK detected %1 distinct image volumes.\n"
+                     "Do you want to load all of them (might slow down MITK)?").arg(resultNodes.size()),
+             QString("Load all %1 image volumes").arg(resultNodes.size()),
              //QString("Ignore only single slices"),
-             QString("Cancel complete import") );
+             QString("Cancel image import") );
       if ( answer == 0 )
       {
         SetRelationsToDataStorage( resultNodes );
-      }
-      /*
-      else if ( answer == 1 )
-      {
-        for( unsigned int n = 0; n < resultNodes.size(); n++ )
-        {
-          BaseProperty::Pointer propertyImageNumber = resultNodes[n]->GetProperty( "NumberOfSlices" );
-          if( propertyImageNumber.IsNull() || ( propertyImageNumber.IsNotNull() && propertyImageNumber->GetValueAsString() != "1" ) )
-          {
-            std::vector<mitk::DataTreeNode::Pointer> tmpVec;
-            tmpVec.push_back( resultNodes[n] );
-            SetRelationsToDataStorage( tmpVec );
-          }
-        }
-      }
-      */
-      else
-      {
-        // do nothing, import cancelled
       }
     }
 
@@ -368,43 +399,36 @@ void mitk::ChiliPlugin::lightBoxImportButtonClicked(int row)
       SetRelationsToDataStorage( LoadTextsFromSeries( selectedLightbox->currentSeries()->oid ) );  //load all texts
 
     // stupid, that this is still necessary
-    DataTreePreOrderIterator treeiter( app->GetTree() );
+    DataTreePreOrderIterator treeiter( m_MITKMainApp->GetTree() );
     RenderingManager::GetInstance()->InitializeViews( &treeiter  );
     RenderingManager::GetInstance()->RequestUpdateAll();
     qApp->processEvents();
+    RenderingManager::GetInstance()->RequestUpdateAll();
+
     m_InImporting = false;
   }
 }
 
+
 /** Reinitialize the application. */
-void mitk::ChiliPlugin::OnApproachReinitializationOfWholeApplication()
+void mitk::ChiliPlugin::ReinitMITKApplication()
 {
-  static int clickCount = 0;
-
-  clickCount++;
-
-  if (clickCount > 0)
+  if ( QMessageBox::question( NULL, tr("MITK"), 
+                                QString("Do you want to restart MITK and lose all work results?"),
+                                QMessageBox::Yes | QMessageBox::Default, 
+                                QMessageBox::No  | QMessageBox::Escape
+                              ) == QMessageBox::Yes )
   {
-    if ( QMessageBox::question( NULL, tr("MITK"), 
-                                  /*QString("Desparate clicking suggests a strong wish to restart the whole MITK plugin.\n\nDo you want to restart MITK?"),*/
-                                  QString("Do you want to restart MITK and loose all work results?"),
-                                  QMessageBox::Yes | QMessageBox::Default, 
-                                  QMessageBox::No  | QMessageBox::Escape
-                                ) == QMessageBox::Yes )
-    {
-      CreateSampleApp();
-    }
-
-    clickCount = 0;
+    CreateSampleApp();
   }
 }
 
-#ifdef WIN32
 
+#ifdef WIN32
 #include <Windows.h>
 #include <stdio.h>
+// TODO somebody check if there is a better way to create a temp dir with windows
 #define BUFSIZE 512
-
 /** Create a temporary directory for windows. */
 std::string mitk::ChiliPlugin::GetTempDirectory()
 {
@@ -444,38 +468,43 @@ std::string mitk::ChiliPlugin::GetTempDirectory()
 
   return fileName;
 }
-
 #else
-
 #include <stdlib.h>
-
 /** Create a temporary directory for linux. */
 std::string mitk::ChiliPlugin::GetTempDirectory()
 {
   char *tmpDirectory = getenv( "TMPDIR" ); //return NULL if the TempDirectory is "/tmp/"
   std::string newTmpDirectory;
-  if( tmpDirectory == NULL )
+  if( !tmpDirectory )
+  {
     newTmpDirectory = "/tmp/ChiliTempXXXXXX"; //mkdtemp need 6-10 dummies
+  }
   else
   {
     newTmpDirectory = tmpDirectory;
     newTmpDirectory = newTmpDirectory + "/ChiliTempXXXXXX";
   }
+
   tmpDirectory = mkdtemp( (char*)newTmpDirectory.c_str() ); //create a new unique directory
-  if( tmpDirectory != NULL )
+  if( tmpDirectory)
   {
     newTmpDirectory = tmpDirectory;
     newTmpDirectory = newTmpDirectory + "/";
     return newTmpDirectory;
   }
   else
+  {
     return "";
+  }
 }
-
 #endif
+
 
 QObject* mitk::ChiliPlugin::findProgressBar(QObject* object)
 {
+  // traverses the CHILI object hierarchy, looking for the
+  // progressbar that pops up when a series is loaded into
+  // a lightbox
   const QObjectList* children = object->children();
   if (children)
   {
@@ -497,6 +526,7 @@ QObject* mitk::ChiliPlugin::findProgressBar(QObject* object)
 
   return NULL;
 }
+
 
 bool mitk::ChiliPlugin::ChiliFillingLightbox()
 {
@@ -549,44 +579,60 @@ bool mitk::ChiliPlugin::ChiliFillingLightbox()
   return false;
 }
 
-/** Event if a new study get selected (from QcPlugin). */
-void mitk::ChiliPlugin::studySelected( study_t* /*study*/ )
+/** Event from QcPlugin. */
+void mitk::ChiliPlugin::lightboxFilled( QcLightbox* /*lbm*/ )
 {
-  SendStudySelectedEvent();
+  GetStudyInformation();
+  GetSeriesInformation();
 }
 
-/** Throw an event, to stop the filter. */
-void mitk::ChiliPlugin::SendAbortFilterEvent()
-{
-  InvokeEvent( PluginAbortFilter() );
-}
-
-/** Event if the lightbox get tiles (from QcPlugin). */
+/** Event from QcPlugin. */
 void mitk::ChiliPlugin::lightboxTiles( QcLightboxManager* /*lbm*/, int tiles )
 {
   m_LightBoxCount = tiles;
 
-  for( int row = 0; row < tiles; ++row )
+  for( unsigned int row = 0; row < m_LightBoxCount; ++row )
   {
     try
     {
       QIDToolButton* button = m_LightBoxImportButtons.at(row);
       button->show();
     }
-    catch(...) {}
+    catch(...) 
+    {
+    }
   }
-  for( int row = tiles; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row )
+  for( unsigned int row = tiles; row < NUMBER_OF_THINKABLE_LIGHTBOXES; ++row )
   {
     try
     {
       QIDToolButton* button = m_LightBoxImportButtons.at(row);
       button->hide();
     }
-    catch(...) {}
+    catch(...) 
+    {
+    }
   }
 
   SendLightBoxCountChangedEvent(); // tell the application
 }
+
+
+/** Event if a new study get selected (from QcPlugin). */
+void mitk::ChiliPlugin::studySelected( study_t* /*study*/ )
+{
+  GetStudyInformation();   // just find out all information, remember OIDs for instance UIDs
+  GetSeriesInformationList(); 
+  SendStudySelectedEvent();
+}
+
+
+/** Throw an event, to stop the filter. */
+void mitk::ChiliPlugin::AbortPACSImport()
+{
+  InvokeEvent( PluginAbortPACSImport() );
+}
+
 
 /** Throw an event, if the study changed. */
 void mitk::ChiliPlugin::SendStudySelectedEvent()
@@ -595,6 +641,7 @@ void mitk::ChiliPlugin::SendStudySelectedEvent()
   InvokeEvent( PluginStudySelected() );
 }
 
+
 /** Throw an event, if the lightboxcount changed. */
 void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
 {
@@ -602,310 +649,232 @@ void mitk::ChiliPlugin::SendLightBoxCountChangedEvent()
   InvokeEvent( PluginLightBoxCountChanged() );
 }
 
+
 void mitk::ChiliPlugin::SetRelationsToDataStorage( std::vector<DataTreeNode::Pointer> inputNodes )
 {
-  //es gibt zwei Möglichkeiten:
-  // - zum einen alles in die DataStorage hängen und anschließend die Beziehungen zwischen den Daten herstellen
-  // - zum anderen kann man während des Einfügens in die DataStorage die Beziehungen berücksichtigen.
-    // Das Problem dabei ist, dass dazu die Daten sortiert werden müssen (in der Form "PSRelationInformation"/"GetStudyRelationInformation()"). Diese Sortierung müsste unterscheiden, ob sich die Daten in der DataStorage befinden, oder gerade übergeben werden. Ebenfalls müssten die Daten die in der Beziehungen vorkommen, aber nicht übergeben werden bzw. nicht in der DataStorage sind, beachtet werden. Beim Einfügen der Daten müsste dann noch beachtet werden, ob die Beziehung beim Einfügen ("ADD()") erstellt werden kann, oder die Daten eingefügt und dann die Beziehung erstellt werden muss (Parent schon in DataStorage).
-  // -> Variante eins wird verwendet
-  if( !inputNodes.empty() )
+  for ( std::vector<DataTreeNode::Pointer>::iterator iter = inputNodes.begin();
+        iter != inputNodes.end();
+        ++iter )
   {
-    //add nodes
-    for( unsigned int x = 0; x < inputNodes.size(); x++ )
-      if( inputNodes[x].IsNotNull() )
-        DataStorage::GetInstance()->Add( inputNodes[x] );
-
-    //create relations
-    PACSPlugin::ParentChildRelationInformationList relationList = GetStudyRelationInformation();  //get information of current study
-    for( PACSPlugin::ParentChildRelationInformationList::iterator relationIter = relationList.begin(); relationIter != relationList.end(); relationIter++ )
-    {
-      //search for current Label and OID at DataStorage
-      DataStorage::SetOfObjects::ConstPointer allNodes = DataStorage::GetInstance()->GetAll();
-      DataStorage::SetOfObjects::const_iterator parentNodeIter;
-
-      for( parentNodeIter = allNodes->begin(); parentNodeIter != allNodes->end(); parentNodeIter++ )  //search at "DataStorage"
-      {
-        if( ( (*parentNodeIter)->GetProperty( "SeriesOID" ) && (*parentNodeIter)->GetProperty( "VolumeLabel" ) ) && ( (*parentNodeIter)->GetProperty( "SeriesOID" )->GetValueAsString() == relationIter->OID && (*parentNodeIter)->GetProperty( "VolumeLabel" )->GetValueAsString() == relationIter->Label ) )
-          break;
-      }
-
-      if( parentNodeIter != allNodes->end() )
-      {
-        for( std::list<std::string>::iterator currentChildren = relationIter->ChildLabel.begin(); currentChildren != relationIter->ChildLabel.end(); currentChildren++ )  //use all children
-        {
-          //first we need the seriesOID additinaly
-          PACSPlugin::ParentChildRelationInformationList::iterator tmpIter;
-          for( tmpIter = relationList.begin(); tmpIter != relationList.end(); tmpIter++ )
-            if( tmpIter->Label == (*currentChildren) )
-              break;
-          if( tmpIter != relationList.end() )
-          {
-            //search for child-Label and OID at DataStorage
-            DataStorage::SetOfObjects::const_iterator childNodeIter;
-
-            for( childNodeIter = allNodes->begin(); childNodeIter != allNodes->end(); childNodeIter++ )  //search at "DataStorage"
-            {
-              if( ( (*childNodeIter)->GetProperty( "SeriesOID" ) && (*childNodeIter)->GetProperty( "VolumeLabel" ) ) && ( (*childNodeIter)->GetProperty( "SeriesOID" )->GetValueAsString() == tmpIter->OID && (*childNodeIter)->GetProperty( "VolumeLabel" )->GetValueAsString() == tmpIter->Label ) )
-                break;
-            }
-
-            if( childNodeIter != allNodes->end() )  //add relation to DataStorage
-            {
-              //DataStorage::GetInstance()->reparent( childIter,parentIter ); //its possible, that the relation always exist and the function have to check for circle
-            }
-          }
-        }
-      }
-    }
+    DataStorage::GetInstance()->Add( *iter );
   }
 }
 
-/** ---- CHILIInformation ---- */
 
-/** Return the studyinformation. If you dont set the seriesOID, you get the current selected study. If you want a specific study, set the OID. If no study could found, this function return StudyInformation.OID == "". */
-mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesOID )
+mitk::PACSPlugin::StudyInformation mitk::ChiliPlugin::GetStudyInformation( const std::string& seriesInstanceUID )
 {
-  StudyInformation resultInformation;
-  resultInformation.OID = "";
-  resultInformation = m_ChiliInformation->GetStudyInformation( this, seriesOID );
+  return m_ChiliInformation->GetStudyInformation( this, seriesInstanceUID );
+}
+
+
+mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesInstanceUID )
+{
+  return m_ChiliInformation->GetPatientInformation( this, seriesInstanceUID );
+}
+
+
+mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesInstanceUID )
+{
+  return m_ChiliInformation->GetSeriesInformation( this, seriesInstanceUID );
+}
+
+mitk::PACSPlugin::PatientInformationList mitk::ChiliPlugin::GetPatientInformationList()
+{
+  PatientInformationList resultInformation;
+  resultInformation.clear();
+
+  PatientInformation patient = GetPatientInformation(); // CHILI Workstation has only one active study --> one active patient
+  resultInformation.push_back( patient );
+
+  return resultInformation;
+}
+    
+mitk::PACSPlugin::StudyInformationList mitk::ChiliPlugin::GetStudyInformationList( const PatientInformation& /* patient */ )
+{
+  StudyInformationList resultInformation;
+  resultInformation.clear();
+
+  StudyInformation study = GetStudyInformation(); // CHILI Workstation has only one active study
+  resultInformation.push_back( study );
+  
   return resultInformation;
 }
 
-/** Return the patientinformation. If you dont set the seriesOID, you get the current selected patient. If you want a specific patient, set the OID. If no patient could found, this function return PatientInformation.OID == "". */
-mitk::PACSPlugin::PatientInformation mitk::ChiliPlugin::GetPatientInformation( const std::string& seriesOID )
-{
-  PatientInformation resultInformation;
-  resultInformation.OID = "";
-  resultInformation = m_ChiliInformation->GetPatientInformation( this, seriesOID );
-  return resultInformation;
-}
 
-/** Return the seriesinformation. If you dont set the seriesOID, you get the current selected series. If you want a specific series, set the OID. If no series could found, this function return SeriesInformation.OID == "". */
-mitk::PACSPlugin::SeriesInformation mitk::ChiliPlugin::GetSeriesInformation( const std::string& seriesOID )
-{
-  SeriesInformation resultInformation;
-  resultInformation.OID = "";
-  resultInformation = m_ChiliInformation->GetSeriesInformation( this, seriesOID );
-  return resultInformation;
-}
-
-/** Return the seriesinformationlist. If you dont set the studyOID, you get the seriesList of the current selected study. If you want a list of a specific study, set the OID. If no series could found, this function returns an empty list. */
-mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& studyOID )
+mitk::PACSPlugin::SeriesInformationList mitk::ChiliPlugin::GetSeriesInformationList( const std::string& studyInstanceUID )
 {
   SeriesInformationList resultInformation;
   resultInformation.clear();
+
+  const std::string studyOID = this->GetStudyOIDFromInstanceUID( studyInstanceUID );
   resultInformation = m_ChiliInformation->GetSeriesInformationList( this, studyOID );
+
   return resultInformation;
 }
 
-/** Return the textinformation. You have to set the textOID to get the information. If no text could found, this function return TextInformation.OID == "". */
-mitk::PACSPlugin::TextInformation mitk::ChiliPlugin::GetTextInformation( const std::string& textOID )
+
+mitk::PACSPlugin::DocumentInformation mitk::ChiliPlugin::GetDocumentInformation( const std::string& seriesInstanceUID, 
+                                                                                 unsigned int instanceNumber )
 {
-  TextInformation resultInformation;
-  resultInformation.OID = "";
-  resultInformation = m_ChiliInformation->GetTextInformation( this, textOID );
-  return resultInformation;
+  return m_ChiliInformation->GetDocumentInformation( this, seriesInstanceUID, instanceNumber );
 }
 
-/** Return a list of all textinformation. You have to set the seriesOID to get the textList. If no texts could found, this function returns an empty list. This function dont return the text which used to save and load the parent-child-relationship. */
-mitk::PACSPlugin::TextInformationList mitk::ChiliPlugin::GetTextInformationList( const std::string& seriesOID )
+
+mitk::PACSPlugin::DocumentInformationList mitk::ChiliPlugin::GetDocumentInformationList( const std::string& seriesInstanceUID )
 {
-  TextInformationList resultInformation;
-  resultInformation.clear();
-  resultInformation = m_ChiliInformation->GetTextInformationList( this, seriesOID );
-  return resultInformation;
+  return m_ChiliInformation->GetDocumentInformationList( this, seriesInstanceUID );
 }
 
-/** ---- LoadFromCHILI ---- */
 
-/** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given seriesOID */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetSeriesRelationInformation( const std::string& seriesOID )
-{
-  ParentChildRelationInformationList resultInformation;
-  resultInformation.clear();
-  if( seriesOID != "" && m_tempDirectory != "" )
-    resultInformation = m_LoadFromCHILI->GetSeriesRelationInformation( this, seriesOID, m_tempDirectory );
-  return resultInformation;
-}
-
-/** In the Parent-Child-XML-File are volumes saved. This function return all volumes to a given studyOID */
-mitk::PACSPlugin::ParentChildRelationInformationList mitk::ChiliPlugin::GetStudyRelationInformation( const std::string& studyOID )
-{
-  ParentChildRelationInformationList resultInformation;
-  resultInformation.clear();
-  if( m_tempDirectory != "" )
-    resultInformation = m_LoadFromCHILI->GetStudyRelationInformation( this, studyOID, m_tempDirectory );
-  return resultInformation;
-}
-
-/** Set the internal reader which used to combine slices.
-0 = ImageNumberFilter; 1 = SpacingSetFilter; 2 = SingleSpacingFilter */
 void mitk::ChiliPlugin::SetReaderType( unsigned int readerType )
 {
   m_LoadFromCHILI->SetReaderType( readerType );
 }
 
-/** Load all images from the given lightbox. If no lightbox set, the current lightbox get used. Chili dont support text-access via lightbox. If you want to load them, use LoadAllTextsFromSeries(...). The slices get combined with the internal set ReaderType. */
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( unsigned int lightboxIndex )
+{
+  QcLightboxManager* manager = lightboxManager();
+  QPtrList<QcLightbox>& lightboxes = manager->getLightboxes();
+  QcLightbox* current;
+  unsigned int currentLightboxIndex = 0;
+  for ( current = lightboxes.first(); current; current = lightboxes.next(), ++currentLightboxIndex )
+  {
+    if ( lightboxIndex == currentLightboxIndex )
+    {
+      return this->LoadImagesFromLightbox( current );
+    }
+  }
+
+  std::vector<DataTreeNode::Pointer> empty;
+  empty.clear();
+  return empty;
+}
+
+
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightbox( QcLightbox* lightbox )
 {
   std::vector<DataTreeNode::Pointer> resultVector;
   resultVector.clear();
-  if( lightbox != NULL && m_tempDirectory != "" )
+
+  if( lightbox && !m_tempDirectory.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
+
     resultVector = m_LoadFromCHILI->LoadImagesFromLightbox( this, lightbox, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
+
   return resultVector;
 }
 
-/** Load all image- and text-files from series. This function use LoadAllImagesFromSeries(...) and LoadAllTextsFromSeries(...). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadFromSeries( const std::string& seriesOID )
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( const std::string& seriesInstanceUID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
-  if( m_tempDirectory != "" && seriesOID != "" )
+
+  if( !m_tempDirectory.empty() && !seriesInstanceUID.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNodes = m_LoadFromCHILI->LoadFromSeries( this, seriesOID, m_tempDirectory );
+
+    resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUID, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
+
   return resultNodes;
 }
 
-/** This function load all images from series, therefore the FileDownload get used. Warning: CHILI use the original server-file-format. That mean that *.pic or *.dcm are possible. Dicomfiles get transformed to pic. The slices get combined with the internal set ReaderType. Should other file-formats saved, they get load with the DataTreeNodeFactory. */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( const std::string& seriesOID )
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries( const std::string& seriesInstanceUID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
-  if( m_tempDirectory != "" && seriesOID != "" )
+
+  if( !m_tempDirectory.empty() && !seriesInstanceUID.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesOID, m_tempDirectory );
+
+    resultNodes = m_LoadFromCHILI->LoadTextsFromSeries( this, seriesInstanceUID, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
+
   return resultNodes;
 }
 
-/** This function load all text-files from the series. Chili combine the filename, the OID, MimeType, ... to create the databasedirectory, so different files can be saved with the same filename. The filename from database is used to save the files. So we have to work sequently, otherwise we override the files ( twice filenames ). */
-std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries( const std::string& seriesOID )
-{
-  std::vector<DataTreeNode::Pointer> resultNodes;
-  resultNodes.clear();
-  if( m_tempDirectory != "" && seriesOID != "" )
-  {
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-    ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNodes = m_LoadFromCHILI->LoadTextsFromSeries( this, seriesOID, m_tempDirectory );
-    ProgressBar::GetInstance()->Progress( 2 );
-    QApplication::restoreOverrideCursor();
-  }
-  return resultNodes;
-}
 
-/** To load a single text-file, you need more than the textOID, this function search for the missing attributes and use LoadOneText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath ). */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& textOID )
+mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& seriesInstanceUID, 
+                                                               unsigned int instanceNumber )
 {
-  DataTreeNode::Pointer resultNode = NULL;
-  if( m_tempDirectory != "" && textOID != "" )
+  DataTreeNode::Pointer resultNode;
+
+  if( !m_tempDirectory.empty() && !seriesInstanceUID.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNode = m_LoadFromCHILI->LoadSingleText( this, textOID, m_tempDirectory );
+
+    resultNode = m_LoadFromCHILI->LoadSingleText( this, seriesInstanceUID, instanceNumber, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
+
   return resultNode;
 }
 
-/** This function load a single text-file. The file get saved to harddisk, get readed via factory ( current: mitkImageWriterFactory, mitkPointSetWriterFactory, mitkSurfaceVtkWriterFactory ) to mitk and deleted from harddisk. */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string& seriesOID, const std::string& textOID, const std::string& textPath)
-{
-  DataTreeNode::Pointer resultNode = NULL;
-  if( m_tempDirectory != "" && seriesOID != "" && textOID != "" && textPath != "" )
-  {
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-    ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNode = m_LoadFromCHILI->LoadSingleText( this, seriesOID, textOID, textPath, m_tempDirectory );
-    ProgressBar::GetInstance()->Progress( 2 );
-    QApplication::restoreOverrideCursor();
-  }
-  return resultNode;
-}
 
-/** This function load single elements from the parent-child-xml-file. */
-mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadParentChildElement( const std::string& seriesOID, const std::string& label )
+void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
+                                         const std::string& studyInstanceUID, 
+                                         int seriesNumber, 
+                                         const std::string& seriesDescription )
 {
-  DataTreeNode::Pointer resultNode = NULL;
-  if( seriesOID != "" && label != "" && m_tempDirectory != "" )
-  {
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-    ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    resultNode = m_LoadFromCHILI->LoadParentChildElement( this, seriesOID, label, m_tempDirectory );
-    ProgressBar::GetInstance()->Progress( 2 );
-    QApplication::restoreOverrideCursor();
-  }
-  return resultNode;
-}
-
-/** ---- SaveToCHILI ---- */
-
-/** This function provides a dialog where the user can decide if he want to create a new series, save to series, override, ... . Then SaveAsNewSeries(...) or SaveToSeries(...) get used. */
-void mitk::ChiliPlugin::SaveToChili( DataStorage::SetOfObjects::ConstPointer inputNodes )
-{
-#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#else
-  if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() )
-  {
-    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
-    ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    m_SaveToCHILI->SaveToChili( this, inputNodes, m_tempDirectory );
-    ProgressBar::GetInstance()->Progress( 2 );
-    QApplication::restoreOverrideCursor();
-  }
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) // CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
 #endif
-}
 
-/** This function create a new series and use the function SaveToSeries() . No dialog is used. */
-void mitk::ChiliPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& studyOID, int seriesNumber, const std::string& seriesDescription )
-{
-#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#else
-  if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && studyOID != "" && seriesDescription != "" )
+  if( !m_tempDirectory.empty() && 
+      inputNodes->begin() != inputNodes->end() && 
+      !studyInstanceUID.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    m_SaveToCHILI->SaveAsNewSeries( this, inputNodes, studyOID, seriesNumber, seriesDescription, m_tempDirectory );
+
+    m_SaveToCHILI->SaveAsNewSeries( this, inputNodes, studyInstanceUID, seriesNumber, seriesDescription, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-#endif
 }
 
-/** This function save the nodes to via FileUpload to chili. */
-void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesOID, bool overrideExistingSeries )
+
+void mitk::ChiliPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesInstanceUID, bool overrideExistingSeries )
 {
-#if CHILI_VERSION_CODE( 1, 1, 4 ) > CHILI_PLUGIN_VERSION_CODE  //CHILI < 3.12
-  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI version does not support this function (SaveToChili)." );
-#else
-  if( m_tempDirectory != "" && inputNodes->begin() != inputNodes->end() && seriesOID != "" )
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) //CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
+#endif
+  if( !m_tempDirectory.empty() && 
+      inputNodes->begin() != inputNodes->end() && 
+      !seriesInstanceUID.empty() )
   {
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
-    m_SaveToCHILI->SaveToSeries( this, inputNodes, seriesOID, overrideExistingSeries, m_tempDirectory );
+
+    m_SaveToCHILI->SaveToSeries( this, inputNodes, seriesInstanceUID, overrideExistingSeries, m_tempDirectory );
+
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
   }
-#endif
 }
 
 /** TELECONFERENCE METHODS */
@@ -916,11 +885,13 @@ void mitk::ChiliPlugin::connectPartner()
   ct->ArrangeToken();
 }
 
+
 void mitk::ChiliPlugin::disconnectPartner()
 {
   ConferenceToken* ct = ConferenceToken::GetInstance();
   ct->SetToken( 0 );
 }
+
 
 void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
 {
@@ -956,7 +927,7 @@ void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
       ipMsgListToVar( list,
                       ipTypeStringPtr, &str );
       //std::cout<<"CONFERENCE: (1) "<<str;
-      if( ! EventCollector::PostEvent(QString(str), task))
+      if( ! EventCollector::PostEvent(QString(str), m_Task))
       //std::cout<<" NO SUCCES!"<<std::endl;
       //std::cout<<std::endl;
 
@@ -1013,6 +984,7 @@ void mitk::ChiliPlugin::handleMessage( ipInt4_t type, ipMsgParaList_t *list )
   }
 }
 
+
 void mitk::ChiliPlugin::OnMenuSeparateByAcquisitionNumberClicked()
 {
   // toggle check mark in menu
@@ -1024,10 +996,9 @@ void mitk::ChiliPlugin::OnMenuSeparateByAcquisitionNumberClicked()
   m_LoadFromCHILI->SetSeparateByAcquisitionNumber(checked);
 }
 
+
 void mitk::ChiliPlugin::OnMenuImportFilterSelected(int id)
 {
-  // 
-  std::cout << "checkeli" << id << std::endl;
   switch (id)
   {
     case 0:
@@ -1053,4 +1024,66 @@ void mitk::ChiliPlugin::OnMenuImportFilterSelected(int id)
       break;
   }
 }
+
+
+const std::string mitk::ChiliPlugin::GetStudyOIDFromInstanceUID( const std::string& studyInstanceUID )
+{
+  std::string returnValue("");
+  UID2OIDMap::iterator iter = m_StudyOIDForInstanceUID.find( studyInstanceUID );
+  if ( iter != m_StudyOIDForInstanceUID.end() )
+  {
+    returnValue = iter->second; // OID for given instance UID;
+  }
+  return returnValue;
+}
+
+
+void mitk::ChiliPlugin::UpdateStudyOIDForInstanceUID( const std::string& studyOID, const std::string& studyInstanceUID )
+{
+  m_StudyOIDForInstanceUID[ studyInstanceUID ] = studyOID;
+  //std::cout << "Remember study OID " << studyOID << " for UID " << studyInstanceUID << std::endl;
+}
+
+
+const std::string mitk::ChiliPlugin::GetSeriesOIDFromInstanceUID( const std::string& seriesInstanceUID )
+{
+  std::string returnValue("");
+  UID2OIDMap::iterator iter = m_SeriesOIDForInstanceUID.find( seriesInstanceUID );
+  if ( iter != m_SeriesOIDForInstanceUID.end() )
+  {
+    returnValue = iter->second; // OID for given instance UID;
+  }
+  return returnValue;
+}
+
+
+void mitk::ChiliPlugin::UpdateSeriesOIDForInstanceUID( const std::string& seriesOID, const std::string& seriesInstanceUID )
+{
+  m_SeriesOIDForInstanceUID[ seriesInstanceUID ] = seriesOID;
+  //std::cout << "Remember series OID " << seriesOID << " for UID " << seriesInstanceUID << std::endl;
+}
+
+
+const std::string mitk::ChiliPlugin::GetTextOIDFromSeriesInstanceUIDAndInstanceNumber( const std::string& seriesInstanceUID, 
+                                                                                       unsigned int textInstanceNumber )
+{
+  std::string returnValue("");
+  UIDAndInstanceNumber2OIDMap::iterator iter = 
+    m_TextOIDForSeriesInstanceUIDAndInstanceNumber.find( std::make_pair(seriesInstanceUID, textInstanceNumber) );
+  if ( iter != m_TextOIDForSeriesInstanceUIDAndInstanceNumber.end() )
+  {
+    returnValue = iter->second;
+  }
+  return returnValue;
+}
+
+
+void mitk::ChiliPlugin::UpdateTextOIDFromSeriesInstanceUIDAndInstanceNumber( const std::string& textOID,
+                                                                             const std::string& seriesInstanceUID, 
+                                                                             unsigned int textInstanceNumber )
+{
+  m_TextOIDForSeriesInstanceUIDAndInstanceNumber[ std::make_pair(seriesInstanceUID, textInstanceNumber) ] = textOID;
+  //std::cout << "Remember text OID " << textOID << " for UID " << seriesInstanceUID << " and instance number " << textInstanceNumber << std::endl;
+}
+
 

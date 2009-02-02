@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 //CHILI
 #include <chili/cdbTypes.h>  //series_t*, study_t*, ...
 //MITK
-#include "mitkParentChild.h"
 #include "mitkDataStorage.h"
 #include "mitkImageToPicDescriptor.h"  //using struct TagInformationList
 
@@ -33,19 +32,26 @@ class SaveToCHILI: public itk::Object
 {
   public:
 
-    void SaveToChili( QcPlugin* instance, DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& tmpDirectory );
+    void SaveAsNewSeries( QcPlugin* instance, 
+                          DataStorage::SetOfObjects::ConstPointer inputNodes, 
+                          const std::string& studyOID, 
+                          int seriesNumber, 
+                          const std::string& seriesDescription, 
+                          const std::string& tmpDirectory );
 
-    void SaveAsNewSeries( QcPlugin* instance, DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& studyOID, int seriesNumber, const std::string& seriesDescription, const std::string& tmpDirectory );
-
-    void SaveToSeries( QcPlugin* instance, DataStorage::SetOfObjects::ConstPointer inputNodes, const std::string& seriesOID, bool overrideExistingSeries, const std::string& tmpDirectory );
+    void SaveToSeries( QcPlugin* instance, 
+                       DataStorage::SetOfObjects::ConstPointer inputNodes, 
+                       const std::string& seriesInstanceUID, 
+                       bool overrideExistingSeries, 
+                       const std::string& tmpDirectory );
 
     mitkClassMacro( SaveToCHILI, itk::Object );
     itkNewMacro( SaveToCHILI );
+
+  protected:
+
+    SaveToCHILI();
     virtual ~SaveToCHILI();
-
-  private:
-
-    ParentChild::Pointer m_ParentChild;
 
     int m_MaximumImageNumber;
 
@@ -55,12 +61,10 @@ class SaveToCHILI: public itk::Object
 
     static ipBool_t GlobalIterateImagesForImageNumber( int rows, int row, image_t* image, void* user_data );
 
-  protected:
-
-    SaveToCHILI();
 
 };
 
 } // namespace mitk
 
 #endif
+

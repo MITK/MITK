@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkInteractiveSegmentationControls.h"
 #include "interactivesegmentation.h" // icon
 
+#include "QmitkPACSLoadDialog.h"
+#include "QmitkPACSSaveDialog.h"
 #include "QmitkStdMultiWidget.h"
 #include "QmitkToolReferenceDataSelectionBox.h"
 #include "QmitkToolWorkingDataSelectionBox.h"
@@ -27,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
 
+#include "mitkPACSPlugin.h"
 #include "mitkToolManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
@@ -107,6 +110,26 @@ QWidget * QmitkInteractiveSegmentation::CreateControlWidget(QWidget *parent)
 
     toolManager->NodePropertiesChanged += mitk::MessageDelegate<QmitkInteractiveSegmentation>( this, &QmitkInteractiveSegmentation::OnNodePropertiesChanged );  // update e.g. the volume overview
     toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkInteractiveSegmentation>( this, &QmitkInteractiveSegmentation::OnNewNodesGenerated );          // update the list of segmentations
+
+
+    mitk::PACSPlugin::PACSPluginCapability pacsCapabilities = mitk::PACSPlugin::GetInstance()->GetPluginCapabilities();
+    if ( pacsCapabilities.IsPACSFunctional && pacsCapabilities.HasLoadCapability )
+    {
+      m_Controls->btnLoadSegmentationPACS->show();
+    }
+    else
+    {
+      m_Controls->btnLoadSegmentationPACS->hide();
+    }
+
+    if ( pacsCapabilities.IsPACSFunctional && pacsCapabilities.HasSaveCapability )
+    {
+      m_Controls->btnSaveSegmentationPACS->show();
+    }
+    else
+    {
+      m_Controls->btnSaveSegmentationPACS->hide();
+    }
   }
   return m_Controls;
 }
@@ -129,8 +152,10 @@ void QmitkInteractiveSegmentation::CreateConnections()
     connect( m_Controls->btnReinit, SIGNAL(clicked()), this, SLOT(ReinitializeToImage()) );
     connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
     connect( m_Controls->btnLoadSegmentation, SIGNAL(clicked()), this, SLOT(LoadSegmentation()) );
+    connect( m_Controls->btnLoadSegmentationPACS, SIGNAL(clicked()), this, SLOT(LoadSegmentationPACS()) );
     connect( m_Controls->btnDeleteSegmentation, SIGNAL(clicked()), this, SLOT(DeleteSegmentation()) );
     connect( m_Controls->btnSaveSegmentation, SIGNAL(clicked()), this, SLOT(SaveSegmentation()) );
+    connect( m_Controls->btnSaveSegmentationPACS, SIGNAL(clicked()), this, SLOT(SaveSegmentationPACS()) );
     connect( m_Controls->m_ToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
     connect( m_Controls->grpInterpolation, SIGNAL(toggled(bool)), m_Controls->m_SlicesInterpolator, SLOT(EnableInterpolation(bool)) );
     connect( m_Controls->chkPixelSmoothing, SIGNAL(toggled(bool)), this, SLOT(SetReferenceImagePixelSmoothing(bool)) );
@@ -510,5 +535,72 @@ void QmitkInteractiveSegmentation::OnReferenceNodeSelected(const mitk::DataTreeN
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
     CheckImageAlignment(image);
   }
+}
+
+void QmitkInteractiveSegmentation::LoadSegmentationPACS()
+{
+  QmitkPACSLoadDialog dialog(m_Controls);
+  dialog.SetDataStorageParent( m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0) );
+  dialog.exec();
+
+  if ( dialog.result() == QDialog::Accepted )
+  {
+    std::vector<mitk::DataTreeNode*> nodes = dialog.GetImportedDataTreeNodes();
+    for ( std::vector<mitk::DataTreeNode*>::iterator iter = nodes.begin();
+          iter != nodes.end();
+          ++iter )
+    {
+      std::string name("no name given during import");
+      if (*iter)
+      {
+        (*iter)->GetStringProperty("name", name);
+      }
+      std::cout << "Successfully imported node '" << name << "' as segmentation" << std::endl;
+    }
+          
+    m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
+  }
+  else
+  {
+    std::cout << "PACS import dialog cancelled by user." << std::endl;
+  }
+}
+
+void QmitkInteractiveSegmentation::SaveSegmentationPACS()
+{
+  mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+  if (!toolManager) return;
+
+  std::vector<mitk::DataTreeNode*> nodesToSave;
+  nodesToSave.clear();
+
+  mitk::ToolManager::DataVectorType nodes = toolManager->GetWorkingData();
+  for ( mitk::ToolManager::DataVectorType::iterator iter = nodes.begin();
+        iter != nodes.end();
+        ++iter )
+  {
+    if (*iter)
+    {
+      nodesToSave.push_back( *iter );
+    }
+  }
+
+  if (!nodesToSave.empty())
+  {
+    QmitkPACSSaveDialog dialog(m_Controls);
+    dialog.SetDataTreeNodesToSave( nodesToSave );
+    dialog.exec();
+
+    if ( dialog.result() == QDialog::Accepted )
+    {
+      std::cout << "PACS export dialog reported success." << std::endl;
+    }
+    else
+    {
+      std::cout << "PACS export dialog cancelled by user." << std::endl;
+    }
+   
+  }
+
 }
 

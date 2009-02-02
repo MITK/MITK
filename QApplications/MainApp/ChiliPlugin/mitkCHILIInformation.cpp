@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 //CHILI
 #include <chili/plugin.h>
 
+#include "mitkChiliPlugin.h"
+
 mitk::CHILIInformation::CHILIInformation()
 {
 }
@@ -29,22 +31,24 @@ mitk::CHILIInformation::CHILIInformation()
 mitk::CHILIInformation::~CHILIInformation()
 {
 }
-
-mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( QcPlugin* instance, const std::string& seriesOID)
+    
+mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( QcPlugin* instance, const std::string& seriesInstanceUID)
 {
+std::cout << "*** In CHILIInformation::GetStudyInformation" << std::endl;
   PACSPlugin::StudyInformation resultInformation;
-  resultInformation.OID = "";
 
   study_t study;
   series_t series;
   initStudyStruct( &study );
   initSeriesStruct( &series );
 
-  if( seriesOID == "" )
+  if( seriesInstanceUID == "" )
   {
     //use current selected study
     if( pCurrentStudy() != NULL )
+    {
       study = (*dupStudyStruct( pCurrentStudy() ) );  //copy the StudyStruct
+    }
     else
     {
       std::cout << "CHILIInformation (GetStudyInformation): pCurrentStudy() failed. Abort." << std::endl;
@@ -56,6 +60,7 @@ mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( 
   else
   {
     //let CHILI search
+    std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
     series.oid = strdup( seriesOID.c_str() );
     if( !pQuerySeries( instance, &series, &study, NULL ) )
     {
@@ -66,32 +71,28 @@ mitk::PACSPlugin::StudyInformation mitk::CHILIInformation::GetStudyInformation( 
     }
   }
 
-  resultInformation.OID = study.oid;
-  resultInformation.InstanceUID = study.instanceUID;
-  resultInformation.ID = study.id;
-  resultInformation.Date = study.date;
-  resultInformation.Time = study.time;
-  resultInformation.Modality = study.modality;
-  resultInformation.Manufacturer = study.manufacturer;
-  resultInformation.ReferingPhysician = study.referingPhysician;
-  resultInformation.Description = study.description;
-  resultInformation.ManufacturersModelName = study.manufacturersModelName;
+  // remember OID for UID
+  ChiliPlugin::GetChiliPluginInstance()->UpdateStudyOIDForInstanceUID( study.oid, study.instanceUID );
+
+  resultInformation.StudyInstanceUID = study.instanceUID;
+  resultInformation.StudyID = study.id;
+  resultInformation.StudyDate = study.date;
+  resultInformation.StudyTime = study.time;
   resultInformation.AccessionNumber = study.accessionNumber;
-  resultInformation.InstitutionName = study.institutionName;
-  resultInformation.PerformingPhysician = study.performingPhysician;
-  resultInformation.ReportingPhysician = study.reportingPhysician;
-  resultInformation.LastAccess = study.last_access;
-  resultInformation.ImageCount = study.image_count;
+  resultInformation.ModalitiesInStudy = study.modality;
+  resultInformation.ReferringPhysician = study.referingPhysician;
+  resultInformation.StudyDescription = study.description;
+  // PS 3.3 2008 Annex C.7.2.1.1.1 defines only referring physician, physician of record, performing physician and reading physician
+  //resultInformation.ReportingPhysician = study.reportingPhysician; // TODO CHILI should clarify the meaning of the corresponding field in study_t, perhaps we can add it to PACSPlugin::StudyInformation
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
   return resultInformation;
 }
 
-mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformation( QcPlugin* instance, const std::string& seriesOID )
+mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformation( QcPlugin* instance, const std::string& seriesInstanceUID )
 {
   PACSPlugin::PatientInformation resultInformation;
-  resultInformation.OID = "";
 
   patient_t patient;
   study_t study;
@@ -100,7 +101,7 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
   initSeriesStruct( &series );
   initPatientStruct( &patient );
 
-  if( seriesOID == "" )
+  if( seriesInstanceUID == "" )
   {
     //use current selected patient
     if( pCurrentPatient() != NULL )
@@ -117,6 +118,7 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
   else
   {
     //let CHILI search
+    std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
     series.oid = strdup( seriesOID.c_str() );
     if( !pQuerySeries( instance, &series, &study, &patient ) )
     {
@@ -128,14 +130,12 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
     }
   }
 
-  resultInformation.OID = patient.oid;
-  resultInformation.Name = patient.name;
-  resultInformation.ID = patient.id;
-  resultInformation.BirthDate = patient.birthDate;
-  resultInformation.BirthTime = patient.birthTime;
-  resultInformation.Sex = patient.sex;
-  resultInformation.MedicalRecordLocator = patient.medicalRecordLocator;
-  resultInformation.Comment = patient.comment;
+  resultInformation.PatientsName = patient.name;
+  resultInformation.PatientID = patient.id;
+  resultInformation.PatientsBirthDate = patient.birthDate;
+  resultInformation.PatientsBirthTime = patient.birthTime;
+  resultInformation.PatientsSex = patient.sex;
+  resultInformation.PatientComments = patient.comment;
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
@@ -143,15 +143,15 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
   return resultInformation;
 }
 
-mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation( QcPlugin* instance, const std::string& seriesOID )
+mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation( QcPlugin* instance, const std::string& seriesInstanceUID )
 {
   PACSPlugin::SeriesInformation resultInformation;
-  resultInformation.OID = "";
+  resultInformation.SeriesInstanceUID = "";
 
   series_t series;
   initSeriesStruct( &series );
 
-  if( seriesOID == "" )
+  if( seriesInstanceUID == "" )
   {
     //use current selected series
     if( pCurrentSeries() != NULL )
@@ -166,6 +166,7 @@ mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation
   else
   {
     //let CHILI search
+    std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
     series.oid = strdup( seriesOID.c_str() );
     if( !pQuerySeries( instance, &series, NULL, NULL ) )
     {
@@ -174,36 +175,43 @@ mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation
       return resultInformation;
     }
   }
+  
+  // remember OID for UID
+  ChiliPlugin::GetChiliPluginInstance()->UpdateSeriesOIDForInstanceUID( series.oid, series.instanceUID );
 
-  resultInformation.OID = series.oid;
-  resultInformation.InstanceUID = series.instanceUID;
-  resultInformation.Number = series.number;
-  resultInformation.Acquisition = series.acquisition;
+  resultInformation.SeriesInstanceUID = series.instanceUID;
+  resultInformation.SeriesNumber = series.number;
+  resultInformation.AcquisitionNumber = series.acquisition;
   resultInformation.EchoNumber = series.echoNumber;
   resultInformation.TemporalPosition = series.temporalPosition;
-  resultInformation.Date = series.date;
-  resultInformation.Time = series.time;
-  resultInformation.Description = series.description;
-  resultInformation.Contrast = series.contrast;
+  resultInformation.SeriesDate = series.date;
+  resultInformation.SeriesTime = series.time;
+  resultInformation.SeriesDescription = series.description;
+  resultInformation.ContrastAgent = series.contrast;
   resultInformation.BodyPartExamined = series.bodyPartExamined;
   resultInformation.ScanningSequence = series.scanningSequence;
   resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
-  resultInformation.ImageCount = series.image_count;
 
   clearSeriesStruct( &series );
   return resultInformation;
 }
 
-mitk::PACSPlugin::SeriesInformationList mitk::CHILIInformation::GetSeriesInformationList( QcPlugin* instance, const std::string& studyOID )
+mitk::PACSPlugin::SeriesInformationList mitk::CHILIInformation::GetSeriesInformationList( QcPlugin* instance, const std::string& studyInstanceUID )
 {
+  // get study oid from uid
+  std::string studyOID = ChiliPlugin::GetChiliPluginInstance()->GetStudyOIDFromInstanceUID( studyInstanceUID );
+
   //get used to save all series
   m_SeriesInformationList.clear();
 
+  if( studyOID.empty() )
+  {
+    PACSPlugin::StudyInformation currentStudy = this->GetStudyInformation( instance, "" ); // gets info for currently selected study
+    studyOID = ChiliPlugin::GetChiliPluginInstance()->GetStudyOIDFromInstanceUID( currentStudy.StudyInstanceUID );
+  }
+
   //iterate over all series
-  if( studyOID == "" )
-    pIterateSeries( instance, (char*)CHILIInformation::GetStudyInformation( instance ).OID.c_str(), NULL, &CHILIInformation::GlobalIterateSeries, this );
-  else
-    pIterateSeries( instance, (char*)studyOID.c_str(), NULL, &CHILIInformation::GlobalIterateSeries, this );
+  pIterateSeries( instance, (char*)studyOID.c_str(), NULL, &CHILIInformation::GlobalIterateSeries, this );
 
   //return the filled SeriesInformationList
   return m_SeriesInformationList;
@@ -214,65 +222,82 @@ ipBool_t mitk::CHILIInformation::GlobalIterateSeries( int /*rows*/, int /*row*/,
   CHILIInformation* callingObject = static_cast<CHILIInformation*>(user_data);
   //create new element and fill
   PACSPlugin::SeriesInformation newSeries;
-  newSeries.OID = series->oid;
-  newSeries.InstanceUID = series->instanceUID;
-  newSeries.Number = series->number;
-  newSeries.Acquisition = series->acquisition;
+  
+  // remember OID for UID
+  ChiliPlugin::GetChiliPluginInstance()->UpdateSeriesOIDForInstanceUID( series->oid, series->instanceUID );
+
+  newSeries.SeriesInstanceUID = series->instanceUID;
+  newSeries.SeriesNumber = series->number;
+  newSeries.SeriesDate = series->date;
+  newSeries.SeriesTime = series->time;
+  newSeries.SeriesDescription = series->description;
+  newSeries.BodyPartExamined = series->bodyPartExamined;
+  newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
+  newSeries.AcquisitionNumber = series->acquisition;
+  newSeries.ContrastAgent = series->contrast;
+  newSeries.ScanningSequence = series->scanningSequence;
   newSeries.EchoNumber = series->echoNumber;
   newSeries.TemporalPosition = series->temporalPosition;
-  newSeries.Date = series->date;
-  newSeries.Time = series->time;
-  newSeries.Description = series->description;
-  newSeries.Contrast = series->contrast;
-  newSeries.BodyPartExamined = series->bodyPartExamined;
-  newSeries.ScanningSequence = series->scanningSequence;
-  newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
   //add to list
   callingObject->m_SeriesInformationList.push_back( newSeries );
 
   return ipTrue; // true = next element; false = break iterate
 }
 
-mitk::PACSPlugin::TextInformation mitk::CHILIInformation::GetTextInformation( QcPlugin* instance, const std::string& textOID )
+mitk::PACSPlugin::DocumentInformation mitk::CHILIInformation::GetDocumentInformation( QcPlugin* instance, const std::string& seriesInstanceUID, unsigned int textInstanceNumber )
 {
-  PACSPlugin::TextInformation resultInformation;
-  resultInformation.OID = "";
+  PACSPlugin::DocumentInformation resultInformation;
+  // TODO insert call to clearDocumentInformation 
 
-  if( textOID == "" )
+  if ( seriesInstanceUID.empty() )
     return resultInformation;
 
   text_t text;
   initTextStruct( &text );
 
   //let CHILI search
+  std::string textOID = ChiliPlugin::GetChiliPluginInstance()->GetTextOIDFromSeriesInstanceUIDAndInstanceNumber( seriesInstanceUID, textInstanceNumber );
   text.oid = strdup( textOID.c_str() );
   if( !pQueryText( instance, &text, NULL, NULL, NULL ) )
   {
     clearTextStruct( &text );
-    std::cout << "CHILIInformation (GetTextInformation): pQueryText() failed. Abort." << std::endl;
+    std::cout << "CHILIInformation (GetDocumentInformation): pQueryText() failed. Abort." << std::endl;
     return resultInformation;
   }
 
-  resultInformation.OID = text.oid;
+  resultInformation.SeriesInstanceUID = seriesInstanceUID;
+  resultInformation.InstanceNumber = textInstanceNumber;
   resultInformation.MimeType = text.mime_type;
-  resultInformation.ChiliText = text.chiliText;
-  resultInformation.Status = text.status;
-  resultInformation.FrameOfReferenceUID = text.frameOfReferenceUID;
-  resultInformation.TextDate = text.text_date;
-  resultInformation.Description = text.description;
+  resultInformation.ContentDate = text.text_date;
+  resultInformation.DocumentTitle = text.description;
 
   clearTextStruct( &text );
   return resultInformation;
 }
 
-mitk::PACSPlugin::TextInformationList mitk::CHILIInformation::GetTextInformationList( QcPlugin* instance, const std::string& seriesOID )
+mitk::PACSPlugin::DocumentInformationList mitk::CHILIInformation::GetDocumentInformationList( QcPlugin* instance, const std::string& seriesInstanceUID )
 {
   //get used to save all text
-  m_TextInformationList.clear();
+  m_DocumentInformationList.clear();
+  m_DocumentTextOIDList.clear();
   //iterate over all text
+  std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
   pIterateTexts( instance, (char*)seriesOID.c_str(), NULL, &CHILIInformation::GlobalIterateText, this );
-  //return the filled TextInformationList
-  return m_TextInformationList;
+
+  unsigned int instanceNumber = 0;
+  std::list<std::string>::iterator OIDiter = m_DocumentTextOIDList.begin();
+  for (PACSPlugin::DocumentInformationList::iterator iter = m_DocumentInformationList.begin(); 
+       iter != m_DocumentInformationList.end(); 
+       ++iter, ++OIDiter, ++instanceNumber )
+  {
+    iter->SeriesInstanceUID = seriesInstanceUID;
+    iter->InstanceNumber = instanceNumber;
+    
+    ChiliPlugin::GetChiliPluginInstance()->UpdateTextOIDFromSeriesInstanceUIDAndInstanceNumber( *OIDiter, seriesInstanceUID, instanceNumber );
+  }
+
+  //return the filled DocumentInformationList
+  return m_DocumentInformationList;
 }
 
 ipBool_t mitk::CHILIInformation::GlobalIterateText( int /*rows*/, int /*row*/, text_t *text, void *user_data )
@@ -285,16 +310,14 @@ ipBool_t mitk::CHILIInformation::GlobalIterateText( int /*rows*/, int /*row*/, t
   if( fileName != "ParentChild.xml" )
   {
     //create new element and fill
-    PACSPlugin::TextInformation resultText;
-    resultText.OID = text->oid;
+    PACSPlugin::DocumentInformation resultText;
+    // InstanceNumber will be filled out by calling method GetDocumentInformationList
     resultText.MimeType = text->mime_type;
-    resultText.ChiliText = text->chiliText;
-    resultText.Status = text->status;
-    resultText.FrameOfReferenceUID = text->frameOfReferenceUID;
-    resultText.TextDate = text->text_date;
-    resultText.Description = text->description;
+    resultText.ContentDate = text->text_date;
+    resultText.DocumentTitle = text->description;
     //add to list
-    callingObject->m_TextInformationList.push_back( resultText );
+    callingObject->m_DocumentInformationList.push_back( resultText );
+    callingObject->m_DocumentTextOIDList.push_back( text->oid );
   }
   return ipTrue; // true = next element; false = break iterate
 }

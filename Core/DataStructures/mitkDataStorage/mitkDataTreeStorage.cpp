@@ -39,7 +39,6 @@ mitk::DataTreeStorage::~DataTreeStorage()
   {
     m_DataTree->RemoveObserver(m_DeleteInTreeObserverTag);
   }
-  m_DataTree = NULL; 
 }
 
 

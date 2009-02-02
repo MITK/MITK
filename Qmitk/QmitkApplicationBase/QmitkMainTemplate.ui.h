@@ -113,6 +113,7 @@ However, it is nice to actually replace the nonsense :-)
 #endif
 
 #include <QmitkCommonFunctionality.h>
+#include <QmitkPACSLoadDialog.h>
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkHelpBrowser.h>
 #include <QmitkSocketClient.h>
@@ -709,6 +710,11 @@ void QmitkMainTemplate::fileExit()
 
 void QmitkMainTemplate::init()
 {
+  mitk::PACSPlugin::PACSPluginCapability pacsCapabilities = mitk::PACSPlugin::GetInstance()->GetPluginCapabilities();
+  fileLoad_from_PACSAction->setVisible( pacsCapabilities.IsPACSFunctional && 
+                                        pacsCapabilities.HasLoadCapability );
+  connect( fileLoad_from_PACSAction, SIGNAL(activated()), this, SLOT(OnFileLoadFromPACS()) );
+
   redoButton->setMode(QUndoRedoButton::Redo);
   m_Instance = this;
   m_MultiWidget=NULL;
@@ -976,7 +982,7 @@ void QmitkMainTemplate::Initialize()
 
   // use dark palette on/off
   mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette"));
-  if(mitk::PACSPlugin::GetInstance()->GetPluginCapabilities().isPlugin)
+  if(mitk::PACSPlugin::GetInstance()->GetPluginCapabilities().IsPACSFunctional)
     this->enableDarkPalette(true);
   else
     if (darkProperty != NULL)
@@ -1503,7 +1509,7 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
 
     // dark palette
     mitk::BoolProperty* darkProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Use dark palette"));
-    if(mitk::PACSPlugin::GetInstance()->GetPluginCapabilities().isPlugin)
+    if(mitk::PACSPlugin::GetInstance()->GetPluginCapabilities().IsPACSFunctional)
       this->enableDarkPalette(true);
     else
       if (darkProperty != NULL)
@@ -1949,3 +1955,10 @@ void QmitkMainTemplate::showFavoritesbar( bool on )
   else
     FavoritesToolbar->show();
 }
+
+void QmitkMainTemplate::OnFileLoadFromPACS()
+{
+  QmitkPACSLoadDialog dialog(this);
+  dialog.exec();
+}
+

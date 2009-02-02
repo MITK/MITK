@@ -168,6 +168,7 @@ void mitk::ImageToPicDescriptor::SetImageNumber( int imageNumber )
 /** This function separate a mitk::image into a list of mitkIpPicDescriptor. If no input set before, the function create an empty output. */
 void mitk::ImageToPicDescriptor::Update()
 {
+std::cout << "1 " <<  m_SourceImage.GetPointer() << " " << m_TagListInitialized << std::endl;
   m_Output.clear();
   m_imageInstanceUIDs.clear();
 
@@ -178,6 +179,8 @@ void mitk::ImageToPicDescriptor::Update()
 
   if( !m_ImageNumberInitialized )
     m_ImageNumber = 1;
+
+std::cout << "Ok, generating image slices" << std::endl;
 
   // used var
   ipPicDescriptor* currentPicDescriptor;
@@ -203,19 +206,30 @@ void mitk::ImageToPicDescriptor::Update()
   ProgressBar::GetInstance()->AddStepsToDo( maxSlice*maxTime );
   for( slice = maxSlice - 1; slice >= 0; --slice )  // Slices
   {
+std::cout << "  working on slice " << slice << std::endl;
     resultSlice->SetSliceNr( slice );
     for( time = 0; time < maxTime; ++time )  // Time
     {
       resultSlice->SetTimeNr( time );
       resultSlice->Update();
+std::cout << "    got slice for time " << time << std::endl;
       // get current slice
+      std::string tmpFileName("/tmp/slicy.pic");
+      mitkIpPicDescriptor* mitkDescriptor = resultSlice->GetOutput()->GetPic();
+      mitkIpPicPut( tmpFileName.c_str(), mitkDescriptor ); 
+      currentPicDescriptor = ipPicGet( (char*)tmpFileName.c_str(), NULL );
+/*
       ipPicDescriptor* chiliPicDescriptor = reinterpret_cast<ipPicDescriptor*>(resultSlice->GetOutput()->GetPic());
+std::cout << "    pic descriptor is " << chiliPicDescriptor  << std::endl;
       currentPicDescriptor = ipPicClone( chiliPicDescriptor );
+*/
 
       if( !currentPicDescriptor ) continue;
+std::cout << "    got pic descriptor" << std::endl;
 
       if( !m_UseSavedPicTags )
       {
+std::cout << "    !m_UseSavedPicTags" << std::endl;
         // create the needed ImageTags
         ipPicDescriptor* missingImageTags = ipPicNew();
         QcPlugin::addTags( missingImageTags, missingImageTags, false );
@@ -285,6 +299,7 @@ void mitk::ImageToPicDescriptor::Update()
       else
       //if the slices should override, no tags get changed, but we need the imageInstanceUID
       {
+std::cout << "    m_UseSavedPicTags" << std::endl;
         ipPicTSV_t* missingImageTagQuery = ipPicQueryTag( currentPicDescriptor, (char*)tagIMAGE_INSTANCE_UID );
         if( missingImageTagQuery )
           m_imageInstanceUIDs.push_back( static_cast<char*>( missingImageTagQuery->value ) );

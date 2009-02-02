@@ -35,17 +35,18 @@ class CHILIInformation: public itk::Object
     itkNewMacro( CHILIInformation );
     virtual ~CHILIInformation();
 
-    PACSPlugin::StudyInformation GetStudyInformation( QcPlugin* instance, const std::string& seriesOID = "" );
+    PACSPlugin::StudyInformation GetStudyInformation( QcPlugin* instance, const std::string& seriesInstanceUID = "" );
 
-    PACSPlugin::PatientInformation GetPatientInformation( QcPlugin* instance, const std::string& seriesOID = "" );
+    PACSPlugin::PatientInformation GetPatientInformation( QcPlugin* instance, const std::string& seriesInstanceUID = "" );
 
-    PACSPlugin::SeriesInformation GetSeriesInformation( QcPlugin* instance, const std::string& seriesOID = "" );
+    PACSPlugin::SeriesInformation GetSeriesInformation( QcPlugin* instance, const std::string& seriesInstanceUID = "" );
 
-    PACSPlugin::SeriesInformationList GetSeriesInformationList( QcPlugin* instance, const std::string& studyOID = "" );
+    PACSPlugin::SeriesInformationList GetSeriesInformationList( QcPlugin* instance, const std::string& studyInstanceUID = "" );
 
-    PACSPlugin::TextInformation GetTextInformation( QcPlugin* instance, const std::string& textOID );
+    PACSPlugin::DocumentInformation GetDocumentInformation( QcPlugin* instance, const std::string& seriesInstanceUID, 
+                                                                                unsigned int textInstanceNumber );
 
-    PACSPlugin::TextInformationList GetTextInformationList( QcPlugin* instance, const std::string& seriesOID );
+    PACSPlugin::DocumentInformationList GetDocumentInformationList( QcPlugin* instance, const std::string& seriesInstanceUID );
 
   private:
 
@@ -55,7 +56,8 @@ class CHILIInformation: public itk::Object
 
     PACSPlugin::SeriesInformationList m_SeriesInformationList;
 
-    PACSPlugin::TextInformationList m_TextInformationList;
+    PACSPlugin::DocumentInformationList m_DocumentInformationList;
+    std::list<std::string> m_DocumentTextOIDList;
 
   protected:
 

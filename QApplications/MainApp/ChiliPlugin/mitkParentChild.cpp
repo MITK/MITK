@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkImageToPicDescriptor.h"
 #include "mitkIpPicUnmangle.h"
+#include "mitkChiliPlugin.h"
 //CHILI
 #include <chili/plugin.h>
 //XML
@@ -28,9 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::ParentChild::ParentChild()
 {
-  m_currentXML.xmlStudyOID = "";
   m_currentXML.xmlStudyInstanceUID = "";
-  m_currentXML.xmlPatientOID = "";
+  m_currentXML.xmlPatientID = "";
   m_currentXML.xmlSeriesOID = "";
   m_currentXML.xmlTextOID = "";
   m_currentXML.xmlDocument = NULL;
@@ -41,14 +41,13 @@ mitk::ParentChild::~ParentChild()
 {
 }
 
-void mitk::ParentChild::InitParentChild( QcPlugin* instance, const std::string& studyOID, const std::string& instanceUID, const std::string& patientOID, const std::string& tmpDirectory )
+void mitk::ParentChild::InitParentChild( QcPlugin* instance, const std::string& studyInstanceUID, const std::string& patientID, const std::string& tmpDirectory )
 {
-  if( studyOID == "" )
+  if( studyInstanceUID == "" )
   {
     std::cout << "ParentChild (InitParentChild): Empty StudyOID set. Its not possible to load/save volumes or relations." << std::endl;
-    m_currentXML.xmlStudyOID = "";
     m_currentXML.xmlStudyInstanceUID = "";
-    m_currentXML.xmlPatientOID = "";
+    m_currentXML.xmlPatientID = "";
     m_currentXML.xmlSeriesOID = "";
     m_currentXML.xmlTextOID = "";
     m_currentXML.xmlDocument = NULL;
@@ -56,19 +55,24 @@ void mitk::ParentChild::InitParentChild( QcPlugin* instance, const std::string& 
     m_SavedNodeList.clear();
   }
 
-  if( m_currentXML.xmlStudyOID != studyOID )
+  if( m_currentXML.xmlStudyInstanceUID != studyInstanceUID )
   {
     m_Instance = instance;
     m_tmpDirectory = tmpDirectory;
-    m_currentXML.xmlStudyOID = studyOID;
-    m_currentXML.xmlStudyInstanceUID = instanceUID;
-    m_currentXML.xmlPatientOID = patientOID;
+    m_currentXML.xmlStudyInstanceUID = studyInstanceUID;
+    m_currentXML.xmlPatientID = patientID;
     m_currentXML.xmlSeriesOID = "";
     m_currentXML.xmlTextOID = "";
     m_currentXML.xmlDocument = NULL;
     m_currentXML.elementCount = 0;
     m_SavedNodeList.clear();
     //search for xml-file
+
+    const std::string studyOID = ChiliPlugin::GetChiliPluginInstance()->GetStudyOIDFromInstanceUID( studyInstanceUID );
+    if (studyOID.empty())
+    {
+      std::cerr << "Couldn't find CHILI specific OID for study instance UID " << studyInstanceUID << ". Debuggin session useful :-)" << std::endl;
+    }
     pIterateSeries( instance, (char*)studyOID.c_str(), NULL, &ParentChild::GlobalIterateSearchStepOne, this );
 
     if( m_currentXML.xmlSeriesOID != "" )
@@ -279,7 +283,7 @@ void mitk::ParentChild::SaveRelationShip()
     }
     //save Text-file
     std::string pathAndFile = m_tmpDirectory + "ParentChild.xml";
-    if( !pStoreDataFromFile( pathAndFile.c_str(), "ParentChild.xml", "application/MITK.xml", NULL, m_currentXML.xmlStudyInstanceUID.c_str(), m_currentXML.xmlPatientOID.c_str(), m_currentXML.xmlStudyOID.c_str(), m_currentXML.xmlSeriesOID.c_str(), m_currentXML.xmlTextOID.c_str() ) )
+    if( !pStoreDataFromFile( pathAndFile.c_str(), "ParentChild.xml", "application/MITK.xml", NULL, m_currentXML.xmlStudyInstanceUID.c_str(), m_currentXML.xmlPatientID.c_str(), m_currentXML.xmlStudyInstanceUID.c_str(), m_currentXML.xmlSeriesOID.c_str(), m_currentXML.xmlTextOID.c_str() ) )
       std::cout << "ParentChild (SaveRelationShip): Error while saving parent-child-relationship." << std::endl;
    else
       if( remove(  pathAndFile.c_str() ) != 0 )
@@ -443,7 +447,7 @@ std::string mitk::ParentChild::GetLabel( std::list< std::string > ImageInstanceU
   return "";
 }
 
-std::list<std::string> mitk::ParentChild::GetSlices( const std::string& label, const std::string& seriesOID )
+std::list<std::string> mitk::ParentChild::GetSlices( const std::string& label, const std::string& seriesInstanceUID )
 {
   std::list<std::string> result;
   result.clear();
@@ -467,12 +471,12 @@ std::list<std::string> mitk::ParentChild::GetSlices( const std::string& label, c
             if( reference == "label" )
               labelAtt = search->Value();
             else
-              if( reference == "seriesOID" )
+              if( reference == "seriesInstanceUID" )
                 oidAtt = search->Value();
           }
 
           //check if the seriesOID and label are equal
-          if( oidAtt == seriesOID && labelAtt == label )
+          if( oidAtt == seriesInstanceUID && labelAtt == label )
           {
             //need to know if to load a text or image
             TiXmlElement* singleID = singleVolume->FirstChildElement();
@@ -502,7 +506,7 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetSerie
   //init the right parent-child-xml-file
   PACSPlugin::StudyInformation currentStudy = PACSPlugin::GetInstance()->GetStudyInformation( seriesOID );
   PACSPlugin::PatientInformation currentPatient = PACSPlugin::GetInstance()->GetPatientInformation( seriesOID );
-  InitParentChild( instance, currentStudy.OID, currentStudy.InstanceUID, currentPatient.OID, tmpDirectory );
+  InitParentChild( instance, currentStudy.StudyInstanceUID, currentPatient.PatientID, tmpDirectory );
 
   if( m_currentXML.xmlDocument )
   {
@@ -537,7 +541,7 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetSerie
           PACSPlugin::ParentChildRelationInformation newElement;
           newElement.Label = label;
           newElement.ID = id;
-          newElement.OID = oid;
+          newElement.SeriesInstanceUID = oid;
           newElement.ParentLabel.clear();
           newElement.ChildLabel.clear();
 
@@ -566,7 +570,7 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudy
     study_t* currentStudy= pCurrentStudy();
     patient_t* currentPatient= pCurrentPatient();
     if( currentStudy && currentPatient )
-      InitParentChild( instance, currentStudy->oid, currentStudy->instanceUID, currentPatient->oid, tmpDirectory );
+      InitParentChild( instance, currentStudy->instanceUID, currentPatient->oid, tmpDirectory );
   }
   else
   {
@@ -576,7 +580,7 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudy
     initPatientStruct( &patient );
 
     if( pQueryStudy( instance, &study, &patient ) )
-      InitParentChild( instance, study.oid, study.instanceUID, patient.oid, tmpDirectory );
+      InitParentChild( instance, study.instanceUID, patient.oid, tmpDirectory );
 
     clearStudyStruct( &study );
     clearPatientStruct( &patient );
@@ -614,7 +618,7 @@ mitk::PACSPlugin::ParentChildRelationInformationList mitk::ParentChild::GetStudy
         PACSPlugin::ParentChildRelationInformation newElement;
         newElement.Label = label;
         newElement.ID = id;
-        newElement.OID = oid;
+        newElement.SeriesInstanceUID = oid;
         newElement.ParentLabel.clear();
         newElement.ChildLabel.clear();
 

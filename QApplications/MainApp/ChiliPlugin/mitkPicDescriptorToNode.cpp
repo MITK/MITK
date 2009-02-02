@@ -24,11 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define ipPicDescriptor mitkIpPicDescriptor
 #include "mitkPicDescriptorToNode.h"
 #include "mitkPACSPlugin.h"
-#include "mitkChiliPluginEvents.h"
+#include "mitkPACSPluginEvents.h"
 #include "mitkFrameOfReferenceUIDManager.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
-#include "math.h"
+
+#include <math.h>
+#include <string.h>
 #undef ipPicDescriptor
 #include <itkCommand.h>
 
@@ -39,7 +41,7 @@ mitk::PicDescriptorToNode::PicDescriptorToNode()
   {
     itk::ReceptorMemberCommand<PicDescriptorToNode>::Pointer command = itk::ReceptorMemberCommand<PicDescriptorToNode>::New();
     command->SetCallbackFunction( this, &PicDescriptorToNode::Abort );
-    m_ObserverTag = mitk::PACSPlugin::GetInstance()->AddObserver( mitk::PluginAbortFilter(), command );
+    m_ObserverTag = mitk::PACSPlugin::GetInstance()->AddObserver( mitk::PluginAbortPACSImport(), command );
   }
 }
 
@@ -117,12 +119,19 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
     {
       case mitkIpPicASCII:
         { 
-          size_t tagLen = currentTag->n[0];
-          char* stringValue = (char*)malloc(tagLen + 1);
-          memcpy(stringValue,currentTag->value,tagLen);
-          stringValue[tagLen]= '\0';
-          resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( stringValue ) );
-          free(stringValue);
+          if ( currentTag->value )
+          {
+            size_t tagLen = currentTag->n[0];
+            char* stringValue = (char*)malloc(tagLen + 1);
+            memcpy(stringValue,currentTag->value,tagLen);
+            stringValue[tagLen]= '\0';
+            std::string s( (const char*)currentTag->value, tagLen );
+            resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( s ) );
+          }
+          else
+          {
+            resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( "(no name)" ) );
+          }
           break;
         }
 	  /* this code does not work. mitkIpPicInt and mitkIpPicUInt can have different sizes.
@@ -302,7 +311,7 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<mitkIpPicDescriptor*> sl
     DataTreeNodeFactory::SetDefaultImageProperties( node );
 
     if( m_SeriesOID != "" )
-      node->SetProperty( "SeriesOID", StringProperty::New( m_SeriesOID ) );
+      node->SetProperty( "SeriesInstanceUID", StringProperty::New( m_SeriesOID ) );
     if( seriesDescription != "" )
       node->SetProperty( "name", StringProperty::New( seriesDescription ) );
     else

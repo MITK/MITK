@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>232</width>
-            <height>304</height>
+            <height>334</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -144,90 +144,11 @@
             <property name="title">
                 <string>Segmentations</string>
             </property>
-            <grid>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QToolButton" row="1" column="1">
-                    <property name="name">
-                        <cstring>btnDeleteSegmentation</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="iconSet">
-                        <iconset>image1</iconset>
-                    </property>
-                    <property name="textLabel">
-                        <string>Delete selected segmentations</string>
-                    </property>
-                </widget>
-                <widget class="QToolButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>btnNewSegmentation</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="iconSet">
-                        <iconset>image2</iconset>
-                    </property>
-                    <property name="textLabel">
-                        <string>New segmentation</string>
-                    </property>
-                    <property name="popupDelay">
-                        <number>300</number>
-                    </property>
-                </widget>
-                <widget class="QToolButton" row="1" column="3">
-                    <property name="name">
-                        <cstring>btnSaveSegmentation</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="iconSet">
-                        <iconset>image3</iconset>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Save segmentation to file</string>
-                    </property>
-                </widget>
-                <widget class="QToolButton" row="1" column="2">
-                    <property name="name">
-                        <cstring>btnLoadSegmentation</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                    <property name="text">
-                        <string></string>
-                    </property>
-                    <property name="iconSet">
-                        <iconset>image4</iconset>
-                    </property>
-                    <property name="textLabel">
-                        <string>Load segmentation from file</string>
-                    </property>
-                </widget>
-                <widget class="QmitkToolWorkingDataSelectionBox" row="0" column="0" rowspan="1" colspan="4">
+                <widget class="QmitkToolWorkingDataSelectionBox">
                     <property name="name">
                         <cstring>m_ToolWorkingDataSelectionBox</cstring>
                     </property>
@@ -237,7 +158,134 @@
                         </font>
                     </property>
                 </widget>
-                <widget class="Line" row="2" column="0" rowspan="1" colspan="4">
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout1</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnNewSegmentation</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image1</iconset>
+                            </property>
+                            <property name="textLabel">
+                                <string>New segmentation</string>
+                            </property>
+                            <property name="popupDelay">
+                                <number>300</number>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnDeleteSegmentation</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image2</iconset>
+                            </property>
+                            <property name="textLabel">
+                                <string>Delete selected segmentations</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnLoadSegmentation</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image3</iconset>
+                            </property>
+                            <property name="textLabel">
+                                <string>Load segmentation from file</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnLoadSegmentationPACS</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image4</iconset>
+                            </property>
+                            <property name="textLabel">
+                                <string>Load segmentation from file</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnSaveSegmentation</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image5</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Save segmentation to file</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>btnSaveSegmentationPACS</cstring>
+                            </property>
+                            <property name="font">
+                                <font>
+                                    <bold>0</bold>
+                                </font>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                            <property name="iconSet">
+                                <iconset>image6</iconset>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Save segmentation to file</string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="Line">
                     <property name="name">
                         <cstring>line1</cstring>
                     </property>
@@ -251,17 +299,7 @@
                         <enum>Horizontal</enum>
                     </property>
                 </widget>
-                <widget class="QmitkToolGUIArea" row="4" column="0" rowspan="1" colspan="4">
-                    <property name="name">
-                        <cstring>m_PostProcessingToolGUIContainer</cstring>
-                    </property>
-                    <property name="font">
-                        <font>
-                            <bold>0</bold>
-                        </font>
-                    </property>
-                </widget>
-                <widget class="QmitkToolSelectionBox" row="3" column="0" rowspan="1" colspan="4">
+                <widget class="QmitkToolSelectionBox">
                     <property name="name">
                         <cstring>m_PostProcessingToolSelectionBox</cstring>
                     </property>
@@ -271,7 +309,17 @@
                         </font>
                     </property>
                 </widget>
-            </grid>
+                <widget class="QmitkToolGUIArea">
+                    <property name="name">
+                        <cstring>m_PostProcessingToolGUIContainer</cstring>
+                    </property>
+                    <property name="font">
+                        <font>
+                            <bold>0</bold>
+                        </font>
+                    </property>
+                </widget>
+            </vbox>
         </widget>
         <widget class="QmitkToolSelectionBox">
             <property name="name">
@@ -334,7 +382,7 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>120</height>
+                    <height>130</height>
                 </size>
             </property>
         </spacer>
@@ -355,7 +403,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image5</pixmap>
+        <pixmap>image7</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkSlicesInterpolator</class>
@@ -371,7 +419,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image5</pixmap>
+        <pixmap>image7</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkToolReferenceDataSelectionBox</class>
@@ -387,7 +435,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image5</pixmap>
+        <pixmap>image7</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkToolGUIArea</class>
@@ -403,7 +451,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image6</pixmap>
+        <pixmap>image8</pixmap>
     </customwidget>
     <customwidget>
         <class>QmitkToolWorkingDataSelectionBox</class>
@@ -419,7 +467,7 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
-        <pixmap>image5</pixmap>
+        <pixmap>image7</pixmap>
     </customwidget>
 </customwidgets>
 <images>
@@ -427,21 +475,27 @@
         <data format="PNG" length="140">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000534944415418958d8fc10dc0300c02e3ccd309d85f3741f6713f4d9592582a4f74061c409b1a525e10cda4a1ec6e567ac12a6d033f5552fe028170b87bada49cd00a6f8940f01cb16ceea7272425e6951bddbb0195a12cabe8aea4b10000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="PNG" length="124">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000434944415418958d8e510a00200843b7ee7fe6eca760cd0509a2cec71827fe6ac85ebb913405294f9dcdd19d2e0307f9ba1d4c191be8d0a5a78c0c11ea802550cb07800b4b480e0c89ab907f0000000049454e44ae426082</data>
-    </image>
-    <image name="image2">
         <data format="PNG" length="146">89504e470d0a1a0a0000000d494844520000000d000000100806000000cda3f53900000059494441542891ed92310ac0300c03a5d2ffff4a7e503e709d124287341d0b3d3078d0190d160d49e269682815d19025016885edb1a7e26d0918f2b14cdfe8c7cf5d61aeb825cdf56dbfabd7f9a56f48672ab6bdfed889547c01ceff2d2d96015fdb0000000049454e44ae426082</data>
     </image>
-    <image name="image3">
-        <data format="PNG" length="189">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000008449444154388dc552410e80200c6b8dffff15bcc097f0817a7106756c440f3621215953da0ea80900f4e6945a40009204002009bb8fd07348621d917a481a8abb021e71e42c74602f4722a983ac93259c4ee0b3c025c23db3877ba4470759e6d0812172913ab00fd3afd29b1bfedfc2a2267a99254d15bad6ade21039d9d92acf7e9ab803e3605c870cae24320000000049454e44ae426082</data>
+    <image name="image2">
+        <data format="PNG" length="124">89504e470d0a1a0a0000000d494844520000000a0000000908060000000ba6bd13000000434944415418958d8e510a00200843b7ee7fe6eca760cd0509a2cec71827fe6ac85ebb913405294f9dcdd19d2e0307f9ba1d4c191be8d0a5a78c0c11ea802550cb07800b4b480e0c89ab907f0000000049454e44ae426082</data>
     </image>
-    <image name="image4">
+    <image name="image3">
         <data format="PNG" length="204">89504e470d0a1a0a0000000d494844520000000f0000000c0806000000bd42e7e4000000934944415428919d92310ec4200c0467d13d809aceed3d21ff274f484b47cd0f7cc5295142827297955cd8b09e154275a9d0204dc9d9a92e55a5152c1a342042df87d20a694aeeeeec2bbd935b344a2b07e3be17e0ee072800924eb33ed1d03c92a46dc1c93c225e2578f55b7f4d21c9c313e3aa707fe5924a9eb3c253aa45fb929fbef646fed768d10879ce5a0fee0a8e3fed03f0dc68f1726dfc090000000049454e44ae426082</data>
     </image>
+    <image name="image4">
+        <data format="PNG" length="352">89504e470d0a1a0a0000000d49484452000000130000000e0806000000cd1827890000012749444154388dad92bf4b425114c73fe79568691836b9144ead41107843e93f085a5c23a3a1a13f2268ecaf70e82fe8c7da725ba441682c49325e848a1864619d8678af9efa30c92f9ce172eef9f0b9872bd65a261527ac912d95745c987866c6187ff8b2b0457e5abe0fb179ae8a451936dc9aaaaace42aa9311dfcc18a3aa8a57f9f50daa8d36d45d78ac913d3e0a58ae9e9fe8d2c3a946175d22e9e71f334055fb5ed468503086c38524cbad26f47a745273dcc692ac4462d069d29e79a5965b239e48f394df947098979b0a1f1767bc74bb68f99ab7bb7baceb928947497c3aa473592afb07fe0a06602243d73390f2ce36efbb7b81cb019888106ad91711c15a1b8039bf9b7f058525f49f8d6be5c32661e5c3c601855905ccfe0b0270bca6888cac51f902b4f77a4746bae2810000000049454e44ae426082</data>
+    </image>
     <image name="image5">
-        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
+        <data format="PNG" length="189">89504e470d0a1a0a0000000d49484452000000100000001008060000001ff3ff610000008449444154388dc552410e80200c6b8dffff15bcc097f0817a7106756c440f3621215953da0ea80900f4e6945a40009204002009bb8fd07348621d917a481a8abb021e71e42c74602f4722a983ac93259c4ee0b3c025c23db3877ba4470759e6d0812172913ab00fd3afd29b1bfedfc2a2267a99254d15bad6ade21039d9d92acf7e9ab803e3605c870cae24320000000049454e44ae426082</data>
     </image>
     <image name="image6">
+        <data format="PNG" length="480">89504e470d0a1a0a0000000d4948445200000013000000100806000000f4c44462000001a749444154388dad94cf4b1b5110c73fb3f9d1ad896223080aa52204ad172b11c188bdd452a107c19317e959a1dec56bd3633dc43fa007aff1e841855ed2270a2da50523622b0611acb851eb8f54777d3d684ad62cab88dfd37bcccc678699794f9452249349cd1da49492f2bb005aeb4b9688503a3bd92c817c1ee2717467272252e123222ea0e1955144f83c3509b333143fbc473219deb4b662dbb6cbafb9b9914260435bd51bdab732d269c8fd80dc0ab477404d045ebde6d18b97ec2e6661eb279f561730869fe2840254af7589274c4488c762e4e6e6587f3b424bc102db86278d7c3b3778167e087f2c0ecc13f2bd5d44a20dec3c1ff086b9f4651967fa23fb7b7b68b5c49975885555851d36885e1834f476f37d744c0082374decf871135f13094e0bbf91e2195b9bdbc4ea6a099a26841eb07b05ba152c525f4f5b5f3f62087f7bfa987f9762627c025d1b657068885499af0b56ea979fb4d6502c72ee38acacfd72d92a2aabe899974c9310b07374e40f037cabf34b56012b5f0faf60cf895fc9f305dc55f70b534a89578fb4d6b71b46998270f99588c8ffc89bd6a364bffe05fd03aab7b1a037dc9de50000000049454e44ae426082</data>
+    </image>
+    <image name="image7">
+        <data format="PNG" length="806">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000002ed49444154388dcd953168dc5618c77f2e1a3e81034f70851378d0818778bc42174186f37834c3153a249dd24097d2251d3315d274c81c3a183cda43211902ce60c8950eba21e16c48890a2ed50d0712d8a03704f44104d7e1c967df9d0d2db4d0b7083d7deff7fdf57f7f3dad2549c27f31bce589f1ebf12c2f72caf7e5df02586bc94e32466f4624bf266b57822bfd7316752b2214ad1539af68aafce65ad59756d730c9407784388e6749e2e073f0f8f57816752b0a7b40596680e2fb4af54128a64279a68010b4a0d351641db4692037200ce1e82a2bf22227421ba8c5f785776f0dc31796f4d802da540ad14d617b60887b40ede645162d9a83cbf7255aeb1c9a0c61efa7c22d5a173a370de2413e5526bf2bbb3f161413c3dd7b72a9e91560a7057c1fdebd9506aaf43e6bd31f08c1c78028aa21c9cb8abd9d8283fd82763ba2ff4500d805f047cb6daa0fc2f0b99d43bffc5a08420b62294f8557cf4bfa039fafbe6d03c2b37d8b3d5b96b87ceb413115d2df2cc618fa0301cf82076a0dbb4f94f4d8529ec2fd0701a343579ba6cea6eb1543b3fb4a1835afdf409f3e769b685ac227b70431155b5db763f9441b23af01bb9cba0211e769991b9e3e56d263d750043a1bbe7bee9dc364c58a15c541cb156653453560f40b4ea911da6d4331b53c7a98931e05e4272e0d61e42f6396bebcda853fda14267f28c9cb8afe1d9ff2d410df12c20d9f470fa198587ef8264355312da1dbadc8a78b915b512cebd01f1800f6760a92c38afb0f02ba3d88ba25df7ddfc1b40dd65ab456b6076dc2cd15c1ab8790d610f7a0981a9eed17ec3e29181d0a5b5b0202f9498e9ee97ce57868c96e8788b7f8a1ccc1d65e045c513ebf279876c4c1cf2e0de9f14573d312fa83886468b1aaa882b58b56ccc1d949c624036e5cc0fb0321ee85a4a9219fb8f970c3a7fb6945b809dbb74327d22b498fae018fde8cd01d210c9ba8d5cc8f4c398fa1077961c95fb8d6e209d6427aa4e4c5a2a56b97ff20711ccf963dff27e3fc2c5e01ff9b63256eff7bf05f44dc4fc7fe04b35b0000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
         <data format="PNG" length="1002">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003b149444154388dad945f4c5b551cc73fe7dc4b7b4bcba0762d45c43114323599ee6192609c51d883892ce083f1718b3ebb185f8dc91e972cf39d2d2a2f1af664b6f1e0fe3863a0718969700eb0c52142da0242a1bd6d696f7bcff101585203ceb8fd9ece39f99dcff9fe7edf939f88c562ec465f5f9fe609442c161362173c3e3eae7b7a7ac8e7f36432196cdbfe4f907c3e4f2291201e8fe338cec3737357e9e8e828aded1e229d650e1f2d51754b082110124c13a4dc5ea341eb9dc284c0558a853f3ce8cb0677ef500fde7d39d2596679e326597b8e9abb85d7a770ab16ab6983ec5a05b487a70e36f0f4e10afe408d6a558310980108478dba4a1e8233990c5d474b64ed39aa3a8fe5f3317fbf81dbd70bccfeb205947632fd74f6589c1c6ea2f70d03a58ba0c1f2c9bdc1b66de3b8256a6e11cbe7e3ee1d181b590124fe2693aeee08d223c82c3a2c24b7b874bec8f26288774f7bd054504aef0dde6e99c0eb83f9fb266323cb80a27fb0958141836044605a2ee5523393371cc646fee2da37195aa35d0c0c5b4859ac03d7e91712dcaac5adab3650a3ff9d08ef7dd8404bb48869e5d958b5b87dadc4c9a1464e9f0d0326df7ebd86bd2e310cb1bf62d384d59441f2d70a070e1c60e09489929b988681bdd9cc97170bcc4c65595f71f8e0e3301337fc24a7732467831875a47f289652b0be5e4151e6d07316c1b0c0340d8ab92023e76d66a6b2840e36d2fb7a13fee632475e6edc367ea98a90fb98b7dd6310ca0328a44761582e1bab41befabcc0ec940d28bc5e93b68e064cab84e1d9beaeb48934eac1f53b01c1b000fca496aa54b61a99fcde61662a4b4b4b23d1680be9d426173e4df3602a48ea411989a4fd590f52a8fd156b05ed9d350e3defe3cfdf4b4c7ce770ea7d3fb9f520afbe1620daeee5c26735d20b9b9cfb6811a754a439e4e5c5639a4caa1e5caf586bfc0197b78702005cb9b4cae4cd3267ce8638fe964bd72b393e39d74928d242617303a756a37f284447770dcdbffc6384a05a85de1306e9a52057c7527c7131c3c42d3f475eb2303c82d4fc3276d6811db37efeb148723082d9b08f79f97c1e5729109a9a28307cc622d2d6cdf52b2b24efe548dedb00142009862cfa879ee1a71f6cec928353511472fbf4389148b0b0e0c108081412458dfe21c9f11351e67e7358595468246d1d1e5e38a6e9e851bc39d84ab502a669331dafec0d8ec7e3e8cb06e1a881d727d1ae40180a434a8c9db129a54126ad48a7358c2b4c5352c8c374bcccdab2bb37d8719cba79fab8211f9df218e0582c261e95f8bfc04f1a1e8bc5c4dfe0a190172af6a9690000000049454e44ae426082</data>
     </image>
 </images>
@@ -451,8 +505,8 @@
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolWorkingDataSelectionBox.h</includehint>
-    <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
+    <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkToolSelectionBox.h</includehint>
     <includehint>QmitkToolGUIArea.h</includehint>
     <includehint>QmitkSlicesInterpolator.h</includehint>

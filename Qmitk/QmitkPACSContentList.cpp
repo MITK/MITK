@@ -138,11 +138,11 @@ void QmitkPACSContentList::UpdatePatientList()
   {
     m_Patients.insert( std::make_pair(
     /*QListViewItem* patientItem = */ new QListViewItem( m_PatientList,
-                                          patientIter->PatientID,
-                                          patientIter->PatientsName,
-                                          patientIter->PatientsBirthDate,
-                                          patientIter->PatientsSex,
-                                          patientIter->PatientComments
+                                          patientIter->PatientID.c_str(),
+                                          patientIter->PatientsName.c_str(),
+                                          patientIter->PatientsBirthDate.c_str(),
+                                          patientIter->PatientsSex.c_str(),
+                                          patientIter->PatientComments.c_str()
                                           ),
                                   *patientIter ) );
   }
@@ -160,11 +160,11 @@ void QmitkPACSContentList::UpdateStudiesList()
   {
     m_Studies.insert( std::make_pair(
     /*QListViewItem* studyItem = */ new QListViewItem( m_StudiesList,
-                                          studyIter->StudyDate,
-                                          studyIter->StudyTime,
-                                          studyIter->StudyDescription,
-                                          studyIter->ModalitiesInStudy,
-                                          studyIter->ReferringPhysician
+                                          studyIter->StudyDate.c_str(),
+                                          studyIter->StudyTime.c_str(),
+                                          studyIter->StudyDescription.c_str(),
+                                          studyIter->ModalitiesInStudy.c_str(),
+                                          studyIter->ReferringPhysician.c_str()
                                           ),
                                   *studyIter ) );
   }
@@ -190,10 +190,10 @@ void QmitkPACSContentList::UpdateSeriesList()
     m_Series.insert( std::make_pair(
     /*QListViewItem* seriesItem = */ new QListViewItem( m_SeriesList,
                                           QString("%1").arg(seriesIter->SeriesNumber), // integer
-                                          seriesIter->SeriesDate,
-                                          seriesIter->SeriesTime,
-                                          seriesIter->SeriesDescription,
-                                          seriesIter->BodyPartExamined
+                                          seriesIter->SeriesDate.c_str(),
+                                          seriesIter->SeriesTime.c_str(),
+                                          seriesIter->SeriesDescription.c_str(),
+                                          seriesIter->BodyPartExamined.c_str()
                                           ),
                                   *seriesIter ) );
   }
@@ -221,9 +221,9 @@ void QmitkPACSContentList::UpdateDocumentList()
           m_Documents.insert( std::make_pair(
           /*QListViewItem* documentItem = */ new QListViewItem( m_DocumentList,
                                                   QString("%1").arg(documentIter->InstanceNumber), // unsigned integer
-                                                  documentIter->ContentDate,
-                                                  documentIter->DocumentTitle,
-                                                  documentIter->MimeType
+                                                  documentIter->ContentDate.c_str(),
+                                                  documentIter->DocumentTitle.c_str(),
+                                                  documentIter->MimeType.c_str()
                                                   ),
                                       *documentIter ) );
         }

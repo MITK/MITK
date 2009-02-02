@@ -115,10 +115,10 @@ void QmitkPACSSaveDialog::UpdateSeriesLists()
     m_Series.insert( std::make_pair(
     /*QListViewItem* seriesItem = */ new QListViewItem( m_SeriesList,
                                           QString("%1").arg(seriesIter->SeriesNumber), // integer
-                                          seriesIter->SeriesDate,
-                                          seriesIter->SeriesTime,
-                                          seriesIter->SeriesDescription,
-                                          seriesIter->BodyPartExamined
+                                          seriesIter->SeriesDate.c_str(),
+                                          seriesIter->SeriesTime.c_str(),
+                                          seriesIter->SeriesDescription.c_str(),
+                                          seriesIter->BodyPartExamined.c_str()
                                           ),
                                   *seriesIter ) );
   }
@@ -203,7 +203,7 @@ void QmitkPACSSaveDialog::SaveIntoSelectedSeries()
   }
     
   int answer = QMessageBox::question( NULL, "Data export to PACS", 
-                                      QString("Are you sure you want to save data into series\n\n%1").arg(seriesDescription),
+                                      QString("Are you sure you want to save data into series\n\n%1").arg(seriesDescription.c_str()),
                                       "Save into named series",
                                       "Cancel, do not save",
                                       QString::null,

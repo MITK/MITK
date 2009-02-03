@@ -182,6 +182,7 @@ void mitk::SaveToCHILI::SaveToSeries( QcPlugin* instance,
 
       // convert Image to ipPicDescriptor
       ImageToPicDescriptor::Pointer converterToDescriptor = ImageToPicDescriptor::New();
+      converterToDescriptor->SetTempDirectory( tmpDirectory );
       LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<LevelWindowProperty*>( node->GetProperty("levelwindow") );
       if( levelWindowProperty.IsNotNull() )
         converterToDescriptor->SetLevelWindow( levelWindowProperty->GetLevelWindow() );

@@ -48,6 +48,11 @@ class HeaderTagInfo
 
 /** Constructor */
 mitk::ImageToPicDescriptor::ImageToPicDescriptor()
+#ifdef WIN32
+:m_TempDirectory("")
+#else
+:m_TempDirectory("/tmp/")
+#endif
 {
   m_LevelWindowInitialized = false;
   m_TagListInitialized = false;
@@ -214,7 +219,8 @@ std::cout << "  working on slice " << slice << std::endl;
       resultSlice->Update();
 std::cout << "    got slice for time " << time << std::endl;
       // get current slice
-      std::string tmpFileName("/tmp/slicy.pic");
+      std::string tmpFileName( m_TempDirectory );
+      tmpFileName += "chili_temporary_slice_for_file_upload_askdljwepuislicy.pic";
       mitkIpPicDescriptor* mitkDescriptor = resultSlice->GetOutput()->GetPic();
       mitkIpPicPut( tmpFileName.c_str(), mitkDescriptor ); 
       currentPicDescriptor = ipPicGet( (char*)tmpFileName.c_str(), NULL );
@@ -418,5 +424,10 @@ std::list<ipPicDescriptor*> mitk::ImageToPicDescriptor::GetOutput()
 std::list< std::string > mitk::ImageToPicDescriptor::GetSaveImageInstanceUIDs()
 {
   return m_imageInstanceUIDs;
+}
+
+void mitk::ImageToPicDescriptor::SetTempDirectory( const std::string& tempDirectory )
+{
+  m_TempDirectory = tempDirectory;
 }
 

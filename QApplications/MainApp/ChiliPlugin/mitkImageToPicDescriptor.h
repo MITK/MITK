@@ -112,6 +112,9 @@ class ImageToPicDescriptor : public itk::Object
     */
     std::list< std::string > GetSaveImageInstanceUIDs();
 
+    /// a temporary directory for temporarily serializing images
+    void SetTempDirectory( const std::string& );
+
   protected:
 
     /** Constuctor */
@@ -135,6 +138,8 @@ class ImageToPicDescriptor : public itk::Object
     /** The imageNumber. */
     int m_ImageNumber;
     bool m_ImageNumberInitialized;
+
+    std::string m_TempDirectory;
 
     /** The Dicom-Header have to deleted, because the function QcPlugin::addDicomHeader() dont change the existing, it create a new one.
     If we dont want to loose to much information, we copy them from the Dicom- to Pic-Header. */

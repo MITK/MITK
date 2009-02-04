@@ -65,7 +65,7 @@ void Category<T>::AddElement(ElementType element)
 }
 
 template<class T>
-void* Category<T>::GetAdapter(const std::type_info& adapter)
+void* Category<T>::GetAdapterImpl(const std::type_info& adapter) const
 {
   if (adapter == typeid(IConfigurationElement))
   {

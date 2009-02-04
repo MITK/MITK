@@ -15,13 +15,12 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef CHERRYIADAPTABLE_H_
-#define CHERRYIADAPTABLE_H_
+#ifndef _CHERRY_IADAPTABLE_H_
+#define _CHERRY_IADAPTABLE_H_
 
 #include "cherryRuntimeDll.h"
 
 #include <typeinfo>
-#include <Poco/Any.h>
 
 namespace cherry {
 
@@ -49,7 +48,7 @@ namespace cherry {
  * @see IAdapterManager
  * @see PlatformObject
  */
-class IAdaptable {
+struct CHERRY_RUNTIME IAdaptable {
 
 public:
 
@@ -66,56 +65,17 @@ public:
   template<typename A>
   A* GetAdapter() const
   {
-    return static_cast<A*>(m_Dispatcher(m_Functor, this, typeid(A)));
+    return static_cast<A*>(this->GetAdapterImpl(typeid(A)));
   }
 
-  virtual ~IAdaptable() { }
+  virtual ~IAdaptable();
 
 protected:
 
-  template<typename AdapterFunctor>
-  IAdaptable(AdapterFunctor func) :
-    m_Functor(func), m_Dispatcher(&Dispatcher<AdapterFunctor>::Dispatch)
-  {
-
-  }
-
-  IAdaptable() : m_Functor(DefaultDispatcher()),
-                 m_Dispatcher(&Dispatcher<DefaultDispatcher>::Dispatch)
-  {
-
-  }
-
-  virtual void* GetAdapterImpl(const std::type_info& /*type*/) const
-  {
-    return 0;
-  }
-
-private:
-
-  typedef void*(*DispatchFunc)(Poco::Any&,const IAdaptable* const, const std::type_info&);
-
-  template<typename AdapterFunctor_>
-  struct Dispatcher {
-    static void* Dispatch(Poco::Any& functor, const IAdaptable* const adaptable, const std::type_info& type)
-    {
-      return (Poco::RefAnyCast<AdapterFunctor_>(functor))(adaptable, type);
-      //return (* static_cast<AdapterFunctor_ *>(functor))(adaptable, type);
-    }
-  };
-
-  struct DefaultDispatcher {
-    void* operator()(const IAdaptable* const adaptable, const std::type_info& type)
-    {
-      return adaptable->GetAdapterImpl(type);
-    }
-  };
-
-  mutable Poco::Any m_Functor;
-  DispatchFunc m_Dispatcher;
-
+  virtual void* GetAdapterImpl(const std::type_info& /*type*/) const = 0;
+  
 };
 
 }  // namespace cherry
 
-#endif /*CHERRYIADAPTABLE_H_*/
+#endif /*_CHERRY_IADAPTABLE_H_*/

@@ -278,8 +278,10 @@ public:
    */
   virtual void EnableUI(std::vector<SmartPointer<IWorkbenchPart> >& parts);
 
+protected:
+
   /**
-   * This implementation of {@link IAdaptable#getAdapter(Class)} returns
+   * This implementation of {@link IAdaptable#GetAdapterImpl(const std::type_info&)} returns
    * <code>null</code>. Subclasses may override. This allows two unrelated
    * subclasses of Saveable to implement {@link #equals(Object)} and
    * {@link #hashCode()} based on an underlying implementation class that is
@@ -287,7 +289,7 @@ public:
    *
    * @since 3.3
    */
-  virtual void* GetAdapter(const std::type_info& adapter);
+  virtual void* GetAdapterImpl(const std::type_info& adapter) const;
 };
 
 }

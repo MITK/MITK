@@ -99,11 +99,6 @@ public:
   void AddElement(ElementType element);
 
   /* (non-Javadoc)
-   * Method declared on IAdaptable.
-   */
-  void* GetAdapter(const std::type_info& adapter);
-
-  /* (non-Javadoc)
    * Method declared on IWorkbenchAdapter.
    */
   //ImageDescriptor GetImageDescriptor();
@@ -175,6 +170,12 @@ public:
    */
   void Clear();
 
+protected:
+
+  /* (non-Javadoc)
+   * Method declared on IAdaptable.
+   */
+  void* GetAdapterImpl(const std::type_info& adapter) const;
 };
 
 } // namespace cherry

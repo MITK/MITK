@@ -23,6 +23,9 @@ class vtkDataObject;
 #include <vtkLinearTransform.h>
 #include <vtkTransformFilter.h>
 #include <sstream>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <stdio.h>
 
 template <class VTKWRITER>
 mitk::UnstructuredGridVtkWriter<VTKWRITER>::UnstructuredGridVtkWriter()
@@ -53,7 +56,21 @@ void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetDefaultExtension()
 template<class VTKWRITER>
 void mitk::UnstructuredGridVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformFilter* /*transformPointSet*/ )
 {
-  m_VtkWriter->Write(); // without any return type. see .cpp for an alternative
+  struct stat fileStatus;
+  time_t timeBefore=0;
+  if (!stat(m_VtkWriter->GetFileName(),&fileStatus))
+  {
+	timeBefore = fileStatus.st_mtime;
+  }
+   if (!m_VtkWriter->Write())
+  {
+    itkExceptionMacro(<<"Error during surface writing.");
+  }
+  // check if file can be written because vtkWriter doesn't check that
+  if (stat(m_VtkWriter->GetFileName(),&fileStatus)||(timeBefore==fileStatus.st_mtime))
+  {
+    itkExceptionMacro(<<"Error during surface writing: file could not be written");
+  }
 }
 
 template <class VTKWRITER>

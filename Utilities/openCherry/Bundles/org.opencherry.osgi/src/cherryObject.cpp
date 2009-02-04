@@ -210,6 +210,10 @@ Object
     std::cout << this->GetNameOfClass() << " (" << this << "): Trying to delete object with non-zero reference count.";
     std::cout << "\n\n";
     }
+    /** 
+    * calls the destroyListener added functions 
+    */ 
+    m_DestroyMessage.Send();
 }
 
 

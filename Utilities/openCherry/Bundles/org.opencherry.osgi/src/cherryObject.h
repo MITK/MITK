@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryOSGiDll.h"
 #include "cherryMacros.h"
+#include "cherryMessage.h"
 
 namespace cherry {
 
@@ -68,6 +69,16 @@ private:
  */
 class CHERRY_OSGI Object
 {
+
+ /** 
+ *  in this case the message macro is used to create a message object as well as add / remove functions 
+ *  (AddDestroyListener, Removedestroylistener) on the message object 
+ *  in order to call the registered functions when the object is destroyed. 
+ *  More information about the NewMessageMacro can be found in @see cherryMessage.h
+ *  
+ */
+ NewMessageMacro(Destroy) 
+ 
 public:
 
   cherryObjectMacro(Object)

@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef @DLL_DEFINE@_DLL.H
-#define @DLL_DEFINE@_DLL.H
+#ifndef _@DLL_DEFINE@_DLL_H_
+#define _@DLL_DEFINE@_DLL_H_
 
 
 //
@@ -40,4 +40,4 @@ PURPOSE.  See the above copyright notices for more information.
   #define @DLL_DEFINE@
 #endif
 
-#endif /*@DLL_DEFINE@_DLL.H*/
+#endif /*_@DLL_DEFINE@_DLL_H_*/

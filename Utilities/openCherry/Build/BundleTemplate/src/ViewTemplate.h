@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef (@UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED)
+#ifndef @UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED
 #define @UBUNDLE_NAMESPACE@_@UVIEW_CLASS@_H_INCLUDED
 
 @INCLUDE_DLL_H@

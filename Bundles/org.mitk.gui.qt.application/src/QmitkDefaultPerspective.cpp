@@ -17,6 +17,10 @@
 
 #include "QmitkDefaultPerspective.h"
 
+QmitkDefaultPerspective::QmitkDefaultPerspective()
+{
+}
+
 void QmitkDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
 {
   std::string editorArea = layout->GetEditorArea();

@@ -25,7 +25,7 @@
 
 struct MITK_QT_APP QmitkDefaultPerspective : public cherry::IPerspectiveFactory
 {
-
+  QmitkDefaultPerspective();
   void CreateInitialLayout(cherry::IPageLayout::Pointer layout);
 
 };

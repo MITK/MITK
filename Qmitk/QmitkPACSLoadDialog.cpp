@@ -184,7 +184,33 @@ void QmitkPACSLoadDialog::ImportSeriesImages()
     QMessageBox::information( NULL, "Series import", "Please select series before importing them.",
                               QMessageBox::Ok );
   }
-
+  
+  std::vector<std::string> uids;
+  for ( std::list< std::string >::iterator iter = seriesInstanceUIDs.begin();
+        iter != seriesInstanceUIDs.end();
+        ++iter )
+  {
+    uids.push_back( *iter );
+  }
+    
+  std::vector<mitk::DataTreeNode::Pointer> m_ImportedNodes = m_Plugin->LoadImagesFromSeries( uids );
+    for ( std::vector<mitk::DataTreeNode::Pointer>::iterator niter = m_ImportedNodes.begin();
+          niter != m_ImportedNodes.end();
+          ++niter )
+    {
+      if ( niter->IsNotNull() )
+      {
+        DecorateNode( niter->GetPointer() );
+        m_ImportedDataTreeNodes.push_back( niter->GetPointer() );
+        mitk::DataStorage::GetInstance()->Add( *niter, m_DataStorageParent );
+      }
+      else
+      {
+        //std::cout << "  Problem importing series " << *iter << std::endl;
+        std::cout << "    Import classes returned an empty DataTreeNode" << std::endl;
+      }
+    }
+/*
   for ( std::list< std::string >::iterator iter = seriesInstanceUIDs.begin();
         iter != seriesInstanceUIDs.end();
         ++iter )
@@ -208,6 +234,7 @@ void QmitkPACSLoadDialog::ImportSeriesImages()
       }
     }
   }
+*/
 
   mitk::RenderingManager::GetInstance()->InitializeViews( mitk::DataStorage::GetInstance() );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

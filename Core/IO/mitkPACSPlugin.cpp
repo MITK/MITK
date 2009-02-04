@@ -162,6 +162,13 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries(
   emptyVector.clear();
   return emptyVector;
 }
+    
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( std::vector<std::string> /* seriesInstanceUIDs */ )
+{
+  std::vector<DataTreeNode::Pointer> emptyVector;
+  emptyVector.clear();
+  return emptyVector;
+}
 
 
 std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string&  /* seriesInstanceUID */ )

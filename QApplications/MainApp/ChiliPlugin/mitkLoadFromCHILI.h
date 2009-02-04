@@ -64,6 +64,10 @@ class LoadFromCHILI: public itk::Object
                                                              const std::string& seriesInstanceUID, 
                                                              const std::string& tmpDirectory );
 
+    std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( QcPlugin* instance, 
+                                                             std::vector<std::string> seriesInstanceUIDs,
+                                                             const std::string& tmpDirectory );
+
     std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( QcPlugin* instance, 
                                                             const std::string& seriesInstanceUID, 
                                                             const std::string& tmpDirectory );

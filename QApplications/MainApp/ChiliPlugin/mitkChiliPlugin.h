@@ -112,6 +112,8 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
 
+    virtual std::vector<mitk::DataTreeNode::Pointer> LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs );
+
     virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
     
     virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber );

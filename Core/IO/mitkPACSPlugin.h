@@ -228,6 +228,8 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \TODO rename to LoadSeriesImageContent, make this take a list of UIDs
      */
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
+    
+    virtual std::vector<mitk::DataTreeNode::Pointer> LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs );
 
     /*!
      * \brief Load all objects from a given series instance UID

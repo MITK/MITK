@@ -295,8 +295,28 @@ mitk::LoadFromCHILI::CreateNodesFromLists( QcPlugin* instance,
   return resultNodes;
 }
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeries( QcPlugin* instance, const std::string&  seriesInstanceUID, const std::string& tmpDirectory )
+std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeries( QcPlugin* instance, 
+                                                                                    const std::string& seriesInstanceUID, 
+                                                                                    const std::string& tmpDirectory )
 {
+  std::vector<std::string> uids;
+  uids.push_back( seriesInstanceUID );
+
+  return LoadImagesFromSeries( instance, uids, tmpDirectory );
+}
+
+
+std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeries( QcPlugin* instance, 
+                                                                                    std::vector<std::string> seriesInstanceUIDs, 
+                                                                                    const std::string& tmpDirectory )
+{
+  if ( seriesInstanceUIDs.empty() )
+  {
+    std::vector<mitk::DataTreeNode::Pointer> empty;
+    empty.clear();
+    return empty;
+  }
+
   m_ImageList.clear();
   m_UnknownImageFormatPath.clear();
   m_StreamImageList.clear();
@@ -309,10 +329,16 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LoadFromCHILI::LoadImagesFromSeri
   //    jpeg compressed streams to m_StreamImageList
   //    unknown imagefiles to unknownImageFormatPath
   m_tmpDirectory = tmpDirectory;
-  std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
-  pIterateImages( instance, (char*)seriesOID.c_str(), NULL, &LoadFromCHILI::GlobalIterateLoadImages, this );
+  
+  for ( std::vector<std::string>::iterator iter = seriesInstanceUIDs.begin();
+        iter != seriesInstanceUIDs.end();
+        ++iter )
+  {
+    std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( *iter );
+    pIterateImages( instance, (char*)seriesOID.c_str(), NULL, &LoadFromCHILI::GlobalIterateLoadImages, this );
+  }
 
-  return CreateNodesFromLists( instance, seriesInstanceUID, tmpDirectory );
+  return CreateNodesFromLists( instance, seriesInstanceUIDs.front(), tmpDirectory ); // use first series instance uid for datatreenode property
 }
 
 ipBool_t mitk::LoadFromCHILI::GlobalIterateLoadImages( int /*rows*/, int row, image_t* image, void* user_data )

@@ -771,7 +771,26 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
   return resultVector;
 }
 
+std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs )
+{
+  std::vector<DataTreeNode::Pointer> resultNodes;
+  resultNodes.clear();
 
+  if( !m_tempDirectory.empty() && !seriesInstanceUIDs.empty() )
+  {
+    QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
+    ProgressBar::GetInstance()->AddStepsToDo( 2 );
+
+    resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUIDs, m_tempDirectory );
+
+    ProgressBar::GetInstance()->Progress( 2 );
+    QApplication::restoreOverrideCursor();
+  }
+
+  return resultNodes;
+}
+
+// TODO liste rein
 std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries( const std::string& seriesInstanceUID )
 {
   std::vector<DataTreeNode::Pointer> resultNodes;

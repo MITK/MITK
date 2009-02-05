@@ -3,6 +3,10 @@ SET(CPP_FILES
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
  
  QmitkModels/QmitkDataStorageListModel.cpp
+ QmitkModels/QmitkPropertiesTableModel.cpp
+ QmitkModels/QmitkDataStorageTreeModel.cpp
+ QmitkModels/QmitkDataStorageTableModel.cpp
+ QmitkModels/QmitkPropertyDelegate.cpp
 
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
@@ -58,12 +62,16 @@ SET(CPP_FILES
  QmitkCopyToClipBoardDialog.cpp
  QmitkMaterialEditor.cpp
  QmitkMaterialShowcase.cpp
+ QmitkPropertiesTableEditor.cpp 
 )
 
 QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
 
 
 SET(MOC_H_FILES
+ 
+ QmitkModels/QmitkDataStorageTableModel.h
+ QmitkModels/QmitkPropertyDelegate.h
  
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyEditor.h
@@ -112,6 +120,7 @@ SET(MOC_H_FILES
  QmitkCopyToClipBoardDialog.h
  QmitkMaterialEditor.h
  QmitkMaterialShowcase.h
+ QmitkPropertiesTableEditor.h
 )
 
 SET(UI_FILES

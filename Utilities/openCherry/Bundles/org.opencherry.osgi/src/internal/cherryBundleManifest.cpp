@@ -106,7 +106,15 @@ BundleManifest::ParseActivator(const std::string& activator)
   Poco::StringTokenizer tokenizer(activator, ";", 
       Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
   
+  if (tokenizer.count() == 0)
+  {
+    m_Activator = "";
+    m_ActivatorLibrary = "";
+    return;
+  }
+
   m_Activator = tokenizer[0];
+  m_Activator = activator;
   
   m_ActivatorLibrary = "";
   if (tokenizer.count() > 1)

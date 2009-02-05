@@ -39,6 +39,11 @@ namespace mitk {
    mitkSpecializeGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
    
    mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
+   /**
+   * \warn If you add more specialization of GenericProperty, you must also add these to the 
+   * templated GetPropertyValue() method in mitkPropertyList.cpp!
+   */
+
    
 } // namespace mitk  
 

@@ -375,7 +375,10 @@ template bool mitk::PropertyList::GetPropertyValue<double>(char const*, double&)
 template bool mitk::PropertyList::GetPropertyValue<float>(char const*, float&) const;
 template bool mitk::PropertyList::GetPropertyValue<int>(char const*, int&) const;
 template bool mitk::PropertyList::GetPropertyValue<bool>(char const*, bool&) const;
-
+template bool mitk::PropertyList::GetPropertyValue<Vector3D>(char const*, Vector3D&) const;
+template bool mitk::PropertyList::GetPropertyValue<Point3D>(char const*, Point3D&) const;
+template bool mitk::PropertyList::GetPropertyValue<Point4D>(char const*, Point4D&) const;
+template bool mitk::PropertyList::GetPropertyValue<Point3I>(char const*, Point3I&) const;
 #endif
 
 

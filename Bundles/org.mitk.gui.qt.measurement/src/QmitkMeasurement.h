@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include "QmitkFunctionality.h"
 
-#include <QmitkViewPart.h>
+#include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
@@ -42,7 +42,7 @@ Allows to measure distances, angles, etc.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class MITK_QT_MEASUREMENT QmitkMeasurement : public QObject, public QmitkViewPart
+class MITK_QT_MEASUREMENT QmitkMeasurement : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 

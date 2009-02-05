@@ -15,8 +15,8 @@
 
  =========================================================================*/
 
-#ifndef QMITKVIEWPART_H_
-#define QMITKVIEWPART_H_
+#ifndef QMITKFUNCTIONALITY_H_
+#define QMITKFUNCTIONALITY_H_
 
 #include <cherryQtViewPart.h>
 #include <cherryIWorkbenchPartReference.h>
@@ -29,15 +29,26 @@
 //!mm-added
 class QmitkStdMultiWidget;
 
-class MITK_QT_COMMON QmitkViewPart : public cherry::QtViewPart, virtual public cherry::IPartListener
+class MITK_QT_COMMON QmitkFunctionality : public cherry::QtViewPart, virtual public cherry::IPartListener
 {
 
 public:
-  cherryObjectMacro(QmitkViewPart)
+  cherryObjectMacro(QmitkFunctionality)
 
-  QmitkViewPart();
-  virtual ~QmitkViewPart();
+  QmitkFunctionality();
+  virtual ~QmitkFunctionality();
+  virtual void CreatePartControl(void* parent);
+
+  ///
+  /// Called immediately after CreateQtPartControl().
+  /// Actions that should be taken after creating the controls are executed here. 
+  ///
   virtual void BeforeCreateQtPartControl(QWidget* parent);
+
+  ///
+  /// Called immediately before CreateQtPartControl().
+  /// Actions that should be taken after creating the controls are executed here. 
+  ///
   virtual void AfterCreateQtPartControl(QWidget* parent);
 
   virtual void SetFocus();
@@ -54,7 +65,7 @@ public:
   ///
   /// Called when a StdMultiWidget is available.
   ///
-  virtual void StdMultiWidgetAvailable();
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
   ///
   /// Called when no StdMultiWidget is available.
   ///
@@ -117,4 +128,4 @@ private:
   bool m_InDataStorageChanged;
 };
 
-#endif /*QMITKVIEWPART_H_*/
+#endif /*QMITKFUNCTIONALITY_H_*/

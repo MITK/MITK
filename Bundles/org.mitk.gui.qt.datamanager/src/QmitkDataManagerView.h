@@ -3,7 +3,7 @@
 
 #include <cherryIPartListener.h>
 
-#include <QmitkViewPart.h>
+#include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 
 #include "mitkQtDataManagerDll.h"
@@ -19,7 +19,7 @@ class QTableView;
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
 
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 

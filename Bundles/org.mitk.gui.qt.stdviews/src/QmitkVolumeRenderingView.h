@@ -2,13 +2,13 @@
 #define QMITKVOLUMERENDERINGVIEW_H_
 
 #include <QObject>
-#include <QmitkViewPart.h>
+#include <QmitkFunctionality.h>
 #include <QmitkDataStorageListModel.h>
 #include <QmitkTransferFunctionWidget.h>
 
 #include "mitkQtStdViewsDll.h"
 
-class MITK_QT_STDVIEWS QmitkVolumeRenderingView : public QObject, public QmitkViewPart
+class MITK_QT_STDVIEWS QmitkVolumeRenderingView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 

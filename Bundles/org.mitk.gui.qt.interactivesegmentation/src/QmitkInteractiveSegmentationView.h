@@ -3,7 +3,7 @@
 
 #include <cherryIPartListener.h>
 
-#include <QmitkViewPart.h>
+#include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
@@ -11,7 +11,7 @@
 #include "ui_QmitkInteractiveSegmentationControls.h"
 
 class MITK_QT_INTERACTIVESEGMENTATION QmitkInteractiveSegmentationView : public QObject
-  , public QmitkViewPart  
+  , public QmitkFunctionality  
 {
   Q_OBJECT
 public:

@@ -1,5 +1,5 @@
 SET(SRC_CPP_FILES
-  QmitkViewPart.cpp
+  QmitkFunctionality.cpp
 )
 
 SET(INTERNAL_CPP_FILES

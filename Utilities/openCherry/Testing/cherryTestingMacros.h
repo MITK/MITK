@@ -91,6 +91,7 @@ namespace cherry {
     cherry::TestManager::GetInstance()->TestPassed(); \
  }
 
+
 /**
  * \brief Begin block which should be checked for exceptions
  *

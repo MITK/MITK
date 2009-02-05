@@ -25,6 +25,39 @@ public:
   TestObject() : Object() {}
 };
 
+
+/**
+* just used for adding Functions to the Object DestroyerListener 
+*/
+struct RegisterMe{
+  
+  RegisterMe () : registered(false){
+  
+  }
+
+  bool registered ; 
+    
+  void Register (){
+    registered = true ; 
+   }
+  void UnRegister (){
+    registered = false ; 
+   }
+  void Output (){
+    if ( registered == false ) {
+      std::cout << "  nothing happened yet  " << std::endl;
+    }
+    else {
+      std::cout << " Function Register had been called " << registered << std::endl ; 
+    }
+  }
+  bool getRegisteredStatus() const {
+    return registered; 
+  }
+
+  };
+
+
 int cherryObjectTest(int /*argc*/, char* /*argv*/[])
 {
   CHERRY_TEST_BEGIN("Object")
@@ -42,11 +75,51 @@ int cherryObjectTest(int /*argc*/, char* /*argv*/[])
 
     obj->SetReferenceCount(0);
   }
+  
+  
 
-  // destroy listener tests
-  {
+  
+  /** 
+  * Functiontest AddDestroyListener (...)
+  *
+  */
+  TestObject* AddDestroyListenerTest = new TestObject();
 
-  }
+  
+  RegisterMe testRegister; 
+  
+  AddDestroyListenerTest->AddDestroyListener(cherry::MessageDelegate<RegisterMe>(&testRegister, &RegisterMe::Register));
+  /** Ouput should be " nothing happened yet " because the underlying object isn't destroyed and therefore no functions are called by the DestroyListener */
+  AddDestroyListenerTest->Delete();
+  /** testobject is deleted, DestroyListener should have called the registered Functions */ 
+  
+  CHERRY_TEST_CONDITION(testRegister.getRegisteredStatus()," AddDestroyListenerTest ") ; 
 
+
+  /** 
+  * Functiontest RemoveDestroyListener (...)
+  *
+  */
+
+  TestObject* RemoveDestroyListenerTest = new TestObject();
+
+  
+  RegisterMe testRegister2; 
+
+  /** Functiontest AddDestroyListener */
+  RemoveDestroyListenerTest->AddDestroyListener(cherry::MessageDelegate<RegisterMe>(&testRegister2, &RegisterMe::Register));
+  /** Ouput should be " nothing happened yet " because the underlying object isn't destroyed and therefore no functions are called by the DestroyListener */
+  RemoveDestroyListenerTest->RemoveDestroyListener(cherry::MessageDelegate<RegisterMe>(&testRegister2, &RegisterMe::Register));
+  
+  
+  RemoveDestroyListenerTest->Delete();
+  /** testobject is deleted, DestroyListener should have called the registered Functions */ 
+  
+  
+ 
+  CHERRY_TEST_CONDITION(testRegister2.getRegisteredStatus() == false," RemoveDestroyListenerTest ") ; 
+ 
   CHERRY_TEST_END()
+  
+  
 }

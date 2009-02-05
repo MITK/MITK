@@ -6,6 +6,7 @@ SET(OPENCHERRY_TESTS
   cherryMessageTest.cpp
   cherryObjectTest.cpp
   cherrySmartPointerTest.cpp
+  cherryWeakPointerTest.cpp
 )
 
 OPENCHERRY_CREATE_TESTS()

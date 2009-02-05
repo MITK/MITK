@@ -8,46 +8,59 @@
 
 #include "mitkQtDataManagerDll.h"
 
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QmitkViewPart
+// Forward declarations
+class QComboBox;
+class QString;
+class QListView;
+class QMenu;
+class QAction;
+class QModelIndex;
+class QTableView;
+class QmitkDataStorageTableModel;
+class QmitkPropertiesTableEditor;
+
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkViewPart
 {
+  Q_OBJECT
 
 public:
 
-  void SetFocus();
+  ///
+  /// Called when the part is activated.
+  ///
+  virtual void Activated();
+  ///
+  /// Called when the part is deactivated.
+  ///
+  virtual void Deactivated();
+  ///
+  /// Called when a DataStorage Add Event was thrown. May be reimplemented
+  /// by deriving classes.
+  ///
+  virtual void NodeAdded(const mitk::DataTreeNode* node);
 
-  ~QmitkDataManagerView();
+  virtual ~QmitkDataManagerView();
+
+protected slots:
+  void DataStorageSelectionChanged(const QString & text);
+  void NodeSelectionModeChanged(const QString & text);
+  void NodeTableViewClicked( const QModelIndex & index );
+  void NodeTableViewContextMenuRequested( const QPoint & index );
+  void ShowDerivedNodesClicked(bool checked = false);
 
 protected:
 
   void CreateQtPartControl(QWidget* parent);
 
 private:
-
-  struct StdMultiWidgetListener : public cherry::IPartListener
-  {
-    cherryObjectMacro(StdMultiWidgetListener);
-
-    StdMultiWidgetListener(QmitkStandardViews* standardViews);
-
-    void PartActivated(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartBroughtToTop(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartClosed(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartOpened(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartHidden(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartVisible(cherry::IWorkbenchPartReference::Pointer partRef);
-    void PartInputChanged(cherry::IWorkbenchPartReference::Pointer partRef);
-
-    void SetStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef);
-    void SetStdMultiWidget(cherry::IWorkbenchPart::Pointer partRef);
-    void ClearStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef);
-
-  private:
-    QmitkStandardViews* m_StandardViewsWidget;
-
-  };
-
-  StdMultiWidgetListener::Pointer m_MultiWidgetListener;
+  QWidget* m_BasePane;
+  QComboBox* m_DataStorageSelectionComboBox;
+  QComboBox* m_NodeSelectionModeComboBox;
+  QmitkDataStorageTableModel* m_NodeTableModel;
+  QTableView* m_NodeTableView;
+  QMenu* m_ShowDerivedNodesMenu;
+  QAction* m_ShowDerivedNodesAction;
+  QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
 
 };
 

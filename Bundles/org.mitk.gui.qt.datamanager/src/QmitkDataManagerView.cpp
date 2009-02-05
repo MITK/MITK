@@ -1,196 +1,164 @@
 #include "QmitkDataManagerView.h"
 
-#include <QPushButton>
-#include <QDockWidget>
-#include <QVBoxLayout>
-#include <QAbstractItemView>
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageReference.h>
-
 #include <mitkNodePredicateDataType.h>
 
 #include <QmitkStdMultiWidget.h>
-#include <QmitkDataTreeComboBox.h>
-#include <QmitkDataStorageListModel.h>
-
+#include <QmitkDataStorageTableModel.h>
+#include <QmitkPropertiesTableEditor.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
 
+#include <QTableView>
+#include <QGroupBox>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QListView>
+#include <QMenu>
+#include <QAction>
+#include <QComboBox>
+#include <QApplication>
+#include <QCursor>
+#include <QHeaderView>
+
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
-  QVBoxLayout* layout = new QVBoxLayout(parent);
-  //!mm
-  //parent->setMinimumSize(QSize(600, 600));
-  layout->setContentsMargins(0,0,0,0);
 
-  cherry::IEditorPart::Pointer editor =
-      this->GetSite()->GetPage()->GetActiveEditor();
+  //// Dim/Get
 
-  // To get hold of the DataStorage hold by the MultiWidget editor,
-  // you can do the following:
-  //
-  // cherry::IEditorInput::Pointer input = editor->GetEditorInput();
-  // if (input.Cast<mitk::DataStorageEditorInput>().IsNotNull())
-  // {
-  //   mitk::IDataStorageReference::Pointer dataStorageRef = input.Cast<DataStorageEditorInput>()->GetDataStorageReference();
-  //   DataStorage::Pointer dataStorage = dataStorageRef->GetDataStorage();
-  //   ...
-  // }
+  // Base
+  QGridLayout* parentLayout = new QGridLayout;
+  m_BasePane = new QWidget(parent);
+  QGridLayout* _BasePaneLayout = new QGridLayout;
 
-  // If you do not have a part instance to do GetSite(), you can call
-  // cherry::PlatforumUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()
-  // in order to get an IWorkbenchPage object
+  // DataStorageSelection
+  QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_BasePane); 
+  QGridLayout* _DataStorageSelectionLayout = new QGridLayout;
+  m_DataStorageSelectionComboBox = new QComboBox(_DataStorageSelectionGroupBox);
+
+  // NodeSelection
+  QGroupBox* _NodeSelectionGroupBox = new QGroupBox("Node Selection", m_BasePane);
+  QVBoxLayout* _NodeSelectionLayout = new QVBoxLayout;
+  m_NodeSelectionModeComboBox = new QComboBox(_NodeSelectionGroupBox);
+
+  // NodeView
+  QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes", m_BasePane);
+  QVBoxLayout* _NodeViewLayout = new QVBoxLayout;
+  m_NodeTableView = new QTableView(_NodeViewGroupBox);
+  m_NodeTableModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), 0, m_NodeTableView);
+  m_ShowDerivedNodesMenu = new QMenu(m_NodeTableView);
+  m_ShowDerivedNodesAction = m_ShowDerivedNodesMenu->addAction("Show Derived Nodes");
+
+  // NodeProperties
+  QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane); 
+  QHBoxLayout* _NodePropertiesLayout = new QHBoxLayout;
+  m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);
+  
+  //// Set
+
+  // Base
+  parent->setLayout(parentLayout);
+  parentLayout->addWidget(m_BasePane, 0, 0);
+  m_BasePane->setLayout(_BasePaneLayout);
+  _BasePaneLayout->addWidget(_DataStorageSelectionGroupBox, 0, 0);
+  _BasePaneLayout->addWidget(_NodeSelectionGroupBox, 1, 0);
+  _BasePaneLayout->addWidget(_NodeViewGroupBox, 2, 0);
+  _BasePaneLayout->addWidget(_NodePropertiesGroupBox, 3, 0);
+
+  // DataStorageSelection
+  _DataStorageSelectionGroupBox->setLayout(_DataStorageSelectionLayout);  
+  _DataStorageSelectionLayout->addWidget(m_DataStorageSelectionComboBox);
+  m_DataStorageSelectionComboBox->setEditable(false);
+  m_DataStorageSelectionComboBox->addItem("Default DataStorage");
+  m_DataStorageSelectionComboBox->addItem("Active DataStorage");
+
+  // NodeSelection
+  _NodeSelectionGroupBox->setLayout(_NodeSelectionLayout);
+  _NodeSelectionLayout->addWidget(m_NodeSelectionModeComboBox);
+  m_NodeSelectionModeComboBox->setEditable(false);
+  m_NodeSelectionModeComboBox->addItem("All Nodes");
+
+  // NodeView
+  _NodeViewGroupBox->setLayout(_NodeViewLayout);
+  _NodeViewLayout->addWidget(m_NodeTableView);
+  m_NodeTableView->setContextMenuPolicy(Qt::CustomContextMenu);  
+  m_NodeTableView->setSelectionMode( QAbstractItemView::SingleSelection );
+  m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectItems );
+  m_NodeTableView->setModel(m_NodeTableModel);
+  m_NodeTableView->horizontalHeader()->setStretchLastSection ( true );
+
+  // NodeProperties
+  _NodePropertiesGroupBox->setLayout(_NodePropertiesLayout);
+  _NodePropertiesLayout->addWidget(m_NodePropertiesTableEditor);
 
 
-  mitk::DataTree::Pointer dataTree;
+  // Connections
+  QObject::connect( m_DataStorageSelectionComboBox, SIGNAL(currentIndexChanged(const QString&))
+    , this, SLOT( DataStorageSelectionChanged( const QString& ) ) );
 
-  if (editor.IsNotNull())
-  {
-    cherry::IEditorInput::Pointer input = editor->GetEditorInput();
-    if (input.Cast<mitk::DataStorageEditorInput>().IsNotNull())
-    {
-      mitk::IDataStorageReference::Pointer dataStorageRef = input.Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference();
-      dataTree = dataStorageRef->GetDataTree();
-    }
-  }
+  QObject::connect( m_NodeSelectionModeComboBox, SIGNAL(currentIndexChanged(const QString&))
+    , this, SLOT( NodeSelectionModeChanged( const QString& )) );
 
-  //QmitkDataTreeComboBox* comboBox = new QmitkDataTreeComboBox(dataTree, parent);
-  QComboBox* comboBox = new QComboBox(parent);
-  QmitkDataStorageListModel* comboModel =
-    new QmitkDataStorageListModel(new mitk::NodePredicateDataType("Image"),
-                                  comboBox);
-  comboModel->SetDataStorage(this->GetDataStorage());
-  comboBox->setModel(comboModel);
-  //comboBox->view()->setModel(comboModel);
-  layout->addWidget(comboBox);
+  QObject::connect( m_NodeTableView, SIGNAL(clicked(const QModelIndex&))
+    , this, SLOT( NodeTableViewClicked( const QModelIndex& )) );
+  
+  QObject::connect( m_NodeTableView, SIGNAL(customContextMenuRequested(const QPoint&))
+    , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
 
-  QmitkStandardViews* stdViews = new QmitkStandardViews(parent);
-  layout->addWidget(stdViews);
-
-  m_MultiWidgetListener = new StdMultiWidgetListener(stdViews);
-  m_MultiWidgetListener->SetStdMultiWidget(editor.Cast<IWorkbenchPart>());
-  this->GetSite()->GetPage()->AddPartListener(m_MultiWidgetListener);
+  QObject::connect( m_ShowDerivedNodesAction, SIGNAL( triggered(bool) )
+    , this, SLOT( ShowDerivedNodesClicked(bool) ) );
 
 }
 
-void QmitkDataManagerView::SetFocus()
+void QmitkDataManagerView::NodeAdded(const mitk::DataTreeNode* node)
+{
+}
+
+void QmitkDataManagerView::Activated()
+{
+
+}
+
+void QmitkDataManagerView::Deactivated()
 {
 
 }
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
-  this->GetSite()->GetPage()->RemovePartListener(m_MultiWidgetListener);
+  //this->GetSite()->GetPage()->RemovePartListener(m_MultiWidgetListener);
 }
 
-QmitkDataManagerView::
-StdMultiWidgetListener::StdMultiWidgetListener(QmitkStandardViews* standardViews)
-: m_StandardViewsWidget(standardViews)
+void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
 {
-
+  std::cout << "DataStorageSelectionChanged\n";
 }
 
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartActivated(cherry::IWorkbenchPartReference::Pointer partRef)
+void QmitkDataManagerView::NodeSelectionModeChanged(const QString & text)
 {
-  std::cout << "PartActivated\n";
-  this->SetStdMultiWidget(partRef);
+  std::cout << "NodeSelectionModeChanged\n";
 }
 
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartBroughtToTop(cherry::IWorkbenchPartReference::Pointer partRef)
+void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 {
-  std::cout << "PartBroughtToTop\n";
-  this->SetStdMultiWidget(partRef);
+  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(index);
+  if(selectedNode.IsNotNull())
+    m_NodePropertiesTableEditor->setNode(selectedNode);
+
+  std::cout << "NodeTableViewClicked\n";
 }
 
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartClosed(cherry::IWorkbenchPartReference::Pointer partRef)
+void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
-  std::cout << "PartClosed\n";
-  this->ClearStdMultiWidget(partRef);
+  m_ShowDerivedNodesMenu->popup(pos);
 }
 
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
+void QmitkDataManagerView::ShowDerivedNodesClicked(bool checked)
 {
-  std::cout << "PartDeactivated\n";
-  //this->ClearStdMultiWidget(partRef);
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartOpened(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  std::cout << "PartOpened\n";
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartHidden(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  std::cout << "PartHidden\n";
-  this->ClearStdMultiWidget(partRef);
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartVisible(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  std::cout << "PartVisible\n";
-  this->SetStdMultiWidget(partRef);
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::PartInputChanged(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  std::cout << "PartInputChanged\n";
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  if (partRef.IsNull()) return;
-
-  cherry::IWorkbenchPart::Pointer part = partRef->GetPart(false);
-  this->SetStdMultiWidget(part);
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::SetStdMultiWidget(cherry::IWorkbenchPart::Pointer part)
-{
-  if (part.IsNull()) return;
-
-  QmitkStdMultiWidget* multiWidget = 0;
-  if (part.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-  {
-    std::cout << "getting multi-widget...\n";
-    multiWidget = part.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-  }
-
-  if (multiWidget != 0)
-  {
-    std::cout << "setting camera controller\n";
-    m_StandardViewsWidget->SetCameraController(multiWidget->mitkWidget4->GetRenderer()->GetCameraController());
-  }
-}
-
-void
-QmitkDataManagerView::
-StdMultiWidgetListener::ClearStdMultiWidget(cherry::IWorkbenchPartReference::Pointer partRef)
-{
-  if (partRef.IsNull()) return;
-
-  if (partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-    m_StandardViewsWidget->SetCameraController(0);
+  std::cout << "ShowDerivedNodesClicked\n";
 }

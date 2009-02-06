@@ -20,6 +20,7 @@
 
 #include <cherryObject.h>
 #include <cherrySmartPointer.h>
+#include <cherryWeakPointer.h>
 
 class TestObject : public cherry::Object
 {
@@ -60,6 +61,14 @@ int cherrySmartPointerTest(int /*argc*/, char* /*argv*/[])
     // copy constructor
     cherry::SmartPointer<TestObject> testobj2 = testobj;
     CHERRY_TEST_CONDITION(testobj.GetPointer() == testobj2.GetPointer() && testobj2->GetReferenceCount() == 2, "Copy constructor")
+  }
+
+  {
+    // WeakPointer constructor
+    cherry::WeakPointer<TestObject> ptr_weak;
+    CHERRY_TEST_FOR_EXCEPTION_BEGIN(cherry::BadWeakPointerException)
+      cherry::SmartPointer<TestObject> testobj(ptr_weak);
+    CHERRY_TEST_FOR_EXCEPTION_END(cherry::BadWeakPointerException)
   }
 
   {

@@ -22,6 +22,7 @@
 #include <stdexcept>
 
 #include "cherryOSGiDll.h"
+#include "cherryException.h"
 
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
 #include "cherryDebugUtil.h"
@@ -30,6 +31,8 @@
 
 namespace cherry
 {
+
+template<class T> class WeakPointer;
 
 /** \class SmartPointer
  * \brief Implements transparent reference counting.
@@ -49,10 +52,9 @@ public:
   typedef SmartPointer Self;
 
   /** Constructor  */
-  SmartPointer()
+  SmartPointer() :
+    m_Pointer(0)
   {
-    m_Pointer = 0;
-
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
@@ -86,11 +88,30 @@ public:
   explicit SmartPointer(ObjectType *p) :
     m_Pointer(p)
   {
-    this->Register();
+    if (m_Pointer)
+      this->Register();
 
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
+  }
+
+  template<class Other>
+  explicit SmartPointer(const WeakPointer<Other>& wp)
+  {
+    if (wp.m_Pointer)
+    {
+      this->m_Pointer = wp.m_Pointer;
+      this->Register();
+
+      #if defined(CHERRY_DEBUG_SMARTPOINTER)
+        DebugInitSmartPointer();
+      #endif
+    }
+    else
+    {
+      throw BadWeakPointerException();
+    }
   }
 
   /** Destructor  */

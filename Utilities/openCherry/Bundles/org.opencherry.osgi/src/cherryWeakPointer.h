@@ -19,103 +19,123 @@
 #include <iostream>
 #include "cherryObject.h"
 #include "cherryOSGiDll.h"
-#include "Poco/Exception.h"
+#include "cherrySmartPointer.h"
 
-namespace cherry {
+namespace cherry
+{
 
-/** \class Weakpointer
+/** \class WeakPointer
  *  \brief implements a WeakPointer class to deal with circular reference problems.
  *
- * 
- * The Weakpointer Object can be described as a testing module before returning a smartpointer.
- * The Weakpointer checks if the Object it is referring to is still alive. If not the Weakpointer returns an Exception if the log method is used. 
- * If the Object is still alive the Weakpointer class creates a smartpointer of the referring object. 
  *
+ * The WeakPointer class implements smart pointer semantics without increasing the reference count.
+ * It registers itself at the Object it points to in order to get notified of its destruction and sets its internal pointer to 0.
+ * To be able to access an object through a weak pointer, you either use SmartPointer(const WeakPointer&)
+ * or the WeakPointer::Lock() method. The first approach throws a BadWeakPointerException if
+ * the object has been destroyed, the second returns an empty SmartPointer.
  */
-
-template<typename TObjectType>
-class WeakPointer{
+template<class TObjectType>
+class WeakPointer
+{
 
 public:
 
   typedef TObjectType ObjectType;
-  friend class MessageDelegate<WeakPointer>;
+  friend class SmartPointer<ObjectType>;
+  friend class MessageDelegate<WeakPointer> ;
+
+  /** Default Constructor */
+  WeakPointer() :
+    m_Pointer(0)
+  {
+
+  }
 
   /** Constructor */
-  explicit WeakPointer(cherry::SmartPointer<ObjectType> sptr):m_Pointer(sptr.GetPointer()) {
+  template<class Other>
+  explicit WeakPointer(cherry::SmartPointer<Other> sptr) :
+    m_Pointer(const_cast<ObjectType*>(sptr.GetPointer()))
+  {
 
-  m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister)); 
-  
-   }
-    /** Default Constructor */
-  WeakPointer():m_Pointer(0) {
-  
-  
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+        &WeakPointer::ObjectDestroyed));
+
+  }
+
+  /** constructor  */
+  template<class Other>
+  WeakPointer(const WeakPointer<Other>& p) :
+    m_Pointer(const_cast<ObjectType*>(p.m_Pointer))
+  {
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+        &WeakPointer::ObjectDestroyed));
   }
 
   /** Copy constructor  */
-  WeakPointer(const WeakPointer<ObjectType> &p) :
+  WeakPointer(const WeakPointer& p) :
     m_Pointer(p.m_Pointer)
   {
-    m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister));  
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+        &WeakPointer::ObjectDestroyed));
   }
-  
-  
-  WeakPointer &operator =(const SmartPointer<ObjectType> &r)
+
+  template<class Other>
+  WeakPointer &operator =(const SmartPointer<Other> &r)
   {
-   if(m_Pointer)
-   m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister));
-   m_Pointer = r.GetPointer(); 
-   if(m_Pointer)
-   m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister));
-   
-   return *this;
-  }
-    
-    /** look method is used to access the referring object  */
-   SmartPointer<ObjectType> lock(){
+    if (m_Pointer)
+      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
 
-    if (m_Pointer == 0 ) {
-      throw Poco::NullPointerException("Weakpointer trying to point to a non exsisting object");
-    }
-    else {
-      return SmartPointer<ObjectType> (m_Pointer) ; 
-    }
-
-  }
- 
-   
-                                    
-  WeakPointer& operator=(const WeakPointer& other) 
-  {
-    if(m_Pointer)
-      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister));
-
-    this->m_Pointer = other.m_Pointer;
-    if(m_Pointer)
-      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister));
+    m_Pointer = const_cast<ObjectType*>(r.GetPointer());
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
 
     return *this;
   }
 
+  template<class Other>
+  WeakPointer& operator=(const WeakPointer<Other>& other)
+  {
+    if (m_Pointer)
+      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
 
-  /** Destructor */
-  ~ WeakPointer () {
-    
-   if(m_Pointer)
-      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer>(this, &WeakPointer::FunctionToRegister)); 
+    this->m_Pointer = const_cast<ObjectType*>(other.m_Pointer);
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
+
+    return *this;
   }
 
+  /** look method is used to access the referring object  */
+  SmartPointer<ObjectType> Lock()
+  {
+    SmartPointer<ObjectType> sp(m_Pointer);
+    return sp;
+  }
 
+  /** Destructor */
+  ~ WeakPointer()
+  {
+    if (m_Pointer)
+      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
+  }
 
-private: 
+private:
 
   ObjectType *m_Pointer;
-    
-  void FunctionToRegister () {
-    m_Pointer = 0;  
-    } 
-  
+
+  void ObjectDestroyed()
+  {
+    m_Pointer = 0;
+  }
+
 };
 
 }

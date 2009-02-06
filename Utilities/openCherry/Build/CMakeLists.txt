@@ -2,29 +2,42 @@ PROJECT(OpenCherryPluginGenerator)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH RUNTIME_OUTPUT_PATH 
-CMAKE_BACKWARDS_COMPATIBILITY CMAKE_INSTALL_PREFIX)
-INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/BundleTemplate/BundleDefaults.cmake)
+CMAKE_BACKWARDS_COMPATIBILITY CMAKE_INSTALL_PREFIX CMAKE_BUILD_TYPE)
 
-SET(PLUGIN_ID "" CACHE STRING "unique plugin id (i.e. your.domain.pluginid) (required)")
+FIND_FILE(PLUGIN_TEMPLATE BundleTemplate 
+          ${PROJECT_SOURCE_DIR}
+          DOC "Path to the plugin templates") 
+
+IF(BUNDLE_DEFAULTS_FILE)
+  IF(EXISTS "${BUNDLE_DEFAULTS_FILE}")
+    INCLUDE(${BUNDLE_DEFAULTS_FILE})
+  ELSE(EXISTS "${BUNDLE_DEFAULTS_FILE}")
+    MESSAGE(SEND_ERROR "cannot find supplied defaults file: ${BUNDLE_DEFAULTS_FILE}")
+  ENDIF(EXISTS "${BUNDLE_DEFAULTS_FILE}")
+ELSE(BUNDLE_DEFAULTS_FILE)
+  INCLUDE(${PLUGIN_TEMPLATE}/BundleDefaults.cmake)
+ENDIF(BUNDLE_DEFAULTS_FILE)
+
+SET(PLUGIN_ID "${DEFAULT_PLUGIN_ID}" CACHE STRING "unique plugin id (i.e. your.domain.pluginid) (required)")
 OPTION(GUI_SUPPORT "enable this if your plugin contributes to the UI" ON)
   
 IF(PLUGIN_ID)
 
 SET(PLUGIN_NAME "" CACHE STRING "a human-readable description of your plugin (required)")
-SET(PLUGIN_VERSION "" CACHE STRING "plugin version (required)")
-SET(PLUGIN_VENDOR "" CACHE STRING "plugin vendor (optional)")
+SET(PLUGIN_VERSION "${DEFAULT_PLUGIN_VERSION}" CACHE STRING "plugin version (required)")
+SET(PLUGIN_VENDOR "${DEFAULT_PLUGIN_VENDOR}" CACHE STRING "plugin vendor (optional)")
 
 SET(ACTIVATOR_CLASS "" CACHE STRING "class name for your plugin activator (optional)")
 
 IF(GUI_SUPPORT)
-  SET(VIEW_NAME "New View" CACHE STRING "a human-readable name of your view (required)")
+  SET(VIEW_NAME "" CACHE STRING "a human-readable name of your view (required)")
   SET(VIEW_CLASS "" CACHE STRING "class name of the view")
   IF(VIEW_CLASS)
     STRING(TOUPPER ${VIEW_CLASS} UVIEW_CLASS)
   ENDIF(VIEW_CLASS)
   SET(VIEW_BASE_CLASS ${DEFAULT_VIEW_BASE_CLASS} CACHE STRING "base class of your new view class (required)")
   SET(VIEW_BASE_CLASS_H ${DEFAULT_VIEW_BASE_CLASS_H} CACHE STRING "base class header (required)")
-  SET(VIEW_ID "" CACHE STRING "unique view id (i.e. your.domain.viewid) (required)")
+  SET(VIEW_ID "${DEFAULT_VIEW_ID}" CACHE STRING "unique view id (i.e. your.domain.viewid) (required)")
 
   #SET(EDITOR_CLASS "" CACHE STRING "")
   #SET(EDITOR_TYPE "" CACHE STRING "")
@@ -44,11 +57,6 @@ IF(ACTIVATOR_CLASS)
 ELSE(ACTIVATOR_CLASS)
 	SET(FULLY_QUALIFIED_ACTIVATOR "")
 ENDIF(ACTIVATOR_CLASS)
-
-
-FIND_FILE(PLUGIN_TEMPLATE BundleTemplate 
-          ${PROJECT_SOURCE_DIR}
-          DOC "Path to the plugin templates") 
 
 SET(PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_ID})
 	
@@ -127,6 +135,12 @@ IF(VIEW_CLASS)
 )
 ENDIF(VIEW_CLASS)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/pluginTemplate.xml ${PLUGIN_DIR}/plugin.xml @ONLY)
+
+# ----------------------- manifestTemplate.cpp ----------------------------
+IF(VIEW_CLASS)
+  SET(SET_MANIFEST_SRC "SET(CPP_FILES manifest.cpp)")
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/manifestTemplate.cpp ${PLUGIN_DIR}/manifest.cpp @ONLY)
+ENDIF(VIEW_CLASS)
 
 # ---------------------- CMakeListsTemplate.txt -----------------------------
 SET(CREATE_PLUGIN_MACRO "CREATE_PLUGIN()")

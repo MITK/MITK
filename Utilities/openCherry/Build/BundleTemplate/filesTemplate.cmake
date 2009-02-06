@@ -6,7 +6,7 @@ SET(INTERNAL_CPP_FILES
   
 )
 
-#SET(CPP_FILES manifest.cpp)
+@SET_MANIFEST_SRC@
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

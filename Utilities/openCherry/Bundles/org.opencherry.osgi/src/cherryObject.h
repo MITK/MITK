@@ -70,15 +70,15 @@ private:
 class CHERRY_OSGI Object
 {
 
- /** 
- *  in this case the message macro is used to create a message object as well as add / remove functions 
- *  (AddDestroyListener, Removedestroylistener) on the message object 
- *  in order to call the registered functions when the object is destroyed. 
+ /**
+ *  in this case the message macro is used to create a message object as well as add / remove functions
+ *  (AddDestroyListener, Removedestroylistener) on the message object
+ *  in order to call the registered functions when the object is destroyed.
  *  More information about the NewMessageMacro can be found in @see cherryMessage.h
- *  
+ *
  */
- NewMessageMacro(Destroy) 
- 
+ cherryNewMessageMacro(Destroy)
+
 public:
 
   cherryObjectMacro(Object)

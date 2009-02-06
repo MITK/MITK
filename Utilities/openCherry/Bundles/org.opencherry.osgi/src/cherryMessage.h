@@ -21,31 +21,30 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <Poco/Mutex.h>
 
- 
-// Message Macro Defintion to add/remove Functions to an MessageObject Type1
 
-#define NewMessageMacro(msgHandleObject)                                                                 \
+/**
+ * Adds a Message<> variable and methods to add/remove message delegates to/from
+ * this variable.
+*/
+#define cherryNewMessageMacro(msgHandleObject)                                                                 \
   private: Message<> m_ ## msgHandleObject ## Message;                                                   \
   public:                                                                                                \
   inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<>& delegate)              \
     { m_ ## msgHandleObject ## Message += delegate; }                                                    \
   inline void Remove ## msgHandleObject ## Listener(const MessageAbstractDelegate<>& delegate)           \
     { m_ ## msgHandleObject ## Message -= delegate; }                                                    \
-                                                        
 
-// Message Macro to add Functions to an MessageObject Type1
 
-#define NewMessageWithReturnMacro(msgHandleObject, returnType)                                                 \
+#define cherryNewMessageWithReturnMacro(msgHandleObject, returnType)                                                 \
   private: Message<returnType> m_ ## msgHandleObject ## Message;                                               \
   public:                                                                                                      \
   inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<returnType>& delegate)          \
     { m_ ## msgHandleObject ## Message += delegate; }                                                          \
     inline void Remove ## msgHandleObject ## Listener(const MessageAbstractDelegate<returnType>& delegate)     \
     { m_ ## msgHandleObject ## Message -= delegate; }                                                          \
-                                          
 
 
-#define NewMessage1Macro(msgHandleObject, type1)                                                          \
+#define cherryNewMessage1Macro(msgHandleObject, type1)                                                          \
   private: Message1< type1 > m_msgHandleObject ## Message;                                                \
   public:                                                                                                 \
   void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate1< type1 >& delegate)              \

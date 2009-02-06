@@ -97,6 +97,20 @@ public:
     return *this;
   }
 
+  WeakPointer& operator=(const WeakPointer& other)
+  {
+    if (m_Pointer)
+      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
+
+    this->m_Pointer = other.m_Pointer;
+    if (m_Pointer)
+      m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
+
+    return *this;
+  }
+
   template<class Other>
   WeakPointer& operator=(const WeakPointer<Other>& other)
   {

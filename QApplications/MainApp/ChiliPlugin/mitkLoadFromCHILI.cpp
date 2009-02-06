@@ -109,8 +109,10 @@ mitk::LoadFromCHILI::LoadImagesFromLightbox( QcPlugin* instance,
   return result;
 }
 
+
 mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mitkIpPicDescriptor* pic)
 {
+#ifndef _WIN32
   StreamImageStruct newElement;
   newElement.imageList.clear();
 
@@ -173,6 +175,11 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mit
   }
 
   return newElement;
+
+#else
+StreamImageStruct dummy;
+return dummy;
+#endif
 }
 
 std::vector<mitk::DataTreeNode::Pointer> 

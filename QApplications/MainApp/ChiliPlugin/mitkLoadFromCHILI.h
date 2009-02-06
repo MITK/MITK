@@ -25,7 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <chili/isg.h>  //geometry
 #include <chili/cdbTypes.h>  //series_t, study_t, ...
 
+#ifndef _WIN32
 extern "C" mitkIpPicDescriptor *ipPicDecompressJPEG( mitkIpPicDescriptor *pic, ipUInt4_t frame, ipUInt4_t total_frames, mitkIpPicDescriptor *result, ipUInt4_t *offset_table = NULL );
+#endif
 
 class QcLightbox;
 class QcPlugin;

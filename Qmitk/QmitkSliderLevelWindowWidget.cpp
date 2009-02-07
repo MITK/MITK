@@ -355,7 +355,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
         float minv = m_LevelWindow.GetRangeMin();
         float wh = m_LevelWindow.GetWindow() / 2;
   
-        float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
+        float level = m_LevelWindow.GetLevel() - (mouseEvent->pos().y()-m_StartPos.y()) / fact;
        
         double diff = (mouseEvent->pos().x()) / fact;
         diff -= (m_StartPos.x()) / fact;

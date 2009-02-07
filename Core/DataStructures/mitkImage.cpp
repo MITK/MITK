@@ -1339,6 +1339,11 @@ void mitk::Image::ComputeImageStatistics(int t) const
       AccessByItk_2( image, _ComputeExtremaInItkImage, thisImage, t );
     }
   }
+  else if(this->m_PixelType.GetNumberOfComponents() > 1)
+  {
+    m_ScalarMin[t] = 0;
+    m_ScalarMax[t] = 255;
+  }
 }
 
 

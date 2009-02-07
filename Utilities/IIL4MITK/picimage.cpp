@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "texture.h"
 #include "picimage.h"
+#include <cmath>
 
 iil4mitkPicImage::iil4mitkPicImage (unsigned int size)
         : iil4mitkImage(size), _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
@@ -344,6 +345,61 @@ static void extrema (unsigned char* dst, short* src, const unsigned int num, con
 }
 #endif
 
+#ifndef PIC_IMAGE_PI
+   #define PIC_IMAGE_PI 3.141592653589
+#endif
+
+// Convert color pixels from (R,G,B) to (H,S,I).
+// Reference: "Digital Image Processing, 2nd. edition", R. Gonzalez and R. Woods. Prentice Hall, 2002.
+template<class T>
+void RGBtoHSI(T* RGB, T* HSI) {
+  T R = RGB[0],
+    G = RGB[1],
+    B = RGB[2],
+    nR = (R<0?0:(R>255?255:R))/255,
+    nG = (G<0?0:(G>255?255:G))/255,
+    nB = (B<0?0:(B>255?255:B))/255,
+    m = nR<nG?(nR<nB?nR:nB):(nG<nB?nG:nB),
+    theta = (T)(std::acos(0.5f*((nR-nG)+(nR-nB))/std::sqrt(std::pow(nR-nG,2)+(nR-nB)*(nG-nB)))*180/PIC_IMAGE_PI),
+    sum = nR + nG + nB;
+  T H = 0, S = 0, I = 0;
+  if (theta>0) H = (nB<=nG)?theta:360-theta;
+  if (sum>0) S = 1 - 3/sum*m;
+  I = sum/3;
+  HSI[0] = (T)H;
+  HSI[1] = (T)S;
+  HSI[2] = (T)I;
+}
+
+// Convert color pixels from (H,S,I) to (R,G,B).
+template<class T>
+void HSItoRGB(T* HSI, T* RGB) {
+  T H = (T)HSI[0],
+    S = (T)HSI[1],
+    I = (T)HSI[2],
+    a = I*(1-S),
+    R = 0, G = 0, B = 0;
+  if (H<120) {
+    B = a;
+    R = (T)(I*(1+S*std::cos(H*PIC_IMAGE_PI/180)/std::cos((60-H)*PIC_IMAGE_PI/180)));
+    G = 3*I-(R+B);
+  } else if (H<240) {
+    H-=120;
+    R = a;
+    G = (T)(I*(1+S*std::cos(H*PIC_IMAGE_PI/180)/std::cos((60-H)*PIC_IMAGE_PI/180)));
+    B = 3*I-(R+G);
+  } else {
+    H-=240;
+    G = a;
+    B = (T)(I*(1+S*std::cos(H*PIC_IMAGE_PI/180)/std::cos((60-H)*PIC_IMAGE_PI/180)));
+    R = 3*I-(G+B);
+  }
+  R*=255; G*=255; B*=255;
+  RGB[0] = (T)(R<0?0:(R>255?255:R));
+  RGB[1] = (T)(G<0?0:(G>255?255:G));
+  RGB[2] = (T)(B<0?0:(B>255?255:B));
+}
+
 void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w, unsigned int h, unsigned char* data, unsigned int width, unsigned int, unsigned int xoffset, unsigned int yoffset)
 {
     assert (_pic);
@@ -367,9 +423,30 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
       unsigned char* dest = dst;
       while (dest < eol) 
       {
-        *dest = *source;
-        ++source;
-        ++dest;
+        if(_min!=0 || _max!=255)
+        {
+          // level/window mechanism for intensity in HSI space
+          double rgb[3], hsi[3];
+          rgb[0] = source[0];
+          rgb[1] = source[1];
+          rgb[2] = source[2];
+          RGBtoHSI<double>(rgb,hsi);
+          hsi[2] = hsi[2] * 255.0 * scale - bias;
+          hsi[2] = (hsi[2] > 255.0 ? 255 : (hsi[2] < 0.0 ? 0 : hsi[2]));
+          hsi[2] /= 255.0;
+          HSItoRGB<double>(hsi,rgb);
+          dest[0] = (unsigned char)rgb[0];
+          dest[1] = (unsigned char)rgb[1];
+          dest[2] = (unsigned char)rgb[2];
+          source+=3;
+          dest+=3;
+        }
+        else
+        {
+          *dest = *source;
+          ++source;
+          ++dest;
+        }
       }
     } else
 	if (mask ()) {

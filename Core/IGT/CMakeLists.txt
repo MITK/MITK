@@ -1,0 +1,6 @@
+INCLUDE_DIRECTORIES(IGTFilters IGTTrackingDevices)
+CREATE_CORE_LIB()
+
+
+
+

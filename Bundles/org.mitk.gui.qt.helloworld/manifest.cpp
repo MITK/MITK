@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-06-25 16:22:13 +0200 (Mi, 25 Jun 2008) $
 Version:   $Revision: 14645 $

@@ -42,11 +42,6 @@ namespace mitk {
     virtual void SetInput( unsigned int idx, const NavigationData* nd);
 
     /**Documentation
-    * \brief sets renderer that visualizes the navigation data
-    */
-    virtual void SetRenderer( const BaseRenderer* renderer );
-
-    /**Documentation
     * \brief Get the input of this filter
     */
     const NavigationData* GetInput(void);
@@ -59,7 +54,6 @@ namespace mitk {
     NavigationDataVisualizationFilter();
     virtual ~NavigationDataVisualizationFilter();
 
-    const BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data
   };
 } // namespace mitk
 

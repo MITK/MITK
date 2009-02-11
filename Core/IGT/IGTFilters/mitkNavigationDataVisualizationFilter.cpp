@@ -42,11 +42,6 @@ namespace mitk{
     this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));  
   }
 
-  void mitk::NavigationDataVisualizationFilter::SetRenderer( const BaseRenderer* renderer )
-  {
-    m_Renderer = renderer;
-  }
-
   const NavigationData* mitk::NavigationDataVisualizationFilter::GetInput( void )
   {
     if (this->GetNumberOfInputs() < 1)

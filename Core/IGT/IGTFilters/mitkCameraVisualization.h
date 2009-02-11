@@ -27,6 +27,19 @@ namespace mitk {
   public:
     mitkClassMacro(CameraVisualization,NavigationDataVisualizationFilter);
     itkNewMacro(Self);
+
+    /**Documentation
+    * \brief sets renderer that visualizes the navigation data
+    */
+    virtual void SetRenderer( const BaseRenderer* renderer )
+    {m_Renderer = renderer;};
+    
+    /**Documentation
+    * \brief returns the renderer that visualizes the navigation data
+    */
+    virtual const BaseRenderer* GetRenderer()
+    {return m_Renderer;};
+
   protected:
     CameraVisualization();
     virtual ~CameraVisualization();
@@ -37,6 +50,9 @@ namespace mitk {
     * positions and orients camera according to NavigationData
     */
     virtual void GenerateData();
+
+    ///< renderer that visualizes the navigation data
+    const BaseRenderer* m_Renderer; 
   };
 } // namespace mitk
 

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <vector>
-//ToDoMBISB#include <mitkMBISBConfig.h>
+#include <mitkConfig.h>
 #include <mitkTrackingDevice.h>
 #include <mitkClaronTool.h>
 #include <itkMultiThreader.h>

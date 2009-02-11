@@ -31,24 +31,37 @@ class QMITK_EXPORT QmitkDataStorageListModel : public QAbstractListModel
 {
 public:
 
-  /**
-   * The NodePredicate is owned by the model
-   */
-  QmitkDataStorageListModel(mitk::NodePredicateBase* pred = 0, QObject* parent = 0);
+  //# Ctors / Dtor
+  ///
+  /// The NodePredicate is owned by the model
+  ///
+  QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage = 0, mitk::NodePredicateBase* pred = 0, QObject* parent = 0);
   ~QmitkDataStorageListModel();
 
+
+  //# Getter / Setter
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  mitk::DataStorage::Pointer GetDataStorage() const;
+
+  void SetPredicate(mitk::NodePredicateBase* pred);
+  mitk::NodePredicateBase* GetPredicate() const;
+
+  mitk::DataStorage::SetOfObjects::ConstPointer GetDataNodes() const; 
+
+  
+  //# From QAbstractListModel
 
   Qt::ItemFlags flags(const QModelIndex& index) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
-private:
+protected:
+  void reset();
 
   mitk::DataStorage::Pointer m_DataStorage;
-  mitk::DataStorage::SetOfObjects::ConstPointer m_DataNodes;
   mitk::NodePredicateBase* m_NodePredicate;
+  mitk::DataStorage::SetOfObjects::ConstPointer m_DataNodes;
 };
 
 #endif /* QMITKDATASTORAGELISTMODEL_H_ */

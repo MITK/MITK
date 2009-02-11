@@ -21,6 +21,7 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
  QmitkPropertyObservers/QmitkStringPropertyView.cpp
  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
+ QmitkPropertyObservers/QmitkDataStorageComboBox.cpp
 
  qclickablelabel.cpp
  QmitkAbortEventFilter.cpp
@@ -86,6 +87,7 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
+ QmitkPropertyObservers/QmitkDataStorageComboBox.h
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h

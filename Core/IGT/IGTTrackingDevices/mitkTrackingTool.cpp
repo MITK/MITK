@@ -28,6 +28,8 @@ mitk::TrackingTool::TrackingTool()
 
 mitk::TrackingTool::~TrackingTool()
 {
+  m_MyMutex->Unlock();
+  m_MyMutex = NULL;
 }
 
 const char* mitk::TrackingTool::GetToolName() const
@@ -45,23 +47,3 @@ const char* mitk::TrackingTool::GetErrorMessage() const
   m_MyMutex->Unlock();
   return c;
 }
-
-void mitk::TrackingTool::SetToolName(const char* _arg)
-{
-  m_MyMutex->Lock();
-  if ( _arg && (_arg == this->m_ToolName) ) 
-  { 
-    m_MyMutex->Unlock();
-    return;
-  }
-  if (_arg)
-    {
-    this->m_ToolName= _arg;
-    }
-    else
-    {
-    this->m_ToolName= "";
-    }
-  this->Modified(); 
-  m_MyMutex->Unlock();
-} 

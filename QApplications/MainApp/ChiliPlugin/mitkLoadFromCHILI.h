@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 //MITK
 #include "mitkPACSPlugin.h"
 
+#include "mitkIpPicUnmangle.h"
 //CHILI
+#include <ipPic/ipPic.h>
 #include <chili/isg.h>  //geometry
 #include <chili/cdbTypes.h>  //series_t, study_t, ...
 

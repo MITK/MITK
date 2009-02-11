@@ -137,8 +137,11 @@ mitk::LoadFromCHILI::StreamImageStruct mitk::LoadFromCHILI::LoadStreamImage( mit
 
       for( unsigned int i = 0; i < frameNumber; i++ )
       {
-        mitkIpPicDescriptor* cinePic = ipPicDecompressJPEG( pic, i, frameNumber, NULL, offset_table );
-        newElement.imageList.push_back( cinePic );
+        ipPicDescriptor* chiliPic = ipPicClone(reinterpret_cast<ipPicDescriptor*>(pic));
+        ipPicDescriptor* cinePic = pipPicDecompressJPEG( chiliPic, i, frameNumber, NULL, offset_table );
+        mitkIpPicDescriptor *mitkCinePic = mitkIpPicClone( reinterpret_cast<mitkIpPicDescriptor*>(cinePic) );
+        ipPicFree( chiliPic );
+        newElement.imageList.push_back( mitkCinePic );
       }
       free( offset_table );
       ProgressBar::GetInstance()->Progress();

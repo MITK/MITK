@@ -228,6 +228,20 @@ std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".pic");
+  possibleFileExtensions.push_back(".bmp");
+  possibleFileExtensions.push_back(".dcm");
+  possibleFileExtensions.push_back(".DCM");
+  possibleFileExtensions.push_back(".dicom");
+  possibleFileExtensions.push_back(".DICOM");
+  possibleFileExtensions.push_back(".gipl");
+  possibleFileExtensions.push_back(".gipl.gz");
+  possibleFileExtensions.push_back(".mha");
+  possibleFileExtensions.push_back(".nii");
+  possibleFileExtensions.push_back(".nrrd");
+  possibleFileExtensions.push_back(".nhdr");
+  possibleFileExtensions.push_back(".png");
+  possibleFileExtensions.push_back(".PNG");
+  possibleFileExtensions.push_back(".spr");
   possibleFileExtensions.push_back(".mhd");
   possibleFileExtensions.push_back(".vtk");
   possibleFileExtensions.push_back(".vti");

@@ -405,7 +405,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     "DSR files (hpsonos.db HPSONOS.DB);;" \
     "DICOM files (*.dcm *.gdcm *.dc3 *.ima)"
 
-#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg)"
+#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.spr *.lsm)"
 
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {

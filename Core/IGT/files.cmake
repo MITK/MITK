@@ -14,7 +14,7 @@ SET(CPP_FILES
   
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp
-  IGTTrackingDevices/mitkTrackingDeviceConfigurator.cpp
+  IGTTrackingDevices/mitkInternalTrackingTool.cpp
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp
   IGTTrackingDevices/mitkTrackingVolume.cpp

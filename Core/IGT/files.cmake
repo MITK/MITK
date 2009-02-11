@@ -1,5 +1,6 @@
 SET(CPP_FILES
   IGTFilters/mitkNavigationDataLandmarkTransformFilter.cpp
+  IGTFilters/mitkNavigationDataToDataTreeFilter.cpp
   IGTFilters/mitkNavigationDataTransformFilter.cpp
   IGTFilters/mitkNavigationDataRecorder.cpp
   IGTFilters/mitkCameraVisualization.cpp

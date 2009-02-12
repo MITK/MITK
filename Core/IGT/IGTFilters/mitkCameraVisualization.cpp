@@ -30,7 +30,7 @@ namespace mitk{
 
   }
 
-  void mitk::CameraVisualization::GenerateData()
+  void mitk::CameraVisualization::Update()
   {
     // check if renderer was set
     if (m_Renderer)

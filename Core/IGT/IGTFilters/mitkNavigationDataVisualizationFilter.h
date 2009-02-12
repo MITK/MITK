@@ -50,6 +50,12 @@ namespace mitk {
     * \brief Get the input with id idx of this filter
     */
     const NavigationData* GetInput(unsigned int idx);
+
+    /**
+    * @brief process the desired operation
+    **/
+    virtual void Update() {};
+
   protected:
     NavigationDataVisualizationFilter();
     virtual ~NavigationDataVisualizationFilter();

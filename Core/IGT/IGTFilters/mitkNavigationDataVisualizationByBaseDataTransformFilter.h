@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATATODATATREEFILTER_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATATODATATREEFILTER_H_HEADER_INCLUDED_
+#ifndef MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_
+#define MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_
 
 #include "mitkNavigationDataVisualizationFilter.h"
 #include "mitkNavigationData.h"
@@ -30,50 +30,56 @@ namespace mitk {
   *
   * @ingroup Navigation
   */
-  class NavigationDataToDataTreeFilter : public NavigationDataVisualizationFilter
+  class NavigationDataVisualizationByBaseDataTransformFilter : public NavigationDataVisualizationFilter
   {
   public:
-    mitkClassMacro(NavigationDataToDataTreeFilter, NavigationDataVisualizationFilter);
+    mitkClassMacro(NavigationDataVisualizationByBaseDataTransformFilter, NavigationDataVisualizationFilter);
 
     itkNewMacro(Self);
 
     /** Smart Pointer type to a DataTreeNode. */
-    typedef DataTreeNode::Pointer DataTreeNodePointer;
+    typedef BaseData::Pointer RepresentationPointer;
 
     /** STL map of SmartPointers to DataTreeNodes and an index. Using map to be able to set non continuous indices*/
-    typedef std::map<const NavigationData*, DataTreeNodePointer> DataTreeNodePointerMap;
+    typedef std::map<const NavigationData*, RepresentationPointer> RepresentationPointerMap;
     /** Size type of an std::vector */
-    typedef DataTreeNodePointerMap::size_type DataTreeNodePointerMapSizeType;
+    typedef RepresentationPointerMap::size_type RepresentationPointerMapSizeType;
 
     /** Set the DataTreeNode of the tool specified by the given index */
-    bool SetDataTreeNode(const NavigationData* nd, DataTreeNode* node);
+    bool SetBaseData(const NavigationData* nd, BaseData* data);
     
     /** Get the DataTreeNode of the tool specified by the given index */
-    DataTreeNode* GetDataTreeNode(const NavigationData* nd) const;
+    const BaseData* GetBaseData(const NavigationData* nd) const;
   
     /** Get the size of the DataTreeNode vector.  This is merely the size of
     * the vector, not the number of dataTreeNodes that have valid
     * DataObject's assigned. Use GetNumberOfValidRequiredDataTreeNodes() to
     * determine how many DataTreeNodes are non-null. */
-    DataTreeNodePointerMapSizeType GetNumberOfDataTreeNodes() const
-    {return m_DataTreeNodeList.size();}
-
-  protected:
-    NavigationDataToDataTreeFilter();
-    ~NavigationDataToDataTreeFilter();
+    RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
+    {return m_RepresentationList.size();}
 
     /** 
     * This method causes the filter 
     * to update the DataTreeNodes of the geometrical objects
     * according to NavigationData. */
-    virtual void GenerateData();
+    virtual void Update();
+
+  protected:
+    NavigationDataVisualizationByBaseDataTransformFilter();
+    ~NavigationDataVisualizationByBaseDataTransformFilter();
+
+
+    /**
+    * @brief Create a BaseData that represents the given tool
+    **/
+    void CreateToolRepresenation();
 
   private:
     /** An array of the DataTreeNodes which represent the tools. */
-    DataTreeNodePointerMap m_DataTreeNodeList;
+    RepresentationPointerMap m_RepresentationList;
   };
 } // namespace mitk
 
 
-#endif /* MITKNAVIGATIONDATATODATATREEFILTER_H_HEADER_INCLUDED_ */
+#endif /* MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_ */
 

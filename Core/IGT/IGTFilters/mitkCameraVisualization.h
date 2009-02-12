@@ -40,16 +40,16 @@ namespace mitk {
     virtual const BaseRenderer* GetRenderer()
     {return m_Renderer;};
 
-  protected:
-    CameraVisualization();
-    virtual ~CameraVisualization();
-
     /**Documentation
     * \brief filter execute method
     *
     * positions and orients camera according to NavigationData
     */
-    virtual void GenerateData();
+    virtual void Update();
+
+  protected:
+    CameraVisualization();
+    virtual ~CameraVisualization();
 
     ///< renderer that visualizes the navigation data
     const BaseRenderer* m_Renderer; 

@@ -11,9 +11,9 @@ void QmitkVolumeRenderingView::CreateQtPartControl(QWidget* parent)
 
   QComboBox* comboBox = new QComboBox(parent);
   m_ComboModel =
-    new QmitkDataStorageListModel(new mitk::NodePredicateDataType("Image"),
+    new QmitkDataStorageListModel(this->GetDataStorage(),
+                                  new mitk::NodePredicateDataType("Image"),
                                   comboBox);
-  m_ComboModel->SetDataStorage(this->GetDataStorage());
   comboBox->setModel(m_ComboModel);
 
   layout->addWidget(comboBox);

@@ -59,7 +59,7 @@ std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
   return returnValue;
   }
 
-std::string mitk::ClaronInterface::GetName(claronToolHandle c)
+const char* mitk::ClaronInterface::GetName(claronToolHandle c)
   {
   printf("Error: MicronTracker is not included in this project. \n");
   return NULL;  

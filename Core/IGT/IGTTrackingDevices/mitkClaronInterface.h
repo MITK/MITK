@@ -63,7 +63,7 @@ namespace mitk
     * @return Returns the name of the tool. This name is given by the calibration file.
     * @param c The handle of the tool, which name should be given back.
     */
-    std::string GetName(claronToolHandle c);
+    const char* GetName(claronToolHandle c);
 
     /**
     * \brief Grabs a frame from the camera.

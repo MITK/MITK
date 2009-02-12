@@ -14,13 +14,13 @@ mitk::ClaronTool::~ClaronTool(void)
 }
 
 
-std::string mitk::ClaronTool::GetCalibrationName()
+const char* mitk::ClaronTool::GetCalibrationName()
 {
-  return m_CalibrationName;
+  return &m_CalibrationName[0];
 }
 
 
-void mitk::ClaronTool::SetCalibrationName(std::string name)
+void mitk::ClaronTool::SetCalibrationName(const char* name)
 {
   this->m_CalibrationName=name;
 }

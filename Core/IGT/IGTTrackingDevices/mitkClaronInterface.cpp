@@ -200,12 +200,13 @@ std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
 
 
 
-std::string mitk::ClaronInterface::GetName(claronToolHandle c)
+const char* mitk::ClaronInterface::GetName(claronToolHandle c)
 {
   char MarkerName[MT_MAX_STRING_LENGTH];
   MTC( Marker_NameGet(c, MarkerName, MT_MAX_STRING_LENGTH, 0) );
   std::string returnValue = std::string(MarkerName);
-  return returnValue;
+  //return &returnValue[0];
+  return MarkerName;
 }
 
 int mitk::ClaronInterface::getMTHome (  char *sMTHome, int size )

@@ -57,7 +57,7 @@ namespace mitk
     /**
     * \brief This is only a stub, please switch the cmake variable USE_MICRON_TRACKER to on if you want to use the Microntracker.
     */
-    std::string GetName(claronToolHandle c);
+    const char* GetName(claronToolHandle c);
 
     /**
     * \brief This is only a stub, please switch the cmake variable USE_MICRON_TRACKER to on if you want to use the Microntracker.

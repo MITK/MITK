@@ -34,13 +34,13 @@ namespace mitk
     /**
     * @return Returns the calibration name which is used to identify the tool.
     */
-    std::string GetCalibrationName();
+    const char* GetCalibrationName();
 
     /**
     * \brief Sets the calibration name of the tool. Be careful, only use this method if you know what you are doing.
     * If you want to change the tool name use the method setToolName instead!
     */
-    void SetCalibrationName(std::string name);
+    void SetCalibrationName(const char* name);
 
     /**
     * @return Returns the toolhandle of the tool.

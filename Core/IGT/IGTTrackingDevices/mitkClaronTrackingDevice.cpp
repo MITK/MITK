@@ -24,7 +24,7 @@ std::vector<mitk::ClaronTool::Pointer> mitk::ClaronTrackingDevice::DetectTools()
   for (std::vector<claronToolHandle>::iterator iter = allHandles.begin(); iter != allHandles.end(); ++iter)
   {
     ClaronTool::Pointer neu = ClaronTool::New();
-    neu->SetToolName(m_Device->GetName(*iter).c_str());
+    neu->SetToolName(m_Device->GetName(*iter));
     neu->SetCalibrationName(m_Device->GetName(*iter));
     neu->SetToolHandle(*iter);
     returnValue.push_back(neu);
@@ -185,7 +185,8 @@ void mitk::ClaronTrackingDevice::TrackTools()
         for(itDetectedTools = detectedTools.begin(); itDetectedTools != detectedTools.end(); itDetectedTools++)
         {
           mitk::ClaronTool::Pointer aktuDet = *itDetectedTools;
-          if (currentTool->GetCalibrationName().compare(aktuDet->GetCalibrationName())==0)
+          std::string tempString(currentTool->GetCalibrationName());
+          if (tempString.compare(aktuDet->GetCalibrationName())==0)
           {
             currentTool->SetToolHandle(aktuDet->GetToolHandle());
             foundTool = true;

@@ -61,6 +61,12 @@ void mitk::InternalTrackingTool::SetToolName(const char* _arg)
 } 
 
 
+void mitk::InternalTrackingTool::SetToolName( const std::string _arg )
+{
+  this->SetToolName(_arg.c_str());
+}
+
+
 void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 {
   m_MyMutex->Lock();

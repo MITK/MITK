@@ -49,6 +49,7 @@ namespace mitk {
     virtual bool IsEnabled() const;                             ///< returns whether the tool is enabled or disabled
     virtual bool IsDataValid() const;                           ///< returns true if the current position data is valid (no error during tracking, tracking error below threshold, ...)
     virtual float GetTrackingError() const;                     ///< return one value that corresponds to the overall tracking error.
+    virtual void SetToolName(const std::string _arg);           ///< Set the name of the tool
     virtual void SetToolName(const char* _arg);                 ///< Set the name of the tool
     virtual void SetPosition(float x, float y, float z);        ///< set the position 
     virtual void SetQuaternion(float q0, float qx, float qy, float qz); ///< set the orientation as a quaternion

@@ -20,6 +20,12 @@ std::string mitk::ClaronTool::GetCalibrationName()
 }
 
 
+void mitk::ClaronTool::SetCalibrationName(std::string name)
+{
+  this->m_CalibrationName=name;
+}
+
+
 bool mitk::ClaronTool::LoadFile(const char* filename)
 {
   return this->LoadFile( std::string(filename));

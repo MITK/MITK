@@ -1,7 +1,7 @@
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
 INCLUDE(MacroParseArguments)
-#INCLUDE(MacroConvertSchema)
+INCLUDE(MacroConvertSchema)
 INCLUDE(MacroOrganizeSources)
 INCLUDE(PluginHelpers)
 
@@ -25,7 +25,8 @@ OPTION(OPENCHERRY_STATIC "Build all plugins as static libraries" OFF)
 MARK_AS_ADVANCED(OPENCHERRY_STATIC)
 
 FIND_PACKAGE(Poco REQUIRED)
-#FIND_PACKAGE(Ant)
+FIND_PACKAGE(Ant)
+FIND_PACKAGE(Eclipse)
 
 SET(OPENCHERRY_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 SET(OPENCHERRY_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
@@ -34,6 +35,12 @@ SET(OPENCHERRY_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
 # Clear the cache variables
 SET(OPENCHERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 SET(OPENCHERRY_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
+
+IF (Eclipse_DIR)
+  SET(OPENCHERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation" FORCE)
+ELSE (Eclipse_DIR)
+  SET(OPENCHERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
+ENDIF (Eclipse_DIR)
 
 CONFIGURE_FILE(openCherryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/openCherryConfig.cmake @ONLY)
 

@@ -31,7 +31,7 @@ ADD_CUSTOM_TARGET(openCherryDoc
                   )
                   
 # convert the extension points schema files into html
-IF(ANT_FOUND)
+IF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
   FILE(GLOB_RECURSE _plugin_xmls  ${OPENCHERRY_SOURCE_DIR}/plugin.xml)
   MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
                        OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/reference/extension-points"
@@ -39,7 +39,7 @@ IF(ANT_FOUND)
                        )
 
   ADD_DEPENDENCIES(openCherryDoc openCherryXPDoc)
-ENDIF(ANT_FOUND)
+ENDIF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
 
 FOREACH(_file ${COPY_DOC_FILES})
   CONFIGURE_FILE(${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file})

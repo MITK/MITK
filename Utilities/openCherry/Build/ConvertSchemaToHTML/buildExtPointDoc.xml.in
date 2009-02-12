@@ -2,9 +2,13 @@
 <project name="openCherry Extension-Point Documentation" default="all"  basedir="." >
 
 	<path id="convertSchema-classpath">  
-	    <fileset dir="@OPENCHERRY_SOURCE_DIR@/../Build/ConvertSchemaToHTML/bin" >  
+	    <fileset dir="@OPENCHERRY_DOC_TOOLS_DIR@/plugins" >  
 	        <include name="*.jar"/>  
-	    </fileset>  
+	        <include name="org.eclipse.pde.build*/*.jar"/>
+	    </fileset>
+	    <fileset dir="@OPENCHERRY_DOC_TOOLS_DIR@/configuration/org.eclipse.osgi/bundles/207/1/.cp/ant_tasks" >  
+	        <include name="*.jar"/>  
+	    </fileset>
 	</path> 
 	
 	<taskdef name="pde.convertSchemaToHTML" classname="org.eclipse.pde.internal.core.ant.ConvertSchemaToHTML" >

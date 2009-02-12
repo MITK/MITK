@@ -29,7 +29,7 @@ float mitk::SurfaceInteractor::CalculateJurisdiction( StateEvent const* stateEve
     mitk::DisplayPositionEvent const *event = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
     mitk::PointSet::PointType pt = event->GetWorldPosition();
 
-    // Use ANN to get the point of the polydata closest to the world event 
+    // Use ANN to get the point of the polydata closest to the world event
     if( surf->GetVtkPolyData(m_TimeStep) == NULL ) itkExceptionMacro(<< "No polydata at this time step!");
     m_PtLoc->SetPoints(dynamic_cast<vtkPointSet*>(surf->GetVtkPolyData(m_TimeStep)));
     mitk::PointLocator::DistanceType dst = m_PtLoc->GetMinimalDistance(pt);

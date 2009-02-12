@@ -1,0 +1,36 @@
+/**
+
+\page ExtPointsIndex Extension-Point Reference
+
+<center>
+	<h1>openCherry Platform Extension Points</h1>
+</center>
+
+The following extension points can be used to extend the capabilities
+of the platform infrastructure:
+
+<h3><a name="runtime"></a>Platform runtime</h3>
+<ul>
+	<li><a href="../../extension-points/org_opencherry_osgi_applications.html">org.opencherry.osgi.applications</a></li>
+</ul>
+
+<h3><a name="workbench"></a>Workbench</h3>
+<ul>
+	<li><a href="../../extension-points/org_opencherry_ui_commands.html">org.opencherry.ui.commands</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_editors.html">org.opencherry.ui.editors</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_perspectives.html">org.opencherry.ui.perspectives</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_presentationFactories.html">org.opencherry.ui.presentationFactories</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_services.html">org.opencherry.ui.services</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_tweaklets.html">org.opencherry.ui.tweaklets</a></li>
+	<li><a href="../../extension-points/org_opencherry_ui_views.html">org.opencherry.ui.views</a></li>
+</ul>
+
+<h3><a name="other"></a>Other</h3>
+<ul>
+	<li><a href="../../extension-points/org_opencherry_core_expressions_definitions.html">org.opencherry.core.expressions.definitions</a></li>
+	<li><a href="../../extension-points/org_opencherry_core_expressions_propertyTesters.html">org.opencherry.core.expressions.propertyTesters</a></li>
+</ul>
+
+
+
+*/

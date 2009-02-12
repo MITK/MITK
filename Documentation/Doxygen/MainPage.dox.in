@@ -39,7 +39,11 @@ an extension, which tries to ease the combination of both and to add the feature
 
 \ref Concepts 
 
-\ref Development 
+\ref Development
+
+@MITK_XP_LINK@
+
+@OPENCHERRY_DOXYGEN_LINK@
 
 <!--\ref UserManual -->
 */

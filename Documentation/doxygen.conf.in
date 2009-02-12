@@ -58,7 +58,7 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/MainPage.dox \
+                         @MITK_BINARY_DIR@/Documentation/Doxygen/MainPage.dox \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
                          @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \
@@ -72,6 +72,8 @@ RECURSIVE              = YES
 EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/vecmath/ \
+                         @MITK_SOURCE_DIR@/Utilities/openCherry/ \
+                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Testing/ \
                          @MITK_SOURCE_DIR@/CMake/QmitkFunctionalityTemplate/ \
                          @QT_DOCUMENTATION_EXCLUDE_DIRS@
@@ -230,9 +232,9 @@ PREDEFINED             = itkNotUsed(x)= \
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
-# Configuration::addtions related to external references   
+# Configuration::additions related to external references   
 #---------------------------------------------------------------------------
-TAGFILES               = 
+TAGFILES               = @OPENCHERRY_TAGFILE@
 GENERATE_TAGFILE       = 
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES

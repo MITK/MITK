@@ -1,0 +1,71 @@
+/*******************************************************************************
+ * Copyright (c) 2003 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials 
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
+
+H6.SchemaHeader {
+	font-size:16px; 
+	display:inline
+}
+
+P.SchemaCopyright {
+	font-size: smaller; 
+	font-style: normal;
+	color: #336699; 
+	display:inline;
+	margin-top: 3.000000pt;
+	margin-bottom: 11.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 0.000000pt;
+}
+
+P.SchemaDtd {
+	color: #800000; 
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 10.000000pt;
+}
+
+P.SchemaDtdAttlist {
+	color: #800000; 
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 20.000000pt;
+}
+
+span.SchemaTag {
+	color: #000080;
+}
+
+span.SchemaCstring {
+	color: #008000;
+}
+
+pre.Example {
+	margin-top: 0.000000pt;
+}
+
+.ConfigMarkupElementDesc {
+	color: black;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 10.000000pt;
+}
+
+.ConfigMarkupAttlistDesc {
+	color: black;
+	margin-top: 0.000000pt;
+	margin-bottom: 0.000000pt;
+	margin-right: 0.000000pt;
+	margin-left: 32.000000pt;
+}
+

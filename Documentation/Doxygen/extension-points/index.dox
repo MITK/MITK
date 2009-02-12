@@ -1,0 +1,19 @@
+/**
+
+\page mitkExtPointsIndex Extension-Point Reference
+
+<center>
+	<h1>MITK Extension Points</h1>
+</center>
+
+The following extension points can be used to extend the capabilities
+of MITK Plugins:
+
+
+<h3><a name="interactivesegmentation"></a>Interactive Segmentation</h3>
+<ul>
+	<li><a href="../extension-points/org_mitk_gui_qt_interactivesegmentation_qmitktoolguis.html">org.mitk.gui.qt.interactivesegmentation.qmitktoolguis</a></li>
+</ul>
+
+
+*/

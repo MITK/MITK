@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="openCherry Extension-Point Documentation" default="all"  basedir="." >
+
+	<path id="convertSchema-classpath">  
+	    <fileset dir="@OPENCHERRY_SOURCE_DIR@/../Build/ConvertSchemaToHTML/bin" >  
+	        <include name="*.jar"/>  
+	    </fileset>  
+	</path> 
+	
+	<taskdef name="pde.convertSchemaToHTML" classname="org.eclipse.pde.internal.core.ant.ConvertSchemaToHTML" >
+		<classpath><path refid="convertSchema-classpath"/></classpath>
+	</taskdef>
+	
+	<target name="all" >
+		<antcall target="convertSchemaToHtml" />
+		<!--antcall target="examplesDocCopy" /-->
+		<!--antcall target="createDocZip" /-->
+	</target>
+
+	<target name="convertSchemaToHtml">
+		<property name="dest" value="@XP_DOC_DESTINATION@" />
+		<!--<property name="source" value="/home/zelzer/svn/mbi/MITK_INSRC/trunk/mitk/Utilities/openCherry/Bundles" />-->
+		
+		<record name="${basedir}/schema_convert.txt" action="start"/>
+		
+		<!-- =============  start extension point reference generation  ============ -->
+		
+		@XP_ANT_TASKS@
+		
+		<!-- =============  end extension point reference generation  ============== -->
+			
+		<record name="${basedir}/platformconvert.txt" action="stop"/>
+			
+	</target>
+
+</project>

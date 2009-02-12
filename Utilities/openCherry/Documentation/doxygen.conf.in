@@ -57,7 +57,11 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = ./ @OPENCHERRY_SOURCE_DIR@ @OPENCHERRY_BINARY_DIR@
+INPUT                  = ./ \
+                         @OPENCHERRY_SOURCE_DIR@/../Documentation/reference/api/MainPage.dox \
+                         @OPENCHERRY_SOURCE_DIR@/../Documentation/reference/extension-points/index.dox \
+                         @OPENCHERRY_SOURCE_DIR@ \
+                         @OPENCHERRY_BINARY_DIR@
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
@@ -184,10 +188,10 @@ PREDEFINED             = FREEVERSION \
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
-# Configuration::addtions related to external references   
+# Configuration::additions related to external references   
 #---------------------------------------------------------------------------
 TAGFILES               = 
-GENERATE_TAGFILE       = 
+GENERATE_TAGFILE       = @OPENCHERRY_DOXYGEN_OUTPUT_DIR@/openCherry.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 PERL_PATH              = /usr/bin/perl

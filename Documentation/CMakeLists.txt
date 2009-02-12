@@ -53,6 +53,15 @@ IF(USE_QT)
   ENDIF(DESIRED_QT_VERSION EQUAL 4)
 ENDIF(USE_QT)
 
+#IF(BUILD_OPENCHERRY)
+#  SET(OPENCHERRY_TAGFILE "${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/openCherry.tag=${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/html")
+#  SET(OPENCHERRY_DOXYGEN_LINK "<a class=\"el\" href=\"../../../Utilities/openCherry/Documentation/reference/api/html/index.html\">openCherry Documentation</a>")
+#  SET(MITK_XP_LINK "\\ref mitkExtPointsIndex")
+#  CONFIGURE_FILE(schema.css ${CMAKE_CURRENT_BINARY_DIR}/schema.css)
+#ENDIF(BUILD_OPENCHERRY)
+
+CONFIGURE_FILE(Doxygen/MainPage.dox.in
+               ${CMAKE_CURRENT_BINARY_DIR}/Doxygen/MainPage.dox)
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 CONFIGURE_FILE(helpPages.conf.in
@@ -70,6 +79,20 @@ ADD_CUSTOM_TARGET(doc
                   ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf
                   )
 
+#IF (BUILD_OPENCHERRY)  
+#  # convert the extension points schema files into html
+#  FIND_PACKAGE(Ant)
+#  IF(ANT_FOUND)
+#    FILE(GLOB_RECURSE _plugin_xmls  ${CMAKE_CURRENT_SOURCE_DIR}/../Bundles/plugin.xml)
+#    MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
+#                         OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/Doxygen/extension-points"
+#                         TARGET_NAME mitkXPDoc
+#                         )
+#
+#    ADD_DEPENDENCIES(doc mitkXPDoc openCherryDoc)
+#  ENDIF(ANT_FOUND)
+#ENDIF (BUILD_OPENCHERRY)
+
 ADD_CUSTOM_TARGET(helpPages
                   ${DOXYGEN} 
                   ${PROJECT_BINARY_DIR}/Documentation/helpPages.conf
@@ -81,4 +104,5 @@ IF(DESIRED_QT_VERSION EQUAL 3)
 ADD_DEPENDENCIES(doc MainApp)
 ADD_DEPENDENCIES(helpPages MainApp)
 ENDIF(DESIRED_QT_VERSION EQUAL 3)
+
 

@@ -36,7 +36,11 @@ ENDIF(NOT MITK_DIR)
 # to decide if they should be build
 OPTION(USE_QT "Use Trolltech's Qt library" ON)
 
-ADD_SUBDIRECTORY(Utilities) 
+ADD_SUBDIRECTORY(Utilities)
+
+IF(BUILD_OPENCHERRY)
+  INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
+ENDIF(BUILD_OPENCHERRY)
 
 IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)
   SET(ITK_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin")

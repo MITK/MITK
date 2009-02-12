@@ -15,7 +15,7 @@ IF(DOT)
 ENDIF(DOT)
 
 
-SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/reference/api)
+SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/reference/api CACHE PATH "openCherry output directory for doxygen generated documentation." )
 
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)

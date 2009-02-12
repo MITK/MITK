@@ -3,7 +3,7 @@
 #include "Poco/ClassLibrary.h"
 
 #include <cherryIViewPart.h>
-#include "src/@VIEW_CLASS_H@"
+#include "src/internal/@VIEW_CLASS_H@"
 
 
 //********************  Views  **********************

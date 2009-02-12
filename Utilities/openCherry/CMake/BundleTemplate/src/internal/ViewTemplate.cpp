@@ -8,6 +8,8 @@
 
 @BEGIN_NAMESPACE@
 
+const std::string @VIEW_CLASS@::VIEW_ID = "@VIEW_ID@";
+
 void @VIEW_CLASS@::CreateQtPartControl(QWidget* parent)
 {
   QVBoxLayout* layout = new QVBoxLayout(parent);
@@ -18,7 +20,7 @@ void @VIEW_CLASS@::CreateQtPartControl(QWidget* parent)
 
 void @VIEW_CLASS@::SetFocus()
 {
-	m_ButtonStart->setFocus();
+  m_ButtonStart->setFocus();
 }
 
 @END_NAMESPACE@

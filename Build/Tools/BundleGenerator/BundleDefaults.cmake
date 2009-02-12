@@ -1,11 +1,9 @@
 SET(BUNDLE_NAMESPACE "")
 SET(DEFAULT_REQUIRED_BUNDLES org.opencherry.osgi org.mitk.gui.qt.common)
-SET(DEFAULT_PLUGIN_ID "org.mitk.gui.qt.<your-name>")
 SET(DEFAULT_PLUGIN_VERSION "0.1")
 SET(DEFAULT_PLUGIN_VENDOR "DKFZ, Medical and Biological Informatics")
 SET(DEFAULT_VIEW_BASE_CLASS "QmitkFunctionality")
 SET(DEFAULT_VIEW_BASE_CLASS_H "QmitkFunctionality.h")
-SET(DEFAULT_VIEW_ID "org.mitk.view.<your-id>")
 SET(PROJECT_STATIC_VAR "MITK_STATIC")
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
 

@@ -8,8 +8,8 @@ SET(PLUGIN_COPYRIGHT "/*========================================================
  
 Program:   openCherry Platform
 Language:  C++
-Date:      $$Date: 2008-06-13 21:02:28 +0200 (Fr, 13 Jun 2008) $$
-Version:   $$Revision: 14620 $$
+Date:      $Date: 2008-06-13 21:02:28 +0200 (Fr, 13 Jun 2008) $
+Version:   $Revision: 14620 $
  
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

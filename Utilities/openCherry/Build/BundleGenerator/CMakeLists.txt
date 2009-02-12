@@ -5,7 +5,7 @@ MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH RUNTIME_OUTPUT_PATH
 CMAKE_BACKWARDS_COMPATIBILITY CMAKE_INSTALL_PREFIX CMAKE_BUILD_TYPE)
 
 FIND_FILE(PLUGIN_TEMPLATE BundleTemplate 
-          ${PROJECT_SOURCE_DIR}
+          ${PROJECT_SOURCE_DIR}/../../CMake
           DOC "Path to the plugin templates") 
 
 IF(BUNDLE_DEFAULTS_FILE)
@@ -90,6 +90,10 @@ ENDIF(ACTIVATOR_CLASS)
 SET(REQUIRED_PLUGINS_MF "${REQUIRED_PLUGINS}")
 STRING(REPLACE ";" "," REQUIRED_PLUGINS_MF "${REQUIRED_PLUGINS_MF}" )
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/META-INF/MANIFEST_TEMPLATE.MF ${PLUGIN_DIR}/META-INF/MANIFEST.MF @ONLY)
+
+# ----------------- documentation/doxygen/modulesTemplate.dox ------------
+CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox 
+               ${PLUGIN_DIR}/documentation/doxygen/modules.dox @ONLY)
 	
 
 # -------------------- BundleDllTemplate.h -------------------------------
@@ -109,7 +113,7 @@ IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 
 
-# --------------------- src/ViewTemplate[.h,.cpp] ----------------------------
+# --------------------- src/internal/ViewTemplate[.h,.cpp] ----------------------------
 IF(VIEW_CLASS)
   SET(VIEW_CLASS_H "${BUNDLE_NAMESPACE}${VIEW_CLASS}.h")
   SET(VIEW_CLASS_CPP "${BUNDLE_NAMESPACE}${VIEW_CLASS}.cpp")
@@ -121,8 +125,8 @@ IF(VIEW_CLASS)
     SET(BEGIN_NAMESPACE "namespace ${BUNDLE_NAMESPACE} {")
     SET(END_NAMESPACE "} //namespace ${BUNDLE_NAMESPACE}")
   ENDIF(BUNDLE_NAMESPACE)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/ViewTemplate.h ${PLUGIN_DIR}/src/${VIEW_CLASS_H} @ONLY)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/ViewTemplate.cpp ${PLUGIN_DIR}/src/${VIEW_CLASS_CPP} @ONLY)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ViewTemplate.h ${PLUGIN_DIR}/src/internal/${VIEW_CLASS_H} @ONLY)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ViewTemplate.cpp ${PLUGIN_DIR}/src/internal/${VIEW_CLASS_CPP} @ONLY)
 ENDIF(VIEW_CLASS)
 	
 # ---------------------- pluginTemplate.xml ---------------------------------
@@ -157,8 +161,9 @@ CONFIGURE_FILE(${PLUGIN_TEMPLATE}/CMakeListsTemplate.txt ${PLUGIN_DIR}/CMakeList
 	
 # ---------------------- filesTemplate.cmake ------------------------------
 SET(PLUGIN_SOURCES "")
+SET(PLUGIN_INTERNAL_SOURCES "")
 IF(VIEW_CLASS)
-  SET(PLUGIN_SOURCES "${VIEW_CLASS_CPP}\n")
+  SET(PLUGIN_INTERNAL_SOURCES "${VIEW_CLASS_CPP}\n")
 ENDIF(VIEW_CLASS)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/filesTemplate.cmake ${PLUGIN_DIR}/files.cmake @ONLY)
 	

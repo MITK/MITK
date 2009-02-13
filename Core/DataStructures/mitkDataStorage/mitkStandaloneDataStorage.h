@@ -65,6 +65,11 @@ namespace mitk {
     void Remove(const mitk::DataTreeNode* node);
 
     //##Documentation
+    //## @brief Checks if a node exists in the StandaloneDataStorage
+    //##
+    virtual bool Exists(const mitk::DataTreeNode* node) const;
+
+    //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
     SetOfObjects::ConstPointer GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const;

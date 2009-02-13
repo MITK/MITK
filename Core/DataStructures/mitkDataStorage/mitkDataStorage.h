@@ -94,6 +94,11 @@ namespace mitk {
     virtual void Remove(const mitk::DataTreeNode* node) = 0;
 
     //##Documentation
+    //## @brief Checks if a node exists in the DataStorage
+    //##
+    virtual bool Exists(const mitk::DataTreeNode* node) const = 0;
+
+    //##Documentation
     //## @brief Removes a set of nodes from the DataStorage
     //##
     void Remove(const mitk::DataStorage::SetOfObjects* nodes);

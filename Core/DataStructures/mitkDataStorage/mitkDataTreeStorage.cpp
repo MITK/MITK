@@ -162,6 +162,10 @@ void mitk::DataTreeStorage::Remove(const mitk::DataTreeNode* node)
 
 }
 
+bool mitk::DataTreeStorage::Exists(const mitk::DataTreeNode* node) const
+{
+  return (m_SourceNodes.find(node) != m_SourceNodes.end());
+}
 
 void mitk::DataTreeStorage::RemoveFromRelation(const mitk::DataTreeNode* node, AdjacencyList& relation)
 {

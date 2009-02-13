@@ -1,28 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.eclipse.ui">
+<schema targetNamespace="org.opencherry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
-         <meta.schema plugin="org.eclipse.ui" id="commands" name="Commands"/>
-      </appInfo>
+      <appinfo>
+         <meta.schema plugin="org.opencherry.ui" id="commands" name="Commands"/>
+      </appinfo>
       <documentation>
          &lt;p&gt;
-The &lt;code&gt;org.eclipse.ui.commands&lt;/code&gt; extension point is used to declare commands and command categories, using the &lt;code&gt;command&lt;/code&gt; and &lt;code&gt;category&lt;/code&gt; elements. A command is an abstract representation of some semantic behaviour, but not it&apos;s actual implementation.  This allows different developers to contribute specific behaviour for their individual parts.  For example, there might be a &quot;paste&quot; command with one implementation in an editor and a different implementation in an explorer widget.  These implementations are called handlers.  Commands can also be viewed as declarative function pointers, or signal handlers.
+The &lt;code&gt;org.opencherry.ui.commands&lt;/code&gt; extension point is used to declare commands and command categories, using the &lt;code&gt;command&lt;/code&gt; and &lt;code&gt;category&lt;/code&gt; elements. A command is an abstract representation of some semantic behaviour, but not it&apos;s actual implementation.  This allows different developers to contribute specific behaviour for their individual parts.  For example, there might be a &quot;paste&quot; command with one implementation in an editor and a different implementation in an explorer widget.  These implementations are called handlers.  Commands can also be viewed as declarative function pointers, or signal handlers.
 &lt;/p&gt;
       </documentation>
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="category" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="command" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="commandParameterType" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="keyBinding" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="keyConfiguration" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="context" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="scope" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="activeKeyConfiguration" minOccurs="0" maxOccurs="1"/>
          </sequence>
          <attribute name="id" type="string">
             <annotation>
@@ -36,9 +36,9 @@ The &lt;code&gt;org.eclipse.ui.commands&lt;/code&gt; extension point is used to 
                <documentation>
                   An optional name of the extension instance.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="point" type="string" use="required">
@@ -55,7 +55,7 @@ The &lt;code&gt;org.eclipse.ui.commands&lt;/code&gt; extension point is used to 
       <annotation>
          <documentation>
             &lt;p&gt;
-This element is used to define commands. A command represents an request from the user that can be handled by an action, and should be semantically unique among other commands. Do not define a command if there is already one defined with the same meaning. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid. See the extension points &lt;a href=&quot;org_eclipse_ui_actionSets.html&quot;&gt;org.eclipse.ui.actionSets&lt;/a&gt; and &lt;a href=&quot;org_eclipse_ui_editorActions.html&quot;&gt;org.eclipse.ui.editorActions&lt;/a&gt; to understand how actions are connected to commands.
+This element is used to define commands. A command represents an request from the user that can be handled by an action, and should be semantically unique among other commands. Do not define a command if there is already one defined with the same meaning. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid. See the extension points &lt;a href=&quot;org_opencherry_ui_actionSets.html&quot;&gt;org.opencherry.ui.actionSets&lt;/a&gt; and &lt;a href=&quot;org_opencherry_ui_editorActions.html&quot;&gt;org.opencherry.ui.editorActions&lt;/a&gt; to understand how actions are connected to commands.
 &lt;/p&gt;
          </documentation>
       </annotation>
@@ -65,24 +65,14 @@ This element is used to define commands. A command represents an request from th
             <element ref="state" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="commandParameter" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
-         <attribute name="category" type="string">
-            <annotation>
-               <documentation>
-                  Please use &lt;code&gt;categoryId&lt;/code&gt; instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
          <attribute name="description" type="string">
             <annotation>
                <documentation>
                   A translatable short description of this command for display in the UI.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="id" type="string" use="required">
@@ -97,51 +87,40 @@ This element is used to define commands. A command represents an request from th
                <documentation>
                   The translatable name of this command for display in the UI. Commands are typically named in the form of an imperative verb.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="categoryId" type="string">
             <annotation>
                <documentation>
-                  &lt;p&gt;
-The unique id of the category for this command. If this command does not specify a category it will be placed in an global &quot;Uncategorized&quot; category.
-&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.0&lt;/em&gt;&lt;/p&gt;
+                  The unique id of the category for this command. If this command does not specify a category it will be placed in an global &quot;Uncategorized&quot; category.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="defaultHandler" type="string">
             <annotation>
                <documentation>
-                  &lt;p&gt;
-The default handler for this command (see the &lt;a href=&quot;org_eclipse_ui_handlers.html&quot;&gt;org.eclipse.ui.handlers&lt;/a&gt; extension point).  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; element instead.
-&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.1&lt;/em&gt;&lt;/p&gt;
+                  The default handler for this command (see the &lt;a href=&quot;org_opencherry_ui_handlers.html&quot;&gt;org.opencherry.ui.handlers&lt;/a&gt; extension point).  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; element instead.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="returnTypeId" type="string">
             <annotation>
                <documentation>
-                  &lt;p&gt;
-The id of a &lt;code&gt;commandParameterType&lt;/code&gt; indicating the type of value returned by this command.  Specifying a &lt;code&gt;returnTypeId&lt;/code&gt; allows clients executing the command to associate the value returned with a Java type and to convert the value to a String form that may be stored and/or passed to another command that accepts parameters of the same type.
-&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
+                  The id of a &lt;code&gt;commandParameterType&lt;/code&gt; indicating the type of value returned by this command.  Specifying a &lt;code&gt;returnTypeId&lt;/code&gt; allows clients executing the command to associate the value returned with a type and to convert the value to a std::string form that may be stored and/or passed to another command that accepts parameters of the same type.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="helpContextId" type="string">
             <annotation>
                <documentation>
-                  &lt;p&gt;
-The identifier of the help context that relates to this command in general.  Handlers can override this context identifier to provide help that is more specific to their particular behaviours.
-&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
+                  The identifier of the help context that relates to this command in general.  Handlers can override this context identifier to provide help that is more specific to their particular behaviours.
+&lt;p&gt;&lt;em&gt;Not used yet&lt;/em&gt;&lt;/p&gt;
                </documentation>
             </annotation>
          </attribute>
@@ -162,9 +141,9 @@ In the UI, commands are often organized by category to make them more manageable
                <documentation>
                   A translatable short description of this category for display in the UI.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="id" type="string" use="required">
@@ -179,9 +158,9 @@ In the UI, commands are often organized by category to make them more manageable
                <documentation>
                   The translatable name of this category for display in the UI.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -189,14 +168,13 @@ In the UI, commands are often organized by category to make them more manageable
 
    <element name="commandParameter">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="id"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
 Defines a parameter that a command should understand.  A parameter is a way to provide more information to a handler at execution time.  For example, a &quot;show view&quot; command might take a view as a parameter.  Handlers should be able to understand these parameters, so they should be treated like API.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.1&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -215,19 +193,19 @@ Defines a parameter that a command should understand.  A parameter is a way to p
                <documentation>
                   The name for the parameter.  This is the name as it will be displayed to an end-user.  As such, it should be translatable.  The name should be short -- preferrably one word.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="values" type="string">
             <annotation>
                <documentation>
-                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.eclipse.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.eclipse.core.runtime.IExecutableExtension&lt;/code&gt;.
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.opencherry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
                </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IParameterValues"/>
-               </appInfo>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.opencherry.core.commands.IParameterValues"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="typeId" type="string">
@@ -251,9 +229,8 @@ Defines a parameter that a command should understand.  A parameter is a way to p
       <annotation>
          <documentation>
             &lt;p&gt;
-Defines the object type of a commandParameter and may specify an &lt;code&gt;org.eclipse.core.commands.AbstractParameterValueConverter&lt;/code&gt; subclass to convert between string parameter values and objects.
+Defines the object type of a commandParameter and may specify an &lt;code&gt;org.opencherry.core.commands.AbstractParameterValueConverter&lt;/code&gt; subclass to convert between string parameter values and objects.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -267,21 +244,21 @@ Defines the object type of a commandParameter and may specify an &lt;code&gt;org
          <attribute name="type" type="string">
             <annotation>
                <documentation>
-                  The fully qualified name of a Java class or interface to use as the type of this command parameter.  This attribute is optional, however if omitted, &lt;code&gt;java.lang.Object&lt;/code&gt; will be used as the parameter type.
+                  The fully qualified name of a class to use as the type of this command parameter.  This attribute is optional, however if omitted, &lt;code&gt;org.opencherry.osgi.Object&lt;/code&gt; will be used as the parameter type.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="converter" type="string">
             <annotation>
                <documentation>
-                  The class for converting between objects and string representations of objects for command parameter values.  This class should extend &lt;code&gt;org.eclipse.core.commands.AbstractParameterValueConverter&lt;/code&gt;. The converter should produce and consume objects of the type indicated in the &lt;code&gt;type&lt;/code&gt; attribute. If this class is not specified, this facility to convert between string and object values for this parameter type will not be available (the &lt;code&gt;getValueConverter()&lt;/code&gt; on class &lt;code&gt;ParameterType&lt;/code&gt; will return &lt;code&gt;null&lt;/code&gt;).
+                  The class for converting between objects and string representations of objects for command parameter values.  This class should extend &lt;code&gt;org.opencherry.core.commands.AbstractParameterValueConverter&lt;/code&gt;. The converter should produce and consume objects of the type indicated in the &lt;code&gt;type&lt;/code&gt; attribute. If this class is not specified, this facility to convert between string and object values for this parameter type will not be available (the &lt;code&gt;GetValueConverter()&lt;/code&gt; on class &lt;code&gt;ParameterType&lt;/code&gt; will return &lt;code&gt;null&lt;/code&gt;).
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.AbstractParameterValueConverter"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -289,14 +266,13 @@ Defines the object type of a commandParameter and may specify an &lt;code&gt;org
 
    <element name="values">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="class"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
 The more verbose version of the &lt;code&gt;values&lt;/code&gt; attribute on the &lt;code&gt;commandParameter&lt;/code&gt;.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.1&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -306,11 +282,11 @@ The more verbose version of the &lt;code&gt;values&lt;/code&gt; attribute on the
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.eclipse.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.eclipse.core.runtime.IExecutableExtension&lt;/code&gt;.
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.opencherry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IParameterValues"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -318,14 +294,13 @@ The more verbose version of the &lt;code&gt;values&lt;/code&gt; attribute on the
 
    <element name="parameter">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="name"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
 A possible value for a parameter.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.1&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -348,14 +323,13 @@ A possible value for a parameter.
 
    <element name="defaultHandler">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="class"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
 The default handler for this command.  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are not creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; attribute instead.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.1&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -365,11 +339,11 @@ The default handler for this command.  If no other handler is active, this handl
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class which implements &lt;code&gt;org.eclipse.core.commands.IHandler&lt;/code&gt;.
+                  The class which implements &lt;code&gt;org.opencherry.core.commands.IHandler&lt;/code&gt;.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -377,14 +351,13 @@ The default handler for this command.  If no other handler is active, this handl
 
    <element name="state">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="class"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
 State information shared between all handlers, and potentially persisted between sessions.The state is simply a class that is loaded to look after the state.  See the API Information for more details.  This is not used for UI attributes like a menu contribution check box state or label.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -394,19 +367,17 @@ State information shared between all handlers, and potentially persisted between
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.eclipse.core.commands.State&lt;/code&gt;.  Please see API Information.
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.opencherry.core.commands.State&lt;/code&gt;.  Please see API Information.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  &lt;p&gt;
-A unique identifier for this state.  This is used for persisting the state between sessions (if the state is an instance of &lt;code&gt;org.eclipse.jface.commands.PersistentState&lt;/code&gt;).  Certain common identifiers (see &lt;code&gt;org.eclipse.jface.menus.IMenuStateIds&lt;/code&gt;) are understood when the command is being rendered in the menus or tool bars.  The identifier only needs to be unique within the command defining the state.
-&lt;/p&gt;
+                  A unique identifier for this state.  This is used for persisting the state between sessions (if the state is an instance of &lt;code&gt;org.opencherry.core.commands.PersistentState&lt;/code&gt;).  Certain common identifiers (see &lt;code&gt;org.opencherry.ui.menus.IMenuStateIds&lt;/code&gt;) are understood when the command is being rendered in the menus or tool bars.  The identifier only needs to be unique within the command defining the state.
                </documentation>
             </annotation>
          </attribute>
@@ -415,14 +386,13 @@ A unique identifier for this state.  This is used for persisting the state betwe
 
    <element name="class">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element labelAttribute="class"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             &lt;p&gt;
-The class that can be loaded to store the state of this command.  This element is used if you wish to pass multiple parameters to an &lt;code&gt;org.eclipse.core.runtime.IExecutableExtension&lt;/code&gt;.
+The class that can be loaded to store the state of this command.  This element is used if you wish to pass multiple parameters to an &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
 &lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
          </documentation>
       </annotation>
       <complexType>
@@ -432,431 +402,65 @@ The class that can be loaded to store the state of this command.  This element i
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.eclipse.core.commands.State&lt;/code&gt;.  Please see API Information.
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.opencherry.core.commands.State&lt;/code&gt;.  Please see API Information.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="keyConfiguration">
-      <annotation>
-         <appInfo>
-            <meta.element deprecated="true"/>
-         </appInfo>
-         <documentation>
-            This element is used to define key configurations. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid.  Please use the &quot;org.eclipse.ui.bindings&quot; extension point instead.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="description" type="string">
-            <annotation>
-               <documentation>
-                  A translatable short description of this key configuration for display in the UI.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The unique identifier of this key configuration.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The translatable name of this key configuration for display in the UI. If this key configuration has a parent, it is not necessary to add &quot;(extends ...)&quot; to the name. This will be automatically added by the UI where necessary.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="parent" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the parent key configuration. If this key configuration has a parent, it will borrow all key bindings from its parent, in addition to the key bindings defined in its own key configuration.
-@deprecated Please use parentId instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="parentId" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the parent key configuration. If this key configuration has a parent, it will borrow all key bindings from its parent, in addition to the key bindings defined in its own key configuration.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="context">
-      <annotation>
-         <appInfo>
-            <meta.element deprecated="true"/>
-         </appInfo>
-         <documentation>
-            This element is used to define contexts. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid.  Please use the &lt;a href=&quot;org_eclipse_ui_contexts.html&quot;&gt;org.eclipse.ui.contexts&lt;/a&gt; extension point instead.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="description" type="string">
-            <annotation>
-               <documentation>
-                  A translatable short description of this context for display in the UI.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The unique identifier of this context.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The translatable name of this context for display in the UI. If this context has a parent, it is not necessary to add &quot;(extends parent)&quot; to the name. This will be automatically added by the UI where necessary.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="parent" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the parent context. If this context has a parent, it will borrow all key bindings from its parent, in addition to the key bindings defined in its own context.
-@deprecated Please use &quot;parentId&quot; instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="parentId" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the parent context. If this context has a parent, it will borrow all key bindings from its parent, in addition to the key bindings defined in its own context.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="scope">
-      <annotation>
-         <appInfo>
-            <meta.element labelAttribute="id" deprecated="true"/>
-         </appInfo>
-         <documentation>
-            This element is used to define scopes. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid.
-@deprecated Please use the &quot;org.eclipse.ui.contexts&quot; extension point instead.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="description" type="string">
-            <annotation>
-               <documentation>
-                  A translatable short description of this scope for display in the UI.
-
-@deprecated Please use the &quot;org.eclipse.ui.contexts&quot; extension point instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="id" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The unique identifier of this scope.
-
-@deprecated Please use the &quot;org.eclipse.ui.contexts&quot; extension point instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="name" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The translatable name of this scope for display in the UI. If this scope has a parent, it is not necessary to add &quot;(extends parent)&quot; to the name. This will be automatically added by the UI where necessary.
-
-@deprecated Please use the &quot;org.eclipse.ui.contexts&quot; extension point instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute translatable="true" deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="parent" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the parent scope. If this scope has a parent, it will borrow all key bindings from its parent, in addition to the key bindings defined in its own scope.
-
-@deprecated Please use the &quot;org.eclipse.ui.contexts&quot; extension point instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="activeKeyConfiguration">
-      <annotation>
-         <appInfo>
-            <meta.element deprecated="true"/>
-         </appInfo>
-         <documentation>
-            &lt;p&gt;
-This element is used to define the initial active key configuration for Eclipse. If more than one of these elements exist, only the last declared element (in order of reading the plugin registry) is considered valid.
-&lt;/p&gt;
-&lt;p&gt;
-This element has been replaced with a preference.  If your application needs to change the default key configuration, then specify the following in your &lt;code&gt;plugin_customization.ini&lt;/code&gt; file: &lt;code&gt;org.eclipse.ui/KEY_CONFIGURATION_ID=your.default.key.configuration.id&lt;/code&gt;.
-&lt;/p&gt;
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="value" type="string">
-            <annotation>
-               <documentation>
-                  The unique id (&lt;code&gt;id&lt;/code&gt; attribute) of the keyConfiguration element one wishes to be initially active.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="keyConfigurationId" type="string">
-            <annotation>
-               <documentation>
-                  The unique id (&lt;code&gt;id&lt;/code&gt; attribute) of the keyConfiguration element one wishes to be initially active.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="keyBinding">
-      <annotation>
-         <appInfo>
-            <meta.element deprecated="true"/>
-         </appInfo>
-         <documentation>
-            This element allows one to assign key sequences to commands.  Please use the &lt;code&gt;key&lt;/code&gt; element in the &quot;org.eclipse.ui.bindings&quot; extension point instead.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="configuration" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the key configuration of this key binding.
-@deprecated Please use keyConfigurationId instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="command" type="string">
-            <annotation>
-               <documentation>
-                  The unique identifier of the command to which the key sequence specified by this key binding is assigned. If the value of this attribute is an empty string, the key sequence is assigned to an internal &apos;no operation&apos; command. This is useful for &apos;undefining&apos; key bindings in specific key configurations and contexts which may have been borrowed from their parents.
-@deprecated Please use &quot;commandId&quot; instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="locale" type="string">
-            <annotation>
-               <documentation>
-                  An optional attribute indicating that this key binding is only defined for the specified locale. Locales are specified according to the format declared in &lt;code&gt;java.util.Locale&lt;/code&gt;.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="platform" type="string">
-            <annotation>
-               <documentation>
-                  An optional attribute indicating that this key binding is only defined for the specified platform. The possible values of the &lt;code&gt;platform&lt;/code&gt; attribute are the set of the possible values returned by &lt;code&gt;org.eclipse.swt.SWT.getPlatform()&lt;/code&gt;.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="contextId" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the context of this key binding.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="string" type="string">
-            <annotation>
-               <documentation>
-                  The key sequence to assign to the command. Key sequences consist of one or more key strokes, where a key stroke consists of a key on the keyboard, optionally pressed in combination with one or more of the following modifiers: Ctrl, Alt, Shift, and Command. Key strokes are separated by spaces, and modifiers are separated by &apos;+&apos; characters.
-@deprecated Please use &quot;keySequence&quot; instead.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="scope" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the context of this key binding.
-@deprecated Please use &quot;contextId&quot; instead.  The old default scope, &quot;org.eclipse.ui.globalScope&quot;, has been changed to &quot;org.eclipse.ui.contexts.window&quot;.  The old name is still supported, but it is deprecated.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="keyConfigurationId" type="string">
-            <annotation>
-               <documentation>
-                  The unique id of the key configuration of this key binding.
-@deprecated Please use the &lt;code&gt;schemeId&lt;/code&gt; attribute on the &lt;code&gt;key&lt;/code&gt; element in the new &quot;org.eclipse.ui.bindings&quot; extension point.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="commandId" type="string">
-            <annotation>
-               <documentation>
-                  The unique identifier of the command to which the key sequence specified by this key binding is assigned. If the value of this attribute is an empty string, the key sequence is assigned to an internal &apos;no operation&apos; command. This is useful for &apos;undefining&apos; key bindings in specific key configurations and contexts which may have been borrowed from their parents.
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="keySequence" type="string">
-            <annotation>
-               <documentation>
-                  &lt;p&gt;The key sequence to assign to the command. Key sequences consist of one or more key strokes, where a key stroke consists of a key on the keyboard, optionally pressed in combination with one or more of the following modifiers: Ctrl, Alt, Shift, and Command. Key strokes are separated by spaces, and modifiers are separated by &apos;+&apos; characters.&lt;/p&gt;
-&lt;p&gt;The modifier keys can also be expressed in a platform-independent way.  On MacOS X, for example, &quot;Command&quot; is almost always used in place of &quot;Ctrl&quot;.  So, we provide &quot;M1&quot; which will map to either &quot;Ctrl&quot; or &quot;Command&quot;, as appropriate.  Similarly, &quot;M2&quot; is &quot;Shift&quot;; &quot;M3&quot; is &quot;Alt&quot;; and &quot;M4&quot; is &quot;Ctrl&quot; (MacOS X).  If more platforms are added, then you can count on these aliases being mapped to good platform defaults.&lt;/p&gt;
-&lt;p&gt;The syntax for this string is defined in &lt;code&gt;org.eclipse.ui.internal.keys&lt;/code&gt;.  Briefly, the string is case insensitive -- though all capitals is preferred stylistically.  If the key is a letter, then simply append the letter.  If the key is a special key (i.e., non-ASCII), then use one of the following: ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, BREAK, CAPS_LOCK, END, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, HOME, INSERT, NUM_LOCK, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5, NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_DECIMAL, NUMPAD_DIVIDE, NUMPAD_ENTER, NUMPAD_EQUAL, NUMPAD_MULTIPLY, NUMPAD_SUBTRACT, PAGE_UP, PAGE_DOWN, PAUSE, PRINT_SCREEN, or SCROLL_LOCK.  If the key is a non-printable ASCII key, then use one of the following: BS, CR, DEL, ESC, FF, LF, NUL, SPACE, TAB, or VT.  Note that the main keyboard enter/return key is CR.&lt;/p&gt;
-               </documentation>
-               <appInfo>
-                  <meta.attribute deprecated="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
-2.1
+0.1
 &lt;/p&gt;
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
-The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.eclipse.ui&lt;/code&gt; plugin makes extensive use of the &lt;code&gt;org.eclipse.ui.commands&lt;/code&gt; extension point.
+The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.opencherry.ui&lt;/code&gt; plugin makes extensive use of the &lt;code&gt;org.opencherry.ui.commands&lt;/code&gt; extension point.
 &lt;/p&gt;
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="apiInfo"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
-Handlers can be registered with commands using the &lt;code&gt;org.eclipse.ui.handlers.IHandlerService&lt;/code&gt;.  This can be retrieved from various workbench components (e.g., workbench, workbench window, part site, etc.) by calling &lt;code&gt;getService(IHandlerService.class)&lt;/code&gt;.
+Handlers can be registered with commands using the &lt;code&gt;org.opencherry.ui.handlers.IHandlerService&lt;/code&gt;. This can be retrieved from various workbench components (e.g., workbench, workbench window, part site, etc.) by calling &lt;code&gt;GetService(IHandlerService::ID)&lt;/code&gt;.
 &lt;/p&gt;
 &lt;p&gt;
-In general, it is preferrably to declare all commands statically (in &lt;code&gt;plugin.xml&lt;/code&gt;).  This is so that users can attach key bindings to the commands.  However, it is possible to declare commands at run-time.  To do this, retrieve the &lt;code&gt;org.eclipse.ui.commands.ICommandService&lt;/code&gt; from a workbench component, call &lt;code&gt;getCommand(yourCommandID)&lt;/code&gt; and then call &lt;code&gt;Command.define(...)&lt;/code&gt;.
+In general, it is preferrably to declare all commands statically (in &lt;code&gt;plugin.xml&lt;/code&gt;).  This is so that users can attach key bindings to the commands.  However, it is possible to declare commands at run-time.  To do this, retrieve the &lt;code&gt;org.opencherry.ui.commands.ICommandService&lt;/code&gt; from a workbench component, call &lt;code&gt;GetCommand(yourCommandID)&lt;/code&gt; and then call &lt;code&gt;Command::Define(...)&lt;/code&gt;.
 Commands defined programmatically must be cleaned up by the plugin if it is unloaded.
 &lt;/p&gt;
 &lt;p&gt;
 There are a few default implementations of handler states that may be useful to users of this extension point:
 &lt;/p&gt;
 &lt;ul&gt;
+&lt;!--
 &lt;li&gt;org.eclipse.jface.commands.TextState&lt;/li&gt;
 &lt;li&gt;org.eclipse.jface.commands.RadioState&lt;/li&gt;
 &lt;li&gt;org.eclipse.jface.commands.ToggleState&lt;/li&gt;
 &lt;li&gt;org.eclipse.ui.handlers.RegistryRadioState&lt;/li&gt;
 &lt;li&gt;org.eclipse.ui.handlers.RegistryToggleState&lt;/li&gt;
+--&gt;
 &lt;/ul&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         Copyright (c) 2000, 2007 IBM Corporation and others.&lt;br&gt;
-All rights reserved. This program and the accompanying materials are made
-available under the terms of the Eclipse Public License v1.0 which accompanies
-this distribution, and is available at &lt;a 
-href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
-      </documentation>
-   </annotation>
 
 </schema>

@@ -87,7 +87,7 @@ namespace mitk {
 
     unsigned int m_RingBufferSize;
 
-    int m_CurrentTimeStep;
+    unsigned int m_CurrentTimeStep;
 
   };
 

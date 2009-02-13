@@ -58,7 +58,7 @@ IF(BUILD_OPENCHERRY)
   FILE(RELATIVE_PATH _opencherry_doxygen_index ${MITK_DOXYGEN_OUTPUT_DIR}/html ${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/html/index.html)
   SET(OPENCHERRY_DOXYGEN_LINK "<a class=\"el\" href=\"${_opencherry_doxygen_index}\">openCherry Documentation</a>")
   SET(MITK_XP_LINK "\\ref mitkExtPointsIndex")
-  CONFIGURE_FILE(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/schema.css)
+  CONFIGURE_FILE(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/html/schema.css)
 ENDIF(BUILD_OPENCHERRY)
 
 CONFIGURE_FILE(Doxygen/MainPage.dox.in
@@ -88,7 +88,7 @@ IF (BUILD_OPENCHERRY)
   IF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
     FILE(GLOB_RECURSE _plugin_xmls  ${CMAKE_CURRENT_SOURCE_DIR}/../Bundles/plugin.xml)
     MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
-                         OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/extension-points/html"
+                         OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
                          TARGET_NAME mitkXPDoc
                          )
 

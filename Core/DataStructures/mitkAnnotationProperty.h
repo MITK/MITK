@@ -53,14 +53,6 @@ public:
   itkGetStringMacro( Label );
   itkSetStringMacro( Label );
 
-  /// @todo: remove after ITK 2.8 compatibility has been dropped 
-#if ITK_VERSION_MAJOR < 3     
-  virtual void SetLabel(const std::string & _arg ) 
-  { 
-    this->SetValue( _arg.c_str() );
-  } 
-#endif
-
   const Point3D &GetPosition() const;
   void SetPosition( const Point3D &position );
 

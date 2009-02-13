@@ -311,11 +311,7 @@ public:
       m_Dimension, 
       tmpDimensions,
       channels);
-#if (ITK_VERSION_MAJOR == 1 && ITK_VERSION_MINOR > 5) || ITK_VERSION_MAJOR > 1
     const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();  
-#else
-    const double *itkspacing = itkimage->GetSpacing();  
-#endif 
 
     // access spacing of itk::Image
     Vector3D spacing;
@@ -364,7 +360,10 @@ public:
       itkWarningMacro(<< "Illegal matrix returned by itk::Image::GetDirection():" << itkdirection << " Using identity instead.");
       for ( i=0; i < itkDimMax3; ++i)
         for( j=0; j < itkDimMax3; ++j )
-          matrix[i][j] = spacing[j];
+          if ( i == j )
+            matrix[i][j] = spacing[j];
+          else
+            matrix[i][j] = 0.0;
     }
     else
     {

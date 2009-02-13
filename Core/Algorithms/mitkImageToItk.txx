@@ -108,7 +108,7 @@ template<class TOutputImage>
     output->SetBufferedRegion(bufferedRegion);
     return;
   }
-
+  
   if (m_CopyMemFlag)
   {
     itkDebugMacro("copyMem ...");
@@ -163,7 +163,7 @@ template<class TOutputImage>
 {
   mitk::Image::ConstPointer input = this->GetInput();
   typename Superclass::OutputImageType::Pointer output = this->GetOutput();
-  
+
   // allocate size, origin, spacing, direction in types of output image
   SizeType  size;
   const unsigned int itkDimMin3 = (TOutputImage::ImageDimension > 3 ? TOutputImage::ImageDimension : 3);
@@ -202,13 +202,17 @@ template<class TOutputImage>
   unsigned int j;
   const AffineTransform3D::MatrixType& matrix = input->GetGeometry()->GetIndexToWorldTransform()->GetMatrix();
   
+  /// \warning 2D MITK images will get a 2D identity matrix in ITK
+  /// \todo Get clear about how to handle directed ITK 2D images in ITK
+  
   // the following loop devides by spacing now to normalize columns.
   // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092. 
-  for ( i=0; i < itkDimMax3; ++i)
-    for( j=0; j < itkDimMax3; ++j )
-      direction[i][j] = matrix[i][j]/spacing[j];
-
-
+  if ( itkDimMax3 >= 3)
+  {
+    for ( i=0; i < itkDimMax3; ++i)
+      for( j=0; j < itkDimMax3; ++j )
+        direction[i][j] = matrix[i][j]/spacing[j];
+  }
 
   // set information into output image
   output->SetRegions( region );

@@ -126,9 +126,12 @@ void mitk::ExtractImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimen
   // possible bug in itk::ExtractImageFilter: or in CastToItkImage ?
   // direction maxtrix is wrong/broken/not working with mitk::Image::InitializeByItkImage
   // solution here: we overwrite it with an unity matrix
+  // correct image direction only if ITK version < 3.10
+#if (ITK_VERSION_MAJOR == 3 && ITK_VERSION_MINOR < 10) || ITK_VERSION_MAJOR < 3
   typename ImageType2D::DirectionType imageDirection;
   imageDirection.SetIdentity();
   slice->SetDirection(imageDirection);
+#endif
 
   // re-import to MITK
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();

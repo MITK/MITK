@@ -33,6 +33,9 @@ namespace mitk
 /**
  * Create itk::ImageSource for mitk::Image
  * \ingroup Adaptor
+ *
+ * \warning 2D MITK images will get a 2D identity matrix in ITK
+ * \todo Get clear about how to handle directed ITK 2D images in ITK
  */
 template <class TOutputImage>
 class ITK_EXPORT ImageToItk : public itk::ImageSource< TOutputImage >

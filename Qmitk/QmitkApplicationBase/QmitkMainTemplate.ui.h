@@ -1347,6 +1347,8 @@ void QmitkMainTemplate::destroy()
 
   delete m_PosOutput;
 
+  delete m_UndoController;
+
   m_Tree = NULL;
 }
 

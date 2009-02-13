@@ -47,6 +47,7 @@ std::cout << "*** In CHILIInformation::GetStudyInformation" << std::endl;
     //use current selected study
     if( pCurrentStudy() != NULL )
     {
+      clearStudyStruct( &study );
       study = (*dupStudyStruct( pCurrentStudy() ) );  //copy the StudyStruct
     }
     else

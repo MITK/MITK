@@ -126,6 +126,7 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
             memcpy(stringValue,currentTag->value,tagLen);
             stringValue[tagLen]= '\0';
             std::string s( (const char*)currentTag->value, tagLen );
+            free(stringValue);
             resultPropertyList->SetProperty( propertyName.c_str(), mitk::StringProperty::New( s ) );
           }
           else
@@ -235,6 +236,8 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<mitkIpPicDescriptor*> sl
         }
       }
       resultImage->Initialize( header );
+
+      mitkIpPicFree( header );
     }
 
     //get interslicegeometry

@@ -68,6 +68,7 @@ QmitkLocalizerDialogBar
 QmitkLocalizerDialogBar
 ::~QmitkLocalizerDialogBar()
 {
+  m_Volume->Delete();
 }
 
 

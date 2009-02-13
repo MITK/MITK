@@ -148,18 +148,23 @@ for( std::list< mitkIpPicDescriptor* >::iterator currentPic = m_PicDescriptorLis
     std::string currentSeriesDescription;
     mitkIpPicTSV_t* seriesDescriptionTag = mitkIpPicQueryTag( (*currentPic), (char*)tagSERIES_DESCRIPTION );
     if( seriesDescriptionTag )
+    {
       currentSeriesDescription = static_cast<char*>( seriesDescriptionTag->value );
+    }
     else
     {
       mitkIpPicTSV_t *tsv;
       void* data = NULL;
       ipUInt4_t len = 0;
       tsv = mitkIpPicQueryTag( (*currentPic), (char*)"SOURCE HEADER" );
-      if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) )
-        if( data != NULL )
-          currentSeriesDescription = (char*)data;
+      if( tsv && dicomFindElement( (unsigned char*) tsv->value, 0x0008, 0x103e, &data, &len ) && data )
+      {
+        currentSeriesDescription = (char*)data;
+      }
       else
+      {
         currentSeriesDescription = "no Description";
+      }
     }
     //normale with ImageSize
     Vector3D rightVector, downVector;

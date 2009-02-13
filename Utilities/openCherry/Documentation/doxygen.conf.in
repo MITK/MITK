@@ -59,7 +59,6 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
                          @OPENCHERRY_SOURCE_DIR@/../Documentation/reference/api/MainPage.dox \
-                         @OPENCHERRY_SOURCE_DIR@/../Documentation/reference/extension-points/index.dox \
                          @OPENCHERRY_SOURCE_DIR@ \
                          @OPENCHERRY_BINARY_DIR@
 FILE_PATTERNS          = *.h \

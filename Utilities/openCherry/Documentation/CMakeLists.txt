@@ -1,8 +1,6 @@
 # 
 # Variables:
-#  OPENCHERRY_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
-
-INCLUDE(files.cmake)
+#  OPENCHERRY_DOCS_OUTPUT_DIR: documentation output directory (optional)
 
 OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
 MARK_AS_ADVANCED(USE_DOT)
@@ -14,11 +12,17 @@ IF(DOT)
   ENDIF(USE_DOT)
 ENDIF(DOT)
 
+SET(OPENCHERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "openCherry output directory for all generated documentation.")
+SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${OPENCHERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL "openCherry doxygen output directory")
+SET(OPENCHERRY_XPDOC_OUTPUT_DIR ${OPENCHERRY_DOCS_OUTPUT_DIR}/reference/extension-points)
 
-SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/reference/api CACHE PATH "openCherry output directory for doxygen generated documentation." )
+FILE(RELATIVE_PATH OPENCHERRY_DOXYGEN_XP_RELATIVEDIR ${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/html ${OPENCHERRY_XPDOC_OUTPUT_DIR}/)
 
 CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
+               
+CONFIGURE_FILE(reference/extension-points/index.dox.in
+               ${CMAKE_CURRENT_BINARY_DIR}/reference/extension-points/index.dox)
 
 FIND_PACKAGE(Doxygen)
 
@@ -34,13 +38,11 @@ ADD_CUSTOM_TARGET(openCherryDoc
 IF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
   FILE(GLOB_RECURSE _plugin_xmls  ${OPENCHERRY_SOURCE_DIR}/plugin.xml)
   MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
-                       OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/reference/extension-points"
+                       OUTPUT_DIR "${OPENCHERRY_XPDOC_OUTPUT_DIR}"
                        TARGET_NAME openCherryXPDoc
                        )
 
   ADD_DEPENDENCIES(openCherryDoc openCherryXPDoc)
 ENDIF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
 
-FOREACH(_file ${COPY_DOC_FILES})
-  CONFIGURE_FILE(${_file} ${CMAKE_CURRENT_BINARY_DIR}/${_file})
-ENDFOREACH(_file ${COPY_DOC_FILES})
+CONFIGURE_FILE(schema.css ${OPENCHERRY_DOCS_OUTPUT_DIR}/schema.css)

@@ -59,6 +59,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
                          @MITK_BINARY_DIR@/Documentation/Doxygen/MainPage.dox \
+                         @MITK_BINARY_DIR@/Documentation/Doxygen/extension-points/index.dox \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
                          @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \

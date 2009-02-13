@@ -2,7 +2,7 @@
  
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2008-10-08 17:15:00 +0200 (Mi, 08 Okt 2008) $
+Date:      $Date$
 Version:   $Revision: 15417 $
  
 Copyright (c) German Cancer Research Center, Division of Medical and

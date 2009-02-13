@@ -1,19 +1,16 @@
 SET(SRC_CPP_FILES
-  QmitkIsoSurface.cpp
-  #QmitkIsoSurfaceControls.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-
+	QmitkIsoSurface.cpp
 )
 
 SET(UI_FILES
-  src/QmitkIsoSurfaceControls.ui
+  src/internal/QmitkIsoSurfaceControls.ui
 )
 
 SET(MOC_H_FILES
-  src/QmitkIsoSurface.h
-  #src/QmitkIsoSurfaceControls.h
+  src/internal/QmitkIsoSurface.h
 )
 
 SET(RES_FILES

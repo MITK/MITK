@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2007-12-11 15:15:45 +0100 (Di, 11 Dez 2007) $
+Date:      $Date$
 Version:   $Revision: 13136 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorSequenceRainbow.h"
 #include "mitkDataStorage.h"
 #include "ui_QmitkIsoSurfaceControls.h"
-#include "QmitkIsoSurfaceDll.h"
+#include "../IsosurfaceDll.h"
 
 //class QmitkStdMultiWidget;
 //class QmitkIsoSurfaceControls;
@@ -33,11 +33,10 @@ PURPOSE.  See the above copyright notices for more information.
   One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
   and CreateAction(..) from QmitkFunctionality. 
 
-  \TODO review use of iterators and DataTreeCombobox
   \sa QmitkFunctionality
   \ingroup Functionalities
   */
-class MITK_QT_ISOSURFACE QmitkIsoSurface : public QObject, public QmitkFunctionality
+class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctionality
 {  
   Q_OBJECT
 

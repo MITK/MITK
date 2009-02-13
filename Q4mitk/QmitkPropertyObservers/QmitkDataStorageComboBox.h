@@ -24,9 +24,11 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
   Q_OBJECT
 
   public:
+    QmitkDataStorageComboBox(QWidget* parent = 0);
     QmitkDataStorageComboBox(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred = 0, QWidget* parent = 0);
     ~QmitkDataStorageComboBox();
 
+    void init(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred);
     //# Getter/Setter
 
     void SetDataStorage(mitk::DataStorage::Pointer dataStorage);    
@@ -34,6 +36,8 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
    
     void SetPredicate(mitk::NodePredicateBase* pred);    
     mitk::NodePredicateBase* GetPredicate() const;
+    
+    const mitk::DataTreeNode::Pointer GetSelectedNode() const;
    
   signals:
     void OnSelectionChanged(const mitk::DataTreeNode::Pointer);

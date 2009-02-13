@@ -56,12 +56,41 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
   int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
+  ///
+  /// Called when a DataStorage Add Event was thrown. May be reimplemented
+  /// by deriving classes.
+  ///
+  virtual void NodeAdded(const mitk::DataTreeNode* node);
+  ///
+  /// Called when a DataStorage Remove Event was thrown. May be reimplemented
+  /// by deriving classes.
+  ///
+  virtual void NodeRemoved(const mitk::DataTreeNode* node);
 protected:
   void reset();
 
+
+  ///
+  /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
+  /// might be more than one DataStorage).
+  ///
   mitk::DataStorage::Pointer m_DataStorage;
+
+  ///
+  /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
+  /// is NULL all Nodes will be selected.
+  ///
   mitk::NodePredicateBase* m_NodePredicate;
+
+  ///
+  /// Holds all selected Nodes.
+  ///
   mitk::DataStorage::SetOfObjects::ConstPointer m_DataNodes;
+
+  ///
+  /// Saves if this model is currently working on events to prevent endless event loops.
+  /// 
+  bool m_ProcessesEvents;
 };
 
 #endif /* QMITKDATASTORAGELISTMODEL_H_ */

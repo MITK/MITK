@@ -11,7 +11,7 @@
 #include <mitkNodePredicateDataType.h>
 
 #include <QmitkStdMultiWidget.h>
-#include <QmitkDataTreeComboBox.h>
+#include <QmitkDataStorageComboBox.h>
 #include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>

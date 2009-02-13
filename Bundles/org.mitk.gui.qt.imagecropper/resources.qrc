@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>resources/icon.xpm</file>
+        <file>resources/btn_ctrl.xpm</file>
+        <file>resources/mouse_left.xpm</file>
+        <file>resources/mouse_middle.xpm</file>
+        <file>resources/mouse_right.xpm</file>
+        <file>resources/UserManual/QmitkImageCropperUserManual.dox</file>
+    </qresource>
+</RCC>

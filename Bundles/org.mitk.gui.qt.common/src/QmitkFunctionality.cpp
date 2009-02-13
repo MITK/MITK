@@ -17,11 +17,19 @@
 
 #include "QmitkFunctionality.h"
 
+// mitk Includes
+#include "mitkMessage.h"
+#include <mitkIDataStorageService.h>
+
+// cherry Includes
 #include <cherryPlatform.h>
 #include <cherryIWorkbenchPage.h>
-#include <mitkIDataStorageService.h>
+
+// Qmitk Includes
 #include <QmitkStdMultiWidgetEditor.h>
-#include "mitkMessage.h"
+
+// Qt Includes
+#include <QMessageBox>
 
 QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
@@ -114,8 +122,8 @@ void QmitkFunctionality::StdMultiWidgetNotAvailable()
 
 void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  if(partRef->GetPart(false) == this)
-    this->Activated();
+//   if(partRef->GetPart(false) == this)
+//     this->Activated();
 }
 
 void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -134,8 +142,8 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  if(partRef->GetPart(false) == this)
-    this->Deactivated();
+//   if(partRef->GetPart(false) == this)
+//     this->Deactivated();
 }
 
 void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -151,10 +159,14 @@ void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
 {
+  if(partRef->GetPart(false) == this)
+    this->Deactivated();
 }
 
 void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer partRef )
 {
+  if(partRef->GetPart(false) == this)
+   this->Activated();
 }
 
 void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -222,4 +234,19 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
   }
 
   return activeStdMultiWidget;
+}
+
+void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
+{
+  itkGenericOutputMacro( << "Exception caught: " << str );
+  if ( showDialog )
+  {
+    QMessageBox::critical ( parent, "Exception caught!", str );
+  }
+}
+
+
+void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog ) const
+{
+  HandleException( e.what(), parent, showDialog );
 }

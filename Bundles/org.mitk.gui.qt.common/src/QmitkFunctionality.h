@@ -97,7 +97,16 @@ public:
   /// by deriving classes.
   ///
   virtual void DataStorageChanged();
-  //!
+
+  ///
+  /// Outputs an error message to the console and displays a message box containing
+  /// the exception description.
+  /// @param e the exception which should be handled
+  /// @param showDialog controls, whether additionally a message box should be
+  ///        displayed to inform the user that something went wrong
+  /// 
+  void HandleException( std::exception& e, QWidget* parent = NULL, bool showDialog = true ) const;
+  void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
 
   // IPartListener
   virtual void 	PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
@@ -121,7 +130,6 @@ protected:
   QWidget* m_Parent;
 private:
   bool m_HandlesMultipleDataStorages;
-
   ///
   /// Saves if this class is currently working on DataStorage changes.
   /// This is a protector variable to avoid recursive calls on event listener functions.

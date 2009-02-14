@@ -129,7 +129,8 @@ mitk::ChiliPlugin::~ChiliPlugin()
       std::cout << "CHILIPlugin: Delete directory "<< m_tempDirectory << std::endl;
     #endif
 
-    system( removeDirectory.c_str() );
+    if ( system( removeDirectory.c_str() ) == -1 )
+      std::cerr << "Couldn't delete " << m_tempDirectory << std::endl;
   }
 
   //m_Task->deleteLater();
@@ -455,7 +456,8 @@ std::string mitk::ChiliPlugin::GetTempDirectory()
   //the function create a random, not existing file; we dont want them, we want a directory
   std::string tmpName = TempName;
   tmpName = "del /Q " + tmpName;
-  system( tmpName.c_str() );
+  if ( system( tmpName.c_str() ) == -1 )
+    std::cerr << "Couldn't delete " << tmpName << std::endl;
 
   //use the random created name
   std::string fileName = TempName;
@@ -464,7 +466,8 @@ std::string mitk::ChiliPlugin::GetTempDirectory()
   std::string makeTmpDirectory = "mkdir " + fileName;
 
   //create directory
-  system( makeTmpDirectory.c_str() );
+  if ( system( makeTmpDirectory.c_str() ) == -1 )
+    std::cerr << "Couldn't create " << makeTmpDirectory << std::endl;
 
   return fileName;
 }

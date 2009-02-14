@@ -108,8 +108,8 @@ mitk::PACSPlugin::SeriesInformation mitk::PACSPlugin::GetSeriesInformation( cons
 }
 
 
-mitk::PACSPlugin::DocumentInformation mitk::PACSPlugin::GetDocumentInformation( const std::string& seriesInstanceUID, 
-                                                                                unsigned int instanceNumber )
+mitk::PACSPlugin::DocumentInformation mitk::PACSPlugin::GetDocumentInformation( const std::string& itkNotUsed(seriesInstanceUID), 
+                                                                                unsigned int itkNotUsed(instanceNumber) )
 {
   DocumentInformation emptyResult;
   return emptyResult;
@@ -139,7 +139,7 @@ void mitk::PACSPlugin::AbortPACSImport()
 }
 
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( unsigned int lightboxIndex )
+std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( unsigned int itkNotUsed(lightboxIndex) )
 {
   std::vector<DataTreeNode::Pointer> emptyVector;
   emptyVector.clear();

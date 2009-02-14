@@ -20,7 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::NavigationData::NavigationData() 
-: itk::DataObject(), /*m_TimeStamp(NULL),*/ m_Error(-1.0), m_DataValid(false), m_Orientation(0.0, 0.0, 0.0, 0.0)
+: itk::DataObject(), 
+  /*m_TimeStamp(NULL),*/ 
+  m_Orientation(0.0, 0.0, 0.0, 0.0),
+  m_Error(-1.0), 
+  m_DataValid(false) 
 {
   m_Position.Fill(0.0);
 }

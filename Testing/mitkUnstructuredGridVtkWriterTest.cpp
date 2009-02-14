@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
+int mitkUnstructuredGridVtkWriterTest(int /*argc*/ , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("UnstructuredGridVtkWriter")

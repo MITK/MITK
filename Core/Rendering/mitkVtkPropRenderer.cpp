@@ -491,7 +491,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
          BaseVtkMapper3D* baseVtkMapper3D = dynamic_cast<BaseVtkMapper3D*>( currentNode->GetMapper( BaseRenderer::Standard3D ) );
          if ( baseVtkMapper3D )
          {
-           vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetProp() );
+           vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetViewProp() );
            if (actor)
            {
              std::cout << "a" << std::flush;

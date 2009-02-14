@@ -185,7 +185,7 @@ void QmitkLocalizerDialogBar::CreateNode()
   m_Storage->Add(node);
 }
 
-void QmitkLocalizerDialogBar::UpdateGeometry(const itk::EventObject &geometryUpdateEvent)
+void QmitkLocalizerDialogBar::UpdateGeometry(const itk::EventObject& itkNotUsed(geometryUpdateEvent))
 {
   SetSeeker(m_Punkt);
 }

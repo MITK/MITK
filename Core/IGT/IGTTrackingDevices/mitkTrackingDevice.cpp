@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::TrackingDevice::TrackingDevice() :
-  m_Mode(mitk::TrackingDevice::Setup), m_StopTracking(false), m_Type(TrackingSystemNotSpecified)
+  m_Type(TrackingSystemNotSpecified),
+  m_Mode(mitk::TrackingDevice::Setup), 
+  m_StopTracking(false) 
 {
   m_StopTrackingMutex = itk::FastMutexLock::New();
   m_TrackingVolume = mitk::TrackingVolume::New();

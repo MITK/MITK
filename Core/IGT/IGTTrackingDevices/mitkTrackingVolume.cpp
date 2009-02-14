@@ -19,7 +19,7 @@ mitk::TrackingVolume::TrackingVolume()
  * NOT IMPLEMENTED YET!
  * @return Returns true if the point "punkt" is inside the trackingvolume. Be sure that the coordinates of "punkt" are in the tracking coordination system!
  */
-bool mitk::TrackingVolume::IsInside(mitk::Point3D punkt)
+bool mitk::TrackingVolume::IsInside(mitk::Point3D itkNotUsed(punkt))
   {
   return false;
   }

@@ -1296,7 +1296,7 @@ void QmitkMainTemplate::changeToLeft2DAnd3DRight2DLayout()
 }
 
 
-void QmitkMainTemplate::FullScreenMode(bool fullscreen)
+void QmitkMainTemplate::FullScreenMode(bool itkNotUsed(fullscreen))
 {
   // mmueller: toggle between fullscreen and old mode via bitwise operation
   this->setWindowState(this->windowState() ^ WindowFullScreen);

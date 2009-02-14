@@ -81,7 +81,7 @@ namespace mitk {
     * the GetParameters method of the filter
     * This method has to be overwritten by each MITK-IGT filter.
     */
-    virtual void SetParameters(const mitk::PropertyList* p){};
+    virtual void SetParameters(const mitk::PropertyList*){};
 
     /**Documentation 
     *@brief Get all filter parameters as a PropertyList

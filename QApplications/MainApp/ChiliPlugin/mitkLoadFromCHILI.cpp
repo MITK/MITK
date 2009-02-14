@@ -186,9 +186,9 @@ return dummy;
 }
 
 std::vector<mitk::DataTreeNode::Pointer> 
-mitk::LoadFromCHILI::CreateNodesFromLists( QcPlugin* instance, 
+mitk::LoadFromCHILI::CreateNodesFromLists( QcPlugin* itkNotUsed(instance), 
                                            const std::string& seriesInstanceUID, 
-                                           const std::string& tmpDirectory )
+                                           const std::string& itkNotUsed(tmpDirectory) )
 {  //hint: text-files handled separately
   std::vector<DataTreeNode::Pointer> resultNodes;
   resultNodes.clear();
@@ -530,7 +530,7 @@ mitk::LoadFromCHILI::LoadSingleText( QcPlugin* instance,
 }
 
 mitk::DataTreeNode::Pointer 
-mitk::LoadFromCHILI::LoadSingleText( QcPlugin* instance, 
+mitk::LoadFromCHILI::LoadSingleText( QcPlugin* itkNotUsed(instance), 
                                      const std::string& seriesInstanceUID, 
                                      unsigned int instanceNumber, 
                                      const std::string& textPath, 

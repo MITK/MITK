@@ -1164,60 +1164,6 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
   m_TransformParameters = mitk::TransformParameters::New();
   m_TransformParameters->SetTransform(m_TransformBox->currentItem());
 
-  mitk::Geometry3D::TransformType::InputPointType center;
-  mitk::Geometry3D::TransformType::OutputVectorType offset;
-
-  std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
-  std::cout << m_GeometryWorldToItkPhysicalTransform->GetMatrix();
-  center = m_GeometryWorldToItkPhysicalTransform->GetCenter();
-  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-  offset = m_GeometryWorldToItkPhysicalTransform->GetOffset();
-  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-  std::cout << std::endl;
-
-  std::cout << "Fixed Image: ITK-physical to World transform" << std::endl;
-  std::cout << m_GeometryItkPhysicalToWorldTransform->GetMatrix();
-  center = m_GeometryItkPhysicalToWorldTransform->GetCenter();
-  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-  offset = m_GeometryItkPhysicalToWorldTransform->GetOffset();
-  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-  std::cout << std::endl;
-
-  //mitk::Geometry3D::TransformType::Pointer invWPm = mitk::Geometry3D::TransformType::New();
-  //m_GeometryWorldToItkPhysicalTransform->GetInverse(invWPm);
-
-  //mitk::Geometry3D::TransformType::Pointer WPf = mitk::Geometry3D::TransformType::New();
-  //m_GeometryItkPhysicalToWorldTransform->GetInverse(WPf);
-
-  //std::cout << "Moving Image: ITK-physical to World transform" << std::endl;
-  //std::cout << invWPm->GetMatrix();
-  //center = invWPm->GetCenter();
-  //std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-  //offset = invWPm->GetOffset();
-  //std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-  //std::cout << std::endl;
-
-  //std::cout << "Fixed Image:  World to ITK-physical transform" << std::endl;
-  //std::cout << WPf->GetMatrix();
-  //center = WPf->GetCenter();
-  //std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-  //offset = WPf->GetOffset();
-  //std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-  //std::cout << std::endl;
-
-  mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
-  initialTransform->SetIdentity();
-  initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
-  initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
-  
-  std::cout << "Initial transform" << std::endl;
-  std::cout << initialTransform->GetMatrix();
-  center = initialTransform->GetCenter();
-  std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-  offset = initialTransform->GetOffset();
-  std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-  std::cout << std::endl;
-
   itk::Array<double> m_Scales;
   
   if (m_TransformBox->currentItem() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
@@ -1274,14 +1220,11 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
     }
     
     m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerAffine->isChecked());
-    //m_TransformParameters->SetTransformInitializerOn(true);
 
-    itk::MatrixOffsetTransformBase<float, 3, 3>::OutputVectorType offset;
-    //offset[0] = 500; offset[1] = 0; offset[2] = 0;
-    //invWPm->SetOffset(offset);  
-    
-         
-    //m_TransformParameters->SetInitialParameters(invWPm->GetParameters());
+    mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
+    initialTransform->SetIdentity();
+    initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
+    initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
     m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());
 
     m_TransformParameters->SetMomentsOn(m_MomentsAffine->isChecked());

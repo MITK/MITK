@@ -32,13 +32,12 @@ namespace mitk {
     m_TransformCenterX(0.0),
     m_TransformCenterY(0.0),
     m_TransformCenterZ(0.0)
-  {
-     m_InitialParameters.SetSize(16);
-    m_InitialParameters.Fill(0.0);
-    m_Scales.SetSize(16);
-    m_Scales.Fill(1.0);
-  }
-  
+    {
+      m_InitialParameters.set_size(0);
+      m_Scales.SetSize(16);
+      m_Scales.Fill(1.0);
+    }
+
   void TransformParameters::SetScales(itk::Array<double> scales)
   {
     m_Scales = scales;

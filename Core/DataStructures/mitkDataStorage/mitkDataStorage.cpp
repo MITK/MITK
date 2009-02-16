@@ -94,8 +94,6 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent
 {
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
   parents->InsertElement(0, parent);
-  std::string name = node->GetName().append("bla");
-  node->SetName(name.c_str());
   this->Add(node, parents);
 }
 

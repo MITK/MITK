@@ -26,6 +26,8 @@ namespace mitk {
     m_TransformParameters = TransformParameters::New();
     m_MetricParameters = MetricParameters::New();
     m_ReferenceImage = Image::New();
+
+   
   }
 
   ImageRegistrationMethod::~ImageRegistrationMethod()

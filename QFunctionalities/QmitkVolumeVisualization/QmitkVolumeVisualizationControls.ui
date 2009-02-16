@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>353</width>
+            <width>468</width>
             <height>889</height>
         </rect>
     </property>
@@ -40,14 +40,6 @@
         <widget class="QmitkDataTreeComboBox">
             <property name="name">
                 <cstring>m_TreeNodeSelector</cstring>
-            </property>
-        </widget>
-        <widget class="QCheckBox">
-            <property name="name">
-                <cstring>m_EnableRenderingCB</cstring>
-            </property>
-            <property name="text">
-                <string>volume rendering</string>
             </property>
         </widget>
         <widget class="QTabWidget">
@@ -133,6 +125,12 @@
                         <property name="name">
                             <cstring>textLabel2</cstring>
                         </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>412</width>
+                                <height>44</height>
+                            </size>
+                        </property>
                         <property name="font">
                             <font>
                             </font>
@@ -161,35 +159,305 @@ Press delete to remove selected handle.</string>
                         <property name="title">
                             <string>Presets</string>
                         </property>
-                        <vbox>
+                        <grid>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLayoutWidget">
+                            <widget class="QLayoutWidget" row="0" column="0">
                                 <property name="name">
-                                    <cstring>layout28</cstring>
+                                    <cstring>layout17</cstring>
                                 </property>
-                                <hbox>
+                                <grid>
                                     <property name="name">
                                         <cstring>unnamed</cstring>
                                     </property>
-                                    <widget class="QLabel">
+                                    <widget class="QLayoutWidget" row="0" column="0" rowspan="1" colspan="3">
                                         <property name="name">
-                                            <cstring>textLabelTF</cstring>
+                                            <cstring>layout16</cstring>
                                         </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>Transfer function</string>
-                                        </property>
+                                        <grid>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <widget class="QPushButton" row="1" column="6">
+                                                <property name="name">
+                                                    <cstring>tf9_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image0</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton" row="1" column="4">
+                                                <property name="name">
+                                                    <cstring>tf8_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image1</pixmap>
+                                                </property>
+                                            </widget>
+                                            <spacer row="1" column="3">
+                                                <property name="name">
+                                                    <cstring>spacer62_5_2_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>39</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <widget class="QPushButton" row="0" column="0">
+                                                <property name="name">
+                                                    <cstring>tf1_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image2</pixmap>
+                                                </property>
+                                            </widget>
+                                            <spacer row="0" column="3">
+                                                <property name="name">
+                                                    <cstring>spacer62_2_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>37</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <widget class="QPushButton" row="1" column="2">
+                                                <property name="name">
+                                                    <cstring>tf7_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image3</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton" row="0" column="8">
+                                                <property name="name">
+                                                    <cstring>tf5_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image4</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton" row="0" column="6">
+                                                <property name="name">
+                                                    <cstring>tf4_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image5</pixmap>
+                                                </property>
+                                            </widget>
+                                            <spacer row="1" column="1">
+                                                <property name="name">
+                                                    <cstring>spacer62_5_5_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>38</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <spacer row="1" column="7">
+                                                <property name="name">
+                                                    <cstring>spacer62_5_4_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>38</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <widget class="QPushButton" row="0" column="4">
+                                                <property name="name">
+                                                    <cstring>tf3_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image6</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton" row="0" column="2">
+                                                <property name="name">
+                                                    <cstring>tf2_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image7</pixmap>
+                                                </property>
+                                            </widget>
+                                            <widget class="QPushButton" row="1" column="8">
+                                                <property name="name">
+                                                    <cstring>tf10_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image8</pixmap>
+                                                </property>
+                                            </widget>
+                                            <spacer row="0" column="7">
+                                                <property name="name">
+                                                    <cstring>spacer62_4_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>37</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <spacer row="0" column="5">
+                                                <property name="name">
+                                                    <cstring>spacer62_3_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>38</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <spacer row="1" column="5">
+                                                <property name="name">
+                                                    <cstring>spacer62_5_3_2_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>38</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                            <widget class="QPushButton" row="1" column="0">
+                                                <property name="name">
+                                                    <cstring>tf6_button</cstring>
+                                                </property>
+                                                <property name="enabled">
+                                                    <bool>false</bool>
+                                                </property>
+                                                <property name="text">
+                                                    <string></string>
+                                                </property>
+                                                <property name="pixmap">
+                                                    <pixmap>image9</pixmap>
+                                                </property>
+                                            </widget>
+                                            <spacer row="0" column="1">
+                                                <property name="name">
+                                                    <cstring>spacer62_6_2</cstring>
+                                                </property>
+                                                <property name="orientation">
+                                                    <enum>Horizontal</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>Expanding</enum>
+                                                </property>
+                                                <property name="sizeHint">
+                                                    <size>
+                                                        <width>38</width>
+                                                        <height>20</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </grid>
                                     </widget>
-                                    <widget class="QComboBox">
+                                    <widget class="QComboBox" row="1" column="1">
                                         <item>
                                             <property name="text">
                                                 <string></string>
@@ -230,7 +498,66 @@ Press delete to remove selected handle.</string>
                                             </font>
                                         </property>
                                     </widget>
-                                    <widget class="QPushButton">
+                                    <widget class="QLabel" row="1" column="0">
+                                        <property name="name">
+                                            <cstring>textLabelTF</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Transfer function</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton" row="2" column="2">
+                                        <property name="name">
+                                            <cstring>pushButtonCS</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Set</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel" row="2" column="0">
+                                        <property name="name">
+                                            <cstring>textLabelCS</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <bold>0</bold>
+                                            </font>
+                                        </property>
+                                        <property name="frameShape">
+                                            <enum>NoFrame</enum>
+                                        </property>
+                                        <property name="text">
+                                            <string>Color style</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton" row="1" column="2">
                                         <property name="name">
                                             <cstring>pushButton1</cstring>
                                         </property>
@@ -260,19 +587,9 @@ Press delete to remove selected handle.</string>
                                             <string>Set</string>
                                         </property>
                                     </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout20</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
+                                    <widget class="QPushButton" row="3" column="2">
                                         <property name="name">
-                                            <cstring>textLabelCS</cstring>
+                                            <cstring>resetButton</cstring>
                                         </property>
                                         <property name="enabled">
                                             <bool>false</bool>
@@ -282,14 +599,28 @@ Press delete to remove selected handle.</string>
                                                 <bold>0</bold>
                                             </font>
                                         </property>
-                                        <property name="frameShape">
-                                            <enum>NoFrame</enum>
-                                        </property>
                                         <property name="text">
-                                            <string>Color style</string>
+                                            <string>Reset</string>
                                         </property>
                                     </widget>
-                                    <widget class="QComboBox">
+                                    <spacer row="3" column="0" rowspan="1" colspan="2">
+                                        <property name="name">
+                                            <cstring>spacer47</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>195</width>
+                                                <height>21</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QComboBox" row="2" column="1">
                                         <item>
                                             <property name="text">
                                                 <string></string>
@@ -330,94 +661,10 @@ Press delete to remove selected handle.</string>
                                             </font>
                                         </property>
                                     </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButtonCS</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>5</hsizetype>
-                                                <vsizetype>0</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>Set</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
+                                </grid>
                             </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout18</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>resetButton</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>Reset</string>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer47</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>250</width>
-                                                <height>21</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </hbox>
-                            </widget>
-                        </vbox>
+                        </grid>
                     </widget>
-                    <spacer>
-                        <property name="name">
-                            <cstring>spacer2</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>170</height>
-                            </size>
-                        </property>
-                    </spacer>
                 </vbox>
             </widget>
             <widget class="QWidget">
@@ -435,467 +682,6 @@ Press delete to remove selected handle.</string>
                         <property name="name">
                             <cstring>m_TransferFunctionWidget_2</cstring>
                         </property>
-                    </widget>
-                    <widget class="QGroupBox">
-                        <property name="name">
-                            <cstring>groupBox8</cstring>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <bold>1</bold>
-                            </font>
-                        </property>
-                        <property name="title">
-                            <string>Presets</string>
-                        </property>
-                        <vbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout5</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf1_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image0</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_6</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf2_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image1</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_2_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf3_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image2</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_3_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf4_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image3</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_4_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf5_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image4</pixmap>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout6</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf6_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image5</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_5_5</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf7_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image6</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_5_2_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf8_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image7</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_5_3_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf9_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image8</pixmap>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer62_5_4_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>16</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>tf10_button</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string></string>
-                                        </property>
-                                        <property name="pixmap">
-                                            <pixmap>image9</pixmap>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout16_2</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>textLabelCS_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>&lt;font size="+1"&gt;&lt;font size="+1"&gt;Color style&lt;/font&gt;&lt;/font&gt;</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QComboBox">
-                                        <item>
-                                            <property name="text">
-                                                <string></string>
-                                            </property>
-                                        </item>
-                                        <item>
-                                            <property name="text">
-                                                <string>bone - natural</string>
-                                            </property>
-                                        </item>
-                                        <item>
-                                            <property name="text">
-                                                <string>muscles - bones</string>
-                                            </property>
-                                        </item>
-                                        <property name="name">
-                                            <cstring>comboBoxCS_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer51_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>21</width>
-                                                <height>21</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButtonCS_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>Set</string>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer11_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>100</width>
-                                                <height>21</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout18_2</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>resetButton_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>false</bool>
-                                        </property>
-                                        <property name="font">
-                                            <font>
-                                                <bold>0</bold>
-                                            </font>
-                                        </property>
-                                        <property name="text">
-                                            <string>Reset</string>
-                                        </property>
-                                    </widget>
-                                    <spacer>
-                                        <property name="name">
-                                            <cstring>spacer47_2</cstring>
-                                        </property>
-                                        <property name="orientation">
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property name="sizeType">
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property name="sizeHint">
-                                            <size>
-                                                <width>281</width>
-                                                <height>21</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </hbox>
-                            </widget>
-                        </vbox>
                     </widget>
                     <spacer>
                         <property name="name">
@@ -1251,6 +1037,12 @@ Press delete to remove selected handle.</string>
                                                         <bold>0</bold>
                                                     </font>
                                                 </property>
+                                                <property name="frameShape">
+                                                    <enum>LineEditPanel</enum>
+                                                </property>
+                                                <property name="frameShadow">
+                                                    <enum>Sunken</enum>
+                                                </property>
                                             </widget>
                                             <spacer>
                                                 <property name="name">
@@ -1516,27 +1308,17 @@ Press delete to remove selected handle.</string>
                 </vbox>
             </widget>
         </widget>
+        <widget class="QCheckBox">
+            <property name="name">
+                <cstring>m_EnableRenderingCB</cstring>
+            </property>
+            <property name="text">
+                <string>volume rendering</string>
+            </property>
+        </widget>
     </vbox>
 </widget>
 <customwidgets>
-    <customwidget>
-        <class>QmitkTransferFunctionWidget</class>
-        <header location="local">QmitkTransferFunctionWidget.h</header>
-        <sizehint>
-            <width>100</width>
-            <height>50</height>
-        </sizehint>
-        <container>0</container>
-        <sizepolicy>
-            <hordata>3</hordata>
-            <verdata>3</verdata>
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-        </sizepolicy>
-        <pixmap>image10</pixmap>
-        <slot access="public" specifier="">slot()</slot>
-        <slot access="public" specifier="">PropertyChange(QListViewItem* PropertyItem)</slot>
-    </customwidget>
     <customwidget>
         <class>QmitkDataTreeComboBox</class>
         <header location="global">QmitkDataTreeComboBox.h</header>
@@ -1551,45 +1333,63 @@ Press delete to remove selected handle.</string>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
+        <pixmap>image10</pixmap>
+    </customwidget>
+    <customwidget>
+        <class>QmitkTransferFunctionWidget</class>
+        <header location="local">QmitkTransferFunctionWidget.h</header>
+        <sizehint>
+            <width>100</width>
+            <height>50</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>3</hordata>
+            <verdata>3</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
         <pixmap>image11</pixmap>
+        <slot access="public" specifier="">slot()</slot>
+        <slot access="public" specifier="">PropertyChange(QListViewItem* PropertyItem)</slot>
     </customwidget>
 </customwidgets>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="1293">789c7d93cd6e83300c80ef3c45d4dcaac95d870a4cd31e61d28e93a61de224064aa1743f8769dabb2f4e42d716a825903e3edb8903ac96e2e5f9492c57c9c7a7faacb5d0957a174bf3d5b6dfaf6f8f3fc9e2ae10e9ad58df8bf5e226591c8416b2d0852a34e38e516d54a6368cc4881bccd0a3f26850a161d4116dc09651673ad519631f310f683c5a8dda3236112960c56832931a9fbc8f9807ac196d6e539b336e23e6013b8f64d112a38d48014b46ca29259f8c11f380d22311924f868814f12264bc5ca8293f6421689cf72e8c856b5e125cf3a5762b4c7bde9dad245839e9bdaeb750cff477de36b5eb7ede3fce2cf939ecf836aa973ec7190d254cf821ab95b1d9944720b7861d7939dc481e3733b57e47473df2ee2af78812c2f62ffbf3e40661ae7e58fc3fce3c8fdc1998f53c5b0fb3dec2160cca59efb6dc235cf16e6f329efb949740bc08ced6bbb7e2bedaf17ca1028d85511ceb6be84b18cef0dc97be813e3dd68b7a56bbe1eb1979ffbff517839df843db544a77a671614c533527b1f87d48fe00db500ddc</data>
+        <data format="XPM.GZ" length="1788">789c6dd55b4fe2401407f0773e45036f66a3d07bb3d907c00bb88277b3c9661fa6d3d6d6ed4ca1d22a35fbddb7e782a0324dd01ffd77e6f4cc241c1d18bfae66c6c151e77925569934642a4ae320aa945afffef3e3add33503c3ea1b4edf1874bf75ba8786347a7dbf2ffb3ef02770d0870bf8c4b4898f4033307d3300de01ad81d5b7702a810c2cdfc2bb11531263a06dda03db04864c879821851dd8022899117105744c67e060b8c774880952388183e1bfcc88b806ba963b702de035d3212e90a11bb821b06646c411d0b3bc8187e186e9105364e8051e86a7cc883806fab66ffa36b062bac45ba4f4852f8113664cbc0706766006187e60bac413a40c4480e163664c7c050a4798c2013e335de22932124244c033664cbc01864e6886183e67bac40ba08c652263e0153072232b7281974c8f3843c651186178ce4c884360ecc556ec01974c8ff8824ce2304e80253321e6c0c44bac04c305d3232a64928409863533211ef6442f0ca58c649cf41ed3289361964919f6b22c79c2c3932b9d6b5d68a5b5568b25fd5fb69fb97ac653ad9070b7bd44aa21a031ae31b06aa3394e50b4335575de4abfb4a936f28a675bc103b9a68f4aa57a3b3020da47618602036bdd0cc1f804d590b5b3510db0cc68a9c658a656edc019b25c5145b0926eb45ec0d3f89d3ac680a25b38f2464142a99d1abe066abda97a6f00a650bb6f91510f69940d2c5e6f2ada131861576afeea4b40bd34f867c1adde0436adc70056577face143005ad4bee93610b61d7b5fa46c305b42a2ddb093bd01dc9531145b9c52407f0814b8d34bd8d4fc8c1bf56909445ab6d51ef36e7e5a028e5b514c0aae21d33b8396c0575d693e72f253409738613e596a7dba2fa0b82d6555d07988c9f47d3eda86d75ce44a15ef1195377a37818135dcde64cae9fbc6e53a2db0d58743bddd8cb2daeeac2aaa73fce9b998cd96f3e1e570de5e57e96cce637839bb9e601f6ea675351adf8ea7d5f836bdabc63ceea70f0f75f7dff7ce7fb87829d2</data>
     </image>
     <image name="image1">
-        <data format="XPM.GZ" length="1668">789c6dd55b6fda301407f0773e4544dfd0d496842444d31e8002bd6cd21e274d7bf0252e7436b96248aa7df7f91c3ba1409d52f8c5ff9c3827a1bd1b79bf7efef0467783aa26f596796c434a6fc4f74a35bfff7c7b1f0c837bcffc4ceebdf1f0cb6078eb31efc64ffca99f00bf038371300970f61599042cc0d96760e887e3d0070ac7d0f2091805d1380a806f8ea1658aa4118f289001e3201ec738cb1d434b82a4711263983a72cb2d703a99fad309f0af6364b941b2299932e08b636a79034c26899f60f8114842129110f880e484100e9c39a69673200da94f31bc778c2c3324a78462f8e0985a564016b18045c0c231b6ac9129a32c05368ec2b204f288071cc34bc7d8728d4c39e5185e390acb05308dd3208d8147c7d8728714294d05b07514963950c4221018d68eb1a5420a410586a5a3b0bcbd218432d3c9949a0fe275c3d896189b8d6fdff0b64925ed30efbb2ccb7b4ba50a7c464e3ba42cabb23e25a4dae36363e760685de4ea70941a7729b3377309e512aaa94d99cc1d60f69e6a38cbbd39be9d695bd4bcd41c1f3f97d0325f94f0a96efa75d8b310d92d44cf355ecf03ae02f6e4172b5d142665b6baee6bccfa1a10ca0fad8d1eabf6f3445375c5e092d455c2ac2287dff071b7cf3fa901079a69ecb9ea2f67f6a11fed5cf5bd557957a44b9809bd6cec19ec9a8af22ad11e94ee3a698edfcd2e579a371f1a09a75b15e65c5d02d23a6be5d9581c7650cbf6549905acaab30a50b48275e17d61a682ea1bd085cc2dd999f7fef95856f26a98224adabbafe0a6aaf30ac6d8584c6c955c17a75eb8143cb3b54b109967fa3c602bea4797e0b258cb5c5e0dad8a461df0ef5a5b1dbb67ea62ccd5237ea3cad275fba286f96214d8b1a722ffb4001c35c77e3caff088eb69b3d52ff82fa25956cdb2289bab51af0b36fcf775f01fbec91c92</data>
+        <data format="XPM.GZ" length="1788">789c7dd55b6fda301407f0773e4544dfaaa90db947d31e4acb654028b4a39a34edc1b7d0d8493a0a01cab4efbe9c63b7a26aa841483fe79f936327c0e5b9f5739658e797adf5866c3266b147f26c9df3aa285e7efdfef6b7d57662cbb52ddfb63aed2fadf685c5ac333bb2991d015360c78617f007328217f011e8741cdbc1731f806ec7b55d2441c66ee4c6c03f864cf316e8395ec77380dcd0d76448e2c51e010a43ae4981bee3fb3e86cf90c48f7d3cba34e49a57c08006714081d7865cf33b3074c34ee8024786be660f49c338c4f0c6906b2e809117399107ac0c03cd1592452462c09da1d0dc02632f76620c8f0d03cd0192c524c6f0c150683e03894f1ce203f78681e61392134238f0de5068de01a94f1d8ae11724a784e2d11b200b98cb026061186aae918251268043c3547306e4017739862786a1e6142938e5184e0c53cd395084c21521b06b186af691a9a022059686a9660e4cc3d44d319c19869a0a99a634c5b0344c352fce08659c33c619152425cc0cc1d9f2119fa54c4a256506efbc5896f27564997ac2a75ae2511cf94ac8e3f18c8faecc722573294b25d79b4aaab761020ccfcff18c6db17b57618fdfa3ba05a5032f87ecea6380d501d3c3aeabae3ff6c0e062b00e797350dd5e43e07511f9aeafb2a60a703a14289e72993707f4360d864a96df1bf641e9407180bd189d08d41d8cd7f567d9d0a4d02d4ec6755035051806cafd1a9a6dba840e241576d26fea218345aea638d35481c3122683fc64e016aebd1dca4f2ac82c59a94f03725c487532c0600f7279ba0791cbc34c993bda5841cd77af054ef4301e9a0eea3b727437ebb90356180eba12761142f9fb0a1858deadd5db4cd9cb8e0378898bf1d15c591d07d43dfed7ece74932e94ee749374966a36962467f3e9f6df1677fb01955bd6ab1d8548baaf7b05a98d1ebad76a3f6bfafadff842b1f5f</data>
     </image>
     <image name="image2">
-        <data format="XPM.GZ" length="1518">789cadd44d8f9b301006e07b7e058a6f51b5db0d6007553d74ef957aac54f530f6d80e900408a4d96cd5ff5e66ec68bb2969a46a877c3df0c2d856e07e917cfdf23959dccffa0186d224660dfb648187edf6f4edfbc79fb379fa3e09af87f9bbd97c9d98446490151910b74499ca5ca6c44f4c2d0ba98996a852f5a0f8e831320fbc636a55280eff88c440475c65abe52a239e2265e033b1c88a65c17c24420e4bc88907268205240e449deba5e6a35da40cac98a84173b88eb4812dd148931a492c235560c3b4461b4b84481768882831450eeb4815b8635ad4c8e127a255b411f74c67b575c44da40bec894eb9d471d847aa40643aa71d8745a40bbc13ff28b899d03713e60dbadc4ebc651714e1fddfd7b01193170989eb3dae77c1d709473b3ced1feb25812f89755955f5b89d6bf367c770c3ee004c03cdf869a0695bbdb9358eaa41f4674caefa063a21f6611cd84cce655f362862abe98410757d9ed1f47a8c736e2bfaf657570c05b66dcf3f2613e399e320865d7f752ed4654c1dcc18c1700d8c675e54055ef8929f5ce23cf08b49b775ff7a1c7851c2b725f21d75fcbb01572f9e5ac32b76f2dc63ea3fe4cd333f7debaa3b7475355c54f73894c371feebc3ec37bb933670</data>
+        <data format="XPM.GZ" length="1293">789c7d93cd6e83300c80ef3c45d4dcaac95d870a4cd31e61d28e93a61de224064aa1743f8769dabb2f4e42d716a825903e3edb8903ac96e2e5f9492c57c9c7a7faacb5d0957a174bf3d5b6dfaf6f8f3fc9e2ae10e9ad58df8bf5e226591c8416b2d0852a34e38e516d54a6368cc4881bccd0a3f26850a161d4116dc09651673ad519631f310f683c5a8dda3236112960c56832931a9fbc8f9807ac196d6e539b336e23e6013b8f64d112a38d48014b46ca29259f8c11f380d22311924f868814f12264bc5ca8293f6421689cf72e8c856b5e125cf3a5762b4c7bde9dad245839e9bdaeb750cff477de36b5eb7ede3fce2cf939ecf836aa973ec7190d254cf821ab95b1d9944720b7861d7939dc481e3733b57e47473df2ee2af78812c2f62ffbf3e40661ae7e58fc3fce3c8fdc1998f53c5b0fb3dec2160cca59efb6dc235cf16e6f329efb949740bc08ced6bbb7e2bedaf17ca1028d85511ceb6be84b18cef0dc97be813e3dd68b7a56bbe1eb1979ffbff517839df843db544a77a671614c533527b1f87d48fe00db500ddc</data>
     </image>
     <image name="image3">
-        <data format="XPM.GZ" length="1623">789c7594c96edb301040effe0ac1be0545d2449164a1e841b6b31d0af418a0e881d442529114ed5bd17f2f6738b253c31104880f7c9ce10c09dd5c59af3f7f585737aba665ad0aad50b2daba8aba3c9f7efdfefe67b5b6bf5af07ad6edfacb6a1d5ba1b5b17d7b6bfb80cf800e732287012680aeeddeba366084c8ddc8e5800cd0b3bd5b0f6739a163f01a917bbe87f286303218026eefb7eef61ef001d0bff7ef7cc42742d7e03b62e8333f047c218c0dbe013287dd3107f091d035b8478c186311e08e3036d8037287df71942742d760831871c651ae0863831d60e88676e80206849ec112310e791803168489c11a3072233b423927f40c8e8871c4239407c2c4e00130f6623bf6005342cfe08c98c43c4e005bc2c460069878899da02c093d830a31497882b2204c0c5e9f3d1bc64368c686ebb15970fe482154fa9609a5bff9278614c57b0a43557e62285155358e2f1b3a7ad6b40d0e8a8b869ec93bd1b730f8c410a21b4431c2a0be64e8d8a26955dae99a288652e7463b29a51aa8f61843c9ff8cb1534275f3924551e40f4a90c3647db68f9324c504ed4aabe33eb0bd1fa2a87682a4b29167fd383979694a4ec9a099591e952ad5ba12757e8a910931bc677289b58393916228855a0c3dd7edf6680ae80665dca9533fb2799a9b81928c81301d68e663160db9182765d676231945bdec54a7851413cde85335590e95b91f4aa7af06ad41103dd7f64b51b2a19d2a71d84379aa1f21cfd81d1b13cc3519185f37a081eb1b8c509bc48b94e34dd6d7d6dc3821f7b38ed4b4507506d2a124639f52d4a1cf44dbc0d69743ee304bda65666f52f583ee863229b0de1e8de060aa83ab33415978d8f80e6ff8af08a43160e5344cd972d29ae707fca9a5cbd1eb4ae6c753adb0e209ffdc795d166551147550d4f9f34b5d94f068ac8b82afff7e5bfd0309cf0705</data>
+        <data format="XPM.GZ" length="1608">789c85d34d8fda301006e03bbf2282dbaadaed129210553d00cbee5e2af55869d583edc490edc4f970c80755ff7b336343d9c8522d22f19097893d761eeebc1fdfbf79770f33ddb026139e38b2dabb4b4e793ebcfdfcfa7b36f73f7bf809bdc7f9a7d9fcde13dec27ff4573e3121c6feda8f9102192c832058225364e88741e82325918771c891cc32317c47467ef41851f868191866441ec51185179689e101b95ead97eb15f2976568c88962cdd602f9828c57f132a6bbaf4816b09005c86762c2184b904f96a9e116c9031e720a77c484334e774f96a9e11e2942e18b10395846868a980a2e526469290d0b6412267e42e1dc32326c8969c2130aef2ca561854ca3d44f2364631919f64499f254223796d2f08c9491f425856bcbc85013a5e492c260290def176cc1c5d8ab441e8e59f69e7d18b4310090ab02a02c2a801a3e0e3a051a9a53a50174dbf5301d7412a01ec60ae70dd44a39130ccedb8d065d43adbb8d3bb1db8246d5f0d49b6fd3a7a8f2e2ae994ed524f60d151fff5d95008e445df41a4cf5bc7326f470be787772af767b9d5def4c1ce1192e2b38efff97d027ed4864d05d121ab6ae7dc9f4b5d763cba64d35abcd6b5ba386e7e9ded14bdb2b0ae055ef5d350ed5de4e62bc0667e2b691caf5944371d384b272d6286e12ad2bd15effa7c7b3ea5a4bdbeb6b420dae44ded7d7c430dd18da975d636f8f57eeaa716c6fe6df4e4f3b753d6ffefd50b9669a958d7986d6e3bbe55ccb601338fadc91102f5da10a5596a55245f75a5e86a231fff365f617ab851094</data>
     </image>
     <image name="image4">
         <data format="XPM.GZ" length="1548">789c75d4cb8eda301406e03d4f11c10e554c21434c547591c0b6529795aa2e623bbe401cc81542d577afcfb117c3283611e4233ff6b1e3f0b68e7efdfc11addf165d5ff49a454c156db4e68331d3ef3fdfff2e96f1d7088e5db45d7e592c79c4a2559cc68738050a601227db240632244d7842812b2089c996e0d5c273efb8415292120c979edc91020fef87e4f00ebc02d3f734499127244b8b94012fc0625fec8a3df088e4455970e01d48f77447f16aef993836484e0b8ae1dcb3741c812c61314b80992771ac9125a3ac040e9ec2b105f284c71cc3c693383e9025a71cc34f4fe1780696a48c4b02bc7912c709294a5a0a60e7291c2ba020221618569ec4512385a002c3d253386e3eb75541192ee566e37a979f9b92529f2f95d4f6d304124ad6d71b9cea7a36a1edab695a3c0f2564d7770d9e0cb309dbda51de3b880413e3430e0f8cce256cdfb299d46db4739aef03cbd05af730ebd93e6c7b8e36314ec18496998112dad02836d1c372ddf270a2831264d5a860c2d46ecab7e08ae5671cab355207667b54786f9e752021a75eba753beac06c1f235eb737780ad4311a9f18da40e23ec136b3ed9ccfef8feaaeb10fbbd99af94a7d19d0b269b652bb3794dbced298d99ddc4fb292702879ae5f1230ba56f2d6c07a61ad4a66393e6faf5d984cb951e017c37d6694fc217da5f6fd7979496071caed71efeefa9280a75056b9fe90d027fcafaa07d76a33d46d7f8233fb55dd66ed3014cb7fdf16ff01407bf622</data>
     </image>
     <image name="image5">
-        <data format="XPM.GZ" length="1563">789c7dd24d8fda301006e03bbf22821baa76bb046250b50760f7b8528f95aa1efc35069c10482010aafef77ac6ceb642c45184f3e057e3b193e771f2e3fb47327e1ed4277edaca446e78958cd5b928da9fbf5e7f0f86e9d704ef3479197e190c75229351fa924e53a24066225399408e902c653396229f88822d18cdf240e52991f3e97c329f225560e6b925cab99e4be43b7221177c415c076acf3d92cff884cf906f81996745549c73853c056acf1552ccc44450b808cc3c774425b8a0f035507b1e9032934c66c886a8a5901a590782678b54994a1585f340e679266a2514858f81e079436aa653cd909b40e6792182161a90cb40f02c91c020050adb40e669880002280c81e0f974778dc2c84742facea0ef32009b6d2ce102b0db456b80cd8b3c9e807d7988f771aca08e274e671b4d984d05d0f4248cefe202f11af5d502b48f1306efb2ba412ce1e60a7cea590513cbd5cd8df661a7b486c11225d8be133370d91dc158d3b35beb1279e50657a4a7869bdb765bee5b25dfc512aed3726fca788dbac095fa13c6ec6d19efa3b98677d7d787dd976517799cc85706ba2fe041c21dd7dad2a1fd4b744be2682d7661ffdbd57d0db785f26dd99bb0f4520f575cc3745fc97dc2952896dde367a2696aba9a266f0fcdf5bd6deab6696bf7ebfe5c0fff7c1bfc0588bbf672</data>
+        <data format="XPM.GZ" length="1623">789c7594c96edb301040effe0ac1be0545d2449164a1e841b6b31d0af418a0e881d442529114ed5bd17f2f6738b253c31104880f7c9ce10c09dd5c59af3f7f585737aba665ad0aad50b2daba8aba3c9f7efdfefe67b5b6bf5af07ad6edfacb6a1d5ba1b5b17d7b6bfb80cf800e732287012680aeeddeba366084c8ddc8e5800cd0b3bd5b0f6739a163f01a917bbe87f286303218026eefb7eef61ef001d0bff7ef7cc42742d7e03b62e8333f047c218c0dbe013287dd3107f091d035b8478c186311e08e3036d8037287df71942742d760831871c651ae0863831d60e88676e80206849ec112310e791803168489c11a3072233b423927f40c8e8871c4239407c2c4e00130f6623bf6005342cfe08c98c43c4e005bc2c460069878899da02c093d830a31497882b2204c0c5e9f3d1bc64368c686ebb15970fe482154fa9609a5bff9278614c57b0a43557e62285155358e2f1b3a7ad6b40d0e8a8b869ec93bd1b730f8c410a21b4431c2a0be64e8d8a26955dae99a288652e7463b29a51aa8f61843c9ff8cb1534275f3924551e40f4a90c3647db68f9324c504ed4aabe33eb0bd1fa2a87682a4b29167fd383979694a4ec9a099591e952ad5ba12757e8a910931bc677289b58393916228855a0c3dd7edf6680ae80665dca9533fb2799a9b81928c81301d68e663160db9182765d676231945bdec54a7851413cde85335590e95b91f4aa7af06ad41103dd7f64b51b2a19d2a71d84379aa1f21cfd81d1b13cc3519185f37a081eb1b8c509bc48b94e34dd6d7d6dc3821f7b38ed4b4507506d2a124639f52d4a1cf44dbc0d69743ee304bda65666f52f583ee863229b0de1e8de060aa83ab33415978d8f80e6ff8af08a43160e5344cd972d29ae707fca9a5cbd1eb4ae6c753adb0e209ffdc795d166551147550d4f9f34b5d94f068ac8b82afff7e5bfd0309cf0705</data>
     </image>
     <image name="image6">
-        <data format="XPM.GZ" length="1608">789c85d34d8fda301006e03bbf2282dbaadaed129210553d00cbee5e2af55869d583edc490edc4f970c80755ff7b336343d9c8522d22f19097893d761eeebc1fdfbf79770f33ddb026139e38b2dabb4b4e793ebcfdfcfa7b36f73f7bf809bdc7f9a7d9fcde13dec27ff4573e3121c6feda8f9102192c832058225364e88741e82325918771c891cc32317c47467ef41851f868191866441ec51185179689e101b95ead97eb15f2976568c88962cdd602f9828c57f132a6bbaf4816b09005c86762c2184b904f96a9e116c9031e720a77c484334e774f96a9e11e2942e18b10395846868a980a2e526469290d0b6412267e42e1dc32326c8969c2130aef2ca561854ca3d44f2364631919f64499f254223796d2f08c9491f425856bcbc85013a5e492c260290def176cc1c5d8ab441e8e59f69e7d18b4310090ab02a02c2a801a3e0e3a051a9a53a50174dbf5301d7412a01ec60ae70dd44a39130ccedb8d065d43adbb8d3bb1db8246d5f0d49b6fd3a7a8f2e2ae994ed524f60d151fff5d95008e445df41a4cf5bc7326f470be787772af767b9d5def4c1ce1192e2b38efff97d027ed4864d05d121ab6ae7dc9f4b5d763cba64d35abcd6b5ba386e7e9ded14bdb2b0ae055ef5d350ed5de4e62bc0667e2b691caf5944371d384b272d6286e12ad2bd15effa7c7b3ea5a4bdbeb6b420dae44ded7d7c430dd18da975d636f8f57eeaa716c6fe6df4e4f3b753d6ffefd50b9669a958d7986d6e3bbe55ccb601338fadc91102f5da10a5596a55245f75a5e86a231fff365f617ab851094</data>
+        <data format="XPM.GZ" length="1518">789cadd44d8f9b301006e07b7e058a6f51b5db0d6007553d74ef957aac54f530f6d80e900408a4d96cd5ff5e66ec68bb2969a46a877c3df0c2d856e07e917cfdf23959dccffa0186d224660dfb648187edf6f4edfbc79fb379fa3e09af87f9bbd97c9d98446490151910b74499ca5ca6c44f4c2d0ba98996a852f5a0f8e831320fbc636a55280eff88c440475c65abe52a239e2265e033b1c88a65c17c24420e4bc88907268205240e449deba5e6a35da40cac98a84173b88eb4812dd148931a492c235560c3b4461b4b84481768882831450eeb4815b8635ad4c8e127a255b411f74c67b575c44da40bec894eb9d471d847aa40643aa71d8745a40bbc13ff28b899d03713e60dbadc4ebc651714e1fddfd7b01193170989eb3dae77c1d709473b3ced1feb25812f89755955f5b89d6bf367c770c3ee004c03cdf869a0695bbdb9358eaa41f4674caefa063a21f6611cd84cce655f362862abe98410757d9ed1f47a8c736e2bfaf657570c05b66dcf3f2613e399e320865d7f752ed4654c1dcc18c1700d8c675e54055ef8929f5ce23cf08b49b775ff7a1c7851c2b725f21d75fcbb01572f9e5ac32b76f2dc63ea3fe4cd333f7debaa3b7475355c54f73894c371feebc3ec37bb933670</data>
     </image>
     <image name="image7">
-        <data format="XPM.GZ" length="1788">789c7dd55b6fda301407f0773e4544dfaaa90db947d31e4acb654028b4a39a34edc1b7d0d8493a0a01cab4efbe9c63b7a26aa841483fe79f936327c0e5b9f5739658e797adf5866c3266b147f26c9df3aa285e7efdfef6b7d57662cbb52ddfb63aed2fadf685c5ac333bb2991d015360c78617f007328217f011e8741cdbc1731f806ec7b55d2441c66ee4c6c03f864cf316e8395ec77380dcd0d76448e2c51e010a43ae4981bee3fb3e86cf90c48f7d3cba34e49a57c08006714081d7865cf33b3074c34ee8024786be660f49c338c4f0c6906b2e809117399107ac0c03cd1592452462c09da1d0dc02632f76620c8f0d03cd0192c524c6f0c150683e03894f1ce203f78681e61392134238f0de5068de01a94f1d8ae11724a784e2d11b200b98cb026061186aae918251268043c3547306e4017739862786a1e6142938e5184e0c53cd395084c21521b06b186af691a9a022059686a9660e4cc3d44d319c19869a0a99a634c5b0344c352fce08659c33c619152425cc0cc1d9f2119fa54c4a256506efbc5896f27564997ac2a75ae2511cf94ac8e3f18c8faecc722573294b25d79b4aaab761020ccfcff18c6db17b57618fdfa3ba05a5032f87ecea6380d501d3c3aeabae3ff6c0e062b00e797350dd5e43e07511f9aeafb2a60a703a14289e72993707f4360d864a96df1bf641e9407180bd189d08d41d8cd7f567d9d0a4d02d4ec6755035051806cafd1a9a6dba840e241576d26fea218345aea638d35481c3122683fc64e016aebd1dca4f2ac82c59a94f03725c487532c0600f7279ba0791cbc34c993bda5841cd77af054ef4301e9a0eea3b727437ebb90356180eba12761142f9fb0a1858deadd5db4cd9cb8e0378898bf1d15c591d07d43dfed7ece74932e94ee749374966a36962467f3e9f6df1677fb01955bd6ab1d8548baaf7b05a98d1ebad76a3f6bfafadff842b1f5f</data>
+        <data format="XPM.GZ" length="1668">789c6dd55b6fda301407f0773e4544dfd0d496842444d31e8002bd6cd21e274d7bf0252e7436b96248aa7df7f91c3ba1409d52f8c5ff9c3827a1bd1b79bf7efef0467783aa26f596796c434a6fc4f74a35bfff7c7b1f0c837bcffc4ceebdf1f0cb6078eb31efc64ffca99f00bf038371300970f61599042cc0d96760e887e3d0070ac7d0f2091805d1380a806f8ea1658aa4118f289001e3201ec738cb1d434b82a4711263983a72cb2d703a99fad309f0af6364b941b2299932e08b636a79034c26899f60f8114842129110f880e484100e9c39a69673200da94f31bc778c2c3324a78462f8e0985a564016b18045c0c231b6ac9129a32c05368ec2b204f288071cc34bc7d8728d4c39e5185e390acb05308dd3208d8147c7d8728714294d05b07514963950c4221018d68eb1a5420a410586a5a3b0bcbd218432d3c9949a0fe275c3d896189b8d6fdff0b64925ed30efbb2ccb7b4ba50a7c464e3ba42cabb23e25a4dae36363e760685de4ea70941a7729b3377309e512aaa94d99cc1d60f69e6a38cbbd39be9d695bd4bcd41c1f3f97d0325f94f0a96efa75d8b310d92d44cf355ecf03ae02f6e4172b5d142665b6baee6bccfa1a10ca0fad8d1eabf6f3445375c5e092d455c2ac2287dff071b7cf3fa901079a69ecb9ea2f67f6a11fed5cf5bd557957a44b9809bd6cec19ec9a8af22ad11e94ee3a698edfcd2e579a371f1a09a75b15e65c5d02d23a6be5d9581c7650cbf6549905acaab30a50b48275e17d61a682ea1bd085cc2dd999f7fef95856f26a98224adabbafe0a6aaf30ac6d8584c6c955c17a75eb8143cb3b54b109967fa3c602bea4797e0b258cb5c5e0dad8a461df0ef5a5b1dbb67ea62ccd5237ea3cad275fba286f96214d8b1a722ffb4001c35c77e3caff088eb69b3d52ff82fa25956cdb2289bab51af0b36fcf775f01fbec91c92</data>
     </image>
     <image name="image8">
-        <data format="XPM.GZ" length="1788">789c6dd55b4fe2401407f0773e45036f66a3d07bb3d907c00bb88277b3c9661fa6d3d6d6ed4ca1d22a35fbddb7e782a0324dd01ffd77e6f4cc241c1d18bfae66c6c151e77925569934642a4ae320aa945afffef3e3add33503c3ea1b4edf1874bf75ba8786347a7dbf2ffb3ef02770d0870bf8c4b4898f4033307d3300de01ad81d5b7702a810c2cdfc2bb11531263a06dda03db04864c879821851dd8022899117105744c67e060b8c774880952388183e1bfcc88b806ba963b702de035d3212e90a11bb821b06646c411d0b3bc8187e186e9105364e8051e86a7cc883806fab66ffa36b062bac45ba4f4852f8113664cbc0706766006187e60bac413a40c4480e163664c7c050a4798c2013e335de22932124244c033664cbc01864e6886183e67bac40ba08c652263e0153072232b7281974c8f3843c651186178ce4c884360ecc556ec01974c8ff8824ce2304e80253321e6c0c44bac04c305d3232a64928409863533211ef6442f0ca58c649cf41ed3289361964919f6b22c79c2c3932b9d6b5d68a5b5568b25fd5fb69fb97ac653ad9070b7bd44aa21a031ae31b06aa3394e50b4335575de4abfb4a936f28a675bc103b9a68f4aa57a3b3020da47618602036bdd0cc1f804d590b5b3510db0cc68a9c658a656edc019b25c5145b0926eb45ec0d3f89d3ac680a25b38f2464142a99d1abe066abda97a6f00a650bb6f91510f69940d2c5e6f2ada131861576afeea4b40bd34f867c1adde0436adc70056577face143005ad4bee93610b61d7b5fa46c305b42a2ddb093bd01dc9531145b9c52407f0814b8d34bd8d4fc8c1bf56909445ab6d51ef36e7e5a028e5b514c0aae21d33b8396c0575d693e72f253409738613e596a7dba2fa0b82d6555d07988c9f47d3eda86d75ce44a15ef1195377a37818135dcde64cae9fbc6e53a2db0d58743bddd8cb2daeeac2aaa73fce9b998cd96f3e1e570de5e57e96cce637839bb9e601f6ea675351adf8ea7d5f836bdabc63ceea70f0f75f7dff7ce7fb87829d2</data>
-    </image>
-    <image name="image9">
         <data format="XPM.GZ" length="1653">789ce5d44b8fda301007f03b9f22821baad8cd3b56d50390650b0b528f95aa1efc48203c6a1bc2235bf5bb37336396bd541cf6d80459fcec7f9c9132c943dffbfe6de1f51f3a879ad795f4e48aefbdbe3aee76cd8f9f5f7e77ba01f3c2472ff23dbffba9d31d78d2eb3d667002778e92f81518b0200b1870e528891c18fa6114e2562592855988ab6b474954c02888fc28002e1d63a244f288451cb87154c4021807b11f63b8e718130592c72cc6f0d6511187c0244cfc2404fe728c890d52242c11c0a3a3229e806998fa2986278e31b1428a94a5183e382a620ecca22cc82260ed9810e74899f14c02678e05710a64110b18861748c938c3d59163411c0379cc031e03cf8e09f115a938e70af80c14b10804aebe2095e002579f80455988a204ee1d4be20558a66558a640e3981235b22c458961eb5812073d2ea42a64299742aeaab5dc48b5dcc2cca6b7c3e7a28ddd5babdbf3501f4fc7ea6441789cb17fda3f067e17db5cda411f61c918185fb16730ae6168f0da215d6fda71845d6431dcce9aaaddc0daea6d033bc606beded2e81ca6f5e18956dfd7e002edb5e6a27187b6f2b6ec31d570bd853d617268df0eac41de3cc1f1749b18ff4781e5bf037a7427408ffb6ee04345de7d58e70f07b086f5cdd0b4564fccb5eba906ea28782d6c8d2fc0a46d5f17c1c0167a5ec3a4a92ed478746857c3607fa56d70af778167fcc81b7c1be01e53addb3d666d4f6b6c648345aa97bac98ff9343fe4a7d944cd679b593daf0f755d4d174df7cfe7ce5f4c22133c</data>
     </image>
+    <image name="image9">
+        <data format="XPM.GZ" length="1563">789c7dd24d8fda301006e03bbf22821baa76bb046250b50760f7b8528f95aa1efc35069c10482010aafef77ac6ceb642c45184f3e057e3b193e771f2e3fb47327e1ed4277edaca446e78958cd5b928da9fbf5e7f0f86e9d704ef3479197e190c75229351fa924e53a24066225399408e902c653396229f88822d18cdf240e52991f3e97c329f225560e6b925cab99e4be43b7221177c415c076acf3d92cff884cf906f81996745549c73853c056acf1552ccc44450b808cc3c774425b8a0f035507b1e9032934c66c886a8a5901a590782678b54994a1585f340e679266a2514858f81e079436aa653cd909b40e6792182161a90cb40f02c91c020050adb40e669880002280c81e0f974778dc2c84742facea0ef32009b6d2ce102b0db456b80cd8b3c9e807d7988f771aca08e274e671b4d984d05d0f4248cefe202f11af5d502b48f1306efb2ba412ce1e60a7cea590513cbd5cd8df661a7b486c11225d8be133370d91dc158d3b35beb1279e50657a4a7869bdb765bee5b25dfc512aed3726fca788dbac095fa13c6ec6d19efa3b98677d7d787dd976517799cc85706ba2fe041c21dd7dad2a1fd4b744be2682d7661ffdbd57d0db785f26dd99bb0f4520f575cc3745fc97dc2952896dde367a2696aba9a266f0fcdf5bd6deab6696bf7ebfe5c0fff7c1bfc0588bbf672</data>
+    </image>
     <image name="image10">
-        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
+        <data format="PNG" length="837">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000030c49444154789cb59531681c4714863f9915bc0515b320c32e28a08518acc210893412b890ca0b2ace814092ca8834811486542e837020a94d0aa12660a930890b23bb90b9ebf61ac3096c5881026bd0c11c58305308f6810f9c62f74e77ba085c28d3eccedb9deffdfbbf37b3335996311c6b6b6b1fb9869165d9cccc10dc7ad5fa982ea6b873873db5f873ff4910e71dc54941e775070617f160a8f4c99f4f8817c0cc2ae91d453f2802303b7c0ba4beea606cf5008a027447e8b675120ce0ce1d6656b1ee05de17408988a203c1f642fcfb12083137215d2c91b98b043207490cddb12f1981eda925bda335d42122e46f225acf1df99107866a84f4b6b0d18c585d0706651595498b46607feed10f3a82666dd8fbc3d68a84f4b64102b03da53856767fb5d87786efef874039e57d303e913a73fe26aca1cac6664ca31962e60129514dc85e2a7b3b9617fb7d9238a5f14d044c16fbc6c46c167420b49eb911f4bb1f424cec401cfe2ca4f5ccf15553d8fa290184bff61deefd658997a701d85e48fed6638ca1d10c21701080fa88dddf4af2238f3f83ad0711d9a190bff5e4c7d1a863fe5b31d4d5579245a93ebf863e7e5415d1cc0bcb774324529696ab8ad9a2ac8dbc025c650dab7ba93cf5fd88c78f4af2230514114817a47a1e84f5ca70ca8a29c5e6268050f414d588ac4da5d408716ce8f73cdb0f2d79d7604faa6e4852b98c99cca383aaf9d3cf85e21f257ba934be15fc9961f56e48b2206c3f84fe3bcff68f05aa8a991756be500e4e75023ca558e6a0d18c00d8dbb1740e95ad07112beb902e3b7efe25c5c406ef3d3a50369a09f1ad29c1979da954afad83ed19fedeefb3fbbb253b1496960404ec8945cf74b4b2db76149b0961205ceccef1b3c2bb51b0a4e4ebfb21519c72f0b4ea86fc68ac0ef342a39992b51d4e1555707ed28a11b83829280a60ee02deb817b2ba9e901f47d8a28a279f092b5f2af12dd8d84c2a918123ef5e01eebceea03b4212d7ad3600020fc1b00da5da40160e9e03286120380f7957b1fdab3c1e40b7ad1347df25f73f31568da9aeb8ae7103aa7fd4ff02be6e78966533ff02c86159b405336ec40000000049454e44ae426082</data>
     </image>
     <image name="image11">
-        <data format="PNG" length="831">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000030649444154388db59531681c4714863f9935bc0515b320c32e28e085182c57914823810ba9bca0e26c0824a98c4813486148e532080792daa4106a02960a93b8106717025db7d7184e60c30a1458430ee6c08299c2b00fbce014bb77d2dd45e04279cdeeccee7cefdfffbd999dcbb28c51acadad7de40a22cbb2b9b911b873d0f97867e90ece3bacb5f8f7fe9320ce3b8ad382deab1e54e7f3c148e9d33f9e122f8249957459d10f8a005c1fbd05d25cb5bab0ba82a200dd11fa5d9d048f329b54b1ee05de17408988a295600721fe5d0984981b90de2c91f9f304320f490cfd0b5f32065b6b4997b5813a4484fc75c4d181233ff6c0488d90de1636da11abeb4055d6b33269d118ecdf7bf4838ea15917f67eb78d2221bd6d9000ec40294e94dd5f2cf6ade1bb072150ce781f5c1c4893397f1d3650656333a6d50e310b8094a826642f95bd1dcb8bfd21499cd2fa3a02268b7d6d62741db4128e9ebb31f4dbef434cec401cfe2ce4e8b9e3abb6b0f56302087fee3bdcbb6989d3c300ec20247fe331c6d06a87103808407dc4eeaf25f9b1c79fc1d6c388ec50c8df78f29368dc31ffad189aea2bc94da93fbf813e795c17d12c08cb774324529696eb8ad9a26c8cbc045c670deb7ba93df5c388278f4bf2630514114817a57e1e84cdca70c68a19c5e60680500c14d588ac4badd408716c180e3cdb8f2c79df604feb6e485299c64ce6d1aa6efef473a1f85bc95e2aad6f047f6658bd1b922c0adb8f60f8d6b3fd4381aa621684952f94ce3f3a019e512cf3d06a4700eced587a87cad6c388957548971d3ffd9c626283f71ead948d76427c6b46f0b433b5eab575b003c35ffb43767fb36487c2d29280803db5e8998e57f6bb8e6233210c84f3dd3975568ca2a4e4fe8390284ee93cabbb213fbe508705a1d54ec9ba0ea78a2a383f69c5185c9c161405307f0e6fdd0b595d4fc84f226c51cf279f092b5f2af12dd8d84c6a918123ef5f02eebdeaa13b421237ad5601818760d486526f200b9d0300250c04e721ef2b767899c715f4bb3a71f44db9ff897375cc74c555c535a8ff51ff0bf8aae15996cdfd0b730b59f473ab63700000000049454e44ae426082</data>
+        <data format="XBM.GZ" length="79">789c534e494dcbcc4b554829cdcdad8c2fcf4c29c95030e0524611cd48cd4ccf28010a1797249664262b2467241641a592324b8aa363156c15aab914146aadb90067111b1f</data>
     </image>
 </images>
 <connections>
@@ -1624,168 +1424,6 @@ Press delete to remove selected handle.</string>
         <slot>EnableShadingLow(bool)</slot>
     </connection>
     <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>resetButton_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>resetButton_2</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>resetTF()</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>textLabelCS_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>tf10_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset10()</slot>
-    </connection>
-    <connection>
-        <sender>tf9_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset9()</slot>
-    </connection>
-    <connection>
-        <sender>tf8_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset8()</slot>
-    </connection>
-    <connection>
-        <sender>tf7_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset7()</slot>
-    </connection>
-    <connection>
-        <sender>tf6_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset6()</slot>
-    </connection>
-    <connection>
-        <sender>tf5_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset5()</slot>
-    </connection>
-    <connection>
-        <sender>tf4_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset4()</slot>
-    </connection>
-    <connection>
-        <sender>tf3_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset3()</slot>
-    </connection>
-    <connection>
-        <sender>tf2_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset2()</slot>
-    </connection>
-    <connection>
-        <sender>tf1_button</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SetPreset1()</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf10_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf9_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf8_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf7_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf6_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf5_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf4_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf3_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf2_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>tf1_button</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>comboBoxCS_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>pushButtonCS_2</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SendCS()</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>pushButtonCS_2</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>comboBoxCS_2</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ColorStyle(const QString&amp;)</slot>
-    </connection>
-    <connection>
         <sender>pushButtonCS</sender>
         <signal>clicked()</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
@@ -1818,25 +1456,7 @@ Press delete to remove selected handle.</string>
     <connection>
         <sender>m_EnableRenderingCB</sender>
         <signal>toggled(bool)</signal>
-        <receiver>textLabelTF</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
         <receiver>resetButton</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>pushButton1</receiver>
-        <slot>setEnabled(bool)</slot>
-    </connection>
-    <connection>
-        <sender>m_EnableRenderingCB</sender>
-        <signal>toggled(bool)</signal>
-        <receiver>comboBox1</receiver>
         <slot>setEnabled(bool)</slot>
     </connection>
     <connection>
@@ -1844,18 +1464,6 @@ Press delete to remove selected handle.</string>
         <signal>clicked()</signal>
         <receiver>QmitkVolumeVisualizationControls</receiver>
         <slot>resetTF()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton1</sender>
-        <signal>clicked()</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>SendChoice()</slot>
-    </connection>
-    <connection>
-        <sender>comboBox1</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>QmitkVolumeVisualizationControls</receiver>
-        <slot>ComboBox(const QString&amp;)</slot>
     </connection>
     <connection>
         <sender>m_EnableRenderingCB</sender>
@@ -1929,10 +1537,97 @@ Press delete to remove selected handle.</string>
         <receiver>QmitkVolumeVisualizationControls</receiver>
         <slot>EnableShadingMed(bool)</slot>
     </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>comboBox1</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>comboBox1</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>ComboBox(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>textLabelTF</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>pushButton1</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>pushButton1</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkVolumeVisualizationControls</receiver>
+        <slot>SendChoice()</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf1_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf2_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf3_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf4_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf5_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf6_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf7_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf8_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf9_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>m_EnableRenderingCB</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>tf10_button</receiver>
+        <slot>setEnabled(bool)</slot>
+    </connection>
 </connections>
-<includes>
-    <include location="local" impldecl="in implementation">QmitkVolumeVisualizationControls.ui.h</include>
-</includes>
 <signals>
     <signal>EnableRenderingToggled(bool)</signal>
     <signal>Choice(int)</signal>
@@ -1969,4 +1664,9 @@ Press delete to remove selected handle.</string>
     <slot>SetDefaultShadingValues()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>QmitkDataTreeComboBox.h</includehint>
+    <includehint>QmitkTransferFunctionWidget.h</includehint>
+    <includehint>QmitkTransferFunctionWidget.h</includehint>
+</includehints>
 </UI>

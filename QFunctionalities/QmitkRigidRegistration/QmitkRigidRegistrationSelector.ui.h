@@ -1221,12 +1221,12 @@ void QmitkRigidRegistrationSelector::setTransformParameters()
     
     m_TransformParameters->SetTransformInitializerOn(m_CenterForInitializerAffine->isChecked());
 
+
     mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
     initialTransform->SetIdentity();
     initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
     initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
     m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());
-
     m_TransformParameters->SetMomentsOn(m_MomentsAffine->isChecked());
    
   

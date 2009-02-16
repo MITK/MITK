@@ -51,17 +51,8 @@ namespace mitk {
       typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsKullbackLeiblerCompareHistogram();
       typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      if (VImageDimension == 2)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-      }
-      else if(VImageDimension == 3)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-        histogramSize[2] = nBins;
-      }
+      histogramSize[0] = nBins;
+      histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize(histogramSize);
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
@@ -71,17 +62,8 @@ namespace mitk {
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsCorrelationCoefficientHistogram();
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      if (VImageDimension == 2)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-      }
-      else if(VImageDimension == 3)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-        histogramSize[2] = nBins;
-      }
+      histogramSize[0] = nBins;
+      histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize(histogramSize);
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
@@ -91,17 +73,8 @@ namespace mitk {
       typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMeanSquaresHistogram();
       typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      if (VImageDimension == 2)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-      }
-      else if(VImageDimension == 3)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-        histogramSize[2] = nBins;
-      }
+      histogramSize[0] = nBins;
+      histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize(histogramSize);
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
@@ -111,17 +84,8 @@ namespace mitk {
       typename itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMutualInformationHistogram();
       typename itk::MutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      if (VImageDimension == 2)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-      }
-      else if(VImageDimension == 3)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-        histogramSize[2] = nBins;
-      }
+      histogramSize[0] = nBins;
+      histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize(histogramSize);
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();
@@ -131,17 +95,8 @@ namespace mitk {
       typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsNormalizedMutualInformationHistogram();
       typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      if (VImageDimension == 2)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-      }
-      else if(VImageDimension == 3)
-      {
-        histogramSize[0] = nBins;
-        histogramSize[1] = nBins;
-        histogramSize[2] = nBins;
-      }
+      histogramSize[0] = nBins;
+      histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize( histogramSize );
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();

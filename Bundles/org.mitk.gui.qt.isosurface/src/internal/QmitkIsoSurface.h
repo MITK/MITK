@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
   \brief IsoSurface
 
   \sa QmitkFunctionality
-  \ingroup org_mitk_gui_qt_measurement_internal
+  \ingroup org_mitk_gui_qt_isosurface_internal
   */
 class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctionality
 {

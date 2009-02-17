@@ -525,6 +525,7 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
     s_ColorMap.insert( std::make_pair( "elbow",               "0xe38686") );
     s_ColorMap.insert( std::make_pair( "eye",                 "0xe38686") );
     s_ColorMap.insert( std::make_pair( "fallopian tube",      "0xe38686") );
+    s_ColorMap.insert( std::make_pair( "fat",                 "0xebe770") );
     s_ColorMap.insert( std::make_pair( "hand",                "0xe38686") );
     s_ColorMap.insert( std::make_pair( "gall bladder",        "0x567f18") );
     s_ColorMap.insert( std::make_pair( "heart",               "0xeb1d32") );
@@ -632,4 +633,5 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   if(!node->GetProperty("visible"))
     node->SetVisibility(true);
 }
+
 

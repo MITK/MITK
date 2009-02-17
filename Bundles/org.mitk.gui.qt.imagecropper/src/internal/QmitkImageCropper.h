@@ -47,7 +47,6 @@ The image size is automatically reduced, if the cuboid is not rotated but parall
 The functionality owns a cuboid (m_CroppingObject) and the associated interactor (m_AffineInteractor),
 which implements moving and scaling the cuboid.
 
-\ingroup Functionalities
 */
 
 //!class QmitkImageCropper : public QmitkFunctionality, public mitk::OperationActor

@@ -42,7 +42,8 @@ mitk::DataStorage::~DataStorage()
   if(s_Instance.IsNotNull())
   {
     mitk::DataTreeStorage* dts = dynamic_cast<mitk::DataTreeStorage*>(s_Instance.GetPointer());
-    dts->m_DataTree->UnRegister();
+    if(dts)
+      dts->m_DataTree->UnRegister();
   }
 }
 

@@ -7,9 +7,9 @@ endif(COMMAND cmake_policy)
 
 # only configure dart here if not already configured in the 
 # parent directory
-IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
-INCLUDE(Dart)
-ENDIF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
+IF(MITK_ALL_BUILD)
+  INCLUDE(CTest)
+ENDIF(MITK_ALL_BUILD)
 
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/ToolExtensionHelpers.cmake)

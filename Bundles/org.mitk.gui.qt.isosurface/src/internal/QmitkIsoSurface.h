@@ -28,46 +28,43 @@ PURPOSE.  See the above copyright notices for more information.
 //class QmitkIsoSurfaceControls;
 
 /*!
-  \brief IsoSurface 
-
-  One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
-  and CreateAction(..) from QmitkFunctionality. 
+  \brief IsoSurface
 
   \sa QmitkFunctionality
-  \ingroup Functionalities
+  \ingroup org_mitk_gui_qt_measurement_internal
   */
 class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctionality
-{  
+{
   Q_OBJECT
 
-  public:  
-    /*!  
-      \brief default constructor  
-      */  
+  public:
+    /*!
+      \brief default constructor
+      */
     QmitkIsoSurface(QObject *parent=0, const char *name=0);
 
-    /*!  
-      \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
-      */  
+    /*!
+      \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
+      */
     //virtual QWidget * CreateControlWidget(QWidget *parent);
     virtual void CreateQtPartControl(QWidget *parent);
 
-    /*!  
-      \brief method for creating the applications main widget  
-      */  
+    /*!
+      \brief method for creating the applications main widget
+      */
     //virtual QWidget * CreateMainWidget(QWidget * parent);
 
-    /*!  
-      \brief method for creating the connections of main and control widget  
-      */  
+    /*!
+      \brief method for creating the connections of main and control widget
+      */
     virtual void CreateConnections();
 
-    /*!  
-      \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-      */  
+    /*!
+      \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+      */
     //virtual QAction * CreateAction(QActionGroup *parent);
 
-    protected slots:  
+    protected slots:
 
     virtual void DataStorageChanged();
 
@@ -76,21 +73,21 @@ class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctiona
      */
     void ImageSelected(const mitk::DataTreeNode::Pointer item);
 
-    /*!  
-      \brief method for creating a surface object  
-      */ 
+    /*!
+      \brief method for creating a surface object
+      */
     void CreateSurface();
 
-  protected:  
-    /*!  
-     * default main widget containing 4 windows showing 3   
-     * orthogonal slices of the volume and a 3d render window  
-     */  
+  protected:
+    /*!
+     * default main widget containing 4 windows showing 3
+     * orthogonal slices of the volume and a 3d render window
+     */
     //QmitkStdMultiWidget * m_MultiWidget;
 
-    /*!  
-     * controls containing sliders for scrolling through the slices  
-     */  
+    /*!
+     * controls containing sliders for scrolling through the slices
+     */
     Ui::QmitkIsoSurfaceControls * m_Controls;
 
     /*!
@@ -104,7 +101,7 @@ class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctiona
     float getThreshold();
 
     /*!
-     *  variable to count Surfaces and give it to name in DataTree 
+     *  variable to count Surfaces and give it to name in DataTree
      */
     int m_SurfaceCounter;
 

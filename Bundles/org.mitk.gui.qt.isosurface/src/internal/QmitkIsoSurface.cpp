@@ -1,21 +1,21 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 15417 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
-#include <QmitkIsoSurface.h>
+#include "QmitkIsoSurface.h"
 //#include <QmitkIsoSurfaceControls.h>//GUI
 //#include <isoSurface.xpm> //image
 
@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name)
-: QmitkFunctionality() , 
+: QmitkFunctionality() ,
   m_Controls(NULL),
   m_MitkImage(NULL),
   m_SurfaceCounter(0)
@@ -86,7 +86,7 @@ void QmitkIsoSurface::CreateConnections()
   if ( m_Controls )
   {
     connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode::Pointer)), this, SLOT(ImageSelected(const mitk::DataTreeNode::Pointer)) );
-    connect( m_Controls->createSurfacePushButton, SIGNAL(clicked()), this, SLOT(CreateSurface()) );  
+    connect( m_Controls->createSurfacePushButton, SIGNAL(clicked()), this, SLOT(CreateSurface()) );
   }
 }
 
@@ -119,15 +119,15 @@ void QmitkIsoSurface::CreateSurface()
     //Value Gauss
     //float gsDev = 1.5;
 
-    //Value for DecimatePro 
+    //Value for DecimatePro
     float targetReduction = 0.05;
 
     //ImageToSurface Instance
     mitk::DataTreeNode::Pointer node = m_Controls->m_ImageSelector->GetSelectedNode();
-    
+
     /*
     mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
-    
+
     iteratorOnImageToBeSkinExtracted = m_Controls->m_ImageSelector->GetFilter()->GetIteratorToSelectedItem();
     if(iteratorOnImageToBeSkinExtracted.IsNull())
     {
@@ -142,7 +142,7 @@ void QmitkIsoSurface::CreateSurface()
       return;
     }
 
-    filter->SetInput( m_MitkImage );  
+    filter->SetInput( m_MitkImage );
     filter->SetGaussianStandardDeviation( 0.5 );
     filter->SetUseGaussianImageSmooth( true );
     filter->SetThreshold( getThreshold()); //if( Gauss ) --> TH manipulated for vtkMarchingCube
@@ -156,12 +156,12 @@ void QmitkIsoSurface::CreateSurface()
       QApplication::restoreOverrideCursor();
       if(QMessageBox::question(NULL, "CAUTION!!!", "The number of polygons is greater than 2 000 000. If you continue, the program might crash. How do you want to go on?", "Proceed anyway!", "Cancel immediately! (maybe you want to insert an other threshold)!",QString::null,0 ,1)==1)
       {
-        
+
         return;
       }
           QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
     }
-    mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New(); 
+    mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New();
     surfaceNode->SetData( filter->GetOutput() );
 
     int layer = 0;
@@ -190,7 +190,7 @@ void QmitkIsoSurface::CreateSurface()
       }
     }
 
-    iteratorClone= iteratorOnImageToBeSkinExtracted;  
+    iteratorClone= iteratorOnImageToBeSkinExtracted;
     iteratorClone->Add(surfaceNode);
     iteratorClone->GetTree()->Modified();
     */

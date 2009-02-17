@@ -4,8 +4,8 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-02-12 15:50:11 +0100 (Do, 12 Feb 2009) $
-Version:   $Revision: 16259 $ 
- 
+Version:   $Revision: 16259 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -37,8 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 
-#if !defined(ISOSURFACE)
-  #define ISOSURFACE
+#if !defined(ISOSURFACE_EXPORTS)
+  #define ISOSURFACE_EXPORTS
 #endif
 
 #endif /*_ISOSURFACE_DLL_H_*/

@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStdMultiWidgetEditor.h>
 
 #include <mitkPointSetInteractor.h>
-#include "mitkQmitkMeasurementDll.h"
+#include "../mitkQmitkMeasurementDll.h"
 //!mm
 #include "ui_QmitkMeasurementControls.h"
 //!
@@ -40,7 +40,7 @@ class QmitkStdMultiWidget;
 Allows to measure distances, angles, etc.
 
 \sa QmitkFunctionality
-\ingroup Functionalities
+\ingroup org_mitk_gui_qt_measurement_internal
 */
 class MITK_QT_MEASUREMENT QmitkMeasurement : public QObject, public QmitkFunctionality
 {

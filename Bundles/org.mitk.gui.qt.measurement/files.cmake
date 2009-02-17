@@ -1,19 +1,17 @@
 SET(SRC_CPP_FILES
-  QmitkMeasurement.cpp
-  #QmitkMeasurementControls.cpp
+  
 )
 
 SET(INTERNAL_CPP_FILES
- 
+  QmitkMeasurement.cpp
 )
 
 SET(UI_FILES
-  src/QmitkMeasurementControls.ui
+  src/internal/QmitkMeasurementControls.ui
 )
 
 SET(MOC_H_FILES
-  src/QmitkMeasurement.h
-  #src/QmitkMeasurementControls.h
+  src/internal/QmitkMeasurement.h
 )
 
 SET(RES_FILES

@@ -1,5 +1,6 @@
 /**
   \defgroup org_mitk_gui_qt_measurement org.mitk.gui.qt.measurement Plugin
+  \ingroup MITKPlugins
 
   \brief This is the measurement plugin. 
   

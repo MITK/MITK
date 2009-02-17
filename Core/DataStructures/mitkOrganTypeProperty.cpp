@@ -73,6 +73,7 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
   AddEnum( "Elbow", newId++ );
   AddEnum( "Eye", newId++ );
   AddEnum( "Fallopian tube", newId++ );
+  AddEnum( "Fat", newId++ );
   AddEnum( "Gall bladder", newId++ );
   AddEnum( "Hand", newId++ );
   AddEnum( "Heart", newId++ );
@@ -112,4 +113,5 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
   AddEnum( "Vertebra", newId++ );
   AddEnum( "Wrist", newId++ );
 }
+
 

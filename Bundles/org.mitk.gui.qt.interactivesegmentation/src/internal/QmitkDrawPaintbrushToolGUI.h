@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkPaintbrushToolGUI.h"
 
 /**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::PaintbrushTool.
 
   This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.

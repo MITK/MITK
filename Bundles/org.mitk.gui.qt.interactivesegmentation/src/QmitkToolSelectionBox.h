@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2008-09-12 15:46:48 +0200 (Fr, 12 Sep 2008) $
-Version:   $Revision: 15236 $
- 
+Date:      $Date$
+Version:   $Revision$
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QmitkToolSelectionBox_h_Included
@@ -39,8 +39,8 @@ class QmitkToolGUI;
 
   \sa mitk::ToolManager
 
+  \ingroup org_mitk_gui_qt_interactivesegmentation
   \ingroup Reliver
-  \ingroup Widgets
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
@@ -48,14 +48,14 @@ class QmitkToolGUI;
   of toggle buttons. Each button show the identification of a Tool (icon and name).
   When a button's toggle state is "down", the tool is activated. When a different button
   is clicked, the active tool is switched. When you click an already active button, the
-  associated tool is deactivated with no replacement, which means that no tool is active 
+  associated tool is deactivated with no replacement, which means that no tool is active
   then.
 
   When this widget is enabled/disabled it (normally) also enables/disables the tools. There
-  could be cases where two QmitkToolSelectionBox widgets are associated to the same ToolManager, 
+  could be cases where two QmitkToolSelectionBox widgets are associated to the same ToolManager,
   but if this happens, please look deeply into the code.
 
-  Last contributor: $Author: maleike $
+  Last contributor: $Author$
 */
 //! mmueller
 //class QMITK_EXPORT QmitkToolSelectionBox : public QGroupBox
@@ -66,15 +66,15 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
   Q_OBJECT
 
   public:
- 
+
     enum EnabledMode { EnabledWithReferenceAndWorkingData, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
-    
+
     QmitkToolSelectionBox(QWidget* parent = 0);
     virtual ~QmitkToolSelectionBox();
 
     mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
-    
+
     /**
       You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
       as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is a match,
@@ -107,12 +107,12 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
     virtual void SetGenerateAccelerators(bool);
 
     virtual void SetToolGUIArea( QWidget* parentWidget );
-  
+
   protected slots:
 
     void toolButtonClicked(int id);
     void SetGUIEnabledAccordingToToolManagerState();
-  
+
   protected:
 
     void RecreateButtons();
@@ -121,7 +121,7 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
     mitk::ToolManager::Pointer m_ToolManager;
 
     bool m_SelfCall;
-    
+
     bool m_Enabled;
 
     std::string m_DisplayedGroups;
@@ -137,7 +137,7 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
 
     QWidget* m_ToolGUIWidget;
     QmitkToolGUI* m_LastToolGUI;
-    
+
     // store buttons in this group
     QButtonGroup* m_ToolButtonGroup;
     QGridLayout* m_ButtonLayout;

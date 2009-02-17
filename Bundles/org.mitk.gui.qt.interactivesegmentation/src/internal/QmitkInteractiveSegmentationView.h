@@ -10,8 +10,11 @@
 #include "mitkQtInteractiveSegmentationDll.h"
 #include "ui_QmitkInteractiveSegmentationControls.h"
 
+/**
+ * \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+ */
 class MITK_QT_INTERACTIVESEGMENTATION QmitkInteractiveSegmentationView : public QObject
-  , public QmitkFunctionality  
+  , public QmitkFunctionality
 {
   Q_OBJECT
 public:
@@ -36,7 +39,7 @@ public:
   void OnNodePropertiesChanged();
   void OnNewNodesGenerated();
 
-  protected slots:  
+  protected slots:
 
     void TreeChanged(const itk::EventObject &);
 

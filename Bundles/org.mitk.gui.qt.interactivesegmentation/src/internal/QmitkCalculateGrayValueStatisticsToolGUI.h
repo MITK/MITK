@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 #define QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 
-#include "QmitkToolGUI.h"
+#include "../QmitkToolGUI.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
 //!mm,added
@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 //!
 
 /**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::CalculateGrayValueStatisticsTool.
 
   Shows nothing. Only when the corresponding tool send a message that statistics are ready, this class pops up a window showing the results.

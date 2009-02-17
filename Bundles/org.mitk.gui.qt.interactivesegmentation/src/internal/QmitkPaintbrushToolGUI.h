@@ -16,44 +16,52 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkErasePaintbrushToolGUI_h_Included
-#define QmitkErasePaintbrushToolGUI_h_Included
+#ifndef QmitkPaintbrushToolGUI_h_Included
+#define QmitkPaintbrushToolGUI_h_Included
 
-#include "QmitkPaintbrushToolGUI.h"
+#include "../QmitkToolGUI.h"
+#include "mitkPaintbrushTool.h"
 
 //!mm,added
 #include "mitkQtInteractiveSegmentationDll.h"
 //!
 
-/**
-  \brief GUI for mitk::PaintbrushTool.
+class QSlider;
+class QLabel;
+class QFrame;
 
-  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
+/**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief GUI for mitk::PaintbrushTool.
+  \sa mitk::PaintbrushTool
+
+  This GUI shows a slider to change the pen's size.
 
   Last contributor: $Author$
 */
 //!mm
-//class QMITK_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+//class QMITK_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 //#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class MITK_QT_INTERACTIVESEGMENTATION QmitkPaintbrushToolGUI : public QmitkToolGUI
 //!
 {
   Q_OBJECT
 
   public:
     //!mm
-    //mitkClassMacro(QmitkErasePaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    //itkNewMacro(QmitkErasePaintbrushToolGUI);
+    //mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
     //#changed
-    cherryObjectMacro(QmitkErasePaintbrushToolGUI);
+    cherryObjectMacro(QmitkPaintbrushToolGUI);
     //!
 
     //!mm
     //#add
-    QmitkErasePaintbrushToolGUI();
+    QmitkPaintbrushToolGUI();
     //!
 
-    virtual ~QmitkErasePaintbrushToolGUI();
+    virtual ~QmitkPaintbrushToolGUI();
+
+    void OnSizeChanged(int current);
 
   signals:
 
@@ -61,12 +69,24 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkErasePaintbrushToolGUI : public Qmitk
 
   protected slots:
 
+    void OnNewToolAssociated(mitk::Tool*);
+
+    void OnSliderValueChanged(int value);
+
+    void VisualizePaintbrushSize(int size);
+
   protected:
 
     //!mm
     //#del
-    //QmitkErasePaintbrushToolGUI();
+    //QmitkPaintbrushToolGUI();
     //!
+
+    QSlider* m_Slider;
+    QLabel* m_SizeLabel;
+    QFrame* m_Frame;
+
+    mitk::PaintbrushTool::Pointer m_PaintbrushTool;
 };
 
 #endif

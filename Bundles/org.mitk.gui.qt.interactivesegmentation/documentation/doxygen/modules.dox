@@ -1,5 +1,6 @@
 /**
   \defgroup org_mitk_gui_qt_interactivesegmentation org.mitk.gui.qt.interactivesegmentation Plugin
+  \ingroup MITKPlugins
 
   \brief This is the interactive segmentation plugin. 
   

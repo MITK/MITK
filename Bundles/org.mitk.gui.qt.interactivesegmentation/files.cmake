@@ -1,33 +1,33 @@
 SET(SRC_CPP_FILES
-  QmitkInteractiveSegmentationView.cpp
   QmitkToolGUI.cpp
-  QmitkBinaryThresholdToolGUI.cpp
   #QmitkNewSegmentationDialog.cpp
   QmitkToolSelectionBox.cpp
-  QmitkCalculateGrayValueStatisticsToolGUI.cpp
-  QmitkDrawPaintbrushToolGUI.cpp
-  QmitkPaintbrushToolGUI.cpp
-  QmitkErasePaintbrushToolGUI.cpp
   #QmitkToolGUIArea.cpp
 )
 
 SET(INTERNAL_CPP_FILES
- 
+  QmitkInteractiveSegmentationView.cpp
+  QmitkBinaryThresholdToolGUI.cpp
+  QmitkCalculateGrayValueStatisticsToolGUI.cpp
+  QmitkDrawPaintbrushToolGUI.cpp
+  QmitkPaintbrushToolGUI.cpp
+  QmitkErasePaintbrushToolGUI.cpp
 )
 
 SET(UI_FILES
-  src/QmitkInteractiveSegmentationControls.ui
+  src/internal/QmitkInteractiveSegmentationControls.ui
 )
 
 SET(MOC_H_FILES
-  src/QmitkInteractiveSegmentationView.h
   src/QmitkToolGUI.h
-  src/QmitkBinaryThresholdToolGUI.h
   src/QmitkToolSelectionBox.h
-  src/QmitkCalculateGrayValueStatisticsToolGUI.h
-  src/QmitkDrawPaintbrushToolGUI.h
-  src/QmitkPaintbrushToolGUI.h
-  src/QmitkErasePaintbrushToolGUI.h
+  
+  src/internal/QmitkBinaryThresholdToolGUI.h
+  src/internal/QmitkInteractiveSegmentationView.h
+  src/internal/QmitkCalculateGrayValueStatisticsToolGUI.h
+  src/internal/QmitkDrawPaintbrushToolGUI.h
+  src/internal/QmitkPaintbrushToolGUI.h
+  src/internal/QmitkErasePaintbrushToolGUI.h
 )
 
 SET(RES_FILES

@@ -33,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
 
+  \ingroup org_mitk_gui_qt_interactivesegmentation
+
   Created through ITK object factory. TODO May be changed to a toolkit specific way later?
 
   Last contributor: $Author$

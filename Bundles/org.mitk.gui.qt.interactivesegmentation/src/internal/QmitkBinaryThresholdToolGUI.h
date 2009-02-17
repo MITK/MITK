@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
-Date:      $Date$
+Date:      $Date: 2008-08-01 14:25:23 +0200 (Fr, 01 Aug 2008) $
 Version:   $Revision: 1.0 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -16,51 +16,45 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkPaintbrushToolGUI_h_Included
-#define QmitkPaintbrushToolGUI_h_Included
+#ifndef QmitkBinaryThresholdToolGUI_h_Included
+#define QmitkBinaryThresholdToolGUI_h_Included
 
-#include "QmitkToolGUI.h"
-#include "mitkPaintbrushTool.h"
-
-//!mm,added
+#include "../QmitkToolGUI.h"
+#include "mitkBinaryThresholdTool.h"
+//! mmueller
 #include "mitkQtInteractiveSegmentationDll.h"
 //!
 
 class QSlider;
-class QLabel;
-class QFrame;
 
 /**
-  \brief GUI for mitk::PaintbrushTool.
-  \sa mitk::PaintbrushTool
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief GUI for mitk::BinaryThresholdTool.
 
-  This GUI shows a slider to change the pen's size.
+  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
 
   Last contributor: $Author$
 */
-//!mm
-//class QMITK_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
-//#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkPaintbrushToolGUI : public QmitkToolGUI
-//!
+class MITK_QT_INTERACTIVESEGMENTATION QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
     //!mm
-    //mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
+    //mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
+    //itkNewMacro(QmitkBinaryThresholdToolGUI);
     //#changed
-    cherryObjectMacro(QmitkPaintbrushToolGUI);
+    cherryObjectMacro(QmitkBinaryThresholdToolGUI);
     //!
 
     //!mm
     //#add
-    QmitkPaintbrushToolGUI();
+    QmitkBinaryThresholdToolGUI();
     //!
+    virtual ~QmitkBinaryThresholdToolGUI();
 
-    virtual ~QmitkPaintbrushToolGUI();
-
-    void OnSizeChanged(int current);
+    void OnThresholdingIntervalBordersChanged(int lower, int upper);
+    void OnThresholdingValueChanged(int current);
 
   signals:
 
@@ -71,21 +65,17 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkPaintbrushToolGUI : public QmitkToolG
     void OnNewToolAssociated(mitk::Tool*);
 
     void OnSliderValueChanged(int value);
-
-    void VisualizePaintbrushSize(int size);
+    void OnAcceptThresholdPreview();
 
   protected:
-
     //!mm
     //#del
-    //QmitkPaintbrushToolGUI();
+    //QmitkBinaryThresholdToolGUI();
     //!
 
     QSlider* m_Slider;
-    QLabel* m_SizeLabel;
-    QFrame* m_Frame;
 
-    mitk::PaintbrushTool::Pointer m_PaintbrushTool;
+    mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };
 
 #endif

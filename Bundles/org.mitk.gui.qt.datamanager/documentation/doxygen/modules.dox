@@ -1,5 +1,6 @@
 /**
   \defgroup org_mitk_gui_qt_datamanager org.mitk.gui.qt.datamanager Plugin
+  \ingroup MITKPlugins
 
   \brief This is the datamanager plugin. It provides means to query mitk::DataStorage objects and to change properties of the contained nodes.
   

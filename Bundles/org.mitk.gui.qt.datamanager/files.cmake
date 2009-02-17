@@ -1,13 +1,13 @@
 SET(SRC_CPP_FILES
-  QmitkDataManagerView.cpp
   #QmitkDataTreeNodeTableModel.cpp
 )
 
-SET(INTERNAL_CPP_FILES 
+SET(INTERNAL_CPP_FILES
+  QmitkDataManagerView.cpp 
 )
 
 SET(MOC_H_FILES
-  src/QmitkDataManagerView.h
+  src/internal/QmitkDataManagerView.h
   #src/QmitkDataTreeNodeTableModel.h  
 )
 

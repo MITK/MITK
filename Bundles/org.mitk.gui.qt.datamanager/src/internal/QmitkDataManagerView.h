@@ -6,7 +6,7 @@
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 
-#include "mitkQtDataManagerDll.h"
+#include "../mitkQtDataManagerDll.h"
 
 // Forward declarations
 class QComboBox;
@@ -19,6 +19,10 @@ class QTableView;
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
 
+/**
+ * \ingroup org_mitk_gui_qt_datamanager_internal
+ *
+ */
 class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT

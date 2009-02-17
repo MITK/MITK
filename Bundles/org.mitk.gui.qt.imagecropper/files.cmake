@@ -1,17 +1,17 @@
 SET(SRC_CPP_FILES
-  QmitkImageCropper.cpp
+  
 )
 
 SET(INTERNAL_CPP_FILES
- 
+  QmitkImageCropper.cpp
 )
 
 SET(UI_FILES
-  src/QmitkImageCropperControls.ui
+  src/internal/QmitkImageCropperControls.ui
 )
 
 SET(MOC_H_FILES
-  src/QmitkImageCropper.h
+  src/internal/QmitkImageCropper.h
   
 )
 

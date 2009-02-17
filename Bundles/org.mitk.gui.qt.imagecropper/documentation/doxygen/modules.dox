@@ -1,5 +1,6 @@
 /**
   \defgroup org_mitk_gui_qt_imagecropper org.mitk.gui.qt.imagecropper Plugin
+  \ingroup MITKPlugins
 
   \brief This is the image cropper plugin. It can crop images.
   

@@ -31,19 +31,20 @@ PURPOSE.  See the above copyright notices for more information.
 //!class QmitkStdMultiWidget;
 //!class QmitkImageCropperControls;
 #include "ui_QmitkImageCropperControls.h"
-#include "QmitkImageCropperDll.h"
+#include "../QmitkImageCropperDll.h"
 
 /*!
-\brief Functionality for cropping images with a cuboid 
+\ingroup org_mitk_gui_qt_imagecropper_internal
+\brief Functionality for cropping images with a cuboid
 
-This functionality lets the user select an image from the data tree, select an area of interest by placing 
+This functionality lets the user select an image from the data tree, select an area of interest by placing
 a cuboid object, and then crop the image, so that pixels from outside the cuboid will remove.
 
 The image size is automatically reduced, if the cuboid is not rotated but parallel to the image axes.
 
 \b Implementation
 
-The functionality owns a cuboid (m_CroppingObject) and the associated interactor (m_AffineInteractor), 
+The functionality owns a cuboid (m_CroppingObject) and the associated interactor (m_AffineInteractor),
 which implements moving and scaling the cuboid.
 
 \ingroup Functionalities
@@ -51,14 +52,14 @@ which implements moving and scaling the cuboid.
 
 //!class QmitkImageCropper : public QmitkFunctionality, public mitk::OperationActor
 class MITK_QT_IMAGECROPPER QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk::OperationActor
-{  
+{
 
-  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode) 
+  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode)
   /// and to two data sets (mitk::BaseData) instances
   class opExchangeNodes: public mitk::Operation
   {
-    public: opExchangeNodes( mitk::OperationType type,  mitk::DataTreeNode* node, 
-                                                        mitk::BaseData* oldData, 
+    public: opExchangeNodes( mitk::OperationType type,  mitk::DataTreeNode* node,
+                                                        mitk::BaseData* oldData,
                                                         mitk::BaseData* newData );
             mitk::DataTreeNode* GetNode() { return m_Node; }
             mitk::BaseData* GetOldData() { return m_OldData; }
@@ -69,61 +70,61 @@ class MITK_QT_IMAGECROPPER QmitkImageCropper : public QObject, public QmitkFunct
   };
 
 private:
-  
+
   Q_OBJECT
-  
-public:  
-  /*!  
-  \brief Constructor. Called by SampleApp (or other apps that use functionalities)  
-  */  
+
+public:
+  /*!
+  \brief Constructor. Called by SampleApp (or other apps that use functionalities)
+  */
   //!QmitkImageCropper(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
   QmitkImageCropper(QObject *parent=0);
 
-  /*!  
-  \brief Destructor  
-  */  
+  /*!
+  \brief Destructor
+  */
   virtual ~QmitkImageCropper();
 
-  /*!  
-  \brief Creates the Qt widget containing the functionality controls, like sliders, buttons etc.  
-  */  
+  /*!
+  \brief Creates the Qt widget containing the functionality controls, like sliders, buttons etc.
+  */
   //!virtual QWidget * CreateControlWidget(QWidget *parent);
   virtual void CreateQtPartControl(QWidget* parent);
 
-  /*!  
+  /*!
   \brief Should create the applications main widget. Not used here (maybe not clever).
-  */  
+  */
   //!virtual QWidget * CreateMainWidget(QWidget * parent);
 
-  /*!  
+  /*!
   \brief Creates the Qt connections needed
-  */  
+  */
   virtual void CreateConnections();
 
-  /*!  
-  \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-  */  
+  /*!
+  \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+  */
   //!virtual QAction * CreateAction(QActionGroup *parent);
 
-  /*!  
-  \brief Invoked when this functionality is selected by the application 
-  */  
+  /*!
+  \brief Invoked when this functionality is selected by the application
+  */
   virtual void Activated();
 
-  /*!  
-  \brief Invoked when the user leaves this functionality 
-  */  
+  /*!
+  \brief Invoked when the user leaves this functionality
+  */
   virtual void Deactivated();
 
-  /*!  
+  /*!
   \brief Invoked when the data tree changes
-  */  
+  */
   //!virtual void TreeChanged();
   virtual void DataStorageChanged();
 
-  /*!  
+  /*!
   \brief Filter function, used with the QmitkTreeNodeSelector widget to ensure, only images can be selected
-  */  
+  */
   static bool DataTreeNodeFilter(mitk::DataTreeNode*);
 
   /*
@@ -149,18 +150,18 @@ protected:
   //mitk::DataTree::Pointer m_DataTree;
   //mitk::DataTreeIteratorClone 	m_DataTreeIterator;
 
-  /*!  
-  * Default main widget containing 4 windows showing 3   
-  * orthogonal slices of the volume and a 3d render window  
-  */  
+  /*!
+  * Default main widget containing 4 windows showing 3
+  * orthogonal slices of the volume and a 3d render window
+  */
   //!QmitkStdMultiWidget* m_MultiWidget;
 
-  /*!  
+  /*!
   * Controls containing an image selection drop down, some usage information and a "crop" button
-  */  
+  */
   //!QmitkImageCropperControls* m_Controls;
   Ui::QmitkImageCropperControls * m_Controls;
-  
+
   /*!
   * \brief A pointer to the node of the image to be croped.
   */
@@ -180,12 +181,12 @@ protected:
   * \brief Tree node of the cuboid used for cropping.
   */
   mitk::DataTreeNode::Pointer m_CroppingObjectNode;
-  
+
   /*!
   * \brief Interactor for moving and scaling the cuboid
   */
   mitk::AffineInteractor::Pointer m_AffineInteractor;
- 
+
   /*!
    * \brief Creates the cuboid and its data tree node.
    */
@@ -195,7 +196,7 @@ protected:
    * \brief Finds the given node in the data tree and fits the cuboid to it
    */
   virtual void AddBoundingObjectToNode(mitk::DataTreeNode::Pointer node);
-  
+
   /*!
    * \brief Removes the cuboid from any node and hides it from the user.
    */

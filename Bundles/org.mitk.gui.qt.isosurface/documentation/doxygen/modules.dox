@@ -1,5 +1,6 @@
 /**
   \defgroup org_mitk_gui_qt_isosurface org.mitk.gui.qt.isosurface Plugin
+  \ingroup MITKPlugins
 
   \brief This is the isosurface plugin. 
   

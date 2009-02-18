@@ -1,0 +1,66 @@
+/**
+\page NewPluginPage How to create a new MITK Plugin
+
+\section CmakePluginGen CMake-based plugin generator
+The BundleGenerator is a tool to simplify the process of creating your own MITK plugin and integrating it into the MainApp.
+
+\par Introduction
+This howto will show you how to create a new MITK plugin. You will get a ready to use plugin which integrates into the MITK MainApp and which can be arbitrarily customized.
+Start by building a MainApp. If everything works you have to think about a name and an id for your new plugin and where you want
+to put the source code. The generator uses the CMake GUI for configuration.
+
+\par Limitations
+The CMake based generator will generate only very few classes for you. It can generate an Activator class and a View class for GUI contributions. 
+Nevertheless, you are advised to use it because it generates the correct plugin directory structure. In the future, there will be a more
+sophisticated generator available.
+
+\par Windows
+\li Start the CMake GUI
+\li Choose \c Build/Tools/BundleGenerator as source directory
+\li Choose a temporary directory as binary directory (create it if it doesn't exist)
+\li Press "Configure" and don't care about the generator
+\li Follow the steps for "All"
+
+\par Linux
+\li Create a temporary directory and cd into it. 
+\li Start <tt>ccmake</tt> with <tt>Build/Tools/BundleGenerator</tt> as source directory
+\li Press "Configure" 
+
+\par All
+\image html BundleGenerator1.png
+\li GUI_SUPPORT: you usually want to contribute to the UI, so leave this ON
+\li PLUGIN_ID: Enter an id for the new plugin. It must be a unique identifier, so the following form is recommended: \c my.domain.identifier.
+    MBI members should use an id similar to \c org.mitk.gui.qt.isosurface. 
+\li PLUGIN_TEMPLATE: Leave this as it is, unless you really know what you are doing.
+\li Press "Configure" again and you will get the following screen:
+
+\image html BundleGenerator2.png
+\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plugin. See cherry::IBundleActivator .
+\li PLUGIN_NAME: The name of your plugin in human-readable form. For example: MITK IsoSurface Plugin
+\li PLUGIN_VENDOR: The person or institution from which this plugin comes from. Change to your needs.
+\li PLUGIN_VERSION: The version number of your plugin. This will be used by the platform for managing plugin dependencies.
+\li REQUIRED_PLUGINS: The ids of plugins your plugin depends on. For now, you have to list also transitive dependencies (to get the include paths right). Usually you won't need to change something.
+\li VIEW_BASE_CLASS: The class from which your new view inherits from. Usually not changed.
+\li VIEW_BASE_CLASS_H: The header file for the base class of your new view. Usually not changed.
+\li VIEW_CLASS: The name of your new view (i.e. functionality) class.
+\li VIEW_ID: A unique id for your new view. Again, it is recommended to use something like my.domain.views.id.
+    MBI members should use an id similar to \c org.mitk.views.isosurface
+\li VIEW_NAME: The name of your view in human-readable form. This name will be shown in the UI of your application.
+\li Press "Configure" again, which will give the following screen:
+
+\image html BundleGenerator3.png
+
+If everything looks okay, press "Generate" and CMake will create a directory named <PLUGIN_ID> in your temporary directory.
+
+\par Integrating your new plugin
+Copy your new plugin from the temporary directory in your source tree.
+(Hint for MBI members: put it in \c mitk/Bundles or \c mbi-sb/Bundles !)
+
+Switch back to the configuration of your projects (MBI: MITK) build. On Windows you can just switch the "Where to build the binaries" combobox back 
+to your projects (MBI: MITKs) binary directory. After pressing "Configure" a new build option for your plugin should appear.
+
+\section BuildSystem Build system for plugins
+
+Just put new files in your plugins \c src or \c src/internal directory and edit the \c files.cmake file there.
+If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
+*/

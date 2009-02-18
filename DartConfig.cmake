@@ -3,17 +3,25 @@ OPTION(USE_KITWARE_DARTBOARD "Use the Kitware Dartboard for Build Submissions." 
 # internal cdash
 set(CTEST_PROJECT_NAME "MITK")
 set(CTEST_NIGHTLY_START_TIME "21:00:00 CET")
+set(NIGHTLY_START_TIME "21:00:00 CET")
 
 set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "mbits")
 set(CTEST_DROP_LOCATION "/cdash/submit.php?project=MITK")
 set(CTEST_DROP_SITE_CDASH TRUE)
+set(DROP_METHOD "http")
+set(DROP_SITE "mbits")
+set(DROP_LOCATION "/cdash/submit.php?project=MITK")
+
 
 # configure dart for submission to kitware
 IF(USE_KITWARE_DARTBOARD)
 #
 # Dart server to submit results (used by client)
 #
+    SET(DROP_METHOD "http")
+    SET(DROP_SITE "my.cdash.org")
+    SET(DROP_LOCATION "/submit.php?project=MITK")
     SET(CTEST_DROP_METHOD "http")
     SET(CTEST_DROP_SITE "my.cdash.org")
     SET(CTEST_DROP_LOCATION "/submit.php?project=MITK")

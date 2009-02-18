@@ -5,6 +5,7 @@ SET(DEFAULT_PLUGIN_VENDOR "DKFZ, Medical and Biological Informatics")
 SET(DEFAULT_VIEW_BASE_CLASS "QmitkFunctionality")
 SET(DEFAULT_VIEW_BASE_CLASS_H "QmitkFunctionality.h")
 SET(PROJECT_STATIC_VAR "MITK_STATIC")
+SET(DOXYGEN_INGROUP "MITKPlugins")
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit

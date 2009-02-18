@@ -92,6 +92,9 @@ STRING(REPLACE ";" "," REQUIRED_PLUGINS_MF "${REQUIRED_PLUGINS_MF}" )
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/META-INF/MANIFEST_TEMPLATE.MF ${PLUGIN_DIR}/META-INF/MANIFEST.MF @ONLY)
 
 # ----------------- documentation/doxygen/modulesTemplate.dox ------------
+IF(DOXYGEN_INGROUP)
+  SET(DOXYGEN_INGROUP_CMD "\\ingroup ${DOXYGEN_INGROUP}")
+ENDIF(DOXYGEN_INGROUP)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox 
                ${PLUGIN_DIR}/documentation/doxygen/modules.dox @ONLY)
 	

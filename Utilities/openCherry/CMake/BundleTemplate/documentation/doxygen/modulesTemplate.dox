@@ -1,5 +1,6 @@
 /**
   \defgroup @NormalizedPluginID@ @PLUGIN_ID@ Plugin
+  @DOXYGEN_INGROUP_CMD@
 
   \brief Describe your plugin here.
   

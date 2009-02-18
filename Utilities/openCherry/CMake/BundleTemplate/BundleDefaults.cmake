@@ -3,6 +3,7 @@ SET(DEFAULT_REQUIRED_BUNDLES "org.opencherry.osgi")
 SET(DEFAULT_VIEW_BASE_CLASS "cherry::QtViewPart")#qt
 SET(DEFAULT_VIEW_BASE_CLASS_H "cherryQtViewPart.h")#qt)
 SET(PROJECT_STATIC_VAR "CHERRY_STATIC")
+SET(DOXYGEN_INGROUP "openCherryPlugins")
 
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
  

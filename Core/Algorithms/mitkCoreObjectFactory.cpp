@@ -384,7 +384,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 }
 
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
+    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
     "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \

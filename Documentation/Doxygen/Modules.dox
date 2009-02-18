@@ -108,4 +108,8 @@
   \brief A couple of classes related to point based registration.
 */
 
-
+/**
+  \defgroup MITKPlugins MITK Plugins
+  
+  \brief This group includes all MITK Plugins
+*/

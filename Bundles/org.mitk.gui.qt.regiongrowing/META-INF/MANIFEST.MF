@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: MITK RegionGrowing Plugin
+Bundle-SymbolicName: org.mitk.gui.qt.regiongrowing
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.opencherry.ui.qt

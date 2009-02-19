@@ -1,0 +1,76 @@
+<ui version="4.0" >
+ <class>QmitkRegionGrowingControls</class>
+ <widget class="QWidget" name="QmitkRegionGrowingControls" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>222</width>
+    <height>541</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>QmitkRegionGrowing</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="m_TreeNodeSelector" />
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnRegionGrow" >
+     <property name="toolTip" >
+      <string>start dumb segmentation</string>
+     </property>
+     <property name="text" >
+      <string>Start region grower</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="textLabel1" >
+     <property name="text" >
+      <string>&lt;p align="center">To start select an input image&lt;br>then insert a seed point&lt;br>(&lt;i>shift + click&lt;/i>)&lt;/p></string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer1" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>220</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global" >QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="local" >QmitkTreeNodeSelector.h</include>
+ </includes>
+ <resources/>
+ <connections/>
+</ui>

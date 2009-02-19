@@ -3,7 +3,7 @@ SET(CMAKE_DEBUG_POSTFIX d)
 # POCO relies on the flags _DEBUG and NDEBUG to be set accordingly.
 # These are Microsoft specific flags and not automatically defined by gcc or
 # others, so we have to define them by ourselves.
-IF(CMAKE_BUILD_TYPE-MODIFIED EQUAL 1)
+IF(CMAKE_BUILD_TYPE)
 
   STRING(TOUPPER ${CMAKE_BUILD_TYPE} buildtype)
   IF(buildtype STREQUAL "DEBUG")
@@ -12,11 +12,12 @@ IF(CMAKE_BUILD_TYPE-MODIFIED EQUAL 1)
     SET(DEBUG_FLAG "-DNDEBUG")
   ENDIF(buildtype STREQUAL "DEBUG")
 
-ELSE(CMAKE_BUILD_TYPE-MODIFIED EQUAL 1)
+ELSE(CMAKE_BUILD_TYPE)
 
-  SET(DEBUG_FLAG "-D_DEBUG")
-
-ENDIF(CMAKE_BUILD_TYPE-MODIFIED EQUAL 1)
+  #SET(DEBUG_FLAG "-D_DEBUG")
+  #default build type is release
+  
+ENDIF(CMAKE_BUILD_TYPE)
 
 SET(POCO_UNIX_COMPILE_FLAGS "-D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE ${DEBUG_FLAG} -w")
 

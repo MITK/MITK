@@ -69,7 +69,7 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >QmitkTreeNodeSelector.h</include>
+  <include location="local" >QmitkDataStorageComboBox.h</include>
  </includes>
  <resources/>
  <connections/>

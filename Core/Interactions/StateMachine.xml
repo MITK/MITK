@@ -3397,7 +3397,7 @@
        <transition NAME="check position 2" NEXT_STATE_ID="0" EVENT_ID="530">
         <action ID="5000"/>
       </transition>
-      <transition NAME="change BoundingBox" NEXT_STATE_ID="3" EVENT_ID="1002">
+      <transition NAME="change BoundingBox" NEXT_STATE_ID="3" EVENT_ID="1013">
         <action ID="65"/>
       </transition>
       </transition>
@@ -3423,35 +3423,40 @@
         <action ID="5000"/>
       </transition>
       <transition NAME="add boundingboxinteractor" NEXT_STATE_ID="4" EVENT_ID="1">
-        <action ID="9"/>
+        <action ID="5003"/>
       </transition>
     </state>
     <state NAME="BoundingBox Resizing" ID="4" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="calculate result 2" NEXT_STATE_ID="0" EVENT_ID="23">
-        <action ID="44"/>
+        <action ID="5004"/>
       </transition>
     </state>
       </stateMachine>
   <stateMachine NAME="BoundingBox Interaction">
-    <state NAME="initial position check" ID="1"  START_STATE="TRUE" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
-      <transition NAME="nothing found" NEXT_STATE_ID="1" EVENT_ID="1003">
-        <action ID="65"/>
+    <state NAME="position check" ID="0"  START_STATE="TRUE" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="nothing found" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="0"/>
       </transition>
-      <transition NAME="determine BoundingBox Position" NEXT_STATE_ID="2" EVENT_ID="1004">
-        <action ID="48000"/>
+      <transition NAME="init resizing" NEXT_STATE_ID="1" EVENT_ID="1004">
+        <action ID="8"/>
       </transition>
-      <transition NAME="position check 1" NEXT_STATE_ID="1" EVENT_ID="520">
+      <transition NAME="position check" NEXT_STATE_ID="0" EVENT_ID="530">
         <action ID="5000"/>
       </transition>
-      <transition NAME="position check 2" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="39"/>
+    </state>
+    <state NAME="boundingbox resizing initialization" ID="1" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="init resizing" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="8"/>
       </transition>
     </state>
-    <state NAME="position determined" ID="2" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
-      <transition NAME="back to initial positioncheck" NEXT_STATE_ID="1" EVENT_ID="520">
-        <action ID="31"/>
+    <state NAME="boundingbox resizing" ID="2" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+     <transition NAME="resizing" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="92"/>
       </transition>
-      </state>
+      <transition NAME="back to position check" NEXT_STATE_ID="0" EVENT_ID="1">
+        <action ID="102"/>
+      </transition>
+    </state> 
     </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->

@@ -9,7 +9,7 @@ endif(COMMAND cmake_policy)
 # parent directory
 IF(NOT MITK_ALL_BUILD)
   INCLUDE(CTest)
-ENDIF(MITK_ALL_BUILD)
+ENDIF(NOT MITK_ALL_BUILD)
 
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/ToolExtensionHelpers.cmake)

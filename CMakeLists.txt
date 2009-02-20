@@ -7,7 +7,7 @@ endif(COMMAND cmake_policy)
 
 # only configure dart here if not already configured in the 
 # parent directory
-IF(MITK_ALL_BUILD)
+IF(NOT MITK_ALL_BUILD)
   INCLUDE(CTest)
 ENDIF(MITK_ALL_BUILD)
 

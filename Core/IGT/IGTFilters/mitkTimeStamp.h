@@ -24,6 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
+#include "mitkRealTimeClock.h"
+//#include "mitkTrackingDevice.h"
+
+//namespace Poco {
+//  class Timestamp;
+//}
 
 namespace mitk {
 
@@ -38,15 +44,46 @@ namespace mitk {
   class TimeStamp : public itk::Object
   {
   public:
+    
     mitkClassMacro(TimeStamp, itk::Object);
-    itkNewMacro(Self);
+    //itkNewMacro(Self);
+    
     static const TimeStamp* GetTimeStamp();
+
+    static TimeStamp* CreateInstance();
+
+    static TimeStamp* GetInstance();
+
+    void StartTracking( itk::Object::Pointer Device );
+
+    void StopTracking( itk::Object::Pointer Device );
+
+    double GetElapsed();
+
+    double GetOffset(itk::Object::Pointer Device);
+
+    void SetRealTimeClock(mitk::RealTimeClock::Pointer Clock);
  
   protected:
     TimeStamp();
+
     virtual ~TimeStamp();
 
+    double GetCurrentStamp();
+
     double m_Time;
+
+    double m_ReferenceTime;
+
+    int m_Devices;
+
+    mitk::RealTimeClock::Pointer m_RealTimeClock;
+
+    static mitk::TimeStamp::Pointer s_Instance;
+
+    std::map<itk::Object::Pointer, double> m_DeviceMap;
+
+    std::map<itk::Object::Pointer, double>::iterator m_MapIterator;    
   };
 } // namespace mitk
 

@@ -18,6 +18,7 @@
 #include <cherryTestingMacros.h>
 
 #include <cherryObject.h>
+#include <cstdlib>
 
 class TestObject: public cherry::Object
 {

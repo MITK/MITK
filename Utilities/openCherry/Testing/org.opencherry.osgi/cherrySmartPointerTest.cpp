@@ -22,6 +22,9 @@
 #include <cherrySmartPointer.h>
 #include <cherryWeakPointer.h>
 
+#include <typeinfo>
+#include <cstdlib>
+
 class TestObject : public cherry::Object
 {
 public:

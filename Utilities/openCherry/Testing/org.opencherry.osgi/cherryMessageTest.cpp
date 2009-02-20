@@ -18,6 +18,7 @@
 #include <cherryTestingMacros.h>
 
 #include <cherryMessage.h>
+#include <cstdlib>
 
 struct MessageReceiver
 {

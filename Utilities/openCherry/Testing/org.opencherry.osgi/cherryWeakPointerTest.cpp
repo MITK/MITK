@@ -20,6 +20,7 @@
 #include <cherryObject.h>
 #include <cherrySmartPointer.h>
 #include <cherryWeakPointer.h>
+#include <cstdlib>
 
 struct ObjectTest: public cherry::Object
 {

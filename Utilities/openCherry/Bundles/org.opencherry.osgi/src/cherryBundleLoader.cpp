@@ -441,6 +441,7 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
   catch (Poco::LibraryLoadException exc)
   {
     std::cout << "Could not create Plugin activator. Did you export the class \"" << activator << "\" ?\n";
+    std::cout << "  Exception displayText(): " << exc.displayText() << std::endl;
     exc.rethrow();
   }
 

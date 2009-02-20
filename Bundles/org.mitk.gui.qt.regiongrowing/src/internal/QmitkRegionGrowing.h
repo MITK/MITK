@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 
 #include "ui_QmitkRegionGrowingControls.h"
-#include "../regiongrowingDLL.h"
+#include "../regiongrowingDll.h"
 
 //class QmitkStdMultiWidget;
 //class QmitkRegionGrowingControls;

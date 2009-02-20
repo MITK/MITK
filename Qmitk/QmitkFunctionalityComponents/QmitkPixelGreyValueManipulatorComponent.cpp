@@ -43,6 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 #include <qstring.h>
 
+#include "itkBoundingBox.h"
+
 const char* NAMEFORBOUNDINGOBJECT = "Bounding Object for Pixel Manipulation";
 
 /***************       CONSTRUCTOR      ***************/
@@ -462,8 +464,25 @@ void QmitkPixelGreyValueManipulatorComponent::CreateBoundingBox(int boundingObje
         break;
     }
 
+    //Change Bounding Object Size by 1/3 of Image-Size for a easier catching of the bounding boxes in big images.
 
+    //calculate new boundingBox size
+    std::vector< double > newBoundingBoxSize;
+    newBoundingBoxSize.resize( 3 );
+    for( unsigned int i = 0; i < 3; i++ )
+      newBoundingBoxSize[0] = 0.0;
+    
+    typedef itk::BoundingBox<unsigned long, 3, mitk::ScalarType> BoundingBoxType;
+    BoundingBoxType::BoundsArrayType bounds = m_MitkImage->GetGeometry()->GetBoundingBox()->GetBounds();
+    
+    newBoundingBoxSize[0] = ( bounds[1] - bounds[0] ) * 0.33;
+    newBoundingBoxSize[1] = ( bounds[3] - bounds[2] ) * 0.33;
+    newBoundingBoxSize[2] = ( bounds[5] - bounds[4] ) * 0.33;
 
+    //increase Bounding object
+    m_BoundingObject->GetGeometry()->SetExtentInMM( 0, newBoundingBoxSize[0] );
+    m_BoundingObject->GetGeometry()->SetExtentInMM( 1, newBoundingBoxSize[1] );
+    m_BoundingObject->GetGeometry()->SetExtentInMM( 2, newBoundingBoxSize[2] );
 
     if(!m_BoundingObjectGroup)
     {

@@ -134,8 +134,15 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
   ENDFOREACH(_dep ${_plugin_dependencies})
   
   # iterator over all dependencies
+  SET(_plugins_turned_off )
   FOREACH(_dep ${_plugin_depends_all})
   
+    # collect the ids of plugins we will have to build
+    IF(NOT BUILD_${_dep})
+      LIST(APPEND _plugins_turned_off ${_dep})
+    ENDIF(NOT BUILD_${_dep})
+    
+    # set include and link directories
     SET(_dep_src_dir )
     SET(_dep_bin_dir )
     _MACRO_FIND_PLUGIN_SRC_DIR(_dep_src_dir ${_dep})
@@ -152,7 +159,10 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
     ENDIF(EXISTS ${_dep_src_dir}/includes.cmake)
     
   ENDFOREACH(_dep ${_plugin_depends_all})
-    
+  
+  IF(_plugins_turned_off)
+    MESSAGE(SEND_ERROR "Unmet dependencies: The plugin ${_FIND_DEPS_PLUGIN_NAME} depends on the following plugins:\n${_plugins_turned_off}.\nSwitch them on in order to build ${_FIND_DEPS_PLUGIN_NAME}.") 
+  ENDIF(_plugins_turned_off)
   
 ENDMACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES)
 

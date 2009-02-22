@@ -15,7 +15,7 @@
 
  =========================================================================*/
 
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIExtensionPointService.h>
 
 #include "cherryEditorRegistry.h"
 

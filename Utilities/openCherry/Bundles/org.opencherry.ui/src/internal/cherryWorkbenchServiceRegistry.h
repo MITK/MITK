@@ -23,8 +23,8 @@
 #include "../cherryAbstractSourceProvider.h"
 #include "../services/cherryIServiceFactory.h"
 
-#include <service/cherryIExtensionPoint.h>
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIExtensionPoint.h>
+#include <cherryIConfigurationElement.h>
 
 #include <vector>
 

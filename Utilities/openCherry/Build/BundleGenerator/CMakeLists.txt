@@ -48,7 +48,7 @@ ENDIF(GUI_SUPPORT)
 
 SET(_required_bundles ${DEFAULT_REQUIRED_BUNDLES})
 IF(GUI_SUPPORT)
-  SET(_required_bundles ${_required_bundles} org.opencherry.ui org.opencherry.ui.qt)
+  SET(_required_bundles ${DEFAULT_REQUIRED_BUNDLES_FOR_GUI})
 ENDIF(GUI_SUPPORT)
 SET(REQUIRED_PLUGINS ${_required_bundles} CACHE STRING "a semicolon-separated list of required plugins (optional)")
 
@@ -97,7 +97,9 @@ IF(DOXYGEN_INGROUP)
 ENDIF(DOXYGEN_INGROUP)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox 
                ${PLUGIN_DIR}/documentation/doxygen/modules.dox @ONLY)
-	
+               
+# ----------------- resources directory ---------------------------------
+FILE(MAKE_DIRECTORY ${PLUGIN_DIR}/resources)
 
 # -------------------- BundleDllTemplate.h -------------------------------
 IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
@@ -150,15 +152,10 @@ IF(VIEW_CLASS)
 ENDIF(VIEW_CLASS)
 
 # ---------------------- CMakeListsTemplate.txt -----------------------------
-SET(CREATE_PLUGIN_MACRO "CREATE_PLUGIN()")
+SET(CREATE_PLUGIN_MACRO "${DEFAULT_CREATE_PLUGIN_MACRO}")
 IF(GUI_SUPPORT)
-  SET(CREATE_PLUGIN_MACRO "CREATE_QT_PLUGIN()")
+  SET(CREATE_PLUGIN_MACRO "${DEFAULT_CREATE_GUI_PLUGIN_MACRO}")
 ENDIF(GUI_SUPPORT)
-
-SET(REQUIRED_PLUGINS_CMAKE)
-FOREACH(_plugin ${REQUIRED_PLUGINS})
-  SET(REQUIRED_PLUGINS_CMAKE "${REQUIRED_PLUGINS_CMAKE} ${_plugin}")
-ENDFOREACH(_plugin ${REQUIRED_PLUGINS})
 
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/CMakeListsTemplate.txt ${PLUGIN_DIR}/CMakeLists.txt @ONLY)
 	

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryHandlerUtil.h"
 
 #include <cherryIEvaluationContext.h>
-#include <common/cherryCommandExceptions.h>
+#include <cherryCommandExceptions.h>
 
 #include "../cherryISources.h"
 

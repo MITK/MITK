@@ -35,14 +35,13 @@ bool HandleObject::operator==(const Object* object) const
   }
 
   // Check if they're the same type.
-  if (typeid(object) != typeid(this))
+  if (const Self* o = dynamic_cast<const Self*>(object))
   {
-    return false;
+    // Check each property in turn.
+    return (id == o->id);
   }
 
-  // Check each property in turn.
-  const HandleObject* handle = dynamic_cast<const HandleObject*>(object);
-  return (id == handle->id);
+  return false;
 }
 
 std::string HandleObject::GetId() const

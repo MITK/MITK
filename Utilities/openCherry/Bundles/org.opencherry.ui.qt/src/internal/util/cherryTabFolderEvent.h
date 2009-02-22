@@ -18,7 +18,7 @@
 #ifndef CHERRYTABFOLDEREVENT_H_
 #define CHERRYTABFOLDEREVENT_H_
 
-#include <presentations/cherryIStackPresentationSite.h>
+#include <cherryIStackPresentationSite.h>
 
 #include <QPoint>
 

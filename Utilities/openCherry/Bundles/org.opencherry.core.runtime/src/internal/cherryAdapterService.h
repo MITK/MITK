@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYADAPTERMANAGER_H_
 #define CHERRYADAPTERMANAGER_H_
 
-#include <service/cherryService.h>
+#include <cherryService.h>
 
 #include "../cherryIAdapterManager.h"
 #include "../cherryIAdapterFactory.h"

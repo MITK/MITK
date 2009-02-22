@@ -19,7 +19,7 @@
 #include "cherryAbstractTabItem.h"
 
 #include <cherryConstants.h>
-#include <presentations/cherryIStackPresentationSite.h>
+#include <cherryIStackPresentationSite.h>
 
 namespace cherry
 {

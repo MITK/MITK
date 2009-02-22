@@ -17,7 +17,7 @@
 
 #include "cherryViewReference.h"
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 
 #include "../cherryUIException.h"
 #include "../tweaklets/cherryWorkbenchPageTweaklet.h"

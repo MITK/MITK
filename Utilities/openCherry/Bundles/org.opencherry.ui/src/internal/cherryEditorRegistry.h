@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYEDITORREGISTRY_H_
 #define CHERRYEDITORREGISTRY_H_
 
-#include <service/cherryIExtensionPoint.h>
+#include <cherryIExtensionPoint.h>
 
 #include "../cherryIEditorRegistry.h"
 #include "../cherryIFileEditorMapping.h"

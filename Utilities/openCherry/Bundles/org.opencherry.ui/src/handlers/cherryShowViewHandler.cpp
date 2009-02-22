@@ -26,8 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../tweaklets/cherryWorkbenchTweaklet.h"
 #include "../dialogs/cherryIShowViewDialog.h"
 
-#include <cherryObjectString.h>
-#include <common/cherryCommandExceptions.h>
+#include <cherryCommandExceptions.h>
 
 #include <vector>
 
@@ -58,7 +57,6 @@ Object::Pointer ShowViewHandler::Execute(
   {
     try
     {
-      //std::string viewId(value.Cast<ObjectString>()->c_str());
       this->OpenView(value, window);
     }
     catch (PartInitException e)

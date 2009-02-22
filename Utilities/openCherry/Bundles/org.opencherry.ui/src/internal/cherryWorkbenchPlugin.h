@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Path.h>
 
-#include <service/cherryIExtensionPoint.h>
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIExtensionPoint.h>
+#include <cherryIExtensionPointService.h>
 #include <cherryPlatform.h>
 
 #include "../cherryAbstractUIPlugin.h"

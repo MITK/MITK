@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKWORKBENCHADVISOR_H_
 #define QMITKWORKBENCHADVISOR_H_
 
-#include <application/cherryQtWorkbenchAdvisor.h>
+#include <cherryQtWorkbenchAdvisor.h>
 
 class QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
 {

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPARTSITE_H_
 #define CHERRYPARTSITE_H_
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 
 #include "cherryServiceLocator.h"
 

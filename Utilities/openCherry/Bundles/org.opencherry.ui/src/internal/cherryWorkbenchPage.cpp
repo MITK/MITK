@@ -37,7 +37,7 @@
 #include "../cherryPlatformUI.h"
 #include "../cherryPartPane.h"
 
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIExtensionPointService.h>
 #include <cherryPlatform.h>
 
 namespace cherry

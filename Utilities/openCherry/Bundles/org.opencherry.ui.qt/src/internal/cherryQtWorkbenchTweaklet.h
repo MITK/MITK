@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTWORKBENCHTWEAKLET_H_
 #define CHERRYQTWORKBENCHTWEAKLET_H_
 
-#include <tweaklets/cherryWorkbenchTweaklet.h>
+#include <cherryWorkbenchTweaklet.h>
 
 #include "../cherryUiQtDll.h"
 

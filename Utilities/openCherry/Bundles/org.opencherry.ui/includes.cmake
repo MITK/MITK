@@ -1,0 +1,10 @@
+SET(ADDITIONAL_INCLUDE_DIRECTORIES
+  src/application
+  src/commands
+  src/dialogs
+  src/guitk
+  src/handlers
+  src/presentations
+  src/services
+  src/tweaklets
+)

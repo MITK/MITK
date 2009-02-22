@@ -3,4 +3,4 @@ Bundle-Name: MITK Hello World Plugin
 Bundle-SymbolicName: org.mitk.gui.qt.helloworld
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.ui.qt
+Require-Bundle: org.mitk.gui.qt.common

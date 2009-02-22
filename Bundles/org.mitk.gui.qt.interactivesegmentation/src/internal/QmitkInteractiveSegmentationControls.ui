@@ -69,7 +69,7 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="../resources.qrc" >
+         <iconset resource="../../resources.qrc" >
           <normaloff>:/resources/btnReinit.xpm</normaloff>:/resources/btnReinit.xpm</iconset>
         </property>
        </widget>
@@ -228,7 +228,7 @@
            <string>New segmentation</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >
+           <iconset resource="../../resources.qrc" >
             <normaloff>:/resources/btnNew.xpm</normaloff>:/resources/btnNew.xpm</iconset>
           </property>
          </widget>
@@ -251,7 +251,7 @@
            <string>Delete selected segmentations</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >
+           <iconset resource="../../resources.qrc" >
             <normaloff>:/resources/btnDelete.xpm</normaloff>:/resources/btnDelete.xpm</iconset>
           </property>
          </widget>
@@ -274,7 +274,7 @@
            <string>Load segmentation from file</string>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >
+           <iconset resource="../../resources.qrc" >
             <normaloff>:/resources/btnLoad.xpm</normaloff>:/resources/btnLoad.xpm</iconset>
           </property>
          </widget>
@@ -297,7 +297,7 @@
            <string/>
           </property>
           <property name="icon" >
-           <iconset resource="../resources.qrc" >
+           <iconset resource="../../resources.qrc" >
             <normaloff>:/resources/btnSave.xpm</normaloff>:/resources/btnSave.xpm</iconset>
           </property>
          </widget>
@@ -439,19 +439,15 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >QmitkToolReferenceDataSelectionBox.h</include>
-  <include location="local" >QmitkToolGUIArea.h</include>
-  <include location="local" >QmitkToolSelectionBox.h</include>
-  <include location="local" >QmitkToolWorkingDataSelectionBox.h</include>
-  <include location="local" >QmitkToolGUIArea.h</include>
-  <include location="local" >QmitkToolSelectionBox.h</include>
-  <include location="local" >QmitkToolSelectionBox.h</include>
-  <include location="local" >QmitkToolGUIArea.h</include>
-  <include location="local" >QmitkSlicesInterpolator.h</include>
+  <include location="global" >QmitkToolReferenceDataSelectionBox.h</include>
+  <include location="global" >QmitkToolGUIArea.h</include>
+  <include location="global" >QmitkToolSelectionBox.h</include>
+  <include location="global" >QmitkToolWorkingDataSelectionBox.h</include>
+  <include location="global" >QmitkSlicesInterpolator.h</include>
  </includes>
  <resources>
-  <include location="../resources.qrc" />
-  <include location="../resources.qrc" />
+  <include location="../../resources.qrc" />
+  <include location="../../resources.qrc" />
  </resources>
  <connections/>
 </ui>

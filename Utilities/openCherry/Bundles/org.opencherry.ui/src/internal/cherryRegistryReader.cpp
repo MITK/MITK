@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIExtensionPointService.h>
 
 #include "cherryRegistryReader.h"
 

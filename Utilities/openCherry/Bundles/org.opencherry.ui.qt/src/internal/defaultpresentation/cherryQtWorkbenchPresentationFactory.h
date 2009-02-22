@@ -18,7 +18,7 @@
 #ifndef CHERRYQTWORKBENCHPRESENTATIONFACTORY_H_
 #define CHERRYQTWORKBENCHPRESENTATIONFACTORY_H_
 
-#include <presentations/cherryIPresentationFactory.h>
+#include <cherryIPresentationFactory.h>
 
 namespace cherry
 {

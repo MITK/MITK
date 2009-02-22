@@ -19,8 +19,8 @@
 #ifndef CHERRYTABORDER_H_
 #define CHERRYTABORDER_H_
 
-#include <presentations/cherryIPresentablePart.h>
-#include <presentations/cherryIPresentationSerializer.h>
+#include <cherryIPresentablePart.h>
+#include <cherryIPresentationSerializer.h>
 #include <cherryIMemento.h>
 
 namespace cherry {

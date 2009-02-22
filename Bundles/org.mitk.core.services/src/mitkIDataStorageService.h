@@ -1,7 +1,7 @@
 #ifndef MITKIDATASTORAGESERVICE_H_
 #define MITKIDATASTORAGESERVICE_H_
 
-#include <service/cherryService.h>
+#include <cherryService.h>
 
 #include "mitkCoreServicesPluginDll.h"
 #include "mitkIDataStorageReference.h"

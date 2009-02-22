@@ -23,8 +23,8 @@
 #include <map>
 
 #include <cherryObject.h>
-#include <service/cherryIConfigurationElement.h>
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIConfigurationElement.h>
+#include <cherryIExtensionPointService.h>
 #include <cherryPlatform.h>
 
 #include "../cherryUiDll.h"

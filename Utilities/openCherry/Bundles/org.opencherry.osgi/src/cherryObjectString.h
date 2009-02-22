@@ -32,11 +32,11 @@ namespace cherry {
 
 //EXPORT_TEMPLATE template class CHERRY_OSGI std::basic_string<char, std::char_traits<char>, std::allocator<char> >;
 
-class ObjectString : std::string, public Object
+class ObjectString : public std::string, public Object
 {
 public:
   cherryObjectMacro(ObjectString);
-  
+
   ObjectString() {}
   ObjectString(const std::string& s) : std::string(s) {}
 

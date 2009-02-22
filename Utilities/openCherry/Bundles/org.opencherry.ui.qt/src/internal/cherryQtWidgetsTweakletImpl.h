@@ -23,7 +23,7 @@
 
 #include <cherryRectangle.h>
 #include <cherryShell.h>
-#include <guitk/cherryGuiTkISelectionListener.h>
+#include <cherryGuiTkISelectionListener.h>
 
 #include <QMetaType>
 

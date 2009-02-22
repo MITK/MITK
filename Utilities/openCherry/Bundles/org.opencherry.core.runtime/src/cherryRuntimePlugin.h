@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryPlugin.h>
 #include <cherryIBundleContext.h>
-#include <event/cherryPlatformEvent.h>
+#include <cherryPlatformEvent.h>
 
 #include "cherryRuntimeDll.h"
 

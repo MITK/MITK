@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPERSPECTIVEDESCRIPTOR_H_
 #define CHERRYPERSPECTIVEDESCRIPTOR_H_
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 
 #include "../cherryIPerspectiveDescriptor.h"
 #include "../cherryIPerspectiveFactory.h"

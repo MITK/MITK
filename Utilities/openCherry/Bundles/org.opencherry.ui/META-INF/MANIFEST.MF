@@ -3,5 +3,5 @@ Bundle-Name: Cherry User Interface Plugin
 Bundle-SymbolicName: org.opencherry.ui
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.osgi, org.opencherry.core.commands, org.opencherry.core.runtime 
+Require-Bundle: org.opencherry.osgi, org.opencherry.core.commands, org.opencherry.core.expressions
 Bundle-Activator: cherry::WorkbenchPlugin

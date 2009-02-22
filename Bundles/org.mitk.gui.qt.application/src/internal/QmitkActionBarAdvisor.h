@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKACTIONBARADVISOR_H_
 #define QMITKACTIONBARADVISOR_H_
 
-#include <application/cherryActionBarAdvisor.h>
+#include <cherryActionBarAdvisor.h>
 
 class QmitkActionBarAdvisor : public cherry::ActionBarAdvisor
 {

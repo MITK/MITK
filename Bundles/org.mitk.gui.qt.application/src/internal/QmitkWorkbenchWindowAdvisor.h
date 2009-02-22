@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKWORKBENCHWINDOWADVISOR_H_
 #define QMITKWORKBENCHWINDOWADVISOR_H_
 
-#include <application/cherryWorkbenchWindowAdvisor.h>
+#include <cherryWorkbenchWindowAdvisor.h>
 
 class QmitkWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
 {

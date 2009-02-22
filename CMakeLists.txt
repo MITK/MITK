@@ -40,6 +40,7 @@ ADD_SUBDIRECTORY(Utilities)
 
 IF(BUILD_OPENCHERRY)
   INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
+  INCLUDE(CMake/MITKPluginHelpers.cmake)
 ENDIF(BUILD_OPENCHERRY)
 
 IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)

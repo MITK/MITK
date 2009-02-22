@@ -21,7 +21,7 @@
 
 #include "../cherryUiQtDll.h"
 
-#include <application/cherryWorkbenchAdvisor.h>
+#include <cherryWorkbenchAdvisor.h>
 
 namespace cherry
 {

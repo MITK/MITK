@@ -3,4 +3,4 @@ Bundle-Name: MITK DataManager Plugin
 Bundle-SymbolicName: org.mitk.gui.qt.datamanager
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.ui.qt
+Require-Bundle: org.mitk.gui.qt.common

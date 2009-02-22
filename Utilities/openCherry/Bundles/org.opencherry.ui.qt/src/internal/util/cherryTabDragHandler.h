@@ -19,7 +19,7 @@
 #ifndef CHERRYTABDRAGHANDLER_H_
 #define CHERRYTABDRAGHANDLER_H_
 
-#include <presentations/cherryStackDropResult.h>
+#include <cherryStackDropResult.h>
 
 #include <QWidget>
 #include <QPoint>

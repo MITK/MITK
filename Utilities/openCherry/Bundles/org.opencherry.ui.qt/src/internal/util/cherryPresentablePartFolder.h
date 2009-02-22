@@ -24,7 +24,7 @@
 
 #include <cherryIShellListener.h>
 #include <cherryIPropertyChangeListener.h>
-#include <guitk/cherryGuiTkIControlListener.h>
+#include <cherryGuiTkIControlListener.h>
 #include <list>
 
 namespace cherry

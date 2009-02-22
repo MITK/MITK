@@ -58,10 +58,17 @@ BundleDirectory::GetResource(const std::string& path) const
 void
 BundleDirectory::List(const std::string& path, std::vector<std::string>& files) const
 {
-  Poco::Path fullPath(m_RootPath);
-  fullPath.append(path);
-  Poco::File file(fullPath);
-  file.list(files);
+  try
+  {
+    Poco::Path fullPath(m_RootPath);
+    fullPath.append(path);
+    Poco::File file(fullPath);
+    file.list(files);
+  }
+  catch (Poco::FileNotFoundException& exc)
+  {
+    std::cout << "Warning: " << exc.displayText() << std::endl;
+  }
 }
 
 bool BundleDirectory::IsDirectory(const std::string& path) const

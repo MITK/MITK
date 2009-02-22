@@ -1,0 +1,125 @@
+# MACRO_CREATE_PLUGIN()
+# 
+# Creates the current plugin.
+# This macro should be called from the plugins CMakeLists.txt file. The plugin
+# library is build in a subdirectory of PLUGIN_OUTPUT_DIR, which is derived from
+# the variable PLUGIN_OUTPUT_BASE_DIR coming from COLLECT_PLUGINS(). 
+# The target name is available as PLUGIN_TARGET
+# to add additional libraries in your CMakeLists.txt. Include paths and link
+# libraries are set depending on the value of the Required-Bundles header 
+# in your plugins MANIFEST.MF file.
+#
+# Available variables:
+#
+# - PLUGIN_OUTPUT_DIR the binary output directory of your plugin
+# - PLUGIN_TARGET the target name of your plugins dll
+# - all entries in your MANIFEST.MF file are accessible with their header
+#   in uppercase letters as the variable name
+#
+#
+MACRO(MACRO_CREATE_PLUGIN)
+
+  IF(MSVC80)
+    ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS)
+  ENDIF(MSVC80)
+  
+  #_MACRO_CREATE_PLUGIN_NAME(PLUGIN_NAME 
+  #                          INPUT ${CMAKE_CURRENT_SOURCE_DIR}
+  #                          BASEDIR ${PLUGINS_SOURCE_BASE_DIR})
+  
+  MACRO_PARSE_MANIFEST(${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF)
+  
+  
+  MESSAGE(STATUS "Creating plugin ${BUNDLE-SYMBOLICNAME}")
+  
+  STRING(REPLACE . _ PLUGIN_TARGET ${BUNDLE-SYMBOLICNAME})
+  
+  IF(NOT PLUGIN_CPP_FILES)
+    MESSAGE(STATUS "Using files.cmake for plugin ${BUNDLE-SYMBOLICNAME}")
+    INCLUDE(files.cmake)
+    
+    SET(PLUGIN_CPP_FILES ${CPP_FILES})
+    SET(PLUGIN_MOC_H_FILES ${MOC_H_FILES})
+    SET(PLUGIN_UI_FILES ${UI_FILES})
+    SET(PLUGIN_RES_FILES ${RES_FILES})
+    SET(PLUGIN_H_FILES ${H_FILES})
+    
+  ELSE(NOT PLUGIN_CPP_FILES)
+    MESSAGE(STATUS "Using PLUGIN_CPP_FILES for plugin ${BUNDLE-SYMBOLICNAME}")
+  ENDIF(NOT PLUGIN_CPP_FILES)
+  
+  SET(PLUGIN_OUTPUT_DIR ${PLUGINS_OUTPUT_BASE_DIR}/${BUNDLE-SYMBOLICNAME})
+  
+  FILE(MAKE_DIRECTORY ${PLUGIN_OUTPUT_DIR})
+  
+  # Copy the META-INF directory into the binary output dir
+  SET (LIBRARY_OUTPUT_PATH ${PLUGIN_OUTPUT_DIR}/bin)
+  SOURCE_GROUP("Plugin META Files" FILES ${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF)
+  SET (PLUGIN_META_FILES ${PLUGIN_META_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF ${PLUGIN_OUTPUT_DIR}/META-INF/MANIFEST.MF COPYONLY)
+  
+  # Copy the plugin.xml into the binary output dir
+  SET(PLUGINXML ${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml)
+  IF(EXISTS ${PLUGINXML})
+    SOURCE_GROUP("Plugin META Files" FILES ${PLUGINXML})
+    SET (PLUGIN_META_FILES ${PLUGIN_META_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml)
+    CONFIGURE_FILE(${PLUGINXML} ${PLUGIN_OUTPUT_DIR}/plugin.xml COPYONLY)
+  ENDIF(EXISTS ${PLUGINXML})
+
+  SET(PLUGIN_GENERATED_FILES "")
+  IF(PLUGIN_UI_FILES)
+    QT4_WRAP_UI(PLUGIN_GENERATED_FILES ${PLUGIN_UI_FILES})
+  ENDIF(PLUGIN_UI_FILES)
+  IF(PLUGIN_MOC_H_FILES)
+    QT4_WRAP_CPP(PLUGIN_GENERATED_FILES ${PLUGIN_MOC_H_FILES})
+  ENDIF(PLUGIN_MOC_H_FILES)
+  IF(PLUGIN_RES_FILES)
+    QT4_ADD_RESOURCES(PLUGIN_GENERATED_FILES ${PLUGIN_RES_FILES})
+  ENDIF(PLUGIN_RES_FILES)
+  
+  
+  INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
+  _MACRO_SETUP_PLUGIN_DEPENDENCIES(_linklibs PLUGIN_NAME ${BUNDLE-SYMBOLICNAME})
+  
+  MACRO_ORGANIZE_SOURCES(INPUT ${PLUGIN_CPP_FILES} 
+                         ${PLUGIN_UI_FILES} 
+                         ${PLUGIN_MOC_H_FILES}
+                         ${PLUGIN_RES_FILES}
+                         ${PLUGIN_H_FILES}
+                         GENERATED ${PLUGIN_GENERATED_FILES})
+                         
+  SET(_all_target_files
+      ${PLUGIN_CPP_FILES} 
+      ${PLUGIN_UI_FILES} 
+      ${PLUGIN_MOC_H_FILES}
+      ${PLUGIN_RES_FILES}
+      ${PLUGIN_H_FILES}
+      ${PLUGIN_GENERATED_FILES}
+      ${GLOBBED_DOX_FILES}
+      ${PLUGIN_META_FILES}
+      ${CORRESPONDING__H_FILES}
+      ${CORRESPONDING__TXX_FILES}
+      )
+  
+  ADD_LIBRARY(${PLUGIN_TARGET} SHARED ${_all_target_files})
+  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_linklibs})
+    
+  SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
+
+ENDMACRO(MACRO_CREATE_PLUGIN)
+
+
+# Macro to set specific Qt options, calls CREATE_PLUGIN at the end
+MACRO(MACRO_CREATE_QT_PLUGIN)
+  
+  IF(QT4_FOUND)
+    INCLUDE_DIRECTORIES(${QT_INCLUDES})
+    ADD_DEFINITIONS(${QT_DEFINITIONS})
+  
+    MACRO_CREATE_PLUGIN()
+  
+    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${QT_LIBRARIES})
+  ENDIF(QT4_FOUND)
+  
+ENDMACRO(MACRO_CREATE_QT_PLUGIN)
+

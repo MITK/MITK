@@ -1,9 +1,9 @@
-# CONVERT_SCHEMA(INPUT plugin.xml ...
-#                OUTPUT_DIR output_dir
-#                TARGET_NAME target_name
-#                [DEPENDS depends]
-#                [WORKING_DIR working_dir]
-#                )
+# MACRO_CONVERT_SCHEMA(INPUT plugin.xml ...
+#                      OUTPUT_DIR output_dir
+#                      TARGET_NAME target_name
+#                      [DEPENDS depends]
+#                      [WORKING_DIR working_dir]
+#                     )
 
 MACRO(MACRO_CONVERT_SCHEMA)
 

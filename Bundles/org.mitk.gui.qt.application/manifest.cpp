@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <application/cherryIApplication.h>
+#include <cherryIApplication.h>
 #include <cherryIEditorPart.h>
 
 #include "src/QmitkApplication.h"

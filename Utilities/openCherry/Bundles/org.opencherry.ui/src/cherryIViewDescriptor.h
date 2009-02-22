@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchPartDescriptor.h"
 #include "cherryIViewPart.h"
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 #include <cherryIAdaptable.h>
 
 #include <string>

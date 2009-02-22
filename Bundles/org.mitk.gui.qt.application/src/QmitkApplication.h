@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKAPPLICATION_H_
 #define QMITKAPPLICATION_H_
 
-#include <application/cherryIApplication.h>
+#include <cherryIApplication.h>
 
 #include "mitkQtAppDll.h"
 

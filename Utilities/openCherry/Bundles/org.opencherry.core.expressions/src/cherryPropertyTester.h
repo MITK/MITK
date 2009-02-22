@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYPROPERTYTESTER_H_
 #define CHERRYPROPERTYTESTER_H_
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 
 #include "internal/cherryPropertyTesterDescriptor.h"
 

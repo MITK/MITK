@@ -19,9 +19,9 @@
 #ifndef CHERRYQTTRACKER_H_
 #define CHERRYQTTRACKER_H_
 
-#include <tweaklets/cherryITracker.h>
-#include <tweaklets/cherryDnDTweaklet.h>
-#include <guitk/cherryGuiTkIControlListener.h>
+#include <cherryITracker.h>
+#include <cherryDnDTweaklet.h>
+#include <cherryGuiTkIControlListener.h>
 
 #include <QDrag>
 #include <QRubberBand>

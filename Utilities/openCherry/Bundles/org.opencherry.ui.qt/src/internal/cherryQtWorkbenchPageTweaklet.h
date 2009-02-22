@@ -19,7 +19,7 @@
 #ifndef CHERRYQTWORKBENCHPAGETWEAKLET_H_
 #define CHERRYQTWORKBENCHPAGETWEAKLET_H_
 
-#include <tweaklets/cherryWorkbenchPageTweaklet.h>
+#include <cherryWorkbenchPageTweaklet.h>
 
 #include "../cherryUiQtDll.h"
 

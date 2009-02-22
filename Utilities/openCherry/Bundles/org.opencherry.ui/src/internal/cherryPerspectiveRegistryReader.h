@@ -21,7 +21,7 @@
 
 #include "cherryRegistryReader.h"
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 
 namespace cherry {
 

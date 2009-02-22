@@ -7,7 +7,7 @@
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
-#include "mitkQtInteractiveSegmentationDll.h"
+#include "../mitkQtInteractiveSegmentationDll.h"
 #include "ui_QmitkInteractiveSegmentationControls.h"
 
 /**

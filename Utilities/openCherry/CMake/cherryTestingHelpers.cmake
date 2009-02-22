@@ -8,7 +8,9 @@
 # 
 MACRO(OPENCHERRY_CREATE_TESTS)
   
-  CREATE_PLUGIN_NAME(plugin_name ${OPENCHERRY_BASE_DIR}/Testing ${CMAKE_CURRENT_SOURCE_DIR})
+  _MACRO_CREATE_PLUGIN_NAME(plugin_name 
+                            INPUT ${CMAKE_CURRENT_SOURCE_DIR}
+                            BASEDIR ${OPENCHERRY_BASE_DIR}/Testing)
   STRING(REPLACE . _ plugin_target ${plugin_name})
   
   INCLUDE_DIRECTORIES(${OPENCHERRY_BASE_DIR}/Testing)

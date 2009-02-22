@@ -18,7 +18,7 @@
 #ifndef CHERRYIPRESENTABLEPARTLIST_H_
 #define CHERRYIPRESENTABLEPARTLIST_H_
 
-#include <presentations/cherryIPresentablePart.h>
+#include <cherryIPresentablePart.h>
 #include <vector>
 
 namespace cherry

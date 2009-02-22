@@ -1,5 +1,6 @@
 /**
   \defgroup org_opencherry_ui org.opencherry.ui Plugin
+  \ingroup openCherryPlugins
 
   \brief This is the user interface plugin. It provides a GUI-Toolkit independent framework
   to build an openCherry workbench.

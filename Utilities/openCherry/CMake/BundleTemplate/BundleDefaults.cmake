@@ -1,9 +1,13 @@
 SET(BUNDLE_NAMESPACE "cherry")
 SET(DEFAULT_REQUIRED_BUNDLES "org.opencherry.osgi")
+SET(DEFAULT_REQUIRED_BUNDLES_FOR_GUI "org.opencherry.ui.qt")
 SET(DEFAULT_VIEW_BASE_CLASS "cherry::QtViewPart")#qt
 SET(DEFAULT_VIEW_BASE_CLASS_H "cherryQtViewPart.h")#qt)
 SET(PROJECT_STATIC_VAR "CHERRY_STATIC")
 SET(DOXYGEN_INGROUP "openCherryPlugins")
+
+SET(DEFAULT_CREATE_PLUGIN_MACRO "MACRO_CREATE_PLUGIN()")
+SET(DEFAULT_CREATE_GUI_PLUGIN_MACRO "MACRO_CREATE_QT_PLUGIN()")
 
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
  

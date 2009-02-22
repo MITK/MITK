@@ -19,7 +19,7 @@
 #ifndef CHERRYIQTCONTROLWIDGET_H_
 #define CHERRYIQTCONTROLWIDGET_H_
 
-#include <guitk/cherryGuiTkIControlListener.h>
+#include <cherryGuiTkIControlListener.h>
 #include <cherryIShellListener.h>
 
 #include <QMetaType>

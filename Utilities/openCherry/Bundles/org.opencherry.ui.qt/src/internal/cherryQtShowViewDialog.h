@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDialog>
 
 #include <cherryIViewRegistry.h>
-#include <dialogs/cherryIShowViewDialog.h>
+#include <cherryIShowViewDialog.h>
 
 #include "ui_cherryQtShowViewDialog.h"
 

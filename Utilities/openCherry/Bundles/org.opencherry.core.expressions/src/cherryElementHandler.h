@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/DOM/Element.h>
 
-#include <service/cherryIConfigurationElement.h>
+#include <cherryIConfigurationElement.h>
 #include <cherryMacros.h>
 
 #include "cherryExpression.h"

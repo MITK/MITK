@@ -24,7 +24,7 @@
 #include "cherryWorkbenchRegistryConstants.h"
 #include "cherrySourcePriorityNameMapping.h"
 
-#include <service/cherryIExtensionPointService.h>
+#include <cherryIExtensionPointService.h>
 
 namespace cherry
 {

@@ -19,7 +19,7 @@
 #define CHERRYWORKBENCHPAGE_H_
 
 #include <cherryIAdaptable.h>
-#include <service/cherryIExtensionPoint.h>
+#include <cherryIExtensionPoint.h>
 
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIWorkbenchPartReference.h"

@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <QRubberBand>
 
-#include <guitk/cherryGuiTkISelectionListener.h>
+#include <cherryGuiTkISelectionListener.h>
 
 namespace cherry {
 

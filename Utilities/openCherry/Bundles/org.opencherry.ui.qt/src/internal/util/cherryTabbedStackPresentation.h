@@ -19,7 +19,7 @@
 #ifndef CHERRYTABBEDSTACKPRESENTATION_H_
 #define CHERRYTABBEDSTACKPRESENTATION_H_
 
-#include <presentations/cherryStackPresentation.h>
+#include <cherryStackPresentation.h>
 
 #include "cherryPresentablePartFolder.h"
 #include "cherryTabOrder.h"

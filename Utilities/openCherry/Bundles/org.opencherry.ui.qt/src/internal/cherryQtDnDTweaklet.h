@@ -19,7 +19,7 @@
 #ifndef CHERRYQTDNDTWEAKLET_H_
 #define CHERRYQTDNDTWEAKLET_H_
 
-#include <tweaklets/cherryDnDTweaklet.h>
+#include <cherryDnDTweaklet.h>
 
 namespace cherry {
 

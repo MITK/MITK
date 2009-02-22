@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryObject.h>
 #include "../cherryCommandsDll.h"
 
+#include <Poco/Hash.h>
+
 namespace cherry {
 
 /**
@@ -141,6 +143,18 @@ public:
 //    }
 //    return hashCode;
 //    }
+
+   struct Hash {
+     inline std::size_t operator()(Self* value) const
+     {
+       return Poco::hash(value->GetId());
+     }
+
+     inline std::size_t operator()(Self::Pointer value) const
+     {
+       return Poco::hash(value->GetId());
+     }
+   };
 
     /**
      * Whether this instance is defined. A defined instance is one that has been

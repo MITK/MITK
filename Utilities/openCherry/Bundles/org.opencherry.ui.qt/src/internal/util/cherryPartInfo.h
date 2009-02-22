@@ -20,7 +20,7 @@
 #define CHERRYPARTINFO_H_
 
 #include <QPixmap>
-#include <presentations/cherryIPresentablePart.h>
+#include <cherryIPresentablePart.h>
 
 namespace cherry {
 

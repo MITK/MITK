@@ -59,7 +59,7 @@ SET(SRC_CPP_FILES
   
   #guitk
   guitk/cherryGuiTkIControlListener.cpp
-  guitk/cherryGuiTkIMenuListener.cpp
+  #guitk/cherryGuiTkIMenuListener.cpp
   guitk/cherryGuiTkISelectionListener.cpp
   guitk/cherryGuiTkSelectionEvent.cpp
   

@@ -74,6 +74,10 @@ FOREACH(dir_entry ${all_dirs})
   ENDIF(EXISTS ${dir_entry}/META-INF/MANIFEST.MF)
 ENDFOREACH(dir_entry ${all_dirs})
 
+# add Poco directories for all plugins
+INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
+LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
+
 FOREACH(_subdir ${_plugins_to_build})
   ADD_SUBDIRECTORY(${_subdir})
 ENDFOREACH(_subdir ${_plugins_to_build})
@@ -81,23 +85,5 @@ ENDFOREACH(_subdir ${_plugins_to_build})
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BundleList.cmake @ONLY)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
-
-INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
-LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
-
-#FOREACH(plugin_dir ${plugin_dirs}) 
-#  MESSAGE(STATUS "Processing ${plugin_dir}")
-  
-  
-#  _MACRO_CREATE_PLUGIN_NAME(PLUGIN_NAME 
-#                            INPUT ${plugin_dir}
-#                            BASEDIR ${PLUGINS_SOURCE_BASE_DIR} )
-  
-#  #MESSAGE(STATUS "PLUGIN_NAME = ${PLUGIN_NAME}")
-#  OPTION("BUILD_${PLUGIN_NAME}" "Build ${PLUGIN_NAME} Plugin" ON)
-#  IF(BUILD_${PLUGIN_NAME} OR _COLLECT_FORCE_BUILD_ALL)
-#    ADD_SUBDIRECTORY(${plugin_dir})
-#  ENDIF(BUILD_${PLUGIN_NAME} OR _COLLECT_FORCE_BUILD_ALL)
-#ENDFOREACH(plugin_dir)
 
 ENDMACRO(MACRO_COLLECT_PLUGINS)

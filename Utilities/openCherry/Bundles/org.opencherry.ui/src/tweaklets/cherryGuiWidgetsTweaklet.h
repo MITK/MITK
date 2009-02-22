@@ -27,10 +27,6 @@
 #include "../cherryRectangle.h"
 #include "../cherryShell.h"
 
-#include "../commands/cherryIMenu.h"
-#include "../commands/cherryIMenuItem.h"
-
-
 namespace cherry {
 
 struct CHERRY_UI GuiWidgetsTweaklet : public Object
@@ -123,11 +119,6 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
   virtual std::vector<Shell::Pointer> GetShells() = 0;
   virtual Shell::Pointer GetShell(void* widget) = 0;
   virtual Shell::Pointer GetActiveShell() = 0;
-
-  // command framework interface classes
-  virtual IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP) = 0;
-  virtual IMenu::Pointer CreateMenu(IMenu::Pointer parent) = 0;
-  virtual IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1) = 0;
 
   /**
    * @brief returns the coordinates of the center point of the primary screen

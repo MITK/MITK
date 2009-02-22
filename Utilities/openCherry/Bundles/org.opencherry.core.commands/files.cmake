@@ -7,7 +7,7 @@ SET(SRC_CPP_FILES
 SET(COMMON_CPP_FILES
   cherryCommandExceptions.cpp
   cherryHandleObject.cpp
-  cherryHandleObjectManager.cpp
+  #cherryHandleObjectManager.cpp
   cherryNamedHandleObject.cpp
 )
 

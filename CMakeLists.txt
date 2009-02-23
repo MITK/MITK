@@ -3,9 +3,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 # only configure dart here if not already configured in the 
 # parent directory
-IF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
-INCLUDE(Dart)
-ENDIF(NOT EXISTS ${PROJECT_BINARY_DIR}/../DartConfiguration.tcl)
+IF(NOT MITK_ALL_BUILD)
+  INCLUDE(CTest)
+ENDIF(NOT MITK_ALL_BUILD)
 
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/ToolExtensionHelpers.cmake)

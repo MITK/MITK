@@ -141,6 +141,13 @@ class QmitkRigidRegistration : public QmitkFunctionality
     void Translate(int* translateVector);
 
     /*!
+    * \brief Rotates the moving image in x, y and z direction given by rotateVector
+    *
+    * @param rotateVector Contains the rotation around x, y and z axis.
+    */
+    void Rotate(int* rotateVector);
+
+    /*!
     * \brief Automatically aligns the image centers.
     */
     void AlignCenters();
@@ -216,6 +223,7 @@ class QmitkRigidRegistration : public QmitkFunctionality
     mitk::Color m_MovingColor;
     invisibleNodesList m_InvisibleNodesList;
     int m_TranslateSliderPos[3];
+    int m_RotateSliderPos[3];
 };
 
 #endif //QMITKRigidREGISTRATION_H

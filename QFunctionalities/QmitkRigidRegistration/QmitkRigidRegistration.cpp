@@ -41,6 +41,10 @@ QmitkRigidRegistration::QmitkRigidRegistration(QObject *parent, const char *name
   m_TranslateSliderPos[1] = 0;
   m_TranslateSliderPos[2] = 0;
 
+  m_RotateSliderPos[0] = 0;
+  m_RotateSliderPos[1] = 0;
+  m_RotateSliderPos[2] = 0;
+  
   SetAvailability(true);
 }
 
@@ -99,6 +103,7 @@ void QmitkRigidRegistration::CreateConnections()
     connect(m_Controls,SIGNAL(opacityChanged(float)),this,SLOT(OpacityUpdate(float)));
     connect(m_Controls,SIGNAL(calculateTransformation()),this,SLOT(CalculateTransformation()));
     connect(m_Controls,SIGNAL(translateMovingImage(int* )),this,SLOT(Translate(int* )));
+    connect(m_Controls,SIGNAL(rotateMovingImage(int* )),this,SLOT(Rotate(int* )));
     connect(m_Controls,SIGNAL(alignCenters()),this,SLOT(AlignCenters()));
     connect(m_Controls,SIGNAL(addNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));
     
@@ -561,6 +566,76 @@ void QmitkRigidRegistration::Translate(int* translateVector)
     m_TranslateSliderPos[2] = translateVector[2];
 
     m_MovingNode->GetData()->GetGeometry()->Translate( translateVec );
+
+    m_MovingNode->GetData()->Modified();
+    m_RedoGeometryList.clear();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+void QmitkRigidRegistration::Rotate(int* rotateVector)
+{ 
+  if (m_MovingNode != NULL)
+  {
+    mitk::Vector3D rotateVec; 
+
+    rotateVec[0] = rotateVector[0] - m_RotateSliderPos[0];
+    rotateVec[1] = rotateVector[1] - m_RotateSliderPos[1];
+    rotateVec[2] = rotateVector[2] - m_RotateSliderPos[2];
+
+    m_RotateSliderPos[0] = rotateVector[0];
+    m_RotateSliderPos[1] = rotateVector[1];
+    m_RotateSliderPos[2] = rotateVector[2];
+
+    vtkMatrix4x4* rotationMatrix = vtkMatrix4x4::New();
+    vtkMatrix4x4* translationMatrix = vtkMatrix4x4::New();
+    rotationMatrix->Identity();
+    translationMatrix->Identity();
+
+    double (*rotMatrix)[4] = rotationMatrix->Element;
+    double (*transMatrix)[4] = translationMatrix->Element;
+    
+    mitk::Point3D centerBB = m_MovingNode->GetData()->GetGeometry()->GetCenter();
+
+    transMatrix[0][3] = centerBB[0];
+    transMatrix[1][3] = centerBB[1];
+    transMatrix[2][3] = centerBB[2];
+
+    translationMatrix->Invert();
+
+    m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
+
+    double radianX = rotateVec[0] * vnl_math::pi / 180;
+    double radianY = rotateVec[1] * vnl_math::pi / 180;
+    double radianZ = rotateVec[2] * vnl_math::pi / 180;
+
+    if ( rotateVec[0] != 0 )
+    {   
+      rotMatrix[1][1] = cos( radianX );
+      rotMatrix[1][2] = -sin( radianX );
+      rotMatrix[2][1] = sin( radianX );
+      rotMatrix[2][2] = cos( radianX );
+    }
+    else if ( rotateVec[1] != 0 )
+    {
+      rotMatrix[0][0] = cos( radianY );
+      rotMatrix[0][2] = sin( radianY );
+      rotMatrix[2][0] = -sin( radianY );
+      rotMatrix[2][2] = cos( radianY );      
+    } 
+    else if ( rotateVec[2] != 0 )
+    {
+      rotMatrix[0][0] = cos( radianZ );
+      rotMatrix[0][1] = -sin( radianZ );
+      rotMatrix[1][0] = sin( radianZ );
+      rotMatrix[1][1] = cos( radianZ );      
+    }
+
+    m_MovingNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+    
+    translationMatrix->Invert();
+
+    m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
 
     m_MovingNode->GetData()->Modified();
     m_RedoGeometryList.clear();

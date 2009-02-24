@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>371</width>
-            <height>607</height>
+            <height>750</height>
         </rect>
     </property>
     <property name="caption" >
@@ -552,7 +552,7 @@
                                                             </widget>
                                                             <widget class="QLayoutWidget">
                                                                 <property name="name">
-                                                                    <cstring>layout7_2</cstring>
+                                                                    <cstring>layout7</cstring>
                                                                 </property>
                                                                 <vbox>
                                                                     <property name="name">
@@ -640,6 +640,141 @@
                                                         <property name="text">
                                                             <string>Automatic Align Image Centers</string>
                                                         </property>
+                                                    </widget>
+                                                </vbox>
+                                            </widget>
+                                            <widget class="QGroupBox">
+                                                <property name="name">
+                                                    <cstring>interactiveRotationBox</cstring>
+                                                </property>
+                                                <property name="font">
+                                                    <font>
+                                                        <bold>1</bold>
+                                                    </font>
+                                                </property>
+                                                <property name="title">
+                                                    <string>Interactive Rotations</string>
+                                                </property>
+                                                <vbox>
+                                                    <property name="name">
+                                                        <cstring>unnamed</cstring>
+                                                    </property>
+                                                    <widget class="QLayoutWidget">
+                                                        <property name="name">
+                                                            <cstring>layout18</cstring>
+                                                        </property>
+                                                        <hbox>
+                                                            <property name="name">
+                                                                <cstring>unnamed</cstring>
+                                                            </property>
+                                                            <widget class="QLayoutWidget">
+                                                                <property name="name">
+                                                                    <cstring>layout19</cstring>
+                                                                </property>
+                                                                <vbox>
+                                                                    <property name="name">
+                                                                        <cstring>unnamed</cstring>
+                                                                    </property>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>xRotationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>x-Axis (Frontal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>yRotationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>y-Axis (Sagittal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QLabel">
+                                                                        <property name="name">
+                                                                            <cstring>zRotationLabel</cstring>
+                                                                        </property>
+                                                                        <property name="font">
+                                                                            <font>
+                                                                                <bold>0</bold>
+                                                                            </font>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>z-Axis (Transversal):</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </vbox>
+                                                            </widget>
+                                                            <widget class="QLayoutWidget">
+                                                                <property name="name">
+                                                                    <cstring>layout20</cstring>
+                                                                </property>
+                                                                <vbox>
+                                                                    <property name="name">
+                                                                      <cstring>unnamed</cstring>
+                                                                    </property>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_XRotSlider</cstring>
+                                                                        </property>
+                                                                        <property name="cursor">
+                                                                            <cursor>0</cursor>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-20</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>20</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                        <property name="toolTip" stdset="0">
+                                                                            <string></string>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_YRotSlider</cstring>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-20</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>20</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                    <widget class="QSlider">
+                                                                        <property name="name">
+                                                                            <cstring>m_ZRotSlider</cstring>
+                                                                        </property>
+                                                                        <property name="minValue">
+                                                                            <number>-20</number>
+                                                                        </property>
+                                                                        <property name="maxValue">
+                                                                            <number>20</number>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </vbox>
+                                                            </widget>
+                                                        </hbox>
                                                     </widget>
                                                 </vbox>
                                             </widget>
@@ -905,6 +1040,24 @@
         <slot>zTrans_valueChanged(int)</slot>
     </connection>
     <connection>
+        <sender>m_XRotSlider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkRigidRegistrationControls</receiver>
+        <slot>xRot_valueChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>m_YRotSlider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkRigidRegistrationControls</receiver>
+        <slot>yRot_valueChanged(int)</slot>
+    </connection>
+    <connection>
+        <sender>m_ZRotSlider</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>QmitkRigidRegistrationControls</receiver>
+        <slot>zRot_valueChanged(int)</slot>
+    </connection>
+    <connection>
         <sender>m_AutomaticTranslation</sender>
         <signal>clicked()</signal>
         <receiver>QmitkRigidRegistrationControls</receiver>
@@ -936,6 +1089,7 @@
 </includes>
 <variables>
     <variable>int * translationParams;</variable>
+    <variable>int * rotationParams;</variable>
     <variable>int m_FixedDimension;</variable>
     <variable>int m_MovingDimension;</variable>
 </variables>
@@ -953,6 +1107,7 @@
     <signal>showFixedImage()</signal>
     <signal>showMovingImage()</signal>
     <signal>translateMovingImage(int *)</signal>
+    <signal>rotateMovingImage(int *)</signal>
     <signal>alignCenters()</signal>
     <signal>calculateRigidRegistration()</signal>
     <signal>addNewTransformationToUndoList()</signal>
@@ -976,6 +1131,9 @@
     <slot>xTrans_valueChanged( int v )</slot>
     <slot>yTrans_valueChanged( int v )</slot>
     <slot>zTrans_valueChanged( int v )</slot>
+    <slot>xRot_valueChanged( int v )</slot>
+    <slot>yRot_valueChanged( int v )</slot>
+    <slot>zRot_valueChanged( int v )</slot>
     <slot>MovingImageChanged()</slot>
     <slot>FixedImageChanged()</slot>
     <slot>Calculate()</slot>

@@ -19,6 +19,7 @@ void QmitkRigidRegistrationControls::init()
   m_FixedDimension = 0;
   m_MovingDimension = 0;
   translationParams = new int[3];
+  rotationParams = new int[3];
   connect(this,SIGNAL(calculateRigidRegistration()),qmitkRigidRegistrationSelector1,SLOT(CalculateTransformation()));
   connect(this,SIGNAL(loadRigidRegistrationParameter()),qmitkRigidRegistrationSelector1,SLOT(LoadRigidRegistrationParameter()));
   connect(this,SIGNAL(saveRigidRegistrationParameter()),qmitkRigidRegistrationSelector1,SLOT(SaveRigidRegistrationParameter()));
@@ -143,13 +144,13 @@ void QmitkRigidRegistrationControls::ShowMovingImageSelected()
   emit showMovingImage();
 }
 
-void QmitkRigidRegistrationControls::xTrans_valueChanged( int v)
+void QmitkRigidRegistrationControls::xTrans_valueChanged( int v )
 {
   if (m_MovingSelector->GetSelectedNode() != NULL)
   {
     translationParams[0]=v;
-	  translationParams[1]=m_YTransSlider->value();
-	  translationParams[2]=m_ZTransSlider->value();
+    translationParams[1]=m_YTransSlider->value();
+    translationParams[2]=m_ZTransSlider->value();
     QToolTip::remove(m_XTransSlider);
     char str[33];
     sprintf(str,"%d",v);    
@@ -162,13 +163,13 @@ void QmitkRigidRegistrationControls::xTrans_valueChanged( int v)
   }
 }
 
-void QmitkRigidRegistrationControls::yTrans_valueChanged( int v)
+void QmitkRigidRegistrationControls::yTrans_valueChanged( int v )
 {
   if (m_MovingSelector->GetSelectedNode() != NULL)
   {
     translationParams[0]=m_XTransSlider->value();
-	  translationParams[1]=v;
-	  translationParams[2]=m_ZTransSlider->value();
+    translationParams[1]=v;
+    translationParams[2]=m_ZTransSlider->value();
     QToolTip::remove(m_YTransSlider);
     char str[33];
     sprintf(str,"%d",v);    
@@ -181,18 +182,75 @@ void QmitkRigidRegistrationControls::yTrans_valueChanged( int v)
   }
 }
 
-void QmitkRigidRegistrationControls::zTrans_valueChanged( int v)
+void QmitkRigidRegistrationControls::zTrans_valueChanged( int v )
 {
   if (m_MovingSelector->GetSelectedNode() != NULL)
   {
     translationParams[0]=m_XTransSlider->value();
-	  translationParams[1]=m_YTransSlider->value();
+    translationParams[1]=m_YTransSlider->value();
     translationParams[2]=v;
     QToolTip::remove(m_ZTransSlider);
     char str[33];
     sprintf(str,"%d",v);    
     QToolTip::add( m_ZTransSlider, tr( str ) );
     emit translateMovingImage(translationParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationControls::xRot_valueChanged( int v )
+{
+  if (m_MovingSelector->GetSelectedNode() != NULL)
+  {
+    rotationParams[0]=v;
+    rotationParams[1]=m_YRotSlider->value();
+    rotationParams[2]=m_ZRotSlider->value();
+    QToolTip::remove(m_XRotSlider);
+    char str[33];
+    sprintf(str,"%d",v);    
+    QToolTip::add( m_XRotSlider, tr( str ) );
+    emit rotateMovingImage(rotationParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationControls::yRot_valueChanged( int v )
+{
+  if (m_MovingSelector->GetSelectedNode() != NULL)
+  {
+    rotationParams[0]=m_XRotSlider->value();
+    rotationParams[1]=v;
+    rotationParams[2]=m_ZRotSlider->value();
+    QToolTip::remove(m_YRotSlider);
+    char str[33];
+    sprintf(str,"%d",v);    
+    QToolTip::add( m_YRotSlider, tr( str ) );
+    emit rotateMovingImage(rotationParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationControls::zRot_valueChanged( int v )
+{
+  if (m_MovingSelector->GetSelectedNode() != NULL)
+  {
+    rotationParams[0]=m_XRotSlider->value();
+    rotationParams[1]=m_YRotSlider->value();
+    rotationParams[2]=v;
+    QToolTip::remove(m_ZRotSlider);
+    char str[33];
+    sprintf(str,"%d",v);    
+    QToolTip::add( m_ZRotSlider, tr( str ) );
+    emit rotateMovingImage(rotationParams);
   }
   else
   {
@@ -212,6 +270,12 @@ void QmitkRigidRegistrationControls::MovingImageChanged()
       translationParams[0]=0;
       translationParams[1]=0;
       translationParams[2]=0;
+      m_XRotSlider->setValue(0);
+      m_YRotSlider->setValue(0);
+      m_ZRotSlider->setValue(0);
+      rotationParams[0]=0;
+      rotationParams[1]=0;
+      rotationParams[2]=0;
       m_MovingDimension = dynamic_cast<mitk::Image*>(m_MovingSelector->GetSelectedNode()->GetData())->GetDimension();
       qmitkRigidRegistrationSelector1->SetMovingDimension(m_MovingDimension);
       qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingSelector->GetSelectedNode());

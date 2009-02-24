@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
-    <height>598</height>
+    <width>174</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="minimumSize" >
@@ -29,79 +29,60 @@
   <property name="windowTitle" >
    <string>QmitkInteractiveSegmentation</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout_2" >
    <item>
     <widget class="Q3GroupBox" name="grpReferenceData" >
      <property name="font" >
       <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
        <weight>75</weight>
-       <italic>false</italic>
        <bold>true</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
       <string>Patient image</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QmitkToolReferenceDataSelectionBox" native="1" name="m_ToolReferenceDataSelectionBox" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font" >
-         <font/>
-        </property>
-       </widget>
+     <layout class="QVBoxLayout" name="verticalLayout" >
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <item>
+         <widget class="QmitkToolReferenceDataSelectionBox" native="1" name="m_ToolReferenceDataSelectionBox" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Preferred" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnReinit" >
+          <property name="font" >
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="toolTip" >
+           <string>Reorientate view on image</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../../resources/interactivesegmentation.qrc" >
+            <normaloff>:/interactivesegmentation/btnReinit.xpm</normaloff>:/interactivesegmentation/btnReinit.xpm</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="0" column="1" >
-       <widget class="QToolButton" name="btnReinit" >
-        <property name="toolTip" >
-         <string>Reorientate view on image</string>
-        </property>
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="icon" >
-         <iconset resource="../../resources.qrc" >
-          <normaloff>:/resources/btnReinit.xpm</normaloff>:/resources/btnReinit.xpm</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2" >
-       <widget class="QmitkToolGUIArea" native="1" name="m_AutoSegmentationToolGUIContainer" >
-        <property name="font" >
-         <font/>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2" >
-       <widget class="QmitkToolSelectionBox" native="1" name="m_AutoSegmentationToolSelectionBox" >
-        <property name="font" >
-         <font/>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QCheckBox" name="chkPixelSmoothing" >
-        <property name="font" >
-         <font/>
-        </property>
-        <property name="toolTip" >
-         <string>Whether or not the pixels should be smoothed</string>
-        </property>
-        <property name="text" >
-         <string>Smooth pixels</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2" >
+      <item>
        <widget class="QLabel" name="lblAlignmentWarning" >
         <property name="palette" >
          <palette>
@@ -181,6 +162,42 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="chkPixelSmoothing" >
+        <property name="font" >
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="toolTip" >
+         <string>Whether or not the pixels should be smoothed</string>
+        </property>
+        <property name="text" >
+         <string>Smooth pixels</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkToolSelectionBox" native="1" name="m_AutoSegmentationToolSelectionBox" >
+        <property name="font" >
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkToolGUIArea" native="1" name="m_AutoSegmentationToolGUIContainer" >
+        <property name="font" >
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -188,13 +205,8 @@
     <widget class="Q3GroupBox" name="groupBox3" >
      <property name="font" >
       <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
        <weight>75</weight>
-       <italic>false</italic>
        <bold>true</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
@@ -204,7 +216,10 @@
       <item>
        <widget class="QmitkToolWorkingDataSelectionBox" native="1" name="m_ToolWorkingDataSelectionBox" >
         <property name="font" >
-         <font/>
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
         </property>
        </widget>
       </item>
@@ -219,7 +234,10 @@
            </sizepolicy>
           </property>
           <property name="font" >
-           <font/>
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
           <property name="toolTip" >
            <string>New segmentation</string>
@@ -228,8 +246,8 @@
            <string>New segmentation</string>
           </property>
           <property name="icon" >
-           <iconset resource="../../resources.qrc" >
-            <normaloff>:/resources/btnNew.xpm</normaloff>:/resources/btnNew.xpm</iconset>
+           <iconset resource="../../resources/interactivesegmentation.qrc" >
+            <normaloff>:/interactivesegmentation/btnNew.xpm</normaloff>:/interactivesegmentation/btnNew.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -242,7 +260,10 @@
            </sizepolicy>
           </property>
           <property name="font" >
-           <font/>
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
           <property name="toolTip" >
            <string>Delete selected segmentations</string>
@@ -251,8 +272,8 @@
            <string>Delete selected segmentations</string>
           </property>
           <property name="icon" >
-           <iconset resource="../../resources.qrc" >
-            <normaloff>:/resources/btnDelete.xpm</normaloff>:/resources/btnDelete.xpm</iconset>
+           <iconset resource="../../resources/interactivesegmentation.qrc" >
+            <normaloff>:/interactivesegmentation/btnDelete.xpm</normaloff>:/interactivesegmentation/btnDelete.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -265,7 +286,10 @@
            </sizepolicy>
           </property>
           <property name="font" >
-           <font/>
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
           <property name="toolTip" >
            <string>Load segmentation from file</string>
@@ -274,8 +298,8 @@
            <string>Load segmentation from file</string>
           </property>
           <property name="icon" >
-           <iconset resource="../../resources.qrc" >
-            <normaloff>:/resources/btnLoad.xpm</normaloff>:/resources/btnLoad.xpm</iconset>
+           <iconset resource="../../resources/interactivesegmentation.qrc" >
+            <normaloff>:/interactivesegmentation/btnLoad.xpm</normaloff>:/interactivesegmentation/btnLoad.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -288,7 +312,10 @@
            </sizepolicy>
           </property>
           <property name="font" >
-           <font/>
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
           <property name="toolTip" >
            <string>Save segmentation to file</string>
@@ -297,8 +324,8 @@
            <string/>
           </property>
           <property name="icon" >
-           <iconset resource="../../resources.qrc" >
-            <normaloff>:/resources/btnSave.xpm</normaloff>:/resources/btnSave.xpm</iconset>
+           <iconset resource="../../resources/interactivesegmentation.qrc" >
+            <normaloff>:/interactivesegmentation/btnSave.xpm</normaloff>:/interactivesegmentation/btnSave.xpm</iconset>
           </property>
          </widget>
         </item>
@@ -329,14 +356,20 @@
          </sizepolicy>
         </property>
         <property name="font" >
-         <font/>
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QmitkToolGUIArea" native="1" name="m_PostProcessingToolGUIContainer" >
         <property name="font" >
-         <font/>
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
         </property>
        </widget>
       </item>
@@ -344,12 +377,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkToolSelectionBox" native="1" name="m_ToolSelectionBox" />
+    <widget class="QmitkToolSelectionBox" native="1" name="m_ToolSelectionBox" >
+     <property name="font" >
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QmitkToolGUIArea" native="1" name="m_ToolGUIContainer" >
      <property name="font" >
-      <font/>
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
     </widget>
    </item>
@@ -357,13 +400,8 @@
     <widget class="Q3GroupBox" name="grpInterpolation" >
      <property name="font" >
       <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
        <weight>75</weight>
-       <italic>false</italic>
        <bold>true</bold>
-       <underline>false</underline>
-       <strikeout>false</strikeout>
       </font>
      </property>
      <property name="title" >
@@ -379,7 +417,10 @@
       <item>
        <widget class="QmitkSlicesInterpolator" native="1" name="m_SlicesInterpolator" >
         <property name="font" >
-         <font/>
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
         </property>
        </widget>
       </item>
@@ -446,8 +487,7 @@
   <include location="global" >QmitkSlicesInterpolator.h</include>
  </includes>
  <resources>
-  <include location="../../resources.qrc" />
-  <include location="../../resources.qrc" />
+  <include location="../../resources/interactivesegmentation.qrc" />
  </resources>
  <connections/>
 </ui>

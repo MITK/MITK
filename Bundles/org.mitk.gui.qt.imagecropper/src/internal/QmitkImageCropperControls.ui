@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
+    <width>339</width>
     <height>651</height>
    </rect>
   </property>
@@ -176,7 +176,7 @@ The original image will not be modified, it will only be hidden.</string>
            </sizepolicy>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/btn_ctrl.xpm</pixmap>
+           <pixmap>:/imagecropper/btn_ctrl.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -195,7 +195,7 @@ The original image will not be modified, it will only be hidden.</string>
            </sizepolicy>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/mouse_left.xpm</pixmap>
+           <pixmap>:/imagecropper/mouse_left.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -231,7 +231,7 @@ The original image will not be modified, it will only be hidden.</string>
            <string/>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/btn_ctrl.xpm</pixmap>
+           <pixmap>:/imagecropper/btn_ctrl.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -250,7 +250,7 @@ The original image will not be modified, it will only be hidden.</string>
            </sizepolicy>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/mouse_middle.xpm</pixmap>
+           <pixmap>:/imagecropper/mouse_middle.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -286,7 +286,7 @@ The original image will not be modified, it will only be hidden.</string>
            <string/>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/btn_ctrl.xpm</pixmap>
+           <pixmap>:/imagecropper/btn_ctrl.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -305,7 +305,7 @@ The original image will not be modified, it will only be hidden.</string>
            </sizepolicy>
           </property>
           <property name="pixmap" >
-           <pixmap resource="../resources.qrc" >:/resources/mouse_right.xpm</pixmap>
+           <pixmap>:/imagecropper/mouse_right.xpm</pixmap>
           </property>
           <property name="scaledContents" >
            <bool>false</bool>
@@ -367,10 +367,7 @@ The original image will not be modified, it will only be hidden.</string>
   <include location="local" >QmitkDataStorageComboBox.h</include>
  </includes>
  <resources>
-  <include location="../resources.qrc" />
-  <include location="../resources.qrc" />
-  <include location="../resources.qrc" />
-  <include location="../resources.qrc" />
+  <include location="../../resources/imagecropper.qrc" />
  </resources>
  <connections>
   <connection>

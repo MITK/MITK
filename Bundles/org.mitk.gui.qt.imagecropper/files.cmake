@@ -16,7 +16,7 @@ SET(MOC_H_FILES
 )
 
 SET(RES_FILES
-  resources.qrc
+  resources/imagecropper.qrc
 )
 
 SET(CPP_FILES manifest.cpp)

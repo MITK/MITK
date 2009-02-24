@@ -2,7 +2,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-	QmitkIsoSurface.cpp
+  QmitkIsoSurface.cpp
 )
 
 SET(UI_FILES
@@ -14,7 +14,7 @@ SET(MOC_H_FILES
 )
 
 SET(RES_FILES
-	resources.qrc
+  resources/isosurface.qrc
 )
 
 

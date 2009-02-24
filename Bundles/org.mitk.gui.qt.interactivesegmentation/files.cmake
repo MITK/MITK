@@ -31,7 +31,7 @@ SET(MOC_H_FILES
 )
 
 SET(RES_FILES
-  resources.qrc
+  resources/interactivesegmentation.qrc
 )
 
 

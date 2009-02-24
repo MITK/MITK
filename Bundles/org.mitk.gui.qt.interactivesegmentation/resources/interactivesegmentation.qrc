@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/interactivesegmentation">
+     <file>btnDelete.xpm</file>
+     <file>btnLoad.xpm</file>
+     <file>btnNew.xpm</file>
+     <file>btnReinit.xpm</file>
+     <file>btnSave.xpm</file>
+     <file>interactivesegmentation.png</file>
+ </qresource>
+ </RCC>

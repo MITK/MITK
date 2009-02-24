@@ -545,6 +545,8 @@ bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& slice
       }
     }
   }
+
+  return false;
 }
 
 

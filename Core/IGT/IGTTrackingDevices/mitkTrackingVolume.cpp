@@ -2,16 +2,15 @@
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkConfig.h"
-//ToDoMBISB#include "mitkMBISBConfig.h"
 
 mitk::TrackingVolume::TrackingVolume()
   {
   this->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
   //####### initialize file locations for the volume-STL-files #########
- /*ToDoMBISB std::string m_VolumeDir = MBISB_SOURCE_DIR;
-  m_VolumeDir += "/Core/Controllers/mitkTracking/TrackingVolumeData";
-  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );*/
+  std::string m_VolumeDir = MITK_ROOT;
+  m_VolumeDir += "Core/IGT/IGTTrackingDevices/TrackingVolumeData";
+  mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
   //####################################################################
 
   }

@@ -77,6 +77,8 @@ class MITK_CORE_EXPORT PaintbrushTool : public FeedbackContourTool
     static int m_Size;
 
     Contour::Pointer m_MasterContour;
+
+    int m_LastContourSize;
 };
 
 } // namespace

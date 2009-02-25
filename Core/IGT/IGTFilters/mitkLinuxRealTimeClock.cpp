@@ -20,14 +20,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <sys/time.h>
 
+
+/**
+* \brief basic constructor
+*/
 mitk::LinuxRealTimeClock::LinuxRealTimeClock()
 {
 }
 
+/**
+* \brief basic destructor
+*/
 mitk::LinuxRealTimeClock::~LinuxRealTimeClock()
 {
 }
 
+/**
+* \brief returns the current time in milliseconds
+* 
+* Gets the current time since the Epoch (01.01.1970). gettimeofday returns the elapsed time in
+* microseconds.This value is calculated to milliseconds and returned as a double.
+*
+* \return Returns the elapsed time in milliseconds
+*/
 double mitk::LinuxRealTimeClock::getCurrentStamp()
 {
   struct timeval tval;
@@ -35,8 +50,8 @@ double mitk::LinuxRealTimeClock::getCurrentStamp()
   ::gettimeofday( &tval, 0 );
   double milliseconds;
 
-  milliseconds = static_cast< double >( tval.tv_sec ) * 1000 +
-          static_cast< double >( tval.tv_usec ) / 1000000.0;
+  milliseconds = static_cast< double >( tval.tv_sec ) +
+          static_cast< double >( tval.tv_usec ) / 1e6;
 
   return milliseconds*1000; // in milliseconds
 }

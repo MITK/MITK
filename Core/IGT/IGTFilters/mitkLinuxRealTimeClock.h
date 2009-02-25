@@ -24,10 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * @brief Time stamp in milliseconds
+  * @brief RealTimeClock for linux-systems
   *
-  * This class provides a timestamp in milliseconds.
-  *  WORK IN PROGRESS
+  * This class provides realtimeclock for linux-systems.
+  * It uses gettimeofday to acquire a current time-value as accurate 
+  * as possible.
+  *
+  * \return Returns the current time since the Epoch (01.01.1970) in milliseconds
   *
   *@ingroup Navigation
   */
@@ -38,10 +41,19 @@ namespace mitk {
     mitkClassMacro(mitk::LinuxRealTimeClock, mitk::RealTimeClock);
     itkNewMacro(Self);
 
+    /**
+    * \brief basic contructor
+    */
     LinuxRealTimeClock();
-
+    
+    /**
+    * \brief basic contructor
+    */
     virtual ~LinuxRealTimeClock();
 
+    /**
+    * \brief returns the current time in milliseconds as a double
+    */
     virtual double getCurrentStamp();
 
   }; //namespace

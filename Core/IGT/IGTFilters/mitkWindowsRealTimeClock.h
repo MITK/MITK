@@ -24,10 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * @brief Time stamp in milliseconds
+  * @brief realtimeclock implementation for windows-systems
   *
-  * This class provides a timestamp in milliseconds.
-  *  WORK IN PROGRESS
+  * This class provides a realtimeclock for windows-systems.
+  * It uses the QueryPerformanceCounter and the QueryPerformaceFrequency.
+  * It polls the current tick-counter, (that counts from bootup ?!?)
+  * is supposed to be the most accurate time you can get on a windows-system.
   *
   *@ingroup Navigation
   */
@@ -38,12 +40,24 @@ namespace mitk {
     mitkClassMacro(WindowsRealTimeClock, mitk::RealTimeClock);
     itkNewMacro(Self);
 
+    /**
+    * \brief basic contructor
+    */
     WindowsRealTimeClock();
-
+    
+    /**
+    * \brief basic destructor
+    */
     virtual ~WindowsRealTimeClock();
 
+    /**
+    * \brief returns the current time in milliseconds as a double 
+    */
     virtual double getCurrentStamp();
 
+    /**
+    * \brief returns the QueryPerformanceFrequency
+    */
     virtual LARGE_INTEGER getFrequency();
     
   protected:

@@ -21,16 +21,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "windows.h"
 
 
+/**
+* \brief basic contructor 
+*/
 mitk::WindowsRealTimeClock::WindowsRealTimeClock()
 {
   QueryPerformanceFrequency(&frequency);
 }
 
+/**
+* \brief basic contructor 
+*/
 mitk::WindowsRealTimeClock::~WindowsRealTimeClock()
 {
 
 }
 
+
+/**
+* \brief returns the current time in milliseconds as a double
+*/
 double mitk::WindowsRealTimeClock::getCurrentStamp()
 {
 #if defined (WIN32) || defined (_WIN32)
@@ -44,6 +54,9 @@ double mitk::WindowsRealTimeClock::getCurrentStamp()
 #endif
 }
 
+/**
+* \brief returns the QueryPerformanceFrequency, needed for acquiring the time from ticks
+*/
 LARGE_INTEGER mitk::WindowsRealTimeClock::getFrequency()
 {
   return this->frequency;

@@ -28,10 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * @brief Time stamp in milliseconds
+  * @brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
   *
-  * This class provides a timestamp in milliseconds.
-  *  WORK IN PROGRESS
+  * This class provides the basic interface, that all RealTimeClocks have in common.
+  * 
   *
   *@ingroup Navigation
   */

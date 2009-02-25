@@ -27,3 +27,5 @@ template class mitk::GenericProperty<itk::Point<int, 3> >;
 template class mitk::GenericProperty<mitk::Point4D>;
 
                
+template class mitk::GenericLookupTableProperty<float>;
+

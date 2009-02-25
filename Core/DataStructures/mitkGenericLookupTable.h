@@ -110,8 +110,6 @@ class GenericLookupTable : public itk::DataObject, public XMLIO
 
   protected:
     GenericLookupTable() {}
-    GenericLookupTable(LookupTableType x) 
-       : m_Value(x) {}
     
     
     LookupTableType m_LookupTable;

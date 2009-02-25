@@ -32,7 +32,6 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
  m_PaintingPixelValue(paintingPixelValue),
  m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
-  FeedbackContourTool::SetFeedbackContourVisible(true);
 }
 
 mitk::PaintbrushTool::~PaintbrushTool()
@@ -42,11 +41,13 @@ mitk::PaintbrushTool::~PaintbrushTool()
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
+  FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
 }
 
 void mitk::PaintbrushTool::Deactivated()
 {
+  FeedbackContourTool::SetFeedbackContourVisible(false);
   Superclass::Deactivated();
 }
 

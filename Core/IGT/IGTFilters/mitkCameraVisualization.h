@@ -28,17 +28,18 @@ namespace mitk {
     mitkClassMacro(CameraVisualization,NavigationDataVisualizationFilter);
     itkNewMacro(Self);
 
+    itkSetMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
+    itkSetMacro(ViewUpInToolCoordinates,Vector3D);
+    itkSetMacro(FocalLength,float);
     /**Documentation
     * \brief sets renderer that visualizes the navigation data
     */
-    virtual void SetRenderer( const BaseRenderer* renderer )
-    {m_Renderer = renderer;};
+    virtual void SetRenderer( BaseRenderer::Pointer renderer );
     
     /**Documentation
     * \brief returns the renderer that visualizes the navigation data
     */
-    virtual const BaseRenderer* GetRenderer()
-    {return m_Renderer;};
+    virtual const BaseRenderer* GetRenderer();
 
     /**Documentation
     * \brief filter execute method
@@ -53,6 +54,10 @@ namespace mitk {
 
     ///< renderer that visualizes the navigation data
     const BaseRenderer* m_Renderer; 
+
+    Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
+    Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates
+    float m_FocalLength; ///< focal length of the camera = distance from camera position to focal point in mm.
   };
 } // namespace mitk
 

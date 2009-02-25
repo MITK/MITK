@@ -53,7 +53,7 @@ void QmitkPrimitiveMovieNavigator::init()
 
 void QmitkPrimitiveMovieNavigator::goButton_clicked()
 {
-  if(!m_InRefetch) 
+  if(!m_InRefetch && m_Stepper->GetSteps() > 0) // this step shall only be used if the dataset is 3D+t. If it is not, nothing happens :-) 
   {
     if(m_Timer->isActive()==false)
     {

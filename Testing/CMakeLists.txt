@@ -1,3 +1,4 @@
+FIND_PACKAGE(MITK)
 INCLUDE(${MITK_SOURCE_DIR}/CMake/TestingHelpers.cmake)
 INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS} ${IPSEGMENTATION_INCLUDE_DIR} ${ANN_INCLUDE_DIR})
 
@@ -5,7 +6,7 @@ ENABLE_TESTING()
 
 # tests with no extra command line parameter
 SET(${KITNAME}_TESTS
-    mitkPointSetWriterTest.cpp
+  mitkPointSetWriterTest.cpp
   mitkMaterialPropertyTest.cpp
   mitkDataTreeNodeTest.cpp
   mitkAbstractTransformGeometryTest.cpp
@@ -53,6 +54,13 @@ SET(${KITNAME}_TESTS
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
 )
+
+IF(MITK_BUILD_IGT)
+  INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
+  SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
+    mitkCameraVisualizationTest.cpp 
+  ) 
+ENDIF(MITK_BUILD_IGT)
 
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS

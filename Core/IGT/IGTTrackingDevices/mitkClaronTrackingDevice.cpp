@@ -51,7 +51,11 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
 
 bool mitk::ClaronTrackingDevice::StartTracking()
 {
-
+  
+  //By Alfred: next line only because of bug 1882, please delete it when bug is solved
+  if (!m_Device->IsMicronTrackerInstalled()) return false;
+  //##################################################################################
+  
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
   {
@@ -90,7 +94,7 @@ bool mitk::ClaronTrackingDevice::StopTracking()
 
   //delete all files in the tool files directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str()); 
+  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   return true;
 }
@@ -104,9 +108,9 @@ unsigned int mitk::ClaronTrackingDevice::GetToolCount() const
 
 mitk::TrackingTool* mitk::ClaronTrackingDevice::GetTool(unsigned int toolNumber)
 {
-  if ( toolNumber >= this->GetToolCount()) 
+  if ( toolNumber >= this->GetToolCount())
     return NULL;
-  else 
+  else
     return this->m_AllTools[toolNumber];
 }
 
@@ -120,16 +124,16 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   returnValue = m_Device->StartTracking();
 
-  if (returnValue) 
-  {    
+  if (returnValue)
+  {
     this->SetMode(Ready);
-  } 
-  else 
+  }
+  else
   {
     //reset everything
-    if(m_Device == NULL)  
+    if(m_Device == NULL)
       m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
-    m_Device->StopTracking(); 
+    m_Device->StopTracking();
     delete m_Device;
     this->SetMode(Setup);
   }
@@ -139,7 +143,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
 
 bool mitk::ClaronTrackingDevice::CloseConnection()
 {
-  bool returnValue = true; 
+  bool returnValue = true;
   if(this->GetMode() == Setup)
     return true;
 
@@ -147,7 +151,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
   delete m_Device;
 
   //delete the temporary directory
-  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str()); 
+  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
 
   this->SetMode(Setup);
   return returnValue;
@@ -192,9 +196,9 @@ void mitk::ClaronTrackingDevice::TrackTools()
           {
             currentTool->SetToolHandle(aktuDet->GetToolHandle());
             foundTool = true;
-          }       
+          }
         }
-        if (!foundTool) 
+        if (!foundTool)
         {
           currentTool->SetToolHandle(0);
         }
@@ -210,7 +214,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
           //write tip quaternion into tool
           currentTool->SetQuaternion(quat[0], quat[1], quat[2], quat[3]);
         }
-        else 
+        else
         {
           currentTool->SetPosition(0,0,0);
           currentTool->SetQuaternion(0,0,0,0);
@@ -247,7 +251,7 @@ ITK_THREAD_RETURN_TYPE mitk::ClaronTrackingDevice::ThreadStartTracking(void* pIn
   }
   ClaronTrackingDevice *trackingDevice = (ClaronTrackingDevice*)pInfo->UserData;
 
-  if (trackingDevice != NULL) 
+  if (trackingDevice != NULL)
     trackingDevice->TrackTools();
 
   return ITK_THREAD_RETURN_VALUE;

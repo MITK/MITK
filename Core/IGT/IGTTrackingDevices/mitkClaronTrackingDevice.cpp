@@ -67,10 +67,12 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   delete m_Device;
 
   m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
-  m_Device->StartTracking();
-
-  m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
-  return true;
+  if (m_Device->StartTracking())
+    {
+    m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+    return true;
+    }
+  else return false;
 }
 
 

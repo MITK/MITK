@@ -1,5 +1,6 @@
 #include "mitkClaronTrackingDevice.h"
 #include "mitkClaronTool.h"
+#include "mitkIGTConfig.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 
@@ -41,9 +42,10 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
   this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
 
   this->m_MultiThreader = itk::MultiThreader::New();
-  //############################# standard directories ###############################################
-  m_ToolfilesDir = std::string("C:\\TEMP\\MT");
-  m_CalibrationDir = std::string("C:\\Programme\\Claron Technology\\MicronTracker\\CalibrationFiles");
+  
+  //############################# standard directories (from cmake) ##################################
+  m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
+  m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
   //##################################################################################################
 }
 
@@ -52,7 +54,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
 bool mitk::ClaronTrackingDevice::StartTracking()
 {
   
-  //By Alfred: next line only because of bug 1882, please delete it when bug is solved
+  //By Alfred: next line because no temp directory is set if MicronTracker is not installed
   if (!m_Device->IsMicronTrackerInstalled()) return false;
   //##################################################################################
   

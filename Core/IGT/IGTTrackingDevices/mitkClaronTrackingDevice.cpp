@@ -44,8 +44,16 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
   this->m_MultiThreader = itk::MultiThreader::New();
   
   //############################# standard directories (from cmake) ##################################
-  m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
-  m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
+  if (m_Device->IsMicronTrackerInstalled())
+    {
+    m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
+    m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
+    }
+  else
+    {
+    m_ToolfilesDir = "Error - No Microntracker installed";
+    m_CalibrationDir = "Error - No Microntracker installed";
+    }
   //##################################################################################################
 }
 

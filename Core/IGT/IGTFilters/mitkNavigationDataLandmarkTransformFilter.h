@@ -21,15 +21,18 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
-#include <vtkLandmarkTransform.h>
-#include <vtkPoints.h>
-#include <vector>
+#include <mitkPointSet.h>
+#include <itkLandmarkBasedTransformInitializer.h>
+#include <itkQuaternionRigidTransform.h>
+#include <itkImage.h>
 
 
 namespace mitk {
 
   /**Documentation
-  * \brief NavigationDataLandmarkTransformFilter applies a vtk-landmark-transformation defined by (three or more) reference ND on all ND objects
+  * \brief NavigationDataLandmarkTransformFilter applies a itk-landmark-transformation
+  * defined by source and target pointsets. <br>
+  * Before executing the filter SetSourcePoints and SetTargetPoints must be called.
   *
   * @ingroup Navigation
   */
@@ -39,69 +42,52 @@ namespace mitk {
     mitkClassMacro(NavigationDataLandmarkTransformFilter, NavigationDataToNavigationDataFilter);
 
     /**
-    * @brief Constructor for initializing filter --> using NavigationDataIDs to 
-    * to specify the reference tools (NavigationDatas).
-    * ToDo: Default constructor uses ND parameter "TYPE"
+    * @brief Constructor 
     **/
-    NavigationDataLandmarkTransformFilter(std::vector<int> IDs);
-
-    itkNewMacro(Self);
-  
-    typedef vtkLandmarkTransform TransformType;
-
-
-  protected:
     NavigationDataLandmarkTransformFilter();
     virtual ~NavigationDataLandmarkTransformFilter();
 
+    itkNewMacro(Self);
+  
+    void SetSourcePoints(mitk::PointSet::Pointer sourcePointSet);
+    void SetTargetPoints(mitk::PointSet::Pointer targetPointSet);
+
+  protected:
+    typedef itk::Image< signed short, 3>  ImageType;       // only because itk::LandmarkBasedTransformInitializer must be templated over two imagetypes
+    typedef itk::VersorRigid3DTransform< double > ITKVersorTransformType;
+    typedef itk::LandmarkBasedTransformInitializer< ITKVersorTransformType, ImageType, ImageType > TransformInitializerType;
+
+    TransformInitializerType::LandmarkPointContainer m_SourcePoints;      // positions of the source points
+    TransformInitializerType::LandmarkPointContainer m_TargetPoints;      // positions of the target points
+    TransformInitializerType::Pointer m_LandmarkTransformInitializer;     // landmark based transform initializer 
+    ITKVersorTransformType::Pointer m_ITKLandmarkTransform;               // transform calculated from source and target points
+
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatLandmarkTransform; //transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatTransform;         //transform needed to rotate orientation
+
+   
     /**Documentation
     * \brief filter execute method
-    *
-    * initializes reference values and calls TransformNavigationDatas   
+    * 
     */
     virtual void GenerateData();
 
-    /**Documentation
-    * \brief check whether ALL navigationDatas are valid
-    *
-    * returns false if one NavigationData is invalid
-    */
-    bool AllNavigationDatasValid();
 
     /**Documentation
-    * \brief insert point values of the reference ND into "points"
+    * \brief transforms input NDs according to the calculated landmarktransform   
     */
-    void FillPointsWithCurrentNDReferencePoints(vtkPoints* points);
+    void TransformNavigationDatas(ITKVersorTransformType::Pointer landmarkTransform);
+   
+    /**Documentation
+    * \brief initializes the transform using source and target pointsets 
+    */
+    void InitializeLandmarkTransform();
+
+    // bool to store if target and source points were set
+    bool m_SourcePointsAreSet;
+    bool m_TargetPointsAreSet;
     
-    /**Documentation
-    * \brief calculates the vtk-landmark-transform 
-    */
-    bool CalculateTransform();
-
-    /**Documentation
-    * \brief transforms all NDs 
-    */
-    void TransformNavigationDatas(TransformType* landmarkTransform);
-
-    // vtk-landmark-transform 
-    TransformType* m_LandmarkTransform; 
-
-    //vtkPoints to hold the position of the initial fiducial markers inorder to calculate a landmark-transform using the reference NDs
-    vtkPoints* m_FiducialMarkers;
-
-    // bool to store if initial fiducial markers are set
-    bool m_FiducialMarkersAreSet;
     
-    /* 
-    * array containing the NavigationDataIDs used as reference tools
-    * only used if filter was initialized with "NavigationDataLandmarkTransformFilter(int *navigationDataIds)"
-    */
-    int *m_ReferenceNavigationDataIDs;
-
-    std::vector<int> m_IDs;
-    
-    // flag for using m_ReferenceNavigationDataIDs as reference tools
-    bool m_UseNavigationDataIDasReference;
   };
 } // namespace mitk
 

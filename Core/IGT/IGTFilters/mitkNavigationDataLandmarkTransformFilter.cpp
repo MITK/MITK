@@ -20,116 +20,50 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() 
-: mitk::NavigationDataToNavigationDataFilter(), m_FiducialMarkersAreSet(false), m_UseNavigationDataIDasReference(false)
+: mitk::NavigationDataToNavigationDataFilter(), m_TargetPointsAreSet(false),m_SourcePointsAreSet(false)
 {
-  m_LandmarkTransform = TransformType::New();
-  m_LandmarkTransform->SetModeToSimilarity();//set to rotation, translation and isotropic scaling
-  m_FiducialMarkers = vtkPoints::New();
-}
+  m_ITKLandmarkTransform = ITKVersorTransformType::New();
 
-mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter(std::vector<int> IDs) 
-: mitk::NavigationDataToNavigationDataFilter(), m_FiducialMarkersAreSet(false)
-{
-  m_LandmarkTransform = TransformType::New();
-  m_LandmarkTransform->SetModeToSimilarity();//set to rotation, translation and isotropic scaling
-  m_FiducialMarkers = vtkPoints::New();
+  m_LandmarkTransformInitializer = TransformInitializerType::New();
+  m_LandmarkTransformInitializer->SetTransform(m_ITKLandmarkTransform);
 
-  m_IDs = IDs;
-  m_UseNavigationDataIDasReference = true;
+  //transform to rotate orientation 
+   m_QuatLandmarkTransform = itk::QuaternionRigidTransform<double>::New();
+   m_QuatTransform = itk::QuaternionRigidTransform<double>::New();
+
 
 }
 
 mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFilter()
-{
-   m_FiducialMarkers->Delete();
-}
+{}
 
-bool mitk::NavigationDataLandmarkTransformFilter::AllNavigationDatasValid()
+void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
 {
-  bool allValid = true;
-  
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  try
   {
-    const mitk::NavigationData* input = this->GetInput(i);
-    assert(input);
+    m_LandmarkTransformInitializer->SetMovingLandmarks(m_TargetPoints);
+    m_LandmarkTransformInitializer->SetFixedLandmarks(m_SourcePoints);
 
-    allValid = (allValid && input->IsDataValid());
+    m_ITKLandmarkTransform->SetIdentity();
+
+    m_LandmarkTransformInitializer->InitializeTransform();
+
+    this->Modified();
   }
-
-  return allValid;
-}
-
-void mitk::NavigationDataLandmarkTransformFilter::FillPointsWithCurrentNDReferencePoints( vtkPoints* points)
-{
-  if(points == NULL)
-    return;
-
-  // use ND IDs to identify the reference NDs
-  if(m_UseNavigationDataIDasReference)
+  catch (std::exception& e)
   {
-    int NUMBEROFREFERENCEPOINTS = m_IDs.size();
-    points->SetNumberOfPoints(NUMBEROFREFERENCEPOINTS);
-
-    for (int i=0; i<NUMBEROFREFERENCEPOINTS; i++)
-    {
-      const mitk::NavigationData* input = this->GetInput( m_IDs[i] );
-      assert(input);
-      
-      if (input->IsDataValid() == false)
-      {
-        continue;
-      }
-
-      mitk::NavigationData::PositionType tempCoordinateIn;
-      float tempPositionIn[3];
-      //convert to vtk
-      tempCoordinateIn = input->GetPosition();
-      tempPositionIn[0] = tempCoordinateIn[0]; 
-      tempPositionIn[1] = tempCoordinateIn[1]; 
-      tempPositionIn[2] = tempCoordinateIn[2];
-
-      points->SetPoint(i, tempPositionIn);
-    }
-    points->Modified();
-  }
-  //get reference ND using the "TYPE-field" of ND
-  else
-  {
-   // mitk::TrackingToolData::TASKREFERENCE see QmitkFiducialRegistrationComponent line 116
+    itkExceptionMacro("Initializing landmark-tranfrom failed\n. "<<e.what());
   }
 
 }
 
-bool mitk::NavigationDataLandmarkTransformFilter::CalculateTransform()
-{
-  if (!m_FiducialMarkersAreSet)
-    return false;
-  
-  //if the original markers are not yet set return with false. they need to be set when the landmark transform is computed
-  if (m_FiducialMarkers->GetNumberOfPoints() < 1) 
-    return false;
- 
-  //load the position of the Tools marked as reference into the vtkPoints
-  static vtkPoints* currentMarkers = vtkPoints::New(); //do not instantiate and delete it all the time. use static!
-  this->FillPointsWithCurrentNDReferencePoints(currentMarkers);
-
-  //build up the vtkLandmarktransform
-  //we need a transform from this coordinates of the fiducial markers to the coordinates of the initial position of the fiducial markers.
-  //so currentMarkers is the Source and FiducialMarkers is the target. 
-  m_LandmarkTransform->SetSourceLandmarks( currentMarkers );
-  m_LandmarkTransform->SetTargetLandmarks( m_FiducialMarkers );//if the same, nothing will be done
-
-  m_LandmarkTransform->Update();//done here, because we don't have to call an update for every transformation of a Tool. Later on only call InternalTransformPoint
-  return true;
-
-}
-
-
-void mitk::NavigationDataLandmarkTransformFilter::TransformNavigationDatas( TransformType * transform )
+void mitk::NavigationDataLandmarkTransformFilter::TransformNavigationDatas(ITKVersorTransformType::Pointer transform )
 {
   //this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
   // \warning This could erase outputs if inputs have been removed
 
+  TransformInitializerType::LandmarkPointType lPointIn, lPointOut;
+  
   /* update outputs with tracking data from tools */
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
   {
@@ -144,36 +78,101 @@ void mitk::NavigationDataLandmarkTransformFilter::TransformNavigationDatas( Tran
     }
 
     mitk::NavigationData::PositionType tempCoordinateIn, tempCoordinateOut;
-    float tempPositionIn[3], tempPositionOut[3];
-
-    //convert to vtk
     tempCoordinateIn = input->GetPosition();
-    tempPositionIn[0] = tempCoordinateIn[0]; 
-    tempPositionIn[1] = tempCoordinateIn[1]; 
-    tempPositionIn[2] = tempCoordinateIn[2]; 
+
+    lPointIn[0]=tempCoordinateIn[0];
+    lPointIn[1]=tempCoordinateIn[1];
+    lPointIn[2]=tempCoordinateIn[2];
 
     //do the landmark transform
-    transform->InternalTransformPoint( tempPositionIn, tempPositionOut );  
-    //InternalTransformPoint don't call the update of the Transform, done in CalculateTransform()
+    lPointOut = transform->TransformPoint(lPointIn);
 
-    //convert back to mitk
-    tempCoordinateOut[0] = tempPositionOut[0]; 
-    tempCoordinateOut[1] = tempPositionOut[1]; 
-    tempCoordinateOut[2] = tempPositionOut[2]; 
+    tempCoordinateOut[0]=lPointOut[0];
+    tempCoordinateOut[1]=lPointOut[1];
+    tempCoordinateOut[2]=lPointOut[2];
 
     output->Graft(input); // First, copy all information from input to output
     output->SetPosition(tempCoordinateOut);// Then change the member(s): add new position of navigation data after transformation
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.
 
+
+
+    //---transform orientation
+    NavigationData::OrientationType  quatIn = input->GetOrientation();
+    vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
+       
+    m_QuatLandmarkTransform->SetMatrix(transform->GetRotationMatrix());
+    m_QuatTransform->SetRotation(vnlQuatIn);
+    m_QuatLandmarkTransform->Compose(m_QuatTransform,true);
+
+    vnl_quaternion<double> vnlQuatOut = m_QuatLandmarkTransform->GetRotation();
+    NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
+    output->SetOrientation(quatOut);
+
+
   }
 }
+
+void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet::Pointer mitkSourcePointSet)
+{
+  m_SourcePoints.clear();
+
+  mitk::Point3D mitkSourcePoint;
+  TransformInitializerType::LandmarkPointType lPoint;
+ 
+  int mitkPointSetSize = mitkSourcePointSet->GetPointSet()->GetNumberOfPoints();
+  
+  for (int i=0; i<mitkPointSetSize; i++)
+  {
+   mitkSourcePointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(i, &mitkSourcePoint);
+   lPoint[0]=mitkSourcePoint[0];
+   lPoint[1]=mitkSourcePoint[1];
+   lPoint[2]=mitkSourcePoint[2];
+   
+   m_SourcePoints.push_back(lPoint);
+  }
+
+  if (m_SourcePoints.size()>2)
+    m_SourcePointsAreSet=true;
+  else
+    itkExceptionMacro("SourcePointSet must contain at least 3 points");
+
+  
+  if(m_TargetPointsAreSet)
+    this->InitializeLandmarkTransform();
+
+}
+
+void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet::Pointer mitkTargetPointSet)
+{
+  m_TargetPoints.clear();
+
+  mitk::Point3D mitkTargetPoint;
+  TransformInitializerType::LandmarkPointType lPoint;
+
+  int mitkPointSetSize = mitkTargetPointSet->GetPointSet()->GetNumberOfPoints();
+
+  for (int i=0; i<mitkPointSetSize; i++)
+  {
+    mitkTargetPointSet->GetPointSet()->GetPoints()->GetElementIfIndexExists(i, &mitkTargetPoint);
+    lPoint[0]=mitkTargetPoint[0];
+    lPoint[1]=mitkTargetPoint[1];
+    lPoint[2]=mitkTargetPoint[2];
+    
+    m_TargetPoints.push_back(lPoint);
+  }
+
+  if (m_TargetPoints.size()>2)
+    m_TargetPointsAreSet=true;
+  else
+    itkExceptionMacro("TargetPointSet must contain at least 3 points");
+
+  if(m_SourcePointsAreSet)
+    this->InitializeLandmarkTransform();
+
+}
+
 void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
 {
-  if(this->AllNavigationDatasValid() && ! m_FiducialMarkersAreSet)
-  {
-    this->FillPointsWithCurrentNDReferencePoints(m_FiducialMarkers);
-    m_FiducialMarkersAreSet = true;
-  }
-  else if (this->CalculateTransform())  //calculate transform if possible 
-    this->TransformNavigationDatas(m_LandmarkTransform);
+     this->TransformNavigationDatas(m_ITKLandmarkTransform);
 }

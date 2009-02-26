@@ -59,12 +59,7 @@ IF(MITK_BUILD_IGT)
   INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
   SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
     mitkCameraVisualizationTest.cpp 
-    mitkNavigationDataLandmarkTransformFilterTest.cpp
-    mitkNavigationDataTransformFilterTest.cpp
-    mitkNavigationDataToPointSetFilterTest.cpp
-    mitkNavigationDataVisualizationByBaseDataTransformFilterTest.cpp
-    mitkNavigationDataDisplacementFilterTest.cpp
-    mitkTrackingVolumeTest.cpp
+
   ) 
 ENDIF(MITK_BUILD_IGT)
 

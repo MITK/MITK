@@ -49,7 +49,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
     #ifdef MITK_MICRON_TRACKER_TEMP_DIR
     m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
     #endif
-    #ifdef MITK_MICRON_TRACKER_TEMP_DIR
+    #ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
     m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
     #endif
     }

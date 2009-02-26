@@ -8,6 +8,9 @@ ENDIF(MITK_USE_MICROBIRD_TRACKER)
 
 CREATE_CORE_LIB()
 
+## create IGT config
+
+CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
 
 

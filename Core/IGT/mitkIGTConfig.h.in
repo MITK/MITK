@@ -1,0 +1,7 @@
+/*
+  mitkIGTConfig.h
+  this file is generated. Do not change!
+*/
+
+#cmakedefine MITK_USE_MICRON_TRACKER
+

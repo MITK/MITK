@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <vector>
-#include <mitkConfig.h>
+#include <mitkIGTConfig.h>
 #include <mitkTrackingDevice.h>
 #include <mitkClaronTool.h>
 #include <itkMultiThreader.h>

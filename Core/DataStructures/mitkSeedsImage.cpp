@@ -40,6 +40,7 @@ mitk::SeedsImage::~SeedsImage()
 
 void mitk::SeedsImage::Initialize() 
 {
+  Superclass::Initialize();
   m_Radius = 1;
 }
 

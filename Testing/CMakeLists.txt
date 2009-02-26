@@ -55,13 +55,13 @@ SET(${KITNAME}_TESTS
   mitkUndoControllerTest.cpp
 )
 
-IF(MITK_BUILD_IGT)
-  INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
+#IF(MITK_BUILD_IGT)
+ # INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
   #SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
   #  mitkCameraVisualizationTest.cpp 
 
-  ) 
-ENDIF(MITK_BUILD_IGT)
+  #) 
+#ENDIF(MITK_BUILD_IGT)
 
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS

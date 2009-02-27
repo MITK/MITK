@@ -11,6 +11,12 @@ CREATE_CORE_LIB()
 ## create IGT config
 CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
-# add test programm for serial communication class
-ADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)
-TARGET_LINK_LIBRARIES(SerialCommunicationTest mitkIGT mitkCore tinyxml) 
+# add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)TARGET_LINK_LIBRARIES(SerialCommunicationTest mitkIGT mitkCore tinyxml) 
+
+ADD_EXECUTABLE (IGTTutorialStep1 IGTTutorial/IGTTutorialStep1.cpp)
+TARGET_LINK_LIBRARIES(IGTTutorialStep1 mitkIGT mitkCore)
+
+
+
+
+

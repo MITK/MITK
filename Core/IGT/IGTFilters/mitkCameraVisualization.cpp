@@ -21,7 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCamera.h"
 
 #include "vtkSphereSource.h"
+#include "mitkPropertyList.h"
+#include "mitkProperties.h"
 #include "mitkSurface.h"
+
 #include "mitkDataStorage.h"
 
 namespace mitk{
@@ -109,4 +112,27 @@ namespace mitk{
     return m_Renderer;
   }
 
+  void CameraVisualization::SetParameters( const mitk::PropertyList* p )
+  {
+    if (p == NULL)
+      return;
+    mitk::Vector3D doP;
+    if (p->GetPropertyValue<mitk::Vector3D>("CameraVisualization_DirectionOfProjectionInToolCoordinates", doP) == true)  // search for Offset parameter
+      this->SetDirectionOfProjectionInToolCoordinates(doP);   // apply if found;
+    mitk::Vector3D vUp;
+    if (p->GetPropertyValue<mitk::Vector3D>("CameraVisualization_ViewUpInToolCoordinates", vUp) == true)  // search for Offset parameter
+      this->SetViewUpInToolCoordinates(vUp);   // apply if found;
+    float fL;
+    if (p->GetPropertyValue<float>("CameraVisualization_FocalLength", fL) == true)  // search for Offset parameter
+      this->SetFocalLength(fL);   // apply if found;
+  }
+
+  mitk::PropertyList::ConstPointer CameraVisualization::GetParameters() const
+  {
+    mitk::PropertyList::Pointer p = mitk::PropertyList::New();
+    p->SetProperty("CameraVisualization_DirectionOfProjectionInToolCoordinates", mitk::Vector3DProperty::New(this->GetDirectionOfProjectionInToolCoordinates()));  // store Offset parameter
+    p->SetProperty("CameraVisualization_ViewUpInToolCoordinates", mitk::Vector3DProperty::New(this->GetViewUpInToolCoordinates()));  // store Offset parameter
+    p->SetProperty("CameraVisualization_FocalLength", mitk::Vector3DProperty::New(this->GetFocalLength()));  // store Offset parameter
+    return mitk::PropertyList::ConstPointer(p);
+  }
 }

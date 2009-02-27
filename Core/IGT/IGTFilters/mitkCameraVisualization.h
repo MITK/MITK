@@ -46,6 +46,27 @@ namespace mitk {
     */
     virtual const BaseRenderer* GetRenderer();
 
+    /**Documentation 
+    *@brief Set all filter parameters as the PropertyList p
+    * This method reads the following properties from the PropertyList (name : data type):
+    *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
+    *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
+    *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
+    */
+    virtual void SetParameters(const mitk::PropertyList* p);
+
+    /**Documentation 
+    *@brief Get all filter parameters as a PropertyList
+    *
+    * This method returns a PropertyList containing the following
+    * properties (name : data type):
+    *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
+    *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
+    *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
+    * The returned PropertyList must be assigned to a 
+    * SmartPointer immediately, or else it will get destroyed.
+    */
+    mitk::PropertyList::ConstPointer GetParameters() const;
     /**Documentation
     * \brief filter execute method
     *

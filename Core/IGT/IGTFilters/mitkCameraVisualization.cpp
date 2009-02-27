@@ -44,7 +44,7 @@ namespace mitk{
 
   }
 
-  void mitk::CameraVisualization::Update()
+  void CameraVisualization::Update()
   {
     // check if renderer was set
     if (m_Renderer)
@@ -71,15 +71,15 @@ namespace mitk{
       // compute current view up vector
       Vector3D viewUp = itkRotationMatrix*m_ViewUpInToolCoordinates;
 
-      mitk::DataTreeNode::Pointer cameraPositionSphereNode = mitk::DataTreeNode::New();
-      cameraPositionSphereNode->SetProperty("color",mitk::ColorProperty::New(1,0,0));
-      vtkSphereSource* sphere = vtkSphereSource::New();
-      sphere->SetCenter(cameraPosition[0],cameraPosition[1],cameraPosition[2]);
-      sphere->SetRadius(10);
-      mitk::Surface::Pointer sphereSurface = mitk::Surface::New();
-      sphereSurface->SetVtkPolyData(sphere->GetOutput());
-      cameraPositionSphereNode->SetData(sphereSurface);
-      mitk::DataStorage::GetInstance()->Add(cameraPositionSphereNode);
+      //mitk::DataTreeNode::Pointer cameraPositionSphereNode = mitk::DataTreeNode::New();
+      //cameraPositionSphereNode->SetProperty("color",mitk::ColorProperty::New(1,0,0));
+      //vtkSphereSource* sphere = vtkSphereSource::New();
+      //sphere->SetCenter(cameraPosition[0],cameraPosition[1],cameraPosition[2]);
+      //sphere->SetRadius(10);
+      //mitk::Surface::Pointer sphereSurface = mitk::Surface::New();
+      //sphereSurface->SetVtkPolyData(sphere->GetOutput());
+      //cameraPositionSphereNode->SetData(sphereSurface);
+      //mitk::DataStorage::GetInstance()->Add(cameraPositionSphereNode);
 
       m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2]);
       m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
@@ -99,12 +99,12 @@ namespace mitk{
     }
   }
 
-  void mitk::CameraVisualization::SetRenderer(BaseRenderer::Pointer renderer)
+  void CameraVisualization::SetRenderer(BaseRenderer::Pointer renderer)
   {
     m_Renderer = renderer;
   }
 
-  const BaseRenderer* mitk::CameraVisualization::GetRenderer()
+  const BaseRenderer* CameraVisualization::GetRenderer()
   {
     return m_Renderer;
   }

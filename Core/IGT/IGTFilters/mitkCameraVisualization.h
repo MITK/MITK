@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CAMERAVISUALIZATION_H_INCLUDED
 #define CAMERAVISUALIZATION_H_INCLUDED
 
+#include "mitkCommon.h"
 #include "mitkNavigationDataVisualizationFilter.h"
 
 namespace mitk {
@@ -31,6 +32,9 @@ namespace mitk {
     itkSetMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
     itkSetMacro(ViewUpInToolCoordinates,Vector3D);
     itkSetMacro(FocalLength,float);
+    itkGetConstMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
+    itkGetConstMacro(ViewUpInToolCoordinates,Vector3D);
+    itkGetConstMacro(FocalLength,float);
     /**Documentation
     * \brief sets renderer that visualizes the navigation data
     */

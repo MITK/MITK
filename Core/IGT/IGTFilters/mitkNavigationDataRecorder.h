@@ -31,7 +31,7 @@ namespace mitk
 {
 
  /**
- /**Documentation
+ /*Documentation
  * \brief This class records NavigationData objects
  *
  * The output of this class is formated as a XML document. 

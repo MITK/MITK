@@ -23,14 +23,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  /**Documentation
+  /**
   * @brief RealTimeClock for linux-systems
   *
   * This class provides realtimeclock for linux-systems.
-  * It uses gettimeofday to acquire a current time-value as accurate 
+  * It uses gettimeofday to acquire a current time-value as accurately 
   * as possible.
   *
-  * \return Returns the current time since the Epoch (01.01.1970) in milliseconds
+  * \return Returns the current time since the Epoch (01.01.1970) in milliseconds as a double
   *
   *@ingroup Navigation
   */

@@ -23,11 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  /**Documentation
+  /**
   * @brief realtimeclock implementation for windows-systems
   *
   * This class provides a realtimeclock for windows-systems.
-  * It uses the QueryPerformanceCounter and the QueryPerformaceFrequency.
+  * Internally, it uses the QueryPerformanceCounter and the QueryPerformaceFrequency.
   * It polls the current tick-counter, (that counts from bootup ?!?)
   * is supposed to be the most accurate time you can get on a windows-system.
   *

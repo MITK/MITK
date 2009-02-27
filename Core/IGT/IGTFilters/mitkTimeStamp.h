@@ -29,23 +29,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  /**Documentation
+  /**
   * @brief Time stamp in milliseconds
   *
   * This class provides a timestamp in milliseconds.
-  * It is a Singleton class, that internally uses a mitkRealTimeClock for
+  * It is a Singleton class, that internally uses a mitkRealTimeClock() for
   * time-acquisition. 
+  *
   * First you have to call StartTracking() in order to set the reference-time to the current time.
-  * If the user has not created and set an own "RealTimeClock", initialize() will be called and a
-  * default mitkRealTimeClock is created.
-  * In addition the TimeStamp saves a pointer to the device calling and the respective offset-time.
+  * If the user has not created and set his own "RealTimeClock", initialize() will be called and a
+  * default mitkRealTimeClock() is created.
+  * In addition the TimeStamp() saves a pointer to the device calling and the respective offset-time.
   * The first device will have an offset of 0, the following's offset will be the time elapsed since the 
   * starting of the first device. This offset can be prompted by calling GetOffset();
   *
   * You can always get the time elapsed since calling StartTracking() with GetElapsed(). It returns the 
-  * time spend in milliseconds as a double-value.
+  * time spent in milliseconds as a double.
   *
-  * When the TimeStamp is no longer used, you can call StopTracking. This erases the pointer to the device 
+  * When the TimeStamp is no longer used, you can call StopTracking(). This erases the pointer to the device 
   * and the offset. When all devices have "stopped tracking" the reference-time and the current-time are reset to 0.
   *
   *@ingroup Navigation
@@ -101,19 +102,21 @@ namespace mitk {
     double GetElapsed();
 
     /**
-    * \brief returns the current time acquired from the defined RealTimeClock
+    * \brief returns the current time acquired from the defined RealTimeClock()
     *
     * only used internally
     */
     double GetOffset(itk::Object::Pointer Device);
 
     /**
-    * \brief setter for the internally used RealTimeClock
+    * \brief setter for the internally used RealTimeClock()
     *
     * If you want to use a "third-party" RealTimeClock, e.g PocoRealTimeClock, BoostRealTimeClock
     * or ITKRealTimeClock, you can set it using this method:
     * mitk::<bla>RealTimeClock::Pointer RealTimeClock = mitk::<bla>RealTimeClock::New();
     * mitk::TimeStamp::GetInstance()->SetRealTimeClock(RealTimeClock);
+    *
+    * Right now, none of these RealTimeClocks have been implemented!!
     *
     * Notice: The mitk-implementation of an os-dependant RealTimeClock is used 
     * by default.

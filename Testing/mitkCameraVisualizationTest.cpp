@@ -81,7 +81,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // create renderer
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();
-  mitk::BaseRenderer::Pointer renderer = mitk::VtkPropRenderer::New("TestRenderer",renderWindow);
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("TestRenderer",renderWindow);
   //vtkRenderer* vtkRenderer = vtkRenderer::New();
   //renderer->SetVtkRenderer(vtkRenderer);
 

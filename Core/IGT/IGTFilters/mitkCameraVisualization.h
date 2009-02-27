@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkNavigationDataVisualizationFilter.h"
+#include "mitkVtkPropRenderer.h"
 
 namespace mitk {
   class CameraVisualization : public NavigationDataVisualizationFilter
@@ -38,7 +39,7 @@ namespace mitk {
     /**Documentation
     * \brief sets renderer that visualizes the navigation data
     */
-    virtual void SetRenderer( BaseRenderer::Pointer renderer );
+    virtual void SetRenderer( VtkPropRenderer::Pointer renderer );
     
     /**Documentation
     * \brief returns the renderer that visualizes the navigation data

@@ -99,7 +99,7 @@ namespace mitk{
     }
   }
 
-  void CameraVisualization::SetRenderer(BaseRenderer::Pointer renderer)
+  void CameraVisualization::SetRenderer(VtkPropRenderer::Pointer renderer)
   {
     m_Renderer = renderer;
   }

@@ -41,7 +41,7 @@ namespace mitk {
     friend class MicroBirdTrackingDevice; // Add all TrackingDevice subclasses that use InternalTrackingDevice directly
   public:
     mitkClassMacro(InternalTrackingTool, TrackingTool);
-
+    itkNewMacro(Self);
     virtual void GetPosition(mitk::Point3D& position) const;    ///< returns the current position of the tool as an array of three floats
     virtual void GetQuaternion(mitk::Quaternion& orientation) const;  ///< returns the current orientation of the tool as a quaternion
     virtual bool Enable();                                      ///< enable the tool, so that it will be tracked
@@ -58,7 +58,7 @@ namespace mitk {
     virtual void SetErrorMessage(const char* _arg);             ///< set the error message
 
   protected:
-    itkNewMacro(Self);
+
     InternalTrackingTool();
     virtual ~InternalTrackingTool();
     

@@ -55,13 +55,18 @@ SET(${KITNAME}_TESTS
   mitkUndoControllerTest.cpp
 )
 
-#IF(MITK_BUILD_IGT)
- # INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
-  #SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
-  #  mitkCameraVisualizationTest.cpp 
-
-  #) 
-#ENDIF(MITK_BUILD_IGT)
+IF(MITK_BUILD_IGT)
+  INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
+  SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
+    mitkCameraVisualizationTest.cpp 
+ mitkNavigationDataLandmarkTransformFilterTest.cpp
+ mitkNavigationDataTransformFilterTest.cpp
+ mitkNavigationDataToPointSetFilterTest.cpp
+ mitkNavigationDataVisualizationByBaseDataTransformFilterTest.cpp
+ mitkNavigationDataDisplacementFilterTest.cpp
+ mitkTrackingVolumeTest.cpp
+ ) 
+ENDIF(MITK_BUILD_IGT)
 
 # test with image filename as an extra command line parameter
 SET(${KITNAME}_IMAGE_TESTS
@@ -99,8 +104,8 @@ SET(${KITNAME}_CUSTOM_TESTS
 
 MITK_CREATE_DEFAULT_TESTS()
 
-#IF(MITK_BUILD_IGT)
-#  TARGET_LINK_LIBRARIES(${KITNAME}TestDriver mitkIGT)
-#ENDIF(MITK_BUILD_IGT)
+IF(MITK_BUILD_IGT)
+  TARGET_LINK_LIBRARIES(${KITNAME}TestDriver mitkIGT tinyxml)
+ENDIF(MITK_BUILD_IGT)
 
 ADD_TEST(mitkLabeledImageToSurfaceFilterTest ${EXECUTABLE_OUTPUT_PATH}/${KITNAME}TestDriver mitkLabeledImageToSurfaceFilterTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/BallBinary30x30x30.pic.gz)

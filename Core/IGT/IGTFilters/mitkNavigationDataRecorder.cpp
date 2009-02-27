@@ -17,7 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkNavigationDataRecorder.h"
-#include <ofstream>
+#include <fstream>
+
 
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()

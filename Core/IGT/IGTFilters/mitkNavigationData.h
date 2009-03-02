@@ -81,6 +81,11 @@ namespace mitk {
       * \brief print object information
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const;
+
+      void SetTimeStamp( double Stamp );
+
+      double GetTimeStamp();
+
     protected:
       NavigationData();
       virtual ~NavigationData();      
@@ -91,7 +96,8 @@ namespace mitk {
       OrientationType m_Orientation;     
       ErrorType m_Error;
       bool m_DataValid;
-      //const mitk::TimeStamp* m_TimeStamp;
+      typedef double TimeStamp;
+      TimeStamp m_TimeStamp;
 
       //itk::FastMutexLock::Pointer m_MyMutex;
     };

@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
 
+#include "mitkDataStorage.h"
+
 
 mitk::NavigationDataVisualizationByBaseDataTransformFilter::NavigationDataVisualizationByBaseDataTransformFilter()
 {}
@@ -66,14 +68,13 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::Update()
     affineTransform->SetMatrix(m);
 
 
-    /*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
+    ///*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
     mitk::Vector3D pos;
     pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
     affineTransform->SetOffset(pos);
     affineTransform->Modified();
-    
-    /*set the prepared transform to IndexToWorldTransform of BaseData*/
-    data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+    data->GetGeometry()->TransferItkToVtkTransform();
+    data->GetGeometry()->Modified();
   }
 }
 

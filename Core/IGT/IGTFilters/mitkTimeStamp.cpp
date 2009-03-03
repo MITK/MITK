@@ -145,7 +145,7 @@ void mitk::TimeStamp::StopTracking(itk::Object::Pointer Device)
     if (m_DeviceMap.empty())
     {
       m_ReferenceTime = NULL;
-      m_Time = NULL;
+      m_Time = -1;
     }
   }
   else
@@ -162,8 +162,11 @@ void mitk::TimeStamp::StopTracking(itk::Object::Pointer Device)
 */
 double mitk::TimeStamp::GetElapsed()
 {
-  m_Time = GetCurrentStamp();
-  m_Time = m_Time - m_ReferenceTime;
+  if (m_Time > -1)
+  {
+    m_Time = GetCurrentStamp();
+    m_Time = m_Time - m_ReferenceTime;
+  }
   return (double) m_Time;
 }
 

@@ -123,12 +123,6 @@ namespace mitk
     mtHandle IdentifyingCamera;
     //------------------------------------------------
 
-    /** @brief gets the MTHome variable from the system. The path is set manually, so this function is not in use. */
-    int getMTHome (  char *sMTHome, int size );
-
-    /** @brief Variable is not in use. Activate the code in the function StartTracking if you need it.*/
-    char MTHome[512];
-
   };
 }//mitk
 #endif

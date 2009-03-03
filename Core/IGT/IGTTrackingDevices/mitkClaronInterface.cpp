@@ -225,34 +225,6 @@ const char* mitk::ClaronInterface::GetName(claronToolHandle c)
   return MarkerName;
 }
 
-int mitk::ClaronInterface::getMTHome (  char *sMTHome, int size )
-{
-  LONG err;
-  HKEY key;
-  char *mfile = "MTHome";
-  DWORD value_type;
-  DWORD value_size = size;
-
-  /* Check registry key to determine log file name: */
-  if ( (err = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment", 0,
-    KEY_QUERY_VALUE, &key)) != ERROR_SUCCESS )
-  {
-    return(-1);
-  }
-
-  if ( RegQueryValueEx( key,
-    mfile,
-    0,	/* reserved */
-    &value_type,
-    (unsigned char*)sMTHome,
-    &value_size ) != ERROR_SUCCESS || value_size <= 1 )
-  {
-    /* size always >1 if exists ('\0' terminator) ? */
-    return(-1);
-  }
-  return(0);
-}
-
 bool mitk::ClaronInterface::IsTracking()
 {
   return this->isTracking;

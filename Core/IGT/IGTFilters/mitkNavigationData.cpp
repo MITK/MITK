@@ -105,13 +105,3 @@ void mitk::NavigationData::CopyInformation( const DataObject* data )
   }
   /* copy all meta data */
 }
-
-void mitk::NavigationData::SetTimeStamp( double Stamp )
-{
-  m_TimeStamp = Stamp;
-}
-
-double mitk::NavigationData::GetTimeStamp()
-{
-  return m_TimeStamp;
-}

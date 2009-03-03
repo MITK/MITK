@@ -45,6 +45,7 @@ namespace mitk {
       typedef mitk::Point3D PositionType;
       typedef mitk::Quaternion OrientationType;
       typedef mitk::ScalarType ErrorType;
+      typedef double TimeStampType;
 
       
       //virtual const char* GetToolName() const;     ///< every tool has a name that can be used to identify it. 
@@ -60,6 +61,8 @@ namespace mitk {
       itkSetMacro(Error, ErrorType);     ///< sets the overall error estimation of the NavigationData object
       itkGetConstMacro(Error, ErrorType);     ///< return one value that corresponds to the overall tracking error.
       //itkGetMacro(TimeStamp, const mitk::TimeStamp*);   ///< returns the time when the position and orientation were received from the tracking device
+      itkSetMacro(m_TimeStamp, TimeStampType);
+      itkGetMacro(m_TimeStamp, TimeStampType);
 
       /** Graft the data and information from one NavigationData to another. This
       * is a convenience method to setup a second NavigationData object with all the meta
@@ -82,10 +85,6 @@ namespace mitk {
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
-      void SetTimeStamp( double Stamp );
-
-      double GetTimeStamp();
-
     protected:
       NavigationData();
       virtual ~NavigationData();      
@@ -96,8 +95,8 @@ namespace mitk {
       OrientationType m_Orientation;     
       ErrorType m_Error;
       bool m_DataValid;
-      typedef double TimeStamp;
-      TimeStamp m_TimeStamp;
+
+      TimeStampType m_TimeStamp;
 
       //itk::FastMutexLock::Pointer m_MyMutex;
     };

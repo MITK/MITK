@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingTool.h"
 
+#include "mitkTimeStamp.h"
+
 
 mitk::TrackingDeviceSource::TrackingDeviceSource() 
 : mitk::NavigationDataSource(), m_TrackingDevice(NULL)
@@ -75,6 +77,8 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetOrientation(o);
     nd->SetError(t->GetTrackingError());
     //\TODO set timestamp from tool too.
+    nd->SetTimeStamp( mitk::TimeStamp::GetInstance()->GetElapsed() );
+
   }
 }
 

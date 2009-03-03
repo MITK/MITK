@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingVolume.h"
+#include "mitkTimeStamp.h"
 
 
 mitk::TrackingDevice::TrackingDevice() :
@@ -55,6 +56,7 @@ bool mitk::TrackingDevice::StopTracking()
     m_TrackingFinishedMutex->Lock();
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
+    mitk::TimeStamp::GetInstance()->StopTracking(this);
     this->SetMode(Ready);
   }
   return true;

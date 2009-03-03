@@ -1,6 +1,7 @@
 #include "mitkClaronTrackingDevice.h"
 #include "mitkClaronTool.h"
 #include "mitkIGTConfig.h"
+#include "mitkTimeStamp.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 
@@ -86,10 +87,11 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
   m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   if (m_Device->StartTracking())
-    {
+  {
+    mitk::TimeStamp::GetInstance()->StartTracking(this);
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
-    }
+  }
   else return false;
 }
 
@@ -105,6 +107,7 @@ bool mitk::ClaronTrackingDevice::StopTracking()
   }
 
   m_TrackingFinishedMutex->Lock();
+  mitk::TimeStamp::GetInstance()->StopTracking(this);
 
   //delete all files in the tool files directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());

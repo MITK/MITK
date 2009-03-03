@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkClaronTool.h>
 #include <itkMultiThreader.h>
 
-//only include MicronTracker if cmake Variable is on
+//only include MicronTracker if cmake Variable is on else the ClaronInterfaceStub is included
 #ifdef MITK_USE_MICRON_TRACKER
 #include <mitkClaronInterface.h>
 #else
@@ -35,6 +35,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /** Documentation:
+  *   @brief An object of this class represents the MicronTracker device. You can add tools to this
+  *          device, then open the connection and start tracking. The tracking device will then
+  *          continiusely update the tool coordinates.
+  */
   class ClaronTrackingDevice : public TrackingDevice
   {
   public:
@@ -43,13 +48,13 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-    * \brief Starts the tracking.
+    * @brief Starts the tracking.
     * @return Returns true if the tracking is started. Returns false if there was an error.
     */
     virtual bool StartTracking();
 
     /**
-    * \brief Stops the tracking.
+    * @brief Stops the tracking.
     * @return Returns true if the tracking is stopped. Returns false if there was an error.
     */
     virtual bool StopTracking();
@@ -60,12 +65,12 @@ namespace mitk
     std::vector<ClaronTool::Pointer> GetAllTools();
 
     /**
-    * \brief Opens the connection to the device. This have to be done before the tracking is startet.
+    * @brief Opens the connection to the device. This have to be done before the tracking is startet.
     */
     virtual bool OpenConnection();
 
     /**
-    * \brief Closes the connection and clears all resources.
+    * @brief Closes the connection and clears all resources.
     */
     virtual bool CloseConnection();
 
@@ -82,7 +87,7 @@ namespace mitk
     TrackingTool* GetTool(unsigned int toolNumber);
 
     /**
-    * \brief Adds a tool to the tracking device.
+    * @brief Adds a tool to the tracking device.
     * @param tool  The tool which will be added.
     * @return Returns true if the tool has been added, false otherwise.
     */
@@ -98,13 +103,13 @@ namespace mitk
     ClaronTrackingDevice();
     ~ClaronTrackingDevice();
     /**
-    * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
+    * @brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means grabbing frames from the camera an updating the tools.
     */
     void TrackTools();
 
     /**
-    * \brief Automatically detects tools in field of measurement of the tracking device. 
+    * @brief Automatically detects tools in field of measurement of the tracking device. 
     * Tools can only be detected if their calibration file is availiable in the directory 
     * for calibration files.
     * @return Returns all detected Tools.
@@ -123,9 +128,9 @@ namespace mitk
     itk::MultiThreader::Pointer m_MultiThreader;
     int m_ThreadID;
 
-    /** \brief The directory where the camera calibration files can be found */        
+    /** @brief The directory where the camera calibration files can be found */        
     std::string m_CalibrationDir;
-    /** \brief The directory where the tool calibration files can be found */
+    /** @brief The directory where the tool calibration files can be found */
     std::string m_ToolfilesDir;              
   };   
 }//mitk

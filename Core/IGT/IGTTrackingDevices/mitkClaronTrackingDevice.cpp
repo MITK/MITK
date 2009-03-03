@@ -80,7 +80,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-  //restart the Microntracker, so that it will load the new tool files
+  //restart the Microntracker, so it will load the new tool files
   m_Device->StopTracking();
   delete m_Device;
 

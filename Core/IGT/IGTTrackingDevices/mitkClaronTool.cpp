@@ -3,37 +3,35 @@
 #include <vector>
 #include <iostream>
 
-
 mitk::ClaronTool::ClaronTool() :InternalTrackingTool()
 {
 }
 
-
 mitk::ClaronTool::~ClaronTool(void)
 {
 }
-
 
 const char* mitk::ClaronTool::GetCalibrationName()
 {
   return &m_CalibrationName[0];
 }
 
-
 void mitk::ClaronTool::SetCalibrationName(const char* name)
 {
   this->m_CalibrationName=name;
 }
-
 
 bool mitk::ClaronTool::LoadFile(const char* filename)
 {
   return this->LoadFile( std::string(filename));
 }
 
-
 bool mitk::ClaronTool::LoadFile(std::string filename)
 {
+  //This method is not really "loading" a file. It is saving the filename and
+  //parsing the calibration name out of the filename. The calibration name is
+  //later used by the tracking device to really load the file.
+
   m_Filename = filename;
 
   int end = m_Filename.length();
@@ -53,18 +51,15 @@ bool mitk::ClaronTool::LoadFile(std::string filename)
   return true;
 }
 
-
 const char* mitk::ClaronTool::GetFile()
 {
   return m_Filename.c_str();
 }
 
-
 void mitk::ClaronTool::SetToolHandle (mitk::claronToolHandle handle)
 {
   this->m_ToolHandle = handle;
 }
-
 
 mitk::claronToolHandle mitk::ClaronTool::GetToolHandle()
 {

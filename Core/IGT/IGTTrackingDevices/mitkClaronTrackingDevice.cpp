@@ -92,7 +92,11 @@ bool mitk::ClaronTrackingDevice::StartTracking()
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }
-  else return false;
+  else 
+    {
+    m_ErrorMessage = "Error while trying to start the device!";
+    return false;
+    }
 }
 
 
@@ -126,7 +130,10 @@ unsigned int mitk::ClaronTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::ClaronTrackingDevice::GetTool(unsigned int toolNumber)
 {
   if ( toolNumber >= this->GetToolCount())
+    {
+    m_ErrorMessage = "Error while trying to get a tool!";
     return NULL;
+    }
   else
     return this->m_AllTools[toolNumber];
 }
@@ -153,6 +160,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
     m_Device->StopTracking();
     delete m_Device;
     this->SetMode(Setup);
+    m_ErrorMessage = "Error while trying to open connection to the MicronTracker 2!";
   }
   return returnValue;
 }

@@ -61,8 +61,8 @@ namespace mitk {
       itkSetMacro(Error, ErrorType);     ///< sets the overall error estimation of the NavigationData object
       itkGetConstMacro(Error, ErrorType);     ///< return one value that corresponds to the overall tracking error.
       //itkGetMacro(TimeStamp, const mitk::TimeStamp*);   ///< returns the time when the position and orientation were received from the tracking device
-      itkSetMacro(m_TimeStamp, TimeStampType);
-      itkGetMacro(m_TimeStamp, TimeStampType);
+      itkSetMacro(TimeStamp, TimeStampType);
+      itkGetMacro(TimeStamp, TimeStampType);
 
       /** Graft the data and information from one NavigationData to another. This
       * is a convenience method to setup a second NavigationData object with all the meta

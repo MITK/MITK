@@ -93,53 +93,10 @@ namespace mitk
       HybridTracking
     };
 
-    enum PortNumber
-    {
-      COM1 = 1,
-      COM2 = 2,
-      COM3 = 3,
-      COM4 = 4,
-      COM5 = 5,
-      COM6 = 6,
-      COM7 = 7,
-      COM8 = 8,
-      COM9 = 9
-    };
 
-    enum BaudRate
-    {
-      BaudRate9600   = 9600,
-      BaudRate14400  = 14400,
-      BaudRate19200  = 19200,
-      BaudRate38400  = 38400,
-      BaudRate57600  = 57600,
-      BaudRate115200 = 115200
-    };
+ 
 
-    enum DataBits
-    {
-      DataBits8 = 8,
-      DataBits7 = 7
-    };
-
-    enum Parity
-    {
-      None = 'N',  // RS232Int can not set parity on windows systems, it will always be 'no parity'
-      Odd  = 'O',
-      Even = 'E'
-    };
-
-    enum StopBits
-    {
-      StopBits1 = 1,
-      StopBits2 = 2
-    };
-
-    enum HardwareHandshake
-    {
-      HardwareHandshakeOn = 1,
-      HardwareHandshakeOff = 0
-    };
+ 
 	/**
 	 * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
 	 * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
@@ -179,7 +136,7 @@ namespace mitk
       ButtonBox = 'B'
     };
 
-    const unsigned char CR = 0xD; // == '\r' - carriage return
+    
 
     typedef itk::Point<double> MarkerPointType;
     typedef std::vector<MarkerPointType> MarkerPointContainerType;

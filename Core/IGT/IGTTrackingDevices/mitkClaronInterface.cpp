@@ -23,30 +23,34 @@ bool mitk::ClaronInterface::StartTracking()
 
   try
   {
+    //Step 1: initialize cameras
     MTC(Cameras_HistogramEqualizeImagesSet(true)); //set the histogram equalizing
     MTC( Cameras_ItemGet(0, &CurrCamera) ); //Obtain a handle to the first/only camera in the array
 
-    //Load the marker templates (with no validation).
+    //Step 2: Load the marker templates
     MTC( Markers_LoadTemplates(markerDir) ); //Path to directory where the marker templates are
     printf("Loaded %d marker templates\n",Markers_TemplatesCount());
 
-    for (int i=0; i<20; i++)//the first 20 frames are auto-adjustment frames, and would be ignored here
+    //Step 3: Wait a 20 frames
+    for (int i=0; i<20; i++)//the first 20 frames are auto-adjustment frames, we ignore them
     {
       MTC( Cameras_GrabFrame(NULL) ); //Grab a frame (all cameras together)
       MTC( Markers_ProcessFrame(NULL) ); //Proces the frame(s) to obtain measurements
     }
 
-    //Initialize MTHome
+    //Step 4: Initialize IdentifiedMarkers and PoseXf
+    IdentifiedMarkers = Collection_New();
+    PoseXf = Xform3D_New();
+    
+    //now we are tracking...
+
     /* MTHome is not in use. The following code has to be activated if you want to use MTHome!
+    //Initialize MTHome
     if ( getMTHome (MTHome, sizeof(MTHome)) < 0 )
     {
     // No Environment
     printf("MTHome environment variable is not set!\n");
     }*/
-
-    //Initialize IdentifiedMarkers and PoseXf
-    IdentifiedMarkers = Collection_New();
-    PoseXf = Xform3D_New();
   }
   catch(...)
   {
@@ -63,10 +67,14 @@ bool mitk::ClaronInterface::StopTracking()
 {
   if (isTracking)
   {
-    //free up all resources taken
+    //free up the resources
     Collection_Free(IdentifiedMarkers);
     Xform3D_Free(PoseXf);
-    Cameras_Detach();//important - otherwise the cameras will continue capturing, locking up this process.
+
+    //stop the camera
+    Cameras_Detach();
+    
+    //now tracking is stopped
     isTracking = false;
     return true;
   }
@@ -78,7 +86,7 @@ bool mitk::ClaronInterface::StopTracking()
 
 std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
 {
-  //Returnvalue
+  //Set returnvalue
   std::vector<claronToolHandle> returnValue;
 
   //Here, MTC internally maintains the measurement results.
@@ -86,11 +94,12 @@ std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
   //are updated to reflect the next frame's content.
   //First, we will obtain the collection of the markers that were identified.
   MTC( Markers_IdentifiedMarkersGet(NULL, IdentifiedMarkers) );
-  //Now we iterate on the identified markers (if any), and report their name and their pose
+  
+  //Now we iterate on the identified markers and add them to the returnvalue
   for (int j=1; j<=Collection_Count(IdentifiedMarkers); j++)
   {
-    //Obtain the marker's handle, and use it to obtain the pose in the current camera's space
-    //  using our Xform3D object, PoseXf.
+    // Obtain the marker's handle, and use it to obtain the pose in the current camera's space
+    // using our Xform3D object, PoseXf.
     mtHandle Marker = Collection_Int(IdentifiedMarkers, j);
     returnValue.push_back(Marker);
   }
@@ -99,8 +108,8 @@ std::vector<mitk::claronToolHandle> mitk::ClaronInterface::GetAllActiveTools()
 
 void mitk::ClaronInterface::GrabFrame()
 {
-  MTC( Cameras_GrabFrame(NULL) ); //Grab a frame (all cameras together)
-  MTC( Markers_ProcessFrame(NULL) ); //Proces the frame(s) to obtain measurements
+  MTC( Cameras_GrabFrame(NULL) ); //Grab a frame
+  MTC( Markers_ProcessFrame(NULL) ); //Process the frame(s)
 }
 
 std::vector<double> mitk::ClaronInterface::GetTipPosition(mitk::claronToolHandle c)
@@ -121,6 +130,8 @@ std::vector<double> mitk::ClaronInterface::GetTipPosition(mitk::claronToolHandle
   //Get position
   MTC( Xform3D_ShiftGet(t2c, Position) );
 
+  // Here we have to negate the X- and Y-coordinates because of a bug of the
+  // MTC-library.
   returnValue.push_back(-Position[0]);
   returnValue.push_back(-Position[1]);
   returnValue.push_back(Position[2]);
@@ -135,6 +146,8 @@ std::vector<double> mitk::ClaronInterface::GetPosition(claronToolHandle c)
   MTC( Marker_Marker2CameraXfGet (c, CurrCamera, PoseXf, &IdentifyingCamera) );
   MTC( Xform3D_ShiftGet(PoseXf, Position) );
 
+  // Here we have to negate the X- and Y-coordinates because of a bug of the
+  // MTC-library.
   returnValue.push_back(-Position[0]);
   returnValue.push_back(-Position[1]);
   returnValue.push_back(Position[2]);
@@ -158,23 +171,25 @@ std::vector<double> mitk::ClaronInterface::GetTipQuaternions(claronToolHandle c)
   //Transform both to t2c
   MTC(Xform3D_Concatenate(t2m,m2c,t2c));
 
-  //Das Claron-Quaternion holen
+  //get the Claron-Quaternion
   double Quarternions[4];
   MTC( Xform3D_RotQuaternionsGet(t2c, Quarternions) );
   mitk::Quaternion claronQuaternion;
+  //note: claron quarternion has different order than the mitk quarternion
   claronQuaternion[3] = Quarternions[0];
   claronQuaternion[0] = Quarternions[1];
   claronQuaternion[1] = Quarternions[2];
   claronQuaternion[2] = Quarternions[3];
 
-  //Vorgeschaltete -90°-Drehung um die Y-Achse als Quaternion
+  // Here we have to make a -90°-turn around the Y-axis because of a bug of the
+  // MTC-library.
   mitk::Quaternion minusNinetyDegreeY;
   minusNinetyDegreeY[3] = sqrt(2.0)/2.0;
   minusNinetyDegreeY[0] = 0;
   minusNinetyDegreeY[1] = -1.0/(sqrt(2.0));
   minusNinetyDegreeY[2] = 0;
 
-  //Ergebnis berechnen
+  //calculate the result...
   mitk::Quaternion erg = (minusNinetyDegreeY*claronQuaternion);
 
   returnValue.push_back(erg[3]);
@@ -188,7 +203,9 @@ std::vector<double> mitk::ClaronInterface::GetTipQuaternions(claronToolHandle c)
 std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
 {
   std::vector<double> returnValue;
-
+  //TODO by Alfred 3.3.2009: I'm afraid we have a bug here. Look at the method
+  //                         GetTipQuaternions... the same has to be done here
+  //                         to compensate the bug in the MTC-lib.
   double	Quarternions[4];
   MTC( Marker_Marker2CameraXfGet (c, CurrCamera, PoseXf, &IdentifyingCamera) );
   MTC( Xform3D_RotQuaternionsGet(PoseXf, Quarternions) );
@@ -205,7 +222,6 @@ const char* mitk::ClaronInterface::GetName(claronToolHandle c)
   char MarkerName[MT_MAX_STRING_LENGTH];
   MTC( Marker_NameGet(c, MarkerName, MT_MAX_STRING_LENGTH, 0) );
   std::string returnValue = std::string(MarkerName);
-  //return &returnValue[0];
   return MarkerName;
 }
 

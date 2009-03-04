@@ -159,8 +159,13 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
           fileName += ".mps";
           QString qfileName = QFileDialog::getSaveFileName(QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
 
+          if (qfileName.isEmpty())
+          {
+            return;
+          }
+
           //check if file is valid for writing
-          if(!IsFilenameValidForWriting(qfileName.ascii()))
+          if (!IsFilenameValidForWriting(qfileName.ascii()))
           {
             QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
             writingSuccessful = false;

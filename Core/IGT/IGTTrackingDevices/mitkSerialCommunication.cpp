@@ -20,19 +20,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #ifdef WIN32
-#include <atlstr.h>
-#include <itksys/SystemTools.hxx>
+  #include <atlstr.h>
+  #include <itksys/SystemTools.hxx>
 #else // Posix
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <termios.h> 
-#include <errno.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <sys/time.h>
+  #include <sys/ioctl.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <termios.h> 
+  #include <errno.h>
 
-#define INVALID_HANDLE_VALUE -1
+  #define INVALID_HANDLE_VALUE -1
 #endif
 
 #define OK 1
@@ -65,13 +65,12 @@ int mitk::SerialCommunication::OpenConnection()
     return ERROR_VALUE;
 
 #ifdef WIN32
+  //CString port = _T("COM") + static_cast<unsigned int>(m_PortNumber);  // <-- original
   std::stringstream ss;
-  if (m_DeviceName.empty())
-    ss << "COM" << static_cast<unsigned int>(m_PortNumber); // use m_PortNumber
-  else
-    ss << m_DeviceName; // use m_DeviceName
+  ss << "COM" << static_cast<unsigned int>(m_PortNumber);
+  std::string port = ss.str(); 
 
-  m_ComPortHandle = CreateFile(ss.str().c_str(), GENERIC_READ | GENERIC_WRITE,
+  m_ComPortHandle = CreateFile(port.c_str(), GENERIC_READ | GENERIC_WRITE,
     NULL,    /* no sharing */
     NULL, /* no security flags */
     OPEN_EXISTING, /* open com port, don't create it */
@@ -94,14 +93,14 @@ int mitk::SerialCommunication::OpenConnection()
   return OK;
 
 #else // Posix
-  std::stringstream ss;
+  std::string deviceName;
   if (m_DeviceName.empty())
-    ss << "/dev/ttyS" << static_cast<unsigned int>(m_PortNumber) - 1; // use m_PortNumber, COM1 = ttyS0
+    deviceName = "/dev/ttyS" + static_cast<unsigned int>(m_PortNumber) - 1; // COM1 = ttyS0
   else
-    ss << m_DeviceName; // use m_DeviceName
+    deviceName = m_DeviceName;
 
-  //m_FileDescriptor = open(ss.str().c_str(), O_RDWR | O_NONBLOCK | O_NDELAY | O_NOCTTY | O_EXCL); // open device file
-  m_FileDescriptor = open(ss.str().c_str(), O_RDWR|O_NONBLOCK|O_EXCL); // open device file
+  //m_FileDescriptor = open(deviceName.c_str(), O_RDWR | O_NONBLOCK | O_NDELAY | O_NOCTTY | O_EXCL); // open device file
+m_FileDescriptor = open(deviceName.c_str(), O_RDWR|O_NONBLOCK|O_EXCL); // open device file
   if (m_FileDescriptor < 0) 
     return ERROR_VALUE; 
 
@@ -343,16 +342,16 @@ int mitk::SerialCommunication::ApplyConfiguration()
   }
   switch (m_Parity)  // set parity
   {
+  case None:
+    termIOStructure.c_cflag &= ~PARENB;
+    break;
   case Odd:
     termIOStructure.c_cflag |= (PARENB|PARODD);
     break;
   case Even:
+  default:
     termIOStructure.c_cflag |= PARENB;
     termIOStructure.c_cflag &= ~PARODD;
-  case None:
-  default:
-    termIOStructure.c_cflag &= ~PARENB;
-    break;
   }
   speed_t baudrate; // set baudrate
   switch (m_BaudRate)
@@ -410,7 +409,7 @@ void mitk::SerialCommunication::SendBreak(unsigned int ms)
   return;
 #endif
 }
-
+ 
 
 void mitk::SerialCommunication::ClearReceiveBuffer()
 {

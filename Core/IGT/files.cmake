@@ -18,9 +18,6 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp
   IGTTrackingDevices/mitkInternalTrackingTool.cpp  ## work in progress
-  IGTTrackingDevices/mitkNDIPassiveTool.cpp
-  IGTTrackingDevices/mitkNDIProtocol.cpp
-  IGTTrackingDevices/mitkNDITrackingDevice.cpp
   IGTTrackingDevices/mitkSerialCommunication.cpp  ## work in progress
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp

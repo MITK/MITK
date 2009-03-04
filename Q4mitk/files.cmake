@@ -63,10 +63,11 @@ SET(CPP_FILES
  QmitkCopyToClipBoardDialog.cpp
  QmitkMaterialEditor.cpp
  QmitkMaterialShowcase.cpp
- QmitkPropertiesTableEditor.cpp 
+ QmitkPropertiesTableEditor.cpp
+ QmitkPrimitiveMovieNavigatorWidget.cpp
 )
 
-QT4_ADD_RESOURCES(CPP_FILES QmitkResources.qrc)
+QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
 
 
 SET(MOC_H_FILES
@@ -123,6 +124,7 @@ SET(MOC_H_FILES
  QmitkMaterialEditor.h
  QmitkMaterialShowcase.h
  QmitkPropertiesTableEditor.h
+ QmitkPrimitiveMovieNavigatorWidget.h
 )
 
 SET(UI_FILES
@@ -136,4 +138,5 @@ SET(UI_FILES
   QmitkSelectableGLWidget.ui
   QmitkMaterialEditor.ui
   QmitkMaterialShowcase.ui
+  QmitkPrimitiveMovieNavigatorWidget.ui
 )

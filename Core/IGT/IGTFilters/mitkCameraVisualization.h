@@ -33,9 +33,11 @@ namespace mitk {
     itkSetMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
     itkSetMacro(ViewUpInToolCoordinates,Vector3D);
     itkSetMacro(FocalLength,float);
+    itkSetMacro(ViewAngle,float);
     itkGetConstMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
     itkGetConstMacro(ViewUpInToolCoordinates,Vector3D);
     itkGetConstMacro(FocalLength,float);
+    itkGetConstMacro(ViewAngle,float);
     /**Documentation
     * \brief sets renderer that visualizes the navigation data
     */
@@ -52,25 +54,25 @@ namespace mitk {
     *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
+    *  - "CameraVisualization_ViewAngle" : mitk::FloatProperty
     */
     virtual void SetParameters(const mitk::PropertyList* p);
 
     /**Documentation 
     *@brief Get all filter parameters as a PropertyList
-    *
     * This method returns a PropertyList containing the following
     * properties (name : data type):
     *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
+    *  - "CameraVisualization_ViewAngle" : mitk::FloatProperty
     * The returned PropertyList must be assigned to a 
     * SmartPointer immediately, or else it will get destroyed.
     */
     mitk::PropertyList::ConstPointer GetParameters() const;
     /**Documentation
     * \brief filter execute method
-    *
-    * positions and orients camera according to NavigationData
+    * positions and orients camera according to the position and orientation hold in the NavigationData
     */
     virtual void Update();
 
@@ -79,11 +81,12 @@ namespace mitk {
     virtual ~CameraVisualization();
 
     ///< renderer that visualizes the navigation data
-    const BaseRenderer* m_Renderer; 
+    BaseRenderer* m_Renderer; 
 
     Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
     Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates
-    float m_FocalLength; ///< focal length of the camera = distance from camera position to focal point in mm.
+    float m_FocalLength; ///< focal length of the camera: distance between camera position and focal point.
+    float m_ViewAngle; ///< view angle of the camera: angular height of the camera view measured in degrees.
   };
 } // namespace mitk
 

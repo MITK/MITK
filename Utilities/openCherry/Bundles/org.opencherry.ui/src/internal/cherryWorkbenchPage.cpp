@@ -440,7 +440,10 @@ WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
   {
     throw WorkbenchException("Perspective ID is undefined");
   }
+
+  this->Register();
   this->Init(w, layoutID, input, true);
+  this->UnRegister(false);
 }
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, IAdaptable* input)

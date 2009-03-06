@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-WorkbenchWindowConfigurer::WindowActionBarConfigurer::WindowActionBarConfigurer(WorkbenchWindow::Pointer wnd)
+WorkbenchWindowConfigurer::WindowActionBarConfigurer::WindowActionBarConfigurer(WorkbenchWindow::WeakPtr wnd)
 : window(wnd)
 {
 
@@ -37,7 +37,7 @@ void WorkbenchWindowConfigurer::WindowActionBarConfigurer::SetProxy(IActionBarCo
 
 IWorkbenchWindowConfigurer::Pointer WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetWindowConfigurer()
 {
-  return window->GetWindowConfigurer();
+  return WorkbenchWindow::Pointer(window)->GetWindowConfigurer();
 }
 
 void* WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetMenuManager()
@@ -65,7 +65,7 @@ WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(WorkbenchWindow::Pointer wi
 
 IWorkbenchWindow::Pointer WorkbenchWindowConfigurer::GetWindow()
 {
-  return window;
+  return IWorkbenchWindow::Pointer(window);
 }
 
 IWorkbenchConfigurer::Pointer WorkbenchWindowConfigurer::GetWorkbenchConfigurer()
@@ -204,17 +204,17 @@ void WorkbenchWindowConfigurer::SetInitialSize(Point size)
 
 void WorkbenchWindowConfigurer::CreateDefaultContents(Shell::Pointer shell)
 {
-  window->CreateDefaultContents(shell);
+  WorkbenchWindow::Pointer(window)->CreateDefaultContents(shell);
 }
 
 void* WorkbenchWindowConfigurer::CreatePageComposite(void* parent)
 {
-  return window->CreatePageComposite(parent);
+  return WorkbenchWindow::Pointer(window)->CreatePageComposite(parent);
 }
 
 bool WorkbenchWindowConfigurer::SaveState(IMemento::Pointer memento)
 {
-  return window->SaveState(memento);
+  return WorkbenchWindow::Pointer(window)->SaveState(memento);
 }
 
 }

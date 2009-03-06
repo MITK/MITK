@@ -34,12 +34,6 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-
-/**
- * Delete a itk object. This method should always be used to delete an object
- * when the new operator was used to create it. Using the C++ delete method
- * will not work with reference counting.
- */
 void
 Object
 ::Delete()
@@ -47,10 +41,6 @@ Object
   this->UnRegister();
 }
 
-
-/**
- * Avoid DLL boundary problems.
- */
 #ifdef _WIN32
 void*
 Object
@@ -82,11 +72,6 @@ Object
 #endif
 
 
-/**
- * This function will be common to all itk objects.  It just calls the
- * header/self/trailer virtual print methods, which can be overriden by
- * subclasses (any itk object).
- */
 void
 Object
 ::Print(std::ostream& os, Indent indent) const
@@ -96,22 +81,13 @@ Object
   this->PrintTrailer(os, indent);
 }
 
-
-/**
- * This method is called when itkExceptionMacro executes. It allows
- * the debugger to break on error.
- */
-void
+std::string
 Object
-::BreakOnError()
+::ToString() const
 {
-  ;
+  return "";
 }
 
-
-/**
- * Increase the reference count (mark as used by another object).
- */
 void
 Object
 ::Register() const
@@ -120,13 +96,9 @@ Object
   m_ReferenceCount++;
 }
 
-
-/**
- * Decrease the reference count (release by another object).
- */
 void
 Object
-::UnRegister() const
+::UnRegister(bool del) const
 {
   m_ReferenceCountLock.lock();
   int tmpReferenceCount = --m_ReferenceCount;
@@ -134,16 +106,12 @@ Object
 
   // ReferenceCount in now unlocked.  We may have a race condition
   // to delete the object.
-  if ( tmpReferenceCount <= 0)
+  if ( tmpReferenceCount <= 0 && del)
     {
     delete this;
     }
 }
 
-
-/**
- * Sets the reference count (use with care)
- */
 void
 Object
 ::SetReferenceCount(int ref)
@@ -192,14 +160,8 @@ Object
   /**
    * warn user if reference counting is on and the object is being referenced
    * by another object.
-   * a call to uncaught_exception is necessary here to avoid throwing an
-   * exception if one has been thrown already. This is likely to
-   * happen when a subclass constructor (say B) is throwing an exception: at
-   * that point, the stack unwinds by calling all superclass destructors back
-   * to this method (~Object): since the ref count is still 1, an
-   * exception would be thrown again, causing the system to abort()!
    */
-  if(m_ReferenceCount > 0 && !std::uncaught_exception())
+  if(m_ReferenceCount > 0)
     {
     // A general exception safety rule is that destructors should
     // never throw.  Something is wrong with a program that reaches
@@ -210,17 +172,13 @@ Object
     std::cout << this->GetNameOfClass() << " (" << this << "): Trying to delete object with non-zero reference count.";
     std::cout << "\n\n";
     }
-    /** 
-    * calls the destroyListener added functions 
-    */ 
+
+    /**
+    * notifies the registered functions that the object is being destroyed
+    */
     m_DestroyMessage.Send();
 }
 
-
-/**
- * Chaining method to print an object's instance variables, as well as
- * its superclasses.
- */
 void
 Object
 ::PrintSelf(std::ostream& os, Indent Indent) const
@@ -270,13 +228,6 @@ Object
 {
 }
 
-
-/**
- * This operator allows all subclasses of Object to be printed via <<.
- * It in turn invokes the Print method, which in turn will invoke the
- * PrintSelf method that all objects should define, if they have anything
- * interesting to print out.
- */
 std::ostream&
 operator<<(std::ostream& os, const Object& o)
 {
@@ -285,12 +236,12 @@ operator<<(std::ostream& os, const Object& o)
 }
 
 
+// ============== Indent related implementations ==============
+
 static const char blanks[41] =
 "                                        ";
 
-/**
- * Instance creation.
- */
+
 Indent*
 Indent::
 New()
@@ -298,11 +249,6 @@ New()
   return new Self;
 }
 
-
-/**
- * Determine the next Indentation level. Keep Indenting by two until the
- * max of forty.
- */
 Indent
 Indent
 ::GetNextIndent()
@@ -315,9 +261,6 @@ Indent
   return Indent;
 }
 
-/**
- * Print out the Indentation. Basically output a bunch of spaces.
- */
 std::ostream&
 operator<<(std::ostream& os, const Indent& ind)
 {

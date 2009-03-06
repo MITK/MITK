@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../application/cherryIWorkbenchConfigurer.h"
 #include "../application/cherryIWorkbenchWindowConfigurer.h"
 
+#include <cherryWeakPointer.h>
+
 namespace cherry
 {
 
@@ -47,7 +49,7 @@ public:
     /**
      * The workbench window associated with this configurer.
      */
-    private: SmartPointer<WorkbenchWindow> window;
+    private: WeakPointer<WorkbenchWindow> window;
 
     /**
      * The shell style bits to use when the window's shell is being created.
@@ -122,11 +124,11 @@ public:
     class WindowActionBarConfigurer : public IActionBarConfigurer {
 
         private: IActionBarConfigurer::Pointer proxy;
-        private: SmartPointer<WorkbenchWindow> window;
+        private: WeakPointer<WorkbenchWindow> window;
 
         public: cherryObjectMacro(WindowActionBarConfigurer);
 
-        public: WindowActionBarConfigurer(SmartPointer<WorkbenchWindow> wnd);
+        public: WindowActionBarConfigurer(WeakPointer<WorkbenchWindow> wnd);
 
         /**
          * Sets the proxy to use, or <code>null</code> for none.

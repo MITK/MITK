@@ -15,10 +15,13 @@
 
  =========================================================================*/
 
+#ifndef __CHERRY_WEAK_POINTER_H__
+#define __CHERRY_WEAK_POINTER_H__
+
 #include <exception>
 #include <iostream>
-#include "cherryObject.h"
-#include "cherryOSGiDll.h"
+
+#include "cherryMessage.h"
 #include "cherrySmartPointer.h"
 
 namespace cherry
@@ -41,8 +44,6 @@ class WeakPointer
 public:
 
   typedef TObjectType ObjectType;
-  friend class SmartPointer<ObjectType>;
-  friend class MessageDelegate<WeakPointer> ;
 
   /** Default Constructor */
   WeakPointer() :
@@ -126,7 +127,7 @@ public:
     return *this;
   }
 
-  /** look method is used to access the referring object  */
+  /** lock method is used to access the referring object  */
   SmartPointer<ObjectType> Lock()
   {
     SmartPointer<ObjectType> sp(m_Pointer);
@@ -143,6 +144,9 @@ public:
 
 private:
 
+  template<class Y> friend class SmartPointer;
+  template<class Y> friend class WeakPointer;
+
   ObjectType *m_Pointer;
 
   void ObjectDestroyed()
@@ -153,3 +157,5 @@ private:
 };
 
 }
+
+#endif // __CHERRY_WEAK_POINTER_H__

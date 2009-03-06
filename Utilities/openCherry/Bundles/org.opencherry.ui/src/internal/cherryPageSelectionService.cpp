@@ -117,7 +117,7 @@ void PageSelectionService::RemoveSelectionListener(const std::string& partId,
 
 IWorkbenchPage::Pointer PageSelectionService::GetPage()
 {
-  return page;
+  return IWorkbenchPage::Pointer(page);
 }
 
 void PageSelectionService::FireSelection(IWorkbenchPart::Pointer part,

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYOSGILIGHTOBJECT_H_
 
 #include <Poco/Mutex.h>
+#include <string>
 
 #include "cherryOSGiDll.h"
 #include "cherryMacros.h"
@@ -56,14 +57,14 @@ private:
   int m_Indent;
 };
 
-//CHERRY_OSGI std::ostream& operator<<(std::ostream& os, const Indent& o);
+CHERRY_OSGI std::ostream& operator<<(std::ostream& os, const Indent& o);
 
 
 /** \class Object
- * \brief Light weight base class for most cherry OSGi classes.
+ * \brief Light weight base class for most openCherry classes.
  *
  * Object is copied from itk::LightObject and is the highest
- * level base class for most cherry osgi objects. It
+ * level base class for most openCherry objects. It
  * implements reference counting and the API for object printing.
  *
  */
@@ -71,9 +72,9 @@ class CHERRY_OSGI Object
 {
 
  /**
- *  in this case the message macro is used to create a message object as well as add / remove functions
- *  (AddDestroyListener, Removedestroylistener) on the message object
- *  in order to call the registered functions when the object is destroyed.
+ *  The message macro is used to create a message object as well as add / remove functions
+ *  (AddDestroyListener, RemoveDestroyListener)
+ *  in order to register functions which will be called when the object is destroyed.
  *  More information about the NewMessageMacro can be found in @see cherryMessage.h
  *
  */
@@ -83,22 +84,11 @@ public:
 
   cherryObjectMacro(Object)
 
-  /** Delete an itk object.  This method should always be used to delete an
+  /** Delete an openCherry object. This method should always be used to delete an
    * object when the new operator was used to create it. Using the C
-   *  delete method will not work with reference counting.  */
+   * delete method will not work with reference counting.  */
   virtual void Delete();
 
-
-  /** Returns a unique name which can be used to name
-     * library manifests for dynamic class loading. Used in the
-     * extension point mechanism.
-     *
-     * This method will be declared by using the cherryInterfaceMacro or
-     * cherryManifestMacro macros.
-     */
-//  static const char *GetManifestName() {
-//    return "cherry::Object";
-//  }
 
 #ifdef _WIN32
   /** Used to avoid dll boundary problems.  */
@@ -108,18 +98,22 @@ public:
   void operator delete[](void*, size_t);
 #endif
 
-  /** Cause the object to print itself out. */
+  /** Cause the object to print itself out. This is usually used to provide
+   * detailed information about the object's state. It just calls the
+ * header/self/trailer virtual print methods, which can be overriden by
+ * subclasses. */
   void Print(std::ostream& os, Indent Indent=0) const;
 
-  /** This method is called when itkExceptionMacro executes. It allows
-   * the debugger to break on error.  */
-  static void BreakOnError();
+  /** Returns a string representation of this object. */
+  virtual std::string ToString() const;
 
   /** Increase the reference count (mark as used by another object).  */
   virtual void Register() const;
 
-  /** Decrease the reference count (release by another object).  */
-  virtual void UnRegister() const;
+  /** Decrease the reference count (release by another object).
+   * Set del to false if you do not want the object to be deleted if
+   * the reference count is zero (use with care!) */
+  virtual void UnRegister(bool del = true) const;
 
   /** Gets the reference count on this object. */
   virtual int GetReferenceCount() const
@@ -129,6 +123,9 @@ public:
    * method, use it with care. */
   virtual void SetReferenceCount(int);
 
+  /** A generic comparison method. Override this method in subclasses and
+   * cast to your derived class to provide a more detailed comparison.
+   */
   virtual bool operator==(const Object*) const;
 
 #ifdef CHERRY_DEBUG_SMARTPOINTER
@@ -163,6 +160,14 @@ private:
 
 
 };
+
+/**
+ * This operator allows all subclasses of Object to be printed via <<.
+ * It in turn invokes the Print method, which in turn will invoke the
+ * PrintSelf method that all objects should define, if they have anything
+ * interesting to print out.
+ */
+CHERRY_OSGI std::ostream& operator<<(std::ostream& os, const Object& o);
 
 
 }

@@ -37,7 +37,7 @@ class PageSelectionService : public ISelectionService {
 
 private:
 
-    IWorkbenchPage::WeakPointer page;
+    IWorkbenchPage::WeakPtr page;
 
     /**
      * The list of selection listeners (not per-part).

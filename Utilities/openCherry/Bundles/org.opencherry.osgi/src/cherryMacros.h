@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __CHERRY_MACROS_H__
 #define __CHERRY_MACROS_H__
 
-#include "cherrySmartPointer.h"
+#include "cherryWeakPointer.h"
 
 #define cherryNameMacro(className) \
   virtual const char* GetNameOfClass() const \
@@ -32,9 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
   typedef className       Self; \
   typedef cherry::SmartPointer<Self> Pointer; \
   typedef cherry::SmartPointer<const Self>  ConstPointer; \
-  /* TODO Weakpointer */ \
-  typedef cherry::SmartPointer<Self> WeakPointer; \
-  typedef cherry::SmartPointer<const Self> ConstWeakPointer; \
+  typedef cherry::WeakPointer<Self> WeakPtr; \
+  typedef cherry::WeakPointer<const Self> ConstWeakPtr; \
   cherryNameMacro(className) \
 
 

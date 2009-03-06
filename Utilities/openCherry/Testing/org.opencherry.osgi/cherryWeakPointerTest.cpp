@@ -41,7 +41,7 @@ struct ObjectTest: public cherry::Object
 int cherryWeakPointerTest(int /*argc*/, char* /*argv*/[])
 {
 
-  CHERRY_TEST_BEGIN("Weakpointer")
+  CHERRY_TEST_BEGIN("WeakPointer")
 
     // test reference counting
     {
@@ -68,7 +68,7 @@ int cherryWeakPointerTest(int /*argc*/, char* /*argv*/[])
         cherry::SmartPointer<ObjectTest> ptr_smart2(ptr_weak2);
         CHERRY_TEST_CONDITION(ptr_smart1.GetPointer() == ptr_smart2.GetPointer(),"copy constructor");
       }
-      CHERRY_TEST_CONDITION((*ptr_smart)->GetReferenceCount() == 1, "refcount = 1";)
+      CHERRY_TEST_CONDITION((*ptr_smart)->GetReferenceCount() == 1, "refcount = 1")
       delete ptr_smart;
       CHERRY_TEST_CONDITION(ptr_weak2.Lock() == 0, "WeakPointer::Lock()");
     }

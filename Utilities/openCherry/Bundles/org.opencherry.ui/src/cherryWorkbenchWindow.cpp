@@ -43,14 +43,17 @@ const int WorkbenchWindow::FILL_ALL_ACTION_BARS =
 
 WorkbenchWindow::WorkbenchWindow(int number) :
   Window(Shell::Pointer(0)), pageComposite(0), windowAdvisor(0),
-      actionBarAdvisor(0), largeUpdates(0), closing(false),
+      actionBarAdvisor(0), number(number), largeUpdates(0), closing(false),
       shellActivated(false),
       updateDisabled(true), emptyWindowContentsCreated(false),
       emptyWindowContents(0),
       asMaximizedState(false),
       serviceLocatorOwner(this)
 {
-  this->number = number;
+  this->Register(); // increase the reference count to avoid deleting
+                    // this object when temporary smart pointers
+                    // go out of scope
+
   // Make sure there is a workbench. This call will throw
   // an exception if workbench not created yet.
   IWorkbench* workbench = PlatformUI::GetWorkbench();
@@ -71,6 +74,9 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
   // Fill the action bars
   this->FillActionBars(FILL_ALL_ACTION_BARS);
+
+  this->UnRegister(false); // decrease reference count and avoid deleting
+                           // the window
 }
 
 WorkbenchWindow::~WorkbenchWindow()
@@ -1300,7 +1306,7 @@ WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()
   if (windowConfigurer.IsNull())
   {
     // lazy initialize
-    windowConfigurer = new WorkbenchWindowConfigurer(WorkbenchWindow::WeakPointer(this));
+    windowConfigurer = new WorkbenchWindowConfigurer(WorkbenchWindow::Pointer(this));
   }
   return windowConfigurer;
 }
@@ -1503,17 +1509,19 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   return (++riter)->Cast<WorkbenchPage>();
 }
 
-WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow::WeakPointer w) :
+WorkbenchWindow::ShellActivationListener::ShellActivationListener(WorkbenchWindow::Pointer w) :
 window(w)
 {
 }
 
 void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointer event)
 {
-  window->shellActivated = true;
-  window->serviceLocator->Activate();
-  window->GetWorkbenchImpl()->SetActivatedWindow(window);
-  WorkbenchPage::Pointer currentPage = window->GetActivePage().Cast<WorkbenchPage>();
+  WorkbenchWindow::Pointer wnd(window);
+
+  wnd->shellActivated = true;
+  wnd->serviceLocator->Activate();
+  wnd->GetWorkbenchImpl()->SetActivatedWindow(wnd);
+  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
   if (currentPage != 0)
   {
     IWorkbenchPart::Pointer part = currentPage->GetActivePart();
@@ -1528,17 +1536,19 @@ void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointe
       PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
       site->GetPane()->ShellActivated();
     }
-    window->GetWorkbenchImpl()->FireWindowActivated(window);
+    wnd->GetWorkbenchImpl()->FireWindowActivated(wnd);
   }
   //liftRestrictions();
 }
 
 void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Pointer event)
 {
-  window->shellActivated = false;
+  WorkbenchWindow::Pointer wnd(window);
+
+  wnd->shellActivated = false;
   //imposeRestrictions();
-  window->serviceLocator->Deactivate();
-  WorkbenchPage::Pointer currentPage = window->GetActivePage().Cast<WorkbenchPage>();
+  wnd->serviceLocator->Deactivate();
+  WorkbenchPage::Pointer currentPage = wnd->GetActivePage().Cast<WorkbenchPage>();
   if (currentPage != 0)
   {
     IWorkbenchPart::Pointer part = currentPage->GetActivePart();
@@ -1553,13 +1563,13 @@ void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Poin
       PartSite::Pointer site = editor->GetSite().Cast<PartSite>();
       site->GetPane()->ShellDeactivated();
     }
-    window->GetWorkbenchImpl()->FireWindowDeactivated(window);
+    wnd->GetWorkbenchImpl()->FireWindowDeactivated(wnd);
   }
 }
 
 void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
 {
-  shellActivationListener = new ShellActivationListener(WorkbenchWindow::WeakPointer(this));
+  shellActivationListener = new ShellActivationListener(WorkbenchWindow::Pointer(this));
   shell->AddShellListener(shellActivationListener);
 }
 
@@ -1582,7 +1592,9 @@ ControlResizeListener::ControlResized(GuiTk::ControlEvent::Pointer e)
 
 void WorkbenchWindow::ControlResizeListener::SaveBounds()
 {
-  Shell::Pointer shell = window->GetShell();
+  WorkbenchWindow::Pointer wnd(window);
+
+  Shell::Pointer shell = wnd->GetShell();
   if (shell == 0)
   {
     return;
@@ -1597,11 +1609,11 @@ void WorkbenchWindow::ControlResizeListener::SaveBounds()
   }
   if (shell->GetMaximized())
   {
-    window->asMaximizedState = true;
+    wnd->asMaximizedState = true;
     return;
   }
-  window->asMaximizedState = false;
-  window->normalBounds = shell->GetBounds();
+  wnd->asMaximizedState = false;
+  wnd->normalBounds = shell->GetBounds();
 }
 
 void WorkbenchWindow::TrackShellResize(Shell::Pointer newShell)

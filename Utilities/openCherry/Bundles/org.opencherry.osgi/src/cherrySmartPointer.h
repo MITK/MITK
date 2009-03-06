@@ -61,6 +61,18 @@ public:
 
   }
 
+  /** Constructor to pointer p  */
+  explicit SmartPointer(ObjectType *p) :
+    m_Pointer(p)
+  {
+    if (m_Pointer)
+      this->Register();
+
+#if defined(CHERRY_DEBUG_SMARTPOINTER)
+    DebugInitSmartPointer();
+#endif
+  }
+
   /** Copy constructor  */
   SmartPointer(const SmartPointer<ObjectType> &p) :
     m_Pointer(p.m_Pointer)
@@ -75,18 +87,6 @@ public:
   template<class Other>
   SmartPointer(const SmartPointer<Other>& ptr) :
     m_Pointer(const_cast<Other*> (ptr.GetPointer()))
-  {
-    if (m_Pointer)
-      this->Register();
-
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
-    DebugInitSmartPointer();
-#endif
-  }
-
-  /** Constructor to pointer p  */
-  explicit SmartPointer(ObjectType *p) :
-    m_Pointer(p)
   {
     if (m_Pointer)
       this->Register();
@@ -295,7 +295,7 @@ public:
 
 private:
 
-  /** The pointer to the object referrred to by this smart pointer. */
+  /** The pointer to the object referred to by this smart pointer. */
   ObjectType* m_Pointer;
 
   void Register()

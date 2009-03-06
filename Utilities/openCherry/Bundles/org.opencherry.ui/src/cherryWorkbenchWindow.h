@@ -566,8 +566,7 @@ private:
 
   struct ShellActivationListener: public IShellListener
   {
-    //TODO Weakpointer
-    ShellActivationListener(WorkbenchWindow::WeakPointer window);
+    ShellActivationListener(WorkbenchWindow::Pointer window);
 
     void ShellActivated(ShellEvent::Pointer event);
 
@@ -575,8 +574,7 @@ private:
 
   private:
 
-    //TODO Weakpointer
-    WorkbenchWindow::WeakPointer window;
+    WorkbenchWindow::WeakPtr window;
   };
 
   IShellListener::Pointer shellActivationListener;

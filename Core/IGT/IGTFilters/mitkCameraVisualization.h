@@ -24,19 +24,50 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkPropRenderer.h"
 
 namespace mitk {
-  class CameraVisualization : public NavigationDataVisualizationFilter
+  /**Documentation
+  * \brief CameraVisualization controls the camera according to the spatial information of the navigation data
+  *
+  * The camera of the renderer will be placed at the position of the navigation data and oriented according to
+  * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
+  *
+  * @ingroup Navigation
+  */  class CameraVisualization : public NavigationDataVisualizationFilter
   {
   public:
     mitkClassMacro(CameraVisualization,NavigationDataVisualizationFilter);
     itkNewMacro(Self);
 
+    /**Documentation
+    * \brief sets the direction of projection of the camera of the renderer in tool coordinates
+    */
     itkSetMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
+    /**Documentation
+    * \brief sets the view up vector of the camera of the renderer in tool coordinates
+    */
     itkSetMacro(ViewUpInToolCoordinates,Vector3D);
+    /**Documentation
+    * \brief sets the focal length of the camera
+    */
     itkSetMacro(FocalLength,float);
+    /**Documentation
+    * \brief sets the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
+    */
     itkSetMacro(ViewAngle,float);
+    /**Documentation
+    * \brief returns the direction of projection of the camera of the renderer in tool coordinates
+    */
     itkGetConstMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
+    /**Documentation
+    * \brief returns the view up vector of the camera of the renderer in tool coordinates
+    */
     itkGetConstMacro(ViewUpInToolCoordinates,Vector3D);
+    /**Documentation
+    * \brief returns the focal length of the camera
+    */
     itkGetConstMacro(FocalLength,float);
+    /**Documentation
+    * \brief returns the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
+    */
     itkGetConstMacro(ViewAngle,float);
     /**Documentation
     * \brief sets renderer that visualizes the navigation data
@@ -80,8 +111,7 @@ namespace mitk {
     CameraVisualization();
     virtual ~CameraVisualization();
 
-    ///< renderer that visualizes the navigation data
-    BaseRenderer* m_Renderer; 
+    BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data
 
     Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
     Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates

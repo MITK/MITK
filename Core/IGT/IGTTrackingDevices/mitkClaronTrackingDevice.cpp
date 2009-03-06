@@ -230,6 +230,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
 
         if (currentTool->GetToolHandle() != 0)
         {
+          currentTool->SetDataValid(true);
           //get tip position of tool:
           std::vector<double> pos = this->GetDevice()->GetTipPosition(currentTool->GetToolHandle());
           //write tip position into tool:

@@ -21,19 +21,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationDataTransformFilter::NavigationDataTransformFilter() 
 : mitk::NavigationDataToNavigationDataFilter()
-{}
+{
+  //transform to rotate orientation 
+  m_QuatOrgRigidTransform = itk::QuaternionRigidTransform<double>::New();
+  m_QuatTmpTransform = itk::QuaternionRigidTransform<double>::New();
+}
 
 
 mitk::NavigationDataTransformFilter::~NavigationDataTransformFilter()
 {}
 
+void mitk::NavigationDataTransformFilter::SetRigid3DTransform( TransformType::Pointer transform )
+{
+  m_Transform = transform; 
+  this->Modified();
+
+}
 
 void mitk::NavigationDataTransformFilter::GenerateData()
 {
 
   //this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
   // \warning This could erase outputs if inputs have been removed
-  
+
   // only update data if m_Transform was set
   if(m_Transform)
   {
@@ -51,27 +61,47 @@ void mitk::NavigationDataTransformFilter::GenerateData()
       }
 
       mitk::NavigationData::PositionType tempCoordinateIn, tempCoordinateOut;
-      float tempPositionIn[3], tempPositionOut[3];
+      tempCoordinateIn= input->GetPosition();
 
-      //convert to vtk
-      tempCoordinateIn = input->GetPosition();
-      tempPositionIn[0] = tempCoordinateIn[0]; 
-      tempPositionIn[1] = tempCoordinateIn[1]; 
-      tempPositionIn[2] = tempCoordinateIn[2]; 
-      
+      itk::Point<float,3> itkPointIn, itkPointOut;
+      itkPointIn[0]=tempCoordinateIn[0];
+      itkPointIn[1]=tempCoordinateIn[1];
+      itkPointIn[2]=tempCoordinateIn[2];
+     
       //do the transform
-      m_Transform->Update();
-      m_Transform->InternalTransformPoint( tempPositionIn, tempPositionOut );  
-      //InternalTransformPoint don't call the update of the Transform
+      itkPointOut = m_Transform->TransformPoint( itkPointIn );  
 
-      //convert back to mitk
-      tempCoordinateOut[0] = tempPositionOut[0]; 
-      tempCoordinateOut[1] = tempPositionOut[1]; 
-      tempCoordinateOut[2] = tempPositionOut[2]; 
+      tempCoordinateOut[0]=itkPointOut[0];
+      tempCoordinateOut[1]=itkPointOut[1];
+      tempCoordinateOut[2]=itkPointOut[2];
 
       output->Graft(input); // First, copy all information from input to output
       output->SetPosition(tempCoordinateOut);// Then change the member(s): add new position of navigation data after tranformation
       output->SetDataValid(true); // operation was successful, therefore data of output is valid.
+
+      //---transform orientation
+      NavigationData::OrientationType  quatIn = input->GetOrientation();
+      vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
+
+
+      itk::Matrix<float,3,3> rotMatrix = m_Transform->GetMatrix();
+      
+      itk::Matrix<double,3,3> rotMatrixD;
+     
+      for (unsigned int i = 0; i < 3; i++)
+         for( int j=0; j < 3; ++j )
+        rotMatrixD[i][j] = rotMatrix[i][j];
+
+      m_QuatOrgRigidTransform->SetRotationMatrix(rotMatrixD);
+      m_QuatTmpTransform->SetRotation(vnlQuatIn);
+      m_QuatTmpTransform->Compose(m_QuatOrgRigidTransform,false);
+
+      vnl_quaternion<double> vnlQuatOut = m_QuatTmpTransform->GetRotation();
+      NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
+      output->SetOrientation(quatOut);
+
+
     }
   }
 }
+

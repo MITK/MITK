@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNavigationDataTransformFilter_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
-#include <vtkTransform.h>
+
+#include <itkQuaternionRigidTransform.h>
+#include <itkTransform.h>
 
 
 namespace mitk {
@@ -33,23 +35,24 @@ namespace mitk {
   */
   class NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
   {
+  
+  typedef itk::Rigid3DTransform< float > TransformType;
+
   public:
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
-    void SetTransform(vtkTransform* transform)
-    { 
-      m_Transform = transform; 
-      this->Modified();
-    }
-    
-    vtkTransform* GetTransform()
-    {return m_Transform;}
-   
+    void SetRigid3DTransform(TransformType::Pointer transform);
+ 
 
   protected:
+    
     NavigationDataTransformFilter();
     virtual ~NavigationDataTransformFilter();
+
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatOrgRigidTransform; //transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatTmpTransform;         //transform needed to rotate orientation
+
 
     /**Documentation
     * \brief filter execute method
@@ -58,7 +61,7 @@ namespace mitk {
     */
     virtual void GenerateData();
 
-    vtkTransform* m_Transform; ///< transform which will be applied on navigation data(s)
+    TransformType::Pointer m_Transform; ///< transform which will be applied on navigation data(s)
   };
 } // namespace mitk
 

@@ -149,7 +149,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
   //------------------------update output2 and check result2------------------------
   output2->Update();
-  MITK_TEST_CONDITION_REQUIRED(
+  MITK_TEST_CONDITION(
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after updating value");
 
@@ -170,11 +170,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
   output1->Update();
   
-  MITK_TEST_CONDITION_REQUIRED(
+  MITK_TEST_CONDITION(
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(),  resultPos1),
     "Testing ND1 position correctly transformed after targetPointSet changed");
 
-  MITK_TEST_CONDITION_REQUIRED(
+  MITK_TEST_CONDITION(
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after targetPointSet changed");
 
@@ -195,11 +195,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
   output1->Update();
 
-  MITK_TEST_CONDITION_REQUIRED(
+  MITK_TEST_CONDITION(
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(),  resultPos1),
     "Testing ND1 position correctly transformed after sourcePointSet changed");
 
-  MITK_TEST_CONDITION_REQUIRED(
+  MITK_TEST_CONDITION(
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after sourcePointSet changed");
 
@@ -217,9 +217,9 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     myFilter2->SetSourcePoints(sourcePoints2);
   }
   catch (std::exception& exp)
-  {  exceptionCatched=true;  }
+  {  exceptionCatched=true; /*std::cout<<exp.what()<<std::endl;*/}
 
-  MITK_TEST_CONDITION_REQUIRED(exceptionCatched,"Testing source points < 3");
+  MITK_TEST_CONDITION(exceptionCatched,"Testing source points < 3");
 
   //------------------------catch exception --> target points < 3------------------------
   try
@@ -233,8 +233,8 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     
   }
   catch (std::exception& exp)
-  {  exceptionCatched=true;  }
-  MITK_TEST_CONDITION_REQUIRED(exceptionCatched,"Testing target points < 3");
+  {  exceptionCatched=true;  /*std::cout<<exp.what()<<std::endl;*/ }
+  MITK_TEST_CONDITION(exceptionCatched,"Testing target points < 3");
 
 
   //------------------------rotate orientation------------------------
@@ -260,13 +260,13 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   myFilter->SetSourcePoints(sourcePoints);
   myFilter->SetTargetPoints(targetPoints);
 
-
   //set initial orientation (x y z r)
   mitk::NavigationData::OrientationType initialQuat(0.0, 0.0, 0.0, 1.0);
   mitk::NavigationData::OrientationType resultQuat(0.0, 0.0, -0.7071, -0.7071);
   
   //set position
   mitk::FillVector3D(initialPos1, 2.2, 2.2, 2.2);
+  mitk::FillVector3D(resultPos1, -2.2, 2.2, 2.2);
   
   nd1->SetOrientation(initialQuat);
   nd1->SetPosition(initialPos1);
@@ -276,7 +276,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   output1 = myFilter->GetOutput(0);
   output1->Update();
   
-  MITK_TEST_CONDITION_REQUIRED( 
+  MITK_TEST_CONDITION( 
+    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(), resultPos1),
+    "Testing ND1 position correctly transformed ");
+
+  MITK_TEST_CONDITION( 
     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoQuaternions(output1->GetOrientation(), resultQuat),
     "Testing ND1 orientation correctly transformed ");
   
@@ -284,5 +288,4 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   MITK_TEST_END();
 
 }
-
 

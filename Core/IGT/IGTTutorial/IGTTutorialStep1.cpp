@@ -2,6 +2,7 @@
 #include <mitkInternalTrackingTool.h>
 #include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataRecorder.h>
+#include <mitkNavigationDataPlayer.h>
 
 
 
@@ -31,7 +32,7 @@ int main(int argc, char* argv[])
 
 
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
-  recorder->SetOutputMode(mitk::NavigationDataRecorder::NormalFile);
+  recorder->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
 
   recorder->SetFileName("Test Output"); //this is first part of the file name the .xml extension and an counter is added automatically
   recorder->SetFilePath("C://"); //the path where the file is stored in
@@ -48,16 +49,34 @@ int main(int argc, char* argv[])
   {
     source->GetOutput()->Update();
     recorder->Update();
+    Sleep(100);
   }
   recorder->StopRecording(); //to get proper XML files you should stop recording
 
-  //recorder->StartRecording();
-  //for (unsigned int x=0; x<100; x++) //write 50 datasets
-  //{
-  //  source->GetOutput()->Update();
-  //  recorder->Update();
-  //}
-  //recorder->StopRecording();
+  //Testing the reader
+  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+  player->SetFileName("Test Output-0.xml"); //this is first part of the file name the .xml extension and an counter is added automatically
+  player->SetFilePath("C://"); //the path where the file is stored in
+  player->StartPlaying();
+
+  //recorder->StartRecording();    
+  
+  mitk::NavigationData::Pointer nd = player->GetOutput();
+  for (unsigned int x=0; x<125; x++) //write 50 datasets
+  {
+    if (nd.IsNotNull())
+    {
+      nd->Update();
+      //nd = player->GetOutput();
+      std::cout << x << ": " << nd->GetPosition() << std::endl;
+      Sleep(100);
+      if (x==50 || x==75)
+      {
+        player->PauseContinuePlaying();
+      }
+    }
+  }
+  player->StopPlaying();
   std::cout << "finished";
   //*************************************************************************
   // Part II: Create some data by reading a file

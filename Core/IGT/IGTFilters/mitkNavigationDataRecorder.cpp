@@ -19,20 +19,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataRecorder.h"
 #include <fstream>
 
-
+#include <mitkTimeStamp.h>
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
   m_NumberOfInputs = 0;
-  m_OutputMode = Console;
+  m_RecordingMode = Console;
   m_Recording = false;
   m_NumberOfRecordedFiles = 0;
   m_Stream = NULL;
   //m_Stream->tie(std::cout);
+
+  //To get a start time
+  mitk::TimeStamp::GetInstance()->StartTracking(this);
+
 }
-
-
-
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
 {
@@ -42,33 +43,6 @@ mitk::NavigationDataRecorder::~NavigationDataRecorder()
 void mitk::NavigationDataRecorder::GenerateData()
 {
 
-  //for (unsigned int index=0; index<inputs.size(); index++)
-  //{
-  //  mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer()) ;
-  //  mitk::NavigationData::PositionType position;
-  //  mitk::NavigationData::OrientationType orientation;
-
-  //  position = nd->GetPosition();
-  //  orientation = nd->GetOrientation();
-
-  //  TiXmlDocument doc = m_XMLFiles[index];
-  //  TiXmlElement* elementData = new TiXmlElement("ND");
-  //  
-  //  elementData->SetDoubleAttribute("X",position[0]);
-  //  elementData->SetDoubleAttribute("Y",position[1]);
-  //  elementData->SetDoubleAttribute("Z",position[2]);
-
-  //  //TODO name them right
-  //  elementData->SetDoubleAttribute("q0",orientation[0]);
-  //  elementData->SetDoubleAttribute("q1",orientation[1]);
-  //  elementData->SetDoubleAttribute("q2",orientation[2]);
-  //  elementData->SetDoubleAttribute("z",orientation[3]);
-
-  //  //TODO timestamp
-
-  //  doc.LinkEndChild( elementData );
-  //}
-  //SaveToDisc();
 }
 
 void mitk::NavigationDataRecorder::AddNavigationData( const NavigationData* nd )
@@ -82,9 +56,9 @@ void mitk::NavigationDataRecorder::AddNavigationData( const NavigationData* nd )
   this->Modified();
 }
 
-void mitk::NavigationDataRecorder::SetOutputMode( OutputMode mode )
+void mitk::NavigationDataRecorder::SetRecordingMode( RecordingMode mode )
 {
-  m_OutputMode = mode;
+  m_RecordingMode = mode;
   this->Modified();
 }
 
@@ -93,7 +67,9 @@ void mitk::NavigationDataRecorder::Update()
   if (m_Recording)
   {
     DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-    //double timestamp;
+    mitk::NavigationData::TimeStampType timestamp=0.0;
+    timestamp = mitk::TimeStamp::GetInstance()->GetElapsed();
+
     for (unsigned int index=0; index<inputs.size(); index++)
     {
       mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer()) ;
@@ -102,11 +78,17 @@ void mitk::NavigationDataRecorder::Update()
 
       position = nd->GetPosition();
       orientation = nd->GetOrientation();
+      
+      //use this one if you want the timestamps of the source
+      //timestamp = nd->GetTimeStamp();
 
-      //TODO timestamp name the quaternion right
-      *m_Stream << "        " << "<ND Tool=\"" << index << "\" X=\"" << position[0] << "\" Y=\"" << position[1] << "\" Z=\"" << position[2] 
-      << " Q0=\"" << orientation[0] << "\" Q1=\"" << orientation[1] << "\" Q2=\"" << orientation[2] << "\" Z0=\"" << orientation[3] << "\" />" << std::endl;
-
+      //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
+      //TODO to avoid possible corrupted files check if this was index 0 and do not write another tool / if neccessary overwrite other indexes
+      if (timestamp >= 0)
+      {             
+        *m_Stream << "        " << "<ND Time=\"" << timestamp << "\" Tool=\"" << index << "\" X=\"" << position[0] << "\" Y=\"" << position[1] << "\" Z=\"" << position[2] 
+        << " QX=\"" << orientation[0] << "\" QY=\"" << orientation[1] << "\" QZ=\"" << orientation[2] << "\" QR=\"" << orientation[3] << "\" />" << std::endl;
+      }
     }
   }
 }
@@ -125,7 +107,7 @@ void mitk::NavigationDataRecorder::StartRecording()
 
     //TODO Save date to filename
     ss << m_FilePath << "/" << m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
-    switch(m_OutputMode)
+    switch(m_RecordingMode)
     {
     case Console:
       stream = &std::cout;
@@ -168,12 +150,13 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   }
 
   m_Stream = stream;
-
+  m_Stream->precision(10);
+  //TODO store date and GMT time
   if (m_Stream)
   {
     *m_Stream << "<?xml version=\"1.0\" ?>" << std::endl;
     *m_Stream << "<Version Ver=\"1\" />" << std::endl;
-    *m_Stream << "    " << "<Data Count=\"" << (m_NumberOfInputs) << "\">" << std::endl;
+    *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\">" << std::endl;
 
     m_Recording = true;
   }

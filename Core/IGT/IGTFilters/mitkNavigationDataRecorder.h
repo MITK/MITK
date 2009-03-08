@@ -30,8 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
- /**
- /*Documentation
+ /**Documentation
  * \brief This class records NavigationData objects
  *
  * The output of this class is formated as a XML document. 
@@ -91,7 +90,7 @@ public:
     */
     virtual void Update();
 
-    enum OutputMode
+    enum RecordingMode
     {
       Console,
       NormalFile,
@@ -99,9 +98,9 @@ public:
     };
 
     /**Documentation
-    * \brief sets the output mode which causes different types of output streams
+    * \brief sets the recording mode which causes different types of output streams
     */
-    void SetOutputMode(OutputMode mode);
+    void SetRecordingMode(RecordingMode mode);
 
 protected:
 
@@ -123,7 +122,7 @@ protected:
 
     std::ostream* m_Stream; //the stream
 
-    OutputMode m_OutputMode;
+    RecordingMode m_RecordingMode;
 
     bool m_Recording; //indicates whether the recording is started or not
 

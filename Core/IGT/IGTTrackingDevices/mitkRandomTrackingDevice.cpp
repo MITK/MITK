@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <mitkTimeStamp.h>
 
 //for the pause 
 #include <itksys/SystemTools.hxx>
@@ -39,16 +40,12 @@ mitk::RandomTrackingDevice::RandomTrackingDevice(void)
 bool mitk::RandomTrackingDevice::StartTracking()
 {
 
-  //copy all toolfiles into the temp directory
-
   this->SetMode(Tracking);            // go to mode Tracking
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex->Lock();  
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-
-
-  //m_Device->StartTracking();
+  mitk::TimeStamp::GetInstance()->StartTracking(this);
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
   return true;
@@ -65,6 +62,7 @@ bool mitk::RandomTrackingDevice::StopTracking()
     this->SetMode(Ready);
   }
 
+  mitk::TimeStamp::GetInstance()->StopTracking(this);
   m_TrackingFinishedMutex->Lock();
 
   return true;

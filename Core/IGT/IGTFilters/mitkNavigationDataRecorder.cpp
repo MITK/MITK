@@ -28,7 +28,8 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_Recording = false;
   m_NumberOfRecordedFiles = 0;
   m_Stream = NULL;
-  //m_Stream->tie(std::cout);
+  m_FilePath = "";
+  m_FileName = "";
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->StartTracking(this);
@@ -78,12 +79,11 @@ void mitk::NavigationDataRecorder::Update()
 
       position = nd->GetPosition();
       orientation = nd->GetOrientation();
-      
+
       //use this one if you want the timestamps of the source
       //timestamp = nd->GetTimeStamp();
 
       //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
-      //TODO to avoid possible corrupted files check if this was index 0 and do not write another tool / if neccessary overwrite other indexes
       if (timestamp >= 0)
       {             
         *m_Stream << "        " << "<ND Time=\"" << timestamp << "\" Tool=\"" << index << "\" X=\"" << position[0] << "\" Y=\"" << position[1] << "\" Z=\"" << position[2] 
@@ -105,39 +105,38 @@ void mitk::NavigationDataRecorder::StartRecording()
     std::stringstream ss;
     std::ostream* stream;
 
-    //TODO Save date to filename
     ss << m_FilePath << "/" << m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
     switch(m_RecordingMode)
     {
-    case Console:
-      stream = &std::cout;
-      break;
-    case NormalFile:
-      
-      //Check if there is a file name and path
-      if (m_FileName == "" || m_FilePath == "")
-      {
+      case Console:
         stream = &std::cout;
-        std::cout << "No file name or file path set the output is redirected to the console";
-      }
-      else
-      {
-        stream = new std::ofstream(ss.str().c_str());
-      }
-      
-      break;
-    case ZipFile:
-      stream = &std::cout;
-      std::cout << "Sorry no ZipFile support yet";
-      break;
-    default:
-      stream = &std::cout;
-      break;
+        break;
+      case NormalFile:
+
+        //Check if there is a file name and path
+        if (m_FileName == "" || m_FilePath == "")
+        {
+          stream = &std::cout;
+          std::cout << "No file name or file path set the output is redirected to the console";
+        }
+        else
+        {
+          stream = new std::ofstream(ss.str().c_str());
+        }
+
+        break;
+      case ZipFile:
+        stream = &std::cout;
+        std::cout << "Sorry no ZipFile support yet";
+        break;
+      default:
+        stream = &std::cout;
+        break;
     }
     StartRecording(stream);
   }
 
-  
+
 
 
 }
@@ -151,6 +150,7 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
 
   m_Stream = stream;
   m_Stream->precision(10);
+
   //TODO store date and GMT time
   if (m_Stream)
   {

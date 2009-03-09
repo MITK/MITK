@@ -25,11 +25,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationDataPlayer::NavigationDataPlayer() 
 {
-  m_PlayerMode = NormalFile;
-  this->m_MultiThreader = itk::MultiThreader::New();
+  
+  m_MultiThreader = itk::MultiThreader::New(); 
   m_NumberOfOutputs = 0;
   m_Pause = false;
   m_Playing = false;
+  m_Stream = NULL;
+  m_PlayerMode = NormalFile;
+  m_FilePath = "";
+  m_FileName = "";
+  m_FileVersion = 1;
+  m_Playing = false;
+  m_Pause = false;
+  m_NumberOfOutputs = 0;
+  m_ThreadID = 0;
+  m_StartPlayingTimeStamp = 0.0;
+  m_PauseTimeStamp = 0.0;
+
   //To get a start time
   mitk::TimeStamp::GetInstance()->StartTracking(this);
 
@@ -56,21 +68,21 @@ void mitk::NavigationDataPlayer::GenerateData()
   TimeStampType timeSinceStart = now - m_StartPlayingTimeStamp;
   
   //init the vectors
-  std::vector<NavigationData::Pointer> nextCandidates; 
-  std::vector<NavigationData::Pointer> lastCandidates; 
+  std::vector< NavigationData::Pointer > nextCandidates; 
+  std::vector< NavigationData::Pointer > lastCandidates; 
+  std::vector< NavigationData::TimeStampType > currentTimeOfData;
 
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
   {
     nextCandidates.push_back(m_NextToPlayNavigationData[index]);
     lastCandidates.push_back(m_NextToPlayNavigationData[index]);
     
-    m_CurrentTimeOfData[index] = timeSinceStart + m_StartTimeOfData[index];
-
+    currentTimeOfData.push_back(timeSinceStart + m_StartTimeOfData[index]);
   }
 
   //now try to find next NavigationData in the stream
-  //the timestamps of each tracked NavigationData is equal
-  while(nextCandidates[0]->GetTimeStamp() < m_CurrentTimeOfData[0])
+  //the timestamps of each tracked NavigationData should be equal
+  while(nextCandidates[0]->GetTimeStamp() < currentTimeOfData[0])
   {
 
     for (unsigned int index=0; index < m_NumberOfOutputs; index++)
@@ -99,10 +111,12 @@ void mitk::NavigationDataPlayer::GenerateData()
     }
 
   }
+
   //Now lastCandidates holds the new output and nextCandidates is stored to the m_NextToPlay vector
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
   {
-    std::cout << lastCandidates[index]->GetPosition() << std::endl;
+    //Debug only
+    //std::cout << lastCandidates[index]->GetPosition() << std::endl;
     mitk::NavigationData* output = this->GetOutput(index);
     
     output->SetPosition(lastCandidates[index]->GetPosition());
@@ -127,7 +141,6 @@ void mitk::NavigationDataPlayer::StartPlaying()
   std::stringstream ss;
   std::istream* stream=NULL;
 
-  //TODO Save date to filename
   ss << m_FilePath << "/" << m_FileName;
   switch(m_PlayerMode)
   {
@@ -137,7 +150,7 @@ void mitk::NavigationDataPlayer::StartPlaying()
       if (m_FileName == "" || m_FilePath == "")
       {
         stream = NULL;
-        std::cout << "No file name or file path set the output is redirected to the console";
+        std::cout << "No file name or file path set!";
       }
       else
       {
@@ -166,10 +179,11 @@ void mitk::NavigationDataPlayer::StartPlaying( std::istream* stream )
   
   m_Playing = true; //starts the player
   
-  GetFileVersion();
+  GetFileVersion(); //first get the file version
 
-  GetNumberOfTrackedTools();
+  GetNumberOfTrackedTools(); //now read the number of Tracked Tools
 
+  //with the information about the tracked tool number we can generate the output
   if (m_NumberOfOutputs > 0)
   {
     //Generate the output
@@ -179,7 +193,7 @@ void mitk::NavigationDataPlayer::StartPlaying( std::istream* stream )
       this->SetNthOutput(index, newOutput);     
     }
 
-    GetFirstData();
+    GetFirstData(); //initialize the player with first data
     m_StartPlayingTimeStamp = mitk::TimeStamp::GetInstance()->GetElapsed();
   }
   else
@@ -187,7 +201,8 @@ void mitk::NavigationDataPlayer::StartPlaying( std::istream* stream )
     StopPlaying();
   }
 
-  //TODO close thread when this class is deconstructed?
+  //There is no event based update at the moment so the threading is not necessary
+  //TODO close thread when this class is deconstructed
   //m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartPlaying, this);
 
 }
@@ -225,7 +240,7 @@ void mitk::NavigationDataPlayer::GetNumberOfTrackedTools()
   }
   
   //If something has changed in a future version of the XML definition e.g. toolcount or addional parameters 
-  //catch this here with a select case block (see play() method)
+  //catch this here with a select case block (see GenerateData() method)
 
   int numberOfTools = 0;
   
@@ -239,11 +254,8 @@ void mitk::NavigationDataPlayer::GetNumberOfTrackedTools()
   std::stringstream ss;
   ss << str;
 
-  std::cout << ss;
   TiXmlElement* elem = new TiXmlElement("");
   ss >> *elem; 
-  //*str >> *elem; 
-
 
   elem->QueryIntAttribute("ToolCount",&numberOfTools);
 
@@ -257,7 +269,6 @@ void mitk::NavigationDataPlayer::GetNumberOfTrackedTools()
   {
       m_NextToPlayNavigationData.push_back(NULL);
       m_StartTimeOfData.push_back(0.0);
-      m_CurrentTimeOfData.push_back(0.0);
   }
 }
 void mitk::NavigationDataPlayer::PlayInThread()
@@ -335,11 +346,11 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   TiXmlElement* elem = new TiXmlElement("");
   *m_Stream >> *elem;
 
-  //TODO check here if EOF (the query don't change the timestamp value which should always be > 0)
+  //check here if EOF (the query don't change the timestamp value which should always be > 0)
   elem->QueryDoubleAttribute("Time",&timestamp);
   if (timestamp == -1)
   {
-    return NULL;
+    return NULL;  //the calling method should check the return value if it is valid/not NULL
   }
   timestamp = mitk::TimeStamp::GetInstance()->GetElapsed();
   elem->QueryFloatAttribute("X",&position[0]);
@@ -362,11 +373,20 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
 
 void mitk::NavigationDataPlayer::StopPlaying()
 {
+  //re init all data!! for playing again with different data
+  m_NumberOfOutputs = 0;
+  m_Pause = false;
+  m_Playing = false;
+  m_Stream = NULL;
+  m_FileVersion = 1;
   m_Playing = false;
   m_Pause = false;
-  
-  m_Stream = NULL;
-  //TODO re init all data!! for playing again with different data
+  m_NumberOfOutputs = 0;
+  m_ThreadID = 0;
+  m_StartPlayingTimeStamp = 0.0;
+  m_PauseTimeStamp = 0.0;
+  m_NextToPlayNavigationData.clear();
+  m_StartTimeOfData.clear();
 }
 
 void mitk::NavigationDataPlayer::GetFirstData()
@@ -401,7 +421,8 @@ void mitk::NavigationDataPlayer::PauseContinuePlaying()
   //first case player runs and pause was called -> pause the player
   if(m_Playing && !m_Pause)
   {
-    m_Playing == false;
+    m_Playing = false;
+    m_Pause = true;
     m_PauseTimeStamp = mitk::TimeStamp::GetInstance()->GetElapsed();
   }
 

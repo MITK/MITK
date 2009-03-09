@@ -31,9 +31,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief Connects a mitk::TrackingDevice to a MITK-IGT NavigationData-Filterpipeline
+  * \brief This class is used to play recorded (see mitkNavigationDataRecorder class) files. 
+  * If you want to play a file you have to set an input stream. This can be an own one (use StartPlaying(std::istream*)) 
+  * or a presetted one (use StartPlaying()). The presets are NormalFile and ZipFile and can be set with the method 
+  * SetPlayerMode(). For pausing the player call PauseContinuePlaying(). Another call of this method will continue the
+  * playing.
   *
-  *
+  * \
   * @ingroup Navigation
   */
   class NavigationDataPlayer : public NavigationDataSource
@@ -44,7 +48,6 @@ namespace mitk {
 
     /**Documentation
     * \brief sets the file name for the InputMode NormalFile and ZipFile
-    * \warning existing files will be overriden
     */
     itkSetStringMacro(FileName);
 
@@ -59,7 +62,7 @@ namespace mitk {
     virtual void UpdateOutputInformation();
 
     /**Documentation
-    * \brief This method starts the player
+    * \brief This method starts the player with the presetted parameters (Playing Mode, file name and path)
     */
     void StartPlaying();
 
@@ -78,11 +81,10 @@ namespace mitk {
     * \brief This method pauses the player. The first call pauses the player if it is in the playing mode.
     * The second call continues the playing mode.
     * 
+    *\warning This method is not tested yet. It is not save to use!
     */
     void PauseContinuePlaying();
     
-
-
     enum PlayerMode
     {
       NormalFile,
@@ -107,19 +109,19 @@ namespace mitk {
     virtual void GenerateData();
 
     /**Documentation
-    * \brief gets the file version out of the XML document
+    * \brief Gets the file version out of the XML document
     *   
     */
     void GetFileVersion();
 
     /**Documentation
-    * \brief gets the number of tracked tools out of the XML document
+    * \brief Gets the number of tracked tools out of the XML document
     *   
     */
     void GetNumberOfTrackedTools();
 
     /**Documentation
-    * \brief gets the first data for initializing the player
+    * \brief Gets the first data for initializing the player
     *   
     */
     void GetFirstData();
@@ -144,7 +146,7 @@ namespace mitk {
     */
     void PlayInThread();
     
-    std::istream*  m_Stream;
+    std::istream* m_Stream; //stores a pointer to the input stream
 
     PlayerMode m_PlayerMode;
 
@@ -152,11 +154,11 @@ namespace mitk {
 
     std::string m_FileName;
 
-    unsigned int m_FileVersion;
+    unsigned int m_FileVersion; //indicates which encoding is used
 
-    bool m_Playing;
+    bool m_Playing; //indicates whether the generateoutput method generates new output or not
 
-    bool m_Pause;
+    bool m_Pause; //indicates if the player is paused
 
     unsigned int m_NumberOfOutputs;
 
@@ -164,21 +166,14 @@ namespace mitk {
 
     int m_ThreadID;
 
-    TiXmlDocument* m_XMLDocument;
+    TimeStampType m_StartPlayingTimeStamp; //the beginning of the player
 
-    TimeStampType m_StartPlayingTimeStamp;
+    TimeStampType m_PauseTimeStamp; //the beginning of a pause
 
-    TimeStampType m_PauseTimeStamp;
+    std::vector<NavigationData::Pointer> m_NextToPlayNavigationData; //stores the next possible candidate for playing
 
-    std::vector<NavigationData::Pointer> m_NextToPlayNavigationData;
-
-    std::vector<TimeStampType> m_StartTimeOfData;
-
-    std::vector<TimeStampType> m_CurrentTimeOfData;
+    std::vector<TimeStampType> m_StartTimeOfData; //stores the start time of the different tools
     
-    //unsigned int m_NextToPlayOutputNumber;
-    
-
   };
 } // namespace mitk
 

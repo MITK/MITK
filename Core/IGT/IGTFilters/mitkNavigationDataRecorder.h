@@ -22,9 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
 
-//#define TIXML_USE_STL
-//#include "tinyxml.h"
-
 #include <iostream>
 
 namespace mitk
@@ -59,7 +56,7 @@ public:
     itkSetStringMacro(FileName);
 
     /**Documentation
-    * \brief sets path for the OutputMode NormalFile and ZipFile
+    * \brief Sets the path for the OutputMode NormalFile and ZipFile
     */
     itkSetStringMacro(FilePath);
 
@@ -81,7 +78,7 @@ public:
     void StartRecording(std::ostream* stream);
 
     /**Documentation
-    * \brief stops the recording and closes the stream
+    * \brief Stops the recording and closes the stream
     */
     void StopRecording();
 
@@ -98,7 +95,7 @@ public:
     };
 
     /**Documentation
-    * \brief sets the recording mode which causes different types of output streams
+    * \brief Sets the recording mode which causes different types of output streams
     */
     void SetRecordingMode(RecordingMode mode);
 

@@ -51,7 +51,7 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   mitk::NavigationData::ErrorType initialError1(0.0);
   mitk::NavigationData::ErrorType initialError2(5.0);
   bool initialValid1(true);
-  bool initialValid2(false);
+  bool initialValid2(true);
   
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos1);
@@ -87,8 +87,10 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   //getting nodes
   MITK_TEST_CONDITION(myFilter->GetBaseData(nd1) == mitkToolData1, "Testing GetBaseData() node 1");
   MITK_TEST_CONDITION(myFilter->GetBaseData(nd2) == mitkToolData2, "Testing GetBaseData() node 2");
-
   
+  mitk::NavigationData* output = myFilter->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
+
   //Process
   myFilter->Update();
 

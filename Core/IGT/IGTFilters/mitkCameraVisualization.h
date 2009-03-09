@@ -105,7 +105,7 @@ namespace mitk {
     * \brief filter execute method
     * positions and orients camera according to the position and orientation hold in the NavigationData
     */
-    virtual void Update();
+    virtual void GenerateData();
 
   protected:
     CameraVisualization();

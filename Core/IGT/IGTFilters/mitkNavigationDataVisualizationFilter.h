@@ -24,9 +24,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
 #include "mitkNavigationData.h"
+#include "mitkNavigationDataToNavigationDataFilter.h"
 
 namespace mitk {
-  class NavigationDataVisualizationFilter : public itk::ProcessObject
+  /**Documentation
+  * \brief NavigationDataVisualizationFilter represents the superclass of all IGT Filters that visualize NavigationData
+  *
+  * @ingroup Navigation
+  */
+  class NavigationDataVisualizationFilter : public mitk::NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataVisualizationFilter,itk::ProcessObject);
@@ -51,10 +57,7 @@ namespace mitk {
     */
     const NavigationData* GetInput(unsigned int idx);
 
-    /**
-    * @brief process the desired operation
-    **/
-    virtual void Update() {};
+    virtual void GenerateData()=0;
 
   protected:
     NavigationDataVisualizationFilter();

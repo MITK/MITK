@@ -88,6 +88,13 @@ namespace mitk {
     void StopTracking();
 
     /**Documentation
+    * \brief returns the number of connected tools
+    *
+    * If the tracking device is not connected, 0 is returned
+    */
+    virtual unsigned int GetToolCount(); 
+
+    /**Documentation
     * \brief Used for pipeline update
     */
     virtual void UpdateOutputInformation();
@@ -105,6 +112,11 @@ namespace mitk {
     * tracking device after it was set as input for this filter     
     */
     virtual void GenerateData();
+    
+    /**
+    * @brief Create the necessary outputs given by m_TrackingDevice
+    **/
+    void CreateOutputs();
 
 
     mitk::TrackingDevice::Pointer m_TrackingDevice;

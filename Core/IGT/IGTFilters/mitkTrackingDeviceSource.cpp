@@ -48,6 +48,10 @@ void mitk::TrackingDeviceSource::GenerateData()
 
   if (this->GetNumberOfOutputs() != m_TrackingDevice->GetToolCount()) // mismatch between tools and outputs. What should we do? Were tools added to the tracking device after SetTrackingDevice() was called?
   {
+    //check this: TODO:
+    ////this might happen if a tool is plugged into an aurora during tracking.
+    //this->CreateOutputs();
+
     std::stringstream ss;
     ss << "mitk::TrackingDeviceSource: not enough outputs available for all tools. " 
       << this->GetNumberOfOutputs() << " outputs available, but "
@@ -89,17 +93,28 @@ void mitk::TrackingDeviceSource::SetTrackingDevice( mitk::TrackingDevice* td )
   if (this->m_TrackingDevice.GetPointer() != td)
   {
     this->m_TrackingDevice = td;
-    this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
-    for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
-      if (this->GetOutput(idx) == NULL)
-      {
-        DataObjectPointer newOutput = this->MakeOutput(idx);
-        this->SetNthOutput(idx, newOutput);
-      }
-    this->Modified();
+    this->CreateOutputs();
   }
 }
 
+void mitk::TrackingDeviceSource::CreateOutputs()
+{
+  //if outputs are set then delete them
+  for (unsigned int numOP = this->GetNumberOfOutputs(); numOP>0; numOP--)
+    this->RemoveOutput(this->GetOutput(numOP));
+
+  //fill the outputs
+  this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
+  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  {
+    if (this->GetOutput(idx) == NULL)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(idx);
+      this->SetNthOutput(idx, newOutput);
+    }
+    this->Modified();
+  }
+}
 
 void mitk::TrackingDeviceSource::Connect()
 {
@@ -107,6 +122,10 @@ void mitk::TrackingDeviceSource::Connect()
     throw std::invalid_argument("mitk::TrackingDeviceSource: No tracking device set");
   if (m_TrackingDevice->OpenConnection() == false)
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not open connection to tracking device");
+  
+  //add the output now that we know how many tools are connected
+  if (m_TrackingDevice->GetType() == mitk::NDIAurora)
+    this->CreateOutputs();
 }
 
 
@@ -141,4 +160,12 @@ void mitk::TrackingDeviceSource::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();
+}
+
+
+unsigned int mitk::TrackingDeviceSource::GetToolCount()
+{
+  if (m_TrackingDevice) 
+    return m_TrackingDevice->GetToolCount(); 
+  return 0;
 }

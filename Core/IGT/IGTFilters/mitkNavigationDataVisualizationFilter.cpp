@@ -22,18 +22,17 @@ namespace mitk{
 
   NavigationDataVisualizationFilter::NavigationDataVisualizationFilter()
   {
-
   }
 
   NavigationDataVisualizationFilter::~NavigationDataVisualizationFilter()
   {
-
   }
 
   void mitk::NavigationDataVisualizationFilter::SetInput( const NavigationData* nd )
   {
     // Process object is not const-correct so the const_cast is required here
     this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
+    this->CreateOutputsForAllInputs();
   }
 
   void mitk::NavigationDataVisualizationFilter::SetInput( unsigned int idx, const NavigationData* nd )
@@ -58,4 +57,4 @@ namespace mitk{
     return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
   }
 
-}
+} //namespace mitk

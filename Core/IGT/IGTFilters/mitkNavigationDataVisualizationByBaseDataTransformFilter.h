@@ -58,11 +58,11 @@ namespace mitk {
     RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
     {return m_RepresentationList.size();}
 
-    /** 
-    * This method causes the filter 
-    * to update the DataTreeNodes of the geometrical objects
-    * according to NavigationData. */
-    virtual void Update();
+    /*
+    * @brief Transfer the informations from the input to the associated BaseData
+    */
+    virtual void GenerateData();
+
 
   protected:
     NavigationDataVisualizationByBaseDataTransformFilter();
@@ -82,4 +82,5 @@ namespace mitk {
 
 
 #endif /* MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_ */
+
 

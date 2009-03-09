@@ -59,7 +59,6 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     //get the needed variables
     const mitk::NavigationData* nd = this->GetInput(index);
     assert(nd);
-    //nd->Update();
 
     mitk::NavigationData* output = this->GetOutput(index);
     assert(output);

@@ -44,9 +44,6 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(mitk::TimeStamp::GetInstance() != (0), "Testing GetInstance() of Singleton" );
 
-  //mitkTimeStampTestClass::Pointer to = mitkTimeStampTestClass::New();
-  //to->StartTest();
-
   itk::Object::Pointer tester = itk::Object::New();
   itk::Object::Pointer tester2 = itk::Object::New();
 
@@ -62,8 +59,8 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
 
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();
 
-  MITK_TEST_CONDITION_REQUIRED((time_elapsed-20) > -5 , "Testing if elapsed time is correct (+-30)");
-  MITK_TEST_CONDITION_REQUIRED((time_elapsed-20) < 5 , "Testing if elapsed time is correct (+-30)");
+  MITK_TEST_CONDITION_REQUIRED((time_elapsed-20) > -10 , "Testing if elapsed time is correct (+-30)");
+  MITK_TEST_CONDITION_REQUIRED((time_elapsed-20) < 10 , "Testing if elapsed time is correct (+-30)");
 
   mitk::TimeStamp::GetInstance()->StartTracking(tester2);
   mitk::TimeStamp::GetInstance()->StopTracking(tester);

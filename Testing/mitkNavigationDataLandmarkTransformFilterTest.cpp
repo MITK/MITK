@@ -92,19 +92,19 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   mitk::FillVector3D(resultPos1, 2.1, 2.1, 2.1);
   mitk::FillVector3D(resultPos2, 23.2, 23.2, 23.2);
   mitk::NavigationData::OrientationType initialOri(0.1, 0.1, 0.1, 0.1);
-  mitk::NavigationData::ErrorType initialError(0.0);
+  mitk::ScalarType initialError(0.0);
   bool initialValid(true);
 
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos1);
   nd1->SetOrientation(initialOri);
-  nd1->SetError(initialError);
+  nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
 
   mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
   nd2->SetPosition(initialPos2);
   nd2->SetOrientation(initialOri);
-  nd2->SetError(initialError);
+  nd2->SetPositionAccuracy(initialError);
   nd2->SetDataValid(initialValid);
 
 

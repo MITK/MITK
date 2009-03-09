@@ -48,21 +48,21 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   mitk::FillVector3D(initialPos2, 5.0, 6.0, 7.0);
   mitk::NavigationData::OrientationType initialOri1(0.1, 0.2, 0.3, 0.4);
   mitk::NavigationData::OrientationType initialOri2(0.5, 0.6, 0.7, 0.8);
-  mitk::NavigationData::ErrorType initialError1(0.0);
-  mitk::NavigationData::ErrorType initialError2(5.0);
+  mitk::ScalarType initialError1(0.0);
+  mitk::ScalarType initialError2(5.0);
   bool initialValid1(true);
   bool initialValid2(true);
   
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos1);
   nd1->SetOrientation(initialOri1);
-  nd1->SetError(initialError1);
+  nd1->SetPositionAccuracy(initialError1);
   nd1->SetDataValid(initialValid1);
 
   mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
   nd2->SetPosition(initialPos2);
   nd2->SetOrientation(initialOri2);
-  nd2->SetError(initialError2);
+  nd2->SetPositionAccuracy(initialError2);
   nd2->SetDataValid(initialValid2);
 
   myFilter->SetInput(nd1);

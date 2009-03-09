@@ -43,13 +43,13 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::PositionType initialPos;
   mitk::FillVector3D(initialPos, 0.0, 0.0, 0.0);
   mitk::NavigationData::OrientationType initialOri(0.0, 0.0, 0.0, 0.0);
-  mitk::NavigationData::ErrorType initialError(0.0);
+  mitk::ScalarType initialError(0.0);
   bool initialValid(true);
   
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos);
   nd1->SetOrientation(initialOri);
-  nd1->SetError(initialError);
+  nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
 
   myFilter->SetInput(nd1);
@@ -69,7 +69,6 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION(output->GetPosition() == (initialPos + offset), "Testing offset calculation");
   MITK_TEST_CONDITION(output->GetOrientation() == initialOri, "Testing if Orientation remains unchanged");
-  MITK_TEST_CONDITION(output->GetError() == initialError, "Testing if Error remains unchanged");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
   /* now test the filter with multiple inputs */
@@ -78,7 +77,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
   nd2->SetPosition(initialPos2);
   nd2->SetOrientation(initialOri);
-  nd2->SetError(initialError);
+  nd2->SetPositionAccuracy(initialError);
   nd2->SetDataValid(initialValid);
 
   myFilter = NULL;
@@ -100,7 +99,6 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(output2->GetPosition() == (initialPos2 + offset), "Testing offset calculation for output 1");
   
   MITK_TEST_CONDITION(output2->GetOrientation() == initialOri, "Testing if Orientation remains unchanged for output 1");
-  MITK_TEST_CONDITION(output2->GetError() == initialError, "Testing if Error remains unchanged for output 1");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 1");
 
   /* test if anything changes on second ->Update() */

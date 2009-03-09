@@ -58,7 +58,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   orientation[3] = rand()%2;
 
   // error of navigation data
-  mitk::NavigationData::ErrorType error = rand()%10;
+  mitk::ScalarType error = rand()%10;
 
   // data valid flag of navigation data
   int val = rand()%2;
@@ -76,7 +76,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(position);
   nd1->SetOrientation(orientation);
-  nd1->SetError(error);
+  nd1->SetPositionAccuracy(error);
   nd1->SetDataValid(valid);
 
   // create renderer

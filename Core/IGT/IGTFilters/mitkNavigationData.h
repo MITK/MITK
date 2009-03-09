@@ -44,7 +44,7 @@ namespace mitk {
       itkNewMacro(Self);
       typedef mitk::Point3D PositionType;
       typedef mitk::Quaternion OrientationType;
-      typedef mitk::ScalarType ErrorType;
+      typedef itk::Matrix<mitk::ScalarType,6,6> CovarianceMatrixType;
       typedef double TimeStampType;
 
       
@@ -58,11 +58,15 @@ namespace mitk {
       itkGetConstMacro(Orientation, OrientationType);  ///< returns the orientation of the NavigationData object
       virtual bool IsDataValid() const;                ///< returns true if the object contains valid data
       itkSetMacro(DataValid, bool);                    ///< sets the overall error estimation of the NavigationData object
-      itkSetMacro(Error, ErrorType);     ///< sets the overall error estimation of the NavigationData object
-      itkGetConstMacro(Error, ErrorType);     ///< return one value that corresponds to the overall tracking error.
       //itkGetMacro(TimeStamp, const mitk::TimeStamp*);   ///< returns the time when the position and orientation were received from the tracking device
-      itkSetMacro(TimeStamp, TimeStampType);
-      itkGetMacro(TimeStamp, TimeStampType);
+      itkSetMacro(TimeStamp, TimeStampType);              ///< sets the timestamp of the NavigationData object
+      itkGetMacro(TimeStamp, TimeStampType);              ///< gets the timestamp of the NavigationData object
+      itkSetMacro(HasPosition, bool);                     ///< sets the HasPosition flag of the NavigationData object
+      itkGetMacro(HasPosition, bool);                     ///< gets the HasPosition flag of the NavigationData object
+      itkSetMacro(HasOrientation, bool);                  ///< sets the HasOrientation flag of the NavigationData object
+      itkGetMacro(HasOrientation, bool);                  ///< gets the HasOrientation flag of the NavigationData object
+      itkSetMacro(CovErrorMatrix, CovarianceMatrixType);  ///< sets the 6x6 Error Covariance Matrix of the NavigationData object
+      itkGetMacro(CovErrorMatrix, CovarianceMatrixType);  ///< gets the 6x6 Error Covariance Matrix of the NavigationData object
 
       /** Graft the data and information from one NavigationData to another. This
       * is a convenience method to setup a second NavigationData object with all the meta
@@ -85,6 +89,16 @@ namespace mitk {
       */
       void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
+      /* Set the position part of m_CovErrorMatrix to I*error^2
+      * This means that all position variables are assumed to be independent
+      */
+      void SetPositionAccuracy(mitk::ScalarType error);
+      
+      /* Set the orientation part of m_CovErrorMatrix to I*error^2
+      * This means that all orientation variables are assumed to be independent
+      */
+      void SetOrientationAccuracy(mitk::ScalarType error);
+
     protected:
       NavigationData();
       virtual ~NavigationData();      
@@ -93,7 +107,15 @@ namespace mitk {
 
       PositionType m_Position;
       OrientationType m_Orientation;     
-      ErrorType m_Error;
+           
+      // A 6x6 covariance matrix parameterizing the Gaussian error
+      // distribution of the measured position and orientation.
+      // The hasPosition/hasOrientation fields define which entries
+      // are valid.
+      CovarianceMatrixType m_CovErrorMatrix;
+      bool m_HasPosition;
+      bool m_HasOrientation;
+      
       bool m_DataValid;
 
       TimeStampType m_TimeStamp;

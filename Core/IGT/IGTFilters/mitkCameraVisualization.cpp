@@ -49,6 +49,21 @@ namespace mitk{
     // check if renderer was set
     if (m_Renderer)
     {
+      /* update outputs with tracking data from tools */
+      for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+      {
+        mitk::NavigationData* output = this->GetOutput(i);
+        assert(output);
+        const mitk::NavigationData* input = this->GetInput(i);
+        assert(input);
+
+        if (input->IsDataValid() == false)
+        {
+          continue;
+        }
+        output->Graft(input); // First, copy all information from input to output
+      }
+
       const NavigationData* navigationData = this->GetInput();
       // get position from NavigationData
       Point3D cameraPosition = navigationData->GetPosition();
@@ -76,21 +91,17 @@ namespace mitk{
 
       m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2]);
       m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
-      m_Renderer->GetVtkRenderer()->GetActiveCamera()->ComputeViewPlaneNormal();
       m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetViewUp(viewUp[0],viewUp[1],viewUp[2]);
-      m_Renderer->GetVtkRenderer()->GetActiveCamera()->OrthogonalizeViewUp();
-      m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetViewAngle(m_ViewAngle);
-      //double* bounds = m_Renderer->GetVtkRenderer()->ComputeVisiblePropBounds();
       m_Renderer->GetVtkRenderer()->ResetCameraClippingRange();
-      //m_Renderer->GetVtkRenderer()->ResetCamera();
 
       m_Renderer->RequestUpdate();
 
-      std::cout<<"Camera Position: "<<cameraPosition<<std::endl;
-      std::cout<<"Focal Point: "<<focalPoint<<std::endl;
-      std::cout<<"View Up: "<<viewUp<<std::endl;
-      std::cout<<"Direction of Projection: "<<directionOfProjection<<std::endl;
-      std::cout<<"View Angle: "<<m_ViewAngle<<std::endl<<std::endl;
+      //std::cout<<"Camera Position: "<<cameraPosition<<std::endl;
+      //std::cout<<"Focal Point: "<<focalPoint<<std::endl;
+      //std::cout<<"View Up: "<<viewUp<<std::endl;
+      //std::cout<<"Direction of Projection: "<<directionOfProjection<<std::endl;
+      //std::cout<<"View Angle: "<<m_ViewAngle<<std::endl;
+      //std::cout<<"Visible actor count: "<<m_Renderer->GetVtkRenderer()->VisibleActorCount()<<std::endl<<std::endl;
     }
     else
     {
@@ -101,7 +112,7 @@ namespace mitk{
   void CameraVisualization::SetRenderer(VtkPropRenderer::Pointer renderer)
   {
     m_Renderer = renderer;
-    //m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.1);
+    m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
   }
 
   const BaseRenderer* CameraVisualization::GetRenderer()

@@ -111,7 +111,7 @@ namespace mitk {
     CameraVisualization();
     virtual ~CameraVisualization();
 
-    BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data
+    BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data-
 
     Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
     Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates

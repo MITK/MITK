@@ -65,6 +65,7 @@ IF(MITK_BUILD_IGT)
  #mitkNavigationDataVisualizationByBaseDataTransformFilterTest.cpp
  mitkNavigationDataDisplacementFilterTest.cpp
  mitkTrackingVolumeTest.cpp
+ mitkTimeStampTest.cpp
  ) 
 ENDIF(MITK_BUILD_IGT)
 

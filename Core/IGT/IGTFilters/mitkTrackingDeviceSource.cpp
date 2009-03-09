@@ -79,7 +79,8 @@ void mitk::TrackingDeviceSource::GenerateData()
     mitk::NavigationData::OrientationType o;
     t->GetQuaternion(o);
     nd->SetOrientation(o);
-    nd->SetError(t->GetTrackingError());
+    nd->SetOrientationAccuracy(t->GetTrackingError());
+    nd->SetPositionAccuracy(t->GetTrackingError());
     //\TODO set timestamp from tool too.
     nd->SetTimeStamp( mitk::TimeStamp::GetInstance()->GetElapsed() );
 

@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef _MSC_VER 
   #include <windows.h>
   #include <psapi.h>
+#elif defined(__APPLE__)
+  #include <mach/task.h>
+  #include <mach/mach_init.h>
+  #include <mach/mach_host.h>
 #else
   #include <sys/sysinfo.h>
   #include <unistd.h>
@@ -49,6 +53,12 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
   }
   CloseHandle( hProcess );
   return size;
+#elif defined(__APPLE__)
+  struct task_basic_info t_info;
+  mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+  task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
+  size_t size = t_info.virtual_size;
+  return size;
 #else
   int size, res, shared, text, sharedLibs, stack, dirtyPages;
   if ( ! ReadStatmFromProcFS( &size, &res, &shared, &text, &sharedLibs, &stack, &dirtyPages ) )
@@ -70,6 +80,15 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx (&statex);
   return (size_t) statex.ullTotalPhys;
+#elif defined(__APPLE__)
+  kern_return_t kr;
+  host_basic_info_data_t hostinfo;
+  int count = HOST_BASIC_INFO_COUNT;
+  kr = host_info(mach_host_self(), HOST_BASIC_INFO, (host_info_t)&hostinfo, (mach_msg_type_number_t*)&count);
+  if(kr == KERN_SUCCESS)
+    return (size_t)hostinfo.memory_size;
+  else
+    return 0;
 #else
   struct sysinfo info;
   if ( ! sysinfo( &info ) )
@@ -80,6 +99,7 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 }
 
 #ifndef _MSC_VER 
+#ifndef __APPLE__
 int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared, int* text, int* sharedLibs, int* stack, int* dirtyPages ) 
 {
 	int ret = 0;
@@ -95,5 +115,6 @@ int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared
 	return ret;
 }
 #endif 
+#endif
 
 

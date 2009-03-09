@@ -74,13 +74,13 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   mitk::FillVector3D(resultPos, 5.0, 5.0,5.0);
 
   mitk::NavigationData::OrientationType initialOri(0.0, 0.0, -0.7071, 0.7071);
-  mitk::NavigationData::ErrorType initialError(0.0);
+  mitk::ScalarType initialError(0.0);
   bool initialValid(true);
   
   mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
   nd1->SetPosition(initialPos);
   nd1->SetOrientation(initialOri);
-  nd1->SetError(initialError);
+  nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
 
   myFilter->SetInput(nd1);
@@ -108,7 +108,6 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( 
     mitkNavigationDataTransformFilterTestClass::compareTwoQuaternions(output->GetOrientation(), initialOri),
     "Testing if Orientation remains unchanged ");
-  MITK_TEST_CONDITION(output->GetError() == initialError, "Testing if Error remains unchanged");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
 
@@ -157,7 +156,6 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
    MITK_TEST_CONDITION( 
      mitkNavigationDataTransformFilterTestClass::compareTwoQuaternions(output2->GetOrientation(), resultOri),
      "Testing if orientation after rotation is correctly caclculated  ");
-   MITK_TEST_CONDITION(output2->GetError() == initialError, "Testing if Error remains unchanged");
    MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged");
 
 
@@ -174,12 +172,12 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   nd1->SetPosition(initialPos);
   nd1->SetOrientation(initialOri);
-  nd1->SetError(initialError);
+  nd1->SetPositionAccuracy(initialError);
   nd1->SetDataValid(initialValid);
   
   nd2->SetPosition(initialPos2);
   nd2->SetOrientation(initialOri2);
-  nd2->SetError(initialError);
+  nd2->SetPositionAccuracy(initialError);
   nd2->SetDataValid(initialValid);
 
   myFilter = NULL;
@@ -200,13 +198,11 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(output->GetPosition() == resultPos, "Testing if position rotation was calculated correct [output 0]");
   MITK_TEST_CONDITION(mitkNavigationDataTransformFilterTestClass::compareTwoQuaternions(output->GetOrientation(), resultOri),
     "Testing if orientation rotation was calculated correct [output 0]");
-  MITK_TEST_CONDITION(output->GetError() == initialError, "Testing if Error remains unchanged for output 0");
   MITK_TEST_CONDITION(output->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 0");
 
   MITK_TEST_CONDITION(output2->GetPosition() == resultPos2, "Testing if rotation was calculated correct [output 1]");
   MITK_TEST_CONDITION(mitkNavigationDataTransformFilterTestClass::compareTwoQuaternions(output2->GetOrientation(), resultOri2),
     "Testing if orientation rotation was calculated correct [output 1]");  
-  MITK_TEST_CONDITION(output2->GetError() == initialError, "Testing if Error remains unchanged for output 1");
   MITK_TEST_CONDITION(output2->IsDataValid() == initialValid, "Testing if DataValid remains unchanged for output 1");
 //
 //  /* test if anything changes on second ->Update() */

@@ -25,9 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 
-namespace mitk {
-
-
+namespace mitk 
+{
   /**Documentation
   * \brief Interface for all Tracking Tools
   *

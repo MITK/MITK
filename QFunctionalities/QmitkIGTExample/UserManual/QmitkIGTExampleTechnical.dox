@@ -1,0 +1,96 @@
+/**
+
+\page QmitkIGTExampleTechnicalPage Technical design of QmitkIGTExample
+
+\section QmitkIGTExampleTechnicalPage2 Introduction
+
+QmitkIGTExample is an example functionality that shows how to use the MITK-IGT component
+of MITK.
+
+\section QmitkIGTExampleTechnicalPage3 Classes involved
+
+Desribe all classes that are used by QmitkIGTExample and how they work together
+
+
+\section How to use SetParameters() & GetParameters() in a functionality:
+
+- Build a GUI Widget that allows to display and change the filter parameters (Sliders, LineEdits...)
+- Add a method to read a PropertyList to the widget:
+
+void QmitkMyFilterWidget::SetMyFilterParameters(mitk::PropertyList* p)
+{
+  if (p == NULL)
+    return;
+  /* read properties and update GUI elements. Example for a Vector3D: */
+  mitk::Vector3D v;
+  if (p->GetPropertyValue<mitk::Vector3D>("MyFilter_MyParameter", v) == true) 
+  {
+    m_X->setText(QString::number(v[0]));
+    m_Y->setText(QString::number(v[1]));
+    m_Z->setText(QString::number(v[2]));    
+  }
+  //...
+}
+- Add a PropertyList "m_Parameters" to your widget (in Qt Designer).
+- Add a "ParametersChanged" Signal/Event to your widget (in Qt Designer)
+- Add listener methods (in Qt: Slots) that are called if the parameter edit widgets are modified:
+
+/* example for a Vector3D parameter */
+void QmitkMyFilterWidget::m_ChangeOffset_clicked()
+{
+  mitk::Vector3D v;
+  v[0] = m_X->text().toFloat();
+  v[1] = m_Y->text().toFloat();
+  v[2] = m_Z->text().toFloat();
+  if (m_Parameters.IsNull())
+    m_Parameters = mitk::PropertyList::New();
+  m_Parameters->SetProperty("MyFilter_MyParameter", mitk::Vector3DProperty::New(v));
+  emit ParametersChanged();
+}
+
+- In your Functionality:
+- If you want to use the persistence mechanism of the MainApp, add a listener method to the ParametersChanged() signal:
+slot:
+   void OnParametersChanged();
+
+...
+connect( (QObject*)(m_Controls->MyWidget), SIGNAL(ParametersChanged()),(QObject*) this, SLOT(OnParametersChanged()));
+...
+
+void QmitkMyFunctionality::OnParametersChanged()
+{
+  /* Check if needed objects exist */
+  if (m_Controls->m_MyFilterWidget->m_Parameters.IsNull())
+    return;
+
+  /* add the filter PropertyList to the options property list of the functionality, so that it will be saved on application exit and restored at the next restart.
+  */
+  GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_MyFilterWidget->m_Parameters.GetPointer(), true);
+}
+
+- When creating/using the filter, use the property list of the widget to set the parameters:
+
+  m_MyFilter = mitk::MyFilter::New();
+  mitk::Vector3D param1;
+  /* Variant 1: check if each parameter is stored in the propertylist. If none is found, use hardcoded values */
+  if (GetFunctionalityOptionsList()->GetPropertyValue<mitk::Vector3D>("MyFilter_MyParameter", param1) == false)  // search for MyParameter. Use the widgets propertylist if you do not react to the filters ParameterChanged() event.
+  mitk::FillVector3D(param1, 100000.0, 0.0, 0.0);  // nothing found, use hardcoded value
+  m_Displacer->SetOffset(param1);
+  /* Variant 2: set the list directly */
+  m_Displacer->SetParameters(GetFunctionalityOptionsList()) 
+  /* (make sure that the list containes all parameters!) */
+
+
+- When using persistence, the functionality options list will contain filter parameters on the next application startup. to initialize the GUI widget with these values, call its SetMyFilterParameters() method when it is created:
+
+QWidget * QmitkMyFunctionality::CreateControlWidget(QWidget *parent)
+{
+  if (m_Controls == NULL)
+  {
+    m_Controls = new QmitkMyFunctionalityControls(parent);
+    m_Controls->MyFilter->SetMyFilterParameters(GetFunctionalityOptionsList());
+...
+
+QmitkIGTExample contains a complete implementation of this. (It does not use a special widget for the displacement filter. Instead, it uses its control widget to hold the filter parameter gui elements)
+
+**/

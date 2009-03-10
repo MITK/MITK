@@ -1,0 +1,22 @@
+/**
+\page QmitkIGTExample The QmitkIGTExample-Functionality
+
+Available sections:
+  - \ref QmitkIGTExampleUserManualOverview 
+  - \ref QmitkIGTExampleUserManualDetails 
+  
+\section QmitkIGTExampleOverview Overview
+
+  This functionality how to use the MITK-IGT component
+  to develop image guided therapy applications with MITK
+
+  \li 
+     
+  
+\section QmitkIGTExampleUserManualDetails 
+
+\subsection Subsection1
+
+  
+
+*/

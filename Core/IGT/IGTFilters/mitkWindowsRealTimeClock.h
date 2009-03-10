@@ -51,7 +51,10 @@ namespace mitk {
     virtual ~WindowsRealTimeClock();
 
     /**
-    * \brief returns the current time in milliseconds as a double 
+    * \brief returns the current time in milliseconds as a double
+    *
+    * Uses the QueryPerformanceCounter to acquire an accurate time.
+    * (Ticks counted / Frequency) = time in ms
     */
     virtual double getCurrentStamp();
 
@@ -62,7 +65,7 @@ namespace mitk {
     
   protected:
 
-    LARGE_INTEGER frequency;
+    LARGE_INTEGER m_Frequency;
 
   }; //namespace
 }

@@ -56,10 +56,7 @@ namespace mitk {
   public:
     
     mitkClassMacro(TimeStamp, itk::Object);
-    //itkNewMacro(Self);
     
-    //static const TimeStamp* GetTimeStamp();
-
     /**
     * \brief creates and returns a new instance of mitkTimeStamp if necessary
     */
@@ -132,14 +129,29 @@ namespace mitk {
 
     void initialize();
 
+    /*
+      the current timestamp when GetCurrentStamp() is called.
+    */
     double m_Time;
 
+    /*
+      the timestamp in ms acquired when StartTracking() was called.
+    */
     double m_ReferenceTime;
 
+    /*
+      pointer to the RealTimeClock used internally
+    */
     mitk::RealTimeClock::Pointer m_RealTimeClock;
 
+    /*
+      pointer to the current instance
+    */
     static mitk::TimeStamp::Pointer s_Instance;
 
+    /*
+      map, in which pointer to all devices calling StartTracking(), are saved
+    */
     std::map<itk::Object::Pointer, double> m_DeviceMap;
 
     std::map<itk::Object::Pointer, double>::iterator m_MapIterator;    

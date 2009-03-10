@@ -37,11 +37,6 @@ mitk::TimeStamp::~TimeStamp()
 {
 }
 
-//const mitk::TimeStamp* mitk::TimeStamp::GetTimeStamp()
-//{
-//  return new TimeStamp();  // \TODO Access real time clock to get meaningful timestamp
-//}
-
 
 /**
 * \brief creates a new instance of mitkTimeStamp

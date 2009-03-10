@@ -39,8 +39,14 @@ GENERATE_TODOLIST      = YES
 GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
-ALIASES                = "FIXME=\par Fix Me's:\n"
-ENABLED_SECTIONS       = 
+ALIASES                = "FIXME=\par Fix Me's:\n" \
+						 "QT4=\if QT4" \
+						 "endQT4=\endif" \
+						 "QT3=\if QT3" \
+						 "endQT3=\endif" \
+						 "openCherry=\if OPENCHERRY" \
+						 "endopenCherry=\endif"
+ENABLED_SECTIONS       = @MITK_DOXYGEN_ENABLED_SECTIONS@
 MAX_INITIALIZER_LINES  = 30
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
@@ -59,7 +65,6 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
                          @MITK_BINARY_DIR@/Documentation/Doxygen/MainPage.dox \
-                         @MITK_BINARY_DIR@/Documentation/Doxygen/extension-points/index.dox \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
                          @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \
@@ -229,7 +234,7 @@ PREDEFINED             = itkNotUsed(x)= \
                          VXL_LITTLE_ENDIAN=0 \
                          VNL_DLL_DATA= \
                          size_t=vcl_size_t \
-                         DOXYGEN_SKIP
+                         DOXYGEN_SKIP 
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------
@@ -238,7 +243,7 @@ SKIP_FUNCTION_MACROS   = YES
 TAGFILES               = @OPENCHERRY_TAGFILE@
 GENERATE_TAGFILE       = 
 ALLEXTERNALS           = NO
-EXTERNAL_GROUPS        = YES
+EXTERNAL_GROUPS        = NO
 PERL_PATH              = /usr/bin/perl
 #---------------------------------------------------------------------------
 # Configuration options related to the dot tool   

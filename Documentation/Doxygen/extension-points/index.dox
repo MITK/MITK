@@ -9,11 +9,11 @@
 The following extension points can be used to extend the capabilities
 of MITK Plugins:
 
-
+\QT3
 <h3><a name="interactivesegmentation"></a>Interactive Segmentation</h3>
 <ul>
 	<li><a href="extension-points/html/org_mitk_gui_qt_interactivesegmentation_qmitktoolguis.html">org.mitk.gui.qt.interactivesegmentation.qmitktoolguis</a></li>
 </ul>
-
+\endQT3
 
 */

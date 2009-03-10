@@ -34,11 +34,11 @@ Essential variables to configure are ITK_DIR and VTK_DIR. The demo application c
 
 \note "Installing" MITK via cmake (or using "make install") is not yet supported. You can find the application in <tt>&lt;binary_dir&gt;/mitk/bin</tt> and the libraries in <tt>&lt;binary_dir&gt;/mitk/lib</tt>.
 
-\section Documentation
+\section three Documentation
 
 If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get  a new project (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in the Documentation/Doxygen directory of your binary tree or in the MITK_DOXYGEN_OUTPUT_DIR if specified. See below.
 
-\section MITK specific configuration variables  
+\section four MITK specific configuration variables  
  - \b USE_QT: this can be set to OFF to build only the Qt-independent classes of MITK
  - \b MITK_BUILD_TUTORIAL: Build the tutorial applications (Step1 to n)
  - \b MITK_CHILI_PLUGIN: MITK can be used for building plugins for the CHILI teleradiology application (<a href="http://www.chili-radiology.com/">CHILI GmbH Heidelberg</A>). You need the CHILI SDK for this. 
@@ -47,9 +47,15 @@ If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool 
  - \b MITK_STARTUP_FUNCTIONALITY: This can be used to specify the functionality which should be activated first after launching the application.
  - \b MITK_USE_TD_MOUSE: (Win32 only) Set to ON if a 3Dconnexion mouse is available and the vendor driver is installed.
 
-\section MITKConfig.cmake
+\section five MITKConfig.cmake
 
-\link NewFunctionalityPage
+\QT3
+\ref NewFunctionalityPage
+\else
+\openCherry
+\ref NewPluginPage
+\endopenCherry
+\endif
 
 In the binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
 

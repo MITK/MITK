@@ -216,7 +216,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     mitk::PointSet::Pointer sourcePoints2 = mitk::PointSet::New();
     myFilter2->SetSourcePoints(sourcePoints2);
   }
-  catch (std::exception& exp)
+  catch (std::exception& /*exp*/)
   {  exceptionCatched=true; /*std::cout<<exp.what()<<std::endl;*/}
 
   MITK_TEST_CONDITION(exceptionCatched,"Testing source points < 3");
@@ -232,7 +232,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     myFilter3->SetTargetPoints(targetPoints2);
     
   }
-  catch (std::exception& exp)
+  catch (std::exception& /*exp*/)
   {  exceptionCatched=true;  /*std::cout<<exp.what()<<std::endl;*/ }
   MITK_TEST_CONDITION(exceptionCatched,"Testing target points < 3");
 

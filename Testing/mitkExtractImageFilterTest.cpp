@@ -128,6 +128,7 @@ static void Test3D( mitk::ExtractImageFilter* filter, mitk::Image* image, unsign
                       << "-dimensional image, sliceDimension " 
                       << sliceDimension 
                       << " sliceIndex " << sliceIndex << "." << "(l. " << __LINE__ << ")" << std::endl;
+            std::cerr << "Following exception was thrown: " << e.what() << std::endl;
         }
       }
       else

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNDITrackingDevice.h"
-
+#include "mitkTimeStamp.h"
 
 #include <itksys/SystemTools.hxx>
 #define HALFPI 1.570796
@@ -676,6 +676,7 @@ bool mitk::NDITrackingDevice::StartTracking()
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+  mitk::TimeStamp::GetInstance()->StartTracking(this);
 
   this->m_ModeMutex->Unlock();
   return true;

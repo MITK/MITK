@@ -28,6 +28,7 @@
 
 //!mm-added
 class QmitkStdMultiWidget;
+class QScrollArea;
 
 class MITK_QT_COMMON QmitkFunctionality : public cherry::QtViewPart, virtual public cherry::IPartListener
 {
@@ -40,16 +41,10 @@ public:
   virtual void CreatePartControl(void* parent);
 
   ///
-  /// Called immediately after CreateQtPartControl().
-  /// Actions that should be taken after creating the controls are executed here. 
-  ///
-  virtual void BeforeCreateQtPartControl(QWidget* parent);
-
-  ///
   /// Called immediately before CreateQtPartControl().
   /// Actions that should be taken after creating the controls are executed here. 
   ///
-  virtual void AfterCreateQtPartControl(QWidget* parent);
+  void AfterCreateQtPartControl();
 
   virtual void SetFocus();
 
@@ -75,7 +70,7 @@ public:
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.
   /// \see m_InDataStorageChanged  
   ///
-  virtual void NodeAddedProxy(const mitk::DataTreeNode* node);
+  void NodeAddedProxy(const mitk::DataTreeNode* node);
   ///
   /// Called when a DataStorage Add Event was thrown. May be reimplemented
   /// by deriving classes.
@@ -86,7 +81,7 @@ public:
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.
   /// \see m_InDataStorageChanged  
   ///
-  virtual void NodeRemovedProxy(const mitk::DataTreeNode* node);
+  void NodeRemovedProxy(const mitk::DataTreeNode* node);
   ///
   /// Called when a DataStorage Remove Event was thrown. May be reimplemented
   /// by deriving classes.

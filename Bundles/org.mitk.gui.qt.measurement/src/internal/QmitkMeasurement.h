@@ -46,9 +46,10 @@ class MITK_QT_MEASUREMENT QmitkMeasurement : public QObject, public QmitkFunctio
 {
   Q_OBJECT
 
+
   public:
-    void StdMultiWidgetAvailable();
-    void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+    virtual void StdMultiWidgetNotAvailable();
 
     virtual ~QmitkMeasurement();
 

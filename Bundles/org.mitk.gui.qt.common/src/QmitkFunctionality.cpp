@@ -30,6 +30,8 @@
 
 // Qt Includes
 #include <QMessageBox>
+#include <QScrollArea>
+#include <QVBoxLayout>
 
 QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
@@ -73,19 +75,27 @@ mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
   return service->GetDefaultDataStorage()->GetDataStorage();
 }
 
-void QmitkFunctionality::BeforeCreateQtPartControl(QWidget* parent)
-{
-  m_Parent = parent;
-}
-
 void QmitkFunctionality::CreatePartControl(void* parent)
 {
-  this->BeforeCreateQtPartControl(static_cast<QWidget*>(parent));
-  this->CreateQtPartControl(static_cast<QWidget*>(parent));
-  this->AfterCreateQtPartControl(static_cast<QWidget*>(parent));
+  // add a scroll area as parent for all widgets
+  QWidget* parentQWidget = static_cast<QWidget*>(parent);
+  QVBoxLayout* parentLayout = new QVBoxLayout(parentQWidget);
+  QScrollArea* scrollArea = new QScrollArea(static_cast<QWidget*>(parentQWidget));  
+  m_Parent = scrollArea;
+
+  // dont show shadow
+  scrollArea->setFrameShadow(QFrame::Plain);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  parentQWidget->setLayout(parentLayout);
+  parentLayout->setMargin(0);
+  parentLayout->setSpacing(0);
+  parentLayout->addWidget(m_Parent);
+
+  this->CreateQtPartControl(m_Parent);
+  this->AfterCreateQtPartControl();
 }
 
-void QmitkFunctionality::AfterCreateQtPartControl(QWidget* parent)
+void QmitkFunctionality::AfterCreateQtPartControl()
 {
   this->GetSite()->GetPage()->AddPartListener(cherry::IPartListener::Pointer(this));
   this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>

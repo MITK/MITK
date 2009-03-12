@@ -209,13 +209,14 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   m_Controls->setupUi(parent);
 
   m_PointSetInteractor = 0u;
+
   m_CurrentPointSetNode = 0u;
 
   this->CreateConnections();
   //SetAvailability(true);
 }
 
-void QmitkMeasurement::StdMultiWidgetAvailable()
+void QmitkMeasurement::StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget)
 {
   this->m_Controls->pbAngle->setEnabled(true);
   this->m_Controls->pbDistance->setEnabled(true);

@@ -257,12 +257,12 @@ namespace mitk {
       xmlWriter.WriteProperty("SCALE10", transformValues[11]);
       xmlWriter.WriteProperty("SCALE11", transformValues[12]);
       xmlWriter.WriteProperty("SCALE12", transformValues[13]);
-      xmlWriter.WriteProperty("SCALE13", transformValues[14]);
+     /* xmlWriter.WriteProperty("SCALE13", transformValues[14]);
       xmlWriter.WriteProperty("SCALE14", transformValues[15]);
       xmlWriter.WriteProperty("SCALE15", transformValues[16]);
-      xmlWriter.WriteProperty("SCALE16", transformValues[17]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[18]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[19]);
+      xmlWriter.WriteProperty("SCALE16", transformValues[17]);*/
+      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[14]);
+      xmlWriter.WriteProperty("USEMOMENTS", transformValues[15]);
     }
     else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
     {
@@ -579,6 +579,8 @@ namespace mitk {
       std::string scale12 = ReadXMLStringAttribut( "SCALE12", atts );
       double sca12 = atof(scale12.c_str());
       transformValues[13] = sca12;
+
+      /*
       std::string scale13 = ReadXMLStringAttribut( "SCALE13", atts );
       double sca13 = atof(scale13.c_str());
       transformValues[14] = sca13;
@@ -591,12 +593,14 @@ namespace mitk {
       std::string scale16 = ReadXMLStringAttribut( "SCALE16", atts );
       double sca16 = atof(scale16.c_str());
       transformValues[17] = sca16;
+      */
+
       std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
       double useIni = atof(useInitializer.c_str());
-      transformValues[18] = useIni;
+      transformValues[14] = useIni;
       std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
       double useMo = atof(useMoments.c_str());
-      transformValues[19] = useMo;
+      transformValues[15] = useMo;
     }
     else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
     {

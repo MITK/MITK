@@ -31,53 +31,108 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
     class TrackingTool; // interface for a tool that can be tracked by the TrackingDevice
 
-    //##Documentation
-    //## \brief Interface for all Tracking Devices
-    //##
-    //## Defines the methods that are common for all tracking devices.
-    //## A User should never directly instantiate one of its subclasses.
-    //## Instead, he should always instantiate an apropriate Configurator 
-    //## object and get a reference of the type TrackingDevice from it.
-    //## 
-    //## @ingroup Tracking
+    /**Documentation
+    * \brief Interface for all Tracking Devices
+    *
+    * Defines the methods that are common for all tracking devices.
+    * 
+    *  \ingroup IGT
+    */
     class TrackingDevice : public itk::Object
     {
     public:
       mitkClassMacro(TrackingDevice, itk::Object);
 
-      enum TrackingDeviceMode {Setup, Ready, Tracking};   // Type for state variable. The trackingdevice is always in one of these states
-
+      enum TrackingDeviceMode {Setup, Ready, Tracking};   ///< Type for state variable. The trackingdevice is always in one of these states
+      /**
+       * \brief Opens a connection to the device
+       * 
+       * This may only be called if there is currently no connection to the device.
+       * If OpenConnection() is successful, the object will change from Setup state to Ready state
+       */
       virtual bool OpenConnection() = 0;
-      virtual bool CloseConnection() = 0;
-      virtual bool StartTracking() = 0;
-      virtual bool StopTracking();
-      virtual TrackingTool* GetTool(unsigned int toolNumber) = 0;
-      virtual unsigned int GetToolCount() const = 0;
-      itkGetStringMacro(ErrorMessage);
-      TrackingDeviceMode GetMode() const;
       
+      /**
+       * \brief Closes the connection to the device
+       * 
+       * This may only be called if there is currently a connection to the device, but tracking is
+       * not running (e.g. object is in Ready state)
+       */
+      virtual bool CloseConnection() = 0; ///< Closes the connection with the device
+
+      /**
+       * \brief start retrieving tracking data from the device. 
+       * 
+       * This may only be called after the connection to the device has been established 
+       * with a call to OpenConnection() (E.g. object is in Ready mode). This will change the
+       * object state from Ready to Tracking
+       */
+      virtual bool StartTracking() = 0;
+
+      /**
+       * \brief stop retrieving tracking data from the device. 
+       * stop retrieving tracking data from the device. 
+       * This may only be called after StartTracking was called 
+       * (e.g. the object is in Tracking mode).
+       * This will change the object state from Tracking to Ready.
+       */
+      virtual bool StopTracking();
+      
+      /**
+       * \brief Return tool with index toolNumber 
+       * 
+       * tools are numbered from 0 to GetToolCount() - 1.
+       */ 
+      virtual TrackingTool* GetTool(unsigned int toolNumber) = 0;
+      /**
+       * \brief Returns number of tracking tools
+       */
+      virtual unsigned int GetToolCount() const = 0;
+      
+      /**
+       * \brief return current error message
+       */
+      itkGetStringMacro(ErrorMessage);
+      /**
+       * \brief return current object state (Setup, Ready or Tracking)
+       */
+      TrackingDeviceMode GetMode() const;
+      /**
+       * \brief return tracking volume of current tracking device
+       */
       TrackingVolume::Pointer GetTrackingVolume();
 
+      /**
+       * \brief return device type identifier
+       */
       itkGetConstMacro(Type,TrackingDeviceType);
+       /**
+       * \brief set device type
+       */
       itkSetMacro(Type,TrackingDeviceType);
 
     protected:
-
+      /**
+      * \brief  set error message
+      */
       itkSetStringMacro(ErrorMessage);
+      /**
+      * \brief  change object state
+      */
       itkSetMacro(Mode,TrackingDeviceMode);
 
 
       TrackingDevice();
       virtual ~TrackingDevice();
 
-      TrackingDeviceType m_Type;
-      TrackingDeviceMode m_Mode;
-      bool m_StopTracking;
-      mitk::TrackingVolume::Pointer m_TrackingVolume;
-      itk::FastMutexLock::Pointer m_StopTrackingMutex;
-      itk::FastMutexLock::Pointer m_TrackingFinishedMutex;
-      itk::FastMutexLock::Pointer m_ModeMutex;
-      std::string m_ErrorMessage;
+      TrackingDeviceType m_Type; ///< current device type 
+      TrackingDeviceMode m_Mode; ///< current object state (Setup, Ready or Tracking)
+      bool m_StopTracking;       ///< signal stop to tracking thread
+      mitk::TrackingVolume::Pointer m_TrackingVolume; ///< tracking volume of current tracking device
+      itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
+      itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
+      itk::FastMutexLock::Pointer m_ModeMutex; ///< mutex to controll access to m_Mode
+      std::string m_ErrorMessage; ///< current error message
     };
 } // namespace mitk
 

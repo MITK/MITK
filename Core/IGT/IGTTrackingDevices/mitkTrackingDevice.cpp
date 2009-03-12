@@ -23,8 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::TrackingDevice::TrackingDevice() :
   m_Type(TrackingSystemNotSpecified),
-  m_Mode(mitk::TrackingDevice::Setup), 
-  m_StopTracking(false) 
+  m_Mode(mitk::TrackingDevice::Setup),
+  m_StopTracking(false), m_ErrorMessage("")
+
 {
   m_StopTrackingMutex = itk::FastMutexLock::New();
   m_TrackingVolume = mitk::TrackingVolume::New();
@@ -35,6 +36,9 @@ mitk::TrackingDevice::TrackingDevice() :
 
 mitk::TrackingDevice::~TrackingDevice()
 {
+  m_TrackingFinishedMutex = NULL;
+  m_StopTrackingMutex = NULL;
+  m_TrackingVolume = NULL;
 }
 
 mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
@@ -54,9 +58,9 @@ bool mitk::TrackingDevice::StopTracking()
     m_StopTrackingMutex->Unlock();
     //we have to wait here that the other thread recognizes the STOP-command and executes it
     m_TrackingFinishedMutex->Lock();
+    mitk::TimeStamp::GetInstance()->StopTracking(this); // notify realtime clock
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
-    mitk::TimeStamp::GetInstance()->StopTracking(this);
     this->SetMode(Ready);
   }
   return true;

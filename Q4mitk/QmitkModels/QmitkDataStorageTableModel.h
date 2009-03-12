@@ -3,6 +3,7 @@
 
 /// Own includes.
 #include "mitkDataStorage.h"
+#include "mitkBaseProperty.h"
 
 /// Toolkit includes.
 #include <QAbstractTableModel>
@@ -105,6 +106,11 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// by deriving classes.
     ///
     virtual void NodeRemoved(const mitk::DataTreeNode* node);
+    ///
+    /// \brief Called when a single property was changed.
+    ///
+    virtual void PropertyModified(const itk::Object *caller, const itk::EventObject &event);
+
   protected:
     ///
     /// Called when DataStorage or Predicate changed. Resets whole model and reads all nodes
@@ -127,14 +133,17 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     /// Holds all selected Nodes.
     ///
-    mitk::DataStorage::SetOfObjects::ConstPointer m_NodeSet;
+    mitk::DataStorage::SetOfObjects::Pointer m_NodeSet;
 
     ///
     /// Saves if this model is currently working on events to prevent endless event loops.
     /// 
-    bool m_ProcessesEvents;
+    bool m_BlockEvents;
 
-    
+    ///
+    /// \brief Maps a property to an observer tag.
+    ///
+    std::map<mitk::BaseProperty*, unsigned long> m_PropertyModifiedObserverTags;
 };
 
 #endif

@@ -23,6 +23,8 @@
 #include "mitkDataTreeNode.h"
 
 /// Toolkit includes.
+#include <vector>
+#include <string>
 #include <QAbstractTableModel>
 
 /// Forward declarations.
@@ -36,11 +38,35 @@ class QMITK_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
 {
 public:
 
+  struct PropertyListElementCompareFunction 
+    : public std::binary_function<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >
+      , std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >, bool>
+  {
+    enum CompareCriteria {
+      CompareByName = 0,
+      CompareByValue,
+      CompareByActivity
+    };
+
+    enum CompareOperator {
+      Less = 0,
+      Greater
+    };
+    
+    PropertyListElementCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
+
+    bool operator()(const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Left
+      , std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right) const;
+
+    protected:
+      CompareCriteria m_CompareCriteria;
+      CompareOperator m_CompareOperator;
+  };
+
   ///
   /// Constructs a new QmitkDataStorageTableModel 
   /// and sets the DataTreeNode for this TableModel.
-  QmitkPropertiesTableModel(mitk::DataTreeNode::Pointer _Node=0
-    , QObject* parent = 0);
+  QmitkPropertiesTableModel(mitk::PropertyList* _PropertyList=0, QObject* parent = 0);
 
   ///
   /// Standard dtor. Nothing to do here.
@@ -49,12 +75,12 @@ public:
   ///
   /// Sets the node. Resets the whole model. If _Node is NULL the model is empty.
   ///
-  void setNode(mitk::DataTreeNode::Pointer _Node);
+  void setPropertyList(mitk::PropertyList* _PropertyList);
 
   ///
   /// Get the node.
   /// 
-  mitk::DataTreeNode::Pointer getNode() const;
+  //mitk::DataTreeNode::Pointer getNode() const;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
@@ -83,10 +109,37 @@ public:
   /// the properties name and its value.
   int columnCount(const QModelIndex &parent) const;
 
+  ///
+  /// \brief Called when a single property was changed. Send a model changed event to the Qt-outer world.
+  ///
+  virtual void PropertyModified(const itk::Object *caller, const itk::EventObject &event);
+
+  ///
+  /// \brief Called when the nodes property list got modified. Call reset() on the whole model.
+  ///
+  virtual void PropertyListModified(const itk::Object *caller, const itk::EventObject &event);
+
+  void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder );
+
 protected:
   /// 
-  /// Holds the node the properties belong to.s
-  mitk::DataTreeNode::Pointer m_Node;
+  /// Holds the the properties list.
+  mitk::PropertyList* m_PropertyList;
+
+  /// Store the properties in a vector so that they may be sorted
+  std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > > m_PropertyListElements;
+
+  unsigned long m_PropertyListModifiedObserverTag;
+
+  ///
+  /// \brief Indicates if this class should neglect all incoming events because
+  /// the class itself triggered the event (in this case when a property was edited).
+  ///
+  bool m_BlockEvents;
+
+  std::map<std::string, unsigned long> m_PropertyModifiedObserverTags;
+
+  bool m_SortDescending;
 };
 
 #endif /* QMITKPROPERTIESTABLEMODEL_H_ */

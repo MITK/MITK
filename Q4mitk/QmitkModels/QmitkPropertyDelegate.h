@@ -47,11 +47,16 @@ class QMITK_EXPORT QmitkPropertyDelegate : public QItemDelegate
     void setModelData(QWidget *editor, QAbstractItemModel* model
       , const QModelIndex &index) const;
 
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
   private slots:
     ///
     /// Invoked when the user accepts editor input, that is when he does not pushes ESC.
     ///
     void commitAndCloseEditor();
+    void ComboBoxCurrentIndexChanged ( int index ) ;
+    void SpinBoxValueChanged ( const QString& value ) ;
+
 };
 
 #endif /* QMITKPROPERTIESTABLEMODEL_H_ */

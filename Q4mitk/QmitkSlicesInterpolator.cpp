@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkDiffImageApplier.h"
 #include "mitkOperationEvent.h"
+#include "mitkSegTool2D.h"
 
 #include <itkCommand.h>
 
@@ -259,7 +260,7 @@ void QmitkSlicesInterpolator::OnFrontalSliceChanged(const itk::EventObject& e)
   }
 }
 
-bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, unsigned int sliceDimension)
+bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::EventObject& e, unsigned int windowID)
 {
   if (!m_InterpolationEnabled) return false;
 
@@ -270,11 +271,11 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
     mitk::TimeSlicedGeometry* tsg = event.GetTimeSlicedGeometry();
     if (tsg)
     {
-      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometry3D(m_TimeStep[sliceDimension]));
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometry3D(m_TimeStep[windowID]));
       if (slicedGeometry)
       {
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
-        Interpolate( sliceDimension, plane, m_TimeStep[sliceDimension] );
+        Interpolate( plane, m_TimeStep[windowID] );
         return true;
       }
     }
@@ -287,7 +288,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
   return false;
 }
 
-void QmitkSlicesInterpolator::Interpolate( unsigned int sliceDimension, mitk::PlaneGeometry* plane, unsigned int timeStep )
+void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep )
 {
   mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
   if (node)
@@ -295,21 +296,16 @@ void QmitkSlicesInterpolator::Interpolate( unsigned int sliceDimension, mitk::Pl
     m_Segmentation = dynamic_cast<mitk::Image*>(node->GetData());
     if (m_Segmentation)
     {
+      int clickedSliceDimension(-1);
+      int clickedSliceIndex(-1);
+
       // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
-      mitk::Geometry3D* imageGeometry = m_Segmentation->GetGeometry(timeStep);
-      mitk::Point3D testPoint = imageGeometry->GetCenter();
-      mitk::Point3D projectedPoint;
-      plane->Project( testPoint, projectedPoint );
+      mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
+      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, timeStep );
 
-      mitk::Point3D indexPoint;
-
-      imageGeometry->WorldToIndex( projectedPoint, indexPoint );
-      unsigned int sliceIndex = ROUND( indexPoint[sliceDimension] );
-
-      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep );
       m_FeedbackNode->SetData( interpolation );
-      m_LastSliceDimension = sliceDimension;
-      m_LastSliceIndex = sliceIndex;
+      m_LastSliceDimension = clickedSliceDimension;
+      m_LastSliceIndex = clickedSliceIndex;
     }
   }
 }
@@ -335,11 +331,18 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
   }
 }
 
-void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimension)
+void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
 {
   // first creates a 3D diff image, then applies this diff to the segmentation
   if (m_Segmentation)
   {
+    int sliceDimension(-1);
+    int dummySliceIndex(-1);
+    if (!GetSliceForWindowsID(windowID, sliceDimension, dummySliceIndex))
+    {
+      return; // cannot determine slice orientation
+    }
+
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
     mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
@@ -353,7 +356,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
     memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
     // now the diff image is all 0
 
-    unsigned int timeStep( m_TimeStep[sliceDimension] );
+    unsigned int timeStep( m_TimeStep[windowID] );
 
     // a slicewriter to create the diff image
     mitk::OverwriteSliceImageFilter::Pointer diffslicewriter = mitk::OverwriteSliceImageFilter::New();
@@ -402,6 +405,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimensio
   }
 }
 
+
 void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
 {
   QMenu orientationPopup(this);
@@ -414,12 +418,9 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   orientationPopup.exec( QCursor::pos() );
 }
 
-void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction * action)
+void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(int windowID)
 {
-  std::map<QAction*, unsigned int>::const_iterator it
-	  = ACTION_TO_SLICEDIMENSION.find(action);
-
-  AcceptAllInterpolations( it->second );
+  AcceptAllInterpolations( windowID );
 }
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
@@ -520,5 +521,45 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject&
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   UpdateVisibleSuggestion();
+}
+
+bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& sliceDimension, int& sliceIndex)
+{
+  mitk::BaseRenderer* renderer(NULL);
+
+  // find sliceDimension for windowID:
+  //   windowID 2: transversal window = renderWindow1
+  //   windowID 1: frontal window = renderWindow3
+  //   windowID 0: sagittal window = renderWindow2
+  switch (windowID)
+  {
+  case 2:
+  default:
+    renderer = m_MultiWidget->mitkWidget1->GetRenderer();
+    break;
+  case 1:
+    renderer = m_MultiWidget->mitkWidget3->GetRenderer();
+    break;
+  case 0:
+    renderer = m_MultiWidget->mitkWidget2->GetRenderer();
+    break;
+  }
+
+  if ( m_Segmentation && renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
+  {
+    const mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>( renderer->GetWorldGeometry() );
+    if (timeSlicedGeometry)
+    {
+      mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(timeSlicedGeometry->GetGeometry3D(m_TimeStep[windowID]));
+      if (slicedGeometry)
+      {
+        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( renderer->GetSlice() ));
+        Interpolate( plane, m_TimeStep[windowID] );
+        return mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, sliceDimension, sliceIndex );
+      }
+    }
+  }
+
+  return false;
 }
 

@@ -12,7 +12,6 @@
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkStdMultiWidgetEditor.h>
-#include <QmitkDataStorageDelegate.h>
 #include <QmitkCommonFunctionality.h>
 
 #include <cherryIEditorPart.h>

@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkTrackingVolume.h"
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
@@ -14,25 +32,18 @@ mitk::TrackingVolume::TrackingVolume()
   //####################################################################
 
   }
-/**
- * NOT IMPLEMENTED YET!
- * @return Returns true if the point "punkt" is inside the trackingvolume. Be sure that the coordinates of "punkt" are in the tracking coordination system!
- */
+
 bool mitk::TrackingVolume::IsInside(mitk::Point3D itkNotUsed(punkt))
   {
+  //NOT IMPLEMENTED YET!
   return false;
   }
-/**
- * \brief Sets the trackingvolume by hand. Only use this method if your specific trackingvolume is not supported by this class.
- */
+
 void mitk::TrackingVolume::SetManualVolume(vtkPolyData* manualVolume)
   {
   this->SetVtkPolyData(manualVolume);
   }
 
-/**
- * \brief Sets the typ of the trackingdevice. The dimensions of the trackingvolume are updated directly.
- */
 bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
   {
   //Dateinamen Anhand des Trackingsystems bestimmen:
@@ -62,7 +73,7 @@ bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
   mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
   stlReader->SetFileName( filename.c_str() );
   stlReader->Update();
-  if ( stlReader->GetOutput() != NULL ) 
+  if ( stlReader->GetOutput() != NULL )
     {
     this->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
     return true;

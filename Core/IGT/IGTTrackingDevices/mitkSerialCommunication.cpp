@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::SerialCommunication::SerialCommunication() : itk::Object(),
-m_PortNumber(COM1), m_BaudRate(BaudRate9600),
+m_DeviceName(""), m_PortNumber(COM1), m_BaudRate(BaudRate9600),
 m_DataBits(DataBits8), m_Parity(None), m_StopBits(StopBits1),
 m_HardwareHandshake(HardwareHandshakeOff),
 m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)

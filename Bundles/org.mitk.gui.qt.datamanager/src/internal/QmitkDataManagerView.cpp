@@ -58,6 +58,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   // setup qsplitter
   QSplitter *_SplitterNodeViewPropertiesView = new QSplitter(m_BasePane);
+  _SplitterNodeViewPropertiesView->setMargin(0);
 
   // NodeView
   QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes", m_BasePane);

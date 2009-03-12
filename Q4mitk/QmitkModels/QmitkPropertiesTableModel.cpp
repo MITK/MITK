@@ -442,7 +442,7 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
 
 bool QmitkPropertiesTableModel::PropertyListElementCompareFunction::operator()
   ( const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Left
-  , std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right ) const
+  , const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right ) const
 {
   switch(m_CompareCriteria)
   {

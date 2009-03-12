@@ -56,7 +56,7 @@ public:
     PropertyListElementCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
 
     bool operator()(const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Left
-      , std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right) const;
+      , const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right) const;
 
     protected:
       CompareCriteria m_CompareCriteria;

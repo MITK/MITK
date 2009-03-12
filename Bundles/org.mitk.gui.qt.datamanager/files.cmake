@@ -13,6 +13,11 @@ SET(MOC_H_FILES
 
 SET(CPP_FILES manifest.cpp)
 
+
+SET(RES_FILES
+  resources/datamanager.qrc
+)
+
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})

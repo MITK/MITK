@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/datamanager">
+     <file>load.xpm</file>
+     <file>save.xpm</file>
+     <file>save-chili.xpm</file>
+     <file>refresh.xpm</file>
+     <file>remove.xpm</file>
+ </qresource>
+ </RCC>

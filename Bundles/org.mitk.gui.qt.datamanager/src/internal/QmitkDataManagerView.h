@@ -16,8 +16,12 @@ class QMenu;
 class QAction;
 class QModelIndex;
 class QTableView;
+class QSplitter;
+class QPushButton;
+
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
+class QmitkPredicateEditor;
 
 /**
  * \ingroup org_mitk_gui_qt_datamanager_internal
@@ -47,23 +51,37 @@ public:
 
 protected slots:
   void DataStorageSelectionChanged(const QString & text);
-  void NodeSelectionModeChanged(const QString & text);
+  void OnPredicateChanged();
   void NodeTableViewClicked( const QModelIndex & index );
   void NodeTableViewContextMenuRequested( const QPoint & index );
-  void ShowDerivedNodesClicked(bool checked = false);
+  void SaveActionTriggered( bool checked = false );
+  void ActionRemoveTriggered( bool checked = false );
+  void ActionReinitTriggered( bool checked = false );
+  void ActionSaveToPacsTriggered ( bool checked = false );
+
+  void BtnLoadClicked ( bool checked = false );
+  void BtnGlobalReinitClicked ( bool checked = false );
+
+
 
 protected:
 
   void CreateQtPartControl(QWidget* parent);
+  void FileOpen( const char * fileName, mitk::DataTreeNode* parentIterator );
 
 private:
   QWidget* m_BasePane;
   QComboBox* m_DataStorageSelectionComboBox;
-  QComboBox* m_NodeSelectionModeComboBox;
+  QmitkPredicateEditor* m_PredicateEditor;
   QmitkDataStorageTableModel* m_NodeTableModel;
   QTableView* m_NodeTableView;
-  QMenu* m_ShowDerivedNodesMenu;
-  QAction* m_ShowDerivedNodesAction;
+  QMenu* m_NodeMenu;  
+  QAction* m_SaveAction;
+  QAction* m_ActionSaveToPacs;
+  QAction* m_RemoveAction;
+  QAction* m_ReinitAction;
+  QPushButton* m_BtnLoad;
+  QPushButton* m_BtnGlobalReinit;
   QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
 
 };

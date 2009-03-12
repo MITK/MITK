@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision: $
+Version:   $Revision $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -26,17 +26,15 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk{
 
   CameraVisualization::CameraVisualization()
+    :m_Renderer(NULL),m_FocalLength(10.0),m_ViewAngle(30.0)
   {
     // initialize members
-    m_Renderer = NULL;
     m_DirectionOfProjectionInToolCoordinates[0] = 0;
     m_DirectionOfProjectionInToolCoordinates[1] = 0;
     m_DirectionOfProjectionInToolCoordinates[2] = -1;
     m_ViewUpInToolCoordinates[0] = 1;
     m_ViewUpInToolCoordinates[1] = 0;
     m_ViewUpInToolCoordinates[2] = 0;
-    m_FocalLength = 10;
-    m_ViewAngle = 30;
   }
 
   CameraVisualization::~CameraVisualization()
@@ -50,7 +48,8 @@ namespace mitk{
     if (m_Renderer)
     {
       /* update outputs with tracking data from tools */
-      for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+      int numberOfOutputs = this->GetNumberOfOutputs();
+      for (unsigned int i = 0; i < numberOfOutputs ; ++i)
       {
         mitk::NavigationData* output = this->GetOutput(i);
         assert(output);
@@ -65,7 +64,7 @@ namespace mitk{
       }
 
       const NavigationData* navigationData = this->GetInput();
-      // get position from NavigationData
+      // get position from NavigationData to move the camera to this position
       Point3D cameraPosition = navigationData->GetPosition();
 
       //calculate the transform from the quaternions
@@ -95,13 +94,6 @@ namespace mitk{
       m_Renderer->GetVtkRenderer()->ResetCameraClippingRange();
 
       m_Renderer->RequestUpdate();
-
-      //std::cout<<"Camera Position: "<<cameraPosition<<std::endl;
-      //std::cout<<"Focal Point: "<<focalPoint<<std::endl;
-      //std::cout<<"View Up: "<<viewUp<<std::endl;
-      //std::cout<<"Direction of Projection: "<<directionOfProjection<<std::endl;
-      //std::cout<<"View Angle: "<<m_ViewAngle<<std::endl;
-      //std::cout<<"Visible actor count: "<<m_Renderer->GetVtkRenderer()->VisibleActorCount()<<std::endl<<std::endl;
     }
     else
     {
@@ -112,7 +104,10 @@ namespace mitk{
   void CameraVisualization::SetRenderer(VtkPropRenderer::Pointer renderer)
   {
     m_Renderer = renderer;
-    m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
+    if (m_Renderer)
+    {
+      m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
+    }
   }
 
   const BaseRenderer* CameraVisualization::GetRenderer()

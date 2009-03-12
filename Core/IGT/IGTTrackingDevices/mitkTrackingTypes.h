@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
 
+  /**Documentation
+   * \brief Error codes of NDI tracking devices
+   */
     enum NDIErrorCode
     {
       NDIOKAY = 0,
@@ -75,16 +78,22 @@ namespace mitk
       TRACKINGDEVICENOTSET
     };
 
+    /**Documentation
+    * \brief identifier for tracking device
+    */
     enum TrackingDeviceType
     {
-      NDIPolaris, //Polaris: optical Tracker from NDI
-      NDIAurora, //Aurora: electromagnetic Tracker from NDI
-      ClaronMicron, //Micron Tracker: optical Tracker from Claron
-      IntuitiveDaVinci, //Intuitive Surgical: DaVinci Telemanipulator API Interface
-      AscensionMicroBird, // Ascension microBird / PCIBird family
-      TrackingSystemNotSpecified //entry for not specified or initialized tracking system
+      NDIPolaris,                ///< Polaris: optical Tracker from NDI
+      NDIAurora,                 ///< Aurora: electromagnetic Tracker from NDI
+      ClaronMicron,              ///< Micron Tracker: optical Tracker from Claron
+      IntuitiveDaVinci,          ///< Intuitive Surgical: DaVinci Telemanipulator API Interface
+      AscensionMicroBird,        ///<  Ascension microBird / PCIBird family
+      TrackingSystemNotSpecified ///< entry for not specified or initialized tracking system
     };
 
+    /**Documentation
+    * \brief Error codes of NDI tracking devices
+    */
     enum OperationMode
     {
       ToolTracking6D,
@@ -93,33 +102,36 @@ namespace mitk
       HybridTracking
     };
 
-
  
-
- 
-	/**
-	 * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
-	 * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
-	 */
+    /**
+    * \brief Represents the setting of the tracking volume of a NDI tracking device. The tracking volume of
+    * a tracking device itself (as 3d-Object) is represented by an instance of the class mitk::TrackingVolume
+    */
     enum NDITrackingVolume
     {
       Standard,
       Pyramid
     };
-
+    /**Documentation
+    * \brief activation rate of IR illuminator for NDI Polaris tracking device
+    */
     enum IlluminationActivationRate
     {
       Hz20 = 20,
       Hz30 = 30,
       Hz60 = 60
     };
-
+    /**Documentation
+    * \brief Data transfer mode for NDI tracking devices
+    */
     enum DataTransferMode
     {
       TX = 0,
       BX = 1
     };
-
+    /**Documentation
+    * \brief Query mode for NDI tracking devices
+    */
     enum PHSRQueryType
     {
       ALL         = 0x00,
@@ -129,14 +141,15 @@ namespace mitk
       ENABLED     = 0x04
     };
 
+    /**Documentation
+    * \brief tracking priority for NDI tracking devices
+    */    
     enum TrackingPriority
     {
       Static    = 'S',
       Dynamic   = 'D',
       ButtonBox = 'B'
     };
-
-    
 
     typedef itk::Point<double> MarkerPointType;
     typedef std::vector<MarkerPointType> MarkerPointContainerType;

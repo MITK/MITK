@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::TimeStamp::Pointer mitk::TimeStamp::s_Instance = NULL;
 
 mitk::TimeStamp::TimeStamp() : itk::Object()
-, m_Time(0.0)
+, m_Time(-1.0)
 {
 }
 
@@ -172,7 +172,11 @@ double mitk::TimeStamp::GetElapsed()
 */
 double mitk::TimeStamp::GetCurrentStamp()
 {
-  return m_RealTimeClock->getCurrentStamp();
+  if ( m_RealTimeClock.IsNotNull() )
+  {
+    return m_RealTimeClock->getCurrentStamp();
+  }
+  else return 0.0;
 }
 
 /**

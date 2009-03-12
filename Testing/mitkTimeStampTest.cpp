@@ -74,7 +74,7 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();
 
   //timestamp still has to be valid (tester2 still tracking), and has to be larger than 20ms
-  MITK_TEST_CONDITION_REQUIRED( time_elapsed > 20 , "testing if second device is still keeping the TimeStamp \"alive\"");
+  MITK_TEST_CONDITION_REQUIRED( time_elapsed > 15 , "testing if second device is still keeping the TimeStamp \"alive\"");
 
   mitk::TimeStamp::GetInstance()->StopTracking(tester2);
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();

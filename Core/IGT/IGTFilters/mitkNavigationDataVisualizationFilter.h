@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision: $
+Version:   $Revision $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -57,11 +57,11 @@ namespace mitk {
     */
     const NavigationData* GetInput(unsigned int idx);
 
-    virtual void GenerateData()=0;
-
   protected:
     NavigationDataVisualizationFilter();
     virtual ~NavigationDataVisualizationFilter();
+
+    virtual void GenerateData()=0;
 
   };
 } // namespace mitk

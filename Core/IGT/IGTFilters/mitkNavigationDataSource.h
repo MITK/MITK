@@ -27,40 +27,44 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * @brief Navigation Data source
+  * \brief Navigation Data source
   *
   * Base class for all navigation filters that produce NavigationData objects as output.
   * This class defines the output-interface for NavigationDataFilters. 
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataSource : public itk::ProcessObject
   {
   public:
     mitkClassMacro(NavigationDataSource, itk::ProcessObject);
 
-    /**Documentation 
-    *@brief return the output (output with id 0) of the filter
+    /**
+    *\brief return the output (output with id 0) of the filter
     */
     NavigationData* GetOutput(void);
-    /**Documentation 
-    *@brief return the output with id idx of the filter
+    
+    /** 
+    *\brief return the output with id idx of the filter
     */
     NavigationData* GetOutput(unsigned int idx);
 
-    /**Documentation 
-    *@brief Graft the specified DataObject onto this ProcessObject's output.
+    /** 
+    *\brief Graft the specified DataObject onto this ProcessObject's output.
+    * 
     * See itk::ImageSource::GraftNthOutput for details
     */
     virtual void GraftNthOutput(unsigned int idx, itk::DataObject *graft);
 
-    /** Graft the specified DataObject onto this ProcessObject's output.
+    /** 
+    * \brief Graft the specified DataObject onto this ProcessObject's output.
+    * 
     * See itk::ImageSource::Graft Output for details
     */
     virtual void GraftOutput(itk::DataObject *graft);
 
-    /**Documentation 
-    *@brief Make a DataObject of the correct type to used as the specified output.
+    /**
+    * \brief Make a DataObject of the correct type to used as the specified output.
     * 
     * This method is automatically called when DataObject::DisconnectPipeline() 
     * is called.  DataObject::DisconnectPipeline, disconnects a data object
@@ -72,9 +76,9 @@ namespace mitk {
     * are created.
     */
     virtual DataObjectPointer MakeOutput(unsigned int idx);
-    
-    /**Documentation 
-    *@brief Set all filter parameters as the PropertyList p
+
+    /** 
+    * \brief Set all filter parameters as the PropertyList p
     *
     * This method allows to set all parameters of a filter with one
     * method call. For the names of the parameters, take a look at 
@@ -83,8 +87,8 @@ namespace mitk {
     */
     virtual void SetParameters(const mitk::PropertyList*){};
 
-    /**Documentation 
-    *@brief Get all filter parameters as a PropertyList
+    /** 
+    * \brief Get all filter parameters as a PropertyList
     *
     * This method allows to get all parameters of a filter with one
     * method call. The returned PropertyList must be assigned to a 
@@ -96,12 +100,11 @@ namespace mitk {
     * Secondly, each filter should list the property names and data types 
     * in the method documentation.
     */
-    mitk::PropertyList::ConstPointer GetParameters() const;
+    virtual mitk::PropertyList::ConstPointer GetParameters() const;
 
   protected:
     NavigationDataSource();
     virtual ~NavigationDataSource();
   };
 } // namespace mitk
-
 #endif /* MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_ */

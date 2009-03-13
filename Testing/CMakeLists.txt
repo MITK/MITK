@@ -55,7 +55,6 @@ SET(${KITNAME}_TESTS
 )
 
 IF(MITK_BUILD_IGT)
-  MESSAGE("@@@@@@@@@@@@@@@ IGT include: ${MITK_IGT_INCLUDE_DIRS}")
   INCLUDE_DIRECTORIES(${MITK_IGT_INCLUDE_DIRS})
   SET(${KITNAME}_TESTS ${${KITNAME}_TESTS} 
     mitkCameraVisualizationTest.cpp 

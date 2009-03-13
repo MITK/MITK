@@ -25,6 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryMacros.h"
 #include "cherryMessage.h"
 
+// disable inheritance by dominance warnings
+#ifdef _MSC_VER
+#pragma warning( disable : 4250 4275 4251 )
+#endif
+
 namespace cherry {
 
 

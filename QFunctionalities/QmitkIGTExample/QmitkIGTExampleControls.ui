@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>260</width>
-            <height>394</height>
+            <height>502</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -21,27 +21,11 @@
     <property name="caption">
         <string>QmitkIGTExample</string>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>m_StartTrackingButton</cstring>
-            </property>
-            <property name="text">
-                <string>Start MITK-IGT-Tracking Test</string>
-            </property>
-        </widget>
-        <widget class="QPushButton">
-            <property name="name">
-                <cstring>m_StartNavigationButton</cstring>
-            </property>
-            <property name="text">
-                <string>Start MITK-IGT-Navigation Test</string>
-            </property>
-        </widget>
-        <widget class="QGroupBox">
+        <widget class="QGroupBox" row="3" column="0">
             <property name="name">
                 <cstring>groupBox1</cstring>
             </property>
@@ -73,29 +57,53 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QPushButton">
+        <widget class="QPushButton" row="1" column="0">
             <property name="name">
-                <cstring>m_MeasureBtn</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
+                <cstring>m_StartTrackingButton</cstring>
             </property>
             <property name="text">
-                <string>Measure!</string>
+                <string>Start MITK-IGT-Tracking Test</string>
             </property>
         </widget>
-        <widget class="QPushButton">
+        <widget class="QPushButton" row="2" column="0">
             <property name="name">
-                <cstring>m_StopBtn</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
+                <cstring>m_StartNavigationButton</cstring>
             </property>
             <property name="text">
-                <string>End MITK-IGT-Navigation Test</string>
+                <string>Start MITK-IGT-Navigation Test</string>
             </property>
         </widget>
-        <widget class="QLayoutWidget">
+        <widget class="QComboBox" row="0" column="0">
+            <item>
+                <property name="text">
+                    <string>NDI Polaris</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>NDI Aurora</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>Micron Tracker</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>MicroBird</string>
+                </property>
+            </item>
+            <item>
+                <property name="text">
+                    <string>RandomTrackingDevice</string>
+                </property>
+            </item>
+            <property name="name">
+                <cstring>m_TrackingDevice</cstring>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="7" column="0">
             <property name="name">
                 <cstring>layout2</cstring>
             </property>
@@ -157,7 +165,40 @@
                 </widget>
             </hbox>
         </widget>
-        <spacer>
+        <widget class="QPushButton" row="6" column="0">
+            <property name="name">
+                <cstring>m_StopBtn</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>End MITK-IGT-Navigation Test</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="4" column="0">
+            <property name="name">
+                <cstring>m_MeasureBtn</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>Measure!</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="5" column="0">
+            <property name="name">
+                <cstring>m_MeasureContinuously</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>Start measure continuously</string>
+            </property>
+        </widget>
+        <spacer row="9" column="0">
             <property name="name">
                 <cstring>spacer2</cstring>
             </property>
@@ -170,11 +211,11 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>60</height>
+                    <height>90</height>
                 </size>
             </property>
         </spacer>
-    </vbox>
+    </grid>
 </widget>
 <connections>
     <connection>

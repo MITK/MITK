@@ -121,6 +121,13 @@ protected slots:
    void OnMeasure();
 
    /**Documentation
+   * \brief performs continuous measurements using the navigation pipeline
+   *
+   * This method calls the above OnMeasure()
+   */
+   void OnMeasureContinuously();
+
+   /**Documentation
    * \brief stops the navigation pipeline and perform clean up
    */
    void OnStop();
@@ -146,5 +153,7 @@ protected:
   mitk::NavigationDataDisplacementFilter::Pointer m_Displacer;  ///< displacement filter that adds an offset to NDs
   mitk::NavigationDataToNavigationDataFilter::Pointer m_EndOfPipeline;  // Pointer to last filter in the pipeline
   QTextEdit* out;   ///< pointer to output widget 
+
+  QTimer* m_Timer; ///< timer for continuous tracking update
 };
 #endif // !defined(QMITKIGTEXAMPLE_H__INCLUDED)

@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>249</width>
+    <width>286</width>
     <height>440</height>
    </rect>
   </property>
@@ -243,11 +243,11 @@
            <string>New segmentation</string>
           </property>
           <property name="text" >
-           <string>New segmentation</string>
+           <string/>
           </property>
           <property name="icon" >
            <iconset resource="../../resources/interactivesegmentation.qrc" >
-            <normaloff>:/interactivesegmentation/btnNew.xpm</normaloff>:/interactivesegmentation/btnNew.xpm</iconset>
+            <normaloff>:/interactivesegmentation/btnNew.png</normaloff>:/interactivesegmentation/btnNew.png</iconset>
           </property>
          </widget>
         </item>
@@ -269,11 +269,11 @@
            <string>Delete selected segmentations</string>
           </property>
           <property name="text" >
-           <string>Delete selected segmentations</string>
+           <string/>
           </property>
           <property name="icon" >
            <iconset resource="../../resources/interactivesegmentation.qrc" >
-            <normaloff>:/interactivesegmentation/btnDelete.xpm</normaloff>:/interactivesegmentation/btnDelete.xpm</iconset>
+            <normaloff>:/interactivesegmentation/btnDelete.png</normaloff>:/interactivesegmentation/btnDelete.png</iconset>
           </property>
          </widget>
         </item>
@@ -295,11 +295,11 @@
            <string>Load segmentation from file</string>
           </property>
           <property name="text" >
-           <string>Load segmentation from file</string>
+           <string/>
           </property>
           <property name="icon" >
            <iconset resource="../../resources/interactivesegmentation.qrc" >
-            <normaloff>:/interactivesegmentation/btnLoad.xpm</normaloff>:/interactivesegmentation/btnLoad.xpm</iconset>
+            <normaloff>:/interactivesegmentation/btnLoad.png</normaloff>:/interactivesegmentation/btnLoad.png</iconset>
           </property>
          </widget>
         </item>
@@ -325,7 +325,7 @@
           </property>
           <property name="icon" >
            <iconset resource="../../resources/interactivesegmentation.qrc" >
-            <normaloff>:/interactivesegmentation/btnSave.xpm</normaloff>:/interactivesegmentation/btnSave.xpm</iconset>
+            <normaloff>:/interactivesegmentation/btnSave.png</normaloff>:/interactivesegmentation/btnSave.png</iconset>
           </property>
          </widget>
         </item>

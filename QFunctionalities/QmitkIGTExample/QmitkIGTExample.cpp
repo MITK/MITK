@@ -171,7 +171,7 @@ void QmitkIGTExample::OnTestTracking()
     out->append("creating Micron Tracker");
 
     tracker_Micron->AddTool(tool_Micron);
-    out->append("adding tool 'Tool13' with tool file 'c:\\tools\MT\Tool13_v2'");
+    out->append("adding tool 'Tool13' with tool file 'c:\\tools\\MT\\Tool13_v2'");
     tracker = tracker_Micron;
     tool1 = tool_Micron;
   }
@@ -324,7 +324,7 @@ void QmitkIGTExample::OnTestNavigation()
     out->append("creating Micron Tracker");
 
     tracker_Micron->AddTool(tool_Micron);
-    out->append("adding tool 'Tool13' with tool file 'c:\\tools\MT\Tool13_v2'");
+    out->append("adding tool 'Tool13' with tool file 'c:\\tools\\MT\\Tool13_v2'");
     tracker = tracker_Micron;
     tool1 = tool_Micron;
   }

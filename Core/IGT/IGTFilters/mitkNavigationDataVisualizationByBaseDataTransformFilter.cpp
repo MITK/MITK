@@ -30,17 +30,22 @@ mitk::NavigationDataVisualizationByBaseDataTransformFilter::~NavigationDataVisua
 
 const mitk::BaseData* mitk::NavigationDataVisualizationByBaseDataTransformFilter::GetBaseData(const NavigationData* nd) const
 {
+  if (nd == NULL)
+    return NULL;
+
   RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(nd);
   if (iter != m_RepresentationList.end())
     return (*iter).second;
   
   //else:
   return NULL;
-
 }
 
 bool mitk::NavigationDataVisualizationByBaseDataTransformFilter::SetBaseData(const NavigationData* nd, BaseData* data)
 {
+  if (nd == NULL || data == NULL)
+    return false;
+
   //pair for returning the result
   std::pair<RepresentationPointerMap::iterator, bool> returnEl;
   
@@ -69,11 +74,12 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
       continue;
 
     const mitk::BaseData* data = this->GetBaseData(nd);
-    if (!data)
+    if (data == NULL)
     {
-      itkWarningMacro("Data not found");
+      itkWarningMacro("Wrong BaseData associated with NavigationData!");
       return;
     }
+    
     //get the transform from data
     mitk::AffineTransform3D::Pointer affineTransform = data->GetGeometry()->GetIndexToWorldTransform();
     if (affineTransform.IsNull())

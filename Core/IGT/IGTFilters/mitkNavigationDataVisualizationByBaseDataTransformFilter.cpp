@@ -69,7 +69,11 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
       continue;
 
     const mitk::BaseData* data = this->GetBaseData(nd);
-    
+    if (!data)
+    {
+      itkWarningMacro("Data not found");
+      return;
+    }
     //get the transform from data
     mitk::AffineTransform3D::Pointer affineTransform = data->GetGeometry()->GetIndexToWorldTransform();
     if (affineTransform.IsNull())

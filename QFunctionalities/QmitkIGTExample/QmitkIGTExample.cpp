@@ -355,15 +355,19 @@ void QmitkIGTExample::OnTestNavigation()
     */
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
-    for (int i=0; i<m_Source->GetNumberOfOutputs(); i++)
+    int numberOfOutputs = m_Source->GetNumberOfOutputs();
+    for (int i=0; i<numberOfOutputs; i++)
     {
       m_Displacer->SetInput(i,m_Source->GetOutput(i));  // connect filter 
     }
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
-    //visualizer->SetInput(0,m_Displacer->GetOutput(0));
-    visualizer->SetInput(0,m_Displacer->GetOutput(1));
+    int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
+    for (int i=0; i<numberOfDisplacerOutputs; i++)
+    {
+      visualizer->SetInput(0,m_Displacer->GetOutput(i));
+    }
     
     //create new BaseData for each tool
     for (int i = 0; i<m_Source->GetToolCount();i++)
@@ -393,7 +397,7 @@ void QmitkIGTExample::OnTestNavigation()
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
 
-      visualizer->SetBaseData(m_Displacer->GetOutput(1), mitkToolData);
+      visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
       m_EndOfPipeline = visualizer;
     }
 

@@ -16,52 +16,33 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkPaintbrushToolGUI_h_Included
-#define QmitkPaintbrushToolGUI_h_Included
+#ifndef QmitkBinaryThresholdToolGUI_h_Included
+#define QmitkBinaryThresholdToolGUI_h_Included
 
-#include "../QmitkToolGUI.h"
-#include "mitkPaintbrushTool.h"
-
-//!mm,added
-#include "mitkQtInteractiveSegmentationDll.h"
-//!
+#include "QmitkToolGUI.h"
+#include "mitkBinaryThresholdTool.h"
 
 class QSlider;
-class QLabel;
-class QFrame;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::PaintbrushTool.
-  \sa mitk::PaintbrushTool
+  \brief GUI for mitk::BinaryThresholdTool.
 
-  This GUI shows a slider to change the pen's size.
+  This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
 
   Last contributor: $Author$
 */
-//!mm
-//class QMITK_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
-//#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkPaintbrushToolGUI : public QmitkToolGUI
-//!
+class QMITK_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    //!mm
-    //mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
-    //#changed
-    cherryObjectMacro(QmitkPaintbrushToolGUI);
-    //!
+    
+    mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
+    itkNewMacro(QmitkBinaryThresholdToolGUI);
 
-    //!mm
-    //#add
-    QmitkPaintbrushToolGUI();
-    //!
-
-    virtual ~QmitkPaintbrushToolGUI();
-
-    void OnSizeChanged(int current);
+    void OnThresholdingIntervalBordersChanged(int lower, int upper);
+    void OnThresholdingValueChanged(int current);
 
   signals:
 
@@ -72,21 +53,15 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkPaintbrushToolGUI : public QmitkToolG
     void OnNewToolAssociated(mitk::Tool*);
 
     void OnSliderValueChanged(int value);
-
-    void VisualizePaintbrushSize(int size);
+    void OnAcceptThresholdPreview();
 
   protected:
-
-    //!mm
-    //#del
-    //QmitkPaintbrushToolGUI();
-    //!
+    QmitkBinaryThresholdToolGUI();
+    virtual ~QmitkBinaryThresholdToolGUI();
 
     QSlider* m_Slider;
-    QLabel* m_SizeLabel;
-    QFrame* m_Frame;
 
-    mitk::PaintbrushTool::Pointer m_PaintbrushTool;
+    mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };
 
 #endif

@@ -19,12 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 #define QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 
-#include "../QmitkToolGUI.h"
+#include "QmitkToolGUI.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
-//!mm,added
-#include "mitkQtInteractiveSegmentationDll.h"
-//!
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -34,28 +31,14 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-//!mm
-//class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
-//#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
-//!
+class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    //!mm
-    //mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
-    //itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
-    //#changed
-    cherryObjectMacro(QmitkCalculateGrayValueStatisticsToolGUI);
-    //!
 
-    //!mm
-    //#add
-    QmitkCalculateGrayValueStatisticsToolGUI();
-    //!
-
-    virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
+    mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
+    itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
 
     /// Reacts to signals from mitk::CalculateGrayValueStatisticsTool
     void OnCalculationsDone();
@@ -71,10 +54,8 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkCalculateGrayValueStatisticsToolGUI :
 
   protected:
 
-    //!mm
-    //#del
-    //QmitkCalculateGrayValueStatisticsToolGUI();
-    //!
+    QmitkCalculateGrayValueStatisticsToolGUI();
+    virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
 
     mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
 };

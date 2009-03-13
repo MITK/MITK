@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-24 18:31:42 +0200 (Do, 24 Apr 2008) $
+Date:      $Date$
 Version:   $Revision: 1.12 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -22,31 +22,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkToolGUI::~QmitkToolGUI()
 {
-  //!mm
-  // commented out
-  //m_ReferenceCountLock.Lock();
-  //m_ReferenceCount = 0; // otherwise ITK will complain in LightObject's destructor
-  //m_ReferenceCountLock.Unlock();
-  //!
+  m_ReferenceCountLock.Lock();
+  m_ReferenceCount = 0; // otherwise ITK will complain in LightObject's destructor
+  m_ReferenceCountLock.Unlock();
 }
 
-//!mm
-// commented out
-//void QmitkToolGUI::Register() const
-//{
+void QmitkToolGUI::Register() const
+{
   // empty on purpose, just don't let ITK handle calls to Register()
-//}
+}
 
-//void QmitkToolGUI::UnRegister() const
-//{
+void QmitkToolGUI::UnRegister() const
+{
   // empty on purpose, just don't let ITK handle calls to UnRegister()
-//}
+}
 
-//void QmitkToolGUI::SetReferenceCount(int)
-//{
+void QmitkToolGUI::SetReferenceCount(int)
+{
   // empty on purpose, just don't let ITK handle calls to SetReferenceCount()
-//}
-//!
+}
 
 void QmitkToolGUI::SetTool( mitk::Tool* tool )
 {

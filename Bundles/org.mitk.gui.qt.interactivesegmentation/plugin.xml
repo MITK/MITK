@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-  <extension-point id="qmitktoolguis" name="QmitkToolGUIs" schema="schema/qmitktoolguis.exsd"/>
 
   <extension point="org.opencherry.ui.views">
     <category 
@@ -14,21 +13,4 @@
       class="QmitkInteractiveSegmentationView" />
   </extension>
   
-   <extension point="org.mitk.gui.qt.interactivesegmentation.qmitktoolguis">
-		<qmitktoolgui 
-			id="QmitkBinaryThresholdToolGUI"
-			class="QmitkBinaryThresholdToolGUI" />
-		<qmitktoolgui 
-			id="QmitkCalculateGrayValueStatisticsToolGUI"
-			class="QmitkCalculateGrayValueStatisticsToolGUI" />
-		<qmitktoolgui 
-			id="QmitkDrawPaintbrushToolGUI"
-			class="QmitkDrawPaintbrushToolGUI" />	
-		<qmitktoolgui 
-			id="QmitkPaintbrushToolGUI"
-			class="QmitkPaintbrushToolGUI" />	
-		<qmitktoolgui 
-			id="QmitkErasePaintbrushToolGUI"
-			class="QmitkErasePaintbrushToolGUI" />		
-   </extension>
 </plugin>

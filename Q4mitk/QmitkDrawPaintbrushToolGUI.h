@@ -16,14 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkErasePaintbrushToolGUI_h_Included
-#define QmitkErasePaintbrushToolGUI_h_Included
+#ifndef QmitkDrawPaintbrushToolGUI_h_Included
+#define QmitkDrawPaintbrushToolGUI_h_Included
 
 #include "QmitkPaintbrushToolGUI.h"
-
-//!mm,added
-#include "mitkQtInteractiveSegmentationDll.h"
-//!
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -33,28 +29,17 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-//!mm
-//class QMITK_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
-//#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
-//!
+
+class QMITK_EXPORT QmitkDrawPaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 
   public:
-    //!mm
-    //mitkClassMacro(QmitkErasePaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    //itkNewMacro(QmitkErasePaintbrushToolGUI);
-    //#changed
-    cherryObjectMacro(QmitkErasePaintbrushToolGUI);
-    //!
+    
+    mitkClassMacro(QmitkDrawPaintbrushToolGUI, QmitkPaintbrushToolGUI);
+    itkNewMacro(QmitkDrawPaintbrushToolGUI);
 
-    //!mm
-    //#add
-    QmitkErasePaintbrushToolGUI();
-    //!
-
-    virtual ~QmitkErasePaintbrushToolGUI();
+    virtual ~QmitkDrawPaintbrushToolGUI();
 
   signals:
 
@@ -63,11 +48,8 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkErasePaintbrushToolGUI : public Qmitk
   protected slots:
 
   protected:
-
-    //!mm
-    //#del
-    //QmitkErasePaintbrushToolGUI();
-    //!
+    
+    QmitkDrawPaintbrushToolGUI();
 };
 
 #endif

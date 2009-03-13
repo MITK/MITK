@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
-Date:      $Date: 2008-10-30 12:33:31 +0100 (Do, 30 Okt 2008) $
+Date:      $Date$
 Version:   $Revision: 1.12 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and

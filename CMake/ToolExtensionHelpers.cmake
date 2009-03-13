@@ -48,12 +48,12 @@ ${FACTORY_INCLUDE_LINES}" )
 
 
   # part for Qt3 widgets
-  IF (TOOL_QT3GUI_FILES)
+  IF (TOOL_QT3GUI_FILES OR TOOL_QT4GUI_FILES)
 
     # give them Qmitk headers
     INCLUDE_DIRECTORIES(${QMITK_INCLUDE_DIRS})
     
-    FOREACH( TOOL_GUI_FILE ${TOOL_QT3GUI_FILES})  
+    FOREACH( TOOL_GUI_FILE ${TOOL_QT3GUI_FILES} ${TOOL_QT4GUI_FILES})  
 
       # construct tool name from file name
       STRING(REGEX REPLACE "^Qmitk(.+)GUI\\.c(pp|xx)$" "\\1" TOOL_NAME ${TOOL_GUI_FILE})
@@ -77,10 +77,10 @@ ${FACTORY_INCLUDE_LINES}" )
 ${FACTORY_INCLUDE_LINES}" )
       SET( FACTORY_REGISTER_CALLS "${FACTORY_REGISTER_CALLS}
            itk::ObjectFactoryBase::RegisterFactory( ${FACTORY_NAME}::New() );" )
-    ENDFOREACH( TOOL_GUI_FILE ${TOOL_QT3GUI_FILES})  
+    ENDFOREACH( TOOL_GUI_FILE ${TOOL_QT3GUI_FILES} ${TOOL_QT4GUI_FILES})  
 
     QT_WRAP_CPP(${libraryname} TOOL_GUI_CPPS ${TOOL_GUI_MOC_H})
-  ENDIF (TOOL_QT3GUI_FILES)
+  ENDIF (TOOL_QT3GUI_FILES OR TOOL_QT4GUI_FILES)
 
   
 
@@ -94,7 +94,7 @@ ${FACTORY_INCLUDE_LINES}" )
   ENDIF (TOOL_ADDITIONAL_MOC_H)
 
   # in any case (GUI or non-GUI), create a shared library
-  IF (TOOL_FILES OR TOOL_QT3GUI_FILES)
+  IF (TOOL_FILES OR TOOL_QT3GUI_FILES OR TOOL_QT4GUI_FILES)
     IF (libraryname AND reallycreatelibrary)
       # configure one file with the itkLoad method
       CONFIGURE_FILE( ${MITK_DIR}/ToolExtensionITKFactoryLoader.cpp.in
@@ -112,7 +112,7 @@ ${FACTORY_INCLUDE_LINES}" )
     
     TARGET_LINK_LIBRARIES(${libraryname} ${QMITK_LIBRARIES})
     ENDIF (libraryname AND reallycreatelibrary)
-  ENDIF (TOOL_FILES OR TOOL_QT3GUI_FILES)
+  ENDIF (TOOL_FILES OR TOOL_QT3GUI_FILES OR TOOL_QT4GUI_FILES)
 
 
 

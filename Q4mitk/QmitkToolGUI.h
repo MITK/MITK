@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
-Date:      $Date: 2008-04-24 18:31:42 +0200 (Do, 24 Apr 2008) $
+Date:      $Date$
 Version:   $Revision: 1.0 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -20,15 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolGUI_h_Included
 
 #include <qwidget.h>
-//!mm
-//#include <itkObject.h>
-#include <cherryMacros.h>
-#include <cherryObject.h>
-//!
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
-#include "mitkQtInteractiveSegmentationDll.h"
 
 /**
   \brief Base class for GUIs belonging to mitk::Tool classes.
@@ -39,29 +33,20 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-//!mm
-//class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public itk::Object
-class MITK_QT_INTERACTIVESEGMENTATION QmitkToolGUI : public QWidget, public virtual cherry::Object
-//!
+
+class QMITK_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 {
   Q_OBJECT
 
   public:
-    //!mm
-    // class has now a cherryInterfaceMacro
-    //mitkClassMacro(QmitkToolGUI, itk::Object);
-    cherryInterfaceMacro(QmitkToolGUI, )
-    //!
+    mitkClassMacro(QmitkToolGUI, itk::Object);
 
     void SetTool( mitk::Tool* tool );
 
-    //!mm
-    // commented out
-    /// just make sure ITK won't take care of anything (especially not destruction)
-    //virtual void Register() const;
-    //virtual void UnRegister() const;
-    //virtual void SetReferenceCount(int);
-    //!
+    // just make sure ITK won't take care of anything (especially not destruction)
+    virtual void Register() const;
+    virtual void UnRegister() const;
+    virtual void SetReferenceCount(int);
 
     virtual ~QmitkToolGUI();
 

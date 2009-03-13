@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$
+Version:   $Revision: 16581 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -17,15 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToolSelectionBox.h"
 #include "QmitkToolGUI.h"
-
-//!mm
-//#added:
-#include "cherryPlatform.h"
-#include "cherryPlatformException.h"
-#include "service/cherryIExtensionPointService.h"
-#include <cherryIEditorPart.h>
-//using namespace cherry;
-//!
 
 #include <qtoolbutton.h>
 #include <QList>
@@ -44,8 +35,8 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent)
  m_GenerateAccelerators(false),
  m_ToolGUIWidget(NULL),
  m_LastToolGUI(NULL),
- m_ToolButtonGroup(0),
- m_ButtonLayout(0),
+ m_ToolButtonGroup(NULL),
+ m_ButtonLayout(NULL),
  m_EnabledMode(EnabledWithReferenceAndWorkingData)
 {
   QFont currentFont = QGroupBox::font();
@@ -202,8 +193,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     // uncheck all other buttons
     QAbstractButton* tmpBtn = 0;
     QList<QAbstractButton*>::iterator it;
-    for(unsigned int i=0; i<m_ToolButtonGroup->buttons().size();
-      i++)
+    for(int i=0; i < m_ToolButtonGroup->buttons().size(); ++i)
     {
       tmpBtn = m_ToolButtonGroup->buttons().at(i);
       if(tmpBtn != toolButton)
@@ -215,31 +205,9 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     if (m_ToolGUIWidget && tool)
     {
       // create and reparent new GUI (if any)
-      //!mm
-      //itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
-      //QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
-      //#changed:
-      cherry::IExtensionPointService::Pointer service = cherry::Platform::GetExtensionPointService();
-      cherry::IConfigurationElement::vector ces(
-        service->GetConfigurationElementsFor("org.mitk.gui.qt.interactivesegmentation.qmitktoolguis"));
+      itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
+      QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
 
-      // name of gui class
-      std::string nameOfPossibleGUI = "Qmitk";
-      nameOfPossibleGUI.append(tool->GetNameOfClass());
-      nameOfPossibleGUI.append("GUI");
-      QmitkToolGUI* gui = 0;
-      for (cherry::IConfigurationElement::vector::iterator i= ces.begin(); i != ces.end(); ++i)
-      {
-        std::string cid;
-        if ((*i)->GetAttribute("id", cid))
-        {
-          if (cid == nameOfPossibleGUI)
-          {
-            gui = (*i)->CreateExecutableExtension<QmitkToolGUI>("class");
-            break;
-          }
-        }
-      }
       //!
       m_LastToolGUI = gui;
       if (gui)
@@ -402,7 +370,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   //Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
   // mmueller using gridlayout instead of Q3GroupBox
   //this->setLayout(0);
-  if(m_ButtonLayout == 0)
+  if(m_ButtonLayout == NULL)
     m_ButtonLayout = new QGridLayout;
   /*else
     delete m_ButtonLayout;*/

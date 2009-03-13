@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$
+Version:   $Revision: 16581 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -28,10 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <map>
 
-//! mmueller
-#include "mitkQtInteractiveSegmentationDll.h"
-//!
-
 class QmitkToolGUI;
 
 /**
@@ -55,12 +51,9 @@ class QmitkToolGUI;
   could be cases where two QmitkToolSelectionBox widgets are associated to the same ToolManager,
   but if this happens, please look deeply into the code.
 
-  Last contributor: $Author$
+  Last contributor: $Author: maleike $
 */
-//! mmueller
-//class QMITK_EXPORT QmitkToolSelectionBox : public QGroupBox
-//#changed
-class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
+class QMITK_EXPORT QmitkToolSelectionBox : public QGroupBox
 //!
 {
   Q_OBJECT

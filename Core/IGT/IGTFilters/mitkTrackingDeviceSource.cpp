@@ -59,7 +59,8 @@ void mitk::TrackingDeviceSource::GenerateData()
     throw std::out_of_range(ss.str());
   }
   /* update outputs with tracking data from tools */
-  for (unsigned int i = 0; i < m_TrackingDevice->GetToolCount(); ++i)
+  unsigned int toolCount = m_TrackingDevice->GetToolCount();
+  for (unsigned int i = 0; i < toolCount; ++i)
   {
     mitk::NavigationData* nd = this->GetOutput(i);
     assert(nd);
@@ -106,7 +107,8 @@ void mitk::TrackingDeviceSource::CreateOutputs()
 
   //fill the outputs
   this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
+  for (unsigned int idx = 0; idx < numberOfOutputs; ++idx)
   {
     if (this->GetOutput(idx) == NULL)
     {

@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkToolGUIArea::QmitkToolGUIArea( QWidget* parent, Qt::WFlags f )
 :QWidget(parent,f)
 {
+  QWidget::setContentsMargins(0, 0, 0, 0);
 }
 
 QmitkToolGUIArea::~QmitkToolGUIArea()

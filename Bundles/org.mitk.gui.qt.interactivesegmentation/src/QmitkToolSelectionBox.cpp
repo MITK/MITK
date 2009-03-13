@@ -573,3 +573,18 @@ void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
   m_ToolGUIWidget = parentWidget;
 }
 
+void QmitkToolSelectionBox::setTitle( const QString& title )
+{
+  // if "" hide frame, set minimal margin
+  QGroupBox::setTitle(title);
+
+  if (title.isEmpty())
+  {
+    QWidget::setContentsMargins(0, 0, 0, 0);
+    if ( layout() != NULL )
+    {
+      layout()->setContentsMargins(0, 0, 0, 0);
+    }
+  }
+}
+

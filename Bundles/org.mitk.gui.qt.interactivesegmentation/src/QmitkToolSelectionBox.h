@@ -75,6 +75,8 @@ class MITK_QT_INTERACTIVESEGMENTATION QmitkToolSelectionBox : public QGroupBox
     mitk::ToolManager* GetToolManager();
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
+    void setTitle( const QString& title );
+
     /**
       You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
       as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is a match,

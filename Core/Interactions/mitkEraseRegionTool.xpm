@@ -2,8 +2,8 @@
 static const char * mitkEraseRegionTool_xpm[] = {
 "15 11 3 1",
 " 	c None",
-".	c #000000",
-"+	c #FFFFFF",
+".	c #2E3436",
+"+	c #EEEEEC",
 "       ........",
 "      .++++++..",
 "     .++++++.+.",

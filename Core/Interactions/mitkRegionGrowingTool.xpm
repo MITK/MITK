@@ -2,8 +2,8 @@
 static const char * mitkRegionGrowingTool_xpm[] = {
 "19 21 3 1",
 " 	c None",
-".	c #000000",
-"+	c #FFFFFF",
+".	c #2E3436",
+"+	c #EEEEEC",
 "    .              ",
 ".   .    ..        ",
 "       ..          ",

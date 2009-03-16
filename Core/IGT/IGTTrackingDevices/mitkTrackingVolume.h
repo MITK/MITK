@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkSurface.h"
-#include "itkObject.h"
 #include "vtkPolyData.h"
 #include "mitkTrackingTypes.h"
 
@@ -60,7 +59,7 @@ namespace mitk
     *			        TrackingSystemNotSpecified if doing this.
     * @param manualVolume	The new tracking volume as vtkPolyData.
     */
-    void SetManualVolume(vtkPolyData* manualVolume);
+    void SetVolumeManually(vtkPolyData* volume);
 
     /**
     * @brief 	Checks wether a point is inside or outside the tracking
@@ -69,7 +68,7 @@ namespace mitk
     * @return 	Returns true if the point "p" is inside the
     *           tracking volume, false if not.
     */
-    bool IsInside(mitk::Point3D p);
+    //bool IsInside(mitk::Point3D p); TODO: implemenation of method
 
   protected:
     TrackingVolume();

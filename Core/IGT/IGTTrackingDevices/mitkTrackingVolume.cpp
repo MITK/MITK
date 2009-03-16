@@ -33,40 +33,41 @@ mitk::TrackingVolume::TrackingVolume()
 
   }
 
+/* TODO: implemenation of method
 bool mitk::TrackingVolume::IsInside(mitk::Point3D itkNotUsed(punkt))
   {
   //NOT IMPLEMENTED YET!
   return false;
   }
+*/
 
-void mitk::TrackingVolume::SetManualVolume(vtkPolyData* manualVolume)
+void mitk::TrackingVolume::SetVolumeManually(vtkPolyData* volume)
   {
-  this->SetVtkPolyData(manualVolume);
+  this->SetVtkPolyData(volume);
   }
 
 bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
   {
   //Dateinamen Anhand des Trackingsystems bestimmen:
   std::string filename = "";
-  if (type == mitk::ClaronMicron)
+
+  switch(type)
     {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-    }
-  else if (type == mitk::IntuitiveDaVinci)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
-    }
-  else if (type == mitk::NDIAurora)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-    }
-  else if (type == mitk::NDIPolaris)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-    }
-  else if (type == mitk::TrackingSystemNotSpecified)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("StandardVolume.stl");
+    case mitk::ClaronMicron:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
+      break;
+    case mitk::IntuitiveDaVinci:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
+      break;
+    case mitk::NDIAurora:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
+      break;
+    case mitk::NDIPolaris:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
+      break;
+    default:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("StandardVolume.stl");
+      break;  
     }
 
   //Die Surface aus der Datei einlesen:

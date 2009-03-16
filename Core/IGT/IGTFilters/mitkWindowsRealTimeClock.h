@@ -26,7 +26,7 @@ namespace mitk {
   /**
   * @brief realtimeclock implementation for windows-systems
   *
-  * This class provides a realtimeclock for windows-systems.
+  * This class provides a RealTimeClock for windows-systems.
   * Internally, it uses the QueryPerformanceCounter and the QueryPerformaceFrequency.
   * It polls the current tick-counter, (that counts from bootup ?!?)
   * is supposed to be the most accurate time you can get on a windows-system.
@@ -56,15 +56,20 @@ namespace mitk {
     * Uses the QueryPerformanceCounter to acquire an accurate time.
     * (Ticks counted / Frequency) = time in ms
     */
-    virtual double getCurrentStamp();
+    virtual double GetCurrentStamp();
 
     /**
     * \brief returns the QueryPerformanceFrequency
     */
-    virtual LARGE_INTEGER getFrequency();
+    virtual LARGE_INTEGER GetFrequency();
     
   protected:
 
+    void SetFrequency();
+
+    /**
+    * \brief Frequency needed to calculate time from tick-counter
+    */
     LARGE_INTEGER m_Frequency;
 
   }; //namespace

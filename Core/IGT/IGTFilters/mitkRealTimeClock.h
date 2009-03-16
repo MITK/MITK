@@ -45,7 +45,7 @@ namespace mitk {
 
     virtual ~RealTimeClock();
 
-    virtual double getCurrentStamp() = 0;
+    virtual double GetCurrentStamp() = 0;
 
   }; //namespace
 }

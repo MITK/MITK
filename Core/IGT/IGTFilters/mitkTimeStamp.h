@@ -85,7 +85,7 @@ namespace mitk {
     /**
     * \brief stops the time-acqusition
     *
-    * Each device has to call StopTracking() when it has finishedand its
+    * Each device has to call StopTracking() when it has finished and its
     * pointer will be erased from the map. When the last device has "stopped"
     * the reference-time and the current-time will be reset to 0.
     *
@@ -93,13 +93,23 @@ namespace mitk {
     void StopTracking( itk::Object::Pointer Device );
 
     /**
-    * \brief returnsthe time elapsed since calling StartTracking() for the first time in milliseconds
+    * \brief returns the time elapsed since calling StartTracking() for the first time in milliseconds
     *
     */
     double GetElapsed();
 
     /**
-    * \brief returns the current time acquired from the defined RealTimeClock()
+    * \brief returns the offset of this device's starting-time to the 
+    *  reference-time in ms
+    *
+    * Device 'A' is the first device to call StartTracking. Device 'B' calls StartTracking
+    * some time later. This time-difference is the offset, that each device has realtive to the 
+    * device that started the time-acquisition.
+    * Each device's offset is stored in a map with a pointer to the device.
+    *
+    * If this device has not been or is no longer saved in the map of devices,
+    * -1 will be returned.
+    *
     *
     * only used internally
     */
@@ -127,7 +137,7 @@ namespace mitk {
 
     double GetCurrentStamp();
 
-    void initialize();
+    void Initialize();
 
     /*
       the current timestamp when GetCurrentStamp() is called.

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTimeStamp.h>
 #include <tinyxml.h>
 
+#include <itksys/SystemTools.hxx>
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
   m_NumberOfInputs = 0;
@@ -162,11 +163,10 @@ void mitk::NavigationDataRecorder::StartRecording()
     std::stringstream ss;
     std::ostream* stream;
     
-    //An extension is given so we cut it
-    if (m_FileName.find_last_of('.') != std::string::npos)
-      m_FileName = m_FileName.substr( 0, m_FileName.find_last_of('.') );
-
-    ss <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
+    //An existing extension will be cut and replaced with .xml
+    std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
+    m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
+    ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
     switch(m_RecordingMode)
     {
       case Console:

@@ -24,11 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkClaronTool.h"
 #include "mitkClaronTrackingDevice.h"
 #include "mitkCone.h"
+#include "mitkInternalTrackingTool.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
 #include "mitkProgressBar.h"
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
+#include "mitkRandomTrackingDevice.h"
 #include "mitkSerialCommunication.h"
 #include "mitkStatusBar.h"
 #include "mitkTrackingTypes.h"
@@ -476,7 +478,11 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
   }
   else if (selectedDevice == "RandomTrackingDevice")
   {
-
+    mitk::InternalTrackingTool::Pointer toolRandom = mitk::InternalTrackingTool::New();
+    mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
+    trackerRandom->AddTool(toolRandom);
+    tool1 = toolRandom;
+    tracker = trackerRandom;
   }
   return tracker;
 }

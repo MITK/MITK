@@ -45,6 +45,8 @@ bool mitk::RandomTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
+  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
+
   mitk::TimeStamp::GetInstance()->StartTracking(this);
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
@@ -125,11 +127,18 @@ void mitk::RandomTrackingDevice::TrackTools()
 {
   try
   {
-    while (this->GetMode() == Tracking)
-    {
-      //Init Random
-      srand(time(NULL));
+    //Init Random
+    srand(time(NULL));
 
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    m_TrackingFinishedMutex->Lock();
+
+    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    localStopTracking = this->m_StopTracking;
+    this->m_StopTrackingMutex->Unlock();
+    while ((this->GetMode() == Tracking) && (localStopTracking == false))
+    {
       std::vector<mitk::InternalTrackingTool::Pointer> allTools = this->GetAllTools();
       std::vector<mitk::InternalTrackingTool::Pointer>::iterator itAllTools;
       for(itAllTools = allTools.begin(); itAllTools != allTools.end(); itAllTools++)
@@ -159,7 +168,12 @@ void mitk::RandomTrackingDevice::TrackTools()
       //there should be a short pause perhaps the multithreader can do this?
       //m_MultiThreader->
       itksys::SystemTools::Delay(m_RefreshRate);
+      /* Update the local copy of m_StopTracking */
+      this->m_StopTrackingMutex->Lock();  
+      localStopTracking = m_StopTracking;
+      this->m_StopTrackingMutex->Unlock();
     }
+    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
   {

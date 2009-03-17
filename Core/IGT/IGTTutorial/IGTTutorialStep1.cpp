@@ -33,13 +33,15 @@ int main(int argc, char* argv[])
 
   //Here we take the RandomTrackingDevice. This is not a real tracking device it just delivers random 
   //positions and orientations. You can use other/real tracking devices if you replace the following 
-  //code with different tracking devices, e.g. mitk::NDITrackingDevice.
+  //code with different tracking devices, e.g. mitk::NDITrackingDevice. The tools represent the
+  //sensors of the tracking device. The TrackingDevice fills the tools with data.
+  std::cout << "Generating TrackingDevice ..." << std::endl;
+
   mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New();
   mitk::InternalTrackingTool::Pointer tool1 = mitk::InternalTrackingTool::New();
   mitk::InternalTrackingTool::Pointer tool2 = mitk::InternalTrackingTool::New();
   tracker->AddTool(tool1);
   tracker->AddTool(tool2);
-  tracker->SetRefreshRate(0);
 
   //The tracking device object is used for the physical connection to the device. To use the
   //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
@@ -51,6 +53,9 @@ int main(int argc, char* argv[])
   //TrackingDevice object. Attention you have to set the tools before you set the whole TrackingDevice
   //object to the TrackingDeviceSource because the source need to know how many outputs should be 
   //generated.
+
+  std::cout << "Generating Source ..." << std::endl;
+
   mitk::TrackingDeviceSource::Pointer source = mitk::TrackingDeviceSource::New();
   source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
 
@@ -68,6 +73,9 @@ int main(int argc, char* argv[])
   //very simple NavigationDataDisplacementFilter. This filter just changes the positions of the input 
   //NavigationData objects with an offset for each direction (X,Y,Z). The input of this filter is the 
   //source and the output of this filter is the "displaced" input.
+
+  std::cout << "Generating DisplacementFilter ..." << std::endl;
+
   mitk::NavigationDataDisplacementFilter::Pointer displacer = mitk::NavigationDataDisplacementFilter::New();
   mitk::Vector3D offset;
   mitk::FillVector3D(offset, 10.0, 100.0, 1.0); //initialize the offset
@@ -87,8 +95,19 @@ int main(int argc, char* argv[])
   //The next part of our pipeline is the recorder. The recorder needs a filename. Otherwise the output
   //is redirected to the console. The input of the recorder is the output of the displacement filter
   //and the output is a XML file with the name "Test Output-0.xml".
+
+  std::cout << "Start Recording ..." << std::endl;
+
+  //we need the stringstream for building up our filename
+  std::stringstream filename;
+
+  //the .xml extension and an counter is added automatically
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
+
+  std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
+
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
-  recorder->SetFileName("C://Test Output"); //the .xml extension and an counter is added automatically
+  recorder->SetFileName(filename.str());
 
   //now every output of the displacer object is connected to the recorder object
   for (int i = 0; i < displacer->GetNumberOfOutputs(); i++)
@@ -116,30 +135,38 @@ int main(int argc, char* argv[])
   // Part IV: Play the data with the NavigationDataPlayer
   //*************************************************************************
 
-  //The recording is finished now so now we can play the data. The NavigationDataPlayer is similiar 
+  //The recording is finished now so now we can play the data. The NavigationDataPlayer is similar 
   //to the TrackingDevice source. It also derives from NavigationDataSource. So you can use a player 
   //instead of a TrackingDeviceSource. The input of this player is the filename and the output are 
   //NavigationData object.
-  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
+  filename << "-0.xml";
+  std::cout << "Start playing from file: " << filename.str() << " ..." << std::endl;
+
+
+  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
   //this is first part of the file name the .xml extension and an counter is added automatically
-  player->SetFileName("C://Test Output-0.xml"); 
+  player->SetFileName(filename.str()); 
   player->StartPlaying(); //this starts the player
                           //From now on the player provides NavigationDatas in the order and 
                           //correct time as they were recorded
   
-  //this connects the output(0) of the player to a NavigationData object
+  //this connects the outputs of the player to the NavigationData objects
   mitk::NavigationData::Pointer nd = player->GetOutput(0); 
+  mitk::NavigationData::Pointer nd2 = player->GetOutput(1); 
   for (unsigned int x=0; x<100; x++) 
   {
-    if (nd.IsNotNull())
+    if (nd.IsNotNull()) //check if the output is not null
     {
       //With this update the NavigationData object propagates through the pipeline to get a new value.
       //In this case we only have a source (NavigationDataPlayer).
       nd->Update(); 
 
-      std::cout << x << ": " << nd->GetPosition() << std::endl;
-      std::cout << x << ": " << nd->GetOrientation() << std::endl;
+      std::cout << x << ": 1:" << nd->GetPosition() << std::endl;
+      std::cout << x << ": 2:" << nd2->GetPosition() << std::endl;
+      std::cout << x << ": 1:" << nd->GetOrientation() << std::endl;
+      std::cout << x << ": 2:" << nd2->GetOrientation() << std::endl;
+
       itksys::SystemTools::Delay(100); //sleep a little like in the recorder part
     }
   }
@@ -147,21 +174,7 @@ int main(int argc, char* argv[])
                          //With another call of StartPlaying the player will start again at the beginning of the file
 
   itksys::SystemTools::Delay(2000);
-  std::cout << "finished";
-  //player->StartPlaying();
-  //for (unsigned int x=0; x<100; x++) //write 50 datasets
-  //{
-  //  if (nd.IsNotNull())
-  //  {
-  //    nd->Update();
-
-  //    std::cout << x << ": " << nd->GetPosition() << std::endl;
-  //    std::cout << x << ": " << nd->GetOrientation() << std::endl;
-  //    Sleep(100);
-  //  }
-  //}
-  //player->StopPlaying();
-
+  std::cout << "finished" << std::endl;
 
 }
 

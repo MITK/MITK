@@ -115,6 +115,19 @@ void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
 }
 
 
+void mitk::NDITrackingDevice::SetDeviceName( const char* _arg )
+{
+  if (this->GetMode() != Setup)
+    return;
+  itkDebugMacro("setting eviceName to " << _arg);
+  if (this->m_DeviceName != _arg)
+  {
+    this->m_DeviceName = _arg;
+    this->Modified();
+  }
+}
+
+
 void mitk::NDITrackingDevice::SetBaudRate(const BaudRate _arg)
 {
   if (this->GetMode() != Setup)
@@ -327,7 +340,10 @@ bool mitk::NDITrackingDevice::OpenConnection()
   /* init local com port to standard com settings for a NDI tracking device:
   9600 baud, 8 data bits, no parity, 1 stop bit, no hardware handshake
   */
-  m_SerialCommunication->SetPortNumber(m_PortNumber);
+  if (m_DeviceName.empty())
+    m_SerialCommunication->SetPortNumber(m_PortNumber);
+  else
+    m_SerialCommunication->SetDeviceName(m_DeviceName);
   m_SerialCommunication->SetBaudRate(mitk::SerialCommunication::BaudRate9600);
   m_SerialCommunication->SetDataBits(mitk::SerialCommunication::DataBits8);
   m_SerialCommunication->SetParity(mitk::SerialCommunication::None);

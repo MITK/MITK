@@ -126,6 +126,7 @@ namespace mitk
     virtual bool UpdateTool(mitk::NDIPassiveTool* tool);
 
     virtual void SetPortNumber(const PortNumber _arg); ///< set port number for serial communication
+    virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
     virtual void SetBaudRate(const BaudRate _arg);     ///< set baud rate for serial communication
     virtual void SetDataBits(const DataBits _arg);     ///< set number of data bits
     virtual void SetParity(const Parity _arg);         ///< set parity mode 
@@ -200,6 +201,7 @@ public://TODO
     itkSetStringMacro(ErrorMessage);
 
   protected:
+    std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number
     BaudRate m_BaudRate;     ///< COM Port Baud Rate
     DataBits m_DataBits;     ///< Number of Data Bits per token

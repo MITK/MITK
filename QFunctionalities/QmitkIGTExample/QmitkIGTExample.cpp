@@ -43,6 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 #include <qtextedit.h>
 #include <qtimer.h>
+#include <qlabel.h>
+#include <qlineedit.h>
 
 QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
     : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -125,66 +127,14 @@ void QmitkIGTExample::OnTestTracking()
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the tracking component", 4000);
 
   /* Create & set up tracking device with a tool */
-  mitk::TrackingDevice::Pointer tracker;
-  mitk::TrackingTool::Pointer tool1;
-  if ((m_Controls->m_TrackingDevice->currentItem()==0)||(m_Controls->m_TrackingDevice->currentItem()==1)) // NDI Polaris || NDI Aurora
+  mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice();
+  if (tracker.IsNull())
   {
-    mitk::NDITrackingDevice::Pointer trackerNDI = mitk::NDITrackingDevice::New();
-    if (m_Controls->m_TrackingDevice->currentItem()==0)
-    {
-      trackerNDI->SetType(mitk::NDIPolaris);
-    }
-    else if (m_Controls->m_TrackingDevice->currentItem()==1)
-    {
-      trackerNDI->SetType(mitk::NDIAurora);
-    }
-    switch (trackerNDI->GetType())
-    {
-    case mitk::NDIPolaris:
-      {
-        trackerNDI->SetPortNumber(mitk::SerialCommunication::COM4);
-        trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200); 
-        out->append("creating NDI Tracker on COM 4 with 115200 Baud");
-        mitk::NDIPassiveTool::Pointer tool_NDI = mitk::NDIPassiveTool::New();
-        tool_NDI->SetToolName("MyInstrument");
-        tool_NDI->LoadSROMFile("c:\\tools\\polaris6D.rom");
-        tool_NDI->SetTrackingPriority(mitk::Dynamic);
-        trackerNDI->Add6DTool(tool_NDI);
-        out->append("adding tool 'MyInstrument' with rom file 'c:\\myinstrument.rom'");
-        tool1 = tool_NDI;
-        break;
-      }
-    case mitk::NDIAurora:
-      {
-        trackerNDI->SetPortNumber(mitk::SerialCommunication::COM1);
-        out->append("creating NDI Tracker on COM 1");
-        break;
-      }
-    }
-    tracker = trackerNDI;
-  }
-  else if (m_Controls->m_TrackingDevice->currentItem()==2) // Micron Tracker
-  {
-    mitk::ClaronTool::Pointer tool_Micron = mitk::ClaronTool::New();
-    tool_Micron->LoadFile("C:/tools/MT/Tool13_v2");
-    mitk::ClaronTrackingDevice::Pointer tracker_Micron = mitk::ClaronTrackingDevice::New();
-    out->append("creating Micron Tracker");
+    out->append("Error creating tracking device. Did you provide all parameters?");
+    return;
+  }  
 
-    tracker_Micron->AddTool(tool_Micron);
-    out->append("adding tool 'Tool13' with tool file 'c:\\tools\\MT\\Tool13_v2'");
-    tracker = tracker_Micron;
-    tool1 = tool_Micron;
-  }
-  else if (m_Controls->m_TrackingDevice->currentItem()==3) // MicroBird
-  {
-
-  }
-  else if (m_Controls->m_TrackingDevice->currentItem()==4) // Random Tracking Device
-  {
-
-  }
-  
-  /*open the connection, load tools that are connected (active Tools) and initialize them. */
+  /* open the connection, load tools that are connected (active Tools) and initialize them. */
   out->append("opening connection to tracking device");
   if (tracker->OpenConnection() == false)
   {
@@ -195,10 +145,6 @@ void QmitkIGTExample::OnTestTracking()
   }
   else
     out->append("successfully connected to tracking device.");
-
-  /* beep a few times, just because we can */
-  //out->append("BEEP!");
-  //tracker->Beep(3);
 
   /* Start tracking */ 
   if (tracker->StartTracking() == false)
@@ -275,59 +221,7 @@ void QmitkIGTExample::OnTestNavigation()
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the navigation component", 4000);  // tell the user what you are doing
 
   /* Create & set up tracking device with a tool */
-  mitk::TrackingDevice::Pointer tracker;
-  mitk::TrackingTool::Pointer tool1;
-  mitk::TrackingTool::Pointer tool2;
-
-  if ((m_Controls->m_TrackingDevice->currentItem()==0)||(m_Controls->m_TrackingDevice->currentItem()==1)) // NDI Polaris || NDI Aurora
-  {
-    mitk::NDITrackingDevice::Pointer trackerNDI = mitk::NDITrackingDevice::New();
-    if (m_Controls->m_TrackingDevice->currentItem()==0)
-    {
-      trackerNDI->SetType(mitk::NDIPolaris);
-    }
-    else if (m_Controls->m_TrackingDevice->currentItem()==1)
-    {
-      trackerNDI->SetType(mitk::NDIAurora);
-    }
-    switch (trackerNDI->GetType())
-    {
-    case mitk::NDIPolaris:
-      {
-        trackerNDI->SetPortNumber(mitk::SerialCommunication::COM4);
-        trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200); 
-        out->append("creating NDI Tracker on COM 4 with 115200 Baud");
-
-        mitk::NDIPassiveTool::Pointer tool_NDI = mitk::NDIPassiveTool::New();
-        tool_NDI->SetToolName("MyInstrument");
-        tool_NDI->LoadSROMFile("c:\\tools\\polaris6D.rom");
-        tool_NDI->SetTrackingPriority(mitk::Dynamic);
-        trackerNDI->Add6DTool(tool_NDI);
-        out->append("adding tool 'MyInstrument' with rom file 'c:\\myinstrument.rom'");
-        tool1 = tool_NDI;
-        break;
-      }
-    case mitk::NDIAurora:
-      {
-        trackerNDI->SetPortNumber(mitk::SerialCommunication::COM1);
-        out->append("creating NDI Tracker on COM 1");
-        break;
-      }
-    }
-    tracker = trackerNDI;
-  }
-  else if (m_Controls->m_TrackingDevice->currentItem()==2) // Micron Tracker
-  {
-    mitk::ClaronTool::Pointer tool_Micron = mitk::ClaronTool::New();
-    tool_Micron->LoadFile("C:/tools/MT/Tool13_v2");
-    mitk::ClaronTrackingDevice::Pointer tracker_Micron = mitk::ClaronTrackingDevice::New();
-    out->append("creating Micron Tracker");
-
-    tracker_Micron->AddTool(tool_Micron);
-    out->append("adding tool 'Tool13' with tool file 'c:\\tools\\MT\\Tool13_v2'");
-    tracker = tracker_Micron;
-    tool1 = tool_Micron;
-  }
+  mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice(); // configure selected tracking device
 
   /* Now set up pipeline */
   try
@@ -345,7 +239,7 @@ void QmitkIGTExample::OnTestNavigation()
     /* check if there is a Offset parameter stored in our propertylist. If none is found, use hardcoded value */
     if (GetFunctionalityOptionsList()->GetPropertyValue<mitk::Vector3D>("NavigationDataDisplacementFilter_Offset", offset) == false)  // search for Offset parameter
     {
-      mitk::FillVector3D(offset, 100000.0, 0.0, 0.0);  // nothing found, use hardcoded value
+      mitk::FillVector3D(offset, -1800.0, 1.0, 2.0);  // nothing found, use default value
       GetFunctionalityOptionsList()->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(offset));  // add the property to the list
     }
     m_Displacer->SetOffset(offset);
@@ -356,47 +250,27 @@ void QmitkIGTExample::OnTestNavigation()
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
     int numberOfOutputs = m_Source->GetNumberOfOutputs();
-    for (int i=0; i<numberOfOutputs; i++)
-    {
+    for (unsigned int i = 0; i < numberOfOutputs; i++)
       m_Displacer->SetInput(i,m_Source->GetOutput(i));  // connect filter 
-    }
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
     int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
-    for (int i=0; i<numberOfDisplacerOutputs; i++)
-    {
-      visualizer->SetInput(0,m_Displacer->GetOutput(i));
-    }
+    for (int i = 0; i < numberOfDisplacerOutputs; i++)
+      visualizer->SetInput(i, m_Displacer->GetOutput(i));
     
     //create new BaseData for each tool
     for (int i = 0; i<m_Source->GetToolCount();i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
-      vtkConeSource* vtkData = vtkConeSource::New();
-      vtkData->SetRadius(10);
-      vtkData->SetHeight(20);
-      vtkData->SetDirection(0.0, 0.0, 1.0);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->SetResolution(20);
-      vtkData->CappingOn();
-      vtkData->Update();
-      mitkToolData->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
-      
       //create DataTreeNode
       mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
       toolNode->SetData(mitkToolData);
-      toolNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New ( "MyInstrument" ) );
-      toolNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));
-      toolNode->GetPropertyList()->SetProperty("visible",mitk::BoolProperty::New(true));
+      toolNode->SetName("MyInstrument");
       toolNode->SetColor(0.0,1.0,0.0);//green
-      toolNode->SetOpacity(0.8);
       toolNode->Modified();
-      
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
-
       visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
       m_EndOfPipeline = visualizer;
     }
@@ -410,13 +284,12 @@ void QmitkIGTExample::OnTestNavigation()
     out->append(QString("ERROR during instantiation and initialization of TrackingDeviceSource filter: ") + QString(exp.what()));
     m_Displacer = NULL;
     m_EndOfPipeline = NULL;
-    if (m_Source)
+    if (m_Source.IsNotNull())
     {
       m_Source->StopTracking();
       m_Source->Disconnect();
       m_Source = NULL;
     }
-    tool1 = NULL;
     tracker = NULL;
     WaitCursorOff();
     return;
@@ -447,9 +320,8 @@ void QmitkIGTExample::OnMeasure()
     return;
   }
   WaitCursorOn();
-  
 
-  /* Get the output of the las filter with output and print it */
+  /* Get the output of the last filter with output and print it */
   for (unsigned int i = 0; i < m_EndOfPipeline->GetNumberOfOutputs(); ++i) // for all outputs of the filter
   {
     mitk::NavigationData* nd = m_EndOfPipeline->GetOutput(i);
@@ -458,7 +330,8 @@ void QmitkIGTExample::OnMeasure()
       out->append("WARNING: Navigation Data is NULL");
       continue;
     }
-    nd->Update();  // update the navigation data. this will read current tracking data from tracking device
+    nd->Update();  // update the navigation data. this will read current tracking data from tracking device.
+                   // this will also update the visualization filter who causes a repainting of the scene
 
     std::stringstream output;
     output << "Navigation Data of Output " << i << ":" << std::endl;
@@ -477,6 +350,7 @@ void QmitkIGTExample::OnMeasure()
   WaitCursorOff();
 }
 
+
 void QmitkIGTExample::OnMeasureContinuously()
 {
   if (m_Controls->m_MeasureContinuously->text()=="Start measure continuously")
@@ -490,6 +364,7 @@ void QmitkIGTExample::OnMeasureContinuously()
     m_Controls->m_MeasureContinuously->setText("Start measure continuously");
   }
 }
+
 
 void QmitkIGTExample::OnStop()
 {
@@ -554,4 +429,54 @@ void QmitkIGTExample::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
     m_Controls->SetDisplacementFilterParameters(pl);  // update GUI
   }
   // MITK-IGT filters will be initialized with the properties in OnTestNavigation()
+}
+
+
+mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
+{
+  mitk::TrackingDevice::Pointer tracker;
+  mitk::TrackingTool::Pointer tool1;
+  QString selectedDevice = m_Controls->GetSelectedTrackingDevice();
+  if ((selectedDevice == "NDI Polaris")
+    || (selectedDevice == "NDI Aurora"))
+  {
+    mitk::NDITrackingDevice::Pointer trackerNDI = mitk::NDITrackingDevice::New();
+    trackerNDI->SetDeviceName(m_Controls->m_Port->text().latin1());
+    trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
+    out->append(QString("creating NDI Tracker on ") + m_Controls->m_Port->text() + QString(" with 115200 Baud"));
+
+    if (selectedDevice == "NDI Polaris")
+    {
+      trackerNDI->SetType(mitk::NDIPolaris);
+      mitk::NDIPassiveTool::Pointer toolNDI = mitk::NDIPassiveTool::New();
+      toolNDI->SetToolName("MyInstrument");
+      toolNDI->LoadSROMFile(m_Controls->GetToolFileName());
+      toolNDI->SetTrackingPriority(mitk::Dynamic);
+      trackerNDI->Add6DTool(toolNDI);
+      out->append(QString("adding tool 'MyInstrument' with rom file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+      tool1 = toolNDI;
+    }
+    tracker = trackerNDI;
+  }
+  else if (selectedDevice == "Micron Tracker")
+  {
+    mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
+    toolMT->LoadFile(m_Controls->GetToolFileName());
+    mitk::ClaronTrackingDevice::Pointer trackerMT = mitk::ClaronTrackingDevice::New();
+    out->append("creating Micron Tracker");
+
+    trackerMT->AddTool(toolMT);
+    out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+    tracker = trackerMT;
+    tool1 = toolMT;
+  }
+  else if (selectedDevice == "MicroBird")
+  {
+
+  }
+  else if (selectedDevice == "RandomTrackingDevice")
+  {
+
+  }
+  return tracker;
 }

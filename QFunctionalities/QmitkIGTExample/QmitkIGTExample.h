@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkTrackingDevice.h"
 
 class QmitkStdMultiWidget;
 class QmitkIGTExampleControls;
@@ -88,24 +89,24 @@ protected slots:
   /**Documentation
    * \brief executes MITK-IGT-Tracking code
    *
-   * This method will create and initalize a mitk::NDITrackingDevice with one tool.
+   * This method will create and initialize a mitk::NDITrackingDevice with one tool.
    * It will start the tracking, read the tracking data from the tool 50 times and 
    * then clean up everything.
    */
    void OnTestTracking();
-   
+
    /**Documentation
    * \brief executes MITK-IGT-Navigation code
    *
-   * This method will create and initalize a mitk::NDITrackingDevice with one tool.
+   * This method will create and initialize a mitk::NDITrackingDevice with one tool.
    * Then it builds an example MITK-IGT filter pipeline:
    * - TrackingDeviceSource filter initialized with the NDITrackingDevice as source of the pipeline
    * - NavigationDataDisplacementFilter
-   * The Offset parameter of the displecement filter is searched in the functionality's options list.
+   * The Offset parameter of the displacement filter is searched in the functionality's options list.
    * It can be written to that list either by the method OnParametersChanged() that gets called after
-   * the user changes the parameter in the GUI or by the persistence mechanismn of MITK (the complete 
+   * the user changes the parameter in the GUI or by the persistence mechanism of MITK (the complete 
    * options list will be saved to disk on application exit and restored on the next application restart).
-   * if the Offset parameter is not found in the list, a hardcoded value is used.
+   * if the Offset parameter is not found in the list, a default value is used.
    * After building the filter pipeline, it is initialized and tracking is started, so that following 
    * calls to OnMeasure() can trigger pipeline updates and retrieve NavigationData objects.
    */   
@@ -146,6 +147,9 @@ protected slots:
    void OnParametersChanged();
 
 protected:  
+
+  mitk::TrackingDevice::Pointer ConfigureTrackingDevice();  ///< create the selected tracker object and configure it (using values from m_Controls)
+
   QmitkStdMultiWidget * m_MultiWidget; ///< default render widget
   QmitkIGTExampleControls * m_Controls; ///< GUI widget for this functionality
 

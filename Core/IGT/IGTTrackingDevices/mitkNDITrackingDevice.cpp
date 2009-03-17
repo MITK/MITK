@@ -47,7 +47,6 @@ m_ErrorMessage(""), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_SerialComm
   m_ToolsMutex = itk::FastMutexLock::New();
   m_MarkerPointsMutex = itk::FastMutexLock::New();
   m_MarkerPoints.reserve(50);   // a maximum of 50 marker positions can be reported by the tracking device
-
 }
 
 
@@ -222,11 +221,6 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
 
   unsigned int messageLength = message.length() + 1; // +1 for CR
 
-  // extract the data from the string
-  //BYTE* data = new BYTE[messageLength];
-  //memcpy(data, message.c_str(), message.length());
-  //data[messageLength - 1] = CR;  // append carriage return to command
-
   // Clear send buffer
   this->ClearSendBuffer();
   // Send the date to the device
@@ -234,11 +228,6 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
   long returnvalue = m_SerialCommunication->Send(message);
   m_SerialCommunicationMutex->Unlock();
 
-
-  // Clear the data buffer
-  //delete[] data;
-
-  //if (returnvalue != messageLength) // check if sending was successfull
   if (returnvalue == 0)
     return SERIALSENDERROR;
   else 
@@ -255,7 +244,6 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Receive(std::string* answer, unsigne
   long returnvalue = m_SerialCommunication->Receive(*answer, numberOfBytes);  // never read more bytes than the device has send, the function will block until enough bytes are send...
   this->m_SerialCommunicationMutex->Unlock();
 
-  //if (returnvalue != numberOfBytes) // Check for read error
   if (returnvalue == 0)
     return SERIALRECEIVEERROR;
   else
@@ -322,8 +310,6 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
   sprintf(returnvalue,"%04X", crcValue);  // 4 hexadecimal digit with uppercase format
   return std::string(returnvalue);
 }
-
-
 
 
 bool mitk::NDITrackingDevice::OpenConnection()
@@ -405,7 +391,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     return false;  
   }
 
-  /*
+  /****  Optional Polaris specific code, Work in progress
   // start diagnostic mode 
   returnvalue = m_DeviceProtocol->DSTART();
   if (returnvalue != NDIOKAY)
@@ -441,7 +427,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   return false;
   }
   }
-  */
+  *** end of optional polaris code ***/
 
   /**
   * now add tools to the tracking system 
@@ -536,7 +522,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     return false;     // ToDo: Is this a fatal error?
   }
 
-  /* if there are port handles that need to be initialized, initialize them. Furthermore instanciate tools for each handle that has no tool yet. */
+  /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
@@ -574,7 +560,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
     if (this->Add6DTool(newTool) == false) 
       this->SetErrorMessage("Error beim einfügen eines Tools");
   }
-
 
   /*POLARIS: set the illuminator activation rate */
   if (this->m_Type == NDIPolaris)
@@ -632,7 +617,6 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
   NDITrackingDevice *trackingDevice = (NDITrackingDevice*)pInfo->UserData;
   if (trackingDevice != NULL)
   {
-    //TODO
     if (trackingDevice->GetOperationMode() == ToolTracking6D) 
       trackingDevice->TrackTools();             // call TrackTools() from the original object
     else if (trackingDevice->GetOperationMode() == MarkerTracking3D)
@@ -648,6 +632,7 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
   return ITK_THREAD_RETURN_VALUE;
 }
 
+
 bool mitk::NDITrackingDevice::StartTracking()
 {
   this->m_ModeMutex->Lock();
@@ -656,22 +641,10 @@ bool mitk::NDITrackingDevice::StartTracking()
     this->m_ModeMutex->Unlock();
     return false;
   }
-
   this->SetMode(Tracking);      // go to mode Tracking
-
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
-
-  if(GetOperationMode() == ToolTracking5D || GetOperationMode() == HybridTracking)
-  {
-    //TODO
-    //std::cout << "Init 5D Tracking" << std::endl;
-    //Init5DTracking();
-  } else
-  {
-    std::cout << "operation mode: "<< GetOperationMode() << std::endl;
-  }
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
@@ -714,12 +687,6 @@ void mitk::NDITrackingDevice::TrackTools()
       if (returnvalue != NDIOKAY)
         break;
     }
-    /* store the data in the tool objects */
-    // ...
-
-    /* Wait a short moment to give the tracking system time to process all data */
-    //Tool6DContainerType20);
-
     /* Update the local copy of m_StopTracking */
     this->m_StopTrackingMutex->Lock();  
     localStopTracking = m_StopTracking;
@@ -730,7 +697,6 @@ void mitk::NDITrackingDevice::TrackTools()
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occured?
-
 
   m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
@@ -770,7 +736,6 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
     this->m_StopTrackingMutex->Unlock();
   }
   /* StopTracking was called, thus the mode should be changed back to Ready now that the tracking loop has ended. */
-
   returnvalue = m_DeviceProtocol->DSTOP();
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occured?
@@ -793,8 +758,6 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   if (returnvalue != NDIOKAY)
     return;
 
-
-
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
@@ -808,12 +771,6 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
     {
       std::cout << "Error in TX: could not read data. Possibly no markers present." << std::endl;
     }
-    //returnvalue = this->m_DeviceProtocol->TX();
-    //if (!((returnvalue == NDIOKAY) || (returnvalue == NDICRCERROR) || (returnvalue == NDICRCDOESNOTMATCH))) // right now, do not stop on crc errors
-    //{
-    //  m_Error_counter++;
-    //   std::cout << "Error in TX(): could not read tool data." << std::endl;
-    //}
     /* Update the local copy of m_StopTracking */
     this->m_StopTrackingMutex->Lock();  
     localStopTracking = m_StopTracking;
@@ -823,7 +780,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
-    return;     // how can this thread tell the application, that an error has occured?
+    return;     // how can this thread tell the application, that an error has occurred?
 
   this->m_ModeMutex->Lock();
   this->m_Mode = Ready;
@@ -834,7 +791,6 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 
 mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber)
 {
-  //TODO umschreiben in GetTool6D
   mitk::TrackingTool* t = NULL;
 
   m_ToolsMutex->Lock();
@@ -866,7 +822,6 @@ mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetTool(std::string* handle)
 
 unsigned int mitk::NDITrackingDevice::GetToolCount() const
 {
-  //TODO umschreiben in Get6DToolCount
   unsigned int s = 0;
   m_ToolsMutex->Lock();
   s = m_6DTools.size();

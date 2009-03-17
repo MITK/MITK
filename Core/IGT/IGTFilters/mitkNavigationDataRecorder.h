@@ -28,7 +28,7 @@ namespace mitk
 {
 
  /**Documentation
- * \brief This class records NavigationData objects
+ * \brief This class records NavigationData objects.
  *
  * The output of this class is formated as a XML document. 
  *
@@ -39,7 +39,7 @@ namespace mitk
  * another call of StartRecording() the output is written to a new file with incremented filename counter. 
  *
  * \warning At the moment there is no check if the file is already existing and this class will override existing files.
- * @ingroup Navigation
+ * \ingroup Navigation
  */
 
 class NavigationDataRecorder : public itk::ProcessObject
@@ -51,18 +51,14 @@ public:
 
     /**Documentation
     * \brief sets the file name for the OutputMode NormalFile and ZipFile
+    * Any extensions will be cut
     * \warning existing files will be overriden
+    * \warning do not use "." in file names at the end
     */
     itkSetStringMacro(FileName);
 
     /**Documentation
-    * \brief Sets the path for the OutputMode NormalFile and ZipFile
-    */
-    itkSetStringMacro(FilePath);
-
-
-    /**Documentation
-    * \brief adds the input NavigationDatas
+    * \brief Adds the input NavigationDatas
     */
     virtual void AddNavigationData(const NavigationData* nd);
 
@@ -87,6 +83,13 @@ public:
     */
     virtual void Update();
 
+    /**Documentation
+    * \brief Determines where the output is directed to
+    * 
+    * Console:    std::cout
+    * NormalFile: std::ofstream
+    * ZipFile:    Not supported yet -> std::cout
+    */
     enum RecordingMode
     {
       Console,
@@ -96,13 +99,14 @@ public:
 
     /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
+    * see enum RecordingMode
     */
     void SetRecordingMode(RecordingMode mode);
 
 protected:
 
     /**Documentation
-    * \brief filter execute method
+    * \brief filter execute method here it is not used
     *
     */
     virtual void GenerateData();
@@ -111,19 +115,17 @@ protected:
     
     virtual ~NavigationDataRecorder();
 
-    std::string m_FilePath;
+    std::string m_FileName; ///< stores the file name and path
 
-    std::string m_FileName;
+    unsigned int m_NumberOfInputs; ///< counts the numbers of added input NavigationDatas
 
-    unsigned int m_NumberOfInputs; //counts the numbers of added input NavigationDatas
+    std::ostream* m_Stream; ///< the output stream
 
-    std::ostream* m_Stream; //the stream
+    RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 
-    RecordingMode m_RecordingMode;
+    bool m_Recording; ///< indicates whether the recording is started or not
 
-    bool m_Recording; //indicates whether the recording is started or not
-
-    unsigned int m_NumberOfRecordedFiles; //necessary for the naming of the file if there is more than one start-stop cycle
+    unsigned int m_NumberOfRecordedFiles; ///< necessary for the naming of the file if there is more than one start-stop cycle
 
 };
 

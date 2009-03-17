@@ -37,11 +37,6 @@ mitk::NavigationDataToPointSetFilter::~NavigationDataToPointSetFilter()
 {
 }
 
-void mitk::NavigationDataToPointSetFilter::GenerateOutputInformation()
-{
-
-}
-
 void mitk::NavigationDataToPointSetFilter::GenerateData()
 {
   switch (m_OperationMode)
@@ -58,29 +53,26 @@ void mitk::NavigationDataToPointSetFilter::GenerateData()
 }
 
 
-const mitk::NavigationData* mitk::NavigationDataToPointSetFilter::GetInput(void)
-{
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return 0;
-  }
-
-  return static_cast<const mitk::NavigationData * >
-    ( this->BaseProcess::GetInput(0) );
-}
-
 void mitk::NavigationDataToPointSetFilter::SetInput(const mitk::NavigationData *input)
 {
   // Process object is not const-correct so the const_cast is required here
   this->BaseProcess::SetNthInput(0, 
     const_cast< mitk::NavigationData * >( input ) );
+
+  this->Modified();
 }
+
+
 void mitk::NavigationDataToPointSetFilter::SetInput(const mitk::NavigationData *input, unsigned int index)
 {
   // Process object is not const-correct so the const_cast is required here
   this->BaseProcess::SetNthInput(index, 
     const_cast< mitk::NavigationData * >( input ) );
+
+  this->Modified();
 }
+
+
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
 {
   DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
@@ -97,6 +89,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
     outputPointSet->SetPoint( index, point); //store it in the pointset always at timestep 0
   }
 }
+
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {
@@ -120,6 +113,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
   else
     m_CurrentTimeStep++;
 }
+
 
 void mitk::NavigationDataToPointSetFilter::SetOperationMode( OperationMode mode )
 {

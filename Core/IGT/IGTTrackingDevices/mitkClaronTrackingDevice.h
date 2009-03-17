@@ -38,7 +38,7 @@ namespace mitk
   /** Documentation:
   *   @brief An object of this class represents the MicronTracker device. You can add tools to this
   *          device, then open the connection and start tracking. The tracking device will then
-  *          continiusely update the tool coordinates.
+  *          continuously update the tool coordinates.
   */
   class ClaronTrackingDevice : public TrackingDevice
   {
@@ -123,8 +123,8 @@ namespace mitk
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
   
-    std::vector<ClaronTool::Pointer> m_AllTools;
-    ClaronInterface* m_Device;
+    std::vector<ClaronTool::Pointer> m_AllTools; ///< vector holding all tools
+    ClaronInterface* m_Device; ///< represents the interface to the tracking hardware
     itk::MultiThreader::Pointer m_MultiThreader;
     int m_ThreadID;
 

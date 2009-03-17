@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile: mitkClaronTrackingDevice.h,v $
+Language:  C++
+Date:      $Date $
+Version:   $Revision $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkClaronTrackingDevice.h"
 #include "mitkClaronTool.h"
 #include "mitkIGTConfig.h"
@@ -25,11 +43,11 @@ std::vector<mitk::ClaronTool::Pointer> mitk::ClaronTrackingDevice::DetectTools()
   std::vector<claronToolHandle> allHandles = m_Device->GetAllActiveTools();
   for (std::vector<claronToolHandle>::iterator iter = allHandles.begin(); iter != allHandles.end(); ++iter)
   {
-    ClaronTool::Pointer neu = ClaronTool::New();
-    neu->SetToolName(m_Device->GetName(*iter));
-    neu->SetCalibrationName(m_Device->GetName(*iter));
-    neu->SetToolHandle(*iter);
-    returnValue.push_back(neu);
+    ClaronTool::Pointer newTool = ClaronTool::New();
+    newTool->SetToolName(m_Device->GetName(*iter));
+    newTool->SetCalibrationName(m_Device->GetName(*iter));
+    newTool->SetToolHandle(*iter);
+    returnValue.push_back(newTool);
   }
   return returnValue;
 }
@@ -43,6 +61,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
   this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
 
   this->m_MultiThreader = itk::MultiThreader::New();
+  m_ThreadID = 0;
 
   //############################# standard directories (from cmake) ##################################
   if (m_Device->IsMicronTrackerInstalled())
@@ -74,7 +93,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
   {
-    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile(), m_ToolfilesDir.c_str());
+    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
   this->SetMode(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -86,6 +105,9 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   delete m_Device;
 
   m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+
+  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
+
   if (m_Device->StartTracking())
   {
     mitk::TimeStamp::GetInstance()->StartTracking(this);
@@ -199,6 +221,14 @@ void mitk::ClaronTrackingDevice::TrackTools()
 {
   try
   {
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    m_TrackingFinishedMutex->Lock();
+
+    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    localStopTracking = this->m_StopTracking;
+    this->m_StopTrackingMutex->Unlock();
+
     while (this->GetMode() == Tracking)
     {
       this->GetDevice()->GrabFrame();
@@ -247,7 +277,12 @@ void mitk::ClaronTrackingDevice::TrackTools()
           currentTool->SetDataValid(false);
         }
       }
+      /* Update the local copy of m_StopTracking */
+      this->m_StopTrackingMutex->Lock();  
+      localStopTracking = m_StopTracking;
+      this->m_StopTrackingMutex->Unlock();
     }
+    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
   {

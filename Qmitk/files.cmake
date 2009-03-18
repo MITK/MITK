@@ -38,6 +38,8 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
   QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
   QmitkHelpBrowser.cpp
+  QmitkHistogram.cpp
+  QmitkHistogramValuesWidget.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLineEditLevelWindowWidget.cpp
@@ -165,6 +167,7 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
   QmitkFunctionalityComponents/QmitkThresholdComponent.h
   QmitkHelpBrowser.h
+  QmitkHistogramValuesWidget.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
   QmitkLineEditLevelWindowWidget.h

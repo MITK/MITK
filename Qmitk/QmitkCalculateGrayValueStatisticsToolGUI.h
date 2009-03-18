@@ -1,5 +1,5 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
@@ -13,7 +13,7 @@ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QmitkCalculateGrayValueStatisticsToolGUI_h_Included
@@ -24,30 +24,33 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCalculateGrayValueStatisticsTool.h"
 
 /**
-  \brief GUI for mitk::CalculateGrayValueStatisticsTool.
+ \brief GUI for mitk::CalculateGrayValueStatisticsTool.
 
-  Shows nothing. Only when the corresponding tool send a message that statistics are ready, this class pops up a window showing the results.
+ Shows nothing. Only when the corresponding tool send a message that statistics are ready, this class pops up a window showing the results.
 
-  Last contributor: $Author$
+ Last contributor: $Author$
 */
 class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
   public:
-    
+
     mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkCalculateGrayValueStatisticsToolGUI);
-    
-    virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
 
-    /// Reacts to signals from mitk::CalculateGrayValueStatisticsTool
-    void OnCalculationsDone();
+  virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
+
+  /**
+   - reacts to signals from mitk::CalculateGrayValueStatisticsTool
+   - shows the histogram and report widget
+   */
+  void OnCalculationsDone();
 
   signals:
 
   public slots:
-  
+
   protected slots:
 
     /// Connected to signal from QmitkToolGUI. We remember the current tool here

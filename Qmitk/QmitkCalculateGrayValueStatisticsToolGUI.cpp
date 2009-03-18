@@ -18,10 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCalculateGrayValueStatisticsToolGUI.h"
 
-#include "QmitkCopyToClipBoardDialog.h"
+#include "QmitkHistogramValuesWidget.h"
 
-QmitkCalculateGrayValueStatisticsToolGUI::QmitkCalculateGrayValueStatisticsToolGUI()
-:QmitkToolGUI()
+#include "mitkCalculateGrayValueStatisticsTool.h"
+
+QmitkCalculateGrayValueStatisticsToolGUI::QmitkCalculateGrayValueStatisticsToolGUI() :
+  QmitkToolGUI()
 {
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -53,14 +55,23 @@ void QmitkCalculateGrayValueStatisticsToolGUI::OnCalculationsDone()
 {
   if (m_CalculateGrayValueStatisticsTool.IsNotNull())
   {
-    std::string report = m_CalculateGrayValueStatisticsTool->GetReport();
+    bool showreport = false;
 
-    // one for linux users
-    std::cout << report << std::endl;
+    //uses the parameter "true" because the report should be shown in addition to the histogram
+    QmitkHistogramValuesWidget* hvw = new QmitkHistogramValuesWidget();
+    typedef itk::Statistics::Histogram<double, 1> HistogramType;
 
-    // one for window users
-    QmitkCopyToClipBoardDialog* dialog = new QmitkCopyToClipBoardDialog( report.c_str(), NULL);
-    dialog->show();
+    HistogramType::ConstPointer histogram = m_CalculateGrayValueStatisticsTool->GetHistogram();
+    hvw->SetHistogram(histogram);
+
+    if(showreport)
+    {
+      std::string report = m_CalculateGrayValueStatisticsTool->GetReport();
+      // one for linux users
+      std::cout << report << std::endl;
+      hvw->SetReport(report);
+    }
+    hvw->show();
   }
 }
 

@@ -30,7 +30,7 @@ class mitkNavigationDataTransformFilterTestClass{ public:
 /* false if difference abs(x1-y1) < delta, else true */
 static bool compareTwoVectors(mitk::NavigationData::PositionType x, mitk::NavigationData::PositionType y)
 { 
-  float delta = 1.0e-3;
+  mitk::ScalarType delta = 1.0e-3;
   if((abs(x[0]-y[0]) < delta ) && (abs(x[1]-y[1]) < delta ) && (abs(x[2]-y[2]) < delta ))
     return true;
   else
@@ -40,7 +40,7 @@ static bool compareTwoVectors(mitk::NavigationData::PositionType x, mitk::Naviga
 /* false if difference abs(x1-y1) < delta, else true */
 static bool compareTwoQuaternions(mitk::NavigationData::OrientationType x, mitk::NavigationData::OrientationType y)
 { 
-  float delta = 1.0e-3;
+  mitk::ScalarType delta = 1.0e-3;
   if((abs(x[0]-y[0]) < delta ) && (abs(x[1]-y[1]) < delta ) && (abs(x[2]-y[2]) < delta ))
     return true;
   else
@@ -53,8 +53,9 @@ static bool compareTwoQuaternions(mitk::NavigationData::OrientationType x, mitk:
 /**Documentation
  *  test for the class "NavigationDataTransformFilter".
  */
-typedef itk::Rigid3DTransform<float > TransformType;
-typedef itk::Vector<float,3> VectorType;
+typedef itk::Rigid3DTransform<mitk::ScalarType > TransformType;
+
+typedef itk::Vector<mitk::ScalarType,3> VectorType;
 
 int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 {
@@ -86,12 +87,28 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   myFilter->SetInput(nd1);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput()");
 
-  /* test identity transformation */
-  TransformType::Pointer transform = TransformType::New();
+  mitk::NavigationData* output = myFilter->GetOutput(0);
+
+  /*test case no transform set*/
+  bool exceptionCatched=false;
+  try
+  {
+    mitk::NavigationData* output = myFilter->GetOutput();
+    output->Update(); // execute filter
+  }
+  catch (std::exception& /*exp*/)
+  {  exceptionCatched=true; /*std::cout<<exp.what()<<std::endl;*/}
+  
+  MITK_TEST_CONDITION(exceptionCatched, "Testing no transform set");
+
+
+
+  /* test transformation */
+  mitk::NavigationDataTransformFilter::TransformType::Pointer transform =  mitk::NavigationDataTransformFilter::TransformType::New();
   VectorType translationVector;
-  translationVector[0]= 3.9;
-  translationVector[1]= 2.8;
-  translationVector[2]= 1.7;
+  translationVector[0] = 3.9;
+  translationVector[1] = 2.8;
+  translationVector[2] = 1.7;
   
   
   /* test translation */
@@ -99,7 +116,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   myFilter->SetRigid3DTransform(transform);
 
-  mitk::NavigationData* output = myFilter->GetOutput();
+  output = myFilter->GetOutput();
   MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
 
   output->Update(); // execute filter
@@ -121,28 +138,28 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   mitk::FillVector3D(resultPos,  1.1, -1.1, 1.1);
 
   mitk::NavigationData::OrientationType resultOri(0.0, 0.0, -0.7071, 0.7071);
-  initialOri[0]=0;
-  initialOri[1]=0;
-  initialOri[2]=0;
-  initialOri[3]=1;
+  initialOri[0] = 0;
+  initialOri[1] = 0;
+  initialOri[2] = 0;
+  initialOri[3] = 1;
 
    nd1->SetPosition(initialPos);
    nd1->SetOrientation(initialOri);
 
    myFilter2->SetInput(nd1);
 
-   itk::Matrix<float,3,3> rotMatrix;
-   rotMatrix[0][0]= 0;
-   rotMatrix[0][1]= 1;
-   rotMatrix[0][2]= 0;
-   rotMatrix[1][0]= -1;
-   rotMatrix[1][1]= 0;
-   rotMatrix[1][2]= 0;
-   rotMatrix[2][0]= 0;
-   rotMatrix[2][1]= 0;
-   rotMatrix[2][2]= 1;
+   itk::Matrix<mitk::ScalarType,3,3> rotMatrix;
+   rotMatrix[0][0] = 0;
+   rotMatrix[0][1] = 1;
+   rotMatrix[0][2] = 0;
+   rotMatrix[1][0] = -1;
+   rotMatrix[1][1] = 0;
+   rotMatrix[1][2] = 0;
+   rotMatrix[2][0] = 0;
+   rotMatrix[2][1] = 0;
+   rotMatrix[2][2] = 1;
 
-   TransformType::Pointer transform2 = TransformType::New();
+   mitk::NavigationDataTransformFilter::TransformType::Pointer transform2 =  mitk::NavigationDataTransformFilter::TransformType::New();
    transform2->SetRotationMatrix(rotMatrix);
 
    myFilter2->SetRigid3DTransform(transform2);
@@ -188,8 +205,8 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION(((myFilter->GetInput(0) == nd1) 
                     && (myFilter->GetInput(1) == nd2)), "Testing Set-/GetInput(index, data)");
-  output=NULL;
-  output2=NULL;
+  output = NULL;
+  output2 = NULL;
   output = myFilter->GetOutput(0);
   output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!

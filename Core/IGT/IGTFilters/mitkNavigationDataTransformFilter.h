@@ -29,19 +29,25 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * \brief NavigationDataTransformFilter applies an user-defined transformation on navigation data objects
+  * \brief NavigationDataTransformFilter applies an user-defined rigid transformation on navigation data objects. 
+  * Input navigation data are mapped 1:1 on output navigation data.  To run the filter SetRigid3DTransform(TransformType::Pointer transform) has to be called first.
   *
-  * @ingroup Navigation
+  * \ingroup Navigation
   */
   class NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
   {
   
-  typedef itk::Rigid3DTransform< float > TransformType;
-
   public:
+
+    typedef itk::Rigid3DTransform< float > TransformType;
+
     mitkClassMacro(NavigationDataTransformFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
+    /**Documentation 
+    *\brief Set the rigid transform used to transform the input navigation data.
+    *
+    */
     void SetRigid3DTransform(TransformType::Pointer transform);
  
 
@@ -50,14 +56,14 @@ namespace mitk {
     NavigationDataTransformFilter();
     virtual ~NavigationDataTransformFilter();
 
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatOrgRigidTransform; //transform needed to rotate orientation
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatTmpTransform;         //transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatOrgRigidTransform; ///< transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatTmpTransform;      ///< further transform needed to rotate orientation
 
 
     /**Documentation
     * \brief filter execute method
     *
-    * transforms data   
+    * transforms navigation data   
     */
     virtual void GenerateData();
 

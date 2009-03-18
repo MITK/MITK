@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::NavigationDataTransformFilter::NavigationDataTransformFilter() 
 : mitk::NavigationDataToNavigationDataFilter()
 {
+  m_Transform = NULL;
+  
   //transform to rotate orientation 
   m_QuatOrgRigidTransform = itk::QuaternionRigidTransform<double>::New();
   m_QuatTmpTransform = itk::QuaternionRigidTransform<double>::New();
@@ -29,23 +31,26 @@ mitk::NavigationDataTransformFilter::NavigationDataTransformFilter()
 
 
 mitk::NavigationDataTransformFilter::~NavigationDataTransformFilter()
-{}
+{
+  m_Transform = NULL;
+}
 
 void mitk::NavigationDataTransformFilter::SetRigid3DTransform( TransformType::Pointer transform )
 {
   m_Transform = transform; 
   this->Modified();
-
 }
 
 void mitk::NavigationDataTransformFilter::GenerateData()
 {
 
-  //this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
-  // \warning This could erase outputs if inputs have been removed
-
   // only update data if m_Transform was set
-  if(m_Transform)
+  if(m_Transform.IsNull())
+  {
+    itkExceptionMacro("Invalid parameter: Transform was not set!  Use SetRigid3DTransform() before updating the filter.");
+    return;  
+  }
+  else
   {
     /* update outputs with tracking data from tools */
     for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
@@ -57,23 +62,24 @@ void mitk::NavigationDataTransformFilter::GenerateData()
 
       if (input->IsDataValid() == false)
       {
+        output->SetDataValid(false);
         continue;
       }
 
       mitk::NavigationData::PositionType tempCoordinateIn, tempCoordinateOut;
-      tempCoordinateIn= input->GetPosition();
+      tempCoordinateIn = input->GetPosition();
 
       itk::Point<float,3> itkPointIn, itkPointOut;
-      itkPointIn[0]=tempCoordinateIn[0];
-      itkPointIn[1]=tempCoordinateIn[1];
-      itkPointIn[2]=tempCoordinateIn[2];
+      itkPointIn[0] = tempCoordinateIn[0];
+      itkPointIn[1] = tempCoordinateIn[1];
+      itkPointIn[2] = tempCoordinateIn[2];
      
       //do the transform
       itkPointOut = m_Transform->TransformPoint( itkPointIn );  
 
-      tempCoordinateOut[0]=itkPointOut[0];
-      tempCoordinateOut[1]=itkPointOut[1];
-      tempCoordinateOut[2]=itkPointOut[2];
+      tempCoordinateOut[0] = itkPointOut[0];
+      tempCoordinateOut[1] = itkPointOut[1];
+      tempCoordinateOut[2] = itkPointOut[2];
 
       output->Graft(input); // First, copy all information from input to output
       output->SetPosition(tempCoordinateOut);// Then change the member(s): add new position of navigation data after tranformation

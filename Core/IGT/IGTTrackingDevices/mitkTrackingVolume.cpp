@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkTrackingVolume.h"
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
@@ -14,55 +32,49 @@ mitk::TrackingVolume::TrackingVolume()
   //####################################################################
 
   }
-/**
- * NOT IMPLEMENTED YET!
- * @return Returns true if the point "punkt" is inside the trackingvolume. Be sure that the coordinates of "punkt" are in the tracking coordination system!
- */
+
+/* TODO: implemenation of method
 bool mitk::TrackingVolume::IsInside(mitk::Point3D itkNotUsed(punkt))
   {
+  //NOT IMPLEMENTED YET!
   return false;
   }
-/**
- * \brief Sets the trackingvolume by hand. Only use this method if your specific trackingvolume is not supported by this class.
- */
-void mitk::TrackingVolume::SetManualVolume(vtkPolyData* manualVolume)
+*/
+
+void mitk::TrackingVolume::SetVolumeManually(vtkPolyData* volume)
   {
-  this->SetVtkPolyData(manualVolume);
+  this->SetVtkPolyData(volume);
   }
 
-/**
- * \brief Sets the typ of the trackingdevice. The dimensions of the trackingvolume are updated directly.
- */
 bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
   {
   //Dateinamen Anhand des Trackingsystems bestimmen:
   std::string filename = "";
-  if (type == mitk::ClaronMicron)
+
+  switch(type)
     {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-    }
-  else if (type == mitk::IntuitiveDaVinci)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
-    }
-  else if (type == mitk::NDIAurora)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-    }
-  else if (type == mitk::NDIPolaris)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-    }
-  else if (type == mitk::TrackingSystemNotSpecified)
-    {
-    filename = mitk::StandardFileLocations::GetInstance()->FindFile("StandardVolume.stl");
+    case mitk::ClaronMicron:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
+      break;
+    case mitk::IntuitiveDaVinci:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
+      break;
+    case mitk::NDIAurora:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
+      break;
+    case mitk::NDIPolaris:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
+      break;
+    default:
+      filename = mitk::StandardFileLocations::GetInstance()->FindFile("StandardVolume.stl");
+      break;  
     }
 
   //Die Surface aus der Datei einlesen:
   mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
   stlReader->SetFileName( filename.c_str() );
   stlReader->Update();
-  if ( stlReader->GetOutput() != NULL ) 
+  if ( stlReader->GetOutput() != NULL )
     {
     this->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
     return true;

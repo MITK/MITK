@@ -23,7 +23,7 @@ mitk::NavigationDataTransformFilter::NavigationDataTransformFilter()
 : mitk::NavigationDataToNavigationDataFilter()
 {
   m_Transform = NULL;
-  
+
   //transform to rotate orientation 
   m_QuatOrgRigidTransform = itk::QuaternionRigidTransform<double>::New();
   m_QuatTmpTransform = itk::QuaternionRigidTransform<double>::New();
@@ -75,7 +75,7 @@ void mitk::NavigationDataTransformFilter::GenerateData()
       itkPointIn[0] = tempCoordinateIn[0];
       itkPointIn[1] = tempCoordinateIn[1];
       itkPointIn[2] = tempCoordinateIn[2];
-     
+
       //do the transform
       itkPointOut = m_Transform->TransformPoint( itkPointIn );  
 
@@ -93,12 +93,12 @@ void mitk::NavigationDataTransformFilter::GenerateData()
 
 
       itk::Matrix<float,3,3> rotMatrix = m_Transform->GetMatrix();
-      
+
       itk::Matrix<double,3,3> rotMatrixD;
-     
+
       for (unsigned int i = 0; i < 3; i++)
-         for( int j=0; j < 3; ++j )
-        rotMatrixD[i][j] = rotMatrix[i][j];
+        for( int j=0; j < 3; ++j )
+          rotMatrixD[i][j] = rotMatrix[i][j];
 
       m_QuatOrgRigidTransform->SetRotationMatrix(rotMatrixD);
       m_QuatTmpTransform->SetRotation(vnlQuatIn);

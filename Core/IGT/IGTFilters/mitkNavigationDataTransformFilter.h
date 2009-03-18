@@ -36,7 +36,7 @@ namespace mitk {
   */
   class NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
   {
-  
+
   public:
 
     typedef itk::Rigid3DTransform< float > TransformType;
@@ -49,10 +49,10 @@ namespace mitk {
     *
     */
     void SetRigid3DTransform(TransformType::Pointer transform);
- 
+
 
   protected:
-    
+
     NavigationDataTransformFilter();
     virtual ~NavigationDataTransformFilter();
 

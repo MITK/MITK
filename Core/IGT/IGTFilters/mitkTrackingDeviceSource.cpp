@@ -126,7 +126,8 @@ void mitk::TrackingDeviceSource::Connect()
   if (m_TrackingDevice->OpenConnection() == false)
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not open connection to tracking device");
   
-  //add the output now that we know how many tools are connected
+  /* NDI Aurora needs a connection to discover tools that are connected to it. 
+     Therefore we need to create outputs for these tools now */
   if (m_TrackingDevice->GetType() == mitk::NDIAurora)
     this->CreateOutputs();
 }

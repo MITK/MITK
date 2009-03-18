@@ -4,7 +4,19 @@
 #include <math.h>
 #include <mitkVector.h>
 
-mitk::ClaronInterface::ClaronInterface(std::string calibrationDir, std::string toolFilesDir)
+mitk::ClaronInterface::ClaronInterface()
+{
+  isTracking = false;
+  sprintf(calibrationDir,"No calibration dir set yet");
+  sprintf(markerDir,"No marker dir set yet");
+}
+
+mitk::ClaronInterface::~ClaronInterface()
+{
+
+}
+
+void mitk::ClaronInterface::Initialize(std::string calibrationDir, std::string toolFilesDir)
 {
   sprintf(this->calibrationDir, calibrationDir.c_str());
   sprintf(this->markerDir,toolFilesDir.c_str());

@@ -124,7 +124,7 @@ namespace mitk
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
   
     std::vector<ClaronTool::Pointer> m_AllTools; ///< vector holding all tools
-    ClaronInterface* m_Device; ///< represents the interface to the tracking hardware
+    ClaronInterface::Pointer m_Device; ///< represents the interface to the tracking hardware
     itk::MultiThreader::Pointer m_MultiThreader;
     int m_ThreadID;
 

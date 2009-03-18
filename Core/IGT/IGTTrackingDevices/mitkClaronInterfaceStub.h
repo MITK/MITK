@@ -22,6 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <string>
 
+#include "mitkCommon.h"
+
+#include <itkObject.h>
+#include <itkObjectFactory.h>
+
 typedef int mtHandle;
 
 namespace mitk
@@ -34,15 +39,19 @@ namespace mitk
   *			 not installed and so we only have stubs here. These stubs send error messages when you try to call the
   *			 methods.
   */
-  class ClaronInterface
+  class ClaronInterface : public itk::Object
   {
   public:
 
+    mitkClassMacro(ClaronInterface,itk::Object);
+    itkNewMacro(Self);
     /**
-    * \brief This is only a stub, please switch the cmake variable USE_MICRON_TRACKER to on if you want to use the Microntracker.
+    * @brief Initialization of claroninterface.
+    * @param calibrationDir   The directory where the device can find the camera calibration file.
+    * @param toolFilesDir     The directory for the tool files.
     */
-    ClaronInterface(std::string calibrationDir, std::string toolFilesDir);
-
+    void Initialize(std::string calibrationDir, std::string toolFilesDir);
+    
     /**
     * \brief This is only a stub, please switch the cmake variable USE_MICRON_TRACKER to on if you want to use the Microntracker.
     */
@@ -93,6 +102,16 @@ namespace mitk
     *         so returns false in this case.
     */
     bool IsMicronTrackerInstalled();
+
+  protected:
+    /**
+    * @brief standard constructor
+    */
+    ClaronInterface();
+    /**
+    * @brief standard destructor
+    */
+    ~ClaronInterface();
 
   };
 }//mitk

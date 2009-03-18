@@ -78,8 +78,6 @@ namespace mitk
     claronToolHandle m_ToolHandle;
     /** @brief  Variable which holds the Tool's calibration name */
     std::string m_CalibrationName;
-    /** @brief not in use in this class!!*/
-    ClaronInterface* m_Device;
     /** @brief Variable to check filename's format and to get back complete filename */
     std::string m_Filename;
   };

@@ -63,6 +63,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
   this->m_MultiThreader = itk::MultiThreader::New();
   m_ThreadID = 0;
 
+  m_Device = mitk::ClaronInterface::New();
   //############################# standard directories (from cmake) ##################################
   if (m_Device->IsMicronTrackerInstalled())
     {
@@ -79,6 +80,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
     m_CalibrationDir = "Error - No Microntracker installed";
     }
   //##################################################################################################
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
 }
 
 
@@ -102,9 +104,10 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
   //restart the Microntracker, so it will load the new tool files
   m_Device->StopTracking();
-  delete m_Device;
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+  //delete m_Device;
 
-  m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
@@ -167,7 +170,8 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   //Create the temp directory
   itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
-  m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   returnValue = m_Device->StartTracking();
 
   if (returnValue)
@@ -177,10 +181,14 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   else
   {
     //reset everything
-    if(m_Device == NULL)
-      m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+    if(m_Device.IsNull())
+    {
+      m_Device = mitk::ClaronInterface::New();
+      m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+    }
+      //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
     m_Device->StopTracking();
-    delete m_Device;
+    //delete m_Device;
     this->SetMode(Setup);
     m_ErrorMessage = "Error while trying to open connection to the MicronTracker 2!";
   }
@@ -195,7 +203,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
     return true;
 
   returnValue = m_Device->StopTracking();
-  delete m_Device;
+  //delete m_Device;
 
   //delete the temporary directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());

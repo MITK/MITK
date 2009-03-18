@@ -60,17 +60,20 @@ class mitkTrackingVolumeTestClass
     MITK_TEST_CONDITION(myTrackingVolume->SetTrackingDeviceType(mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:")
     }
 
+    
+    /* The isInside() method is not implemented so far. So please activate is as soon as this is done. Then we could load 
+     * the different Trackingvolumens (Polaris, MicronTracker, etc) and test different points inside and outside in this method. 
     static void TestIsInside()
     {
     MITK_TEST_OUTPUT(<< "---- Testing IsInside-Method ----")
     mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    /* The isInside() method is not implemented so far. As soon as this is done, we could load the different Trackingvolumens (Polaris,
-     *  MicronTracker, etc) and test different points inside and outside in this method. 
-     */
+    
     mitk::Point3D p1;
     mitk::FillVector3D(p1,(float)0,(float)0,(float)0);
     MITK_TEST_CONDITION(myTrackingVolume->IsInside(p1)==false,"... successfull")
     }
+    */
+   
 
     static void TestManualVolume()
     {
@@ -79,7 +82,7 @@ class mitkTrackingVolumeTestClass
     try
       {
       vtkPolyData* myPolyData = vtkPolyData::New();
-      myTrackingVolume->SetManualVolume(myPolyData);
+      myTrackingVolume->SetVolumeManually(myPolyData);
       }
     catch(...)
       {
@@ -100,7 +103,7 @@ int mitkTrackingVolumeTest(int /* argc */, char* /*argv*/[])
   mitkTrackingVolumeTestClass::TestNDIAuroraTrackingVolume();
   mitkTrackingVolumeTestClass::TestNDIPolarisTrackingVolume();
   mitkTrackingVolumeTestClass::TestIntuitiveDaVinciTrackingVolume();
-  mitkTrackingVolumeTestClass::TestIsInside();
+  //mitkTrackingVolumeTestClass::TestIsInside(); Activate this code when method isInside() is implemented!
   mitkTrackingVolumeTestClass::TestManualVolume();
     
   MITK_TEST_END() 

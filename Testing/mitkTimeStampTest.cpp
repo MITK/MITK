@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "itkObject.h"
 
-#include <time.h>
+//#include <time.h>
 
 
 

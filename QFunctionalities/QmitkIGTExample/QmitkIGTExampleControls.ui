@@ -118,6 +118,12 @@
                                     <height>0</height>
                                 </size>
                             </property>
+                            <property name="frameShape">
+                                <enum>LineEditPanel</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Sunken</enum>
+                            </property>
                         </widget>
                     </hbox>
                 </widget>

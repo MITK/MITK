@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 #include "mitkTrackingTypes.h"
 #include "mitkVector.h"
+#include "mitkGeometry3D.h"
 
 #include <itksys/SystemTools.hxx>
 
@@ -241,7 +242,7 @@ void QmitkIGTExample::OnTestNavigation()
     /* check if there is a Offset parameter stored in our propertylist. If none is found, use hardcoded value */
     if (GetFunctionalityOptionsList()->GetPropertyValue<mitk::Vector3D>("NavigationDataDisplacementFilter_Offset", offset) == false)  // search for Offset parameter
     {
-      mitk::FillVector3D(offset, -1800.0, 1.0, 2.0);  // nothing found, use default value
+      mitk::FillVector3D(offset, 1.0, 1.0, 1800.0);  // nothing found, use default value
       GetFunctionalityOptionsList()->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(offset));  // add the property to the list
     }
     m_Displacer->SetOffset(offset);
@@ -252,30 +253,36 @@ void QmitkIGTExample::OnTestNavigation()
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
     int numberOfOutputs = m_Source->GetNumberOfOutputs();
-    for (unsigned int i = 0; i < numberOfOutputs; i++)
-      m_Displacer->SetInput(i,m_Source->GetOutput(i));  // connect filter
+    //for (unsigned int i = 0; i < numberOfOutputs; i++)
+    //  m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
     int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
-    for (int i = 0; i < numberOfDisplacerOutputs; i++)
-      visualizer->SetInput(i, m_Displacer->GetOutput(i));
+    //for (int i = 0; i < numberOfDisplacerOutputs; i++)
+    //  visualizer->SetInput(i, m_Displacer->GetOutput(i));
+    for (int i = 0; i < numberOfOutputs; i++)
+      visualizer->SetInput(i, m_Source->GetOutput(i));
 
     //create new BaseData for each tool
+    //for (int i = 0; i<m_Displacer->GetToolCount();i++)
     for (int i = 0; i<m_Source->GetToolCount();i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
+      float scale[] = {40.0, 40.0, 10 + 10.0 * i};
+      mitkToolData->GetGeometry()->SetSpacing(scale);
       //create DataTreeNode
       mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
       toolNode->SetData(mitkToolData);
-      toolNode->SetName("MyInstrument");
-      toolNode->SetColor(0.0,1.0,0.0);//green
+      toolNode->SetName(QString("MyInstrument %1").arg(i).latin1());
+      toolNode->SetColor(0.2, 0.2 * i ,0.9 - 0.1 * i); //different colors
       toolNode->Modified();
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
-      visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
-      m_EndOfPipeline = visualizer;
+      //visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
+      visualizer->SetBaseData(m_Source->GetOutput(i), mitkToolData);
     }
+    m_EndOfPipeline = visualizer;
 
     //start the tracking
     m_Source->StartTracking();
@@ -348,7 +355,7 @@ void QmitkIGTExample::OnMeasure()
     output << "--------------------------------------------" << std::endl;
     out->append(output.str().c_str()); // append string stream content to gui widget
   }
-
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
   WaitCursorOff();
 }
 

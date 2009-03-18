@@ -89,6 +89,12 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
       return;
     }
 
+    //store the current scaling to set it after transformation
+    mitk::Vector3D spacing = data->GetGeometry()->GetSpacing();
+    //clear spacing of data to be able to set it again afterwards
+    float scale[] = {1.0, 1.0, 1.0};
+    data->GetGeometry()->SetSpacing(scale);
+
     /*now bring quaternion to affineTransform by using vnl_Quaternion*/
     affineTransform->SetIdentity();
 
@@ -107,14 +113,19 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     static AffineTransform3D::MatrixType m;
     mitk::TransferMatrix(quatTransform->GetMatrix(), m);
     affineTransform->SetMatrix(m);
-
-
+    
     ///*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
     mitk::Vector3D pos;
     pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
     affineTransform->SetOffset(pos);
     affineTransform->Modified();
-    data->GetGeometry()->TransferItkToVtkTransform();
+    
+    //set the transform to data
+    data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+
+    //set the original spacing to keep scaling of the geometrical object
+    data->GetGeometry()->SetSpacing(spacing);
+
     data->GetGeometry()->Modified();
     data->Modified();
 

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 #include "QmitkIGTExample.h"
 #include "QmitkIGTExampleControls.h"
@@ -123,9 +123,9 @@ void QmitkIGTExample::Activated()
 
 
 
-void QmitkIGTExample::OnTestTracking() 
-{  
-  WaitCursorOn(); 
+void QmitkIGTExample::OnTestTracking()
+{
+  WaitCursorOn();
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the tracking component", 4000);
 
   /* Create & set up tracking device with a tool */
@@ -134,7 +134,7 @@ void QmitkIGTExample::OnTestTracking()
   {
     out->append("Error creating tracking device. Did you provide all parameters?");
     return;
-  }  
+  }
 
   /* open the connection, load tools that are connected (active Tools) and initialize them. */
   out->append("opening connection to tracking device");
@@ -148,7 +148,7 @@ void QmitkIGTExample::OnTestTracking()
   else
     out->append("successfully connected to tracking device.");
 
-  /* Start tracking */ 
+  /* Start tracking */
   if (tracker->StartTracking() == false)
   {
     out->append(QString("ERROR during StartTracking(): ") + QString(tracker->GetErrorMessage()));
@@ -163,7 +163,7 @@ void QmitkIGTExample::OnTestTracking()
   out->append("Starting to read tracking data for all tools.");
   mitk::TrackingTool* t = NULL;
   mitk::Point3D pos;
-  mitk::Quaternion quat;  
+  mitk::Quaternion quat;
   for(int i=0; i< 50; i++)  // 50x
   {
     for (unsigned int i = 0; i < tracker->GetToolCount(); i++) // each tool
@@ -176,7 +176,7 @@ void QmitkIGTExample::OnTestTracking()
       if (t->IsDataValid() == true)
       {
         t->GetPosition(pos);
-        output << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl; 
+        output << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl;
         t->GetQuaternion(quat);
         output << "  Orientation   = <" << quat[0] << ", " << quat[1] << ", " << quat[2] << ", " << quat[3] << ">" << std::endl;
         output << "  TrackingError = " << t->GetTrackingError() << std::endl;
@@ -189,8 +189,8 @@ void QmitkIGTExample::OnTestTracking()
     //wait a little to get the next coordinate
     itksys::SystemTools::Delay(100);
   }
-  
-  /* Stop tracking */ 
+
+  /* Stop tracking */
   out->append("Enough tracking data. Stopping tracking now.");
   if (tracker->StopTracking() == false)
   {
@@ -202,10 +202,10 @@ void QmitkIGTExample::OnTestTracking()
   else
     out->append("Tracking stopped.");
 
-  /* Stop tracking */ 
+  /* Stop tracking */
   if (tracker->CloseConnection() == false)
   {
-    out->append(QString("ERROR during CloseConnection(): ") + QString(tracker->GetErrorMessage()));  
+    out->append(QString("ERROR during CloseConnection(): ") + QString(tracker->GetErrorMessage()));
     WaitCursorOff();
     return;
   }
@@ -217,7 +217,7 @@ void QmitkIGTExample::OnTestTracking()
 }
 
 
-void QmitkIGTExample::OnTestNavigation() 
+void QmitkIGTExample::OnTestNavigation()
 {
   WaitCursorOn(); // always good to show the user that the application is processing and will not react to user input for a while
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the navigation component", 4000);  // tell the user what you are doing
@@ -246,21 +246,21 @@ void QmitkIGTExample::OnTestNavigation()
     }
     m_Displacer->SetOffset(offset);
     /* --> Instead, we could have just called m_Displacer->SetParameters(GetFunctionalityOptionsList()) to set all stored parameters at once.
-       But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the 
+       But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the
        persistence mechanism or by the GUI Event ParametersChanged that calls the OnParametersChanged() method)
     */
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
     int numberOfOutputs = m_Source->GetNumberOfOutputs();
     for (unsigned int i = 0; i < numberOfOutputs; i++)
-      m_Displacer->SetInput(i,m_Source->GetOutput(i));  // connect filter 
+      m_Displacer->SetInput(i,m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
     int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
     for (int i = 0; i < numberOfDisplacerOutputs; i++)
       visualizer->SetInput(i, m_Displacer->GetOutput(i));
-    
+
     //create new BaseData for each tool
     for (int i = 0; i<m_Source->GetToolCount();i++)
     {
@@ -302,7 +302,7 @@ void QmitkIGTExample::OnTestNavigation()
   m_Controls->m_MeasureContinuously->show();
   m_Controls->m_MeasureContinuously->setEnabled(true);
   m_Controls->m_StopBtn->show();
-  m_Controls->m_StopBtn->setEnabled(true);  
+  m_Controls->m_StopBtn->setEnabled(true);
   m_Controls->m_StartTrackingButton->setEnabled(false);
   m_Controls->m_StartNavigationButton->setEnabled(false);
 
@@ -315,7 +315,7 @@ void QmitkIGTExample::OnTestNavigation()
 
 
 void QmitkIGTExample::OnMeasure()
-{  
+{
   if (m_EndOfPipeline.IsNull())
   {
     out->append("Tracking Pipeline not ready.");
@@ -339,7 +339,7 @@ void QmitkIGTExample::OnMeasure()
     output << "Navigation Data of Output " << i << ":" << std::endl;
     if (nd->IsDataValid() == true)
     {
-      output << "  Position    = " << nd->GetPosition() << std::endl; 
+      output << "  Position    = " << nd->GetPosition() << std::endl;
       output << "  Orientation = <" << nd->GetOrientation() << std::endl;
       output << "  Error       = " << nd->GetCovErrorMatrix() << std::endl;
     }
@@ -376,7 +376,7 @@ void QmitkIGTExample::OnStop()
   m_Controls->m_MeasureContinuously->hide();
   m_Controls->m_MeasureContinuously->setEnabled(false);
   m_Controls->m_StopBtn->hide();
-  m_Controls->m_StopBtn->setEnabled(false);  
+  m_Controls->m_StopBtn->setEnabled(false);
   m_Controls->m_StartTrackingButton->setEnabled(true);
   m_Controls->m_StartNavigationButton->setEnabled(true);
   try
@@ -387,7 +387,7 @@ void QmitkIGTExample::OnStop()
     m_Source->Disconnect();
     m_Source = NULL;
     WaitCursorOff();
-  }  
+  }
   catch (std::exception& exp)
   {
     out->append(QString("ERROR during cleanup of filter pipeline: ") + QString(exp.what()));
@@ -395,7 +395,7 @@ void QmitkIGTExample::OnStop()
     WaitCursorOff();
     return;
   }
-  out->append("Filter pipeline stopped and destroyed. Everything is back to normal."); 
+  out->append("Filter pipeline stopped and destroyed. Everything is back to normal.");
   WaitCursorOff();
 }
 
@@ -408,13 +408,13 @@ void QmitkIGTExample::OnParametersChanged()
 
   /* get all filter parameters in the form of a PropertyList and pass it to the filter */
   //m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
-  //out->append("Using GUI Parameters for Displacement Filter."); 
+  //out->append("Using GUI Parameters for Displacement Filter.");
 
-  /* add the filter PropertyList to the functionalities List, so that it will be saved on application exit 
+  /* add the filter PropertyList to the functionalities List, so that it will be saved on application exit
      this will be restored at the next restart.
   */
   GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_Parameters.GetPointer(), true);
-  out->append("Adding GUI parameters to persistence storage."); 
+  out->append("Adding GUI parameters to persistence storage.");
   m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
   out->append("Setting GUI parameters to filter.");
 }
@@ -457,6 +457,10 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
       trackerNDI->Add6DTool(toolNDI);
       out->append(QString("adding tool 'MyInstrument' with rom file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
       tool1 = toolNDI;
+    }
+    else if (selectedDevice == "NDI Aurora")
+    {
+    	trackerNDI->SetType(mitk::NDIAurora);
     }
     tracker = trackerNDI;
   }

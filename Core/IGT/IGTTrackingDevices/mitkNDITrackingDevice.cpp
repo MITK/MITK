@@ -27,9 +27,9 @@ const unsigned char CR = 0xD; // == '\r' - carriage return
 
 
 mitk::NDITrackingDevice::NDITrackingDevice() :
-TrackingDevice(), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600), 
-m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1), 
-m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard), 
+TrackingDevice(), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
+m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
+m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard),
 m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX),
 m_ErrorMessage(""), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_SerialCommunication(NULL)
 {
@@ -77,7 +77,7 @@ bool mitk::NDITrackingDevice::UpdateTool(mitk::NDIPassiveTool* tool)
 mitk::NDITrackingDevice::~NDITrackingDevice()
 {
   /* stop tracking and disconnect from tracking device */
-  if (GetMode() == Tracking) 
+  if (GetMode() == Tracking)
   {
     this->StopTracking();
   }
@@ -98,7 +98,7 @@ mitk::NDITrackingDevice::~NDITrackingDevice()
     m_SerialCommunication->ClearSendBuffer();
     m_SerialCommunication->CloseConnection();
     m_SerialCommunication = NULL;
-  } 	
+  }
 }
 
 
@@ -243,7 +243,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
 
   if (returnvalue == 0)
     return SERIALSENDERROR;
-  else 
+  else
     return NDIOKAY;
 }
 
@@ -272,7 +272,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
   std::string m;
   m_SerialCommunicationMutex->Lock();
   long returnvalue = m_SerialCommunication->Receive(m, 1);
-  m_SerialCommunicationMutex->Unlock();  
+  m_SerialCommunicationMutex->Unlock();
 
   if ((returnvalue == 0) ||(m.size() != 1))
     return SERIALRECEIVEERROR;
@@ -357,9 +357,9 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
   /* Read answer from tracking device (RESETBE6F) */
   static const std::string reset("RESETBE6F\r");
-  std::string answer = "";  
+  std::string answer = "";
   this->Receive(&answer, reset.length());  // read answer (should be RESETBE6F)
-  this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset    
+  this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset
   if (reset.compare(answer) != 0)  // check for RESETBE6F
   {
     this->SetErrorMessage("Hardware Reset of tracking device did not work");
@@ -369,7 +369,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       m_SerialCommunication->CloseConnection();
       m_SerialCommunication = NULL;
     }
-    return false;  
+    return false;
   }
 
   /* Now the tracking device is reset, start initialization */
@@ -382,14 +382,14 @@ bool mitk::NDITrackingDevice::OpenConnection()
   {
     this->SetErrorMessage("Could not set comm settings in trackingdevice");
     this->m_ModeMutex->Unlock();
-    return false;  
+    return false;
   }
 
   //after changing COMM wait at least 100ms according to NDI Api documentation page 31
   itksys::SystemTools::Delay(500);
 
   /* now change local com settings accordingly */
-  m_SerialCommunication->CloseConnection();  
+  m_SerialCommunication->CloseConnection();
   m_SerialCommunication->SetBaudRate(m_BaudRate);
   m_SerialCommunication->SetDataBits(m_DataBits);
   m_SerialCommunication->SetParity(m_Parity);
@@ -404,11 +404,11 @@ bool mitk::NDITrackingDevice::OpenConnection()
   {
     this->SetErrorMessage("Could not initialize the tracking device");
     this->m_ModeMutex->Unlock();
-    return false;  
+    return false;
   }
 
   /****  Optional Polaris specific code, Work in progress
-  // start diagnostic mode 
+  // start diagnostic mode
   returnvalue = m_DeviceProtocol->DSTART();
   if (returnvalue != NDIOKAY)
   {
@@ -417,7 +417,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   else    // we are in diagnostic mode
   {
-  // initialize extensive IR checking 
+  // initialize extensive IR checking
   returnvalue = m_DeviceProtocol->IRINIT();
   if (returnvalue != NDIOKAY)
   {
@@ -433,7 +433,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   }
   if (intenseIR == true)
   // do something - warn the user, raise exception, write to protocol or similar
-  std::cout << "Warning: Intense infrared light detected. Accurate tracking will probably not be possible.\n"; 
+  std::cout << "Warning: Intense infrared light detected. Accurate tracking will probably not be possible.\n";
 
   // stop diagnictic mode
   returnvalue = m_DeviceProtocol->DSTOP();
@@ -446,7 +446,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   *** end of optional polaris code ***/
 
   /**
-  * now add tools to the tracking system 
+  * now add tools to the tracking system
   **/
 
   /* POLARIS: first search for port handles that need to be freed: e.g. because of a reset of the tracking system */
@@ -471,13 +471,13 @@ bool mitk::NDITrackingDevice::OpenConnection()
       if (returnvalue != NDIOKAY)
       {
         this->SetErrorMessage("Could not free all Port Handles");
-        //        return false; // could not free all Handles      
+        //        return false; // could not free all Handles
       }
     }
   }
 
   /**
-  * POLARIS: initialize the tools that were added manually 
+  * POLARIS: initialize the tools that were added manually
   **/
   m_ToolsMutex->Lock();
   portHandle.clear();
@@ -513,7 +513,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
           returnvalue = m_DeviceProtocol->PENA(&portHandle, (*it)->GetTrackingPriority()); // Enable tool
           if (returnvalue != NDIOKAY)
           {
-            this->SetErrorMessage((std::string("Could not enable port '") + portHandle + 
+            this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
               std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str());
             this->m_ModeMutex->Unlock();
             this->m_ToolsMutex->Unlock();
@@ -526,7 +526,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_ToolsMutex->Unlock();
 
   /**
-  * Polaris active tools or Aurora sensors: get the list of all ports/sensors that are connected and have to be initialized 
+  * Polaris active tools or Aurora sensors: get the list of all ports/sensors that are connected and have to be initialized
   **/
   portHandle.clear();
   returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
@@ -549,7 +549,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     newTool->SetTrackingPriority(mitk::Dynamic);
     //newTool->SetDataValid(false); not valid by default so doesn't have to be set
 
-    //set a name for identification 
+    //set a name for identification
     std::string sumString = std::string("Port") + ph;
     newTool->SetToolName(sumString.c_str());
 
@@ -558,7 +558,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     {
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not initialize port '") + ph + 
+        this->SetErrorMessage((std::string("Could not initialize port '") + ph +
           std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
         this->m_ModeMutex->Unlock();
         return false;
@@ -567,14 +567,18 @@ bool mitk::NDITrackingDevice::OpenConnection()
       returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not enable port '") + ph + 
+        this->SetErrorMessage((std::string("Could not enable port '") + ph +
           std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
         this->m_ModeMutex->Unlock();
         return false;
       }
     }
-    if (this->Add6DTool(newTool) == false) 
-      this->SetErrorMessage("Error beim einfügen eines Tools");
+
+    //we have to unlock here to avoid a deadlock with another try to lock this mutex
+    m_ModeMutex->Unlock();
+    if (this->Add6DTool(newTool) == false)
+      this->SetErrorMessage("Error beim einfï¿½gen eines Tools");
+    m_ModeMutex->Lock();
   }
 
   /*POLARIS: set the illuminator activation rate */
@@ -593,7 +597,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   this->SetErrorMessage("");
   this->m_ModeMutex->Unlock();
 
-  return true; 
+  return true;
 }
 
 
@@ -614,7 +618,7 @@ bool mitk::NDITrackingDevice::CloseConnection()
     m_SerialCommunication = NULL;
   }
   m_ModeMutex->Unlock();
-  return true; 
+  return true;
 }
 
 
@@ -633,11 +637,11 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
   NDITrackingDevice *trackingDevice = (NDITrackingDevice*)pInfo->UserData;
   if (trackingDevice != NULL)
   {
-    if (trackingDevice->GetOperationMode() == ToolTracking6D) 
+    if (trackingDevice->GetOperationMode() == ToolTracking6D)
       trackingDevice->TrackTools();             // call TrackTools() from the original object
     else if (trackingDevice->GetOperationMode() == MarkerTracking3D)
       trackingDevice->TrackMarkerPositions();   // call TrackMarkerPositions() from the original object
-    else if (trackingDevice->GetOperationMode() == ToolTracking5D)  
+    else if (trackingDevice->GetOperationMode() == ToolTracking5D)
       trackingDevice->TrackMarkerPositions(); // call TrackMarkerPositions() from the original object
     else if (trackingDevice->GetOperationMode() == HybridTracking)
     {
@@ -685,7 +689,7 @@ void mitk::NDITrackingDevice::TrackTools()
   /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
   m_TrackingFinishedMutex->Lock();
 
-  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
@@ -704,7 +708,7 @@ void mitk::NDITrackingDevice::TrackTools()
         break;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();  
+    this->m_StopTrackingMutex->Lock();
     localStopTracking = m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
   }
@@ -733,7 +737,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (returnvalue != NDIOKAY)
     return;
 
-  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
@@ -747,7 +751,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
       std::cout << "Error in POS3D: could not read data. Possibly no markers present." << std::endl;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();  
+    this->m_StopTrackingMutex->Lock();
     localStopTracking = m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
   }
@@ -774,7 +778,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   if (returnvalue != NDIOKAY)
     return;
 
-  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+  bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
@@ -788,7 +792,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
       std::cout << "Error in TX: could not read data. Possibly no markers present." << std::endl;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();  
+    this->m_StopTrackingMutex->Lock();
     localStopTracking = m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
   }
@@ -878,7 +882,7 @@ bool mitk::NDITrackingDevice::Add6DTool(mitk::NDIPassiveTool* tool)
       returnvalue = m_DeviceProtocol->PINIT(&newPortHandle);
       if (returnvalue != NDIOKAY)
       {
-        this->SetErrorMessage((std::string("Could not initialize port '") + newPortHandle + 
+        this->SetErrorMessage((std::string("Could not initialize port '") + newPortHandle +
           std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str());
         return false;
       }
@@ -888,7 +892,7 @@ bool mitk::NDITrackingDevice::Add6DTool(mitk::NDIPassiveTool* tool)
         returnvalue = m_DeviceProtocol->PENA(&newPortHandle, p->GetTrackingPriority()); // Enable tool
         if (returnvalue != NDIOKAY)
         {
-          this->SetErrorMessage((std::string("Could not enable port '") + newPortHandle + 
+          this->SetErrorMessage((std::string("Could not enable port '") + newPortHandle +
             std::string("' for tool '")+ p->GetToolName() + std::string("'")).c_str());
           return false;
         }
@@ -900,7 +904,7 @@ bool mitk::NDITrackingDevice::Add6DTool(mitk::NDIPassiveTool* tool)
     m_ToolsMutex->Unlock();
     this->Modified();
     return true;
-  } 
+  }
   else if (this->GetMode() == Setup)
   {
     /* In Setup mode, we only add it to the list, so that OpenConnection() can add it later */
@@ -920,11 +924,11 @@ bool mitk::NDITrackingDevice::Remove6DTool(mitk::NDIPassiveTool* tool)
   if (tool == NULL)
     return false;
   std::string portHandle = tool->GetPortHandle();
-  /* a valid portHandle has length 2. If a valid handle exists, the tool is already added to the tracking device, so we have to remove it there 
+  /* a valid portHandle has length 2. If a valid handle exists, the tool is already added to the tracking device, so we have to remove it there
   if the connection to the tracking device has already been established.
   */
   if ((portHandle.length() == 2) && (this->GetMode() == Ready))  // do not remove a tool in tracking mode
-  {  
+  {
     NDIErrorCode returnvalue;
     returnvalue = m_DeviceProtocol->PHF(&portHandle);
     if (returnvalue != NDIOKAY)

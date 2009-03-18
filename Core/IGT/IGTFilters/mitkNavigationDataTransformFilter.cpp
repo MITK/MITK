@@ -52,6 +52,8 @@ void mitk::NavigationDataTransformFilter::GenerateData()
   }
   else
   {
+    this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
+
     /* update outputs with tracking data from tools */
     for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
     {

@@ -206,7 +206,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
   //------------------------catch exception --> source points < 3------------------------
 
-  bool exceptionCatched=false;
+  bool exceptionCaught=false;
 
   try
   {
@@ -216,15 +216,17 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     mitk::PointSet::Pointer sourcePoints2 = mitk::PointSet::New();
     myFilter2->SetSourcePoints(sourcePoints2);
   }
-  catch (std::exception& /*exp*/)
-  {  exceptionCatched=true; /*std::cout<<exp.what()<<std::endl;*/}
+  catch (std::exception& exp)
+  {  
+    exceptionCaught=true; 
+  }
 
-  MITK_TEST_CONDITION(exceptionCatched,"Testing source points < 3");
+  MITK_TEST_CONDITION(exceptionCaught,"Testing source points < 3");
 
   //------------------------catch exception --> target points < 3------------------------
   try
   { 
-    exceptionCatched=false;
+    exceptionCaught=false;
     mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter3 = mitk::NavigationDataLandmarkTransformFilter::New();
     MITK_TEST_CONDITION_REQUIRED(myFilter3.IsNotNull(),"Testing instantiation for second filter");
 
@@ -233,8 +235,8 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     
   }
   catch (std::exception& /*exp*/)
-  {  exceptionCatched=true;  /*std::cout<<exp.what()<<std::endl;*/ }
-  MITK_TEST_CONDITION(exceptionCatched,"Testing target points < 3");
+  {  exceptionCaught=true;  /*std::cout<<exp.what()<<std::endl;*/ }
+  MITK_TEST_CONDITION(exceptionCaught,"Testing target points < 3");
 
 
   //------------------------rotate orientation------------------------

@@ -45,7 +45,7 @@ namespace mitk {
     mitkClassMacro(InternalTrackingTool, TrackingTool);
     itkNewMacro(Self);
     virtual void GetPosition(mitk::Point3D& position) const;    ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)
-    virtual void GetQuaternion(mitk::Quaternion& orientation) const;  ///< returns the current orientation of the tool as a quaternion (in the tracking device coordinate system)
+    virtual void GetOrientation(mitk::Quaternion& orientation) const;  ///< returns the current orientation of the tool as a quaternion (in the tracking device coordinate system)
     virtual bool Enable();                                      ///< enablea the tool, so that it will be tracked. Returns true if enabling was successfull
     virtual bool Disable();                                     ///< disables the tool, so that it will not be tracked anymore. Returns true if disabling was successfull
     virtual bool IsEnabled() const;                             ///< returns whether the tool is enabled or disabled
@@ -53,8 +53,8 @@ namespace mitk {
     virtual float GetTrackingError() const;                     ///< return one value that corresponds to the overall tracking error. The dimension of this value is specific to each tracking device
     virtual void SetToolName(const std::string _arg);           ///< Sets the name of the tool
     virtual void SetToolName(const char* _arg);                 ///< Sets the name of the tool
-    virtual void SetPosition(float x, float y, float z);        ///< sets the position
-    virtual void SetQuaternion(float q0, float qx, float qy, float qz); ///< sets the orientation as a quaternion
+    virtual void SetPosition(mitk::Point3D position);           ///< sets the position
+    virtual void SetOrientation(mitk::Quaternion orientation);  ///< sets the orientation as a quaternion
     virtual void SetTrackingError(float error);                 ///< sets the tracking error
     virtual void SetDataValid(bool _arg);                       ///< sets if the tracking data (position & Orientation) is valid
     virtual void SetErrorMessage(const char* _arg);             ///< sets the error message
@@ -64,8 +64,8 @@ namespace mitk {
     InternalTrackingTool();
     virtual ~InternalTrackingTool();
     
-    float m_Position[3];      ///< holds the position of the tool
-    float m_Orientation[4];   ///< holds the orientation of the tool 
+    Point3D m_Position;      ///< holds the position of the tool
+    Quaternion m_Orientation;   ///< holds the orientation of the tool 
     float m_TrackingError;    ///< holds the tracking error of the tool
     bool m_Enabled;           ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;         ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data

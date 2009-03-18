@@ -155,7 +155,7 @@ void TestTracking()
       {
         t->GetPosition(pos);
         std::cout << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl; 
-        t->GetQuaternion(quat);
+        t->GetOrientation(quat);
         std::cout << "  Orientation   = <" << quat[0] << ", " << quat[1] << ", " << quat[2] << ", " << quat[3] << ">" << std::endl;
         std::cout << "  TrackingError = " << t->GetTrackingError() << std::endl;
       }

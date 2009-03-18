@@ -52,10 +52,10 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // generate a random orientation for the navigation data
   mitk::NavigationData::OrientationType orientation;
-  orientation[0] = rand()%2;
-  orientation[1] = rand()%2;
-  orientation[2] = rand()%2;
-  orientation[3] = rand()%2;
+  orientation[0] = (rand()%1000)/1000.0;
+  orientation[1] = (rand()%1000)/1000.0;
+  orientation[2] = (rand()%1000)/1000.0;
+  orientation[3] = (rand()%1000)/1000.0;
 
   // generate a random error for the navigation data
   mitk::ScalarType error = rand()%10;

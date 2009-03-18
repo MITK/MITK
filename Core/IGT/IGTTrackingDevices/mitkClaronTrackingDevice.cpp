@@ -270,18 +270,25 @@ void mitk::ClaronTrackingDevice::TrackTools()
         {
           currentTool->SetDataValid(true);
           //get tip position of tool:
-          std::vector<double> pos = this->GetDevice()->GetTipPosition(currentTool->GetToolHandle());
+          std::vector<double> pos_vector = this->GetDevice()->GetTipPosition(currentTool->GetToolHandle());
           //write tip position into tool:
-          currentTool->SetPosition(pos[0], pos[1], pos[2]);
+          mitk::Point3D pos;
+          pos[0] = pos_vector[0];
+          pos[1] = pos_vector[1];
+          pos[2] = pos_vector[2];
+          currentTool->SetPosition(pos);
           //get tip quaternion of tool
           std::vector<double> quat = this->GetDevice()->GetTipQuaternions(currentTool->GetToolHandle());
           //write tip quaternion into tool
-          currentTool->SetQuaternion(quat[0], quat[1], quat[2], quat[3]);
+          mitk::Quaternion orientation(quat[0], quat[1], quat[2], quat[3]);
+          currentTool->SetOrientation(orientation);
         }
         else
         {
-          currentTool->SetPosition(0,0,0);
-          currentTool->SetQuaternion(0,0,0,0);
+          mitk::Point3D origin;
+          origin.Fill(0);
+          currentTool->SetPosition(origin);
+          currentTool->SetOrientation(mitk::Quaternion(0,0,0,0));
           currentTool->SetDataValid(false);
         }
       }

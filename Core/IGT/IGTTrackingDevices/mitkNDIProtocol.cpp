@@ -810,8 +810,13 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
         converter.str("");
 
         /* copy local values to the tool */
-        tool->SetQuaternion(localQuat[0], localQuat[1], localQuat[2], localQuat[3]);
-        tool->SetPosition(localPos[0], localPos[1], localPos[2]);
+        mitk::Quaternion orientation(localQuat[1], localQuat[2], localQuat[3], localQuat[0]);
+        tool->SetOrientation(orientation);
+        mitk::Point3D position;
+        position[0] = localPos[0];
+        position[1] = localPos[1];
+        position[2] = localPos[2];
+        tool->SetPosition(position);
         tool->SetTrackingError(localError);
         tool->SetErrorMessage("");
         tool->SetDataValid(true);
@@ -1056,8 +1061,13 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
         converter.str("");
 
         /* copy local values to the tool */
-        tool->SetQuaternion(localQuat[0], localQuat[1], localQuat[2], localQuat[3]);
-        tool->SetPosition(localPos[0], localPos[1], localPos[2]);
+        mitk::Quaternion orientation(localQuat[1], localQuat[2], localQuat[3], localQuat[0]);
+        tool->SetOrientation(orientation);
+        mitk::Point3D position;
+        position[0] = localPos[0];
+        position[1] = localPos[1];
+        position[2] = localPos[2];
+        tool->SetPosition(position);
         tool->SetTrackingError(localError);
         tool->SetErrorMessage("");
         tool->SetDataValid(true);

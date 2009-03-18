@@ -178,7 +178,7 @@ void QmitkIGTExample::OnTestTracking()
       {
         t->GetPosition(pos);
         output << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl;
-        t->GetQuaternion(quat);
+        t->GetOrientation(quat);
         output << "  Orientation   = <" << quat[0] << ", " << quat[1] << ", " << quat[2] << ", " << quat[3] << ">" << std::endl;
         output << "  TrackingError = " << t->GetTrackingError() << std::endl;
       }
@@ -475,6 +475,7 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
   {
     mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
     toolMT->LoadFile(m_Controls->GetToolFileName());
+    
     mitk::ClaronTrackingDevice::Pointer trackerMT = mitk::ClaronTrackingDevice::New();
     out->append("creating Micron Tracker");
 

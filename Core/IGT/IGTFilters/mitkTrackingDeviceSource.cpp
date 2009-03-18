@@ -78,7 +78,7 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetPosition(p);
 
     mitk::NavigationData::OrientationType o;
-    t->GetQuaternion(o);
+    t->GetOrientation(o);
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());

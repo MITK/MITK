@@ -77,23 +77,13 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
 }
 
 
-void mitk::InternalTrackingTool::SetPosition(float x, float y, float z)
+void mitk::InternalTrackingTool::SetPosition(Point3D position)
 {
   m_MyMutex->Lock();
   bool modified = false;
-  if (m_Position[0] != x)
+  if (m_Position!=position)
   {
-    m_Position[0] = x;
-    modified = true;
-  }
-  if (m_Position[1] != y)
-  {
-    m_Position[1] = y;
-    modified = true;
-  }
-  if (m_Position[2] != z)
-  {
-    m_Position[2] = z;
+    m_Position = position;
     modified = true;
   }
   if (modified == true)
@@ -102,39 +92,21 @@ void mitk::InternalTrackingTool::SetPosition(float x, float y, float z)
 }
 
 
-void mitk::InternalTrackingTool::GetQuaternion(mitk::Quaternion& orientation) const
+void mitk::InternalTrackingTool::GetOrientation(mitk::Quaternion& orientation) const
 {
   m_MyMutex->Lock();
-  orientation.r() = m_Orientation[0];
-  orientation.x() = m_Orientation[1];
-  orientation.y() = m_Orientation[2];
-  orientation.z() = m_Orientation[3];
+  orientation = m_Orientation;
   m_MyMutex->Unlock();
 }
 
 
-void mitk::InternalTrackingTool::SetQuaternion(float q0, float qx, float qy, float qz)
+void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   m_MyMutex->Lock();
   bool modified = false;
-  if (m_Orientation[0] != q0)
+  if (m_Orientation!=orientation)
   {
-    m_Orientation[0] = q0;
-    modified = true;
-  }
-  if (m_Orientation[1] != qx)
-  {
-    m_Orientation[1] = qx;
-    modified = true;
-  }
-  if (m_Orientation[2] != qy)
-  {
-    m_Orientation[2] = qy;
-    modified = true;
-  }
-  if (m_Orientation[3] != qz)
-  {
-    m_Orientation[3] = qz;
+    m_Orientation = orientation;
     modified = true;
   }
   if (modified == true)

@@ -159,9 +159,9 @@ void mitk::RandomTrackingDevice::TrackTools()
         quat[2] = (double)(rand()%100) / 100;
         quat[3] = (double)(rand()%100) / 100;
 
-        currentTool->SetPosition(pos[0], pos[1], pos[2]);
+        currentTool->SetPosition(pos);
 
-        currentTool->SetQuaternion(quat[0], quat[1], quat[2], quat[3]);
+        currentTool->SetOrientation(quat);
         currentTool->SetDataValid(true);
       }
 

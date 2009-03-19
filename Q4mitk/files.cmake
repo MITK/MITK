@@ -41,7 +41,8 @@ SET(CPP_FILES
  QmitkLineEditLevelWindowWidget.cpp
  QmitkSliderLevelWindowWidget.cpp
  QmitkLevelWindowWidget.cpp
- QmitkPointListWidget.cpp
+ #QmitkPointListWidget.cpp
+ QmitkPointListView.cpp
  QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
@@ -108,7 +109,8 @@ SET(MOC_H_FILES
  QmitkSlicesInterpolator.h
  QmitkStdMultiWidget.h
  QmitkColorTransferFunctionCanvas.h
- QmitkPointListWidget.h
+ #QmitkPointListWidget.h
+ QmitkPointListView.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h

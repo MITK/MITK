@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkPointListWidget.h"
+#include "QmitkPointListView.h"
 
 #include "QmitkPointListModel.h"
 #include "QmitkStdMultiWidget.h"

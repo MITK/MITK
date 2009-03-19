@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  * @brief Time stamp in milliseconds
+  * \brief Time stamp in milliseconds
   *
   * This class provides a timestamp in milliseconds.
   * It is a Singleton class, that internally uses a mitkRealTimeClock() for
@@ -49,7 +49,7 @@ namespace mitk {
   * When the TimeStamp is no longer used, you can call StopTracking(). This erases the pointer to the device 
   * and the offset. When all devices have "stopped tracking" the reference-time and the current-time are reset to 0.
   *
-  *@ingroup Navigation
+  * \ingroup IGT
   */
   class TimeStamp : public itk::Object
   {

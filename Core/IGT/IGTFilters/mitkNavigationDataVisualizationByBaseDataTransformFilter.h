@@ -30,7 +30,7 @@ namespace mitk {
   *
   * Derived from NavigationDataVisualizationFilter
   *
-  * \ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataVisualizationByBaseDataTransformFilter : public NavigationDataVisualizationFilter
   {
@@ -56,22 +56,22 @@ namespace mitk {
 
     /** 
     * \brief Set the BaseData of the tool specified by the given NavigationData
-    * @param data The BaseData to be associated to the NavigationData nd
-    * @param nd Specification of the NavigationData tha data will be associated to
-    * @return Returns true if the tool has been added, false otherwise.
+    * \param data The BaseData to be associated to the NavigationData nd
+    * \param nd Specification of the NavigationData tha data will be associated to
+    * \return Returns true if the tool has been added, false otherwise.
     */
     bool SetBaseData(const NavigationData* nd, BaseData* data);
     
     /** 
     * \brief Get the BaseData of the tool specified by the given NavigationData
-    * @param nd The NavigationData of the BaseData that has to be returned
-    * @return Returns the desired BaseData if the NavigationData could be found; Returns Null if no nd was found or if nd is NULL.
+    * \param nd The NavigationData of the BaseData that has to be returned
+    * \return Returns the desired BaseData if the NavigationData could be found; Returns Null if no nd was found or if nd is NULL.
     */
     const BaseData* GetBaseData(const NavigationData* nd) const;
   
     /** 
     *\brief Get the number of added BaseData associated to NavigationData 
-    * @return Returns the size of the internal map
+    * \return Returns the size of the internal map
     */
     RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
     {return m_RepresentationList.size();}
@@ -84,12 +84,12 @@ namespace mitk {
 
   protected:
     /**
-    * @brief Constructor
+    * \brief Constructor
     **/
     NavigationDataVisualizationByBaseDataTransformFilter();
 
     /**
-    * @brief Destructor
+    * \brief Destructor
     **/
     ~NavigationDataVisualizationByBaseDataTransformFilter();
 

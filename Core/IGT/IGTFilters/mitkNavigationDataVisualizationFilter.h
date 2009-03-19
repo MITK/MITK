@@ -30,7 +30,7 @@ namespace mitk {
   /**Documentation
   * \brief NavigationDataVisualizationFilter represents the superclass of all IGT Filters that visualize NavigationData
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataVisualizationFilter : public mitk::NavigationDataToNavigationDataFilter
   {

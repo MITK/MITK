@@ -32,7 +32,7 @@ namespace mitk {
   * \brief NavigationDataTransformFilter applies an user-defined rigid transformation on navigation data objects. 
   * Input navigation data are mapped 1:1 on output navigation data.  To run the filter SetRigid3DTransform(TransformType::Pointer transform) has to be called first.
   *
-  * \ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
   {

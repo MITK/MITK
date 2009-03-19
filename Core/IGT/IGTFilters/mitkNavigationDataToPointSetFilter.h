@@ -32,7 +32,7 @@ namespace mitk {
   *
   * The mode can be set with the SetOperationMode(OperationMode mode) method. Default is Mode3D.
   *
-  * \ingroup Navigation
+  * \ingroup IGT
   * 
   */
   class NavigationDataToPointSetFilter : public PointSetSource

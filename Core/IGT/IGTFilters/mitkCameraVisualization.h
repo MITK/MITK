@@ -30,7 +30,7 @@ namespace mitk {
   * The camera of the renderer will be placed at the position of the navigation data and oriented according to
   * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */  class CameraVisualization : public NavigationDataVisualizationFilter
   {
   public:

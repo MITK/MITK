@@ -39,7 +39,7 @@ namespace mitk
  * another call of StartRecording() the output is written to a new file with incremented filename counter. 
  *
  * \warning At the moment there is no check if the file is already existing and this class will override existing files.
- * \ingroup Navigation
+ * \ingroup IGT
  */
 
 class NavigationDataRecorder : public itk::ProcessObject

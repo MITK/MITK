@@ -34,10 +34,11 @@ namespace mitk
   typedef int claronToolHandle;
   
   /** Documentation:
-  *   @brief An object of this class represents the interface to the MicronTracker. Normally the methods of this class
+  *   \brief An object of this class represents the interface to the MicronTracker. Normally the methods of this class
   *          are calling the c-functions which are provided by the MTC-library. But in this case the MicronTracker is
   *			 not installed and so we only have stubs here. These stubs send error messages when you try to call the
   *			 methods.
+  *   \ingroup IGT
   */
   class ClaronInterface : public itk::Object
   {
@@ -46,9 +47,9 @@ namespace mitk
     mitkClassMacro(ClaronInterface,itk::Object);
     itkNewMacro(Self);
     /**
-    * @brief Initialization of claroninterface.
-    * @param calibrationDir   The directory where the device can find the camera calibration file.
-    * @param toolFilesDir     The directory for the tool files.
+    * \brief Initialization of claroninterface.
+    * \param calibrationDir   The directory where the device can find the camera calibration file.
+    * \param toolFilesDir     The directory for the tool files.
     */
     void Initialize(std::string calibrationDir, std::string toolFilesDir);
     
@@ -98,18 +99,18 @@ namespace mitk
     void GrabFrame();
 
     /**
-    * @return Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
+    * \return Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
     *         so returns false in this case.
     */
     bool IsMicronTrackerInstalled();
 
   protected:
     /**
-    * @brief standard constructor
+    * \brief standard constructor
     */
     ClaronInterface();
     /**
-    * @brief standard destructor
+    * \brief standard destructor
     */
     ~ClaronInterface();
 

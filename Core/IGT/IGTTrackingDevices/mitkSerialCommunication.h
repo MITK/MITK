@@ -45,7 +45,7 @@ namespace mitk
   * effect. You have to close the connection using CloseConnection() and then reopen it with 
   * the new parameters with OpenConnection().
   * 
-  * @ingroup IGT
+  * \ingroup IGT
   */
   class SerialCommunication : public itk::Object
   {

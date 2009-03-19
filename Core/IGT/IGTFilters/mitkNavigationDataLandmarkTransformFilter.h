@@ -36,7 +36,7 @@ namespace mitk {
   * Before executing the filter SetSourcePoints and SetTargetPoints must be called. 
   * If source or target pointSet were changed the corresponding setMethod has to be called again, to apply the changes.
   *
-  * \ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
   {
@@ -44,7 +44,7 @@ namespace mitk {
     mitkClassMacro(NavigationDataLandmarkTransformFilter, NavigationDataToNavigationDataFilter);
 
     /**
-    * @brief Constructor 
+    * \brief Constructor 
     **/
     NavigationDataLandmarkTransformFilter();
     virtual ~NavigationDataLandmarkTransformFilter();

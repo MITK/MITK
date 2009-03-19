@@ -32,7 +32,7 @@ namespace mitk
   *
   * Abstract class that defines the methods that are common for all tracking tools.
   * 
-  * @ingroup Tracking
+  * \ingroup IGT
   */
   class TrackingTool : public itk::Object
   {

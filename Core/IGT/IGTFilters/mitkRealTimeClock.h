@@ -28,12 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**Documentation
-  * @brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
+  * \brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
   *
   * This class provides the basic interface, that all RealTimeClocks have in common.
   * 
   *
-  *@ingroup Navigation
+  * \ingroup IGT
   */
 
   class RealTimeClock : public itk::Object

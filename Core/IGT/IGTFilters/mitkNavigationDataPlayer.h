@@ -38,7 +38,7 @@ namespace mitk {
   * For pausing the player call Pause(). A call of Resume() will continue the playing.
   *
   *
-  * \ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataPlayer : public NavigationDataSource
   {

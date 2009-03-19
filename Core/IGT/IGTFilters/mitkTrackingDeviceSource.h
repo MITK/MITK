@@ -40,7 +40,7 @@ namespace mitk {
   * \warning If a tool is removed from the tracking device, there will be a mismatch between
   * the outputs and the tool number!
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */
   class TrackingDeviceSource : public NavigationDataSource
   {
@@ -114,7 +114,7 @@ namespace mitk {
     virtual void GenerateData();
     
     /**
-    * @brief Create the necessary outputs given by m_TrackingDevice
+    * \brief Create the necessary outputs given by m_TrackingDevice
     **/
     void CreateOutputs();
 

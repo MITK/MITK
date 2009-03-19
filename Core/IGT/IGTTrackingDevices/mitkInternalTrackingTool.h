@@ -36,7 +36,7 @@ namespace mitk {
   * mitk::MicroBirdTrackingDevice uses this class to manage its tools. Other tracking devices
   * uses specialized versions of this class (e.g. mitk::NDITrackingTool)
   *
-  * @ingroup IGT
+  * \ingroup IGT
   */
   class InternalTrackingTool : public TrackingTool
   {

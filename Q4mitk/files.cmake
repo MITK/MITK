@@ -121,7 +121,7 @@ SET(MOC_H_FILES
  QmitkMaterialEditor.h
  QmitkMaterialShowcase.h
  QmitkPropertiesTableEditor.h
- QmitkPrimitiveMovieNavigatorWidget.h´
+ QmitkPrimitiveMovieNavigatorWidget.h
  QmitkDataStorageComboBox.h
 )
 

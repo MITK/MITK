@@ -39,8 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itksys/SystemTools.hxx>
 
-#include <vtkConeSource.h>
-
 #include <qaction.h>
 #include <qcombobox.h>
 #include <qpushbutton.h>
@@ -253,23 +251,20 @@ void QmitkIGTExample::OnTestNavigation()
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
     int numberOfOutputs = m_Source->GetNumberOfOutputs();
-    //for (unsigned int i = 0; i < numberOfOutputs; i++)
-    //  m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
+    for (unsigned int i = 0; i < numberOfOutputs; i++)
+      m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
     int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
-    //for (int i = 0; i < numberOfDisplacerOutputs; i++)
-    //  visualizer->SetInput(i, m_Displacer->GetOutput(i));
-    for (int i = 0; i < numberOfOutputs; i++)
-      visualizer->SetInput(i, m_Source->GetOutput(i));
+    for (int i = 0; i < numberOfDisplacerOutputs; i++)
+      visualizer->SetInput(i, m_Displacer->GetOutput(i));
 
     //create new BaseData for each tool
-    //for (int i = 0; i<m_Displacer->GetToolCount();i++)
-    for (int i = 0; i<m_Source->GetToolCount();i++)
+    for (int i = 0; i < numberOfDisplacerOutputs;i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
-      float scale[] = {40.0, 40.0, 10 + 10.0 * i};
+      float scale[] = {20.0, 20.0, 20.0};
       mitkToolData->GetGeometry()->SetSpacing(scale);
       //create DataTreeNode
       mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
@@ -279,8 +274,7 @@ void QmitkIGTExample::OnTestNavigation()
       toolNode->Modified();
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
-      //visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
-      visualizer->SetBaseData(m_Source->GetOutput(i), mitkToolData);
+      visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
     }
     m_EndOfPipeline = visualizer;
 
@@ -328,8 +322,6 @@ void QmitkIGTExample::OnMeasure()
     out->append("Tracking Pipeline not ready.");
     return;
   }
-  WaitCursorOn();
-
   /* Get the output of the last filter with output and print it */
   for (unsigned int i = 0; i < m_EndOfPipeline->GetNumberOfOutputs(); ++i) // for all outputs of the filter
   {
@@ -356,7 +348,6 @@ void QmitkIGTExample::OnMeasure()
     out->append(output.str().c_str()); // append string stream content to gui widget
   }
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
-  WaitCursorOff();
 }
 
 

@@ -280,7 +280,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
           //get tip quaternion of tool
           std::vector<double> quat = this->GetDevice()->GetTipQuaternions(currentTool->GetToolHandle());
           //write tip quaternion into tool
-          mitk::Quaternion orientation(quat[0], quat[1], quat[2], quat[3]);
+          mitk::Quaternion orientation(quat[1], quat[2], quat[3], quat[0]);
           currentTool->SetOrientation(orientation);
         }
         else

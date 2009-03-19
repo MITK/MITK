@@ -81,7 +81,7 @@
                                 <cstring>m_TransformFrame</cstring>
                             </property>
                             <property name="enabled">
-                                <bool>false</bool>
+                                <bool>true</bool>
                             </property>
                             <property name="font">
                                 <font>
@@ -193,7 +193,7 @@
                                         <cstring>m_TransformBox</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="duplicatesEnabled">
                                         <bool>false</bool>
@@ -204,7 +204,7 @@
                                         <cstring>m_TransformWidgetStack</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <widget class="QWidget">
                                         <property name="name">
@@ -974,7 +974,7 @@
                                                                     <cstring>m_CenterForInitializerAffine</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="title">
                                                                     <string>Center for Initializer</string>
@@ -991,7 +991,7 @@
                                                                             <cstring>m_GeometryAffine</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Geometry</string>
@@ -1002,7 +1002,7 @@
                                                                             <cstring>m_MomentsAffine</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Moments</string>
@@ -1338,7 +1338,7 @@
                                                             <cstring>m_CenterForInitializerFixedCenterOfRotationAffine</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -1355,7 +1355,7 @@
                                                                     <cstring>m_GeometryFixedCenterOfRotationAffine</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -1366,7 +1366,7 @@
                                                                     <cstring>m_MomentsFixedCenterOfRotationAffine</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -1708,7 +1708,7 @@
                                                                     <cstring>m_CenterForInitializerRigid3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="title">
                                                                     <string>Center for Initializer</string>
@@ -1725,7 +1725,7 @@
                                                                             <cstring>m_GeometryRigid3D</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Geometry</string>
@@ -1736,7 +1736,7 @@
                                                                             <cstring>m_MomentsRigid3D</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Moments</string>
@@ -1958,7 +1958,7 @@
                                                             <cstring>m_CenterForInitializerEuler3D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -1975,7 +1975,7 @@
                                                                     <cstring>m_GeometryEuler3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -1986,7 +1986,7 @@
                                                                     <cstring>m_MomentsEuler3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -2206,7 +2206,7 @@
                                                             <cstring>m_CenterForInitializerCenteredEuler3D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -2223,7 +2223,7 @@
                                                                     <cstring>m_GeometryCenteredEuler3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -2234,7 +2234,7 @@
                                                                     <cstring>m_MomentsCenteredEuler3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -2473,7 +2473,7 @@
                                                             <cstring>m_CenterForInitializerQuaternionRigid</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -2490,7 +2490,7 @@
                                                                     <cstring>m_GeometryQuaternionRigid</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -2501,7 +2501,7 @@
                                                                     <cstring>m_MomentsQuaternionRigid</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -2664,7 +2664,7 @@
                                                             <cstring>m_CenterForInitializerVersor</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -2681,7 +2681,7 @@
                                                                     <cstring>m_GeometryVersor</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -2692,7 +2692,7 @@
                                                                     <cstring>m_MomentsVersor</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -2912,7 +2912,7 @@
                                                             <cstring>m_CenterForInitializerVersorRigid3D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -2929,7 +2929,7 @@
                                                                     <cstring>m_GeometryVersorRigid3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -2940,7 +2940,7 @@
                                                                     <cstring>m_MomentsVersorRigid3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -3325,7 +3325,7 @@
                                                             <cstring>m_CenterForInitializerScaleSkewVersorRigid3D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -3342,7 +3342,7 @@
                                                                     <cstring>m_GeometryScaleSkewVersorRigid3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -3353,7 +3353,7 @@
                                                                     <cstring>m_MomentsScaleSkewVersorRigid3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -3592,7 +3592,7 @@
                                                             <cstring>m_CenterForInitializerSimilarity3D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -3609,7 +3609,7 @@
                                                                     <cstring>m_GeometrySimilarity3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -3620,7 +3620,7 @@
                                                                     <cstring>m_MomentsSimilarity3D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -3783,7 +3783,7 @@
                                                             <cstring>m_CenterForInitializerRigid2D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -3800,7 +3800,7 @@
                                                                     <cstring>m_GeometryRigid2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -3811,7 +3811,7 @@
                                                                     <cstring>m_MomentsRigid2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -4041,7 +4041,7 @@
                                                             <cstring>m_CenterForInitializerCenteredRigid2D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -4058,7 +4058,7 @@
                                                                     <cstring>m_GeometryCenteredRigid2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -4069,7 +4069,7 @@
                                                                     <cstring>m_MomentsCenteredRigid2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -4232,7 +4232,7 @@
                                                             <cstring>m_CenterForInitializerEuler2D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -4249,7 +4249,7 @@
                                                                     <cstring>m_GeometryEuler2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -4260,7 +4260,7 @@
                                                                     <cstring>m_MomentsEuler2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -4504,7 +4504,7 @@
                                                             <cstring>m_CenterForInitializerSimilarity2D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -4521,7 +4521,7 @@
                                                                     <cstring>m_GeometrySimilarity2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -4532,7 +4532,7 @@
                                                                     <cstring>m_MomentsSimilarity2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -4820,7 +4820,7 @@
                                                             <cstring>m_CenterForInitializerCenteredSimilarity2D</cstring>
                                                         </property>
                                                         <property name="enabled">
-                                                            <bool>false</bool>
+                                                            <bool>true</bool>
                                                         </property>
                                                         <property name="title">
                                                             <string>Center for Initializer</string>
@@ -4843,7 +4843,7 @@
                                                                     <cstring>m_GeometryCenteredSimilarity2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Geometry</string>
@@ -4854,7 +4854,7 @@
                                                                     <cstring>m_MomentsCenteredSimilarity2D</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="text">
                                                                     <string>Moments</string>
@@ -4907,7 +4907,7 @@
                                 <cstring>m_MetricFrame</cstring>
                             </property>
                             <property name="enabled">
-                                <bool>false</bool>
+                                <bool>true</bool>
                             </property>
                             <property name="font">
                                 <font>
@@ -4994,7 +4994,7 @@
                                         <cstring>m_MetricBox</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="duplicatesEnabled">
                                         <bool>false</bool>
@@ -5005,7 +5005,7 @@
                                         <cstring>m_MetricWidgetStack</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <widget class="QWidget">
                                         <property name="name">
@@ -5971,7 +5971,7 @@
                                 <cstring>m_OptimizerFrame</cstring>
                             </property>
                             <property name="enabled">
-                                <bool>false</bool>
+                                <bool>true</bool>
                             </property>
                             <property name="font">
                                 <font>
@@ -6063,7 +6063,7 @@
                                         <cstring>m_OptimizerBox</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="duplicatesEnabled">
                                         <bool>false</bool>
@@ -6074,7 +6074,7 @@
                                         <cstring>m_OptimizerWidgetStack</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="margin">
                                         <number>0</number>
@@ -6778,7 +6778,7 @@
                                                                     <cstring>buttonGroup2</cstring>
                                                                 </property>
                                                                 <property name="enabled">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </property>
                                                                 <property name="title">
                                                                     <string>Type</string>
@@ -6806,7 +6806,7 @@
                                                                                     <cstring>m_FletchReevesFRPR</cstring>
                                                                                 </property>
                                                                                 <property name="enabled">
-                                                                                    <bool>false</bool>
+                                                                                    <bool>true</bool>
                                                                                 </property>
                                                                                 <property name="text">
                                                                                     <string>Fletch Reeves</string>
@@ -6820,7 +6820,7 @@
                                                                                     <cstring>m_PolakRibiereFRPR</cstring>
                                                                                 </property>
                                                                                 <property name="enabled">
-                                                                                    <bool>false</bool>
+                                                                                    <bool>true</bool>
                                                                                 </property>
                                                                                 <property name="text">
                                                                                     <string>Polak Ribiere</string>
@@ -7838,7 +7838,7 @@
                                                     <cstring>m_SPSAFrame</cstring>
                                                 </property>
                                                 <property name="enabled">
-                                                    <bool>false</bool>
+                                                    <bool>true</bool>
                                                 </property>
                                                 <property name="frameShape">
                                                     <enum>StyledPanel</enum>
@@ -7877,7 +7877,7 @@
                                                                             <cstring>textLabel29</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>a:</string>
@@ -7888,7 +7888,7 @@
                                                                             <cstring>textLabel30</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>A:</string>
@@ -7899,7 +7899,7 @@
                                                                             <cstring>textLabel31</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Alpha:</string>
@@ -7910,7 +7910,7 @@
                                                                             <cstring>textLabel33</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Gamma:</string>
@@ -7921,7 +7921,7 @@
                                                                             <cstring>textLabel32</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>c:</string>
@@ -7932,7 +7932,7 @@
                                                                             <cstring>textLabel34</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Tolerance:</string>
@@ -7943,7 +7943,7 @@
                                                                             <cstring>textLabel35</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>State Of Convergence Decay Rate:</string>
@@ -7954,7 +7954,7 @@
                                                                             <cstring>textLabel36</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Minimum Number of Iterations:</string>
@@ -7965,7 +7965,7 @@
                                                                             <cstring>textLabel37</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Number Of Perturbations:</string>
@@ -7976,7 +7976,7 @@
                                                                             <cstring>textLabel38</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>Number of Iterations:</string>
@@ -7997,7 +7997,7 @@
                                                                             <cstring>m_aSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>1.0</string>
@@ -8011,7 +8011,7 @@
                                                                             <cstring>m_ASPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>10.0</string>
@@ -8025,7 +8025,7 @@
                                                                             <cstring>m_AlphaSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>0.602</string>
@@ -8039,7 +8039,7 @@
                                                                             <cstring>m_cSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>0.0001</string>
@@ -8053,7 +8053,7 @@
                                                                             <cstring>m_GammaSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>0.101</string>
@@ -8067,7 +8067,7 @@
                                                                             <cstring>m_ToleranceSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>1e-5</string>
@@ -8081,7 +8081,7 @@
                                                                             <cstring>m_StateOfConvergenceDecayRateSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>0.5</string>
@@ -8095,7 +8095,7 @@
                                                                             <cstring>m_MinimumNumberOfIterationsSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>10</string>
@@ -8109,7 +8109,7 @@
                                                                             <cstring>m_NumberOfPerturbationsSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>1</string>
@@ -8123,7 +8123,7 @@
                                                                             <cstring>m_IterationsSPSA</cstring>
                                                                         </property>
                                                                         <property name="enabled">
-                                                                            <bool>false</bool>
+                                                                            <bool>true</bool>
                                                                         </property>
                                                                         <property name="text">
                                                                             <string>200</string>
@@ -8293,7 +8293,7 @@
                                         <cstring>m_Maximize</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="text">
                                         <string>Maximize Optimizer Value</string>
@@ -8336,7 +8336,7 @@
                                 <cstring>m_InterpolatorFrame</cstring>
                             </property>
                             <property name="enabled">
-                                <bool>false</bool>
+                                <bool>true</bool>
                             </property>
                             <property name="font">
                                 <font>
@@ -8368,7 +8368,7 @@
                                         <cstring>m_InterpolatorBox</cstring>
                                     </property>
                                     <property name="enabled">
-                                        <bool>false</bool>
+                                        <bool>true</bool>
                                     </property>
                                     <property name="duplicatesEnabled">
                                         <bool>false</bool>

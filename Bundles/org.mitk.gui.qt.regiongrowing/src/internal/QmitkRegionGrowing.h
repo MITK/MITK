@@ -28,9 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkRegionGrowingControls.h"
 #include "../regiongrowingDll.h"
 
-//class QmitkStdMultiWidget;
-//class QmitkRegionGrowingControls;
-
 /*!
 
   \brief QmitkRegionGrowing 
@@ -49,25 +46,14 @@ class REGIONGROWING_EXPORTS QmitkRegionGrowing : public QObject, public QmitkFun
   Q_OBJECT
   
   public:  
-  /// \brief Constructor  
-  QmitkRegionGrowing();
 
-  /// \brief Destructor  
+  QmitkRegionGrowing();
   virtual ~QmitkRegionGrowing();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation the widget containing the application   controls, like sliders, buttons etc.  
-  //virtual QWidget * CreateControlWidget(QWidget *parent);
-
-  ///// \brief Creation the applications main widget  
-  //virtual QWidget * CreateMainWidget(QWidget * parent);
-
   /// \brief Creation of the connections of main and control widget  
   virtual void CreateConnections();
-
-  /// \brief Creation of an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-  //virtual QAction * CreateAction(QActionGroup *parent);
 
   /// \brief Called when the functionality is activated
   virtual void Activated();
@@ -75,11 +61,11 @@ class REGIONGROWING_EXPORTS QmitkRegionGrowing : public QObject, public QmitkFun
   /// \brief Called when the functionality is deactivated
   virtual void Deactivated();
 
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
+  virtual void StdMultiWidgetNotAvailable();
+
 protected slots:  
   
-  /// \brief Called by the application whenever the data tree changes
-  void DataStorageChanged();
-
   /// \brief Called when the user clicks the GUI button
   void DoRegionGrowing();
 
@@ -93,12 +79,6 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
   void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
 
-  /*!  
-    Default main widget containing 4 windows showing 3   
-    orthogonal slices of the volume and a 3D render window  
-   */  
-  //QmitkStdMultiWidget * m_MultiWidget;
-
   /// \brief This node is created once and used for storing seed points
   mitk::DataTreeNode::Pointer m_PointSetNode;
 
@@ -107,8 +87,9 @@ protected:
 
   mitk::PointSetInteractor::Pointer m_Interactor;
 
-  Ui::QmitkRegionGrowingControls * m_Controls;
+  Ui::QmitkRegionGrowingControls* m_Controls;
 
+  QmitkStdMultiWidget* m_MultiWidget;
 };
 
 #endif // !defined(QmitkRegionGrowing_H__INCLUDED)

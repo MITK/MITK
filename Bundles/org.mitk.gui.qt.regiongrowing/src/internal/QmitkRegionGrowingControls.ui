@@ -18,12 +18,15 @@
   <property name="windowTitle" >
    <string>QmitkRegionGrowing</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
     <widget class="QmitkDataStorageComboBox" name="m_TreeNodeSelector" />
    </item>
    <item>
-    <widget class="QPushButton" name="btnRegionGrow" >
+    <widget class="QmitkPointListView" name="m_PointListWidget" />
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_ButtonRegionGrow" >
      <property name="toolTip" >
       <string>start dumb segmentation</string>
      </property>
@@ -65,7 +68,12 @@
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global" >QmitkDataStorageComboBox.h</header>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkPointListView</class>
+   <extends>QListView</extends>
+   <header>QmitkPointListView.h</header>
   </customwidget>
  </customwidgets>
  <includes>

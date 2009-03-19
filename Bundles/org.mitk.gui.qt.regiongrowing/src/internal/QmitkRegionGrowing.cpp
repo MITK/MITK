@@ -17,73 +17,50 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "QmitkRegionGrowing.h"
-#include "QmitkStdMultiWidget.h"
-//#include "QmitkTreeNodeSelector.h"
-#include "QmitkDataStorageComboBox.h"
-#include <mitkIDataStorageService.h>
-#include <mitkNodePredicateDataType.h>
 
-#include <qaction.h>
-#include <qmessagebox.h>
-
-#include "mitkColorProperty.h"
-#include "mitkDataStorage.h"
-#include "mitkDataTreeHelper.h"
-#include "mitkGlobalInteraction.h"
+#include "mitkNodePredicateDataType.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkProperties.h"
+#include "mitkColorProperty.h"
+#include "mitkGlobalInteraction.h"
+
+#include "QmitkDataStorageComboBox.h"
+#include "QmitkPointListView.h"
+#include "QmitkStdMultiWidget.h"
+
+#include <qmessagebox.h>
 
 #include <itkConnectedThresholdImageFilter.h>
 
-#include <itkCommand.h>
-
 #include <limits>
-
-
-
-//#include "icon.xpm"
 
 QmitkRegionGrowing::QmitkRegionGrowing()
 : QmitkFunctionality(), 
-  //m_MultiWidget(mitkStdMultiWidget), 
-  m_Controls(0)
+  m_Controls(0),
+  m_MultiWidget(NULL)
 {
-  //SetAvailability(true);
 }
 
 QmitkRegionGrowing::~QmitkRegionGrowing()
 {
 }
 
-//QWidget * QmitkRegionGrowing::CreateMainWidget(QWidget *parent)
-//{
-//  if ( m_MultiWidget == NULL )
-//  {
-//    m_MultiWidget = new QmitkStdMultiWidget( parent );
-//  }
-//  return m_MultiWidget;
-//}
-//
-//QWidget * QmitkRegionGrowing::CreateControlWidget(QWidget *parent)
-//{
-//  if (m_Controls == NULL)
-//  {
-//    m_Controls = new QmitkRegionGrowingControls(parent);
-//  }
-//  return m_Controls;
-//}
-
 void QmitkRegionGrowing::CreateQtPartControl(QWidget *parent)
 {
   if (!m_Controls)
   {
+    // create GUI widgets
     m_Controls = new Ui::QmitkRegionGrowingControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_TreeNodeSelector->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->m_TreeNodeSelector->SetPredicate(new mitk::NodePredicateDataType("Image"));
+    // define data type for combobox
+    m_Controls->m_TreeNodeSelector->SetDataStorage( this->GetDefaultDataStorage() );
+    m_Controls->m_TreeNodeSelector->SetPredicate( new mitk::NodePredicateDataType("Image") );
+
+    // if so, let the point set widget know about the multi widget (crosshair updates)
+    m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );
   }
 }
 
@@ -91,21 +68,8 @@ void QmitkRegionGrowing::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->btnRegionGrow), SIGNAL(clicked()), 
-                                              this, SLOT(DoRegionGrowing()) );
+    connect( (QObject*)(m_Controls->m_ButtonRegionGrow), SIGNAL(clicked()), this, SLOT(DoRegionGrowing()) );
   }
-}
-
-//QAction * QmitkRegionGrowing::CreateAction(QActionGroup *parent)
-//{
-//  QAction* action;
-//  action = new QAction( tr( "Quite simple region grower" ), QPixmap((const char**)icon_xpm), tr( "You will never see this" ), 0, parent, "QmitkRegionGrowing" );
-//  return action;
-//}
-
-void QmitkRegionGrowing::DataStorageChanged()
-{
-  //m_Controls->m_TreeNodeSelector->SetDataTreeNodeIterator( GetDataTreeIterator() );
 }
 
 void QmitkRegionGrowing::Activated()
@@ -120,67 +84,70 @@ void QmitkRegionGrowing::Activated()
     m_PointSet = mitk::PointSet::New();
     m_PointSetNode->SetData( m_PointSet );
     m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
+
     // add the pointset to the data tree (for rendering)
     GetDefaultDataStorage()->Add( m_PointSetNode );
-  }
-  // new behavior/interaction for the pointset node
 
+    // tell the GUI widget about out point set
+    m_Controls->m_PointListWidget->SetPointSet( m_PointSet );
+  }
+  
+  // new behavior/interaction for the pointset node
   mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
 }
 
 void QmitkRegionGrowing::Deactivated()
 {
+  // deactivate behavior/interaction for the pointset node
   mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);
   QmitkFunctionality::Deactivated();
 }
 
 void QmitkRegionGrowing::DoRegionGrowing()
 {
-  //const mitk::DataTreeIteratorClone* iterator = m_Controls->m_TreeNodeSelector->GetSelectedIterator(); // should never fail, the selection widget cares for that
-  //if (!iterator)
-  //{
-  //  // Nothing selected. Inform the user and return
-  //  QMessageBox::information( NULL, "Region growing functionality", "Please load and select an image before region growing.");
-  //  return;
-  //}
-    
   mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();
-  if ( node )
+  if (!node)
   {
-    // here we have a valid mitk::DataTreeNode
-
-    // a node itself is not very useful, we need its data item (the image)
-    mitk::BaseData* data = node->GetData();
-    if (data)
-    {
-      // test if this data item is an image or not (could also be a surface or something totally different)
-      mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-      if (image)
-      {
-        std::string name;
-        std::cout << "Performing region growing for image";
-        if (node->GetName(name))
-        {
-          // a property called "name" was found for this DataTreeNode
-          std::cout << "'" << name << "'";
-        }
-        std::cout << "." << std::endl;
-
-        // So we have an image. Let's see if the user has set some seed points already
-        if ( m_PointSet->GetSize() == 0 )
-        {
-          // no points there. Not good for region growing
-          QMessageBox::information( NULL, "Region growing functionality", "Please set some seed points inside the image first.\n(hold Shift key and click left mouse button inside the image.)");
-          return;
-        }
-
-        // actually perform region growing. Here we have both an image and some seed points
-        AccessByItk_1( image, ItkImageProcessing, image->GetGeometry() ); // some magic to call the correctly templated function
-
-      }
-    }
+    // Nothing selected. Inform the user and return
+    QMessageBox::information( NULL, "Region growing functionality", "Please load and select an image before region growing.");
+    return;
   }
 
+  // here we have a valid mitk::DataTreeNode
+
+  // a node itself is not very useful, we need its data item (the image)
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
+    if (image)
+    {
+      std::string name;
+      std::cout << "Performing region growing for image ";
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataTreeNode
+        std::cout << "'" << name << "'";
+      }
+      std::cout << "." << std::endl;
+
+      // So we have an image. Let's see if the user has set some seed points already
+      if ( m_PointSet->GetSize() == 0 )
+      {
+        // no points there. Not good for region growing
+        QMessageBox::information( NULL, "Region growing functionality", 
+                                        "Please set some seed points inside the image first.\n"
+                                        "(hold Shift key and click left mouse button inside the image.)"
+                                );
+        return;
+      }
+
+      // actually perform region growing. Here we have both an image and some seed points
+      AccessByItk_1( image, ItkImageProcessing, image->GetGeometry() ); // some magic to call the correctly templated function
+
+    }
+  }
 }
 
 template < typename TPixel, unsigned int VImageDimension >
@@ -198,13 +165,16 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   IndexType seedIndex;
   TPixel min( std::numeric_limits<TPixel>::max() );
   TPixel max( std::numeric_limits<TPixel>::min() );
-  for ( mitk::PointSet::PointsConstIterator pointsIterator = m_PointSet->GetPointSet()->GetPoints()->Begin(); // really nice syntax to get an interator for all points
-        pointsIterator != m_PointSet->GetPointSet()->GetPoints()->End();
+  mitk::PointSet::PointsContainer* points = m_PointSet->GetPointSet()->GetPoints();
+  for ( mitk::PointSet::PointsConstIterator pointsIterator = points->Begin(); 
+        pointsIterator != points->End();
         ++pointsIterator ) 
   {
     // first test if this point is inside the image at all
     if ( !imageGeometry->IsInside( pointsIterator.Value()) ) 
+    {
       continue;
+    }
 
     // convert world coordinates to image indices
     imageGeometry->WorldToIndex( pointsIterator.Value(), seedIndex);
@@ -238,17 +208,27 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   newNode->SetData( resultImage );
 
   // set some properties
-  mitk::DataTreeNodeFactory::SetDefaultImageProperties( newNode );
   newNode->SetProperty("binary", mitk::BoolProperty::New(true));
   newNode->SetProperty("name", mitk::StringProperty::New("dumb segmentation"));
   newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
-  //newNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+  newNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
   // add result to data tree
   mitk::DataStorage::GetInstance()->Add( newNode );
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+  
+void QmitkRegionGrowing::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+{
+  m_MultiWidget = &stdMultiWidget;
+  m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );
+}
+
+void QmitkRegionGrowing::StdMultiWidgetNotAvailable()
+{
+  m_MultiWidget = NULL;
 }
 

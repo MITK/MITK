@@ -263,7 +263,7 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
     return;
 
   switch(QMessageBox::question(m_Parent, tr("DataManager")
-    , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?")), QMessageBox::Yes | QMessageBox::No) 
+    , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No)) 
   {
     case QMessageBox::Yes: //Remove the item from view and tree
       this->GetDataStorage()->Remove(node);

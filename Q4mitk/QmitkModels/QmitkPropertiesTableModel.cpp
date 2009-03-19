@@ -70,8 +70,10 @@ void QmitkPropertiesTableModel::setPropertyList( mitk::PropertyList* _PropertyLi
   // set all other members to default values
   m_PropertyListElements.clear();
   m_PropertyModifiedObserverTags.clear();
+  m_PropertyDeleteObserverTags.clear();
   m_PropertyListModifiedObserverTag = 0;
-  m_SortDescending = false;
+  m_PropertyListDeleteObserverTag = 0;
+  //m_SortDescending = false;
 
   if(m_PropertyList != 0)
   {
@@ -80,6 +82,12 @@ void QmitkPropertiesTableModel::setPropertyList( mitk::PropertyList* _PropertyLi
       itk::MemberCommand<QmitkPropertiesTableModel>::New();
     propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListModified);
     m_PropertyListModifiedObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
+
+    itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyDeleteCommand =
+      itk::MemberCommand<QmitkPropertiesTableModel>::New();
+    propertyDeleteCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListDelete);
+    m_PropertyListDeleteObserverTag = m_PropertyList->AddObserver(itk::DeleteEvent(), propertyDeleteCommand);
+
 
     // subscribe for all properties modified events
     for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
@@ -91,11 +99,13 @@ void QmitkPropertiesTableModel::setPropertyList( mitk::PropertyList* _PropertyLi
 
       // subscribe for property change events
       itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyModifiedCommand =
-        itk::MemberCommand<QmitkPropertiesTableModel>::New();
+         itk::MemberCommand<QmitkPropertiesTableModel>::New();
       propertyModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
-
-      m_PropertyModifiedObserverTags[it->first] = it->second.first->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+ 
+       m_PropertyModifiedObserverTags[it->first] = it->second.first->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
     }      
+    // sort the list
+    this->sort(m_SortDescending);
   }
   
   // model was resetted
@@ -375,29 +385,11 @@ void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, con
 {
   if(!m_BlockEvents)
   {
-    const mitk::BaseProperty* modifiedProperty = dynamic_cast<const mitk::BaseProperty*>(caller);
+    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
 
-    if(modifiedProperty)
-    {
-      int row = -1;
+    QModelIndex indexOfChangedProperty = index(row, 1);
 
-      // search for property that changed and emit datachanged on the corresponding ModelIndex
-      std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > >::iterator propertyIterator;
-
-      for( propertyIterator=m_PropertyListElements.begin(); propertyIterator!=m_PropertyListElements.end()
-        ; propertyIterator++)
-      {
-        if(propertyIterator->second.first == modifiedProperty)
-          break;
-      }
-
-      if(propertyIterator != m_PropertyListElements.end())
-        row = std::distance(m_PropertyListElements.begin(), propertyIterator);
-
-      QModelIndex indexOfChangedProperty = index(row, 1);
-
-      emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
-    }
+    emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
   }
 }
 
@@ -439,6 +431,46 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
     QAbstractTableModel::reset();
 
   }
+}
+
+void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object *caller, const itk::EventObject &event )
+{
+  if(!m_BlockEvents)
+  {
+    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
+
+    // reset the whole model again. may be changed to emit rowsRemoved signal.
+    if(row >= 0)
+      this->setPropertyList(m_PropertyList);
+  }
+}
+
+void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const itk::EventObject &event )
+{
+
+}
+
+int QmitkPropertiesTableModel::FindProperty( const mitk::BaseProperty* _Property )
+{
+  int row = -1;
+
+  if(_Property)
+  {
+    // search for property that changed and emit datachanged on the corresponding ModelIndex
+    std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > >::iterator propertyIterator;
+
+    for( propertyIterator=m_PropertyListElements.begin(); propertyIterator!=m_PropertyListElements.end()
+      ; propertyIterator++)
+    {
+      if(propertyIterator->second.first == _Property)
+        break;
+    }
+
+    if(propertyIterator != m_PropertyListElements.end())
+      row = std::distance(m_PropertyListElements.begin(), propertyIterator);
+  }
+
+  return row;
 }
 
 bool QmitkPropertiesTableModel::PropertyListElementCompareFunction::operator()

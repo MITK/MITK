@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef QMITK_POINTLIST_WIDGET_H_INCLUDED
-#define QMITK_POINTLIST_WIDGET_H_INCLUDED
+#ifndef QMITK_POINTLIST_VIEW_H_INCLUDED
+#define QMITK_POINTLIST_VIEW_H_INCLUDED
 
 #include <QListView>
 
@@ -37,14 +37,14 @@ class QmitkStdMultiWidget;
  * point.
  *
  */
-class QmitkPointListWidget : public QListView
+class QmitkPointListView : public QListView
 {
   Q_OBJECT
 
   public:
 
-    QmitkPointListWidget( QWidget* parent = 0 );
-    ~QmitkPointListWidget();
+    QmitkPointListView( QWidget* parent = 0 );
+    ~QmitkPointListView();
 
     /// assign a point set for observation
     void SetPointSet( mitk::PointSet* pointSet );

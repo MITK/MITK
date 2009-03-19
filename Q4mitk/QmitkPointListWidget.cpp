@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 
-QmitkPointListWidget::QmitkPointListWidget( QWidget* parent )
+QmitkPointListView::QmitkPointListView( QWidget* parent )
 :QListView( parent ),
  m_PointListModel( new QmitkPointListModel() ),
  m_SelfCall( false ),
@@ -43,22 +43,22 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent )
            this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
 }
 
-QmitkPointListWidget::~QmitkPointListWidget()
+QmitkPointListView::~QmitkPointListView()
 {
   delete m_PointListModel;
 }
 
-void QmitkPointListWidget::SetPointSet( mitk::PointSet* pointSet )
+void QmitkPointListView::SetPointSet( mitk::PointSet* pointSet )
 {
   m_PointListModel->SetPointSet( pointSet );
 }
     
-void QmitkPointListWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
+void QmitkPointListView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_MultiWidget = multiWidget;
 }
 
-void QmitkPointListWidget::OnPointSetSelectionChanged()
+void QmitkPointListView::OnPointSetSelectionChanged()
 {
   if (m_SelfCall) return;
 
@@ -86,7 +86,7 @@ void QmitkPointListWidget::OnPointSetSelectionChanged()
   m_SelfCall = false;
 }
 
-void QmitkPointListWidget::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
   if (m_SelfCall) return;
 

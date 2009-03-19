@@ -168,7 +168,7 @@ public:
    * \brief If the Id exists in mitkData, then point is set and true is 
    * returned in world coordinates
    */
-  bool GetPointIfExists( PointIdentifier id, PointType* point, int t = 0 );
+  bool GetPointIfExists( PointIdentifier id, PointType* point, int t = 0 ) const;
 
   /**
    * \brief Set the given point in world coordinate system into the itkPointSet.
@@ -187,18 +187,20 @@ public:
    * \brief searches a selected point and returns the id of that point. 
    * If no point is found, then -1 is returned
    */
-  virtual int SearchSelectedPoint( int t = 0 );
+  virtual int SearchSelectedPoint( int t = 0 ) const;
 
   /** \brief returns true if a point exists at this position */
-  virtual bool IndexExists( int position, int t = 0 );
+  virtual bool IndexExists( int position, int t = 0 ) const;
 
   /** \brief to get the state selected/unselected of the point on the
    * position
    */
-  virtual bool GetSelectInfo( int position, int t = 0 );
+  virtual bool GetSelectInfo( int position, int t = 0 ) const;
+  
+  virtual void SetSelectInfo( int position, bool selected, int t = 0 );
 
   /** \brief returns the number of selected points */
-  virtual int GetNumberOfSelected( int t = 0 );
+  virtual int GetNumberOfSelected( int t = 0 ) const;
 
   /**
    * \brief searches a point in the list == point +/- distance
@@ -208,7 +210,7 @@ public:
    * returns -1 if no point is found
    * or the position in the list of the first match
    */
-  int SearchPoint( Point3D point, float distance, int t = 0 );
+  int SearchPoint( Point3D point, float distance, int t = 0 ) const;
 
   virtual bool IsEmpty(unsigned int t) const;
 

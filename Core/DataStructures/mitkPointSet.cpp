@@ -114,7 +114,7 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
   }
 }
 
-int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  )
+int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
 {
   if ( t >= (int)m_PointSetSeries.size() )
   {
@@ -203,7 +203,7 @@ mitk::PointSet::GetPoint( int position, int t ) const
 
 bool 
 mitk::PointSet
-::GetPointIfExists( PointIdentifier id, PointType* point, int t )
+::GetPointIfExists( PointIdentifier id, PointType* point, int t ) const
 {
   if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
@@ -245,7 +245,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
     mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
     if (tempGeometry == NULL)
     {
-      std::cout<<"mitkPointSet.cpp::L252:GetGeometry of "<< t <<" returned NULL!\n";
+      std::cout<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
       return;
     }
     tempGeometry->WorldToIndex( point, indexPoint );
@@ -281,7 +281,7 @@ void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, in
   }
 }
 
-bool mitk::PointSet::IndexExists( int position, int t )
+bool mitk::PointSet::IndexExists( int position, int t ) const
 {
   if ( (unsigned int) t < m_PointSetSeries.size() )
   {
@@ -293,7 +293,7 @@ bool mitk::PointSet::IndexExists( int position, int t )
   }
 }
 
-bool mitk::PointSet::GetSelectInfo( int position, int t )
+bool mitk::PointSet::GetSelectInfo( int position, int t ) const
 {
   if ( this->IndexExists( position, t ) )
   {
@@ -306,9 +306,34 @@ bool mitk::PointSet::GetSelectInfo( int position, int t )
     return false;
   }
 }
+  
+void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
+{
+  if ( this->IndexExists( position, t ) )
+  {
+    // timeStep to ms
+    ScalarType timeInMS = this->GetTimeSlicedGeometry()->TimeStepToMS( t );
+
+    // point
+    Point3D point = this->GetPoint( position, t );
+
+    PointOperation* op;
+    if (selected)
+    {
+      op = new mitk::PointOperation(OpSELECTPOINT, timeInMS, point, position );
+    }
+    else
+    {
+      op = new mitk::PointOperation(OpDESELECTPOINT, timeInMS, point, position );
+    }
+      
+    this->ExecuteOperation( op );
+  }
+}
 
 
-int mitk::PointSet::GetNumberOfSelected( int t )
+
+int mitk::PointSet::GetNumberOfSelected( int t ) const
 {
   if ( (unsigned int) t >= m_PointSetSeries.size() )
   {
@@ -331,7 +356,7 @@ int mitk::PointSet::GetNumberOfSelected( int t )
 }
 
 
-int mitk::PointSet::SearchSelectedPoint( int t )
+int mitk::PointSet::SearchSelectedPoint( int t ) const
 {
   if ( (unsigned int) t >= m_PointSetSeries.size() )
   {

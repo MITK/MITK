@@ -21,7 +21,6 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
  QmitkPropertyObservers/QmitkStringPropertyView.cpp
  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
- QmitkPropertyObservers/QmitkDataStorageComboBox.cpp
 
  qclickablelabel.cpp
  QmitkAbortEventFilter.cpp
@@ -64,6 +63,7 @@ SET(CPP_FILES
  QmitkMaterialShowcase.cpp
  QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
+ QmitkDataStorageComboBox.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
@@ -87,7 +87,6 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
- QmitkPropertyObservers/QmitkDataStorageComboBox.h
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
@@ -122,7 +121,8 @@ SET(MOC_H_FILES
  QmitkMaterialEditor.h
  QmitkMaterialShowcase.h
  QmitkPropertiesTableEditor.h
- QmitkPrimitiveMovieNavigatorWidget.h
+ QmitkPrimitiveMovieNavigatorWidget.h´
+ QmitkDataStorageComboBox.h
 )
 
 SET(UI_FILES

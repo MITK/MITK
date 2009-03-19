@@ -7,6 +7,7 @@ SET(CPP_FILES
  QmitkModels/QmitkDataStorageTreeModel.cpp
  QmitkModels/QmitkDataStorageTableModel.cpp
  QmitkModels/QmitkPropertyDelegate.cpp
+ QmitkModels/QmitkPointListModel.cpp
 
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
@@ -40,6 +41,7 @@ SET(CPP_FILES
  QmitkLineEditLevelWindowWidget.cpp
  QmitkSliderLevelWindowWidget.cpp
  QmitkLevelWindowWidget.cpp
+ QmitkPointListWidget.cpp
  QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
@@ -73,6 +75,7 @@ SET(MOC_H_FILES
  
  QmitkModels/QmitkDataStorageTableModel.h
  QmitkModels/QmitkPropertyDelegate.h
+ QmitkModels/QmitkPointListModel.h
  
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyEditor.h
@@ -105,6 +108,7 @@ SET(MOC_H_FILES
  QmitkSlicesInterpolator.h
  QmitkStdMultiWidget.h
  QmitkColorTransferFunctionCanvas.h
+ QmitkPointListWidget.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h

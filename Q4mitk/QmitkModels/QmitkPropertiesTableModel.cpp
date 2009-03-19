@@ -321,6 +321,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
       std::string propertyName = m_PropertyListElements[index.row()].first;
 
       m_PropertyList->SetEnabled(propertyName, active);
+	  m_PropertyListElements[index.row()].second.second = active;
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }

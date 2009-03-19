@@ -31,10 +31,12 @@ namespace mitk {
 
   /**Documentation
   * \brief NavigationDataLandmarkTransformFilter applies a itk-landmark-transformation
-  * defined by source and target pointsets. <br>
-  * Before executing the filter SetSourcePoints and SetTargetPoints must be called.
+  * defined by source and target pointsets. 
+  * 
+  * Before executing the filter SetSourcePoints and SetTargetPoints must be called. 
+  * If source or target pointSet were changed the corresponding setMethod has to be called again, to apply the changes.
   *
-  * @ingroup Navigation
+  * \ingroup Navigation
   */
   class NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
   {
@@ -49,7 +51,16 @@ namespace mitk {
 
     itkNewMacro(Self);
   
+    /**Documentation 
+    *\brief Set points used as source points for landmark transform.
+    *
+    */
     void SetSourcePoints(mitk::PointSet::Pointer sourcePointSet);
+    
+    /**Documentation 
+    *\brief Set points used as target points for landmark transform
+    *
+    */
     void SetTargetPoints(mitk::PointSet::Pointer targetPointSet);
 
   protected:
@@ -57,35 +68,30 @@ namespace mitk {
     typedef itk::VersorRigid3DTransform< double > ITKVersorTransformType;
     typedef itk::LandmarkBasedTransformInitializer< ITKVersorTransformType, ImageType, ImageType > TransformInitializerType;
 
-    TransformInitializerType::LandmarkPointContainer m_SourcePoints;      // positions of the source points
-    TransformInitializerType::LandmarkPointContainer m_TargetPoints;      // positions of the target points
-    TransformInitializerType::Pointer m_LandmarkTransformInitializer;     // landmark based transform initializer 
-    ITKVersorTransformType::Pointer m_ITKLandmarkTransform;               // transform calculated from source and target points
+    TransformInitializerType::LandmarkPointContainer m_SourcePoints;      ///<  positions of the source points
+    TransformInitializerType::LandmarkPointContainer m_TargetPoints;      ///<  positions of the target points
+    TransformInitializerType::Pointer m_LandmarkTransformInitializer;     ///<  landmark based transform initializer 
+    ITKVersorTransformType::Pointer m_ITKLandmarkTransform;               ///<  transform calculated from source and target points
 
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatLandmarkTransform; //transform needed to rotate orientation
-    itk::QuaternionRigidTransform<double>::Pointer m_QuatTransform;         //transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatLandmarkTransform; ///< transform needed to rotate orientation
+    itk::QuaternionRigidTransform<double>::Pointer m_QuatTransform;         ///< further transform needed to rotate orientation
 
    
     /**Documentation
-    * \brief filter execute method
+    * \brief transforms input NDs according to the calculated landmarktransform 
     * 
     */
     virtual void GenerateData();
 
 
     /**Documentation
-    * \brief transforms input NDs according to the calculated landmarktransform   
-    */
-    void TransformNavigationDatas(ITKVersorTransformType::Pointer landmarkTransform);
-   
-    /**Documentation
     * \brief initializes the transform using source and target pointsets 
     */
     void InitializeLandmarkTransform();
 
     // bool to store if target and source points were set
-    bool m_SourcePointsAreSet;
-    bool m_TargetPointsAreSet;
+    bool m_SourcePointsAreSet; ///< bool to store if source points were set
+    bool m_TargetPointsAreSet; ///< bool to store if target points were set
     
     
   };

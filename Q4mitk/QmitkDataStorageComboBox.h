@@ -10,6 +10,7 @@
 
 // Forward Declartions
 class QmitkDataStorageListModel;
+class QmitkDataStorageTableModel;
 
 ///
 /// \class QmitkDataStorageComboBox
@@ -24,8 +25,9 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
   Q_OBJECT
 
   public:
-    QmitkDataStorageComboBox(QWidget* parent = 0);
-    QmitkDataStorageComboBox(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred = 0, QWidget* parent = 0);
+    QmitkDataStorageComboBox(QWidget* parent = 0, bool _AutoSelectFirstItem=false);
+    QmitkDataStorageComboBox(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred = 0, QWidget* parent = 0
+      , bool _AutoSelectFirstItem=false);
     ~QmitkDataStorageComboBox();
 
     void init(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred);
@@ -46,6 +48,9 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     
   protected:
     QmitkDataStorageListModel* m_DataStorageListModel;
+	  ///
+	  /// \brief Autoselects first item if true.
+	  bool m_AutoSelectFirstItem;
 };
 
 #endif // QmitkDataStorageComboBox_h

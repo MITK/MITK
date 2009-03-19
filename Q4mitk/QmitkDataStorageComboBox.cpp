@@ -1,16 +1,19 @@
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkDataStorageListModel.h"
 
-QmitkDataStorageComboBox::QmitkDataStorageComboBox(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred, QWidget* parent)
+QmitkDataStorageComboBox::QmitkDataStorageComboBox(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred, QWidget* parent
+												   , bool _AutoSelectFirstItem)
 : QComboBox(parent)
 , m_DataStorageListModel(0)
+, m_AutoSelectFirstItem(_AutoSelectFirstItem)
 {
   init(dataStorage, pred);
 }
 
-QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent /*= 0*/ )
+QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent /*= 0*/, bool _AutoSelectFirstItem )
 : QComboBox(parent)
 , m_DataStorageListModel(0)
+, m_AutoSelectFirstItem(_AutoSelectFirstItem)
 {
   init(0, 0);
 }
@@ -46,6 +49,10 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
 void QmitkDataStorageComboBox::SetPredicate(mitk::NodePredicateBase* pred)
 {
   m_DataStorageListModel->SetPredicate(pred);
+  if(m_AutoSelectFirstItem)
+	  if(this->count() > 0)
+		  this->setCurrentIndex(0);
+
 }
 
 mitk::NodePredicateBase* QmitkDataStorageComboBox::GetPredicate() const

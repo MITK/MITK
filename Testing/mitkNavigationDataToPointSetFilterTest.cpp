@@ -69,9 +69,9 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   myNavigationDataToPointSetFilter->SetInput(nd4,3);
 
   //Process
-  myNavigationDataToPointSetFilter->Update();
   mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
 
+  pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0)[0] == 1.0 && pointSet->GetPoint(0)[1] == 2.0 && pointSet->GetPoint(0)[2] == 3.0 &&
     pointSet->GetPoint(1)[0] == 4.0 && pointSet->GetPoint(1)[1] == 5.0 && pointSet->GetPoint(1)[2] == 6.0 &&
@@ -117,8 +117,9 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
 
   myNavigationDataToPointSetFilter->SetInput(nd,0);
   myNavigationDataToPointSetFilter->SetInput(nd2,1);
-  myNavigationDataToPointSetFilter->Update();
+
   mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 1.0 && pointSet->GetPoint(0,0)[1] == 2.0 && pointSet->GetPoint(0,0)[2] == 3.0 &&
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 
@@ -136,11 +137,12 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     , "Testing the conversion of navigation data object to one point set in Mode 4D in second timestep" )
 
   myNavigationDataToPointSetFilter->SetInput(nd3,0);
-  nd3->Modified(); //necessary because the generate data is only called when input has changed...
+  //nd3->Modified(); //necessary because the generate data is only called when input has changed...
   myNavigationDataToPointSetFilter->SetInput(nd4,1);
-  nd4->Modified();
-  myNavigationDataToPointSetFilter->Update();
+  //nd4->Modified();
+  //myNavigationDataToPointSetFilter->Update();
   pointSet = myNavigationDataToPointSetFilter->GetOutput();
+  pointSet->Update();
 
   MITK_TEST_CONDITION( pointSet->GetPoint(0,0)[0] == 7.0 && pointSet->GetPoint(0,0)[1] == 8.0 && pointSet->GetPoint(0,0)[2] == 9.0 &&
     pointSet->GetPoint(1,0)[0] == 10.0 && pointSet->GetPoint(1,0)[1] == 11.0 && pointSet->GetPoint(1,0)[2] == 12.0 &&

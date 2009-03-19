@@ -12,3 +12,12 @@ SET(ODIN_PLUGIN_CACHE_DIR "${EXECUTABLE_OUTPUT_PATH}/plugin_cache")
 
 CONFIGURE_FILE(MainApp.ini
                ${EXECUTABLE_OUTPUT_PATH}/MainApp.ini)
+
+IF(WIN32)
+  SET(MAINAPP_BUILD_TYPE debug)
+  CONFIGURE_FILE(startMainApp.bat.in
+               ${EXECUTABLE_OUTPUT_PATH}/startMainApp_${MAINAPP_BUILD_TYPE}.bat @ONLY)
+  SET(MAINAPP_BUILD_TYPE release)
+  CONFIGURE_FILE(startMainApp.bat.in
+               ${EXECUTABLE_OUTPUT_PATH}/startMainApp_${MAINAPP_BUILD_TYPE}.bat @ONLY)
+ENDIF(WIN32)

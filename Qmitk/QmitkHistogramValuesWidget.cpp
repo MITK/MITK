@@ -99,14 +99,14 @@ void QmitkHistogramValuesWidget::SetHistogram(HistogramType::ConstPointer itkHis
   QwtArray<QwtDoubleInterval> xValues(size[0]);
   QwtArray<double> yValues(size[0]);
 
-  for (size_t i = 0; i < size[0]; ++i)
+  for (unsigned int i = 0; i < size[0]; ++i)
   {
     index[0] = static_cast<HistogramType::IndexType::IndexValueType> (i);
     currentMeasurementVector = itkHistogram->GetMeasurementVector(index);
     if (currentMeasurementVector[0] != 0.0)
     {
-      xValues[i] = QwtDoubleInterval(Round(currentMeasurementVector[0]-1), Round(currentMeasurementVector[0]));
-      yValues[i] = static_cast<double> (itkHistogram->GetFrequency(index));
+      xValues.at(i) = QwtDoubleInterval(Round(currentMeasurementVector[0]-1), Round(currentMeasurementVector[0]));
+      yValues.at(i) = static_cast<double> (itkHistogram->GetFrequency(index));
     }
   }
 

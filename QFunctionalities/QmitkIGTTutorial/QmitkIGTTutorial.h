@@ -28,7 +28,12 @@ class QmitkStdMultiWidget;
 class QmitkIGTTutorialControls;
 
 /**
-* \brief QmitkIGTTutorial 
+* \brief QmitkIGTTutorial shows a small typically navigation MITK functionality.
+*
+* Any kind of navigation application will start with the connection to a tracking system 
+* and as we do image guided procedures we want to show something on the screen. In this
+* tutorial we connect to the NDI Polaris tracking system and we will show the movement 
+* of a tool as cone in MITK.
 *
 *
 * \ingroup Functionalities

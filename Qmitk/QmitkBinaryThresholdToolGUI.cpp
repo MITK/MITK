@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 #include <qlayout.h>
 
+#include "mitkStatusBar.h"
+
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
  m_Slider(NULL)
@@ -83,6 +85,10 @@ void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
   if (m_BinaryThresholdTool.IsNotNull())
   {
     m_BinaryThresholdTool->SetThresholdValue( value );
+    QString status;
+    status = status.append("New Treshold: %1");
+    status = status.arg(value);
+    mitk::StatusBar::GetInstance()->DisplayText(status.ascii());
   }
 }
 

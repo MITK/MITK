@@ -23,10 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkITKImageImport.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
-#include "mitkGlobalInteraction.h"
 
 #include "QmitkDataStorageComboBox.h"
-#include "QmitkPointListView.h"
+#include "QmitkPointListWidget.h"
 #include "QmitkStdMultiWidget.h"
 
 #include <qmessagebox.h>
@@ -79,28 +78,18 @@ void QmitkRegionGrowing::Activated()
   if (m_PointSetNode.IsNull()) // only once create a new DataTreeNode containing a PointSet with some interaction
   {
     // new node and data item
-    m_PointSetNode = mitk::DataTreeNode::New();
-    m_PointSetNode->SetName("Seedpoints for region growing");
     m_PointSet = mitk::PointSet::New();
-    m_PointSetNode->SetData( m_PointSet );
-    m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
 
-    // add the pointset to the data tree (for rendering)
+    m_PointSetNode = mitk::DataTreeNode::New();
+    m_PointSetNode->SetData( m_PointSet );
+    m_PointSetNode->SetName("Seedpoints for region growing");
+
+    // add the pointset to the data tree (for rendering and access by other modules)
     GetDefaultDataStorage()->Add( m_PointSetNode );
 
     // tell the GUI widget about out point set
-    m_Controls->m_PointListWidget->SetPointSet( m_PointSet );
+    m_Controls->m_PointListWidget->SetPointSetNode( m_PointSetNode );
   }
-  
-  // new behavior/interaction for the pointset node
-  mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
-}
-
-void QmitkRegionGrowing::Deactivated()
-{
-  // deactivate behavior/interaction for the pointset node
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_Interactor);
-  QmitkFunctionality::Deactivated();
 }
 
 void QmitkRegionGrowing::DoRegionGrowing()

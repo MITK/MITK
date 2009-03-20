@@ -23,7 +23,7 @@
     <widget class="QmitkDataStorageComboBox" name="m_TreeNodeSelector" />
    </item>
    <item>
-    <widget class="QmitkPointListView" name="m_PointListWidget" />
+    <widget class="QmitkPointListWidget" name="m_PointListWidget" />
    </item>
    <item>
     <widget class="QPushButton" name="m_ButtonRegionGrow" >
@@ -71,9 +71,9 @@
    <header>QmitkDataStorageComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkPointListView</class>
+   <class>QmitkPointListWidget</class>
    <extends>QListView</extends>
-   <header>QmitkPointListView.h</header>
+   <header>QmitkPointListWidget.h</header>
   </customwidget>
  </customwidgets>
  <includes>

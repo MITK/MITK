@@ -58,9 +58,6 @@ class REGIONGROWING_EXPORTS QmitkRegionGrowing : public QObject, public QmitkFun
   /// \brief Called when the functionality is activated
   virtual void Activated();
 
-  /// \brief Called when the functionality is deactivated
-  virtual void Deactivated();
-
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 

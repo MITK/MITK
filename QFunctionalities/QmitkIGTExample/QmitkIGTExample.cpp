@@ -27,10 +27,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInternalTrackingTool.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
+#include "mitkRandomTrackingDevice.h"
+#ifdef MITK_USE_MICROBIRD_TRACKER
+  #include "mitkMicroBirdTrackingDevice.h"
+#endif // MITK_USE_MICROBIRD_TRACKER
+
 #include "mitkProgressBar.h"
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
-#include "mitkRandomTrackingDevice.h"
 #include "mitkSerialCommunication.h"
 #include "mitkStatusBar.h"
 #include "mitkTrackingTypes.h"
@@ -441,7 +445,6 @@ void QmitkIGTExample::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
 mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
 {
   mitk::TrackingDevice::Pointer tracker;
-  mitk::TrackingTool::Pointer tool1;
   QString selectedDevice = m_Controls->GetSelectedTrackingDevice();
   if ((selectedDevice == "NDI Polaris")
     || (selectedDevice == "NDI Aurora"))
@@ -460,7 +463,6 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
       toolNDI->SetTrackingPriority(mitk::Dynamic);
       trackerNDI->Add6DTool(toolNDI);
       out->append(QString("adding tool 'MyInstrument' with rom file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
-      tool1 = toolNDI;
     }
     else if (selectedDevice == "NDI Aurora")
     {
@@ -472,17 +474,22 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
   {
     mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
     toolMT->LoadFile(m_Controls->GetToolFileName());
-    
     mitk::ClaronTrackingDevice::Pointer trackerMT = mitk::ClaronTrackingDevice::New();
     out->append("creating Micron Tracker");
-
     trackerMT->AddTool(toolMT);
     out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
     tracker = trackerMT;
-    tool1 = toolMT;
   }
   else if (selectedDevice == "MicroBird")
   {
+#ifdef MITK_USE_MICROBIRD_TRACKER
+    mitk::MicroBirdTrackingDevice::Pointer trackerMB = mitk::MicroBirdTrackingDevice::New();
+    mitk::InternalTrackingTool::Pointer toolMB = mitk::InternalTrackingTool::New();
+    trackerMB->AddTool(toolMB);
+    out->append("creating MicroBird tracking device with one tool");
+#else
+    out->append("MicroBird support not available in this version. Please select a different tracking device");
+#endif // MITK_USE_MICROBIRD_TRACKER
 
   }
   else if (selectedDevice == "RandomTrackingDevice")
@@ -490,8 +497,12 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
     mitk::InternalTrackingTool::Pointer toolRandom = mitk::InternalTrackingTool::New();
     mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
     trackerRandom->AddTool(toolRandom);
-    tool1 = toolRandom;
     tracker = trackerRandom;
+    out->append("creating virtual random tracking device with one tool");
+  }
+  else
+  {
+    tracker = NULL;
   }
   return tracker;
 }

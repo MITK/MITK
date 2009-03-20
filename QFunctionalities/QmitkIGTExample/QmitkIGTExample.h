@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
 #include "mitkTrackingDevice.h"
+#include "mitkNavigationDataRecorder.h"
+#include "mitkNavigationDataPlayer.h"
+#include "mitkNavigationDataToPointSetFilter.h"
 
 class QmitkStdMultiWidget;
 class QmitkIGTExampleControls;
@@ -146,6 +149,14 @@ protected slots:
    */
    void OnParametersChanged();
 
+   void OnStartRecording();
+
+   void OnStartPlaying();
+
+   void OnRecording();
+
+   void OnPlaying();
+
 protected:  
 
   mitk::TrackingDevice::Pointer ConfigureTrackingDevice();  ///< create the selected tracker object and configure it (using values from m_Controls)
@@ -156,8 +167,14 @@ protected:
   mitk::TrackingDeviceSource::Pointer m_Source; ///< first filter in the pipeline
   mitk::NavigationDataDisplacementFilter::Pointer m_Displacer;  ///< displacement filter that adds an offset to NDs
   mitk::NavigationDataToNavigationDataFilter::Pointer m_EndOfPipeline;  // Pointer to last filter in the pipeline
+  mitk::NavigationDataRecorder::Pointer m_Recorder; ///< records NDs to a XML file
+  mitk::NavigationDataPlayer::Pointer m_Player; ///< plays a XML file
+  mitk::NavigationDataToPointSetFilter::Pointer m_PointSetFilter; ///< has a NDs as input and a PointSet as output
+  mitk::PointSet::Pointer m_PointSet; ///< stores the output of the pointsetfilter
   QTextEdit* out;   ///< pointer to output widget 
 
   QTimer* m_Timer; ///< timer for continuous tracking update
+  QTimer* m_RecordingTimer; ///< timer for continuous recording
+  QTimer* m_PlayingTimer; ///< timer for continuous playing
 };
 #endif // !defined(QMITKIGTEXAMPLE_H__INCLUDED)

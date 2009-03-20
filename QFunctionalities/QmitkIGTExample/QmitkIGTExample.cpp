@@ -52,6 +52,8 @@ QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMult
 {
   SetAvailability(true);
   m_Timer = new QTimer(this);
+  m_RecordingTimer = new QTimer(this);
+  m_PlayingTimer = new QTimer(this);
 }
 
 
@@ -98,6 +100,10 @@ void QmitkIGTExample::CreateConnections()
     connect( (QObject*)(m_Controls->m_StopBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnStop())); // cleanup navigation filter pipeline
     connect( (QObject*)(m_Controls), SIGNAL(ParametersChanged()),(QObject*) this, SLOT(OnParametersChanged()));  // update filter parameters with values from the GUI widget
     connect( m_Timer, SIGNAL(timeout()), this, SLOT(OnMeasure()) );
+    connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
+    connect( m_PlayingTimer, SIGNAL(timeout()), this, SLOT(OnPlaying()) );
+    connect( (QObject*)(m_Controls->m_StartRecordingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartRecording()));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_StartPlayingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartPlaying()));  // execute tracking test code
   }
 }
 
@@ -488,4 +494,98 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
     tracker = trackerRandom;
   }
   return tracker;
+}
+
+void QmitkIGTExample::OnStartRecording()
+{
+  mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New();
+  mitk::InternalTrackingTool::Pointer tool1 = mitk::InternalTrackingTool::New();
+  mitk::InternalTrackingTool::Pointer tool2 = mitk::InternalTrackingTool::New();
+  tracker->AddTool(tool1);
+  tracker->AddTool(tool2);
+
+  std::cout << "Start Recording ..." << std::endl;
+
+  m_Source = mitk::TrackingDeviceSource::New();
+  m_Source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
+
+  m_Source->Connect();        //here we connect to the tracking system
+  //Note we do not call this on the TrackingDevice object
+  m_Source->StartTracking();  //start the tracking
+                            //TODO do this later
+  //Now the source generates outputs.
+
+  //we need the stringstream for building up our filename
+  std::stringstream filename;
+
+  //the .xml extension and an counter is added automatically
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
+
+  std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
+
+  m_Recorder = mitk::NavigationDataRecorder::New();
+  m_Recorder->SetFileName(filename.str());
+
+  //now every output of the displacer object is connected to the recorder object
+  for (int i = 0; i < m_Source->GetNumberOfOutputs(); i++)
+  {
+    m_Recorder->AddNavigationData(m_Source->GetOutput(i));  // here we connect to the recorder
+  }
+
+  m_Recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
+  //now every update of the recorder stores one line into the file for 
+  //each added NavigationData
+  
+  
+  m_RecordingTimer->start(100);
+
+}
+
+void QmitkIGTExample::OnStartPlaying()
+{
+  m_RecordingTimer->stop();
+  m_Recorder->StopRecording();
+
+  
+
+  std::stringstream filename;
+
+  //the .xml extension and an counter is added automatically
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
+ 
+  m_Player = mitk::NavigationDataPlayer::New();
+  //this is first part of the file name the .xml extension and an counter is added automatically
+  m_Player->SetFileName(filename.str()); 
+  m_Player->StartPlaying(); //this starts the player 
+                            //this is necessary because we do not know how many outputs the player has
+  
+  m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+  for (int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
+  {
+    m_PointSetFilter->SetInput(m_Player->GetOutput(i), i);  // here we connect to the recorder
+  }
+  
+  m_PointSet = m_PointSetFilter->GetOutput(0); //it is always output 0
+
+  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+  pointSetNode->SetData(m_PointSet);
+  pointSetNode->SetName(QString("Player PointSet").latin1());
+  pointSetNode->SetColor(0.2,0.2,0.9); //change color
+  pointSetNode->Modified();
+  //add it to the DataStorage
+  mitk::DataStorage::GetInstance()->Add(pointSetNode);
+  
+  m_PlayingTimer->start(100);
+
+}
+
+void QmitkIGTExample::OnRecording()
+{
+  m_Recorder->Update();
+}
+
+void QmitkIGTExample::OnPlaying()
+{
+  m_PointSet->Update();
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
 }

@@ -42,12 +42,12 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myNDIPassiveTool.IsNotNull(),"Testing instantiation") 
 
-  myNDIPassiveTool->SetTrackingPriority(mitk::TrackingPriority::Dynamic);
-  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::TrackingPriority::Dynamic,"Testing Set/GetTrackingPriority() with 'Dynamic'");
-  myNDIPassiveTool->SetTrackingPriority(mitk::TrackingPriority::ButtonBox);
-  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::TrackingPriority::ButtonBox,"Testing Set/GetTrackingPriority() with 'ButtonBox'");
-  myNDIPassiveTool->SetTrackingPriority(mitk::TrackingPriority::Static);
-  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::TrackingPriority::Static,"Testing Set/GetTrackingPriority() with 'Static'");
+  myNDIPassiveTool->SetTrackingPriority(mitk::Dynamic);
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::Dynamic,"Testing Set/GetTrackingPriority() with 'Dynamic'");
+  myNDIPassiveTool->SetTrackingPriority(mitk::ButtonBox);
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::ButtonBox,"Testing Set/GetTrackingPriority() with 'ButtonBox'");
+  myNDIPassiveTool->SetTrackingPriority(mitk::Static);
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::Static,"Testing Set/GetTrackingPriority() with 'Static'");
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

@@ -29,7 +29,7 @@ SET(Poco_LIBRARY_DIR
     "top-level directory containing the poco libraries."
 )
 
-OPTION(BUILD_OPENCHERRY "EXPERIMENTAL! Build the openCherry platform" OFF)
+OPTION(BUILD_OPENCHERRY "Build the openCherry platform" OFF)
 
 IF(BUILD_OPENCHERRY)       
   ADD_SUBDIRECTORY(openCherry)

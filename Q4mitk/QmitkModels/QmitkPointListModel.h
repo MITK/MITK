@@ -57,6 +57,9 @@ class QMITK_EXPORT QmitkPointListModel : public QAbstractListModel
 
     /// itk observer for point set "modified" events
     void OnPointSetChanged( const itk::EventObject & e );
+    
+    /// itk observer for point set "delete" events
+    void OnPointSetDeleted( const itk::EventObject & e );
 
   signals:
 
@@ -71,7 +74,8 @@ class QMITK_EXPORT QmitkPointListModel : public QAbstractListModel
     void ObserveNewPointset( const mitk::PointSet* pointSet );
 
     const mitk::PointSet* m_PointSet;
-    unsigned int m_PointSetObserverTag;
+    unsigned int m_PointSetModifiedObserverTag;
+    unsigned int m_PointSetDeletedObserverTag;
     
     int m_TimeStep;
 };

@@ -52,7 +52,12 @@ void QmitkPointListView::SetPointSet( mitk::PointSet* pointSet )
 {
   m_PointListModel->SetPointSet( pointSet );
 }
-    
+
+const mitk::PointSet* QmitkPointListView::GetPointSet()
+{
+  return m_PointListModel->GetPointSet();
+}
+     
 void QmitkPointListView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_MultiWidget = multiWidget;

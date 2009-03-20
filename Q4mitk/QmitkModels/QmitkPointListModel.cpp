@@ -21,7 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkPointListModel::QmitkPointListModel( const mitk::PointSet* pointSet, int t, QObject* parent )
 :QAbstractListModel(parent),
  m_PointSet(NULL),
- m_PointSetObserverTag(0),
+ m_PointSetModifiedObserverTag(0),
+ m_PointSetDeletedObserverTag(0),
  m_TimeStep(t)
 {
   ObserveNewPointset( pointSet );
@@ -61,21 +62,34 @@ void QmitkPointListModel::ObserveNewPointset( const mitk::PointSet* pointSet )
   // remove old observer
   if ( m_PointSet != NULL )
   {
-    const_cast<mitk::PointSet*>(m_PointSet)->RemoveObserver( m_PointSetObserverTag );
+    const_cast<mitk::PointSet*>(m_PointSet)->RemoveObserver( m_PointSetModifiedObserverTag );
+    const_cast<mitk::PointSet*>(m_PointSet)->RemoveObserver( m_PointSetDeletedObserverTag );
   }
 
   m_PointSet = pointSet;
 
-  // add new observer if neccessary
+  // add new observer for modified if neccessary
   if ( m_PointSet != NULL )
   {
     itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer command = itk::ReceptorMemberCommand<QmitkPointListModel>::New();
     command->SetCallbackFunction( this, &QmitkPointListModel::OnPointSetChanged );
-    m_PointSetObserverTag = const_cast<mitk::PointSet*>(m_PointSet)->AddObserver( itk::ModifiedEvent(), command );
+    m_PointSetModifiedObserverTag = const_cast<mitk::PointSet*>(m_PointSet)->AddObserver( itk::ModifiedEvent(), command );
   }
   else
   {
-    m_PointSetObserverTag = 0;
+    m_PointSetModifiedObserverTag = 0;
+  }
+
+  // add new observer for modified if neccessary
+  if ( m_PointSet != NULL )
+  {
+    itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer command = itk::ReceptorMemberCommand<QmitkPointListModel>::New();
+    command->SetCallbackFunction( this, &QmitkPointListModel::OnPointSetDeleted );
+    m_PointSetDeletedObserverTag = const_cast<mitk::PointSet*>(m_PointSet)->AddObserver( itk::DeleteEvent(), command );
+  }
+  else
+  {
+    m_PointSetDeletedObserverTag = 0;
   }
 }
     
@@ -85,6 +99,17 @@ void QmitkPointListModel::OnPointSetChanged( const itk::EventObject & e )
   emit QAbstractListModel::layoutChanged();
   emit UpdateSelection();
 }
+
+void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject & e )
+{
+  m_PointSet = NULL;
+  m_PointSetModifiedObserverTag = 0;
+  m_PointSetDeletedObserverTag = 0;
+
+  //std::cout << "point set deleted" << std::endl;
+  emit QAbstractListModel::layoutChanged();
+}
+
 
 int QmitkPointListModel::rowCount( const QModelIndex& parent ) const
 {

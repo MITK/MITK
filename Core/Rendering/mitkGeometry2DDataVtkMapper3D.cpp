@@ -54,6 +54,9 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
 {
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
+  
+  // Disable OGL Displaylist for the "Edge". Workaround for Bug #1787
+  m_EdgeMapper->ImmediateModeRenderingOn();
 
   m_SurfaceCreator = Geometry2DDataToSurfaceFilter::New();
   m_SurfaceCreatorBoundingBox = BoundingBox::New();

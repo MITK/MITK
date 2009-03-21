@@ -49,15 +49,21 @@ public:
 
     itkNewMacro( Self );
 
-    /**Documentation
+    /**
     * \brief sets the file name for the OutputMode NormalFile and ZipFile
+    *
     * Any extensions will be cut
-    * \warning existing files will be overriden
+    * \warning existing files will be overridden
     * \warning do not use "." in file names at the end
     */
     itkSetStringMacro(FileName);
+    
+    /**
+    * \brief Returns the file name of the recording file (in OutputMode NormalFile and ZipFile)
+    */
+    itkGetStringMacro(FileName);
 
-    /**Documentation
+    /**
     * \brief Adds the input NavigationDatas
     */
     virtual void AddNavigationData(const NavigationData* nd);

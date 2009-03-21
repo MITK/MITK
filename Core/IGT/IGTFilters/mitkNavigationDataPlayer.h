@@ -46,24 +46,30 @@ namespace mitk {
     mitkClassMacro(NavigationDataPlayer, NavigationDataSource);
     itkNewMacro(Self);
 
-    /**Documentation
+    /**
     * \brief sets the file name and path for the PlayerMode NormalFile and ZipFile
     */
     itkSetStringMacro(FileName);
 
-    /**Documentation
+    /**
+    * \brief returns the file name and path for the PlayerMode NormalFile and ZipFile
+    */
+    itkGetStringMacro(FileName);
+
+    /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
     virtual void UpdateOutputInformation();
 
-    /**Documentation
+    /**
     * \brief This method starts the player. 
+    *
     * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
     * with an own inputstream (SetStream(istream*)).
     */
     void StartPlaying();
 
-    /**Documentation
+    /**
     * \brief Stops the player and closes the stream. After a call of StopPlaying()
     * StartPlaying() must be called to get new output data
     *
@@ -71,22 +77,22 @@ namespace mitk {
     * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
     */
     void StopPlaying();
-    
-    /**Documentation
+
+    /**
     * \brief This method pauses the player. If you want to play again call Resume()
     * 
     *\warning This method is not tested yet. It is not save to use!
     */
     void Pause();
 
-    /**Documentation
+    /**
     * \brief This method resumes the player when it was paused. 
     * 
     *\warning This method is not tested yet. It is not save to use!
     */
     void Resume();
 
-    /**Documentation
+    /**
     * \brief The PlayerMode is used for generating a presetted output stream. You do not need to
     * set it if you want to use your own stream.
     *
@@ -102,13 +108,13 @@ namespace mitk {
       ZipFile
     };
 
-    /**Documentation
+    /**
     * \brief sets the recording mode which causes different types of output streams
     * This method is overloaded with SetStream( ostream* )
     */
     void SetStream(PlayerMode mode);
 
-    /**Documentation
+    /**
     * \brief sets the recording mode which causes different types of output streams
     * This method is overloaded with SetStream( PlayerMode )
     */
@@ -120,40 +126,34 @@ namespace mitk {
 
     typedef mitk::NavigationData::TimeStampType TimeStampType;
 
-    /**Documentation
-    * \brief filter execute method
-    *   
+    /**
+    * \brief filter execute method 
     */
     virtual void GenerateData();
 
-    /**Documentation
-    * \brief Returns the file version out of the XML document.
-    *   
+    /**
+    * \brief Returns the file version out of the XML document. 
     */
     unsigned int GetFileVersion(std::istream* stream);
 
-    /**Documentation
+    /**
     * \brief Returns the number of tracked tools out of the XML document.
-    *   
     */
     unsigned int GetNumberOfNavigationDatas(std::istream* stream);
 
-    /**Documentation
+    /**
     * \brief Gets the first data for initializing the player
-    *   
     */
     void GetFirstData();
 
-    /**Documentation
+    /**
     * \brief This method reads one line of the XML document and returns the data as a NavigationData object
     * If there is a new file version another method must be added which reads this data.
-    *   
     */
     mitk::NavigationData::Pointer ReadVersion1();
 
-    /**Documentation
-    * \brief This method initializes the player with first data
-    *   
+    /**
+    * \brief This method initializes the player with first data  
     */
     void InitPlayer();
 
@@ -178,7 +178,6 @@ namespace mitk {
     std::vector<NavigationData::Pointer> m_NextToPlayNavigationData; ///< stores the next possible candidate for playing
 
     std::vector<TimeStampType> m_StartTimeOfData; ///< stores the start time of the different tools
-    
   };
 } // namespace mitk
 

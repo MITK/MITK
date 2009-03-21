@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNDITrackingDevice.h"
 #include "mitkRandomTrackingDevice.h"
 #ifdef MITK_USE_MICROBIRD_TRACKER
-  #include "mitkMicroBirdTrackingDevice.h"
+#include "mitkMicroBirdTrackingDevice.h"
 #endif // MITK_USE_MICROBIRD_TRACKER
 
 #include "mitkProgressBar.h"
@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlineedit.h>
 
 QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
+: QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
   m_Timer = new QTimer(this);
@@ -255,8 +255,8 @@ void QmitkIGTExample::OnTestNavigation()
     }
     m_Displacer->SetOffset(offset);
     /* --> Instead, we could have just called m_Displacer->SetParameters(GetFunctionalityOptionsList()) to set all stored parameters at once.
-       But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the
-       persistence mechanism or by the GUI Event ParametersChanged that calls the OnParametersChanged() method)
+    But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the
+    persistence mechanism or by the GUI Event ParametersChanged that calls the OnParametersChanged() method)
     */
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
@@ -342,7 +342,7 @@ void QmitkIGTExample::OnMeasure()
       continue;
     }
     nd->Update();  // update the navigation data. this will read current tracking data from tracking device.
-                   // this will also update the visualization filter who causes a repainting of the scene
+    // this will also update the visualization filter who causes a repainting of the scene
 
     std::stringstream output;
     output << "Navigation Data of Output " << i << ":" << std::endl;
@@ -419,7 +419,7 @@ void QmitkIGTExample::OnParametersChanged()
   //out->append("Using GUI Parameters for Displacement Filter.");
 
   /* add the filter PropertyList to the functionalities List, so that it will be saved on application exit
-     this will be restored at the next restart.
+  this will be restored at the next restart.
   */
   GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_Parameters.GetPointer(), true);
   out->append("Adding GUI parameters to persistence storage.");
@@ -466,7 +466,7 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
     }
     else if (selectedDevice == "NDI Aurora")
     {
-    	trackerNDI->SetType(mitk::NDIAurora);
+      trackerNDI->SetType(mitk::NDIAurora);
     }
     tracker = trackerNDI;
   }
@@ -509,94 +509,101 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
 
 void QmitkIGTExample::OnStartRecording()
 {
-  mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New();
-  mitk::InternalTrackingTool::Pointer tool1 = mitk::InternalTrackingTool::New();
-  mitk::InternalTrackingTool::Pointer tool2 = mitk::InternalTrackingTool::New();
-  tracker->AddTool(tool1);
-  tracker->AddTool(tool2);
-
-  std::cout << "Start Recording ..." << std::endl;
-
-  m_Source = mitk::TrackingDeviceSource::New();
-  m_Source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
-
-  m_Source->Connect();        //here we connect to the tracking system
-  //Note we do not call this on the TrackingDevice object
-  m_Source->StartTracking();  //start the tracking
-                            //TODO do this later
-  //Now the source generates outputs.
-
-  //we need the stringstream for building up our filename
-  std::stringstream filename;
-
-  //the .xml extension and an counter is added automatically
-  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
-
-  std::cout << "Record to file: " << filename.str() << "-0.xml ..." << std::endl;
-
-  m_Recorder = mitk::NavigationDataRecorder::New();
-  m_Recorder->SetFileName(filename.str());
-
-  //now every output of the displacer object is connected to the recorder object
-  for (int i = 0; i < m_Source->GetNumberOfOutputs(); i++)
+  try
   {
-    m_Recorder->AddNavigationData(m_Source->GetOutput(i));  // here we connect to the recorder
+    mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice();
+    if (tracker.IsNull())
+    {
+      out->append("Error creating tracking device. Did you provide all parameters?");
+      return;
+    }
+    m_Source = mitk::TrackingDeviceSource::New();
+    m_Source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
+
+    m_Source->Connect();        //here we connect to the tracking system
+
+    //we need the stringstream for building up our filename
+    std::stringstream filename;
+
+    //the .xml extension and an counter is added automatically
+    filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
+
+    m_Recorder = mitk::NavigationDataRecorder::New();
+    m_Recorder->SetFileName(filename.str());
+
+    //now every output of the displacer object is connected to the recorder object
+    for (unsigned int i = 0; i < m_Source->GetNumberOfOutputs(); i++)
+    {
+      m_Recorder->AddNavigationData(m_Source->GetOutput(i));  // here we connect to the recorder
+    }
+
+    m_Source->StartTracking();  //start the tracking
+    m_Recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
+
+    out->append(QString("Starting Recording from ") + QString(m_Controls->GetSelectedTrackingDevice())
+         + QString(" to file ") + QString(m_Recorder->GetFileName()) + QString(" now."));
+
+    //now every update of the recorder stores one line into the file for 
+    //each added NavigationData
+    m_RecordingTimer->start(100);
   }
-
-  m_Recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
-  //now every update of the recorder stores one line into the file for 
-  //each added NavigationData
-  
-  
-  m_RecordingTimer->start(100);
-
+  catch (std::exception& e)
+  {
+    out->append(QString("An error occured: ") + QString(e.what()));
+  }
 }
 
-void QmitkIGTExample::OnStartPlaying()
-{
-  m_RecordingTimer->stop();
-  m_Recorder->StopRecording();
-
-  
-
-  std::stringstream filename;
-
-  //the .xml extension and an counter is added automatically
-  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
- 
-  m_Player = mitk::NavigationDataPlayer::New();
-  //this is first part of the file name the .xml extension and an counter is added automatically
-  m_Player->SetFileName(filename.str()); 
-  m_Player->StartPlaying(); //this starts the player 
-                            //this is necessary because we do not know how many outputs the player has
-  
-  m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-  for (int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
-  {
-    m_PointSetFilter->SetInput(m_Player->GetOutput(i), i);  // here we connect to the recorder
-  }
-  
-  m_PointSet = m_PointSetFilter->GetOutput(0); //it is always output 0
-
-  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
-  pointSetNode->SetData(m_PointSet);
-  pointSetNode->SetName(QString("Player PointSet").latin1());
-  pointSetNode->SetColor(0.2,0.2,0.9); //change color
-  pointSetNode->Modified();
-  //add it to the DataStorage
-  mitk::DataStorage::GetInstance()->Add(pointSetNode);
-  
-  m_PlayingTimer->start(100);
-
-}
 
 void QmitkIGTExample::OnRecording()
 {
   m_Recorder->Update();
+  mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now", 75); // Display recording message for 75ms in status bar
 }
+
+
+void QmitkIGTExample::OnStartPlaying()
+{
+  /* Stop recording */
+  m_RecordingTimer->stop();
+  m_Recorder->StopRecording();
+  out->append("Stopped recording");
+
+  std::stringstream filename;
+  //the .xml extension and an counter is added automatically
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
+
+  m_Player = mitk::NavigationDataPlayer::New();
+  //this is first part of the file name the .xml extension and an counter is added automatically
+  m_Player->SetFileName(filename.str()); 
+  m_Player->StartPlaying(); //this starts the player 
+  //this is necessary because we do not know how many outputs the player has
+
+  out->append(QString("Starting replay from ") + QString(m_Player->GetFileName()));
+
+  /* Visualize output of player using a mitk::PointSet */
+  m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+  for (int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
+  {
+    m_PointSetFilter->SetInput(m_Player->GetOutput(i), i);  // here we connect the player with the pointset filter
+  }
+  m_PointSet = m_PointSetFilter->GetOutput();
+
+  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+  pointSetNode->SetData(m_PointSet);
+  pointSetNode->SetName("Player object");
+  pointSetNode->SetColor(0.2,0.2,0.9); //change color
+  pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(20.0)); // enlarge visualization of points
+  mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
+  out->append("Creating Pointset for replay visualization");
+
+  m_PlayingTimer->start(100);  // start the playback timer
+  out->append("starting replay");
+}
+
 
 void QmitkIGTExample::OnPlaying()
 {
   m_PointSet->Update();
-  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update only 3D render window
+  mitk::StatusBar::GetInstance()->DisplayText("Replaying tracking data now", 75); // Display replay message for 75ms in status bar
 }

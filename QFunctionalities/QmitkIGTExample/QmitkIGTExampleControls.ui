@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>261</width>
+            <width>287</width>
             <height>710</height>
         </rect>
     </property>
@@ -105,7 +105,7 @@
                                 <cstring>m_PortLabel</cstring>
                             </property>
                             <property name="text">
-                                <string>Port:</string>
+                                <string>Port (e.g. COM4, /dev/ttyUSB0):</string>
                             </property>
                         </widget>
                         <widget class="QLineEdit">
@@ -294,7 +294,7 @@
                 <cstring>m_StartPlayingButton</cstring>
             </property>
             <property name="text">
-                <string>Start Playing</string>
+                <string>Start Replaying</string>
             </property>
         </widget>
         <widget class="QPushButton" row="8" column="0">
@@ -302,7 +302,7 @@
                 <cstring>m_StartRecordingButton</cstring>
             </property>
             <property name="text">
-                <string>Start Recording</string>
+                <string>Start Recording Test</string>
             </property>
         </widget>
     </grid>

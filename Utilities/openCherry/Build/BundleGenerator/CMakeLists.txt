@@ -19,25 +19,32 @@ ELSE(BUNDLE_DEFAULTS_FILE)
 ENDIF(BUNDLE_DEFAULTS_FILE)
 
 SET(PLUGIN_ID "${DEFAULT_PLUGIN_ID}" CACHE STRING "unique plugin id (i.e. your.domain.pluginid) (required)")
+SET(PLUGIN_NAME "" CACHE STRING "a human-readable description of your plugin (required)")
 OPTION(GUI_SUPPORT "enable this if your plugin contributes to the UI" ON)
   
-IF(PLUGIN_ID)
+IF(PLUGIN_ID AND PLUGIN_NAME)
 
-SET(PLUGIN_NAME "" CACHE STRING "a human-readable description of your plugin (required)")
 SET(PLUGIN_VERSION "${DEFAULT_PLUGIN_VERSION}" CACHE STRING "plugin version (required)")
 SET(PLUGIN_VENDOR "${DEFAULT_PLUGIN_VENDOR}" CACHE STRING "plugin vendor (optional)")
 
 SET(ACTIVATOR_CLASS "" CACHE STRING "class name for your plugin activator (optional)")
 
 IF(GUI_SUPPORT)
-  SET(VIEW_NAME "" CACHE STRING "a human-readable name of your view (required)")
-  SET(VIEW_CLASS "" CACHE STRING "class name of the view")
+
+  STRING(REPLACE " " "" _view_baseid "${PLUGIN_NAME}")
+  STRING(TOLOWER ${_view_baseid} _lview_baseid)
+  
+  SET(_default_view_class_name "${DEFAULT_VIEW_CLASS_BEGIN}${_view_baseid}View")
+  
+  SET(VIEW_NAME "${PLUGIN_NAME}" CACHE STRING "a human-readable name of your view (required)")
+  SET(VIEW_CLASS "${_default_view_class_name}" CACHE STRING "class name of the view")
   IF(VIEW_CLASS)
     STRING(TOUPPER ${VIEW_CLASS} UVIEW_CLASS)
   ENDIF(VIEW_CLASS)
   SET(VIEW_BASE_CLASS ${DEFAULT_VIEW_BASE_CLASS} CACHE STRING "base class of your new view class (required)")
   SET(VIEW_BASE_CLASS_H ${DEFAULT_VIEW_BASE_CLASS_H} CACHE STRING "base class header (required)")
-  SET(VIEW_ID "${DEFAULT_VIEW_ID}" CACHE STRING "unique view id (i.e. your.domain.viewid) (required)")
+  
+  SET(VIEW_ID "${DEFAULT_VIEW_BASEID}${_lview_baseid}" CACHE STRING "unique view id (i.e. your.domain.viewid) (required)")
 
   #SET(EDITOR_CLASS "" CACHE STRING "")
   #SET(EDITOR_TYPE "" CACHE STRING "")
@@ -167,6 +174,6 @@ IF(VIEW_CLASS)
 ENDIF(VIEW_CLASS)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/filesTemplate.cmake ${PLUGIN_DIR}/files.cmake @ONLY)
 	
-ENDIF(PLUGIN_ID)
+ENDIF(PLUGIN_ID AND PLUGIN_NAME)
 
 

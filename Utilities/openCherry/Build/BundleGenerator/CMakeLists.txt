@@ -125,6 +125,20 @@ IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 
 
+# --------------------- src/internal/ViewTemplateControls.ui ----------------------------
+IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+IF(VIEW_CLASS) 
+  SET(VIEW_CONTROLS "${VIEW_CLASS}Controls")
+  SET(VIEW_CONTROLS_UI "${VIEW_CONTROLS}.ui")
+  SET(VIEW_CONTROLS_FILE "ui_${VIEW_CONTROLS}.h")
+  SET(VIEW_CONTROLS_CLASS "${VIEW_CONTROLS}")
+  
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui ${PLUGIN_DIR}/src/internal/${VIEW_CONTROLS_UI} @ONLY)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/QmitkTemplate.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/icon.xpm ${PLUGIN_DIR}/resources/icon.xpm COPYONLY)
+ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+
+
 # --------------------- src/internal/ViewTemplate[.h,.cpp] ----------------------------
 IF(VIEW_CLASS)
   SET(VIEW_CLASS_H "${BUNDLE_NAMESPACE}${VIEW_CLASS}.h")
@@ -140,7 +154,7 @@ IF(VIEW_CLASS)
   CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ViewTemplate.h ${PLUGIN_DIR}/src/internal/${VIEW_CLASS_H} @ONLY)
   CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ViewTemplate.cpp ${PLUGIN_DIR}/src/internal/${VIEW_CLASS_CPP} @ONLY)
 ENDIF(VIEW_CLASS)
-	
+
 # ---------------------- pluginTemplate.xml ---------------------------------
 IF(VIEW_CLASS)
   SET(XP_VIEW "  <extension point=\"org.opencherry.ui.views\">
@@ -172,6 +186,12 @@ SET(PLUGIN_INTERNAL_SOURCES "")
 IF(VIEW_CLASS)
   SET(PLUGIN_INTERNAL_SOURCES "${VIEW_CLASS_CPP}\n")
 ENDIF(VIEW_CLASS)
+IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+  SET(PLUGIN_RES_FILES "resources/${VIEW_CLASS}.qrc")
+  SET(PLUGIN_UI_FILES "src/internal/${VIEW_CONTROLS_UI}")
+  SET(PLUGIN_MOC_H_FILES "src/internal/${VIEW_CLASS}.h")
+ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/filesTemplate.cmake ${PLUGIN_DIR}/files.cmake @ONLY)
 	
 ENDIF(PLUGIN_ID AND PLUGIN_NAME)

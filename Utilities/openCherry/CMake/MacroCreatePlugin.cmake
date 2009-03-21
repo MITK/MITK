@@ -110,6 +110,7 @@ MACRO(MACRO_CREATE_PLUGIN)
       ${CORRESPONDING__TXX_FILES}
       )
   
+  INCLUDE_DIRECTORIES(PLUGIN_OUTPUT_DIR)
   ADD_LIBRARY(${PLUGIN_TARGET} SHARED ${_all_target_files})
   
   # we need to explicitly state the debug versions of the libraries

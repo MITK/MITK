@@ -103,6 +103,10 @@ void QmitkRegionGrowing::Activated()
   }
 }
 
+void QmitkRegionGrowing::Deactivated()
+{
+}
+
 void QmitkRegionGrowing::DoRegionGrowing()
 {
   mitk::DataTreeNode* node = m_Controls->m_TreeNodeSelector->GetSelectedNode();

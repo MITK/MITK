@@ -884,6 +884,9 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
+  if (sourcePart == NULL) {
+    return IDropTarget::Pointer(0);
+  }
   PartStack::Pointer sourceContainer = draggedObject.Cast<PartStack> ();
   if (sourceContainer == 0)
   {

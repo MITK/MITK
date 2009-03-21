@@ -143,10 +143,15 @@ void QmitkPropertiesTableEditor::init()
 void QmitkPropertiesTableEditor::ChkShowRenderPropertiesToggled( bool checked )
 {
   m_ComboRenderer->setEnabled(checked);
-  if(checked)
+  if(checked) {
     ComboRendererCurrentIndexChanged( m_ComboRenderer->currentIndex() );
-  else
-    m_Model->setPropertyList( m_SelectedNode->GetPropertyList() );
+  } else {
+    if (m_SelectedNode != NULL) { 
+      m_Model->setPropertyList( m_SelectedNode->GetPropertyList() );
+    } else {
+      m_Model->setPropertyList( NULL );
+    }
+  }
 }
 
 void QmitkPropertiesTableEditor::ComboRendererCurrentIndexChanged( int index )

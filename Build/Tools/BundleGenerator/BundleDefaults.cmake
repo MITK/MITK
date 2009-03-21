@@ -11,6 +11,7 @@ SET(PROJECT_STATIC_VAR "MITK_STATIC")
 SET(DOXYGEN_INGROUP "MITKPlugins")
 SET(DEFAULT_CREATE_PLUGIN_MACRO "MACRO_CREATE_MITK_PLUGIN()")
 SET(DEFAULT_CREATE_GUI_PLUGIN_MACRO "MACRO_CREATE_QMITK_PLUGIN()")
+SET(PLUGIN_TEMPLATE "${PROJECT_SOURCE_DIR}/../../../../CMake/Qt4FunctionalityTemplate" CACHE PATH "Path to the plugin templates" FORCE)
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit

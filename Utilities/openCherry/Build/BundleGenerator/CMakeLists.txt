@@ -127,7 +127,6 @@ ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 
 # --------------------- src/internal/ViewTemplateControls.ui ----------------------------
 IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
-IF(VIEW_CLASS) 
   SET(VIEW_CONTROLS "${VIEW_CLASS}Controls")
   SET(VIEW_CONTROLS_UI "${VIEW_CONTROLS}.ui")
   SET(VIEW_CONTROLS_FILE "ui_${VIEW_CONTROLS}.h")

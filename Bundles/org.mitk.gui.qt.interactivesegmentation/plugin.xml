@@ -10,6 +10,7 @@
       id="org.mitk.views.interactivesegmentation" 
       name="InteractiveSegmentation" 
       category="org.mitk.views.general" 
+      icon="resources/interactivesegmentation.png"
       class="QmitkInteractiveSegmentationView" />
   </extension>
   

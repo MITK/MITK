@@ -13,6 +13,10 @@ SET(MOC_H_FILES
   src/internal/QmitkRegionGrowing.h
 )
 
+SET(RESOURCE_FILES
+  resources/icon.xpm
+)
+
 SET(RES_FILES
   resources/regiongrowing.qrc
 )

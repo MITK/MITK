@@ -20,6 +20,7 @@ public:
 
   void SetFocus();
 
+  QmitkInteractiveSegmentationView();
   virtual ~QmitkInteractiveSegmentationView();
 
 protected:

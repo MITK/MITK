@@ -10,6 +10,7 @@
       id="org.mitk.views.regiongrowing"
       name="RegionGrowing"
       category="org.mitk.views.general"
+      icon="resources/icon.xpm"
       class="QmitkRegionGrowing" />
   </extension>
 

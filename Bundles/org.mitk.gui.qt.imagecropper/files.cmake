@@ -12,7 +12,10 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkImageCropper.h
-  
+)
+
+SET(RESOURCE_FILES
+  resources/icon.xpm
 )
 
 SET(RES_FILES

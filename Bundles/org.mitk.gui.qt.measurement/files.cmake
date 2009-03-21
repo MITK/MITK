@@ -14,6 +14,10 @@ SET(MOC_H_FILES
   src/internal/QmitkMeasurement.h
 )
 
+SET(RESOURCE_FILES
+  resources/icon.xpm
+)
+
 SET(RES_FILES
 )
 

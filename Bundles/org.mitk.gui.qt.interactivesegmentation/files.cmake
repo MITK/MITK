@@ -13,6 +13,10 @@ SET(MOC_H_FILES
   src/internal/QmitkInteractiveSegmentationView.h
 )
 
+SET(RESOURCE_FILES
+  resources/interactivesegmentation.png
+)
+
 SET(RES_FILES
   resources/interactivesegmentation.qrc
 )

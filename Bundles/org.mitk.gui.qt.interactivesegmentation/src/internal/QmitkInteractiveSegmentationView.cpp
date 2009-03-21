@@ -40,6 +40,11 @@
 
 #include "itkTreeChangeEvent.h"
 
+QmitkInteractiveSegmentationView::QmitkInteractiveSegmentationView()
+:m_MultiWidget(NULL)
+{
+}
+
 
 void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 {

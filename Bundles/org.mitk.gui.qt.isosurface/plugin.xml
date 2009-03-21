@@ -10,6 +10,7 @@
       id="org.mitk.views.isosurface"
       name="IsoSurface"
       category="org.mitk.views.general"
+      icon="resources/isoSurface.xpm"
       class="QmitkIsoSurface" />
   </extension>
 

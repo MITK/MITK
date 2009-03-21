@@ -10,6 +10,7 @@
       id="org.mitk.views.measurement" 
       name="Measurement" 
       category="org.mitk.views.general" 
+      icon="resources/icon.xpm"
       class="QmitkMeasurement" />
   </extension>
   

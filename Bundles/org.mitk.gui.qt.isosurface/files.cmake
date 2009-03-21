@@ -13,6 +13,10 @@ SET(MOC_H_FILES
   src/internal/QmitkIsoSurface.h
 )
 
+SET(RESOURCE_FILES
+  resources/isoSurface.xpm
+)
+
 SET(RES_FILES
   resources/isosurface.qrc
 )

@@ -51,23 +51,23 @@ int QtWidgetsTweaklet::GetPrimaryScreenNumber()
   return impl.GetPrimaryScreenNumber();
 }
 
-IMenu::Pointer QtWidgetsTweaklet::CreateMenu(void*, IMenu::Style style)
-{
-  //TODO Qt CreateMenu
-  return IMenu::Pointer(0);
-}
+//IMenu::Pointer QtWidgetsTweaklet::CreateMenu(void*, IMenu::Style style)
+//{
+//  //TODO Qt CreateMenu
+//  return IMenu::Pointer(0);
+//}
 
-IMenu::Pointer QtWidgetsTweaklet::CreateMenu(IMenu::Pointer parent)
-{
-  //TODO Qt CreateMenu
-  return IMenu::Pointer(0);
-}
+//IMenu::Pointer QtWidgetsTweaklet::CreateMenu(IMenu::Pointer parent)
+//{
+//  //TODO Qt CreateMenu
+//  return IMenu::Pointer(0);
+//}
 
-IMenuItem::Pointer QtWidgetsTweaklet::CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index)
-{
-  //TODO Qt CreateMenuItem
-  return IMenuItem::Pointer(0);
-}
+//IMenuItem::Pointer QtWidgetsTweaklet::CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index)
+//{
+//  //TODO Qt CreateMenuItem
+//  return IMenuItem::Pointer(0);
+//}
 
 void QtWidgetsTweaklet::AddControlListener(void* widget,
     GuiTk::IControlListener::Pointer listener)

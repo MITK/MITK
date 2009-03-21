@@ -55,9 +55,9 @@ public:
   void SetData(void* widget, const std::string& id, Object::Pointer data);
   Object::Pointer GetData(void* widget, const std::string& id);
 
-  IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP);
-  IMenu::Pointer CreateMenu(IMenu::Pointer parent);
-  IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1);
+  //IMenu::Pointer CreateMenu(void*, IMenu::Style = IMenu::POP_UP);
+  //IMenu::Pointer CreateMenu(IMenu::Pointer parent);
+  //IMenuItem::Pointer CreateMenuItem(IMenu::Pointer, IMenuItem::Style, int index = -1);
 
   Rectangle GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();

@@ -67,12 +67,14 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
 
     mitk::NavigationData* output = this->GetOutput(index);
     assert(output);
-    output->Graft(nd); // copy all information from input to output
-    
+        
     //check if the dada is valid
-    if ( ! nd->IsDataValid())
+    if (!nd->IsDataValid())
+    {
+      output->SetDataValid(false);
       continue;
-
+    }
+    output->Graft(nd); // copy all information from input to output
     const mitk::BaseData* data = this->GetBaseData(nd);
     if (data == NULL)
     {

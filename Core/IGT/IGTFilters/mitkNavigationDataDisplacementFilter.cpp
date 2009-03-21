@@ -46,6 +46,7 @@ void mitk::NavigationDataDisplacementFilter::GenerateData()
 
     if (input->IsDataValid() == false)
     {
+      output->SetDataValid(false);
       continue;
     }
     output->Graft(input); // First, copy all information from input to output

@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorSequenceRainbow.h"
 #include "mitkDataStorage.h"
 #include "ui_QmitkIsoSurfaceControls.h"
-#include "../IsosurfaceDll.h"
 
 //class QmitkStdMultiWidget;
 //class QmitkIsoSurfaceControls;
@@ -33,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup org_mitk_gui_qt_isosurface_internal
   */
-class ISOSURFACE_EXPORTS QmitkIsoSurface : public QObject, public QmitkFunctionality
+class QmitkIsoSurface : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 

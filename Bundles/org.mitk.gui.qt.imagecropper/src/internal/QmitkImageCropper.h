@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 //!class QmitkStdMultiWidget;
 //!class QmitkImageCropperControls;
 #include "ui_QmitkImageCropperControls.h"
-#include "../QmitkImageCropperDll.h"
 
 /*!
 \ingroup org_mitk_gui_qt_imagecropper_internal
@@ -50,7 +49,7 @@ which implements moving and scaling the cuboid.
 */
 
 //!class QmitkImageCropper : public QmitkFunctionality, public mitk::OperationActor
-class MITK_QT_IMAGECROPPER QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk::OperationActor
+class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk::OperationActor
 {
 
   /// Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode)

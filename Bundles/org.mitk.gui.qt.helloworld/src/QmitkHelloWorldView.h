@@ -7,9 +7,7 @@
 #include <QPushButton>
 #include <QmitkStandardViews.h>
 
-#include "mitkQtHelloWorldDll.h"
-
-class MITK_QT_HELLOWORLD QmitkHelloWorldView : public QObject, public QmitkFunctionality
+class QmitkHelloWorldView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT;
 

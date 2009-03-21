@@ -6,9 +6,7 @@
 #include <QmitkDataStorageListModel.h>
 #include <QmitkTransferFunctionWidget.h>
 
-#include "mitkQtStdViewsDll.h"
-
-class MITK_QT_STDVIEWS QmitkVolumeRenderingView : public QObject, public QmitkFunctionality
+class QmitkVolumeRenderingView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 

@@ -26,7 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 
 #include "ui_QmitkRegionGrowingControls.h"
-#include "../regiongrowingDll.h"
 
 /*!
 
@@ -39,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class REGIONGROWING_EXPORTS QmitkRegionGrowing : public QObject, public QmitkFunctionality
+class QmitkRegionGrowing : public QObject, public QmitkFunctionality
 {  
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

@@ -7,13 +7,12 @@
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
-#include "../mitkQtInteractiveSegmentationDll.h"
 #include "ui_QmitkInteractiveSegmentationControls.h"
 
 /**
  * \ingroup org_mitk_gui_qt_interactivesegmentation_internal
  */
-class MITK_QT_INTERACTIVESEGMENTATION QmitkInteractiveSegmentationView : public QObject
+class QmitkInteractiveSegmentationView : public QObject
   , public QmitkFunctionality
 {
   Q_OBJECT

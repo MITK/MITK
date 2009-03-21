@@ -34,8 +34,12 @@ WorkbenchPart::~WorkbenchPart()
     m_ImageDescriptor->DestroyImage(m_TitleImage);
 }
 
-WorkbenchPart::WorkbenchPart() :
-  m_Title(""), m_ToolTip(""), m_PartName(""), m_ContentDescription("")
+WorkbenchPart::WorkbenchPart() 
+:m_Title(""), 
+ m_TitleImage(0),
+ m_ToolTip(""), 
+ m_PartName(""), 
+ m_ContentDescription("")
 {
 
 }

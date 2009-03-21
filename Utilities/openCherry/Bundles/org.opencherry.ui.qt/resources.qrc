@@ -6,5 +6,7 @@
      <file>resources/cursor_offscreen.xpm</file>
      <file>resources/cursor_right.xpm</file>
      <file>resources/cursor_top.xpm</file>
+     <file>resources/icon_missing.png</file>
+     <file>resources/tab_close_icon.png</file>
  </qresource>
  </RCC>

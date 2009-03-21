@@ -95,7 +95,10 @@ QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
-    closeButton = new QPushButton("c");
+    const QIcon iconCloseTab( ":/resources/tab_close_icon.png" );
+    closeButton = new QPushButton( iconCloseTab, "");
+    closeButton->setContentsMargins(0, 0, 0, 0);
+    closeButton->setFixedSize(16,16);
     closeButton->setFlat(true);
   }
 

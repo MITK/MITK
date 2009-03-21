@@ -33,13 +33,14 @@ SET(INTERNAL_CPP_FILES
   cherryQtImageTweaklet.cpp
   cherryQtLogView.cpp
   cherryQtMainWindowControl.cpp
+  cherryQtMissingImageDescriptor.cpp
+  cherryQtPlatformLogModel.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp
   cherryQtShowViewAction.cpp
+  cherryQtShowViewDialog.cpp
   cherryQtTracker.cpp
   cherryQtUIPlugin.cpp
-  cherryQtPlatformLogModel.cpp
-  cherryQtShowViewDialog.cpp
   cherryQtWidgetController.cpp
   cherryQtWidgetsTweaklet.cpp
   cherryQtWidgetsTweakletImpl.cpp

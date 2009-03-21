@@ -20,6 +20,7 @@
 #include <cherryImageDescriptor.h>
 #include "cherryQtFileImageDescriptor.h"
 #include "cherryQtIconImageDescriptor.h"
+#include "cherryQtMissingImageDescriptor.h"
 
 namespace cherry {
 
@@ -37,7 +38,8 @@ SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromImage(void* img)
 
 SmartPointer<ImageDescriptor> QtImageTweaklet::GetMissingImageDescriptor()
 {
-  return ImageDescriptor::Pointer();
+  SmartPointer<QtMissingImageDescriptor> descriptor(new QtMissingImageDescriptor());
+  return descriptor;
 }
 
 void QtImageTweaklet::DestroyImage(const void* img)

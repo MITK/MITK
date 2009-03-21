@@ -25,14 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryIConfigurationElement.h>
 #include <cherryIAdaptable.h>
+#include "cherryImageDescriptor.h"
 
 #include <string>
 #include <vector>
 
 namespace cherry
 {
-
-class ImageDescriptor;
 
 /**
  * \ingroup org_opencherry_ui

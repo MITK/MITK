@@ -18,6 +18,7 @@
 #include "cherrySaveablesList.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryDefaultSaveable.h"
+#include "../cherryImageDescriptor.h"
 
 #include "../cherryWorkbenchPart.h"
 

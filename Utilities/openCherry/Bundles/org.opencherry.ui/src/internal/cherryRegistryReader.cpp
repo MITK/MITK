@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchRegistryConstants.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry
 {

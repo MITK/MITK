@@ -21,6 +21,7 @@
 #include "cherryDetachedWindow.h"
 #include "../cherryIWorkbenchWindow.h"
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry
 {

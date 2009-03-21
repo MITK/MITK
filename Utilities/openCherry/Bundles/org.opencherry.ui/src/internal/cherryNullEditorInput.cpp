@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryNullEditorInput.h"
 #include "../cherryPartPane.h"
 
+
 namespace cherry
 {
 

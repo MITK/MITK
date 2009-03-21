@@ -106,8 +106,8 @@ public:
         const Self::ConstPointer sv(value.Lock());
         return sv->HashCode();
       }
-      catch (BadWeakPointerException& e)
-      {
+      catch (BadWeakPointerException& /*e*/)
+      {        
         return 0;
       }
     }

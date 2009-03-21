@@ -32,6 +32,7 @@ SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromFile(const std::string&
 SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromImage(void* img)
 {
   ImageDescriptor::Pointer descriptor(new QtIconImageDescriptor(img));
+  return descriptor;
 }
 
 SmartPointer<ImageDescriptor> QtImageTweaklet::GetMissingImageDescriptor()

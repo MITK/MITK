@@ -21,13 +21,12 @@
 
 #include "../cherryUiDll.h"
 #include "../internal/cherryTweaklets.h"
+#include "../cherryImageDescriptor.h"
 
 #include <iostream>
 
 namespace cherry
 {
-
-class ImageDescriptor;
 
 /**
  * Provides the set of cursors used for drag-and-drop.

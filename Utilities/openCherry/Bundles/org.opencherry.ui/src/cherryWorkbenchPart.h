@@ -28,9 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIConfigurationElement.h>
 #include <cherryIExecutableExtension.h>
 
+#include "cherryImageDescriptor.h"
+
 namespace cherry {
 
-class ImageDescriptor;
 
 /**
  * \ingroup org_opencherry_ui

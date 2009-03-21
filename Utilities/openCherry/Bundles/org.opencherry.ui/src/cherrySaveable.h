@@ -26,13 +26,12 @@
 #include <vector>
 
 #include "cherryUiDll.h"
+#include "cherryImageDescriptor.h"
 
 namespace cherry {
 
 struct IWorkbenchPage;
 struct IWorkbenchPart;
-
-class ImageDescriptor;
 
 /**
  * A <code>Saveable</code> represents a unit of saveability, e.g. an editable

@@ -28,10 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 //TODO should be removed
 #include "../cherryUiDll.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry {
 
-class ImageDescriptor;
 class PartPane;
 
 /**

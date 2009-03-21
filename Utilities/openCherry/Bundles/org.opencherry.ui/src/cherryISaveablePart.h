@@ -92,7 +92,7 @@ struct CHERRY_UI ISaveablePart : public virtual Object {
      *   saving, and <code>false</code> if they have not changed since the last
      *   save
      */
-    virtual bool IsDirty() = 0;
+    virtual bool IsDirty() const = 0;
 
     /**
      * Returns whether the "Save As" operation is supported by this part.
@@ -100,7 +100,7 @@ struct CHERRY_UI ISaveablePart : public virtual Object {
      * @return <code>true</code> if "Save As" is supported, and <code>false</code>
      *  if not supported
      */
-    virtual bool IsSaveAsAllowed() = 0;
+    virtual bool IsSaveAsAllowed() const = 0;
 
     /**
      * Returns whether the contents of this part should be saved when the part
@@ -109,7 +109,7 @@ struct CHERRY_UI ISaveablePart : public virtual Object {
      * @return <code>true</code> if the contents of the part should be saved on
      *   close, and <code>false</code> if the contents are expendable
      */
-    virtual bool IsSaveOnCloseNeeded() = 0;
+    virtual bool IsSaveOnCloseNeeded() const = 0;
 };
 
 }

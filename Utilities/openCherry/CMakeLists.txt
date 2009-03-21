@@ -49,10 +49,13 @@ ELSE (Eclipse_DIR)
   SET(OPENCHERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
 ENDIF (Eclipse_DIR)
 
+SET(OPENCHERRY_DEBUG_POSTFIX d)
+
 CONFIGURE_FILE(openCherryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/openCherryConfig.cmake @ONLY)
 
 ADD_SUBDIRECTORY(Bundles)
 ADD_SUBDIRECTORY(Documentation)
+
 
 OPTION(BUILD_OPENCHERRY_TESTING "Build the openCherry tests." ON)
 

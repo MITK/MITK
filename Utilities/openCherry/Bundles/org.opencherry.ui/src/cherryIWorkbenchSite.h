@@ -58,7 +58,7 @@ struct IWorkbenchWindow;
  * @since 2.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct CHERRY_UI IWorkbenchSite : public IServiceLocator, public Object { // IAdaptable, IShellProvider {
+struct CHERRY_UI IWorkbenchSite : public IServiceLocator { // IAdaptable, IShellProvider {
 
   cherryInterfaceMacro(IWorkbenchSite, cherry);
 

@@ -44,19 +44,12 @@ namespace cherry {
  * @see org.opencherry.ui.handlers.IHandlerService
  * @see org.opencherry.ui.ISources
  */
-struct CHERRY_UI ISourceProvider {
+struct CHERRY_UI ISourceProvider : public virtual Object {
 
-  cherrySimpleInterfaceMacro(ISourceProvider, cherry);
+  cherryInterfaceMacro(ISourceProvider, cherry);
 
   typedef std::map<std::string, Object::Pointer> StateMapType;
 
-  /**
-   * Allows the source provider an opportunity to clean up resources (e.g.,
-   * listeners) before being released. This method should be called by the
-   * creator after the source provider has been removed from all the services
-   * with which it was registered.
-   */
-  virtual ~ISourceProvider() {}
 
   /**
    * Adds a listener to this source provider. This listener will be notified

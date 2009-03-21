@@ -215,7 +215,7 @@ bool SaveablesList::PromptForSavingIfNecessary(
 //  }
 //  return modelsToSave.isEmpty() ? false : promptForSaving(modelsToSave, window,
 //      window, canCancel, false);
-  return true;
+  return false;
 }
 
 void SaveablesList::FillModelsClosing(Saveable::Set& modelsClosing,
@@ -326,22 +326,22 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
     const std::list<IWorkbenchPart::Pointer>& partsToClose, bool save,
     IWorkbenchWindow::Pointer window)
 {
-//  // reference count (how many occurrences of a model will go away?)
-//  PostCloseInfo::Pointer postCloseInfo;
-//  for (std::list<IWorkbenchPart::Pointer>::iterator it = partsToClose.begin();
-//       it != partsToClose.end(); ++it)
-//  {
-//    WorkbenchPart::Pointer part = it->Cast<WorkbenchPart>();
-//    postCloseInfo->partsClosing.push_back(part);
-//    if (part.Cast<ISaveablePart> () != 0)
-//    {
-//      ISaveablePart::Pointer saveablePart = part.Cast<ISaveablePart>();
-//      if (save && !saveablePart->IsSaveOnCloseNeeded())
-//      {
-//        // pretend for now that this part is not closing
-//        continue;
-//      }
-//    }
+  // reference count (how many occurrences of a model will go away?)
+  PostCloseInfo::Pointer postCloseInfo(new PostCloseInfo());
+  for (std::list<IWorkbenchPart::Pointer>::const_iterator it = partsToClose.begin();
+       it != partsToClose.end(); ++it)
+  {
+    WorkbenchPart::Pointer part = it->Cast<WorkbenchPart>();
+    postCloseInfo->partsClosing.push_back(part);
+    if (part.Cast<ISaveablePart> () != 0)
+    {
+      ISaveablePart::Pointer saveablePart = part.Cast<ISaveablePart>();
+      if (save && !saveablePart->IsSaveOnCloseNeeded())
+      {
+        // pretend for now that this part is not closing
+        continue;
+      }
+    }
 //    if (save && part.Cast<ISaveablePart2> () != 0)
 //    {
 //      ISaveablePart2 saveablePart2 = (ISaveablePart2) part;
@@ -360,25 +360,24 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 //        continue;
 //      }
 //    }
-//    std::vector<Saveable::Pointer> modelsFromSource = getSaveables(part);
-//    for (int i = 0; i < modelsFromSource.length; i++)
-//    {
-//      incrementRefCount(postCloseInfo.modelsDecrementing, modelsFromSource[i]);
-//    }
-//  }
-//  fillModelsClosing(postCloseInfo.modelsClosing,
-//      postCloseInfo.modelsDecrementing);
-//  if (save)
-//  {
-//    boolean canceled = promptForSavingIfNecessary(window,
-//        postCloseInfo.modelsClosing, postCloseInfo.modelsDecrementing, true);
-//    if (canceled)
-//    {
-//      return 0;
-//    }
-//  }
-//  return postCloseInfo;
-  return PostCloseInfo::Pointer(0);
+    std::vector<Saveable::Pointer> modelsFromSource = this->GetSaveables(part);
+    for (unsigned int i = 0; i < modelsFromSource.size(); i++)
+    {
+      this->IncrementRefCount(postCloseInfo->modelsDecrementing, modelsFromSource[i]);
+    }
+  }
+  this->FillModelsClosing(postCloseInfo->modelsClosing,
+      postCloseInfo->modelsDecrementing);
+  if (save)
+  {
+    bool canceled = this->PromptForSavingIfNecessary(window,
+        postCloseInfo->modelsClosing, postCloseInfo->modelsDecrementing, true);
+    if (canceled)
+    {
+      return PostCloseInfo::Pointer(0);
+    }
+  }
+  return postCloseInfo;
 }
 
 bool SaveablesList::PromptForSaving(

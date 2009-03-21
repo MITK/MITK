@@ -22,6 +22,7 @@
 #include "../cherryUIException.h"
 #include "../tweaklets/cherryWorkbenchPageTweaklet.h"
 #include "../cherryPlatformUI.h"
+#include "../cherryImageDescriptor.h"
 
 #include "cherryWorkbenchPage.h"
 #include "cherryViewDescriptor.h"
@@ -39,11 +40,11 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
   factory(fac), secondaryId(secId), memento(m)
 {
   ViewDescriptor::Pointer desc = this->factory->GetViewRegistry()->Find(id).Cast<ViewDescriptor>();
-  //ImageDescriptor iDesc = null;
+  ImageDescriptor::Pointer iDesc;
   std::string title;
   if (!desc.IsNull())
   {
-    //iDesc = desc.getImageDescriptor();
+    iDesc = desc->GetImageDescriptor();
     title = desc->GetLabel();
   }
 
@@ -66,7 +67,7 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
     name = title;
   }
 
-  this->Init(id, "", /*iDesc,*/name, ""); //$NON-NLS-1$//$NON-NLS-2$
+  this->Init(id, "", iDesc, name, ""); //$NON-NLS-1$//$NON-NLS-2$
 
 }
 
@@ -105,7 +106,7 @@ void ViewReference::DoDisposePart()
 
 }
 
-IWorkbenchPage::Pointer ViewReference::GetPage()
+IWorkbenchPage::Pointer ViewReference::GetPage() const
 {
   return this->factory->GetWorkbenchPage().Cast<IWorkbenchPage>();
 }

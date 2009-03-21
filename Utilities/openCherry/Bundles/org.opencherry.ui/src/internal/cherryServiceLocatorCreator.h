@@ -33,8 +33,12 @@ class ServiceLocatorCreator : public IServiceLocatorCreator
 
 public:
 
-  IServiceLocator* CreateServiceLocator(IServiceLocator* parent,
-      IServiceFactory* factory, IDisposable* owner);
+  cherryObjectMacro(ServiceLocatorCreator)
+
+  SmartPointer<IServiceLocator> CreateServiceLocator(
+      const WeakPointer<IServiceLocator> parent,
+      const SmartPointer<const IServiceFactory> factory,
+      WeakPointer<IDisposable> owner);
 };
 
 }

@@ -147,7 +147,7 @@ public:
   IMemento::Pointer GetMemento();
 
 public:
-  SmartPointer<IWorkbenchPage> GetPage();
+  SmartPointer<IWorkbenchPage> GetPage() const;
 
 public:
   IEditorInput::Pointer GetEditorInput();

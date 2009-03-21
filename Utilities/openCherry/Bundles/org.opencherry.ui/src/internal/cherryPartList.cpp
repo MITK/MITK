@@ -153,7 +153,10 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
   poco_assert(activePartReference != ref);
   // We're not allowed to remove the active editor. We must deactivate it
   // first.
-  poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+  if (ref.Cast<IEditorReference>())
+  {
+    poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+  }
 
   if (ref->GetVisible())
   {
@@ -325,7 +328,10 @@ void PartList::PartClosed(WorkbenchPartReference::Pointer ref)
   poco_assert(activePartReference != ref);
   // Not allowed to close the active editor. The editor must be
   // deactivated before it may be closed.
-  poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+  if (ref.Cast<IEditorReference>())
+  {
+    poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+  }
 
   this->FirePartClosed(ref);
 }

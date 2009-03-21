@@ -111,10 +111,10 @@ private:
     void Dispose();
   };
 
-  ServiceLocatorOwner serviceLocatorOwner;
+  ServiceLocatorOwner::Pointer serviceLocatorOwner;
 
 protected:
-  ServiceLocator* serviceLocator;
+  ServiceLocator::Pointer serviceLocator;
 
   /**
    * Build the part site.
@@ -286,7 +286,7 @@ protected: void* GetAdapterImpl(const std::type_info& adapter) const;
    */
 //public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-public: Object::Pointer GetService(const std::string& api) const;
+public: Object::Pointer GetService(const std::string& api);
 
 public: bool HasService(const std::string& api) const;
 

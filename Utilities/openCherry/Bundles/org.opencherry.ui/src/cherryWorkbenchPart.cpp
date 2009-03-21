@@ -18,6 +18,7 @@
 #include "cherryWorkbenchPart.h"
 
 #include "cherryIWorkbenchPartConstants.h"
+#include "cherryImageDescriptor.h"
 
 #include "internal/cherryWorkbenchPlugin.h"
 
@@ -26,6 +27,12 @@
 
 namespace cherry
 {
+
+WorkbenchPart::~WorkbenchPart()
+{
+  if (m_TitleImage && m_ImageDescriptor)
+    m_ImageDescriptor->DestroyImage(m_TitleImage);
+}
 
 WorkbenchPart::WorkbenchPart() :
   m_Title(""), m_ToolTip(""), m_PartName(""), m_ContentDescription("")
@@ -95,12 +102,14 @@ void WorkbenchPart::SetTitleImage(void* titleImage)
   {
     return;
   }
+  m_ImageDescriptor->DestroyImage(m_TitleImage);
   this->m_TitleImage = titleImage;
-  //firePropertyChange(IWorkbenchPart.PROP_TITLE);
-  //    if (imageDescriptor != null) {
-  //      JFaceResources.getResources().destroyImage(imageDescriptor);
-  //      imageDescriptor = null;
-  //    }
+  this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
+
+  if (m_ImageDescriptor) {
+    //JFaceResources.getResources().destroyImage(imageDescriptor);
+    m_ImageDescriptor = 0;
+  }
 }
 
 void WorkbenchPart::SetTitleToolTip(const std::string& toolTip)
@@ -207,32 +216,35 @@ void WorkbenchPart::SetPartProperty(const std::string& key,
   this->FirePropertyChanged(key, oldValue, value);
 }
 
-std::string WorkbenchPart::GetPartProperty(const std::string& key)
+std::string WorkbenchPart::GetPartProperty(const std::string& key) const
 {
-  return partProperties[key];
+  std::map<std::string, std::string>::const_iterator itr = partProperties.find(key);
+  if (itr == partProperties.end()) return "";
+
+  return itr->second;
 }
 
-const std::map<std::string, std::string>& WorkbenchPart::GetPartProperties()
+const std::map<std::string, std::string>& WorkbenchPart::GetPartProperties() const
 {
   return partProperties;
 }
 
-IWorkbenchPartSite::Pointer WorkbenchPart::GetSite()
+IWorkbenchPartSite::Pointer WorkbenchPart::GetSite() const
 {
   return this->m_PartSite;
 }
 
-std::string WorkbenchPart::GetPartName()
+std::string WorkbenchPart::GetPartName() const
 {
   return this->m_PartName;
 }
 
-std::string WorkbenchPart::GetContentDescription()
+std::string WorkbenchPart::GetContentDescription() const
 {
   return this->m_ContentDescription;
 }
 
-void* WorkbenchPart::GetTitleImage()
+void* WorkbenchPart::GetTitleImage() const
 {
   if (this->m_TitleImage != 0)
   {
@@ -243,7 +255,7 @@ void* WorkbenchPart::GetTitleImage()
   //return GetDefaultImage();
 }
 
-std::string WorkbenchPart::GetTitleToolTip()
+std::string WorkbenchPart::GetTitleToolTip() const
 {
   return this->m_ToolTip;
 }
@@ -259,19 +271,21 @@ void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
   m_Title = m_PartName;
 
   // Icon.
-  //String strIcon = cfig.getAttribute("icon");//$NON-NLS-1$
-  //if (strIcon == null) {
-  //  return;
-  //}
+  std::string strIcon;
+  cfig->GetAttribute("icon", strIcon);//$NON-NLS-1$
+  if (strIcon.empty()) {
+    return;
+  }
 
-  //imageDescriptor = AbstractUIPlugin.imageDescriptorFromPlugin(
-  //        configElement.getNamespace(), strIcon);
+  m_ImageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+     m_ConfigElement->GetContributor(), strIcon);
 
-  //if (imageDescriptor == null) {
-  //  return;
-  //}
+  if (!m_ImageDescriptor) {
+    return;
+  }
 
   //titleImage = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+  m_TitleImage = m_ImageDescriptor->CreateImage();
 }
 
 } // namespace cherry

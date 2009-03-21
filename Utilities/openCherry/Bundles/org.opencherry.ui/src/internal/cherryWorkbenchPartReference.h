@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+class ImageDescriptor;
 class PartPane;
 
 /**
@@ -81,17 +82,17 @@ private: bool pinned;
 
 private: std::string tooltip;
 
-    /**
-     * Stores the current Image for this part reference. Lazily created. Null if not allocated.
-     */
-//private: Image image;
+/**
+ * Stores the current Image for this part reference. Lazily created. Null if not allocated.
+ */
+private: void* image;
 
-//private: ImageDescriptor defaultImageDescriptor;
+private: SmartPointer<ImageDescriptor> defaultImageDescriptor;
 
     /**
      * Stores the current image descriptor for the part.
      */
-//private: ImageDescriptor imageDescriptor;
+private: SmartPointer<ImageDescriptor> imageDescriptor;
 
     /**
      * API listener list
@@ -140,7 +141,7 @@ private: void DeferEvents(bool shouldQueue);
 
 public: WorkbenchPartReference();
 
-public: virtual bool IsDisposed();
+public: virtual bool IsDisposed() const;
 
 protected: virtual void CheckReference();
 
@@ -157,7 +158,7 @@ protected: virtual void SetPartName(const std::string& newPartName);
 
 protected: virtual void SetContentDescription(const std::string& newContentDescription);
 
-//protected: virtual void SetImageDescriptor(ImageDescriptor descriptor);
+protected: virtual void SetImageDescriptor(SmartPointer<ImageDescriptor> descriptor);
 
 protected: virtual void SetToolTip(const std::string& newToolTip);
 
@@ -170,10 +171,10 @@ protected: virtual void PropertyChanged(PropertyChangeEvent::Pointer event);
      */
 protected: virtual void RefreshFromPart();
 
-//protected: virtual ImageDescriptor ComputeImageDescriptor();
+protected: virtual SmartPointer<ImageDescriptor> ComputeImageDescriptor();
 
 public: virtual void Init(const std::string& id, const std::string& tooltip,
-            /*ImageDescriptor desc,*/ const std::string& paneName, const std::string& contentDescription);
+            SmartPointer<ImageDescriptor> desc, const std::string& paneName, const std::string& contentDescription);
 
 
     /**
@@ -186,18 +187,18 @@ public: virtual void AddPropertyListener(IPropertyChangeListener::Pointer listen
      */
 public: virtual void RemovePropertyListener(IPropertyChangeListener::Pointer listener);
 
-public: std::string GetId();
+public: std::string GetId() const;
 
-public: virtual std::string GetTitleToolTip();
+public: virtual std::string GetTitleToolTip() const;
 
-protected: std::string GetRawToolTip();
+protected: std::string GetRawToolTip() const;
 
     /**
      * Returns the pane name for the part
      *
      * @return the pane name for the part
      */
-public: virtual std::string GetPartName();
+public: virtual std::string GetPartName() const;
 
     /**
      * Gets the part name directly from the associated workbench part,
@@ -205,16 +206,16 @@ public: virtual std::string GetPartName();
      *
      * @return
      */
-protected: std::string GetRawPartName();
+protected: std::string GetRawPartName() const;
 
-protected: virtual std::string ComputePartName();
+protected: virtual std::string ComputePartName() const;
 
     /**
      * Returns the content description for this part.
      *
      * @return the pane name for the part
      */
-public: virtual std::string GetContentDescription();
+public: virtual std::string GetContentDescription() const;
 
     /**
      * Computes a new content description for the part. Subclasses may override to change the
@@ -222,20 +223,20 @@ public: virtual std::string GetContentDescription();
      *
      * @return the new content description for the part
      */
-protected: virtual std::string ComputeContentDescription();
+protected: virtual std::string ComputeContentDescription() const;
 
     /**
      * Returns the content description as set directly by the part, or the empty string if none
      *
      * @return the unmodified content description from the part (or the empty string if none)
      */
-protected: std::string GetRawContentDescription();
+protected: std::string GetRawContentDescription() const;
 
-public: virtual bool IsDirty();
+public: virtual bool IsDirty() const;
 
-//public: virtual Image GetTitleImage();
+public: virtual void* GetTitleImage();
 
-//public: virtual ImageDescriptor GetTitleImageDescriptor();
+public: virtual SmartPointer<ImageDescriptor> GetTitleImageDescriptor() const;
 
 public: virtual void FireVisibilityChange();
 
@@ -276,12 +277,14 @@ public: void Dispose();
 
 public: virtual void SetPinned(bool newPinned);
 
-public: virtual bool IsPinned();
+public: virtual bool IsPinned() const;
+
+protected: void DoDisposePart();
 
 /* (non-Javadoc)
  * @see org.opencherry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
  */
-public: virtual std::string GetPartProperty(const std::string& key);
+public: virtual std::string GetPartProperty(const std::string& key) const;
 
 protected: virtual void FirePropertyChange(PropertyChangeEvent::Pointer event);
 

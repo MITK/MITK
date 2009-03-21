@@ -18,8 +18,13 @@
 #include "cherryWorkbenchServiceRegistry.h"
 
 #include "../cherryISources.h"
+#include "../cherryISourceProvider.h"
 #include "../cherryPlatformUI.h"
+#include "../cherryImageDescriptor.h"
 
+#include "../services/cherryIServiceFactory.h"
+
+#include "cherryServiceLocator.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchRegistryConstants.h"
 #include "cherrySourcePriorityNameMapping.h"
@@ -36,8 +41,8 @@ const std::string WorkbenchServiceRegistry::EXT_ID_SERVICES =
 
 WorkbenchServiceRegistry* WorkbenchServiceRegistry::registry = 0;
 
-const IServiceLocator* WorkbenchServiceRegistry::GLOBAL_PARENT =
-    new GlobalParentLocator();
+const IServiceLocator::Pointer WorkbenchServiceRegistry::GLOBAL_PARENT =
+    IServiceLocator::Pointer(new GlobalParentLocator());
 
 const std::string* const WorkbenchServiceRegistry::supportedLevels()
 {
@@ -61,16 +66,16 @@ WorkbenchServiceRegistry::WorkbenchServiceRegistry()
 }
 
 WorkbenchServiceRegistry::ServiceFactoryHandle::ServiceFactoryHandle(
-    IServiceFactory* _factory)
+    IServiceFactory::ConstPointer _factory)
 : factory(_factory)
 {
 
 }
 
-WorkbenchServiceRegistry::ServiceFactoryHandle* WorkbenchServiceRegistry::LoadFromRegistry(
+WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry::LoadFromRegistry(
     const std::string& key)
 {
-  ServiceFactoryHandle* result = 0;
+  ServiceFactoryHandle::Pointer result;
   const std::vector<IConfigurationElement::Pointer> serviceFactories =
       this->GetExtensionPoint()->GetConfigurationElements();
   try
@@ -93,10 +98,10 @@ WorkbenchServiceRegistry::ServiceFactoryHandle* WorkbenchServiceRegistry::LoadFr
       }
       if (done)
       {
-        IServiceFactory* f =
+        IServiceFactory::Pointer f(
                 serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
-                    WorkbenchRegistryConstants::ATTR_FACTORY_CLASS);
-        ServiceFactoryHandle* handle = new ServiceFactoryHandle(f);
+                    WorkbenchRegistryConstants::ATTR_FACTORY_CLASS));
+        ServiceFactoryHandle::Pointer handle(new ServiceFactoryHandle(f));
 //        PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 //            serviceFactories[i].getDeclaringExtension(), handle,
 //            IExtensionTracker.REF_WEAK);
@@ -176,13 +181,13 @@ void WorkbenchServiceRegistry::ProcessVariables(
 }
 
 Object::Pointer WorkbenchServiceRegistry::GlobalParentLocator::GetService(
-    const std::string& api) const
+    const std::string& /*api*/)
 {
   return Object::Pointer(0);
 }
 
 bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
-    const std::string& api) const
+    const std::string& /*api*/) const
 {
   return false;
 }
@@ -197,17 +202,17 @@ WorkbenchServiceRegistry* WorkbenchServiceRegistry::GetRegistry()
 }
 
 Object::Pointer WorkbenchServiceRegistry::GetService(const std::string& key,
-    const IServiceLocator* parentLocator, const ServiceLocator* locator)
+    const IServiceLocator::Pointer parentLocator, const ServiceLocator::ConstPointer locator)
 {
-  ServiceFactoryHandle* handle = factories[key];
-  if (handle == 0)
+  ServiceFactoryHandle::Pointer handle(factories[key]);
+  if (!handle)
   {
     handle = this->LoadFromRegistry(key);
   }
-  if (handle != 0)
+  if (handle)
   {
-    Object::Pointer result = handle->factory->Create(key, parentLocator, locator);
-    if (result != 0)
+    Object::Pointer result(handle->factory->Create(key, parentLocator, locator));
+    if (result)
     {
       //handle->serviceLocators.insert(locator, new Object());
       return result;
@@ -216,9 +221,9 @@ Object::Pointer WorkbenchServiceRegistry::GetService(const std::string& key,
   return Object::Pointer(0);
 }
 
-std::vector<ISourceProvider*> WorkbenchServiceRegistry::GetSourceProviders()
+std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders()
 {
-  std::vector<ISourceProvider*> providers;
+  std::vector<ISourceProvider::Pointer> providers;
   const IExtensionPoint* ep = this->GetExtensionPoint();
   std::vector<IConfigurationElement::Pointer> elements =
       ep->GetConfigurationElements();
@@ -229,8 +234,9 @@ std::vector<ISourceProvider*> WorkbenchServiceRegistry::GetSourceProviders()
     {
       try
       {
-        providers.push_back(elements[i]->CreateExecutableExtension<ISourceProvider>(
+        ISourceProvider::Pointer provider(elements[i]->CreateExecutableExtension<ISourceProvider>(
             WorkbenchRegistryConstants::ATTR_PROVIDER));
+        providers.push_back(provider);
         this->ProcessVariables(elements[i]->GetChildren(
             WorkbenchRegistryConstants::TAG_VARIABLE));
       } catch (CoreException& e)

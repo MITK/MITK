@@ -19,7 +19,7 @@
 #ifndef CHERRYPARTINFO_H_
 #define CHERRYPARTINFO_H_
 
-#include <QPixmap>
+#include <QIcon>
 #include <cherryIPresentablePart.h>
 
 namespace cherry {
@@ -29,7 +29,7 @@ struct PartInfo {
      QString title;
      QString contentDescription;
      QString toolTip;
-     QPixmap* image;
+     QIcon* image;
      bool dirty;
 
      PartInfo();

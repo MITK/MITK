@@ -13,11 +13,11 @@ MACRO(MACRO_PARSE_MANIFEST _manifest_)
     SET(CHERRY-SYSTEMBUNDLE "")
     SET(REQUIRE-BUNDLE "")
 
-    SET(_file ${_manifest_})
+    SET(_file "${_manifest_}")
     
-    #FILE(STRINGS ${_file} _mflines LENGTH_MINIMUM 1 REGEX .*:.+)
+    #FILE(STRINGS "${_file}" _mflines LENGTH_MINIMUM 1 REGEX .*:.+)
     
-    FILE(READ ${_file} _mfcontent)
+    FILE(READ "${_file}" _mfcontent)
     STRING(REGEX MATCHALL [^\n\r]+ _mflines "${_mfcontent}")
     
     FOREACH(_line ${_mflines})

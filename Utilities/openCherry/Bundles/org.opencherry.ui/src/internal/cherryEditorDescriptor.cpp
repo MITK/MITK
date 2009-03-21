@@ -1,19 +1,19 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryEditorDescriptor.h"
 
@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchPlugin.h"
 
 #include "../cherryEditorPart.h"
+#include "cherryImageDescriptor.h"
 
 namespace cherry
 {
@@ -32,14 +33,15 @@ const int EditorDescriptor::OPEN_INPLACE = 0x02;
 const int EditorDescriptor::OPEN_EXTERNAL = 0x04;
 
 EditorDescriptor::EditorDescriptor(const std::string& id2,
-    IConfigurationElement::Pointer element)
-: matchingStrategyChecked(false), openMode(0)
+    IConfigurationElement::Pointer element) :
+  testImage(true), matchingStrategyChecked(false), openMode(0)
 {
   this->SetID(id2);
   this->SetConfigurationElement(element);
 }
 
-EditorDescriptor::EditorDescriptor() : matchingStrategyChecked(false), openMode(0)
+EditorDescriptor::EditorDescriptor() :
+  testImage(true), matchingStrategyChecked(false), openMode(0)
 {
 }
 
@@ -75,7 +77,7 @@ EditorDescriptor::EditorDescriptor() : matchingStrategyChecked(false), openMode(
 //  return contributor;
 //}
 
-std::string EditorDescriptor::GetClassName()
+std::string EditorDescriptor::GetClassName() const
 {
   if (configurationElement.IsNull())
   {
@@ -85,29 +87,31 @@ std::string EditorDescriptor::GetClassName()
       WorkbenchRegistryConstants::ATT_CLASS);
 }
 
-IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement()
+IConfigurationElement::Pointer EditorDescriptor::GetConfigurationElement() const
 {
   return configurationElement;
 }
 
 IEditorPart::Pointer EditorDescriptor::CreateEditor()
 {
-  IEditorPart::Pointer extension(configurationElement->CreateExecutableExtension<IEditorPart>(
-      WorkbenchRegistryConstants::ATT_CLASS));
+  IEditorPart::Pointer extension(
+      configurationElement->CreateExecutableExtension<IEditorPart> (
+          WorkbenchRegistryConstants::ATT_CLASS));
   return extension;
 }
 
-std::string EditorDescriptor::GetFileName()
+std::string EditorDescriptor::GetFileName() const
 {
   //if (program == null)
   //{
-    if (configurationElement.IsNull())
-    {
-      return fileName;
-    }
-    std::string val;
-    configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND, val);
-    return val;
+  if (configurationElement.IsNull())
+  {
+    return fileName;
+  }
+  std::string val;
+  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_COMMAND,
+      val);
+  return val;
   //}
   //return program.getName();
 }
@@ -116,44 +120,102 @@ std::string EditorDescriptor::GetId() const
 {
   //if (program == null)
   //{
-    if (configurationElement.IsNull())
-    {
-      return id;
-    }
-    std::string val;
-    configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, val);
-    return val;
+  if (configurationElement.IsNull())
+  {
+    return id;
+  }
+  std::string val;
+  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ID, val);
+  return val;
   //}
   //return Util.safeString(program.getName());
 }
 
-std::string EditorDescriptor::GetLabel()
+SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
+{
+  if (testImage)
+  {
+    testImage = false;
+    if (!imageDesc)
+    {
+      std::string imageFileName(this->GetImageFilename());
+      std::string command(this->GetFileName());
+      if (!imageFileName.empty() && configurationElement)
+      {
+        imageDesc = AbstractUIPlugin::ImageDescriptorFromPlugin(
+            configurationElement->GetContributor(), imageFileName);
+      }
+      else if (!command.empty())
+      {
+        //imageDesc = WorkbenchImages.getImageDescriptorFromProgram(
+        //    command, 0);
+      }
+    }
+    this->VerifyImage();
+  }
+
+  return imageDesc;
+}
+
+void EditorDescriptor::VerifyImage() const
+{
+  //TODO Editor verify image
+  //    if (!imageDesc) {
+  //      imageDesc = WorkbenchImages
+  //            .getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
+  //    }
+  //    else {
+  //      Image img = imageDesc.createImage(false);
+  //      if (img == null) {
+  //          // @issue what should be the default image?
+  //          imageDesc = WorkbenchImages
+  //                  .getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
+  //      } else {
+  //          img.dispose();
+  //      }
+  //    }
+}
+
+std::string EditorDescriptor::GetImageFilename() const
+{
+  if (!configurationElement)
+  {
+    return imageFilename;
+  }
+  std::string filename;
+  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON,
+      filename);
+  return filename;
+}
+
+std::string EditorDescriptor::GetLabel() const
 {
   //if (program == null)
   //{
-    if (configurationElement.IsNull())
-    {
-      return editorName;
-    }
-    std::string val;
-    configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
-    return val;
+  if (configurationElement.IsNull())
+  {
+    return editorName;
+  }
+  std::string val;
+  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
+  return val;
   //}
   //return program.getName();
 }
 
-std::string EditorDescriptor::GetLauncher()
+std::string EditorDescriptor::GetLauncher() const
 {
   if (configurationElement.IsNull())
   {
     return launcherName;
   }
   std::string val;
-  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LAUNCHER, val);
+  configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_LAUNCHER,
+      val);
   return val;
 }
 
-std::string EditorDescriptor::GetPluginID()
+std::string EditorDescriptor::GetPluginID() const
 {
   if (!configurationElement.IsNull())
   {
@@ -162,104 +224,104 @@ std::string EditorDescriptor::GetPluginID()
   return pluginIdentifier;
 }
 
-bool EditorDescriptor::IsInternal()
+bool EditorDescriptor::IsInternal() const
 {
   return this->GetOpenMode() == OPEN_INTERNAL;
 }
 
-bool EditorDescriptor::IsOpenInPlace()
+bool EditorDescriptor::IsOpenInPlace() const
 {
   return this->GetOpenMode() == OPEN_INPLACE;
 }
 
-bool EditorDescriptor::IsOpenExternal()
+bool EditorDescriptor::IsOpenExternal() const
 {
   return this->GetOpenMode() == OPEN_EXTERNAL;
 }
 
 bool EditorDescriptor::LoadValues(IMemento::Pointer memento)
 {
-//  editorName = memento.getString(IWorkbenchConstants.TAG_LABEL);
-//  imageFilename = memento.getString(IWorkbenchConstants.TAG_IMAGE);
-//  className = memento.getString(IWorkbenchConstants.TAG_CLASS);
-//  launcherName = memento.getString(IWorkbenchConstants.TAG_LAUNCHER);
-//  fileName = memento.getString(IWorkbenchConstants.TAG_FILE);
-//  id = Util.safeString(memento.getString(IWorkbenchConstants.TAG_ID));
-//  pluginIdentifier = memento.getString(IWorkbenchConstants.TAG_PLUGIN);
-//
-//  Integer openModeInt = memento
-//  .getInteger(IWorkbenchConstants.TAG_OPEN_MODE);
-//  if (openModeInt != null)
-//  {
-//    openMode = openModeInt.intValue();
-//  }
-//  else
-//  {
-//    // legacy: handle the older attribute names, needed to allow reading of pre-3.0-RCP workspaces
-//    boolean internal = new Boolean(memento
-//        .getString(IWorkbenchConstants.TAG_INTERNAL))
-//    .booleanValue();
-//    boolean openInPlace = new Boolean(memento
-//        .getString(IWorkbenchConstants.TAG_OPEN_IN_PLACE))
-//    .booleanValue();
-//    if (internal)
-//    {
-//      openMode = OPEN_INTERNAL;
-//    }
-//    else
-//    {
-//      if (openInPlace)
-//      {
-//        openMode = OPEN_INPLACE;
-//      }
-//      else
-//      {
-//        openMode = OPEN_EXTERNAL;
-//      }
-//    }
-//  }
-//  if (openMode != OPEN_EXTERNAL && openMode != OPEN_INTERNAL && openMode
-//      != OPEN_INPLACE)
-//  {
-//    WorkbenchPlugin
-//    .log("Ignoring editor descriptor with invalid openMode: " + this); //$NON-NLS-1$
-//    return false;
-//  }
-//
-//  String programName = memento
-//  .getString(IWorkbenchConstants.TAG_PROGRAM_NAME);
-//  if (programName != null)
-//  {
-//    this.program = findProgram(programName);
-//  }
+  //  editorName = memento.getString(IWorkbenchConstants.TAG_LABEL);
+  //  imageFilename = memento.getString(IWorkbenchConstants.TAG_IMAGE);
+  //  className = memento.getString(IWorkbenchConstants.TAG_CLASS);
+  //  launcherName = memento.getString(IWorkbenchConstants.TAG_LAUNCHER);
+  //  fileName = memento.getString(IWorkbenchConstants.TAG_FILE);
+  //  id = Util.safeString(memento.getString(IWorkbenchConstants.TAG_ID));
+  //  pluginIdentifier = memento.getString(IWorkbenchConstants.TAG_PLUGIN);
+  //
+  //  Integer openModeInt = memento
+  //  .getInteger(IWorkbenchConstants.TAG_OPEN_MODE);
+  //  if (openModeInt != null)
+  //  {
+  //    openMode = openModeInt.intValue();
+  //  }
+  //  else
+  //  {
+  //    // legacy: handle the older attribute names, needed to allow reading of pre-3.0-RCP workspaces
+  //    boolean internal = new Boolean(memento
+  //        .getString(IWorkbenchConstants.TAG_INTERNAL))
+  //    .booleanValue();
+  //    boolean openInPlace = new Boolean(memento
+  //        .getString(IWorkbenchConstants.TAG_OPEN_IN_PLACE))
+  //    .booleanValue();
+  //    if (internal)
+  //    {
+  //      openMode = OPEN_INTERNAL;
+  //    }
+  //    else
+  //    {
+  //      if (openInPlace)
+  //      {
+  //        openMode = OPEN_INPLACE;
+  //      }
+  //      else
+  //      {
+  //        openMode = OPEN_EXTERNAL;
+  //      }
+  //    }
+  //  }
+  //  if (openMode != OPEN_EXTERNAL && openMode != OPEN_INTERNAL && openMode
+  //      != OPEN_INPLACE)
+  //  {
+  //    WorkbenchPlugin
+  //    .log("Ignoring editor descriptor with invalid openMode: " + this); //$NON-NLS-1$
+  //    return false;
+  //  }
+  //
+  //  String programName = memento
+  //  .getString(IWorkbenchConstants.TAG_PROGRAM_NAME);
+  //  if (programName != null)
+  //  {
+  //    this.program = findProgram(programName);
+  //  }
   return true;
 }
 
 void EditorDescriptor::SaveValues(IMemento::Pointer memento)
 {
-//  memento.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
-//  memento.putString(IWorkbenchConstants.TAG_IMAGE, getImageFilename());
-//  memento.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
-//  memento.putString(IWorkbenchConstants.TAG_LAUNCHER, getLauncher());
-//  memento.putString(IWorkbenchConstants.TAG_FILE, getFileName());
-//  memento.putString(IWorkbenchConstants.TAG_ID, getId());
-//  memento.putString(IWorkbenchConstants.TAG_PLUGIN, getPluginId());
-//
-//  memento.putInteger(IWorkbenchConstants.TAG_OPEN_MODE, getOpenMode());
-//  // legacy: handle the older attribute names, needed to allow reading of workspace by pre-3.0-RCP
-//  memento.putString(IWorkbenchConstants.TAG_INTERNAL, String
-//  .valueOf(isInternal()));
-//  memento.putString(IWorkbenchConstants.TAG_OPEN_IN_PLACE, String
-//  .valueOf(isOpenInPlace()));
-//
-//  if (this.program != null)
-//  {
-//    memento.putString(IWorkbenchConstants.TAG_PROGRAM_NAME,
-//        this.program.getName());
-//  }
+  //  memento.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
+  //  memento.putString(IWorkbenchConstants.TAG_IMAGE, getImageFilename());
+  //  memento.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
+  //  memento.putString(IWorkbenchConstants.TAG_LAUNCHER, getLauncher());
+  //  memento.putString(IWorkbenchConstants.TAG_FILE, getFileName());
+  //  memento.putString(IWorkbenchConstants.TAG_ID, getId());
+  //  memento.putString(IWorkbenchConstants.TAG_PLUGIN, getPluginId());
+  //
+  //  memento.putInteger(IWorkbenchConstants.TAG_OPEN_MODE, getOpenMode());
+  //  // legacy: handle the older attribute names, needed to allow reading of workspace by pre-3.0-RCP
+  //  memento.putString(IWorkbenchConstants.TAG_INTERNAL, String
+  //  .valueOf(isInternal()));
+  //  memento.putString(IWorkbenchConstants.TAG_OPEN_IN_PLACE, String
+  //  .valueOf(isOpenInPlace()));
+  //
+  //  if (this.program != null)
+  //  {
+  //    memento.putString(IWorkbenchConstants.TAG_PROGRAM_NAME,
+  //        this.program.getName());
+  //  }
 }
 
-int EditorDescriptor::GetOpenMode()
+int EditorDescriptor::GetOpenMode() const
 {
   if (configurationElement.IsNull())
   { // if we've been serialized, return our serialized value
@@ -327,17 +389,18 @@ void EditorDescriptor::SetPluginIdentifier(const std::string& anID)
   pluginIdentifier = anID;
 }
 
-std::string EditorDescriptor::ToString()
+std::string EditorDescriptor::ToString() const
 {
-  return "EditorDescriptor(id=" + this->GetId() + ", label=" + this->GetLabel() + ")"; //$NON-NLS-2$ //$NON-NLS-3$//$NON-NLS-1$
+  return "EditorDescriptor(id=" + this->GetId() + ", label=" + this->GetLabel()
+      + ")"; //$NON-NLS-2$ //$NON-NLS-3$//$NON-NLS-1$
 }
 
-std::string EditorDescriptor::GetLocalId()
+std::string EditorDescriptor::GetLocalId() const
 {
   return this->GetId();
 }
 
-std::string EditorDescriptor::GetPluginId()
+std::string EditorDescriptor::GetPluginId() const
 {
   return this->GetPluginID();
 }
@@ -347,18 +410,22 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
   if (matchingStrategy.IsNull() && !matchingStrategyChecked)
   {
     matchingStrategyChecked = true;
-    if (/*program == null &&*/ !configurationElement.IsNull())
+    if (/*program == null &&*/!configurationElement.IsNull())
     {
       std::string strategy;
-      if (configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY, strategy))
+      if (configurationElement->GetAttribute(
+          WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY, strategy))
       {
         try
         {
-          matchingStrategy = configurationElement->CreateExecutableExtension<IEditorMatchingStrategy>(WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
-        }
-        catch (CoreException e)
+          matchingStrategy = configurationElement->CreateExecutableExtension<
+              IEditorMatchingStrategy> (
+              WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
+        } catch (CoreException e)
         {
-          WorkbenchPlugin::Log("Error creating editor management policy for editor id " + this->GetId(), e); //$NON-NLS-1$
+          WorkbenchPlugin::Log(
+              "Error creating editor management policy for editor id "
+                  + this->GetId(), e); //$NON-NLS-1$
         }
       }
     }

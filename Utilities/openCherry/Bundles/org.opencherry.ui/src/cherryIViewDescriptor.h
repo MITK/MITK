@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+class ImageDescriptor;
+
 /**
  * \ingroup org_opencherry_ui
  *
@@ -67,20 +69,20 @@ struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdap
    * view in places like submenus.
    * @return array of category tokens or null if not specified.
    */
-  virtual const std::vector<std::string>& GetCategoryPath() = 0;
+  virtual const std::vector<std::string>& GetCategoryPath() const = 0;
 
   /**
    * Returns the description of this view.
    *
    * @return the description
    */
-  virtual std::string GetDescription() = 0;
+  virtual std::string GetDescription() const = 0;
 
 
   /**
    * Returns the descriptor for the icon to show for this view.
    */
-  //ImageDescriptor getImageDescriptor();
+  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
 
 
   /**
@@ -88,7 +90,7 @@ struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdap
    *
    * @return whether this view allows multiple instances
    */
-  virtual bool GetAllowMultiple() = 0;
+  virtual bool GetAllowMultiple() const = 0;
 
   virtual bool operator==(const Object*) const = 0;
 };

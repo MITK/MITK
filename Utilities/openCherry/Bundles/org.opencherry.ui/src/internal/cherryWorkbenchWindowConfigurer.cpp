@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchWindowConfigurer.h"
 
 #include "../cherryWorkbenchWindow.h"
+#include "../cherryImageDescriptor.h"
 #include "cherryWorkbench.h"
 #include "cherryWorkbenchPlugin.h"
 

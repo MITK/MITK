@@ -91,7 +91,7 @@ public:
    *
    * @see org.opencherry.ui.services.IServiceLocator#getService(java.lang.Object)
    */
-  Object::Pointer GetService(const std::string& key) const;
+  Object::Pointer GetService(const std::string& key);
 
   /*
    * (non-Javadoc)
@@ -369,7 +369,7 @@ private:
    * The service locator maintained by the workbench. These services are
    * initialized during workbench during the <code>init</code> method.
    */
-  ServiceLocator* serviceLocator;
+  ServiceLocator::Pointer serviceLocator;
 
   struct ServiceLocatorOwner : public IDisposable
   {
@@ -383,7 +383,7 @@ private:
 
   friend struct ServiceLocatorOwner;
 
-  ServiceLocatorOwner serviceLocatorOwner;
+  IDisposable::Pointer serviceLocatorOwner;
 
   /**
    * A count of how many large updates are going on. This tracks nesting of

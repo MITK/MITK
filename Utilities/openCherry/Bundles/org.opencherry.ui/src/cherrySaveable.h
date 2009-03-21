@@ -32,6 +32,8 @@ namespace cherry {
 struct IWorkbenchPage;
 struct IWorkbenchPart;
 
+class ImageDescriptor;
+
 /**
  * A <code>Saveable</code> represents a unit of saveability, e.g. an editable
  * subset of the underlying domain model that may contain unsaved changes.
@@ -89,7 +91,7 @@ public:
    *
    * @return the model's name; never <code>null</code>.
    */
-  virtual std::string GetName() = 0;
+  virtual std::string GetName() const = 0;
 
   /**
    * Returns the tool tip text for this saveable. This text is used to
@@ -99,7 +101,7 @@ public:
    *
    * @return the tool tip text; never <code>null</code>
    */
-  virtual  std::string GetToolTipText() = 0;
+  virtual  std::string GetToolTipText() const = 0;
 
   /**
    * Returns the image descriptor for this saveable.
@@ -107,7 +109,7 @@ public:
    * @return the image descriptor for this model; may be <code>null</code>
    *         if there is no image
    */
-  virtual void* GetImageDescriptor() = 0;
+  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
 
   /**
    * Saves the contents of this saveable.
@@ -141,7 +143,7 @@ public:
    *         saving, and <code>false</code> if they have not changed since
    *         the last save
    */
-  virtual bool IsDirty() = 0;
+  virtual bool IsDirty() const = 0;
 
   /**
    * Clients must implement equals and hashCode as defined in

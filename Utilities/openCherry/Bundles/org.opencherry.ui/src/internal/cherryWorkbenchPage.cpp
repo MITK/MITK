@@ -36,6 +36,7 @@
 #include "../cherryUIException.h"
 #include "../cherryPlatformUI.h"
 #include "../cherryPartPane.h"
+#include "../cherryImageDescriptor.h"
 
 #include <cherryIExtensionPointService.h>
 #include <cherryPlatform.h>
@@ -1440,7 +1441,7 @@ void WorkbenchPage::PartAdded(WorkbenchPartReference::Pointer ref)
 
 void WorkbenchPage::PartRemoved(WorkbenchPartReference::Pointer ref)
 {
-  partList->RemovePart(ref);
+  //partList->RemovePart(ref);
   this->DisposePart(ref);
 }
 

@@ -4,7 +4,8 @@
 # internal cache variable. 
 #
 # MACRO_COLLECT_PLUGINS(OUTPUT_DIR plugin_output_dir
-#                       [ADD_DIR on|off]
+#                       [CACHE_PLUGIN_SOURCE_DIRS cache_src_dirs]
+#                       [CACHE_PLUGIN_BINARY_DIRS cache_bin_dirs]
 #                       [FORCE_BUILD_ALL]
 #                       )
 #
@@ -12,9 +13,10 @@
 # plugins found. It is available as PLUGINS_OUTPUT_BASE_DIR
 # and used by the MACRO_CREATE_PLUGIN macro.
 #
-# ADD_DIR boolean value determining if the plugin_output_dir
-# should be added to the OPENCHERRY_PLUGIN_BINARY_DIRS variable. 
-# Default is on.
+# CACHE_PLUGIN_SOURCE_DIRS and CACHE_PLUGIN_BINARY_DIRS
+# names of CMake cache variables where the base plugin source
+# and binary directories will be appended. These variables
+# can late be used to configure your applications .ini file.
 #
 # FORCE_BUILD_ALL if set, the BUILD_pluginname variables are ignored and all
 # plugins under this directory are build
@@ -23,7 +25,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;ADD_DIR" "FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS" "FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -31,7 +33,7 @@ ENDIF(NOT _COLLECT_ADD_DIR)
  
 SET(PLUGINS_OUTPUT_BASE_DIR ${_COLLECT_OUTPUT_DIR})
 
-SET(CMAKE_DEBUG_POSTFIX d)
+SET(CMAKE_DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
 
  
 #MESSAGE(SEND_ERROR "_COLLECT_OUTPUT_DIR: ${_COLLECT_OUTPUT_DIR}")
@@ -40,38 +42,39 @@ SET(CMAKE_DEBUG_POSTFIX d)
 
 SET(PLUGINS_SOURCE_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-IF(_COLLECT_ADD_DIR)
-  
-  SET(OPENCHERRY_PLUGIN_SOURCE_DIRS ${OPENCHERRY_PLUGIN_SOURCE_DIRS} ${PLUGINS_SOURCE_BASE_DIR}
+IF(_COLLECT_CACHE_PLUGIN_SOURCE_DIRS)  
+  SET(${_COLLECT_CACHE_PLUGIN_SOURCE_DIRS} ${${_COLLECT_CACHE_PLUGIN_SOURCE_DIRS}} "${PLUGINS_SOURCE_BASE_DIR}"
       CACHE INTERNAL "List of base plugin source directories" FORCE)
-  SET(OPENCHERRY_PLUGIN_BINARY_DIRS ${OPENCHERRY_PLUGIN_BINARY_DIRS} ${_COLLECT_OUTPUT_DIR}
-      CACHE INTERNAL "List of base plugin binary directories" FORCE)
-  
-  #MESSAGE("New OPENCHERRY_PLUGIN_BINARY_DIRS is: ${OPENCHERRY_PLUGIN_BINARY_DIRS}")
-  
-ENDIF(_COLLECT_ADD_DIR)
+ENDIF(_COLLECT_CACHE_PLUGIN_SOURCE_DIRS)
 
+IF(_COLLECT_CACHE_PLUGIN_BINARY_DIRS)  
+  SET(${_COLLECT_CACHE_PLUGIN_BINARY_DIRS} ${${_COLLECT_CACHE_PLUGIN_BINARY_DIRS}} "${_COLLECT_OUTPUT_DIR}"
+      CACHE INTERNAL "List of base plugin source directories" FORCE)
+ENDIF(_COLLECT_CACHE_PLUGIN_BINARY_DIRS)
+  
 SET(_plugins_to_build )
 FILE(GLOB all_dirs *)
 FOREACH(dir_entry ${all_dirs})
-  IF(EXISTS ${dir_entry}/META-INF/MANIFEST.MF)
+  IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
     #SET(plugin_dirs ${plugin_dirs} ${dir_entry})
-    MACRO_PARSE_MANIFEST(${dir_entry}/META-INF/MANIFEST.MF)
+    MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF")
     IF(BUNDLE-SYMBOLICNAME)
-      SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR ${dir_entry})
-      SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR ${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME})
+      SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR "${dir_entry}")
+      SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR "${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}")
       # write the variable in .cmake file, so external projects have access to them
       SET(OPENCHERRY_BUNDLE_VARIABLES "${OPENCHERRY_BUNDLE_VARIABLES}
-      SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR ${dir_entry})
-      SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR ${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME})")
+SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
+SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
       
       OPTION("BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ON)
       IF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
-        LIST(APPEND _plugins_to_build ${dir_entry})
+        LIST(APPEND _plugins_to_build "${dir_entry}")
+        SET(OPENCHERRY_BUNDLE_VARIABLES "${OPENCHERRY_BUNDLE_VARIABLES}
+SET(BUILD_${BUNDLE-SYMBOLICNAME} 1)")
       ENDIF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
       
     ENDIF(BUNDLE-SYMBOLICNAME)
-  ENDIF(EXISTS ${dir_entry}/META-INF/MANIFEST.MF)
+  ENDIF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
 ENDFOREACH(dir_entry ${all_dirs})
 
 # add Poco directories for all plugins

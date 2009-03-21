@@ -95,7 +95,7 @@ private:
 
   IPropertyChangeListener::Pointer GetPropertyListenerProxy();
 
-  WorkbenchPartReference::Pointer GetPartReference();
+  WorkbenchPartReference::Pointer GetPartReference() const;
 
 protected:
 
@@ -111,7 +111,7 @@ public:
    */
   PresentablePart(SmartPointer<PartPane> part, void* parent);
 
-  SmartPointer<PartPane> GetPane();
+  SmartPointer<PartPane> GetPane() const;
 
   /**
    * Detach this PresentablePart from the real part. No further methods should
@@ -155,17 +155,17 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#getName()
    */
-  std::string GetName();
+  std::string GetName() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#getTitle()
    */
-  std::string GetTitle();
+  std::string GetTitle() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#getTitleStatus()
    */
-  std::string GetTitleStatus();
+  std::string GetTitleStatus() const;
 
   /*
    * (non-Javadoc)
@@ -179,19 +179,19 @@ public:
    *
    * @see org.opencherry.ui.presentations.IPresentablePart#getTitleToolTip()
    */
-  std::string GetTitleToolTip();
+  std::string GetTitleToolTip() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#isDirty()
    */
-  bool IsDirty();
+  bool IsDirty() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.presentations.IPresentablePart#isBusy()
    */
-  bool IsBusy();
+  bool IsBusy() const;
 
   /*
    * (non-Javadoc)
@@ -232,7 +232,7 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#isCloseable()
    */
-  bool IsCloseable();
+  bool IsCloseable() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#getControl()
@@ -246,7 +246,7 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.presentations.IPresentablePart#getPartProperty(java.lang.String)
    */
-  std::string GetPartProperty(const std::string& key);
+  std::string GetPartProperty(const std::string& key) const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)

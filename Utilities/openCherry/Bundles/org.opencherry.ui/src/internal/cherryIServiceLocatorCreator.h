@@ -19,13 +19,15 @@
 #ifndef CHERRYISERVICELOCATORCREATOR_H_
 #define CHERRYISERVICELOCATORCREATOR_H_
 
+#include <cherryObject.h>
 #include <cherryMacros.h>
 
-#include "../services/cherryIServiceLocator.h"
-#include "../services/cherryIServiceFactory.h"
-#include "../services/cherryIDisposable.h"
 
 namespace cherry {
+
+struct IServiceLocator;
+struct IServiceFactory;
+struct IDisposable;
 
 /**
  * When creating components this service can be used to create the appropriate
@@ -43,7 +45,7 @@ namespace cherry {
  *
  * @since 3.4
  */
-struct IServiceLocatorCreator : public Object {
+struct IServiceLocatorCreator : public virtual Object {
 
   cherryInterfaceMacro(IServiceLocatorCreator, cherry);
 
@@ -73,8 +75,10 @@ struct IServiceLocatorCreator : public Object {
    * @return the created service locator. The returned service locator will be
    *         an instance of {@link IDisposable}.
    */
-  virtual IServiceLocator* CreateServiceLocator(IServiceLocator* parent,
-      IServiceFactory* factory, IDisposable* owner) = 0;
+  virtual SmartPointer<IServiceLocator> CreateServiceLocator(
+      const WeakPointer<IServiceLocator> parent,
+      const SmartPointer<const IServiceFactory> factory,
+      WeakPointer<IDisposable> owner) = 0;
 };
 
 }

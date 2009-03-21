@@ -20,12 +20,27 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-std::string State::GetId()
+void State::AddListener(IStateListener::Pointer listener)
+{
+  stateEvents.AddListener(listener);
+}
+
+void State::RemoveListener(IStateListener::Pointer listener)
+{
+  stateEvents.RemoveListener(listener);
+}
+
+void State::FireStateChanged(Object::Pointer oldValue)
+{
+  stateEvents.stateChanged(State::Pointer(this), oldValue);
+}
+
+std::string State::GetId() const
 {
   return id;
 }
 
-Object::Pointer State::GetValue()
+Object::Pointer State::GetValue() const
 {
   return value;
 }

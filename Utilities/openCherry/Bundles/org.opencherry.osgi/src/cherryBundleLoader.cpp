@@ -328,15 +328,11 @@ void BundleLoader::ReadContributions(IBundle::Pointer bundle)
   IExtensionPointService::Pointer service = Platform::GetExtensionPointService();
   if (service->HasContributionFrom(bundle->GetSymbolicName())) return;
 
-  try
-  {
   std::istream* istr = bundle->GetResource(this->GetContributionsPathFor(bundle));
-  service->AddContribution(*istr, bundle->GetSymbolicName());
-  delete istr;
-  }
-  catch (Poco::FileNotFoundException exc)
+  if (istr)
   {
-    //std::cout << exc.displayText() << std::endl;
+    service->AddContribution(*istr, bundle->GetSymbolicName());
+    delete istr;
   }
 }
 

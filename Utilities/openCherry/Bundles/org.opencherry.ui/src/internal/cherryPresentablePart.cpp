@@ -48,7 +48,7 @@ IPropertyChangeListener::Pointer PresentablePart::GetPropertyListenerProxy()
   return lazyPartPropertyChangeListener;
 }
 
-WorkbenchPartReference::Pointer PresentablePart::GetPartReference()
+WorkbenchPartReference::Pointer PresentablePart::GetPartReference() const
 {
   return part->GetPartReference().Cast<WorkbenchPartReference>();
 }
@@ -79,7 +79,7 @@ PresentablePart::PresentablePart(PartPane::Pointer part, void* parent)
   this->GetPane()->AddPropertyListener(this->GetPropertyListenerProxy());
 }
 
-PartPane::Pointer PresentablePart::GetPane()
+PartPane::Pointer PresentablePart::GetPane() const
 {
   return part;
 }
@@ -135,7 +135,7 @@ void PresentablePart::SetFocus()
   }
 }
 
-std::string PresentablePart::GetName()
+std::string PresentablePart::GetName() const
 {
   if (enableOutputs)
   {
@@ -144,12 +144,12 @@ std::string PresentablePart::GetName()
   return name;
 }
 
-std::string PresentablePart::GetTitle()
+std::string PresentablePart::GetTitle() const
 {
   return this->GetPartReference()->GetPartName();
 }
 
-std::string PresentablePart::GetTitleStatus()
+std::string PresentablePart::GetTitleStatus() const
 {
   if (enableOutputs)
   {
@@ -161,14 +161,10 @@ std::string PresentablePart::GetTitleStatus()
 
 void* PresentablePart::GetTitleImage()
 {
-  //
-  //        return PlatformUI.getWorkbench().getSharedImages().getImage(
-  //                ISharedImages.IMG_DEF_VIEW);
-  //
+
   if (enableOutputs)
   {
-    //return this->GetPartReference()->GetTitleImage();
-    return 0;
+    return this->GetPartReference()->GetTitleImage();
   }
 
 //  return PlatformUI.getWorkbench().getSharedImages().getImage(
@@ -176,12 +172,12 @@ void* PresentablePart::GetTitleImage()
   return 0;
 }
 
-std::string PresentablePart::GetTitleToolTip()
+std::string PresentablePart::GetTitleToolTip() const
 {
   return this->GetPartReference()->GetTitleToolTip();
 }
 
-bool PresentablePart::IsDirty()
+bool PresentablePart::IsDirty() const
 {
   if (enableOutputs)
   {
@@ -190,7 +186,7 @@ bool PresentablePart::IsDirty()
   return isDirty;
 }
 
-bool PresentablePart::IsBusy()
+bool PresentablePart::IsBusy() const
 {
   if (enableOutputs)
   {
@@ -208,7 +204,7 @@ void* PresentablePart::GetToolBar()
   return 0;
 }
 
-bool PresentablePart::IsCloseable()
+bool PresentablePart::IsCloseable() const
 {
   return part->IsCloseable();
 }
@@ -291,7 +287,7 @@ void PresentablePart::EnableInputs(bool isActive)
   }
 }
 
-std::string PresentablePart::GetPartProperty(const std::string& key)
+std::string PresentablePart::GetPartProperty(const std::string& key) const
 {
   return this->GetPartReference()->GetPartProperty(key);
 }

@@ -52,7 +52,12 @@ BundleDirectory::GetResource(const std::string& path) const
   Poco::Path resPath(m_RootPath);
   std::string resStr = resPath.append(Path(path)).toString();
   //std::cout << "Getting resource: " << resStr << std::endl;
-  return new Poco::FileInputStream(resStr);
+  try {
+    return new Poco::FileInputStream(resStr);
+  }
+  catch (...)
+  {}
+  return 0;
 }
 
 void

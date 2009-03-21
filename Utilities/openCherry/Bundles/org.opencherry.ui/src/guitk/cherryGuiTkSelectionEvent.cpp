@@ -25,22 +25,10 @@ namespace cherry
 namespace GuiTk
 {
 
-SelectionEvent::SelectionEvent(void* item_) :
-  item(item_), detail(0), x(0), y(0), width(0), height(0),
-  stateMask(0), text(""), doit(true)
+SelectionEvent::SelectionEvent(void* item) :
+  Event()
 {
-
-}
-
-std::string SelectionEvent::ToString()
-{
-  std::ostringstream stream;
-  stream << "GUI SelectionEvent: " << " item=" << item << " detail=" << detail
-      << " x=" << x << " y=" << y << " width=" << width << " height=" << height
-      << " stateMask=" << stateMask << " text=" << text << " doit=" << doit
-      << std::endl;
-
-  return stream.str();
+  this->item = item;
 }
 
 }

@@ -22,6 +22,7 @@
 #include "../cherryUiDll.h"
 
 #include <cherryObject.h>
+#include <cherryMacros.h>
 
 namespace cherry {
 
@@ -43,7 +44,9 @@ namespace cherry {
  *
  * @since 3.2
  */
-struct CHERRY_UI IServiceLocator {
+struct CHERRY_UI IServiceLocator : public virtual Object {
+
+  cherryInterfaceMacro(IServiceLocator, cherry)
 
   /**
    * Retrieves the service corresponding to the given API.
@@ -54,7 +57,7 @@ struct CHERRY_UI IServiceLocator {
    * @return The service, or <code>null</code> if no such service could be
    *         found.
    */
-  virtual Object::Pointer GetService(const std::string& api) const = 0;
+  virtual Object::Pointer GetService(const std::string& api) = 0;
 
   /**
    * Whether this service exists within the scope of this service locator.
@@ -70,7 +73,6 @@ struct CHERRY_UI IServiceLocator {
    */
   virtual bool HasService(const std::string& api) const = 0;
 
-  virtual ~IServiceLocator() {}
 };
 
 }

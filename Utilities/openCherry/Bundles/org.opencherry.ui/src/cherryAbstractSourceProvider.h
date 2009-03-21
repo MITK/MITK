@@ -21,9 +21,9 @@
 
 #include "cherryISourceProvider.h"
 
-#include "services/cherryIServiceLocator.h"
-
 namespace cherry {
+
+struct IServiceLocator;
 
 /**
  * <p>
@@ -110,7 +110,7 @@ public:
    *            services like the IContextService
    * @since 3.4
    */
-  void Initialize(IServiceLocator* locator);
+  void Initialize(SmartPointer<const IServiceLocator> locator);
 };
 
 }

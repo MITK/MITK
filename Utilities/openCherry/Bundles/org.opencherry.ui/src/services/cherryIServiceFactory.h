@@ -21,9 +21,12 @@
 
 #include "../cherryUiDll.h"
 
+#include <cherryObject.h>
 #include <cherryMacros.h>
 
 namespace cherry {
+
+struct IServiceLocator;
 
 /**
  * A factory for creating services for use with the
@@ -33,9 +36,9 @@ namespace cherry {
  *
  * @since 3.4
  */
-struct CHERRY_UI IServiceFactory {
+struct CHERRY_UI IServiceFactory : public virtual Object {
 
-  cherryManifestMacro(IServiceFactory, cherry);
+  cherryInterfaceMacro(IServiceFactory, cherry);
 
   /**
    * When a service locator cannot find a service it will request one from the
@@ -60,7 +63,7 @@ struct CHERRY_UI IServiceFactory {
    * @return the created service or <code>null</code>
    */
   virtual Object::Pointer Create(const std::string& serviceInterface,
-      const IServiceLocator* parentLocator, const IServiceLocator* locator) = 0;
+      const SmartPointer<const IServiceLocator> parentLocator, const SmartPointer<const IServiceLocator> locator) const = 0;
 };
 
 }

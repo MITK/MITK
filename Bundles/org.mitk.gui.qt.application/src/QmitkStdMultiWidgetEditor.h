@@ -42,8 +42,8 @@ public:
 
   void DoSave() {}
   void DoSaveAs() {}
-  bool IsDirty() { return false; }
-  bool IsSaveAsAllowed() { return false; }
+  bool IsDirty() const { return false; }
+  bool IsSaveAsAllowed() const { return false; }
 
 protected:
 

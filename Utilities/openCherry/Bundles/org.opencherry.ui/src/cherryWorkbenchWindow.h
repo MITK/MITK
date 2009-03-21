@@ -60,7 +60,7 @@ public:
 
   ~WorkbenchWindow();
 
-  Object::Pointer GetService(const std::string& key) const;
+  Object::Pointer GetService(const std::string& key);
 
   bool HasService(const std::string& key) const;
 
@@ -307,7 +307,7 @@ private:
    * are initialized during workbench window during the
    * {@link #configureShell(Shell)}.
    */
-  ServiceLocator* serviceLocator;
+  ServiceLocator::Pointer serviceLocator;
 
   bool emptyWindowContentsCreated;
   void* emptyWindowContents;
@@ -327,7 +327,7 @@ private:
     void Dispose();
   };
 
-  ServiceLocatorOwner serviceLocatorOwner;
+  IDisposable::Pointer serviceLocatorOwner;
 
   class PageList
   {

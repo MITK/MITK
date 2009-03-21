@@ -1,37 +1,40 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryNamedHandleObjectWithState.h"
+#include "cherryINamedHandleStateIds.h"
+
+#include <Poco/Exception.h>
 
 namespace cherry
 {
 
 void NamedHandleObjectWithState::AddState(const std::string& stateId,
-    const State::ConstPointer state)
+    const State::Pointer state)
 {
-  if (state.IsNull())
+  if (!state)
   {
-    throw NullPointerException("Cannot add a null state"); //$NON-NLS-1$
+    throw Poco::NullPointerException("Cannot add a null state"); //$NON-NLS-1$
   }
 
   states[stateId] = state;
 }
 
-std::string NamedHandleObjectWithState::GetDescription()
+std::string NamedHandleObjectWithState::GetDescription() const
 {
   const std::string description(NamedHandleObject::GetDescription()); // Trigger a NDE.
 
@@ -42,14 +45,14 @@ std::string NamedHandleObjectWithState::GetDescription()
     const Object::ConstPointer value(descriptionState->GetValue());
     if (value.IsNotNull())
     {
-      return value.toString();
+      return value->ToString();
     }
   }
 
   return description;
 }
 
-std::string NamedHandleObjectWithState::GetName()
+std::string NamedHandleObjectWithState::GetName() const
 {
   const std::string name(NamedHandleObject::GetName()); // Trigger a NDE, if necessary.
 
@@ -60,33 +63,34 @@ std::string NamedHandleObjectWithState::GetName()
     const Object::ConstPointer value(nameState->GetValue());
     if (value.IsNotNull())
     {
-      return value.toString();
+      return value->ToString();
     }
   }
 
   return name;
 }
 
-const State::Pointer NamedHandleObjectWithState::GetState(
+State::Pointer NamedHandleObjectWithState::GetState(
     const std::string& stateId) const
 {
-  if (states.isEmpty())
+  if (states.empty())
   {
-    return NULL_STATE;
+    return State::Pointer(0);
   }
 
-  return states.find(stateId);
+  std::map<std::string, State::Pointer>::const_iterator iter = states.find(stateId);
+  return iter->second;
 }
 
 std::vector<std::string> NamedHandleObjectWithState::GetStateIds() const
 {
-  if (states.isEmpty())
+  if (states.empty())
   {
     return std::vector<std::string>();
   }
 
   std::vector<std::string> stateIds;
-  for (std::map<std::string, State>::const_iterator iter = states.begin();
+  for (std::map<std::string, State::Pointer>::const_iterator iter = states.begin();
       iter != states.end(); ++iter)
   {
     stateIds.push_back(iter->first);
@@ -96,19 +100,12 @@ std::vector<std::string> NamedHandleObjectWithState::GetStateIds() const
 
 void NamedHandleObjectWithState::RemoveState(const std::string& id)
 {
-  if (id == null)
+  if (id.empty())
   {
-    throw new NullPointerException("Cannot remove a null id"); //$NON-NLS-1$
+    throw Poco::InvalidArgumentException("Cannot remove an empty id"); //$NON-NLS-1$
   }
 
-  if (states != null)
-  {
-    states.remove(id);
-    if (states.isEmpty())
-    {
-      states = null;
-    }
-  }
+  states.erase(id);
 }
 
 NamedHandleObjectWithState::NamedHandleObjectWithState(const std::string& id)

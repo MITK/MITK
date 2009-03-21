@@ -118,7 +118,9 @@ public:
   /**
    * Returns the workbench. Fails if the workbench has not been created yet.
    *
-   * @return the workbench
+   * @return the workbench. A raw pointer is returned because you normally
+   * should not hold a smart pointer to it (and possibly create reference
+   * cycles)
    */
   static IWorkbench* GetWorkbench();
 

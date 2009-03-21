@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryViewRegistry.h"
 
 #include "../cherryPlatformUI.h"
+#include "../cherryImageDescriptor.h"
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchRegistryConstants.h"
 

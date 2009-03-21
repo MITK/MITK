@@ -21,8 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+const std::size_t HandleObject::HASH_CODE_NOT_COMPUTED = 0;
+const std::size_t HandleObject::HASH_FACTOR = 89;
+const std::size_t HandleObject::HASH_INITIAL = Poco::hash("cherry::HandleObject");
+
 HandleObject::HandleObject(const std::string& ID) :
-  defined(false), id(ID)
+  hashCode(HASH_CODE_NOT_COMPUTED), defined(false), id(ID)
 {
 }
 

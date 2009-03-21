@@ -333,8 +333,8 @@ public:
      * could be found
      * @since 3.0
      */
-//    static ImageDescriptor imageDescriptorFromPlugin(String pluginId,
-//            String imageFilePath);
+    static SmartPointer<ImageDescriptor> ImageDescriptorFromPlugin(
+        const std::string& pluginId, const std::string& imageFilePath);
 
 };
 

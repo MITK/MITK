@@ -77,7 +77,7 @@ struct CHERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
    *
    * @return the editor label
    */
-  virtual std::string GetLabel() = 0;
+  virtual std::string GetLabel() const = 0;
 
   /**
    * Returns whether this editor descriptor will open a regular editor
@@ -87,7 +87,7 @@ struct CHERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
    * <code>false</code> otherwise
    * @since 3.0
    */
-  virtual bool IsInternal() = 0;
+  virtual bool IsInternal() const = 0;
 
   /**
    * Returns whether this editor descriptor will open an external
@@ -97,7 +97,7 @@ struct CHERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
    * otherwise
    * @since 3.0
    */
-  virtual bool IsOpenInPlace() = 0;
+  virtual bool IsOpenInPlace() const = 0;
 
   /**
    * Returns whether this editor descriptor will open an external editor
@@ -107,7 +107,7 @@ struct CHERRY_UI IEditorDescriptor : public IWorkbenchPartDescriptor
    * otherwise
    * @since 3.0
    */
-  virtual bool IsOpenExternal() = 0;
+  virtual bool IsOpenExternal() const = 0;
 
   /**
    * Returns the editor matching strategy object for editors

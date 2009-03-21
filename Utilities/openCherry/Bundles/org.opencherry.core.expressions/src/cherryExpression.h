@@ -52,12 +52,12 @@ public:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-  static const int HASH_CODE_NOT_COMPUTED;
+  static const std::size_t HASH_CODE_NOT_COMPUTED;
 
   /**
    * A factor for computing the hash code for all expressions.
    */
-  static const intptr_t HASH_FACTOR;
+  static const std::size_t HASH_FACTOR;
 
   /**
    * Name of the value attribute of an expression (value is <code>value</code>).
@@ -70,7 +70,7 @@ private:
    * The hash code for this object. This value is computed lazily.  If it is
    * not yet computed, it is equal to {@link #HASH_CODE_NOT_COMPUTED}.
    */
-  mutable int fHashCode;
+  mutable std::size_t fHashCode;
 
 protected:
 
@@ -120,7 +120,7 @@ protected:
    *
    * @since 3.2
    */
-   static int HashCode(Expression::Pointer object);
+   static std::size_t HashCode(Expression::Pointer object);
 
     /**
    * Returns the hash code for the given array. This method handles
@@ -133,9 +133,9 @@ protected:
    *
    * @since 3.2
    */
-  static int HashCode(std::vector<Expression::Pointer>& array);
+  static std::size_t HashCode(std::vector<Expression::Pointer>& array);
 
-  static int HashCode(std::vector<ExpressionVariable::Pointer>& array);
+  static std::size_t HashCode(std::vector<ExpressionVariable::Pointer>& array);
 
   /**
      * Method to compute the hash code for this object. The result
@@ -149,7 +149,7 @@ protected:
      *
      * @since 3.2
      */
-    virtual intptr_t ComputeHashCode() const;
+    virtual std::size_t ComputeHashCode() const;
 
 
 public:
@@ -168,7 +168,7 @@ public:
   virtual ~Expression();
 
 
-  virtual int HashCode() const;
+  virtual std::size_t HashCode() const;
 
   /**
    * Evaluates this expression.

@@ -17,6 +17,8 @@
 
 #include "cherryViewLayout.h"
 
+#include "../cherryImageDescriptor.h"
+
 namespace cherry
 {
 

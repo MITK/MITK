@@ -54,17 +54,17 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
     /**
      * @see IWorkbenchPart#getTitleImage
      */
-    //virtual void* GetTitleImage() = 0;
+    virtual void* GetTitleImage() = 0;
 
     /**
      * @see IWorkbenchPart#getTitleToolTip
      */
-    virtual std::string GetTitleToolTip() = 0;
+    virtual std::string GetTitleToolTip() const = 0;
 
     /**
      * @see IWorkbenchPartSite#getId
      */
-    virtual std::string GetId() = 0;
+    virtual std::string GetId() const = 0;
 
     /**
      * @see IWorkbenchPart#addPropertyListener
@@ -79,7 +79,7 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
     /**
      * Returns the workbench page that contains this part
      */
-    virtual SmartPointer<IWorkbenchPage> GetPage() = 0;
+    virtual SmartPointer<IWorkbenchPage> GetPage() const = 0;
 
     /**
      * Returns the name of the part, as it should be shown in tabs.
@@ -88,7 +88,7 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
      *
      * @since 3.0
      */
-    virtual std::string GetPartName() = 0;
+    virtual std::string GetPartName() const = 0;
 
     /**
      * Returns the content description for the part (or the empty string if none)
@@ -97,12 +97,12 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
      *
      * @since 3.0
      */
-    virtual std::string GetContentDescription() = 0;
+    virtual std::string GetContentDescription() const = 0;
 
     /**
       * Returns true if the part is pinned otherwise returns false.
       */
-    virtual bool IsPinned() = 0;
+    virtual bool IsPinned() const = 0;
 
     /**
      * Returns whether the part is dirty (i.e. has unsaved changes).
@@ -111,7 +111,7 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
      *
      * @since 3.2 (previously existed on IEditorReference)
      */
-    virtual bool IsDirty() = 0;
+    virtual bool IsDirty() const = 0;
 
     /**
    * Return an arbitrary property from the reference. If the part has been
@@ -124,7 +124,7 @@ struct CHERRY_UI IWorkbenchPartReference : public Object {
    * @return The String property, or <code>null</code>.
    * @since 3.3
    */
-   virtual std::string GetPartProperty(const std::string& key) = 0;
+   virtual std::string GetPartProperty(const std::string& key) const = 0;
 
     /**
    * Add a listener for changes in the arbitrary properties set.

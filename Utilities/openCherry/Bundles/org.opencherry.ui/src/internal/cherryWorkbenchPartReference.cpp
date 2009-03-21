@@ -25,6 +25,7 @@
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIEditorPart.h"
 #include "../cherryIWorkbenchPartConstants.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry
 {
@@ -34,23 +35,25 @@ int WorkbenchPartReference::STATE_CREATION_IN_PROGRESS = 1;
 int WorkbenchPartReference::STATE_CREATED = 2;
 int WorkbenchPartReference::STATE_DISPOSED = 3;
 
+WorkbenchPartReference::PropertyChangeListener::PropertyChangeListener(
+    WorkbenchPartReference* ref) :
+  partRef(ref)
+{
 
-WorkbenchPartReference::PropertyChangeListener::PropertyChangeListener(WorkbenchPartReference* ref)
-  : partRef(ref)
-  {
-
-  }
-     void WorkbenchPartReference::PropertyChangeListener::PropertyChange(PropertyChangeEvent::Pointer event) {
-      partRef->PropertyChanged(event);
-     }
+}
+void WorkbenchPartReference::PropertyChangeListener::PropertyChange(
+    PropertyChangeEvent::Pointer event)
+{
+  partRef->PropertyChanged(event);
+}
 
 WorkbenchPartReference::WorkbenchPartReference() :
-  state(STATE_LAZY), pinned(false)
+  state(STATE_LAZY), pinned(false), image(0)
 {
   propertyChangeListener = new PropertyChangeListener(this);
 }
 
-bool WorkbenchPartReference::IsDisposed()
+bool WorkbenchPartReference::IsDisposed() const
 {
   return state == STATE_DISPOSED;
 }
@@ -107,31 +110,37 @@ void WorkbenchPartReference::SetContentDescription(
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_CONTENT_DESCRIPTION);
 }
 
-//void WorkbenchPartReference::SetImageDescriptor(ImageDescriptor descriptor) {
-//        if (Util.equals(imageDescriptor, descriptor)) {
-//            return;
-//        }
-//
-//        Image oldImage = image;
-//        ImageDescriptor oldDescriptor = imageDescriptor;
-//        image = null;
-//        imageDescriptor = descriptor;
-//
-//        // Don't queue events triggered by image changes. We'll dispose the image
-//        // immediately after firing the event, so we need to fire it right away.
-//        immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-//        if (queueEvents) {
-//            // If there's a PROP_TITLE event queued, remove it from the queue because
-//            // we've just fired it.
-//            queuedEvents.clear(IWorkbenchPartConstants.PROP_TITLE);
-//        }
-//
-//        // If we had allocated the old image, deallocate it now (AFTER we fire the property change
-//        // -- listeners may need to clean up references to the old image)
-//        if (oldImage != null) {
-//            JFaceResources.getResources().destroy(oldDescriptor);
-//        }
-//    }
+void WorkbenchPartReference::SetImageDescriptor(
+    ImageDescriptor::Pointer descriptor)
+{
+  if (imageDescriptor == descriptor)
+  {
+    return;
+  }
+
+  void* oldImage = image;
+  ImageDescriptor::Pointer oldDescriptor = imageDescriptor;
+  image = 0;
+  imageDescriptor = descriptor;
+
+  // Don't queue events triggered by image changes. We'll dispose the image
+  // immediately after firing the event, so we need to fire it right away.
+  this->ImmediateFirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
+  if (queueEvents)
+  {
+    // If there's a PROP_TITLE event queued, remove it from the queue because
+    // we've just fired it.
+    queuedEvents.erase(IWorkbenchPartConstants::PROP_TITLE);
+  }
+
+  // If we had allocated the old image, deallocate it now (AFTER we fire the property change
+  // -- listeners may need to clean up references to the old image)
+  if (oldImage && oldDescriptor)
+  {
+    //JFaceResources.getResources().destroy(oldDescriptor);
+    oldDescriptor->DestroyImage(oldImage);
+  }
+}
 
 void WorkbenchPartReference::SetToolTip(const std::string& newToolTip)
 {
@@ -144,33 +153,38 @@ void WorkbenchPartReference::SetToolTip(const std::string& newToolTip)
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void WorkbenchPartReference::PropertyChanged(Object::Pointer source, int propId) {
+void WorkbenchPartReference::PropertyChanged(Object::Pointer source, int propId)
+{
 
   // We handle these properties directly (some of them may be transformed
   // before firing events to workbench listeners)
-  if (propId == IWorkbenchPartConstants::PROP_CONTENT_DESCRIPTION
-          || propId == IWorkbenchPartConstants::PROP_PART_NAME
-          || propId == IWorkbenchPartConstants::PROP_TITLE) {
+  if (propId == IWorkbenchPartConstants::PROP_CONTENT_DESCRIPTION || propId
+      == IWorkbenchPartConstants::PROP_PART_NAME || propId
+      == IWorkbenchPartConstants::PROP_TITLE)
+  {
 
-      this->RefreshFromPart();
-  } else {
-      // Any other properties are just reported to listeners verbatim
-      this->FirePropertyChange(propId);
+    this->RefreshFromPart();
+  }
+  else
+  {
+    // Any other properties are just reported to listeners verbatim
+    this->FirePropertyChange(propId);
   }
 
   // Let the model manager know as well
-//  if (propId == IWorkbenchPartConstants::PROP_DIRTY) {
-//    IWorkbenchPart actualPart = getPart(false);
-//    if (actualPart != null) {
-//  SaveablesList modelManager = (SaveablesList) actualPart.getSite().getService(ISaveablesLifecycleListener.class);
-//      modelManager.dirtyChanged(actualPart);
-//    }
-//  }
+  //  if (propId == IWorkbenchPartConstants::PROP_DIRTY) {
+  //    IWorkbenchPart actualPart = getPart(false);
+  //    if (actualPart != null) {
+  //  SaveablesList modelManager = (SaveablesList) actualPart.getSite().getService(ISaveablesLifecycleListener.class);
+  //      modelManager.dirtyChanged(actualPart);
+  //    }
+  //  }
 }
 
-void WorkbenchPartReference::PropertyChanged(PropertyChangeEvent::Pointer event) {
-      this->FirePropertyChange(event);
-    }
+void WorkbenchPartReference::PropertyChanged(PropertyChangeEvent::Pointer event)
+{
+  this->FirePropertyChange(event);
+}
 
 /**
  * Refreshes all cached values with the values from the real part
@@ -187,42 +201,47 @@ void WorkbenchPartReference::RefreshFromPart()
   this->DeferEvents(false);
 }
 
-//ImageDescriptor WorkbenchPartReference::ComputeImageDescriptor() {
-//        if (part != null) {
-//            return ImageDescriptor.createFromImage(part.getTitleImage(), Display.getCurrent());
-//        }
-//        return defaultImageDescriptor;
-//    }
+ImageDescriptor::Pointer WorkbenchPartReference::ComputeImageDescriptor()
+{
+  if (part)
+  {
+    return ImageDescriptor::CreateFromImage(part->GetTitleImage());
+  }
+  return defaultImageDescriptor;
+}
 
 void WorkbenchPartReference::Init(const std::string& id,
-    const std::string& tooltip,
-    /*ImageDescriptor desc,*/const std::string& paneName,
-    const std::string& contentDescription)
+    const std::string& tooltip, ImageDescriptor::Pointer desc,
+    const std::string& paneName, const std::string& contentDescription)
 {
 
   this->id = id;
   this->tooltip = tooltip;
   this->partName = paneName;
   this->contentDescription = contentDescription;
-  //this->defaultImageDescriptor = desc;
-  //this->imageDescriptor = computeImageDescriptor();
+  this->defaultImageDescriptor = desc;
+  this->imageDescriptor = this->ComputeImageDescriptor();
 }
 
 /**
  * @see IWorkbenchPart
  */
-void WorkbenchPartReference::AddPropertyListener(IPropertyChangeListener::Pointer listener) {
+void WorkbenchPartReference::AddPropertyListener(
+    IPropertyChangeListener::Pointer listener)
+{
   propChangeEvents.AddListener(listener);
 }
 
 /**
  * @see IWorkbenchPart
  */
-void WorkbenchPartReference::RemovePropertyListener(IPropertyChangeListener::Pointer listener) {
+void WorkbenchPartReference::RemovePropertyListener(
+    IPropertyChangeListener::Pointer listener)
+{
   propChangeEvents.RemoveListener(listener);
 }
 
-std::string WorkbenchPartReference::GetId()
+std::string WorkbenchPartReference::GetId() const
 {
   if (!part.IsNull())
   {
@@ -235,12 +254,12 @@ std::string WorkbenchPartReference::GetId()
   return id;
 }
 
-std::string WorkbenchPartReference::GetTitleToolTip()
+std::string WorkbenchPartReference::GetTitleToolTip() const
 {
   return tooltip;
 }
 
-std::string WorkbenchPartReference::GetRawToolTip()
+std::string WorkbenchPartReference::GetRawToolTip() const
 {
   return part->GetTitleToolTip();
 }
@@ -250,7 +269,7 @@ std::string WorkbenchPartReference::GetRawToolTip()
  *
  * @return the pane name for the part
  */
-std::string WorkbenchPartReference::GetPartName()
+std::string WorkbenchPartReference::GetPartName() const
 {
   return partName;
 }
@@ -261,13 +280,13 @@ std::string WorkbenchPartReference::GetPartName()
  *
  * @return
  */
-std::string WorkbenchPartReference::GetRawPartName()
+std::string WorkbenchPartReference::GetRawPartName() const
 {
   return part->GetPartName();
 
 }
 
-std::string WorkbenchPartReference::ComputePartName()
+std::string WorkbenchPartReference::ComputePartName() const
 {
   return this->GetRawPartName();
 }
@@ -277,7 +296,7 @@ std::string WorkbenchPartReference::ComputePartName()
  *
  * @return the pane name for the part
  */
-std::string WorkbenchPartReference::GetContentDescription()
+std::string WorkbenchPartReference::GetContentDescription() const
 {
   return contentDescription;
 }
@@ -288,7 +307,7 @@ std::string WorkbenchPartReference::GetContentDescription()
  *
  * @return the new content description for the part
  */
-std::string WorkbenchPartReference::ComputeContentDescription()
+std::string WorkbenchPartReference::ComputeContentDescription() const
 {
   return this->GetRawContentDescription();
 }
@@ -298,39 +317,47 @@ std::string WorkbenchPartReference::ComputeContentDescription()
  *
  * @return the unmodified content description from the part (or the empty string if none)
  */
-std::string WorkbenchPartReference::GetRawContentDescription()
+std::string WorkbenchPartReference::GetRawContentDescription() const
 {
   return part->GetContentDescription();
 
 }
 
-bool WorkbenchPartReference::IsDirty()
+bool WorkbenchPartReference::IsDirty() const
 {
-  if (part.Cast<IEditorPart>().IsNull())
+  if (part.Cast<IEditorPart> ().IsNull())
   {
     return false;
   }
-  return part.Cast<IEditorPart>()->IsDirty();
+  return part.Cast<IEditorPart> ()->IsDirty();
 }
 
-//Image WorkbenchPartReference::GetTitleImage() {
-//        if (isDisposed()) {
-//            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
-//        }
-//
-//        if (image == null) {
-//            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-//        }
-//        return image;
-//    }
+void* WorkbenchPartReference::GetTitleImage()
+{
+  if (this->IsDisposed())
+  {
+    //return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+    return 0;
+  }
 
-//ImageDescriptor WorkbenchPartReference::GetTitleImageDescriptor() {
-//        if (isDisposed()) {
-//            return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
-//        }
-//
-//        return imageDescriptor;
-//    }
+  if (!image && imageDescriptor)
+  {
+    //image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+    image = imageDescriptor->CreateImage();
+  }
+  return image;
+}
+
+ImageDescriptor::Pointer WorkbenchPartReference::GetTitleImageDescriptor() const
+{
+  if (this->IsDisposed())
+  {
+    //return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
+    return ImageDescriptor::Pointer(0);
+  }
+
+  return imageDescriptor;
+}
 
 void WorkbenchPartReference::FireVisibilityChange()
 {
@@ -359,33 +386,41 @@ void WorkbenchPartReference::SetVisible(bool isVisible)
   this->GetPane()->SetVisible(isVisible);
 }
 
-void WorkbenchPartReference::DeferEvents(bool shouldQueue) {
-    queueEvents = shouldQueue;
+void WorkbenchPartReference::DeferEvents(bool shouldQueue)
+{
+  queueEvents = shouldQueue;
 
-    if (queueEvents == false) {
-      std::set<int>::iterator iter = queuedEvents.begin();
-      while (iter != queuedEvents.end()) {
-        this->FirePropertyChange(*iter);
-        queuedEvents.erase(iter++);
-      }
+  if (queueEvents == false)
+  {
+    std::set<int>::iterator iter = queuedEvents.begin();
+    while (iter != queuedEvents.end())
+    {
+      this->FirePropertyChange(*iter);
+      queuedEvents.erase(iter++);
     }
+  }
 }
 
-void WorkbenchPartReference::FirePropertyChange(int id) {
+void WorkbenchPartReference::FirePropertyChange(int id)
+{
 
-  if (queueEvents) {
-      queuedEvents.insert(id);
-      return;
+  if (queueEvents)
+  {
+    queuedEvents.insert(id);
+    return;
   }
 
   this->ImmediateFirePropertyChange(id);
 }
 
-void WorkbenchPartReference::ImmediateFirePropertyChange(int id) {
+void WorkbenchPartReference::ImmediateFirePropertyChange(int id)
+{
   //UIListenerLogging.logPartReferencePropertyChange(this, id);
   ObjectInt::Pointer value(new ObjectInt(id));
   Object::Pointer source(this);
-  PropertyChangeEvent::Pointer event(new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, value, value));
+  PropertyChangeEvent::Pointer
+      event(
+          new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, value, value));
   propChangeEvents.propertyChange(event);
 }
 
@@ -431,21 +466,20 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
         //ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
         //if (sizeProvider != null) {
         // If this part has a preferred size, indicate that the preferred size may have changed at this point
-        if (this->GetSizeFlags(true) != 0 || this->GetSizeFlags(false) != 0) {
-            this->FirePropertyChange(IWorkbenchPartConstants::PROP_PREFERRED_SIZE);
+        if (this->GetSizeFlags(true) != 0 || this->GetSizeFlags(false) != 0)
+        {
+          this->FirePropertyChange(IWorkbenchPartConstants::PROP_PREFERRED_SIZE);
         }
         //}
       }
 
       state = STATE_CREATED;
-    }
-    catch (Poco::Exception& e)
+    } catch (Poco::Exception& e)
     {
       state = STATE_CREATED;
       std::cerr << e.displayText() << std::flush;
       throw e;
-    }
-    catch (std::exception& e)
+    } catch (std::exception& e)
     {
       state = STATE_CREATED;
       throw e;
@@ -501,15 +535,16 @@ void WorkbenchPartReference::Dispose()
   }
 
   // Disposing the pane disposes the part's widgets. The part's widgets need to be disposed before the part itself.
-//  if (pane != 0) {
-//      // Remove the dispose listener since this is the correct place for the widgets to get disposed
-//      Control targetControl = getPane().getControl();
-//      if (targetControl != null) {
-//          targetControl.removeDisposeListener(prematureDisposeListener);
-//      }
-//      pane->Dispose();
-//  }
+  //  if (pane != 0) {
+  //      // Remove the dispose listener since this is the correct place for the widgets to get disposed
+  //      Control targetControl = getPane().getControl();
+  //      if (targetControl != null) {
+  //          targetControl.removeDisposeListener(prematureDisposeListener);
+  //      }
+  //      pane->Dispose();
+  //  }
 
+  this->DoDisposePart();
 
   if (!pane.IsNull())
   {
@@ -518,19 +553,52 @@ void WorkbenchPartReference::Dispose()
 
   //clearListenerList(internalPropChangeListeners);
   //clearListenerList(partChangeListeners);
-  //Image oldImage = image;
-  //ImageDescriptor oldDescriptor = imageDescriptor;
-  //image = null;
+  void* oldImage = image;
+  ImageDescriptor::Pointer oldDescriptor = imageDescriptor;
+  image = 0;
 
   state = STATE_DISPOSED;
-  //imageDescriptor = ImageDescriptor.getMissingImageDescriptor();
-  //defaultImageDescriptor = ImageDescriptor.getMissingImageDescriptor();
+  imageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
+  defaultImageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
   this->ImmediateFirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
   //clearListenerList(propChangeListeners);
 
-  //if (oldImage != null) {
-  //    JFaceResources.getResources().destroy(oldDescriptor);
-  //}
+  if (oldImage)
+  {
+    //JFaceResources.getResources().destroy(oldDescriptor);
+    oldDescriptor->DestroyImage(oldImage);
+  }
+}
+
+void WorkbenchPartReference::DoDisposePart()
+{
+  if (part)
+  {
+    //this->FireInternalPropertyChange(INTERNAL_PROPERTY_CLOSED);
+    this->FirePropertyChange(IWorkbenchPartConstants::PROP_CLOSED);
+    // Don't let exceptions in client code bring us down. Log them and continue.
+    try
+    {
+      part->RemovePropertyListener(propertyChangeListener);
+//      if (part instanceof IWorkbenchPart3)
+//      {
+//        ((IWorkbenchPart3) part).removePartPropertyListener(
+//            partPropertyChangeListener);
+//      }
+//      part->Dispose();
+      part = 0;
+    } catch (const Poco::RuntimeException& e)
+    {
+      WorkbenchPlugin::Log(e);
+    }
+    catch (const std::exception& e)
+    {
+      std::string msg("Exception in WorkbenchPartReference::DoDisposePart: ");
+      msg.append(e.what());
+      WorkbenchPlugin::Log(msg);
+    }
+    part = 0;
+  }
 }
 
 /**
@@ -567,32 +635,38 @@ void WorkbenchPartReference::SetPinned(bool newPinned)
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_PINNED);
 }
 
-bool WorkbenchPartReference::IsPinned()
+bool WorkbenchPartReference::IsPinned() const
 {
   return pinned;
 }
 
-std::string WorkbenchPartReference::GetPartProperty(const std::string& key) {
+std::string WorkbenchPartReference::GetPartProperty(const std::string& key) const
+{
   if (part != 0)
   {
     return part->GetPartProperty(key);
   }
   else
   {
-    return propertyCache[key];
+    std::map<std::string, std::string>::const_iterator itr =
+        propertyCache.find(key);
+    if (itr == propertyCache.end())
+      return "";
+    return itr->second;
   }
 }
 
-
-void WorkbenchPartReference::FirePropertyChange(PropertyChangeEvent::Pointer event)
+void WorkbenchPartReference::FirePropertyChange(
+    PropertyChangeEvent::Pointer event)
 {
   propChangeEvents.propertyChange(event);
 }
 
-void WorkbenchPartReference::CreatePartProperties(IWorkbenchPart::Pointer workbenchPart)
+void WorkbenchPartReference::CreatePartProperties(
+    IWorkbenchPart::Pointer workbenchPart)
 {
-  for (std::map<std::string, std::string>::iterator iter = propertyCache.begin();
-       iter != propertyCache.end(); ++iter)
+  for (std::map<std::string, std::string>::iterator iter =
+      propertyCache.begin(); iter != propertyCache.end(); ++iter)
   {
     workbenchPart->SetPartProperty(iter->first, iter->second);
   }
@@ -601,23 +675,23 @@ void WorkbenchPartReference::CreatePartProperties(IWorkbenchPart::Pointer workbe
 int WorkbenchPartReference::ComputePreferredSize(bool width,
     int availableParallel, int availablePerpendicular, int preferredResult)
 {
-//  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
-//  if (sizeProvider != null)
-//  {
-//    return sizeProvider.computePreferredSize(width, availableParallel,
-//        availablePerpendicular, preferredResult);
-//  }
+  //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
+  //  if (sizeProvider != null)
+  //  {
+  //    return sizeProvider.computePreferredSize(width, availableParallel,
+  //        availablePerpendicular, preferredResult);
+  //  }
 
   return preferredResult;
 }
 
 int WorkbenchPartReference::GetSizeFlags(bool width)
 {
-//  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
-//  if (sizeProvider != null)
-//  {
-//    return sizeProvider.getSizeFlags(width);
-//  }
+  //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
+  //  if (sizeProvider != null)
+  //  {
+  //    return sizeProvider.getSizeFlags(width);
+  //  }
   return 0;
 }
 

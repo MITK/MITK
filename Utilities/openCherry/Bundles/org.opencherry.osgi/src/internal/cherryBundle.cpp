@@ -268,6 +268,9 @@ void
 Bundle::LoadManifest()
 {
   std::istream* istr = m_Storage->GetResource("META-INF/MANIFEST.MF");
+  if (!istr)
+    throw Poco::FileNotFoundException("Could not load META-INF/MANIFEST.MF from " + m_Storage->GetPath().toString());
+
   m_Manifest = new BundleManifest(istr);
   delete istr;
 }

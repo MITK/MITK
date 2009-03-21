@@ -1,22 +1,24 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryAbstractUIPlugin.h"
 
+#include "internal/cherryBundleUtility.h"
+#include "cherryImageDescriptor.h"
 #include "cherryPlatformUI.h"
 
 namespace cherry
@@ -186,77 +188,67 @@ void AbstractUIPlugin::Start(IBundleContext::Pointer context)
   // We don't want to have created any delegates if this happens.
   // See bug 63324 for more details.
 
-//  bundleListener = new BundleListener()
-//  {
-//  public void bundleChanged(BundleEvent event)
-//    {
-//      if (event.getBundle() == getBundle())
-//      {
-//        if (event.getType() == BundleEvent.STARTED)
-//        {
-//          // We're getting notified that the bundle has been started.
-//          // Make sure it's still active.  It may have been shut down between
-//          // the time this event was queued and now.
-//          if (getBundle().getState() == Bundle.ACTIVE)
-//          {
-//            refreshPluginActions();
-//          }
-//          fc.removeBundleListener(this);
-//        }
-//      }
-//    }
-//  };
-//  context.addBundleListener(bundleListener);
+  //  bundleListener = new BundleListener()
+  //  {
+  //  public void bundleChanged(BundleEvent event)
+  //    {
+  //      if (event.getBundle() == getBundle())
+  //      {
+  //        if (event.getType() == BundleEvent.STARTED)
+  //        {
+  //          // We're getting notified that the bundle has been started.
+  //          // Make sure it's still active.  It may have been shut down between
+  //          // the time this event was queued and now.
+  //          if (getBundle().getState() == Bundle.ACTIVE)
+  //          {
+  //            refreshPluginActions();
+  //          }
+  //          fc.removeBundleListener(this);
+  //        }
+  //      }
+  //    }
+  //  };
+  //  context.addBundleListener(bundleListener);
 
   // bundleListener is removed in stop(BundleContext)
 }
 
 void AbstractUIPlugin::Stop(IBundleContext::Pointer context)
 {
-//  try
-//  {
-//    if (bundleListener != null)
-//    {
-//      context.removeBundleListener(bundleListener);
-//    }
-//    saveDialogSettings();
-//    savePreferenceStore();
-//    preferenceStore = null;
-//    if (imageRegistry != null)
-//    imageRegistry.dispose();
-//    imageRegistry = null;
-//}
+  //  try
+  //  {
+  //    if (bundleListener != null)
+  //    {
+  //      context.removeBundleListener(bundleListener);
+  //    }
+  //    saveDialogSettings();
+  //    savePreferenceStore();
+  //    preferenceStore = null;
+  //    if (imageRegistry != null)
+  //    imageRegistry.dispose();
+  //    imageRegistry = null;
+  //}
 
   Plugin::Stop(context);
 
 }
 
-//    static ImageDescriptor imageDescriptorFromPlugin(String pluginId,
-//            String imageFilePath) {
-//        if (pluginId == null || imageFilePath == null) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        // if the bundle is not ready then there is no image
-//        Bundle bundle = Platform.getBundle(pluginId);
-//        if (!BundleUtility.isReady(bundle)) {
-//      return null;
-//    }
-//
-//        // look for the image (this will check both the plugin and fragment folders
-//        URL fullPathString = BundleUtility.find(bundle, imageFilePath);
-//        if (fullPathString == null) {
-//            try {
-//                fullPathString = new URL(imageFilePath);
-//            } catch (MalformedURLException e) {
-//                return null;
-//            }
-//        }
-//
-//        if (fullPathString == null) {
-//      return null;
-//    }
-//        return ImageDescriptor.createFromURL(fullPathString);
-//    }
+SmartPointer<ImageDescriptor> AbstractUIPlugin::ImageDescriptorFromPlugin(
+    const std::string& pluginId, const std::string& imageFilePath)
+{
+  if (pluginId.empty() || imageFilePath.empty())
+  {
+    throw Poco::InvalidArgumentException();
+  }
+
+  // if the bundle is not ready then there is no image
+  IBundle::Pointer bundle = Platform::GetBundle(pluginId);
+  if (!BundleUtility::IsReady(bundle))
+  {
+    return ImageDescriptor::Pointer(0);
+  }
+
+  return ImageDescriptor::CreateFromFile(imageFilePath, pluginId);
+}
 
 }

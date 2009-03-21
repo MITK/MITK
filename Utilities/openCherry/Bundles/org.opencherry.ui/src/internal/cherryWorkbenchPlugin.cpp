@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbench.h"
 #include "cherryPlatform.h"
 
+#include "../cherryImageDescriptor.h"
+
 #include <Poco/String.h>
 
 namespace cherry

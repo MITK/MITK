@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "cherryAbstractSourceProvider.h"
+#include "services/cherryIServiceLocator.h"
 
 #include <Poco/Exception.h>
 
@@ -66,7 +67,7 @@ void AbstractSourceProvider::RemoveSourceProviderListener(
   sourceEvents.RemoveListener(listener);
 }
 
-void AbstractSourceProvider::Initialize(IServiceLocator* locator)
+void AbstractSourceProvider::Initialize(IServiceLocator::ConstPointer locator)
 {
 }
 

@@ -28,6 +28,7 @@
 #include "cherryPartTester.h"
 #include "../tweaklets/cherryWorkbenchPageTweaklet.h"
 
+#include "../cherryImageDescriptor.h"
 #include "../cherryPlatformUI.h"
 
 namespace cherry
@@ -42,8 +43,8 @@ EditorReference::EditorReference(EditorManager* man,
   this->InitListenersAndHandlers();
   restoredInput = input;
   this->editorState = editorState;
-  this->Init(desc->GetId(), "", /*desc.getImageDescriptor(),*/
-  desc->GetLabel(), ""); //$NON-NLS-1$//$NON-NLS-2$
+  this->Init(desc->GetId(), "", desc->GetImageDescriptor(),
+  desc->GetLabel(), "");
 }
 
 EditorReference::EditorReference(EditorManager* man, IMemento::Pointer memento) :
@@ -197,7 +198,7 @@ IMemento::Pointer EditorReference::GetMemento()
   return editorMemento;
 }
 
-IWorkbenchPage::Pointer EditorReference::GetPage()
+IWorkbenchPage::Pointer EditorReference::GetPage() const
 {
   return this->manager->page;
 }

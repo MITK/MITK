@@ -21,6 +21,8 @@
 #include "cherryPerspectiveHelper.h"
 #include "cherryLayoutTree.h"
 
+#include "../cherryImageDescriptor.h"
+
 namespace cherry
 {
 

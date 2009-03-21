@@ -442,9 +442,19 @@ class Message
       this->Send();
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:
@@ -556,9 +566,19 @@ class Message1
       this->Send(t);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:
@@ -653,11 +673,20 @@ class Message2
       this->Send(t, u);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
     }
 
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
+    }
 
   protected:
 
@@ -750,9 +779,19 @@ class Message3
       this->Send(t, u, v);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
 
@@ -847,9 +886,19 @@ class Message4
       this->Send(t, u, v, w);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return this->m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:

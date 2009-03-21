@@ -58,28 +58,28 @@ public:
    *
    * @see org.opencherry.ui.Saveable#getName()
    */
-  std::string GetName();
+  std::string GetName() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.Saveable#getImageDescriptor()
    */
-  void* GetImageDescriptor();
+  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.Saveable#getToolTipText()
    */
-  std::string GetToolTipText();
+  std::string GetToolTipText() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.Saveable#isDirty()
    */
-  bool IsDirty();
+  bool IsDirty() const;
 
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)

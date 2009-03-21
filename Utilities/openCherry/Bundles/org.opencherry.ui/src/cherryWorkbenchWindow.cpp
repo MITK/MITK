@@ -30,6 +30,8 @@
 #include "tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "tweaklets/cherryWorkbenchTweaklet.h"
 
+#include "services/cherryIServiceFactory.h"
+
 #include "cherryPlatformUI.h"
 
 #include "cherryDebugUtil.h"
@@ -48,7 +50,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
       updateDisabled(true), emptyWindowContentsCreated(false),
       emptyWindowContents(0),
       asMaximizedState(false),
-      serviceLocatorOwner(this)
+      serviceLocatorOwner(new ServiceLocatorOwner(this))
 {
   this->Register(); // increase the reference count to avoid deleting
                     // this object when temporary smart pointers
@@ -58,11 +60,13 @@ WorkbenchWindow::WorkbenchWindow(int number) :
   // an exception if workbench not created yet.
   IWorkbench* workbench = PlatformUI::GetWorkbench();
   IServiceLocatorCreator::Pointer slc =
-      workbench ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<
+      workbench->GetService(IServiceLocatorCreator::GetManifestName()).Cast<
           IServiceLocatorCreator> ();
-  this->serviceLocator
-      = dynamic_cast<ServiceLocator*> (slc ->CreateServiceLocator(workbench, 0,
-          &serviceLocatorOwner));
+
+  IServiceLocator::Pointer locator(workbench);
+    this->serviceLocator = slc->CreateServiceLocator(IServiceLocator::WeakPtr(locator), IServiceFactory::ConstPointer(0),
+          IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
+
   //  initializeDefaultServices();
 
   // Add contribution managers that are exposed to other plugins.
@@ -81,7 +85,6 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
 WorkbenchWindow::~WorkbenchWindow()
 {
-  delete serviceLocator;
 
   Shell::Pointer shell = detachedWindowShells->availableShells.front();
 
@@ -92,7 +95,7 @@ WorkbenchWindow::~WorkbenchWindow()
 #endif
 }
 
-Object::Pointer WorkbenchWindow::GetService(const std::string& key) const
+Object::Pointer WorkbenchWindow::GetService(const std::string& key)
 {
   return serviceLocator->GetService(key);
 }

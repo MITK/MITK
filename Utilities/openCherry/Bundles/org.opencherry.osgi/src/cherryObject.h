@@ -89,6 +89,30 @@ public:
 
   cherryObjectMacro(Object)
 
+  struct Hash {
+    inline std::size_t operator()(const Self* value) const
+    {
+      return value->HashCode();
+    }
+
+    inline std::size_t operator()(Self::ConstPointer value) const
+    {
+      return value->HashCode();
+    }
+
+    inline std::size_t operator()(Self::WeakPtr value) const
+    {
+      try {
+        const Self::ConstPointer sv(value.Lock());
+        return sv->HashCode();
+      }
+      catch (BadWeakPointerException& e)
+      {
+        return 0;
+      }
+    }
+  };
+
   /** Delete an openCherry object. This method should always be used to delete an
    * object when the new operator was used to create it. Using the C
    * delete method will not work with reference counting.  */
@@ -111,6 +135,17 @@ public:
 
   /** Returns a string representation of this object. */
   virtual std::string ToString() const;
+
+  /** Returns a hash code value for the object. Use the Object::Hash functor
+   * together with hashtable implementations.
+   */
+  virtual std::size_t HashCode() const;
+
+  /**
+   * Override this method to implement a specific "less than" operator
+   * for associative STL containers.
+   */
+  virtual bool operator<(const Object*) const;
 
   /** Increase the reference count (mark as used by another object).  */
   virtual void Register() const;

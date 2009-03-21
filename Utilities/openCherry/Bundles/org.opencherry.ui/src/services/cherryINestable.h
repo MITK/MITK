@@ -21,6 +21,9 @@
 
 #include "../cherryUiDll.h"
 
+#include <cherryObject.h>
+#include <cherryMacros.h>
+
 namespace cherry {
 
 /**
@@ -53,8 +56,10 @@ namespace cherry {
  *
  * @since 3.2
  */
-struct CHERRY_UI INestable
+struct CHERRY_UI INestable : public virtual Object
 {
+
+  cherryInterfaceMacro(INestable, cherry)
 
   /**
    * Notifies this service that the component within which it exists has
@@ -69,7 +74,6 @@ struct CHERRY_UI INestable
    */
   virtual void Deactivate() = 0;
 
-  virtual ~INestable() {};
 };
 
 }

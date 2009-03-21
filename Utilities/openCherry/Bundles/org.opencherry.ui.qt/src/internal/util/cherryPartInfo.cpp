@@ -36,7 +36,7 @@ void PartInfo::Set(IPresentablePart::Pointer part)
   name = part->GetName().c_str();
   title = part->GetTitle().c_str();
   contentDescription = part->GetTitleStatus().c_str();
-  image = static_cast<QPixmap*> (part->GetTitleImage());
+  image = static_cast<QIcon*> (part->GetTitleImage());
   toolTip = part->GetTitleToolTip().c_str();
   dirty = part->IsDirty();
 }

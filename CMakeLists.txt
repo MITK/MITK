@@ -5,6 +5,10 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
+# Clear the cache variables containing plugin base directories
+SET(MITK_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
+SET(MITK_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
+
 # only configure dart here if not already configured in the 
 # parent directory
 IF(NOT MITK_ALL_BUILD)

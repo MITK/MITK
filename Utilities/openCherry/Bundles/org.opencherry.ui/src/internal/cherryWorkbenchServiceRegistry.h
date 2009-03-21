@@ -18,18 +18,19 @@
 #ifndef CHERRYWORKBENCHSERVICEREGISTRY_H_
 #define CHERRYWORKBENCHSERVICEREGISTRY_H_
 
-#include "cherryServiceLocator.h"
-
-#include "../cherryAbstractSourceProvider.h"
-#include "../services/cherryIServiceFactory.h"
-
-#include <cherryIExtensionPoint.h>
-#include <cherryIConfigurationElement.h>
+#include "../services/cherryIServiceLocator.h"
 
 #include <vector>
+#include <map>
 
 namespace cherry
 {
+
+struct ISourceProvider;
+struct IServiceFactory;
+struct IExtensionPoint;
+struct IConfigurationElement;
+class ServiceLocator;
 
 /**
  * This class will create a service from the matching factory. If the factory
@@ -53,19 +54,21 @@ private:
 
   WorkbenchServiceRegistry();
 
-  struct ServiceFactoryHandle
+  struct ServiceFactoryHandle : public Object
   {
-    IServiceFactory* factory;
+    cherryObjectMacro(ServiceFactoryHandle)
+
+    SmartPointer<const IServiceFactory> factory;
     // TODO used in removeExtension to react to bundles being unloaded
     //WeakHashMap serviceLocators = new WeakHashMap();
     std::vector<std::string> serviceNames;
 
-    ServiceFactoryHandle(IServiceFactory* factory);
+    ServiceFactoryHandle(SmartPointer<const IServiceFactory> factory);
   };
 
-  std::map<std::string, ServiceFactoryHandle*> factories;
+  std::map<std::string, ServiceFactoryHandle::Pointer> factories;
 
-  ServiceFactoryHandle* LoadFromRegistry(const std::string& key);
+  ServiceFactoryHandle::Pointer LoadFromRegistry(const std::string& key);
 
   const IExtensionPoint* GetExtensionPoint();
 
@@ -73,11 +76,11 @@ private:
   static const unsigned int supportedLevelsCount;
 
   void ProcessVariables(
-      const std::vector<IConfigurationElement::Pointer>& children);
+      const std::vector<SmartPointer<IConfigurationElement> >& children);
 
   struct GlobalParentLocator: public IServiceLocator
   {
-    Object::Pointer GetService(const std::string& api) const;
+    Object::Pointer GetService(const std::string& api);
     bool HasService(const std::string& api) const;
   };
 
@@ -88,12 +91,12 @@ public:
   /**
    * Used as the global service locator's parent.
    */
-  static const IServiceLocator* GLOBAL_PARENT; // = new GlobalParentLocator();
+  static const IServiceLocator::Pointer GLOBAL_PARENT; // = new GlobalParentLocator();
 
   Object::Pointer GetService(const std::string& key,
-      const IServiceLocator* parentLocator, const ServiceLocator* locator);
+      const IServiceLocator::Pointer parentLocator, const SmartPointer<const ServiceLocator> locator);
 
-  std::vector<ISourceProvider*> GetSourceProviders();
+  std::vector<SmartPointer<ISourceProvider> > GetSourceProviders();
 
   //  void addExtension(IExtensionTracker tracker, IExtension extension) {
   //    // we don't need to react to adds because we are not caching the extensions we find -

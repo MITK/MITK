@@ -300,14 +300,19 @@ void QtWidgetsTweakletImpl::Dispose(QWidget* widget)
 
 Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int style)
 {
-  Qt::WindowFlags qtFlags;
+  Qt::WindowFlags qtFlags(Qt::CustomizeWindowHint);
 
   if (style & Constants::MAX)
     qtFlags |= Qt::WindowMaximizeButtonHint;
   if (style & Constants::MIN)
     qtFlags |= Qt::WindowMinimizeButtonHint;
   if (style & Constants::CLOSE)
+  {
     qtFlags |= Qt::WindowSystemMenuHint;
+#if QT_VERSION >= 0x040500
+    qtFlags |= Qt::WindowCloseButtonHint;
+#endif
+  }
   if (!(style & Constants::BORDER))
     qtFlags |= Qt::FramelessWindowHint;
   if (style & Constants::TITLE)

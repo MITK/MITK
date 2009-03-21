@@ -47,7 +47,7 @@ void HandlerUtil::IncorrectTypeFound(ExecutionEvent::Pointer event,
 Object::Pointer HandlerUtil::GetVariable(
     ExecutionEvent::Pointer event, const std::string& name)
 {
-  return event->GetApplicationContext().Cast<IEvaluationContext>()->GetVariable(name);
+  return event->GetApplicationContext().Cast<const IEvaluationContext>()->GetVariable(name);
 }
 
 Object::Pointer HandlerUtil::GetVariableChecked(

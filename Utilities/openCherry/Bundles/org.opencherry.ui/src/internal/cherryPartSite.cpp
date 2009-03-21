@@ -22,6 +22,8 @@
 #include "../cherryIWorkbenchWindow.h"
 #include "../cherryPartPane.h"
 
+#include "../services/cherryIServiceFactory.h"
+
 #include "cherryIServiceLocatorCreator.h"
 #include "cherryWorkbenchPartReference.h"
 
@@ -60,25 +62,25 @@ namespace cherry
 PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
     IWorkbenchPart::Pointer _part, IWorkbenchPage::Pointer _page) :
   partReference(ref), part(_part), page(_page),
-  serviceLocatorOwner(this)
+  serviceLocatorOwner(new ServiceLocatorOwner(this))
 {
 
   extensionID = "org.opencherry.ui.UnknownID"; //$NON-NLS-1$
   extensionName = "Unknown Name"; //$NON-NLS-1$
 
   // Initialize the service locator.
-  IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow().GetPointer();
-  IServiceLocatorCreator::Pointer slc = parentServiceLocator
-      ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<IServiceLocatorCreator>();
-  this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(
-      parentServiceLocator, 0, &serviceLocatorOwner));
+  IServiceLocator::Pointer parentServiceLocator(page->GetWorkbenchWindow());
+  IServiceLocatorCreator::Pointer slc(parentServiceLocator
+      ->GetService(IServiceLocatorCreator::GetManifestName()).Cast<IServiceLocatorCreator>());
+  this->serviceLocator = slc->CreateServiceLocator(IServiceLocator::WeakPtr(parentServiceLocator),
+      IServiceFactory::Pointer(0), IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
 
   //initializeDefaultServices();
 }
 
 PartSite::~PartSite()
 {
-  delete serviceLocator;
+
 }
 
 PartSite::ServiceLocatorOwner::ServiceLocatorOwner(PartSite* s)
@@ -331,7 +333,7 @@ void* PartSite::GetAdapterImpl(const std::type_info& /*adapter*/) const
 //  }
 
 Object::Pointer
-PartSite::GetService(const std::string& api) const {
+PartSite::GetService(const std::string& api) {
   return serviceLocator->GetService(api);
 }
 

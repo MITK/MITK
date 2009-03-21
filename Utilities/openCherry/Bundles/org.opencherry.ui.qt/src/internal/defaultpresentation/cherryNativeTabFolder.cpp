@@ -21,6 +21,7 @@
 #include "../cherryQtControlWidget.h"
 
 #include <cherryShell.h>
+#include <cherryConstants.h>
 
 #include <QVBoxLayout>
 
@@ -41,6 +42,11 @@ void NativeTabFolder::DragStarted(const QPoint& location)
 {
   Point point(location.x(), location.y());
   this->HandleDragStarted(location);
+}
+
+void NativeTabFolder::CloseButtonClicked(bool /*checked*/)
+{
+  this->FireEvent(TabFolderEvent::EVENT_CLOSE, this->GetSelection());
 }
 
 NativeTabFolder::NativeTabFolder(QWidget* parent)
@@ -97,7 +103,12 @@ QSize NativeTabFolder::ComputeSize(int widthHint, int heightHint)
 
 AbstractTabItem* NativeTabFolder::Add(int index, int flags)
 {
-  NativeTabItem* item = new NativeTabItem(this, index);
+  NativeTabItem* item = new NativeTabItem(this, index, flags);
+
+  if (flags & Constants::CLOSE)
+  {
+    this->connect(item->GetCloseButton(), SIGNAL(clicked(bool)), this, SLOT(CloseButtonClicked(bool)));
+  }
 
   return item;
 }

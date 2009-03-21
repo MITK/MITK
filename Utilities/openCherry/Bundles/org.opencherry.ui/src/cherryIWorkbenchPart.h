@@ -163,7 +163,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      * @return The part site; this value may be <code>null</code> if the part
      *         has not yet been initialized
      */
-    virtual SmartPointer<IWorkbenchPartSite> GetSite() = 0;
+    virtual SmartPointer<IWorkbenchPartSite> GetSite() const = 0;
 
 
     /**
@@ -173,7 +173,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      * @return the name of this view, or the empty string if the name is being managed
      * by the workbench (not <code>null</code>)
      */
-    virtual std::string GetPartName() = 0;
+    virtual std::string GetPartName() const = 0;
 
     /**
      * Returns the content description of this part. The content description is an optional
@@ -186,7 +186,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      *
      * @return the content description of this part (not <code>null</code>)
      */
-    virtual std::string GetContentDescription() = 0;
+    virtual std::string GetContentDescription() const = 0;
 
     /**
      * Returns the title image of this workbench part.  If this value changes
@@ -200,7 +200,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      *
      * @return the title image
      */
-    //virtual Image GetTitleImage() = 0;
+    virtual void* GetTitleImage() const = 0;
 
     /**
      * Returns the title tool tip text of this workbench part.
@@ -214,7 +214,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      *
      * @return the workbench part title tool tip (not <code>null</code>)
      */
-    virtual std::string GetTitleToolTip() = 0;
+    virtual std::string GetTitleToolTip() const = 0;
 
     /**
      * Removes the given property listener from this workbench part.
@@ -231,7 +231,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      *            the arbitrary property. Must not be <code>null</code>.
      * @return the property value, or <code>null</code>.
      */
-    virtual std::string GetPartProperty(const std::string& key) = 0;
+    virtual std::string GetPartProperty(const std::string& key) const = 0;
 
     /**
      * Set an arbitrary property on the part. It is the implementor's
@@ -254,7 +254,7 @@ struct CHERRY_UI IWorkbenchPart : public virtual Object { // public IAdaptable {
      *
      * @return A Map of the properties. Must not be <code>null</code>.
      */
-    virtual const std::map<std::string, std::string>& GetPartProperties() = 0;
+    virtual const std::map<std::string, std::string>& GetPartProperties() const = 0;
 
     /**
      * Asks this part to take focus within the workbench.

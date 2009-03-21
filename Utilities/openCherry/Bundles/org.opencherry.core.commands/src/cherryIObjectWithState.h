@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIOBJECTWITHSTATE_H_
@@ -33,15 +33,17 @@ namespace cherry {
  * <p>
  * Clients may implement, but must not extend this interface.
  * </p>
- * 
+ *
  * @see AbstractHandlerWithState
  * @since 3.2
  */
-struct CHERRY_COMMANDS IObjectWithState {
+struct CHERRY_COMMANDS IObjectWithState : public virtual Object {
+
+  cherryInterfaceMacro(IObjectWithState, cherry)
 
   /**
    * Adds state to this object.
-   * 
+   *
    * @param id
    *            The identifier indicating the type of state being added; must
    *            not be <code>null</code>.
@@ -49,11 +51,11 @@ struct CHERRY_COMMANDS IObjectWithState {
    *            The new state to add to this object; must not be
    *            <code>null</code>.
    */
-  virtual void AddState(const std::string& id, State::Pointer state) = 0;
+  virtual void AddState(const std::string& id, const State::Pointer state) = 0;
 
   /**
    * Gets the state with the given id.
-   * 
+   *
    * @param stateId
    *            The identifier of the state to retrieve; must not be
    *            <code>null</code>.
@@ -64,7 +66,7 @@ struct CHERRY_COMMANDS IObjectWithState {
 
   /**
    * Gets the identifiers for all of the state associated with this object.
-   * 
+   *
    * @return All of the state identifiers; may be empty, but never
    *         <code>null</code>.
    */
@@ -72,7 +74,7 @@ struct CHERRY_COMMANDS IObjectWithState {
 
   /**
    * Removes state from this object.
-   * 
+   *
    * @param stateId
    *            The id of the state to remove from this object; must not be
    *            <code>null</code>.

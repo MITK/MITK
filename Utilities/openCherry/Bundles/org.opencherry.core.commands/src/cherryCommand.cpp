@@ -1,21 +1,35 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryCommand.h"
+
+#include "cherryIParameter.h"
+#include "cherryITypedParameter.h"
+#include "cherryIHandler.h"
+#include "cherryIParameterValueConverter.h"
+#include "cherryHandlerEvent.h"
+#include "cherryCommandEvent.h"
+#include "cherryExecutionEvent.h"
+#include "cherryCommandCategory.h"
+
+#include "util/cherryCommandTracing.h"
+#include "internal/cherryCommandUtils.h"
+
+#include <sstream>
 
 namespace cherry {
 
@@ -23,370 +37,463 @@ bool Command::DEBUG_COMMAND_EXECUTION = false;
 
 bool Command::DEBUG_HANDLERS = false;
 
-std::string Command::DEBUG_HANDLERS_COMMAND_ID = null;
+std::string Command::DEBUG_HANDLERS_COMMAND_ID = "";
 
-  
-  Command::Command(const std::string& id) {
-    super(id);
+
+  Command::Command(const std::string& id) :
+  NamedHandleObjectWithState(id)
+  {
+
   }
 
-  void Command::AddState(const std::string& id, const State::ConstPointer state) {
-    super.addState(id, state);
-    state.setId(id);
-    if (handler instanceof IObjectWithState) {
-      ((IObjectWithState) handler).addState(id, state);
+  void Command::AddCommandListener(const ICommandListener::Pointer commandListener) {
+    if (!commandListener) {
+      throw Poco::NullPointerException("Cannot add a null command listener");
+    }
+    commandEvents.AddListener(commandListener);
+  }
+
+  void Command::AddExecutionListener(
+      const IExecutionListener::Pointer executionListener) {
+    if (!executionListener) {
+      throw Poco::NullPointerException(
+          "Cannot add a null execution listener"); //$NON-NLS-1$
+    }
+    executionEvents.AddListener(executionListener);
+  }
+
+  void Command::AddState(const std::string& id, const State::Pointer state) {
+    NamedHandleObjectWithState::AddState(id, state);
+    state->SetId(id);
+    if (IObjectWithState::Pointer stateHandler = handler.Cast<IObjectWithState>()) {
+      stateHandler->AddState(id, state);
     }
   }
 
-  int Command::CompareTo(final Object object) {
-    final Command castedObject = (Command) object;
-    int compareTo = Util.compare(category, castedObject.category);
+  bool Command::operator<(const Object* object) const {
+    const Command* castedObject = dynamic_cast<const Command*>(object);
+    int compareTo = CommandUtils::CompareObj(category, castedObject->category);
     if (compareTo == 0) {
-      compareTo = Util.compare(defined, castedObject.defined);
+      compareTo = CommandUtils::Compare(defined, castedObject->defined);
       if (compareTo == 0) {
-        compareTo = Util.compare(description, castedObject.description);
+        compareTo = CommandUtils::Compare(description, castedObject->description);
         if (compareTo == 0) {
-          compareTo = Util.compare(handler, castedObject.handler);
+          compareTo = CommandUtils::CompareObj(handler, castedObject->handler);
           if (compareTo == 0) {
-            compareTo = Util.compare(id, castedObject.id);
+            compareTo = CommandUtils::Compare(id, castedObject->id);
             if (compareTo == 0) {
-              compareTo = Util.compare(name, castedObject.name);
+              compareTo = CommandUtils::Compare(name, castedObject->name);
               if (compareTo == 0) {
-                compareTo = Util.compare(parameters,
-                    castedObject.parameters);
+                compareTo = CommandUtils::Compare(parameters,
+                    castedObject->parameters);
               }
             }
           }
         }
       }
     }
-    return compareTo;
-  }
-
-  void Command::Define(const std::string& name, const std::string& description
-      /*, final Category category*/) {
-    define(name, description, category, null);
+    return compareTo < 0;
   }
 
   void Command::Define(const std::string& name, const std::string& description,
-      /*final Category category,*/ const std::vector<IParameter::Pointer>& parameters,
-      ParameterType::Pointer returnType = 0, const std::string& helpContextId = "") {
-    if (name == null) {
-      throw new NullPointerException(
-          "The name of a command cannot be null"); //$NON-NLS-1$
+      const CommandCategory::Pointer category, const std::vector<IParameter::Pointer>& parameters,
+      ParameterType::Pointer returnType, const std::string& helpContextId) {
+    if (name == "") {
+      throw Poco::InvalidArgumentException(
+          "The name of a command cannot be empty"); //$NON-NLS-1$
     }
 
-    if (category == null) {
-      throw new NullPointerException(
+    if (!category) {
+      throw Poco::NullPointerException(
           "The category of a command cannot be null"); //$NON-NLS-1$
     }
 
-    final boolean definedChanged = !this.defined;
-    this.defined = true;
+    const bool definedChanged = !this->defined;
+    this->defined = true;
 
-    final boolean nameChanged = !Util.equals(this.name, name);
-    this.name = name;
+    const bool nameChanged = this->name != name;
+    this->name = name;
 
-    final boolean descriptionChanged = !Util.equals(this.description,
-        description);
-    this.description = description;
+    const bool descriptionChanged = this->description != description;
+    this->description = description;
 
-    final boolean categoryChanged = !Util.equals(this.category, category);
-    this.category = category;
+    const bool categoryChanged = this->category != category;
+    this->category = category;
 
-    final boolean parametersChanged = !Util.equals(this.parameters,
+    const bool parametersChanged = !CommandUtils::Equals(this->parameters,
         parameters);
-    this.parameters = parameters;
+    this->parameters = parameters;
 
-    final boolean returnTypeChanged = !Util.equals(this.returnType,
-        returnType);
-    this.returnType = returnType;
+    const bool returnTypeChanged = this->returnType != returnType;
+    this->returnType = returnType;
 
-    final boolean helpContextIdChanged = !Util.equals(this.helpContextId,
-        helpContextId);
-    this.helpContextId = helpContextId;
+    const bool helpContextIdChanged = this->helpContextId != helpContextId;
+    this->helpContextId = helpContextId;
 
-    fireCommandChanged(new CommandEvent(this, categoryChanged,
+    CommandEvent::Pointer event(new CommandEvent(Command::Pointer(this), categoryChanged,
         definedChanged, descriptionChanged, false, nameChanged,
         parametersChanged, returnTypeChanged, helpContextIdChanged));
+    this->FireCommandChanged(event);
   }
 
   Object::Pointer Command::ExecuteWithChecks(const ExecutionEvent::ConstPointer event) {
-    firePreExecute(event);
-    final IHandler handler = this.handler;
+    this->FirePreExecute(event);
+    const IHandler::Pointer handler(this->handler);
 
-    if (!isDefined()) {
-      final NotDefinedException exception = new NotDefinedException(
-          "Trying to execute a command that is not defined. " //$NON-NLS-1$
-              + getId());
-      fireNotDefined(exception);
+    if (!this->IsDefined()) {
+      const NotDefinedException exception(
+          "Trying to execute a command that is not defined. " + this->GetId());
+      this->FireNotDefined(&exception);
       throw exception;
     }
 
     // Perform the execution, if there is a handler.
-    if ((handler != null) && (handler.isHandled())) {
-      setEnabled(event.getApplicationContext());
-      if (!isEnabled()) {
-        final NotEnabledException exception = new NotEnabledException(
-            "Trying to execute the disabled command " + getId()); //$NON-NLS-1$
-        fireNotEnabled(exception);
+    if (handler && handler->IsHandled()) {
+      this->SetEnabled(event->GetApplicationContext());
+      if (!this->IsEnabled()) {
+        const NotEnabledException exception(
+            "Trying to execute the disabled command " + this->GetId());
+        this->FireNotEnabled(&exception);
         throw exception;
       }
 
       try {
-        final Object returnValue = handler.execute(event);
-        firePostExecuteSuccess(returnValue);
+        const Object::Pointer returnValue(handler->Execute(event));
+        this->FirePostExecuteSuccess(returnValue);
         return returnValue;
-      } catch (final ExecutionException e) {
-        firePostExecuteFailure(e);
+      } catch (const ExecutionException* e) {
+        this->FirePostExecuteFailure(e);
         throw e;
       }
     }
 
-    final NotHandledException e = new NotHandledException(
-        "There is no handler to execute for command " + getId()); //$NON-NLS-1$
-    fireNotHandled(e);
+    const NotHandledException e(
+        "There is no handler to execute for command " + this->GetId()); //$NON-NLS-1$
+    this->FireNotHandled(&e);
     throw e;
   }
 
-  IHandler::Pointer Command::GetHandler() {
+  void Command::FireCommandChanged(const CommandEvent::ConstPointer commandEvent) {
+    if (!commandEvent) {
+      throw Poco::NullPointerException("Cannot fire a null event");
+    }
+
+    try
+    {
+      commandEvents.commandChanged(commandEvent);
+    }
+    catch (...)
+    {
+      //TODO log exceptions?
+    }
+  }
+
+  void Command::FireNotDefined(const NotDefinedException* e) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "not defined: id=" + this->GetId() + "; exception=" + e->what());
+    }
+
+    executionEvents.notDefined(this->GetId(), e);
+  }
+
+  void Command::FireNotEnabled(const NotEnabledException* e) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "not enabled: id=" + this->GetId() + "; exception=" + e->what());
+    }
+
+    executionEvents.notEnabled(this->GetId(), e);
+  }
+
+  void Command::FireNotHandled(const NotHandledException* e) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "not handled: id=" + this->GetId() + "; exception=" + e->what());
+    }
+
+    executionEvents.notHandled(this->GetId(), e);
+  }
+
+  void Command::FirePostExecuteFailure(const ExecutionException* e) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "failure: id=" + this->GetId() + "; exception=" + e->what());
+    }
+
+    executionEvents.postExecuteFailure(this->GetId(), e);
+  }
+
+  void Command::FirePostExecuteSuccess(const Object::Pointer returnValue) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "success: id=" + this->GetId() + "; returnValue=" + returnValue->ToString());
+    }
+
+    executionEvents.postExecuteSuccess(this->GetId(), returnValue);
+  }
+
+  void Command::FirePreExecute(const ExecutionEvent::ConstPointer event) {
+    // Debugging output
+    if (DEBUG_COMMAND_EXECUTION) {
+      CommandTracing::PrintTrace("COMMANDS", "execute" + CommandTracing::SEPARATOR
+          + "starting: id=" + this->GetId() + "; event=" + event->ToString());
+    }
+
+    executionEvents.preExecute(this->GetId(), event);
+  }
+
+  IHandler::Pointer Command::GetHandler() const {
     return handler;
   }
 
-  std::string Command::GetHelpContextId() {
+  std::string Command::GetHelpContextId() const {
     return helpContextId;
   }
 
-  IParameter GetParameter(const std::string& parameterId)
-      throws NotDefinedException {
-    if (!isDefined()) {
-      throw new NotDefinedException(
-          "Cannot get a parameter from an undefined command. " //$NON-NLS-1$
-              + id);
+  IParameter::Pointer Command::GetParameter(const std::string& parameterId) const
+       {
+    if (!this->IsDefined()) {
+      throw NotDefinedException(
+          "Cannot get a parameter from an undefined command. " + id);
     }
 
-    if (parameters == null) {
-      return null;
-    }
-
-    for (int i = 0; i < parameters.length; i++) {
-      final IParameter parameter = parameters[i];
-      if (parameter.getId().equals(parameterId)) {
+    for (unsigned int i = 0; i < parameters.size(); i++) {
+      IParameter::Pointer parameter(parameters[i]);
+      if (parameter->GetId() == parameterId) {
         return parameter;
       }
     }
 
-    return null;
+    return IParameter::Pointer(0);
   }
 
-  std::vector<IParameter::Pointer> Command::GetParameters() {
-    if (!isDefined()) {
-      throw new NotDefinedException(
-          "Cannot get the parameters from an undefined command. " //$NON-NLS-1$
-              + id);
+  std::vector<IParameter::Pointer> Command::GetParameters() const {
+    if (!this->IsDefined()) {
+      throw NotDefinedException(
+          "Cannot get the parameters from an undefined command. " + id);
     }
 
-    if ((parameters == null) || (parameters.length == 0)) {
-      return null;
-    }
-
-    final IParameter[] returnValue = new IParameter[parameters.length];
-    System.arraycopy(parameters, 0, returnValue, 0, parameters.length);
-    return returnValue;
+    return parameters;
   }
 
-  ParameterType GetParameterType(const std::string& parameterId)
-      throws NotDefinedException {
-    final IParameter parameter = getParameter(parameterId);
-    if (parameter instanceof ITypedParameter) {
-      final ITypedParameter parameterWithType = (ITypedParameter) parameter;
-      return parameterWithType.getParameterType();
+  ParameterType::Pointer Command::GetParameterType(const std::string& parameterId) const
+      {
+    const IParameter::Pointer parameter(this->GetParameter(parameterId));
+    if (ITypedParameter::Pointer parameterWithType = parameter.Cast<ITypedParameter>()) {
+      return parameterWithType->GetParameterType();
     }
-    return null;
+    return ParameterType::Pointer(0);
   }
 
-  ParameterType Command::GetReturnType() {
-    if (!isDefined()) {
-      throw new NotDefinedException(
-          "Cannot get the return type of an undefined command. " //$NON-NLS-1$
-              + id);
+  ParameterType::Pointer Command::GetReturnType() const {
+    if (!this->IsDefined()) {
+      throw NotDefinedException(
+          "Cannot get the return type of an undefined command. " + id);
     }
 
     return returnType;
   }
 
-  bool Command::IsEnabled() {
-    if (handler == null) {
+  bool Command::IsEnabled() const {
+    if (!handler) {
       return false;
     }
 
-    return handler.isEnabled();
-  }
-  
-  void Command::SetEnabled(Object::Pointer evaluationContext) {
-    if (handler instanceof IHandler2) {
-      ((IHandler2) handler).setEnabled(evaluationContext);
-    }
+    return handler->IsEnabled();
   }
 
-  bool Command::IsHandled() {
-    if (handler == null) {
+  void Command::SetEnabled(Object::ConstPointer evaluationContext) {
+    handler->SetEnabled(evaluationContext);
+  }
+
+  bool Command::IsHandled() const {
+    if (!handler) {
       return false;
     }
 
-    return handler.isHandled();
+    return handler->IsHandled();
+  }
+
+  void Command::RemoveCommandListener(
+      const ICommandListener::Pointer commandListener) {
+    if (!commandListener) {
+      throw Poco::NullPointerException(
+          "Cannot remove a null command listener");
+    }
+
+    commandEvents.RemoveListener(commandListener);
+  }
+
+  /**
+   * Removes a listener from this command.
+   *
+   * @param executionListener
+   *            The listener to be removed; must not be <code>null</code>.
+   *
+   */
+  void Command::RemoveExecutionListener(
+      const IExecutionListener::Pointer executionListener) {
+    if (!executionListener) {
+      throw Poco::NullPointerException(
+          "Cannot remove a null execution listener"); //$NON-NLS-1$
+    }
+
+    executionEvents.RemoveListener(executionListener);
   }
 
   void Command::RemoveState(const std::string& stateId) {
-    if (handler instanceof IObjectWithState) {
-      ((IObjectWithState) handler).removeState(stateId);
+    if (IObjectWithState::Pointer stateHandler = handler.Cast<IObjectWithState>()) {
+      stateHandler->RemoveState(stateId);
     }
-    super.removeState(stateId);
+    NamedHandleObjectWithState::RemoveState(stateId);
   }
 
-  bool Command::SetHandler(const IHandler::ConstPointer handler) {
-    if (Util.equals(handler, this.handler)) {
+  bool Command::SetHandler(const IHandler::Pointer handler) {
+    if (handler == this->handler) {
       return false;
     }
 
     // Swap the state around.
-    final String[] stateIds = getStateIds();
-    if (stateIds != null) {
-      for (int i = 0; i < stateIds.length; i++) {
-        final String stateId = stateIds[i];
-        if (this.handler instanceof IObjectWithState) {
-          ((IObjectWithState) this.handler).removeState(stateId);
+    const std::vector<std::string> stateIds(this->GetStateIds());
+      for (unsigned int i = 0; i < stateIds.size(); ++i) {
+        const std::string stateId = stateIds[i];
+        if (IObjectWithState::Pointer stateHandler = this->handler.Cast<IObjectWithState>()) {
+          stateHandler->RemoveState(stateId);
         }
-        if (handler instanceof IObjectWithState) {
-          final State stateToAdd = getState(stateId);
-          ((IObjectWithState) handler).addState(stateId, stateToAdd);
+        if (IObjectWithState::Pointer stateHandler = handler.Cast<IObjectWithState>()) {
+          const State::Pointer stateToAdd(this->GetState(stateId));
+          stateHandler->AddState(stateId, stateToAdd);
         }
       }
-    }
 
-    boolean enabled = isEnabled();
-    if (this.handler != null) {
-      this.handler.removeHandlerListener(getHandlerListener());
+    bool enabled = this->IsEnabled();
+    if (this->handler) {
+      this->handler->RemoveHandlerListener(this->GetHandlerListener());
     }
 
     // Update the handler, and flush the string representation.
-    this.handler = handler;
-    if (this.handler != null) {
-      this.handler.addHandlerListener(getHandlerListener());
+    this->handler = handler;
+    if (this->handler) {
+      this->handler->AddHandlerListener(this->GetHandlerListener());
     }
-    string = null;
+    this->str = "";
 
     // Debugging output
     if ((DEBUG_HANDLERS)
-        && ((DEBUG_HANDLERS_COMMAND_ID == null) || (DEBUG_HANDLERS_COMMAND_ID
-            .equals(id)))) {
-      final StringBuffer buffer = new StringBuffer("Command('"); //$NON-NLS-1$
-      buffer.append(id);
-      buffer.append("') has changed to "); //$NON-NLS-1$
-      if (handler == null) {
-        buffer.append("no handler"); //$NON-NLS-1$
+        && ((DEBUG_HANDLERS_COMMAND_ID.empty()) || (DEBUG_HANDLERS_COMMAND_ID == id)))
+    {
+      std::string buffer("Command('");
+      buffer += id + "') has changed to ";
+      if (!handler) {
+        buffer += "no handler";
       } else {
-        buffer.append('\'');
-        buffer.append(handler);
-        buffer.append("' as its handler"); //$NON-NLS-1$
+        buffer += "\'" + handler->ToString() + "' as its handler";
       }
-      Tracing.printTrace("HANDLERS", buffer.toString()); //$NON-NLS-1$
+      CommandTracing::PrintTrace("HANDLERS", buffer);
     }
 
     // Send notification
-    fireCommandChanged(new CommandEvent(this, false, false, false, true,
-        false, false, false, false, enabled != isEnabled()));
+    CommandEvent::Pointer cmdEvent(new CommandEvent(Command::Pointer(this), false, false, false, true,
+        false, false, false, false, enabled != this->IsEnabled()));
+    this->FireCommandChanged(cmdEvent);
 
     return true;
   }
 
-  void Command::PrintSelf(std::ostream& os, Indent Indent) const {
-    if (string == null) {
-      final StringWriter sw = new StringWriter();
-      final BufferedWriter buffer = new BufferedWriter(sw);
-      try {
-        buffer.write("Command("); //$NON-NLS-1$
-        buffer.write(id);
-        buffer.write(',');
-        buffer.write(name==null?"":name); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.newLine();
-        buffer.write("\t\t"); //$NON-NLS-1$
-        buffer.write(description==null?"":description); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.newLine();
-        buffer.write("\t\t"); //$NON-NLS-1$
-        buffer.write(category==null?"":category.toString()); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.newLine();
-        buffer.write("\t\t"); //$NON-NLS-1$
-        buffer.write(handler==null?"":handler.toString()); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.newLine();
-        buffer.write("\t\t"); //$NON-NLS-1$
-        buffer.write(parameters==null?"":parameters.toString()); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.write(returnType==null?"":returnType.toString()); //$NON-NLS-1$
-        buffer.write(',');
-        buffer.write(""+defined); //$NON-NLS-1$
-        buffer.write(')');
-        buffer.flush();
-      } catch (IOException e) {
-        // should never get this exception
-      }
-      string = sw.toString();
+  Command::HandlerListener::HandlerListener(cherry::Command* command) : command(command)
+    {}
+
+    void Command::HandlerListener::HandlerChanged(HandlerEvent::Pointer handlerEvent) {
+      bool enabledChanged = handlerEvent->IsEnabledChanged();
+      bool handledChanged = handlerEvent->IsHandledChanged();
+      CommandEvent::Pointer cmdEvent(new CommandEvent(Command::Pointer(command), false,
+          false, false, handledChanged, false, false, false,
+          false, enabledChanged));
+      command->FireCommandChanged(cmdEvent);
     }
-    return string;
+
+  /**
+   * @return the handler listener
+   */
+  SmartPointer<IHandlerListener> Command::GetHandlerListener() {
+  if (!handlerListener) {
+    handlerListener = new HandlerListener(this);
+  }
+  return handlerListener;
+  }
+
+  std::string Command::ToString() const {
+    if (str.empty()) {
+      std::stringstream buffer;
+
+      buffer << "Command(" << id << ',' << name << "," << std::endl << "\t\t";
+        buffer << description << "," << std::endl << "\t\t" << (category ? category->ToString() : "");
+        buffer << "," << std::endl << "\t\t" << (handler ? handler->ToString() : "");
+        buffer << "," << std::endl << "\t\t" << "[";
+        for (unsigned int i = 0; i < parameters.size(); ++i)
+        {
+          buffer << parameters[i]->GetId();
+        }
+        buffer << "]," << (returnType ? returnType->ToString() : "");
+        buffer << "," << defined << ")";
+
+      str = buffer.str();
+    }
+    return str;
   }
 
   void Command::Undefine() {
-    boolean enabledChanged = isEnabled();
+    bool enabledChanged = this->IsEnabled();
 
-    string = null;
+    str = "";
 
-    final boolean definedChanged = defined;
+    const bool definedChanged = defined;
     defined = false;
 
-    final boolean nameChanged = name != null;
-    name = null;
+    const bool nameChanged = !name.empty();
+    name = "";
 
-    final boolean descriptionChanged = description != null;
-    description = null;
+    const bool descriptionChanged = !description.empty();
+    description = "";
 
-    final boolean categoryChanged = category != null;
-    category = null;
+    const bool categoryChanged = category;
+    category = 0;
 
-    final boolean parametersChanged = parameters != null;
-    parameters = null;
+    const bool parametersChanged = !parameters.empty();
+    parameters.clear();
 
-    final boolean returnTypeChanged = returnType != null;
-    returnType = null;
+    const bool returnTypeChanged = returnType;
+    returnType = 0;
 
-    final String[] stateIds = getStateIds();
-    if (stateIds != null) {
-      if (handler instanceof IObjectWithState) {
-        final IObjectWithState handlerWithState = (IObjectWithState) handler;
-        for (int i = 0; i < stateIds.length; i++) {
-          final String stateId = stateIds[i];
-          handlerWithState.removeState(stateId);
+    const std::vector<std::string> stateIds(this->GetStateIds());
+      if (IObjectWithState::Pointer handlerWithState = handler.Cast<IObjectWithState>()) {
+        for (unsigned int i = 0; i < stateIds.size(); i++) {
+          const std::string stateId(stateIds[i]);
+          handlerWithState->RemoveState(stateId);
 
-          final State state = getState(stateId);
-          removeState(stateId);
-          state.dispose();
+          const State::Pointer state(this->GetState(stateId));
+          this->RemoveState(stateId);
+          //state.dispose();
         }
       } else {
-        for (int i = 0; i < stateIds.length; i++) {
-          final String stateId = stateIds[i];
-          final State state = getState(stateId);
-          removeState(stateId);
-          state.dispose();
+        for (unsigned int i = 0; i < stateIds.size(); ++i) {
+          const std::string stateId(stateIds[i]);
+          const State::Pointer state(this->GetState(stateId));
+          this->RemoveState(stateId);
+          //state.dispose();
         }
       }
-    }
 
-    fireCommandChanged(new CommandEvent(this, categoryChanged,
+    CommandEvent::Pointer cmdEvent(new CommandEvent(Command::Pointer(this), categoryChanged,
         definedChanged, descriptionChanged, false, nameChanged,
         parametersChanged, returnTypeChanged, false, enabledChanged));
+    this->FireCommandChanged(cmdEvent);
   }
 
 }

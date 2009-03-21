@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryDefaultVariable.h"
@@ -36,7 +36,7 @@ DefaultVariable::DefaultVariable(IEvaluationContext* parent,
   fDefaultVariable= defaultVariable;
 }
 
-IEvaluationContext* DefaultVariable::GetParent()
+IEvaluationContext* DefaultVariable::GetParent() const
 {
   return fParent;
 }
@@ -46,7 +46,7 @@ IEvaluationContext* DefaultVariable::GetRoot()
   return fParent->GetRoot();
 }
 
-ExpressionVariable::Pointer DefaultVariable::GetDefaultVariable()
+ExpressionVariable::Pointer DefaultVariable::GetDefaultVariable() const
 {
   return fDefaultVariable;
 }
@@ -56,7 +56,7 @@ void DefaultVariable::SetAllowPluginActivation(bool value)
   fParent->SetAllowPluginActivation(value);
 }
 
-bool DefaultVariable::GetAllowPluginActivation()
+bool DefaultVariable::GetAllowPluginActivation() const
 {
   return fParent->GetAllowPluginActivation();
 }
@@ -71,7 +71,7 @@ ExpressionVariable::Pointer DefaultVariable::RemoveVariable(const std::string& n
   return fManagedPool->RemoveVariable(name);
 }
 
-ExpressionVariable::Pointer DefaultVariable::GetVariable(const std::string& name)
+ExpressionVariable::Pointer DefaultVariable::GetVariable(const std::string& name) const
 {
   return fManagedPool->GetVariable(name);
 }

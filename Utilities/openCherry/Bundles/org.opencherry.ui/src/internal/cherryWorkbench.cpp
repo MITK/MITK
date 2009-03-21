@@ -25,6 +25,8 @@
 #include "cherryServiceLocatorCreator.h"
 #include "../dialogs/cherryMessageDialog.h"
 #include "../cherryWorkbenchWindow.h"
+#include "../cherryImageDescriptor.h"
+#include "../services/cherryIServiceFactory.h"
 
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchConstants.h"
@@ -62,15 +64,23 @@ void Workbench::ServiceLocatorOwner::Dispose() {
 
 
 Workbench::Workbench(WorkbenchAdvisor* advisor)
- : serviceLocatorOwner(this), largeUpdates(0), isStarting(true), isClosing(false)
+ : serviceLocatorOwner(new ServiceLocatorOwner(this)), largeUpdates(0), isStarting(true), isClosing(false)
 {
   poco_check_ptr(advisor);
+
+  // the reference count to the one and only workbench instance
+  // is increased, so that temporary smart pointer to the workbench
+  // do not delete it
+  this->Register();
 
   this->advisor = advisor;
   Workbench::instance = this;
 
   IServiceLocatorCreator::Pointer slc(new ServiceLocatorCreator());
-  this->serviceLocator = dynamic_cast<ServiceLocator*>(slc->CreateServiceLocator(0, 0, &serviceLocatorOwner));
+  this->serviceLocator =
+    slc->CreateServiceLocator(IServiceLocator::WeakPtr(),
+        IServiceFactory::ConstPointer(0),
+        IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
   serviceLocator->RegisterService(IServiceLocatorCreator::GetManifestName(), slc);
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
@@ -82,10 +92,10 @@ Workbench* Workbench::GetInstance()
 
 Workbench::~Workbench()
 {
-  delete serviceLocator;
+  this->UnRegister(false);
 }
 
-Object::Pointer Workbench::GetService(const std::string& key) const
+Object::Pointer Workbench::GetService(const std::string& key)
 {
 return serviceLocator->GetService(key);
 }

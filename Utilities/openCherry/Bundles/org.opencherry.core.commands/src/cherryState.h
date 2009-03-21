@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryObject.h>
 #include "cherryCommandsDll.h"
 
+#include "cherryIStateListener.h"
+
 namespace cherry {
 
 /**
@@ -42,27 +44,11 @@ namespace cherry {
  *
  * @since 3.2
  */
-class CHERRY_COMMANDS State : public Object { // extends EventManager {
+class CHERRY_COMMANDS State : public Object {
 
 public:
 
   cherryObjectMacro(State)
-
-private:
-
-  /**
-   * The identifier of the state; may be <code>null</code> if it has not
-   * been initialized.
-   */
-  std::string id;
-
-  /**
-   * The value held by this state; may be anything at all.
-   */
-  Object::Pointer value;
-
-
-public:
 
   /**
    * Adds a listener to changes for this state.
@@ -70,36 +56,14 @@ public:
    * @param listener
    *            The listener to add; must not be <code>null</code>.
    */
-//  void AddListener(final IStateListener listener) {
-//    addListenerObject(listener);
-//  }
-
-
-protected:
-
-  /**
-   * Notifies listeners to this state that it has changed in some way.
-   *
-   * @param oldValue
-   *            The old value; may be anything.
-   */
-//  final void fireStateChanged(final Object oldValue) {
-//    final Object[] listeners = getListeners();
-//    for (int i = 0; i < listeners.length; i++) {
-//      final IStateListener listener = (IStateListener) listeners[i];
-//      listener.handleStateChange(this, oldValue);
-//    }
-//  }
-
-
-public:
+  void AddListener(IStateListener::Pointer listener);
 
   /**
    * Returns the identifier for this state.
    *
    * @return The id; may be <code>null</code>.
    */
-   std::string GetId();
+   std::string GetId() const;
 
   /**
    * The current value associated with this state. This can be any type of
@@ -109,7 +73,7 @@ public:
    * @return The current value; may be anything.
    */
 
-  Object::Pointer GetValue();
+  Object::Pointer GetValue() const;
 
   /**
    * Removes a listener to changes from this state.
@@ -117,9 +81,7 @@ public:
    * @param listener
    *            The listener to remove; must not be <code>null</code>.
    */
-//  void RemoveListener(final IStateListener listener) {
-//    removeListenerObject(listener);
-//  }
+  void RemoveListener(IStateListener::Pointer listener);
 
   /**
    * Sets the identifier for this object.  This method should only be called
@@ -137,6 +99,34 @@ public:
    *            The value to set; may be anything.
    */
   void SetValue(const Object::Pointer value);
+
+
+protected:
+
+  /**
+   * Notifies listeners to this state that it has changed in some way.
+   *
+   * @param oldValue
+   *            The old value; may be anything.
+   */
+  void FireStateChanged(Object::Pointer oldValue);
+
+
+private:
+
+  /**
+   * The identifier of the state; may be <code>null</code> if it has not
+   * been initialized.
+   */
+  std::string id;
+
+  /**
+   * The value held by this state; may be anything at all.
+   */
+  Object::Pointer value;
+
+  IStateListener::Events stateEvents;
+
 };
 
 }

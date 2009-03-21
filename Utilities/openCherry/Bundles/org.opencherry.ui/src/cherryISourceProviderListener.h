@@ -75,7 +75,7 @@ struct CHERRY_UI ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-      const std::map<std::string, Object::Pointer>& sourceValuesByName) {}
+      const std::map<std::string, Object::Pointer>& sourceValuesByName) = 0;
 
   /**
    * Handles a change to one source. The source priority should indicate the
@@ -93,7 +93,7 @@ struct CHERRY_UI ISourceProviderListener : public virtual Object {
    * @see ISources
    */
   virtual void SourceChanged(int sourcePriority,
-      const std::string& sourceName, Object::Pointer sourceValue) {};
+      const std::string& sourceName, Object::Pointer sourceValue) = 0;
 };
 
 }

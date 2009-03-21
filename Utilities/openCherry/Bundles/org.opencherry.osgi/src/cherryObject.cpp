@@ -88,6 +88,20 @@ Object
   return "";
 }
 
+std::size_t
+Object
+::HashCode() const
+{
+  return reinterpret_cast<std::size_t>(this);
+}
+
+bool
+Object
+::operator<(const Object* o) const
+{
+  return this < o;
+}
+
 void
 Object
 ::Register() const

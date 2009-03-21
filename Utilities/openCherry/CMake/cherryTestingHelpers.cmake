@@ -23,7 +23,7 @@ MACRO(OPENCHERRY_CREATE_TESTS)
     ${OPENCHERRY_TESTS} ${OPENCHERRY_CUSTOM_TESTS} )
   
   ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_BASE_DIR}/Testing/cherryTestManager.cpp)
-  TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} ${plugin_target})
+  TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized ${plugin_target} debug ${plugin_target}${OPENCHERRY_DEBUG_POSTFIX})
   #
   # Now tell CMake which tests should be run. This is done automatically 
   # for all tests in CHERRY_TESTS 

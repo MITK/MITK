@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYCATEGORY_H_
@@ -26,7 +26,7 @@ namespace cherry
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * Category provides for hierarchical grouping of elements
  * registered in the registry. One extension normally defines
  * a category, and other reference it via its ID.
@@ -39,7 +39,7 @@ template<class T> class Category : /*IWorkbenchAdapter*/public IAdaptable, publi
 {
 
 public:
-  
+
   cherryObjectMacro(Category<T>);
 
   typedef T ElementType;
@@ -75,7 +75,7 @@ public:
   /**
    * Creates an instance of <code>Category</code> with
    * an ID and label.
-   * 
+   *
    * @param id the unique identifier for the category
    * @param label the presentation label for this category
    */
@@ -84,7 +84,7 @@ public:
   /**
    * Creates an instance of <code>Category</code> using the
    * information from the specified configuration element.
-   * 
+   *
    * @param configElement the <code>IConfigurationElement<code> containing
    *    the ID, label, and optional parent category path.
    * @throws WorkbenchException if the ID or label is <code>null</code
@@ -93,7 +93,7 @@ public:
 
   /**
    * Add an element to this category.
-   * 
+   *
    * @param element the element to add
    */
   void AddElement(ElementType element);
@@ -101,7 +101,7 @@ public:
   /* (non-Javadoc)
    * Method declared on IWorkbenchAdapter.
    */
-  //ImageDescriptor GetImageDescriptor();
+  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
 
   /**
    * Return the id for this category.
@@ -111,42 +111,42 @@ public:
 
   /**
    * Return the label for this category.
-   * 
+   *
    * @return the label
    */
   std::string GetLabel() const;
 
   /**
    * Return the parent path for this category.
-   * 
+   *
    * @return the parent path
    */
   const std::vector<std::string>& GetParentPath();
 
   /**
    * Return the unparsed parent path.  May be <code>null</code>.
-   * 
+   *
    * @return the unparsed parent path or <code>null</code>
    */
   std::string GetRawParentPath() const;
 
   /**
    * Return the root path for this category.
-   * 
+   *
    * @return the root path
    */
   std::string GetRootPath();
 
   /**
    * Return the elements contained in this category.
-   * 
+   *
    * @return the elements
    */
   const std::vector<ElementType>& GetElements() const;
 
   /**
    * Return whether a given object exists in this category.
-   * 
+   *
    * @param o the object to search for
    * @return whether the object is in this category
    */
@@ -154,7 +154,7 @@ public:
 
   /**
    * Return whether this category has child elements.
-   * 
+   *
    * @return whether this category has child elements
    */
   bool HasElements() const;
@@ -166,7 +166,7 @@ public:
 
   /**
    * Clear all elements from this category.
-   * 
+   *
    */
   void Clear();
 

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryUIException.h"
 #include "../cherryIViewRegistry.h"
+#include "../cherryImageDescriptor.h"
 
 #include "cherryViewReference.h"
 #include "cherryViewDescriptor.h"

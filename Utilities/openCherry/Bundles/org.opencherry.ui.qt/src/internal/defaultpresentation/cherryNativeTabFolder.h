@@ -56,6 +56,7 @@ private:
   //
   //    };
 
+
   /**
    * @param item
    * @return
@@ -67,6 +68,8 @@ private slots:
 
   void TabSelectionChanged(int index);
   void DragStarted(const QPoint& location);
+
+  void CloseButtonClicked(bool checked);
 
 public:
 
@@ -195,6 +198,7 @@ public:
    * @since 3.1
    */
   void EnablePaneMenu(bool enabled);
+
 };
 
 }

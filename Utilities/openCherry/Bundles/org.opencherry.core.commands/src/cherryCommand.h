@@ -1,32 +1,39 @@
 /*=========================================================================
- 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
- 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
- 
-=========================================================================*/
+
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
+
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
+
+ =========================================================================*/
 
 #ifndef CHERRYCOMMAND_H_
 #define CHERRYCOMMAND_H_
 
 #include "cherryNamedHandleObjectWithState.h"
-#include "cherryIHandler.h"
 #include "cherryIParameter.h"
+#include "cherryParameterType.h"
+
+#include "cherryIExecutionListenerWithChecks.h"
+#include "cherryICommandListener.h"
+#include "cherryIHandlerListener.h"
 
 #include <vector>
 
-namespace cherry {
+namespace cherry
+{
 
+class CommandCategory;
 class ExecutionEvent;
+struct IHandler;
 
 /**
  * <p>
@@ -54,18 +61,20 @@ class ExecutionEvent;
  * <p>
  * Commands are mutable and will change as their definition changes.
  * </p>
- * 
- * @since 3.1
+ *
  */
-class CHERRY_COMMANDS Command : public NamedHandleObjectWithState { // implements Comparable {
+class CHERRY_COMMANDS Command: public NamedHandleObjectWithState
+{ // implements Comparable {
 
 public:
-  
+
+  cherryObjectMacro(Command)
+
   /**
    * This flag can be set to <code>true</code> if commands should print
    * information to <code>System.out</code> when executing.
    */
-  static bool DEBUG_COMMAND_EXECUTION;
+  static  bool DEBUG_COMMAND_EXECUTION;
 
   /**
    * This flag can be set to <code>true</code> if commands should print
@@ -80,32 +89,36 @@ public:
    */
   static std::string DEBUG_HANDLERS_COMMAND_ID;
 
-  
 private:
-  
+
   /**
    * The category to which this command belongs. This value should not be
    * <code>null</code> unless the command is undefined.
    */
-   //Category category = null;
+  SmartPointer<CommandCategory> category;
 
   /**
-   * A collection of objects listening to the execution of this command. This
-   * collection is <code>null</code> if there are no listeners.
+   * A collection of objects listening to the execution of this command.
    */
+  IExecutionListenerWithChecks::Events executionEvents;
   //ListenerList executionListeners;
+
+  /**
+   * A collection of objects listening to changes of this command.
+   */
+  ICommandListener::Events commandEvents;
 
   /**
    * The handler currently associated with this command. This value may be
    * <code>null</code> if there is no handler currently.
    */
-  IHandler::Pointer handler;
+  SmartPointer<IHandler> handler;
 
   /**
    * The help context identifier for this command. This can be
    * <code>null</code> if there is no help currently associated with the
    * command.
-   * 
+   *
    * @since 3.2
    */
   std::string helpContextId;
@@ -115,76 +128,60 @@ private:
    * may be <code>null</code> if there are no parameters, or if the command
    * is undefined. It may also be empty.
    */
-  std::vector<IParameter::Pointer> parameters;
+  std::vector<SmartPointer<IParameter> > parameters;
 
   /**
    * The type of the return value of this command. This value may be
    * <code>null</code> if the command does not declare a return type.
-   * 
+   *
    * @since 3.2
    */
-  //ParameterType returnType;
+  SmartPointer<ParameterType> returnType;
 
   /**
    * Our command will listen to the active handler for enablement changes so
    * that they can be fired from the command itself.
-   * 
+   *
    * @since 3.3
    */
-  //IHandlerListener handlerListener;
+  SmartPointer<IHandlerListener> handlerListener;
 
-  
 protected:
-  
+
   /**
    * Constructs a new instance of <code>Command</code> based on the given
    * identifier. When a command is first constructed, it is undefined.
    * Commands should only be constructed by the <code>CommandManager</code>
    * to ensure that the identifier remains unique.
-   * 
+   *
    * @param id
    *            The identifier for the command. This value must not be
    *            <code>null</code>, and must be unique amongst all commands.
    */
   Command(const std::string& id);
 
-  
+  friend class CommandManager;
+
 public:
-  
+
   /**
    * Adds a listener to this command that will be notified when this command's
    * state changes.
-   * 
+   *
    * @param commandListener
    *            The listener to be added; must not be <code>null</code>.
    */
-//   void AddCommandListener(final ICommandListener commandListener) {
-//    if (commandListener == null) {
-//      throw new NullPointerException("Cannot add a null command listener"); //$NON-NLS-1$
-//    }
-//    addListenerObject(commandListener);
-//  }
+  void AddCommandListener(const ICommandListener::Pointer commandListener);
 
   /**
    * Adds a listener to this command that will be notified when this command
    * is about to execute.
-   * 
+   *
    * @param executionListener
    *            The listener to be added; must not be <code>null</code>.
    */
-//  void AddExecutionListener(
-//      final IExecutionListener executionListener) {
-//    if (executionListener == null) {
-//      throw new NullPointerException(
-//          "Cannot add a null execution listener"); //$NON-NLS-1$
-//    }
-//
-//    if (executionListeners == null) {
-//      executionListeners = new ListenerList(ListenerList.IDENTITY);
-//    }
-//
-//    executionListeners.add(executionListener);
-//  }
+  void AddExecutionListener(
+      const IExecutionListener::Pointer executionListener);
 
   /**
    * <p>
@@ -195,7 +192,7 @@ public:
    * A single instance of {@link State} cannot be registered with multiple
    * commands. Each command requires its own unique instance.
    * </p>
-   * 
+   *
    * @param id
    *            The identifier of the state to add; must not be
    *            <code>null</code>.
@@ -203,19 +200,19 @@ public:
    *            The state to add; must not be <code>null</code>.
    * @since 3.2
    */
-  void AddState(const std::string& id, const State::ConstPointer state);
+  void AddState(const std::string& id, const State::Pointer state);
 
   /**
    * Compares this command with another command by comparing each of its
    * non-transient attributes.
-   * 
+   *
    * @param object
    *            The object with which to compare; must be an instance of
    *            <code>Command</code>.
-   * @return A negative integer, zero or a postivie integer, if the object is
-   *         greater than, equal to or less than this command.
+   * @return false if the object is
+   *         equal to or greater than this command.
    */
-  int CompareTo(const Object::ConstPointer object);
+  bool operator<(const Object* object) const;
 
   /**
    * <p>
@@ -225,27 +222,7 @@ public:
    * <p>
    * Notification is sent to all listeners that something has changed.
    * </p>
-   * 
-   * @param name
-   *            The name of this command; must not be <code>null</code>.
-   * @param description
-   *            The description for this command; may be <code>null</code>.
-   * @param category
-   *            The category for this command; must not be <code>null</code>.
-   * @since 3.2
-   */
-  void Define(const std::string& name, const std::string& description
-      /*, final Category category*/);
-
-  /**
-   * <p>
-   * Defines this command by giving it a name, and possibly a description as
-   * well. The defined property automatically becomes <code>true</code>.
-   * </p>
-   * <p>
-   * Notification is sent to all listeners that something has changed.
-   * </p>
-   * 
+   *
    * @param name
    *            The name of this command; must not be <code>null</code>.
    * @param description
@@ -267,8 +244,9 @@ public:
    * @since 3.2
    */
   void Define(const std::string& name, const std::string& description,
-      /*final Category category,*/ const std::vector<IParameter::Pointer>& parameters,
-      /*ParameterType::Pointer returnType = 0,*/ const std::string& helpContextId = "");
+      const SmartPointer<CommandCategory> category,
+      const std::vector<SmartPointer<IParameter> >& parameters = std::vector<SmartPointer<IParameter> >(),
+      SmartPointer<ParameterType> returnType = SmartPointer<ParameterType>(0), const std::string& helpContextId = "");
 
   /**
    * Executes this command by delegating to the current handler, if any. If
@@ -277,7 +255,7 @@ public:
    * to see if the command is enabled and defined. If it is not both enabled
    * and defined, then the execution listeners will be notified and an
    * exception thrown.
-   * 
+   *
    * @param event
    *            An event containing all the information about the current
    *            state of the application; must not be <code>null</code>.
@@ -296,190 +274,80 @@ public:
    */
   Object::Pointer ExecuteWithChecks(const SmartPointer<const ExecutionEvent> event);
 
-  
 private:
-  
+
   /**
    * Notifies the listeners for this command that it has changed in some way.
-   * 
+   *
    * @param commandEvent
    *            The event to send to all of the listener; must not be
    *            <code>null</code>.
    */
-//  void FireCommandChanged(final CommandEvent commandEvent) {
-//    if (commandEvent == null) {
-//      throw new NullPointerException("Cannot fire a null event"); //$NON-NLS-1$
-//    }
-//
-//    final Object[] listeners = getListeners();
-//    for (int i = 0; i < listeners.length; i++) {
-//      final ICommandListener listener = (ICommandListener) listeners[i];
-//      SafeRunner.run(new ISafeRunnable() {
-//        public void handleException(Throwable exception) {
-//        }
-//
-//        public void run() throws Exception {
-//          listener.commandChanged(commandEvent);
-//        }
-//      });
-//    }
-//  }
+  void FireCommandChanged(const SmartPointer<const CommandEvent> commandEvent);
 
   /**
    * Notifies the execution listeners for this command that an attempt to
    * execute has failed because the command is not defined.
-   * 
+   *
    * @param e
    *            The exception that is about to be thrown; never
    *            <code>null</code>.
    * @since 3.2
    */
-//  void FireNotDefined(final NotDefinedException e) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "not defined: id=" + getId() + "; exception=" + e); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final Object object = listeners[i];
-//        if (object instanceof IExecutionListenerWithChecks) {
-//          final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
-//          listener.notDefined(getId(), e);
-//        }
-//      }
-//    }
-//  }
+  void FireNotDefined(const NotDefinedException* e);
 
   /**
    * Notifies the execution listeners for this command that an attempt to
    * execute has failed because there is no handler.
-   * 
+   *
    * @param e
    *            The exception that is about to be thrown; never
    *            <code>null</code>.
    * @since 3.2
    */
-//  void FireNotEnabled(final NotEnabledException e) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "not enabled: id=" + getId() + "; exception=" + e); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final Object object = listeners[i];
-//        if (object instanceof IExecutionListenerWithChecks) {
-//          final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
-//          listener.notEnabled(getId(), e);
-//        }
-//      }
-//    }
-//  }
+  void FireNotEnabled(const NotEnabledException* e);
 
   /**
    * Notifies the execution listeners for this command that an attempt to
    * execute has failed because there is no handler.
-   * 
+   *
    * @param e
    *            The exception that is about to be thrown; never
    *            <code>null</code>.
    */
-//  void fireNotHandled(final NotHandledException e) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "not handled: id=" + getId() + "; exception=" + e); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final IExecutionListener listener = (IExecutionListener) listeners[i];
-//        listener.notHandled(getId(), e);
-//      }
-//    }
-//  }
+  void FireNotHandled(const NotHandledException* e);
 
   /**
    * Notifies the execution listeners for this command that an attempt to
    * execute has failed during the execution.
-   * 
+   *
    * @param e
    *            The exception that has been thrown; never <code>null</code>.
    *            After this method completes, the exception will be thrown
    *            again.
    */
-//  void firePostExecuteFailure(final ExecutionException e) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "failure: id=" + getId() + "; exception=" + e); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final IExecutionListener listener = (IExecutionListener) listeners[i];
-//        listener.postExecuteFailure(getId(), e);
-//      }
-//    }
-//  }
+  void FirePostExecuteFailure(const ExecutionException* e);
 
   /**
    * Notifies the execution listeners for this command that an execution has
    * completed successfully.
-   * 
+   *
    * @param returnValue
    *            The return value from the command; may be <code>null</code>.
    */
-//  void firePostExecuteSuccess(final Object returnValue) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "success: id=" + getId() + "; returnValue=" //$NON-NLS-1$ //$NON-NLS-2$
-//          + returnValue);
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final IExecutionListener listener = (IExecutionListener) listeners[i];
-//        listener.postExecuteSuccess(getId(), returnValue);
-//      }
-//    }
-//  }
+  void FirePostExecuteSuccess(const Object::Pointer returnValue);
 
   /**
    * Notifies the execution listeners for this command that an attempt to
    * execute is about to start.
-   * 
+   *
    * @param event
    *            The execution event that will be used; never <code>null</code>.
    */
-//  void firePreExecute(final ExecutionEvent event) {
-//    // Debugging output
-//    if (DEBUG_COMMAND_EXECUTION) {
-//      Tracing.printTrace("COMMANDS", "execute" + Tracing.SEPARATOR //$NON-NLS-1$ //$NON-NLS-2$
-//          + "starting: id=" + getId() + "; event=" + event); //$NON-NLS-1$ //$NON-NLS-2$
-//    }
-//
-//    if (executionListeners != null) {
-//      final Object[] listeners = executionListeners.getListeners();
-//      for (int i = 0; i < listeners.length; i++) {
-//        final IExecutionListener listener = (IExecutionListener) listeners[i];
-//        listener.preExecute(getId(), event);
-//      }
-//    }
-//  }
-
+  void FirePreExecute(const SmartPointer<const ExecutionEvent> event);
 
 public:
-  
+
   /**
    * Returns the current handler for this command. This is used by the command
    * manager for determining the appropriate help context identifiers and by
@@ -487,27 +355,27 @@ public:
    * <p>
    * This value can change at any time and should never be cached.
    * </p>
-   * 
+   *
    * @return The current handler for this command; may be <code>null</code>.
    * @since 3.3
    */
-  IHandler::Pointer GetHandler();
+  SmartPointer<IHandler> GetHandler() const;
 
   /**
    * Returns the help context identifier associated with this command. This
    * method should not be called by clients. Clients should use
    * {@link CommandManager#getHelpContextId(Command)} instead.
-   * 
+   *
    * @return The help context identifier for this command; may be
    *         <code>null</code> if there is none.
    * @since 3.2
    */
-  std::string GetHelpContextId();
+  std::string GetHelpContextId() const;
 
   /**
    * Returns the parameter with the provided id or <code>null</code> if this
    * command does not have a parameter with the id.
-   * 
+   *
    * @param parameterId
    *            The id of the parameter to retrieve.
    * @return The parameter with the provided id or <code>null</code> if this
@@ -516,24 +384,24 @@ public:
    *             If the handle is not currently defined.
    * @since 3.2
    */
-  IParameter::Pointer GetParameter(const std::string& parameterId);
+  SmartPointer<IParameter> GetParameter(const std::string& parameterId) const;
 
   /**
    * Returns the parameters for this command. This call triggers provides a
    * copy of the array, so excessive calls to this method should be avoided.
-   * 
+   *
    * @return The parameters for this command. This value might be
    *         <code>null</code>, if the command has no parameters.
    * @throws NotDefinedException
    *             If the handle is not currently defined.
    */
-  std::vector<IParameter::Pointer> GetParameters();
+  std::vector<SmartPointer<IParameter> > GetParameters() const;
 
   /**
    * Returns the {@link ParameterType} for the parameter with the provided id
    * or <code>null</code> if this command does not have a parameter type
    * with the id.
-   * 
+   *
    * @param parameterId
    *            The id of the parameter to retrieve the {@link ParameterType}
    *            of.
@@ -544,13 +412,13 @@ public:
    *             If the handle is not currently defined.
    * @since 3.2
    */
-  //ParameterType GetParameterType(const std::string& parameterId);
+  SmartPointer<ParameterType> GetParameterType(const std::string& parameterId) const;
 
   /**
    * Returns the {@link ParameterType} for the return value of this command or
    * <code>null</code> if this command does not declare a return value
    * parameter type.
-   * 
+   *
    * @return The {@link ParameterType} for the return value of this command or
    *         <code>null</code> if this command does not declare a return
    *         value parameter type.
@@ -558,75 +426,56 @@ public:
    *             If the handle is not currently defined.
    * @since 3.2
    */
-  //ParameterType GetReturnType();
+  SmartPointer<ParameterType> GetReturnType() const;
 
   /**
    * Returns whether this command has a handler, and whether this handler is
    * also handled and enabled.
-   * 
+   *
    * @return <code>true</code> if the command is handled; <code>false</code>
    *         otherwise.
    */
-  bool IsEnabled();
-  
+  bool IsEnabled() const;
+
   /**
    * Called be the framework to allow the handler to update its enabled state.
-   * 
+   *
    * @param evaluationContext
    *            the state to evaluate against. May be <code>null</code>
    *            which indicates that the handler can query whatever model that
    *            is necessary.  This context must not be cached.
    * @since 3.4
    */
-  void SetEnabled(Object::Pointer evaluationContext);
+  void SetEnabled(Object::ConstPointer evaluationContext);
 
   /**
    * Returns whether this command has a handler, and whether this handler is
    * also handled.
-   * 
+   *
    * @return <code>true</code> if the command is handled; <code>false</code>
    *         otherwise.
    */
-  bool IsHandled();
+  bool IsHandled() const;
 
   /**
    * Removes a listener from this command.
-   * 
+   *
    * @param commandListener
    *            The listener to be removed; must not be <code>null</code>.
-   * 
+   *
    */
-//  void RemoveCommandListener(
-//      final ICommandListener commandListener) {
-//    if (commandListener == null) {
-//      throw new NullPointerException(
-//          "Cannot remove a null command listener"); //$NON-NLS-1$
-//    }
-//
-//    removeListenerObject(commandListener);
-//  }
+  void RemoveCommandListener(
+      const ICommandListener::Pointer commandListener);
 
   /**
    * Removes a listener from this command.
-   * 
+   *
    * @param executionListener
    *            The listener to be removed; must not be <code>null</code>.
-   * 
+   *
    */
-//  void removeExecutionListener(
-//      final IExecutionListener executionListener) {
-//    if (executionListener == null) {
-//      throw new NullPointerException(
-//          "Cannot remove a null execution listener"); //$NON-NLS-1$
-//    }
-//
-//    if (executionListeners != null) {
-//      executionListeners.remove(executionListener);
-//      if (executionListeners.isEmpty()) {
-//        executionListeners = null;
-//      }
-//    }
-//  }
+  void RemoveExecutionListener(
+      const IExecutionListener::Pointer executionListener);
 
   /**
    * <p>
@@ -634,7 +483,7 @@ public:
    * active handler, if the active handler is an instance of
    * {@link IObjectWithState}.
    * </p>
-   * 
+   *
    * @param stateId
    *            The identifier of the state to remove; must not be
    *            <code>null</code>.
@@ -647,49 +496,43 @@ public:
    * the currently active handler (if any), and add it to <code>handler</code>.
    * If debugging is turned on, then this will also print information about
    * the change to <code>System.out</code>.
-   * 
+   *
    * @param handler
    *            The new handler; may be <code>null</code> if none.
    * @return <code>true</code> if the handler changed; <code>false</code>
    *         otherwise.
    */
-  bool SetHandler(const IHandler::ConstPointer handler);
+  bool SetHandler(const SmartPointer<IHandler> handler);
 
-  
 private:
-  
+
+  struct HandlerListener : public IHandlerListener
+  {
+
+    HandlerListener(Command* command);
+
+    void HandlerChanged(SmartPointer<HandlerEvent> handlerEvent);
+
+  private:
+    Command* command;
+  };
+
   /**
    * @return the handler listener
    */
-//   IHandlerListener getHandlerListener() {
-//    if (handlerListener == null) {
-//      handlerListener = new IHandlerListener() {
-//        public void handlerChanged(HandlerEvent handlerEvent) {
-//          boolean enabledChanged = handlerEvent.isEnabledChanged();
-//          boolean handledChanged = handlerEvent.isHandledChanged();
-//          fireCommandChanged(new CommandEvent(Command.this, false,
-//              false, false, handledChanged, false, false, false,
-//              false, enabledChanged));
-//        }
-//      };
-//    }
-//    return handlerListener;
-//  }
+  SmartPointer<IHandlerListener> GetHandlerListener();
 
-  
-protected:
+
+public:
 
   /**
    * The string representation of this command -- for debugging purposes only.
    * This string should not be shown to an end user.
-   * 
+   *
    * @return The string representation; never <code>null</code>.
    */
-  void PrintSelf(std::ostream& os, Indent Indent) const;
- 
-  
-public:
-  
+  std::string ToString() const;
+
   /**
    * Makes this command become undefined. This has the side effect of changing
    * the name and description to <code>null</code>. This also removes all

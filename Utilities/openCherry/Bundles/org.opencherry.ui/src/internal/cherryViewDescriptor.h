@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+struct IHandlerActivation;
+
 /**
  * \ingroup org_opencherry_ui_internal
  *
@@ -38,7 +40,7 @@ class ViewDescriptor : public IViewDescriptor
 private:
 
   std::string id;
-  // ImageDescriptor imageDescriptor;
+  mutable SmartPointer<ImageDescriptor> imageDescriptor;
   IConfigurationElement::Pointer configElement;
   std::vector<std::string> categoryPath;
 
@@ -46,7 +48,7 @@ private:
    * The activation token returned when activating the show view handler with
    * the workbench.
    */
-  //IHandlerActivation handlerActivation;
+  SmartPointer<IHandlerActivation> handlerActivation;
 
 public:
 
@@ -68,7 +70,7 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
-  const std::vector<std::string>& GetCategoryPath();
+  const std::vector<std::string>& GetCategoryPath() const;
 
   /**
    * Return the configuration element for this descriptor.
@@ -80,7 +82,7 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.registry.IViewDescriptor#getDescription()
    */
-  std::string GetDescription();
+  std::string GetDescription() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IWorkbenchPartDescriptor#getId()
@@ -90,24 +92,24 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.IWorkbenchPartDescriptor#getImageDescriptor()
    */
-  //ImageDescriptor GetImageDescriptor();
+  SmartPointer<ImageDescriptor> GetImageDescriptor() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IWorkbenchPartDescriptor#getLabel()
    */
-  std::string GetLabel();
+  std::string GetLabel() const;
 
   /**
    * Return the accelerator attribute.
    *
    * @return the accelerator attribute
    */
-  std::string GetAccelerator();
+  std::string GetAccelerator() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.registry.IViewDescriptor#getAllowMultiple()
    */
-  bool GetAllowMultiple();
+  bool GetAllowMultiple() const;
 
   bool operator==(const Object*) const;
 
@@ -117,7 +119,7 @@ public:
    * This method will only activate the handler if it is not currently active.
    *
    */
-  //void ActivateHandler();
+  void ActivateHandler();
 
   /**
    * Deactivates the show view handler for this descriptor. This handler was
@@ -125,7 +127,7 @@ public:
    * This method will only deactivative the handler if it is currently active.
    *
    */
-  //void DeactivateHandler();
+  void DeactivateHandler();
 
 protected:
 

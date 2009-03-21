@@ -13,6 +13,9 @@ SET(MOC_H_FILES
 
 SET(CPP_FILES manifest.cpp)
 
+SET(RESOURCE_FILES
+  resources/datamanager.xpm
+)
 
 SET(RES_FILES
   resources/datamanager.qrc

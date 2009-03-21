@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+class ImageDescriptor;
+
 /**
  * \ingroup org_opencherry_ui
  *
@@ -51,9 +53,11 @@ class CHERRY_UI WorkbenchPart : public virtual IWorkbenchPart,
 public:
   cherryObjectMacro(WorkbenchPart);
 
+  ~WorkbenchPart();
+
 private:
   std::string m_Title;
-  //ImageDescriptor m_ImageDescriptor;
+  SmartPointer<ImageDescriptor> m_ImageDescriptor;
   void* m_TitleImage;
   std::string m_ToolTip;
 
@@ -77,7 +81,7 @@ protected:
     *
     * @return the configuration element for this part
     */
-  IConfigurationElement::Pointer GetConfigurationElement()
+  IConfigurationElement::Pointer GetConfigurationElement() const
   {
     return m_ConfigElement;
   }
@@ -167,12 +171,12 @@ public:
   /* (non-Javadoc)
    * @see org.opencherry.ui.IWorkbenchPart3#getPartProperty(java.lang.String)
    */
-  std::string GetPartProperty(const std::string& key);
+  std::string GetPartProperty(const std::string& key) const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IWorkbenchPart3#getPartProperties()
    */
-  const std::map<std::string, std::string>& GetPartProperties();
+  const std::map<std::string, std::string>& GetPartProperties() const;
 
   /**
    * {@inheritDoc}
@@ -214,7 +218,7 @@ public:
   /*
    * Method declared on IWorkbenchPart.
    */
-  IWorkbenchPartSite::Pointer GetSite();
+  IWorkbenchPartSite::Pointer GetSite() const;
 
   /**
    * {@inheritDoc}
@@ -223,7 +227,7 @@ public:
    * Parts should call setPartName to change their part name.
    * </p>
    */
-  std::string GetPartName();
+  std::string GetPartName() const;
 
   /**
    * {@inheritDoc}
@@ -232,20 +236,20 @@ public:
    * Parts should call setContentDescription to change their content description.
    * </p>
    */
-  std::string GetContentDescription();
+  std::string GetContentDescription() const;
 
 
   /* (non-Javadoc)
    * Method declared on IWorkbenchPart.
    */
-  void* GetTitleImage();
+  void* GetTitleImage() const;
 
   /* (non-Javadoc)
    * Gets the title tool tip text of this part.
    *
    * @return the tool tip text
    */
-  std::string GetTitleToolTip();
+  std::string GetTitleToolTip() const;
 
 };
 

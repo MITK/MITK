@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryPlatformUI.h"
 #include "../cherryWorkbenchWindow.h"
+#include "../cherryImageDescriptor.h"
 #include "cherryWorkbench.h"
 
 namespace cherry

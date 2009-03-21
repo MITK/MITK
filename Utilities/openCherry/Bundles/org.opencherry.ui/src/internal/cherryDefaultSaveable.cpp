@@ -20,6 +20,7 @@
 #include "../cherryIWorkbenchPart.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryUIException.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry
 {
@@ -38,28 +39,29 @@ void DefaultSaveable::DoSave(/*IProgressMonitor monitor*/)
   }
 }
 
-std::string DefaultSaveable::GetName()
+std::string DefaultSaveable::GetName() const
 {
   return part->GetPartName();
 }
 
-void* DefaultSaveable::GetImageDescriptor()
+ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
 {
+  //TODO DefaultSaveable GetImageDescriptor
 //  Image image = part.getTitleImage();
 //  if (image == null)
 //  {
 //    return null;
 //  }
 //  return ImageDescriptor.createFromImage(image);
-  return 0;
+  return ImageDescriptor::Pointer(0);
 }
 
-std::string DefaultSaveable::GetToolTipText()
+std::string DefaultSaveable::GetToolTipText() const
 {
   return part->GetTitleToolTip();
 }
 
-bool DefaultSaveable::IsDirty()
+bool DefaultSaveable::IsDirty() const
 {
   if (part.Cast<ISaveablePart> () != 0)
   {

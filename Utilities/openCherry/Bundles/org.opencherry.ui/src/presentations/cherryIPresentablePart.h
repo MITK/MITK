@@ -141,7 +141,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the short name of the part (not null)
      */
-    virtual std::string GetName() = 0;
+    virtual std::string GetName() const = 0;
 
     /**
      * Returns the title of this workbench part. If this value changes
@@ -154,7 +154,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the workbench part title (not null)
      */
-    virtual std::string GetTitle() = 0;
+    virtual std::string GetTitle() const = 0;
 
     /**
      * Returns the status message from the part's title, or the empty string if none.
@@ -168,7 +168,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the status message or the empty string if none (not null)
      */
-    virtual std::string GetTitleStatus() = 0;
+    virtual std::string GetTitleStatus() const = 0;
 
     /**
      * Returns the title image of this workbench part.  If this value changes
@@ -195,7 +195,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      *
      * @return the workbench part title tool tip (not null)
      */
-    virtual std::string GetTitleToolTip() = 0;
+    virtual std::string GetTitleToolTip() const = 0;
 
     /**
      * Returns true iff the contents of this part have changed recently. For
@@ -205,13 +205,13 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      *
      * @return true iff the part is dirty
      */
-    virtual bool IsDirty() = 0;
+    virtual bool IsDirty() const = 0;
 
     /**
      * Return true if the the receiver is currently in a busy state.
      * @return boolean true if busy
      */
-    virtual bool IsBusy() = 0;
+    virtual bool IsBusy() const = 0;
 
     /**
      * Returns true iff this part can be closed
@@ -219,7 +219,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
      * @return true iff this part can be closed
      * @since 3.1
      */
-    virtual bool IsCloseable() = 0;
+    virtual bool IsCloseable() const = 0;
 
     /**
      * Returns the local toolbar for this part, or null if this part does not
@@ -259,7 +259,7 @@ struct CHERRY_UI IPresentablePart : public Object, public ISizeProvider {
    * @return the property, or <code>null</code> if that property is not set.
    * @since 3.3
    */
-  virtual std::string GetPartProperty(const std::string& key) = 0;
+  virtual std::string GetPartProperty(const std::string& key) const = 0;
 
 };
 

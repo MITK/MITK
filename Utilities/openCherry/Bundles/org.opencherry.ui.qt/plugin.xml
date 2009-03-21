@@ -40,6 +40,13 @@
          description="Qt specific DnD tweaks" 
          definition="cherryDnDTweaklet" 
          implementation="cherry::QtDnDTweaklet" />
+         
+       <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.ImageTweaklet" 
+         name="Qt Image Tweaklet" 
+         description="Qt specific image tweaks" 
+         definition="cherryImageTweaklet" 
+         implementation="cherry::QtImageTweaklet" />
    </extension>
    
    <extension

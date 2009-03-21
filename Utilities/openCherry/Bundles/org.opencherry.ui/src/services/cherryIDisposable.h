@@ -21,6 +21,9 @@
 
 #include "../cherryUiDll.h"
 
+#include <cherryObject.h>
+#include <cherryMacros.h>
+
 namespace cherry {
 
 /**
@@ -46,8 +49,10 @@ namespace cherry {
  *
  * @since 3.2
  */
-struct CHERRY_UI IDisposable
+struct CHERRY_UI IDisposable : public virtual Object
 {
+
+  cherryInterfaceMacro(IDisposable, cherry)
 
   /**
    * Disposes of this service. All resources must be freed. All listeners must
@@ -56,7 +61,6 @@ struct CHERRY_UI IDisposable
    */
   virtual void Dispose() = 0;
 
-  virtual ~IDisposable() {}
 };
 
 }

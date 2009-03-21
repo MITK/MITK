@@ -19,11 +19,8 @@
 #define CHERRYSERVICELOCATOR_H_
 
 #include "../services/cherryIServiceLocator.h"
-#include "../services/cherryIServiceFactory.h"
 #include "../services/cherryINestable.h"
 #include "../services/cherryIDisposable.h"
-
-#include <cherryObject.h>
 
 #include <map>
 #include <vector>
@@ -32,6 +29,8 @@
 
 namespace cherry
 {
+
+struct IServiceFactory;
 
 class ServiceLocator: public IDisposable,
     public INestable,
@@ -45,12 +44,12 @@ private:
   class ParentLocator: public IServiceLocator
   {
 
-    const IServiceLocator* locator;
+    const IServiceLocator::WeakPtr locator;
     const std::string& key;
 
   public:
 
-    ParentLocator(const IServiceLocator* parent,
+    ParentLocator(const IServiceLocator::WeakPtr parent,
         const std::string& serviceInterface);
 
     /*
@@ -58,7 +57,7 @@ private:
      *
      * @see org.opencherry.ui.services.IServiceLocator#getService(java.lang.Class)
      */
-    Object::Pointer GetService(const std::string& api) const;
+    Object::Pointer GetService(const std::string& api);
 
     /*
      * (non-Javadoc)
@@ -68,14 +67,14 @@ private:
     bool HasService(const std::string& api) const;
   };
 
-  IServiceFactory* factory;
+  const SmartPointer<const IServiceFactory> factory;
 
   /**
    * The parent for this service locator. If a service can't be found in this
    * locator, then the parent is asked. This value may be <code>null</code>
    * if there is no parent.
    */
-  IServiceLocator* parent;
+  IServiceLocator::WeakPtr parent;
 
   /**
    * The map of services This value is <code>null</code> until a service is
@@ -86,9 +85,11 @@ private:
 
   bool disposed;
 
-  IDisposable* owner;
+  IDisposable::WeakPtr owner;
 
 public:
+
+  cherryObjectMacro(ServiceLocator)
 
   /**
    * Constructs a service locator with no parent.
@@ -105,8 +106,8 @@ public:
    *            a local factory that can provide services at this level
    * @param owner
    */
-  ServiceLocator(IServiceLocator* parent, IServiceFactory* factory,
-      IDisposable* owner);
+  ServiceLocator(const IServiceLocator::WeakPtr parent, const SmartPointer<const IServiceFactory> factory,
+      IDisposable::WeakPtr owner);
 
   void Activate();
 
@@ -114,7 +115,7 @@ public:
 
   void Dispose();
 
-  Object::Pointer GetService(const std::string& key) const;
+  Object::Pointer GetService(const std::string& key);
 
   bool HasService(const std::string& key) const;
 
@@ -135,7 +136,7 @@ public:
   /**
    * @return
    */
-  bool IsDisposed();
+  bool IsDisposed() const;
 
   /**
    * Some services that were contributed to this locator are no longer available

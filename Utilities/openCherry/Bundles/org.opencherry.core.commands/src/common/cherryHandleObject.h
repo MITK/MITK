@@ -50,7 +50,7 @@ namespace cherry {
  *
  * @since 3.1
  */
-class CHERRY_COMMANDS HandleObject : public Object { // extends EventManager implements IIdentifiable {
+class CHERRY_COMMANDS HandleObject : public virtual Object { // extends EventManager implements IIdentifiable {
 
 public:
 
@@ -62,56 +62,55 @@ private:
    * The constant integer hash code value meaning the hash code has not yet
    * been computed.
    */
-   //static const int HASH_CODE_NOT_COMPUTED = -1;
+  static const std::size_t HASH_CODE_NOT_COMPUTED; // = 0;
 
-    /**
-     * A factor for computing the hash code for all schemes.
-     */
-    //static const int HASH_FACTOR = 89;
+  /**
+   * A factor for computing the hash code for all schemes.
+   */
+  static const std::size_t HASH_FACTOR; // = 89;
 
-    /**
-     * The seed for the hash code for all schemes.
-     */
-    //static const int HASH_INITIAL = HandleObject.class.getName()
-    //       .hashCode();
+  /**
+   * The seed for the hash code for all schemes.
+   */
+  static const std::size_t HASH_INITIAL;
 
-    /**
-     * The hash code for this object. This value is computed lazily, and marked
-     * as invalid when one of the values on which it is based changes.
-     */
-    //int hashCode = HASH_CODE_NOT_COMPUTED;
+  /**
+   * The hash code for this object. This value is computed lazily, and marked
+   * as invalid when one of the values on which it is based changes.
+   */
+  mutable std::size_t hashCode; // = HASH_CODE_NOT_COMPUTED;
 
 
 protected:
 
-    /**
-     * Whether this object is defined. A defined object is one that has been
-     * fully initialized. By default, all objects start as undefined.
-     */
-     bool defined;
+  /**
+   * Whether this object is defined. A defined object is one that has been
+   * fully initialized. By default, all objects start as undefined.
+   */
+   bool defined;
 
-    /**
-     * The identifier for this object. This identifier should be unique across
-     * all objects of the same type and should never change. This value will
-     * never be <code>null</code>.
-     */
-    const  std::string id;
+  /**
+   * The identifier for this object. This identifier should be unique across
+   * all objects of the same type and should never change. This value will
+   * never be <code>null</code>.
+   */
+  const  std::string id;
 
-    /**
-     * The string representation of this object. This string is for debugging
-     * purposes only, and is not meant to be displayed to the user. This value
-     * is computed lazily, and is cleared if one of its dependent values
-     * changes.
-     */
-    std::string string;
+  /**
+   * The string representation of this object. This string is for debugging
+   * purposes only, and is not meant to be displayed to the user. This value
+   * is computed lazily, and is cleared if one of its dependent values
+   * changes.
+   */
+  mutable std::string str;
 
-    /**
-     * Constructs a new instance of <code>HandleObject</code>.
-     *
-     * @param id
-     *            The id of this handle; must not be <code>null</code>.
-     */
-    HandleObject(const std::string& id);
+  /**
+   * Constructs a new instance of <code>HandleObject</code>.
+   *
+   * @param id
+   *            The id of this handle; must not be <code>null</code>.
+   */
+  HandleObject(const std::string& id);
 
 
 public:
@@ -134,27 +133,15 @@ public:
      *
      * @return The hash code for this object.
      */
-//    virtual int HashCode() {
-//        if (hashCode == HASH_CODE_NOT_COMPUTED) {
-//      hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(id);
-//      if (hashCode == HASH_CODE_NOT_COMPUTED) {
-//        hashCode++;
-//      }
-//    }
-//    return hashCode;
-//    }
-
-   struct Hash {
-     inline std::size_t operator()(Self* value) const
-     {
-       return Poco::hash(value->GetId());
-     }
-
-     inline std::size_t operator()(Self::Pointer value) const
-     {
-       return Poco::hash(value->GetId());
-     }
-   };
+    virtual std::size_t HashCode() const {
+        if (hashCode == HASH_CODE_NOT_COMPUTED) {
+      hashCode = HASH_INITIAL * HASH_FACTOR + Poco::hash(id);
+      if (hashCode == HASH_CODE_NOT_COMPUTED) {
+        hashCode++;
+      }
+    }
+    return hashCode;
+    }
 
     /**
      * Whether this instance is defined. A defined instance is one that has been

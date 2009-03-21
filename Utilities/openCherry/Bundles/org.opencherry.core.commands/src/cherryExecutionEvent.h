@@ -57,7 +57,7 @@ private:
    * part of the active selection (for example). This value may be
    * <code>null</code>.
    */
-  const Object::Pointer applicationContext;
+  const Object::ConstPointer applicationContext;
 
   /**
    * The command being executed. This value may be <code>null</code>.
@@ -108,7 +108,7 @@ public:
    * @since 3.2
    */
   ExecutionEvent(const Command::ConstPointer command, const ParameterMap& parameters,
-      const Object::ConstPointer trigger, const Object::Pointer applicationContext);
+      const Object::ConstPointer trigger, const Object::ConstPointer applicationContext);
 
   /**
    * Returns the state of the application at the time the execution was
@@ -116,7 +116,7 @@ public:
    *
    * @return The application context; may be <code>null</code>.
    */
-  const Object::Pointer GetApplicationContext();
+  const Object::ConstPointer GetApplicationContext() const;
 
   /**
    * Returns the command being executed.
@@ -143,7 +143,7 @@ public:
    *             reason
    * @since 3.2
    */
-  const Object::ConstPointer GetObjectParameterForExecution(const std::string& parameterId);
+  const Object::ConstPointer GetObjectParameterForExecution(const std::string& parameterId) const;
 
   /**
    * Returns the value of the parameter with the given id.
@@ -153,29 +153,27 @@ public:
    * @return The parameter value; <code>null</code> if the parameter cannot
    *         be found.
    */
-  std::string GetParameter(const std::string parameterId);
+  std::string GetParameter(const std::string parameterId) const;
 
   /**
    * Returns all of the parameters.
    *
    * @return The parameters; never <code>null</code>, but may be empty.
    */
-  const ParameterMap& GetParameters();
+  const ParameterMap& GetParameters() const;
 
   /**
    * Returns the object that triggered the execution
    *
    * @return The trigger; <code>null</code> if there was no trigger.
    */
-  const Object::ConstPointer GetTrigger();
-
-protected:
+  const Object::ConstPointer GetTrigger() const;
 
   /**
    * The string representation of this execution event -- for debugging
    * purposes only. This string should not be shown to an end user.
    */
-  void PrintSelf(std::ostream& os, Indent Indent) const;
+  std::string ToString() const;
 };
 
 }

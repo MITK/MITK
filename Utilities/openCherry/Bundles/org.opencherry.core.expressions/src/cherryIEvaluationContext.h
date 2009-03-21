@@ -53,7 +53,7 @@ struct CHERRY_EXPRESSIONS IEvaluationContext : public Object {
    *
    * @return the parent evaluation context or <code>null</code>
    */
-  virtual IEvaluationContext* GetParent() = 0;
+  virtual IEvaluationContext* GetParent() const = 0;
 
   /**
    * Returns the root evaluation context.
@@ -84,7 +84,7 @@ struct CHERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return whether plug-in activation is supported or not
    * @since 3.2
    */
-  virtual bool GetAllowPluginActivation() = 0;
+  virtual bool GetAllowPluginActivation() const = 0;
 
   /**
    * Returns the default variable.
@@ -92,7 +92,7 @@ struct CHERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return the default variable or <code>null</code> if
    *  no default variable is managed.
    */
-  virtual ExpressionVariable::Pointer GetDefaultVariable() = 0;
+  virtual ExpressionVariable::Pointer GetDefaultVariable() const = 0;
 
   /**
    * Adds a new named variable to this context. If a variable
@@ -121,7 +121,7 @@ struct CHERRY_EXPRESSIONS IEvaluationContext : public Object {
    * @return the variable's value or <code>null</code> if the content
    *  doesn't manage a variable with the given name
    */
-  virtual ExpressionVariable::Pointer GetVariable(const std::string& name) = 0;
+  virtual ExpressionVariable::Pointer GetVariable(const std::string& name) const = 0;
 
   /**
    * Resolves a variable for the given name and arguments. This

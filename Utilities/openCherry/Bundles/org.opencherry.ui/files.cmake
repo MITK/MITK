@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
   cherryEditorPart.cpp
   cherryGeometry.cpp
   cherryIEditorRegistry.cpp
+  cherryImageDescriptor.cpp
   cherryIPageLayout.cpp
   cherryIPartListener.cpp
   cherryIPerspectiveListener.cpp
@@ -44,32 +45,42 @@ SET(SRC_CPP_FILES
   application/cherryWorkbenchWindowAdvisor.cpp
   
   #commands
+  #commands/cherryAbstractContributionFactory.cpp
+  #commands/cherryCommandContributionItem.cpp
   #commands/cherryCommandContributionItemParameter.cpp
   #commands/cherryContributionItem.cpp
   #commands/cherryContributionManager.cpp
+  #commands/cherryICommandImageService.cpp
+  #commands/cherryICommandService.cpp
   #commands/cherryIContributionManagerOverrides.cpp
   #commands/cherryIMenuItem.cpp
+  #commands/cherryIMenuItemListener.cpp
   #commands/cherryIMenuListener.cpp
   #commands/cherryMenuManager.cpp
   #commands/cherrySubContributionItem.cpp
+  #commands/cherryUIElement.cpp
   
   #dialogs
   dialogs/cherryIDialog.cpp
   dialogs/cherryMessageDialog.cpp
   
   #guitk
+  guitk/cherryGuiTkControlEvent.cpp
+  guitk/cherryGuiTkEvent.cpp
   guitk/cherryGuiTkIControlListener.cpp
-  #guitk/cherryGuiTkIMenuListener.cpp
+  guitk/cherryGuiTkIMenuListener.cpp
   guitk/cherryGuiTkISelectionListener.cpp
   guitk/cherryGuiTkSelectionEvent.cpp
   
   #handlers
   handlers/cherryHandlerUtil.cpp
+  handlers/cherryIHandlerActivation.cpp
   handlers/cherryShowViewHandler.cpp
   
   #tweaklets
   tweaklets/cherryDnDTweaklet.cpp
   tweaklets/cherryGuiWidgetsTweaklet.cpp
+  tweaklets/cherryImageTweaklet.cpp
   tweaklets/cherryMessageDialogTweaklet.cpp
   tweaklets/cherryWorkbenchPageTweaklet.cpp
   tweaklets/cherryWorkbenchTweaklet.cpp
@@ -80,10 +91,12 @@ SET(SRC_CPP_FILES
   presentations/cherryIStackPresentationSite.cpp
   presentations/cherryStackDropResult.cpp
   presentations/cherryStackPresentation.cpp
+  
 )
 
 
 SET(INTERNAL_CPP_FILES
+  cherryBundleUtility.cpp
   cherryContainerPlaceholder.cpp
   cherryDetachedPlaceHolder.cpp
   cherryDefaultSaveable.cpp

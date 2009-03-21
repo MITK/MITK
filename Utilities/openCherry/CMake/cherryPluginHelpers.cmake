@@ -35,7 +35,7 @@ MACRO(_MACRO_FIND_PLUGIN_SRC_DIR pluginpath pluginname)
   #  ENDIF(EXISTS ${plugindir}/${ARGV1})
   #ENDFOREACH(plugindir ${OPENCHERRY_PLUGIN_SOURCE_DIRS})
   
-  SET(${pluginpath} ${${ARGV1}_SRC_DIR})
+  SET(${pluginpath} "${${ARGV1}_SRC_DIR}")
   
   #MESSAGE(STATUS "Found plugin src dir: ${${pluginpath}}")
 
@@ -52,7 +52,7 @@ MACRO(_MACRO_FIND_PLUGIN_BIN_DIR pluginpath pluginname)
   #    SET(${pluginpath} ${plugindir}/${ARGV1})
   #  ENDIF(EXISTS ${plugindir}/${ARGV1})
   #ENDFOREACH(plugindir ${OPENCHERRY_PLUGIN_BINARY_DIRS})
-  SET(${pluginpath} ${${ARGV1}_BIN_DIR})
+  SET(${pluginpath} "${${ARGV1}_BIN_DIR}")
   
   #MESSAGE(STATUS "Found plugin bin dir: ${${pluginpath}}")
 
@@ -115,7 +115,7 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
           MESSAGE(SEND_ERROR "EMPTY DIR found for dep: \"${_depdep}\"")
         ENDIF(NOT _plugin_src_dir)
   
-        MACRO_PARSE_MANIFEST(${_plugin_src_dir}/META-INF/MANIFEST.MF)
+        MACRO_PARSE_MANIFEST("${_plugin_src_dir}/META-INF/MANIFEST.MF")
         SET(_plugin_dependencies )
         _MACRO_REQUIRED_BUNDLES_LIST(_plugin_dependencies "${REQUIRE-BUNDLE}")
         

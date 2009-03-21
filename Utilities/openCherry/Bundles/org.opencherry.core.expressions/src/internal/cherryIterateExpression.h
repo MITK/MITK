@@ -51,7 +51,7 @@ private:
 			fIterEnd = end;
 		}
 
-    IEvaluationContext* GetParent() {
+    IEvaluationContext* GetParent() const {
 			return fParent;
 		}
 
@@ -59,11 +59,11 @@ private:
 			return fParent->GetRoot();
 		}
 
-    ExpressionVariable::Pointer GetDefaultVariable() {
+    ExpressionVariable::Pointer GetDefaultVariable() const {
 			return fDefaultVariable;
 		}
 
-    bool GetAllowPluginActivation() {
+    bool GetAllowPluginActivation() const {
 			return fParent->GetAllowPluginActivation();
 		}
 
@@ -79,7 +79,7 @@ private:
 			return fParent->RemoveVariable(name);
 		}
 
-    ExpressionVariable::Pointer GetVariable(const std::string& name) {
+    ExpressionVariable::Pointer GetVariable(const std::string& name) const {
 			return fParent->GetVariable(name);
 		}
 

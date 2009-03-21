@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
+class ImageDescriptor;
+
 /**
  * \ingroup org_opencherry_ui
  *
@@ -54,14 +56,14 @@ struct CHERRY_UI IWorkbenchPartDescriptor : public Object
    *
    * @return the descriptor of the image to display next to this part
    */
-  //virtual ImageDescriptor GetImageDescriptor() = 0;
+  virtual SmartPointer<ImageDescriptor> GetImageDescriptor() const = 0;
 
   /**
    * Returns the label to show for this part.
    *
    * @return the part label
    */
-  virtual std::string GetLabel() = 0;
+  virtual std::string GetLabel() const = 0;
 
   virtual ~IWorkbenchPartDescriptor()
   {

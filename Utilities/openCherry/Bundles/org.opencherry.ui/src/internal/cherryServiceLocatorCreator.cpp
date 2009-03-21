@@ -18,13 +18,20 @@
 #include "cherryServiceLocatorCreator.h"
 
 #include "cherryServiceLocator.h"
+#include "../services/cherryIServiceFactory.h"
+#include "../services/cherryIDisposable.h"
 
 namespace cherry {
 
-IServiceLocator* ServiceLocatorCreator::CreateServiceLocator(IServiceLocator* parent,
-      IServiceFactory* factory, IDisposable* owner)
+SmartPointer<IServiceLocator>
+ServiceLocatorCreator::CreateServiceLocator(
+      const WeakPointer<IServiceLocator> parent,
+      const SmartPointer<const IServiceFactory> factory,
+      WeakPointer<IDisposable> owner)
 {
-  return new ServiceLocator(parent, factory, owner);
+  IServiceLocator::WeakPtr weakParent(parent);
+  IServiceLocator::Pointer locator(new ServiceLocator(weakParent, factory, owner));
+  return locator;
 }
 
 }

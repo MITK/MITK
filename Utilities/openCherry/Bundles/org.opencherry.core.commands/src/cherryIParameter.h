@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIPARAMETER_H_
 #define CHERRYIPARAMETER_H_
 
+#include <cherryObject.h>
 #include <cherryMacros.h>
 #include "cherryCommandsDll.h"
 
@@ -35,7 +36,7 @@ namespace cherry {
  *
  * @since 3.1
  */
-struct CHERRY_COMMANDS IParameter : public Object {
+struct CHERRY_COMMANDS IParameter : public virtual Object {
 
   cherryInterfaceMacro(IParameter, cherry);
 

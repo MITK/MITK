@@ -20,6 +20,8 @@
 
 #include "../util/cherryAbstractTabItem.h"
 
+#include <QPushButton>
+
 namespace cherry
 {
 
@@ -32,10 +34,14 @@ private:
 
   Object::Pointer data;
   NativeTabFolder* parent;
+  const int style;
+  bool showClose;
+
+  QPushButton* closeButton;
 
 public:
 
-  NativeTabItem(NativeTabFolder* parent, int index);
+  NativeTabItem(NativeTabFolder* parent, int index, int style);
 
   /* (non-Javadoc)
    * @see AbstractTabItem#getBounds()
@@ -43,6 +49,12 @@ public:
   QRect GetBounds();
 
   void SetInfo(const PartInfo& info);
+
+  bool GetShowClose() const;
+
+  void SetShowClose(bool close);
+
+  QWidget* GetCloseButton();
 
   void Dispose();
 

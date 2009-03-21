@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYEDITORDESCRIPTOR_H_
@@ -30,7 +30,7 @@ struct IEditorPart;
 
 /**
  * \ingroup org_opencherry_ui_internal
- * 
+ *
  * @see IEditorDescriptor
  */
 class CHERRY_UI EditorDescriptor : public IEditorDescriptor
@@ -62,9 +62,9 @@ private:
 
   std::string imageFilename;
 
-  // ImageDescriptor imageDesc;
+  mutable SmartPointer<ImageDescriptor> imageDesc;
 
-  //bool testImage = true;
+  mutable bool testImage;
 
   std::string className;
 
@@ -104,7 +104,7 @@ public: EditorDescriptor();
 
   /**
    * Creates a descriptor for an external program.
-   * 
+   *
    * @param filename the external editor full path and filename
    * @return the editor descriptor
    */
@@ -158,28 +158,28 @@ public: EditorDescriptor();
 
   /**
    * Create the editor action bar contributor for editors of this type.
-   * 
+   *
    * @return the action bar contributor, or <code>null</code>
    */
 //public: IEditorActionBarContributor::Pointer CreateActionBarContributor();
 
   /**
    * Return the editor class name.
-   * 
+   *
    * @return the class name
    */
-public: std::string GetClassName();
+public: std::string GetClassName() const;
 
   /**
    * Return the configuration element used to define this editor, or <code>null</code>.
-   * 
+   *
    * @return the element or null
    */
-public: IConfigurationElement::Pointer GetConfigurationElement();
+public: IConfigurationElement::Pointer GetConfigurationElement() const;
 
   /**
    * Create an editor part based on this descriptor.
-   * 
+   *
    * @return the editor part
    * @throws CoreException thrown if there is an issue creating the editor
    */
@@ -187,98 +187,60 @@ public: SmartPointer<IEditorPart> CreateEditor();
 
   /**
    * Return the file name of the command to execute for this editor.
-   * 
+   *
    * @return the file name to execute
    */
-public: std::string GetFileName();
+public: std::string GetFileName() const;
 
   /**
    * Return the id for this editor.
-   * 
+   *
    * @return the id
    */
 public: std::string GetId() const;
 
   /**
    * Return the image descriptor describing this editor.
-   * 
+   *
    * @return the image descriptor
    */
-  //public: ImageDescriptor GetImageDescriptor() {
-  //      if (testImage) {
-  //        testImage = false;
-  //      if (imageDesc == null) {
-  //        String imageFileName = getImageFilename();
-  //        String command = getFileName();
-  //        if (imageFileName != null && configurationElement != null) {
-  //          imageDesc = AbstractUIPlugin.imageDescriptorFromPlugin(
-  //              configurationElement.getNamespace(), imageFileName);
-  //        } else if (command != null) {
-  //          imageDesc = WorkbenchImages.getImageDescriptorFromProgram(
-  //              command, 0);
-  //        }
-  //      }
-  //      verifyImage();        
-  //      }
-  //      
-  //        return imageDesc;
-  //    }
+public: SmartPointer<ImageDescriptor> GetImageDescriptor() const;
 
   /**
-   * Verifies that the image descriptor generates an image.  If not, the 
+   * Verifies that the image descriptor generates an image.  If not, the
    * descriptor is replaced with the default image.
-   * 
+   *
    * @since 3.1
    */
-  //private: void VerifyImage() {
-  //    if (imageDesc == null) {
-  //      imageDesc = WorkbenchImages
-  //            .getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
-  //    }
-  //    else {
-  //      Image img = imageDesc.createImage(false);
-  //      if (img == null) {
-  //          // @issue what should be the default image?
-  //          imageDesc = WorkbenchImages
-  //                  .getImageDescriptor(ISharedImages.IMG_OBJ_FILE);
-  //      } else {
-  //          img.dispose();
-  //      }
-  //    }
-  //  }
+private: void VerifyImage() const;
 
   /**
    * The name of the image describing this editor.
-   * 
+   *
    * @return the image file name
    */
-  //public: std::string GetImageFilename() {
-  //      if (configurationElement == null) {
-  //      return imageFilename;
-  //    }
-  //      return configurationElement.getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
-  //    }
+public: std::string GetImageFilename() const;
 
   /**
    * Return the user printable label for this editor.
-   * 
+   *
    * @return the label
    */
-public: std::string GetLabel();
+public: std::string GetLabel() const;
 
   /**
    * Returns the class name of the launcher.
-   * 
+   *
    * @return the launcher class name
    */
-public: std::string GetLauncher();
+public: std::string GetLauncher() const;
 
   /**
    * Return the contributing plugin id.
-   * 
+   *
    * @return the contributing plugin id
    */
-public: std::string GetPluginID();
+public: std::string GetPluginID() const;
 
   /**
    * Get the program for the receiver if there is one.
@@ -291,21 +253,21 @@ public: std::string GetPluginID();
   /* (non-Javadoc)
    * @see org.opencherry.ui.IEditorDescriptor#isInternal
    */
-public: bool IsInternal();
+public: bool IsInternal() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IEditorDescriptor#isOpenInPlace
    */
-public: bool IsOpenInPlace();
+public: bool IsOpenInPlace() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IEditorDescriptor#isOpenExternal
    */
-public: bool IsOpenExternal();
+public: bool IsOpenExternal() const;
 
   /**
    * Load the object properties from a memento.
-   * 
+   *
    * @return <code>true</code> if the values are valid, <code>false</code> otherwise
    */
 protected: bool LoadValues(IMemento::Pointer memento);
@@ -321,7 +283,7 @@ protected: void SaveValues(IMemento::Pointer memento);
    * @return the open mode of this editor
    * @since 3.1
    */
-private: int GetOpenMode();
+private: int GetOpenMode() const;
 
   /**
    * Set the class name of an internal editor.
@@ -377,9 +339,9 @@ private: int GetOpenMode();
 
   /**
    * Sets the open mode of this editor descriptor.
-   * 
+   *
    * @param mode the open mode
-   * 
+   *
    * @issue this method is public as a temporary fix for bug 47600
    */
 public: void SetOpenMode(int mode);
@@ -405,17 +367,17 @@ public: void SetOpenMode(int mode);
   /**
    * For debugging purposes only.
    */
-public: std::string ToString();
+public: std::string ToString() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.activities.support.IPluginContribution#getLocalId()
    */
-public: std::string GetLocalId();
+public: std::string GetLocalId() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.activities.support.IPluginContribution#getPluginId()
    */
-public: std::string GetPluginId();
+public: std::string GetPluginId() const;
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.IEditorDescriptor#getEditorManagementPolicy()

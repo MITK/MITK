@@ -18,8 +18,7 @@
 #ifndef CHERRYGUITKCONTROLEVENT_H_
 #define CHERRYGUITKCONTROLEVENT_H_
 
-#include <cherryMacros.h>
-#include <cherryObject.h>
+#include "cherryGuiTkEvent.h"
 
 namespace cherry
 {
@@ -35,46 +34,18 @@ namespace GuiTk
  * @see <a href="http://www.opencherry.org/swt/">Sample code and further information</a>
  */
 
-class ControlEvent: public Object
-{ //extends TypedEvent {
+class CHERRY_UI ControlEvent: public Event
+{
 
 public:
 
   cherryObjectMacro(ControlEvent);
 
-  /**
-   * The item that was moved, resized, or activated.
-   */
-  void* item;
 
-  /**
-   * The new x location
-   */
-  int x;
 
-  /**
-   * The new y location
-   */
-  int y;
+  ControlEvent();
 
-  /**
-   * The new width
-   */
-  int width;
-
-  /**
-   * The new height
-   */
-  int height;
-
-  ControlEvent() : item(0), x(0), y(0), width(0), height(0)
-  {
-  }
-
-  ControlEvent(void* item, int x = 0, int y = 0, int width = 0, int height = 0) :
-    item(item), x(x), y(y), width(width), height(height)
-  {
-  }
+  ControlEvent(void* item, int x = 0, int y = 0, int width = 0, int height = 0);
 
 };
 

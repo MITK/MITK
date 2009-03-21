@@ -18,8 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryExecutionEvent.h"
 
 #include "common/cherryCommandExceptions.h"
+#include "cherryIParameterValueConverter.h"
+#include "cherryCommandCategory.h"
+#include "cherryIHandler.h"
 
 #include <cherryObjectString.h>
+#include <sstream>
 
 namespace cherry
 {
@@ -31,13 +35,13 @@ ExecutionEvent::ExecutionEvent()
 
 ExecutionEvent::ExecutionEvent(const Command::ConstPointer cmd,
     const ParameterMap& params, const Object::ConstPointer trg,
-    const Object::Pointer appContext)
+    const Object::ConstPointer appContext)
 : applicationContext(appContext), command(cmd), parameters(params), trigger(trg)
 {
 
 }
 
-const Object::Pointer ExecutionEvent::GetApplicationContext()
+const Object::ConstPointer ExecutionEvent::GetApplicationContext() const
 {
   return applicationContext;
 }
@@ -48,7 +52,7 @@ const Command::ConstPointer ExecutionEvent::GetCommand() const
 }
 
 const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
-    const std::string& parameterId)
+    const std::string& parameterId) const
 {
   if (command.IsNull())
   {
@@ -89,7 +93,7 @@ const Object::ConstPointer ExecutionEvent::GetObjectParameterForExecution(
 //  }
 }
 
-std::string ExecutionEvent::GetParameter(const std::string parameterId)
+std::string ExecutionEvent::GetParameter(const std::string parameterId) const
 {
   ParameterMap::const_iterator res = parameters.find(parameterId);
   if (res != parameters.end())
@@ -97,21 +101,23 @@ std::string ExecutionEvent::GetParameter(const std::string parameterId)
   else return "";
 }
 
-const ExecutionEvent::ParameterMap& ExecutionEvent::GetParameters()
+const ExecutionEvent::ParameterMap& ExecutionEvent::GetParameters() const
 {
   return parameters;
 }
 
-const Object::ConstPointer ExecutionEvent::GetTrigger()
+const Object::ConstPointer ExecutionEvent::GetTrigger() const
 {
   return trigger;
 }
 
-void ExecutionEvent::PrintSelf(std::ostream& os, Indent Indent) const
+std::string ExecutionEvent::ToString() const
 {
+  std::stringstream str;
+  str << "ExecutionEvent(" << command->ToString() << ',' << parameters.size() << ','
+      << trigger->ToString() << ',' << applicationContext->ToString() << ')';
 
-  os << Indent << "ExecutionEvent(" << command << ',' << parameters.size() << ','
-      << trigger << ',' << applicationContext << ')';
+  return str.str();
 }
 
 }

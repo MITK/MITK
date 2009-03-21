@@ -88,7 +88,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart,
    *
    * @return the editor input
    */
-  virtual SmartPointer<IEditorInput> GetEditorInput() = 0;
+  virtual SmartPointer<IEditorInput> GetEditorInput() const = 0;
 
   /**
    * Returns the site for this editor.
@@ -102,7 +102,7 @@ struct CHERRY_UI IEditorPart : public virtual IWorkbenchPart,
    * @return the editor site; this value may be <code>null</code> if the editor
    *         has not yet been initialized
    */
-  virtual SmartPointer<IEditorSite> GetEditorSite() = 0;
+  virtual SmartPointer<IEditorSite> GetEditorSite() const = 0;
 
   /**
    * Initializes this editor with the given editor site and input.

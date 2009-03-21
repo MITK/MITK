@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const int Expression::HASH_CODE_NOT_COMPUTED = -1;
-const intptr_t Expression::HASH_FACTOR = 89;
+const std::size_t Expression::HASH_CODE_NOT_COMPUTED = 0;
+const std::size_t Expression::HASH_FACTOR = 89;
 const std::string Expression::ATT_VALUE= "value"; //$NON-NLS-1$
 
 const Expression::Pointer Expression::TRUE_EVAL(new TRUE_EVALExpression());
@@ -91,32 +91,32 @@ bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
   return true;
 }
 
-int
+std::size_t
 Expression::HashCode(Expression::Pointer object)
 {
   return object != 0 ? object->HashCode() : 0;
 }
 
-int
+std::size_t
 Expression::HashCode(std::vector<Expression::Pointer>& array)
 {
   if (array.size() == 0) {
     return 0;
   }
-  int hashCode = Poco::Hash<std::string>()("std::vector<Expression::Pointer>");
+  std::size_t hashCode = Poco::hash("std::vector<Expression::Pointer>");
   for (unsigned int i= 0; i < array.size(); i++) {
     hashCode = hashCode * HASH_FACTOR + HashCode(array[i]);
   }
   return hashCode;
 }
 
-int
+std::size_t
 Expression::HashCode(std::vector<ExpressionVariable::Pointer>& array)
 {
   if (array.size() == 0) {
     return 0;
   }
-  int hashCode = Poco::Hash<std::string>()("std::vector<ExpressionVariable::Pointer>");
+  int hashCode = Poco::hash("std::vector<ExpressionVariable::Pointer>");
   for (unsigned int i= 0; i < array.size(); i++) {
     hashCode = hashCode + array[i]->HashCode();
   }
@@ -137,13 +137,13 @@ Expression::CollectExpressionInfo(ExpressionInfo* info) const
   info->AddMisBehavingExpressionType(typeid(this));
 }
 
-intptr_t
+std::size_t
 Expression::ComputeHashCode() const
 {
-  return reinterpret_cast<intptr_t>(this);
+  return reinterpret_cast<std::size_t>(this);
 }
 
-int
+std::size_t
 Expression::HashCode() const
 {
   if (fHashCode != HASH_CODE_NOT_COMPUTED)

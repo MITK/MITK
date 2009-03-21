@@ -41,6 +41,7 @@ MACRO(MACRO_CREATE_PLUGIN)
     SET(PLUGIN_CPP_FILES ${CPP_FILES})
     SET(PLUGIN_MOC_H_FILES ${MOC_H_FILES})
     SET(PLUGIN_UI_FILES ${UI_FILES})
+    SET(PLUGIN_RESOURCE_FILES ${RESOURCE_FILES})
     SET(PLUGIN_RES_FILES ${RES_FILES})
     SET(PLUGIN_H_FILES ${H_FILES})
     
@@ -65,6 +66,11 @@ MACRO(MACRO_CREATE_PLUGIN)
     SET (PLUGIN_META_FILES ${PLUGIN_META_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml)
     CONFIGURE_FILE(${PLUGINXML} ${PLUGIN_OUTPUT_DIR}/plugin.xml COPYONLY)
   ENDIF(EXISTS ${PLUGINXML})
+  
+  # Copy the resource files into the binary output dir
+  FOREACH(_resource ${PLUGIN_RESOURCE_FILES})
+    CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/${_resource}" "${PLUGIN_OUTPUT_DIR}/${_resource}" COPYONLY)
+  ENDFOREACH(_resource ${PLUGIN_RESOURCE_FILES})
 
   SET(PLUGIN_GENERATED_FILES "")
   IF(PLUGIN_UI_FILES)
@@ -88,7 +94,6 @@ MACRO(MACRO_CREATE_PLUGIN)
   
   MACRO_ORGANIZE_SOURCES(INPUT ${PLUGIN_CPP_FILES} 
                          ${PLUGIN_UI_FILES} 
-                         ${PLUGIN_MOC_H_FILES}
                          ${PLUGIN_RES_FILES}
                          ${PLUGIN_H_FILES}
                          GENERATED ${PLUGIN_GENERATED_FILES})
@@ -96,7 +101,6 @@ MACRO(MACRO_CREATE_PLUGIN)
   SET(_all_target_files
       ${PLUGIN_CPP_FILES} 
       ${PLUGIN_UI_FILES} 
-      ${PLUGIN_MOC_H_FILES}
       ${PLUGIN_RES_FILES}
       ${PLUGIN_H_FILES}
       ${PLUGIN_GENERATED_FILES}
@@ -107,9 +111,27 @@ MACRO(MACRO_CREATE_PLUGIN)
       )
   
   ADD_LIBRARY(${PLUGIN_TARGET} SHARED ${_all_target_files})
-  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_linklibs})
+  
+  # we need to explicitly state the debug versions of the libraries
+  # we are linking to in the TARGET_LINK_LIBRARIES command.
+  # Although we set CMAKE_DEBUG_POSTFIX to d, CMake automatically
+  # append it in a TARGET_LINK_LIBRARIES(target lib1) command only
+  # if lib1 has been build within the same project.
+  # External projects using this macro would therefore alway link
+  # to lib1, instead of lib1d in debug configurations
+  SET(_debug_linklibs "")
+  FOREACH(_linklib ${_linklibs})
+    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${CMAKE_DEBUG_POSTFIX}")
+  ENDFOREACH(_linklib)
+  #MESSAGE(STATUS "${PLUGIN_TARGET} deps: ${_linklibs}")
+  #IF(BUILDING_OPENCHERRY)
+  #  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_linklibs})
+  #ELSE(BUILDING_OPENCHERRY)
+    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})
+  #ENDIF(BUILDING_OPENCHERRY)
     
-  SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
+  #SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
+  SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib)
 
 ENDMACRO(MACRO_CREATE_PLUGIN)
 

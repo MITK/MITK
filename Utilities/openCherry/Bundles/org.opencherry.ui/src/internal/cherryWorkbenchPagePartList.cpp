@@ -17,6 +17,7 @@
 
 #include "cherryWorkbenchPagePartList.h"
 #include "../cherryPartPane.h"
+#include "../cherryImageDescriptor.h"
 
 namespace cherry
 {

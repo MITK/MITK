@@ -55,7 +55,7 @@ public:
   /** Constructor */
   template<class Other>
   explicit WeakPointer(cherry::SmartPointer<Other> sptr) :
-    m_Pointer(const_cast<ObjectType*>(sptr.GetPointer()))
+    m_Pointer(dynamic_cast<ObjectType*>(sptr.GetPointer()))
   {
 
     if (m_Pointer)
@@ -67,7 +67,7 @@ public:
   /** constructor  */
   template<class Other>
   WeakPointer(const WeakPointer<Other>& p) :
-    m_Pointer(const_cast<ObjectType*>(p.m_Pointer))
+    m_Pointer(dynamic_cast<ObjectType*>(p.m_Pointer))
   {
     if (m_Pointer)
       m_Pointer->AddDestroyListener(MessageDelegate<WeakPointer> (this,
@@ -127,11 +127,39 @@ public:
     return *this;
   }
 
+  /** Template comparison operators. */
+  template<typename R>
+  bool operator ==(const R* o) const
+  {
+    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+  }
+
+  template<typename R>
+  bool operator ==(const WeakPointer<R>& r) const
+  {
+    const R* o = r.m_Pointer;
+    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+  }
+
   /** lock method is used to access the referring object  */
-  SmartPointer<ObjectType> Lock()
+  SmartPointer<ObjectType> Lock() const
   {
     SmartPointer<ObjectType> sp(m_Pointer);
     return sp;
+  }
+
+  void Reset()
+  {
+    if (m_Pointer)
+      m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
+          &WeakPointer::ObjectDestroyed));
+
+    m_Pointer = 0;
+  }
+
+  bool Expired() const
+  {
+    return m_Pointer == 0;
   }
 
   /** Destructor */

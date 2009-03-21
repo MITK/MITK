@@ -62,6 +62,17 @@ void QmitkRegionGrowing::CreateQtPartControl(QWidget *parent)
     m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );
   }
 }
+  
+void QmitkRegionGrowing::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+{
+  m_MultiWidget = &stdMultiWidget;
+  m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );
+}
+
+void QmitkRegionGrowing::StdMultiWidgetNotAvailable()
+{
+  m_MultiWidget = NULL;
+}
 
 void QmitkRegionGrowing::CreateConnections()
 {
@@ -209,15 +220,4 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-  
-void QmitkRegionGrowing::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-  m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );
-}
-
-void QmitkRegionGrowing::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
 

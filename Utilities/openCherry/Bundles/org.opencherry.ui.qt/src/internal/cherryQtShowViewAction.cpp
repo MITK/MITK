@@ -31,6 +31,10 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   this->setText(QString(desc->GetLabel().c_str()));
   this->setToolTip(QString(desc->GetLabel().c_str()));
 
+  QIcon* icon = static_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage());
+  this->setIcon(*icon);
+  desc->GetImageDescriptor()->DestroyImage(icon);
+
   m_Window = window;
   m_Desc = desc;
 

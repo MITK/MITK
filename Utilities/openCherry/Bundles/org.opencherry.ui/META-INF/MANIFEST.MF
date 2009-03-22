@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: Cherry User Interface Plugin
+Bundle-Name: openCherry User Interface Plugin
 Bundle-SymbolicName: org.opencherry.ui
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

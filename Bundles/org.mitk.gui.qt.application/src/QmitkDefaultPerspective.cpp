@@ -27,7 +27,7 @@ void QmitkDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer l
 
   layout->AddView("org.mitk.views.datamanager", cherry::IPageLayout::RIGHT, 0.7, editorArea);
 
-  layout->AddView("org.opencherry.views.logview", cherry::IPageLayout::BOTTOM, 0.7, editorArea);
+  //layout->AddView("org.opencherry.views.logview", cherry::IPageLayout::BOTTOM, 0.7, editorArea);
 
   //cherry::IFolderLayout::Pointer bottom = layout->CreateFolder("bottom", cherry::IPageLayout::BOTTOM, 0.7, editorArea);
   //bottom->AddView("org.opencherry.views.logview");

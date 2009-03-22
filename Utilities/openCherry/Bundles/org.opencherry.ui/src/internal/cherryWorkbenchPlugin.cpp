@@ -240,7 +240,7 @@ void WorkbenchPlugin::Start(IBundleContext::Pointer context)
 {
   //context.addBundleListener(getBundleListener());
   AbstractUIPlugin::Start(context);
-  std::cout << "\nStarting WorkbenchPluing...\n\n";
+  std::cout << "\nStarting WorkbenchPlugin...\n\n";
   bundleContext = context;
 
 

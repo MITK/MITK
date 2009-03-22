@@ -30,29 +30,30 @@ IF (MITK_USE_OPENCHERRY)
   # There is no PocoConfig.cmake, so we set Poco specific CMake variables
   # here. This way the call to FIND_PACKAGE(Poco) in openCherryConfig.cmake
   # finds the Poco distribution supplied by MITK
-  SET(Poco_INCLUDE_DIR 
-    "@MITK_SOURCE_DIR@/Utilities/Poco" 
-    CACHE PATH 
+  SET(Poco_INCLUDE_DIR
+    "@MITK_SOURCE_DIR@/Utilities/Poco"
+    CACHE PATH
     "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2")
 
-  SET(Poco_LIBRARY_DIR 
+  SET(Poco_LIBRARY_DIR
     "@MITK_BINARY_DIR@/bin"
-    CACHE PATH 
+    CACHE PATH
     "top-level directory containing the poco libraries.")
 
   INCLUDE("@MITK_SOURCE_DIR@/CMake/MITKPluginHelpers.cmake")
   INCLUDE("@MITK_BINARY_DIR@/Bundles/BundleList.cmake")
 
   FIND_PACKAGE(openCherry)
-  
+
   IF(NOT openCherry_FOUND)
     MESSAGE(SEND_ERROR "MITK does not seem to be configured with openCherry support. Set BUILD_OPENCHERRY to ON in your MITK build configuration.")
   ENDIF(NOT openCherry_FOUND)
-  
+
   SET(MITK_PLUGIN_SOURCE_DIRS "@MITK_SOURCE_DIR@/Bundles")
   SET(MITK_PLUGIN_BINARY_DIRS "@EXECUTABLE_OUTPUT_PATH@/Bundles")
-  
-  SET(MITK_VTK_LIBRARY_DIRS @VTK_LIBRARY_DIRS@)
-  SET(MITK_ITK_LIBRARY_DIRS @ITK_LIBRARY_DIRS@)
-  
+
+  SET(MITK_LIBRARY_DIRS "@LIBRARY_OUTPUT_PATH@")
+  SET(MITK_VTK_LIBRARY_DIRS "@VTK_LIBRARY_DIRS@")
+  SET(MITK_ITK_LIBRARY_DIRS "@ITK_LIBRARY_DIRS@")
+
 ENDIF(MITK_USE_OPENCHERRY)

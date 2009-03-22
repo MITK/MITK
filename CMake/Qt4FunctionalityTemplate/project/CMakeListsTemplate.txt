@@ -1,21 +1,23 @@
 PROJECT(@CUSTOM_PROJECT_NAME@)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
+IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0003 OLD)
+ENDIF(COMMAND CMAKE_POLICY)
+
 SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all libraries.")
 
 SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin" CACHE INTERNAL "Single output directory for building all executables.")
 
-# This variable will contain a list of directories 
+# This variable will contain a list of directories
 # which contain your binary plug-ins
 SET(@CUSTOM_PROJECT_NAME@_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "@CUSTOM_PROJECT_NAME@ base plugin directories." FORCE)
 
 @FIND_PACKAGE_QT4@
+INCLUDE(${QT_USE_FILE})
 
 SET(MITK_USE_OPENCHERRY 1)
 FIND_PACKAGE(MITK REQUIRED)
-
-# Set up MITK include paths.
-@MITK_INCLUDE_DIRS@
 
 # Go through all directories in the current directory
 # and if it contains a plug-in configure it
@@ -34,7 +36,7 @@ TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ optimized org_opencherry_osgi 
 SET(PLUGIN_CACHE_DIR "${EXECUTABLE_OUTPUT_PATH}/plugin_cache")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
                "${EXECUTABLE_OUTPUT_PATH}/@CUSTOM_PROJECT_EXECUTABLE@.ini" @ONLY)
-               
+
 # If we are under Windows, create two batch files which correctly
 # set up the environment for the application
 IF(WIN32)

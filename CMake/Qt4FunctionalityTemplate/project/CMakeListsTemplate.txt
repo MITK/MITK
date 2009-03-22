@@ -36,9 +36,10 @@ TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ optimized org_opencherry_osgi 
 SET(PLUGIN_CACHE_DIR "${EXECUTABLE_OUTPUT_PATH}/plugin_cache")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
                "${EXECUTABLE_OUTPUT_PATH}/@CUSTOM_PROJECT_EXECUTABLE@.ini" @ONLY)
+              
 
 # If we are under Windows, create two batch files which correctly
-# set up the environment for the application
+# set up the environment for the application and another for VS 2008
 IF(WIN32)
   SET(APP_BUILD_TYPE debug)
   CONFIGURE_FILE(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
@@ -46,4 +47,8 @@ IF(WIN32)
   SET(APP_BUILD_TYPE release)
   CONFIGURE_FILE(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
                ${EXECUTABLE_OUTPUT_PATH}/start@CUSTOM_PROJECT_EXECUTABLE@_${APP_BUILD_TYPE}.bat @ONLY)
+               
+  # Configure VS batch file
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/startVS2008.bat.in"
+               "${PROJECT_BINARY_DIR}/startVS2008.bat" @ONLY)
 ENDIF(WIN32)

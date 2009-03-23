@@ -221,8 +221,8 @@ const char* mitk::ClaronInterface::GetName(claronToolHandle c)
 {
   char MarkerName[MT_MAX_STRING_LENGTH];
   MTC( Marker_NameGet(c, MarkerName, MT_MAX_STRING_LENGTH, 0) );
-  std::string returnValue = std::string(MarkerName);
-  return MarkerName;
+  std::string* returnValue = new std::string(MarkerName);
+  return returnValue->c_str();
 }
 
 bool mitk::ClaronInterface::IsTracking()

@@ -82,6 +82,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Testing/ \
                          @MITK_SOURCE_DIR@/CMake/QmitkFunctionalityTemplate/ \
+                         @MITK_SOURCE_DIR@/CMake/Qt4FunctionalityTemplate/ \
                          @QT_DOCUMENTATION_EXCLUDE_DIRS@
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \

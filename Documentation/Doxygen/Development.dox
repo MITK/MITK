@@ -9,7 +9,7 @@ Some abstract concepts of MITK are described in \ref Concepts
 \li \ref BuildInstructionsPage
 \li \ref TutorialPage
 \li \ref StylesAndNotesPage
-\li \ref NewFunctionalityPage
+\QT3 \li \ref NewFunctionalityPage \endQT3 \QT4 \li \ref NewPluginPage \endQT4
 \li \ref QtWidgetPage
 \li \ref todo
 \li \ref KnownProblemsPage

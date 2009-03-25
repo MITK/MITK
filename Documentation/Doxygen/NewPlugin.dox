@@ -1,13 +1,17 @@
 /**
-\page NewPluginPage How to create a new MITK Plugin
+\page NewPluginPage How to create a new MITK Plug-in
 
-\section CmakePluginGen CMake-based plugin generator
-The BundleGenerator is a tool to simplify the process of creating your own MITK plugin and integrating it into the MainApp.
+\section CmakePluginGen CMake-based plug-in generator
+The BundleGenerator is a tool to simplify the process of creating your own MITK project (optional) and plug-ins.
 
 \par Introduction
-This howto will show you how to create a new MITK plugin. You will get a ready to use plugin which integrates into the MITK MainApp and which can be arbitrarily customized.
-Start by building a MainApp. If everything works you have to think about a name and an id for your new plugin and where you want
-to put the source code. The generator uses the CMake GUI for configuration.
+This how-to will show you how to create a new MITK project together with a new plug-in. You will not need to touch
+either the MITK source tree or any MITK binary tree.
+
+\par
+You will get a ready to use plug-in which integrates into any openCherry Workbench configured with the MITK plug-ins.
+Start by building MITK with openCherry enabled. If everything works you have to think about a name and an id for your new plugin and/or
+your new project. The generator uses the CMake GUI for configuration.
 
 \par Limitations
 The CMake based generator will generate only very few classes for you. It can generate an Activator class and a View class for GUI contributions. 
@@ -17,29 +21,32 @@ sophisticated generator available.
 \par Windows
 \li Start the CMake GUI
 \li Choose \c Build/Tools/BundleGenerator as source directory
-\li Choose a temporary directory as binary directory (create it if it doesn't exist)
+\li Choose a directory for the source code of your project and/or plug-in (create it if it doesn't exist)
 \li Press "Configure" and don't care about the generator
 \li Follow the steps for "All"
 
 \par Linux
-\li Create a temporary directory and cd into it. 
+\li Create a directory for the source code of your project and/or plug-in and cd into it. 
 \li Start <tt>ccmake</tt> with <tt>Build/Tools/BundleGenerator</tt> as source directory
 \li Press "Configure" 
 
 \par All
 \image html BundleGenerator1.png
+\li CUSTOM_PROJECT_NAME (optional): The name of your new project. If empty, only the source code for your plug-in is generated.
+    MBI members should not supply a value.
 \li GUI_SUPPORT: you usually want to contribute to the UI, so leave this ON
-\li PLUGIN_ID: Enter an id for the new plugin. It must be a unique identifier, so the following form is recommended: \c my.domain.identifier.
+\li PLUGIN_ID: Enter an id for the new plug-in. It must be a unique identifier, so the following form is recommended: \c my.domain.identifier.
     MBI members should use an id similar to \c org.mitk.gui.qt.isosurface. 
+\li PLUGIN_NAME: The name of your plug-in in human-readable form. For example: MITK IsoSurface Plug-in
 \li PLUGIN_TEMPLATE: Leave this as it is, unless you really know what you are doing.
 \li Press "Configure" again and you will get the following screen:
 
 \image html BundleGenerator2.png
-\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plugin. See cherry::IBundleActivator .
-\li PLUGIN_NAME: The name of your plugin in human-readable form. For example: MITK IsoSurface Plugin
-\li PLUGIN_VENDOR: The person or institution from which this plugin comes from. Change to your needs.
-\li PLUGIN_VERSION: The version number of your plugin. This will be used by the platform for managing plugin dependencies.
-\li REQUIRED_PLUGINS: The ids of plugins your plugin depends on. For now, you have to list also transitive dependencies (to get the include paths right). Usually you won't need to change something.
+\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plug-in. See cherry::IBundleActivator .
+\li CUSTOM_PROJECT_EXECUTABLE (optional/required): If you supplied a CUSTOM_PROJECT_NAME, this variable will hold the name of your executable which will start an openCherry Workbench.
+\li PLUGIN_VENDOR: The person or institution from which this plug-in comes from. Change to your needs.
+\li PLUGIN_VERSION: The version number of your plug-in. This will be used by the platform for managing plug-in dependencies.
+\li REQUIRED_PLUGINS: The ids of plug-ins your plug-in directly depends on. Usually you won't need to change something.
 \li VIEW_BASE_CLASS: The class from which your new view inherits from. Usually not changed.
 \li VIEW_BASE_CLASS_H: The header file for the base class of your new view. Usually not changed.
 \li VIEW_CLASS: The name of your new view (i.e. functionality) class.
@@ -50,17 +57,33 @@ sophisticated generator available.
 
 \image html BundleGenerator3.png
 
-If everything looks okay, press "Generate" and CMake will create a directory named <PLUGIN_ID> in your temporary directory.
+If everything looks okay, press "Generate" and CMake will create a directory named <CUSTOM_PROJECT_NAME> if you set a value for it and
+a directory named <PLUGIN_ID>.
 
-\par Integrating your new plugin
-Copy your new plugin from the temporary directory in your source tree.
-(Hint for MBI members: put it in \c mitk/Bundles or \c mbi-sb/Bundles !)
+\par Integrating your new plug-in
+If you supplied a CUSTOM_PROJECT_NAME value, create a new directory outside of the <CUSTOM_PROJECT_NAME> directory for your project's
+binary tree. Start CMake again and use <CUSTOM_PROJECT_NAME> as source directory and your newly created directory as binary directory.
+Go through the configuration and generation process again and you will get project files for your chosen environment. On Windows, use
+the supplied \b startVS2008.bat file in your binary tree to start Visual Studio (this will correctly set your path environment variable).
 
+\par
+If you did not want to create a new project (because you already have one), copy your new plug-in from the temporary directory
+in your project's source tree. (Hint for MBI members: put it in \c mitk/Bundles or \c mbi-sb/Bundles !)
 Switch back to the configuration of your projects (MBI: MITK) build. On Windows you can just switch the "Where to build the binaries" combobox back 
-to your projects (MBI: MITKs) binary directory. After pressing "Configure" a new build option for your plugin should appear.
+to your projects (MBI: MITKs) binary directory. After pressing "Configure" a new build option for your plug-in should appear.
 
-\section BuildSystem Build system for plugins
+\section BuildSystem Build system for plug-ins
 
-Just put new files in your plugins \c src or \c src/internal directory and edit the \c files.cmake file there.
+Just put new files in your plug-in's \c src or \c src/internal directory and edit the \c files.cmake file there.
 If you have any fancy stuff like external libraries and include directories you should have a look at the CMake manual and general MITK build system documentation.
+
+\section Troubleshooting Troubleshooting
+
+\par I get "Could not find library" messages and similar stuff when I try to start my project's executable.
+This is mostly due to wrong environment settings. On Windows, make sure that you use the supplied batch files to start
+Visual Studio or your project's executable. If you still get errors, double check the value of the PATH variable in
+your batch files (it must contain MITK's binary directory and paths to the ITK, VTK and Qt libraries.
+
+\par
+On Linux, set your LD_LIBRARY_PATH variable accordingly. 
 */

@@ -19,14 +19,10 @@ INCLUDE(${QT_USE_FILE})
 SET(MITK_USE_OPENCHERRY 1)
 FIND_PACKAGE(MITK REQUIRED)
 
-# Go through all directories in the current directory
-# and if it contains a plug-in configure it
-MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${LIBRARY_OUTPUT_PATH}/Bundles
-                      CACHE_PLUGIN_BINARY_DIRS @CUSTOM_PROJECT_NAME@_PLUGIN_BINARY_DIRS)
-
+ADD_SUBDIRECTORY(Bundles)
 
 # Now build a custom executable to start the
-# MITK MainApp with our plug-ins
+# openCherry Workbench with our plug-ins
 INCLUDE_DIRECTORIES("${OPENCHERRY_SOURCE_DIR}")
 LINK_DIRECTORIES("${org.opencherry.osgi_BIN_DIR}/bin")
 ADD_EXECUTABLE(@CUSTOM_PROJECT_EXECUTABLE@ @CUSTOM_PROJECT_EXECUTABLE@.cpp)
@@ -34,12 +30,13 @@ TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ optimized org_opencherry_osgi 
 
 # Configure the application's .ini file
 SET(PLUGIN_CACHE_DIR "${EXECUTABLE_OUTPUT_PATH}/plugin_cache")
+SET(PLUGIN_BINARY_DIRS "${LIBRARY_OUTPUT_PATH}/Bundles")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
                "${EXECUTABLE_OUTPUT_PATH}/@CUSTOM_PROJECT_EXECUTABLE@.ini" @ONLY)
               
 
 # If we are under Windows, create two batch files which correctly
-# set up the environment for the application and another for VS 2008
+# set up the environment for the application and for VS 2008
 IF(WIN32)
   SET(APP_BUILD_TYPE debug)
   CONFIGURE_FILE(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in

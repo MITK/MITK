@@ -377,7 +377,7 @@ protected:
   MapperSlotId m_MapperID;
 
   //##Documentation
-  //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
+  //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for rendering.
   DataTreeIteratorClone m_DataTreeIterator;
 
   //##Documentation

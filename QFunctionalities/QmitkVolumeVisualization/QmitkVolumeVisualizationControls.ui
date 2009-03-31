@@ -54,6 +54,12 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
+            <property name="minimumSize">
+                <size>
+                    <width>0</width>
+                    <height>44</height>
+                </size>
+            </property>
             <property name="maximumSize">
                 <size>
                     <width>32767</width>
@@ -124,6 +130,12 @@
                     <widget class="QLabel">
                         <property name="name">
                             <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="minimumSize">
+                            <size>
+                                <width>0</width>
+                                <height>44</height>
+                            </size>
                         </property>
                         <property name="maximumSize">
                             <size>
@@ -674,16 +686,34 @@ Press delete to remove selected handle.</string>
                 <attribute name="title">
                     <string>TF Styles</string>
                 </attribute>
-                <vbox>
+                <grid>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QmitkTransferFunctionWidget">
+                    <widget class="QGroupBox" row="0" column="0">
+                        <property name="name">
+                            <cstring>transferFunctionGroupBox</cstring>
+                        </property>
+                        <property name="title">
+                            <string>Transfer Functions</string>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QComboBox">
+                                <property name="name">
+                                    <cstring>m_TransferFunctionTable</cstring>
+                                </property>
+                            </widget>
+                        </vbox>
+                    </widget>
+                    <widget class="QmitkTransferFunctionWidget" row="1" column="0">
                         <property name="name">
                             <cstring>m_TransferFunctionWidget_2</cstring>
                         </property>
                     </widget>
-                    <spacer>
+                    <spacer row="2" column="0">
                         <property name="name">
                             <cstring>spacer32</cstring>
                         </property>
@@ -696,11 +726,11 @@ Press delete to remove selected handle.</string>
                         <property name="sizeHint">
                             <size>
                                 <width>31</width>
-                                <height>150</height>
+                                <height>300</height>
                             </size>
                         </property>
                     </spacer>
-                </vbox>
+                </grid>
             </widget>
             <widget class="QWidget">
                 <property name="name">

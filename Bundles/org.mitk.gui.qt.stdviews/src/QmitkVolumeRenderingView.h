@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QmitkFunctionality.h>
 #include <QmitkDataStorageListModel.h>
+#include <QmitkDataStorageComboBox.h>
 #include <QmitkTransferFunctionWidget.h>
 
 class QmitkVolumeRenderingView : public QObject, public QmitkFunctionality
@@ -24,9 +25,11 @@ protected slots:
 
   void comboIndexChanged(int index);
 
+  void OnTransferFunctionModeChanged( int mode );
+
 private:
 
-  QmitkDataStorageListModel* m_ComboModel;
+  QmitkDataStorageComboBox* m_DataStorageComboBox;
   QmitkTransferFunctionWidget* m_TransferFunctionWidget;
 
 };

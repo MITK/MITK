@@ -58,6 +58,12 @@ public:
   void InitializeByMitkImage(const mitk::Image* image);
   void InitializeByItkHistogram(const itk::Statistics::Histogram<double>* histogram);
   
+  /** */
+  void InitializeHistogram( const mitk::Image* image );
+
+  /** Set TransferFunction Mode */
+  void SetTransferFunctionMode( int mode );
+  
   itkNewMacro(Self);
   
   typedef std::vector<std::pair<double, double> > ControlPoints;

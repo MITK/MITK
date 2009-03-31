@@ -35,6 +35,14 @@ class QMITK_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Qmit
 	 void SetXValue();
 	 void SetYValue();
 
+   /** */
+   void OnChangeTransferFunctionMode( int mode );
+
+signals:
+
+   /** */
+   void SignalTransferFunctionModeChanged( int );
+
  private:
 
 	 int number_c; //Anzahl Color-Points

@@ -8,9 +8,24 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 {
   this->setupUi(this);
 
+  //insert Transfer Function Combo Box
+  m_TransferFunctionComboBox->insertItem( " choose Transferfunction ..");
+  m_TransferFunctionComboBox->insertItem( "Ramp between 25% & 50%, Tan");
+  m_TransferFunctionComboBox->insertItem( "Ramp between 25% & 75%, Tan");
+  m_TransferFunctionComboBox->insertItem( "CT AAA");
+  m_TransferFunctionComboBox->insertItem( "CT Bone");
+  m_TransferFunctionComboBox->insertItem( "CT Cardiac");
+  m_TransferFunctionComboBox->insertItem( "CT Coronary arteries");
+  m_TransferFunctionComboBox->insertItem( "MR Default");
+  m_TransferFunctionComboBox->insertItem( "MR MIP");
+  m_TransferFunctionComboBox->insertItem( "MITK Default");
+
   // signals and slots connections
   connect(m_XEdit, SIGNAL(returnPressed()), this, SLOT(SetXValue()));
   connect(m_YEdit, SIGNAL(returnPressed()), this, SLOT(SetYValue()));
+
+  // !!! Transfer Function Changed
+  connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT( OnChangeTransferFunctionMode( int ) ) );
 }
 
 QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
@@ -25,18 +40,24 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
     {
       if (tfp)
       {
-        mitk::TransferFunction* tf = dynamic_cast<mitk::TransferFunction*>(tfp->GetValue().GetPointer());
-        if (tf)
-        {
-          tf->InitializeByMitkImage(dynamic_cast<mitk::Image*>(node->GetData()));
-          //std::cout << "TF access" << std::endl;
-          m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction(tf->GetScalarOpacityFunction());
-          m_ScalarOpacityFunctionCanvas->SetHistogram(tf->GetHistogram());
-          m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
-          m_GradientOpacityCanvas ->SetPiecewiseFunctionGO(tf->GetGradientOpacityFunction());
-          m_GradientOpacityCanvas->SetHistogram(tf->GetHistogram());
-          UpdateMinMaxLabels();
-        }
+        //generate Initiale Histogram
+        mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+        if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
+          tf->InitializeHistogram( image );
+
+        //Get TransferFunction Parameter from the DataTreeNode
+        m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tfp->GetValue()->GetScalarOpacityFunction() );
+        m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
+        m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
+        m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
+
+        m_GradientOpacityCanvas->SetPiecewiseFunction( tfp->GetValue()->GetGradientOpacityFunction() );
+        m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
+        m_GradientOpacityCanvas->SetMin( tf->GetMin() );
+        m_GradientOpacityCanvas->SetMax( tf->GetMax() );
+
+        m_ColorTransferFunctionCanvas->SetColorTransferFunction( tfp->GetValue()->GetColorTransferFunction() );
+        UpdateMinMaxLabels();
       }
     }
     else
@@ -830,5 +851,17 @@ void QmitkTransferFunctionWidget::SetYValue()
   m_GradientOpacityCanvas->SetY(m_YEdit->text().toFloat());
   mitk::RenderingManager::GetInstance()->SetNextLOD(2);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkTransferFunctionWidget::OnChangeTransferFunctionMode( int mode )
+{
+  //first item is nothing
+  if( mode == 0 )
+    return;
+  else //subract 1 for correct TransferFunction order ( mode = 0 = TF_SKIN_50 )
+    mode -= 1;
+
+  //send Signal
+  emit SignalTransferFunctionModeChanged( mode );
 }
 

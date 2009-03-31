@@ -47,16 +47,16 @@ class QMITK_EXPORT QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCa
 
      void SetPiecewiseFunctionGO(vtkPiecewiseFunction* piecewiseFunction)
      {
-      this->m_PiecewiseFunction = piecewiseFunction;
-          this->SetMin(m_PiecewiseFunction->GetRange()[0]);
-          this->SetMax((m_PiecewiseFunction->GetRange()[1]));
-      //this->SetMin(0);
-      //this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
-      setEnabled(true);
+        this->m_PiecewiseFunction = piecewiseFunction;
+        this->SetMin(m_PiecewiseFunction->GetRange()[0]);
+        this->SetMax(m_PiecewiseFunction->GetRange()[1]);
+        //this->SetMin(0);
+        //this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
+        setEnabled(true);
 
-      m_IsGradientOpacityFunction = true;
-     
-      update();
+        m_IsGradientOpacityFunction = true;
+       
+        update();
 
     };
 

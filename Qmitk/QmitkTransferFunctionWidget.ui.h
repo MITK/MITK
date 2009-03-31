@@ -41,21 +41,24 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
   if (node) {
     if (mitk::TransferFunctionProperty::Pointer tfp = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction")))
     {
-      if (tfp)
-      {
-        mitk::TransferFunction* tf = dynamic_cast<mitk::TransferFunction*>(tfp->GetValue().GetPointer());
-        if (tf)
-        {
-          tf->InitializeByMitkImage(dynamic_cast<mitk::Image*>(node->GetData()));
-          //std::cout << "TF access" << std::endl;
-          m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction(tf->GetScalarOpacityFunction());
-          m_ScalarOpacityFunctionCanvas->SetHistogram(tf->GetHistogram());
-          m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
-          m_GradientOpacityCanvas ->SetPiecewiseFunctionGO(tf->GetGradientOpacityFunction());
-          m_GradientOpacityCanvas->SetHistogram(tf->GetHistogram());
-          UpdateMinMaxLabels();
-        }
-      }
+      //generate Initiale Histogram
+      mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+      if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
+        tf->InitializeHistogram( image );
+            
+      //Get TransferFunction Parameter from the DataTreeNode
+      m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tfp->GetValue()->GetScalarOpacityFunction() );
+      m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
+      m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
+      m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
+      
+      m_GradientOpacityCanvas->SetPiecewiseFunction( tfp->GetValue()->GetGradientOpacityFunction() );
+      m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
+      m_GradientOpacityCanvas->SetMin( tf->GetMin() );
+      m_GradientOpacityCanvas->SetMax( tf->GetMax() );
+
+      m_ColorTransferFunctionCanvas->SetColorTransferFunction( tfp->GetValue()->GetColorTransferFunction() );
+      UpdateMinMaxLabels();
     }
     else 
     {
@@ -69,6 +72,8 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
         m_GradientOpacityCanvas->SetHistogram(tf->GetHistogram());
         m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
         UpdateMinMaxLabels();
+
+        //set Transfer Function to Data Node
         node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
       } 
       else 
@@ -94,7 +99,6 @@ void QmitkTransferFunctionWidget::SetDataTreeNode( mitk::DataTreeNode* node)
     m_ColorTransferFunctionCanvas->setEnabled(false);
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
 
 void QmitkTransferFunctionWidget::UpdateMinMaxLabels()

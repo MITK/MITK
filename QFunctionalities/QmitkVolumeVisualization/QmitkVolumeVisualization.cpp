@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkVolumeVisualization.h"
 #include "QmitkVolumeVisualizationControls.h"
 #include "QmitkTransferFunctionWidget.h"
+#include "QmitkPiecewiseFunctionCanvas.h"
+#include "QmitkColorTransferFunctionCanvas.h"
+
 #include <qaction.h>
 #include <qcheckbox.h>
 #include "icon.xpm"
@@ -25,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNode.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
+#include "mitkHistogramGenerator.h"
 
   QmitkVolumeVisualization::QmitkVolumeVisualization(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget) ,m_Controls(NULL)
@@ -45,6 +51,18 @@ QWidget * QmitkVolumeVisualization::CreateControlWidget(QWidget *parent)
   if (m_Controls == NULL)
   {
     m_Controls = new QmitkVolumeVisualizationControls(parent);
+
+    // !!! Fill Transfer Function List with issues
+    m_Controls->m_TransferFunctionTable->insertItem( " choose Transferfunction ..");
+    m_Controls->m_TransferFunctionTable->insertItem( "Ramp between 25% & 50%, Tan");
+    m_Controls->m_TransferFunctionTable->insertItem( "Ramp between 25% & 75%, Tan");
+    m_Controls->m_TransferFunctionTable->insertItem( "CT AAA");
+    m_Controls->m_TransferFunctionTable->insertItem( "CT Bone");
+    m_Controls->m_TransferFunctionTable->insertItem( "CT Cardiac");
+    m_Controls->m_TransferFunctionTable->insertItem( "CT Coronary arteries");
+    m_Controls->m_TransferFunctionTable->insertItem( "MR Default");
+    m_Controls->m_TransferFunctionTable->insertItem( "MR MIP");
+    m_Controls->m_TransferFunctionTable->insertItem( "MITK Default");
   }
   return m_Controls;
 }
@@ -76,6 +94,9 @@ void QmitkVolumeVisualization::CreateConnections()
     
     //Immediate Update
     connect( (QObject*)(m_Controls), SIGNAL(ImmUpdate(bool)),(QObject*) this, SLOT(ImmediateUpdate(bool)));
+
+    // !!! Transfer Function Changed
+    connect( m_Controls->m_TransferFunctionTable, SIGNAL( activated( int ) ), this, SLOT( OnChangeTransferFunctionMode( int ) ) );
   }
 }
 
@@ -89,6 +110,42 @@ QAction * QmitkVolumeVisualization::CreateAction(QActionGroup *parent)
 void QmitkVolumeVisualization::TreeChanged()
 {
   m_Controls->m_TreeNodeSelector->Update();
+
+  const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
+  if (item)
+  {
+    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>( item->GetNode() );
+    bool enabled = false;
+
+    if( node )
+      node->GetBoolProperty("volumerendering",enabled);
+    
+    m_Controls->m_EnableRenderingCB->setChecked(enabled);
+  }
+  else
+  {
+    mitk::HistogramGenerator::Pointer histGen= mitk::HistogramGenerator::New();
+    vtkPiecewiseFunction* piecewiseFunction = vtkPiecewiseFunction::New();
+    vtkColorTransferFunction* colorTransferFunction = vtkColorTransferFunction::New();
+    
+    m_Controls->m_TransferFunctionWidget->m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( piecewiseFunction );
+    m_Controls->m_TransferFunctionWidget->m_ScalarOpacityFunctionCanvas->SetHistogram( histGen->GetHistogram() );
+    
+    m_Controls->m_TransferFunctionWidget_2->m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( piecewiseFunction );
+    m_Controls->m_TransferFunctionWidget_2->m_ScalarOpacityFunctionCanvas->SetHistogram( histGen->GetHistogram() );
+
+    m_Controls->m_TransferFunctionWidget->m_GradientOpacityCanvas->SetPiecewiseFunction( piecewiseFunction );
+    m_Controls->m_TransferFunctionWidget->m_GradientOpacityCanvas->SetHistogram( histGen->GetHistogram() );
+    
+    m_Controls->m_TransferFunctionWidget_2->m_GradientOpacityCanvas->SetPiecewiseFunction( piecewiseFunction );
+    m_Controls->m_TransferFunctionWidget_2->m_GradientOpacityCanvas->SetHistogram( histGen->GetHistogram() );
+    
+    m_Controls->m_TransferFunctionWidget->m_ColorTransferFunctionCanvas->SetColorTransferFunction( colorTransferFunction );
+    m_Controls->m_TransferFunctionWidget_2->m_ColorTransferFunctionCanvas->SetColorTransferFunction( colorTransferFunction );
+
+    m_Controls->m_EnableRenderingCB->setChecked(false);
+  }
+
 }
 
 void QmitkVolumeVisualization::Activated()
@@ -174,7 +231,6 @@ void QmitkVolumeVisualization::SetShading(bool state, int lod)
  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-
 void QmitkVolumeVisualization::ImmediateUpdate(bool state)
 {
   m_Controls->m_TransferFunctionWidget->ImmediateUpdate(state);
@@ -184,14 +240,48 @@ void QmitkVolumeVisualization::EnableClippingPlane(bool state)
 {
   mitk::RenderingManager::GetInstance()->SetClippingPlaneStatus(state);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll( 
-    mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
 void QmitkVolumeVisualization::SetShadingValues(float ambient, float diffuse, float specular, float specpower)
 {
   mitk::RenderingManager::GetInstance()->SetShadingValues(ambient, diffuse, specular, specpower);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll( 
-    mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
+  mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 }
 
+/* !!! ***********/
+void QmitkVolumeVisualization::OnChangeTransferFunctionMode( int mode )
+{
+  //first item is nothing
+  if( mode == 0 )
+    return;
+  else //subract 1 for correct TransferFunction order ( mode = 0 = TF_SKIN_50 )
+    mode -= 1;
 
+  //set Transfer Function to Data Node
+  const mitk::DataTreeFilter::Item* item = m_Controls->m_TreeNodeSelector->GetFilter()->GetSelectedItem();
+  if (item)
+  {
+    mitk::DataTreeNode* node = const_cast<mitk::DataTreeNode*>( item->GetNode() );
+    if( node )
+    {
+      //Create new Transfer Function
+      mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+      
+      //-- Create Histogramm (for min / max Calculation)
+      if( mode == 8 ) //TF_MITK_DEFAULT           
+      {
+        if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
+          tf->InitializeHistogram( image );
+      }
+
+      // -- Creat new TransferFunction
+      tf->SetTransferFunctionMode( mode );
+
+      node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
+      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+      m_Controls->m_TransferFunctionWidget_2->SetDataTreeNode(node);
+    }
+  }
+}

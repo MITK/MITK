@@ -85,6 +85,10 @@ class QmitkVolumeVisualization : public QmitkFunctionality
     void ImmediateUpdate(bool state);
     void EnableClippingPlane(bool state);
     void SetShadingValues(float ambient, float diffuse, float specular, float specpower);
+
+    /* !!! ************************/
+    virtual void OnChangeTransferFunctionMode( int mode );
+
   protected:  
     /*!  
      * default main widget containing 4 windows showing 3   
@@ -96,6 +100,7 @@ class QmitkVolumeVisualization : public QmitkFunctionality
      * controls containing sliders for scrolling through the slices  
      */  
     QmitkVolumeVisualizationControls * m_Controls;
+
     bool image_ok;
 
 };

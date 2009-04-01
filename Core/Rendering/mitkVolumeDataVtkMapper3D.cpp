@@ -314,9 +314,25 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   this->UpdateTransferFunctions( renderer );
 
   vtkRenderWindowInteractor *interactor = renderWindow->GetInteractor();
-  interactor->SetDesiredUpdateRate(0.00001);
-  interactor->SetStillUpdateRate(0.00001);
-
+  
+  float frameRate;
+  if( this->GetDataTreeNode()->GetFloatProperty( "framerate", frameRate ) && frameRate > 0 && frameRate <= 60)
+  {
+    interactor->SetDesiredUpdateRate(  frameRate );
+    interactor->SetStillUpdateRate( frameRate );
+  }
+  else if( frameRate > 60 )
+  {
+    this->GetDataTreeNode()->SetProperty( "framerate",mitk::FloatProperty::New(60));
+    interactor->SetDesiredUpdateRate(  60 );
+    interactor->SetStillUpdateRate( 60 );
+  }
+  else
+  {
+    this->GetDataTreeNode()->SetProperty( "framerate",mitk::FloatProperty::New(0.00001));
+    interactor->SetDesiredUpdateRate(  0.00001 );
+    interactor->SetStillUpdateRate( 0.00001 );
+  }
 
   if ( m_RenderWindowInitialized.find( renderWindow ) == m_RenderWindowInitialized.end() )
   {
@@ -529,6 +545,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
 {
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "framerate", mitk::FloatProperty::New( 10 ), renderer, overwrite );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())

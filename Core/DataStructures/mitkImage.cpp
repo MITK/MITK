@@ -53,8 +53,6 @@ mitk::Image::Image() :
   m_Initialized = false;
   mitk::HistogramGenerator::Pointer generator = mitk::HistogramGenerator::New();
   m_HistogramGeneratorObject = generator;
-  generator->SetImage(this);
-  this->UnRegister();
 }
 
 mitk::Image::~Image()
@@ -652,7 +650,7 @@ mitk::ImageTimeSelector* mitk::Image::GetTimeSelector() const
 
     ImageTimeSelector* timeSelector = static_cast<mitk::ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );
     timeSelector->SetInput(this);
-	this->UnRegister();
+  	this->UnRegister();
   }
 
   return static_cast<ImageTimeSelector*>( m_TimeSelectorForExtremaObject.GetPointer() );

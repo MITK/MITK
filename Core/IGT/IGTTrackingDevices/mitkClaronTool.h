@@ -26,9 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   /** Documentation:
-  *   @brief  An object of this class represents a MicronTracker 2 tool.
+  *   \brief  An object of this class represents a MicronTracker 2 tool.
   *           A tool has to be added to a tracking device which will then
-  *           continiusely update the tool coordinates.
+  *           continuously update the tool coordinates.
+  *   \ingroup IGT
   */
   class ClaronTool : public InternalTrackingTool
   {
@@ -38,32 +39,32 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-    * @brief Loads a tool calibration file. Without this file the tool can not be tracked!
+    * \brief Loads a tool calibration file. Without this file the tool can not be tracked!
     */
     bool LoadFile(const char* filename);
     /**
-    * @brief Loads a tool calibration file. Without this file the tool can not be tracked!
+    * \brief Loads a tool calibration file. Without this file the tool can not be tracked!
     */
     bool LoadFile(std::string filename);  
 
-    const char* GetFile();
+    std::string GetFile();
    
     /**
-    * @brief Sets the handle of the tool.
-    * @param handle The new handle of the tool.
+    * \brief Sets the handle of the tool.
+    * \param handle The new handle of the tool.
     */
     void SetToolHandle (claronToolHandle handle);
 
     /**
-    * @return Returns the calibration name which is used to identify the tool.
+    * \return Returns the calibration name which is used to identify the tool.
     */
-    const char* GetCalibrationName();
+    std::string GetCalibrationName();
 
     /**
-    * @brief Sets the calibration name of the tool. Be careful, only use this method if you know what you are doing.
+    * \brief Sets the calibration name of the tool. Be careful, only use this method if you know what you are doing.
     * If you want to change the tool name use the method setToolName instead!
     */
-    void SetCalibrationName(const char* name);
+    void SetCalibrationName(std::string name);
 
     /**
     * @return Returns the toolhandle of the tool.
@@ -74,10 +75,11 @@ namespace mitk
 
     ClaronTool();
     virtual ~ClaronTool();
-
+    /** \brief Tool handle variable from tracking device */
     claronToolHandle m_ToolHandle;
+    /** \brief  Variable which holds the Tool's calibration name */
     std::string m_CalibrationName;
-    ClaronInterface* m_Device;
+    /** \brief Variable to check filename's format and to get back complete filename */
     std::string m_Filename;
   };
 }//mitk

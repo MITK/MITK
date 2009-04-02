@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision: $
+Version:   $Revision $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -30,7 +30,7 @@ namespace mitk {
   * The camera of the renderer will be placed at the position of the navigation data and oriented according to
   * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */  class CameraVisualization : public NavigationDataVisualizationFilter
   {
   public:
@@ -101,15 +101,16 @@ namespace mitk {
     * SmartPointer immediately, or else it will get destroyed.
     */
     mitk::PropertyList::ConstPointer GetParameters() const;
+
+  protected:
+    CameraVisualization();
+    virtual ~CameraVisualization();
+
     /**Documentation
     * \brief filter execute method
     * positions and orients camera according to the position and orientation hold in the NavigationData
     */
     virtual void GenerateData();
-
-  protected:
-    CameraVisualization();
-    virtual ~CameraVisualization();
 
     BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data-
 

@@ -386,8 +386,13 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
         if (tool != NULL)
         {
           tool->SetTrackingError(record.quality); // Set tracking error (quality) from record
-          tool->SetPosition(record.x, record.y, record.z);  // Set position
-          tool->SetQuaternion(record.q[0], record.q[1], record.q[2], record.q[3]); // Set orientation as quaternion \todo : verify quaternion order q(r,x,y,z)
+          mitk::Point3D position;
+          position[0] = record.x;
+          position[1] = record.y;
+          position[2] = record.z;
+          tool->SetPosition(position);  // Set position
+          mitk::Quaternion orientation(record.q[1], record.q[2], record.q[3],record.q[0]);
+          tool->SetOrientation(orientation); // Set orientation as quaternion \todo : verify quaternion order q(r,x,y,z)
           tool->SetDataValid(true); // Set data state to valid
         }        
         toolNumber++; // Increment tool number

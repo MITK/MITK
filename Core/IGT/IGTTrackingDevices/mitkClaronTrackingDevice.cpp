@@ -1,3 +1,21 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile: mitkClaronTrackingDevice.h,v $
+Language:  C++
+Date:      $Date $
+Version:   $Revision $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkClaronTrackingDevice.h"
 #include "mitkClaronTool.h"
 #include "mitkIGTConfig.h"
@@ -25,11 +43,11 @@ std::vector<mitk::ClaronTool::Pointer> mitk::ClaronTrackingDevice::DetectTools()
   std::vector<claronToolHandle> allHandles = m_Device->GetAllActiveTools();
   for (std::vector<claronToolHandle>::iterator iter = allHandles.begin(); iter != allHandles.end(); ++iter)
   {
-    ClaronTool::Pointer neu = ClaronTool::New();
-    neu->SetToolName(m_Device->GetName(*iter));
-    neu->SetCalibrationName(m_Device->GetName(*iter));
-    neu->SetToolHandle(*iter);
-    returnValue.push_back(neu);
+    ClaronTool::Pointer newTool = ClaronTool::New();
+    newTool->SetToolName(m_Device->GetName(*iter));
+    newTool->SetCalibrationName(m_Device->GetName(*iter));
+    newTool->SetToolHandle(*iter);
+    returnValue.push_back(newTool);
   }
   return returnValue;
 }
@@ -43,7 +61,9 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
   this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
 
   this->m_MultiThreader = itk::MultiThreader::New();
+  m_ThreadID = 0;
 
+  m_Device = mitk::ClaronInterface::New();
   //############################# standard directories (from cmake) ##################################
   if (m_Device->IsMicronTrackerInstalled())
     {
@@ -60,6 +80,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
     m_CalibrationDir = "Error - No Microntracker installed";
     }
   //##################################################################################################
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
 }
 
 
@@ -74,7 +95,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
   {
-    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile(), m_ToolfilesDir.c_str());
+    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
   this->SetMode(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -83,9 +104,13 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
   //restart the Microntracker, so it will load the new tool files
   m_Device->StopTracking();
-  delete m_Device;
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+  //delete m_Device;
 
-  m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+
+  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
+
   if (m_Device->StartTracking())
   {
     mitk::TimeStamp::GetInstance()->StartTracking(this);
@@ -145,7 +170,8 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   //Create the temp directory
   itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
-  m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   returnValue = m_Device->StartTracking();
 
   if (returnValue)
@@ -155,10 +181,14 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   else
   {
     //reset everything
-    if(m_Device == NULL)
-      m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
+    if(m_Device.IsNull())
+    {
+      m_Device = mitk::ClaronInterface::New();
+      m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+    }
+      //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
     m_Device->StopTracking();
-    delete m_Device;
+    //delete m_Device;
     this->SetMode(Setup);
     m_ErrorMessage = "Error while trying to open connection to the MicronTracker 2!";
   }
@@ -173,7 +203,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
     return true;
 
   returnValue = m_Device->StopTracking();
-  delete m_Device;
+  //delete m_Device;
 
   //delete the temporary directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
@@ -199,6 +229,14 @@ void mitk::ClaronTrackingDevice::TrackTools()
 {
   try
   {
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    m_TrackingFinishedMutex->Lock();
+
+    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    localStopTracking = this->m_StopTracking;
+    this->m_StopTrackingMutex->Unlock();
+
     while (this->GetMode() == Tracking)
     {
       this->GetDevice()->GrabFrame();
@@ -232,22 +270,34 @@ void mitk::ClaronTrackingDevice::TrackTools()
         {
           currentTool->SetDataValid(true);
           //get tip position of tool:
-          std::vector<double> pos = this->GetDevice()->GetTipPosition(currentTool->GetToolHandle());
+          std::vector<double> pos_vector = this->GetDevice()->GetTipPosition(currentTool->GetToolHandle());
           //write tip position into tool:
-          currentTool->SetPosition(pos[0], pos[1], pos[2]);
+          mitk::Point3D pos;
+          pos[0] = pos_vector[0];
+          pos[1] = pos_vector[1];
+          pos[2] = pos_vector[2];
+          currentTool->SetPosition(pos);
           //get tip quaternion of tool
           std::vector<double> quat = this->GetDevice()->GetTipQuaternions(currentTool->GetToolHandle());
           //write tip quaternion into tool
-          currentTool->SetQuaternion(quat[0], quat[1], quat[2], quat[3]);
+          mitk::Quaternion orientation(quat[1], quat[2], quat[3], quat[0]);
+          currentTool->SetOrientation(orientation);
         }
         else
         {
-          currentTool->SetPosition(0,0,0);
-          currentTool->SetQuaternion(0,0,0,0);
+          mitk::Point3D origin;
+          origin.Fill(0);
+          currentTool->SetPosition(origin);
+          currentTool->SetOrientation(mitk::Quaternion(0,0,0,0));
           currentTool->SetDataValid(false);
         }
       }
+      /* Update the local copy of m_StopTracking */
+      this->m_StopTrackingMutex->Lock();  
+      localStopTracking = m_StopTracking;
+      this->m_StopTrackingMutex->Unlock();
     }
+    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
   {

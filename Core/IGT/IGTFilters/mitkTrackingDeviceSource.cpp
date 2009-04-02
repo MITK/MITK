@@ -59,7 +59,8 @@ void mitk::TrackingDeviceSource::GenerateData()
     throw std::out_of_range(ss.str());
   }
   /* update outputs with tracking data from tools */
-  for (unsigned int i = 0; i < m_TrackingDevice->GetToolCount(); ++i)
+  unsigned int toolCount = m_TrackingDevice->GetToolCount();
+  for (unsigned int i = 0; i < toolCount; ++i)
   {
     mitk::NavigationData* nd = this->GetOutput(i);
     assert(nd);
@@ -77,7 +78,7 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetPosition(p);
 
     mitk::NavigationData::OrientationType o;
-    t->GetQuaternion(o);
+    t->GetOrientation(o);
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());
@@ -106,7 +107,8 @@ void mitk::TrackingDeviceSource::CreateOutputs()
 
   //fill the outputs
   this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
-  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
+  for (unsigned int idx = 0; idx < numberOfOutputs; ++idx)
   {
     if (this->GetOutput(idx) == NULL)
     {
@@ -124,7 +126,8 @@ void mitk::TrackingDeviceSource::Connect()
   if (m_TrackingDevice->OpenConnection() == false)
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not open connection to tracking device");
   
-  //add the output now that we know how many tools are connected
+  /* NDI Aurora needs a connection to discover tools that are connected to it. 
+     Therefore we need to create outputs for these tools now */
   if (m_TrackingDevice->GetType() == mitk::NDIAurora)
     this->CreateOutputs();
 }

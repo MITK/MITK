@@ -40,7 +40,7 @@ namespace mitk {
   * \warning If a tool is removed from the tracking device, there will be a mismatch between
   * the outputs and the tool number!
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */
   class TrackingDeviceSource : public NavigationDataSource
   {
@@ -48,13 +48,13 @@ namespace mitk {
     mitkClassMacro(TrackingDeviceSource, NavigationDataSource);
     itkNewMacro(Self);
 
-    /**Documentation
+    /**
     * \brief sets the tracking device that will be used as a source for tracking data
     */
     virtual void SetTrackingDevice(mitk::TrackingDevice* td);
 
 
-    /**Documentation
+    /**
     * \brief Establishes a connection to the tracking device
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
     * set with SetTrackingDevice(). Will throw a std::runtime_error if the tracking device 
@@ -62,7 +62,7 @@ namespace mitk {
     */
     void Connect();
 
-    /**Documentation
+    /**
     * \brief Closes the connection to the tracking device
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
     * set with SetTrackingDevice(). Will throw a std::runtime_error if the tracking device 
@@ -70,7 +70,7 @@ namespace mitk {
     */
     void Disconnect();
 
-    /**Documentation
+    /**
     * \brief starts tracking. 
     * This needs to be called before Update() or GetOutput()->Update().
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
@@ -79,7 +79,7 @@ namespace mitk {
     */
     void StartTracking();
 
-    /**Documentation
+    /**
     * \brief stops tracking. 
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
     * set with SetTrackingDevice(). Will throw a std::runtime_error if the tracking device 
@@ -87,14 +87,14 @@ namespace mitk {
     */
     void StopTracking();
 
-    /**Documentation
+    /**
     * \brief returns the number of connected tools
     *
     * If the tracking device is not connected, 0 is returned
     */
     virtual unsigned int GetToolCount(); 
 
-    /**Documentation
+    /**
     * \brief Used for pipeline update
     */
     virtual void UpdateOutputInformation();
@@ -103,7 +103,7 @@ namespace mitk {
     TrackingDeviceSource();
     virtual ~TrackingDeviceSource();
 
-    /**Documentation
+    /**
     * \brief filter execute method
     *
     * queries the tracking device for new position and orientation data for all tools 
@@ -114,7 +114,7 @@ namespace mitk {
     virtual void GenerateData();
     
     /**
-    * @brief Create the necessary outputs given by m_TrackingDevice
+    * \brief Create the necessary outputs given by m_TrackingDevice
     **/
     void CreateOutputs();
 

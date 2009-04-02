@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <termios.h> 
+#include <termios.h>
 #include <errno.h>
 
 #define INVALID_HANDLE_VALUE -1
@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::SerialCommunication::SerialCommunication() : itk::Object(),
-m_PortNumber(COM1), m_BaudRate(BaudRate9600),
+m_DeviceName(""), m_PortNumber(COM1), m_BaudRate(BaudRate9600),
 m_DataBits(DataBits8), m_Parity(None), m_StopBits(StopBits1),
 m_HardwareHandshake(HardwareHandshakeOff),
 m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)
@@ -77,7 +77,7 @@ int mitk::SerialCommunication::OpenConnection()
     OPEN_EXISTING, /* open com port, don't create it */
     NULL, /* no flags */
     NULL); /* no template */
-  if (m_ComPortHandle == INVALID_HANDLE_VALUE) 
+  if (m_ComPortHandle == INVALID_HANDLE_VALUE)
     return ERROR_VALUE;
 
   GetCommState(m_ComPortHandle, &m_PreviousDeviceControlBlock);
@@ -102,8 +102,8 @@ int mitk::SerialCommunication::OpenConnection()
 
   //m_FileDescriptor = open(ss.str().c_str(), O_RDWR | O_NONBLOCK | O_NDELAY | O_NOCTTY | O_EXCL); // open device file
   m_FileDescriptor = open(ss.str().c_str(), O_RDWR|O_NONBLOCK|O_EXCL); // open device file
-  if (m_FileDescriptor < 0) 
-    return ERROR_VALUE; 
+  if (m_FileDescriptor < 0)
+    return ERROR_VALUE;
 
   fcntl(m_FileDescriptor, F_SETFL, 0);    // change to blocking mode
   tcflush(m_FileDescriptor, TCIOFLUSH);   // flush buffers
@@ -185,8 +185,8 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
   if (m_FileDescriptor == INVALID_HANDLE_VALUE)
     return ERROR_VALUE;
 
-  long bytesRead = 0;
-  long bytesLeft = numberOfBytes;
+  unsigned long bytesRead = 0;
+  unsigned long bytesLeft = numberOfBytes;
   char* buffer = new char[numberOfBytes];
 
   while ((bytesLeft > 0) && (bytesRead < numberOfBytes))
@@ -195,7 +195,7 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
     if (num == -1) // ERROR_VALUE
     {
       if (errno == EAGAIN) // nonblocking, no byte there right now, but maybe next time
-        continue; 
+        continue;
       else
         break; // ERROR_VALUE, stop trying to read
     }
@@ -380,7 +380,7 @@ int mitk::SerialCommunication::ApplyConfiguration()
     break;
   }
   cfsetispeed(&termIOStructure, baudrate);
-  cfsetospeed(&termIOStructure, baudrate); 
+  cfsetospeed(&termIOStructure, baudrate);
 
   termIOStructure.c_cc[VMIN] = 0;
   termIOStructure.c_cc[VTIME] = m_ReceiveTimeout / 100; // timeout in 1/10 sec, not in ms. Rounded down.
@@ -404,6 +404,7 @@ void mitk::SerialCommunication::SendBreak(unsigned int ms)
   return;
 
 #else  // Posix
+
   if (m_FileDescriptor == INVALID_HANDLE_VALUE)
     return;
   tcsendbreak(m_FileDescriptor, ms);

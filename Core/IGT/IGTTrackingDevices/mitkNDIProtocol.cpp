@@ -17,11 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNDIProtocol.h"
-
 #include "mitkNDITrackingDevice.h"
 #include <string>
 #include <sstream>
-
 #include <itksys/SystemTools.hxx>
 
 
@@ -29,6 +27,7 @@ mitk::NDIProtocol::NDIProtocol()
 : itk::Object(), m_TrackingDevice(NULL), m_UseCRC(true)
 {
 }
+
 
 mitk::NDIProtocol::~NDIProtocol()
 {
@@ -39,8 +38,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::COMM(mitk::SerialCommunication::BaudRate b
 {
   /* Build parameter string */
   std::string param;
-
-
   switch (baudRate) 
   {
   case mitk::SerialCommunication::BaudRate14400:
@@ -109,25 +106,30 @@ mitk::NDIErrorCode mitk::NDIProtocol::COMM(mitk::SerialCommunication::BaudRate b
   return GenericCommand("COMM", &param);
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::INIT()
 {
   return GenericCommand("INIT");
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::DSTART()
 {
   return GenericCommand("DSTART");
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::DSTOP()
 {
   return GenericCommand("DSTOP");
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::IRINIT()
 {
   return GenericCommand("IRINIT");
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
 {
@@ -208,6 +210,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
   m_TrackingDevice->ClearReceiveBuffer();        // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
   return returnValue;
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string* portHandles)
 {
@@ -295,7 +298,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
 
 mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
 {
-  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
+  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking device
 
   if (m_TrackingDevice == NULL)
     return TRACKINGDEVICENOTSET;
@@ -315,7 +318,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
     return returnValue;
   }
 
-  itksys::SystemTools::Delay(100);            // give the trackingsystem some time to process the command
+  itksys::SystemTools::Delay(100);            // give the tracking device some time to process the command
 
   std::string reply;
   m_TrackingDevice->Receive(&reply, 2);       // read first 2 characters of reply ("Number of Handles" as a 2 digit hexadecimal number)
@@ -353,6 +356,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
   m_TrackingDevice->ClearReceiveBuffer();     // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
   return returnValue;
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::PVWR(std::string* portHandle, const unsigned char* sromData, unsigned int sromDataLength)
 {
@@ -405,6 +409,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PVWR(std::string* portHandle, const unsign
   m_TrackingDevice->ClearReceiveBuffer();         // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
   return returnValue;
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
 {
@@ -485,6 +490,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
   return returnValue;
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::PENA(std::string* portHandle, TrackingPriority prio)
 {
   std::string param;
@@ -494,19 +500,25 @@ mitk::NDIErrorCode mitk::NDIProtocol::PENA(std::string* portHandle, TrackingPrio
     param = "";
   return this->GenericCommand("PENA", &param);
 }
+
+
 mitk::NDIErrorCode mitk::NDIProtocol::PHINF(std::string* portHandle)
 {
   return this->GenericCommand("PHINF", portHandle);
 }
+
+
 mitk::NDIErrorCode mitk::NDIProtocol::PDIS(std::string* portHandle)
 {
   return this->GenericCommand("PDIS", portHandle);
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::PHF(std::string* portHandle)
 {
   return this->GenericCommand("PHF", portHandle);
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::IRATE(IlluminationActivationRate rate)
 {
@@ -526,6 +538,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRATE(IlluminationActivationRate rate)
   }
   return this->GenericCommand("IRATE", &param);
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
 {
@@ -602,6 +615,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
 
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::TSTART(bool resetFrameCounter)
 {
   std::string param = "80";
@@ -611,16 +625,19 @@ mitk::NDIErrorCode mitk::NDIProtocol::TSTART(bool resetFrameCounter)
     return this->GenericCommand("TSTART");
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::TSTOP()
 {
   return this->GenericCommand("TSTOP");
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::PSOUT(std::string portHandle, std::string state)
 {
   std::string param = portHandle + state;
   return this->GenericCommand("PSOUT", &param);
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPointContainerType* markerPositions)
 {
@@ -690,7 +707,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
     converter >> numberOfHandles;             // extract number of handles as unsigned byte
     converter.clear();                        // converter must be cleared to be reused
     converter.str("");
-    //unsigned int toolCount = m_TrackingDevice->GetToolCount();    // we expect this number of handles. ToDo: Compare, do something if not equal
 
     /* read and parse transformation data for each handle */
     for (unsigned int i = 0; i < numberOfHandles; i++)    // for each handle
@@ -734,7 +750,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       }
       else  // transformation data
       {
-        /* define local copies */   //ToDo: make them static to improve performance? this would make this method not reentrant safe, but that should not be a problem anyway
+        /* define local copies */
         signed int number = 0;
         float localPos[3] = {0.0, 0.0, 0.0};
         float localQuat[4] = {0.0, 0.0, 0.0, 0.0};
@@ -792,11 +808,15 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
         converter >> localFrameNumber;      // extract the number as unsigned long
         converter.clear();                  // converter must be cleared to be reused
         converter.str("");
-        // ToDo: the above conversions could use some error checking...
 
         /* copy local values to the tool */
-        tool->SetQuaternion(localQuat[0], localQuat[1], localQuat[2], localQuat[3]);
-        tool->SetPosition(localPos[0], localPos[1], localPos[2]);
+        mitk::Quaternion orientation(localQuat[1], localQuat[2], localQuat[3], localQuat[0]);
+        tool->SetOrientation(orientation);
+        mitk::Point3D position;
+        position[0] = localPos[0];
+        position[1] = localPos[1];
+        position[2] = localPos[2];
+        tool->SetPosition(position);
         tool->SetTrackingError(localError);
         tool->SetErrorMessage("");
         tool->SetDataValid(true);
@@ -884,9 +904,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
 }
 
 
-
-
-
 mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPositions)
 {
 
@@ -941,7 +958,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
     converter >> numberOfHandles;             // extract number of handles as unsigned byte
     converter.clear();                        // converter must be cleared to be reused
     converter.str("");
-    //unsigned int toolCount = m_TrackingDevice->GetToolCount();    // we expect this number of handles. ToDo: Compare, do something if not equal
 
     /* read and parse transformation data for each handle */
     for (unsigned int i = 0; i < numberOfHandles; i++)    // for each handle
@@ -985,7 +1001,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
       }
       else  // transformation data
       {
-        /* define local copies */   //ToDo: make them static to improve performance? this would make this method not reentrant safe, but that should not be a problem anyway
+        /* define local copies */
         signed int number = 0;
         float localPos[3] = {0.0, 0.0, 0.0};
         float localQuat[4] = {0.0, 0.0, 0.0, 0.0};
@@ -1043,11 +1059,15 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
         converter >> localFrameNumber;      // extract the number as unsigned long
         converter.clear();                  // converter must be cleared to be reused
         converter.str("");
-        // ToDo: the above conversions could use some error checking...
 
         /* copy local values to the tool */
-        tool->SetQuaternion(localQuat[0], localQuat[1], localQuat[2], localQuat[3]);
-        tool->SetPosition(localPos[0], localPos[1], localPos[2]);
+        mitk::Quaternion orientation(localQuat[1], localQuat[2], localQuat[3], localQuat[0]);
+        tool->SetOrientation(orientation);
+        mitk::Point3D position;
+        position[0] = localPos[0];
+        position[1] = localPos[1];
+        position[2] = localPos[2];
+        tool->SetPosition(position);
         tool->SetTrackingError(localError);
         tool->SetErrorMessage("");
         tool->SetDataValid(true);
@@ -1138,6 +1158,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::BX()
   std::cout << "BX() not implemented yet, using TX() instead." << std::endl;
   return this->TX();
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPositions)
 {
@@ -1305,6 +1326,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
   return returnValue;
 }
 
+
 mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, const std::string* parameter)
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
@@ -1332,7 +1354,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
     m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove any reply
     return returnValue;
   }
-
   /* wait for the trackingsystem to process the command */
   itksys::SystemTools::Delay(100);
 
@@ -1342,6 +1363,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
   returnValue = this->ParseOkayError();
   return returnValue;
 }
+
 
 unsigned int mitk::NDIProtocol::ByteToNbBitsOn(char& c) const
 {
@@ -1356,22 +1378,9 @@ unsigned int mitk::NDIProtocol::ByteToNbBitsOn(char& c) const
   else if (c == 'F')
     return 4;
   else
-    return 0;//TODO
-
-  //if(c == 0)
-  //  return 0;
-  //else if (c == 0x1 || c == 2 || c == 0x4 || c == 0x8)
-  //  return 1;
-  //else if (c == 0x3 || c == 0x5 || c == 0x9 || c == 0x6 || c == 0xA  || c == 0xC)
-  //  return 2;
-  //else if (c == 0x7 || c == 0xB || c == 0xD || c == 0xE)
-  //  return 3;
-  //else if (c == 0xF)
-  //  return 4;
-  //else
-  //  return 0;//TODO
-
+    return 0;
 }
+
 
 mitk::NDIErrorCode mitk::NDIProtocol::ParseOkayError()
 {
@@ -1425,7 +1434,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::ParseOkayError()
 
 mitk::NDIErrorCode mitk::NDIProtocol::GetErrorCode(const std::string* input)
 {
-  //optional TODO: rewrite: first convert to int, then compare integers --> faster (but this method's runtime is not critical)
   if (input->compare("01") == 0)
     return NDIINVALIDCOMMAND;
   else if (input->compare("02") == 0)

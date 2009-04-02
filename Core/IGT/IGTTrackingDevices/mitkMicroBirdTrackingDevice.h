@@ -35,7 +35,7 @@ namespace mitk {
   /**Documentation
   * \brief superclass for specific MIRCOBIRD tracking Devices
   *
-  *@ingroup Tracking
+  * \ingroup IGT
   */
   class MicroBirdTrackingDevice : public TrackingDevice
   {

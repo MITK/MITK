@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationData::NavigationData() 
 : itk::DataObject(), 
-  /*m_TimeStamp(NULL),*/ 
+  m_TimeStamp(0.0),
   m_Orientation(0.0, 0.0, 0.0, 0.0),
   m_HasPosition(true),
   m_HasOrientation(true),
@@ -63,6 +63,10 @@ void mitk::NavigationData::Graft( const DataObject *data )
   this->SetPosition(nd->GetPosition());
   this->SetOrientation(nd->GetOrientation());
   this->SetDataValid(nd->IsDataValid());
+  this->SetTimeStamp(nd->GetTimeStamp());
+  this->SetHasPosition(nd->GetHasPosition());
+  this->SetHasOrientation(nd->GetHasOrientation());
+  this->SetCovErrorMatrix(nd->GetCovErrorMatrix());
 }
 
 
@@ -75,10 +79,14 @@ bool mitk::NavigationData::IsDataValid() const
 void mitk::NavigationData::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "data valid: " << m_DataValid << std::endl;
-  os << indent << "Position: " << m_Position << std::endl;
-  os << indent << "Orientation: " << m_Orientation << std::endl; 
+  os << indent << "data valid: "     << this->IsDataValid() << std::endl;
+  os << indent << "Position: "       << this->GetPosition() << std::endl;
+  os << indent << "TimeStamp: "      << this->GetTimeStamp() << std::endl;
+  os << indent << "HasPosition: "    << this->GetHasPosition() << std::endl;
+  os << indent << "HasOrientation: " << this->GetHasOrientation() << std::endl;
+  os << indent << "CovErrorMatrix: " << this->GetCovErrorMatrix() << std::endl;
 }
+
 
 void mitk::NavigationData::CopyInformation( const DataObject* data )
 {
@@ -106,6 +114,7 @@ void mitk::NavigationData::CopyInformation( const DataObject* data )
   /* copy all meta data */
 }
 
+
 void mitk::NavigationData::SetPositionAccuracy(mitk::ScalarType error)
 {
   for ( int i = 0; i < 3; i++ )
@@ -116,10 +125,9 @@ void mitk::NavigationData::SetPositionAccuracy(mitk::ScalarType error)
       m_CovErrorMatrix[ i + 3 ][ j ] = 0;
       m_CovErrorMatrix[ i ][ j + 3 ] = 0;
     }
-
   m_CovErrorMatrix[0][0] = m_CovErrorMatrix[1][1] = m_CovErrorMatrix[2][2] = error * error;
-
 }
+
 
 void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
 {
@@ -130,6 +138,5 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
       m_CovErrorMatrix[ i + 3 ][ j ] = 0;
       m_CovErrorMatrix[ i ][ j + 3 ] = 0;
     }
-
   m_CovErrorMatrix[3][3] = m_CovErrorMatrix[4][4] = m_CovErrorMatrix[5][5] = error * error;
 }

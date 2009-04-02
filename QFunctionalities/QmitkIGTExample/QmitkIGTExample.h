@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataDisplacementFilter.h"
 #include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkTrackingDevice.h"
+#include "mitkNavigationDataRecorder.h"
+#include "mitkNavigationDataPlayer.h"
+#include "mitkNavigationDataToPointSetFilter.h"
 
 class QmitkStdMultiWidget;
 class QmitkIGTExampleControls;
@@ -88,24 +92,24 @@ protected slots:
   /**Documentation
    * \brief executes MITK-IGT-Tracking code
    *
-   * This method will create and initalize a mitk::NDITrackingDevice with one tool.
+   * This method will create and initialize a mitk::NDITrackingDevice with one tool.
    * It will start the tracking, read the tracking data from the tool 50 times and 
    * then clean up everything.
    */
    void OnTestTracking();
-   
+
    /**Documentation
    * \brief executes MITK-IGT-Navigation code
    *
-   * This method will create and initalize a mitk::NDITrackingDevice with one tool.
+   * This method will create and initialize a mitk::NDITrackingDevice with one tool.
    * Then it builds an example MITK-IGT filter pipeline:
    * - TrackingDeviceSource filter initialized with the NDITrackingDevice as source of the pipeline
    * - NavigationDataDisplacementFilter
-   * The Offset parameter of the displecement filter is searched in the functionality's options list.
+   * The Offset parameter of the displacement filter is searched in the functionality's options list.
    * It can be written to that list either by the method OnParametersChanged() that gets called after
-   * the user changes the parameter in the GUI or by the persistence mechanismn of MITK (the complete 
+   * the user changes the parameter in the GUI or by the persistence mechanism of MITK (the complete 
    * options list will be saved to disk on application exit and restored on the next application restart).
-   * if the Offset parameter is not found in the list, a hardcoded value is used.
+   * if the Offset parameter is not found in the list, a default value is used.
    * After building the filter pipeline, it is initialized and tracking is started, so that following 
    * calls to OnMeasure() can trigger pipeline updates and retrieve NavigationData objects.
    */   
@@ -119,6 +123,13 @@ protected slots:
    * its transformed tracking data to the GUI.
    */
    void OnMeasure();
+
+   /**Documentation
+   * \brief performs continuous measurements using the navigation pipeline
+   *
+   * This method calls the above OnMeasure()
+   */
+   void OnMeasureContinuously();
 
    /**Documentation
    * \brief stops the navigation pipeline and perform clean up
@@ -138,13 +149,32 @@ protected slots:
    */
    void OnParametersChanged();
 
+   void OnStartRecording();
+
+   void OnStartPlaying();
+
+   void OnRecording();
+
+   void OnPlaying();
+
 protected:  
+
+  mitk::TrackingDevice::Pointer ConfigureTrackingDevice();  ///< create the selected tracker object and configure it (using values from m_Controls)
+
   QmitkStdMultiWidget * m_MultiWidget; ///< default render widget
   QmitkIGTExampleControls * m_Controls; ///< GUI widget for this functionality
 
   mitk::TrackingDeviceSource::Pointer m_Source; ///< first filter in the pipeline
   mitk::NavigationDataDisplacementFilter::Pointer m_Displacer;  ///< displacement filter that adds an offset to NDs
   mitk::NavigationDataToNavigationDataFilter::Pointer m_EndOfPipeline;  // Pointer to last filter in the pipeline
+  mitk::NavigationDataRecorder::Pointer m_Recorder; ///< records NDs to a XML file
+  mitk::NavigationDataPlayer::Pointer m_Player; ///< plays a XML file
+  mitk::NavigationDataToPointSetFilter::Pointer m_PointSetFilter; ///< has a NDs as input and a PointSet as output
+  mitk::PointSet::Pointer m_PointSet; ///< stores the output of the pointsetfilter
   QTextEdit* out;   ///< pointer to output widget 
+
+  QTimer* m_Timer; ///< timer for continuous tracking update
+  QTimer* m_RecordingTimer; ///< timer for continuous recording
+  QTimer* m_PlayingTimer; ///< timer for continuous playing
 };
 #endif // !defined(QMITKIGTEXAMPLE_H__INCLUDED)

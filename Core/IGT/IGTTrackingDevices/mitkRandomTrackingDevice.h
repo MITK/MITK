@@ -29,6 +29,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /** Documentation
+  * \brief Class representing a tracking device which generates random positions / orientations. No hardware is needed for tracking device.
+  *
+  * 
+  * \ingroup IGT
+  */
   class RandomTrackingDevice : public TrackingDevice
   {
   public:
@@ -38,30 +44,30 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
-    * @return Sets the refresh rate of the pseudo trackingdevice in ms
+    * \return Sets the refresh rate of the pseudo trackingdevice in ms
     */
     itkSetMacro(RefreshRate,unsigned int)
 
     /**
     * \brief Starts the tracking.
-    * @return Returns the refresh rate in ms.
+    * \return Returns the refresh rate in ms.
     */
     itkGetMacro(RefreshRate,unsigned int)
 
     /**
     * \brief Starts the tracking.
-    * @return Returns true if the tracking is started. Returns false if there was an error.
+    * \return Returns true if the tracking is started. Returns false if there was an error.
     */
     virtual bool StartTracking();
 
     /**
     * \brief Stops the tracking.
-    * @return Returns true if the tracking is stopped. Returns false if there was an error.
+    * \return Returns true if the tracking is stopped. Returns false if there was an error.
     */
     virtual bool StopTracking();
 
     /**
-    * @return Returns all tools of the tracking device.
+    * \return Returns all tools of the tracking device.
     */
     std::vector<InternalTrackingTool::Pointer> GetAllTools();
 
@@ -76,21 +82,21 @@ namespace mitk
     virtual bool CloseConnection();
 
     /**
-    * @return Returns the number of tools which have been added to the device.
+    * \return Returns the number of tools which have been added to the device.
     */
     virtual unsigned int GetToolCount() const;
 
     /**
-    * @param toolNumber The number of the tool which should be given back.
-    * @return Returns the tool which the number "toolNumber". Returns NULL, if there is
+    * \param toolNumber The number of the tool which should be given back.
+    * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
     */
     TrackingTool* GetTool(unsigned int toolNumber);
 
     /**
     * \brief Adds a tool to the tracking device.
-    * @param tool  The tool which will be added.
-    * @return Returns true if the tool has been added, false otherwise.
+    * \param tool  The tool which will be added.
+    * \return Returns true if the tool has been added, false otherwise.
     */
     bool AddTool(InternalTrackingTool::Pointer tool);
 

@@ -32,10 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNDIPassiveTool.h"
 #include "mitkSerialCommunication.h"
 
-//TODO TMP
-//#include <fstream>
-//class RS232Interface;
-
 namespace mitk 
 {
   class NDIProtocol;
@@ -43,9 +39,9 @@ namespace mitk
   /** Documentation
   * \brief superclass for specific NDI tracking Devices that use serial communication. 
   *
-  * implements most of the TrackingDevice interface for NDI tracking devices (POLARIS, AURORA)
+  * implements the TrackingDevice interface for NDI tracking devices (POLARIS, AURORA)
   * 
-  * @ingroup Tracking
+  * \ingroup IGT
   */
   class NDITrackingDevice : public TrackingDevice
   {
@@ -55,12 +51,12 @@ namespace mitk
     typedef std::vector<NDIPassiveTool::Pointer> Tool6DContainerType;  ///< List of 6D tools of the correct type for this tracking device
     typedef mitk::TrackingDeviceType NDITrackingDeviceType;  ///< This enumeration includes the two types of NDI tracking devices (Polaris, Aurora).
 
-    typedef mitk::SerialCommunication::PortNumber PortNumber;
-    typedef mitk::SerialCommunication::BaudRate BaudRate;
-    typedef mitk::SerialCommunication::DataBits DataBits;
-    typedef mitk::SerialCommunication::Parity Parity;
-    typedef mitk::SerialCommunication::StopBits StopBits;
-    typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake;
+    typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
+    typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
+    typedef mitk::SerialCommunication::DataBits DataBits;     ///< Number of data bits used in the serial connection
+    typedef mitk::SerialCommunication::Parity Parity;         ///< Parity mode used in the serial connection
+    typedef mitk::SerialCommunication::StopBits StopBits;     ///< Number of stop bits used in the serial connection
+    typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
 
 
     mitkClassMacro(NDITrackingDevice, TrackingDevice);
@@ -68,7 +64,7 @@ namespace mitk
 
     /**
     * \brief Set the type of the NDI Tracking Device because it can not jet handle this itself
-    **/
+    */
     itkSetMacro(Type,TrackingDeviceType);
 
     /**
@@ -80,14 +76,14 @@ namespace mitk
     * - initializing the device
     * - initializing all manually added passive tools (user supplied srom file)
     * - initializing active tools that are connected to the tracking device
-    **/
+    */
     virtual bool OpenConnection();
 
     /**
     * \brief Closes the connection
     * 
     * CloseConnection() resets the tracking device, invalidates all tools and then closes the serial port.
-    **/
+    */
     virtual bool CloseConnection();
 
     /**
@@ -97,7 +93,7 @@ namespace mitk
     * Depending on the current operation mode (see SetOperationMode()), either the 6D tools (ToolTracking6D), 5D tools (ToolTracking5D),
     * 3D marker positions (MarkerTracking3D) or both 6D tools and 3D markers (HybridTracking) are updated.
     * Call StopTracking() to stop the tracking thread.
-    **/
+    */
     virtual bool StartTracking();
 
     /**
@@ -114,28 +110,28 @@ namespace mitk
     * \brief Add a passive 6D tool to the list of tracked tools.
     *
     * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
-    **/
+    */
     virtual bool Add6DTool(NDIPassiveTool* tool);
 
     /**
     * \brief Remove a passive 6D tool from the list of tracked tools.
     *
-    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
-    **/
+    * \WARNING adding tools is not possible in tracking mode, only in setup and ready modes.
+    */
     virtual bool Remove6DTool(NDIPassiveTool* tool);
 
     /**
     * \brief reloads the srom file and reinitializes the tool
-    **/
+    */
     virtual bool UpdateTool(mitk::NDIPassiveTool* tool);
 
     virtual void SetPortNumber(const PortNumber _arg); ///< set port number for serial communication
+    virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
     virtual void SetBaudRate(const BaudRate _arg);     ///< set baud rate for serial communication
     virtual void SetDataBits(const DataBits _arg);     ///< set number of data bits
     virtual void SetParity(const Parity _arg);         ///< set parity mode 
     virtual void SetStopBits(const StopBits _arg);     ///< set number of stop bits 
     virtual void SetHardwareHandshake(const HardwareHandshake _arg);  ///< set use hardware handshake for serial communication
-    //virtual void SetTrackingVolume(const TrackingVolume _arg);      // Not supported in first Version
     virtual void SetIlluminationActivationRate(const IlluminationActivationRate _arg); ///< set activation rate of IR illumator for polaris
     virtual void SetDataTransferMode(const DataTransferMode _arg);    ///< set data transfer mode to text (TX) or binary (BX). \warning: only TX is supportet at the moment
 
@@ -154,9 +150,9 @@ namespace mitk
 
   protected:
     /* Methods for NDIProtocol friend class */
-    virtual void InvalidateAll();     ///< invalidate all tools
+    virtual void InvalidateAll();             ///< invalidate all tools
     NDIPassiveTool* GetTool(std::string* handle); ///< returns the tool object that has been assigned the handle or NULL if no tool can be found
-    NDIErrorCode Send(const std::string* message, bool addCRC = true);  ///< Send message to tracking device
+    NDIErrorCode Send(const std::string* message, bool addCRC = true);      ///< Send message to tracking device
     NDIErrorCode Receive(std::string* answer, unsigned int numberOfBytes);  ///< receive numberOfBytes bytes from tracking device
     NDIErrorCode ReceiveByte(char* answer);   ///< lightweight receive function, that reads just one byte
     void ClearSendBuffer();                   ///< empty send buffer of serial communication interface
@@ -180,7 +176,7 @@ public://TODO
     * \brief continuously polls serial interface for new 3D marker positions until StopTracking is called.
     *
     * Continuously tracks the 3D position of all markers until StopTracking() is called. 
-    * This function is executed by the trackign thread (through StartTracking() and ThreadStartTracking()). 
+    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()). 
     * It should not be called directly.
     */
     virtual void TrackMarkerPositions();
@@ -189,7 +185,7 @@ public://TODO
     * \brief continuously polls serial interface for new 3D marker positions and 6D tool positions until StopTracking is called.
     *
     * Continuously tracks the 3D position of all markers and the 6D position of all tools until StopTracking() is called. 
-    * This function is executed by the trackign thread (through StartTracking() and ThreadStartTracking()). 
+    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()). 
     * It should not be called directly.
     */
     virtual void TrackToolsAndMarkers();
@@ -203,24 +199,16 @@ public://TODO
     * \brief set current error message
     */
     itkSetStringMacro(ErrorMessage);
-    /**
-    * \brief sets current error message according to NDI error code
-    */
-    //virtual void SetErrorMessage(NDIErrorCode errorCode);
-
-
-
 
   protected:
-
-
+    std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number
     BaudRate m_BaudRate;     ///< COM Port Baud Rate
     DataBits m_DataBits;     ///< Number of Data Bits per token
     Parity m_Parity;         ///< Parity mode for communication
     StopBits m_StopBits;     ///< number of stop bits per token
     HardwareHandshake m_HardwareHandshake; ///< use hardware handshake for serial port connection
-    NDITrackingVolume m_NDITrackingVolume; ///< Wich tracking volume is currently used (if device supports multiple volumes) (\warning This parameter is not used yet)
+    NDITrackingVolume m_NDITrackingVolume; ///< which tracking volume is currently used (if device supports multiple volumes) (\warning This parameter is not used yet)
     IlluminationActivationRate m_IlluminationActivationRate; ///< update rate of IR illuminator for Polaris
     DataTransferMode m_DataTransferMode;  ///< use TX (text) or BX (binary) (\warning currently, only TX mode is supported)
     bool m_AutoRecovery;                  ///< automatically restart tracking after error (\warning currently not used)
@@ -236,13 +224,7 @@ public://TODO
     int m_ThreadID;                 ///< ID of tracking thread
     OperationMode m_OperationMode;  ///< tracking mode (6D tool tracking, 3D marker tracking,...)
     itk::FastMutexLock::Pointer m_MarkerPointsMutex;  ///< mutex for marker point data container
-    MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)
-
-
-  
-
-
-  
+    MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)  
   };
 } // namespace mitk
 #endif /* MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2 */

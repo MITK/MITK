@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  * @brief RealTimeClock for linux-systems
+  * \brief RealTimeClock for linux-systems
   *
   * This class provides realtimeclock for linux-systems.
   * It uses gettimeofday to acquire a current time-value as accurately 
@@ -32,7 +32,7 @@ namespace mitk {
   *
   * \return Returns the current time since the Epoch (01.01.1970) in milliseconds as a double
   *
-  *@ingroup Navigation
+  * \ingroup IGT
   */
 
   class LinuxRealTimeClock : public RealTimeClock
@@ -54,7 +54,7 @@ namespace mitk {
     /**
     * \brief returns the current time in milliseconds as a double
     */
-    virtual double getCurrentStamp();
+    virtual double GetCurrentStamp();
 
   }; //namespace
 }

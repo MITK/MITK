@@ -4,10 +4,26 @@
 #include <math.h>
 #include <mitkVector.h>
 
-mitk::ClaronInterface::ClaronInterface(std::string calibrationDir, std::string toolFilesDir)
+mitk::ClaronInterface::ClaronInterface()
+{
+  isTracking = false;
+  sprintf(calibrationDir,"No calibration dir set yet");
+  sprintf(markerDir,"No marker dir set yet");
+}
+
+mitk::ClaronInterface::~ClaronInterface()
+{
+
+}
+
+void mitk::ClaronInterface::Initialize(std::string calibrationDir, std::string toolFilesDir)
 {
   sprintf(this->calibrationDir, calibrationDir.c_str());
   sprintf(this->markerDir,toolFilesDir.c_str());
+  this->IdentifiedMarkers = 0;
+  this->PoseXf = 0;
+  this->CurrCamera = 0;
+  this->IdentifyingCamera = 0;
 }
 
 
@@ -175,6 +191,7 @@ std::vector<double> mitk::ClaronInterface::GetTipQuaternions(claronToolHandle c)
   double Quarternions[4];
   MTC( Xform3D_RotQuaternionsGet(t2c, Quarternions) );
   mitk::Quaternion claronQuaternion;
+
   //note: claron quarternion has different order than the mitk quarternion
   claronQuaternion[3] = Quarternions[0];
   claronQuaternion[0] = Quarternions[1];
@@ -203,14 +220,35 @@ std::vector<double> mitk::ClaronInterface::GetTipQuaternions(claronToolHandle c)
 std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
 {
   std::vector<double> returnValue;
-  //TODO by Alfred 3.3.2009: I'm afraid we have a bug here. Look at the method
-  //                         GetTipQuaternions... the same has to be done here
-  //                         to compensate the bug in the MTC-lib.
+
   double	Quarternions[4];
   MTC( Marker_Marker2CameraXfGet (c, CurrCamera, PoseXf, &IdentifyingCamera) );
   MTC( Xform3D_RotQuaternionsGet(PoseXf, Quarternions) );
 
-  for (int i = 0; i<4; i++) returnValue.push_back(Quarternions[i]);
+  //here we have to compensate a bug in the MTC-lib. (difficult to understand)
+  mitk::Quaternion claronQuaternion;
+
+  //note: claron quarternion has different order than the mitk quarternion
+  claronQuaternion[3] = Quarternions[0];
+  claronQuaternion[0] = Quarternions[1];
+  claronQuaternion[1] = Quarternions[2];
+  claronQuaternion[2] = Quarternions[3];
+
+  // Here we have to make a -90°-turn around the Y-axis because of a bug of the
+  // MTC-library.
+  mitk::Quaternion minusNinetyDegreeY;
+  minusNinetyDegreeY[3] = sqrt(2.0)/2.0;
+  minusNinetyDegreeY[0] = 0;
+  minusNinetyDegreeY[1] = -1.0/(sqrt(2.0));
+  minusNinetyDegreeY[2] = 0;
+
+  //calculate the result...
+  mitk::Quaternion erg = (minusNinetyDegreeY*claronQuaternion);
+
+  returnValue.push_back(erg[3]);
+  returnValue.push_back(erg[0]);
+  returnValue.push_back(erg[1]);
+  returnValue.push_back(erg[2]);
 
   return returnValue;
 }

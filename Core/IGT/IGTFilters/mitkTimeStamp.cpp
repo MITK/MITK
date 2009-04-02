@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::TimeStamp::Pointer mitk::TimeStamp::s_Instance = NULL;
 
 mitk::TimeStamp::TimeStamp() : itk::Object()
-, m_Time(-1.0)
+, m_Time(-1.0), m_ReferenceTime(0.0)
 {
 }
 
@@ -100,7 +100,7 @@ void mitk::TimeStamp::StartTracking(itk::Object::Pointer Device)
 {
   if (m_RealTimeClock.IsNull())
   {
-    initialize();
+    Initialize();
   }
   if ( s_Instance.IsNotNull() )
   {
@@ -152,9 +152,7 @@ void mitk::TimeStamp::StopTracking(itk::Object::Pointer Device)
   }
 }
 
-/**
-* \brief returns the currently elapsed time since the call of StartTracking() in milliseconds
-*/
+
 double mitk::TimeStamp::GetElapsed()
 {
   if (m_Time > -1)
@@ -172,9 +170,9 @@ double mitk::TimeStamp::GetElapsed()
 */
 double mitk::TimeStamp::GetCurrentStamp()
 {
-  if ( m_RealTimeClock.IsNotNull() )
+  if (m_RealTimeClock.IsNotNull())
   {
-    return m_RealTimeClock->getCurrentStamp();
+    return m_RealTimeClock->GetCurrentStamp();
   }
   else return 0.0;
 }
@@ -196,8 +194,7 @@ void mitk::TimeStamp::SetRealTimeClock(mitk::RealTimeClock::Pointer Clock)
 }
 
 /**
-* \brief returns the offset of this device's starting-time to the 
-* reference-time in ms
+* 
 *
 * This method returns the time acquired when StartTracking() was called.
 * This is the offset, that each device will have in relation to the device that 
@@ -231,7 +228,7 @@ double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
 * by the user.
 *
 */
-void mitk::TimeStamp::initialize()
+void mitk::TimeStamp::Initialize()
 {
   #  if defined (WIN32) || defined (_WIN32)
     m_RealTimeClock = mitk::WindowsRealTimeClock::New();

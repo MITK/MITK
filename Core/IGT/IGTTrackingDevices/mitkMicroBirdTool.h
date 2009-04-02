@@ -28,7 +28,7 @@ namespace mitk {
     //## \brief Implementation of a MicroBird tool
     //##
     //## 
-    //## @ingroup Tracking
+    //## \ingroup IGT
 
     class MicroBirdTool : public InternalTrackingTool
     {

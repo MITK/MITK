@@ -1,47 +1,63 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
-=========================================================================*/
 
+=========================================================================*/
 #include "QmitkIGTExample.h"
 #include "QmitkIGTExampleControls.h"
-#include <qaction.h>
 #include "icon.xpm"
-#include "QmitkTreeNodeSelector.h"
+
 #include "QmitkStdMultiWidget.h"
-#include "mitkStatusBar.h"
-#include "mitkProgressBar.h"
-#include <qtextedit.h>
-#include <qpushbutton.h>
-#include "mitkNDITrackingDevice.h"
+#include "QmitkTreeNodeSelector.h"
+
+#include "mitkClaronTool.h"
+#include "mitkClaronTrackingDevice.h"
+#include "mitkCone.h"
+#include "mitkInternalTrackingTool.h"
 #include "mitkNDIPassiveTool.h"
-#include "mitkVector.h"
-#include <itksys/SystemTools.hxx>
-#include "mitkTrackingTypes.h"
-#include "mitkVector.h"
+#include "mitkNDITrackingDevice.h"
+#include "mitkRandomTrackingDevice.h"
+#ifdef MITK_USE_MICROBIRD_TRACKER
+#include "mitkMicroBirdTrackingDevice.h"
+#endif // MITK_USE_MICROBIRD_TRACKER
+
+#include "mitkProgressBar.h"
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
 #include "mitkSerialCommunication.h"
-#include <vtkConeSource.h>
-#include <mitkCone.h>
+#include "mitkStatusBar.h"
+#include "mitkTrackingTypes.h"
+#include "mitkVector.h"
+#include "mitkGeometry3D.h"
 
+#include <itksys/SystemTools.hxx>
+
+#include <qaction.h>
+#include <qcombobox.h>
+#include <qpushbutton.h>
+#include <qtextedit.h>
+#include <qtimer.h>
+#include <qlabel.h>
+#include <qlineedit.h>
 
 QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
-    : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
+: QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
 {
   SetAvailability(true);
+  m_Timer = new QTimer(this);
+  m_RecordingTimer = new QTimer(this);
+  m_PlayingTimer = new QTimer(this);
 }
 
 
@@ -84,8 +100,14 @@ void QmitkIGTExample::CreateConnections()
     connect( (QObject*)(m_Controls->m_StartTrackingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnTestTracking()));  // execute tracking test code
     connect( (QObject*)(m_Controls->m_StartNavigationButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnTestNavigation())); // build and initialize navigation filter pipeline
     connect( (QObject*)(m_Controls->m_MeasureBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnMeasure())); // execute navigation filter pipeline to read transformed tracking data
+    connect( (QObject*)(m_Controls->m_MeasureContinuously), SIGNAL(clicked()),(QObject*) this, SLOT(OnMeasureContinuously())); // execute navigation filter pipeline to read transformed tracking data
     connect( (QObject*)(m_Controls->m_StopBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnStop())); // cleanup navigation filter pipeline
     connect( (QObject*)(m_Controls), SIGNAL(ParametersChanged()),(QObject*) this, SLOT(OnParametersChanged()));  // update filter parameters with values from the GUI widget
+    connect( m_Timer, SIGNAL(timeout()), this, SLOT(OnMeasure()) );
+    connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
+    connect( m_PlayingTimer, SIGNAL(timeout()), this, SLOT(OnPlaying()) );
+    connect( (QObject*)(m_Controls->m_StartRecordingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartRecording()));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_StartPlayingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartPlaying()));  // execute tracking test code
   }
 }
 
@@ -110,41 +132,20 @@ void QmitkIGTExample::Activated()
 
 
 
-void QmitkIGTExample::OnTestTracking() 
-{  
-  WaitCursorOn(); 
+void QmitkIGTExample::OnTestTracking()
+{
+  WaitCursorOn();
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the tracking component", 4000);
 
-  /* Create & set up tracking device*/
-  mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
-  /* choose between mitk::NDIPolaris, mitk::NDIAurora, mitk::ClaronMicron, mitk::IntuitiveDaVinci and mitk::AscensionMicroBird*/
-  tracker->SetType(mitk::NDIAurora);
-  switch (tracker->GetType())
+  /* Create & set up tracking device with a tool */
+  mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice();
+  if (tracker.IsNull())
   {
-  case mitk::NDIPolaris:
-    {
-      tracker->SetPortNumber(mitk::SerialCommunication::COM4);
-      tracker->SetBaudRate(mitk::SerialCommunication::BaudRate115200); 
-      out->append("creating NDI Tracker on COM 4 with 115200 Baud");
-
-      /* create a tool and add to tracking device */
-      mitk::NDIPassiveTool::Pointer tool1 = mitk::NDIPassiveTool::New();
-      tool1->SetToolName("MyInstrument");
-      tool1->LoadSROMFile("c:\\myinstrument.rom");
-      tool1->SetTrackingPriority(mitk::Dynamic);
-      tracker->Add6DTool(tool1);
-      out->append("adding tool 'MyInstrument' with rom file 'c:\\myinstrument.rom'");
-      break;
-    }
-  case mitk::NDIAurora:
-    {
-      tracker->SetPortNumber(mitk::SerialCommunication::COM1);
-      out->append("creating NDI Tracker on COM 1");
-      break;
-    }
+    out->append("Error creating tracking device. Did you provide all parameters?");
+    return;
   }
 
-  /*open the connection, load tools that are connected (active Tools) and initialize them. */
+  /* open the connection, load tools that are connected (active Tools) and initialize them. */
   out->append("opening connection to tracking device");
   if (tracker->OpenConnection() == false)
   {
@@ -156,11 +157,7 @@ void QmitkIGTExample::OnTestTracking()
   else
     out->append("successfully connected to tracking device.");
 
-  /* beep a few times, just because we can */
-  out->append("BEEP!");
-  tracker->Beep(3);
-
-  /* Start tracking */ 
+  /* Start tracking */
   if (tracker->StartTracking() == false)
   {
     out->append(QString("ERROR during StartTracking(): ") + QString(tracker->GetErrorMessage()));
@@ -175,7 +172,7 @@ void QmitkIGTExample::OnTestTracking()
   out->append("Starting to read tracking data for all tools.");
   mitk::TrackingTool* t = NULL;
   mitk::Point3D pos;
-  mitk::Quaternion quat;  
+  mitk::Quaternion quat;
   for(int i=0; i< 50; i++)  // 50x
   {
     for (unsigned int i = 0; i < tracker->GetToolCount(); i++) // each tool
@@ -188,8 +185,8 @@ void QmitkIGTExample::OnTestTracking()
       if (t->IsDataValid() == true)
       {
         t->GetPosition(pos);
-        output << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl; 
-        t->GetQuaternion(quat);
+        output << "  Position      = <" << pos[0] << ", " << pos[1] << ", " << pos[2] << ">" << std::endl;
+        t->GetOrientation(quat);
         output << "  Orientation   = <" << quat[0] << ", " << quat[1] << ", " << quat[2] << ", " << quat[3] << ">" << std::endl;
         output << "  TrackingError = " << t->GetTrackingError() << std::endl;
       }
@@ -201,8 +198,8 @@ void QmitkIGTExample::OnTestTracking()
     //wait a little to get the next coordinate
     itksys::SystemTools::Delay(100);
   }
-  
-  /* Stop tracking */ 
+
+  /* Stop tracking */
   out->append("Enough tracking data. Stopping tracking now.");
   if (tracker->StopTracking() == false)
   {
@@ -214,10 +211,10 @@ void QmitkIGTExample::OnTestTracking()
   else
     out->append("Tracking stopped.");
 
-  /* Stop tracking */ 
+  /* Stop tracking */
   if (tracker->CloseConnection() == false)
   {
-    out->append(QString("ERROR during CloseConnection(): ") + QString(tracker->GetErrorMessage()));  
+    out->append(QString("ERROR during CloseConnection(): ") + QString(tracker->GetErrorMessage()));
     WaitCursorOff();
     return;
   }
@@ -229,40 +226,13 @@ void QmitkIGTExample::OnTestTracking()
 }
 
 
-void QmitkIGTExample::OnTestNavigation() 
+void QmitkIGTExample::OnTestNavigation()
 {
   WaitCursorOn(); // always good to show the user that the application is processing and will not react to user input for a while
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the navigation component", 4000);  // tell the user what you are doing
 
   /* Create & set up tracking device with a tool */
-  mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
-  
-  /* choose between mitk::NDIPolaris, mitk::NDIAurora, mitk::ClaronMicron, mitk::IntuitiveDaVinci and mitk::AscensionMicroBird*/
-  tracker->SetType(mitk::NDIAurora);
-  mitk::NDIPassiveTool::Pointer tool1;
-  switch (tracker->GetType())
-  {
-  case mitk::NDIPolaris:
-    {
-      tracker->SetPortNumber(mitk::SerialCommunication::COM4);
-      tracker->SetBaudRate(mitk::SerialCommunication::BaudRate115200); 
-      out->append("creating NDI Tracker on COM 4 with 115200 Baud");
-
-      tool1 = mitk::NDIPassiveTool::New();
-      tool1->SetToolName("MyInstrument");
-      tool1->LoadSROMFile("c:\\myinstrument.rom");
-      tool1->SetTrackingPriority(mitk::Dynamic);
-      tracker->Add6DTool(tool1);
-      out->append("adding tool 'MyInstrument' with rom file 'c:\\myinstrument.rom'");
-      break;
-    }
-  case mitk::NDIAurora:
-    {
-      tracker->SetPortNumber(mitk::SerialCommunication::COM1);
-      out->append("creating NDI Tracker on COM 1");
-      break;
-    }
-  }
+  mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice(); // configure selected tracking device
 
   /* Now set up pipeline */
   try
@@ -280,58 +250,42 @@ void QmitkIGTExample::OnTestNavigation()
     /* check if there is a Offset parameter stored in our propertylist. If none is found, use hardcoded value */
     if (GetFunctionalityOptionsList()->GetPropertyValue<mitk::Vector3D>("NavigationDataDisplacementFilter_Offset", offset) == false)  // search for Offset parameter
     {
-      mitk::FillVector3D(offset, 100000.0, 0.0, 0.0);  // nothing found, use hardcoded value
+      mitk::FillVector3D(offset, 1.0, 1.0, 1800.0);  // nothing found, use default value
       GetFunctionalityOptionsList()->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(offset));  // add the property to the list
     }
     m_Displacer->SetOffset(offset);
     /* --> Instead, we could have just called m_Displacer->SetParameters(GetFunctionalityOptionsList()) to set all stored parameters at once.
-       But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the 
-       persistence mechanism or by the GUI Event ParametersChanged that calls the OnParametersChanged() method)
+    But then we would have to check, if the PropertyList contains the parameters ( they were stored in the list before by the
+    persistence mechanism or by the GUI Event ParametersChanged that calls the OnParametersChanged() method)
     */
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
-    for (unsigned int i =0; i<m_Source->GetNumberOfOutputs(); i++)
-      m_Displacer->SetInput(i, m_Source->GetOutput(i));  // connect filter
+    int numberOfOutputs = m_Source->GetNumberOfOutputs();
+    for (unsigned int i = 0; i < numberOfOutputs; i++)
+      m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
-    for (unsigned int i =0; i<m_Displacer->GetNumberOfOutputs(); i++)
+    int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
+    for (int i = 0; i < numberOfDisplacerOutputs; i++)
       visualizer->SetInput(i, m_Displacer->GetOutput(i));
-    
+
     //create new BaseData for each tool
-    for (int i = 0; i<m_Source->GetToolCount();i++)
+    for (int i = 0; i < numberOfDisplacerOutputs;i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
-      vtkConeSource* vtkData = vtkConeSource::New();
-      vtkData->SetRadius(5);
-      vtkData->SetHeight(10);
-      vtkData->SetDirection(0.0, 0.0, 1.0);
-      vtkData->SetCenter(0.0, 0.0, 0.0);
-      vtkData->SetResolution(20);
-      vtkData->CappingOn();
-      vtkData->Update();
-      mitkToolData->SetVtkPolyData(vtkData->GetOutput());
-      vtkData->Delete();
-      
+      float scale[] = {20.0, 20.0, 20.0};
+      mitkToolData->GetGeometry()->SetSpacing(scale);
       //create DataTreeNode
       mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
       toolNode->SetData(mitkToolData);
-      toolNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New ( "MyInstrument" ) );
-      toolNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));
-      toolNode->GetPropertyList()->SetProperty("visible",mitk::BoolProperty::New(true));
-      toolNode->SetColor(0.0,1.0,0.0);//green
-      toolNode->SetOpacity(0.8);
+      toolNode->SetName(QString("MyInstrument %1").arg(i).latin1());
+      toolNode->SetColor(0.2, 0.2 * i ,0.9 - 0.1 * i); //different colors
       toolNode->Modified();
-      
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
-      out->append("added tool to data tree.");
-
-      //add data object to visualizer
       visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
     }
-
-    //copy to member to call update of tools on OnMeasure()
     m_EndOfPipeline = visualizer;
 
     //start the tracking
@@ -343,13 +297,12 @@ void QmitkIGTExample::OnTestNavigation()
     out->append(QString("ERROR during instantiation and initialization of TrackingDeviceSource filter: ") + QString(exp.what()));
     m_Displacer = NULL;
     m_EndOfPipeline = NULL;
-    if (m_Source)
+    if (m_Source.IsNotNull())
     {
       m_Source->StopTracking();
       m_Source->Disconnect();
       m_Source = NULL;
     }
-    tool1 = NULL;
     tracker = NULL;
     WaitCursorOff();
     return;
@@ -357,8 +310,10 @@ void QmitkIGTExample::OnTestNavigation()
   /* set up GUI, so that measurements can be done*/
   m_Controls->m_MeasureBtn->show();
   m_Controls->m_MeasureBtn->setEnabled(true);
+  m_Controls->m_MeasureContinuously->show();
+  m_Controls->m_MeasureContinuously->setEnabled(true);
   m_Controls->m_StopBtn->show();
-  m_Controls->m_StopBtn->setEnabled(true);  
+  m_Controls->m_StopBtn->setEnabled(true);
   m_Controls->m_StartTrackingButton->setEnabled(false);
   m_Controls->m_StartNavigationButton->setEnabled(false);
 
@@ -371,15 +326,13 @@ void QmitkIGTExample::OnTestNavigation()
 
 
 void QmitkIGTExample::OnMeasure()
-{  
+{
   if (m_EndOfPipeline.IsNull())
   {
     out->append("Tracking Pipeline not ready.");
     return;
   }
-  WaitCursorOn();
-  
-  /* Get the output of the las filter with output and print it */
+  /* Get the output of the last filter with output and print it */
   for (unsigned int i = 0; i < m_EndOfPipeline->GetNumberOfOutputs(); ++i) // for all outputs of the filter
   {
     mitk::NavigationData* nd = m_EndOfPipeline->GetOutput(i);
@@ -388,13 +341,14 @@ void QmitkIGTExample::OnMeasure()
       out->append("WARNING: Navigation Data is NULL");
       continue;
     }
-    nd->Update();  // update the navigation data. this will read current tracking data from tracking device
+    nd->Update();  // update the navigation data. this will read current tracking data from tracking device.
+    // this will also update the visualization filter who causes a repainting of the scene
 
     std::stringstream output;
     output << "Navigation Data of Output " << i << ":" << std::endl;
     if (nd->IsDataValid() == true)
     {
-      output << "  Position    = " << nd->GetPosition() << std::endl; 
+      output << "  Position    = " << nd->GetPosition() << std::endl;
       output << "  Orientation = <" << nd->GetOrientation() << std::endl;
       output << "  Error       = " << nd->GetCovErrorMatrix() << std::endl;
     }
@@ -403,7 +357,22 @@ void QmitkIGTExample::OnMeasure()
     output << "--------------------------------------------" << std::endl;
     out->append(output.str().c_str()); // append string stream content to gui widget
   }
-  WaitCursorOff();
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
+}
+
+
+void QmitkIGTExample::OnMeasureContinuously()
+{
+  if (m_Controls->m_MeasureContinuously->text()=="Start measure continuously")
+  {
+    m_Timer->start(100);
+    m_Controls->m_MeasureContinuously->setText("Stop measure continuously");
+  }
+  else if (m_Controls->m_MeasureContinuously->text()=="Stop measure continuously")
+  {
+    m_Timer->stop();
+    m_Controls->m_MeasureContinuously->setText("Start measure continuously");
+  }
 }
 
 
@@ -412,8 +381,10 @@ void QmitkIGTExample::OnStop()
   WaitCursorOn();
   m_Controls->m_MeasureBtn->hide();
   m_Controls->m_MeasureBtn->setEnabled(false);
+  m_Controls->m_MeasureContinuously->hide();
+  m_Controls->m_MeasureContinuously->setEnabled(false);
   m_Controls->m_StopBtn->hide();
-  m_Controls->m_StopBtn->setEnabled(false);  
+  m_Controls->m_StopBtn->setEnabled(false);
   m_Controls->m_StartTrackingButton->setEnabled(true);
   m_Controls->m_StartNavigationButton->setEnabled(true);
   try
@@ -424,7 +395,7 @@ void QmitkIGTExample::OnStop()
     m_Source->Disconnect();
     m_Source = NULL;
     WaitCursorOff();
-  }  
+  }
   catch (std::exception& exp)
   {
     out->append(QString("ERROR during cleanup of filter pipeline: ") + QString(exp.what()));
@@ -432,7 +403,7 @@ void QmitkIGTExample::OnStop()
     WaitCursorOff();
     return;
   }
-  out->append("Filter pipeline stopped and destroyed. Everything is back to normal."); 
+  out->append("Filter pipeline stopped and destroyed. Everything is back to normal.");
   WaitCursorOff();
 }
 
@@ -445,13 +416,13 @@ void QmitkIGTExample::OnParametersChanged()
 
   /* get all filter parameters in the form of a PropertyList and pass it to the filter */
   //m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
-  //out->append("Using GUI Parameters for Displacement Filter."); 
+  //out->append("Using GUI Parameters for Displacement Filter.");
 
-  /* add the filter PropertyList to the functionalities List, so that it will be saved on application exit 
-     this will be restored at the next restart.
+  /* add the filter PropertyList to the functionalities List, so that it will be saved on application exit
+  this will be restored at the next restart.
   */
   GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_Parameters.GetPointer(), true);
-  out->append("Adding GUI parameters to persistence storage."); 
+  out->append("Adding GUI parameters to persistence storage.");
   m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
   out->append("Setting GUI parameters to filter.");
 }
@@ -468,4 +439,171 @@ void QmitkIGTExample::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
     m_Controls->SetDisplacementFilterParameters(pl);  // update GUI
   }
   // MITK-IGT filters will be initialized with the properties in OnTestNavigation()
+}
+
+
+mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
+{
+  mitk::TrackingDevice::Pointer tracker;
+  QString selectedDevice = m_Controls->GetSelectedTrackingDevice();
+  if ((selectedDevice == "NDI Polaris")
+    || (selectedDevice == "NDI Aurora"))
+  {
+    mitk::NDITrackingDevice::Pointer trackerNDI = mitk::NDITrackingDevice::New();
+    trackerNDI->SetDeviceName(m_Controls->m_Port->text().latin1());
+    trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
+    out->append(QString("creating NDI Tracker on ") + m_Controls->m_Port->text() + QString(" with 115200 Baud"));
+
+    if (selectedDevice == "NDI Polaris")
+    {
+      trackerNDI->SetType(mitk::NDIPolaris);
+      mitk::NDIPassiveTool::Pointer toolNDI = mitk::NDIPassiveTool::New();
+      toolNDI->SetToolName("MyInstrument");
+      toolNDI->LoadSROMFile(m_Controls->GetToolFileName());
+      toolNDI->SetTrackingPriority(mitk::Dynamic);
+      trackerNDI->Add6DTool(toolNDI);
+      out->append(QString("adding tool 'MyInstrument' with rom file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+    }
+    else if (selectedDevice == "NDI Aurora")
+    {
+      trackerNDI->SetType(mitk::NDIAurora);
+    }
+    tracker = trackerNDI;
+  }
+  else if (selectedDevice == "Micron Tracker")
+  {
+    mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
+    toolMT->LoadFile(m_Controls->GetToolFileName());
+    mitk::ClaronTrackingDevice::Pointer trackerMT = mitk::ClaronTrackingDevice::New();
+    out->append("creating Micron Tracker");
+    trackerMT->AddTool(toolMT);
+    out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+    tracker = trackerMT;
+  }
+  else if (selectedDevice == "MicroBird")
+  {
+#ifdef MITK_USE_MICROBIRD_TRACKER
+    mitk::MicroBirdTrackingDevice::Pointer trackerMB = mitk::MicroBirdTrackingDevice::New();
+    mitk::InternalTrackingTool::Pointer toolMB = mitk::InternalTrackingTool::New();
+    trackerMB->AddTool(toolMB);
+    out->append("creating MicroBird tracking device with one tool");
+#else
+    out->append("MicroBird support not available in this version. Please select a different tracking device");
+#endif // MITK_USE_MICROBIRD_TRACKER
+
+  }
+  else if (selectedDevice == "RandomTrackingDevice")
+  {
+    mitk::InternalTrackingTool::Pointer toolRandom = mitk::InternalTrackingTool::New();
+    mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
+    trackerRandom->AddTool(toolRandom);
+    tracker = trackerRandom;
+    out->append("creating virtual random tracking device with one tool");
+  }
+  else
+  {
+    tracker = NULL;
+  }
+  return tracker;
+}
+
+void QmitkIGTExample::OnStartRecording()
+{
+  try
+  {
+    mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice();
+    if (tracker.IsNull())
+    {
+      out->append("Error creating tracking device. Did you provide all parameters?");
+      return;
+    }
+    m_Source = mitk::TrackingDeviceSource::New();
+    m_Source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
+
+    m_Source->Connect();        //here we connect to the tracking system
+
+    //we need the stringstream for building up our filename
+    std::stringstream filename;
+
+    //the .xml extension and an counter is added automatically
+    filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output";
+
+    m_Recorder = mitk::NavigationDataRecorder::New();
+    m_Recorder->SetFileName(filename.str());
+
+    //now every output of the displacer object is connected to the recorder object
+    for (unsigned int i = 0; i < m_Source->GetNumberOfOutputs(); i++)
+    {
+      m_Recorder->AddNavigationData(m_Source->GetOutput(i));  // here we connect to the recorder
+    }
+
+    m_Source->StartTracking();  //start the tracking
+    m_Recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
+
+    out->append(QString("Starting Recording from ") + QString(m_Controls->GetSelectedTrackingDevice())
+         + QString(" to file ") + QString(m_Recorder->GetFileName()) + QString(" now."));
+
+    //now every update of the recorder stores one line into the file for 
+    //each added NavigationData
+    m_RecordingTimer->start(100);
+  }
+  catch (std::exception& e)
+  {
+    out->append(QString("An error occured: ") + QString(e.what()));
+  }
+}
+
+
+void QmitkIGTExample::OnRecording()
+{
+  m_Recorder->Update();
+  mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now", 75); // Display recording message for 75ms in status bar
+}
+
+
+void QmitkIGTExample::OnStartPlaying()
+{
+  /* Stop recording */
+  m_RecordingTimer->stop();
+  m_Recorder->StopRecording();
+  out->append("Stopped recording");
+
+  std::stringstream filename;
+  //the .xml extension and an counter is added automatically
+  filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
+
+  m_Player = mitk::NavigationDataPlayer::New();
+  //this is first part of the file name the .xml extension and an counter is added automatically
+  m_Player->SetFileName(filename.str()); 
+  m_Player->StartPlaying(); //this starts the player 
+  //this is necessary because we do not know how many outputs the player has
+
+  out->append(QString("Starting replay from ") + QString(m_Player->GetFileName()));
+
+  /* Visualize output of player using a mitk::PointSet */
+  m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+  for (int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
+  {
+    m_PointSetFilter->SetInput(m_Player->GetOutput(i), i);  // here we connect the player with the pointset filter
+  }
+  m_PointSet = m_PointSetFilter->GetOutput();
+
+  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+  pointSetNode->SetData(m_PointSet);
+  pointSetNode->SetName("Player object");
+  pointSetNode->SetColor(0.2,0.2,0.9); //change color
+  pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(20.0)); // enlarge visualization of points
+  mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
+  out->append("Creating Pointset for replay visualization");
+
+  m_PlayingTimer->start(100);  // start the playback timer
+  out->append("starting replay");
+}
+
+
+void QmitkIGTExample::OnPlaying()
+{
+  m_PointSet->Update();
+  mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update only 3D render window
+  mitk::StatusBar::GetInstance()->DisplayText("Replaying tracking data now", 75); // Display replay message for 75ms in status bar
 }

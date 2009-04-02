@@ -20,7 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMacro.h>
 #include <string>
 
-mitk::ClaronInterface::ClaronInterface(std::string itkNotUsed(calibrationDir), std::string itkNotUsed(toolFilesDir))
+mitk::ClaronInterface::ClaronInterface()
+{
+  printf("Error: MicronTracker is not included in this project. \n");
+}
+
+mitk::ClaronInterface::~ClaronInterface()
+{
+
+}
+
+void mitk::ClaronInterface::Initialize(std::string itkNotUsed(calibrationDir), std::string itkNotUsed(toolFilesDir))
   {
   printf("Error: MicronTracker is not included in this project. \n");
   }

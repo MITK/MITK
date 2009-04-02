@@ -44,20 +44,20 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
   srand(time(NULL));
-  // position of navigation data
+  // generate a random position for the navigation data 
   mitk::NavigationData::PositionType position;
   position[0] = rand()%1000;
   position[1] = rand()%1000;
   position[2] = rand()%1000;
 
-  // orientation of navigation data
+  // generate a random orientation for the navigation data
   mitk::NavigationData::OrientationType orientation;
-  orientation[0] = rand()%2;
-  orientation[1] = rand()%2;
-  orientation[2] = rand()%2;
-  orientation[3] = rand()%2;
+  orientation[0] = (rand()%1000)/1000.0;
+  orientation[1] = (rand()%1000)/1000.0;
+  orientation[2] = (rand()%1000)/1000.0;
+  orientation[3] = (rand()%1000)/1000.0;
 
-  // error of navigation data
+  // generate a random error for the navigation data
   mitk::ScalarType error = rand()%10;
 
   // data valid flag of navigation data
@@ -82,8 +82,6 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   // create renderer
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("TestRenderer",renderWindow);
-  //vtkRenderer* vtkRenderer = vtkRenderer::New();
-  //renderer->SetVtkRenderer(vtkRenderer);
 
   myFilter->SetInput(nd1);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput() input 1");

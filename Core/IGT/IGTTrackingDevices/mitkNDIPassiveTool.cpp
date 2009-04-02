@@ -72,10 +72,12 @@ bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
   return true;
 }
 
+
 const unsigned char* mitk::NDIPassiveTool::GetSROMData() const
 {
   return m_SROMData;
 }
+
 
 unsigned int mitk::NDIPassiveTool::GetSROMDataLength() const
 {

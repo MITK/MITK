@@ -26,19 +26,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkMultiThreader.h>
 
-//#define TIXML_USE_STL
 #include "tinyxml.h"
 
 namespace mitk {
   /**Documentation
-  * \brief This class is used to play recorded (see mitkNavigationDataRecorder class) files. 
-  * If you want to play a file you have to set an input stream. This can be an own one (use StartPlaying(std::istream*)) 
-  * or a presetted one (use StartPlaying()). The presets are NormalFile and ZipFile and can be set with the method 
-  * SetPlayerMode(). For pausing the player call PauseContinuePlaying(). Another call of this method will continue the
-  * playing.
+  * \brief This class is used to play recorded (see mitkNavigationDataRecorder class) files.
   *
-  * \
-  * @ingroup Navigation
+  * If you want to play a file you have to set an input stream. This can be an own one (use StartPlaying(std::istream*)) 
+  * or a preset (use StartPlaying()). The presets are NormalFile and ZipFile and can be set with the method 
+  * SetPlayerMode(PlayerMode). The presets need a FileName. Therefore the FileName must be set before the preset. 
+  * For pausing the player call Pause(). A call of Resume() will continue the playing.
+  *
+  *
+  * \ingroup IGT
   */
   class NavigationDataPlayer : public NavigationDataSource
   {
@@ -46,55 +46,79 @@ namespace mitk {
     mitkClassMacro(NavigationDataPlayer, NavigationDataSource);
     itkNewMacro(Self);
 
-    /**Documentation
-    * \brief sets the file name for the InputMode NormalFile and ZipFile
+    /**
+    * \brief sets the file name and path for the PlayerMode NormalFile and ZipFile
     */
     itkSetStringMacro(FileName);
 
-    /**Documentation
-    * \brief sets path for the InputMode: NormalFile and ZipFile
+    /**
+    * \brief returns the file name and path for the PlayerMode NormalFile and ZipFile
     */
-    itkSetStringMacro(FilePath);
+    itkGetStringMacro(FileName);
 
-    /**Documentation
-    * \brief Used for pipeline update
+    /**
+    * \brief Used for pipeline update just to tell the pipeline that we always have to update
     */
     virtual void UpdateOutputInformation();
 
-    /**Documentation
-    * \brief This method starts the player with the presetted parameters (Playing Mode, file name and path)
+    /**
+    * \brief This method starts the player. 
+    *
+    * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
+    * with an own inputstream (SetStream(istream*)).
     */
     void StartPlaying();
 
-    /**Documentation
-    * \brief This method starts the player with an own input stream
-    */
-    void StartPlaying(std::istream* stream);
-
-    /**Documentation
+    /**
     * \brief Stops the player and closes the stream. After a call of StopPlaying()
     * StartPlaying() must be called to get new output data
+    *
+    * \warning the output is generated in this method because we know first about the number of output after
+    * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
     */
     void StopPlaying();
-    
-    /**Documentation
-    * \brief This method pauses the player. The first call pauses the player if it is in the playing mode.
-    * The second call continues the playing mode.
+
+    /**
+    * \brief This method pauses the player. If you want to play again call Resume()
     * 
     *\warning This method is not tested yet. It is not save to use!
     */
-    void PauseContinuePlaying();
-    
+    void Pause();
+
+    /**
+    * \brief This method resumes the player when it was paused. 
+    * 
+    *\warning This method is not tested yet. It is not save to use!
+    */
+    void Resume();
+
+    /**
+    * \brief The PlayerMode is used for generating a presetted output stream. You do not need to
+    * set it if you want to use your own stream.
+    *
+    * There are:
+    * NormalFile: ifstream
+    * ZipFile: not implemented yet
+    *
+    *\warning The ZipFile Mode is not implemented yet
+    */
     enum PlayerMode
     {
       NormalFile,
       ZipFile
     };
 
-    /**Documentation
+    /**
     * \brief sets the recording mode which causes different types of output streams
+    * This method is overloaded with SetStream( ostream* )
     */
-    void SetPlayerMode(PlayerMode mode);
+    void SetStream(PlayerMode mode);
+
+    /**
+    * \brief sets the recording mode which causes different types of output streams
+    * This method is overloaded with SetStream( PlayerMode )
+    */
+    void SetStream(std::istream* stream);
 
   protected:
     NavigationDataPlayer();
@@ -102,78 +126,58 @@ namespace mitk {
 
     typedef mitk::NavigationData::TimeStampType TimeStampType;
 
-    /**Documentation
-    * \brief filter execute method
-    *   
+    /**
+    * \brief filter execute method 
     */
     virtual void GenerateData();
 
-    /**Documentation
-    * \brief Gets the file version out of the XML document
-    *   
+    /**
+    * \brief Returns the file version out of the XML document. 
     */
-    void GetFileVersion();
+    unsigned int GetFileVersion(std::istream* stream);
 
-    /**Documentation
-    * \brief Gets the number of tracked tools out of the XML document
-    *   
+    /**
+    * \brief Returns the number of tracked tools out of the XML document.
     */
-    void GetNumberOfTrackedTools();
+    unsigned int GetNumberOfNavigationDatas(std::istream* stream);
 
-    /**Documentation
+    /**
     * \brief Gets the first data for initializing the player
-    *   
     */
     void GetFirstData();
 
-    /**Documentation
+    /**
     * \brief This method reads one line of the XML document and returns the data as a NavigationData object
     * If there is a new file version another method must be added which reads this data.
-    *   
     */
     mitk::NavigationData::Pointer ReadVersion1();
 
-
-    /**Documentation
-    * \brief Starts the thread for the thread based player
-    * \warning This method is not used yet! If there is an event based polling of the data we will need this.
+    /**
+    * \brief This method initializes the player with first data  
     */
-    static ITK_THREAD_RETURN_TYPE ThreadStartPlaying(void* pInfoStruct);
-   
-    /**Documentation
-    * \brief This method plays the data in a thread. It is neccessary if you want to throw events if "new" data arrived.
-    *   
-    */
-    void PlayInThread();
-    
-    std::istream* m_Stream; //stores a pointer to the input stream
+    void InitPlayer();
 
-    PlayerMode m_PlayerMode;
+    std::istream* m_Stream; ///< stores a pointer to the input stream
 
-    std::string m_FilePath;
+    PlayerMode m_PlayerMode; ///< stores the mode for the presetted PlayerMode sieh enum PlayerMode
 
-    std::string m_FileName;
+    std::string m_FileName; ///< stores the filename
 
-    unsigned int m_FileVersion; //indicates which encoding is used
+    unsigned int m_FileVersion; ///< indicates which XML encoding is used
 
-    bool m_Playing; //indicates whether the generateoutput method generates new output or not
+    bool m_Playing; ///< indicates whether the generateoutput method generates new output or not
 
-    bool m_Pause; //indicates if the player is paused
+    bool m_Pause; ///< indicates if the player is paused
 
-    unsigned int m_NumberOfOutputs;
+    unsigned int m_NumberOfOutputs; ///< stores the number of outputs known from the XML document
 
-    itk::MultiThreader::Pointer m_MultiThreader;
+    TimeStampType m_StartPlayingTimeStamp; ///< the starttime of the playing set in the method StartPlaying()
 
-    int m_ThreadID;
+    TimeStampType m_PauseTimeStamp; ///< stores the beginning of a pause
 
-    TimeStampType m_StartPlayingTimeStamp; //the beginning of the player
+    std::vector<NavigationData::Pointer> m_NextToPlayNavigationData; ///< stores the next possible candidate for playing
 
-    TimeStampType m_PauseTimeStamp; //the beginning of a pause
-
-    std::vector<NavigationData::Pointer> m_NextToPlayNavigationData; //stores the next possible candidate for playing
-
-    std::vector<TimeStampType> m_StartTimeOfData; //stores the start time of the different tools
-    
+    std::vector<TimeStampType> m_StartTimeOfData; ///< stores the start time of the different tools
   };
 } // namespace mitk
 

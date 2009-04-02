@@ -30,17 +30,22 @@ mitk::NavigationDataVisualizationByBaseDataTransformFilter::~NavigationDataVisua
 
 const mitk::BaseData* mitk::NavigationDataVisualizationByBaseDataTransformFilter::GetBaseData(const NavigationData* nd) const
 {
+  if (nd == NULL)
+    return NULL;
+
   RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(nd);
   if (iter != m_RepresentationList.end())
     return (*iter).second;
   
   //else:
   return NULL;
-
 }
 
 bool mitk::NavigationDataVisualizationByBaseDataTransformFilter::SetBaseData(const NavigationData* nd, BaseData* data)
 {
+  if (nd == NULL || data == NULL)
+    return false;
+
   //pair for returning the result
   std::pair<RepresentationPointerMap::iterator, bool> returnEl;
   
@@ -62,13 +67,20 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
 
     mitk::NavigationData* output = this->GetOutput(index);
     assert(output);
-    output->Graft(nd); // copy all information from input to output
-    
+        
     //check if the dada is valid
-    if ( ! nd->IsDataValid())
+    if (!nd->IsDataValid())
+    {
+      output->SetDataValid(false);
       continue;
-
+    }
+    output->Graft(nd); // copy all information from input to output
     const mitk::BaseData* data = this->GetBaseData(nd);
+    if (data == NULL)
+    {
+      itkWarningMacro("Wrong BaseData associated with NavigationData!");
+      return;
+    }
     
     //get the transform from data
     mitk::AffineTransform3D::Pointer affineTransform = data->GetGeometry()->GetIndexToWorldTransform();
@@ -78,6 +90,12 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
       itkWarningMacro("AffineTransform IndexToWorldTransform not initialized!");
       return;
     }
+
+    //store the current scaling to set it after transformation
+    mitk::Vector3D spacing = data->GetGeometry()->GetSpacing();
+    //clear spacing of data to be able to set it again afterwards
+    float scale[] = {1.0, 1.0, 1.0};
+    data->GetGeometry()->SetSpacing(scale);
 
     /*now bring quaternion to affineTransform by using vnl_Quaternion*/
     affineTransform->SetIdentity();
@@ -97,14 +115,19 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     static AffineTransform3D::MatrixType m;
     mitk::TransferMatrix(quatTransform->GetMatrix(), m);
     affineTransform->SetMatrix(m);
-
-
+    
     ///*set the offset by convert from itkPoint to itkVector and setting offset of transform*/
     mitk::Vector3D pos;
     pos.Set_vnl_vector(nd->GetPosition().Get_vnl_vector());
     affineTransform->SetOffset(pos);
     affineTransform->Modified();
-    data->GetGeometry()->TransferItkToVtkTransform();
+    
+    //set the transform to data
+    data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+
+    //set the original spacing to keep scaling of the geometrical object
+    data->GetGeometry()->SetSpacing(spacing);
+
     data->GetGeometry()->Modified();
     data->Modified();
 

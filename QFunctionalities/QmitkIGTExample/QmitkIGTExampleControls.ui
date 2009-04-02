@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>260</width>
-            <height>394</height>
+            <width>287</width>
+            <height>710</height>
         </rect>
     </property>
     <property name="minimumSize">
@@ -21,19 +21,115 @@
     <property name="caption">
         <string>QmitkIGTExample</string>
     </property>
-    <vbox>
+    <grid>
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QPushButton">
+        <widget class="QGroupBox" row="0" column="0">
             <property name="name">
-                <cstring>m_StartTrackingButton</cstring>
+                <cstring>m_TrackingDeviceContainer</cstring>
             </property>
-            <property name="text">
-                <string>Start MITK-IGT-Tracking Test</string>
+            <property name="title">
+                <string>Select Tracking Device</string>
             </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QComboBox">
+                    <item>
+                        <property name="text">
+                            <string>NDI Polaris</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>NDI Aurora</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>Micron Tracker</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>MicroBird</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>RandomTrackingDevice</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>m_TrackingDevice</cstring>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout5</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>m_LoadToolBtn</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Load Tool</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_ToolFileName</cstring>
+                            </property>
+                            <property name="text">
+                                <string></string>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout4</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>m_PortLabel</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Port (e.g. COM4, /dev/ttyUSB0):</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>m_Port</cstring>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>80</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                            <property name="frameShape">
+                                <enum>LineEditPanel</enum>
+                            </property>
+                            <property name="frameShadow">
+                                <enum>Sunken</enum>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
         </widget>
-        <widget class="QPushButton">
+        <widget class="QPushButton" row="2" column="0">
             <property name="name">
                 <cstring>m_StartNavigationButton</cstring>
             </property>
@@ -41,7 +137,7 @@
                 <string>Start MITK-IGT-Navigation Test</string>
             </property>
         </widget>
-        <widget class="QGroupBox">
+        <widget class="QGroupBox" row="3" column="0">
             <property name="name">
                 <cstring>groupBox1</cstring>
             </property>
@@ -73,7 +169,7 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QPushButton">
+        <widget class="QPushButton" row="4" column="0">
             <property name="name">
                 <cstring>m_MeasureBtn</cstring>
             </property>
@@ -84,7 +180,18 @@
                 <string>Measure!</string>
             </property>
         </widget>
-        <widget class="QPushButton">
+        <widget class="QPushButton" row="5" column="0">
+            <property name="name">
+                <cstring>m_MeasureContinuously</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>Start measure continuously</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="6" column="0">
             <property name="name">
                 <cstring>m_StopBtn</cstring>
             </property>
@@ -95,7 +202,7 @@
                 <string>End MITK-IGT-Navigation Test</string>
             </property>
         </widget>
-        <widget class="QLayoutWidget">
+        <widget class="QLayoutWidget" row="7" column="0">
             <property name="name">
                 <cstring>layout2</cstring>
             </property>
@@ -157,7 +264,7 @@
                 </widget>
             </hbox>
         </widget>
-        <spacer>
+        <spacer row="10" column="0">
             <property name="name">
                 <cstring>spacer2</cstring>
             </property>
@@ -170,11 +277,35 @@
             <property name="sizeHint">
                 <size>
                     <width>20</width>
-                    <height>60</height>
+                    <height>80</height>
                 </size>
             </property>
         </spacer>
-    </vbox>
+        <widget class="QPushButton" row="1" column="0">
+            <property name="name">
+                <cstring>m_StartTrackingButton</cstring>
+            </property>
+            <property name="text">
+                <string>Start MITK-IGT-Tracking Test</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="9" column="0">
+            <property name="name">
+                <cstring>m_StartPlayingButton</cstring>
+            </property>
+            <property name="text">
+                <string>Start Replaying</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="8" column="0">
+            <property name="name">
+                <cstring>m_StartRecordingButton</cstring>
+            </property>
+            <property name="text">
+                <string>Start Recording Test</string>
+            </property>
+        </widget>
+    </grid>
 </widget>
 <connections>
     <connection>
@@ -182,6 +313,24 @@
         <signal>clicked()</signal>
         <receiver>QmitkIGTExampleControls</receiver>
         <slot>m_ChangeOffset_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_TrackingDevice</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>QmitkIGTExampleControls</receiver>
+        <slot>m_TrackingDevice_textChanged(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>m_LoadToolBtn</sender>
+        <signal>clicked()</signal>
+        <receiver>QmitkIGTExampleControls</receiver>
+        <slot>m_LoadToolBtn_clicked()</slot>
+    </connection>
+    <connection>
+        <sender>m_TrackingDevice</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>QmitkIGTExampleControls</receiver>
+        <slot>m_TrackingDevice_textChanged(const QString&amp;)</slot>
     </connection>
 </connections>
 <includes>
@@ -196,10 +345,14 @@
 </signals>
 <slots>
     <slot>m_ChangeOffset_clicked()</slot>
+    <slot>m_TrackingDevice_textChanged( const QString &amp; )</slot>
+    <slot>m_LoadToolBtn_clicked()</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>
     <function>SetDisplacementFilterParameters( mitk::PropertyList * p )</function>
+    <function returnType="const char *">GetSelectedTrackingDevice()</function>
+    <function returnType="const char *">GetToolFileName()</function>
 </functions>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 mitk::WindowsRealTimeClock::WindowsRealTimeClock()
 {
-  QueryPerformanceFrequency(&m_Frequency);
+  SetFrequency();
 }
 
 /**
@@ -37,28 +37,38 @@ mitk::WindowsRealTimeClock::~WindowsRealTimeClock()
 
 }
 
+void mitk::WindowsRealTimeClock::SetFrequency()
+{
+  if ( !QueryPerformanceFrequency(&m_Frequency) )
+  {
+    m_Frequency.QuadPart = 0;
+  }
+}
 
 /**
 * \brief returns the current time in milliseconds as a double
 */
-double mitk::WindowsRealTimeClock::getCurrentStamp()
+double mitk::WindowsRealTimeClock::GetCurrentStamp()
 {
 // "if defined" not really necessary in this case, as the class is only available on Windows-systems
-//#if defined (WIN32) || defined (_WIN32)
   __int64 time, ticks = 0;
+
+  if (m_Frequency.QuadPart < 1)
+  {
+    return -1.0;
+  }
 
   QueryPerformanceCounter( (LARGE_INTEGER*) &ticks);
   time = (ticks * 100000) / this->m_Frequency.QuadPart;
   double milliseconds = (double) (time & 0xffffffff);
   (double) milliseconds /= 100.0;
   return milliseconds;
-//#endif
 }
 
 /**
 * \brief returns the QueryPerformanceFrequency, needed for acquiring the time from ticks
 */
-LARGE_INTEGER mitk::WindowsRealTimeClock::getFrequency()
+LARGE_INTEGER mitk::WindowsRealTimeClock::GetFrequency()
 {
   return this->m_Frequency;
 }

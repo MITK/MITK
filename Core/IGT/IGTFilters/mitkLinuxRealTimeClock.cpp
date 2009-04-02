@@ -43,16 +43,19 @@ mitk::LinuxRealTimeClock::~LinuxRealTimeClock()
 *
 * \return Returns the elapsed time in milliseconds
 */
-double mitk::LinuxRealTimeClock::getCurrentStamp()
+double mitk::LinuxRealTimeClock::GetCurrentStamp()
 {
   struct timeval tval;
 
-  ::gettimeofday( &tval, 0 );
+  if ( ::gettimeofday( &tval, 0 )!= 0 )
+  {
+    itkGenericOutputMacro("gettimeofday-method could not successfully acquire the current time");
+    return -1;
+  }
   double milliseconds;
 
   milliseconds = static_cast< double >( tval.tv_sec ) +
-          static_cast< double >( tval.tv_usec ) / 1e6;
+    static_cast< double >( tval.tv_usec ) / 1e6;
 
   return milliseconds*1000; // in milliseconds
 }
-

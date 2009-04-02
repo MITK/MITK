@@ -22,24 +22,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkNavigationDataSource.h>
 
-
-namespace mitk {
+namespace mitk 
+{
 
   /**Documentation
-  * \brief NavigationDataToNavigationDataFilter
+  * \brief NavigationDataToNavigationDataFilter is the base class of all filters that receive 
+  * NavigationDatas as input and produce NavigationDatas as output
   *
   * Base class that for all navigation filters that receive NavigationData objects as input 
   * and produce NavigationData objects as output.
   * This class defines the input-interface for NavigationDataFilters. 
   *
-  * @ingroup Navigation
+  * \ingroup IGT
   */
   class NavigationDataToNavigationDataFilter : public NavigationDataSource
   {
   public:
     mitkClassMacro(NavigationDataToNavigationDataFilter, NavigationDataSource);
 
-    /**Documentation
+    /**
     * \brief Set the input of this filter
     *
     * \warning: this will set the number of outputs to the number of inputs, 
@@ -49,7 +50,7 @@ namespace mitk {
     */
     virtual void SetInput( const NavigationData* nd);
 
-    /**Documentation
+    /**
     * \brief Set input with id idx of this filter
     *
     * \warning: this will set the number of outputs to the number of inputs, 
@@ -58,22 +59,22 @@ namespace mitk {
     * must overwrite the SetInput methods.
     */
     virtual void SetInput( unsigned int idx, const NavigationData* nd);
-    
-    /**Documentation
+
+    /**
     * \brief Get the input of this filter
     */
     const NavigationData* GetInput(void);
-    
-    /**Documentation
+
+    /**
     * \brief Get the input with id idx of this filter
     */
     const NavigationData* GetInput(unsigned int idx);
-    
+
   protected:
     NavigationDataToNavigationDataFilter();
     virtual ~NavigationDataToNavigationDataFilter();
-    
-    /**Documentation
+
+    /**
     * \brief Create an output for each input
     *
     * This Method sets the number of outputs to the number of inputs
@@ -83,5 +84,4 @@ namespace mitk {
     void CreateOutputsForAllInputs();
   };
 } // namespace mitk
-
 #endif /* MITKNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

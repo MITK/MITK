@@ -25,10 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  /**Documentation
-  * @brief Class that reads navigationData from input and transfers the information to associated DataTreeNodes
+  /**
+  * \brief Class that reads NavigationData from input and transfers the information to the geometry of the associated BaseData
   *
-  * @ingroup Navigation
+  * Derived from NavigationDataVisualizationFilter
+  *
+  * \ingroup IGT
   */
   class NavigationDataVisualizationByBaseDataTransformFilter : public NavigationDataVisualizationFilter
   {
@@ -37,45 +39,69 @@ namespace mitk {
 
     itkNewMacro(Self);
 
-    /** Smart Pointer type to a DataTreeNode. */
+    /** 
+    * \brief Smart Pointer type to a BaseData. 
+    */
     typedef BaseData::Pointer RepresentationPointer;
 
-    /** STL map of SmartPointers to DataTreeNodes and an index. Using map to be able to set non continuous indices*/
+    /** 
+    * \brief STL map of SmartPointers to BaseData and an index. Using map to be able to set non continuous indices
+    */
     typedef std::map<const NavigationData*, RepresentationPointer> RepresentationPointerMap;
-    /** Size type of an std::vector */
+    
+    /** 
+    * \brief Size type of an std::vector 
+    */
     typedef RepresentationPointerMap::size_type RepresentationPointerMapSizeType;
 
-    /** Set the DataTreeNode of the tool specified by the given index */
+    /** 
+    * \brief Set the BaseData of the tool specified by the given NavigationData
+    * \param data The BaseData to be associated to the NavigationData nd
+    * \param nd Specification of the NavigationData tha data will be associated to
+    * \return Returns true if the tool has been added, false otherwise.
+    */
     bool SetBaseData(const NavigationData* nd, BaseData* data);
     
-    /** Get the DataTreeNode of the tool specified by the given index */
+    /** 
+    * \brief Get the BaseData of the tool specified by the given NavigationData
+    * \param nd The NavigationData of the BaseData that has to be returned
+    * \return Returns the desired BaseData if the NavigationData could be found; Returns Null if no nd was found or if nd is NULL.
+    */
     const BaseData* GetBaseData(const NavigationData* nd) const;
   
-    /** Get the size of the DataTreeNode vector.  This is merely the size of
-    * the vector, not the number of dataTreeNodes that have valid
-    * DataObject's assigned. Use GetNumberOfValidRequiredDataTreeNodes() to
-    * determine how many DataTreeNodes are non-null. */
+    /** 
+    *\brief Get the number of added BaseData associated to NavigationData 
+    * \return Returns the size of the internal map
+    */
     RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
     {return m_RepresentationList.size();}
 
     /*
-    * @brief Transfer the informations from the input to the associated BaseData
+    * \brief Transfer the information from the input to the associated BaseData
     */
     virtual void GenerateData();
 
 
   protected:
+    /**
+    * \brief Constructor
+    **/
     NavigationDataVisualizationByBaseDataTransformFilter();
-    ~NavigationDataVisualizationByBaseDataTransformFilter();
-
 
     /**
-    * @brief Create a BaseData that represents the given tool
+    * \brief Destructor
+    **/
+    ~NavigationDataVisualizationByBaseDataTransformFilter();
+
+    /**
+    * \brief Create a BaseData that represents the given tool
     **/
     void CreateToolRepresenation();
 
   private:
-    /** An array of the DataTreeNodes which represent the tools. */
+    /** 
+    * \brief An array of the BaseData which represent the tools. 
+    */
     RepresentationPointerMap m_RepresentationList;
   };
 } // namespace mitk

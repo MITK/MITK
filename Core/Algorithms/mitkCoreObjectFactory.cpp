@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCylinder.h"
 #include "mitkDataTreeNode.h"
 #include "mitkEllipsoid.h"
+#include "mitkEnhancedPointSetVtkMapper3D.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkGeometry2DData.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -67,6 +68,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+
+
 
 #include "mitkPicFileIOFactory.h"
 #include "mitkPointSetIOFactory.h"
@@ -357,6 +360,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     else if((dynamic_cast<PointSet*>(data)!=NULL))
     {
       newMapper = mitk::PointSetVtkMapper3D::New();
+      //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
       newMapper->SetDataTreeNode(node);
     }
     else if((dynamic_cast<PointData*>(data)!=NULL))

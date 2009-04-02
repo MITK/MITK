@@ -41,7 +41,7 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(internalTrackingTool.IsNotNull(),"Testing instantiation")
+  MITK_TEST_CONDITION_REQUIRED(internalTrackingTool.IsNotNull(),"Testing instantiation");
 
     // test for Enable()
   internalTrackingTool->Enable();
@@ -87,6 +87,6 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
   // do not write to std::cout and do not return from this function yourself!
   
   // always end with this!
-  MITK_TEST_END()
+  MITK_TEST_END();
 }
 

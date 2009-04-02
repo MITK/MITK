@@ -73,21 +73,21 @@ void mitk::InternalTrackingTool::GetPosition(mitk::Point3D& position) const
   position[0] = m_Position[0];
   position[1] = m_Position[1];
   position[2] = m_Position[2];
+  this->Modified();
   m_MyMutex->Unlock();
 }
 
 
-void mitk::InternalTrackingTool::SetPosition(Point3D position)
+void mitk::InternalTrackingTool::SetPosition(mitk::Point3D position)
 {
-  m_MyMutex->Lock();
-  bool modified = false;
-  if (m_Position!=position)
-  {
-    m_Position = position;
-    modified = true;
+  m_MyMutex->Lock();  
+  if (mitk::Equal(position, m_Position))
+  { 
+    m_MyMutex->Unlock();
+    return;
   }
-  if (modified == true)
-    this->Modified();
+  m_Position = position;
+  this->Modified();
   m_MyMutex->Unlock();
 }
 
@@ -103,14 +103,13 @@ void mitk::InternalTrackingTool::GetOrientation(mitk::Quaternion& orientation) c
 void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 {
   m_MyMutex->Lock();
-  bool modified = false;
-  if (m_Orientation!=orientation)
-  {
-    m_Orientation = orientation;
-    modified = true;
+  if (mitk::Equal(orientation, m_Orientation))
+  { 
+    m_MyMutex->Unlock();
+    return;
   }
-  if (modified == true)
-    this->Modified();
+  m_Orientation = orientation;
+  this->Modified();
   m_MyMutex->Unlock();
 }
 
@@ -118,7 +117,13 @@ void mitk::InternalTrackingTool::SetOrientation(mitk::Quaternion orientation)
 void mitk::InternalTrackingTool::SetTrackingError(float error)
 {
   m_MyMutex->Lock();
+  if (error == m_TrackingError)
+  { 
+    m_MyMutex->Unlock();
+    return;
+  }
   m_TrackingError = error;
+  this->Modified();
   m_MyMutex->Unlock();
 }
 
@@ -129,14 +134,13 @@ float mitk::InternalTrackingTool::GetTrackingError() const
   float r = m_TrackingError;
   m_MyMutex->Unlock();
   return r;
-
 }
 
 
 bool mitk::InternalTrackingTool::Enable()
 {
   m_MyMutex->Lock();
-  if (IsEnabled() == false)
+  if (m_Enabled == false)
   {
     this->m_Enabled = true;
     this->Modified();
@@ -149,7 +153,7 @@ bool mitk::InternalTrackingTool::Enable()
 bool mitk::InternalTrackingTool::Disable()
 {
   m_MyMutex->Lock();
-  if (IsEnabled() == true)
+  if (m_Enabled == true)
   {
     this->m_Enabled = false;
     this->Modified();

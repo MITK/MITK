@@ -7,6 +7,7 @@
 #include "mitkPACSPlugin.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkCommon.h"
+#include "mitkDelegateManager.h"
 
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageTableModel.h>
@@ -34,6 +35,17 @@
 #include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
+
+QmitkDataManagerView::QmitkDataManagerView()
+{
+  mitk::DelegateManager::GetInstance()->SetCommand("Show Node Info"
+    , new mitk::MessageDelegate<QmitkDataManagerView>( this, &QmitkDataManagerView::ShowNodeInfo ));
+}
+
+QmitkDataManagerView::~QmitkDataManagerView()
+{
+  mitk::DelegateManager::GetInstance()->RemoveCommand("Show Node Info");
+}
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
@@ -148,6 +160,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QObject::connect( m_NodeTableView, SIGNAL(clicked(const QModelIndex&))
     , this, SLOT( NodeTableViewClicked( const QModelIndex& )) );
+
+  QObject::connect( m_NodeTableView->selectionModel(), SIGNAL(currentChanged ( const QModelIndex&, const QModelIndex& ))
+    , this, SLOT( NodeTableViewSelectionChanged( const QModelIndex&, const QModelIndex& )) );
   
   QObject::connect( m_NodeTableView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
@@ -172,23 +187,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
 }
 
-void QmitkDataManagerView::NodeAdded(const mitk::DataTreeNode* node)
-{
-}
-
 void QmitkDataManagerView::Activated()
 {
-
+  if(m_NodeTableView && m_NodeTableView->currentIndex().isValid())
+    NodeTableViewClicked(m_NodeTableView->currentIndex());
+  else
+    if(m_NodePropertiesTableEditor)
+      m_NodePropertiesTableEditor->SetPropertyList(0);
 }
 
 void QmitkDataManagerView::Deactivated()
 {
-
-}
-
-QmitkDataManagerView::~QmitkDataManagerView()
-{
-  //this->GetSite()->GetPage()->RemovePartListener(m_MultiWidgetListener);
 }
 
 void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
@@ -196,18 +205,21 @@ void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
   std::cout << "DataStorageSelectionChanged\n";
 }
 
-void QmitkDataManagerView::OnPredicateChanged()
-{
-  std::cout << "OnPredicateChanged\n";
-}
-
 void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 {
-  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(index);
-  if(selectedNode.IsNotNull())
-    m_NodePropertiesTableEditor->setNode(selectedNode);
+  // select this item if not already selected
+  if(m_NodeTableView->currentIndex() != index)
+  {
+    m_NodeTableView->setCurrentIndex(index);
+  }
+}
 
-  std::cout << "NodeTableViewClicked\n";
+
+void QmitkDataManagerView::NodeTableViewSelectionChanged( const QModelIndex & current, const QModelIndex & previous )
+{
+  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(current);
+  if(selectedNode.IsNotNull())
+    m_NodePropertiesTableEditor->SetPropertyList(selectedNode->GetPropertyList());
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
@@ -270,10 +282,8 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
 
-    case QMessageBox::No:
-    case QMessageBox::Cancel: 
-    default:
-      break;
+    case QMessageBox::No: break;
+    case QMessageBox::Cancel: break;
   }
 }
 
@@ -358,4 +368,39 @@ void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
     std::cout << "PACS export dialog cancelled by user." << std::endl;
   }*/
 
+}
+
+void QmitkDataManagerView::ShowNodeInfo()
+{
+  QModelIndex current = m_NodeTableView->currentIndex();
+  if(!current.isValid())
+    return;
+
+  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(current);
+  QString nodeName = QString::fromStdString(selectedNode->GetName());
+  bool nodeIsVisible = false;
+  selectedNode->GetVisibility(nodeIsVisible, 0);
+
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Node Info");
+  
+  QString info("node name: %1\nvisible: %2");
+  info = info.arg(nodeName).arg(nodeIsVisible);
+  msgBox.setText(info);
+  msgBox.exec();
+}
+
+void QmitkDataManagerView::SingleNodeSelection::SetNode( mitk::DataTreeNode* _SelectedNode )
+{
+  m_Node = _SelectedNode;
+}
+
+mitk::DataTreeNode* QmitkDataManagerView::SingleNodeSelection::GetNode() const
+{
+  return m_Node;
+}
+
+bool QmitkDataManagerView::SingleNodeSelection::IsEmpty() const
+{
+  return ( m_Node == 0 );
 }

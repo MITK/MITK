@@ -5,5 +5,14 @@
      <file>save-chili.xpm</file>
      <file>refresh.xpm</file>
      <file>remove.xpm</file>
+     <file>data-type-image-24.png</file>	
+     <file>data-type-image-mask-24.png</file>
+     <file>data-type-mesh-24.png</file> 
+     <file>data-type-planegeometries-24.png</file> 
+     <file>data-type-planegeometry1-24.png</file> 
+     <file>data-type-planegeometry2-24.png</file> 
+     <file>data-type-planegeometry3-24.png</file>
+     <file>data-type-pointset-24.png</file> 
+     <file>data-type-unknown-24.png</file> 
  </qresource>
  </RCC>

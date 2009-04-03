@@ -293,7 +293,7 @@ void mitk::TransferFunction::InitializeHistogram( const mitk::Image * image )
 void mitk::TransferFunction::SetTransferFunctionMode( int mode )
 {
   //Define Transfer Function
-  typedef enum TransferFunctionMode{TF_SKIN_50, TF_SKIN_75, TF_CT_AAA, TF_CT_Bone, TF_CT_CARDIAC, TF_CT_CA, TF_MR_Default, TF_MR_MIP, TF_MITK_DEFAULT};
+  enum TransferFunctionMode{TF_SKIN_50, TF_SKIN_75, TF_CT_AAA, TF_CT_Bone, TF_CT_CARDIAC, TF_CT_CA, TF_MR_Default, TF_MR_MIP, TF_MITK_DEFAULT};
 
   //remove all old points
   m_ScalarOpacityFunction->RemoveAllPoints();

@@ -300,6 +300,10 @@ void mitk::TransferFunction::SetTransferFunctionMode( int mode )
   m_ColorTransferFunction->RemoveAllPoints();
   m_GradientOpacityFunction->RemoveAllPoints();
 
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION >= 2)  )
+
+  //VTK Version >= 5.2
+
   switch( mode )
   {
   case ( TF_SKIN_50 ):
@@ -526,4 +530,239 @@ void mitk::TransferFunction::SetTransferFunctionMode( int mode )
 
     break;
   }
+
+#else
+
+//VTK Version < 5.2
+
+switch( mode )
+{
+case ( TF_SKIN_50 ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( 0.055176, 0.0 );
+  m_ScalarOpacityFunction->AddPoint( 27.879, 0.0 );
+  m_ScalarOpacityFunction->AddPoint( 87.593, 1.0);
+  m_ScalarOpacityFunction->AddPoint( 551.76, 1.0 );
+
+  //Set Color
+  m_ColorTransferFunction->AddRGBPoint( 0.055176, 0.75, 0.60, 0.35 );
+  m_ColorTransferFunction->AddRGBPoint( 551.76, 0.75, 0.60, 0.35 );
+
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );  
+
+  break;
+
+case ( TF_SKIN_75 ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( 0.055176, 0.0 );
+  m_ScalarOpacityFunction->AddPoint( 87.593, 0.0 );
+  m_ScalarOpacityFunction->AddPoint( 198.84, 1.0);
+  m_ScalarOpacityFunction->AddPoint( 551.76, 1.0 );
+
+  //Set Color
+  m_ColorTransferFunction->AddRGBPoint( 0.055176, 0.75, 0.60, 0.35 );
+  m_ColorTransferFunction->AddRGBPoint( 551.76, 0.75, 0.60, 0.35 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_CT_AAA ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( -3024, 0 );
+  m_ScalarOpacityFunction->AddPoint( 143.556, 0 );
+  m_ScalarOpacityFunction->AddPoint( 166.222, 0.686275 );
+  m_ScalarOpacityFunction->AddPoint( 214.389, 0.696078 );
+  m_ScalarOpacityFunction->AddPoint( 419.736, 0.833333 );
+  m_ScalarOpacityFunction->AddPoint( 3071, 0.803922 );
+
+  //Set Color
+  m_ColorTransferFunction->AddRGBPoint( -3024, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 143.556, 0.615686, 0.356863, 0.184314 );
+  m_ColorTransferFunction->AddRGBPoint( 166.222, 0.882353, 0.603922, 0.290196 );
+  m_ColorTransferFunction->AddRGBPoint( 214.389, 1, 1, 1 );
+  m_ColorTransferFunction->AddRGBPoint( 419.736, 1, 0.937033, 0.954531 );
+  m_ColorTransferFunction->AddRGBPoint( 3071, 0.827451, 0.658824, 1 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_CT_Bone ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( -3024, 0 );
+  m_ScalarOpacityFunction->AddPoint( -16.4458, 0 );
+  m_ScalarOpacityFunction->AddPoint( 641.385, 0.715686 );
+  m_ScalarOpacityFunction->AddPoint( 3071, 0.705882 );
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint( -3024, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( -16.4458, 0.729412, 0.254902, 0.301961 );
+  m_ColorTransferFunction->AddRGBPoint( 641.385, 0.905882, 0.815686, 0.552941 );
+  m_ColorTransferFunction->AddRGBPoint( 3071, 1, 1, 1 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+  break;
+
+case ( TF_CT_CARDIAC ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( -3024, 0);
+  m_ScalarOpacityFunction->AddPoint( -77.6875, 0 );
+  m_ScalarOpacityFunction->AddPoint( 94.9518, 0.285714 );
+  m_ScalarOpacityFunction->AddPoint( 179.052, 0.553571 );
+  m_ScalarOpacityFunction->AddPoint( 260.439, 0.848214 );
+  m_ScalarOpacityFunction->AddPoint( 3071, 0.875 );
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint( -3024, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( -77.6875, 0.54902, 0.25098, 0.14902 );
+  m_ColorTransferFunction->AddRGBPoint( 94.9518, 0.882353, 0.603922, 0.290196 );
+  m_ColorTransferFunction->AddRGBPoint( 179.052, 1, 0.937033, 0.954531 );
+  m_ColorTransferFunction->AddRGBPoint( 260.439, 0.615686, 0, 0);
+  m_ColorTransferFunction->AddRGBPoint( 3071, 0.827451, 0.658824, 1 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_CT_CA ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( -2048, 0);
+  m_ScalarOpacityFunction->AddPoint( 142.677, 0 );
+  m_ScalarOpacityFunction->AddPoint( 145.016, 0.116071 );
+  m_ScalarOpacityFunction->AddPoint( 192.174, 0.5625 );
+  m_ScalarOpacityFunction->AddPoint( 217.24, 0.776786 );
+  m_ScalarOpacityFunction->AddPoint( 384.347, 0.830357 );
+  m_ScalarOpacityFunction->AddPoint( 3661, 0.830357 );
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint( -2048, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 142.677, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 145.016, 0.615686, 0, 0.0156863 );
+  m_ColorTransferFunction->AddRGBPoint( 192.174, 0.909804, 0.454902, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 217.24, 0.972549, 0.807843, 0.611765 );
+  m_ColorTransferFunction->AddRGBPoint( 384.347, 0.909804, 0.909804, 1 );
+  m_ColorTransferFunction->AddRGBPoint( 3661, 1, 1, 1 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_MR_Default ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( 0, 0 );
+  m_ScalarOpacityFunction->AddPoint( 20, 0 );
+  m_ScalarOpacityFunction->AddPoint( 40, 0.15 );
+  m_ScalarOpacityFunction->AddPoint( 120, 0.3 );
+  m_ScalarOpacityFunction->AddPoint( 220, 0.375 );
+  m_ScalarOpacityFunction->AddPoint( 1024, 0.5 );
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint( 0, 0, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 20, 0.168627, 0, 0 );
+  m_ColorTransferFunction->AddRGBPoint( 40, 0.403922, 0.145098, 0.0784314 );
+  m_ColorTransferFunction->AddRGBPoint( 120, 0.780392, 0.607843, 0.380392 );
+  m_ColorTransferFunction->AddRGBPoint( 220, 0.847059, 0.835294, 0.788235 );
+  m_ColorTransferFunction->AddRGBPoint( 1024, 1, 1, 1  );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_MR_MIP ):
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint( 0, 0 );
+  m_ScalarOpacityFunction->AddPoint( 98.3725, 0 );
+  m_ScalarOpacityFunction->AddPoint( 416.637, 1 );
+  m_ScalarOpacityFunction->AddPoint( 2800, 0 );
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint( 0, 1, 1, 1 );
+  m_ColorTransferFunction->AddRGBPoint( 98.3725, 1, 1, 1 );
+  m_ColorTransferFunction->AddRGBPoint( 416.637, 1, 1, 1 );
+  m_ColorTransferFunction->AddRGBPoint( 2800, 1, 1, 1 );
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint( 0, 1 );
+  m_GradientOpacityFunction->AddPoint( 255, 1 );
+
+  break;
+
+case ( TF_MITK_DEFAULT ): //Old MITK Transfer Function Style
+
+  //Set Opacity
+  m_ScalarOpacityFunction->Initialize();
+  m_ScalarOpacityFunction->AddPoint(m_Min,0.0);
+  m_ScalarOpacityFunction->AddPoint(0.0,0.0);
+  m_ScalarOpacityFunction->AddPoint(m_Max,1.0);
+
+  //Set Color
+  m_ColorTransferFunction->RemoveAllPoints();
+  m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
+  m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
+  m_ColorTransferFunction->SetColorSpaceToHSV();
+
+  //Set Gradient
+  m_GradientOpacityFunction->Initialize();
+  m_GradientOpacityFunction->AddPoint(m_Min,0.0);
+  m_GradientOpacityFunction->AddPoint(0.0,1.0);
+  m_GradientOpacityFunction->AddPoint((m_Max*0.125),1.0);
+  m_GradientOpacityFunction->AddPoint((m_Max*0.2),1.0);
+  m_GradientOpacityFunction->AddPoint((m_Max*0.25),1.0);
+  m_GradientOpacityFunction->AddPoint(m_Max,1.0);
+
+  break;
+
+default:
+
+  break;
+}
+
+
+#endif
+
 }

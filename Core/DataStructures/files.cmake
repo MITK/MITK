@@ -1,4 +1,6 @@
 SET(H_FILES  
+  mitkDelegateProperty.h
+  mitkDelegateManager.h
   mitkGenericLookupTable.h
   mitkGenericLookupTableProperty.h
   mitkGenericProperty.h
@@ -49,6 +51,8 @@ SET(CPP_FILES
   mitkDataTreeFilterFunctions.cpp
   mitkDataTreeHelper.cpp
   mitkDataTreeNode.cpp
+  mitkDelegateProperty.cpp
+  mitkDelegateManager.cpp
   mitkDisplayGeometry.cpp
   mitkDrawOperation.cpp
   mitkEllipsoid.cpp

@@ -20,7 +20,9 @@
 #define QMITKCUSTOMVARIANTS_H_
 
 #include <mitkDataTreeNode.h>
+#include <mitkDelegateProperty.h>
 
 Q_DECLARE_METATYPE(mitk::DataTreeNode::Pointer)
+Q_DECLARE_METATYPE(mitk::DelegateProperty*)
 
 #endif /* QMITKCUSTOMVARIANTS_H_ */

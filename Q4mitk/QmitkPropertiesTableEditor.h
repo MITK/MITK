@@ -10,8 +10,7 @@
 /// Forward declarations.
 class QmitkPropertiesTableModel;
 class QTableView;
-class QCheckBox;
-class QComboBox;
+class QLineEdit;
 
 /// 
 /// \class QmitkPropertiesTableEditor
@@ -36,14 +35,9 @@ public:
   virtual ~QmitkPropertiesTableEditor();
 
   ///
-  /// Convenience method. Sets the node in the model.
+  /// Convenience method. Sets the property list in the model.
   ///
-  void setNode(mitk::DataTreeNode* _Node);
-
-  ///
-  /// Convenience method. Get the node from the model.
-  /// 
-  //mitk::DataTreeNode::Pointer getNode() const;
+  void SetPropertyList(mitk::PropertyList::Pointer _List);
 
   ///
   /// Get the model.
@@ -51,20 +45,24 @@ public:
   QmitkPropertiesTableModel* getModel() const;
 
   protected slots:
-    void ChkShowRenderPropertiesToggled ( bool checked );
-    void ComboRendererCurrentIndexChanged ( int index );
-
+    void PropertyFilterKeyWordEditingFinished();
 protected:  
   ///
   /// Initialise empty GUI.
   ///
   virtual void init();
-
-  mitk::DataTreeNode* m_SelectedNode;
-
+  ///
+  /// The table view that renders the property list.
+  /// 
   QTableView* m_NodePropertiesTableView;
-  QCheckBox* m_ChkShowRenderProperties;
-  QComboBox* m_ComboRenderer;
+  ///
+  /// A text field in which the user can enter a filter keyword for the properties. Only properties beginning with this keyword
+  /// will be selected.
+  /// 
+  QLineEdit* m_TxtPropertyFilterKeyWord;
+  ///
+  /// The property list table model.
+  /// 
   QmitkPropertiesTableModel* m_Model;
 };
 

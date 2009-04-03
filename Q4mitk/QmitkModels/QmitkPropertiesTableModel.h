@@ -31,7 +31,7 @@
 
 /// 
 /// \class QmitkPropertiesTableModel
-/// \brief A table model for the properties of a node.
+/// \brief A table model for showing and editing mitk::Properties.
 ///
 /// \see QmitkPropertyDelegate
 class QMITK_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
@@ -67,7 +67,6 @@ public:
     /// \brief Creates a PropertyListElementCompareFunction. A CompareCriteria and a CompareOperator must be given.
     ///
     PropertyListElementCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
-
     ///
     /// \brief The reimplemented compare function.
     ///
@@ -77,6 +76,19 @@ public:
     protected:
       CompareCriteria m_CompareCriteria;
       CompareOperator m_CompareOperator;
+  };
+
+  struct PropertyListElementFilterFunction
+    : public std::unary_function<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >, bool>
+  {
+    PropertyListElementFilterFunction(const std::string& m_FilterKeyWord);
+    ///
+    /// \brief The reimplemented compare function.
+    ///
+    bool operator()(const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Elem) const;
+
+  protected:
+    std::string m_FilterKeyWord;
   };
 
   ///
@@ -150,6 +162,11 @@ public:
   ///
   void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder );
 
+  ///
+  /// \brief Set a keyword for filtering of properties. Only properties beginning with this string will be shown
+  ///
+  void SetFilterPropertiesKeyWord(std::string _FilterKeyWord);
+
 protected:
   ///
   /// \brief Searches for the specified property and returns the row of the element in this QTableModel. 
@@ -196,6 +213,11 @@ protected:
   /// \brief The property is true when the property list is sorted in descending order.
   ///
   bool m_SortDescending;
+
+  ///
+  /// \brief If set to any value, only properties with the specified keyword will be shown.
+  ///
+  std::string m_FilterKeyWord;
 };
 
 #endif /* QMITKPROPERTIESTABLEMODEL_H_ */

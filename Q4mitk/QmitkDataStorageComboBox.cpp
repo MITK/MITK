@@ -10,7 +10,7 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox(mitk::DataStorage::Pointer da
   init(dataStorage, pred);
 }
 
-QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent /*= 0*/, bool _AutoSelectFirstItem )
+QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoSelectFirstItem )
 : QComboBox(parent)
 , m_DataStorageListModel(0)
 , m_AutoSelectFirstItem(_AutoSelectFirstItem)
@@ -27,7 +27,7 @@ QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 
 void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
-  m_DataStorageListModel->SetDataStorage(dataStorage);
+  m_DataStorageListModel->SetDataStorage(dataStorage.GetPointer());
 }
 
 mitk::DataStorage::Pointer QmitkDataStorageComboBox::GetDataStorage() const
@@ -37,13 +37,14 @@ mitk::DataStorage::Pointer QmitkDataStorageComboBox::GetDataStorage() const
 
 void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
 {
-  mitk::DataTreeNode::Pointer node = 0;
+  mitk::DataTreeNode* node = 0;
   if(index >= 0)
   {
-    node = m_DataStorageListModel->GetDataNodes()->ElementAt(index);
+    node = m_DataStorageListModel->GetDataNodes().at(index);
   }
-  
-  emit OnSelectionChanged(node);
+  mitk::DataTreeNode::Pointer smartPtrToNode;
+  smartPtrToNode = node;
+  emit OnSelectionChanged(smartPtrToNode);
 }
    
 void QmitkDataStorageComboBox::SetPredicate(mitk::NodePredicateBase* pred)
@@ -62,13 +63,15 @@ mitk::NodePredicateBase* QmitkDataStorageComboBox::GetPredicate() const
 
 const mitk::DataTreeNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
 {
-  mitk::DataTreeNode::Pointer node = 0;
+  mitk::DataTreeNode* node = 0;
   int _CurrentIndex = this->currentIndex();
 
   if(_CurrentIndex >= 0)
-    node = m_DataStorageListModel->GetDataNodes()->at(_CurrentIndex);
+    node = m_DataStorageListModel->GetDataNodes().at(_CurrentIndex);
 
-  return node;
+  mitk::DataTreeNode::Pointer smartPtrToNode;
+  smartPtrToNode = node;
+  return smartPtrToNode;
 }
 
 void QmitkDataStorageComboBox::init(mitk::DataStorage::Pointer dataStorage, mitk::NodePredicateBase* pred)

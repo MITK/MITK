@@ -8,6 +8,8 @@
 /// Toolkit includes.
 #include <QAbstractTableModel>
 
+#include <itkWeakPointer.h>
+
 /// Forward declarations.
 class mitk::NodePredicateBase;
 
@@ -15,6 +17,7 @@ class mitk::NodePredicateBase;
 /// \class QmitkDataStorageTableModel
 ///
 /// \brief A table model for a set of DataTreeNodes defined by a predicate.
+/// \TODO make columns interchangeable, select which properties to show as columns
 ///
 class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
 {
@@ -110,7 +113,6 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// \brief Called when a single property was changed.
     ///
     virtual void PropertyModified(const itk::Object *caller, const itk::EventObject &event);
-
   protected:
     ///
     /// Called when DataStorage or Predicate changed. Resets whole model and reads all nodes
@@ -121,8 +123,10 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
     /// might be more than one DataStorage).
+    /// Store it in a weak pointer. This is a GUI class which should not hold a strong reference
+    /// to any non-GUI Object.
     ///
-    mitk::DataStorage::Pointer m_DataStorage;
+    itk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     ///
     /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
@@ -136,14 +140,15 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     mitk::DataStorage::SetOfObjects::Pointer m_NodeSet;
 
     ///
+    /// \brief Maps a property to an observer tag.
+    ///
+    std::map<mitk::BaseProperty*, unsigned long> m_PropertyModifiedObserverTags;
+
+    ///
     /// Saves if this model is currently working on events to prevent endless event loops.
     /// 
     bool m_BlockEvents;
 
-    ///
-    /// \brief Maps a property to an observer tag.
-    ///
-    std::map<mitk::BaseProperty*, unsigned long> m_PropertyModifiedObserverTags;
 };
 
 #endif

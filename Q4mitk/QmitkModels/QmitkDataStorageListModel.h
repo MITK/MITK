@@ -19,18 +19,22 @@
 #ifndef QMITKDATASTORAGELISTMODEL_H_
 #define QMITKDATASTORAGELISTMODEL_H_
 
+//# Own includes
+// mitk
+#include "mitkDataStorage.h"
+#include "mitkNodePredicateBase.h"
+#include "mitkCommon.h"
+// Qmitk
+
+//# Toolkit includes
+// Qt
 #include <QAbstractListModel>
+// stl
+#include <vector>
 
-#include <mitkDataStorage.h>
-#include <mitkNodePredicateBase.h>
-
-#include <QmitkEnums.h>
-#include <QmitkCustomVariants.h>
-
-class QMITK_EXPORT QmitkDataStorageListModel : public QAbstractListModel
+class QMITK_EXPORT QmitkDataStorageListModel: public QAbstractListModel
 {
 public:
-
   //# Ctors / Dtor
   ///
   /// The NodePredicate is owned by the model
@@ -46,11 +50,11 @@ public:
   void SetPredicate(mitk::NodePredicateBase* pred);
   mitk::NodePredicateBase* GetPredicate() const;
 
-  mitk::DataStorage::SetOfObjects::ConstPointer GetDataNodes() const; 
+  std::vector<mitk::DataTreeNode*> GetDataNodes() const; 
 
-  
+  mitk::DataTreeNode::Pointer getNode(const QModelIndex &index) const;
+
   //# From QAbstractListModel
-
   Qt::ItemFlags flags(const QModelIndex& index) const;
   QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -66,31 +70,56 @@ public:
   /// by deriving classes.
   ///
   virtual void NodeRemoved(const mitk::DataTreeNode* node);
+
+  ///
+  /// \brief Called when a itk::Object that is hold as a member variable was 
+  /// modified in order to react to it.
+  ///
+  virtual void OnModified(const itk::Object *caller, const itk::EventObject &event);
+
+  ///
+  /// \brief Called when a itk::Object that is hold as a member variable is about to be 
+  /// deleted in order to react to it.
+  ///
+  virtual void OnDelete(const itk::Object *caller, const itk::EventObject &event);
+
 protected:
+  ///
+  /// \brief Resets the whole model. Get all nodes matching the predicate from the data storage.
+  ///
   void reset();
 
+  ///
+  /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
+  /// is NULL all Nodes will be selected. *Attention: this class owns the predicate and deletes it*
+  ///
+  mitk::NodePredicateBase* m_NodePredicate;
 
   ///
   /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
   /// might be more than one DataStorage).
   ///
-  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::DataStorage* m_DataStorage;
 
   ///
-  /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
-  /// is NULL all Nodes will be selected.
+  /// \brief Holds the tag of the datastorage-delete observer.
   ///
-  mitk::NodePredicateBase* m_NodePredicate;
+  unsigned long m_DataStorageDeleteObserverTag;
 
   ///
-  /// Holds all selected Nodes.
+  /// Holds all selected Nodes. Dont hold smart pointer as we are in a GUI class.
   ///
-  mitk::DataStorage::SetOfObjects::ConstPointer m_DataNodes;
+  std::vector<mitk::DataTreeNode*> m_DataNodes;
+
+  ///
+  /// \brief Holds the tags of the node-modified observers.
+  ///
+  std::vector<unsigned long> m_DataNodesModifiedObserversTags;
 
   ///
   /// Saves if this model is currently working on events to prevent endless event loops.
   /// 
-  bool m_ProcessesEvents;
+  bool m_BlockEvents;
 };
 
 #endif /* QMITKDATASTORAGELISTMODEL_H_ */

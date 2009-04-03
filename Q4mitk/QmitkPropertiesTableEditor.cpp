@@ -11,15 +11,14 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QTableView>
-#include <QCheckBox>
-#include <QComboBox>
+#include <QLineEdit>
+#include <QLabel>
 
 #include <vtkRenderWindow.h>
 
 QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(mitk::DataTreeNode::Pointer _Node, QWidget* parent
                                                        , Qt::WindowFlags f)
 : QWidget(parent, f)
-, m_SelectedNode(0)
 , m_NodePropertiesTableView(0)
 , m_Model(0)
 {
@@ -35,14 +34,15 @@ QmitkPropertiesTableEditor::~QmitkPropertiesTableEditor()
 {
 }
 
-void QmitkPropertiesTableEditor::setNode(mitk::DataTreeNode* _Node)
+void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _List )
 {
-  m_SelectedNode = _Node;
-  if(m_SelectedNode)
+  if(_List.IsNotNull())
   {
-    m_Model->setPropertyList(m_SelectedNode->GetPropertyList());
+    m_Model->setPropertyList(_List);
+    m_NodePropertiesTableView->resizeColumnsToContents();
     m_NodePropertiesTableView->resizeRowsToContents();
 
+/*
     // refill the combo boxes
     m_ComboRenderer->clear();
 
@@ -77,11 +77,12 @@ void QmitkPropertiesTableEditor::setNode(mitk::DataTreeNode* _Node)
     {
       m_ComboRenderer->setCurrentText("no focused window");
     }
+*/
+
   }
   else
   {
     m_Model->setPropertyList(0);
-    m_ComboRenderer->clear();
   }
 }
 
@@ -92,54 +93,47 @@ QmitkPropertiesTableModel* QmitkPropertiesTableEditor::getModel() const
 
 void QmitkPropertiesTableEditor::init()
 {
-  // read
+  // read/ dim
   QVBoxLayout* _NodePropertiesLayout = new QVBoxLayout;
-  //QWidget* _PaneRendererSelection = new QWidget(this);
-  //QVBoxLayout* _RendererSelectionLayout = new QVBoxLayout;
-  m_ChkShowRenderProperties = new QCheckBox("Show Renderer Properties", QWidget::parentWidget());
-  m_ComboRenderer = new QComboBox(QWidget::parentWidget());
+  QWidget* _PropertyFilterKeyWordPane = new QWidget(QWidget::parentWidget());
+  QHBoxLayout* _PropertyFilterKeyWordLayout = new QHBoxLayout;
+  QLabel* _LabelPropertyFilterKeyWord = new QLabel("Filter: ",_PropertyFilterKeyWordPane);
+  m_TxtPropertyFilterKeyWord = new QLineEdit(_PropertyFilterKeyWordPane);
   m_NodePropertiesTableView = new QTableView(QWidget::parentWidget());
-  
-  // write
-  _NodePropertiesLayout->setMargin(0);
+
+  // write  
   setLayout(_NodePropertiesLayout);
+
+  _PropertyFilterKeyWordPane->setLayout(_PropertyFilterKeyWordLayout);
   
-  //_NodePropertiesLayout->addWidget(_PaneRendererSelection);
-  _NodePropertiesLayout->addWidget(m_ChkShowRenderProperties);
-  _NodePropertiesLayout->addWidget(m_ComboRenderer);
+  _PropertyFilterKeyWordLayout->setMargin(0);
+  _PropertyFilterKeyWordLayout->addWidget(_LabelPropertyFilterKeyWord);
+  _PropertyFilterKeyWordLayout->addWidget(m_TxtPropertyFilterKeyWord);
+
+  _NodePropertiesLayout->setMargin(0);
+  _NodePropertiesLayout->addWidget(_PropertyFilterKeyWordPane);
   _NodePropertiesLayout->addWidget(m_NodePropertiesTableView);
 
-// 
-//   _PaneRendererSelection->setLayout(_RendererSelectionLayout);
-//   _RendererSelectionLayout->addWidget(m_ChkShowRenderProperties);
-//   _RendererSelectionLayout->addWidget(m_ComboRenderer);
-
-  m_ChkShowRenderProperties->setChecked(false);
-
-  m_ComboRenderer->setEditable(false);
-  m_ComboRenderer->setEnabled(false);
-  
   m_NodePropertiesTableView->setSelectionMode( QAbstractItemView::SingleSelection );
   m_NodePropertiesTableView->setSelectionBehavior( QAbstractItemView::SelectItems );
   m_NodePropertiesTableView->verticalHeader()->hide();
   m_NodePropertiesTableView->setItemDelegate(new QmitkPropertyDelegate(this));
   m_NodePropertiesTableView->setAlternatingRowColors(true);
-  m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
+  //m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
   m_NodePropertiesTableView->setSortingEnabled(true);
-  //m_NodePropertiesTableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
-  //m_NodePropertiesTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
   m_NodePropertiesTableView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
-  QObject::connect( m_ChkShowRenderProperties, SIGNAL( toggled(bool) )
-    , this, SLOT( ChkShowRenderPropertiesToggled(bool) ) );
+  QObject::connect( m_TxtPropertyFilterKeyWord, SIGNAL( editingFinished() )
+    , this, SLOT( PropertyFilterKeyWordEditingFinished() ) );
 
-  QObject::connect( m_ComboRenderer, SIGNAL( currentIndexChanged(int) )
-    , this, SLOT( ComboRendererCurrentIndexChanged(int) ) );
-
-//   QObject::connect( m_NodePropertiesTableView->horizontalHeader(), SIGNAL( sectionClicked(int) )
-//     , m_NodePropertiesTableView, SLOT( sortByColumn(int) ) );
 }
 
+void QmitkPropertiesTableEditor::PropertyFilterKeyWordEditingFinished()
+{
+  m_Model->SetFilterPropertiesKeyWord(m_TxtPropertyFilterKeyWord->text().toStdString());
+}
+
+/*
 void QmitkPropertiesTableEditor::ChkShowRenderPropertiesToggled( bool checked )
 {
   m_ComboRenderer->setEnabled(checked);
@@ -174,3 +168,4 @@ void QmitkPropertiesTableEditor::ComboRendererCurrentIndexChanged( int index )
     m_NodePropertiesTableView->resizeRowsToContents();
   }
 }
+*/

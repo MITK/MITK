@@ -573,10 +573,11 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+
+      /* //old Transfer Function Version
       float m_Min = image->GetScalarValueMin();
       float m_Max = image->GetScalarValueMax();
 
-      /* //old Transfer Function Version
       tf->GetScalarOpacityFunction()->Initialize();
       tf->GetScalarOpacityFunction()->AddPoint ( m_Min, 0 );
       tf->GetScalarOpacityFunction()->AddPoint ( m_Max, 1 );

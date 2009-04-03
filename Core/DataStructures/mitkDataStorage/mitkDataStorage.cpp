@@ -24,13 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGroupTagProperty.h"
 #include "mitkDataTreeStorage.h"
 
-
+#include "itkCommand.h"
 
 mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
 
 
 mitk::DataStorage::DataStorage() 
 : itk::Object()
+, m_BlockNodeModifiedEvents(false)
 {
 }
 
@@ -244,4 +245,41 @@ void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataTreeNode* node)
 void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataTreeNode* node)
 {
   RemoveNodeEvent.Send(node);
+}
+
+void mitk::DataStorage::OnNodeModified( const itk::Object *caller, const itk::EventObject &event )
+{
+  if(m_BlockNodeModifiedEvents)
+    return;
+
+  const mitk::DataTreeNode* modifiedNode = dynamic_cast<const mitk::DataTreeNode*>(caller);
+  if(modifiedNode)
+  {
+    ChangedNodeEvent.Send(modifiedNode);
+  }
+}
+
+void mitk::DataStorage::AddModifiedListener( const mitk::DataTreeNode* _Node )
+{
+  // node must not be 0 and must not be yet registered
+  if(_Node && m_NodeModifiedObserverTags.find(_Node) == m_NodeModifiedObserverTags.end())
+  {
+    itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
+      itk::MemberCommand<mitk::DataStorage>::New();
+    nodeModifiedCommand->SetCallbackFunction(this, &DataStorage::OnNodeModified);
+    m_NodeModifiedObserverTags[_Node] 
+      = _Node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+  }
+}
+
+void mitk::DataStorage::RemoveModifiedListener( const mitk::DataTreeNode* _Node )
+{
+  // node must not be 0 and must be registered
+  if(_Node && m_NodeModifiedObserverTags.find(_Node) != m_NodeModifiedObserverTags.end())
+  {
+    unsigned long tag = m_NodeModifiedObserverTags.find(_Node)->second;
+    // const cast is bad! but sometimes it is necessary. removing an observer does not really
+    // touch the internal state
+    (const_cast<mitk::DataTreeNode*>(_Node))->RemoveObserver(tag);
+  }
 }

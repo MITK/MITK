@@ -65,6 +65,9 @@ void mitk::DataTreeStorage::NodeDeletedInTree(const itk::EventObject & treeChang
   if (node == NULL)
     return;
   
+  // remove ITK modified event listener
+  this->RemoveModifiedListener(node);
+
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
 
@@ -127,6 +130,10 @@ void mitk::DataTreeStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorag
     mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
+
+  // register for ITK changed events
+  this->AddModifiedListener(node);
+
   /* Notify observers */
   EmitAddNodeEvent(node);
 }
@@ -145,6 +152,9 @@ void mitk::DataTreeStorage::Remove(const mitk::DataTreeNode* node)
  
   m_DuringRemove = true;
 
+  // remove ITK modified event listener
+  this->RemoveModifiedListener(node);
+
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
 
@@ -158,6 +168,7 @@ void mitk::DataTreeStorage::Remove(const mitk::DataTreeNode* node)
   /* remove node from both relation adjacency lists */
   this->RemoveFromRelation(node, m_SourceNodes);
   this->RemoveFromRelation(node, m_DerivedNodes);
+
   m_DuringRemove = false;
 
 }

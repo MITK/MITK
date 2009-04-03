@@ -78,6 +78,10 @@ void mitk::StandaloneDataStorage::Add(mitk::DataTreeNode* node, const mitk::Data
     mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
     deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
   }
+
+  // register for ITK changed events
+  this->AddModifiedListener(node);
+
   /* Notify observers */
   EmitAddNodeEvent(node);
   
@@ -90,6 +94,9 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataTreeNode* node)
     throw 1;  // insert exception handling here
   if (node == NULL)
     return;
+
+  // remove ITK modified event listener
+  this->RemoveModifiedListener(node);
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);

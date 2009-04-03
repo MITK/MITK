@@ -213,6 +213,16 @@ namespace mitk {
     //## Note: RemoveEvents are also emitted if a node was removed from the DataStorage by deleting it from the underlying DataTree
     DataStorageEvent RemoveNodeEvent;
 
+    //##Documentation
+    //## @brief ChangedEvent is emitted directly before a node is removed from the DataStorage. 
+    //##
+    //## Observers should register to this event by calling myDataStorage->ChangedNodeEvent.AddListener(myObject, MyObject::MyMethod).
+    //## After registering, myObject->MyMethod() will be called every time a new node has been changed.
+    //## Observers should unregister by calling myDataStorage->ChangedNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
+    //## Internally the DataStorage listens to itk::ModifiedEvents on the nodes and forwards them
+    //## to the listeners of this event.
+    DataStorageEvent ChangedNodeEvent;
+
   protected:
 
     //TODO investigate removing friend declarations when DataStorage is
@@ -232,6 +242,30 @@ namespace mitk {
     //##
     //## This method should be called by subclasses to emit the RemoveNodeEvent
     void EmitRemoveNodeEvent(const mitk::DataTreeNode* node);
+
+    //##Documentation
+    //## @brief  OnNodeModified listens to modified events of DataTreeNodes.
+    //##
+    //## The node is hidden behind the caller parameter, which has to be casted first.
+    //## If the cast succeeds the ChangedNodeEvent is emitted with this node.
+    void OnNodeModified( const itk::Object *caller, const itk::EventObject &event );
+
+    //##Documentation
+    //## @brief  Adds a Modified-Listener to the given Node.
+    void AddModifiedListener(const mitk::DataTreeNode* _Node);
+
+    //##Documentation
+    //## @brief  Removes a Modified-Listener from the given Node.
+    void RemoveModifiedListener(const mitk::DataTreeNode* _Node);
+
+    //##Documentation
+    //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
+    std::map<const mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;
+
+    //##Documentation
+    //## @brief If this class changes nodes itself, set this to TRUE in order
+    //## to suppress NodeChangedEvent to be emitted.
+    bool m_BlockNodeModifiedEvents;
 
     //##Documentation
     //## @brief Standard Constructor for ::New() instantiation

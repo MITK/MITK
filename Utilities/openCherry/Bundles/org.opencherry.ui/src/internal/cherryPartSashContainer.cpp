@@ -884,9 +884,6 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
-  if (sourcePart == NULL) {
-    return IDropTarget::Pointer(0);
-  }
   PartStack::Pointer sourceContainer = draggedObject.Cast<PartStack> ();
   if (sourceContainer == 0)
   {
@@ -898,11 +895,12 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
     return IDropTarget::Pointer(0);
   }
 
-  bool differentWindows = sourcePart->GetWorkbenchWindow()
+  IWorkbenchWindow::Pointer window = sourcePart ? sourcePart->GetWorkbenchWindow() : sourceContainer->GetWorkbenchWindow();
+  bool differentWindows = window
       != this->GetWorkbenchWindow();
   bool editorDropOK = ((sourceContainer->GetAppearance()
       == PresentationFactoryUtil::ROLE_EDITOR)
-      && sourcePart->GetWorkbenchWindow()->GetWorkbench()
+      && window->GetWorkbench()
           == this->GetWorkbenchWindow()->GetWorkbench());
   if (differentWindows && !editorDropOK)
   {
@@ -983,10 +981,10 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
 
       bool pointlessDrop = false; // = isZoomed();
 
-//      if (sourcePart == targetPart)
-//      {
-//        pointlessDrop = true;
-//      }
+      if (sourcePart == targetPart)
+      {
+        pointlessDrop = true;
+      }
 
       if ((sourceContainer != 0) && (sourceContainer == targetPart)
           && this->GetVisibleChildrenCount(sourceContainer.Cast<IStackableContainer>()) <= 1)
@@ -1007,7 +1005,10 @@ IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
         cursor = Constants::CENTER;
       }
 
-      return this->CreateDropTarget(sourcePart, side, cursor, targetPart);
+      if (sourcePart)
+        return this->CreateDropTarget(sourcePart, side, cursor, targetPart);
+      else
+        return this->CreateDropTarget(sourceContainer, side, cursor, targetPart);
     }
   }
   else

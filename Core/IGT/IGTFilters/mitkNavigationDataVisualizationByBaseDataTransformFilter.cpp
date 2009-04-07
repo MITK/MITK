@@ -55,6 +55,11 @@ bool mitk::NavigationDataVisualizationByBaseDataTransformFilter::SetBaseData(con
   return returnEl.second;
 }
 
+void mitk::NavigationDataVisualizationByBaseDataTransformFilter::Clear()
+{
+  m_RepresentationList.clear();
+}
+
 void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
 {
   /*get each input, lookup the associated BaseData and transfer the data*/

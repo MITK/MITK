@@ -56,6 +56,8 @@ namespace mitk {
 
     /** 
     * \brief Set the BaseData of the tool specified by the given NavigationData
+    * 
+    * Note, that NavigationDatas cannot be overwritten. The list has to be cleared first.
     * \param data The BaseData to be associated to the NavigationData nd
     * \param nd Specification of the NavigationData tha data will be associated to
     * \return Returns true if the tool has been added, false otherwise.
@@ -69,6 +71,12 @@ namespace mitk {
     */
     const BaseData* GetBaseData(const NavigationData* nd) const;
   
+    /** 
+    * \brief Clear the map of BaseDatas
+    */
+    void Clear();
+
+
     /** 
     *\brief Get the number of added BaseData associated to NavigationData 
     * \return Returns the size of the internal map

@@ -64,7 +64,7 @@ void @VIEW_CLASS@::Activated()
 
 void @VIEW_CLASS@::Deactivated()
 {
-  QmitkFunctionality::Activated();
+  QmitkFunctionality::Deactivated();
 }
 
 void @VIEW_CLASS@::DoSomething()

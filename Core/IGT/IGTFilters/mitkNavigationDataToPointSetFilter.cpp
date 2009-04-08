@@ -23,10 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationDataToPointSetFilter::NavigationDataToPointSetFilter()
 {
-  OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
+
   this->SetNumberOfRequiredInputs(1);
-  this->SetNumberOfOutputs( 1 );
-  this->SetNthOutput(0, output.GetPointer());
 
   m_OperationMode = Mode3D;
   m_CurrentTimeStep = 0;
@@ -53,62 +51,90 @@ void mitk::NavigationDataToPointSetFilter::GenerateData()
 }
 
 
-void mitk::NavigationDataToPointSetFilter::SetInput(const mitk::NavigationData *input)
+void mitk::NavigationDataToPointSetFilter::SetInput(const NavigationData* nd)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->BaseProcess::SetNthInput(0, 
-    const_cast< mitk::NavigationData * >( input ) );
-
-  this->Modified();
+  this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
+  this->CreateOutputsForAllInputs();
 }
 
 
-void mitk::NavigationDataToPointSetFilter::SetInput(const mitk::NavigationData *input, unsigned int index)
+void mitk::NavigationDataToPointSetFilter::SetInput(unsigned int idx, const NavigationData* nd)
 {
   // Process object is not const-correct so the const_cast is required here
-  this->BaseProcess::SetNthInput(index, 
-    const_cast< mitk::NavigationData * >( input ) );
+  this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
+  this->CreateOutputsForAllInputs();
+}
 
+
+const mitk::NavigationData* mitk::NavigationDataToPointSetFilter::GetInput( void )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
+}
+
+
+const mitk::NavigationData* mitk::NavigationDataToPointSetFilter::GetInput( unsigned int idx )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
+}
+
+
+void mitk::NavigationDataToPointSetFilter::CreateOutputsForAllInputs()
+{
+  switch (m_OperationMode)
+  {
+  case Mode3D:
+    this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create one pointset output for each navigation data input
+    break;
+  case Mode4D:
+    this->SetNumberOfOutputs(1); // create just one output pointset that will contain all input navigation data objects
+    break;
+  default:
+    break;
+  }
+  
+  for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
+    if (this->GetOutput(idx) == NULL)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(idx);
+      this->SetNthOutput(idx, newOutput);
+    }
   this->Modified();
 }
 
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
 {
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-
-  for (unsigned int index=0; index<inputs.size(); index++)
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet
   {
-    mitk::PointSet* outputPointSet = GetOutput();
-    NavigationData::PositionType point;
+    mitk::PointSet* output = this->GetOutput(i);
+    assert(output);
+    const mitk::NavigationData* input = this->GetInput(i);
+    assert(input);
 
-   mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer()) ;
-
-    point = nd->GetPosition();  //get the position
-
-    outputPointSet->SetPoint( index, point); //store it in the pointset always at timestep 0
+    mitk::PointSet::PointType pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
+    output->InsertPoint(output->GetSize(), pos);  // add point with current position of input NavigationData to the output PointSet
+    // \TODO: regard ringbuffersize
   }
 }
 
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {
-  DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-
-  for (unsigned int index=0; index<inputs.size(); index++)
+  mitk::PointSet* output = GetOutput();
+  assert(output);
+  for (unsigned int index = 0; index < this->GetNumberOfInputs(); index++)
   {
-    mitk::PointSet* outputPointSet = GetOutput();
-    NavigationData::PositionType point;
-
-    mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer()) ;
-
-    point = nd->GetPosition();  //get the position
-
-    outputPointSet->SetPoint( index, point, m_CurrentTimeStep); //store it in the pointset always at the current time step
-  }  
-  
-  //in which timestep should be stored next?s
-  if (m_CurrentTimeStep == m_RingBufferSize-1)
+    const mitk::NavigationData* nd = GetInput(index);
+    assert(nd);
+    mitk::NavigationData::PositionType point = nd->GetPosition();  //get the position
+    output->SetPoint( index, point, m_CurrentTimeStep); //store it in the pointset always at the current time step
+  }   
+  if (m_CurrentTimeStep == m_RingBufferSize - 1) // update ring buffer index
     m_CurrentTimeStep = 0;
   else
     m_CurrentTimeStep++;
@@ -117,17 +143,9 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 
 void mitk::NavigationDataToPointSetFilter::SetOperationMode( OperationMode mode )
 {
-  if (mode==Mode3D || mode==Mode4D)
-    m_OperationMode = mode;
-  else
-  {
-    m_OperationMode = Mode3D;
-    std::cout << "Wrong Mode Setting switched to Mode3D" << std::endl;
-  }
-
+  m_OperationMode = mode;
   //Initialize 4D Mode
   if (m_OperationMode == Mode4D)
-  {
-    m_CurrentTimeStep=0;
-  }
+    m_CurrentTimeStep = 0;
+  this->Modified();
 }

@@ -121,7 +121,12 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
   // get and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-  input->Update();
+  
+  /* only update the input data, if the property tells us to */
+  bool update = true;
+  this->GetDataTreeNode()->GetBoolProperty("updateDataOnRender", update);
+  if (update == true)
+    input->Update();
 
   int timestep = this->GetTimestep();
 
@@ -595,7 +600,7 @@ void mitk::PointSetVtkMapper3D::CreateContour(mitk::BaseRenderer* renderer)
 
   // get and update the PointSet
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-  input->Update();
+  //input->Update();
 
   int timestep = this->GetTimestep();
   mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
@@ -673,6 +678,7 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, m
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

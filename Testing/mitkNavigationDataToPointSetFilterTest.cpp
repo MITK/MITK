@@ -63,10 +63,10 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   point[2] = 12.0;
   nd4->SetPosition(point);
 
-  myNavigationDataToPointSetFilter->SetInput(nd,0);
-  myNavigationDataToPointSetFilter->SetInput(nd2,1);
-  myNavigationDataToPointSetFilter->SetInput(nd3,2);
-  myNavigationDataToPointSetFilter->SetInput(nd4,3);
+  myNavigationDataToPointSetFilter->SetInput(0, nd);
+  myNavigationDataToPointSetFilter->SetInput(1, nd2);
+  myNavigationDataToPointSetFilter->SetInput(2, nd3);
+  myNavigationDataToPointSetFilter->SetInput(3, nd4);
 
   //Process
   mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
@@ -115,8 +115,8 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   point[2] = 12.0;
   nd4->SetPosition(point);
 
-  myNavigationDataToPointSetFilter->SetInput(nd,0);
-  myNavigationDataToPointSetFilter->SetInput(nd2,1);
+  myNavigationDataToPointSetFilter->SetInput(0, nd);
+  myNavigationDataToPointSetFilter->SetInput(1, nd2);
 
   mitk::PointSet::Pointer pointSet = myNavigationDataToPointSetFilter->GetOutput();
   pointSet->Update();
@@ -125,8 +125,8 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     pointSet->GetPoint(1,0)[0] == 4.0 && pointSet->GetPoint(1,0)[1] == 5.0 && pointSet->GetPoint(1,0)[2] == 6.0 
     , "Testing the conversion of navigation data object to one point set in Mode 4D in first timestep" )
 
-  myNavigationDataToPointSetFilter->SetInput(nd3,0);
-  myNavigationDataToPointSetFilter->SetInput(nd4,1);
+  myNavigationDataToPointSetFilter->SetInput(0, nd3);
+  myNavigationDataToPointSetFilter->SetInput(1, nd4);
   myNavigationDataToPointSetFilter->Update();
   pointSet = myNavigationDataToPointSetFilter->GetOutput();
 
@@ -136,9 +136,9 @@ static void TestMode4D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
     pointSet->GetPoint(1,1)[0] == 10.0 && pointSet->GetPoint(1,1)[1] == 11.0 && pointSet->GetPoint(1,1)[2] == 12.0
     , "Testing the conversion of navigation data object to one point set in Mode 4D in second timestep" )
 
-  myNavigationDataToPointSetFilter->SetInput(nd3,0);
+  myNavigationDataToPointSetFilter->SetInput(0, nd3);
   //nd3->Modified(); //necessary because the generate data is only called when input has changed...
-  myNavigationDataToPointSetFilter->SetInput(nd4,1);
+  myNavigationDataToPointSetFilter->SetInput(1, nd4);
   //nd4->Modified();
   //myNavigationDataToPointSetFilter->Update();
   pointSet = myNavigationDataToPointSetFilter->GetOutput();

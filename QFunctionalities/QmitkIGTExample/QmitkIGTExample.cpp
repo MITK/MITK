@@ -50,6 +50,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qtimer.h>
 #include <qlabel.h>
 #include <qlineedit.h>
+#include <qcheckbox.h>
+
 
 QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
 : QmitkFunctionality(parent, name, it), m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)
@@ -280,13 +282,42 @@ void QmitkIGTExample::OnTestNavigation()
       mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
       toolNode->SetData(mitkToolData);
       toolNode->SetName(QString("MyInstrument %1").arg(i).latin1());
-      toolNode->SetColor(0.2, 0.2 * i ,0.9 - 0.1 * i); //different colors
+      toolNode->SetColor(0.2, 0.3 * i ,0.9 - 0.2 * i); //different colors
       toolNode->Modified();
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
       visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
     }
     m_EndOfPipeline = visualizer;
+
+    /* set up trajectories */
+    if (m_Controls->m_ShowTrajectories->isChecked())
+    {
+      m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+      m_PointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3D);
+      for (unsigned int i = 0; i < visualizer->GetNumberOfOutputs(); ++i)
+        m_PointSetFilter->SetInput(i, visualizer->GetOutput(i));
+      for (unsigned int i = 0; i < m_PointSetFilter->GetNumberOfOutputs(); i++)
+      {
+        mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
+        assert(p);
+
+        mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+        pointSetNode->SetData(p);
+        pointSetNode->SetName(QString("Trajectory of Output %1").arg(i).latin1());
+        mitk::Color color;
+        color.Set(0.2, 0.3 * i ,0.9 - 0.2 * i);
+        pointSetNode->SetColor(color); //change color of points
+        pointSetNode->SetProperty("contourcolor", mitk::ColorProperty::New(color)); // change color of trajectory line
+        pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(2.0)); // enlarge visualization of points
+        pointSetNode->SetProperty("contoursize", mitk::FloatProperty::New(1.0)); // enlarge visualization of trajectory line
+        pointSetNode->SetBoolProperty("show contour", true);
+		pointSetNode->SetBoolProperty("updateDataOnRender", false); // do not call Update() on the pointset during render (this would cause a execution of the pipeline that is still connected to the pointset)
+
+        mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
+        out->append(QString("Creating Pointset %1 for trajectory visualization").arg(i));
+      }
+    }
 
     //start the tracking
     m_Source->StartTracking();
@@ -296,6 +327,7 @@ void QmitkIGTExample::OnTestNavigation()
   {
     out->append(QString("ERROR during instantiation and initialization of TrackingDeviceSource filter: ") + QString(exp.what()));
     m_Displacer = NULL;
+    m_PointSetFilter = NULL;
     m_EndOfPipeline = NULL;
     if (m_Source.IsNotNull())
     {
@@ -357,6 +389,9 @@ void QmitkIGTExample::OnMeasure()
     output << "--------------------------------------------" << std::endl;
     out->append(output.str().c_str()); // append string stream content to gui widget
   }
+  if (m_PointSetFilter.IsNotNull()) // update tracjectory generation if it is in use
+    m_PointSetFilter->Update();
+
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
 }
 
@@ -389,11 +424,15 @@ void QmitkIGTExample::OnStop()
   m_Controls->m_StartNavigationButton->setEnabled(true);
   try
   {
+    if (m_Source.IsNotNull())
+    {
+      m_Source->StopTracking();
+      m_Source->Disconnect();
+      m_Source = NULL;
+    }
     m_EndOfPipeline = NULL;
+    m_PointSetFilter = NULL;
     m_Displacer = NULL;
-    m_Source->StopTracking();
-    m_Source->Disconnect();
-    m_Source = NULL;
     WaitCursorOff();
   }
   catch (std::exception& exp)
@@ -453,31 +492,44 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
     trackerNDI->SetDeviceName(m_Controls->m_Port->text().latin1());
     trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
     out->append(QString("creating NDI Tracker on ") + m_Controls->m_Port->text() + QString(" with 115200 Baud"));
+    tracker = trackerNDI;
 
     if (selectedDevice == "NDI Polaris")
     {
       trackerNDI->SetType(mitk::NDIPolaris);
-      mitk::NDIPassiveTool::Pointer toolNDI = mitk::NDIPassiveTool::New();
-      toolNDI->SetToolName("MyInstrument");
-      toolNDI->LoadSROMFile(m_Controls->GetToolFileName());
-      toolNDI->SetTrackingPriority(mitk::Dynamic);
-      trackerNDI->Add6DTool(toolNDI);
-      out->append(QString("adding tool 'MyInstrument' with rom file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+      QStringList tools = m_Controls->m_ToolList;
+      QStringList::iterator it;
+      unsigned int index = 0;
+      for (it = tools.begin(); it != tools.end(); ++it )
+      {
+        mitk::NDIPassiveTool::Pointer toolNDI = mitk::NDIPassiveTool::New();
+        toolNDI->SetToolName(QString("MyInstrument %1").arg(index++).latin1());
+        toolNDI->LoadSROMFile((*it).latin1());
+        /*toolNDI->LoadSROMFile(m_Controls->GetToolFileName());*/
+        toolNDI->SetTrackingPriority(mitk::Dynamic);
+        trackerNDI->Add6DTool(toolNDI);
+        out->append(QString("adding tool 'MyInstrument' with rom file '") + (*it) + QString("'"));
+      }
     }
     else if (selectedDevice == "NDI Aurora")
     {
       trackerNDI->SetType(mitk::NDIAurora);
     }
-    tracker = trackerNDI;
   }
   else if (selectedDevice == "Micron Tracker")
   {
-    mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
-    toolMT->LoadFile(m_Controls->GetToolFileName());
     mitk::ClaronTrackingDevice::Pointer trackerMT = mitk::ClaronTrackingDevice::New();
     out->append("creating Micron Tracker");
-    trackerMT->AddTool(toolMT);
-    out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+    QStringList tools = m_Controls->m_ToolList;
+    QStringList::iterator it;
+    unsigned int index = 0;
+    for (it = tools.begin(); it != tools.end(); ++it )
+    {
+      mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
+      toolMT->LoadFile((*it).latin1());    
+      trackerMT->AddTool(toolMT);
+      out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+    }
     tracker = trackerMT;
   }
   else if (selectedDevice == "MicroBird")
@@ -490,15 +542,16 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
 #else
     out->append("MicroBird support not available in this version. Please select a different tracking device");
 #endif // MITK_USE_MICROBIRD_TRACKER
-
   }
   else if (selectedDevice == "RandomTrackingDevice")
   {
-    mitk::InternalTrackingTool::Pointer toolRandom = mitk::InternalTrackingTool::New();
     mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
-    trackerRandom->AddTool(toolRandom);
+    mitk::InternalTrackingTool::Pointer toolRandom1 = mitk::InternalTrackingTool::New();
+    trackerRandom->AddTool(toolRandom1);
+    mitk::InternalTrackingTool::Pointer toolRandom2 = mitk::InternalTrackingTool::New();
+    trackerRandom->AddTool(toolRandom2);
     tracker = trackerRandom;
-    out->append("creating virtual random tracking device with one tool");
+    out->append("creating virtual random tracking device with two tools");
   }
   else
   {
@@ -506,6 +559,7 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
   }
   return tracker;
 }
+
 
 void QmitkIGTExample::OnStartRecording()
 {
@@ -541,7 +595,7 @@ void QmitkIGTExample::OnStartRecording()
     m_Recorder->StartRecording(); //after finishing the settings you can start the recording mechanism 
 
     out->append(QString("Starting Recording from ") + QString(m_Controls->GetSelectedTrackingDevice())
-         + QString(" to file ") + QString(m_Recorder->GetFileName()) + QString(" now."));
+      + QString(" to file ") + QString(m_Recorder->GetFileName()) + QString(" now."));
 
     //now every update of the recorder stores one line into the file for 
     //each added NavigationData
@@ -582,19 +636,29 @@ void QmitkIGTExample::OnStartPlaying()
 
   /* Visualize output of player using a mitk::PointSet */
   m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
-  for (int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
-  {
-    m_PointSetFilter->SetInput(m_Player->GetOutput(i), i);  // here we connect the player with the pointset filter
-  }
-  m_PointSet = m_PointSetFilter->GetOutput();
+  m_PointSetFilter->SetOperationMode(mitk::NavigationDataToPointSetFilter::Mode3D);
+  for (unsigned int i = 0; i < m_Player->GetNumberOfOutputs(); i++)
+    m_PointSetFilter->SetInput(i, m_Player->GetOutput(i));  // connect the player with the pointset filter
 
-  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
-  pointSetNode->SetData(m_PointSet);
-  pointSetNode->SetName("Player object");
-  pointSetNode->SetColor(0.2,0.2,0.9); //change color
-  pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(20.0)); // enlarge visualization of points
-  mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
-  out->append("Creating Pointset for replay visualization");
+  for (unsigned int i = 0; i < m_PointSetFilter->GetNumberOfOutputs(); i++)
+  {
+    mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
+    assert(p);
+
+    mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+    pointSetNode->SetData(p);
+    pointSetNode->SetName(QString("Trajectory of Output %1").arg(i).latin1());
+    mitk::Color color;
+    color.Set(0.25 * i, 1 - 0.25 * i, 0.5);
+    pointSetNode->SetColor(color); //change color of points
+    pointSetNode->SetProperty("contourcolor", mitk::ColorProperty::New(color)); // change color of trajectory line
+    pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(20.0)); // enlarge visualization of points
+    pointSetNode->SetProperty("contoursize", mitk::FloatProperty::New(20.0)); // enlarge visualization of trajectory line
+    pointSetNode->SetBoolProperty("show contour", true);
+    
+    mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
+    out->append(QString("Creating Pointset %1 for replay visualization").arg(i));
+  }
 
   m_PlayingTimer->start(100);  // start the playback timer
   out->append("starting replay");
@@ -603,7 +667,7 @@ void QmitkIGTExample::OnStartPlaying()
 
 void QmitkIGTExample::OnPlaying()
 {
-  m_PointSet->Update();
+  m_PointSetFilter->Update();
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update only 3D render window
   mitk::StatusBar::GetInstance()->DisplayText("Replaying tracking data now", 75); // Display replay message for 75ms in status bar
 }

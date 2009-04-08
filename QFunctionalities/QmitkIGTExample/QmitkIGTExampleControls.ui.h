@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include "mitkVector.h"
 #include "qstring.h"
+#include "qstringlist.h"
 #include "qvalidator.h"
 #include "qlabel.h"
 #include "qlineedit.h"
@@ -114,13 +115,18 @@ const char* QmitkIGTExampleControls::GetSelectedTrackingDevice()
 
 void QmitkIGTExampleControls::m_LoadToolBtn_clicked()
 {
-  QString s = QFileDialog::getOpenFileName(
-    QDir::homeDirPath (),
+  QStringList s = QFileDialog::getOpenFileNames(
+    
     "tool definition file (*.*)",
-    this,
+    QDir::homeDirPath(),
+	this,
     "open file dialog"
     "Choose a tool definition file" );
-  m_ToolFileName->setText(s);
+  if (s.empty() == false)
+  { 
+	  m_ToolFileName->setText(s.front());
+  }
+  m_ToolList = s;
 }
 
 

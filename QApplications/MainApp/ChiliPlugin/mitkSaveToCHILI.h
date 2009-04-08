@@ -45,6 +45,22 @@ class SaveToCHILI: public itk::Object
                        bool overrideExistingSeries, 
                        const std::string& tmpDirectory );
 
+    void UploadFileAsNewSeries( QcPlugin* instance,
+                                const std::string& filename,
+                                const std::string& mimeType,
+                                const std::string& studyInstanceUID, 
+                                int seriesNumber, 
+                                const std::string& seriesDescription );
+
+    void UploadFileToSeries( QcPlugin* instance,
+                             const std::string& filename,
+                             const std::string& filebasename,
+                             const std::string& mimeType,
+                             const std::string& seriesInstanceUID, 
+                             bool overwriteExistingSeries );
+
+
+
     mitkClassMacro( SaveToCHILI, itk::Object );
     itkNewMacro( SaveToCHILI );
 

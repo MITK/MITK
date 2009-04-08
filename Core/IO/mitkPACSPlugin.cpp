@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPACSPlugin.h"
 
+#include <iostream>
+
 mitk::PACSPlugin* mitk::PACSPlugin::GetInstance(bool destroyInstance)
 {
   static mitk::PACSPlugin::Pointer s_Instance = mitk::PACSPlugin::New();
@@ -199,3 +201,97 @@ void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer /* 
 {
 }
 
+void mitk::PACSPlugin::UploadFileAsNewSeries( const std::string& /* filename */,
+                                              const std::string& /* mimeType */, 
+                                              const std::string& /* studyInstanceUID */, 
+                                              int /* seriesNumber */, 
+                                              const std::string& /* seriesDescription */ )
+{
+}
+
+void mitk::PACSPlugin::UploadFileToSeries( const std::string& /* filename */,
+                                           const std::string& /* filebasename */, 
+                                           const std::string& /* mimeType */, 
+                                           const std::string& /* seriesInstanceUID */, 
+                                           bool /* overwriteExistingSeries */ )
+{
+}
+
+std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
+{
+  std::ifstream file( filename.c_str() );
+  if (!file)
+  {
+    // cannot open file
+    return std::string("");
+  }
+
+  const unsigned int maxLength = 8;
+  char line[ maxLength];
+  file.getline( line, maxLength );
+  file.close();
+
+  std::string firstLine( line );
+
+  if ( firstLine.substr( 1, 3 ) == "PDF" )
+  {
+    return std::string("application/pdf");
+  }
+
+  if ( firstLine.substr( 0, 5 ) == "{\rtf" )
+  {
+    return std::string("text/richtext");
+  }
+
+  if ( firstLine.substr( 0, 2 ) == "PK" )
+  {
+    return std::string("application/zip");
+  }
+
+  if ( (line[0] == 0xFF) && (line[1] == 0xD8) )
+  {
+    return std::string("image/jpeg");
+  }
+
+  if ( (line[0] == 0x89) && 
+       (line[1] == 0x50) &&
+       (line[2] == 0x4E) &&
+       (line[3] == 0x47) &&
+       (line[4] == 0x0D) &&
+       (line[5] == 0x0A) &&
+       (line[6] == 0x1A) &&
+       (line[7] == 0x0A) 
+     )
+  {
+    return std::string("image/png");
+  }
+
+  if ( (line[0] == 0x4D) && (line[1] == 0x5A) )
+  {
+    //return std::string("application/octet-stream");
+    return std::string("Windows EXE");
+  }
+
+  if ( ( filename.rfind( ".stl" ) == filename.length() - 4 ) ||
+       ( filename.rfind( ".STL" ) == filename.length() - 4 ) )
+  {
+    // this is a guess. don't know a good way to test for STL.
+    return std::string("application/sla");
+  }
+
+  if ( ( filename.rfind( ".txt" ) == filename.length() - 4 ) ||
+       ( filename.rfind( ".TXT" ) == filename.length() - 4 ) )
+  {
+    // this is a guess. don't know a good way to test for STL.
+    return std::string("text/plain");
+  }
+
+  return std::string("");
+}
+
+    
+void mitk::PACSPlugin::DownloadSingleFile( const std::string& /*seriesInstanceUID*/, 
+                                           unsigned int /*instanceNumber*/,
+                                           const std::string& /*filename*/)
+{
+}

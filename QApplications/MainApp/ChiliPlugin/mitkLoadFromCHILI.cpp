@@ -609,6 +609,38 @@ mitk::LoadFromCHILI::LoadSingleText( QcPlugin* itkNotUsed(instance),
   return resultNode;
 }
 
+void mitk::LoadFromCHILI::DownloadSingleFile( QcPlugin* plugin,
+                                              const std::string& seriesInstanceUID, 
+                                              unsigned int instanceNumber, 
+                                              const std::string& filename )
+{
+  std::cout << "Downloading text item " << instanceNumber << " from series " << seriesInstanceUID << " to " << filename << std::endl;
+
+  text_t text;
+  series_t series;
+  initTextStruct( &text );
+  initSeriesStruct( &series );
+  std::string textOID = 
+    ChiliPlugin::GetChiliPluginInstance()->GetTextOIDFromSeriesInstanceUIDAndInstanceNumber( seriesInstanceUID, instanceNumber );
+  
+  text.oid = strdup( textOID.c_str() );
+
+  if( pQueryText( plugin, &text, &series, NULL, NULL ) )
+  {
+    ipInt4_t error;
+    pFetchDataToFile( text.chiliText, filename.c_str(), &error );
+    ProgressBar::GetInstance()->Progress();
+    if( error != 0 )
+    {
+      std::cout << "LoadFromCHILI (DownloadSingleFile): ChiliError: " << error << 
+                   ", while reading file (" << text.chiliText << 
+                   ") from Database." << std::endl;
+      ProgressBar::GetInstance()->Progress();
+    }
+  }
+}
+
+
 void mitk::LoadFromCHILI::SetSeparateByAcquisitionNumber(bool on)
 {
   m_GroupByAcquisitionNumber = on;

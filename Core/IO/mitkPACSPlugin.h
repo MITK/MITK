@@ -242,6 +242,14 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \TODO rename to LoadDocument make it take a list of parameters
      */
     virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber ); 
+    
+    /*!
+     * \brief Load a given document object for a series instance UID and a document instance number
+     * In contrast to LoadSingleText this method will just create a new file on the local file system.
+     */
+    virtual void DownloadSingleFile( const std::string& seriesInstanceUID, 
+                                     unsigned int instanceNumber,
+                                     const std::string& filename ); 
 
     /*!
      * \brief Save given data as a new series
@@ -257,12 +265,37 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /*!
      * \brief Save given data into an existing series
      * \param seriesInstanceUID save into this series
-     * \param seriesNumber a number identifying the new series
      * \param seriesDescription a string description for the new series
      */
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
                                const std::string& seriesInstanceUID, 
                                bool overwriteExistingSeries );
+
+    /*!
+     * \brief Upload a file as a new series
+     * \param studyInstanceUID save into this study
+     * \param seriesNumber a number identifying the new series
+     * \param seriesDescription a string description for the new series
+     */
+    virtual void UploadFileAsNewSeries( const std::string& filename,
+                                        const std::string& mimeType, 
+                                        const std::string& studyInstanceUID, 
+                                        int seriesNumber, 
+                                        const std::string& seriesDescription );
+
+    /*!
+     * \brief Upload file into an existing series
+     * \param seriesInstanceUID save into this series
+     * \param seriesDescription a string description for the new series
+     */
+    virtual void UploadFileToSeries( const std::string& filename,
+                                     const std::string& filebasename, 
+                                     const std::string& mimeType, 
+                                     const std::string& seriesInstanceUID, 
+                                     bool overwriteExistingSeries );
+    
+    virtual std::string GuessMIMEType( const std::string& filename );
+
 
   protected:
     

@@ -366,7 +366,7 @@ std::cout << " saving image " << temp.PicTagContent << std::endl;
         if( !pStoreDataFromFile( pathAndFile.c_str(), 
                                  fileName.c_str(), 
                                  writer->GetWritenMIMEType().c_str(), 
-                                 NULL, 
+                                 fileName.c_str(), 
                                  study.instanceUID, 
                                  patient.oid, 
                                  study.oid, 
@@ -465,5 +465,135 @@ ipBool_t mitk::SaveToCHILI::GlobalIterateImagesForImageNumber( int /*rows*/, int
   }
 
   return ipTrue; // true = next element; false = break iterate
+}
+
+void mitk::SaveToCHILI::UploadFileAsNewSeries( QcPlugin* instance,
+                                               const std::string& filename,
+                                               const std::string& mimeType,
+                                               const std::string& studyInstanceUID, 
+                                               int seriesNumber, 
+                                               const std::string& seriesDescription )
+{
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) //CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
+#endif
+
+  std::cout << __FILE__ << ": Uploading '" << filename << "' as new series" << std::endl;
+
+  std::string newSeriesDescription( seriesDescription );
+
+  if (newSeriesDescription.empty()) newSeriesDescription = "Never upload files without a name :-P";
+
+  std::cout << "Request to save file " << filename
+            << " as series '" << seriesDescription 
+            << "' to study " << studyInstanceUID 
+            << " with seriesNumber " << seriesNumber << std::endl;
+  //CHILI-Version >= 3.12 ???
+  #if CHILI_VERSION_CODE( 1, 1, 3 ) < CHILI_PLUGIN_VERSION_CODE
+
+  std::string studyOID = ChiliPlugin::GetChiliPluginInstance()->GetStudyOIDFromInstanceUID( studyInstanceUID );
+
+  study_t study;
+  initStudyStruct( &study );
+  study.oid = strdup( studyOID.c_str() );
+
+  if( pQueryStudy( instance, &study, NULL ) )  //test if study exist
+  {
+    //create new series
+    series_t* newSeries = ( series_t* )malloc( sizeof( series_t ) );
+    initSeriesStruct( newSeries );
+    newSeries->description = (char*)newSeriesDescription.c_str();
+    newSeries->number = seriesNumber;
+    if( pCreateSeries( instance, &study, newSeries ) )
+    {
+      ChiliPlugin::GetChiliPluginInstance()->UpdateSeriesOIDForInstanceUID( newSeries->oid, newSeries->instanceUID );
+std::cout << " **** Created new series UID " << newSeries->instanceUID << std::endl;
+      UploadFileToSeries( instance, filename, newSeriesDescription, mimeType, newSeries->instanceUID, true );
+    }
+    else
+    {
+      std::cout << "SaveToCHILI (UploadFileAsNewSeries): Can not create a new Series." << std::endl;
+    }
+    
+    free( newSeries );
+  }
+  else
+  {
+    std::cout << "SaveToCHILI (UploadFileAsNewSeries): Study not exist. Abort." << std::endl;
+  }
+
+  clearStudyStruct( &study );
+  #endif
+}
+
+void mitk::SaveToCHILI::UploadFileToSeries( QcPlugin* instance,
+                                            const std::string& filename,
+                                            const std::string& filebasename,
+                                            const std::string& mimeType,
+                                            const std::string& seriesInstanceUID, 
+                                            bool /*overwriteExistingSeries*/ )
+{
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) //CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
+#endif
+  
+  std::string textOID = pGetNewOID(); // ask CHILI to generate a new oid
+  std::cout << __FILE__ << 
+               ": Uploading '" << filename << 
+               "' to series '" << seriesInstanceUID << 
+               "' as '" << filebasename << 
+               "' using text OID " << textOID << std::endl;
+
+  std::cout << "Request to save file '" << filename
+            << "' to series " << seriesInstanceUID << std::endl;
+#if CHILI_PLUGIN_VERSION_CODE > CHILI_VERSION_CODE( 1, 1, 3 ) //CHILI-Version >= 3.12 ???
+
+  study_t study;
+  patient_t patient;
+  series_t series;
+  initStudyStruct( &study );
+  initPatientStruct( &patient );
+  initSeriesStruct( &series );
+  
+  std::string seriesOID = ChiliPlugin::GetChiliPluginInstance()->GetSeriesOIDFromInstanceUID( seriesInstanceUID );
+
+  series.oid = strdup( seriesOID.c_str() );
+  if( !pQuerySeries( instance, &series, &study, &patient ) )
+  {
+    std::cout << "SaveToCHILI (UploadFileToSeries): Series not exist. Abort." << std::endl;
+    clearStudyStruct( &study );
+    clearPatientStruct( &patient );
+    clearSeriesStruct( &series );
+    return;
+  }
+      
+  pOpenAssociation();
+  if( !pStoreDataFromFile( filename.c_str(), 
+                           filebasename.c_str(), 
+                           mimeType.c_str(),
+                           filebasename.c_str(), 
+                           study.instanceUID, 
+                           patient.oid, 
+                           study.oid, 
+                           series.oid, 
+                           textOID.c_str() ) 
+      )
+  {
+    std::cout << "ChiliPlugin (UploadFileToSeries): "
+                 "Error while saving File (" << filename << 
+                  ") to database." << std::endl;
+  }
+  else
+  {
+    std::cout << "ChiliPlugin (UploadFileToSeries): Upload success." << std::endl;
+  }
+  pCloseAssociation();
+
+  clearStudyStruct( &study );
+  clearPatientStruct( &patient );
+  clearSeriesStruct( &series );
+  #endif
 }
 

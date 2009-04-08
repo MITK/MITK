@@ -44,6 +44,8 @@
         <action name="fileOpenRawImageSequenceAction"/>
         <action name="fileOpenProjectAction"/>
         <separator/>
+        <action name="fileUploadToPACSAction"/>
+        <action name="fileDownloadFromPACSAction"/>
         <action name="fileSaveProjectAction"/>
         <action name="fileSaveProjectAsAction"/>
         <action name="fileCloseProjectAction"/>
@@ -185,6 +187,28 @@
         </property>
         <property name="accel">
             <string>Ctrl+O</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileUploadToPACSAction</cstring>
+        </property>
+        <property name="text">
+            <string>Upload file to PACS...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Upload file to PACS...</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>fileDownloadFromPACSAction</cstring>
+        </property>
+        <property name="text">
+            <string>Download file from PACS...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Download file from PACS...</string>
         </property>
     </action>
     <action>
@@ -1425,6 +1449,8 @@
     <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
     <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
     <slot>OnFileLoadFromPACS()</slot>
+    <slot>OnUploadFileToPACS()</slot>
+    <slot>OnDownloadFileFromPACS()</slot>
     <slot>fileOpenRawImage()</slot>
     <slot>fileOpenRawImage( const char * fileName )</slot>
     <slot>fileOpenRawImageSequence()</slot>

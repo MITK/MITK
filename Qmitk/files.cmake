@@ -132,6 +132,8 @@ SET(UI_FILES
   QmitkStdMultiWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkTwoButtonNavigator.ui
+  QmitkUploadFileToPACSDialog.ui
+  QmitkDownloadFileFromPACSDialog.ui
   QmitkVolumetryWidget.ui
 )
 SET(MOC_H_FILES

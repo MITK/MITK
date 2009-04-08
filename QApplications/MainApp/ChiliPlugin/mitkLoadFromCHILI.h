@@ -81,6 +81,12 @@ class LoadFromCHILI: public itk::Object
                                           unsigned int instanceNumber, 
                                           const std::string& tmpDirectory );
 
+    void DownloadSingleFile( QcPlugin* plugin,
+                             const std::string& seriesInstanceUID, 
+                             unsigned int instanceNumber, 
+                             const std::string& filename );
+
+
     mitkClassMacro( LoadFromCHILI, itk::Object );
     itkNewMacro( LoadFromCHILI );
 

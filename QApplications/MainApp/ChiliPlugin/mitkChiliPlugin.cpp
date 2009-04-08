@@ -1109,3 +1109,36 @@ void mitk::ChiliPlugin::UpdateTextOIDFromSeriesInstanceUIDAndInstanceNumber( con
 }
 
 
+void mitk::ChiliPlugin::UploadFileAsNewSeries( const std::string& filename,
+                                               const std::string& mimeType,
+                                               const std::string& studyInstanceUID, 
+                                               int seriesNumber, 
+                                               const std::string& seriesDescription )
+{
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) //CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
+#endif
+  m_SaveToCHILI->UploadFileAsNewSeries( this, filename, mimeType, studyInstanceUID, seriesNumber, seriesDescription );
+}
+
+void mitk::ChiliPlugin::UploadFileToSeries( const std::string& filename,
+                                            const std::string& filebasename,
+                                            const std::string& mimeType,
+                                            const std::string& seriesInstanceUID, 
+                                            bool overwriteExistingSeries )
+{
+#if CHILI_PLUGIN_VERSION_CODE < CHILI_VERSION_CODE( 1, 1, 4 ) //CHILI < 3.12
+  QMessageBox::information( 0, "MITK", "Sorry, your current CHILI Workstation does not support plugins saving data" );
+  return;
+#endif
+  
+  m_SaveToCHILI->UploadFileToSeries( this, filename, filebasename, mimeType, seriesInstanceUID, overwriteExistingSeries );
+}
+
+void mitk::ChiliPlugin::DownloadSingleFile( const std::string& seriesInstanceUID, 
+                                            unsigned int instanceNumber, 
+                                            const std::string& filename )
+{
+  m_LoadFromCHILI->DownloadSingleFile( this, seriesInstanceUID, instanceNumber, filename );
+}

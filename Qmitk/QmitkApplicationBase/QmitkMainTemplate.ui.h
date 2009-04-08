@@ -117,6 +117,8 @@ However, it is nice to actually replace the nonsense :-)
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkHelpBrowser.h>
 #include <QmitkSocketClient.h>
+#include <QmitkUploadFileToPACSDialog.h>
+#include <QmitkDownloadFileFromPACSDialog.h>
 #include <qsplitter.h>
 
 #include <vtkSTLReader.h>
@@ -714,6 +716,14 @@ void QmitkMainTemplate::init()
   fileLoad_from_PACSAction->setVisible( pacsCapabilities.IsPACSFunctional && 
                                         pacsCapabilities.HasLoadCapability );
   connect( fileLoad_from_PACSAction, SIGNAL(activated()), this, SLOT(OnFileLoadFromPACS()) );
+  fileUploadToPACSAction->setVisible( pacsCapabilities.IsPACSFunctional && 
+                                      pacsCapabilities.HasSaveCapability );
+  connect( fileUploadToPACSAction, SIGNAL(activated()), this, SLOT(OnUploadFileToPACS()) );
+  fileDownloadFromPACSAction->setVisible( pacsCapabilities.IsPACSFunctional && 
+                                      pacsCapabilities.HasLoadCapability );
+  connect( fileDownloadFromPACSAction, SIGNAL(activated()), this, SLOT(OnDownloadFileFromPACS()) );
+
+
 
   redoButton->setMode(QUndoRedoButton::Redo);
   m_Instance = this;
@@ -1961,6 +1971,18 @@ void QmitkMainTemplate::showFavoritesbar( bool on )
 void QmitkMainTemplate::OnFileLoadFromPACS()
 {
   QmitkPACSLoadDialog dialog(this);
+  dialog.exec();
+}
+
+void QmitkMainTemplate::OnUploadFileToPACS()
+{
+  QmitkUploadFileToPACSDialog dialog(this);
+  dialog.exec();
+}
+
+void QmitkMainTemplate::OnDownloadFileFromPACS()
+{
+  QmitkDownloadFileFromPACSDialog dialog(this);
   dialog.exec();
 }
 

@@ -117,6 +117,9 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
     
     virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber );
+    virtual void DownloadSingleFile( const std::string& seriesInstanceUID, 
+                                     unsigned int instanceNumber, 
+                                     const std::string& filename );
 
     virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
                                   const std::string& studyInstanceUID, 
@@ -126,6 +129,18 @@ class ChiliPlugin : protected QcPlugin, public PACSPlugin
     virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
                                const std::string& seriesInstanceUID, 
                                bool ovewriteExistingSeries );
+
+    virtual void UploadFileAsNewSeries( const std::string& filename,
+                                        const std::string& mimeType,
+                                        const std::string& studyInstanceUID, 
+                                        int seriesNumber, 
+                                        const std::string& seriesDescription );
+
+    virtual void UploadFileToSeries( const std::string& filename,
+                                     const std::string& filebasename, 
+                                     const std::string& mimeType,
+                                     const std::string& seriesInstanceUID, 
+                                     bool overwriteExistingSeries );
 
 
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( QcLightbox* inputLightbox = NULL );

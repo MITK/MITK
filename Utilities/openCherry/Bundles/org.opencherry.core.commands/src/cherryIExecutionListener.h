@@ -100,7 +100,7 @@ struct CHERRY_COMMANDS IExecutionListener : public virtual Object {
    * @param returnValue
    *            The return value from the command; may be <code>null</code>.
    */
-  virtual void PostExecuteSuccess(const std::string& commandId, Object::Pointer returnValue) = 0;
+  virtual void PostExecuteSuccess(const std::string& commandId, const Object::Pointer returnValue) = 0;
 
   /**
    * Notifies the listener that a command is about to execute.

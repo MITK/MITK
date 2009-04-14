@@ -236,7 +236,7 @@ _ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream
       ipPicTag_t tag_name;
       ipUInt4_t len;
 
-      /*printf( "bytes_to_read: %i\n", bytes_to_read ); /**/
+      /*printf( "bytes_to_read: %i\n", bytes_to_read ); */
 
       tsv = malloc( sizeof(ipPicTSV_t) );
 
@@ -260,7 +260,7 @@ _ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream
               tsv->bpe,
               tsv->dim,
               tsv->n[0],
-              tsv->n[1] ); /**/
+              tsv->n[1] ); */
 
       if( tsv->type == ipPicTSV )
         {

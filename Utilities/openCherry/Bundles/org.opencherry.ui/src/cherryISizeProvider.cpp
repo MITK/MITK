@@ -23,4 +23,9 @@ namespace cherry {
 
 const int ISizeProvider::INF = std::numeric_limits<int>::max();
 
+
+ISizeProvider::~ISizeProvider()
+{
+}
+
 }

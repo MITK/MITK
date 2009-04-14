@@ -47,6 +47,8 @@ struct IWorkbenchPage;
  * @noimplement This interface is not intended to be implemented by clients.
  */
 struct CHERRY_UI IPageService {
+
+    virtual ~IPageService() {}
     /**
      * Adds the given listener for page lifecycle events.
      * Has no effect if an identical listener is already registered.

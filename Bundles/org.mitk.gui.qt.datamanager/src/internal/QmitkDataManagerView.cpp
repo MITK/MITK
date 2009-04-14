@@ -282,8 +282,10 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
 
-    case QMessageBox::No: break;
-    case QMessageBox::Cancel: break;
+    case QMessageBox::No: 
+    case QMessageBox::Cancel:
+	default:
+	 break;
   }
 }
 

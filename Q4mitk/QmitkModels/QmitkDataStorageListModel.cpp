@@ -215,7 +215,7 @@ void QmitkDataStorageListModel::NodeRemoved( const mitk::DataTreeNode* node )
     m_BlockEvents = true;
 
     int row = -1;
-    bool removeNode = false;    
+    //bool removeNode = false;    
     // check if node is contained in current list, if yes: reset model
     for (std::vector<mitk::DataTreeNode*>::const_iterator nodeIt = m_DataNodes.begin()
       ; nodeIt != m_DataNodes.end(); nodeIt++)  // for each node

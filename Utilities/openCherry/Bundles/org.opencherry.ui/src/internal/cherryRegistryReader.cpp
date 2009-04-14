@@ -30,6 +30,10 @@ RegistryReader::RegistryReader()
 {
 }
 
+RegistryReader::~RegistryReader()
+{
+}
+
 void RegistryReader::LogError(IConfigurationElement::Pointer element,
     const std::string& text)
 {

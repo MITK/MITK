@@ -49,6 +49,7 @@ class RegistryReader {
 protected:
   
   RegistryReader();
+  virtual ~RegistryReader();
 
     /**
      * Logs the error in the workbench log using the provided

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef MITK_COMMON_H_DEFINED
+#define MITK_COMMON_H_DEFINED
 
 #ifdef _MSC_VER
 // This warns about truncation to 255 characters in debug/browse info
@@ -117,4 +119,4 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
 // legacy support for designer plugin 
 #define MITK_EXPORT
 
-
+#endif

@@ -11,6 +11,9 @@
  * ipFReadCvt
  * ipFWriteCvt
  */
+ 
+#ifndef MITK_IP_PIC_MANGLE_H_DEFINED
+#define MITK_IP_PIC_MANGLE_H_DEFINED
 
 #define _ipCp _mitkIpCp
 #define _ipEndian _mitkIpEndian
@@ -290,3 +293,5 @@
 #define ipPicVersionEncryption mitkIpPicVersionEncryption
 #define _ipPicWriteTags _mitkIpPicWriteTags
 #define _ipPicWriteTagsMem _mitkIpPicWriteTagsMem
+
+#endif

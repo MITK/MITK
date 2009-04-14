@@ -50,6 +50,8 @@ struct CHERRY_COMMANDS IExecutionListener : public virtual Object {
     Message2<const std::string&, const ExecutionException*> postExecuteFailure;
     Message2<const std::string&, Object::Pointer> postExecuteSuccess;
     Message2<const std::string&, const SmartPointer<const ExecutionEvent> > preExecute;
+	
+	virtual ~Events();
 
     virtual void AddListener(IExecutionListener::Pointer listener);
     virtual void RemoveListener(IExecutionListener::Pointer listener);
@@ -61,6 +63,8 @@ struct CHERRY_COMMANDS IExecutionListener : public virtual Object {
     typedef MessageDelegate2<IExecutionListener, const std::string&, Object::Pointer> PostExecuteSuccessDelegate;
     typedef MessageDelegate2<IExecutionListener, const std::string&, const SmartPointer<const ExecutionEvent> > PreExecuteDelegate;
   };
+  
+  virtual ~IExecutionListener();
 
   /**
    * Notifies the listener that an attempt was made to execute a command with

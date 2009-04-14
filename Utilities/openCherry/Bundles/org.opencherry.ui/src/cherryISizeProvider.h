@@ -37,6 +37,8 @@ struct CHERRY_UI ISizeProvider {
      * that it is greater than any other integer.
      */
    static const int INF;
+   
+   virtual ~ISizeProvider();
 
     /**
      * Returns a bitwise combination of flags indicating how and when computePreferredSize should

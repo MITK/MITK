@@ -30,6 +30,10 @@ AbstractTabFolder::AbstractTabFolder() :
 
 }
 
+AbstractTabFolder::~AbstractTabFolder()
+{
+}
+
 void AbstractTabFolder::SetActive(int activeState)
 {
   this->activeState = activeState;

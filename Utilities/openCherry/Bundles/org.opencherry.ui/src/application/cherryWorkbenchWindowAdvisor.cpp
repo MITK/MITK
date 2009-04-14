@@ -36,6 +36,10 @@ WorkbenchWindowAdvisor::WorkbenchWindowAdvisor(
   this->windowConfigurer = configurer;
 }
 
+WorkbenchWindowAdvisor::~WorkbenchWindowAdvisor()
+{
+}
+
 void WorkbenchWindowAdvisor::PreWindowOpen()
 {
   // do nothing

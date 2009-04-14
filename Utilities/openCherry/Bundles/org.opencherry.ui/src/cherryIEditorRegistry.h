@@ -98,6 +98,8 @@ struct CHERRY_UI IEditorRegistry {
      */
     // virtual void AddPropertyListener(IPropertyListener listener) = 0;
 
+    virtual ~IEditorRegistry();
+
     /**
      * Finds and returns the descriptor of the editor with the given editor id.
      *

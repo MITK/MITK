@@ -49,20 +49,20 @@
  *  copys a slice from a pic into a new pic
  */
 
- /*$Log$
-  *Revision 1.7  2002/11/13 17:53:00  ivo
-  *new ipPic added.
-  *
- /*Revision 1.5  2002/04/23 11:06:25  ivo
- /*ipPicCopySlice behaves now in the same way as ipPicGetSlice:
- /*2D-slices are copied, no longer hyper-planes of dimension dim-1.
- /*
- /*Revision 1.4  2000/05/04 12:52:36  ivo
- /*inserted BSD style license
- /*
-  *Revision 1.3  2000/05/04 12:35:58  ivo
-  *some doxygen comments.
-  *
+/*$Log$
+ *Revision 1.7  2002/11/13 17:53:00  ivo
+ *new ipPic added.
+ *
+ *Revision 1.5  2002/04/23 11:06:25  ivo
+ *ipPicCopySlice behaves now in the same way as ipPicGetSlice:
+ *2D-slices are copied, no longer hyper-planes of dimension dim-1.
+ *
+ *Revision 1.4  2000/05/04 12:52:36  ivo
+ *inserted BSD style license
+ *
+ *Revision 1.3  2000/05/04 12:35:58  ivo
+ *some doxygen comments.
+ *
  * Revision 1.2  1997/09/15  13:21:11  andre
  * switched to new what string format
  *

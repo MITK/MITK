@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIViewPart.h"
 #include "../cherryIWorkbench.h"
+#include "../cherryWorkbenchWindow.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIWorkbenchPartReference.h"
 
@@ -37,7 +38,7 @@ namespace cherry {
 
 class ViewRegistry;
 class EditorRegistry;
-class WorkbenchWindow;
+class WorkbenchWindowConfigurer;
 
 /**
  * \ingroup org_opencherry_ui
@@ -232,6 +233,7 @@ protected:
   friend class WorkbenchConfigurer;
   friend class WorkbenchWindowConfigurer;
   friend class WorkbenchWindow;
+  friend class WorkbenchWindow::ShellActivationListener;
 
   int RunUI();
 

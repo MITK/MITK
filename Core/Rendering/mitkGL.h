@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __APPLE__
   #include "GL/gl.h"
 #else
-  #include "gl.h"
+  #include "OpenGL/gl.h"
 #endif
 
 #endif /* MITKGL_H_HEADER_INCLUDED_C1C53722 */

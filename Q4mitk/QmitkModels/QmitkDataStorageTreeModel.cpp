@@ -151,7 +151,7 @@ QModelIndex QmitkDataStorageTreeModel::index ( int row, int column, const QModel
 			mitk::NodePredicateFirstLevel p1(m_DataStorage);
 			if (m_DataStorage->GetSubset(p1)->Size() > row)
 			{
-				int num = m_DataStorage->GetSubset(p1)->Size();
+				//int num = m_DataStorage->GetSubset(p1)->Size();
 				return createIndex(row, column, m_DataStorage->GetSubset(p1)->GetElement(row));
 			}
 		}

@@ -88,6 +88,7 @@ public:
      * @param configurer an object for configuring the workbench window
      */
     WorkbenchWindowAdvisor(IWorkbenchWindowConfigurer::Pointer configurer);
+	virtual ~WorkbenchWindowAdvisor();
 
 
     /**

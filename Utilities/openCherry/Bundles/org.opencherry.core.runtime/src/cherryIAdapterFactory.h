@@ -39,6 +39,9 @@ namespace cherry {
  * @see IAdaptable
  */
 struct CHERRY_RUNTIME IAdapterFactory {
+
+  virtual ~IAdapterFactory() {};
+  
   /**
    * Returns an object which is an instance of the given class
    * associated with the given object. Returns <code>null</code> if

@@ -7,6 +7,7 @@
 
 struct MITK_QT_HELLOWORLD IDialog
 {
+  virtual ~IDialog() {}
   cherryManifestMacro(IDialog, );
   virtual void show() = 0;
 };

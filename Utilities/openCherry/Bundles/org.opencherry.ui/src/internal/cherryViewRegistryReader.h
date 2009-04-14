@@ -44,7 +44,7 @@ public:
    * RegistryViewReader constructor comment.
    */
   ViewRegistryReader();
-
+  
   /**
    * Read the view extensions within a registry.
    * @param in the extension registry

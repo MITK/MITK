@@ -146,6 +146,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       return spinBox;
     }
 
+    // TODO serious warnings. check logic, if neccessary, add casts
     else if(data.type() == QMetaType::Float)
     {
       QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);

@@ -27,6 +27,10 @@ WorkbenchAdvisor::WorkbenchAdvisor()
   // do nothing
 }
 
+WorkbenchAdvisor::~WorkbenchAdvisor()
+{
+}
+
 void WorkbenchAdvisor::InternalBasicInitialize(IWorkbenchConfigurer::Pointer configurer)
 {
   if (workbenchConfigurer.IsNotNull())

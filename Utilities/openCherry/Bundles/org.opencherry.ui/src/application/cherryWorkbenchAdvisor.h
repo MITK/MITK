@@ -125,6 +125,7 @@ class CHERRY_UI WorkbenchAdvisor {
    * Creates and initializes a new workbench advisor instance.
    */
   protected: WorkbenchAdvisor();
+             virtual ~WorkbenchAdvisor();
 
   /**
    * Remembers the configurer and calls <code>initialize</code>.

@@ -55,6 +55,7 @@ struct CHERRY_OSGI IApplication {
      */
     static const int EXIT_RELAUNCH;
 
+    virtual ~IApplication();
     /**
      * Starts this application with the given context and returns a result.  This
      * method must not exit until the application is finished and is ready to exit.

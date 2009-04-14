@@ -164,6 +164,7 @@ protected:
 
   friend class WorkbenchConfigurer;
   friend class WorkbenchWindowConfigurer;
+  friend class WorkbenchWindowConfigurer::WindowActionBarConfigurer;
   friend class Workbench;
   friend class LayoutPartSash;
   friend class WorkbenchPage;

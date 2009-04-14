@@ -26,5 +26,8 @@ const std::string IEditorRegistry::SYSTEM_EXTERNAL_EDITOR_ID =
 const std::string IEditorRegistry::SYSTEM_INPLACE_EDITOR_ID =
     "org.opencherry.ui.systemInPlaceEditor"; //$NON-NLS-1$
 
+IEditorRegistry::~IEditorRegistry()
+{
+}
 
 }

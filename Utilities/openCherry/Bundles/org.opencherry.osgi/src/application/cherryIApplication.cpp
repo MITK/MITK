@@ -24,4 +24,8 @@ const int IApplication::EXIT_OK = 0;
 const int IApplication::EXIT_RESTART = 23;
 const int IApplication::EXIT_RELAUNCH = 24;
 
+IApplication::~IApplication()
+{
+}
+
 }

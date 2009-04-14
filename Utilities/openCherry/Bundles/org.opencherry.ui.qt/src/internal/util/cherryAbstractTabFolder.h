@@ -81,7 +81,8 @@ private:
 public:
 
   AbstractTabFolder();
-
+  virtual ~AbstractTabFolder();
+  
   virtual QSize ComputeSize(int widthHint, int heightHint) = 0;
 
   virtual AbstractTabItem* Add(int index, int flags) = 0;

@@ -20,7 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() 
-: mitk::NavigationDataToNavigationDataFilter(), m_TargetPointsAreSet(false),m_SourcePointsAreSet(false)
+: mitk::NavigationDataToNavigationDataFilter(), 
+  m_SourcePointsAreSet(false),
+  m_TargetPointsAreSet(false)
+  
 {
   m_ITKLandmarkTransform = ITKVersorTransformType::New();
 

@@ -39,6 +39,8 @@ namespace cherry {
  */
 struct CHERRY_UI IPartService {
 
+  virtual ~IPartService() {}
+
   /**
    * Returns the PartEvents object containing all possible events.
    * This is used to register for individual events, instead of

@@ -49,7 +49,7 @@ class QFontMenuItem : public QCustomMenuItem
       : string( s ), font( f ), color( c ) {};
     ~QFontMenuItem(){}
 
-    void paint( QPainter* p, const QColorGroup& /*cg* /, bool /*act* /, bool /*enabled* /, int x, int y, int w, int h )
+    void paint( QPainter* p, const QColorGroup& cg, bool act, bool enabled, int x, int y, int w, int h )
     {
       p->setBackgroundMode ( Qt::OpaqueMode );
       int ha,es,vau;

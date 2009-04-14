@@ -23,7 +23,11 @@
 #include "cherryIHandler.h"
 
 namespace cherry {
-
+	
+IExecutionListener::Events::~Events()
+{
+}
+	
 void
 IExecutionListener::Events
 ::AddListener(IExecutionListener::Pointer l)
@@ -61,6 +65,10 @@ IExecutionListener::Events
 ::IsEmpty() const
 {
   return !this->HasListeners();
+}
+
+IExecutionListener::~IExecutionListener()
+{
 }
 
 }

@@ -15,12 +15,13 @@ MACRO(OPENCHERRY_CREATE_TESTS)
   
   INCLUDE_DIRECTORIES(${OPENCHERRY_BASE_DIR}/Testing)
   INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
+  LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
   
   #
   # Create the TestDriver binary which contains all the tests.
   #  
   CREATE_TEST_SOURCELIST(cherry_test_sources TestDriver_${plugin_target}.cpp 
-    ${OPENCHERRY_TESTS} ${OPENCHERRY_CUSTOM_TESTS} )
+    ${OPENCHERRY_TESTS} ${OPENCHERRY_CUSTOM_TESTS} )  
   
   ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_BASE_DIR}/Testing/cherryTestManager.cpp)
   TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized ${plugin_target} debug ${plugin_target}${OPENCHERRY_DEBUG_POSTFIX})

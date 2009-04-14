@@ -182,13 +182,6 @@ ENDIF(USE_QT)
 
 ADD_SUBDIRECTORY(Bundles)
 
-# Q4Applications depends on cmake variables set in the Bundles
-IF(DESIRED_QT_VERSION EQUAL 4)
-  ADD_SUBDIRECTORY(Q4Applications)
-ENDIF(DESIRED_QT_VERSION EQUAL 4)
-
-ADD_SUBDIRECTORY(Documentation)
-
 #### find out version number #####
 
 FIND_PACKAGE(Subversion)
@@ -218,6 +211,12 @@ IF(USE_QT)
 ENDIF(USE_QT)
 CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 
+# Q4Applications depends on cmake variables set in the Bundles
+IF(DESIRED_QT_VERSION EQUAL 4)
+  ADD_SUBDIRECTORY(Q4Applications)
+ENDIF(DESIRED_QT_VERSION EQUAL 4)
+
+ADD_SUBDIRECTORY(Documentation)
 
 OPTION(BUILD_TESTING "Build the MITK tests." ON)
 IF(BUILD_TESTING)

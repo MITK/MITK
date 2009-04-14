@@ -167,7 +167,7 @@ void QmitkUploadFileToPACSDialog::btnUpload_clicked()
   mitk::PACSPlugin::StudyInformation study = pacs->GetStudyInformation();
 
   std::string filename = edtFilename->text().ascii();
-  QFileInfo fileinfo( filename );
+  QFileInfo fileinfo( filename.c_str() );
   std::string filebasename = fileinfo.fileName();
   
   std::cout << "Upload '" << filename << "' to study '" << study.StudyDescription << "' as '" << filebasename << "'" << std::endl;

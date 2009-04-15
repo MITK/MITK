@@ -350,7 +350,7 @@ public:
   /**
    * \brief Returns the lot from the point to the plane
    */
-  Point3D Lot( const Point3D &pt ) const;
+  Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
 
 
   /**

@@ -676,7 +676,7 @@ PlaneGeometry::IsOnPlane( const PlaneGeometry *plane ) const
 
 
 Point3D
-PlaneGeometry::Lot( const Point3D& pt ) const
+PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 {
   ScalarType len = GetNormalVnl().two_norm();
   return pt-GetNormal()*Distance(pt)/len;

@@ -1177,6 +1177,7 @@ void QmitkMainTemplate::parseCommandLine()
     }
     fileOpen(qApp->argv()[i]);
   }
+  m_MultiWidget->GetRenderWindow4()->GetRenderer()->GetCameraController()->SetViewToAnterior();
 }
 
 /**

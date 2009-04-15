@@ -186,6 +186,8 @@ void SampleApp::SetDefaultWidgetSize()
     fctwidget->MainSplitter->setSizes(i);
     this->repaint();
   }
+
+  qApp->processEvents();
 }
 
 void SampleApp::InitializeQfm()

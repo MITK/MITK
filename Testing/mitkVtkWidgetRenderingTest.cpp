@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkClassNameTest(int /* argc */, char* /*argv*/[])
+int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("ClassName")

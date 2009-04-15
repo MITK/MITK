@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("ClassName")
+  MITK_TEST_BEGIN("mitkVTKWidgetRenderingTest")
 
   // Test: instantiation
   mitk::VtkWidgetRendering::Pointer widgetRendering = mitk::VtkWidgetRendering::New();

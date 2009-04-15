@@ -23,31 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 
-class mitkNavigationDataLandmarkTransformFilterTestClass{ public:
-
-/* false if difference abs(x1-y1) < delta, else true */
-static bool compareTwoVectors(mitk::NavigationData::PositionType x, mitk::NavigationData::PositionType y)
-{ 
-  float delta = 1.0e-3;
-  if((abs(x[0]-y[0]) < delta ) && (abs(x[1]-y[1]) < delta ) && (abs(x[2]-y[2]) < delta ))
-    return true;
-  else
-    return false;
-}
-
-/* false if difference abs(x1-y1) < delta, else true */
-static bool compareTwoQuaternions(mitk::NavigationData::OrientationType x, mitk::NavigationData::OrientationType y)
-{ 
-  float delta = 1.0e-3;
-  if((abs(x[0]-y[0]) < delta ) && (abs(x[1]-y[1]) < delta ) && (abs(x[2]-y[2]) < delta ))
-    return true;
-  else
-    return false;
-}
-
-};
-
-
 /**Documentation
  *  test for the class "NavigationDataLandmarkTransformFilter".
  */
@@ -120,7 +95,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   //------------------------landmark transform should be initialized at this point------------------------
   output1->Update();
   MITK_TEST_CONDITION_REQUIRED(
-     mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(),  resultPos1),
+     mitk::Equal(output1->GetPosition(),  resultPos1),
      "Testing ND1 position correctly transformed");
 
 
@@ -134,7 +109,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   //------------------------update output1 but check result2------------------------
   output1->Update();
   MITK_TEST_CONDITION_REQUIRED(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
+    mitk::Equal(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed");
 
   //------------------------update ND on slot 1------------------------
@@ -150,7 +125,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   //------------------------update output2 and check result2------------------------
   output2->Update();
   MITK_TEST_CONDITION(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
+    mitk::Equal(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after updating value");
 
   
@@ -171,11 +146,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   output1->Update();
   
   MITK_TEST_CONDITION(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(),  resultPos1),
+    mitk::Equal(output1->GetPosition(),  resultPos1),
     "Testing ND1 position correctly transformed after targetPointSet changed");
 
   MITK_TEST_CONDITION(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
+    mitk::Equal(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after targetPointSet changed");
 
 
@@ -196,11 +171,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   output1->Update();
 
   MITK_TEST_CONDITION(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(),  resultPos1),
+    mitk::Equal(output1->GetPosition(),  resultPos1),
     "Testing ND1 position correctly transformed after sourcePointSet changed");
 
   MITK_TEST_CONDITION(
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output2->GetPosition(),  resultPos2),
+    mitk::Equal(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after sourcePointSet changed");
 
 
@@ -279,11 +254,11 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   output1->Update();
   
   MITK_TEST_CONDITION( 
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoVectors(output1->GetPosition(), resultPos1),
+    mitk::Equal(output1->GetPosition(), resultPos1),
     "Testing ND1 position correctly transformed ");
 
   MITK_TEST_CONDITION( 
-    mitkNavigationDataLandmarkTransformFilterTestClass::compareTwoQuaternions(output1->GetOrientation(), resultQuat),
+    mitk::Equal(output1->GetOrientation(), resultQuat),
     "Testing ND1 orientation correctly transformed ");
   
     // always end with this!

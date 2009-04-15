@@ -297,6 +297,13 @@ inline bool Equal(double scalar1, double scalar2)
   return fabs(scalar1-scalar2) < mitk::eps;
 }
 
+template <typename TCoordRep, unsigned int NPointDimension>
+  inline bool Equal(const vnl_vector_fixed<TCoordRep, NPointDimension> & vector1, const vnl_vector_fixed<TCoordRep, NPointDimension>& vector2) 
+{
+  vnl_vector_fixed<TCoordRep, NPointDimension> diff = vector1-vector2;
+  return diff.squared_magnitude() < mitk::eps; 
+}
+
 template <typename U, typename V, unsigned int NRows, unsigned int NColumns> 
 inline void TransferMatrix(const itk::Matrix<U, NRows, NColumns>& in, itk::Matrix<V, NRows, NColumns>& out)
 { 

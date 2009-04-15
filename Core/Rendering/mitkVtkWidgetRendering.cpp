@@ -99,8 +99,13 @@ void mitk::VtkWidgetRendering::Enable()
     {
       m_VtkWidget->SetInteractor( interactor );
 
-      //mitk::VtkLayerController::GetInstance(m_RenderWindow)
-      //  ->InsertForegroundRenderer(m_Renderer,false);
+      mitk::VtkLayerController *layerController =
+        mitk::VtkLayerController::GetInstance(m_RenderWindow);
+
+      if ( layerController )
+      {
+        layerController->InsertForegroundRenderer(m_Renderer,false);
+      }
       
       m_IsEnabled = true;
     }
@@ -116,7 +121,14 @@ void mitk::VtkWidgetRendering::Disable()
 {
   if ( this->IsEnabled() )
   {
-    mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_Renderer);
+    mitk::VtkLayerController *layerController =
+      mitk::VtkLayerController::GetInstance(m_RenderWindow);
+
+    if ( layerController )
+    {
+      layerController->RemoveRenderer(m_Renderer);
+    }
+
     m_IsEnabled = false;
   }
 }

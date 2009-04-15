@@ -52,6 +52,7 @@ SET(${KITNAME}_TESTS
   mitkToolManagerTest.cpp
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
+  mitkVtkWidgetRenderingTest.cpp
 )
 
 IF(MITK_BUILD_IGT)

@@ -30,8 +30,16 @@ namespace mitk {
 class RenderWindow;  
 
 /**
- * Renders a widget in the foreground
- * of a vtkRenderWindow.
+ * \brief Mechanism for rendering a vtkWidget in the foreground of a RenderWindow.
+ *
+ * To use this class, specify the vtkRenderWindow of the window into which the
+ * vtkWidget shall be placed, and set the vtkWidget using SetVtkWidget().
+ * After enabling the vtkWidget and calling Enable() of this class, the widget
+ * should be rendered.
+ *
+ * Note: this class only provides a basic mechanism for adding widget; all widget
+ * configuration such as placement, size, and en-/disabling of interaction
+ * mechanisms need to be done in the vtkWidget object.
  */
 class MITK_CORE_EXPORT VtkWidgetRendering : public BaseData
 {
@@ -106,8 +114,11 @@ public:
   virtual vtkRenderer* GetVtkRenderer();
 
 
+  /** Set the vtkWidget to be rendered */
   void SetVtkWidget( vtkInteractorObserver *widget );
 
+  /** Get the vtkWidget to be rendered */
+  vtkInteractorObserver *GetVtkWidget() const;
 
 protected:
   /**

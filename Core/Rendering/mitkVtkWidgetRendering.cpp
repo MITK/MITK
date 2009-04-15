@@ -99,8 +99,8 @@ void mitk::VtkWidgetRendering::Enable()
     {
       m_VtkWidget->SetInteractor( interactor );
 
-      mitk::VtkLayerController::GetInstance(m_RenderWindow)
-        ->InsertForegroundRenderer(m_Renderer,false);
+      //mitk::VtkLayerController::GetInstance(m_RenderWindow)
+      //  ->InsertForegroundRenderer(m_Renderer,false);
       
       m_IsEnabled = true;
     }
@@ -154,4 +154,9 @@ void mitk::VtkWidgetRendering::SetRequestedRegion(itk::DataObject*)
 void mitk::VtkWidgetRendering::SetVtkWidget( vtkInteractorObserver *widget )
 {
   m_VtkWidget = widget;
+}
+
+vtkInteractorObserver *mitk::VtkWidgetRendering::GetVtkWidget() const
+{
+  return m_VtkWidget;
 }

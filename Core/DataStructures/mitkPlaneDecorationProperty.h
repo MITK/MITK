@@ -24,10 +24,17 @@ namespace mitk
 {
 
 /**
- * Encapsulates the enumeration vtkInterpolation. Valid values are 
- * (VTK constant/Id/string representation):
- * VTK_FLAT/0/Flat, VTK_GOURAUD/1/Gouraud, VTK_PHONG/2/Phong
- * Default is the Gouraud interpolation
+ * Property which controls whether 2D line representation of a PlaneGeometry
+ * should have small arrows at both ends to indicate the orientation of
+ * the plane, and whether the arrows should be oriented in the direction of 
+ * the plane's normal or against it.
+ * 
+ * Valid values of the enumeration property are
+ * - PLANE_DECORATION_NONE (no arrows) 
+ * - PLANE_DECORATION_POSITIVE_ORIENTATION (arrows pointing upwards)
+ * - PLANE_DECORATION_NEGATIVE_ORIENTATION (arrows pointing downwards)
+ *
+ * See also mitk::Geometry2DDataMapper2D::DrawOrientationArrow()
  */
 class MITK_CORE_EXPORT PlaneDecorationProperty : public EnumerationProperty
 {
@@ -90,13 +97,12 @@ protected:
 
   /**
    * this function is overridden as protected, so that the user may not add
-   * additional invalid interpolation types.
+   * additional invalid types.
    */
   virtual bool AddEnum( const std::string &name, const IdType &id );
 
   /**
-   * Adds the enumeration types as defined by vtk to the list of known 
-   * enumeration values.
+   * Adds the standard enumeration types with corresponding strings.
    */
   virtual void AddDecorationTypes();
 };

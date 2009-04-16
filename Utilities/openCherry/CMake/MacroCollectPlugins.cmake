@@ -6,7 +6,7 @@
 # MACRO_COLLECT_PLUGINS(OUTPUT_DIR plugin_output_dir
 #                       [CACHE_PLUGIN_SOURCE_DIRS cache_src_dirs]
 #                       [CACHE_PLUGIN_BINARY_DIRS cache_bin_dirs]
-#                       [BUNDLE_LIST_NAME bundle_list_name]
+#                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [FORCE_BUILD_ALL]
 #                       )
 #
@@ -19,9 +19,10 @@
 # and binary directories will be appended. These variables
 # can late be used to configure your applications .ini file.
 #
-# BUNDLE_LIST_NAME
-# The name of the generated cmake file containing the BUILD_<plugin-id>
-# variables. If not set, "BundleList" is used.
+# BUNDLE_LIST_PATH
+# The full path for the generated cmake file containing the BUILD_<plugin-id>
+# variables. If not set, "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake"
+# is used.
  
 # FORCE_BUILD_ALL if set, the BUILD_pluginname variables are ignored and all
 # plugins under this directory are build
@@ -30,15 +31,15 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;BUNDLE_LIST_NAME" "FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;BUNDLE_LIST_PATH" "FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
 ENDIF(NOT _COLLECT_ADD_DIR)
 
-IF(NOT _COLLECT_BUNDLE_LIST_NAME)
-  SET(_COLLECT_BUNDLE_LIST_NAME "BundleList")
-ENDIF(NOT _COLLECT_BUNDLE_LIST_NAME)
+IF(NOT _COLLECT_BUNDLE_LIST_PATH)
+  SET(_COLLECT_BUNDLE_LIST_PATH "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake")
+ENDIF(NOT _COLLECT_BUNDLE_LIST_PATH)
  
 SET(PLUGINS_OUTPUT_BASE_DIR ${_COLLECT_OUTPUT_DIR})
 
@@ -95,7 +96,7 @@ FOREACH(_subdir ${_plugins_to_build})
 ENDFOREACH(_subdir ${_plugins_to_build})
 
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in" "${OPENCHERRY_BINARY_DIR}/${_COLLECT_BUNDLE_LIST_NAME}.cmake" @ONLY)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in" "${_COLLECT_BUNDLE_LIST_PATH}" @ONLY)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
 
 ENDMACRO(MACRO_COLLECT_PLUGINS)

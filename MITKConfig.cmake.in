@@ -41,7 +41,7 @@ IF (MITK_USE_OPENCHERRY)
     "top-level directory containing the poco libraries.")
 
   INCLUDE("@MITK_SOURCE_DIR@/CMake/MITKPluginHelpers.cmake")
-  INCLUDE("@MITK_BINARY_DIR@/Bundles/BundleList.cmake")
+  INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKBundleList.cmake")
 
   FIND_PACKAGE(openCherry)
 

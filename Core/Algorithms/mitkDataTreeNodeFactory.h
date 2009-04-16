@@ -80,40 +80,11 @@ public:
   */
   itkGetStringMacro( FilePattern );
 
-  /**
-   * Sets default properties common to all image types
-   */
-  static void SetDefaultImageProperties(DataTreeNode::Pointer &node);
-  
-  /**
-   * Sets default properties common to all data types representing a surface
-   */
-  static void SetDefaultSurfaceProperties(DataTreeNode::Pointer &node);
-
-  /**
-   * Sets default properties common to all data types representing a binary segmentation
-   */
-  static void SetDefaultSegmentationProperties(DataTreeNode::Pointer &node);
-  
-  /**
-   * Sets default properties common to all data types representing a PointSet
-   */
-  static void SetDefaultPointSetProperties(DataTreeNode::Pointer &node);
-  
-  /**
-    * Sets default properties common to all data types representing an unstructured grid
-    */
-  static void SetDefaultUnstructuredGridProperties(DataTreeNode::Pointer &node);
 
   /**
     * Nice default colors for segmentations of some "normal" organs.
     */
   static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );
-
-  /**
-   * Sets default common properties
-   */
-  void SetDefaultCommonProperties(DataTreeNode::Pointer &node);
 
   /**
    * if true -> loaded image is part of a serie

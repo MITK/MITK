@@ -22,7 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 
-#include "mitkDataTreeNodeFactory.h"
+//#include "mitkDataTreeNodeFactory.h"
+#include <mitkCoreObjectFactory.h>
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -42,7 +43,8 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
  m_CurrentThresholdValue(1)
 {
   m_ThresholdFeedbackNode = DataTreeNode::New();
-  DataTreeNodeFactory::SetDefaultImageProperties ( m_ThresholdFeedbackNode );
+  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
+
   m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.2, 1.0, 0.2) );
   m_ThresholdFeedbackNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   m_ThresholdFeedbackNode->SetProperty( "layer", IntProperty::New( 20 ) );

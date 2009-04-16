@@ -82,7 +82,6 @@ namespace mitk
         node->SetData(mitkImage);
         if(name!=NULL)
           node->SetProperty("name", mitk::StringProperty::New(name));
-        mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
         iterator->Add(node);
       }
 

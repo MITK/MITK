@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNodeFactory.h"
+//#include "mitkDataTreeNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -37,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffImageApplier.h"
 #include "mitkOperationEvent.h"
 #include "mitkSegTool2D.h"
+#include <mitkCoreObjectFactory.h>
 
 #include <itkCommand.h>
 
@@ -71,7 +72,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataTreeNode::New();
-  mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_FeedbackNode );
+  //mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_FeedbackNode );
+  mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_FeedbackNode );
   m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
   m_FeedbackNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
   m_FeedbackNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 1.0) );

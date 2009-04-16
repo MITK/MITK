@@ -540,7 +540,6 @@ void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::Da
     boundingNode = mitk::DataTreeNode::New(); 
     mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
     m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
-    mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( boundingNode );
     boundingNode->SetData( m_BoundingObject );
     boundingNode->SetProperty( "name", mitk::StringProperty::New(NAMEFORBOUNDINGOBJECT) );
     boundingNode->SetProperty( "color", mitk::ColorProperty::New(0.1, 0.57, 0.04) );
@@ -1560,7 +1559,6 @@ void QmitkPixelGreyValueManipulatorComponent::AddManipulatedImageIntoTree(typena
     std::string sPName = "PixelChanged Image " + buffer.str();
     m_PixelChangedImageNode = mitk::DataTreeNode::New();//m_GradientShiftedImageNode = mitk::DataTreeNode::New();
     m_PixelChangedImageNode->SetData(m_PixelChangedImage);
-    mitk::DataTreeNodeFactory::SetDefaultImageProperties(m_PixelChangedImageNode);
     m_PixelChangedImageNode->SetProperty("name", mitk::StringProperty::New(sPName ) );
     m_PixelChangedImageNode->SetIntProperty("layer", 2);
     selectedIterator->Add(m_PixelChangedImageNode);

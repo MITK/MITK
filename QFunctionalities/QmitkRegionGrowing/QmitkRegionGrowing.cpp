@@ -220,7 +220,6 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   newNode->SetData( resultImage );
 
   // set some properties
-  mitk::DataTreeNodeFactory::SetDefaultImageProperties( newNode );
   newNode->SetProperty("binary", mitk::BoolProperty::New(true));
   newNode->SetProperty("name", mitk::StringProperty::New("dumb segmentation"));
   newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));

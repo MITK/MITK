@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkMaterialProperty.h"
+#include <mitkCoreObjectFactory.h>
 
 #include <vtkPolyDataNormals.h>
 
@@ -129,8 +130,6 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
   if (m_AddToTree)
   {
     m_Node = DataTreeNode::New();
-  
-    DataTreeNodeFactory::SetDefaultSurfaceProperties(m_Node);
 
     bool wireframe(false);
     GetParameter("Wireframe", wireframe );

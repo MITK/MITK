@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkColorSequenceRainbow.h>
 #include <mitkManualSegmentationToSurfaceFilter.h>
 //#include <mitkImageToSurfaceFilter.h>
+#include <mitkCoreObjectFactory.h>
 
 #include "QmitkSelectableGLWidget.h"
 
@@ -684,7 +685,7 @@ void QmitkSurfaceCreatorComponent::InsertSurfaceIntoDataTree(mitk::ManualSegment
     m_b += 0.25; if(m_b > 1){m_b = m_b - 1;}
 
     iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
-    mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
+    mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( surfaceNode );
     surfaceNode->SetIntProperty("layer", layer+1);
     surfaceNode->SetProperty("Surface", mitk::BoolProperty::New(true));
     surfaceNode->SetProperty("name", mitk::StringProperty::New(surfaceNodeName));

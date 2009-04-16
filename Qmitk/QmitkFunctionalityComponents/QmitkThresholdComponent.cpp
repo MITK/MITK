@@ -490,7 +490,6 @@ mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode(
 	// decorate the datatreenode with some properties
 	mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
 	segmentationNode->SetData( image );
-	mitk::DataTreeNodeFactory::SetDefaultImageProperties ( segmentationNode );
 
 	// visualization properties
 

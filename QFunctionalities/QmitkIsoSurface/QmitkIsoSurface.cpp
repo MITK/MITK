@@ -156,7 +156,6 @@ void QmitkIsoSurface::CreateSurface()
     std::string surfaceNodeName = "Surface " + buffer.str();
 
     iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
-    mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(surfaceNode);
     surfaceNode->SetIntProperty("layer", layer+1);
     surfaceNode->SetProperty("Surface", mitk::BoolProperty::New(true));
     surfaceNode->SetProperty("name", mitk::StringProperty::New(surfaceNodeName));

@@ -139,7 +139,6 @@ namespace CommonFunctionality
     {
       node=mitk::DataTreeNode::New();
       node->SetData(image);
-      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
       mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(str.c_str());
       node->SetProperty("name",nameProp);
       it->Add(node);

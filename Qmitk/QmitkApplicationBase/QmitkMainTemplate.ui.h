@@ -1775,7 +1775,6 @@ void QmitkMainTemplate::fileOpenRawImage( const char * fileName )
   {
     mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
     node->SetData(m_ResultImage);
-    mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
     node->SetProperty("name", mitk::StringProperty::New( fileName ));
     mitk::DataStorage::GetInstance()->Add(node);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1806,7 +1805,6 @@ void QmitkMainTemplate::fileOpenRawImageSequence(QStringList fileNames)
     {
       mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
       node->SetData(m_ResultImage);
-      mitk::DataTreeNodeFactory::SetDefaultImageProperties(node);
       node->SetProperty("name", mitk::StringProperty::New( fileNames.first().ascii() ));
       mitk::DataStorage::GetInstance()->Add(node);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -676,7 +676,6 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
           mitk::DataTreeIteratorClone iteratorOnImageToBeSkinExtracted = m_ConnectivityFilterComponentGUI->GetTreeNodeSelector()->GetFilter()->GetIteratorToSelectedItem(); 
           iteratorOnImageToBeSkinExtracted->Get()->GetIntProperty("layer", layer);
           connectivityNode->SetIntProperty("layer", layer+1);
-          mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties(connectivityNode);
           connectivityNode->SetProperty("deprecated usePointDataForColouring", mitk::BoolProperty::New(true));
           connectivityNode->SetProperty("name", mitk::StringProperty::New(connectivityNodeName) );
           connectivityNode->SetProperty("ScalarsRangeMaximum", mitk::FloatProperty::New(scalarsMax));

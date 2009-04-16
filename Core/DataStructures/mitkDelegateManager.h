@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <map>
 
-namespace mitk 
+namespace mitk
 {
 
   ///
@@ -40,7 +40,7 @@ namespace mitk
   /// One could also say it is an Event Multiplexer.
   ///
   ///
-  class MITK_CORE_EXPORT DelegateManager 
+  class MITK_CORE_EXPORT DelegateManager
   {
     public:
       ///
@@ -51,7 +51,7 @@ namespace mitk
       /// \brief Adds or overwrites a Command. *Attention*: This is class is the owner of the Command.
       /// Thus whenever a command is overwritten, the old Command is deleted!
       ///
-      void SetCommand(const std::string& _CommandID, MessageAbstractDelegate*);
+      void SetCommand(const std::string& _CommandID, MessageAbstractDelegate<>*);
       ///
       /// \brief Removes and *deletes* the Command with the given id.
       ///
@@ -59,7 +59,7 @@ namespace mitk
       ///
       /// \brief Returns the Command with the given id or NULL if the _CommandID is unknown.
       ///
-      MessageAbstractDelegate* GetCommand(const std::string& _CommandID) const;
+      MessageAbstractDelegate<>* GetCommand(const std::string& _CommandID) const;
       ///
       /// \brief Dtor: Deletes all commands and clears m_CommandMap.
       ///
@@ -72,10 +72,10 @@ namespace mitk
       ///
       /// \brief Maps IDs to Commands.
       ///
-      std::map<std::string, MessageAbstractDelegate*> m_CommandMap;
+      std::map<std::string, MessageAbstractDelegate<>*> m_CommandMap;
 
   };
-}  
+}
 
 
 #endif /* MITKDelegateManager_H_HEADER_INCLUDED */

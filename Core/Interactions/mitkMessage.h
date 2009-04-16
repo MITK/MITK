@@ -26,34 +26,35 @@ PURPOSE.  See the above copyright notices for more information.
  * this variable.
 */
 #define mitkNewMessageMacro(msgHandleObject)                                                                 \
-  private: Message<> m_##msgHandleObject##Message;                                                   \
+  private: ::mitk::Message<> m_##msgHandleObject##Message;                                                   \
   public:                                                                                                \
-  inline void Add##msgHandleObject##Listener(const MessageAbstractDelegate<>& delegate)              \
+  inline void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate<>& delegate)              \
     { m_##msgHandleObject##Message += delegate; }                                                    \
-  inline void Remove##msgHandleObject##Listener(const MessageAbstractDelegate<>& delegate)           \
+  inline void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate<>& delegate)           \
     { m_##msgHandleObject##Message -= delegate; }                                                    \
 
 
 #define mitkNewMessageWithReturnMacro(msgHandleObject, returnType)                                                 \
-  private: Message<returnType> m_##msgHandleObject##Message;                                               \
+  private: ::mitk::Message<returnType> m_##msgHandleObject##Message;                                               \
   public:                                                                                                      \
-  inline void Add##msgHandleObject##Listener(const MessageAbstractDelegate<returnType>& delegate)          \
+  inline void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate<returnType>& delegate)          \
     { m_##msgHandleObject##Message += delegate; }                                                          \
-    inline void Remove##msgHandleObject##Listener(const MessageAbstractDelegate<returnType>& delegate)     \
+    inline void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate<returnType>& delegate)     \
     { m_##msgHandleObject##Message -= delegate; }                                                          \
 
 
 #define mitkNewMessage1Macro(msgHandleObject, type1)                                                          \
-  private: Message1< type1 > m_##msgHandleObject##Message;                                                \
+  private: ::mitk::Message1< type1 > m_##msgHandleObject##Message;                                                \
   public:                                                                                                 \
-  void Add##msgHandleObject##Listener(const MessageAbstractDelegate1< type1 >& delegate)              \
+  void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1< type1 >& delegate)              \
     { m_##msgHandleObject##Message += delegate; }                                                     \
-    void Remove##msgHandleObject##Listener(const MessageAbstractDelegate1< type1 >& delegate)         \
+    void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1< type1 >& delegate)         \
     { m_##msgHandleObject##Message -= delegate; }
 
 
 namespace mitk {
 
+template<typename A = void>
 class MessageAbstractDelegate
 {
   public:
@@ -62,7 +63,7 @@ class MessageAbstractDelegate
     {
     }
 
-    virtual void Execute() = 0;
+    virtual A Execute() = 0;
     virtual bool operator==(const MessageAbstractDelegate* cmd) = 0;
     virtual MessageAbstractDelegate* Clone() const = 0;
 };
@@ -124,14 +125,22 @@ class MessageAbstractDelegate4
     virtual MessageAbstractDelegate4* Clone() const = 0;
 };
 
-template <class R>
-class MessageDelegate : public MessageAbstractDelegate
+/**
+ * This class essentially wraps a function pointer with signature
+ * A(R::*function)(). A is the return type of your callback function
+ * and R the type of the class implementing the function.
+ *
+ * Use this class to add a callback function to
+ * messages without parameters.
+ */
+template <class R, typename A = void>
+class MessageDelegate : public MessageAbstractDelegate<A>
 {
   public:
 
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
-    MessageDelegate(R* object, void(R::*memberFunctionPointer)())
+    MessageDelegate(R* object, A(R::*memberFunctionPointer)())
     :m_Object(object),
     m_MemberFunctionPointer(memberFunctionPointer)
     {
@@ -142,14 +151,14 @@ class MessageDelegate : public MessageAbstractDelegate
     }
 
     // override function "Call"
-    virtual void Execute()
+    virtual A Execute()
     {
       return (m_Object->*m_MemberFunctionPointer)();    // execute member function
     }
 
-    bool operator==(const MessageAbstractDelegate* c)
+    bool operator==(const MessageAbstractDelegate<A>* c)
     {
-      const MessageDelegate<R>* cmd = dynamic_cast<const MessageDelegate<R>* >(c);
+      const MessageDelegate<R,A>* cmd = dynamic_cast<const MessageDelegate<R,A>* >(c);
       if (!cmd) return false;
 
       if ((void*)this->m_Object != (void*)cmd->m_Object) return false;
@@ -157,17 +166,28 @@ class MessageDelegate : public MessageAbstractDelegate
       return true;
     }
 
-    MessageAbstractDelegate* Clone() const
+    MessageAbstractDelegate<A>* Clone() const
     {
       return new MessageDelegate(m_Object, m_MemberFunctionPointer);
     }
 
   private:
     R* m_Object;                            // pointer to object
-    void (R::*m_MemberFunctionPointer)();   // pointer to member function
+    A (R::*m_MemberFunctionPointer)();   // pointer to member function
 };
 
 
+/**
+ * This class essentially wraps a function pointer with signature
+ * A(R::*function)(T). A is the return type of your callback function,
+ * R the type of the class implementing the function and T the type
+ * of the argument.
+ *
+ * Use this class to add a callback function to
+ * messages with one parameter.
+ *
+ * If you need more parameters, use MessageDelegate2 etc.
+ */
 template <class R, typename T, typename A = void>
 class MessageDelegate1 : public MessageAbstractDelegate1<T,A>
 {
@@ -207,7 +227,7 @@ class MessageDelegate1 : public MessageAbstractDelegate1<T,A>
     }
 
   private:
-    R* m_Object;                            // pointer to object
+    R* m_Object;                          // pointer to object
     A (R::*m_MemberFunctionPointer)(T);   // pointer to member function
 };
 
@@ -349,29 +369,140 @@ class MessageDelegate4 : public MessageAbstractDelegate4<T,U,V,W,A>
  *
  * This totally ITK, Qt, VTK, whatever toolkit independent class
  * allows one class to send out messages and another class to
- * receive these message. There are subclasses for sending
- * parameters along with the messages.
+ * receive these message. This class is templated over the
+ * return type (A) of the callback functions.
+ * There are variations of this class
+ * (Message1, Message2, etc.) for sending
+ * one, two or more parameters along with the messages.
  *
  * This is an implementation of the Observer pattern.
  *
  * \li There is no guarantee about the order of which observer is notified first. At the moment the observers which register first will be notified first.
  * \li Notifications are <b>synchronous</b>, by direct method calls. There is no support for asynchronous messages.
  *
- * A lengthy example of how to use these message classes can be
+ * To conveniently add methods for registering/unregistering observers
+ * to Message variables of your class, you can use the mitkNewMessageMacro
+ * macros.
+ *
+ * Here is an example how to use the macros and templates:
+ *
+ * \code
+ *
+ * // An object to be send around
+ * class Law
+ * {
+ *   private:
+ *     std::string m_Description;
+ *
+ *   public:
+ *
+ *     Law(const std::string law) : m_Description(law)
+ *     { }
+ *
+ *     std::string GetDescription() const
+ *     {
+ *       return m_Description;
+ *     }
+ * };
+ *
+ * // The NewtonMachine will issue specific events
+ * class NewtonMachine
+ * {
+ *   mitkNewMessageMacro(AnalysisStarted);
+ *   mitkNewMessage1Macro(AnalysisStopped, bool);
+ *   mitkNewMessage1Macro(LawDiscovered, const Law&);
+ *
+ *   public:
+ *
+ *     void StartAnalysis()
+ *     {
+ *       // send the "started" signal
+ *       m_AnalysisStartedMessage();
+ *
+ *       // we found a new law of nature by creating one :-)
+ *       Law massLaw("F=ma");
+ *       m_LawDiscoveredMessage(massLaw);
+ *     }
+ *
+ *     void StopAnalysis()
+ *     {
+ *       // send the "stop" message with false, indicating
+ *       // that no error occured
+ *       m_AnalysisStoppedMessage(false);
+ *     }
+ * };
+ *
+ * class Observer
+ * {
+ *   private:
+ *
+ *     NewtonMachine* m_Machine;
+ *
+ *   public:
+ *
+ *     Observer(NewtonMachine* machine) : m_Machine(machine)
+ *     {
+ *       // Add "observers", i.e. function pointers to the machine
+ *       m_Machine->AddAnalysisStartedListener(
+ *         ::mitk::MessageDelegate<Observer>(this, &Observer::MachineStarted));
+ *       m_Machine->AddAnalysisStoppedListener(
+ *         ::mitk::MessageDelegate1<Observer, bool>(this, &Observer::MachineStopped));
+ *       m_Machine->AddLawDiscoveredListener(
+ *         ::mitk::MessageDelegate1<Observer, const Law&>(this, &Observer::LawDiscovered));
+ *      }
+ *
+ *     ~Observer()
+ *     {
+ *       // Always remove your observers when finished
+ *       m_Machine->RemoveAnalysisStartedListener(
+ *         ::mitk::MessagDelegate<Observer>(this, &Observer::MachineStarted));
+ *       m_Machine->RemoveAnalysisStoppedListener(
+ *         ::mitk::MessageDelegate1<Observer, bool>(this, &Observer::MachineStopped));
+ *       m_Machine->RemoveLawDiscoveredListener(
+ *         ::mitk::MessageDelegate1<Observer, const Law&>(this, &Observer::LawDiscovered));
+ *      }
+ *
+ *      void MachineStarted()
+ *      {
+ *        std::cout << "Observed machine has started" << std::endl;
+ *      }
+ *
+ *      void MachineStopped(bool error)
+ *      {
+ *        std::cout << "Observed machine stopped " << (error ? "with an error" : "") << std::endl;
+ *      }
+ *
+ *      void LawDiscovered(const Law& law)
+ *      {
+ *        std::cout << "New law of nature discovered: " << law.GetDescription() << std::endl;
+ *      }
+ *  };
+ *
+ *  NewtonMachine newtonMachine;
+ *  Observer observer(&newtonMachine);
+ *
+ *  // This will send two events to registered observers
+ *  newtonMachine.StartAnalysis();
+ *  // This will send one event to registered observers
+ *  newtonMachine.StopAnalysis();
+ *
+ * \endcode
+ *
+ * Another example of how to use these message classes can be
  * found in the directory Testing, file mitkMessageTest.cpp
  *
  */
-// message without parameters (pure signals)
+template<typename A = void>
 class Message
 {
   public:
 
     typedef Message Self;
-    typedef MessageAbstractDelegate AbstractDelegate;
+    typedef MessageAbstractDelegate<A> AbstractDelegate;
     typedef std::vector<AbstractDelegate* > ListenerList;
 
     ~Message() {
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end(); ++iter )
       {
         delete *iter;
@@ -383,7 +514,7 @@ class Message
       AbstractDelegate* msgCmd = delegate.Clone();
 
       m_Mutex.Lock();
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -405,7 +536,7 @@ class Message
     void RemoveListener( const AbstractDelegate& delegate ) const
     {
       m_Mutex.Lock();
-      for (ListenerList::iterator iter = m_Listeners.begin();
+      for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -435,7 +566,7 @@ class Message
         m_Mutex.Unlock();
       }
 
-      for ( ListenerList::iterator iter = listeners.begin();
+      for (typename ListenerList::iterator iter = listeners.begin();
             iter != listeners.end();
             ++iter )
       {
@@ -447,6 +578,21 @@ class Message
     void operator()()
     {
       this->Send();
+    }
+
+    const ListenerList& GetListeners() const
+    {
+      return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:
@@ -484,7 +630,8 @@ class Message1
     typedef MessageAbstractDelegate1<T,A> AbstractDelegate;
     typedef std::vector<AbstractDelegate*> ListenerList;
 
-    ~Message1() {
+    ~Message1()
+    {
       for (typename ListenerList::iterator iter = m_Listeners.begin();
            iter != m_Listeners.end(); ++iter )
       {
@@ -563,9 +710,19 @@ class Message1
       this->Send(t);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:
@@ -665,11 +822,20 @@ class Message2
       this->Send(t, u);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
     }
 
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
+    }
 
   protected:
 
@@ -767,11 +933,20 @@ class Message3
       this->Send(t, u, v);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return m_Listeners;
     }
 
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
+    }
 
   protected:
 
@@ -869,9 +1044,19 @@ class Message4
       this->Send(t, u, v, w);
     }
 
-    const ListenerList& GetListeners()
+    const ListenerList& GetListeners() const
     {
       return this->m_Listeners;
+    }
+
+    bool HasListeners() const
+    {
+      return !m_Listeners.empty();
+    }
+
+    bool IsEmpty() const
+    {
+      return m_Listeners.empty();
     }
 
   protected:

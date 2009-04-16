@@ -59,10 +59,10 @@ class MessageSenderClass
   public:
 
     // message without any parameters, pure notification
-    Message WaveHand;
+    Message<> WaveHand;
 
     // message without any parameters, pure notification
-    Message ShowFinger;
+    Message<> ShowFinger;
 
     // message with one parameter of type std::string
     Message1<const std::string&> Say;
@@ -260,7 +260,7 @@ int mitkMessageTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(
       (sender.DoShoutAgeAndFootSize(46, 30.5),
        (receiver.Age() == 46 && (receiver.FootSize() - 30.5 < 0.0001))),
-      "Message with int AND loat parameter");
+      "Message with int AND float parameter");
   receiver.Amnesia();
 
   MITK_TEST_END()

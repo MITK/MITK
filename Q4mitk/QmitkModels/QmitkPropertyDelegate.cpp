@@ -35,7 +35,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
       QPalette::ColorGroup cg = option.state & QStyle::State_HasFocus
         ? QPalette::Normal : QPalette::Disabled;
       painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
-    }    
+    }
 
     // draw a coloured button
     if(data.type() == QVariant::Color)
@@ -88,7 +88,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
       const int indicatorHeight = style->pixelMetric(QStyle::PM_IndicatorHeight, &opt);
       opt.rect = QRect(opt.rect.x()+ opt.rect.width()/2-indicatorWidth/2,
         opt.rect.y()+ opt.rect.height()/2-indicatorHeight/2,
-        indicatorWidth, indicatorHeight); 
+        indicatorWidth, indicatorHeight);
 
       // draw item data as CheckBox
       style->drawControl(QStyle::CE_CheckBox,&opt,painter);
@@ -172,7 +172,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       QPushButton* commandBtn = new QPushButton(parent);
       commandBtn->setText(QString::fromStdString(commandLabel));
 
-      
+
       connect(commandBtn, SIGNAL(pressed()), this, SLOT(ExecuteDelegate()));
 
       // emulate pressed signal
@@ -343,7 +343,7 @@ void QmitkPropertyDelegate::updateEditorGeometry(QWidget *editor,
 /*
   QRect rect = option.rect;
 
-  if (QCheckBox* checkBoxEditor = qobject_cast<QCheckBox*>(editor)) 
+  if (QCheckBox* checkBoxEditor = qobject_cast<QCheckBox*>(editor))
   {
     const QStyle *style = QApplication::style();
 
@@ -351,7 +351,7 @@ void QmitkPropertyDelegate::updateEditorGeometry(QWidget *editor,
     const int indicatorHeight = style->pixelMetric(QStyle::PM_IndicatorHeight, &option);
     rect = QRect(option.rect.x()+ option.rect.width()/2-indicatorWidth/2,
       option.rect.y()+ option.rect.height()/2-indicatorHeight/2,
-      indicatorWidth, indicatorHeight); 
+      indicatorWidth, indicatorHeight);
   }
 */
 
@@ -383,7 +383,7 @@ void QmitkPropertyDelegate::ExecuteDelegate()
   if(QPushButton *cmdButton = qobject_cast<QPushButton *>(sender()))
   {
     std::string commandLabel = cmdButton->text().toStdString();
-    mitk::MessageAbstractDelegate* messageDelegate = mitk::DelegateManager::GetInstance()->GetCommand(commandLabel);
+    mitk::MessageAbstractDelegate<>* messageDelegate = mitk::DelegateManager::GetInstance()->GetCommand(commandLabel);
 
     if(!messageDelegate)
       QMessageBox::critical(qApp->mainWidget(), "Delegate not found"

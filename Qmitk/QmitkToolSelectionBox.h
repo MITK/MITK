@@ -105,6 +105,9 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QButtonGroup
   
   protected:
 
+    void showEvent( QShowEvent* );
+    void hideEvent( QHideEvent* );
+
     void RecreateButtons();
     void SetOrUnsetButtonForActiveTool();
 

@@ -248,16 +248,16 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   {
     default:
     case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && m_Enabled;
+      enabled = referenceNode && workingNode && m_Enabled && isVisible();
       break;
     case EnabledWithReferenceData:
-      enabled = referenceNode && m_Enabled;
+      enabled = referenceNode && m_Enabled && isVisible();
       break;
     case EnabledWithWorkingData:
-      enabled = workingNode && m_Enabled;
+      enabled = workingNode && m_Enabled && isVisible();
       break;
     case AlwaysEnabled:
-      enabled = m_Enabled;
+      enabled = m_Enabled && isVisible();
       break;
   }
 
@@ -446,5 +446,19 @@ void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
 void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
 {
   m_ToolGUIWidget = parentWidget;
+}
+
+    
+void QmitkToolSelectionBox::showEvent( QShowEvent* e )
+{
+  QButtonGroup::showEvent(e);
+  SetGUIEnabledAccordingToToolManagerState();
+}
+
+
+void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
+{
+  QButtonGroup::hideEvent(e);
+  SetGUIEnabledAccordingToToolManagerState();
 }
 

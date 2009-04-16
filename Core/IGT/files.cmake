@@ -8,6 +8,7 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationData.cpp
   IGTFilters/mitkNavigationDataDisplacementFilter.cpp
   IGTFilters/mitkNavigationDataSource.cpp
+  IGTFilters/mitkNavigationDataToMessageFilter.cpp
   IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
   IGTFilters/mitkNavigationDataVisualizationFilter.cpp

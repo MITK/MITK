@@ -64,8 +64,9 @@ IF(MITK_BUILD_IGT)
  mitkClaronTrackingDeviceTest.cpp
  mitkInternalTrackingToolTest.cpp
  mitkNavigationDataLandmarkTransformFilterTest.cpp
- mitkNavigationDataTransformFilterTest.cpp
+ mitkNavigationDataToMessageFilterTest.cpp
  mitkNavigationDataToPointSetFilterTest.cpp
+ mitkNavigationDataTransformFilterTest.cpp
  mitkNavigationDataVisualizationByBaseDataTransformFilterTest.cpp
  mitkNavigationDataDisplacementFilterTest.cpp
  mitkNDIPassiveToolTest.cpp

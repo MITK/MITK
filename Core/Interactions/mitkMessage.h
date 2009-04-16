@@ -26,30 +26,31 @@ PURPOSE.  See the above copyright notices for more information.
  * this variable.
 */
 #define mitkNewMessageMacro(msgHandleObject)                                                                 \
-  private: Message<> m_ ## msgHandleObject ## Message;                                                   \
+  private: Message<> m_##msgHandleObject##Message;                                                   \
   public:                                                                                                \
-  inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<>& delegate)              \
-    { m_ ## msgHandleObject ## Message += delegate; }                                                    \
-  inline void Remove ## msgHandleObject ## Listener(const MessageAbstractDelegate<>& delegate)           \
-    { m_ ## msgHandleObject ## Message -= delegate; }                                                    \
+  inline void Add##msgHandleObject##Listener(const MessageAbstractDelegate<>& delegate)              \
+    { m_##msgHandleObject##Message += delegate; }                                                    \
+  inline void Remove##msgHandleObject##Listener(const MessageAbstractDelegate<>& delegate)           \
+    { m_##msgHandleObject##Message -= delegate; }                                                    \
 
 
 #define mitkNewMessageWithReturnMacro(msgHandleObject, returnType)                                                 \
-  private: Message<returnType> m_ ## msgHandleObject ## Message;                                               \
+  private: Message<returnType> m_##msgHandleObject##Message;                                               \
   public:                                                                                                      \
-  inline void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate<returnType>& delegate)          \
-    { m_ ## msgHandleObject ## Message += delegate; }                                                          \
-    inline void Remove ## msgHandleObject ## Listener(const MessageAbstractDelegate<returnType>& delegate)     \
-    { m_ ## msgHandleObject ## Message -= delegate; }                                                          \
+  inline void Add##msgHandleObject##Listener(const MessageAbstractDelegate<returnType>& delegate)          \
+    { m_##msgHandleObject##Message += delegate; }                                                          \
+    inline void Remove##msgHandleObject##Listener(const MessageAbstractDelegate<returnType>& delegate)     \
+    { m_##msgHandleObject##Message -= delegate; }                                                          \
 
 
 #define mitkNewMessage1Macro(msgHandleObject, type1)                                                          \
-  private: Message1< type1 > m_msgHandleObject ## Message;                                                \
+  private: Message1< type1 > m_##msgHandleObject##Message;                                                \
   public:                                                                                                 \
-  void Add ## msgHandleObject ## Listener(const MessageAbstractDelegate1< type1 >& delegate)              \
-    { m_ ## msgHandleObject ## Message += delegate; }                                                     \
-    void Remove ## msgHandleObject ## Listener(const MessageAbstractDelegate1< type1 >& delegate)         \
-    { m_ ## msgHandleObject ## Message -= delegate; }
+  void Add##msgHandleObject##Listener(const MessageAbstractDelegate1< type1 >& delegate)              \
+    { m_##msgHandleObject##Message += delegate; }                                                     \
+    void Remove##msgHandleObject##Listener(const MessageAbstractDelegate1< type1 >& delegate)         \
+    { m_##msgHandleObject##Message -= delegate; }
+
 
 namespace mitk {
 

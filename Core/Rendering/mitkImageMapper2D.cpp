@@ -619,17 +619,10 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   
   rendererInfo.m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
-
-  
-
-  // Determine output extent for reslicing
-  ScalarType size[2];
-  size[0] = (bounds[1] - bounds[0]) / mmPerPixel[0];
-  size[1] = (bounds[3] - bounds[2]) / mmPerPixel[1];
-
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
+    // Calculate output extent (integer values)
     xMin = static_cast< int >( bounds[0] / mmPerPixel[0] + 0.5 );
     xMax = static_cast< int >( bounds[1] / mmPerPixel[0] + 0.5 );
     yMin = static_cast< int >( bounds[2] / mmPerPixel[1] + 0.5 );
@@ -637,8 +630,8 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
     // Calculate the extent by which the maximal plane (due to plane rotation)
     // overlaps the regular plane size.
-    rendererInfo.m_Overlap[0] = -bounds[0] / mmPerPixel[0];
-    rendererInfo.m_Overlap[1] = -bounds[2] / mmPerPixel[1];
+    rendererInfo.m_Overlap[0] = -xMin;
+    rendererInfo.m_Overlap[1] = -yMin;
   }
   else
   {

@@ -558,7 +558,6 @@ void QmitkPixelGreyValueManipulatorComponent::AddBoundingObjectToNode(/*mitk::Da
     //m_BoundingObjectNode = mitk::DataTreeNode::New(); 
     //mitk::Point3D currentCrossPosition = m_MultiWidget->GetCrossPosition();
     //m_BoundingObject->GetGeometry()->Translate(currentCrossPosition.GetVectorFromOrigin());
-    //mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_BoundingObjectNode );
     //m_BoundingObjectNode->SetData( m_BoundingObject );
     //m_BoundingObjectNode->SetProperty( "name", mitk::StringProperty::New( NAMEFORBOUNDINGOBJECT ) );
     //m_BoundingObjectNode->SetProperty( "color", mitk::ColorProperty::New(0.1, 0.57, 0.04) );

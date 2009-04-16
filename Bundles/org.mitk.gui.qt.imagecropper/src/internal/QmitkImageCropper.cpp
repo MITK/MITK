@@ -418,7 +418,6 @@ void QmitkImageCropper::CreateBoundingObject()
   m_CroppingObject = mitk::Cuboid::New();
 
   m_CroppingObjectNode = mitk::DataTreeNode::New(); 
-  mitk::DataTreeNodeFactory::SetDefaultSurfaceProperties( m_CroppingObjectNode );
   m_CroppingObjectNode->SetData( m_CroppingObject );
   m_CroppingObjectNode->SetProperty( "name", mitk::StringProperty::New( "CroppingObject" ) );
   m_CroppingObjectNode->SetProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 0.0) );

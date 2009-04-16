@@ -311,7 +311,6 @@ void mitk::PicDescriptorToNode::GenerateData( std::list<mitkIpPicDescriptor*> sl
   {
     DataTreeNode::Pointer node = mitk::DataTreeNode::New();
     node->SetData( resultImage );
-    DataTreeNodeFactory::SetDefaultImageProperties( node );
 
     if( m_SeriesOID != "" )
       node->SetProperty( "SeriesInstanceUID", StringProperty::New( m_SeriesOID ) );

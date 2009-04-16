@@ -113,7 +113,6 @@ void mitk::StreamReader::Update()
     {
       DataTreeNode::Pointer node = mitk::DataTreeNode::New();
       node->SetData( resultImage );
-      DataTreeNodeFactory::SetDefaultImageProperties( node );
 
       if( m_SeriesDescription == "" )
         m_SeriesDescription = "no SeriesDescription";

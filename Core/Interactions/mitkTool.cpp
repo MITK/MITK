@@ -181,7 +181,6 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, co
   // decorate the datatreenode with some properties
   DataTreeNode::Pointer segmentationNode = DataTreeNode::New();
   segmentationNode->SetData( image );
-  //DataTreeNodeFactory::SetDefaultImageProperties ( segmentationNode );
 
   // name
   segmentationNode->SetProperty( "name", StringProperty::New( organName ) );

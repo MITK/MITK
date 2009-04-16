@@ -72,7 +72,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
 
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataTreeNode::New();
-  //mitk::DataTreeNodeFactory::SetDefaultImageProperties ( m_FeedbackNode );
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_FeedbackNode );
   m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
   m_FeedbackNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );

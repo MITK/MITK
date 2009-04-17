@@ -161,8 +161,7 @@ void mitk::NDITrackingDevice::SetParity(const Parity _arg)
   itkDebugMacro("setting Parity to " << _arg);
   if (this->m_Parity != _arg)
   {
-    //    this->m_Parity = _arg;
-    this->m_Parity = mitk::SerialCommunication::None;  // has always to be None because RS232Int does not set the parity correctly on windows systems
+    this->m_Parity = _arg;
     this->Modified();
   }
 }

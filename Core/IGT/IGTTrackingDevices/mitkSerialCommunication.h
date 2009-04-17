@@ -84,7 +84,7 @@ namespace mitk
 
     enum Parity
     {
-      None = 'N',  // RS232Int can not set parity on windows systems, it will always be 'no parity'
+      None = 'N',
       Odd  = 'O',
       Even = 'E'
     };

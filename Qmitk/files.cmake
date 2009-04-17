@@ -49,6 +49,8 @@ SET(CPP_FILES
   QmitkPACSLoadDialog.cpp
   QmitkPACSSaveDialog.cpp
   QmitkPiecewiseFunctionCanvas.cpp
+  QmitkPlotDialog.cpp
+  QmitkPlotWidget.cpp
   QmitkPluginListViewItem.cpp
   QmitkProgressBar.cpp
   QmitkPropertyListPopup.cpp
@@ -179,6 +181,8 @@ SET(MOC_H_FILES
   QmitkPACSLoadDialog.h
   QmitkPACSSaveDialog.h
   QmitkPiecewiseFunctionCanvas.h
+  QmitkPlotWidget.h
+  QmitkPlotDialog.h
   QmitkProgressBar.h
   QmitkPropertyListPopup.h
   QmitkPropertyListViewItem.h

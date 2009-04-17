@@ -162,11 +162,11 @@ void mitk::RandomTrackingDevice::TrackTools()
         currentTool->SetPosition(pos);
 
         currentTool->SetOrientation(quat);
+        currentTool->SetTrackingError((double)(rand()%100) / 100);
         currentTool->SetDataValid(true);
       }
 
       //there should be a short pause perhaps the multithreader can do this?
-      //m_MultiThreader->
       itksys::SystemTools::Delay(m_RefreshRate);
       /* Update the local copy of m_StopTracking */
       this->m_StopTrackingMutex->Lock();  

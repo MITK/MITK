@@ -273,6 +273,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   }
   else
   {
+    m_ToolManager->ActivateTool(-1);
     m_ToolManager->UnregisterClient();
 
     emit ToolSelected(-1);

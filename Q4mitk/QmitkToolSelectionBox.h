@@ -109,6 +109,9 @@ class QMITK_EXPORT QmitkToolSelectionBox : public QGroupBox
     void SetGUIEnabledAccordingToToolManagerState();
 
   protected:
+    
+    void showEvent( QShowEvent* );
+    void hideEvent( QHideEvent* );
 
     void RecreateButtons();
     void SetOrUnsetButtonForActiveTool();

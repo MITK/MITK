@@ -47,7 +47,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent)
 
   // muellerm
   // QButtonGroup
-  m_ToolButtonGroup = new QButtonGroup;
+  m_ToolButtonGroup = new QButtonGroup(this);
   // some features of QButtonGroup
   m_ToolButtonGroup->setExclusive( false ); // mutually exclusive toggle buttons
 
@@ -283,16 +283,16 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   {
     default:
     case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && m_Enabled;
+      enabled = referenceNode && workingNode && m_Enabled && isVisible();
       break;
     case EnabledWithReferenceData:
-      enabled = referenceNode && m_Enabled;
+      enabled = referenceNode && m_Enabled && isVisible();
       break;
     case EnabledWithWorkingData:
-      enabled = workingNode && m_Enabled;
+      enabled = workingNode && m_Enabled && isVisible();
       break;
     case AlwaysEnabled:
-      enabled = m_Enabled;
+      enabled = m_Enabled && isVisible();
       break;
   }
 
@@ -308,6 +308,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   }
   else
   {
+    m_ToolManager->ActivateTool(-1);
     m_ToolManager->UnregisterClient();
 
     emit ToolSelected(-1);
@@ -554,5 +555,18 @@ void QmitkToolSelectionBox::setTitle( const QString& title )
       layout()->setContentsMargins(0, 0, 0, 0);
     }
   }
+}
+
+void QmitkToolSelectionBox::showEvent( QShowEvent* e )
+{
+  QGroupBox::showEvent(e);
+  SetGUIEnabledAccordingToToolManagerState();
+}
+
+
+void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
+{
+  QGroupBox::hideEvent(e);
+  SetGUIEnabledAccordingToToolManagerState();
 }
 

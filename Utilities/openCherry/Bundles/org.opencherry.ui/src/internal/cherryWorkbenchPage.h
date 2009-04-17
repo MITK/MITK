@@ -61,8 +61,7 @@ class CHERRY_UI WorkbenchPage: public IWorkbenchPage
 
 public:
   cherryObjectMacro(WorkbenchPage)
-  ;
-
+;
 protected:
 
   //TODO Weakpointer
@@ -132,6 +131,112 @@ private:
 
   };
 
+  class ActivationList
+  {
+
+  public:
+
+    //List of parts in the activation order (oldest first)
+    typedef std::deque<IWorkbenchPartReference::Pointer> PartListType;
+    typedef std::deque<IWorkbenchPartReference::Pointer>::iterator PartListIter;
+    typedef std::deque<IWorkbenchPartReference::Pointer>::reverse_iterator PartListReverseIter;
+
+  private:
+
+    PartListType parts;
+
+    WorkbenchPage* page;
+
+  public:
+
+    ActivationList(WorkbenchPage* page);
+
+    /*
+     * Add/Move the active part to end of the list;
+     */
+    void SetActive(SmartPointer<IWorkbenchPart> part);
+
+    /*
+     * Ensures that the given part appears AFTER any other part in the same
+     * container.
+     */
+    void BringToTop(SmartPointer<IWorkbenchPartReference> ref);
+
+    /*
+     * Returns the last (most recent) iterator (index) of the given container in the activation list, or returns
+     * end() if the given container does not appear in the activation list.
+     */
+    PartListIter LastIndexOfContainer(SmartPointer<IStackableContainer> container);
+
+    /*
+     * Add/Move the active part to end of the list;
+     */
+    void SetActive(SmartPointer<IWorkbenchPartReference> ref);
+
+    /*
+     * Add the active part to the beginning of the list.
+     */
+    void Add(SmartPointer<IWorkbenchPartReference> ref);
+
+    /*
+     * Return the active part. Filter fast views.
+     */
+    SmartPointer<IWorkbenchPart> GetActive();
+
+    /*
+     * Return the previously active part. Filter fast views.
+     */
+    SmartPointer<IWorkbenchPart> GetPreviouslyActive();
+
+    SmartPointer<IWorkbenchPartReference> GetActiveReference(bool editorsOnly);
+
+    /*
+     * Retuns the index of the part within the activation list. The higher
+     * the index, the more recently it was used.
+     */
+    PartListIter IndexOf(SmartPointer<IWorkbenchPart> part);
+
+    /*
+     * Returns the index of the part reference within the activation list.
+     * The higher the index, the more recent it was used.
+     */
+    PartListIter IndexOf(SmartPointer<IWorkbenchPartReference> ref);
+
+    /*
+     * Remove a part from the list
+     */
+    bool Remove(SmartPointer<IWorkbenchPartReference> ref);
+
+    /*
+     * Returns the topmost editor on the stack, or null if none.
+     */
+    SmartPointer<IEditorPart> GetTopEditor();
+
+    /*
+     * Returns the editors in activation order (oldest first).
+     */
+    std::vector<SmartPointer<IEditorReference> > GetEditors();
+
+    /*
+     * Return a list with all parts (editors and views).
+     */
+    std::vector<SmartPointer<IWorkbenchPartReference> > GetParts();
+
+  private:
+
+    SmartPointer<IWorkbenchPart> GetActive(PartListIter start);
+
+    SmartPointer<IWorkbenchPartReference> GetActiveReference(PartListIter start, bool editorsOnly);
+
+    /*
+     * Find a part in the list starting from the end and filter
+     * and views from other perspectives. Will filter fast views
+     * unless 'includeActiveFastViews' is true;
+     */
+    SmartPointer<IWorkbenchPartReference> GetActiveReference(PartListIter start, bool editorsOnly, bool skipPartsObscuredByZoom);
+
+  };
+
   /**
    * Helper class to keep track of all opened perspective. Both the opened
    * and used order is kept.
@@ -162,7 +267,7 @@ private:
      */
     SmartPointer<Perspective> active;
 
-    void UpdateActionSets(SmartPointer<Perspective>  oldPersp,
+    void UpdateActionSets(SmartPointer<Perspective> oldPersp,
         SmartPointer<Perspective> newPersp);
 
   public:
@@ -228,12 +333,12 @@ private:
     /**
      * Returns the most recently used perspective in the list.
      */
-    SmartPointer<Perspective>  GetActive();
+    SmartPointer<Perspective> GetActive();
 
     /**
      * Returns the next most recently used perspective in the list.
      */
-    SmartPointer<Perspective>  GetNextActive();
+    SmartPointer<Perspective> GetNextActive();
 
     /**
      * Returns the number of perspectives opened
@@ -253,7 +358,7 @@ private:
   void* composite;
 
   //Could be delete. This information is in the active part list;
-  //ActivationList activationList = new ActivationList();
+  ActivationList activationList;
 
   EditorManager* editorMgr;
 
@@ -952,7 +1057,7 @@ protected:
    */
 public:
   void
-      ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input);
+  ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input);
 
   /**
    * See IWorkbenchPage.
@@ -1595,36 +1700,35 @@ public:
 private:
 
   struct ActivationOrderPred : std::binary_function<IViewReference::Pointer,
-                                                    IViewReference::Pointer, bool>
+  IViewReference::Pointer, bool>
   {
-    ActivationOrderPred(PartList* partList);
+    ActivationOrderPred(ActivationList* partList);
 
-    PartList* partList;
+    ActivationList* activationList;
 
     bool operator()(const IViewReference::Pointer o1, const IViewReference::Pointer o2) const;
   };
 
   // provides sash information for the given pane
-    struct SashInfo
-    {
+  struct SashInfo
+  {
 
-      SmartPointer<LayoutPartSash> right;
+    SmartPointer<LayoutPartSash> right;
 
-      SmartPointer<LayoutPartSash> left;
+    SmartPointer<LayoutPartSash> left;
 
-      SmartPointer<LayoutPartSash> top;
+    SmartPointer<LayoutPartSash> top;
 
-      SmartPointer<LayoutPartSash> bottom;
+    SmartPointer<LayoutPartSash> bottom;
 
-      SmartPointer<LayoutTreeNode> rightNode;
+    SmartPointer<LayoutTreeNode> rightNode;
 
-      SmartPointer<LayoutTreeNode> leftNode;
+    SmartPointer<LayoutTreeNode> leftNode;
 
-      SmartPointer<LayoutTreeNode> topNode;
+    SmartPointer<LayoutTreeNode> topNode;
 
-      SmartPointer<LayoutTreeNode> bottomNode;
-    };
-
+    SmartPointer<LayoutTreeNode> bottomNode;
+  };
 
   void FindSashParts(SmartPointer<LayoutTree> tree, const PartPane::Sashes& sashes,
       SashInfo& info);

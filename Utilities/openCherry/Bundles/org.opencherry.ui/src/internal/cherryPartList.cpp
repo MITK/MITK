@@ -64,18 +64,18 @@ IWorkbenchPart::Pointer PartList::GetActivePart()
   return activePartReference == 0 ? IWorkbenchPart::Pointer(0) : activePartReference->GetPart(false);
 }
 
-std::vector<IEditorReference::Pointer> PartList::GetEditors()
-{
-  std::vector<IEditorReference::Pointer> result;
-  for (std::deque<IWorkbenchPartReference::Pointer>::iterator iter =
-      parts.begin(); iter != parts.end(); ++iter)
-  {
-    if (iter->Cast<IEditorReference> () != 0)
-      result.push_back(iter->Cast<IEditorReference> ());
-  }
-
-  return result;
-}
+//std::vector<IEditorReference::Pointer> PartList::GetEditors()
+//{
+//  std::vector<IEditorReference::Pointer> result;
+//  for (std::deque<IWorkbenchPartReference::Pointer>::iterator iter =
+//      parts.begin(); iter != parts.end(); ++iter)
+//  {
+//    if (iter->Cast<IEditorReference> () != 0)
+//      result.push_back(iter->Cast<IEditorReference> ());
+//  }
+//
+//  return result;
+//}
 
 void PartList::AddPart(WorkbenchPartReference::Pointer ref)
 {
@@ -83,10 +83,10 @@ void PartList::AddPart(WorkbenchPartReference::Pointer ref)
 
   ref->AddPropertyListener(IPropertyChangeListener::Pointer(this));
 
-  if (!this->Contains(ref))
-  {
-    parts.push_back(ref);
-  }
+//  if (!this->Contains(ref))
+//  {
+//    parts.push_back(ref);
+//  }
 
   // parts.add(ref);
   this->FirePartAdded(ref);
@@ -118,8 +118,8 @@ void PartList::SetActivePart(IWorkbenchPartReference::Pointer ref)
   // A part can't be activated until it is added
   //poco_assert(ref == 0 || this->Contains(ref));
 
-  std::remove(parts.begin(), parts.end(), ref);
-  parts.push_front(ref);
+  //std::remove(parts.begin(), parts.end(), ref);
+  //parts.push_front(ref);
 
   activePartReference = ref;
 
@@ -137,8 +137,8 @@ void PartList::SetActiveEditor(IEditorReference::Pointer ref)
   //poco_assert(ref == 0 || this->Contains(ref));
 
   activeEditorReference = ref;
-  std::remove(parts.begin(), parts.end(), ref);
-  parts.push_front(ref);
+  //std::remove(parts.begin(), parts.end(), ref);
+  //parts.push_front(ref);
 
   this->FireActiveEditorChanged(ref);
 }
@@ -170,101 +170,101 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
     this->PartClosed(ref);
   }
 
-  std::remove(parts.begin(), parts.end(), ref);
+  //std::remove(parts.begin(), parts.end(), ref);
   ref->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
 
   this->FirePartRemoved(ref);
 }
 
-int PartList::IndexOf(const IWorkbenchPartReference::Pointer ref) const
-{
-  std::deque<IWorkbenchPartReference::Pointer>::const_iterator result = std::find(parts.begin(), parts.end(), ref);
-  if (result == parts.end()) return -1;
-  else return result - parts.begin();
-}
+//int PartList::IndexOf(const IWorkbenchPartReference::Pointer ref) const
+//{
+//  std::deque<IWorkbenchPartReference::Pointer>::const_iterator result = std::find(parts.begin(), parts.end(), ref);
+//  if (result == parts.end()) return -1;
+//  else return result - parts.begin();
+//}
 
-void PartList::BringToTop(IWorkbenchPartReference::Pointer ref)
-{
-  IStackableContainer::Pointer targetContainer;
-  if (ref != 0)
-  {
-    PartPane::Pointer pane = ref.Cast<WorkbenchPartReference>()->GetPane();
-    if (pane != 0)
-    {
-      targetContainer = pane->GetContainer();
-    }
-  }
+//void PartList::BringToTop(IWorkbenchPartReference::Pointer ref)
+//{
+//  IStackableContainer::Pointer targetContainer;
+//  if (ref != 0)
+//  {
+//    PartPane::Pointer pane = ref.Cast<WorkbenchPartReference>()->GetPane();
+//    if (pane != 0)
+//    {
+//      targetContainer = pane->GetContainer();
+//    }
+//  }
+//
+//  std::deque<IWorkbenchPartReference::Pointer>::iterator newIndex = this->LastIndexOfContainer(targetContainer);
+//
+//  // //New index can be -1 if there is no last index
+//  // if (newIndex >= 0 && ref == parts.get(newIndex))
+//  //  return;
+//
+//  std::remove(parts.begin(), parts.end(), ref);
+//  if(newIndex != parts.end())
+//  {
+//    parts.insert(newIndex, ref);
+//  }
+//  else
+//  parts.push_front(ref);
+//}
 
-  std::deque<IWorkbenchPartReference::Pointer>::iterator newIndex = this->LastIndexOfContainer(targetContainer);
+//std::vector<IWorkbenchPartReference::Pointer>
+//PartList::GetParts(const std::vector<IViewReference::Pointer>& views)
+//{
+//  std::vector<IWorkbenchPartReference::Pointer> resultList;
+//  for (std::deque<IWorkbenchPartReference::Pointer>::iterator partIter = parts.begin();
+//      partIter != parts.end(); ++partIter)
+//  {
+//    IWorkbenchPartReference::Pointer ref = *partIter;
+//    if (ref.Cast<IViewReference>() != 0)
+//    {
+//      //Filter views from other perspectives
+//      for (unsigned int i = 0; i < views.size(); i++)
+//      {
+//        if (ref == views[i])
+//        {
+//          resultList.push_back(ref);
+//          break;
+//        }
+//      }
+//    }
+//    else
+//    {
+//      resultList.push_back(ref);
+//    }
+//  }
+//  return resultList;
+//}
 
-  // //New index can be -1 if there is no last index
-  // if (newIndex >= 0 && ref == parts.get(newIndex))
-  //  return;
+//std::deque<IWorkbenchPartReference::Pointer>::iterator
+//PartList::LastIndexOfContainer(IStackableContainer::Pointer container)
+//{
+//  for (std::deque<IWorkbenchPartReference::Pointer>::iterator iter = parts.begin();
+//      iter != parts.end(); ++iter)
+//  {
+//    IWorkbenchPartReference::Pointer ref = *iter;
+//
+//    IStackableContainer::Pointer cnt;
+//    PartPane::Pointer pane = ref.Cast<WorkbenchPartReference>()->GetPane();
+//    if (pane != 0)
+//    {
+//      cnt = pane->GetContainer();
+//    }
+//    if (cnt == container)
+//    {
+//      return iter;
+//    }
+//  }
+//
+//  return parts.end();
+//}
 
-  std::remove(parts.begin(), parts.end(), ref);
-  if(newIndex != parts.end())
-  {
-    parts.insert(newIndex, ref);
-  }
-  else
-  parts.push_front(ref);
-}
-
-std::vector<IWorkbenchPartReference::Pointer>
-PartList::GetParts(const std::vector<IViewReference::Pointer>& views)
-{
-  std::vector<IWorkbenchPartReference::Pointer> resultList;
-  for (std::deque<IWorkbenchPartReference::Pointer>::iterator partIter = parts.begin();
-      partIter != parts.end(); ++partIter)
-  {
-    IWorkbenchPartReference::Pointer ref = *partIter;
-    if (ref.Cast<IViewReference>() != 0)
-    {
-      //Filter views from other perspectives
-      for (unsigned int i = 0; i < views.size(); i++)
-      {
-        if (ref == views[i])
-        {
-          resultList.push_back(ref);
-          break;
-        }
-      }
-    }
-    else
-    {
-      resultList.push_back(ref);
-    }
-  }
-  return resultList;
-}
-
-std::deque<IWorkbenchPartReference::Pointer>::iterator
-PartList::LastIndexOfContainer(IStackableContainer::Pointer container)
-{
-  for (std::deque<IWorkbenchPartReference::Pointer>::iterator iter = parts.begin();
-      iter != parts.end(); ++iter)
-  {
-    IWorkbenchPartReference::Pointer ref = *iter;
-
-    IStackableContainer::Pointer cnt;
-    PartPane::Pointer pane = ref.Cast<WorkbenchPartReference>()->GetPane();
-    if (pane != 0)
-    {
-      cnt = pane->GetContainer();
-    }
-    if (cnt == container)
-    {
-      return iter;
-    }
-  }
-
-  return parts.end();
-}
-
-bool PartList::Contains(IWorkbenchPartReference::Pointer ref)
-{
-  return std::find(parts.begin(), parts.end(), ref) != parts.end();
-}
+//bool PartList::Contains(IWorkbenchPartReference::Pointer ref)
+//{
+//  return std::find(parts.begin(), parts.end(), ref) != parts.end();
+//}
 
 void PartList::PartInputChanged(WorkbenchPartReference::Pointer ref)
 {
@@ -322,7 +322,7 @@ void PartList::PartClosed(WorkbenchPartReference::Pointer ref)
   // there.
   poco_assert(actualPart.IsNotNull());
   // Must be called before the part is actually removed from the part list
-  poco_assert(this->Contains(ref));
+  // poco_assert(this->Contains(ref));
   // Not allowed to close the active part. The part must be deactivated
   // before it may be closed.
   poco_assert(activePartReference != ref);
@@ -344,7 +344,7 @@ void PartList::PartVisible(WorkbenchPartReference::Pointer ref)
   poco_assert(ref->GetVisible());
   // We shouldn't be receiving events from parts until they are in the
   // list
-  poco_assert(this->Contains(ref));
+  //poco_assert(this->Contains(ref));
   // Part must be open before it can be made visible
   poco_assert(ref->GetPart(false).IsNotNull());
 

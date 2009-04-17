@@ -17,7 +17,7 @@ class PartList : public IPropertyChangeListener {
 private:
 
   // list of parts in the activation order (oldest last)
-  std::deque<IWorkbenchPartReference::Pointer> parts;
+  //std::deque<IWorkbenchPartReference::Pointer> parts;
 
   IWorkbenchPartReference::Pointer activePartReference;
   IEditorReference::Pointer activeEditorReference;
@@ -34,7 +34,7 @@ public:
 
   IWorkbenchPart::Pointer GetActivePart();
 
-  std::vector<IEditorReference::Pointer> GetEditors();
+  //std::vector<IEditorReference::Pointer> GetEditors();
 
   void AddPart(WorkbenchPartReference::Pointer ref);
 
@@ -52,18 +52,18 @@ public:
    */
   void RemovePart(WorkbenchPartReference::Pointer ref);
 
-  int IndexOf(const IWorkbenchPartReference::Pointer ref) const;
+  //int IndexOf(const IWorkbenchPartReference::Pointer ref) const;
 
   /*
    * Ensures that the given part appears AFTER any other part in the same
    * container.
    */
-  void BringToTop(IWorkbenchPartReference::Pointer ref);
+  //void BringToTop(IWorkbenchPartReference::Pointer ref);
 
   /*
    * Return a list with all parts (editors and views).
    */
-  std::vector<IWorkbenchPartReference::Pointer> GetParts(const std::vector<IViewReference::Pointer>& views);
+  //std::vector<IWorkbenchPartReference::Pointer> GetParts(const std::vector<IViewReference::Pointer>& views);
 
 
 private:
@@ -72,8 +72,8 @@ private:
    * Returns the last (most recent) index of the given container in the activation list, or returns
    * -1 if the given container does not appear in the activation list.
    */
-  std::deque<IWorkbenchPartReference::Pointer>::iterator
-    LastIndexOfContainer(IStackableContainer::Pointer container);
+  //std::deque<IWorkbenchPartReference::Pointer>::iterator
+  //  LastIndexOfContainer(IStackableContainer::Pointer container);
 
   void PartInputChanged(WorkbenchPartReference::Pointer ref);
 
@@ -92,7 +92,7 @@ private:
 
   void PartVisible(WorkbenchPartReference::Pointer ref);
 
-  bool Contains(IWorkbenchPartReference::Pointer ref);
+  //bool Contains(IWorkbenchPartReference::Pointer ref);
 
 protected:
 

@@ -279,7 +279,9 @@ void QmitkInteractiveSegmentationView::LoadSegmentation()
 {
   try
   {
+    m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( NULL );
     mitk::DataTreeNode::Pointer automaticNode = CommonFunctionality::OpenVolumeOrSliceStack();
+    m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
 
     if (automaticNode.IsNotNull())
     {
@@ -368,6 +370,7 @@ void QmitkInteractiveSegmentationView::SaveSegmentation()
 
     if (image.IsNotNull())
     {
+      m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( NULL );
       std::string nodeName;
       if ( node->GetName( nodeName ) )
       {
@@ -378,6 +381,7 @@ void QmitkInteractiveSegmentationView::SaveSegmentation()
       {
         CommonFunctionality::SaveImage(image);
       }
+      m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
     }
     else
     {

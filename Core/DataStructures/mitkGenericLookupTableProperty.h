@@ -132,14 +132,14 @@ class GenericLookupTableProperty : public BaseProperty
 };
 
 template <class T>
-bool GenericLookupTableProperty<T>::WriteXMLData( XMLWriter& xmlWriter )
+bool GenericLookupTableProperty<T>::WriteXMLData( XMLWriter& /*xmlWriter*/ )
 {
   //TODO: implement writer for generic lookup tables (c.f. mitkLookupTableProperty)
   return true;
 }
 
 template <class T>
-bool GenericLookupTableProperty<T>::ReadXMLData( XMLReader& xmlReader )
+bool GenericLookupTableProperty<T>::ReadXMLData( XMLReader& /*xmlReader*/ )
 {
   //TODO: implement reader for generic lookup tables (c.f. mitkLookupTableProperty)
   return true;

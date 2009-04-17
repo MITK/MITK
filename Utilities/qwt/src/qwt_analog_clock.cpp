@@ -87,7 +87,7 @@ QwtAnalogClock::~QwtAnalogClock()
 
 /*! 
   Nop method, use setHand instead
-  \sa QwtAnalogClock::setHand
+  \sa setHand()
 */
 void QwtAnalogClock::setNeedle(QwtDialNeedle *)
 {
@@ -99,7 +99,7 @@ void QwtAnalogClock::setNeedle(QwtDialNeedle *)
    Set a clockhand
    \param hand Specifies the type of hand
    \param needle Hand
-   \sa QwtAnalogClock::hand()
+   \sa hand()
 */
 void QwtAnalogClock::setHand(Hand hand, QwtDialNeedle *needle)
 {
@@ -113,7 +113,7 @@ void QwtAnalogClock::setHand(Hand hand, QwtDialNeedle *needle)
 /*!
   \return Clock hand
   \param hd Specifies the type of hand
-  \sa QwtAnalogClock::setHand
+  \sa setHand()
 */
 QwtDialNeedle *QwtAnalogClock::hand(Hand hd)
 {
@@ -126,7 +126,7 @@ QwtDialNeedle *QwtAnalogClock::hand(Hand hd)
 /*!
   \return Clock hand
   \param hd Specifies the type of hand
-  \sa QwtAnalogClock::setHand
+  \sa setHand()
 */
 const QwtDialNeedle *QwtAnalogClock::hand(Hand hd) const
 {
@@ -186,7 +186,7 @@ QwtText QwtAnalogClock::scaleLabel(double value) const
   \param direction Dummy, not used.
   \param cg ColorGroup
 
-  \sa QwtAnalogClock::drawHand()
+  \sa drawHand()
 */
 void QwtAnalogClock::drawNeedle(QPainter *painter, const QPoint &center,
         int radius, double, QPalette::ColorGroup cg) const
@@ -198,12 +198,21 @@ void QwtAnalogClock::drawNeedle(QPainter *painter, const QPoint &center,
         const double seconds = value() - (int)hours * 60.0 * 60.0 
             - (int)minutes * 60.0;
 
-        drawHand(painter, HourHand, center, radius,
-            360.0 - (origin() + 360.0 * hours / 12.0), cg);
-        drawHand(painter, MinuteHand, center, radius,
-            360.0 - (origin() + 360.0 * minutes / 60.0), cg);
-        drawHand(painter, SecondHand, center, radius,
-            360.0 - (origin() + 360.0 * seconds / 60.0), cg);
+        double angle[NHands];
+        angle[HourHand] = 360.0 * hours / 12.0;
+        angle[MinuteHand] = 360.0 * minutes / 60.0;
+        angle[SecondHand] = 360.0 * seconds / 60.0;
+
+        for ( int hand = 0; hand < NHands; hand++ )
+        {
+            double d = angle[hand];
+            if ( direction() == Clockwise )
+                d = 360.0 - d;
+
+            d -= origin();
+
+            drawHand(painter, (Hand)hand, center, radius, d, cg);
+        }
     }
 }
 

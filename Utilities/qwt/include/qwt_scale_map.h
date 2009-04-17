@@ -35,6 +35,7 @@ public:
     virtual double invXForm(double x, double s1, double s2,
         double p1, double p2) const;
 
+    //! \return Transformation type
     inline Type type() const { return d_type; }
     
     virtual QwtScaleTransformation *copy() const;
@@ -129,11 +130,17 @@ inline double QwtScaleMap::p2() const
     return d_p2;
 }
 
+/*!
+    \return qwtAbs(p2() - p1())
+*/
 inline double QwtScaleMap::pDist() const
 {
     return qwtAbs(d_p2 - d_p1);
 }
 
+/*!
+    \return qwtAbs(s2() - s1())
+*/
 inline double QwtScaleMap::sDist() const
 {
     return qwtAbs(d_s2 - d_s1);
@@ -142,6 +149,8 @@ inline double QwtScaleMap::sDist() const
 /*!
   Transform a point related to the scale interval into an point 
   related to the interval of the paint device
+
+  \param s Value relative to the coordinates of the scale
 */
 inline double QwtScaleMap::xTransform(double s) const
 {
@@ -157,8 +166,11 @@ inline double QwtScaleMap::xTransform(double s) const
 }
 
 /*!
-  \brief Transform an paint device value into a value in the
-         interval of the scale.
+  Transform an paint device value into a value in the 
+  interval of the scale.
+
+  \param p Value relative to the coordinates of the paint device
+  \sa transform()
 */
 inline double QwtScaleMap::invTransform(double p) const
 {
@@ -170,7 +182,8 @@ inline double QwtScaleMap::invTransform(double p) const
   related to the interval of the paint device and round it to
   an integer. (In Qt <= 3.x paint devices are integer based. )
 
-  \sa QwtScaleMap::xTransform
+  \param s Value relative to the coordinates of the scale
+  \sa xTransform()
 */
 inline int QwtScaleMap::transform(double s) const
 {

@@ -87,6 +87,11 @@ void QwtDialNeedle::drawKnob(QPainter *painter,
 
 /*!
   Constructor
+
+  \param style Style
+  \param hasKnob With/Without knob
+  \param mid Middle color
+  \param base Base color
 */
 QwtDialSimpleNeedle::QwtDialSimpleNeedle(Style style, bool hasKnob, 
         const QColor &mid, const QColor &base):
@@ -106,7 +111,11 @@ QwtDialSimpleNeedle::QwtDialSimpleNeedle(Style style, bool hasKnob,
     setPalette(palette);
 }
 
-//! Set the width of the needle
+/*! 
+  Set the width of the needle
+  \param width Width
+  \sa width()
+*/
 void QwtDialSimpleNeedle::setWidth(int width)
 {
     d_width = width;
@@ -114,6 +123,7 @@ void QwtDialSimpleNeedle::setWidth(int width)
 
 /*!
   \return the width of the needle
+  \sa setWidth()
 */
 int QwtDialSimpleNeedle::width() const
 {
@@ -146,6 +156,15 @@ void QwtDialSimpleNeedle::draw(QPainter *painter, const QPoint &center,
 
 /*!
   Draw a needle looking like a ray
+
+  \param painter Painter
+  \param palette Palette
+  \param colorGroup Color group
+  \param center center of the needle
+  \param length Length of the needle
+  \param width Width of the needle
+  \param direction Current Direction
+  \param hasKnob With/Without knob
 */
 void QwtDialSimpleNeedle::drawRayNeedle(QPainter *painter, 
     const QPalette &palette, QPalette::ColorGroup colorGroup,
@@ -198,6 +217,15 @@ void QwtDialSimpleNeedle::drawRayNeedle(QPainter *painter,
 
 /*!
   Draw a needle looking like an arrow
+
+  \param painter Painter
+  \param palette Palette
+  \param colorGroup Color group
+  \param center center of the needle
+  \param length Length of the needle
+  \param width Width of the needle
+  \param direction Current Direction
+  \param hasKnob With/Without knob
 */
 void QwtDialSimpleNeedle::drawArrowNeedle(QPainter *painter, 
     const QPalette &palette, QPalette::ColorGroup colorGroup,

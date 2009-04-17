@@ -81,7 +81,7 @@ QwtAbstractScaleDraw &QwtAbstractScaleDraw::operator=(const QwtAbstractScaleDraw
   \param component Scale component
   \param enable On/Off
 
-  \sa QwtAbstractScaleDraw::hasComponent
+  \sa hasComponent()
 */
 void QwtAbstractScaleDraw::enableComponent(
     ScaleComponent component, bool enable)
@@ -94,7 +94,7 @@ void QwtAbstractScaleDraw::enableComponent(
 
 /*! 
   Check if a component is enabled 
-  \sa QwtAbstractScaleDraw::enableComponent
+  \sa enableComponent()
 */
 bool QwtAbstractScaleDraw::hasComponent(ScaleComponent component) const
 {
@@ -108,7 +108,7 @@ bool QwtAbstractScaleDraw::hasComponent(ScaleComponent component) const
 void QwtAbstractScaleDraw::setScaleDiv(const QwtScaleDiv &sd)
 {
     d_data->scldiv = sd;
-    d_data->map.setScaleInterval(sd.lBound(), sd.hBound());
+    d_data->map.setScaleInterval(sd.lowerBound(), sd.upperBound());
     d_data->labelCache.clear();
 }
 
@@ -242,7 +242,7 @@ void QwtAbstractScaleDraw::draw(QPainter *painter,
 
   \param spacing Spacing
 
-  \sa QwtAbstractScaleDraw::spacing
+  \sa spacing()
 */
 void QwtAbstractScaleDraw::setSpacing(int spacing)
 {
@@ -258,7 +258,7 @@ void QwtAbstractScaleDraw::setSpacing(int spacing)
   The spacing is the distance between ticks and labels.
   The default spacing is 4 pixels.
 
-  \sa QwtAbstractScaleDraw::setSpacing
+  \sa setSpacing()
 */
 int QwtAbstractScaleDraw::spacing() const
 {
@@ -325,8 +325,7 @@ void QwtAbstractScaleDraw::setTickLength(
 /*!
     Return the length of the ticks
 
-    \sa QwtAbstractScaleDraw::setTickLength, 
-        QwtAbstractScaleDraw::majTickLength
+    \sa setTickLength(), majTickLength()
 */
 int QwtAbstractScaleDraw::tickLength(QwtScaleDiv::TickType tickType) const
 {

@@ -65,6 +65,10 @@ public:
     virtual bool eventFilter(QObject *, QEvent *);
 
 protected:
+    /*!
+       Rescale the parent widget
+       \param factor Scale factor
+     */
     virtual void rescale(double factor) = 0;
 
     virtual void widgetMousePressEvent(QMouseEvent *);

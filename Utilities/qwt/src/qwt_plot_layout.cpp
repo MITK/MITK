@@ -242,7 +242,7 @@ void QwtPlotLayout::setCanvasMargin(int margin, int axis)
         for (axis = 0; axis < QwtPlot::axisCnt; axis++)
             d_data->canvasMargin[axis] = margin;
     }
-    else if ( axis >= 0 || axis < QwtPlot::axisCnt )
+    else if ( axis >= 0 && axis < QwtPlot::axisCnt )
         d_data->canvasMargin[axis] = margin;
 }
 
@@ -642,6 +642,7 @@ QSize QwtPlotLayout::minimumSizeHint(const QwtPlot *plot) const
   \param options Options how to layout the legend
   \param rect Rectangle where to place the legend
   \return Geometry for the legend
+  \sa Options
 */
 
 QRect QwtPlotLayout::layoutLegend(int options, 
@@ -739,13 +740,25 @@ QRect QwtPlotLayout::alignLegend(const QRect &canvasRect,
   \param rect Bounding rect for title, axes and canvas.
   \param dimTitle Expanded height of the title widget
   \param dimAxis Expanded heights of the axis in axis orientation.
+
+  \sa Options
 */
 void QwtPlotLayout::expandLineBreaks(int options, const QRect &rect, 
     int &dimTitle, int dimAxis[QwtPlot::axisCnt]) const
 {
     dimTitle = 0;
-    for ( int i = 0; i < QwtPlot::axisCnt; i++ )
-        dimAxis[i] = 0;
+    for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
+        dimAxis[axis] = 0;
+
+    int backboneOffset[QwtPlot::axisCnt];
+    for (int axis = 0; axis < QwtPlot::axisCnt; axis++ )
+    {
+        backboneOffset[axis] = 0;
+        if ( !d_data->alignCanvasToScales )
+            backboneOffset[axis] += d_data->canvasMargin[axis];
+        if ( !(options & IgnoreFrames) )
+            backboneOffset[axis] += d_data->layoutData.canvas.frameWidth;
+    }
 
     bool done = false;
     while (!done)
@@ -784,10 +797,6 @@ void QwtPlotLayout::expandLineBreaks(int options, const QRect &rect,
 
         for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
         {
-            int backboneOffset = d_data->canvasMargin[axis];
-            if ( !(options & IgnoreFrames) )
-                backboneOffset += d_data->layoutData.canvas.frameWidth;
-
             const struct LayoutData::t_scaleData &scaleData = 
                 d_data->layoutData.scale[axis];
 
@@ -798,27 +807,39 @@ void QwtPlotLayout::expandLineBreaks(int options, const QRect &rect,
                 {
                     length = rect.width() - dimAxis[QwtPlot::yLeft] 
                         - dimAxis[QwtPlot::yRight];
+                    length -= scaleData.start + scaleData.end;
+
+                    if ( dimAxis[QwtPlot::yRight] > 0 )
+                        length -= 1;
+
                     length += qwtMin(dimAxis[QwtPlot::yLeft], 
-                        scaleData.start - backboneOffset);
+                        scaleData.start - backboneOffset[QwtPlot::yLeft]);
                     length += qwtMin(dimAxis[QwtPlot::yRight], 
-                        scaleData.end - backboneOffset);
+                        scaleData.end - backboneOffset[QwtPlot::yRight]);
                 }
                 else // QwtPlot::yLeft, QwtPlot::yRight
                 {
                     length = rect.height() - dimAxis[QwtPlot::xTop] 
                         - dimAxis[QwtPlot::xBottom];
+                    length -= scaleData.start + scaleData.end;
+                    length -= 1;
+
+                    if ( dimAxis[QwtPlot::xBottom] <= 0 )
+                        length -= 1;
+                    if ( dimAxis[QwtPlot::xTop] <= 0 )
+                        length -= 1;
 
                     if ( dimAxis[QwtPlot::xBottom] > 0 )
                     {
                         length += qwtMin(
                             d_data->layoutData.scale[QwtPlot::xBottom].tickOffset, 
-                            scaleData.start - backboneOffset);
+                            scaleData.start - backboneOffset[QwtPlot::xBottom]);
                     }
                     if ( dimAxis[QwtPlot::xTop] > 0 )
                     {
                         length += qwtMin(
                             d_data->layoutData.scale[QwtPlot::xTop].tickOffset, 
-                            scaleData.end - backboneOffset);
+                            scaleData.end - backboneOffset[QwtPlot::xTop]);
                     }
 
                     if ( dimTitle > 0 )
@@ -830,6 +851,7 @@ void QwtPlotLayout::expandLineBreaks(int options, const QRect &rect,
                 {
                     d += scaleData.scaleWidget->titleHeightForWidth(length);
                 }
+
 
                 if ( d > dimAxis[axis] )
                 {
@@ -844,6 +866,8 @@ void QwtPlotLayout::expandLineBreaks(int options, const QRect &rect,
 /*!
   Align the ticks of the axis to the canvas borders using
   the empty corners.
+
+  \sa Options
 */
 
 void QwtPlotLayout::alignScales(int options,
@@ -1016,7 +1040,7 @@ void QwtPlotLayout::alignScales(int options,
   \param plotRect Rect where to place the components
   \param options Options
 
-  \sa invalidate(), titleRect(),
+  \sa invalidate(), Options, titleRect(),
       legendRect(), scaleRect(), canvasRect()
 */
 void QwtPlotLayout::activate(const QwtPlot *plot,
@@ -1081,6 +1105,8 @@ void QwtPlotLayout::activate(const QwtPlot *plot,
         }
     }
 
+#ifdef __GNUC__
+#endif
     /*
      +---+-----------+---+
      |       Title       |
@@ -1095,7 +1121,6 @@ void QwtPlotLayout::activate(const QwtPlot *plot,
      |   |   Axis    |   |
      +---+-----------+---+
     */
-
 
     // axes and title include text labels. The height of each
     // label depends on its line breaks, that depend on the width

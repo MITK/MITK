@@ -59,7 +59,7 @@ void QwtPlot::initAxesData()
         d.scaleWidget->setFont(fscl);
         d.scaleWidget->setMargin(2);
 
-        QwtText text;
+        QwtText text = d.scaleWidget->title();
         text.setFont(fttl);
         d.scaleWidget->setTitle(text);
 
@@ -140,7 +140,10 @@ void QwtPlot::setAxisScaleEngine(int axisId, QwtScaleEngine *scaleEngine)
     }
 }
 
-//! \return Scale engine for a specific axis
+/*! 
+  \param axisId axis index
+  \return Scale engine for a specific axis
+*/
 QwtScaleEngine *QwtPlot::axisScaleEngine(int axisId)
 {
     if (axisValid(axisId))
@@ -149,7 +152,10 @@ QwtScaleEngine *QwtPlot::axisScaleEngine(int axisId)
         return NULL;
 }
 
-//! \return Scale engine for a specific axis
+/*! 
+  \param axisId axis index
+  \return Scale engine for a specific axis
+*/
 const QwtScaleEngine *QwtPlot::axisScaleEngine(int axisId) const
 {
     if (axisValid(axisId))
@@ -224,13 +230,13 @@ int QwtPlot::axisMaxMinor(int axisId) const
 /*!
   \brief Return the scale division of a specified axis
 
-  axisScaleDiv(axisId)->lBound(), axisScaleDiv(axisId)->hBound()
+  axisScaleDiv(axisId)->lowerBound(), axisScaleDiv(axisId)->upperBound()
   are the current limits of the axis scale.
 
   \param axisId axis index
   \return Scale division 
 
-  \sa QwtScaleDiv, setAxisScaleDiv
+  \sa QwtScaleDiv, setAxisScaleDiv()
 */
 const QwtScaleDiv *QwtPlot::axisScaleDiv(int axisId) const
 {
@@ -243,13 +249,13 @@ const QwtScaleDiv *QwtPlot::axisScaleDiv(int axisId) const
 /*!
   \brief Return the scale division of a specified axis
 
-  axisScaleDiv(axisId)->lBound(), axisScaleDiv(axisId)->hBound()
+  axisScaleDiv(axisId)->lowerBound(), axisScaleDiv(axisId)->upperBound()
   are the current limits of the axis scale.
 
   \param axisId axis index
   \return Scale division 
 
-  \sa QwtScaleDiv, setAxisScaleDiv
+  \sa QwtScaleDiv, setAxisScaleDiv()
 */
 QwtScaleDiv *QwtPlot::axisScaleDiv(int axisId) 
 {
@@ -295,7 +301,7 @@ QwtScaleDraw *QwtPlot::axisScaleDraw(int axisId)
   \param axisId axis index
   \return step size parameter value
 
-   \sa setAxisScale
+   \sa setAxisScale()
 */ 
 double QwtPlot::axisStepSize(int axisId) const
 {
@@ -492,7 +498,7 @@ void QwtPlot::setAxisLabelAlignment(int axisId, Qt::Alignment alignment)
   \param axisId axis index
   \param rotation Angle in degrees. When changing the label rotation,
                   the label alignment might be adjusted too.
-  \sa QwtScaleDraw::setLabelRotation(), QwtPlot::setAxisLabelAlignment
+  \sa QwtScaleDraw::setLabelRotation(), setAxisLabelAlignment()
 */
 void QwtPlot::setAxisLabelRotation(int axisId, double rotation)
 {

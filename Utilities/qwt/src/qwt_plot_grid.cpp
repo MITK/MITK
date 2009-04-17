@@ -117,10 +117,9 @@ void QwtPlotGrid::enableYMin(bool tf)
 }
 
 /*!
-  \brief Assign an x axis scale division
+  Assign an x axis scale division
+
   \param scaleDiv Scale division
-  \warning QwtPlotGrid uses implicit sharing (see Qt Manual) for
-  the scale divisions.
 */
 void QwtPlotGrid::setXDiv(const QwtScaleDiv &scaleDiv)
 {
@@ -132,58 +131,70 @@ void QwtPlotGrid::setXDiv(const QwtScaleDiv &scaleDiv)
 }
 
 /*!
-  \brief Assign a y axis division
-  \param sy Scale division
-  \warning QwtPlotGrid uses implicit sharing (see Qt Manual) for
-  the scale divisions.
+  Assign a y axis division
+
+  \param scaleDiv Scale division
 */
-void QwtPlotGrid::setYDiv(const QwtScaleDiv &sy)
+void QwtPlotGrid::setYDiv(const QwtScaleDiv &scaleDiv)
 {
-    if ( d_data->yScaleDiv != sy )
+    if ( d_data->yScaleDiv != scaleDiv )
     {
-        d_data->yScaleDiv = sy;    
+        d_data->yScaleDiv = scaleDiv;    
         itemChanged();
     }
 }
 
 /*!
-  \brief Assign a pen for both major and minor gridlines
-  \param p Pen
-  \sa setMajPen(), setMinPen()
+  Assign a pen for both major and minor gridlines
+
+  The width of non cosmetic pens is scaled according to the resolution
+  of the paint device.
+
+  \param pen Pen
+  \sa setMajPen(), setMinPen(), QwtPainter::scaledPen()
 */
-void QwtPlotGrid::setPen(const QPen &p)
+void QwtPlotGrid::setPen(const QPen &pen)
 {
-    if ( d_data->majPen != p || d_data->minPen != p )
+    if ( d_data->majPen != pen || d_data->minPen != pen )
     {
-        d_data->majPen = p;
-        d_data->minPen = p;
+        d_data->majPen = pen;
+        d_data->minPen = pen;
         itemChanged();
     }
 }
 
 /*!
-  \brief Assign a pen for the major gridlines
-  \param p Pen
-  \sa majPen(), setMinPen(), setPen()
+  Assign a pen for the major gridlines
+
+  The width of non cosmetic pens is scaled according to the resolution
+  of the paint device.
+
+  \param pen Pen
+  \sa majPen(), setMinPen(), setPen(), QwtPainter::scaledPen()
 */
-void QwtPlotGrid::setMajPen(const QPen &p)
+void QwtPlotGrid::setMajPen(const QPen &pen)
 {
-    if ( d_data->majPen != p )
+    if ( d_data->majPen != pen )
     {
-        d_data->majPen = p;
+        d_data->majPen = pen;
         itemChanged();
     }
 }
 
 /*!
-  \brief Assign a pen for the minor gridlines
-  \param p Pen
+  Assign a pen for the minor gridlines
+
+  The width of non cosmetic pens is scaled according to the resolution
+  of the paint device.
+
+  \param pen Pen
+  \sa minPen(), setMajPen(), setPen(), QwtPainter::scaledPen()
 */
-void QwtPlotGrid::setMinPen(const QPen &p)
+void QwtPlotGrid::setMinPen(const QPen &pen)
 {
-    if ( d_data->minPen != p )
+    if ( d_data->minPen != pen )
     {
-        d_data->minPen = p;  
+        d_data->minPen = pen;  
         itemChanged();
     }
 }
@@ -205,7 +216,7 @@ void QwtPlotGrid::draw(QPainter *painter,
     const QRect &canvasRect) const
 {
     //  draw minor gridlines
-    painter->setPen(d_data->minPen);
+    painter->setPen(QwtPainter::scaledPen(d_data->minPen));
     
     if (d_data->xEnabled && d_data->xMinEnabled)
     {
@@ -224,7 +235,7 @@ void QwtPlotGrid::draw(QPainter *painter,
     }
 
     //  draw major gridlines
-    painter->setPen(d_data->majPen);
+    painter->setPen(QwtPainter::scaledPen(d_data->majPen));
     
     if (d_data->xEnabled)
     {
@@ -331,9 +342,17 @@ const QwtScaleDiv &QwtPlotGrid::yScaleDiv() const
     return d_data->yScaleDiv; 
 }
  
-void QwtPlotGrid::updateScaleDiv(const QwtScaleDiv& xDiv,
-    const QwtScaleDiv& yDiv)
+/*!
+   Update the grid to changes of the axes scale division
+
+   \param xScaleDiv Scale division of the x-axis
+   \param yScaleDiv Scale division of the y-axis
+
+   \sa QwtPlot::updateAxes()
+*/
+void QwtPlotGrid::updateScaleDiv(const QwtScaleDiv& xScaleDiv,
+    const QwtScaleDiv& yScaleDiv)
 {
-    setXDiv(xDiv);
-    setYDiv(yDiv);
+    setXDiv(xScaleDiv);
+    setYDiv(yScaleDiv);
 }

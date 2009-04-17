@@ -13,8 +13,8 @@
 
 //! Construct an invalid QwtScaleDiv instance.
 QwtScaleDiv::QwtScaleDiv():
-    d_lBound(0.0),
-    d_hBound(0.0),
+    d_lowerBound(0.0),
+    d_upperBound(0.0),
     d_isValid(false)
 {
 }
@@ -28,8 +28,8 @@ QwtScaleDiv::QwtScaleDiv():
 QwtScaleDiv::QwtScaleDiv(
         const QwtDoubleInterval &interval, 
         QwtValueList ticks[NTickTypes]):
-    d_lBound(interval.minValue()),
-    d_hBound(interval.maxValue()),
+    d_lowerBound(interval.minValue()),
+    d_upperBound(interval.maxValue()),
     d_isValid(true)
 {
     for ( int i = 0; i < NTickTypes; i++ )
@@ -39,15 +39,15 @@ QwtScaleDiv::QwtScaleDiv(
 /*! 
   Construct QwtScaleDiv instance.
 
-  \param lBound First interval limit
-  \param hBound Second interval limit
+  \param lowerBound First interval limit
+  \param upperBound Second interval limit
   \param ticks List of major, medium and minor ticks
 */
 QwtScaleDiv::QwtScaleDiv(
-        double lBound, double hBound,
+        double lowerBound, double upperBound,
         QwtValueList ticks[NTickTypes]):
-    d_lBound(lBound),
-    d_hBound(hBound),
+    d_lowerBound(lowerBound),
+    d_upperBound(upperBound),
     d_isValid(true)
 {
     for ( int i = 0; i < NTickTypes; i++ )
@@ -56,7 +56,7 @@ QwtScaleDiv::QwtScaleDiv(
 
 /*!
    Change the interval
-   \interval Interval
+   \param interval Interval
 */
 void QwtScaleDiv::setInterval(const QwtDoubleInterval &interval)
 {
@@ -69,8 +69,8 @@ void QwtScaleDiv::setInterval(const QwtDoubleInterval &interval)
 */
 int QwtScaleDiv::operator==(const QwtScaleDiv &other) const
 {
-    if ( d_lBound != other.d_lBound ||
-        d_hBound != other.d_hBound ||
+    if ( d_lowerBound != other.d_lowerBound ||
+        d_upperBound != other.d_upperBound ||
         d_isValid != other.d_isValid )
     {
         return false;
@@ -103,7 +103,7 @@ void QwtScaleDiv::invalidate()
     for ( int i = 0; i < NTickTypes; i++ )
         d_ticks[i].clear();
 
-    d_lBound = d_hBound = 0;
+    d_lowerBound = d_upperBound = 0;
 }
 
 //! Check if the scale division is valid
@@ -112,21 +112,27 @@ bool QwtScaleDiv::isValid() const
     return d_isValid;
 }
 
-bool QwtScaleDiv::contains(double v) const
+/*!
+  Return if a value is between lowerBound() and upperBound()
+
+  \param value Value
+  \return true/false
+*/ 
+bool QwtScaleDiv::contains(double value) const
 {
     if ( !d_isValid )
         return false;
 
-    const double min = qwtMin(d_lBound, d_hBound);
-    const double max = qwtMax(d_lBound, d_hBound);
+    const double min = qwtMin(d_lowerBound, d_upperBound);
+    const double max = qwtMax(d_lowerBound, d_upperBound);
 
-    return v >= min && v <= max;
+    return value >= min && value <= max;
 }
 
 //! Invert the scale divison
 void QwtScaleDiv::invert()
 {
-    qSwap(d_lBound, d_hBound);
+    qSwap(d_lowerBound, d_upperBound);
 
     for ( int i = 0; i < NTickTypes; i++ )
     {

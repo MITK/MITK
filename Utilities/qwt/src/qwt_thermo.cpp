@@ -107,10 +107,15 @@ QwtThermo::~QwtThermo()
     delete d_data;
 }
 
-//! Set the maximum value.
-void QwtThermo::setMaxValue(double v) 
+/*! 
+  Set the maximum value.
+
+  \param max Maximum value
+  \sa maxValue(), setMinValue()
+*/
+void QwtThermo::setMaxValue(double max) 
 { 
-    setRange(d_data->minValue, v); 
+    setRange(d_data->minValue, max); 
 }
 
 //! Return the maximum value.
@@ -119,10 +124,15 @@ double QwtThermo::maxValue() const
     return d_data->maxValue; 
 }
 
-//! Set the minimum value.
-void QwtThermo::setMinValue(double v) 
+/*! 
+  Set the minimum value.
+
+  \param min Minimum value
+  \sa minValue(), setMaxValue()
+*/
+void QwtThermo::setMinValue(double min) 
 { 
-    setRange(v, d_data->maxValue); 
+    setRange(min, d_data->maxValue); 
 }
 
 //! Return the minimum value.
@@ -131,12 +141,17 @@ double QwtThermo::minValue() const
     return d_data->minValue; 
 }
 
-//! Set the current value.
-void QwtThermo::setValue(double v)
+/*! 
+  Set the current value.
+
+  \param value New Value
+  \sa value()
+*/
+void QwtThermo::setValue(double value)
 {
-    if (d_data->value != v)
+    if (d_data->value != value)
     {
-        d_data->value = v;
+        d_data->value = value;
         update();
     }
 }
@@ -181,11 +196,14 @@ QwtScaleDraw *QwtThermo::scaleDraw()
     return (QwtScaleDraw *)abstractScaleDraw();
 }
 
-//! Qt paint event.
-void QwtThermo::paintEvent(QPaintEvent *e)
+/*! 
+  Qt paint event.
+  event Paint event
+*/
+void QwtThermo::paintEvent(QPaintEvent *event)
 {
     // Use double-buffering
-    const QRect &ur = e->rect();
+    const QRect &ur = event->rect();
     if ( ur.isValid() )
     {
 #if QT_VERSION < 0x040000
@@ -198,33 +216,38 @@ void QwtThermo::paintEvent(QPaintEvent *e)
     }
 }
 
-//! Draw the whole QwtThermo.
-void QwtThermo::draw(QPainter *p, const QRect& ur)
+/*! 
+  Draw the whole QwtThermo.
+
+  \param painter Painter
+  \param rect Update rectangle
+*/
+void QwtThermo::draw(QPainter *painter, const QRect& rect)
 {
-    if ( !d_data->thermoRect.contains(ur) )
+    if ( !d_data->thermoRect.contains(rect) )
     {
         if (d_data->scalePos != NoScale)
         {
 #if QT_VERSION < 0x040000
-            scaleDraw()->draw(p, colorGroup());
+            scaleDraw()->draw(painter, colorGroup());
 #else
-            scaleDraw()->draw(p, palette());
+            scaleDraw()->draw(painter, palette());
 #endif
         }
 
-        qDrawShadePanel(p,
+        qDrawShadePanel(painter,
             d_data->thermoRect.x() - d_data->borderWidth,
             d_data->thermoRect.y() - d_data->borderWidth,
-            d_data->thermoRect.width() + 2*d_data->borderWidth,
-            d_data->thermoRect.height() + 2*d_data->borderWidth,
+            d_data->thermoRect.width() + 2 * d_data->borderWidth,
+            d_data->thermoRect.height() + 2 * d_data->borderWidth,
 #if QT_VERSION < 0x040000
             colorGroup(), 
 #else
             palette(), 
 #endif
-            true, d_data->borderWidth,0);
+            true, d_data->borderWidth, 0);
     }
-    drawThermo(p);
+    drawThermo(painter);
 }
 
 //! Qt resize event handler
@@ -236,6 +259,7 @@ void QwtThermo::resizeEvent(QResizeEvent *)
 /*!
   Recalculate the QwtThermo geometry and layout based on
   the QwtThermo::rect() and the fonts.
+
   \param update_geometry notify the layout system and call update
          to redraw the scale
 */
@@ -345,22 +369,22 @@ void QwtThermo::layoutThermo( bool update_geometry )
 }
 
 /*!
-  \brief Set the thermometer orientation and the scale position.
+   \brief Set the thermometer orientation and the scale position.
 
-  The scale position NoScale disables the scale.
-  \param o orientation. Possible values are Qt::Horizontal and Qt::Vertical.
+   The scale position NoScale disables the scale.
+   \param o orientation. Possible values are Qt::Horizontal and Qt::Vertical.
          The default value is Qt::Vertical.
-  \param s Position of the scale.
+   \param s Position of the scale.
          The default value is NoScale.
 
-  A valid combination of scale position and orientation is enforced:
-  - a horizontal thermometer can have the scale positions TopScale, 
-    BottomScale or NoScale;
-  - a vertical thermometer can have the scale positions LeftScale, 
-    RightScale or NoScale;
-  - an invalid scale position will default to NoScale.
+   A valid combination of scale position and orientation is enforced:
+   - a horizontal thermometer can have the scale positions TopScale, 
+     BottomScale or NoScale;
+   - a vertical thermometer can have the scale positions LeftScale, 
+     RightScale or NoScale;
+   - an invalid scale position will default to NoScale.
 
-  \sa QwtThermo::setScalePosition()
+   \sa setScalePosition()
 */
 void QwtThermo::setOrientation(Qt::Orientation o, ScalePos s)
 {
@@ -414,7 +438,7 @@ void QwtThermo::setOrientation(Qt::Orientation o, ScalePos s)
 /*!
   \brief Change the scale position (and thermometer orientation).
 
-  \param s Position of the scale.
+  \param scalePos Position of the scale.
   
   A valid combination of scale position and orientation is enforced:
   - if the new scale position is LeftScale or RightScale, the 
@@ -423,19 +447,22 @@ void QwtThermo::setOrientation(Qt::Orientation o, ScalePos s)
     orientation will become Qt::Horizontal;
   - if the new scale position is NoScale, the scale orientation will not change.
 
-  \sa QwtThermo::setOrientation()
+  \sa setOrientation(), scalePosition()
 */
-void QwtThermo::setScalePosition(ScalePos s)
+void QwtThermo::setScalePosition(ScalePos scalePos)
 {
-    if ((s == BottomScale) || (s == TopScale))
-        setOrientation(Qt::Horizontal, s);
-    else if ((s == LeftScale) || (s == RightScale))
-        setOrientation(Qt::Vertical, s);
+    if ((scalePos == BottomScale) || (scalePos == TopScale))
+        setOrientation(Qt::Horizontal, scalePos);
+    else if ((scalePos == LeftScale) || (scalePos == RightScale))
+        setOrientation(Qt::Vertical, scalePos);
     else
         setOrientation(d_data->orientation, NoScale);
 }
 
-//! Return the scale position.
+/*! 
+   Return the scale position.
+   \sa setScalePosition()
+*/
 QwtThermo::ScalePos QwtThermo::scalePosition() const
 {
     return d_data->scalePos;
@@ -455,8 +482,11 @@ void QwtThermo::scaleChange()
     layoutThermo();
 }
 
-//! Redraw the liquid in thermometer pipe.
-void QwtThermo::drawThermo(QPainter *p)
+/*! 
+   Redraw the liquid in thermometer pipe.
+   \param painter Painter
+*/
+void QwtThermo::drawThermo(QPainter *painter)
 {
     int alarm  = 0, taval = 0;
 
@@ -611,26 +641,33 @@ void QwtThermo::drawThermo(QPainter *p)
 #else
         palette().color(QPalette::Background);
 #endif
-    p->fillRect(bRect, bgColor);
+    painter->fillRect(bRect, bgColor);
 
     if (alarm)
-       p->fillRect(aRect, d_data->alarmBrush);
+       painter->fillRect(aRect, d_data->alarmBrush);
 
-    p->fillRect(fRect, d_data->fillBrush);
+    painter->fillRect(fRect, d_data->fillBrush);
 }
 
-//! Set the border width of the pipe.
-void QwtThermo::setBorderWidth(int w)
+/*! 
+   Set the border width of the pipe.
+   \param width Border width
+   \sa borderWidth()
+*/
+void QwtThermo::setBorderWidth(int width)
 {
-    if ((w >= 0) && (w < (qwtMin(d_data->thermoRect.width(), 
+    if ((width >= 0) && (width < (qwtMin(d_data->thermoRect.width(), 
         d_data->thermoRect.height()) + d_data->borderWidth) / 2  - 1))
     {
-        d_data->borderWidth = w;
+        d_data->borderWidth = width;
         layoutThermo();
     }
 }
 
-//! Return the border width of the thermometer pipe.
+/*! 
+   Return the border width of the thermometer pipe.
+   \sa setBorderWidth()
+*/
 int QwtThermo::borderWidth() const
 {
     return d_data->borderWidth;
@@ -670,6 +707,7 @@ void QwtThermo::setRange(double vmin, double vmax, bool logarithmic)
 /*!
   \brief Change the brush of the liquid.
   \param brush New brush. The default brush is solid black.
+  \sa fillBrush()
 */
 void QwtThermo::setFillBrush(const QBrush& brush)
 {
@@ -677,7 +715,10 @@ void QwtThermo::setFillBrush(const QBrush& brush)
     update();
 }
 
-//! Return the liquid brush.
+/*! 
+  Return the liquid brush.
+  \sa setFillBrush()
+*/
 const QBrush& QwtThermo::fillBrush() const
 {
     return d_data->fillBrush;
@@ -686,6 +727,7 @@ const QBrush& QwtThermo::fillBrush() const
 /*!
   \brief Change the color of the liquid.
   \param c New color. The default color is black.
+  \sa fillColor()
 */
 void QwtThermo::setFillColor(const QColor &c)
 {
@@ -693,7 +735,10 @@ void QwtThermo::setFillColor(const QColor &c)
     update();
 }
 
-//! Return the liquid color.
+/*! 
+  Return the liquid color.
+  \sa setFillColor()
+*/
 const QColor &QwtThermo::fillColor() const
 {
     return d_data->fillBrush.color();
@@ -702,6 +747,7 @@ const QColor &QwtThermo::fillColor() const
 /*!
   \brief Specify the liquid brush above the alarm threshold
   \param brush New brush. The default is solid white.
+  \sa alarmBrush()
 */
 void QwtThermo::setAlarmBrush(const QBrush& brush)
 {
@@ -709,7 +755,10 @@ void QwtThermo::setAlarmBrush(const QBrush& brush)
     update();
 }
 
-//! Return the liquid brush above the alarm threshold.
+/*! 
+  Return the liquid brush above the alarm threshold.
+  \sa setAlarmBrush()
+*/
 const QBrush& QwtThermo::alarmBrush() const
 {
     return d_data->alarmBrush;
@@ -731,31 +780,47 @@ const QColor &QwtThermo::alarmColor() const
     return d_data->alarmBrush.color();
 }
 
-//! Specify the alarm threshold.
-void QwtThermo::setAlarmLevel(double v)
+/*! 
+  Specify the alarm threshold.
+
+  \param level Alarm threshold
+  \sa alarmLevel()
+*/
+void QwtThermo::setAlarmLevel(double level)
 {
-    d_data->alarmLevel = v;
+    d_data->alarmLevel = level;
     d_data->alarmEnabled = 1;
     update();
 }
 
-//! Return the alarm threshold.
+/*! 
+  Return the alarm threshold.
+  \sa setAlarmLevel()
+*/
 double QwtThermo::alarmLevel() const
 {
     return d_data->alarmLevel;
 }
 
-//! Change the width of the pipe.
-void QwtThermo::setPipeWidth(int w)
+/*! 
+  Change the width of the pipe.
+
+  \param width Width of the pipe
+  \sa pipeWidth()
+*/
+void QwtThermo::setPipeWidth(int width)
 {
-    if (w > 0)
+    if (width > 0)
     {
-        d_data->thermoWidth = w;
+        d_data->thermoWidth = width;
         layoutThermo();
     }
 }
 
-//! Return the width of the pipe.
+/*! 
+  Return the width of the pipe.
+  \sa setPipeWidth()
+*/
 int QwtThermo::pipeWidth() const
 {
     return d_data->thermoWidth;
@@ -799,7 +864,7 @@ bool QwtThermo::alarmEnabled() const
 
 /*!
   \return the minimum size hint
-  \sa QwtThermo::minimumSizeHint
+  \sa minimumSizeHint()
 */
 QSize QwtThermo::sizeHint() const
 {
@@ -809,7 +874,7 @@ QSize QwtThermo::sizeHint() const
 /*!
   \brief Return a minimum size hint
   \warning The return value depends on the font and the scale.
-  \sa QwtThermo::sizeHint
+  \sa sizeHint()
 */
 QSize QwtThermo::minimumSizeHint() const
 {

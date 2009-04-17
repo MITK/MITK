@@ -101,6 +101,10 @@ private:
     PrivateData *d_data;
 };
 
+/*! 
+   Move the position of the scale
+   \sa move(const QPoint &)
+*/
 inline void QwtScaleDraw::move(int x, int y)
 {
     move(QPoint(x, y));

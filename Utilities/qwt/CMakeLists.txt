@@ -21,6 +21,7 @@ SET(QWT_MOC_HEADERS
   include/qwt_plot_magnifier.h
   include/qwt_plot_panner.h
   include/qwt_plot_picker.h
+  include/qwt_plot_rescaler.h
   include/qwt_plot_zoomer.h
   include/qwt_scale_widget.h
   include/qwt_slider.h
@@ -52,7 +53,8 @@ SET(QWT_HEADERS
   include/qwt_double_interval.h  
   include/qwt_legend_itemmanager.h  
   include/qwt_plot.h    
-  include/qwt_plot_zoomer.h    
+  include/qwt_plot_zoomer.h
+  include/qwt_plot_rescaler.h    
   include/qwt_symbol.h
   include/qwt_array.h   
   include/qwt_double_range.h  
@@ -107,6 +109,7 @@ SET(QWT_SOURCES
   src/qwt_double_interval.cpp
   src/qwt_panner.cpp
   src/qwt_plot_picker.cpp
+  src/qwt_plot_rescaler.cpp
   src/qwt_scale_engine.cpp
   src/qwt_abstract_scale_draw.cpp
   src/qwt_double_range.cpp

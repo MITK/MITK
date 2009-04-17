@@ -44,7 +44,10 @@ public:
     QwtText title;
 };
 
-//! Constructor
+/*! 
+   Constructor
+   \param title Title of the item
+*/
 QwtPlotItem::QwtPlotItem(const QwtText &title)
 {
     d_data = new PrivateData;
@@ -66,6 +69,7 @@ QwtPlotItem::~QwtPlotItem()
   necessary). If a NULL argument is passed, it will detach from any QwtPlot it
   was attached to.
 
+  \param plot Plot widget
   \sa QwtPlotItem::detach()
 */
 void QwtPlotItem::attach(QwtPlot *plot)
@@ -216,7 +220,7 @@ void QwtPlotItem::setItemAttribute(ItemAttribute attribute, bool on)
 /*!
    Test an item attribute
 
-   \param ItemAttribute Attribute type
+   \param attribute Attribute type
    \return true/false
    \sa setItemAttribute(), ItemAttribute
 */
@@ -414,6 +418,8 @@ QWidget *QwtPlotItem::legendItem() const
    The default implementation is made for QwtPlotCurve and updates a 
    QwtLegendItem(), but an item could be represented by any type of widget,
    by overloading legendItem() and updateLegend().
+
+   \param legend Legend
 
    \sa legendItem(), itemChanged(), QwtLegend()
 */

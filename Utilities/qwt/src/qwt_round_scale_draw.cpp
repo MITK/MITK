@@ -79,7 +79,7 @@ QwtRoundScaleDraw &QwtRoundScaleDraw::operator=(const QwtRoundScaleDraw &other)
   Radius is the radius of the backbone without ticks and labels.
 
   \param radius New Radius
-  \sa moveCenter
+  \sa moveCenter()
 */
 void QwtRoundScaleDraw::setRadius(int radius)
 {
@@ -102,7 +102,7 @@ int QwtRoundScaleDraw::radius() const
    Move the center of the scale draw, leaving the radius unchanged
 
    \param center New center
-   \sa setRadius
+   \sa setRadius()
 */
 void QwtRoundScaleDraw::moveCenter(const QPoint &center)
 {

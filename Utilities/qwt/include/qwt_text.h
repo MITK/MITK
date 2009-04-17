@@ -79,7 +79,7 @@ public:
         The number of text formats can be extended using setTextEngine.
         Formats >= OtherFormat are not used by Qwt.
 
-      \sa QwtTextEngine, setTextEngine
+      \sa QwtTextEngine, setTextEngine()
     */
 
     enum TextFormat

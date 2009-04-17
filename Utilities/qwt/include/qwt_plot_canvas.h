@@ -20,7 +20,7 @@ class QwtPlot;
 class QPixmap;
 
 /*!
-  Canvas of a QwtPlot. 
+  \brief Canvas of a QwtPlot. 
   \sa QwtPlot 
 */
 class QWT_EXPORT QwtPlotCanvas : public QFrame
@@ -96,6 +96,8 @@ public:
     QPixmap *paintCache();
     const QPixmap *paintCache() const;
     void invalidatePaintCache();
+
+    void replot();
 
 protected:
     virtual void hideEvent(QHideEvent *);

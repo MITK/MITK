@@ -23,7 +23,10 @@ class QWT_EXPORT QwtCompassRose
 public:
     virtual ~QwtCompassRose() {};
 
+    //! Assign a palette
     virtual void setPalette(const QPalette &p) { d_palette = p; }
+
+    //! \return Current palette
     const QPalette &palette() const { return d_palette; }
 
     /*!
@@ -52,6 +55,8 @@ public:
     QwtSimpleCompassRose(int numThorns = 8, int numThornLevels = -1);
 
     void setWidth(double w);
+
+    //! \sa setWidth()
     double width() const { return d_width; }
 
     void setNumThorns(int count);

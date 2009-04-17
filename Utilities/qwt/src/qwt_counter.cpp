@@ -213,7 +213,7 @@ bool QwtCounter::event ( QEvent * e )
 }
 
 /*!
-  Handles key events
+  Handle key events
 
   - Ctrl + Qt::Key_Home
     Step to minValue()
@@ -232,7 +232,6 @@ bool QwtCounter::event ( QEvent * e )
   - Shift + Qt::Key_PageDown
     Decrement by incSteps(QwtCounter::Button3)
 */
-
 void QwtCounter::keyPressEvent (QKeyEvent *e)
 {
     bool accepted = true;
@@ -298,6 +297,10 @@ void QwtCounter::keyPressEvent (QKeyEvent *e)
     QWidget::keyPressEvent (e);
 }
 
+/*!
+  Handle wheel events
+  \param e Wheel event
+*/
 void QwtCounter::wheelEvent(QWheelEvent *e)
 {
     e->accept();
@@ -376,7 +379,7 @@ int QwtCounter::incSteps(QwtCounter::Button btn) const
   \brief Set a new value
   \param v new value
   Calls QwtDoubleRange::setValue and does all visual updates.
-  \sa QwtDoubleRange::setValue
+  \sa QwtDoubleRange::setValue()
 */
 
 void QwtCounter::setValue(double v)
@@ -468,11 +471,15 @@ int QwtCounter::numButtons() const
     return d_data->nButtons; 
 }
 
-//!  Display number string
-void QwtCounter::showNum(double d)
+/*!  
+  Display number string
+
+  \param number Number
+*/
+void QwtCounter::showNum(double number)
 {
     QString v;
-    v.setNum(d);
+    v.setNum(number);
 
     const int cursorPos = d_data->valueEdit->cursorPosition();
     d_data->valueEdit->setText(v);
@@ -552,10 +559,14 @@ double QwtCounter::step() const
     return QwtDoubleRange::step();
 }
     
-//! sets the step size
-void QwtCounter::setStep(double s)
+/*! 
+   Set the step size
+   \param stepSize Step size
+   \sa QwtDoubleRange::setStep()
+*/
+void QwtCounter::setStep(double stepSize)
 {
-    QwtDoubleRange::setStep(s);
+    QwtDoubleRange::setStep(stepSize);
 }
 
 //! returns the minimum value of the range
@@ -564,10 +575,15 @@ double QwtCounter::minVal() const
     return minValue();
 }
 
-//! sets the minimum value of the range
-void QwtCounter::setMinValue(double m)
+/*! 
+  Set the minimum value of the range
+
+  \param value Minimum value
+  \sa setMaxValue(), minVal()
+*/
+void QwtCounter::setMinValue(double value)
 {
-    setRange(m, maxValue(), step());
+    setRange(value, maxValue(), step());
 }
 
 //! returns the maximum value of the range
@@ -576,13 +592,21 @@ double QwtCounter::maxVal() const
     return QwtDoubleRange::maxValue();
 }
 
-//! sets the maximum value of the range
-void QwtCounter::setMaxValue(double m)
+/*! 
+  Set the maximum value of the range
+
+  \param value Maximum value
+  \sa setMinValue(), maxVal()
+*/
+void QwtCounter::setMaxValue(double value)
 {
-    setRange(minValue(), m, step());
+    setRange(minValue(), value, step());
 }
 
-//! set the number of increment steps for button 1
+/*! 
+  Set the number of increment steps for button 1
+  \param nSteps Number of steps
+*/
 void QwtCounter::setStepButton1(int nSteps)
 {
     setIncSteps(Button1, nSteps);
@@ -594,7 +618,10 @@ int QwtCounter::stepButton1() const
     return incSteps(Button1);
 }
 
-//! set the number of increment steps for button 2
+/*! 
+  Set the number of increment steps for button 2
+  \param nSteps Number of steps
+*/
 void QwtCounter::setStepButton2(int nSteps)
 {
     setIncSteps(Button2, nSteps);
@@ -606,7 +633,10 @@ int QwtCounter::stepButton2() const
     return incSteps(Button2);
 }
 
-//! set the number of increment steps for button 3
+/*! 
+  Set the number of increment steps for button 3
+  \param nSteps Number of steps
+*/
 void QwtCounter::setStepButton3(int nSteps)
 {
     setIncSteps(Button3, nSteps);
@@ -618,6 +648,7 @@ int QwtCounter::stepButton3() const
     return incSteps(Button3);
 }
 
+//! \return Current value
 double QwtCounter::value() const
 {
     return QwtDoubleRange::value();

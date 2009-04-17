@@ -152,7 +152,7 @@ QFont QwtPlotPrintFilter::font(const QFont &f, Item) const
 
 /*! 
   Change color and fonts of a plot
-  \sa apply
+  \sa apply()
 */
 void QwtPlotPrintFilter::apply(QwtPlot *plot) const
 {
@@ -361,7 +361,7 @@ void QwtPlotPrintFilter::apply(QwtPlotItem *item) const
 
 /*! 
    Reset color and fonts of a plot
-   \sa apply
+   \sa apply()
 */
 void QwtPlotPrintFilter::reset(QwtPlot *plot) const
 {

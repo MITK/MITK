@@ -51,7 +51,7 @@ public:
                     the scale item is corresponding to the xAxis(), 
                     otherwise it corresponds to the yAxis().
 
-   \param position  x or y position, depending on the corresponding axis.
+   \param pos x or y position, depending on the corresponding axis.
   
    \sa setPosition(), setAlignment()
 */
@@ -103,6 +103,7 @@ const QwtScaleDiv& QwtPlotScaleItem::scaleDiv() const
    Enable/Disable the synchronization of the scale division with 
    the corresponding axis.
 
+   \param on true/false
    \sa isScaleDivFromAxis()
 */
 void QwtPlotScaleItem::setScaleDivFromAxis(bool on)
@@ -185,7 +186,7 @@ QPalette QwtPlotScaleItem::palette() const
 
 /*!
    Change the tick label font
-   \sa font
+   \sa font()
 */
 void QwtPlotScaleItem::setFont(const QFont &font)
 {
@@ -208,7 +209,6 @@ QFont QwtPlotScaleItem::font() const
 /*!
   \brief Set a scale draw
 
-  \param axisId axis index
   \param scaleDraw object responsible for drawing scales.
 
   The main use case for replacing the default QwtScaleDraw is
@@ -263,6 +263,7 @@ QwtScaleDraw *QwtPlotScaleItem::scaleDraw()
 
    The border distance is set to -1.
 
+   \param pos New position
    \sa position(), setAlignment()
 */
 void QwtPlotScaleItem::setPosition(double pos)
@@ -391,7 +392,7 @@ void QwtPlotScaleItem::draw(QPainter *painter,
             return;
 
         sd->move(canvasRect.left(), y);
-        sd->setLength(canvasRect.width());
+        sd->setLength(canvasRect.width() - 1);
         sd->setTransformation(xMap.transformation()->copy());
     }
     else // == Qt::Vertical
@@ -414,7 +415,7 @@ void QwtPlotScaleItem::draw(QPainter *painter,
             return;
 
         sd->move(x, canvasRect.top());
-        sd->setLength(canvasRect.height());
+        sd->setLength(canvasRect.height() - 1);
         sd->setTransformation(yMap.transformation()->copy());
     }
 

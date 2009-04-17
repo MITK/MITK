@@ -24,12 +24,13 @@ class QwtDoubleInterval;
 
   In most cases scale divisions are calculated by a QwtScaleEngine.
 
-  \sa QwtScaleEngine::subDivideInto, QwtScaleEngine::subDivide
+  \sa subDivideInto(), subDivide()
 */
 
 class QWT_EXPORT QwtScaleDiv
 {
 public:
+    //! Scale tick types
     enum TickType
     {
         NoTick = -1,
@@ -44,18 +45,18 @@ public:
     explicit QwtScaleDiv();
     explicit QwtScaleDiv(const QwtDoubleInterval &,
         QwtValueList[NTickTypes]);
-    explicit QwtScaleDiv(double lBound, double rBound,
+    explicit QwtScaleDiv(double lowerBound, double upperBound,
         QwtValueList[NTickTypes]);
 
     int operator==(const QwtScaleDiv &s) const;
     int operator!=(const QwtScaleDiv &s) const;
     
-    void setInterval(double lBound, double rBound);
+    void setInterval(double lowerBound, double upperBound);
     void setInterval(const QwtDoubleInterval &);
     QwtDoubleInterval interval() const;
 
-    inline double lBound() const;
-    inline double hBound() const;
+    inline double lowerBound() const;
+    inline double upperBound() const;
     inline double range() const;
 
     bool contains(double v) const;
@@ -69,8 +70,8 @@ public:
     void invert();
 
 private:
-    double d_lBound;
-    double d_hBound;
+    double d_lowerBound;
+    double d_upperBound;
     QwtValueList d_ticks[NTickTypes];
 
     bool d_isValid;
@@ -78,46 +79,46 @@ private:
 
 /*!
    Change the interval
-   \lBound left bound
-   \rBound right bound
+   \param lowerBound lower bound
+   \param upperBound upper bound
 */
-inline void QwtScaleDiv::setInterval(double lBound, double hBound)
+inline void QwtScaleDiv::setInterval(double lowerBound, double upperBound)
 {
-    d_lBound = lBound;
-    d_hBound = hBound;
+    d_lowerBound = lowerBound;
+    d_upperBound = upperBound;
 }
 
 /*! 
-  \return lBound -> hBound
+  \return lowerBound -> upperBound
 */
 inline QwtDoubleInterval QwtScaleDiv::interval() const
 {
-    return QwtDoubleInterval(d_lBound, d_hBound);
+    return QwtDoubleInterval(d_lowerBound, d_upperBound);
 }
 
 /*! 
-  \return left bound
-  \sa QwtScaleDiv::hBound
+  \return lower bound
+  \sa upperBound()
 */
-inline double QwtScaleDiv::lBound() const 
+inline double QwtScaleDiv::lowerBound() const 
 { 
-    return d_lBound;
+    return d_lowerBound;
 }
 
 /*! 
-  \return right bound
-  \sa QwtScaleDiv::lBound
+  \return upper bound
+  \sa lowerBound()
 */
-inline double QwtScaleDiv::hBound() const 
+inline double QwtScaleDiv::upperBound() const 
 { 
-    return d_hBound;
+    return d_upperBound;
 }
 
 /*! 
-  \return hBound() - lBound()
+  \return upperBound() - lowerBound()
 */
 inline double QwtScaleDiv::range() const 
 { 
-    return d_hBound - d_lBound;
+    return d_upperBound - d_lowerBound;
 }
 #endif

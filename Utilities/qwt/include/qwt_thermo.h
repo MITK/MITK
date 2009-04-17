@@ -93,7 +93,7 @@ public:
       - Qt::Horizonal combines with NoScale, TopScale and BottomScale
       - Qt::Vertical combines with NoScale, LeftScale and RightScale
       
-      \sa setOrientation, setScalePosition
+      \sa setOrientation(), setScalePosition()
     */
     enum ScalePos 
     {

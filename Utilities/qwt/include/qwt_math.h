@@ -10,7 +10,7 @@
 #ifndef QWT_MATH_H
 #define QWT_MATH_H
 
-#include <math.h> 
+#include <math.h>
 #include <qpoint.h>
 #include "qwt_global.h"
 #include "qwt_double_rect.h"

@@ -104,7 +104,7 @@ void QwtMagnifier::setEnabled(bool on)
 
 /*!
   \return true when enabled, false otherwise
-  \sa setEnabled, eventFilter()
+  \sa setEnabled(), eventFilter()
 */
 bool QwtMagnifier::isEnabled() const
 {
@@ -141,7 +141,7 @@ double QwtMagnifier::wheelFactor() const
    The default button state is Qt::NoButton.
 
    \param buttonState Button state
-   \sa wheelButtonState
+   \sa wheelButtonState()
 */
 void QwtMagnifier::setWheelButtonState(int buttonState)
 {
@@ -150,7 +150,7 @@ void QwtMagnifier::setWheelButtonState(int buttonState)
 
 /*!
    \return Wheel button state
-   \sa setWheelButtonState
+   \sa setWheelButtonState()
 */
 int QwtMagnifier::wheelButtonState() const
 {
@@ -187,7 +187,7 @@ double QwtMagnifier::mouseFactor() const
 
    \param button Button
    \param buttonState Button state
-   \sa getMouseButton
+   \sa getMouseButton()
 */
 void QwtMagnifier::setMouseButton(int button, int buttonState)
 {
@@ -195,7 +195,7 @@ void QwtMagnifier::setMouseButton(int button, int buttonState)
     d_data->mouseButtonState = buttonState;
 }
 
-//! \sa setMouseButton
+//! \sa setMouseButton()
 void QwtMagnifier::getMouseButton(
     int &button, int &buttonState) const
 {
@@ -242,7 +242,7 @@ void QwtMagnifier::setZoomInKey(int key, int modifiers)
     d_data->zoomInKeyModifiers = modifiers;
 }
 
-//! \sa setZoomInKey
+//! \sa setZoomInKey()
 void QwtMagnifier::getZoomInKey(int &key, int &modifiers) const
 {
     key = d_data->zoomInKey;
@@ -263,7 +263,7 @@ void QwtMagnifier::setZoomOutKey(int key, int modifiers)
     d_data->zoomOutKeyModifiers = modifiers;
 }
 
-//! \sa setZoomOutKey
+//! \sa setZoomOutKey()
 void QwtMagnifier::getZoomOutKey(int &key, int &modifiers) const
 {
     key = d_data->zoomOutKey;
@@ -462,6 +462,7 @@ void QwtMagnifier::widgetKeyReleaseEvent(QKeyEvent *)
 {
 }
 
+//! \return Parent widget, where the rescaling happens
 QWidget *QwtMagnifier::parentWidget()
 {
     if ( parent()->inherits("QWidget") )
@@ -470,6 +471,7 @@ QWidget *QwtMagnifier::parentWidget()
     return NULL;
 }
 
+//! \return Parent widget, where the rescaling happens
 const QWidget *QwtMagnifier::parentWidget() const
 {
     if ( parent()->inherits("QWidget") )

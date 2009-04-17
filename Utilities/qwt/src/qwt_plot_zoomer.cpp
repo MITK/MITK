@@ -95,7 +95,7 @@ QwtPlotZoomer::QwtPlotZoomer(int xAxis, int yAxis,
                   when the plot is in a state with pending scale changes.
 
   \sa QwtPicker, QwtPicker::setSelectionFlags(), QwtPicker::setRubberBand(),
-      QwtPicker::setTrackerMode
+      QwtPicker::setTrackerMode()
 
   \sa QwtPlot::autoReplot(), QwtPlot::replot(), setZoomBase()
 */
@@ -352,8 +352,14 @@ void QwtPlotZoomer::zoom(int offset)
 void QwtPlotZoomer::setZoomStack(
     const QwtZoomStack &zoomStack, int zoomRectIndex)
 {
-    if ( zoomStack.isEmpty() || int(zoomStack.count()) > d_data->maxStackDepth )
+    if ( zoomStack.isEmpty() )
         return;
+
+    if ( d_data->maxStackDepth >= 0 &&
+        int(zoomStack.count()) > d_data->maxStackDepth )
+    {
+        return;
+    }
 
     if ( zoomRectIndex < 0 || zoomRectIndex > int(zoomStack.count()) )
         zoomRectIndex = zoomStack.count() - 1;
@@ -390,8 +396,8 @@ void QwtPlotZoomer::rescale()
 
         double x1 = rect.left();
         double x2 = rect.right();
-        if ( plt->axisScaleDiv(xAxis())->lBound() > 
-            plt->axisScaleDiv(xAxis())->hBound() )
+        if ( plt->axisScaleDiv(xAxis())->lowerBound() > 
+            plt->axisScaleDiv(xAxis())->upperBound() )
         {
             qSwap(x1, x2);
         }
@@ -400,8 +406,8 @@ void QwtPlotZoomer::rescale()
 
         double y1 = rect.top();
         double y2 = rect.bottom();
-        if ( plt->axisScaleDiv(yAxis())->lBound() > 
-            plt->axisScaleDiv(yAxis())->hBound() )
+        if ( plt->axisScaleDiv(yAxis())->lowerBound() > 
+            plt->axisScaleDiv(yAxis())->upperBound() )
         {
             qSwap(y1, y2);
         }
@@ -497,7 +503,7 @@ void QwtPlotZoomer::moveBy(double dx, double dy)
   \param x X value
   \param y Y value
 
-  \sa QwtDoubleRect::move
+  \sa QwtDoubleRect::move()
   \note The changed rectangle is limited by the zoom base
 */
 void QwtPlotZoomer::move(double x, double y)
@@ -606,7 +612,7 @@ void QwtPlotZoomer::begin()
   Expand the selected rectangle to minZoomSize() and zoom in
   if accepted.
 
-  \sa QwtPlotZoomer::accept()a, QwtPlotZoomer::minZoomSize()
+  \sa accept(), minZoomSize()
 */
 bool QwtPlotZoomer::end(bool ok)
 {

@@ -214,7 +214,10 @@ int QwtTextLabel::heightForWidth(int width) const
     return height;
 }
 
-//! Qt paint event
+/*! 
+   Qt paint event
+   \param event Paint event
+*/
 void QwtTextLabel::paintEvent(QPaintEvent *event)
 {
 #if QT_VERSION >= 0x040000

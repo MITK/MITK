@@ -10,7 +10,6 @@
 #include <math.h>
 #include <qpainter.h>
 #if QT_VERSION >= 0x040000
-#include <qpaintengine.h>
 #include <qbitmap.h>
 #include <qpalette.h>
 #endif
@@ -24,19 +23,6 @@
 #include "qwt_dial_needle.h"
 #include "qwt_dial.h"
 
-#if QT_VERSION >= 0x040000
-static void setAntialiasing(QPainter *painter, bool on)
-{
-    QPaintEngine *engine = painter->paintEngine();
-    if ( engine && engine->hasFeature(QPaintEngine::Antialiasing) )
-        painter->setRenderHint(QPainter::Antialiasing, on);
-}
-#else
-static void setAntialiasing(QPainter *, bool)
-{
-}
-#endif
-
 class QwtDial::PrivateData
 {
 public:
@@ -45,6 +31,7 @@ public:
         frameShadow(Sunken),
         lineWidth(0),
         mode(RotateNeedle),
+        direction(Clockwise),
         origin(90.0),
         minScaleArc(0.0),
         maxScaleArc(0.0),
@@ -66,6 +53,7 @@ public:
     int lineWidth;
 
     QwtDial::Mode mode;
+    QwtDial::Direction direction;
 
     double origin;
     double minScaleArc;
@@ -120,7 +108,7 @@ uint QwtDialScaleDraw::penWidth() const
 
   \param value Value to display
     
-  \sa QwtDial::scaleLabel
+  \sa QwtDial::scaleLabel()
 */  
 QwtText QwtDialScaleDraw::label(double value) const
 {
@@ -412,6 +400,33 @@ bool QwtDial::wrapping() const
     return periodic();
 }
 
+/*!
+    Set the direction of the dial (clockwise/counterclockwise)
+
+    Direction direction
+    \sa direction()
+*/
+void QwtDial::setDirection(Direction direction)
+{
+    if ( direction != d_data->direction )
+    {
+        d_data->direction = direction;
+        update();
+    }
+}
+
+/*!
+   \return Direction of the dial
+
+   The default direction of a dial is QwtDial::Clockwise
+
+   \sa setDirection()
+*/
+QwtDial::Direction QwtDial::direction() const
+{
+    return d_data->direction;
+}
+
 /*! 
    Resize the dial widget
    \param e Resize event
@@ -438,9 +453,8 @@ void QwtDial::paintEvent(QPaintEvent *e)
         QPainter &painter = *paintBuffer.painter();
 #else
         QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
 #endif
-
-        setAntialiasing(&painter, true);
 
         painter.save();
         drawContents(&painter);
@@ -516,8 +530,6 @@ void QwtDial::drawFrame(QPainter *painter)
     r.setRect(r.x() + lw / 2 - off, r.y() + lw / 2 - off,
         r.width() - lw + off + 1, r.height() - lw + off + 1);
 #if QT_VERSION >= 0x040000
-#ifdef __GNUC__
-#endif
     r.setX(r.x() + 1);
     r.setY(r.y() + 1);
     r.setWidth(r.width() - 2);
@@ -567,7 +579,7 @@ void QwtDial::drawFrame(QPainter *painter)
 
   \param painter Painter
   \sa boundingRect(), contentsRect(),
-    scaleContentsRect(), QWidget::setPalette
+    scaleContentsRect(), QWidget::setPalette()
 */
 void QwtDial::drawContents(QPainter *painter) const
 {
@@ -633,7 +645,7 @@ void QwtDial::drawContents(QPainter *painter) const
 
     if (isValid())
     {
-        direction = d_data->origin + d_data->minScaleArc;
+        direction = d_data->minScaleArc;
         if ( maxValue() > minValue() && d_data->maxScaleArc > d_data->minScaleArc )
         {
             const double ratio = 
@@ -641,8 +653,14 @@ void QwtDial::drawContents(QPainter *painter) const
             direction += ratio * (d_data->maxScaleArc - d_data->minScaleArc);
         }
 
+        if ( d_data->direction == QwtDial::CounterClockwise )
+            direction = d_data->maxScaleArc - (direction - d_data->minScaleArc);
+
+        direction += d_data->origin;
         if ( direction >= 360.0 )
             direction -= 360.0;
+        else if ( direction < 0.0 )
+            direction += 360.0;
     }
 
     double origin = d_data->origin;
@@ -653,7 +671,8 @@ void QwtDial::drawContents(QPainter *painter) const
     }
 
     painter->save();
-    drawScale(painter, center, radius, origin, d_data->minScaleArc, d_data->maxScaleArc);
+    drawScale(painter, center, radius, origin, 
+        d_data->minScaleArc, d_data->maxScaleArc);
     painter->restore();
 
     if ( isValid() )
@@ -699,7 +718,7 @@ void QwtDial::drawNeedle(QPainter *painter, const QPoint &center,
   \param minArc Minimum of the arc 
   \param maxArc Minimum of the arc 
   
-  \sa QwtAbstractScaleDraw::setAngleRange
+  \sa QwtAbstractScaleDraw::setAngleRange()
 */
 void QwtDial::drawScale(QPainter *painter, const QPoint &center,
     int radius, double origin, double minArc, double maxArc) const
@@ -711,11 +730,11 @@ void QwtDial::drawScale(QPainter *painter, const QPoint &center,
 
     double angle = maxArc - minArc;
     if ( angle > 360.0 )
-        angle = fmod(angle, 360.0);
+        angle = ::fmod(angle, 360.0);
 
     minArc += origin;
     if ( minArc < -360.0 )
-        minArc = fmod(minArc, 360.0);
+        minArc = ::fmod(minArc, 360.0);
     
     maxArc = minArc + angle;
     if ( maxArc > 360.0 )
@@ -725,6 +744,9 @@ void QwtDial::drawScale(QPainter *painter, const QPoint &center,
         minArc -= 360.0;
         maxArc -= 360.0;
     }
+
+    if ( d_data->direction == QwtDial::CounterClockwise )
+        qSwap(minArc, maxArc);
     
     painter->setFont(font());
 
@@ -856,7 +878,7 @@ void QwtDial::setScaleDraw(QwtDialScaleDraw *scaleDraw)
 
 /*!
   Change the intervals of the scale
-  \sa QwtAbstractScaleDraw::setScale
+  \sa QwtAbstractScaleDraw::setScale()
 */
 void QwtDial::setScale(int maxMajIntv, int maxMinIntv, double step)
 {
@@ -879,7 +901,7 @@ void QwtDial::setScale(int maxMajIntv, int maxMinIntv, double step)
   - options & ScaleLabel\n
     En/disable scale labels
     
-  \sa QwtAbstractScaleDraw::enableComponent 
+  \sa QwtAbstractScaleDraw::enableComponent()
 */
 void QwtDial::setScaleOptions(int options)
 {
@@ -900,7 +922,16 @@ void QwtDial::setScaleOptions(int options)
         options & ScaleLabel);
 }
 
-//! See: QwtAbstractScaleDraw::setTickLength, QwtDialScaleDraw::setPenWidth
+/*! 
+  Assign length and width of the ticks
+
+  \param minLen Length of the minor ticks
+  \param medLen Length of the medium ticks
+  \param majLen Length of the major ticks
+  \param penWidth Width of the pen for all ticks
+
+  \sa QwtAbstractScaleDraw::setTickLength(), QwtDialScaleDraw::setPenWidth()
+*/
 void QwtDial::setScaleTicks(int minLen, int medLen, 
     int majLen, int penWidth)
 {
@@ -1150,15 +1181,21 @@ double QwtDial::getValue(const QPoint &pos)
 }
 
 /*!
-  \sa QwtAbstractSlider::getScrollMode
+  See QwtAbstractSlider::getScrollMode()
+
+  \param pos point where the mouse was pressed
+  \retval scrollMode The scrolling mode
+  \retval direction  direction: 1, 0, or -1.
+
+  \sa QwtAbstractSlider::getScrollMode()
 */
-void QwtDial::getScrollMode(const QPoint &p, int &scrollMode, int &direction)
+void QwtDial::getScrollMode(const QPoint &pos, int &scrollMode, int &direction)
 {
     direction = 0;
     scrollMode = ScrNone;
 
     const QRegion region(contentsRect(), QRegion::Ellipse);
-    if ( region.contains(p) && p != rect().center() )
+    if ( region.contains(pos) && pos != rect().center() )
     {
         scrollMode = ScrMouse;
         d_data->previousDir = -1.0;
@@ -1182,13 +1219,14 @@ void QwtDial::getScrollMode(const QPoint &p, int &scrollMode, int &direction)
   - Key_End\n
     Set the value to maxValue()
 
+  \param event Key event
   \sa isReadOnly()
 */
-void QwtDial::keyPressEvent(QKeyEvent *e)
+void QwtDial::keyPressEvent(QKeyEvent *event)
 {
     if ( isReadOnly() )
     {
-        e->ignore();
+        event->ignore();
         return;
     }
 
@@ -1196,7 +1234,7 @@ void QwtDial::keyPressEvent(QKeyEvent *e)
         return;
 
     double previous = prevValue();
-    switch ( e->key() )
+    switch ( event->key() )
     {
         case Qt::Key_Down:
         case Qt::Key_Left:
@@ -1228,7 +1266,7 @@ void QwtDial::keyPressEvent(QKeyEvent *e)
             setValue(maxValue());
             break;
         default:;
-            e->ignore();
+            event->ignore();
     }
 
     if (value() != previous)

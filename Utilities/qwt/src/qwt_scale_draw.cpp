@@ -620,11 +620,17 @@ void QwtScaleDraw::drawLabel(QPainter *painter, double value) const
     if ( lbl.isEmpty() )
         return; 
 
-    const QPoint pos = labelPosition(value);
+    QPoint pos = labelPosition(value);
 
     QSize labelSize = lbl.textSize(painter->font());
     if ( labelSize.height() % 2 )
         labelSize.setHeight(labelSize.height() + 1);
+
+    const QwtMetricsMap metricsMap = QwtPainter::metricsMap();
+    QwtPainter::resetMetricsMap();
+
+    labelSize = metricsMap.layoutToDevice(labelSize);
+    pos = metricsMap.layoutToDevice(pos);
     
     const QwtMatrix m = labelMatrix( pos, labelSize);
 
@@ -636,6 +642,9 @@ void QwtScaleDraw::drawLabel(QPainter *painter, double value) const
 #endif
 
     lbl.draw (painter, QRect(QPoint(0, 0), labelSize) );
+
+    QwtPainter::setMetricsMap(metricsMap); // restore metrics map
+
     painter->restore();
 }
 

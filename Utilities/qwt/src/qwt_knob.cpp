@@ -8,9 +8,6 @@
  *****************************************************************************/
 
 #include <qpainter.h>
-#if QT_VERSION >= 0x040000
-#include <qpaintengine.h>
-#endif
 #include <qpalette.h>
 #include <qstyle.h>
 #include <qevent.h>
@@ -327,17 +324,20 @@ void QwtKnob::rangeChange()
 }
 
 /*!
-  \brief Qt Resize Event
+  Qt Resize Event
 */
 void QwtKnob::resizeEvent(QResizeEvent *)
 {
     layoutKnob( false );
 }
 
-//! Recalculate the knob's geometry and layout based on
-//  the current rect and fonts.
-//  \param update_geometry  notify the layout system and call update
-//         to redraw the scale
+/*! 
+   Recalculate the knob's geometry and layout based on
+   the current rect and fonts.
+
+   \param update_geometry notify the layout system and call update
+                          to redraw the scale
+*/
 void QwtKnob::layoutKnob( bool update_geometry )
 {
     const QRect r = rect();
@@ -358,7 +358,9 @@ void QwtKnob::layoutKnob( bool update_geometry )
 }
 
 /*!
-  \brief Repaint the knob
+  Repaint the knob
+
+  \param e Paint event
 */
 void QwtKnob::paintEvent(QPaintEvent *e)
 {
@@ -370,19 +372,21 @@ void QwtKnob::paintEvent(QPaintEvent *e)
         draw(paintBuffer.painter(), ur);
 #else
         QPainter painter(this);
-        if ( paintEngine()->hasFeature(QPaintEngine::Antialiasing) )
-            painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::Antialiasing);
         draw(&painter, ur);
 #endif
     }
 }
 
 /*!
-  \brief Repaint the knob
+  Repaint the knob
+
+  \param painter Painter
+  \param rect Update rectangle
 */
-void QwtKnob::draw(QPainter *painter, const QRect& ur)
+void QwtKnob::draw(QPainter *painter, const QRect& rect)
 {
-    if ( !d_data->knobRect.contains( ur ) ) // event from valueChange()
+    if ( !d_data->knobRect.contains( rect ) ) // event from valueChange()
     {
 #if QT_VERSION < 0x040000
         scaleDraw()->draw( painter, colorGroup() );

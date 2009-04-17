@@ -23,8 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcolor.h>
 
 #include <qwt_plot_item.h> 
-
-class QwtIntervalData;
+#include <qwt_interval_data.h>
 
 /** 
 \brief Used to create a histogram that can be shown in a Qwt Plot.

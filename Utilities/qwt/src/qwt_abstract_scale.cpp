@@ -253,8 +253,8 @@ const QwtAbstractScaleDraw *QwtAbstractScale::abstractScaleDraw() const
 
 void QwtAbstractScale::updateScaleDraw()
 {
-    rescale( d_data->scaleDraw->scaleDiv().lBound(), 
-        d_data->scaleDraw->scaleDiv().hBound(), d_data->stepSize);
+    rescale( d_data->scaleDraw->scaleDiv().lowerBound(), 
+        d_data->scaleDraw->scaleDiv().upperBound(), d_data->stepSize);
 }
 
 /*!

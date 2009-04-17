@@ -311,7 +311,7 @@ void QwtDoubleRange::stepChange()
 
 /*!
   \return the step size
-  \sa QwtDoubleRange::setStep, QwtDoubleRange::setRange
+  \sa setStep(), setRange()
 */
 double QwtDoubleRange::step() const
 {
@@ -324,7 +324,7 @@ double QwtDoubleRange::step() const
   maxValue returns the value which has been specified
   as the second parameter in  QwtDoubleRange::setRange.
     
-  \sa QwtDoubleRange::setRange()
+  \sa setRange()
 */  
 double QwtDoubleRange::maxValue() const
 {   
@@ -337,7 +337,7 @@ double QwtDoubleRange::maxValue() const
   minValue returns the value which has been specified
   as the first parameter in  setRange().
     
-  \sa QwtDoubleRange::setRange()
+  \sa setRange()
 */
 double QwtDoubleRange::minValue() const 
 {
@@ -346,7 +346,7 @@ double QwtDoubleRange::minValue() const
 
 /*!
   \brief Returns true if the range is periodic
-  \sa QwtDoubleRange::setPeriodic()
+  \sa setPeriodic()
 */
 bool QwtDoubleRange::periodic() const 
 { 

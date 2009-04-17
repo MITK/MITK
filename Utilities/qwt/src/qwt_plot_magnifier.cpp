@@ -53,7 +53,7 @@ QwtPlotMagnifier::~QwtPlotMagnifier()
    \param axis Axis, see QwtPlot::Axis
    \param on On/Off
 
-   \sa isAxisEnabled
+   \sa isAxisEnabled()
 */
 void QwtPlotMagnifier::setAxisEnabled(int axis, bool on)
 {
@@ -67,7 +67,7 @@ void QwtPlotMagnifier::setAxisEnabled(int axis, bool on)
    \param axis Axis, see QwtPlot::Axis
    \return True, if the axis is enabled
 
-   \sa setAxisEnabled
+   \sa setAxisEnabled()
 */
 bool QwtPlotMagnifier::isAxisEnabled(int axis) const
 {
@@ -135,7 +135,7 @@ void QwtPlotMagnifier::rescale(double factor)
         if ( isAxisEnabled(axisId) && scaleDiv->isValid() )
         {
             const double center =
-                scaleDiv->lBound() + scaleDiv->range() / 2;
+                scaleDiv->lowerBound() + scaleDiv->range() / 2;
             const double width_2 = scaleDiv->range() / 2 * factor;
 
             plt->setAxisScale(axisId, center - width_2, center + width_2);

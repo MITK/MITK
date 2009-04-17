@@ -17,18 +17,36 @@
 class QwtLegend;
 class QWidget;
 
+/*!
+  \brief Abstract API to bind plot items to the legend
+*/
+
 class QWT_EXPORT QwtLegendItemManager
 {
 public:
+    //! Constructor
     QwtLegendItemManager() 
     {
     }
 
+    //! Destructor
     virtual ~QwtLegendItemManager() 
     {
     }
 
-    virtual void updateLegend(QwtLegend *) const = 0;
+    /*!
+      Update the widget that represents the item on the legend
+      \param legend Legend
+      \sa legendItem()
+     */
+    virtual void updateLegend(QwtLegend *legend) const = 0;
+
+    /*!
+      Allocate the widget that represents the item on the legend
+      \return Allocated widget
+      \sa updateLegend() QwtLegend()
+     */
+
     virtual QWidget *legendItem() const = 0;
 };
 

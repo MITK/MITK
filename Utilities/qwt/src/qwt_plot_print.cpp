@@ -36,7 +36,7 @@
 
   \param paintDev device to paint on, often a printer
   \param pfilter print filter
-  \sa QwtPlot::print
+
   \sa QwtPlotPrintFilter
 */
 
@@ -68,6 +68,7 @@ void QwtPlot::print(QPaintDevice &paintDev,
   \param painter Painter
   \param plotRect Bounding rectangle
   \param pfilter Print filter
+
   \sa QwtPlotPrintFilter
 */
 void QwtPlot::print(QPainter *painter, const QRect &plotRect,
@@ -184,7 +185,8 @@ void QwtPlot::print(QPainter *painter, const QRect &plotRect,
         map[axisId].setTransformation(axisScaleEngine(axisId)->transformation());
 
         const QwtScaleDiv &scaleDiv = *axisScaleDiv(axisId);
-        map[axisId].setScaleInterval(scaleDiv.lBound(), scaleDiv.hBound());
+        map[axisId].setScaleInterval(
+            scaleDiv.lowerBound(), scaleDiv.upperBound());
 
         double from, to;
         if ( axisEnabled(axisId) )
@@ -206,16 +208,18 @@ void QwtPlot::print(QPainter *painter, const QRect &plotRect,
         }
         else
         {
-            const int margin = plotLayout()->canvasMargin(axisId);
+            int margin = plotLayout()->canvasMargin(axisId);
             if ( axisId == yLeft || axisId == yRight )
             {
-                from = metricsMap.layoutToDeviceX(canvasRect.bottom() - margin);
-                to = metricsMap.layoutToDeviceX(canvasRect.top() + margin);
+                margin = metricsMap.layoutToDeviceY(margin);
+                from = canvasRect.bottom() - margin;
+                to = canvasRect.top() + margin;
             }
             else
             {
-                from = metricsMap.layoutToDeviceY(canvasRect.left() + margin);
-                to = metricsMap.layoutToDeviceY(canvasRect.right() - margin);
+                margin = metricsMap.layoutToDeviceX(margin);
+                from = canvasRect.left() + margin;
+                to = canvasRect.right() - margin;
             }
         }
         map[axisId].setPaintXInterval(from, to);
@@ -484,15 +488,19 @@ void QwtPlot::printCanvas(QPainter *painter,
             r = canvasRect;
 #if QT_VERSION >= 0x040000
             // Unfortunately the paint engines do no always the same
-            switch(painter->paintEngine()->type() )
+            const QPaintEngine *pe = painter->paintEngine();
+            if ( pe )
             {
-                case QPaintEngine::Raster:
-                case QPaintEngine::X11:
-                    break;
-                default:
-                    r.setWidth(r.width() - 1);
-                    r.setHeight(r.height() - 1);
-                    break;
+                switch(painter->paintEngine()->type() )
+                {
+                    case QPaintEngine::Raster:
+                    case QPaintEngine::X11:
+                        break;
+                    default:
+                        r.setWidth(r.width() - 1);
+                        r.setHeight(r.height() - 1);
+                        break;
+                }
             }
 #else
             if ( painter->device()->isExtDev() )

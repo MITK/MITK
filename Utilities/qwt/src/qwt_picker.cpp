@@ -130,15 +130,17 @@ void QwtPicker::PickerWidget::updateMask()
     {
         d_hasTextMask = true;
 #if QT_VERSION >= 0x040300
-        if ( !parentWidget()->testAttribute(Qt::WA_PaintOnScreen) &&
-           parentWidget()->paintEngine()->type() != QPaintEngine::OpenGL )
+        if ( !parentWidget()->testAttribute(Qt::WA_PaintOnScreen) )
         {
-            /*
-              With Qt >= 4.3 drawing of the tracker can be implemented in an
-              easier way, using the textRect as mask. 
-            */
+#if 0
+            if ( parentWidget()->paintEngine()->type() != QPaintEngine::OpenGL )
+#endif
+            {
+                // With Qt >= 4.3 drawing of the tracker can be implemented in an
+                // easier way, using the textRect as mask. 
 
-            d_hasTextMask = false;
+                d_hasTextMask = false;
+            }
         }
 #endif
         
@@ -529,7 +531,7 @@ void QwtPicker::setEnabled(bool enabled)
 
 /*!
   \return true when enabled, false otherwise
-  \sa setEnabled, eventFilter()
+  \sa setEnabled(), eventFilter()
 */
 
 bool QwtPicker::isEnabled() const
@@ -771,11 +773,21 @@ void QwtPicker::drawTracker(QPainter *painter) const
     }
 }
 
+//! \return Current position of the tracker
 QPoint QwtPicker::trackerPosition() const 
 {
     return d_data->trackerPosition;
 }
 
+/*!
+   Calculate the bounding rectangle for the tracker text
+   from the current position of the tracker
+
+   \param font Font of the tracker text
+   \return Bounding rectangle of the tracker text
+
+   \sa trackerPosition()
+*/
 QRect QwtPicker::trackerRect(const QFont &font) const
 {
     if ( trackerMode() == AlwaysOff || 
@@ -1129,7 +1141,7 @@ void QwtPicker::transition(const QEvent *e)
 /*!
   Open a selection setting the state to active
 
-  \sa isActive, end(), append(), move()
+  \sa isActive(), end(), append(), move()
 */
 void QwtPicker::begin()
 {
@@ -1161,7 +1173,7 @@ void QwtPicker::begin()
   \param ok If true, complete the selection and emit a selected signal
             otherwise discard the selection.
   \return true if the selection is accepted, false otherwise
-  \sa isActive, begin(), append(), move(), selected(), accept()
+  \sa isActive(), begin(), append(), move(), selected(), accept()
 */
 bool QwtPicker::end(bool ok)
 {
@@ -1208,7 +1220,7 @@ void QwtPicker::reset()
 
   \param pos Additional point
 
-  \sa isActive, begin(), end(), move(), appended()
+  \sa isActive(), begin(), end(), move(), appended()
 */
 void QwtPicker::append(const QPoint &pos)
 {
@@ -1229,7 +1241,7 @@ void QwtPicker::append(const QPoint &pos)
   The moved() signal is emitted.
 
   \param pos New position
-  \sa isActive, begin(), end(), append()
+  \sa isActive(), begin(), end(), append()
 
 */
 void QwtPicker::move(const QPoint &pos)
@@ -1355,6 +1367,7 @@ QRect QwtPicker::pickRect() const
     return rect;
 }
 
+//! Update the state of rubberband and tracker label
 void QwtPicker::updateDisplay()
 {
     QWidget *w = parentWidget();
@@ -1414,11 +1427,13 @@ void QwtPicker::updateDisplay()
         delete tw;
 }
 
+//! \return Widget displaying the rubberband
 const QWidget *QwtPicker::rubberBandWidget() const
 {
     return d_data->rubberBandWidget;
 }
 
+//! \return Widget displaying the tracker text
 const QWidget *QwtPicker::trackerWidget() const
 {
     return d_data->trackerWidget;

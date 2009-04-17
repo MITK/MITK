@@ -162,6 +162,9 @@ void QwtPanner::getMouseButton(int &button, int &buttonState) const
 /*!
    Change the abort key
    The defaults are Qt::Key_Escape and Qt::NoButton
+
+   \param key Key ( See Qt::Keycode )
+   \param state State
 */
 void QwtPanner::setAbortKey(int key, int state)
 {
@@ -528,8 +531,6 @@ void QwtPanner::widgetKeyPressEvent(QKeyEvent *ke)
 
 /*!
   Handle a key release event for the observed widget.
-
-  \param ke Key event
   \sa eventFilter(), widgetKeyReleaseEvent()
 */
 void QwtPanner::widgetKeyReleaseEvent(QKeyEvent *)

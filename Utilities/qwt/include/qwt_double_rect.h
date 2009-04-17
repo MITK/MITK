@@ -332,7 +332,7 @@ inline void QwtDoubleSize::setHeight(double height)
     A null rectangle has both the width and the height set to 0.
     A null rectangle is also empty and invalid.
 
-    \sa QwtDoubleRect::isEmpty, QwtDoubleRect::isValid
+    \sa isEmpty(), isValid()
 */
 inline bool QwtDoubleRect::isNull() const
 { 
@@ -344,7 +344,7 @@ inline bool QwtDoubleRect::isNull() const
     An empty rectangle has a width() <= 0 or height() <= 0.
     An empty rectangle is not valid. isEmpty() == !isValid()
 
-    \sa QwtDoubleRect::isNull, QwtDoubleRect::isValid
+    \sa isNull(), isValid()
 */
 inline bool QwtDoubleRect::isEmpty() const
 { 

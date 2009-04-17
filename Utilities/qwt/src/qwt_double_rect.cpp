@@ -17,7 +17,7 @@
 /*! 
     Constructs a null point.
 
-    \sa QwtDoublePoint::isNull
+    \sa QwtDoublePoint::isNull()
 */
 QwtDoublePoint::QwtDoublePoint():
     d_x(0.0),

@@ -110,7 +110,13 @@ void QwtCompass::initCompass()
 #endif
 }
 
-//! Draw the contents of the scale
+/*! 
+   Draw the contents of the scale
+
+   \param painter Painter
+   \param center Center of the content circle
+   \param radius Radius of the content circle
+*/
 void QwtCompass::drawScaleContents(QPainter *painter, 
         const QPoint &center, int radius) const
 {

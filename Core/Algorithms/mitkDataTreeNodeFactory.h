@@ -86,6 +86,8 @@ public:
     */
   static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );
 
+  void SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node);
+
   /**
    * if true -> loaded image is part of a serie
    */

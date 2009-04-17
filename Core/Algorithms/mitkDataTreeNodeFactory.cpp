@@ -186,7 +186,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
         //if(pointset.IsNotNull())
         //  this->SetDefaultPointSetProperties(node);
 
-        //this->SetDefaultCommonProperties( node );
+        this->SetDefaultCommonProperties( node );
 
         this->SetOutput(i, node);
       }
@@ -473,3 +473,27 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
   }
 
 }
+
+void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
+{
+  // path
+  mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath( m_FileName ) );
+  node->SetProperty( StringProperty::PATH, pathProp );
+  
+  // name
+  mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
+  if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))
+  {
+    if (FileNameEndsWith( ".gz" ))
+      m_FileName = m_FileName.substr( 0, m_FileName.length()-3 );
+    
+    nameProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
+
+    node->SetProperty( "name", nameProp );
+  }
+  
+  // visibility
+  if(!node->GetProperty("visible"))
+    node->SetVisibility(true);
+}
+

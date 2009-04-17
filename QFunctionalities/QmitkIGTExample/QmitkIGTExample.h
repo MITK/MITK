@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataRecorder.h"
 #include "mitkNavigationDataPlayer.h"
 #include "mitkNavigationDataToPointSetFilter.h"
+#include "mitkNavigationDataToMessageFilter.h"
+#include "QmitkPlotWidget.h"
 
 class QmitkStdMultiWidget;
 class QmitkIGTExampleControls;
@@ -131,7 +133,7 @@ protected slots:
    */
    void OnMeasureContinuously();
 
-   /**Documentation
+   /**
    * \brief stops the navigation pipeline and perform clean up
    */
    void OnStop();
@@ -149,13 +151,61 @@ protected slots:
    */
    void OnParametersChanged();
 
+   /**Documentation
+   * \brief Starts recording of tracking data
+   *
+   * This method sets up a IGT pipeline that connects a tracking device
+   * with a NavigationDataRecorder filter. It will then start a timer that 
+   * updates the recorder periodically until OnStartPlaying() is called.
+   */
    void OnStartRecording();
 
+   /**Documentation
+   * \brief Stops the recording of tracking data and starts the replay
+   *
+   * This method stops the recording filter that was set up in OnStartRecording().
+   * It sets up a new pipeline that connects a NavigationDataPlayer with a 
+   * NavigationDataToPointSetFilter as an example for an alternative visualization
+   * method. It then starts a Replay timer that updates the recorder periodically.
+   */
    void OnStartPlaying();
 
+   /**Documentation
+   * \brief Timer update method for recording of tracking data
+   *
+   * updates the recording filter and displays a message in the status bar
+   */
    void OnRecording();
 
+   /**Documentation
+   * \brief Timer update method for replaying of tracking data
+   *
+   * updates the replay filter, rerenders the 3D render window and 
+   * displays a message in the status bar
+   */
    void OnPlaying();
+
+   /**Documentation
+   * \brief Display a graph and progress bar that shows error values from the first navigation data
+   *
+   * This method is an example of how to use NavigationDataToMessageFilter to update
+   * GUI elements from a IGT pipeline. It creates a NavigationDataToMessageFilter, 
+   * sets its input to the first output of the displacement filter
+   * and registers the OnErrorValueChanged() method as a callback whenever the
+   * error value of the input navigation data changes.
+   */
+   void OnShowErrorPlot();
+
+   /**Documentation
+   * \brief Callback method of the NavigationDataToMessageFilter
+   *
+   * This method will be called by NavigationDataToMessageFilter when the
+   * error value of its input navigation data object changes. 
+   * The method calculates an overall error value and adds it both to an
+   * error plot widget and to a progress bar. If the error is above a hardcoded
+   * threshold, a warning is also displayed in the text output widget
+   */
+   void OnErrorValueChanged(mitk::NavigationData::CovarianceMatrixType v);
 
 protected:  
 
@@ -170,7 +220,11 @@ protected:
   mitk::NavigationDataRecorder::Pointer m_Recorder; ///< records NDs to a XML file
   mitk::NavigationDataPlayer::Pointer m_Player; ///< plays a XML file
   mitk::NavigationDataToPointSetFilter::Pointer m_PointSetFilter; ///< has a NDs as input and a PointSet as output
+  mitk::NavigationDataToMessageFilter::Pointer m_MessageFilter; ///< calls OnErrorValueChanged when the error value of its input changes
   mitk::PointSet::Pointer m_PointSet; ///< stores the output of the pointsetfilter
+
+  QmitkPlotWidget::DataVector m_XValues; ///< X-Values of the error plot (timestamp of navigation data)
+  QmitkPlotWidget::DataVector m_YValues; ///< Y-Values of the error plot (error value of navigation data
   QTextEdit* out;   ///< pointer to output widget 
 
   QTimer* m_Timer; ///< timer for continuous tracking update

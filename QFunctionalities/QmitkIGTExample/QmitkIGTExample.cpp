@@ -51,6 +51,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>
+#include <qprogressbar.h>
+#include <qcolor.h>
+#include <qwindowsstyle.h>
 
 
 QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
@@ -60,11 +63,22 @@ QmitkIGTExample::QmitkIGTExample(QObject *parent, const char *name, QmitkStdMult
   m_Timer = new QTimer(this);
   m_RecordingTimer = new QTimer(this);
   m_PlayingTimer = new QTimer(this);
+  m_XValues.clear();
+  m_YValues.clear();
 }
 
 
 QmitkIGTExample::~QmitkIGTExample()
-{}
+{
+  this->OnStop();  // cleanup IGT pipeline, if tracking is in progress
+  m_Timer->stop();
+  m_RecordingTimer->stop();
+  m_PlayingTimer->stop();
+  m_Recorder = NULL;
+  m_Player = NULL;
+  m_RecordingTimer = NULL;
+  m_PlayingTimer = NULL;
+}
 
 
 QWidget * QmitkIGTExample::CreateMainWidget(QWidget *parent)
@@ -110,6 +124,7 @@ void QmitkIGTExample::CreateConnections()
     connect( m_PlayingTimer, SIGNAL(timeout()), this, SLOT(OnPlaying()) );
     connect( (QObject*)(m_Controls->m_StartRecordingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartRecording()));  // execute tracking test code
     connect( (QObject*)(m_Controls->m_StartPlayingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartPlaying()));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_ShowErrorPlotBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnShowErrorPlot()));  // execute tracking test code
   }
 }
 
@@ -268,12 +283,11 @@ void QmitkIGTExample::OnTestNavigation()
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
-    int numberOfDisplacerOutputs = m_Displacer->GetNumberOfOutputs();
-    for (int i = 0; i < numberOfDisplacerOutputs; i++)
+    for (int i = 0; i < m_Displacer->GetNumberOfOutputs(); i++)
       visualizer->SetInput(i, m_Displacer->GetOutput(i));
 
     //create new BaseData for each tool
-    for (int i = 0; i < numberOfDisplacerOutputs;i++)
+    for (int i = 0; i < m_Displacer->GetNumberOfOutputs();i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
       float scale[] = {20.0, 20.0, 20.0};
@@ -392,6 +406,9 @@ void QmitkIGTExample::OnMeasure()
   if (m_PointSetFilter.IsNotNull()) // update tracjectory generation if it is in use
     m_PointSetFilter->Update();
 
+  if (m_MessageFilter.IsNotNull()) // update error visualization if it is in use
+    m_MessageFilter->Update();
+
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update 3D render window
 }
 
@@ -433,6 +450,7 @@ void QmitkIGTExample::OnStop()
     m_EndOfPipeline = NULL;
     m_PointSetFilter = NULL;
     m_Displacer = NULL;
+    m_MessageFilter = NULL;
     WaitCursorOff();
   }
   catch (std::exception& exp)
@@ -670,4 +688,78 @@ void QmitkIGTExample::OnPlaying()
   m_PointSetFilter->Update();
   mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget4->GetRenderWindow())->RequestUpdate();  // update only 3D render window
   mitk::StatusBar::GetInstance()->DisplayText("Replaying tracking data now", 75); // Display replay message for 75ms in status bar
+}
+
+
+void QmitkIGTExample::OnShowErrorPlot()
+{
+  if (m_Displacer.IsNull()) // only possible after tracking pipeline is initalized
+  {
+    out->append("You have to click on 'Start MITK-IGT-Navigation Test' first");
+    return; 
+  }
+  /* Set up error display */
+  m_Controls->m_ErrorPlot->SetPlotTitle("Error Values of tool 1");
+  m_Controls->m_ErrorPlot->SetAxisTitle( QwtPlot::xBottom, "Timestamp" ); 
+  m_Controls->m_ErrorPlot->SetAxisTitle( QwtPlot::yLeft, "Error" ); 
+  int curveId = m_Controls->m_ErrorPlot->InsertCurve( "Error value of tool 1" ); 
+  m_Controls->m_ErrorPlot->SetCurvePen( curveId, QPen( red ) ); 
+  m_XValues.clear();
+  m_YValues.clear();
+  m_Controls->m_ErrorPlot->setEnabled(true);
+  m_Controls->m_ErrorPlot->show();
+
+  m_Controls->m_ErrorBar->setTotalSteps(100); // needs to be set to meaningful values depending on tracking device and application requirements
+  m_Controls->m_ErrorBar->setPercentageVisible(false);
+  m_Controls->m_ErrorBar->setCenterIndicator(true);
+  m_Controls->m_ErrorBar->setStyle(new QWindowsStyle()); // to be able to use custom colors
+  m_Controls->m_ErrorBar->reset();
+  
+  /*set up IGT pipeline -> GUI connection */
+  m_MessageFilter = mitk::NavigationDataToMessageFilter::New();
+  m_MessageFilter->SetInput(m_Displacer->GetOutput()); // connect with first output of Displacer 
+  m_MessageFilter->AddErrorChangedListener(mitk::MessageDelegate1<QmitkIGTExample, mitk::NavigationData::CovarianceMatrixType>(this, &QmitkIGTExample::OnErrorValueChanged));  
+}
+
+
+void QmitkIGTExample::OnErrorValueChanged(mitk::NavigationData::CovarianceMatrixType v)
+{
+  /* calculate overall error (this should be replaced with a more meaningful implementation depending on the application requirements) */
+  mitk::ScalarType errorValue = 0.0;
+  for (unsigned int i = 0; i < v.ColumnDimensions; ++i)
+    for (unsigned int j = 0; j < v.RowDimensions; ++j)
+      errorValue += v(i, j);
+
+  if ((m_MessageFilter.IsNotNull()) && (m_MessageFilter->GetOutput() != NULL))
+  {
+    mitk::ScalarType timeValue =  m_MessageFilter->GetOutput()->GetTimeStamp();
+    m_XValues.push_back(timeValue);
+    m_YValues.push_back(errorValue);
+
+    m_Controls->m_ErrorPlot->SetCurveData( 0, m_XValues, m_YValues ); // hardcoded for curve id 0!
+    m_Controls->m_ErrorPlot->Replot();
+  }
+  const mitk::ScalarType errorThreshold = 0.8; // needs to be set to meaningful value depending on application requirements
+  
+  mitk::ScalarType progressClampError = (errorValue < 1.0) ? errorValue* 100 : 100;// use primitive mapping of error values to the progress bar range of 0..100. needs to be adjusted to meaningful values
+  m_Controls->m_ErrorBar->setProgress(progressClampError); 
+
+  /* color the progress bar */
+  QColor aboveThresholdColor(255, 0, 0);
+  QColor belowThresholdColor(0, 255, 0);
+
+  QPalette pal = m_Controls->m_ErrorBar->palette();
+  QColor newColor;
+  if (errorValue > errorThreshold)
+  {
+    newColor = aboveThresholdColor;
+    out->append(QString("error value %1 is above threshold of %2!").arg(errorValue).arg(errorThreshold));
+  }
+  else
+  {
+    newColor = belowThresholdColor;
+  }
+  pal.setColor(QColorGroup::Highlight, newColor);   // Set the bar color
+  pal.setColor(QColorGroup::Foreground, newColor); // Set the percentage text color
+  m_Controls->m_ErrorBar->setPalette(pal);
 }

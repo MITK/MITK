@@ -79,6 +79,7 @@ mitk::GradientBackground::GradientBackground()
 
   m_Mapper->SetInput( m_Plane );
   m_Mapper->SetLookupTable( m_Lut );
+  m_Mapper->ImmediateModeRenderingOn();
 
   m_Actor->SetMapper( m_Mapper );
 

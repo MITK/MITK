@@ -109,12 +109,23 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
     #define QMITK_EXPORT __declspec(dllexport)
   #else
     #define QMITK_EXPORT __declspec(dllimport)
+  #endif
+  #ifdef mitkCoreSB_EXPORTS
+    #define MBISB_CORE_EXPORT __declspec(dllexport)
+  #else
+    #define MBISB_CORE_EXPORT __declspec(dllimport)
+  #endif        
+  #ifdef QmitkSB_EXPORTS
+    #define QMITK_SB_EXPORT __declspec(dllexport)
+  #else
+    #define QMITK_SB_EXPORT __declspec(dllimport)
   #endif        
 #else
   #define MITK_CORE_EXPORT
+  #define MBISB_CORE_EXPORT
   #define QMITK_EXPORT
+  #define QMITK_SB_EXPORT
 #endif
-
 
 // legacy support for designer plugin 
 #define MITK_EXPORT

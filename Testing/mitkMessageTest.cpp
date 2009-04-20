@@ -22,7 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-namespace mitk {
+namespace mitk 
+{
 
 class mitkMessageTestTestClass
 {
@@ -198,6 +199,7 @@ class MessageReceiverClass
       sender.ShoutAgeAndFootSize += MessageDelegate2<MessageReceiverClass, int, float>( this, &MessageReceiverClass::OnShoutAgeAndFootSize );
     }
 
+
   private:
 
     bool m_HandWaved;
@@ -207,6 +209,121 @@ class MessageReceiverClass
     int m_Age;
     float m_FootSize;
 };
+
+/* MessageMacro Test classes */
+class Law
+ {
+   private:
+     std::string m_Description;
+
+   public:
+
+     Law(const std::string law) : m_Description(law)
+     { }
+
+     std::string GetDescription() const
+     {
+       return m_Description;
+     }
+ };
+
+ // The NewtonMachine will issue specific events
+ class NewtonMachine
+ {
+   mitkNewMessageMacro(AnalysisStarted);
+   mitkNewMessage1Macro(AnalysisStopped, bool);
+   mitkNewMessage1Macro(LawDiscovered, const Law&);
+   //mitkNewMessageWithReturnMacro(PatentFiled, bool); 
+
+   public:
+
+     void StartAnalysis()
+     {
+       // send the "started" signal
+       m_AnalysisStartedMessage();
+
+       // we found a new law of nature by creating one :-)
+       Law massLaw("Unit tests are mandatory!");
+       m_LawDiscoveredMessage(massLaw);
+     }
+
+     void StopAnalysis()
+     {
+       // send the "stop" message with true, indicating
+       // that an error occurred
+       m_AnalysisStoppedMessage(true);
+     }
+     bool PatentLaw()
+     {
+       //bool patentAccepted = m_PatentFiledMessage();
+       //return patentAccepted;
+       //m_PatentFiledMessage();
+       return false;
+     }
+ };
+
+ class Observer
+ {
+   private:
+
+     NewtonMachine* m_Machine;
+
+   public:
+
+     Observer(NewtonMachine* machine) : 
+      m_Machine(machine), m_MachineStarted(false), m_MachineStopped(false),
+      m_Error(false), m_Law("NONE")
+     {
+       // Add "observers", i.e. function pointers to the machine
+       m_Machine->AddAnalysisStartedListener(
+         ::mitk::MessageDelegate<Observer>(this, &Observer::MachineStarted));
+       m_Machine->AddAnalysisStoppedListener(
+         ::mitk::MessageDelegate1<Observer, bool>(this, &Observer::MachineStopped));
+       m_Machine->AddLawDiscoveredListener(
+         ::mitk::MessageDelegate1<Observer, const Law&>(this, &Observer::LawDiscovered));
+       //m_Machine->AddPatentFiledListener(
+       //  ::mitk::MessageDelegate<Observer>(this, &Observer::ReviewPatent));
+      }
+
+     ~Observer()
+     {
+       // Always remove your observers when finished
+       m_Machine->RemoveAnalysisStartedListener(
+         ::mitk::MessageDelegate<Observer>(this, &Observer::MachineStarted));
+       m_Machine->RemoveAnalysisStoppedListener(
+         ::mitk::MessageDelegate1<Observer, bool>(this, &Observer::MachineStopped));
+       m_Machine->RemoveLawDiscoveredListener(
+         ::mitk::MessageDelegate1<Observer, const Law&>(this, &Observer::LawDiscovered));
+       //m_Machine->RemoveLawDiscoveredListener(
+       //  ::mitk::MessageDelegate<Observer>(this, &Observer::ReviewPatent));
+      }
+
+      void MachineStarted()
+      {
+        m_MachineStarted = true;
+      }
+
+      void MachineStopped(bool error)
+      {
+        m_MachineStopped = true;
+        m_Error = error;
+      }
+
+      void LawDiscovered(const Law& law)
+      {
+        m_Law = law;
+      }
+      bool ReviewPatent()
+      {
+        m_PatentReviewed = true;
+        return false; // laws of nature are not patentable.
+      }
+      bool m_MachineStarted;
+      bool m_MachineStopped;
+      bool m_Error;
+      Law m_Law;
+      bool m_PatentReviewed;
+  };
 
 }; // end test class
 
@@ -263,6 +380,38 @@ int mitkMessageTest(int /* argc */, char* /*argv*/[])
       "Message with int AND float parameter");
   receiver.Amnesia();
 
-  MITK_TEST_END()
-}
 
+  mitk::mitkMessageTestTestClass::NewtonMachine newtonMachine;
+  mitk::mitkMessageTestTestClass::Observer observer1(&newtonMachine);
+  mitk::mitkMessageTestTestClass::Observer observer2(&newtonMachine);
+
+  // This will send two events to registered observers
+  newtonMachine.StartAnalysis();
+  MITK_TEST_CONDITION(observer1.m_MachineStarted == true, "Message from Message Macro send to receiver 1");
+  MITK_TEST_CONDITION(observer2.m_MachineStarted == true, "Message from Message Macro send to receiver 2");
+  
+  MITK_TEST_CONDITION(observer1.m_Law.GetDescription() == std::string("Unit tests are mandatory!"), 
+    "Message1 from Message Macro send to receiver 1");
+  MITK_TEST_CONDITION(observer2.m_Law.GetDescription() == std::string("Unit tests are mandatory!"), 
+    "Message1 from Message Macro send to receiver 2");
+
+  
+  // This will send one event to registered observers
+  newtonMachine.StopAnalysis();
+  MITK_TEST_CONDITION(observer1.m_MachineStopped == true, "Message1 from Message Macro send to receiver 1");
+  MITK_TEST_CONDITION(observer1.m_Error == true, "Message1 parameter from Message Macro send to receiver 1");
+
+  MITK_TEST_CONDITION(observer2.m_MachineStopped == true, "Message1 from Message Macro send to receiver 2");
+  MITK_TEST_CONDITION(observer2.m_Error == true, "Message1 parameter from Message Macro send to receiver 2");
+
+  /* Message with return type tests are work in progess... */
+  //bool patentSuccessful = newtonMachine.PatentLaw();   // what with return types from multiple observers?
+
+  //MITK_TEST_CONDITION((observer1.m_PatentReviewed == true) && (patentSuccessful == false), 
+  //  "Message with return type from Message Macro send to receiver 1");
+  //
+  //MITK_TEST_CONDITION((observer2.m_PatentReviewed == true) && (patentSuccessful == false), 
+  //  "Message with return type from Message Macro send to receiver 2");
+  
+  MITK_TEST_END();
+}

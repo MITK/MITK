@@ -485,6 +485,7 @@ void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk:
   node->AddProperty( "back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite );
   node->AddProperty( "front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
   node->AddProperty( "back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite );
+  node->AddProperty( "layer", mitk::IntProperty::New(100), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

@@ -1157,7 +1157,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
 {
 	  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-	if((image->GetScalarValueMax()==1 && image->GetScalarValue2ndMax()==0)||(image->GetScalarValueMin()==0 && image->GetScalarValue2ndMin()==1) ) // decides whether the object is a binary 
+	if(image->GetScalarValueMax()==1 && image->GetScalarValue2ndMax()==0 && image->GetScalarValueMin()==0 && image->GetScalarValue2ndMin()==1 ) // decides whether the object is a binary 
   {
 	 node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
 	 node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );

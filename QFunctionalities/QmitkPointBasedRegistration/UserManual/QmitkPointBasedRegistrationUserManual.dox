@@ -88,7 +88,7 @@ data. You have to set at least one landmark and the same number of landmarks in 
 The root mean squares difference between the landmarks will be displayed as LCD number, so that you can check how good the landmarks correspond.
 
 The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
-you perform an undo to redo the transformation without to recalculate it.
+you have performed an undo to redo the transformation without to recalculate it.
 
 With the "Save Transformed Data" button you can save the moving dataset to hard disk.
  

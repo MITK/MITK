@@ -20,6 +20,7 @@
 
 #include "../util/cherryAbstractTabItem.h"
 
+#include <QObject>
 #include <QPushButton>
 
 namespace cherry
@@ -27,8 +28,10 @@ namespace cherry
 
 class NativeTabFolder;
 
-class NativeTabItem: public AbstractTabItem
+class NativeTabItem: public QObject, public AbstractTabItem
 {
+
+  Q_OBJECT
 
 private:
 
@@ -38,6 +41,10 @@ private:
   bool showClose;
 
   QPushButton* closeButton;
+
+private slots:
+
+  void CloseButtonClicked();
 
 public:
 

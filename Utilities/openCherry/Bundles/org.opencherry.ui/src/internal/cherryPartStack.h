@@ -155,12 +155,12 @@ public: cherryObjectMacro(PartStack);
 
         private:
 
-          PartPane::Pointer pane;
+          PartPane::WeakPtr pane;
 
         // Result of the presentation's dragOver method or null if we are stacking over the
         // client area of the pane.
          StackDropResult::Pointer dropResult;
-         PartStack::Pointer stack;
+         PartStack::WeakPtr stack;
 
         public:
 

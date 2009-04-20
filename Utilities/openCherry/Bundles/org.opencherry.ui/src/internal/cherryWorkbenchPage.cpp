@@ -291,10 +291,13 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartRefere
 
   parts.erase(std::find(parts.begin(), parts.end(), ref));
   if (newIndex != parts.end())
+  {
     parts.insert(newIndex, ref);
+  }
   else
+  {
     parts.push_back(ref);
-
+  }
 }
 
 WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::LastIndexOfContainer(SmartPointer<IStackableContainer> container)
@@ -336,7 +339,7 @@ SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetActive()
   {
     return IWorkbenchPart::Pointer(0);
   }
-  return this->GetActive(--parts.end());
+  return this->GetActive(parts.end());
 }
 
 SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetPreviouslyActive()
@@ -345,12 +348,12 @@ SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetPreviouslyActive(
   {
     return IWorkbenchPart::Pointer(0);
   }
-  return this->GetActive(--(--parts.end()));
+  return this->GetActive(--parts.end());
 }
 
 SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(bool editorsOnly)
 {
-  return this->GetActiveReference(--parts.end(), editorsOnly);
+  return this->GetActiveReference(parts.end(), editorsOnly);
 }
 
 WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::IndexOf(SmartPointer<IWorkbenchPart> part)
@@ -377,7 +380,7 @@ bool WorkbenchPage::ActivationList::Remove(SmartPointer<IWorkbenchPartReference>
 
 SmartPointer<IEditorPart> WorkbenchPage::ActivationList::GetTopEditor()
 {
-  IEditorReference::Pointer editor = this->GetActiveReference(--parts.end(), true).Cast<IEditorReference>();
+  IEditorReference::Pointer editor = this->GetActiveReference(parts.end(), true).Cast<IEditorReference>();
 
   if (editor == 0)
   {

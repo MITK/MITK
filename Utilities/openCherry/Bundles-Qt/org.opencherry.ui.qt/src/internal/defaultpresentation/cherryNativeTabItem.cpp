@@ -31,9 +31,15 @@ NativeTabItem::NativeTabItem(NativeTabFolder* _parent, int index, int flags) :
 #if QT_VERSION >= 0x040500
   if (this->GetShowClose())
   {
-// parent->GetTabFolder()->setTabButton(index, QTabBar::RightSide, this->GetCloseButton());
+    parent->GetTabFolder()->setTabButton(index, QTabBar::RightSide, this->GetCloseButton());
+    this->connect(this->GetCloseButton(), SIGNAL(clicked()), this, SLOT(CloseButtonClicked()));
   }
 #endif
+}
+
+void NativeTabItem::CloseButtonClicked()
+{
+  parent->CloseButtonClicked(this);
 }
 
 QRect NativeTabItem::GetBounds()

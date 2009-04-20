@@ -174,7 +174,6 @@ PresentablePartFolder::~PresentablePartFolder()
   std::cout << "DELETING PresentablePartFolder and contentProxy\n";
 
   delete folder;
-  delete contentProxy;
 }
 
 void PresentablePartFolder::InitTab(AbstractTabItem* item,
@@ -211,6 +210,7 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
   // NOTE: if the shape of contentProxy changes, the fix for bug 85899 in EmptyTabFolder.computeSize may need adjustment.
   contentListener = new ContentProxyListener(this);
   contentProxy = new QtControlWidget(folder->GetContentParent(), Shell::Pointer(0));
+  contentProxy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   //contentProxy->setVisible(false);
   int i = 0;
   for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget

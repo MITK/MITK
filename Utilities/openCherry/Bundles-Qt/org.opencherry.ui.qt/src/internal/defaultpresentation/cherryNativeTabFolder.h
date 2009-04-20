@@ -60,20 +60,21 @@ private:
   /**
    * @param item
    * @return
-   * @since 3.1
    */
-AbstractTabItem  * GetTab(int index);
+  AbstractTabItem* GetTab(int index);
 
 private slots:
 
   void TabSelectionChanged(int index);
   void DragStarted(const QPoint& location);
 
-  void CloseButtonClicked(bool checked);
-
 public:
 
   NativeTabFolder(QWidget* parent);
+
+  ~NativeTabFolder();
+
+  void CloseButtonClicked(AbstractTabItem* item);
 
   /* (non-Javadoc)
    * @see org.opencherry.ui.internal.presentations.util.AbstractTabFolder#computeSize(int, int)

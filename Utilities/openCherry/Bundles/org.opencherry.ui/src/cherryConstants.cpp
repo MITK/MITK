@@ -40,6 +40,7 @@ const int Constants::FILL = 4;
 const int Constants::WRAP = 1 << 6;
 const int Constants::BORDER = 1 << 11;
 const int Constants::CLOSE = 1 << 6;
+const int Constants::TOOL = 1 << 2;
 const int Constants::RESIZE = 1 << 4;
 const int Constants::TITLE = 1 << 5;
 const int Constants::SHELL_TRIM = Constants::BORDER| Constants::CLOSE | Constants::TITLE | Constants::MIN | Constants::MAX | Constants::RESIZE;

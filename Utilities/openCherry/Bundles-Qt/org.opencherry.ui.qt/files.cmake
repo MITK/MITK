@@ -50,6 +50,7 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/internal/defaultpresentation/cherryNativeTabFolder.h
+  src/internal/defaultpresentation/cherryNativeTabItem.h
   src/internal/defaultpresentation/cherryQCTabBar.h
   
   src/internal/cherryQtControlWidget.h

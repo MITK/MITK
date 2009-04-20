@@ -28,14 +28,14 @@ const int StackPresentation::AS_ACTIVE_NOFOCUS = 2;
 
 
 StackPresentation::StackPresentation(IStackPresentationSite::Pointer stackSite)
+ : site(stackSite)
 {
   poco_assert(stackSite.IsNotNull());
-  site = stackSite;
 }
 
 IStackPresentationSite::Pointer StackPresentation::GetSite()
 {
-  return site;
+  return site.Lock();
 }
 
 Point StackPresentation::ComputeMinimumSize()

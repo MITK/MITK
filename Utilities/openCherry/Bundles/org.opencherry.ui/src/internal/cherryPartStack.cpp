@@ -59,6 +59,8 @@ void PartStack::PartStackDropResult::Drop()
     cookie = dropResult->GetCookie();
   }
 
+  PartPane::Pointer pane(this->pane);
+  PartStack::Pointer stack(this->stack);
   // Handle cross window drops by opening a new editor
   if (pane->GetPartReference().Cast<IEditorReference> () != 0)
   {
@@ -111,7 +113,7 @@ Rectangle PartStack::PartStackDropResult::GetSnapRectangle()
 {
   if (dropResult == 0)
   {
-    return DragUtil::GetDisplayBounds(stack->GetControl());
+    return DragUtil::GetDisplayBounds(stack.Lock()->GetControl());
   }
   return dropResult->GetSnapRectangle();
 }
@@ -677,7 +679,7 @@ void PartStack::SavePresentationState()
 
 PartStack::~PartStack()
 {
-  std::cout << "DELETING PARTSTACK\n";
+  //std::cout << "DELETING PARTSTACK\n";
 }
 
 void PartStack::Dispose()

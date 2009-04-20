@@ -831,13 +831,13 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
       // it
       if (oldContainer.Cast<LayoutPart> () != 0)
       {
-        std::cout << "No children left, removing container\n";
+        //std::cout << "No children left, removing container\n";
 
         LayoutPart::Pointer parent = oldContainer.Cast<LayoutPart>();
         ILayoutContainer::Pointer parentContainer = parent->GetContainer();
         if (parentContainer != 0)
         {
-          std::cout << "Calling remove of parent container\n";
+          //std::cout << "Calling remove of parent container\n";
           parentContainer->Remove(parent);
           parent->Print(std::cout);
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
@@ -1068,7 +1068,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     const std::string& secondaryId)
 {
 
-  std::cout << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
+  //std::cout << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
 
   // check main window.
   std::vector<MatchingPart> matchingParts;
@@ -1107,7 +1107,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     }
   }
 
-  std::cout << "Looking through the matched parts (count: " << matchingParts.size() << ")\n";
+  //std::cout << "Looking through the matched parts (count: " << matchingParts.size() << ")\n";
 
   // sort the matching parts
   if (matchingParts.size()> 0)
@@ -1126,7 +1126,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     std::vector<MatchingPart>& matchingParts)
 {
 
-  std::cout << "Looking for part " << id << " in a list of layout parts with size " << parts.size() << std::endl;
+  //std::cout << "Looking for part " << id << " in a list of layout parts with size " << parts.size() << std::endl;
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
@@ -1144,7 +1144,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
       if (result != 0) return result;
     }
   }
-  std::cout << "Returning 0\n";
+  //std::cout << "Returning 0\n";
   return StackablePart::Pointer(0);
 }
 
@@ -1179,7 +1179,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     const std::list<StackablePart::Pointer>& parts,
     std::vector<MatchingPart>& matchingParts)
 {
-  std::cout << "Looking for part " << id << " in a list of stackable parts with size " << parts.size() << std::endl;
+  //std::cout << "Looking for part " << id << " in a list of stackable parts with size " << parts.size() << std::endl;
   for (std::list<StackablePart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
@@ -1216,7 +1216,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     }
   }
 
-  std::cout << "Returning 0\n";
+  //std::cout << "Returning 0\n";
   return StackablePart::Pointer(0);
 }
 
@@ -1360,12 +1360,12 @@ void PerspectiveHelper::RemovePart(StackablePart::Pointer part)
     std::string placeHolderId = part->GetPlaceHolderId();
     container->Replace(part, StackablePart::Pointer(new PartPlaceholder(placeHolderId)));
 
-    //    // If the parent is root we're done. Do not try to replace
-    //    // it with placeholder.
-    //    if (container == mainLayout)
-    //    {
-    //      return;
-    //    }
+//    // If the parent is root we're done. Do not try to replace
+//    // it with placeholder.
+//    if (container == mainLayout)
+//    {
+//      return;
+//    }
 
     // If the parent is empty replace it with a placeholder.
     std::list<StackablePart::Pointer> children = container->GetChildren();
@@ -1390,12 +1390,12 @@ void PerspectiveHelper::RemovePart(StackablePart::Pointer part)
       if (wasDocked)
       {
 
-        //        // PR 1GDFVBY: ViewStack not disposed when page
-        //        // closed.
-        //        if (container.Cast<PartStack> () != 0)
-        //        {
-        //          container.Cast<PartStack>()->Dispose();
-        //        }
+        // PR 1GDFVBY: ViewStack not disposed when page
+        // closed.
+        if (container.Cast<PartStack> () != 0)
+        {
+          container.Cast<PartStack>()->Dispose();
+        }
 
         // replace the real container with a
         // ContainerPlaceholder

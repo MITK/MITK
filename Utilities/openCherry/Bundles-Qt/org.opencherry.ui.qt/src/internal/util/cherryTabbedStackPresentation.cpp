@@ -61,7 +61,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
   else if (type == TabFolderEvent::EVENT_CLOSE)
   {
     IPresentablePart::Pointer part = folder->GetPartForTab(e->tab);
-
+    std::cout << "TabFolderEvent::EVENT_CLOSE part = " << (part != 0) << std::endl;
     if (part != 0)
     {
       std::vector<IPresentablePart::Pointer> parts;

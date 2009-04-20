@@ -317,6 +317,8 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
     qtFlags |= Qt::FramelessWindowHint;
   if (style & Constants::TITLE)
     qtFlags |= Qt::WindowTitleHint;
+  if (style & Constants::TOOL)
+    qtFlags |= Qt::Tool;
 
   QWidget* parentWidget = 0;
   if (parent != 0)

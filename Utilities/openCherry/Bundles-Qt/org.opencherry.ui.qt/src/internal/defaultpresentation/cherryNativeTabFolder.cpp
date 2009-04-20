@@ -44,11 +44,6 @@ void NativeTabFolder::DragStarted(const QPoint& location)
   this->HandleDragStarted(location);
 }
 
-void NativeTabFolder::CloseButtonClicked(bool /*checked*/)
-{
-  this->FireEvent(TabFolderEvent::EVENT_CLOSE, this->GetSelection());
-}
-
 NativeTabFolder::NativeTabFolder(QWidget* parent)
 {
   content = 0;
@@ -96,6 +91,17 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   //        viewForm.setTopLeft(title);
 }
 
+NativeTabFolder::~NativeTabFolder()
+{
+  std::cout << "NativeTabFolder: DESTROYED\n";
+  delete viewForm;
+}
+
+void NativeTabFolder::CloseButtonClicked(AbstractTabItem* item)
+{
+  this->FireEvent(TabFolderEvent::EVENT_CLOSE, item);
+}
+
 QSize NativeTabFolder::ComputeSize(int widthHint, int heightHint)
 {
   return QSize(50,50);
@@ -104,12 +110,6 @@ QSize NativeTabFolder::ComputeSize(int widthHint, int heightHint)
 AbstractTabItem* NativeTabFolder::Add(int index, int flags)
 {
   NativeTabItem* item = new NativeTabItem(this, index, flags);
-
-  if (flags & Constants::CLOSE)
-  {
-    this->connect(item->GetCloseButton(), SIGNAL(clicked(bool)), this, SLOT(CloseButtonClicked(bool)));
-  }
-
   return item;
 }
 
@@ -227,9 +227,13 @@ QWidget* NativeTabFolder::GetContentParent()
 void NativeTabFolder::SetContent(QWidget* newContent)
 {
   //viewForm.setContent(newContent);
-  if (content != 0) viewForm->layout()->removeWidget(content);
+  if (content != 0)
+  {
+    viewForm->layout()->removeWidget(content);
+    delete content;
+  }
   content = newContent;
-  ((QBoxLayout*)viewForm->layout())->addWidget(newContent, 1);
+  ((QBoxLayout*)viewForm->layout())->addWidget(content, 1);
 }
 
 QCTabBar* NativeTabFolder::GetTabFolder()

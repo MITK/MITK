@@ -19,7 +19,7 @@
 
 #include "cherryLayoutTreeNode.h"
 #include "cherryLayoutPartSash.h"
-#include "cherryPartPlaceholder.h"
+#include "cherryContainerPlaceholder.h"
 
 #include "../cherryConstants.h"
 
@@ -404,7 +404,7 @@ bool LayoutTree::IsCompressible()
 
 bool LayoutTree::IsVisible()
 {
-  return part.Cast<PartPlaceholder>().IsNull();
+  return part.Cast<ContainerPlaceholder>().IsNull();
 }
 
 void LayoutTree::RecomputeRatio()

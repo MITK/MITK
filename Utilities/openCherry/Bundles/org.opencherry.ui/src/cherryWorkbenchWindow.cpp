@@ -1319,7 +1319,7 @@ void WorkbenchWindow::ConfigureShell(Shell::Pointer shell)
   Window::ConfigureShell(shell);
 
   detachedWindowShells = new ShellPool(shell, Constants::TITLE
-          | Constants::MAX | Constants::RESIZE | Constants::BORDER );
+          | Constants::MAX | Constants::CLOSE | Constants::RESIZE | Constants::BORDER );
 
   std::string title = this->GetWindowConfigurer()->BasicGetTitle();
   if (title != "")

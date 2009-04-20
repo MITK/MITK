@@ -65,7 +65,7 @@ private:
   /**
     * The presentation site.
     */
-  IStackPresentationSite::Pointer site;
+  IStackPresentationSite::WeakPtr site;
 
 protected:
 

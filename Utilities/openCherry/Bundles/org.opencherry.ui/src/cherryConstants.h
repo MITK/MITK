@@ -217,6 +217,19 @@ struct CHERRY_UI Constants
   static const int CLOSE; // = 1 << 6;
 
   /**
+   * Style constant for tool window behavior (value is 1&lt;&lt;2).
+   * <p>
+   * A tool window is a window intended to be used as a floating toolbar.
+   * It typically has a title bar that is shorter than a normal title bar,
+   * and the window title is typically drawn using a smaller font.
+   * <br>Note that this is a <em>HINT</em>.
+   * </p><p><b>Used By:</b><ul>
+   * <li><code>Decorations</code> and subclasses</li>
+   * </ul></p>
+   */
+  static const int TOOL; // = 1 << 2;
+
+  /**
    * Style constant for resize box trim (value is 1&lt;&lt;4).
    * <p><b>Used By:</b><ul>
    * <li><code>Decorations</code> and subclasses</li>

@@ -39,6 +39,7 @@ namespace mitk {
 {
   public:
   mitkClassMacro(FocusManager, itk::Object);
+  itkNewMacro(Self);
 
   //##Documentation
   //##@brief Element, that can be focused and held here.

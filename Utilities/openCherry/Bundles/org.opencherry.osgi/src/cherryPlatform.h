@@ -127,6 +127,9 @@ PURPOSE.  See the above copyright notices for more information.
 #elif defined(__x86_64__)
   #define CHERRY_ARCH CHERRY_ARCH_AMD64
   #define CHERRY_ARCH_LITTLE_ENDIAN 1
+#elif defined(_M_X64)
+#define CHERRY_ARCH CHERRY_ARCH_AMD64
+#define CHERRY_ARCH_LITTLE_ENDIAN 1
 #elif defined(__mips__) || defined(__mips) || defined(__MIPS__) || defined(_M_MRX000)
   #define CHERRY_ARCH CHERRY_ARCH_MIPS
   #define CHERRY_ARCH_BIG_ENDIAN 1

@@ -765,7 +765,15 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromLightb
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
 
-    resultVector = m_LoadFromCHILI->LoadImagesFromLightbox( this, lightbox, m_tempDirectory );
+    try
+    {
+      resultVector = m_LoadFromCHILI->LoadImagesFromLightbox( this, lightbox, m_tempDirectory );
+    }
+    catch (std::exception& e)
+    {
+      QMessageBox::information( 0, "Internal error", QString("Internal error during image import. Error message is %1").arg(e.what()) );
+      ProgressBar::GetInstance()->Progress(50000);
+    }
 
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
@@ -784,7 +792,16 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
 
-    resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUIDs, m_tempDirectory );
+    try
+    {
+      resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUIDs, m_tempDirectory );
+    }
+    catch (std::exception& e)
+    {
+      QMessageBox::information( 0, "Internal error", QString("Internal error during image import. Error message is %1").arg(e.what()) );
+      ProgressBar::GetInstance()->Progress(50000);
+    }
+
 
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
@@ -804,7 +821,17 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadImagesFromSeries
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
 
-    resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUID, m_tempDirectory );
+    try
+    {
+      resultNodes = m_LoadFromCHILI->LoadImagesFromSeries( this, seriesInstanceUID, m_tempDirectory );
+    }
+    catch (std::exception& e)
+    {
+      QMessageBox::information( 0, "Internal error", QString("Internal error during image import. Error message is %1").arg(e.what()) );
+      ProgressBar::GetInstance()->Progress(50000);
+    }
+
+
 
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
@@ -824,7 +851,15 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::ChiliPlugin::LoadTextsFromSeries(
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
 
-    resultNodes = m_LoadFromCHILI->LoadTextsFromSeries( this, seriesInstanceUID, m_tempDirectory );
+    try
+    {
+      resultNodes = m_LoadFromCHILI->LoadTextsFromSeries( this, seriesInstanceUID, m_tempDirectory );
+    }
+    catch (std::exception& e)
+    {
+      QMessageBox::information( 0, "Internal error", QString("Internal error during document import. Error message is %1").arg(e.what()) );
+      ProgressBar::GetInstance()->Progress(50000);
+    }
 
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();
@@ -844,7 +879,16 @@ mitk::DataTreeNode::Pointer mitk::ChiliPlugin::LoadSingleText( const std::string
     QApplication::setOverrideCursor( QCursor( Qt::WaitCursor ) );
     ProgressBar::GetInstance()->AddStepsToDo( 2 );
 
-    resultNode = m_LoadFromCHILI->LoadSingleText( this, seriesInstanceUID, instanceNumber, m_tempDirectory );
+    try
+    {
+      resultNode = m_LoadFromCHILI->LoadSingleText( this, seriesInstanceUID, instanceNumber, m_tempDirectory );
+    }
+    catch (std::exception& e)
+    {
+      QMessageBox::information( 0, "Internal error", QString("Internal error during document import. Error message is %1").arg(e.what()) );
+      ProgressBar::GetInstance()->Progress(50000);
+    }
+
 
     ProgressBar::GetInstance()->Progress( 2 );
     QApplication::restoreOverrideCursor();

@@ -73,10 +73,69 @@ int mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarT
 
   return EXIT_SUCCESS;
 }
+  
+int TestCase1210()
+{
+  mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+ 
+  mitk::Point3D origin;
+  mitk::Vector3D right, down, spacing;
+  mitk::ScalarType width, height;
+  mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+
+  thicknessInMM = 1.0;
+  mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
+  mitk::FillVector3D(right,   
+      1.015625, 1.015625, 1.1999969482421875
+      );
+
+  mitk::FillVector3D(down,     
+      1.4012984643248170709237295832899161312802619418765e-45, 0, 0
+      );
+  mitk::FillVector3D(spacing,     
+      0, 1.4713633875410579244699160624544119378442750389703e-43, 9.2806360452222355258639080851310540729807238879469e-32
+      );
+
+  std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = NULL): "<<std::endl;
+  planegeometry->InitializeStandardPlane(right, down, &spacing);
+/*
+  std::cout << "Testing width, height and thickness (in units): ";
+  if((mitk::Equal(planegeometry->GetExtent(0),width)==false) || 
+     (mitk::Equal(planegeometry->GetExtent(1),height)==false) || 
+     (mitk::Equal(planegeometry->GetExtent(2),1)==false)
+    )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing width, height and thickness (in mm): ";
+  if((mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM)==false) || 
+     (mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM)==false) || 
+     (mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM)==false)
+    )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+*/
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  return EXIT_SUCCESS;
+}
 
 int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
+
+  /*
+  // the following can be used to reproduce a bug in ITK matrix inversion
+  // which was found while investigating bug #1210.
+  result = TestCase1210();
+  if(result!=EXIT_SUCCESS)
+    return result;
+  */
 
   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
  

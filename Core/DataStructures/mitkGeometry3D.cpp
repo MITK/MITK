@@ -337,7 +337,15 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     temp[j] = in[j] - offset[j];
   }
 
-  const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverseMatrix();
+  // in GetInverseMatrix geht was schief
+  TransformType::Pointer invertedTransform = TransformType::New();
+  if (!m_IndexToWorldTransform->GetInverse( invertedTransform.GetPointer() ))
+  {
+    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed." );
+  }
+
+  const TransformType::MatrixType& inverse = invertedTransform->GetMatrix();
+  unsigned int nans(0);
   for (i = 0; i < 3; i++)
   {
     out[i] = 0.0;
@@ -345,6 +353,18 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     {
       out[i] += inverse[i][j]*temp[j];
     }
+
+    if (inverse[i][j] != inverse[i][j] ) // this is only true for NaN
+    {
+      ++nans;
+    }
+  }
+  
+  if (nans > 0)
+  {
+    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+                      << m_IndexToWorldTransform << "Suggested inverted matrix is:" << std::endl
+                      << inverse );
   }
 }
 

@@ -23,7 +23,7 @@ First of all you have to open the data sets which you want to register. The uppe
 Select the fixed data in the "Dataset:" selector combobox in the "Fixed Data" area and the moving data in the "Dataset:" selector combobox in the "Moving Data" area. In both cases a "Reinit" 
 button next to the selector combobox can make the QmitkStdMultiWidget to reinitialize the dataset from the combobox.
 
-\image html FixedData.png "The Fixed Data area"
+\image html FixedDataPointBased.png "The Fixed Data area"
 
 The "Fixed Data" area contains a QmitkPointListWidget. Within this widget, all points for the fixed data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the fixed data. Points can 
@@ -36,7 +36,7 @@ in the render window with a left mouse button click on them. If you keep the mou
 button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. The QmitkStdMultiWidget changes 
 its view to show the position of the landmark.
 
-\image html MovingData.png "The Moving Data area"
+\image html MovingDataPointBased.png "The Moving Data area"
 
 The "Moving Data" area contains a QmitkPointListWidget. Within this widget, all points for the moving data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the moving data. With the 
@@ -50,7 +50,7 @@ select landmarks in the render window with a left mouse button click on them. If
 release the mouse button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. The 
 QmitkStdMultiWidget changes its view to show the position of the landmark.
 
-\image html DisplayOptions.png "The Display Options area"
+\image html DisplayOptionsPointBased.png "The Display Options area"
 
 In the "Display Options" area are two checkboxes. The first one is for setting all datasets in the data tree to invisible except the selected fixed data and selected moving data and their 
 corresponding point sets. This will help you not to get confused due to too much data in the QmitkStdMultiWidget. Nevertheless, if you want to see all datasets in the QmitkStdMultiWidget you 
@@ -60,7 +60,7 @@ displayed in greyvalues.
 
 Before you perform your transformation it is useful to see both images again. Therefore detoggle the "Set Points" button for the fixed data as well as for the moving data.
 
-\image html Registration.png "The Registration area"
+\image html RegistrationPointBased.png "The Registration area"
 
 The functions concerning to the registration are in the "Registration" area. To that belongs the registration method selection, the registration itself, the possibility to save the result, the 
 possibility for undo and redo, and a display to show how good the landmarks correspond and are explained in the following paragraphs.

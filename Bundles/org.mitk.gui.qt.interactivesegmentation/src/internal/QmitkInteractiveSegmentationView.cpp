@@ -54,7 +54,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->setupUi(parent);
 
   mitk::IDataStorageService::Pointer service =
-   cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   if (service.IsNotNull())
   {
@@ -65,13 +65,10 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
     m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
   }
 
-  cherry::IEditorPart::Pointer editor =
-      this->GetSite()->GetPage()->GetActiveEditor();
-
-  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
-  {
-    m_MultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
-  }
+  itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::Pointer command 
+    = itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::New();
+  command->SetCallbackFunction(this, &QmitkInteractiveSegmentationView::TreeChanged);
+  m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
 
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
 
@@ -109,7 +106,10 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing");    // show only tools which are marked with "segmentationProcessing"
   m_Controls->m_PostProcessingToolSelectionBox->SetToolGUIArea( m_Controls->m_PostProcessingToolGUIContainer );
 
-  m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
+  if(this->GetActiveStdMultiWidget())
+  {
+    m_Controls->m_SlicesInterpolator->Initialize( toolManager, this->GetActiveStdMultiWidget() );
+  }
 
   toolManager->NodePropertiesChanged += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNodePropertiesChanged );  // update e.g. the volume overview
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkInteractiveSegmentationView>( this, &QmitkInteractiveSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
@@ -170,14 +170,17 @@ void QmitkInteractiveSegmentationView::TreeChanged( const itk::EventObject & )
 
 void QmitkInteractiveSegmentationView::Activated()
 {
-  //QMessageBox::information(m_Parent, "Activated", "Activated");
+  if(m_MultiWidget)
+  {
+    //QMessageBox::information(m_Parent, "Activated", "Activated");
+    m_MultiWidget->SetWidgetPlanesVisibility(false);
 
-  m_MultiWidget->SetWidgetPlanesVisibility(false);
+    m_Controls->m_ToolSelectionBox->setEnabled( true );
+    m_Controls->m_PostProcessingToolSelectionBox->setEnabled( true );
 
-  m_Controls->m_ToolSelectionBox->setEnabled( true );
-  m_Controls->m_PostProcessingToolSelectionBox->setEnabled( true );
+    m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
 
-  m_Controls->m_ToolWorkingDataSelectionBox->InstallKeyFilterOn( qApp );
+  }
 }
 
 void QmitkInteractiveSegmentationView::Deactivated()
@@ -441,7 +444,7 @@ void QmitkInteractiveSegmentationView::CheckImageAlignment(mitk::Image* image)
 {
   bool wrongAlignment(false);
 
-  if (image)
+  if (image && m_MultiWidget)
   {
     QmitkRenderWindow* renderWindow = m_MultiWidget->GetRenderWindow1();
 
@@ -539,3 +542,32 @@ void QmitkInteractiveSegmentationView::HandleException( const char* str, QWidget
   }
 }
 
+void QmitkInteractiveSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+{
+  if(m_MultiWidget == 0)
+  {
+    m_Parent->setEnabled(true);
+    // save the actual multiwidget as the working widget
+    m_MultiWidget = &stdMultiWidget;
+    this->Activated();
+  }
+}
+
+void QmitkInteractiveSegmentationView::StdMultiWidgetNotAvailable()
+{
+  m_Parent->setEnabled(false);
+  this->Deactivated();
+}
+
+void QmitkInteractiveSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
+{
+  if(&stdMultiWidget == m_MultiWidget)
+    m_MultiWidget = 0;
+  // set new multi widget to the one that is available
+  m_MultiWidget = this->GetActiveStdMultiWidget();
+
+  // reinitialize m_SlicesInterpolator
+  if(m_MultiWidget)
+    m_Controls->m_SlicesInterpolator->Initialize( m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager(), m_MultiWidget );
+
+}

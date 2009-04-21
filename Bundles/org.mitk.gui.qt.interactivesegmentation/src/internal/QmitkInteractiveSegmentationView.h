@@ -28,16 +28,30 @@ protected:
   void CreateQtPartControl(QWidget* parent);
 
 // QmitkInteractiveSegmentation
-public:
+  public:
 
-  virtual void CreateConnections();
+    virtual void CreateConnections();
 
-  virtual void Activated();
+    virtual void Activated();
 
-  virtual void Deactivated();
+    virtual void Deactivated();
 
-  void OnNodePropertiesChanged();
-  void OnNewNodesGenerated();
+    void OnNodePropertiesChanged();
+    void OnNewNodesGenerated();
+
+    ///
+    /// Called when a StdMultiWidget is available.
+    ///
+    virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+    ///
+    /// Called when no StdMultiWidget is available.
+    ///
+    virtual void StdMultiWidgetNotAvailable();
+
+    ///
+    /// Called when no StdMultiWidget is getting closed.
+    ///
+    virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 
   protected slots:
 
@@ -64,7 +78,6 @@ public:
     Ui::QmitkInteractiveSegmentationControls * m_Controls;
     unsigned long m_ObserverTag;
     mitk::DataTree::Pointer m_DataTree;
-
 
   /// from QmitkInteractiveSegmentation
 

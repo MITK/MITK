@@ -62,6 +62,10 @@ public:
   ///
   virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
   ///
+  /// Called when a StdMultiWidget is available.
+  ///
+  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
+  ///
   /// Called when no StdMultiWidget is available.
   ///
   virtual void StdMultiWidgetNotAvailable();

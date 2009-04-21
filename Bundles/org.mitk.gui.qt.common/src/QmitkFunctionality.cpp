@@ -143,10 +143,14 @@ void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Poin
 
 void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  // when the last stdmutliwidget got closed disable view
-  if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID && this->GetActiveStdMultiWidget() == 0)
+  if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
-    this->StdMultiWidgetNotAvailable();
+    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+    this->StdMultiWidgetClosed(*(stdMultiWidgetEditor->GetStdMultiWidget()));
+    // if no other multi widget is available inform plugins bout that
+    if(this->GetActiveStdMultiWidget() == 0)
+      this->StdMultiWidgetNotAvailable();
   }
 }
 
@@ -259,4 +263,9 @@ void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool
 void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog ) const
 {
   HandleException( e.what(), parent, showDialog );
+}
+
+void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
+{
+  
 }

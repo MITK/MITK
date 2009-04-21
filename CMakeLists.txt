@@ -5,6 +5,8 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+
 # Clear the cache variables containing plugin base directories
 SET(MITK_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 SET(MITK_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
@@ -149,8 +151,6 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${P
 ADD_SUBDIRECTORY(Core)
 
 IF(USE_QT)
-  SET(QT_MT_REQUIRED 1)
-  SET(QT_USE_QT3SUPPORT 1)
   # setting this to 3 since Qt4 support is in a very early stage of 
   # development. If you want to use Qt4, please create an initial cache with
   # a line  
@@ -158,8 +158,7 @@ IF(USE_QT)
   # 
   # or by passing -DDESIRED_QT_VERSION:STRING=4 as option to the very first
   # c(c)make call
-  SET(DESIRED_QT_VERSION 3 CACHE STRING "Pick a version of QT to use: 3 or     4")
-  FIND_PACKAGE(Qt)
+  FIND_PACKAGE(MitkQt)
   IF(DESIRED_QT_VERSION EQUAL 3)
     SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
     FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents QmitkDialogBars) 
@@ -169,7 +168,7 @@ IF(USE_QT)
     INCLUDE(CMake/FunctionalityHelpers.cmake)
     SET(LIBS_FOR_QFUNCTIONALITY "Qmitk")
     SUBDIRS(Qmitk QFunctionalities QApplications)
-  ELSE(DESIRED_QT_VERSION EQUAL 4)
+  ELSEIF(DESIRED_QT_VERSION EQUAL 4)
     INCLUDE(${QT_USE_FILE})
     SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk ${PROJECT_BINARY_DIR}/Q4mitk ${QT_INCLUDES})
     FOREACH(dir QmitkApplicationBase QmitkModels QmitkPropertyObservers) 

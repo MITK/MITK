@@ -10,11 +10,159 @@ Available sections:
 This functionality allows you to register 2D as well as 3D images in a rigid manner. Register means to align two images, so that they become as similar as
 possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will directly be applied to the Moving Image.
 
+\image html RigidRegistration.png "MITK with the QmitkRigidRegistration functionality"
+
 This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
 
 \section QmitkRigidRegistrationUserManualDetails Details
 
-Comming soon...
+First of all you have to open the data sets which you want to register and select them in the "Fixed:" and "Moving:" combo boxes.
+
+\image html ImageSelectionRigid.png "The Image area"
+
+The upper area is the "Image" area. It is used for image selection, changing the colour of the images between grey values and red/green and changing the opacity of the moving image.
+With the "Moving Image Opacity:" slider you can change the opacity of the moving dataset. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, 
+the fixed dataset will be displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
+both datasets will be displayed in greyvalues.
+
+\image html SelectShownImageRigid.png "The Select Shown Image area"
+
+The "Select Shown Image" area defines, which image is shown in the QmitkStdMultiWidget. If "Fixed Image" is selected only the fixed image is rendered in the QmitkStdMultiWidget. If "Moving Image" 
+is selected only the moving image is rendered. If "Both Images" is selected the fixed image as well as the moving image is shown. In all cases all other images within the current data tree will be 
+set to invisible. 
+
+\image html ImageViewsRigid.png "The Image Views area"
+
+In the next area, the "Image Views", there are three buttons to reinitialize the QmitkStdMultiWidget to let the views fit exactly the desired images. This can be done for the fixed image only with the 
+"Reinit Fixed" button, for the moving image only with the "Reinit Moving" button or with the "Global Reinit" button to let the QmitkStdMultiWidget adapt the view to show all images. 
+The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
+you have performed an undo to redo the transformation without to recalculate it.
+
+\image html SaveRigid.png "The Save area"
+
+In the "Save" area you have the possibility to save the result image after performing a registration with the "Save Transformed Moving Image". You can also save the current sets of parameters 
+with the "Save Rigid Registration Parameter" button and you can load a previously saved set of parameters with the "Load Rigid Registration Parameter" button.
+
+\image html RegistrationMethodSelectionRigid.png "The Registration Method Selection area"
+
+In the "Registration Method Selection" area you have to choose a transform, a metric, an optimizer and an interpolator and you have to set the corresponding parameters to specify the registration 
+method you want to perform.
+
+The available <b>transforms</b> are:
+
+\li <b>Translation</b>
+
+\li <b>Scale</b>
+
+\li <b>ScaleLogarithmic</b>
+
+\li <b>Affine</b>
+
+\li <b>FixedCenterOfRotationAffine</b>
+
+\li <b>Rigid3DTransform</b>
+
+\li <b>Euler3DTransform</b>
+
+\li <b>CenteredEuler3DTransform</b>
+
+\li <b>QuaternionRigidTransform</b>
+
+\li <b>VersorTransform</b>
+
+\li <b>VersorRigid3DTransform</b>
+
+\li <b>ScaleSkewVersorTransform</b>
+
+\li <b>Similarity3DTransform</b>
+
+\li <b>Rigid2DTransform</b>
+
+\li <b>CenteredRigid2DTransform</b>
+
+\li <b>Euler2DTransform</b>
+
+\li <b>Similarity2DTransform</b>
+
+\li <b>CenteredSimilarity2DTransform</b>
+
+The available <b>metrics</b> are:
+
+\li <b>MeanSquares</b>
+
+\li <b>NormalizedCorrelation</b>
+
+\li <b>GradientDifference</b>
+
+\li <b>KullbackLeiblerCompareHistogram</b>
+
+\li <b>CorrelationCoefficientHistogram</b>
+
+\li <b>MeanSquaresHistogram</b>
+
+\li <b>MutualInformationHistogram</b>
+
+\li <b>NormalizedMutualInformationHistogram</b>
+
+\li <b>MattesMutualInformation</b>
+
+\li <b>MeanReciprocalSquareDifference</b>
+
+\li <b>MutualInformation</b>
+
+\li <b>MatchCardinality</b>
+
+\li <b>KappaStatistic</b>
+
+The available <b>optimizers</b> are:
+
+\li <b>Exhaustive</b>
+
+\li <b>GradientDescent</b>
+
+\li <b>QuaternionRigidTransformGradientDescent</b>
+
+\li <b>LBFGSB</b>
+
+\li <b>OnePlusOneEvolutionary</b>
+
+\li <b>Powell</b>
+
+\li <b>FRPR</b>
+
+\li <b>RegularStepGradientDescent</b>
+
+\li <b>VersorTransform</b>
+
+\li <b>Amoeba</b>
+
+\li <b>ConjugateGradient</b>
+
+\li <b>LBFGS</b>
+
+\li <b>SPSA</b>
+
+\li <b>VersorRigid3DTransform</b>
+
+The available <b>interpolators</b> are:
+
+\li <b>Linear</b>
+
+\li <b>NearestNeighbor</b>
+
+You can show and hide the parameters for the selection by checking or unchecking the corresponding area. You can save the current sets of parameters with the "Save Rigid Registration Parameter" 
+button. You can load a previously saved set of parameters with the "Load Rigid Registration Parameter" button.
+
+\image html ManualRegistrationRigid.png "The Manual Registration area"
+
+In the "Manual Registration" area, opened by the tab "Manual", you can manually allign the images by moving sliders for translation in x-, y- and z-axis as well as for rotation around the x-, 
+y- and z-Axis. Additionally you can automatically allign the image centers with the button "Automatic Allign Image Centers".
+
+\image html RegisterRigid.png "The Register area"
+
+In the "Register" area you can start the registration by clicking the "Calculate Transform" button. The optimizer value for every iteration step is diplayed as LCD number next to the 
+"Optimizer Value:" label. Many of the registration methods can be canceled during their iteration steps by clicking the "Stop Optimization" button.
+
 
 */

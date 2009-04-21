@@ -13,6 +13,7 @@ SET(CPP_FILES
   mitkCylindricToCartesianFilter.cpp
   mitkDataTreeNodeFactory.cpp
   mitkDataTreeNodeSource.cpp
+  mitkDemonsRegistration.cpp
   mitkDiffImageApplier.cpp
   mitkDopplerToStrainRateFilter.cpp
   mitkExtractImageFilter.cpp
@@ -21,6 +22,7 @@ SET(CPP_FILES
   mitkGeometryClipImageFilter.cpp
   mitkGeometryDataSource.cpp
   mitkHistogramGenerator.cpp
+  mitkHistogramMatching.cpp 
   mitkImageCastPart1.cpp
   mitkImageCastPart2.cpp
   mitkImageCastPart3.cpp
@@ -55,6 +57,7 @@ SET(CPP_FILES
   mitkPointSetToGeometryDataFilter.cpp
   mitkPolygonToRingFilter.cpp
   mitkProbeFilter.cpp
+  mitkRegistrationBase.cpp
   mitkRigidRegistrationObserver.cpp
   mitkRigidRegistrationPreset.cpp
   mitkSegmentationSink.cpp
@@ -63,6 +66,7 @@ SET(CPP_FILES
   mitkSubImageSelector.cpp
   mitkSurfaceSource.cpp
   mitkSurfaceToImageFilter.cpp
+  mitkSymmetricForcesDemonsRegistration.cpp
   mitkTransformParameters.cpp
   mitkUIDGenerator.cpp
   mitkUnstructuredGridHistogram.cpp

@@ -1,0 +1,300 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>QmitkDemonsRegistrationControls</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>QmitkDemonsRegistrationControls</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>243</width>
+            <height>250</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>QmitkDemonsRegistrationControls</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout7</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QComboBox">
+                    <item>
+                        <property name="text">
+                            <string>Demons Registration</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>Symmetric Forces Demons Registration</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>m_RegistrationSelection</cstring>
+                    </property>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>histogramMatchingBox</cstring>
+                    </property>
+                    <property name="title">
+                        <string>Histogram Matching</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout16</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout15</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>useHistogramMatching</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Use Histogram Matching:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>numberOfHistogramLevels</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of Histogram Levels:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>numberOfMatchPoints</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of Match Points:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>thresholdAtMeanIntensity</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Threshold at Mean Intensity:</string>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout13</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_UseHistogramMatching</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>m_NumberOfHistogramLevels</cstring>
+                                            </property>
+                                            <property name="frameShape">
+                                                <enum>LineEditPanel</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>Sunken</enum>
+                                            </property>
+                                            <property name="text">
+                                                <string>1024</string>
+                                            </property>
+                                            <property name="alignment">
+                                                <set>AlignRight</set>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>m_NumberOfMatchPoints</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>7</string>
+                                            </property>
+                                            <property name="alignment">
+                                                <set>AlignRight</set>
+                                            </property>
+                                        </widget>
+                                        <widget class="QCheckBox">
+                                            <property name="name">
+                                                <cstring>m_ThresholdAtMeanIntensity</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string></string>
+                                            </property>
+                                            <property name="checked">
+                                                <bool>true</bool>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>demonsRegistrationBox</cstring>
+                    </property>
+                    <property name="title">
+                        <string>Demons Registration</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>layout18</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout17</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>iterationsLabel</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Number of Iterations:</string>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLabel">
+                                            <property name="name">
+                                                <cstring>standardDeviationLabel</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>Standard Deviation:</string>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                                <widget class="QLayoutWidget">
+                                    <property name="name">
+                                        <cstring>layout14</cstring>
+                                    </property>
+                                    <vbox>
+                                        <property name="name">
+                                            <cstring>unnamed</cstring>
+                                        </property>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>m_Iterations</cstring>
+                                            </property>
+                                            <property name="sizePolicy">
+                                                <sizepolicy>
+                                                    <hsizetype>3</hsizetype>
+                                                    <vsizetype>0</vsizetype>
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="frameShape">
+                                                <enum>LineEditPanel</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>Sunken</enum>
+                                            </property>
+                                            <property name="text">
+                                                <string>100</string>
+                                            </property>
+                                            <property name="alignment">
+                                                <set>AlignRight</set>
+                                            </property>
+                                        </widget>
+                                        <widget class="QLineEdit">
+                                            <property name="name">
+                                                <cstring>m_StandardDeviation</cstring>
+                                            </property>
+                                            <property name="text">
+                                                <string>1.0</string>
+                                            </property>
+                                            <property name="alignment">
+                                                <set>AlignRight</set>
+                                            </property>
+                                        </widget>
+                                    </vbox>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </vbox>
+                </widget>
+            </vbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>m_UseHistogramMatching</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>QmitkDemonsRegistrationControls</receiver>
+        <slot>UseHistogramMatching(bool)</slot>
+    </connection>
+</connections>
+<includes>
+    <include location="local" impldecl="in declaration">mitkDataTreeNode.h</include>
+    <include location="local" impldecl="in declaration">mitkDemonsRegistration.h</include>
+    <include location="local" impldecl="in declaration">mitkHistogramMatching.h</include>
+    <include location="local" impldecl="in declaration">mitkSymmetricForcesDemonsRegistration.h</include>
+    <include location="local" impldecl="in implementation">QmitkDemonsRegistrationControls.ui.h</include>
+</includes>
+<variables>
+    <variable>mitk::DataTreeNode* m_MovingNode;</variable>
+    <variable>mitk::DataTreeNode* m_FixedNode;</variable>
+</variables>
+<slots>
+    <slot>CalculateTransformation()</slot>
+    <slot>SetFixedNode( mitk::DataTreeNode * fixedNode )</slot>
+    <slot>SetMovingNode( mitk::DataTreeNode * movingNode )</slot>
+    <slot access="protected">UseHistogramMatching( bool useHM )</slot>
+</slots>
+<functions>
+    <function access="private">init()</function>
+    <function returnType="int">GetNumberOfIterations()</function>
+    <function returnType="float">GetStandardDeviation()</function>
+</functions>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

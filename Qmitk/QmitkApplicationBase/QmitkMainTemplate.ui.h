@@ -957,6 +957,17 @@ void QmitkMainTemplate::Initialize()
   this->InitializeFunctionality();
 
   // loading application options
+
+    // loading application options
+  int i;
+  for ( i=1;i<qApp->argc();++i )
+  {
+	  if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
+		  m_NoMITKOptions = true;
+		  break;
+	  }
+  }
+
   if (! m_NoMITKOptions ) 
   {
     std::string optionsFile(mitk::StandardFileLocations::GetInstance()->FindFile("MITKOptions.xml"));
@@ -1169,10 +1180,6 @@ void QmitkMainTemplate::parseCommandLine()
       break;
     }
     if (strcmp(qApp->argv()[i], "-statemachineDebug")==0) {
-      break;
-    }
-    if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
-      m_NoMITKOptions = true;
       break;
     }
     fileOpen(qApp->argv()[i]);

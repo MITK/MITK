@@ -694,10 +694,10 @@ bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mi
   return false;
 }
 
-template bool mitk::DataTreeNode::GetPropertyValue<double>(char const*, double&, mitk::BaseRenderer*, bool*) const;
-template bool mitk::DataTreeNode::GetPropertyValue<float>(char const*, float&, mitk::BaseRenderer*, bool*) const;
-template bool mitk::DataTreeNode::GetPropertyValue<int>(char const*, int&, mitk::BaseRenderer*, bool*) const;
-template bool mitk::DataTreeNode::GetPropertyValue<bool>(char const*, bool&, mitk::BaseRenderer*, bool*) const;
+template bool mitk::DataTreeNode::GetPropertyValue<double>(char const*, double&, mitk::BaseRenderer*) const;
+template bool mitk::DataTreeNode::GetPropertyValue<float>(char const*, float&, mitk::BaseRenderer*) const;
+template bool mitk::DataTreeNode::GetPropertyValue<int>(char const*, int&, mitk::BaseRenderer*) const;
+template bool mitk::DataTreeNode::GetPropertyValue<bool>(char const*, bool&, mitk::BaseRenderer*) const;
 
 #endif
 

@@ -500,7 +500,7 @@ void QmitkDataManagerControls::GlobalReInit_clicked()
 void QmitkDataManagerControls::init()
 {
 #ifndef MBI_INTERNAL
-  //m_AffineInteraction->hide();
+  m_AffineInteraction->hide();
 #endif
     
   mitk::PACSPlugin::PACSPluginCapability pacsCapabilities = mitk::PACSPlugin::GetInstance()->GetPluginCapabilities();

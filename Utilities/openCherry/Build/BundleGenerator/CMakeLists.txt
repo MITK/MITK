@@ -162,6 +162,9 @@ CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox
 
 # ----------------- resources directory ---------------------------------
 FILE(MAKE_DIRECTORY ${PLUGIN_DIR}/resources)
+IF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/qtresources.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
+ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
 
 # -------------------- BundleDllTemplate.h -------------------------------
 IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
@@ -188,8 +191,6 @@ IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
   SET(VIEW_CONTROLS_CLASS "${VIEW_CONTROLS}")
 
   CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui ${PLUGIN_DIR}/src/internal/${VIEW_CONTROLS_UI} @ONLY)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/QmitkTemplate.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/icon.xpm ${PLUGIN_DIR}/resources/icon.xpm COPYONLY)
 ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
 
 

@@ -187,7 +187,7 @@ public:
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
-  mitk::BaseProperty* GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const;
+  mitk::BaseProperty* GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
   //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
@@ -200,9 +200,9 @@ public:
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
   template <typename T>
-    bool GetProperty(itk::SmartPointer<T> &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
+    bool GetProperty(itk::SmartPointer<T> &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const
   {
-    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed));
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer));
     return property.IsNotNull();
   }
 
@@ -217,9 +217,9 @@ public:
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
   template <typename T>
-    bool GetProperty(T* &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL, bool* defaultRendererUsed = NULL) const
+    bool GetProperty(T* &property, const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const
   {
-    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer, defaultRendererUsed));
+    property = dynamic_cast<T *>(GetProperty(propertyKey, renderer));
     return property!=NULL;
   }
 
@@ -228,10 +228,10 @@ public:
   //## (T being the type of the second parameter)
   //## @return @a true property was found
   template <typename T>
-    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL, bool* defaultRendererUsed = NULL) const
+    bool GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer=NULL) const
 #ifdef _MSC_VER
     {
-      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed));
+      GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer));
       if ( gp != NULL )
       {
         value = gp->GetValue();
@@ -334,8 +334,6 @@ public:
   //## of BoolProperty with property-key "visible")
   //## @return @a true property was found
   //## @sa IsVisible
-  //## @defaultRendererUsed is set to true if the specific renderer wasn't found so the default renderer was used
-  //##    if set to Null, this variable is not set
   bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* propertyKey = "visible") const
   {
     return GetBoolProperty(propertyKey, visible, renderer);
@@ -394,6 +392,9 @@ public:
   //##Documentation
   //## @brief Convenience method for setting visibility properties (instances
   //## of BoolProperty)
+  //## @param visible If set to true, the data will be rendered. If false, the render will skip this data.
+  //## @param renderer Specify a renderer if the visibility shall be specific to a renderer
+  //## @param propertykey Can be used to specify a user defined name of the visibility propery.
   void SetVisibility(bool visible, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "visible");
 
   //##Documentation

@@ -57,10 +57,6 @@ class GenericLookupTableProperty : public BaseProperty
     
     typedef GenericLookupTable< T > ValueType;
 
-    virtual ~GenericLookupTableProperty() 
-    {
-    }
-
     itkSetObjectMacro(Value,ValueType);
     itkGetObjectMacro(Value,ValueType);
 
@@ -127,7 +123,8 @@ class GenericLookupTableProperty : public BaseProperty
   protected:
     GenericLookupTableProperty() {}
     GenericLookupTableProperty(ValueType *x) : m_Value(x) {}
-
+    virtual ~GenericLookupTableProperty() {}
+    
     typename ValueType::Pointer m_Value;
 };
 

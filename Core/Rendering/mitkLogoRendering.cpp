@@ -40,7 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkConfigure.h>
 #include <vtkImageFlip.h>
 
-#include <mbilogo.h>
+//frisiert #include <mbilogo.h>
+#include <wolflogo.h>
 
 #include <algorithm>
 
@@ -167,19 +168,19 @@ void mitk::LogoRendering::Enable()
     else // either logo file not found or logo renderer is forced to show the MBI logo
     {
       m_VtkImageImport->SetDataScalarTypeToUnsignedChar();
-      m_VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
-      m_VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
+      m_VtkImageImport->SetNumberOfScalarComponents(wolfLogo_NumberOfScalars);
+      m_VtkImageImport->SetWholeExtent(0,wolfLogo_Width-1,0,wolfLogo_Height-1,0,1-1);
       m_VtkImageImport->SetDataExtentToWholeExtent();
 
       // flip mbi logo around y axis and change color order
-      m_ImageData = new char[mbiLogo_Height*mbiLogo_Width*mbiLogo_NumberOfScalars];
+      m_ImageData = new char[wolfLogo_Height*wolfLogo_Width*wolfLogo_NumberOfScalars];
       
       unsigned int column, row;
       char * dest   = m_ImageData;
-      char * source = (char*) &mbiLogo_Data[0];;
+      char * source = (char*) &wolfLogo_Data[0];;
       char r, g, b, a;
-      for (column = 0; column < mbiLogo_Height; column++)
-        for (row = 0; row < mbiLogo_Width; row++)
+      for (column = 0; column < wolfLogo_Height; column++)
+        for (row = 0; row < wolfLogo_Width; row++)
         {   //change r with b
             b = *source++;
             g = *source++;

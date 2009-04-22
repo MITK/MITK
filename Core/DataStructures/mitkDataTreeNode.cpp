@@ -204,39 +204,41 @@ void mitk::DataTreeNode::ConcatenatePropertyList(PropertyList *pList, bool repla
   m_PropertyList->ConcatenatePropertyList(pList, replace);
 }
 
-mitk::BaseProperty* mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
+mitk::BaseProperty* mitk::DataTreeNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer) const
 {
-  if (defaultRendererUsed)
-      *defaultRendererUsed = false;
-
   if(propertyKey==NULL)
     return NULL;
 
-  std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
-
-  //does a renderer-specific PropertyList exist?
-  it=m_MapOfPropertyLists.find(renderer);
-  if(it==m_MapOfPropertyLists.end())
+  //renderer specified?
+  if (renderer)
   {
-    //no? use the renderer-independent one!
-    
-    if (defaultRendererUsed)
-      *defaultRendererUsed = true;
-    return m_PropertyList->GetProperty(propertyKey);
+    std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer>::const_iterator it;
+    //check for the renderer specific property
+    it=m_MapOfPropertyLists.find(renderer);
+    if(it!=m_MapOfPropertyLists.end()) //found
+    {
+      mitk::BaseProperty::Pointer property;
+      property=it->second->GetProperty(propertyKey);
+      if(property.IsNotNull())//found an enabled property in the render specific list
+        return property;
+      else //found a renderer specific list, but not the desired property
+        return m_PropertyList->GetProperty(propertyKey); //return renderer unspecific property
+    }
+    else //didn't find the property list of the given renderer
+    {
+      //return the renderer unspecific property if there is one
+      return m_PropertyList->GetProperty(propertyKey); 
+    }
   }
-
-  //does the renderer-specific PropertyList contain the @a propertyKey?
-  //and is it enabled
-  mitk::BaseProperty::Pointer property;
-  property=it->second->GetProperty(propertyKey);
-  if(property.IsNotNull())
-    //yes? return it
-    return property;
-
-  //no? use the renderer-independent one!
-  property=m_PropertyList->GetProperty(propertyKey);
-  if(property.IsNotNull())
-    return property;
+  else //no specific renderer given; use the renderer independent one
+  {
+    mitk::BaseProperty::Pointer property;
+    property=m_PropertyList->GetProperty(propertyKey);
+    if(property.IsNotNull())
+      return property;
+  }
+  
+  //only to satisfy compiler!
   return NULL;
 }
   
@@ -359,13 +361,9 @@ void mitk::DataTreeNode::SetColor(const float rgb[3], mitk::BaseRenderer* render
 
 void mitk::DataTreeNode::SetVisibility(bool visible, mitk::BaseRenderer* renderer, const char* propertyKey)
 {
-  bool defaultRendererUsed = false;
-  mitk::BoolProperty::Pointer prop = dynamic_cast<mitk::BoolProperty*>(GetProperty(propertyKey, renderer, &defaultRendererUsed));
-
-  if (prop && !defaultRendererUsed)
-    prop->SetValue(visible);
-  else
-    GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(visible));
+  mitk::BoolProperty::Pointer prop;
+  prop = mitk::BoolProperty::New(visible);
+  GetPropertyList(renderer)->SetProperty(propertyKey, prop);
 }
 
 void mitk::DataTreeNode::SetOpacity(float opacity, mitk::BaseRenderer* renderer, const char* propertyKey)
@@ -685,9 +683,9 @@ bool mitk::DataTreeNode::IsInteractorEnabled() const
 
 #ifndef _MSC_VER
 template <typename T>
-bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer, bool* defaultRendererUsed) const
+bool mitk::DataTreeNode::GetPropertyValue(const char* propertyKey, T & value, mitk::BaseRenderer* renderer) const
 {
-  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer, defaultRendererUsed) );
+  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey, renderer) );
   if ( gp != NULL )
   {
     value = gp->GetValue();

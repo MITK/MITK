@@ -264,7 +264,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #define _mitkIpPicTAGLEN 32
 
 
-#if (THIS_IS_BIG_ENDIAN) || defined (_IBMR2) || (mc68000) || (sun) || (__convex__) || (__hppa) || (_MIPSEB) || defined ( __PPC__) || defined (__APPLE__)
+#if (THIS_IS_BIG_ENDIAN) || defined (_IBMR2) || (mc68000) || (sun) || (__convex__) || (__hppa) || (_MIPSEB) || defined ( __PPC__)
 #  define _mitkIpENDIAN_IS_BIG
 #else
 #  define _mitkIpENDIAN_IS_LITTLE

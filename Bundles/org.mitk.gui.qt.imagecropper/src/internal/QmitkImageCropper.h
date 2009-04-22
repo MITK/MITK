@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkOperation.h>
 #include <mitkAffineInteractor.h>
 #include <itkImage.h>
-#include <qprogressdialog.h>
+#include <QProgressDialog>
 
 //!class QmitkStdMultiWidget;
 //!class QmitkImageCropperControls;

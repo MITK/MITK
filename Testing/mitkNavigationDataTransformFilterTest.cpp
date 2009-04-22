@@ -65,19 +65,7 @@ int mitkNavigationDataTransformFilterTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData* output = myFilter->GetOutput(0);
 
   /*test case no transform set*/
-  bool exceptionCaught=false;
-  try
-  {
-    mitk::NavigationData* output = myFilter->GetOutput();
-    output->Update(); // execute filter
-  }
-  catch (std::exception& exp)
-  {
-    exceptionCaught=true; 
-  }
-
-  MITK_TEST_CONDITION(exceptionCaught, "Testing no transform set");
-
+  MITK_TEST_FOR_EXCEPTION(std::exception, output->Update(););
 
   /* test transformation */
   mitk::NavigationDataTransformFilter::TransformType::Pointer transform =  mitk::NavigationDataTransformFilter::TransformType::New();

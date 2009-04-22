@@ -6,6 +6,7 @@
 # MACRO_COLLECT_PLUGINS(OUTPUT_DIR plugin_output_dir
 #                       [CACHE_PLUGIN_SOURCE_DIRS cache_src_dirs]
 #                       [CACHE_PLUGIN_BINARY_DIRS cache_bin_dirs]
+#                       [CACHE_PLUGIN_TARGETS cache_plugin_targets]
 #                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [FORCE_BUILD_ALL]
 #                       )
@@ -19,6 +20,10 @@
 # and binary directories will be appended. These variables
 # can late be used to configure your applications .ini file.
 #
+# CACHE_PLUGIN_TARGETS
+# <cache_plugin_targets> is used as the name of a cache variable which
+# stores a list of enabled plug-ins (their CMake target names)
+#
 # BUNDLE_LIST_PATH
 # The full path for the generated cmake file containing the BUILD_<plugin-id>
 # variables. If not set, "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake"
@@ -31,7 +36,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;BUNDLE_LIST_PATH" "FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH" "FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -63,6 +68,7 @@ IF(_COLLECT_CACHE_PLUGIN_BINARY_DIRS)
 ENDIF(_COLLECT_CACHE_PLUGIN_BINARY_DIRS)
   
 SET(_plugins_to_build )
+SET(_plugins_target_list )
 FILE(GLOB all_dirs *)
 FOREACH(dir_entry ${all_dirs})
   IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
@@ -79,6 +85,9 @@ SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAM
       OPTION("BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ON)
       IF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND _plugins_to_build "${dir_entry}")
+        STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})
+        LIST(APPEND _plugin_target_list ${_plugin_target})
+        
         SET(OPENCHERRY_BUNDLE_VARIABLES "${OPENCHERRY_BUNDLE_VARIABLES}
 SET(BUILD_${BUNDLE-SYMBOLICNAME} 1)")
       ENDIF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
@@ -94,6 +103,10 @@ LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
 FOREACH(_subdir ${_plugins_to_build})
   ADD_SUBDIRECTORY(${_subdir})
 ENDFOREACH(_subdir ${_plugins_to_build})
+
+IF(_COLLECT_CACHE_PLUGIN_TARGETS)
+  SET(${_COLLECT_CACHE_PLUGIN_TARGETS} ${_plugin_target_list} CACHE INTERNAL "A list of enabled plug-ins")
+ENDIF(_COLLECT_CACHE_PLUGIN_TARGETS)
 
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in" "${_COLLECT_BUNDLE_LIST_PATH}" @ONLY)

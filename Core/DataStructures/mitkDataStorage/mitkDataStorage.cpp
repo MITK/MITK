@@ -53,7 +53,7 @@ mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
 {
   if(s_Instance.IsNotNull())
   {
-    throw std::exception("__FILE__ __LINE__ : DataStorage instance already exists! CreateInstance should only be called once.");
+    itkExceptionMacro("DataStorage instance already exists! CreateInstance should only be called once.");
   } 
   try
   {

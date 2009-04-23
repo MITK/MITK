@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ipDicom/ipDicom.h>
 #include <ipPic/ipPicTags.h>
 
+#include <qmessagebox.h>
+
 #include <algorithm>  //needed for "sort" (windows)
 
 bool mitk::ImageNumberFilter::PositionSort( const Slice elem1, const Slice elem2 )
@@ -140,6 +142,8 @@ void mitk::ImageNumberFilter::SortPicsToGroup()
     Vector3D rightVector, downVector;
     vtk2itk( isg->u, rightVector );
     vtk2itk( isg->v, downVector );
+    newSlice.right = rightVector;
+    newSlice.down = downVector;
     newSlice.normal[0] = Round( ( ( rightVector[1]*downVector[2] ) - ( rightVector[2]*downVector[1] ) ), 2);
     newSlice.normal[1] = Round( ( ( rightVector[2]*downVector[0] ) - ( rightVector[0]*downVector[2] ) ), 2);
     newSlice.normal[2] = Round( ( ( rightVector[0]*downVector[1] ) - ( rightVector[1]*downVector[0] ) ), 2);
@@ -511,6 +515,7 @@ void mitk::ImageNumberFilter::GenerateImages()
     ipPicDescriptor* chiliPic = reinterpret_cast<ipPicDescriptor*>(slicesOfCurrentGroup.front().pic);
     interSliceGeometry_t* isg = ( interSliceGeometry_t* ) malloc ( sizeof( interSliceGeometry_t ) );
     pFetchSliceGeometryFromPic( chiliPic, isg );
+
     vtk2itk( isg->ps, spacing );
     if(    Equal(spacing[0], 0.0) 
         && Equal(spacing[1], 0.0) 
@@ -529,23 +534,52 @@ void mitk::ImageNumberFilter::GenerateImages()
     {
       if ( Equal(firstSlice->origin, sliceIter->origin ) ) continue;
 
-      spacing[2] = (sliceIter->origin - firstSlice->origin).GetNorm();
+      Vector3D interSliceDirection = sliceIter->origin - firstSlice->origin;
+      spacing[2] = interSliceDirection.GetNorm();
+
+      // test if vector from slice to next slice is orthogonal to row and col vectors (u and v)
+      Vector3D u = sliceIter->right;
+      Vector3D v = sliceIter->down;
+    
+      ScalarType suv = u * v;
+      ScalarType sui = u * interSliceDirection;
+      ScalarType siv = interSliceDirection * v;
+
+      if ( fabs(suv) > eps || fabs(sui) > eps || fabs(siv) > eps )
+      {
+        std::cout << "ALARM: non-orthogonal slice directions" << std::endl;
+        QMessageBox::information(0, "MITK", "A couple of the imported slices were acquired with \n"
+                            "a non-orthogonal inter slice direction (tilted gantry?).\n"
+                            "These images cannot be processed with MITK and will NOT be imported");
+        slicesOfCurrentGroup.clear();
+        break;
+      }
+      else
+      {
+        std::cout << "u " << u << " v " << v << " w " << interSliceDirection << " suv " << suv << " sui " << sui << " siv " << siv << std::endl;
+      }
+
       break;
      }
-        
-    // build image volume from a list of pic descriptors
-    std::sort( slicesOfCurrentGroup.begin(), slicesOfCurrentGroup.end(), PositionSort );
-    
-    std::list<mitkIpPicDescriptor*> picList;
-    for( std::vector< Slice >::iterator sliceIter = slicesOfCurrentGroup.begin(); 
-        sliceIter != slicesOfCurrentGroup.end(); 
-        ++sliceIter )
-    {
-      picList.push_back( sliceIter->pic );
-    }
 
-    // method of the super class
-    GenerateData( picList, slicesPerTimeStep, timeSteps, spacing, m_GroupList[n].seriesDescription );
+    if (slicesOfCurrentGroup.size() > 0)
+    {
+          
+      // build image volume from a list of pic descriptors
+      std::sort( slicesOfCurrentGroup.begin(), slicesOfCurrentGroup.end(), PositionSort );
+      
+      std::list<mitkIpPicDescriptor*> picList;
+      for( std::vector< Slice >::iterator sliceIter = slicesOfCurrentGroup.begin(); 
+          sliceIter != slicesOfCurrentGroup.end(); 
+          ++sliceIter )
+      {
+        picList.push_back( sliceIter->pic );
+      }
+
+      // method of the super class
+      GenerateData( picList, slicesPerTimeStep, timeSteps, spacing, m_GroupList[n].seriesDescription );
+    }
+    
     std::cout << "." << std::flush;
     ProgressBar::GetInstance()->Progress(1);
   }

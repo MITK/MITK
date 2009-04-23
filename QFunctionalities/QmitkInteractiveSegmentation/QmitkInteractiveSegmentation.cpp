@@ -211,7 +211,7 @@ void QmitkInteractiveSegmentation::CreateNewSegmentation()
     {
 
       // ask about the name and organ type of the new segmentation
-      QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, "this" is not QWidget
+      QmitkNewSegmentationDialog dialog( m_Controls ); // needs a QWidget as parent, this is not QWidget
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar

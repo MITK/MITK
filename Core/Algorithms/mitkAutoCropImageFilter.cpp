@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkAutoCropImageFilter.h"
@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 
 
-mitk::AutoCropImageFilter::AutoCropImageFilter() 
-: m_BackgroundValue(0), 
+mitk::AutoCropImageFilter::AutoCropImageFilter()
+: m_BackgroundValue(0),
   m_MarginFactor(1.0),
   m_TimeSelector(NULL),
   m_OverrideCroppingRegion(false)
@@ -48,7 +48,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
     std::cout << " image is NULL...returning" << std::endl;
-    return; 
+    return;
   }
 
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
@@ -89,13 +89,13 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
     return;
 
   itkDebugMacro(<<"GenerateOutputInformation()");
-  
-  // PART I: initialize input requested region. We do this already here (and not 
-  // later when GenerateInputRequestedRegion() is called), because we 
+
+  // PART I: initialize input requested region. We do this already here (and not
+  // later when GenerateInputRequestedRegion() is called), because we
   // also need the information to setup the output.
 
   // pre-initialize input-requested-region to largest-possible-region
-  // and correct time-region; spatial part will be cropped by 
+  // and correct time-region; spatial part will be cropped by
   // bounding-box of bounding-object below
   m_InputRequestedRegion = input->GetLargestPossibleRegion();
 
@@ -104,14 +104,14 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   index[0] = m_RegionIndex[0];
   index[1] = m_RegionIndex[1];
   index[2] = m_RegionIndex[2];
-  index[3] = m_InputRequestedRegion.GetIndex()[3]; 
-  index[4] = m_InputRequestedRegion.GetIndex()[4]; 
+  index[3] = m_InputRequestedRegion.GetIndex()[3];
+  index[4] = m_InputRequestedRegion.GetIndex()[4];
   mitk::SlicedData::SizeType  size;
-  size[0] = m_RegionSize[0]; 
-  size[1] = m_RegionSize[1]; 
-  size[2] = m_RegionSize[2]; 
-  size[3] = m_InputRequestedRegion.GetSize()[3]; 
-  size[4] = m_InputRequestedRegion.GetSize()[4]; 
+  size[0] = m_RegionSize[0];
+  size[1] = m_RegionSize[1];
+  size[2] = m_RegionSize[2];
+  size[3] = m_InputRequestedRegion.GetSize()[3];
+  size[4] = m_InputRequestedRegion.GetSize()[4];
 
   mitk::SlicedData::RegionType boRegion(index, size);
 
@@ -141,7 +141,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // Set the spacing
   output->GetGeometry()->SetIndexToWorldTransform( input->GetGeometry()->GetIndexToWorldTransform() );
   output->SetSpacing( input->GetSlicedGeometry()->GetSpacing() );
-  
+
   // Position the output Image to match the corresponding region of the input image
   mitk::SlicedGeometry3D* slicedGeometry = output->GetSlicedGeometry();
   const mitk::SlicedData::IndexType& start = m_InputRequestedRegion.GetIndex();
@@ -164,7 +164,7 @@ void mitk::AutoCropImageFilter::GenerateData()
   mitk::Image::Pointer output = this->GetOutput();
 
   if(input.IsNull())
-    return;  
+    return;
 
   if(input->GetDimension() <= 2)
   {
@@ -208,6 +208,27 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
       m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
 
+      if (m_RegionIndex[i] >= inputMitk->GetDimension(i))
+      {
+        itkExceptionMacro("Cropping index is not inside the image. "
+                       << std::endl << "Index:"
+                       << std::endl << m_CroppingRegion.GetIndex()
+                       << std::endl << "Size:"
+                       << std::endl << m_CroppingRegion.GetSize());
+      }
+
+      if (m_RegionIndex[i] + m_RegionSize[i] >= inputMitk->GetDimension(i))
+      {
+        m_RegionSize[i] = inputMitk->GetDimension(i) - m_RegionIndex[i];
+      }
+    }
+
+    for (unsigned int i=0; i<3; ++i)
+    {
+      m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
+      m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
+
+
       m_LowerBounds[i] = m_CroppingRegion.GetIndex()[i];
       m_UpperBounds[i] = inputMitk->GetDimension(i)-m_CroppingRegion.GetSize()[i]-m_LowerBounds[i];
     }
@@ -226,7 +247,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_TimeSelector = mitk::ImageTimeSelector::New();
       m_TimeSelector->SetInput( inputMitk );
       m_TimeSelector->SetTimeNr( 0 );
-      m_TimeSelector->UpdateLargestPossibleRegion(); 
+      m_TimeSelector->UpdateLargestPossibleRegion();
       inputMitk = m_TimeSelector->GetOutput();
     }
 
@@ -250,7 +271,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       if( idx > 0)
       {
         m_TimeSelector->SetTimeNr( idx );
-        m_TimeSelector->UpdateLargestPossibleRegion(); 
+        m_TimeSelector->UpdateLargestPossibleRegion();
         inputMitk = m_TimeSelector->GetOutput();
         mitk::CastToItkImage( inputMitk , inputItk );
       }
@@ -284,7 +305,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
     ImageType::RegionType cropRegion(m_RegionIndex,m_RegionSize);
     origRegion.Crop(cropRegion);
-    
+
     m_RegionSize[0] = origRegion.GetSize()[0];
     m_RegionSize[1] = origRegion.GetSize()[1];
     m_RegionSize[2] = origRegion.GetSize()[2];
@@ -311,11 +332,11 @@ void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 
 }
 
-const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType() 
+const std::type_info& mitk::AutoCropImageFilter::GetOutputPixelType()
 {
   return *this->GetInput()->GetPixelType().GetTypeId();
 }
-  
+
 void mitk::AutoCropImageFilter::SetCroppingRegion(RegionType overrideRegion)
 {
   m_CroppingRegion = overrideRegion;

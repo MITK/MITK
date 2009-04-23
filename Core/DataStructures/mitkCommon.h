@@ -104,7 +104,12 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
     #define MITK_CORE_EXPORT __declspec(dllexport)
   #else
     #define MITK_CORE_EXPORT __declspec(dllimport)
-  #endif        
+  #endif
+   #ifdef mitkIGT_EXPORTS
+    #define MITK_IGT_EXPORT __declspec(dllexport)
+  #else
+    #define MITK_IGT_EXPORT __declspec(dllimport)
+  #endif               
   #ifdef Qmitk_EXPORTS
     #define QMITK_EXPORT __declspec(dllexport)
   #else
@@ -122,6 +127,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #endif        
 #else
   #define MITK_CORE_EXPORT
+  #define MITK_IGT_EXPORT
   #define MBISB_CORE_EXPORT
   #define QMITK_EXPORT
   #define QMITK_SB_EXPORT

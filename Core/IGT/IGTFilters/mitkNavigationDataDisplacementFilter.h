@@ -32,7 +32,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class NavigationDataDisplacementFilter : public NavigationDataToNavigationDataFilter
+  class MITK_IGT_EXPORT NavigationDataDisplacementFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataDisplacementFilter, NavigationDataToNavigationDataFilter);

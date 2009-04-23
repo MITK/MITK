@@ -39,7 +39,7 @@ namespace mitk
   *  \ingroup IGT
   */
 
-  class TrackingVolume : public mitk::Surface
+  class MITK_IGT_EXPORT TrackingVolume : public mitk::Surface
   {
   public:
     mitkClassMacro(TrackingVolume, mitk::Surface);

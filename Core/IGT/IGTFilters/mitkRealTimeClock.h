@@ -36,7 +36,7 @@ namespace mitk {
   * \ingroup IGT
   */
 
-  class RealTimeClock : public itk::Object
+  class MITK_IGT_EXPORT RealTimeClock : public itk::Object
   {
   public:
     mitkClassMacro(RealTimeClock, itk::Object);

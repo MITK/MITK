@@ -37,7 +37,7 @@ namespace mitk {
   * \ingroup IGT
   * 
   */
-  class NavigationDataToPointSetFilter : public PointSetSource
+  class MITK_IGT_EXPORT NavigationDataToPointSetFilter : public PointSetSource
   {
   public:
     mitkClassMacro(NavigationDataToPointSetFilter, PointSetSource);

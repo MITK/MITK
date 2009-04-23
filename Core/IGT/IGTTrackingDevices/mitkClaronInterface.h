@@ -41,7 +41,7 @@ namespace mitk
   *          by a stub class called "ClaronInterfaceStub". 
   *   \ingroup IGT
   */
-  class ClaronInterface : public itk::Object
+  class MITK_IGT_EXPORT ClaronInterface : public itk::Object
   {
   public:
     

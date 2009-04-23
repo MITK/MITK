@@ -43,7 +43,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class NDITrackingDevice : public TrackingDevice
+  class MITK_IGT_EXPORT NDITrackingDevice : public TrackingDevice
   {
     friend class NDIProtocol;
 

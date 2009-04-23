@@ -37,7 +37,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class NDIProtocol : public itk::Object
+  class MITK_IGT_EXPORT NDIProtocol : public itk::Object
   {
   public:
     mitkClassMacro(NDIProtocol, itk::Object);

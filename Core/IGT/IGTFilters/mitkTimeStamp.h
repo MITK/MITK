@@ -51,7 +51,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class TimeStamp : public itk::Object
+  class MITK_IGT_EXPORT TimeStamp : public itk::Object
   {
   public:
     

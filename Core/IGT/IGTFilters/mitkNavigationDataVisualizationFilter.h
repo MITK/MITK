@@ -32,7 +32,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class NavigationDataVisualizationFilter : public mitk::NavigationDataToNavigationDataFilter
+  class MITK_IGT_EXPORT NavigationDataVisualizationFilter : public mitk::NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataVisualizationFilter,itk::ProcessObject);

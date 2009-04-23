@@ -34,7 +34,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class TrackingTool : public itk::Object
+  class MITK_IGT_EXPORT TrackingTool : public itk::Object
   {
   public:
     mitkClassMacro(TrackingTool, itk::Object);

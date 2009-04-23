@@ -47,7 +47,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class SerialCommunication : public itk::Object
+  class MITK_IGT_EXPORT SerialCommunication : public itk::Object
   {
   public:    
     mitkClassMacro(SerialCommunication, itk::Object);    

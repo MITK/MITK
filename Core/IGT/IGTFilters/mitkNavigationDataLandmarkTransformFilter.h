@@ -38,7 +38,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
+  class MITK_IGT_EXPORT NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataLandmarkTransformFilter, NavigationDataToNavigationDataFilter);

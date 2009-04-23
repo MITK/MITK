@@ -35,7 +35,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class RandomTrackingDevice : public TrackingDevice
+  class MITK_IGT_EXPORT RandomTrackingDevice : public TrackingDevice
   {
   public:
 

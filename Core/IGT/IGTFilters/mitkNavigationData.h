@@ -34,7 +34,7 @@ namespace mitk {
     * 
     * \ingroup IGT
     */
-  class NavigationData : public itk::DataObject
+  class MITK_IGT_EXPORT NavigationData : public itk::DataObject
     {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);

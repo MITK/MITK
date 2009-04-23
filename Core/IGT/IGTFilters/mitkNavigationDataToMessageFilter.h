@@ -41,7 +41,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class NavigationDataToMessageFilter : public NavigationDataToNavigationDataFilter
+  class MITK_IGT_EXPORT NavigationDataToMessageFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataToMessageFilter, NavigationDataToNavigationDataFilter);

@@ -33,7 +33,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class NDIPassiveTool : public InternalTrackingTool
+  class MITK_IGT_EXPORT NDIPassiveTool : public InternalTrackingTool
   {
   public:
     mitkClassMacro(NDIPassiveTool, InternalTrackingTool);

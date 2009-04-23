@@ -10,11 +10,19 @@ of release notes for the next release.
 
 ======== New stuff only in the SVN trunk ========
 
+- a basic Qt 4.5 application
+
+======== Changes in release 0.12 (2009-May-??) ========
+
+(still have to be collected)
+
+- Application module "deformable registration"
 - Paintbrush tool in InteractiveSegmentation
 - localizer widget in MainApp
 - a PointListWidget
 - gcc 4.3 compatibility (Ubuntu 8.10, Fedora 9)
 - VTK 5.2 compatibility
+- ITK 3.10 and ITK 3.10 compatibility
 
 
 ======== Changes in release 0.10 (2008-Oct-??) ========

@@ -51,21 +51,14 @@ mitk::DataStorage::~DataStorage()
 
 mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
 {
-  // workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
-  // which happens when a PlugIn is re-initialized within Chili
   if(s_Instance.IsNotNull())
   {
-    mitk::DataTreeStorage* dts = dynamic_cast<mitk::DataTreeStorage*>(s_Instance.GetPointer());
-    if (dts != NULL)
-      dts->m_DataTree->UnRegister();
-  }
-  s_Instance = NULL;
+    throw std::exception("__FILE__ __LINE__ : DataStorage instance already exists! CreateInstance should only be called once.");
+  } 
   try
   {
     mitk::DataTreeStorage::Pointer dts = mitk::DataTreeStorage::New();
     dts->Initialize(tree);   // If no DataStorage created yet, and tree is NULL, then this will raise an exception, because the DataStorage must be initialized with a DataTree
-    /// \todo additional register on tree needed to prevent crash in itkTimeStamp.cxx (see bug #343)
-    tree->Register();
     s_Instance = dts;
   }
   catch(...)
@@ -227,11 +220,6 @@ const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 
 void mitk::DataStorage::ShutdownSingleton()
 {
-  if(s_Instance.IsNotNull())
-  {
-    mitk::DataTreeStorage* dts = dynamic_cast<mitk::DataTreeStorage*>(s_Instance.GetPointer());
-    dts->m_DataTree->UnRegister();
-  }
   s_Instance = NULL; 
 }
 

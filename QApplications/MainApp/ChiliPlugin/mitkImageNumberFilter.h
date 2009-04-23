@@ -85,6 +85,8 @@ class ImageNumberFilter : public PicDescriptorToNode
       mitkIpPicDescriptor* pic;
       Vector3D origin;
       Vector3D normal;
+      Vector3D right;
+      Vector3D down;
       int imageNumber;
     };
 

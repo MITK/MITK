@@ -17,6 +17,7 @@ of release notes for the next release.
 (still have to be collected)
 
 - Application module "deformable registration"
+- Application module "point set interaction"
 - Paintbrush tool in InteractiveSegmentation
 - localizer widget in MainApp
 - a PointListWidget

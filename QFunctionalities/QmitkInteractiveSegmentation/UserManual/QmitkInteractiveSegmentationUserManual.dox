@@ -13,7 +13,7 @@ Available sections:
 
 \section QmitkInteractiveSegmentationUserManualOverview Overview
 
-"Interactive segmentation" is a program module for interactive (manual) segmentation of images.
+InteractiveSegmentation is a program module for interactive (manual) segmentation of images.
 
   \li <b>Segmentation</b> means a binary image. Each voxel must be either part of the object or background.
   \li <b>Images</b> mean 2D, 3D or 3D+t images, where each voxel must have exactly one channel. Color images are not supported.

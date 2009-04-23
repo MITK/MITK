@@ -83,7 +83,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
 
   std::cout << "Testing creation of mitk::Image with same Geometry as Surface: " << std::flush;
   mitk::Image::Pointer image = mitk::Image::New();
-  surface->UpdateOutputInformation(); //should not be necessary, bug #1536
+  //surface->UpdateOutputInformation(); //is not necessary anymore (bug #1536), should never be neccessary
   image->Initialize(typeid(unsigned char), *surface->GetGeometry());
 
   std::cout << "Testing mitk::SurfaceToImageFilter::MakeOutputBinaryOn(): " << std::flush;

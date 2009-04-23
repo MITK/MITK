@@ -33,17 +33,17 @@ namespace mitk {
 class MITK_CORE_EXPORT ImageChannelSelector : public SubImageSelector
 {
 public:
-	mitkClassMacro(ImageChannelSelector,SubImageSelector);
+  mitkClassMacro(ImageChannelSelector,SubImageSelector);
 
-	itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-	itkGetConstMacro(ChannelNr,int);
-	itkSetMacro(ChannelNr,int);
+  itkGetConstMacro(ChannelNr,int);
+  itkSetMacro(ChannelNr,int);
 
 protected:
-	ImageChannelSelector();
+  ImageChannelSelector();
 
-	virtual ~ImageChannelSelector();
+  virtual ~ImageChannelSelector();
 
   virtual void GenerateOutputInformation();
 

@@ -45,14 +45,14 @@ namespace mitk {
   //##@brief Element, that can be focused and held here.
   //##
   //## has to be an itk-Objekct in order to use itk-Smartpointer!
-	typedef mitk::BaseRenderer FocusElement;
+  typedef mitk::BaseRenderer FocusElement;
 
-	typedef itk::WeakPointer<FocusElement> FocusElementWeakPointer;
+  typedef itk::WeakPointer<FocusElement> FocusElementWeakPointer;
 
   typedef std::vector<FocusElementWeakPointer> FocusElementList;
-	
+  
   typedef std::vector<FocusElementWeakPointer>::iterator FocusListIterator;
-	
+  
   //##Documentation
   //## Destructor
   ~FocusManager();
@@ -62,12 +62,12 @@ namespace mitk {
   //## widget and sets the focus to the added one
   bool AddElement(FocusElement* element);
 
-	//##Documentation
+  //##Documentation
   //## removes the given widget from the list.
-	//## true if found and removed, else false
-	//## afterwards the focused widget is the one behind the deleted
-	//## or if the deleted was the last, then the one before the deleted
-	//## that way you can delete sequentialy from the back on or from front to back
+  //## true if found and removed, else false
+  //## afterwards the focused widget is the one behind the deleted
+  //## or if the deleted was the last, then the one before the deleted
+  //## that way you can delete sequentialy from the back on or from front to back
   bool RemoveElement(FocusElement* element);
 
   //##Documentation
@@ -98,39 +98,39 @@ namespace mitk {
   //##Documentation
   //## sets the focus to the next in list
   //## loops the list, if switch loop is true
-	//## returns true if successful, else false
+  //## returns true if successful, else false
   bool GoToNext();
     
-	//##Documentation
+  //##Documentation
   //## returns an iterator, that points to the 
-	//## beginning of the list
-	//## no changes are made to the current focused element
-	FocusListIterator GetIter();
+  //## beginning of the list
+  //## no changes are made to the current focused element
+  FocusListIterator GetIter();
 
-	//##Documentation
+  //##Documentation
   //## Sets the LoopMode.
-	//## if set to true-> the one after the last is the first
-	void SetLoop(bool loop);
+  //## if set to true-> the one after the last is the first
+  void SetLoop(bool loop);
 
-  friend class GlobalInteraction;	
+  friend class GlobalInteraction;  
 protected:
-	//##Documentation
+  //##Documentation
   //## Constructor
   FocusManager();
 
 private:
-	//##Documentation
+  //##Documentation
   //## stores the Widgets
-	FocusElementList m_FocusList;
+  FocusElementList m_FocusList;
 
-	//##Documentation
+  //##Documentation
   //## holds the focused Widget
   itk::WeakPointer<FocusElement> m_FocElement;
 
-	//##Documentation
+  //##Documentation
   //## switch which sets the LoopMode.
-	//## if true, then the next after the last one is the first
-	bool m_Loop;
+  //## if true, then the next after the last one is the first
+  bool m_Loop;
 };
 
 //##Documentation

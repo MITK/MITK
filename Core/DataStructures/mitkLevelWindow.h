@@ -178,7 +178,7 @@ public:
 
   /*!
   * \brief implementation necessary because operator made
-  *	private in itk::Object
+  *  private in itk::Object
   */
   virtual LevelWindow& operator=(const LevelWindow& levWin);
 

@@ -64,7 +64,7 @@ class QMITK_EXPORT QmitkPixelGreyValueManipulatorComponent : public QmitkFunctio
 
 public:
 
-	QCheckBox* m_CheckBox;
+  QCheckBox* m_CheckBox;
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
   QmitkPixelGreyValueManipulatorComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
@@ -139,13 +139,13 @@ public slots:
   /** \brief Slot method that will be called if the CheckBox at the TreeNodeSelector-Group-Box was toggled to show the TreeNodeSelector or not. */ 
   void ShowImageContent(bool show = true);
 
-  ///** \brief Method is called when the DataTree was changed. This Method is 	self-evident obligatory */
+  ///** \brief Method is called when the DataTree was changed. This Method is   self-evident obligatory */
   //virtual void TreeChanged();
 
   /** \brief Method is called when the "create new manipulated image" - was pressed. This Method coordinates all steps to create a new manipulated image  */
   virtual void PipelineControllerToCreateManipulatedImage();
 
-  /** \brief Method is called when the ManipulationMode was selected to decide 	whether value2 shall be visible or not */
+  /** \brief Method is called when the ManipulationMode was selected to decide   whether value2 shall be visible or not */
   virtual void HideOrShowValue2(int index);
 
   /** \brief Slot-Method to set the Threshold from extern, for example by signal-slot from the surfaceCreatorComponent */
@@ -228,7 +228,7 @@ private:
   */
   QmitkStdMultiWidget * m_MultiWidget;
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkPixelGreyValueManipulatorComponentGUI * m_PixelGreyValueManipulatorComponentGUI;
 
   ///** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/

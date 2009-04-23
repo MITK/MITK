@@ -140,7 +140,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkEmptyComponentGUI * m_EmptyComponentGUI;
 
   /** \brief This Attribute holds the information if a EmptyNode is already existing or not*/

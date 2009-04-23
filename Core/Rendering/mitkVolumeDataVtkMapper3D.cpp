@@ -185,7 +185,7 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 
   if (m_Mask)
   {
-	  m_Mask->Delete();
+    m_Mask->Delete();
   }
 }
 

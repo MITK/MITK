@@ -107,10 +107,10 @@ namespace mitk
     */
     bool IsTracking();
     
-	  /**
+    /**
     * \return   Returns wether the MicronTracker is installed (means wether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set ON),
     *           so returns true in this case. This is because the class mitkClaronInterfaceStub, in which the same Method returns false 
-    *		        is used otherways.
+    *            is used otherways.
     */
     bool IsMicronTrackerInstalled();
 

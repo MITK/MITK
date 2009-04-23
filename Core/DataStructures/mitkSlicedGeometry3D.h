@@ -160,7 +160,7 @@ public:
    *
    * \sa GetGeometry2D
    */
- 	itkGetConstMacro(EvenlySpaced, bool);
+   itkGetConstMacro(EvenlySpaced, bool);
 
   virtual void SetEvenlySpaced(bool on = true);
 

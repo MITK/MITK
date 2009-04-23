@@ -26,10 +26,10 @@ namespace mitk {
   class MITK_CORE_EXPORT RegistrationBase : public ImageToImageFilter
   {
   public:
-	  mitkClassMacro(RegistrationBase, ImageToImageFilter);
+    mitkClassMacro(RegistrationBase, ImageToImageFilter);
   
-	  /** Method for creation through the object factory. */
-	  itkNewMacro(Self);
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
 

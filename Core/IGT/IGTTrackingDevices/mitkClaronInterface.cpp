@@ -131,7 +131,7 @@ void mitk::ClaronInterface::GrabFrame()
 std::vector<double> mitk::ClaronInterface::GetTipPosition(mitk::claronToolHandle c)
 {
   std::vector<double> returnValue;
-  double	Position[3];
+  double  Position[3];
   mtHandle t2m = Xform3D_New(); // tooltip to marker xform handle
   mtHandle t2c = Xform3D_New(); // tooltip to camera xform handle
   mtHandle m2c = Xform3D_New(); // marker to camera xform handle
@@ -158,7 +158,7 @@ std::vector<double> mitk::ClaronInterface::GetTipPosition(mitk::claronToolHandle
 std::vector<double> mitk::ClaronInterface::GetPosition(claronToolHandle c)
 {
   std::vector<double> returnValue;
-  double	Position[3];
+  double  Position[3];
   MTC( Marker_Marker2CameraXfGet (c, CurrCamera, PoseXf, &IdentifyingCamera) );
   MTC( Xform3D_ShiftGet(PoseXf, Position) );
 
@@ -221,7 +221,7 @@ std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle c)
 {
   std::vector<double> returnValue;
 
-  double	Quarternions[4];
+  double  Quarternions[4];
   MTC( Marker_Marker2CameraXfGet (c, CurrCamera, PoseXf, &IdentifyingCamera) );
   MTC( Xform3D_RotQuaternionsGet(PoseXf, Quarternions) );
 

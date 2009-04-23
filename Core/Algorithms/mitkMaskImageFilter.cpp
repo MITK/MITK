@@ -44,9 +44,9 @@ mitk::MaskImageFilter::~MaskImageFilter()
 
 void mitk::MaskImageFilter::SetMask( const mitk::Image* mask ) 
 {
-	// Process object is not const-correct so the const_cast is required here
+  // Process object is not const-correct so the const_cast is required here
   m_Mask = const_cast< mitk::Image * >( mask );
-	this->ProcessObject::SetNthInput(1, m_Mask );
+  this->ProcessObject::SetNthInput(1, m_Mask );
 }
 
 const mitk::Image* mitk::MaskImageFilter::GetMask() const 

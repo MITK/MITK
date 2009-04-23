@@ -39,7 +39,7 @@ namespace mitk
  */
 class MITK_CORE_EXPORT VtkLayerController
 {
-	public:  
+  public:  
     static VtkLayerController* GetInstance(vtkRenderWindow* renWin);
     static void AddInstance(vtkRenderWindow* renWin, vtkRenderer * mitkSceneRenderer);
     static void RemoveInstance(vtkRenderWindow* renWin);
@@ -94,10 +94,10 @@ class MITK_CORE_EXPORT VtkLayerController
     int GetNumberOfRenderers();
 
     void SetEraseForAllRenderers(int i);
-	protected:
+  protected:
     vtkRenderWindow*    m_RenderWindow;
-       	
-	private:
+         
+  private:
 
     /**
     * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
@@ -114,7 +114,7 @@ class MITK_CORE_EXPORT VtkLayerController
 
     typedef std::map<const vtkRenderWindow*,mitk::VtkLayerController*> vtkLayerControllerMapType;
     static vtkLayerControllerMapType s_LayerControllerMap;
-		
+    
 };
 
 } // Namespace MITK

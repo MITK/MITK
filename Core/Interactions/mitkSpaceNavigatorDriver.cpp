@@ -158,8 +158,8 @@ HRESULT SpaceNavigatorDriver::OnKeyUp(int keyCode )
    return result;
 }
 
-#define ScaleRotation		1024.0
-#define ScaleTranslation	512.0
+#define ScaleRotation    1024.0
+#define ScaleTranslation  512.0
 #define Sensitivity        1.0
 
 HRESULT SpaceNavigatorDriver::OnSensorInput(void)

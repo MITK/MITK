@@ -29,21 +29,21 @@ namespace mitk {
 class MITK_CORE_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
 {
 public:
-	mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>);
+  mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>);
 
-	itkNewMacro(Self);
-	
-	void Initialize(mitk::UnstructuredGrid*);
-	
-	void SetUsePointData() { m_UsePointData = true; }
-	void SetUseCellData() { m_UsePointData = false; }
-	
+  itkNewMacro(Self);
+  
+  void Initialize(mitk::UnstructuredGrid*);
+  
+  void SetUsePointData() { m_UsePointData = true; }
+  void SetUseCellData() { m_UsePointData = false; }
+  
 protected:
-	UnstructuredGridHistogram() : m_UsePointData(true) {}
+  UnstructuredGridHistogram() : m_UsePointData(true) {}
 
-	virtual ~UnstructuredGridHistogram();
-	
-	bool m_UsePointData;
+  virtual ~UnstructuredGridHistogram();
+  
+  bool m_UsePointData;
 };
 
 } // namespace mitk

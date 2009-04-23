@@ -962,10 +962,10 @@ void QmitkMainTemplate::Initialize()
   int i;
   for ( i=1;i<qApp->argc();++i )
   {
-	  if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
-		  m_NoMITKOptions = true;
-		  break;
-	  }
+    if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
+      m_NoMITKOptions = true;
+      break;
+    }
   }
 
   if (! m_NoMITKOptions ) 
@@ -1040,24 +1040,24 @@ void QmitkMainTemplate::Initialize()
   }
   mitk::BoolProperty* searchBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show search toolbar"));
   if(searchBarProperty != NULL)
-  {	
+  {  
     options_showSearchToolbarAction->setOn(searchBarProperty->GetValue());
   }
   mitk::BoolProperty* dropdownBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show dropdown toolbar"));
   if(dropdownBarProperty != NULL)
-  {	
+  {  
     options_ShowDropdownToolbarAction->setOn(dropdownBarProperty->GetValue());
   }
 
   mitk::BoolProperty* iconBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show icon set toolbar"));
   if(iconBarProperty != NULL)
-  {	
+  {  
     options_ShowIconsetToolbarAction->setOn(iconBarProperty->GetValue());
   }
 
   mitk::BoolProperty* favBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show recently used toolbar"));
   if(favBarProperty != NULL)
-  {	
+  {  
     options_ShowRecentlyusedToolbarAction->setOn(favBarProperty->GetValue());
   }
 
@@ -1183,8 +1183,8 @@ void QmitkMainTemplate::parseCommandLine()
       break;
     }
     if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
-		  break;
-	  }
+      break;
+    }
     fileOpen(qApp->argv()[i]);
   }
   m_MultiWidget->GetRenderWindow4()->GetRenderer()->GetCameraController()->SetViewToAnterior();
@@ -1574,24 +1574,24 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     }
     mitk::BoolProperty* searchBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show search toolbar"));
     if(searchBarProperty != NULL)
-    {	
+    {  
       options_showSearchToolbarAction->setOn(searchBarProperty->GetValue());
     }
     mitk::BoolProperty* dropdownBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show dropdown toolbar"));
     if(dropdownBarProperty != NULL)
-    {	
+    {  
       options_ShowDropdownToolbarAction->setOn(dropdownBarProperty->GetValue());
     }
 
     mitk::BoolProperty* iconBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show icon set toolbar"));
     if(iconBarProperty != NULL)
-    {	
+    {  
       options_ShowIconsetToolbarAction->setOn(iconBarProperty->GetValue());
     }
 
     mitk::BoolProperty* favBarProperty = dynamic_cast<mitk::BoolProperty*>(m_Options->GetProperty("Show recently used toolbar"));
     if(favBarProperty != NULL)
-    {	
+    {  
       options_ShowRecentlyusedToolbarAction->setOn(favBarProperty->GetValue());
     }
     m_InOptionsUpdate = false;

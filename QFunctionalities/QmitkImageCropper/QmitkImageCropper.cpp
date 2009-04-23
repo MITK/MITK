@@ -192,7 +192,7 @@ void QmitkImageCropper::SurroundingCheck(bool /*value*/)
   {
     mitk::DataTreeNode *imageNode = m_IteratorToImageToCrop->Get();
     if (imageNode)
-    {	
+    {  
       mitk::BaseData* data = imageNode->GetData();
       if (data)
       {
@@ -332,12 +332,12 @@ void QmitkImageCropper::AddSurrounding( itk::Image< TPixel, VImageDimension >* i
   progress->setCaption("Image cropper");
   progress->show();
 
-  for (unsigned int i=0;i<size[0];i++)	
+  for (unsigned int i=0;i<size[0];i++)  
   {
     for (unsigned int j=0;j<size[1];j++)
     {
       for (unsigned int k=0;k<size[2];k++)
-      {		    
+      {        
         idx[0]=i;
         idx[1]=j;
         idx[2]=k;

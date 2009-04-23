@@ -168,10 +168,10 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   Matrix3D m;
   //Initialisierung für ersten Punkt
   //alternative1:
-  //	last_v=*(vl.getLast()); next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
+  //  last_v=*(vl.getLast()); next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
   //alternative2:
-  //	last_v=*(vl.getLast()); next_v=*vit.current(); s.cross(last_v,next_v); s.normalize();
-  //	axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
+  //  last_v=*(vl.getLast()); next_v=*vit.current(); s.cross(last_v,next_v); s.normalize();
+  //  axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
   //alternative3:
   last_v=vecList.back(); next_v=*vit; s.Set_vnl_vector( vnl_cross_3d(last_v.Get_vnl_vector(),next_v.Get_vnl_vector()) ); s.Normalize();
   a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
@@ -191,9 +191,9 @@ void mitk::PolygonToRingFilter::BuildVtkTube(vtkPoints *vPoints, vtkCellArray *p
   //nun die Hauptschleife über alle Punkte
   for ( ; pit != pend; ++pit, ++vit )
   {
-    //		cur_p=*pit.current(); last_v=next_v; next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
+    //    cur_p=*pit.current(); last_v=next_v; next_v=*vit.current(); axis=last_v+next_v; s.cross(last_v,next_v); s.normalize();
     cur_p=*pit; last_v=next_v; next_v=*vit; s.Set_vnl_vector( vnl_cross_3d(last_v.Get_vnl_vector(),next_v.Get_vnl_vector()) ); s.Normalize();
-    //		axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
+    //    axis=next_v-last_v; axis.normalize(); aa.set(s, M_PI/2.0); m.set(aa); m.transform(&axis);
     a=last_v; b=next_v; a.Normalize(); b.Normalize(); axis=a+b; axis.Normalize();
 
     //neuen Stern sc (SternCurrent) bauen und dabei Start für neuen Stern suchen

@@ -102,17 +102,17 @@ size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 #ifndef __APPLE__
 int mitk::MemoryUtilities::ReadStatmFromProcFS( int* size, int* res, int* shared, int* text, int* sharedLibs, int* stack, int* dirtyPages ) 
 {
-	int ret = 0;
-	FILE* f;
-	f = fopen( "/proc/self/statm", "r" );
-	if( f ) {
-		size_t ignored = fscanf( f, "%d %d %d %d %d %d %d", size, res, shared, text, sharedLibs, stack, dirtyPages );
+  int ret = 0;
+  FILE* f;
+  f = fopen( "/proc/self/statm", "r" );
+  if( f ) {
+    size_t ignored = fscanf( f, "%d %d %d %d %d %d %d", size, res, shared, text, sharedLibs, stack, dirtyPages );
                 ++ignored;
-		fclose( f );
-	} else {
-		ret = -1;
-	}
-	return ret;
+    fclose( f );
+  } else {
+    ret = -1;
+  }
+  return ret;
 }
 #endif 
 #endif

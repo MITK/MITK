@@ -59,7 +59,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
   if ( !this->IsVisible(renderer) ) return;
 
-  //	@FIXME: Logik fuer update
+  //  @FIXME: Logik fuer update
   bool updateNeccesary = true;
 
   if (updateNeccesary) 
@@ -153,7 +153,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
 
           switch (dataIt->Value().pointSpec)
-	        {
+          {
           case PTSTART:
             {
               //a quad
@@ -171,7 +171,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
               glBegin (GL_LINE_LOOP);
                 tmp=pt2d-horz;      glVertex2fv(&tmp[0]);
                 tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
-                tmp=pt2d+horz;			glVertex2fv(&tmp[0]);
+                tmp=pt2d+horz;      glVertex2fv(&tmp[0]);
                 tmp=pt2d-vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
@@ -189,7 +189,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         {
           glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
           switch (dataIt->Value().pointSpec)
-	        {
+          {
           case PTSTART:
             {
               //a quad
@@ -210,9 +210,9 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
                   tmp=pt2d+vert;      glVertex2fv(&tmp[0]);
               glEnd ();
             }
-	  default:
+    default:
             {
-	      break;
+        break;
             }
           }//switch
         }//else
@@ -273,7 +273,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           //a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
           //since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
           Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
-			    if (position != selectedLines.end())
+          if (position != selectedLines.end())
           {
             lineSelected = true;
           }
@@ -314,7 +314,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
               else //if not selected
               {
                 glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-						    //drawing crosses
+                //drawing crosses
                 glBegin (GL_LINES);
                   glVertex2fv(&(*lastPoint)[0]);
                   glVertex2fv(&pt2d[0]);
@@ -351,7 +351,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
             lineSelected = false;
             Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
             Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
-			      if (position != selectedLines.end())//found the index
+            if (position != selectedLines.end())//found the index
             {
               glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
               //a line from lastPoint to firstPoint
@@ -374,9 +374,9 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
         //Axis-aligned bounding box(AABB) around the cell if selected and set in Property
         bool showBoundingBox;
         if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox")) == NULL)
-		  		showBoundingBox = false;
-			  else
-				  showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox"))->GetValue();
+          showBoundingBox = false;
+        else
+          showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox"))->GetValue();
 
         if(showBoundingBox) 
         {

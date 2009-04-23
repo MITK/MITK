@@ -33,7 +33,7 @@ bool mitk::NodePredicateFirstLevel::CheckNode(const mitk::DataTreeNode* node) co
     throw 1;  // Insert Exception Handling here
 
   mitk::DataStorage::SetOfObjects::ConstPointer list = 
-	  m_DataStorage->GetSources(node, NULL, true);
+    m_DataStorage->GetSources(node, NULL, true);
 
   return list->Size() == 0;
 }

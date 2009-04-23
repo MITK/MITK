@@ -391,7 +391,7 @@ const mitk::Geometry2DData *mitk::Geometry2DDataToSurfaceFilter::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
   {
-	  return 0;
+    return 0;
   }
 
   return static_cast<const mitk::Geometry2DData * >
@@ -414,7 +414,7 @@ mitk::Geometry2DDataToSurfaceFilter
 {
   // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput( 0, 
-	const_cast< mitk::Geometry2DData * >( input )
+  const_cast< mitk::Geometry2DData * >( input )
   );
 }
 
@@ -425,7 +425,7 @@ mitk::Geometry2DDataToSurfaceFilter
 {
   if( index+1 > this->GetNumberOfInputs() )
   {
-	  this->SetNumberOfRequiredInputs( index + 1 );
+    this->SetNumberOfRequiredInputs( index + 1 );
   }
   // Process object is not const-correct so the const_cast is required here
   this->ProcessObject::SetNthInput(index, 

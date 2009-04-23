@@ -89,7 +89,7 @@ void mitk::AnnotationProperty::SetPosition( const mitk::Point3D &position )
 
 
 bool mitk::AnnotationProperty::operator==( const BaseProperty &property ) const 
-{	
+{  
   const Self *other = dynamic_cast< const Self * >( &property );
 
   if ( other == NULL ) return false;

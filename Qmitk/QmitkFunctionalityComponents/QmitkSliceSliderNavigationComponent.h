@@ -115,7 +115,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkSliceSliderNavigationComponentGUI * m_SliceSliderComponentGUI;
 
   /** \brief check if the selected image has a fourth-dimension an than show or hide the temporal slider*/

@@ -31,28 +31,28 @@ namespace mitk {
 class MITK_CORE_EXPORT HistogramGenerator : public itk::Object
 {
 public:
-	mitkClassMacro(HistogramGenerator,itk::Object);
+  mitkClassMacro(HistogramGenerator,itk::Object);
 
-	itkNewMacro(Self);  
-	typedef itk::Statistics::Histogram<double> HistogramType;
+  itkNewMacro(Self);  
+  typedef itk::Statistics::Histogram<double> HistogramType;
         
-	itkSetMacro(Image,mitk::Image::ConstPointer);
-	itkSetMacro(Size,int);
-	itkGetConstMacro(Size,int);
-	itkGetConstObjectMacro(Histogram,HistogramType);
-	
-	// TODO: calculate if needed in GetHistogram()
-	void ComputeHistogram();
-	float GetMaximumFrequency() const;
-	static float CalculateMaximumFrequency(const HistogramType* histogram);
+  itkSetMacro(Image,mitk::Image::ConstPointer);
+  itkSetMacro(Size,int);
+  itkGetConstMacro(Size,int);
+  itkGetConstObjectMacro(Histogram,HistogramType);
+  
+  // TODO: calculate if needed in GetHistogram()
+  void ComputeHistogram();
+  float GetMaximumFrequency() const;
+  static float CalculateMaximumFrequency(const HistogramType* histogram);
 protected:
-	HistogramGenerator();
+  HistogramGenerator();
 
-	virtual ~HistogramGenerator();
+  virtual ~HistogramGenerator();
        
-	mitk::Image::ConstPointer m_Image;
-	int m_Size;
-	HistogramType::ConstPointer m_Histogram;
+  mitk::Image::ConstPointer m_Image;
+  int m_Size;
+  HistogramType::ConstPointer m_Histogram;
 };
 
 } // namespace mitk

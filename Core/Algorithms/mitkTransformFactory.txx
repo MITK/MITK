@@ -50,7 +50,7 @@ namespace mitk {
     }
     else
     {
-  	  m_FixedImage3D = reinterpret_cast<FixedImage3DType*>(fixed);;
+      m_FixedImage3D = reinterpret_cast<FixedImage3DType*>(fixed);;
       m_FixedImage = fixed;
     }
   }
@@ -58,7 +58,7 @@ namespace mitk {
   template < class TPixelType, unsigned int VImageDimension >
   void TransformFactory< TPixelType, VImageDimension >::SetMovingImage(MovingImageType* moving)
   {
-	  if (VImageDimension == 2)
+    if (VImageDimension == 2)
     {
       m_MovingImage2D = reinterpret_cast<MovingImage2DType*>(moving);
       m_MovingImage = moving;
@@ -66,7 +66,7 @@ namespace mitk {
     else
     {
       m_MovingImage3D = reinterpret_cast<MovingImage3DType*>(moving);
-  	  m_MovingImage = moving;
+      m_MovingImage = moving;
     }
   }
 
@@ -149,11 +149,11 @@ namespace mitk {
     TransformFactory< TPixelType, VImageDimension >::GetTransform()
   {
     int transform = m_TransformParameters->GetTransform();
-	  if (transform == TransformParameters::TRANSLATIONTRANSFORM)
+    if (transform == TransformParameters::TRANSLATIONTRANSFORM)
     {
-	  typename itk::TranslationTransform< double, VImageDimension>::Pointer transformPointer = itk::TranslationTransform< double, VImageDimension>::New();
+    typename itk::TranslationTransform< double, VImageDimension>::Pointer transformPointer = itk::TranslationTransform< double, VImageDimension>::New();
       transformPointer->SetIdentity();
-	  return transformPointer.GetPointer();
+    return transformPointer.GetPointer();
     }
     else if (transform == TransformParameters::SCALETRANSFORM)
     {
@@ -169,14 +169,14 @@ namespace mitk {
     }
     else if (transform == TransformParameters::AFFINETRANSFORM)
     {
-      typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();		
+      typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();    
       transformPointer->SetIdentity();
       if (m_TransformParameters->GetTransformInitializerOn())
-	    {
-	      typedef typename itk::AffineTransform< double, VImageDimension >    AffineTransformType;
-	      typedef typename itk::CenteredTransformInitializer<AffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
-	      typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-	      transformInitializer->SetFixedImage( m_FixedImage );
+      {
+        typedef typename itk::AffineTransform< double, VImageDimension >    AffineTransformType;
+        typedef typename itk::CenteredTransformInitializer<AffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+        typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
+        transformInitializer->SetFixedImage( m_FixedImage );
         transformInitializer->SetMovingImage( m_MovingImage );
         transformInitializer->SetTransform( transformPointer );
         if (m_TransformParameters->GetMomentsOn())
@@ -188,7 +188,7 @@ namespace mitk {
           transformInitializer->GeometryOn();
         }
         transformInitializer->InitializeTransform();        
-	    }
+      }
       m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
       m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
       m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
@@ -200,11 +200,11 @@ namespace mitk {
       typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::Pointer transformPointer = itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::New();
       transformPointer->SetIdentity();
       if (m_TransformParameters->GetTransformInitializerOn())
-	    {
-	      typedef typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension >    FixedCenterOfRotationAffineTransformType;
-	      typedef typename itk::CenteredTransformInitializer<FixedCenterOfRotationAffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
-	      typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-	      transformInitializer->SetFixedImage( m_FixedImage );
+      {
+        typedef typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension >    FixedCenterOfRotationAffineTransformType;
+        typedef typename itk::CenteredTransformInitializer<FixedCenterOfRotationAffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+        typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
+        transformInitializer->SetFixedImage( m_FixedImage );
         transformInitializer->SetMovingImage( m_MovingImage );
         transformInitializer->SetTransform( transformPointer );
         if (m_TransformParameters->GetMomentsOn())
@@ -219,7 +219,7 @@ namespace mitk {
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
         transformInitializer->InitializeTransform();        
-	    }
+      }
       return transformPointer.GetPointer();
     }
     else if (transform == TransformParameters::RIGID3DTRANSFORM)
@@ -227,60 +227,60 @@ namespace mitk {
       //return MakeRigidTransform<VImageDimension>();
       if (VImageDimension == 3)
       {
-	      typename itk::Rigid3DTransform< double >::Pointer transformPointer = itk::Rigid3DTransform< double >::New();
+        typename itk::Rigid3DTransform< double >::Pointer transformPointer = itk::Rigid3DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::EULER3DTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::Euler3DTransform< double >::Pointer transformPointer = itk::Euler3DTransform< double >::New();
+        typename itk::Euler3DTransform< double >::Pointer transformPointer = itk::Euler3DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::CENTEREDEULER3DTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::CenteredEuler3DTransform< double >::Pointer transformPointer = itk::CenteredEuler3DTransform< double >::New();
+        typename itk::CenteredEuler3DTransform< double >::Pointer transformPointer = itk::CenteredEuler3DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::QUATERNIONRIGIDTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::QuaternionRigidTransform< double >::Pointer transformPointer = itk::QuaternionRigidTransform< double >::New();
+        typename itk::QuaternionRigidTransform< double >::Pointer transformPointer = itk::QuaternionRigidTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::VERSORTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::VersorTransform< double >::Pointer transformPointer = itk::VersorTransform< double >::New();
+        typename itk::VersorTransform< double >::Pointer transformPointer = itk::VersorTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::VERSORRIGID3DTRANSFORM)
@@ -291,10 +291,10 @@ namespace mitk {
         transformPointer->SetIdentity();
         typedef typename itk::VersorRigid3DTransform< double >    VersorRigid3DTransformType;
         if (m_TransformParameters->GetTransformInitializerOn())
-	      {
-	        typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
-	        typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-	        transformInitializer->SetFixedImage( m_FixedImage3D );
+        {
+          typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
+          typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
+          transformInitializer->SetFixedImage( m_FixedImage3D );
           transformInitializer->SetMovingImage( m_MovingImage3D );
           transformInitializer->SetTransform( transformPointer );
           if (m_TransformParameters->GetMomentsOn())
@@ -325,57 +325,57 @@ namespace mitk {
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::ScaleSkewVersor3DTransform< double >::Pointer transformPointer = itk::ScaleSkewVersor3DTransform< double >::New();
+        typename itk::ScaleSkewVersor3DTransform< double >::Pointer transformPointer = itk::ScaleSkewVersor3DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::SIMILARITY3DTRANSFORM)
     {
       if (VImageDimension == 3)
       {
-	      typename itk::Similarity3DTransform< double >::Pointer transformPointer = itk::Similarity3DTransform< double >::New();
+        typename itk::Similarity3DTransform< double >::Pointer transformPointer = itk::Similarity3DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
         m_TransformParameters->SetTransformCenterZ(transformPointer->GetCenter()[2]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::RIGID2DTRANSFORM)
     {
       if (VImageDimension == 2)
       {
-	      typename itk::Rigid2DTransform< double >::Pointer transformPointer = itk::Rigid2DTransform< double >::New();
+        typename itk::Rigid2DTransform< double >::Pointer transformPointer = itk::Rigid2DTransform< double >::New();
         transformPointer->SetIdentity();
         transformPointer->SetAngle( m_TransformParameters->GetAngle() );
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::CENTEREDRIGID2DTRANSFORM)
     {
       if (VImageDimension == 2)
       {
-	      typename itk::CenteredRigid2DTransform< double >::Pointer transformPointer = itk::CenteredRigid2DTransform< double >::New();
+        typename itk::CenteredRigid2DTransform< double >::Pointer transformPointer = itk::CenteredRigid2DTransform< double >::New();
         transformPointer->SetIdentity();
         if (m_TransformParameters->GetTransformInitializerOn())
-	      {
-	        typedef typename itk::CenteredRigid2DTransform< double >    CenteredRigid2DTransformType;
-	        typedef typename itk::CenteredTransformInitializer<CenteredRigid2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
-	        typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-	        transformInitializer->SetFixedImage( m_FixedImage2D );
+        {
+          typedef typename itk::CenteredRigid2DTransform< double >    CenteredRigid2DTransformType;
+          typedef typename itk::CenteredTransformInitializer<CenteredRigid2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
+          typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
+          transformInitializer->SetFixedImage( m_FixedImage2D );
           transformInitializer->SetMovingImage( m_MovingImage2D );
           transformInitializer->SetTransform( transformPointer );
           if (m_TransformParameters->GetMomentsOn())
@@ -391,45 +391,45 @@ namespace mitk {
         transformPointer->SetAngle( m_TransformParameters->GetAngle() );
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::EULER2DTRANSFORM)
     {
       if (VImageDimension == 2)
       {
-	      typename itk::Euler2DTransform< double >::Pointer transformPointer = itk::Euler2DTransform< double >::New();
+        typename itk::Euler2DTransform< double >::Pointer transformPointer = itk::Euler2DTransform< double >::New();
         transformPointer->SetIdentity();
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::SIMILARITY2DTRANSFORM)
     {
       if (VImageDimension == 2)
       {
-	      typename itk::Similarity2DTransform< double >::Pointer transformPointer = itk::Similarity2DTransform< double >::New();
+        typename itk::Similarity2DTransform< double >::Pointer transformPointer = itk::Similarity2DTransform< double >::New();
         transformPointer->SetIdentity();
         transformPointer->SetScale( m_TransformParameters->GetScale() );
         transformPointer->SetAngle( m_TransformParameters->GetAngle() );
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     else if (transform == TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
     {
       if (VImageDimension == 2)
       {
-	      typename itk::CenteredSimilarity2DTransform< double >::Pointer transformPointer = itk::CenteredSimilarity2DTransform< double >::New();
+        typename itk::CenteredSimilarity2DTransform< double >::Pointer transformPointer = itk::CenteredSimilarity2DTransform< double >::New();
         transformPointer->SetIdentity();
         if (m_TransformParameters->GetTransformInitializerOn())
-	      {
-	        typedef typename itk::CenteredSimilarity2DTransform< double >    CenteredSimilarity2DTransformType;
-	        typedef typename itk::CenteredTransformInitializer<CenteredSimilarity2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
-	        typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-	        transformInitializer->SetFixedImage( m_FixedImage2D );
+        {
+          typedef typename itk::CenteredSimilarity2DTransform< double >    CenteredSimilarity2DTransformType;
+          typedef typename itk::CenteredTransformInitializer<CenteredSimilarity2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
+          typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
+          transformInitializer->SetFixedImage( m_FixedImage2D );
           transformInitializer->SetMovingImage( m_MovingImage2D );
           transformInitializer->SetTransform( transformPointer );
           if (m_TransformParameters->GetMomentsOn())
@@ -441,12 +441,12 @@ namespace mitk {
             transformInitializer->GeometryOn();
           }
           transformInitializer->InitializeTransform();        
-	      }
+        }
         transformPointer->SetScale( m_TransformParameters->GetScale() );
         transformPointer->SetAngle( m_TransformParameters->GetAngle() );
         m_TransformParameters->SetTransformCenterX(transformPointer->GetCenter()[0]);
         m_TransformParameters->SetTransformCenterY(transformPointer->GetCenter()[1]);
-	      return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
+        return reinterpret_cast<TransformType*>(transformPointer.GetPointer());
       }
     }
     return NULL;

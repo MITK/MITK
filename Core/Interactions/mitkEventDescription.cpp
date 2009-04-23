@@ -24,11 +24,11 @@ mitk::EventDescription::EventDescription(int type, int button, int buttonState, 
 
 std::string mitk::EventDescription::GetName() const
 {
-	return m_Name;
+  return m_Name;
 }
 
 int mitk::EventDescription::GetId() const
 {
-	return m_Id;
+  return m_Id;
 }
 

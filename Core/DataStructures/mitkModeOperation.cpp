@@ -30,5 +30,5 @@ mitk::ModeOperation::~ModeOperation()
 
 mitk::ModeOperation::ModeType mitk::ModeOperation::GetMode()
 {
-	return m_Mode;
+  return m_Mode;
 }

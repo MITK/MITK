@@ -319,24 +319,24 @@ bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
 
 void mitk::Surface::ExecuteOperation(Operation *operation)
 {
-	switch ( operation->GetOperationType() )
-	{
-	case OpSURFACECHANGED:
-	
-		mitk::SurfaceOperation* surfOp = dynamic_cast<mitk::SurfaceOperation*>(operation);
-		if( ! surfOp ) break;
+  switch ( operation->GetOperationType() )
+  {
+  case OpSURFACECHANGED:
+  
+    mitk::SurfaceOperation* surfOp = dynamic_cast<mitk::SurfaceOperation*>(operation);
+    if( ! surfOp ) break;
 
-		unsigned int time = surfOp->GetTimeStep();
+    unsigned int time = surfOp->GetTimeStep();
 
-		if(m_PolyDataSeries[ time ] != NULL)
-		{
-			vtkPolyData* updatePoly = surfOp->GetVtkPolyData();
-			if( updatePoly ){
-				this->SetVtkPolyData( updatePoly, time );
-				this->CalculateBoundingBox();
-			}
-		}
-		break;
-	}
-	this->Modified();
+    if(m_PolyDataSeries[ time ] != NULL)
+    {
+      vtkPolyData* updatePoly = surfOp->GetVtkPolyData();
+      if( updatePoly ){
+        this->SetVtkPolyData( updatePoly, time );
+        this->CalculateBoundingBox();
+      }
+    }
+    break;
+  }
+  this->Modified();
 }

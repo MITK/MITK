@@ -39,7 +39,7 @@ mitk::PointLocator::PointLocator()
 mitk::PointLocator::~PointLocator()
 {
   if ( m_SearchTreeInitialized )
-  	DestroyANN();
+    DestroyANN();
 }
 
 

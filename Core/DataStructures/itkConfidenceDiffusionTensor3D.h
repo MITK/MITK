@@ -48,7 +48,7 @@ namespace itk {
     Self& operator= (const Superclass & r);
     Self& operator= (const ComponentType& r);
     Self& operator= (const ComponentArrayType r);
-		
+    
     TComponent GetConfidence()
     {return m_Confidence;}
 

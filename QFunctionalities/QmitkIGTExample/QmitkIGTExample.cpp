@@ -326,7 +326,7 @@ void QmitkIGTExample::OnTestNavigation()
         pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(2.0)); // enlarge visualization of points
         pointSetNode->SetProperty("contoursize", mitk::FloatProperty::New(1.0)); // enlarge visualization of trajectory line
         pointSetNode->SetBoolProperty("show contour", true);
-		pointSetNode->SetBoolProperty("updateDataOnRender", false); // do not call Update() on the pointset during render (this would cause a execution of the pipeline that is still connected to the pointset)
+    pointSetNode->SetBoolProperty("updateDataOnRender", false); // do not call Update() on the pointset during render (this would cause a execution of the pipeline that is still connected to the pointset)
 
         mitk::DataStorage::GetInstance()->Add(pointSetNode); //add it to the DataStorage
         out->append(QString("Creating Pointset %1 for trajectory visualization").arg(i));

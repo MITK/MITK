@@ -67,20 +67,20 @@ void mitk::ImageToItk<TOutputImage>::SetInput( unsigned int index, const mitk::I
 template<class TOutputImage>
 const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void) 
 {
-	if (this->GetNumberOfInputs() < 1)
-	{
-		return 0;
-	}
+  if (this->GetNumberOfInputs() < 1)
+  {
+    return 0;
+  }
 
-	return static_cast< const mitk::Image * >
-		(itk::ProcessObject::GetInput(0) );
+  return static_cast< const mitk::Image * >
+    (itk::ProcessObject::GetInput(0) );
 }
 
 template<class TOutputImage>
 const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(unsigned int idx)
 {
-	return static_cast< mitk::Image * >
-		(itk::ProcessObject::GetInput(idx));
+  return static_cast< mitk::Image * >
+    (itk::ProcessObject::GetInput(idx));
 }
 
 template<class TOutputImage>

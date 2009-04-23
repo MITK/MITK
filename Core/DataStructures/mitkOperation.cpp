@@ -29,5 +29,5 @@ mitk::Operation::~Operation()
 
 mitk::OperationType mitk::Operation::GetOperationType()
 {
-	return m_OperationType;
+  return m_OperationType;
 }

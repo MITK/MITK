@@ -123,9 +123,9 @@ namespace mitk {
 
     //DOUBLE_POSITION_MATRIX_TIME_Q_RECORD record, *pRecord;  ///< One tracking data record (matrix orientation format)
     DOUBLE_POSITION_QUATERNION_TIME_Q_RECORD record, *pRecord; ///< One tracking data record (quaternion orientation format)
-    SYSTEM_CONFIGURATION		m_SystemConfig;         ///< The system configuration - used to specify its use
-    SENSOR_CONFIGURATION		*m_SensorConfig;        ///< The sensor configuration - used to get and set the sensor properties
-    TRANSMITTER_CONFIGURATION	*m_TransmitterConfig; ///< The transmitter configuration - used to get and set the transmitter properties
+    SYSTEM_CONFIGURATION    m_SystemConfig;         ///< The system configuration - used to specify its use
+    SENSOR_CONFIGURATION    *m_SensorConfig;        ///< The sensor configuration - used to get and set the sensor properties
+    TRANSMITTER_CONFIGURATION  *m_TransmitterConfig; ///< The transmitter configuration - used to get and set the transmitter properties
     BOOL m_metric;            ///< Specifies whether metric measurement is used
     double m_measurementRate; ///< Specifies the measurement rate - default set to maximum
     double m_pl;              ///< Specifies the power line frequency (Europe 50Hz, USA 60Hz)

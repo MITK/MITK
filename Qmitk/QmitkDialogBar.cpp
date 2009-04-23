@@ -94,7 +94,7 @@ QmitkDialogBar
   // Reflect new visible state in global preferences
   if ( m_GlobalOptions )
   {
-		std::string dialogBarStateName = "DialogBar " + m_Caption + " active";
+    std::string dialogBarStateName = "DialogBar " + m_Caption + " active";
 
     m_GlobalOptions->SetProperty( 
       dialogBarStateName, mitk::BoolProperty::New( visible ) );

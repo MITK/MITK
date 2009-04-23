@@ -65,7 +65,7 @@ MakeCastImageFilter(  ItkInputImageType* inputImage )
     result->InitializeByItk(itkpipeline->GetOutput());                                              \
     result->SetVolume(itkpipeline->GetOutput()->GetBufferPointer());                           \
 }                                                              
-//		_calculateItkPipelineFunction(result, mitkimage, itkpipeline<type, dimension>::New());     
+//    _calculateItkPipelineFunction(result, mitkimage, itkpipeline<type, dimension>::New());     
 
 #define ItkFunctionMultiplexer(result, mitkSourceImage, itkfunction)                                     \
 {                                                                                                  \

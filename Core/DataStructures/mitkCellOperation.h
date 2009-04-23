@@ -33,12 +33,12 @@ class MITK_CORE_EXPORT CellOperation : public Operation
 {
   public:
     mitkClassMacro(CellOperation, Operation);
-	//##Documentation
-	//##@brief constructor
-	//##
-	//## @param
-	//## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
-	//## cellId: Id of the cell and a vector if needed
+  //##Documentation
+  //##@brief constructor
+  //##
+  //## @param
+  //## operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //## cellId: Id of the cell and a vector if needed
     CellOperation(OperationType operationType, int cellId, Vector3D vector);
     
     CellOperation(OperationType operationType, int cellId);

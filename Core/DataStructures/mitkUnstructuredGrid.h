@@ -37,7 +37,7 @@ class MITK_CORE_EXPORT UnstructuredGrid : public BaseData
 public:
   // not yet the best chioce of a region-type for surfaces, but it works for the time being
   typedef itk::ImageRegion< 5 >  RegionType;  
-	
+  
   mitkClassMacro(UnstructuredGrid, BaseData);
   
   itkNewMacro(Self);
@@ -65,9 +65,9 @@ public:
 
   const RegionType& GetLargestPossibleRegion() const
   {
-	  m_LargestPossibleRegion.SetIndex(3, 0);
-	  m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
-	  return m_LargestPossibleRegion;
+    m_LargestPossibleRegion.SetIndex(3, 0);
+    m_LargestPossibleRegion.SetSize(3, GetTimeSlicedGeometry()->GetTimeSteps());
+    return m_LargestPossibleRegion;
   }
 
   //##Documentation

@@ -154,7 +154,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
       /* create operation with position difference */
       mitk::PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPosition, 0); // Index is not used here
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         mitk::Point3D oldPosition=geometry->GetCornerPoint(0);
 
@@ -197,7 +197,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
       mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, dataPosition, rotationaxis, angle);
 
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         RotationOperation* undoOp = new mitk::RotationOperation(OpROTATE, dataPosition, rotationaxis, -angle);
         OperationEvent *operationEvent = new OperationEvent(geometry, doOp, undoOp);
@@ -245,7 +245,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 
       /* generate Operation and send it to the receiving geometry */
       PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0); // Index is not used here
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         mitk::Point3D oldScaleData;
         oldScaleData[0] = -newScale[0];

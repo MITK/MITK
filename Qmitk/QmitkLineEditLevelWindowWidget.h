@@ -51,8 +51,8 @@ public:
   QLineEdit* m_WindowInput;
 
   /*!
-  *	data structure which stores the values manipulated
-  *	by a QmitkLineEditLevelWindowWidget
+  *  data structure which stores the values manipulated
+  *  by a QmitkLineEditLevelWindowWidget
   */
   mitk::LevelWindow m_LevelWindow;
 
@@ -110,7 +110,7 @@ protected:
   bool m_IsObserverTagSet;
 
   /*!
-  *	data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
+  *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
 

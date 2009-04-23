@@ -194,7 +194,7 @@ public slots:
 protected:
 
   /** \brief Vector with all added components */
-	//std::vector<std::list<QmitkBaseFunctionalityComponent*>> m_WidgetStackAddedChildList;  
+  //std::vector<std::list<QmitkBaseFunctionalityComponent*>> m_WidgetStackAddedChildList;  
 
   /** \brief Method to update the content of all DataTreeComboBoxes. */
   virtual void UpdateDataTreeComboBoxes();

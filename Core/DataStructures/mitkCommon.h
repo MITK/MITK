@@ -34,10 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
 typedef unsigned int MapperSlotId;
 
 #define mitkClassMacro(className,SuperClassName) \
-	typedef className				Self; \
-	typedef SuperClassName			Superclass; \
-	typedef itk::SmartPointer<Self> Pointer; \
-	typedef itk::SmartPointer<const Self>  ConstPointer; \
+  typedef className        Self; \
+  typedef SuperClassName      Superclass; \
+  typedef itk::SmartPointer<Self> Pointer; \
+  typedef itk::SmartPointer<const Self>  ConstPointer; \
     itkTypeMacro(className,SuperClassName)
 /**
 * Macro for Constructors with one parameter for classes derived from itk::Lightobject

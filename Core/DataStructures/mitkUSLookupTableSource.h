@@ -74,16 +74,16 @@ protected:
      * 
      * @returns a vtkLookupTable
      */
-		vtkLookupTable* BuildStrainRateLookupTable();
+    vtkLookupTable* BuildStrainRateLookupTable();
 
     /**
      * Generates a default lookup table
      * @returns a vtkLookupTable
      */
-		vtkLookupTable* BuildDefaultLookupTable();
+    vtkLookupTable* BuildDefaultLookupTable();
     
     
-	
+  
 private:
     LookupTableMode m_Mode;
     OutputTypePointer m_LookupTable;

@@ -39,8 +39,8 @@ QmitkDataManager::~QmitkDataManager()
 QString QmitkDataManager::GetFunctionalityName()
 {
   //return "DataManager";
-	return name();
-	
+  return name();
+  
 }
 
 QWidget * QmitkDataManager::CreateMainWidget(QWidget *parent)

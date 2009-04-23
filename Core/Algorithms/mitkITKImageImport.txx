@@ -62,12 +62,12 @@ void mitk::ITKImageImport<TInputImage>::SetGeometry(const Geometry3D* geometry)
 template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::GenerateOutputInformation()
 {
-	InputImageConstPointer input  = this->GetInput();
-	mitk::Image::Pointer output = this->GetOutput();
+  InputImageConstPointer input  = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
 
-	itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<<"GenerateOutputInformation()");
 
-	output->InitializeByItk(input.GetPointer());
+  output->InitializeByItk(input.GetPointer());
 
   if(m_Geometry.IsNotNull())
   {
@@ -78,8 +78,8 @@ void mitk::ITKImageImport<TInputImage>::GenerateOutputInformation()
 template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::GenerateData()
 {
-	InputImageConstPointer input  = this->GetInput();
-	mitk::Image::Pointer output = this->GetOutput();
+  InputImageConstPointer input  = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
 
   output->SetImportChannel((void*)input->GetBufferPointer(), 0, mitk::Image::ReferenceMemory); 
 }
@@ -114,10 +114,10 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(unsigned int idx, itk::Data
     // copy buffer of input to output, because we
     // cannot guarantee that the input (to which our
     // output is refering) will stay alive.
-  	InputImageConstPointer input = this->GetInput();
-  	mitk::Image::Pointer currentOutput = this->GetOutput();
-  	if(input.IsNotNull() && currentOutput.IsNotNull())
-  	  currentOutput->SetChannel(input->GetBufferPointer());
+    InputImageConstPointer input = this->GetInput();
+    mitk::Image::Pointer currentOutput = this->GetOutput();
+    if(input.IsNotNull() && currentOutput.IsNotNull())
+      currentOutput->SetChannel(input->GetBufferPointer());
   }
   Superclass::SetNthOutput(idx, output);
 }

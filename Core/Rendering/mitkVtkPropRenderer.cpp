@@ -539,7 +539,7 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
 */
 vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
-	return this->m_TextCollection[text_id]->GetTextProperty();
+  return this->m_TextCollection[text_id]->GetTextProperty();
 }
 
 void mitk::VtkPropRenderer::InitPathTraversal()

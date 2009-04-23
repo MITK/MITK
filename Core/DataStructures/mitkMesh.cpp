@@ -556,13 +556,13 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     ////the cell has to exist!
     //{
     //mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
-    //	if (lineOp == NULL)//if no lineoperation, then call superclass pointSet
+    //  if (lineOp == NULL)//if no lineoperation, then call superclass pointSet
     // {
     //    Superclass::ExecuteOperation(operation);
     //  }
     //    int cellId = lineOp->GetCellId();
     //    int pIdC = lineOp->GetPIdC();
-    //	int pIdA = lineOp->GetPIdA();
+    //  int pIdA = lineOp->GetPIdA();
     //    int pIdB = lineOp->GetPIdB();
 
     //    //the points of the given PointIds have to exist in the PointSet
@@ -573,7 +573,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     //    ok = m_PointSetSeries[0]->GetPoints()->IndexExists(pIdB);
     //    if (!ok) 
     //      return;
-    //	ok = m_PointSetSeries[0]->GetPoints()->IndexExists(pIdC);
+    //  ok = m_PointSetSeries[0]->GetPoints()->IndexExists(pIdC);
     //    if (!ok) 
     //      return;
 
@@ -581,20 +581,20 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     //    // with the given Id
     //    DataType::CellAutoPointer cell;
     //    ok = m_PointSetSeries[0]->GetCell(cellId, cell);
-    //	if (!ok)
-    //		return;
+    //  if (!ok)
+    //    return;
 
-    //	//pIdA and pIdB should exist in the cell
+    //  //pIdA and pIdB should exist in the cell
     //    
-    //	PointIdIterator pit = cell->PointIdsBegin();
+    //  PointIdIterator pit = cell->PointIdsBegin();
     //    PointIdIterator end = cell->PointIdsEnd();
     //    
-    //	//now arrange the new Ids in the cell like desired; pIdC between 
+    //  //now arrange the new Ids in the cell like desired; pIdC between 
     //  // pIdA and pIdB
     //  unsigned int nuPoints = cell->GetNumberOfPoints();
 
-    //	std::vector<unsigned int> newPoints;
-    //	pit = cell->PointIdsBegin();
+    //  std::vector<unsigned int> newPoints;
+    //  pit = cell->PointIdsBegin();
     //    end = cell->PointIdsEnd();
     //    int i = 0;
     //    while( pit != end )
@@ -611,12 +611,12 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
     //      pit++;
     //    }
 
-    //	//now we have the Ids, that existed before combined with the new ones
+    //  //now we have the Ids, that existed before combined with the new ones
     //  //so delete the old cell
     //  //doesn't seem to be necessary!
-    //	//cell->ClearPoints();
-    //	pit = cell->PointIdsBegin();
-    //	cell->SetPointIds(pit);
+    //  //cell->ClearPoints();
+    //  pit = cell->PointIdsBegin();
+    //  cell->SetPointIds(pit);
     //}
     break;
 

@@ -22,12 +22,12 @@ PURPOSE.  See the above copyright notices for more information.
 /**
  * Konstruktor
  */
-QmitkSocketClient::QmitkSocketClient() :	socket( this ), connectionAdvance(0), maxConnectionAdvance(2000) {
+QmitkSocketClient::QmitkSocketClient() :  socket( this ), connectionAdvance(0), maxConnectionAdvance(2000) {
 
-	QObject::connect( &socket, SIGNAL(connected()), this, SLOT(connected()) );	
-	QObject::connect( &socket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()) );		
-	connect( &socket, SIGNAL( error( int ) ) , this, SLOT ( error( int ) ) );	
-	connect( &timer, SIGNAL( timeout() ) , this, SLOT ( timeout() ) );
+  QObject::connect( &socket, SIGNAL(connected()), this, SLOT(connected()) );  
+  QObject::connect( &socket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()) );    
+  connect( &socket, SIGNAL( error( int ) ) , this, SLOT ( error( int ) ) );  
+  connect( &timer, SIGNAL( timeout() ) , this, SLOT ( timeout() ) );
   mitk::SocketClient::SetImplementationInstance(this);
 }
 
@@ -36,8 +36,8 @@ QmitkSocketClient::QmitkSocketClient() :	socket( this ), connectionAdvance(0), m
  */
 QmitkSocketClient::~QmitkSocketClient() {
 
-	disconnect( &socket, SIGNAL(connected()), this, SLOT(connected()) );	
-	disconnect( &socket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()) );
+  disconnect( &socket, SIGNAL(connected()), this, SLOT(connected()) );  
+  disconnect( &socket, SIGNAL(connectionClosed()), this, SLOT(connectionClosed()) );
 }
 
 
@@ -47,7 +47,7 @@ QmitkSocketClient::~QmitkSocketClient() {
  */
 void QmitkSocketClient::setMaxConnectionAdvance( int maxConnectionAdvance ) {
 
-	this->maxConnectionAdvance = maxConnectionAdvance;
+  this->maxConnectionAdvance = maxConnectionAdvance;
 }
 
 /**
@@ -55,9 +55,9 @@ void QmitkSocketClient::setMaxConnectionAdvance( int maxConnectionAdvance ) {
  */
 void QmitkSocketClient::open( const char* ipAddress, unsigned short port ) {
 
-	this->ipAddress = ipAddress;
-	this->port = port;
-	socket.connectToHost ( ipAddress, port );
+  this->ipAddress = ipAddress;
+  this->port = port;
+  socket.connectToHost ( ipAddress, port );
 }
 
 /**
@@ -65,7 +65,7 @@ void QmitkSocketClient::open( const char* ipAddress, unsigned short port ) {
  */
 void QmitkSocketClient::connected() {
 
-	std::cout << "conected to " << ipAddress.ascii() << " port " << port << std::endl;
+  std::cout << "conected to " << ipAddress.ascii() << " port " << port << std::endl;
 }
 
 /**
@@ -73,8 +73,8 @@ void QmitkSocketClient::connected() {
  */
 void QmitkSocketClient::connectionClosed() {
 
-	disconnect( &socket, SIGNAL(readyRead()), this, SLOT(readyRead()) );
-	std::cout << "connectionClosed" << std::endl;
+  disconnect( &socket, SIGNAL(readyRead()), this, SLOT(readyRead()) );
+  std::cout << "connectionClosed" << std::endl;
 }
 
 /**
@@ -85,24 +85,24 @@ bool QmitkSocketClient::send( unsigned int messagetype, unsigned int bodySize, c
   if ( messagetype > 7 )
     std::cout << "fehler!!!!!!!" << std::endl;
 
-	char* wb = writeBuffer;	
-	*((unsigned int*) wb) = messagetype;
-	wb += 4;
+  char* wb = writeBuffer;  
+  *((unsigned int*) wb) = messagetype;
+  wb += 4;
 
-	*(unsigned int*) wb = bodySize;
-	wb += 4;
+  *(unsigned int*) wb = bodySize;
+  wb += 4;
 
-	for ( unsigned int i=0; i < bodySize; i++ )
-		*(wb++) = *(body++);
+  for ( unsigned int i=0; i < bodySize; i++ )
+    *(wb++) = *(body++);
 
-	int length = 8 + bodySize;
+  int length = 8 + bodySize;
 
-	int a = socket.writeBlock ( writeBuffer, length);
+  int a = socket.writeBlock ( writeBuffer, length);
 
-	if ( a == length )
-		return true;
-	else 
-		return false;
+  if ( a == length )
+    return true;
+  else 
+    return false;
 }
 
 /**
@@ -112,19 +112,19 @@ void QmitkSocketClient::error( int nr ) {
 
   std::cout << "Error: Ende " << nr << " Versuch Nummer: "<< connectionAdvance << std::endl;
 
-	if ( connectionAdvance < maxConnectionAdvance ) {
+  if ( connectionAdvance < maxConnectionAdvance ) {
 
-		connectionAdvance++;
-		std::cout << "In einer Sekunde wird ein erneuter Versuch unternommen" << std::endl;
-		timer.start ( 2000, true );
-	}
+    connectionAdvance++;
+    std::cout << "In einer Sekunde wird ein erneuter Versuch unternommen" << std::endl;
+    timer.start ( 2000, true );
+  }
 }
 
 /**
  *
  */
 void QmitkSocketClient::timeout() {
-	
-	std::cout << "Neuer versuch eine Verbindung aufzubauen zu " << ipAddress.ascii() << " Port: " << port << std::endl;
-	socket.connectToHost( ipAddress, port );		
+  
+  std::cout << "Neuer versuch eine Verbindung aufzubauen zu " << ipAddress.ascii() << " Port: " << port << std::endl;
+  socket.connectToHost( ipAddress, port );    
 }

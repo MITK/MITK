@@ -237,7 +237,7 @@ void QmitkNumberPropertyEditor::onValueChanged(int value)
     
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         m_ShortProperty->SetValue(ROUND_SHORT(newValue));
@@ -283,14 +283,14 @@ void QmitkNumberPropertyEditor::DisplayNumber()
   m_SelfChangeLock = true;
   switch (m_DataType)
   {
-	/*
+  /*
     case DT_SHORT:
       {
         short s = m_ShortProperty->GetValue();
         QSpinBox::setValue( s );
         break;
       }
-	*/
+  */
     case DT_INT:
       {
         int i = m_IntProperty->GetValue();

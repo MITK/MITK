@@ -100,7 +100,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
       v[0]=point[0]-center[0];
       v[1]=point[1]-center[1];
       v[2]=point[2]-center[2];
-      if (v.GetNorm() < radius) radius = v.GetNorm();			
+      if (v.GetNorm() < radius) radius = v.GetNorm();      
     }
     break;
   case 1/*MAX*/:
@@ -112,7 +112,7 @@ void mitk::SphereLandmarkProjector::ProjectLandmarks(
       v[0]=point[0]-center[0];
       v[1]=point[1]-center[1];
       v[2]=point[2]-center[2];
-      if (v.GetNorm() > radius) radius = v.GetNorm();			
+      if (v.GetNorm() > radius) radius = v.GetNorm();      
     }
     break;
   case 2/*AVERAGE*/:

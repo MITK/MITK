@@ -172,9 +172,9 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
   {
     m_Plane = static_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
 
-		BoundingBox::BoundsArrayType b=m_Plane->GetBoundingBox()->GetBounds();
+    BoundingBox::BoundsArrayType b=m_Plane->GetBoundingBox()->GetBounds();
 
-		SetParametricBounds(b);
+    SetParametricBounds(b);
 
     CalculateFrameGeometry();
   }

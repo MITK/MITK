@@ -88,7 +88,7 @@ public:
   virtual void Activated();
   virtual void TreeChanged() 
   {
-  	update();
+    update();
   };
   static bool test();
   static QmitkFunctionality* CreateInstance( QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL );

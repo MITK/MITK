@@ -747,10 +747,10 @@ public:
 
     typedef typename MeshType::MeshTraits   OMeshTraits;
     typedef typename OMeshTraits::PixelType       OPixelType; 
-    typedef typename MeshType::CellTraits					CellTraits;
+    typedef typename MeshType::CellTraits          CellTraits;
     typedef typename itk::CellInterface<OPixelType, CellTraits>   CellInterfaceType;
     typedef typename itk::TriangleCell<CellInterfaceType>         TriCellType;
-    typedef typename TriCellType::CellAutoPointer	           TriCellPointer;
+    typedef typename TriCellType::CellAutoPointer             TriCellPointer;
 
     TriCellPointer newCell;
     output->GetCells()->Reserve( poly->GetNumberOfPolys() + poly->GetNumberOfStrips() );
@@ -929,7 +929,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::LineCell< typename MeshType::CellType >, 
-      SingleCellArrayUserVisitorType>			          SingleCellArrayLineVisitor;
+      SingleCellArrayUserVisitorType>                SingleCellArrayLineVisitor;
 
     /*! 
     default SingleCellArray polygon cell visitior definition 
@@ -937,7 +937,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::PolygonCell< typename MeshType::CellType >, 
-      SingleCellArrayUserVisitorType>			          SingleCellArrayPolygonVisitor;
+      SingleCellArrayUserVisitorType>                SingleCellArrayPolygonVisitor;
 
     /*! 
     default SingleCellArray triangle cell visitior definition 
@@ -945,7 +945,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
-      SingleCellArrayUserVisitorType>			          SingleCellArrayTriangleVisitor;
+      SingleCellArrayUserVisitorType>                SingleCellArrayTriangleVisitor;
 
 
     /*! 
@@ -1154,7 +1154,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::LineCell< typename MeshType::CellType >, 
-      DistributeUserVisitorType>			          DistributeLineVisitor;
+      DistributeUserVisitorType>                DistributeLineVisitor;
 
     /*! 
     default Distribute polygon cell visitior definition 
@@ -1162,7 +1162,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::PolygonCell< typename MeshType::CellType >, 
-      DistributeUserVisitorType>			          DistributePolygonVisitor;
+      DistributeUserVisitorType>                DistributePolygonVisitor;
 
     /*! 
     default Distribute triangle cell visitior definition 
@@ -1170,7 +1170,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
-      DistributeUserVisitorType>			          DistributeTriangleVisitor;
+      DistributeUserVisitorType>                DistributeTriangleVisitor;
 
 
     /*! 
@@ -1187,7 +1187,7 @@ public:
     typedef typename itk::CellInterfaceVisitorImplementation<typename MeshType::CellPixelType,
       typename MeshType::CellTraits,
       itk::TriangleCell<itk::CellInterface<typename MeshType::CellPixelType, typename MeshType::CellTraits > >, 
-      ExactUserVisitorType>			              ExactTriangleVisitor;
+      ExactUserVisitorType>                    ExactTriangleVisitor;
 
 
     // Get the number of points in the mesh

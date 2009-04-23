@@ -226,7 +226,7 @@ bool QmitkFctMediator::AddFunctionality(QmitkFunctionality *functionality)
       //Add the action to the toolbar containing only icons
       if ( m_IconToolBar != NULL )
       {
-        action->addTo( m_IconToolBar );		
+        action->addTo( m_IconToolBar );    
       }
 
       //Add the action to the dropdown box
@@ -717,7 +717,7 @@ void QmitkFctMediator::PopulateSearchResults()
   else
   {
     m_SearchComboBox->clear();
-    m_SearchComboBox->insertItem("No matches found.");		
+    m_SearchComboBox->insertItem("No matches found.");    
   };
 }
 

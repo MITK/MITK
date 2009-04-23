@@ -12,10 +12,10 @@ mitk::SurfaceOperation::~SurfaceOperation()
 
 vtkPolyData* mitk::SurfaceOperation::GetVtkPolyData()
 {
-	return m_polyData;
+  return m_polyData;
 }
 
 unsigned int mitk::SurfaceOperation::GetTimeStep()
 {
-	return m_timeStep;
+  return m_timeStep;
 }

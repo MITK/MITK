@@ -64,8 +64,8 @@ namespace mitk
 
     protected:
       VideoSource();
-	    virtual ~VideoSource();  
-  	  
+      virtual ~VideoSource();  
+      
       unsigned char * m_CurrentVideoTexture;
       int m_CaptureWidth, m_CaptureHeight;
       bool m_CapturingInProcess;

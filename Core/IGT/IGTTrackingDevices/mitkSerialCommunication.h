@@ -49,7 +49,7 @@ namespace mitk
   */
   class SerialCommunication : public itk::Object
   {
-  public:		
+  public:    
     mitkClassMacro(SerialCommunication, itk::Object);    
     itkNewMacro(Self);
 

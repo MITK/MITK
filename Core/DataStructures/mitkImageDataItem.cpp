@@ -116,8 +116,8 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
   unsigned long size = 0;
   if ( m_PicDescriptor->dim == 1 ) 
   {
-    inData->SetDimensions( m_PicDescriptor->n[0] -1, 1, 1);		
-    size = m_PicDescriptor->n[0];		
+    inData->SetDimensions( m_PicDescriptor->n[0] -1, 1, 1);    
+    size = m_PicDescriptor->n[0];    
     inData->SetOrigin( ((float) m_PicDescriptor->n[0]) / 2.0f, 0, 0 );
   } 
   else 

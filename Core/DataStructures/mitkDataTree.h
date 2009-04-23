@@ -40,24 +40,24 @@ typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 //##Documentation
 //## @brief typedef to a base-iterator on the data tree
 //## @ingroup DataTree
-typedef	itk::TreeIteratorBase<DataTreeBase> DataTreeIteratorBase;
+typedef  itk::TreeIteratorBase<DataTreeBase> DataTreeIteratorBase;
 
 //##Documentation
 //## @brief typedef to an iterator on the data tree
 //## @ingroup DataTree
-typedef	itk::TreeIteratorClone<DataTreeIteratorBase> DataTreeIteratorClone;
+typedef  itk::TreeIteratorClone<DataTreeIteratorBase> DataTreeIteratorClone;
 
 //##Documentation
 //## @brief typedef to a preorder-iterator on the data tree
 //## @ingroup DataTree
-typedef	itk::PreOrderTreeIterator<DataTreeBase> DataTreePreOrderIterator;
+typedef  itk::PreOrderTreeIterator<DataTreeBase> DataTreePreOrderIterator;
 
 //##Documentation
 //## @brief typedef to a children-iterator on the data tree
 //## @ingroup DataTree
-typedef	itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
+typedef  itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
 
-typedef	itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
+typedef  itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
 
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
@@ -158,8 +158,8 @@ public:
   static bool Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo = true );
   static bool Load( const mitk::DataTreeIteratorBase* it, const char* filename );
 
-  static const std::string 	XML_NODE_NAME;
-  static const std::string 	XML_TAG_TREE_NODE;
+  static const std::string   XML_NODE_NAME;
+  static const std::string   XML_TAG_TREE_NODE;
 
 protected:
   DataTree();

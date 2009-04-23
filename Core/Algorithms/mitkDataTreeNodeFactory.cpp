@@ -83,7 +83,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGridVolumeMapperProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 
-bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;		// default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 {

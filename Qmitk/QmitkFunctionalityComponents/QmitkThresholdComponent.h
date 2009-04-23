@@ -171,7 +171,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkThresholdComponentGUI * m_ThresholdComponentGUI;
 
   /** \brief This Attribute holds the information if a thresholdnode is already existing or not*/

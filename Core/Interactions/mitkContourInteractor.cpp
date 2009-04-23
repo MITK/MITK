@@ -58,8 +58,8 @@ mitk::ContourInteractor::~ContourInteractor()
 //  for (idx = 0; idx < size; idx++)
 //    if ( ((ipUInt1_t*) pic->data)[idx]> 0) break;
 //
-//  int sizePoints;	// size of the _points buffer (number of coordinate pairs that fit in)
-//  int numPoints;		// number of coordinate pairs stored in _points buffer
+//  int sizePoints;  // size of the _points buffer (number of coordinate pairs that fit in)
+//  int numPoints;    // number of coordinate pairs stored in _points buffer
 //  float *points = 0;
 //
 //  points = ipSegmentationGetContour8N( pic, idx, numPoints, sizePoints, points );

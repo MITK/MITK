@@ -180,7 +180,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
 
     /* Set data format for sensor */
     DATA_FORMAT_TYPE *pTempBuffer = &tempBuffer;
-    errorCode = SetSensorParameter(i, DATA_FORMAT, pTempBuffer, sizeof(tempBuffer));	
+    errorCode = SetSensorParameter(i, DATA_FORMAT, pTempBuffer, sizeof(tempBuffer));  
     if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
     {
       HandleError(errorCode);
@@ -396,7 +396,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
           tool->SetDataValid(true); // Set data state to valid
         }        
         toolNumber++; // Increment tool number
-      }	
+      }  
       else
       { // ERROR while reading sensor information
         HandleError(errorCode);

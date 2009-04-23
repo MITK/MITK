@@ -33,26 +33,26 @@ class QmitkSocketClient : public QObject, public mitk::SocketClientImplementatio
   Q_OBJECT
 
 protected:
-	QSocket socket;
-	QString ipAddress;
-	unsigned short port;
-	char readBuffer[256];
-	char writeBuffer[256];
-	QTimer timer;
-	int connectionAdvance;
-	int maxConnectionAdvance;
+  QSocket socket;
+  QString ipAddress;
+  unsigned short port;
+  char readBuffer[256];
+  char writeBuffer[256];
+  QTimer timer;
+  int connectionAdvance;
+  int maxConnectionAdvance;
 
 public:
-	QmitkSocketClient();
-	~QmitkSocketClient();
-	void open( const char* ipAdress, unsigned short port );
-	void setMaxConnectionAdvance( int maxConnectionAdvance );
+  QmitkSocketClient();
+  ~QmitkSocketClient();
+  void open( const char* ipAdress, unsigned short port );
+  void setMaxConnectionAdvance( int maxConnectionAdvance );
   bool send( unsigned int messagetype, unsigned int bodySize = 0, char* body = NULL );
 
 protected slots:
-	void connected ();
-	void connectionClosed();
-	void error( int );
-	void timeout();
+  void connected ();
+  void connectionClosed();
+  void error( int );
+  void timeout();
 };
 #endif // QMITKSOCKET_CLIENT

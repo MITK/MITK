@@ -55,7 +55,7 @@ mitk::StateMachine::StateMachine(const char * type)
   //\*todo: @todo:why are the basecontrollers statemachines then??? <ingmar 18.12.06>
   
   m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
-	m_UndoEnabled = true;
+  m_UndoEnabled = true;
 
   m_TimeStep = 0;
 
@@ -79,7 +79,7 @@ mitk::StateMachine::~StateMachine()
 
 std::string mitk::StateMachine::GetType() const
 {
-	return m_Type;
+  return m_Type;
 }
 
 const mitk::State* mitk::StateMachine::GetCurrentState(unsigned int timeStep) const
@@ -93,7 +93,7 @@ void mitk::StateMachine::ResetStatemachineToStartState(unsigned int timeStep)
 {
   mitk::State* startState = mitk::StateMachineFactory::GetStartState((const char *)(&m_Type[0]));
 
-  if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
+  if ( m_UndoEnabled )  //write to UndoMechanism if Undo is enabled
   {
     //UNDO for this statechange; 
     StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, startState, timeStep);
@@ -142,13 +142,13 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   //and ActionId to execute later on
   if ( m_CurrentStateVector[m_TimeStep]->GetId() != tempNextState->GetId() )//statechange only if there is a real statechange
   {
-    if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
+    if ( m_UndoEnabled )  //write to UndoMechanism if Undo is enabled
     {
       //UNDO for this statechange; since we directly change the state, we don't need the do-Operation in case m_UndoEnables == false
-  	  StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState, m_TimeStep);
+      StateTransitionOperation* doOp = new StateTransitionOperation(OpSTATECHANGE, tempNextState, m_TimeStep);
       StateTransitionOperation* undoOp = new StateTransitionOperation(OpSTATECHANGE, m_CurrentStateVector[m_TimeStep], m_TimeStep);
-	    OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
-	    m_UndoController->SetOperationEvent(operationEvent);
+      OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
+      m_UndoController->SetOperationEvent(operationEvent);
     }
 //#define INTERDEBUG
             #ifdef INTERDEBUG
@@ -199,12 +199,12 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 
 void mitk::StateMachine::EnableUndo(bool enable)
 {
-	m_UndoEnabled = enable;
+  m_UndoEnabled = enable;
 }
 
 void mitk::StateMachine::IncCurrGroupEventId()
 {
-	mitk::OperationEvent::IncCurrGroupEventId();
+  mitk::OperationEvent::IncCurrGroupEventId();
 }
 
 /// look up which object method is associated to the given action and call the method
@@ -234,42 +234,42 @@ void mitk::StateMachine::AddActionFunction(int action, mitk::TStateMachineFuncto
 
 void mitk::StateMachine::ExecuteOperation(Operation* operation)
 {
-	switch (operation->GetOperationType())
-	{
-	case OpNOTHING:
-		break;
-	case OpSTATECHANGE:
-		{
-			mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
-			if (stateTransOp == NULL)
-			{
-				itkWarningMacro("Error! see mitkStateMachine.cpp");
-				return;
-			}
+  switch (operation->GetOperationType())
+  {
+  case OpNOTHING:
+    break;
+  case OpSTATECHANGE:
+    {
+      mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
+      if (stateTransOp == NULL)
+      {
+        itkWarningMacro("Error! see mitkStateMachine.cpp");
+        return;
+      }
 #ifdef INTERDEBUG
 //Debug StateChanges through cout output! Thus very slow!
 std::cout<<this->GetType()<<": Undo: Changing from StateId "<<m_CurrentStateVector[m_TimeStep]->GetId()<<" to StateId "<<stateTransOp->GetState()->GetId()<<std::endl;
 std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentStateVector[m_TimeStep]->GetName()<<" to State "<<stateTransOp->GetState()->GetName()<<std::endl;
 #endif
       unsigned int time = stateTransOp->GetTime();
-			m_CurrentStateVector[time] = stateTransOp->GetState();
-		}
-		break;
+      m_CurrentStateVector[time] = stateTransOp->GetState();
+    }
+    break;
   case OpTIMECHANGE:
     {
       mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
-			if (stateTransOp == NULL)
-			{
-				itkWarningMacro("Error! see mitkStateMachine.cpp");
-				return;
-			}
+      if (stateTransOp == NULL)
+      {
+        itkWarningMacro("Error! see mitkStateMachine.cpp");
+        return;
+      }
 #ifdef INTERDEBUG
 //Debug StateChanges through cout output! Thus very slow!
 std::cout<<this->GetType()<<": Undo: Changing from Time "<<m_TimeStep<<" to time "<<stateTransOp->GetTime()<<std::endl;
 #endif
       m_TimeStep = stateTransOp->GetTime();
-		}
-		break;
+    }
+    break;
   case OpDELETE:
     {
       //delete this!
@@ -282,22 +282,22 @@ std::cout<<this->GetType()<<": Undo: Changing from Time "<<m_TimeStep<<" to time
       //that way a delete of a StateMachine can be undone 
       //IMPORTANT: The type has to be the same!!!Done by a higher instance, that creates this!
       mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
-			if (stateTransOp != NULL)
+      if (stateTransOp != NULL)
       {
         unsigned int time = stateTransOp->GetTime();
-			  m_CurrentStateVector[time] = stateTransOp->GetState();
+        m_CurrentStateVector[time] = stateTransOp->GetState();
       }
     }
-	default:
-		;
-	}
+  default:
+    ;
+  }
 }
 
 bool mitk::StateMachine::WriteXMLData( XMLWriter& xmlWriter )
 {
-	xmlWriter.WriteProperty( STATE_MACHINE_TYPE, GetType() );
-	xmlWriter.WriteProperty( STATE_ID, GetCurrentState()->GetId() );
-	return true;
+  xmlWriter.WriteProperty( STATE_MACHINE_TYPE, GetType() );
+  xmlWriter.WriteProperty( STATE_ID, GetCurrentState()->GetId() );
+  return true;
 }
 
 bool mitk::StateMachine::ReadXMLData( XMLReader& xmlReader )
@@ -305,7 +305,7 @@ bool mitk::StateMachine::ReadXMLData( XMLReader& xmlReader )
   std::string stateMachineType;
   int stateId;
 
-	if ( xmlReader.GetAttribute( STATE_MACHINE_TYPE, stateMachineType ) && xmlReader.GetAttribute( STATE_ID, stateId ) )
+  if ( xmlReader.GetAttribute( STATE_MACHINE_TYPE, stateMachineType ) && xmlReader.GetAttribute( STATE_ID, stateId ) )
   {
     m_CurrentStateVector[m_TimeStep] = StateMachineFactory::GetState( stateMachineType.c_str(), stateId );
 
@@ -313,7 +313,7 @@ bool mitk::StateMachine::ReadXMLData( XMLReader& xmlReader )
       return true;
   }
 
-	return false;
+  return false;
 }
 
 const std::string& mitk::StateMachine::GetXMLNodeName() const
@@ -359,7 +359,7 @@ void mitk::StateMachine::UpdateTimeStep(unsigned int timeStep)
 
   //create an operation that changes the time and send it to undocontroller 
   StateTransitionOperation* doOp = new StateTransitionOperation(OpTIMECHANGE, NULL, timeStep);
-  if ( m_UndoEnabled )	//write to UndoMechanism if Undo is enabled
+  if ( m_UndoEnabled )  //write to UndoMechanism if Undo is enabled
   {
     StateTransitionOperation* undoOp = new StateTransitionOperation(OpTIMECHANGE, NULL, m_TimeStep);
     OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);

@@ -130,7 +130,7 @@ private:
  void IsNodeExisting();
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkSeedPointSetComponentGUI * m_PointSetComponentGUI;
   bool m_PointSetNodeExisting;
 

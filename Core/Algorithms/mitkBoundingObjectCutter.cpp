@@ -35,9 +35,9 @@ namespace mitk
 void BoundingObjectCutter::SetBoundingObject( const mitk::BoundingObject* boundingObject ) 
 {
   m_BoundingObject = const_cast<mitk::BoundingObject*>(boundingObject);
-	// Process object is not const-correct so the const_cast is required here
-	this->ProcessObject::SetNthInput(1, 
-		const_cast< mitk::BoundingObject * >( boundingObject ) );
+  // Process object is not const-correct so the const_cast is required here
+  this->ProcessObject::SetNthInput(1, 
+    const_cast< mitk::BoundingObject * >( boundingObject ) );
 }
 
 const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const 

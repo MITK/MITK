@@ -31,13 +31,13 @@ mitk::ImageTimeSelector::~ImageTimeSelector()
 
 void mitk::ImageTimeSelector::GenerateOutputInformation()
 {
-	Image::ConstPointer input  = this->GetInput();
-	Image::Pointer output = this->GetOutput();
+  Image::ConstPointer input  = this->GetInput();
+  Image::Pointer output = this->GetOutput();
 
-	itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<<"GenerateOutputInformation()");
 
   int dim=(input->GetDimension()<3?input->GetDimension():3);
-	output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
+  output->Initialize(input->GetPixelType(), dim, input->GetDimensions());
 
   if( (unsigned int) m_TimeNr >= input->GetDimension(3) )
   {
@@ -55,7 +55,7 @@ void mitk::ImageTimeSelector::GenerateData()
 
   //do we really need a complete volume at a time?
   if(requestedRegion.GetSize(2)>1)
-  	this->SetVolumeItem( this->GetVolumeData(m_TimeNr, m_ChannelNr), 0 );
+    this->SetVolumeItem( this->GetVolumeData(m_TimeNr, m_ChannelNr), 0 );
   else
   //no, so take just a slice!
     this->SetSliceItem( this->GetSliceData(requestedRegion.GetIndex(2), m_TimeNr, m_ChannelNr), requestedRegion.GetIndex(2), 0 );

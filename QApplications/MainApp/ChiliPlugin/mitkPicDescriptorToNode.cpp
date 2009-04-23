@@ -135,8 +135,8 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
           }
           break;
         }
-	  /* this code does not work. mitkIpPicInt and mitkIpPicUInt can have different sizes.
-	  case mitkIpPicInt:
+    /* this code does not work. mitkIpPicInt and mitkIpPicUInt can have different sizes.
+    case mitkIpPicInt:
       {
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( *static_cast<int*>( currentTag->value ) ) );
         break;
@@ -146,7 +146,7 @@ const mitk::PropertyList::Pointer mitk::PicDescriptorToNode::CreatePropertyListF
         resultPropertyList->SetProperty( propertyName.c_str(), mitk::IntProperty::New( (int)*( (char*)( currentTag->value ) ) ) );
         break;
       }
-	  */
+    */
       default:  //mitkIpPicUnknown, mitkIpPicBool, mitkIpPicFloat, mitkIpPicNonUniform, mitkIpPicTSV, _mitkIpPicTypeMax
       {
         break;

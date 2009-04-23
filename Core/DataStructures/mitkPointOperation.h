@@ -35,29 +35,29 @@ namespace mitk {
 class MITK_CORE_EXPORT PointOperation : public Operation
 {
   public:
-	//##Documentation
-	//##@brief Operation that handles all actions on one Point.
-	//##
-	//## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //##Documentation
+  //##@brief Operation that handles all actions on one Point.
+  //##
+  //## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
   //## @param point is the information of the point to add or is the information to change a point into
   //## @param index is e.g. the position in a list which describes the element to change
-  PointOperation(OperationType operationType,	Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
+  PointOperation(OperationType operationType,  Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
  
-	//##Documentation
-	//##@brief Operation that handles all actions on one Point.
-	//##
-	//## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+  //##Documentation
+  //##@brief Operation that handles all actions on one Point.
+  //##
+  //## @param operationType is the type of the operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
   //## @param point is the information of the point to add or is the information to change a point into
   //## @param index is e.g. the position in a list which describes the element to change
-  PointOperation(OperationType operationType,	ScalarType timeInMS, Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
+  PointOperation(OperationType operationType,  ScalarType timeInMS, Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
 
-  PointOperation(OperationType operationType,	Point3D point, ScalarType timeInMS, int index, bool selected, PointSpecificationType type);
+  PointOperation(OperationType operationType,  Point3D point, ScalarType timeInMS, int index, bool selected, PointSpecificationType type);
 
   virtual ~PointOperation();
 
-	Point3D GetPoint();
+  Point3D GetPoint();
 
-	int GetIndex();
+  int GetIndex();
 
   bool GetSelected();
 
@@ -66,11 +66,11 @@ class MITK_CORE_EXPORT PointOperation : public Operation
   ScalarType GetTimeInMS() const;
 
   private:
-	Point3D m_Point;
+  Point3D m_Point;
 
   //##Documentation
   //##@brief to declare an index where to store the point in data
-	int m_Index;
+  int m_Index;
 
   //to declare weather the point is selected or deselected
   bool m_Selected;

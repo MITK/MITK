@@ -45,7 +45,7 @@ m_DataBits(DataBits8), m_Parity(None), m_StopBits(StopBits1),
 m_HardwareHandshake(HardwareHandshakeOff),
 m_ReceiveTimeout(500), m_SendTimeout(500), m_Connected(false)
 {
-#ifdef	WIN32 // Windows
+#ifdef  WIN32 // Windows
   m_ComPortHandle = INVALID_HANDLE_VALUE;
 #else // Posix
   m_FileDescriptor = INVALID_HANDLE_VALUE;

@@ -119,12 +119,12 @@ void QmitkIGTExampleControls::m_LoadToolBtn_clicked()
     
     "tool definition file (*.*)",
     QDir::homeDirPath(),
-	this,
+  this,
     "open file dialog"
     "Choose a tool definition file" );
   if (s.empty() == false)
   { 
-	  m_ToolFileName->setText(s.front());
+    m_ToolFileName->setText(s.front());
   }
   m_ToolList = s;
 }

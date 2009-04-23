@@ -35,7 +35,7 @@ public:
 
   enum MapperType { RAYCAST = 0
   #if (VTK_MAJOR_VERSION >= 5)
-	  , PT = 1, ZSWEEP = 2 
+    , PT = 1, ZSWEEP = 2 
   #endif
   };
   

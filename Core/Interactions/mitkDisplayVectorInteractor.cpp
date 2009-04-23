@@ -66,7 +66,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   //case 0:
   //  {
   //    DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpTEST,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition());
-  //    if (m_UndoEnabled)	//write to UndoMechanism
+  //    if (m_UndoEnabled)  //write to UndoMechanism
   //    {
   //      DisplayCoordinateOperation* undoOp = new DisplayCoordinateOperation(OpTEST, m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, m_CurrentDisplayCoordinate);
   //      
@@ -110,7 +110,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
     }
   case AcFINISHMOVE:
     {
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         DisplayCoordinateOperation* doOp = new mitk::DisplayCoordinateOperation(OpMOVE,  m_Sender, m_StartDisplayCoordinate, m_StartDisplayCoordinate, posEvent->GetDisplayPosition());
         DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpMOVE,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), m_StartDisplayCoordinate);
@@ -125,7 +125,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
     {
       DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition());
       
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         DisplayCoordinateOperation* undoOp = new mitk::DisplayCoordinateOperation(OpZOOM,  posEvent->GetSender(), posEvent->GetDisplayPosition(), posEvent->GetDisplayPosition(), m_LastDisplayCoordinate);
         

@@ -39,7 +39,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
-  ////	@FIXME: Logik fuer update
+  ////  @FIXME: Logik fuer update
   bool updateNeccesary=true;
 
   if (updateNeccesary) 

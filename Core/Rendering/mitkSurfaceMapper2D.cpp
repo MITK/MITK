@@ -357,7 +357,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
     vlines->GetNextCell(cellSize, cell);
 
     vpoints->GetPoint(cell[0], vp);
-    //take transformation via vtktransform into account 	 
+    //take transformation via vtktransform into account    
     vtktransform->TransformPoint(vp, vp);
     vtk2itk(vp, p);
 
@@ -373,7 +373,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
       vpoints->GetPoint(cell[j], vp);
       Point3D originalPoint;
       vtk2itk(vp, originalPoint);
-      //take transformation via vtktransform into account 	 
+      //take transformation via vtktransform into account    
       vtktransform->TransformPoint(vp, vp);
       vtk2itk(vp, p);
 

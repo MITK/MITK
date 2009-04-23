@@ -217,21 +217,21 @@ void QmitkSurfaceCreatorComponent::ImageSelected(const mitk::DataTreeFilter::Ite
 
 void QmitkSurfaceCreatorComponent::TreeChanged()
 {
-	UpdateDataTreeComboBoxes();
+  UpdateDataTreeComboBoxes();
 
-	for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
-	{
-		m_AddedChildList[i]->TreeChanged();
-	} 
+  for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+  {
+    m_AddedChildList[i]->TreeChanged();
+  } 
 
     ImageSelected();
-	//if(m_MitkImageIterator.GetPointer())
-	//{
-	//	if(m_MitkImageIterator->Get())
-	//	{
-	//		m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
-	//	}
-	//}
+  //if(m_MitkImageIterator.GetPointer())
+  //{
+  //  if(m_MitkImageIterator->Get())
+  //  {
+  //    m_MitkImage = static_cast<mitk::Image*> (m_MitkImageIterator->Get()->GetData());
+  //  }
+  //}
 }
 
 /***************  CREATE CONTROL WIDGET  **************/
@@ -242,14 +242,14 @@ QWidget* QmitkSurfaceCreatorComponent::CreateControlWidget(QWidget* parent)
 
   m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
 
- 	if(m_ShowSelector)
-	{
-		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
-	}
+   if(m_ShowSelector)
+  {
+    m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  }
 
   m_SurfaceCreatorComponentGUI->GetTreeNodeSelector()->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
   InitSurfaceGUI();
@@ -320,14 +320,14 @@ QGroupBox * QmitkSurfaceCreatorComponent::GetMainCheckBoxContainer()
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkSurfaceCreatorComponent::ShowImageContent(bool)
 {
-	if(m_ShowSelector)
-	{
-		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_ShowSelector);
-	}
+  if(m_ShowSelector)
+  {
+    m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_SurfaceCreatorComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_SurfaceCreatorComponentGUI->GetImageContent()->setShown(m_ShowSelector);
+  }
 
 
 }

@@ -269,7 +269,7 @@ void QmitkSeedPointSetComponent::Deactivated()
 {
     QmitkBaseFunctionalityComponent::Deactivated();
     m_Active = false;
-	GetMainCheckBoxContainer()->setChecked(false);
+  GetMainCheckBoxContainer()->setChecked(false);
   //  if(m_PointSetNode.IsNotNull())
   //{
   //  mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;

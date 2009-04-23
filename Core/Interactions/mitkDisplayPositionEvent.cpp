@@ -27,7 +27,7 @@ mitk::DisplayPositionEvent::DisplayPositionEvent(mitk::BaseRenderer* sender, int
 const mitk::Point3D& mitk::DisplayPositionEvent::GetWorldPosition() const
 {
   if(m_WorldPositionIsSet)
-	  return m_WorldPosition;
+    return m_WorldPosition;
   m_WorldPositionIsSet = true;
   assert(m_Sender!=NULL);
   m_Sender->PickWorldPoint(m_DisplayPosition, m_WorldPosition);

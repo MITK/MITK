@@ -33,30 +33,30 @@ namespace mitk {
 class MITK_CORE_EXPORT ImageTimeSelector : public SubImageSelector
 {
 public:
-	mitkClassMacro(ImageTimeSelector,SubImageSelector);
+  mitkClassMacro(ImageTimeSelector,SubImageSelector);
 
-	itkNewMacro(Self);  
+  itkNewMacro(Self);  
 
-	itkGetConstMacro(TimeNr,int);
-	itkSetMacro(TimeNr,int);
+  itkGetConstMacro(TimeNr,int);
+  itkSetMacro(TimeNr,int);
 
-	itkGetConstMacro(ChannelNr,int);
-	itkSetMacro(ChannelNr,int);
+  itkGetConstMacro(ChannelNr,int);
+  itkSetMacro(ChannelNr,int);
 
 protected:
-	ImageTimeSelector();
+  ImageTimeSelector();
 
-	virtual ~ImageTimeSelector();
+  virtual ~ImageTimeSelector();
 
   virtual void GenerateOutputInformation();
 
   virtual void GenerateInputRequestedRegion();
 
-	virtual void GenerateData();
+  virtual void GenerateData();
 
-	int m_TimeNr;
+  int m_TimeNr;
 
-	int m_ChannelNr;
+  int m_ChannelNr;
 };
 
 } // namespace mitk

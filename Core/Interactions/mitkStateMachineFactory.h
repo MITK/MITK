@@ -196,7 +196,7 @@ namespace mitk {
 
     static const std::string STYLE;
     static const std::string NAME;
-    static const std::string ID;	  
+    static const std::string ID;    
     static const std::string START_STATE;
     static const std::string NEXT_STATE_ID;
     static const std::string EVENT_ID;

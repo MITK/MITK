@@ -216,10 +216,10 @@ void mitk::SurfaceToImageFilter::SetInput(const mitk::Surface *input)
 
 void mitk::SurfaceToImageFilter::SetImage(const mitk::Image *source)
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );	
+  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );  
 }
 
 const mitk::Image *mitk::SurfaceToImageFilter::GetImage(void)
 {
-  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));		
+  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));    
 }

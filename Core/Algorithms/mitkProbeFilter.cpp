@@ -51,7 +51,7 @@ const mitk::Surface *mitk::ProbeFilter::GetInput(void)
 
 const mitk::Image *mitk::ProbeFilter::GetSource(void)
 {
-  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));		
+  return static_cast< const mitk::Image * >(this->ProcessObject::GetInput(1));    
 }
 
 void mitk::ProbeFilter::SetInput(const mitk::Surface *input)
@@ -61,13 +61,13 @@ void mitk::ProbeFilter::SetInput(const mitk::Surface *input)
 
 void mitk::ProbeFilter::SetSource(const mitk::Image *source)
 {
-  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );	
+  this->ProcessObject::SetNthInput( 1, const_cast< mitk::Image * >( source ) );  
 }
 
 void mitk::ProbeFilter::GenerateOutputInformation()
 {
-  mitk::Surface::ConstPointer input  = this->GetInput();	
-  mitk::Image::ConstPointer source = this->GetSource();	
+  mitk::Surface::ConstPointer input  = this->GetInput();  
+  mitk::Image::ConstPointer source = this->GetSource();  
   mitk::Surface::Pointer output = this->GetOutput();
 
   if(input.IsNull()) return;
@@ -97,7 +97,7 @@ void mitk::ProbeFilter::GenerateOutputInformation()
 
 void mitk::ProbeFilter::GenerateData()
 {
-  mitk::Surface *input  = const_cast< mitk::Surface * >(this->GetInput());	
+  mitk::Surface *input  = const_cast< mitk::Surface * >(this->GetInput());  
   mitk::Image *source = const_cast< mitk::Image * >(this->GetSource());
   mitk::Surface::Pointer output = this->GetOutput();
 
@@ -145,7 +145,7 @@ void mitk::ProbeFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Surface *input  = const_cast< mitk::Surface * >( this->GetInput() );	
+  mitk::Surface *input  = const_cast< mitk::Surface * >( this->GetInput() );  
   mitk::Image *source = const_cast< mitk::Image * >( this->GetSource() );
 
   if(input==NULL) return;

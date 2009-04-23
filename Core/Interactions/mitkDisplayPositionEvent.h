@@ -46,7 +46,7 @@ class MITK_CORE_EXPORT DisplayPositionEvent : public Event
 
     const Point2D& GetDisplayPosition() const
     {
-      	return m_DisplayPosition;
+        return m_DisplayPosition;
     }
 
     void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }

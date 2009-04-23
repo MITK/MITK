@@ -149,14 +149,14 @@ QWidget* QmitkEmptyComponent::CreateControlWidget(QWidget* parent)
 
   m_EmptyComponentGUI->GetTreeNodeSelector()->SetDataTree(GetDataTreeIterator());
 
- 	if(m_ShowSelector)
-	{
-		m_EmptyComponentGUI->GetImageContent()->setShown(m_EmptyComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_EmptyComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
-	}
+   if(m_ShowSelector)
+  {
+    m_EmptyComponentGUI->GetImageContent()->setShown(m_EmptyComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_EmptyComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  }
 
   return m_EmptyComponentGUI;
 }
@@ -253,7 +253,7 @@ void QmitkEmptyComponent::CreateEmptyImageNode()
 ///************ SHOW EMPTY CONTENT ***********/
 void QmitkEmptyComponent::ShowEmptyContent(bool)
 {
-	m_EmptyComponentGUI->GetContainerContent()->setShown(m_EmptyComponentGUI->GetEmptyFinderGroupBox()->isChecked());
+  m_EmptyComponentGUI->GetContainerContent()->setShown(m_EmptyComponentGUI->GetEmptyFinderGroupBox()->isChecked());
   
   if(m_ShowSelector)
   {
@@ -266,14 +266,14 @@ void QmitkEmptyComponent::ShowImageContent(bool)
 {
   m_EmptyComponentGUI->GetImageContent()->setShown(m_EmptyComponentGUI->GetSelectDataGroupBox()->isChecked());
 
-  	if(m_ShowSelector)
-	{
-		m_EmptyComponentGUI->GetImageContent()->setShown(m_EmptyComponentGUI->GetSelectDataGroupBox()->isChecked());
-	}
-	else
-	{
-		m_EmptyComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
-	}
+    if(m_ShowSelector)
+  {
+    m_EmptyComponentGUI->GetImageContent()->setShown(m_EmptyComponentGUI->GetSelectDataGroupBox()->isChecked());
+  }
+  else
+  {
+    m_EmptyComponentGUI->GetSelectDataGroupBox()->setShown(m_ShowSelector);
+  }
 }
 
 

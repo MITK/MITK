@@ -81,7 +81,7 @@ void ClippingProperty::SetNormal( const Vector3D &normal )
 
 
 bool ClippingProperty::operator==( const BaseProperty &property ) const 
-{	
+{  
   const Self *other = dynamic_cast< const Self * >( &property );
 
   if ( other == NULL ) return false;

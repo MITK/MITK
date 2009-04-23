@@ -138,7 +138,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkSingleTimeStepExporterComponentGUI * m_SingleTimeStepExporterComponentGUI;
 
   /*!

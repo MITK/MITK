@@ -32,12 +32,12 @@ mitk::PointOperation::~PointOperation()
 
 mitk::Point3D mitk::PointOperation::GetPoint()
 {
-	return m_Point;
+  return m_Point;
 }
 
 int mitk::PointOperation::GetIndex()
 {
-	return m_Index;
+  return m_Index;
 }
 
 bool mitk::PointOperation::GetSelected()

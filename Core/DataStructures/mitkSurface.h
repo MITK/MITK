@@ -92,7 +92,7 @@ namespace mitk {
 
     void CalculateBoundingBox();
 
-	virtual void ExecuteOperation(Operation *operation);
+  virtual void ExecuteOperation(Operation *operation);
 
   protected:
 

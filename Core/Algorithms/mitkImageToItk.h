@@ -50,24 +50,24 @@ public:
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
 
-	/** Method for creation through the object factory. */
-	itkNewMacro(Self);  
-	
-	/** Superclass typedefs. */
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);  
+  
+  /** Superclass typedefs. */
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-	/** Some convenient typedefs. */
-	typedef mitk::Image                    InputImageType;
-	typedef InputImageType::Pointer        InputImagePointer;
-	typedef InputImageType::ConstPointer   InputImageConstPointer;
-	typedef SlicedData::RegionType         InputImageRegionType;
+  /** Some convenient typedefs. */
+  typedef mitk::Image                    InputImageType;
+  typedef InputImageType::Pointer        InputImagePointer;
+  typedef InputImageType::ConstPointer   InputImageConstPointer;
+  typedef SlicedData::RegionType         InputImageRegionType;
   typedef typename TOutputImage::SizeType         SizeType;
   typedef typename TOutputImage::IndexType        IndexType;
   typedef typename TOutputImage::RegionType       RegionType;
   typedef typename TOutputImage::PixelType        PixelType;
   
-	const mitk::Image * GetInput(void);
-	const mitk::Image * GetInput(unsigned int idx);
+  const mitk::Image * GetInput(void);
+  const mitk::Image * GetInput(unsigned int idx);
 
   virtual void SetInput(const mitk::Image *input);
   virtual void SetInput(unsigned int index, const mitk::Image * image);
@@ -82,27 +82,27 @@ public:
   itkBooleanMacro( CopyMemFlag );
 
 protected:
-	ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
-	{
-	}
-	
-	virtual ~ImageToItk()
-	{
-	}
+  ImageToItk(): m_CopyMemFlag(false), m_Channel(0)
+  {
+  }
+  
+  virtual ~ImageToItk()
+  {
+  }
 
-	void PrintSelf(std::ostream& os, itk::Indent indent) const;
-	
+  void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  
 
   virtual void GenerateData();
 
   virtual void GenerateOutputInformation();
   
 private:
-	bool m_CopyMemFlag;
+  bool m_CopyMemFlag;
   int m_Channel;
   
-	//ImageToItk(const Self&); //purposely not implemented
-	void operator=(const Self&); //purposely not implemented
+  //ImageToItk(const Self&); //purposely not implemented
+  void operator=(const Self&); //purposely not implemented
 
 };
 

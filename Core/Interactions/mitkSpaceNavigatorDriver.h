@@ -34,9 +34,9 @@ public:
 private:
 
   SpaceNavigatorDriver();
-	~SpaceNavigatorDriver();
+  ~SpaceNavigatorDriver();
 
-  //methods for workaround of .net 2003 compiler Artikel-ID	:	829749
+  //methods for workaround of .net 2003 compiler Artikel-ID  :  829749
   //http://support.microsoft.com/kb/829749/de
   inline HRESULT HookEvent1(CComPtr<ISimpleDevice> device);
   inline HRESULT HookEvent2();

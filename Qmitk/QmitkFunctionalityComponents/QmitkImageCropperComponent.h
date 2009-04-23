@@ -49,7 +49,7 @@ class QmitkStdMultiWidget;
 
 class QMITK_EXPORT QmitkImageCropperComponent : public QmitkFunctionalityComponentContainer, public mitk::OperationActor
 {
-	Q_OBJECT
+  Q_OBJECT
     // Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode) 
     // and to two data sets (mitk::BaseData) instances
   class QMITK_EXPORT opExchangeNodes: public mitk::Operation
@@ -146,7 +146,7 @@ public slots:
 protected:
 
 
-	  /*!
+    /*!
   * image which is used to create the surface
   */
   mitk::Image* m_MitkImage;
@@ -232,7 +232,7 @@ private:
   QmitkFunctionalityComponentContainer* m_ParentObject;
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkImageCropperComponentGUI * m_ImageCropperComponentGUI;
 
   /** \brief This Attribute holds the information if a ImageCropperNode is already existing or not*/

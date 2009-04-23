@@ -151,7 +151,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkConnectivityFilterComponentGUI * m_ConnectivityFilterComponentGUI;
 
 

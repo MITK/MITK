@@ -37,7 +37,7 @@ public:
 
   mitkClassMacro(ModeOperation, Operation);
   //##Documentation
-	//## Constructor
+  //## Constructor
   ModeOperation(OperationType operationType, ModeType mode);
 
   virtual ~ModeOperation();

@@ -147,8 +147,8 @@ void QmitkLocalizerDialogBar::DrawVolume()
   mitk::DataTreeNode::Pointer imageNode;
   if (m_TreeNodeSelector->GetSelectedNode() != NULL){
     if (mitk::DataTreeNode::Pointer imageNode = m_Storage->GetNamedNode(m_TreeNodeSelector->GetSelectedNode()->GetName().c_str()))
-  	  if (mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(imageNode->GetData()))
-  		  if (vtkImageData* vtkImage = mitkImage->GetVtkImageData()){
+      if (mitk::Image::Pointer mitkImage = dynamic_cast<mitk::Image*>(imageNode->GetData()))
+        if (vtkImageData* vtkImage = mitkImage->GetVtkImageData()){
           m_FileUsed = m_TreeNodeSelector->GetSelectedNode()->GetName().c_str();
           m_Volume = createVolume(vtkImage);          
           m_LocalizerRenderWindow->GetRenderer()->GetVtkRenderer()->AddViewProp(m_Volume);
@@ -302,7 +302,7 @@ vtkVolume* QmitkLocalizerDialogBar::createVolume(vtkImageData* vtkImage)
 
   //Create new Volume
   m_Volume->SetMapper(volumeMapper);
-	m_Volume->SetProperty(volumeProperty);
+  m_Volume->SetProperty(volumeProperty);
   
   //delete old stuff to deallocate memory
   thresh->Delete();

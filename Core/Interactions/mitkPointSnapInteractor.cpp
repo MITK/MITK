@@ -156,7 +156,7 @@ bool mitk::PointSnapInteractor::ExecuteAction( Action* action, mitk::StateEvent 
       PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT, worldPoint, m_Position);
 
       //Undo
-      if (m_UndoEnabled)	//write to UndoMechanism
+      if (m_UndoEnabled)  //write to UndoMechanism
       {
         PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT, worldPoint, m_Position);
         OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);

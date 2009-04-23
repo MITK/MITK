@@ -31,7 +31,7 @@ void mitk::Transition::AddAction( Action* action )
 
 std::string mitk::Transition::GetName() const
 {
-	return m_Name;
+  return m_Name;
 }
 
 mitk::State* mitk::Transition::GetNextState() const
@@ -41,7 +41,7 @@ mitk::State* mitk::Transition::GetNextState() const
 
 int mitk::Transition::GetNextStateId() const
 {
-	return m_NextStateId;
+  return m_NextStateId;
 }
 
 int mitk::Transition::GetEventId() const 
@@ -67,11 +67,11 @@ mitk::Transition::ActionVectorConstIterator mitk::Transition::GetActionEndIterat
 
 bool mitk::Transition::IsEvent(int eventId) const
 {
-	return (eventId == m_EventId);
+  return (eventId == m_EventId);
 }
 
 void mitk::Transition::SetNextState(State* state)
 {
-	m_NextState = state;
+  m_NextState = state;
 }
 

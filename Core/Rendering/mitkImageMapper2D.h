@@ -253,7 +253,7 @@ protected:
   vtkGeneralTransform *m_ComposedResliceTransform;
 
 private:
-	int m_iil4mitkMode;
+  int m_iil4mitkMode;
 
 };
 

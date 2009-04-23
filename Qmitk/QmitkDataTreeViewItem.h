@@ -46,7 +46,7 @@ class QMITK_EXPORT QmitkDataTreeViewItem : public QListViewItem
 
 
 
-class QmitkDataManagerControls;	
+class QmitkDataManagerControls;  
 class QmitkFocusChangeCommand : public itk::Command {
   protected:
     QmitkDataManagerControls* m_QmitkDataManagerControls; 

@@ -95,7 +95,7 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   itkDebugMacro( << "  TransducerPosition[0]=" << m_TransducerPosition[0] << " TransducerPosition[1]=" << m_TransducerPosition[1] << " TransducerPosition[2]=" << m_TransducerPosition[2] );
 
   const Vector3D & spacing = input->GetSlicedGeometry()->GetSpacing();
-  //	std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
+  //  std::cout << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
   
   if((spacing[0]!=spacing[1]) || (spacing[0]!=spacing[2]))
   {

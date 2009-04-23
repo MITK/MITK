@@ -61,9 +61,9 @@ bool mitk::Event::operator==(const Event& event) const
   if(input==NULL) return false;
 
   if ( (m_Type == event.GetType())
-	  && (m_Button == event.GetButton())
-	  && (m_ButtonState == event.GetButtonState())
-	  && (m_Key == event.GetKey()) )
+    && (m_Button == event.GetButton())
+    && (m_ButtonState == event.GetButtonState())
+    && (m_Key == event.GetKey()) )
   {
     return true;
   }

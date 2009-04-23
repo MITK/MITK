@@ -35,5 +35,5 @@ mitk::State* mitk::StateTransitionOperation::GetState()
 
 unsigned int mitk::StateTransitionOperation::GetTime()
 {
-	return m_Time;
+  return m_Time;
 }

@@ -27,17 +27,17 @@ mitk::LineOperation::LineOperation(OperationType operationType, int cellId, int 
 
 int mitk::LineOperation::GetPIdA()
 {
-	return m_PIdA;
+  return m_PIdA;
 }
 
 int mitk::LineOperation::GetPIdB()
 {
-	return m_PIdB;
+  return m_PIdB;
 }
 
 int mitk::LineOperation::GetId()
 {
-	return m_Id;
+  return m_Id;
 }
 
 

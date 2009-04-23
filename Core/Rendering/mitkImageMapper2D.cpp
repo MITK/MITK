@@ -990,7 +990,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
       LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
     }
-    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());	
+    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());  
   }
 }
 
@@ -1155,34 +1155,34 @@ void mitk::ImageMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRe
 
 void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-	  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-	if(image->GetScalarValueMax() == image->GetScalarValue2ndMin()&& image->GetScalarValueMin() == image->GetScalarValue2ndMax()) // decides whether the object is a binary 
+  if(image->GetScalarValueMax() == image->GetScalarValue2ndMin()&& image->GetScalarValueMin() == image->GetScalarValue2ndMax()) // decides whether the object is a binary 
   {
-	 node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
-	 node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+   node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
+   node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
      node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
      node->AddProperty( "binary", mitk::BoolProperty::New( true ), renderer, overwrite );
      node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-     node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
-	 node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-	 node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
-	 node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
-	 node->AddProperty("layer", mitk::IntProperty::New(10), renderer, overwrite);
+     node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
+   node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
+   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+   node->AddProperty("layer", mitk::IntProperty::New(10), renderer, overwrite);
   }
 
-  else					//or image type object
+  else          //or image type object
   {
-	  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
-	  node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
-	  node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
-	  node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-	  node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
-	  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );	// set to user configurable default value (see global options)
-	  node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-	  node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
-	  node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
-	  node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
+    node->AddProperty( "opacity", mitk::FloatProperty::New(1.0f), renderer, overwrite );
+    node->AddProperty( "color", ColorProperty::New(1.0,1.0,1.0), renderer, overwrite );
+    node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
+    node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+    node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
+    node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+    node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
+    node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+    node->AddProperty("layer", mitk::IntProperty::New(0), renderer, overwrite);
   }
   
 

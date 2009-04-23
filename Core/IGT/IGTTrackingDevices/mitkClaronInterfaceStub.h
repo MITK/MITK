@@ -36,8 +36,8 @@ namespace mitk
   /** Documentation:
   *   \brief An object of this class represents the interface to the MicronTracker. Normally the methods of this class
   *          are calling the c-functions which are provided by the MTC-library. But in this case the MicronTracker is
-  *			 not installed and so we only have stubs here. These stubs send error messages when you try to call the
-  *			 methods.
+  *       not installed and so we only have stubs here. These stubs send error messages when you try to call the
+  *       methods.
   *   \ingroup IGT
   */
   class ClaronInterface : public itk::Object

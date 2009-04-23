@@ -230,7 +230,7 @@ void QmitkMovieMaker::Activated()
 {
   QmitkFunctionality::Activated();
   
-	// create a member command that will be executed from the observer
+  // create a member command that will be executed from the observer
   itk::SimpleMemberCommand<QmitkMovieMaker>::Pointer stepperChangedCommand;
   stepperChangedCommand = itk::SimpleMemberCommand<QmitkMovieMaker>::New();
   // set the callback function of the member command
@@ -531,17 +531,17 @@ void QmitkMovieMaker::GenerateScreenshot()
 
 void QmitkMovieMaker::UpdateGUI()
 {
-	int bla = this->GetTemporalController()->GetTime()->GetSteps();
-	if ( bla < 2 ) {
-		m_Controls->rbtnTemporal->setEnabled(false);
-		m_Controls->rbtnCombined->setEnabled(false);
-		m_Controls->spatialTimeRelation->setEnabled(false);
-	}
-	else {
-		m_Controls->rbtnTemporal->setEnabled(true);
-		m_Controls->rbtnCombined->setEnabled(true);
-		m_Controls->spatialTimeRelation->setEnabled(true);
-	}
+  int bla = this->GetTemporalController()->GetTime()->GetSteps();
+  if ( bla < 2 ) {
+    m_Controls->rbtnTemporal->setEnabled(false);
+    m_Controls->rbtnCombined->setEnabled(false);
+    m_Controls->spatialTimeRelation->setEnabled(false);
+  }
+  else {
+    m_Controls->rbtnTemporal->setEnabled(true);
+    m_Controls->rbtnCombined->setEnabled(true);
+    m_Controls->spatialTimeRelation->setEnabled(true);
+  }
 
 }
 

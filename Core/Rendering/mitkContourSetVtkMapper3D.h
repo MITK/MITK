@@ -58,7 +58,7 @@ class MITK_CORE_EXPORT ContourSetVtkMapper3D : public BaseVtkMapper3D
     vtkPolyDataMapper* m_VtkPolyDataMapper;
     vtkTubeFilter*     m_TubeFilter;
 
-		vtkPolyData *m_ContourSet;
+    vtkPolyData *m_ContourSet;
     vtkActor *m_Actor;
   
 };

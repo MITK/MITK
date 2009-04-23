@@ -54,13 +54,13 @@ namespace mitk {
   void InteractionDebug::OpenConection()
   {
     char* wb = m_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) GetHashValue();
-	  wb += sizeof(long);
+    *((unsigned long*) wb) = (unsigned long) GetHashValue();
+    wb += sizeof(long);
     
     int size = strlen( m_FileName );
 
     *((unsigned long*) wb) = (unsigned long) size;
-	  wb += sizeof(long);
+    wb += sizeof(long);
 
     strcpy( wb, m_FileName );
     size += 2*sizeof(long);
@@ -80,14 +80,14 @@ namespace mitk {
 
     // Instance Address
     char* wb = m_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) stateMachine;
-	  wb += sizeof(long);
+    *((unsigned long*) wb) = (unsigned long) stateMachine;
+    wb += sizeof(long);
 
     // Length of the name
     int size = strlen(name);
 
-	  *((unsigned long*) wb) = (unsigned long) size;
-	  wb += sizeof(long);
+    *((unsigned long*) wb) = (unsigned long) size;
+    wb += sizeof(long);
 
     // name
     strcpy(wb,name);
@@ -111,12 +111,12 @@ namespace mitk {
 
       // Instance Address
       char* wb = m_Buffer;
-	    *((unsigned long*) wb) = (unsigned long) stateMachine;
-	    wb += sizeof(long);
+      *((unsigned long*) wb) = (unsigned long) stateMachine;
+      wb += sizeof(long);
 
       // eventID
-	    *((unsigned long*) wb) = EventId;
-    	
+      *((unsigned long*) wb) = EventId;
+      
       sendCounter();
       // std::cout << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
       return SocketClient::GetInstance()->send( EVENT, 2*sizeof(long), m_Buffer );
@@ -134,12 +134,12 @@ namespace mitk {
 
     // Instance Address
     char* wb = m_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) stateMachine;
-	  wb += sizeof(long);
+    *((unsigned long*) wb) = (unsigned long) stateMachine;
+    wb += sizeof(long);
 
     // transitionName
     unsigned long size = strlen( transitionName );
-	  *((unsigned long*) wb) = size;
+    *((unsigned long*) wb) = size;
 
     wb += sizeof(long);
 
@@ -147,7 +147,7 @@ namespace mitk {
       *wb = transitionName[i];
 
     size += 2*sizeof(long);
-  	
+    
     //sendCounter();
     //std::cout << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
     return SocketClient::GetInstance()->send( TRANSITION, size, m_Buffer );
@@ -163,14 +163,14 @@ namespace mitk {
 
     // Instance Address
     char* wb = m_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) stateMachine;
-	  wb += sizeof(long);
+    *((unsigned long*) wb) = (unsigned long) stateMachine;
+    wb += sizeof(long);
 
     // transitionName
     unsigned long size = strlen( transitionName );
-	  *((unsigned long*) wb) = size;
+    *((unsigned long*) wb) = size;
 
-	  wb += sizeof(long);
+    wb += sizeof(long);
 
     for ( unsigned long i=0; i<size; i++, wb++ )
       *wb = transitionName[i];
@@ -196,7 +196,7 @@ namespace mitk {
 
     // Instance Address
     char* wb = m_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) stateMachine;
+    *((unsigned long*) wb) = (unsigned long) stateMachine;
 
     sendCounter();
     // std::cout << "DELETE_STATE_MACHINE: instance: << (unsigned int) stateMachine" << std::endl;
@@ -231,7 +231,7 @@ namespace mitk {
     m_Counter++;
 
     char* wb = my_Buffer;
-	  *((unsigned long*) wb) = (unsigned long) m_Counter;
+    *((unsigned long*) wb) = (unsigned long) m_Counter;
 
     bool success = SocketClient::GetInstance()->send( 7, sizeof(long), wb );
     if (success)

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPROGRESSBARIMPLEMENTATION_H
 #define MITKPROGRESSBARIMPLEMENTATION_H
 #include "mitkCommon.h"
-	 
+   
 namespace mitk 
 {
 

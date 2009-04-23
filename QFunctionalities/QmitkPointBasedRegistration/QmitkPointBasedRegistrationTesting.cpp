@@ -64,14 +64,14 @@ int QmitkPointBasedRegistration::TestYourself()
   {
     node = mitk::DataTreeNode::New();
     //Create Image out of nowhere
-	  mitk::Image::Pointer image;
+    mitk::Image::Pointer image;
     m_Controls->m_FixedSelector->GetSelectedNode()->GetData();
-	  mitk::PixelType pt(typeid(int));
+    mitk::PixelType pt(typeid(int));
     unsigned int dim[]={100,100,20};
 
     std::cout << "Creating image: ";
-	  image = mitk::Image::New();
-	  image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+    image = mitk::Image::New();
+    image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
     int *p = (int*)image->GetData();
 
     int size = dim[0]*dim[1]*dim[2];

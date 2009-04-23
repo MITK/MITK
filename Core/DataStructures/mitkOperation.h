@@ -32,7 +32,7 @@ class MITK_CORE_EXPORT Operation
 {
 public:
   //##Documentation
-	//## Constructor
+  //## Constructor
   Operation(OperationType operationType);
 
   virtual ~Operation();

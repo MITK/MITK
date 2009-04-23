@@ -61,9 +61,9 @@ void mitk::MultiStepper::SetPos(unsigned int pos) {
   Stepper::SetPos(pos);
   for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     unsigned int count = (*it)->GetSteps() * m_ScaleFactors[(*it)];
-	if ((this->GetSteps() != 0 ) && ((*it)->GetSteps() != 0)) {
-		(*it)->SetPos((pos * count / this->GetSteps() ) % (*it)->GetSteps()) ;
-	}
+  if ((this->GetSteps() != 0 ) && ((*it)->GetSteps() != 0)) {
+    (*it)->SetPos((pos * count / this->GetSteps() ) % (*it)->GetSteps()) ;
+  }
   }
 };
 

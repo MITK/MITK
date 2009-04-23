@@ -47,21 +47,21 @@ class TDMouseEvent : public Event
 
     const Vector3D& GetTranslation() const
     {
-      	return m_Translation;
+        return m_Translation;
     }
 
     void SetTranslation(const Vector3D& translation) { m_Translation = translation; }
 
     const Vector3D& GetRotation() const
     {
-      	return m_Rotation;
+        return m_Rotation;
     }
 
     void SetRotation(const Vector3D& rotation) { m_Rotation = rotation; }
 
     const ScalarType& GetAngle() const
     {
-      	return m_Angle;
+        return m_Angle;
     }
 
     void SetAngle(const ScalarType& angle) { m_Angle = angle; }

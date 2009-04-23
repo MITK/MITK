@@ -44,30 +44,30 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   m_Actor->VisibilityOn();
 
-	m_vtkPointList->Delete();
-	m_vtkTextList->Delete();
-	m_contour->Delete();
-	m_tubefilter->Delete();
+  m_vtkPointList->Delete();
+  m_vtkTextList->Delete();
+  m_contour->Delete();
+  m_tubefilter->Delete();
 
-	m_vtkPointList = vtkAppendPolyData::New();
-	m_vtkTextList = vtkAppendPolyData::New();
-	m_contour = vtkPolyData::New();
-	m_tubefilter = vtkTubeFilter::New();
+  m_vtkPointList = vtkAppendPolyData::New();
+  m_vtkTextList = vtkAppendPolyData::New();
+  m_contour = vtkPolyData::New();
+  m_tubefilter = vtkTubeFilter::New();
 
 
   mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
   mitk::PointSet::PointSetType::Pointer pointList;
 
-	pointList = input->GetPointList();
+  pointList = input->GetPointList();
 
   mitk::PointSet::PointsContainer::Iterator i;
 
-	int j;
+  int j;
   bool makeContour;
-	if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer()) == NULL)
-		makeContour = false;
-	else
-		makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer())->GetValue();
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer()) == NULL)
+    makeContour = false;
+  else
+    makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer())->GetValue();
 
   vtkPoints *points = vtkPoints::New();
   vtkCellArray *polys = vtkCellArray::New();
@@ -77,7 +77,7 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     int cell[2] = {j-1,j};
     points->InsertPoint(j,i.Value()[0],i.Value()[1],i.Value()[2]);
     if (j>0)
-  	  polys->InsertNextCell(2,cell);
+      polys->InsertNextCell(2,cell);
   }
 
   bool close;
@@ -102,8 +102,8 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   m_tubefilter->SetRadius(1);
   m_tubefilter->Update();;
 
-	m_vtkPointList->AddInput(m_tubefilter->GetOutput());
-	
+  m_vtkPointList->AddInput(m_tubefilter->GetOutput());
+  
 
   // check for color prop and use it for rendering if it exists
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
@@ -111,47 +111,47 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   for (j=0, i=pointList->GetPoints()->Begin(); i!=pointList->GetPoints()->End() ; i++,j++)
   {
-	  vtkSphereSource *sphere = vtkSphereSource::New();
+    vtkSphereSource *sphere = vtkSphereSource::New();
 
-		sphere->SetRadius(2);
+    sphere->SetRadius(2);
     sphere->SetCenter(i.Value()[0],i.Value()[1],i.Value()[2]);
 
-		m_vtkPointList->AddInput(sphere->GetOutput());
+    m_vtkPointList->AddInput(sphere->GetOutput());
 
-		if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
-		{
-    }
-		else 
+    if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
     {
-	  	const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
-			char buffer[20];
- 	    std::string l = pointLabel;
-			if (input->GetSize()>1)
-			{
-				sprintf(buffer,"%d",j+1);
-				l.append(buffer);
-			}
+    }
+    else 
+    {
+      const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+      char buffer[20];
+       std::string l = pointLabel;
+      if (input->GetSize()>1)
+      {
+        sprintf(buffer,"%d",j+1);
+        l.append(buffer);
+      }
 
-			// Define the text for the label
-			vtkVectorText *label = vtkVectorText::New();
-			label->SetText(l.c_str());
+      // Define the text for the label
+      vtkVectorText *label = vtkVectorText::New();
+      label->SetText(l.c_str());
 
-			// Set up a transform to move the label to a new position.
-			vtkTransform *aLabelTransform =vtkTransform::New();
-			aLabelTransform->Identity();
-			aLabelTransform->Translate(i.Value()[0]+2,i.Value()[1]+2,i.Value()[2]);
-			aLabelTransform->Scale(5.7,5.7,5.7);
+      // Set up a transform to move the label to a new position.
+      vtkTransform *aLabelTransform =vtkTransform::New();
+      aLabelTransform->Identity();
+      aLabelTransform->Translate(i.Value()[0]+2,i.Value()[1]+2,i.Value()[2]);
+      aLabelTransform->Scale(5.7,5.7,5.7);
 
-			// Move the label to a new position.
-			vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
-			labelTransform->SetTransform(aLabelTransform);
-			labelTransform->SetInput(label->GetOutput());
+      // Move the label to a new position.
+      vtkTransformPolyDataFilter *labelTransform = vtkTransformPolyDataFilter::New();
+      labelTransform->SetTransform(aLabelTransform);
+      labelTransform->SetInput(label->GetOutput());
 
-			m_vtkPointList->AddInput(labelTransform->GetOutput());
-		}
+      m_vtkPointList->AddInput(labelTransform->GetOutput());
+    }
 
 
-	}
+  }
 
 
   m_VtkPolyDataMapper->SetInput(m_vtkPointList->GetOutput());

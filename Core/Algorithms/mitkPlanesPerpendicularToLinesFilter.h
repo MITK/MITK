@@ -31,15 +31,15 @@ namespace mitk {
 //## To create the planes as input a
 //## mitk::mesh (for example a pointSet) and as geometry hint a geometry (for example from the original image) must be given.
 //##
-//##	mitk::Mesh::Pointer mesh = mitk::Mesh::New();
-//##	mesh->SetMesh(pointSet->GetPointSet());
-//##	mitk::Image* currentImage = dynamic_cast<mitk::Image*> (mitk::DataStorage::GetInstance()->GetNamedNode(IMAGE)->GetData());
-//##	const mitk::Geometry3D* imagegeometry = currentImage->GetUpdatedGeometry();
-//##	mitk::PlanesPerpendicularToLinesFilter::Pointer perpendicularPlanes = mitk::PlanesPerpendicularToLinesFilter::New();
-//##	perpendicularPlanes->SetInput(mesh);
-//##	perpendicularPlanes->SetUseAllPoints(true);
-//##	perpendicularPlanes->SetFrameGeometry(imagegeometry);
-//##	perpendicularPlanes->Update();
+//##  mitk::Mesh::Pointer mesh = mitk::Mesh::New();
+//##  mesh->SetMesh(pointSet->GetPointSet());
+//##  mitk::Image* currentImage = dynamic_cast<mitk::Image*> (mitk::DataStorage::GetInstance()->GetNamedNode(IMAGE)->GetData());
+//##  const mitk::Geometry3D* imagegeometry = currentImage->GetUpdatedGeometry();
+//##  mitk::PlanesPerpendicularToLinesFilter::Pointer perpendicularPlanes = mitk::PlanesPerpendicularToLinesFilter::New();
+//##  perpendicularPlanes->SetInput(mesh);
+//##  perpendicularPlanes->SetUseAllPoints(true);
+//##  perpendicularPlanes->SetFrameGeometry(imagegeometry);
+//##  perpendicularPlanes->Update();
 //##
 //## To get one single plane out of these use SlicedGeometry3D->GetGeometry2D(int slicenumber).
 

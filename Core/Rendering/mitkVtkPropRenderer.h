@@ -91,7 +91,7 @@ public:
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0);
-	vtkTextProperty * GetTextLabelProperty(int text_id);
+  vtkTextProperty * GetTextLabelProperty(int text_id);
 
   // Initialization / geometry handling
 

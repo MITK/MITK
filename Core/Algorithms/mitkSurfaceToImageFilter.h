@@ -58,8 +58,8 @@ public:
   itkGetMacro(MakeOutputBinary, bool);
   itkBooleanMacro(MakeOutputBinary);
 
-	itkGetConstMacro(BackgroundValue,float);
-	itkSetMacro(BackgroundValue,float);
+  itkGetConstMacro(BackgroundValue,float);
+  itkSetMacro(BackgroundValue,float);
 
   virtual void GenerateInputRequestedRegion();
 

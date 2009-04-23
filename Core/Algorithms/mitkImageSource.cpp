@@ -33,7 +33,7 @@ mitk::ImageSource::ImageSource()
  */
 mitk::ImageSource::DataObjectPointer mitk::ImageSource::MakeOutput(unsigned int)
 {
-	return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
+  return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }
   
 /**

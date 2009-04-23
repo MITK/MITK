@@ -36,15 +36,15 @@ class MITK_CORE_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
 public:
   mitkClassMacro(DopplerToStrainRateFilter, ImageToImageFilter);
 
-	itkNewMacro(Self);
+  itkNewMacro(Self);
 
   itkSetMacro(Distance, float);
-	itkGetMacro(Distance, float);
+  itkGetMacro(Distance, float);
 
   itkSetMacro(NoStrainInterval, int);
-	itkGetMacro(NoStrainInterval, int);
+  itkGetMacro(NoStrainInterval, int);
 
-	float GetLimit();
+  float GetLimit();
 
 protected:
 
@@ -56,12 +56,12 @@ protected:
 protected:
   virtual void GenerateData();
 
-	virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
-	virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion();
 
   
-	DopplerToStrainRateFilter();
+  DopplerToStrainRateFilter();
 
     ~DopplerToStrainRateFilter();
 

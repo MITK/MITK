@@ -43,9 +43,9 @@ public:
   typedef itk::Image<PixelType, 3> ItkImageType;
   typedef itk::ImageToImageFilter<ItkImageType, ItkImageType> ImageToImageFilterType;
 
-	mitkClassMacro(ItkImageToImageFilterAdapter,ImageSource);
-	/** Method for creation through the object factory. */
-	itkNewMacro(Self);
+  mitkClassMacro(ItkImageToImageFilterAdapter,ImageSource);
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
 
   itkSetObjectMacro(FirstFilter, ImageToImageFilterType);
   itkGetObjectMacro(FirstFilter, ImageToImageFilterType);
@@ -57,8 +57,8 @@ public:
   virtual void GenerateData();
 
 protected:
-	ItkImageToImageFilterAdapter();
-	virtual ~ItkImageToImageFilterAdapter();
+  ItkImageToImageFilterAdapter();
+  virtual ~ItkImageToImageFilterAdapter();
  
   typename ImageToImageFilterType::Pointer m_FirstFilter;  // Start of Filter Pipeline
   typename ImageToImageFilterType::Pointer m_LastFilter;   // End of Filter Pipeline

@@ -708,7 +708,7 @@ void QmitkConnectivityFilterComponent::StartConnectivityFilter()
                 ////std::cout <<"Gleicher Knoten"<<std::endl;
                 //if(filterMode==2)
                 //{
-                	mitk::DataTreeNode::Pointer imageNode = iteratorConnectivity->Get();
+                  mitk::DataTreeNode::Pointer imageNode = iteratorConnectivity->Get();
                   mitk::DataStorage::GetInstance()->Add( connectivityNode, imageNode );
                   //iteratorConnectivity->Add(connectivityNode);
                   emit nodeExported( connectivityNode );

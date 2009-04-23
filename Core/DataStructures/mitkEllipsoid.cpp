@@ -50,7 +50,7 @@ bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
   p[2] = worldPoint[2];
   p[3] = 1;
   GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
-	mitk::Point3D itkPoint;
+  mitk::Point3D itkPoint;
   return (pow(p[0], 2) + pow(p[1], 2) + pow(p[2], 2) <= 1);
 }
 

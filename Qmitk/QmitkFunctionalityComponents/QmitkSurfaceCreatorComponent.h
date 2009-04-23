@@ -276,7 +276,7 @@ private:
 
   /***************        ATTRIBUTES      ***************/
 
-  /** \brief The created GUI from the .ui-File. This Attribute is	obligatory*/
+  /** \brief The created GUI from the .ui-File. This Attribute is  obligatory*/
   QmitkSurfaceCreatorComponentGUI * m_SurfaceCreatorComponentGUI;
 
   ///** \brief This Attribute holds the current ImageItem from the TreeNodeSelector if his selection was changed*/

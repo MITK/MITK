@@ -8,4 +8,4 @@ SET( APPMOD_MOC_H ${APPMOD_MOC_H} QmitkRigidRegistration.h
 SET( APPMOD_CPP ${APPMOD_CPP} QmitkRigidRegistration.cpp
                               QmitkLoadPresetDialog.cpp )
 SET (APPMOD_FORMS ${APPMOD_FORMS} QmitkRigidRegistrationControls.ui
-				  QmitkRigidRegistrationSelector.ui )
+          QmitkRigidRegistrationSelector.ui )

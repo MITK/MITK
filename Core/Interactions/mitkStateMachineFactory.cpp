@@ -36,7 +36,7 @@ std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
 //XML StateMachine
 const std::string mitk::StateMachineFactory::STYLE = "STYLE";
 const std::string mitk::StateMachineFactory::NAME = "NAME";
-const std::string mitk::StateMachineFactory::ID = "ID";	  
+const std::string mitk::StateMachineFactory::ID = "ID";    
 const std::string mitk::StateMachineFactory::START_STATE = "START_STATE";
 const std::string mitk::StateMachineFactory::NEXT_STATE_ID = "NEXT_STATE_ID";
 const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
@@ -141,8 +141,8 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
 
   //for debugging
-  //	int thisStateId = (thisState->second)->GetId();
-  //	int firstNextState = *nextStatesSet.begin();
+  //  int thisStateId = (thisState->second)->GetId();
+  //  int firstNextState = *nextStatesSet.begin();
 
 
   //remove loops in nextStatesSet; 

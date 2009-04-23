@@ -201,7 +201,7 @@ void mitk::ParRecFileReader::GenerateData()
     zmax=zstart+output->GetRequestedRegion().GetSize(2);
     tmax=tstart+output->GetRequestedRegion().GetSize(3);
 
-    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8; 	 
+    int sliceSize=output->GetDimension(0)*output->GetDimension(1)*output->GetPixelType().GetBpe()/8;    
     void *data = malloc(sliceSize);
 
     bool ignore4Dtopogram=false;
@@ -214,11 +214,11 @@ void mitk::ParRecFileReader::GenerateData()
       for(t=tstart;t<tmax;++t)
         for(z=zstart;z<zmax;++z)
         {
-			    if(ignore4Dtopogram)
+          if(ignore4Dtopogram)
             fseek(f,slicePlusTimeSize*z+(sliceSize+1)*t,SEEK_SET);
           else
             fseek(f,slicePlusTimeSize*z+sliceSize*t,SEEK_SET);
-      	  size_t ignored = fread(data, sliceSize, 1, f);
+          size_t ignored = fread(data, sliceSize, 1, f);
           ++ignored;
           output->SetSlice(data,z,t,0);
         }
@@ -227,8 +227,8 @@ void mitk::ParRecFileReader::GenerateData()
     //{
     //  for(;z<zmax;++z)
     //  {
-    //    fseek(f,sliceSize*z,SEEK_SET);				  
-    //  	fread(data, sliceSize, 1, f);
+    //    fseek(f,sliceSize*z,SEEK_SET);          
+    //    fread(data, sliceSize, 1, f);
     //    output->SetSlice(data,z,0,0);
     //  }
     //}

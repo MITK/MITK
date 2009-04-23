@@ -41,13 +41,13 @@ public:
   virtual ~QmitkLevelWindowWidgetContextMenu();
   
   /*!
-  *	data structure which reads and writes presets defined in a XML-file
+  *  data structure which reads and writes presets defined in a XML-file
   */
   mitk::LevelWindowPreset* m_LevelWindowPreset;
 
   /*!
-  *	data structure which stores the values manipulated
-  *	by a QmitkLevelWindowWidgetContextMenu
+  *  data structure which stores the values manipulated
+  *  by a QmitkLevelWindowWidgetContextMenu
   */
   mitk::LevelWindow m_LevelWindow;
 

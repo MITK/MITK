@@ -33,19 +33,19 @@ namespace mitk {
 class MITK_CORE_EXPORT ImageSliceSelector : public SubImageSelector
 {
   public:
-	  
-	mitkClassMacro(ImageSliceSelector,SubImageSelector);
+    
+  mitkClassMacro(ImageSliceSelector,SubImageSelector);
 
     itkNewMacro(Self);  
 
-	itkGetConstMacro(SliceNr,int);
-	itkSetMacro(SliceNr,int);
+  itkGetConstMacro(SliceNr,int);
+  itkSetMacro(SliceNr,int);
 
-	itkGetConstMacro(TimeNr,int);
-	itkSetMacro(TimeNr,int);
+  itkGetConstMacro(TimeNr,int);
+  itkSetMacro(TimeNr,int);
 
-	itkGetConstMacro(ChannelNr,int);
-	itkSetMacro(ChannelNr,int);
+  itkGetConstMacro(ChannelNr,int);
+  itkSetMacro(ChannelNr,int);
 
 protected:
   virtual void GenerateOutputInformation();

@@ -715,7 +715,7 @@ void QmitkTransferFunctionWidget::ImmediateUpdate(bool state)
 {
     m_ScalarOpacityFunctionCanvas->SetImmediateUpdate(state);
     m_ColorTransferFunctionCanvas->SetImmediateUpdate(state);
-    m_GradientOpacityCanvas->SetImmediateUpdate(state);	    
+    m_GradientOpacityCanvas->SetImmediateUpdate(state);      
 }
 
 void QmitkTransferFunctionWidget::SetXValue()

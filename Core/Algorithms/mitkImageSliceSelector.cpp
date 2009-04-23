@@ -22,12 +22,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::ImageSliceSelector::GenerateOutputInformation()
 {
-	mitk::Image::ConstPointer input  = this->GetInput();
-	mitk::Image::Pointer output = this->GetOutput();
+  mitk::Image::ConstPointer input  = this->GetInput();
+  mitk::Image::Pointer output = this->GetOutput();
 
-	itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<<"GenerateOutputInformation()");
 
-	output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
+  output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
 
   if( (unsigned int)m_SliceNr >= input->GetDimension(2) )
   {
@@ -46,7 +46,7 @@ void mitk::ImageSliceSelector::GenerateOutputInformation()
 
 void mitk::ImageSliceSelector::GenerateData()
 {
-	SetSliceItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), 0);
+  SetSliceItem(GetSliceData(m_SliceNr, m_TimeNr, m_ChannelNr), 0);
 }
 
 mitk::ImageSliceSelector::ImageSliceSelector() : m_SliceNr(0), m_TimeNr(0), m_ChannelNr(0)

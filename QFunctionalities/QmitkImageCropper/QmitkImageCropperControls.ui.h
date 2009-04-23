@@ -69,15 +69,15 @@ void QmitkImageCropperControls::m_EnableSurroundingCheckBox_toggled( bool value)
 {
     if(value)
     {
-	m_SurroundingSlider->show();
-	m_SurroundingSpin->show();
-	m_TLGrayvalue->show();
+  m_SurroundingSlider->show();
+  m_SurroundingSpin->show();
+  m_TLGrayvalue->show();
     }
     else
     {
-	m_SurroundingSlider->hide();
-	m_SurroundingSpin->hide();
-	m_TLGrayvalue->hide();
+  m_SurroundingSlider->hide();
+  m_SurroundingSpin->hide();
+  m_TLGrayvalue->hide();
     }
     
 }

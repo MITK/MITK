@@ -60,7 +60,7 @@ void mitk::UnstructuredGridVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_
   time_t timeBefore=0;
   if (!stat(m_VtkWriter->GetFileName(),&fileStatus))
   {
-	timeBefore = fileStatus.st_mtime;
+  timeBefore = fileStatus.st_mtime;
   }
    if (!m_VtkWriter->Write())
   {

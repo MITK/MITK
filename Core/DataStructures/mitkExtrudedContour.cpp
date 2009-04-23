@@ -393,10 +393,10 @@ unsigned long mitk::ExtrudedContour::GetMTime() const
 {
   unsigned long latestTime = Superclass::GetMTime();
   if(m_Contour.IsNotNull())
-	{
+  {
     unsigned long localTime;
     localTime = m_Contour->GetMTime();
     if(localTime > latestTime) latestTime = localTime;
-	}
+  }
   return latestTime;
 }

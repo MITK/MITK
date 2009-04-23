@@ -154,10 +154,10 @@ void QmitkSurfaceTransformerComponent::TransformXBox()
 
     //mitk::OperationType OpROTATE;
     
-	   //   //get movedistance from GUI
+     //   //get movedistance from GUI
     //double xValue = m_SurfaceTransformerComponentGUI->GetXBox()->text().toDouble();
 
-	   // mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
+     // mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
 
     //  //mitk::Point3D newPos = pointOp->GetPoint();
     //  //ScalarType data[3];
@@ -201,7 +201,7 @@ void QmitkSurfaceTransformerComponent::TransformXBox()
   surfaceCenter[0] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(0,3);
   surfaceCenter[1] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(1,3);
   surfaceCenter[2] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(2,3);
-	 
+   
     /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
     mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, surfaceCenter);
 
@@ -358,10 +358,10 @@ void QmitkSurfaceTransformerComponent::TransformYBox()
 {
   if(m_SurfaceTransformerComponentGUI->GetMoveButton()->isOn())
   {
-	  double yValue = m_SurfaceTransformerComponentGUI->GetYBox()->text().toDouble();
-	  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-	  surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(1,3,yValue);
-	  surface->UpdateOutputData();
+    double yValue = m_SurfaceTransformerComponentGUI->GetYBox()->text().toDouble();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(1,3,yValue);
+    surface->UpdateOutputData();
 
   //mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
   mitk::Point3D surfaceCenter;
@@ -369,13 +369,13 @@ void QmitkSurfaceTransformerComponent::TransformYBox()
   surfaceCenter[1] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(1,3);
   surfaceCenter[2] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(2,3);
 
-	  /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
-	  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, surfaceCenter);
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, surfaceCenter);
 
-	  /* execute the Operation */
-	  surface->GetGeometry()->ExecuteOperation(doOp);
+    /* execute the Operation */
+    surface->GetGeometry()->ExecuteOperation(doOp);
 
-	  surface->UpdateOutputData();
+    surface->UpdateOutputData();
       this->m_MultiWidget->RequestUpdate();//neu
 
 
@@ -432,10 +432,10 @@ void QmitkSurfaceTransformerComponent::TransformZBox()
 {
   if(m_SurfaceTransformerComponentGUI->GetMoveButton()->isOn())
   {
-	  double zValue = m_SurfaceTransformerComponentGUI->GetZBox()->text().toDouble();
-	  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
-	  surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(2,3,zValue);
-	  surface->UpdateOutputData();
+    double zValue = m_SurfaceTransformerComponentGUI->GetZBox()->text().toDouble();
+    mitk::Surface* surface = dynamic_cast<mitk::Surface*>(m_SurfaceNode->GetData());
+    surface->GetGeometry()->GetVtkTransform()->GetMatrix()->SetElement(2,3,zValue);
+    surface->UpdateOutputData();
 
   //mitk::Point3D surfaceCenter = surface->GetGeometry()->GetCenter();
   mitk::Point3D surfaceCenter;
@@ -443,13 +443,13 @@ void QmitkSurfaceTransformerComponent::TransformZBox()
   surfaceCenter[1] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(1,3);
   surfaceCenter[2] = surface->GetGeometry()->GetVtkTransform()->GetMatrix()->GetElement(2,3);
 
-	  /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
-	  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, surfaceCenter);
+    /* create operation with center of rotation, angle and axis and send it to the geometry and Undo controller */
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVE, surfaceCenter);
 
-	  /* execute the Operation */
-	  surface->GetGeometry()->ExecuteOperation(doOp);
+    /* execute the Operation */
+    surface->GetGeometry()->ExecuteOperation(doOp);
 
-	  surface->UpdateOutputData();
+    surface->UpdateOutputData();
 
   ////std::cout<<"Move"<<std::endl;
   //double zValue = m_SurfaceTransformerComponentGUI->GetZBox()->text().toDouble();

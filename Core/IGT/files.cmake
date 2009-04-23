@@ -42,8 +42,8 @@ IF(MITK_USE_MICROBIRD_TRACKER)
 ENDIF(MITK_USE_MICROBIRD_TRACKER)
 
 IF(WIN32) 
-	SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
+  SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
 ELSE()
-	SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
+  SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
 ENDIF(WIN32)
 

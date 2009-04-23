@@ -56,14 +56,14 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
 {
   Surface::WriteXMLData( xmlWriter );
-  xmlWriter.WriteProperty("Positive", m_Positive );	
-	return true;
+  xmlWriter.WriteProperty("Positive", m_Positive );  
+  return true;
 }
 
 
 bool mitk::BoundingObject::ReadXMLData( XMLReader& xmlReader )
 {
   Surface::ReadXMLData( xmlReader );
-  xmlReader.GetAttribute("Positive", m_Positive );	
+  xmlReader.GetAttribute("Positive", m_Positive );  
   return true;
 }

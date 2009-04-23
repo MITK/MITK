@@ -71,7 +71,7 @@ public:
   //## (b) m_EvenlyTimed is activated and (c) the first geometry (t=0) 
   //## is set, then we clone the geometry and set the m_TimeBounds accordingly.
   //## \sa GetGeometry3D
- 	itkGetConstMacro(EvenlyTimed, bool);
+   itkGetConstMacro(EvenlyTimed, bool);
   virtual void SetEvenlyTimed(bool on = true);
 
   //##Documentation

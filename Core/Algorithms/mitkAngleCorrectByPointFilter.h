@@ -33,16 +33,16 @@ class MITK_CORE_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
 public:
   mitkClassMacro(AngleCorrectByPointFilter, ImageToImageFilter);
 
-	itkNewMacro(Self);
+  itkNewMacro(Self);
   
   itkSetMacro(Center, Point3D);
-	itkGetConstReferenceMacro(Center, Point3D);
+  itkGetConstReferenceMacro(Center, Point3D);
 
   itkSetMacro(TransducerPosition, Point3D);
-	itkGetConstReferenceMacro(TransducerPosition, Point3D);
+  itkGetConstReferenceMacro(TransducerPosition, Point3D);
 
   itkSetMacro(PreferTransducerPositionFromProperty, bool);
-	itkGetMacro(PreferTransducerPositionFromProperty, bool);
+  itkGetMacro(PreferTransducerPositionFromProperty, bool);
 
 protected:
 
@@ -51,15 +51,15 @@ protected:
   itk::TimeStamp m_TimeOfHeaderInitialization;
  
 protected:
-	AngleCorrectByPointFilter();
+  AngleCorrectByPointFilter();
 
   ~AngleCorrectByPointFilter();
 
   virtual void GenerateData();
 
-	virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation();
 
-	virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion();
 
   Point3D m_TransducerPosition;
   Point3D m_Center;

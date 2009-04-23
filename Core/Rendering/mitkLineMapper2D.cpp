@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include "mitkPointSet.h"
 #include "mitkGL.h"
-	
+  
 mitk::LineMapper2D::LineMapper2D()
 : mitk::PointSetMapper2D()
 {
@@ -63,8 +63,8 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     PointSet::DataType::PointsContainerConstIterator it, end;
     it = input->GetPointSet()->GetPoints()->Begin();
     end = input->GetPointSet()->GetPoints()->End();//the last before end, because lines from n to n+1
-		if (end!=it)  // otherwise PointSet is empty
-				end--;
+    if (end!=it)  // otherwise PointSet is empty
+        end--;
 
     //bool list for the selection of the points
     PointSet::DataType::PointDataContainerIterator selIt, selItNext;
@@ -123,7 +123,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
         //}
         //else
         //{
-					glBegin (GL_LINES);
+          glBegin (GL_LINES);
             glVertex2f(p2d[0], p2d[1]);
             glVertex2f(q2d[0], q2d[1]);
           glEnd ();
@@ -131,7 +131,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
       }
       ++it;
       ++selIt;
- 			j++;
+       j++;
     }
     //drawing the points
     PointSetMapper2D::Paint(renderer);

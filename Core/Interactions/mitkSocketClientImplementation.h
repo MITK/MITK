@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSOCKETCLIENTIMPLEMENTATION_H
 
 #include "mitkCommon.h"
-	 
+   
 namespace mitk 
 {
 
@@ -41,7 +41,7 @@ namespace mitk
 
     virtual void open( const char* ipAdress, unsigned short port )=0;
 
-	  virtual void setMaxConnectionAdvance( int maxConnectionAdvance )=0;
+    virtual void setMaxConnectionAdvance( int maxConnectionAdvance )=0;
 
     virtual bool send( unsigned int messagetype, unsigned int bodySize = 0, char* body = NULL )=0;
   };

@@ -1182,6 +1182,9 @@ void QmitkMainTemplate::parseCommandLine()
     if (strcmp(qApp->argv()[i], "-statemachineDebug")==0) {
       break;
     }
+    if (strcmp(qApp->argv()[i], "-noMITKOptions")==0) {
+		  break;
+	  }
     fileOpen(qApp->argv()[i]);
   }
   m_MultiWidget->GetRenderWindow4()->GetRenderer()->GetCameraController()->SetViewToAnterior();

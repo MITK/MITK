@@ -42,6 +42,34 @@ namespace mitk {
   /**
   * @brief Vtk-based mapper for Surface
   * 
+
+  * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
+  *
+  *   - \b "material": (MaterialProperty) Material of the surface object. The material properties are:
+
+  *   - \b "color": (ColorProperty) Color of the surface object
+  *   - \b "AmbientColor": (AmbientColor) Ambient color  of the surface object
+  *   - \b "Ambient": (  FloatProperty) Ambient coefficient of the surface object
+  *   - \b "DiffuseColor": ( DiffuseColor) Diffuse color of the surface object
+  *   - \b "Diffuse": (FloatProperty) Diffuse coefficient of the surface object
+  *   - \b "SpecularColor": (SpecularColor) Specular Color of the surface object
+  *   - \b "Specular": (FloatProperty) Specular coefficient of the surface object
+  *   - \b "SpecularPower": (FloatProperty) Specular power of the surface object
+  *   - \b "Opacity": (FloatProperty) Opacity of the surface object
+  *   - \b "Interpolation": (VtkInterpolationProperty) Interpolation
+  *   - \b "Representation": (VtkRepresentationProperty*) Representation
+  *   - \b "LineWidth": (IntProperty) Width in pixels of the lines drawn.
+  *   - \b ""scalar visibility": (BoolProperty) If the scarlars of the surface are visible
+  
+  The default properties are:
+  *   - \b "wireframe line width": (FloatProperty::New(1.0))
+  *   - \b ""material": (MaterialProperty)
+  *   - \b ""scalar visibility": (BoolProperty)
+  *   - \b "color mode": (BoolProperty)
+  *   - \b "representation": (VtkRepresentationProperty)
+  *   - \b "interpolation"(VtkInterpolationProperty)
+  *   - \b "scalar mode": (VtkScalarModeProperty)
+
   * Properties to look for are:
   *
   *   - \b "scalar visibility": if set to on, scalars assigned to the data are shown
@@ -50,9 +78,11 @@ namespace mitk {
   *         for the level window settings.
   *   - \b "ScalarsRangeMaximum": Optional. See above.
   *
-  * There are still some other, deprecated properties. These will not be documented anymore.
+  * There might be still some other, deprecated properties. These will not be documented anymore.
   * Please check the source if you really need them.
   *
+  *
+  */
   * @ingroup Mapper
   */
 

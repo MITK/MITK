@@ -81,8 +81,6 @@ namespace mitk {
   * There might be still some other, deprecated properties. These will not be documented anymore.
   * Please check the source if you really need them.
   *
-  *
-  */
   * @ingroup Mapper
   */
 

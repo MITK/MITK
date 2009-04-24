@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.opencherry.ui.views">
+    <view id="org.mitk.views.imageguidedtherapytutorial"
+          name="Image Guided Therapy Tutorial"
+          class="::QmitkImageGuidedTherapyTutorialView"
+          icon="resources/igt-tutorial-icon.png"/>
+  </extension>
+
+</plugin>

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: Image Guided Therapy Tutorial 
+Bundle-SymbolicName: org.mitk.gui.qt.igttutorial 
+Bundle-Version: 0.1
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.mitk.gui.qt.common
+Bundle-Activator: 

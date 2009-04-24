@@ -20,6 +20,6 @@ QT4_WRAP_CPP(STEP8_CPP Step6.h Step8.h)
 FOREACH(stepNo RANGE 1 8)
   SET(STEP${stepNo}_CPP ${STEP${stepNo}_CPP} Step${stepNo}.cpp QtTesting.cpp)
   ADD_EXECUTABLE(Step${stepNo} ${STEP${stepNo}_CPP})
-  TARGET_LINK_LIBRARIES(Step${stepNo} Qmitk)
+  TARGET_LINK_LIBRARIES(Step${stepNo} Qmitk ${QT_LIBRARIES})
 ENDFOREACH(stepNo)
 

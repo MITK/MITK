@@ -29,7 +29,6 @@
 */
 class QMITK_EXPORT QmitkPlotDialog: public QDialog 
 {
-  Q_OBJECT
 
 public:
   /**

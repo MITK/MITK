@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCalculateGrayValueStatisticsToolGUI.h"
 
-#include "QmitkHistogramValuesWidget.h"
+#include "QmitkHistogramWidget.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
 
@@ -58,7 +58,7 @@ void QmitkCalculateGrayValueStatisticsToolGUI::OnCalculationsDone()
     bool showreport = false;
 
     //uses the parameter "true" because the report should be shown in addition to the histogram
-    QmitkHistogramValuesWidget* hvw = new QmitkHistogramValuesWidget();
+    QmitkHistogramWidget* hvw = new QmitkHistogramWidget();
     typedef itk::Statistics::Histogram<double, 1> HistogramType;
 
     HistogramType::ConstPointer histogram = m_CalculateGrayValueStatisticsTool->GetHistogram();

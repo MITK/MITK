@@ -3,7 +3,7 @@
 
 #include "QmitkPlotWidget.h"
 
-QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char* name, WFlags f): QWidget(parent, name, f) 
+QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char* name, Qt::WindowFlags f): QWidget(parent, name, f) 
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;

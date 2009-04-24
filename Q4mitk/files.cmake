@@ -67,6 +67,9 @@ SET(CPP_FILES
  QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
  QmitkDataStorageComboBox.cpp
+ 
+ QmitkHistogram.cpp
+ QmitkHistogramWidget.cpp
  QmitkPlotWidget.cpp
  QmitkPlotDialog.cpp
 )

@@ -39,7 +39,7 @@ SET(CPP_FILES
   QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
   QmitkHelpBrowser.cpp
   QmitkHistogram.cpp
-  QmitkHistogramValuesWidget.cpp
+  QmitkHistogramWidget.cpp
   QmitkInteractionFunctionalityComponent.cpp
   QmitkLevelWindowWidgetContextMenu.cpp
   QmitkLineEditLevelWindowWidget.cpp

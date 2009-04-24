@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef QMITKHISTOGRAMVALUESWIDGET_H_
-#define QMITKHISTOGRAMVALUESWIDGET_H_
+#ifndef QMITKHistogramWidget_H_
+#define QMITKHistogramWidget_H_
 
 #include <qlayout.h>
 #include <qtextedit.h>
@@ -38,15 +38,14 @@ PURPOSE.  See the above copyright notices for more information.
  Offers zoom possibility. 
  A marker can be set and shows the frequency at his position.
  */
-class QMITK_EXPORT QmitkHistogramValuesWidget: public QDialog
+class QMITK_EXPORT QmitkHistogramWidget: public QDialog
 {
-Q_OBJECT
 
 public:
 
   //overloaded constructor to choose between showing only the histogram or the histogram and the report
-  QmitkHistogramValuesWidget(QWidget *parent = 0, bool showreport = false);
-  virtual ~QmitkHistogramValuesWidget();
+  QmitkHistogramWidget(QWidget *parent = 0, bool showreport = false);
+  virtual ~QmitkHistogramWidget();
 
   typedef mitk::Image::HistogramType   HistogramType;
 
@@ -82,5 +81,5 @@ protected:
   QmitkHistogram* m_Histogram;
 };
 
-#endif /* QMITKHISTOGRAMVALUESWIDGET_H_ */
+#endif /* QMITKHistogramWidget_H_ */
 

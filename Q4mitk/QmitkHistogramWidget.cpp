@@ -16,11 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkHistogramValuesWidget.h"
+#include "QmitkHistogramWidget.h"
 
 #include <qlabel.h>
 #include <qpen.h>
-#include <qvgroupbox.h>
+#include <qgroupbox.h>
 
 #include <qwt_plot_grid.h>
 #include <qwt_interval_data.h>
@@ -31,13 +31,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <iostream>
 
-QmitkHistogramValuesWidget::QmitkHistogramValuesWidget(QWidget *parent, bool showreport)
+QmitkHistogramWidget::QmitkHistogramWidget(QWidget *parent, bool showreport)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 
   //***histogram***
 
-  QVGroupBox *hgroupbox = new QVGroupBox("", this, "histogram");
+  QGroupBox *hgroupbox = new QGroupBox("", this, "histogram");
 
   hgroupbox->setMinimumSize(900, 400);
 
@@ -61,12 +61,12 @@ QmitkHistogramValuesWidget::QmitkHistogramValuesWidget(QWidget *parent, bool sho
   if (showreport == true)
   {
     //***report***
-    QVGroupBox *rgroupbox = new QVGroupBox("", this, "report");
+    QGroupBox *rgroupbox = new QGroupBox("", this, "report");
 
     rgroupbox->setMinimumSize(900, 400);
 
     QLabel *label = new QLabel("Gray  Value  Analysis", rgroupbox, "report");
-    label->setAlignment(AlignHCenter);
+    label->setAlignment(Qt::AlignHCenter);
     label->setFont(QFont("Helvetica", 14, QFont::Bold));
 
     m_Textedit = new QTextEdit(rgroupbox);
@@ -85,12 +85,12 @@ QmitkHistogramValuesWidget::QmitkHistogramValuesWidget(QWidget *parent, bool sho
     SLOT(OnSelect(const QwtDoublePoint &)));
 }
 
-QmitkHistogramValuesWidget::~QmitkHistogramValuesWidget()
+QmitkHistogramWidget::~QmitkHistogramWidget()
 {
 
 }
 
-void QmitkHistogramValuesWidget::SetHistogram(HistogramType::ConstPointer itkHistogram)
+void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram)
 {
   HistogramType::SizeType size = itkHistogram->GetSize();
   HistogramType::IndexType index;
@@ -105,8 +105,8 @@ void QmitkHistogramValuesWidget::SetHistogram(HistogramType::ConstPointer itkHis
     currentMeasurementVector = itkHistogram->GetMeasurementVector(index);
     if (currentMeasurementVector[0] != 0.0)
     {
-      xValues.at(i) = QwtDoubleInterval(Round(currentMeasurementVector[0]-1), Round(currentMeasurementVector[0]));
-      yValues.at(i) = static_cast<double> (itkHistogram->GetFrequency(index));
+      xValues[i] = QwtDoubleInterval(Round(currentMeasurementVector[0]-1), Round(currentMeasurementVector[0]));
+      yValues[i] = static_cast<double> (itkHistogram->GetFrequency(index));
     }
   }
 
@@ -124,17 +124,17 @@ void QmitkHistogramValuesWidget::SetHistogram(HistogramType::ConstPointer itkHis
   m_Plot->replot();
 }
 
-void QmitkHistogramValuesWidget::SetHistogram( mitk::Image* mitkImage )
+void QmitkHistogramWidget::SetHistogram( mitk::Image* mitkImage )
 {
   this->SetHistogram(mitkImage->GetScalarHistogram());
 }
 
-void QmitkHistogramValuesWidget::SetReport(std::string report)
+void QmitkHistogramWidget::SetReport(std::string report)
 {
   m_Textedit->setText(report.c_str());
 }
 
-void QmitkHistogramValuesWidget::InitializeMarker()
+void QmitkHistogramWidget::InitializeMarker()
 {
   m_Marker = new QwtPlotMarker();
   m_Marker->setXValue(0.);
@@ -147,7 +147,7 @@ void QmitkHistogramValuesWidget::InitializeMarker()
 }
 
 
-void QmitkHistogramValuesWidget::InitializeZoomer()
+void QmitkHistogramWidget::InitializeZoomer()
 {
   m_Zoomer = new QwtPlotZoomer(m_Plot->xBottom, m_Plot->yLeft, m_Plot->canvas());
   m_Zoomer->setRubberBandPen(QPen(Qt::red, 2, Qt::DotLine));
@@ -155,7 +155,7 @@ void QmitkHistogramValuesWidget::InitializeZoomer()
   m_Zoomer->setSelectionFlags(QwtPlotZoomer::RectSelection);
 }
 
-void QmitkHistogramValuesWidget::OnSelect( const QwtDoublePoint& pos )
+void QmitkHistogramWidget::OnSelect( const QwtDoublePoint& pos )
 {
   m_Marker->setXValue( this->Round(pos.x()) );
   //unsigned int count = (unsigned int)(m_Histogram->data().value(pos.x()));
@@ -168,12 +168,12 @@ void QmitkHistogramValuesWidget::OnSelect( const QwtDoublePoint& pos )
   m_Plot->replot();
 }
 
-double QmitkHistogramValuesWidget::GetMarkerPosition()
+double QmitkHistogramWidget::GetMarkerPosition()
 {
   return m_Marker->xValue();
 }
 
-double QmitkHistogramValuesWidget::Round(double val)
+double QmitkHistogramWidget::Round(double val)
 {
   double ival = (double)(int)val;
   if( (val - ival) > 0.5)

@@ -34,7 +34,6 @@
 
 class QMITK_EXPORT QmitkPlotWidget: public QWidget 
 {
-  Q_OBJECT
 
 public:
   /** 
@@ -60,7 +59,7 @@ public:
   /**
   * Standard qt constructor
   */
-  QmitkPlotWidget(QWidget* parent = 0,const char* title = 0, const char* name = 0, WFlags f = 0);    
+  QmitkPlotWidget(QWidget* parent = 0,const char* title = 0, const char* name = 0, Qt::WindowFlags f = 0);    
 
   /**
   * Virtual destructor

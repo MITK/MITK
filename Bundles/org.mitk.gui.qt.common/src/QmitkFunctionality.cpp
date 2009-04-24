@@ -269,3 +269,13 @@ void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidg
 {
   
 }
+
+void QmitkFunctionality::WaitCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
+}
+
+void QmitkFunctionality::WaitCursorOff()
+{
+  QApplication::restoreOverrideCursor();
+}

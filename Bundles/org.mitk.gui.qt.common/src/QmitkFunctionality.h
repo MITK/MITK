@@ -33,6 +33,7 @@ class QScrollArea;
 class MITK_QT_COMMON QmitkFunctionality : public cherry::QtViewPart, virtual public cherry::IPartListener
 {
 
+
 public:
   cherryObjectMacro(QmitkFunctionality)
 
@@ -116,6 +117,11 @@ public:
   virtual void 	PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void 	PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void 	PartInputChanged (cherry::IWorkbenchPartReference::Pointer partRef);
+
+  // Convinient methods to set and reset a wait cursor ("hourglass")
+  void WaitCursorOn();
+  void WaitCursorOff();
+
 protected:
 
   void SetHandleMultipleDataStorages(bool multiple);

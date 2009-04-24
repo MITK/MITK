@@ -9,7 +9,7 @@
 
 /** 
 * Provides a convenient interface for plotting curves using qwt.
-* Designed for qwt version 5.1.1.
+* Designed for qwt version 5.2.1.
 * Can be used with a QmitkPlotDialog, which provides a "Close" button.
 * @see QmitkPlotDialog
 *

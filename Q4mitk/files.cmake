@@ -67,6 +67,8 @@ SET(CPP_FILES
  QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
  QmitkDataStorageComboBox.cpp
+ QmitkPlotWidget.cpp
+ QmitkPlotDialog.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)

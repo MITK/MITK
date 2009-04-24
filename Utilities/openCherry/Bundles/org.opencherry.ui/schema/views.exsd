@@ -126,8 +126,8 @@ by &apos;/&apos;. Each referenced category must be declared in a corresponding c
             <annotation>
                <documentation>
                   a fully qualified name of the class that implements 
-&lt;samp&gt;org.eclipse.ui.IViewPart&lt;/samp&gt;. A common practice 
-is to subclass &lt;samp&gt;org.eclipse.ui.part.ViewPart&lt;/samp&gt; 
+&lt;samp&gt;org.opencherry.ui/cherry::IViewPart&lt;/samp&gt;. A common practice 
+is to subclass &lt;samp&gt;org.opencherry.ui/cherry::ViewPart&lt;/samp&gt; 
 in order to inherit the default functionality.
                </documentation>
                <appInfo>
@@ -146,19 +146,10 @@ be associated with the view.
                </appInfo>
             </annotation>
          </attribute>
-         <attribute name="fastViewWidthRatio" type="string">
-            <annotation>
-               <documentation>
-                  the percentage of the width of the workbench that the view will take up as an active fast view.
-This must be defined as a floating point value and lie between 0.05 and 0.95.
-If no value is supplied, a default ratio will be used.
-               </documentation>
-            </annotation>
-         </attribute>
          <attribute name="allowMultiple" type="boolean">
             <annotation>
                <documentation>
-                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage.showView(String id, String secondaryId).  The default is false.
+                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(const std::string& id, const std::string& secondaryId).  The default is false.
                </documentation>
             </annotation>
          </attribute>
@@ -207,8 +198,8 @@ If no value is supplied, a default ratio will be used.
       <documentation>
          The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a 
 fully qualified name of the class that implements 
-&lt;samp&gt;org.opencherry.ui.IViewPart&lt;/samp&gt;.  It is common 
-practice to subclass &lt;samp&gt;org.opencherry.ui.ViewPart&lt;/samp&gt;
+&lt;samp&gt;org.opencherry.ui/cherry::IViewPart&lt;/samp&gt;.  It is common 
+practice to subclass &lt;samp&gt;org.opencherry.ui/cherry::ViewPart&lt;/samp&gt;
  when developing a new view.
       </documentation>
    </annotation>
@@ -218,7 +209,7 @@ practice to subclass &lt;samp&gt;org.opencherry.ui.ViewPart&lt;/samp&gt;
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         The Cherry Platform provides a number of standard views including Navigator, Properties, Outline and Tasks. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
+         The openCherry Platform provides a number of standard views including Properties and Log View. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
       </documentation>
    </annotation>
 
@@ -227,11 +218,11 @@ practice to subclass &lt;samp&gt;org.opencherry.ui.ViewPart&lt;/samp&gt;
          <meta.section type="copyright"/>
       </appInfo>
       <documentation>
-         Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
+         Copyright (c) 2009 German Cancer Research Center.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
-available under the terms of the Eclipse Public License v1.0 which accompanies
+available under the terms of a BSD-style license which accompanies
 this distribution, and is available at &lt;a 
-href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+href=&quot;http://www.mitk.org/wiki/License&quot;&gt;http://www.mitk.org/wiki/License&lt;/a&gt;
       </documentation>
    </annotation>
 

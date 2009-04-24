@@ -171,7 +171,7 @@ SET(MOC_H_FILES
   QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
   QmitkFunctionalityComponents/QmitkThresholdComponent.h
   QmitkHelpBrowser.h
-  QmitkHistogramValuesWidget.h
+  QmitkHistogramWidget.h
   QmitkInteractionFunctionalityComponent.h
   QmitkLevelWindowWidgetContextMenu.h
   QmitkLineEditLevelWindowWidget.h

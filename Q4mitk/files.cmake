@@ -134,6 +134,7 @@ SET(MOC_H_FILES
  QmitkPropertiesTableEditor.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkDataStorageComboBox.h
+ QmitkHistogramWidget.h
 )
 
 SET(UI_FILES

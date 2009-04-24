@@ -1,5 +1,3 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/QmitkTemplate">
-     <file>icon.xpm</file>
- </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/QmitkTemplate" />
+</RCC>

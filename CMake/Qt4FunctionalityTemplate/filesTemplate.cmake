@@ -22,7 +22,8 @@ SET(RESOURCE_FILES
 )
 
 SET(RES_FILES
-  @PLUGIN_RES_FILES@
+# uncomment the following line if you want to use Qt resources
+#  @PLUGIN_RES_FILES@
 )
 
 @SET_MANIFEST_SRC@

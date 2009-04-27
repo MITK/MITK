@@ -12,23 +12,21 @@
 @BEGIN_NAMESPACE@
 
 /*!
-
-  \brief QmitkTemplate 
-
-  Functionality for demonstration of MITK basics.
-
-  This functionality allows the user to set some seed points that are used for a simple region growing algorithm from ITK.
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
-*/
+ * \ingroup @NormalizedPluginID@_internal
+ *
+ * \brief @VIEW_CLASS@
+ *
+ * Document your class here.
+ *
+ * \sa @VIEW_BASE_CLASS@
+ */
 class @VIEW_CLASS@ : public QObject, public @VIEW_BASE_CLASS@
-{  
+{
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
-  
-  public: 
+
+  public:
 
   static const std::string VIEW_ID;
 
@@ -37,24 +35,24 @@ class @VIEW_CLASS@ : public QObject, public @VIEW_BASE_CLASS@
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation of the connections of main and control widget  
+  /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
   virtual void Activated();
-  
+
   virtual void Deactivated();
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
-protected slots:  
-  
+protected slots:
+
   /// \brief Called when the user clicks the GUI button
   void DoSomething();
 
-protected:  
-  
+protected:
+
   Ui::@VIEW_CONTROLS_CLASS@* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;

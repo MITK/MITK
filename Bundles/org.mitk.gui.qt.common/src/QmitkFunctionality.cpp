@@ -134,6 +134,13 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
 {
 //   if(partRef->GetPart(false) == this)
 //     this->Activated();
+  QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+  // inform ViewPart that multi widget is available now
+  if (stdMultiWidgetEditor.IsNotNull())
+  {
+    this->StdMultiWidgetAvailable(*(stdMultiWidgetEditor->GetStdMultiWidget()));
+  }
 }
 
 void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -162,13 +169,7 @@ void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Point
 
 void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
 
-  // inform ViewPart that multi widget is available now
-  if (stdMultiWidgetEditor.IsNotNull())
-  {
-    this->StdMultiWidgetAvailable(*(stdMultiWidgetEditor->GetStdMultiWidget()));
-  }
 }
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )

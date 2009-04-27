@@ -58,8 +58,9 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
-                         @OPENCHERRY_SOURCE_DIR@/../Documentation/reference/api/ \
-                         @OPENCHERRY_SOURCE_DIR@ \
+                         @OPENCHERRY_BASE_DIR@/Documentation/ \
+                         @OPENCHERRY_BASE_DIR@/Bundles \
+                         @OPENCHERRY_BASE_DIR@/Bundles-Qt \
                          @OPENCHERRY_BINARY_DIR@
 FILE_PATTERNS          = *.h \
                          *.cpp \

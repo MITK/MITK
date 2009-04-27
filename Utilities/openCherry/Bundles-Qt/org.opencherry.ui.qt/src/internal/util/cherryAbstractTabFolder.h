@@ -19,11 +19,13 @@
 #define CHERRYABSTRACTTABFOLDER_H_
 
 #include <cherryMessage.h>
-#include <QWidget>
+
 #include <QRect>
 
 #include "cherryPartInfo.h"
 #include "cherryTabFolderEvent.h"
+
+class QWidget;
 
 namespace cherry
 {
@@ -82,7 +84,7 @@ public:
 
   AbstractTabFolder();
   virtual ~AbstractTabFolder();
-  
+
   virtual QSize ComputeSize(int widthHint, int heightHint) = 0;
 
   virtual AbstractTabItem* Add(int index, int flags) = 0;
@@ -249,7 +251,7 @@ protected:
 
   void HandleContextMenu(const QPoint& displayPos);
 
-  void HandleMouseDown(const QPoint& displayPos);
+  void HandleMousePress(const QPoint& displayPos);
 
   void HandleDoubleClick(const QPoint& displayPos);
 

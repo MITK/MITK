@@ -18,8 +18,11 @@
 #include "cherryNativeTabItem.h"
 
 #include "cherryNativeTabFolder.h"
+#include "cherryQCTabBar.h"
 
 #include <cherryConstants.h>
+
+#include <QToolButton>
 
 namespace cherry
 {
@@ -101,11 +104,15 @@ QWidget* NativeTabItem::GetCloseButton()
 {
   if (!closeButton)
   {
-    const QIcon iconCloseTab( ":/resources/tab_close_icon.png" );
-    closeButton = new QPushButton( iconCloseTab, "");
+    QIcon iconCloseTab( ":/org.opencherry.ui.qt/tab_close_icon.png" );
+    iconCloseTab.addFile(":/org.opencherry.ui.qt/tab_close_icon-active.png", QSize(), QIcon::Active);
+    closeButton = new QToolButton(parent->GetControl());
+    closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);
-    closeButton->setFixedSize(16,16);
-    closeButton->setFlat(true);
+    closeButton->setFixedSize(12,12);
+    //closeButton->setFlat(true);
+    closeButton->setIcon(iconCloseTab);
+    closeButton->setAutoRaise(true);
   }
 
   return closeButton;

@@ -544,11 +544,11 @@ PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const std::string& id)
 
 void EditorSashContainer::UpdateTabList()
 {
-  //TODO EditorSashContainer update tab list
-//  Composite parent = getParent();
-//  if (parent != 0)
-//  { // parent may be 0 on startup
-//    EditorStack wb = getActiveWorkbook();
+  void* parent = this->GetParent();
+  if (parent != 0)
+  { // parent may be 0 on startup
+    PartStack::Pointer wb(this->GetActiveWorkbook());
+//TODO EditorSashContainer update tab list
 //    if (wb == 0)
 //    {
 //      parent.setTabList(new Control[0]);
@@ -557,7 +557,7 @@ void EditorSashContainer::UpdateTabList()
 //    {
 //      parent.setTabList(wb.getTabList());
 //    }
-//  }
+  }
 }
 
 void EditorSashContainer::CreateControl(void* parent)

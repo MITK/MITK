@@ -146,7 +146,7 @@ void QtControlWidget::resizeEvent(QResizeEvent* event)
   controller->controlEvents.resizedEvent(controlEvent);
 }
 
-void QtControlWidget::inFocusEvent(QFocusEvent* /*event*/)
+void QtControlWidget::FireActivateEvent()
 {
   GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this)));
   controller->controlEvents.activatedEvent(controlEvent);

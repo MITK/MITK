@@ -21,7 +21,8 @@
 #include "../util/cherryAbstractTabItem.h"
 
 #include <QObject>
-#include <QPushButton>
+
+class QToolButton;
 
 namespace cherry
 {
@@ -40,7 +41,7 @@ private:
   const int style;
   bool showClose;
 
-  QPushButton* closeButton;
+  QToolButton* closeButton;
 
 private slots:
 

@@ -101,6 +101,8 @@ public:
 
   private: bool busy;
 
+  private: bool hasFocus;
+
   //private: SmartPointer<PartStack> partStack;
 
   protected:

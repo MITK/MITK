@@ -20,6 +20,7 @@
 
 #include <QHBoxLayout>
 #include <QRect>
+#include <QWidget>
 
 namespace cherry
 {

@@ -31,6 +31,7 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
   QWidget* parent = static_cast<QWidget*>(pageControl);
   QtControlWidget* client = new QtControlWidget(parent, Shell::Pointer(0));
   client->setObjectName("Client Composite");
+  parent->layout()->setContentsMargins(3, 3, 3, 3);
   parent->layout()->addWidget(client);
 
   // we have to enable visibility to get a proper layout (see bug #1654)
@@ -43,7 +44,10 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
 {
   QWidget* qParent = static_cast<QWidget*>(parent);
   QtControlWidget* control = new QtControlWidget(qParent, Shell::Pointer(0));
-  control->setObjectName("Pane Control");
+  // the object name is used in the global event filter to find
+  // the pane control over which a mouse pressed event occured
+  // --> do not change the object name
+  control->setObjectName("PartPaneControl");
 
   return control;
 }

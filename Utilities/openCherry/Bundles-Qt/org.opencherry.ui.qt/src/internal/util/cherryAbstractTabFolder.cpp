@@ -21,6 +21,8 @@
 #include <cherryConstants.h>
 #include <cherryIStackPresentationSite.h>
 
+#include <QWidget>
+
 namespace cherry
 {
 
@@ -196,7 +198,7 @@ void AbstractTabFolder::HandleContextMenu(const QPoint& displayPos)
   this->FireEvent(TabFolderEvent::EVENT_SYSTEM_MENU, tab, displayPos);
 }
 
-void AbstractTabFolder::HandleMouseDown(const QPoint& displayPos)
+void AbstractTabFolder::HandleMousePress(const QPoint& displayPos)
 {
   this->FireEvent(TabFolderEvent::EVENT_GIVE_FOCUS_TO_PART);
 }

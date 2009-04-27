@@ -16,42 +16,26 @@
  =========================================================================*/
 
 
-#ifndef CHERRYQTCONTROLWIDGET_H_
-#define CHERRYQTCONTROLWIDGET_H_
+#ifndef CHERRYQTGLOBALEVENTFILTER_H_
+#define CHERRYQTGLOBALEVENTFILTER_H_
 
-#include <QFrame>
+#include <QObject>
 
-#include "cherryQtWidgetController.h"
+class QEvent;
 
 namespace cherry {
 
-class QtControlWidget : public QFrame
+class QtGlobalEventFilter : public QObject
 {
   Q_OBJECT
 
 public:
 
-  QtControlWidget(QWidget* parent, SmartPointer<Shell> shell, Qt::WindowFlags f = 0);
+  QtGlobalEventFilter(QObject* parent = 0);
 
-  ~QtControlWidget();
-
-  void FireActivateEvent();
-
-protected:
-
-  // used for shell listeners
-  void changeEvent(QEvent* event);
-  void closeEvent(QCloseEvent* closeEvent);
-
-  // used for control listeners
-  void moveEvent(QMoveEvent* event);
-  void resizeEvent(QResizeEvent* event);
-
-private:
-
-  QtWidgetController::Pointer controller;
+  bool eventFilter(QObject* obj, QEvent* event);
 };
 
 }
 
-#endif /* CHERRYQTCONTROLWIDGET_H_ */
+#endif /* CHERRYQTGLOBALEVENTFILTER_H_ */

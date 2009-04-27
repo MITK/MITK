@@ -38,7 +38,7 @@ PartPane::Sashes::Sashes() :
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage::Pointer workbenchPage)
  : StackablePart(partReference->GetId()),
-   control(0), inLayout(true)
+   control(0), inLayout(true), busy(false), hasFocus(false)
 {
   //super(partReference.getId());
   this->partReference = partReference;
@@ -184,6 +184,19 @@ WorkbenchPage::Pointer PartPane::GetPage()
 void PartPane::SetContainer(IStackableContainer::Pointer container)
 {
 
+  if (hasFocus)
+  {
+    IStackableContainer::Pointer oldContainer = this->GetContainer();
+    if (PartStack::Pointer oldStack = oldContainer.Cast<PartStack>())
+    {
+      oldStack->SetActive(StackPresentation::AS_INACTIVE);
+    }
+    if (PartStack::Pointer newContainer = container.Cast<PartStack>())
+    {
+      newContainer->SetActive(StackPresentation::AS_ACTIVE_FOCUS);
+    }
+  }
+
   void* containerControl = container == 0 ? 0 : container.Cast<LayoutPart>()->GetControl();
 
   if (containerControl != 0)
@@ -233,6 +246,7 @@ void PartPane::ShowFocus(bool inFocus)
 
   if (partReference.Cast<IViewReference>() != 0)
   {
+    hasFocus = inFocus;
     stack->SetActive(inFocus ? StackPresentation::AS_ACTIVE_FOCUS
                             : StackPresentation::AS_INACTIVE);
   }

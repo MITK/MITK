@@ -143,27 +143,27 @@ QtTracker::QtTracker() :
   rubberBand->setPalette(rubberPalette);
   rubberBand->ensurePolished();
 
-  QPixmap pixCursorTop(":/resources/cursor_top.xpm");
+  QPixmap pixCursorTop(":/org.opencherry.ui.qt/cursor_top.xpm");
   QCursor* cursorTop = new QCursor(pixCursorTop, 15, 8);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_TOP, cursorTop));
 
-  QPixmap pixCursorRight(":/resources/cursor_right.xpm");
+  QPixmap pixCursorRight(":/org.opencherry.ui.qt/cursor_right.xpm");
   QCursor* cursorRight = new QCursor(pixCursorRight, 23, 15);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_RIGHT, cursorRight));
 
-  QPixmap pixCursorBottom(":/resources/cursor_bottom.xpm");
+  QPixmap pixCursorBottom(":/org.opencherry.ui.qt/cursor_bottom.xpm");
   QCursor* cursorBottom = new QCursor(pixCursorBottom, 16, 23);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_BOTTOM, cursorBottom));
 
-  QPixmap pixCursorLeft(":/resources/cursor_left.xpm");
+  QPixmap pixCursorLeft(":/org.opencherry.ui.qt/cursor_left.xpm");
   QCursor* cursorLeft = new QCursor(pixCursorLeft, 8, 15);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_LEFT, cursorLeft));
 
-  QPixmap pixCursorCenter(":/resources/cursor_center.xpm");
+  QPixmap pixCursorCenter(":/org.opencherry.ui.qt/cursor_center.xpm");
   QCursor* cursorCenter = new QCursor(pixCursorCenter, 15, 15);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_CENTER, cursorCenter));
 
-  QPixmap pixCursorOffscreen(":/resources/cursor_offscreen.xpm");
+  QPixmap pixCursorOffscreen(":/org.opencherry.ui.qt/cursor_offscreen.xpm");
   QCursor* cursorOffscreen = new QCursor(pixCursorOffscreen, 15, 15);
   cursorMap.insert(std::make_pair(DnDTweaklet::CURSOR_OFFSCREEN, cursorOffscreen));
 

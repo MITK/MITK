@@ -18,11 +18,17 @@
 #ifndef CHERRYNATIVETABFOLDER_H_
 #define CHERRYNATIVETABFOLDER_H_
 
-#include "cherryQCTabBar.h"
 #include "../util/cherryAbstractTabFolder.h"
+
+#include <QObject>
+
+class QFrame;
+class QWidget;
 
 namespace cherry
 {
+
+class QCTabBar;
 
 class NativeTabFolder: public QObject, public AbstractTabFolder
 {
@@ -32,6 +38,7 @@ Q_OBJECT
 private:
 
   QCTabBar* tabControl;
+  QFrame* contentFrame;
   QWidget* viewForm;
   QWidget* content;
   //  ViewForm viewForm;
@@ -63,6 +70,8 @@ private:
    */
   AbstractTabItem* GetTab(int index);
 
+  void UpdateColors();
+
 private slots:
 
   void TabSelectionChanged(int index);
@@ -73,6 +82,10 @@ public:
   NativeTabFolder(QWidget* parent);
 
   ~NativeTabFolder();
+
+  void SetActive(int activeState);
+
+  bool eventFilter(QObject* watched, QEvent* event);
 
   void CloseButtonClicked(AbstractTabItem* item);
 

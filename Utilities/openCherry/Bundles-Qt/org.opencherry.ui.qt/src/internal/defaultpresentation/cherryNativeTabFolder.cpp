@@ -17,13 +17,17 @@
 
 #include "cherryNativeTabFolder.h"
 #include "cherryNativeTabItem.h"
+#include "cherryQCTabBar.h"
 
 #include "../cherryQtControlWidget.h"
 
 #include <cherryShell.h>
 #include <cherryConstants.h>
 
+#include <QFrame>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QKeyEvent>
 
 namespace cherry
 {
@@ -48,14 +52,43 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 {
   content = 0;
   viewForm = new QtControlWidget(parent, Shell::Pointer(0));
-  qobject_cast<QFrame*>(viewForm)->setFrameStyle(QFrame::Box | QFrame::Plain);
   viewForm->setObjectName("ViewForm");
+  viewForm->installEventFilter(this);
   QVBoxLayout* layout = new QVBoxLayout(viewForm);
   layout->setContentsMargins(0,0,0,0);
+  layout->setSpacing(0);
   viewForm->setLayout(layout);
 
-  tabControl = new QCTabBar(viewForm);
-  layout->addWidget(tabControl);
+  QWidget* topControls = new QWidget(viewForm);
+  topControls->setMinimumSize(0, 24);
+  topControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  layout->addWidget(topControls);
+  QHBoxLayout* topLayout = new QHBoxLayout(topControls);
+  topLayout->setContentsMargins(0, 0, 0, 0);
+  topLayout->setSpacing(0);
+
+  tabControl = new QCTabBar(topControls);
+  tabControl->installEventFilter(this);
+  tabControl->setMinimumSize(0, 25);
+  tabControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  topLayout->addWidget(tabControl);
+
+  QFrame* topRightControls = new QFrame(topControls);
+  topRightControls->setObjectName("TabTopRightControls");
+  topRightControls->setMinimumSize(6, 25);
+  topRightControls->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  topLayout->addWidget(topRightControls);
+
+  contentFrame = new QFrame(viewForm);
+  contentFrame->setObjectName("ViewFormContentFrame");
+  contentFrame->installEventFilter(this);
+  contentFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  QVBoxLayout* contentFrameLayout = new QVBoxLayout(contentFrame);
+  contentFrameLayout->setContentsMargins(0,0,0,0);
+  contentFrameLayout->setSpacing(0);
+  //contentFrame->setLayout(layout);
+
+  layout->addWidget(contentFrame);
 
   this->connect(tabControl, SIGNAL(currentChanged(int)), this,
       SLOT(TabSelectionChanged(int)));
@@ -64,16 +97,16 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
       SLOT(DragStarted(const QPoint&)));
 
 
-  std::cout << "Created: viewForm <-- " << qPrintable(parent->objectName());
-  for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
-    std::cout << " <-- " << qPrintable(parent->objectName());
-  std::cout << std::endl;
+  //std::cout << "Created: viewForm <-- " << qPrintable(parent->objectName());
+  //for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
+  //  std::cout << " <-- " << qPrintable(parent->objectName());
+  //std::cout << std::endl;
 
-  parent = viewForm;
-  std::cout << "Created control: QCTabBar <-- " << qPrintable(parent->objectName());
-  for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
-    std::cout << " <-- " << qPrintable(parent->objectName());
-  std::cout << std::endl;
+  //parent = viewForm;
+  //std::cout << "Created control: QCTabBar <-- " << qPrintable(parent->objectName());
+  //for (parent = parent->parentWidget(); parent != 0; parent = parent->parentWidget())
+  //  std::cout << " <-- " << qPrintable(parent->objectName());
+  //std::cout << std::endl;
 
   //attachListeners(control, false);
 
@@ -93,8 +126,37 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 
 NativeTabFolder::~NativeTabFolder()
 {
-  std::cout << "NativeTabFolder: DESTROYED\n";
+  //std::cout << "NativeTabFolder: DESTROYED\n";
   delete viewForm;
+}
+
+bool NativeTabFolder::eventFilter(QObject* watched, QEvent* event)
+{
+  if (event->type() == QEvent::MouseButtonPress)
+    {
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      this->HandleMousePress(mouseEvent->pos());
+    }
+
+
+  return QObject::eventFilter(watched, event);
+}
+
+void NativeTabFolder::UpdateColors()
+{
+  std::string activeColor = this->GetActive() == 1 ? "highlight" : "window";
+  tabControl->setStyleSheet(QString::fromStdString("QTabBar::tab:selected {"
+      "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+      "                            stop:0 palette(light), stop:1 palette(" + activeColor + ")); }"));
+
+  contentFrame->setStyleSheet(QString::fromStdString("QFrame#ViewFormContentFrame {"
+      "border: 2px solid palette(" + activeColor + ") }"));
+}
+
+void NativeTabFolder::SetActive(int activeState)
+{
+  AbstractTabFolder::SetActive(activeState);
+  this->UpdateColors();
 }
 
 void NativeTabFolder::CloseButtonClicked(AbstractTabItem* item)
@@ -221,7 +283,7 @@ AbstractTabItem* NativeTabFolder::GetSelection()
 
 QWidget* NativeTabFolder::GetContentParent()
 {
-  return viewForm;
+  return contentFrame;
 }
 
 void NativeTabFolder::SetContent(QWidget* newContent)
@@ -229,11 +291,13 @@ void NativeTabFolder::SetContent(QWidget* newContent)
   //viewForm.setContent(newContent);
   if (content != 0)
   {
-    viewForm->layout()->removeWidget(content);
+    contentFrame->layout()->removeWidget(content);
     delete content;
   }
   content = newContent;
-  ((QBoxLayout*)viewForm->layout())->addWidget(content, 1);
+  content->installEventFilter(this);
+  //((QBoxLayout*)contentFrame->layout())->addWidget(content, 1);
+  contentFrame->layout()->addWidget(content);
 }
 
 QCTabBar* NativeTabFolder::GetTabFolder()

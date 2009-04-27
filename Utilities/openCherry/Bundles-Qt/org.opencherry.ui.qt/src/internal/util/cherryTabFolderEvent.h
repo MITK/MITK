@@ -25,7 +25,7 @@
 namespace cherry
 {
 
-class AbstractTabItem;
+struct AbstractTabItem;
 
 struct TabFolderEvent : public Object
 {

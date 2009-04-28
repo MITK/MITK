@@ -36,6 +36,7 @@
 QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_HandlesMultipleDataStorages(false)
+ , m_InDataStorageChanged(false)
 {
 }
   

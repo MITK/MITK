@@ -29,17 +29,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent)
-:Q3VBox(parent),
- m_SelfCall(false),
- m_DisplayMode(ListDataIfAnyToolMatches ),
- m_ToolGroupsForFiltering("default")
+:QWidget(parent),
+m_SelfCall(false),
+m_DisplayMode(ListDataIfAnyToolMatches ),
+m_ToolGroupsForFiltering("default")
 {
   m_ToolManager = mitk::ToolManager::New();
 
+  m_Layout = new QVBoxLayout( this );
+  this->setLayout( m_Layout );
+
   m_ReferenceDataSelectionBox = new QmitkDataTreeComboBox( this );
+  m_Layout->addWidget(m_ReferenceDataSelectionBox);
 
   connect( m_ReferenceDataSelectionBox, SIGNAL(activated(const mitk::DataTreeFilter::Item*)),
-           this, SLOT(OnReferenceDataSelected(const mitk::DataTreeFilter::Item*)) );
+    this, SLOT(OnReferenceDataSelected(const mitk::DataTreeFilter::Item*)) );
 
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
@@ -101,8 +105,8 @@ void QmitkToolReferenceDataSelectionBox::EnsureOnlyReferenceImageIsVisibile()
 
   mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes = GetAllPossibleReferenceImages();
   for ( mitk::DataStorage::SetOfObjects::const_iterator nodeIter = allImageNodes->begin();
-        nodeIter != allImageNodes->end();
-        ++nodeIter )
+    nodeIter != allImageNodes->end();
+    ++nodeIter )
   {
     mitk::DataTreeNode* currentNode = (*nodeIter).GetPointer();
 
@@ -128,11 +132,11 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
 
   /**
-   * Build up predicate:
-   *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
-   *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
-   *    \sa SetDisplayMode
-   */
+  * Build up predicate:
+  *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
+  *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
+  *    \sa SetDisplayMode
+  */
 
   static std::vector< const mitk::NodePredicateBase* > m_Predicates;
   static const mitk::NodePredicateBase* completePredicate = NULL;
@@ -140,8 +144,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   if (rebuildNeeded)
   {
     for ( std::vector< const mitk::NodePredicateBase* >::iterator iter = m_Predicates.begin();
-          iter != m_Predicates.end();
-          ++iter )
+      iter != m_Predicates.end();
+      ++iter )
     {
       delete *iter;
     }
@@ -152,24 +156,24 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
     const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 
     for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
-          iter != allTools.end();
-          ++iter )
+      iter != allTools.end();
+      ++iter )
     {
       const mitk::Tool* tool = *iter;
 
       if ( (m_ToolGroupsForFiltering.empty()) || ( m_ToolGroupsForFiltering.find( tool->GetGroup() ) != std::string::npos ) ||
-                                                 ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
-         )
+        ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
+        )
       {
         if (completePredicate)
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetReferenceDataPreference() ) );
+            m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetReferenceDataPreference() ) );
           }
           else
           {
-              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetReferenceDataPreference() ) );
+            m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetReferenceDataPreference() ) );
           }
           completePredicate = m_Predicates.back();
         }
@@ -185,8 +189,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects;
 
   /**
-   *  display everything matching the predicate
-   */
+  *  display everything matching the predicate
+  */
   if (completePredicate)
   {
     allObjects = dataStorage->GetSubset( *completePredicate );
@@ -199,8 +203,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   mitk::ToolManager::DataVectorType resultVector;
 
   for ( mitk::DataStorage::SetOfObjects::const_iterator objectIter = allObjects->begin();
-        objectIter != allObjects->end();
-        ++objectIter )
+    objectIter != allObjects->end();
+    ++objectIter )
   {
     mitk::DataTreeNode* node = (*objectIter).GetPointer();
     resultVector.push_back( node );

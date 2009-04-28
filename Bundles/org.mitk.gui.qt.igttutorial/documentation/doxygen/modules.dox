@@ -2,7 +2,13 @@
   \defgroup org_mitk_gui_qt_igttutorial org.mitk.gui.qt.igttutorial Plugin
   \ingroup MITKPlugins
 
-  \brief Describe your plugin here.
+   \brief QmitkIGTTutorial shows a small typically navigation MITK functionality.
+
+ Any kind of navigation application will start with the connection to a tracking system 
+ and as we do image guided procedures we want to show something on the screen. In this
+ tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device)
+ and we will show the movement of a tool as cone in the StdMultiWidget editor.
+
   
 */
 
@@ -13,4 +19,6 @@
   \brief This subcategory includes the internal classes of the org.mitk.gui.qt.igttutorial plugin. Other
   plugins must not rely on these classes. They contain implementation details and their interface
   may change at any time. We mean it.
+  
+  QmitkIGTTutorial does not contain any internal classes.
 */

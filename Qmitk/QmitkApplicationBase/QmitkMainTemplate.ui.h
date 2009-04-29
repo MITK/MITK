@@ -885,7 +885,7 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->SetData(&it);
 
     m_MultiWidget->AddDisplayPlaneSubTree(&it);
-    m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
+    //m_MultiWidget->AddPositionTrackingPointSet(&it); //mouse position
     m_MultiWidget->EnableStandardLevelWindow();
 
     // show/hide plane widgets when the corresponding buttons/menu items are checked

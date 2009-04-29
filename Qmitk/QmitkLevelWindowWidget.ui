@@ -169,6 +169,7 @@
 </variables>
 <slots>
     <slot>setDataTree( mitk::DataTree * tree )</slot>
+    <slot>SetDataStorage( mitk::DataStorage* ds )</slot>
 </slots>
 <functions>
     <function access="private" specifier="non virtual">init()</function>

@@ -45,7 +45,13 @@ void QmitkLevelWindowWidget::setDataTree( mitk::DataTree* tree )
   m_Manager->SetDataTree(tree); 
 } 
 
+void QmitkLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
+{
+  m_Manager->SetDataStorage(ds);
+}
+
 mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();
 }
+

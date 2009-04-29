@@ -37,7 +37,7 @@ The "Select Shown Image" area defines, which image is shown in the QmitkStdMulti
 is selected only the moving image is rendered. If "Both Images" is selected the fixed image as well as the moving image is shown. In all cases all other images within the current data tree will be 
 set to invisible. 
 
-\image html RegistrationDeformable.png "The Registartion area"
+\image html RegistrationDeformable.png "The Registration area"
 
 In the "Registration" area you have the choice between different deformable registration algorithms. Currently there are available:
 

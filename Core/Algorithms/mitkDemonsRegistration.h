@@ -27,6 +27,14 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+  /*!
+  \brief This class performes a demons registration between two images.
+
+  \ingroup DeformableRegistration
+
+  \author Daniel Stein
+  */
+
   class MITK_CORE_EXPORT DemonsRegistration : public RegistrationBase
   {
 
@@ -34,16 +42,49 @@ namespace mitk
     
     mitkClassMacro(DemonsRegistration, RegistrationBase);
 
+    /*!  
+    * \brief Method for creation through the object factory. 
+    */
     itkNewMacro(Self);
 
+    /*!  
+    * \brief Sets the number of iterations which will be performed during the registration process. 
+    */
     void SetNumberOfIterations(int iterations);
+
+    /*!  
+    * \brief Sets the standard deviation used by the demons registration. 
+    */
     void SetStandardDeviation(float deviation);
+
+    /*!  
+    * \brief Sets whether the resulting deformation field should be saved or not. 
+    */
     void SetSaveDeformationField(bool saveField);
+
+    /*!  
+    * \brief Sets the filename for the resulting deformation field. 
+    */
     void SetDeformationFieldFileName(const char* fieldName);
+
+    /*!  
+    * \brief Sets whether the result should be saved or not. 
+    */
     void SetSaveResult(bool saveResult);
+
+    /*!  
+    * \brief Sets the filename for the resulting deformed image. 
+    */
     void SetResultFileName(const char* resultName);
+
+    /*!  
+    * \brief Returns the deformation field, which results by the registration. 
+    */
     itk::Image<class itk::Vector<float, 3>,3>::Pointer GetDeformationField();
     
+    /*!  
+    * \brief Starts the demons registration. 
+    */
     virtual void GenerateData()
     {
       if (this->GetInput())
@@ -54,8 +95,20 @@ namespace mitk
 
     
   protected:
+
+    /*!  
+    * \brief Default constructor
+    */ 
     DemonsRegistration();
+
+    /*!  
+    * \brief Default destructor
+    */
     virtual ~DemonsRegistration();
+
+    /*!  
+    * \brief Template class to perform the demons registration with any kind of image. Called by GenerateData().
+    */  
     template < typename TPixel, unsigned int VImageDimension >
       void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
 

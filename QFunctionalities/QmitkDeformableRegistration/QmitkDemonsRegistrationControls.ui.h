@@ -17,6 +17,7 @@
 #include <mitkRenderingManager.h>
 #include "itkRegularStepGradientDescentOptimizer.h"
 #include <qfiledialog.h>
+#include <qmessagebox.h>
 
 void QmitkDemonsRegistrationControls::init()
 {
@@ -116,7 +117,14 @@ void QmitkDemonsRegistrationControls::CalculateTransformation()
       {
         registration->SetInput(mimage);
       }
-      registration->Update();
+      try
+      {
+        registration->Update();
+      }
+      catch (...)
+      {
+        QMessageBox::information( NULL, "Registration exception", "Could be memory allocation exception", QMessageBox::Ok );
+      }
       mitk::Image::Pointer image = registration->GetOutput();
       if (image.IsNotNull())
       {

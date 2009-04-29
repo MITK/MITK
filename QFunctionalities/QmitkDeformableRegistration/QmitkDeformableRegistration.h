@@ -26,13 +26,18 @@ class QmitkStdMultiWidget;
 class QmitkDeformableRegistrationControls;
 
 /*!
-\brief DeformableRegistration 
+\brief The DeformableRegistration functionality is used to perform deformable registration.
 
-One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..) 
-and CreateAction(..) from QmitkFunctionality. 
+This functionality allows you to register two 2D as well as two 3D images in a non rigid manner.
+Register means to align two images, so that they become as similar as possible. 
+Therefore you can select from different deformable registration methods. 
+Registration results will directly be applied to the Moving Image. The result is shown in the multi-widget. 
+
+For more informations see: \ref QmitkDeformableRegistrationUserManual
 
 \sa QmitkFunctionality
 \ingroup Functionalities
+\ingroup DeformableRegistration
 */
 class QmitkDeformableRegistration : public QmitkFunctionality
 {  
@@ -72,57 +77,67 @@ class QmitkDeformableRegistration : public QmitkFunctionality
     */  
     virtual QAction * CreateAction(QActionGroup *parent);
 
+    /*!  
+    \brief Method which is called when this functionality is selected in MITK  
+    */ 
     virtual void Activated();
+
+    /*!  
+    \brief Method which is called whenever the functionality is deselected in MITK  
+    */
     virtual void Deactivated();
 
   protected slots:  
     
+    /*!
+    * \brief Called whenever the data tree has changed. 
+    */
     void TreeChanged();
     
-    /*
+    /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(mitk::DataTreeIteratorClone imageIt);
     
-    /*
+    /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
     void MovingSelected(mitk::DataTreeIteratorClone imageIt);
 
-    /*
+    /*!
     * checks if registration is possible
     */
     bool CheckCalculate();
 
-    /*
+    /*!
     * stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
     * @param if true, then images will be shown in red and green
     */
     void ShowRedGreen(bool show);
 
-    /*
+    /*!
     * set the selected opacity for moving image
     * @param opacity the selected opacity
     */
     void OpacityUpdate(float opacity);
 
-    /*
+    /*!
     * sets the images to grayvalues or fixed image to red and moving image to green
     * @param if true, then images will be shown in red and green
     */
     void SetImageColor(bool redGreen);
 
-    /*
+    /*!
     * sets all other images except the fixed image to invisible
     */
     void ShowFixedImage();
 
-    /*
+    /*!
     * sets all other images except the moving image to invisible
     */
     void ShowMovingImage();
 
-    /*
+    /*!
     * sets all other images except the fixed and moving images to invisible
     */
     void ShowBothImages();

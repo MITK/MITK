@@ -57,8 +57,7 @@ mitk::LookupTable::~LookupTable()
 {
   if ( m_LookupTable )
   {
-    m_LookupTable->Delete();
-    //m_LookupTable->UnRegister(this);
+    m_LookupTable->Delete();   
     m_LookupTable = NULL;
   }
 }
@@ -73,24 +72,17 @@ void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 
   if(m_LookupTable)
   {
-    m_LookupTable->UnRegister(lut);
+    m_LookupTable->UnRegister(NULL);
     m_LookupTable = NULL;
   }
 
   if(lut)
   {
-    lut->Register(lut);    
+    lut->Register(NULL);    
   }
 
   m_LookupTable = lut;
-  this->Modified();
-
-  /*
-  if (m_LookupTable != lut)
-  {
-    m_LookupTable = lut;
-    this->Modified();
-  }*/
+  this->Modified();  
 
 }
 

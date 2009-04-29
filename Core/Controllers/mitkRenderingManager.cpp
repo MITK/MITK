@@ -990,6 +990,15 @@ RenderingManager
   return m_ShadingValues;
 }
 
+void RenderingManager::SetDepthPeelingEnabled( bool enabled )
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance( it->first );
+    baseRenderer->SetDepthPeelingEnabled(enabled);
+  }
+}
 
 // Create and register generic RenderingManagerFactory.
 GenericRenderingManagerFactory renderingManagerFactory;

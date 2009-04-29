@@ -119,7 +119,7 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
   m_EmptyWorldGeometry(true),
-  m_NumberOfVisibleLODEnabledMappers( 0 )
+  m_NumberOfVisibleLODEnabledMappers( 0 ), m_DepthPeelingEnabled(true)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -296,7 +296,7 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   //BUG (#1551) added settings for depth peeling
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   m_RenderWindow->SetAlphaBitPlanes(1);
-  m_VtkRenderer->SetUseDepthPeeling(1);
+  m_VtkRenderer->SetUseDepthPeeling(m_DepthPeelingEnabled);
   m_VtkRenderer->SetMaximumNumberOfPeels(100);
   m_VtkRenderer->SetOcclusionRatio(0.1);
 #endif
@@ -743,4 +743,10 @@ void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   os << indent << " DisplayGeometryTransformTime: " << m_DisplayGeometryTransformTime << std::endl;
   Superclass::PrintSelf(os,indent);
+}
+
+void mitk::BaseRenderer::SetDepthPeelingEnabled( bool enabled )
+{
+  m_DepthPeelingEnabled = enabled;
+  m_VtkRenderer->SetUseDepthPeeling(enabled);
 }

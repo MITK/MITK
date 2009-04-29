@@ -778,6 +778,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Startup window size", mitk::Point3dProperty::New(point) );
   m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
   m_Options->SetProperty( "LOD abort mechanism (experimental)", mitk::BoolProperty::New(false) );
+  m_Options->SetProperty( "Depth Peeling", mitk::BoolProperty::New(true) );
 
   //Set the toolbar state properties
   m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(true) );
@@ -1023,6 +1024,14 @@ void QmitkMainTemplate::Initialize()
       lodAbortProperty->GetValue() );
   }
 
+  // Depth Peeling
+  mitk::BoolProperty* depthPeelingProperty = dynamic_cast<mitk::BoolProperty*>(
+    m_Options->GetProperty( "Depth Peeling" ) );
+  if ( depthPeelingProperty != NULL )
+  {
+    mitk::RenderingManager::GetInstance()->SetDepthPeelingEnabled( 
+      depthPeelingProperty->GetValue() );
+  }
 
   // Initialize other global options
   mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));
@@ -1551,6 +1560,14 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     {
       mitk::RenderingManager::GetInstance()->SetLODAbortMechanismEnabled( 
         lodAbortProperty->GetValue() );
+    }
+
+    mitk::BoolProperty* depthPeelingProperty = dynamic_cast<mitk::BoolProperty*>(
+      m_Options->GetProperty( "Depth Peeling" ) );
+    if ( depthPeelingProperty != NULL )
+    {
+      mitk::RenderingManager::GetInstance()->SetDepthPeelingEnabled( 
+        depthPeelingProperty->GetValue() );
     }
 
     mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));

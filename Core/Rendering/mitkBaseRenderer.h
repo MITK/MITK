@@ -298,6 +298,10 @@ public:
   //## not the renderer itself.
   itkSetMacro(Focused, bool);
 
+  //##Documentation
+  //## @brief Sets whether depth peeling is enabled or not
+  void SetDepthPeelingEnabled(bool enabled);
+
   itkGetMacro(Size, int*);
 
   void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
@@ -509,6 +513,8 @@ protected:
   double m_Bounds[6];
   
   bool m_EmptyWorldGeometry;
+
+  bool m_DepthPeelingEnabled;
 
   typedef std::set< Mapper * > LODEnabledMappersType;
 

@@ -221,6 +221,9 @@ public:
   /** En-/Disable LOD abort mechanism. */
   itkBooleanMacro( LODAbortMechanismEnabled );
 
+  /** En-/Disable depth peeling for all renderers */
+  void SetDepthPeelingEnabled(bool enabled);
+
 
   virtual void DoStartRendering() {};
   virtual void DoMonitorRendering() {};

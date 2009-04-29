@@ -698,23 +698,44 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  DataStorage::Pointer storage = m_DataStorage;
+  if( m_DataStorage.IsNotNull() )
+  {
+    DataStorage::Pointer storage = m_DataStorage;
+    DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
 
-  DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
-  for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();
+    for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();
       iter != allObjects->end();
       ++iter)
-  {
-    DataTreeNode::Pointer node = *iter;
-    if ( node.IsNull() )
-      continue;
-
-    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if(mapper.IsNotNull())
     {
-      mapper->ReleaseGraphicsResources(renWin);
+      DataTreeNode::Pointer node = *iter;
+      if ( node.IsNull() )
+        continue;
+
+      Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+      if(mapper.IsNotNull())
+      {
+        mapper->ReleaseGraphicsResources(renWin);
+      }
     }
   }
+
+  else if( m_DataTreeIterator.IsNotNull() )
+  {
+    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+    for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
+    {
+      mitk::DataTreeNode::Pointer node = it->Get();
+
+      if ( node.IsNull() )
+        continue;
+
+      Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+      if(mapper.IsNotNull())
+      {
+        mapper->ReleaseGraphicsResources(renWin);
+      }
+    }
+  }  
 }
   
 vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()

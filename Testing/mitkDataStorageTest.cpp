@@ -159,7 +159,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   mitk::Surface::Pointer surface = mitk::Surface::New();
   n2->SetData(surface);
   n2->SetProperty("name", mitk::StringProperty::New("Node 2 - Surface Node"));
-  mitk::Color color;  color.Set(1.0f, 0.0f, 0.0f);
+  mitk::Color color;  color.Set(1.0f, 1.0f, 0.0f);
   n2->SetColor(color);
   n2->SetProperty("Resection Proposal 1", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents2 = mitk::DataStorage::SetOfObjects::New();

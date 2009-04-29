@@ -38,35 +38,31 @@ class vtkProp;
 namespace mitk {
 
   /**
-  * @brief Vtk-based mapper for PointSet
+  * \brief Alternative Vtk-based 3D mapper for mitk::PointSet
   *
-  * Due to the need of different colors for selected 
-  * and unselected points and the facts, that we also have a contour and 
-  * labels for the points, the vtk structure is build up the following way: 
+  * This class renders mitk::PointSet objects in 3D views. It resembles the
+  * standard mitk::PointSetVtkMapper3D, but is designed to enable single
+  * points to be rendered with individual appearances.
   *
-  * We have two AppendPolyData, one selected, and one unselected and one 
-  * for a contour between the points. Each one is connected to an own 
-  * PolyDataMapper and an Actor. The different color for the unselected and 
-  * selected state and for the contour is read from properties.
+  * Instead of assembling one vtkPolyData object containing all points,
+  * a list of VTK source objects (spheres, cubes, cones, ...) is maintained.
+  * Therefore, the application can change the appearance and/or type of a
+  * specific point at runtime, without having to rebuild the 
   *
-  * "unselectedcolor", "selectedcolor" and "contourcolor" are the properties, 
-  * that are looked for. Labels are added besides the selected or the 
-  * deselected points. Specify the text in a "label" property.
+  * You should use this class instead of the standard mapper if you
   *
-  * Then the three Actors are combined inside a vtkPropAssembly and this 
-  * object is returned in GetProp() and so hooked up into the rendering 
-  * pipeline. Other properties looked for are:
+  * - change the PointSet very often (by adding or removing points)
+  * - need different representations for points (+++)
+  * - want to change the point representation frequently (+++)
   *
-  *   - \b "show contour": if set to on, lines between the points are shown
-  *   - \b "close contour": if set to on, the open strip is closed (first point 
-  *       connected with last point)
-  *   - \b "pointsize": size of the points mapped
-  *   - \b "show label": show text stored in "label" 
-  *   - \b "label": text of the Points to show besides points
-  *   - \b "opacity": transparency of the points and contour
-  *   - \b "contoursize": size of the contour drawn between the points 
-  *       (if not set, the pointsize is taken)
-  * @ingroup Mapper
+  * Note: the class is still in experimental stage, and the points above
+  * marked with (+++) are not yet working correctly. Also, drawing lines
+  * between points (contour mode) is not yet supported. The class will be
+  * extended so that point representations are stored in a lookup table,
+  * which is indexed by point data from the rendered PointSet.
+  *
+  *
+  * \sa PointSetVtkMapper3D
   */
   class MITK_CORE_EXPORT EnhancedPointSetVtkMapper3D : public BaseVtkMapper3D
   {
@@ -77,12 +73,10 @@ namespace mitk {
 
     virtual const mitk::PointSet* GetInput();
 
-    //overwritten from BaseVtkMapper3D to be able to return a 
-    //m_PointsAssembly which is much faster than a vtkAssembly
-    //virtual vtkProp* GetProp();
     virtual void UpdateVtkTransform();
 
-    static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataTreeNode* node, 
+      mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
     void ReleaseGraphicsResources(vtkWindow *renWin);
 
@@ -94,12 +88,12 @@ namespace mitk {
     void RemoveEntryFromSourceMaps( mitk::PointSet::PointIdentifier pointID );
     void DeleteVtkObject(vtkObject* o);  // functor for stl_each in destructor
 
-    void UpdateVtkObjects();  // update all vtk sources, mappers, actors with current data and properties
+    // update all vtk sources, mappers, actors with current data and properties
+    void UpdateVtkObjects();  
 
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);    
-    virtual void CreateContour(mitk::BaseRenderer* renderer);
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;
     typedef std::map<PointIdentifier, vtkSphereSource*> SphereSourceMap;

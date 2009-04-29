@@ -52,7 +52,33 @@ namespace mitk {
   *
   * Then the three Actors are combined inside a vtkPropAssembly and this 
   * object is returned in GetProp() and so hooked up into the rendering 
-  * pipeline. Other properties looked for are:
+  * pipeline. 
+  
+  * Properties that can be set for point sets and influence the PointSetVTKMapper3D are:
+  *
+
+  *   - \b "color": (ColorProperty*) Color of the point set
+  *   - \b "Opacity": (FloatProperty) Opacity of the point set
+  *   - \b "show contour": (BoolProperty) If the contour of the points are visible
+  *   - \b "contourSizeProp":(FloatProperty) Contour size of the points
+
+
+  The default properties are:
+
+  *   - \b "line width": (IntProperty::New(2), renderer, overwrite )
+  *   - \b "pointsize": (FloatProperty::New(1.0), renderer, overwrite)
+  *   - \b "selectedcolor": (ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite)  //red
+  *   - \b "color": (ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite)  //yellow
+  *   - \b "show contour": (BoolProperty::New(false), renderer, overwrite )
+  *   - \b "contourcolor": (ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite)
+  *   - \b "contoursize": (FloatProperty::New(0.5), renderer, overwrite )
+  *   - \b "close contour": (BoolProperty::New(false), renderer, overwrite )
+  *   - \b "show points": (BoolProperty::New(true), renderer, overwrite )
+  *   - \b "updateDataOnRender": (BoolProperty::New(true), renderer, overwrite ) 
+
+
+
+  *Other properties looked for are:
   *
   *   - \b "show contour": if set to on, lines between the points are shown
   *   - \b "close contour": if set to on, the open strip is closed (first point 

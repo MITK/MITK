@@ -36,7 +36,10 @@ mitk::SeedsImageLookupTableSource::SeedsImageLookupTableSource() : mitk::LookupT
 void mitk::SeedsImageLookupTableSource::GenerateData()
 {
   OutputType::Pointer output = this->GetOutput();
-  output->SetVtkLookupTable( this->BuildVtkLookupTable( ) );
+
+  vtkLookupTable* vtkLut = this->BuildVtkLookupTable();
+  output->SetVtkLookupTable( vtkLut );
+  vtkLut->Delete();
 }
 
 vtkLookupTable* mitk::SeedsImageLookupTableSource::BuildSeedsLookupTable()

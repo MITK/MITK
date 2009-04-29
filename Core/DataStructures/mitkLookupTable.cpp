@@ -55,19 +55,45 @@ mitk::LookupTable::LookupTable()
 
 mitk::LookupTable::~LookupTable()
 {
-  if ( m_LookupTable != NULL )
+  if ( m_LookupTable )
+  {
     m_LookupTable->Delete();
+    //m_LookupTable->UnRegister(this);
+    m_LookupTable = NULL;
+  }
 }
 
 void mitk::LookupTable::SetVtkLookupTable( vtkLookupTable* lut )
 {
+  
+  if(m_LookupTable == lut)
+  {
+    return;
+  }
+
+  if(m_LookupTable)
+  {
+    m_LookupTable->UnRegister(lut);
+    m_LookupTable = NULL;
+  }
+
+  if(lut)
+  {
+    lut->Register(lut);    
+  }
+
+  m_LookupTable = lut;
+  this->Modified();
+
+  /*
   if (m_LookupTable != lut)
   {
     m_LookupTable = lut;
     this->Modified();
-  }
+  }*/
 
 }
+
 
 
 void mitk::LookupTable::ChangeOpacityForAll( float opacity )

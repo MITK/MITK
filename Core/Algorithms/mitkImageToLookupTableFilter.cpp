@@ -139,5 +139,6 @@ void mitk::ImageToLookupTableFilter::GenerateData()
         }*/
         vtkLut->SetRange(0, 10);
         output->SetVtkLookupTable( vtkLut );
+        vtkLut->Delete();
     }
 }

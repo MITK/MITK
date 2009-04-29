@@ -59,6 +59,33 @@ namespace mitk {
  * requested direction. This results in a stretched version when used for texture
  * mapping.
  *
+
+ * Properties that can be set for images and influence the imageMapper2D are:
+ *
+ *   - \b "opacity": (FloatProperty) Opacity of the image
+ *   - \b "color": (ColorProperty) Color of the image
+ *   - \b "use color": (BoolProperty) Use the color of the image or not
+ *   - \b "binary": (BoolProperty) is the image a binary image or not
+ *   - \b "outline binary": (BoolProperty) show outline of the image or not
+ *   - \b "texture interpolation": (BoolProperty) texture interpolation of the image
+ *   - \b "reslice interpolation": (VtkResliceInterpolationProperty) reslice interpolation of the image
+ *   - \b "in plane resample extent by geometry": (BoolProperty) Do it or not
+ *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
+ *   - \b "layer": (IntProperty) Layer of the image
+
+ The default properties are:
+
+ *   - \b "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite )
+ *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
+ *   - \b "use color", mitk::BoolProperty::New( true ), renderer, overwrite )
+ *   - \b "binary", mitk::BoolProperty::New( true ), renderer, overwrite )
+ *   - \b "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite )
+ *   - \b "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) )
+ *   - \b "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() )
+ *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
+ *   - \b "bounding box", mitk::BoolProperty::New( false ) )
+ *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
+
  * \ingroup Mapper
  */
 class MITK_CORE_EXPORT ImageMapper2D : public GLMapper2D

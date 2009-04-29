@@ -286,17 +286,19 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartRefere
 
   PartListIter newIndex = this->LastIndexOfContainer(targetContainer);
 
-  if (ref == *newIndex)
-  return;
-
-  parts.erase(std::find(parts.begin(), parts.end(), ref));
-  if (newIndex != parts.end())
+  if (newIndex != parts.end() && ref == *newIndex)
   {
-    parts.insert(newIndex, ref);
+    return;
+  }
+
+  if (newIndex == parts.end())
+  {
+    parts.push_back(ref);
   }
   else
   {
-    parts.push_back(ref);
+    parts.erase(std::find(parts.begin(), parts.end(), ref));
+    parts.insert(newIndex, ref);
   }
 }
 

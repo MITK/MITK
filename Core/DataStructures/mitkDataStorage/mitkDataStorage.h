@@ -223,6 +223,80 @@ namespace mitk {
     //## to the listeners of this event.
     DataStorageEvent ChangedNodeEvent;
 
+
+    //##Documentation
+    //## @brief Compute the axis-parallel bounding geometry of the data tree
+    //## (bounding box, minimal spacing of the considered nodes, live-span)
+    //##
+    //## @param it an iterator to a data tree structure
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    //## @param renderer see @a boolPropertyKey
+    //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
+    Geometry3D::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+
+    //##Documentation
+    //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
+    //## data tree bounding box, minimal spacing of the considered nodes, live-span)
+    //##
+    //## Simply calls ComputeBoundingGeometry3D(it, "visible", renderer, boolPropertyKey).
+    //## @param it an iterator of a data tree structure
+    //## @param renderer the reference to the renderer
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    mitk::Geometry3D::Pointer ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
+
+    //##Documentation
+    //## @brief Compute the bounding box of data tree structure
+    //## @param it an iterator to a data tree structure
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    //## @param renderer see @a boolPropertyKey
+    //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
+    mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+
+    //##Documentation
+    //## \brief Compute the bounding box of all visible parts of the data tree structure, for general 
+    //## rendering or renderer specific visibility property checking
+    //## 
+    //## Simply calls ComputeBoundingBox(it, "visible", renderer, boolPropertyKey).
+    //## @param it an iterator of a data tree structure
+    //## @param renderer the reference to the renderer
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
+    {
+      return ComputeBoundingBox( "visible", renderer, boolPropertyKey);
+    }
+
+    //##Documentation
+    //## @brief Compute the time-bounds of the contents of a data tree structure
+    //##
+    //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
+    //## all data-objects with infinite live-span are ignored.
+    //## @param it an iterator to a data tree structure
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## and is set to @a false, the node is ignored for the time-bounds calculation.
+    //## @param renderer see @a boolPropertyKey
+    //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
+    TimeBounds ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+
+    //##Documentation
+    //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general 
+    //## rendering or renderer specific visibility property checking
+    //##
+    //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
+    //## all data-objects with infinite live-span are ignored.
+    //## Simply calls ComputeTimeBounds(it, "visible", renderer, boolPropertyKey).
+    //## @param it an iterator to a data tree structure
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## and is set to @a false, the node is ignored for the time-bounds calculation.
+    //## @param renderer see @a boolPropertyKey
+    TimeBounds ComputeTimeBounds( mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+    {
+      return ComputeTimeBounds( "visible", renderer, boolPropertyKey);
+    }
+
   protected:
 
     //TODO investigate removing friend declarations when DataStorage is
@@ -258,6 +332,8 @@ namespace mitk {
     //## @brief  Removes a Modified-Listener from the given Node.
     void RemoveModifiedListener(const mitk::DataTreeNode* _Node);
 
+    
+ 
     //##Documentation
     //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
     std::map<const mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;

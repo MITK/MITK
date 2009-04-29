@@ -36,7 +36,9 @@ namespace mitk
 Geometry2DDataMapper2D::Geometry2DDataMapper2D()
 : m_SurfaceMapper( NULL ),
   m_RenderOrientationArrows( false ),
-  m_ArrowOrientationPositive( true )
+  m_ArrowOrientationPositive( true ),
+  m_ParentNode(NULL),
+  m_DataStorage(NULL)
 {
 }
 
@@ -65,49 +67,69 @@ Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(
 }
 
 
-void 
-Geometry2DDataMapper2D::GenerateData()
+void Geometry2DDataMapper2D::GenerateData()
 {
   // collect all Geometry2DDatas accessible by traversing
   // m_IteratorToOtherGeometry2Ds
   m_OtherGeometry2Ds.clear();
-  if(m_IteratorToOtherGeometry2Ds.IsNull()) return;
-
-  DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
-  while(!it->IsAtEnd())
+  if (m_DataStorage.IsNotNull())
   {
-    if(it->Get().IsNotNull())
+    mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode);
+    for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
     {
-      BaseData* data = it->Get()->GetData();
-      if(data != NULL)
-      {
-        Geometry2DData* geometry2dData = 
-          dynamic_cast<Geometry2DData*>(data);
-        if(geometry2dData!=NULL)
-        {
-          PlaneGeometry* planegeometry = 
-            dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+      if(it->Value().IsNull())
+        continue;
+      
+      BaseData* data = it->Value()->GetData();
+      if (data == NULL)
+        continue;
+      
+      Geometry2DData* geometry2dData = dynamic_cast<Geometry2DData*>(data);
+      if(geometry2dData == NULL)
+       continue;
 
-          if(planegeometry!=NULL)
-            m_OtherGeometry2Ds.push_back(it->Get());
+      PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+      if (planegeometry != NULL)
+          m_OtherGeometry2Ds.push_back(it->Value());
+    }
+  }
+  else if (m_IteratorToOtherGeometry2Ds.IsNotNull()) 
+  {
+
+    DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
+    while(!it->IsAtEnd())
+    {
+      if(it->Get().IsNotNull())
+      {
+        BaseData* data = it->Get()->GetData();
+        if(data != NULL)
+        {
+          Geometry2DData* geometry2dData = 
+            dynamic_cast<Geometry2DData*>(data);
+          if(geometry2dData!=NULL)
+          {
+            PlaneGeometry* planegeometry = 
+              dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+
+            if(planegeometry!=NULL)
+              m_OtherGeometry2Ds.push_back(it->Get());
+          }
         }
       }
+      ++it;
     }
-    ++it;
   }
 }
 
 
-void 
-Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
+void Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 {
   if ( !this->IsVisible(renderer) )
   {
     return;
   }
   
-  Geometry2DData::Pointer input =
-    const_cast< Geometry2DData * >(this->GetInput());
+  Geometry2DData::Pointer input = const_cast< Geometry2DData * >(this->GetInput());
 
   // intersecting with ourself?
   if ( input.IsNull() || (this->GetInput()->GetGeometry2D() == 
@@ -457,6 +479,18 @@ Geometry2DDataMapper2D
   }
 }
 
+
+void Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent )
+{
+  if (ds.IsNotNull())
+  {
+    m_DataStorage = ds;
+  }
+  if (parent.IsNotNull())
+  {
+    m_ParentNode = parent;
+  }
+}
 
 
 } // namespace

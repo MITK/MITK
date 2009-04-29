@@ -114,7 +114,7 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
 }
 
 mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataTreeIterator(NULL),
+  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_DataStorage(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
@@ -245,12 +245,12 @@ void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
   }
 }
 
-void mitk::BaseRenderer::SetData(DataStorage* storage)
+void mitk::BaseRenderer::SetData(DataStorage::Pointer storage)
 {
-  if (storage != NULL)
+  if ( storage.IsNotNull() )
   {
-    DataTreePreOrderIterator poi( (dynamic_cast<mitk::DataTreeStorage*>(storage))->m_DataTree );
-    this->SetData( &poi );
+    m_DataStorage = storage;
+    Modified();
   }
 }
 

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataTree.h"
+#include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 
 #include <vtkSystemIncludes.h>
@@ -105,6 +106,10 @@ protected:
   virtual ~Geometry2DDataVtkMapper3D();
 
   virtual void GenerateData(BaseRenderer* renderer);
+
+  typedef std::multimap< int, vtkActor * > LayerSortedActorList;
+
+  void ProcessNode( DataTreeNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors );
 
   /*
    * \brief Construct an extended lookup table from the given one.
@@ -198,9 +203,10 @@ protected:
   /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
   bool m_NormalsActorAdded;
 
-
   DataTreeIteratorClone m_DataTreeIterator;
 
+  /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
+  mitk::DataStorage::Pointer m_DataStorage;
 
   /** A default grayscale lookup-table, used for reference */
   vtkLookupTable *m_DefaultLookupTable;
@@ -245,7 +251,6 @@ protected:
   /** \brief List holding some lookup table properties of the previous pass */
   LookupTablePropertiesList m_LookupTableProperties;
 
-  typedef std::multimap< int, vtkActor * > LayerSortedActorList;
 
   // responsiblity to remove the observer upon its destruction
   typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;

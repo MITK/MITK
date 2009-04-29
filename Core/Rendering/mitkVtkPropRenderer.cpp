@@ -124,9 +124,43 @@ void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
   }
 }
 
+void mitk::VtkPropRenderer::SetData( mitk::DataStorage::Pointer it )
+{
+  if( it.IsNotNull() )
+  {
+    BaseRenderer::SetData(it);
+
+    static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())
+       ->SetDataIteratorForTexture( m_DataStorage.GetPointer() );
+
+    // Compute the geometry from the current data tree bounds and set it as world geometry
+    
+    this->SetWorldGeometryToDataTreeBounds();
+  }
+}
+
 bool mitk::VtkPropRenderer::SetWorldGeometryToDataTreeBounds()
 {
-  if ( this->GetData() != NULL )
+  if ( m_DataStorage.IsNotNull() )
+  {
+    //initialize world geometry
+    mitk::Geometry3D::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
+
+    if ( geometry.IsNotNull() )
+    {
+      this->SetWorldGeometry(geometry);
+      this->GetDisplayGeometry()->Fit();
+      this->GetVtkRenderer()->ResetCamera();
+      this->Modified();
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+  else if ( this->GetData() != NULL )
   {
     //initialize world geometry
     mitk::Geometry3D::Pointer geometry = 
@@ -150,6 +184,8 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataTreeBounds()
   return false;
 }
 
+
+
 /*!
 \brief 
 
@@ -157,14 +193,22 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
-  // Do we have to render?
-  if ( this->GetData() == NULL ) return 0;
-  if ( dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) return 0;
-  if ( this->GetEmptyWorldGeometry()) return 0;
+   // Do we have objects to render?
+  if ( this->GetEmptyWorldGeometry()) 
+    return 0;
+
+  if ( m_DataStorage.IsNull() && this->GetData() == NULL )
+    return 0;
+     
+  if( this->GetData() != NULL )
+  {
+    if ( dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) 
+      return 0;
+  }
 
   // Update mappers and prepare mapper queue
   if(type == VtkPropRenderer::Opaque)
-    PrepareMapperQueue();
+    this->PrepareMapperQueue();
   
   //go through the generated list and let the sorted mappers paint
   bool lastVtkBased = true;
@@ -253,32 +297,70 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   m_MappersMap.clear();
  
   int mapperNo = 0;
-  mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-  for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
+
+  //DataStorage
+  if( m_DataStorage.IsNotNull() )
   {
-    mitk::DataTreeNode::Pointer node = it->Get();
-
-    if ( node.IsNull() )
-      continue;
-
-    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-    if ( mapper.IsNull() )
-      continue;
-
-    // The information about LOD-enabled mappers is required by RenderingManager
-    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+    DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
+    
+    for(DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();  iter != allObjects->end(); ++iter)
     {
-      ++m_NumberOfVisibleLODEnabledMappers;
+      DataTreeNode::Pointer node = *iter;
+
+      if ( node.IsNull() )
+        continue;
+
+      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+      if ( mapper.IsNull() )
+        continue;
+
+      // The information about LOD-enabled mappers is required by RenderingManager
+      if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+      {
+        ++m_NumberOfVisibleLODEnabledMappers;
+      }
+
+      // mapper without a layer property get layer number 1
+      int layer = 1;
+      node->GetIntProperty("layer", layer, this);
+
+      int nr = (layer<<16) + mapperNo;
+      m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
+      mapperNo++;
     }
 
-    // mapper without a layer property get layer number 1
-    int layer = 1;
-    node->GetIntProperty("layer", layer, this);
-
-    int nr = (layer<<16) + mapperNo;
-    m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
-    mapperNo++;
   }
+
+  //DataTree Iterator
+  else if( m_DataTreeIterator.IsNotNull() )
+  {
+    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+    for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
+    {
+      mitk::DataTreeNode::Pointer node = it->Get();
+
+      if ( node.IsNull() )
+        continue;
+
+      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+      if ( mapper.IsNull() )
+        continue;
+
+      // The information about LOD-enabled mappers is required by RenderingManager
+      if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
+      {
+        ++m_NumberOfVisibleLODEnabledMappers;
+      }
+
+      // mapper without a layer property get layer number 1
+      int layer = 1;
+      node->GetIntProperty("layer", layer, this);
+
+      int nr = (layer<<16) + mapperNo;
+      m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
+      mapperNo++;
+    }
+  }  
 }
 
 /*!
@@ -366,22 +448,35 @@ void mitk::VtkPropRenderer::Update(mitk::DataTreeNode* datatreenode)
   }
 }
 
+
 void mitk::VtkPropRenderer::Update()
 {
-  if(m_DataTreeIterator.IsNull()) return;
-
-  m_VtkMapperPresent=false;
-
-  mitk::DataTreeIteratorClone it=m_DataTreeIterator;
-  it->GoToBegin();
-
-  while(!it->IsAtEnd())
+  if( m_DataStorage.IsNotNull() )
   {
-    Update(it->Get());
-    ++it;
+    m_VtkMapperPresent = false;
+
+    mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
+    for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+      Update(it->Value());
+
+    Modified();
+    m_LastUpdateTime = GetMTime();
   }
-  Modified();
-  m_LastUpdateTime=GetMTime();
+  else if( m_DataTreeIterator.IsNotNull() )
+  {
+    m_VtkMapperPresent = false;
+
+    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
+    it->GoToBegin();
+
+    while(!it->IsAtEnd())
+    {
+      Update(it->Get());
+      ++it;
+    }
+    Modified();
+    m_LastUpdateTime = GetMTime();
+  }  
 }
 
 /*!
@@ -544,9 +639,11 @@ vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 
 void mitk::VtkPropRenderer::InitPathTraversal()
 {
-  m_PickingObjects = DataStorage::GetInstance()->GetAll();
-  m_PickingObjectsIterator = m_PickingObjects->begin();
-
+  if (m_DataStorage.IsNotNull())
+  {
+    m_PickingObjects = m_DataStorage->GetAll();
+    m_PickingObjectsIterator = m_PickingObjects->begin();
+  }
 }
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
@@ -601,7 +698,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  DataStorage::Pointer storage = DataStorage::GetInstance();
+  DataStorage::Pointer storage = m_DataStorage;
 
   DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
   for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();

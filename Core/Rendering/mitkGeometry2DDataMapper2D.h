@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkGLMapper2D.h"
 #include "mitkSurfaceMapper2D.h"
+#include "mitkDataStorage.h"
+#include "mitkDataTreeNode.h"
 
 namespace mitk {
 
@@ -60,6 +62,8 @@ public:
     */
   virtual void SetDataIteratorToOtherGeometry2Ds(const DataTreeIteratorBase *iterator);
 
+  virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent);
+
   /** Applies properties specific to this mapper */
   virtual void ApplyProperties( BaseRenderer *renderer );
 
@@ -86,6 +90,8 @@ protected:
     * \note works currently for PlaneGeometry only
     */
   DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
+  DataStorage::Pointer m_DataStorage;
+  DataTreeNode::Pointer m_ParentNode;
 
   typedef std::vector<DataTreeNode*> NodesVectorType;
   NodesVectorType m_OtherGeometry2Ds;

@@ -77,8 +77,18 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
   if (glRenderer)
   {
     vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
-    mitk::DataTree*  tree = dynamic_cast<mitk::DataTree*>(m_Renderer->GetData()->GetTree());
-    mitk::BoundingBox::Pointer bb = tree->ComputeBoundingBox(m_Renderer->GetData());
+
+    mitk::BoundingBox::Pointer bb;
+    mitk::DataStorage* ds = m_Renderer->GetDataStorage();
+    if (ds != NULL)
+    {
+      bb = ds->ComputeBoundingBox();
+    }
+    else
+    {
+      mitk::DataTree*  tree = dynamic_cast<mitk::DataTree*>(m_Renderer->GetData()->GetTree());
+      bb = tree->ComputeBoundingBox(m_Renderer->GetData());
+    }
 
     mitk::Point3D middle =bb->GetCenter();
     vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0],middle[1],middle[2]);

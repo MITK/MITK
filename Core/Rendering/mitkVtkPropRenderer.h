@@ -75,6 +75,10 @@ public:
   // Data handling
   using BaseRenderer::SetData;
   virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
+
+  /** */
+  virtual void SetData(mitk::DataStorage::Pointer it);
+
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
   virtual void Update(mitk::DataTreeNode* datatreenode);
   virtual void SetMapperID(const MapperSlotId mapperId);

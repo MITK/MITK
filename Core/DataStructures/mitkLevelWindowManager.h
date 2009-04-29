@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLEVELWINDOWMANAGER_H
 
 #include <mitkDataTree.h>
+#include <mitkDataStorage.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkBaseProperty.h>
 
@@ -41,7 +42,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object {
+  class MITK_CORE_EXPORT LevelWindowManager : public itk::Object 
+  {
   public:
 
     mitkClassMacro(LevelWindowManager, itk::Object)
@@ -49,10 +51,12 @@ namespace mitk
 
     /// sets the DataTree which holds all image-nodes
     void SetDataTree(mitk::DataTree* tree);
+    void SetDataStorage(mitk::DataStorage* ds);
 
     /// returns the DataTree
     DataTree::Pointer GetDataTree();
-  
+    DataStorage::Pointer GetDataStorage();  ///< returns the datastorage
+    
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
     void SetAutoTopMostImage(bool autoTopMost);
 
@@ -79,6 +83,9 @@ namespace mitk
   
     /// change notifications from the DataTree
     void TreeChanged(const itk::EventObject& treeChangedEvent);
+    
+    /// Change notifications from DataStorage
+    void DataStorageChanged(const mitk::DataTreeNode* n = NULL);
 
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);
@@ -99,6 +106,8 @@ namespace mitk
 
     /// the DataTree with all image-nodes
     DataTree::Pointer m_DataTree;
+
+    DataStorage::Pointer m_DataStorage;
 
     /// pointer to the LevelWindowProperty of the current image
     LevelWindowProperty::Pointer m_LevelWindowProperty;

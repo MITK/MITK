@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 
 #include "mitkDataTree.h"
+#include "mitkDataStorage.h"
+#include "mitkDataTreeStorage.h"
 #include "mitkGeometry2D.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkDisplayGeometry.h"
@@ -95,13 +97,18 @@ public:
   //##Documentation
   //## @brief @a iterator defines which part of the data tree is traversed for renderering.
   virtual void SetData(const DataTreeIteratorBase* iterator);
-  virtual void SetData(DataStorage* storage);
+  virtual void SetData( DataStorage::Pointer storage );
 
   //##Documentation
   //## @brief Get the DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
   virtual DataTreeIteratorBase* GetData() const
   {
     return m_DataTreeIterator.GetPointer();
+  };
+
+  virtual mitk::DataStorage::Pointer GetDataStorage() const
+  {
+    return m_DataStorage.GetPointer();
   };
 
   //##Documentation
@@ -383,6 +390,10 @@ protected:
   //##Documentation
   //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for rendering.
   DataTreeIteratorClone m_DataTreeIterator;
+
+  //##Documentation
+  //## @brief The DataStorage defines which part of the data tree is traversed for renderering.
+  mitk::DataStorage::Pointer m_DataStorage;
 
   //##Documentation
   //## @brief Timestamp of last call of Update().

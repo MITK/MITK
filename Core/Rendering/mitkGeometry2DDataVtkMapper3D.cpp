@@ -50,7 +50,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_ColorTwoSides(false),
   m_InvertNormals(true),
   m_NormalsActorAdded(false),
-  m_DataTreeIterator(NULL)
+  m_DataTreeIterator(NULL),
+  m_DataStorage(NULL)
 {
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
@@ -193,8 +194,8 @@ vtkProp *
 Geometry2DDataVtkMapper3D::GetProp()
 {
   if ( (this->GetDataTreeNode() != NULL )
-       && (m_Prop3D != NULL)
-       && (m_ImageAssembly != NULL) )
+    && (m_Prop3D != NULL)
+    && (m_ImageAssembly != NULL) )
   {
     // Do not transform the entire Prop3D assembly, but only the image part
     // here. The colored frame is transformed elsewhere (via m_EdgeTransformer),
@@ -236,8 +237,11 @@ Geometry2DDataVtkMapper3D
 {
   if (storage != NULL)
   {
-    DataTreePreOrderIterator poi( (dynamic_cast<mitk::DataTreeStorage*>(storage))->m_DataTree );
-    this->SetDataIteratorForTexture( &poi );
+    if( m_DataStorage != storage )
+    {
+      m_DataStorage = storage;
+      this->Modified();
+    }
   }
 }
 
@@ -366,7 +370,7 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     if ( (surfacecreatorprop.IsNull())
       || (surfacecreatorprop->GetSmartPointer().IsNull())
       || ((m_SurfaceCreator = dynamic_cast<Geometry2DDataToSurfaceFilter*>(
-             surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() )
+      surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() )
       )
     {
       //m_SurfaceCreator = Geometry2DDataToSurfaceFilter::New();
@@ -417,11 +421,16 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     {
       // If no reference geometry is available, clip with the current global
       // bounds
-      m_SurfaceCreator->SetBoundingBox(
-        DataTree::ComputeVisibleBoundingBox(
-          m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"
-        )
-      );
+      if (m_DataStorage.IsNotNull())
+      {
+        m_SurfaceCreator->SetBoundingBox(m_DataStorage->ComputeVisibleBoundingBox(NULL, "includeInBoundingBox"));
+      }
+      else
+      {
+        m_SurfaceCreator->SetBoundingBox(
+          DataTree::ComputeVisibleBoundingBox(
+          m_DataTreeIterator.GetPointer(), NULL, "includeInBoundingBox"));
+      }
     }
 
     // Calculate the surface of the Geometry2D
@@ -511,230 +520,24 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 
     // Traverse the data tree to find nodes resliced by ImageMapper2D
-    if ( m_DataTreeIterator.IsNotNull() )
+    if (m_DataStorage.IsNotNull())
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
+
+      for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+      {
+        DataTreeNode *node = it->Value();
+        this->ProcessNode(node, renderer, surface, layerSortedActors);
+      }
+    } 
+    else if ( m_DataTreeIterator.IsNotNull() )
     {
       DataTreeIteratorClone it = m_DataTreeIterator.GetPointer();
-      int nodeCounter = 0;
 
       while ( !it->IsAtEnd() )
       {
         DataTreeNode *node = it->Get();
-
-        if ( node != NULL )
-        {
-          ImageMapper2D *imageMapper =
-            dynamic_cast< ImageMapper2D * >( node->GetMapper(1) );
-
-          if ( (node->IsVisible(renderer)) && imageMapper )
-          {
-            nodeCounter++;
-            WeakPointerProperty::Pointer rendererProp =
-              dynamic_cast< WeakPointerProperty * >(
-                GetDataTreeNode()->GetPropertyList()
-                  ->GetProperty("renderer"));
-
-            if ( rendererProp.IsNotNull() )
-            {
-              BaseRenderer::Pointer planeRenderer =
-                dynamic_cast< BaseRenderer * >(
-                  rendererProp->GetWeakPointer().GetPointer()
-                );
-
-              if ( planeRenderer.IsNotNull() )
-              {
-                // If it has not been initialized already in a previous pass,
-                // generate an actor, a lookup table and a texture object to
-                // render the image associated with the ImageMapper2D.
-                vtkActor *imageActor;
-                vtkDataSetMapper *dataSetMapper = NULL;
-                vtkLookupTable *lookupTable;
-                vtkTexture *texture;
-                if ( m_ImageActors.count( imageMapper ) == 0 )
-                {
-                  dataSetMapper = vtkDataSetMapper::New();
-                  dataSetMapper->ImmediateModeRenderingOn();
-
-                  lookupTable = vtkLookupTable::New();
-                  lookupTable->DeepCopy( m_DefaultLookupTable );
-                  lookupTable->SetRange( -1024.0, 4095.0 );
-
-                  texture = vtkTexture::New();
-                  texture->InterpolateOn();
-                  texture->SetLookupTable( lookupTable );
-                  texture->MapColorScalarsThroughLookupTableOn();
-                  texture->RepeatOff();
-
-                  imageActor = vtkActor::New();
-                  imageActor->GetProperty()->SetAmbient( 0.5 );
-                  imageActor->SetMapper( dataSetMapper );
-                  imageActor->SetTexture( texture );
-
-                  // Make imageActor the sole owner of the mapper and texture
-                  // objects
-                  lookupTable->UnRegister( NULL );
-                  dataSetMapper->UnRegister( NULL );
-                  texture->UnRegister( NULL );
-
-                  // Store the actor so that it may be accessed in following
-                  // passes.
-                  m_ImageActors[imageMapper].Initialize(imageActor, imageMapper, m_ImageMapperDeletedCommand);
-                }
-                else
-                {
-                  // Else, retrieve the actor and associated objects from the
-                  // previous pass.
-                  imageActor = m_ImageActors[imageMapper].m_Actor;
-                  dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
-                  texture = imageActor->GetTexture();
-
-                  //BUG (#1551) added dynamic cast for VTK5.2 support
-                  #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-                  lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
-                  #else
-                  lookupTable = texture->GetLookupTable();
-                  #endif
-                }
-
-                // Set poly data new each time its object changes (e.g. when
-                // switching between planar and curved geometries)
-                if ( dataSetMapper != NULL )
-                {
-                  if ( dataSetMapper->GetInput() != surface->GetVtkPolyData() )
-                  {
-                    dataSetMapper->SetInput( surface->GetVtkPolyData() );
-                  }
-                }
-
-                imageActor->GetMapper()->GetInput()->Update();
-                imageActor->GetMapper()->Update();
-
-                // We have to do this before GenerateAllData() is called
-                // since there may be no RendererInfo for renderer yet,
-                // thus GenerateAllData won't update the (non-existing)
-                // RendererInfo for renderer. By calling GetRendererInfo
-                // a RendererInfo will be created for renderer (if it does not
-                // exist yet).
-                imageMapper->GetRendererInfo( planeRenderer );
-
-                imageMapper->GenerateAllData();
-
-                // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
-                renderer->GetRenderWindow()->MakeCurrent();
-
-                // Retrieve and update image to be mapped
-                const ImageMapper2D::RendererInfo *rit =
-                  imageMapper->GetRendererInfo( planeRenderer );
-                if(rit->m_Image!=NULL)
-                {
-                  rit->m_Image->Update();
-
-                  texture->SetInput( rit->m_Image );
-
-
-                  // check for level-window-prop and use it if it exists
-                  ScalarType windowMin = 0.0;
-                  ScalarType windowMax = 255.0;
-                  LevelWindow levelWindow;
-
-                  bool binary = false;
-                  node->GetBoolProperty( "binary", binary, renderer );
-
-                  if( binary )
-                  {
-                    windowMin = 0;
-                    windowMax = 1;
-                  }
-                  else
-                  if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
-                    || node->GetLevelWindow( levelWindow, planeRenderer ) )
-                  {
-                    windowMin = levelWindow.GetMin();
-                    windowMax = levelWindow.GetMax();
-                  }
-
-                  vtkLookupTable *lookupTableSource;
-
-                  // check for "use color"
-                  bool useColor;
-                  if ( !node->GetBoolProperty( "use color", useColor, planeRenderer ) )
-                  {
-                    useColor = false;
-                  }
-
-                  if ( binary )
-                  {
-                    useColor = true;
-                  }
-
-                  // check for LookupTable
-                  LookupTableProperty::Pointer lookupTableProp;
-                  lookupTableProp = dynamic_cast< LookupTableProperty * >(
-                    node->GetPropertyList()
-                      ->GetProperty( "LookupTable" ));
-
-                  // If there is a lookup table supplied, use it; otherwise,
-                  // use the default grayscale table
-                  if ( lookupTableProp.IsNotNull()  && !useColor )
-                  {
-                    lookupTableSource = lookupTableProp->GetLookupTable()
-                      ->GetVtkLookupTable();
-                  }
-                  else
-                  {
-                    lookupTableSource = m_DefaultLookupTable;
-                  }
-
-                  LookupTableProperties &lutProperties =
-                    m_LookupTableProperties[imageMapper];
-
-                  // If there has been some change since the last pass which
-                  // makes it necessary to re-build the lookup table, do it.
-                  if ( (lutProperties.LookupTableSource != lookupTableSource)
-                    || (lutProperties.windowMin != windowMin)
-                    || (lutProperties.windowMax != windowMax) )
-                  {
-                    // Note the values for the next pass (lutProperties is a
-                    // reference to the list entry!)
-                    if ( lutProperties.LookupTableSource != NULL )
-                    {
-                      lutProperties.LookupTableSource->Delete();
-                    }
-                    lutProperties.LookupTableSource = lookupTableSource;
-                    lutProperties.LookupTableSource->Register( NULL );
-                    lutProperties.windowMin = windowMin;
-                    lutProperties.windowMax = windowMax;
-
-                    lookupTable->DeepCopy( lookupTableSource );
-                    lookupTable->SetRange( windowMin, windowMax );
-                  }
-
-                  // Apply color property (of the node, not of the plane)
-                  float rgb[3] = { 1.0, 1.0, 1.0 };
-                  node->GetColor( rgb, renderer );
-                  imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-                  //m_BackgroundActor->GetProperty()->SetColor(1,1,1);
-
-                  // Apply opacity property (of the node, not of the plane)
-                  float opacity = 0.999;
-                  node->GetOpacity( opacity, renderer );
-                  imageActor->GetProperty()->SetOpacity( opacity );
-
-                  // Set texture interpolation on/off
-                  bool textureInterpolation = node->IsOn( "texture interpolation", renderer );
-                  texture->SetInterpolate( textureInterpolation );
-
-
-                  // Store this actor to be added to the actor assembly, sort
-                  // by layer
-                  int layer = 1;
-                  node->GetIntProperty( "layer", layer );
-                  layerSortedActors.insert(
-                    std::pair< int, vtkActor * >( layer, imageActor ) );
-                }
-              }
-            }
-          }
-        }
+        this->ProcessNode(node, renderer, surface, layerSortedActors);
         ++it;
       }
     }
@@ -744,8 +547,8 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     // layer property
     LayerSortedActorList::iterator actorIt;
     for ( actorIt = layerSortedActors.begin();
-          actorIt != layerSortedActors.end();
-          ++actorIt )
+      actorIt != layerSortedActors.end();
+      ++actorIt )
     {
       m_ImageAssembly->AddPart( actorIt->second );
     }
@@ -800,6 +603,223 @@ Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 }
 
+void Geometry2DDataVtkMapper3D::ProcessNode( DataTreeNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors )
+{
+  if ( node != NULL )
+  {
+    ImageMapper2D *imageMapper =
+      dynamic_cast< ImageMapper2D * >( node->GetMapper(1) );
+
+    if ( (node->IsVisible(renderer)) && imageMapper )
+    {
+      WeakPointerProperty::Pointer rendererProp =
+        dynamic_cast< WeakPointerProperty * >(
+        GetDataTreeNode()->GetPropertyList()
+        ->GetProperty("renderer"));
+
+      if ( rendererProp.IsNotNull() )
+      {
+        BaseRenderer::Pointer planeRenderer =
+          dynamic_cast< BaseRenderer * >(
+          rendererProp->GetWeakPointer().GetPointer()
+          );
+
+        if ( planeRenderer.IsNotNull() )
+        {
+          // If it has not been initialized already in a previous pass,
+          // generate an actor, a lookup table and a texture object to
+          // render the image associated with the ImageMapper2D.
+          vtkActor *imageActor;
+          vtkDataSetMapper *dataSetMapper = NULL;
+          vtkLookupTable *lookupTable;
+          vtkTexture *texture;
+          if ( m_ImageActors.count( imageMapper ) == 0 )
+          {
+            dataSetMapper = vtkDataSetMapper::New();
+            dataSetMapper->ImmediateModeRenderingOn();
+
+            lookupTable = vtkLookupTable::New();
+            lookupTable->DeepCopy( m_DefaultLookupTable );
+            lookupTable->SetRange( -1024.0, 4095.0 );
+
+            texture = vtkTexture::New();
+            texture->InterpolateOn();
+            texture->SetLookupTable( lookupTable );
+            texture->MapColorScalarsThroughLookupTableOn();
+            texture->RepeatOff();
+
+            imageActor = vtkActor::New();
+            imageActor->GetProperty()->SetAmbient( 0.5 );
+            imageActor->SetMapper( dataSetMapper );
+            imageActor->SetTexture( texture );
+
+            // Make imageActor the sole owner of the mapper and texture
+            // objects
+            lookupTable->UnRegister( NULL );
+            dataSetMapper->UnRegister( NULL );
+            texture->UnRegister( NULL );
+
+            // Store the actor so that it may be accessed in following
+            // passes.
+            m_ImageActors[imageMapper].Initialize(imageActor, imageMapper, m_ImageMapperDeletedCommand);
+          }
+          else
+          {
+            // Else, retrieve the actor and associated objects from the
+            // previous pass.
+            imageActor = m_ImageActors[imageMapper].m_Actor;
+            dataSetMapper = (vtkDataSetMapper *)imageActor->GetMapper();
+            texture = imageActor->GetTexture();
+
+            //BUG (#1551) added dynamic cast for VTK5.2 support
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+            lookupTable = dynamic_cast<vtkLookupTable*>(texture->GetLookupTable());
+#else
+            lookupTable = texture->GetLookupTable();
+#endif
+          }
+
+          // Set poly data new each time its object changes (e.g. when
+          // switching between planar and curved geometries)
+          if ( dataSetMapper != NULL )
+          {
+            if ( dataSetMapper->GetInput() != surface->GetVtkPolyData() )
+            {
+              dataSetMapper->SetInput( surface->GetVtkPolyData() );
+            }
+          }
+
+          imageActor->GetMapper()->GetInput()->Update();
+          imageActor->GetMapper()->Update();
+
+          // We have to do this before GenerateAllData() is called
+          // since there may be no RendererInfo for renderer yet,
+          // thus GenerateAllData won't update the (non-existing)
+          // RendererInfo for renderer. By calling GetRendererInfo
+          // a RendererInfo will be created for renderer (if it does not
+          // exist yet).
+          imageMapper->GetRendererInfo( planeRenderer );
+
+          imageMapper->GenerateAllData();
+
+          // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
+          renderer->GetRenderWindow()->MakeCurrent();
+
+          // Retrieve and update image to be mapped
+          const ImageMapper2D::RendererInfo *rit =
+            imageMapper->GetRendererInfo( planeRenderer );
+          if(rit->m_Image!=NULL)
+          {
+            rit->m_Image->Update();
+
+            texture->SetInput( rit->m_Image );
+
+
+            // check for level-window-prop and use it if it exists
+            ScalarType windowMin = 0.0;
+            ScalarType windowMax = 255.0;
+            LevelWindow levelWindow;
+
+            bool binary = false;
+            node->GetBoolProperty( "binary", binary, renderer );
+
+            if( binary )
+            {
+              windowMin = 0;
+              windowMax = 1;
+            }
+            else
+              if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
+                || node->GetLevelWindow( levelWindow, planeRenderer ) )
+              {
+                windowMin = levelWindow.GetMin();
+                windowMax = levelWindow.GetMax();
+              }
+
+              vtkLookupTable *lookupTableSource;
+
+              // check for "use color"
+              bool useColor;
+              if ( !node->GetBoolProperty( "use color", useColor, planeRenderer ) )
+              {
+                useColor = false;
+              }
+
+              if ( binary )
+              {
+                useColor = true;
+              }
+
+              // check for LookupTable
+              LookupTableProperty::Pointer lookupTableProp;
+              lookupTableProp = dynamic_cast< LookupTableProperty * >(
+                node->GetPropertyList()
+                ->GetProperty( "LookupTable" ));
+
+              // If there is a lookup table supplied, use it; otherwise,
+              // use the default grayscale table
+              if ( lookupTableProp.IsNotNull()  && !useColor )
+              {
+                lookupTableSource = lookupTableProp->GetLookupTable()
+                  ->GetVtkLookupTable();
+              }
+              else
+              {
+                lookupTableSource = m_DefaultLookupTable;
+              }
+
+              LookupTableProperties &lutProperties =
+                m_LookupTableProperties[imageMapper];
+
+              // If there has been some change since the last pass which
+              // makes it necessary to re-build the lookup table, do it.
+              if ( (lutProperties.LookupTableSource != lookupTableSource)
+                || (lutProperties.windowMin != windowMin)
+                || (lutProperties.windowMax != windowMax) )
+              {
+                // Note the values for the next pass (lutProperties is a
+                // reference to the list entry!)
+                if ( lutProperties.LookupTableSource != NULL )
+                {
+                  lutProperties.LookupTableSource->Delete();
+                }
+                lutProperties.LookupTableSource = lookupTableSource;
+                lutProperties.LookupTableSource->Register( NULL );
+                lutProperties.windowMin = windowMin;
+                lutProperties.windowMax = windowMax;
+
+                lookupTable->DeepCopy( lookupTableSource );
+                lookupTable->SetRange( windowMin, windowMax );
+              }
+
+              // Apply color property (of the node, not of the plane)
+              float rgb[3] = { 1.0, 1.0, 1.0 };
+              node->GetColor( rgb, renderer );
+              imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
+              //m_BackgroundActor->GetProperty()->SetColor(1,1,1);
+
+              // Apply opacity property (of the node, not of the plane)
+              float opacity = 0.999;
+              node->GetOpacity( opacity, renderer );
+              imageActor->GetProperty()->SetOpacity( opacity );
+
+              // Set texture interpolation on/off
+              bool textureInterpolation = node->IsOn( "texture interpolation", renderer );
+              texture->SetInterpolate( textureInterpolation );
+
+
+              // Store this actor to be added to the actor assembly, sort
+              // by layer
+              int layer = 1;
+              node->GetIntProperty( "layer", layer );
+              layerSortedActors.insert(
+                std::pair< int, vtkActor * >( layer, imageActor ) );
+          }
+        }
+      }
+    }
+  }
+}
 void
 Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
 {

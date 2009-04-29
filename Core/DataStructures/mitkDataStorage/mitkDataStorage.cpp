@@ -271,3 +271,206 @@ void mitk::DataStorage::RemoveModifiedListener( const mitk::DataTreeNode* _Node 
     (const_cast<mitk::DataTreeNode*>(_Node))->RemoveObserver(tag);
   }
 }
+
+mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+{
+  BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
+
+  BoundingBox::PointIdentifier pointid=0;
+  Point3D point;
+
+  Vector3D minSpacing;
+  minSpacing.Fill(ScalarTypeNumericTraits::max());
+
+  TimeBounds timeBounds;
+  ScalarType stmin, stmax, cur;
+  stmin= ScalarTypeNumericTraits::NonpositiveMin();
+  stmax= ScalarTypeNumericTraits::max();
+
+  timeBounds[0]=stmax; timeBounds[1]=stmin;
+  SetOfObjects::ConstPointer all = this->GetAll();
+  for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  {
+    DataTreeNode::Pointer node = it->Value();
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+      (node->GetData()->IsEmpty()==false) && 
+      node->IsOn(boolPropertyKey, renderer) && 
+      node->IsOn(boolPropertyKey2, renderer)
+      )
+    {
+      const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+      if (geometry != NULL ) 
+      {
+        // bounding box
+        unsigned char i;
+        for(i=0; i<8; ++i)
+        {
+          point = geometry->GetCornerPoint(i);
+          if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
+            pointscontainer->InsertElement( pointid++, point);
+          else
+          {
+            itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+          }
+        }
+        // spacing
+        try
+        {
+          AffineTransform3D::Pointer inverseTransform = AffineTransform3D::New();
+          geometry->GetIndexToWorldTransform()->GetInverse(inverseTransform);
+          vnl_vector< AffineTransform3D::MatrixType::ValueType > unitVector(3);
+          int axis;
+          for(axis = 0; axis < 3; ++axis)
+          {
+            unitVector.fill(0);
+            unitVector[axis] = 1.0;
+            ScalarType mmPerPixel = 1.0/(inverseTransform->GetMatrix()*unitVector).magnitude();
+            if(minSpacing[axis] > mmPerPixel)
+            {
+              minSpacing[axis] = mmPerPixel;
+            }
+          }
+          // timebounds
+          const TimeBounds & curTimeBounds = geometry->GetTimeBounds();
+          cur=curTimeBounds[0];
+          //is it after -infinity, but before everything else that we found until now?
+          if((cur > stmin) && (cur < timeBounds[0]))
+            timeBounds[0] = cur;
+
+          cur=curTimeBounds[1];
+          //is it before infinity, but after everything else that we found until now?
+          if((cur < stmax) && (cur > timeBounds[1]))
+            timeBounds[1] = cur;
+        }
+        catch(itk::ExceptionObject e)
+        {
+          std::cerr << e << std::endl;
+        }
+      }
+    }
+  }
+
+  BoundingBox::Pointer result = BoundingBox::New();
+  result->SetPoints(pointscontainer);
+  result->ComputeBoundingBox();
+
+  Geometry3D::Pointer geometry;
+  if ( result->GetPoints()->Size()>0 )
+  {
+    geometry = Geometry3D::New();
+    geometry->Initialize();
+    // correct bounding-box (is now in mm, should be in index-coordinates)
+    // according to spacing
+    BoundingBox::BoundsArrayType bounds = result->GetBounds();
+    int i;
+    for(i = 0; i < 6; ++i)
+    {
+      bounds[i] /= minSpacing[i/2];
+    }
+    geometry->SetBounds(bounds);
+    geometry->SetSpacing(minSpacing);
+    // timebounds
+    if(!(timeBounds[0]<stmax))
+    {
+      timeBounds[0] = stmin;
+      timeBounds[1] = stmax;
+    }
+    geometry->SetTimeBounds(timeBounds);
+  }
+  return geometry;
+}
+
+mitk::Geometry3D::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
+{
+  return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
+}
+
+mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+{
+  BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
+
+  BoundingBox::PointIdentifier pointid=0;
+  Point3D point;
+
+  SetOfObjects::ConstPointer all = this->GetAll();
+  for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  {
+    DataTreeNode::Pointer node = it->Value();
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+      (node->GetData()->IsEmpty()==false) && 
+      node->IsOn(boolPropertyKey, renderer) && 
+      node->IsOn(boolPropertyKey2, renderer)
+      )
+    {
+      const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+      if (geometry != NULL ) 
+      {
+        unsigned char i;
+        for(i=0; i<8; ++i)
+        {
+          point = geometry->GetCornerPoint(i);
+          if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
+            pointscontainer->InsertElement( pointid++, point);
+          else
+          {
+            itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+          }
+        }
+      }
+    }
+    
+  }
+
+  BoundingBox::Pointer result = BoundingBox::New();
+  result->SetPoints(pointscontainer);
+  result->ComputeBoundingBox();
+
+  return result;
+}
+
+mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
+{
+  TimeBounds timeBounds;
+
+  ScalarType stmin, stmax, cur;
+
+  stmin= ScalarTypeNumericTraits::NonpositiveMin();
+  stmax= ScalarTypeNumericTraits::max();
+
+  timeBounds[0]=stmax; timeBounds[1]=stmin;
+
+  SetOfObjects::ConstPointer all = this->GetAll();
+  for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  {
+    DataTreeNode::Pointer node = it->Value();
+    if((node.IsNotNull()) && (node->GetData() != NULL) && 
+      (node->GetData()->IsEmpty()==false) && 
+      node->IsOn(boolPropertyKey, renderer) && 
+      node->IsOn(boolPropertyKey2, renderer)
+      )
+    {
+      const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+      if (geometry != NULL ) 
+      {
+        const TimeBounds & curTimeBounds = geometry->GetTimeBounds();
+        cur=curTimeBounds[0];
+        //is it after -infinity, but before everything else that we found until now?
+        if((cur > stmin) && (cur < timeBounds[0]))
+          timeBounds[0] = cur;
+
+        cur=curTimeBounds[1];
+        //is it before infinity, but after everything else that we found until now?
+        if((cur < stmax) && (cur > timeBounds[1]))
+          timeBounds[1] = cur;
+      }
+    }
+  }
+
+  if(!(timeBounds[0]<stmax))
+  {
+    timeBounds[0] = stmin;
+    timeBounds[1] = stmax;
+  }
+
+  return timeBounds;
+}

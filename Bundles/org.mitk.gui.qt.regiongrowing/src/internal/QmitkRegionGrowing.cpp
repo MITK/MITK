@@ -56,7 +56,7 @@ void QmitkRegionGrowing::CreateQtPartControl(QWidget *parent)
 
     // define data type for combobox
     m_Controls->m_TreeNodeSelector->SetDataStorage( this->GetDefaultDataStorage() );
-    m_Controls->m_TreeNodeSelector->SetPredicate( new mitk::NodePredicateDataType("Image") );
+    m_Controls->m_TreeNodeSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
 
     // if so, let the point set widget know about the multi widget (crosshair updates)
     m_Controls->m_PointListWidget->SetMultiWidget( m_MultiWidget );

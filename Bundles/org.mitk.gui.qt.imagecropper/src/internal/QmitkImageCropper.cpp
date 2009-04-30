@@ -111,7 +111,7 @@ void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
     this->CreateConnections();
 
     m_Controls->cmbImage->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->cmbImage->SetPredicate(new mitk::NodePredicateDataType("Image"));
+    m_Controls->cmbImage->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
 
 }

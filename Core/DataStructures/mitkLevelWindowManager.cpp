@@ -430,14 +430,14 @@ std::vector<mitk::DataTreeNode::Pointer> mitk::LevelWindowManager::GetAllNodes()
   else
     dataStorage = mitk::DataStorage::GetInstance();
 
-  mitk::NodePredicateProperty isVisible("visible", myProp);
-  mitk::NodePredicateProperty isBinary("binary", myProp);
-  mitk::NodePredicateNOT notBinary(isBinary);
-  mitk::NodePredicateProperty hasLevelWindow("levelwindow", NULL);
-  mitk::NodePredicateDataType isImage("Image");
-  mitk::NodePredicateAND predicate( isVisible, isImage );
-  mitk::NodePredicateAND predicateNotBinary( predicate, notBinary );
-  mitk::NodePredicateAND predicateLevelWindow( predicateNotBinary, hasLevelWindow );
+  mitk::NodePredicateProperty::Pointer isVisible = mitk::NodePredicateProperty::New("visible", myProp);
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", myProp);
+  mitk::NodePredicateNOT::Pointer notBinary = mitk::NodePredicateNOT::New(isBinary);
+  mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", NULL);
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( isVisible, isImage );
+  mitk::NodePredicateAND::Pointer predicateNotBinary = mitk::NodePredicateAND::New( predicate, notBinary );
+  mitk::NodePredicateAND::Pointer predicateLevelWindow = mitk::NodePredicateAND::New( predicateNotBinary, hasLevelWindow );
 
   mitk::DataStorage::SetOfObjects::ConstPointer allObjects = dataStorage->GetSubset( predicateLevelWindow );
 

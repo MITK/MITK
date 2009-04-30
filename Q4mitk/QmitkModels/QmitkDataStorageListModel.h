@@ -93,7 +93,7 @@ protected:
   /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
   /// is NULL all Nodes will be selected. *Attention: this class owns the predicate and deletes it*
   ///
-  mitk::NodePredicateBase* m_NodePredicate;
+  mitk::NodePredicateBase::Pointer m_NodePredicate;
 
   ///
   /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there

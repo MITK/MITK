@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkDataStorage.h"
 #include "mitkDataTreeNode.h"
+#include "mitkWeakPointer.h"
 
 namespace mitk {
 
@@ -36,9 +37,10 @@ namespace mitk {
     class MITK_CORE_EXPORT NodePredicateSource : public NodePredicateBase
     {
     public:
-      //##Documentation
-      //## @brief Constructor - This class can either search only for direct source objects or for all source objects
-      NodePredicateSource(mitk::DataTreeNode* n, bool allsources, mitk::DataStorage* ds);
+
+      mitkClassMacro(NodePredicateSource, NodePredicateBase);
+      mitkNewMacro3Param(NodePredicateSource, mitk::DataTreeNode*, bool, mitk::DataStorage*);
+
       //##Documentation
       //## @brief Standard Destructor
       virtual ~NodePredicateSource();
@@ -48,9 +50,13 @@ namespace mitk {
       virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
     protected:
-      mitk::DataTreeNode::Pointer m_BaseNode;
+      //##Documentation
+      //## @brief Constructor - This class can either search only for direct source objects or for all source objects
+      NodePredicateSource(mitk::DataTreeNode* n, bool allsources, mitk::DataStorage* ds);
+
+      mitk::WeakPointer<mitk::DataTreeNode> m_BaseNode;
       bool m_SearchAllSources;
-      mitk::DataStorage::Pointer m_DataStorage;
+      mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
     };
 
 } // namespace mitk

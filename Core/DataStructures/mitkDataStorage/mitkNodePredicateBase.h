@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 
 #include "mitkCommon.h"
+#include "itkObject.h"
 
 namespace mitk {
   class DataTreeNode;
@@ -30,17 +31,18 @@ namespace mitk {
   //## of mitk::DataStorage. By combining different predicate objects, the user can form complex
   //## queries like "give me all nodes that either contain a surface object or a binary segmentation 
   //## and that are tagged as Organtype == 'Liver'".
-  //## @warning NodePredicates should be created, used and thrown away, not stored as member variables 
-  //##          because they may hold (smart-)pointers to other objects (DataObject and Properties)
+  //## @warning NodePredicates are now derived from itk::Object and make thus use of the smart pointer concept.
+  //##          As a result predicates should only store raw pointers because for one thing they are not owners
+  //##          of these objects and should not keep them alive.
   //##
   //## @ingroup DataStorage
-  class MITK_CORE_EXPORT NodePredicateBase
+  class MITK_CORE_EXPORT NodePredicateBase: public itk::Object
   {
 
   public:
-    //##Documentation
-    //## @brief Standard Constructor
-    NodePredicateBase();
+
+    mitkClassMacro(NodePredicateBase,itk::Object);
+
     //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateBase();

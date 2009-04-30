@@ -66,7 +66,7 @@ void mitk::DataTreeStorage::NodeDeletedInTree(const itk::EventObject & treeChang
     return;
   
   // remove ITK modified event listener
-  this->RemoveModifiedListener(node);
+  this->RemoveListeners(node);
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
@@ -132,7 +132,7 @@ void mitk::DataTreeStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorag
   }
 
   // register for ITK changed events
-  this->AddModifiedListener(node);
+  this->AddListeners(node);
 
   /* Notify observers */
   EmitAddNodeEvent(node);
@@ -153,7 +153,7 @@ void mitk::DataTreeStorage::Remove(const mitk::DataTreeNode* node)
   m_DuringRemove = true;
 
   // remove ITK modified event listener
-  this->RemoveModifiedListener(node);
+  this->RemoveListeners(node);
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);

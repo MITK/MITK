@@ -13,10 +13,10 @@ QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointe
                                                        , QObject* parent )
 : QAbstractTableModel(parent)
 , m_DataStorage(0)
-, m_Predicate(_Predicate)
 , m_NodeSet(mitk::DataStorage::SetOfObjects::New())
 , m_BlockEvents(false)
 {
+  m_Predicate = _Predicate;
   this->setDataStorage(_DataStorage);
 }
 
@@ -40,9 +40,9 @@ void QmitkDataStorageTableModel::reset()
   if(m_DataStorage != 0)
   {
 
-    if(m_Predicate != 0)
+    if(m_Predicate.IsNotNull())
       // get subset
-      _NodeSet = m_DataStorage->GetSubset(*m_Predicate);
+      _NodeSet = m_DataStorage->GetSubset(m_Predicate);
     // if predicate is NULL, select all nodes
     else
     {
@@ -82,10 +82,6 @@ QmitkDataStorageTableModel::~QmitkDataStorageTableModel()
 {
   // set data storage 0 to remove event listeners
   this->setDataStorage(0);
-
-  // delete the predicate (we are the owner)
-  delete m_Predicate;
-  m_Predicate = 0;
 }
 
 void QmitkDataStorageTableModel::setPredicate(mitk::NodePredicateBase* _Predicate)

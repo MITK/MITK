@@ -68,6 +68,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
 #include "mitkMaterialProperty.h"
+#include "mitkDelegateProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"
@@ -479,7 +480,10 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   // path
   mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath( m_FileName ) );
   node->SetProperty( StringProperty::PATH, pathProp );
-  
+
+  mitk::DelegateProperty::Pointer showNodeInfoDelegate = mitk::DelegateProperty::New( "Show Node Info" );
+  node->SetProperty( "ShowNodeInfo", showNodeInfoDelegate );
+
   // name
   mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
   if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))

@@ -60,7 +60,7 @@ private:
 
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::DataStorage::SetOfObjects::ConstPointer m_DataNodes;
-  mitk::NodePredicateBase* m_NodePredicate;
+  mitk::NodePredicateBase::Pointer m_NodePredicate;
   DataStorageViewMode m_ViewMode;
 };
 

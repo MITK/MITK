@@ -400,17 +400,17 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetWorkingDataPreference() ) );
+            m_Predicates.push_back( mitk::NodePredicateOR::New( completePredicate, tool->GetWorkingDataPreference() ) );
           }
           else
           {
-              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetWorkingDataPreference() ) );
+              m_Predicates.push_back( mitk::NodePredicateAND::New( completePredicate, tool->GetWorkingDataPreference() ) );
           }
           completePredicate = m_Predicates.back();
         }
         else
         {
-          completePredicate = &tool->GetWorkingDataPreference();
+          completePredicate = tool->GetWorkingDataPreference();
         }
       }
     }
@@ -440,7 +440,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   {
     if (completePredicate)
     {
-      allObjects = dataStorage->GetSubset( *completePredicate );
+      allObjects = dataStorage->GetSubset( completePredicate );
     }
     else
     {

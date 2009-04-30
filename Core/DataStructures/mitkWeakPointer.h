@@ -1,19 +1,20 @@
 /*=========================================================================
 
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: mitkWeakPointer.h,v $
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision: 1.10 $
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 14123 $
 
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.mitk.org/HTML/Copyright.htm for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
 #ifndef __mitkWeakPointer_h
 #define __mitkWeakPointer_h
 
@@ -39,7 +40,7 @@ template <class TObjectType>
 class WeakPointer
 {
 public:
-  /** Extract information from template parameter. */
+  /** Extract infoirmation from template parameter. */
   typedef TObjectType ObjectType;
 
   typedef Message1<const itk::Object*> itkObjectEvent;

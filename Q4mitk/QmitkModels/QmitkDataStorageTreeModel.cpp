@@ -89,13 +89,13 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex& parent) const
 	{
 		if(m_NodePredicate)
 		{
-			mitk::NodePredicateFirstLevel p1(m_DataStorage);
-			mitk::NodePredicateAND p2(p1,*m_NodePredicate);
+      mitk::NodePredicateFirstLevel::Pointer p1 = mitk::NodePredicateFirstLevel::New(m_DataStorage);
+			mitk::NodePredicateAND::Pointer p2 = mitk::NodePredicateAND::New(p1,m_NodePredicate);
 			return m_DataStorage->GetSubset(p2)->Size();
 		}
 		else
 		{
-			mitk::NodePredicateFirstLevel p1(m_DataStorage);
+      mitk::NodePredicateFirstLevel::Pointer p1 = mitk::NodePredicateFirstLevel::New(m_DataStorage);
 			int num  = m_DataStorage->GetSubset(p1)->Size();
 			return m_DataStorage->GetSubset(p1)->Size();
 		}
@@ -141,14 +141,14 @@ QModelIndex QmitkDataStorageTreeModel::index ( int row, int column, const QModel
 	{
 		if(m_NodePredicate)
 		{
-			mitk::NodePredicateFirstLevel p1(m_DataStorage);
-			mitk::NodePredicateAND p2(p1,*m_NodePredicate);
+			mitk::NodePredicateFirstLevel::Pointer p1(mitk::NodePredicateFirstLevel::New(m_DataStorage));
+			mitk::NodePredicateAND::Pointer p2(mitk::NodePredicateAND::New(p1,m_NodePredicate));
 			if (m_DataStorage->GetSubset(p2)->GetElement(row))
 				return createIndex(row, column, m_DataStorage->GetSubset(p2)->GetElement(row));
 		}
 		else
 		{
-			mitk::NodePredicateFirstLevel p1(m_DataStorage);
+			mitk::NodePredicateFirstLevel::Pointer p1(mitk::NodePredicateFirstLevel::New(m_DataStorage));
 			if (m_DataStorage->GetSubset(p1)->Size() > row)
 			{
 				//int num = m_DataStorage->GetSubset(p1)->Size();
@@ -169,13 +169,13 @@ bool QmitkDataStorageTreeModel::hasChildren ( const QModelIndex & parent ) const
 	}
 	if(m_NodePredicate)
 	{
-		mitk::NodePredicateFirstLevel p1(m_DataStorage);
-		mitk::NodePredicateAND p2(p1,*m_NodePredicate);
+		mitk::NodePredicateFirstLevel::Pointer p1(mitk::NodePredicateFirstLevel::New(m_DataStorage));
+		mitk::NodePredicateAND::Pointer p2(mitk::NodePredicateAND::New(p1,m_NodePredicate));
 		return m_DataStorage->GetSubset(p2)->Size();
 	}
 	else
 	{
-		mitk::NodePredicateFirstLevel p1(m_DataStorage);
+		mitk::NodePredicateFirstLevel::Pointer p1(mitk::NodePredicateFirstLevel::New(m_DataStorage));
 		return m_DataStorage->GetSubset(p1)->Size();
 	}
 }

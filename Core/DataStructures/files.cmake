@@ -5,6 +5,7 @@ SET(H_FILES
   mitkGenericLookupTableProperty.h
   mitkGenericProperty.h
   mitkTransferFunctionProperty.h
+  mitkWeakPointer.h
   itkConfidenceDiffusionTensor3D.h
 )
 

@@ -36,9 +36,9 @@ namespace mitk {
   class MITK_CORE_EXPORT NodePredicateData : public NodePredicateBase
   {
   public:
-    //##Documentation
-    //## @brief Standard Constructor
-    NodePredicateData(mitk::BaseData* d);
+    mitkClassMacro(NodePredicateData, NodePredicateBase);
+    mitkNewMacro1Param(NodePredicateData, mitk::BaseData*);
+
     //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateData();
@@ -48,6 +48,10 @@ namespace mitk {
     virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
   protected:
+    //##Documentation
+    //## @brief Protected constructor, use static instantiation functions instead
+    NodePredicateData(mitk::BaseData* d);
+
     mitk::BaseData* m_DataObject;
   };
 } // namespace mitk

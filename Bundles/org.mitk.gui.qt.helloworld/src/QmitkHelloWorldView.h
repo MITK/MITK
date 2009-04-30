@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QmitkStandardViews.h>
 
+class QmitkDataStorageComboBox;
+
 class QmitkHelloWorldView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT;
@@ -25,6 +27,7 @@ protected:
   void CreateQtPartControl(QWidget* parent);
   QPushButton* m_ButtonHelloWorld;
   QWidget* m_Parent;
+  QmitkDataStorageComboBox* m_DataComboBox;
 
 };
 

@@ -109,7 +109,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   _BasePaneLayout->addWidget(_DataStorageSelectionGroupBox, 0, 0);
   _SplitterNodeViewPropertiesView->setOrientation(Qt::Vertical);
   _SplitterNodeViewPropertiesView->setHandleWidth(5);
-  _SplitterNodeViewPropertiesView->setMargin(5);
+  //_SplitterNodeViewPropertiesView->setMargin(5);
   // just to show a visible splitter handle!
   _SplitterNodeViewPropertiesView->setStyle(new QMotifStyle);
   _SplitterNodeViewPropertiesView->addWidget(_NodeViewGroupBox);
@@ -202,7 +202,23 @@ void QmitkDataManagerView::Deactivated()
 
 void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
 {
-  std::cout << "DataStorageSelectionChanged\n";
+  //std::cout << "DataStorageSelectionChanged\n";
+  //this->m_NodeTableView->set
+  QmitkDataStorageTableModel* _NodeTableModel = 0;
+
+  // default datastorage
+  if(m_NodeTableView->currentIndex().row() == 0)
+  {
+    _NodeTableModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), 0, m_NodeTableView);
+  }
+  else
+  {
+    _NodeTableModel = new QmitkDataStorageTableModel(this->GetDataStorage(), 0, m_NodeTableView);
+  }
+
+  m_NodeTableView->setModel(_NodeTableModel);
+  delete m_NodeTableModel;
+  m_NodeTableModel = _NodeTableModel;
 }
 
 void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )

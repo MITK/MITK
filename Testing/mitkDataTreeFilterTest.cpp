@@ -756,7 +756,7 @@ int testDataStorageCompliance()
   }
   /* next, get a resultset of n2-n3 */
   std::cout << "Testing subset of DataStorage: ";
-  mitk::NodePredicateProperty p("color", mitk::ColorProperty::New(color));
+  mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color));
   mitk::DataStorage::SetOfObjects::ConstPointer rs2 = ds->GetSubset(p);
   dTF->SetDataStorageResultset(rs2);
 

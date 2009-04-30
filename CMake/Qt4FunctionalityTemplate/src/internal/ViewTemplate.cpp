@@ -35,7 +35,7 @@ void @VIEW_CLASS@::CreateQtPartControl(QWidget *parent)
 
     // define data type for combobox
     m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
-    m_Controls->m_ImageSelector->SetPredicate( new mitk::NodePredicateDataType("Image") );
+    m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
   }
 }
 

@@ -35,9 +35,9 @@ namespace mitk {
   class MITK_CORE_EXPORT NodePredicateDataType : public NodePredicateBase
   {
   public:
-    //##Documentation
-    //## @brief Standard Constructor
-    NodePredicateDataType(const char* datatype);
+    mitkClassMacro(NodePredicateDataType, NodePredicateBase);
+    mitkNewMacro1Param(NodePredicateDataType, const char*);
+
     //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateDataType();
@@ -47,6 +47,10 @@ namespace mitk {
     virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
   protected:
+    //##Documentation
+    //## @brief Protected constructor, use static instantiation functions instead
+    NodePredicateDataType(const char* datatype);
+
     std::string m_ValidDataType;
   };
 
@@ -62,10 +66,8 @@ namespace mitk {
   class TNodePredicateDataType : public NodePredicateBase
   {
   public:
-    
-    TNodePredicateDataType() 
-    {
-    }
+    mitkClassMacro(TNodePredicateDataType, NodePredicateBase);
+    itkFactorylessNewMacro(TNodePredicateDataType);
 
     virtual ~TNodePredicateDataType() 
     {
@@ -76,6 +78,12 @@ namespace mitk {
     virtual bool CheckNode(const mitk::DataTreeNode* node) const
     {
       return node && node->GetData() && dynamic_cast<T*>(node->GetData());
+    }
+  protected:
+    //##Documentation
+    //## @brief Protected constructor, use static instantiation functions instead
+    TNodePredicateDataType() 
+    {
     }
   };
 

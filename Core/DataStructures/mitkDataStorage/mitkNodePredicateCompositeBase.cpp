@@ -17,22 +17,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateCompositeBase.h"
 
-
-mitk::NodePredicateCompositeBase::NodePredicateCompositeBase()
-: NodePredicateBase()
-{
-}
+// for std::find
+#include <algorithm>
 
 mitk::NodePredicateCompositeBase::~NodePredicateCompositeBase()
 {
 }
 
-void mitk::NodePredicateCompositeBase::AddPredicate(const NodePredicateBase& p)
+void mitk::NodePredicateCompositeBase::AddPredicate( const NodePredicateBase* p )
 {
-  m_ChildPredicates.push_back(&p);
+  m_ChildPredicates.push_back(p);
 }
 
-void mitk::NodePredicateCompositeBase::RemovePredicate(const NodePredicateBase& p)
+void mitk::NodePredicateCompositeBase::RemovePredicate( const NodePredicateBase* p )
 {
-  m_ChildPredicates.remove(&p);
+  m_ChildPredicates.remove(p);
+}
+
+mitk::NodePredicateCompositeBase::ChildPredicates mitk::NodePredicateCompositeBase::GetPredicates() const
+{
+  return m_ChildPredicates;
 }

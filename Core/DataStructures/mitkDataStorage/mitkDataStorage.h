@@ -118,7 +118,7 @@ namespace mitk {
     //## (see definition of NodePredicateBase for details).
     //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the
     //## conditions. A set of all objects can be retrieved with the GetAll() method;
-    SetOfObjects::ConstPointer GetSubset(const NodePredicateBase& condition) const;
+    SetOfObjects::ConstPointer GetSubset(const NodePredicateBase* condition) const;
 
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
@@ -214,7 +214,7 @@ namespace mitk {
     DataStorageEvent RemoveNodeEvent;
 
     //##Documentation
-    //## @brief ChangedEvent is emitted directly before a node is removed from the DataStorage. 
+    //## @brief ChangedEvent is emitted directly after a node was changed. 
     //##
     //## Observers should register to this event by calling myDataStorage->ChangedNodeEvent.AddListener(myObject, MyObject::MyMethod).
     //## After registering, myObject->MyMethod() will be called every time a new node has been changed.
@@ -223,6 +223,15 @@ namespace mitk {
     //## to the listeners of this event.
     DataStorageEvent ChangedNodeEvent;
 
+    //##Documentation
+    //## @brief DeleteNodeEvent is emitted directly before a node is deleted.
+    //##
+    //## Observers should register to this event by calling myDataStorage->DeleteNodeEvent.AddListener(myObject, MyObject::MyMethod).
+    //## After registering, myObject->MyMethod() will be called when a node is deleted.
+    //## Observers should unregister by calling myDataStorage->DeleteNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
+    //## Internally the DataStorage listens to itk::DeleteEvents on the nodes and forwards them
+    //## to the listeners of this event.
+    DataStorageEvent DeleteNodeEvent;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -249,20 +258,20 @@ namespace mitk {
     //##Documentation
     //## @brief Compute the bounding box of data tree structure
     //## @param it an iterator to a data tree structure
-    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
-    //## and is set to @a false, the node is ignored for the bounding-box calculation.
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
+     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
     mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
     //##Documentation
-    //## \brief Compute the bounding box of all visible parts of the data tree structure, for general 
+    //## \brief Compute the bounding box of all visible parts of the data tree structure, for general
     //## rendering or renderer specific visibility property checking
-    //## 
+    //##
     //## Simply calls ComputeBoundingBox(it, "visible", renderer, boolPropertyKey).
     //## @param it an iterator of a data tree structure
     //## @param renderer the reference to the renderer
-    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
     {
@@ -275,21 +284,21 @@ namespace mitk {
     //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
     //## all data-objects with infinite live-span are ignored.
     //## @param it an iterator to a data tree structure
-    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
     TimeBounds ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
     //##Documentation
-    //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general 
-    //## rendering or renderer specific visibility property checking
+    //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general
+     //## rendering or renderer specific visibility property checking
     //##
     //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
     //## all data-objects with infinite live-span are ignored.
     //## Simply calls ComputeTimeBounds(it, "visible", renderer, boolPropertyKey).
     //## @param it an iterator to a data tree structure
-    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer) 
+    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
     TimeBounds ComputeTimeBounds( mitk::BaseRenderer* renderer, const char* boolPropertyKey)
@@ -322,21 +331,25 @@ namespace mitk {
     //##
     //## The node is hidden behind the caller parameter, which has to be casted first.
     //## If the cast succeeds the ChangedNodeEvent is emitted with this node.
-    void OnNodeModified( const itk::Object *caller, const itk::EventObject &event );
+    void OnNodeModifiedOrDeleted( const itk::Object *caller, const itk::EventObject &event );
 
     //##Documentation
     //## @brief  Adds a Modified-Listener to the given Node.
-    void AddModifiedListener(const mitk::DataTreeNode* _Node);
+    void AddListeners(const mitk::DataTreeNode* _Node);
 
     //##Documentation
     //## @brief  Removes a Modified-Listener from the given Node.
-    void RemoveModifiedListener(const mitk::DataTreeNode* _Node);
+    void RemoveListeners(const mitk::DataTreeNode* _Node);
 
     
  
     //##Documentation
     //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
     std::map<const mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;
+
+    //##Documentation
+    //## @brief  Saves Delete-Observer Tags for each node in order to remove the event listeners again.
+    std::map<const mitk::DataTreeNode*, unsigned long> m_NodeDeleteObserverTags;
 
     //##Documentation
     //## @brief If this class changes nodes itself, set this to TRUE in order

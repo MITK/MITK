@@ -9,12 +9,18 @@
 #include <mitkIDataStorageReference.h>
 
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateProperty.h>
+
+#include <mitkProperties.h>
 
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>
+#include <QmitkDataStorageComboBox.h>
 
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
@@ -31,10 +37,18 @@ void QmitkHelloWorldView::CreateQtPartControl(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
   m_Parent = parent;
   m_ButtonHelloWorld = new QPushButton("Hello World", m_Parent);
+  m_DataComboBox = new QmitkDataStorageComboBox(m_Parent, true);
+  mitk::BoolProperty::Pointer myProp = mitk::BoolProperty::New(true);
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", myProp);
+  mitk::NodePredicateNOT::Pointer notBinary = mitk::NodePredicateNOT::New(isBinary); 
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image"); 
+  mitk::NodePredicateAND::Pointer completePredicate = mitk::NodePredicateAND::New( notBinary, isImage );
+  m_DataComboBox->SetPredicate(  completePredicate  );
 
   QObject::connect(m_ButtonHelloWorld, SIGNAL(clicked()),
          this, SLOT(buttonClicked()));
   layout->addWidget(m_ButtonHelloWorld);
+  layout->addWidget(m_DataComboBox);
 }
 
 

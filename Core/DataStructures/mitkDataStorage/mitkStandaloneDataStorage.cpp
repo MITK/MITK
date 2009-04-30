@@ -80,7 +80,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataTreeNode* node, const mitk::Data
   }
 
   // register for ITK changed events
-  this->AddModifiedListener(node);
+  this->AddListeners(node);
 
   /* Notify observers */
   EmitAddNodeEvent(node);
@@ -96,7 +96,7 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataTreeNode* node)
     return;
 
   // remove ITK modified event listener
-  this->RemoveModifiedListener(node);
+  this->RemoveListeners(node);
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);

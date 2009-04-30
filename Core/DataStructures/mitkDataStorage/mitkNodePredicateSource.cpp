@@ -32,6 +32,9 @@ bool mitk::NodePredicateSource::CheckNode(const mitk::DataTreeNode* node) const
   if (!node)
     throw 1;  // Insert Exception Handling here
 
+  if(m_DataStorage.IsNull())
+    throw 1;
+
   // check, if any of the source objects of m_BaseNode are equal to node.
   if (m_SearchAllSources)
     ;   // also search recursivly in sources of sources

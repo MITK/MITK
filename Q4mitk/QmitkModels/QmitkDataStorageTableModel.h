@@ -4,14 +4,13 @@
 /// Own includes.
 #include "mitkDataStorage.h"
 #include "mitkBaseProperty.h"
+#include "mitkWeakPointer.h"
+#include "mitkNodePredicateBase.h"
 
 /// Toolkit includes.
 #include <QAbstractTableModel>
 
-#include <itkWeakPointer.h>
-
 /// Forward declarations.
-class mitk::NodePredicateBase;
 
 /// 
 /// \class QmitkDataStorageTableModel
@@ -126,13 +125,13 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// Store it in a weak pointer. This is a GUI class which should not hold a strong reference
     /// to any non-GUI Object.
     ///
-    itk::WeakPointer<mitk::DataStorage> m_DataStorage;
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     ///
     /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
     /// is NULL all Nodes will be selected.
     ///
-    mitk::NodePredicateBase* m_Predicate;
+    mitk::NodePredicateBase::Pointer m_Predicate;
 
     ///
     /// Holds all selected Nodes.

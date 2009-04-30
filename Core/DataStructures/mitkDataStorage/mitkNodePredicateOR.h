@@ -33,19 +33,24 @@ namespace mitk {
     class MITK_CORE_EXPORT NodePredicateOR : public NodePredicateCompositeBase
     {
     public:
-      //##Documentation
-      //## @brief Constructor
-      NodePredicateOR();
+      mitkClassMacro(NodePredicateOR, NodePredicateCompositeBase);
+      itkFactorylessNewMacro(NodePredicateOR);
+      mitkNewMacro2Param(NodePredicateOR, const NodePredicateBase*, const NodePredicateBase*);
+
       //##Documentation
       //## @brief Standard Destructor
       virtual ~NodePredicateOR();
-      //##Documentation
-      //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
-      NodePredicateOR(const NodePredicateBase& p1, const NodePredicateBase& p2);
 
       //##Documentation
       //## @brief Checks, if the node fulfills any of the subpredicates conditions
       virtual bool CheckNode(const DataTreeNode* node) const;
+    protected:
+      //##Documentation
+      //## @brief Constructor
+      NodePredicateOR();
+      //##Documentation
+      //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
+      NodePredicateOR(const NodePredicateBase* p1, const NodePredicateBase* p2);
     };
 
 } // namespace mitk

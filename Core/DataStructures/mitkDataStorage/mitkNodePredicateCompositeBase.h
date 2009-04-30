@@ -34,23 +34,27 @@ namespace mitk {
   class MITK_CORE_EXPORT NodePredicateCompositeBase : public NodePredicateBase
   {
   public:
+    mitkClassMacro(NodePredicateCompositeBase, NodePredicateBase);
+
+    typedef std::list<const NodePredicateBase*> ChildPredicates;
+
     //##Documentation
-    //## @brief Constructor
-    NodePredicateCompositeBase();
-    //##Documentation
-    //## @brief Standard Destructor
-    virtual ~NodePredicateCompositeBase();
+    //## @brief Pure virtual (but implemented) Destructor makes NodePredicateCompositeBase an abstract class
+    virtual ~NodePredicateCompositeBase() = 0;
 
     //##Documentation
     //## @brief Adds a child predicate
-    virtual void AddPredicate(const NodePredicateBase& p);
+    virtual void AddPredicate(const NodePredicateBase* p);
 
     //##Documentation
     //## @brief Removes a child predicate
-    virtual void RemovePredicate(const NodePredicateBase& p);
+    virtual void RemovePredicate(const NodePredicateBase* p);
+
+    //##Documentation
+    //## @brief Return all child predicates (immutable).
+    virtual ChildPredicates GetPredicates() const;
 
   protected:
-    typedef std::list<const NodePredicateBase*> ChildPredicates;
     //##Documentation
     //## @brief list of child predicates
     ChildPredicates m_ChildPredicates;

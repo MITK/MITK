@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateBase.h"
 #include "mitkBaseProperty.h"
+#include "mitkWeakPointer.h"
 
 namespace mitk {
 
@@ -34,13 +35,9 @@ namespace mitk {
     class MITK_CORE_EXPORT NodePredicateProperty : public NodePredicateBase
     {
     public:
-      //##Documentation
-      //## @brief Constructor to check for a named property
-      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p);
-      
-      //##Documentation
-      //## @brief Constructor to check for the existence of a property with a given name
-      NodePredicateProperty(const char* propertyName);
+      mitkClassMacro(NodePredicateProperty, NodePredicateBase);
+      mitkNewMacro1Param(NodePredicateProperty, const char*);
+      mitkNewMacro2Param(NodePredicateProperty, const char*, mitk::BaseProperty*);
 
       //##Documentation
       //## @brief Standard Destructor
@@ -51,7 +48,15 @@ namespace mitk {
       virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
     protected:
-      mitk::BaseProperty::Pointer m_ValidProperty;
+      //##Documentation
+      //## @brief Constructor to check for a named property
+      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p);
+
+      //##Documentation
+      //## @brief Constructor to check for the existence of a property with a given name
+      NodePredicateProperty(const char* propertyName);
+
+      mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
       //mitk::BaseProperty* m_ValidProperty;
       std::string m_ValidPropertyName;
     };

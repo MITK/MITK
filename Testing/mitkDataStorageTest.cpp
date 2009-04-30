@@ -225,32 +225,32 @@ void TestDataStorage( mitk::DataStorage* ds )
     }
     /* Requesting a named object */
     {
-    mitk::NodePredicateProperty predicate("name", mitk::StringProperty::New("Node 2 - Surface Node"));
+    mitk::NodePredicateProperty::Pointer predicate(mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("Node 2 - Surface Node")));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting a named object");
     }
 
   /* Requesting objects of specific data type */
     {
-    mitk::NodePredicateDataType predicate("Image");
+    mitk::NodePredicateDataType::Pointer predicate(mitk::NodePredicateDataType::New("Image"));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific data type")
   }
   /* Requesting objects of specific dimension */
     {
-    mitk::NodePredicateDimension predicate( 3 );
+    mitk::NodePredicateDimension::Pointer predicate(mitk::NodePredicateDimension::New( 3 ));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific dimension")
   }
   /* Requesting objects with specific data object */
     {
-  mitk::NodePredicateData predicate(image);
+  mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(image));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects with specific data object")
   }
   /* Requesting objects with NULL data */
     {
-    mitk::NodePredicateData predicate(NULL);
+    mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(NULL));
     mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION(
          (all->Size() == 3)
@@ -261,21 +261,21 @@ void TestDataStorage( mitk::DataStorage* ds )
   }
   /* Requesting objects that meet a conjunction criteria */
     {
-    mitk::NodePredicateDataType p1("Surface");
-    mitk::NodePredicateProperty p2("color", mitk::ColorProperty::New(color));
-    mitk::NodePredicateAND predicate;
-    predicate.AddPredicate(p1);
-    predicate.AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
+      mitk::NodePredicateDataType::Pointer p1 = mitk::NodePredicateDataType::New("Surface");
+    mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color));
+    mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
+    predicate->AddPredicate(p1);
+    predicate->AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting objects that meet a conjunction criteria");
     }
   /* Requesting objects that meet a disjunction criteria */
   {
-    mitk::NodePredicateDataType p1("Image");
-    mitk::NodePredicateProperty p2("color", mitk::ColorProperty::New(color));
-    mitk::NodePredicateOR predicate;
-    predicate.AddPredicate(p1);
-    predicate.AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
+    mitk::NodePredicateDataType::Pointer p1(mitk::NodePredicateDataType::New("Image"));
+    mitk::NodePredicateProperty::Pointer p2(mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color)));
+    mitk::NodePredicateOR::Pointer predicate = mitk::NodePredicateOR::New();
+    predicate->AddPredicate(p1);
+    predicate->AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     MITK_TEST_CONDITION(
         (all->Size() == 3)
@@ -287,8 +287,8 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting objects that do not meet a criteria */
   {
     mitk::ColorProperty::Pointer cp = mitk::ColorProperty::New(color);
-    mitk::NodePredicateProperty proppred("color", cp);
-    mitk::NodePredicateNOT predicate(proppred);
+    mitk::NodePredicateProperty::Pointer proppred(mitk::NodePredicateProperty::New("color", cp));
+    mitk::NodePredicateNOT::Pointer predicate(mitk::NodePredicateNOT::New(proppred));
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
@@ -385,7 +385,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   //* Checking GroupTagProperty */
   {
     mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
-    mitk::NodePredicateProperty pred("Resection Proposal 1", tp);
+    mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 1", tp));
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
@@ -398,7 +398,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Checking GroupTagProperty 2 */
   {
     mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
-    mitk::NodePredicateProperty pred("Resection Proposal 2", tp);
+    mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 2", tp));
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
@@ -411,8 +411,8 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking direct sources with condition */
   {
-    mitk::NodePredicateDataType pred("Surface");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, &pred, true);
+    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Surface");
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, true);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n2 is in resultset
@@ -422,8 +422,8 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking all sources with condition */
   {
-    mitk::NodePredicateDataType pred("Image");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, &pred, false);
+    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Image");
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n1 is in resultset
@@ -433,15 +433,15 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking all sources with condition with empty resultset */
   {
-    mitk::NodePredicateDataType pred("VesselTree");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, &pred, false);
+    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("VesselTree");
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
     MITK_TEST_CONDITION(all->Size() == 0 , "Checking all sources with condition with empty resultset"); // check if resultset is empty
   }
 
   /* Checking direct derivations with condition */
   {
-    mitk::NodePredicateProperty pred("color");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, &pred, true);
+    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, true);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n2 is in resultset
@@ -451,9 +451,9 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking all derivations with condition */
   {
-    mitk::NodePredicateProperty pred("color");
+    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
 
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, &pred, false);
+    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, false);
     std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 2) // check if n2 and n4 are in resultset
@@ -492,13 +492,13 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking GetNode with valid predicate */
   {
-    mitk::NodePredicateDataType p("Image");
-    MITK_TEST_CONDITION(ds->GetNode(&p) == n1, "Checking GetNode with valid predicate");
+    mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("Image"));
+    MITK_TEST_CONDITION(ds->GetNode(p) == n1, "Checking GetNode with valid predicate");
   }
   /* Checking GetNode with invalid predicate */
   {
-    mitk::NodePredicateDataType p("PointSet");
-    MITK_TEST_CONDITION(ds->GetNode(&p) == NULL, "Checking GetNode with invalid predicate");
+    mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("PointSet"));
+    MITK_TEST_CONDITION(ds->GetNode(p) == NULL, "Checking GetNode with invalid predicate");
   }
 
   } // object retrieval methods

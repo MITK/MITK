@@ -150,7 +150,7 @@ void QmitkDataStorageListModel::reset()
     mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects;
 
     if (m_NodePredicate)
-      setOfObjects = m_DataStorage->GetSubset(*m_NodePredicate);
+      setOfObjects = m_DataStorage->GetSubset(m_NodePredicate);
     else
       setOfObjects = m_DataStorage->GetAll();   
 

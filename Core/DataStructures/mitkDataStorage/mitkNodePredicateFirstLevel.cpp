@@ -32,6 +32,9 @@ bool mitk::NodePredicateFirstLevel::CheckNode(const mitk::DataTreeNode* node) co
   if (!node)
     throw 1;  // Insert Exception Handling here
 
+  if(m_DataStorage.IsNull())
+    throw 1;
+
   mitk::DataStorage::SetOfObjects::ConstPointer list = 
     m_DataStorage->GetSources(node, NULL, true);
 

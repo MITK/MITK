@@ -141,8 +141,8 @@ class MITK_CORE_EXPORT Tool : public StateMachine
      */
     virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
 
-    virtual const NodePredicateBase& GetReferenceDataPreference() const;
-    virtual const NodePredicateBase& GetWorkingDataPreference() const;
+    virtual const NodePredicateBase* GetReferenceDataPreference() const;
+    virtual const NodePredicateBase* GetWorkingDataPreference() const;
 
     DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName );
     DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organType, const std::string& organName );
@@ -219,29 +219,29 @@ class MITK_CORE_EXPORT Tool : public StateMachine
   private:
 
     // for working data
-    NodePredicateProperty m_IsSegmentationPredicate;
+    NodePredicateProperty::Pointer m_IsSegmentationPredicate;
 
     // for reference data
-    NodePredicateDataType m_PredicateImages;
-    NodePredicateDimension m_PredicateDim3;
-    NodePredicateDimension m_PredicateDim4;
-    NodePredicateOR m_PredicateDimension;
-    NodePredicateAND m_PredicateImage3D;
+    NodePredicateDataType::Pointer m_PredicateImages;
+    NodePredicateDimension::Pointer m_PredicateDim3;
+    NodePredicateDimension::Pointer m_PredicateDim4;
+    NodePredicateOR::Pointer m_PredicateDimension;
+    NodePredicateAND::Pointer m_PredicateImage3D;
 
-    NodePredicateProperty m_PredicateBinary;
-    NodePredicateNOT m_PredicateNotBinary;
+    NodePredicateProperty::Pointer m_PredicateBinary;
+    NodePredicateNOT::Pointer m_PredicateNotBinary;
 
-    NodePredicateProperty m_PredicateSegmentation;
-    NodePredicateNOT m_PredicateNotSegmentation;
+    NodePredicateProperty::Pointer m_PredicateSegmentation;
+    NodePredicateNOT::Pointer m_PredicateNotSegmentation;
 
-    NodePredicateProperty m_PredicateHelper;
-    NodePredicateNOT m_PredicateNotHelper;
+    NodePredicateProperty::Pointer m_PredicateHelper;
+    NodePredicateNOT::Pointer m_PredicateNotHelper;
 
-    NodePredicateAND m_PredicateImageColorful;
+    NodePredicateAND::Pointer m_PredicateImageColorful;
 
-    NodePredicateAND m_PredicateImageColorfulNotHelper;
+    NodePredicateAND::Pointer m_PredicateImageColorfulNotHelper;
 
-    NodePredicateAND m_PredicateReference;
+    NodePredicateAND::Pointer m_PredicateReference;
 };
 
 } // namespace

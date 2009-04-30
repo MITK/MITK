@@ -14,7 +14,7 @@ void QmitkVolumeRenderingView::CreateQtPartControl(QWidget* parent)
   QVBoxLayout* layout = new QVBoxLayout(parent);
 
   m_DataStorageComboBox = new QmitkDataStorageComboBox( this->GetDataStorage(),
-                                                        new mitk::NodePredicateDataType("Image"),
+                                                        mitk::NodePredicateDataType::New("Image"),
                                                         parent );
  layout->addWidget(m_DataStorageComboBox);
 

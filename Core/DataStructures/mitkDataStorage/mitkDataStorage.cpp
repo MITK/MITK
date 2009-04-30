@@ -102,9 +102,9 @@ void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
 }
 
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const NodePredicateBase& condition) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const NodePredicateBase* condition) const
 {
-  mitk::DataStorage::SetOfObjects::ConstPointer result = this->FilterSetOfObjects(this->GetAll(), &condition);
+  mitk::DataStorage::SetOfObjects::ConstPointer result = this->FilterSetOfObjects(this->GetAll(), condition);
   return result;
 }
 
@@ -115,7 +115,7 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
     return NULL;
 
   mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
-  mitk::NodePredicateProperty p("name", s);
+  mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("name", s);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(p);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
@@ -129,7 +129,7 @@ mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* conditio
   if (condition == NULL)
     return NULL;
   
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(*condition);
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(condition);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
   else
@@ -142,8 +142,8 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, con
     return NULL;
 
   mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
-  mitk::NodePredicateProperty p("name", s);
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDerivations(sourceNode, &p, onlyDirectDerivations);
+  mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("name", s);
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDerivations(sourceNode, p, onlyDirectDerivations);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
   else
@@ -235,40 +235,52 @@ void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataTreeNode* node)
   RemoveNodeEvent.Send(node);
 }
 
-void mitk::DataStorage::OnNodeModified( const itk::Object *caller, const itk::EventObject &event )
+void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, const itk::EventObject &event )
 {
   if(m_BlockNodeModifiedEvents)
     return;
 
-  const mitk::DataTreeNode* modifiedNode = dynamic_cast<const mitk::DataTreeNode*>(caller);
-  if(modifiedNode)
+  const mitk::DataTreeNode* _Node = dynamic_cast<const mitk::DataTreeNode*>(caller);
+  if(_Node)
   {
-    ChangedNodeEvent.Send(modifiedNode);
+    const itk::ModifiedEvent* modEvent = dynamic_cast<const itk::ModifiedEvent*>(&event);
+    if(modEvent)
+      ChangedNodeEvent.Send(_Node);
+    else
+      DeleteNodeEvent.Send(_Node);
   }
 }
 
-void mitk::DataStorage::AddModifiedListener( const mitk::DataTreeNode* _Node )
+void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 {
   // node must not be 0 and must not be yet registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) == m_NodeModifiedObserverTags.end())
   {
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
-    nodeModifiedCommand->SetCallbackFunction(this, &DataStorage::OnNodeModified);
+    nodeModifiedCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeModifiedOrDeleted);
     m_NodeModifiedObserverTags[_Node] 
       = _Node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+
+    // add itk delete listener on datastorage
+    itk::MemberCommand<mitk::DataStorage>::Pointer deleteCommand =
+      itk::MemberCommand<mitk::DataStorage>::New();
+    deleteCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeModifiedOrDeleted);
+    // add observer
+    m_NodeDeleteObserverTags[_Node] = _Node->AddObserver(itk::DeleteEvent(), deleteCommand);
   }
 }
 
-void mitk::DataStorage::RemoveModifiedListener( const mitk::DataTreeNode* _Node )
+void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 {
   // node must not be 0 and must be registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) != m_NodeModifiedObserverTags.end())
   {
-    unsigned long tag = m_NodeModifiedObserverTags.find(_Node)->second;
     // const cast is bad! but sometimes it is necessary. removing an observer does not really
     // touch the internal state
-    (const_cast<mitk::DataTreeNode*>(_Node))->RemoveObserver(tag);
+    mitk::DataTreeNode* NonConstNode = const_cast<mitk::DataTreeNode*>(_Node);
+    NonConstNode->RemoveObserver(m_NodeModifiedObserverTags.find(_Node)->second);
+    NonConstNode->RemoveObserver(m_NodeDeleteObserverTags.find(_Node)->second);
   }
 }
 

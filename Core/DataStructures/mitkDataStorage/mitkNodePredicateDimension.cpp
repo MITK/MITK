@@ -26,6 +26,12 @@ mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, int
 {
 }
 
+mitk::NodePredicateDimension::NodePredicateDimension( unsigned int dimension )
+: m_Dimension( dimension ),
+m_PixelComponents(1)
+{
+
+}
 
 mitk::NodePredicateDimension::~NodePredicateDimension()
 {

@@ -25,7 +25,7 @@ mitk::NodePredicateAND::NodePredicateAND()
 {
 }
 
-mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase& p1, const NodePredicateBase& p2)
+mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2)
 : NodePredicateCompositeBase()
 {
   this->AddPredicate(p1);

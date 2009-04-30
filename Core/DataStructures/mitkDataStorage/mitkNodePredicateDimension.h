@@ -34,9 +34,10 @@ namespace mitk {
   class MITK_CORE_EXPORT NodePredicateDimension : public NodePredicateBase
   {
   public:
-    //##Documentation
-    //## @brief Standard Constructor
-    NodePredicateDimension(unsigned int dimension, int pixelComponents = 1);
+    mitkClassMacro(NodePredicateDimension, NodePredicateBase);
+    mitkNewMacro1Param(NodePredicateDimension, unsigned int);
+    mitkNewMacro2Param(NodePredicateDimension, unsigned int, int);
+
       //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateDimension();
@@ -46,6 +47,15 @@ namespace mitk {
     virtual bool CheckNode(const mitk::DataTreeNode* node) const;
 
   protected:
+
+    //##Documentation
+    //## @brief Standard Constructor
+    NodePredicateDimension(unsigned int dimension);
+
+    //##Documentation
+    //## @brief Standard Constructor
+    NodePredicateDimension(unsigned int dimension, int pixelComponents);
+
     unsigned int m_Dimension;
     int m_PixelComponents;
   };

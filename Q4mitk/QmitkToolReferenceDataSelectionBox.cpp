@@ -169,17 +169,15 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-            m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetReferenceDataPreference() ) );
-          }
+            m_Predicates.push_back( mitk::NodePredicateOR::New( completePredicate, tool->GetReferenceDataPreference() ) );          }
           else
           {
-            m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetReferenceDataPreference() ) );
-          }
+              m_Predicates.push_back( mitk::NodePredicateAND::New( completePredicate, tool->GetReferenceDataPreference() ) );          }
           completePredicate = m_Predicates.back();
         }
         else
         {
-          completePredicate = &tool->GetReferenceDataPreference();
+          completePredicate = tool->GetReferenceDataPreference();
         }
       }
     }
@@ -193,7 +191,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   */
   if (completePredicate)
   {
-    allObjects = dataStorage->GetSubset( *completePredicate );
+    allObjects = dataStorage->GetSubset( completePredicate );
   }
   else
   {
@@ -211,7 +209,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   }
 
 
-  mitk::DataStorage::SetOfObjects::ConstPointer sceneImages = mitk::DataStorage::GetInstance()->GetSubset( *completePredicate );
+  mitk::DataStorage::SetOfObjects::ConstPointer sceneImages = mitk::DataStorage::GetInstance()->GetSubset( completePredicate );
   return sceneImages;
 }
 

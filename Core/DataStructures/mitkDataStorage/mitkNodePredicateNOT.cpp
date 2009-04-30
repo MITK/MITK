@@ -18,15 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateNOT.h"
 
 
-mitk::NodePredicateNOT::NodePredicateNOT(mitk::NodePredicateBase& p)
-: NodePredicateBase(), m_ChildPredicate(p)
+mitk::NodePredicateNOT::NodePredicateNOT(const mitk::NodePredicateBase* p)
 {
+  m_ChildPredicates.push_back(p);
 }
 
 mitk::NodePredicateNOT::~NodePredicateNOT()
 {
 }
-
 
 bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
 {
@@ -34,6 +33,13 @@ bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
     throw 1;  // Insert Exception Handling here
 
   // return the negation of the child predicate
-  return !m_ChildPredicate.CheckNode(node);
+  return !m_ChildPredicates.front()->CheckNode(node);
 }
 
+void mitk::NodePredicateNOT::AddPredicate( const mitk::NodePredicateBase* p )
+{
+  if(!m_ChildPredicates.empty())
+    m_ChildPredicates.clear();
+
+  NodePredicateCompositeBase::AddPredicate(p);
+}

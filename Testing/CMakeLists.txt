@@ -16,12 +16,14 @@ SET(${KITNAME}_TESTS
   mitkDataStorageTest.cpp
   mitkDataTreeFilterTest.cpp
   mitkDataTreeTest.cpp
+  mitkDemonsRegistrationTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
+  mitkHistogramMatchingTest.cpp
   mitkImageDataItemTest.cpp
   mitkImageMapper2DTest.cpp
   mitkImageTest.cpp
@@ -39,6 +41,7 @@ SET(${KITNAME}_TESTS
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPropertyListTest.cpp
+  mitkRegistrationBaseTest.cpp
   mitkRigidRegistrationPresetTest.cpp
   mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
@@ -48,6 +51,7 @@ SET(${KITNAME}_TESTS
   mitkStateTest.cpp
   mitkStepperTest.cpp
   mitkSurfaceTest.cpp
+  mitkSymmetricForcesDemonsRegistrationTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkToolManagerTest.cpp
   mitkTransitionTest.cpp

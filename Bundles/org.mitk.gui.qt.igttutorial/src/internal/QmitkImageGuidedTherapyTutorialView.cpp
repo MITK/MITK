@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkImageGuidedTherapyTutorialView.h"
 
 #include "QmitkStdMultiWidget.h"
-
+#include "QmitkStdMultiWidgetEditor.h"
 
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
@@ -101,11 +101,16 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
   //show the movement of a tool as cone in MITK.
 
   //Check if we have a widget for visualization. Makes no sense to start otherwise.
-  //The multiwidget will be created when a dataset is loaded (image, surface,...)
-  if (m_MultiWidget == NULL)
+  //If there is no multiwidget, create one.
+  //if (m_MultiWidget == NULL)
+  //{
+  //  QmitkStdMultiWidgetEditor::Pointer m = new QmitkStdMultiWidgetEditor();
+  //  this->GetPage()->OpenEditor(m, QmitkStdMultiWidgetEditor::EDITOR_ID);
+  //}
+  if (m_MultiWidget == NULL) // if creating the multiwidget failed, stop here.
   {
     QMessageBox::warning ( NULL, "Error", "Starting the tutorial is not possible without an initialized "
-                                          "rendering widget. Please load a dataset first.");
+      "rendering widget. Please load a dataset first.");
     return;
   }
 
@@ -137,9 +142,7 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
     // For tests, it is useful to simulate a tracking device in software. This is what mitk::RandomTrackingDevice does.
     // It will produce random position, orientation and error values for each tool that is added.
     mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New(); // create virtual tracker
-    mitk::InternalTrackingTool::Pointer tool = mitk::InternalTrackingTool::New();    // create tool for virtual tracker
-    tool->SetToolName("MyInstrument");  // name the tool
-    tracker->AddTool(tool);         // add tool to tracker
+    tracker->AddTool("MyInstrument");      // add a tool to tracker
 /**************** End of Variant 2 ****************/
 
     //The tracking device object is used for the physical connection to the device. To use the

@@ -298,7 +298,7 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   m_RenderWindow->SetAlphaBitPlanes(1);
   m_VtkRenderer->SetUseDepthPeeling(m_DepthPeelingEnabled);
-  m_VtkRenderer->SetMaximumNumberOfPeels(100);
+  m_VtkRenderer->SetMaximumNumberOfPeels(m_MaxNumberOfPeels);
   m_VtkRenderer->SetOcclusionRatio(0.1);
 #endif
 }

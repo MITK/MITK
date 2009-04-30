@@ -297,8 +297,10 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartRefere
   }
   else
   {
+    unsigned int index = newIndex - parts.begin();
     parts.erase(std::find(parts.begin(), parts.end(), ref));
-    parts.insert(newIndex, ref);
+    PartListIter insertIndex = parts.begin() + index;
+    parts.insert(insertIndex, ref);
   }
 }
 

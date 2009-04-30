@@ -121,9 +121,9 @@ void QmitkDemonsRegistrationControls::CalculateTransformation()
       {
         registration->Update();
       }
-      catch (...)
+      catch (itk::ExceptionObject& excpt)
       {
-        QMessageBox::information( NULL, "Registration exception", "Could be memory allocation exception", QMessageBox::Ok );
+        QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
       }
       mitk::Image::Pointer image = registration->GetOutput();
       if (image.IsNotNull())

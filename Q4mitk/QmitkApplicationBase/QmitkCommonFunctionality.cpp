@@ -583,7 +583,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
   std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
   selectedItemsName += ".stl";
   QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk *.vtp)");
-  if (qfileName.isEmpty() )
+  if (!(qfileName.isEmpty()) )
   {
     //check if file is valid for writing
     if(!IsFilenameValidForWriting(fileName.c_str()))

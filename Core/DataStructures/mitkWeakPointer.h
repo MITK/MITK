@@ -173,17 +173,17 @@ private:
     if(m_DeleteObserverTag == -1 && m_ModifiedObserverTag == -1 && m_Pointer != 0)
     {
       // add observer for delete event
-      itk::MemberCommand<WeakPointer<ObjectType> >::Pointer onObjectDelete =
-        itk::MemberCommand<WeakPointer<ObjectType> >::New();
+      typename itk::MemberCommand<WeakPointer<TObjectType> >::Pointer onObjectDelete =
+        itk::MemberCommand<WeakPointer<TObjectType> >::New();
 
-      onObjectDelete->SetCallbackFunction(this, &WeakPointer<ObjectType>::OnObjectDelete);
+      onObjectDelete->SetCallbackFunction(this, &WeakPointer<TObjectType>::OnObjectDelete);
       m_DeleteObserverTag = m_Pointer->AddObserver(itk::DeleteEvent(), onObjectDelete);
 
       // add observer for modified event
-      itk::MemberCommand<WeakPointer<ObjectType> >::Pointer onObjectModified =
-        itk::MemberCommand<WeakPointer<ObjectType> >::New();
+      typename itk::MemberCommand<WeakPointer<TObjectType> >::Pointer onObjectModified =
+        itk::MemberCommand<WeakPointer<TObjectType> >::New();
 
-      onObjectModified->SetCallbackFunction(this, &WeakPointer<ObjectType>::OnObjectModified);
+      onObjectModified->SetCallbackFunction(this, &WeakPointer<TObjectType>::OnObjectModified);
       m_ModifiedObserverTag = m_Pointer->AddObserver(itk::ModifiedEvent(), onObjectModified);
     }
   }

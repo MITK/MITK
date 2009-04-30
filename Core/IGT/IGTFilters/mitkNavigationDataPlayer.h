@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMultiThreader.h>
 
 #include "tinyxml.h"
+#include <istream>
+
 
 namespace mitk {
   /**Documentation

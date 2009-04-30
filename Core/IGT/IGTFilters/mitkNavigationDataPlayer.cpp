@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 
 #include <mitkTimeStamp.h>
+#include <fstream>
 
 mitk::NavigationDataPlayer::NavigationDataPlayer() 
 {

@@ -139,7 +139,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   */
 
   static std::vector< const mitk::NodePredicateBase* > m_Predicates;
-  static const mitk::NodePredicateBase* completePredicate = NULL;
+  static mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
@@ -151,7 +151,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
     }
 
     m_Predicates.clear();
-    completePredicate = NULL;
+    completePredicate = 0;
 
     const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 
@@ -169,10 +169,12 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-            m_Predicates.push_back( mitk::NodePredicateOR::New( completePredicate, tool->GetReferenceDataPreference() ) );          }
+            m_Predicates.push_back( mitk::NodePredicateOR::New( completePredicate, tool->GetReferenceDataPreference() ) );
+          }
           else
           {
-              m_Predicates.push_back( mitk::NodePredicateAND::New( completePredicate, tool->GetReferenceDataPreference() ) );          }
+            m_Predicates.push_back( mitk::NodePredicateAND::New( completePredicate, tool->GetReferenceDataPreference() ) );
+          }
           completePredicate = m_Predicates.back();
         }
         else

@@ -36,9 +36,6 @@ m_SensorConfig(NULL)
   // Set the tracker type
   this->m_Type = AscensionMicroBird;
 
-  // Set the tracking volume
-  this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
-
   // Clear tools vector
   m_Tools.clear();
 
@@ -187,7 +184,7 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
     }
   }
 
-  /* Initialise tools vector */
+  /* Initialize tools vector */
   m_ToolsMutex->Lock();
   for (int i = 0; i < m_SystemConfig.numberSensors; i++)
   {

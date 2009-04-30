@@ -61,11 +61,6 @@ namespace mitk
     virtual bool StopTracking();
 
     /**
-    * \return Returns all tools of the tracking device.
-    */
-    std::vector<ClaronTool::Pointer> GetAllTools();
-
-    /**
     * \brief Opens the connection to the device. This have to be done before the tracking is startet.
     */
     virtual bool OpenConnection();
@@ -87,12 +82,20 @@ namespace mitk
     */
     TrackingTool* GetTool(unsigned int toolNumber);
 
+    
     /**
-    * \brief Adds a tool to the tracking device.
-    * \param tool  The tool which will be added.
-    * \return Returns true if the tool has been added, false otherwise.
+    * \brief Create a new Claron tool with toolName and fileName and add it to the list of tools
+    *
+    * This method will create a new ClaronTool object, load the tool definition file fileName,
+    * set the tool name toolName and then add it to the list of tools. 
+    * It returns a pointer of type mitk::TrackingTool to the tool
+    * that can be used to read tracking data from it.
+    * This is the only way to add tools to ClaronTrackingDevice.
+    *
+    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
     */
-    bool AddTool(ClaronTool::Pointer tool);
+    mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
+      
 
     /**
     * \return Returns whether the MicronTracker is installed (means whether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
@@ -103,6 +106,15 @@ namespace mitk
   protected:
     ClaronTrackingDevice();
     ~ClaronTrackingDevice();
+
+    /**
+    * \brief Adds a tool to the tracking device.
+    *
+    * \param tool  The tool which will be added.
+    * \return Returns true if the tool has been added, false otherwise.
+    */
+    bool InternalAddTool(ClaronTool::Pointer tool);
+
     /**
     * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means grabbing frames from the camera an updating the tools.
@@ -116,6 +128,11 @@ namespace mitk
     * \return Returns all detected Tools.
     */
     std::vector<ClaronTool::Pointer> DetectTools();
+
+    /**
+    * \return Returns all tools of the tracking device.
+    */
+    std::vector<ClaronTool::Pointer> GetAllTools();
 
     /**
     * \return Gives back the device which is represented by an object of the class ClaronInterface.

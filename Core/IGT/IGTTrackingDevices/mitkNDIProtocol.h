@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 #include <mitkCommon.h>
-#include "mitkTrackingTypes.h"
 #include "mitkSerialCommunication.h"
+#include "mitkNDIPassiveTool.h"
 
 namespace mitk 
 {
@@ -51,7 +51,7 @@ namespace mitk
     typedef mitk::SerialCommunication::Parity Parity;         ///< Parity mode used in the serial connection
     typedef mitk::SerialCommunication::StopBits StopBits;     ///< Number of stop bits used in the serial connection
     typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
-
+    typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
     /** 
     * \brief Detects and initializes active tools which are wired to the tracking device.
     *  

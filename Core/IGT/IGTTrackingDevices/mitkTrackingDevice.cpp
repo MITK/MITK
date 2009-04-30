@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTrackingDevice.h"
-#include "mitkTrackingVolume.h"
 #include "mitkTimeStamp.h"
 
 
@@ -28,7 +27,6 @@ mitk::TrackingDevice::TrackingDevice() :
 
 {
   m_StopTrackingMutex = itk::FastMutexLock::New();
-  m_TrackingVolume = mitk::TrackingVolume::New();
   m_ModeMutex = itk::FastMutexLock::New();
   m_TrackingFinishedMutex = itk::FastMutexLock::New();
   m_TrackingFinishedMutex->Lock();  // execution rights are owned by the application thread at the beginning
@@ -38,7 +36,6 @@ mitk::TrackingDevice::~TrackingDevice()
 {
   m_TrackingFinishedMutex = NULL;
   m_StopTrackingMutex = NULL;
-  m_TrackingVolume = NULL;
 }
 
 mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
@@ -64,9 +61,4 @@ bool mitk::TrackingDevice::StopTracking()
     this->SetMode(Ready);
   }
   return true;
-}
-
-mitk::TrackingVolume::Pointer mitk::TrackingDevice::GetTrackingVolume()
-{
-  return m_TrackingVolume;
 }

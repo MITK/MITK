@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  class ClaronTrackingDevice;
   /** Documentation:
   *   \brief  An object of this class represents a MicronTracker 2 tool.
   *           A tool has to be added to a tracking device which will then
@@ -34,9 +35,9 @@ namespace mitk
   class MITK_IGT_EXPORT ClaronTool : public InternalTrackingTool
   {
   public:
-
+    friend ClaronTrackingDevice;
     mitkClassMacro(ClaronTool, InternalTrackingTool);
-    itkNewMacro(Self);
+    
 
     /**
     * \brief Loads a tool calibration file. Without this file the tool can not be tracked!
@@ -67,12 +68,12 @@ namespace mitk
     void SetCalibrationName(std::string name);
 
     /**
-    * @return Returns the toolhandle of the tool.
+    * @return Returns the tool handle of the tool.
     */
     claronToolHandle GetToolHandle();
    
   protected:
-
+    itkNewMacro(Self);
     ClaronTool();
     virtual ~ClaronTool();
     /** \brief Tool handle variable from tracking device */

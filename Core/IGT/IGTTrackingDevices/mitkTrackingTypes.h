@@ -141,15 +141,6 @@ namespace mitk
       ENABLED     = 0x04
     };
 
-    /**Documentation
-    * \brief tracking priority for NDI tracking devices
-    */    
-    enum TrackingPriority
-    {
-      Static    = 'S',
-      Dynamic   = 'D',
-      ButtonBox = 'B'
-    };
 
     typedef itk::Point<double> MarkerPointType;
     typedef std::vector<MarkerPointType> MarkerPointContainerType;

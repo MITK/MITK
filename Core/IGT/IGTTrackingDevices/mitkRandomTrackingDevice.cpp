@@ -11,30 +11,44 @@
 //for the pause 
 #include <itksys/SystemTools.hxx>
 
-mitk::RandomTrackingDevice::~RandomTrackingDevice()
-{
-}
-
-
-bool mitk::RandomTrackingDevice::AddTool(InternalTrackingTool::Pointer tool)
-{
-  m_AllTools.push_back(tool);
-  return true;
-}
-
-
-mitk::RandomTrackingDevice::RandomTrackingDevice(void)
+mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice()
 {
   //set the type of this tracking device
   this->m_Type = mitk::TrackingSystemNotSpecified;
 
   m_RefreshRate = 50;
-  //set the tracking volume
-  //this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
 
   this->m_MultiThreader = itk::MultiThreader::New();
 }
 
+
+mitk::RandomTrackingDevice::~RandomTrackingDevice()
+{
+  if (GetMode() == Tracking)
+  {
+    this->StopTracking();
+  }
+  if (GetMode() == Ready)
+  {
+    this->CloseConnection();
+  }
+  /* cleanup tracking thread */
+  if ((m_ThreadID != 0) && (m_MultiThreader.IsNotNull()))
+  {
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  }
+  m_MultiThreader = NULL;
+  m_AllTools.clear();
+}
+
+
+mitk::TrackingTool* mitk::RandomTrackingDevice::AddTool(const char* toolName)
+{
+  mitk::InternalTrackingTool::Pointer t = mitk::InternalTrackingTool::New();
+  t->SetToolName(toolName);
+  m_AllTools.push_back(t);
+  return t;
+}
 
 
 bool mitk::RandomTrackingDevice::StartTracking()

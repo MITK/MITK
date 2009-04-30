@@ -38,10 +38,8 @@ int main(int argc, char* argv[])
   std::cout << "Generating TrackingDevice ..." << std::endl;
 
   mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New();
-  mitk::InternalTrackingTool::Pointer tool1 = mitk::InternalTrackingTool::New();
-  mitk::InternalTrackingTool::Pointer tool2 = mitk::InternalTrackingTool::New();
-  tracker->AddTool(tool1);
-  tracker->AddTool(tool2);
+  tracker->AddTool("tool1");
+  tracker->AddTool("tool2");
 
   //The tracking device object is used for the physical connection to the device. To use the
   //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device

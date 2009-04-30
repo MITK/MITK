@@ -57,6 +57,7 @@ namespace mitk
     typedef mitk::SerialCommunication::Parity Parity;         ///< Parity mode used in the serial connection
     typedef mitk::SerialCommunication::StopBits StopBits;     ///< Number of stop bits used in the serial connection
     typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
+    typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
 
 
     mitkClassMacro(NDITrackingDevice, TrackingDevice);
@@ -65,7 +66,7 @@ namespace mitk
     /**
     * \brief Set the type of the NDI Tracking Device because it can not jet handle this itself
     */
-    itkSetMacro(Type,TrackingDeviceType);
+    itkSetMacro(Type, TrackingDeviceType);
 
     /**
     * \brief initialize the connection to the tracking device
@@ -107,23 +108,29 @@ namespace mitk
     virtual unsigned int GetToolCount() const;
 
     /**
-    * \brief Add a passive 6D tool to the list of tracked tools.
+    * \brief Create a passive 6D tool with toolName and fileName and add it to the list of tools
+    *
+    * This method will create a new NDIPassiveTool object, load the SROM file fileName,
+    * set the tool name toolName and the tracking priority p and then add
+    * it to the list of tools. It returns a pointer of type mitk::TrackingTool to the tool
+    * that can be used to read tracking data from it.
+    * This is the only way to add tools to NDITrackingDevice.
     *
     * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
     */
-    virtual bool Add6DTool(NDIPassiveTool* tool);
+    mitk::TrackingTool* AddTool(const char* toolName, const char* fileName, TrackingPriority p = NDIPassiveTool::Dynamic);
 
     /**
     * \brief Remove a passive 6D tool from the list of tracked tools.
     *
-    * \WARNING adding tools is not possible in tracking mode, only in setup and ready modes.
+    * \WARNING removing tools is not possible in tracking mode, only in setup and ready modes.
     */
-    virtual bool Remove6DTool(NDIPassiveTool* tool);
+    virtual bool RemoveTool(TrackingTool* tool);
 
     /**
     * \brief reloads the srom file and reinitializes the tool
     */
-    virtual bool UpdateTool(mitk::NDIPassiveTool* tool);
+    virtual bool UpdateTool(mitk::TrackingTool* tool);
 
     virtual void SetPortNumber(const PortNumber _arg); ///< set port number for serial communication
     virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
@@ -149,6 +156,14 @@ namespace mitk
     virtual bool GetMarkerPositions(MarkerPointContainerType* markerpositions);
 
   protected:
+
+    /**
+    * \brief Add a passive 6D tool to the list of tracked tools. This method is used by AddTool
+    *
+    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
+    */
+    virtual bool InternalAddTool(NDIPassiveTool* tool);
+
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
     NDIPassiveTool* GetTool(std::string* handle); ///< returns the tool object that has been assigned the handle or NULL if no tool can be found

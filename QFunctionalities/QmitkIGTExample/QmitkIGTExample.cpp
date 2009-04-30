@@ -151,6 +151,7 @@ void QmitkIGTExample::Activated()
 
 void QmitkIGTExample::OnTestTracking()
 {
+    mitk::NDITrackingDevice::Pointer trak = mitk::NDITrackingDevice::New(); // TEST
   WaitCursorOn();
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the tracking component", 4000);
 
@@ -520,12 +521,7 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
       unsigned int index = 0;
       for (it = tools.begin(); it != tools.end(); ++it )
       {
-        mitk::NDIPassiveTool::Pointer toolNDI = mitk::NDIPassiveTool::New();
-        toolNDI->SetToolName(QString("MyInstrument %1").arg(index++).latin1());
-        toolNDI->LoadSROMFile((*it).latin1());
-        /*toolNDI->LoadSROMFile(m_Controls->GetToolFileName());*/
-        toolNDI->SetTrackingPriority(mitk::Dynamic);
-        trackerNDI->Add6DTool(toolNDI);
+        trackerNDI->AddTool(QString("MyInstrument %1").arg(index++).latin1(), (*it).latin1());
         out->append(QString("adding tool 'MyInstrument' with rom file '") + (*it) + QString("'"));
       }
     }
@@ -543,10 +539,8 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
     unsigned int index = 0;
     for (it = tools.begin(); it != tools.end(); ++it )
     {
-      mitk::ClaronTool::Pointer toolMT = mitk::ClaronTool::New();
-      toolMT->LoadFile((*it).latin1());    
-      trackerMT->AddTool(toolMT);
-      out->append(QString("adding tool with tool file '") + QString(m_Controls->GetToolFileName()) + QString("'"));
+      trackerMT->AddTool(QString("MyInstrument %1").arg(index++).latin1(), (*it).latin1()); // create tool with name and tool definition file
+      out->append(QString("adding tool 'MyInstrument' with tool definition file '") + (*it) + QString("'"));
     }
     tracker = trackerMT;
   }
@@ -564,10 +558,8 @@ mitk::TrackingDevice::Pointer QmitkIGTExample::ConfigureTrackingDevice()
   else if (selectedDevice == "RandomTrackingDevice")
   {
     mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
-    mitk::InternalTrackingTool::Pointer toolRandom1 = mitk::InternalTrackingTool::New();
-    trackerRandom->AddTool(toolRandom1);
-    mitk::InternalTrackingTool::Pointer toolRandom2 = mitk::InternalTrackingTool::New();
-    trackerRandom->AddTool(toolRandom2);
+    trackerRandom->AddTool("toolRandom1");
+    trackerRandom->AddTool("toolRandom2");
     tracker = trackerRandom;
     out->append("creating virtual random tracking device with two tools");
   }

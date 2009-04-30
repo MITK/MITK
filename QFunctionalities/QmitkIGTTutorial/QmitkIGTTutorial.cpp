@@ -112,15 +112,13 @@ void QmitkIGTTutorial::OnDoIGT()
     //The tools represent the sensors of the tracking device. In this case we have one pointer tool.
     //The TrackingDevice object it self fills the tool with data. So we have to add the tool to the
     //TrackingDevice object.
-    mitk::NDIPassiveTool::Pointer tool = mitk::NDIPassiveTool::New(); 
-    tool->SetToolName("MyInstrument"); //Every tool should have a name.
-    tool->LoadSROMFile("c:\\myinstrument.rom"); //The Polaris system needs a ".rom" file which describes
-                                                //the geometry of the markers related to the tool tip.
-                                                //NDI provides an own software (NDI architect) to 
-                                                //generate those files.
-
-    //tool->LoadSROMFile(mitk::StandardFileLocations::GetInstance()->FindFile("myToolDefinitionFile.srom").c_str());
-    tracker->Add6DTool(tool); //Add the tool to the TrackingDevice object.
+    
+    
+    //The Polaris system needs a ".rom" file which describes
+    //the geometry of the markers related to the tool tip.
+    //NDI provides an own software (NDI architect) to 
+    //generate those files.
+    tracker->AddTool("MyInstrument", "c:\\myinstrument.rom"); //Create a tool and add it the TrackingDevice object.
 
     //The tracking device object is used for the physical connection to the device. To use the
     //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device

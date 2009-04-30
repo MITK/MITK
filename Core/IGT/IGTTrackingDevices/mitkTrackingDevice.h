@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkTrackingTypes.h"
 #include "itkFastMutexLock.h"
-#include "mitkTrackingVolume.h"
 
 
 namespace mitk {
@@ -97,10 +96,6 @@ namespace mitk {
        * \brief return current object state (Setup, Ready or Tracking)
        */
       TrackingDeviceMode GetMode() const;
-      /**
-       * \brief return tracking volume of current tracking device
-       */
-      TrackingVolume::Pointer GetTrackingVolume();
 
       /**
        * \brief return device type identifier
@@ -128,7 +123,6 @@ namespace mitk {
       TrackingDeviceType m_Type; ///< current device type 
       TrackingDeviceMode m_Mode; ///< current object state (Setup, Ready or Tracking)
       bool m_StopTracking;       ///< signal stop to tracking thread
-      mitk::TrackingVolume::Pointer m_TrackingVolume; ///< tracking volume of current tracking device
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
       itk::FastMutexLock::Pointer m_ModeMutex; ///< mutex to controll access to m_Mode

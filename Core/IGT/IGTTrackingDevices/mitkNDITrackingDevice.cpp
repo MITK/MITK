@@ -1,4 +1,4 @@
-  /*=========================================================================
+/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
@@ -35,9 +35,6 @@ m_ErrorMessage(""), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_SerialComm
 {
   this->m_Type = NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
 
-  //set the tracking volume
-  this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
-
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -50,23 +47,26 @@ m_ErrorMessage(""), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_SerialComm
 }
 
 
-bool mitk::NDITrackingDevice::UpdateTool(mitk::NDIPassiveTool* tool)
+bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
 {
-  NDIErrorCode returnvalue;
-
-  std::string portHandle = tool->GetPortHandle();
-
-  //return false if the SROM Data has not been set
-  if (tool->GetSROMData() == NULL)
+  mitk::NDIPassiveTool* ndiTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
+  if (ndiTool == NULL)
     return false;
 
-  returnvalue = m_DeviceProtocol->PVWR(&portHandle, tool->GetSROMData(), tool->GetSROMDataLength());
+  std::string portHandle = ndiTool->GetPortHandle();
+
+  //return false if the SROM Data has not been set
+  if (ndiTool->GetSROMData() == NULL)
+    return false;
+  
+  NDIErrorCode returnvalue;
+  returnvalue = m_DeviceProtocol->PVWR(&portHandle, ndiTool->GetSROMData(), ndiTool->GetSROMDataLength());
   if (returnvalue != NDIOKAY)
     return false;
   returnvalue = m_DeviceProtocol->PINIT(&portHandle);
   if (returnvalue != NDIOKAY)
     return false;
-  returnvalue = m_DeviceProtocol->PENA(&portHandle, tool->GetTrackingPriority()); // Enable tool
+  returnvalue = m_DeviceProtocol->PENA(&portHandle, ndiTool->GetTrackingPriority()); // Enable tool
   if (returnvalue != NDIOKAY)
     return false;
 
@@ -545,7 +545,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     //instantiate an object for each tool that is connected
     mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
     newTool->SetPortHandle(ph.c_str());
-    newTool->SetTrackingPriority(mitk::Dynamic);
+    newTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
     //newTool->SetDataValid(false); not valid by default so doesn't have to be set
 
     //set a name for identification
@@ -575,8 +575,8 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
     //we have to unlock here to avoid a deadlock with another try to lock this mutex
     m_ModeMutex->Unlock();
-    if (this->Add6DTool(newTool) == false)
-      this->SetErrorMessage("Error beim einf�gen eines Tools");
+    if (this->InternalAddTool(newTool) == false)
+      this->SetErrorMessage("Error while adding new tool");
     m_ModeMutex->Lock();
   }
 
@@ -854,8 +854,20 @@ bool mitk::NDITrackingDevice::Beep(unsigned char count)
   return (m_DeviceProtocol->BEEP(count) == NDIOKAY);
 }
 
+mitk::TrackingTool* mitk::NDITrackingDevice::AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )
+{
+  mitk::NDIPassiveTool::Pointer t = mitk::NDIPassiveTool::New();
+  if (t->LoadSROMFile(fileName) == false)
+    return NULL;
+  t->SetToolName(toolName);
+  t->SetTrackingPriority(p);
+  if (this->InternalAddTool(t) == false)
+    return NULL;
+  return t.GetPointer();
+}
 
-bool mitk::NDITrackingDevice::Add6DTool(mitk::NDIPassiveTool* tool)
+
+bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
 {
   if (tool == NULL)
     return false;
@@ -918,11 +930,13 @@ bool mitk::NDITrackingDevice::Add6DTool(mitk::NDIPassiveTool* tool)
 }
 
 
-bool mitk::NDITrackingDevice::Remove6DTool(mitk::NDIPassiveTool* tool)
+bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
 {
-  if (tool == NULL)
+  mitk::NDIPassiveTool* ndiTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
+  if (ndiTool == NULL)
     return false;
-  std::string portHandle = tool->GetPortHandle();
+
+  std::string portHandle = ndiTool->GetPortHandle();
   /* a valid portHandle has length 2. If a valid handle exists, the tool is already added to the tracking device, so we have to remove it there
   if the connection to the tracking device has already been established.
   */
@@ -936,7 +950,7 @@ bool mitk::NDITrackingDevice::Remove6DTool(mitk::NDIPassiveTool* tool)
     m_ToolsMutex->Lock();
     Tool6DContainerType::iterator end = m_6DTools.end();
     for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
-      if ((*iterator).GetPointer() == tool)
+      if ((*iterator).GetPointer() == ndiTool)
       {
         m_6DTools.erase(iterator);
         this->Modified();
@@ -951,7 +965,7 @@ bool mitk::NDITrackingDevice::Remove6DTool(mitk::NDIPassiveTool* tool)
     m_ToolsMutex->Lock();
     Tool6DContainerType::iterator end = m_6DTools.end();
     for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
-      if ((*iterator).GetPointer() == tool)
+      if ((*iterator).GetPointer() == ndiTool)
       {
         m_6DTools.erase(iterator);
         this->Modified();

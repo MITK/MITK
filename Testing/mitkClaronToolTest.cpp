@@ -18,6 +18,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkClaronTool.h"
 #include "mitkTestingMacros.h"
 
+/**Documentation
+* ClaronTool has a protected constructor and a protected itkNewMacro
+* so that only it's friend class ClaronTrackingDevice is able to instantiate
+* tool objects. Therefore, we derive from ClaronTool and add a 
+* public itkNewMacro, so that we can instantiate and test the class
+*/
+class ClaronToolTestClass : public mitk::ClaronTool
+{
+public:
+  mitkClassMacro(ClaronToolTestClass, ClaronTool);
+  /** make a public constructor, so that the test is able
+  *   to instantiate NDIPassiveTool
+  */
+  itkNewMacro(Self);
+protected:
+  ClaronToolTestClass() : mitk::ClaronTool()  
+  {
+  }
+};
+
 /**
  * This function tests the ClaronTool class.
  */
@@ -27,7 +47,7 @@ int mitkClaronToolTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ClaronTool")
   {
     // let's create an object of our class  
-    mitk::ClaronTool::Pointer myClaronTool = mitk::ClaronTool::New();
+    mitk::ClaronTool::Pointer myClaronTool = ClaronToolTestClass::New();
 
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

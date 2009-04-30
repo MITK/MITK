@@ -24,13 +24,53 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 
+mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
+{
+  //set the type of this tracking device
+  this->m_Type = ClaronMicron;
+
+  this->m_MultiThreader = itk::MultiThreader::New();
+  m_ThreadID = 0;
+
+  m_Device = mitk::ClaronInterface::New();
+  //############################# standard directories (from cmake) ##################################
+  if (m_Device->IsMicronTrackerInstalled())
+  {
+#ifdef MITK_MICRON_TRACKER_TEMP_DIR
+    m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
+#endif
+#ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
+    m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
+#endif
+  }
+  else
+  {
+    m_ToolfilesDir = "Error - No Microntracker installed";
+    m_CalibrationDir = "Error - No Microntracker installed";
+  }
+  //##################################################################################################
+  m_Device->Initialize(m_CalibrationDir, m_ToolfilesDir);
+}
+
 
 mitk::ClaronTrackingDevice::~ClaronTrackingDevice()
 {
 }
 
 
-bool mitk::ClaronTrackingDevice::AddTool(ClaronTool::Pointer tool)
+mitk::TrackingTool* mitk::ClaronTrackingDevice::AddTool( const char* toolName, const char* fileName )
+{
+  mitk::ClaronTool::Pointer t = mitk::ClaronTool::New();
+  if (t->LoadFile(fileName) == false)
+    return NULL;
+  t->SetToolName(toolName);
+  if (this->InternalAddTool(t) == false)
+    return NULL;
+  return t.GetPointer();
+}
+
+
+bool mitk::ClaronTrackingDevice::InternalAddTool(ClaronTool::Pointer tool)
 {
   m_AllTools.push_back(tool);
   return true;
@@ -51,38 +91,6 @@ std::vector<mitk::ClaronTool::Pointer> mitk::ClaronTrackingDevice::DetectTools()
   }
   return returnValue;
 }
-
-mitk::ClaronTrackingDevice::ClaronTrackingDevice(void)
-{
-  //set the type of this tracking device
-  this->m_Type = ClaronMicron;
-
-  //set the tracking volume
-  this->m_TrackingVolume->SetTrackingDeviceType(this->m_Type);
-
-  this->m_MultiThreader = itk::MultiThreader::New();
-  m_ThreadID = 0;
-
-  m_Device = mitk::ClaronInterface::New();
-  //############################# standard directories (from cmake) ##################################
-  if (m_Device->IsMicronTrackerInstalled())
-    {
-    #ifdef MITK_MICRON_TRACKER_TEMP_DIR
-    m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
-    #endif
-    #ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
-    m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
-    #endif
-    }
-  else
-    {
-    m_ToolfilesDir = "Error - No Microntracker installed";
-    m_CalibrationDir = "Error - No Microntracker installed";
-    }
-  //##################################################################################################
-  m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
-}
-
 
 
 bool mitk::ClaronTrackingDevice::StartTracking()

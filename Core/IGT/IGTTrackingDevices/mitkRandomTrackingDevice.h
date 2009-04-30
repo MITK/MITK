@@ -98,7 +98,7 @@ namespace mitk
     * \param tool  The tool which will be added.
     * \return Returns true if the tool has been added, false otherwise.
     */
-    bool AddTool(InternalTrackingTool::Pointer tool);
+    TrackingTool* AddTool(const char* toolName);
 
   
   protected:

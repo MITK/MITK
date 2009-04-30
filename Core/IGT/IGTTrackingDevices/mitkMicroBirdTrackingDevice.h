@@ -35,6 +35,12 @@ namespace mitk {
   /**Documentation
   * \brief superclass for specific MIRCOBIRD tracking Devices
   *
+  * This class connects to a Ascension Microbird tracking device.
+  * You can not add tools manually. All connected tools are discovered
+  * during OpenConnection() and added automatically. Retrieve them with
+  * GetTool(unsigned int toolNumber) and GetToolCount() after a call to
+  * OpenConnection().
+  *
   * \ingroup IGT
   */
   class MITK_IGT_EXPORT MicroBirdTrackingDevice : public TrackingDevice

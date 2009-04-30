@@ -82,9 +82,7 @@ void mitk::TrackingDeviceSource::GenerateData()
     nd->SetOrientation(o);
     nd->SetOrientationAccuracy(t->GetTrackingError());
     nd->SetPositionAccuracy(t->GetTrackingError());
-    //\TODO set timestamp from tool too.
     nd->SetTimeStamp( mitk::TimeStamp::GetInstance()->GetElapsed() );
-
   }
 }
 
@@ -99,8 +97,7 @@ void mitk::TrackingDeviceSource::SetTrackingDevice( mitk::TrackingDevice* td )
   }
 }
 
-void mitk::TrackingDeviceSource::CreateOutputs()
-{
+void mitk::TrackingDeviceSource::CreateOutputs(){
   //if outputs are set then delete them
   for (unsigned int numOP = this->GetNumberOfOutputs(); numOP>0; numOP--)
     this->RemoveOutput(this->GetOutput(numOP));

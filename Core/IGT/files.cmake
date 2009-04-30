@@ -37,8 +37,7 @@ ELSE()
 ENDIF(MITK_USE_MICRON_TRACKER)
 
 IF(MITK_USE_MICROBIRD_TRACKER)
-  SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp
-                             IGTTrackingDevices/mitkMicroBirdTool.cpp )
+  SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 ENDIF(MITK_USE_MICROBIRD_TRACKER)
 
 IF(WIN32) 

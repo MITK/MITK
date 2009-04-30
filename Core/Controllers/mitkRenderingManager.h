@@ -223,6 +223,8 @@ public:
 
   /** En-/Disable depth peeling for all renderers */
   void SetDepthPeelingEnabled(bool enabled);
+  /** Set maximum number of peels for all renderers */
+  void SetMaxNumberOfPeels(int maxNumber);
 
 
   virtual void DoStartRendering() {};

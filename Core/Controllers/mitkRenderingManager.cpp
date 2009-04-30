@@ -1000,6 +1000,15 @@ void RenderingManager::SetDepthPeelingEnabled( bool enabled )
   }
 }
 
+void RenderingManager::SetMaxNumberOfPeels( int maxNumber )
+{
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance( it->first );
+    baseRenderer->SetMaxNumberOfPeels(maxNumber);
+  }
+}
 // Create and register generic RenderingManagerFactory.
 GenericRenderingManagerFactory renderingManagerFactory;
 

@@ -119,7 +119,8 @@ mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
   m_EmptyWorldGeometry(true),
-  m_NumberOfVisibleLODEnabledMappers( 0 ), m_DepthPeelingEnabled(true)
+  m_NumberOfVisibleLODEnabledMappers( 0 ), m_DepthPeelingEnabled(true),
+  m_MaxNumberOfPeels(100)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -749,4 +750,10 @@ void mitk::BaseRenderer::SetDepthPeelingEnabled( bool enabled )
 {
   m_DepthPeelingEnabled = enabled;
   m_VtkRenderer->SetUseDepthPeeling(enabled);
+}
+
+void mitk::BaseRenderer::SetMaxNumberOfPeels( int maxNumber )
+{
+  m_MaxNumberOfPeels = maxNumber;
+  m_VtkRenderer->SetMaximumNumberOfPeels(maxNumber);
 }

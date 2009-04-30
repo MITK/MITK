@@ -779,6 +779,7 @@ void QmitkMainTemplate::init()
   m_Options->SetProperty( "Main Splitter ratio", mitk::Point3dProperty::New(point) );
   m_Options->SetProperty( "LOD abort mechanism (experimental)", mitk::BoolProperty::New(false) );
   m_Options->SetProperty( "Depth Peeling", mitk::BoolProperty::New(true) );
+  m_Options->SetProperty( "Maximum number of peels", mitk::IntProperty::New(100) );
 
   //Set the toolbar state properties
   m_Options->SetProperty( "Show main toolbar", mitk::BoolProperty::New(true) );
@@ -1031,6 +1032,13 @@ void QmitkMainTemplate::Initialize()
   {
     mitk::RenderingManager::GetInstance()->SetDepthPeelingEnabled( 
       depthPeelingProperty->GetValue() );
+  }
+  mitk::IntProperty* maxNumberOfPeelsProperty = dynamic_cast<mitk::IntProperty*>(
+    m_Options->GetProperty( "Maximum number of peels" ) );
+  if ( maxNumberOfPeelsProperty != NULL )
+  {
+    mitk::RenderingManager::GetInstance()->SetMaxNumberOfPeels( 
+      maxNumberOfPeelsProperty->GetValue() );
   }
 
   // Initialize other global options
@@ -1568,6 +1576,13 @@ void QmitkMainTemplate::optionsShow_OptionsAction_activated()
     {
       mitk::RenderingManager::GetInstance()->SetDepthPeelingEnabled( 
         depthPeelingProperty->GetValue() );
+    }
+    mitk::IntProperty* maxNumberOfPeelsProperty = dynamic_cast<mitk::IntProperty*>(
+      m_Options->GetProperty( "Maximum number of peels" ) );
+    if ( maxNumberOfPeelsProperty != NULL )
+    {
+      mitk::RenderingManager::GetInstance()->SetMaxNumberOfPeels( 
+        maxNumberOfPeelsProperty->GetValue() );
     }
 
     mitk::BoolProperty* textureInterpolationProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Default value for texture interpolation"));

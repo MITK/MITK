@@ -307,7 +307,9 @@ public:
 
   //##Documentation
   //## @brief Sets whether depth peeling is enabled or not
-  void SetDepthPeelingEnabled(bool enabled);
+  void SetDepthPeelingEnabled(bool enabled);  //##Documentation
+  //## @brief Sets maximal number of peels
+  void SetMaxNumberOfPeels(int maxNumber);
 
   itkGetMacro(Size, int*);
 
@@ -526,6 +528,8 @@ protected:
   bool m_EmptyWorldGeometry;
 
   bool m_DepthPeelingEnabled;
+
+  int m_MaxNumberOfPeels; 
 
   typedef std::set< Mapper * > LODEnabledMappersType;
 

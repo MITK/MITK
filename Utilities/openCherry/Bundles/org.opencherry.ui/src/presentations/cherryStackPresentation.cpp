@@ -35,7 +35,7 @@ StackPresentation::StackPresentation(IStackPresentationSite::Pointer stackSite)
 
 IStackPresentationSite::Pointer StackPresentation::GetSite()
 {
-  return site.Lock();
+  return site;
 }
 
 Point StackPresentation::ComputeMinimumSize()

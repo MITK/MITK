@@ -518,7 +518,7 @@ void mitk::NavigationDataPlayer::SetStream( PlayerMode mode )
   {
   case NormalFile:
 
-    m_Stream = new std::ifstream(m_FileName.c_str(), std::ifstream::in);
+    m_Stream = new std::ifstream(m_FileName.c_str());
     
     break;
   case ZipFile:

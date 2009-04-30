@@ -233,7 +233,7 @@ protected:
   friend class WorkbenchConfigurer;
   friend class WorkbenchWindowConfigurer;
   friend class WorkbenchWindow;
-  friend class WorkbenchWindow::ShellActivationListener;
+  friend struct WorkbenchWindow::ShellActivationListener;
 
   int RunUI();
 

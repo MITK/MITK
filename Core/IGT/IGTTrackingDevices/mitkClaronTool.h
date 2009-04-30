@@ -35,7 +35,7 @@ namespace mitk
   class MITK_IGT_EXPORT ClaronTool : public InternalTrackingTool
   {
   public:
-    friend ClaronTrackingDevice;
+    friend class ClaronTrackingDevice;
     mitkClassMacro(ClaronTool, InternalTrackingTool);
     
 

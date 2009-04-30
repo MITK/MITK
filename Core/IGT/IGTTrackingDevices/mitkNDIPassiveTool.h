@@ -37,7 +37,7 @@ namespace mitk
   class MITK_IGT_EXPORT NDIPassiveTool : public InternalTrackingTool
   {
   public:
-    friend NDITrackingDevice;
+    friend class NDITrackingDevice;
     /**
     * \brief tracking priority for NDI tracking devices
     */    

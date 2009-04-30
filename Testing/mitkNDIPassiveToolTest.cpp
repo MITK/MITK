@@ -50,7 +50,7 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("NDIPassiveTool");
 
   // let's create an object of our class  
-  mitk::NDIPassiveTool::Pointer myNDIPassiveTool = NDIPassiveToolTestClass::New();
+  mitk::NDIPassiveTool::Pointer myNDIPassiveTool = NDIPassiveToolTestClass::New().GetPointer();
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

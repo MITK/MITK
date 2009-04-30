@@ -47,7 +47,7 @@ int mitkClaronToolTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ClaronTool")
   {
     // let's create an object of our class  
-    mitk::ClaronTool::Pointer myClaronTool = ClaronToolTestClass::New();
+    mitk::ClaronTool::Pointer myClaronTool = ClaronToolTestClass::New().GetPointer();
 
     // first test: did this work?
     // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

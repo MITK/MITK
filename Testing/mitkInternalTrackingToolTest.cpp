@@ -56,7 +56,7 @@ int mitkInternalTrackingToolTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("InternalTrackingTool")
 
   // let's create an object of our class  
-  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New();
+  mitk::InternalTrackingTool::Pointer internalTrackingTool = InternalTrackingToolTestClass::New().GetPointer();
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

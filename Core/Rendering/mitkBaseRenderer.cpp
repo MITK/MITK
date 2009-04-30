@@ -749,11 +749,15 @@ void mitk::BaseRenderer::PrintSelf(std::ostream& os, itk::Indent indent) const
 void mitk::BaseRenderer::SetDepthPeelingEnabled( bool enabled )
 {
   m_DepthPeelingEnabled = enabled;
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   m_VtkRenderer->SetUseDepthPeeling(enabled);
+#endif
 }
 
 void mitk::BaseRenderer::SetMaxNumberOfPeels( int maxNumber )
 {
   m_MaxNumberOfPeels = maxNumber;
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   m_VtkRenderer->SetMaximumNumberOfPeels(maxNumber);
+#endif
 }

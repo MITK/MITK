@@ -372,7 +372,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   {
     factory = persp->CreateFactory();
   }
-  catch (CoreException& e)
+  catch (CoreException& /*e*/)
   {
     throw WorkbenchException("Unable to load perspective: " + persp->GetId());
   }
@@ -1510,7 +1510,7 @@ IViewReference::Pointer Perspective::GetViewReference(const std::string& viewId,
     {
       ref = factory->CreateView(viewId, secondaryId);
     }
-    catch (PartInitException& e)
+    catch (PartInitException& /*e*/)
     {
 //      IStatus status = StatusUtil.newStatus(IStatus.ERR,
 //          e.getMessage() == 0 ? "" : e.getMessage(), //$NON-NLS-1$

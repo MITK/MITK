@@ -192,7 +192,7 @@ bool PerspectiveExtensionReader::ProcessView(
     try
     {
       ratio = (float)Poco::NumberParser::parseFloat(ratioString);
-    } catch (Poco::SyntaxException& e)
+    } catch (Poco::SyntaxException& /*e*/)
     {
       return false;
     }

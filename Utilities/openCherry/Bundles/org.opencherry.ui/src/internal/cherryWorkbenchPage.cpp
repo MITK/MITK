@@ -1677,7 +1677,7 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
     }
     return persp;
   }
-  catch (WorkbenchException& e)
+  catch (WorkbenchException& /*e*/)
   {
     if (!window->GetWorkbenchImpl()->IsStarting())
     {

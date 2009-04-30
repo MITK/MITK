@@ -105,7 +105,7 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
       ->CreateExecutableExtension<IPerspectiveFactory>(WorkbenchRegistryConstants::ATT_CLASS));
       return factory;
     }
-    catch (CoreException& e)
+    catch (CoreException& /*e*/)
     {
       // do nothing
     }

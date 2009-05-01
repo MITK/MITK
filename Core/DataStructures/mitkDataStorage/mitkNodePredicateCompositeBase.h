@@ -36,7 +36,7 @@ namespace mitk {
   public:
     mitkClassMacro(NodePredicateCompositeBase, NodePredicateBase);
 
-    typedef std::list<const NodePredicateBase*> ChildPredicates;
+    typedef std::list<NodePredicateBase::ConstPointer> ChildPredicates;
 
     //##Documentation
     //## @brief Pure virtual (but implemented) Destructor makes NodePredicateCompositeBase an abstract class

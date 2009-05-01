@@ -56,7 +56,8 @@ namespace mitk {
       //## @brief Constructor to check for the existence of a property with a given name
       NodePredicateProperty(const char* propertyName);
 
-      mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
+      //mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
+      mitk::BaseProperty::Pointer m_ValidProperty;
       //mitk::BaseProperty* m_ValidProperty;
       std::string m_ValidPropertyName;
     };

@@ -359,7 +359,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
    */
 
   static std::vector< mitk::NodePredicateBase::ConstPointer > m_Predicates;
-  static mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
+  static mitk::NodePredicateBase::ConstPointer completePredicate = 0;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
@@ -373,7 +373,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
 */
 
     m_Predicates.clear();
-    completePredicate = NULL;
+    completePredicate = 0;
 
     const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 

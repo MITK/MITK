@@ -139,12 +139,14 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
+/*
     for ( std::vector< mitk::NodePredicateBase::ConstPointer >::iterator iter = m_Predicates.begin();
           iter != m_Predicates.end();
           ++iter )
     {
       delete *iter;
     }
+*/
 
     m_Predicates.clear();
     completePredicate = NULL;

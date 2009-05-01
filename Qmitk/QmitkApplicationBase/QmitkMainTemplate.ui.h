@@ -1889,20 +1889,20 @@ void QmitkMainTemplate::fileCloseProject()
   and nodes that do not have a data object. This should free most of the used memory.
   If other nodes (with helper objects like the widget planes) should be kept, they have
   to be added here as a predicate. */
-  mitk::NodePredicateProperty w1("name", mitk::StringProperty::New("Widgets"));        // keep helper objects
-  mitk::NodePredicateProperty w2("name", mitk::StringProperty::New("widget1Plane"));
-  mitk::NodePredicateProperty w3("name", mitk::StringProperty::New("widget2Plane"));
-  mitk::NodePredicateProperty w4("name", mitk::StringProperty::New("widget3Plane"));
-  mitk::NodePredicateProperty dontsaveorclose("helper object", mitk::BoolProperty::New(true));
-  mitk::NodePredicateData w5(NULL);   // keep objects without data (e.g. root node of the tree!)
-  mitk::NodePredicateOR orpred;
-  orpred.AddPredicate(w1);
-  orpred.AddPredicate(w2);
-  orpred.AddPredicate(w3);
-  orpred.AddPredicate(w4);
-  orpred.AddPredicate(w5);
-  orpred.AddPredicate(dontsaveorclose);
-  mitk::NodePredicateNOT notpred(orpred);
+  mitk::NodePredicateProperty::Pointer w1 = mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("Widgets"));        // keep helper objects
+  mitk::NodePredicateProperty::Pointer w2 = mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("widget1Plane"));
+  mitk::NodePredicateProperty::Pointer w3 = mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("widget2Plane"));
+  mitk::NodePredicateProperty::Pointer w4 = mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("widget3Plane"));
+  mitk::NodePredicateProperty::Pointer dontsaveorclose = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  mitk::NodePredicateData::Pointer w5 = mitk::NodePredicateData::New(NULL);   // keep objects without data (e.g. root node of the tree!)
+  mitk::NodePredicateOR::Pointer orpred = mitk::NodePredicateOR::New();
+  orpred->AddPredicate(w1);
+  orpred->AddPredicate(w2);
+  orpred->AddPredicate(w3);
+  orpred->AddPredicate(w4);
+  orpred->AddPredicate(w5);
+  orpred->AddPredicate(dontsaveorclose);
+  mitk::NodePredicateNOT::Pointer notpred = mitk::NodePredicateNOT::New(orpred);
   mitk::DataStorage::SetOfObjects::ConstPointer all = mitk::DataStorage::GetInstance()->GetSubset(notpred);
   mitk::DataStorage::GetInstance()->Remove(all);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

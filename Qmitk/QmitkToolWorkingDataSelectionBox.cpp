@@ -358,17 +358,19 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
    *    \sa SetDisplayMode
    */
 
-  static std::vector< const mitk::NodePredicateBase* > m_Predicates;
-  static const mitk::NodePredicateBase* completePredicate = NULL;
+  static std::vector< mitk::NodePredicateBase::ConstPointer > m_Predicates;
+  static mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
-    for ( std::vector< const mitk::NodePredicateBase* >::iterator iter = m_Predicates.begin();
+/*
+    for ( std::vector< mitk::NodePredicateBase::ConstPointer >::iterator iter = m_Predicates.begin();
           iter != m_Predicates.end();
           ++iter )
     {
       delete *iter;
     }
+*/
 
     m_Predicates.clear();
     completePredicate = NULL;
@@ -389,17 +391,17 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
-              m_Predicates.push_back( new mitk::NodePredicateOR( *completePredicate, tool->GetWorkingDataPreference() ) );
+            m_Predicates.push_back( (mitk::NodePredicateOR::New( completePredicate, tool->GetWorkingDataPreference() )).GetPointer() );
           }
           else
           {
-              m_Predicates.push_back( new mitk::NodePredicateAND( *completePredicate, tool->GetWorkingDataPreference() ) );
+            m_Predicates.push_back( (mitk::NodePredicateAND::New( completePredicate, tool->GetWorkingDataPreference() )).GetPointer() );
           }
           completePredicate = m_Predicates.back();
         }
         else
         {
-          completePredicate = &tool->GetWorkingDataPreference();
+          completePredicate = tool->GetWorkingDataPreference();
         }
       }
     }
@@ -429,7 +431,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   {
     if (completePredicate)
     {
-      allObjects = dataStorage->GetSubset( *completePredicate );
+      allObjects = dataStorage->GetSubset( completePredicate );
     }
     else
     {

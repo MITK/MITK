@@ -101,15 +101,15 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
   return object;
 }
 
-const mitk::NodePredicateBase* mitk::Tool::GetReferenceDataPreference() const
+mitk::NodePredicateBase::ConstPointer mitk::Tool::GetReferenceDataPreference() const
 {
   return m_PredicateReference.GetPointer();
 }
 
 
-const mitk::NodePredicateBase* mitk::Tool::GetWorkingDataPreference() const
+mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() const
 {
-  return m_IsSegmentationPredicate;
+  return m_IsSegmentationPredicate.GetPointer();
 }
 
 //--------------------------------------------------------------------------------

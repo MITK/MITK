@@ -369,22 +369,12 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
    *    \sa SetDisplayMode
    */
 
-  static std::vector< mitk::NodePredicateBase::ConstPointer > m_Predicates;
-  static mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
+  std::vector< mitk::NodePredicateBase::ConstPointer > m_Predicates;
+  mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
-    /*
-    for ( std::vector< const mitk::NodePredicateBase* >::iterator iter = m_Predicates.begin();
-          iter != m_Predicates.end();
-          ++iter )
-    {
-      delete *iter;
-    }
-    */
-
     m_Predicates.clear();
-    completePredicate = NULL;
 
     const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 
@@ -398,7 +388,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
                                                  ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
          )
       {
-        if (completePredicate)
+        if (completePredicate.IsNotNull())
         {
           if ( m_DisplayMode == ListDataIfAnyToolMatches )
           {
@@ -449,6 +439,9 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
       allObjects = dataStorage->GetAll();
     }
   }
+    
+  m_Predicates.clear();
+  completePredicate = NULL;
 
   mitk::ToolManager::DataVectorType resultVector;
 

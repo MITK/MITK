@@ -35,6 +35,12 @@ CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 ADD_EXECUTABLE (IGTTutorialStep1 IGTTutorial/IGTTutorialStep1.cpp)
 TARGET_LINK_LIBRARIES(IGTTutorialStep1 mitkIGT mitkCore tinyxml PocoXML)
 
+INSTALL(TARGETS mitkIGT
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib/static
+)
+
 
 
 

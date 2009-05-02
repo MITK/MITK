@@ -63,6 +63,15 @@ class QmitkIsoSurface : public QObject, public QmitkFunctionality
       */
     //virtual QAction * CreateAction(QActionGroup *parent);
 
+    ///
+    /// Called when a StdMultiWidget is available.
+    ///
+    virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+    ///
+    /// Called when no StdMultiWidget is available.
+    ///
+    virtual void StdMultiWidgetNotAvailable();
+
     protected slots:
 
     virtual void DataStorageChanged();

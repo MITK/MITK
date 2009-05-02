@@ -475,3 +475,13 @@ void QmitkImageCropper::ChkInformationToggled( bool on )
   else
     m_Controls->groupInfo->hide();
 }
+
+void QmitkImageCropper::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+{
+  m_Parent->setEnabled(true);
+}
+
+void QmitkImageCropper::StdMultiWidgetNotAvailable()
+{
+  m_Parent->setEnabled(false);
+}

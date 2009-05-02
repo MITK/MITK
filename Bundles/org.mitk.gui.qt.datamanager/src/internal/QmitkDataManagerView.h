@@ -159,14 +159,41 @@ private:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTableModel* m_NodeTableModel;
+  ///
+  /// \brief The Table view to show the selected nodes.
+  ///
   QTableView* m_NodeTableView;
-  QMenu* m_NodeMenu;  
+  ///
+  /// \brief The context menu that shows up when right clicking on a node.
+  ///
+  QMenu* m_NodeMenu;
+  ///
+  /// \brief Action that is triggered when a node should be saved.
+  ///
   QAction* m_SaveAction;
+  ///
+  /// \brief Action for saving to pacs (not implemented yet for qt4)
+  ///
   QAction* m_ActionSaveToPacs;
+  ///
+  /// \brief Action that is triggered when a node should be removed.
+  ///
   QAction* m_RemoveAction;
+  ///
+  /// \brief Action that is triggered when a node should be reinited.
+  ///
   QAction* m_ReinitAction;
+  ///
+  /// \brief A button to load new nodes.
+  ///
   QPushButton* m_BtnLoad;
+  ///
+  /// \brief A button to make a global reinit.
+  ///
   QPushButton* m_BtnGlobalReinit;
+  ///
+  /// \brief The properties table editor.
+  ///
   QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
 
 };

@@ -214,4 +214,12 @@ float QmitkIsoSurface::getThreshold()
   return m_Controls->thresholdLineEdit->text().toFloat();
 }
 
+void QmitkIsoSurface::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+{
+  m_Parent->setEnabled(true);
+}
 
+void QmitkIsoSurface::StdMultiWidgetNotAvailable()
+{
+  m_Parent->setEnabled(false);
+}

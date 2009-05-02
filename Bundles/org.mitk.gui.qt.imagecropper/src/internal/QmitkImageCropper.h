@@ -120,6 +120,15 @@ public:
   //!virtual void TreeChanged();
   virtual void DataStorageChanged();
 
+  ///
+  /// Called when a StdMultiWidget is available.
+  ///
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+  ///
+  /// Called when no StdMultiWidget is available.
+  ///
+  virtual void StdMultiWidgetNotAvailable();
+
   /*!
   \brief Filter function, used with the QmitkTreeNodeSelector widget to ensure, only images can be selected
   */

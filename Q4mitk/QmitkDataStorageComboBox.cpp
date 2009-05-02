@@ -4,23 +4,23 @@
 
 //#CTORS/DTOR
 
-QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoSelectNewItems )
+QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoSelectNewNodes )
 : QComboBox(parent)
 , m_DataStorage(0)
 , m_Predicate(0)
 , m_BlockEvents(false)
-, m_AutoSelectNewNodes(_AutoSelectNewItems)
+, m_AutoSelectNewNodes(_AutoSelectNewNodes)
 {
   this->Init();
 }
 
 QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate,
-                                                   QWidget* parent, bool _AutoSelectNewItems )
+                                                   QWidget* parent, bool _AutoSelectNewNodes )
 : QComboBox(parent)
 , m_DataStorage(0)
 , m_Predicate(_Predicate)
 , m_BlockEvents(false)
-, m_AutoSelectNewNodes(_AutoSelectNewItems)
+, m_AutoSelectNewNodes(_AutoSelectNewNodes)
 {
   // make connections, fill combobox
   this->Init();
@@ -51,6 +51,23 @@ mitk::DataTreeNode* QmitkDataStorageComboBox::GetSelectedNode() const
 {
   int _CurrentIndex = this->currentIndex();
   return (_CurrentIndex >= 0)? this->GetNode(_CurrentIndex): 0;
+}
+
+mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes() const
+{
+  mitk::DataStorage::SetOfObjects::Pointer _SetOfObjects = mitk::DataStorage::SetOfObjects::New();
+
+  for (std::vector<mitk::DataTreeNode*>::const_iterator it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
+  {
+    _SetOfObjects->push_back(*it);
+  }
+
+  return _SetOfObjects.GetPointer();
+}
+
+const bool QmitkDataStorageComboBox::GetAutoSelectNewItems()
+{
+  return m_AutoSelectNewNodes;
 }
 
 //#PUBLIC SETTER
@@ -156,6 +173,11 @@ void QmitkDataStorageComboBox::SetNode(int index, mitk::DataTreeNode* _DataTreeN
 void QmitkDataStorageComboBox::SetNode(const mitk::DataTreeNode* _DataTreeNode, mitk::DataTreeNode* _OtherDataTreeNode)
 {
   this->SetNode( this->Find(_DataTreeNode), _OtherDataTreeNode);
+}
+
+void QmitkDataStorageComboBox::SetAutoSelectNewItems( bool _AutoSelectNewItems )
+{
+  m_AutoSelectNewNodes = _AutoSelectNewItems;
 }
 
 void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
@@ -331,16 +353,4 @@ void QmitkDataStorageComboBox::Reset()
       this->AddNode( nodeIt.Value().GetPointer() );
     }
   }
-}
-
-mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes() const
-{
-  mitk::DataStorage::SetOfObjects::Pointer _SetOfObjects = mitk::DataStorage::SetOfObjects::New();
-
-  for (std::vector<mitk::DataTreeNode*>::const_iterator it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
-  {
-    _SetOfObjects->push_back(*it);
-  }
-
-  return _SetOfObjects.GetPointer();
 }

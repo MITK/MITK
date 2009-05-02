@@ -33,12 +33,12 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Ctor for an empty combobox. Use setDataStorage and setPredicate afterwards.
     ///
-    QmitkDataStorageComboBox(QWidget* parent = 0, bool _AutoSelectNewItems=true);
+    QmitkDataStorageComboBox(QWidget* parent = 0, bool _AutoSelectNewNodes=false);
 
     ///
     /// \brief Ctor for constructing QmitkDataStorageComboBox with given DataStorageComboBox and given _Predicate.
     ///
-    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate, QWidget* parent = 0, bool _AutoSelectNewItems=true);
+    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate, QWidget* parent = 0, bool _AutoSelectNewNodes=false);
 
     ///
     /// \brief Standard Dtor. Nothing to do here.
@@ -67,6 +67,11 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Returns the _DataTreeNode at Index index or 0 if the index is out of bounds.
     ///
     mitk::DataStorage::SetOfObjects::ConstPointer GetNodes() const;   
+    ///
+    /// Returns the AutoSelectNewItems.
+    /// \see SetAutoSelectNewItems
+    ///
+    virtual const bool GetAutoSelectNewItems();
 
   //#PUBLIC SETTER
   public:
@@ -102,6 +107,10 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// Internally the method just calls SetNode(unsigned int, mitk::DataTreeNode*)
     ///
     virtual void SetNode(const mitk::DataTreeNode* _DataTreeNode, mitk::DataTreeNode* _OtherDataTreeNode);
+    ///
+    /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
+    ///
+    virtual void SetAutoSelectNewItems(bool _AutoSelectNewItems);
     ///
     /// \brief Called when a node is deleted or the name property of the node was modified. Calls RemoveNode or SetNode then.
     ///

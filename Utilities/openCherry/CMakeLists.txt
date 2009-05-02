@@ -32,7 +32,7 @@ IF(NOT DESIRED_QT_VERSION)
 ENDIF(NOT DESIRED_QT_VERSION)
 
 IF(USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
-  MESSAGE(SEND_ERROR "Qt4 is required to build the openCherry Qt plug-ins.")
+  MESSAGE("Attention: Qt4 is required to build the openCherry Qt plug-ins.")
 ENDIF(USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
 
 IF(USE_QT AND DESIRED_QT_VERSION EQUAL 4)
@@ -73,6 +73,10 @@ ELSE (Eclipse_DIR)
 ENDIF (Eclipse_DIR)
 
 SET(OPENCHERRY_DEBUG_POSTFIX d)
+
+IF(QT4_FOUND)
+  SET(_include_opencherry_qtbundlelist "INCLUDE(\"${OPENCHERRY_BINARY_DIR}/openCherryQtBundleList.cmake\")")
+ENDIF(QT4_FOUND)
 
 CONFIGURE_FILE(openCherryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/openCherryConfig.cmake @ONLY)
 

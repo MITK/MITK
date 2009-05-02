@@ -60,7 +60,7 @@ WARN_LOGFILE           =
 INPUT                  = ./ \
                          @OPENCHERRY_BASE_DIR@/Documentation/ \
                          @OPENCHERRY_BASE_DIR@/Bundles \
-                         @OPENCHERRY_BASE_DIR@/Bundles-Qt \
+                         @_doxygen_qt4bundles@ \
                          @OPENCHERRY_BINARY_DIR@
 FILE_PATTERNS          = *.h \
                          *.cpp \

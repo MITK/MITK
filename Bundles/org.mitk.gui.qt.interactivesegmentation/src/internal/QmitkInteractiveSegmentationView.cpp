@@ -53,22 +53,10 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls = new Ui::QmitkInteractiveSegmentationControls;
   m_Controls->setupUi(parent);
 
-  mitk::IDataStorageService::Pointer service =
-    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-
-  if (service.IsNotNull())
-  {
-    m_DataTree = service->GetDefaultDataStorage()->GetDataTree();
-    itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::Pointer command 
-      = itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::New();
-    command->SetCallbackFunction(this, &QmitkInteractiveSegmentationView::TreeChanged);
-    m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
-  }
-
-  itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::Pointer command 
-    = itk::ReceptorMemberCommand<QmitkInteractiveSegmentationView>::New();
-  command->SetCallbackFunction(this, &QmitkInteractiveSegmentationView::TreeChanged);
-  m_ObserverTag = m_DataTree->AddObserver(itk::TreeChangeEvent<mitk::DataTreeBase>(), command);
+  // listen to datastorage changed event
+  m_DataStorage = this->GetDefaultDataStorage();
+  m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkInteractiveSegmentationView , const mitk::DataTreeNode*>( this, &QmitkInteractiveSegmentationView::DataStorageChanged ) );
+  m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkInteractiveSegmentationView , const mitk::DataTreeNode*>( this, &QmitkInteractiveSegmentationView::DataStorageChanged ) );
 
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
 
@@ -76,7 +64,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->lblAlignmentWarning->hide();
 
-  m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataTree );
+  m_Controls->m_ToolReferenceDataSelectionBox->Initialize( m_DataStorage );
 
   m_Controls->m_ToolWorkingDataSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_ToolWorkingDataSelectionBox->SetAdditionalColumns("volume:Vol. [ml]");                     // show a second column with the "volume" property
@@ -129,7 +117,8 @@ void QmitkInteractiveSegmentationView::SetFocus()
 
 QmitkInteractiveSegmentationView::~QmitkInteractiveSegmentationView()
 {
-  m_DataTree->RemoveObserver(m_ObserverTag);
+  m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkInteractiveSegmentationView , const mitk::DataTreeNode*>( this, &QmitkInteractiveSegmentationView::DataStorageChanged ) );
+  m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkInteractiveSegmentationView , const mitk::DataTreeNode*>( this, &QmitkInteractiveSegmentationView::DataStorageChanged ) );
   this->Deactivated();
   delete m_Controls;
 }
@@ -160,12 +149,6 @@ void QmitkInteractiveSegmentationView::CreateConnections()
 
     connect( m_Controls->m_ToolReferenceDataSelectionBox, SIGNAL(ReferenceNodeSelected (const mitk::DataTreeNode*)), this, SLOT(OnReferenceNodeSelected(const mitk::DataTreeNode*)) );
   }
-}
-
-void QmitkInteractiveSegmentationView::TreeChanged( const itk::EventObject & )
-{
-  m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
-  m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
 }
 
 void QmitkInteractiveSegmentationView::Activated()
@@ -571,3 +554,10 @@ void QmitkInteractiveSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget
     m_Controls->m_SlicesInterpolator->Initialize( m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager(), m_MultiWidget );
 
 }
+  
+void QmitkInteractiveSegmentationView::DataStorageChanged( const mitk::DataTreeNode* node )
+{
+  m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
+  m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
+}
+

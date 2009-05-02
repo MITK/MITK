@@ -55,7 +55,7 @@ protected:
 
   protected slots:
 
-    void TreeChanged(const itk::EventObject &);
+    void DataStorageChanged( const mitk::DataTreeNode* node );
 
     void ReinitializeToImage();
     void CreateNewSegmentation();
@@ -77,7 +77,7 @@ protected:
 
     Ui::QmitkInteractiveSegmentationControls * m_Controls;
     unsigned long m_ObserverTag;
-    mitk::DataTree::Pointer m_DataTree;
+    mitk::DataStorage::Pointer m_DataStorage;
 
   /// from QmitkInteractiveSegmentation
 

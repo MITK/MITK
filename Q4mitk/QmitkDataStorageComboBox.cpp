@@ -8,19 +8,19 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoS
 : QComboBox(parent)
 , m_DataStorage(0)
 , m_Predicate(0)
-, m_AutoSelectNewNodes(_AutoSelectNewItems)
 , m_BlockEvents(false)
+, m_AutoSelectNewNodes(_AutoSelectNewItems)
 {
   this->Init();
 }
 
-QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, mitk::NodePredicateBase* _Predicate,
+QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate,
                                                    QWidget* parent, bool _AutoSelectNewItems )
 : QComboBox(parent)
 , m_DataStorage(0)
 , m_Predicate(_Predicate)
-, m_AutoSelectNewNodes(_AutoSelectNewItems)
 , m_BlockEvents(false)
+, m_AutoSelectNewNodes(_AutoSelectNewItems)
 {
   // make connections, fill combobox
   this->Init();
@@ -86,7 +86,7 @@ void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage* _DataStorage)
   }
 }
    
-void QmitkDataStorageComboBox::SetPredicate(mitk::NodePredicateBase* _Predicate)
+void QmitkDataStorageComboBox::SetPredicate(const mitk::NodePredicateBase* _Predicate)
 {
   if(m_Predicate != _Predicate)
   {

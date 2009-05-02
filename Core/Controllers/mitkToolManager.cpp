@@ -215,7 +215,10 @@ void mitk::ToolManager::SetReferenceData(DataTreeNode* data)
 {
   //std::cout << "ToolManager::SetReferenceData(" << (void*)data << ")" << std::endl;
   DataVectorType v;
-  v.push_back(data);
+  if (data)
+  {
+    v.push_back(data);
+  }
   SetReferenceData(v);
 }
 

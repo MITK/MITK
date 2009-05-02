@@ -38,7 +38,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Ctor for constructing QmitkDataStorageComboBox with given DataStorageComboBox and given _Predicate.
     ///
-    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, mitk::NodePredicateBase* _Predicate, QWidget* parent = 0, bool _AutoSelectNewItems=true);
+    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate, QWidget* parent = 0, bool _AutoSelectNewItems=true);
 
     ///
     /// \brief Standard Dtor. Nothing to do here.
@@ -79,7 +79,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Set the predicate for this ComboBox. (QmitkDataStorageComboBox is now owner of the predicate)
     ///
     /// If predicate is NULL all nodes will be selected. If predicate changes the whole combobox will be resetted.
-    void SetPredicate(mitk::NodePredicateBase* _Predicate); 
+    void SetPredicate(const mitk::NodePredicateBase* _Predicate); 
     ///
     /// Adds a node to the ComboBox. Gets called everytime a DataStorage Add Event was thrown.
     ///
@@ -167,7 +167,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Holds the predicate that is responsible for the _DataTreeNode selection of this ComboBox.
     /// If the predicate is 0, every _DataTreeNode will be selected.
     ///
-    mitk::NodePredicateBase::Pointer m_Predicate;
+    mitk::NodePredicateBase::ConstPointer m_Predicate;
 
     ///
     /// Holds all selected Nodes. Dont hold smart pointer as we are in a GUI class.
@@ -195,9 +195,9 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// first checks if this is true in order to avoid endless loops.
     bool m_BlockEvents;
 
-	  ///
-	  /// \brief If set to "true" new Nodes will be automatically selected.
-	  bool m_AutoSelectNewNodes;
+    ///
+    /// \brief If set to "true" new Nodes will be automatically selected.
+    bool m_AutoSelectNewNodes;
 
 };
 

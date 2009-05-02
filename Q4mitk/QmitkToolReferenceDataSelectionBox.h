@@ -19,12 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolReferenceDataSelectionBox_h_Included
 
 #include "mitkToolManager.h"
-#include "mitkDataTreeFilter.h"
+#include "mitkDataStorage.h"
 
 #include <QWidget>
 #include <QVBoxLayout>
 
-class QmitkDataTreeComboBox;
+class QmitkDataStorageComboBox;
 
 /**
 \brief Display the data selection of a ToolManager.
@@ -63,8 +63,9 @@ public:
 
   QmitkToolReferenceDataSelectionBox(QWidget* parent = 0);
   virtual ~QmitkToolReferenceDataSelectionBox();
-
-  void Initialize(mitk::DataTreeBase*); // just needed because combobox relies on data tree
+ 
+  /// initialization with a data storage object
+  void Initialize(mitk::DataStorage*);
 
   void UpdateDataDisplay();
 
@@ -97,21 +98,21 @@ signals:
 
   void ReferenceNodeSelected(const mitk::DataTreeNode*);
 
-  public slots:
+protected slots:
 
-    protected slots:
+  void OnReferenceDataSelected(const mitk::DataTreeNode* node);
 
-      void OnReferenceDataSelected(const mitk::DataTreeFilter::Item* item);
-
-      void EnsureOnlyReferenceImageIsVisibile();
+  void EnsureOnlyReferenceImageIsVisibile();
 
 protected:
 
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllPossibleReferenceImages();
+  
+  mitk::NodePredicateBase::ConstPointer GetAllPossibleReferenceImagesPredicate();
 
   mitk::ToolManager::Pointer m_ToolManager;
 
-  QmitkDataTreeComboBox* m_ReferenceDataSelectionBox;
+  QmitkDataStorageComboBox* m_ReferenceDataSelectionBox;
 
   bool m_SelfCall;
 

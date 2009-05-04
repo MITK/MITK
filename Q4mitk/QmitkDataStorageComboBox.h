@@ -50,21 +50,21 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Get the DataStorage this ComboBox listens to.
     ///
-    mitk::DataStorage* GetDataStorage() const;    
+    mitk::DataStorage::Pointer GetDataStorage() const;    
     ///
     /// \brief Return the predicate (may be NULL) that is responsible for the _DataTreeNode selection of this ComboBox.
     ///
-    const mitk::NodePredicateBase* GetPredicate() const;     
+    const mitk::NodePredicateBase::ConstPointer GetPredicate() const;     
     ///
     /// \brief Returns the _DataTreeNode at Index index or 0 if the index is out of bounds.
     ///
-    mitk::DataTreeNode* GetNode(int index) const;   
+    mitk::DataTreeNode::Pointer GetNode(int index) const;   
     ///
     /// \brief Returns the selected _DataTreeNode or 0 if there is none.
     ///
-    mitk::DataTreeNode* GetSelectedNode() const;     
+    mitk::DataTreeNode::Pointer GetSelectedNode() const;     
     ///
-    /// \brief Returns the _DataTreeNode at Index index or 0 if the index is out of bounds.
+    /// \brief Returns all nodes that are stored in this combobox.
     ///
     mitk::DataStorage::SetOfObjects::ConstPointer GetNodes() const;   
     ///

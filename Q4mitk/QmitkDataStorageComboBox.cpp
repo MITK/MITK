@@ -32,22 +32,22 @@ QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 }
 
 //#PUBLIC GETTER
-mitk::DataStorage* QmitkDataStorageComboBox::GetDataStorage() const
+mitk::DataStorage::Pointer QmitkDataStorageComboBox::GetDataStorage() const
 {
   return m_DataStorage.GetPointer();
 }
 
-const mitk::NodePredicateBase* QmitkDataStorageComboBox::GetPredicate() const
+const mitk::NodePredicateBase::ConstPointer QmitkDataStorageComboBox::GetPredicate() const
 {
   return m_Predicate.GetPointer();
 }
 
-mitk::DataTreeNode* QmitkDataStorageComboBox::GetNode(int index) const
+mitk::DataTreeNode::Pointer QmitkDataStorageComboBox::GetNode( int index ) const
 {
   return (this->HasIndex(index))? m_Nodes.at(index): 0;
 }
 
-mitk::DataTreeNode* QmitkDataStorageComboBox::GetSelectedNode() const
+mitk::DataTreeNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
 {
   int _CurrentIndex = this->currentIndex();
   return (_CurrentIndex >= 0)? this->GetNode(_CurrentIndex): 0;
@@ -186,37 +186,36 @@ void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object 
   {
     m_BlockEvents = true;
 
+    // check if we have a modified event (if not it is a delete event)
+    const itk::ModifiedEvent* modifiedEvent = dynamic_cast<const itk::ModifiedEvent*>(&event);
 
-      // check if we have a modified event (if not it is a delete event)
-      const itk::ModifiedEvent* modifiedEvent = dynamic_cast<const itk::ModifiedEvent*>(&event);
+    // when node was modified reset text
+    if(modifiedEvent)
+    {
+      const mitk::BaseProperty* _NameProperty = dynamic_cast<const mitk::BaseProperty*>(caller);
 
-      // when node was modified reset text
-      if(modifiedEvent)
+      // node name changed, set it
+      // but first of all find associated node
+      for(std::map<mitk::DataTreeNode*, const mitk::BaseProperty*>::iterator it=m_PropertyToNode.begin()
+        ; it!=m_PropertyToNode.end()
+        ; ++it)
       {
-        const mitk::BaseProperty* _NameProperty = dynamic_cast<const mitk::BaseProperty*>(caller);
-
-        // node name changed, set it
-        // but first of all find associated node
-        for(std::map<mitk::DataTreeNode*, const mitk::BaseProperty*>::iterator it=m_PropertyToNode.begin()
-          ; it!=m_PropertyToNode.end()
-          ; ++it)
+        // property is found take node
+        if(it->second == _NameProperty)
         {
-          // property is found take node
-          if(it->second == _NameProperty)
-          {
-            // looks strange but when calling setnode with the same node, that means the node gets updated
-            this->SetNode(it->first, it->first);
-            break;
-          }
-        }              
-      }
-      else
-      {
-        const mitk::DataTreeNode* _ConstDataTreeNode = dynamic_cast<const mitk::DataTreeNode*>(caller);
-        if(_ConstDataTreeNode)
-          // node will be deleted, remove it
-          this->RemoveNode(_ConstDataTreeNode);
-      }
+          // looks strange but when calling setnode with the same node, that means the node gets updated
+          this->SetNode(it->first, it->first);
+          break;
+        }
+      }              
+    }
+    else
+    {
+      const mitk::DataTreeNode* _ConstDataTreeNode = dynamic_cast<const mitk::DataTreeNode*>(caller);
+      if(_ConstDataTreeNode)
+        // node will be deleted, remove it
+        this->RemoveNode(_ConstDataTreeNode);
+    }
 
     m_BlockEvents = false;
   }

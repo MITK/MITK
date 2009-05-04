@@ -56,7 +56,7 @@ protected:
   /// 
   QTableView* m_NodePropertiesTableView;
   ///
-  /// A text field in which the user can enter a filter keyword for the properties. Only properties beginning with this keyword
+  /// A text field in which the user can enter a filter keyword for the properties. Only properties containing with this keyword
   /// will be selected.
   /// 
   QLineEdit* m_TxtPropertyFilterKeyWord;

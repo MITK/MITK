@@ -22,8 +22,8 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
 {
   Q_OBJECT
 
-  public:
-    
+  //#Ctors/Dtor
+  public:    
     ///
     /// Constructs a new QmitkDataStorageTableModel and sets a predicate that defines
     /// this list.
@@ -37,67 +37,56 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     virtual ~QmitkDataStorageTableModel();
 
-    ///
-    /// Sets the predicate. <b>QmitkDataStorageTableModel is owner of the predicate!</b>
-    ///
-    void setPredicate(mitk::NodePredicateBase* _Predicate);
-
-    ///
-    /// Get the predicate.
-    /// 
-    mitk::NodePredicateBase* getPredicate() const;
-
-    ///
-    /// Sets the DataStorage.
-    ///
-    void setDataStorage(mitk::DataStorage::Pointer _DataStorage);
-
+  //# Public GETTER
+  public:
     ///
     /// Get the DataStorage.
     /// 
-    const mitk::DataStorage::Pointer getDataStorage() const;
-
+    const mitk::DataStorage::Pointer GetDataStorage() const;
     ///
-    /// Overridden from QAbstractTableModel. Returns the node count.
-    ///
-    int rowCount(const QModelIndex &parent) const;
-
-    ///
-    /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
-    ///
-    int columnCount(const QModelIndex &parent) const;
-
-    ///
-    /// Overridden from QAbstractTableModel. Returns the data at index for given role.
-    ///
-    QVariant data(const QModelIndex &index, int role) const;
-
+    /// Get the predicate.
+    /// 
+    mitk::NodePredicateBase::Pointer GetPredicate() const;
     ///
     /// Get node at a specific model index. Another way to implement this, is
     /// by introducing a new role like "DateTreeNode" and capture
     /// that in the data function.
     ///
-    mitk::DataTreeNode::Pointer getNode(const QModelIndex &index) const;
-
+    mitk::DataTreeNode::Pointer GetNode(const QModelIndex &index) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the header data at section
     /// for given orientation and role. 
     ///
     QVariant headerData(int section, Qt::Orientation orientation,
       int role) const;
-
-    ///
-    /// Overridden from QAbstractTableModel. Sets data at index for given role.
-    ///
-    bool setData(const QModelIndex &index, const QVariant &value,
-      int role);
-
     ///
     /// Overridden from QAbstractTableModel. Returns what can be done
     /// with an item.
     ///
     Qt::ItemFlags flags(const QModelIndex &index) const;
+    ///
+    /// Overridden from QAbstractTableModel. Returns the node count.
+    ///
+    int rowCount(const QModelIndex &parent) const;
+    ///
+    /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
+    ///
+    int columnCount(const QModelIndex &parent) const;
+    ///
+    /// Overridden from QAbstractTableModel. Returns the data at index for given role.
+    ///
+    QVariant data(const QModelIndex &index, int role) const;
 
+  //# Public SETTERS
+  public:
+    ///
+    /// Sets the DataStorage.
+    ///
+    void SetDataStorage(mitk::DataStorage::Pointer _DataStorage);
+    ///
+    /// Sets the predicate. <b>QmitkDataStorageTableModel is owner of the predicate!</b>
+    ///
+    void SetPredicate(mitk::NodePredicateBase* _Predicate);
     ///
     /// Called when a DataStorage Add Event was thrown. May be reimplemented
     /// by deriving classes.
@@ -112,13 +101,22 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// \brief Called when a single property was changed.
     ///
     virtual void PropertyModified(const itk::Object *caller, const itk::EventObject &event);
+    ///
+    /// Overridden from QAbstractTableModel. Sets data at index for given role.
+    ///
+    bool setData(const QModelIndex &index, const QVariant &value,
+      int role);
+
+  //#Protected SETTER
   protected:
     ///
     /// Called when DataStorage or Predicate changed. Resets whole model and reads all nodes
     /// in again.
     ///
-    void reset();
+    virtual void Reset();
 
+  //#Protected MEMBER VARIABLES
+  protected:
     ///
     /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
     /// might be more than one DataStorage).
@@ -126,23 +124,23 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// to any non-GUI Object.
     ///
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-
     ///
     /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
     /// is NULL all Nodes will be selected.
     ///
     mitk::NodePredicateBase::Pointer m_Predicate;
-
     ///
     /// Holds all selected Nodes.
     ///
     mitk::DataStorage::SetOfObjects::Pointer m_NodeSet;
-
     ///
     /// \brief Maps a property to an observer tag.
     ///
-    std::map<mitk::BaseProperty*, unsigned long> m_PropertyModifiedObserverTags;
-
+    std::map<mitk::BaseProperty*, unsigned long> m_NamePropertyModifiedObserverTags;
+    ///
+    /// \brief Maps a property to an observer tag.
+    ///
+    std::map<mitk::BaseProperty*, unsigned long> m_VisiblePropertyModifiedObserverTags;
     ///
     /// Saves if this model is currently working on events to prevent endless event loops.
     /// 

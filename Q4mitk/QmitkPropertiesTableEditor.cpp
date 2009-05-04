@@ -26,7 +26,7 @@ QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(mitk::DataTreeNode::Point
   this->init();
 
   // set up model
-  m_Model = new QmitkPropertiesTableModel(0, m_NodePropertiesTableView);    
+  m_Model = new QmitkPropertiesTableModel(m_NodePropertiesTableView, 0);    
   m_NodePropertiesTableView->setModel(m_Model);
 }
 
@@ -38,7 +38,7 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
 {
   if(_List.IsNotNull())
   {
-    m_Model->setPropertyList(_List);
+    m_Model->SetPropertyList(_List);
     m_NodePropertiesTableView->resizeColumnsToContents();
     m_NodePropertiesTableView->resizeRowsToContents();
 
@@ -82,7 +82,7 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
   }
   else
   {
-    m_Model->setPropertyList(0);
+    m_Model->SetPropertyList(0);
   }
 }
 

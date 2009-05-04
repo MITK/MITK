@@ -1,5 +1,7 @@
 #include "QmitkDataManagerView.h"
 
+//# Own Includes
+//## mitk
 #include "mitkDataStorageEditorInput.h"
 #include "mitkIDataStorageReference.h"
 #include "mitkNodePredicateDataType.h"
@@ -8,16 +10,19 @@
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkCommon.h"
 #include "mitkDelegateManager.h"
-
+#include "mitkNodePredicateData.h"
+#include "mitkNodePredicateNOT.h"
+//## Qmitk
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageTableModel.h>
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkStdMultiWidgetEditor.h>
 #include <QmitkCommonFunctionality.h>
-
+//## Cherry
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
 
+//# Toolkit Includes
 #include <QTableView>
 #include <QGroupBox>
 #include <QGridLayout>
@@ -38,45 +43,46 @@
 
 QmitkDataManagerView::QmitkDataManagerView()
 {
+/*
   mitk::DelegateManager::GetInstance()->SetCommand("Show Node Info"
     , new mitk::MessageDelegate<QmitkDataManagerView>( this, &QmitkDataManagerView::ShowNodeInfo ));
+*/
 }
+
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
-  mitk::DelegateManager::GetInstance()->RemoveCommand("Show Node Info");
+/*  mitk::DelegateManager::GetInstance()->RemoveCommand("Show Node Info");*/
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
+  //# Dim/Get
 
-  //// Dim/Get
-
-  // Base
+  //# Base
   QGridLayout* parentLayout = new QGridLayout;
   m_BasePane = new QWidget(parent);
   QGridLayout* _BasePaneLayout = new QGridLayout;
 
-  // DataStorageSelection
+  //# DataStorageSelection
   QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_BasePane); 
   QGridLayout* _DataStorageSelectionLayout = new QGridLayout;
   m_DataStorageSelectionComboBox = new QComboBox(_DataStorageSelectionGroupBox);
 
-  // NodeSelection
-//   QGroupBox* _NodeSelectionGroupBox = new QGroupBox("Node Selection", m_BasePane);
-//   QVBoxLayout* _NodeSelectionLayout = new QVBoxLayout;
-//   m_PredicateEditor = new QmitkPredicateEditor(_NodeSelectionGroupBox);
-
-  // setup qsplitter
+  //# setup qsplitter
   QSplitter *_SplitterNodeViewPropertiesView = new QSplitter(m_BasePane);
   _SplitterNodeViewPropertiesView->setMargin(0);
 
-  // NodeView
-  QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes", m_BasePane);
+  //# NodeView
+  QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes (Use Right Mouse Button for a Context Menu)", m_BasePane);
   QVBoxLayout* _NodeViewLayout = new QVBoxLayout;
   m_NodeTableView = new QTableView(_NodeViewGroupBox);
-  m_NodeTableModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), 0, m_NodeTableView);
+  // Show only nodes that really contain data
+  mitk::NodePredicateData::Pointer nullDataPredicate = mitk::NodePredicateData::New(0);
+  mitk::NodePredicateNOT::Pointer notNullDataPredicate = mitk::NodePredicateNOT::New(nullDataPredicate);
+  m_NodeTableModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), notNullDataPredicate, m_NodeTableView);
 
+  //# Node actions: buttons, context menu
   QWidget* _PaneNodeButton = new QWidget(_NodeViewGroupBox);
   QHBoxLayout* _NodeButtonLayout = new QHBoxLayout;
   m_BtnLoad = new QPushButton(QIcon(":/datamanager/load.xpm"), "Load", _PaneNodeButton);
@@ -189,6 +195,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
 void QmitkDataManagerView::Activated()
 {
+  // emulate click action to show properties of selected node
   if(m_NodeTableView && m_NodeTableView->currentIndex().isValid())
     NodeTableViewClicked(m_NodeTableView->currentIndex());
   else
@@ -233,7 +240,7 @@ void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 
 void QmitkDataManagerView::NodeTableViewSelectionChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(current);
+  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->GetNode(current);
   if(selectedNode.IsNotNull())
     m_NodePropertiesTableEditor->SetPropertyList(selectedNode->GetPropertyList());
 }
@@ -250,7 +257,7 @@ void QmitkDataManagerView::SaveActionTriggered(bool checked)
   QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
   if(!indexOfSelectedRow.isValid()) return;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->getNode(indexOfSelectedRow);
+  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
   if ( !node ) return;
 
   mitk::BaseData::Pointer data = node->GetData();
@@ -266,7 +273,7 @@ void QmitkDataManagerView::ActionReinitTriggered( bool checked /*= false */ )
   QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
   if(indexOfSelectedRow.isValid())
   {
-    mitk::DataTreeNode* node = m_NodeTableModel->getNode(indexOfSelectedRow);
+    mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
     if (node != NULL )
     {
       mitk::BaseData::Pointer basedata = node->GetData();
@@ -286,7 +293,7 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
   if(!indexOfSelectedRow.isValid()) 
     return;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->getNode(indexOfSelectedRow);
+  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
   if ( !node )
     return;
 
@@ -311,7 +318,7 @@ void QmitkDataManagerView::BtnLoadClicked( bool checked /*= false */ )
 
   if(!indexOfSelectedRow.isValid()) return;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->getNode(indexOfSelectedRow);
+  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
   if ( !node )
     return;
 
@@ -362,7 +369,7 @@ void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
   if(!indexOfSelectedRow.isValid()) 
     return;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->getNode(indexOfSelectedRow);
+  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
   if ( !node )
     return;
 
@@ -394,7 +401,7 @@ void QmitkDataManagerView::ShowNodeInfo()
   if(!current.isValid())
     return;
 
-  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->getNode(current);
+  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->GetNode(current);
   QString nodeName = QString::fromStdString(selectedNode->GetName());
   bool nodeIsVisible = false;
   selectedNode->GetVisibility(nodeIsVisible, 0);

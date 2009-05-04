@@ -48,7 +48,22 @@ public:
   /// \brief Standard dtor.
   ///
   virtual ~QmitkDataManagerView();
+  ///
+  /// Called when the part is activated.
+  ///
+  virtual void Activated();
+  ///
+  /// Called when the part is deactivated.
+  ///
+  virtual void Deactivated();
 
+  ///
+  /// \brief Shows a popup dialog with the currently selected node.
+  ///
+  void ShowNodeInfo();
+
+//# Inner classes
+public:
   ///
   /// \struct SingleNodeSelection
   /// \brief Represents a selection object that encapsulates the selection of a single node.
@@ -79,19 +94,6 @@ public:
     mitk::DataTreeNode* m_Node;
   };
 
-  ///
-  /// Called when the part is activated.
-  ///
-  virtual void Activated();
-  ///
-  /// Called when the part is deactivated.
-  ///
-  virtual void Deactivated();
-
-  ///
-  /// \brief Shows a popup dialog with the currently selected node.
-  ///
-  void ShowNodeInfo();
 
 protected slots:
   ///
@@ -136,7 +138,6 @@ protected slots:
   void BtnGlobalReinitClicked ( bool checked = false );
 
 protected:
-
   ///
   /// \brief Create the view here.
   ///

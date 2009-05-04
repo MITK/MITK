@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkPropertiesTableModel.h"
 
+//# Own includes
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -26,98 +27,32 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyManager.h"
 #include "QmitkCustomVariants.h"
 
-#include "itkCommand.h"
-
+//# Toolkit includes
+#include <itkCommand.h>
 #include <QColor>
 #include <QStringList>
 
-QmitkPropertiesTableModel::QmitkPropertiesTableModel(mitk::PropertyList* _PropertyList, QObject* parent)
+//# PUBLIC CTORS,DTOR
+QmitkPropertiesTableModel::QmitkPropertiesTableModel(QObject* parent, mitk::PropertyList::Pointer _PropertyList)
 : QAbstractTableModel(parent)
 , m_PropertyList(0)
-, m_PropertyListModifiedObserverTag(0)
-, m_PropertyListDeleteObserverTag(0)
 , m_BlockEvents(false)
 , m_SortDescending(false)
+, m_FilterKeyWord("")
 {
-  this->setPropertyList(_PropertyList);
+  this->SetPropertyList(_PropertyList);
 }
 
 QmitkPropertiesTableModel::~QmitkPropertiesTableModel()
 {
-  // remove all event listeners
-  setPropertyList(0);
+  // remove all event listeners by setting the property list to 0
+  this->SetPropertyList(0);
 }
 
-void QmitkPropertiesTableModel::setPropertyList( mitk::PropertyList* _PropertyList )
+//# PUBLIC GETTER
+mitk::PropertyList::Pointer QmitkPropertiesTableModel::GetPropertyList() const
 {
-  // if node is 0 the property list is also 0 => no items in this model
-  // otherwise retrieve list from the node
-  //mitk::PropertyList* _PropertyList = (_PropertyList.IsNotNull()) ? _PropertyList->GetPropertyList(): 0;
-
-  if(m_PropertyList != 0)
-  {
-    // remove all property event listener
-/*
-    for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
-      ; it!=m_PropertyList->GetMap()->end()
-      ; it++)
-    {
-      it->second.first->RemoveObserver(m_PropertyModifiedObserverTags[it->first]);
-    }
-*/
-
-    // unsubscribe from all modified events for old list
-    m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
-    m_PropertyList->RemoveObserver(m_PropertyListDeleteObserverTag);
-  }
-
-  // set new list
-  m_PropertyList = _PropertyList;  
-  // set all other members to default values
-  m_PropertyListElements.clear();
-  m_PropertyModifiedObserverTags.clear();
-  m_PropertyDeleteObserverTags.clear();
-  m_PropertyListModifiedObserverTag = 0;
-  m_PropertyListDeleteObserverTag = 0;
-  //m_SortDescending = false;
-
-  if(m_PropertyList != 0)
-  {
-    // subscribe for all modified events for new list
-    itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyListModifiedCommand =
-      itk::MemberCommand<QmitkPropertiesTableModel>::New();
-    propertyListModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListModified);
-    m_PropertyListModifiedObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), propertyListModifiedCommand);
-
-    itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyDeleteCommand =
-      itk::MemberCommand<QmitkPropertiesTableModel>::New();
-    propertyDeleteCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListDelete);
-    m_PropertyListDeleteObserverTag = m_PropertyList->AddObserver(itk::DeleteEvent(), propertyDeleteCommand);
-
-    // subscribe for all properties modified events
-    for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
-      ; it!=m_PropertyList->GetMap()->end()
-      ; it++)
-    {
-      // add relevant property column values
-      m_PropertyListElements.push_back((*it));
-
-      // subscribe for property change events
-/*
-      itk::MemberCommand<QmitkPropertiesTableModel>::Pointer propertyModifiedCommand =
-         itk::MemberCommand<QmitkPropertiesTableModel>::New();
-      propertyModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
- 
-       m_PropertyModifiedObserverTags[it->first] = it->second.first->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);*/
-
-    }      
-    // sort the list
-    this->sort(m_SortDescending);
-  }
-  
-  // model was resetted
-  QAbstractTableModel::reset();
-
+  return m_PropertyList.GetPointer();
 }
 
 Qt::ItemFlags QmitkPropertiesTableModel::flags(const QModelIndex& index) const
@@ -125,14 +60,14 @@ Qt::ItemFlags QmitkPropertiesTableModel::flags(const QModelIndex& index) const
   // no editing so far, return default (enabled, selectable)
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
-  if (index.column() == 1)
+  if (index.column() == PROPERTY_VALUE_COLUMN)
   {
     // there are also read only property items -> do not allow editing them
     if(index.data(Qt::EditRole).isValid())
       flags |= Qt::ItemIsEditable;
   }
 
-  if (index.column() == 2)
+  if (index.column() == PROPERTY_ACTIVE_COLUMN)
   {
     flags |= Qt::ItemIsEditable;
   }
@@ -140,24 +75,50 @@ Qt::ItemFlags QmitkPropertiesTableModel::flags(const QModelIndex& index) const
   return flags;
 }
 
+QVariant QmitkPropertiesTableModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+  if (role != Qt::DisplayRole)
+    return QVariant();
+
+  if (orientation == Qt::Horizontal) {
+    switch (section) 
+    {
+    case PROPERTY_NAME_COLUMN:
+      return tr("Name");
+
+    case PROPERTY_VALUE_COLUMN:
+      return tr("Value");
+
+    case PROPERTY_ACTIVE_COLUMN:
+      return tr("Active");
+
+    default:
+      return QVariant();
+    }
+  }
+
+  return QVariant();
+}
+
+
 QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) const
 {
   // empty data by default
   QVariant data;
 
-  if(!index.isValid() || m_PropertyListElements.empty() || index.row() > (m_PropertyListElements.size()-1))
+  if(!index.isValid() || m_SelectedProperties.empty() || index.row() > (m_SelectedProperties.size()-1))
     return data;
 
   // the properties name
-  if(index.column() == 0)
+  if(index.column() == PROPERTY_NAME_COLUMN)
   {
     if(role == Qt::DisplayRole)
-      data = QString::fromStdString(m_PropertyListElements[index.row()].first);
+      data = QString::fromStdString(m_SelectedProperties[index.row()].first);
   }
   // the real properties value
-  else if(index.column() == 1)
+  else if(index.column() == PROPERTY_VALUE_COLUMN)
   {
-    mitk::BaseProperty* baseProp = m_PropertyListElements[index.row()].second.first;
+    mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second.first;
 
     if (const mitk::ColorProperty* colorProp 
       = dynamic_cast<const mitk::ColorProperty*>(baseProp))
@@ -231,34 +192,108 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
     else
     {
       if(role == Qt::DisplayRole)
-        data.setValue<QString>(QString::fromStdString(m_PropertyListElements[index.row()].second.first->GetValueAsString()));
+        data.setValue<QString>(QString::fromStdString(m_SelectedProperties[index.row()].second.first->GetValueAsString()));
     }
   }
 
   // enabled/disabled value
-  else if(index.column() == 2)
+  else if(index.column() == PROPERTY_ACTIVE_COLUMN)
   {
     if(role == Qt::DisplayRole)
-      data.setValue<bool>(m_PropertyListElements[index.row()].second.second);
+      data.setValue<bool>(m_SelectedProperties[index.row()].second.second);
 
     else if(role == Qt::EditRole)
-      data.setValue<bool>(m_PropertyListElements[index.row()].second.second);
+      data.setValue<bool>(m_SelectedProperties[index.row()].second.second);
   }
 
   return data;
 }
 
+int QmitkPropertiesTableModel::rowCount(const QModelIndex& parent) const
+{
+  // return the number of properties in the properties list.
+  return m_SelectedProperties.size();
+}
+
+int QmitkPropertiesTableModel::columnCount(const QModelIndex &parent)const
+{
+  return 3;
+}
+
+//# PUBLIC SETTER
+void QmitkPropertiesTableModel::SetPropertyList( mitk::PropertyList* _PropertyList )
+{
+  // if propertylist really changed
+  if(m_PropertyList.GetPointer() != _PropertyList)
+  {
+    // Remove delete listener if there was a propertylist before
+    if(m_PropertyList.IsNotNull())
+    {
+      m_PropertyList.ObjectDelete.RemoveListener
+        (mitk::MessageDelegate1<QmitkPropertiesTableModel
+        , const itk::Object*>( this, &QmitkPropertiesTableModel::PropertyListDelete ));
+    }
+  
+    // set new list
+    m_PropertyList = _PropertyList;
+
+    if(m_PropertyList.IsNotNull())
+    {
+      m_PropertyList.ObjectDelete.AddListener
+        (mitk::MessageDelegate1<QmitkPropertiesTableModel
+        , const itk::Object*>( this, &QmitkPropertiesTableModel::PropertyListDelete ));
+    }
+    this->Reset();
+  }
+}
+
+void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object *_PropertyList )
+{
+  if(!m_BlockEvents)
+  {
+    m_BlockEvents = true;
+    this->Reset();
+    m_BlockEvents = false;
+  }
+}
+
+void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject &event )
+{
+  if(!m_BlockEvents)
+  {
+    m_BlockEvents = true;
+    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
+
+    QModelIndex indexOfChangedProperty = index(row, 1);
+
+    emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
+    m_BlockEvents = false;
+  }
+}
+
+void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const itk::EventObject &event )
+{
+  if(!m_BlockEvents)
+  {
+    m_BlockEvents = true;
+    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
+    if(row >= 0)
+      this->Reset();
+    m_BlockEvents = false;
+  }
+}
+
 bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if (index.isValid() && !m_PropertyListElements.empty() && index.row() < m_PropertyListElements.size() && role == Qt::EditRole) 
+  if (index.isValid() && !m_SelectedProperties.empty() && index.row() < m_SelectedProperties.size() && role == Qt::EditRole) 
   {
     // block all events now!
     m_BlockEvents = true;
 
     // the properties name
-    if(index.column() == 1)
+    if(index.column() == PROPERTY_VALUE_COLUMN)
     {
-      mitk::BaseProperty* baseProp = m_PropertyListElements[index.row()].second.first;
+      mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second.first;
 
       if (mitk::ColorProperty* colorProp 
         = dynamic_cast<mitk::ColorProperty*>(baseProp))
@@ -317,7 +352,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
           floatProp->SetValue(floatValue);
           m_PropertyList->InvokeEvent(itk::ModifiedEvent());
           m_PropertyList->Modified();
-          
+
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
       }
@@ -340,13 +375,13 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
     }
 
     // enabled/disabled value
-    else if(index.column() == 2)
+    else if(index.column() == PROPERTY_ACTIVE_COLUMN)
     {
       bool active = value.value<bool>();
-      std::string propertyName = m_PropertyListElements[index.row()].first;
+      std::string propertyName = m_SelectedProperties[index.row()].first;
 
       m_PropertyList->SetEnabled(propertyName, active);
-	  m_PropertyListElements[index.row()].second.second = active;
+      m_SelectedProperties[index.row()].second.second = active;
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -360,63 +395,6 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
   return false;
 }
 
-QVariant QmitkPropertiesTableModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-  if (role != Qt::DisplayRole)
-    return QVariant();
-
-  if (orientation == Qt::Horizontal) {
-    switch (section) 
-    {
-     case 0:
-       return tr("Name");
-
-     case 1:
-       return tr("Value");
-
-     case 2:
-       return tr("Active");
-
-     default:
-       return QVariant();
-    }
-  }
-
-  return QVariant();
-}
-
-int QmitkPropertiesTableModel::rowCount(const QModelIndex& parent) const
-{
-  // return the number of properties in the properties list.
-  return m_PropertyListElements.size();
-}
-
-int QmitkPropertiesTableModel::columnCount(const QModelIndex &parent)const
-{
-  return 3;
-}
-
-void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject &event )
-{
-  if(!m_BlockEvents)
-  {
-    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
-
-    QModelIndex indexOfChangedProperty = index(row, 1);
-
-    emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
-  }
-}
-
-void QmitkPropertiesTableModel::PropertyListModified( const itk::Object *caller, const itk::EventObject &event )
-{
-  if(!m_BlockEvents)
-  {
-    //const mitk::PropertyList* modifiedPropertyList = dynamic_cast<const mitk::PropertyList*>(caller);
-    // reset
-    this->setPropertyList(m_PropertyList);
-  }
-}
 
 void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::AscendingOrder */ )
 {
@@ -427,91 +405,153 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
   {
     m_SortDescending = sortDescending;
 
-    PropertyListElementCompareFunction::CompareCriteria _CompareCriteria 
-      = PropertyListElementCompareFunction::CompareByName;
+    PropertyDataSetCompareFunction::CompareCriteria _CompareCriteria 
+      = PropertyDataSetCompareFunction::CompareByName;
 
-    PropertyListElementCompareFunction::CompareOperator _CompareOperator
-      = m_SortDescending ? PropertyListElementCompareFunction::Greater: PropertyListElementCompareFunction::Less;
+    PropertyDataSetCompareFunction::CompareOperator _CompareOperator
+      = m_SortDescending ? PropertyDataSetCompareFunction::Greater: PropertyDataSetCompareFunction::Less;
 
-    if(column == 1)
-      _CompareCriteria = PropertyListElementCompareFunction::CompareByValue;
+    if(column == PROPERTY_VALUE_COLUMN)
+      _CompareCriteria = PropertyDataSetCompareFunction::CompareByValue;
 
-    else if(column == 2)
-      _CompareCriteria = PropertyListElementCompareFunction::CompareByValue;
+    else if(column == PROPERTY_ACTIVE_COLUMN)
+      _CompareCriteria = PropertyDataSetCompareFunction::CompareByActivity;
 
 
-    PropertyListElementCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
-    std::sort(m_PropertyListElements.begin(), m_PropertyListElements.end(), compareFunc);
+    PropertyDataSetCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
+    std::sort(m_SelectedProperties.begin(), m_SelectedProperties.end(), compareFunc);
 
     QAbstractTableModel::reset();
 
   }
 }
 
-void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object *caller, const itk::EventObject &event )
-{
-  if(!m_BlockEvents)
-  {
-    int row = this->FindProperty(dynamic_cast<const mitk::BaseProperty*>(caller));
-
-    // reset the whole model again. may be changed to emit rowsRemoved signal.
-    if(row >= 0)
-      this->setPropertyList(m_PropertyList);
-  }
-}
-
-void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const itk::EventObject &event )
-{
-
-}
-
-int QmitkPropertiesTableModel::FindProperty( const mitk::BaseProperty* _Property )
+//# PROTECTED GETTER
+int QmitkPropertiesTableModel::FindProperty( const mitk::BaseProperty* _Property ) const
 {
   int row = -1;
 
   if(_Property)
   {
     // search for property that changed and emit datachanged on the corresponding ModelIndex
-    std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > >::iterator propertyIterator;
+    std::vector<PropertyDataSet >::const_iterator propertyIterator;
 
-    for( propertyIterator=m_PropertyListElements.begin(); propertyIterator!=m_PropertyListElements.end()
+    for( propertyIterator=m_SelectedProperties.begin(); propertyIterator!=m_SelectedProperties.end()
       ; propertyIterator++)
     {
       if(propertyIterator->second.first == _Property)
         break;
     }
 
-    if(propertyIterator != m_PropertyListElements.end())
-      row = std::distance(m_PropertyListElements.begin(), propertyIterator);
+    if(propertyIterator != m_SelectedProperties.end())
+      row = std::distance(m_SelectedProperties.begin(), propertyIterator);
   }
 
   return row;
 }
 
+//# PROTECTED SETTER
+void QmitkPropertiesTableModel::AddSelectedProperty( PropertyDataSet& _PropertyDataSet )
+{
+  // subscribe for modified event
+  itk::MemberCommand<QmitkPropertiesTableModel>::Pointer _PropertyDataSetModifiedCommand =
+    itk::MemberCommand<QmitkPropertiesTableModel>::New();
+  _PropertyDataSetModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
+  m_PropertyModifiedObserverTags.push_back(_PropertyDataSet.second.first->AddObserver(itk::ModifiedEvent(), _PropertyDataSetModifiedCommand));
+
+  // subscribe for delete event
+  itk::MemberCommand<QmitkPropertiesTableModel>::Pointer _PropertyDataSetDeleteCommand =
+    itk::MemberCommand<QmitkPropertiesTableModel>::New();
+  _PropertyDataSetDeleteCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyDelete);
+  m_PropertyDeleteObserverTags.push_back(_PropertyDataSet.second.first->AddObserver(itk::DeleteEvent(), _PropertyDataSetDeleteCommand));
+
+  // add to the selection
+  m_SelectedProperties.push_back(_PropertyDataSet);
+}
+
+void QmitkPropertiesTableModel::RemoveSelectedProperty( unsigned int _Index )
+{
+  PropertyDataSet& _PropertyDataSet = m_SelectedProperties.at(_Index);
+
+  // remove modified event listener
+  _PropertyDataSet.second.first->RemoveObserver(m_PropertyModifiedObserverTags[_Index]);
+  m_PropertyModifiedObserverTags.erase(m_PropertyModifiedObserverTags.begin()+_Index);
+  // remove delete event listener
+  _PropertyDataSet.second.first->RemoveObserver(m_PropertyDeleteObserverTags[_Index]);
+  m_PropertyDeleteObserverTags.erase(m_PropertyDeleteObserverTags.begin()+_Index);
+  // remove from selection
+  m_SelectedProperties.erase(m_SelectedProperties.begin()+_Index);
+}
+
+void QmitkPropertiesTableModel::Reset()
+{
+  // remove all selected properties
+  while(!m_SelectedProperties.empty())
+  {
+    this->RemoveSelectedProperty(m_SelectedProperties.size()-1);
+  }
+  
+  std::vector<PropertyDataSet> allPredicates;
+  if(m_PropertyList.IsNotNull())
+  {
+    // first of all: collect all properties from the list
+    for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
+      ; it!=m_PropertyList->GetMap()->end()
+      ; it++)
+    {
+      allPredicates.push_back(*it);
+    }      
+  }
+  // make a subselection if a keyword is specified
+  if(!m_FilterKeyWord.empty())
+  {
+    std::vector<PropertyDataSet> subSelection;
+
+    for(std::vector<PropertyDataSet>::iterator it=allPredicates.begin()
+      ; it!=allPredicates.end()
+      ; it++)
+    {
+      // add this to the selection if it is matched by the keyword
+      if((*it).first.find(m_FilterKeyWord) != std::string::npos)
+        subSelection.push_back((*it));
+    }
+    allPredicates.clear();
+    allPredicates = subSelection;
+  }
+
+  PropertyDataSet tmpPropertyDataSet;
+  // add all selected now to the Model
+  for(std::vector<PropertyDataSet>::iterator it=allPredicates.begin()
+    ; it!=allPredicates.end()
+    ; it++)
+  {
+    tmpPropertyDataSet = *it;
+    this->AddSelectedProperty(tmpPropertyDataSet);
+  }
+
+  // sort the list as indicated by m_SortDescending
+  this->sort(m_SortDescending);
+
+  // model was resetted
+  QAbstractTableModel::reset();
+}
+
 void QmitkPropertiesTableModel::SetFilterPropertiesKeyWord( std::string _FilterKeyWord )
 {
   m_FilterKeyWord = _FilterKeyWord;
-/*
-  std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > >::iterator propertyIterator;
-  
-  propertyIterator = std::find_if(m_PropertyListElements.begin(), m_PropertyListElements.end(), PropertyListElementFilterFunction(_FilterKeyWord));
-
-  std::vector<std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > > tempVec;
-  while(propertyIterator != m_PropertyListElements.end())
-  {
-    tempVec.push_back(*propertyIterator);
-    ++propertyIterator;
-  }
-
-  m_PropertyListElements.clear();
-  m_PropertyListElements = tempVec;
-  QAbstractTableModel::reset();*/
-
+  this->Reset();
 }
 
-bool QmitkPropertiesTableModel::PropertyListElementCompareFunction::operator()
-  ( const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Left
-  , const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Right ) const
+QmitkPropertiesTableModel::PropertyDataSetCompareFunction::PropertyDataSetCompareFunction( CompareCriteria _CompareCriteria
+                                                                                          , CompareOperator _CompareOperator )
+                                                                                          : m_CompareCriteria(_CompareCriteria)
+                                                                                          , m_CompareOperator(_CompareOperator)
+{
+}
+
+bool QmitkPropertiesTableModel::PropertyDataSetCompareFunction::operator()
+  ( const PropertyDataSet& _Left
+  , const PropertyDataSet& _Right ) const
 {
   switch(m_CompareCriteria)
   {
@@ -538,22 +578,13 @@ bool QmitkPropertiesTableModel::PropertyListElementCompareFunction::operator()
     break;
   }
 }
-
-QmitkPropertiesTableModel::PropertyListElementCompareFunction::PropertyListElementCompareFunction( CompareCriteria _CompareCriteria
-                                                                                  , CompareOperator _CompareOperator )
-: m_CompareCriteria(_CompareCriteria)
-, m_CompareOperator(_CompareOperator)
-{
-  
-}
-
 QmitkPropertiesTableModel::PropertyListElementFilterFunction::PropertyListElementFilterFunction( const std::string& _FilterKeyWord )
 : m_FilterKeyWord(_FilterKeyWord)
 {
 
 }
 
-bool QmitkPropertiesTableModel::PropertyListElementFilterFunction::operator()( const std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> >& _Elem ) const
+bool QmitkPropertiesTableModel::PropertyListElementFilterFunction::operator()( const PropertyDataSet& _Elem ) const
 {
   if(m_FilterKeyWord.empty())
     return true;

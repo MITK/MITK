@@ -339,7 +339,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
       mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
       unsigned long size;
       size = children->Size();
-      for (int i = 0; i < size; ++i)
+      for (unsigned long i = 0; i < size; ++i)
       {
         mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(children->GetElement(i)->GetProperty("name"));
         if(nameProp.IsNotNull() && nameProp->GetValueAsString()=="PointBasedRegistrationNode")
@@ -444,7 +444,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
       mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
       unsigned long size;
       size = children->Size();
-      for (int i = 0; i < size; ++i)
+      for (unsigned long i = 0; i < size; ++i)
       {
         mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(children->GetElement(i)->GetProperty("name"));
         if(nameProp.IsNotNull() && nameProp->GetValueAsString()=="PointBasedRegistrationNode")

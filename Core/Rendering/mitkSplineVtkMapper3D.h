@@ -27,11 +27,18 @@ class vtkAssembly;
 namespace mitk
 {
   //##Documentation
-  //## @brief Vtk-based mapper for Spline between points from PointSet
+  //## @brief Vtk-based mapper for Splines
   //##
   //## properties looked for:
   //## "line width" = with of the spline
   //## @ingroup Mapper
+
+  /************************************************************************/
+  /* 
+  *   - \b "line width": (FloatProperty) line width of the spline
+  
+  */
+  /************************************************************************/
 class MITK_CORE_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
 {
 public:

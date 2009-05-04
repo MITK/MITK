@@ -50,6 +50,13 @@ class vtkActor;
 
 namespace mitk {
 
+  /************************************************************************/
+  /* Properties that influence the mapper are:
+  *
+  * - \b "level window": for the level window of the volume data
+  * - \b "LookupTable" : for the lookup table of the volume data
+  * - \b "TransferFunction" (mitk::TransferFunctionProperty): for the used transfer function of the volume data
+  /************************************************************************/
 
 //##Documentation
 //## @brief Vtk-based mapper for VolumeData

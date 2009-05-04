@@ -35,7 +35,13 @@ class BaseRenderer;
  * Currently implemented for mapping on PlaneGeometry. 
  * The result is normally a line. An important usage of this class is to show
  * the orientation of the slices displayed in other 2D windows.
+ *  /**
+ * 
+ * Properties that can be set and influence the Geometry2DDataMapper2D are:
  *
+ *   - \b "PlaneDecorationProperty": (PlaneDecorationProperty)
+
+
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */

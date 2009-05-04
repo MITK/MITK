@@ -128,7 +128,7 @@ void QmitkImageCropper::CreateConnections()
     //!connect( (QObject*) m_Controls, SIGNAL(cropImage()), this, SLOT(CropImage()) );   // click on the crop button
     connect( m_Controls->btnCrop, SIGNAL(clicked()), this, SLOT(CropImage()));   // click on the crop button
     connect( m_Controls->m_NewBoxButton, SIGNAL(clicked()), this, SLOT(ImageSelectionChanged()) );
-    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode::Pointer)), this, SLOT(ImageNodeChanged(const mitk::DataTreeNode::Pointer)) );
+    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeNode::Pointer)) );
     connect( m_Controls->m_EnableSurroundingCheckBox, SIGNAL(toggled(bool)), this, SLOT(SurroundingCheck(bool)) );
     connect( m_Controls->chkInformation, SIGNAL(toggled(bool)), this, SLOT(ChkInformationToggled(bool)) );
     //! from QmitkImageCropperControls::init()

@@ -101,12 +101,12 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// Set a _DataTreeNode in the ComboBox at the specified index (if the index exists).    
     /// Internally the method just calls RemoveNode(unsigned int)
     ///
-    virtual void SetNode(int index, mitk::DataTreeNode* _DataTreeNode);
+    virtual void SetNode(int index, const mitk::DataTreeNode* _DataTreeNode);
     ///
     /// Replaces a _DataTreeNode in the combobox by an _OtherDataTreeNode.
     /// Internally the method just calls SetNode(unsigned int, mitk::DataTreeNode*)
     ///
-    virtual void SetNode(const mitk::DataTreeNode* _DataTreeNode, mitk::DataTreeNode* _OtherDataTreeNode);
+    virtual void SetNode(const mitk::DataTreeNode* _DataTreeNode, const mitk::DataTreeNode* _OtherDataTreeNode);
     ///
     /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
     ///

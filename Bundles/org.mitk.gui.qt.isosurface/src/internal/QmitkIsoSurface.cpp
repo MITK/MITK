@@ -85,7 +85,7 @@ void QmitkIsoSurface::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode::Pointer)), this, SLOT(ImageSelected(const mitk::DataTreeNode::Pointer)) );
+    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageSelected(const mitk::DataTreeNode::Pointer)) );
     connect( m_Controls->createSurfacePushButton, SIGNAL(clicked()), this, SLOT(CreateSurface()) );
   }
 }

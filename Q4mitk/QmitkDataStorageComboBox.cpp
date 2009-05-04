@@ -162,7 +162,7 @@ void QmitkDataStorageComboBox::RemoveNode( const mitk::DataTreeNode* _DataTreeNo
   }
 }
 
-void QmitkDataStorageComboBox::SetNode(int index, mitk::DataTreeNode* _DataTreeNode)
+void QmitkDataStorageComboBox::SetNode(int index, const mitk::DataTreeNode* _DataTreeNode)
 {
   if(this->HasIndex(index))
   {
@@ -170,7 +170,7 @@ void QmitkDataStorageComboBox::SetNode(int index, mitk::DataTreeNode* _DataTreeN
   }
 }
     
-void QmitkDataStorageComboBox::SetNode(const mitk::DataTreeNode* _DataTreeNode, mitk::DataTreeNode* _OtherDataTreeNode)
+void QmitkDataStorageComboBox::SetNode( const mitk::DataTreeNode* _DataTreeNode, const mitk::DataTreeNode* _OtherDataTreeNode)
 {
   this->SetNode( this->Find(_DataTreeNode), _OtherDataTreeNode);
 }
@@ -313,8 +313,10 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
       this->setCurrentIndex(index);
   }
   else
+  {
     // update text in combobox
-    this->setItemText( index, QString::fromStdString(_NonConstDataTreeNodeName));  
+    this->setItemText( index, QString::fromStdString(_NonConstDataTreeNodeName));
+  }  
 }
 
 void QmitkDataStorageComboBox::Init()

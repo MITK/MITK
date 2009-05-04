@@ -77,7 +77,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
+  mitk::NodePredicateBase* GetMovingImagePredicate();
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();

@@ -97,6 +97,18 @@ void QmitkPointListWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
   m_ListView->SetMultiWidget( multiWidget );
 }
 
+void QmitkPointListWidget::DeactivateInteractor(bool deactivate)
+{
+  if (deactivate)
+  {
+    if (m_Interactor)
+    {
+      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
+      m_Interactor = NULL;
+      m_BtnEdit->setChecked( false );
+    }
+  }
+}
     
 void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
 {
@@ -154,6 +166,7 @@ void QmitkPointListWidget::OnEditPointSetButtonToggled(bool checked)
       mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
       m_Interactor = NULL;
     }
+    emit EditPointSets(checked);
   }
 }
 
@@ -181,6 +194,7 @@ void QmitkPointListWidget::OnClearPointSetButtonClicked()
     default:
       break;
   }
+  emit PointListChanged();
 }
 
 void QmitkPointListWidget::OnLoadPointSetButtonClicked()
@@ -225,6 +239,7 @@ void QmitkPointListWidget::OnLoadPointSetButtonClicked()
   {
     QMessageBox::warning( this, "Load point set", QString("File reader collapsed while reading %1").arg(filename) );
   }
+  emit PointListChanged();
 }
 
 void QmitkPointListWidget::OnSavePointSetButtonClicked()

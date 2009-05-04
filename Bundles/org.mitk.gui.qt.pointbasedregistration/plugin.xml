@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.opencherry.ui.views">
+    <view id="org.mitk.views.pointbasedregistration"
+          name="PointBasedRegistration"
+          class="::QmitkPointBasedRegistrationView" 
+          icon="resources/PointBasedRegistration.xpm"/>
+  </extension>
+
+</plugin>

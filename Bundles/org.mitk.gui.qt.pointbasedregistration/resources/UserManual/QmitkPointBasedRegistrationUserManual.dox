@@ -1,0 +1,95 @@
+/**
+\page QmitkPointBasedRegistrationUserManual The Point Based Registration Functionality
+
+Available sections:
+  - \ref QmitkPointBasedRegistrationUserManualOverview 
+  - \ref QmitkPointBasedRegistrationUserManualDetails 
+
+\section QmitkPointBasedRegistrationUserManualOverview Overview
+
+This functionality allows you to register two datasets in a rigid and deformable manner via corresponding 
+PointSets. Register means to align two datasets, so that they become as similar as possible. 
+Therefore you have to set corresponding points in both datasets, which will be matched. The movement, which has to be 
+performed on the points to align them, will be performed on the moving data as well. The result is shown in the multi-widget. 
+
+\image html PointBasedRegistration.png "MITK with the QmitkPointBasedRegistration functionality"
+
+This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through 
+the slices of a dataset using the multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+
+\section QmitkPointBasedRegistrationUserManualDetails Details
+
+First of all you have to open the data sets which you want to register. The upper area is for interaction with the fixed data. Beneath this area is the interaction area for the moving data.
+Select the fixed data in the "Dataset:" selector combobox in the "Fixed Data" area and the moving data in the "Dataset:" selector combobox in the "Moving Data" area. In both cases a "Reinit" 
+button next to the selector combobox can make the QmitkStdMultiWidget to reinitialize the dataset from the combobox.
+
+\image html FixedDataPointBased.png "The Fixed Data area"
+
+The "Fixed Data" area contains a QmitkPointListWidget. Within this widget, all points for the fixed data are listed. The label above this list shows the number of points that are already set. 
+To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the fixed data. Points can 
+be defined by performing a left mousebutton click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left mousebutton click while 
+holding the "Shift"-key pressed by detoggle the "Set Points" button. The next button, "Clear Point Set", is for deleting all specified points from this dataset. The user is prompted to confirm 
+the decision. With the third button a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. The user is prompted 
+to select the file to be loaded. The file extension is ".mps". On the right of this button is the save button. With this function all points specified for this dataset and shown in the 
+QmitkPointListWidget are saved to harddisk. The user is prompted to select a filename. Pointsets were saved in XML fileformat but have to have a ".mps" file extension. You can select landmarks 
+in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then release the mouse 
+button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. The QmitkStdMultiWidget changes 
+its view to show the position of the landmark.
+
+\image html MovingDataPointBased.png "The Moving Data area"
+
+The "Moving Data" area contains a QmitkPointListWidget. Within this widget, all points for the moving data are listed. The label above this list shows the number of points that are already set. 
+To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the moving data. With the 
+"Opacity:" slider you can change the opacity of the moving dataset. If the slider is leftmost the moving dataset is totally transparent, whereas if it is rightmost the moving dataset is totally 
+opaque. Points can be defined by performing a left mousebutton click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left 
+mousebutton click while holding the "Shift"-key pressed by detoggle the "Set Points" button. The next button, "Clear Point Set", is for deleting all specified points from this dataset. The user 
+is prompted to confirm the decision. With the third button a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. 
+The user is prompted to select the file to be loaded. The file extension is ".mps". On the right of this button is the save button. With this function all points specified for this dataset and 
+shown in the QmitkPointListWidget are saved to harddisk. The user is prompted to select a filename. Pointsets were saved in XML fileformat but have to have a ".mps" file extension. You can 
+select landmarks in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then 
+release the mouse button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. The 
+QmitkStdMultiWidget changes its view to show the position of the landmark.
+
+\image html DisplayOptionsPointBased.png "The Display Options area"
+
+In the "Display Options" area are two checkboxes. The first one is for setting all datasets in the data tree to invisible except the selected fixed data and selected moving data and their 
+corresponding point sets. This will help you not to get confused due to too much data in the QmitkStdMultiWidget. Nevertheless, if you want to see all datasets in the QmitkStdMultiWidget you 
+have to uncheck the checkbox. The second checkbox is the "Show Images Red/Green" checkbox. Here you can switch the color from both datasets. If you check the box, the fixed dataset will be 
+displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, both datasets will be 
+displayed in greyvalues.
+
+Before you perform your transformation it is useful to see both images again. Therefore detoggle the "Set Points" button for the fixed data as well as for the moving data.
+
+\image html RegistrationPointBased.png "The Registration area"
+
+The functions concerning to the registration are in the "Registration" area. To that belongs the registration method selection, the registration itself, the possibility to save the result, the 
+possibility for undo and redo, and a display to show how good the landmarks correspond and are explained in the following paragraphs.
+
+You can select between different kinds of transformations from a combobox. 
+
+\li <b>Rigid with ICP</b> means only translation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the moving data. You 
+have to set at least one landmark in each dataset to enable the Calculate button which performs the transformation.
+
+\li <b>Similarity with ICP</b> means only translation and scaling. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the 
+moving data. You have to set at least one landmark in each dataset to enable the Calculate button which performs the transformation.
+
+\li <b>Affine with ICP</b> means only translation, scaling and shearing. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in 
+the moving data. You have to set at least one landmark in each dataset to enable the Calculate button which performs the transformation.
+
+\li <b>Rigid</b> means only translation. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. You have to set 
+at least one landmark and the same number of landmarks in each dataset to enable the Calculate button which performs the transformation.
+
+\li <b>Similarity</b> means only translation and scaling. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. 
+You have to set at least one landmark and the same number of landmarks in each dataset to enable the Calculate button which performs the transformation.
+
+\li <b>Affine</b> means only translation, scaling and shearing. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving 
+data. You have to set at least one landmark and the same number of landmarks in each dataset to enable the Calculate button which performs the transformation.
+
+The root mean squares difference between the landmarks will be displayed as LCD number, so that you can check how good the landmarks correspond.
+
+The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
+you have performed an undo to redo the transformation without to recalculate it.
+
+With the "Save Transformed Data" button you can save the moving dataset to hard disk.
+ 
+*/

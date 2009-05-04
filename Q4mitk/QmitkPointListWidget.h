@@ -64,6 +64,18 @@ class QMITK_EXPORT QmitkPointListWidget : public QWidget
     
     /// itk observer for node "delete" events
     void OnNodeDeleted( const itk::EventObject & e );
+
+  signals:
+
+    /// signal to inform about cleared or loaded point sets
+    void PointListChanged();
+
+    /// signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not
+    void EditPointSets(bool active);
+
+  public slots:
+
+    void DeactivateInteractor(bool deactivate);
  
   protected slots:
 

@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/QmitkPointBasedRegistrationView" >
+    <file>btnReinit.xpm</file>
+  </qresource>
+</RCC>

@@ -115,7 +115,8 @@ mitk::NodePredicateBase::Pointer QmitkPointBasedRegistrationView::GetMovingImage
   mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
   mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
   mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( notFixedAndBaseData, notPointSetAndNotGeometry2DData );
-  return predicate;
+  mitk::NodePredicateBase::Pointer returnPredicate = predicate;
+  return returnPredicate;
 }
 
 void QmitkPointBasedRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

@@ -77,8 +77,6 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  mitk::NodePredicateBase* GetMovingImagePredicate();
-
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
@@ -148,6 +146,8 @@ signals:
     \brief Called whenever the data storage has changed. 
     */
     virtual void DataStorageChanged();
+
+    mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
 
     /*!  
     \brief Sets the fixed Image according to TreeNodeSelector widget

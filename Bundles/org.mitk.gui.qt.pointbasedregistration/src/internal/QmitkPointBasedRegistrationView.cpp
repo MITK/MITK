@@ -103,7 +103,7 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingPointListWidget->SetMultiWidget( m_MultiWidget );
 }
 
-mitk::NodePredicateBase* QmitkPointBasedRegistrationView::GetMovingImagePredicate()
+mitk::NodePredicateBase::Pointer QmitkPointBasedRegistrationView::GetMovingImagePredicate()
 {
   mitk::NodePredicateProperty::Pointer isFixedImage = mitk::NodePredicateProperty::New("selectedFixedImage", mitk::BoolProperty::New(true));
   mitk::NodePredicateNOT::Pointer notFixedImage = mitk::NodePredicateNOT::New(isFixedImage);
@@ -115,7 +115,7 @@ mitk::NodePredicateBase* QmitkPointBasedRegistrationView::GetMovingImagePredicat
   mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
   mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
   mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( notFixedAndBaseData, notPointSetAndNotGeometry2DData );
-  return dynamic_cast<mitk::NodePredicateBase*>(predicate.GetPointer());
+  return predicate.GetPointer();
 }
 
 void QmitkPointBasedRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

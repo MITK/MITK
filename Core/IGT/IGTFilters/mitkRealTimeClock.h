@@ -30,8 +30,9 @@ namespace mitk {
   /**Documentation
   * \brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
   *
-  * This class provides the basic interface, that all RealTimeClocks have in common.
-  * 
+  * When mitk::RealTimeClock::New() is called, a new instance of a RealTimeClock will be
+  * instanciated. WindowsRealTimeClock on a Windows-system and a LinuxRealTimeClock on a 
+  * Linux-system
   *
   * \ingroup IGT
   */
@@ -41,12 +42,10 @@ namespace mitk {
   public:
     mitkClassMacro(RealTimeClock, itk::Object);
 
-    RealTimeClock();
-
-    virtual ~RealTimeClock();
-
-    virtual double GetCurrentStamp() = 0;
-
+    /**
+    *\brief instanciates a new, operating-system dependant, instance of mitk::RealTimeClock.
+    */
+    static Pointer New(void);
   }; //namespace
 }
 

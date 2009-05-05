@@ -20,11 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 
 #include "mitkRealTimeClock.h"
-#if defined (WIN32) || defined (_WIN32)
-#include "mitkWindowsRealTimeClock.h"
-#else
-#include "mitkLinuxRealTimeClock.h"
-#endif
 
 mitk::TimeStamp::Pointer mitk::TimeStamp::s_Instance = NULL;
 
@@ -220,20 +215,15 @@ double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
 }
 
 /**
-* \brief creates a new RealTimeClock dependant on the OS in use.
+* \brief creates a new RealTimeClock
 *
-* On windows-systems a WindowsRealTimeClock and on linux-systems a LinuxRealTimeClock 
-* will be created. (SURPRISE!)
+* Instanciates a new RealTimeClock, that will be specific for the Operating System.
 * This will only be called internally when no other RealTimeClock has been set
 * by the user.
 *
 */
 void mitk::TimeStamp::Initialize()
 {
-  #  if defined (WIN32) || defined (_WIN32)
-    m_RealTimeClock = mitk::WindowsRealTimeClock::New();
-  #else
-    m_RealTimeClock = mitk::LinuxRealTimeClock::New();
-  #endif
+  m_RealTimeClock = mitk::RealTimeClock::New();
 }
 

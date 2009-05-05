@@ -16,12 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTimeStamp.h"
-
-#if defined (WIN32) || defined (_WIN32)
-#include "mitkWindowsRealTimeClock.h"
-#else
-#include "mitkLinuxRealTimeClock.h"
-#endif
+#include "mitkRealTimeClock.h"
 
 #include "mitkTestingMacros.h"
 #include "itkObject.h"

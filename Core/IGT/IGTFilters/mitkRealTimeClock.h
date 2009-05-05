@@ -46,6 +46,9 @@ namespace mitk {
     *\brief instanciates a new, operating-system dependant, instance of mitk::RealTimeClock.
     */
     static Pointer New(void);
+
+    virtual double GetCurrentStamp() = 0;
+
   }; //namespace
 }
 

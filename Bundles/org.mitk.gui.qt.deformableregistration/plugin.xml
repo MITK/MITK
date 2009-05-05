@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.opencherry.ui.views">
+    <view id="org.mitk.views.deformableregistration"
+          name="DeformableRegistration"
+          class="::QmitkDeformableRegistrationView"
+          icon="resources/DeformableRegistration.xpm" />
+  </extension>
+
+</plugin>

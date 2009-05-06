@@ -140,7 +140,7 @@ unnatural to put something other here, but the Designer will strip the leading "
 lowercase characters (until the next uppercase character) from these strings, when displaying them
 in the toolbox. You if you happen to name your class QmitkRenderManagerEdit it will appear as
 "RenderManagerEdit". A widget named QvtkRenderManagerEdit will appear under exactly the same name
-"RenderManagerEdit". But still, <b><big>always use your real C++ class names here</big></b>.
+"RenderManagerEdit". But still, <b>always use your real C++ class names here</b>.
 Otherwise some part of the Designer or the widget factory or whatever will get confused and you'll
 experience strange side effects, like your widget appears on the form but not in the preview, or
 header files required by your widget won't appear in the .ui file. 
@@ -355,7 +355,7 @@ TARGET_LINK_LIBRARIES( QmitkUndoRedoButton_plugin ITKCommon ${QT_LIBRARIES})
 \endverbatim
 
 Note, that currently the \c MITK_EXPORT macro is defined so that it expands to nothing, when no
-special \c #define is set. That is, the plugin is built as a shared library, which can be used with
+special \c \#define is set. That is, the plugin is built as a shared library, which can be used with
 the Designer. But the widget is compiled into the Qmitk library, too. Otherwise a new dependency
 on a DLL for a single widget would be added.
 

@@ -221,7 +221,7 @@ class MITK_CORE_EXPORT ToolManager : public itk::Object
 
     /**
       You may specify a list of tool "groups" that should be available for this ToolManager. Every Tool can report its group
-      as a string. This constructor will try to find the tool's group inside the supplied string \param groups. If there is a match,
+      as a string. This constructor will try to find the tool's group inside the supplied string. If there is a match,
       the tool is accepted. Effectively, you can provide a human readable list like "default, lymphnodevolumetry, oldERISstuff".
     */
     ToolManager(); // purposely hidden

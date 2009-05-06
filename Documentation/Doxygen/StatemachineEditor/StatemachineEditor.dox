@@ -27,19 +27,19 @@ Start Eclipse and select "File" -> "Import...".
 
 \image html Import.PNG "\b Fig.1: Import"
 
-In the popup window (<B>Fig.1: Import</B>) select the folder "Plug-in Development" and "Plug-ins and Fragments". Click "Next >".
+In the popup window (<b>Fig.1: Import</b>) select the folder "Plug-in Development" and "Plug-ins and Fragments". Click "Next >".
 
 \image html Import2.PNG "\b Fig.2: Import Plug-ins and Fragments"
 
-On the page "Import Plug-ins and Fragments" (\b Fig.2: Import Plug-ins and Fragments</B>) just click "Next >".
+On the page "Import Plug-ins and Fragments" (<b> Fig.2: Import Plug-ins and Fragments</b>) just click "Next >".
 
 \image html Import3.PNG "\b Fig.3: Selection"
 
-On the page "Selection" (\b Fig.3: Selection</B>) select the "StateMachines (1.0.0)" Plug-in and click the "Add ->" button.
+On the page "Selection" (<b> Fig.3: Selection</b>) select the "StateMachines (1.0.0)" Plug-in and click the "Add ->" button.
 
 \image html Import4.PNG "\b Fig.4: Selection 2"
 
-Click "Finish" (\b Fig.4: Selection 2</B>).
+Click "Finish" (<b> Fig.4: Selection 2</b>).
 
 Now you have to make sure that the path to vecmath.jar and jdom.jar is set correctly.
 
@@ -52,7 +52,7 @@ Now you should be able to start a Run-time Workbench.
 
 \image html Runas.png "\b Fig.6: Start Run-time Workbench"
 
-Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (<B>Fig.6: Start Run-time Workbench</B>).
+Therefore you have to press the "Run" button and select "Eclipse Application". Click "OK" (<b>Fig.6: Start Run-time Workbench</b>).
 
 A new Eclipse workbench opens where we can use the Statemachine-Editor.
 

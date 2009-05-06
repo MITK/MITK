@@ -34,16 +34,16 @@ class HierarchicalInteractor;
 //##Documentation
 //## @brief Interface for an Interactor.
 //##
-//## The Interactor is held with a SmartPointer by a DataTreeNode 
+//## The Interactor is held with a SmartPointer by a DataTreeNode
 //## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
-//## Different Modes: In order to work with hierarchical StateMachines and not to send Events to all StateMachines, a StateMachine can be 
-//## in three different modes: 
+//## Different Modes: In order to work with hierarchical StateMachines and not to send Events to all StateMachines, a StateMachine can be
+//## in three different modes:
 //## DESELECTED: this statemachine doesn't wait for an event
 //## SELECTED: this statemachine just has handled an event and waits for the next one
 //## SUBSELECTED: a hierarchical lower statemachine has just handled an event so this statemachine wants to pass the event to this machine
-//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data, 
+//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data,
 //## subselect if a subobject is selected (and a submachine is selected).
-//## Set the mode in each hierachical lavel of a statemachine! Each statemachine has to to this on its own in ExecuteAction, cause only here 
+//## Set the mode in each hierachical lavel of a statemachine! Each statemachine has to to this on its own in ExecuteAction, cause only here
 //## can be recognized if a substatemachine has to be selected or this statemachine has to be selected.
 //##
 //## In moving the machine is selected. After a new insert the machine is selected, since the data is also selected
@@ -62,7 +62,7 @@ public:
     mitkNewMacro2Param(Self, const char*, DataTreeNode*);
 
   //##Documentation
-  //##@brief Enumeration of the different modes an Interactor can be into. 
+  //##@brief Enumeration of the different modes an Interactor can be into.
   //## See class documentation for further details
   enum SMMode
   {
@@ -87,8 +87,8 @@ public:
 
   //##Documentation
   //## @brief calculates how good the data, this statemachine handles, is hit by the event.
-  //## 
-  //## Returns a value between 0 and 1 
+  //##
+  //## Returns a value between 0 and 1
   //## where 0 represents not responsible and 1 represents definitive responsible!
   //## Standard function to override if needed.
   //## (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
@@ -105,13 +105,13 @@ protected:
   /**
   * @brief Constructor
   * @param dataTreeNode is the node, this Interactor is connected to
-  * @params type is the type of StateMachine like declared in the XML-Configure-File
+  * @param type is the type of StateMachine like declared in the XML-Configure-File
   *
   * Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
   **/
   Interactor(const char * type, DataTreeNode* dataTreeNode);
 
-  /** 
+  /**
   * @brief Destructor
   **/
   ~Interactor(){}
@@ -132,7 +132,7 @@ protected:
   void CreateModeOperation(ModeType mode);
 
   //##Documentation
-  //## @brief convenience method for accessing the data contained in the 
+  //## @brief convenience method for accessing the data contained in the
   //## node to which this interactor is associated to
   BaseData* GetData() const;
 

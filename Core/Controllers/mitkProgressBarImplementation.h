@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPROGRESSBARIMPLEMENTATION_H
 #define MITKPROGRESSBARIMPLEMENTATION_H
 #include "mitkCommon.h"
-   
-namespace mitk 
+
+namespace mitk
 {
 
   //##Documentation
@@ -29,11 +29,11 @@ namespace mitk
   {
 
   public:
-    
+
     //##Documentation
     //## @brief Constructor
     ProgressBarImplementation(){};
-    
+
     //##Documentation
     //## @brief Destructor
     virtual ~ProgressBarImplementation(){};
@@ -45,10 +45,10 @@ namespace mitk
     //##Documentation
     //## @brief Adds steps to totalSteps.
     virtual void AddStepsToDo(unsigned int steps) =0;
-  
+
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
-    //## @param: steps the number of steps done since last Progress(int steps) call.
+    //## @param steps the number of steps done since last Progress(int steps) call.
     virtual void Progress(unsigned int steps) =0;
   };
 

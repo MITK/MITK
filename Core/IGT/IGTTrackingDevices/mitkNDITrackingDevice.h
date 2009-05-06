@@ -32,15 +32,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNDIPassiveTool.h"
 #include "mitkSerialCommunication.h"
 
-namespace mitk 
+namespace mitk
 {
   class NDIProtocol;
 
   /** Documentation
-  * \brief superclass for specific NDI tracking Devices that use serial communication. 
+  * \brief superclass for specific NDI tracking Devices that use serial communication.
   *
   * implements the TrackingDevice interface for NDI tracking devices (POLARIS, AURORA)
-  * 
+  *
   * \ingroup IGT
   */
   class MITK_IGT_EXPORT NDITrackingDevice : public TrackingDevice
@@ -70,7 +70,7 @@ namespace mitk
 
     /**
     * \brief initialize the connection to the tracking device
-    * 
+    *
     * OpenConnection() establishes the connection to the tracking device by:
     * - initializing the serial port with the given parameters (port number, baud rate, ...)
     * - connection to the tracking device
@@ -82,14 +82,14 @@ namespace mitk
 
     /**
     * \brief Closes the connection
-    * 
+    *
     * CloseConnection() resets the tracking device, invalidates all tools and then closes the serial port.
     */
     virtual bool CloseConnection();
 
     /**
-    * \brief Start the tracking. 
-    * 
+    * \brief Start the tracking.
+    *
     * A new thread is created, which continuously reads the position and orientation information of each tool and stores them inside the tools.
     * Depending on the current operation mode (see SetOperationMode()), either the 6D tools (ToolTracking6D), 5D tools (ToolTracking5D),
     * 3D marker positions (MarkerTracking3D) or both 6D tools and 3D markers (HybridTracking) are updated.
@@ -98,10 +98,10 @@ namespace mitk
     virtual bool StartTracking();
 
     /**
-    * \brief return the tool with index toolNumber 
+    * \brief return the tool with index toolNumber
     */
     virtual TrackingTool* GetTool(unsigned int toolNumber);
-    
+
     /**
     * \brief return current number of tools
     */
@@ -116,14 +116,14 @@ namespace mitk
     * that can be used to read tracking data from it.
     * This is the only way to add tools to NDITrackingDevice.
     *
-    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
+    * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName, TrackingPriority p = NDIPassiveTool::Dynamic);
 
     /**
     * \brief Remove a passive 6D tool from the list of tracked tools.
     *
-    * \WARNING removing tools is not possible in tracking mode, only in setup and ready modes.
+    * \warning removing tools is not possible in tracking mode, only in setup and ready modes.
     */
     virtual bool RemoveTool(TrackingTool* tool);
 
@@ -136,8 +136,8 @@ namespace mitk
     virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
     virtual void SetBaudRate(const BaudRate _arg);     ///< set baud rate for serial communication
     virtual void SetDataBits(const DataBits _arg);     ///< set number of data bits
-    virtual void SetParity(const Parity _arg);         ///< set parity mode 
-    virtual void SetStopBits(const StopBits _arg);     ///< set number of stop bits 
+    virtual void SetParity(const Parity _arg);         ///< set parity mode
+    virtual void SetStopBits(const StopBits _arg);     ///< set number of stop bits
     virtual void SetHardwareHandshake(const HardwareHandshake _arg);  ///< set use hardware handshake for serial communication
     virtual void SetIlluminationActivationRate(const IlluminationActivationRate _arg); ///< set activation rate of IR illumator for polaris
     virtual void SetDataTransferMode(const DataTransferMode _arg);    ///< set data transfer mode to text (TX) or binary (BX). \warning: only TX is supportet at the moment
@@ -149,7 +149,7 @@ namespace mitk
 
     virtual bool SetOperationMode(OperationMode mode);  ///< set operation mode to 6D tool tracking, 3D marker tracking or 6D&3D hybrid tracking (see OperationMode)
     virtual OperationMode GetOperationMode();           ///< get current operation mode
-    
+
     /**
     * \brief Get 3D marker positions (operation mode must be set to MarkerTracking3D or HybridTracking)
     */
@@ -160,7 +160,7 @@ namespace mitk
     /**
     * \brief Add a passive 6D tool to the list of tracked tools. This method is used by AddTool
     *
-    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
+    * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
     virtual bool InternalAddTool(NDIPassiveTool* tool);
 
@@ -181,35 +181,35 @@ public://TODO
     /**
     * \brief TrackTools() continuously polls serial interface for new 6d tool positions until StopTracking is called.
     *
-    * Continuously tracks the 6D position of all tools until StopTracking() is called. 
-    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()). 
+    * Continuously tracks the 6D position of all tools until StopTracking() is called.
+    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()).
     * It should not be called directly.
     */
-    virtual void TrackTools();            
+    virtual void TrackTools();
 
     /**
     * \brief continuously polls serial interface for new 3D marker positions until StopTracking is called.
     *
-    * Continuously tracks the 3D position of all markers until StopTracking() is called. 
-    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()). 
+    * Continuously tracks the 3D position of all markers until StopTracking() is called.
+    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()).
     * It should not be called directly.
     */
     virtual void TrackMarkerPositions();
-    
+
     /**
     * \brief continuously polls serial interface for new 3D marker positions and 6D tool positions until StopTracking is called.
     *
-    * Continuously tracks the 3D position of all markers and the 6D position of all tools until StopTracking() is called. 
-    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()). 
+    * Continuously tracks the 3D position of all markers and the 6D position of all tools until StopTracking() is called.
+    * This function is executed by the tracking thread (through StartTracking() and ThreadStartTracking()).
     * It should not be called directly.
     */
     virtual void TrackToolsAndMarkers();
-    
+
     /**
     * \brief static start method for the tracking thread.
     */
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
-    
+
     /**
     * \brief set current error message
     */
@@ -239,7 +239,7 @@ public://TODO
     int m_ThreadID;                 ///< ID of tracking thread
     OperationMode m_OperationMode;  ///< tracking mode (6D tool tracking, 3D marker tracking,...)
     itk::FastMutexLock::Pointer m_MarkerPointsMutex;  ///< mutex for marker point data container
-    MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)  
+    MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)
   };
 } // namespace mitk
 #endif /* MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2 */

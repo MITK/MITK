@@ -19,7 +19,7 @@ Interaction in 2D views:
            This is probably the fastest way of getting an overview of the image.
  \li <tt>Middle mouse-button</tt>: Pan the visible part of the image. This is useful when you zoomed "too much" into an image.
  \li <tt>Right mouse-button</tt>: Zooming the image: drag up to zoom into, drag down to zoom out.
- \li <tt>Mouse wheel<\tt>: Scrolls through the slices one by one. This is sometimes very slow.
+ \li <tt>Mouse wheel</tt>: Scrolls through the slices one by one. This is sometimes very slow.
 
 Interaction in 3D scene:
 

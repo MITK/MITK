@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 
@@ -61,7 +61,7 @@ namespace mitk
 }
 
 /**
- * This class provides some data handling methods, like loading data or adding different 
+ * This class provides some data handling methods, like loading data or adding different
  * types to the data tree...
  */
 namespace CommonFunctionality
@@ -119,7 +119,7 @@ namespace CommonFunctionality
 
 
   /**
-  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to 
+  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to
   * the referenced datatree
   */
   template < typename TImageType >
@@ -154,7 +154,7 @@ namespace CommonFunctionality
 
 
   /**
-  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to 
+  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to
   * the referenced datatree
   */
   template < typename TMeshType >
@@ -194,13 +194,13 @@ namespace CommonFunctionality
     node->SetVisibility(true, NULL );
   }
   /**
-  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to 
+  * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to
   * the referenced datatree
   */
   QMITK_EXPORT mitk::DataTreeNode::Pointer AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIteratorBase* iterator, std::string str);
 
   /**
-  * \brief creates a datatreenode for th PIC image and adds the node to 
+  * \brief creates a datatreenode for th PIC image and adds the node to
   * the referenced datatree
   */
   QMITK_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
@@ -215,12 +215,12 @@ namespace CommonFunctionality
   QMITK_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 
   QMITK_EXPORT std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
-  
+
   /**
    * Saves a screenshot of the given renderer in a file.
    * @param renderWindow the render window to generate a screenshot from. If renderWindow
    *                     is NULL, the function returns an empty string.
-   * @param filename     the filename, under which the file should be saved. If 
+   * @param filename     the filename, under which the file should be saved. If
    *                     filename is NULL, a file selector pops up and asks for a
    *                     file name. The file type is determined via the extension
    *                     of the screen shot
@@ -231,7 +231,7 @@ namespace CommonFunctionality
   QMITK_EXPORT void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
 
   // internal vessel graph save code removed ...
-  
+
   QMITK_EXPORT void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
   QMITK_EXPORT mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
@@ -240,16 +240,16 @@ namespace CommonFunctionality
   QMITK_EXPORT mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
 
   /**
-  * Checks if the filename is valid for writing. This includes checking whether the file already exists. 
+  * Checks if the filename is valid for writing. This includes checking whether the file already exists.
   * If so, the user is asked whether he wants to overwrite the existing file. In addition, the writing permission is checked.
-  * @param filename the filename, under which the file should be saved. 
-  * @returns true if the filename is valid for writing  
+  * @param aFileName the filename, under which the file should be saved.
+  * @returns true if the filename is valid for writing
   */
   QMITK_EXPORT bool IsFilenameValidForWriting(const char* aFileName);
 
 
   /**
-   * Searches for the first node in the data tree, which holds a given type. 
+   * Searches for the first node in the data tree, which holds a given type.
    * @param it an iterator pointing to the position in the data tree, where
    *          the search should start
    * @returns the first node in the data tree which is of the type given by
@@ -269,7 +269,7 @@ namespace CommonFunctionality
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
       if ( node.IsNull() )
       {
-        itkGenericOutputMacro("Iterator points to a node that is NULL!"); 
+        itkGenericOutputMacro("Iterator points to a node that is NULL!");
       }
       else if ( node->GetData() != NULL )
       {
@@ -288,7 +288,7 @@ namespace CommonFunctionality
   }
 
   /**
-   * Searches for the data object in the data tree, which matches a given type. 
+   * Searches for the data object in the data tree, which matches a given type.
    * @param it an iterator pointing to the position in the data tree, where
    *          the search should start
    * @returns the first data oobject in the data tree which is of the type given by
@@ -309,7 +309,7 @@ namespace CommonFunctionality
   }
 
   /**
-   * Searches for the first node in the data tree, which holds a given type 
+   * Searches for the first node in the data tree, which holds a given type
    * and matches a given property key and value. This may be used to search
    * e.g. for a node holding an image with a given name in the data tree.
    * @param it an iterator pointing to the position in the data tree, where
@@ -333,7 +333,7 @@ namespace CommonFunctionality
       mitk::DataTreeNode::Pointer node = iteratorClone->Get();
       if ( node.IsNull() )
       {
-        itkGenericOutputMacro("Iterator points to a node that is NULL!"); 
+        itkGenericOutputMacro("Iterator points to a node that is NULL!");
       }
       else if ( node->GetData() != NULL )
       {
@@ -355,7 +355,7 @@ namespace CommonFunctionality
   }
 
   /**
-   * Searches for the first data object in the data tree, which is of a given type 
+   * Searches for the first data object in the data tree, which is of a given type
    * and whose node matches a given property key and value. This may be used to search
    * e.g. for an image with a given name in the data tree.
    * @param it an iterator pointing to the position in the data tree, where
@@ -380,7 +380,7 @@ namespace CommonFunctionality
   }
 
   /**
-   * Searches for the first node in the data tree, which matches a given 
+   * Searches for the first node in the data tree, which matches a given
    * property key and value. This may be used to search e.g. for a node holding
    * a data object with a given name in the data tree.
    * @param it an iterator pointing to the position in the data tree, where
@@ -392,7 +392,7 @@ namespace CommonFunctionality
   QMITK_EXPORT mitk::DataTreeNode* GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
 
   /**
-   * Searches for the first data object in the data tree, whose node matches a given 
+   * Searches for the first data object in the data tree, whose node matches a given
    * property key and value. This may be used to search e.g. for a node holding
    * a data object with a given name in the data tree.
    * @param it an iterator pointing to the position in the data tree, where
@@ -403,7 +403,7 @@ namespace CommonFunctionality
    */
   QMITK_EXPORT mitk::BaseData* GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
   /**
-   * Searches for the node in the data tree which holds a given mitk::BaseData 
+   * Searches for the node in the data tree which holds a given mitk::BaseData
    * @param it an iterator pointing to the position in the data tree, where
    *          the search should start
    * @param data the data object, for which the node in the tree should be searched.

@@ -31,7 +31,7 @@ namespace mitk {
   //##
   //## The function WriteXML() writes a complete XML node and its data (calls the functions BeginNode(), WriteProperty(), WriteXMLData() and EndNode() of the XMLWriter class).
   //## Normally the function WriteXML() is used to write mitk classes to the XML file
-  //## e.g. <dataTreeNode CLASS_NAME="class mitk::DataTreeNode"> ...data... </dataTreeNode>
+  //## e.g. \<dataTreeNode CLASS_NAME="class mitk::DataTreeNode"\> ...data... \</dataTreeNode\>
   //## To write the data of a XML node (e.g. child nodes, attributes) call the function WriteXMLData().
   //## For elements like the data of data types you can use the functions BeginNode(), EndNode() from the BaseXMLWriter class to write a XML node.
   //## To read data from the XML file call the function ReadXMLData().
@@ -42,11 +42,11 @@ namespace mitk {
   //## Just have a look to the documentation of the module IO classes.
   //## @ingroup IO
   class MITK_CORE_EXPORT XMLIO {
-  
+
   public:
 
     virtual ~XMLIO() {};
-    
+
     virtual const char* GetNameOfClass() const = 0;
 
     /// writes a XML node and its data (calls the functions BeginNode(), WriteXMLData() and EndNode()).

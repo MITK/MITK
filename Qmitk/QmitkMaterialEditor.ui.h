@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 /****************************************************************************
@@ -31,10 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /**
- * The widget QmitkMaterialEditor gives the user the possibility to edit 
+ * The widget QmitkMaterialEditor gives the user the possibility to edit
  * materials associated with an object. Some things are simplified to make it
  * easier for the user. The specular and color coefficients may not be edited
- * separately, since it is hard to get good-looking results. Thus, they are 
+ * separately, since it is hard to get good-looking results. Thus, they are
  * modified together via a single slider. Additionally, the specular color may
  * not be changed.
  * Note that not only one material property may be edited at once, but also
@@ -81,22 +81,22 @@ void QmitkMaterialEditor::destroy()
 /**
  * Slot which reacts on a color change by the user. Fills the current material
  * property with the new color and forwards it to the current showcase.
- * @param value the slider value, which represents the new color. 
+ * @param value the slider value, which represents the new color.
  */
 void QmitkMaterialEditor::OnColorChanged( int value )
 {
     mitk::MaterialProperty::Color color = this->ValueToColor( value );
     m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
     m_Showcases[ m_ActiveShowcase ]->SetColor( color );
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 
 /**
- * Slot which reacts on a specular power change by the user. Fills the current 
- * material property with the new coefficient and forwards it to the current 
+ * Slot which reacts on a specular power change by the user. Fills the current
+ * material property with the new coefficient and forwards it to the current
  * showcase.
  * @param value the slider value, which represents the new coefficient. The slider
  * value is normalized to be in range of the specular powers value range
@@ -109,14 +109,14 @@ void QmitkMaterialEditor::OnSpecularPowerChanged( int value )
       m_MaterialProperties->GetElement( index )->SetSpecularPower( power );
       m_Showcases[ index ]->SetSpecularPower( power );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 /**
- * Slot which reacts on a opacity change by the user. Fills the current 
- * material property with the new coefficient and forwards it to the current 
+ * Slot which reacts on a opacity change by the user. Fills the current
+ * material property with the new coefficient and forwards it to the current
  * showcase.
  * @param value the slider value, which represents the new opacity. The slider
  * value is normalized to be in range of the opacity value range
@@ -129,15 +129,15 @@ void QmitkMaterialEditor::OnOpacityChanged( int value )
       m_MaterialProperties->GetElement( index )->SetOpacity( opacity );
       m_Showcases[ index ]->SetOpacity( opacity );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 /**
- * Slot which reacts on a line width change by the user. Fills the current 
- * material property with the new line width and forwards it to the current 
+ * Slot which reacts on a line width change by the user. Fills the current
+ * material property with the new line width and forwards it to the current
  * showcase.
- * @param value the slider value, which represents the line width. 
+ * @param value the slider value, which represents the line width.
  */
 void QmitkMaterialEditor::OnLineWidthChanged( int value )
 {
@@ -147,7 +147,7 @@ void QmitkMaterialEditor::OnLineWidthChanged( int value )
       m_MaterialProperties->GetElement( index )->SetLineWidth( lineWidth );
       m_Showcases[ index ]->SetLineWidth( lineWidth );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 /**
@@ -164,7 +164,7 @@ void QmitkMaterialEditor::OnOKClicked()
     for ( unsigned int i = 0 ; i < m_MaterialProperties->size() ; ++i )
     {
         assert ( m_OriginalMaterialProperties->GetElement( i ).IsNotNull() );
-        assert ( m_MaterialProperties->GetElement( i ).IsNotNull() );        
+        assert ( m_MaterialProperties->GetElement( i ).IsNotNull() );
         m_OriginalMaterialProperties->GetElement( i )->Initialize( * ( m_MaterialProperties->GetElement( i ) ), false ) ;
     }
 
@@ -204,7 +204,7 @@ void QmitkMaterialEditor::OnPreviewClicked()
 
 /**
  * Initializes the dialog with the materials given in material property
- * @param material property the materials which should be edited. Note that
+ * @param materialProperty property the materials which should be edited. Note that
  * if the user presses OK, materialProperty will be modified. If Cancel is pressed.
  * the object remains unchanged.
  */
@@ -238,7 +238,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialProperty* materialProperty )
 void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Pointer materialPropertyVectorContainer )
 {
     assert ( materialPropertyVectorContainer.IsNotNull() );
-    ClearMaterialProperties();     
+    ClearMaterialProperties();
     for ( unsigned int i = 0 ; i < materialPropertyVectorContainer->size() ; ++i )
     {
         mitk::MaterialProperty::Pointer materialProperty = materialPropertyVectorContainer->GetElement( i );
@@ -259,7 +259,7 @@ void QmitkMaterialEditor::Initialize( mitk::MaterialPropertyVectorContainer::Poi
 }
 
 /**
- * Fills a grid with a set of showcases, one for each object in m_MaterialProperties. 
+ * Fills a grid with a set of showcases, one for each object in m_MaterialProperties.
  */
 void QmitkMaterialEditor::Initialize()
 {
@@ -385,27 +385,27 @@ int QmitkMaterialEditor::ColorToValue( mitk::MaterialProperty::Color color )
 {
     int value = 0;
     vtkFloatingPointType* rgba = color.GetDataPointer();
-    
+
     //
     // Mindestens ein Wert muss 0 sein und die Summe der anderen
     // Beiden 1. Ansonsten kommt die Farbe nicht aus dem Farbraum.
     //
-    
+
     // check that at least one value is 0
     if ( rgba[0] > 0.00001 &&
          rgba[1] > 0.00001 &&
-         rgba[2] > 0.00001 
+         rgba[2] > 0.00001
        )
     {
       return -1;
     }
-    
+
     // check that the sum is 1
     if ( fabs ( rgba[0] + rgba[1] + rgba[2] - 1.0 ) > 0.00001 )
     {
-        return -1;  
+        return -1;
     }
-    
+
     //
     // now we know, that the color is from the given color space an can convert
     // it back to a slider value
@@ -444,8 +444,8 @@ void QmitkMaterialEditor::OnColorSelectButtonClickedClicked()
       color.SetBlue( result.blue() / 255.0 );
       m_MaterialProperties->GetElement( m_ActiveShowcase )->SetColor( color );
       m_Showcases[ m_ActiveShowcase ]->SetColor( color );
-      
-      if (m_Inline ) 
+
+      if (m_Inline )
       {
         OnOKClicked(); // here we are being closed because inside some popup menu, so the user can't possibly hit the accept button anymore
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -455,8 +455,8 @@ void QmitkMaterialEditor::OnColorSelectButtonClickedClicked()
 
 
 /**
- * Slot which reacts on a coefficient change by the user. Fills the current 
- * material property with the new coefficient and forwards it to the current 
+ * Slot which reacts on a coefficient change by the user. Fills the current
+ * material property with the new coefficient and forwards it to the current
  * showcase. The coefficient whill be used for BOTH color coefficient and specular
  * coefficient.
  * @param value the slider value, which represents the new coefficient. The slider
@@ -475,7 +475,7 @@ void QmitkMaterialEditor::OnCoefficientsChanged( int value )
       m_Showcases[ index ]->SetColorCoefficient( coefficient );
       m_Showcases[ index ]->SetSpecularCoefficient( coefficient );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -493,7 +493,7 @@ void QmitkMaterialEditor::OnInterpolationChanged( int item )
       m_MaterialProperties->GetElement( index )->SetInterpolation( interpolation );
       m_Showcases[ index ]->SetInterpolation( interpolation );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -512,7 +512,7 @@ void QmitkMaterialEditor::OnRepresentationChanged( int item )
       m_MaterialProperties->GetElement( index )->SetRepresentation( representation );
       m_Showcases[ index ]->SetRepresentation( representation );
     }
-    
+
     if (m_Inline) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -530,7 +530,7 @@ void QmitkMaterialEditor::OnMaterialShowcaseSelected( QmitkMaterialShowcase * sh
     }
     else
     {
-        std::cout << "Warning: showcase is NULL!" << std::endl;    
+        std::cout << "Warning: showcase is NULL!" << std::endl;
     }
 }
 

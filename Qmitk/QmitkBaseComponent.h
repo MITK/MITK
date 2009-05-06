@@ -53,34 +53,34 @@ class QMITK_EXPORT QmitkBaseComponent : public QObject
 public:
 
   /***************       CONSTRUCTOR      ***************/
-  /** 
+  /**
   * @brief Constructor
   */
   QmitkBaseComponent(QObject *parent=0, const char *name=0);
 
   /***************        DESTRUCTOR      ***************/
-  /** 
-  * @brief Destructor 
+  /**
+  * @brief Destructor
   */
   virtual  ~QmitkBaseComponent();
 
-  /** 
-  * @brief Method to create the GUI for the component from the .ui-File. This Method is obligatory 
+  /**
+  * @brief Method to create the GUI for the component from the .ui-File. This Method is obligatory
   */
   virtual QWidget* CreateControlWidget(QWidget* parent);
 
-  /** 
+  /**
   * @brief Method to create the connections for the component. This Method is obligatory even if no connections is needed
   */
   virtual void CreateConnections();
 
-  /** 
+  /**
   * @brief The TreeChanged-slot-method if the component needs this information then reimplement
   */
   virtual void TreeChanged();
 
-  /** 
-  * @brief Method to set the Name of the Functionality 
+  /**
+  * @brief Method to set the Name of the Functionality
   */
   void SetFunctionalityName(QString name);
 
@@ -98,8 +98,8 @@ public:
   /************ GET MAIN CHECK BOX CONTAINER ************/
   virtual QGroupBox * GetMainCheckBoxContainer();
 
-  /** 
-  * @brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()" 
+  /**
+  * @brief Method to set the "GetContentContainer"-visible or not, addicted to the visibility of a parent-component and the status of the checkable ComboBox from "GetMainCheckBoxContainer()"
   */
   virtual void SetContentContainerVisibility(bool);
 
@@ -136,14 +136,14 @@ protected:
 
   /***************        SET AND GET     ***************/
   /*!
-  * @biref To set whether this component can be used or not. Thats why some components can only be used  in connexion with other components.
+  * @brief To set whether this component can be used or not. Thats why some components can only be used  in connexion with other components.
   */
   virtual void SetAvailability(bool available);
 
   QObject* GetParent();
 
-  /** 
-  * @brief Vector with all added components 
+  /**
+  * @brief Vector with all added components
   */
   std::vector<QmitkBaseComponent*> m_AddedChildList;
 

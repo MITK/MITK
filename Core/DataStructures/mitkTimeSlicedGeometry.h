@@ -24,18 +24,18 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief Describes a geometry consisting of several geometries which 
+//## @brief Describes a geometry consisting of several geometries which
 //## exist at different times.
 //##
 //## The geometry contains m_TimeSteps geometries, which can be accessed
-//## using GetGeometry3D(int t). To convert between world-time in 
+//## using GetGeometry3D(int t). To convert between world-time in
 //## milliseconds and the integer timestep-number use MSToTimeStep.
 //## The hull (in space and time) of the TimeSlicedGeometry contains all
-//## contained geometries. 
+//## contained geometries.
 //## @warning The hull (i.e., transform, bounding-box and
-//## time-bounds) is only guaranteed to be up-to-date after calling 
+//## time-bounds) is only guaranteed to be up-to-date after calling
 //## UpdateInformation().
-//## 
+//##
 //## TimeSlicedGeometry and the associated Geometry3Ds have to be
 //## initialized in the method GenerateOutputInformation() of BaseProcess (or
 //## CopyInformation/ UpdateOutputInformation of BaseData, if possible, e.g.,
@@ -43,7 +43,7 @@ namespace mitk {
 //## itk::ProcessObject::GenerateOutputInformation(),
 //## itk::DataObject::CopyInformation() and
 //## itk::DataObject::UpdateOutputInformation().
-//## 
+//##
 //## @ingroup Geometry
 class MITK_CORE_EXPORT TimeSlicedGeometry : public Geometry3D
 {
@@ -66,9 +66,9 @@ public:
 
   //##Documentation
   //## @brief Set/Get whether the TimeSlicedGeometry is evenly-timed (m_EvenlyTimed)
-  //## 
-  //## If (a) we don't have a Geometry3D stored for the requested time, 
-  //## (b) m_EvenlyTimed is activated and (c) the first geometry (t=0) 
+  //##
+  //## If (a) we don't have a Geometry3D stored for the requested time,
+  //## (b) m_EvenlyTimed is activated and (c) the first geometry (t=0)
   //## is set, then we clone the geometry and set the m_TimeBounds accordingly.
   //## \sa GetGeometry3D
    itkGetConstMacro(EvenlyTimed, bool);
@@ -98,19 +98,19 @@ public:
   virtual bool ReadXMLData( XMLReader& xmlReader );
 
   //##Documentation
-  //## @brief Completely initialize this instance as evenly-timed with 
-  //## @timeSteps geometries of type Geometry3D, each initialized by
+  //## @brief Completely initialize this instance as evenly-timed with
+  //## \a timeSteps geometries of type Geometry3D, each initialized by
   //## Geometry3D::Initialize().
   virtual void Initialize(unsigned int timeSteps);
 
   //##Documentation
-  //## @brief Completely initialize this instance as evenly-timed with 
-  //## \a timeSteps geometries identical to the provided Geometry3D 
+  //## @brief Completely initialize this instance as evenly-timed with
+  //## \a timeSteps geometries identical to the provided Geometry3D
   //## except for the time bounds
   virtual void InitializeEvenlyTimed(mitk::Geometry3D* geometry3D, unsigned int timeSteps);
 
   //##Documentation
-  //## @brief Initialize this instance to contain \a timeSteps 
+  //## @brief Initialize this instance to contain \a timeSteps
   //## geometries, but without setting them yet
   virtual void InitializeEmpty(unsigned int timeSteps);
 
@@ -129,12 +129,12 @@ public:
   //## in timeslicedgeometry into the geometries contained in this
   //## TimeSlicedGeometry object.
   //##
-  //## Useful for initialization of the TimeSlicedGeometry of the 
-  //## output in GenerateOutputInformation() methods of process objects, 
+  //## Useful for initialization of the TimeSlicedGeometry of the
+  //## output in GenerateOutputInformation() methods of process objects,
   //## see for example BoundingObjectCutter::GenerateOutputInformation().
-  //## @param t start time index 
-  //## @param endtimeindex (endtimeindex) is the time index of 
-  //## the last geometry whose time-bounds are copied. If 
+  //## @param t start time index
+  //## @param endtimeindex (endtimeindex) is the time index of
+  //## the last geometry whose time-bounds are copied. If
   //## timeslicedgeometry or this TimeSlicedGeometry object does
   //## not contain enough geometries, endtimeindex is reduced
   //## appropriately.
@@ -143,8 +143,8 @@ public:
   //##Documentation
   //## @brief duplicates the geometry
   virtual AffineGeometryFrame3D::Pointer Clone() const;
-  
-  virtual void ExecuteOperation(Operation* operation); 
+
+  virtual void ExecuteOperation(Operation* operation);
 protected:
   TimeSlicedGeometry();
 

@@ -94,7 +94,6 @@ The diagram below shows the important classes related to a functionality.
  Documentation you should read
  
  \li \ref Widgets
- \li \ref Applications
  \li \ref SampleApp
  
  Classes you should be aware of:

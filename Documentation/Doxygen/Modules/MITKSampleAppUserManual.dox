@@ -103,7 +103,7 @@ You can move the three 2D views through your data by clicking and dragging the m
   <li> You <b>move slices</b> by dragging the crosshair in any of the 2D views. Alternatively you can use the mouse wheel to scroll through the slices of a 2D view.
   <li> You <b>zoom</b> by holding down the right mouse button and then moving the cursor up and down.
   <li> You <b>pan</b> the current view by dragging inside a renderwindow with the middle mouse button.
-<ul>
+</ul>
 
 In 3D, the left mouse button function changes to rotation of the whole scene.
 

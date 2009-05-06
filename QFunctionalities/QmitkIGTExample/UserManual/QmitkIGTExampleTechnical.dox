@@ -17,11 +17,13 @@ Desribe all classes that are used by QmitkIGTExample and how they work together
 - Build a GUI Widget that allows to display and change the filter parameters (Sliders, LineEdits...)
 - Add a method to read a PropertyList to the widget:
 
+
+\code
 void QmitkMyFilterWidget::SetMyFilterParameters(mitk::PropertyList* p)
 {
   if (p == NULL)
     return;
-  /* read properties and update GUI elements. Example for a Vector3D: */
+  // read properties and update GUI elements. Example for a Vector3D:
   mitk::Vector3D v;
   if (p->GetPropertyValue<mitk::Vector3D>("MyFilter_MyParameter", v) == true) 
   {
@@ -47,9 +49,12 @@ void QmitkMyFilterWidget::m_ChangeOffset_clicked()
   m_Parameters->SetProperty("MyFilter_MyParameter", mitk::Vector3DProperty::New(v));
   emit ParametersChanged();
 }
+\endcode
 
 - In your Functionality:
 - If you want to use the persistence mechanism of the MainApp, add a listener method to the ParametersChanged() signal:
+
+\code
 slot:
    void OnParametersChanged();
 
@@ -67,9 +72,11 @@ void QmitkMyFunctionality::OnParametersChanged()
   */
   GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_MyFilterWidget->m_Parameters.GetPointer(), true);
 }
+\endcode
 
 - When creating/using the filter, use the property list of the widget to set the parameters:
 
+\code
   m_MyFilter = mitk::MyFilter::New();
   mitk::Vector3D param1;
   /* Variant 1: check if each parameter is stored in the propertylist. If none is found, use hardcoded values */
@@ -79,10 +86,11 @@ void QmitkMyFunctionality::OnParametersChanged()
   /* Variant 2: set the list directly */
   m_Displacer->SetParameters(GetFunctionalityOptionsList()) 
   /* (make sure that the list containes all parameters!) */
-
+\endcode
 
 - When using persistence, the functionality options list will contain filter parameters on the next application startup. to initialize the GUI widget with these values, call its SetMyFilterParameters() method when it is created:
 
+\code
 QWidget * QmitkMyFunctionality::CreateControlWidget(QWidget *parent)
 {
   if (m_Controls == NULL)
@@ -90,6 +98,7 @@ QWidget * QmitkMyFunctionality::CreateControlWidget(QWidget *parent)
     m_Controls = new QmitkMyFunctionalityControls(parent);
     m_Controls->MyFilter->SetMyFilterParameters(GetFunctionalityOptionsList());
 ...
+\endcode
 
 QmitkIGTExample contains a complete implementation of this. (It does not use a special widget for the displacement filter. Instead, it uses its control widget to hold the filter parameter gui elements)
 

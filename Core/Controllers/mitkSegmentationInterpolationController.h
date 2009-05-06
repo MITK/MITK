@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef mitkSegmentationInterpolationController_h_Included
@@ -42,7 +42,7 @@ class Image;
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 
-  This class keeps track of the contents of a 3D segmentation image. 
+  This class keeps track of the contents of a 3D segmentation image.
   \attention mitk::SegmentationInterpolationController assumes that the image contains pixel values of 0 and 1.
 
   After you set the segmentation image using SetSegmentationVolume(), the whole image is scanned for pixels other than 0.
@@ -66,7 +66,7 @@ class Image;
 class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
-    
+
     mitkClassMacro(SegmentationInterpolationController, itk::Object);
     itkNewMacro(SegmentationInterpolationController); /// specify the segmentation image that should be interpolated
 
@@ -99,7 +99,7 @@ class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
       When you change a single slice, call SetChangedSlice() instead.
     */
     void SetSegmentationVolume( const Image* segmentation );
-    
+
     /**
       \brief Set a reference image (original patient image) - optional.
 
@@ -108,11 +108,11 @@ class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
       (estimated) segmentation.
      */
     void SetReferenceVolume( const Image* segmentation );
-    
+
     /**
       \brief Update after changing a single slice.
 
-      \param slice is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
+      \param sliceDiff is a 2D image with the difference image of the slice determined by sliceDimension and sliceIndex.
              The difference is (pixel value in the new slice minus pixel value in the old slice).
 
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
@@ -123,14 +123,14 @@ class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
     */
     void SetChangedSlice( const Image* sliceDiff, unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
     void SetChangedVolume( const Image* sliceDiff, unsigned int timeStep );
-    
+
     /**
       \brief Generates an interpolated image for the given slice.
-      
+
       \param sliceDimension Number of the dimension which is constant for all pixels of the meant slice.
 
       \param sliceIndex Which slice to take, in the direction specified by sliceDimension. Count starts from 0.
-      
+
       \param timeStep Which time step to use
     */
     Image::Pointer Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
@@ -145,7 +145,7 @@ class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
     class MITK_CORE_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels ) 
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
           : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
         {
         }
@@ -165,17 +165,17 @@ class MITK_CORE_EXPORT SegmentationInterpolationController : public itk::Object
 
     SegmentationInterpolationController();// purposely hidden
     virtual ~SegmentationInterpolationController();
-  
+
     /// internal scan of a single slice
     template < typename DATATYPE >
     void ScanChangedSlice( itk::Image<DATATYPE, 2>*, const SetChangedSliceOptions& options );
 
     template < typename TPixel, unsigned int VImageDimension >
     void ScanChangedVolume( itk::Image<TPixel, VImageDimension>*, unsigned int timeStep );
-    
+
     template < typename DATATYPE >
     void ScanWholeVolume( itk::Image<DATATYPE, 3>*, const Image* volume, unsigned int timeStep );
-    
+
     void PrintStatus();
 
     /**

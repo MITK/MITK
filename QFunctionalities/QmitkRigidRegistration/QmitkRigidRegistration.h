@@ -26,10 +26,10 @@ class QmitkStdMultiWidget;
 class QmitkRigidRegistrationControls;
 
 /*!
-\brief This functionality allows you to register 2D as well as 3D images in a rigid manner.  
+\brief This functionality allows you to register 2D as well as 3D images in a rigid manner.
 
-Register means to align two images, so that they become as similar as possible. 
-Therefore you can select from different transforms, metrics and optimizers. 
+Register means to align two images, so that they become as similar as possible.
+Therefore you can select from different transforms, metrics and optimizers.
 Registration results will directly be applied to the Moving Image.
 
 \sa QmitkFunctionality
@@ -39,65 +39,65 @@ Registration results will directly be applied to the Moving Image.
 \author Daniel Stein
 */
 class QmitkRigidRegistration : public QmitkFunctionality
-{  
+{
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
-    /*!  
-    \brief Default constructor  
-    */  
+    /*!
+    \brief Default constructor
+    */
     QmitkRigidRegistration(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
-    /*!  
-    \brief Default destructor  
-    */  
+    /*!
+    \brief Default destructor
+    */
     virtual ~QmitkRigidRegistration();
 
-    /*!  
-    \brief Method for creating the widget containing the application controls, like sliders, buttons etc.  
-    */  
+    /*!
+    \brief Method for creating the widget containing the application controls, like sliders, buttons etc.
+    */
     virtual QWidget * CreateControlWidget(QWidget *parent);
 
-    /*!  
-    \brief Method for creating the applications main widget  
-    */  
+    /*!
+    \brief Method for creating the applications main widget
+    */
     virtual QWidget * CreateMainWidget(QWidget * parent);
 
-    /*!  
-    \brief Method for creating the connections of main and control widget  
-    */  
+    /*!
+    \brief Method for creating the connections of main and control widget
+    */
     virtual void CreateConnections();
 
-    /*!  
-    \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-    */  
+    /*!
+    \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+    */
     virtual QAction * CreateAction(QActionGroup *parent);
 
-    /*!  
-    \brief Method which is called when this functionality is selected in MITK  
-    */ 
+    /*!
+    \brief Method which is called when this functionality is selected in MITK
+    */
     virtual void Activated();
 
-    /*!  
-    \brief Method which is called whenever the functionality is deselected in MITK  
-    */ 
+    /*!
+    \brief Method which is called whenever the functionality is deselected in MITK
+    */
     virtual void Deactivated();
 
-  protected slots:  
-    
+  protected slots:
+
     /*!
-    * \brief Called whenever the data tree has changed. 
+    * \brief Called whenever the data tree has changed.
     */
     void TreeChanged();
-    
+
     /*!
     * \brief sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(mitk::DataTreeIteratorClone imageIt);
-    
+
     /*!
     * \brief sets the moving Image according to TreeNodeSelector widget
     */
@@ -112,12 +112,12 @@ class QmitkRigidRegistration : public QmitkFunctionality
     * \brief Saves the moving image, intended to be done after a registration.
     */
     void SaveModel();
-    
+
     /*!
     * \brief Undo the last registration.
     */
     void UndoTransformation();
-    
+
     /*!
     * \brief Redo the last registration
     */
@@ -132,7 +132,7 @@ class QmitkRigidRegistration : public QmitkFunctionality
     * \brief Starts the registration process.
     */
     void CalculateTransformation();
-    
+
     /*!
     * \brief Translates the moving image in x, y and z direction given by translateVector
     *
@@ -154,7 +154,7 @@ class QmitkRigidRegistration : public QmitkFunctionality
 
     /*!
     * \brief Stores whether the image will be shown in gray values or in red for fixed image and green for moving image
-    * @param if true, then images will be shown in red and green
+    * @param show if true, then images will be shown in red and green
     */
     void ShowRedGreen(bool show);
 
@@ -166,7 +166,7 @@ class QmitkRigidRegistration : public QmitkFunctionality
 
     /*!
     * \brief Sets the images to grayvalues or fixed image to red and moving image to green
-    * @param if true, then images will be shown in red and green
+    * @param redGreen if true, then images will be shown in red and green
     */
     void SetImageColor(bool redGreen);
 
@@ -195,15 +195,15 @@ class QmitkRigidRegistration : public QmitkFunctionality
 
   protected:
 
-    /*!  
-    * \brief Default main widget containing 4 windows showing 3   
-    * orthogonal slices of the volume and a 3d render window  
-    */  
+    /*!
+    * \brief Default main widget containing 4 windows showing 3
+    * orthogonal slices of the volume and a 3d render window
+    */
     QmitkStdMultiWidget * m_MultiWidget;
 
-    /*!  
-    * \brief Control widget to make all changes for Rigid registration 
-    */  
+    /*!
+    * \brief Control widget to make all changes for Rigid registration
+    */
     QmitkRigidRegistrationControls * m_Controls;
     mitk::DataTreeNode* m_MovingNode;
     mitk::DataTreeNode* m_FixedNode;

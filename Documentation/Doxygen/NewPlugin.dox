@@ -57,12 +57,12 @@ sophisticated generator available.
 
 \image html BundleGenerator3.png
 
-If everything looks okay, press "Generate" and CMake will create a directory named <CUSTOM_PROJECT_NAME> if you set a value for it and
-a directory named <PLUGIN_ID>.
+If everything looks okay, press "Generate" and CMake will create a directory named \<CUSTOM_PROJECT_NAME\> if you set a value for it and
+a directory named \<PLUGIN_ID\>.
 
 \par Integrating your new plug-in
-If you supplied a CUSTOM_PROJECT_NAME value, create a new directory outside of the <CUSTOM_PROJECT_NAME> directory for your project's
-binary tree. Start CMake again and use <CUSTOM_PROJECT_NAME> as source directory and your newly created directory as binary directory.
+If you supplied a CUSTOM_PROJECT_NAME value, create a new directory outside of the \<CUSTOM_PROJECT_NAME\> directory for your project's
+binary tree. Start CMake again and use \<CUSTOM_PROJECT_NAME\> as source directory and your newly created directory as binary directory.
 Go through the configuration and generation process again and you will get project files for your chosen environment. On Windows, use
 the supplied \b startVS2008.bat file in your binary tree to start Visual Studio (this will correctly set your path environment variable).
 

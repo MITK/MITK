@@ -63,7 +63,7 @@ namespace mitk {
  * to be in wrong place, are declared here (for example SelectedLinesType).
  *
  * \section mitkPointSetDisplayOptions
- * 
+ *
  * The default mappers for this data structure are mitk::PointSetMapper2D and
  * mitk::PointSetVtkMapper3D. See these classes for display options which can
  * can be set via properties.
@@ -71,14 +71,14 @@ namespace mitk {
  * \section Events
  *
  * PointSet issues the following events, for which observers can register
- * (the below events are grouped into a class hierarchy as indicated by 
- * identation level; e.g. PointSetSizeChangeEvent comprises PointSetAddEvent 
+ * (the below events are grouped into a class hierarchy as indicated by
+ * identation level; e.g. PointSetSizeChangeEvent comprises PointSetAddEvent
  * and PointSetRemoveEvent):
- * 
+ *
  * <tt>
  * PointSetEvent <i>subsumes all PointSet events</i>
  *   PointSetMoveEvent <i>issued when a point of the PointSet is moved</i>
- *   PointSetSizeChangeEvent <i>subsumes add and remove events<i>
+ *   PointSetSizeChangeEvent <i>subsumes add and remove events</i>
  *     PointSetAddEvent <i>issued when a point is added to the PointSet</i>
  *     PointSetRemoveEvent <i>issued when a point is removed from the PointSet</i>
  * </tt>
@@ -92,7 +92,7 @@ public:
 
   itkNewMacro(Self);
 
-  
+
   typedef mitk::ScalarType CoordinateType;
   typedef mitk::ScalarType InterpolationWeightType;
 
@@ -102,7 +102,7 @@ public:
   /**
    * \brief struct for data of a point
    */
-  struct PointDataType 
+  struct PointDataType
   {
     unsigned int id;  //to give the point a special ID
     bool selected;  //information about if the point is selected
@@ -117,22 +117,22 @@ public:
    */
   typedef std::vector<unsigned int> SelectedLinesType;
   typedef SelectedLinesType::iterator SelectedLinesIter;
-  struct CellDataType 
+  struct CellDataType
   {
     //used to set the whole cell on selected
     bool selected;
-    
+
     //indexes of selected lines. 0 is between pointId 0 and 1
     SelectedLinesType selectedLines;
-    
+
     //is the polygon already finished and closed
     bool closed;
   };
 
   typedef itk::DefaultDynamicMeshTraits<
-    PointDataType, PointDimension, MaxTopologicalDimension, 
+    PointDataType, PointDimension, MaxTopologicalDimension,
     CoordinateType, InterpolationWeightType, CellDataType > MeshTraits;
-  typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;  
+  typedef itk::Mesh<PointDataType, PointDimension, MeshTraits> MeshType;
 
   typedef MeshType DataType;
   typedef DataType::PointType PointType;
@@ -165,7 +165,7 @@ public:
   PointType GetPoint( int position, int t = 0 ) const;
 
   /**
-   * \brief If the Id exists in mitkData, then point is set and true is 
+   * \brief If the Id exists in mitkData, then point is set and true is
    * returned in world coordinates
    */
   bool GetPointIfExists( PointIdentifier id, PointType* point, int t = 0 ) const;
@@ -184,7 +184,7 @@ public:
 
 
   /**
-   * \brief searches a selected point and returns the id of that point. 
+   * \brief searches a selected point and returns the id of that point.
    * If no point is found, then -1 is returned
    */
   virtual int SearchSelectedPoint( int t = 0 ) const;
@@ -196,7 +196,7 @@ public:
    * position
    */
   virtual bool GetSelectInfo( int position, int t = 0 ) const;
-  
+
   virtual void SetSelectInfo( int position, bool selected, int t = 0 );
 
   /** \brief returns the number of selected points */
@@ -230,7 +230,7 @@ protected:
   PointSet();
 
   virtual ~PointSet();
-  
+
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;

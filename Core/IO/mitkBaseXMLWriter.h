@@ -38,12 +38,12 @@ namespace mitk{
   //##
   //## The XMLIO class manages the writing and reading of the data.
   //## An example of how to start the XMLWriter can be found in the function Save() of the DataTree class.
-  //## 
-  //## \TODO Remove this class and mitk::XMLReader (cleanly) and grab 300g Milka chocolate from D. Maleike.
+  //##
+  //## \todo Remove this class and mitk::XMLReader (cleanly) and grab 300g Milka chocolate from D. Maleike.
   //##
   //## @ingroup IO
   class MITK_CORE_EXPORT BaseXMLWriter {
-    
+
     /// encapsulates all information of a node in a stream
     class MITK_CORE_EXPORT StreamNode
     {
@@ -52,7 +52,7 @@ namespace mitk{
       std::string GetName() { return m_Name; };
       std::ostream& GetPropertyStream() { return m_PropertyStream; };
       std::ostream& GetChildrenStream() { return m_ChildrenStream; };
-      std::ostream& GetComment() { return m_Comment; };      
+      std::ostream& GetComment() { return m_Comment; };
 
       void Write( std::ostream& out, int steps );
     private:
@@ -93,7 +93,7 @@ namespace mitk{
 
     /// writes a comment in the XML file
     void WriteComment( const std::string& key );
-  
+
     /// returns the current node depth
     int GetCurrentDeph() const;
 

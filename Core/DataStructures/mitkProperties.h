@@ -26,28 +26,28 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
    mitkSpecializeGenericProperty(BoolProperty,bool,false);
-   
+
    mitkSpecializeGenericProperty(IntProperty,int,0);
-   
+
    mitkSpecializeGenericProperty(FloatProperty,float,0.0f);
-   
+
    mitkSpecializeGenericProperty(DoubleProperty,double,0.0);
-   
+
    mitkSpecializeGenericProperty(Vector3DProperty,Vector3D,Vector3D(0.0f));
-   
+
    mitkSpecializeGenericProperty(Point3dProperty,Point3D,Point3D::BaseArray::Filled(0.0f).GetDataPointer() );
-   
+
    mitkSpecializeGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
-   
+
    mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
 
    /**
-   * \warn If you add more specialization of GenericProperty, you must also add these to the 
+   * \warning If you add more specialization of GenericProperty, you must also add these to the
    * templated GetPropertyValue() method in mitkPropertyList.cpp!
    */
 
    mitkSpecializeGenericLookupTableProperty(FloatLookupTableProperty,float);
-   
-} // namespace mitk  
+
+} // namespace mitk
 
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

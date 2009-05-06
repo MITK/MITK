@@ -82,27 +82,27 @@ namespace mitk
     */
     TrackingTool* GetTool(unsigned int toolNumber);
 
-    
+
     /**
     * \brief Create a new Claron tool with toolName and fileName and add it to the list of tools
     *
     * This method will create a new ClaronTool object, load the tool definition file fileName,
-    * set the tool name toolName and then add it to the list of tools. 
+    * set the tool name toolName and then add it to the list of tools.
     * It returns a pointer of type mitk::TrackingTool to the tool
     * that can be used to read tracking data from it.
     * This is the only way to add tools to ClaronTrackingDevice.
     *
-    * \WARNING adding tools is not possible in tracking mode, only in setup and ready.
+    * \warning adding tools is not possible in tracking mode, only in setup and ready.
     */
     mitk::TrackingTool* AddTool(const char* toolName, const char* fileName);
-      
+
 
     /**
     * \return Returns whether the MicronTracker is installed (means whether the C-Make-Variable "MITK_USE_MICRON_TRACKER" is set),
     *         so returns false in this case.
     */
     bool IsMicronTrackerInstalled();
-  
+
   protected:
     ClaronTrackingDevice();
     ~ClaronTrackingDevice();
@@ -122,8 +122,8 @@ namespace mitk
     void TrackTools();
 
     /**
-    * \brief Automatically detects tools in field of measurement of the tracking device. 
-    * Tools can only be detected if their calibration file is availiable in the directory 
+    * \brief Automatically detects tools in field of measurement of the tracking device.
+    * Tools can only be detected if their calibration file is availiable in the directory
     * for calibration files.
     * \return Returns all detected Tools.
     */
@@ -137,19 +137,19 @@ namespace mitk
     /**
     * \return Gives back the device which is represented by an object of the class ClaronInterface.
     */
-    ClaronInterface* GetDevice();        
+    ClaronInterface* GetDevice();
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
-  
+
     std::vector<ClaronTool::Pointer> m_AllTools; ///< vector holding all tools
     ClaronInterface::Pointer m_Device; ///< represents the interface to the tracking hardware
     itk::MultiThreader::Pointer m_MultiThreader;
     int m_ThreadID;
 
-    /** \brief The directory where the camera calibration files can be found */        
+    /** \brief The directory where the camera calibration files can be found */
     std::string m_CalibrationDir;
     /** \brief The directory where the tool calibration files can be found */
-    std::string m_ToolfilesDir;              
-  };   
+    std::string m_ToolfilesDir;
+  };
 }//mitk
 #endif /* MITKCLARONTRACKINGDEVICE_H_HEADER_INCLUDED_ */

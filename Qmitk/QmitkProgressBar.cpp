@@ -55,18 +55,18 @@ void QmitkProgressBar::AddStepsToDo(unsigned int steps)
   }
   qApp->processEvents();
 }
-  
+
 /**
- *Documentation
- *@brief Sets the current amount of progress to current progress + steps.
- *@param: steps the number of steps done since last Progress(int steps) call.
+ * Documentation
+ * @brief Sets the current amount of progress to current progress + steps.
+ * @param steps the number of steps done since last Progress(int steps) call.
  */
 void QmitkProgressBar::Progress(unsigned int steps)
 {
   m_Progress += steps;
   this->setProgress(m_Progress);
   this->show();
-  
+
   if (m_Progress >= m_TotalSteps)
     Reset();
 

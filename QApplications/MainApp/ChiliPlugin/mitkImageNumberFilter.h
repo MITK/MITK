@@ -55,11 +55,11 @@ class ImageNumberFilter : public PicDescriptorToNode
     \brief Create multiple nodes (images).
     Calls other methods of this class in turn:
 
-    <li>  SortPicsToGroup
-    <li>  SortSlicesByImageNumber
-    <li>  SeparateBySpacing
-    <li>  SeparateByTime
-    <li>  GenerateImages
+    \li  SortPicsToGroup
+    \li  SortSlicesByImageNumber
+    \li  SeparateBySpacing
+    \li  SeparateByTime
+    \li  GenerateImages
     */
     virtual void Update();
 
@@ -114,13 +114,13 @@ class ImageNumberFilter : public PicDescriptorToNode
      */
     void SortPicsToGroup();
     /** This function sort the slices by imagenumber and location. */
-  
-    /** 
+
+    /**
      * \brief Sort all slices in each group by slice position.
-     * 
+     *
      * Sort by distance of image origin from world origin
      * else sort by image number
-     * 
+     *
      * Uses ImageNumberFilter::PositionSort for comparison of two slices.
      */
     void SortSlicesBySlicePosition();
@@ -131,12 +131,12 @@ class ImageNumberFilter : public PicDescriptorToNode
     void SeparateBySpacing();
 
     /**
-     * Ensures that for each position in space we have an 
+     * Ensures that for each position in space we have an
      * equal number of slices that share this position. The
      * number of "allowed" slices per position is set to the
      * minimum number of slices seen for any timestep.
      *
-     * The loop inside this method will go through all slices and sort 
+     * The loop inside this method will go through all slices and sort
      * everything beyond minTimeSteps into a new group (waste?).
      */
     void SeparateByTime();

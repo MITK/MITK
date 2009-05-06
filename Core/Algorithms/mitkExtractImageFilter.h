@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef mitkExtractImageFilter_h_Included
@@ -43,13 +43,13 @@ namespace mitk
   The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count from zero.
 
   Output will not be set if there was a problem extracting the desired slice.
- 
+
   Last contributor: $Author$
 */
 class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
 {
   public:
-    
+
     mitkClassMacro(ExtractImageFilter, ImageToImageFilter);
     itkNewMacro(ExtractImageFilter);
 
@@ -62,11 +62,11 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
     /**
       \brief The orientation of the slice to be extracted.
 
-      \param dim Number of the dimension which is constant for all pixels of the desired slice (e.g. 2 for transversal)
+      \a Parameter SliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 2 for transversal)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);
-    
+
     /**
       \brief Time step of the image to be extracted.
      */
@@ -77,7 +77,7 @@ class MITK_CORE_EXPORT ExtractImageFilter : public ImageToImageFilter
 
     ExtractImageFilter(); // purposely hidden
     virtual ~ExtractImageFilter();
-  
+
     virtual void GenerateOutputInformation();
     virtual void GenerateInputRequestedRegion();
 

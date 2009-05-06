@@ -31,7 +31,7 @@ namespace mitk {
   Currently only really implemented for the CHILI Workstation (see CHILIPlugin),
   but should be basic enough to work with differnt systems, too.
 
-  \TODO The PatientInformation, StudyInformation, SeriesInformation structures should be classes able to contain any kind of tags
+  \todo The PatientInformation, StudyInformation, SeriesInformation structures should be classes able to contain any kind of tags
 */
 class MITK_CORE_EXPORT PACSPlugin : public itk::Object
 {
@@ -48,7 +48,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /** Information about a patient in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.2 **/
     class PatientInformation
     {
-      public: 
+      public:
         std::string PatientsName;       // tag 0010,0010
         std::string PatientID;          // tag 0010,0020
         std::string PatientsBirthDate;  // tag 0010,0030
@@ -60,7 +60,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<PatientInformation> PatientInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.3 **/
-    class StudyInformation 
+    class StudyInformation
     {
       public:
         std::string StudyInstanceUID;   // tag 0020,000D
@@ -72,7 +72,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
         std::string ReferringPhysician; // tag 0008,0090
         std::string StudyDescription;   // tag 0008,1030
     };
-    
+
     typedef std::list<StudyInformation> StudyInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.4 **/
@@ -81,13 +81,13 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
       public:
         std::string SeriesInstanceUID;  // tag 0020,000E
         int SeriesNumber;               // tag 0020,0011
-        std::string SeriesDate;         // tag 0008,0021 
+        std::string SeriesDate;         // tag 0008,0021
         std::string SeriesTime;         // tag 0008,0031
         std::string SeriesDescription;  // tag 0008,103E
         std::string BodyPartExamined;   // tag 0018,0015
-        std::string FrameOfReferenceUID;// tag 0020,0052 
+        std::string FrameOfReferenceUID;// tag 0020,0052
         int AcquisitionNumber;          // tag 0020,0012 image specific
-        std::string ContrastAgent;      // tag 0018,0010 image specific 
+        std::string ContrastAgent;      // tag 0018,0010 image specific
         std::string ScanningSequence;   // tag 0018,0020 mr image specific
         int EchoNumber;                 // tag 0018,0086 mr image specific
         int TemporalPosition;           // tag 0020,0100 mr image specific
@@ -120,18 +120,18 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     };
 
     /** There can be lots of texts to one series, so we need a list. */
-    typedef std::list<DocumentInformation> DocumentInformationList; 
+    typedef std::list<DocumentInformation> DocumentInformationList;
 
     mitkClassMacro( PACSPlugin,itk::Object );
 
     /*!
      * \brief Return a singleton mitk::PACSPlugin-Instance
      *
-     * \param destroyInstance Tell the specific implementation it should free/delete itself. 
+     * \param destroyInstance Tell the specific implementation it should free/delete itself.
      * \warning Application should not use the instance after calling GetInstance(true);
-     * \TODO check deletion mechanism, should be done by the application, which knows about CHILI (because there is a QcMITK...
+     * \todo check deletion mechanism, should be done by the application, which knows about CHILI (because there is a QcMITK...
      */
-    static PACSPlugin* GetInstance( bool destroyInstance = false ); 
+    static PACSPlugin* GetInstance( bool destroyInstance = false );
 
     /*!
      * \brief Information about capabilities of the current implementation.
@@ -144,10 +144,10 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     virtual PatientInformationList GetPatientInformationList();
 
     /*!
-     * \brief Get a list of all studies for a patient 
+     * \brief Get a list of all studies for a patient
      */
     virtual StudyInformationList GetStudyInformationList( const PatientInformation& patient );
- 
+
     /*!
      * \brief Get a list of all series for a study instance UID
      */
@@ -176,7 +176,7 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /*!
      * \brief Document information for a given series instance UID and a document instance number
      */
-    virtual DocumentInformation GetDocumentInformation( const std::string& seriesInstanceUID, 
+    virtual DocumentInformation GetDocumentInformation( const std::string& seriesInstanceUID,
                                                         unsigned int instanceNumber );
 
     /*!
@@ -204,52 +204,52 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
     /*!
      * Set type of "sorter" that stacks 2D images into 3D or 3D+t volumes
      * \param readerType   0 used for the ImageNumberFilter, 1 for the SingleSpacingFilter and 2 used for SpacingSetFilter.
-     * \TODO this should take enum values
+     * \todo this should take enum values
      */
     virtual void SetReaderType( unsigned int readerType = 0 );
 
-    virtual void AbortPACSImport(); 
+    virtual void AbortPACSImport();
 
     /*!
      *
      * \brief Load all images from the given lightbox.
-     * \TODO rename to LoadLightboxContent and load all images and texts, ignoring the lightbox!! make it use LoadSeriesContent for all series UIDs found in lightbox
+     * \todo rename to LoadLightboxContent and load all images and texts, ignoring the lightbox!! make it use LoadSeriesContent for all series UIDs found in lightbox
      */
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( unsigned int lightboxIndex = 0 );
 
     /*!
      * \brief Load all objects from a given series instance UID
-     * \TODO rename to LoadSeriesContent, make this take a list of UIDs
+     * \todo rename to LoadSeriesContent, make this take a list of UIDs
      */
-    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesInstanceUID ); 
+    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesInstanceUID );
 
     /*!
      * \brief Load all image objects from a given series instance UID
-     * \TODO rename to LoadSeriesImageContent, make this take a list of UIDs
+     * \todo rename to LoadSeriesImageContent, make this take a list of UIDs
      */
     virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
-    
+
     virtual std::vector<mitk::DataTreeNode::Pointer> LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs );
 
     /*!
      * \brief Load all objects from a given series instance UID
-     * \TODO rename to LoadSeriesDocumentContent, make this take a list of UIDs
+     * \todo rename to LoadSeriesDocumentContent, make this take a list of UIDs
      */
     virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
 
     /*!
      * \brief Load a given document object for a series instance UID and a document instance number
-     * \TODO rename to LoadDocument make it take a list of parameters
+     * \todo rename to LoadDocument make it take a list of parameters
      */
-    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber ); 
-    
+    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber );
+
     /*!
      * \brief Load a given document object for a series instance UID and a document instance number
      * In contrast to LoadSingleText this method will just create a new file on the local file system.
      */
-    virtual void DownloadSingleFile( const std::string& seriesInstanceUID, 
+    virtual void DownloadSingleFile( const std::string& seriesInstanceUID,
                                      unsigned int instanceNumber,
-                                     const std::string& filename ); 
+                                     const std::string& filename );
 
     /*!
      * \brief Save given data as a new series
@@ -257,9 +257,9 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \param seriesNumber a number identifying the new series
      * \param seriesDescription a string description for the new series
      */
-    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
-                                  const std::string& studyInstanceUID, 
-                                  int seriesNumber, 
+    virtual void SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer inputNodes,
+                                  const std::string& studyInstanceUID,
+                                  int seriesNumber,
                                   const std::string& seriesDescription );
 
     /*!
@@ -267,8 +267,8 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \param seriesInstanceUID save into this series
      * \param seriesDescription a string description for the new series
      */
-    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes, 
-                               const std::string& seriesInstanceUID, 
+    virtual void SaveToSeries( DataStorage::SetOfObjects::ConstPointer inputNodes,
+                               const std::string& seriesInstanceUID,
                                bool overwriteExistingSeries );
 
     /*!
@@ -278,9 +278,9 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \param seriesDescription a string description for the new series
      */
     virtual void UploadFileAsNewSeries( const std::string& filename,
-                                        const std::string& mimeType, 
-                                        const std::string& studyInstanceUID, 
-                                        int seriesNumber, 
+                                        const std::string& mimeType,
+                                        const std::string& studyInstanceUID,
+                                        int seriesNumber,
                                         const std::string& seriesDescription );
 
     /*!
@@ -289,16 +289,16 @@ class MITK_CORE_EXPORT PACSPlugin : public itk::Object
      * \param seriesDescription a string description for the new series
      */
     virtual void UploadFileToSeries( const std::string& filename,
-                                     const std::string& filebasename, 
-                                     const std::string& mimeType, 
-                                     const std::string& seriesInstanceUID, 
+                                     const std::string& filebasename,
+                                     const std::string& mimeType,
+                                     const std::string& seriesInstanceUID,
                                      bool overwriteExistingSeries );
-    
+
     virtual std::string GuessMIMEType( const std::string& filename );
 
 
   protected:
-    
+
     // All this is hidden, should be instantiated through the GetInstance() method.
     itkNewMacro( PACSPlugin );
     PACSPlugin();

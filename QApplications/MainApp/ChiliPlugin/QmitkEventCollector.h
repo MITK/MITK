@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef QMITK_EVENT_COLLECTOR_H
@@ -27,10 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 /** Collects all kind of QT events.
  * To collect events like like Actions to include in your application use.
- * #include <qapplication.h>
+ * \#include \<qapplication.h\>
  * qmitk::EventCollector* logger = new qmitk::EventCollector();
  * qApp->installEventFilter(logger);
- * 
+ *
  */
 
 class EventCollector : public QObject

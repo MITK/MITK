@@ -30,9 +30,9 @@ namespace mitk
   *     a tracking device. As it inherits from mitk::Surface it can be
   *     displayed in the 3D-window of MITK. The coordinate system is the same
   *     as the coordination system of the tracking device.
-  *     To have the specific dimensions of the trackingvolume of a tracking device 
-  *      the method SetTrackingDeviceType() needs to be called. If you get your 
-  *      trackingvolume from an instance of the class TrackingDevice 
+  *     To have the specific dimensions of the trackingvolume of a tracking device
+  *      the method SetTrackingDeviceType() needs to be called. If you get your
+  *      trackingvolume from an instance of the class TrackingDevice
   *      (ClaronTrackingDevice for example) this is already done for you.
   *     This also means that every tracking device instance has a predefined tracking
   *     volume, which is automatically set when you construct the instance.
@@ -55,26 +55,26 @@ namespace mitk
     bool SetTrackingDeviceType(TrackingDeviceType type);
 
     /**
-    * \brief       Sets the trackingvolume explicitly. Only use this method if your specific 
-    *              trackingvolume is not supported by this class. The type is set to 
+    * \brief       Sets the trackingvolume explicitly. Only use this method if your specific
+    *              trackingvolume is not supported by this class. The type is set to
     *              TrackingSystemNotSpecified if doing this.
-    * \param manualVolume  The new tracking volume as vtkPolyData.
+    * \param volume  The new tracking volume as vtkPolyData.
     */
     void SetVolumeManually(vtkPolyData* volume);
 
-    /**
-    * \brief   Checks wether a point is inside or outside the tracking
-    *          volume.
-    * \param p  The point which should be checked.
-    * \return   Returns true if the point "p" is inside the
-    *           tracking volume, false if not.
-    */
+
+    //brief   Checks wether a point is inside or outside the tracking
+    //          volume.
+    //param p  The point which should be checked.
+    //return   Returns true if the point "p" is inside the
+    //           tracking volume, false if not.
+    //
     //bool IsInside(mitk::Point3D p); TODO: implemenation of method
 
   protected:
     TrackingVolume();
     /**
-     * 
+     *
      * \brief   The current type of the corresponding tracking device is hold here.
      *          If the type is unknown the value is set to TrackingSystemNotSpecified.
      */

@@ -38,10 +38,10 @@ namespace mitk {
   //##
   //## The DataStorage provides data storage and management functionality.
   //## It handles a 'was created by' relation by associating each data object with a
-  //## set of source objects, that this object was created from. 
+  //## set of source objects, that this object was created from.
   //## Thus, nodes are stored in a noncyclical directed graph data structure.
-  //## If a new node is added to the DataStorage, AddNodeEvent is emitted. 
-  //## If a node is removed, RemoveNodeEvent is emitted. 
+  //## If a new node is added to the DataStorage, AddNodeEvent is emitted.
+  //## If a node is removed, RemoveNodeEvent is emitted.
   //## Currently, DataStorage uses an underlying mitk::DataTree. Therefore a DataStorage object
   //## must be initialized with a DataTree before it can be used by calling ->Initialize(myTree).
   //## @warning DataStorage methods will raise exceptions if called before the DataStorage is initialized.
@@ -196,7 +196,7 @@ namespace mitk {
     /* Public Events */
     typedef Message1<const mitk::DataTreeNode*> DataStorageEvent;
     //##Documentation
-    //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage. 
+    //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage.
     //##
     //## Observers should register to this event by calling myDataStorage->AddNodeEvent.AddListener(myObject, MyObject::MyMethod).
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
@@ -205,7 +205,7 @@ namespace mitk {
     DataStorageEvent AddNodeEvent;
 
     //##Documentation
-    //## @brief RemoveEvent is emitted directly before a node is removed from the DataStorage. 
+    //## @brief RemoveEvent is emitted directly before a node is removed from the DataStorage.
     //##
     //## Observers should register to this event by calling myDataStorage->RemoveNodeEvent.AddListener(myObject, MyObject::MyMethod).
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
@@ -214,7 +214,7 @@ namespace mitk {
     DataStorageEvent RemoveNodeEvent;
 
     //##Documentation
-    //## @brief ChangedEvent is emitted directly after a node was changed. 
+    //## @brief ChangedEvent is emitted directly after a node was changed.
     //##
     //## Observers should register to this event by calling myDataStorage->ChangedNodeEvent.AddListener(myObject, MyObject::MyMethod).
     //## After registering, myObject->MyMethod() will be called every time a new node has been changed.
@@ -237,7 +237,7 @@ namespace mitk {
     //## @brief Compute the axis-parallel bounding geometry of the data tree
     //## (bounding box, minimal spacing of the considered nodes, live-span)
     //##
-    //## @param it an iterator to a data tree structure
+    //## it -> an iterator to a data tree structure
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
@@ -249,7 +249,7 @@ namespace mitk {
     //## data tree bounding box, minimal spacing of the considered nodes, live-span)
     //##
     //## Simply calls ComputeBoundingGeometry3D(it, "visible", renderer, boolPropertyKey).
-    //## @param it an iterator of a data tree structure
+    //## it -> an iterator of a data tree structure
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
@@ -257,7 +257,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Compute the bounding box of data tree structure
-    //## @param it an iterator to a data tree structure
+    //## it -> an iterator to a data tree structure
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
      //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
@@ -269,7 +269,7 @@ namespace mitk {
     //## rendering or renderer specific visibility property checking
     //##
     //## Simply calls ComputeBoundingBox(it, "visible", renderer, boolPropertyKey).
-    //## @param it an iterator of a data tree structure
+    //## it -> an iterator of a data tree structure
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
@@ -283,7 +283,7 @@ namespace mitk {
     //##
     //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
     //## all data-objects with infinite live-span are ignored.
-    //## @param it an iterator to a data tree structure
+    //## it -> an iterator to a data tree structure
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
@@ -341,8 +341,8 @@ namespace mitk {
     //## @brief  Removes a Modified-Listener from the given Node.
     void RemoveListeners(const mitk::DataTreeNode* _Node);
 
-    
- 
+
+
     //##Documentation
     //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
     std::map<const mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;

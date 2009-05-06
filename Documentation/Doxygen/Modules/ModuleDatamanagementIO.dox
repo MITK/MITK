@@ -47,7 +47,7 @@
   
   \image html SceneXML.png "A typical XML file of a MITK image."  
   
-  Initial point is the DataTree class. So <mitkDataTree> is the root element.
+  Initial point is the DataTree class. So \<mitkDataTree\> is the root element.
   The hierarchy of the datatree is reflected again in the hierarchy of the XML nodes.
   At large the XML nodes represent classes. The name of the class is stored with the XML attribute "CLASS_NAME".
   Generally data is stored with attributes. 

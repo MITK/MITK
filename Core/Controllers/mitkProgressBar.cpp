@@ -29,7 +29,7 @@ namespace mitk
 
   /**
    * Sets the current amount of progress to current progress + steps.
-   * @param: steps the number of steps done since last Progress(int steps) call.
+   * @param steps the number of steps done since last Progress(int steps) call.
    */
   void ProgressBar::Progress(unsigned int steps, bool callFromThread)
   {
@@ -137,7 +137,7 @@ namespace mitk
   ProgressBar::~ProgressBar()
   {
   }
-    
+
   void ProgressBar::AddStepsToDo(const itk::EventObject& e)
   {
     if (m_Implementation)

@@ -58,7 +58,7 @@ class BaseRenderer;
 //## (PropertyList).
 //## @ingroup DataTree
 //##
-//## @TODO clean up all the GetProperty methods. There are too many different flavours... Can most probably be reduced to <tt>bool GetProperty<type>(type&)</tt>
+//## @todo clean up all the GetProperty methods. There are too many different flavours... Can most probably be reduced to <tt>bool GetProperty<type>(type&)</tt>
 //##
 //## @warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
 //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
@@ -73,7 +73,7 @@ public:
 
   mitkClassMacro(DataTreeNode, itk::DataObject);
 
-  itkNewMacro(Self);  
+  itkNewMacro(Self);
 
   mitk::Mapper* GetMapper(MapperSlotId id) const;
   //##Documentation
@@ -86,12 +86,12 @@ public:
   //## \deprecated use GetData()->GetGeometry()->GetVtkTransform() instead
   vtkLinearTransform* GetVtkTransform(int t=0) const;
   //##Documentation
-  //## @brief Get the Interactor 
+  //## @brief Get the Interactor
   Interactor* GetInteractor() const;
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
   //## managed by this DataTreeNode
-  //## @warning the actor-mode of the vtkInteractor does not work any more, if the transform of the 
+  //## @warning the actor-mode of the vtkInteractor does not work any more, if the transform of the
   //## data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
   virtual void SetData(mitk::BaseData* baseData);
   //##Documentation
@@ -115,22 +115,22 @@ public:
   virtual void CopyInformation(const itk::DataObject *data);
 
   //##Documentation
-  //## @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList 
+  //## @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
   //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-value.
   //##
   //## @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
   //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
-  //## 
+  //##
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
   void SetProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);
- 
+
   //##Documentation
-  //## @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList 
+  //## @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
   //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
-  //## 
-  //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent 
+  //##
+  //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent
   //## PropertyList of this DataTreeNode.
   //## @sa GetProperty
   //## @sa m_PropertyList
@@ -138,14 +138,14 @@ public:
   void ReplaceProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL);
 
   //##Documentation
-  //## @brief Add the property (instance of BaseProperty) if it does 
-  //## not exist (or always if \a overwrite is \a true) 
-  //## with key @a propertyKey in the PropertyList 
-  //## of the @a renderer (if NULL, use BaseRenderer-independent 
+  //## @brief Add the property (instance of BaseProperty) if it does
+  //## not exist (or always if \a overwrite is \a true)
+  //## with key @a propertyKey in the PropertyList
+  //## of the @a renderer (if NULL, use BaseRenderer-independent
   //## PropertyList). This is set-by-value.
   //##
-  //## For \a overwrite == \a false the property is \em not changed 
-  //## if it already exists. For \a overwrite == \a true the method 
+  //## For \a overwrite == \a false the property is \em not changed
+  //## if it already exists. For \a overwrite == \a true the method
   //## is identical to SetProperty.
   //##
   //## @sa SetProperty
@@ -153,11 +153,11 @@ public:
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
   void AddProperty(const char *propertyKey, BaseProperty* property, const mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
- 
+
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
   //## NULL, the BaseRenderer-independent PropertyList of this DataTreeNode
-  //## is returned. 
+  //## is returned.
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -178,11 +178,11 @@ public:
   void ConcatenatePropertyList(PropertyList* pList, bool replace = false);
 
   //##Documentation
-  //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList 
+  //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
   //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
-  //## 
-  //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
-  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
+  //##
+  //## If @a renderer is @a NULL or the @a propertyKey cannot be found
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
   //## PropertyList of this DataTreeNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
@@ -190,11 +190,11 @@ public:
   mitk::BaseProperty* GetProperty(const char *propertyKey, const mitk::BaseRenderer* renderer = NULL) const;
 
   //##Documentation
-  //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
+  //## @brief Get the property of type T with key @a propertyKey from the PropertyList
   //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
-  //## 
-  //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
-  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
+  //##
+  //## If @a renderer is @a NULL or the @a propertyKey cannot be found
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
   //## PropertyList of this DataTreeNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
@@ -207,11 +207,11 @@ public:
   }
 
   //##Documentation
-  //## @brief Get the property of type T with key @a propertyKey from the PropertyList 
+  //## @brief Get the property of type T with key @a propertyKey from the PropertyList
   //## of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
-  //## 
-  //## If @a renderer is @a NULL or the @a propertyKey cannot be found 
-  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent 
+  //##
+  //## If @a renderer is @a NULL or the @a propertyKey cannot be found
+  //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
   //## PropertyList of this DataTreeNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
@@ -224,7 +224,7 @@ public:
   }
 
   //##Documentation
-  //## @brief Convenience access method for GenericProperty<T> properties 
+  //## @brief Convenience access method for GenericProperty<T> properties
   //## (T being the type of the second parameter)
   //## @return @a true property was found
   template <typename T>
@@ -282,13 +282,13 @@ public:
   //## @return @a true property was found
   bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer = NULL, const char* propertyKey = "levelwindow") const;
 
-  //## 
-  //##Documentation 
+  //##
+  //##Documentation
   //## @brief set the node as selected
   void SetSelected(bool selected, mitk::BaseRenderer* renderer=NULL);
 
-  //## 
-  //##Documentation 
+  //##
+  //##Documentation
   //## @brief set the node as selected
   //## @return @a true node is selected
   bool IsSelected(mitk::BaseRenderer* renderer=NULL);
@@ -304,11 +304,11 @@ public:
 
   //##Documentation
   //## @brief Extra convenience access method for accessing the name of an object (instance of
-  //## StringProperty with property-key "name"). 
+  //## StringProperty with property-key "name").
   //##
-  //## This method does not take the renderer specific 
+  //## This method does not take the renderer specific
   //## propertylists into account, because the name of an object should never be renderer specific.
-  //## @returns a std::string with the name of the object (content of "name" Property). 
+  //## @returns a std::string with the name of the object (content of "name" Property).
   //## If there is no "name" Property, an empty string will be returned.
   virtual std::string GetName() const
   {
@@ -347,15 +347,15 @@ public:
 
   //##Documentation
   //## @brief Convenience access method for boolean properties (instances
-  //## of BoolProperty). Return value is the value of the property. If the property is 
+  //## of BoolProperty). Return value is the value of the property. If the property is
   //## not found, the value of @a defaultIsOn is returned.
-  //## 
+  //##
   //## Thus, the return value has a different meaning than in the
   //## GetBoolProperty method!
   //## @sa GetBoolProperty
   bool IsOn(const char* propertyKey, mitk::BaseRenderer* renderer, bool defaultIsOn = true) const
   {
-    if(propertyKey==NULL) 
+    if(propertyKey==NULL)
       return defaultIsOn;
     GetBoolProperty(propertyKey, defaultIsOn, renderer);
     return defaultIsOn;
@@ -366,7 +366,7 @@ public:
   //## of BoolProperty). Return value is the visibility. Default is
   //## visible==true, i.e., true is returned even if the property (@a
   //## propertyKey) is not found.
-  //## 
+  //##
   //## Thus, the return value has a different meaning than in the
   //## GetVisibility method!
   //## @sa GetVisibility
@@ -428,36 +428,36 @@ public:
   void SetStringProperty(const char* propertyKey, const char* string, mitk::BaseRenderer* renderer=NULL);
 
   //##Documentation
-  //## @brief Get the timestamp of the last change of the contents of this node or 
+  //## @brief Get the timestamp of the last change of the contents of this node or
   //## the referenced BaseData.
   virtual unsigned long GetMTime() const;
 
   //##Documentation
-  //## @brief Get the timestamp of the last change of the reference to the 
+  //## @brief Get the timestamp of the last change of the reference to the
   //## BaseData.
   unsigned long GetDataReferenceChangedTime() const
   {
     return m_DataReferenceChangedTime.GetMTime();
   }
-  
+
   //##Documentation
   //## @brief Adds or removes the associated interactor to mitk::GLobalInteraction.
-  //## 
+  //##
   virtual void SetInteractorEnabled( const bool& enabled );
-  
+
   //##Documentation
   //## @brief Adds the interactor to mitk::GlobalInteraction
-  //## 
+  //##
   virtual void EnableInteractor();
-  
+
   //##Documentation
   //## @brief Removes the Interactor from mitk::GlobalInteraction
-  //## 
+  //##
   virtual void DisableInteractor();
-  
+
   //##Documentation
   //## @brief Tests, if the interactor is already added to mitk::GlobalInteraction
-  //## 
+  //##
   virtual bool IsInteractorEnabled() const;
 
   //##
@@ -485,7 +485,7 @@ protected:
 
   //##Documentation
   //## @brief BaseRenderer-independent PropertyList
-  //## 
+  //##
   //## Properties herein can be overwritten specifically for each BaseRenderer
   //## by the BaseRenderer-specific properties defined in m_MapOfPropertyLists.
   PropertyList::Pointer m_PropertyList;

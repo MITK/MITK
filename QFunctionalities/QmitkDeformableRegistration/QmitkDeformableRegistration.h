@@ -29,9 +29,9 @@ class QmitkDeformableRegistrationControls;
 \brief The DeformableRegistration functionality is used to perform deformable registration.
 
 This functionality allows you to register two 2D as well as two 3D images in a non rigid manner.
-Register means to align two images, so that they become as similar as possible. 
-Therefore you can select from different deformable registration methods. 
-Registration results will directly be applied to the Moving Image. The result is shown in the multi-widget. 
+Register means to align two images, so that they become as similar as possible.
+Therefore you can select from different deformable registration methods.
+Registration results will directly be applied to the Moving Image. The result is shown in the multi-widget.
 
 For more informations see: \ref QmitkDeformableRegistrationUserManual
 
@@ -40,65 +40,65 @@ For more informations see: \ref QmitkDeformableRegistrationUserManual
 \ingroup DeformableRegistration
 */
 class QmitkDeformableRegistration : public QmitkFunctionality
-{  
+{
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
-    /*!  
-    \brief default constructor  
-    */  
+    /*!
+    \brief default constructor
+    */
     QmitkDeformableRegistration(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
 
-    /*!  
-    \brief default destructor  
-    */  
+    /*!
+    \brief default destructor
+    */
     virtual ~QmitkDeformableRegistration();
 
-    /*!  
-    \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
-    */  
+    /*!
+    \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
+    */
     virtual QWidget * CreateControlWidget(QWidget *parent);
 
-    /*!  
-    \brief method for creating the applications main widget  
-    */  
+    /*!
+    \brief method for creating the applications main widget
+    */
     virtual QWidget * CreateMainWidget(QWidget * parent);
 
-    /*!  
-    \brief method for creating the connections of main and control widget  
-    */  
+    /*!
+    \brief method for creating the connections of main and control widget
+    */
     virtual void CreateConnections();
 
-    /*!  
-    \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-    */  
+    /*!
+    \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
+    */
     virtual QAction * CreateAction(QActionGroup *parent);
 
-    /*!  
-    \brief Method which is called when this functionality is selected in MITK  
-    */ 
+    /*!
+    \brief Method which is called when this functionality is selected in MITK
+    */
     virtual void Activated();
 
-    /*!  
-    \brief Method which is called whenever the functionality is deselected in MITK  
+    /*!
+    \brief Method which is called whenever the functionality is deselected in MITK
     */
     virtual void Deactivated();
 
-  protected slots:  
-    
+  protected slots:
+
     /*!
-    * \brief Called whenever the data tree has changed. 
+    * \brief Called whenever the data tree has changed.
     */
     void TreeChanged();
-    
+
     /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(mitk::DataTreeIteratorClone imageIt);
-    
+
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
@@ -111,7 +111,7 @@ class QmitkDeformableRegistration : public QmitkFunctionality
 
     /*!
     * stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
-    * @param if true, then images will be shown in red and green
+    * @param show if true, then images will be shown in red and green
     */
     void ShowRedGreen(bool show);
 
@@ -123,7 +123,7 @@ class QmitkDeformableRegistration : public QmitkFunctionality
 
     /*!
     * sets the images to grayvalues or fixed image to red and moving image to green
-    * @param if true, then images will be shown in red and green
+    * @param redGreen if true, then images will be shown in red and green
     */
     void SetImageColor(bool redGreen);
 
@@ -144,15 +144,15 @@ class QmitkDeformableRegistration : public QmitkFunctionality
 
   protected:
 
-    /*!  
-    * default main widget containing 4 windows showing 3   
-    * orthogonal slices of the volume and a 3d render window  
-    */  
+    /*!
+    * default main widget containing 4 windows showing 3
+    * orthogonal slices of the volume and a 3d render window
+    */
     QmitkStdMultiWidget * m_MultiWidget;
 
-    /*!  
-    * control widget to make all changes for Deformable registration 
-    */  
+    /*!
+    * control widget to make all changes for Deformable registration
+    */
     QmitkDeformableRegistrationControls * m_Controls;
     mitk::DataTreeNode* m_MovingNode;
     mitk::DataTreeNode* m_FixedNode;

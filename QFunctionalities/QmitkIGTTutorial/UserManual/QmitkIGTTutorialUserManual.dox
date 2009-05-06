@@ -2,7 +2,7 @@
 \page QmitkIGTTutorial The X Functionality
 
 Available sections:
-  - \ref QmitkIGTTutorialUserManualOverview 
+    //todo reference to QmitkIGTTutorialUserManualOverview 
   - \ref QmitkIGTTutorialUserManualDetails 
   
 \section QmitkIGTTutorialOverview Overview

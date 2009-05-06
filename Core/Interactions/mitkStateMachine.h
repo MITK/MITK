@@ -32,41 +32,41 @@ namespace mitk {
   class Action;
   class StateEvent;
   class UndoController;
-  
+
   // base class of statem machine functors
   class MITK_CORE_EXPORT TStateMachineFunctor
   {
     public:
       virtual bool DoAction(Action*, const StateEvent*)=0;        // call using function
-      virtual ~TStateMachineFunctor() {} 
+      virtual ~TStateMachineFunctor() {}
   };
-  
+
   // the template functor for arbitrary StateMachine derivations
-  template <class T> 
+  template <class T>
   class TSpecificStateMachineFunctor : public TStateMachineFunctor
   {
     public:
-  
+
       // constructor - takes pointer to an object and pointer to a member and stores
       // them in two private variables
       TSpecificStateMachineFunctor(T* object, bool(T::*memberFunctionPointer)(Action*, const StateEvent*))
-      :m_Object(object), 
+      :m_Object(object),
       m_MemberFunctionPointer(memberFunctionPointer)
       {
       }
-    
+
       virtual ~TSpecificStateMachineFunctor() {} // virtual destructor
-  
+
       // override function "Call"
       virtual bool DoAction(Action* action, const StateEvent* stateEvent)
-      { 
+      {
         return (*m_Object.*m_MemberFunctionPointer)(action, stateEvent);             // execute member function
       }
 
     private:
       T* m_Object;                  // pointer to object
       bool (T::*m_MemberFunctionPointer)(Action*, const StateEvent*);   // pointer to member function
-  }; 
+  };
 
 /// Can be uses by derived classes of StateMachine to connect action IDs to methods
 /// Assumes that there is a typedef Classname Self in classes that use this macro
@@ -80,21 +80,21 @@ namespace mitk {
 
   Realizes the methods, that every statemachine has to have.
   Undo can be enabled and disabled through EnableUndo.
-  
+
   To implement your own state machine, you have to derive a class from mitk::StateMachine and either
-  
+
   - override ExecuteAction()
-  or 
+  or
   - Write bool methods that take (Action*, const StateEvent*) as parameter and use the CONNECT_ACTION macro in your constructor
-  
+
   The second version is recommended, since it provides more structured code. The following piece of code demonstrates how to
   use the CONNECT_ACTION macro. The important detail is to provide a <i>typedef classname Self</i>
-  
-  \code 
+
+  \code
 class LightSwitch : public StateMachine
 {
   public:
-    
+
     mitkClassMacro(LightSwitch, StateMachine); // this creates the Self typedef
 
     LightSwitch(const char*);
@@ -132,7 +132,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
 
   public:
     mitkClassMacro(StateMachine,itk::Object);
-   
+
     /**
     * @brief New Macro with one parameter for creating this object with static New(..) method
     **/
@@ -156,7 +156,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
 
     /**
     * @brief handles an Event accordingly to its current State
-    * 
+    *
     * Statechange with Undo functionality;
     * EventMapper gives each event a new objectEventId
     * and a StateMachine::ExecuteAction can descide weather it gets a
@@ -166,7 +166,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     virtual bool HandleEvent(StateEvent const* stateEvent);
 
     /**
-    * @brief Enables or disabled Undo. 
+    * @brief Enables or disabled Undo.
     **/
     void EnableUndo(bool enable);
 
@@ -179,7 +179,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * @brief To be able to save a StateMachine to an xml-file.
     **/
     virtual bool WriteXMLData( XMLWriter& xmlWriter );
-    
+
     /**
     * @brief To be able to read a StateMachine from an xml-file.
     **/
@@ -219,7 +219,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
 
     /**
     * @brief if true, then UndoFunctionality is enabled
-    * 
+    *
     * Default value is true;
     **/
     bool m_UndoEnabled;
@@ -235,7 +235,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     UndoController* m_UndoController;
 
     /**
-    * @brief A statemachine is also an OperationActor due to the UndoMechanism. 
+    * @brief A statemachine is also an OperationActor due to the UndoMechanism.
     *
     * The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
     * Is set private here and in superclass it is set public, so UndoController
@@ -245,7 +245,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
 
     /**
     * @brief Resets the current state from the given timeStep to the StartState with undo functionality! Use carefully!
-    * @param[in] time If the statemachine has several timesteps to take care of, specify the according timestep
+    * @param[in] timeStep If the statemachine has several timesteps to take care of, specify the according timestep
     **/
     void ResetStatemachineToStartState(unsigned int timeStep = 0);
 
@@ -257,7 +257,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     void InitializeStartStates(unsigned int timeSteps = 1);
 
     /**
-    * @brief Check if the number of timeSteps is equal to the number of stored StartStates. Nothing is changed if the number is equal. 
+    * @brief Check if the number of timeSteps is equal to the number of stored StartStates. Nothing is changed if the number is equal.
     **/
     void ExpandStartStateVector(unsigned int timeSteps);
 
@@ -270,7 +270,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * @brief Current TimeStep if the data which is to be interacted on, has more than 1 TimeStep
     **/
     unsigned int m_TimeStep;
-   
+
     virtual const std::string& GetXMLNodeName() const;
 
     static const std::string STATE_MACHINE_TYPE;

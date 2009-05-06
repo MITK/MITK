@@ -29,7 +29,7 @@ namespace mitk {
 
 //##Documentation
 //## @brief Event on 3D Mouse input
-//## 
+//##
 //## Seven coordinates exposed by the 3D Mouse:
 //## 3-dimensional translation vector
 //## 3-dimensional rotation achsis (length allways 1.0)
@@ -41,8 +41,7 @@ class TDMouseEvent : public Event
     //##Documentation
     //## @brief Constructor with all necessary arguments.
     //##
-    //## @param type, button, buttonState: information from the Event
-    //## @param displPosition is the 2D Position of the mouse
+    //## buttonState: information from the Event
     TDMouseEvent(int buttonState, const Vector3D& translation, const Vector3D& rotation, const ScalarType& angle);
 
     const Vector3D& GetTranslation() const
@@ -66,12 +65,12 @@ class TDMouseEvent : public Event
 
     void SetAngle(const ScalarType& angle) { m_Angle = angle; }
 
-   
+
   protected:
     Vector3D m_Translation;
     Vector3D m_Rotation;
     ScalarType m_Angle;
-    
+
 };
 
 } // namespace mitk

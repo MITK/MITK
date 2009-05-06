@@ -56,12 +56,12 @@ class DataStorage;
 //## data tree and asks the mappers of the data objects to render
 //## the data into the renderwindow it is associated to.
 //##
-//## #Render() checks if rendering is currently allowed by calling
+//## \#Render() checks if rendering is currently allowed by calling
 //## RenderWindow::PrepareRendering(). Initialization of a rendering context
 //## can also be performed in this method.
 //##
-//## The actual rendering code has been moved to #Repaint()
-//## Both #Repaint() and #Update() are declared protected now.
+//## The actual rendering code has been moved to \#Repaint()
+//## Both \#Repaint() and \#Update() are declared protected now.
 //##
 //## Note: Separation of the Repaint and Update processes (rendering vs
 //## creating a vtk prop tree) still needs to be worked on. The whole
@@ -73,7 +73,7 @@ class MITK_CORE_EXPORT BaseRenderer : public itk::Object
 public:
   typedef std::map<vtkRenderWindow*,BaseRenderer*> BaseRendererMapType;
   static BaseRendererMapType baseRendererMap;
-  
+
   static BaseRenderer* GetInstance(vtkRenderWindow * renWin);
   static void AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer);
   static void RemoveInstance(vtkRenderWindow* renWin);
@@ -184,7 +184,7 @@ public:
   itkGetConstObjectMacro(CurrentWorldGeometry2D, Geometry2D);
 
   //##Documentation
-  //## Calculates the bounds of the DataTree (if it contains any valid data), 
+  //## Calculates the bounds of the DataTree (if it contains any valid data),
   //## creates a geometry from these bounds and sets it as world geometry of the renderer.
   //##
   //## Call this method to re-initialize the renderer to the current DataTree
@@ -238,7 +238,7 @@ public:
   //## @brief SetWorldGeometry is called according to the geometrySliceEvent,
   //## which is supposed to be a SliceNavigationController::GeometrySendEvent
   virtual void SetGeometry(const itk::EventObject & geometrySliceEvent);
-  
+
   //##Documentation
   //## @brief UpdateWorldGeometry is called to re-read the 2D geometry from the
   //## slice navigation controller
@@ -376,7 +376,7 @@ public:
    * rendering enabled */
   unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
- 
+
 protected:
 
   virtual ~BaseRenderer();
@@ -482,7 +482,7 @@ private:
   //##Documentation
   //## @brief timestamp of last call of SetWorldGeometry
   itk::TimeStamp m_CurrentWorldGeometry2DUpdateTime;
-  
+
   //##Documentation
   //## @brief timestamp of last call of SetDisplayGeometry
   itk::TimeStamp m_DisplayGeometryUpdateTime;
@@ -524,7 +524,7 @@ protected:
   std::string m_Name;
 
   double m_Bounds[6];
-  
+
   bool m_EmptyWorldGeometry;
 
   bool m_DepthPeelingEnabled;

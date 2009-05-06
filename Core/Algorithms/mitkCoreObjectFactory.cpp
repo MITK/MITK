@@ -49,7 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointDataVtkMapper3D.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetMapper2D.h"
-#include "mitkPointSetSliceMapper2D.h"
+#include "mitkUnstructuredGridMapper2D.h"
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkPolyDataGLMapper2D.h"
 #include "mitkProperties.h"
@@ -322,7 +322,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
-      newMapper = mitk::PointSetSliceMapper2D::New();
+      newMapper = mitk::UnstructuredGridMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
   }

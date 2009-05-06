@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkGL.h>
-#include "mitkPointSetSliceMapper2D.h"
+#include "mitkUnstructuredGridMapper2D.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 
-void mitk::PointSetSliceMapper2D::GenerateData()
+void mitk::UnstructuredGridMapper2D::GenerateData()
 {
   mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
   if ( node.IsNull() )
@@ -91,7 +91,7 @@ void mitk::PointSetSliceMapper2D::GenerateData()
 
 }
 
-void mitk::PointSetSliceMapper2D::GenerateData( mitk::BaseRenderer* renderer )
+void mitk::UnstructuredGridMapper2D::GenerateData( mitk::BaseRenderer* renderer )
 {
   mitk::BaseData::Pointer input = const_cast<mitk::BaseData*>( this->GetData() );
   assert( input );
@@ -137,7 +137,7 @@ void mitk::PointSetSliceMapper2D::GenerateData( mitk::BaseRenderer* renderer )
   }
 }
 
-void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
+void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 {
   if ( IsVisible( renderer ) == false )
     return ;
@@ -396,7 +396,7 @@ void mitk::PointSetSliceMapper2D::Paint( mitk::BaseRenderer* renderer )
 
 
 vtkAbstractMapper3D* 
-mitk::PointSetSliceMapper2D
+mitk::UnstructuredGridMapper2D
 ::GetVtkAbstractMapper3D(mitk::BaseRenderer * renderer)
 {
   //std::cout << "GETVTKABSTRACTMAPPER3D\n";
@@ -429,7 +429,7 @@ mitk::PointSetSliceMapper2D
 
 
 vtkPointSet*
-mitk::PointSetSliceMapper2D
+mitk::UnstructuredGridMapper2D
 ::GetVtkPointSet(mitk::BaseRenderer* renderer)
 {
   //std::cout << "GETVTKPOINTSET\n";
@@ -466,7 +466,7 @@ mitk::PointSetSliceMapper2D
 
 
 
-vtkScalarsToColors* mitk::PointSetSliceMapper2D::GetVtkLUT(mitk::BaseRenderer* renderer)
+vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer* renderer)
 {
   //std::cout << "GETVTKLUT\n";
   vtkMapper * mapper = dynamic_cast<vtkMapper*>(GetVtkAbstractMapper3D(renderer));
@@ -511,12 +511,12 @@ vtkScalarsToColors* mitk::PointSetSliceMapper2D::GetVtkLUT(mitk::BaseRenderer* r
 }
 
 
-bool mitk::PointSetSliceMapper2D::IsConvertibleToVtkPointSet(mitk::BaseRenderer * renderer)
+bool mitk::UnstructuredGridMapper2D::IsConvertibleToVtkPointSet(mitk::BaseRenderer * renderer)
 {
     return ( GetVtkPointSet(renderer) != 0 );
 }
 
-mitk::PointSetSliceMapper2D::PointSetSliceMapper2D()
+mitk::UnstructuredGridMapper2D::UnstructuredGridMapper2D()
 {
     m_Plane = vtkPlane::New();
     m_Slicer = vtkPointSetSlicer::New();
@@ -536,7 +536,7 @@ mitk::PointSetSliceMapper2D::PointSetSliceMapper2D()
 
 
 
-mitk::PointSetSliceMapper2D::~PointSetSliceMapper2D()
+mitk::UnstructuredGridMapper2D::~UnstructuredGridMapper2D()
 {
   m_Slicer->Delete();
   m_Plane->Delete();

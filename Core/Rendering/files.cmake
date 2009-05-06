@@ -24,7 +24,7 @@ SET(CPP_FILES
   mitkNativeRenderWindowInteractor.cpp
   mitkPointDataVtkMapper3D.cpp
   mitkPointSetMapper2D.cpp
-  mitkPointSetSliceMapper2D.cpp
+  mitkUnstructuredGridMapper2D.cpp
   mitkPointSetVtkMapper3D.cpp
   mitkPolyDataGLMapper2D.cpp
   mitkSplineMapper2D.cpp

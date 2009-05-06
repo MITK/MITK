@@ -45,11 +45,11 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is 
  * rendered in 3D via a vtkPolyData.
  */
-class MITK_CORE_EXPORT PointSetSliceMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT UnstructuredGridMapper2D : public GLMapper2D
 {
 public:
 
-    mitkClassMacro( PointSetSliceMapper2D, GLMapper2D );
+    mitkClassMacro( UnstructuredGridMapper2D, GLMapper2D );
 
     itkNewMacro( Self );
 
@@ -62,9 +62,9 @@ public:
 
 protected:
 
-    PointSetSliceMapper2D();
+    UnstructuredGridMapper2D();
 
-    virtual ~PointSetSliceMapper2D();
+    virtual ~UnstructuredGridMapper2D();
 
     virtual void GenerateData();
     virtual void GenerateData(BaseRenderer*);

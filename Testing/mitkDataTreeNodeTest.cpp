@@ -55,7 +55,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageMapper2D.h>
 #include <mitkMeshMapper2D.h>
 #include <mitkPointSetMapper2D.h>
-#include <mitkPointSetSliceMapper2D.h>
+#include <mitkUnstructuredGridMapper2D.h>
 #include <mitkPolyDataGLMapper2D.h>
 #include <mitkSurfaceMapper2D.h>
 #include <mitkLineMapper2D.h>
@@ -236,9 +236,9 @@ static void TestMapperSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a PointSetMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
 
-  mapper = mitk::PointSetSliceMapper2D::New();
+  mapper = mitk::UnstructuredGridMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a PointSetSliceMapper2D was set correctly" )
+  MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a UnstructuredGridMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
 
   mapper = mitk::PolyDataGLMapper2D::New();

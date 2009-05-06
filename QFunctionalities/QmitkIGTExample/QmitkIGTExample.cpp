@@ -105,6 +105,7 @@ QWidget * QmitkIGTExample::CreateControlWidget(QWidget *parent)
       m_Controls->SetDisplacementFilterParameters(GetFunctionalityOptionsList());
       out->append("found offset value in persistence storage");
     }
+    m_Controls->m_StartPlayingButton->setEnabled(false);
   }
   return m_Controls;
 }
@@ -611,10 +612,12 @@ void QmitkIGTExample::OnStartRecording()
     //now every update of the recorder stores one line into the file for 
     //each added NavigationData
     m_RecordingTimer->start(100);
+    m_Controls->m_StartPlayingButton->setEnabled(true);
   }
   catch (std::exception& e)
   {
     out->append(QString("An error occured: ") + QString(e.what()));
+    m_Controls->m_StartPlayingButton->setEnabled(false);
   }
 }
 

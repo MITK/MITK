@@ -110,7 +110,7 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
   MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData2, "Testing GetBaseData() node 2");
   MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(NULL) == NULL, "Testing GetBaseData(NULL) == NULL");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(111) == NULL, "Testing GetBaseData() with out of range parameter");
   
   //Process
   myFilter->Update();
@@ -145,7 +145,6 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
   MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData1, "Testing switched BaseData NavigationData 2");
   MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(NULL) == NULL, "Testing GetBaseData(NULL) still == NULL");
 
   //processing update through pipeline
   myFilter->Update();

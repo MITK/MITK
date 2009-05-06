@@ -253,11 +253,21 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
     return;
 
   bool addNewNode = false;
+  bool insertNewNode = false;
+  bool changedNode = false;
+
   // if this->HasIndex(index), then a node shall be updated
   if(this->HasIndex(index))
   {
-    // remove node, then proceed as usual
-    this->RemoveNode(index);
+    // if we really have another node at this position then ...
+    if(_DataTreeNode != m_Nodes.at(index))
+    {
+      // ... remove node, then proceed as usual
+      this->RemoveNode(index);
+      insertNewNode = true;
+    }
+    else
+      changedNode = true;
   }  
   // otherwise a new node shall be added, let index point to the element after the last element
   else
@@ -266,37 +276,40 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
     addNewNode = true;
   }
 
-  // break on duplicated nodes (that doesnt make sense to have duplicates in the combobox)
-  if(this->Find(_DataTreeNode) != -1)
-    return;
-
   // const cast because we need non const nodes
   mitk::DataTreeNode* _NonConstDataTreeNode = const_cast<mitk::DataTreeNode*>(_DataTreeNode);
-
-  // add modified observer
-  itk::MemberCommand<QmitkDataStorageComboBox>::Pointer modifiedCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
-  modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
-  // !!!! add modified observer for the name 
-  /// property of the node because this is the only thing we are interested in !!!!!
   mitk::BaseProperty* nameProperty = _NonConstDataTreeNode->GetProperty("name");
-  if(nameProperty)
+
+  if(!changedNode)
   {
-    m_NodesModifiedObserverTags.push_back( nameProperty->AddObserver(itk::ModifiedEvent(), modifiedCommand) );
-    m_PropertyToNode[_NonConstDataTreeNode] = nameProperty;
+    // break on duplicated nodes (that doesnt make sense to have duplicates in the combobox)
+    if(this->Find(_DataTreeNode) != -1)
+      return;
+
+    // add modified observer
+    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer modifiedCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
+    modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
+    // !!!! add modified observer for the name 
+    /// property of the node because this is the only thing we are interested in !!!!!
+    if(nameProperty)
+    {
+      m_NodesModifiedObserverTags.push_back( nameProperty->AddObserver(itk::ModifiedEvent(), modifiedCommand) );
+      m_PropertyToNode[_NonConstDataTreeNode] = nameProperty;
+    }
+    // if there is no name node save an invalid value for the observer tag (-1)
+    else
+      m_NodesModifiedObserverTags.push_back( -1 );
+    
+    // add delete observer
+    itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
+    deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
+    m_NodesDeleteObserverTags.push_back( _NonConstDataTreeNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
   }
-  // if there is no name node save an invalid value for the observer tag (-1)
-  else
-    m_NodesModifiedObserverTags.push_back( -1 );
-  
-  // add delete observer
-  itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
-  deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
-  m_NodesDeleteObserverTags.push_back( _NonConstDataTreeNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
 
   // add node to the vector
   if(addNewNode)
     m_Nodes.push_back( _NonConstDataTreeNode );
-  else
+  else if(insertNewNode)
     m_Nodes.insert( m_Nodes.begin()+index, _NonConstDataTreeNode );
 
   // ... and to the combobox

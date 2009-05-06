@@ -108,6 +108,7 @@ int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
     TestDataTreeStorage(dts, tree);
 
     /* Cleanup */
+    dts = NULL;
     mitk::DataStorage::ShutdownSingleton();
   }
   catch (...)

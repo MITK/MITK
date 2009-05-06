@@ -32,7 +32,11 @@ mitk::StandaloneDataStorage::StandaloneDataStorage()
 
 mitk::StandaloneDataStorage::~StandaloneDataStorage()
 {
-
+  for(AdjacencyList::iterator it = m_SourceNodes.begin();
+    it != m_SourceNodes.end(); it++)
+  {
+    this->RemoveListeners(it->first);
+  }
 }
 
 

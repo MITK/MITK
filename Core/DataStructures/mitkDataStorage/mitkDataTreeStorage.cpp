@@ -38,6 +38,11 @@ mitk::DataTreeStorage::~DataTreeStorage()
   if(m_DataTree.IsNotNull())
   {
     m_DataTree->RemoveObserver(m_DeleteInTreeObserverTag);
+    for(AdjacencyList::iterator it = m_SourceNodes.begin();
+      it != m_SourceNodes.end(); it++)
+    {
+      this->RemoveListeners(it->first);
+    }
   }
 }
 

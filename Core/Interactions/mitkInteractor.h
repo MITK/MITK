@@ -35,15 +35,12 @@ class BaseData;
 //##
 //## The Interactor is held with a SmartPointer by a DataTreeNode
 //## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
-//## Different Modes: In order to work with hierarchical StateMachines and not to send Events to all StateMachines, a StateMachine can be
+//## Different Modes: In order to not send Events to all StateMachines, a StateMachine can be
 //## in three different modes:
 //## DESELECTED: this statemachine doesn't wait for an event
 //## SELECTED: this statemachine just has handled an event and waits for the next one
-//## SUBSELECTED: a hierarchical lower statemachine has just handled an event so this statemachine wants to pass the event to this machine
-//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data,
-//## subselect if a subobject is selected (and a submachine is selected).
-//## Set the mode in each hierachical lavel of a statemachine! Each statemachine has to to this on its own in ExecuteAction, cause only here
-//## can be recognized if a substatemachine has to be selected or this statemachine has to be selected.
+//## SUBSELECTED: depricate; was used for hierarchical statemachines before.
+//## Guidelines for the modevalues: Selected if the coresponding data is selected, deselected if deselect of data.
 //##
 //## In moving the machine is selected. After a new insert the machine is selected, since the data is also selected
 //## In method ExecuteAction(..) the different actions are divided up through switch/case statements. Each block has to check

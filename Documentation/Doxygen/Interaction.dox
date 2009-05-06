@@ -92,8 +92,8 @@ To add or remove a statemachine to the list of registered interactors, call \a A
 
 So after the object \a GlobalInteraction has recieved an event, it sends this event to all registered Listeners and then asks all registered Interactors through the method \a CalculateJurisdiction how good each Interactor can handle this event. The Interactor which can handle the event the best recieves the event. Also see the documented code in \a mitkGlobalInteraction.
 
-Due to the realization of an hierarchical statemachine mechanism (see press) the class \a Interactor has also a mode, which can be one of the following: deselected, subselected, selected. These modes are also used for the event mechanism.
-If a statemachine or better called an interactor is in a state, where the user builds up a graphical object, it is likely, that the following events are also for the build of the object. Here the interactor is in mode selected as long as the interactor couldn't handle an event. Then it changes to mode deselected. The mode changes are done in the actions through operations (described further down) and so declared inside the interaction pattern.
+To not ask all registered interactors on a new event, the class \a Interactor also has a mode, which can be one of the following: deselected, subselected (depricated since HierarchicalInteraction has been removed), selected. These modes are also used for the event mechanism.
+If an interactor is in a state, where the user builds up a graphical object, it is likely, that the following events are also for the build of the object. Here the interactor is in mode selected as long as the interactor couldn't handle an event. Then it changes to mode deselected. The mode changes are done in the actions through operations (described further down) and so declared inside the interaction pattern.
 
 See mitk::GlobalInteraction
 

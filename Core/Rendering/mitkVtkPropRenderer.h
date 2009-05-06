@@ -53,6 +53,12 @@ VtkPropRenderer replaces the old OpenGLRenderer.
 */
 class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
 {
+  // Workaround for Displaylistbug
+private:
+  bool didCount;
+  void checkState();
+  // Workaround END
+
 public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);

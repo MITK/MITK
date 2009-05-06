@@ -57,6 +57,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkProp.h>
 #include <vtkAssemblyPath.h>
 #include <vtkAssemblyNode.h>
+#include <vtkMapper.h>
 
 
 
@@ -66,6 +67,8 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
   m_VtkMapperPresent(false), 
   m_NewRenderer(true)
 {
+  didCount=false;
+
   m_WorldPointPicker = vtkWorldPointPicker::New();
   m_PointPicker = vtkPointPicker::New();
 
@@ -90,6 +93,12 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
 */
 mitk::VtkPropRenderer::~VtkPropRenderer()
 {
+  // Workaround for GLDisplayList Bug
+  {
+    m_MapperID=0;
+    checkState();
+  }
+
   if(m_LightKit != NULL)
     m_LightKit->Delete();
 
@@ -537,6 +546,9 @@ void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   if(m_MapperID != mapperId)
     Superclass::SetMapperID(mapperId);
+
+  // Workaround for GL Displaylist Bug
+  checkState();
 }
 
 /*!
@@ -753,3 +765,46 @@ mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() con
   return m_MappersMap;
 }
 #endif
+
+
+
+
+// Workaround for GL Displaylist bug
+
+static int glWorkAroundGlobalCount=0;
+
+void mitk::VtkPropRenderer::checkState()
+{
+  if(m_MapperID==Standard3D)
+  {
+    if(!didCount)
+    {
+      didCount=true;
+      glWorkAroundGlobalCount++;
+      if(glWorkAroundGlobalCount==2)
+      {
+        //std::cout << "GIMR ON\n";
+          vtkMapper::GlobalImmediateModeRenderingOn();
+      }
+
+    //std::cout << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
+       
+    }
+  }
+  else
+  {
+    if(didCount)
+    {
+    didCount=false;
+    glWorkAroundGlobalCount--;
+    if(glWorkAroundGlobalCount==1)
+    {
+      //std::cout << "GIMR OFF\n";
+      vtkMapper::GlobalImmediateModeRenderingOff();
+    }
+
+    //std::cout << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
+    
+    }
+   }
+}

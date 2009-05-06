@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPointData.h>
 #include <vtkObjectFactory.h>
 #include <vtkRendererCollection.h>
-
+   
 
 mitk::GradientBackground::GradientBackground()
 {
@@ -79,7 +79,8 @@ mitk::GradientBackground::GradientBackground()
 
   m_Mapper->SetInput( m_Plane );
   m_Mapper->SetLookupTable( m_Lut );
-  m_Mapper->ImmediateModeRenderingOn();
+  
+  //m_Mapper->ImmediateModeRenderingOn();
 
   m_Actor->SetMapper( m_Mapper );
 

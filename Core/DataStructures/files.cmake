@@ -126,6 +126,7 @@ SET(CPP_FILES
   mitkVtkInterpolationProperty.cpp
   mitkVtkRepresentationProperty.cpp
   mitkVtkResliceInterpolationProperty.cpp
+  mitkVtkVolumeRenderingProperty.cpp
   mitkVtkScalarModeProperty.cpp
   mitkWeakPointerProperty.cpp
   mitkXMLIO.cpp

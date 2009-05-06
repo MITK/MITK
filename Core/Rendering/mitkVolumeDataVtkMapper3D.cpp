@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeRayCastCompositeFunction.h>
+#include <vtkVolumeRayCastMIPFunction.h>
 #include <vtkFiniteDifferenceGradientEstimator.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -55,6 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>
+#include "mitkVtkVolumeRenderingProperty.h"
 
 
 #include <itkMultiThreader.h>
@@ -72,18 +74,25 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_ClippingPlane = vtkPlane::New();
   m_PlaneWidget = vtkImplicitPlaneWidget::New();
 
+  /*
   m_T2DMapper =  vtkVolumeTextureMapper2D::New();
   m_T2DMapper->SetMaximumNumberOfPlanes( 100 );
-
+*/
   m_HiResMapper = vtkVolumeRayCastMapper::New();
   m_HiResMapper->SetSampleDistance(0.5); // 4 rays for every pixel
 
   m_HiResMapper->IntermixIntersectingGeometryOn();
   m_HiResMapper->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
+  /*
   vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
   compositeFunction->SetCompositeMethodToClassifyFirst();
   m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
   compositeFunction->Delete();
+
+  vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
+  m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
+  mipFunction->Delete();
+ */
 
   vtkFiniteDifferenceGradientEstimator* gradientEstimator =
   vtkFiniteDifferenceGradientEstimator::New();
@@ -99,7 +108,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
 
   m_HiResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyHigh,0.0); // RayCast
 
-  m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumePropertyLow,0.0); // TextureMapper2D
+//  m_LowResID = m_VolumeLOD->AddLOD(m_T2DMapper,m_VolumePropertyLow,0.0); // TextureMapper2D
 
 
   m_MedResID = m_VolumeLOD->AddLOD(m_HiResMapper,m_VolumePropertyMed,0.0); // RayCast
@@ -154,7 +163,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   this->m_Resampler->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
   this->m_HiResMapper->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
 
-  m_T2DMapper->SetInput(m_Resampler->GetOutput());
+//  m_T2DMapper->SetInput(m_Resampler->GetOutput());
 
 
   this->CreateDefaultTransferFunctions();
@@ -165,7 +174,7 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 {
   m_UnitSpacingImageFilter->Delete();
   m_ImageCast->Delete();
-  m_T2DMapper->Delete();
+//  m_T2DMapper->Delete();
   m_HiResMapper->Delete();
   m_Resampler->Delete();
   m_VolumePropertyLow->Delete();
@@ -196,7 +205,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
 
   vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
-   
+
   bool volumeRenderingEnabled = true;
 
   if (this->IsVisible(renderer)==false ||
@@ -252,6 +261,30 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
   else
   {
+        int renderingValue = dynamic_cast<mitk::VtkVolumeRenderingProperty*>(GetDataTreeNode()->GetProperty("volumerendering configuration",renderer))->GetValueAsId();
+        switch(renderingValue)
+        {
+            case  VTK_VOLUME_RAY_CAST_MIP_FUNCTION:
+            {
+                vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
+                m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
+                mipFunction->Delete();
+                std::cout <<"in switch" <<std::endl;
+                break;
+            }
+            
+            case VTK_RAY_CAST_COMPOSITE_FUNCTION:
+            {
+                vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+                compositeFunction->SetCompositeMethodToClassifyFirst();
+                m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
+                compositeFunction->Delete();
+                break;
+            }
+            default:
+                std::cerr <<"Warning: invalid volume rendering option.  " << std::endl;
+
+        }
     m_VolumeLOD->VisibilityOn();
   }
 
@@ -261,7 +294,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
   case 0:
   default:
-    m_VolumeLOD->SetSelectedLODID( m_LowResID );
+    m_VolumeLOD->SetSelectedLODID(m_MedResID);  /*m_LowResID );*/
     break;
 
   case 1:
@@ -510,7 +543,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
     m_PlaneWidget->PlaceWidget(
         input->GetGeometry()->GetOrigin()[0],(input->GetGeometry()->GetOrigin()[0])+(input->GetDimension(0))*(input->GetVtkImageData()->GetSpacing()[0]),                               input->GetGeometry()->GetOrigin()[1],(input->GetGeometry()->GetOrigin()[1])+(input->GetDimension(1))*(input->GetVtkImageData()->GetSpacing()[1]),                               input->GetGeometry()->GetOrigin()[2],(input->GetGeometry()->GetOrigin()[2])+(input->GetDimension(2))*(input->GetVtkImageData()->GetSpacing()[2]));
 
-    m_T2DMapper->AddClippingPlane(m_ClippingPlane);
+//    m_T2DMapper->AddClippingPlane(m_ClippingPlane);
     m_HiResMapper->AddClippingPlane(m_ClippingPlane);
     }
 
@@ -531,7 +564,7 @@ void mitk::VolumeDataVtkMapper3D::SetClippingPlane(vtkRenderWindowInteractor* in
 /* Removes the clipping plane */
 void mitk::VolumeDataVtkMapper3D::DelClippingPlane()
 {
-  m_T2DMapper->RemoveAllClippingPlanes();
+//  m_T2DMapper->RemoveAllClippingPlanes();
   m_HiResMapper->RemoveAllClippingPlanes();
   m_PlaneSet = false;
 }
@@ -544,6 +577,7 @@ void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "volumerendering configuration", mitk::VtkVolumeRenderingProperty::New( 1 ), renderer, overwrite );
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 #include "mitkNavigationData.h"
 
 #include "mitkTestingMacros.h"
@@ -28,14 +28,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /**Documentation
- *  test for the class "NavigationDataVisualizationByBaseDataTransformFilter".
+ *  test for the class "NavigationDataObjectVisualizationFilter".
  */
-int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */, char* /*argv*/[])
+int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("NavigationDataVisualizationByBaseDataTransformFilter")
+  MITK_TEST_BEGIN("NavigationDataObjectVisualizationFilter")
 
   // let's create an object of our class  
-  mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer myFilter = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
+  mitk::NavigationDataObjectVisualizationFilter::Pointer myFilter = mitk::NavigationDataObjectVisualizationFilter::New();
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
@@ -81,18 +81,12 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   MITK_TEST_CONDITION_REQUIRED(output != myFilter->GetOutput(1), "Testing GetOutput() != GetOutput(1)");
 
   // Test setting BaseData
-  vtkConeSource* vtkData1 = vtkConeSource::New();
   mitk::Cone::Pointer mitkToolData1 = mitk::Cone::New();
-  mitkToolData1->SetVtkPolyData(vtkData1->GetOutput());
 
-  vtkConeSource* vtkData2 = vtkConeSource::New();
   mitk::Cone::Pointer mitkToolData2 = mitk::Cone::New();
-  mitkToolData2->SetVtkPolyData(vtkData2->GetOutput());
 
   //dummy for test; will not be set but used to test find
-  vtkConeSource* vtkDataDummy = vtkConeSource::New();
   mitk::Cone::Pointer mitkToolDataDummy = mitk::Cone::New();
-  mitkToolDataDummy->SetVtkPolyData(vtkDataDummy->GetOutput());
   //and the Dummy NavigationData for this
   mitk::NavigationData::PositionType initialPosDummy;
   mitk::FillVector3D(initialPosDummy, 8.8, 9.9, 10.10);
@@ -107,15 +101,15 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   //now we have ndDummy and mitkToolDataDummy to test with
 
   //setting nodes
-  MITK_TEST_CONDITION(myFilter->SetBaseData(nd1, mitkToolData1), "Testing SetBaseData() node 1");
+  MITK_TEST_CONDITION(myFilter->SetBaseData(0, mitkToolData1), "Testing SetBaseData() node 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() after adding first tool");
-  MITK_TEST_CONDITION(myFilter->SetBaseData(nd2, mitkToolData2), "Testing SetBaseData() node 2");
+  MITK_TEST_CONDITION(myFilter->SetBaseData(1, mitkToolData2), "Testing SetBaseData() node 2");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() after adding second tool");
   //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd1) == mitkToolData1, "Testing GetBaseData() node 1");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd2) == mitkToolData2, "Testing GetBaseData() node 2");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd2) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData1, "Testing GetBaseData() node 1");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData2, "Testing GetBaseData() node 2");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
   MITK_TEST_CONDITION(myFilter->GetBaseData(NULL) == NULL, "Testing GetBaseData(NULL) == NULL");
   
   //Process
@@ -142,15 +136,15 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   myFilter->Clear();
   std::cout<<"Clearing BaseData\n";
 
-  MITK_TEST_CONDITION(myFilter->SetBaseData(nd1, mitkToolData2), "Twisting mitkToolData by using SetBaseData() NavigationData 1 with ToolData 2");
+  MITK_TEST_CONDITION(myFilter->SetBaseData(0, mitkToolData2), "Twisting mitkToolData by using SetBaseData() NavigationData 1 with ToolData 2");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() == 1");
-  MITK_TEST_CONDITION(myFilter->SetBaseData(nd2, mitkToolData1), "Twisting mitkToolData by using SetBaseData() NavigationData 2 with ToolData 1");
+  MITK_TEST_CONDITION(myFilter->SetBaseData(1, mitkToolData1), "Twisting mitkToolData by using SetBaseData() NavigationData 2 with ToolData 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 2");
   //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd1) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd2) == mitkToolData1, "Testing switched BaseData NavigationData 2");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(nd2) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData1, "Testing switched BaseData NavigationData 2");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
   MITK_TEST_CONDITION(myFilter->GetBaseData(NULL) == NULL, "Testing GetBaseData(NULL) still == NULL");
 
   //processing update through pipeline
@@ -182,9 +176,9 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   MITK_TEST_CONDITION(myFilter->GetInput(2) == ndDummy, "Testing Input == newly added input");
   MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != NULL, "Testing GetOutput(2) != NULL");
   MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != myFilter->GetOutput(1), "Testing GetOutput(2) != GetOutput(1)");
-  MITK_TEST_CONDITION(myFilter->SetBaseData(ndDummy, mitkToolDataDummy), "Testing SetBaseData() node 3");
+  MITK_TEST_CONDITION(myFilter->SetBaseData(2, mitkToolDataDummy), "Testing SetBaseData() node 3");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 3, "Testing GetNumberOfToolRepresentations() after adding latest tool");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(ndDummy) == mitkToolDataDummy, "Testing GetBaseData() equals wat was set");
+  MITK_TEST_CONDITION(myFilter->GetBaseData(2) == mitkToolDataDummy, "Testing GetBaseData() equals wat was set");
   
   //last time processing update through pipeline
   myFilter->Update();
@@ -196,11 +190,7 @@ int mitkNavigationDataVisualizationByBaseDataTransformFilterTest(int /* argc */,
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Latest= affineTransformDummy->GetMatrix().GetVnlMatrix();
   std::cout<<"\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest <<"\n";
-  
- 
+
   // always end with this!
   MITK_TEST_END();
-
 }
-
-

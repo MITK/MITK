@@ -160,9 +160,9 @@ void QmitkIGTTutorial::OnDoIGT()
     //PolyData. In our case the input is the source and the PolyData our cone.
 
     //First we create a new filter for the visualization update.
-    m_Visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
+    m_Visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
     m_Visualizer->SetInput(0, m_Source->GetOutput(0));        //Then we connect to the pipeline.
-    m_Visualizer->SetBaseData(m_Source->GetOutput(0), cone);  //After that we have to assign the right output 
+    m_Visualizer->SetBaseData(0, cone);  //After that we have to assign the right output 
                                                               //to our cone
 
     //Now this simple pipeline is ready, so we can start the tracking. Here again: We do not call the 

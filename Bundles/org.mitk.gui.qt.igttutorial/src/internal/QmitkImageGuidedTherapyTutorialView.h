@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkImageGuidedTherapyTutorialViewControls.h"
 
 #include "mitkTrackingDeviceSource.h"
-#include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 
 /**
 * \brief QmitkIGTTutorial shows a small typically navigation MITK functionality.
@@ -91,7 +91,7 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget; ///< our display widget
 
   mitk::TrackingDeviceSource::Pointer m_Source; ///< source filer that connects to the tracking device
-  mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer m_Visualizer; ///< visualization filter uses output from m_Source
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; ///< visualization filter uses output from m_Source
   QTimer* m_Timer; ///< timer for continuous tracking update
 };
 

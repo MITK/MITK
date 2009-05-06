@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingConfig.h"
 
 #include "mitkTrackingDeviceSource.h"
-#include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 
 class QmitkStdMultiWidget;
 class QmitkIGTTutorialControls;
@@ -105,7 +105,7 @@ protected:
   QmitkIGTTutorialControls * m_Controls;
 
   mitk::TrackingDeviceSource::Pointer m_Source; ///< first filter in the pipeline
-  mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer m_Visualizer;
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer;
   QTimer* m_Timer; ///< timer for continuous tracking update
 };
 #endif // !defined(QmitkIGTTutorial_H__INCLUDED)

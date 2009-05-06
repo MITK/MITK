@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define CAMERAVISUALIZATION_H_INCLUDED
 
 #include "mitkCommon.h"
-#include "mitkNavigationDataVisualizationFilter.h"
-#include "mitkVtkPropRenderer.h"
+#include "mitkNavigationDataToNavigationDataFilter.h"
+#include "mitkBaseRenderer.h"
 
 namespace mitk {
   /**Documentation
@@ -31,56 +31,65 @@ namespace mitk {
   * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
   *
   * \ingroup IGT
-  */  class MITK_IGT_EXPORT CameraVisualization : public NavigationDataVisualizationFilter
+  */  class MITK_IGT_EXPORT CameraVisualization : public NavigationDataToNavigationDataFilter
   {
   public:
-    mitkClassMacro(CameraVisualization,NavigationDataVisualizationFilter);
+    mitkClassMacro(CameraVisualization, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
 
-    /**Documentation
+    /**
     * \brief sets the direction of projection of the camera of the renderer in tool coordinates
     */
-    itkSetMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
-    /**Documentation
+    itkSetMacro(DirectionOfProjectionInToolCoordinates, mitk::Vector3D);
+    
+    /**
     * \brief sets the view up vector of the camera of the renderer in tool coordinates
     */
-    itkSetMacro(ViewUpInToolCoordinates,Vector3D);
-    /**Documentation
+    itkSetMacro(ViewUpInToolCoordinates, mitk::Vector3D);
+    
+    /**
     * \brief sets the focal length of the camera
     */
-    itkSetMacro(FocalLength,float);
-    /**Documentation
+    itkSetMacro(FocalLength, float);
+    
+    /**
     * \brief sets the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
     */
-    itkSetMacro(ViewAngle,float);
-    /**Documentation
+    itkSetMacro(ViewAngle, float);
+
+    /**
     * \brief returns the direction of projection of the camera of the renderer in tool coordinates
     */
-    itkGetConstMacro(DirectionOfProjectionInToolCoordinates,Vector3D);
-    /**Documentation
+    itkGetConstMacro(DirectionOfProjectionInToolCoordinates, mitk::Vector3D);
+
+    /**
     * \brief returns the view up vector of the camera of the renderer in tool coordinates
     */
-    itkGetConstMacro(ViewUpInToolCoordinates,Vector3D);
-    /**Documentation
+    itkGetConstMacro(ViewUpInToolCoordinates, mitk::Vector3D);
+    
+    /**
     * \brief returns the focal length of the camera
     */
-    itkGetConstMacro(FocalLength,float);
-    /**Documentation
+    itkGetConstMacro(FocalLength, float);
+    
+    /**
     * \brief returns the view angle of the camera of the renderer which angular height of the camera view measured in degrees (cf. vtkCamera)
     */
-    itkGetConstMacro(ViewAngle,float);
-    /**Documentation
+    itkGetConstMacro(ViewAngle, float);
+    
+    /**
     * \brief sets renderer that visualizes the navigation data
     */
-    virtual void SetRenderer( VtkPropRenderer::Pointer renderer );
+    virtual void SetRenderer( mitk::BaseRenderer* renderer );
     
-    /**Documentation
+    /**
     * \brief returns the renderer that visualizes the navigation data
     */
-    virtual const BaseRenderer* GetRenderer();
+    virtual const mitk::BaseRenderer* GetRenderer();
 
     /**Documentation 
-    *@brief Set all filter parameters as the PropertyList p
+    *\brief Set all filter parameters as the PropertyList p
+    *
     * This method reads the following properties from the PropertyList (name : data type):
     *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
     *  - "CameraVisualization_ViewUpInToolCoordinates" : mitk::Vector3DProperty
@@ -90,7 +99,8 @@ namespace mitk {
     virtual void SetParameters(const mitk::PropertyList* p);
 
     /**Documentation 
-    *@brief Get all filter parameters as a PropertyList
+    *\brief Get all filter parameters as a PropertyList
+    *
     * This method returns a PropertyList containing the following
     * properties (name : data type):
     *  - "CameraVisualization_DirectionOfProjectionInToolCoordinates" : mitk::Vector3DProperty
@@ -108,11 +118,12 @@ namespace mitk {
 
     /**Documentation
     * \brief filter execute method
+    *
     * positions and orients camera according to the position and orientation hold in the NavigationData
     */
     virtual void GenerateData();
 
-    BaseRenderer* m_Renderer; ///< renderer that visualizes the navigation data-
+    mitk::BaseRenderer::Pointer m_Renderer; ///< renderer that visualizes the navigation data-
 
     Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
     Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates
@@ -120,6 +131,4 @@ namespace mitk {
     float m_ViewAngle; ///< view angle of the camera: angular height of the camera view measured in degrees.
   };
 } // namespace mitk
-
-
 #endif

@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataDisplacementFilter.h"
-#include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
 #include "mitkTrackingDevice.h"
 #include "mitkNavigationDataRecorder.h"
 #include "mitkNavigationDataPlayer.h"

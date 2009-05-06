@@ -17,25 +17,26 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_
+#ifndef MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_
+#define MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_
 
-#include "mitkNavigationDataVisualizationFilter.h"
+#include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"
+#include "mitkBaseData.h"
 
 namespace mitk {
 
   /**
   * \brief Class that reads NavigationData from input and transfers the information to the geometry of the associated BaseData
   *
-  * Derived from NavigationDataVisualizationFilter
+  * Derived from NavigationDataToNavigationDataFilter
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT NavigationDataVisualizationByBaseDataTransformFilter : public NavigationDataVisualizationFilter
+  class MITK_IGT_EXPORT NavigationDataObjectVisualizationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
-    mitkClassMacro(NavigationDataVisualizationByBaseDataTransformFilter, NavigationDataVisualizationFilter);
+    mitkClassMacro(NavigationDataObjectVisualizationFilter, NavigationDataToNavigationDataFilter);
 
     itkNewMacro(Self);
 
@@ -62,14 +63,15 @@ namespace mitk {
     * \param nd Specification of the NavigationData tha data will be associated to
     * \return Returns true if the tool has been added, false otherwise.
     */
-    bool SetBaseData(const NavigationData* nd, BaseData* data);
+    bool SetBaseData(unsigned int index, BaseData* data);
     
     /** 
     * \brief Get the BaseData of the tool specified by the given NavigationData
-    * \param nd The NavigationData of the BaseData that has to be returned
-    * \return Returns the desired BaseData if the NavigationData could be found; Returns Null if no nd was found or if nd is NULL.
+    * \param idx the corresponding input number with which the BaseData is associated
+    * \return Returns the desired BaseData if it exists for the given input; Returns NULL 
+    *         if no BaseData was found or no input was set for the given number.
     */
-    const BaseData* GetBaseData(const NavigationData* nd) const;
+    const BaseData* GetBaseData(unsigned int idx);
   
     /** 
     * \brief Clear the map of BaseDatas
@@ -82,7 +84,9 @@ namespace mitk {
     * \return Returns the size of the internal map
     */
     RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
-    {return m_RepresentationList.size();}
+    {
+      return m_RepresentationList.size();
+    }
 
     /*
     * \brief Transfer the information from the input to the associated BaseData
@@ -94,12 +98,12 @@ namespace mitk {
     /**
     * \brief Constructor
     **/
-    NavigationDataVisualizationByBaseDataTransformFilter();
+    NavigationDataObjectVisualizationFilter();
 
     /**
     * \brief Destructor
     **/
-    ~NavigationDataVisualizationByBaseDataTransformFilter();
+    ~NavigationDataObjectVisualizationFilter();
 
     /**
     * \brief Create a BaseData that represents the given tool
@@ -115,6 +119,6 @@ namespace mitk {
 } // namespace mitk
 
 
-#endif /* MITKNAVIGATIONDATAVISUALIZATIONBYBASEDATATRANSFORMFILTER_H_HEADER_INCLUDED_ */
+#endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */
 
 

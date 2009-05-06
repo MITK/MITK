@@ -15,52 +15,64 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#include "mitkNavigationDataVisualizationByBaseDataTransformFilter.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 
 #include "mitkDataStorage.h"
 
 
-mitk::NavigationDataVisualizationByBaseDataTransformFilter::NavigationDataVisualizationByBaseDataTransformFilter()
-{}
-
-
-mitk::NavigationDataVisualizationByBaseDataTransformFilter::~NavigationDataVisualizationByBaseDataTransformFilter()
-{}
-
-
-const mitk::BaseData* mitk::NavigationDataVisualizationByBaseDataTransformFilter::GetBaseData(const NavigationData* nd) const
+mitk::NavigationDataObjectVisualizationFilter::NavigationDataObjectVisualizationFilter()
+: NavigationDataToNavigationDataFilter()
 {
+  m_RepresentationList.clear();
+}
+
+
+mitk::NavigationDataObjectVisualizationFilter::~NavigationDataObjectVisualizationFilter()
+{
+  m_RepresentationList.clear();
+}
+
+
+const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetBaseData(unsigned int idx)
+{
+  if (idx >= this->GetNumberOfInputs())
+    return NULL;
+  
+  const NavigationData* nd = this->GetInput(idx);  
   if (nd == NULL)
     return NULL;
 
   RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(nd);
   if (iter != m_RepresentationList.end())
     return (*iter).second;
-  
-  //else:
+
   return NULL;
 }
 
-bool mitk::NavigationDataVisualizationByBaseDataTransformFilter::SetBaseData(const NavigationData* nd, BaseData* data)
+
+bool mitk::NavigationDataObjectVisualizationFilter::SetBaseData(unsigned int idx, BaseData* data)
 {
+  if (idx >= this->GetNumberOfInputs())
+    return false;
+
+  const NavigationData* nd = this->GetInput(idx);
+
   if (nd == NULL || data == NULL)
     return false;
 
-  //pair for returning the result
-  std::pair<RepresentationPointerMap::iterator, bool> returnEl;
-  
-  //insert the given elements
-  returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) );
-  
-  return returnEl.second;
+  std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
+  returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements  
+  return returnEl.second; // return if insert was successful 
 }
 
-void mitk::NavigationDataVisualizationByBaseDataTransformFilter::Clear()
+
+void mitk::NavigationDataObjectVisualizationFilter::Clear()
 {
   m_RepresentationList.clear();
 }
 
-void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
+
+void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
 {
   /*get each input, lookup the associated BaseData and transfer the data*/
   DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
@@ -80,10 +92,10 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
       continue;
     }
     output->Graft(nd); // copy all information from input to output
-    const mitk::BaseData* data = this->GetBaseData(nd);
+    const mitk::BaseData* data = this->GetBaseData(index);
     if (data == NULL)
     {
-      itkWarningMacro("Wrong BaseData associated with NavigationData!");
+      itkWarningMacro("NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.");
       return;
     }
     
@@ -92,7 +104,7 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     if (affineTransform.IsNull())
     {
       //replace with mitk standard output
-      itkWarningMacro("AffineTransform IndexToWorldTransform not initialized!");
+      itkWarningMacro("NavigationDataObjectVisualizationFilter: AffineTransform IndexToWorldTransform not initialized!");
       return;
     }
 
@@ -115,7 +127,7 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     quatTransform->SetRotation(doubleQuaternion);
     quatTransform->Modified();
 
-    /* because of an itk bug, the transform can not be calculated with float datatype. 
+    /* because of an itk bug, the transform can not be calculated with float data type. 
     To use it in the mitk geometry classes, it has to be transfered to mitk::ScalarType which is float */
     static AffineTransform3D::MatrixType m;
     mitk::TransferMatrix(quatTransform->GetMatrix(), m);
@@ -139,6 +151,3 @@ void mitk::NavigationDataVisualizationByBaseDataTransformFilter::GenerateData()
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.
   }
 }
-
-
-

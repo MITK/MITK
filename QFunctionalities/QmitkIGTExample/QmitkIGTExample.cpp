@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
 #include "mitkRandomTrackingDevice.h"
+#include "mitkNavigationDataObjectVisualizationFilter.h"
 #ifdef MITK_USE_MICROBIRD_TRACKER
 #include "mitkMicroBirdTrackingDevice.h"
 #endif // MITK_USE_MICROBIRD_TRACKER
@@ -283,7 +284,7 @@ void QmitkIGTExample::OnTestNavigation()
       m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
-    mitk::NavigationDataVisualizationByBaseDataTransformFilter::Pointer visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
+    mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
     for (int i = 0; i < m_Displacer->GetNumberOfOutputs(); i++)
       visualizer->SetInput(i, m_Displacer->GetOutput(i));
 
@@ -301,7 +302,7 @@ void QmitkIGTExample::OnTestNavigation()
       toolNode->Modified();
       //add it to the DataStorage
       mitk::DataStorage::GetInstance()->Add(toolNode);
-      visualizer->SetBaseData(m_Displacer->GetOutput(i), mitkToolData);
+      visualizer->SetBaseData(i, mitkToolData);
     }
     m_EndOfPipeline = visualizer;
 

@@ -178,14 +178,13 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
                                                   //render windows.
 
     //For updating the render windows we use another filter of the MITK-IGT pipeline concept. The 
-    //NavigationDataVisualizationByBaseDataTransformFilter needs as input a NavigationData and a
+    //NavigationDataObjectVisualizationFilter needs as input a NavigationData and a
     //PolyData. In our case the input is the source and the PolyData our cone.
 
     //First we create a new filter for the visualization update.
-    m_Visualizer = mitk::NavigationDataVisualizationByBaseDataTransformFilter::New();
+    m_Visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
     m_Visualizer->SetInput(0, m_Source->GetOutput(0));        //Then we connect to the pipeline.
-    m_Visualizer->SetBaseData(m_Source->GetOutput(0), cone);  //After that we have to assign the correct
-                                                              //output to our cone
+    m_Visualizer->SetBaseData(0, cone);  //After that we have to assign the cone to the input
 
     //Now this simple pipeline is ready, so we can start the tracking. Here again: We do not call the 
     //StartTracking method from the tracker object itself. Instead we call this method from our source.

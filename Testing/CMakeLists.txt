@@ -71,7 +71,7 @@ IF(MITK_BUILD_IGT)
  mitkNavigationDataToMessageFilterTest.cpp
  mitkNavigationDataToPointSetFilterTest.cpp
  mitkNavigationDataTransformFilterTest.cpp
- mitkNavigationDataVisualizationByBaseDataTransformFilterTest.cpp
+ mitkNavigationDataObjectVisualizationFilterTest.cpp
  mitkNavigationDataDisplacementFilterTest.cpp
  mitkNDIPassiveToolTest.cpp
  mitkTimeStampTest.cpp

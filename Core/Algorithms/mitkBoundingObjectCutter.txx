@@ -19,8 +19,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #ifndef MITKBOUNDINGOBJECTCUTTER_TXX
 #define MITKBOUNDINGOBJECTCUTTER_TXX
 
-//##Documentation
-//## @brief For internal within mitkBoundingObjectCutter.cpp and mitkBoundingObjectCutAndCast.txx only
 
 #include "mitkStatusBar.h"
 #include "mitkImageToItk.h"

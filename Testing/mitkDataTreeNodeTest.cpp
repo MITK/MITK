@@ -78,16 +78,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkConnectPointsInteractor.h>
 #include <mitkContourInteractor.h>
 #include <mitkExtrudedContourInteractor.h>
-#include <mitkHierarchicalInteractor.h>
 #include <mitkPointInteractor.h>
 #include <mitkPointSelectorInteractor.h>
 #include <mitkPointSetInteractor.h>
 #include <mitkSeedsInteractor.h>
-
-#include <mitkLineInteractor.h>
-#include <mitkPointSnapInteractor.h>
-#include <mitkPolygonInteractor.h>
-#include <mitkPrimStripInteractor.h>
 
 #include <mitkDisplayPointSetInteractor.h>
 
@@ -349,9 +343,6 @@ static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   interactor = mitk::ExtrudedContourInteractor::New("AffineInteractions click to select", dataTreeNode);
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a ExtrudedContourInteractor was set correctly" )
 
-  interactor = mitk::HierarchicalInteractor::New("AffineInteractions click to select", dataTreeNode);
-  MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a HierarchicalInteractor was set correctly" )
-
   interactor = mitk::PointInteractor::New("AffineInteractions click to select", dataTreeNode);
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a PointInteractor was set correctly" )
 
@@ -363,21 +354,6 @@ static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
 
   interactor = mitk::SeedsInteractor::New("AffineInteractions click to select", dataTreeNode);
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a SeedsInteractor was set correctly" )
-
-  interactor = mitk::LineInteractor::New("AffineInteractions click to select", dataTreeNode);
-  MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a LineInteractor was set correctly" )
-  
-  //Bug#: 	1501
-  //interactor = mitk::PointSnapInteractor::New("AffineInteractions click to select", dataTreeNode);
-  //MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a PointSnapInteractor was set correctly" )
-
-  //Bug#: 	1502
-  //interactor = mitk::PolygonInteractor::New("AffineInteractions click to select", dataTreeNode);
-  //MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a PolygonInteractor was set correctly" )
-
-  //see other bugs
-  //interactor = mitk::PrimStripInteractor::New("AffineInteractions click to select", dataTreeNode);
-  //MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a PrimStripInteractor was set correctly" )
 
   interactor = mitk::DisplayPointSetInteractor::New("AffineInteractions click to select", dataTreeNode);
   MITK_TEST_CONDITION( interactor == dataTreeNode->GetInteractor(), "Testing if a DisplayPointSetInteractor was set correctly" )

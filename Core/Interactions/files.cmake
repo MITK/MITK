@@ -18,19 +18,14 @@ SET(CPP_FILES
   mitkExtrudedContourInteractor.cpp
   mitkFeedbackContourTool.cpp
   mitkGlobalInteraction.cpp
-  mitkHierarchicalInteractor.cpp
   # mitkInteractionDebug.cpp
   mitkInteractionDebugger.cpp
   mitkInteractor.cpp
-  mitkLineInteractor.cpp
   mitkPointInteractor.cpp
   mitkPointSelectorInteractor.cpp
   mitkPointSetInteractor.cpp
-  mitkPointSnapInteractor.cpp
-  mitkPolygonInteractor.cpp
   mitkPositionEvent.cpp
   mitkPositionTracker.cpp
-  mitkPrimStripInteractor.cpp
   mitkSeedsInteractor.cpp
   mitkSegmentationsProcessingTool.cpp
   mitkSegTool2D.cpp

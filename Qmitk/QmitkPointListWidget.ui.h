@@ -39,7 +39,6 @@ void QmitkPointListWidget::init()
   m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
-  m_CurrentPolygonInteraction = NULL;
   m_PointSetNode = NULL;
   m_NumberOfPoints = UNLIMITED;
   this->m_SetPoints->setEnabled(false);
@@ -245,7 +244,6 @@ void QmitkPointListWidget::Reinitialize( bool disableInteraction )
   m_DataChangedCommand->SetCallbackFunction(this, &QmitkPointListWidget::ItemsOfListUpdate);
   m_CurrentObserverID = 0;
   m_CurrentInteraction = NULL;
-  m_CurrentPolygonInteraction = NULL;
   m_PointSetNode = NULL;
   m_PointSet = NULL;
 

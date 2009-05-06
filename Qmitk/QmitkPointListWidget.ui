@@ -219,7 +219,6 @@
     <include location="local" impldecl="in declaration">mitkStringProperty.h</include>
     <include location="global" impldecl="in declaration">sstream</include>
     <include location="global" impldecl="in declaration">string</include>
-    <include location="local" impldecl="in declaration">mitkPolygonInteractor.h</include>
     <include location="local" impldecl="in declaration">mitkMesh.h</include>
     <include location="local" impldecl="in declaration">qmessagebox.h</include>
     <include location="local" impldecl="in declaration">qfiledialog.h</include>
@@ -228,7 +227,6 @@
     <include location="local" impldecl="in declaration">itksys/SystemTools.hxx</include>
 </includes>
 <variables>
-    <variable>mitk::PolygonInteractor::Pointer m_CurrentPolygonInteraction;</variable>
     <variable access="public">static const int UNLIMITED;</variable>
     <variable>mitk::DataTreeNode::Pointer m_DatatreeNode;</variable>
     <variable>mitk::PointSetInteractor::Pointer m_CurrentInteraction;</variable>
@@ -244,15 +242,15 @@
 </signals>
 <slots>
     <slot>PointSelect( int ItemIndex )</slot>
-    <slot>OnSetPointsToggled(bool setPoints)</slot>
-    <slot>OnClearPointSetClicked()</slot>
-    <slot>OnLoadPointSetClicked()</slot>
-    <slot>OnSavePointSet()</slot>
     <slot>ItemsOfListUpdate()</slot>
     <slot>RemoveInteraction()</slot>
     <slot access="private">AddInteraction()</slot>
     <slot>Reinitialize( bool disableInteraction )</slot>
     <slot>keyPressEvent( QKeyEvent * e )</slot>
+    <slot>OnSetPointsToggled(bool setPoints)</slot>
+    <slot>OnClearPointSetClicked()</slot>
+    <slot>OnLoadPointSetClicked()</slot>
+    <slot>OnSavePointSet()</slot>
     <slot access="private">DeactivateInteractor(bool removeInteractor)</slot>
     <slot>ShowPointSetActionButtons(bool show)</slot>
 </slots>

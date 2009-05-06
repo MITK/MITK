@@ -29,7 +29,6 @@ namespace mitk {
 
 class DataTreeNode;
 class BaseData;
-class HierarchicalInteractor;
 
 //##Documentation
 //## @brief Interface for an Interactor.
@@ -157,7 +156,6 @@ protected:
   ModeType m_Mode;
 
   friend class DataTreeNode;
-  friend class HierarchicalInteractor;
 };
 
 }//namespace mitk

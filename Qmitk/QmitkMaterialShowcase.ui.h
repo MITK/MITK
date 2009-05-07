@@ -78,10 +78,15 @@ void QmitkMaterialShowcase::init()
 }
 
 void QmitkMaterialShowcase::destroy()
-{
+{  
   mitk::VtkLayerController::GetInstance(m_RenderWindow->GetRenderWindow())->RemoveRenderer( m_TextRenderer );
   m_TextRenderer->Delete();
   m_TextActor->Delete();
+
+  delete m_RenderWindow;
+  m_RenderWindow  = NULL;
+  m_DataTreeNode  = NULL;
+  m_DataTree      = NULL;
 }
 
 void QmitkMaterialShowcase::SetMaterialProperty( mitk::MaterialProperty* property )

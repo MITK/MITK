@@ -6,10 +6,14 @@ This document should be updated with every release. Major changes
 in the trunk version can be listed right on top to simplify creation
 of release notes for the next release.
 
-
-
 ======== New stuff only in the SVN trunk ========
 
+======== Changes in release 0.12 (2009-May-08) ========
+
+- Application module "deformable registration"
+- Application module "point set interaction"
+- Paintbrush tool in InteractiveSegmentation
+- localizer widget in MainApp
 - a basic Qt 4.5 application
 
 ======== Changes in release 0.12 (2009-May-??) ========
@@ -21,12 +25,19 @@ of release notes for the next release.
 - Paintbrush tool in InteractiveSegmentation
 - localizer widget in MainApp
 - a PointListWidget
+- Volume rendering: MIP support and transfer function presets
+- DataStorage: new events, can be used without DataTree for rendering
+- new histogram and plot widgets based on Qwt
+- Qt4 version: many many impovements, nearly complete MainApp,
+               most functionalities have been ported from Qt3,
+			   bundle generator (similar to Qt3 functionality generator)
 - gcc 4.3 compatibility (Ubuntu 8.10, Fedora 9)
-- VTK 5.2 compatibility
-- ITK 3.10 and ITK 3.10 compatibility
+- VTK 5.2 and VTK 5.4 compatibility
+- ITK 3.10 and ITK 3.12 compatibility
+- new framework MITK-IGT: image guided therapy with MITK, support for tracking devices etc., 
+  see http://mitk.org/wiki/IGT for details
 
-
-======== Changes in release 0.10 (2008-Oct-??) ========
+======== Changes in release 0.10 (2008-Nov-21) ========
 
 Application changes:
 

@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkEllipsoid.h>
 
+#include <qgrid.h>
+
 
 
 /**
@@ -113,6 +115,8 @@ protected:
   bool wasActive;
 
   mitk::DataStorage* m_Storage;  // hier muss ne member für die datastorage und dann in der cpp ersetzen
+
+  QGrid* grid;
   
 
 protected slots:

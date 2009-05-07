@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qaction.h>
 #include <qlabel.h>
 #include <qvbox.h>
-#include <qgrid.h>
 #include <qcombobox.h>
 #include <qlayout.h>
 
@@ -100,10 +99,7 @@ QWidget *
 QmitkLocalizerDialogBar
 ::CreateDialogBar( QWidget *parent )
 {
-          
-  new QVBox( parent );
-
-  QGrid *grid = new QGrid( 5, Qt::Vertical, parent );
+  grid = new QGrid( 5, Qt::Vertical, parent );
 
   grid->setSpacing(7);
 
@@ -137,6 +133,8 @@ QmitkLocalizerDialogBar
   m_LocalizerRenderWindow->setMinimumSize(200, 200);
 
   ToggleVisible(true);
+
+  SetSeeker( m_Punkt );
   
   return grid;
 }
@@ -153,7 +151,7 @@ void QmitkLocalizerDialogBar::DrawVolume()
           m_Volume = createVolume(vtkImage);          
           m_LocalizerRenderWindow->GetRenderer()->GetVtkRenderer()->AddViewProp(m_Volume);
           
-          SetSeeker(m_Punkt);
+          //SetSeeker(m_Punkt);
 
           if (m_Storage->GetNamedNode("Localizer") != NULL)
           {
@@ -165,8 +163,9 @@ void QmitkLocalizerDialogBar::DrawVolume()
           
         }
   }
-  m_LocalizerRenderWindow->repaint();
   SetSeeker(m_Punkt);
+  m_LocalizerRenderWindow->repaint();
+  grid->repaint();
 }
 
 void QmitkLocalizerDialogBar::CreateNode()
@@ -183,6 +182,11 @@ void QmitkLocalizerDialogBar::CreateNode()
   node->SetVisibility(false, m_MultiWidget->GetRenderWindow4()->GetRenderer(), "visible");
   node->SetVisibility(true, m_LocalizerRenderWindow->GetRenderer(), "visible");
   m_Storage->Add(node);
+
+  m_LocalizerRenderWindow->repaint();
+  //m_LocalizerRenderWindow->InitRenderer();
+  /*m_LocalizerRenderWindow->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
+  m_LocalizerRenderWindow->GetRenderer()->ForceImmediateUpdate();*/
 }
 
 void QmitkLocalizerDialogBar::UpdateGeometry(const itk::EventObject& itkNotUsed(geometryUpdateEvent))
@@ -219,6 +223,8 @@ void QmitkLocalizerDialogBar::Activated()
  
   SetSeeker(m_Punkt);
   m_LocalizerRenderWindow->repaint();
+  /*m_LocalizerRenderWindow->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
+  m_LocalizerRenderWindow->GetRenderer()->ForceImmediateUpdate();*/
 }
 
 void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* /*n*/)
@@ -229,6 +235,8 @@ void QmitkLocalizerDialogBar::OnNewNode(const mitk::DataTreeNode* /*n*/)
 void QmitkLocalizerDialogBar::Deactivated()
 {
   m_Storage->Remove(mitk::DataStorage::GetInstance()->GetNamedNode("Localizer"));
+
+  m_LocalizerRenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard2D );
 
   m_Storage->AddNodeEvent -= mitk::MessageDelegate1<QmitkLocalizerDialogBar, const mitk::DataTreeNode*>(this, &QmitkLocalizerDialogBar::OnNewNode);
   m_Storage->RemoveNodeEvent -= mitk::MessageDelegate1<QmitkLocalizerDialogBar, const mitk::DataTreeNode*>(this, &QmitkLocalizerDialogBar::OnNewNode);

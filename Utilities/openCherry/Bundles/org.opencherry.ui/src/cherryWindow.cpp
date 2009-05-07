@@ -261,13 +261,6 @@ Point Window::GetInitialLocation(const Point& initialSize)
 {
   void* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(shell->GetControl());
 
-//  Monitor monitor = shell.getDisplay().getPrimaryMonitor();
-//  if (parent != null)
-//  {
-//    monitor = parent.getMonitor();
-//  }
-//
-//  Rectangle monitorBounds = monitor.getClientArea();
   Point centerPoint(0,0);
   Rectangle parentBounds(0,0,0,0);
   if (parent != 0)
@@ -278,14 +271,16 @@ Point Window::GetInitialLocation(const Point& initialSize)
   }
   else
   {
-    //centerPoint = Geometry.centerPoint(monitorBounds);
     parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)
       ->GetScreenSize(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetPrimaryScreenNumber());
     centerPoint.x = parentBounds.width/2;
     centerPoint.y = parentBounds.height/2;
   }
 
-  return Point(centerPoint.x - (initialSize.x / 2), centerPoint.y - (initialSize.y * 2 / 3));
+  return Point(centerPoint.x - (initialSize.x / 2),
+              std::max<int>(parentBounds.y,
+                            std::min<int>(centerPoint.y - (initialSize.y * 2 / 3),
+                                          parentBounds.y + parentBounds.height - initialSize.y)));
 }
 
 Point Window::GetInitialSize()

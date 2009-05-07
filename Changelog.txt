@@ -24,6 +24,7 @@ of release notes for the next release.
 - gcc 4.3 compatibility (Ubuntu 8.10, Fedora 9)
 - VTK 5.2 and VTK 5.4 compatibility
 - ITK 3.10 and ITK 3.12 compatibility
+- Windows Vista 64 Bit compatibility
 - new framework MITK-IGT: image guided therapy with MITK, support for tracking devices etc., 
   see http://mitk.org/wiki/IGT for details
 

@@ -72,40 +72,101 @@ void QmitkDemonsRegistrationControls::CalculateTransformation()
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
     if ( m_RegistrationSelection->currentItem() == 0)
     {
-      mitk::DemonsRegistration::Pointer registration = mitk::DemonsRegistration::New();
-
-      // ask for filenames to save deformation field and result image
       QString deformationFieldname;
-      deformationFieldname = QFileDialog::getSaveFileName(
-        "deformationField.mhd",
-        "*.mhd",
-        this,  
-        "Choose filename",
-        "Where do you want to save the deformation field?");
-      if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) deformationFieldname += ".mhd";
-
       QString resultImagename;
-        resultImagename = QFileDialog::getSaveFileName(
-          "resultImage.mhd",
-          "*.mhd",
-          this,
-          "Choose directory",
-          "Where do you want to save the result image?");
-      if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) resultImagename += ".mhd";
-
-      if(deformationFieldname.isEmpty())
-        registration->SetSaveDeformationField(false);
-      else
+      mitk::DemonsRegistration::Pointer registration = mitk::DemonsRegistration::New();
+      int saveResult = QMessageBox::question(this, "Save results", "Do you want to save the results?",QMessageBox::Yes,QMessageBox::No);
+      if(saveResult == QMessageBox::Yes)
       {
+        // ask for filenames to save deformation field and result image
+        bool isValid = false;
+        while(!isValid)
+        {
+          deformationFieldname = QFileDialog::getSaveFileName(
+            "deformationField.mhd",
+            "*.mhd",
+            this,  
+            "Choose filename",
+            "Where do you want to save the deformation field?");
+          if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) 
+          {
+            deformationFieldname += ".mhd";
+          }
+          else if (deformationFieldname.isEmpty())
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
+            isValid = false;
+          }
+          //check if file exists
+          if(QFile::exists( deformationFieldname ))
+          {
+            //ask the user whether the file shall be overwritten
+            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
+            if(overwrite == QMessageBox::Yes)
+            {
+              isValid = true;
+            } 
+            else
+            {
+              isValid  = false;
+            }
+          }
+          else
+          {
+            isValid = true;
+          }
+        }        
+        isValid = false;
+        while(!isValid)
+        {
+          resultImagename = QFileDialog::getSaveFileName(
+            "resultImage.mhd",
+            "*.mhd",
+            this,
+            "Choose directory",
+            "Where do you want to save the result image?");
+          if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) 
+          {
+            resultImagename += ".mhd";
+          }
+          else if (resultImagename.isEmpty())
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
+            isValid = false;
+          }
+          //check if file exists
+          if (resultImagename == deformationFieldname)
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a different file name than for the deformation field!",QMessageBox::Ok);
+            isValid = false;
+          }
+          else if(QFile::exists( resultImagename ))
+          {
+            //ask the user whether the file shall be overwritten
+            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
+            if(overwrite == QMessageBox::Yes)
+            {
+              isValid = true;
+            } 
+            else 
+            {
+              isValid  = false;
+            }
+          }
+          else
+          {
+            isValid = true;
+          }
+        }        
+        registration->SetSaveDeformationField(true);
+        registration->SetSaveResult(true);
         registration->SetDeformationFieldFileName(deformationFieldname);
+        registration->SetResultFileName(resultImagename);
       }
-      registration->SetDeformationFieldFileName(deformationFieldname);
-
-      if(resultImagename.isEmpty())
-        registration->SetSaveResult(false);
       else
       {
-        registration->SetResultFileName(resultImagename);
+        registration->SetSaveDeformationField(false);
+        registration->SetSaveResult(false);
       }
       
       registration->SetReferenceImage(fimage);
@@ -155,40 +216,101 @@ void QmitkDemonsRegistrationControls::CalculateTransformation()
     }
     else if(m_RegistrationSelection->currentItem() == 1)
     {
-      mitk::SymmetricForcesDemonsRegistration::Pointer registration = mitk::SymmetricForcesDemonsRegistration::New();
-
-      // ask for filenames to save deformation field and result image
       QString deformationFieldname;
-      deformationFieldname = QFileDialog::getSaveFileName(
-        "deformationField.mhd",
-        "*.mhd",
-        this,  
-        "Choose filename",
-        "Where do you want to save the deformation field?");
-      if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) deformationFieldname += ".mhd";
-
       QString resultImagename;
-      resultImagename = QFileDialog::getSaveFileName(
-        "resultImage.mhd",
-        "*.mhd",
-        this,
-        "Choose directory",
-        "Where do you want to save the result image?");
-      if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) resultImagename += ".mhd";
-
-      if(deformationFieldname.isEmpty())
-        registration->SetSaveDeformationField(false);
-      else
+      mitk::SymmetricForcesDemonsRegistration::Pointer registration = mitk::SymmetricForcesDemonsRegistration::New();
+      int saveResult = QMessageBox::question(this, "Save results", "Do you want to save the results?",QMessageBox::Yes,QMessageBox::No);
+      if(saveResult == QMessageBox::Yes)
       {
+        // ask for filenames to save deformation field and result image
+        bool isValid = false;
+        while(!isValid)
+        {
+          deformationFieldname = QFileDialog::getSaveFileName(
+            "deformationField.mhd",
+            "*.mhd",
+            this,  
+            "Choose filename",
+            "Where do you want to save the deformation field?");
+          if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) 
+          {
+            deformationFieldname += ".mhd";
+          }
+          else if (deformationFieldname.isEmpty())
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
+            isValid = false;
+          }
+          //check if file exists
+          if(QFile::exists( deformationFieldname ))
+          {
+            //ask the user whether the file shall be overwritten
+            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
+            if(overwrite == QMessageBox::Yes)
+            {
+              isValid = true;
+            } 
+            else
+            {
+              isValid  = false;
+            }
+          }
+          else
+          {
+            isValid = true;
+          }
+        }        
+        isValid = false;
+        while(!isValid)
+        {
+          resultImagename = QFileDialog::getSaveFileName(
+            "resultImage.mhd",
+            "*.mhd",
+            this,
+            "Choose directory",
+            "Where do you want to save the result image?");
+          if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) 
+          {
+            resultImagename += ".mhd";
+          }
+          else if (resultImagename.isEmpty())
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
+            isValid = false;
+          }
+          //check if file exists
+          if (resultImagename == deformationFieldname)
+          {
+            QMessageBox::information(this, "Save file", "You have to specify a different file name than for the deformation field!",QMessageBox::Ok);
+            isValid = false;
+          }
+          else if(QFile::exists( resultImagename ))
+          {
+            //ask the user whether the file shall be overwritten
+            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
+            if(overwrite == QMessageBox::Yes)
+            {
+              isValid = true;
+            } 
+            else 
+            {
+              isValid  = false;
+            }
+          }
+          else
+          {
+            isValid = true;
+          }
+        }        
+        registration->SetSaveDeformationField(true);
+        registration->SetSaveResult(true);
         registration->SetDeformationFieldFileName(deformationFieldname);
+        registration->SetResultFileName(resultImagename);
       }
-      registration->SetDeformationFieldFileName(deformationFieldname);
-
-      if(resultImagename.isEmpty())
-        registration->SetSaveResult(false);
       else
       {
-        registration->SetResultFileName(resultImagename);
+        registration->SetSaveDeformationField(false);
+        registration->SetSaveResult(false);
       }
 
       registration->SetReferenceImage(fimage);

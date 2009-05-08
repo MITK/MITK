@@ -91,7 +91,7 @@ class MITK_CORE_EXPORT VtkLayerController
     /**
     * Returns the number of renderers in the renderwindow.
     */
-    int GetNumberOfRenderers();
+    unsigned int GetNumberOfRenderers();
 
     void SetEraseForAllRenderers(int i);
   protected:

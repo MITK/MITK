@@ -21,8 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataNormals.h>
 
 
-mitk::STLFileReader::STLFileReader()
-    : m_FileName("")
+mitk::STLFileReader::STLFileReader() : mitk::SurfaceSource(), m_FileName("")
 {
 }
 

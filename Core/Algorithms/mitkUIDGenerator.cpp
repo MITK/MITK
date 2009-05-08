@@ -68,7 +68,7 @@ std::string UIDGenerator::GetUID()
     std::ostringstream rs;
     rs << (long int)( pow(10.0, double(m_LengthOfRandomPart)) / double(RAND_MAX) * double(rand()) );
 
-    for (unsigned int i = rs.str().length(); i < m_LengthOfRandomPart; ++i)
+    for (size_t i = rs.str().length(); i < m_LengthOfRandomPart; ++i)
     {
       s << "X";
     }

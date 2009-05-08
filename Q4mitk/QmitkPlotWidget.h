@@ -80,7 +80,7 @@ public:
   * @returns the id of the curve. Use this id to 
   * refer to the curve, if you want to modify or add data.
   */
-  int InsertCurve( const char* title );
+  unsigned int InsertCurve( const char* title );
 
   /**
   * Sets the title of the given axis. For the set of available axes
@@ -98,7 +98,7 @@ public:
   * @param yValues the y coordinates of the points that define the curve
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData( int curveId, const DataVector& xValues, const DataVector& yValues );
+  bool SetCurveData( unsigned int curveId, const DataVector& xValues, const DataVector& yValues );
 
   /**
   * Sets the data for a previously added curve. Data is provided as a vectors of pairs. 
@@ -107,14 +107,14 @@ public:
   * @param data the coordinates of the points that define the curve
   * @returns whether data was added successfully or not
   */
-  bool SetCurveData( int curveId, const XYDataVector& data );
+  bool SetCurveData( unsigned int curveId, const XYDataVector& data );
 
   /** 
   * Defines how a curve should be drawn. For drawing a curve, a QPen is used.
   * @param curveId the id of the curve for which appearance should be changed
   * @param pen a QPen (@see QPen) defining the line style
   */
-  void SetCurvePen( int curveId, const QPen& pen );
+  void SetCurvePen( unsigned int curveId, const QPen& pen );
 
   /**
   * Assign a brush, which defines the fill pattern of shapes drawn by a QPainter. 
@@ -126,7 +126,7 @@ public:
   * @param curveId the id of the curve for which appearance should be changed
   * @param brush a QBrush (@see QBrush) defining the line style
   */
-  void SetCurveBrush( int curveId, const QBrush& brush);
+  void SetCurveBrush( unsigned int curveId, const QBrush& brush);
 
   /**
   * Sets the title of the given curve. The title will be shown in the legend of
@@ -134,7 +134,7 @@ public:
   * @param curveId the id of the curve for which the title should be set
   * @param title the description of the curve that will be shown in the legend.
   */
-  void SetCurveTitle( int curveId, const char* title );
+  void SetCurveTitle( unsigned int curveId, const char* title );
 
   /** 
   * Triggers a replot of the curve. Replot should be called once after

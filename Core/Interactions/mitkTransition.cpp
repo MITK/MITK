@@ -49,9 +49,9 @@ int mitk::Transition::GetEventId() const
   return m_EventId;
 }
 
-int mitk::Transition::GetActionCount() const 
+unsigned int mitk::Transition::GetActionCount() const 
 {
-  return m_Actions.size();
+  return static_cast<unsigned int>(m_Actions.size());
 }
 
 

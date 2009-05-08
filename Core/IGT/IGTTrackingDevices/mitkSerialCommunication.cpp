@@ -229,7 +229,7 @@ int mitk::SerialCommunication::Send(const std::string& input)
     return ERROR_VALUE;
 
   DWORD bytesWritten = 0;
-  if (WriteFile(m_ComPortHandle, input.data(), input.size(), &bytesWritten, NULL) == TRUE)
+  if (WriteFile(m_ComPortHandle, input.data(), static_cast<DWORD>(input.size()), &bytesWritten, NULL) == TRUE)
     return OK;
   else
     return GetLastError();

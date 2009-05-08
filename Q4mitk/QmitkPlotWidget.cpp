@@ -25,12 +25,12 @@ QwtPlot* QmitkPlotWidget::GetPlot()
 }
 
 
-int QmitkPlotWidget::InsertCurve(const char* title)
+unsigned int QmitkPlotWidget::InsertCurve(const char* title)
 {
   QwtPlotCurve* curve = new QwtPlotCurve(QwtText(title));
   m_PlotCurveVector.push_back(curve);
   curve->attach(m_Plot);
-  return m_PlotCurveVector.size() - 1;
+  return static_cast<unsigned int> (m_PlotCurveVector.size() - 1);
 }
 
 void QmitkPlotWidget::SetPlotTitle(const char* title)
@@ -44,7 +44,7 @@ void QmitkPlotWidget::SetAxisTitle(int axis, const char* title)
 }
 
 
-bool QmitkPlotWidget::SetCurveData( int curveId, const QmitkPlotWidget::DataVector& xValues, const QmitkPlotWidget::DataVector& yValues )
+bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget::DataVector& xValues, const QmitkPlotWidget::DataVector& yValues )
 {
   if ( xValues.size() != yValues.size() )
   {
@@ -53,37 +53,37 @@ bool QmitkPlotWidget::SetCurveData( int curveId, const QmitkPlotWidget::DataVect
   }
   double* rawDataX = ConvertToRawArray( xValues );
   double* rawDataY = ConvertToRawArray( yValues );
-  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, xValues.size() );
+  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, static_cast<int>(xValues.size()) );
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
 }
 
 
-bool QmitkPlotWidget::SetCurveData( int curveId, const QmitkPlotWidget::XYDataVector& data )
+bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget::XYDataVector& data )
 {
   double* rawDataX = ConvertToRawArray( data, 0 );
   double* rawDataY = ConvertToRawArray( data, 1 );
-  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, data.size() );
+  m_PlotCurveVector[curveId]->setData( rawDataX, rawDataY, static_cast<int>(data.size()) );
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
 }
 
 
-void QmitkPlotWidget::SetCurvePen( int curveId, const QPen& pen )
+void QmitkPlotWidget::SetCurvePen( unsigned int curveId, const QPen& pen )
 {
   m_PlotCurveVector[curveId]->setPen( pen );
 }
 
 
-void QmitkPlotWidget::SetCurveBrush( int curveId, const QBrush& brush )
+void QmitkPlotWidget::SetCurveBrush( unsigned int curveId, const QBrush& brush )
 {
   m_PlotCurveVector[curveId]->setBrush( brush );
 }
 
 
-void QmitkPlotWidget::SetCurveTitle( int curveId, const char* title )
+void QmitkPlotWidget::SetCurveTitle( unsigned int curveId, const char* title )
 {
   m_Plot->setTitle( title );
 }

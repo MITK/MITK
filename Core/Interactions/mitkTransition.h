@@ -80,7 +80,7 @@ namespace mitk {
     /**
     * @brief Get the number of actions.
     **/
-    int GetActionCount() const;
+    unsigned int GetActionCount() const;
 
     /**
     * @brief Get an interator on the first action in list.

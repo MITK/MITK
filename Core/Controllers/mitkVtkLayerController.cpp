@@ -270,7 +270,7 @@ void mitk::VtkLayerController::UpdateLayers()
   v->RemoveAllItems();
 
 
-  int numberOfLayers = m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size();
+  unsigned int numberOfLayers = static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
   int currentLayerNumber;
   bool traverseUpwards;
 
@@ -325,9 +325,9 @@ void mitk::VtkLayerController::UpdateLayers()
 /**
  * Returns the number of renderers in the renderwindow.
  */
-int mitk::VtkLayerController::GetNumberOfRenderers()
+unsigned int mitk::VtkLayerController::GetNumberOfRenderers()
 {
-  return m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size();
+  return static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
 }
 
 void mitk::VtkLayerController::SetEraseForAllRenderers(int i)

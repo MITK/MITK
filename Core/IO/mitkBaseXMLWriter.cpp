@@ -128,9 +128,9 @@ void BaseXMLWriter::WriteComment( const std::string& text )
 }
   
 
-int BaseXMLWriter::GetCurrentDeph() const
+unsigned int BaseXMLWriter::GetCurrentDeph() const
 {
-  return m_Stack.size();
+  return static_cast<unsigned int>(m_Stack.size());
 }
 
 

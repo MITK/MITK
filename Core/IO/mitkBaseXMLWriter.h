@@ -95,7 +95,7 @@ namespace mitk{
     void WriteComment( const std::string& key );
 
     /// returns the current node depth
-    int GetCurrentDeph() const;
+    unsigned int GetCurrentDeph() const;
 
     /// returns the current count of nodes
     int GetNodeCount() const;

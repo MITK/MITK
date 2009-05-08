@@ -80,8 +80,7 @@ int TestCase1210()
  
   mitk::Point3D origin;
   mitk::Vector3D right, down, spacing;
-  mitk::ScalarType width, height;
-  mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
+  mitk::ScalarType thicknessInMM;
 
   thicknessInMM = 1.0;
   mitk::FillVector3D(origin, 4.5,              7.3, 11.2);

@@ -58,6 +58,8 @@ ExtensionPointService::AddContribution(std::istream& istr,
                                             const std::string& contributor)
 {
   m_XMLInputSource.setByteStream(istr);
+  try
+  {
   Poco::XML::Document* document = m_DOMParser.parse(&m_XMLInputSource);
 
   Poco::XML::NodeList* nodes = document->getElementsByTagName("extension-point");
@@ -106,7 +108,7 @@ ExtensionPointService::AddContribution(std::istream& istr,
     if (attr == 0) continue;
 
     std::string xp = attr->nodeValue();
-    std::cout << "Extension found for extension-point: " << xp << std::endl;
+    std::cout << "Extension found for extension-point: " << xp << " (from " << contributor << ")\n";
     if (m_ExtensionPointMap[xp].IsNull())
     {
       std::cout << "Extension-point unknown, extension skipped.\n";
@@ -145,6 +147,15 @@ ExtensionPointService::AddContribution(std::istream& istr,
   //nodes->release();
 
   m_Contributors.insert(contributor);
+  }
+  catch(Poco::Exception* exc)
+  {
+    std::cerr << exc->displayText() << std::endl;
+  }
+  catch(...)
+  {
+    std::cerr << "Exception while parsing plugin.xml from " << contributor << std::endl;
+  }
 }
 
 bool

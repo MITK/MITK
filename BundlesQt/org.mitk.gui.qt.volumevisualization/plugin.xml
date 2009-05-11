@@ -6,9 +6,9 @@
       id="org.mitk.views.general" 
       name="MITK General"/> 
     <view 
-      id="org.mitk.views.volumerendering" 
-      name="Volume Rendering" 
+      id="org.mitk.views.volumevisualization" 
+      name="Volume Visualization" 
       category="org.mitk.views.general" 
-      class="QmitkVolumeRenderingView" />
+      class="QmitkVolumeVisualizationView" />
   </extension>
 </plugin>

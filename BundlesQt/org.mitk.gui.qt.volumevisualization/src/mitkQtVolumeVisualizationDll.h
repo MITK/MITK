@@ -15,27 +15,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef MITKQTSTDVIEWSDLL_H_
-#define MITKQTSTDVIEWSDLL_H_
+#ifndef MITK_QT_VOLUME_VISUALIZATION_DLL_H_
+#define MITK_QT_VOLUME_VISUALIZATION_DLL_H_
 
 //
 // The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the org_mitk_gui_qt_application_EXPORTS
+// from a DLL simpler. All files within this DLL are compiled with the org_mitk_gui_qt_volumevisualization_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// MITK_QT_APP functions as being imported from a DLL, wheras this DLL sees symbols
+// MITK_QT_VOLUMEVISUALIZATION functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org_mitk_gui_qt_stdviews_EXPORTS)
-    #define MITK_QT_STDVIEWS __declspec(dllexport)
+  #if defined(org_mitk_gui_qt_volumevisualization_EXPORTS)
+    #define MITK_QT_VOLUMEVISUALIZATION __declspec(dllexport)
   #else
-    #define MITK_QT_STDVIEWS __declspec(dllimport)
+    #define MITK_QT_VOLUMEVISUALIZATION __declspec(dllimport)
   #endif
 #endif
 
-#if !defined(MITK_QT_STDVIEWS)
-  #define MITK_QT_STDVIEWS
+#if !defined(MITK_QT_VOLUMEVISUALIZATION)
+  #define MITK_QT_VOLUMEVISUALIZATION
 #endif
 
-#endif /*MITKQTSTDVIEWSDLL_H_*/
+#endif /*MITK_QT_VOLUME_VISUALIZATION_DLL_H_*/

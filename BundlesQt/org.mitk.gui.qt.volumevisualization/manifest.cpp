@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include <cherryIViewPart.h>
-#include "src/QmitkVolumeRenderingView.h"
+#include "src/internal/QmitkVolumeVisualizationView.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(QmitkVolumeRenderingView)
+  POCO_EXPORT_CLASS(QmitkVolumeVisualizationView)
 POCO_END_MANIFEST

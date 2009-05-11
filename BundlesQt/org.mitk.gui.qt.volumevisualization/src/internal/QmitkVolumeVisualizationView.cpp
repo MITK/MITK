@@ -1,4 +1,21 @@
-#include "QmitkVolumeRenderingView.h"
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 15646 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include "QmitkVolumeVisualizationView.h"
 
 #include <QComboBox>
 
@@ -9,7 +26,7 @@
 #include <mitkTransferFunctionProperty.h>
 #include "mitkHistogramGenerator.h"
 
-void QmitkVolumeRenderingView::CreateQtPartControl(QWidget* parent)
+void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 {
   QVBoxLayout* layout = new QVBoxLayout(parent);
 
@@ -30,7 +47,7 @@ void QmitkVolumeRenderingView::CreateQtPartControl(QWidget* parent)
   connect( m_TransferFunctionWidget, SIGNAL( SignalTransferFunctionModeChanged( int ) ), this, SLOT( OnTransferFunctionModeChanged( int ) ) );
 }
 
-void QmitkVolumeRenderingView::comboIndexChanged(int index)
+void QmitkVolumeVisualizationView::comboIndexChanged(int index)
 {
   mitk::DataTreeNode::Pointer node = m_DataStorageComboBox->GetSelectedNode();
 
@@ -39,7 +56,7 @@ void QmitkVolumeRenderingView::comboIndexChanged(int index)
   m_TransferFunctionWidget->SetDataTreeNode(node);
 }
 
-void QmitkVolumeRenderingView::OnTransferFunctionModeChanged( int mode )
+void QmitkVolumeVisualizationView::OnTransferFunctionModeChanged( int mode )
 {
   //set Transfer Function to Data Node
   mitk::DataTreeNode::Pointer node = m_DataStorageComboBox->GetSelectedNode();
@@ -65,12 +82,12 @@ void QmitkVolumeRenderingView::OnTransferFunctionModeChanged( int mode )
   }
 }
 
-void QmitkVolumeRenderingView::SetFocus()
+void QmitkVolumeVisualizationView::SetFocus()
 {
 
 }
 
-QmitkVolumeRenderingView::~QmitkVolumeRenderingView()
+QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
 
 }

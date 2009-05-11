@@ -1,13 +1,13 @@
 SET(SRC_CPP_FILES
-  QmitkVolumeRenderingView.cpp
+  
 )
 
 SET(MOC_H_FILES
-  src/QmitkVolumeRenderingView.h
+  src/internal/QmitkVolumeVisualizationView.h
 )
 
 SET(INTERNAL_CPP_FILES
- 
+  QmitkVolumeVisualizationView.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

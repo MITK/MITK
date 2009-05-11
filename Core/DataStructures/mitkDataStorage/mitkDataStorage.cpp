@@ -284,6 +284,113 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
   }
 }
 
+
+Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input)
+{
+  if (input == NULL)
+    throw std::invalid_argument("DataStorage: input is invalid");
+
+  BoundingBox::PointsContainer::Pointer pointscontainer = BoundingBox::PointsContainer::New();
+  BoundingBox::PointIdentifier pointid = 0;
+  Point3D point;
+  Vector3D minSpacing;
+  minSpacing.Fill(ScalarTypeNumericTraits::max());
+
+  TimeBounds timeBounds;
+  ScalarType stmin, stmax;
+  stmin = ScalarTypeNumericTraits::NonpositiveMin();
+  stmax = ScalarTypeNumericTraits::max();
+
+  timeBounds[0] = stmax; 
+  timeBounds[1] = stmin;
+
+  for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
+  {
+    DataTreeNode::Pointer node = it->Value();
+    if (node.IsNull)
+      continue;
+    if (node->GetData == NULL)
+      continue;
+    if (node->GetData()->IsEmpty())
+      continue;
+
+    const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
+    if (geometry == NULL ) 
+      continue;
+
+    // bounding box
+
+    for( unsigned int i = 0; i < 8; ++i)
+    {
+      point = geometry->GetCornerPoint(i);
+      if (point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
+        pointscontainer->InsertElement( pointid++, point);
+      else
+      {
+        itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );
+      }
+    }
+    // spacing
+    try
+    {
+      AffineTransform3D::Pointer inverseTransform = AffineTransform3D::New();
+      geometry->GetIndexToWorldTransform()->GetInverse(inverseTransform);
+      vnl_vector< AffineTransform3D::MatrixType::ValueType > unitVector(3);
+      for (unsigned int axis = 0; axis < 3; ++axis)
+      {
+        unitVector.fill(0);
+        unitVector[axis] = 1.0;
+        ScalarType mmPerPixel = 1.0 / (inverseTransform->GetMatrix()*unitVector).magnitude();
+        if (minSpacing[axis] > mmPerPixel)
+          minSpacing[axis] = mmPerPixel;
+      }
+      // timebounds
+      const TimeBounds& curTimeBounds = geometry->GetTimeBounds();
+      ScalarType cur = curTimeBounds[0];
+      //is it after -infinity, but before everything else that we found until now?
+      if ((cur > stmin) && (cur < timeBounds[0]))
+        timeBounds[0] = cur;
+
+      cur = curTimeBounds[1];
+      //is it before infinity, but after everything else that we found until now?
+      if ((cur < stmax) && (cur > timeBounds[1]))
+        timeBounds[1] = cur;
+    }
+    catch(itk::ExceptionObject e)
+    {
+      std::cerr << e << std::endl;
+    }
+  }
+
+  BoundingBox::Pointer result = BoundingBox::New();
+  result->SetPoints(pointscontainer);
+  result->ComputeBoundingBox();
+
+  Geometry3D::Pointer geometry;
+  if (result->GetPoints()->Size() > 0)
+  {
+    geometry = Geometry3D::New();
+    geometry->Initialize();
+    // correct bounding-box (is now in mm, should be in index-coordinates)
+    // according to spacing
+    BoundingBox::BoundsArrayType bounds = result->GetBounds();
+    for (unsigned int i = 0; i < 6; ++i)
+      bounds[i] /= minSpacing[i/2];
+
+    geometry->SetBounds(bounds);
+    geometry->SetSpacing(minSpacing);
+    // timebounds
+    if (timeBounds[0] >= stmax)
+    {
+      timeBounds[0] = stmin;
+      timeBounds[1] = stmax;
+    }
+    geometry->SetTimeBounds(timeBounds);
+  }
+  return geometry;
+}
+
+
 mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();

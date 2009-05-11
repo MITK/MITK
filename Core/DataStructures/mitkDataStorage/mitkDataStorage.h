@@ -234,6 +234,12 @@ namespace mitk {
     DataStorageEvent DeleteNodeEvent;
 
     //##Documentation
+    //## @brief Compute the axis-parallel bounding geometry of the input objects
+    //## 
+    //## Throws std::invalid_argument exception if input is NULL
+    Geometry3D::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input);
+
+    //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
     //## (bounding box, minimal spacing of the considered nodes, live-span)
     //##

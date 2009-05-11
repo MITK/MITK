@@ -285,7 +285,7 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 }
 
 
-Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input)
+mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input)
 {
   if (input == NULL)
     throw std::invalid_argument("DataStorage: input is invalid");
@@ -307,24 +307,34 @@ Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObj
   for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
   {
     DataTreeNode::Pointer node = it->Value();
-    if (node.IsNull)
+    if (node.IsNull())
+    {
       continue;
-    if (node->GetData == NULL)
+    }
+    if (node->GetData() == NULL)
+    {
       continue;
+    }
     if (node->GetData()->IsEmpty())
+    {
       continue;
+    }
 
     const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
     if (geometry == NULL ) 
+    {
       continue;
+    }
 
     // bounding box
 
-    for( unsigned int i = 0; i < 8; ++i)
+    for( int i = 0; i < 8; ++i)
     {
       point = geometry->GetCornerPoint(i);
       if (point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
+      {
         pointscontainer->InsertElement( pointid++, point);
+      }
       else
       {
         itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. Node: " << node );

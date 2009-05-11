@@ -183,10 +183,14 @@ IF(USE_QT)
   SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
 ENDIF(USE_QT)
 
+IF(BUILD_OPENCHERRY)
+  ADD_SUBDIRECTORY(Bundles)
+ENDIF(BUILD_OPENCHERRY)
+
 IF(QT4_FOUND)
   # for now, Qt independent bundles are also not build if Qt4 is not found
   # until we create a specific BundlesQt directory and move the Qt bundles there
-  ADD_SUBDIRECTORY(Bundles)
+  ADD_SUBDIRECTORY(BundlesQt)
 ENDIF(QT4_FOUND)
 
 #### find out version number #####

@@ -25,6 +25,7 @@
 #include "cherryPoint.h"
 
 #include "internal/cherryWindowManager.h"
+#include "tweaklets/cherryGuiWidgetsTweaklet.h"
 
 #include <cherryMacros.h>
 #include <vector>
@@ -283,6 +284,21 @@ protected:
    * @since 3.1
    */
   Window(IShellProvider::Pointer shellProvider);
+
+  /**
+	 * Given the desired position of the window, this method returns an adjusted
+	 * position such that the window is no larger than its monitor, and does not
+	 * extend beyond the edge of the monitor. This is used for computing the
+	 * initial window position, and subclasses can use this as a utility method
+	 * if they want to limit the region in which the window may be moved.
+	 * 
+	 * @param preferredSize
+	 *            the preferred position of the window
+	 * @return a rectangle as close as possible to preferredSize that does not
+	 *         extend outside the monitor
+	 * 
+	 */
+	Rectangle GetConstrainedShellBounds(const Rectangle& preferredSize);
 
   /**
    * Initializes this windows variables

@@ -51,6 +51,16 @@ int QtWidgetsTweaklet::GetPrimaryScreenNumber()
   return impl.GetPrimaryScreenNumber();
 }
 
+Rectangle QtWidgetsTweaklet::GetAvailableScreenSize(int i)
+{
+  return impl.GetAvailableScreenSize(i);
+}
+
+int QtWidgetsTweaklet::GetClosestScreenNumber(const Rectangle& rect)
+{
+  return impl.GetClosestScreenNumber(rect);
+}
+
 //IMenu::Pointer QtWidgetsTweaklet::CreateMenu(void*, IMenu::Style style)
 //{
 //  //TODO Qt CreateMenu

@@ -338,7 +338,31 @@ void Window::InitializeBounds()
 
   Point size = this->GetInitialSize();
   Point location = this->GetInitialLocation(size);
-  shell->SetBounds(Rectangle(location.x, location.y, size.x, size.y));
+  shell->SetBounds(this->GetConstrainedShellBounds(Rectangle(location.x, location.y, size.x, size.y)));
+}
+
+Rectangle Window::GetConstrainedShellBounds(const Rectangle& preferredSize) 
+{
+  Rectangle result(preferredSize);
+
+  GuiWidgetsTweaklet::Pointer guiTweaklet(Tweaklets::Get(GuiWidgetsTweaklet::KEY));
+  int screenNum = guiTweaklet->GetClosestScreenNumber(result);
+  Rectangle bounds(guiTweaklet->GetAvailableScreenSize(screenNum));
+
+  if (result.height > bounds.height) {
+    result.height = bounds.height;
+  }
+
+  if (result.width > bounds.width) {
+    result.width = bounds.width;
+  }
+
+  result.x = std::max<int>(bounds.x, std::min<int>(result.x, bounds.x
+    + bounds.width - result.width));
+  result.y = std::max<int>(bounds.y, std::min<int>(result.y, bounds.y
+    + bounds.height - result.height));
+
+  return result;
 }
 
 void Window::SetParentShell(Shell::Pointer newParentShell)

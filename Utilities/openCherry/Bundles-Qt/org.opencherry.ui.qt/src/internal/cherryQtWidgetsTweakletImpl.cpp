@@ -142,6 +142,23 @@ int QtWidgetsTweakletImpl::GetPrimaryScreenNumber()
   return primaryScreenNr;
 }
 
+Rectangle QtWidgetsTweakletImpl::GetAvailableScreenSize(int i)
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  QRect screenGeometry;
+  if (i < 0) screenGeometry = desktop->screen()->geometry();
+  else screenGeometry = desktop->availableGeometry(i);
+
+  return (Rectangle(screenGeometry.x(), screenGeometry.y()
+    , screenGeometry.width(), screenGeometry.height()));
+}
+ 
+int QtWidgetsTweakletImpl::GetClosestScreenNumber(const Rectangle& r)
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  return desktop->screenNumber(QPoint(r.x + r.width/2, r.y + r.height/2));
+}
+
 void QtWidgetsTweakletImpl::AddControlListener(QtWidgetController* controller,
     GuiTk::IControlListener::Pointer listener)
 {

@@ -62,6 +62,8 @@ public:
   Rectangle GetScreenSize(int i = -1);
   unsigned int GetScreenNumber();
   int GetPrimaryScreenNumber();
+  Rectangle GetAvailableScreenSize(int i = -1);
+  int GetClosestScreenNumber(const Rectangle&);
 
   Point GetCursorLocation();
   void* GetCursorControl();

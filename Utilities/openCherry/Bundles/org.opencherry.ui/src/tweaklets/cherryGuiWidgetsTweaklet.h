@@ -141,6 +141,10 @@ struct CHERRY_UI GuiWidgetsTweaklet : public Object
    */
   virtual Rectangle GetScreenSize(int i = -1) = 0;
 
+  virtual Rectangle GetAvailableScreenSize(int i = -1) = 0;
+
+  virtual int GetClosestScreenNumber(const Rectangle&) = 0;
+
   /**
    * @brief Gets the number of available screens in a multi-screen environment.
    *

@@ -29,10 +29,10 @@ SET(Poco_LIBRARY_DIR
     "top-level directory containing the poco libraries."
 )
 
-OPTION(BUILD_OPENCHERRY "Build the openCherry platform" OFF)
+OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" OFF)
 
-IF(BUILD_OPENCHERRY)       
+IF(MITK_USE_OPENCHERRY)       
   ADD_SUBDIRECTORY(openCherry)
   SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
-ENDIF(BUILD_OPENCHERRY)
+ENDIF(MITK_USE_OPENCHERRY)
 

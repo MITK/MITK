@@ -1,5 +1,5 @@
 
-IF(BUILD_OPENCHERRY)
+IF(MITK_USE_OPENCHERRY)
 
   INCLUDE("${MITK_BINARY_DIR}/Bundles/MITKBundleList.cmake")
  
@@ -16,4 +16,4 @@ IF(BUILD_OPENCHERRY)
                         BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKQtBundleList.cmake" 
                         ${BUILD_ALL_PLUGINS_OPTION})
    
-ENDIF(BUILD_OPENCHERRY)
+ENDIF(MITK_USE_OPENCHERRY)

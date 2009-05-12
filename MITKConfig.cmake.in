@@ -53,7 +53,7 @@ IF (MITK_USE_OPENCHERRY)
   FIND_PACKAGE(openCherry)
 
   IF(NOT openCherry_FOUND)
-    MESSAGE(SEND_ERROR "MITK does not seem to be configured with openCherry support. Set BUILD_OPENCHERRY to ON in your MITK build configuration.")
+    MESSAGE(SEND_ERROR "MITK does not seem to be configured with openCherry support. Set MITK_USE_OPENCHERRY to ON in your MITK build configuration.")
   ENDIF(NOT openCherry_FOUND)
 
   SET(MITK_PLUGIN_SOURCE_DIRS "@MITK_SOURCE_DIR@/Bundles")

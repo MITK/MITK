@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
-#include "mitkDataTree.h"
 #include "mitkDataStorage.h"
 
 #include <itkCommand.h>
@@ -39,7 +38,8 @@ class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
 
-namespace mitk {
+namespace mitk 
+{
 
 /*!
 \brief VtkPropRenderer
@@ -78,12 +78,7 @@ public:
   // Active current renderwindow
   virtual void MakeCurrent();
 
-  // Data handling
-  using BaseRenderer::SetData;
-  virtual void SetData(const mitk::DataTreeIteratorBase* iterator);
-
-  /** */
-  virtual void SetData(mitk::DataStorage::Pointer it);
+  virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering
 
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
   virtual void Update(mitk::DataTreeNode* datatreenode);
@@ -105,15 +100,15 @@ public:
 
   // Initialization / geometry handling
 
-  /** This method calculates the bounds of the DataTree (if it contains any
+  /** This method calculates the bounds of the DataStorage (if it contains any
    * valid data), creates a geometry from these bounds and sets it as world
    * geometry of the renderer.
    *
-   * Call this method to re-initialize the renderer to the current DataTree
+   * Call this method to re-initialize the renderer to the current DataStorage
    * (e.g. after loading an additional dataset), to ensure that the view is
    * aligned correctly.
    */
-  virtual bool SetWorldGeometryToDataTreeBounds();
+  virtual bool SetWorldGeometryToDataStorageBounds();
 
   /**
    * \brief Used by vtkPointPicker/vtkPicker.

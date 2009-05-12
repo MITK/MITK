@@ -240,12 +240,12 @@ mitk::BaseRenderer::~BaseRenderer()
 }
 
 
-void mitk::BaseRenderer::SetData(DataStorage::Pointer storage)
+void mitk::BaseRenderer::SetDataStorage(DataStorage* storage)
 {
-  if ( storage.IsNotNull() )
+  if ( storage != NULL )
   {
     m_DataStorage = storage;
-    Modified();
+    this->Modified();
   }
 }
 

@@ -121,78 +121,38 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_TextRenderer->Delete();
 }
 
-void mitk::VtkPropRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
-{
-  if(iterator!=GetData())
-  {
-    BaseRenderer::SetData(iterator);
-    static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture(m_DataTreeIterator.GetPointer());
 
-    // Compute the geometry from the current data tree bounds and set it as world geometry
-    this->SetWorldGeometryToDataTreeBounds();
-  }
+void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
+{
+  if ( storage == NULL )
+    return;
+
+  BaseRenderer::SetDataStorage(storage);
+
+  static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture( m_DataStorage.GetPointer() );
+
+  // Compute the geometry from the current data tree bounds and set it as world geometry  
+  this->SetWorldGeometryToDataStorageBounds();
 }
 
-void mitk::VtkPropRenderer::SetData( mitk::DataStorage::Pointer it )
+
+bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
 {
-  if( it.IsNotNull() )
-  {
-    BaseRenderer::SetData(it);
+  if ( m_DataStorage.IsNull() )
+    return false;
 
-    static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())
-       ->SetDataIteratorForTexture( m_DataStorage.GetPointer() );
+  //initialize world geometry
+  mitk::Geometry3D::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
 
-    // Compute the geometry from the current data tree bounds and set it as world geometry
-    
-    this->SetWorldGeometryToDataTreeBounds();
-  }
+  if ( geometry.IsNull() )
+    return false;
+
+  this->SetWorldGeometry(geometry);
+  this->GetDisplayGeometry()->Fit();
+  this->GetVtkRenderer()->ResetCamera();
+  this->Modified();
+  return true;
 }
-
-bool mitk::VtkPropRenderer::SetWorldGeometryToDataTreeBounds()
-{
-  if ( m_DataStorage.IsNotNull() )
-  {
-    //initialize world geometry
-    mitk::Geometry3D::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D( NULL, "includeInBoundingBox" );
-
-    if ( geometry.IsNotNull() )
-    {
-      this->SetWorldGeometry(geometry);
-      this->GetDisplayGeometry()->Fit();
-      this->GetVtkRenderer()->ResetCamera();
-      this->Modified();
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  else if ( this->GetData() != NULL )
-  {
-    //initialize world geometry
-    mitk::Geometry3D::Pointer geometry = 
-      mitk::DataTree::ComputeVisibleBoundingGeometry3D(
-        const_cast<mitk::DataTreeIteratorBase*>( this->GetData() ), 
-        NULL, "includeInBoundingBox" );
-
-    if ( geometry.IsNotNull() )
-    {
-      this->SetWorldGeometry(geometry);
-      this->GetDisplayGeometry()->Fit();
-      this->GetVtkRenderer()->ResetCamera();
-      this->Modified();
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-  return false;
-}
-
 
 
 /*!
@@ -206,17 +166,11 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   if ( this->GetEmptyWorldGeometry()) 
     return 0;
 
-  if ( m_DataStorage.IsNull() && this->GetData() == NULL )
+  if ( m_DataStorage.IsNull())
     return 0;
-     
-  if( this->GetData() != NULL )
-  {
-    if ( dynamic_cast<mitk::DataTree*>(GetData()->GetTree()) == NULL ) 
-      return 0;
-  }
 
   // Update mappers and prepare mapper queue
-  if(type == VtkPropRenderer::Opaque)
+  if (type == VtkPropRenderer::Opaque)
     this->PrepareMapperQueue();
   
   //go through the generated list and let the sorted mappers paint
@@ -247,7 +201,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       Enable2DOpenGL();
       lastVtkBased = false;
     }
-    
+
     switch(type)
     {
       case mitk::VtkPropRenderer::Opaque:        mapper->MitkRenderOpaqueGeometry(this); break;
@@ -260,19 +214,19 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     }
   }
   
-  if(lastVtkBased==false)
+  if (lastVtkBased == false)
     Disable2DOpenGL();
   
   //fix for bug 1177. In 2D rendering the camera is not needed, but nevertheless it is used by 
   //the vtk rendering mechanism to determine what is seen (and therefore has to be rendered)
   //by using the bounds of the vtkMitkRenderProp
-  if(sthVtkBased == false)
+  if (sthVtkBased == false)
     this->GetVtkRenderer()->ResetCamera();
 
   // Render text
-  if(type == VtkPropRenderer::Overlay)
+  if (type == VtkPropRenderer::Overlay)
   {
-    if(m_TextCollection.size() > 0)
+    if (m_TextCollection.size() > 0)
     {
       for (TextMapType::iterator it = m_TextCollection.begin(); it != m_TextCollection.end() ; it++)
         m_TextRenderer->AddViewProp((*it).second);
@@ -295,80 +249,44 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   // Do we have to update the mappers ?
   if ( m_LastUpdateTime < GetMTime() || m_LastUpdateTime < GetDisplayGeometry()->GetMTime() )
     Update();
-  else if(m_MapperID>=2 && m_MapperID < 6)
+  else if (m_MapperID>=2 && m_MapperID < 6)
     Update();
 
   // remove all text properties before mappers will add new ones
   m_TextRenderer->RemoveAllViewProps();
   m_TextCollection.clear();
-  
+
   // clear priority_queue
   m_MappersMap.clear();
- 
+
   int mapperNo = 0;
 
   //DataStorage
-  if( m_DataStorage.IsNotNull() )
+  if( m_DataStorage.IsNull() )
+    return;
+
+  DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
+
+  for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();  it != allObjects->End(); ++it)
   {
-    DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
-    
-    for(DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();  iter != allObjects->end(); ++iter)
+    DataTreeNode::Pointer node = it->Value();
+    if ( node.IsNull() )
+      continue;
+    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    if ( mapper.IsNull() )
+      continue;
+
+    // The information about LOD-enabled mappers is required by RenderingManager
+    if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
     {
-      DataTreeNode::Pointer node = *iter;
-
-      if ( node.IsNull() )
-        continue;
-
-      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if ( mapper.IsNull() )
-        continue;
-
-      // The information about LOD-enabled mappers is required by RenderingManager
-      if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
-      {
-        ++m_NumberOfVisibleLODEnabledMappers;
-      }
-
-      // mapper without a layer property get layer number 1
-      int layer = 1;
-      node->GetIntProperty("layer", layer, this);
-
-      int nr = (layer<<16) + mapperNo;
-      m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
-      mapperNo++;
+      ++m_NumberOfVisibleLODEnabledMappers;
     }
-
-  }
-
-  //DataTree Iterator
-  else if( m_DataTreeIterator.IsNotNull() )
-  {
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
-    {
-      mitk::DataTreeNode::Pointer node = it->Get();
-
-      if ( node.IsNull() )
-        continue;
-
-      mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if ( mapper.IsNull() )
-        continue;
-
-      // The information about LOD-enabled mappers is required by RenderingManager
-      if ( mapper->IsLODEnabled( this ) && mapper->IsVisible( this ) )
-      {
-        ++m_NumberOfVisibleLODEnabledMappers;
-      }
-
-      // mapper without a layer property get layer number 1
-      int layer = 1;
-      node->GetIntProperty("layer", layer, this);
-
-      int nr = (layer<<16) + mapperNo;
-      m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
-      mapperNo++;
-    }
+    // mapper without a layer property get layer number 1
+    int layer = 1;
+    node->GetIntProperty("layer", layer, this);
+    int nr = (layer<<16) + mapperNo;
+    m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
+    mapperNo++;
   }  
 }
 
@@ -460,33 +378,18 @@ void mitk::VtkPropRenderer::Update(mitk::DataTreeNode* datatreenode)
 
 void mitk::VtkPropRenderer::Update()
 {
-  if( m_DataStorage.IsNotNull() )
-  {
-    m_VtkMapperPresent = false;
+  if( m_DataStorage.IsNull() )
+    return;
 
-    mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
-      Update(it->Value());
+  m_VtkMapperPresent = false;
+  mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+    Update(it->Value());
 
-    Modified();
-    m_LastUpdateTime = GetMTime();
-  }
-  else if( m_DataTreeIterator.IsNotNull() )
-  {
-    m_VtkMapperPresent = false;
-
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    it->GoToBegin();
-
-    while(!it->IsAtEnd())
-    {
-      Update(it->Get());
-      ++it;
-    }
-    Modified();
-    m_LastUpdateTime = GetMTime();
-  }  
+  Modified();
+  m_LastUpdateTime = GetMTime();
 }
+
 
 /*!
 \brief
@@ -511,6 +414,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 
 }
 
+
 /*!
 \brief Resize the OpenGL Window
 */
@@ -527,6 +431,7 @@ void mitk::VtkPropRenderer::Resize(int w, int h)
   Update();
 }
 
+
 void mitk::VtkPropRenderer::InitSize(int w, int h)
 {
   m_RenderWindow->SetSize(w,h);
@@ -542,6 +447,7 @@ void mitk::VtkPropRenderer::InitSize(int w, int h)
   }
 }
 
+
 void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 {
   if(m_MapperID != mapperId)
@@ -551,6 +457,7 @@ void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
   checkState();
 }
 
+
 /*!
 \brief Activates the current renderwindow.
 */
@@ -559,6 +466,7 @@ void mitk::VtkPropRenderer::MakeCurrent()
   if(m_RenderWindow!=NULL)
      m_RenderWindow->MakeCurrent();
 }
+
 
 void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
@@ -621,6 +529,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
   }
 }
 
+
 /*!
 \brief Writes some 2D text as overlay. Function returns an unique int Text_ID for each call, which can be used via the GetTextLabelProperty(int text_id) function
 in order to get a vtkTextProperty. This property enables the setup of font, font size, etc.
@@ -641,6 +550,7 @@ int mitk::VtkPropRenderer::WriteSimpleText(std::string text, double posX, double
   return -1;
 }
 
+
 /*!
 \brief Can be used in order to get a vtkTextProperty for a specific text_id. This property enables the setup of font, font size, etc.
 */
@@ -648,6 +558,7 @@ vtkTextProperty* mitk::VtkPropRenderer::GetTextLabelProperty(int text_id)
 {
   return this->m_TextCollection[text_id]->GetTextProperty();
 }
+
 
 void mitk::VtkPropRenderer::InitPathTraversal()
 {
@@ -657,6 +568,7 @@ void mitk::VtkPropRenderer::InitPathTraversal()
     m_PickingObjectsIterator = m_PickingObjects->begin();
   }
 }
+
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
@@ -708,57 +620,38 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
   }
 }
 
+
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 {
-  if( m_DataStorage.IsNotNull() )
+  if( m_DataStorage.IsNull() )
+    return;
+
+  DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
+  for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin(); iter != allObjects->end(); ++iter)
   {
-    DataStorage::Pointer storage = m_DataStorage;
-    DataStorage::SetOfObjects::ConstPointer allObjects = storage->GetAll();
+    DataTreeNode::Pointer node = *iter;
+    if ( node.IsNull() )
+      continue;
 
-    for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin();
-      iter != allObjects->end();
-      ++iter)
-    {
-      DataTreeNode::Pointer node = *iter;
-      if ( node.IsNull() )
-        continue;
-
-      Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if(mapper.IsNotNull())
-      {
-        mapper->ReleaseGraphicsResources(renWin);
-      }
-    }
-  }
-
-  else if( m_DataTreeIterator.IsNotNull() )
-  {
-    mitk::DataTreeIteratorClone it = m_DataTreeIterator;
-    for ( it->GoToBegin(); it->IsAtEnd() == false; ++it )
-    {
-      mitk::DataTreeNode::Pointer node = it->Get();
-
-      if ( node.IsNull() )
-        continue;
-
-      Mapper::Pointer mapper = node->GetMapper(m_MapperID);
-      if(mapper.IsNotNull())
-      {
-        mapper->ReleaseGraphicsResources(renWin);
-      }
-    }
-  }  
+    Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    if(mapper.IsNotNull())
+      mapper->ReleaseGraphicsResources(renWin);
+  } 
 }
   
+
 vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()
 {
   return m_WorldPointPicker;
 }
 
+
 vtkPointPicker* mitk::VtkPropRenderer::GetPointPicker()
 {
   return m_PointPicker;
 }
+
+
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
 mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() const
 {
@@ -767,28 +660,24 @@ mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() con
 #endif
 
 
-
-
 // Workaround for GL Displaylist bug
 
-static int glWorkAroundGlobalCount=0;
+static int glWorkAroundGlobalCount = 0;
 
 void mitk::VtkPropRenderer::checkState()
 {
-  if(m_MapperID==Standard3D)
+  if (m_MapperID == Standard3D)
   {
-    if(!didCount)
+    if (!didCount)
     {
-      didCount=true;
+      didCount = true;
       glWorkAroundGlobalCount++;
-      if(glWorkAroundGlobalCount==2)
+      if (glWorkAroundGlobalCount == 2)
       {
         //std::cout << "GIMR ON\n";
           vtkMapper::GlobalImmediateModeRenderingOn();
       }
-
     //std::cout << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
-       
     }
   }
   else

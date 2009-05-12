@@ -27,13 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkSurfaceMapper2D.h"
 #include "mitkLine.h"
+#include "mitkNodePredicateDataType.h"
 
 
-namespace mitk
-{
-
-
-Geometry2DDataMapper2D::Geometry2DDataMapper2D()
+mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
 : m_SurfaceMapper( NULL ),
   m_RenderOrientationArrows( false ),
   m_ArrowOrientationPositive( true ),
@@ -43,86 +40,47 @@ Geometry2DDataMapper2D::Geometry2DDataMapper2D()
 }
 
 
-Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
+mitk::Geometry2DDataMapper2D::~Geometry2DDataMapper2D()
 {
 }
 
 
-const Geometry2DData *
-Geometry2DDataMapper2D::GetInput(void)
+const mitk::Geometry2DData* mitk::Geometry2DDataMapper2D::GetInput(void)
 {
   return static_cast<const Geometry2DData * > ( GetData() );
 }
 
 
-void 
-Geometry2DDataMapper2D::SetDataIteratorToOtherGeometry2Ds(
-  const DataTreeIteratorBase *iterator )
+void mitk::Geometry2DDataMapper2D::GenerateData()
 {
-  if (m_IteratorToOtherGeometry2Ds != iterator)
-  {
-    m_IteratorToOtherGeometry2Ds = iterator;
-    this->Modified();
-  }
-}
-
-
-void Geometry2DDataMapper2D::GenerateData()
-{
-  // collect all Geometry2DDatas accessible by traversing
-  // m_IteratorToOtherGeometry2Ds
+  // collect all Geometry2DDatas accessible from the DataStorage
   m_OtherGeometry2Ds.clear();
-  if (m_DataStorage.IsNotNull())
+  if (m_DataStorage.IsNull())
+    return;
+  
+  mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("Geometry2DData");
+  mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode, p, false);
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetDerivations(m_ParentNode);
-    for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
-    {
-      if(it->Value().IsNull())
-        continue;
-      
-      BaseData* data = it->Value()->GetData();
-      if (data == NULL)
-        continue;
-      
-      Geometry2DData* geometry2dData = dynamic_cast<Geometry2DData*>(data);
-      if(geometry2dData == NULL)
-       continue;
+    if(it->Value().IsNull())
+      continue;
 
-      PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
-      if (planegeometry != NULL)
-          m_OtherGeometry2Ds.push_back(it->Value());
-    }
-  }
-  else if (m_IteratorToOtherGeometry2Ds.IsNotNull()) 
-  {
+    BaseData* data = it->Value()->GetData();
+    if (data == NULL)
+      continue;
 
-    DataTreeIteratorClone it = m_IteratorToOtherGeometry2Ds;
-    while(!it->IsAtEnd())
-    {
-      if(it->Get().IsNotNull())
-      {
-        BaseData* data = it->Get()->GetData();
-        if(data != NULL)
-        {
-          Geometry2DData* geometry2dData = 
-            dynamic_cast<Geometry2DData*>(data);
-          if(geometry2dData!=NULL)
-          {
-            PlaneGeometry* planegeometry = 
-              dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+    Geometry2DData* geometry2dData = dynamic_cast<Geometry2DData*>(data);
+    if(geometry2dData == NULL)
+      continue;
 
-            if(planegeometry!=NULL)
-              m_OtherGeometry2Ds.push_back(it->Get());
-          }
-        }
-      }
-      ++it;
-    }
+    PlaneGeometry* planegeometry = dynamic_cast<PlaneGeometry*>(geometry2dData->GetGeometry2D());
+    if (planegeometry != NULL)
+      m_OtherGeometry2Ds.push_back(it->Value());
   }
 }
 
 
-void Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
+void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 {
   if ( !this->IsVisible(renderer) )
   {
@@ -382,13 +340,13 @@ void Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     }
 
     int res;
-    bool usegeometryparametricbounds=true;
-    if(GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
+    bool usegeometryparametricbounds = true;
+    if ( GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
     {
       surfaceCreator->SetXResolution(res);
       usegeometryparametricbounds=false;        
     }
-    if(GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
+    if (GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
     {
       surfaceCreator->SetYResolution(res);
       usegeometryparametricbounds=false;        
@@ -409,12 +367,10 @@ void Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
   }
 }
 
-void 
-Geometry2DDataMapper2D
-::DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
-  const PlaneGeometry *planeGeometry,
-  const PlaneGeometry *rendererPlaneGeometry,
-  const DisplayGeometry *displayGeometry,
+void mitk::Geometry2DDataMapper2D::DrawOrientationArrow( mitk::Point2D &outerPoint, mitk::Point2D &innerPoint, 
+  const mitk::PlaneGeometry *planeGeometry,
+  const mitk::PlaneGeometry *rendererPlaneGeometry,
+  const mitk::DisplayGeometry *displayGeometry,
   bool positiveOrientation )
 {
   // Draw arrows to indicate plane orientation
@@ -450,9 +406,8 @@ Geometry2DDataMapper2D
   glEnd();
 }
 
-void 
-Geometry2DDataMapper2D
-::ApplyProperties( BaseRenderer *renderer )
+
+void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
 {
   Superclass::ApplyProperties(renderer);
 
@@ -480,7 +435,7 @@ Geometry2DDataMapper2D
 }
 
 
-void Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent )
+void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent )
 {
   if (ds.IsNotNull())
   {
@@ -491,6 +446,3 @@ void Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorag
     m_ParentNode = parent;
   }
 }
-
-
-} // namespace

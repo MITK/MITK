@@ -60,13 +60,6 @@ public:
 
   virtual void Paint( BaseRenderer *renderer );
 
-  /**
-    * \brief Leave a little gap when crossing other nodes containing 
-    * Geometry2DData accessible by traversing the iterator
-    *
-    * \note works currently for PlaneGeometry only
-    */
-  virtual void SetDataIteratorToOtherGeometry2Ds(const DataTreeIteratorBase *iterator);
 
   virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent);
 
@@ -82,30 +75,21 @@ protected:
   virtual void GenerateData();
 
   void DrawOrientationArrow( Point2D &outerPoint, Point2D &innerPoint, 
-    const PlaneGeometry *planeGeometry, 
-    const PlaneGeometry *rendererPlaneGeometry, 
-    const DisplayGeometry *displayGeometry,
-    bool positiveOrientation = true );
+                            const PlaneGeometry *planeGeometry, 
+                            const PlaneGeometry *rendererPlaneGeometry, 
+                            const DisplayGeometry *displayGeometry,
+                            bool positiveOrientation = true );
 
   SurfaceMapper2D::Pointer m_SurfaceMapper;
 
-  /**
-    * \brief Leave a little gap when crossing other nodes containing 
-    * Geometry2DData accessible by traversing this iterator (if set)
-    *
-    * \note works currently for PlaneGeometry only
-    */
-  DataTreeIteratorClone m_IteratorToOtherGeometry2Ds;
-  DataStorage::Pointer m_DataStorage;
-  DataTreeNode::Pointer m_ParentNode;
-
+  DataStorage::Pointer m_DataStorage;  ///< DataStorage that will be searched for sub nodes
+  DataTreeNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
+ 
   typedef std::vector<DataTreeNode*> NodesVectorType;
   NodesVectorType m_OtherGeometry2Ds;
 
   bool m_RenderOrientationArrows;
   bool m_ArrowOrientationPositive;
 };
-
 } // namespace mitk
-
 #endif /* MITKGEOMETRY2DDATAMAPPER2D_H_HEADER_INCLUDED_C19C0BFB */

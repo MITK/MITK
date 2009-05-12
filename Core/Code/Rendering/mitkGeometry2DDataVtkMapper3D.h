@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseVtkMapper3D.h"
-#include "mitkDataTree.h"
 #include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 
@@ -96,8 +95,7 @@ public:
    * \brief All images found when traversing the (sub-) tree starting at
    * \a iterator which are resliced by an ImageMapper2D will be mapped.
    */
-  virtual void SetDataIteratorForTexture(const DataTreeIteratorBase *iterator);
-  virtual void SetDataIteratorForTexture(DataStorage* storage);
+  virtual void SetDataStorageForTexture(mitk::DataStorage* storage);
 
 protected:
 
@@ -203,8 +201,6 @@ protected:
   /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
   bool m_NormalsActorAdded;
 
-  DataTreeIteratorClone m_DataTreeIterator;
-
   /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
   mitk::DataStorage::Pointer m_DataStorage;
 
@@ -223,7 +219,6 @@ protected:
     void Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command);
 
     ActorInfo();
-
     ~ActorInfo();
   };
 
@@ -255,12 +250,6 @@ protected:
   // responsiblity to remove the observer upon its destruction
   typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;
   MemberCommandType::Pointer m_ImageMapperDeletedCommand;
-
 };
-
 } // namespace mitk
-
 #endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */
-
-
-

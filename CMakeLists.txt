@@ -132,7 +132,7 @@ IF(MITK_USE_QT)
   # 
   # or by passing -DDESIRED_QT_VERSION:STRING=4 as option to the very first
   # c(c)make call
-  FIND_PACKAGE(MitkQt)
+  FIND_PACKAGE(Qt4)
   IF(DESIRED_QT_VERSION EQUAL 3)
     SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
     FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents QmitkDialogBars) 

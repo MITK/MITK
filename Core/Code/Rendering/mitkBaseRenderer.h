@@ -19,9 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 
-#include "mitkDataTree.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeStorage.h"
 #include "mitkGeometry2D.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkDisplayGeometry.h"
@@ -30,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEventTypedefs.h"
 
 #include "mitkSliceNavigationController.h"
-//#include "mitkNavigationController.h"
 #include "mitkCameraController.h"
 #include "mitkCameraRotationController.h"
 
@@ -40,8 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 #include <set>
 
-
-namespace mitk {
+namespace mitk 
+{
 
 class NavigationController;
 class SliceNavigationController;
@@ -53,7 +50,7 @@ class DataStorage;
 //## @brief Organizes the rendering process
 //##
 //## Organizes the rendering process. A Renderer contains a reference to a
-//## data tree and asks the mappers of the data objects to render
+//## DataStorage and asks the mappers of the data objects to render
 //## the data into the renderwindow it is associated to.
 //##
 //## \#Render() checks if rendering is currently allowed by calling
@@ -94,18 +91,11 @@ public:
 
   enum StandardMapperSlot{Standard2D=1, Standard3D=2};
 
-  //##Documentation
-  //## @brief @a iterator defines which part of the data tree is traversed for renderering.
-  virtual void SetData(const DataTreeIteratorBase* iterator);
-  virtual void SetData( DataStorage::Pointer storage );
+
+  virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering
 
   //##Documentation
-  //## @brief Get the DataTreeIteratorClone defining which part of the data tree is traversed for renderering.
-  virtual DataTreeIteratorBase* GetData() const
-  {
-    return m_DataTreeIterator.GetPointer();
-  };
-
+  //## return the DataStorage that is used for rendering
   virtual mitk::DataStorage::Pointer GetDataStorage() const
   {
     return m_DataStorage.GetPointer();
@@ -175,22 +165,26 @@ public:
   //## \sa m_TimeSlicedWorldGeometry
   //## \sa m_CurrentWorldGeometry2D
   virtual void SetWorldGeometry(Geometry3D* geometry);
+
   itkGetConstObjectMacro(WorldGeometry, Geometry3D);
+
   //##Documentation
   //## @brief Get the current 3D-worldgeometry (m_CurrentWorldGeometry) used for 3D-rendering
   itkGetConstObjectMacro(CurrentWorldGeometry, Geometry3D);
+
   //##Documentation
   //## @brief Get the current 2D-worldgeometry (m_CurrentWorldGeometry2D) used for 2D-rendering
   itkGetConstObjectMacro(CurrentWorldGeometry2D, Geometry2D);
 
   //##Documentation
-  //## Calculates the bounds of the DataTree (if it contains any valid data),
+  //## Calculates the bounds of the DataStorage (if it contains any valid data),
   //## creates a geometry from these bounds and sets it as world geometry of the renderer.
   //##
-  //## Call this method to re-initialize the renderer to the current DataTree
+  //## Call this method to re-initialize the renderer to the current DataStorage
   //## (e.g. after loading an additional dataset), to ensure that the view is
   //## aligned correctly.
-  virtual bool SetWorldGeometryToDataTreeBounds()
+  //## \warn This is not implemented yet.
+  virtual bool SetWorldGeometryToDataStorageBounds()
   {
     return false;
   }
@@ -201,7 +195,9 @@ public:
   //## The DisplayGeometry describes which part of the Geometry2D m_CurrentWorldGeometry2D
   //## is displayed.
   virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
+
   itkGetConstObjectMacro(DisplayGeometry, DisplayGeometry);
+
   itkGetObjectMacro(DisplayGeometry, DisplayGeometry);
 
   //##Documentation
@@ -210,13 +206,16 @@ public:
   //##
   //## \sa m_Slice
   virtual void SetSlice(unsigned int slice);
+
   itkGetConstMacro(Slice, unsigned int);
+
   //##Documentation
   //## @brief Set/Get m_TimeStep which defines together with m_Slice the 2D geometry
   //## stored in m_TimeSlicedWorldGeometry used as m_CurrentWorldGeometry2D
   //##
   //## \sa m_TimeStep
   virtual void SetTimeStep(unsigned int timeStep);
+
   itkGetConstMacro(TimeStep, unsigned int);
 
   //##Documentation
@@ -262,13 +261,13 @@ public:
   itkGetObjectMacro(WorldGeometryData, Geometry2DData);
 
   //##Documentation
-  //## @brief Get a data tree node pointing to a data object containing the WorldGeometry (3D and 2D rendering)
+  //## @brief Get a DataTreeNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
   itkGetObjectMacro(WorldGeometryNode, DataTreeNode);
   //##Documentation
-  //## @brief Get a data tree node pointing to a data object containing the DisplayGeometry (for 2D rendering)
+  //## @brief Get a DataTreeNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
   itkGetObjectMacro(DisplayGeometryNode, DataTreeNode);
   //##Documentation
-  //## @brief Get a data tree node pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
+  //## @brief Get a DataTreeNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
   itkGetObjectMacro(CurrentWorldGeometry2DNode, DataTreeNode);
 
   //##Documentation
@@ -390,11 +389,7 @@ protected:
   MapperSlotId m_MapperID;
 
   //##Documentation
-  //## @brief The DataTreeIteratorClone defining which part of the data tree is traversed for rendering.
-  DataTreeIteratorClone m_DataTreeIterator;
-
-  //##Documentation
-  //## @brief The DataStorage defines which part of the data tree is traversed for renderering.
+  //## @brief The DataStorage that is used for renderering.
   mitk::DataStorage::Pointer m_DataStorage;
 
   //##Documentation
@@ -405,7 +400,7 @@ protected:
   //## @brief CameraController for 3D rendering
   //## @note preliminary.
   CameraController::Pointer           m_CameraController;
-  SliceNavigationController::Pointer       m_SliceNavigationController;
+  SliceNavigationController::Pointer  m_SliceNavigationController;
   CameraRotationController::Pointer   m_CameraRotationController;
 
 

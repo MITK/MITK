@@ -45,10 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 
-//#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
-#include "mitkDataTreeStorage.h"
-#include "mitkDataStorage.h"
 
 // VTK
 #include <vtkLinearTransform.h>
@@ -60,7 +57,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 
+
 mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
+
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
 {
@@ -73,6 +72,7 @@ mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
   return NULL;
 }
 
+
 void mitk::BaseRenderer::AddInstance(vtkRenderWindow* renWin, BaseRenderer* baseRenderer)
 {
   if(renWin == NULL || baseRenderer == NULL)
@@ -84,12 +84,14 @@ void mitk::BaseRenderer::AddInstance(vtkRenderWindow* renWin, BaseRenderer* base
   baseRendererMap.insert(BaseRendererMapType::value_type(renWin,baseRenderer));
 }
 
+
 void mitk::BaseRenderer::RemoveInstance(vtkRenderWindow* renWin)
 {
   BaseRendererMapType::iterator mapit = baseRendererMap.find(renWin);
   if(mapit != baseRendererMap.end())
     baseRendererMap.erase(mapit);
 }
+
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetByName( const std::string& name )
 {
@@ -102,6 +104,7 @@ mitk::BaseRenderer* mitk::BaseRenderer::GetByName( const std::string& name )
   return NULL;
 }
 
+
 vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& name )
 {
   for(BaseRendererMapType::iterator mapit = baseRendererMap.begin(); 
@@ -113,8 +116,9 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
   return NULL;
 }
 
+
 mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataTreeIterator(NULL), m_DataStorage(NULL),
+  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL),
   m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
   m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
   m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
@@ -225,7 +229,8 @@ mitk::BaseRenderer::~BaseRenderer()
   mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
   
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
-  m_DataTreeIterator = NULL;
+ 
+  m_DataStorage = NULL;
 
   if(m_RenderWindow!=NULL)
   {
@@ -234,17 +239,6 @@ mitk::BaseRenderer::~BaseRenderer()
   }
 }
 
-void mitk::BaseRenderer::SetData(const mitk::DataTreeIteratorBase* iterator)
-{
-  if(m_DataTreeIterator != iterator)
-  {
-    if (iterator != NULL)
-      m_DataTreeIterator = iterator;
-    else
-      m_DataTreeIterator = NULL;
-    Modified();
-  }
-}
 
 void mitk::BaseRenderer::SetData(DataStorage::Pointer storage)
 {

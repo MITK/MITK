@@ -19,12 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKLEVELWINDOWMANAGER_H
 #define MITKLEVELWINDOWMANAGER_H
 
-#include <mitkDataTree.h>
 #include <mitkDataStorage.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkBaseProperty.h>
+#include <map>
 
-/**
+/**Documentation
   \class mitk::LevelWindowManager mitkLevelWindowManager.h mitkLevelWindowManager.h
 
   \brief Provides access to the mitkLevelWindowProperty object and mitkLevelWindow to the current image.
@@ -34,11 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
   Changes on Level/Window, when another image gets active or by SetLevelWindow(const mitk::LevelWindow& levelWindow),
   will be sent to all listeners by Modified().
 
-  TreeChanged() listens to the DataTree for new or removed images. Depending on how m_AutoTopMost is set,
-  the new image becomes active or not. If an image is removed from the tree and m_AutoTopMost is false,
+  DataStorageChanged() listens to the DataStorage for new or removed images. Depending on how m_AutoTopMost is set,
+  the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
   there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
-
-  */
+*/
 
 namespace mitk
 {
@@ -49,23 +48,18 @@ namespace mitk
     mitkClassMacro(LevelWindowManager, itk::Object)
     itkNewMacro(Self); 
 
-    /// sets the DataTree which holds all image-nodes
-    void SetDataTree(mitk::DataTree* tree);
     void SetDataStorage(mitk::DataStorage* ds);
-
-    /// returns the DataTree
-    DataTree::Pointer GetDataTree();
-    DataStorage::Pointer GetDataStorage();  ///< returns the datastorage
+    mitk::DataStorage* GetDataStorage();  ///< returns the datastorage
     
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
     void SetAutoTopMostImage(bool autoTopMost);
 
-    void Update(const itk::EventObject& e);
+    void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
-    /*!
-    * sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
+    /**Documentation
+    * Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
     *
-    * sets m_AutoTopMost to false
+    * Sets m_AutoTopMost to false
     */
     void SetLevelWindowProperty(LevelWindowProperty::Pointer levelWindowProperty);
 
@@ -81,40 +75,27 @@ namespace mitk
     /// true if changes on slider or line-edits will affect always the topmost layer image
     bool isAutoTopMost();
   
-    /// change notifications from the DataTree
-    void TreeChanged(const itk::EventObject& treeChangedEvent);
-    
     /// Change notifications from DataStorage
     void DataStorageChanged(const mitk::DataTreeNode* n = NULL);
 
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);
 
-    std::vector<DataTreeNode::Pointer> GetAllNodes();
-
-    mitk::Image* GetCurrentImage();
-
   protected:
-
-    /// constructor
     LevelWindowManager();
-
-    /// destructor
     ~LevelWindowManager();
 
-  private:
-
-    /// the DataTree with all image-nodes
-    DataTree::Pointer m_DataTree;
+    /**
+    *  returns all nodes in the DataStorage that have the following properties: 
+    *  "visible" == true, "binary" == false, "levelwindow", and DataType == Image
+    */
+    mitk::DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
+    //mitk::Image* GetCurrentImage();
 
     DataStorage::Pointer m_DataStorage;
-
-    /// pointer to the LevelWindowProperty of the current image
-    LevelWindowProperty::Pointer m_LevelWindowProperty;
-
-    //map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
-    std::map<unsigned long, mitk::BaseProperty::Pointer> m_PropObserverToNode;
-
+    LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
+    typedef std::map<unsigned long, mitk::BaseProperty::Pointer> ObserverToPropertyMap;
+    ObserverToPropertyMap m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
     bool m_AutoTopMost;
     unsigned long m_ObserverTag;
     bool m_IsObserverTagSet;
@@ -123,5 +104,4 @@ namespace mitk
     mitk::Image* m_CurrentImage;
   };
 }
-
 #endif

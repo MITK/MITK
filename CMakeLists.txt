@@ -39,6 +39,15 @@ ENDIF(NOT MITK_DIR)
 OPTION(MITK_USE_QT "Use Trolltech's Qt library" ON)
 
 ADD_SUBDIRECTORY(Utilities)
+
+OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" OFF)
+IF(MITK_USE_OPENCHERRY)
+  ADD_SUBDIRECTORY(openCherry)
+  SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
+  INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
+  INCLUDE(CMake/MITKPluginHelpers.cmake)
+ENDIF(MITK_USE_OPENCHERRY)
+
 IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)
   SET(ITK_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin")
 ENDIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)
@@ -162,7 +171,7 @@ SET(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 
 ADD_SUBDIRECTORY(Documentation)
-ADD_SUBDIRECTORY(CoreUI)
+#ADD_SUBDIRECTORY(CoreUI)
 
 # CPACK OPTIONS
 

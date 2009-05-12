@@ -125,44 +125,18 @@ SET(MITK_LIBRARIES ${MITK_CORE_LIBRARIES} ${LIBRARIES_FOR_MITK_CORE} ${IPFUNC_LI
 SET(MITK_IGT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTFilters ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTTrackingDevices) 
 
 IF(MITK_USE_QT)
-  # setting this to 3 since Qt4 support is in a very early stage of 
-  # development. If you want to use Qt4, please create an initial cache with
-  # a line  
-  # DESIRED_QT_VERSION:STRING=4
-  # 
-  # or by passing -DDESIRED_QT_VERSION:STRING=4 as option to the very first
-  # c(c)make call
   FIND_PACKAGE(Qt4)
-  IF(DESIRED_QT_VERSION EQUAL 3)
-    SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk ${PROJECT_BINARY_DIR}/Qmitk ${QT_INCLUDE_DIR})
-    FOREACH(dir QmitkFunctionalityBase QmitkPropertyObservers QmitkApplicationBase QmitkFunctionalityComponents QmitkDialogBars) 
-      SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Qmitk/${dir})
-    ENDFOREACH(dir)
-    SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${QWT_INCLUDE_DIR})
-    INCLUDE(CMake/FunctionalityHelpers.cmake)
-    SET(LIBS_FOR_QFUNCTIONALITY "Qmitk")
-    SUBDIRS(Qmitk QFunctionalities QApplications)
-  ELSEIF(DESIRED_QT_VERSION EQUAL 4)
-    SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk ${PROJECT_BINARY_DIR}/Q4mitk)
+  SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Qmitk ${PROJECT_BINARY_DIR}/Qmitk)
     FOREACH(dir QmitkApplicationBase QmitkModels QmitkPropertyObservers) 
-      SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/Q4mitk/${dir})
+      SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Qmitk/${dir})
     ENDFOREACH(dir)
     SET(Q${KITNAME}_INCLUDE_DIRS ${Q${KITNAME}_INCLUDE_DIRS} ${QWT_INCLUDE_DIR})
-    ADD_SUBDIRECTORY(Q4mitk)
-  ENDIF(DESIRED_QT_VERSION EQUAL 3)
-  
   SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
 ENDIF(MITK_USE_QT)
 
 IF(MITK_USE_OPENCHERRY)
-  ADD_SUBDIRECTORY(Bundles)
+  ADD_SUBDIRECTORY(openCherry)
 ENDIF(MITK_USE_OPENCHERRY)
-
-IF(QT4_FOUND)
-  # for now, Qt independent bundles are also not build if Qt4 is not found
-  # until we create a specific BundlesQt directory and move the Qt bundles there
-  ADD_SUBDIRECTORY(BundlesQt)
-ENDIF(QT4_FOUND)
 
 #### find out version number #####
 
@@ -171,6 +145,7 @@ IF(Subversion_FOUND)
   Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN_INFO)
 ENDIF(Subversion_FOUND)
 
+# TODO: check what could be moved to subdirectories
 #### mitkConfig.h ####
 SET(MITK_CONFIG_H ${PROJECT_BINARY_DIR}/mitkConfig.h)
 CONFIGURE_FILE(mitkConfig.h.in ${MITK_CONFIG_H})
@@ -180,28 +155,16 @@ IF(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
 FILE(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
 ENDIF(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
 CONFIGURE_FILE(mitkTestingConfig.h.in ${MITK_TESTING_CONFIG_H})
+#### MITKConfig.cmake ####
 SET(${KITNAME}_INCLUDE_DIRS_CONFIG ${${KITNAME}_INCLUDE_DIRS})
 SET(Q${KITNAME}_INCLUDE_DIRS_CONFIG ${Q${KITNAME}_INCLUDE_DIRS})
 SET(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 SET(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 SET(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
-SET(REGISTER_QFUNCTIONALITY_CPP_IN "${PROJECT_SOURCE_DIR}/Qmitk/QmitkApplicationBase/RegisterQFunctionality.cpp.in")
 CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 
-# Q4Applications depends on cmake variables set in the Bundles
-# and in MITKConfig.cmake
-IF(DESIRED_QT_VERSION EQUAL 4)
-  ADD_SUBDIRECTORY(Q4Applications)
-ENDIF(DESIRED_QT_VERSION EQUAL 4)
-
 ADD_SUBDIRECTORY(Documentation)
-
-OPTION(BUILD_TESTING "Build the MITK tests." ON)
-IF(BUILD_TESTING)
-ENABLE_TESTING()
-ADD_SUBDIRECTORY(Testing)
-ENDIF(BUILD_TESTING)
-
+ADD_SUBDIRECTORY(CoreUI)
 
 # CPACK OPTIONS
 

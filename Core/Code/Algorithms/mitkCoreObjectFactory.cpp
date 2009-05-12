@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkColorProperty.h"
+/*
 #include "mitkCone.h"
 #include "mitkContour.h"
 #include "mitkContourMapper2D.h"
@@ -28,9 +29,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkContourVtkMapper3D.h"
 #include "mitkCuboid.h"
 #include "mitkCylinder.h"
-#include "mitkDataTreeNode.h"
 #include "mitkEllipsoid.h"
+#include "mitkMeshMapper2D.h"
+#include "mitkMeshVtkMapper3D.h"
+#include "mitkUnstructuredGridMapper2D.h"
+#include "mitkPointDataVtkMapper3D.h"
 #include "mitkEnhancedPointSetVtkMapper3D.h"
+#include "mitkSeedsImage.h"
+*/
+#include "mitkDataTreeNode.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkGeometry2DData.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -43,18 +50,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkMaterialProperty.h"
-#include "mitkMeshMapper2D.h"
-#include "mitkMeshVtkMapper3D.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkPointDataVtkMapper3D.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetMapper2D.h"
-#include "mitkUnstructuredGridMapper2D.h"
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkPolyDataGLMapper2D.h"
 #include "mitkProperties.h"
 #include "mitkPropertyList.h"
-#include "mitkSeedsImage.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkStringProperty.h"
@@ -74,21 +76,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicFileIOFactory.h"
 #include "mitkPointSetIOFactory.h"
 #include "mitkItkImageFileIOFactory.h"
-#include "mitkParRecFileIOFactory.h"
+//#include "mitkParRecFileIOFactory.h"
 #include "mitkSTLFileIOFactory.h"
-#include "mitkObjFileIOFactory.h"
+//#include "mitkObjFileIOFactory.h"
 #include "mitkVtkSurfaceIOFactory.h"
-#include "mitkVtkUnstructuredGridIOFactory.h"
+//#include "mitkVtkUnstructuredGridIOFactory.h"
 #include "mitkVtkImageIOFactory.h"
 #include "mitkVtiFileIOFactory.h"
 #include "mitkPicVolumeTimeSeriesIOFactory.h"
-#include "mitkStlVolumeTimeSeriesIOFactory.h"
-#include "mitkVtkVolumeTimeSeriesIOFactory.h"
+//#include "mitkStlVolumeTimeSeriesIOFactory.h"
+//#include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
 #include "mitkImageWriterFactory.h"
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
+/*
 #include "mitkAddContourToolFactory.h"
 #include "mitkSubtractContourToolFactory.h"
 #include "mitkRegionGrowingToolFactory.h"
@@ -102,10 +105,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCalculateGrayValueStatisticsToolFactory.h"
 #include "mitkDrawPaintbrushToolFactory.h"
 #include "mitkErasePaintbrushToolFactory.h"
+*/
 
-
+/*
 #include "mitkUnstructuredGrid.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
+*/
 
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
@@ -140,18 +145,18 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( VtkRepresentationProperty, "VtkRepresentationProperty" )
     CREATE_ITK( VtkResliceInterpolationProperty, "VtkResliceInterpolationProperty" )
     CREATE_ITK( GeometryData, "GeometryData" )
-    CREATE_ITK( Contour, "Contour" )
+//    CREATE_ITK( Contour, "Contour" )
     CREATE_ITK( Surface, "Surface" )
-    CREATE_ITK( Ellipsoid, "Ellipsoid" )
-    CREATE_ITK( Cylinder, "Cylinder" )
-    CREATE_ITK( Cuboid, "Cuboid" )
-    CREATE_ITK( Cone, "Cone" )
+//  CREATE_ITK( Ellipsoid, "Ellipsoid" )
+//  CREATE_ITK( Cylinder, "Cylinder" )
+//  CREATE_ITK( Cuboid, "Cuboid" )
+//  CREATE_ITK( Cone, "Cone" )
     CREATE_ITK( Image, "Image" )
-    CREATE_ITK( SeedsImage, "SeedsImage" )
+//    CREATE_ITK( SeedsImage, "SeedsImage" )
     CREATE_ITK( Geometry3D, "Geometry3D" )
     CREATE_ITK( TimeSlicedGeometry, "TimeSlicedGeometry" )
     CREATE_ITK( Surface, "Surface" )
-    CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
+//    CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
     CREATE_ITK( PointSet, "PointSet" )
     CREATE_ITK( SlicedGeometry3D, "SlicedGeometry3D" )
     CREATE_ITK( PlaneGeometry, "PlaneGeometry" )
@@ -160,7 +165,7 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( SurfaceVtkMapper3D, "SurfaceVtkMapper3D" )
     CREATE_ITK( ImageMapper2D, "ImageMapper2D" )
     CREATE_ITK( VolumeDataVtkMapper3D, "VolumeDataVtkMapper3D" )
-    CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
+//    CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
     CREATE_ITK( LookupTable, "LookupTable" )
     CREATE_ITK( PointSetMapper2D, "PointSetMapper2D" )
     CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
@@ -235,22 +240,23 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   {
     itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+//    itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
+//    itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkSurfaceIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
+//    itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtiFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( ItkImageFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PicVolumeTimeSeriesIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+//    itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
+//    itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
 
     mitk::SurfaceVtkWriterFactory::RegisterOneFactory();
     mitk::PointSetWriterFactory::RegisterOneFactory();
     mitk::ImageWriterFactory::RegisterOneFactory();
 
+    /*
     itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( SubtractContourToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( DrawPaintbrushToolFactory::New() );
@@ -265,7 +271,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( CreateSurfaceToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( BinaryThresholdToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( CalculateGrayValueStatisticsToolFactory::New() );
-
+*/
     alreadyDone = true;
   }
 }
@@ -295,16 +301,19 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       mitk::SurfaceMapper2D *castedMapper = (mitk::SurfaceMapper2D*)newMapper.GetPointer();
       castedMapper->SetDataTreeNode(node);
     }
+    /*
     else if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
+    */
     else if((dynamic_cast<PointSet*>(data)!=NULL))
     {
       newMapper = mitk::PointSetMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
+    /*
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PolyDataGLMapper2D::New();
@@ -325,6 +334,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       newMapper = mitk::UnstructuredGridMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
+    */
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -352,17 +362,20 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       newMapper = mitk::SurfaceVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
+    /*
     else if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
+    */
     else if((dynamic_cast<PointSet*>(data)!=NULL))
     {
       newMapper = mitk::PointSetVtkMapper3D::New();
       //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
       newMapper->SetDataTreeNode(node);
     }
+    /*
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PointDataVtkMapper3D::New();
@@ -383,6 +396,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       newMapper = mitk::UnstructuredGridVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
+    */
   }
   return newMapper;
 }

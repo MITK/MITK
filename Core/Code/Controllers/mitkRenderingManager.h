@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
 
 #include "mitkCommon.h"
-#include "mitkDataTree.h"
 
 #include <vtkCallbackCommand.h>
 
@@ -38,7 +37,7 @@ class RenderingManager;
 class RenderingManagerFactory;
 class Geometry3D;
 class SliceNavigationController;
-class DataStorage;
+class BaseRenderer;
 
 /**
  * \brief Manager for coordinating the rendering process.
@@ -140,17 +139,10 @@ public:
    * via the parameter requestType. */
   void ForceImmediateUpdateAll( RequestType type = REQUEST_UPDATE_ALL );
 
-
-  /** Initializes the windows specified by requestType to the geometry of the
-   * given DataTreeNode. PLATFORM SPECIFIC. */
-  virtual bool InitializeViews( DataTreeIteratorBase *dataIt,
-    RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
-
-
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataStorage. */
-  virtual bool InitializeViews( const DataStorage *storage,
-     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
+  //virtual bool InitializeViews( const DataStorage *storage, const DataTreeNode* node = NULL,
+  //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
    * geometry. PLATFORM SPECIFIC. */
@@ -166,14 +158,12 @@ public:
   /** Initializes the specified window to the geometry of the given
    * DataTreeNode. Set "initializeGlobalTimeSNC" to true in order to use this
    * geometry as global TimeSlicedGeometry. PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow,
-    DataTreeIteratorBase *dataIt, bool initializeGlobalTimeSNC = false );
+  //virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataTreeNode* node = NULL, bool initializeGlobalTimeSNC = false );
 
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as
    * global TimeSlicedGeometry. PLATFORM SPECIFIC. */
-  virtual bool InitializeView( vtkRenderWindow *renderWindow,
-    const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
+  virtual bool InitializeView( vtkRenderWindow *renderWindow, const Geometry3D *geometry, bool initializeGlobalTimeSNC = false);
 
   /** Initializes the specified window to the default viewing direction
    * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
@@ -231,7 +221,7 @@ public:
   virtual void DoMonitorRendering() {};
   virtual void DoFinishAbortRendering() {};
 
-  int GetNextLOD( BaseRenderer *renderer );
+  int GetNextLOD( BaseRenderer* renderer );
 
   /** Set current LOD (NULL means all renderers)*/
   void SetNextLOD( unsigned int lod, BaseRenderer *renderer = NULL );

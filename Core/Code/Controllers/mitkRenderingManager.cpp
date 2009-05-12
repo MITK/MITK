@@ -19,10 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkBaseRenderer.h"
-#include "mitkDataStorage.h"
-
-#include "mitkDataTreeStorage.h"
-#include "mitkDataStorage.h"
 
 #include <vtkRenderWindow.h>
 
@@ -296,85 +292,38 @@ RenderingManager
 }
 
 
-bool
-RenderingManager
-::InitializeViews( DataTreeIteratorBase * dataIt, RequestType type, bool preserveRoughOrientationInWorldSpace )
-{
-  mitk::Geometry3D::Pointer geometry;
-  if ( dataIt != NULL )
-  {
-    geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(
-      dataIt, NULL, "includeInBoundingBox" );
-
-    if ( geometry.IsNotNull() )
-    {
-      // let's see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-      {
-        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-
-        mitk::TimeSlicedGeometry::Pointer timegeometry =
-          mitk::TimeSlicedGeometry::New();
-        timegeometry->InitializeEvenlyTimed(
-          geometry, (unsigned int) duration );
-        timegeometry->SetTimeBounds( timebounds );
-
-        timebounds[1] = timebounds[0] + 1.0;
-        geometry->SetTimeBounds( timebounds );
-
-        geometry = timegeometry;
-      }
-    }
-  }
-
-  // Use geometry for initialization
-  return this->InitializeViews( geometry.GetPointer(), type, preserveRoughOrientationInWorldSpace );
-}
-
-
-bool
-RenderingManager
-::InitializeViews( const mitk::DataStorage * storage, RequestType type, bool preserveRoughOrientationInWorldSpace )
-{
-  mitk::DataTreePreOrderIterator it((dynamic_cast<const mitk::DataTreeStorage*>(storage))->m_DataTree);
-  return this->InitializeViews(&it, type, preserveRoughOrientationInWorldSpace);
-
-
-// following lines of code are never reached
-// and may be used to generate native datastorage code later
-
-    mitk::Geometry3D::Pointer geometry;
-  if ( storage != NULL )
-  {
-//    geometry = mitk::DataStorage::ComputeVisibleBoundingGeometry3D(
-//      *storage, "visible", NULL, "includeInBoundingBox" );
-
-    if ( geometry.IsNotNull() )
-    {
-      // let's see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-      {
-        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-
-        mitk::TimeSlicedGeometry::Pointer timegeometry =
-          mitk::TimeSlicedGeometry::New();
-        timegeometry->InitializeEvenlyTimed(
-          geometry, (unsigned int) duration );
-        timegeometry->SetTimeBounds( timebounds );
-
-        timebounds[1] = timebounds[0] + 1.0;
-        geometry->SetTimeBounds( timebounds );
-
-        geometry = timegeometry;
-      }
-    }
-  }
-
-  // Use geometry for initialization
-  return this->InitializeViews( geometry.GetPointer(), type );
-}
+//bool RenderingManager::InitializeViews( const mitk::DataStorage * storage, const DataTreeNode* node = NULL, RequestType type, bool preserveRoughOrientationInWorldSpace )
+//{
+//  mitk::Geometry3D::Pointer geometry;
+//  if ( storage != NULL )
+//  {
+//    geometry = storage->ComputeVisibleBoundingGeometry3D(node, "visible", NULL, "includeInBoundingBox" );
+//
+//    if ( geometry.IsNotNull() )
+//    {
+//      // let's see if we have data with a limited live-span ...
+//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+//      {
+//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+//
+//        mitk::TimeSlicedGeometry::Pointer timegeometry =
+//          mitk::TimeSlicedGeometry::New();
+//        timegeometry->InitializeEvenlyTimed(
+//          geometry, (unsigned int) duration );
+//        timegeometry->SetTimeBounds( timebounds );
+//
+//        timebounds[1] = timebounds[0] + 1.0;
+//        geometry->SetTimeBounds( timebounds );
+//
+//        geometry = timegeometry;
+//      }
+//    }
+//  }
+//
+//  // Use geometry for initialization
+//  return this->InitializeViews( geometry.GetPointer(), type );
+//}
 
 
 bool
@@ -557,50 +506,41 @@ RenderingManager
   return true;
 }
 
-bool
-RenderingManager
-::InitializeView( vtkRenderWindow * renderWindow,
-  DataTreeIteratorBase * dataIt,
-  bool initializeGlobalTimeSNC )
-{
-  mitk::Geometry3D::Pointer geometry;
-  if ( dataIt != NULL )
-  {
-    geometry = mitk::DataTree::ComputeVisibleBoundingGeometry3D(
-      dataIt, NULL, "includeInBoundingBox" );
+//bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const DataStorage* ds, const DataTreeNode node = NULL,  bool initializeGlobalTimeSNC )
+//{
+//  mitk::Geometry3D::Pointer geometry;
+//  if ( ds != NULL )
+//  {
+//    geometry = ds->ComputeVisibleBoundingGeometry3D(node, NULL, "includeInBoundingBox" );
+//
+//    if ( geometry.IsNotNull() )
+//    {
+//      // let's see if we have data with a limited live-span ...
+//      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+//      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+//      {
+//        mitk::ScalarType duration = timebounds[1]-timebounds[0];
+//
+//        mitk::TimeSlicedGeometry::Pointer timegeometry =
+//          mitk::TimeSlicedGeometry::New();
+//        timegeometry->InitializeEvenlyTimed(
+//          geometry, (unsigned int) duration );
+//        timegeometry->SetTimeBounds( timebounds );
+//
+//        timebounds[1] = timebounds[0] + 1.0;
+//        geometry->SetTimeBounds( timebounds );
+//
+//        geometry = timegeometry;
+//      }
+//    }
+//  }
+//
+//  // Use geometry for initialization
+//  return this->InitializeView( renderWindow,
+//    geometry.GetPointer(), initializeGlobalTimeSNC );
+//}
 
-    if ( geometry.IsNotNull() )
-    {
-      // let's see if we have data with a limited live-span ...
-      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-      {
-        mitk::ScalarType duration = timebounds[1]-timebounds[0];
-
-        mitk::TimeSlicedGeometry::Pointer timegeometry =
-          mitk::TimeSlicedGeometry::New();
-        timegeometry->InitializeEvenlyTimed(
-          geometry, (unsigned int) duration );
-        timegeometry->SetTimeBounds( timebounds );
-
-        timebounds[1] = timebounds[0] + 1.0;
-        geometry->SetTimeBounds( timebounds );
-
-        geometry = timegeometry;
-      }
-    }
-  }
-
-  // Use geometry for initialization
-  return this->InitializeView( renderWindow,
-    geometry.GetPointer(), initializeGlobalTimeSNC );
-}
-
-bool
-RenderingManager
-::InitializeView( vtkRenderWindow * renderWindow,
-  const Geometry3D * geometry,
-  bool initializeGlobalTimeSNC )
+bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const Geometry3D * geometry, bool initializeGlobalTimeSNC )
 {
   bool boundingBoxInitialized = false;
 
@@ -638,9 +578,7 @@ RenderingManager
 }
 
 
-bool
-RenderingManager
-::InitializeView( vtkRenderWindow * renderWindow )
+bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
 {
   mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( renderWindow );
@@ -659,14 +597,10 @@ RenderingManager
   return true;
 }
 
-void
-RenderingManager
-::InternalViewInitialization(
-  mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry,
-  bool boundingBoxInitialized, int mapperID )
+
+void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
 {
-  mitk::SliceNavigationController *nc =
-    baseRenderer->GetSliceNavigationController();
+  mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
   // Re-initialize view direction
   nc->SetViewDirectionToDefault();
@@ -704,33 +638,25 @@ RenderingManager
 }
 
 
-void
-RenderingManager
-::SetTimeNavigationController( SliceNavigationController *nc )
+void RenderingManager::SetTimeNavigationController( SliceNavigationController *nc )
 {
   m_TimeNavigationController = nc;
 }
 
 
-const SliceNavigationController *
-RenderingManager
-::GetTimeNavigationController() const
+const SliceNavigationController* RenderingManager::GetTimeNavigationController() const
 {
   return m_TimeNavigationController;
 }
 
 
-SliceNavigationController *
-RenderingManager
-::GetTimeNavigationController()
+SliceNavigationController* RenderingManager::GetTimeNavigationController()
 {
   return m_TimeNavigationController;
 }
 
 
-void
-RenderingManager
-::UpdateCallback()
+void RenderingManager::UpdateCallback()
 {
   m_UpdatePending = false;
 
@@ -746,9 +672,7 @@ RenderingManager
 }
 
 
-void
-RenderingManager
-::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
+void RenderingManager::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
 {
   // Static method: access member objects via static instance
   RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;

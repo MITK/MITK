@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIMAGECAST_H_HEADER_INCLUDED
 #define MITKIMAGECAST_H_HEADER_INCLUDED
 
-#include "itkDiffusionTensor3D.h"
-#include "itkConfidenceDiffusionTensor3D.h"
+//#include "itkDiffusionTensor3D.h"
+//#include "itkConfidenceDiffusionTensor3D.h"
 #include "itkVector.h"
 
 #include <mitkImageAccessByItk.h>

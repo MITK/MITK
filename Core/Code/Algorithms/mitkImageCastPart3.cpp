@@ -41,28 +41,28 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
 #endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
-typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
-typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
-typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 2>  itkImageCDTIF2;
-typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 2>  itkImageCDTID2;
+//typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
+//typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
+//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 2>  itkImageCDTIF2;
+//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 2>  itkImageCDTID2;
 
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC2*,  itk::SmartPointer<itkImageRGBUC2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF2*,  itk::SmartPointer<itkImageDTIF2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTIF2*,  itk::SmartPointer<itkImageCDTIF2>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTID2*,  itk::SmartPointer<itkImageCDTID2>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF2*,  itk::SmartPointer<itkImageDTIF2>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID2*,  itk::SmartPointer<itkImageDTID2>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTIF2*,  itk::SmartPointer<itkImageCDTIF2>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTID2*,  itk::SmartPointer<itkImageCDTID2>&);
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
-typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
-typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
-typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 3>  itkImageCDTIF3;
-typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 3>  itkImageCDTID3;
+//typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
+//typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
+//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 3>  itkImageCDTIF3;
+//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 3>  itkImageCDTID3;
 
 template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageRGBUC3*,  itk::SmartPointer<itkImageRGBUC3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTIF3*,  itk::SmartPointer<itkImageCDTIF3>&);
-template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTID3*,  itk::SmartPointer<itkImageCDTID3>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTIF3*,  itk::SmartPointer<itkImageDTIF3>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::SmartPointer<itkImageDTID3>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTIF3*,  itk::SmartPointer<itkImageCDTIF3>&);
+//template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageCDTID3*,  itk::SmartPointer<itkImageCDTID3>&);
 
 #define CAST_HUNDRED_VECS(HUN)   \
   CAST_TEN_VECS(HUN)              \

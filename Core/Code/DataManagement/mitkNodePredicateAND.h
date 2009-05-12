@@ -37,6 +37,7 @@ namespace mitk {
 
       itkFactorylessNewMacro(NodePredicateAND);
       mitkNewMacro2Param(NodePredicateAND, const NodePredicateBase*, const NodePredicateBase*);
+      mitkNewMacro3Param(NodePredicateAND, const NodePredicateBase*, const NodePredicateBase*, const NodePredicateBase*);
 
       //##Documentation
       //## @brief Standard Destructor
@@ -54,6 +55,11 @@ namespace mitk {
       //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
       //## Protected constructor, use static instantiation functions instead
       NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2);
+  
+      //##Documentation
+      //## @brief Convenience constructor that adds p1, p2 and p3 to list of child predicates
+      //## Protected constructor, use static instantiation functions instead
+      NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3);
     };
 
 } // namespace mitk

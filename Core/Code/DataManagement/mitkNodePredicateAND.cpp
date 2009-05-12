@@ -18,12 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateAND.h"
 
 
-
-
 mitk::NodePredicateAND::NodePredicateAND()
 : NodePredicateCompositeBase()
 {
 }
+
 
 mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2)
 : NodePredicateCompositeBase()
@@ -31,6 +30,16 @@ mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const Node
   this->AddPredicate(p1);
   this->AddPredicate(p2);
 }
+
+
+mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3)
+: NodePredicateCompositeBase()
+{
+  this->AddPredicate(p1);
+  this->AddPredicate(p2);
+  this->AddPredicate(p3);
+}
+
 
 mitk::NodePredicateAND::~NodePredicateAND()
 {

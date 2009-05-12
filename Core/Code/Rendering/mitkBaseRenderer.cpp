@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 
-#include "mitkStatusBar.h"
+//#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataTreeStorage.h"
 #include "mitkDataStorage.h"
@@ -543,8 +543,10 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   //set the Focus on the renderer
   bool success = mitk::GlobalInteraction::GetInstance()->SetFocus(this);
+  /*
   if (! success) 
     mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
+  */
 
   //if (m_CameraController)
   //{

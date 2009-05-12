@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkXMLReader.h"
 
 #include <vtkXMLDataElement.h>
-#include <mitkStatusBar.h>
+//#include <mitkStatusBar.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
@@ -78,7 +78,7 @@ namespace mitk {
 
    if ( xmlReader->Parse() == 0 )    
    {
-     mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse xml-Project File!" );
+     //mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse xml-Project File!" );
      xmlReader->Delete();  
      return false;
    }

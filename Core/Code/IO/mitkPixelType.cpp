@@ -157,7 +157,7 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
     SET_ITK_TYPE_ID(SCALAR, 1, TYPE ) else                                            \
                                                                                       \
     SET_ITK_TYPE_ID(RGB, 3, itk::RGBPixel<TYPE> ) else                                \
-    //SET_ITK_TYPE_ID(DIFFUSIONTENSOR3D, 6, itk::DiffusionTensor3D<TYPE> ) else         \
+    /*SET_ITK_TYPE_ID(DIFFUSIONTENSOR3D, 6, itk::DiffusionTensor3D<TYPE> ) else */        \
     SET_ITK_TYPE_ID(VECTOR, 3, Vector3Type ) else                                     \
     SET_ITK_TYPE_ID(COVARIANTVECTOR, 3, CovariantVector3Type ) else                   \
     SET_ITK_TYPE_ID(POINT, 3, Point3Type ) else                                       \

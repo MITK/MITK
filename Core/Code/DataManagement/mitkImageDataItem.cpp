@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageDataItem.h"
-#include "mitkMemoryUtilities.h"
+// #include "mitkMemoryUtilities.h"
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 

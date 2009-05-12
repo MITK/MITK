@@ -40,7 +40,7 @@ class Image;
 //## See documentation of SetAuto for information on how the
 //## level window is initialized from an image.
 //##
-//## @ingroup DataTree
+//## @ingroup DataManagement
 class MITK_CORE_EXPORT LevelWindow
 {
 public:

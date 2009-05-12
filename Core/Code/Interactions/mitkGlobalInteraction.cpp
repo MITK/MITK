@@ -34,8 +34,6 @@ mitk::GlobalInteraction::GlobalInteraction(const char * type)
   m_CurrentlyInInformListenersLoop(false)
 {
   m_FocusManager = FocusManager::New();
-  m_InteractionDebugger = InteractionDebugger::New();
-  InteractionDebugger::Deactivate();
 }
 
 mitk::GlobalInteraction::~GlobalInteraction()

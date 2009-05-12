@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractor.h"
 #include <string>
 #include <vector>
-#include "mitkInteractionDebugger.h"
 
 namespace mitk {
 
@@ -226,8 +225,6 @@ namespace mitk {
 
     bool m_CurrentlyInInformListenersLoop;
     bool m_CurrentlyInInformInteractorsLoop;
-
-    InteractionDebugger::Pointer m_InteractionDebugger;
 
     static GlobalInteraction::Pointer s_GlobalInteraction;
   };

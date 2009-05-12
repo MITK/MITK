@@ -37,7 +37,7 @@ ENDFOREACH(kit)
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 SET(MITK_HELPPAGES_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )
 
-IF(USE_QT)
+IF(MITK_USE_QT)
   IF(DESIRED_QT_VERSION EQUAL 3)
     #TODO glob org.mitk.gui.qt*
     FILE(GLOB _qt4bundles ${CMAKE_CURRENT_SOURCE_DIR}/../Bundles/org.mitk.gui.qt*)
@@ -55,7 +55,7 @@ IF(USE_QT)
   
     SET(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} QT4")
   ENDIF(DESIRED_QT_VERSION EQUAL 4)
-ENDIF(USE_QT)
+ENDIF(MITK_USE_QT)
 
 IF(BUILD_OPENCHERRY)
   FILE(RELATIVE_PATH _opencherry_doxygen_path ${MITK_DOXYGEN_OUTPUT_DIR}/html ${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/html)

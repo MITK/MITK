@@ -1,5 +1,5 @@
 
-IF(USE_QT) # only if MITK is built with Qt
+IF(MITK_USE_QT) # only if MITK is built with Qt
 
 PROJECT(QWT)
 
@@ -193,5 +193,5 @@ ENDIF(DESIRED_QT_VERSION EQUAL 3)
 ADD_LIBRARY(qwt ${QWT_SOURCES})
 TARGET_LINK_LIBRARIES(qwt ${QT_LIBRARIES})
 
-ENDIF(USE_QT) # only if MITK is built with Qt
+ENDIF(MITK_USE_QT) # only if MITK is built with Qt
 

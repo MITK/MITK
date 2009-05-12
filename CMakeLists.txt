@@ -1,5 +1,5 @@
 PROJECT(MITK)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 # this should be set to NEW at some point, see bug #1402
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
@@ -31,16 +31,13 @@ SET(MITK_VERSION_MINOR "13")
 SET(MITK_VERSION_PATCH "1")
 SET(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
 
-IF(NOT MITK_KITNAME_FOR_MAINAPP)
-SET(MITK_KITNAME_FOR_MAINAPP MITK)
-ENDIF(NOT MITK_KITNAME_FOR_MAINAPP)
 IF(NOT MITK_DIR)
-SET(MITK_DIR ${CMAKE_CURRENT_BINARY_DIR})
+  SET(MITK_DIR ${CMAKE_CURRENT_BINARY_DIR})
 ENDIF(NOT MITK_DIR)
 
 # some targets in Utilities also depend on Qt. Use this option
 # to decide if they should be build
-OPTION(USE_QT "Use Trolltech's Qt library" ON)
+OPTION(MITK_USE_QT "Use Trolltech's Qt library" ON)
 
 ADD_SUBDIRECTORY(Utilities)
 
@@ -153,7 +150,7 @@ ADD_SUBDIRECTORY(Core)
 SET(MITK_LIBRARIES ${MITK_CORE_LIBRARIES} ${LIBRARIES_FOR_MITK_CORE} ${IPFUNC_LIBRARY} pic2vtk IIL4MITK ipSegmentation ann )
 SET(MITK_IGT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTFilters ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTTrackingDevices) 
 
-IF(USE_QT)
+IF(MITK_USE_QT)
   # setting this to 3 since Qt4 support is in a very early stage of 
   # development. If you want to use Qt4, please create an initial cache with
   # a line  
@@ -181,7 +178,7 @@ IF(USE_QT)
   ENDIF(DESIRED_QT_VERSION EQUAL 3)
   
   SET(QMITK_LIBRARIES Qmitk ${MITK_LIBRARIES} ${QT_LIBRARIES})
-ENDIF(USE_QT)
+ENDIF(MITK_USE_QT)
 
 IF(BUILD_OPENCHERRY)
   ADD_SUBDIRECTORY(Bundles)

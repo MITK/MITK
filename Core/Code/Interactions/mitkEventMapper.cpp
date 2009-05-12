@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEventMapper.h"
 #include <itkOutputWindow.h>
 #include <itkMacro.h>
-#include "mitkStatusBar.h"
+//#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
 #include "mitkOperationEvent.h"
@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include <mitkStandardFileLocations.h>
 
-#include <mitkInteractionDebugger.h>
+//#include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
 #include <itksys/SystemTools.hxx>
 #include "mitkCoreObjectFactory.h"
@@ -502,11 +502,6 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
   */
   bool ok;
 
-#ifdef INTERDEBUG
-  std::cout<<"thrown event-type: "<<m_StateEvent.GetId()<<std::endl;
-  mitk::InteractionDebugger::Set("EventMapper", "Thrown event-type: ");
-#endif
-
   switch (event->GetType())
   {
   case mitk::Type_MouseButtonPress://Increase
@@ -584,7 +579,7 @@ inline int mitk::EventMapper::convertConstString2ConstInt(std::string input)
     return (tempIt)->second;
   }
 
-  mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
+  //mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkEventMapper.cpp: Couldn't find matching Event Int from Event String in XML-File");
   return -1;//for didn't find anything
 }
 

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
 #include "mitkPointSet.h"
-#include "mitkStatusBar.h"
+//#include "mitkStatusBar.h"
 #include "mitkDataTreeNode.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
@@ -714,9 +714,11 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       //point in list and set var position
       else
       {
-        mitk::StatusBar::GetInstance()->DisplayText(
+        /*
+         mitk::StatusBar::GetInstance()->DisplayText(
           "Message from mitkPointSetInteractor: Error in Actions! Check Config XML-file", 
           10000);
+        */
         ok = false;
       }
   

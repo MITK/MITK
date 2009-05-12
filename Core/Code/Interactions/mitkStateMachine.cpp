@@ -28,7 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMacro.h>
 #include <mitkXMLWriter.h>
 #include <mitkXMLReader.h>
-#include <mitkInteractionDebug.h>
 
 const std::string mitk::StateMachine::XML_NODE_NAME = "stateMachine";
 const std::string mitk::StateMachine::STATE_MACHINE_TYPE = "STATE_MACHINE_TYPE";
@@ -58,8 +57,6 @@ mitk::StateMachine::StateMachine(const char * type)
   m_UndoEnabled = true;
 
   m_TimeStep = 0;
-
-  InteractionDebug::GetInstance()->NewStateMachine( type, this );
 }
 
 mitk::StateMachine::~StateMachine()
@@ -73,8 +70,6 @@ mitk::StateMachine::~StateMachine()
   }
 
   delete m_UndoController;
-
-  InteractionDebug::GetInstance()->DeleteStateMachine( this );
 }
 
 std::string mitk::StateMachine::GetType() const
@@ -111,8 +106,6 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   if (stateEvent == NULL)
     return false;
 
-  InteractionDebug::GetInstance()->Event( this, stateEvent->GetId() );
-
   if (m_CurrentStateVector.empty())
     return false;//m_CurrentStateVector needs to be initialized!
 
@@ -127,11 +120,6 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   if (tempTransition == NULL) //no transition in this state for that EventId
   {
     return false;
-    #ifdef INTERDEBUG
-            //Debug StateChanges through cout output! Thus very slow!
-            //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentStateVector[m_TimeStep]->GetId()<<" to StateId "<<tempNextState->GetId());
-            itkWarningMacro(<<": Did not find transition for Event Id " << stateEvent->GetId());
-    #endif
   }
 
   //get next State
@@ -150,31 +138,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
       OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
       m_UndoController->SetOperationEvent(operationEvent);
     }
-//#define INTERDEBUG
-            #ifdef INTERDEBUG
-            //Debug StateChanges through cout output! Thus very slow!
-            //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentStateVector[m_TimeStep]->GetId()<<" to StateId "<<tempNextState->GetId());
-            itkWarningMacro(<<": Changing from State "<<m_CurrentStateVector[m_TimeStep]->GetName()<<" to State "<<tempNextState->GetName() << " via Transition " << tempTransition->GetName() << " due to Event " << stateEvent->GetId());
-            #endif
 
     //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentStateVector[m_TimeStep] = tempNextState;
   }
-  else
-  {
-    #ifdef INTERDEBUG
-    if( (tempTransition != m_CurrentStateVector[m_TimeStep]->GetTransition(0)) //dont show 0 events
-        && (m_CurrentStateVector[m_TimeStep]->GetName()!="neutral"))
-    {
-      //Debug StateChanges through cout output! Thus very slow!
-      //itkWarningMacro(<<this->GetType()<<": Changing from StateId "<<m_CurrentStateVector[m_TimeStep]->GetId()<<" to StateId "<<tempNextState->GetId());
-      itkWarningMacro(<<": Keeping State "<<m_CurrentStateVector[m_TimeStep]->GetName()<< " at Transition " << tempTransition->GetName() << " due to Event " << stateEvent->GetId());
-    }
-    #endif
-  }
-
-  InteractionDebug::GetInstance()->Transition( this, tempTransition->GetName().c_str() );
-
 
   mitk::Transition::ActionVectorIterator actionIdIterator = tempTransition->GetActionBeginIterator();
   mitk::Transition::ActionVectorConstIterator actionIdIteratorEnd = tempTransition->GetActionEndIterator();
@@ -184,12 +151,6 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   {
     if ( !ExecuteAction(*actionIdIterator, stateEvent) )
     {
-      #ifdef INTERDEBUG
-      itkWarningMacro( << "Warning: no action defind for " << *actionIdIterator << " in " << m_Type );
-      #endif
-
-      InteractionDebug::GetInstance()->Action( this, tempTransition->GetName().c_str(), (*actionIdIterator)->GetActionId() );
-
       ok = false;
     }
     actionIdIterator++;
@@ -246,11 +207,6 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
         itkWarningMacro("Error! see mitkStateMachine.cpp");
         return;
       }
-#ifdef INTERDEBUG
-//Debug StateChanges through cout output! Thus very slow!
-std::cout<<this->GetType()<<": Undo: Changing from StateId "<<m_CurrentStateVector[m_TimeStep]->GetId()<<" to StateId "<<stateTransOp->GetState()->GetId()<<std::endl;
-std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentStateVector[m_TimeStep]->GetName()<<" to State "<<stateTransOp->GetState()->GetName()<<std::endl;
-#endif
       unsigned int time = stateTransOp->GetTime();
       m_CurrentStateVector[time] = stateTransOp->GetState();
     }
@@ -263,10 +219,6 @@ std::cout<<this->GetType()<<": Undo: Changing from State "<<m_CurrentStateVector
         itkWarningMacro("Error! see mitkStateMachine.cpp");
         return;
       }
-#ifdef INTERDEBUG
-//Debug StateChanges through cout output! Thus very slow!
-std::cout<<this->GetType()<<": Undo: Changing from Time "<<m_TimeStep<<" to time "<<stateTransOp->GetTime()<<std::endl;
-#endif
       m_TimeStep = stateTransOp->GetTime();
     }
     break;
@@ -368,4 +320,3 @@ void mitk::StateMachine::UpdateTimeStep(unsigned int timeStep)
   this->ExecuteOperation(doOp);
 }
 
-#include <mitkInteractionDebug.cpp>

@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkFixedArray.h>
 #include "mitkAction.h"
 
-#include "mitkBoundingObject.h"
+//#include "mitkBoundingObject.h"
 #include "mitkRenderingManager.h"
 
 #include <math.h>
@@ -105,6 +105,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         selected = mitk::BoolProperty::New(false);
         color->SetColor(0.0, 0.0, 1.0);
 
+        /*
         mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
         if(b != NULL)
         {
@@ -112,6 +113,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         }
         else
           color = mitk::ColorProperty::New(1.0, 1.0, 1.0);   // if deselcted and no bounding object, color is white
+        */
       }
 
       /* write new state (selected/not selected) to the property */      
@@ -259,12 +261,14 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       /* execute the Operation */
       geometry->ExecuteOperation(doOp);
       /* Update Volume Property with new value */
+      /*
       mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
       if (b != NULL)
       {
         m_DataTreeNode->GetPropertyList()->SetProperty("volume", FloatProperty::New(b->GetVolume()));
         //std::cout << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
       }
+      */
       ok = true;
       break;
     }
@@ -287,12 +291,14 @@ bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint, int 
     m_DataTreeNode->SetProperty("selected", mitk::BoolProperty::New(false));  // create it
 
   // check if mouseclick has hit the object
+  /*
   mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
   if(boundingObject.IsNotNull())  // if it is a bounding object, use its inside function for exact hit calculation
   {
     selected = boundingObject->IsInside(worldPoint); // check if point is inside the object
   }
   else    // use the data objects bounding box to determine if hit
+  */
   {
     const Geometry3D* geometry = GetData()->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( timestep );
     selected = geometry->IsInside(worldPoint);

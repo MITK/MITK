@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStateEvent.h>
 #include <mitkState.h>
 #include <mitkUndoController.h>
-#include <mitkStatusBar.h>
+//#include <mitkStatusBar.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include "mitkInteractionConst.h"
@@ -116,7 +116,7 @@ bool mitk::Interactor::OnModeSelect(Action* /*action*/, StateEvent const*)
 
 bool mitk::Interactor::OnModeSubSelect(Action* /*action*/, StateEvent const*)
 {
-  StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
+  //StatusBar::GetInstance()->DisplayText("Error! in XML-Interaction: an simple Interactor can not set in sub selected", 1102);
   return false;
 }
 

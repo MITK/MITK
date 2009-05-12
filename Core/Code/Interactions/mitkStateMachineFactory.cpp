@@ -17,13 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStateMachineFactory.h"
 #include "mitkGlobalInteraction.h"
-#include <mitkStatusBar.h>
+//#include <mitkStatusBar.h>
 #include <vtkXMLDataElement.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkConfig.h>
 #include <mitkStandardFileLocations.h>
-#include <mitkInteractionDebug.h>
 
 /**
 * @brief This class builds up all the necessary structures for a statemachine.
@@ -106,13 +105,10 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   mitk::StateMachineFactory* stateMachineFactory = StateMachineFactory::New();
   stateMachineFactory->SetFileName( fileName.c_str() );
 
-  InteractionDebug::SetXMLFileName( "StateMachine.xml" );
-  InteractionDebug::GetInstance()->OpenConection();
-
   //parse the XML input. Method is implemented in vtkXMLParser
   if ( ! stateMachineFactory->Parse() )    
   {
-    mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse behavior!" );
+    //mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse behavior!" );
   }
 
   stateMachineFactory->Delete();
@@ -140,11 +136,6 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   history->insert((thisState->second)->GetId());//log our path  //or thisState->first. but this seems safer
   std::set<int> nextStatesSet = (thisState->second)->GetAllNextStates();
 
-  //for debugging
-  //  int thisStateId = (thisState->second)->GetId();
-  //  int firstNextState = *nextStatesSet.begin();
-
-
   //remove loops in nextStatesSet; 
   //nether do we have to go there, nor will it clear a deadlock
   std::set<int>::iterator position = nextStatesSet.find((thisState->second)->GetId());//look for the same state in nextStateSet
@@ -156,7 +147,7 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   //nextStatesSet is empty, so deadlock!
   if ( nextStatesSet.empty() )
   {
-    StatusBar::GetInstance()->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+    //StatusBar::GetInstance()->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
     return true;//but it is allowed as an end-state
   }
   bool ok = false;
@@ -199,7 +190,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     else //ether !ok or sizeA!=sizeB
     {
       delete history;
-      mitk::StatusBar::GetInstance()->DisplayText("Warning: An unreachable state was produced! Please check the StateMachinePattern-File.");    
+      //mitk::StatusBar::GetInstance()->DisplayText("Warning: An unreachable state was produced! Please check the StateMachinePattern-File.");    
       //return false;//better go on and build/ connect the states than quit
     }
   }
@@ -210,7 +201,7 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
     if ( tempbool == false )
     {
-      mitk::StatusBar::GetInstance()->DisplayText("Warning: The connection of the states was not successful!");    
+      //mitk::StatusBar::GetInstance()->DisplayText("Warning: The connection of the states was not successful!");    
       return false;//abort!
     }
   }

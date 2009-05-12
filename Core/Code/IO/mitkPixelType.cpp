@@ -16,13 +16,14 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
+#include "mitkIpPic.h"
 #include "mitkPixelType.h"
 #include <itkVector.h>
 #include <itkRGBPixel.h>
 #include <itkRGBAPixel.h>
 #include <itkCovariantVector.h>
-#include "itkDiffusionTensor3D.h"
-#include "itkConfidenceDiffusionTensor3D.h"
+//#include "itkDiffusionTensor3D.h"
+//#include "itkConfidenceDiffusionTensor3D.h"
 
 #define HUNDRED_VECS(HUN)   \
   TEN_VECS(HUN)                \
@@ -156,7 +157,7 @@ bool mitk::PixelType::operator!=(const std::type_info& typeId) const
     SET_ITK_TYPE_ID(SCALAR, 1, TYPE ) else                                            \
                                                                                       \
     SET_ITK_TYPE_ID(RGB, 3, itk::RGBPixel<TYPE> ) else                                \
-    SET_ITK_TYPE_ID(DIFFUSIONTENSOR3D, 6, itk::DiffusionTensor3D<TYPE> ) else         \
+    //SET_ITK_TYPE_ID(DIFFUSIONTENSOR3D, 6, itk::DiffusionTensor3D<TYPE> ) else         \
     SET_ITK_TYPE_ID(VECTOR, 3, Vector3Type ) else                                     \
     SET_ITK_TYPE_ID(COVARIANTVECTOR, 3, CovariantVector3Type ) else                   \
     SET_ITK_TYPE_ID(POINT, 3, Point3Type ) else                                       \
@@ -187,6 +188,8 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
    SET_TYPE(unsigned short, ipPicUInt)
    SET_TYPE(char, ipPicInt)
    SET_TYPE(unsigned char, ipPicUInt)
+
+   /*
    if ( *m_TypeId == typeid( itk::DiffusionTensor3D<float> ) )
    {
      m_TypeId = & typeid( float );
@@ -219,7 +222,9 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      m_Bpe = sizeof(double) * 8 * m_NumberOfComponents;
      m_ItkTypeId = &typeid( itk::ConfidenceDiffusionTensor3D<double> );
    }
-   else if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
+   else
+   */
+   if ( *m_TypeId == typeid( itk::RGBPixel<unsigned char> ) )
    {
      m_Type = ipPicUInt;
      m_NumberOfComponents = 3;

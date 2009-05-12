@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEvent.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
-#include <mitkStatusBar.h>
 #include <mitkPositionEvent.h>
 #include <vtkWorldPointPicker.h>
 

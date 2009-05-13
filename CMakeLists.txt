@@ -18,6 +18,7 @@ IF(NOT MITK_ALL_BUILD)
 ENDIF(NOT MITK_ALL_BUILD)
 
 INCLUDE(CMake/CoreHelpers.cmake)
+INCLUDE(CMake/ToolExtensionHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")
 SET(LIBPOSTFIX "")

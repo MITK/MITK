@@ -118,42 +118,29 @@ SET(CPP_FILES
   IO/mitkVtkUnstructuredGridReader.cpp
   IO/mitkVtkVolumeTimeSeriesIOFactory.cpp
   IO/mitkVtkVolumeTimeSeriesReader.cpp
-  Interactions/mitkAddContourTool.cpp
-  Interactions/mitkAutoCropTool.cpp
   Interactions/mitkAutoSegmentationTool.cpp
-  Interactions/mitkBinaryThresholdTool.cpp
-  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
-  Interactions/mitkCalculateVolumetryTool.cpp
   Interactions/mitkConferenceEventMapper.cpp
   Interactions/mitkConnectPointsInteractor.cpp
   Interactions/mitkContourInteractor.cpp
   Interactions/mitkContourTool.cpp
   #Interactions/mitkCoordinateSupplier.cpp
-  Interactions/mitkCorrectorTool2D.cpp
-  Interactions/mitkCreateSurfaceTool.cpp
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
-  Interactions/mitkDrawPaintbrushTool.cpp
-  Interactions/mitkErasePaintbrushTool.cpp
-  Interactions/mitkEraseRegionTool.cpp
   Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkFeedbackContourTool.cpp
-  Interactions/mitkFillRegionTool.cpp
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
-  Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSeedsInteractor.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSocketClient.cpp
-  Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
   Rendering/mitkContourMapper2D.cpp
@@ -174,7 +161,28 @@ SET(CPP_FILES
   Rendering/mitkUnstructuredGridVtkMapper3D.cpp
   Rendering/vtkUnstructuredGridMapper.cpp
 )
-  
+
+# Segmentation (or related) tools for interactive segmentation view
+#
+# Tool classes, which do not appear in this list but in the CPP_FILES
+# list, do not need a factory. The list below contains only "end-user"
+# tools, which should be instantiated during runtime
+SET( TOOL_FILES
+  Interactions/mitkAddContourTool.cpp
+  Interactions/mitkAutoCropTool.cpp
+  Interactions/mitkBinaryThresholdTool.cpp
+  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
+  Interactions/mitkCalculateVolumetryTool.cpp
+  Interactions/mitkCorrectorTool2D.cpp
+  Interactions/mitkCreateSurfaceTool.cpp
+  Interactions/mitkEraseRegionTool.cpp
+  Interactions/mitkFillRegionTool.cpp
+  Interactions/mitkRegionGrowingTool.cpp
+  Interactions/mitkSubtractContourTool.cpp
+  Interactions/mitkDrawPaintbrushTool.cpp
+  Interactions/mitkErasePaintbrushTool.cpp
+)
+
 IF(WIN32)
   SET(CPP_FILES 
     Controllers/mitkMovieGeneratorWin32.cpp

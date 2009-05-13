@@ -61,18 +61,16 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(parent);
     layout->addWidget(m_StdMultiWidget);
 
-    mitk::DataTree::Pointer dataTree = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
-      ->GetDataStorageReference()->GetDataTree();
-
-    // Create an iterator on the tree
-    mitk::DataTreePreOrderIterator it(dataTree);
+    mitk::DataStorage::Pointer ds = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
+      ->GetDataStorageReference()->GetDataStorage();
 
     // Tell the multiWidget which (part of) the tree to render
-    m_StdMultiWidget->SetData(&it);
+    m_StdMultiWidget->SetDataStorage(ds);
 
-    // Initialize views as transversal, sagittal, coronar (from
-    // top-left to bottom)
-    mitk::RenderingManager::GetInstance()->InitializeViews(&it);
+    // Initialize views as transversal, sagittal, coronar to all data objects in DataStorage
+    // (from top-left to bottom)
+    mitk::Geometry3D::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+    mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
     // Initialize bottom-right view as 3D view
     m_StdMultiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
@@ -83,7 +81,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     // Add the displayed views to the tree to see their positions
     // in 2D and 3D
-    m_StdMultiWidget->AddDisplayPlaneSubTree(&it);
+    m_StdMultiWidget->AddDisplayPlaneSubTree();
 
     m_StdMultiWidget->EnableNavigationControllerEventListening();
 

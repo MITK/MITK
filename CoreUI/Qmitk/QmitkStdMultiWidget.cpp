@@ -652,7 +652,7 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 }
 
 
-void QmitkStdMultiWidget::SetData( mitk::DataStorage* ds )
+void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 {
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(ds);

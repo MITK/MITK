@@ -1,14 +1,13 @@
 #include "mitkDataStorageService.h"
 
 #include "mitkDataStorageReference.h"
-
-#include <mitkDataTree.h>
+#include "mitkStandaloneDataStorage.h"
 
 namespace mitk {
 
 DataStorageService::DataStorageService()
 {
-  m_DefaultDataStorageRef = this->CreateDefaultDataStorage();
+  m_DefaultDataStorageRef = this->CreateDataStorage("Default DataStorage");
   m_ActiveDataStorageRef = m_DefaultDataStorageRef;
 }
 
@@ -27,9 +26,9 @@ DataStorageService::GetType() const
 
 IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const std::string& label)
 {
-  DataTree::Pointer dataTree = DataTree::New();
-  DataStorage::Pointer dataStorage = DataStorage::CreateInstance(dataTree);
-  DataStorageReference::Pointer ref(new DataStorageReference(dataStorage, dataTree));
+
+  StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
+  DataStorageReference::Pointer ref(new DataStorageReference(dataStorage.GetPointer()));
   ref->SetLabel(label);
   m_DataStorageReferences.push_back(ref);
 
@@ -56,17 +55,6 @@ void DataStorageService::SetActiveDataStorage(IDataStorageReference::Pointer dat
 {
   if (dataStorageRef.IsNull()) m_ActiveDataStorageRef = m_DefaultDataStorageRef;
   else m_ActiveDataStorageRef = dataStorageRef;
-}
-
-IDataStorageReference::Pointer DataStorageService::CreateDefaultDataStorage()
-{
-  DataTree::Pointer dataTree = DataTree::New();
-  DataStorage::Pointer dataStorage = DataStorage::CreateInstance(dataTree);
-  DataStorageReference::Pointer ref(new DataStorageReference(dataStorage, dataTree, true));
-  ref->SetLabel("Default DataStorage");
-  m_DataStorageReferences.push_back(ref);
-
-  return ref;
 }
 
 }

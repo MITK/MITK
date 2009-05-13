@@ -17,7 +17,6 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public cherry::Object
 
 
   virtual DataStorage::Pointer GetDataStorage() const = 0;
-  virtual DataTree::Pointer GetDataTree() const = 0;
 
   virtual bool IsDefault() const = 0;
 

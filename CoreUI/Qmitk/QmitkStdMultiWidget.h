@@ -103,7 +103,7 @@ public slots:
 
   void changeLayoutToLeft2Dand3DRight2D();
 
-  void SetData( mitk::DataStorage* ds );
+  void SetDataStorage( mitk::DataStorage* ds );
 
   void Fit();
 
@@ -114,9 +114,6 @@ public slots:
   void EnableStandardLevelWindow();
 
   void DisableStandardLevelWindow();
-
-  bool InitializeStandardViews(
-    mitk::DataTreeIteratorBase * it);
 
   bool InitializeStandardViews( const mitk::Geometry3D * geometry );
 

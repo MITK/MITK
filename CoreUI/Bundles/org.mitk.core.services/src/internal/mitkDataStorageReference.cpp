@@ -2,9 +2,8 @@
 
 namespace mitk {
 
-DataStorageReference::DataStorageReference(DataStorage::Pointer dataStorage,
-    DataTree::Pointer dataTree, bool isDefault)
-: m_Default(isDefault), m_DataStorage(dataStorage), m_DataTree(dataTree)
+DataStorageReference::DataStorageReference(DataStorage::Pointer dataStorage, bool isDefault)
+: m_Default(isDefault), m_DataStorage(dataStorage)
 {
   
 }
@@ -14,10 +13,6 @@ DataStorage::Pointer DataStorageReference::GetDataStorage() const
   return m_DataStorage;
 }
 
-DataTree::Pointer DataStorageReference::GetDataTree() const
-{
-  return m_DataTree;
-}
 
 bool DataStorageReference::IsDefault() const
 {

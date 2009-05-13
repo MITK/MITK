@@ -25,9 +25,7 @@ public:
   void SetActiveDataStorage(IDataStorageReference::Pointer dataStorageRef);
   
 private:
-  
-  IDataStorageReference::Pointer CreateDefaultDataStorage();
-  
+
   IDataStorageReference::Pointer m_ActiveDataStorageRef;
   IDataStorageReference::Pointer m_DefaultDataStorageRef;
   std::vector<IDataStorageReference::Pointer> m_DataStorageReferences;

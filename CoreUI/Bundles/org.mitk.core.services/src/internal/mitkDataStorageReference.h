@@ -10,10 +10,9 @@ class DataStorageReference : public IDataStorageReference
 {
 public:
    
-  DataStorageReference(DataStorage::Pointer dataStorage, DataTree::Pointer dataTree, bool isDefault = false);
+  DataStorageReference(DataStorage::Pointer dataStorage, bool isDefault = false);
   
   DataStorage::Pointer GetDataStorage() const;
-  DataTree::Pointer GetDataTree() const;
   
   bool IsDefault() const;
   
@@ -27,7 +26,6 @@ private:
   bool m_Default;
   std::string m_Label;
   DataStorage::Pointer m_DataStorage;
-  DataTree::Pointer m_DataTree;
 };
 
 }

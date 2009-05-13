@@ -38,7 +38,6 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
   this->setupUi(this);
 
   planesIterator = NULL;
-  m_PositionTracker = NULL;
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;

@@ -1,8 +1,6 @@
 #include "QmitkPropertyDelegate.h"
 
 #include "QmitkCustomVariants.h"
-#include "mitkDelegateProperty.h"
-#include "mitkDelegateManager.h"
 
 #include <bitset>
 #include <QPainter>
@@ -57,23 +55,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
       paintFlags.set(0, true);
     }
 
-    else if(mitk::DelegateProperty* commandProp = data.value<mitk::DelegateProperty*>())
-    {
-      painter->save();
-      const QStyle *style = QApplication::style();
-      QStyleOptionButton opt;
-      opt.state |= QStyle::State_Raised |QStyle::State_Enabled;
-      opt.features |= QStyleOptionButton::DefaultButton;
-      opt.rect = option.rect;
-      opt.text = QString::fromStdString(commandProp->GetValueAsString());
-
-      // draw item data as CheckBox
-      style->drawControl(QStyle::CE_PushButton,&opt,painter);
-      painter->restore();
-
-      paintFlags.set(0, true);
-    }
-/*
+    /*
     else if(data.type() == QVariant::Bool)
     {
       bool boolValue = data.value<bool>();
@@ -145,9 +127,9 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       spinBox->setSingleStep(1);
       return spinBox;
     }
-
-    // TODO serious warnings. check logic, if neccessary, add casts
-    else if(data.type() == QMetaType::Float)
+    // see qt documentation. cast is correct, it would be obsolete if we 
+    // store doubles
+    else if(static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
     {
       QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
       spinBox->setDecimals(2);
@@ -165,21 +147,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       return comboBox;
     }
 
-    else if(mitk::DelegateProperty* commandProp = data.value<mitk::DelegateProperty*>())
-    {
-      std::string commandLabel = commandProp->GetValueAsString();
-
-      QPushButton* commandBtn = new QPushButton(parent);
-      commandBtn->setText(QString::fromStdString(commandLabel));
-
-
-      connect(commandBtn, SIGNAL(pressed()), this, SLOT(ExecuteDelegate()));
-
-      // emulate pressed signal
-      commandBtn->click();
-      return commandBtn;
-    }
-
+    
     else
       return QItemDelegate::createEditor(parent, option, index);
 
@@ -224,8 +192,9 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
       QSpinBox* spinBox = qobject_cast<QSpinBox *>(editor);
       spinBox->setValue(data.toInt());
     }
-
-    else if(data.type() == QMetaType::Float)
+    // see qt documentation. cast is correct, it would be obsolete if we 
+    // store doubles
+    else if(static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
     {
       QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       spinBox->setValue(data.toDouble());
@@ -239,10 +208,6 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
 //       connect(comboBox, SIGNAL(currentIndexChanged(int)),
 //         this, SLOT(ComboBoxCurrentIndexChanged(int)));
-    }
-
-    else if(mitk::DelegateProperty* commandProp = data.value<mitk::DelegateProperty*>())
-    {
     }
 
     else
@@ -276,7 +241,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
       model->setData(index, intValueVariant);
     }
 
-    else if(data.type() == QMetaType::Float)
+    else if(static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
     {
       QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox *>(editor);
       double doubleValue = spinBox->value();
@@ -296,10 +261,6 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
       QVariant comboBoxValueVariant;
       comboBoxValueVariant.setValue<QString>(comboBoxValue);
       model->setData(index, comboBoxValueVariant);
-    }
-
-    else if(mitk::DelegateProperty* commandProp = data.value<mitk::DelegateProperty*>())
-    {
     }
 
     else
@@ -378,19 +339,3 @@ void QmitkPropertyDelegate::SpinBoxValueChanged( const QString& value )
   }
 }
 
-void QmitkPropertyDelegate::ExecuteDelegate()
-{
-  if(QPushButton *cmdButton = qobject_cast<QPushButton *>(sender()))
-  {
-    std::string commandLabel = cmdButton->text().toStdString();
-    mitk::MessageAbstractDelegate<>* messageDelegate = mitk::DelegateManager::GetInstance()->GetCommand(commandLabel);
-
-    if(!messageDelegate)
-      QMessageBox::critical(qApp->mainWidget(), "Delegate not found"
-      , "Could not execute command. Delegate was not found.", QMessageBox::Ok, QMessageBox::Ok);
-    else
-    {
-      messageDelegate->Execute();
-    }
-  }
-}

@@ -253,7 +253,7 @@ void QmitkPointListWidget::OnSavePointSetButtonClicked()
   std::string name("");
 
   QString fileNameProposal = "PointSet.mps";
-  QString aFilename = QFileDialog::getSaveFileName( fileNameProposal.toLatin1() );
+  QString aFilename = QFileDialog::getSaveFileName( NULL, fileNameProposal.toLatin1() );
   if ( aFilename.isEmpty() ) return;
 
   try

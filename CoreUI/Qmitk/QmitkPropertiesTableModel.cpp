@@ -22,9 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkEnumerationProperty.h"
-#include "mitkDelegateProperty.h"
 #include "mitkRenderingManager.h"
-#include "mitkPropertyManager.h"
 #include "QmitkCustomVariants.h"
 
 //# Toolkit includes
@@ -137,14 +135,6 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
         data.setValue<bool>( boolProp->GetValue() );
       else if(role == Qt::EditRole)
         data.setValue<bool>( boolProp->GetValue() );
-    }
-
-    else if (mitk::DelegateProperty* commandProp = dynamic_cast<mitk::DelegateProperty*>(baseProp))
-    {
-      if(role == Qt::DisplayRole)
-        data.setValue<mitk::DelegateProperty*>(commandProp);
-      else if(role == Qt::EditRole)
-        data.setValue<mitk::DelegateProperty*>(commandProp);
     }
 
     else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))

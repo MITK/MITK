@@ -59,10 +59,6 @@ class QMITK_EXPORT QmitkPropertyDelegate : public QItemDelegate
     void commitAndCloseEditor();
     void ComboBoxCurrentIndexChanged ( int index ) ;
     void SpinBoxValueChanged ( const QString& value ) ;
-    ///
-    /// \brief Invoked when a delegate button was clicked
-    ///
-    void ExecuteDelegate();
 
 };
 

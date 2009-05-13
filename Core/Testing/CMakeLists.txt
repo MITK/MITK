@@ -13,7 +13,7 @@ SET(${KITNAME}_TESTS
   #mitkAutoCropImageFilterTest.cpp
   #mitkContourMapper2DTest.cpp
   #mitkContourTest.cpp
-  #mitkDataStorageTest.cpp
+  mitkDataStorageTest.cpp
   #mitkDataTreeFilterTest.cpp
   #mitkDataTreeTest.cpp
   #mitkDemonsRegistrationTest.cpp

@@ -25,10 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGroupTagProperty.h"
 #include "mitkDataTreeNode.h"
 #include "mitkReferenceCountWatcher.h"
-#include "mitkDataTreeHelper.h"
 
 #include "mitkDataStorage.h"
-#include "mitkDataTreeStorage.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
@@ -44,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 void TestDataStorage(mitk::DataStorage* ds);
-void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree);
+//void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree);
 
 
 class DSEventReceiver // Helper class for event testing
@@ -78,44 +76,6 @@ int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("DataStorageTest");
 
-  /* Create DataTreeStorage */
-  MITK_TEST_OUTPUT( << "Testing DataTreeStorage : ");
-  try
-  {
-    mitk::DataTreeStorage::Pointer dts;
-    mitk::DataTree::Pointer tree = mitk::DataTree::New();
-    try
-    {
-      dts = dynamic_cast<mitk::DataTreeStorage*>(mitk::DataStorage::CreateInstance(tree));
-      MITK_TEST_CONDITION_REQUIRED(dts.IsNotNull(), "Creating DataTreeStorage");
-    }
-    catch (...)
-    {
-  	  MITK_TEST_FAILED_MSG( << "Exception during creation of DataTreeStorage");
-    }
-
-    MITK_TEST_OUTPUT( << "Testing DataTreeStorage in 'Only manage added nodes' mode.");
-    dts->SetManageCompleteTree(false);
-    TestDataStorage(dts); // test the data storage in both operation modes
-    /* Cleanup, get new ds */
-    tree = NULL;
-    dts = NULL;
-    mitk::DataStorage::ShutdownSingleton();
-    tree = mitk::DataTree::New();
-    dts = dynamic_cast<mitk::DataTreeStorage*>(mitk::DataStorage::CreateInstance(tree));
-
-    MITK_TEST_OUTPUT( << "Specific tests for DataTreeStorage");
-    TestDataTreeStorage(dts, tree);
-
-    /* Cleanup */
-    dts = NULL;
-    mitk::DataStorage::ShutdownSingleton();
-  }
-  catch (...)
-  {
-    mitk::DataStorage::ShutdownSingleton();
-  }
-
   /* Create StandaloneDataStorage */
   MITK_TEST_OUTPUT( << "Create StandaloneDataStorage : ");
   mitk::StandaloneDataStorage::Pointer sds;
@@ -129,7 +89,7 @@ int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
     MITK_TEST_FAILED_MSG( << "Exception during creation of StandaloneDataStorage");
   }
 
-  MITK_TEST_OUTPUT( << "Testing DataTreeStorage: ");
+  MITK_TEST_OUTPUT( << "Testing StandaloneDataStorage: ");
   TestDataStorage(sds);
   // TODO: Add specific StandaloneDataStorage Tests here
   sds = NULL;
@@ -742,51 +702,4 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Clear DataStorage */
   ds->Remove(ds->GetAll());
   MITK_TEST_CONDITION(ds->GetAll()->Size() == 0, "Checking Clear DataStorage");
-}
-
-
-//## Documentation
-//## Test DataTreeStorage specific behavior
-void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree)
-{
-  /* Adding a node directly to the tree to test if the DataStorage can handle that */
-  mitk::DataTreePreOrderIterator it(tree);
-  mitk::DataTreeNode::Pointer treeNode = mitk::DataTreeNode::New();   // node with image and name property
-  treeNode->SetProperty("name", mitk::StringProperty::New("TreeNode - not added by DataStorage"));
-  it.Add(treeNode);
-  MITK_TEST_CONDITION(ds->GetNamedNode("TreeNode - not added by DataStorage") == treeNode, "Adding a node directly to the tree");
-
-  mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();   // node with image and name property
-  n1->SetName("n1");
-  ds->Add(n1);
-  ds->SetManageCompleteTree(true);
-  MITK_TEST_CONDITION(ds->GetAll()->Size() == static_cast<unsigned int>(tree->Count()), "Testing SetManageCompleteTree(true): same number of objects in tree and dts");
-
-  ds->SetManageCompleteTree(false);
-  MITK_TEST_CONDITION(ds->GetAll()->Size() == 1, "Testing SetManageCompleteTree(false) different number of objects in tree and dts");
-
-  /* Checking DataTree Delete Observer functionality */
-  {
-
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    // Strange syntax, but VS2008 compiler could not resolve the overloaded method otherwise:
-    ds->DataStorage::Add(extra, n1); // add extra to DataStorage. Reference count should be 5 (extra smartpointer, tree, sources map, derivations map, derivations list of n1)
-    mitk::DataTreeIteratorClone it = mitk::DataTreeHelper::FindIteratorToNode(tree, extra); // remove extra directly from tree
-    it->Disconnect(); // delete node directly from tree. the observer mechanism should delete it from the internal relations too
-    extra = NULL; // delete last reference to the node. its memory should be freed now
-
-    MITK_TEST_CONDITION(watcher->GetReferenceCount() == 0, "Checking DataTree Delete Observer functionality");
-  }
-  /* Checking RemoveEvent on delete in DataTree */
-  {
-    DSEventReceiver listener;
-    ds->RemoveNodeEvent += mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnRemove);
-
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
-    ds->Add(extra);
-    mitk::DataTreeIteratorClone it = mitk::DataTreeHelper::FindIteratorToNode(tree, extra); // remove extra directly from tree
-    it->Disconnect(); // delete node directly from tree. the observer mechanism should delete it from the internal relations too
-    MITK_TEST_CONDITION((listener.m_NodeRemoved == extra.GetPointer()), "Checking RemoveEvent on delete in DataTree");
-  }
 }

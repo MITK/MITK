@@ -36,7 +36,7 @@ namespace mitk {
         Everything in the direction of the normal
         of the planes (if fill mode is set to "FILL") will be set to a specified value.
  */
-class MITK_CORE_EXPORT PlaneCutFilter : public ImageToImageFilter
+class MITKEXT_CORE_EXPORT PlaneCutFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(PlaneCutFilter, ImageToImageFilter);

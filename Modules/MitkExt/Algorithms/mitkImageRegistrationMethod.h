@@ -45,7 +45,7 @@ namespace mitk
 
   \author Daniel Stein
   */
-  class MITK_CORE_EXPORT ImageRegistrationMethod : public ImageToImageFilter
+  class MITKEXT_CORE_EXPORT ImageRegistrationMethod : public ImageToImageFilter
   {
 
   public:

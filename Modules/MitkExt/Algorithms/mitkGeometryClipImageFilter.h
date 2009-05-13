@@ -42,7 +42,7 @@ namespace mitk {
 //##       front/back side of curved planes
 //##
 //## @ingroup Process
-class MITK_CORE_EXPORT GeometryClipImageFilter : public ImageToImageFilter
+class MITKEXT_CORE_EXPORT GeometryClipImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(GeometryClipImageFilter, ImageToImageFilter);

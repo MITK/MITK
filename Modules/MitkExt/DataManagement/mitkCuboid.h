@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Data class containing an cuboid
 //## @ingroup Data
-class MITK_CORE_EXPORT Cuboid : public BoundingObject
+class MITKEXT_CORE_EXPORT Cuboid : public BoundingObject
 {
 public:
   mitkClassMacro(Cuboid, BoundingObject);  

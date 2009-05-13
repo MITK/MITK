@@ -26,7 +26,7 @@ namespace mitk
 
   //##Documentation
   //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
-  class MITK_CORE_EXPORT SocketClientImplementation
+  class MITKEXT_CORE_EXPORT SocketClientImplementation
   {
 
   public:

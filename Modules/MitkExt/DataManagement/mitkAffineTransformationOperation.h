@@ -28,7 +28,7 @@ namespace mitk {
 //## @brief Operation, that holds everything necessary for an affine operation.
 //##
 //## @ingroup Undo
-class MITK_CORE_EXPORT AffineTransformationOperation : public PointOperation
+class MITKEXT_CORE_EXPORT AffineTransformationOperation : public PointOperation
 {
 public:
   AffineTransformationOperation(OperationType operationType, Point3D point, ScalarType angle, int index);

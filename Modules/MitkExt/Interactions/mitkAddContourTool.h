@@ -42,7 +42,7 @@ namespace mitk
 
   $Author$
 */
-class MITK_CORE_EXPORT AddContourTool : public ContourTool
+class MITKEXT_CORE_EXPORT AddContourTool : public ContourTool
 {
   public:
     

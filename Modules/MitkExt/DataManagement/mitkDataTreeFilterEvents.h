@@ -28,7 +28,7 @@ itkEventMacro( TreeFilterUpdateAllEvent, itk::ModifiedEvent );
 itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
 
 //------ TreeFilterItemEvent -------------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterItemEvent : public itk::ModifiedEvent
+  class MITKEXT_CORE_EXPORT TreeFilterItemEvent : public itk::ModifiedEvent
   { 
   public: 
     typedef TreeFilterItemEvent Self; 
@@ -73,7 +73,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
 
 //------ TreeFilterEvent --------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterNewItemEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterNewItemEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterNewItemEvent Self; 
@@ -108,7 +108,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
 
 
 //------ TreeFilterItemAddedEvent --------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterItemAddedEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterItemAddedEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterItemAddedEvent Self; 
@@ -142,7 +142,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
 
 //------ TreeFilterSelectionChangedEvent -------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterSelectionChangedEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterSelectionChangedEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterSelectionChangedEvent Self; 
@@ -179,7 +179,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
 
   //------ TreeFilterItemChangedEvent ------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterItemChangedEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterItemChangedEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterItemChangedEvent Self; 
@@ -213,7 +213,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
   
 //------ TreeFilterRemoveItemEvent -------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterRemoveItemEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterRemoveItemEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterRemoveItemEvent Self; 
@@ -247,7 +247,7 @@ itkEventMacro( TreeFilterRemoveAllEvent, itk::ModifiedEvent );
   };
 
 //------ TreeFilterRemoveChildrenEvent -------------------------------------------------------
-  class MITK_CORE_EXPORT TreeFilterRemoveChildrenEvent : public TreeFilterItemEvent 
+  class MITKEXT_CORE_EXPORT TreeFilterRemoveChildrenEvent : public TreeFilterItemEvent 
   {
   public:
     typedef TreeFilterRemoveChildrenEvent Self; 

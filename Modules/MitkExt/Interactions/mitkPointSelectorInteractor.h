@@ -34,7 +34,7 @@ namespace mitk
   //## All Set-operations would be done through the method "ExecuteAction", if there would be anyone.
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT PointSelectorInteractor : public Interactor
+  class MITKEXT_CORE_EXPORT PointSelectorInteractor : public Interactor
   {
   public:
     mitkClassMacro(PointSelectorInteractor, Interactor);

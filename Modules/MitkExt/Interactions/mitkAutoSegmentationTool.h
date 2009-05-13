@@ -30,7 +30,7 @@ namespace mitk
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class MITK_CORE_EXPORT AutoSegmentationTool : public Tool
+class MITKEXT_CORE_EXPORT AutoSegmentationTool : public Tool
 {
   public:
     

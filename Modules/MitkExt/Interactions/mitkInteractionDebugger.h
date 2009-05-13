@@ -30,7 +30,7 @@ namespace mitk{
   * prints out recieved text in a sorted way
   * @ingroup Interaction
   */
-  class MITK_CORE_EXPORT InteractionDebugger : public itk::Object
+  class MITKEXT_CORE_EXPORT InteractionDebugger : public itk::Object
   {
   public:
     /**

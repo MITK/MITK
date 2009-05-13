@@ -36,7 +36,7 @@ namespace mitk {
  *
  * \ingroup Process
  */
-class MITK_CORE_EXPORT PadImageFilter : public ImageToImageFilter
+class MITKEXT_CORE_EXPORT PadImageFilter : public ImageToImageFilter
 {
 public:    
   mitkClassMacro(PadImageFilter, ImageToImageFilter);

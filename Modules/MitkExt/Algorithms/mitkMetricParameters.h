@@ -39,7 +39,7 @@ namespace mitk {
 
   \author Daniel Stein
   */
-  class MITK_CORE_EXPORT MetricParameters : public itk::Object
+  class MITKEXT_CORE_EXPORT MetricParameters : public itk::Object
   {
   public:
     mitkClassMacro(MetricParameters,::itk::Object);

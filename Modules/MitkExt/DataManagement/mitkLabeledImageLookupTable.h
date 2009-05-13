@@ -35,7 +35,7 @@ namespace mitk
  * the label 0 is assumed. The color for the background is set to fully transparent
  * as default.
  */
-class MITK_CORE_EXPORT LabeledImageLookupTable : public LookupTable
+class MITKEXT_CORE_EXPORT LabeledImageLookupTable : public LookupTable
 {
 public:
   /** 

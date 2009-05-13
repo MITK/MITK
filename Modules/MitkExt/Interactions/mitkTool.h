@@ -72,7 +72,7 @@ class ToolManager;
 
   $Author$
 */
-class MITK_CORE_EXPORT Tool : public StateMachine
+class MITKEXT_CORE_EXPORT Tool : public StateMachine
 {
   public:
 
@@ -163,7 +163,7 @@ class MITK_CORE_EXPORT Tool : public StateMachine
       At the moment the verboseness-level is defined at compile-time
       (and by default 0 - nearly no messages get to the commandline).
      */
-    class MITK_CORE_EXPORT ToolLogger
+    class MITKEXT_CORE_EXPORT ToolLogger
     {
 
       struct NullStream: std::ostream

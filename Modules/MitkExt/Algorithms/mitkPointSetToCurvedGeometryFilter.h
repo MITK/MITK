@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class MITK_CORE_EXPORT PointSetToCurvedGeometryFilter : public PointSetToGeometryDataFilter
+class MITKEXT_CORE_EXPORT PointSetToCurvedGeometryFilter : public PointSetToGeometryDataFilter
 {
 public:
   /**

@@ -59,7 +59,7 @@ namespace mitk {
   *
   * \author Daniel Stein
   */
-  class MITK_CORE_EXPORT RigidRegistrationObserver : public itk::Command
+  class MITKEXT_CORE_EXPORT RigidRegistrationObserver : public itk::Command
   {
     public:
       typedef  RigidRegistrationObserver   Self;

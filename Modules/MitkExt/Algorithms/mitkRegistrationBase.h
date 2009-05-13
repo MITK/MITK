@@ -32,7 +32,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITK_CORE_EXPORT RegistrationBase : public ImageToImageFilter
+  class MITKEXT_CORE_EXPORT RegistrationBase : public ImageToImageFilter
   {
   public:
     mitkClassMacro(RegistrationBase, ImageToImageFilter);

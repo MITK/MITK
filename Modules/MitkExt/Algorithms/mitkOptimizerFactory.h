@@ -42,7 +42,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITK_CORE_EXPORT OptimizerFactory : public ::itk::Object
+  class MITKEXT_CORE_EXPORT OptimizerFactory : public ::itk::Object
   {
   public:
 

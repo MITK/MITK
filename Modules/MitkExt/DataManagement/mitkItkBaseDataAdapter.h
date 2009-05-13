@@ -28,7 +28,7 @@ namespace mitk {
  * Please be aware that these objects cannot be visualized via mappers.
  * The user of this class must care himself for type safety.
  **/
-class MITK_CORE_EXPORT ItkBaseDataAdapter : public BaseData
+class MITKEXT_CORE_EXPORT ItkBaseDataAdapter : public BaseData
 {
 public:
   mitkClassMacro(ItkBaseDataAdapter, BaseData);

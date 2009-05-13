@@ -62,7 +62,7 @@ namespace mitk {
   // [x0, a <, d, normd >] = lsplane(X)
   // ---------------------------------------------------------------------
 
-  class MITK_CORE_EXPORT PlaneFit : public GeometryDataSource
+  class MITKEXT_CORE_EXPORT PlaneFit : public GeometryDataSource
   {
     public:
 

@@ -31,7 +31,7 @@ namespace mitk {
  * This class provides some basic functionality to generate reports based on text-format
  * templates and keyword substitution
  */  
-class MITK_CORE_EXPORT ReportGenerator : public itk::Object
+class MITKEXT_CORE_EXPORT ReportGenerator : public itk::Object
 {
 public:
   typedef std::map<std::string,std::string> KeyValueMapType;

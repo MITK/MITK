@@ -30,7 +30,7 @@ namespace mitk
 //## @brief Create instances of ParRecFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITK_CORE_EXPORT ParRecFileIOFactory : public itk::ObjectFactoryBase
+class MITKEXT_CORE_EXPORT ParRecFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

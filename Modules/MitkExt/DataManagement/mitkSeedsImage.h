@@ -35,7 +35,7 @@ namespace mitk
 //##
 //## Handles operations for drawing seeds. 
 //## @ingroup Data
-class MITK_CORE_EXPORT SeedsImage : public Image
+class MITKEXT_CORE_EXPORT SeedsImage : public Image
 {
 
 public:

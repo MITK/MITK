@@ -39,7 +39,7 @@ namespace mitk
   
   */
   /************************************************************************/
-class MITK_CORE_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
+class MITKEXT_CORE_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
 {
 public:
 

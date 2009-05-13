@@ -27,7 +27,7 @@ namespace mitk
   /**
   * Simple base class for acquiring video data. 
   */
-  class MITK_CORE_EXPORT VideoSource : public itk::Object
+  class MITKEXT_CORE_EXPORT VideoSource : public itk::Object
   {
     public:
       mitkClassMacro( VideoSource, itk::Object );

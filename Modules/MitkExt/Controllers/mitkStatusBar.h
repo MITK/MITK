@@ -33,7 +33,7 @@ namespace mitk {
 //## all mitk-classes use this class to display text on GUI-StatusBar.
 //## The mainapplication has to set the internal held StatusBarImplementation with SetInstance(..).
 //## @ingroup Interaction
-class MITK_CORE_EXPORT StatusBar : public itk::Object
+class MITKEXT_CORE_EXPORT StatusBar : public itk::Object
 {
 public:
   itkTypeMacro(StatusBar, itk::Object);

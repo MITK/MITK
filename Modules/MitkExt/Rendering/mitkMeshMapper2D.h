@@ -33,7 +33,7 @@ class Mesh;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT MeshMapper2D : public GLMapper2D
+class MITKEXT_CORE_EXPORT MeshMapper2D : public GLMapper2D
 {
 public:
   mitkClassMacro(MeshMapper2D, Mapper2D);

@@ -36,7 +36,7 @@ namespace mitk {
 
 class BaseProperty;
 
-class MITK_CORE_EXPORT PropertyObserver 
+class MITKEXT_CORE_EXPORT PropertyObserver 
 {
   public:
 
@@ -57,7 +57,7 @@ class MITK_CORE_EXPORT PropertyObserver
     bool m_SelfCall;
 };
   
-class MITK_CORE_EXPORT PropertyView : public PropertyObserver
+class MITKEXT_CORE_EXPORT PropertyView : public PropertyObserver
 {
   public:
 
@@ -72,7 +72,7 @@ class MITK_CORE_EXPORT PropertyView : public PropertyObserver
     const mitk::BaseProperty* m_Property;
 };
 
-class MITK_CORE_EXPORT PropertyEditor : public PropertyObserver
+class MITKEXT_CORE_EXPORT PropertyEditor : public PropertyObserver
 {
   public:
 

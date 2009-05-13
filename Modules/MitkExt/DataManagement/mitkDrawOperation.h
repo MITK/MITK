@@ -32,7 +32,7 @@ namespace mitk {
 //##
 //## Stores everything for adding and deleting seeds.
 //## @ingroup Undo
-class MITK_CORE_EXPORT DrawOperation : public Operation
+class MITKEXT_CORE_EXPORT DrawOperation : public Operation
 {
   public:
   //##Documentation

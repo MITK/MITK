@@ -31,7 +31,7 @@ namespace mitk {
 //## @brief 
 //## @ingroup Process
 
-class MITK_CORE_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
+class MITKEXT_CORE_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(DopplerToStrainRateFilter, ImageToImageFilter);

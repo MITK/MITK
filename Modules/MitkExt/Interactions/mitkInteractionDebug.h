@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk{
 
-class MITK_CORE_EXPORT InteractionDebug
+class MITKEXT_CORE_EXPORT InteractionDebug
 {
   static InteractionDebug* m_Instance;
   static char* m_FileName;

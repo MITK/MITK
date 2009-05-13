@@ -36,7 +36,7 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-class MITK_CORE_EXPORT LookupTableSource : public itk::ProcessObject
+class MITKEXT_CORE_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 

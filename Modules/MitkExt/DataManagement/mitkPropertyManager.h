@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 
 namespace mitk {
-  class MITK_CORE_EXPORT PropertyManager {
+  class MITKEXT_CORE_EXPORT PropertyManager {
 
     public:
       typedef std::set<std::string> PropertyNameSet;

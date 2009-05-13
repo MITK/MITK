@@ -35,7 +35,7 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class MITK_CORE_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
+class MITKEXT_CORE_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
 {
   public:
     

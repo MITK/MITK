@@ -53,7 +53,7 @@ class PointSet;
 * - \b "label": StringProperty with a label for this point set
 */
 //## @ingroup Mapper
-class MITK_CORE_EXPORT SplineMapper2D : public PointSetMapper2D
+class MITKEXT_CORE_EXPORT SplineMapper2D : public PointSetMapper2D
 {
 public:
   mitkClassMacro ( SplineMapper2D, PointSetMapper2D );

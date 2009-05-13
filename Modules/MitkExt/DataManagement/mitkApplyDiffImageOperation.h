@@ -41,7 +41,7 @@ namespace mitk {
  @ingroup Undo
  @ingroup Reliver
 */
-class MITK_CORE_EXPORT ApplyDiffImageOperation : public Operation
+class MITKEXT_CORE_EXPORT ApplyDiffImageOperation : public Operation
 {
   protected:
   

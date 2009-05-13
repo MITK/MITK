@@ -31,7 +31,7 @@ namespace mitk {
   //##Documentation
   //## @brief SeedsInteractor handles all actions on the seedsimage
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT SeedsInteractor : public Interactor
+  class MITKEXT_CORE_EXPORT SeedsInteractor : public Interactor
   {
   public:
     mitkClassMacro(SeedsInteractor, Interactor);

@@ -33,7 +33,7 @@ namespace mitk {
 
   \todo The PatientInformation, StudyInformation, SeriesInformation structures should be classes able to contain any kind of tags
 */
-class MITK_CORE_EXPORT PACSPlugin : public itk::Object
+class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
 {
   public:
 

@@ -45,7 +45,7 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is 
  * rendered in 3D via a vtkPolyData.
  */
-class MITK_CORE_EXPORT UnstructuredGridMapper2D : public GLMapper2D
+class MITKEXT_CORE_EXPORT UnstructuredGridMapper2D : public GLMapper2D
 {
 public:
 

@@ -79,7 +79,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class MITK_CORE_EXPORT ToolManager : public itk::Object
+class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
 {
   public:
 

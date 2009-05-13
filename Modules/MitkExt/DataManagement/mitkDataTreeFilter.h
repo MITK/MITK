@@ -428,7 +428,7 @@ class DataTreeFilterFunction;
 
 //------ DataTreeFilter ------------------------------------------------------------------
 
-class MITK_CORE_EXPORT DataTreeFilter : public itk::Object
+class MITKEXT_CORE_EXPORT DataTreeFilter : public itk::Object
 {
 public:
 
@@ -470,12 +470,12 @@ public:
 
   /// Exception, that is thrown, when an not-editable property should be accessed as a
   /// non-const object
-  class MITK_CORE_EXPORT NoPermissionException {};
+  class MITKEXT_CORE_EXPORT NoPermissionException {};
 
   /// Objects of this class are returned by Item[string]
   /// This class provides access to a BaseProperty, where the permission to write
   /// depends on the constructor's bool parameter
-  class MITK_CORE_EXPORT BasePropertyAccessor
+  class MITKEXT_CORE_EXPORT BasePropertyAccessor
   {
   public:
     /// bool parameter: whether property is editable/writeable
@@ -500,7 +500,7 @@ public:
   };
 
   /// One item of the filter result list or tree
-  class MITK_CORE_EXPORT Item : public itk::LightObject
+  class MITKEXT_CORE_EXPORT Item : public itk::LightObject
   {
     friend class mitk::DataTreeFilter;
 

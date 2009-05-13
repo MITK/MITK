@@ -46,7 +46,7 @@ namespace mitk {
 
 
 //## @ingroup Process
-class MITK_CORE_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
+class MITKEXT_CORE_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
 {
 public:
   mitkClassMacro(PlanesPerpendicularToLinesFilter, GeometryDataSource);

@@ -32,7 +32,7 @@ namespace mitk
  *
  *  Originally copied from FeedbackContourTool
  */
-class MITK_CORE_EXPORT ContourUtils : public itk::Object
+class MITKEXT_CORE_EXPORT ContourUtils : public itk::Object
 {
   public:
     

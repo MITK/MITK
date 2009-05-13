@@ -29,7 +29,7 @@ namespace mitk
 //## @brief Create instances of DICOMFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITK_CORE_EXPORT DICOMFileIOFactory : public itk::ObjectFactoryBase
+class MITKEXT_CORE_EXPORT DICOMFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

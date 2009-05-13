@@ -36,7 +36,7 @@ class GeometryData;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::GeometryDataSource.
 //## @ingroup Process
-class MITK_CORE_EXPORT GeometryDataSource : public BaseProcess
+class MITKEXT_CORE_EXPORT GeometryDataSource : public BaseProcess
 {
 public:
   mitkClassMacro(GeometryDataSource, BaseProcess);

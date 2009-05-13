@@ -37,7 +37,7 @@ namespace mitk
 
   $Author$
 */
-class MITK_CORE_EXPORT FillRegionTool : public SetRegionTool
+class MITKEXT_CORE_EXPORT FillRegionTool : public SetRegionTool
 {
   public:
     

@@ -35,7 +35,7 @@ namespace mitk {
  * \brief Create ring around polygons contained in a Mesh
  * \ingroup Process
  */
-class MITK_CORE_EXPORT PolygonToRingFilter : public SurfaceSource
+class MITKEXT_CORE_EXPORT PolygonToRingFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(PolygonToRingFilter, SurfaceSource);

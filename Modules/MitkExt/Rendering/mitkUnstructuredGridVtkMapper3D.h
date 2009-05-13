@@ -44,7 +44,7 @@ namespace mitk {
 //## @brief Vtk-based mapper for UnstructuredGrid
 //##
 //## @ingroup Mapper
-class MITK_CORE_EXPORT UnstructuredGridVtkMapper3D : public BaseVtkMapper3D
+class MITKEXT_CORE_EXPORT UnstructuredGridVtkMapper3D : public BaseVtkMapper3D
 {
 public:
 

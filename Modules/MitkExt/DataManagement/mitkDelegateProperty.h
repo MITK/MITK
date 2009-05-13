@@ -32,7 +32,7 @@ namespace mitk {
  *
  * A command property saves the name of 
  */
-  class MITK_CORE_EXPORT DelegateProperty : public StringProperty
+  class MITKEXT_CORE_EXPORT DelegateProperty : public StringProperty
   {
     protected:
       DelegateProperty( const char* string = 0 );

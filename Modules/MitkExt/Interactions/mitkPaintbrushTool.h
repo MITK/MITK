@@ -43,7 +43,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MITK_CORE_EXPORT PaintbrushTool : public FeedbackContourTool
+class MITKEXT_CORE_EXPORT PaintbrushTool : public FeedbackContourTool
 {
   public:
 

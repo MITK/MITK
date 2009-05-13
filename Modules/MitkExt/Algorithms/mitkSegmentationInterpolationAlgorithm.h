@@ -48,7 +48,7 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class MITK_CORE_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
+class MITKEXT_CORE_EXPORT SegmentationInterpolationAlgorithm : public itk::Object
 {
   public:
     

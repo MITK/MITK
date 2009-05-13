@@ -24,7 +24,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read unstructured grid files in vtk-format
 //## @ingroup IO
-class MITK_CORE_EXPORT VtkUnstructuredGridReader : public UnstructuredGridSource
+class MITKEXT_CORE_EXPORT VtkUnstructuredGridReader : public UnstructuredGridSource
 {
 public:
     mitkClassMacro(VtkUnstructuredGridReader, UnstructuredGridSource);

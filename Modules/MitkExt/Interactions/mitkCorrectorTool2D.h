@@ -46,7 +46,7 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
+class MITKEXT_CORE_EXPORT CorrectorTool2D : public FeedbackContourTool
 {
   public:
     

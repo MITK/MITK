@@ -26,7 +26,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in Obj-format
 //## @ingroup IO
-class MITK_CORE_EXPORT ObjFileReader : public SurfaceSource
+class MITKEXT_CORE_EXPORT ObjFileReader : public SurfaceSource
 {
 public:
     mitkClassMacro(ObjFileReader, SurfaceSource);

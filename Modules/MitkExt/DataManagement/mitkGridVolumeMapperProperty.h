@@ -29,7 +29,7 @@ namespace mitk
  * PT/0/Projected Tetrahedra, ZSWEEP/1/ZSweep, RAYCAST/2/Ray Cast
  * Default is the Wireframe representation
  */
-class MITK_CORE_EXPORT GridVolumeMapperProperty : public EnumerationProperty
+class MITKEXT_CORE_EXPORT GridVolumeMapperProperty : public EnumerationProperty
 {
 public:
 

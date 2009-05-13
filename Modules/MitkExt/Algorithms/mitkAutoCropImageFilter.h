@@ -55,7 +55,7 @@ namespace mitk {
  *
  */
 
-class MITK_CORE_EXPORT AutoCropImageFilter : public SubImageSelector
+class MITKEXT_CORE_EXPORT AutoCropImageFilter : public SubImageSelector
 {
 public:
 

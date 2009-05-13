@@ -29,7 +29,7 @@ namespace mitk
  * POINTS/0/Points, WIREFRAME/1/Wireframe, SURFACE/2/Surface, VOLUME/3/Volume
  * Default is the Wireframe representation
  */
-class MITK_CORE_EXPORT GridRepresentationProperty : public EnumerationProperty
+class MITKEXT_CORE_EXPORT GridRepresentationProperty : public EnumerationProperty
 {
 public:
 

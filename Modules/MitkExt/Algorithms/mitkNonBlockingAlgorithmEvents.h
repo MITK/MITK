@@ -24,7 +24,7 @@ namespace mitk {
 
   class NonBlockingAlgorithm;
 
-  class MITK_CORE_EXPORT NonBlockingAlgorithmEvent : public itk::AnyEvent
+  class MITKEXT_CORE_EXPORT NonBlockingAlgorithmEvent : public itk::AnyEvent
   { 
   public: 
     typedef NonBlockingAlgorithmEvent Self; 
@@ -66,7 +66,7 @@ namespace mitk {
   };
 
 
-  class MITK_CORE_EXPORT ResultAvailable : public NonBlockingAlgorithmEvent
+  class MITKEXT_CORE_EXPORT ResultAvailable : public NonBlockingAlgorithmEvent
   {
     public:
 
@@ -80,7 +80,7 @@ namespace mitk {
       }
   };
 
-  class MITK_CORE_EXPORT ProcessingError : public NonBlockingAlgorithmEvent
+  class MITKEXT_CORE_EXPORT ProcessingError : public NonBlockingAlgorithmEvent
   {
     public:
 

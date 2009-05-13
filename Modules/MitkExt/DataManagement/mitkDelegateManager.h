@@ -40,7 +40,7 @@ namespace mitk
   /// One could also say it is an Event Multiplexer.
   ///
   ///
-  class MITK_CORE_EXPORT DelegateManager
+  class MITKEXT_CORE_EXPORT DelegateManager
   {
     public:
       ///

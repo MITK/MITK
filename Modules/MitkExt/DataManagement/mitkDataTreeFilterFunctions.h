@@ -33,7 +33,7 @@ namespace mitk
     the object, and the NodeMatches() method. NodeMatches() will receive a
     mitk::DataTreeNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
   */
-   class MITK_CORE_EXPORT DataTreeFilterFunction
+   class MITKEXT_CORE_EXPORT DataTreeFilterFunction
   {
     public:
       virtual ~DataTreeFilterFunction() {}
@@ -196,7 +196,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITK_CORE_EXPORT IsDataTreeNode : public DataTreeFilterFunction
+  class MITKEXT_CORE_EXPORT IsDataTreeNode : public DataTreeFilterFunction
   {
     public:
       virtual ~IsDataTreeNode() {}
@@ -211,7 +211,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITK_CORE_EXPORT IsGoodDataTreeNode : public DataTreeFilterFunction
+  class MITKEXT_CORE_EXPORT IsGoodDataTreeNode : public DataTreeFilterFunction
   {
     public:
       virtual ~IsGoodDataTreeNode() {}
@@ -226,7 +226,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITK_CORE_EXPORT IsInResultSet : public DataTreeFilterFunction
+  class MITKEXT_CORE_EXPORT IsInResultSet : public DataTreeFilterFunction
   {
     public:
       IsInResultSet( std::set<const DataTreeNode*> rs )

@@ -35,7 +35,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_CORE_EXPORT HistogramMatching : public RegistrationBase
+  class MITKEXT_CORE_EXPORT HistogramMatching : public RegistrationBase
   {
 
   public:

@@ -29,7 +29,7 @@ namespace mitk
 {
 
 
-class MITK_CORE_EXPORT USLookupTableSource : public LookupTableSource
+class MITKEXT_CORE_EXPORT USLookupTableSource : public LookupTableSource
 {
 public:
     typedef enum {DSRDoppler, StrainRate, DefaultLUT} LookupTableMode;

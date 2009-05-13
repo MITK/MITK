@@ -31,7 +31,7 @@ namespace mitk {
   //## by modifying its geometry. The surface closest to the picking point is
   //## chosen for interaction automatically by CalculateJurisdiction
   //## @ingroup Interaction
-  class MITK_CORE_EXPORT SurfaceInteractor : public AffineInteractor
+  class MITKEXT_CORE_EXPORT SurfaceInteractor : public AffineInteractor
   {
   public:
     mitkClassMacro(SurfaceInteractor,AffineInteractor);

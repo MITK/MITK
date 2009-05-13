@@ -41,7 +41,7 @@ namespace mitk {
 //## The m_Contour is extruded in the direction m_Vector until
 //## reaching m_ClippingGeometry.
 //## @ingroup Data
-class MITK_CORE_EXPORT ExtrudedContour : public BoundingObject
+class MITKEXT_CORE_EXPORT ExtrudedContour : public BoundingObject
 {
 public:
   mitkClassMacro(ExtrudedContour, BoundingObject);  

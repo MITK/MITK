@@ -56,7 +56,7 @@ namespace mitk {
  *
  * \ingroup Data
  */
-class MITK_CORE_EXPORT Mesh : public PointSet
+class MITKEXT_CORE_EXPORT Mesh : public PointSet
 {
 public:
   mitkClassMacro(Mesh, PointSet);

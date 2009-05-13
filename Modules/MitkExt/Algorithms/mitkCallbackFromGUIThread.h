@@ -77,7 +77,7 @@ namespace mitk
   be registered with mitk::CallbackFromGUIThread. See the (very simple) implmentation of 
   QmitkCallbackFromGUIThread for an example.
 */
-class MITK_CORE_EXPORT CallbackFromGUIThreadImplementation
+class MITKEXT_CORE_EXPORT CallbackFromGUIThreadImplementation
 {
   public:
     
@@ -174,7 +174,7 @@ void ThreadedClass::ChangeGUIElementsToIndicateProgress(const itk::EventObject& 
 
 \todo Create a set of "normal" parameter-event-objects that people might want to use.
 */
-class MITK_CORE_EXPORT CallbackFromGUIThread
+class MITKEXT_CORE_EXPORT CallbackFromGUIThread
 {
   public:
 

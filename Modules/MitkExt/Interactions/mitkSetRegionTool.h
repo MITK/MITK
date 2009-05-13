@@ -43,7 +43,7 @@ class Image;
 
   $Author$
 */
-class MITK_CORE_EXPORT SetRegionTool : public FeedbackContourTool
+class MITKEXT_CORE_EXPORT SetRegionTool : public FeedbackContourTool
 {
   public:
     

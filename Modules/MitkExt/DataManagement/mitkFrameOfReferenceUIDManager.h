@@ -30,7 +30,7 @@ namespace mitk {
 //## the Geometry3D (Geometry3D::m_FrameOfReferenceID) to a 
 //## DICOM FrameOfReferenceUID
 //##
-class MITK_CORE_EXPORT FrameOfReferenceUIDManager
+class MITKEXT_CORE_EXPORT FrameOfReferenceUIDManager
 {
 public:
   typedef std::string FrameOfReferenceUIDType;

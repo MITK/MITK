@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachine.h"
 
 
-namespace mitk {
-
+namespace mitk 
+{
   class Operation;
   class OperationActor;
   
@@ -49,9 +49,6 @@ namespace mitk {
     //## @brief executes the actions that are sent to this statemachine
     //## derived from StateMachine 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
-
   };
-
 } // namespace mitk
-
 #endif /* MITKPositionTracker_H */

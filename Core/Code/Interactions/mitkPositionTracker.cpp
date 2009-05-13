@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionTracker.h>
 
 #include <mitkBaseRenderer.h>
-#include <mitkDataTree.h>
+#include <mitkDataStorage.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkDisplayPositionEvent.h>
 #include <mitkAction.h>
 #include <mitkStateEvent.h>
@@ -27,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSet.h>
 #include <mitkRenderingManager.h>
 #include <mitkVector.h> // for PointDataType 
+#include <mitkProperties.h>
 
 
 mitk::PositionTracker::PositionTracker(const char * type, mitk::OperationActor* /*operationActor*/)
@@ -39,64 +41,45 @@ bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent c
   bool ok = false;
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
 
-  mitk::DataTreeIteratorClone dtit;
   mitk::DataTreeNode::Pointer  dtnode;
+  mitk::DataStorage* ds = NULL;
+  if (displayPositionEvent == NULL)
+    return false;
 
-  if(displayPositionEvent!=NULL)
+  if (stateEvent->GetEvent()->GetSender()!=NULL)
   {
-    if(stateEvent->GetEvent()->GetSender()!=NULL)
-    {
-      dtit = stateEvent->GetEvent()->GetSender()->GetDataStorage();
-    }
-    else
-    {
-      itkWarningMacro(<<"StateEvent::GetSender()==NULL - setting timeInMS to 0");
-      return false;
-    }
-
-
-    if (dtit.IsNull()) return false;
-
-    // looking for desired point set
-    bool isPointSet=false;
-    while( !dtit->IsAtEnd() )
-    {
-      dtnode = dtit->Get();
-      if ( dtnode->GetBoolProperty("inputdevice",isPointSet) && isPointSet)
-      {
-//        mitk::StringProperty sp = mitk::StringProperty::New(stateEvent->GetEvent()->GetSender()->GetName());
-          int mapperID = stateEvent->GetEvent()->GetSender()->GetMapperID();
-          dtnode->SetIntProperty("BaseRendererMapperID",mapperID);
-
-        break;
-      }
-      ++dtit;
-    }
-
-    if ( dtit->IsAtEnd() ) return ok;
-
-    if( isPointSet )
-    {
-      mitk::PointSet* ps = (mitk::PointSet*) dtnode->GetData();
-      int position = 0;
-
-      if( ps->GetPointSet()->GetPoints()->IndexExists( position )) //first element
-      {
-        ps->GetPointSet()->GetPoints()->SetElement( position, displayPositionEvent->GetWorldPosition());                            
-      }
-      else
-      {
-        mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
-        ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
-        ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
-      }
-
-      ps->Modified();
-
-      dtnode->SetData(ps);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-
+    ds = stateEvent->GetEvent()->GetSender()->GetDataStorage();
   }
+  else
+  {
+    itkWarningMacro(<<"StateEvent::GetSender()==NULL - setting timeInMS to 0");
+    return false;
+  }
+  if (ds == NULL) 
+    return false;
+
+  // looking for desired point set
+  dtnode = ds->GetNode(mitk::NodePredicateProperty::New("inputdevice", mitk::BoolProperty::New(true)));
+  if (dtnode.IsNull())
+    return false;
+
+  dtnode->SetIntProperty("BaseRendererMapperID", stateEvent->GetEvent()->GetSender()->GetMapperID());
+  mitk::PointSet* ps = dynamic_cast<mitk::PointSet*>(dtnode->GetData());
+  if (ps == NULL)
+    return false;
+
+  int position = 0;
+  if( ps->GetPointSet()->GetPoints()->IndexExists( position )) //first element
+  {
+    ps->GetPointSet()->GetPoints()->SetElement( position, displayPositionEvent->GetWorldPosition());                            
+  }
+  else
+  {
+    mitk::PointSet::PointDataType pointData = {position , false /*selected*/, mitk::PTUNDEFINED};
+    ps->GetPointSet()->GetPointData()->InsertElement(position, pointData);
+    ps->GetPointSet()->GetPoints()->InsertElement(position, displayPositionEvent->GetWorldPosition());
+  }
+  ps->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   return ok;
 }

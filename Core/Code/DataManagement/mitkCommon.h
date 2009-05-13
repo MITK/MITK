@@ -99,7 +99,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
  *  
  *    class MITK_EXPORT ClassName : public SomeClass {};
  */
-#if defined(WIN32) && defined(MITK_BUILD_SHARED_CORE)
+#if defined(WIN32)
   #ifdef mitkCore_EXPORTS
     #define MITK_CORE_EXPORT __declspec(dllexport)
   #else

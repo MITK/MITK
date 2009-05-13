@@ -25,32 +25,33 @@ SET(CPP_FILES
 
  qclickablelabel.cpp
  #QmitkAbortEventFilter.cpp
- QmitkApplicationCursor.cpp
+ # QmitkApplicationCursor.cpp
  QmitkCallbackFromGUIThread.cpp
- QmitkRegisterClasses.cpp
- QmitkRenderingManager.cpp
- QmitkRenderingManagerFactory.cpp
- QmitkRenderWindow.cpp
+ QmitkExtRegisterClasses.cpp
+ # QmitkRenderingManager.cpp
+ # QmitkRenderingManagerFactory.cpp
+ # QmitkRenderWindow.cpp
  
- QmitkEventAdapter.cpp
+ # QmitkEventAdapter.cpp
  
  QmitkColorTransferFunctionCanvas.cpp
  QmitkSlicesInterpolator.cpp
  QmitkStandardViews.cpp
  QmitkStepperAdapter.cpp
- QmitkLineEditLevelWindowWidget.cpp
- QmitkSliderLevelWindowWidget.cpp
- QmitkLevelWindowWidget.cpp
- QmitkPointListWidget.cpp
- QmitkPointListView.cpp
+ # QmitkLineEditLevelWindowWidget.cpp
+ # mitkSliderLevelWindowWidget.cpp
+ # QmitkLevelWindowWidget.cpp
+ # QmitkPointListWidget.cpp
+ # QmitkPointListView.cpp
  QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
- QmitkLevelWindowRangeChangeDialog.cpp
- QmitkLevelWindowPresetDefinitionDialog.cpp
- QmitkLevelWindowWidgetContextMenu.cpp
+  #QmitkLevelWindowRangeChangeDialog.cpp
+ 
+ #QmitkLevelWindowPresetDefinitionDialog.cpp
+ # QmitkLevelWindowWidgetContextMenu.cpp
  QmitkSliceWidget.cpp
- QmitkStdMultiWidget.cpp
+ # QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
  QmitkSelectableGLWidget.cpp
  QmitkToolReferenceDataSelectionBox.cpp
@@ -62,11 +63,11 @@ SET(CPP_FILES
  QmitkNewSegmentationDialog.cpp
  QmitkPaintbrushToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
- QmitkMaterialEditor.cpp
- QmitkMaterialShowcase.cpp
- QmitkPropertiesTableEditor.cpp
+ # QmitkMaterialEditor.cpp
+ # QmitkMaterialShowcase.cpp
+ # QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
- QmitkDataStorageComboBox.cpp
+ # QmitkDataStorageComboBox.cpp
  
  QmitkHistogram.cpp
  QmitkHistogramWidget.cpp
@@ -79,9 +80,6 @@ QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
 
 SET(MOC_H_FILES
  
- QmitkModels/QmitkDataStorageTableModel.h
- QmitkModels/QmitkPropertyDelegate.h
- QmitkModels/QmitkPointListModel.h
  
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyEditor.h
@@ -99,23 +97,13 @@ SET(MOC_H_FILES
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
- QmitkRenderingManager.h
  
  QmitkStandardViews.h
  QmitkStepperAdapter.h
- QmitkLineEditLevelWindowWidget.h
- QmitkSliderLevelWindowWidget.h
  QmitkSliderNavigatorWidget.h
- QmitkLevelWindowWidget.h
- QmitkLevelWindowRangeChangeDialog.h
- QmitkLevelWindowPresetDefinitionDialog.h
- QmitkLevelWindowWidgetContextMenu.h
  QmitkSliceWidget.h
  QmitkSlicesInterpolator.h
- QmitkStdMultiWidget.h
  QmitkColorTransferFunctionCanvas.h
- QmitkPointListWidget.h
- QmitkPointListView.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h
@@ -129,25 +117,18 @@ SET(MOC_H_FILES
  QmitkNewSegmentationDialog.h
  QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
- QmitkMaterialEditor.h
- QmitkMaterialShowcase.h
- QmitkPropertiesTableEditor.h
  QmitkPrimitiveMovieNavigatorWidget.h
- QmitkDataStorageComboBox.h
  QmitkHistogramWidget.h
 )
 
 SET(UI_FILES
   QmitkSliderNavigator.ui
-  QmitkLevelWindowRangeChange.ui
-  QmitkLevelWindowPresetDefinition.ui
-  QmitkLevelWindowWidget.ui
+  # QmitkLevelWindowRangeChange.ui
+  # QmitkLevelWindowPresetDefinition.ui
+  # QmitkLevelWindowWidget.ui
   QmitkSliceWidget.ui
-  QmitkStdMultiWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
-  QmitkMaterialEditor.ui
-  QmitkMaterialShowcase.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
 )
 

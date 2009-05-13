@@ -129,7 +129,7 @@ void mitk::VtkPropRenderer::SetDataStorage(  mitk::DataStorage* storage  )
 
   BaseRenderer::SetDataStorage(storage);
 
-  static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataIteratorForTexture( m_DataStorage.GetPointer() );
+  static_cast<mitk::Geometry2DDataVtkMapper3D*>(m_CurrentWorldGeometry2DMapper.GetPointer())->SetDataStorageForTexture( m_DataStorage.GetPointer() );
 
   // Compute the geometry from the current data tree bounds and set it as world geometry  
   this->SetWorldGeometryToDataStorageBounds();
@@ -638,7 +638,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
       mapper->ReleaseGraphicsResources(renWin);
   } 
 }
-  
+
 
 vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()
 {

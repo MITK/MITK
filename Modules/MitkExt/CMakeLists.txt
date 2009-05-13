@@ -41,3 +41,23 @@ ENDIF(MSVC_IDE OR MSVC_VERSION)
 
 SET(TOOL_CPPS "")
 
+IF(WIN32)
+  OPTION(MITK_USE_TD_MOUSE "Enable support for 3D Connexion SpaceNavigator" OFF)
+ENDIF(WIN32)
+
+IF(FALSE)
+# modify list of tool filenames. For the classes inside these files, we'll create ITK factories
+FOREACH(TOOL_FILE ${TOOL_FILES})
+  STRING(REGEX REPLACE "(.*)Tool" "Interactions/\\1Tool" TOOL_FILE ${TOOL_FILE})
+  SET(NEW_TOOL_FILES ${TOOL_FILE} ${NEW_TOOL_FILES})
+ENDFOREACH(TOOL_FILE ${TOOL_FILES})
+SET(TOOL_FILES ${NEW_TOOL_FILES})
+INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
+
+# MITK_GENERATE_TOOLS_LIBRARY()
+
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
+CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
+
+ENDIF(FALSE)

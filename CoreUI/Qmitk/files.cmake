@@ -5,6 +5,7 @@ QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp
 QmitkDataStorageTreeModel.cpp
+QmitkEventAdapter.cpp
 QmitkLevelWindowPresetDefinitionDialog.cpp
 QmitkLevelWindowRangeChangeDialog.cpp
 QmitkLevelWindowWidgetContextMenu.cpp

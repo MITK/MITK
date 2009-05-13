@@ -7,7 +7,7 @@
 #include "cherryISelectionProvider.h"
 /// Qmitk
 #include "QmitkFunctionality.h"
-#include "QmitkStandardViews.h"
+// #include "QmitkStandardViews.h"
 #include "../mitkQtDataManagerDll.h"
 
 // Forward declarations

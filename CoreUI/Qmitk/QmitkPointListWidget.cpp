@@ -209,7 +209,7 @@ void QmitkPointListWidget::OnLoadPointSetButtonClicked()
   try
   {
     mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
-    reader->SetFileName( filename.latin1() );
+    reader->SetFileName( filename.toLatin1() );
     reader->Update();
 
     mitk::PointSet::Pointer pointSet = reader->GetOutput();
@@ -253,7 +253,7 @@ void QmitkPointListWidget::OnSavePointSetButtonClicked()
   std::string name("");
 
   QString fileNameProposal = "PointSet.mps";
-  QString aFilename = QFileDialog::getSaveFileName( fileNameProposal.latin1() );
+  QString aFilename = QFileDialog::getSaveFileName( fileNameProposal.toLatin1() );
   if ( aFilename.isEmpty() ) return;
 
   try
@@ -261,7 +261,7 @@ void QmitkPointListWidget::OnSavePointSetButtonClicked()
     // instantiate the writer and add the point-sets to write
     mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
     writer->SetInput( pointSet );
-    writer->SetFileName( aFilename.latin1() );
+    writer->SetFileName( aFilename.toLatin1() );
     writer->Update();
   }
   catch(...)

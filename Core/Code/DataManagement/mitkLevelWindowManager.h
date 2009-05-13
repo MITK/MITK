@@ -82,9 +82,6 @@ namespace mitk
     void OnPropertyModified(const itk::EventObject& e);
 
     mitk::Image* GetCurrentImage(); ///< return the currently active image
-  protected:
-    LevelWindowManager();
-    ~LevelWindowManager();
 
     /**
     *  returns all nodes in the DataStorage that have the following properties: 
@@ -92,6 +89,9 @@ namespace mitk
     */
     mitk::DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
 
+  protected:
+    LevelWindowManager();
+    ~LevelWindowManager();
 
     DataStorage::Pointer m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image

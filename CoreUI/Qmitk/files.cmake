@@ -25,7 +25,7 @@ QmitkRenderWindow.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 )
-SET(H_FILES
+SET(MOC_H_FILES
 QmitkAbortEventFilter.h
 QmitkApplicationCursor.h
 QmitkDataStorageComboBox.h
@@ -53,3 +53,8 @@ QmitkRenderWindow.h
 QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
 )
+SET(UI_FILES
+QmitkLevelWindowPresetDefinition.ui  QmitkLevelWindowWidget.ui  QmitkMaterialShowcase.ui
+QmitkLevelWindowRangeChange.ui       QmitkMaterialEditor.ui     QmitkStdMultiWidget.ui
+)
+

@@ -10,8 +10,8 @@ QmitkLevelWindowRangeChangeDialog.cpp
 QmitkLevelWindowWidgetContextMenu.cpp
 QmitkLevelWindowWidget.cpp
 QmitkLineEditLevelWindowWidget.cpp
-QmitkMaterialEditor.cpp
-QmitkMaterialShowcase.cpp
+# QmitkMaterialEditor.cpp
+# QmitkMaterialShowcase.cpp
 QmitkPointListModel.cpp
 QmitkPointListView.cpp
 QmitkPointListWidget.cpp
@@ -38,7 +38,7 @@ QmitkLevelWindowRangeChangeDialog.h
 QmitkLevelWindowWidgetContextMenu.h
 QmitkLevelWindowWidget.h
 QmitkLineEditLevelWindowWidget.h
-QmitkMaterialEditor.h
+# QmitkMaterialEditor.h
 QmitkMaterialShowcase.h
 QmitkPointListModel.h
 QmitkPointListView.h

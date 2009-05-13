@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkStdMultiWidget.h"
 
-#include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
@@ -200,7 +199,6 @@ protected:
   mitk::DataTreeIteratorClone planesIterator;
   mitk::SliceNavigationController::Pointer m_TimeNavigationController;
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
-  mitk::PositionTracker::Pointer m_PositionTracker;
   mitk::DataTreeNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
   mitk::SlicesRotator::Pointer m_SlicesRotator;

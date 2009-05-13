@@ -54,8 +54,8 @@ float mitk::SurfaceInteractor::CalculateJurisdiction( StateEvent const* stateEve
     mitk::BaseRenderer* ren = stateEvent->GetEvent()->GetSender();
 
     // Get the diameter of the render window bounding box
-    mitk::DataTree* tree = dynamic_cast<mitk::DataTree*>(ren->GetData()->GetTree());
-    mitk::BoundingBox::Pointer bb = tree->ComputeBoundingBox(ren->GetData());
+    mitk::DataStorage* storage = ren->GetDataStorage();
+    mitk::BoundingBox::Pointer bb = storage->ComputeBoundingBox();
     mitk::BoundingBox::AccumulateType dia = bb->GetDiagonalLength2();
 
     if (dia > 0.00001) //if diameter not zero

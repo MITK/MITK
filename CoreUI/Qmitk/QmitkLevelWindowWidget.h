@@ -25,22 +25,15 @@ PURPOSE.  See the above copyright notices for more information.
 class QMITK_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::QmitkLevelWindow
 {
   Q_OBJECT
-  
 public:
-  
   QmitkLevelWindowWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-
   mitk::LevelWindowManager* GetManager();
   
 public slots:
-
-  void setDataTree( mitk::DataTree* tree );
+  void SetDataStorage( mitk::DataStorage* ds );
   
 protected:
-  
   //unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;
-  
 };
-
 #endif /*QMITKLEVELWINDOWWIDGET_H_*/

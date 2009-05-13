@@ -500,9 +500,9 @@ void QmitkSliderLevelWindowWidget::showScale()
   update();
 }
 
-void QmitkSliderLevelWindowWidget::setDataTree(mitk::DataTree* tree)
+void QmitkSliderLevelWindowWidget::setDataStorage(mitk::DataStorage* ds)
 {
-  m_Manager->SetDataTree(tree);
+  m_Manager->SetDataStorage(ds);
 }
 
 mitk::LevelWindowManager* QmitkSliderLevelWindowWidget::GetManager()

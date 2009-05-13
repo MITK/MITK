@@ -64,7 +64,7 @@ public:
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
 
   /// sets the DataTree which holds all image-nodes
-  void setDataTree( mitk::DataTree* tree );
+  void SetDataStorage( mitk::DataStorage* ds );
 
   /// returns the manager who is responsible to collect and deliver changes on Level/Window
   mitk::LevelWindowManager* GetManager();

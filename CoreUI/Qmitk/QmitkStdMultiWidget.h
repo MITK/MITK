@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLogoRendering.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
+#include "mitkDataStorage.h"
 
 #include <QWidget>
 
@@ -103,14 +104,13 @@ public slots:
 
   void changeLayoutToLeft2Dand3DRight2D();
 
-  void SetData( mitk::DataTreeIteratorBase* it );
+  void SetData( mitk::DataStorage* ds );
 
   void Fit();
 
-  void AddPositionTrackingPointSet(
-    mitk::DataTreeIteratorBase* treeIterator);
+  void InitPositionTracking();
 
-  void AddDisplayPlaneSubTree(mitk::DataTreeIteratorBase* it);
+  void AddDisplayPlaneSubTree();
 
   void EnableStandardLevelWindow();
 
@@ -202,7 +202,7 @@ protected:
   mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
   mitk::PositionTracker::Pointer m_PositionTracker;
   mitk::DataTreeNode::Pointer m_PositionTrackerNode;
-  mitk::DataTreeBase::Pointer m_Tree;
+  mitk::DataStorage::Pointer m_DataStorage;
   mitk::SlicesRotator::Pointer m_SlicesRotator;
   mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
   mitk::GradientBackground::Pointer m_GradientBackground1;
@@ -212,7 +212,5 @@ protected:
   mitk::LogoRendering::Pointer m_LogoRendering3;
   mitk::ColoredRectangleRendering::Pointer m_RectangleRendering2;
   mitk::ColoredRectangleRendering::Pointer m_RectangleRendering4;
-
 };
-
 #endif /*QMITKSTDMULTIWIDGET_H_*/

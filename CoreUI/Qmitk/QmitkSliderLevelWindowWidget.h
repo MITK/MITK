@@ -89,8 +89,8 @@ public:
   /// sets the manager who is responsible to collect and deliver changes on Level/Window
   void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
 
-  /// sets the DataTree which holds all image-nodes
-  void setDataTree(mitk::DataTree* tree);
+  /// sets the DataStorage which holds all image-nodes
+  void setDataStorage(mitk::DataStorage* ds);
 
   /// returns the manager who is responsible to collect and deliver changes on Level/Window
   mitk::LevelWindowManager* GetManager();
@@ -177,7 +177,5 @@ protected slots:
 
   /// shows the scale if "Show Scale" is selected in contextmenu
   void showScale();
-
 };
-
 #endif //QMITKSLIDERLEVELWINDOW_WIDGET

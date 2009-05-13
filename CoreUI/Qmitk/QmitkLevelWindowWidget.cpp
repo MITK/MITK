@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 #include "QmitkLevelWindowWidget.h"
-
 #include "QmitkSliderLevelWindowWidget.h"
+
 
 QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
  : QWidget(parent, f)
@@ -29,10 +29,12 @@ QmitkLevelWindowWidget::QmitkLevelWindowWidget(QWidget* parent, Qt::WindowFlags 
   LineEditLevelWindowWidget->setLevelWindowManager(m_Manager.GetPointer());
 } 
 
-void QmitkLevelWindowWidget::setDataTree( mitk::DataTree* tree ) 
+
+void QmitkLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds ) 
 { 
-  m_Manager->SetDataTree(tree); 
+  m_Manager->SetDataStorage(ds); 
 } 
+
 
 mitk::LevelWindowManager* QmitkLevelWindowWidget::GetManager()
 {

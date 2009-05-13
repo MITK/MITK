@@ -128,9 +128,9 @@ void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowMana
   }
 }
 
-void QmitkLineEditLevelWindowWidget::setDataTree( mitk::DataTree* tree )
+void QmitkLineEditLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
 {
-  m_Manager->SetDataTree(tree);
+  m_Manager->SetDataStorage(ds);
 }
 
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit

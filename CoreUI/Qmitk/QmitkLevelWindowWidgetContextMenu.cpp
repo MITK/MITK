@@ -194,12 +194,10 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
       m_ImageAction->setChecked(true);
     m_ImageSubmenu->addSeparator();
     Q_CHECK_PTR( m_ImageSubmenu );
-    std::vector<mitk::DataTreeNode::Pointer> allObjects = m_Manager->GetAllNodes();
-    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
-        objectIter != allObjects.end();
-        ++objectIter)
+    mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
+    for ( mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin(); objectIter != allObjects->End(); ++objectIter)
     {
-      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      mitk::DataTreeNode* node = objectIter->Value();
       if (node)
       {
         mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
@@ -274,12 +272,10 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
       m_ImageAction->setChecked(true);
     m_ImageSubmenu->addSeparator();
     Q_CHECK_PTR( m_ImageSubmenu );
-    std::vector<mitk::DataTreeNode::Pointer> allObjects = m_Manager->GetAllNodes();
-    for ( std::vector<mitk::DataTreeNode::Pointer>::const_iterator objectIter = allObjects.begin();
-        objectIter != allObjects.end();
-        ++objectIter)
+    mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
+    for ( mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin(); objectIter != allObjects->End(); ++objectIter)
     {
-      mitk::DataTreeNode* node = (*objectIter).GetPointer();
+      mitk::DataTreeNode* node = objectIter->Value();
       if (node)
       {
         mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));

@@ -132,7 +132,7 @@ SET(CPP_FILES
   Interactions/mitkCorrectorTool2D.cpp
   Interactions/mitkCreateSurfaceTool.cpp
   #Interactions/mitkDisplayCoordinateOperation.cpp
-  Interactions/mitkDisplayInteractor.cpp
+  #Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkDrawPaintbrushTool.cpp

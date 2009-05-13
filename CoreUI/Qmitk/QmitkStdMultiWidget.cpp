@@ -701,7 +701,7 @@ void QmitkStdMultiWidget::InitPositionTracking()
   m_PositionTrackerNode->SetData( mitk::PointSet::New() );
   m_PositionTrackerNode->SetColor(1.0,0.33,0.0);
   m_PositionTrackerNode->SetProperty("layer", mitk::IntProperty::New(1001));
-  m_PositionTrackerNode->SetVisible(true);
+  m_PositionTrackerNode->SetVisibility(true);
   m_PositionTrackerNode->SetProperty("inputdevice", mitk::BoolProperty::New(true) );
   m_PositionTrackerNode->SetProperty("BaseRendererMapperID", mitk::IntProperty::New(0) );//point position 2D mouse
   m_PositionTrackerNode->SetProperty("baserenderer", mitk::StringProperty::New("N/A"));
@@ -774,7 +774,7 @@ mitk::SliceNavigationController* QmitkStdMultiWidget::GetTimeNavigationControlle
 void QmitkStdMultiWidget::EnableStandardLevelWindow()
 {
   levelWindowWidget->disconnect(this);
-  levelWindowWidget->setDataStorage(mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDataStorage());
+  levelWindowWidget->SetDataStorage(mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDataStorage());
   levelWindowWidget->show();
 }
 

@@ -39,7 +39,7 @@ QmitkLevelWindowWidgetContextMenu.h
 QmitkLevelWindowWidget.h
 QmitkLineEditLevelWindowWidget.h
 # QmitkMaterialEditor.h
-QmitkMaterialShowcase.h
+# QmitkMaterialShowcase.h
 QmitkPointListModel.h
 QmitkPointListView.h
 QmitkPointListWidget.h
@@ -54,7 +54,7 @@ QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
 )
 SET(UI_FILES
-QmitkLevelWindowPresetDefinition.ui  QmitkLevelWindowWidget.ui  QmitkMaterialShowcase.ui
-QmitkLevelWindowRangeChange.ui       QmitkMaterialEditor.ui     QmitkStdMultiWidget.ui
+QmitkLevelWindowPresetDefinition.ui  QmitkLevelWindowWidget.ui  
+QmitkLevelWindowRangeChange.ui        QmitkStdMultiWidget.ui
 )
 

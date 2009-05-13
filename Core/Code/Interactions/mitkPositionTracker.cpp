@@ -46,7 +46,7 @@ bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent c
   {
     if(stateEvent->GetEvent()->GetSender()!=NULL)
     {
-      dtit = stateEvent->GetEvent()->GetSender()->GetData();
+      dtit = stateEvent->GetEvent()->GetSender()->GetDataStorage();
     }
     else
     {

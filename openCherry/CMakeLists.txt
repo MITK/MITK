@@ -74,16 +74,9 @@ ENDIF (Eclipse_DIR)
 
 SET(OPENCHERRY_DEBUG_POSTFIX d)
 
-IF(QT4_FOUND)
-  SET(_include_opencherry_qtbundlelist "INCLUDE(\"${OPENCHERRY_BINARY_DIR}/openCherryQtBundleList.cmake\")")
-ENDIF(QT4_FOUND)
-
 CONFIGURE_FILE(openCherryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/openCherryConfig.cmake @ONLY)
 
 ADD_SUBDIRECTORY(Bundles)
-IF(QT4_FOUND)
-  ADD_SUBDIRECTORY(Bundles-Qt)
-ENDIF(QT4_FOUND)
 
 ADD_SUBDIRECTORY(Documentation)
 

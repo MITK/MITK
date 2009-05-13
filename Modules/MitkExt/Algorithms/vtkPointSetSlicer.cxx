@@ -35,11 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkUnstructuredGrid.h"
 
-#if (VTK_MAJOR_VERSION >= 5)
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#endif
 
 vtkStandardNewMacro(vtkPointSetSlicer);
 
@@ -110,7 +108,6 @@ unsigned long vtkPointSetSlicer::GetMTime()
   return mTime;
 }
 
-#if (VTK_MAJOR_VERSION >= 5)
 int vtkPointSetSlicer::RequestData(
   vtkInformation * /*request*/,
   vtkInformationVector **inputVector,
@@ -196,44 +193,6 @@ int vtkPointSetSlicer::FillInputPortInformation(int, vtkInformation *info)
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
-#else
-void vtkPointSetSlicer::Execute()
-{
-  vtkDebugMacro(<< "Executing cutter");
-
-  vtkDataSet *input = this->GetInput();
-  vtkPolyData *output = this->GetOutput();
-
-  if (!input)
-  {
-    vtkErrorMacro("No input specified");
-    return;
-  }
-
-  if (!this->SlicePlane)
-  {
-    vtkErrorMacro("No slice plane specified");
-    return;
-  }
-
-  if ( input->GetNumberOfPoints() < 1 )
-  {
-    vtkErrorMacro("Input data set is empty");
-    return;
-  }
-
-  if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID)
-  { 
-    vtkDebugMacro(<< "Executing Unstructured Grid Cutter");   
-    this->UnstructuredGridCutter(input, output);
-  }
-  else
-  {
-    vtkDebugMacro(<< "Executing DataSet Cutter");
-    //this->DataSetCutter(input, output);
-  }
-}
-#endif
 
 void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
 {
@@ -256,12 +215,10 @@ void vtkPointSetSlicer::GetCellTypeDimensions(unsigned char* cellTypeDimensions)
   cellTypeDimensions[VTK_PARAMETRIC_SURFACE] = 2;
   cellTypeDimensions[VTK_PARAMETRIC_TRI_SURFACE] = 2;
   cellTypeDimensions[VTK_PARAMETRIC_QUAD_SURFACE] = 2;
-#if (VTK_MAJOR_VERSION >= 5)
   cellTypeDimensions[VTK_HIGHER_ORDER_EDGE] = 1;
   cellTypeDimensions[VTK_HIGHER_ORDER_TRIANGLE] = 2;
   cellTypeDimensions[VTK_HIGHER_ORDER_QUAD] = 2;
   cellTypeDimensions[VTK_HIGHER_ORDER_POLYGON] = 2;
-#endif
 }
 
 

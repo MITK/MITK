@@ -132,6 +132,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #endif        
 #else
   #define MITK_CORE_EXPORT
+  #define MITKEXT_CORE_EXPORT
   #define MITK_IGT_EXPORT
   #define MBISB_CORE_EXPORT
   #define QMITK_EXPORT

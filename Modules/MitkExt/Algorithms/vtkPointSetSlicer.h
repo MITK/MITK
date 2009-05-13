@@ -34,24 +34,12 @@ class vtkCellData;
 
 #include "mitkCommon.h"
 
-#if (VTK_MAJOR_VERSION >= 5)
 #include "vtkPolyDataAlgorithm.h"
 
-class MITKEXT_CORE_EXPORT /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkPolyDataAlgorithm
+class MITKEXT_CORE_EXPORT vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
-
-#else
-#include "vtkDataSetToPolyDataFilter.h"
-#define VTK_NUMBER_OF_CELL_TYPES 68
-
-class MITKEXT_CORE_EXPORT /*VTK_GRAPHICS_EXPORT*/ vtkPointSetSlicer : public vtkDataSetToPolyDataFilter
-{
-public:
-  vtkTypeMacro(vtkPointSetSlicer,vtkDataSetToPolyDataFilter);
-  
-#endif
   
   void PrintSelf(std::ostream& os, vtkIndent indent);
 
@@ -99,13 +87,9 @@ protected:
   vtkPointSetSlicer(vtkPlane* cf = 0);
   ~vtkPointSetSlicer();
 
-#if (VTK_MAJOR_VERSION >= 5)
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
-#else
-  virtual void Execute();
-#endif
   
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
   

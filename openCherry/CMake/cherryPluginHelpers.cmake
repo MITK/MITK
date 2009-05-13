@@ -139,9 +139,9 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
   FOREACH(_dep ${_plugin_depends_all})
 
     # collect the ids of plugins we will have to build
-    IF(NOT BUILD_${_dep})
+    IF(NOT _BUILD_${_dep})
       LIST(APPEND _plugins_turned_off ${_dep})
-    ENDIF(NOT BUILD_${_dep})
+    ENDIF()
 
     # set include and link directories
     SET(_dep_src_dir )
@@ -169,3 +169,17 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
   ENDIF(_plugins_turned_off)
 
 ENDMACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES)
+
+MACRO(_MACRO_ENABLE_QT4_PLUGINS)
+
+  SET(_enable_qt_plugin ${ARGV0})
+  STRING(REGEX MATCH ".*\\.qt.*" _qt_matched ${_enable_qt_plugin})
+  IF(_qt_matched)
+    IF(QT4_FOUND)
+      SET(ENABLE_PLUGIN 1)
+    ELSE()
+      SET(ENABLE_PLUGIN 0)
+    ENDIF()
+  ENDIF()
+
+ENDMACRO()

@@ -8,6 +8,8 @@
 #                       [CACHE_PLUGIN_BINARY_DIRS cache_bin_dirs]
 #                       [CACHE_PLUGIN_TARGETS cache_plugin_targets]
 #                       [BUNDLE_LIST_PATH bundle_list_path]
+#                       [CMAKE_CACHE_PREFIX cache_prefix]
+#                       [ENABLE_PLUGIN_MACROS _enable_macros]
 #                       [FORCE_BUILD_ALL]
 #                       )
 #
@@ -28,7 +30,16 @@
 # The full path for the generated cmake file containing the BUILD_<plugin-id>
 # variables. If not set, "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake"
 # is used.
- 
+# 
+# CMAKE_CACHE_PREFIX
+# <cache_prefix> is prepended to the CMake cache variables
+#
+# ENABLE_PLUGIN_MACROS
+# <_enable_macros> is a list containing macro names which will be evaluated
+# to determine if a specific plug-in should be build. The parameter list of
+# the macro is (<bundle-symbolicname>) and the macro must set the variable
+# ENABLE_PLUGIN to true or false. For Qt4, a default macro is provided.
+#
 # FORCE_BUILD_ALL if set, the BUILD_pluginname variables are ignored and all
 # plugins under this directory are build
 #
@@ -36,7 +47,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH" "FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -45,11 +56,30 @@ ENDIF(NOT _COLLECT_ADD_DIR)
 IF(NOT _COLLECT_BUNDLE_LIST_PATH)
   SET(_COLLECT_BUNDLE_LIST_PATH "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake")
 ENDIF(NOT _COLLECT_BUNDLE_LIST_PATH)
+
+IF(_COLLECT_CMAKE_CACHE_PREFIX)
+  SET(_COLLECT_CMAKE_CACHE_PREFIX "${_COLLECT_CMAKE_CACHE_PREFIX}_")
+ENDIF(_COLLECT_CMAKE_CACHE_PREFIX)
+
+LIST(APPEND _COLLECT_ENABLE_PLUGIN_MACROS "_MACRO_ENABLE_QT4_PLUGINS")
  
 SET(PLUGINS_OUTPUT_BASE_DIR ${_COLLECT_OUTPUT_DIR})
 
 SET(CMAKE_DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
 
+SET(_enable_plugins_file "${CMAKE_CURRENT_BINARY_DIR}/cherryEnablePlugin.cmake")
+SET(_enable_plugins_filecontent "SET(_enable_bundle 1)")
+FOREACH(_macro_name ${_COLLECT_ENABLE_PLUGIN_MACROS})
+  SET(_enable_plugins_filecontent "${_enable_plugins_filecontent}
+  IF(_enable_bundle)
+    SET(ENABLE_PLUGIN 1)
+    ${_macro_name}(\${BUNDLE-SYMBOLICNAME})
+    IF(NOT ENABLE_PLUGIN)
+      SET(_enable_bundle 0)
+    ENDIF()
+  ENDIF()")
+ENDFOREACH()
+CONFIGURE_FILE("${OPENCHERRY_BASE_DIR}/CMake/cherryEnablePlugin.cmake.in" "${_enable_plugins_file}" @ONLY)
  
 #MESSAGE(SEND_ERROR "_COLLECT_OUTPUT_DIR: ${_COLLECT_OUTPUT_DIR}")
 #MESSAGE(SEND_ERROR "_COLLECT_ADD_DIR: ${_COLLECT_ADD_DIR}")
@@ -72,9 +102,12 @@ SET(_plugins_target_list )
 FILE(GLOB all_dirs *)
 FOREACH(dir_entry ${all_dirs})
   IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
-    #SET(plugin_dirs ${plugin_dirs} ${dir_entry})
     MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF")
     IF(BUNDLE-SYMBOLICNAME)
+
+    INCLUDE("${_enable_plugins_file}")
+        
+    IF(_enable_bundle)
       SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR "${dir_entry}")
       SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR "${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}")
       # write the variable in .cmake file, so external projects have access to them
@@ -82,22 +115,23 @@ FOREACH(dir_entry ${all_dirs})
 SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
 SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
       
-      OPTION("BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ON)
-      IF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
+      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ON)
+      IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND _plugins_to_build "${dir_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})
         LIST(APPEND _plugin_target_list ${_plugin_target})
         
+        SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)
         SET(OPENCHERRY_BUNDLE_VARIABLES "${OPENCHERRY_BUNDLE_VARIABLES}
-SET(BUILD_${BUNDLE-SYMBOLICNAME} 1)")
-      ELSE(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
+SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)")
+      ELSE()
         FILE(RELATIVE_PATH _binary_manifest_path "${CMAKE_CURRENT_SOURCE_DIR}" "${dir_entry}/META-INF/MANIFEST.MF")
         SET(_binary_manifest_path "${_COLLECT_OUTPUT_DIR}/${_binary_manifest_path}")
         FILE(REMOVE "${_binary_manifest_path}")
-      ENDIF(BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
-      
-    ENDIF(BUNDLE-SYMBOLICNAME)
-  ENDIF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
+      ENDIF()
+      ENDIF()
+    ENDIF()
+  ENDIF()
 ENDFOREACH(dir_entry ${all_dirs})
 
 # add Poco directories for all plugins

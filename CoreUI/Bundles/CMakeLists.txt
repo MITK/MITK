@@ -11,7 +11,8 @@ IF(MITK_USE_OPENCHERRY)
                         CACHE_PLUGIN_SOURCE_DIRS MITK_PLUGIN_SOURCE_DIRS
                         CACHE_PLUGIN_BINARY_DIRS MITK_PLUGIN_BINARY_DIRS
                         CACHE_PLUGIN_TARGETS MITK_ENABLED_PLUGINS
-                        BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKBundleList.cmake" 
+                        BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKBundleList.cmake"
+                        CMAKE_CACHE_PREFIX "MITK" 
                         ${BUILD_ALL_PLUGINS_OPTION})
    
 ENDIF(MITK_USE_OPENCHERRY)

@@ -21,10 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchPart.h"
 #include "cherryIWorkbenchPartSite.h"
 
-#include <QtCore/QString>
-#include <QtGui/QIcon>
-#include <QtGui/QWidget>
-
 #include <cherryIConfigurationElement.h>
 #include <cherryIExecutableExtension.h>
 

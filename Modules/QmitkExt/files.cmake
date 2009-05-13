@@ -2,12 +2,12 @@ SET(CPP_FILES
 
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
  
- QmitkModels/QmitkDataStorageListModel.cpp
- QmitkModels/QmitkPropertiesTableModel.cpp
- QmitkModels/QmitkDataStorageTreeModel.cpp
- QmitkModels/QmitkDataStorageTableModel.cpp
- QmitkModels/QmitkPropertyDelegate.cpp
- QmitkModels/QmitkPointListModel.cpp
+ #QmitkModels/QmitkDataStorageListModel.cpp
+ #QmitkModels/QmitkPropertiesTableModel.cpp
+ #QmitkModels/QmitkDataStorageTreeModel.cpp
+ #QmitkModels/QmitkDataStorageTableModel.cpp
+ #QmitkModels/QmitkPropertyDelegate.cpp
+ #QmitkModels/QmitkPointListModel.cpp
 
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
@@ -24,7 +24,7 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
 
  qclickablelabel.cpp
- QmitkAbortEventFilter.cpp
+ #QmitkAbortEventFilter.cpp
  QmitkApplicationCursor.cpp
  QmitkCallbackFromGUIThread.cpp
  QmitkRegisterClasses.cpp

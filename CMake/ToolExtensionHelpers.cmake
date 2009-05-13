@@ -31,7 +31,7 @@ MACRO(MITK_GENERATE_TOOLS_LIBRARY)
       # configure a file that contains an itkObjectFactory for this tool
       SET( FACTORY_NAME ${TOOL_NAME}Factory )
       SET( FACTORY_DESCRIPTION "Generated factory for ${TOOL_NAME}" )
-      CONFIGURE_FILE( ${MITK_DIR}/CMake/ToolExtensionITKFactory.cpp.in 
+      CONFIGURE_FILE( ${MITK_DIR}/ToolExtensionITKFactory.cpp.in 
                       ${PROJECT_BINARY_DIR}/mitk${FACTORY_NAME}.h
                       @ONLY )
       INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
@@ -67,7 +67,7 @@ ${FACTORY_INCLUDE_LINES}" )
       # configure a file that contains an itkObjectFactory for this tool
       STRING(REGEX REPLACE "(.+)\\.c(pp|xx)$" "\\1Factory" FACTORY_NAME ${TOOL_GUI_FILE})
       SET( FACTORY_DESCRIPTION "Generated factory for Qmitk${TOOL_NAME}GUI" )
-      CONFIGURE_FILE( ${MITK_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in 
+      CONFIGURE_FILE( ${MITK_DIR}/ToolGUIExtensionITKFactory.cpp.in 
                       ${PROJECT_BINARY_DIR}/${FACTORY_NAME}.h
                       @ONLY )
       INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
@@ -97,7 +97,7 @@ ${FACTORY_INCLUDE_LINES}" )
   IF (TOOL_FILES OR TOOL_QT3GUI_FILES OR TOOL_QT4GUI_FILES)
     IF (libraryname AND reallycreatelibrary)
       # configure one file with the itkLoad method
-      CONFIGURE_FILE( ${MITK_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in
+      CONFIGURE_FILE( ${MITK_DIR}/ToolExtensionITKFactoryLoader.cpp.in
                       ${PROJECT_BINARY_DIR}/mitkToolExtensionITKFactoryLoader.cpp
                       @ONLY )
       # also mark this file for compilation

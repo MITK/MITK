@@ -202,7 +202,7 @@ void QmitkPointListWidget::OnLoadPointSetButtonClicked()
   if (!m_PointSetNode) return;
 
   // get the name of the file to load
-  QString filename = QFileDialog::getOpenFileName( QString::null, "MITK Point Sets (*.mps)", NULL );
+  QString filename = QFileDialog::getOpenFileName( NULL, QString::null, "MITK Point Sets (*.mps)", NULL );
   if ( filename.isEmpty() ) return;
 
   // attempt to load file

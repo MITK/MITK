@@ -271,9 +271,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   mitk::DataStorage::SetOfObjects::ConstPointer relevantNodes = m_DataStorage->GetSubset( predicate );
   return relevantNodes; 
 }
-//
-//
-//mitk::Image* mitk::LevelWindowManager::GetCurrentImage()
-//{
-//  return m_CurrentImage;
-//}
+
+
+mitk::Image* mitk::LevelWindowManager::GetCurrentImage()
+{
+  return m_CurrentImage;
+}

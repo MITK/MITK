@@ -81,6 +81,7 @@ namespace mitk
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);
 
+    mitk::Image* GetCurrentImage(); ///< return the currently active image
   protected:
     LevelWindowManager();
     ~LevelWindowManager();
@@ -90,7 +91,7 @@ namespace mitk
     *  "visible" == true, "binary" == false, "levelwindow", and DataType == Image
     */
     mitk::DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
-    //mitk::Image* GetCurrentImage();
+
 
     DataStorage::Pointer m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image

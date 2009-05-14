@@ -117,7 +117,7 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
-  std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Interactions") );
+  std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
 
   if (!xmlFileName.empty()) 
     return LoadBehavior(xmlFileName);

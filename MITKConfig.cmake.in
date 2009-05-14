@@ -26,7 +26,7 @@ APPLY_VTK_FLAGS()
 
 IF (MITK_USE_OPENCHERRY)
 
-  SET(openCherry_DIR "@MITK_BINARY_DIR@/Utilities/openCherry")
+  SET(openCherry_DIR "@MITK_BINARY_DIR@/openCherry")
 
   # There is no PocoConfig.cmake, so we set Poco specific CMake variables
   # here. This way the call to FIND_PACKAGE(Poco) in openCherryConfig.cmake

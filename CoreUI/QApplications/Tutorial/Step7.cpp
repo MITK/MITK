@@ -39,7 +39,7 @@ void Step7::StartRegionGrowing()
     mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New();
     surfaceNode->SetData(surface);
 
-    mitk::DataStorage::GetInstance()->Add(surfaceNode);
+    m_DataStorage->Add(surfaceNode);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

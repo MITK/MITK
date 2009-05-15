@@ -29,7 +29,6 @@ namespace mitk {
   class NodePredicateBase;
   class DataTreeNode;
 
-
   //##Documentation
   //## @brief Data management class that handles 'was created by' relations
   //##
@@ -45,7 +44,6 @@ namespace mitk {
   public:
     mitkClassMacro(StandaloneDataStorage, mitk::DataStorage);
     itkNewMacro(Self);
-    
 
     //##Documentation
     //## @brief Adds a DataTreeNode containing a data object to its internal storage
@@ -93,13 +91,6 @@ namespace mitk {
 
   protected:
 
-    //TODO investigate removing friend declarations when StandaloneDataStorage is
-    //     independent of the DataTree
-    friend class BaseRenderer;
-    friend class Geometry2DDataVtkMapper3D;
-    friend class RenderingManager;
-
-
     //##Documentation
     //## @brief noncyclical directed graph data structure to store the nodes with their relation
     typedef std::map<mitk::DataTreeNode::ConstPointer, SetOfObjects::ConstPointer> AdjacencyList;
@@ -133,8 +124,6 @@ namespace mitk {
     //##Documentation
     //## @brief Nodes are stored in reverse relation for easier traversal in the opposite direction of the relation
     AdjacencyList m_DerivedNodes;
-
   };
 } // namespace mitk
-
 #endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */

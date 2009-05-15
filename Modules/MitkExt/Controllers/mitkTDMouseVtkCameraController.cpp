@@ -102,11 +102,11 @@ bool mitk::TDMouseVtkCameraController::OnTDMouseEvent(mitk::Action* a, const mit
   // rotation:    -1.00   -1.00   -1.00   
   // angle:        0.00
 
-  //compute current sensivity according to current BoundingBox of the whole scene!
+  //compute current sensitivity according to current BoundingBox of the whole scene!
   double sceneSensivity = 1.0;
 
-  mitk::DataTree*  tree = dynamic_cast<mitk::DataTree*>(m_Renderer->GetData()->GetTree());
-  mitk::BoundingBox::Pointer bb = tree->ComputeBoundingBox(m_Renderer->GetData());
+  mitk::DataStorage* ds = m_Renderer->GetDataStorage();
+  mitk::BoundingBox::Pointer bb = ds->ComputeBoundingBox();
   mitk::BoundingBox::AccumulateType length = bb->GetDiagonalLength2();
   if (length > 0.00001)//if length not zero
     sceneSensivity *= 100.0 / (sqrt(length)) ;
@@ -226,11 +226,11 @@ bool mitk::TDMouseVtkCameraController::OnTDMouseKeyDown(mitk::Action* a, const m
   if (glRenderer)
   {
     vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
-    mitk::DataTree* tree = dynamic_cast<mitk::DataTree*>(m_Renderer->GetData()->GetTree());
-    if (tree == NULL)
+    mitk::DataStorage* ds = m_Renderer->GetDataStorage();
+    if (ds == NULL)
       return false;
 
-    mitk::BoundingBox::Pointer bb = tree->ComputeBoundingBox(m_Renderer->GetData());
+    mitk::BoundingBox::Pointer bb = ds->ComputeBoundingBox();
 
     mitk::Point3D middle =bb->GetCenter();
     vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0],middle[1],middle[2]);
@@ -241,5 +241,3 @@ bool mitk::TDMouseVtkCameraController::OnTDMouseKeyDown(mitk::Action* a, const m
   }
   return false;
 }
-
-

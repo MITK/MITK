@@ -28,7 +28,7 @@ namespace mitk {
 
 /**
  * @brief Property for commands.
- * @ingroup DataTree
+ * @ingroup DataManagement
  *
  * A command property saves the name of 
  */

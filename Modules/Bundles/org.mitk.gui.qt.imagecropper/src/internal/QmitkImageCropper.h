@@ -154,8 +154,6 @@ public slots:
   virtual void ChkInformationToggled( bool on );
 
 protected:
-  //mitk::DataTree::Pointer m_DataTree;
-  //mitk::DataTreeIteratorClone 	m_DataTreeIterator;
 
   /*!
   * Default main widget containing 4 windows showing 3

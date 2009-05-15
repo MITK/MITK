@@ -202,7 +202,7 @@ void QmitkInteractiveSegmentationView::CreateNewSegmentation()
 
         if (!emptySegmentation) return; // could be aborted by user
 
-        mitk::DataStorage::GetInstance()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+        this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
         m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
       }
@@ -242,7 +242,7 @@ void QmitkInteractiveSegmentationView::DeleteSegmentation()
     {
       try
       {
-        mitk::DataStorage::GetInstance()->Remove( node );
+        this->GetDefaultDataStorage()->Remove( node );
       }
       catch(...)
       {
@@ -311,7 +311,7 @@ void QmitkInteractiveSegmentationView::LoadSegmentation()
             firstTool->CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
           mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
-          mitk::DataStorage::GetInstance()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
+          this->GetDefaultDataStorage()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image
 
           mitk::RenderingManager::GetInstance()->RequestUpdateAll();
           m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();

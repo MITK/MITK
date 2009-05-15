@@ -56,7 +56,7 @@ class BaseRenderer;
 //## Contains the data (instance of BaseData), a list of mappers, which can
 //## draw the data, a transform (vtkTransform) and a list of properties
 //## (PropertyList).
-//## @ingroup DataTree
+//## @ingroup DataManagement
 //##
 //## @todo clean up all the GetProperty methods. There are too many different flavours... Can most probably be reduced to <tt>bool GetProperty<type>(type&)</tt>
 //##

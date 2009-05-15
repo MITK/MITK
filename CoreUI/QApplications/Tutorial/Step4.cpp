@@ -43,18 +43,9 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a tree
-  // For now we need a DataTree to initialize a DataStorage later on. In the
-  // future, the DataStorage will be independent of the DataTree
-  mitk::DataTree::Pointer tree=mitk::DataTree::New();
+  // Create a DataStorage  
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-  // Create an iterator on the tree
-  // We need the iterator to initialize the slice widget below. This will be
-  // done with a datastorage in the future
-  mitk::DataTreePreOrderIterator it(tree);
-
-  // Create a data storage object. We will use it as a singleton
-  mitk::DataStorage* storage = mitk::DataStorage::CreateInstance(tree);
 
   //*************************************************************************
   // Part II: Create some data by reading files
@@ -80,7 +71,7 @@ int main(int argc, char* argv[])
       // Since the DataTreeNodeFactory directly creates a node,
       // use the datastorage to add the read node
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
-      storage->Add(node);
+      ds->Add(node);
     }
     catch(...)
     {
@@ -109,7 +100,7 @@ int main(int argc, char* argv[])
   layout.addWidget(&renderWindow);
 
   // Tell the renderwindow which (part of) the datastorage to render
-  renderWindow.GetRenderer()->SetData(storage);
+  renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
@@ -131,7 +122,7 @@ int main(int argc, char* argv[])
   view2.SetData(&it);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
-  storage->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
+  ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   //*************************************************************************
   // Part IVc: 2D view for slicing sagitally
@@ -147,7 +138,7 @@ int main(int argc, char* argv[])
   view3.SetData(&it, mitk::SliceNavigationController::Sagittal);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
-  storage->Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
+  ds->Add(view3.GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   // *******************************************************
   // ******************* END OF NEW PART *******************
@@ -164,10 +155,6 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
-
-  // Release all resources used by the data storage and
-  // the datatree
-  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

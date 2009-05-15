@@ -21,9 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkObject.h"
 #include "mitkCommon.h"
-#include "mitkDataTree.h"
 #include "mitkMessage.h"
 #include "itkVectorContainer.h"
+#include "mitkDataTreeNode.h"
+#include "mitkGeometry3D.h"
 #include <map>
 
 namespace mitk {
@@ -31,7 +32,6 @@ namespace mitk {
   class NodePredicateBase;
   class DataTreeNode;
   class BaseRenderer;
-  class Geometry2DDataVtkMapper3D;
 
   //##Documentation
   //## @brief Data management class that handles 'was created by' relations
@@ -42,30 +42,13 @@ namespace mitk {
   //## Thus, nodes are stored in a noncyclical directed graph data structure.
   //## If a new node is added to the DataStorage, AddNodeEvent is emitted.
   //## If a node is removed, RemoveNodeEvent is emitted.
-  //## Currently, DataStorage uses an underlying mitk::DataTree. Therefore a DataStorage object
-  //## must be initialized with a DataTree before it can be used by calling ->Initialize(myTree).
-  //## @warning DataStorage methods will raise exceptions if called before the DataStorage is initialized.
   //##
-  //## All objects that are added to DataStorage get automatically added to the underlying tree.
-  //## The tree can be used to get notifications on New/Delete events.
-  //## @warning Do not mix Adding/Removing objects with the DataStorage and DataTree methods.
-  //## @warning The DataStorage does not automatically return all objects that are stored in the
-  //##          DataTree. Use SetManageCompleteTree() to enable/disable management of objects that were
-  //##          added to the tree directly.
   //##
-  //## @ingroup DataStorage
+  //## \ingroup DataStorage
   class MITK_CORE_EXPORT DataStorage : public itk::Object
   {
   public:
     mitkClassMacro(DataStorage, itk::Object);
-    //itkNewMacro(Self);
-
-    static DataStorage* CreateInstance(mitk::DataTree* tree);  // create method that initializes singleton object
-    static DataStorage* GetInstance();    // Singleton pattern like access method
-
-    //##Documentation
-    //## @brief Shutdown the singleton. Workaround for bug #1446
-    static void ShutdownSingleton();
 
     //##Documentation
     //## @brief A Container of objects that is used as a result set of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
@@ -237,7 +220,7 @@ namespace mitk {
     //## @brief Compute the axis-parallel bounding geometry of the input objects
     //## 
     //## Throws std::invalid_argument exception if input is NULL
-    Geometry3D::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input);
+    mitk::Geometry3D::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input);
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -248,7 +231,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    Geometry3D::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::Geometry3D::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
@@ -294,7 +277,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    TimeBounds ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
+    mitk::TimeBounds ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2);
 
     //##Documentation
     //## @brief Compute the time-bounds of all visible parts of the data tree structure, for general
@@ -307,19 +290,12 @@ namespace mitk {
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
-    TimeBounds ComputeTimeBounds( mitk::BaseRenderer* renderer, const char* boolPropertyKey)
+    mitk::TimeBounds ComputeTimeBounds( mitk::BaseRenderer* renderer, const char* boolPropertyKey)
     {
       return ComputeTimeBounds( "visible", renderer, boolPropertyKey);
     }
 
   protected:
-
-    //TODO investigate removing friend declarations when DataStorage is
-    //     independent of the DataTree
-    friend class BaseRenderer;
-    friend class Geometry2DDataVtkMapper3D;
-    friend class RenderingManager;
-
     //##Documentation
     //## @brief  EmitAddNodeEvent emits the AddNodeEvent
     //##
@@ -376,8 +352,6 @@ namespace mitk {
     //##Documentation
     //## @brief Prints the contents of the DataStorage to os. Do not call directly, call ->Print() instead
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
-    static mitk::DataStorage::Pointer s_Instance;
   };
 } // namespace mitk
 

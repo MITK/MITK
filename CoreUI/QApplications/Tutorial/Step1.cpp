@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
   QApplication qtapplication( argc, argv );
 
-  if(argc<2)
+  if (argc < 2)
   {
     fprintf( stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
     return 1;
@@ -27,8 +27,11 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a data storage object. We will use it as a singleton
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  // Create a DataStorage
+  // The DataStorage manages all data objects. It is used by the 
+  // rendering mechanism to render all data objects
+  // We use the standard implementation mitk::StandaloneDataStorage.
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
 
   //*************************************************************************
@@ -36,7 +39,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a PicFileReader to read a .pic-file
-  mitk::PicFileReader::Pointer reader=mitk::PicFileReader::New();
+  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   const char * filename = argv[1];
   try
   {
@@ -54,7 +57,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a node and add the Image (which is read from the file) to it
-  mitk::DataTreeNode::Pointer node=mitk::DataTreeNode::New();
+  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
   node->SetData(reader->GetOutput());
 
   // Add the node to the DataStorage
@@ -72,8 +75,7 @@ int main(int argc, char* argv[])
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Initialize the RenderWindow
-  mitk::Geometry3D::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
+  mitk::RenderingManager::GetInstance()->InitializeViews( ds );
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
@@ -88,14 +90,15 @@ int main(int argc, char* argv[])
 
   // for testing
   #include "QtTesting.h"
-  if(strcmp(argv[argc-1], "-testing")!=0)
+  if (strcmp(argv[argc-1], "-testing") != 0)
     return qtapplication.exec();
   else
     return QtTesting();
 
+  // cleanup: Remove References to node and DataStorage. This will delete the two objects
+  node = NULL;
+  ds = NULL;
 }
-
 /**
 \example Step1.cpp
 */
-

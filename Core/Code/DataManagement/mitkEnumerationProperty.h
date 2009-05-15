@@ -44,7 +44,7 @@ namespace mitk
  *    so that the user may not add additional invalid enumeration values.
  *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty
  *
- * @ingroup DataTree
+ * @ingroup DataManagement
  */
 class MITK_CORE_EXPORT EnumerationProperty : public BaseProperty
 {

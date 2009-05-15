@@ -32,7 +32,7 @@ namespace mitk
 
   //##Documentation
   //## @brief Convenience methods for common tasks concerning the data tree
-  //## @ingroup DataTree
+  //## @ingroup DataManagement
   namespace DataTreeHelper
   {
     //##Documentation

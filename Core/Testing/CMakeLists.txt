@@ -22,8 +22,8 @@ SET(${KITNAME}_TESTS
   #mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp
-  #mitkLevelWindowManagerTest.cpp
-  #mitkLevelWindowTest.cpp
+  mitkLevelWindowManagerTest.cpp
+  mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneGeometryTest.cpp
@@ -56,7 +56,7 @@ SET(${KITNAME}_IMAGE_TESTS
   #mitkImageSliceSelectorTest.cpp
   mitkImageTimeSelectorTest.cpp
   mitkPicFileReaderTest.cpp
-  #mitkVtkPropRendererTest.cpp
+  mitkVtkPropRendererTest.cpp
 )
 
 # list of images for which the tests are run

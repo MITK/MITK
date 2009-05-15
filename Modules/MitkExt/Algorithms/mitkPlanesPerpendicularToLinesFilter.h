@@ -27,13 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 //##Documentation
-//## @brief Create Planes perpendicular to lines containted in a Mesh. The planes data is generated as one SlicedGeometry3D data. 
+//## @brief Create Planes perpendicular to lines contained in a Mesh. The planes data is generated as one SlicedGeometry3D data. 
 //## To create the planes as input a
 //## mitk::mesh (for example a pointSet) and as geometry hint a geometry (for example from the original image) must be given.
 //##
 //##  mitk::Mesh::Pointer mesh = mitk::Mesh::New();
 //##  mesh->SetMesh(pointSet->GetPointSet());
-//##  mitk::Image* currentImage = dynamic_cast<mitk::Image*> (mitk::DataStorage::GetInstance()->GetNamedNode(IMAGE)->GetData());
+//##  mitk::Image* currentImage = dynamic_cast<mitk::Image*> (myDataStorage->GetNamedNode(IMAGE)->GetData());
 //##  const mitk::Geometry3D* imagegeometry = currentImage->GetUpdatedGeometry();
 //##  mitk::PlanesPerpendicularToLinesFilter::Pointer perpendicularPlanes = mitk::PlanesPerpendicularToLinesFilter::New();
 //##  perpendicularPlanes->SetInput(mesh);

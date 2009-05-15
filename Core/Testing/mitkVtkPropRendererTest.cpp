@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVtkPropRenderer.h>
 #include <vtkMitkRenderProp.h>
 #include <mitkVtkLayerController.h>
-#include <mitkNativeRenderWindowInteractor.h>
+#include <mitkNativeRenderWindowInteractor.h>  // Needs MitkExt!
 
 #include <itksys/SystemTools.hxx>
 
@@ -42,13 +42,13 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkVtkPropRendererTest(int argc, char* argv[])
 {
   //independently read header of pic file
-  ipPicDescriptor *picheader=NULL;
-  if(argc>=1)
+  ipPicDescriptor *picheader = NULL;
+  if (argc >= 1)
   {
     if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
       picheader = ipPicGetHeader(argv[1], NULL);
   }
-  if(picheader==NULL)
+  if( picheader==NULL)
   {
     std::cout<<"file not found/not a pic-file - test not applied [PASSED]"<<std::endl;
     std::cout<<"[TEST DONE]"<<std::endl;
@@ -75,18 +75,12 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   node->SetData(image);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Creating tree: ";
-  mitk::DataTree::Pointer tree;
-  tree=mitk::DataTree::New();
-  mitk::DataStorage::CreateInstance( tree );
+  std::cout << "Creating DataStorage: ";
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Creating iterator on tree: ";
-  mitk::DataTreePreOrderIterator it(tree);
-  std::cout<<"[PASSED]"<<std::endl;
-
-  std::cout << "Adding node via iterator: ";
-  it.Add(node);
+  std::cout << "Adding node via DataStorage: ";
+  ds->Add(node);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding level-window property: ";
@@ -130,7 +124,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   //renderWindow->SetErase(0);
 
   std::cout << "BaseRenderer::SetData(iterator): ";
-  propRenderer->SetData(&it);
+  propRenderer->SetDataStorage(ds);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating vtkMitkRenderProp and connecting it to the VtkPropRenderer: ";
@@ -212,10 +206,8 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   renderWindow->Delete();
 
   vtkImage->Delete();
-  tree = NULL; // As the tree has been registered explicitely, destroy it again.
+  ds = NULL;
   
-  mitk::DataStorage::GetInstance()->ShutdownSingleton();
-
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

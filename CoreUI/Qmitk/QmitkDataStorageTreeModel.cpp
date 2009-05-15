@@ -22,9 +22,8 @@
 #include "mitkNodePredicateAND.h"
 
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel(mitk::NodePredicateBase* pred, QObject* parent)
- : QAbstractItemModel(parent), m_NodePredicate(pred), m_ViewMode(DSVW_Hirarchy)
+ : QAbstractItemModel(parent), m_NodePredicate(pred), m_ViewMode(DSVW_Hirarchy), m_DataStorage(NULL)
 {
-  SetDataStorage(mitk::DataStorage::GetInstance());
 }
 
 QmitkDataStorageTreeModel::~QmitkDataStorageTreeModel()

@@ -38,28 +38,22 @@ void Step8::SetupWidgets()
   QmitkStdMultiWidget* multiWidget = new QmitkStdMultiWidget(viewParent);
   hlayout->addWidget(multiWidget);
   
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(m_Tree);
 
-  // Tell the multiWidget which (part of) the tree to render
-  // This will be changed to take a DataStorage object
-  multiWidget->SetData(&it);
+  // Tell the multiWidget which DataStorage to render
+  multiWidget->SetDataStorage(m_DataStorage);
 
   // Initialize views as transversal, sagittal, coronar (from
   // top-left to bottom)
-  mitk::RenderingManager::GetInstance()->InitializeViews(mitk::DataStorage::GetInstance());
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_DataStorage);
 
   // Initialize bottom-right view as 3D view
-  multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
-    mitk::BaseRenderer::Standard3D );
+  multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
 
   // Enable standard handler for levelwindow-slider
   multiWidget->EnableStandardLevelWindow();
 
-  // Add the displayed views to the tree to see their positions
-  // in 2D and 3D
-  // This will be changed to take a DataStorage object
-  multiWidget->AddDisplayPlaneSubTree(&it);
+  // Add the displayed views to the DataStorage to see their positions in 2D and 3D
+  multiWidget->AddDisplayPlaneSubTree();
 
   //*************************************************************************
   // Part II: Setup standard interaction with the mouse
@@ -72,9 +66,7 @@ void Step8::SetupWidgets()
   mitk::GlobalInteraction::GetInstance()->AddListener(
     multiWidget->GetMoveAndZoomInteractor()
   );
-
 }
-
 /**
 \example Step8.cpp
 */

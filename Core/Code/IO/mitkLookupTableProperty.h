@@ -28,7 +28,7 @@ namespace mitk {
   //##Documentation
   //## @brief Property for LookupTable data
   //##
-  //## @ingroup DataTree
+  //## @ingroup DataManagement
   class MITK_CORE_EXPORT LookupTableProperty : public BaseProperty
   {
 

@@ -3,7 +3,7 @@
 
 //#include <qmainwindow.h>
 #include <QWidget>
-#include <mitkDataTree.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
 #include <mitkPointSet.h>
 
@@ -32,7 +32,7 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
     friend void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6);
 
-  mitk::DataTree::Pointer m_Tree;
+  mitk::DataStorage::Pointer m_DataStorage;
   mitk::Image::Pointer m_FirstImage;
   mitk::PointSet::Pointer m_Seeds;
 

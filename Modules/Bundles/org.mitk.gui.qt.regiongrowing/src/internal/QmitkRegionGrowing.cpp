@@ -220,7 +220,7 @@ void QmitkRegionGrowing::ItkImageProcessing( itk::Image< TPixel, VImageDimension
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
   // add result to data tree
-  mitk::DataStorage::GetInstance()->Add( newNode );
+  this->GetDefaultDataStorage()->Add( newNode );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

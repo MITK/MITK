@@ -6,14 +6,12 @@
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
-#include "mitkDataStorage.h"
 
 #include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
 
 #include "mitkImageAccessByItk.h"
-#include "mitkDataTreeHelper.h"
 
 #include "mitkRenderingManager.h"
 
@@ -28,7 +26,7 @@
 //## @brief Start region-grower at interactively added points
 Step6::Step6( int argc, char* argv[], QWidget *parent )
 : QWidget( parent ), m_FirstImage(NULL), m_ResultImage(NULL),
-  m_ResultNode(NULL)
+  m_ResultNode(NULL), m_DataStorage(NULL);
 {
   // load data as in the previous steps; a reference to the first loaded
   // image is kept in the member m_FirstImage and used as input for the
@@ -77,7 +75,7 @@ void Step6::Initialize()
   mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
   pointSetNode->SetData(m_Seeds);
   pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
-  mitk::DataStorage::GetInstance()->Add(pointSetNode);
+  m_DataStorage->Add(pointSetNode);
   mitk::GlobalInteraction::GetInstance()->AddInteractor(
     mitk::PointSetInteractor::New("pointsetinteractor", pointSetNode)
   );
@@ -106,11 +104,7 @@ void Step6::Load(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a tree
-  m_Tree=mitk::DataTree::New();
-
-  // Create DataStorageInstance
-  mitk::DataStorage::CreateInstance(m_Tree);
+  m_DataStorage = mitk::StandaloneDataStorage::New();
 
   //*************************************************************************
   // Part II: Create some data by reading files
@@ -136,7 +130,7 @@ void Step6::Load(int argc, char* argv[])
       // Since the DataTreeNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
       mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
-      mitk::DataStorage::GetInstance()->Add(node);
+      m_DataStorage->Add(node);
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
       if((m_FirstImage.IsNull()) && (image.IsNotNull()))
@@ -152,11 +146,8 @@ void Step6::Load(int argc, char* argv[])
 
 void Step6::SetupWidgets()
 {
-  // Create an iterator on the tree
-  mitk::DataTreePreOrderIterator it(m_Tree);
-
   //*************************************************************************
-  // Part I: Create windows and pass the tree to it
+  // Part I: Create windows and pass the datastorage to it
   //*************************************************************************
 
   // Create toplevel widget with vertical layout
@@ -181,7 +172,7 @@ void Step6::SetupWidgets()
   hlayout->addWidget(renderWindow);
 
   // Tell the renderwindow which (part of) the tree to render
-  renderWindow->GetRenderer()->SetData(&it);
+  renderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
 
   // Use it as a 3D view
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
@@ -192,16 +183,16 @@ void Step6::SetupWidgets()
 
   // Create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
-  QmitkSliceWidget *view2=new QmitkSliceWidget(viewParent);
+  QmitkSliceWidget *view2 = new QmitkSliceWidget(viewParent);
   hlayout->addWidget(view2);
 
   // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
-  view2->SetData(&it);
+  view2->SetDataStorage(m_DataStorage);
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
-  it.Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
+  m_DataStorage->Add(view2->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   //*************************************************************************
   // Part Ic: 2D view for slicing sagitally
@@ -209,16 +200,16 @@ void Step6::SetupWidgets()
 
   // Create QmitkSliceWidget, which is based on the class
   // QmitkRenderWindow, but additionally provides sliders
-  QmitkSliceWidget *view3=new QmitkSliceWidget(viewParent);
+  QmitkSliceWidget *view3 = new QmitkSliceWidget(viewParent);
   hlayout->addWidget(view3);
 
   // Tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagitally
-  view3->SetData(&it, mitk::SliceNavigationController::Sagittal);
+  view3->SetDataStorage(m_DataStorage, mitk::SliceNavigationController::Sagittal);
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
-  it.Add(view3->GetRenderer()->GetCurrentWorldGeometry2DNode());
+  m_DataStorage->Add(view3->GetRenderer()->GetCurrentWorldGeometry2DNode());
 
   //*************************************************************************
   // Part II: handle updates: To avoid unnecessary updates, we have to
@@ -230,7 +221,6 @@ void Step6::SetupWidgets()
   renderingManager->AddRenderWindow( renderWindow );
   renderingManager->AddRenderWindow( view2->GetRenderWindow() );
   renderingManager->AddRenderWindow( view3->GetRenderWindow() );*/
-
 }
 
 /**

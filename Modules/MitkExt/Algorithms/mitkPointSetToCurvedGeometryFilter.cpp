@@ -182,6 +182,6 @@ void mitk::PointSetToCurvedGeometryFilter::SetDefaultCurvedGeometryProperties ( 
   node->SetIntProperty ( "xresolution", 50 );
   node->SetIntProperty ( "yresolution", 50 );
   node->SetProperty ( "name", mitk::StringProperty::New ( "Curved Plane" ) );
-  // exclude extent of this plane when calculating DataTree bounding box
+  // exclude extent of this plane when calculating DataStorage bounding box
   node->SetProperty ( "includeInBoundingBox", mitk::BoolProperty::New ( false ) );
 }

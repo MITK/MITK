@@ -238,5 +238,5 @@ void QmitkImageGuidedTherapyTutorialView::OnStopIGT()
   m_Source = NULL;
   m_Visualizer = NULL;
   m_Source = NULL;
-  mitk::DataStorage::GetInstance()->Remove(mitk::DataStorage::GetInstance()->GetNamedNode("My tracked object"));
+  this->GetDefaultDataStorage()->Remove(this->GetDefaultDataStorage()->GetNamedNode("My tracked object"));
 }

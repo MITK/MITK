@@ -31,9 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 /**
- * @brief Property for clipping datasets; currently only
+ * \brief Property for clipping datasets; currently only
  * clipping planes are possible
- * @ingroup DataTree
+ * \ingroup DataManagement
  */
 class MITK_CORE_EXPORT ClippingProperty : public BaseProperty
 {

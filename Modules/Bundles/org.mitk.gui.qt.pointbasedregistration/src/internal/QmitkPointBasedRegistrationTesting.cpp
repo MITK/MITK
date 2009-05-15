@@ -175,13 +175,13 @@ PURPOSE.  See the above copyright notices for more information.
 //   // clean up
 //   if (m_FixedPointSetNode.IsNotNull())
 //   {
-//     mitk::DataStorage::GetInstance()->Remove(m_FixedPointSetNode);
+//     this->GetDefaultDataStorage()->Remove(m_FixedPointSetNode);
 //     m_FixedPointSetNode = NULL;
 //   }
 //   if (m_MovingPointSetNode)
 //   if (node.IsNotNull())
 //   {
-//     mitk::DataStorage::GetInstance()->Remove(m_MovingPointSetNode);
+//     this->GetDefaultDataStorage()->Remove(m_MovingPointSetNode);
 //     m_MovingPointSetNode = NULL;
 //   }
 //   

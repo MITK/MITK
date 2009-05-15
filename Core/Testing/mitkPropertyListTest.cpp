@@ -20,126 +20,128 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include <iostream>
 
-bool TestXMLWriter()
-{
-#define FIRST_VALUE  5
-#define SECOND_VALUE 325
-
-  std::cout << "Testing to share properties between two PropertyLists..." << std::endl;
-
-  // first list
-  mitk::DataTreeNode::Pointer list1 = mitk::DataTreeNode::New();
-  // insert an IntProperty
-  mitk::IntProperty::Pointer intProp = mitk::IntProperty::New(FIRST_VALUE);
-  list1->SetProperty("int", intProp);
-  
-  // second list
-  mitk::DataTreeNode::Pointer list2 = mitk::DataTreeNode::New();
-  // insert the same property as in list1
-  list2->SetProperty("int", intProp);
-
-  // everything ok?
-  mitk::IntProperty* ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int") );
-
-  if (!ip1)
-  {
-    std::cout << "  IntProperty got lost after SetProperty()" << std::endl;
-    return false;
-  }
-
-  if (ip1->GetValue() != FIRST_VALUE)
-  {
-    std::cout << "  IntProperty got changed SetProperty()" << std::endl;
-    return false;
-   }
-  
-  mitk::IntProperty* ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
-
-  if (ip1 != ip2)
-  {
-    std::cout << "  pointers to IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
-
-  if (ip1->GetValue() != ip2->GetValue())
-  {
-    std::cout << "  IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
-
-  ip1->SetValue(SECOND_VALUE);
-  if (ip1->GetValue() != ip2->GetValue())
-  {
-    std::cout << "  IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
- 
-  std::cout << "Writing lists to file" << std::endl;
-  // write to file
-  {
-    // build a small data tree to write to file
-    mitk::DataTree::Pointer tree = mitk::DataTree::New();
-    mitk::DataTreePreOrderIterator iter(tree);
-    iter.Add(list1);
-    iter.Add(list2);
-
-    mitk::DataTree::Save(&iter, "tempfile", false);
-  }
-  
-  std::cout << "Load lists from file again" << std::endl;
-  // read from file
-  mitk::DataTree::Pointer tree = mitk::DataTree::New();
-  mitk::DataTreePreOrderIterator iter(tree);
-  mitk::DataTree::Load(&iter, "tempfile");
-
-  iter.GoToBegin();
-
-  ++iter;
-  list1 = iter.Get();
-  ++iter;
-  list2 = iter.Get();
-
-  std::cout << "Test if everything is still as before writing..." << std::endl;
-   // everything ok?
-
-  ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int"));
-  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
-
-  if (!ip1)
-  {
-    std::cout << "  IntProperty got lost after write/read to file" << std::endl;
-    return false;
-  }
-
-  if (ip1->GetValue() != SECOND_VALUE)
-  {
-    std::cout << "  IntProperty got changed write/read to file" << std::endl;
-    return false;
-   }
-  
-  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
-
-  if (ip1 != ip2)
-  {
-    std::cout << "  pointers to IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
-
-  if (ip1->GetValue() != ip2->GetValue())
-  {
-    std::cout << "  IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
-
-  ip1->SetValue(FIRST_VALUE);
-  if (ip1->GetValue() != ip2->GetValue())
-  {
-    std::cout << "  IntProperties somehow corrupted" << std::endl;
-    return false;
-  }
-  
-  return true;
-}
+/// \TODO DataTree based scene writing is deprecated and will be replaced by a new mechanism. Therefore
+/// This test case is disabled for now.
+//bool TestXMLWriter()
+//{
+//#define FIRST_VALUE  5
+//#define SECOND_VALUE 325
+//
+//  std::cout << "Testing to share properties between two PropertyLists..." << std::endl;
+//
+//  // first list
+//  mitk::DataTreeNode::Pointer list1 = mitk::DataTreeNode::New();
+//  // insert an IntProperty
+//  mitk::IntProperty::Pointer intProp = mitk::IntProperty::New(FIRST_VALUE);
+//  list1->SetProperty("int", intProp);
+//  
+//  // second list
+//  mitk::DataTreeNode::Pointer list2 = mitk::DataTreeNode::New();
+//  // insert the same property as in list1
+//  list2->SetProperty("int", intProp);
+//
+//  // everything ok?
+//  mitk::IntProperty* ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int") );
+//
+//  if (!ip1)
+//  {
+//    std::cout << "  IntProperty got lost after SetProperty()" << std::endl;
+//    return false;
+//  }
+//
+//  if (ip1->GetValue() != FIRST_VALUE)
+//  {
+//    std::cout << "  IntProperty got changed SetProperty()" << std::endl;
+//    return false;
+//   }
+//  
+//  mitk::IntProperty* ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
+//
+//  if (ip1 != ip2)
+//  {
+//    std::cout << "  pointers to IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+//
+//  if (ip1->GetValue() != ip2->GetValue())
+//  {
+//    std::cout << "  IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+//
+//  ip1->SetValue(SECOND_VALUE);
+//  if (ip1->GetValue() != ip2->GetValue())
+//  {
+//    std::cout << "  IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+// 
+//  std::cout << "Writing lists to file" << std::endl;
+//  // write to file
+//  {
+//    // build a small data tree to write to file
+//    mitk::DataTree::Pointer tree = mitk::DataTree::New();
+//    mitk::DataTreePreOrderIterator iter(tree);
+//    iter.Add(list1);
+//    iter.Add(list2);
+//
+//    mitk::DataTree::Save(&iter, "tempfile", false);
+//  }
+//  
+//  std::cout << "Load lists from file again" << std::endl;
+//  // read from file
+//  mitk::DataTree::Pointer tree = mitk::DataTree::New();
+//  mitk::DataTreePreOrderIterator iter(tree);
+//  mitk::DataTree::Load(&iter, "tempfile");
+//
+//  iter.GoToBegin();
+//
+//  ++iter;
+//  list1 = iter.Get();
+//  ++iter;
+//  list2 = iter.Get();
+//
+//  std::cout << "Test if everything is still as before writing..." << std::endl;
+//   // everything ok?
+//
+//  ip1 = dynamic_cast<mitk::IntProperty*>( list1->GetProperty("int"));
+//  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
+//
+//  if (!ip1)
+//  {
+//    std::cout << "  IntProperty got lost after write/read to file" << std::endl;
+//    return false;
+//  }
+//
+//  if (ip1->GetValue() != SECOND_VALUE)
+//  {
+//    std::cout << "  IntProperty got changed write/read to file" << std::endl;
+//    return false;
+//   }
+//  
+//  ip2 = dynamic_cast<mitk::IntProperty*>( list2->GetProperty("int"));
+//
+//  if (ip1 != ip2)
+//  {
+//    std::cout << "  pointers to IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+//
+//  if (ip1->GetValue() != ip2->GetValue())
+//  {
+//    std::cout << "  IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+//
+//  ip1->SetValue(FIRST_VALUE);
+//  if (ip1->GetValue() != ip2->GetValue())
+//  {
+//    std::cout << "  IntProperties somehow corrupted" << std::endl;
+//    return false;
+//  }
+//  
+//  return true;
+//}
 
 int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
 {
@@ -249,11 +251,11 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout << "[PASSED]" << std::endl;
   
-  std::cout << "Testing output of PropertyList to file: ";
-  if ( TestXMLWriter() )
-    std::cout << "[PASSED]" << std::endl;
-  else
-    return EXIT_FAILURE;
+  //std::cout << "Testing output of PropertyList to file: ";
+  //if ( TestXMLWriter() )
+  //  std::cout << "[PASSED]" << std::endl;
+  //else
+  //  return EXIT_FAILURE;
   
   std::cout << "Testing GetPropertyValue(bool): ";
   mitk::BoolProperty::Pointer gpvTest = mitk::BoolProperty::New(true);

@@ -28,7 +28,7 @@ namespace mitk {
   //##Documentation
   //## @brief Property containing a smart-pointer
   //##
-  //## @ingroup DataTree
+  //## @ingroup DataManagement
   class MITK_CORE_EXPORT WeakPointerProperty : public BaseProperty
   {
   public:

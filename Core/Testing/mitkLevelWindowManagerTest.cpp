@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkLevelWindowManager.h"
-#include "mitkDataStorage.h"
+#include "mitkStandaloneDataStorage.h"
 
 int mitkLevelWindowManagerTest(int, char* [])
 {
@@ -30,15 +30,16 @@ int mitkLevelWindowManagerTest(int, char* [])
   }
   std::cout<<"[PASSED]"<<std::endl;
    
-  mitk::DataTree::Pointer datatree = mitk::DataTree::New();
-  mitk::DataStorage::CreateInstance(datatree);
-
-  std::cout << "Testing mitk::LevelWindowManager SetDataTree ";
-  manager->SetDataTree(datatree);
+  std::cout << "Creating DataStorage: ";
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing mitk::LevelWindowManager GetDataTree ";
-  if (datatree != manager->GetDataTree())
+  std::cout << "Testing mitk::LevelWindowManager SetDataStorage ";
+  manager->SetDataStorage(ds);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  std::cout << "Testing mitk::LevelWindowManager GetDataStorage ";
+  if (ds != manager->GetDataStorage())
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -93,6 +94,5 @@ int mitkLevelWindowManagerTest(int, char* [])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout<<"[TEST DONE]"<<std::endl;
-  mitk::DataStorage::ShutdownSingleton();  // Cleanup
   return EXIT_SUCCESS;
 }

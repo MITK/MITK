@@ -492,7 +492,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
        vtkRenderer* pickingRenderer = vtkRenderer::New();
        pickingRenderer->SetActiveCamera( );
       
-       DataStorage* dataStorage = DataStorage::GetInstance();
+       DataStorage* dataStorage = m_DataStorage;
        TNodePredicateDataType<Surface> isSurface;
 
        DataStorage::SetOfObjects::ConstPointer allSurfaces = dataStorage->GetSubset( isSurface );

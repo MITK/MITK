@@ -109,7 +109,7 @@ class QmitkIsoSurface : public QObject, public QmitkFunctionality
     float getThreshold();
 
     /*!
-     *  variable to count Surfaces and give it to name in DataTree
+     *  variable to count Surfaces and give it to name
      */
     int m_SurfaceCounter;
 

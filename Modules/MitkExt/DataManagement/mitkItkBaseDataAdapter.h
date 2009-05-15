@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 /**
- * \brief Small class to store itk::DataObjects in the mitk::DataTree.
+ * \brief Small class to store itk::DataObjects in the mitk::DataStorage.
  *
- * This class can used to store any itk::DataObject in the data tree.
+ * This class can used to store any itk::DataObject in the DataStorage.
  * Please be aware that these objects cannot be visualized via mappers.
  * The user of this class must care himself for type safety.
  **/

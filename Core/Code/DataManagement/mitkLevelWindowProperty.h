@@ -27,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Property for level/window data
 //##
-//## @ingroup DataTree
+//## @ingroup DataManagement
 class MITK_CORE_EXPORT LevelWindowProperty : public BaseProperty
 {
 

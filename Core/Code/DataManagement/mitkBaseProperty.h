@@ -26,9 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-/*! @brief Abstract base class for properties
+/*! \brief Abstract base class for properties
     
-  @ingroup DataTree
+  \ingroup DataManagement
 
     Base class for properties. Properties are arbitrary additional information
     (to define a new type of information you have to define a subclass of

@@ -25,7 +25,7 @@ namespace mitk {
 
 /*! @brief Property class that has no value. 
     
-  @ingroup DataTree
+  @ingroup DataManagement
 
     The GroupTag property is used to tag a datatree node to show, that it is member of a 
     group of datatree nodes. This can be used to build groups of datatreenodes without the

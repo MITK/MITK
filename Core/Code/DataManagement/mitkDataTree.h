@@ -39,29 +39,29 @@ typedef itk::TreeContainer<mitk::DataTreeNode::Pointer> DataTreeBase;
 
 //##Documentation
 //## @brief typedef to a base-iterator on the data tree
-//## @ingroup DataTree
+//## @ingroup DataManagement
 typedef  itk::TreeIteratorBase<DataTreeBase> DataTreeIteratorBase;
 
 //##Documentation
 //## @brief typedef to an iterator on the data tree
-//## @ingroup DataTree
+//## @ingroup DataManagement
 typedef  itk::TreeIteratorClone<DataTreeIteratorBase> DataTreeIteratorClone;
 
 //##Documentation
 //## @brief typedef to a preorder-iterator on the data tree
-//## @ingroup DataTree
+//## @ingroup DataManagement
 typedef  itk::PreOrderTreeIterator<DataTreeBase> DataTreePreOrderIterator;
 
 //##Documentation
 //## @brief typedef to a children-iterator on the data tree
-//## @ingroup DataTree
+//## @ingroup DataManagement
 typedef  itk::ChildTreeIterator<DataTreeBase> DataTreeChildIterator;
 
 typedef  itk::TreeChangeEvent<DataTreeBase> DataTreeChangeEvent;
 
 //##Documentation
 //## @brief Main run-time data management class defining a data tree
-//## @ingroup DataTree
+//## @ingroup DataManagement
 class MITK_CORE_EXPORT DataTree : public DataTreeBase
 {
 

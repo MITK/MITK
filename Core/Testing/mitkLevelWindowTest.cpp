@@ -595,68 +595,7 @@ int mitkLevelWindowTest(int, char* [])
   levWin->ResetDefaultLevelWindow();
   std::cout<<"[PASSED]"<<std::endl;
 
-
-
-
-
   // auch für default levelwindow und default range
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   //Create Image out of nowhere
 	mitk::Image::Pointer image;
@@ -693,24 +632,6 @@ int mitkLevelWindowTest(int, char* [])
   delete levWin;
   delete lw;
   std::cout<<"[PASSED]"<<std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

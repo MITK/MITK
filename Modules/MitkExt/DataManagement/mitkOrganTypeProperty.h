@@ -30,7 +30,7 @@ namespace mitk
 
   \sa QmitkInteractiveSegmentation
   \ingroup Reliver
-  \ingroup DataTree
+  \ingroup DataManagement
 
   Last contributor $Author$
 */

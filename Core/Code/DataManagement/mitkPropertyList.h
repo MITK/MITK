@@ -60,7 +60,7 @@ class XMLWriter;
  * method will try to change the value of an existing property and will
  * not allow you to replace e.g. a ColorProperty with an IntProperty.
  * 
- * @ingroup DataTree
+ * @ingroup DataManagement
  */
 class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
 {

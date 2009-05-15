@@ -54,16 +54,15 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   node->SetData(image);
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Creating tree: ";
-  mitk::DataTree::Pointer tree;
-  tree=mitk::DataTree::New();
+  std::cout << "Creating DataStorage: ";
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing reference count of tree: ";
-  mitk::ReferenceCountWatcher::Pointer treeWatcher = new mitk::ReferenceCountWatcher(tree, "tree");
-  if(treeWatcher->GetReferenceCount()!=1)
+  mitk::ReferenceCountWatcher::Pointer dsWatcher = new mitk::ReferenceCountWatcher(ds, "DataStorage");
+  if(dsWatcher->GetReferenceCount() != 1)
   {
-    std::cout<<treeWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
+    std::cout << dsWatcher->GetReferenceCount()<<"!=1 [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
@@ -77,12 +76,9 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Creating iterator on tree: ";
-  mitk::DataTreePreOrderIterator it(tree);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Adding node via iterator: ";
-  it.Add(node);
+  std::cout << "Adding node via DataStorage: ";
+  ds->Add(node);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding level-window property: ";
@@ -99,7 +95,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "BaseRenderer::SetData(iterator): ";
-  propRenderer->SetData(&it);
+  propRenderer->SetDataStorage(ds);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing reference count of node: ";
@@ -167,13 +163,13 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout << "Deleting renderwindow, node and tree: ";
   renderWindow->Delete();
   node = NULL;
-  tree = NULL;
+  ds = NULL;
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing reference count of tree: ";
-  if(treeWatcher->GetReferenceCount()!=0)
+  if(dsWatcher->GetReferenceCount() != 0)
   {
-    std::cout<<treeWatcher->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
+    std::cout << ds->GetReferenceCount()<<"!=0 [FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;

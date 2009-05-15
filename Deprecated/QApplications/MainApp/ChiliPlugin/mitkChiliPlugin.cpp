@@ -166,9 +166,7 @@ mitk::ChiliPlugin::~ChiliPlugin()
   m_MITKMainApp->parent()->removeChild( m_MITKMainApp );
   m_MITKMainApp->reparent(NULL, 0, QPoint(0,0));
   delete m_MITKMainApp;
-  
-  // delete DataStorage singleton
-  mitk::DataStorage::GetInstance()->ShutdownSingleton();
+
 */
 
   m_ReferenceCountLock.Lock();

@@ -31,8 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 /**
- * @brief Property for annotations
- * @ingroup DataTree
+ * \brief Property for annotations
+ * \ingroup DataManagement
  */
 class MITK_CORE_EXPORT AnnotationProperty : public BaseProperty
 {

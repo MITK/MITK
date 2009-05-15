@@ -22,15 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
-#include "mitkDataTreeStorage.h"
 
 #include "itkCommand.h"
 
-mitk::DataStorage::Pointer mitk::DataStorage::s_Instance = NULL;
 
-
-mitk::DataStorage::DataStorage() 
-: itk::Object()
+mitk::DataStorage::DataStorage() : itk::Object()
 , m_BlockNodeModifiedEvents(false)
 {
 }
@@ -38,50 +34,12 @@ mitk::DataStorage::DataStorage()
 
 mitk::DataStorage::~DataStorage()
 {
-  // workaround for bug #343: do another UnRegister in case we re-create a DataStorage 
-  // which happens when a PlugIn is re-initialized within Chili
-  if(s_Instance.IsNotNull())
-  {
-    mitk::DataTreeStorage* dts = dynamic_cast<mitk::DataTreeStorage*>(s_Instance.GetPointer());
-    if(dts)
-      dts->m_DataTree->UnRegister();
-  }
-}
-
-
-mitk::DataStorage* mitk::DataStorage::CreateInstance(mitk::DataTree* tree)
-{
-  if(s_Instance.IsNotNull())
-  {
-    throw std::logic_error("__FILE__ l. __LINE__ DataStorage instance already exists! CreateInstance should only be called once.");
-  } 
-  try
-  {
-    mitk::DataTreeStorage::Pointer dts = mitk::DataTreeStorage::New();
-    dts->Initialize(tree);   // If no DataStorage created yet, and tree is NULL, then this will raise an exception, because the DataStorage must be initialized with a DataTree
-    s_Instance = dts;
-  }
-  catch(...)
-  {
-    s_Instance = NULL;
-    throw 1;  // insert exception handling here
-  }
-  return s_Instance;
-}
-
-
-mitk::DataStorage* mitk::DataStorage::GetInstance()
-{
-  if (DataStorage::s_Instance.IsNull())
-  {
-      itkGenericOutputMacro("Trying to use mitk::DataStorage::GetInstance() " 
-        << "without an available singleton instance. Either no instance has "
-        << "been created (use DataStorage::CreateInstance) or it has already "
-        << "been destroyed.");
-      return NULL;
-  }
-  else  
-    return s_Instance;
+  ///// we can not call GetAll() in destructor, because it is implemented in a subclass
+  //SetOfObjects::ConstPointer all = this->GetAll();
+  //for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
+  //  this->RemoveListeners(it->Value());
+  //m_NodeModifiedObserverTags.clear();
+  //m_NodeDeleteObserverTags.clear();
 }
 
 
@@ -218,12 +176,6 @@ const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 }
 
 
-void mitk::DataStorage::ShutdownSingleton()
-{
-  s_Instance = NULL; 
-}
-
-
 void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataTreeNode* node)
 {
   AddNodeEvent.Send(node);
@@ -251,6 +203,7 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
   }
 }
 
+
 void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 {
   // node must not be 0 and must not be yet registered
@@ -270,6 +223,7 @@ void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
     m_NodeDeleteObserverTags[_Node] = _Node->AddObserver(itk::DeleteEvent(), deleteCommand);
   }
 }
+
 
 void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 {
@@ -308,27 +262,20 @@ mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const Se
   {
     DataTreeNode::Pointer node = it->Value();
     if (node.IsNull())
-    {
       continue;
-    }
     if (node->GetData() == NULL)
-    {
       continue;
-    }
     if (node->GetData()->IsEmpty())
-    {
       continue;
-    }
 
     const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
     if (geometry == NULL ) 
-    {
       continue;
-    }
+
 
     // bounding box
 
-    for( int i = 0; i < 8; ++i)
+    for(int i = 0; i < 8; ++i)
     {
       point = geometry->GetCornerPoint(i);
       if (point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < large)
@@ -509,10 +456,12 @@ mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const ch
   return geometry;
 }
 
+
 mitk::Geometry3D::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
 {
   return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
 }
+
 
 mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
@@ -557,6 +506,7 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
   return result;
 }
 
+
 mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
   TimeBounds timeBounds;
@@ -594,12 +544,10 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
       }
     }
   }
-
-  if(!(timeBounds[0]<stmax))
+  if(!(timeBounds[0] < stmax))
   {
     timeBounds[0] = stmin;
     timeBounds[1] = stmax;
   }
-
   return timeBounds;
 }

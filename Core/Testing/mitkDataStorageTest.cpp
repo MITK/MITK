@@ -42,8 +42,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 void TestDataStorage(mitk::DataStorage* ds);
-//void TestDataTreeStorage(mitk::DataTreeStorage* ds, mitk::DataTree* tree);
-
 
 class DSEventReceiver // Helper class for event testing
 {

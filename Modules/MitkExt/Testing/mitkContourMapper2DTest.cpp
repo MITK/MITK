@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkContourMapper2D.h"
 #include "mitkCommon.h"
-#include "mitkDataTree.h"
+#include "mitkStandaloneDataStorage.h"
 
 #include "mitkVtkPropRenderer.h"
 
@@ -51,16 +51,15 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   mitk::Contour* testContour = (mitk::Contour*)contourMapper->GetInput();
   std::cout << testContour << std::endl;
   
-  mitk::DataTree::Pointer dataTree = mitk::DataTree::New();
-  mitk::DataTreePreOrderIterator it(dataTree);
+  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-  it.Add( node );
+  ds->Add( node );
 
-  mitk::BoundingBox::Pointer bounds = mitk::DataTree::ComputeBoundingBox(&it);
+  mitk::BoundingBox::Pointer bounds = ds->ComputeBoundingBox();
 
   std::cout << "bounds: " << bounds << std::endl;
 
-  bounds = mitk::DataTree::ComputeVisibleBoundingBox(&it);
+  bounds = ds->ComputeVisibleBoundingBox();
   std::cout << "visible bounds: " << bounds << std::endl;
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
@@ -69,7 +68,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
 
-  renderer->SetData(&it);
+  renderer->SetDataStorage(ds);
 
   std::cout<<"[TEST DONE]"<<std::endl;
 

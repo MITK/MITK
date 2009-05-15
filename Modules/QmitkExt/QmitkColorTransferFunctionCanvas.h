@@ -22,7 +22,7 @@
 
 #include <vtkColorTransferFunction.h>
 
-class QMITK_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
+class QMITKEXT_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

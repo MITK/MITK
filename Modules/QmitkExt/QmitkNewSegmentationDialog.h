@@ -39,7 +39,7 @@ class QPushButton;
 
   Last contribution by $Author: maleike $.
 */
-class QMITK_EXPORT QmitkNewSegmentationDialog : public QDialog
+class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 

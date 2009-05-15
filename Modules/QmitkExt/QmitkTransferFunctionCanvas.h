@@ -28,7 +28,7 @@
 
 #include <mitkCommon.h>
 
-class QMITK_EXPORT QmitkTransferFunctionCanvas : public QWidget
+class QMITKEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
 
   Q_OBJECT

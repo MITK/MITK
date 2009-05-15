@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
   Last contributor: $Author$
 */
 
-class QMITK_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class QMITKEXT_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 

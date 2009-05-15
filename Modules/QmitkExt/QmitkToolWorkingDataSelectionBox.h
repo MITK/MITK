@@ -45,7 +45,7 @@ class QCustomEvent;
 
   $Author: maleike $
 */
-class QMITK_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
+class QMITKEXT_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
 {
   Q_OBJECT
 

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+class QMITKEXT_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

@@ -32,7 +32,7 @@ class QSlider;
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
+class QMITKEXT_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

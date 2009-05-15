@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   For output of any kind of information that might be copied into other applications.
 */
-class QMITK_EXPORT QmitkCopyToClipBoardDialog : public QDialog
+class QMITKEXT_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 {
   Q_OBJECT
 

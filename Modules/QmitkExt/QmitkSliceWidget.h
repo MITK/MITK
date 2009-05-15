@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QWidget>
 
-class QMITK_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
+class QMITKEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
 {
   Q_OBJECT
   

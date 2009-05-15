@@ -197,24 +197,24 @@ namespace CommonFunctionality
   * \brief converts the itk image to mitk image, creates a datatreenode and adds the node to 
   * the referenced datatree
   */
-  QMITK_EXPORT mitk::DataTreeNode::Pointer AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIteratorBase* iterator, std::string str);
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer AddVtkMeshToDataTree(vtkPolyData* polys, mitk::DataTreeIteratorBase* iterator, std::string str);
 
   /**
   * \brief creates a datatreenode for th PIC image and adds the node to 
   * the referenced datatree
   */
-  QMITK_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
 
-  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
-  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const char *fileExtensions );
-  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
-  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence();
-  QMITK_EXPORT mitk::DataTreeNode::Pointer FileOpen();
-  QMITK_EXPORT mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack();
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const char *fileExtensions );
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence();
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpen();
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack();
 
-  QMITK_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
+  QMITKEXT_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 
-  QMITK_EXPORT std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
+  QMITKEXT_EXPORT std::string SaveSurface(mitk::Surface* surface, const char* fileName = NULL);
   
   /**
    * Saves a screenshot of the given renderer in a file.
@@ -226,18 +226,18 @@ namespace CommonFunctionality
    *                     of the screen shot
    * @returns the filename of the saved file
    */
-  QMITK_EXPORT std::string SaveScreenshot( vtkRenderWindow* renderWindow , const char* filename = NULL );
+  QMITKEXT_EXPORT std::string SaveScreenshot( vtkRenderWindow* renderWindow , const char* filename = NULL );
 
-  QMITK_EXPORT void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
+  QMITKEXT_EXPORT void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
 
   // internal vessel graph save code removed ...
   
-  QMITK_EXPORT void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
+  QMITKEXT_EXPORT void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
-  QMITK_EXPORT mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
+  QMITKEXT_EXPORT mitk::DataTreeIteratorBase* GetIteratorToFirstImage(mitk::DataTreeIteratorBase* dataTreeIterator);
 
-  QMITK_EXPORT mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
-  QMITK_EXPORT mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
+  QMITKEXT_EXPORT mitk::DataTreeIteratorBase* GetIteratorToFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
+  QMITKEXT_EXPORT mitk::Image* GetFirstImageInDataTree(mitk::DataTree::Pointer dataTree);
 
   /**
   * Checks if the filename is valid for writing. This includes checking whether the file already exists. 
@@ -245,7 +245,7 @@ namespace CommonFunctionality
   * @param filename the filename, under which the file should be saved. 
   * @returns true if the filename is valid for writing  
   */
-  QMITK_EXPORT bool IsFilenameValidForWriting(const char* aFileName);
+  QMITKEXT_EXPORT bool IsFilenameValidForWriting(const char* aFileName);
 
 
   /**
@@ -389,7 +389,7 @@ namespace CommonFunctionality
    * @param property the value of the property we want to search for in the data tree
    * @returns the first node in the data tree which matches propertyKey and property, or NULL otherwise.
    */
-  QMITK_EXPORT mitk::DataTreeNode* GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
+  QMITKEXT_EXPORT mitk::DataTreeNode* GetFirstNodeByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
 
   /**
    * Searches for the first data object in the data tree, whose node matches a given 
@@ -401,7 +401,7 @@ namespace CommonFunctionality
    * @param property the value of the property we want to search for in the data tree
    * @returns the first data object in the data tree whose node matches propertyKey and property, or NULL otherwise.
    */
-  QMITK_EXPORT mitk::BaseData* GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
+  QMITKEXT_EXPORT mitk::BaseData* GetFirstDataByProperty( mitk::DataTreeIteratorClone it, std::string propertyKey, mitk::BaseProperty* property );
   /**
    * Searches for the node in the data tree which holds a given mitk::BaseData 
    * @param it an iterator pointing to the position in the data tree, where
@@ -409,7 +409,7 @@ namespace CommonFunctionality
    * @param data the data object, for which the node in the tree should be searched.
    * @returns the node holding data, or NULL otherwise.
    */
-  QMITK_EXPORT mitk::DataTreeNode* GetNodeForData( mitk::DataTreeIteratorClone it, mitk::BaseData* data );
+  QMITKEXT_EXPORT mitk::DataTreeNode* GetNodeForData( mitk::DataTreeIteratorClone it, mitk::BaseData* data );
 
   template <typename BaseDataType>
   static DataTreeNodeVector GetNodesForDataType(mitk::DataTreeIteratorClone it)
@@ -476,6 +476,6 @@ namespace CommonFunctionality
   }
 
 
-  QMITK_EXPORT DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*));
+  QMITKEXT_EXPORT DataTreeIteratorVector FilterNodes(mitk::DataTreeIteratorClone it, bool (* FilterFunction)(mitk::DataTreeNode*));
 };
 #endif // _CommonFunctionality__h_

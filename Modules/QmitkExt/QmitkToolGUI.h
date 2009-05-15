@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
   Last contributor: $Author$
 */
 
-class QMITK_EXPORT QmitkToolGUI : public QWidget, public itk::Object
+class QMITKEXT_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 {
   Q_OBJECT
 

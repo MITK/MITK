@@ -55,7 +55,7 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class QMITK_EXPORT QmitkSlicesInterpolator : public Q3VBox
+class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
 {
   Q_OBJECT
 

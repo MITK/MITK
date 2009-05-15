@@ -32,7 +32,7 @@
 * @see QwtPlot
 */
 
-class QMITK_EXPORT QmitkPlotWidget: public QWidget 
+class QMITKEXT_EXPORT QmitkPlotWidget: public QWidget 
 {
 
 public:

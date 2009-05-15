@@ -10,7 +10,7 @@
 
 #include <mitkDataTreeNode.h>
 
-class QMITK_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
+class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
 
 	Q_OBJECT

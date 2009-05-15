@@ -35,7 +35,7 @@ class QFrame;
 
   Last contributor: $Author$
 */
-class QMITK_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
+class QMITKEXT_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

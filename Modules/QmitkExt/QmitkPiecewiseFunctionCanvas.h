@@ -22,7 +22,7 @@
 
 #include <vtkPiecewiseFunction.h>
 
-class QMITK_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
+class QMITKEXT_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

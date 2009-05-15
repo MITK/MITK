@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLineEdit>
 
 /// @ingroup Widgets
-class QMITK_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
+class QMITKEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
 {
   Q_OBJECT
 

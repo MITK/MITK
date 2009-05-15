@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
  Offers zoom possibility. 
  A marker can be set and shows the frequency at his position.
  */
-class QMITK_EXPORT QmitkHistogramWidget: public QDialog
+class QMITKEXT_EXPORT QmitkHistogramWidget: public QDialog
 {
   Q_OBJECT
 

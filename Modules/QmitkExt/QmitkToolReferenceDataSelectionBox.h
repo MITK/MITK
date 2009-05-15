@@ -43,7 +43,7 @@ The reference image can be selected from a combobox, where all images of the sce
 
 $Author: maleike $
 */
-class QMITK_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
+class QMITKEXT_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
 {
   Q_OBJECT
 

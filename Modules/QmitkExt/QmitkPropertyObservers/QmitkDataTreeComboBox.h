@@ -117,7 +117,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 */
 
-class QMITK_EXPORT QmitkDataTreeComboBox : public QComboBox
+class QMITKEXT_EXPORT QmitkDataTreeComboBox : public QComboBox
 {
   Q_OBJECT;
 

@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QWidget>
 #include <QString>
 
-class QMITK_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
+class QMITKEXT_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
 {
   Q_OBJECT
   

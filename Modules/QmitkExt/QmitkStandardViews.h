@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QClickableLabel;
 class vtkRenderWindow;
 
-class QMITK_EXPORT QmitkStandardViews : public QWidget 
+class QMITKEXT_EXPORT QmitkStandardViews : public QWidget 
 {
 
   Q_OBJECT

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLabel>
 
 /// @ingroup Widgets
-class QMITK_EXPORT QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
+class QMITKEXT_EXPORT QmitkNumberPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ decimalPlaces WRITE setDecimalPlaces )

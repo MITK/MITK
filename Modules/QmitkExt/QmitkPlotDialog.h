@@ -27,7 +27,7 @@
 *    the QwtPlot instance using the method GetQwtPlot().
 * @see QwtPlot, @see QmitkPlotWidget
 */
-class QMITK_EXPORT QmitkPlotDialog: public QDialog 
+class QMITKEXT_EXPORT QmitkPlotDialog: public QDialog 
 {
 
 public:

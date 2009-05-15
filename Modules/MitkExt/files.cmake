@@ -158,8 +158,8 @@ SET(CPP_FILES
   Rendering/mitkSplineMapper2D.cpp
   Rendering/mitkSplineVtkMapper3D.cpp
   Rendering/mitkUnstructuredGridMapper2D.cpp
-  # Rendering/mitkUnstructuredGridVtkMapper3D.cpp
-  # Rendering/vtkUnstructuredGridMapper.cpp
+  Rendering/mitkUnstructuredGridVtkMapper3D.cpp
+  Rendering/vtkUnstructuredGridMapper.cpp
 )
 
 # Segmentation (or related) tools for interactive segmentation view

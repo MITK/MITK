@@ -7,7 +7,7 @@
 #include <itkConnectedThresholdImageFilter.h>
 
 #include <mitkImageAccessByItk.h>
-#include <mitkDataTreeHelper.h>
+#include <mitkLevelWindowProperty.h>
 
 template < typename TPixel, unsigned int VImageDimension >
 void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 )
@@ -27,7 +27,6 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   smoothingFilter->SetInput( itkImage );
   smoothingFilter->SetNumberOfIterations( 4 );
   smoothingFilter->SetTimeStep( 0.0625 );
-  
  
   // create itk::ConnectedThresholdImageFilter and set filtered image as input
   typedef itk::ConnectedThresholdImageFilter< InternalImageType, ImageType > RegionGrowingFilterType;
@@ -43,21 +42,35 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   // to the RegionGrower
   mitk::PointSet::PointsConstIterator pit, pend = step6->m_Seeds->GetPointSet()->GetPoints()->End();
   IndexType seedIndex;
-  for(pit=step6->m_Seeds->GetPointSet()->GetPoints()->Begin();pit!=pend;++pit)
+  for (pit = step6->m_Seeds->GetPointSet()->GetPoints()->Begin(); pit != pend; ++pit)
   {
     geometry->WorldToIndex(pit.Value(), seedIndex);
     regGrowFilter->AddSeed( seedIndex );
   }
+  
+  regGrowFilter->GetOutput()->Update();
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  mitk::CastToMitkImage(regGrowFilter->GetOutput(), mitkImage);
 
-  // add output of RegionGrower to tree
-  mitk::DataTreePreOrderIterator it(step6->m_Tree);
-  step6->m_ResultNode = mitk::DataTreeHelper::AddItkImageToDataTree(regGrowFilter->GetOutput(), &it, "segmentation");
-  step6->m_ResultImage = static_cast<mitk::Image*>(step6->m_ResultNode->GetData());
+  if (step6->m_ResultNode.IsNull())
+  {
+    step6->m_ResultNode = mitk::DataTreeNode::New();
+    step6->m_DataStorage->Add(step6->m_ResultNode);
+  }
+  step6->m_ResultNode->SetData(mitkImage);
   // set some additional properties
+  step6->m_ResultNode->SetProperty("name", mitk::StringProperty::New("segmentation"));
   step6->m_ResultNode->SetProperty("binary", mitk::BoolProperty::New(true));
   step6->m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
   step6->m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
   step6->m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
+  mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+  mitk::LevelWindow levelwindow;
+  levelwindow.SetAuto( mitkImage );
+  levWinProp->SetLevelWindow( levelwindow );
+  step6->m_ResultNode->SetProperty( "levelwindow", levWinProp );
+  
+  step6->m_ResultImage = static_cast<mitk::Image*>(step6->m_ResultNode->GetData());
 }
 
 /**

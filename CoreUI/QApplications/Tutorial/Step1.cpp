@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Initialize the RenderWindow
-  mitk::RenderingManager::GetInstance()->InitializeViews( ds );
+  mitk::RenderingManager::GetInstance()->InitializeViews();
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();

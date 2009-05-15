@@ -44,7 +44,7 @@ void Step8::SetupWidgets()
 
   // Initialize views as transversal, sagittal, coronar (from
   // top-left to bottom)
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_DataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViews();
 
   // Initialize bottom-right view as 3D view
   multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );

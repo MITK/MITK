@@ -9,6 +9,7 @@
 #                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [CMAKE_CACHE_PREFIX cache_prefix]
 #                       [ENABLE_PLUGIN_MACROS _enable_macros]
+#                       [DEFAULT_BUILD_ON]
 #                       [FORCE_BUILD_ALL]
 #                       )
 #
@@ -39,6 +40,9 @@
 # the macro is (<bundle-symbolicname>) and the macro must set the variable
 # ENABLE_PLUGIN to true or false. For Qt4, a default macro is provided.
 #
+# DEFAULT_BUILD_ON if set, the generated CMake option for building plug-ins
+# defaults to ON. Otherwise, it is set to OFF.
+#
 # FORCE_BUILD_ALL if set, the BUILD_pluginname variables are ignored and all
 # plugins under this directory are build
 #
@@ -46,7 +50,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "DEFAULT_BUILD_ON;FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -114,7 +118,7 @@ FOREACH(dir_entry ${all_dirs})
 SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
 SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
       
-      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" OFF)
+      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ${_COLLECT_DEFAULT_BUILD_ON})
       IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND _plugins_to_build "${dir_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})

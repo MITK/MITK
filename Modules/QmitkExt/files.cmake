@@ -50,18 +50,18 @@ SET(CPP_FILES
  
  #QmitkLevelWindowPresetDefinitionDialog.cpp
  # QmitkLevelWindowWidgetContextMenu.cpp
- QmitkSliceWidget.cpp
+ # QmitkSliceWidget.cpp
  # QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
  QmitkSelectableGLWidget.cpp
- QmitkToolReferenceDataSelectionBox.cpp
- QmitkToolGUIArea.cpp
- QmitkToolWorkingDataSelectionBox.cpp
- QmitkToolSelectionBox.cpp
- QmitkPropertyListPopup.cpp
+ # QmitkToolReferenceDataSelectionBox.cpp
+ # QmitkToolGUIArea.cpp
+ # QmitkToolWorkingDataSelectionBox.cpp
+ # QmitkToolSelectionBox.cpp
+ # QmitkPropertyListPopup.cpp
  QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
- QmitkPaintbrushToolGUI.cpp
+ # QmitkPaintbrushToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
  # QmitkMaterialEditor.cpp
  # QmitkMaterialShowcase.cpp
@@ -101,21 +101,21 @@ SET(MOC_H_FILES
  QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
- QmitkSliceWidget.h
+ # QmitkSliceWidget.h
  QmitkSlicesInterpolator.h
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h
- QmitkToolGUIArea.h
+ # QmitkToolGUIArea.h
  QmitkToolGUI.h
- QmitkToolReferenceDataSelectionBox.h  
- QmitkToolSelectionBox.h  
- QmitkPropertyListPopup.h
- QmitkToolWorkingDataSelectionBox.h  
+ # QmitkToolReferenceDataSelectionBox.h  
+ # QmitkToolSelectionBox.h  
+ # QmitkPropertyListPopup.h
+ # QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h
- QmitkPaintbrushToolGUI.h
+ # QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkHistogramWidget.h
@@ -126,7 +126,7 @@ SET(UI_FILES
   # QmitkLevelWindowRangeChange.ui
   # QmitkLevelWindowPresetDefinition.ui
   # QmitkLevelWindowWidget.ui
-  QmitkSliceWidget.ui
+  # QmitkSliceWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
@@ -134,8 +134,8 @@ SET(UI_FILES
 
 # TODO TODO auf Qt4 anpassen
 SET(TOOL_QT4GUI_FILES
-  QmitkBinaryThresholdToolGUI.cpp
-  QmitkDrawPaintbrushToolGUI.cpp
-  QmitkErasePaintbrushToolGUI.cpp
-  QmitkCalculateGrayValueStatisticsToolGUI.cpp
+  # QmitkBinaryThresholdToolGUI.cpp
+  # QmitkDrawPaintbrushToolGUI.cpp
+  # QmitkErasePaintbrushToolGUI.cpp
+  # QmitkCalculateGrayValueStatisticsToolGUI.cpp
 )

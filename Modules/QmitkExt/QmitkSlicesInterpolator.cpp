@@ -433,11 +433,11 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   {
     if (on)
     {
-      mitk::DataStorage::GetInstance()->Add( m_FeedbackNode );
+      // mitk::DataStorage::GetInstance()->Add( m_FeedbackNode );
     }
     else
     {
-      mitk::DataStorage::GetInstance()->Remove( m_FeedbackNode );
+      // mitk::DataStorage::GetInstance()->Remove( m_FeedbackNode );
     }
   }
   catch(...)

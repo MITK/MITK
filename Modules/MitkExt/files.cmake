@@ -3,7 +3,7 @@ SET(CPP_FILES
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
-  Algorithms/mitkCalculateSegmentationVolume.cpp
+  # Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkCallbackFromGUIThread.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
@@ -44,9 +44,9 @@ SET(CPP_FILES
   Algorithms/mitkRegistrationBase.cpp
   Algorithms/mitkRigidRegistrationObserver.cpp
   Algorithms/mitkRigidRegistrationPreset.cpp
-  Algorithms/mitkSegmentationSink.cpp
+  # Algorithms/mitkSegmentationSink.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
-  Algorithms/mitkShowSegmentationAsSurface.cpp
+  # Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkSymmetricForcesDemonsRegistration.cpp
   Algorithms/mitkTransformParameters.cpp
@@ -122,24 +122,24 @@ SET(CPP_FILES
   Interactions/mitkConferenceEventMapper.cpp
   Interactions/mitkConnectPointsInteractor.cpp
   Interactions/mitkContourInteractor.cpp
-  Interactions/mitkContourTool.cpp
+  # Interactions/mitkContourTool.cpp
   #Interactions/mitkCoordinateSupplier.cpp
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkExtrudedContourInteractor.cpp
-  Interactions/mitkFeedbackContourTool.cpp
+  # Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
-  Interactions/mitkPaintbrushTool.cpp
+  # Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
   Interactions/mitkSeedsInteractor.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
-  Interactions/mitkSetRegionTool.cpp
+  # Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSocketClient.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
@@ -158,8 +158,8 @@ SET(CPP_FILES
   Rendering/mitkSplineMapper2D.cpp
   Rendering/mitkSplineVtkMapper3D.cpp
   Rendering/mitkUnstructuredGridMapper2D.cpp
-  Rendering/mitkUnstructuredGridVtkMapper3D.cpp
-  Rendering/vtkUnstructuredGridMapper.cpp
+  # Rendering/mitkUnstructuredGridVtkMapper3D.cpp
+  # Rendering/vtkUnstructuredGridMapper.cpp
 )
 
 # Segmentation (or related) tools for interactive segmentation view
@@ -170,7 +170,7 @@ SET(CPP_FILES
 SET( TOOL_FILES
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
-  Interactions/mitkBinaryThresholdTool.cpp
+  # Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkCalculateGrayValueStatisticsTool.cpp
   Interactions/mitkCalculateVolumetryTool.cpp
   Interactions/mitkCorrectorTool2D.cpp
@@ -182,6 +182,7 @@ SET( TOOL_FILES
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
 )
+SET( TOOL_FILES "")
 
 IF(WIN32)
   SET(CPP_FILES 

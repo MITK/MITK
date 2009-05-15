@@ -87,7 +87,7 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 
   if (visible)
   {
-    DataStorage::GetInstance()->Add( m_FeedbackContourNode );
+    // DataStorage::GetInstance()->Add( m_FeedbackContourNode );
   }
   else
   {

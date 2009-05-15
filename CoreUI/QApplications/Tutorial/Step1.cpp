@@ -3,6 +3,7 @@
 #include "QmitkRenderWindow.h"
 
 #include <mitkPicFileReader.h>
+#include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
@@ -26,13 +27,8 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a tree
-  // For now we need a DataTree to initialize a DataStorage later on. In the
-  // future, the DataStorage will be independent of the DataTree
-  mitk::DataTree::Pointer tree=mitk::DataTree::New();
-
   // Create a data storage object. We will use it as a singleton
-  mitk::DataStorage::CreateInstance(tree);
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
 
   //*************************************************************************
@@ -62,7 +58,7 @@ int main(int argc, char* argv[])
   node->SetData(reader->GetOutput());
 
   // Add the node to the DataStorage
-  mitk::DataStorage::GetInstance()->Add(node);
+  ds->Add(node);
 
 
   //*************************************************************************
@@ -73,10 +69,11 @@ int main(int argc, char* argv[])
   QmitkRenderWindow renderWindow;
 
   // Tell the RenderWindow which (part of) the datastorage to render
-  renderWindow.GetRenderer()->SetData(mitk::DataStorage::GetInstance());
+  renderWindow.GetRenderer()->SetDataStorage(ds);
 
   // Initialize the RenderWindow
-  mitk::RenderingManager::GetInstance()->InitializeViews( mitk::DataStorage::GetInstance() );
+  mitk::Geometry3D::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
@@ -96,9 +93,6 @@ int main(int argc, char* argv[])
   else
     return QtTesting();
 
-  // Release all resources used by the data storage and
-  // the datatree
-  mitk::DataStorage::ShutdownSingleton();
 }
 
 /**

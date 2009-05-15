@@ -1,3 +1,4 @@
+FIND_PACKAGE(openCherry)
 
 SET(TEST_BUNDLES
  org.opencherry.osgi

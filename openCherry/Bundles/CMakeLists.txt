@@ -6,4 +6,4 @@ MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${OPENCHERRY_BINARY_DIR}
                       BUNDLE_LIST_PATH "${OPENCHERRY_BINARY_DIR}/openCherryBundleList.cmake"
                       CMAKE_CACHE_PREFIX "OPENCHERRY"
                       DEFAULT_BUILD_ON
-                      ${BUILD_ALL_PLUGINS_OPTION})
+                      ${OPENCHERRY_BUILD_ALL_PLUGINS_OPTION})

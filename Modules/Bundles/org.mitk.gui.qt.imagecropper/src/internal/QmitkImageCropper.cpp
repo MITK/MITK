@@ -192,7 +192,7 @@ void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
       opExchangeNodes* op = static_cast<opExchangeNodes*>(operation);
       op->GetNode()->SetData(op->GetNewData());
       //!mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
-      mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDefaultDataStorage());
+      mitk::RenderingManager::GetInstance()->InitializeViews();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
@@ -213,7 +213,7 @@ void QmitkImageCropper::ImageSelectionChanged()
 
     m_ImageNode->SetVisibility(true);
     //!mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
-    mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDefaultDataStorage());
+    mitk::RenderingManager::GetInstance()->InitializeViews();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     m_Controls->m_NewBoxButton->setEnabled(false);
   }

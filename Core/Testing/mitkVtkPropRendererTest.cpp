@@ -76,7 +76,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating DataStorage: ";
-  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Adding node via DataStorage: ";

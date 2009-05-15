@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkDeformableRegistrationView.h"
@@ -97,7 +97,7 @@ void QmitkDeformableRegistrationView::CreateConnections()
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
-    
+
   connect(m_Controls.m_FixedReinit, SIGNAL(clicked()), this, SLOT(reinitFixedClicked()));
   connect(m_Controls.m_MovingReinit, SIGNAL(clicked()), this, SLOT(reinitMovingClicked()));
   connect(m_Controls.m_GlobalReinit, SIGNAL(clicked()), this, SLOT(globalReinitClicked()));
@@ -157,7 +157,7 @@ void QmitkDeformableRegistrationView::Activated()
   QmitkFunctionality::Activated();
   this->FixedSelected();
   this->MovingSelected();
-  this->OpacityUpdate(m_Opacity);  
+  this->OpacityUpdate(m_Opacity);
 }
 
 void QmitkDeformableRegistrationView::Deactivated()
@@ -256,7 +256,7 @@ void QmitkDeformableRegistrationView::FixedSelected(int)
       {
         if (m_FixedNode != NULL)
         {
-          m_FixedNode->SetVisibility(true); 
+          m_FixedNode->SetVisibility(true);
         }
       }
     }
@@ -336,7 +336,7 @@ void QmitkDeformableRegistrationView::MovingSelected(int)
       {
         if (m_MovingNode != NULL)
         {
-          m_MovingNode->SetVisibility(true); 
+          m_MovingNode->SetVisibility(true);
         }
       }
     }
@@ -483,7 +483,7 @@ void QmitkDeformableRegistrationView::globalReinitClicked()
 {
   if(m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDefaultDataStorage() );
+    mitk::RenderingManager::GetInstance()->InitializeViews();
   }
 }
 

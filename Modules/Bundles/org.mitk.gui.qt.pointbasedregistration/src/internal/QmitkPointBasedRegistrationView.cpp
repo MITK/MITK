@@ -49,10 +49,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject *parent, const char *name)
-: QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL), 
-m_FixedNode(NULL), m_SetInvisible(true), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0), m_NewMovingLayer(0), 
+: QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
+m_FixedNode(NULL), m_SetInvisible(true), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0), m_NewMovingLayer(0),
 m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
-m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0) 
+m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0)
 {
   m_FixedLandmarksChangedCommand = itk::SimpleMemberCommand<QmitkPointBasedRegistrationView>::New();
   m_FixedLandmarksChangedCommand->SetCallbackFunction(this, &QmitkPointBasedRegistrationView::updateFixedLandmarksList);
@@ -96,7 +96,7 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
 
   // define data type for moving image combobox
   m_Controls.m_MovingSelector->SetDataStorage( this->GetDefaultDataStorage() );
-  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );  
+  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
 
   // let the point set widget know about the multi widget (cross hair updates)
   m_Controls.m_FixedPointListWidget->SetMultiWidget( m_MultiWidget );
@@ -503,13 +503,13 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
 }
 
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
-{  
+{
   this->checkLandmarkError();
   this->CheckCalculate();
 }
 
 void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
-{  
+{
   this->checkLandmarkError();
   this->CheckCalculate();
 }
@@ -552,7 +552,7 @@ void QmitkPointBasedRegistrationView::HideMovingImage(bool hide)
 
 bool QmitkPointBasedRegistrationView::CheckCalculate()
 {
-  if((m_MovingPointSetNode.IsNull())||(m_FixedPointSetNode.IsNull()||m_FixedLandmarks.IsNull()||m_MovingLandmarks.IsNull())) 
+  if((m_MovingPointSetNode.IsNull())||(m_FixedPointSetNode.IsNull()||m_FixedLandmarks.IsNull()||m_MovingLandmarks.IsNull()))
     return false;
   if(m_MovingNode==m_FixedNode)
     return false;
@@ -801,7 +801,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
       mitk::Point3D pointSource=m_MovingLandmarks->GetPoint(pointId);
       vPointsSource->InsertNextPoint(pointSource[0],pointSource[1],pointSource[2]);
       vCellsSource->InsertNextCell(1, &pointId);
-    } 
+    }
 
     vtkPoints* vPointsTarget=vtkPoints::New();
     vtkCellArray* vCellsTarget = vtkCellArray::New();
@@ -844,10 +844,10 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
 
     double determinant = fabs(matrix->Determinant());
     if((determinant < mitk::eps) || (determinant > 100) || (determinant < 0.01)
-      || (determinant==itk::NumericTraits<double>::infinity()) 
+      || (determinant==itk::NumericTraits<double>::infinity())
       || (determinant==itk::NumericTraits<double>::quiet_NaN())
       || (determinant==itk::NumericTraits<double>::signaling_NaN())
-      || (determinant==-itk::NumericTraits<double>::infinity()) 
+      || (determinant==-itk::NumericTraits<double>::infinity())
       || (determinant==-itk::NumericTraits<double>::quiet_NaN())
       || (determinant==-itk::NumericTraits<double>::signaling_NaN())
       || (!(determinant <= 0) && !(determinant > 0)))
@@ -933,10 +933,10 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
     vtkMatrix4x4 * matrix=transform->GetMatrix();
     double determinant = fabs(matrix->Determinant());
     if((determinant < mitk::eps) || (determinant > 100) || (determinant < 0.01)
-      || (determinant==itk::NumericTraits<double>::infinity()) 
+      || (determinant==itk::NumericTraits<double>::infinity())
       || (determinant==itk::NumericTraits<double>::quiet_NaN())
       || (determinant==itk::NumericTraits<double>::signaling_NaN())
-      || (determinant==-itk::NumericTraits<double>::infinity()) 
+      || (determinant==-itk::NumericTraits<double>::infinity())
       || (determinant==-itk::NumericTraits<double>::quiet_NaN())
       || (determinant==-itk::NumericTraits<double>::signaling_NaN())
       || (!(determinant <= 0) && !(determinant > 0)))
@@ -1003,7 +1003,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
     }
     registration->SetLandmarks(fixedLandmarks.GetPointer(), movingLandmarks.GetPointer());
     LandmarkWarping::MovingImageType::Pointer output = registration->Register();
-    if (output.IsNotNull()) 
+    if (output.IsNotNull())
     {
       mitk::Image::Pointer image = mitk::Image::New();
       mitk::CastToMitkImage(output, image);
@@ -1093,7 +1093,7 @@ void QmitkPointBasedRegistrationView::globalReinitClicked()
 {
   if(m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDefaultDataStorage() );
+    mitk::RenderingManager::GetInstance()->InitializeViews();
   }
 }
 
@@ -1149,7 +1149,7 @@ void QmitkPointBasedRegistrationView::calculate()
   }
   else if (m_Transformation == 3 || m_Transformation == 4 || m_Transformation == 5)
   {
-    this->calculateLandmarkbased();  
+    this->calculateLandmarkbased();
   }
   else
   {

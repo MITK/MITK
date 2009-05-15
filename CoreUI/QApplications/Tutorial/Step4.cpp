@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   //*************************************************************************
 
   // Create a DataStorage  
-  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
 
   //*************************************************************************

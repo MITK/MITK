@@ -65,7 +65,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QGridLayout* _BasePaneLayout = new QGridLayout;
 
   //# DataStorageSelection
-  QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_BasePane); 
+  QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_BasePane);
   QGridLayout* _DataStorageSelectionLayout = new QGridLayout;
   m_DataStorageSelectionComboBox = new QComboBox(_DataStorageSelectionGroupBox);
 
@@ -101,7 +101,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_ReinitAction = m_NodeMenu->addAction(QIcon(":/datamanager/refresh.xpm"), "Reinit");
 
   // NodeProperties
-  QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane); 
+  QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane);
   QHBoxLayout* _NodePropertiesLayout = new QHBoxLayout;
   m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);
 
@@ -129,7 +129,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 //   _BasePaneLayout->addWidget(_NodePropertiesGroupBox, 2, 0);
 
   // DataStorageSelection
-  _DataStorageSelectionGroupBox->setLayout(_DataStorageSelectionLayout);  
+  _DataStorageSelectionGroupBox->setLayout(_DataStorageSelectionLayout);
   _DataStorageSelectionLayout->addWidget(m_DataStorageSelectionComboBox);
   m_DataStorageSelectionComboBox->setEditable(false);
   m_DataStorageSelectionComboBox->addItem("Default DataStorage");
@@ -143,7 +143,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   _NodeViewGroupBox->setLayout(_NodeViewLayout);
   _NodeViewLayout->addWidget(m_NodeTableView);
   _NodeViewLayout->addWidget(_PaneNodeButton);
-  m_NodeTableView->setContextMenuPolicy(Qt::CustomContextMenu);  
+  m_NodeTableView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTableView->setSelectionMode( QAbstractItemView::SingleSelection );
   m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
@@ -169,7 +169,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QObject::connect( m_NodeTableView->selectionModel(), SIGNAL(currentChanged ( const QModelIndex&, const QModelIndex& ))
     , this, SLOT( NodeTableViewSelectionChanged( const QModelIndex&, const QModelIndex& )) );
-  
+
   QObject::connect( m_NodeTableView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
 
@@ -290,7 +290,7 @@ void QmitkDataManagerView::ActionReinitTriggered( bool checked /*= false */ )
 void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
 {
   QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-  if(!indexOfSelectedRow.isValid()) 
+  if(!indexOfSelectedRow.isValid())
     return;
 
   mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
@@ -298,14 +298,14 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
     return;
 
   switch(QMessageBox::question(m_Parent, tr("DataManager")
-    , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No)) 
+    , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
   {
     case QMessageBox::Yes: //Remove the item from view and tree
       this->GetDataStorage()->Remove(node);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
 
-    case QMessageBox::No: 
+    case QMessageBox::No:
     case QMessageBox::Cancel:
 	default:
 	 break;
@@ -360,13 +360,13 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 
 void QmitkDataManagerView::BtnGlobalReinitClicked( bool checked /*= false */ )
 {
-  mitk::RenderingManager::GetInstance()->InitializeViews( this->GetDefaultDataStorage() );
+  mitk::RenderingManager::GetInstance()->InitializeViews();
 }
 
 void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
 {
   QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-  if(!indexOfSelectedRow.isValid()) 
+  if(!indexOfSelectedRow.isValid())
     return;
 
   mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
@@ -408,7 +408,7 @@ void QmitkDataManagerView::ShowNodeInfo()
 
   QMessageBox msgBox;
   msgBox.setWindowTitle("Node Info");
-  
+
   QString info("node name: %1\nvisible: %2");
   info = info.arg(nodeName).arg(nodeIsVisible);
   msgBox.setText(info);

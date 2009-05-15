@@ -55,7 +55,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating DataStorage: ";
-  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing reference count of tree: ";

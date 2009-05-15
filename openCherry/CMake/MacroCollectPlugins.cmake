@@ -1,7 +1,6 @@
 # Recursively searches for plugins (i.e. directories containing a
 # META-INF/MANIFEST.MF file). The macro adds the found directories
-# to cmake and stores the plugin-name and absolute path in an
-# internal cache variable. 
+# to cmake and writes information about the configured plug-ins in a file
 #
 # MACRO_COLLECT_PLUGINS(OUTPUT_DIR plugin_output_dir
 #                       [CACHE_PLUGIN_SOURCE_DIRS cache_src_dirs]
@@ -27,7 +26,7 @@
 # stores a list of enabled plug-ins (their CMake target names)
 #
 # BUNDLE_LIST_PATH
-# The full path for the generated cmake file containing the BUILD_<plugin-id>
+# The full path for the generated cmake file containing the _BUILD_<plugin-id>
 # variables. If not set, "${PROJECT_BINARY_DIR}/${PROJECT_NAME}BundleList.cmake"
 # is used.
 # 
@@ -115,7 +114,7 @@ FOREACH(dir_entry ${all_dirs})
 SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
 SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
       
-      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ON)
+      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" OFF)
       IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND _plugins_to_build "${dir_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})

@@ -31,7 +31,7 @@ int mitkLevelWindowManagerTest(int, char* [])
   std::cout<<"[PASSED]"<<std::endl;
    
   std::cout << "Creating DataStorage: ";
-  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing mitk::LevelWindowManager SetDataStorage ";

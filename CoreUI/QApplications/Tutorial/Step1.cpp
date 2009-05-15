@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   // The DataStorage manages all data objects. It is used by the 
   // rendering mechanism to render all data objects
   // We use the standard implementation mitk::StandaloneDataStorage.
-  mitk::DataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
 
   //*************************************************************************

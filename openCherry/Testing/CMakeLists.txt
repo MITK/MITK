@@ -1,4 +1,4 @@
-FIND_PACKAGE(openCherry)
+INCLUDE("${OPENCHERRY_BINARY_DIR}/openCherryConfig.cmake")
 
 SET(TEST_BUNDLES
  org.opencherry.osgi

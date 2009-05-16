@@ -47,6 +47,8 @@ IF(MITK_USE_OPENCHERRY)
   SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
   INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
   INCLUDE(CMake/MITKPluginHelpers.cmake)
+  
+  SET(OPENCHERRY_USE_QT ${MITK_USE_QT} CACHE BOOL "Use the Qt GUI toolkit" FORCE)
 ENDIF(MITK_USE_OPENCHERRY)
 
 IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)
@@ -161,6 +163,14 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in ${PROJ
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
 
+IF(MITK_USE_OPENCHERRY)
+  OPTION(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins (overriding selection)" OFF)
+  MARK_AS_ADVANCED(MITK_BUILD_ALL_PLUGINS)
+  
+  IF(MITK_BUILD_ALL_PLUGINS)
+    SET(MITK_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
+  ENDIF()
+ENDIF()
 
 ADD_SUBDIRECTORY(Documentation)
 ADD_SUBDIRECTORY(CoreUI)

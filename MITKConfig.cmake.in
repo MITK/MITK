@@ -44,7 +44,10 @@ IF (MITK_USE_OPENCHERRY)
   INCLUDE("@MITK_SOURCE_DIR@/CMake/MITKPluginHelpers.cmake")
 
   IF(NOT MITK_SKIP_BUNDLELIST)
-    INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKBundleList.cmake")
+    INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKCoreBundleList.cmake")
+    IF(MITK_USE_EXT)
+      INCLUDE("@MITK_BINARY_DIR@/Bundles/MITKModulesBundleList.cmake")
+    ENDIF()
   ENDIF(NOT MITK_SKIP_BUNDLELIST)
   
   FIND_PACKAGE(openCherry)

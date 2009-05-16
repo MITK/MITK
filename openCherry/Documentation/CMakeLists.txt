@@ -19,7 +19,7 @@ SET(OPENCHERRY_XPDOC_OUTPUT_DIR ${OPENCHERRY_DOCS_OUTPUT_DIR}/reference/extensio
 FILE(RELATIVE_PATH OPENCHERRY_DOXYGEN_XP_RELATIVEDIR ${OPENCHERRY_DOXYGEN_OUTPUT_DIR}/html ${OPENCHERRY_XPDOC_OUTPUT_DIR}/)
 
 IF(QT4_FOUND)
-  SET(_doxygen_qt4bundles "${OPENCHERRY_BASE_DIR}/Bundles-Qt")
+  SET(_doxygen_qt4bundles "${OPENCHERRY_SOURCE_DIR}/Bundles-Qt")
 ENDIF(QT4_FOUND)
 
 CONFIGURE_FILE(doxygen.conf.in
@@ -40,7 +40,7 @@ ADD_CUSTOM_TARGET(openCherryDoc
                   
 # convert the extension points schema files into html
 IF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
-  FILE(GLOB_RECURSE _plugin_xmls  ${OPENCHERRY_SOURCE_DIR}/plugin.xml)
+  FILE(GLOB_RECURSE _plugin_xmls  ${OPENCHERRY_PLUGINS_SOURCE_DIR}/plugin.xml)
   MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
                        OUTPUT_DIR "${OPENCHERRY_XPDOC_OUTPUT_DIR}"
                        TARGET_NAME openCherryXPDoc

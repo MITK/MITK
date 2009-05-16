@@ -82,7 +82,7 @@ FOREACH(_macro_name ${_COLLECT_ENABLE_PLUGIN_MACROS})
     ENDIF()
   ENDIF()")
 ENDFOREACH()
-CONFIGURE_FILE("${OPENCHERRY_BASE_DIR}/CMake/cherryEnablePlugin.cmake.in" "${_enable_plugins_file}" @ONLY)
+CONFIGURE_FILE("${OPENCHERRY_SOURCE_DIR}/CMake/cherryEnablePlugin.cmake.in" "${_enable_plugins_file}" @ONLY)
  
 #MESSAGE(SEND_ERROR "_COLLECT_OUTPUT_DIR: ${_COLLECT_OUTPUT_DIR}")
 #MESSAGE(SEND_ERROR "_COLLECT_ADD_DIR: ${_COLLECT_ADD_DIR}")

@@ -1,5 +1,5 @@
-INCLUDE(${OPENCHERRY_BASE_DIR}/CMake/cherryTestingHelpers.cmake)
-INCLUDE_DIRECTORIES(${OPENCHERRY_SOURCE_DIR}/org.opencherry.osgi/src)
+INCLUDE(${OPENCHERRY_SOURCE_DIR}/CMake/cherryTestingHelpers.cmake)
+INCLUDE_DIRECTORIES(${OPENCHERRY_PLUGINS_SOURCE_DIR}/org.opencherry.osgi/src)
 
 # tests with no extra command line parameter
 SET(OPENCHERRY_TESTS

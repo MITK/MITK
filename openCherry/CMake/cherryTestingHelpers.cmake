@@ -10,14 +10,14 @@ MACRO(OPENCHERRY_CREATE_TESTS)
   
   _MACRO_CREATE_PLUGIN_NAME(plugin_name 
                             INPUT ${CMAKE_CURRENT_SOURCE_DIR}
-                            BASEDIR ${OPENCHERRY_BASE_DIR}/Testing)
+                            BASEDIR ${OPENCHERRY_SOURCE_DIR}/Testing)
   STRING(REPLACE . _ plugin_target ${plugin_name})
   
-  INCLUDE_DIRECTORIES(${OPENCHERRY_BASE_DIR}/Testing)
+  INCLUDE_DIRECTORIES(${OPENCHERRY_SOURCE_DIR}/Testing)
   INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
   LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
   
-  MACRO_PARSE_MANIFEST(${OPENCHERRY_SOURCE_DIR}/${plugin_name}/META-INF/MANIFEST.MF)
+  MACRO_PARSE_MANIFEST(${OPENCHERRY_PLUGINS_SOURCE_DIR}/${plugin_name}/META-INF/MANIFEST.MF)
   LINK_DIRECTORIES("${${BUNDLE-SYMBOLICNAME}_BIN_DIR}/bin")
   
   #
@@ -26,7 +26,7 @@ MACRO(OPENCHERRY_CREATE_TESTS)
   CREATE_TEST_SOURCELIST(cherry_test_sources TestDriver_${plugin_target}.cpp 
     ${OPENCHERRY_TESTS} ${OPENCHERRY_CUSTOM_TESTS} )  
   
-  ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_BASE_DIR}/Testing/cherryTestManager.cpp)
+  ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_SOURCE_DIR}/Testing/cherryTestManager.cpp)
   TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized ${plugin_target} debug ${plugin_target}${OPENCHERRY_DEBUG_POSTFIX})
   TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized PocoFoundation debug PocoFoundationd )
   #

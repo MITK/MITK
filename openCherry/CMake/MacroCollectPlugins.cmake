@@ -9,6 +9,7 @@
 #                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [CMAKE_CACHE_PREFIX cache_prefix]
 #                       [ENABLE_PLUGIN_MACROS _enable_macros]
+#                       [BUNDLE_DEFAULT_ON bundle_default_on]
 #                       [DEFAULT_BUILD_ON]
 #                       [FORCE_BUILD_ALL]
 #                       )
@@ -40,6 +41,10 @@
 # the macro is (<bundle-symbolicname>) and the macro must set the variable
 # ENABLE_PLUGIN to true or false. For Qt4, a default macro is provided.
 #
+# BUNDLE_DEFAULT_ON
+# <bundle_default_on> is a list of bundle symbolic names for which the
+# CMake build option should default to ON
+#
 # DEFAULT_BUILD_ON if set, the generated CMake option for building plug-ins
 # defaults to ON. Otherwise, it is set to OFF.
 #
@@ -50,7 +55,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "DEFAULT_BUILD_ON;FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_BINARY_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;BUNDLE_DEFAULT_ON;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "DEFAULT_BUILD_ON;FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -118,7 +123,13 @@ FOREACH(dir_entry ${all_dirs})
 SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
 SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
       
-      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ${_COLLECT_DEFAULT_BUILD_ON})
+      SET(_default_bundle_option ${_COLLECT_DEFAULT_BUILD_ON})
+      LIST(FIND _COLLECT_BUNDLE_DEFAULT_ON ${BUNDLE-SYMBOLICNAME} _bundle_default_on_found)
+      IF(_bundle_default_on_found GREATER -1)
+        SET(_default_bundle_option 1)
+      ENDIF()
+      
+      OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ${_default_bundle_option})
       IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND _plugins_to_build "${dir_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})

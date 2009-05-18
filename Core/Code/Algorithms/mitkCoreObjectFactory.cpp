@@ -20,23 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkColorProperty.h"
-/*
-#include "mitkCone.h"
-#include "mitkContour.h"
-#include "mitkContourMapper2D.h"
-#include "mitkContourSetMapper2D.h"
-#include "mitkContourSetVtkMapper3D.h"
-#include "mitkContourVtkMapper3D.h"
-#include "mitkCuboid.h"
-#include "mitkCylinder.h"
-#include "mitkEllipsoid.h"
-#include "mitkMeshMapper2D.h"
-#include "mitkMeshVtkMapper3D.h"
-#include "mitkUnstructuredGridMapper2D.h"
-#include "mitkPointDataVtkMapper3D.h"
-#include "mitkEnhancedPointSetVtkMapper3D.h"
-#include "mitkSeedsImage.h"
-*/
 #include "mitkDataTreeNode.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkGeometry2DData.h"
@@ -90,22 +73,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageWriterFactory.h"
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
-
-/*
-#include "mitkAddContourToolFactory.h"
-#include "mitkSubtractContourToolFactory.h"
-#include "mitkRegionGrowingToolFactory.h"
-#include "mitkCorrectorTool2DFactory.h"
-#include "mitkFillRegionToolFactory.h"
-#include "mitkEraseRegionToolFactory.h"
-#include "mitkAutoCropToolFactory.h"
-#include "mitkCalculateVolumetryToolFactory.h"
-#include "mitkCreateSurfaceToolFactory.h"
-#include "mitkBinaryThresholdToolFactory.h"
-#include "mitkCalculateGrayValueStatisticsToolFactory.h"
-#include "mitkDrawPaintbrushToolFactory.h"
-#include "mitkErasePaintbrushToolFactory.h"
-*/
 
 /*
 #include "mitkUnstructuredGrid.h"
@@ -256,22 +223,6 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     mitk::PointSetWriterFactory::RegisterOneFactory();
     mitk::ImageWriterFactory::RegisterOneFactory();
 
-    /*
-    itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( SubtractContourToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( DrawPaintbrushToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( ErasePaintbrushToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( RegionGrowingToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( CorrectorTool2DFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( FillRegionToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( EraseRegionToolFactory::New() );
-
-    itk::ObjectFactoryBase::RegisterFactory( AutoCropToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( CalculateVolumetryToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( CreateSurfaceToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( BinaryThresholdToolFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( CalculateGrayValueStatisticsToolFactory::New() );
-*/
     alreadyDone = true;
   }
 }

@@ -1,3 +1,21 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile: mitkPropertyManager.cpp,v $
+Language:  C++
+Date:      $Date: 2005/06/28 12:37:25 $
+Version:   $Revision: 1.12 $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
 #include "QmitkInteractiveSegmentationView.h"
 
 #include "QmitkStdMultiWidget.h"
@@ -59,6 +77,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkInteractiveSegmentationView , const mitk::DataTreeNode*>( this, &QmitkInteractiveSegmentationView::DataStorageChanged ) );
 
   mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+  toolManager->SetDataStorage( *m_DataStorage );
 
   assert ( toolManager );
 
@@ -557,7 +576,9 @@ void QmitkInteractiveSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget
   
 void QmitkInteractiveSegmentationView::DataStorageChanged( const mitk::DataTreeNode* node )
 {
+  /*
   m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
   m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
+  */
 }
 

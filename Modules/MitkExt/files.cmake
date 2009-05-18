@@ -1,5 +1,6 @@
 SET(CPP_FILES 
   Algorithms/vtkPointSetSlicer.cxx
+  Algorithms/mitkCoreExtObjectFactory.cpp
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp

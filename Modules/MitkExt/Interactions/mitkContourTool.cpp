@@ -58,6 +58,8 @@ bool mitk::ContourTool::OnMousePressed (Action* action, const StateEvent* stateE
   contour->AddVertex( positionEvent->GetWorldPosition() );
   
   FeedbackContourTool::SetFeedbackContourVisible(true);
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   return true;
 }

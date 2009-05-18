@@ -1,5 +1,5 @@
 <ui version="4.0" >
- <exportmacro>QMITK_EXPORT</exportmacro>
+ <exportmacro>QMITKEXT_EXPORT</exportmacro>
  <class>QmitkPrimitiveMovieNavigator</class>
  <widget class="QWidget" name="QmitkPrimitiveMovieNavigator" >
   <property name="geometry" >

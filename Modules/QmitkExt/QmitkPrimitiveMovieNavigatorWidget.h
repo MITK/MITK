@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QWidget>
 #include <QTimer>
 
-class QMITKEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget, public Ui::QmitkPrimitiveMovieNavigator
+class QMITKEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget//, public Ui::QmitkPrimitiveMovieNavigator
 {
     Q_OBJECT
 
@@ -41,6 +41,7 @@ public slots:
     virtual void setTimerInterval( int timerIntervalInMS );
 
 protected:
+    Ui::QmitkPrimitiveMovieNavigator m_Controls;
     mitk::Stepper::Pointer m_Stepper;
     bool m_InRefetch;
     QTimer* m_Timer;

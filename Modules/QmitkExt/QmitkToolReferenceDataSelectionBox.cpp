@@ -28,13 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 
-QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent)
+QmitkToolReferenceDataSelectionBox::QmitkToolReferenceDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
 m_SelfCall(false),
 m_DisplayMode(ListDataIfAnyToolMatches ),
 m_ToolGroupsForFiltering("default")
 {
-  m_ToolManager = mitk::ToolManager::New();
+  m_ToolManager = mitk::ToolManager::New( storage );
 
   m_Layout = new QVBoxLayout( this );
   this->setLayout( m_Layout );
@@ -51,6 +51,16 @@ m_ToolGroupsForFiltering("default")
 QmitkToolReferenceDataSelectionBox::~QmitkToolReferenceDataSelectionBox()
 {
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
+}
+  
+mitk::DataStorage* QmitkToolReferenceDataSelectionBox::GetDataStorage()
+{
+  return m_ToolManager->GetDataStorage();
+}
+
+void QmitkToolReferenceDataSelectionBox::SetDataStorage(mitk::DataStorage& storage)
+{
+  m_ToolManager->SetDataStorage(storage);
 }
 
 void QmitkToolReferenceDataSelectionBox::Initialize(mitk::DataStorage* storage )
@@ -171,7 +181,11 @@ mitk::NodePredicateBase::ConstPointer QmitkToolReferenceDataSelectionBox::GetAll
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox::GetAllPossibleReferenceImages()
 {
-  mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
+  mitk::DataStorage* dataStorage = m_ToolManager->GetDataStorage();
+  if (!dataStorage)
+  {
+    return mitk::DataStorage::SetOfObjects::New().GetPointer();
+  }
 
   mitk::NodePredicateBase::ConstPointer completePredicate = GetAllPossibleReferenceImagesPredicate();
 
@@ -200,7 +214,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
   }
 
 
-  mitk::DataStorage::SetOfObjects::ConstPointer sceneImages = mitk::DataStorage::GetInstance()->GetSubset( completePredicate );
+  mitk::DataStorage::SetOfObjects::ConstPointer sceneImages = dataStorage->GetSubset( completePredicate );
   return sceneImages;
 }
 

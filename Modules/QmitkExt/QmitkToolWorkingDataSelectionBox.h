@@ -63,8 +63,11 @@ class QMITKEXT_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
      */
     enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
     
-    QmitkToolWorkingDataSelectionBox(QWidget* parent = 0, const char* name = 0);
+    QmitkToolWorkingDataSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0, const char* name = 0);
     virtual ~QmitkToolWorkingDataSelectionBox();
+  
+    mitk::DataStorage* GetDataStorage();
+    void SetDataStorage(mitk::DataStorage& storage);
 
     /**
       Installs an event filter on the given object. QmitkToolWorkingDataSelectionBox will catch all key-press events

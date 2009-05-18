@@ -61,8 +61,11 @@ public:
   */
   enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
 
-  QmitkToolReferenceDataSelectionBox(QWidget* parent = 0);
+  QmitkToolReferenceDataSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
   virtual ~QmitkToolReferenceDataSelectionBox();
+
+  mitk::DataStorage* GetDataStorage();
+  void SetDataStorage(mitk::DataStorage& storage);
  
   /// initialization with a data storage object
   void Initialize(mitk::DataStorage*);

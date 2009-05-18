@@ -87,7 +87,10 @@ void mitk::BinaryThresholdTool::Deactivated()
   m_NodeForThresholding = NULL;
   try
   {
-    DataStorage::GetInstance()->Remove( m_ThresholdFeedbackNode );
+    if (DataStorage* storage = m_ToolManager->GetDataStorage())
+    {
+      storage->Remove( m_ThresholdFeedbackNode );
+    }
   }
   catch(...)
   {
@@ -129,7 +132,10 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataTreeNode* nodeForThresh
       nodeForThresholding->GetIntProperty("layer", layer);
       m_ThresholdFeedbackNode->SetIntProperty("layer", layer+1);
        
-      DataStorage::GetInstance()->Add( m_ThresholdFeedbackNode, nodeForThresholding );
+      if (DataStorage* storage = m_ToolManager->GetDataStorage())
+      {
+        storage->Add( m_ThresholdFeedbackNode, nodeForThresholding );
+      }
 
       m_SensibleMinimumThresholdValue = static_cast<int>( image->GetScalarValueMin() );
       m_SensibleMaximumThresholdValue = static_cast<int>( image->GetScalarValueMax() );
@@ -181,7 +187,10 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode*
           }
         }
 
-        DataStorage::GetInstance()->Add( emptySegmentation, m_NodeForThresholding ); // add as a child, because the segmentation "derives" from the original
+        if (DataStorage* storage = m_ToolManager->GetDataStorage())
+        {
+          storage->Add( emptySegmentation, m_NodeForThresholding ); // add as a child, because the segmentation "derives" from the original
+        }
 
         m_ToolManager->SetWorkingData( emptySegmentation );
       }

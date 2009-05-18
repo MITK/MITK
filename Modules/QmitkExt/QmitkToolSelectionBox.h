@@ -62,7 +62,7 @@ class QMITKEXT_EXPORT QmitkToolSelectionBox : public QGroupBox
 
     enum EnabledMode { EnabledWithReferenceAndWorkingData, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
 
-    QmitkToolSelectionBox(QWidget* parent = 0);
+    QmitkToolSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
     virtual ~QmitkToolSelectionBox();
 
     mitk::ToolManager* GetToolManager();

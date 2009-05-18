@@ -20,12 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderingManagerFactory.h"
 
-/*
 #include "QmitkBinaryThresholdToolGUIFactory.h"
 #include "QmitkCalculateGrayValueStatisticsToolGUIFactory.h"
 #include "QmitkDrawPaintbrushToolGUIFactory.h"
 #include "QmitkErasePaintbrushToolGUIFactory.h"
-*/
 
 #include <iostream>
 
@@ -35,12 +33,12 @@ void QmitkExtRegisterClasses()
   if (!alreadyDone)
   {
     std::cout << "QmitkExtRegisterClasses()" << std::endl;
-/*  
+  
   itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
   itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
   itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
   itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
-*/
+
   alreadyDone = true;
   }
 }

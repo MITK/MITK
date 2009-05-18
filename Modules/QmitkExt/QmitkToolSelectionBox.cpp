@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qapplication.h>
 
-QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent)
+QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QGroupBox("Tools", parent),
  m_SelfCall(false),
  m_Enabled(true),
@@ -43,7 +43,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent)
   currentFont.setBold(true);
   QGroupBox::setFont( currentFont );
 
-  m_ToolManager = mitk::ToolManager::New();
+  m_ToolManager = mitk::ToolManager::New( storage );
 
   // muellerm
   // QButtonGroup

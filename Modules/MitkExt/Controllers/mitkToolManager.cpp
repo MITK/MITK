@@ -24,10 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 
-mitk::ToolManager::ToolManager()
+mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
- m_RegisteredClients(0)
+ m_RegisteredClients(0),
+ m_DataStorage(storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
 
@@ -316,6 +317,18 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetWorkingData()
 {
   return m_WorkingData;
 }
+
+mitk::DataStorage* mitk::ToolManager::GetDataStorage()
+{
+  return m_DataStorage;
+}
+
+void mitk::ToolManager::SetDataStorage(DataStorage& storage)
+{
+  m_DataStorage = &storage;
+}
+
+
 
 mitk::DataTreeNode* mitk::ToolManager::GetWorkingData(int idx)
 {

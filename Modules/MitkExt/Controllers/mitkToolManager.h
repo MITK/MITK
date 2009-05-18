@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTool.h"
 #include "mitkDataTreeNode.h"
+#include "mitkDataStorage.h"
 
 #include <itkEventObject.h>
 
@@ -99,7 +100,7 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
     Message1<std::string> GeneralToolMessage;
 
     mitkClassMacro(ToolManager, itk::Object);
-    itkNewMacro(ToolManager);
+    mitkNewMacro1Param(ToolManager, DataStorage*);
 
     /**
       \brief Gives you a list of all tools.
@@ -187,6 +188,9 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
     */
     DataTreeNode* GetWorkingData(int);
 
+    DataStorage* GetDataStorage();
+    void SetDataStorage(DataStorage& storage);
+
     /*
       \brief Tell that someone is using tools.
       GUI elements should call this when they become active. This method increases an internal "client count". Tools
@@ -224,7 +228,7 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
       as a string. This constructor will try to find the tool's group inside the supplied string. If there is a match,
       the tool is accepted. Effectively, you can provide a human readable list like "default, lymphnodevolumetry, oldERISstuff".
     */
-    ToolManager(); // purposely hidden
+    ToolManager(DataStorage* storage); // purposely hidden
     virtual ~ToolManager();
 
     ToolVectorType m_Tools;
@@ -239,6 +243,8 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
     NodeTagMapType  m_WorkingDataObserverTags;
 
     int m_RegisteredClients;
+
+    DataStorage::Pointer m_DataStorage;
 };
 
 } // namespace

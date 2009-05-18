@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkToolWorkingDataSelectionBox.h"
-#include "QmitkPropertyListPopup.h"
+//#include "QmitkPropertyListPopup.h"
 
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateProperty.h"
@@ -47,7 +47,7 @@ class QmitkToolWorkingDataSelectionBoxUpdateDataEvent : public QCustomEvent
 };
 
 
-QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, const char* name)
+QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, mitk::DataStorage* storage, const char* name)
 :Q3ListView(parent, name),
  m_ShowOnlySelected(true),
  m_SelfCall(false),
@@ -57,7 +57,7 @@ QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* pare
  m_ToolGroupsForFiltering(std::string()),
  m_DisplayOnlyDerivedNodes(true)
 {
-  m_ToolManager = mitk::ToolManager::New(); // this widget should be placeable from designer so it can't take other than the defaul parameters
+  m_ToolManager = mitk::ToolManager::New( storage ); // this widget should be placeable from designer so it can't take other than the defaul parameters
 
   Q3ListView::addColumn( "" ); // color
   Q3ListView::addColumn( "Segmentation" );
@@ -84,6 +84,17 @@ QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* pare
 QmitkToolWorkingDataSelectionBox::~QmitkToolWorkingDataSelectionBox()
 {
 }
+
+mitk::DataStorage* QmitkToolWorkingDataSelectionBox::GetDataStorage()
+{
+  return m_ToolManager->GetDataStorage();
+}
+
+void QmitkToolWorkingDataSelectionBox::SetDataStorage(mitk::DataStorage& storage)
+{
+  m_ToolManager->SetDataStorage(storage);
+}
+
 
 mitk::ToolManager* QmitkToolWorkingDataSelectionBox::GetToolManager()
 {
@@ -360,7 +371,11 @@ mitk::DataTreeNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
 
 mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes( bool onlyDerivedFromOriginal )
 {
-  mitk::DataStorage* dataStorage = mitk::DataStorage::GetInstance();
+  mitk::DataStorage* dataStorage = m_ToolManager->GetDataStorage();
+  if (!dataStorage)
+  {
+    return mitk::ToolManager::DataVectorType();
+  }
 
   /**
    * Build up predicate:
@@ -468,6 +483,7 @@ void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, c
 
       if (node)
       {
+        /*
         QmitkPropertyListPopup* popup = new QmitkPropertyListPopup( node->GetPropertyList(), this, true );
         popup->popup(p);
         delete popup;
@@ -477,6 +493,7 @@ void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, c
         // why not update it now?
         UpdateDataDisplay();
         //!
+        */
       }
     }
   }

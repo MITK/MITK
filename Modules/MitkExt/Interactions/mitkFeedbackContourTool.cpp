@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkFeedbackContourTool.h"
+#include "mitkToolManager.h"
 
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
@@ -85,13 +86,16 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
   if ( m_FeedbackContourVisible == visible ) return; // nothing changed
 
-  if (visible)
+  if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
   {
-    // DataStorage::GetInstance()->Add( m_FeedbackContourNode );
-  }
-  else
-  {
-    DataStorage::GetInstance()->Remove( m_FeedbackContourNode );
+    if (visible)
+    {
+      storage->Add( m_FeedbackContourNode );
+    }
+    else
+    {
+      storage->Remove( m_FeedbackContourNode );
+    }
   }
 
   m_FeedbackContourVisible = visible;

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
 
 #include "mitkNonBlockingAlgorithm.h"
+#include "mitkDataStorage.h"
 
 namespace mitk 
 {
@@ -30,10 +31,14 @@ class MITKEXT_CORE_EXPORT SegmentationSink : public NonBlockingAlgorithm
     mitkClassMacro( SegmentationSink, NonBlockingAlgorithm )
     mitkAlgorithmNewMacro( SegmentationSink );
     
+    void SetDataStorage(DataStorage& storage);
+    DataStorage* GetDataStorage();
+
   protected:
     
     SegmentationSink();  // use smart pointers
     virtual ~SegmentationSink();
+
 
     virtual void Initialize(const NonBlockingAlgorithm* other = NULL);
     virtual bool ReadyToRun();
@@ -43,6 +48,8 @@ class MITKEXT_CORE_EXPORT SegmentationSink : public NonBlockingAlgorithm
     void InsertBelowGroupNode(mitk::DataTreeNode* node);
     DataTreeNode* LookForPointerTargetBelowGroupNode(const char* name);
     DataTreeNode* GetGroupNode();
+
+    DataStorage::Pointer m_DataStorage;
 
   private:
 

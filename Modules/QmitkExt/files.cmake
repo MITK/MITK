@@ -54,14 +54,14 @@ SET(CPP_FILES
  # QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
  QmitkSelectableGLWidget.cpp
- # QmitkToolReferenceDataSelectionBox.cpp
- # QmitkToolGUIArea.cpp
- # QmitkToolWorkingDataSelectionBox.cpp
- # QmitkToolSelectionBox.cpp
+ QmitkToolReferenceDataSelectionBox.cpp
+ QmitkToolGUIArea.cpp
+ QmitkToolWorkingDataSelectionBox.cpp
+ QmitkToolSelectionBox.cpp
  # QmitkPropertyListPopup.cpp
  QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
- # QmitkPaintbrushToolGUI.cpp
+ QmitkPaintbrushToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
  # QmitkMaterialEditor.cpp
  # QmitkMaterialShowcase.cpp
@@ -107,15 +107,15 @@ SET(MOC_H_FILES
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
  QmitkTransferFunctionWidget.h
- # QmitkToolGUIArea.h
+ QmitkToolGUIArea.h
  QmitkToolGUI.h
- # QmitkToolReferenceDataSelectionBox.h  
- # QmitkToolSelectionBox.h  
+ QmitkToolReferenceDataSelectionBox.h  
+ QmitkToolSelectionBox.h  
  # QmitkPropertyListPopup.h
- # QmitkToolWorkingDataSelectionBox.h  
+ QmitkToolWorkingDataSelectionBox.h  
  QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h
- # QmitkPaintbrushToolGUI.h
+ QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkHistogramWidget.h
@@ -132,10 +132,10 @@ SET(UI_FILES
   QmitkPrimitiveMovieNavigatorWidget.ui
 )
 
-# TODO TODO auf Qt4 anpassen
 SET(TOOL_QT4GUI_FILES
-  # QmitkBinaryThresholdToolGUI.cpp
-  # QmitkDrawPaintbrushToolGUI.cpp
-  # QmitkErasePaintbrushToolGUI.cpp
-  # QmitkCalculateGrayValueStatisticsToolGUI.cpp
+  QmitkBinaryThresholdToolGUI.cpp
+  QmitkDrawPaintbrushToolGUI.cpp
+  QmitkErasePaintbrushToolGUI.cpp
+  QmitkCalculateGrayValueStatisticsToolGUI.cpp
 )
+

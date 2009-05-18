@@ -28,6 +28,16 @@ SegmentationSink::SegmentationSink()
 SegmentationSink::~SegmentationSink()
 {
 }
+    
+void mitk::SegmentationSink::SetDataStorage(DataStorage& storage)
+{
+  m_DataStorage = &storage;
+}
+
+DataStorage* mitk::SegmentationSink::GetDataStorage()
+{
+  return m_DataStorage;
+}
 
 void SegmentationSink::Initialize(const NonBlockingAlgorithm* other) 
 { 
@@ -70,7 +80,10 @@ void SegmentationSink::InsertBelowGroupNode(mitk::DataTreeNode* node)
 {
   DataTreeNode* groupNode = GetGroupNode();
 
-  DataStorage::GetInstance()->Add( node, groupNode );
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->Add( node, groupNode );
+  }
     
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -88,9 +101,9 @@ DataTreeNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* n
   DataTreeNode::Pointer groupNode;
   GetPointerParameter("Group node", groupNode);
 
-  if (groupNode.IsNotNull())
+  if (groupNode.IsNotNull() && m_DataStorage.IsNotNull())
   {
-    return DataStorage::GetInstance()->GetNamedDerivedNode(name, groupNode, true);
+    return m_DataStorage->GetNamedDerivedNode(name, groupNode, true);
   }
 
   return NULL;

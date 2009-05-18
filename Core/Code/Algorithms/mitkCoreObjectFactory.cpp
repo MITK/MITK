@@ -161,6 +161,13 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
       }
       ++factoryIt;
     }
+    factoryIt = allobjects.begin();
+    while (instance.IsNull() && factoryIt != allobjects.end() ) {
+      if (std::string("CoreExtObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
+        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
+      }
+      ++factoryIt;
+    }
     if (instance.IsNull()) {
       instance = mitk::CoreObjectFactory::New();
     }

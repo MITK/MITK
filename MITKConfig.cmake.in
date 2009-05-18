@@ -24,6 +24,10 @@ IF(MITK_USE_EXT)
   INCLUDE(${MITK_DIR}/QmitkExtConfig.cmake)
 ENDIF()
 
+IF(MITK_USE_IGT)
+  INCLUDE(${MITK_DIR}/mitkIGTConfig.cmake)
+ENDIF()
+
 INCLUDE("@MITK_SOURCE_DIR@/CMake/CoreHelpers.cmake")
 INCLUDE("@MITK_SOURCE_DIR@/CMake/ToolExtensionHelpers.cmake")
 APPLY_VTK_FLAGS()

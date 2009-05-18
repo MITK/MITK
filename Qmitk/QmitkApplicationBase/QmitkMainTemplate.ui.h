@@ -991,14 +991,12 @@ void QmitkMainTemplate::Initialize()
     m_MultiWidget->SetGradientBackgroundColors( upperColProp->GetColor(), lowerColProp->GetColor() );
 
   // department logo
+  mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path"));
+  if (logoPath)
+    m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
   mitk::BoolProperty* logoProperty = dynamic_cast<mitk::BoolProperty*>( m_Options->GetProperty("Department logo visible") );
   if (logoProperty != NULL)
     this->enableDepartmentLogo(logoProperty->GetValue());
-  mitk::StringProperty::Pointer logoPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Department logo path"));
-  if (logoPath)
-  {
-    m_MultiWidget->SetDepartmentLogoPath(logoPath->GetValue());
-  }
 
   // default dataset path
   m_DefaultDatasetPath = dynamic_cast<mitk::StringProperty*>( m_Options->GetProperty("Default dataset path"));

@@ -140,12 +140,21 @@ vtkImageMapper* mitk::LogoRendering::GetMapper()
 
 void mitk::LogoRendering::SetLogoSource(const char* filename)
 {
+  //store the name, even if not readable or empty to fallback on mbi-department logo
+  m_FileName  = filename;
+  
   std::string file = filename;
   if(file.length() != 0)
-  {
-    m_FileName  = filename;
     m_PngReader->SetFileName(m_FileName.c_str());
+
+  //cause a refresh if already enabled
+  //if empty string, then use default logo;
+  if (m_IsEnabled)
+  {
+    m_IsEnabled = false;
+    this->Enable();
   }
+
 }
 
 /**

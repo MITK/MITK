@@ -58,10 +58,11 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
-                         @OPENCHERRY_BASE_DIR@/Documentation/ \
-                         @OPENCHERRY_BASE_DIR@/Bundles \
+                         @OPENCHERRY_SOURCE_DIR@/Documentation/ \
+                         @_doxygen_bundles@ \
                          @_doxygen_qt4bundles@ \
-                         @OPENCHERRY_BINARY_DIR@
+                         @_doxygen_binary_bundles@ \
+                         @_doxygen_binary_qt4bundles@ \
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \

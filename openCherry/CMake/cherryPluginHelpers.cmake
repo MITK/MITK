@@ -183,3 +183,21 @@ MACRO(_MACRO_ENABLE_QT4_PLUGINS)
   ENDIF()
 
 ENDMACRO()
+
+MACRO(_MACRO_CREATE_ENABLE_PLUGIN_CODE)
+    SET(_enable_plugins_file "${CMAKE_CURRENT_BINARY_DIR}/cherryEnablePlugin.cmake")
+    SET(_enable_plugins_filecontent "SET(_enable_bundle 1)")
+    FOREACH(_macro_name ${ARGN})
+      SET(_enable_plugins_filecontent "${_enable_plugins_filecontent}
+      IF(_enable_bundle)
+        SET(ENABLE_PLUGIN 1)
+        ${_macro_name}(\${BUNDLE-SYMBOLICNAME})
+        IF(NOT ENABLE_PLUGIN)
+          SET(_enable_bundle 0)
+        ENDIF()
+      ENDIF()")
+    ENDFOREACH()
+    CONFIGURE_FILE("${OPENCHERRY_SOURCE_DIR}/CMake/cherryEnablePlugin.cmake.in" "${_enable_plugins_file}" @ONLY)
+ENDMACRO()
+
+

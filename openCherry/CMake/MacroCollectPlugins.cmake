@@ -75,24 +75,9 @@ SET(PLUGINS_OUTPUT_BASE_DIR ${_COLLECT_OUTPUT_DIR})
 
 SET(CMAKE_DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
 
-SET(_enable_plugins_file "${CMAKE_CURRENT_BINARY_DIR}/cherryEnablePlugin.cmake")
-SET(_enable_plugins_filecontent "SET(_enable_bundle 1)")
-FOREACH(_macro_name ${_COLLECT_ENABLE_PLUGIN_MACROS})
-  SET(_enable_plugins_filecontent "${_enable_plugins_filecontent}
-  IF(_enable_bundle)
-    SET(ENABLE_PLUGIN 1)
-    ${_macro_name}(\${BUNDLE-SYMBOLICNAME})
-    IF(NOT ENABLE_PLUGIN)
-      SET(_enable_bundle 0)
-    ENDIF()
-  ENDIF()")
-ENDFOREACH()
-CONFIGURE_FILE("${OPENCHERRY_SOURCE_DIR}/CMake/cherryEnablePlugin.cmake.in" "${_enable_plugins_file}" @ONLY)
- 
-#MESSAGE(SEND_ERROR "_COLLECT_OUTPUT_DIR: ${_COLLECT_OUTPUT_DIR}")
-#MESSAGE(SEND_ERROR "_COLLECT_ADD_DIR: ${_COLLECT_ADD_DIR}")
-#MESSAGE(SEND_ERROR "_COLLECT_FORCE_BUILD_ALL: ${_COLLECT_FORCE_BUILD_ALL}")
-
+# writes the file ${CMAKE_CURRENT_BINARY_DIR}/cherryEnablePlugin.cmake
+_MACRO_CREATE_ENABLE_PLUGIN_CODE(${_COLLECT_ENABLE_PLUGIN_MACROS})
+  
 SET(PLUGINS_SOURCE_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 IF(_COLLECT_CACHE_PLUGIN_SOURCE_DIRS)  

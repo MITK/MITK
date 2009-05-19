@@ -69,15 +69,7 @@ ENDIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/vtk-bin)
 FIND_PACKAGE(VTK)
 APPLY_VTK_FLAGS()
 
-IF(UNIX)
-  OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
-ELSE(UNIX)
-  OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." OFF)
-  IF(BUILD_SHARED_LIBS)
-    MESSAGE(FATAL_ERROR 
-	  "Sorry. General BUILD_SHARED_LIBS is not available yet for MITK. Please look at MITK_BUILD_SHARED_CORE for creating dlls.")
-  ENDIF(BUILD_SHARED_LIBS)
-ENDIF(UNIX)
+OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
 
 # TODO: check if necessary
 OPTION(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)

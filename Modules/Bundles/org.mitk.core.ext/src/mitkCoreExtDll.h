@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _MBI_SANDBOX_EXPORTS_DLL_H_
-#define _MBI_SANDBOX_EXPORTS_DLL_H_
+#ifndef _MITKEXT_EXPORTS_DLL_H_
+#define _MITKEXT_EXPORTS_DLL_H_
 
 
 //

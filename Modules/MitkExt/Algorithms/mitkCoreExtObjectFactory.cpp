@@ -68,6 +68,7 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory(bool registerSelf)
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
+    std::cout << "CoreExtObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
     itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );

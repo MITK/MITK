@@ -29,16 +29,6 @@ SegmentationSink::~SegmentationSink()
 {
 }
     
-void mitk::SegmentationSink::SetDataStorage(DataStorage& storage)
-{
-  m_DataStorage = &storage;
-}
-
-DataStorage* mitk::SegmentationSink::GetDataStorage()
-{
-  return m_DataStorage;
-}
-
 void SegmentationSink::Initialize(const NonBlockingAlgorithm* other) 
 { 
   Superclass::Initialize(other);

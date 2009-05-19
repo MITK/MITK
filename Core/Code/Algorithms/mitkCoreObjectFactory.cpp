@@ -192,6 +192,8 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
+    std::cout << "CoreObjectFactory c'tor" << std::endl;
+
     itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( STLFileIOFactory::New() );

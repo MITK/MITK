@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
+#include "mitkDataStorage.h"
+#include "mitkWeakPointer.h"
 
 #include "mitkImage.h"
 #include "mitkSurface.h"
@@ -80,6 +82,9 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
 
 
     mitkClassMacro( NonBlockingAlgorithm, itk::Object )
+   
+    void SetDataStorage(DataStorage& storage);
+    DataStorage* GetDataStorage();
 
 // parameter setting
 
@@ -209,6 +214,8 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     virtual void ThreadedUpdateFailed(); // will when ThreadedUpdateFunction() returns false
 
     PropertyList::Pointer m_Parameters;
+
+    WeakPointer<DataStorage> m_DataStorage;
 
   private:
 

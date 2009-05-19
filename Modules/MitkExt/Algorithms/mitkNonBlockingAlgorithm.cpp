@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNonBlockingAlgorithm.h"
 #include "mitkCallbackFromGUIThread.h"
+#include "mitkDataStorage.h"
 #include <itkCommand.h>
 
 namespace mitk {
@@ -34,6 +35,17 @@ NonBlockingAlgorithm::NonBlockingAlgorithm()
 NonBlockingAlgorithm::~NonBlockingAlgorithm()
 {
 }
+
+void mitk::NonBlockingAlgorithm::SetDataStorage(DataStorage& storage)
+{
+  m_DataStorage = &storage;
+}
+
+DataStorage* mitk::NonBlockingAlgorithm::GetDataStorage()
+{
+  return m_DataStorage;
+}
+
 
 void NonBlockingAlgorithm::Initialize(const NonBlockingAlgorithm* itkNotUsed(other))
 { 

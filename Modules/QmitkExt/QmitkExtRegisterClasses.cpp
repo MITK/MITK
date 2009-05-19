@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDrawPaintbrushToolGUIFactory.h"
 #include "QmitkErasePaintbrushToolGUIFactory.h"
 
+#include "QmitkCallbackFromGUIThread.h"
+
 #include <iostream>
 
 void QmitkExtRegisterClasses()
@@ -38,6 +40,8 @@ void QmitkExtRegisterClasses()
   itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
   itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
   itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
+
+  static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
 
   alreadyDone = true;
   }

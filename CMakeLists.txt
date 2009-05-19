@@ -39,6 +39,9 @@ ENDIF(NOT MITK_DIR)
 # to decide if they should be build
 OPTION(MITK_USE_QT "Use Trolltech's Qt library" ON)
 
+IF(NOT UNIX)
+  SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE STRING "Use this variable to always build static libraries on non-unix platforms")
+ENDIF()
 ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" OFF)

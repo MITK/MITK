@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_core_ext_EXPORTS)
-    #define MITKEXT_CORE_EXPORT __declspec(dllexport)
+    #define MITKCOREEXT_EXPORT __declspec(dllexport)
   #else
-    #define MITKEXT_CORE_EXPORT __declspec(dllimport)
+    #define MITKCOREEXT_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
 #if !defined(MBI_SANDBOX_EXPORTS)
-  #define MITKEXT_CORE_EXPORT
+  #define MITKCOREEXT_EXPORT
 #endif
 
 #endif /*_MBI_SANDBOX_EXPORTS_DLL_H_*/

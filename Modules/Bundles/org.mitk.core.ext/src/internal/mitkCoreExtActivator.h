@@ -34,7 +34,7 @@ namespace mitk
  * When the plug-in is started by the framework, it initialzes sandbox
  * specific things.
  */
-class MITKEXT_CORE_EXPORT CoreExtActivator : public cherry::Plugin
+class MITKCOREEXT_EXPORT CoreExtActivator : public cherry::Plugin
 {
 
 public:

@@ -88,17 +88,22 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     void SetPredicate(mitk::NodePredicateBase* _Predicate);
     ///
-    /// Called when a DataStorage Add Event was thrown. May be reimplemented
-    /// by deriving classes.
+    /// Adds a node to this model. 
+    /// There are two constraints for nodes in this model:
+    /// 1. If a predicate is set (not null) the node will be checked against it.
+    /// 2. The node has to have a data object (no one wants to see empty nodes).
+    /// Also adds event listeners to the node.
     ///
-    virtual void NodeAdded(const mitk::DataTreeNode* node);
+    virtual void AddNode(const mitk::DataTreeNode* node);
     ///
-    /// Called when a DataStorage Remove Event was thrown. May be reimplemented
-    /// by deriving classes.
+    /// Removes a node from this model. Also removes any event listener from the node.
     ///
-    virtual void NodeRemoved(const mitk::DataTreeNode* node);
+    virtual void RemoveNode(const mitk::DataTreeNode* node);
     ///
     /// \brief Called when a single property was changed.
+    /// The function searches through the list of nodes in this model for the changed
+    /// property. If the property was found a dataChanged signal is emitted forcing
+    /// all observing views to request the data again.
     ///
     virtual void PropertyModified(const itk::Object *caller, const itk::EventObject &event);
     ///

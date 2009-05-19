@@ -211,10 +211,10 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     if(m_DataStorage != 0)
     {
       this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::NodeAdded ) );
+        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::NodeRemoved ) );
+        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
     }
 
     // set new data storage
@@ -225,10 +225,10 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     {
       // subscribe for node added/removed events
       this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::NodeAdded ) );
+        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::NodeRemoved ) );
+        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
     }
 
     // Reset model (even if datastorage is 0->will be checked in Reset())
@@ -237,49 +237,85 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
 }
 
 
-void QmitkDataStorageTableModel::NodeAdded( const mitk::DataTreeNode* node )
+void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
 {
   // garantuee no recursions when a new node event is thrown
   if(!m_BlockEvents)
   {
-    m_BlockEvents = true;
+    // if we have a predicate, check node against predicate first
+    if(m_Predicate.IsNotNull() && !m_Predicate->CheckNode(node))
+      return;
 
-    // check if node should be added to the model
-    bool addNode = true;
-    if(m_Predicate && !m_Predicate->CheckNode(node))
-      addNode = false;
+    // dont add nodes without data (formerly known as helper objects)
+    if(node->GetData() == 0)
+      return;
 
-    // currently we dont have the possibility to add single nodes to the node set
-    if(addNode)
-      this->Reset();
+    // create listener commands to listen to changes in the name or the visibility of the node
+    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand 
+      = itk::MemberCommand<QmitkDataStorageTableModel>::New();
+    propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
 
-    m_BlockEvents = false;
+    mitk::BaseProperty* tempProperty = 0;
+
+    // add listener for properties
+    tempProperty = node->GetProperty("visible");
+    if(tempProperty)
+      m_VisiblePropertyModifiedObserverTags[tempProperty] 
+        = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+
+    tempProperty = node->GetProperty("name");
+    if(tempProperty)
+      m_NamePropertyModifiedObserverTags[tempProperty] 
+        = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+
+    // emit beginInsertRows event
+    beginInsertRows(QModelIndex(), m_NodeSet->size(), m_NodeSet->size());
+
+    // add node
+    m_NodeSet->push_back(const_cast<mitk::DataTreeNode*>(node));
+
+    // emit endInsertRows event
+    endInsertRows();
   }
 }
 
-void QmitkDataStorageTableModel::NodeRemoved( const mitk::DataTreeNode* node )
+void QmitkDataStorageTableModel::RemoveNode( const mitk::DataTreeNode* node )
 {
   // garantuee no recursions when a new node event is thrown
   if(!m_BlockEvents)
   {
-    m_BlockEvents = true;
+    // find corresponding node
+    mitk::DataStorage::SetOfObjects::iterator nodeIt
+      = std::find(m_NodeSet->begin(), m_NodeSet->end(), node);
 
-    bool removeNode = false;    
-    // check if node is contained in current list, if yes: Reset model
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = m_NodeSet->Begin()
-      ; nodeIt != m_NodeSet->End(); nodeIt++)  // for each node
+    if(nodeIt != m_NodeSet->end())
     {
-      if( nodeIt.Value() == node )
-      {
-        removeNode = true;
-        break;
-      }
+      // now: remove listeners for name property ...
+      mitk::BaseProperty* tempProperty = 0;
+
+      tempProperty = (*nodeIt)->GetProperty("visible");
+      if(tempProperty)
+        tempProperty->RemoveObserver(m_VisiblePropertyModifiedObserverTags[tempProperty]);
+      m_VisiblePropertyModifiedObserverTags.erase(tempProperty);
+
+      // ... and visibility property
+      tempProperty = (*nodeIt)->GetProperty("name");
+      if(tempProperty)
+        tempProperty->RemoveObserver(m_NamePropertyModifiedObserverTags[tempProperty]);
+      m_NamePropertyModifiedObserverTags.erase(tempProperty);
+
+      // get an index from iterator
+      int row = std::distance(m_NodeSet->begin(), nodeIt);
+
+      // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
+      this->beginRemoveRows(QModelIndex(), row, row);
+
+      // remove node
+      m_NodeSet->erase(nodeIt);
+
+      // emit endRemoveRows event
+      endRemoveRows();
     }
-
-    if(removeNode)
-      this->Reset();
-
-    m_BlockEvents = false;
   }
 }
 
@@ -319,9 +355,11 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
         }
       }
 
+      // if we have the property we have a valid iterator
       if( it != m_NodeSet->end() )
         row = std::distance(m_NodeSet->begin(), it);
 
+      // now emit the dataChanged signal
       QModelIndex indexOfChangedProperty = index(row, column);
       emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
     }
@@ -331,6 +369,7 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
 bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVariant &value,
   int role)
 {
+  bool noErr = false;
 
   if (index.isValid() && role == Qt::EditRole) 
   {
@@ -354,9 +393,10 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
     emit dataChanged(index, index);
 
     m_BlockEvents = false;
-    return true;
+    noErr = true;
   }
-  return false;
+
+  return noErr;
 }
 
 //#Protected SETTER
@@ -364,21 +404,18 @@ void QmitkDataStorageTableModel::Reset()
 {
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet;
 
-  // remove all event listeners
-
-  // remove all event listeners
-  for(std::map<mitk::BaseProperty*, unsigned long>::iterator it=m_NamePropertyModifiedObserverTags.begin()
-    ; it!=m_NamePropertyModifiedObserverTags.end(); it++)
-  {
-    it->first->RemoveObserver(it->second);
-  }
-  for(std::map<mitk::BaseProperty*, unsigned long>::iterator it=m_VisiblePropertyModifiedObserverTags.begin()
-    ; it!=m_VisiblePropertyModifiedObserverTags.end(); it++)
-  {
-    it->first->RemoveObserver(it->second);
+  // remove all nodes now (dont use iterators because removing elements
+  // would invalidate the iterator)
+  // start at the last element: first in, last out
+  unsigned int i = m_NodeSet->size();
+  while(!m_NodeSet->empty())
+  {    
+    --i;
+    this->RemoveNode(m_NodeSet->at(i));
   }
 
-  // clear all members that belong to the node selection
+  // normally now everything should be empty->just to be sure
+  // erase all arrays again
   m_NamePropertyModifiedObserverTags.clear();
   m_VisiblePropertyModifiedObserverTags.clear();
   m_NodeSet->clear();
@@ -386,7 +423,6 @@ void QmitkDataStorageTableModel::Reset()
   // the whole reset depends on the fact if a data storage is set or not
   if(m_DataStorage.IsNotNull())
   {
-
     if(m_Predicate.IsNotNull())
       // get subset
       _NodeSet = m_DataStorage->GetSubset(m_Predicate);
@@ -397,64 +433,13 @@ void QmitkDataStorageTableModel::Reset()
       // remove ghost root node
     }
 
-    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand 
-      = itk::MemberCommand<QmitkDataStorageTableModel>::New();
-    propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
-
-    mitk::BaseProperty* tempProperty = 0;
-    // only add nodes with appended data (no one wants to see an empty node)
+    // finally add all nodes to the model
     for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end()
       ; it++)
     {
-      tempProperty = 0;
       // save node
-      m_NodeSet->push_back(*it);
-
-      // add listener for properties
-      tempProperty = (*it)->GetProperty("visible");
-      if(tempProperty)
-        m_VisiblePropertyModifiedObserverTags[tempProperty] 
-          = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-
-      tempProperty = (*it)->GetProperty("name");
-      if(tempProperty)
-        m_NamePropertyModifiedObserverTags[tempProperty] 
-          = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-    }
-  }
-
-  // emit reset signals
-  QAbstractItemModel::reset();
-}
-
-/*
-void QmitkDataStorageTableModel::NodeChanged( const mitk::DataTreeNode* node )
-{
-  if(!m_BlockEvents)
-  {
-    m_BlockEvents = true;
-
-    bool nodeFound = false;    
-    // check if node is contained in current list
-    mitk::DataStorage::SetOfObjects::iterator nodeIt = 
-      std::find(m_NodeSet->begin(), m_NodeSet->end(), node);
-
-    int row = -1;
-
-    // get right index
-    if( nodeIt != m_NodeSet->end() )
-      row = std::distance( m_NodeSet->begin(), nodeIt );
-
-    // create two model indexes: one beginning at the "name" column
-    // and a second one ending at the last column
-    if(row >= 0)
-    {
-      QModelIndex indexOfChangedPropertyFirstColumn = index(row, 0);
-      QModelIndex indexOfChangedPropertyLastColumn = index(row, 2);
-      emit dataChanged(indexOfChangedPropertyFirstColumn, indexOfChangedPropertyLastColumn);
+      this->AddNode(*it);
     }
 
-    m_BlockEvents = false;
   }
 }
-*/

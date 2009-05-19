@@ -23,6 +23,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 {
   std::bitset<2> paintFlags;
 
+/*
   if(index.column() == 1)
   {
     //Get item data
@@ -55,7 +56,7 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
       paintFlags.set(0, true);
     }
 
-    /*
+    / *
     else if(data.type() == QVariant::Bool)
     {
       bool boolValue = data.value<bool>();
@@ -76,10 +77,11 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
       style->drawControl(QStyle::CE_CheckBox,&opt,painter);
 
       paintFlags.set(1, true);
-    }*/
+    }* /
 
 
-  }
+  }*/
+
 
   if(paintFlags.none())
   {
@@ -95,6 +97,8 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
   if(data.isValid())
   {
+
+    /*
     if(data.type() == QVariant::Color)
     {
       QPushButton* colorBtn = new QPushButton(parent);
@@ -111,7 +115,6 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       return colorBtn;
     }
 
-/*
     else if(data.type() == QVariant::Bool)
     {
       QCheckBox *visibilityCheckBox = new QCheckBox(parent);
@@ -121,7 +124,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       return visibilityCheckBox;
     }
 */
-    else if(data.type() == QVariant::Int)
+    /*else*/ if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
@@ -165,20 +168,22 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
   if(data.isValid())
   {
+/*
     if(data.type() == QVariant::Color)
     {
       //QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
       //QColor qcol = data.value<QColor>();
       //colorBtn->setPalette(QPalette(qcol));
 
-/*
+/ *
       QColor result = QColorDialog::getColor(qcol);
       if(result.isValid())
       {
         colorBtn->setPalette(QPalette(result));
-      }*/
+      }* /
 
-    }
+    }*/
+
 
 /*
     else if(data.type() == QVariant::Bool)
@@ -187,7 +192,7 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
       visibilityCheckBox->setChecked(data.toBool());
     }*/
 
-    else if(data.type() == QVariant::Int)
+    /*else*/ if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = qobject_cast<QSpinBox *>(editor);
       spinBox->setValue(data.toInt());
@@ -223,15 +228,17 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
 
   if(data.isValid())
   {
+/*
     if(data.type() == QVariant::Color)
     {
       QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
       QVariant colorVariant;
       colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
       model->setData(index, colorVariant);
-    }
+    }*/
 
-    else if(data.type() == QVariant::Int)
+
+    /*else*/ if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = qobject_cast<QSpinBox *>(editor);
       int intValue = spinBox->value();
@@ -272,6 +279,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
 void QmitkPropertyDelegate::commitAndCloseEditor()
 {
   QWidget* editor = 0;
+/*
   if(QPushButton *pushBtn = qobject_cast<QPushButton *>(sender()))
   {
     QColor result = QColorDialog::getColor(pushBtn->palette().color(QPalette::Button));
@@ -280,7 +288,8 @@ void QmitkPropertyDelegate::commitAndCloseEditor()
       pushBtn->setPalette(QPalette(result));
       editor = pushBtn;
     }
-  }
+  }*/
+
 
 /*
   else if(QCheckBox *chkBox = qobject_cast<QCheckBox *>(sender()))

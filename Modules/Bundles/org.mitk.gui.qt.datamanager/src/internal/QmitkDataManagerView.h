@@ -195,7 +195,7 @@ private:
   ///
   /// \brief The properties table editor.
   ///
-  QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
+  //QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
 
 };
 

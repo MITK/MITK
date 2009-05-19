@@ -29,8 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::LevelWindowManager::LevelWindowManager()
-: m_DataStorage(NULL), m_LevelWindowProperty(NULL), m_CurrentImage(NULL), 
-  m_IsObserverTagSet(false), m_AutoTopMost(true)
+: m_DataStorage(NULL)
+, m_LevelWindowProperty(NULL)
+, m_AutoTopMost(true)
+, m_IsObserverTagSet(false)
+, m_CurrentImage(NULL)
 {
 }
 

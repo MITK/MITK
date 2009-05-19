@@ -54,24 +54,25 @@ public:
 
   /** Constructor.  */
   WeakPointer ()
-    : m_Pointer(0)
-    , m_DeleteObserverTag(-1)
+    : m_DeleteObserverTag(-1)
     , m_ModifiedObserverTag(-1)
+    , m_Pointer(0)
   {
   }
 
   /** Copy constructor.  */
   WeakPointer (const WeakPointer<ObjectType> &p)
-    : m_Pointer(p.m_Pointer)
-    , m_DeleteObserverTag(-1)
+    : m_DeleteObserverTag(-1)
     , m_ModifiedObserverTag(-1)
+    , m_Pointer(p.m_Pointer)
   {
     this->AddDeleteAndModifiedObserver();
   }
 
   /** Constructor to pointer p.  */
   WeakPointer (ObjectType *p)
-    : m_Pointer(p) 
+    : m_DeleteObserverTag(0),
+      m_Pointer(p) 
   {
     this->AddDeleteAndModifiedObserver();
   }
@@ -202,6 +203,7 @@ private:
 
   long m_DeleteObserverTag;
   long m_ModifiedObserverTag;
+
   /** The pointer to the object referrred to by this smart pointer. */
   ObjectType* m_Pointer;
 };

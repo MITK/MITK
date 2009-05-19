@@ -93,16 +93,16 @@ namespace mitk
     LevelWindowManager();
     ~LevelWindowManager();
 
-    DataStorage::Pointer m_DataStorage;
+    DataStorage::Pointer         m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
     typedef std::map<unsigned long, mitk::BaseProperty::Pointer> ObserverToPropertyMap;
-    ObserverToPropertyMap m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
-    bool m_AutoTopMost;
-    unsigned long m_ObserverTag;
-    bool m_IsObserverTagSet;
-    unsigned long m_PropertyModifiedTag;
-    bool m_IsPropertyModifiedTagSet;
-    mitk::Image* m_CurrentImage;
+    ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
+    bool                         m_AutoTopMost;
+    unsigned long                m_ObserverTag;
+    bool                         m_IsObserverTagSet;
+    unsigned long                m_PropertyModifiedTag;
+    bool                         m_IsPropertyModifiedTagSet;
+    mitk::Image*                 m_CurrentImage;
   };
 }
 #endif

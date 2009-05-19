@@ -40,6 +40,7 @@
 #include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QToolbar>
 
 QmitkDataManagerView::QmitkDataManagerView()
 {
@@ -49,6 +50,7 @@ QmitkDataManagerView::QmitkDataManagerView()
 QmitkDataManagerView::~QmitkDataManagerView()
 {
 /*  mitk::DelegateManager::GetInstance()->RemoveCommand("Show Node Info");*/
+
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -73,6 +75,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   //# NodeView
   QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes (Use Right Mouse Button for a Context Menu)", m_BasePane);
+  m_NodeToolbar = new QToolBar(_NodeViewGroupBox);
   QVBoxLayout* _NodeViewLayout = new QVBoxLayout;
   m_NodeTableView = new QTableView(_NodeViewGroupBox);
   // Show only nodes that really contain data
@@ -143,16 +146,25 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   // NodeView
   _NodeViewGroupBox->setLayout(_NodeViewLayout);
+  _NodeViewLayout->addWidget(m_NodeToolbar);
   _NodeViewLayout->addWidget(m_NodeTableView);
   _NodeViewLayout->addWidget(_PaneNodeButton);
   m_NodeTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-  m_NodeTableView->setSelectionMode( QAbstractItemView::SingleSelection );
+  m_NodeTableView->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectRows );
-  m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+  m_NodeTableView->horizontalHeader()->setStretchLastSection(true);
+  //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+  //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
   m_NodeTableView->setAlternatingRowColors(true);
+  m_NodeTableView->setSortingEnabled(true);
   //m_NodeTableView->setItemDelegate(new QmitkDataStorageDelegate(2, m_NodeTableView));
   m_NodeTableView->setModel(m_NodeTableModel);
+
+  m_NodeToolbar->setIconSize(QSize(16, 16));
+  m_NodeToolbar->addAction(m_SaveAction);
+  m_NodeToolbar->addAction(m_RemoveAction);
+  m_NodeToolbar->addAction(m_ReinitAction);
 
   _NodeButtonLayout->addWidget(m_BtnLoad);
   _NodeButtonLayout->addWidget(m_BtnGlobalReinit);
@@ -237,10 +249,12 @@ void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
 void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 {
   // select this item if not already selected
+/*
   if(m_NodeTableView->currentIndex() != index)
   {
     m_NodeTableView->setCurrentIndex(index);
-  }
+  }*/
+
 }
 
 
@@ -262,61 +276,93 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 
 void QmitkDataManagerView::SaveActionTriggered(bool checked)
 {
-  QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-  if(!indexOfSelectedRow.isValid()) return;
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
+  std::vector<mitk::DataTreeNode*> selectedNodes;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
-  if ( !node ) return;
-
-  mitk::BaseData::Pointer data = node->GetData();
-
-  if (data.IsNotNull())
+  mitk::DataTreeNode* node = 0;
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
   {
-    CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+    node = m_NodeTableModel->GetNode(*it);
+    // if node is not defined or if the node contains geometry data do not remove it
+    if ( node != 0 )
+      selectedNodes.push_back(node);
+  }
+
+  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+    ; it != selectedNodes.end(); it++)
+  {
+    node = *it;
+    mitk::BaseData::Pointer data = node->GetData();
+
+    if (data.IsNotNull())
+    {
+      CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+    }  	
   }
 }
 
 void QmitkDataManagerView::ActionReinitTriggered( bool checked /*= false */ )
 {
-  QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-  if(indexOfSelectedRow.isValid())
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
+  std::vector<mitk::DataTreeNode*> selectedNodes;
+
+  mitk::DataTreeNode* node = 0;
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
   {
-    mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
-    if (node != NULL )
+    node = m_NodeTableModel->GetNode(*it);
+    // if node is not defined or if the node contains geometry data do not remove it
+    if ( node != 0 )
+      selectedNodes.push_back(node);
+  }
+
+  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+    ; it != selectedNodes.end(); it++)
+  {
+    node = *it;
+    mitk::BaseData::Pointer basedata = node->GetData();
+    if (basedata.IsNotNull())
     {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      if (basedata.IsNotNull())
-      {
-        mitk::RenderingManager::GetInstance()->InitializeViews(
-          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
+      mitk::RenderingManager::GetInstance()->InitializeViews(
+        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
 }
 
 void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
 {
-  QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-  if(!indexOfSelectedRow.isValid())
-    return;
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
+  std::vector<mitk::DataTreeNode*> selectedNodes;
 
-  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
-  if ( !node )
-    return;
-
-  switch(QMessageBox::question(m_Parent, tr("DataManager")
-    , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+  mitk::DataTreeNode* node = 0;
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
   {
-    case QMessageBox::Yes: //Remove the item from view and tree
-      this->GetDataStorage()->Remove(node);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      break;
+    node = m_NodeTableModel->GetNode(*it);
+    // if node is not defined or if the node contains geometry data do not remove it
+    if ( node != 0 /*& strcmp(node->GetData()->GetNameOfClass(), "Geometry2DData") != 0*/ )
+      selectedNodes.push_back(node);
+  }
 
-    case QMessageBox::No:
-    case QMessageBox::Cancel:
-	default:
-	 break;
+  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+    ; it != selectedNodes.end(); it++)
+  {
+    node = *it;
+    switch(QMessageBox::question(m_Parent, tr("DataManager")
+      , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+    {
+      case QMessageBox::Yes: //Remove the item from view and tree
+        this->GetDataStorage()->Remove(node);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        break;
+
+      case QMessageBox::No:
+      case QMessageBox::Cancel:
+	  default:
+	   break;
+    }
   }
 }
 

@@ -20,6 +20,7 @@ class QModelIndex;
 class QTableView;
 class QSplitter;
 class QPushButton;
+class QToolBar;
 
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
@@ -160,6 +161,10 @@ private:
   /// \brief A plain widget as the base pane.
   ///
   QmitkDataStorageTableModel* m_NodeTableModel;
+  ///
+  /// A Toolbar showing actions for saving, loading and re-initing nodes.
+  ///
+  QToolBar* m_NodeToolbar;
   ///
   /// \brief The Table view to show the selected nodes.
   ///

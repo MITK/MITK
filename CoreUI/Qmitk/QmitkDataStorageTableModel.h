@@ -111,6 +111,51 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     bool setData(const QModelIndex &index, const QVariant &value,
       int role);
+    ///
+    /// \brief Reimplemented sort function from QAbstractTableModel to enable sorting on the table.
+    ///
+    void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder );
+
+    //#PROTECTED INNER CLASSES
+protected:
+  ///
+  /// \struct DataTreeNodeCompareFunction
+  /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the node list elements.
+  ///
+  struct DataTreeNodeCompareFunction 
+    : public std::binary_function<mitk::DataTreeNode::Pointer, mitk::DataTreeNode::Pointer, bool>
+  {
+    ///
+    /// \brief Specifies field of the property with which it will be sorted.
+    ///
+    enum CompareCriteria {
+      CompareByName = 0,
+      CompareByClassName,
+      CompareByVisibility
+    };
+
+    ///
+    /// \brief Specifies Ascending/descending ordering.
+    ///
+    enum CompareOperator {
+      Less = 0,
+      Greater
+    };
+
+    ///
+    /// \brief Creates a PropertyDataSetCompareFunction. A CompareCriteria and a CompareOperator must be given.
+    ///
+    DataTreeNodeCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
+    ///
+    /// \brief The reimplemented compare function.
+    ///
+    bool operator()(const mitk::DataTreeNode::Pointer& _Left
+      , const mitk::DataTreeNode::Pointer& _Right) const;
+
+  protected:
+    CompareCriteria m_CompareCriteria;
+    CompareOperator m_CompareOperator;
+  };
 
   //#Protected SETTER
   protected:
@@ -137,7 +182,7 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     /// Holds all selected Nodes.
     ///
-    mitk::DataStorage::SetOfObjects::Pointer m_NodeSet;
+    std::vector<mitk::DataTreeNode*> m_NodeSet;
     ///
     /// \brief Maps a property to an observer tag.
     ///
@@ -150,6 +195,10 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// Saves if this model is currently working on events to prevent endless event loops.
     /// 
     bool m_BlockEvents;
+    ///
+    /// \brief The property is true when the property list is sorted in descending order.
+    ///
+    bool m_SortDescending;
 
 };
 

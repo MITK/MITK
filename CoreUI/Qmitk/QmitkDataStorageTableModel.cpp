@@ -16,8 +16,8 @@ QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointe
 : QAbstractTableModel(parent)
 , m_DataStorage(0)
 , m_Predicate(0)
-, m_NodeSet(mitk::DataStorage::SetOfObjects::New())
 , m_BlockEvents(false)
+, m_SortDescending(false)
 {
   this->SetPredicate(_Predicate);
   this->SetDataStorage(_DataStorage);
@@ -46,7 +46,7 @@ mitk::DataTreeNode::Pointer QmitkDataStorageTableModel::GetNode( const QModelInd
 
   if(index.isValid())
   {
-    node = m_NodeSet->ElementAt(index.row());
+    node = m_NodeSet.at(index.row());
   }
 
   return node;
@@ -96,7 +96,7 @@ Qt::ItemFlags QmitkDataStorageTableModel::flags(const QModelIndex &index) const
 
 int QmitkDataStorageTableModel::rowCount(const QModelIndex &parent) const
 {
-  return m_NodeSet->size();
+  return m_NodeSet.size();
 }
 
 int QmitkDataStorageTableModel::columnCount(const QModelIndex &parent) const
@@ -110,9 +110,9 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
 {
   QVariant data;
 
-  if (index.isValid() && !m_NodeSet->empty())
+  if (index.isValid() && !m_NodeSet.empty())
   {
-    mitk::DataTreeNode::Pointer node = m_NodeSet->ElementAt(index.row());
+    mitk::DataTreeNode::Pointer node = m_NodeSet.at(index.row());
 
     std::string nodeName = node->GetName();
     if(nodeName.empty())
@@ -187,7 +187,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
 
     } // index.column() == 2 
 
-  } // index.isValid() && !m_NodeSet->empty()
+  } // index.isValid() && !m_NodeSet.empty()
   return data;
 }
 
@@ -269,10 +269,10 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
         = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
 
     // emit beginInsertRows event
-    beginInsertRows(QModelIndex(), m_NodeSet->size(), m_NodeSet->size());
+    beginInsertRows(QModelIndex(), m_NodeSet.size(), m_NodeSet.size());
 
     // add node
-    m_NodeSet->push_back(const_cast<mitk::DataTreeNode*>(node));
+    m_NodeSet.push_back(const_cast<mitk::DataTreeNode*>(node));
 
     // emit endInsertRows event
     endInsertRows();
@@ -285,10 +285,10 @@ void QmitkDataStorageTableModel::RemoveNode( const mitk::DataTreeNode* node )
   if(!m_BlockEvents)
   {
     // find corresponding node
-    mitk::DataStorage::SetOfObjects::iterator nodeIt
-      = std::find(m_NodeSet->begin(), m_NodeSet->end(), node);
+    std::vector<mitk::DataTreeNode*>::iterator nodeIt
+      = std::find(m_NodeSet.begin(), m_NodeSet.end(), node);
 
-    if(nodeIt != m_NodeSet->end())
+    if(nodeIt != m_NodeSet.end())
     {
       // now: remove listeners for name property ...
       mitk::BaseProperty* tempProperty = 0;
@@ -305,13 +305,13 @@ void QmitkDataStorageTableModel::RemoveNode( const mitk::DataTreeNode* node )
       m_NamePropertyModifiedObserverTags.erase(tempProperty);
 
       // get an index from iterator
-      int row = std::distance(m_NodeSet->begin(), nodeIt);
+      int row = std::distance(m_NodeSet.begin(), nodeIt);
 
       // emit beginRemoveRows event (QModelIndex is empty because we dont have a tree model)
       this->beginRemoveRows(QModelIndex(), row, row);
 
       // remove node
-      m_NodeSet->erase(nodeIt);
+      m_NodeSet.erase(nodeIt);
 
       // emit endRemoveRows event
       endRemoveRows();
@@ -332,12 +332,12 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
       int row = -1;
       int column = -1;
 
-      mitk::DataStorage::SetOfObjects::iterator it;
+      std::vector<mitk::DataTreeNode*>::iterator it;
       mitk::BaseProperty* visibilityProperty = 0; 
       mitk::BaseProperty* nameProperty = 0;
 
       // search for property that changed and emit datachanged on the corresponding ModelIndex
-      for(it=m_NodeSet->begin(); it!=m_NodeSet->end(); it++)
+      for(it=m_NodeSet.begin(); it!=m_NodeSet.end(); it++)
       {
         // check for the visible property or the name property
         visibilityProperty = (*it)->GetProperty("visible");
@@ -356,8 +356,8 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
       }
 
       // if we have the property we have a valid iterator
-      if( it != m_NodeSet->end() )
-        row = std::distance(m_NodeSet->begin(), it);
+      if( it != m_NodeSet.end() )
+        row = std::distance(m_NodeSet.begin(), it);
 
       // now emit the dataChanged signal
       QModelIndex indexOfChangedProperty = index(row, column);
@@ -377,7 +377,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
     // --> set m_BlockEvents to true
     m_BlockEvents = true;
 
-    mitk::DataTreeNode::Pointer node = m_NodeSet->ElementAt(index.row());
+    mitk::DataTreeNode::Pointer node = m_NodeSet.at(index.row());
 
     if(index.column() == 0)
     {
@@ -407,18 +407,18 @@ void QmitkDataStorageTableModel::Reset()
   // remove all nodes now (dont use iterators because removing elements
   // would invalidate the iterator)
   // start at the last element: first in, last out
-  unsigned int i = m_NodeSet->size();
-  while(!m_NodeSet->empty())
+  unsigned int i = m_NodeSet.size();
+  while(!m_NodeSet.empty())
   {    
     --i;
-    this->RemoveNode(m_NodeSet->at(i));
+    this->RemoveNode(m_NodeSet.at(i));
   }
 
   // normally now everything should be empty->just to be sure
   // erase all arrays again
   m_NamePropertyModifiedObserverTags.clear();
   m_VisiblePropertyModifiedObserverTags.clear();
-  m_NodeSet->clear();
+  m_NodeSet.clear();
 
   // the whole reset depends on the fact if a data storage is set or not
   if(m_DataStorage.IsNotNull())
@@ -441,5 +441,81 @@ void QmitkDataStorageTableModel::Reset()
       this->AddNode(*it);
     }
 
+  }
+}
+
+void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::AscendingOrder */ )
+{
+  bool sortDescending = (order == Qt::DescendingOrder) ? true: false;
+
+  // do not sort twice !!! (dont know why, but qt calls this func twice. STUPID!)
+/*
+  if(sortDescending != m_SortDescending)
+  {*/
+
+    //m_SortDescending = sortDescending;
+
+    DataTreeNodeCompareFunction::CompareCriteria _CompareCriteria 
+      = DataTreeNodeCompareFunction::CompareByName;
+
+    DataTreeNodeCompareFunction::CompareOperator _CompareOperator
+      = sortDescending ? DataTreeNodeCompareFunction::Greater: DataTreeNodeCompareFunction::Less;
+
+    if(column == 1)
+      _CompareCriteria = DataTreeNodeCompareFunction::CompareByClassName;
+
+    else if(column == 2)
+      _CompareCriteria = DataTreeNodeCompareFunction::CompareByVisibility;
+
+
+    DataTreeNodeCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
+    std::sort(m_NodeSet.begin(), m_NodeSet.end(), compareFunc);
+
+    QAbstractTableModel::reset();
+  //}
+}
+
+QmitkDataStorageTableModel::DataTreeNodeCompareFunction::DataTreeNodeCompareFunction( CompareCriteria _CompareCriteria
+                                                                                          , CompareOperator _CompareOperator )
+                                                                                          : m_CompareCriteria(_CompareCriteria)
+                                                                                          , m_CompareOperator(_CompareOperator)
+{
+}
+
+bool QmitkDataStorageTableModel::DataTreeNodeCompareFunction::operator()
+( const mitk::DataTreeNode::Pointer& _Left
+ , const mitk::DataTreeNode::Pointer& _Right ) const
+{
+  switch(m_CompareCriteria)
+  {
+  case CompareByClassName:
+    if(m_CompareOperator == Less)
+      return (_Left->GetData()->GetNameOfClass() < _Right->GetData()->GetNameOfClass() );
+    else
+      return (_Left->GetData()->GetNameOfClass()  > _Right->GetData()->GetNameOfClass() );
+    break;
+
+  case CompareByVisibility:
+    {
+
+      bool _LeftVisibility = false;
+      bool _RightVisibility = false;
+      _Left->GetVisibility(_LeftVisibility, 0);
+      _Right->GetVisibility(_RightVisibility, 0);
+
+      if(m_CompareOperator == Less)
+        return (_LeftVisibility < _RightVisibility);
+      else
+        return (_LeftVisibility > _RightVisibility);
+    }
+    break;
+
+    // CompareByName:
+  default:
+    if(m_CompareOperator == Less)
+      return (_Left->GetName() < _Right->GetName());
+    else
+      return (_Left->GetName() > _Right->GetName());
+    break;
   }
 }

@@ -21,6 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkDataTreeNode.h"
 
+#include "mitkParRecFileIOFactory.h"
+#include "mitkObjFileIOFactory.h"
+#include "mitkVtkUnstructuredGridIOFactory.h"
+#include "mitkStlVolumeTimeSeriesIOFactory.h"
+#include "mitkVtkVolumeTimeSeriesIOFactory.h"
+
 #include "mitkCone.h"
 #include "mitkContour.h"
 #include "mitkContourMapper2D.h"
@@ -36,6 +42,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointDataVtkMapper3D.h"
 #include "mitkEnhancedPointSetVtkMapper3D.h"
 #include "mitkSeedsImage.h"
+#include "mitkUnstructuredGrid.h"
+#include "mitkUnstructuredGridVtkMapper3D.h"
+#include "mitkPolyDataGLMapper2D.h"
 
 #include "mitkVolumeDataVtkMapper3D.h"
 
@@ -60,6 +69,12 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory(bool registerSelf)
   if (!alreadyDone)
   {
     RegisterIOFactories();
+
+    itk::ObjectFactoryBase::RegisterFactory( ParRecFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( ObjFileIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
 
     itk::ObjectFactoryBase::RegisterFactory( AddContourToolFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( SubtractContourToolFactory::New() );
@@ -98,15 +113,14 @@ itk::Object::Pointer mitk::CoreExtObjectFactory::CreateCoreObject( const std::st
 
   if ( className == "" )
     return NULL;
-
-    CREATE_ITK( Contour, "Contour" )
-//  CREATE_ITK( Ellipsoid, "Ellipsoid" )
-//  CREATE_ITK( Cylinder, "Cylinder" )
-//  CREATE_ITK( Cuboid, "Cuboid" )
-//  CREATE_ITK( Cone, "Cone" )
-//    CREATE_ITK( SeedsImage, "SeedsImage" )
-//    CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
-//    CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
+  CREATE_ITK( Contour, "Contour" )
+  CREATE_ITK( Ellipsoid, "Ellipsoid" )
+  CREATE_ITK( Cylinder, "Cylinder" )
+  CREATE_ITK( Cuboid, "Cuboid" )
+  CREATE_ITK( Cone, "Cone" )
+  CREATE_ITK( SeedsImage, "SeedsImage" )
+  CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
+  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
   else
     pointer = Superclass::CreateCoreObject( className );
 
@@ -121,8 +135,7 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    /*
-    else if((dynamic_cast<Mesh*>(data)!=NULL))
+    if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataTreeNode(node);
@@ -132,13 +145,11 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
       newMapper = mitk::PolyDataGLMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
-    else */
-    if((dynamic_cast<Contour*>(data)!=NULL))
+    else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
-    /*
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetMapper2D::New();
@@ -149,31 +160,24 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
       newMapper = mitk::UnstructuredGridMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
-    */
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    /*
-    else if((dynamic_cast<Mesh*>(data)!=NULL))
+    if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
-    */
-    /*
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PointDataVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
-    else 
-    */
-    if((dynamic_cast<Contour*>(data)!=NULL))
+    else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
-    /*
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetVtkMapper3D::New();
@@ -184,7 +188,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
       newMapper = mitk::UnstructuredGridVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
-    */
   }
 
   if (newMapper.IsNull()) {

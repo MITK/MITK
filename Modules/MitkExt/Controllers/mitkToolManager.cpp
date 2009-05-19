@@ -320,7 +320,14 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetWorkingData()
 
 mitk::DataStorage* mitk::ToolManager::GetDataStorage()
 {
-  return m_DataStorage;
+  if ( m_DataStorage.IsNotNull() )
+  {
+    return m_DataStorage;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 void mitk::ToolManager::SetDataStorage(DataStorage& storage)

@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTool.h"
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
+#include "mitkWeakPointer.h"
 
 #include <itkEventObject.h>
 
@@ -244,7 +245,7 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
 
     int m_RegisteredClients;
 
-    DataStorage::Pointer m_DataStorage;
+    WeakPointer<DataStorage> m_DataStorage;
 };
 
 } // namespace

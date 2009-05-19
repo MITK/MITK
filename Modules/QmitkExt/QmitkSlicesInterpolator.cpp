@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSelectableGLWidget.h"
 
 #include "mitkToolManager.h"
-#include "mitkDataStorage.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
@@ -57,11 +56,10 @@ const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSl
   return actionToSliceDimension;
 }
 
-const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::ACTION_TO_SLICEDIMENSION
-  = QmitkSlicesInterpolator::createActionToSliceDimension();
 
 QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* name)
 :Q3VBox(parent, name),
+ ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
  m_Interpolator( mitk::SegmentationInterpolationController::New() ),
  m_MultiWidget(NULL),
  m_ToolManager(NULL),
@@ -96,6 +94,24 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 }
+    
+void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage& storage )
+{
+  m_DataStorage = &storage;
+}
+
+mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()
+{
+  if ( m_DataStorage.IsNotNull() )
+  {
+    return m_DataStorage;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 
 void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkStdMultiWidget* multiWidget)
 {
@@ -420,9 +436,17 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   orientationPopup.exec( QCursor::pos() );
 }
 
-void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(int windowID)
+void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
 {
-  AcceptAllInterpolations( windowID );
+  try
+  {
+    int windowID = ACTION_TO_SLICEDIMENSION.at( action );
+    AcceptAllInterpolations( windowID );
+  }
+  catch(...)
+  {
+    std::cerr << "Ill construction in " __FILE__ " l. " << __LINE__ << std::endl;
+  }
 }
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
@@ -431,13 +455,16 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
   try
   {
-    if (on)
+    if ( m_DataStorage.IsNotNull() )
     {
-      // mitk::DataStorage::GetInstance()->Add( m_FeedbackNode );
-    }
-    else
-    {
-      // mitk::DataStorage::GetInstance()->Remove( m_FeedbackNode );
+      if (on)
+      {
+        m_DataStorage->Add( m_FeedbackNode );
+      }
+      else
+      {
+        m_DataStorage->Remove( m_FeedbackNode );
+      }
     }
   }
   catch(...)

@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSliceNavigationController.h"
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkDataTreeNode.h"
+#include "mitkDataStorage.h"
+#include "mitkWeakPointer.h"
 
 #include <Q3VBox>
 #include <map>
@@ -69,6 +71,9 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
     void Initialize(mitk::ToolManager* toolManager, QmitkStdMultiWidget* multiWidget);
 
     virtual ~QmitkSlicesInterpolator();
+
+    void SetDataStorage( mitk::DataStorage& storage );
+    mitk::DataStorage* GetDataStorage();
 
     /**
       Just public because it is called by itk::Commands. You should not need to call this.
@@ -139,7 +144,7 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
     /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
      */
-    void OnAcceptAllPopupActivated(int windowID);
+    void OnAcceptAllPopupActivated(QAction* action);
     
     /**
       Called on activation/deactivation
@@ -148,8 +153,8 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
 
   protected:
 
-	static const std::map<QAction*, unsigned int> createActionToSliceDimension();
-	static const std::map<QAction*, unsigned int> ACTION_TO_SLICEDIMENSION;
+    const std::map<QAction*, unsigned int> createActionToSliceDimension();
+    const std::map<QAction*, unsigned int> ACTION_TO_SLICEDIMENSION;
 
     void AcceptAllInterpolations(unsigned int windowID);
         
@@ -161,13 +166,13 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
       \param windowID is 2 for transversal, 1 for frontal, 0 for sagittal (similar to sliceDimension in other methods)
           */
     bool TranslateAndInterpolateChangedSlice(const itk::EventObject& e, unsigned int windowID);
-    	
+    
     /**
       Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated ToolManager)
       should be interpolated. The actual work is then done by our SegmentationInterpolation object.
      */
     void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep );
-    	
+    
     /**
       Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
      */
@@ -206,6 +211,8 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
     std::vector<unsigned int> m_TimeStep; // current time step of the render windows
 
     bool m_InterpolationEnabled;
+
+    mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };
 
 #endif

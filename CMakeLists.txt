@@ -40,7 +40,7 @@ ENDIF(NOT MITK_DIR)
 OPTION(MITK_USE_QT "Use Trolltech's Qt library" ON)
 
 IF(NOT UNIX)
-  SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE STRING "Use this variable to always build static libraries on non-unix platforms")
+  SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 ENDIF()
 ADD_SUBDIRECTORY(Utilities)
 

@@ -40,7 +40,7 @@
 #include <QMotifStyle>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QToolbar>
+#include <QToolBar>
 
 QmitkDataManagerView::QmitkDataManagerView()
 {
@@ -298,7 +298,7 @@ void QmitkDataManagerView::SaveActionTriggered(bool checked)
     if (data.IsNotNull())
     {
       CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
-    }  	
+    }
   }
 }
 

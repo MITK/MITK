@@ -439,9 +439,14 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
 void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
 {
   try
-  {
-    int windowID = ACTION_TO_SLICEDIMENSION.at( action );
-    AcceptAllInterpolations( windowID );
+  {    
+    std::map<QAction*, unsigned int>::const_iterator iter = ACTION_TO_SLICEDIMENSION.find( action );
+    if (iter != ACTION_TO_SLICEDIMENSION.end())
+    {
+      int windowID = iter->second;
+      AcceptAllInterpolations( windowID );
+    }
+    
   }
   catch(...)
   {

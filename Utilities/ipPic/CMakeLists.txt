@@ -17,7 +17,7 @@ SET(IPPIC_FILES
   ipPicSize.c ipPicElements.c                       
   ipPicTSVSize.c ipPicTSVElements.c
   )
-ADD_LIBRARY(mitkIpPic ${IPPIC_FILES})
+ADD_LIBRARY(mitkIpPic STATIC ${IPPIC_FILES})
 IF(USE_ITKZLIB)
   TARGET_LINK_LIBRARIES(mitkIpPic itkzlib)
 ELSE(USE_ITKZLIB)

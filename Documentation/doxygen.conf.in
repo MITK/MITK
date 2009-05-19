@@ -40,10 +40,6 @@ GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
 ALIASES                = "FIXME=\par Fix Me's:\n" \
-						 "QT4=\if QT4" \
-						 "endQT4=\endif" \
-						 "QT3=\if QT3" \
-						 "endQT3=\endif" \
 						 "openCherry=\if OPENCHERRY" \
 						 "endopenCherry=\endif"
 ENABLED_SECTIONS       = @MITK_DOXYGEN_ENABLED_SECTIONS@
@@ -64,11 +60,9 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
-                         @MITK_BINARY_DIR@/Documentation/Doxygen/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
-                         @MITK_SOURCE_DIR@ @MBIQM_SOURCE_DIR@ @MBISB_SOURCE_DIR@ \
-                         @MITK_BINARY_DIR@ @MBIQM_BINARY_DIR@ @MBISB_BINARY_DIR@ \
-                         @FUNCTIONALITY_DIRS@
+                         @MITK_SOURCE_DIR@ @MITK_BINARY_DIR@ \
+                         @MBIQM_SOURCE_DIR@ @MBIQM_BINARY_DIR@ \
+                         @MBISB_SOURCE_DIR@ @MBISB_BINARY_DIR@ \
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
@@ -78,16 +72,23 @@ RECURSIVE              = YES
 EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/vecmath/ \
-                         @MITK_SOURCE_DIR@/Utilities/openCherry/ \
+                         @MITK_SOURCE_DIR@/openCherry/ \
+                         @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
-                         @MITK_SOURCE_DIR@/Testing/ \
-                         @MITK_SOURCE_DIR@/CMake/QmitkFunctionalityTemplate/ \
-                         @MITK_SOURCE_DIR@/CMake/Qt4FunctionalityTemplate/ \
-                         @QT_DOCUMENTATION_EXCLUDE_DIRS@
+                         @MITK_SOURCE_DIR@/Core/Testing/ \
+                         @MITK_SOURCE_DIR@/CMake/ \
+                         \
+                         @MBIQM_SOURCE_DIR@/QFunctionalities/
+                         @MBIQM_SOURCE_DIR@/Qmitk/ \
+                         \
+                         @MBISB_SOURCE_DIR@/QApplications/ \
+                         @MBISB_SOURCE_DIR@/CMake/ \
+                         @MBISB_SOURCE_DIR@/QFunctionalities/ \
+                         @MBISB_SOURCE_DIR@/Qmitk/
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \
                          Register*
-EXAMPLE_PATH           = @MITK_SOURCE_DIR@/QApplications/Tutorial/
+EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Applications/Tutorial/
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \

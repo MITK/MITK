@@ -1,8 +1,8 @@
 /**
-  \defgroup org_mitk_core_sandbox org.mitk.core.sandbox Plugin
+  \defgroup org_mitk_core_ext org.mitk.core.ext Plugin
   \ingroup MITKPlugins
 
-  \brief This small plug-in is responsible for initializing the MBI Sandbox.
+  \brief This small plug-in is responsible for initializing the MBI CoreExt module.
   
   It is started with an "eager" Bundle-ActivationPolicy, sucht that the plug-ins
   activator is executed before any other (non-eager) plug-ins.
@@ -10,10 +10,10 @@
 */
 
 /**
-  \defgroup org_mitk_core_sandbox_internal Internal
-  \ingroup org_mitk_core_sandbox
+  \defgroup org_mitk_core_ext_internal Internal
+  \ingroup org_mitk_core_ext
 
-  \brief This subcategory includes the internal classes of the org.mitk.core.sandbox plugin. Other
+  \brief This subcategory includes the internal classes of the org.mitk.core.ext plugin. Other
   plugins must not rely on these classes. They contain implementation details and their interface
   may change at any time. We mean it.
 */

@@ -16,22 +16,22 @@
  =========================================================================*/
 
 
-#ifndef QMITKEXTasdfEXTACTIVATOR_H_ 
-#define QMITKEXTasdfEXTACTIVATOR_H_ 
+#ifndef QMITKEXTEXTACTIVATOR_H_ 
+#define QMITKEXTEXTACTIVATOR_H_ 
 
 #include <cherryPlugin.h>
 
 #include <QmitkExtDll.h>
 
 /**
- * \ingroup org_mitk_core_sandbox_internal
+ * \ingroup org_mitk_gui_qt_ext_internal
  *
  * \brief The plug-in activator for the sandbox
  *
  * When the plug-in is started by the framework, it initialzes sandbox
  * specific things.
  */
-class QMITKEXT_EXPORT QmitkExtActivator : public cherry::Plugin
+class ORG_MITK_GUI_QT_EXT_EXPORT QmitkExtActivator : public cherry::Plugin
 {
 
 public:
@@ -43,4 +43,4 @@ public:
 
 };
 
-#endif /* MBISANDBOXACTIVATOR_H_ */
+#endif /* QMITKEXTEXTACTIVATOR_H_ */

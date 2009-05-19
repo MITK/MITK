@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkRegisterClasses.h"
+#include "QmitkExtRegisterClasses.h"
 
 #include "QmitkRenderingManagerFactory.h"
 

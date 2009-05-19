@@ -27,11 +27,11 @@ namespace mitk
 {
 
 /**
- * \ingroup org_mitk_core_sandbox_internal
+ * \ingroup org_mitk_core_ext_internal
  *
- * \brief The plug-in activator for the sandbox
+ * \brief The plug-in activator for the CoreExt module
  *
- * When the plug-in is started by the framework, it initialzes sandbox
+ * When the plug-in is started by the framework, it initialzes CoreExt
  * specific things.
  */
 class MITKCOREEXT_EXPORT CoreExtActivator : public cherry::Plugin
@@ -48,4 +48,4 @@ public:
 
 }
 
-#endif /* MBISANDBOXACTIVATOR_H_ */
+#endif /* MBICOREEXTACTIVATOR_H_ */

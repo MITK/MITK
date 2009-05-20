@@ -649,11 +649,11 @@ public:
   */
   static void ConvertTransformToItk(const MITKTransformType* mitkTransform, ITKTransformType* itkTransform)
   {
-    MITKTransformType::MatrixType mitkM = mitkTransform->GetMatrix();
-    ITKTransformType::MatrixType itkM;
+    typename MITKTransformType::MatrixType mitkM = mitkTransform->GetMatrix();
+    typename ITKTransformType::MatrixType itkM;
 
-    MITKTransformType::OffsetType mitkO = mitkTransform->GetOffset();
-    ITKTransformType::OffsetType itkO;
+    typename MITKTransformType::OffsetType mitkO = mitkTransform->GetOffset();
+    typename ITKTransformType::OffsetType itkO;
 
     for(short i = 0; i < 3; ++i)
     {

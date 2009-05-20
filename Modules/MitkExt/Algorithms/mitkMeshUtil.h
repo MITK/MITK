@@ -640,6 +640,34 @@ class MeshUtil
 
 public:
 
+  typedef itk::MatrixOffsetTransformBase<typename MeshType::CoordRepType,3,3> ITKTransformType;
+  typedef itk::MatrixOffsetTransformBase<mitk::ScalarType,3,3>       MITKTransformType;
+
+  /*! 
+  Convert a MITK transformation to an ITK transformation 
+  Necessary because ITK uses double and MITK uses float values
+  */
+  static void ConvertTransformToItk(const MITKTransformType* mitkTransform, ITKTransformType* itkTransform)
+  {
+    MITKTransformType::MatrixType mitkM = mitkTransform->GetMatrix();
+    ITKTransformType::MatrixType itkM;
+
+    MITKTransformType::OffsetType mitkO = mitkTransform->GetOffset();
+    ITKTransformType::OffsetType itkO;
+
+    for(short i = 0; i < 3; ++i)
+    {
+      for(short j = 0; j<3; ++j)
+      {
+        itkM[i][j] = (double)mitkM[i][j];
+      }
+      itkO[i] = (double)mitkO[i];
+    }
+
+    itkTransform->SetMatrix(itkM);
+    itkTransform->SetOffset(itkO);
+  }
+
   /*!
   create an itkMesh object from a vtkPolyData
   */

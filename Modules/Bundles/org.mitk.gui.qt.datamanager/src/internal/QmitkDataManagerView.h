@@ -58,44 +58,6 @@ public:
   ///
   virtual void Deactivated();
 
-  ///
-  /// \brief Shows a popup dialog with the currently selected node.
-  ///
-  void ShowNodeInfo();
-
-//# Inner classes
-public:
-  ///
-  /// \struct SingleNodeSelection
-  /// \brief Represents a selection object that encapsulates the selection of a single node.
-  ///
-  struct SingleNodeSelection: public cherry::ISelection
-  {
-    ///
-    /// \brief Make typdefs for pointer types.
-    ///
-    cherryObjectMacro(SingleNodeSelection);
-    ///
-    /// \brief Node setter.
-    ///
-    void SetNode(mitk::DataTreeNode* _SelectedNode);
-    ///
-    /// \brief Node getter.
-    ///
-    mitk::DataTreeNode* GetNode() const;
-    ///
-    /// \brief Checks if node is 0.
-    ///
-    virtual bool IsEmpty() const;
-
-  protected:
-    ///
-    /// \brief Holds the node that is currently selected.
-    ///
-    mitk::DataTreeNode* m_Node;
-  };
-
-
 protected slots:
   ///
   /// \brief Other datastorage selected, reset node selection and properties
@@ -200,7 +162,7 @@ private:
   ///
   /// \brief The properties table editor.
   ///
-  //QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
+  QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
 
 };
 

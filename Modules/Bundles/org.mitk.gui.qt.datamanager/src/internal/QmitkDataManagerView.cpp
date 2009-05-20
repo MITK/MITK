@@ -67,11 +67,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QGridLayout* _DataStorageSelectionLayout = new QGridLayout;
   m_DataStorageSelectionComboBox = new QComboBox(_DataStorageSelectionGroupBox);
 
-/*
   //# setup qsplitter
   QSplitter *_SplitterNodeViewPropertiesView = new QSplitter(m_BasePane);
   _SplitterNodeViewPropertiesView->setMargin(0);
-*/
 
   //# NodeView
   QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes (Use Right Mouse Button for a Context Menu)", m_BasePane);
@@ -101,12 +99,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_RemoveAction = m_NodeMenu->addAction(QIcon(":/datamanager/remove.xpm"), "Remove");
   m_ReinitAction = m_NodeMenu->addAction(QIcon(":/datamanager/refresh.xpm"), "Reinit");
 
-/*
   // NodeProperties
   QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane);
   QHBoxLayout* _NodePropertiesLayout = new QHBoxLayout;
-  m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);*/
-
+  m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);
 
   //// Set
 
@@ -116,21 +112,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   parentLayout->addWidget(m_BasePane, 0, 0);
   m_BasePane->setLayout(_BasePaneLayout);
   _BasePaneLayout->addWidget(_DataStorageSelectionGroupBox, 0, 0);
-/*
+
   _SplitterNodeViewPropertiesView->setOrientation(Qt::Vertical);
-  _SplitterNodeViewPropertiesView->setHandleWidth(5);
-  //_SplitterNodeViewPropertiesView->setMargin(5);
-  // just to show a visible splitter handle!
-  _SplitterNodeViewPropertiesView->setStyle(new QMotifStyle);
+  //_SplitterNodeViewPropertiesView->setHandleWidth(5);
   _SplitterNodeViewPropertiesView->addWidget(_NodeViewGroupBox);
   _SplitterNodeViewPropertiesView->addWidget(_NodePropertiesGroupBox);
-  _SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodeViewGroupBox), 1);
-  _SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodePropertiesGroupBox), 2);*/
+  //_SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodeViewGroupBox), 1);
+  //_SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodePropertiesGroupBox), 2);
 
-
-  // _BasePaneLayout->addWidget(_SplitterNodeViewPropertiesView, 1, 0);
+  _BasePaneLayout->addWidget(_SplitterNodeViewPropertiesView, 1, 0);
   // _BasePaneLayout->addWidget(_NodeSelectionGroupBox, 1, 0);
-  _BasePaneLayout->addWidget(_NodeViewGroupBox, 1, 0);
+  //_BasePaneLayout->addWidget(_NodeViewGroupBox, 1, 0);
   // _BasePaneLayout->addWidget(_NodePropertiesGroupBox, 2, 0);
 
   // DataStorageSelection
@@ -171,9 +163,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   _PaneNodeButton->setLayout(_NodeButtonLayout);
 
   // NodeProperties
-/*
   _NodePropertiesGroupBox->setLayout(_NodePropertiesLayout);
-  _NodePropertiesLayout->addWidget(m_NodePropertiesTableEditor);*/
+  _NodePropertiesLayout->addWidget(m_NodePropertiesTableEditor);
 
 
   // Connections
@@ -219,6 +210,7 @@ void QmitkDataManagerView::Activated()
     if(m_NodePropertiesTableEditor)
       m_NodePropertiesTableEditor->SetPropertyList(0);*/
 
+
 }
 
 void QmitkDataManagerView::Deactivated()
@@ -260,10 +252,9 @@ void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 
 void QmitkDataManagerView::NodeTableViewSelectionChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-/*
   mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->GetNode(current);
   if(selectedNode.IsNotNull())
-    m_NodePropertiesTableEditor->SetPropertyList(selectedNode->GetPropertyList());*/
+    m_NodePropertiesTableEditor->SetPropertyList(selectedNode->GetPropertyList());
 
 }
 
@@ -368,18 +359,10 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
 
 void QmitkDataManagerView::BtnLoadClicked( bool checked /*= false */ )
 {
-  QModelIndex indexOfSelectedRow = m_NodeTableView->currentIndex();
-
-  if(!indexOfSelectedRow.isValid()) return;
-
-  mitk::DataTreeNode* node = m_NodeTableModel->GetNode(indexOfSelectedRow);
-  if ( !node )
-    return;
-
   QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
-    FileOpen((*it).ascii(), node);
+    FileOpen((*it).ascii(), 0);
   }
 }
 
@@ -414,7 +397,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 
 void QmitkDataManagerView::BtnGlobalReinitClicked( bool checked /*= false */ )
 {
-  mitk::RenderingManager::GetInstance()->InitializeViews();
+  mitk::RenderingManager::GetInstance()->InitializeViews(mitk::RenderingManager::REQUEST_UPDATE_ALL);
 }
 
 void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
@@ -447,39 +430,4 @@ void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
     std::cout << "PACS export dialog cancelled by user." << std::endl;
   }*/
 
-}
-
-void QmitkDataManagerView::ShowNodeInfo()
-{
-  QModelIndex current = m_NodeTableView->currentIndex();
-  if(!current.isValid())
-    return;
-
-  mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->GetNode(current);
-  QString nodeName = QString::fromStdString(selectedNode->GetName());
-  bool nodeIsVisible = false;
-  selectedNode->GetVisibility(nodeIsVisible, 0);
-
-  QMessageBox msgBox;
-  msgBox.setWindowTitle("Node Info");
-
-  QString info("node name: %1\nvisible: %2");
-  info = info.arg(nodeName).arg(nodeIsVisible);
-  msgBox.setText(info);
-  msgBox.exec();
-}
-
-void QmitkDataManagerView::SingleNodeSelection::SetNode( mitk::DataTreeNode* _SelectedNode )
-{
-  m_Node = _SelectedNode;
-}
-
-mitk::DataTreeNode* QmitkDataManagerView::SingleNodeSelection::GetNode() const
-{
-  return m_Node;
-}
-
-bool QmitkDataManagerView::SingleNodeSelection::IsEmpty() const
-{
-  return ( m_Node == 0 );
 }

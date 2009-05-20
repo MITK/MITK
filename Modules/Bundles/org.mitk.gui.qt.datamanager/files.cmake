@@ -1,5 +1,5 @@
 SET(SRC_CPP_FILES
-  #QmitkDataTreeNodeTableModel.cpp
+  cherrySingleNodeSelection.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -8,7 +8,6 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkDataManagerView.h
-  #src/QmitkDataTreeNodeTableModel.h  
 )
 
 SET(CPP_FILES manifest.cpp)

@@ -1,0 +1,50 @@
+#ifndef QMITKSINGLENODESELECTION_H_
+#define QMITKSINGLENODESELECTION_H_
+
+// Own includes
+#include "cherryISelection.h"
+/// Qmitk
+#include "mitkQtDataManagerDll.h"
+
+//# forward declarations
+namespace mitk
+{
+  class DataTreeNode;
+}
+
+namespace cherry
+{
+
+  ///
+  /// \struct SingleNodeSelection
+  /// \brief Represents a selection object that encapsulates the selection of a single node.
+  ///
+  struct MITK_QT_DATAMANAGER SingleNodeSelection: public cherry::ISelection
+  {
+    ///
+    /// \brief Make typdefs for pointer types.
+    ///
+    cherryObjectMacro(SingleNodeSelection);
+    ///
+    /// \brief Node setter.
+    ///
+    void SetNode(mitk::DataTreeNode* _SelectedNode);
+    ///
+    /// \brief Node getter.
+    ///
+    mitk::DataTreeNode* GetNode() const;
+    ///
+    /// \brief Checks if node is 0.
+    ///
+    virtual bool IsEmpty() const;
+
+  protected:
+    ///
+    /// \brief Holds the node that is currently selected.
+    ///
+    mitk::DataTreeNode* m_Node;
+  };
+
+}
+
+#endif // QMITKSINGLENODESELECTION_H_

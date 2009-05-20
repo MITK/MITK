@@ -29,11 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::LevelWindowManager::LevelWindowManager()
-: m_DataStorage(NULL)
-, m_LevelWindowProperty(NULL)
-, m_AutoTopMost(true)
-, m_IsObserverTagSet(false)
-, m_CurrentImage(NULL)
+: m_DataStorage(NULL), m_LevelWindowProperty(NULL), m_AutoTopMost(true),
+  m_IsObserverTagSet(false), m_CurrentImage(NULL),m_IsPropertyModifiedTagSet(false)
 {
 }
 
@@ -88,7 +85,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
   if (m_AutoTopMost == false)
     return;
 
-  if (m_IsPropertyModifiedTagSet)
+  if (m_IsPropertyModifiedTagSet && m_LevelWindowProperty.IsNotNull())
   {
     m_LevelWindowProperty->RemoveObserver(m_PropertyModifiedTag);
     m_IsPropertyModifiedTagSet = false;

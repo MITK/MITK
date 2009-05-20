@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateNOT.h"
 
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject *parent, const char *name)
-: QmitkFunctionality() , m_MultiWidget(NULL), m_FixedNode(NULL), m_MovingNode(NULL), m_ShowRedGreen(false),
+: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
   m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), 
   m_OldMovingLayer(0), m_NewMovingLayer(0), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Deactivated(false)
 {

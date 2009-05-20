@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef MITKMESHUTIL_H_INCLUDED
+#define MITKMESHUTIL_H_INCLUDED
+
+
 #if(_MSC_VER==1200)
 #error MeshUtils currently not supported for MS Visual C++ 6.0. Sorry.
 #endif
@@ -1568,3 +1572,6 @@ private:
   }
 
 };
+
+#endif // MITKMESHUTIL_H_INCLUDED
+

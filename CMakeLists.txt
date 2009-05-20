@@ -44,7 +44,7 @@ IF(NOT UNIX)
 ENDIF()
 ADD_SUBDIRECTORY(Utilities)
 
-OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" OFF)
+OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" ON)
 IF(MITK_USE_OPENCHERRY)
   ADD_SUBDIRECTORY(openCherry)
   SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)

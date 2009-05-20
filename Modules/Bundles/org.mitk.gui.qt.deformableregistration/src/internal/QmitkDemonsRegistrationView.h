@@ -39,8 +39,6 @@ public:
   QmitkDemonsRegistrationView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkDemonsRegistrationView();
 
-  //void CreateQtPartControl(QWidget* parent);
-
   int GetNumberOfIterations();
   float GetStandardDeviation();
   
@@ -53,18 +51,6 @@ protected:
   Ui::QmitkDemonsRegistrationViewControls m_Controls;
   mitk::DataTreeNode* m_FixedNode;
   mitk::DataTreeNode* m_MovingNode;
-
-
-//signals:
-
-//public slots:
-
-//protected slots:
-
-
-//protected:
-
-
 };
 
 #endif

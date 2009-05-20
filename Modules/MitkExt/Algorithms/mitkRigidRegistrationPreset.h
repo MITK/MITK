@@ -46,7 +46,7 @@ namespace mitk {
     ~RigidRegistrationPreset();
 
     /**
-    * \brief Tries to find mitkRigidRegistrationPresets.xml in /QFunctionalities/QmitkRigidRegistration and loads all presets stored in this file.
+    * \brief Tries to find mitkRigidRegistrationPresets.xml in /mitk/Config and loads all presets stored in this file.
     */
     bool LoadPreset();
     /**

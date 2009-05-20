@@ -39,7 +39,7 @@ namespace mitk {
     std::string location2 = "/QFunctionalities/QmitkRigidRegistration";
     std::string location = location1 + location2;
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(location.c_str(), true);
-    std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml");
+    std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml", "Config");
 
     if (!xmlFileName.empty())
     {

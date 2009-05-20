@@ -34,10 +34,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../PointbasedregistrationDll.h"
 
-
-//class QmitkStdMultiWidget;
-//class QmitkPointBasedRegistrationControls;
-
 /*!
 \brief The PointBasedRegistration functionality is used to perform point based registration.
 
@@ -52,13 +48,12 @@ For more informations see: \ref QmitkPointBasedRegistrationUserManual
 \ingroup Functionalities
 \ingroup PointBasedRegistration
 */
+
 class POINTBASEDREGISTRATION_EXPORTS QmitkPointBasedRegistrationView : public QObject, public QmitkFunctionality
 {  
   Q_OBJECT
 
 public:  
-
-  typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
   /*!  
   \brief Default constructor  
@@ -71,29 +66,24 @@ public:
   virtual ~QmitkPointBasedRegistrationView();
 
   /*!  
-  \brief Method for creating the widget containing the application   controls, like sliders, buttons etc.  
+  \brief method for creating the applications main widget  
   */  
-  //virtual QWidget * CreateControlWidget(QWidget *parent);
-
   virtual void CreateQtPartControl(QWidget *parent);
 
+  /*!  
+  \brief Sets the StdMultiWidget and connects it to the functionality. 
+  */  
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
 
   /*!  
-  \brief Method for creating the applications main widget  
-  */  
-  //virtual QWidget * CreateMainWidget(QWidget * parent);
+  \brief Removes the StdMultiWidget and disconnects it from the functionality. 
+  */ 
+  virtual void StdMultiWidgetNotAvailable();
 
   /*!  
   \brief Method for creating the connections of main and control widget  
   */  
   virtual void CreateConnections();
-
-  /*!  
-  \brief Method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget  
-  */  
-  //virtual QAction * CreateAction(QActionGroup *parent);
 
   virtual void Activated();
   virtual void Deactivated();
@@ -136,8 +126,14 @@ public:
 
 signals:
 
+  /*!  
+  \brief Signal that informs about that the fixed image should be reinitialized in the multi-widget.
+  */
   void reinitFixed(const mitk::Geometry3D *);
 
+  /*!  
+  \brief Signal that informs about that the moving image should be reinitialized in the multi-widget.
+  */
   void reinitMoving(const mitk::Geometry3D *);
 
   protected slots:  
@@ -147,6 +143,9 @@ signals:
     */
     virtual void DataStorageChanged();
 
+    /*!  
+    \brief Returns the predication for the nodes shown in the DataStorageComboBoxes.
+    */
     mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
 
     /*!  
@@ -207,7 +206,7 @@ signals:
     /*!  
     \brief Stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
 
-    @param if true, then images will be shown in red and green
+    @param show if true, then images will be shown in red and green
     */
     void showRedGreen(bool show);
 
@@ -238,7 +237,7 @@ signals:
     /*!  
     \brief Sets the images to gray values or fixed image to red and moving image to green
 
-    @param if true, then images will be shown in red and green
+    @param redGreen if true, then images will be shown in red and green
     */
     void setImageColor(bool redGreen);
 
@@ -264,17 +263,37 @@ signals:
     */
     void setInvisible(bool invisible);
 
+    /*!  
+    \brief Reinitializes the fixed image in the multi-widget.
+    */
     void reinitFixedClicked();
 
+    /*!  
+    \brief Reinitializes the moving image in the multi-widget.
+    */
     void reinitMovingClicked();
 
+    /*!  
+    \brief Reinitializes all visible images in the multi-widget.
+    */
     void globalReinitClicked();
 
+    /*!  
+    \brief Checks whether the registration can be performed.
+    */
     bool checkCalculateEnabled();
 
+    /*!  
+    \brief Performs the registration.
+    */
     void calculate();
 
 protected:
+
+  /*!  
+  \brief List that holds all invisible data tree nodes. 
+  */
+  typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
   /*!  
   * default main widget containing 4 windows showing 3   

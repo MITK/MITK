@@ -17,30 +17,29 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef QMITKDEFORMABLEREGISTRATION_H
-#define QMITKDEFORMABLEREGISTRATION_H
+#ifndef QMITKRIGIDREGISTRATION_H
+#define QMITKRIGIDREGISTRATION_H
 
 #include "QmitkFunctionality.h"
-#include "ui_QmitkDeformableRegistrationViewControls.h"
+#include "ui_QmitkRigidRegistrationViewControls.h"
 
-#include "../DeformableregistrationDll.h"
+#include "../RigidregistrationDll.h"
 
 /*!
-\brief The DeformableRegistration functionality is used to perform deformable registration.
+\brief This functionality allows you to register 2D as well as 3D images in a rigid manner.  
 
-This functionality allows you to register two 2D as well as two 3D images in a non rigid manner.
 Register means to align two images, so that they become as similar as possible. 
-Therefore you can select from different deformable registration methods. 
-Registration results will directly be applied to the Moving Image. The result is shown in the multi-widget. 
-
-For more informations see: \ref QmitkDeformableRegistrationUserManual
+Therefore you can select from different transforms, metrics and optimizers. 
+Registration results will directly be applied to the Moving Image.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
-\ingroup DeformableRegistration
+\ingroup RigidRegistration
+
+\author Daniel Stein
 */
 
-class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QObject, public QmitkFunctionality
+class RIGIDREGISTRATION_EXPORTS QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
 {  
   Q_OBJECT
   
@@ -49,12 +48,12 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     /*!  
     \brief default constructor  
     */  
-    QmitkDeformableRegistrationView(QObject *parent=0, const char *name=0);
+    QmitkRigidRegistrationView(QObject *parent=0, const char *name=0);
 
     /*!  
     \brief default destructor  
     */  
-    virtual ~QmitkDeformableRegistrationView();
+    virtual ~QmitkRigidRegistrationView();
 
     /*!  
     \brief method for creating the applications main widget  
@@ -119,7 +118,7 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     * sets the fixed Image according to TreeNodeSelector widget
     */
     void FixedSelected(int = 0);
-    
+
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
@@ -131,13 +130,52 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     bool CheckCalculate();
 
     /*!
-    * stores whether the image will be shown in grayvalues or in red for fixed image and green for moving image
+    * \brief Saves the moving image, intended to be done after a registration.
+    */
+    void SaveModel();
+    
+    /*!
+    * \brief Undo the last registration.
+    */
+    void UndoTransformation();
+    
+    /*!
+    * \brief Redo the last registration
+    */
+    void RedoTransformation();
+
+    /*!
+    * \brief Adds a new Transformation to the undo list and enables the undo button.
+    */
+    void AddNewTransformationToUndoList();
+    
+    /*!
+    * \brief Translates the moving image in x, y and z direction given by translateVector
+    *
+    * @param translateVector Contains the translation in x, y and z direction.
+    */
+    void Translate(int* translateVector);
+
+    /*!
+    * \brief Rotates the moving image in x, y and z direction given by rotateVector
+    *
+    * @param rotateVector Contains the rotation around x, y and z axis.
+    */
+    void Rotate(int* rotateVector);
+
+    /*!
+    * \brief Automatically aligns the image centers.
+    */
+    void AlignCenters();
+
+    /*!
+    * \brief Stores whether the image will be shown in gray values or in red for fixed image and green for moving image
     * @param show if true, then images will be shown in red and green
     */
     void ShowRedGreen(bool show);
 
     /*!
-    * set the selected opacity for moving image
+    * \brief Sets the selected opacity for moving image
     * @param opacity the selected opacity
     */
     void OpacityUpdate(float opacity);
@@ -150,23 +188,31 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     void OpacityUpdate(int opacity);
 
     /*!
-    * sets the images to grayvalues or fixed image to red and moving image to green
+    * \brief Sets the images to grayvalues or fixed image to red and moving image to green
     * @param redGreen if true, then images will be shown in red and green
     */
     void SetImageColor(bool redGreen);
 
     /*!
-    * sets all other images except the fixed image to invisible
+    * \brief Clears the undo and redo lists and sets the undo and redo buttons to disabled.
+    */
+    void ClearTransformationLists();
+
+    /*!
+    * \brief Only shows the fixed image in the render windows.
+    * Only shows the fixed image in the render windows.  All other data tree nodes are invisible.
     */
     void ShowFixedImage();
 
     /*!
-    * sets all other images except the moving image to invisible
+    * \brief Only shows the moving image in the render windows.
+    * Only shows the moving image in the render windows. All other data tree nodes are invisible.
     */
     void ShowMovingImage();
 
     /*!
-    * sets all other images except the fixed and moving images to invisible
+    * \brief Shows the fixed and the moving image in the render windows.
+    * Shows the fixed and the moving image in the render windows. All other data tree nodes are invisible.
     */
     void ShowBothImages();
 
@@ -185,15 +231,36 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     */
     void globalReinitClicked();
 
-    /*!  
-    \brief Checks whether the registration can be performed.
-    */
+    void SetUndoEnabled( bool enable );
+
+    void SetRedoEnabled( bool enable );
+
     void CheckCalculateEnabled();
 
-    /*!  
-    \brief Performs the registration.
+    void xTrans_valueChanged( int v );
+
+    void yTrans_valueChanged( int v );
+
+    void zTrans_valueChanged( int v );
+
+    void xRot_valueChanged( int v );
+
+    void yRot_valueChanged( int v );
+
+    void zRot_valueChanged( int v );
+
+    void MovingImageChanged();
+
+    /*!
+    * \brief Starts the registration process.
     */
     void Calculate();
+
+    void SetOptimizerValue( double value );
+
+    void registrationTabChanged( int );
+
+    void StopOptimizationClicked();
 
   protected:
 
@@ -211,9 +278,11 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     /*!  
     * control widget to make all changes for Deformable registration 
     */  
-    Ui::QmitkDeformableRegistrationViewControls m_Controls;
+    Ui::QmitkRigidRegistrationViewControls m_Controls;
     mitk::DataTreeNode* m_MovingNode;
     mitk::DataTreeNode* m_FixedNode;
+    std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
+    std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
     bool m_ShowRedGreen;
     bool m_ShowFixedImage;
     bool m_ShowMovingImage;
@@ -224,10 +293,16 @@ class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QO
     int m_NewMovingLayer;
     bool m_OldMovingLayerSet;
     bool m_NewMovingLayerSet;
+    bool m_Deactivated;
+    int m_FixedDimension;
+    int m_MovingDimension;
+    int * translationParams;
+    int * rotationParams;
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
     invisibleNodesList m_InvisibleNodesList;
-    bool m_Deactivated;
+    int m_TranslateSliderPos[3];
+    int m_RotateSliderPos[3];
 };
 
-#endif //QMITKDEFORMABLEREGISTRATION_H
+#endif //QMITKRigidREGISTRATION_H

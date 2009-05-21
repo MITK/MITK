@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../QmitkStdMultiWidgetEditor.h"
 
 QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
- : QAction(0)
+: QAction(0)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
@@ -43,7 +43,9 @@ void QmitkFileOpenAction::Run()
   QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   dialog.setFileMode(QFileDialog::ExistingFiles);
   QStringList filters;
-  filters << "Images (*.pic *.pic.gz)" << "All Files (*.*)";
+  filters << "Images (*.pic *.pic.gz *.vti *.dcm)" 
+    << "Surfaces (*.stl *.vtk *.vtp)"
+    << "All Files (*.*)";
   dialog.setFilters(filters);
   QStringList fileNames;
   if (dialog.exec())
@@ -67,7 +69,7 @@ void QmitkFileOpenAction::Run()
   }
 
   for (QStringList::Iterator fileName = fileNames.begin();
-       fileName != fileNames.end(); ++fileName)
+    fileName != fileNames.end(); ++fileName)
   {
     mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
     try
@@ -95,4 +97,3 @@ void QmitkFileOpenAction::Run()
     multiWidgetEditor->GetStdMultiWidget()->ForceImmediateUpdate();
   }
 }
-

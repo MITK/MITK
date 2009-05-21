@@ -100,7 +100,7 @@ namespace mitk
     /**
     * \brief return the tool with index toolNumber
     */
-    virtual TrackingTool* GetTool(unsigned int toolNumber);
+    virtual TrackingTool* GetTool(unsigned int toolNumber) const;
 
     /**
     * \brief return current number of tools
@@ -166,7 +166,7 @@ namespace mitk
 
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
-    NDIPassiveTool* GetTool(std::string* handle); ///< returns the tool object that has been assigned the handle or NULL if no tool can be found
+    NDIPassiveTool* GetInternalTool(std::string handle); ///< returns the tool object that has been assigned the handle or NULL if no tool can be found
     NDIErrorCode Send(const std::string* message, bool addCRC = true);      ///< Send message to tracking device
     NDIErrorCode Receive(std::string* answer, unsigned int numberOfBytes);  ///< receive numberOfBytes bytes from tracking device
     NDIErrorCode ReceiveByte(char* answer);   ///< lightweight receive function, that reads just one byte

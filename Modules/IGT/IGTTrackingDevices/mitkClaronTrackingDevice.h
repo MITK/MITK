@@ -80,7 +80,7 @@ namespace mitk
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
     */
-    TrackingTool* GetTool(unsigned int toolNumber);
+    TrackingTool* GetTool(unsigned int toolNumber)  const;
 
 
     /**

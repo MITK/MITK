@@ -808,7 +808,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 }
 
 
-mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber)
+mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) const
 {
   mitk::TrackingTool* t = NULL;
 
@@ -820,7 +820,7 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber)
 }
 
 
-mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetTool(std::string* handle)
+mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string handle)
 {
   mitk::NDIPassiveTool* t = NULL;
 
@@ -828,7 +828,7 @@ mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetTool(std::string* handle)
   Tool6DContainerType::iterator end = m_6DTools.end();
   for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
   {
-    if (handle->compare((*iterator)->GetPortHandle()) == 0)
+    if (handle.compare((*iterator)->GetPortHandle()) == 0)
     {
       t = *iterator;
       break;

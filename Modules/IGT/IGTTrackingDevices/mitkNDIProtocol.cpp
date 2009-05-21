@@ -714,7 +714,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
       /* Read port handle */
       m_TrackingDevice->Receive(&s, 2);        // read port handle
       reply += s;                              // build complete command string
-      NDIPassiveTool::Pointer tool = m_TrackingDevice->GetTool(&s);   // get tool object for that handle
+      NDIPassiveTool::Pointer tool = m_TrackingDevice->GetInternalTool(s);   // get tool object for that handle
       if (tool.IsNull())
       {
         returnValue = UNKNOWNHANDLERETURNED;
@@ -965,7 +965,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
       /* Read port handle */
       m_TrackingDevice->Receive(&s, 2);        // read port handle
       reply += s;                              // build complete command string
-      NDIPassiveTool::Pointer tool = m_TrackingDevice->GetTool(&s);   // get tool object for that handle
+      NDIPassiveTool::Pointer tool = m_TrackingDevice->GetInternalTool(s);   // get tool object for that handle
       if (tool.IsNull())
       {
         returnValue = UNKNOWNHANDLERETURNED;
@@ -1182,8 +1182,8 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
     std::cout << "ERROR: no tools present" << std::endl;
     return NDIUNKNOWNERROR;
   }
-  TrackingTool* t = m_TrackingDevice->GetTool((unsigned int) 0);
-  NDIPassiveTool* t2 = dynamic_cast<NDIPassiveTool*>(t);
+  const TrackingTool* t = m_TrackingDevice->GetTool(static_cast<unsigned int>(0));
+  const NDIPassiveTool* t2 = dynamic_cast<const NDIPassiveTool*>(t);
   if (t2 == NULL)
   {
     std::cout << "ERROR: no tool present" << std::endl;

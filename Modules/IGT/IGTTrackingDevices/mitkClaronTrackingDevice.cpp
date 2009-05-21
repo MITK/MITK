@@ -160,13 +160,10 @@ unsigned int mitk::ClaronTrackingDevice::GetToolCount() const
 }
 
 
-mitk::TrackingTool* mitk::ClaronTrackingDevice::GetTool(unsigned int toolNumber)
+mitk::TrackingTool* mitk::ClaronTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if ( toolNumber >= this->GetToolCount())
-    {
-    m_ErrorMessage = "Error while trying to get a tool!";
     return NULL;
-    }
   else
     return this->m_AllTools[toolNumber];
 }

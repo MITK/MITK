@@ -82,7 +82,7 @@ namespace mitk {
        * 
        * tools are numbered from 0 to GetToolCount() - 1.
        */ 
-      virtual TrackingTool* GetTool(unsigned int toolNumber) = 0;
+      virtual TrackingTool* GetTool(unsigned int toolNumber) const = 0;
       /**
        * \brief Returns number of tracking tools
        */

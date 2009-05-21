@@ -36,8 +36,7 @@ const std::string QmitkImageGuidedTherapyTutorialView::VIEW_ID = "org.mitk.views
 
 QmitkImageGuidedTherapyTutorialView::QmitkImageGuidedTherapyTutorialView()
 : QmitkFunctionality(), 
-  m_Controls(NULL),
-  m_MultiWidget(NULL)
+  m_Controls(NULL),  m_MultiWidget(NULL), m_Source(NULL), m_Visualizer(NULL), m_Timer(NULL)
 {
 }
 
@@ -104,8 +103,6 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
   //If there is no multiwidget, create one.
   //if (m_MultiWidget == NULL)
   //{
-  //  QmitkStdMultiWidgetEditor::Pointer m = new QmitkStdMultiWidgetEditor();
-  //  this->GetPage()->OpenEditor(m, QmitkStdMultiWidgetEditor::EDITOR_ID);
   //}
   if (m_MultiWidget == NULL) // if creating the multiwidget failed, stop here.
   {

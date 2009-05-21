@@ -25,17 +25,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  /**
-  * \brief   An instance of this class represents the tracking volume of
-  *     a tracking device. As it inherits from mitk::Surface it can be
-  *     displayed in the 3D-window of MITK. The coordinate system is the same
-  *     as the coordination system of the tracking device.
-  *     To have the specific dimensions of the trackingvolume of a tracking device
-  *      the method SetTrackingDeviceType() needs to be called. If you get your
-  *      trackingvolume from an instance of the class TrackingDevice
-  *      (ClaronTrackingDevice for example) this is already done for you.
-  *     This also means that every tracking device instance has a predefined tracking
-  *     volume, which is automatically set when you construct the instance.
+  /**Documentation
+  * \brief   An instance of this class represents the tracking volume of a tracking device. 
+  * 
+  *  As it inherits from mitk::Surface it can be
+  *  displayed in the 3D-window of MITK. The coordinate system is the same
+  *  as the coordination system of the tracking device.
+  *  To have the specific dimensions of the tracking volume of a tracking device
+  *  the method SetTrackingDeviceType() needs to be called. 
+  *  For tracking devices that have a modifiable tracking volume (e.g. VirtualTrackingDevice, 
+  *  this class produces a tracking volume with default values (e.g. that are set in the class'
+  *  constructor
+  *  
   *  \ingroup IGT
   */
 

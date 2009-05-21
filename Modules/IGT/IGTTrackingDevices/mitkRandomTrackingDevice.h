@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKRandomTrackingDevice_H_HEADER_INCLUDED_
 #define MITKRandomTrackingDevice_H_HEADER_INCLUDED_
 
-
 #include <vector>
 #include <mitkConfig.h>
 #include <mitkTrackingDevice.h>
@@ -43,16 +42,16 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-    * \brief Starts the tracking.
-    * \return Sets the refresh rate of the pseudo trackingdevice in ms
+    * \brief Sets the refresh rate of the virtual tracking device in ms
+    * \return Sets the refresh rate of the virtual tracking device in ms
     */
     itkSetMacro(RefreshRate,unsigned int)
 
     /**
-    * \brief Starts the tracking.
+    * \brief Returns the refresh rate in ms.
     * \return Returns the refresh rate in ms.
     */
-    itkGetMacro(RefreshRate,unsigned int)
+    itkGetConstMacro(RefreshRate,unsigned int)
 
     /**
     * \brief Starts the tracking.
@@ -67,12 +66,7 @@ namespace mitk
     virtual bool StopTracking();
 
     /**
-    * \return Returns all tools of the tracking device.
-    */
-    std::vector<InternalTrackingTool::Pointer> GetAllTools();
-
-    /**
-    * \brief Opens the connection to the device. This have to be done before the tracking is startet.
+    * \brief Opens the connection to the device. This have to be done before the tracking is started.
     */
     virtual bool OpenConnection();
 
@@ -91,7 +85,7 @@ namespace mitk
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
     */
-    TrackingTool* GetTool(unsigned int toolNumber);
+    TrackingTool* GetTool(unsigned int toolNumber) const;
 
     /**
     * \brief Adds a tool to the tracking device.
@@ -100,6 +94,25 @@ namespace mitk
     */
     TrackingTool* AddTool(const char* toolName);
 
+
+    /**
+    * \brief Set the tracking volume bounds
+    *
+    * This will set the tracking volume as an axis aligned bounding box
+    * defined by the six bounds values xMin, xMax, yMin, yMax, zMin, zMax
+    */
+    itkSetVectorMacro(Bounds, mitk::ScalarType, 6);
+    
+    /**
+    * \brief return the tracking volume bounds
+    *
+    * This will return the tracking volume as an axis aligned bounding box
+    * defined by the six bounds values xMin, xMax, yMin, yMax, zMin, zMax
+    */
+    const mitk::ScalarType* GetBounds() const
+    {
+      return m_Bounds;
+    };
   
   protected:
     RandomTrackingDevice();
@@ -118,6 +131,8 @@ namespace mitk
     int m_ThreadID;
     
     unsigned int m_RefreshRate;
+
+    mitk::ScalarType m_Bounds[6];
   };   
 }//mitk
 #endif /* MITKRandomTrackingDevice_H_HEADER_INCLUDED_ */

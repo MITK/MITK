@@ -20,10 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkConfig.h"
+#include <vtkCubeSource.h>
+
 
 mitk::TrackingVolume::TrackingVolume()
-  {
-  this->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
+{
+  m_TrackingDeviceType = mitk::TrackingSystemNotSpecified;
 
   //####### initialize file locations for the volume-STL-files #########
   std::string m_VolumeDir = MITK_ROOT;
@@ -31,56 +33,64 @@ mitk::TrackingVolume::TrackingVolume()
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
   //####################################################################
 
-  }
+}
 
-/* TODO: implemenation of method
+/* TODO: implementation of method
 bool mitk::TrackingVolume::IsInside(mitk::Point3D itkNotUsed(punkt))
-  {
-  //NOT IMPLEMENTED YET!
-  return false;
-  }
+{
+//NOT IMPLEMENTED YET!
+return false;
+}
 */
 
 void mitk::TrackingVolume::SetVolumeManually(vtkPolyData* volume)
-  {
+{
   this->SetVtkPolyData(volume);
-  }
+}
 
 bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
-  {
-  //Dateinamen Anhand des Trackingsystems bestimmen:
+{
+  // get filename / perform custom initiation
   std::string filename = "";
 
   switch(type)
+  {
+  case mitk::ClaronMicron:
+    filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
+    break;
+  case mitk::IntuitiveDaVinci:
+    filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
+    break;
+  case mitk::NDIAurora:
+    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
+    break;
+  case mitk::NDIPolaris:
+    filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
+    break;
+  case mitk::VirtualTrackingDevice:
     {
-    case mitk::ClaronMicron:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-      break;
-    case mitk::IntuitiveDaVinci:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
-      break;
-    case mitk::NDIAurora:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-      break;
-    case mitk::NDIPolaris:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-      break;
-    default:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("StandardVolume.stl");
-      break;  
+      vtkCubeSource* cs = vtkCubeSource::New();
+      double bounds[6];
+       bounds[0] = bounds[2] = bounds[4] = -400.0;  // initialize bounds to -400 ... +400 cube. This is the default value of the 
+       bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case, 
+      // the tracking volume polydata has be updated manually
+      cs->SetBounds(bounds);
+      cs->GetOutput()->Update();
+      this->SetVtkPolyData(cs->GetOutput());
+      cs->Delete();
+      return true;
     }
+  default:
+    return false;
+  }
 
-  //Die Surface aus der Datei einlesen:
   mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
   stlReader->SetFileName( filename.c_str() );
   stlReader->Update();
-  if ( stlReader->GetOutput() != NULL )
-    {
-    this->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
-    return true;
-    }
-  else
-    {
+  if ( stlReader->GetOutput() == NULL )
     return false;
-    }
-  }
+
+  this->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
+  stlReader->Delete();
+  return true;  
+}

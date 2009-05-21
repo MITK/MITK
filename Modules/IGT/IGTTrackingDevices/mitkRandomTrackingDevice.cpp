@@ -32,9 +32,11 @@ mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice()
 {
   //set the type of this tracking device
   this->m_Type = mitk::TrackingSystemNotSpecified;
-
-  m_RefreshRate = 50;
-
+  
+  m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
+  m_Bounds[1] = m_Bounds[3] = m_Bounds[5] =  400.0;
+  
+  m_RefreshRate = 20;
   this->m_MultiThreader = itk::MultiThreader::New();
 }
 
@@ -108,7 +110,7 @@ unsigned int mitk::RandomTrackingDevice::GetToolCount() const
 }
 
 
-mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber)
+mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if ( toolNumber >= this->GetToolCount()) 
     return NULL;
@@ -148,11 +150,6 @@ bool mitk::RandomTrackingDevice::CloseConnection()
   return returnValue;
 }
 
-std::vector<mitk::InternalTrackingTool::Pointer> mitk::RandomTrackingDevice::GetAllTools()
-{
-  return this->m_AllTools;
-}
-
 
 void mitk::RandomTrackingDevice::TrackTools()
 {
@@ -170,9 +167,8 @@ void mitk::RandomTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Unlock();
     while ((this->GetMode() == Tracking) && (localStopTracking == false))
     {
-      std::vector<mitk::InternalTrackingTool::Pointer> allTools = this->GetAllTools();
       std::vector<mitk::InternalTrackingTool::Pointer>::iterator itAllTools;
-      for(itAllTools = allTools.begin(); itAllTools != allTools.end(); itAllTools++)
+      for(itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
       {
         mitk::InternalTrackingTool::Pointer currentTool = *itAllTools;
 
@@ -180,30 +176,30 @@ void mitk::RandomTrackingDevice::TrackTools()
         mitk::Quaternion quat;
 
         //generate numbers between 0 and 99 for each direction
-        pos[0] = (double)(rand()%100); 
-        pos[1] = (double)(rand()%100);
-        pos[2] = (double)(rand()%100);
-
-        //generate numbers between 0 and 1
-        quat[0] = (double)(rand()%100) / 100;
-        quat[1] = (double)(rand()%100) / 100;
-        quat[2] = (double)(rand()%100) / 100;
-        quat[3] = (double)(rand()%100) / 100;
-
+        
+          
+        pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
+        pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
+        pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z
         currentTool->SetPosition(pos);
 
+        //generate numbers between 0 and 1
+        quat[0] = rand() / (RAND_MAX + 1.0);
+        quat[1] = rand() / (RAND_MAX + 1.0);
+        quat[2] = rand() / (RAND_MAX + 1.0);
+        quat[3] = rand() / (RAND_MAX + 1.0);       
         currentTool->SetOrientation(quat);
-        currentTool->SetTrackingError((double)(rand()%100) / 100);
+
+        currentTool->SetTrackingError( 2 * (rand() / (RAND_MAX + 1.0)));  // tracking errror in 0 .. 2 Range
         currentTool->SetDataValid(true);
       }
-
-      //there should be a short pause perhaps the multithreader can do this?
       itksys::SystemTools::Delay(m_RefreshRate);
       /* Update the local copy of m_StopTracking */
       this->m_StopTrackingMutex->Lock();  
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
-    }
+    } // tracking ends if we pass this line
+
     m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
@@ -226,7 +222,7 @@ ITK_THREAD_RETURN_TYPE mitk::RandomTrackingDevice::ThreadStartTracking(void* pIn
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  RandomTrackingDevice *trackingDevice = (RandomTrackingDevice*)pInfo->UserData;
+  RandomTrackingDevice *trackingDevice = static_cast<RandomTrackingDevice*>(pInfo->UserData);
 
   if (trackingDevice != NULL) 
     trackingDevice->TrackTools();

@@ -98,6 +98,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_RemoveAction = m_NodeMenu->addAction(QIcon(":/datamanager/remove.xpm"), "Remove");
   m_ReinitAction = m_NodeMenu->addAction(QIcon(":/datamanager/refresh.xpm"), "Reinit");
+  m_ToggleSelectedVisibility = m_NodeMenu->addAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png"), "Toggle visibility of selected nodes");
 
   // NodeProperties
   QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane);
@@ -157,6 +158,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeToolbar->addAction(m_SaveAction);
   m_NodeToolbar->addAction(m_RemoveAction);
   m_NodeToolbar->addAction(m_ReinitAction);
+  m_NodeToolbar->addAction(m_ToggleSelectedVisibility);
 
   _NodeButtonLayout->addWidget(m_BtnLoad);
   _NodeButtonLayout->addWidget(m_BtnGlobalReinit);
@@ -191,6 +193,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionRemoveTriggered(bool) ) );
+
+  QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionToggleSelectedVisibilityTriggered(bool) ) );
 
   QObject::connect( m_BtnLoad, SIGNAL( clicked(bool) )
     , this, SLOT( BtnLoadClicked(bool) ) );
@@ -261,8 +266,8 @@ void QmitkDataManagerView::NodeTableViewSelectionChanged( const QModelIndex & cu
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
   m_NodeMenu->popup(QCursor::pos());
-  QModelIndex selected = m_NodeTableView->indexAt(pos);
-  m_NodeTableView->selectRow(selected.row());
+  //QModelIndex selected = m_NodeTableView->indexAt(pos);
+  //m_NodeTableView->selectRow(selected.row());
 }
 
 void QmitkDataManagerView::SaveActionTriggered(bool checked)
@@ -357,6 +362,34 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
   }
 }
 
+void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked /*= false */ )
+{
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
+  std::vector<mitk::DataTreeNode*> selectedNodes;
+
+  mitk::DataTreeNode* node = 0;
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = 0;
+    node = m_NodeTableModel->GetNode(*it);
+    // if node is not defined or if the node contains geometry data do not remove it
+    if ( node != 0 )
+      selectedNodes.push_back(node);
+  }
+
+  bool isVisible = false;
+  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+    ; it != selectedNodes.end(); it++)
+  {
+    isVisible = false;
+    node = *it;
+    node->GetBoolProperty("visible", isVisible);
+    node->SetVisibility(!isVisible);
+  }
+  BtnGlobalReinitClicked();
+}
+
 void QmitkDataManagerView::BtnLoadClicked( bool checked /*= false */ )
 {
   QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
@@ -398,6 +431,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 void QmitkDataManagerView::BtnGlobalReinitClicked( bool checked /*= false */ )
 {
   mitk::RenderingManager::GetInstance()->InitializeViews(mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )

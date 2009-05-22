@@ -92,6 +92,10 @@ protected slots:
   ///
   void ActionSaveToPacsTriggered ( bool checked = false );
   ///
+  /// \brief Invoked when the visibility of the selected nodes should be toggled.
+  ///
+  void ActionToggleSelectedVisibilityTriggered ( bool checked = false );
+  ///
   /// \brief Shows a load dialog.
   ///
   void BtnLoadClicked ( bool checked = false );
@@ -151,6 +155,10 @@ private:
   /// \brief Action that is triggered when a node should be reinited.
   ///
   QAction* m_ReinitAction;
+  ///
+  /// \brief Action that is triggered when the visibility of the selected nodes should be toggled.
+  ///
+  QAction* m_ToggleSelectedVisibility;
   ///
   /// \brief A button to load new nodes.
   ///

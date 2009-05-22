@@ -41,6 +41,7 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
     m_Model->SetPropertyList(_List);
     m_NodePropertiesTableView->resizeColumnsToContents();
     m_NodePropertiesTableView->resizeRowsToContents();
+    m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
 
 /*
     // refill the combo boxes

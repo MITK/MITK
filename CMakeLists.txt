@@ -216,34 +216,60 @@ INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
 #OPENCV DLLs may be added elsewhere to install target
 
 #STATEMACHINE XML
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Interactions/StateMachine.xml DESTINATION bin)
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml DESTINATION bin)
 INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/QFunctionalities/QmitkRigidRegistration/mitkRigidRegistrationPresets.xml DESTINATION bin)
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml DESTINATION bin)
 
 IF(WIN32)
   #QT
-  FILE(GLOB qtdlllist ${QT_INCLUDE_DIR}/../bin/*.dll)
-  FOREACH(qtlib ${qtdlllist})
-    INSTALL(FILES ${qtdlllist} DESTINATION bin)
-  ENDFOREACH(qtlib)
+  IF(MITK_USE_QT)
+    SET(QT_USE_SVG 1)
+    SET(QT_USE_QT3SUPPORT 1)
+    INCLUDE(${QT_USE_FILE})
+    
+    SET(qtdebugdlls)
+    SET(qtreleasedlls)
+    FOREACH(qtlib ${QT_LIBRARIES})
+      GET_FILENAME_COMPONENT(qtdllname ${qtlib} NAME_WE)
+      STRING(REGEX MATCH ".*d4" debugmatch ${qtdllname})
+      IF(debugmatch)
+        LIST(APPEND qtdebugdlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
+      ELSE()
+        STRING(REGEX MATCH ".*4" releasematch ${qtdllname})
+      IF(releasematch)
+        LIST(APPEND qtreleasedlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
+      ENDIF()
+    ENDIF()
+    ENDFOREACH(qtlib)
+  
+    INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
+    INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
+  
+  ENDIF(MITK_USE_QT)
  
   #VTK DLLs install target
-  FILE(GLOB vtkdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
-  FOREACH(vtklib ${vtkdlllist})
-    INSTALL(FILES ${vtkdlllist} DESTINATION bin)
-  ENDFOREACH(vtklib)
+  FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
+  FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
+  INSTALL(FILES ${vtkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
+  INSTALL(FILES ${vtkreleasedlllist} DESTINATION bin CONFIGURATIONS Release) 
   
-  # install ITK _release_ dll , this will probably crash with a MITK debug version. Also this
-  # will fail if ITK starts using more than one directory for its libs.
-  FILE(GLOB itkdlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
-  FOREACH(itklib ${itkdlllist})
-    INSTALL(FILES ${itkdlllist} DESTINATION bin)
-  ENDFOREACH(itklib)
+  #ITK DLLs install target
+  FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
+  FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
+  INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
+  INSTALL(FILES ${itkdreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
+  
+  #OpenCherry
+  IF(MITK_USE_OPENCHERRY)
+    INSTALL(FILES ${OPENCHERRY_PLUGINS_BINARY_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+    INSTALL(FILES ${OPENCHERRY_PLUGINS_BINARY_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+  ENDIF()
+ 
 ENDIF(WIN32)
    
 
-  # include required mfc libraries
-  INCLUDE(InstallRequiredSystemLibraries)
-  # include CPack model once all variables are set
-  INCLUDE(CPack)
+# include required mfc libraries
+INCLUDE(InstallRequiredSystemLibraries)
+# include CPack model once all variables are set
+INCLUDE(CPack)
 

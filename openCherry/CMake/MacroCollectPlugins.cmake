@@ -92,8 +92,9 @@ ENDIF(_COLLECT_CACHE_PLUGIN_BINARY_DIRS)
   
 SET(_plugins_to_build )
 SET(_plugins_target_list )
-FILE(GLOB all_dirs *)
-FOREACH(dir_entry ${all_dirs})
+FILE(GLOB all_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
+FOREACH(dir_relative_entry ${all_dirs})
+  SET(dir_entry "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
   IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
     MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF")
     IF(BUNDLE-SYMBOLICNAME)
@@ -116,7 +117,7 @@ SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAM
       
       OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ${_default_bundle_option})
       IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
-        LIST(APPEND _plugins_to_build "${dir_entry}")
+        LIST(APPEND _plugins_to_build "${dir_relative_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})
         LIST(APPEND _plugin_target_list ${_plugin_target})
         
@@ -131,7 +132,7 @@ SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)")
       ENDIF()
     ENDIF()
   ENDIF()
-ENDFOREACH(dir_entry ${all_dirs})
+ENDFOREACH()
 
 # add Poco directories for all plugins
 INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
@@ -148,5 +149,14 @@ ENDIF(_COLLECT_CACHE_PLUGIN_TARGETS)
 IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in" "${_COLLECT_BUNDLE_LIST_PATH}" @ONLY)
 ENDIF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/BundleList.cmake.in)
+
+#SET UP INSTALL TARGETS FOR CPACK
+ STRING(REGEX REPLACE ".*/(.+)/?$" "\\1" _toplevel_bundledir ${_COLLECT_OUTPUT_DIR})
+ SET(_plugins_to_install)
+ FOREACH(_bundle_dir ${_plugins_to_build})
+   LIST(APPEND _plugins_to_install "${_COLLECT_OUTPUT_DIR}/${_bundle_dir}")
+ ENDFOREACH()
+ INSTALL(DIRECTORY ${_plugins_to_install}  DESTINATION bin/${_toplevel_bundledir} CONFIGURATIONS Debug PATTERN "Release/*" EXCLUDE )
+ INSTALL(DIRECTORY ${_plugins_to_install} DESTINATION bin/${_toplevel_bundledir} CONFIGURATIONS Release PATTERN "Debug/*" EXCLUDE )
 
 ENDMACRO(MACRO_COLLECT_PLUGINS)

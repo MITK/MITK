@@ -10,9 +10,10 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     "http://www.mitk.org" "MITK Web Site"
     )
   # tell cpack the executables you want in the start menu as links
-  SET(CPACK_PACKAGE_EXECUTABLES "MainApp" "MITK - Main Application")
+  SET(CPACK_PACKAGE_EXECUTABLES "ExtApp" "MITK - Application")
+  SET(CPACK_PACKAGE_EXECUTABLES "CoreApp" "MITK - Core Application")
   # tell cpack to create a desktop link to MainApp
-  SET(CPACK_CREATE_DESKTOP_LINKS "MainApp")
+  SET(CPACK_CREATE_DESKTOP_LINKS "ExtApp")
   SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\mitk.ico")
   SET(CPACK_NSIS_DISPLAY_NAME "MITK - Medical Imaging Interaction Toolkit")
   SET(CPACK_NSIS_HELP_LINK "http:\\\\www.mitk.org")

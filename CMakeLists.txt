@@ -8,8 +8,10 @@ endif(COMMAND cmake_policy)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 
 # Clear the cache variables containing plugin base directories
-SET(MITK_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
-SET(MITK_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
+SET(MITK_MODULES_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
+SET(MITK_MODULES_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "List of base plugin output directories" FORCE)
+SET(MITK_CORE_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "List of base plugin output directories" FORCE)
+SET(MITK_CORE_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 
 # only configure dart here if not already configured in the 
 # parent directory
@@ -22,8 +24,10 @@ INCLUDE(CMake/ToolExtensionHelpers.cmake)
 INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")
 SET(LIBPOSTFIX "")
-SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all libraries.")
-SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL "Single output directory for building all executables.")
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+# maybe change the next to directories to "lib" ?
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # MITK_VERSION
 SET(MITK_VERSION_MAJOR "0")
@@ -121,7 +125,7 @@ SET(MITK_LIBRARIES ${MITK_CORE_LIBRARIES} ${LIBRARIES_FOR_MITK_CORE} ${IPFUNC_LI
 SET(MITK_IGT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTFilters ${CMAKE_CURRENT_SOURCE_DIR}/Core/IGT/IGTTrackingDevices) 
 
 IF(MITK_USE_QT)
-  FIND_PACKAGE(Qt4)
+  FIND_PACKAGE(Qt4 REQUIRED)
 
   ADD_DEFINITIONS(-DQWT_DLL)
   SET(Q${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Qmitk ${PROJECT_BINARY_DIR}/CoreUI/Qmitk)
@@ -155,7 +159,6 @@ SET(Q${KITNAME}_INCLUDE_DIRS_CONFIG ${Q${KITNAME}_INCLUDE_DIRS})
 SET(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 SET(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 SET(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
-CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
@@ -172,6 +175,8 @@ ENDIF()
 ADD_SUBDIRECTORY(Documentation)
 ADD_SUBDIRECTORY(CoreUI)
 ADD_SUBDIRECTORY(Modules)
+
+CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.cmake @ONLY)
 
 ADD_SUBDIRECTORY(Applications)
 
@@ -223,7 +228,8 @@ INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml DEST
 IF(WIN32)
   #QT
   IF(MITK_USE_QT)
-    SET(QT_USE_SVG 1)
+    SET(QT_USE_QTSVG 1)
+	SET(QT_USE_QTOPENGL 1)
     SET(QT_USE_QT3SUPPORT 1)
     INCLUDE(${QT_USE_FILE})
     
@@ -261,8 +267,8 @@ IF(WIN32)
   
   #OpenCherry
   IF(MITK_USE_OPENCHERRY)
-    INSTALL(FILES ${OPENCHERRY_PLUGINS_BINARY_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-    INSTALL(FILES ${OPENCHERRY_PLUGINS_BINARY_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+    INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+    INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
   ENDIF()
  
 ENDIF(WIN32)

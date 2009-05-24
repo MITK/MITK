@@ -63,7 +63,7 @@ ServiceRegistry& InternalPlatform::GetServiceRegistry()
   return m_ServiceRegistry;
 }
 
-void InternalPlatform::Initialize(int& argc, char** argv)
+void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractConfiguration* config)
 {
   // initialization
   Poco::Mutex::ScopedLock lock(m_Mutex);
@@ -71,39 +71,57 @@ void InternalPlatform::Initialize(int& argc, char** argv)
   m_Argc = &argc;
   m_Argv = argv;
 
-//  try
-//  {
-    this->init(argc, argv);
-    this->loadConfiguration();
+  this->init(argc, argv);
+  this->loadConfiguration();
+  if (config)
+  {
+    this->config().add(config, 50, false);
+  }
 
-    m_ConfigPath.assign(this->GetConfiguration().getString("application.configDir"));
-    m_InstallPath.assign(this->GetConfiguration().getString(Platform::ARG_HOME));
-    m_InstancePath.assign(this->GetConfiguration().getString("application.dir"));
+  m_ConfigPath.assign(this->GetConfiguration().getString("application.configDir"));
+  m_InstancePath.assign(this->GetConfiguration().getString("application.dir"));
+  try
+  {
+		m_InstallPath.assign(this->GetConfiguration().getString(Platform::ARG_HOME));
+	}
+  catch (Poco::NotFoundException& )
+  {
+  	m_InstallPath.assign(m_InstancePath);
+  }
 
-    m_UserPath.assign(Poco::Path::home());
-    m_UserPath.pushDirectory("." + this->commandName());
-    Poco::File userFile(m_UserPath);
-    userFile.createDirectory();
+  m_UserPath.assign(Poco::Path::home());
+  m_UserPath.pushDirectory("." + this->commandName());
+  Poco::File userFile(m_UserPath);
+  userFile.createDirectory();
 
-    m_BaseStatePath = m_UserPath;
-    m_BaseStatePath.pushDirectory(".metadata");
-    m_BaseStatePath.pushDirectory(".plugins");
+  m_BaseStatePath = m_UserPath;
+  m_BaseStatePath.pushDirectory(".metadata");
+  m_BaseStatePath.pushDirectory(".plugins");
 
-    Poco::Path logPath(m_UserPath);
-    logPath.setFileName(this->commandName() + ".log");
-    m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
-    m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
+  Poco::Path logPath(m_UserPath);
+  logPath.setFileName(this->commandName() + ".log");
+  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
+  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
 
+  try
+  {
     m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
-    m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
+  }
+  catch (Poco::NotFoundException&)
+  {
+    m_CodeCache = new CodeCache(m_UserPath.append(Poco::Path("plugin_cache")).toString());
+  }
+  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
 
-    m_Initialized = true;
+  m_Initialized = true;
 
-    // Clear the CodeCache
-    if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
-      m_CodeCache->Clear();
+  // Clear the CodeCache
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
+    m_CodeCache->Clear();
 
+  try
+  {
     // assemble a list of base plugin-directories (which contain
     // the real plugins as directories)
     std::vector<std::string> pluginBaseDirs;
@@ -164,11 +182,11 @@ void InternalPlatform::Initialize(int& argc, char** argv)
 
     // resolve plugins
     m_BundleLoader->ResolveAllBundles();
-//  }
-//  catch (Poco::Exception& exc)
-//  {
-//    this->logger().log(exc);
-//  }
+  }
+  catch (Poco::Exception& exc)
+  {
+    this->logger().log(exc);
+  }
 
 }
 
@@ -262,6 +280,11 @@ IBundle::Pointer InternalPlatform::GetBundle(const std::string& id)
   AssertInitialized();
 
   return m_BundleLoader->FindBundle(id);
+}
+
+Poco::Logger* InternalPlatform::GetLogger()
+{
+  return m_PlatformLogger;
 }
 
 Poco::Util::LayeredConfiguration& InternalPlatform::GetConfiguration() const

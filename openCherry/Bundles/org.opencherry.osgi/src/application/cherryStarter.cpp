@@ -31,16 +31,23 @@ namespace cherry {
 
 const std::string Starter::XP_APPLICATIONS = "org.opencherry.osgi.applications";
 
-int Starter::Run(int& argc, char** argv)
+int Starter::Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* config)
 {
 
   // startup the internal platform
   InternalPlatform* platform = InternalPlatform::GetInstance();
-  platform->Initialize(argc, argv);
+  platform->Initialize(argc, argv, config);
   platform->Launch();
 
   // run the application
   IExtensionPointService::Pointer service = platform->GetExtensionPointService();
+  if (service == 0)
+  {
+    platform->GetLogger()->log(Poco::Message("Starter", "The extension point service could not be retrieved. This usually indicates that the openCherry OSGi plug-in could not be loaded.", Poco::Message::PRIO_FATAL));
+    unexpected();
+    return 1;
+  }
+
   IConfigurationElement::vector extensions(
     service->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
   IConfigurationElement::vector::iterator iter;

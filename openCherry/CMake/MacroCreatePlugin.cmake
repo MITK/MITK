@@ -13,8 +13,6 @@
 #
 # - PLUGIN_OUTPUT_DIR the binary output directory of your plugin
 # - PLUGIN_TARGET the target name of your plugins dll
-# - all entries in your MANIFEST.MF file are accessible with their header
-#   in uppercase letters as the variable name
 #
 #
 MACRO(MACRO_CREATE_PLUGIN)
@@ -54,7 +52,6 @@ MACRO(MACRO_CREATE_PLUGIN)
   FILE(MAKE_DIRECTORY ${PLUGIN_OUTPUT_DIR})
 
   # Copy the META-INF directory into the binary output dir
-  SET (LIBRARY_OUTPUT_PATH ${PLUGIN_OUTPUT_DIR}/bin)
   SOURCE_GROUP("Plugin META Files" FILES ${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF)
   SET (PLUGIN_META_FILES ${PLUGIN_META_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF)
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/META-INF/MANIFEST.MF ${PLUGIN_OUTPUT_DIR}/META-INF/MANIFEST.MF COPYONLY)
@@ -111,14 +108,19 @@ MACRO(MACRO_CREATE_PLUGIN)
       )
 
   #INCLUDE_DIRECTORIES(PLUGIN_OUTPUT_DIR)
-  ADD_LIBRARY(${PLUGIN_TARGET} SHARED ${_all_target_files})
+  ADD_LIBRARY(${PLUGIN_TARGET} ${_all_target_files})
+  SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
+    DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
 
   # we need to explicitly state the debug versions of the libraries
   # we are linking to in the TARGET_LINK_LIBRARIES command.
   # Although we set CMAKE_DEBUG_POSTFIX to d, CMake automatically
-  # append it in a TARGET_LINK_LIBRARIES(target lib1) command only
+  # appends it in a TARGET_LINK_LIBRARIES(target lib1) command only
   # if lib1 has been build within the same project.
-  # External projects using this macro would therefore alway link
+  # External projects using this macro would therefore always link
   # to lib1, instead of lib1d in debug configurations
   SET(_debug_linklibs "")
   FOREACH(_linklib ${PLUGIN_LINK_LIBRARIES})
@@ -130,6 +132,12 @@ MACRO(MACRO_CREATE_PLUGIN)
 
   #SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
   SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib)
+  
+  FILE(RELATIVE_PATH _toplevel_dir "${PLUGINS_SOURCE_BASE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+  STRING(REGEX REPLACE ".*/(.+)/?$" "\\1" _toplevel_output_dir ${PLUGINS_OUTPUT_BASE_DIR})
+  MACRO_INSTALL_PLUGIN("${PLUGINS_OUTPUT_BASE_DIR}/${_toplevel_dir}" 
+                       TARGETS ${PLUGIN_TARGET}
+					   DESTINATION "bin/${_toplevel_output_dir}")
 
 ENDMACRO(MACRO_CREATE_PLUGIN)
 

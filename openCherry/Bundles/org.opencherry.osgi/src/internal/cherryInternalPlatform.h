@@ -89,7 +89,7 @@ public:
 
   static InternalPlatform* GetInstance();
 
-  void Initialize(int& argc, char** argv);
+  void Initialize(int& argc, char** argv, Poco::Util::AbstractConfiguration* config = 0);
   void Launch();
   void Shutdown();
 
@@ -124,6 +124,8 @@ public:
   int& GetRawApplicationArgs(char**& argv);
 
   IBundle::Pointer GetBundle(const std::string& id);
+
+  Poco::Logger* GetLogger();
 };
 
 }  // namespace cherry

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryOSGiDll.h"
 
+#include "../cherryPlatform.h"
 #include <string>
 
 namespace cherry {
@@ -31,7 +32,7 @@ public:
 
   static const std::string XP_APPLICATIONS;
 
-  static int Run(int& argc, char** argv);
+  static int Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* config = 0);
 
 };
 

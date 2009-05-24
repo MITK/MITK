@@ -44,7 +44,7 @@ int Starter::Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* conf
   if (service == 0)
   {
     platform->GetLogger()->log(Poco::Message("Starter", "The extension point service could not be retrieved. This usually indicates that the openCherry OSGi plug-in could not be loaded.", Poco::Message::PRIO_FATAL));
-    unexpected();
+    std::unexpected();
     return 1;
   }
 

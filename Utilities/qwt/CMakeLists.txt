@@ -189,10 +189,12 @@ ADD_DEFINITIONS(-DQWT_MAKEDLL)
 ADD_LIBRARY(qwt ${QWT_SOURCES})
 TARGET_LINK_LIBRARIES(qwt ${QT_LIBRARIES})
 
-# install only if shared lib (for now)
-INSTALL(TARGETS qwt${LIBPOSTFIX}
-   RUNTIME DESTINATION bin   
-)
+IF(WIN32)
+  # install only if shared lib (for now)
+  INSTALL(TARGETS qwt${LIBPOSTFIX}
+    RUNTIME DESTINATION bin   
+  )
+ENDIF()
 
 ENDIF(MITK_USE_QT) # only if MITK is built with Qt
 

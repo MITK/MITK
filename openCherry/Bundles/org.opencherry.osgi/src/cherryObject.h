@@ -25,9 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryMacros.h"
 #include "cherryMessage.h"
 
-// disable inheritance by dominance warnings
 #ifdef _MSC_VER
+// disable inheritance by dominance warnings
 #pragma warning( disable : 4250 4275 4251 )
+// disable warning: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+#pragma warning( disable : 4290 )
 #endif
 
 namespace cherry {
@@ -107,7 +109,7 @@ public:
         return sv->HashCode();
       }
       catch (BadWeakPointerException& /*e*/)
-      {        
+      {
         return 0;
       }
     }

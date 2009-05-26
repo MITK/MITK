@@ -76,6 +76,7 @@ class QMITK_EXPORT QmitkPointListWidget : public QWidget
   public slots:
 
     void DeactivateInteractor(bool deactivate);
+    void EnableEditButton(bool enabled);
  
   protected slots:
 
@@ -95,7 +96,7 @@ class QMITK_EXPORT QmitkPointListWidget : public QWidget
     QPushButton* m_BtnSave;
     mitk::DataTreeNode* m_PointSetNode;
     mitk::PointSetInteractor::Pointer m_Interactor;
-    
+    bool m_EditAllowed;
     unsigned int m_NodeObserverTag;
 };
 

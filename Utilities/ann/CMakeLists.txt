@@ -29,9 +29,9 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF()
 ADD_LIBRARY(ann ${ANN_HEADERS} ${ANN_SOURCES})
 
-IF(WIN32)
-  # install only if shared lib (for now)
-  INSTALL(TARGETS ann${LIBPOSTFIX}
-     RUNTIME DESTINATION bin
-  )
-ENDIF()
+# install only if shared lib (for now)
+INSTALL(TARGETS ann${LIBPOSTFIX}
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib/static
+)

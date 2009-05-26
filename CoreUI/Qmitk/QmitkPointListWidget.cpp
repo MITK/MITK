@@ -35,7 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
 :QWidget( parent, f ),
  m_PointSetNode(NULL),
- m_NodeObserverTag(0)
+ m_NodeObserverTag(0),
+ m_EditAllowed(true)
 {
   QGridLayout* layout = new QGridLayout;
   layout->setContentsMargins( 0, 0, 0, 0 );
@@ -45,11 +46,11 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   m_ListView = new QmitkPointListView( this );
   layout->addWidget( m_ListView, 0, 0, 1, 4 ); // span 4 cols
 
-  const QIcon iconEdit( btnSetPoints_xpm );
+  const QIcon iconEdit( btnSetPoints_xpm ); // installs/removes pointset interactor
   m_BtnEdit = new QPushButton( iconEdit, "", this );
-  m_BtnEdit->setToolTip("Toggle point editing (use CTRL+left mouse button)");
-  connect( m_BtnEdit, SIGNAL(toggled(bool)), this, SLOT(OnEditPointSetButtonToggled(bool)) );
-  m_BtnEdit->setCheckable( true ); // installs/removes pointset interactor
+  m_BtnEdit->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
+  connect( m_BtnEdit, SIGNAL(toggled(bool)), this, SLOT(OnEditPointSetButtonToggled(bool)) ); 
+  m_BtnEdit->setCheckable( true ); 
   layout->addWidget( m_BtnEdit, 1, 0 );
 
   const QIcon iconClear( btnClear_xpm ); // clears whole point set
@@ -73,9 +74,17 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   ObserveNewNode(NULL);
 }
 
+
 QmitkPointListWidget::~QmitkPointListWidget()
-{
+{ 
+  if (m_Interactor)
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
+  m_Interactor = NULL;
+  if (m_PointSetNode != NULL)
+    m_PointSetNode->RemoveObserver( m_NodeObserverTag );
+  m_PointSetNode = NULL;
 }
+
 
 void QmitkPointListWidget::SetPointSetNode( mitk::DataTreeNode* node )
 {
@@ -92,10 +101,12 @@ void QmitkPointListWidget::SetPointSetNode( mitk::DataTreeNode* node )
   }
 }
 
+
 void QmitkPointListWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_ListView->SetMultiWidget( multiWidget );
 }
+
 
 void QmitkPointListWidget::DeactivateInteractor(bool deactivate)
 {
@@ -109,7 +120,8 @@ void QmitkPointListWidget::DeactivateInteractor(bool deactivate)
     }
   }
 }
-    
+   
+
 void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
 {
   // remove old observer
@@ -127,7 +139,7 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
 
   m_PointSetNode = node;
 
-  // add new observer if neccessary
+  // add new observer if necessary
   if ( m_PointSetNode != NULL )
   {
     itk::ReceptorMemberCommand<QmitkPointListWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkPointListWidget>::New();
@@ -139,11 +151,16 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
     m_NodeObserverTag = 0;
   }
 
-  m_BtnEdit->setEnabled( m_PointSetNode != NULL );
+  if (m_EditAllowed == true)
+    m_BtnEdit->setEnabled( m_PointSetNode != NULL );
+  else
+    m_BtnEdit->setEnabled( false ); 
+
   m_BtnClear->setEnabled( m_PointSetNode != NULL );
   m_BtnLoad->setEnabled( m_PointSetNode != NULL );
   m_BtnSave->setEnabled( m_PointSetNode != NULL );
 }
+
 
 void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject & e )
 {
@@ -151,6 +168,7 @@ void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject & e )
   m_NodeObserverTag = 0;
   m_ListView->SetPointSet( NULL );
 }
+
 
 void QmitkPointListWidget::OnEditPointSetButtonToggled(bool checked)
 {
@@ -169,6 +187,7 @@ void QmitkPointListWidget::OnEditPointSetButtonToggled(bool checked)
     emit EditPointSets(checked);
   }
 }
+
 
 void QmitkPointListWidget::OnClearPointSetButtonClicked()
 {
@@ -197,12 +216,13 @@ void QmitkPointListWidget::OnClearPointSetButtonClicked()
   emit PointListChanged();
 }
 
+
 void QmitkPointListWidget::OnLoadPointSetButtonClicked()
 {
   if (!m_PointSetNode) return;
 
   // get the name of the file to load
-  QString filename = QFileDialog::getOpenFileName( NULL, QString::null, "MITK Point Sets (*.mps)", NULL );
+  QString filename = QFileDialog::getOpenFileName( NULL, "Open MITK Pointset", "", "MITK Point Sets (*.mps)");
   if ( filename.isEmpty() ) return;
 
   // attempt to load file
@@ -242,6 +262,7 @@ void QmitkPointListWidget::OnLoadPointSetButtonClicked()
   emit PointListChanged();
 }
 
+
 void QmitkPointListWidget::OnSavePointSetButtonClicked()
 {
   if (!m_PointSetNode) return;
@@ -253,8 +274,9 @@ void QmitkPointListWidget::OnSavePointSetButtonClicked()
   std::string name("");
 
   QString fileNameProposal = "PointSet.mps";
-  QString aFilename = QFileDialog::getSaveFileName( NULL, fileNameProposal.toLatin1() );
-  if ( aFilename.isEmpty() ) return;
+  QString aFilename = QFileDialog::getSaveFileName( NULL, "Save point set", fileNameProposal, "MITK Pointset (*.mps)" );
+  if ( aFilename.isEmpty() ) 
+    return;
 
   try
   {
@@ -273,3 +295,12 @@ void QmitkPointListWidget::OnSavePointSetButtonClicked()
 }
 
 
+void QmitkPointListWidget::EnableEditButton( bool enabled )
+{
+  m_EditAllowed = enabled;
+  if (enabled == false)    
+    m_BtnEdit->setEnabled(false);
+  else
+    m_BtnEdit->setEnabled(true);
+  OnEditPointSetButtonToggled(enabled);
+}

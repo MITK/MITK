@@ -149,7 +149,7 @@ be associated with the view.
          <attribute name="allowMultiple" type="boolean">
             <annotation>
                <documentation>
-                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(const std::string& id, const std::string& secondaryId).  The default is false.
+                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(const std::string&amp; id, const std::string&amp; secondaryId).  The default is false.
                </documentation>
             </annotation>
          </attribute>

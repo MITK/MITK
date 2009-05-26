@@ -209,10 +209,15 @@ void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataTreeNode* itk
   }
 
   /* search image than belongs to the property */
-  mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
-  mitk::DataTreeNode* n = m_DataStorage->GetNode(p2);
-  if (n == NULL) // if node was deleted, change our behaviour to AutoTopMost
+  if (m_LevelWindowProperty.IsNull())
     SetAutoTopMostImage(true);
+  else
+  {
+    mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
+    mitk::DataTreeNode* n = m_DataStorage->GetNode(p2);
+    if (n == NULL) // if node was deleted, change our behaviour to AutoTopMost
+      SetAutoTopMostImage(true);
+   }
 }
 
 

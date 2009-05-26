@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGET_H_
 #define QMITKSTDMULTIWIDGET_H_
 
-#include "ui_QmitkStdMultiWidget.h"
+//#include "ui_QmitkStdMultiWidget.h" //we create the GUI manual
 
 #include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
@@ -30,11 +30,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
 
-#include <QWidget>
+#include <qwidget.h>
+
+#include <QmitkRenderWindow.h>
+#include <QmitkLevelWindowWidget.h>
 
 class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
+class QSpacerItem;
+class QmitkLevelWindowWidget;
+class QmitkRenderWindow;
 
-class QMITK_EXPORT QmitkStdMultiWidget : public QWidget, public Ui::QmitkStdMultiWidgetUi
+class QMITK_EXPORT QmitkStdMultiWidget : public QWidget //, public Ui::QmitkStdMultiWidgetUi
 {
   Q_OBJECT
 
@@ -74,6 +82,8 @@ public:
   mitk::SlicesRotator * GetSlicesRotator() const;
 
   mitk::SlicesSwiveller * GetSlicesSwiveller() const;
+
+  void InitializeWidget();
 
 
 public slots:
@@ -174,6 +184,14 @@ signals:
 
 public:
 
+  /** Define RenderWindow (public)*/ 
+  QmitkRenderWindow* mitkWidget1;
+  QmitkRenderWindow* mitkWidget2;
+  QmitkRenderWindow* mitkWidget3;
+  QmitkRenderWindow* mitkWidget4;
+  QmitkLevelWindowWidget* levelWindowWidget;
+  /********************************/
+
   enum { PLANE_MODE_SLICING = 0, PLANE_MODE_ROTATION, PLANE_MODE_SWIVEL };
   enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT,
     LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3,
@@ -186,28 +204,34 @@ protected:
 
   QHBoxLayout* QmitkStdMultiWidgetLayout;
 
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering3;
-  int m_PlaneMode;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering1;
-  mitk::LogoRendering::Pointer m_LogoRendering4;
-  mitk::GradientBackground::Pointer m_GradientBackground4;
-  mitk::GradientBackground::Pointer m_GradientBackground3;
   int m_Layout;
-  mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
-  mitk::DataTreeIteratorClone planesIterator;
-  mitk::SliceNavigationController::Pointer m_TimeNavigationController;
-  mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
-  mitk::PositionTracker::Pointer m_PositionTracker;
-  mitk::DataTreeNode::Pointer m_PositionTrackerNode;
-  mitk::DataStorage::Pointer m_DataStorage;
-  mitk::SlicesRotator::Pointer m_SlicesRotator;
-  mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
-  mitk::GradientBackground::Pointer m_GradientBackground1;
-  mitk::GradientBackground::Pointer m_GradientBackground2;
+  int m_PlaneMode;
+
+  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering3;
+  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering2;
+  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering1;
+  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering4;
+
   mitk::LogoRendering::Pointer m_LogoRendering1;
   mitk::LogoRendering::Pointer m_LogoRendering2;
   mitk::LogoRendering::Pointer m_LogoRendering3;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering2;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering4;
+  mitk::LogoRendering::Pointer m_LogoRendering4;
+
+  mitk::GradientBackground::Pointer m_GradientBackground1;
+  mitk::GradientBackground::Pointer m_GradientBackground2;
+  mitk::GradientBackground::Pointer m_GradientBackground4;
+  mitk::GradientBackground::Pointer m_GradientBackground3;
+  
+  mitk::DisplayVectorInteractor::Pointer m_MoveAndZoomInteractor;
+  mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
+  mitk::PositionTracker::Pointer m_PositionTracker;
+  mitk::SliceNavigationController::Pointer m_TimeNavigationController;
+  mitk::SlicesRotator::Pointer m_SlicesRotator;
+  mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
+
+  mitk::DataTreeIteratorClone planesIterator;
+  mitk::DataTreeNode::Pointer m_PositionTrackerNode;
+  mitk::DataStorage::Pointer m_DataStorage;
+    
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

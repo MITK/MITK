@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
+#include <qsplitter.h>
+#include <QMotifStyle>
 
 #include "mitkProperties.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -32,12 +34,92 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
 
+#include "vtkTextProperty.h"
+#include "vtkCornerAnnotation.h"
+#include "mitkVtkLayerController.h"
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
  : QWidget(parent, f)
 {
-  this->setupUi(this);
+  //this->setupUi(this);
+   
+  /*******************************/
+  //Create Widget manually
+  /*******************************/
+  
+  //create Layouts
+  QmitkStdMultiWidgetLayout = new QHBoxLayout( this ); 
+  
+  //Set Layout to widget
+  this->setLayout(QmitkStdMultiWidgetLayout);
 
+  //create splitter
+  QSplitter *mainSplit = new QSplitter( this );
+  QSplitter *vSplit = new QSplitter( Qt::Vertical, mainSplit );
+  QSplitter *splitterUp = new QSplitter( vSplit );
+  QSplitter *splitterBottom = new QSplitter( vSplit );
+      
+  //Create RenderWindows 1
+  mitkWidget1 = new QmitkRenderWindow( splitterUp, "mitkWidget1" );
+  mitkWidget1->setMaximumSize(2000,2000);
+  //m_RenderWindowLayout->addWidget( mitkWidget1, 0, 0 );
+ 
+  //Create RenderWindows 2
+  mitkWidget2 = new QmitkRenderWindow( splitterUp, "mitkWidget2" );
+  mitkWidget2->setMaximumSize(2000,2000);
+  mitkWidget2->setEnabled( TRUE );
+  //m_RenderWindowLayout->addWidget( mitkWidget2, 0, 1 );
+ 
+  //Create RenderWindows 3
+  mitkWidget3 = new QmitkRenderWindow( splitterBottom, "mitkWidget3" );
+  mitkWidget3->setMaximumSize(2000,2000);
+  //m_RenderWindowLayout->addWidget( mitkWidget3, 1, 0 );
+
+  //Create RenderWindows 4
+  mitkWidget4 = new QmitkRenderWindow( splitterBottom, "mitkWidget4" );
+  mitkWidget4->setMaximumSize(2000,2000);
+  //m_RenderWindowLayout->addWidget( mitkWidget4, 1, 1 );
+
+  //insert Widget into the splitters
+  splitterUp->addWidget( mitkWidget1 );
+  splitterUp->addWidget( mitkWidget2 );
+
+  splitterBottom->addWidget( mitkWidget3 );
+  splitterBottom->addWidget( mitkWidget4 );
+
+  //add widget Splitter to main Splitter
+  mainSplit->addWidget( vSplit );
+
+ 
+  //Create Level Window Widget
+  levelWindowWidget = new QmitkLevelWindowWidget( mainSplit ); //this
+  levelWindowWidget->setObjectName(QString::fromUtf8("levelWindowWidget"));
+  QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+  sizePolicy.setHorizontalStretch(0);
+  sizePolicy.setVerticalStretch(0);
+  sizePolicy.setHeightForWidth(levelWindowWidget->sizePolicy().hasHeightForWidth());
+  levelWindowWidget->setSizePolicy(sizePolicy);
+  levelWindowWidget->setMinimumSize(QSize(0, 50));
+  levelWindowWidget->setMaximumSize(QSize(50, 2000));
+
+  //add LevelWindow Widget to mainSplitter
+  mainSplit->addWidget( levelWindowWidget );
+
+  //show mainSplitt and add to Layout
+  mainSplit->show();
+  QmitkStdMultiWidgetLayout->addWidget( mainSplit );
+
+  //resize Image.
+  this->resize( QSize(364, 477).expandedTo(minimumSizeHint()) );
+ 
+  //Initialize the widgets.
+  this->InitializeWidget();
+}
+
+void QmitkStdMultiWidget::InitializeWidget()
+{
   planesIterator = NULL;
+  m_PositionTracker = NULL;
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
@@ -82,6 +164,62 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
     mitk::SliceNavigationController::Frontal );
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Original );
+
+  /*************************************************/
+  //Write Layout Names into the viewers -- hardCoded
+  
+  //Info for later: 
+  //int view = this->GetRenderWindow1()->GetSliceNavigationController()->GetDefaultViewDirection();
+  //QString layoutName;
+  //if( view == mitk::SliceNavigationController::Transversal )
+  //  layoutName = "Transversal";
+  //else if( view == mitk::SliceNavigationController::Sagittal )
+  //  layoutName = "Saggital";
+  //else if( view == mitk::SliceNavigationController::Frontal )
+  //  layoutName = "Coronal";
+  //else if( view == mitk::SliceNavigationController::Original )
+  //  layoutName = "Original";
+  //if( view >= 0 && view < 4 )
+  //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
+ 
+  vtkCornerAnnotation *cornerText;
+  vtkTextProperty *textProp;
+  vtkRenderer *ren;
+
+  //Render Window 1 == transversal
+  cornerText = vtkCornerAnnotation::New();
+  cornerText->SetText(0, "Transversal");
+  cornerText->SetMaximumFontSize(12);
+  textProp = vtkTextProperty::New();
+  textProp->SetColor( 1.0, 0.0, 0.0 );
+  cornerText->SetTextProperty( textProp );
+  ren = vtkRenderer::New();
+  ren->AddActor(cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+ 
+  //Render Window 2 == saggital
+  cornerText = vtkCornerAnnotation::New();
+  cornerText->SetText(0, "Saggital");
+  cornerText->SetMaximumFontSize(12);
+  textProp = vtkTextProperty::New();
+  textProp->SetColor( 0.0, 1.0, 0.0 );
+  cornerText->SetTextProperty( textProp );
+  ren = vtkRenderer::New();
+  ren->AddActor(cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+
+  //Render Window 3 == coronal
+  cornerText = vtkCornerAnnotation::New();
+  cornerText->SetText(0, "Coronal");
+  cornerText->SetMaximumFontSize(12);
+  textProp = vtkTextProperty::New();
+  textProp->SetColor( 0.0, 0.0, 1.0 );
+  cornerText->SetTextProperty( textProp );
+  ren = vtkRenderer::New();
+  ren->AddActor(cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+  /*************************************************/
+
 
   // create a slice rotator
   // m_SlicesRotator = mitk::SlicesRotator::New();

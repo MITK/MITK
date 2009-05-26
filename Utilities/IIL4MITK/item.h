@@ -1,7 +1,16 @@
 #ifndef _ITEM_H_
 #define _ITEM_H_
 
-#include <mitkGL.h>
+#ifdef WIN32
+  #include <windows.h>
+#endif
+
+#ifndef __APPLE__
+  #include "GL/gl.h"
+#else
+  #include "OpenGL/gl.h"
+#endif
+
 
 /*!
 \brief The items are objects that can be displayed by 

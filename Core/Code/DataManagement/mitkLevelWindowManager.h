@@ -101,8 +101,8 @@ namespace mitk
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;
     unsigned long                m_PropertyModifiedTag;
-    bool                         m_IsPropertyModifiedTagSet;
     mitk::Image*                 m_CurrentImage;
+    bool                         m_IsPropertyModifiedTagSet;
   };
 }
 #endif

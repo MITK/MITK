@@ -248,7 +248,7 @@ std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
     return std::string("application/zip");
   }
 
-  if ( (line[0] == 0xFF) && (line[1] == 0xD8) )
+  if ( ((reinterpret_cast<unsigned char*>(line))[0] == 0xFF) && (line[1] == 0xD8) )
   {
     return std::string("image/jpeg");
   }

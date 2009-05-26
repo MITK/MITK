@@ -43,7 +43,7 @@ struct CHERRY_UI ISelectionChangedListener : public virtual Object {
 
   cherryInterfaceMacro(ISelectionChangedListener, cherry);
 
-  struct Events {
+  struct CHERRY_UI Events {
 
     Message1<SelectionChangedEvent::Pointer > selectionChanged;
 

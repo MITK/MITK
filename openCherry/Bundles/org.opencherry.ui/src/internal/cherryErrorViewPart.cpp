@@ -15,32 +15,37 @@
 
  =========================================================================*/
 
-
-#ifndef CHERRYQTWORKBENCHPAGETWEAKLET_H_
-#define CHERRYQTWORKBENCHPAGETWEAKLET_H_
-
-#include <cherryWorkbenchPageTweaklet.h>
-
-#include "../cherryUiQtDll.h"
+#include "cherryErrorViewPart.h"
 
 namespace cherry
 {
 
-class CHERRY_UI_QT QtWorkbenchPageTweaklet : public WorkbenchPageTweaklet
+ErrorViewPart::ErrorViewPart()
 {
+}
 
-public:
-
-  cherryObjectMacro(QtWorkbenchPageTweaklet);
-
-  void* CreateClientComposite(void* pageControl);
-  void* CreatePaneControl(void* parent);
-
-  Object::Pointer CreateStatusPart(void* parent, const std::string& title, const std::string& msg);
-  IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName, const std::string& msg);
-
-};
+ErrorViewPart::ErrorViewPart(const std::string& title, const std::string& error) :
+  title(title), error(error)
+{
 
 }
 
-#endif /* CHERRYQTWORKBENCHPAGETWEAKLET_H_ */
+void ErrorViewPart::CreatePartControl(void* parent)
+{
+  if (!error.empty())
+  {
+    statusPart = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateStatusPart(
+        parent, title, error);
+  }
+}
+
+void ErrorViewPart::SetPartName(const std::string& newName)
+{
+  ViewPart::SetPartName(newName);
+}
+
+void ErrorViewPart::SetFocus()
+{
+}
+
+}

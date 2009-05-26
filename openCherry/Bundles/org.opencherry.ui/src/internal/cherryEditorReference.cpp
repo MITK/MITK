@@ -506,7 +506,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     EditorDescriptor::Pointer descr)
 {
   IEditorPart::Pointer part =
-      Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart("(Empty)");
+      Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorEditorPart("(Empty)", "");
 
   IEditorInput::Pointer input;
   try

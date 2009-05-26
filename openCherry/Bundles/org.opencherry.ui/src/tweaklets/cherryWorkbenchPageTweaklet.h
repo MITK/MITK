@@ -34,8 +34,8 @@ struct CHERRY_UI WorkbenchPageTweaklet : public Object
   virtual void* CreateClientComposite(void* pageControl) = 0;
   virtual void* CreatePaneControl(void* parent) = 0;
 
-  virtual IViewPart::Pointer CreateErrorViewPart(const std::string& partName = "", const std::string& msg = "") = 0;
-  virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName = "", const std::string& msg = "") = 0;
+  virtual Object::Pointer CreateStatusPart(void* parent, const std::string& title, const std::string& msg) = 0;
+  virtual IEditorPart::Pointer CreateErrorEditorPart(const std::string& partName, const std::string& msg) = 0;
 
 };
 

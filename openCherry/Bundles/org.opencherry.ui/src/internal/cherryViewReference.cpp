@@ -31,6 +31,7 @@
 #include "cherryViewSite.h"
 #include "cherryPartTester.h"
 #include "cherryWorkbenchPlugin.h"
+#include "cherryErrorViewPart.h"
 
 namespace cherry
 {
@@ -39,7 +40,8 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
     const std::string& secId, IMemento::Pointer m) :
   factory(fac), secondaryId(secId), memento(m)
 {
-  ViewDescriptor::Pointer desc = this->factory->GetViewRegistry()->Find(id).Cast<ViewDescriptor>();
+  ViewDescriptor::Pointer desc =
+      this->factory->GetViewRegistry()->Find(id).Cast<ViewDescriptor> ();
   ImageDescriptor::Pointer iDesc;
   std::string title;
   if (!desc.IsNull())
@@ -73,7 +75,7 @@ ViewReference::ViewReference(ViewFactory* fac, const std::string& id,
 
 void ViewReference::DoDisposePart()
 {
-  IViewPart::Pointer view = part.Cast<IViewPart>();
+  IViewPart::Pointer view = part.Cast<IViewPart> ();
   //WorkbenchPartReference::DoDisposePart();
   if (!view.IsNull())
   {
@@ -108,7 +110,7 @@ void ViewReference::DoDisposePart()
 
 IWorkbenchPage::Pointer ViewReference::GetPage() const
 {
-  return this->factory->GetWorkbenchPage().Cast<IWorkbenchPage>();
+  return this->factory->GetWorkbenchPage().Cast<IWorkbenchPage> ();
 }
 
 std::string ViewReference::GetRegisteredName()
@@ -134,7 +136,7 @@ std::string ViewReference::GetSecondaryId()
 
 IViewPart::Pointer ViewReference::GetView(bool restore)
 {
-  return this->GetPart(restore).Cast<IViewPart>();
+  return this->GetPart(restore).Cast<IViewPart> ();
 }
 
 IWorkbenchPart::Pointer ViewReference::CreatePart()
@@ -152,8 +154,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   try
   {
     result = this->CreatePartHelper();
-  }
-  catch (PartInitException e)
+  } catch (PartInitException e)
   {
     exception = e;
     error = true;
@@ -176,55 +177,54 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
     // Pass the error to the status handling facility
     //      StatusManager.getManager().handle(logStatus);
 
-    WorkbenchPlugin::Log("Unable to create view ID " + this->GetId() + ": " + exception.displayText());
+    std::string errorTitle = "Unable to create view ID " + this->GetId();
+    WorkbenchPlugin::Log(errorTitle + ": " + exception.displayText());
 
-    IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(this->GetId());
+    IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(
+        this->GetId());
     std::string label = this->GetId();
     if (!desc.IsNull())
     {
       label = desc->GetLabel();
     }
 
+    std::string errorMsg = exception.displayText();
+    errorMsg
+        += "\n\n- Check your shared library for unresolved symbols\n- Check your import/export macros (Windows only)\n- Check your class attribute in your plugin.xml file\n- Check your manifest.cpp file";
+    ErrorViewPart::Pointer part(new ErrorViewPart(errorTitle, errorMsg));
 
-    IViewPart::Pointer part =
-        Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateErrorViewPart(label, exception.displayText());
-
-    if (part.IsNotNull())
+    //PartPane pane = getPane();
+    IViewReference::Pointer viewRef(this);
+    ViewSite::Pointer site(new ViewSite(viewRef, part,
+        factory->GetWorkbenchPage(), GetId(), PlatformUI::PLUGIN_ID, label));
+    //site.setActionBars(new ViewActionBars(factory.page.getActionBars(),
+    //    site, (ViewPane) pane));
+    try
     {
-      //PartPane pane = getPane();
-      IViewReference::Pointer viewRef(this);
-      ViewSite::Pointer site(new ViewSite(viewRef, part, factory->GetWorkbenchPage(), GetId(),
-          PlatformUI::PLUGIN_ID, label));
-      //site.setActionBars(new ViewActionBars(factory.page.getActionBars(),
-      //    site, (ViewPane) pane));
-      try
-      {
-        part->Init(site);
-      }
-      catch (PartInitException e)
-      {
-        std::cout << e.displayText();
-        //StatusUtil.handleStatus(e, StatusManager.SHOW
-        //    | StatusManager.LOG);
-        return IWorkbenchPart::Pointer(0);
-      }
-
-      void* parent = pane->GetControl();
-
-      try
-      {
-        part->CreatePartControl(parent);
-      }
-      catch (std::exception e)
-      {
-        std::cout << "Error creating view: " << e.what() << std::endl;
-        //          StatusUtil.handleStatus(e, StatusManager.SHOW
-        //              | StatusManager.LOG);
-        return IWorkbenchPart::Pointer(0);
-      }
-
-      result = part.Cast<IWorkbenchPart>();
+      part->Init(site);
+    } catch (PartInitException e)
+    {
+      std::cout << e.displayText();
+      //StatusUtil.handleStatus(e, StatusManager.SHOW
+      //    | StatusManager.LOG);
+      return IWorkbenchPart::Pointer(0);
     }
+    part->SetPartName(label);
+
+    void* parent = pane->GetControl();
+
+    try
+    {
+      part->CreatePartControl(parent);
+    } catch (std::exception e)
+    {
+      std::cout << "Error creating view: " << e.what() << std::endl;
+      //          StatusUtil.handleStatus(e, StatusManager.SHOW
+      //              | StatusManager.LOG);
+      return IWorkbenchPart::Pointer(0);
+    }
+
+    result = part.Cast<IWorkbenchPart> ();
   }
 
   return result;
@@ -233,7 +233,8 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 PartPane::Pointer ViewReference::CreatePane()
 {
   IWorkbenchPartReference::Pointer partRef(this);
-  PartPane::Pointer pane(new PartPane(partRef, this->factory->GetWorkbenchPage()));
+  PartPane::Pointer pane(new PartPane(partRef,
+      this->factory->GetWorkbenchPage()));
   return pane;
   //return Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateViewPane(this, this->factory->GetWorkbenchPage());
 }
@@ -358,7 +359,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     // part.
     PartTester::TestView(view);
 
-    result = view.Cast<IWorkbenchPart>();
+    result = view.Cast<IWorkbenchPart> ();
 
     //      IConfigurationElement::Pointer element = desc->GetConfigurationElement();
     //      if (!element.IsNull()) {
@@ -366,8 +367,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     //            element.getDeclaringExtension(), view,
     //            IExtensionTracker.REF_WEAK);
     //      }
-  }
-  catch (std::exception e)
+  } catch (std::exception e)
   {
     //      if ((e instanceof Error) && !(e instanceof LinkageError)) {
     //        throw (Error) e;

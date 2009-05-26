@@ -69,6 +69,7 @@ SET(MOC_H_FILES
 
 SET(UI_FILES
   src/internal/cherryQtShowViewDialog.ui
+  src/internal/cherryQtStatusPart.ui
   src/internal/cherryQtLogView.ui
 )
 

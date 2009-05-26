@@ -20,6 +20,8 @@
 #include "cherryQtControlWidget.h"
 #include "cherryQtErrorView.h"
 
+#include <ui_cherryQtStatusPart.h>
+
 #include <QWidget>
 #include <QHBoxLayout>
 
@@ -52,12 +54,14 @@ void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
   return control;
 }
 
-IViewPart::Pointer QtWorkbenchPageTweaklet::CreateErrorViewPart(const std::string& partName, const std::string& msg)
+Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(void* parent, const std::string& title, const std::string& msg)
 {
-  QtErrorView::Pointer part(new QtErrorView());
-  //part->SetPartName(partName);
-  part->SetErrorMsg(msg);
-  return part;
+  Ui::QtStatusPart statusPart;
+  statusPart.setupUi(static_cast<QWidget*>(parent));
+  statusPart.m_TitleLabel->setText(QString::fromStdString(title));
+  statusPart.m_DetailsLabel->setText(QString::fromStdString(msg));
+
+  return Object::Pointer(0);
 }
 
 IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const std::string& partName, const std::string& msg)

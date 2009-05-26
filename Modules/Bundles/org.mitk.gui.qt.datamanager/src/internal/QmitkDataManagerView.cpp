@@ -49,8 +49,6 @@ QmitkDataManagerView::QmitkDataManagerView()
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
-/*  mitk::DelegateManager::GetInstance()->RemoveCommand("Show Node Info");*/
-
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -207,6 +205,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_BtnGlobalReinit, SIGNAL( clicked(bool) )
     , this, SLOT( BtnGlobalReinitClicked(bool) ) );
 
+  QObject::connect( m_NodePropertiesTableEditor, SIGNAL( destroyed(QObject*) )
+    , this, SLOT( QtObjectDestroyed(QObject*) ) );
+
 }
 
 void QmitkDataManagerView::Activated()
@@ -262,7 +263,7 @@ void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )
 void QmitkDataManagerView::NodeTableViewSelectionChanged( const QModelIndex & current, const QModelIndex & previous )
 {
   mitk::DataTreeNode::Pointer selectedNode = m_NodeTableModel->GetNode(current);
-  if(selectedNode.IsNotNull())
+  if(selectedNode.IsNotNull() && m_NodePropertiesTableEditor != 0)
     m_NodePropertiesTableEditor->SetPropertyList(selectedNode->GetPropertyList());
 
 }
@@ -468,4 +469,10 @@ void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )
     std::cout << "PACS export dialog cancelled by user." << std::endl;
   }*/
 
+}
+
+void QmitkDataManagerView::QtObjectDestroyed( QObject * obj /*= 0 */ )
+{
+  if(obj == m_NodePropertiesTableEditor)
+    m_NodePropertiesTableEditor = 0;
 }

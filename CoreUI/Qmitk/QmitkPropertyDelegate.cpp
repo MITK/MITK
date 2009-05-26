@@ -13,6 +13,7 @@
 #include <QDoubleSpinBox>
 #include <QStringList>
 #include <QMessageBox>
+#include <QPen>
 
 QmitkPropertyDelegate::QmitkPropertyDelegate(QObject *parent)
 {
@@ -29,6 +30,13 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     painter->save();
     painter->fillRect(option.rect, qcol);
+    QRect rect = option.rect;
+    rect.setWidth(rect.width()-1);
+    rect.setHeight(rect.height()-1);
+    QPen pen;
+    pen.setWidth(1);
+    painter->setPen(pen);
+    painter->drawRect(rect);
     painter->restore();
 
   }

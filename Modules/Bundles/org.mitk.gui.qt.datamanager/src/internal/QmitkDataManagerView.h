@@ -60,6 +60,8 @@ public:
   virtual void Deactivated();
 
 protected slots:
+
+  void QtObjectDestroyed ( QObject * obj = 0 );
   ///
   /// \brief Other datastorage selected, reset node selection and properties
   ///
@@ -104,7 +106,7 @@ protected slots:
   /// \brief Reinits everything.
   ///
   void BtnGlobalReinitClicked ( bool checked = false );
-
+  
 protected:
   ///
   /// \brief Create the view here.

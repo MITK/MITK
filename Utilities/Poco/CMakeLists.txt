@@ -1,5 +1,15 @@
 SET(CMAKE_DEBUG_POSTFIX d)
 
+SET(Poco_INCLUDE_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    CACHE PATH
+    "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2")
+
+SET(Poco_LIBRARY_DIR
+    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    CACHE PATH
+    "top-level directory containing the poco libraries.")
+
 # POCO relies on the flags _DEBUG and NDEBUG to be set accordingly.
 # These are Microsoft specific flags and not automatically defined by gcc or
 # others, so we have to define them by ourselves.

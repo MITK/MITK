@@ -96,12 +96,12 @@ Qt::ItemFlags QmitkDataStorageTableModel::flags(const QModelIndex &index) const
   return flags;
 }
 
-int QmitkDataStorageTableModel::rowCount(const QModelIndex &parent) const
+int QmitkDataStorageTableModel::rowCount(const QModelIndex &) const
 {
   return m_NodeSet.size();
 }
 
-int QmitkDataStorageTableModel::columnCount(const QModelIndex &parent) const
+int QmitkDataStorageTableModel::columnCount(const QModelIndex &) const
 {
   // show name, type and visible columnn
   int columns = 3;
@@ -325,7 +325,7 @@ void QmitkDataStorageTableModel::RemoveNode( const mitk::DataTreeNode* node )
   }
 }
 
-void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject &event )
+void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject & )
 {
   if(!m_BlockEvents)
   {
@@ -525,3 +525,4 @@ bool QmitkDataStorageTableModel::DataTreeNodeCompareFunction::operator()
     break;
   }
 }
+

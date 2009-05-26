@@ -39,7 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTubeFilter.h>
-#include "pic2vtk.h"
 
 namespace mitk
 {

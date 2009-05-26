@@ -36,7 +36,7 @@ namespace mitk {
     Modified();
   }
 
-  void RegistrationBase::SetProgress(const itk::EventObject& event)
+  void RegistrationBase::SetProgress(const itk::EventObject& )
   {
     ProgressBar::GetInstance()->AddStepsToDo(1);
     ProgressBar::GetInstance()->Progress();

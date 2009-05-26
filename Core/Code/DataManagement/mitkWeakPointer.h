@@ -155,7 +155,7 @@ public:
   ///
   /// \brief Gets called when the object is deleted or modified.
   ///
-  void OnObjectDelete( const itk::Object *caller, const itk::EventObject &event )
+  void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
   {
     // do not unsubsribe from this object. this would invalidate the itterator of the
     // event listener vector (in itk::Object)
@@ -166,7 +166,7 @@ public:
 
   }
 
-  void OnObjectModified( const itk::Object *caller, const itk::EventObject &event )
+  void OnObjectModified( const itk::Object *caller, const itk::EventObject & )
   {
     ObjectModified.Send(caller);
   }

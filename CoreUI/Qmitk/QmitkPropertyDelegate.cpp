@@ -21,71 +21,20 @@ QmitkPropertyDelegate::QmitkPropertyDelegate(QObject *parent)
 void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
   , const QModelIndex &index) const
 {
-  std::bitset<2> paintFlags;
 
-/*
-  if(index.column() == 1)
+  QVariant data = index.data(Qt::DisplayRole);
+  if(index.column() == 1 && data.type() == QVariant::Color)
   {
-    //Get item data
-    QVariant data = index.data(Qt::DisplayRole);
+    QColor qcol = data.value<QColor>();
 
-    if (option.state & QStyle::State_Selected)
-    {
-      QPalette::ColorGroup cg = option.state & QStyle::State_HasFocus
-        ? QPalette::Normal : QPalette::Disabled;
-      painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
-    }
+    painter->save();
+    painter->fillRect(option.rect, qcol);
+    painter->restore();
 
-    // draw a coloured button
-    if(data.type() == QVariant::Color)
-    {
-      QColor qcol = data.value<QColor>();
-
-      painter->save();
-      const QStyle *style = QApplication::style();
-      QStyleOptionButton opt;
-      opt.state |= QStyle::State_Raised |QStyle::State_Enabled;
-      opt.features |= QStyleOptionButton::DefaultButton;
-      opt.palette = QPalette(qcol);
-      opt.rect = option.rect;
-
-      // draw item data as CheckBox
-      style->drawControl(QStyle::CE_PushButton,&opt,painter);
-      painter->restore();
-
-      paintFlags.set(0, true);
-    }
-
-    / *
-    else if(data.type() == QVariant::Bool)
-    {
-      bool boolValue = data.value<bool>();
-
-      const QStyle *style = QApplication::style();
-      QStyleOptionButton opt;
-      opt.state |= boolValue ? QStyle::State_On : QStyle::State_Off;
-      opt.state |= QStyle::State_Enabled;
-      opt.rect = option.rect;
-
-      const int indicatorWidth = style->pixelMetric(QStyle::PM_IndicatorWidth, &opt);
-      const int indicatorHeight = style->pixelMetric(QStyle::PM_IndicatorHeight, &opt);
-      opt.rect = QRect(opt.rect.x()+ opt.rect.width()/2-indicatorWidth/2,
-        opt.rect.y()+ opt.rect.height()/2-indicatorHeight/2,
-        indicatorWidth, indicatorHeight);
-
-      // draw item data as CheckBox
-      style->drawControl(QStyle::CE_CheckBox,&opt,painter);
-
-      paintFlags.set(1, true);
-    }* /
-
-
-  }*/
-
-
-  if(paintFlags.none())
+  }
+  else
   {
-    QItemDelegate::paint(painter, option, index);
+    QStyledItemDelegate::paint(painter, option, index);
   }
 }
 
@@ -98,16 +47,19 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
   if(data.isValid())
   {
 
-    /*
     if(data.type() == QVariant::Color)
     {
       QPushButton* colorBtn = new QPushButton(parent);
       QColor color = data.value<QColor>();
-
+      
       QColor result = QColorDialog::getColor(color);
       if(result.isValid())
       {
-        colorBtn->setPalette(QPalette(result));
+        QPalette palette = colorBtn->palette();
+        palette.setColor(QPalette::Window, result);
+        colorBtn->setPalette(palette);
+        colorBtn->setStyleSheet(QString("background-color: %1;foreground-color: %1; border-style: none;").arg(result.name()));
+        //colorBtn->setFlat(true);
       }
 
       connect(colorBtn, SIGNAL(pressed()), this, SLOT(commitAndCloseEditor()));
@@ -115,6 +67,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       return colorBtn;
     }
 
+/*
     else if(data.type() == QVariant::Bool)
     {
       QCheckBox *visibilityCheckBox = new QCheckBox(parent);
@@ -122,9 +75,10 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
         this, SLOT(commitAndCloseEditor()));
 
       return visibilityCheckBox;
-    }
-*/
-    /*else*/ if(data.type() == QVariant::Int)
+    }*/
+
+
+    else if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
@@ -152,7 +106,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
     
     else
-      return QItemDelegate::createEditor(parent, option, index);
+      return QStyledItemDelegate::createEditor(parent, option, index);
 
   }
   else
@@ -168,21 +122,24 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
 
   if(data.isValid())
   {
-/*
+
     if(data.type() == QVariant::Color)
     {
-      //QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
-      //QColor qcol = data.value<QColor>();
-      //colorBtn->setPalette(QPalette(qcol));
 
-/ *
+      /*
+      QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
+      QColor qcol = data.value<QColor>();
+      colorBtn->setPalette(QPalette(qcol));
+
+
       QColor result = QColorDialog::getColor(qcol);
       if(result.isValid())
       {
         colorBtn->setPalette(QPalette(result));
-      }* /
+      }
+*/
 
-    }*/
+    }
 
 
 /*
@@ -216,7 +173,7 @@ void QmitkPropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     }
 
     else
-      return QItemDelegate::setEditorData(editor, index);
+      return QStyledItemDelegate::setEditorData(editor, index);
   }
 }
 
@@ -228,17 +185,16 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
 
   if(data.isValid())
   {
-/*
+
     if(data.type() == QVariant::Color)
     {
-      QPushButton *colorBtn = qobject_cast<QPushButton *>(editor);
+      QWidget *colorBtn = qobject_cast<QWidget *>(editor);
       QVariant colorVariant;
-      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
+      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Window));
       model->setData(index, colorVariant);
-    }*/
+    }
 
-
-    /*else*/ if(data.type() == QVariant::Int)
+    else if(data.type() == QVariant::Int)
     {
       QSpinBox* spinBox = qobject_cast<QSpinBox *>(editor);
       int intValue = spinBox->value();
@@ -271,7 +227,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
     }
 
     else
-      QItemDelegate::setModelData(editor, model, index);
+      QStyledItemDelegate::setModelData(editor, model, index);
   }
 
 }
@@ -279,16 +235,19 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
 void QmitkPropertyDelegate::commitAndCloseEditor()
 {
   QWidget* editor = 0;
-/*
   if(QPushButton *pushBtn = qobject_cast<QPushButton *>(sender()))
   {
-    QColor result = QColorDialog::getColor(pushBtn->palette().color(QPalette::Button));
+/*
+    QColor result = QColorDialog::getColor(pushBtn->palette().color(QPalette::Window));
     if(result.isValid())
     {
-      pushBtn->setPalette(QPalette(result));
-      editor = pushBtn;
-    }
-  }*/
+      QPalette palette = pushBtn->palette();
+      palette.setColor(QPalette::Window, result);
+      pushBtn->setPalette(palette);
+    }*/
+
+    editor = pushBtn;
+  }
 
 
 /*
@@ -348,3 +307,7 @@ void QmitkPropertyDelegate::SpinBoxValueChanged( const QString& value )
   }
 }
 
+void QmitkPropertyDelegate::showColorDialog()
+{
+
+}

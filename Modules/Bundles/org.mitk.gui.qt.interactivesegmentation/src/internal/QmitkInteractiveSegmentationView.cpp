@@ -562,9 +562,8 @@ void QmitkInteractiveSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget
   
 void QmitkInteractiveSegmentationView::DataStorageChanged( const mitk::DataTreeNode* node )
 {
-  /*
+  std::cout << "Add/Remove in DataStorage" << std::endl;
   m_Controls->m_ToolReferenceDataSelectionBox->UpdateDataDisplay();
   m_Controls->m_ToolWorkingDataSelectionBox->UpdateDataDisplay();
-  */
 }
 

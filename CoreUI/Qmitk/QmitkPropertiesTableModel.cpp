@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 //# Toolkit includes
 #include <itkCommand.h>
 #include <QColor>
+#include <QBrush>
 #include <QStringList>
 
 //# PUBLIC CTORS,DTOR

@@ -5,7 +5,7 @@
 #include "mitkBaseProperty.h"
 
 /// Toolkit includes.
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 /// Forward declarations.
 
@@ -14,7 +14,7 @@
 /// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
 ///
 /// \see QmitkPropertiesTableModel
-class QMITK_EXPORT QmitkPropertyDelegate : public QItemDelegate
+class QMITK_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
 {  
   Q_OBJECT
 
@@ -57,6 +57,7 @@ class QMITK_EXPORT QmitkPropertyDelegate : public QItemDelegate
     /// Invoked when the user accepts editor input, that is when he does not pushes ESC.
     ///
     void commitAndCloseEditor();
+    void showColorDialog();
     void ComboBoxCurrentIndexChanged ( int index ) ;
     void SpinBoxValueChanged ( const QString& value ) ;
 

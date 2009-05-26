@@ -15,36 +15,29 @@
 
  =========================================================================*/
 
-#include "cherrySelectionChangedEvent.h"
-#include "cherryISelectionProvider.h"
+#include "cherryQtItemSelection.h"
 
+namespace cherry {
 
-namespace cherry
+QtItemSelection::QtItemSelection()
 {
 
-SelectionChangedEvent::SelectionChangedEvent(
-    ISelectionProvider::Pointer source, ISelection::ConstPointer selection)
-{
-  poco_assert(source.IsNotNull());
-  poco_assert(selection.IsNotNull());
-
-  this->source = source;
-  this->selection = selection;
 }
 
-ISelectionProvider::Pointer SelectionChangedEvent::GetSource() const
+QtItemSelection::QtItemSelection(const QItemSelection& sel)
+: m_QItemSelection(sel)
 {
-  return source;
+
 }
 
-ISelection::ConstPointer SelectionChangedEvent::GetSelection() const
+bool QtItemSelection::IsEmpty() const
 {
-  return selection;
+  return m_QItemSelection.indexes().isEmpty();
 }
 
-ISelectionProvider::Pointer SelectionChangedEvent::GetSelectionProvider() const
+const QItemSelection& QtItemSelection::GetQItemSelection() const
 {
-  return this->GetSource();
+  return m_QItemSelection;
 }
 
 }

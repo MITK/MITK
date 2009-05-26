@@ -28,11 +28,23 @@ namespace cherry {
 /**
  * \ingroup org_opencherry_ui
  *
+ * Interface for a selection.
+ *
+ * @see ISelectionProvider
+ * @see ISelectionChangedListener
+ * @see SelectionChangedEvent
+ *
  **/
 struct CHERRY_UI ISelection : public Object
 {
   cherryInterfaceMacro(ISelection, cherry);
 
+  /**
+   * Returns whether this selection is empty.
+   *
+   * @return <code>true</code> if this selection is empty,
+   *   and <code>false</code> otherwise
+   */
   virtual bool IsEmpty() const = 0;
 
   virtual ~ISelection() {}

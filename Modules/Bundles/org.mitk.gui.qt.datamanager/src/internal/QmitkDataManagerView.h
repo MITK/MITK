@@ -7,6 +7,7 @@
 #include "cherryISelectionProvider.h"
 /// Qmitk
 #include "QmitkFunctionality.h"
+#include "QmitkDataTreeNodeSelectionProvider.h"
 // #include "QmitkStandardViews.h"
 #include "../mitkQtDataManagerDll.h"
 
@@ -31,7 +32,7 @@ class QmitkPredicateEditor;
 ///
 /// \brief A View class that is subdivided in three parts. 1. datastorage-selection, 2. node / other objects with properties-selection
 /// and 3. properties table view with the possibility of editing them
-/// 
+///
 /// \TODO: complete PACS support, complete datastorage selection change, outsource the properties table as an own view and use the Selection
 /// of openCherry to intercommunicate, in save dialog show regular filename
 ///
@@ -171,6 +172,10 @@ private:
   /// \brief The properties table editor.
   ///
   QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
+  ///
+  /// \brief The openCherry selection provider
+  ///
+  QmitkDataTreeNodeSelectionProvider::Pointer m_SelectionProvider;
 
 };
 

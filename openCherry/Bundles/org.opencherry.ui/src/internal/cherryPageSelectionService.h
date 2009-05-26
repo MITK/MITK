@@ -165,7 +165,7 @@ protected:
   /**
    * Returns the page.
    */
-  IWorkbenchPage::Pointer GetPage();
+  IWorkbenchPage::Pointer GetPage() const;
 
     /**
      * Fires a selection event to the given listeners.
@@ -173,7 +173,7 @@ protected:
      * @param part the part or <code>null</code> if no active part
      * @param sel the selection or <code>null</code> if no active selection
      */
-    void FireSelection(IWorkbenchPart::Pointer part, ISelection::Pointer sel);
+    void FireSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
 
     /**
      * Fires a selection event to the given listeners.
@@ -182,7 +182,7 @@ protected:
      * @param sel the selection or <code>null</code> if no active selection
      */
     void FirePostSelection(IWorkbenchPart::Pointer part,
-            ISelection::Pointer sel);
+            ISelection::ConstPointer sel);
 
     /**
      * Returns the per-part selection tracker for the given part id.
@@ -199,7 +199,7 @@ protected:
      * @return per-part selection tracker
      */
     PagePartSelectionTracker::Pointer CreatePartTracker(
-            const std::string& partId);
+            const std::string& partId) const;
 
 
 public:
@@ -207,12 +207,12 @@ public:
     /**
      * Returns the selection.
      */
-    ISelection::Pointer GetSelection();
+    ISelection::ConstPointer GetSelection() const;
 
     /*
      * @see ISelectionService#getSelection(String)
      */
-    ISelection::Pointer GetSelection(const std::string& partId);
+    ISelection::ConstPointer GetSelection(const std::string& partId);
 
     /**
      * Sets the current-active part (or null if none)

@@ -902,13 +902,13 @@ public:
    * (non-Javadoc) Method declared on ISelectionService
    */
 public:
-  ISelection::Pointer GetSelection();
+  ISelection::ConstPointer GetSelection() const;
 
   /*
    * (non-Javadoc) Method declared on ISelectionService
    */
 public:
-  ISelection::Pointer GetSelection(const std::string& partId);
+  ISelection::ConstPointer GetSelection(const std::string& partId);
 
 public:
   SelectionEvents& GetSelectionEvents(const std::string& partId = "");

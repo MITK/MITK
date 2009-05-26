@@ -125,7 +125,7 @@ void PagePartSelectionTracker::AddPostSelectionListener(
     ISelectionService::SelectionEvents::Delegate(listener.GetPointer(), &ISelectionListener::SelectionChanged);
 }
 
-ISelection::Pointer PagePartSelectionTracker::GetSelection()
+ISelection::ConstPointer PagePartSelectionTracker::GetSelection()
 {
   IWorkbenchPart::Pointer part = this->GetPart();
   if (part.IsNotNull())
@@ -160,13 +160,13 @@ PagePartSelectionTracker::~PagePartSelectionTracker()
 }
 
 void PagePartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
-    ISelection::Pointer sel)
+    ISelection::ConstPointer sel)
 {
   selectionEvents.selectionChanged(part, sel);
 }
 
 void PagePartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer part,
-    ISelection::Pointer sel)
+    ISelection::ConstPointer sel)
 {
   selectionEvents.postSelectionChanged(part, sel);
 }
@@ -242,7 +242,7 @@ void PagePartSelectionTracker::SetPart(IWorkbenchPart::Pointer part, bool notify
     }
   }
   fPart = part;
-  ISelection::Pointer sel;
+  ISelection::ConstPointer sel;
   if (part.IsNotNull())
   {
     ISelectionProvider::Pointer sp = part->GetSite()->GetSelectionProvider();

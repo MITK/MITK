@@ -2059,12 +2059,12 @@ IPerspectiveDescriptor::Pointer WorkbenchPage::GetPerspective()
   }
 }
 
-ISelection::Pointer WorkbenchPage::GetSelection()
+ISelection::ConstPointer WorkbenchPage::GetSelection() const
 {
   return selectionService->GetSelection();
 }
 
-ISelection::Pointer WorkbenchPage::GetSelection(const std::string& partId)
+ISelection::ConstPointer WorkbenchPage::GetSelection(const std::string& partId)
 {
   return selectionService->GetSelection(partId);
 }

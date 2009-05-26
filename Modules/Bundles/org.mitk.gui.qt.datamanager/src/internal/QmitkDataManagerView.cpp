@@ -154,6 +154,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //m_NodeTableView->setItemDelegate(new QmitkDataStorageDelegate(2, m_NodeTableView));
   m_NodeTableView->setModel(m_NodeTableModel);
 
+  m_SelectionProvider = new QmitkDataTreeNodeSelectionProvider();
+  m_SelectionProvider->SetItemSelectionModel(m_NodeTableView->selectionModel());
+  this->GetSite()->SetSelectionProvider(m_SelectionProvider);
+
   m_NodeToolbar->setIconSize(QSize(16, 16));
   m_NodeToolbar->addAction(m_SaveAction);
   m_NodeToolbar->addAction(m_RemoveAction);

@@ -47,8 +47,8 @@ struct CHERRY_UI ISelectionService {
 
   struct SelectionEvents {
 
-    typedef Message2<IWorkbenchPart::Pointer, ISelection::Pointer> SelectionEvent;
-    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer, ISelection::Pointer> Delegate;
+    typedef Message2<IWorkbenchPart::Pointer, ISelection::ConstPointer> SelectionEvent;
+    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer, ISelection::ConstPointer> Delegate;
 
     SelectionEvent selectionChanged;
     SelectionEvent postSelectionChanged;
@@ -127,7 +127,7 @@ struct CHERRY_UI ISelectionService {
    *
    * @return the current selection, or <code>null</code> if undefined
    */
-  virtual ISelection::Pointer GetSelection() = 0;
+  virtual ISelection::ConstPointer GetSelection() const = 0;
 
   /**
    * Returns the current selection in the part with the given id.  If the part is not open,
@@ -138,7 +138,7 @@ struct CHERRY_UI ISelectionService {
    * @return the current selection, or <code>null</code> if undefined
    * @since 2.0
    */
-  virtual ISelection::Pointer GetSelection(const std::string& partId) = 0;
+  virtual ISelection::ConstPointer GetSelection(const std::string& partId) = 0;
 
   /**
    * Removes the given selection listener.

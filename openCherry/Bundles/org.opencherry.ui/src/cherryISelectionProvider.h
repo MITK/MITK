@@ -52,7 +52,7 @@ struct CHERRY_UI ISelectionProvider : public virtual Object {
      *
      * @return the current selection
      */
-    virtual ISelection::Pointer GetSelection() = 0;
+    virtual ISelection::ConstPointer GetSelection() const = 0;
 
     /**
      * Removes the given selection change listener from this selection provider.

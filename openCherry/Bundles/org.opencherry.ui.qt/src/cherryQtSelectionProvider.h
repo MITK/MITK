@@ -15,7 +15,6 @@
 
  =========================================================================*/
 
-
 #ifndef CHERRYQTSELECTIONPROVIDER_H_
 #define CHERRYQTSELECTIONPROVIDER_H_
 
@@ -24,36 +23,44 @@
 #include <cherryISelectionProvider.h>
 
 #include <QItemSelectionModel>
+#include <QItemSelection>
+#include <QObject>
 
 namespace cherry
 {
 
-class CHERRY_UI_QT QtSelectionProvider : public ISelectionProvider
+class CHERRY_UI_QT QtSelectionProvider: public QObject,
+    public ISelectionProvider
 {
+  Q_OBJECT
+
 public:
 
-  cherryObjectMacro(QtSelectionProvider);
+  cherryObjectMacro(QtSelectionProvider)
 
   QtSelectionProvider();
 
   void AddSelectionChangedListener(ISelectionChangedListener::Pointer listener);
 
-  ISelection::Pointer GetSelection();
+  void RemoveSelectionChangedListener(
+      ISelectionChangedListener::Pointer listener);
 
-  void RemoveSelectionChangedListener(ISelectionChangedListener::Pointer listener);
-
+  ISelection::ConstPointer GetSelection() const;
   void SetSelection(ISelection::Pointer selection);
 
-  QItemSelectionModel* GetItemSelectionModel();
+  QItemSelection GetQItemSelection() const;
+  void SetQItemSelection(const QItemSelection& selection);
+
+  QItemSelectionModel* GetItemSelectionModel() const;
   void SetItemSelectionModel(QItemSelectionModel* combo);
 
-private:
-
+protected:
+  ISelectionChangedListener::Events selectionEvents;
   QItemSelectionModel* qSelectionModel;
 
-private slots:
+protected slots:
 
-  void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
 };
 

@@ -1,9 +1,10 @@
 SET(SRC_CPP_FILES
+  QmitkDataTreeNodeSelectionProvider.cpp
   QmitkFunctionality.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  
+  QmitkDataTreeNodeSelection.cpp
 )
 
 SET(MOC_H_FILES

@@ -1,5 +1,7 @@
 SET(SRC_CPP_FILES
   cherryQtEditorPart.cpp
+  cherryQtItemSelection.cpp
+  cherryQtSelectionProvider.cpp
   cherryQtViewPart.cpp
   
   # application
@@ -50,6 +52,8 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
+  src/cherryQtSelectionProvider.h
+  
   src/internal/defaultpresentation/cherryNativeTabFolder.h
   src/internal/defaultpresentation/cherryNativeTabItem.h
   src/internal/defaultpresentation/cherryQCTabBar.h

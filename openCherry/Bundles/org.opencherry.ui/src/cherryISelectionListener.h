@@ -45,14 +45,14 @@ struct CHERRY_UI ISelectionListener : public virtual Object {
 
   struct Events {
 
-    Message2<IWorkbenchPart::Pointer, ISelection::Pointer> selectionChanged;
+    Message2<IWorkbenchPart::Pointer, ISelection::ConstPointer> selectionChanged;
 
     void AddListener(ISelectionListener::Pointer listener);
     void RemoveListener(ISelectionListener::Pointer listener);
 
   private:
 
-    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer, ISelection::Pointer> Delegate;
+    typedef MessageDelegate2<ISelectionListener, IWorkbenchPart::Pointer, ISelection::ConstPointer> Delegate;
   };
 
   /**
@@ -69,7 +69,7 @@ struct CHERRY_UI ISelectionListener : public virtual Object {
    * @param selection the current selection. This may be <code>null</code>
    *    if <code>INullSelectionListener</code> is implemented.
    */
-  virtual void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::Pointer selection) = 0;
+  virtual void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection) = 0;
 };
 
 }

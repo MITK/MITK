@@ -32,30 +32,30 @@ public:
    * @param selection the selection
    */
   SelectionChangedEvent(SmartPointer<ISelectionProvider> source,
-      ISelection::Pointer selection);
+      ISelection::ConstPointer selection);
 
-  SmartPointer<ISelectionProvider> GetSource();
+  SmartPointer<ISelectionProvider> GetSource() const;
 
   /**
    * Returns the selection.
    *
    * @return the selection
    */
-  ISelection::Pointer GetSelection();
+  ISelection::ConstPointer GetSelection() const;
 
   /**
    * Returns the selection provider that is the source of this event.
    *
    * @return the originating selection provider
    */
-  SmartPointer<ISelectionProvider> GetSelectionProvider();
+  SmartPointer<ISelectionProvider> GetSelectionProvider() const;
 
 protected:
 
   /**
    * The selection.
    */
-  ISelection::Pointer selection;
+  ISelection::ConstPointer selection;
 
 private:
 

@@ -91,7 +91,7 @@ struct CHERRY_UI IWorkbenchSite : public IServiceLocator { // IAdaptable, IShell
    * @param provider
    *            the selection provider, or <code>null</code> to clear it
    */
-  //virtual void SetSelectionProvider(SmartPointer<ISelectionProvider> provider) = 0;
+  virtual void SetSelectionProvider(SmartPointer<ISelectionProvider> provider) = 0;
 
 };
 

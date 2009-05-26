@@ -154,7 +154,7 @@ public:
    * Returns the selection from the part being tracked,
    * or <code>null</code> if the part is closed or has no selection.
    */
-  ISelection::Pointer GetSelection();
+  ISelection::ConstPointer GetSelection();
 
   /**
    * Removes a selection listener from this tracker.
@@ -184,7 +184,7 @@ protected:
    * @param sel the selection or <code>null</code> if no active selection
    * @param listeners the list of listeners to notify
    */
-  void FireSelection(IWorkbenchPart::Pointer part, ISelection::Pointer sel);
+  void FireSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
 
   /**
    * Fires a post selection event to the listeners.
@@ -193,7 +193,7 @@ protected:
    * @param sel the selection or <code>null</code> if no active selection
    * @param listeners the list of listeners to notify
    */
-  void FirePostSelection(IWorkbenchPart::Pointer part, ISelection::Pointer sel);
+  void FirePostSelection(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel);
 
   /**
    * Returns the id of the part that this tracks.

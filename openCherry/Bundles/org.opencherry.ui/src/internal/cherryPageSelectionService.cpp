@@ -40,6 +40,9 @@ void PageSelectionService::SetPage(IWorkbenchPage::Pointer p)
 PageSelectionService::PageSelectionService(IWorkbenchPage::Pointer p)
 {
   this->SetPage(p);
+
+  selListener = new SelectionListener(this);
+  postSelListener = new PostSelectionListener(this);
 }
 
 PageSelectionService::SelectionListener::SelectionListener(PageSelectionService* service)
@@ -115,19 +118,19 @@ void PageSelectionService::RemoveSelectionListener(const std::string& partId,
   this->GetPerPartTracker(partId)->RemoveSelectionListener(listener);
 }
 
-IWorkbenchPage::Pointer PageSelectionService::GetPage()
+IWorkbenchPage::Pointer PageSelectionService::GetPage() const
 {
   return IWorkbenchPage::Pointer(page);
 }
 
 void PageSelectionService::FireSelection(IWorkbenchPart::Pointer part,
-    ISelection::Pointer sel)
+    ISelection::ConstPointer sel)
 {
    selectionEvents.selectionChanged(part, sel);
 }
 
 void PageSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
-    ISelection::Pointer sel)
+    ISelection::ConstPointer sel)
 {
   selectionEvents.postSelectionChanged(part, sel);
 }
@@ -136,7 +139,7 @@ PagePartSelectionTracker::Pointer PageSelectionService::GetPerPartTracker(
     const std::string& partId)
 {
   PagePartSelectionTracker::Pointer tracker;
-  std::map<std::string, PagePartSelectionTracker::Pointer>::iterator res = perPartTrackers.find(partId);
+  std::map<std::string, PagePartSelectionTracker::Pointer>::const_iterator res = perPartTrackers.find(partId);
   if (res == perPartTrackers.end())
   {
     tracker = this->CreatePartTracker(partId);
@@ -151,13 +154,13 @@ PagePartSelectionTracker::Pointer PageSelectionService::GetPerPartTracker(
 }
 
 PagePartSelectionTracker::Pointer PageSelectionService::CreatePartTracker(
-    const std::string& partId)
+    const std::string& partId) const
 {
   PagePartSelectionTracker::Pointer tracker(new PagePartSelectionTracker(this->GetPage(), partId));
   return tracker;
 }
 
-ISelection::Pointer PageSelectionService::GetSelection()
+ISelection::ConstPointer PageSelectionService::GetSelection() const
 {
   if (activeProvider.IsNotNull())
   {
@@ -165,11 +168,11 @@ ISelection::Pointer PageSelectionService::GetSelection()
   }
   else
   {
-    return ISelection::Pointer(0);
+    return ISelection::ConstPointer(0);
   }
 }
 
-ISelection::Pointer PageSelectionService::GetSelection(const std::string& partId)
+ISelection::ConstPointer PageSelectionService::GetSelection(const std::string& partId)
 {
   return this->GetPerPartTracker(partId)->GetSelection();
 }
@@ -226,7 +229,7 @@ void PageSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
     activeProvider = selectionProvider;
     // Fire an event if there's an active provider
     activeProvider->AddSelectionChangedListener(selListener);
-    ISelection::Pointer sel = activeProvider->GetSelection();
+    ISelection::ConstPointer sel = activeProvider->GetSelection();
     this->FireSelection(newPart, sel);
     if (activeProvider.Cast<IPostSelectionProvider>().IsNotNull())
     {
@@ -241,8 +244,8 @@ void PageSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
   }
   else
   {
-    this->FireSelection(IWorkbenchPart::Pointer(0), ISelection::Pointer(0));
-    this->FirePostSelection(IWorkbenchPart::Pointer(0), ISelection::Pointer(0));
+    this->FireSelection(IWorkbenchPart::Pointer(0), ISelection::ConstPointer(0));
+    this->FirePostSelection(IWorkbenchPart::Pointer(0), ISelection::ConstPointer(0));
   }
 }
 

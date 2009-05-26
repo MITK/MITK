@@ -15,36 +15,38 @@
 
  =========================================================================*/
 
-#include "cherrySelectionChangedEvent.h"
-#include "cherryISelectionProvider.h"
+#include "mitkDataTreeNodeSelection.h"
 
-
-namespace cherry
+namespace mitk
 {
 
-SelectionChangedEvent::SelectionChangedEvent(
-    ISelectionProvider::Pointer source, ISelection::ConstPointer selection)
+DataTreeNodeSelection::DataTreeNodeSelection()
 {
-  poco_assert(source.IsNotNull());
-  poco_assert(selection.IsNotNull());
 
-  this->source = source;
-  this->selection = selection;
 }
 
-ISelectionProvider::Pointer SelectionChangedEvent::GetSource() const
+DataTreeNodeSelection::DataTreeNodeSelection(const NodeContainer& nodes)
+: m_Nodes(nodes)
 {
-  return source;
+
 }
 
-ISelection::ConstPointer SelectionChangedEvent::GetSelection() const
+const std::vector<DataTreeNode::Pointer>&
+DataTreeNodeSelection::GetDataTreeNodes() const
 {
-  return selection;
+  return m_Nodes;
 }
 
-ISelectionProvider::Pointer SelectionChangedEvent::GetSelectionProvider() const
+unsigned int
+DataTreeNodeSelection::GetSize() const
 {
-  return this->GetSource();
+  return m_Nodes.size();
+}
+
+bool
+DataTreeNodeSelection::IsEmpty() const
+{
+  return m_Nodes.empty();
 }
 
 }

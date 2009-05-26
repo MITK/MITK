@@ -4,6 +4,8 @@
 #include "mitkNodePredicateBase.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
+#include "QmitkEnums.h"
+#include "QmitkCustomVariants.h"
 
 //# Toolkit includes
 #include <itkCommand.h>
@@ -122,9 +124,13 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
     if(index.column() == 0)
     {
       // get name of node (may also be edited)
-      if (role == Qt::DisplayRole || role == Qt::EditRole) 
+      if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
         data = nodeName.c_str();
+      }
+      else if (role == QmitkDataTreeNodeRole)
+      {
+        data = QVariant::fromValue(node);
       }
     }
     else if (index.column() == 1)
@@ -145,7 +151,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
         className = "unknown";
 
       // get type property of mitk::BaseData
-      if (role == Qt::DisplayRole) 
+      if (role == Qt::DisplayRole)
       {
 
         data = QString::fromStdString(className);
@@ -156,7 +162,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
         if(className == "Image")
           data = QIcon(":/datamanager/data-type-image-24.png");
         else if(className == "Image Mask")
-          data = QIcon(":/datamanager/data-type-image-mask-24.png");    
+          data = QIcon(":/datamanager/data-type-image-mask-24.png");
         else if(className == "Surface")
           data = QIcon(":/datamanager/data-type-mesh-24.png");
         else if(className == "PointSet")
@@ -177,15 +183,15 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       bool visibility = false;
 
       if(node->GetVisibility(visibility, 0))
-      {    
-        if (role == Qt::DisplayRole || role == Qt::EditRole) 
+      {
+        if (role == Qt::DisplayRole || role == Qt::EditRole)
         {
           data = visibility;
         } // role == Qt::DisplayRole
 
-      } // node->GetVisibility(visibility, 0)   
+      } // node->GetVisibility(visibility, 0)
 
-    } // index.column() == 2 
+    } // index.column() == 2
 
   } // index.isValid() && !m_NodeSet.empty()
   return data;
@@ -251,7 +257,7 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
       return;
 
     // create listener commands to listen to changes in the name or the visibility of the node
-    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand 
+    itk::MemberCommand<QmitkDataStorageTableModel>::Pointer propertyModifiedCommand
       = itk::MemberCommand<QmitkDataStorageTableModel>::New();
     propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
 
@@ -260,12 +266,12 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
     // add listener for properties
     tempProperty = node->GetProperty("visible");
     if(tempProperty)
-      m_VisiblePropertyModifiedObserverTags[tempProperty] 
+      m_VisiblePropertyModifiedObserverTags[tempProperty]
         = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
 
     tempProperty = node->GetProperty("name");
     if(tempProperty)
-      m_NamePropertyModifiedObserverTags[tempProperty] 
+      m_NamePropertyModifiedObserverTags[tempProperty]
         = tempProperty->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
 
     // emit beginInsertRows event
@@ -333,7 +339,7 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
       int column = -1;
 
       std::vector<mitk::DataTreeNode*>::iterator it;
-      mitk::BaseProperty* visibilityProperty = 0; 
+      mitk::BaseProperty* visibilityProperty = 0;
       mitk::BaseProperty* nameProperty = 0;
 
       // search for property that changed and emit datachanged on the corresponding ModelIndex
@@ -371,7 +377,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
 {
   bool noErr = false;
 
-  if (index.isValid() && role == Qt::EditRole) 
+  if (index.isValid() && role == Qt::EditRole)
   {
     // any change events produced here should not be caught in this class
     // --> set m_BlockEvents to true
@@ -409,7 +415,7 @@ void QmitkDataStorageTableModel::Reset()
   // start at the last element: first in, last out
   unsigned int i = m_NodeSet.size();
   while(!m_NodeSet.empty())
-  {    
+  {
     --i;
     this->RemoveNode(m_NodeSet.at(i));
   }
@@ -455,7 +461,7 @@ void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::A
 
     //m_SortDescending = sortDescending;
 
-    DataTreeNodeCompareFunction::CompareCriteria _CompareCriteria 
+    DataTreeNodeCompareFunction::CompareCriteria _CompareCriteria
       = DataTreeNodeCompareFunction::CompareByName;
 
     DataTreeNodeCompareFunction::CompareOperator _CompareOperator

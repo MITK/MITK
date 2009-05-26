@@ -29,7 +29,7 @@ mitk::TrackingVolume::TrackingVolume()
 
   //####### initialize file locations for the volume-STL-files #########
   std::string m_VolumeDir = MITK_ROOT;
-  m_VolumeDir += "Core/IGT/IGTTrackingDevices/TrackingVolumeData";
+  m_VolumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData";
   mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
   //####################################################################
 
@@ -84,13 +84,23 @@ bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
     return false;
   }
 
+  if (filename.empty())
+    return false;
+
   mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-  stlReader->SetFileName( filename.c_str() );
-  stlReader->Update();
+  try
+  {
+    stlReader->SetFileName( filename.c_str() );
+    stlReader->Update();
+  }
+  catch (...)
+  {
+  	return false;
+  }
   if ( stlReader->GetOutput() == NULL )
     return false;
 
   this->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
-  stlReader->Delete();
+  stlReader = NULL;
   return true;  
 }

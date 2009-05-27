@@ -158,7 +158,7 @@ public:
   void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
   {
     // do not unsubsribe from this object. this would invalidate the itterator of the
-    // event listener vector (in itk::Object)
+    // event listener vector (in itk::Object) and would lead to a crash
     // instead: do nothing->object is going to be dead soon...
     //this->RemoveDeleteAndModifiedObserver();
     m_Pointer = 0;

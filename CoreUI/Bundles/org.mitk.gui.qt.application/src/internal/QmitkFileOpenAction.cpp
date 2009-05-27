@@ -101,7 +101,7 @@ void QmitkFileOpenAction::Run()
 
   if(node.IsNotNull() && node->GetData() != 0)
   {
-      mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::RenderingManager::GetInstance()->InitializeViews(dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll()));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

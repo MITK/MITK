@@ -31,6 +31,8 @@ namespace mitk {
   *
   * Base class for all navigation filters that produce NavigationData objects as output.
   * This class defines the output-interface for NavigationDataFilters. 
+  * \warning: if Update() is called on any output object, all NavigationData filters will
+  * generate new output data for all outputs, not just the one on which Update() was called.
   *
   * \ingroup IGT
   */

@@ -43,6 +43,10 @@ ENDIF(NOT MITK_DIR)
 # some targets in Utilities also depend on Qt. Use this option
 # to decide if they should be build
 OPTION(MITK_USE_QT "Use Trolltech's Qt library" ON)
+IF(MITK_USE_QT)
+  # find the package at the very beginning, so that QT4_FOUND is available
+  FIND_PACKAGE(Qt4 REQUIRED)
+ENDIF()
 
 IF(NOT UNIX)
   SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")

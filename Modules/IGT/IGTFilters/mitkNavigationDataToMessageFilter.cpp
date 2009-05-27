@@ -32,22 +32,22 @@ mitk::NavigationDataToMessageFilter::~NavigationDataToMessageFilter()
 }
 
 
-void mitk::NavigationDataToMessageFilter::SetInput( unsigned int idx, const NavigationData* nd )
-{
-  if (idx > 0)
-    throw std::invalid_argument("mitk::NavigationDataToMessageFilter: only one input is supported");
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
-  this->CreateOutputsForAllInputs();
-}
+//void mitk::NavigationDataToMessageFilter::SetInput( unsigned int idx, const NavigationData* nd )
+//{
+//  if (idx > 0)
+//    throw std::invalid_argument("mitk::NavigationDataToMessageFilter: only one input is supported");
+//  // Process object is not const-correct so the const_cast is required here
+//  this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
+//  this->CreateOutputsForAllInputs();
+//}
 
 
-void mitk::NavigationDataToMessageFilter::SetInput( const NavigationData* nd )
-{
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
-  this->CreateOutputsForAllInputs();
-}
+//void mitk::NavigationDataToMessageFilter::SetInput( const NavigationData* nd )
+//{
+//  // Process object is not const-correct so the const_cast is required here
+//  this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
+//  this->CreateOutputsForAllInputs();
+//}
 
 
 void mitk::NavigationDataToMessageFilter::GenerateData()
@@ -62,15 +62,15 @@ void mitk::NavigationDataToMessageFilter::GenerateData()
 
     /* check for differences, then send message. */
     if (input->GetPosition() != output->GetPosition())
-      m_PositionChangedMessage.Send(input->GetPosition());
+      m_PositionChangedMessage.Send(input->GetPosition(), i);
     if (input->GetOrientation() != output->GetOrientation())
-      m_OrientationChangedMessage.Send(input->GetOrientation());
+      m_OrientationChangedMessage.Send(input->GetOrientation(), i);
     if (input->GetCovErrorMatrix() != output->GetCovErrorMatrix())
-      m_ErrorChangedMessage.Send(input->GetCovErrorMatrix());
+      m_ErrorChangedMessage.Send(input->GetCovErrorMatrix(), i);
     if (input->GetTimeStamp() != output->GetTimeStamp())
-      m_TimeStampChangedMessage.Send(input->GetTimeStamp());
+      m_TimeStampChangedMessage.Send(input->GetTimeStamp(), i);
     if (input->IsDataValid() != output->IsDataValid())
-      m_DataValidChangedMessage.Send(input->IsDataValid());
+      m_DataValidChangedMessage.Send(input->IsDataValid(), i);
 
     output->Graft(input); // Because this is a NavigationDataToNavigationData Filter, we need to copy the input to the output to provide up to date navigation data objects
   }

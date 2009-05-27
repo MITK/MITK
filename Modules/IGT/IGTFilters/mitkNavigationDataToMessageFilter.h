@@ -26,19 +26,18 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk 
 {
   /**Documentation
-  * \brief NavigationDataToMessageilter emits multiple mitk::Message messages when the input NavigationData values change
+  * \brief NavigationDataToMessageFilter emits multiple mitk::Message messages when the input NavigationData values change
   *
-  * This filter has only one input. It copies the input navigation data values to its output and emits 
-  * the following Messages if the input navigation data values changed since the last Update()
+  * This filter can have multiple inputs. It emits 
+  * the following Messages if an input navigation data values changed since the last Update()
   * - PositionChangedMessage
   * - OrientationChangedMessage
   * - ErrorChangedMessage
   * - TimeStampChangedMessage
   * - DataValidChangedMessage
   *
-  * Warning: adding more inputs with SetInput(idx, const mitk::NavigationData* nd) will raise an 
-  * std::invalid_argument exception for idx > 0.
-  *
+  * The first parameter of these messages is the new value, the second is the index of the input that has changed
+  * The filter has as many outputs as it has inputs. It copies the inputs to the outputs after sending the messages.
   * \ingroup IGT
   */
   class MITK_IGT_EXPORT NavigationDataToMessageFilter : public NavigationDataToNavigationDataFilter
@@ -46,11 +45,11 @@ namespace mitk
   public:
     mitkClassMacro(NavigationDataToMessageFilter, NavigationDataToNavigationDataFilter);
     itkNewMacro(Self);
-    mitkNewMessage1Macro(PositionChanged, mitk::NavigationData::PositionType);       ///< Sends the message PositionChangedMessage whenever the position of the input changes
-    mitkNewMessage1Macro(OrientationChanged, mitk::NavigationData::OrientationType); ///< Sends the message OrientationChangedMessage whenever the orientation of the input changes
-    mitkNewMessage1Macro(ErrorChanged, mitk::NavigationData::CovarianceMatrixType);  ///< Sends the message ErrorChangedMessage whenever the error covariance matrix of the input changes
-    mitkNewMessage1Macro(TimeStampChanged, mitk::NavigationData::TimeStampType);     ///< Sends the message TimeStampChangedMessage whenever the timestamp of the input changes
-    mitkNewMessage1Macro(DataValidChanged, bool);                                    ///< Sends the message DataValidChangedMessage whenever the DataValid flag of the input changes
+    mitkNewMessage2Macro(PositionChanged, mitk::NavigationData::PositionType, unsigned int);       ///< Sends the message PositionChangedMessage whenever the position of the input changes. First parameter is the new position, second parameter is the index of the input that changed
+    mitkNewMessage2Macro(OrientationChanged, mitk::NavigationData::OrientationType, unsigned int); ///< Sends the message OrientationChangedMessage whenever the orientation of the input changes. First parameter is the new orientation, second parameter is the index of the input that changed
+    mitkNewMessage2Macro(ErrorChanged, mitk::NavigationData::CovarianceMatrixType, unsigned int);  ///< Sends the message ErrorChangedMessage whenever the error covariance matrix of the input changes. First parameter is the new error covariance matrix, second parameter is the index of the input that changed
+    mitkNewMessage2Macro(TimeStampChanged, mitk::NavigationData::TimeStampType, unsigned int);     ///< Sends the message TimeStampChangedMessage whenever the timestamp of the input changes. First parameter is the new timestamp, second parameter is the index of the input that changed
+    mitkNewMessage2Macro(DataValidChanged, bool, unsigned int);                                    ///< Sends the message DataValidChangedMessage whenever the DataValid flag of the input changes. First parameter is the new DataValid value, second parameter is the index of the input that changed
 
     /**Documentation
     * \brief sets the nth input of the filter. Warning: this filter only has input #0!
@@ -58,14 +57,14 @@ namespace mitk
     * WARNING: NavigationDataToMessageFilter manages only one input. Calling this method 
     * with an idx parameter other than 0 will raise an std::invalid_argument exception!
     */    
-    virtual void SetInput(unsigned int idx, const NavigationData* nd);
+    //virtual void SetInput(unsigned int idx, const NavigationData* nd);
     
     /**Documentation
     * \brief Sets the input of this filter
     *
     * Sets the input navigation data object for this filter. 
     */
-    virtual void SetInput(const NavigationData* nd);
+    //virtual void SetInput(const NavigationData* nd);
    
   protected:
     NavigationDataToMessageFilter();

@@ -29,7 +29,6 @@ SET(INTERNAL_CPP_FILES
 
   cherryQtControlWidget.cpp
   cherryQtDnDTweaklet.cpp
-  cherryQtErrorView.cpp
   cherryQtFileImageDescriptor.cpp
   cherryQtGlobalEventFilter.cpp
   cherryQtIconImageDescriptor.cpp

@@ -18,7 +18,6 @@
 #include "cherryQtWorkbenchPageTweaklet.h"
 
 #include "cherryQtControlWidget.h"
-#include "cherryQtErrorView.h"
 
 #include <ui_cherryQtStatusPart.h>
 

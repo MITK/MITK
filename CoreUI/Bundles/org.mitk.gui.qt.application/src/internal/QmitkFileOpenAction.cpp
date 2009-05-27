@@ -68,6 +68,7 @@ void QmitkFileOpenAction::Run()
     dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
   }
 
+  mitk::DataTreeNode::Pointer node;
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
@@ -76,7 +77,7 @@ void QmitkFileOpenAction::Run()
     {
       nodeReader->SetFileName(fileName->toStdString());
       nodeReader->Update();
-      mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
+      node = nodeReader->GetOutput();
       std::cout << "node name on line 78: " << node->GetName() << std::endl;
       dataStorage->Add(node);
       std::cout << "node name on line 80: " << node->GetName() << std::endl;
@@ -94,6 +95,12 @@ void QmitkFileOpenAction::Run()
   }
   else
   {
-    multiWidgetEditor->GetStdMultiWidget()->ForceImmediateUpdate();
+    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
+  }        
+
+  if(node.IsNotNull() && node->GetData() != 0)
+  {
+      mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

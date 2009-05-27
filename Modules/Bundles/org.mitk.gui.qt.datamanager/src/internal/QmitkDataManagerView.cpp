@@ -435,8 +435,8 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 
 void QmitkDataManagerView::BtnGlobalReinitClicked( bool checked /*= false */ )
 {
-  mitk::RenderingManager::GetInstance()->InitializeViews(mitk::RenderingManager::REQUEST_UPDATE_ALL);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDataStorage()
+    ->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll()));
 }
 
 void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )

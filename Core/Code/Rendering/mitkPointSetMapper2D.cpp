@@ -490,6 +490,6 @@ void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk
   node->AddProperty( "distance decimal digits", mitk::IntProperty::New(2), renderer, overwrite ); //set the number of decimal digits to be shown
   node->AddProperty( "show angles", mitk::BoolProperty::New(false), renderer, overwrite ); //show or hide angle measurement (not always available)
   node->AddProperty( "show distant lines", mitk::BoolProperty::New(false), renderer, overwrite ); //show the line between to points from a distant view (equals "always on top" option)
-
+  node->AddProperty( "layer", mitk::IntProperty::New(1), renderer, overwrite ); // default to draw pointset above images (they have a default layer of 0)
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

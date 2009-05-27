@@ -111,6 +111,7 @@ SET(INTERNAL_CPP_FILES
   cherryEditorRegistryReader.cpp
   cherryEditorSashContainer.cpp
   cherryEditorSite.cpp
+  cherryErrorViewPart.cpp
   cherryFileEditorMapping.cpp
   cherryFolderLayout.cpp
   cherryIDragOverListener.cpp

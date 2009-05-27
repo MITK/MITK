@@ -253,6 +253,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
     
     //boundingbox has to be computed anyway
     m_CalculateBoundingBox = true;
+    this->Modified();
   }
 }
 
@@ -278,6 +279,7 @@ void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, in
         InsertPoint(id,point,t);
       }
     }
+    this->Modified();
   }
 }
 

@@ -51,6 +51,14 @@ PURPOSE.  See the above copyright notices for more information.
     void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate1< type1 >& delegate)         \
     { m_##msgHandleObject##Message -= delegate; }
 
+#define mitkNewMessage2Macro(msgHandleObject, type1, type2)                                                          \
+  private: ::mitk::Message2< type1, type2 > m_##msgHandleObject##Message;                                                \
+  public:                                                                                                 \
+  void Add##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate2< type1, type2 >& delegate)              \
+    { m_##msgHandleObject##Message += delegate; }                                                     \
+    void Remove##msgHandleObject##Listener(const ::mitk::MessageAbstractDelegate2< type1, type2 >& delegate)         \
+    { m_##msgHandleObject##Message -= delegate; }
+
 
 namespace mitk {
 

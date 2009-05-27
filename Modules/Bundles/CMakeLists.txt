@@ -17,7 +17,7 @@ IF(MITK_USE_OPENCHERRY)
                         CACHE_PLUGIN_TARGETS MITK_MODULES_ENABLED_PLUGINS
                         BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKModulesBundleList.cmake" 
                         CMAKE_CACHE_PREFIX "MITK"
-                        BUNDLE_DEFAULT_ON ${_mitk_bundles_default}
+                        PLUGIN_DEFAULT_ON ${_mitk_bundles_default}
                         ${MITK_BUILD_ALL_PLUGINS_OPTION})
    
 ENDIF(MITK_USE_OPENCHERRY)

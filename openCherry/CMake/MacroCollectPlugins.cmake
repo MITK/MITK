@@ -9,7 +9,8 @@
 #                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [CMAKE_CACHE_PREFIX cache_prefix]
 #                       [ENABLE_PLUGIN_MACROS macro...]
-#                       [BUNDLE_DEFAULT_ON id...]
+#                       [PLUGIN_DEFAULT_ON id...]
+#                       [PLUGIN_EXCLUDES id...]
 #                       [DEFAULT_BUILD_ON]
 #                       [FORCE_BUILD_ALL]
 #                       )
@@ -45,9 +46,13 @@
 # the macro is (<bundle-symbolicname>) and the macro must set the variable
 # ENABLE_PLUGIN to true or false. For Qt4, a default macro is provided.
 #
-# BUNDLE_DEFAULT_ON
+# PLUGIN_DEFAULT_ON
 # id... is a list of bundle symbolic names for which the
 # CMake build option should default to ON
+#
+# PLUGIN_EXCLUDES
+# id... is a list of bundle symbolic names which will be excluded from
+# the build process
 #
 # DEFAULT_BUILD_ON if set, the generated CMake option for building plug-ins
 # defaults to ON. Otherwise, it is set to OFF.
@@ -67,7 +72,7 @@
 #
 MACRO(MACRO_COLLECT_PLUGINS)
 
-MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_OUTPUT_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;BUNDLE_DEFAULT_ON;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "DEFAULT_BUILD_ON;FORCE_BUILD_ALL" ${ARGN})
+MACRO_PARSE_ARGUMENTS(_COLLECT "OUTPUT_DIR;CACHE_PLUGIN_SOURCE_DIRS;CACHE_PLUGIN_OUTPUT_DIRS;CACHE_PLUGIN_TARGETS;BUNDLE_LIST_PATH;PLUGIN_EXCLUDES;PLUGIN_DEFAULT_ON;CMAKE_CACHE_PREFIX;ENABLE_PLUGIN_MACROS" "DEFAULT_BUILD_ON;FORCE_BUILD_ALL" ${ARGN})
 
 IF(NOT _COLLECT_ADD_DIR)
   SET(_COLLECT_ADD_DIR 1)
@@ -108,7 +113,11 @@ FOREACH(dir_relative_entry ${all_dirs})
   SET(dir_entry "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
   IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
     MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF")
+    
     IF(BUNDLE-SYMBOLICNAME)
+    
+    LIST(FIND _COLLECT_PLUGIN_EXCLUDES ${BUNDLE-SYMBOLICNAME} _excluded)
+    IF(_excluded EQUAL -1)
 
 	# include the generated file with the custom macro code for
 	# checking if a bundle should be enabled
@@ -127,8 +136,8 @@ SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAM
       
 	  # compute the default for the build option (ON/OFF)
       SET(_default_bundle_option ${_COLLECT_DEFAULT_BUILD_ON})
-      LIST(FIND _COLLECT_BUNDLE_DEFAULT_ON ${BUNDLE-SYMBOLICNAME} _bundle_default_on_found)
-      IF(_bundle_default_on_found GREATER -1)
+      LIST(FIND _COLLECT_PLUGIN_DEFAULT_ON ${BUNDLE-SYMBOLICNAME} _PLUGIN_DEFAULT_ON_found)
+      IF(_PLUGIN_DEFAULT_ON_found GREATER -1)
         SET(_default_bundle_option 1)
       ENDIF()
       
@@ -154,6 +163,7 @@ SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)")
         FILE(RELATIVE_PATH _binary_manifest_path "${CMAKE_CURRENT_SOURCE_DIR}" "${dir_entry}/META-INF/MANIFEST.MF")
         SET(_binary_manifest_path "${_COLLECT_OUTPUT_DIR}/${_binary_manifest_path}")
         FILE(REMOVE "${_binary_manifest_path}")
+      ENDIF()
       ENDIF()
       ENDIF()
     ENDIF()

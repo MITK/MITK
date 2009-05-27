@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
   displacer->SetOffset(offset); //now set the offset in the NavigationDataDisplacementFilter object
 
   //now every output of the source object is connected to the displacer object
-  for (int i = 0; i < source->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < source->GetNumberOfOutputs(); i++)
   {
     displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter 
   }
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
   recorder->SetFileName(filename.str());
 
   //now every output of the displacer object is connected to the recorder object
-  for (int i = 0; i < displacer->GetNumberOfOutputs(); i++)
+  for (unsigned int i = 0; i < displacer->GetNumberOfOutputs(); i++)
   {
     recorder->AddNavigationData(displacer->GetOutput(i));  // here we connect to the recorder
   }
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
                               //each added NavigationData
 
 
-  for (unsigned int x = 0; x<100; x++) //write 100 datasets
+  for (unsigned int x = 0; x < 100; x++) //write 100 datasets
   {
     recorder->Update(); //the update causes one line in the XML file for every tool
                         //in this case two lines

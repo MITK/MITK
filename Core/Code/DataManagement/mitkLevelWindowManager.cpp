@@ -120,6 +120,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
     m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
     maxLayer = layer;
   }
+  Modified();
 }
 
 // sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.

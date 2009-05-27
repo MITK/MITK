@@ -37,8 +37,9 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 
-#if !defined(MBI_SANDBOX_EXPORTS)
+#if !defined(MITKCOREEXT_EXPORTS)
   #define MITKCOREEXT_EXPORT
 #endif
 
-#endif /*_MBI_SANDBOX_EXPORTS_DLL_H_*/
+#endif /* MITKEXT_EXPORTS_DLL_H_*/
+

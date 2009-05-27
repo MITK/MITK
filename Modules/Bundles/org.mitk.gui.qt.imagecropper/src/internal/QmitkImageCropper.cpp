@@ -128,7 +128,7 @@ void QmitkImageCropper::CreateConnections()
     //!connect( (QObject*) m_Controls, SIGNAL(cropImage()), this, SLOT(CropImage()) );   // click on the crop button
     connect( m_Controls->btnCrop, SIGNAL(clicked()), this, SLOT(CropImage()));   // click on the crop button
     connect( m_Controls->m_NewBoxButton, SIGNAL(clicked()), this, SLOT(ImageSelectionChanged()) );
-    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeNode::Pointer)) );
+    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeNode*)) );
     connect( m_Controls->m_EnableSurroundingCheckBox, SIGNAL(toggled(bool)), this, SLOT(SurroundingCheck(bool)) );
     connect( m_Controls->chkInformation, SIGNAL(toggled(bool)), this, SLOT(ChkInformationToggled(bool)) );
     //! from QmitkImageCropperControls::init()
@@ -206,9 +206,9 @@ void QmitkImageCropper::ImageSelectionChanged()
   // 2. If any image is selected,
   //    attach the cuboid to it, and update the views
   m_ImageNode = selectedImage();
-  if (m_ImageNode.IsNotNull())
+  m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
+  if (m_ImageNode.IsNotNull() && m_ImageToCrop.IsNotNull())
   {
-    m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
     AddBoundingObjectToNode( m_ImageNode );
 
     m_ImageNode->SetVisibility(true);
@@ -427,7 +427,7 @@ void QmitkImageCropper::CreateBoundingObject()
 }
 
 
-void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataTreeNode::Pointer node)
+void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataTreeNode* node)
 {
   m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
 
@@ -454,11 +454,14 @@ void QmitkImageCropper::RemoveBoundingObjectFromNode()
     m_CroppingObjectNode->SetVisibility(false);
   }
 }
-void QmitkImageCropper::ImageNodeChanged( const mitk::DataTreeNode::Pointer item )
+void QmitkImageCropper::ImageNodeChanged( const mitk::DataTreeNode* item )
 {
-  // called when the selection of the image selector changes
-  m_Controls->btnCrop->setEnabled( item.IsNotNull() );
-  ImageSelectionChanged();
+  if(m_Controls != 0)
+  {
+    // called when the selection of the image selector changes
+    m_Controls->btnCrop->setEnabled( item != 0 );
+    ImageSelectionChanged();
+  }
 }
 
 

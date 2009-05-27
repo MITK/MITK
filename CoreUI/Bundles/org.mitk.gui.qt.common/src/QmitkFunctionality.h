@@ -109,14 +109,14 @@ public:
   void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
 
   // IPartListener
-  virtual void 	PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartBroughtToTop (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartDeactivated (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartOpened (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void 	PartInputChanged (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartBroughtToTop (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartDeactivated (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartOpened (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartInputChanged (cherry::IWorkbenchPartReference::Pointer partRef);
 
   // Convinient methods to set and reset a wait cursor ("hourglass")
   void WaitCursorOn();
@@ -139,6 +139,10 @@ private:
   /// Saves if this class is currently working on DataStorage changes.
   /// This is a protector variable to avoid recursive calls on event listener functions.
   bool m_InDataStorageChanged;
+  ///
+  /// Saves if this view is the currently active one.
+  ///
+  bool m_IsActive;
 };
 
 #endif /*QMITKFUNCTIONALITY_H_*/

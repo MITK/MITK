@@ -19,7 +19,8 @@
 
 // mitk Includes
 #include "mitkMessage.h"
-#include <mitkIDataStorageService.h>
+#include "mitkIDataStorageService.h"
+#include "mitkDataStorageEditorInput.h"
 
 // cherry Includes
 #include <cherryPlatform.h>
@@ -37,6 +38,7 @@ QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
+ , m_IsActive(false)
 {
 }
   
@@ -133,14 +135,28 @@ void QmitkFunctionality::StdMultiWidgetNotAvailable()
 
 void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-//   if(partRef->GetPart(false) == this)
-//     this->Activated();
-  QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
 
-  // inform ViewPart that multi widget is available now
-  if (stdMultiWidgetEditor.IsNotNull())
+  // if this QmitkFunctionality was activated call Activated() here
+  if(partRef->GetPart(false) == this &&  m_IsActive != true)
   {
-    this->StdMultiWidgetAvailable(*(stdMultiWidgetEditor->GetStdMultiWidget()));
+    m_IsActive = true;
+    this->Activated();
+  }
+  // another QmitkFunctionality was activated
+  else if(partRef->GetPart(false) != this && partRef->GetPart(false).Cast<QmitkFunctionality>() && m_IsActive == true)
+  {
+    m_IsActive = false;
+    this->Deactivated();
+  }
+  else 
+  {
+    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+    // inform ViewPart that multi widget is available now
+    if (stdMultiWidgetEditor.IsNotNull())
+    {
+      this->StdMultiWidgetAvailable(*(stdMultiWidgetEditor->GetStdMultiWidget()));
+    }
   }
 }
 
@@ -164,25 +180,18 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-//   if(partRef->GetPart(false) == this)
-//     this->Deactivated();
 }
 
 void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-
 }
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  if(partRef->GetPart(false) == this)
-    this->Deactivated();
 }
 
 void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  if(partRef->GetPart(false) == this)
-   this->Activated();
 }
 
 void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -246,6 +255,13 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
 
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
   {
+    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+  }
+  else
+  {
+    mitk::DataStorageEditorInput::Pointer editorInput;
+    editorInput = new mitk::DataStorageEditorInput();
+    cherry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 

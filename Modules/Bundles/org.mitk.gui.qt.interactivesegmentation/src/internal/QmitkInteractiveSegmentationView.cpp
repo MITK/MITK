@@ -537,6 +537,12 @@ void QmitkInteractiveSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWid
     m_Parent->setEnabled(true);
     // save the actual multiwidget as the working widget
     m_MultiWidget = &stdMultiWidget;
+
+    mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+
+    // tell the interpolation about toolmanager and multiwidget
+    m_Controls->m_SlicesInterpolator->SetDataStorage( *m_DataStorage );
+    m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
     this->Activated();
   }
 }
@@ -554,7 +560,7 @@ void QmitkInteractiveSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget
   // set new multi widget to the one that is available
   m_MultiWidget = this->GetActiveStdMultiWidget();
 
-  // reinitialize m_SlicesInterpolator
+  // tell the interpolation about toolmanager and multiwidget
   if(m_MultiWidget)
     m_Controls->m_SlicesInterpolator->Initialize( m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager(), m_MultiWidget );
 

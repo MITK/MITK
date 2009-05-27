@@ -151,49 +151,52 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified );
 
   // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
-  m_TimeStep.resize(3);
-  m_TimeStep[2] = slicer->GetTime()->GetPos();
+  if (m_MultiWidget)
   {
-  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalTimeChanged );
-  TTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
-  }
+    mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+    m_TimeStep.resize(3);
+    m_TimeStep[2] = slicer->GetTime()->GetPos();
+    {
+    itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalTimeChanged );
+    TTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
+    }
 
-  {
-  itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalSliceChanged );
-  TSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
+    {
+    itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalSliceChanged );
+    TSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
 
-  // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
-  m_TimeStep[0] = slicer->GetTime()->GetPos();
-  {
-  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalTimeChanged );
-  STimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
-  }
+    // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
+    slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+    m_TimeStep[0] = slicer->GetTime()->GetPos();
+    {
+    itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalTimeChanged );
+    STimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
+    }
 
-  {
-  itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalSliceChanged );
-  SSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-  }
+    {
+    itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalSliceChanged );
+    SSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
 
-  // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
-  slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
-  m_TimeStep[1] = slicer->GetTime()->GetPos();
-  {
-  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalTimeChanged );
-  FTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
-  }
+    // connect to the steppers of the three multi widget widgets. after each change, call the interpolator
+    slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+    m_TimeStep[1] = slicer->GetTime()->GetPos();
+    {
+    itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalTimeChanged );
+    FTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
+    }
 
-  {
-  itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
-  command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalSliceChanged );
-  FSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    {
+    itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
+    command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalSliceChanged );
+    FSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
   }
 
   m_Initialized = true;
@@ -258,7 +261,10 @@ void QmitkSlicesInterpolator::OnTransversalSliceChanged(const itk::EventObject& 
 {
   if ( TranslateAndInterpolateChangedSlice( e, 2 ) )
   {
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RequestUpdate();
+    if (m_MultiWidget)
+    {
+      mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget1->GetRenderWindow())->RequestUpdate();
+    }
   }
 }
 
@@ -266,7 +272,10 @@ void QmitkSlicesInterpolator::OnSagittalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 0 ) )
   {
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate();
+    if (m_MultiWidget)
+    {
+      mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget2->GetRenderWindow())->RequestUpdate();
+    }
   }
 }
 
@@ -274,7 +283,10 @@ void QmitkSlicesInterpolator::OnFrontalSliceChanged(const itk::EventObject& e)
 {
   if ( TranslateAndInterpolateChangedSlice( e, 1 ) )
   {
-    mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RequestUpdate();
+    if (m_MultiWidget)
+    {
+      mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())->RequestUpdate();
+    }
   }
 }
 
@@ -565,18 +577,21 @@ bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& slice
   //   windowID 2: transversal window = renderWindow1
   //   windowID 1: frontal window = renderWindow3
   //   windowID 0: sagittal window = renderWindow2
-  switch (windowID)
+  if ( m_MultiWidget )
   {
-  case 2:
-  default:
-    renderer = m_MultiWidget->mitkWidget1->GetRenderer();
-    break;
-  case 1:
-    renderer = m_MultiWidget->mitkWidget3->GetRenderer();
-    break;
-  case 0:
-    renderer = m_MultiWidget->mitkWidget2->GetRenderer();
-    break;
+    switch (windowID)
+    {
+    case 2:
+    default:
+      renderer = m_MultiWidget->mitkWidget1->GetRenderer();
+      break;
+    case 1:
+      renderer = m_MultiWidget->mitkWidget3->GetRenderer();
+      break;
+    case 0:
+      renderer = m_MultiWidget->mitkWidget2->GetRenderer();
+      break;
+    }
   }
 
   if ( m_Segmentation && renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)

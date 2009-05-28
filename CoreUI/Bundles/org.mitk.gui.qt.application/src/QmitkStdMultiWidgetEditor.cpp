@@ -106,6 +106,32 @@ void QmitkStdMultiWidgetEditor::PartClosed( cherry::IWorkbenchPartReference::Poi
   }
 }
 
+void QmitkStdMultiWidgetEditor::PartVisible( cherry::IWorkbenchPartReference::Pointer partRef )
+{
+  if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+  {
+    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+    if (m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
+    {
+      m_StdMultiWidget->AddPlanesToDataStorage();
+    }
+  }
+}
+
+void QmitkStdMultiWidgetEditor::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
+{
+  if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+  {
+    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+    if (m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
+    {
+      m_StdMultiWidget->RemovePlanesFromDataStorage();
+    }
+  }
+}
+
 void QmitkStdMultiWidgetEditor::SetFocus()
 {
   if (m_StdMultiWidget != 0)

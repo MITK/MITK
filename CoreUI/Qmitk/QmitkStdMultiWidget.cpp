@@ -345,10 +345,30 @@ void QmitkStdMultiWidget::InitializeWidget()
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
 {
-  m_DataStorage->Remove(m_PlaneNode1);
-  m_DataStorage->Remove(m_PlaneNode2);
-  m_DataStorage->Remove(m_PlaneNode3);
-  m_DataStorage->Remove(m_Node);
+  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
+  {
+    m_DataStorage->Remove(m_PlaneNode1);
+    m_DataStorage->Remove(m_PlaneNode2);
+    m_DataStorage->Remove(m_PlaneNode3);
+    m_DataStorage->Remove(m_Node);
+  }
+}
+
+void QmitkStdMultiWidget::AddPlanesToDataStorage()
+{
+  if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
+  {
+    if (m_DataStorage.IsNotNull())
+    {
+      m_DataStorage->Add(m_Node);
+      m_DataStorage->Add(m_PlaneNode1, m_Node);
+      m_DataStorage->Add(m_PlaneNode2, m_Node);
+      m_DataStorage->Add(m_PlaneNode3, m_Node);
+      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
+      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
+      static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
+    }
+  }
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -895,16 +915,6 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   m_Node = mitk::DataTreeNode::New();
   m_Node->SetProperty("name", mitk::StringProperty::New("Widgets"));
   m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
-  if (m_DataStorage.IsNotNull())
-  {
-    m_DataStorage->Add(m_Node);
-    m_DataStorage->Add(m_PlaneNode1, m_Node);
-    m_DataStorage->Add(m_PlaneNode2, m_Node);
-    m_DataStorage->Add(m_PlaneNode3, m_Node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
-  }
 }
 
 

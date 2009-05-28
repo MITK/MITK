@@ -88,6 +88,8 @@ public:
   /// called when the StdMultiWidget is closed to remove the 3 widget planes and the helper node from the DataStorage
   void RemovePlanesFromDataStorage();
 
+  void AddPlanesToDataStorage();
+
 
 public slots:
 

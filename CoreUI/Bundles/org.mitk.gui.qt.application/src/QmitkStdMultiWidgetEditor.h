@@ -51,6 +51,8 @@ protected:
   void CreateQtPartControl(QWidget* parent);
   // IPartListener
   virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
 
 private:
 

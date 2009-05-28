@@ -35,40 +35,35 @@ mitk::NavigationDataObjectVisualizationFilter::~NavigationDataObjectVisualizatio
 
 const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetBaseData(unsigned int idx)
 {
-  if (idx >= this->GetNumberOfInputs())
-    return NULL;
+  //if (idx >= this->GetNumberOfInputs())
+  //  return NULL;
   
-  const NavigationData* nd = this->GetInput(idx);  
-  if (nd == NULL)
-    return NULL;
+  //const NavigationData* nd = this->GetInput(idx);  
+  //if (nd == NULL)
+  //  return NULL;
 
-  RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(nd);
+  RepresentationPointerMap::const_iterator iter = m_RepresentationList.find(idx);
   if (iter != m_RepresentationList.end())
-    return (*iter).second;
+    return iter->second;
 
   return NULL;
 }
 
 
-bool mitk::NavigationDataObjectVisualizationFilter::SetBaseData(unsigned int idx, BaseData* data)
+void mitk::NavigationDataObjectVisualizationFilter::SetBaseData(unsigned int idx, BaseData* data)
 {
-  if (idx >= this->GetNumberOfInputs())
-    return false;
+  //if (idx >= this->GetNumberOfInputs())
+  //  return false;
 
-  const NavigationData* nd = this->GetInput(idx);
+  //const NavigationData* nd = this->GetInput(idx);
 
-  if (nd == NULL || data == NULL)
-    return false;
+  //if (nd == NULL || data == NULL)
+  //  return false;
 
-  std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
-  returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements  
-  return returnEl.second; // return if insert was successful 
-}
-
-
-void mitk::NavigationDataObjectVisualizationFilter::Clear()
-{
-  m_RepresentationList.clear();
+  m_RepresentationList[idx] = RepresentationPointer(data);
+  //std::pair<RepresentationPointerMap::iterator, bool> returnEl; //pair for returning the result
+  //returnEl = m_RepresentationList.insert( RepresentationPointerMap::value_type(nd, data) ); //insert the given elements  
+  //return returnEl.second; // return if insert was successful 
 }
 
 
@@ -85,7 +80,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     mitk::NavigationData* output = this->GetOutput(index);
     assert(output);
         
-    //check if the dada is valid
+    //check if the data is valid
     if (!nd->IsDataValid())
     {
       output->SetDataValid(false);

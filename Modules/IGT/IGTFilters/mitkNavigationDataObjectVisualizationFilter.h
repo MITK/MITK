@@ -43,12 +43,12 @@ namespace mitk {
     /** 
     * \brief Smart Pointer type to a BaseData. 
     */
-    typedef BaseData::Pointer RepresentationPointer;
+    typedef BaseData::ConstPointer RepresentationPointer;
 
     /** 
-    * \brief STL map of SmartPointers to BaseData and an index. Using map to be able to set non continuous indices
+    * \brief STL map of index to BaseData . Using map to be able to set non continuous indices
     */
-    typedef std::map<const NavigationData*, RepresentationPointer> RepresentationPointerMap;
+    typedef std::map<unsigned int, RepresentationPointer> RepresentationPointerMap;
     
     /** 
     * \brief Size type of an std::vector 
@@ -56,29 +56,22 @@ namespace mitk {
     typedef RepresentationPointerMap::size_type RepresentationPointerMapSizeType;
 
     /** 
-    * \brief Set the BaseData of the tool specified by the given NavigationData
+    * \brief Set the representation object of the input
     * 
-    * Note, that NavigationDatas cannot be overwritten. The list has to be cleared first.
-    * \param data The BaseData to be associated to the NavigationData nd
-    * \param nd Specification of the NavigationData tha data will be associated to
-    * \return Returns true if the tool has been added, false otherwise.
+    * \param data The BaseData to be associated to the index 
+    * \param index the index with which data will be associated
     */
-    bool SetBaseData(unsigned int index, BaseData* data);
+    void SetBaseData(unsigned int index, BaseData* data);
     
     /** 
-    * \brief Get the BaseData of the tool specified by the given NavigationData
+    * \brief Get the representation object associated with the index idx
+    *
     * \param idx the corresponding input number with which the BaseData is associated
     * \return Returns the desired BaseData if it exists for the given input; Returns NULL 
-    *         if no BaseData was found or no input was set for the given number.
+    *         if no BaseData was found.
     */
     const BaseData* GetBaseData(unsigned int idx);
   
-    /** 
-    * \brief Clear the map of BaseDatas
-    */
-    void Clear();
-
-
     /** 
     *\brief Get the number of added BaseData associated to NavigationData 
     * \return Returns the size of the internal map
@@ -105,20 +98,10 @@ namespace mitk {
     **/
     ~NavigationDataObjectVisualizationFilter();
 
-    /**
-    * \brief Create a BaseData that represents the given tool
-    **/
-    void CreateToolRepresenation();
-
-  private:
     /** 
     * \brief An array of the BaseData which represent the tools. 
     */
     RepresentationPointerMap m_RepresentationList;
   };
 } // namespace mitk
-
-
 #endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */
-
-

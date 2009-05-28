@@ -101,9 +101,11 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   //now we have ndDummy and mitkToolDataDummy to test with
 
   //setting nodes
-  MITK_TEST_CONDITION(myFilter->SetBaseData(0, mitkToolData1), "Testing SetBaseData() node 1");
+  myFilter->SetBaseData(0, mitkToolData1);
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData1, "Testing SetBaseData()/GetBaseData() node 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() after adding first tool");
-  MITK_TEST_CONDITION(myFilter->SetBaseData(1, mitkToolData2), "Testing SetBaseData() node 2");
+  myFilter->SetBaseData(1, mitkToolData2)
+  MITK_TEST_CONDITION(myFilter->GetBaseData(2) == mitkToolData2, "Testing SetBaseData() node 2");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() after adding second tool");
   //getting nodes
   MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData1, "Testing GetBaseData() node 1");
@@ -125,20 +127,19 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(offset2.Get_vnl_vector()==initialPos2.Get_vnl_vector(), "Testing Offset position 2");
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m1= affineTransform1->GetMatrix().GetVnlMatrix();
-  std::cout<<"\n initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1 <<"\n";
+  MITK_TEST_OUTPUT( <<"\n initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1);
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m2= affineTransform2->GetMatrix().GetVnlMatrix();
-  std::cout<<"\n initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2 <<"\n";
+  MITK_TEST_OUTPUT( "\n initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2);
   
 
 //messing with SetBaseData
 //setting nodes
-  myFilter->Clear();
-  std::cout<<"Clearing BaseData\n";
-
-  MITK_TEST_CONDITION(myFilter->SetBaseData(0, mitkToolData2), "Twisting mitkToolData by using SetBaseData() NavigationData 1 with ToolData 2");
-  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() == 1");
-  MITK_TEST_CONDITION(myFilter->SetBaseData(1, mitkToolData1), "Twisting mitkToolData by using SetBaseData() NavigationData 2 with ToolData 1");
+  myFilter->SetBaseData(0, mitkToolData2);
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData2, "Twisting mitkToolData by using SetBaseData() NavigationData 1 with ToolData 2");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 1");
+  myFilter->SetBaseData(1, mitkToolData1)
+  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData1, "Twisting mitkToolData by using SetBaseData() NavigationData 2 with ToolData 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 2");
   //getting nodes
   MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
@@ -163,10 +164,10 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(offset2Second.Get_vnl_vector()==offset2.Get_vnl_vector(), "Testing offset2 equals first update");
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Second= affineTransform1Second->GetMatrix().GetVnlMatrix();
-  std::cout<<"\n after second update initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1Second <<"\n";
+  MITK_TEST_OUTPUT( <<"\n after second update initOrient1="<<initialOri1<<" affineTransform1->GetVnlMatrix():\n "<< m1Second);
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m2Second= affineTransform2Second->GetMatrix().GetVnlMatrix();
-  std::cout<<"\n after second update initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2Second <<"\n";
+  MITK_TEST_OUTPUT( "\n after second update initOrient2="<<initialOri2<<" affineTransform2->GetVnlMatrix():\n "<< m2Second);
 
   //testing adding a third input
   myFilter->SetInput(2,ndDummy);
@@ -188,7 +189,11 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(offsetDummy.Get_vnl_vector()==initialPosDummy.Get_vnl_vector(), "Testing Offset latest added tool");
   
   mitk::AffineTransform3D::MatrixType::InternalMatrixType m1Latest= affineTransformDummy->GetMatrix().GetVnlMatrix();
-  std::cout<<"\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest <<"\n";
+  MITK_TEST_OUTPUT( << "\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest);
+
+  mitk::Cone::Pointer anothercone = mitk::Cone::New();
+  myFilter->SetBaseData(0, anothercone);
+  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == anothercone, "Overwriting BaseData index 0");
 
   // always end with this!
   MITK_TEST_END();

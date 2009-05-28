@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _IGTTUTORIAL_EXPORTS_DLL_H_
-#define _IGTTUTORIAL_EXPORTS_DLL_H_
+#ifndef _IGTTUTORIAL_EXPORT_DLL_H_
+#define _IGTTUTORIAL_EXPORT_DLL_H_
 
 
 //
@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_igttutorial_EXPORTS)
-    #define IGTTUTORIAL_EXPORTS __declspec(dllexport)
+    #define IGTTUTORIAL_EXPORT __declspec(dllexport)
   #else
-    #define IGTTUTORIAL_EXPORTS __declspec(dllimport)
+    #define IGTTUTORIAL_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(IGTTUTORIAL_EXPORTS)
-  #define IGTTUTORIAL_EXPORTS
+#if !defined(IGTTUTORIAL_EXPORT)
+  #define IGTTUTORIAL_EXPORT
 #endif
 
-#endif /*_IGTTUTORIAL_EXPORTS_DLL_H_*/
+#endif /*_IGTTUTORIAL_EXPORT_DLL_H_*/

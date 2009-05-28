@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _DEFORMABLEREGISTRATION_EXPORTS_DLL_H_
-#define _DEFORMABLEREGISTRATION_EXPORTS_DLL_H_
+#ifndef _DEFORMABLEREGISTRATION_EXPORT_DLL_H_
+#define _DEFORMABLEREGISTRATION_EXPORT_DLL_H_
 
 
 //
@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_deformableregistration_EXPORTS)
-    #define DEFORMABLEREGISTRATION_EXPORTS __declspec(dllexport)
+    #define DEFORMABLEREGISTRATION_EXPORT __declspec(dllexport)
   #else
-    #define DEFORMABLEREGISTRATION_EXPORTS __declspec(dllimport)
+    #define DEFORMABLEREGISTRATION_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(DEFORMABLEREGISTRATION_EXPORTS)
-  #define DEFORMABLEREGISTRATION_EXPORTS
+#if !defined(DEFORMABLEREGISTRATION_EXPORT)
+  #define DEFORMABLEREGISTRATION_EXPORT
 #endif
 
-#endif /*_DEFORMABLEREGISTRATION_EXPORTS_DLL_H_*/
+#endif /*_DEFORMABLEREGISTRATION_EXPORT_DLL_H_*/

@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _POINTBASEDREGISTRATION_EXPORTS_DLL_H_
-#define _POINTBASEDREGISTRATION_EXPORTS_DLL_H_
+#ifndef _POINTBASEDREGISTRATION_EXPORT_DLL_H_
+#define _POINTBASEDREGISTRATION_EXPORT_DLL_H_
 
 
 //
@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_pointbasedregistration_EXPORTS)
-    #define POINTBASEDREGISTRATION_EXPORTS __declspec(dllexport)
+    #define POINTBASEDREGISTRATION_EXPORT __declspec(dllexport)
   #else
-    #define POINTBASEDREGISTRATION_EXPORTS __declspec(dllimport)
+    #define POINTBASEDREGISTRATION_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(POINTBASEDREGISTRATION_EXPORTS)
-  #define POINTBASEDREGISTRATION_EXPORTS
+#if !defined(POINTBASEDREGISTRATION_EXPORT)
+  #define POINTBASEDREGISTRATION_EXPORT
 #endif
 
-#endif /*_POINTBASEDREGISTRATION_EXPORTS_DLL_H_*/
+#endif /*_POINTBASEDREGISTRATION_EXPORT_DLL_H_*/

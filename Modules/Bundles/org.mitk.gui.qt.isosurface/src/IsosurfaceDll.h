@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_isosurface_EXPORTS)
-    #define ISOSURFACE_EXPORTS __declspec(dllexport)
+    #define ISOSURFACE_EXPORT __declspec(dllexport)
   #else
-    #define ISOSURFACE_EXPORTS __declspec(dllimport)
+    #define ISOSURFACE_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(ISOSURFACE_EXPORTS)
-  #define ISOSURFACE_EXPORTS
+#if !defined(ISOSURFACE_EXPORT)
+  #define ISOSURFACE_EXPORT
 #endif
 
 #endif /*_ISOSURFACE_DLL_H_*/

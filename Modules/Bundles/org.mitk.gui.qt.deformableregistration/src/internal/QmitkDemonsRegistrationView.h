@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for demons registration.
 */
-class DEFORMABLEREGISTRATION_EXPORTS QmitkDemonsRegistrationView : public QWidget
+class DEFORMABLEREGISTRATION_EXPORT QmitkDemonsRegistrationView : public QWidget
 {
   Q_OBJECT
 

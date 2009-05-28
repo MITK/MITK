@@ -40,7 +40,7 @@ For more informations see: \ref QmitkDeformableRegistrationUserManual
 \ingroup DeformableRegistration
 */
 
-class DEFORMABLEREGISTRATION_EXPORTS QmitkDeformableRegistrationView : public QObject, public QmitkFunctionality
+class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QObject, public QmitkFunctionality
 {  
   Q_OBJECT
   

@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_regiongrowing_EXPORTS)
-    #define REGIONGROWING_EXPORTS __declspec(dllexport)
+    #define REGIONGROWING_EXPORT __declspec(dllexport)
   #else
-    #define REGIONGROWING_EXPORTS __declspec(dllimport)
+    #define REGIONGROWING_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(REGIONGROWING_EXPORTS)
-  #define REGIONGROWING_EXPORTS
+#if !defined(REGIONGROWING_EXPORT)
+  #define REGIONGROWING_EXPORT
 #endif
 
 #endif /*_REGIONGROWING_DLL_H_*/

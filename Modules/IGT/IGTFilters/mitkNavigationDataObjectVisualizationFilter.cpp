@@ -136,9 +136,10 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     
     //set the transform to data
     data->GetGeometry()->SetIndexToWorldTransform(affineTransform);
-
+    
     //set the original spacing to keep scaling of the geometrical object
     data->GetGeometry()->SetSpacing(spacing);
+    data->GetGeometry()->TransferItkToVtkTransform(); // update VTK Transform for rendering too
 
     data->GetGeometry()->Modified();
     data->Modified();

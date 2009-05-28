@@ -1,8 +1,8 @@
 
 IF(MITK_USE_OPENCHERRY)
 
-  INCLUDE("${MITK_BINARY_DIR}/mitkExtConfig.cmake")
-  INCLUDE("${MITK_BINARY_DIR}/QmitkExtConfig.cmake")
+  # INCLUDE("${MITK_BINARY_DIR}/mitkExtConfig.cmake")
+  # INCLUDE("${MITK_BINARY_DIR}/QmitkExtConfig.cmake")
 
   INCLUDE("${MITK_BINARY_DIR}/Bundles/MITKCoreBundleList.cmake")
   

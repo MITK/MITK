@@ -16,3 +16,17 @@ SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt)
 SUBDIRS(ipPic ipFunc)
 
 # ENDIF(NOT MITK_CHILI_PLUGIN)
+
+SET(Poco_INCLUDE_DIR 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Poco 
+    CACHE PATH 
+    "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2"
+)
+
+SET(Poco_LIBRARY_DIR 
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    CACHE PATH 
+    "top-level directory containing the poco libraries."
+)
+
+

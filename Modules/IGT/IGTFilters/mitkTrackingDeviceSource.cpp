@@ -170,3 +170,21 @@ unsigned int mitk::TrackingDeviceSource::GetToolCount()
     return m_TrackingDevice->GetToolCount(); 
   return 0;
 }
+
+
+bool mitk::TrackingDeviceSource::IsConnected()
+{
+  if (m_TrackingDevice.IsNull())
+    return false;
+  
+  return m_TrackingDevice->GetMode() == mitk::TrackingDevice::Setup;
+}
+
+
+bool mitk::TrackingDeviceSource::IsTracking()
+{
+  if (m_TrackingDevice.IsNull())
+    return false;
+
+  return m_TrackingDevice->GetMode() == mitk::TrackingDevice::Tracking;
+}

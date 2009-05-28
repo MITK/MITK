@@ -95,6 +95,18 @@ namespace mitk {
     virtual unsigned int GetToolCount(); 
 
     /**
+    * \brief returns true if a connection to the tracking device is established
+    *
+    */
+    virtual bool IsConnected();
+
+    /**
+    * \brief returns true if tracking is in progress
+    *
+    */
+    virtual bool IsTracking();
+
+    /**
     * \brief Used for pipeline update
     */
     virtual void UpdateOutputInformation();

@@ -206,16 +206,19 @@ void QmitkImageCropper::ImageSelectionChanged()
   // 2. If any image is selected,
   //    attach the cuboid to it, and update the views
   m_ImageNode = selectedImage();
-  m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
-  if (m_ImageNode.IsNotNull() && m_ImageToCrop.IsNotNull())
+  if (m_ImageNode.IsNotNull())
   {
-    AddBoundingObjectToNode( m_ImageNode );
+    m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
+    if(m_ImageToCrop.IsNotNull())
+    {
+      AddBoundingObjectToNode( m_ImageNode );
 
-    m_ImageNode->SetVisibility(true);
-    //!mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
-    mitk::RenderingManager::GetInstance()->InitializeViews();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    m_Controls->m_NewBoxButton->setEnabled(false);
+      m_ImageNode->SetVisibility(true);
+      //!mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
+      mitk::RenderingManager::GetInstance()->InitializeViews();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      m_Controls->m_NewBoxButton->setEnabled(false);
+    }
   }
 }
 

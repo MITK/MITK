@@ -85,7 +85,7 @@ void QmitkIsoSurface::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageSelected(const mitk::DataTreeNode::Pointer)) );
+    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageSelected(const mitk::DataTreeNode*)) );
     connect( m_Controls->createSurfacePushButton, SIGNAL(clicked()), this, SLOT(CreateSurface()) );
   }
 }
@@ -105,7 +105,7 @@ void QmitkIsoSurface::DataStorageChanged()
 }
 
 
-void QmitkIsoSurface::ImageSelected(const mitk::DataTreeNode::Pointer item)
+void QmitkIsoSurface::ImageSelected(const mitk::DataTreeNode* item)
 {
   m_MitkImage = dynamic_cast<mitk::Image*> (item->GetData());
 }

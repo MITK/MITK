@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkLayerController.h"
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
- : QWidget(parent, f)
+ : QWidget(parent, f), m_PlaneNode1(NULL), m_PlaneNode2(NULL), m_PlaneNode3(NULL), m_Node(NULL)
 {
   //this->setupUi(this);
    
@@ -341,6 +341,14 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_RectangleRendering4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
   m_RectangleRendering4->Enable(1.0,1.0,0.0);
+}
+
+void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
+{
+  m_DataStorage->Remove(m_PlaneNode1);
+  m_DataStorage->Remove(m_PlaneNode2);
+  m_DataStorage->Remove(m_PlaneNode3);
+  m_DataStorage->Remove(m_Node);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
@@ -848,57 +856,54 @@ void QmitkStdMultiWidget::InitPositionTracking()
 
 void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
 {
-  // add the diplayed planes of the multiwidget to a node to which the subtree 
+  // add the displayed planes of the multiwidget to a node to which the subtree 
   // @a planesSubTree points ...
 
   float white[3] = {1.0f,1.0f,1.0f};
-  mitk::DataTreeNode::Pointer planeNode1;
-  mitk::DataTreeNode::Pointer planeNode2;
-  mitk::DataTreeNode::Pointer planeNode3;
   mitk::Geometry2DDataMapper2D::Pointer mapper;
 
   // ... of widget 1
-  planeNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
-  planeNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
-  planeNode1->SetProperty("visible", mitk::BoolProperty::New(true));
-  planeNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
-  planeNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  planeNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
+  m_PlaneNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_PlaneNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
-  planeNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
+  m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 2
-  planeNode2 =( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
-  planeNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
-  planeNode2->SetProperty("visible", mitk::BoolProperty::New(true));
-  planeNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
-  planeNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  planeNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_PlaneNode2 =( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
+  m_PlaneNode2->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_PlaneNode2->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
-  planeNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
+  m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 3
-  planeNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
-  planeNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
-  planeNode3->SetProperty("visible", mitk::BoolProperty::New(true));
-  planeNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
-  planeNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  planeNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow()))->GetCurrentWorldGeometry2DNode();
+  m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
+  m_PlaneNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
+  m_PlaneNode3->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+  m_PlaneNode3->SetProperty("helper object", mitk::BoolProperty::New(true));
   mapper = mitk::Geometry2DDataMapper2D::New();
-  planeNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
+  m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
-  node->SetProperty("name", mitk::StringProperty::New("Widgets"));
-  node->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_Node = mitk::DataTreeNode::New();
+  m_Node->SetProperty("name", mitk::StringProperty::New("Widgets"));
+  m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
   if (m_DataStorage.IsNotNull())
   {
-    m_DataStorage->Add(node);
-    m_DataStorage->Add(planeNode1, node);
-    m_DataStorage->Add(planeNode2, node);
-    m_DataStorage->Add(planeNode3, node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(planeNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(planeNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, node);
-    static_cast<mitk::Geometry2DDataMapper2D*>(planeNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, node);
+    m_DataStorage->Add(m_Node);
+    m_DataStorage->Add(m_PlaneNode1, m_Node);
+    m_DataStorage->Add(m_PlaneNode2, m_Node);
+    m_DataStorage->Add(m_PlaneNode3, m_Node);
+    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
+    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
+    static_cast<mitk::Geometry2DDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(m_DataStorage, m_Node);
   }
 }
 

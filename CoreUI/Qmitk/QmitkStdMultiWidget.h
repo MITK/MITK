@@ -85,6 +85,9 @@ public:
 
   void InitializeWidget();
 
+  /// called when the StdMultiWidget is closed to remove the 3 widget planes and the helper node from the DataStorage
+  void RemovePlanesFromDataStorage();
+
 
 public slots:
 
@@ -232,6 +235,11 @@ protected:
   mitk::DataTreeIteratorClone planesIterator;
   mitk::DataTreeNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
+
+  mitk::DataTreeNode::Pointer m_PlaneNode1;
+  mitk::DataTreeNode::Pointer m_PlaneNode2;
+  mitk::DataTreeNode::Pointer m_PlaneNode3;
+  mitk::DataTreeNode::Pointer m_Node;
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

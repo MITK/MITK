@@ -15,8 +15,8 @@
 
  =========================================================================*/
 
-#include <mitkDataTreeNode.h>
 #include <mitkDataTreeNodeSelection.h>
+#include <mitkDataTreeNode.h>
 #include <cherryQtItemSelection.h>
 
 #include <vector>

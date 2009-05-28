@@ -1,7 +1,6 @@
 SET(QT_USE_QT3SUPPORT 1)
 
 MITK_GENERATE_TOOLS_LIBRARY(QmitkExt "NO")
-MESSAGE("TOOLS: ${TOOL_GUI_CPPS} ${TOOL_CPPS}")
 MITK_CREATE_MODULE( QmitkExt
   INCLUDE_DIRS QmitkApplicationBase QmitkPropertyObservers
   DEPENDS MitkExt Qmitk qwt

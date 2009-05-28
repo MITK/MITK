@@ -60,6 +60,9 @@
        </layout>
       </item>
       <item>
+       <widget class="QmitkSliderNavigatorWidget" name="timeSlider" native="true"/>
+      </item>
+      <item>
        <widget class="QCheckBox" name="m_ShowRedGreenValues">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -699,6 +702,12 @@
    <class>QmitkRigidRegistrationSelectorView</class>
    <extends>QWidget</extends>
    <header location="global">src/internal/QmitkRigidRegistrationSelectorView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSliderNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSliderNavigatorWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for demons registration.
 */
-class RIGIDREGISTRATION_EXPORTS QmitkRigidRegistrationSelectorView : public QWidget
+class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationSelectorView : public QWidget
 {
   Q_OBJECT
 
@@ -50,7 +50,7 @@ public:
     void SetMovingNode( mitk::DataTreeNode * movingNode );
     void SetMovingDimension(int dimension );
     int GetSelectedTransform();
-    void CalculateTransformation();
+    void CalculateTransformation(unsigned int timestep);
     void StopOptimization(bool stopOptimization);
 
   protected slots:

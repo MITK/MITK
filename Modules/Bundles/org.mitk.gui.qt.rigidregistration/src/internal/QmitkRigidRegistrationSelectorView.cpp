@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMetricParameters.h"
 #include "mitkOptimizerParameters.h"
 #include "mitkTransformParameters.h"
+#include "mitkImageTimeSelector.h"
 #include "qvalidator.h"
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
@@ -290,13 +291,32 @@ QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
 }
 
 /// this method starts the registration process
-void QmitkRigidRegistrationSelectorView::CalculateTransformation()
+void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int timestep)
 {
   if (m_FixedNode != NULL && m_MovingNode != NULL)
   {
     emit AddNewTransformationToUndoList();
+
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+
+    mitk::ImageTimeSelector::Pointer its = mitk::ImageTimeSelector::New();
+    
+    if(fimage->GetDimension()>3)
+    {
+      its->SetInput(fimage);
+      its->SetTimeNr(timestep);
+      its->Update();
+      fimage = its->GetOutput();
+    }
+
+    if(mimage->GetDimension()>3)
+    {
+      its->SetInput(mimage);
+      its->SetTimeNr(timestep);
+      its->Update();
+      mimage = its->GetOutput();
+    }
 
     // Initial moving image geometry
     m_ImageGeometry = m_MovingNode->GetData()->GetGeometry()->Clone();
@@ -862,7 +882,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
       m_Controls.m_ScalesTranslationTransformTranslationZ->hide();
       m_Controls.textLabel4_4_2->hide();
     }
-    else if (m_FixedDimension == 3)
+    else if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScalesTranslationTransformTranslationZ->show();
       m_Controls.textLabel4_4_2->show();
@@ -876,7 +896,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
       m_Controls.m_ScalesScaleTransformScaleZ->hide();
       m_Controls.textLabel3_5->hide();
     }
-    else if (m_FixedDimension == 3)
+    else if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScalesScaleTransformScaleZ->show();
       m_Controls.textLabel3_5->show();
@@ -890,7 +910,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
       m_Controls.m_ScalesScaleLogarithmicTransformScaleZ->hide();
       m_Controls.textLabel3_5_3->hide();
     }
-    else if (m_FixedDimension == 3)
+    else if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScalesScaleLogarithmicTransformScaleZ->show();
       m_Controls.textLabel3_5_3->show();
@@ -914,7 +934,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
       m_Controls.textLabel6_4->hide();
       m_Controls.textLabel13_2->hide();
     }
-    else if (m_FixedDimension == 3)
+    else if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScalesAffineTransformScale5->show();
       m_Controls.m_ScalesAffineTransformScale6->show();
@@ -948,7 +968,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
       m_Controls.textLabel6_4_2_2->hide();
       m_Controls.textLabel13_2_2_2->hide();
     }
-    else if (m_FixedDimension == 3)
+    else if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale5->show();
       m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale6->show();
@@ -967,56 +987,56 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
   }
   else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_Rigid3DTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::EULER3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_Euler3DTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_CenteredEuler3DTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_QuaternionRigidTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::VERSORTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_VersorFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_VersorRigid3DTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_ScaleSkewVersorRigid3DTransformFrame->show();
     }
   }
   else if (transform == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
   {
-    if (m_FixedDimension == 3)
+    if (m_FixedDimension >= 3)
     {
       m_Controls.m_Similarity3DTransformFrame->show();
     }

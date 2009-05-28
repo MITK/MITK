@@ -49,6 +49,8 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject *parent, const ch
   m_RotateSliderPos[2] = 0;
   translationParams = new int[3];
   rotationParams = new int[3];
+
+  m_TimeStepperAdapter = NULL;
 }
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
@@ -389,6 +391,11 @@ void QmitkRigidRegistrationView::MovingSelected(int)
     m_Controls.m_ShowMovingImage->setEnabled(false);
   }
   this->CheckCalculateEnabled();
+  if(this->GetActiveStdMultiWidget())
+  {
+    m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls.timeSlider, GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromRigidRegistration");
+    connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
+  }
 }
 
 void QmitkRigidRegistrationView::reinitFixedClicked()
@@ -732,11 +739,11 @@ void QmitkRigidRegistrationView::CheckCalculateEnabled()
     && m_Controls.m_RigidTransform->tabText(m_Controls.m_RigidTransform->currentIndex()) != "Manual")
   {
     m_Controls.m_CalculateTransformation->setEnabled(true);
-    if (m_FixedDimension != m_MovingDimension || m_FixedDimension < 2 || m_FixedDimension > 3)
+    if (m_FixedDimension != m_MovingDimension || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
     {
       m_Controls.m_CalculateTransformation->setEnabled(false);
     }
-    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2 || m_FixedDimension > 3))
+    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2) /*|| m_FixedDimension > 3)*/)
     {
       m_Controls.m_CalculateTransformation->setEnabled(false);
     }
@@ -901,7 +908,7 @@ void QmitkRigidRegistrationView::Calculate()
   m_Controls.m_SaveModel->setEnabled(false);
   if (m_Controls.m_RigidTransform->tabText(m_Controls.m_RigidTransform->currentIndex()) == "Automatic")
   {
-    m_Controls.qmitkRigidRegistrationSelector1->CalculateTransformation();
+    m_Controls.qmitkRigidRegistrationSelector1->CalculateTransformation(((QmitkSliderNavigatorWidget*)m_Controls.timeSlider)->GetPos());
   }
   m_Controls.m_StopOptimization->setEnabled(false);
   m_Controls.qmitkRigidRegistrationSelector1->StopOptimization(false);
@@ -932,3 +939,9 @@ void QmitkRigidRegistrationView::StopOptimizationClicked()
 {
   m_Controls.qmitkRigidRegistrationSelector1->StopOptimization(true);
 }
+
+void QmitkRigidRegistrationView::UpdateTimestep()
+{
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+

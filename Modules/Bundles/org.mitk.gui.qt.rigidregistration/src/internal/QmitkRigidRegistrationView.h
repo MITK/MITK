@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../RigidregistrationDll.h"
 
+// Time Slider related
+#include <QmitkStepperAdapter.h>
+
 /*!
 \brief This functionality allows you to register 2D as well as 3D images in a rigid manner.  
 
@@ -39,7 +42,7 @@ Registration results will directly be applied to the Moving Image.
 \author Daniel Stein
 */
 
-class RIGIDREGISTRATION_EXPORTS QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
+class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
 {  
   Q_OBJECT
   
@@ -262,6 +265,8 @@ class RIGIDREGISTRATION_EXPORTS QmitkRigidRegistrationView : public QObject, pub
 
     void StopOptimizationClicked();
 
+    void UpdateTimestep();
+
   protected:
 
     /*!  
@@ -303,6 +308,8 @@ class RIGIDREGISTRATION_EXPORTS QmitkRigidRegistrationView : public QObject, pub
     invisibleNodesList m_InvisibleNodesList;
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
+
+    QmitkStepperAdapter*      m_TimeStepperAdapter;
 };
 
 #endif //QMITKRigidREGISTRATION_H

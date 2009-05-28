@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _RIGIDREGISTRATION_EXPORTS_DLL_H_
-#define _RIGIDREGISTRATION_EXPORTS_DLL_H_
+#ifndef _RIGIDREGISTRATION_EXPORT_DLL_H_
+#define _RIGIDREGISTRATION_EXPORT_DLL_H_
 
 
 //
@@ -30,15 +30,15 @@ PURPOSE.  See the above copyright notices for more information.
 //
 #if defined(_WIN32) && !defined(MITK_STATIC)
   #if defined(org_mitk_gui_qt_rigidregistration_EXPORTS)
-    #define RIGIDREGISTRATION_EXPORTS __declspec(dllexport)
+    #define RIGIDREGISTRATION_EXPORT __declspec(dllexport)
   #else
-    #define RIGIDREGISTRATION_EXPORTS __declspec(dllimport)
+    #define RIGIDREGISTRATION_EXPORT __declspec(dllimport)
   #endif
 #endif
 
 
-#if !defined(RIGIDREGISTRATION_EXPORTS)
-  #define RIGIDREGISTRATION_EXPORTS
+#if !defined(RIGIDREGISTRATION_EXPORT)
+  #define RIGIDREGISTRATION_EXPORT
 #endif
 
-#endif /*_RIGIDREGISTRATION_EXPORTS_DLL_H_*/
+#endif /*_RIGIDREGISTRATION_EXPORT_DLL_H_*/

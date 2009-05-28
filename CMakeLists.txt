@@ -6,6 +6,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf)
 
 # Clear the cache variables containing plugin base directories
 SET(MITK_MODULES_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)

@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _MBI_QMITKEXT_EXPORTS_DLL_H_
-#define _MBI_QMITKEXT_EXPORTS_DLL_H_
+#ifndef _MBI_QMITKEXT_EXPORT_DLL_H_
+#define _MBI_QMITKEXT_EXPORT_DLL_H_
 
 
 //
@@ -41,4 +41,4 @@ PURPOSE.  See the above copyright notices for more information.
   #define ORG_MITK_GUI_QT_EXT_EXPORT
 #endif
 
-#endif /*_MBI_SANDBOX_EXPORTS_DLL_H_*/
+#endif /*_MBI_SANDBOX_EXPORT_DLL_H_*/

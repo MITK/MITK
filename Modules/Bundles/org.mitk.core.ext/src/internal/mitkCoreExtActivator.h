@@ -31,7 +31,7 @@ namespace mitk
  *
  * \brief The plug-in activator for the CoreExt module
  *
- * When the plug-in is started by the framework, it initialzes CoreExt
+ * When the plug-in is started by the framework, it initializes CoreExt
  * specific things.
  */
 class MITKCOREEXT_EXPORT CoreExtActivator : public cherry::Plugin

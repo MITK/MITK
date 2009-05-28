@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKSTDMULTIWIDGETEDITOR_H_
 
 #include <cherryQtEditorPart.h>
+#include <cherryIPartListener.h>
 
 #include <QmitkStdMultiWidget.h>
 
 #include "mitkQtAppDll.h"
 
-class MITK_QT_APP QmitkStdMultiWidgetEditor : public cherry::QtEditorPart
+class MITK_QT_APP QmitkStdMultiWidgetEditor : public cherry::QtEditorPart, virtual public cherry::IPartListener
 {
 public:
   cherryObjectMacro(QmitkStdMultiWidgetEditor);
@@ -48,6 +49,8 @@ public:
 protected:
 
   void CreateQtPartControl(QWidget* parent);
+  // IPartListener
+  virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
 
 private:
 

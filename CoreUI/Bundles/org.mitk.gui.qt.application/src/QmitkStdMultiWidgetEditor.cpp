@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidgetEditor.h"
 
 #include <cherryUIException.h>
+#include <cherryIWorkbenchPage.h>
 
 #include <QWidget>
 
@@ -88,8 +89,21 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     mitk::GlobalInteraction::GetInstance()->AddListener(
         m_StdMultiWidget->GetMoveAndZoomInteractor()
       );
+    this->GetSite()->GetPage()->AddPartListener(cherry::IPartListener::Pointer(this));
   }
+}
 
+void QmitkStdMultiWidgetEditor::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
+{
+  if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+  {
+    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+    if (m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
+    {
+      m_StdMultiWidget->RemovePlanesFromDataStorage();
+    }
+  }
 }
 
 void QmitkStdMultiWidgetEditor::SetFocus()

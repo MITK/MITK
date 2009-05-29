@@ -90,6 +90,7 @@ public:
 
   void AddPlanesToDataStorage();
 
+  void SetDataStorage( mitk::DataStorage* ds );
 
 public slots:
 
@@ -118,8 +119,6 @@ public slots:
   void changeLayoutTo2x2Dand3DWidget();
 
   void changeLayoutToLeft2Dand3DRight2D();
-
-  void SetDataStorage( mitk::DataStorage* ds );
 
   void Fit();
 

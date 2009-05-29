@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraRotationController.h"
 
+#include "QmitkRenderWindowMenu.h"
+
 /**
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
@@ -79,6 +81,12 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* event);
     // overloaded key press handler
     virtual void keyPressEvent(QKeyEvent* event);
+
+    // overloaded enter handler
+    virtual void enterEvent(QEvent*);
+    // overloaded leave handler
+    virtual void leaveEvent(QEvent*);
+
 #ifndef QT_NO_WHEELEVENT
     // overload wheel mouse event
     virtual void wheelEvent(QWheelEvent*);
@@ -86,14 +94,16 @@ protected:
 
 
 private:
+  
   mitk::VtkPropRenderer::Pointer m_Renderer;
+
   vtkMitkRenderProp*             m_RenderProp;
 
   bool                           m_InResize;
 
   bool                           m_ResendQtEvents;
 
-
+  QmitkRenderWindowMenu*              m_MenuWidget;
 
 };
 

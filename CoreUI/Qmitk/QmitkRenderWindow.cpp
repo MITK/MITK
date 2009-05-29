@@ -32,10 +32,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
 
+#include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
 : QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true)
-
 {
   if(m_Renderer.IsNull())
   {
@@ -60,7 +60,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
 
-  m_InResize = false;
+  m_InResize = false;  
+
+  //crate Renderwindow MenuBar for split, close Window or set new setting.
+  m_MenuWidget = new QmitkRenderWindowMenu(this);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -155,6 +158,34 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   }
 
   if (m_ResendQtEvents) ke->ignore();
+}
+
+void QmitkRenderWindow::enterEvent( QEvent *e )
+{
+  QVTKWidget::enterEvent(e);
+
+  //show Menu Widget
+  if( m_MenuWidget->isHidden() )
+  {
+    /* //Window position. Is used, if m_MenuWidge is a Window and not a Widget.
+    QPoint widgetOrigin = this->mapToGlobal( this->geometry().topLeft() );
+    int moveX = floor( double( widgetOrigin.x() + ( this->width() - m_MenuWidget->width() - 6.0 ) ) );*/
+
+    int moveX= floor( double(this->width() - m_MenuWidget->width() - 4.0) );
+    m_MenuWidget->move( moveX, 3 );
+
+    m_MenuWidget->show();
+    m_MenuWidget->update();
+  }
+}
+
+void QmitkRenderWindow::leaveEvent( QEvent *e )
+{
+  QVTKWidget::leaveEvent(e);
+
+  //hide Menu Widget
+  if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() )
+    m_MenuWidget->hide();
 }
 
 void QmitkRenderWindow::InitRenderer()

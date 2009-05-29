@@ -52,7 +52,8 @@ void QmitkFileOpenAction::Run()
   if (dialog.exec())
     fileNames = dialog.selectedFiles();
 
-  if (fileNames.empty()) return;
+  if (fileNames.empty()) 
+    return;
 
   mitk::DataStorageEditorInput::Pointer editorInput;
   mitk::DataStorage::Pointer dataStorage;
@@ -79,9 +80,7 @@ void QmitkFileOpenAction::Run()
       nodeReader->SetFileName(fileName->toStdString());
       nodeReader->Update();
       node = nodeReader->GetOutput();
-      std::cout << "node name on line 78: " << node->GetName() << std::endl;
       dataStorage->Add(node);
-      std::cout << "node name on line 80: " << node->GetName() << std::endl;
     }
     catch(...)
     {

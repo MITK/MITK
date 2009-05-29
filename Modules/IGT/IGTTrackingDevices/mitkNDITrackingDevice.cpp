@@ -715,7 +715,10 @@ void mitk::NDITrackingDevice::TrackTools()
 
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
-    return;     // how can this thread tell the application, that an error has occured?
+  {
+    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
+    return;     // how can this thread tell the application, that an error has occurred?
+  }
 
   m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread

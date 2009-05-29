@@ -12,6 +12,8 @@
 #include "mitkDelegateManager.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkProperties.h"
 //## Qmitk
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageTableModel.h>
@@ -435,8 +437,13 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 
 void QmitkDataManagerView::BtnGlobalReinitClicked( bool checked /*= false */ )
 {
-  mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDataStorage()
-    ->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll()));
+  /* get all nodes that have not set "includeInBoundingBox" to false */
+  mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+  /* calculate bounding geometry of these nodes */
+  mitk::Geometry3D::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  /* initialize the views to the bounding geometry */
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
 void QmitkDataManagerView::ActionSaveToPacsTriggered ( bool checked )

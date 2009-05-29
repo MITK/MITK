@@ -99,7 +99,6 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(levelWindowWidget->sizePolicy().hasHeightForWidth());
   levelWindowWidget->setSizePolicy(sizePolicy);
-  levelWindowWidget->setMinimumSize(QSize(0, 50));
   levelWindowWidget->setMaximumSize(QSize(50, 2000));
 
   //add LevelWindow Widget to mainSplitter

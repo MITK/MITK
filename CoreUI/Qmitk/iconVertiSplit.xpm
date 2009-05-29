@@ -1,5 +1,5 @@
 /* XPM */
-static char * iconVertiSplit_xpm[] = {
+static const char * iconVertiSplit_xpm[] = {
 "32 32 3 1",
 " 	c None",
 ".	c #6999D1",

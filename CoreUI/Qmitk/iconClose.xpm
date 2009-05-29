@@ -1,5 +1,5 @@
 /* XPM */
-static char * iconClose_xpm[] = {
+static const char * iconClose_xpm[] = {
 "32 32 256 2",
 "  	c #EEB9B9",
 ". 	c #E6E3E3",

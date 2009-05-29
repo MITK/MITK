@@ -1,5 +1,5 @@
 /* XPM */
-static char * iconFullScreen_xpm[] = {
+static const  char * iconFullScreen_xpm[] = {
 "32 32 2 1",
 " 	c #6999D1",
 ".	c #000000",

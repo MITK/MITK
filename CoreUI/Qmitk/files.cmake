@@ -16,6 +16,7 @@ QmitkLineEditLevelWindowWidget.cpp
 QmitkPointListModel.cpp
 QmitkPointListView.cpp
 QmitkPointListWidget.cpp
+QmitkRenderWindowMenu.cpp
 QmitkPropertiesTableEditor.cpp
 QmitkPropertiesTableModel.cpp
 QmitkPropertyDelegate.cpp
@@ -44,6 +45,7 @@ QmitkLineEditLevelWindowWidget.h
 QmitkPointListModel.h
 QmitkPointListView.h
 QmitkPointListWidget.h
+QmitkRenderWindowMenu.h
 QmitkPropertiesTableEditor.h
 QmitkPropertiesTableModel.h
 QmitkPropertyDelegate.h
@@ -59,3 +61,6 @@ QmitkLevelWindowPresetDefinition.ui  QmitkLevelWindowWidget.ui
 QmitkLevelWindowRangeChange.ui        QmitkStdMultiWidget.ui
 )
 
+SET(RES_FILES
+  icon/Rendering.qrc
+)

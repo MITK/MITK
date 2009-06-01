@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: Cherry Core Commands Plugin
+Bundle-Name: openCherry Core Commands Plugin
 Bundle-SymbolicName: org.opencherry.core.commands
 Bundle-Version: 1.0.0
 Require-Bundle: org.opencherry.osgi

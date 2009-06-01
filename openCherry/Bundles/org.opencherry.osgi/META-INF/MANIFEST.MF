@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: OSGi System Bundle
+Bundle-Name: openCherry OSGi System Bundle
 Bundle-SymbolicName: org.opencherry.osgi
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: Cherry Core Expressions Plugin
+Bundle-Name: openCherry Core Expressions Plugin
 Bundle-SymbolicName: org.opencherry.core.expressions
 Bundle-Version: 1.0.0
 Require-Bundle: org.opencherry.osgi, org.opencherry.core.runtime

@@ -4,7 +4,7 @@
 #
 # MACRO_COLLECT_PLUGINS(OUTPUT_DIR plugin_output_dir
 #                       [CACHE_PLUGIN_SOURCE_DIRS cache_src_dirs]
-#                       [CACHE_PLUGIN_OUTPUT_DIRS cache_bin_dirs]
+#                       [CACHE_PLUGIN_OUTPUT_DIRS cache_out_dirs]
 #                       [CACHE_PLUGIN_TARGETS cache_plugin_targets]
 #                       [BUNDLE_LIST_PATH bundle_list_path]
 #                       [CMAKE_CACHE_PREFIX cache_prefix]
@@ -112,7 +112,7 @@ FILE(GLOB all_dirs RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
 FOREACH(dir_relative_entry ${all_dirs})
   SET(dir_entry "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
   IF(EXISTS "${dir_entry}/META-INF/MANIFEST.MF")
-    MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF")
+    MACRO_PARSE_MANIFEST("${dir_entry}/META-INF/MANIFEST.MF" OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${dir_relative_entry}")
     
     IF(BUNDLE-SYMBOLICNAME)
     
@@ -128,11 +128,13 @@ FOREACH(dir_relative_entry ${all_dirs})
 	  # i.e. a build option will be displayed and internal variables are set
 	  
       SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR "${dir_entry}")
-      SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR "${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}")
+      SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/${dir_relative_entry}")
+      SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR "${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}")
       # write the variable in .cmake file, so external projects have access to them
       SET(OPENCHERRY_BUNDLE_VARIABLES "${OPENCHERRY_BUNDLE_VARIABLES}
-SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${dir_entry}\")
-SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}\")")
+SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${${BUNDLE-SYMBOLICNAME}_SRC_DIR}\")
+SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${${BUNDLE-SYMBOLICNAME}_BIN_DIR}\")
+SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR \"${${BUNDLE-SYMBOLICNAME}_OUT_DIR}\")")
       
 	  # compute the default for the build option (ON/OFF)
       SET(_default_bundle_option ${_COLLECT_DEFAULT_BUILD_ON})
@@ -159,9 +161,7 @@ SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)")
 	    # the build option for the bundle is off, hence we delete the MANIFEST.MF
 		# file in the output directory to prevent the bundle loader from finding
 		# the disabled bundle.
-        FILE(RELATIVE_PATH _binary_manifest_path "${CMAKE_CURRENT_SOURCE_DIR}" "${dir_entry}/META-INF/MANIFEST.MF")
-        SET(_binary_manifest_path "${_COLLECT_OUTPUT_DIR}/${_binary_manifest_path}")
-        FILE(REMOVE "${_binary_manifest_path}")
+        FILE(REMOVE "${${BUNDLE-SYMBOLICNAME}_OUT_DIR}/META-INF/MANIFEST.MF")
       ENDIF()
       ENDIF()
       ENDIF()
@@ -175,6 +175,8 @@ LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
 
 SET(PLUGIN_TARGETS "" CACHE INTERNAL "Temporary list of plug-in targets")
 FOREACH(_subdir ${ENABLED_PLUGINS_RELATIVE_DIRS})
+  INCLUDE("${CMAKE_CURRENT_BINARY_DIR}/${_subdir}/Manifest.cmake")
+  #MACRO_PARSE_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}/${_subdir}/META-INF/MANIFEST.MF")
   ADD_SUBDIRECTORY(${_subdir})
 ENDFOREACH(_subdir ${ENABLED_PLUGINS_RELATIVE_DIRS})
 

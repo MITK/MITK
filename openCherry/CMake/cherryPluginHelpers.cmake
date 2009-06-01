@@ -22,42 +22,6 @@ MACRO(_MACRO_CREATE_PLUGIN_NAME output_name)
 
 ENDMACRO()
 
-
-# sets pluginpath to the absolut path of the plugins source directory
-#
-# pluginname: the unique plugin id (i.e. org.opencherry.osgi)
-#
-MACRO(_MACRO_FIND_PLUGIN_SRC_DIR pluginpath pluginname)
-
-  #FOREACH(plugindir ${OPENCHERRY_PLUGIN_SOURCE_DIRS})
-  #  IF(EXISTS ${plugindir}/${ARGV1})
-  #    SET(${pluginpath} ${plugindir}/${ARGV1})
-  #  ENDIF(EXISTS ${plugindir}/${ARGV1})
-  #ENDFOREACH(plugindir ${OPENCHERRY_PLUGIN_SOURCE_DIRS})
-
-  SET(${pluginpath} "${${ARGV1}_SRC_DIR}")
-
-  #MESSAGE(STATUS "Found plugin src dir: ${${pluginpath}}")
-
-ENDMACRO()
-
-# sets pluginpath to the absolut path of the plugins binary output directory
-#
-# pluginname: the unique plugin id (i.e. org.opencherry.osgi)
-#
-MACRO(_MACRO_FIND_PLUGIN_BIN_DIR pluginpath pluginname)
-
-  #FOREACH(plugindir ${OPENCHERRY_PLUGIN_BINARY_DIRS})
-  #  IF(EXISTS ${plugindir}/${ARGV1})
-  #    SET(${pluginpath} ${plugindir}/${ARGV1})
-  #  ENDIF(EXISTS ${plugindir}/${ARGV1})
-  #ENDFOREACH(plugindir ${OPENCHERRY_PLUGIN_BINARY_DIRS})
-  SET(${pluginpath} "${${ARGV1}_BIN_DIR}")
-
-  #MESSAGE(STATUS "Found plugin bin dir: ${${pluginpath}}")
-
-ENDMACRO()
-
 MACRO(_MACRO_REQUIRED_BUNDLES_LIST output_list input_file)
 
   SET(_file "${input_file}")
@@ -76,6 +40,8 @@ MACRO(_MACRO_REQUIRED_BUNDLES_LIST output_list input_file)
   ENDFOREACH(_dep ${_reqb_dependencies})
 ENDMACRO()
 
+
+
 # _MACRO_SETUP_PLUGIN_DEPENDENCIES(
 #      _explicit_libs
 #      PLUGIN_NAME _plugin_name
@@ -83,13 +49,9 @@ ENDMACRO()
 #
 MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
 
-  MACRO_PARSE_ARGUMENTS(_FIND_DEPS "PLUGIN_NAME" "" ${ARGN})
-
-  SET(_plugin_src_dir )
-  _MACRO_FIND_PLUGIN_SRC_DIR(_plugin_src_dir ${_FIND_DEPS_PLUGIN_NAME})
-
-  SET(_plugin_dependencies )
-  _MACRO_REQUIRED_BUNDLES_LIST(_plugin_dependencies "${_plugin_src_dir}/META-INF/MANIFEST.MF")
+  SET(_plugin_src_dir ${${BUNDLE-SYMBOLICNAME}_SRC_DIR})
+  SET(_plugin_dependencies ${REQUIRE-BUNDLE})
+  SET(_bundle_id ${BUNDLE-SYMBOLICNAME})
   
   FOREACH(_dep ${_plugin_dependencies})
     STRING(REPLACE . _ _dep_target ${_dep})
@@ -103,16 +65,17 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
     
     FOREACH(_dep ${_plugin_dependencies})
 
-        SET(_plugin_src_dir )
-        _MACRO_FIND_PLUGIN_SRC_DIR(_plugin_src_dir ${_dep})
-
+        SET(_plugin_src_dir ${${_dep}_SRC_DIR})
+        
         IF(NOT _plugin_src_dir)
           MESSAGE(SEND_ERROR "Plug-in dependency \"${_dep}\" does not seem to exist.")
           SET(_dep_error 1)
           BREAK()
         ENDIF()
 
-        _MACRO_REQUIRED_BUNDLES_LIST(_plugin_dependencies "${_plugin_src_dir}/META-INF/MANIFEST.MF")
+       #_MACRO_REQUIRED_BUNDLES_LIST(_plugin_dependencies "${_plugin_src_dir}/META-INF/MANIFEST.MF")
+       INCLUDE(${${_dep}_BIN_DIR}/RequireBundle.cmake)
+       LIST(APPEND _plugin_dependencies ${REQUIRE-BUNDLE})
 
     ENDFOREACH()
     
@@ -133,12 +96,10 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
         ENDIF()
     
         # set include and link directories
-        SET(_dep_src_dir )
-        SET(_dep_bin_dir )
-        _MACRO_FIND_PLUGIN_SRC_DIR(_dep_src_dir ${_dep})
-        _MACRO_FIND_PLUGIN_BIN_DIR(_dep_bin_dir ${_dep})
-    
-        LINK_DIRECTORIES(${_dep_bin_dir}/bin)
+        SET(_dep_src_dir ${${_dep}_SRC_DIR})
+        SET(_dep_out_dir ${${_dep}_OUT_DIR})
+        
+        LINK_DIRECTORIES(${_dep_out_dir}/bin)
         INCLUDE_DIRECTORIES(${_dep_src_dir}/src)
     
         IF(EXISTS ${_dep_src_dir}/includes.cmake)
@@ -154,11 +115,11 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
       ENDFOREACH(_dep ${_plugin_dependencies})
       
       IF(_plugins_turned_off)
-        MESSAGE(SEND_ERROR "Unmet dependencies: The plugin ${_FIND_DEPS_PLUGIN_NAME} depends on the following plugins:\n${_plugins_turned_off}.\nSwitch them on in order to build ${_FIND_DEPS_PLUGIN_NAME}.")
+        MESSAGE(SEND_ERROR "Unmet dependencies: The plugin ${_bundle_id} depends on the following plugins:\n${_plugins_turned_off}.\nSwitch them on in order to build ${_FIND_DEPS_PLUGIN_NAME}.")
       ENDIF(_plugins_turned_off)
   ENDIF()
 
-ENDMACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES)
+ENDMACRO()
 
 MACRO(_MACRO_ENABLE_QT4_PLUGINS)
 

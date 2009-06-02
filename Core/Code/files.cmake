@@ -18,6 +18,7 @@ SET(CPP_FILES
   Algorithms/mitkPointSetSource.cpp
   Algorithms/mitkSubImageSelector.cpp
   Algorithms/mitkSurfaceSource.cpp
+  Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
   Controllers/mitkBaseController.cpp

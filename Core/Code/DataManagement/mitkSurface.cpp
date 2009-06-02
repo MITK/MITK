@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkSurfaceOperation.h"
 
+
 mitk::Surface::Surface() : m_CalculateBoundingBox( false )
 {
   m_Initialized = false;
@@ -216,8 +217,24 @@ void mitk::Surface::SetRequestedRegion(Surface::RegionType *region)  //by arin
   }
 }
 
-void mitk::Surface::CopyInformation( const itk::DataObject * )
-{}
+void mitk::Surface::CopyInformation( const itk::DataObject * data)
+{
+  Superclass::CopyInformation( data );
+
+  const mitk::Surface* surfaceData;
+
+  surfaceData = dynamic_cast<const mitk::Surface*>( data );
+
+  if ( surfaceData )
+  {
+    m_LargestPossibleRegion = surfaceData->GetLargestPossibleRegion();
+  }
+  else
+  {
+    // pointer could not be cast back down
+    itkExceptionMacro( << "mitk::Surface::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(surfaceData).name() );
+  }
+}
 
 void mitk::Surface::Update()
 {
@@ -339,4 +356,44 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
     break;
   }
   this->Modified();
+}
+
+unsigned int mitk::Surface::GetNumberOfPolyDatas() const
+{
+  return m_PolyDataSeries.size();
+}
+
+void mitk::Surface::Graft( const DataObject* data )
+{
+  const Self* surface;
+  try 
+  {
+    surface = dynamic_cast<const Self*>( data );
+  }
+  catch(...)
+  {
+    itkExceptionMacro( << "mitk::Surface::Graft cannot cast "
+      << typeid(data).name() << " to "
+      << typeid(const Self *).name() );
+    return;    
+  }
+
+  if(!surface)
+  {
+    // pointer could not be cast back down
+    itkExceptionMacro( << "mitk::Surface::Graft cannot cast "
+      << typeid(data).name() << " to "
+      << typeid(const Self *).name() );
+    return;
+  }
+
+  this->CopyInformation( data );
+  //clear list of PolyData's
+  m_PolyDataSeries.clear();
+  // do copy
+  for (int i=0; i<surface->GetNumberOfPolyDatas(); i++)
+    {
+      m_PolyDataSeries.push_back(vtkPolyData::New());
+      m_PolyDataSeries.back()->CopyStructure( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );
+    }
 }

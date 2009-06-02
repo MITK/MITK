@@ -64,9 +64,13 @@ namespace mitk {
 
     virtual bool IsEmpty(unsigned int t) const;
 
+    unsigned int GetNumberOfPolyDatas() const;
+
     virtual void Update();
 
     virtual void Expand( unsigned int timeSteps = 1 );
+
+    virtual void Graft( const DataObject* data );
 
     const RegionType& GetLargestPossibleRegion() const
     {

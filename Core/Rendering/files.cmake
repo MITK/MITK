@@ -27,6 +27,7 @@ SET(CPP_FILES
   mitkUnstructuredGridMapper2D.cpp
   mitkPointSetVtkMapper3D.cpp
   mitkPolyDataGLMapper2D.cpp
+  mitkSceneDistortionRendering.cpp
   mitkSplineMapper2D.cpp
   mitkSplineVtkMapper3D.cpp
   mitkSurfaceMapper2D.cpp
@@ -40,6 +41,7 @@ SET(CPP_FILES
   mitkVtkWidgetRendering.cpp
   mitkColoredRectangleRendering.cpp
   vtkMitkRectangleProp.cpp
+  vtkMitkSceneDistortionProp.cpp
   vtkUnstructuredGridMapper.cpp
 )
 

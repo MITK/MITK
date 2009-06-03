@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
     #ifdef @MODULE_PROVIDES@_EXPORTS
 	  #define @MODULE_EXPORT_DEFINE@ __declspec(dllexport)
     #else
-	  #define MODULE_EXPORT_DEFINE@ __declspec(dllimport)
+	  #define @MODULE_EXPORT_DEFINE@ __declspec(dllimport)
     #endif
   #else
     #define @MODULE_EXPORT_DEFINE@

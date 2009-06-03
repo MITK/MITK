@@ -8,6 +8,8 @@ of release notes for the next release.
 
 ======== New stuff only in the SVN trunk ========
 
+- more flexible GUI presentation of renderwindows
+
 ======== Changes in release 0.12 (2009-May-08) ========
 
 - Application module "deformable registration"

@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkBSplineRegistrationViewControls.h"
 #include "mitkBSplineRegistration.h"
 #include "itkImageFileReader.h"
+#include "mitkOptimizerParameters.h"
 
 typedef itk::Vector< float, 3 >       VectorType;
 typedef itk::Image< VectorType, 3 >   DeformationFieldType;

@@ -74,13 +74,13 @@ QmitkLoadPresetDialog::~QmitkLoadPresetDialog()
 
 std::string QmitkLoadPresetDialog::GetPresetName()
 {
-  std::string presetName = lstPresets->currentItem()->text().toLatin1();
+  std::string presetName = std::string(lstPresets->currentItem()->text().toAscii());
   return presetName;
 }
 
 void QmitkLoadPresetDialog::onPresetImmediatelySelected(QListWidgetItem * )
 {
-  if ( (signed)(lstPresets->currentItem()) != (signed)(lstPresets->count()-1) )
+  if ( (signed int)(lstPresets->currentItem()) != (signed int)(lstPresets->count()-1) )
   {
     accept(); // close
   }

@@ -80,7 +80,7 @@ std::string QmitkLoadPresetDialog::GetPresetName()
 
 void QmitkLoadPresetDialog::onPresetImmediatelySelected(QListWidgetItem * )
 {
-  if ( (signed int)(lstPresets->currentItem()) != (signed int)(lstPresets->count()-1) )
+  if ( (signed)(lstPresets->row(lstPresets->currentItem())) != (signed)(lstPresets->count()-1) )
   {
     accept(); // close
   }

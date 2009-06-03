@@ -279,35 +279,27 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 
 void QmitkDataManagerView::SaveActionTriggered(bool checked)
 {
-  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
-  std::vector<mitk::DataTreeNode*> selectedNodes;
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
 
   mitk::DataTreeNode* node = 0;
-  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
-    ; it != indexesOfSelectedRows.end(); it++)
+  unsigned int indexesOfSelectedRowsSize = indexesOfSelectedRows.size();
+  for (unsigned int i = 0; i<indexesOfSelectedRowsSize; ++i)
   {
-    node = m_NodeTableModel->GetNode(*it);
+    node = m_NodeTableModel->GetNode(indexesOfSelectedRows.at(i));
     // if node is not defined or if the node contains geometry data do not remove it
     if ( node != 0 )
-      selectedNodes.push_back(node);
-  }
-
-  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
-    ; it != selectedNodes.end(); it++)
-  {
-    node = *it;
-    mitk::BaseData::Pointer data = node->GetData();
-
-    if (data.IsNotNull())
     {
-      CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+      mitk::BaseData::Pointer data = node->GetData();
+      if (data.IsNotNull())
+        CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
     }
   }
+
 }
 
 void QmitkDataManagerView::ActionReinitTriggered( bool checked /*= false */ )
 {
-  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
   std::vector<mitk::DataTreeNode*> selectedNodes;
 
   mitk::DataTreeNode* node = 0;
@@ -371,7 +363,7 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
 
 void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked /*= false */ )
 {
-  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedIndexes();
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
   std::vector<mitk::DataTreeNode*> selectedNodes;
 
   mitk::DataTreeNode* node = 0;

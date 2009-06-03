@@ -138,7 +138,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
       if(image.IsNotNull())
       {
-        fileNameUsed = CommonFunctionality::SaveImage(image);
+        fileNameUsed = CommonFunctionality::SaveImage(image, aFileName, true);
         if(!(fileNameUsed.length()>0)){
           return;
         } else {

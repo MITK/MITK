@@ -4,6 +4,7 @@ SET(CPP_FILES
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
+  Algorithms/mitkBSplineRegistration.cpp
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkCallbackFromGUIThread.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp

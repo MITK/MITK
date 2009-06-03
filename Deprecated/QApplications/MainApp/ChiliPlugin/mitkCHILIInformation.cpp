@@ -75,14 +75,30 @@ std::cout << "*** In CHILIInformation::GetStudyInformation" << std::endl;
   // remember OID for UID
   ChiliPlugin::GetChiliPluginInstance()->UpdateStudyOIDForInstanceUID( study.oid, study.instanceUID );
 
-  resultInformation.StudyInstanceUID = study.instanceUID;
-  resultInformation.StudyID = study.id;
-  resultInformation.StudyDate = study.date;
-  resultInformation.StudyTime = study.time;
-  resultInformation.AccessionNumber = study.accessionNumber;
-  resultInformation.ModalitiesInStudy = study.modality;
-  resultInformation.ReferringPhysician = study.referingPhysician;
-  resultInformation.StudyDescription = study.description;
+  if (study.instanceUID)
+    resultInformation.StudyInstanceUID = study.instanceUID;
+
+  if (study.id)
+    resultInformation.StudyID = study.id;
+
+  if (study.date)
+    resultInformation.StudyDate = study.date;
+
+  if (study.time)
+    resultInformation.StudyTime = study.time;
+
+  if (study.accessionNumber)
+    resultInformation.AccessionNumber = study.accessionNumber;
+
+  if (study.modality)
+    resultInformation.ModalitiesInStudy = study.modality;
+
+  if (study.referingPhysician)
+    resultInformation.ReferringPhysician = study.referingPhysician;
+
+  if (study.description)
+    resultInformation.StudyDescription = study.description;
+
   // PS 3.3 2008 Annex C.7.2.1.1.1 defines only referring physician, physician of record, performing physician and reading physician
   //resultInformation.ReportingPhysician = study.reportingPhysician; // TODO CHILI should clarify the meaning of the corresponding field in study_t, perhaps we can add it to PACSPlugin::StudyInformation
 
@@ -131,12 +147,23 @@ mitk::PACSPlugin::PatientInformation mitk::CHILIInformation::GetPatientInformati
     }
   }
 
-  resultInformation.PatientsName = patient.name;
-  resultInformation.PatientID = patient.id;
-  resultInformation.PatientsBirthDate = patient.birthDate;
-  resultInformation.PatientsBirthTime = patient.birthTime;
-  resultInformation.PatientsSex = patient.sex;
-  resultInformation.PatientComments = patient.comment;
+  if (patient.name)
+    resultInformation.PatientsName = patient.name;
+
+  if (patient.id)
+    resultInformation.PatientID = patient.id;
+
+  if (patient.birthDate)
+    resultInformation.PatientsBirthDate = patient.birthDate;
+
+  if (patient.birthTime)
+    resultInformation.PatientsBirthTime = patient.birthTime;
+
+  if (patient.sex)
+    resultInformation.PatientsSex = patient.sex;
+
+  if (patient.comment)
+    resultInformation.PatientComments = patient.comment;
 
   clearStudyStruct( &study );
   clearSeriesStruct( &series );
@@ -180,18 +207,34 @@ mitk::PACSPlugin::SeriesInformation mitk::CHILIInformation::GetSeriesInformation
   // remember OID for UID
   ChiliPlugin::GetChiliPluginInstance()->UpdateSeriesOIDForInstanceUID( series.oid, series.instanceUID );
 
-  resultInformation.SeriesInstanceUID = series.instanceUID;
+  if (series.instanceUID)       
+    resultInformation.SeriesInstanceUID = series.instanceUID;
+
   resultInformation.SeriesNumber = series.number;
   resultInformation.AcquisitionNumber = series.acquisition;
   resultInformation.EchoNumber = series.echoNumber;
   resultInformation.TemporalPosition = series.temporalPosition;
-  resultInformation.SeriesDate = series.date;
-  resultInformation.SeriesTime = series.time;
-  resultInformation.SeriesDescription = series.description;
-  resultInformation.ContrastAgent = series.contrast;
-  resultInformation.BodyPartExamined = series.bodyPartExamined;
-  resultInformation.ScanningSequence = series.scanningSequence;
-  resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
+
+  if (series.date)       
+    resultInformation.SeriesDate = series.date;
+
+  if (series.time)       
+    resultInformation.SeriesTime = series.time;
+
+  if (series.description)       
+    resultInformation.SeriesDescription = series.description;
+
+  if (series.contrast)       
+    resultInformation.ContrastAgent = series.contrast;
+
+  if (series.bodyPartExamined)       
+    resultInformation.BodyPartExamined = series.bodyPartExamined;
+
+  if (series.scanningSequence)       
+    resultInformation.ScanningSequence = series.scanningSequence;
+
+  if (series.frameOfReferenceUID)       
+    resultInformation.FrameOfReferenceUID = series.frameOfReferenceUID;
 
   clearSeriesStruct( &series );
   return resultInformation;
@@ -227,20 +270,40 @@ ipBool_t mitk::CHILIInformation::GlobalIterateSeries( int /*rows*/, int /*row*/,
   // remember OID for UID
   ChiliPlugin::GetChiliPluginInstance()->UpdateSeriesOIDForInstanceUID( series->oid, series->instanceUID );
 
-  newSeries.SeriesInstanceUID = series->instanceUID;
-  newSeries.SeriesNumber = series->number;
-  newSeries.SeriesDate = series->date;
-  newSeries.SeriesTime = series->time;
-  newSeries.SeriesDescription = series->description;
-  newSeries.BodyPartExamined = series->bodyPartExamined;
-  newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
-  newSeries.AcquisitionNumber = series->acquisition;
-  newSeries.ContrastAgent = series->contrast;
-  newSeries.ScanningSequence = series->scanningSequence;
-  newSeries.EchoNumber = series->echoNumber;
-  newSeries.TemporalPosition = series->temporalPosition;
-  //add to list
-  callingObject->m_SeriesInformationList.push_back( newSeries );
+  if (series)
+  {
+    if (series->instanceUID)       
+      newSeries.SeriesInstanceUID = series->instanceUID;
+
+    newSeries.SeriesNumber = series->number;
+    newSeries.AcquisitionNumber = series->acquisition;
+    newSeries.EchoNumber = series->echoNumber;
+    newSeries.TemporalPosition = series->temporalPosition;
+
+    if (series->date)       
+      newSeries.SeriesDate = series->date;
+
+    if (series->time)       
+      newSeries.SeriesTime = series->time;
+
+    if (series->description)       
+      newSeries.SeriesDescription = series->description;
+
+    if (series->contrast)       
+      newSeries.ContrastAgent = series->contrast;
+
+    if (series->bodyPartExamined)       
+      newSeries.BodyPartExamined = series->bodyPartExamined;
+
+    if (series->scanningSequence)       
+      newSeries.ScanningSequence = series->scanningSequence;
+
+    if (series->frameOfReferenceUID)       
+      newSeries.FrameOfReferenceUID = series->frameOfReferenceUID;
+
+    //add to list
+    callingObject->m_SeriesInformationList.push_back( newSeries );
+  }
 
   return ipTrue; // true = next element; false = break iterate
 }
@@ -268,9 +331,14 @@ mitk::PACSPlugin::DocumentInformation mitk::CHILIInformation::GetDocumentInforma
 
   resultInformation.SeriesInstanceUID = seriesInstanceUID;
   resultInformation.InstanceNumber = textInstanceNumber;
-  resultInformation.MimeType = text.mime_type;
-  resultInformation.ContentDate = text.text_date;
-  resultInformation.DocumentTitle = text.description;
+  if (text.mime_type)
+    resultInformation.MimeType = text.mime_type;
+  
+  if (text.text_date)
+    resultInformation.ContentDate = text.text_date;
+  
+  if (text.description)
+    resultInformation.DocumentTitle = text.description;
 
   clearTextStruct( &text );
   return resultInformation;
@@ -313,12 +381,19 @@ ipBool_t mitk::CHILIInformation::GlobalIterateText( int /*rows*/, int /*row*/, t
     //create new element and fill
     PACSPlugin::DocumentInformation resultText;
     // InstanceNumber will be filled out by calling method GetDocumentInformationList
-    resultText.MimeType = text->mime_type;
-    resultText.ContentDate = text->text_date;
-    resultText.DocumentTitle = text->description;
-    //add to list
-    callingObject->m_DocumentInformationList.push_back( resultText );
-    callingObject->m_DocumentTextOIDList.push_back( text->oid );
+    if (text)
+    {
+      if (text->mime_type)
+        resultText.MimeType = text->mime_type;
+      if (text->text_date)
+        resultText.ContentDate = text->text_date;
+      if (text->description)
+        resultText.DocumentTitle = text->description;
+
+      //add to list
+      callingObject->m_DocumentInformationList.push_back( resultText );
+      callingObject->m_DocumentTextOIDList.push_back( text->oid );
+    }
   }
   return ipTrue; // true = next element; false = break iterate
 }

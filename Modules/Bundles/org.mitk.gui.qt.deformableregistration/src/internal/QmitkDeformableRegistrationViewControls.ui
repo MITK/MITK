@@ -223,44 +223,38 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>Demons</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QFrame" name="frame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <widget class="QmitkDemonsRegistrationView" name="m_QmitkDemonsRegistrationViewControls" native="true">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>-70</y>
-            <width>287</width>
-            <height>261</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>287</width>
-            <height>260</height>
-           </size>
-          </property>
-         </widget>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QmitkDemonsRegistrationView" name="m_QmitkDemonsRegistrationViewControls" native="true">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>9</y>
+         <width>308</width>
+         <height>220</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>B-Spline</string>
+      </attribute>
+      <widget class="QmitkBSplineRegistrationView" name="m_QmitkBSplineRegistrationViewControls" native="true">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>20</y>
+         <width>251</width>
+         <height>151</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -289,22 +283,6 @@
      </property>
     </widget>
    </item>
-   <item>
-    <spacer name="spacer2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -318,6 +296,12 @@
    <class>QmitkDemonsRegistrationView</class>
    <extends>QWidget</extends>
    <header location="global">src/internal/QmitkDemonsRegistrationView.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkBSplineRegistrationView</class>
+   <extends>QWidget</extends>
+   <header location="global">src/internal/QmitkBSplineRegistrationView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -35,6 +35,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateNOT.h"
 
+#include "itkImageFileReader.h"
+#include "itkWarpImageFilter.h"
+
+typedef itk::Vector< float, 3 >       VectorType;
+typedef itk::Image< VectorType, 3 >   DeformationFieldType;
+
+typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
+
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject *parent, const char *name)
 : QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
   m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), 
@@ -60,7 +68,77 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingSelector->SetDataStorage( this->GetDefaultDataStorage() );
   m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
   connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));
+  connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
+  
+  
+  QObject::connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
+              SIGNAL(clicked()), 
+              (QObject*) this,
+              SLOT(ApplyDeformationField()) );
+  
+  
   this->CheckCalculateEnabled();
+}
+
+
+void QmitkDeformableRegistrationView::ApplyDeformationField()
+{
+  
+  ImageReaderType::Pointer reader  = ImageReaderType::New();
+  reader->SetFileName( m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_DeformationField->text().toStdString() );
+  reader->Update();
+      
+  DeformationFieldType::Pointer deformationField = reader->GetOutput();
+
+  m_MovingNode = m_Controls.m_MovingSelector->GetSelectedNode();
+  m_FixedNode = m_Controls.m_FixedSelector->GetSelectedNode();
+  mitk::Image * mimage = dynamic_cast<mitk::Image*> (m_MovingNode->GetData());
+  mitk::Image * fimage = dynamic_cast<mitk::Image*> (m_FixedNode->GetData());
+  
+  typedef itk::Image<float, 3> FloatImageType;  
+
+  FloatImageType::Pointer itkMovingImage = FloatImageType::New();
+  FloatImageType::Pointer itkFixedImage = FloatImageType::New();
+  mitk::CastToItkImage(mimage, itkMovingImage);
+  mitk::CastToItkImage(fimage, itkFixedImage);
+
+  typedef itk::WarpImageFilter<
+                            FloatImageType, 
+                            FloatImageType,
+                            DeformationFieldType  >     WarperType;
+
+  typedef itk::LinearInterpolateImageFunction<
+                                    FloatImageType,
+                                    double          >  InterpolatorType;
+
+  WarperType::Pointer warper = WarperType::New();
+  InterpolatorType::Pointer interpolator = InterpolatorType::New();
+
+  warper->SetInput( itkMovingImage );
+  warper->SetInterpolator( interpolator );
+  warper->SetOutputSpacing( itkFixedImage->GetSpacing() );
+  warper->SetOutputOrigin( itkFixedImage->GetOrigin() );
+  warper->SetDeformationField( deformationField );
+  warper->Update();
+
+  FloatImageType::Pointer outputImage = warper->GetOutput();
+  mitk::Image::Pointer result = mitk::Image::New();
+
+  mitk::CastToMitkImage(outputImage, result);
+
+  // Create new DataTreeNode
+  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  newNode->SetData( result );   
+  newNode->SetProperty( "name", mitk::StringProperty::New("warped image") );
+
+  // add the new datatree node to the datatree
+  this->GetDefaultDataStorage()->Add(newNode); 
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
+
+  //Image::Pointer outputImage = this->GetOutput();
+  //mitk::CastToMitkImage( warper->GetOutput(), outputImage );
+
+  
 }
 
 mitk::NodePredicateBase::Pointer QmitkDeformableRegistrationView::GetMovingImagePredicate()
@@ -501,10 +579,19 @@ void QmitkDeformableRegistrationView::CheckCalculateEnabled()
 
 void QmitkDeformableRegistrationView::Calculate()
 {
-  m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
-  m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
+ 
+ 
   if (m_Controls.m_DeformableTransform->tabText(m_Controls.m_DeformableTransform->currentIndex()) == "Demons")
   {
+    m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
+    m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
     emit calculateDemonsRegistration();
+  }
+
+  else if (m_Controls.m_DeformableTransform->tabText(m_Controls.m_DeformableTransform->currentIndex()) == "B-Spline")
+  {
+    m_Controls.m_QmitkBSplineRegistrationViewControls->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
+    m_Controls.m_QmitkBSplineRegistrationViewControls->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
+    emit calculateBSplineRegistration();
   }
 }

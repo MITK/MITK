@@ -5,17 +5,19 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkDeformableRegistrationView.cpp
   QmitkDemonsRegistrationView.cpp
-
+  QmitkBSplineRegistrationView.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkDeformableRegistrationViewControls.ui
   src/internal/QmitkDemonsRegistrationViewControls.ui
+  src/internal/QmitkBSplineRegistrationViewControls.ui
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkDeformableRegistrationView.h
   src/internal/QmitkDemonsRegistrationView.h
+  src/internal/QmitkBSplineRegistrationView.h
 )
 
 SET(RESOURCE_FILES

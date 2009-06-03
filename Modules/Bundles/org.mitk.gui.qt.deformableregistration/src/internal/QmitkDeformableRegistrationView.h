@@ -103,6 +103,11 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     */
     void calculateDemonsRegistration();
 
+    /*!  
+    \brief Signal that informs about that the BSpline registration should be performed.
+    */
+    void calculateBSplineRegistration();
+
   protected slots:  
     
     /*!
@@ -194,6 +199,12 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     \brief Performs the registration.
     */
     void Calculate();
+
+
+     /*!
+     * Prints the values of the deformationfield 
+     */
+    void ApplyDeformationField();
 
   protected:
 

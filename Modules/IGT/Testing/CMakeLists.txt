@@ -10,12 +10,14 @@ SET(${KITNAME}_TESTS
    mitkClaronToolTest.cpp
    mitkClaronTrackingDeviceTest.cpp
    mitkInternalTrackingToolTest.cpp
-   mitkNavigationDataLandmarkTransformFilterTest.cpp
-   mitkNavigationDataToMessageFilterTest.cpp
-   mitkNavigationDataToPointSetFilterTest.cpp
-   mitkNavigationDataTransformFilterTest.cpp
-   mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataDisplacementFilterTest.cpp
+   mitkNavigationDataLandmarkTransformFilterTest.cpp
+   mitkNavigationDataObjectVisualizationFilterTest.cpp
+   mitkNavigationDataSourceTest.cpp
+   mitkNavigationDataToMessageFilterTest.cpp
+   mitkNavigationDataToNavigationDataFilterTest.cpp
+   mitkNavigationDataToPointSetFilterTest.cpp
+   mitkNavigationDataTransformFilterTest.cpp  
    mitkNDIPassiveToolTest.cpp
    mitkTimeStampTest.cpp
    mitkTrackingVolumeTest.cpp

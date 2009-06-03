@@ -25,6 +25,7 @@ mitk::NavigationDataSource::NavigationDataSource()
 {
 }
 
+
 mitk::NavigationDataSource::~NavigationDataSource()
 {
 }
@@ -72,11 +73,13 @@ void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObjec
   output->Graft( graft );
 }
 
+
 itk::ProcessObject::DataObjectPointer mitk::NavigationDataSource::MakeOutput( unsigned int /*idx */)
 {
   mitk::NavigationData::Pointer p = mitk::NavigationData::New();
   return static_cast<itk::DataObject*>(p.GetPointer());
 }
+
 
 mitk::PropertyList::ConstPointer mitk::NavigationDataSource::GetParameters() const
 {

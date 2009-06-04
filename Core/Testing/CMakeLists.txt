@@ -19,6 +19,7 @@ SET(${KITNAME}_TESTS
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageTest.cpp
+  mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp

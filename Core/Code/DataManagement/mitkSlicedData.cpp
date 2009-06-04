@@ -208,7 +208,6 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   if (slicedData)
   {
     m_LargestPossibleRegion = slicedData->GetLargestPossibleRegion();
-    SetGeometry(dynamic_cast<Geometry3D*>(GetTimeSlicedGeometry()->Clone().GetPointer()));//new SlicedGeometry3D(*slicedData->GetGeometry().GetPointer());
   }
   else
   {

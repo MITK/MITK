@@ -212,8 +212,10 @@ void mitk::UnstructuredGrid::SetRequestedRegion(UnstructuredGrid::RegionType *re
   }
 }
 
-void mitk::UnstructuredGrid::CopyInformation( const itk::DataObject * )
-{}
+void mitk::UnstructuredGrid::CopyInformation( const itk::DataObject * data )
+{
+  Superclass::CopyInformation(data);
+}
 
 void mitk::UnstructuredGrid::Update()
 {

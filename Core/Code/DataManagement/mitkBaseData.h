@@ -178,11 +178,11 @@ public:
   //## BaseProcess will copy meta-data from the first input to all of its
   //## outputs. See ProcessObject::GenerateOutputInformation().  Each
   //## subclass of DataObject is responsible for being able to copy
-  //## whatever meta-data it needs from from another DataObject.
-  //## The default implementation of this method is empty. If a subclass
-  //## overrides this method, it should always call its superclass'
-  //## version. 
-  void CopyInformation(const itk::DataObject*) {};
+  //## whatever meta-data it needs from another DataObject.
+  //## The default implementation of this method copies the time sliced geometry
+  //## and the property list of an object. If a subclass overrides this
+  //## method, it should always call its superclass' version. 
+  void CopyInformation(const itk::DataObject* data);
 
   //##Documentation
   //## @brief Check whether the data has been initialized, i.e., 
@@ -251,7 +251,7 @@ public:
   virtual void SetGeometry(Geometry3D* aGeometry3D, unsigned int time);
 
   //##Documentation
-  //## @brief Set a clone of the provided parameter as Geometry3D of the data. 
+  //## @brief Set a clone of the provided geometry as Geometry3D of the data. 
   //## Assumes the data object has only 1 time step ( is a 3D object )
   //## 
   //## \sa SetGeometry
@@ -264,19 +264,20 @@ public:
   virtual void SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time);
 
   //##Documentation
-  //## @brief Get the PropertyList 
+  //## @brief Get the data's property list 
   //## @sa GetProperty
   //## @sa m_PropertyList
   mitk::PropertyList::Pointer GetPropertyList() const;
 
   //##Documentation
-  //## @brief Set the PropertyList
+  //## @brief Set the data's property list
   //## @sa SetProperty
   //## @sa m_PropertyList
   void SetPropertyList(PropertyList* propertyList);
   
   //##Documentation
-  //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
+  //## @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList,
+  //## and set it to this, respectively;
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists

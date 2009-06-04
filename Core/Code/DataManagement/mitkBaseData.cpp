@@ -304,6 +304,24 @@ unsigned long mitk::BaseData::GetMTime() const
   return time;
 }
 
+void mitk::BaseData::CopyInformation( const itk::DataObject* data )
+{
+  const Self* bd = dynamic_cast<const Self*>(data);
+  if (bd != NULL)
+  {
+  	m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(bd->GetTimeSlicedGeometry()->Clone().GetPointer());
+    m_PropertyList = bd->GetPropertyList()->Clone();
+  }
+  else
+  {
+    // pointer could not be cast back down
+    itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
+      << typeid(data).name() << " to "
+      << typeid(Self*).name() );
+  }
+
+}
+
 bool mitk::BaseData::IsInitialized() const
 {
   return m_Initialized;
@@ -314,7 +332,6 @@ void mitk::BaseData::Clear()
   if(m_Initialized)
   {
     ReleaseData();
-
     m_Initialized = false;
   }
 }

@@ -11,110 +11,63 @@
 # correspondigly to the given files are stored in the
 # variable:
 # ${CORRESPONDING__H_FILES}
-# ${CORRESPONDING__TXX_FILES}
+#
+# GLOBBED__H_FILES
   
-# Globbed can be found in the variables
-# ${GLOBBED__txx_fileS} (CURRENTLY COMMENTED OUT)
-# ${GLOBBED_DOX_FILES}
 
 MACRO(MACRO_ORGANIZE_SOURCES)
 
-  MACRO_PARSE_ARGUMENTS(_ORG "INPUT;GENERATED" "" ${ARGN})
+  MACRO_PARSE_ARGUMENTS(_ORG "HEADER;SOURCE;TXX;DOC;MOC;GEN_QRC;GEN_UI;META;UI;QRC" "" ${ARGN})
 
-  # glob all txx files and add to subgroup
-  #FILE(GLOB_RECURSE GLOBBED__TXX_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.txx)
-  
-  # include documentation
-  FILE(GLOB_RECURSE GLOBBED_DOX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.dox)
-  SOURCE_GROUP("Doxygen Files" FILES ${GLOBBED_DOX_FILES})
-  
-  # include documentation
-  FILE(GLOB_RECURSE GLOBBED_UI_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
-  SOURCE_GROUP("QT UI Files" FILES ${GLOBBED_UI_FILES})
-  
-  # initialise storage for header-files
   SET(CORRESPONDING__H_FILES "" )
-  SET(CORRESPONDING__TXX_FILES "" )
+  SET(GLOBBED__H_FILES "" )
   
-  _MACRO_ITERATE_OVER_SOURCES("${CMAKE_CURRENT_SOURCE_DIR}/" ${_ORG_INPUT})
-  _MACRO_ITERATE_OVER_SOURCES("" ${_ORG_GENERATED})
+  IF(_ORG_HEADER)
+    FOREACH(_file ${_ORG_SOURCE})
+      STRING(REGEX REPLACE "(.*)\\.(txx|cpp|c|cxx)$" "\\1.h" H_FILE ${_file})
+      IF(EXISTS ${H_FILE})
+        LIST(APPEND CORRESPONDING__H_FILES "${H_FILE}")
+  	  ENDIF()
+    ENDFOREACH()
+  ELSE()
+    FILE(GLOB_RECURSE GLOBBED__H_FILES *.h)
+  ENDIF()
   
-ENDMACRO(MACRO_ORGANIZE_SOURCES)
+  IF(_ORG_GEN_QRC OR _ORG_GEN_UI OR _ORG_MOC)
+    SOURCE_GROUP("Generated\\Qt QRC Source Files" FILES ${_ORG_GEN_QRC})
+    SOURCE_GROUP("Generated\\Qt UI Header Files" FILES ${_ORG_GEN_UI})
+    SOURCE_GROUP("Generated\\Qt MOC Source Files" FILES ${_ORG_MOC})
+  ENDIF()
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("== Source Files ==" FILES ${_ORG_SOURCE})
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_TXX "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("== Template Files ==" FILES ${_ORG_TXX})
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("== Header Files ==" FILES ${_ORG_HEADER} ${_ORG_HEADER} ${CORRESPONDING__H_FILES} ${GLOBBED__H_FILES})
+  
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_UI "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("QT UI Files" FILES ${_ORG_UI})
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_DOC "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("Doxygen Files" FILES ${_ORG_DOC})
+  
+  #_MACRO_APPEND_TO_LIST(_ORG_QRC "${CMAKE_CURRENT_SOURCE_DIR}/")
+  SOURCE_GROUP("Qt Resource Files" FILES ${_ORG_QRC})
+  
+  SOURCE_GROUP("Plugin META Files" FILES ${_ORG_META})
+ 
+ENDMACRO()
 
-MACRO(_MACRO_ITERATE_OVER_SOURCES _path_prefix_)
-
-SET(_path_prefix "${_path_prefix_}")
-
-# iterate through sources
-  FOREACH(_file ${ARGN} )#${GLOBBED__TXX_FILES})
-    #IF(EXISTS ${_path_prefix}${_file})
-      STRING(REGEX MATCH "cxx$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("Generated Source Files" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-      
-      STRING(REGEX MATCH "cpp$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("== Source Files ==" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-      
-      STRING(REGEX MATCH "txx$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("== Template Files ==" FILES ${_path_prefix}/${_file})
-      ENDIF(_result)
-      
-      STRING(REGEX MATCH "c$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("== Source Files ==" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-      
-      STRING(REGEX MATCH "h$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("== Header Files ==" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-      
-      STRING(REGEX MATCH "ui$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("QT UI Files" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-
-      STRING(REGEX MATCH ".*moc_.*cxx$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("Generated MOC Source Files" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-
-      STRING(REGEX MATCH ".*ui_.*h$" _result ${_file})
-      IF(_result)
-        SOURCE_GROUP("Generated UI Header Files" FILES ${_path_prefix}${_file})
-      ENDIF(_result)
-      
-      # include header files in visual studio solution
-      STRING(REGEX MATCH "(txx|cpp|c|cxx)$" _result ${_file})
-      IF(_result)
-        STRING(REGEX REPLACE "(txx|cpp|c|cxx)$" "h" _h_file ${_file})
-        IF(EXISTS ${_path_prefix}${_h_file})
-          SET(CORRESPONDING__H_FILES
-            ${CORRESPONDING__H_FILES}
-            ${_path_prefix}${_h_file}
-          )
-          SOURCE_GROUP("== Header Files ==" FILES ${_path_prefix}${_h_file} )
-        ENDIF(EXISTS ${_path_prefix}${_h_file})
-      ENDIF(_result)
-      
-      # include txx files in visual studio solution
-      STRING(REGEX MATCH "(h|cpp|c|cxx)$" _result ${_file})
-      IF(_result)
-        STRING(REGEX REPLACE "(h|cpp|c|cxx)$" "txx" _txx_file ${_file})
-        IF(EXISTS ${_path_prefix}${_txx_file})
-          SET(CORRESPONDING__TXX_FILES
-            ${CORRESPONDING__TXX_FILES}
-            ${_path_prefix}${_txx_file}
-          )
-          SOURCE_GROUP("== Template Files ==" FILES ${_path_prefix}${_txx_file} )
-        ENDIF(EXISTS ${_path_prefix}${_txx_file})
-      ENDIF(_result)
-      
-    #ENDIF(EXISTS ${_path_prefix}${_file})
-  ENDFOREACH(_file)
-
-ENDMACRO(_MACRO_ITERATE_OVER_SOURCES _path_prefix)
+MACRO(_MACRO_APPEND_TO_LIST _list _value)
+  SET(_origlist ${${_list}})
+  SET(${_list} )
+  FOREACH(_element ${_origlist})
+    LIST(APPEND ${_list} "${_value}${_element}")
+  ENDFOREACH()
+ENDMACRO()
+    
+ 

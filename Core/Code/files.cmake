@@ -1,3 +1,7 @@
+SET(H_FILES
+  DataManagement/mitkCommon.h
+)
+
 SET(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkBaseProcess.cpp

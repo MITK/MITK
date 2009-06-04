@@ -62,5 +62,5 @@ QmitkLevelWindowRangeChange.ui        QmitkStdMultiWidget.ui
 )
 
 SET(RES_FILES
-  icon/Rendering.qrc
+  #icon/Rendering.qrc
 )

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 //##Documentation
 //## @brief GUI indepentent Interface for all Gui depentent implementations of a StatusBar.
-class MITKEXT_CORE_EXPORT StatusBarImplementation
+class MITK_CORE_EXPORT StatusBarImplementation
 {
 public:
   //##Documentation

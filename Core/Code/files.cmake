@@ -22,16 +22,19 @@ SET(CPP_FILES
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
   Controllers/mitkBaseController.cpp
+  Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
   Controllers/mitkFocusManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
+  Controllers/mitkProgressBar.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
   Controllers/mitkSlicesCoordinator.cpp
   Controllers/mitkSlicesRotator.cpp
   Controllers/mitkSlicesSwiveller.cpp
+  Controllers/mitkStatusBar.cpp
   Controllers/mitkStepper.cpp
   Controllers/mitkTestManager.cpp
   Controllers/mitkUndoController.cpp

@@ -2,6 +2,8 @@ SET(SRC_CPP_FILES
   QmitkApplication.cpp
   QmitkDefaultPerspective.cpp
   QmitkStdMultiWidgetEditor.cpp
+  QmitkStatusBar.cpp
+  QmitkProgressBar.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -13,6 +15,7 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkFileOpenAction.h
+  src/QmitkProgressBar.h
 )
 
 SET(CPP_FILES manifest.cpp)

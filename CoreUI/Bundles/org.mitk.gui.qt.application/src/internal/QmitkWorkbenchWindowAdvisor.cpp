@@ -22,12 +22,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMenu>
 #include <QMenuBar>
 #include <QMainWindow>
+#include <QStatusBar>
 
 #include <cherryPlatformUI.h>
 #include <cherryIWorkbenchWindow.h>
 
 #include <internal/cherryQtShowViewAction.h>
 #include "QmitkFileOpenAction.h"
+
+#include <QmitkStatusBar.h>
+#include <QmitkProgressBar.h>
+//#include <QmitkMemoryUsageIndicator.h>
 
 QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
  : cherry::WorkbenchWindowAdvisor(configurer)
@@ -66,4 +71,20 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
   }
+
+  QStatusBar* qStatusBar = new QStatusBar();
+
+  //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
+  QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
+  //disabling the SizeGrip in the lower right corner
+  statusBar->SetSizeGripEnabled(false);
+
+  QmitkProgressBar *progBar = new QmitkProgressBar();
+  qStatusBar->addPermanentWidget(progBar, 0);
+  progBar->hide();
+  mainWindow->setStatusBar(qStatusBar);
+
+  //QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
+  //this->statusBar()->addWidget(memoryIndicator, 0, true);
+
 }

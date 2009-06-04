@@ -25,7 +25,7 @@ namespace mitk
 
   //##Documentation
   //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
-  class MITKEXT_CORE_EXPORT ProgressBarImplementation
+  class MITK_CORE_EXPORT ProgressBarImplementation
   {
 
   public:

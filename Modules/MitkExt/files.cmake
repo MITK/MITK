@@ -6,7 +6,6 @@ SET(CPP_FILES
   Algorithms/mitkBoundingObjectCutter.cpp
   Algorithms/mitkBSplineRegistration.cpp
   Algorithms/mitkCalculateSegmentationVolume.cpp
-  Algorithms/mitkCallbackFromGUIThread.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
@@ -56,10 +55,8 @@ SET(CPP_FILES
   Algorithms/mitkUnstructuredGridSource.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
-  Controllers/mitkProgressBar.cpp
   Controllers/mitkReportGenerator.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
-  Controllers/mitkStatusBar.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/itkConfidenceDiffusionTensor3D.cpp
   DataManagement/mitkAffineTransformationOperation.cpp

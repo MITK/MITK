@@ -173,9 +173,6 @@ void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
 
 void EditorRegistry::AddExternalEditorsToEditorMap()
 {
-  IEditorDescriptor::Pointer desc;
-  ;
-
   // Add registered editors (may include external editors).
   std::vector<FileEditorMapping::Pointer> maps =
       typeEditorMappings.AllMappings();
@@ -186,7 +183,7 @@ void EditorRegistry::AddExternalEditorsToEditorMap()
     for (std::list<IEditorDescriptor::Pointer>::iterator itr =
         descArray.begin(); itr != descArray.end(); ++itr)
     {
-      mapIDtoEditor[desc->GetId()] = itr->Cast<EditorDescriptor> ();
+      mapIDtoEditor[(*itr)->GetId()] = itr->Cast<EditorDescriptor> ();
     }
   }
 }

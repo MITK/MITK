@@ -469,7 +469,7 @@ IEditorPart::Pointer EditorReference::CreatePartHelper()
     // Create a pane for this part
     PartPane::Pointer pane = this->GetPane();
 
-    //pane->CreateControl((Composite) manager.page.getEditorPresentation().getLayoutPart().getControl());
+    pane->CreateControl(manager->page->GetEditorPresentation()->GetLayoutPart()->GetControl());
 
 
     // Link everything up to the part reference (the part reference itself should not have

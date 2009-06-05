@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __mitkDicomDiffusionVolumeHeaderReader_h__
 #define __mitkDicomDiffusionVolumeHeaderReader_h__
 
+#include "MitkDiffusionImagingExports.h"
+
 #include <mitkFileReader.h>
 #include "itkImageSeriesReader.h"
 #include "itkImageFileReader.h"
@@ -29,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-  class __declspec(dllexport) DicomDiffusionVolumeHeaderReader : public itk::Object
+  class MitkDiffusionImaging_EXPORT DicomDiffusionVolumeHeaderReader : public itk::Object
   {
   public:
 

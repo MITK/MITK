@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _mitkGroupDiffusionHeadersFilter_h
 #define _mitkGroupDiffusionHeadersFilter_h
 
+#include "MitkDiffusionImagingExports.h"
+
 #include "mitkBaseProcess.h"
 #include "mitkDiffusionVolumeHeaderInformation.h"
 
@@ -29,7 +31,7 @@ namespace mitk
   * @brief Groups Headers containing Diffusion Information
   * @ingroup Process
   */
-  class __declspec(dllexport) GroupDiffusionHeadersFilter : public BaseProcess
+  class MitkDiffusionImaging_EXPORT GroupDiffusionHeadersFilter : public BaseProcess
   {
   public:
     mitkClassMacro( GroupDiffusionHeadersFilter, BaseProcess );

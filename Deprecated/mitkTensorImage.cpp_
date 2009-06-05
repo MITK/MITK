@@ -1,0 +1,41 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2008-08-27 16:33:54 +0200 (Mi, 27 Aug 2008) $
+Version:   $Revision: 15093 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#include "mitkTensorImage.h"
+vtkImageData* mitk::TensorImage::GetVtkImageData(int t, int n)
+{
+  if(m_Initialized==false)
+  {
+    if(GetSource()==NULL)
+      return NULL;
+    if(GetSource()->Updating()==false)
+      GetSource()->UpdateOutputInformation();
+  }
+  ImageDataItemPointer volume=GetVolumeData(t, n);
+  if(volume.GetPointer()==NULL || volume->GetVtkImageData() == NULL)
+    return NULL;
+
+#if ((VTK_MAJOR_VERSION > 4) || ((VTK_MAJOR_VERSION==4) && (VTK_MINOR_VERSION>=4) ))
+  float *fspacing = const_cast<float *>(GetSlicedGeometry(t)->GetFloatSpacing());
+  double dspacing[3] = {fspacing[0],fspacing[1],fspacing[2]};
+  volume->GetVtkImageData()->SetSpacing( dspacing );
+#else
+  volume->GetVtkImageData()->SetSpacing(const_cast<float*>(GetSlicedGeometry(t)->GetFloatSpacing()));
+#endif
+  return volume->GetVtkImageData();
+}
+

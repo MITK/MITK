@@ -58,7 +58,6 @@ SET(CPP_FILES
   Controllers/mitkReportGenerator.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
-  DataManagement/itkConfidenceDiffusionTensor3D.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
   DataManagement/mitkApplyDiffImageOperation.cpp
   DataManagement/mitkBoundingObject.cpp

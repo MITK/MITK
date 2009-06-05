@@ -1,6 +1,7 @@
 SET(LIBPOSTFIX "Ext")
 ADD_SUBDIRECTORY(MitkExt)
 ADD_SUBDIRECTORY(QmitkExt)
+ADD_SUBDIRECTORY(DiffusionImaging)
 
 OPTION(MITK_BUILD_IGT "Build the MITK image guided therapy library" OFF)
 IF(MITK_BUILD_IGT)

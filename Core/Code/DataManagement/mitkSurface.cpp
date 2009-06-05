@@ -234,6 +234,8 @@ void mitk::Surface::CopyInformation( const itk::DataObject * data)
     // pointer could not be cast back down
     itkExceptionMacro( << "mitk::Surface::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(surfaceData).name() );
   }
+  
+
 }
 
 void mitk::Surface::Update()
@@ -358,7 +360,7 @@ void mitk::Surface::ExecuteOperation(Operation *operation)
   this->Modified();
 }
 
-unsigned int mitk::Surface::GetNumberOfPolyDatas() const
+unsigned int mitk::Surface::GetSizeOfPolyDataSeries() const
 {
   return m_PolyDataSeries.size();
 }
@@ -391,9 +393,10 @@ void mitk::Surface::Graft( const DataObject* data )
   //clear list of PolyData's
   m_PolyDataSeries.clear();
   // do copy
-  for (int i=0; i<surface->GetNumberOfPolyDatas(); i++)
+  for (int i=0; i<surface->GetSizeOfPolyDataSeries(); i++)
     {
       m_PolyDataSeries.push_back(vtkPolyData::New());
-      m_PolyDataSeries.back()->CopyStructure( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );
+      m_PolyDataSeries.back()->DeepCopy( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );
+      //CopyStructure( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );
     }
 }

@@ -64,7 +64,7 @@ namespace mitk {
 
     virtual bool IsEmpty(unsigned int t) const;
 
-    unsigned int GetNumberOfPolyDatas() const;
+    unsigned int GetSizeOfPolyDataSeries() const;
 
     virtual void Update();
 

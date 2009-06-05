@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkSimpleExampleViewControls</class>
+ <widget class="QWidget" name="QmitkSimpleExampleViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>208</width>
+    <height>585</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>false</bool>
+  </property>
+  <property name="windowTitle">
+   <string>Form1</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="spacing">
+    <number>4</number>
+   </property>
+   <property name="margin">
+    <number>4</number>
+   </property>
+   <item>
+    <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorTransversal" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorSagittal" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorFrontal" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorTime" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkPrimitiveMovieNavigatorWidget" name="movieNavigatorTime" native="true"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="reInitializeNavigatorsButton">
+     <property name="text">
+      <string>Re-initialize Navigators</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <layout class="QGridLayout">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="m_RenderWindow1Button">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>32767</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>1</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="m_RenderWindow4Button">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>32767</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>4</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="m_RenderWindow2Button">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>32767</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>2</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="m_RenderWindow3Button">
+         <property name="maximumSize">
+          <size>
+           <width>30</width>
+           <height>32767</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>3</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout">
+       <item>
+        <spacer name="spacer2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="genMovieButton">
+         <property name="maximumSize">
+          <size>
+           <width>32767</width>
+           <height>23</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Generate Movie</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QComboBox" name="stereoSelect">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>stereo off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>red-blue stereo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>D4D stereo</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer1">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>230</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="0" margin="0"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkPrimitiveMovieNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkPrimitiveMovieNavigatorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkSliderNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSliderNavigatorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>reInitializeNavigatorsButton</tabstop>
+  <tabstop>stereoSelect</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

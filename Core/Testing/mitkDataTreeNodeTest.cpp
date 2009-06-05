@@ -413,6 +413,13 @@ static void TestPropertyList(mitk::DataTreeNode::Pointer dataTreeNode)
   dataTreeNode->GetStringProperty("string", s);
   MITK_TEST_CONDITION(s == "MITK", "Testing Set/GetStringProperty");
 
+  std::string name = "MyTestName";
+  dataTreeNode->SetName(name.c_str());
+  MITK_TEST_CONDITION(dataTreeNode->GetName() == name, "Testing Set/GetName");
+  name = "MySecondTestName";
+  dataTreeNode->SetName(name);
+  MITK_TEST_CONDITION(dataTreeNode->GetName() == name, "Testing Set/GetName(std::string)");
+
   MITK_TEST_CONDITION(propertyList == dataTreeNode->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
 }
 

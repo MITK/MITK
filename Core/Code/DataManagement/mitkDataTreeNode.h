@@ -328,6 +328,14 @@ public:
       return;
     this->SetProperty("name", StringProperty::New(name));
   }
+  //##Documentation
+  //## @brief Extra convenience access method to set the name of an object.
+  //##
+  //## The name will be stored in the non-renderer-specific PropertyList in a StringProperty named "name".
+  virtual void SetName( const std::string name)
+  {
+    this->SetName(name.c_str());
+  }
 
   //##Documentation
   //## @brief Convenience access method for visibility properties (instances

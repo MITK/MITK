@@ -112,6 +112,10 @@ protected:
   
 private:
   ImageDataItem::ConstPointer m_Parent;
+  
+  template <class TPixeltype>
+    unsigned char *ConvertTensorsToRGB() const;
+
 };
 
 } // namespace mitk

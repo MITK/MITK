@@ -115,6 +115,11 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #else
     #define MITK_IGT_EXPORT __declspec(dllimport)
   #endif
+  #ifdef mitkDIFFUSION_EXPORTS
+    #define MITK_DIFFUSION_EXPORT __declspec(dllexport)
+  #else
+    #define MITK_DIFFUSION_EXPORT __declspec(dllimport)
+  #endif
   #ifdef mitkMBIIGT_EXPORTS
     #define MitkMBIIGT_EXPORT __declspec(dllexport)
   #else
@@ -145,6 +150,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #define MITKEXT_CORE_EXPORT
   #define MITK_IGT_EXPORT
   #define MBI_IGT_EXPORT
+  #define MITK_DIFFUSION_EXPORT
   #define MBISB_CORE_EXPORT
   #define QMITK_EXPORT
   #define QMITKEXT_EXPORT

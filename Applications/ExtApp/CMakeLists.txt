@@ -7,7 +7,10 @@ LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
 ADD_EXECUTABLE(ExtApp ExtApp.cpp)
 
-TARGET_LINK_LIBRARIES(ExtApp optimized org_opencherry_osgi debug org_opencherry_osgi${OPENCHERRY_DEBUG_POSTFIX})
+TARGET_LINK_LIBRARIES(ExtApp 
+                      optimized PocoFoundation      debug PocoFoundationd 
+                      optimized PocoUtil            debug PocoUtild 
+                      optimized org_opencherry_osgi debug org_opencherry_osgi${OPENCHERRY_DEBUG_POSTFIX})
 
 SET(_plugin_deps ${OPENCHERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
 

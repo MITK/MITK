@@ -422,12 +422,14 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking named node method */
   MITK_TEST_CONDITION(ds->GetNamedNode("Node 2 - Surface Node") == n2, "Checking named node method");
+  MITK_TEST_CONDITION(ds->GetNamedNode(std::string("Node 2 - Surface Node")) == n2, "Checking named node(std::string) method");
 
   /* Checking named node method with wrong name */
   MITK_TEST_CONDITION(ds->GetNamedNode("This name does not exist") == NULL, "Checking named node method with wrong name");
 
   /* Checking named object method */
   MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("Node 1 - Image Node") == image, "Checking named object method");
+  MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>(std::string("Node 1 - Image Node")) == image, "Checking named object(std::string) method");
 
   /* Checking named object method with wrong DataType */
   MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == NULL, "Checking named object method with wrong DataType");

@@ -135,6 +135,14 @@ namespace mitk {
     //## @brief Convenience method to get the first node with a given name
     //##
     mitk::DataTreeNode* GetNamedNode(const char* name) const;
+    
+    //##Documentation
+    //## @brief Convenience method to get the first node with a given name
+    //##    
+    mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const std::string name) const
+    {
+      return this->GetNamedNode(name.c_str());
+    }
 
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
@@ -154,6 +162,14 @@ namespace mitk {
         return NULL;
       else
         return dynamic_cast<DataType*>(n->GetData());
+    }
+    //##Documentation
+    //## @brief Convenience method to get the first data object of a given data type with a given name
+    //##
+    template <class DataType>
+    DataType* GetNamedObject(const std::string name) const
+    {
+      return this->GetNamedObject<DataType>(name.c_str());
     }
 
     //##Documentation

@@ -26,19 +26,24 @@ mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilt
   
 {
   m_ITKLandmarkTransform = ITKVersorTransformType::New();
-
+  m_ITKLandmarkTransform->SetIdentity();
   m_LandmarkTransformInitializer = TransformInitializerType::New();
   m_LandmarkTransformInitializer->SetTransform(m_ITKLandmarkTransform);
 
   //transform to rotate orientation 
    m_QuatLandmarkTransform = itk::QuaternionRigidTransform<double>::New();
    m_QuatTransform = itk::QuaternionRigidTransform<double>::New();
-
-
 }
 
+
 mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFilter()
-{}
+{
+  m_ITKLandmarkTransform = NULL;
+  m_LandmarkTransformInitializer = NULL;
+  m_QuatLandmarkTransform = NULL;
+  m_QuatTransform = NULL;
+}
+
 
 void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
 {
@@ -50,14 +55,13 @@ void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
     m_ITKLandmarkTransform->SetIdentity();
 
     m_LandmarkTransformInitializer->InitializeTransform();
-
+    m_QuatLandmarkTransform->SetMatrix(m_ITKLandmarkTransform->GetRotationMatrix());
     this->Modified();
   }
   catch (std::exception& e)
   {
     itkExceptionMacro("Initializing landmark-tranfrom failed\n. "<<e.what());
   }
-
 }
 
 
@@ -80,8 +84,8 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
    m_SourcePoints.push_back(lPoint);
   }
 
-  if (m_SourcePoints.size()>2)
-    m_SourcePointsAreSet=true;
+  if (m_SourcePoints.size() > 2)
+    m_SourcePointsAreSet = true;
   else
     itkExceptionMacro("SourcePointSet must contain at least 3 points");
 
@@ -110,12 +114,12 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
     m_TargetPoints.push_back(lPoint);
   }
 
-  if (m_TargetPoints.size()>2)
-    m_TargetPointsAreSet=true;
+  if (m_TargetPoints.size() > 2)
+    m_TargetPointsAreSet = true;
   else
     itkExceptionMacro("TargetPointSet must contain at least 3 points");
 
-  if(m_SourcePointsAreSet)
+  if (m_SourcePointsAreSet)
     this->InitializeLandmarkTransform();
 
 }
@@ -123,8 +127,6 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
 void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
 {
   this->CreateOutputsForAllInputs(); // make sure that we have the same number of outputs as inputs
-
-  TransformInitializerType::LandmarkPointType lPointIn, lPointOut;
 
   /* update outputs with tracking data from tools */
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
@@ -139,39 +141,37 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
       output->SetDataValid(false);
       continue;
     }
-
-    mitk::NavigationData::PositionType tempCoordinateIn, tempCoordinateOut;
-    tempCoordinateIn = input->GetPosition();
-
-    lPointIn[0]=tempCoordinateIn[0];
-    lPointIn[1]=tempCoordinateIn[1];
-    lPointIn[2]=tempCoordinateIn[2];
-
-    //do the landmark transform
-    lPointOut = m_ITKLandmarkTransform->TransformPoint(lPointIn);
-
-    tempCoordinateOut[0]=lPointOut[0];
-    tempCoordinateOut[1]=lPointOut[1];
-    tempCoordinateOut[2]=lPointOut[2];
-
     output->Graft(input); // First, copy all information from input to output
-    output->SetPosition(tempCoordinateOut);// Then change the member(s): add new position of navigation data after transformation
-    output->SetDataValid(true); // operation was successful, therefore data of output is valid.
+    if ((m_SourcePointsAreSet == false) || (m_TargetPointsAreSet == false)) // as long as there is no valid transformation matrix, only graft the outputs
+      continue;
 
+    TransformInitializerType::LandmarkPointType lPointIn;
+    TransformInitializerType::LandmarkPointType lPointOut;
+    mitk::NavigationData::PositionType tempCoordinate;
+    tempCoordinate = input->GetPosition();
 
+    lPointIn[0] = tempCoordinate[0];
+    lPointIn[1] = tempCoordinate[1];
+    lPointIn[2] = tempCoordinate[2];
 
-    //---transform orientation
+    /* transform position */
+    lPointOut = m_ITKLandmarkTransform->TransformPoint(lPointIn);
+    tempCoordinate[0] = lPointOut[0];
+    tempCoordinate[1] = lPointOut[1];
+    tempCoordinate[2] = lPointOut[2];
+    output->SetPosition(tempCoordinate);  // update position of output to transformed position
+
+    /* transform orientation */
     NavigationData::OrientationType  quatIn = input->GetOrientation();
     vnl_quaternion<double> const vnlQuatIn(quatIn.x(), quatIn.y(), quatIn.z(), quatIn.r());
 
-    m_QuatLandmarkTransform->SetMatrix(m_ITKLandmarkTransform->GetRotationMatrix());
+    m_QuatTransform->SetIdentity();
     m_QuatTransform->SetRotation(vnlQuatIn);
-    m_QuatLandmarkTransform->Compose(m_QuatTransform,true);
+    m_QuatLandmarkTransform->SetIdentity();
+    m_QuatLandmarkTransform->Compose(m_QuatTransform, true);
 
     vnl_quaternion<double> vnlQuatOut = m_QuatLandmarkTransform->GetRotation();
     NavigationData::OrientationType quatOut(vnlQuatOut[0], vnlQuatOut[1], vnlQuatOut[2], vnlQuatOut[3]);
-    output->SetOrientation(quatOut);
-
-
+    output->SetOrientation(quatOut);      // update orientation of output to transformed orientation
   }
 }

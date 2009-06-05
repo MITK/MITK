@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_
 #define MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_
 
@@ -33,8 +32,10 @@ namespace mitk {
   * \brief NavigationDataLandmarkTransformFilter applies a itk-landmark-transformation
   * defined by source and target pointsets. 
   * 
-  * Before executing the filter SetSourcePoints and SetTargetPoints must be called. 
-  * If source or target pointSet were changed the corresponding setMethod has to be called again, to apply the changes.
+  * Before executing the filter SetSourcePoints and SetTargetPoints must be called. Before both source 
+  * and target landmarks are set, the filter performs an identity transform.
+  * If source or target points are changed after calling SetXXXPoints, the corresponding SetXXXPoints 
+  * method has to be called again to apply the changes.
   *
   * \ingroup IGT
   */
@@ -76,25 +77,19 @@ namespace mitk {
     itk::QuaternionRigidTransform<double>::Pointer m_QuatLandmarkTransform; ///< transform needed to rotate orientation
     itk::QuaternionRigidTransform<double>::Pointer m_QuatTransform;         ///< further transform needed to rotate orientation
 
-   
-    /**Documentation
+    /**
     * \brief transforms input NDs according to the calculated landmarktransform 
     * 
     */
     virtual void GenerateData();
 
-
-    /**Documentation
+    /**
     * \brief initializes the transform using source and target pointsets 
     */
     void InitializeLandmarkTransform();
 
-    // bool to store if target and source points were set
     bool m_SourcePointsAreSet; ///< bool to store if source points were set
-    bool m_TargetPointsAreSet; ///< bool to store if target points were set
-    
-    
+    bool m_TargetPointsAreSet; ///< bool to store if target points were set 
   };
 } // namespace mitk
-
 #endif /* MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_ */

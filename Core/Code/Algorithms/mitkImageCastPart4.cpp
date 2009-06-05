@@ -31,68 +31,44 @@ namespace mitk
 #endif //DOXYGEN_SKIP
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
-//typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
-//typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
-//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 2>  itkImageCDTIF2;
-//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 2>  itkImageCDTID2;
+typedef itk::Image<itk::DiffusionTensor3D<float>, 2>  itkImageDTIF2;
+typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 
 template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC2>& itkOutputImage)
 {
   typedef itkImageRGBUC2 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::RGBPixel<unsigned char>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
 }
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF2>& itkOutputImage)
-//{
-//  typedef itkImageDTIF2 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID2>& itkOutputImage)
-//{
-//  typedef itkImageDTID2 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageCDTIF2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageCDTIF2>& itkOutputImage)
-//{
-//  typedef itkImageCDTIF2 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::ConfidenceDiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageCDTID2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageCDTID2>& itkOutputImage)
-//{
-//  typedef itkImageCDTID2 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::ConfidenceDiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
+template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF2>& itkOutputImage)
+{
+  typedef itkImageDTIF2 ItkOutputImageType;
+  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+}
+template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID2>& itkOutputImage)
+{
+  typedef itkImageDTID2 ItkOutputImageType;
+  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+}
 
 typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
-//typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
-//typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
-//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<float>, 3>  itkImageCDTIF3;
-//typedef itk::Image<itk::ConfidenceDiffusionTensor3D<double>, 3>  itkImageCDTID3;
+typedef itk::Image<itk::DiffusionTensor3D<float>, 3>  itkImageDTIF3;
+typedef itk::Image<itk::DiffusionTensor3D<double>, 3>  itkImageDTID3;
 
 template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC3>& itkOutputImage)
 {
   typedef itkImageRGBUC3 ItkOutputImageType;
   AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::RGBPixel<unsigned char>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
 }
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF3>& itkOutputImage)
-//{
-//  typedef itkImageDTIF3 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID3>& itkOutputImage)
-//{
-//  typedef itkImageDTID3 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageCDTIF3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageCDTIF3>& itkOutputImage)
-//{
-//  typedef itkImageCDTIF3 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::ConfidenceDiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
-//template <> void MITK_CORE_EXPORT CastToItkImage<itkImageCDTID3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageCDTID3>& itkOutputImage)
-//{
-//  typedef itkImageCDTID3 ItkOutputImageType;
-//  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::ConfidenceDiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
-//}
+template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF3>& itkOutputImage)
+{
+  typedef itkImageDTIF3 ItkOutputImageType;
+  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<float>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+}
+template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTID3>& itkOutputImage)
+{
+  typedef itkImageDTID3 ItkOutputImageType;
+  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, itk::DiffusionTensor3D<double>, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+}
 
 #define TYPE_VECS(HUN)        \
   TYPE_TEN_VECS(HUN)        \
@@ -138,6 +114,7 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC3>(const mitk::Ima
 
 // the following lines allow for fixed-size vector images up to a certain size limit
 // (commented out for shorter compile times)
+
 //TYPE_VECS(000)
 //TYPE_VECS(100)
 //TYPE_VECS(200)
@@ -149,6 +126,7 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC3>(const mitk::Ima
 
 // allow for fixed-size vectors of specific length
 // (inspired by itkPointshell.cpp, precompiled q-ball configs)
+
 //TYPE_TEN_VECS(0)
 //TYPE_N_VEC(11)
 //TYPE_N_VEC(12)
@@ -158,10 +136,10 @@ TYPE_N_VEC(92)
 TYPE_N_VEC(162)
 TYPE_N_VEC(252)
 TYPE_N_VEC(362)
-//TYPE_N_VEC(492)
-//TYPE_N_VEC(642)
-//TYPE_N_VEC(812)
-//TYPE_N_VEC(1002)
+TYPE_N_VEC(492)
+TYPE_N_VEC(642)
+TYPE_N_VEC(812)
+TYPE_N_VEC(1002)
 
 #ifndef DOXYGEN_SKIP
 

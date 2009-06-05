@@ -43,7 +43,7 @@ void QmitkFileOpenAction::Run()
   QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   dialog.setFileMode(QFileDialog::ExistingFiles);
   QStringList filters;
-  filters << "Images (*.pic *.pic.gz *.vti *.dcm)" 
+  filters << "Images (*.pic *.pic.gz *.vti *.dcm *.nhdr *.nrrd *.mhd)" 
     << "Surfaces (*.stl *.vtk *.vtp)"
     << "MITK Pointset (*.mps)"
     << "All Files (*.*)";

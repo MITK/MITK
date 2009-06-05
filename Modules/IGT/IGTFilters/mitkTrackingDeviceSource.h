@@ -52,7 +52,11 @@ namespace mitk {
     * \brief sets the tracking device that will be used as a source for tracking data
     */
     virtual void SetTrackingDevice(mitk::TrackingDevice* td);
-
+    
+    /**
+    * \brief returns the tracking device that is used by this filter
+    */
+    itkGetConstObjectMacro(TrackingDevice, mitk::TrackingDevice);
 
     /**
     * \brief Establishes a connection to the tracking device
@@ -126,13 +130,11 @@ namespace mitk {
     virtual void GenerateData();
     
     /**
-    * \brief Create the necessary outputs given by m_TrackingDevice
+    * \brief Create the necessary outputs for the TrackingTool objects in m_TrackingDevice
     **/
     void CreateOutputs();
 
-
-    mitk::TrackingDevice::Pointer m_TrackingDevice;
+    mitk::TrackingDevice::Pointer m_TrackingDevice;  ///< the tracking device that is used as a source for this filter object
   };
 } // namespace mitk
-
 #endif /* MITKTrackingDeviceSource_H_HEADER_INCLUDED_ */

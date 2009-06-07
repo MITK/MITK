@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -19,8 +19,9 @@
 
 #include "mitkNrrdDiffusionVolumesWriter.h"
 #include "itkMetaDataDictionary.h"
+#include "itkMetaDataObject.h"
 #include <itkNrrdImageIO.h>
-//#include "itkImageFileWriter.h"
+#include "itkImageFileWriter.h"
 
 
 template <class TInputImage>
@@ -47,17 +48,17 @@ void mitk::NrrdDiffusionVolumesWriter<TInputImage>
   for(int i=0; i<m_Directions->Size(); i++)
   {
     sprintf( keybuffer, "DWMRI_gradient_%04d", i );
-    
+
     /*if(itk::ExposeMetaData<std::string>(m_Input->GetMetaDataDictionary(),
       std::string(keybuffer),tmp))
       continue;*/
 
-    sprintf( valbuffer, "%1f %1f %1f", m_Directions->ElementAt(i).get(0), 
+    sprintf( valbuffer, "%1f %1f %1f", m_Directions->ElementAt(i).get(0),
       m_Directions->ElementAt(i).get(1), m_Directions->ElementAt(i).get(2));
-    
+
     itk::EncapsulateMetaData<std::string>(m_Input->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
   }
-  
+
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   //io->SetNrrdVectorType( nrrdKindList );
   io->SetFileType( itk::ImageIOBase::Binary );

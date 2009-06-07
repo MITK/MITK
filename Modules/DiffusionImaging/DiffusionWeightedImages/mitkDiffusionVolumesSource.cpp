@@ -24,8 +24,8 @@ mitk::DiffusionVolumesSource<TPixelType>::DiffusionVolumesSource()
 {
   // Create the output. We use static_cast<> here because we know the default
   // output must be of type DiffusionVolumes
-  mitk::DiffusionVolumes<>::Pointer output
-    = static_cast<mitk::DiffusionVolumes<TPixelType>*>(this->MakeOutput(0).GetPointer());
+  typename mitk::DiffusionVolumes<TPixelType>::Pointer output
+    = static_cast<typename mitk::DiffusionVolumes<TPixelType>*>(this->MakeOutput(0).GetPointer());
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
@@ -38,7 +38,7 @@ mitk::DiffusionVolumesSource<TPixelType>::~DiffusionVolumesSource()
 
 
 template<typename TPixelType>
-virtual itk::DataObject::Pointer mitk::DiffusionVolumesSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::DiffusionVolumesSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
 {
   return static_cast<itk::DataObject*>(mitk::DiffusionVolumes<TPixelType>::New().GetPointer());
 }
@@ -52,14 +52,14 @@ mitk::DiffusionVolumes<TPixelType>* mitk::DiffusionVolumesSource<TPixelType>::Ge
     return 0;
   }
 
-  return static_cast<mitk::DiffusionVolumes*>
+  return static_cast<mitk::DiffusionVolumes<TPixelType>*>
     (this->BaseProcess::GetOutput(0));
 }
 
 template<typename TPixelType>
 mitk::DiffusionVolumes<TPixelType>* mitk::DiffusionVolumesSource<TPixelType>::GetOutput(unsigned int idx)
 {
-  return static_cast<mitk::DiffusionVolumes*>
+  return static_cast<mitk::DiffusionVolumes<TPixelType>*>
     (this->ProcessObject::GetOutput(idx));
 }
 
@@ -71,7 +71,7 @@ void mitk::DiffusionVolumesSource<TPixelType>::SetOutput(mitk::DiffusionVolumes<
 }
 
 template<typename TPixelType>
-virtual void mitk::DiffusionVolumesSource<TPixelType>::GraftOutput(mitk::DiffusionVolumes<TPixelType>* graft)
+void mitk::DiffusionVolumesSource<TPixelType>::GraftOutput(mitk::DiffusionVolumes<TPixelType>* graft)
 {
   this->GraftNthOutput(0, graft);
 }
@@ -81,7 +81,7 @@ void mitk::DiffusionVolumesSource<TPixelType>::GraftNthOutput(unsigned int idx, 
 {
   if (idx < this->GetNumberOfOutputs())
   {
-    mitk::DiffusionVolumes * output = this->GetOutput(idx);
+    mitk::DiffusionVolumes<TPixelType> * output = this->GetOutput(idx);
 
     if (output && graft)
     {

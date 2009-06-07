@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnsignedLongArray.h>
 #include <vtkUnsignedShortArray.h>
 
-#include "itkDiffusionTensor3d.h"
+#include "itkDiffusionTensor3D.h"
 
 #include "ipFunc/ipFunc.h"
 
@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __IMG_DAT_ITEM__CEIL_ZERO_ONE__(val) (val) =       \
   ( (val) < 0 ) ? ( 0 ) : ( ( (val)>1 ) ? ( 1 ) : ( (val) ) );
 
-mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data, bool manageMemory, size_t offset) : 
+mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int dimension, void *data, bool manageMemory, size_t offset) :
   m_Data(NULL), m_ManageMemory(false), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(offset), m_IsComplete(false), m_Size(0),
   m_Parent(&aParent)
 {
@@ -86,7 +86,7 @@ mitk::ImageDataItem::~ImageDataItem()
   }
 }
 
-mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) : 
+mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, void *data, bool manageMemory) :
   m_Data((unsigned char*)data), m_ManageMemory(manageMemory), m_PicDescriptor(NULL), m_VtkImageData(NULL), m_Offset(0), m_IsComplete(false), m_Size(0),
   m_Parent(NULL)
 {
@@ -107,7 +107,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
     m_ManageMemory = true;
   }
   m_PicDescriptor->data=m_Data;
-  
+
   m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0;
   m_ReferenceCountLock.Unlock();
@@ -119,14 +119,14 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
   vtkDataArray *scalars = NULL;
 
   unsigned long size = 0;
-  if ( m_PicDescriptor->dim == 1 ) 
+  if ( m_PicDescriptor->dim == 1 )
   {
-    inData->SetDimensions( m_PicDescriptor->n[0] -1, 1, 1);    
-    size = m_PicDescriptor->n[0];    
+    inData->SetDimensions( m_PicDescriptor->n[0] -1, 1, 1);
+    size = m_PicDescriptor->n[0];
     inData->SetOrigin( ((float) m_PicDescriptor->n[0]) / 2.0f, 0, 0 );
-  } 
-  else 
-  if ( m_PicDescriptor->dim == 2 ) 
+  }
+  else
+  if ( m_PicDescriptor->dim == 2 )
   {
     inData->SetDimensions( m_PicDescriptor->n[0] , m_PicDescriptor->n[1] , 1 );
     size = m_PicDescriptor->n[0] * m_PicDescriptor->n[1];
@@ -140,7 +140,7 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
     // Test
     //inData->SetOrigin( (float) m_PicDescriptor->n[0] / 2.0f, (float) m_PicDescriptor->n[1] / 2.0f, (float) m_PicDescriptor->n[2] / 2.0f );
     inData->SetOrigin( 0, 0, 0 );
-  } 
+  }
   else
   {
     inData->Delete () ;
@@ -156,7 +156,7 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
 
     inData->SetNumberOfScalarComponents(m_PixelType.GetNumberOfComponents());
 
-    if ( ( m_PixelType.GetType() == ipPicInt || m_PixelType.GetType() == ipPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 ) 
+    if ( ( m_PixelType.GetType() == ipPicInt || m_PixelType.GetType() == ipPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
     {
       inData->SetScalarType( VTK_BIT );
       scalars = vtkBitArray::New();
@@ -255,7 +255,7 @@ void mitk::ImageDataItem::Modified() const
     m_VtkImageData->Modified();
 }
 
-/** 
+/**
  * This method calculates RGB image from tensor information.
  * Templated over pixeltype, output always three uchar components.
  */
@@ -276,7 +276,7 @@ unsigned char *mitk::ImageDataItem::ConvertTensorsToRGB() const
     tensor->ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
     int index = 2;
-    if( (eigenvalues[0] >= eigenvalues[1]) 
+    if( (eigenvalues[0] >= eigenvalues[1])
       && (eigenvalues[0] >= eigenvalues[2]) )
       index = 0;
     else if(eigenvalues[1] >= eigenvalues[2])

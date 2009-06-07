@@ -59,7 +59,7 @@ Object::Pointer QtItemSelection::GetFirstElement() const
     return m_Selection->begin();
   }
 
-  QtItemSelection::QtItemSelection::iterator QtItemSelection::End() const
+  QtItemSelection::iterator QtItemSelection::End() const
   {
     return m_Selection->end();
   }

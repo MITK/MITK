@@ -47,7 +47,6 @@ struct CHERRY_UI ISelection : public Object
    */
   virtual bool IsEmpty() const = 0;
 
-  virtual ~ISelection() {}
 };
 
 }

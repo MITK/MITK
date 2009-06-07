@@ -1,19 +1,19 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #ifndef CHERRYIADAPTERMANAGER_H_
 #define CHERRYIADAPTERMANAGER_H_
@@ -21,12 +21,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryMacros.h>
 
 #include "cherryRuntimeDll.h"
-#include "cherryExpressionVariables.h"
+
+#include "cherryPlatformObject.h"
 #include "cherryIAdapterFactory.h"
+
+#include <Poco/Any.h>
 
 #include <typeinfo>
 
-namespace cherry {
+namespace cherry
+{
 
 /**
  * An adapter manager maintains a registry of adapter factories. Clients
@@ -78,31 +82,30 @@ namespace cherry {
  * @see IAdaptable
  * @see IAdapterFactory
  */
-struct IAdapterManager : public Object {
+struct CHERRY_RUNTIME IAdapterManager: public Object
+{
 
   cherryInterfaceMacro(IAdapterManager, cherry)
-
-  virtual ~IAdapterManager() {}
 
   /**
    * This value can be returned to indicate that no applicable adapter factory
    * was found.
    * @since org.opencherry.equinox.common 3.3
    */
-  static CHERRY_RUNTIME const int NONE;
+  static const int NONE;
 
   /**
    * This value can be returned to indicate that an adapter factory was found,
    * but has not been loaded.
    * @since org.opencherry.equinox.common 3.3
    */
-  static CHERRY_RUNTIME const int NOT_LOADED;
+  static const int NOT_LOADED;
 
   /**
    * This value can be returned to indicate that an adapter factory is loaded.
    * @since org.opencherry.equinox.common 3.3
    */
-  static CHERRY_RUNTIME const int LOADED;
+  static const int LOADED;
 
   /**
    * Returns the types that can be obtained by converting <code>adaptableClass</code>
@@ -121,7 +124,8 @@ struct IAdapterManager : public Object {
    * is returned if there are none.
    * @since 3.1
    */
-  virtual void ComputeAdapterTypes(std::vector<const std::type_info&>& types, const std::type_info& adaptableClass) = 0;
+  virtual std::vector<std::string> ComputeAdapterTypes(
+      const std::type_info& adaptableClass) = 0;
 
   /**
    * Returns the class search order for a given class. The search order from a
@@ -144,51 +148,36 @@ struct IAdapterManager : public Object {
   //public Class[] computeClassOrder(Class clazz);
 
   /**
-   * Returns an object which is an instance of the given class associated
-   * with the given object. Returns <code>null</code> if no such object can
+   * Returns a Poco::Any object which contains an instance of the given name associated
+   * with the given adaptable. Returns an empty Poco::Any if no such object can
    * be found.
    * <p>
    * Note that this method will never cause plug-ins to be loaded. If the
-   * only suitable factory is not yet loaded, this method will return <code>null</code>.
-   *
-   * @param adaptable the adaptable object being queried (usually an instance
-   * of <code>IAdaptable</code>)
-   * @param adapterType the type of adapter to look up
-   * @return an object castable to the given adapter type, or <code>null</code>
-   * if the given adaptable object does not have an available adapter of the
-   * given type
-   */
-  virtual ExpressionVariable::Pointer GetAdapter(ExpressionVariable::Pointer adaptable, const std::type_info& adapterType) = 0;
-
-  /**
-   * Returns an object which is an instance of the given class name associated
-   * with the given object. Returns <code>null</code> if no such object can
-   * be found.
-   * <p>
-   * Note that this method will never cause plug-ins to be loaded. If the
-   * only suitable factory is not yet loaded, this method will return <code>null</code>.
+   * only suitable factory is not yet loaded, this method will return an empty Poco::Any.
    * If activation of the plug-in providing the factory is required, use the
-   * <code>loadAdapter</code> method instead.
+   * <code>LoadAdapter</code> method instead.
    *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified name of the type of adapter to look up
-   * @return an object castable to the given adapter type, or <code>null</code>
+   * @return a Poco::Any castable to the given adapter type, or empty
    * if the given adaptable object does not have an available adapter of the
    * given type
-   * @since 3.0
    */
-  virtual ExpressionVariable::Pointer GetAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterTypeName) = 0;
+  template<typename A>
+  Poco::Any GetAdapter(A adaptable, const std::string& adapterTypeName) {
+    return this->GetAdapter(Poco::Any(adaptable), adapterTypeName, false);
+  }
 
   /**
    * Returns whether there is an adapter factory registered that may be able
    * to convert <code>adaptable</code> to an object of type <code>adapterTypeName</code>.
    * <p>
    * Note that a return value of <code>true</code> does not guarantee that
-   * a subsequent call to <code>getAdapter</code> with the same arguments
-   * will return a non-null result. If the factory's plug-in has not yet been
-   * loaded, or if the factory itself returns <code>null</code>, then
-   * <code>getAdapter</code> will still return <code>null</code>.
+   * a subsequent call to <code>GetAdapter</code> with the same arguments
+   * will return a non-empty result. If the factory's plug-in has not yet been
+   * loaded, or if the factory itself returns nothing, then
+   * <code>GetAdapter</code> will still return an empty Poco::Any.
    *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
@@ -197,74 +186,70 @@ struct IAdapterManager : public Object {
    * @return <code>true</code> if there is an adapter factory that claims
    * it can convert <code>adaptable</code> to an object of type <code>adapterType</code>,
    * and <code>false</code> otherwise.
-   * @since 3.0
    */
-  virtual bool HasAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterType) = 0;
+  virtual bool HasAdapter(const std::string& adaptableType, const std::string& adapterType) = 0;
 
   /**
    * Returns a status of an adapter factory registered that may be able
    * to convert <code>adaptable</code> to an object of type <code>adapterTypeName</code>.
    * <p>
    * One of the following values can be returned:<ul>
-   * <li>{@link org.opencherry.core.runtime.IAdapterManager#NONE} if no applicable adapter factory was found;</li>
-   * <li>{@link org.opencherry.core.runtime.IAdapterManager#NOT_LOADED} if an adapter factory was found, but has not been loaded;</li>
-   * <li>{@link org.opencherry.core.runtime.IAdapterManager#LOADED} if an adapter factory was found, and it is loaded.</li>
+   * <li>{@link cherry::IAdapterManager::NONE} if no applicable adapter factory was found;</li>
+   * <li>{@link cherry::IAdapterManager::NOT_LOADED} if an adapter factory was found, but has not been loaded;</li>
+   * <li>{@link cherry::IAdapterManager::LOADED} if an adapter factory was found, and it is loaded.</li>
    * </ul></p>
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified class name of an adapter to
    * look up
    * @return a status of the adapter
-   * @since org.opencherry.equinox.common 3.3
    */
-  virtual int QueryAdapter(ExpressionVariable::Pointer adaptable, const std::string& adapterType) = 0;
+  virtual int
+      QueryAdapter(const std::string& adaptableType, const std::string& adapterType) = 0;
 
   /**
    * Returns an object that is an instance of the given class name associated
-   * with the given object. Returns <code>null</code> if no such object can
+   * with the given object. Returns an empty Poco::Any if no such object can
    * be found.
    * <p>
-   * Note that unlike the <code>getAdapter</code> methods, this method
+   * Note that unlike the <code>GetAdapter</code> methods, this method
    * will cause the plug-in that contributes the adapter factory to be loaded
    * if necessary. As such, this method should be used judiciously, in order
    * to avoid unnecessary plug-in activations. Most clients should avoid
-   * activation by using <code>getAdapter</code> instead.
+   * activation by using <code>GetAdapter</code> instead.
    *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
    * @param adapterTypeName the fully qualified name of the type of adapter to look up
-   * @return an object castable to the given adapter type, or <code>null</code>
+   * @return a Poco::Any castable to the given adapter type, or empty
    * if the given adaptable object does not have an available adapter of the
    * given type
-   * @since 3.0
    */
-  virtual ExpressionVariable::Pointer LoadAdapter(ExpressionVariable::Pointer adaptable, const std::type_info& adapterType) = 0;
+  template<typename A>
+  Poco::Any LoadAdapter(A adaptable, const std::string& adapterTypeName) {
+    return this->GetAdapter(Poco::Any(adaptable), adapterTypeName, true);
+  }
 
   /**
    * Registers the given adapter factory as extending objects of the given
    * type.
-   * <p>
-   * If the type being extended is a class, the given factory's adapters are
-   * available on instances of that class and any of its subclasses. If it is
-   * an interface, the adapters are available to all classes that directly or
-   * indirectly implement that interface.
-   * </p>
    *
    * @param factory the adapter factory
-   * @param adaptable the type being extended
-   * @see #unregisterAdapters(IAdapterFactory)
-   * @see #unregisterAdapters(IAdapterFactory, Class)
+   * @param adaptableTypeName the fully qualified typename being extended
+   * @see #UnregisterAdapters(IAdapterFactory*)
+   * @see #UnregisterAdapters(IAdapterFactory*, const std::adaptableTypeName&)
    */
-  virtual void RegisterAdapters(IAdapterFactory* factory, const std::type_info& adaptable) = 0;
+  virtual void RegisterAdapters(IAdapterFactory* factory,
+      const std::string& adaptableTypeName) = 0;
 
   /**
    * Removes the given adapter factory completely from the list of registered
-   * factories. Equivalent to calling <code>unregisterAdapters(IAdapterFactory,Class)</code>
+   * factories. Equivalent to calling <code>UnregisterAdapters(IAdapterFactory*, const std::string&)</code>
    * on all classes against which it had been explicitly registered. Does
    * nothing if the given factory is not currently registered.
    *
    * @param factory the adapter factory to remove
-   * @see #registerAdapters(IAdapterFactory, Class)
+   * @see #RegisterAdapters(IAdapterFactory*, const std::string&)
    */
   virtual void UnregisterAdapters(IAdapterFactory* factory) = 0;
 
@@ -274,11 +259,16 @@ struct IAdapterManager : public Object {
    * combination is not registered.
    *
    * @param factory the adapter factory to remove
-   * @param adaptable one of the types against which the given factory is
+   * @param adaptableTypeName one of the type names against which the given factory is
    * registered
-   * @see #registerAdapters(IAdapterFactory, Class)
+   * @see #RegisterAdapters(IAdapterFactory*, const std::string&)
    */
-  virtual void UnregisterAdapters(IAdapterFactory* factory, const std::type_info& adaptable) = 0;
+  virtual void UnregisterAdapters(IAdapterFactory* factory,
+      const std::string& adaptableTypeName) = 0;
+
+protected:
+
+  virtual Poco::Any GetAdapter(Poco::Any adaptable, const std::string& adapterType, bool force) = 0;
 };
 
 } // namespace cherry

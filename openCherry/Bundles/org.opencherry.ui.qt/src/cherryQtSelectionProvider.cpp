@@ -18,6 +18,7 @@
 #include "cherryQtSelectionProvider.h"
 
 #include "cherryQtItemSelection.h"
+#include "cherryQModelIndexObject.h"
 
 namespace cherry {
 

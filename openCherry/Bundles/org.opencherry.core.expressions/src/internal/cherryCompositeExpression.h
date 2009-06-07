@@ -39,7 +39,7 @@ private:
   /**
    * The seed for the hash code for all composite expressions.
    */
-  static const intptr_t HASH_INITIAL;
+  static const std::size_t HASH_INITIAL;
 
 protected:
   std::vector<Expression::Pointer> fExpressions;
@@ -47,7 +47,7 @@ protected:
   virtual EvaluationResult EvaluateAnd(IEvaluationContext* scope);
   virtual EvaluationResult EvaluateOr(IEvaluationContext* scope);
 
-  virtual intptr_t ComputeHashCode();
+  virtual std::size_t ComputeHashCode();
 
 public:
 

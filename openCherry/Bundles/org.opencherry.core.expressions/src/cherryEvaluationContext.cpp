@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 EvaluationContext::EvaluationContext(IEvaluationContext* parent,
-                                     ExpressionVariable::Pointer defaultVariable)
+                                     Object::Pointer defaultVariable)
 {
   poco_assert(defaultVariable.IsNotNull());
 
@@ -30,7 +30,7 @@ EvaluationContext::EvaluationContext(IEvaluationContext* parent,
 }
 
 EvaluationContext::EvaluationContext(IEvaluationContext* parent,
-    ExpressionVariable::Pointer defaultVariable,
+    Object::Pointer defaultVariable,
     std::vector<IVariableResolver*> resolvers)
 {
   poco_assert(defaultVariable.IsNotNull());
@@ -57,7 +57,7 @@ EvaluationContext::GetRoot()
   return fParent->GetRoot();
 }
 
-ExpressionVariable::Pointer
+Object::Pointer
 EvaluationContext::GetDefaultVariable() const
 {
   return fDefaultVariable;
@@ -76,7 +76,7 @@ EvaluationContext::GetAllowPluginActivation() const
 }
 
 void
-EvaluationContext::AddVariable(const std::string& name, ExpressionVariable::Pointer value)
+EvaluationContext::AddVariable(const std::string& name, Object::Pointer value)
 {
   poco_assert(name.size() != 0);
   poco_assert(value.IsNotNull());
@@ -84,24 +84,24 @@ EvaluationContext::AddVariable(const std::string& name, ExpressionVariable::Poin
   fVariables[name] = value;
 }
 
-ExpressionVariable::Pointer
+Object::Pointer
 EvaluationContext::RemoveVariable(const std::string& name)
 {
   poco_assert(name.size() != 0);
 
-  ExpressionVariable::Pointer elem(fVariables[name]);
+  Object::Pointer elem(fVariables[name]);
   fVariables.erase(name);
   return elem;
 }
 
-ExpressionVariable::Pointer
+Object::Pointer
 EvaluationContext::GetVariable(const std::string& name) const
 {
   poco_assert(name.size() != 0);
 
-  ExpressionVariable::Pointer result;
+  Object::Pointer result;
 
-  std::map<std::string, ExpressionVariable::Pointer>::const_iterator iter(fVariables.find(name));
+  std::map<std::string, Object::Pointer>::const_iterator iter(fVariables.find(name));
   if (iter != fVariables.end()) {
     result = iter->second;
   }
@@ -115,13 +115,13 @@ EvaluationContext::GetVariable(const std::string& name) const
   return result;
 }
 
-ExpressionVariable::Pointer
-EvaluationContext::ResolveVariable(const std::string& name, std::vector<ExpressionVariable::Pointer>& args)
+Object::Pointer
+EvaluationContext::ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args)
 {
   if (fVariableResolvers.size() > 0) {
     for (unsigned int i= 0; i < fVariableResolvers.size(); ++i) {
       IVariableResolver* resolver = fVariableResolvers[i];
-      ExpressionVariable::Pointer variable(resolver->Resolve(name, args));
+      Object::Pointer variable(resolver->Resolve(name, args));
       if (!variable.IsNull())
         return variable;
     }
@@ -130,7 +130,7 @@ EvaluationContext::ResolveVariable(const std::string& name, std::vector<Expressi
   if (fParent != 0)
     return fParent->ResolveVariable(name, args);
 
-  return ExpressionVariable::Pointer();
+  return Object::Pointer();
 }
 
 }

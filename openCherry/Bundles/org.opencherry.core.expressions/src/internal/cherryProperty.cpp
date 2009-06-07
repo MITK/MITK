@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-Property::Property(ExpressionVariable::Pointer type,
+Property::Property(Object::Pointer type,
      const std::string& namespaze, const std::string& name)
  : fType(type), fNamespace(namespaze), fName(name) {
 
@@ -56,7 +56,7 @@ Property::Property(ExpressionVariable::Pointer type,
  }
 
  bool
- Property::Test(ExpressionVariable::Pointer receiver, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue) {
+ Property::Test(Object::Pointer receiver, std::vector<Object::Pointer>& args, Object::Pointer expectedValue) {
    return fTester->Test(receiver, fName, args, expectedValue);
  }
 

@@ -175,7 +175,7 @@ protected:
   /* (non-Javadoc)
    * Method declared on IAdaptable.
    */
-  void* GetAdapterImpl(const std::type_info& adapter) const;
+  Poco::Any GetAdapter(const std::string& adapter);
 };
 
 } // namespace cherry

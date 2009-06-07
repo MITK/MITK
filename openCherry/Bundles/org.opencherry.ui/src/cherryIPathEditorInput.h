@@ -56,7 +56,7 @@ struct CHERRY_UI IPathEditorInput : public IEditorInput {
      *
      * @return a local file system path
      */
-   virtual Poco::Path GetPath() = 0;
+   virtual Poco::Path GetPath() const = 0;
 };
 
 }

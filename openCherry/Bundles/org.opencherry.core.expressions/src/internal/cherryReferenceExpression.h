@@ -46,7 +46,7 @@ private:
 	/**
 	 * The seed for the hash code for all equals expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
 	std::string fDefinitionId;
 
@@ -67,7 +67,7 @@ public:
 
 
 protected:
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 };
 
 } // namespace cherry

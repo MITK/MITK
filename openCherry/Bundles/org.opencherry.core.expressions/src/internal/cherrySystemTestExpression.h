@@ -37,7 +37,7 @@ private:
 	/**
 	 * The seed for the hash code for all system test expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
 public:
 
@@ -55,7 +55,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 
 	// ---- Debugging ---------------------------------------------------
 

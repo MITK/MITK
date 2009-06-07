@@ -17,36 +17,75 @@
 
 #include "mitkDataTreeNodeSelection.h"
 
+#include "mitkDataTreeNodeObject.h"
+
 namespace mitk
 {
 
-DataTreeNodeSelection::DataTreeNodeSelection()
+DataTreeNodeSelection::DataTreeNodeSelection() :
+  m_Selection(new ContainerType())
 {
 
 }
 
-DataTreeNodeSelection::DataTreeNodeSelection(const NodeContainer& nodes)
-: m_Nodes(nodes)
+DataTreeNodeSelection::DataTreeNodeSelection(DataTreeNode::Pointer node) :
+  m_Selection(new ContainerType())
 {
-
+  DataTreeNodeObject::Pointer obj(new DataTreeNodeObject(node));
+  m_Selection->push_back(obj);
 }
 
-const std::vector<DataTreeNode::Pointer>&
-DataTreeNodeSelection::GetDataTreeNodes() const
+DataTreeNodeSelection::DataTreeNodeSelection(const std::vector<DataTreeNode::Pointer>& nodes) :
+  m_Selection(new ContainerType())
 {
-  return m_Nodes;
+  for (std::vector<DataTreeNode::Pointer>::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+  {
+    DataTreeNodeObject::Pointer obj(new DataTreeNodeObject(*i));
+    m_Selection->push_back(obj);
+  }
 }
 
-unsigned int
-DataTreeNodeSelection::GetSize() const
+cherry::Object::Pointer DataTreeNodeSelection::GetFirstElement() const
 {
-  return m_Nodes.size();
+  if (m_Selection->empty())
+    return cherry::Object::Pointer();
+
+  return *(m_Selection->begin());
 }
 
-bool
-DataTreeNodeSelection::IsEmpty() const
+cherry::IStructuredSelection::iterator DataTreeNodeSelection::Begin() const
 {
-  return m_Nodes.empty();
+  return m_Selection->begin();
+}
+
+cherry::IStructuredSelection::iterator DataTreeNodeSelection::End() const
+{
+  return m_Selection->end();
+}
+
+int DataTreeNodeSelection::Size() const
+{
+  return m_Selection->size();
+}
+
+cherry::IStructuredSelection::ContainerType::Pointer DataTreeNodeSelection::ToVector() const
+{
+  return m_Selection;
+}
+
+bool DataTreeNodeSelection::IsEmpty() const
+{
+  return m_Selection->empty();
+}
+
+bool DataTreeNodeSelection::operator==(const cherry::Object* obj) const
+{
+  if (const cherry::IStructuredSelection* other = dynamic_cast<const cherry::IStructuredSelection*>(obj))
+  {
+    return m_Selection == other->ToVector();
+  }
+
+  return false;
 }
 
 }

@@ -25,10 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const intptr_t EqualsExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::EqualsExpression");
+const std::size_t EqualsExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::EqualsExpression");
 
 
-EqualsExpression::EqualsExpression(ExpressionVariable::Pointer expectedValue) {
+EqualsExpression::EqualsExpression(Object::Pointer expectedValue) {
   poco_assert(expectedValue.IsNotNull());
 
   fExpectedValue = expectedValue;
@@ -49,7 +49,7 @@ EqualsExpression::EqualsExpression(Poco::XML::Element* element) {
 
 EvaluationResult
 EqualsExpression::Evaluate(IEvaluationContext* context) {
-  ExpressionVariable::Pointer element= context->GetDefaultVariable();
+  Object::Pointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(element == fExpectedValue);
 }
 
@@ -71,7 +71,7 @@ EqualsExpression::operator==(Expression& object) {
   }
 }
 
-intptr_t
+std::size_t
 EqualsExpression::ComputeHashCode() {
   return HASH_INITIAL * HASH_FACTOR + fExpectedValue->HashCode();
 }

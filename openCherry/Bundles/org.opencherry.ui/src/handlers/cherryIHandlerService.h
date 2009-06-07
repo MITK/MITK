@@ -28,8 +28,11 @@ namespace cherry {
 class Command;
 class ExecutionEvent;
 class ParameterizedCommand;
+class Expression;
+class UIElement;
 
-namespace GuiTk { class Event; }
+struct IHandler;
+struct IHandlerActivation;
 
 /**
  * <p>
@@ -233,7 +236,7 @@ struct CHERRY_UI IHandlerService : public IServiceWithSources {
    * @see Command#executeWithChecks(ExecutionEvent)
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
-      SmartPointer<const Command> command, SmartPointer<const GuiTk::Event> event) = 0;
+      SmartPointer<const Command> command, SmartPointer<const UIElement> uielement) = 0;
 
   /**
    * Creates a parameterized execution event based on an SWT event and a
@@ -254,7 +257,7 @@ struct CHERRY_UI IHandlerService : public IServiceWithSources {
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
       SmartPointer<const ParameterizedCommand> command,
-      SmartPointer<const GuiTk::Event> event) = 0;
+      SmartPointer<const UIElement> uielement) = 0;
 
   /**
    * Deactivates the given handler within the context of this service. If the
@@ -307,7 +310,7 @@ struct CHERRY_UI IHandlerService : public IServiceWithSources {
    * @see Command#executeWithChecks(ExecutionEvent)
    */
   virtual Object::Pointer ExecuteCommand(const std::string& commandId,
-      SmartPointer<const GuiTk::Event> event)
+      SmartPointer<const UIElement> uielement)
       throw(ExecutionException, NotDefinedException,
       NotEnabledException, NotHandledException) = 0;
 
@@ -334,7 +337,7 @@ struct CHERRY_UI IHandlerService : public IServiceWithSources {
    */
   virtual Object::Pointer ExecuteCommand(
       SmartPointer<ParameterizedCommand> command,
-      SmartPointer<const GuiTk::Event> event)
+      SmartPointer<const UIElement> uielement)
       throw(ExecutionException, NotDefinedException,
       NotEnabledException, NotHandledException) = 0;
 
@@ -368,7 +371,7 @@ struct CHERRY_UI IHandlerService : public IServiceWithSources {
    */
   virtual Object::Pointer ExecuteCommandInContext(
       SmartPointer<ParameterizedCommand> command,
-      SmartPointer<const GuiTk::Event> event,
+      SmartPointer<const UIElement> uielement,
       SmartPointer<IEvaluationContext> context)
     throw(ExecutionException,
       NotDefinedException, NotEnabledException, NotHandledException) = 0;

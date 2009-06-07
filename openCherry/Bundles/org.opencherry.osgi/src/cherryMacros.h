@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWeakPointer.h"
 
 #define cherryNameMacro(className) \
-  virtual const char* GetNameOfClass() const \
+  virtual const char* GetClassName() const \
+  { return #className; }\
+  static const char* GetStaticClassName() \
   { return #className; }\
 
 #define cherryManifestMacro(className, namespaze) \

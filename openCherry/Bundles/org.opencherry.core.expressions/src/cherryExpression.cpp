@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "cherryExpression.h"
+#include <Poco/Hash.h>
 
 
 namespace cherry {
@@ -64,8 +65,8 @@ bool Expression::Equals(std::vector<Expression::Pointer>& leftArray,
   return true;
 }
 
-bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
-    std::vector<ExpressionVariable::Pointer>& rightArray)
+bool Expression::Equals(std::vector<Object::Pointer>& leftArray,
+    std::vector<Object::Pointer>& rightArray)
 {
   if (leftArray == rightArray)
   {
@@ -79,8 +80,8 @@ bool Expression::Equals(std::vector<ExpressionVariable::Pointer>& leftArray,
 
   for (unsigned int i= 0; i < leftArray.size(); ++i)
   {
-    ExpressionVariable::Pointer left= leftArray[i];
-    ExpressionVariable::Pointer right= rightArray[i];
+    Object::Pointer left= leftArray[i];
+    Object::Pointer right= rightArray[i];
     const bool equal = (left.IsNull()) ? (right.IsNull()) : (left == right);
     if (!equal)
     {
@@ -111,12 +112,12 @@ Expression::HashCode(std::vector<Expression::Pointer>& array)
 }
 
 std::size_t
-Expression::HashCode(std::vector<ExpressionVariable::Pointer>& array)
+Expression::HashCode(std::vector<Object::Pointer>& array)
 {
   if (array.size() == 0) {
     return 0;
   }
-  int hashCode = Poco::hash("std::vector<ExpressionVariable::Pointer>");
+  int hashCode = Poco::hash("std::vector<Object::Pointer>");
   for (unsigned int i= 0; i < array.size(); i++) {
     hashCode = hashCode + array[i]->HashCode();
   }

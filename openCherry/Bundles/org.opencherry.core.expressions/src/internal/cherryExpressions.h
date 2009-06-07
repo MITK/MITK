@@ -47,13 +47,13 @@ public:
   /* debugging flag to enable tracing */
   static const bool TRACING;
 
-  static bool IsInstanceOf(ExpressionVariable::ConstPointer element, const std::string& type);
+  static bool IsInstanceOf(Object::ConstPointer element, const std::string& type);
 
   static void CheckAttribute(const std::string& name, bool value);
 
   static void CheckAttribute(const std::string& name, bool result, const std::string& value, std::vector<std::string>& validValues);
 
-  static void CheckCollection(ExpressionVariable::ConstPointer var, Expression::Pointer expression);
+  static void CheckCollection(Object::ConstPointer var, Expression::Pointer expression);
 
   /**
    * Converts the given variable into an <code>IIterable</code>. If a corresponding adapter can't be found an
@@ -66,7 +66,7 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>IIterable</code>
    */
-  static IIterable::Pointer GetAsIIterable(ExpressionVariable::Pointer var, Expression::Pointer expression);
+  static IIterable::Pointer GetAsIIterable(Object::Pointer var, Expression::Pointer expression);
 
   /**
    * Converts the given variable into an <code>ICountable</code>. If a corresponding adapter can't be found an
@@ -79,7 +79,7 @@ public:
    *
    * @throws CoreException if the var can't be adapted to an <code>ICountable</code>
    */
-  static ICountable::Pointer GetAsICountable(ExpressionVariable::Pointer var, Expression::Pointer expression);
+  static ICountable::Pointer GetAsICountable(Object::Pointer var, Expression::Pointer expression);
 
   static bool GetOptionalBooleanAttribute(SmartPointer<IConfigurationElement> element, const std::string& attributeName);
 
@@ -87,13 +87,13 @@ public:
 
   //---- Argument parsing --------------------------------------------
 
-  static void GetArguments(std::vector<ExpressionVariable::Pointer>& args, SmartPointer<IConfigurationElement> element, const std::string& attributeName);
+  static void GetArguments(std::vector<Object::Pointer>& args, SmartPointer<IConfigurationElement> element, const std::string& attributeName);
 
-  static void GetArguments(std::vector<ExpressionVariable::Pointer>& args, Poco::XML::Element* element, const std::string& attributeName);
+  static void GetArguments(std::vector<Object::Pointer>& args, Poco::XML::Element* element, const std::string& attributeName);
 
-  static void ParseArguments(std::vector<ExpressionVariable::Pointer>&, const std::string& args);
+  static void ParseArguments(std::vector<Object::Pointer>&, const std::string& args);
 
-  static ExpressionVariable::Pointer ConvertArgument(const std::string& arg, bool result = true);
+  static Object::Pointer ConvertArgument(const std::string& arg, bool result = true);
 
   static std::string UnEscapeString(const std::string& str);
 

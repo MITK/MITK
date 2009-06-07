@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYICOUNTABLE_H_
 #define CHERRYICOUNTABLE_H_
 
-#include <cherryExpressionVariables.h>
+#include <cherryObject.h>
 #include <cherryMacros.h>
 
 #include "cherryExpressionsDll.h"
@@ -34,13 +34,10 @@ namespace cherry {
  *
  * @since 3.3
  */
-struct CHERRY_EXPRESSIONS ICountable : public ExpressionVariable {
+struct CHERRY_EXPRESSIONS ICountable : public Object {
 
   cherryObjectMacro(ICountable)
 
-  ICountable() {
-    m_TypeInfo.Add("cherry::ICountable", typeid(this));
-  }
   /**
    * Returns the number of elements.
    *

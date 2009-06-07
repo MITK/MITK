@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryTypeExtensionManager.h"
 
 #include "service/cherryIConfigurationElement.h"
-#include "cherryExpressionVariables.h"
+#include "cherryObject.h"
 
 #include "Poco/DOM/Element.h"
 
@@ -33,8 +33,8 @@ class TestExpression : public Expression {
 private:
   std::string fNamespace;
   std::string fProperty;
-	std::vector<ExpressionVariable::Pointer> fArgs;
-	ExpressionVariable::Pointer fExpectedValue;
+	std::vector<Object::Pointer> fArgs;
+	Object::Pointer fExpectedValue;
 	bool fForcePluginActivation;
 
 	static const char PROP_SEP;
@@ -44,7 +44,7 @@ private:
 	/**
 	 * The seed for the hash code for all test expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
   static TypeExtensionManager fgTypeExtensionManager;
 
@@ -56,10 +56,10 @@ public:
 	TestExpression(Poco::XML::Element* element);
 
 	TestExpression(const std::string& namespaze, const std::string& property,
-	    std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue);
+	    std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
 
 	TestExpression(const std::string& namespaze, const std::string& property,
-	    std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue, bool forcePluginActivation);
+	    std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation);
 
 	EvaluationResult Evaluate(IEvaluationContext* context);
 
@@ -69,7 +69,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 
 	//---- Debugging ---------------------------------------------------
 

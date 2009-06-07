@@ -15,27 +15,37 @@
 
  =========================================================================*/
 
-#include "cherryPlatformObject.h"
 
-#include <cherryPlatform.h>
-#include "cherryRuntime.h"
-#include "cherryIAdapterManager.h"
+#ifndef CHERRYQMODELINDEXOBJECT_H_
+#define CHERRYQMODELINDEXOBJECT_H_
 
-namespace cherry {
+#include <cherryObject.h>
+#include <cherryMacros.h>
 
-PlatformObject::PlatformObject()
- : Object()
+#include <QModelIndex>
+
+namespace cherry
 {
 
-}
-
-Poco::Any PlatformObject::GetAdapter(const std::string& adapter)
+class QModelIndexObject : public Object
 {
-  IAdapterManager::Pointer adapterManager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
-  if (adapterManager)
-    return adapterManager->GetAdapter(Object::Pointer(this), adapter);
 
-  return Poco::Any();
+public:
+
+  cherryObjectMacro(cherry::QModelIndexObject)
+
+  QModelIndexObject(const QModelIndex& index);
+
+  const QModelIndex& GetQModelIndex() const;
+
+  bool operator==(const Object* obj) const;
+
+private:
+
+  QModelIndex m_QModelIndex;
+
+};
+
 }
 
-}
+#endif /* CHERRYQMODELINDEXOBJECT_H_ */

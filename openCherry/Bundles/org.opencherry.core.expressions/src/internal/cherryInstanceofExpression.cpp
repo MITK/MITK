@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-const intptr_t InstanceofExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::InstanceofExpression");
+const std::size_t InstanceofExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::InstanceofExpression");
 
 InstanceofExpression::InstanceofExpression(IConfigurationElement::Pointer element)
 {
@@ -46,7 +46,7 @@ InstanceofExpression::InstanceofExpression(const std::string& typeName)
 EvaluationResult
 InstanceofExpression::Evaluate(IEvaluationContext* context)
 {
-  ExpressionVariable::Pointer element= context->GetDefaultVariable();
+  Object::Pointer element= context->GetDefaultVariable();
   return EvaluationResult::ValueOf(Expressions::IsInstanceOf(element, fTypeName));
 }
 
@@ -76,7 +76,7 @@ InstanceofExpression::ToString()
   return "<instanceof value=\"" + fTypeName + "\"/>"; ;
 }
 
-intptr_t
+std::size_t
 InstanceofExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fTypeName);

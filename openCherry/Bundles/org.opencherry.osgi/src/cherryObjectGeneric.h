@@ -91,7 +91,7 @@ class CHERRY_OSGI ObjectGeneric : public Object
 
 /**
  * Generates a specialized subclass of cherry::ObjectGeneric.
- * This way, GetNameOfClass() returns the value provided by ObjectName.
+ * This way, GetClassName() returns the value provided by ObjectName.
  * Please see cherryObjects.h for examples
  * @param ObjectName the name of the instantiation of ObjectGeneric
  * @param Type the value type

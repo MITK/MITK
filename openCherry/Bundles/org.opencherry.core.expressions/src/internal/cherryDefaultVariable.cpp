@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 DefaultVariable::DefaultVariable(IEvaluationContext* parent,
-    ExpressionVariable::Pointer defaultVariable)
+    Object::Pointer defaultVariable)
 {
   poco_check_ptr(parent);
 
@@ -46,7 +46,7 @@ IEvaluationContext* DefaultVariable::GetRoot()
   return fParent->GetRoot();
 }
 
-ExpressionVariable::Pointer DefaultVariable::GetDefaultVariable() const
+Object::Pointer DefaultVariable::GetDefaultVariable() const
 {
   return fDefaultVariable;
 }
@@ -61,23 +61,23 @@ bool DefaultVariable::GetAllowPluginActivation() const
   return fParent->GetAllowPluginActivation();
 }
 
-void DefaultVariable::AddVariable(const std::string& name, ExpressionVariable::Pointer value)
+void DefaultVariable::AddVariable(const std::string& name, Object::Pointer value)
 {
   fManagedPool->AddVariable(name, value);
 }
 
-ExpressionVariable::Pointer DefaultVariable::RemoveVariable(const std::string& name)
+Object::Pointer DefaultVariable::RemoveVariable(const std::string& name)
 {
   return fManagedPool->RemoveVariable(name);
 }
 
-ExpressionVariable::Pointer DefaultVariable::GetVariable(const std::string& name) const
+Object::Pointer DefaultVariable::GetVariable(const std::string& name) const
 {
   return fManagedPool->GetVariable(name);
 }
 
-ExpressionVariable::Pointer DefaultVariable::ResolveVariable(const std::string& name,
-    std::vector<ExpressionVariable::Pointer>& args)
+Object::Pointer DefaultVariable::ResolveVariable(const std::string& name,
+    std::vector<Object::Pointer>& args)
 {
   return fManagedPool->ResolveVariable(name, args);
 }

@@ -27,7 +27,7 @@ namespace cherry {
 
 const std::string SystemTestExpression::ATT_PROPERTY= "property";
 
-const intptr_t SystemTestExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::SystemTestExpression");
+const std::size_t SystemTestExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::SystemTestExpression");
 
 SystemTestExpression::SystemTestExpression(IConfigurationElement::Pointer element)
 {
@@ -82,7 +82,7 @@ SystemTestExpression::operator==(Expression& object)
 
 }
 
-intptr_t
+std::size_t
 SystemTestExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fExpectedValue)

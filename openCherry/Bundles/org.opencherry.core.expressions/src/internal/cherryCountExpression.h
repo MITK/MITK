@@ -43,7 +43,7 @@ private:
 	/**
 	 * The seed for the hash code for all count expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
 	 int fMode;
 	 int fSize;
@@ -66,7 +66,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 
 };
 

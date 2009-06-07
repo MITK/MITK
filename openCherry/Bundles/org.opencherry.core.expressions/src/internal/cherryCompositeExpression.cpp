@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-const intptr_t CompositeExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::CompositeExpression");
+const std::size_t CompositeExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::CompositeExpression");
 
 void CompositeExpression::Add(Expression::Pointer expression)
 {
@@ -78,7 +78,7 @@ void CompositeExpression::CollectExpressionInfo(ExpressionInfo* info)
   }
 }
 
-intptr_t CompositeExpression::ComputeHashCode()
+std::size_t CompositeExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions);
 }

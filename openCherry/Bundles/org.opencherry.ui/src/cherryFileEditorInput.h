@@ -15,27 +15,38 @@
 
  =========================================================================*/
 
-#include "cherryPlatformObject.h"
 
-#include <cherryPlatform.h>
-#include "cherryRuntime.h"
-#include "cherryIAdapterManager.h"
+#ifndef CHERRYFILEEDITORINPUT_H_
+#define CHERRYFILEEDITORINPUT_H_
+
+#include "cherryIPathEditorInput.h"
 
 namespace cherry {
 
-PlatformObject::PlatformObject()
- : Object()
+class FileEditorInput : public IPathEditorInput
 {
 
+public:
+
+  cherryObjectMacro(FileEditorInput);
+
+  FileEditorInput(const Poco::Path& path);
+
+  Poco::Path GetPath() const;
+
+  bool Exists() const;
+
+  std::string GetName() const ;
+
+  std::string GetToolTipText() const;
+
+  bool operator==(const IEditorInput* o) const;
+
+private:
+
+  Poco::Path m_Path;
+};
+
 }
 
-Poco::Any PlatformObject::GetAdapter(const std::string& adapter)
-{
-  IAdapterManager::Pointer adapterManager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
-  if (adapterManager)
-    return adapterManager->GetAdapter(Object::Pointer(this), adapter);
-
-  return Poco::Any();
-}
-
-}
+#endif /* CHERRYFILEEDITORINPUT_H_ */

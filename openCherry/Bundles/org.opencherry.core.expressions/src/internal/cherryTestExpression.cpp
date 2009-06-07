@@ -21,6 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPlatform.h"
 
+#include <cherryObjectString.h>
+
+#include <Poco/Hash.h>
+
 namespace cherry {
 
 const char TestExpression::PROP_SEP = '.';
@@ -30,7 +34,7 @@ const std::string TestExpression::ATT_FORCE_PLUGIN_ACTIVATION = "forcePluginActi
 
 TypeExtensionManager TestExpression::fgTypeExtensionManager("propertyTesters");
 
-const intptr_t TestExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::TextExpression");
+const std::size_t TestExpression::HASH_INITIAL= Poco::hash("cherry::TextExpression");
 
 
 TestExpression::TestExpression(IConfigurationElement::Pointer element)
@@ -67,12 +71,12 @@ TestExpression::TestExpression(Poco::XML::Element* element)
   fForcePluginActivation= Expressions::GetOptionalBooleanAttribute(element, ATT_FORCE_PLUGIN_ACTIVATION);
 }
 
-TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue)
+TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue)
 {
   TestExpression(namespaze, property, args, expectedValue, false);
 }
 
-TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue, bool forcePluginActivation)
+TestExpression::TestExpression(const std::string& namespaze, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation)
  : fNamespace(namespaze), fProperty(property), fArgs(args),
    fExpectedValue(expectedValue), fForcePluginActivation(forcePluginActivation)
 {
@@ -82,7 +86,7 @@ TestExpression::TestExpression(const std::string& namespaze, const std::string& 
 EvaluationResult
 TestExpression::Evaluate(IEvaluationContext* context)
 {
-  ExpressionVariable::Pointer element = context->GetDefaultVariable();
+  Object::Pointer element = context->GetDefaultVariable();
   if (typeid(Platform) == typeid(element.GetPointer()))
   {
     std::string str = Platform::GetProperty(fProperty);
@@ -91,9 +95,9 @@ TestExpression::Evaluate(IEvaluationContext* context)
       return EvaluationResult::FALSE_EVAL;
     }
 
-    StringExpressionVariable::Pointer var = fArgs[0].Cast<StringExpressionVariable>();
-    if (!var.IsNull())
-      return EvaluationResult::ValueOf(str == var->GetVariable());
+    ObjectString::Pointer var = fArgs[0].Cast<ObjectString>();
+    if (var)
+      return EvaluationResult::ValueOf(*var == str);
 
     return EvaluationResult::FALSE_EVAL;
   }
@@ -129,13 +133,13 @@ TestExpression::operator==(Expression& object)
 
 }
 
-intptr_t
+std::size_t
 TestExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fArgs)
   * HASH_FACTOR + fExpectedValue->HashCode()
-  * HASH_FACTOR + Poco::Hash<std::string>()(fNamespace)
-  * HASH_FACTOR + Poco::Hash<std::string>()(fProperty)
+  * HASH_FACTOR + Poco::hash(fNamespace)
+  * HASH_FACTOR + Poco::hash(fProperty)
   * HASH_FACTOR + (fForcePluginActivation ? 1 : 0);
 }
 
@@ -145,12 +149,12 @@ TestExpression::ToString()
   std::string args("");
   for (unsigned int i= 0; i < fArgs.size(); i++)
   {
-    ExpressionVariable::Pointer arg= fArgs[i];
-    StringExpressionVariable::Pointer strarg = arg.Cast<StringExpressionVariable>();
-    if (!strarg.IsNull())
+    Object::Pointer arg= fArgs[i];
+    ObjectString::Pointer strarg = arg.Cast<ObjectString>();
+    if (strarg)
     {
       args.append(1,'\'');
-      args.append(strarg->GetVariable());
+      args.append(*strarg);
       args.append(1,'\'');
     }
     else

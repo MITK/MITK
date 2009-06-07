@@ -51,7 +51,7 @@ public:
   Indent(int ind=0) {m_Indent=ind;}
 
   /** Return the name of the class. */
-  static const char *GetNameOfClass() {return "Indent";}
+  static const char *GetClassName() {return "Indent";}
 
   /** Determine the next Indentation level. Keep Indenting by two until the
    * a maximum of forty spaces is reached.  */

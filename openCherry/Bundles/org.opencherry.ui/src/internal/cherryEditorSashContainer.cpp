@@ -76,7 +76,7 @@ PartStack::Pointer EditorSashContainer::NewEditorWorkbook()
 {
   PartStack::Pointer newWorkbook(new PartStack(page, true, PresentationFactoryUtil::ROLE_EDITOR));
   std::stringstream buf;
-  buf << newWorkbook->GetNameOfClass() << newWorkbook.GetPointer();
+  buf << newWorkbook->GetClassName() << newWorkbook.GetPointer();
   newWorkbook->SetID(buf.str());
 
   return newWorkbook;

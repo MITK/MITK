@@ -21,13 +21,13 @@
 
 #include "cherryUiQtDll.h"
 
-#include <cherryISelection.h>
+#include <cherryIStructuredSelection.h>
 
 #include <QItemSelection>
 
 namespace cherry {
 
-class CHERRY_UI_QT QtItemSelection : public virtual ISelection
+class CHERRY_UI_QT QtItemSelection : public virtual IStructuredSelection
 {
 
 public:
@@ -37,11 +37,21 @@ public:
   QtItemSelection();
   QtItemSelection(const QItemSelection& sel);
 
+  QItemSelection GetQItemSelection() const;
+
   bool IsEmpty() const;
-  const QItemSelection& GetQItemSelection() const;
+
+  Object::Pointer GetFirstElement() const;
+  iterator Begin() const;
+  iterator End() const;
+  int Size() const;
+  ContainerType::Pointer ToVector() const;
+
+  bool operator==(const Object* obj) const;
 
 private:
 
+  ContainerType::Pointer m_Selection;
   QItemSelection m_QItemSelection;
 
 };

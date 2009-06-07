@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryPlatform.h>
 #include <cherryRuntime.h>
 #include <cherryIAdapterManager.h>
-#include <cherryExpressionVariables.h>
+#include <cherryObject.h>
 
 #include "cherryExpressions.h"
 #include "cherryDefaultVariable.h"
@@ -36,7 +36,7 @@ const std::string AdaptExpression::ATT_TYPE= "type"; //$NON-NLS-1$
 /**
  * The seed for the hash code for all adapt expressions.
  */
-const intptr_t AdaptExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::AdaptExpression");
+const std::size_t AdaptExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::AdaptExpression");
 
 AdaptExpression::AdaptExpression(IConfigurationElement::Pointer configElement)
 {
@@ -68,7 +68,7 @@ AdaptExpression::AdaptExpression(const std::string& typeName)
 //      && equals(this.fExpressions, that.fExpressions);
 //}
 
-intptr_t
+std::size_t
 AdaptExpression::ComputeHashCode()
 {
   throw Poco::NotImplementedException("ComputeHashCode not implemented");
@@ -84,21 +84,25 @@ AdaptExpression::Evaluate(IEvaluationContext* context)
 {
   if (fTypeName.size() == 0)
     return EvaluationResult::FALSE_EVAL;
-  ExpressionVariable::Pointer var(context->GetDefaultVariable());
-  ExpressionVariable::Pointer adapted;
+  Object::Pointer var(context->GetDefaultVariable());
+  Object::Pointer adapted;
   IAdapterManager::Pointer manager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
   if (Expressions::IsInstanceOf(var, fTypeName)) {
     adapted= var;
   } else {
-    if (!manager->HasAdapter(var, fTypeName))
+    if (!manager->HasAdapter(var->GetClassName(), fTypeName))
       return EvaluationResult::FALSE_EVAL;
 
-    adapted = manager->GetAdapter(var, fTypeName);
+    Poco::Any anyAdapted(manager->GetAdapter(var.GetPointer(), fTypeName));
+    if (!anyAdapted.empty() && anyAdapted.type() == typeid(Object::Pointer))
+    {
+      adapted = Poco::AnyCast<Object::Pointer>(anyAdapted);
+    }
   }
   // the adapted result is null but hasAdapter returned TRUE_EVAL check
   // if the adapter is loaded.
   if (adapted.IsNull()) {
-    if (manager->QueryAdapter(var, fTypeName) == IAdapterManager::NOT_LOADED) {
+    if (manager->QueryAdapter(var->GetClassName(), fTypeName) == IAdapterManager::NOT_LOADED) {
       return EvaluationResult::NOT_LOADED;
     } else {
       return EvaluationResult::FALSE_EVAL;

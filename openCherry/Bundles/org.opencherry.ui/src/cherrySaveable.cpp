@@ -72,9 +72,9 @@ void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>& parts)
   //    }
 }
 
-void* Saveable::GetAdapterImpl(const std::type_info& adapter) const
+Poco::Any Saveable::GetAdapter(const std::string& adapter)
 {
-  return 0;
+  return Poco::Any();
 }
 
 }

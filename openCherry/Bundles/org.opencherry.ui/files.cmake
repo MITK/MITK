@@ -2,7 +2,9 @@ SET(SRC_CPP_FILES
   cherryAbstractSourceProvider.cpp
   cherryAbstractUIPlugin.cpp
   cherryConstants.cpp
+  #cherryDisplay.cpp
   cherryEditorPart.cpp
+  cherryFileEditorInput.cpp
   cherryGeometry.cpp
   cherryIEditorRegistry.cpp
   cherryImageDescriptor.cpp
@@ -56,6 +58,8 @@ SET(SRC_CPP_FILES
   #commands/cherryIMenuItem.cpp
   #commands/cherryIMenuItemListener.cpp
   #commands/cherryIMenuListener.cpp
+  #commands/cherryIToolItemListener.cpp
+  #commands/cherryIUIElementListener.cpp
   #commands/cherryMenuManager.cpp
   #commands/cherrySubContributionItem.cpp
   #commands/cherryUIElement.cpp

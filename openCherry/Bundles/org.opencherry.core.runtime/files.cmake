@@ -1,8 +1,7 @@
 SET(SRC_CPP_FILES
-  cherryExpressionVariables.cpp
   cherryIAdaptable.cpp
   cherryIAdapterManager.cpp
-  #cherryPlatformObject.cpp
+  cherryPlatformObject.cpp
   cherryRuntime.cpp
   cherryRuntimePlugin.cpp
 )

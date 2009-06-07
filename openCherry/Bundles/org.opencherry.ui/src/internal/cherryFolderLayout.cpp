@@ -72,7 +72,7 @@ void FolderLayout::AddView(const std::string& viewId)
   catch (PartInitException& e)
   {
     // cannot safely open the dialog so log the problem
-    WorkbenchPlugin::Log(this->GetNameOfClass(), "AddView(const std::string&)", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetClassName(), "AddView(const std::string&)", e); //$NON-NLS-1$
   }
 }
 

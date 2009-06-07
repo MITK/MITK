@@ -26,7 +26,7 @@ namespace cherry {
 
 const std::string ResolveExpression::ATT_VARIABLE= "variable";
 const std::string ResolveExpression::ATT_ARGS= "args";
-const intptr_t ResolveExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::ResolveExpression");
+const std::size_t ResolveExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::ResolveExpression");
 
 ResolveExpression::ResolveExpression(IConfigurationElement::Pointer configElement)
 {
@@ -42,7 +42,7 @@ ResolveExpression::ResolveExpression(Poco::XML::Element* element)
   Expressions::GetArguments(fArgs, element, ATT_ARGS);
 }
 
-ResolveExpression::ResolveExpression(const std::string& variable, std::vector<ExpressionVariable::Pointer>& args)
+ResolveExpression::ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args)
  : fVariable(variable), fArgs(args)
 {
 
@@ -51,7 +51,7 @@ ResolveExpression::ResolveExpression(const std::string& variable, std::vector<Ex
 EvaluationResult
 ResolveExpression::Evaluate(IEvaluationContext* context)
 {
-  ExpressionVariable::Pointer variable= context->ResolveVariable(fVariable, fArgs);
+  Object::Pointer variable= context->ResolveVariable(fVariable, fArgs);
   if (variable.IsNull())
   {
     throw CoreException("Variable not defined", fVariable);
@@ -88,7 +88,7 @@ ResolveExpression::operator==(Expression& object)
   }
 }
 
-intptr_t
+std::size_t
 ResolveExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)

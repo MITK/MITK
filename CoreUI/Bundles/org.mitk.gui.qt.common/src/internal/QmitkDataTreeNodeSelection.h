@@ -17,6 +17,7 @@
 
 #include <mitkDataTreeNodeSelection.h>
 #include <mitkDataTreeNode.h>
+
 #include <cherryQtItemSelection.h>
 
 #include <vector>
@@ -30,6 +31,19 @@ public:
   QmitkDataTreeNodeSelection();
   QmitkDataTreeNodeSelection(const QItemSelection& sel);
 
+  virtual cherry::Object::Pointer GetFirstElement() const;
+  virtual iterator Begin() const;
+  virtual iterator End() const;
+
+  virtual int Size() const;
+
+  virtual ContainerType::Pointer ToVector() const;
+
+  /**
+   * @see cherry::ISelection::IsEmpty()
+   */
   bool IsEmpty() const;
+
+  bool operator==(const cherry::Object* obj) const;
 
 };

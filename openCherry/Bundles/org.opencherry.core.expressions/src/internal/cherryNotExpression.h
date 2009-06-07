@@ -29,7 +29,7 @@ private:
   /**
     * The seed for the hash code for all not expressions.
     */
-  static const intptr_t HASH_INITIAL;
+  static const std::size_t HASH_INITIAL;
 
 	Expression::Pointer fExpression;
 
@@ -46,7 +46,7 @@ public:
 	
 	protected:
 	  
-	  intptr_t ComputeHashCode();
+	  std::size_t ComputeHashCode();
 };
 
 } // namespace cherry

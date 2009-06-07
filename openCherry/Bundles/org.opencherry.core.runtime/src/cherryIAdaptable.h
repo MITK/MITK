@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef _CHERRY_IADAPTABLE_H_
@@ -20,7 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryRuntimeDll.h"
 
-#include <typeinfo>
+#include <cherryMacros.h>
+#include <cherryObject.h>
+
+#include <Poco/Any.h>
 
 namespace cherry {
 
@@ -52,28 +55,22 @@ struct CHERRY_RUNTIME IAdaptable {
 
 public:
 
+  cherryNameMacro(cherry::IAdaptable)
+
   /**
    * Returns an object which is an instance of the given class
    * associated with this object. Returns <code>null</code> if
    * no such object can be found.
    *
-   * @param adapter the adapter class to look up
-   * @return a object castable to the given class, 
+   * @param adapterType the adapter class to look up
+   * @return a object castable to the given class,
    *    or <code>null</code> if this object does not
    *    have an adapter for the given class
    */
-  template<typename A>
-  A* GetAdapter() const
-  {
-    return static_cast<A*>(this->GetAdapterImpl(typeid(A)));
-  }
+  virtual Poco::Any GetAdapter(const std::string& adapterType) = 0;
 
   virtual ~IAdaptable();
 
-protected:
-
-  virtual void* GetAdapterImpl(const std::type_info& /*type*/) const = 0;
-  
 };
 
 }  // namespace cherry

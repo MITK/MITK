@@ -20,11 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryExpressions.h"
 #include "../cherryEvaluationContext.h"
 
+#include <Poco/Hash.h>
+
 namespace cherry {
 
 const std::string WithExpression::ATT_VARIABLE= "variable";
 
-const intptr_t WithExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::WithExpression");
+const std::size_t WithExpression::HASH_INITIAL= Poco::hash("cherry::WithExpression");
 
 WithExpression::WithExpression(IConfigurationElement::Pointer configElement)
 {
@@ -62,7 +64,7 @@ WithExpression::operator==(Expression& object)
 EvaluationResult
 WithExpression::Evaluate(IEvaluationContext* context)
 {
-  ExpressionVariable::Pointer variable(context->GetVariable(fVariable));
+  Object::Pointer variable(context->GetVariable(fVariable));
   if (variable.IsNull())
   {
     throw CoreException("Variable not defined", fVariable);
@@ -82,11 +84,11 @@ WithExpression::CollectExpressionInfo(ExpressionInfo* info)
   info->MergeExceptDefaultVariable(other);
 }
 
-intptr_t
+std::size_t
 WithExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + this->HashCode(fExpressions)
-  * HASH_FACTOR + Poco::Hash<std::string>()(fVariable);
+  * HASH_FACTOR + Poco::hash(fVariable);
 }
 
 }

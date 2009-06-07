@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.0"?>
+<?openCherry version="0.1"?>
 <plugin>
    <extension-point id="commands" name="Commands" schema="schema/commands.exsd"/>
    <extension-point id="editors" name="Editors" schema="schema/editors.exsd"/>

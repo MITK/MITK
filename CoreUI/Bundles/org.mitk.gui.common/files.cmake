@@ -1,5 +1,6 @@
 SET(SRC_CPP_FILES
   mitkDataStorageEditorInput.cpp
+  mitkDataTreeNodeObject.cpp
   mitkDataTreeNodeSelection.cpp
 )
 

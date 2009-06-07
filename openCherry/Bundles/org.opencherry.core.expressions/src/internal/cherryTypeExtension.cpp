@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 
-TypeExtension::TypeExtension(ExpressionVariable::ExtTypeInfo typeInfo)
+TypeExtension::TypeExtension(const std::string& typeInfo)
  : fTypeInfo(typeInfo), fExtendersLoaded(false), fExtendsLoaded(false) {
 
 }
@@ -34,7 +34,7 @@ TypeExtension::TypeExtension(ExpressionVariable::ExtTypeInfo typeInfo)
      const std::string& namespaze, const std::string& method,
      bool staticMethod, bool forcePluginActivation) {
   if (!fExtendersLoaded) {
-    manager.LoadTesters(fExtenders, fTypeInfo.m_TypeNames.back());
+    manager.LoadTesters(fExtenders, fTypeInfo);
     fExtendersLoaded = true;
   }
   IPropertyTester::Pointer result;
@@ -82,21 +82,22 @@ TypeExtension::TypeExtension(ExpressionVariable::ExtTypeInfo typeInfo)
     return CONTINUE_::Pointer(new CONTINUE_());
 
   // handle inheritance chain
-  if (!fExtendsLoaded) {
-    fExtends.clear();
-    ExpressionVariable::ExtTypeInfo types(fTypeInfo);
-    while (!types.m_TypeNames.empty()) {
-      types.m_TypeNames.pop_back();
-      types.m_TypeInfos.pop_back();
-      fExtends.push_back(manager.Get(types));
-    }
-    fExtendsLoaded = true;
-  }
-  for (unsigned int i= 0; i < fExtends.size(); i++) {
-    result = fExtends[i]->FindTypeExtender(manager, namespaze, method, staticMethod, forcePluginActivation);
-    if (result.Cast<CONTINUE_>().IsNull())
-      return result;
-  }
+  // TODO Reflection
+//  if (!fExtendsLoaded) {
+//    fExtends.clear();
+//    Object::ExtTypeInfo types(fTypeInfo);
+//    while (!types.m_TypeNames.empty()) {
+//      types.m_TypeNames.pop_back();
+//      types.m_TypeInfos.pop_back();
+//      fExtends.push_back(manager.Get(types));
+//    }
+//    fExtendsLoaded = true;
+//  }
+//  for (unsigned int i= 0; i < fExtends.size(); i++) {
+//    result = fExtends[i]->FindTypeExtender(manager, namespaze, method, staticMethod, forcePluginActivation);
+//    if (result.Cast<CONTINUE_>().IsNull())
+//      return result;
+//  }
   return CONTINUE_::Pointer(new CONTINUE_());
 }
 

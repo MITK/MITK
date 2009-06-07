@@ -134,7 +134,7 @@ protected:
   /* (non-Javadoc)
    * @see IAdaptable#GetAdapterImpl(const std::type_info&)
    */
-  void* GetAdapterImpl(const std::type_info& adapter) const;
+  Poco::Any GetAdapter(const std::string& adapter);
 
 private:
   /**

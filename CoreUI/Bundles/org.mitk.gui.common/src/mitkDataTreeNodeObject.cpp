@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   Medical Imaging & Interaction Toolkit
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -15,27 +15,36 @@
 
  =========================================================================*/
 
-#include "cherryPlatformObject.h"
+#include "mitkDataTreeNodeObject.h"
 
-#include <cherryPlatform.h>
-#include "cherryRuntime.h"
-#include "cherryIAdapterManager.h"
+namespace mitk
+{
 
-namespace cherry {
-
-PlatformObject::PlatformObject()
- : Object()
+DataTreeNodeObject::DataTreeNodeObject() :
+  m_Node(0)
 {
 
 }
 
-Poco::Any PlatformObject::GetAdapter(const std::string& adapter)
+DataTreeNodeObject::DataTreeNodeObject(DataTreeNode::Pointer node) :
+  m_Node(node)
 {
-  IAdapterManager::Pointer adapterManager = Platform::GetServiceRegistry().GetServiceById<IAdapterManager>(Runtime::ADAPTER_SERVICE_ID);
-  if (adapterManager)
-    return adapterManager->GetAdapter(Object::Pointer(this), adapter);
 
-  return Poco::Any();
+}
+
+DataTreeNode::Pointer DataTreeNodeObject::GetDataTreeNode() const
+{
+  return m_Node;
+}
+
+bool DataTreeNodeObject::operator==(const cherry::Object* obj) const
+{
+  if (const DataTreeNodeObject* other = dynamic_cast<const DataTreeNodeObject*>(obj))
+  {
+    return m_Node == other->m_Node;
+  }
+
+  return false;
 }
 
 }

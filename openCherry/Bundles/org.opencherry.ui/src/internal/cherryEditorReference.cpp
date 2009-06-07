@@ -414,7 +414,7 @@ void EditorReference::ReportMalfunction(const std::string& string)
     std::string errorMessage = "Problem detected with part " + this->GetId(); //$NON-NLS-1$
     if (part.IsNotNull())
     {
-      errorMessage.append("(class = ").append(part->GetNameOfClass()).append(
+      errorMessage.append("(class = ").append(part->GetClassName()).append(
           ")"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 

@@ -35,14 +35,14 @@ private:
   struct IteratePool : public IEvaluationContext {
 
   private:
-    std::vector<ExpressionVariable::Pointer>::iterator fIterator;
-		std::vector<ExpressionVariable::Pointer>::iterator fIterEnd;
-		ExpressionVariable::Pointer fDefaultVariable;
+    std::vector<Object::Pointer>::iterator fIterator;
+		std::vector<Object::Pointer>::iterator fIterEnd;
+		Object::Pointer fDefaultVariable;
 		IEvaluationContext* fParent;
 
   public:
 
-    IteratePool(IEvaluationContext* parent, std::vector<ExpressionVariable::Pointer>::iterator begin, std::vector<ExpressionVariable::Pointer>::iterator end)
+    IteratePool(IEvaluationContext* parent, std::vector<Object::Pointer>::iterator begin, std::vector<Object::Pointer>::iterator end)
     {
 			poco_check_ptr(parent);
 
@@ -59,7 +59,7 @@ private:
 			return fParent->GetRoot();
 		}
 
-    ExpressionVariable::Pointer GetDefaultVariable() const {
+    Object::Pointer GetDefaultVariable() const {
 			return fDefaultVariable;
 		}
 
@@ -71,19 +71,19 @@ private:
 			fParent->SetAllowPluginActivation(value);
 		}
 
-    void AddVariable(const std::string& name, ExpressionVariable::Pointer value) {
+    void AddVariable(const std::string& name, Object::Pointer value) {
 			fParent->AddVariable(name, value);
 		}
 
-    ExpressionVariable::Pointer RemoveVariable(const std::string& name) {
+    Object::Pointer RemoveVariable(const std::string& name) {
 			return fParent->RemoveVariable(name);
 		}
 
-    ExpressionVariable::Pointer GetVariable(const std::string& name) const {
+    Object::Pointer GetVariable(const std::string& name) const {
 			return fParent->GetVariable(name);
 		}
 
-    ExpressionVariable::Pointer ResolveVariable(const std::string& name, std::vector<ExpressionVariable::Pointer>& args) {
+    Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args) {
 			return fParent->ResolveVariable(name, args);
 		}
 
@@ -105,7 +105,7 @@ private:
 	/**
 	 * The seed for the hash code for all iterate expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
 	int fOperator;
 	int fEmptyResult;
@@ -140,7 +140,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 };
 
 } // namespace cherry

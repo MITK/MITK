@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIITERABLE_H_
 #define CHERRYIITERABLE_H_
 
-#include <cherryExpressionVariables.h>
+#include <cherryObject.h>
 #include <cherryMacros.h>
 
 #include "cherryExpressionsDll.h"
@@ -36,15 +36,11 @@ namespace cherry {
  *
  * @since 3.3
  */
-struct CHERRY_EXPRESSIONS IIterable : public ExpressionVariable {
+struct CHERRY_EXPRESSIONS IIterable : public Object {
 
   cherryObjectMacro(IIterable)
 
-  typedef std::vector<ExpressionVariable::Pointer>::iterator iterator;
-
-  IIterable() {
-    m_TypeInfo.Add("cherry::IIterable", typeid(this));
-  }
+  typedef std::vector<Object::Pointer>::iterator iterator;
 
   virtual ~IIterable() {}
 

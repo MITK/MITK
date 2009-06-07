@@ -49,9 +49,11 @@ namespace cherry {
  *
  * @see Platform#getAdapterManager
  */
-class CHERRY_RUNTIME PlatformObject : public virtual Object, public virtual IAdaptable {
+class CHERRY_RUNTIME PlatformObject : public Object, public IAdaptable {
 
 public:
+
+  cherryObjectMacro(cherry::PlatformObject)
 
   /**
    * Constructs a new platform object.
@@ -74,9 +76,8 @@ public:
    * @see IAdaptable#getAdapter
    * @see Platform#getAdapterManager
    */
-//  Object getAdapter(Class adapter) {
-//    return InternalPlatform.getDefault().getAdapterManager().getAdapter(this, adapter);
-//  }
+  Poco::Any GetAdapter(const std::string& adapter);
+
 };
 
 }

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "cherryTypeExtensionManager.h"
@@ -37,15 +37,15 @@ namespace cherry {
     this->InitializeCaches();
   }
 
-  Property::Pointer TypeExtensionManager::GetProperty(ExpressionVariable::Pointer receiver,
+  Property::Pointer TypeExtensionManager::GetProperty(Object::Pointer receiver,
       const std::string& namespaze, const std::string& method)
   {
     return GetProperty(receiver, namespaze, method, false);
   }
 
-  /*synchronized*/Property::Pointer 
+  /*synchronized*/Property::Pointer
   TypeExtensionManager::GetProperty(
-      ExpressionVariable::Pointer receiver, const std::string& namespaze,
+      Object::Pointer receiver, const std::string& namespaze,
       const std::string& method, bool forcePluginActivation)
   {
     std::clock_t start= 0;
@@ -75,12 +75,12 @@ namespace cherry {
       // implementation class gets loaded.
       fPropertyCache->Remove(cached);
     }
-    TypeExtension::Pointer extension(this->Get(receiver->GetExtTypeInfo()));
+    TypeExtension::Pointer extension(this->Get(receiver->GetClassName()));
     IPropertyTester::Pointer extender(extension->FindTypeExtender(*this, namespaze, method, false /*receiver instanceof Class*/, forcePluginActivation));
     if (!extender.Cast<TypeExtension::CONTINUE_>().IsNull() || extender.IsNull())
     {
       std::string msg("Unknown method for ");
-      msg.append(typeid(receiver).name());
+      msg.append(receiver->GetClassName());
       throw CoreException(msg, method);
     }
     result->SetPropertyTester(extender);
@@ -95,14 +95,14 @@ namespace cherry {
     return result;
   }
 
-  /* package */TypeExtension::Pointer 
-  TypeExtensionManager::Get(ExpressionVariable::ExtTypeInfo typeInfo)
+  /* package */TypeExtension::Pointer
+  TypeExtensionManager::Get(const std::string& type)
   {
-    TypeExtension::Pointer result(fTypeExtensionMap[typeInfo.m_TypeNames.back()]);
+    TypeExtension::Pointer result(fTypeExtensionMap[type]);
     if (result.IsNull())
     {
-      result = new TypeExtension(typeInfo);
-      fTypeExtensionMap[typeInfo.m_TypeNames.back()] = result;
+      result = new TypeExtension(type);
+      fTypeExtensionMap[type] = result;
     }
     return result;
   }

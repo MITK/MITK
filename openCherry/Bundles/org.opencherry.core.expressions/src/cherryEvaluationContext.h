@@ -43,8 +43,8 @@ class CHERRY_EXPRESSIONS EvaluationContext : public IEvaluationContext
 
 private:
   IEvaluationContext* fParent;
-  ExpressionVariable::Pointer fDefaultVariable;
-  std::map<std::string, ExpressionVariable::Pointer> fVariables;
+  Object::Pointer fDefaultVariable;
+  std::map<std::string, Object::Pointer> fVariables;
   std::vector<IVariableResolver*> fVariableResolvers;
   bool fAllowPluginActivation;
 
@@ -57,7 +57,7 @@ public:
    * @param parent the parent context. Can be <code>null</code>.
    * @param defaultVariable the default variable
    */
-  EvaluationContext(IEvaluationContext* parent, ExpressionVariable::Pointer defaultVariable);
+  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable);
 
   /**
    * Create a new evaluation context with the given parent and default
@@ -70,7 +70,7 @@ public:
    *
    * @see #resolveVariable(String, Object[])
    */
-  EvaluationContext(IEvaluationContext* parent, ExpressionVariable::Pointer defaultVariable, std::vector<IVariableResolver*> resolvers);
+  EvaluationContext(IEvaluationContext* parent, Object::Pointer defaultVariable, std::vector<IVariableResolver*> resolvers);
 
 
   /**
@@ -86,7 +86,7 @@ public:
   /**
    * {@inheritDoc}
    */
-  ExpressionVariable::Pointer GetDefaultVariable() const;
+  Object::Pointer GetDefaultVariable() const;
 
   /**
    * {@inheritDoc}
@@ -101,22 +101,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const std::string& name, ExpressionVariable::Pointer value);
+  void AddVariable(const std::string& name, Object::Pointer value);
 
   /**
    * {@inheritDoc}
    */
-  ExpressionVariable::Pointer RemoveVariable(const std::string& name);
+  Object::Pointer RemoveVariable(const std::string& name);
 
   /**
    * {@inheritDoc}
    */
-  ExpressionVariable::Pointer GetVariable(const std::string& name) const;
+  Object::Pointer GetVariable(const std::string& name) const;
 
   /**
    * {@inheritDoc}
    */
-  ExpressionVariable::Pointer ResolveVariable(const std::string& name, std::vector<ExpressionVariable::Pointer>& args);
+  Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args);
 };
 
 }  // namespace cherry

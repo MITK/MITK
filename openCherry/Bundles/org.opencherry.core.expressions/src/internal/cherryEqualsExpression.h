@@ -34,13 +34,13 @@ class EqualsExpression : public Expression {
 	 */
 private:
 
-  static const intptr_t HASH_INITIAL;
+  static const std::size_t HASH_INITIAL;
 
-	ExpressionVariable::Pointer fExpectedValue;
+	Object::Pointer fExpectedValue;
 
 public:
 
-  EqualsExpression(const ExpressionVariable::Pointer expectedValue);
+  EqualsExpression(const Object::Pointer expectedValue);
 
 	EqualsExpression(SmartPointer<IConfigurationElement> element);
 
@@ -54,7 +54,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 };
 
 } // namespace cherry

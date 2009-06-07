@@ -88,7 +88,7 @@ HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveContextsChecked(
   if (o.Cast<StringVectorType>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_CONTEXT_NAME(),
-        "StringVectorType", o->GetNameOfClass());
+        "StringVectorType", o->GetClassName());
   }
   return o.Cast<StringVectorType>();
 }
@@ -108,7 +108,7 @@ HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveContextsChecked(
 //  if (o.Cast<IEditorPart>().IsNull())
 //  {
 //    HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_EDITOR_NAME,
-//        "IEditorPart", o->GetNameOfClass());
+//        "IEditorPart", o->GetClassName());
 //  }
 //  return (IEditorPart) o;
 //}
@@ -128,7 +128,7 @@ ObjectString::Pointer HandlerUtil::GetActiveEditorIdChecked(
   if (o.Cast<ObjectString>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_EDITOR_ID_NAME(),
-        "std::string", o->GetNameOfClass());
+        "std::string", o->GetClassName());
   }
   return o.Cast<ObjectString>();
 }
@@ -148,7 +148,7 @@ IWorkbenchPart::Pointer HandlerUtil::GetActivePartChecked(
   if (o.Cast<IWorkbenchPart>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_NAME(),
-        "IWorkbenchPart", o->GetNameOfClass());
+        "IWorkbenchPart", o->GetClassName());
   }
   return o.Cast<IWorkbenchPart>();
 }
@@ -168,7 +168,7 @@ ObjectString::Pointer HandlerUtil::GetActivePartIdChecked(
   if (o.Cast<ObjectString>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_ID_NAME(),
-        "std::string", o->GetNameOfClass());
+        "std::string", o->GetClassName());
   }
   return o.Cast<ObjectString>();
 }
@@ -189,7 +189,7 @@ IWorkbenchPartSite::Pointer HandlerUtil::GetActiveSiteChecked(
   if (o.Cast<IWorkbenchPartSite>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_SITE_NAME(),
-        "IWorkbenchSitePart", o->GetNameOfClass());
+        "IWorkbenchSitePart", o->GetClassName());
   }
   return o.Cast<IWorkbenchPartSite>();
 }
@@ -211,7 +211,7 @@ ISelection::Pointer HandlerUtil::GetCurrentSelectionChecked(
   {
     HandlerUtil::IncorrectTypeFound(event,
         ISources::ACTIVE_CURRENT_SELECTION_NAME(), "ISelection",
-        o->GetNameOfClass());
+        o->GetClassName());
   }
   return o.Cast<ISelection>();
 }
@@ -232,7 +232,7 @@ HandlerUtil::StringVectorType::Pointer HandlerUtil::GetActiveMenusChecked(
   if (o.Cast<StringVectorType>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_MENU_NAME(),
-        "StringVectorType", o->GetNameOfClass());
+        "StringVectorType", o->GetClassName());
   }
   return o.Cast<StringVectorType>();
 }
@@ -253,7 +253,7 @@ ISelection::Pointer HandlerUtil::GetActiveMenuSelectionChecked(
   if (o.Cast<ISelection>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event,
-        ISources::ACTIVE_MENU_SELECTION_NAME(), "ISelection", o->GetNameOfClass());
+        ISources::ACTIVE_MENU_SELECTION_NAME(), "ISelection", o->GetClassName());
   }
   return o.Cast<ISelection>();
 }
@@ -275,7 +275,7 @@ IWorkbenchWindow::Pointer HandlerUtil::GetActiveWorkbenchWindowChecked(
   {
     HandlerUtil::IncorrectTypeFound(event,
         ISources::ACTIVE_WORKBENCH_WINDOW_NAME(), "IWorkbenchWindow",
-        o->GetNameOfClass());
+        o->GetClassName());
   }
   return o.Cast<IWorkbenchWindow>();
 }
@@ -297,7 +297,7 @@ ISelection::Pointer HandlerUtil::GetActiveMenuEditorInputChecked(
   {
     HandlerUtil::IncorrectTypeFound(event,
         ISources::ACTIVE_MENU_EDITOR_INPUT_NAME(), "ISelection",
-        o->GetNameOfClass());
+        o->GetClassName());
   }
   return o.Cast<ISelection>();
 }
@@ -318,7 +318,7 @@ ISelection::Pointer HandlerUtil::GetShowInSelectionChecked(
   if (o.Cast<ISelection>().IsNull())
   {
     HandlerUtil::IncorrectTypeFound(event, ISources::SHOW_IN_SELECTION(),
-        "ISelection", o->GetNameOfClass());
+        "ISelection", o->GetClassName());
   }
   return o.Cast<ISelection>();
 }

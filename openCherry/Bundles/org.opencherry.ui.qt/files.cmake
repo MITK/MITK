@@ -1,4 +1,5 @@
 SET(SRC_CPP_FILES
+  cherryQModelIndexObject.cpp
   cherryQtEditorPart.cpp
   cherryQtItemSelection.cpp
   cherryQtSelectionProvider.cpp

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryExpressionsDll.h"
 
 #include <cherryMacros.h>
-#include <cherryExpressionVariables.h>
+#include <cherryObject.h>
 
 #include <string>
 
@@ -106,7 +106,7 @@ protected:
    */
   static bool Equals(std::vector<Expression::Pointer>& leftArray, std::vector<Expression::Pointer>& rightArray);
 
-  static bool Equals(std::vector<ExpressionVariable::Pointer>& leftArray, std::vector<ExpressionVariable::Pointer>& rightArray);
+  static bool Equals(std::vector<Object::Pointer>& leftArray, std::vector<Object::Pointer>& rightArray);
 
     /**
    * Returns the hash code for the given <code>object</code>. This method
@@ -135,7 +135,7 @@ protected:
    */
   static std::size_t HashCode(std::vector<Expression::Pointer>& array);
 
-  static std::size_t HashCode(std::vector<ExpressionVariable::Pointer>& array);
+  static std::size_t HashCode(std::vector<Object::Pointer>& array);
 
   /**
      * Method to compute the hash code for this object. The result

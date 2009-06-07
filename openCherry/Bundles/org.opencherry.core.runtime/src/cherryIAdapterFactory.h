@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYIADAPTERFACTORY_H_
@@ -41,21 +41,38 @@ namespace cherry {
 struct CHERRY_RUNTIME IAdapterFactory {
 
   virtual ~IAdapterFactory() {};
-  
+
   /**
-   * Returns an object which is an instance of the given class
-   * associated with the given object. Returns <code>null</code> if
+   * Returns an object which can be cast to the given adapter type and which is
+   * associated with the given adaptable object. Returns <code>0</code> if
    * no such object can be found.
+   *
+   * A typical implementation would look like this:
+   *
+   * <code>
+   * void* GetAdapter(void* adaptableObject, const std::type_info& adaptableType, const std::string& adapterType)
+   * {
+   *   if (Image* img = CastHelper<Image>(adaptableObject, adaptableType))
+   *   {
+   *     if (adapterType == "cherry::IResource")
+   *     {
+   *       return new IResource(img->GetPath());
+   *     }
+   *   }
+   *   return 0;
+   * }
+   * </code>
    *
    * @param adaptableObject the adaptable object being queried
    *   (usually an instance of <code>IAdaptable</code>)
+   * @param adaptableType the type information for the adaptable object
    * @param adapterType the type of adapter to look up
-   * @return a object castable to the given adapter type, 
-   *    or <code>null</code> if this adapter factory 
+   * @return a object castable to the given adapter type,
+   *    or <code>0</code> if this adapter factory
    *    does not have an adapter of the given type for the
    *    given object
    */
-  virtual void* GetAdapter(void* adaptableObject, const std::type_info& adapterType) = 0;
+  virtual Object* GetAdapter(IAdaptable* adaptableObject, const std::string& adapterType) = 0;
 
   /**
    * Returns the collection of adapter types handled by this

@@ -290,7 +290,7 @@ protected:
    *
    * @since 3.3
    */
-  virtual void* GetAdapterImpl(const std::type_info& adapter) const;
+  virtual Poco::Any GetAdapter(const std::string& adapter);
 };
 
 }

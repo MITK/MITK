@@ -124,13 +124,13 @@ bool ViewDescriptor::GetAllowMultiple() const
   return allow;
 }
 
-void* ViewDescriptor::GetAdapterImpl(const std::type_info& adapter) const
+Poco::Any ViewDescriptor::GetAdapter(const std::string& adapter)
 {
-  if (adapter == typeid(IConfigurationElement))
+  if (adapter == IConfigurationElement::GetStaticClassName())
   {
-    return GetConfigurationElement().GetPointer();
+    return Poco::Any(GetConfigurationElement());
   }
-  return 0;
+  return Poco::Any();
 }
 
 void

@@ -47,7 +47,7 @@ struct CHERRY_EXPRESSIONS IVariableResolver {
    * @exception CoreException if an errors occurs while resolving
    *  the variable
    */
-  virtual ExpressionVariable::Pointer Resolve(const std::string& name, std::vector<ExpressionVariable::Pointer> args) = 0;
+  virtual Object::Pointer Resolve(const std::string& name, std::vector<Object::Pointer> args) = 0;
 };
 
 }  // namespace cherry

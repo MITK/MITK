@@ -64,7 +64,7 @@ public:
   
   IPropertyTester* Instantiate();
   
-  bool Test(ExpressionVariable::Pointer receiver, const std::string& method, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue);
+  bool Test(Object::Pointer receiver, const std::string& method, std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
 };
 
 }  // namespace cherry

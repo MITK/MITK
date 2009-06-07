@@ -114,7 +114,7 @@ void SaveablesList::LogWarning(const std::string& message,
 {
   // create a new exception
   std::string text = message + "; " + "unknown saveable: " + model->GetName()
-          + " from part: " + source->GetNameOfClass();
+          + " from part: " + source->GetClassName();
   // record the current stack trace to help with debugging
   //assertionFailedException.fillInStackTrace();
   WorkbenchPlugin::Log(text);

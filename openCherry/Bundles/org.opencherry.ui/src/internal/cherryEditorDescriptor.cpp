@@ -77,7 +77,7 @@ EditorDescriptor::EditorDescriptor() :
 //  return contributor;
 //}
 
-std::string EditorDescriptor::GetClassName() const
+std::string EditorDescriptor::GetEditorClassName() const
 {
   if (configurationElement.IsNull())
   {
@@ -301,7 +301,7 @@ void EditorDescriptor::SaveValues(IMemento::Pointer memento)
 {
   //  memento.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
   //  memento.putString(IWorkbenchConstants.TAG_IMAGE, getImageFilename());
-  //  memento.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
+  //  memento.putString(IWorkbenchConstants.TAG_CLASS, getEditorClassName());
   //  memento.putString(IWorkbenchConstants.TAG_LAUNCHER, getLauncher());
   //  memento.putString(IWorkbenchConstants.TAG_FILE, getFileName());
   //  memento.putString(IWorkbenchConstants.TAG_ID, getId());

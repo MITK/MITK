@@ -19,8 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryExpressions.h"
 
-#include "Poco/Hash.h"
-#include "Poco/NumberParser.h"
+#include <cherryObjectVector.h>
+
+#include <Poco/Hash.h>
+#include <Poco/NumberParser.h>
 
 namespace cherry {
 
@@ -31,7 +33,7 @@ const int CountExpression::NONE_OR_ONE= 2;
 const int CountExpression::NONE= 1;
 const int CountExpression::UNKNOWN= 0;
 
-const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::CountExpression");
+const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry::CountExpression");
 
   void
   CountExpression::InitializeSize(std::string size)
@@ -82,20 +84,19 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
   EvaluationResult
   CountExpression::Evaluate(IEvaluationContext* context)
   {
-    ExpressionVariable::Pointer var(context->GetDefaultVariable());
+    Object::Pointer var(context->GetDefaultVariable());
     int size;
 
-    VectorExpressionVariable::Pointer coll = var.Cast<VectorExpressionVariable>();
-    if (coll.IsNull())
+    if(ObjectVector<Object::Pointer>::Pointer coll = var.Cast<ObjectVector<Object::Pointer> >())
     {
-      ICountable::Pointer countable= Expressions::GetAsICountable(var, Expression::Pointer(this));
-      if (countable == 0)
-      return EvaluationResult::NOT_LOADED;
-      size = countable->Count();
+      size = coll->size();
     }
     else
     {
-      size = coll->GetVariable().size();
+      ICountable::Pointer countable = Expressions::GetAsICountable(var, Expression::Pointer(this));
+      if (!countable)
+        return EvaluationResult::NOT_LOADED;
+      size = countable->Count();
     }
 
     switch (fMode)
@@ -138,7 +139,7 @@ const intptr_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("cherry
 
   }
 
-  intptr_t
+  std::size_t
   CountExpression::ComputeHashCode()
   {
     return HASH_INITIAL * HASH_FACTOR + fMode * HASH_FACTOR + fSize;

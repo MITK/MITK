@@ -183,7 +183,7 @@ Object
     // whole object has been destroyed by this point anyway.  Just
     // issue a warning.
     std::cout << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n";
-    std::cout << this->GetNameOfClass() << " (" << this << "): Trying to delete object with non-zero reference count.";
+    std::cout << this->GetClassName() << " (" << this << "): Trying to delete object with non-zero reference count.";
     std::cout << "\n\n";
     }
 
@@ -229,7 +229,7 @@ void
 Object
 ::PrintHeader(std::ostream& os, Indent Indent) const
 {
-  os << Indent << this->GetNameOfClass() << " (" << this << ")\n";
+  os << Indent << this->GetClassName() << " (" << this << ")\n";
 }
 
 

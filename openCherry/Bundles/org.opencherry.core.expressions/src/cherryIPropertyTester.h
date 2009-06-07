@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYIPROPERTYTESTER_H_
 
 #include <cherryMacros.h>
-#include <cherryExpressionVariables.h>
+#include <cherryObject.h>
 
 #include "cherryExpressionsDll.h"
 
@@ -100,7 +100,7 @@ struct CHERRY_EXPRESSIONS IPropertyTester : public Object {
    * @return returns <code>true<code> if the property is equal to the expected value;
    *  otherwise <code>false</code> is returned
    */
-  virtual bool Test(ExpressionVariable::Pointer receiver, const std::string& property, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue) = 0;
+  virtual bool Test(Object::Pointer receiver, const std::string& property, std::vector<Object::Pointer>& args, Object::Pointer expectedValue) = 0;
 
 };
 

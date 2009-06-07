@@ -65,15 +65,15 @@ void Category<T>::AddElement(ElementType element)
 }
 
 template<class T>
-void* Category<T>::GetAdapterImpl(const std::type_info& adapter) const
+Poco::Any Category<T>::GetAdapter(const std::string& adapter)
 {
-  if (adapter == typeid(IConfigurationElement))
+  if (adapter == IConfigurationElement::GetStaticClassName())
   {
-    return configurationElement.GetPointer();
+    return Poco::Any(configurationElement);
   }
   else
   {
-    return 0;
+    return Poco::Any();
   }
 }
 

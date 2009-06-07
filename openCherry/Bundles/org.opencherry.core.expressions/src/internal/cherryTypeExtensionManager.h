@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   openCherry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef CHERRYTYPEEXTENSIONMANAGER_H_
@@ -59,8 +59,8 @@ private:
     {
       return this;
     }
-    bool Test(ExpressionVariable::Pointer, const std::string& property,
-        std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue)
+    bool Test(Object::Pointer, const std::string& property,
+        std::vector<Object::Pointer>& args, Object::Pointer expectedValue)
     {
       return false;
     }
@@ -69,15 +69,15 @@ private:
   static const NULL_PROPERTY_TESTER_ NULL_PROPERTY_TESTER;
 
   /*
-   * Map containing all already created type extension object. 
+   * Map containing all already created type extension object.
    */
   std::map<std::string, TypeExtension::Pointer> fTypeExtensionMap;
 
   /*
-   * Table containing mapping of class name to configuration element 
+   * Table containing mapping of class name to configuration element
    */
   std::map<std::string, std::vector<IConfigurationElement::Pointer> >* fConfigurationElementMap;
-  
+
   /*
    * A cache to give fast access to the last 1000 method invocations.
    */
@@ -88,21 +88,21 @@ public:
   TypeExtensionManager(const std::string& extensionPoint);
   ~TypeExtensionManager();
 
-  Property::Pointer GetProperty(ExpressionVariable::Pointer receiver,
+  Property::Pointer GetProperty(Object::Pointer receiver,
       const std::string& namespaze, const std::string& method);
 
-  /*synchronized*/Property::Pointer GetProperty(ExpressionVariable::Pointer receiver,
+  /*synchronized*/Property::Pointer GetProperty(Object::Pointer receiver,
       const std::string& namespaze, const std::string& method, bool forcePluginActivation);
 
 protected:
 
   friend class TypeExtension;
-  
+
   /*
    * This method doesn't need to be synchronized since it is called
    * from withing the getProperty method which is synchronized
    */
-  /* package */TypeExtension::Pointer Get(ExpressionVariable::ExtTypeInfo typeInfo);
+  /* package */TypeExtension::Pointer Get(const std::string& type);
 
   /*
    * This method doesn't need to be synchronized since it is called

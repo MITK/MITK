@@ -21,18 +21,20 @@
 
 #include "cherryISelection.h"
 
+#include <cherryObjectVector.h>
+
 namespace cherry
 {
 
 /**
  * A selection containing elements.
  */
-template<typename T>
-struct CHERRY_UI IStructuredSelection : public ISelection {
+struct CHERRY_UI IStructuredSelection : public virtual ISelection {
 
-  typedef std::vector<T>::iterator iterator;
+  typedef ObjectVector<Object::Pointer> ContainerType;
+  typedef ContainerType::const_iterator iterator;
 
-  cherryInterfaceMacro(IStructuredSelection<T>, cherry);
+  cherryInterfaceMacro(IStructuredSelection, cherry);
 
   /**
    * Returns the first element in this selection, or <code>null</code>
@@ -40,35 +42,35 @@ struct CHERRY_UI IStructuredSelection : public ISelection {
    *
    * @return an element, or <code>null</code> if none
    */
-  virtual T GetFirstElement();
+  virtual Object::Pointer GetFirstElement() const = 0;
 
   /**
    * Returns an iterator to the beginning of the elements of this selection.
    *
    * @return an iterator over the selected elements
    */
-  virtual iterator Begin();
+  virtual iterator Begin() const = 0;
 
   /**
    * Returns an iterator to the end of the elements of this selection.
    *
    * @return an iterator over the selected elements
    */
-  virtual iterator End();
+  virtual iterator End() const = 0;
 
   /**
    * Returns the number of elements selected in this selection.
    *
    * @return the number of elements selected
    */
-  virtual int Size();
+  virtual int Size() const = 0;
 
   /**
    * Returns the elements in this selection as a vector.
    *
    * @return the selected elements as a vector
    */
-  virtual const std::vector<T>& ToVector();
+  virtual ContainerType::Pointer ToVector() const = 0;
 
 };
 

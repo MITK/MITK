@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryIPropertyTester.h"
 
-#include "cherryExpressionVariables.h"
+#include "cherryObject.h"
 
 #include "Poco/SharedPtr.h"
 #include "Poco/Any.h"
@@ -38,14 +38,14 @@ public:
   typedef Poco::SharedPtr<const Self> ConstPointer;
 
 private:
-  ExpressionVariable::Pointer fType;
+  Object::Pointer fType;
   std::string fNamespace;
   std::string fName;
 
   IPropertyTester::Pointer fTester;
 
   friend class TypeExtensionManager;
-  /* package */ Property(ExpressionVariable::Pointer type,
+  /* package */ Property(Object::Pointer type,
       const std::string& namespaze, const std::string& name);
 
   /* package */ void SetPropertyTester(IPropertyTester::Pointer tester);
@@ -57,7 +57,7 @@ public:
 
   bool IsValidCacheEntry(bool forcePluginActivation);
 
-  bool Test(ExpressionVariable::Pointer receiver, std::vector<ExpressionVariable::Pointer>& args, ExpressionVariable::Pointer expectedValue);
+  bool Test(Object::Pointer receiver, std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
 
   bool operator==(Property& obj);
 

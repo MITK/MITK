@@ -67,7 +67,7 @@ void PageLayout::AddEditorArea()
   }
   catch (PartInitException& e)
   {
-    WorkbenchPlugin::Log(this->GetNameOfClass(), "AddEditorArea()", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetClassName(), "AddEditorArea()", e); //$NON-NLS-1$
   }
 }
 
@@ -266,7 +266,7 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
   }
   catch (PartInitException& e)
   {
-    WorkbenchPlugin::Log(this->GetNameOfClass(), "AddView()", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetClassName(), "AddView()", e); //$NON-NLS-1$
   }
 }
 
@@ -568,7 +568,7 @@ void PageLayout::StackView(const std::string& viewId, const std::string& refId)
   }
   catch (PartInitException& e)
   {
-    WorkbenchPlugin::Log(this->GetNameOfClass(), "StackView", e); //$NON-NLS-1$
+    WorkbenchPlugin::Log(this->GetClassName(), "StackView", e); //$NON-NLS-1$
   }
 }
 

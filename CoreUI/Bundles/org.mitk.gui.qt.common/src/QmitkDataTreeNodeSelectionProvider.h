@@ -33,9 +33,10 @@ public:
   QmitkDataTreeNodeSelectionProvider();
 
   cherry::ISelection::ConstPointer GetSelection() const;
-  mitk::DataTreeNodeSelection::ConstPointer GetDataTreeNodeSelection() const;
 
 protected:
+
+  mitk::DataTreeNodeSelection::ConstPointer GetDataTreeNodeSelection() const;
 
   virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 };

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry {
 
 const std::string ReferenceExpression::ATT_DEFINITION_ID= "definitionId";
-const intptr_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::ReferenceExpression");
+const std::size_t ReferenceExpression::HASH_INITIAL= Poco::Hash<std::string>()("cherry::ReferenceExpression");
 
 DefinitionRegistry ReferenceExpression::fgDefinitionRegistry = DefinitionRegistry();
 
@@ -88,7 +88,7 @@ ReferenceExpression::operator==(Expression& object)
   }
 }
 
-intptr_t
+std::size_t
 ReferenceExpression::ComputeHashCode()
 {
   return HASH_INITIAL * HASH_FACTOR + Poco::Hash<std::string>()(fDefinitionId);

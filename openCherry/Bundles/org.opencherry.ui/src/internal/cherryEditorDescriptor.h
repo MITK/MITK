@@ -168,7 +168,7 @@ public: EditorDescriptor();
    *
    * @return the class name
    */
-public: std::string GetClassName() const;
+public: std::string GetEditorClassName() const;
 
   /**
    * Return the configuration element used to define this editor, or <code>null</code>.

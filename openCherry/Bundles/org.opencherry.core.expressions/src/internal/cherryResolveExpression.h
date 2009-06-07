@@ -32,7 +32,7 @@ class ResolveExpression : public CompositeExpression {
 
 private:
   std::string fVariable;
-	std::vector<ExpressionVariable::Pointer> fArgs;
+	std::vector<Object::Pointer> fArgs;
 
 	static const std::string ATT_VARIABLE;
 	static const std::string ATT_ARGS;
@@ -40,7 +40,7 @@ private:
 	/**
 	 * The seed for the hash code for all resolve expressions.
 	 */
-	static const intptr_t HASH_INITIAL;
+	static const std::size_t HASH_INITIAL;
 
 public:
 
@@ -48,7 +48,7 @@ public:
 
 	ResolveExpression(Poco::XML::Element* element);
 
-	ResolveExpression(const std::string& variable, std::vector<ExpressionVariable::Pointer>& args);
+	ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args);
 
 	EvaluationResult Evaluate(IEvaluationContext* context);
 
@@ -59,7 +59,7 @@ public:
 
 protected:
 
-  intptr_t ComputeHashCode();
+  std::size_t ComputeHashCode();
 };
 
 } // namespace cherry

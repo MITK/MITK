@@ -135,11 +135,11 @@ namespace mitk {
     //## @brief Convenience method to get the first node with a given name
     //##
     mitk::DataTreeNode* GetNamedNode(const char* name) const;
-    
+
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
-    //##    
-    mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const std::string name) const
+    //##
+    mitk::DataTreeNode* GetNamedNode(const std::string name) const
     {
       return this->GetNamedNode(name.c_str());
     }
@@ -234,7 +234,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the input objects
-    //## 
+    //##
     //## Throws std::invalid_argument exception if input is NULL
     mitk::Geometry3D::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input);
 

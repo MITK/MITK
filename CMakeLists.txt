@@ -189,13 +189,6 @@ IF(QT4_FOUND)
   ADD_SUBDIRECTORY(Bundles)
 ENDIF(QT4_FOUND)
 
-#### find out version number #####
-
-FIND_PACKAGE(Subversion)
-IF(Subversion_FOUND)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN_INFO)
-ENDIF(Subversion_FOUND)
-
 #### mitkConfig.h ####
 SET(MITK_CONFIG_H ${PROJECT_BINARY_DIR}/mitkConfig.h)
 CONFIGURE_FILE(mitkConfig.h.in ${MITK_CONFIG_H})

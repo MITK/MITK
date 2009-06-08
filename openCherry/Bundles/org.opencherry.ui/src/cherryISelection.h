@@ -35,7 +35,7 @@ namespace cherry {
  * @see SelectionChangedEvent
  *
  **/
-struct CHERRY_UI ISelection : public Object
+struct ISelection : public Object
 {
   cherryInterfaceMacro(ISelection, cherry);
 

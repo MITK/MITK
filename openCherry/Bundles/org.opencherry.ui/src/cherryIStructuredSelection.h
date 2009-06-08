@@ -29,7 +29,7 @@ namespace cherry
 /**
  * A selection containing elements.
  */
-struct CHERRY_UI IStructuredSelection : public virtual ISelection {
+struct IStructuredSelection : public ISelection {
 
   typedef ObjectVector<Object::Pointer> ContainerType;
   typedef ContainerType::const_iterator iterator;

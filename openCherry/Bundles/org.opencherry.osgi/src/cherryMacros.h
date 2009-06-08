@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #define cherryInterfaceMacro(className, namespaze) \
-  protected: className() {} \
   public: \
   cherryObjectMacro(className) \
   cherryManifestMacro(className, namespaze) \

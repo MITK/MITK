@@ -144,9 +144,9 @@ ENDIF(MITK_USE_QT)
 #### find out version number #####
 
 FIND_PACKAGE(Subversion)
-IF(Subversion_FOUND)
+IF(Subversion_FOUND AND MITK_USE_SUBVERSION)
   Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN_INFO)
-ENDIF(Subversion_FOUND)
+ENDIF(Subversion_FOUND AND MITK_USE_SUBVERSION)
 
 # TODO: check what could be moved to subdirectories
 #### mitkConfig.h ####

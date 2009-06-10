@@ -32,26 +32,24 @@ mitk::NavigationDataToNavigationDataFilter::~NavigationDataToNavigationDataFilte
 
 void mitk::NavigationDataToNavigationDataFilter::SetInput( const NavigationData* nd )
 {
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(0, const_cast<NavigationData*>(nd));
-  this->CreateOutputsForAllInputs();
+  this->SetInput(0, nd);
 }
 
 
 void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, const NavigationData* nd )
 {
-  // Process object is not const-correct so the const_cast is required here
-  this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));
+  if ((nd == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+    this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  else
+    this->ProcessObject::SetNthInput(idx, const_cast<NavigationData*>(nd));   // Process object is not const-correct so the const_cast is required here
+
   this->CreateOutputsForAllInputs();
 }
 
 
 const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( void )
 {
-  if (this->GetNumberOfInputs() < 1)
-    return NULL;
-
-  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
+  return this->GetInput(0);
 }
 
 

@@ -65,8 +65,14 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_CONDITION(myFilter->GetOutput(0) != myFilter->GetOutput(1), "testing GetOutput(0) different object than GetOutput(1)");
 
   myFilter->SetInput(10, nd1);
-  MITK_TEST_CONDITION(myFilter->GetNumberOfInput() == 11, "testing SetInput(10) produces 11 outputs");
+  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 11, "testing SetInput(10) produces 11 outputs");
   MITK_TEST_CONDITION(myFilter->GetInput(10) == nd1, "testing Set-/GetInput(10)");
+
+  myFilter->SetInput(10, NULL);
+  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 10, "testing SetInput(10, NULL) removes output with index 10");
+
+  myFilter->SetInput(1, NULL);
+  MITK_TEST_CONDITION(myFilter->GetNumberOfInputs() == 10, "testing SetInput(1, NULL) does not change number of outputs");
 
   // always end with this!
   MITK_TEST_END();

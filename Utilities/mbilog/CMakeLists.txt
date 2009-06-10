@@ -19,7 +19,7 @@ ENDIF(MBILOG_ENABLE_DEBUG_MESSAGES)
 
 SET(mbilog_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}")
 
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/mbilogConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mbilogConfig.cmake" @ONLY)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/MBILOGConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/MBILOGConfig.cmake" @ONLY)
 
 # mbilog is independent of mitk, and cant use mitk macros i.e. MITK_CREATE_MODULE_CONF( mbilog )
 # configuring happens through ../CMakeList.txt and mbilogConfig.cmake.in

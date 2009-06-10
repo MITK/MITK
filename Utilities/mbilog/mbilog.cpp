@@ -111,7 +111,7 @@ void mbilog::backendCout::formatSmart(const LogMessage &l,int threadID)
   }
   else
   {
-    if(std::strcmp(l.moduleName,"n/a"))
+    if(strcmp(l.moduleName,"n/a"))
     {
       printf(":%s",l.moduleName);
     }

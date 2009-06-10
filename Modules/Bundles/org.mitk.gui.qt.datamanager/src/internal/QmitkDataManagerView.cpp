@@ -248,6 +248,10 @@ void QmitkDataManagerView::DataStorageSelectionChanged(const QString & text)
   m_NodeTableView->setModel(_NodeTableModel);
   delete m_NodeTableModel;
   m_NodeTableModel = _NodeTableModel;
+
+   QObject::connect( m_NodeTableView->selectionModel(), SIGNAL(currentChanged ( const QModelIndex&, const QModelIndex& ))
+    , this, SLOT( NodeTableViewSelectionChanged( const QModelIndex&, const QModelIndex& )) );
+
 }
 
 void QmitkDataManagerView::NodeTableViewClicked( const QModelIndex & index )

@@ -225,7 +225,6 @@ public://TODO
     NDITrackingVolume m_NDITrackingVolume; ///< which tracking volume is currently used (if device supports multiple volumes) (\warning This parameter is not used yet)
     IlluminationActivationRate m_IlluminationActivationRate; ///< update rate of IR illuminator for Polaris
     DataTransferMode m_DataTransferMode;  ///< use TX (text) or BX (binary) (\warning currently, only TX mode is supported)
-    bool m_AutoRecovery;                  ///< automatically restart tracking after error (\warning currently not used)
     Tool6DContainerType m_6DTools;        ///< list of 6D tools
 
     itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container

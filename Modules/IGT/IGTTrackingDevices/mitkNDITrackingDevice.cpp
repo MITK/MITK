@@ -20,21 +20,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeStamp.h"
 
 #include <itksys/SystemTools.hxx>
-#define HALFPI 1.570796
-#define PI 3.14159
 
 const unsigned char CR = 0xD; // == '\r' - carriage return
 
 
 mitk::NDITrackingDevice::NDITrackingDevice() :
-TrackingDevice(), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
+TrackingDevice(),m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
 m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
 m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard),
-m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX),
-m_ErrorMessage(""), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_SerialCommunication(NULL)
+m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(NULL), 
+m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
+m_ErrorMessage(""), m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
   this->m_Type = NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
-
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -231,7 +229,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
   else
     message = *input + std::string(1, CR);
 
-  unsigned int messageLength = message.length() + 1; // +1 for CR
+  //unsigned int messageLength = message.length() + 1; // +1 for CR
 
   // Clear send buffer
   this->ClearSendBuffer();

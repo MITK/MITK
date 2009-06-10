@@ -25,9 +25,9 @@ void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
 {
   logMutex.Lock();
   #ifdef _WIN32
-    mbilog::backendCout::formatSmart( l, (int)GetCurrentThreadId() );
+    mbilog::BackendCout::FormatSmart( l, (int)GetCurrentThreadId() );
   #else
-    mbilog::backendCout::formatSmart( l );
+    mbilog::BackendCout::FormatSmart( l );
   #endif
   logMutex.Unlock();
 }
@@ -54,5 +54,5 @@ mitk::LogBackend *mitk::LogBackend::GetBackend()
 {
   return mitkLogBackend;
 }
-      
-      
+
+

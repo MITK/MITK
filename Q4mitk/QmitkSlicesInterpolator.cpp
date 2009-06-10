@@ -420,9 +420,21 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
   orientationPopup.exec( QCursor::pos() );
 }
 
-void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(int windowID)
+void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction* action)
 {
-  AcceptAllInterpolations( windowID );
+  try
+  {
+    std::map<QAction*, unsigned int>::const_iterator iter = ACTION_TO_SLICEDIMENSION.find( action );
+    if (iter != ACTION_TO_SLICEDIMENSION.end())
+    {
+      int windowID = iter->second;
+      AcceptAllInterpolations( windowID );
+    }
+  }
+  catch(...)
+  {
+    std::cerr << "Ill construction in " __FILE__ " l. " << __LINE__ << std::endl;
+  }
 }
 
 void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)

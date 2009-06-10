@@ -139,7 +139,7 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public Q3VBox
     /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
      */
-    void OnAcceptAllPopupActivated(int windowID);
+    void OnAcceptAllPopupActivated(QAction* action);
     
     /**
       Called on activation/deactivation
@@ -148,8 +148,8 @@ class QMITK_EXPORT QmitkSlicesInterpolator : public Q3VBox
 
   protected:
 
-	static const std::map<QAction*, unsigned int> createActionToSliceDimension();
-	static const std::map<QAction*, unsigned int> ACTION_TO_SLICEDIMENSION;
+    static const std::map<QAction*, unsigned int> createActionToSliceDimension();
+    static const std::map<QAction*, unsigned int> ACTION_TO_SLICEDIMENSION;
 
     void AcceptAllInterpolations(unsigned int windowID);
         

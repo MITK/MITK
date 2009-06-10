@@ -14,11 +14,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 #include <ctime>
+#include <stdio.h>
 
 #include "mbilog.h"
 
 static std::list<mbilog::AbstractBackend*> backends;
-  
+
 void mbilog::RegisterBackend(mbilog::AbstractBackend* backend)
 {
   backends.push_back(backend);
@@ -32,20 +33,20 @@ void mbilog::UnregisterBackend(mbilog::AbstractBackend* backend)
 static bool warningNoBackend = false;
 
 void mbilog::DistributeToBackends(const mbilog::LogMessage &l)
-{ 
+{
   if(backends.empty())
   {
     if(!warningNoBackend)
     {
       warningNoBackend = true;
       printf("mbilog ... receiving log messages, but still no backend registered, sending to std::cout\n");
-    }  
+    }
     mbilog::backendCout::formatFull(l);
     return;
   }
 
   std::list<mbilog::AbstractBackend*>::iterator i;
-   
+
   for(i = backends.begin(); i != backends.end(); i++)
     (*i)->ProcessMessage(l);
 }
@@ -71,7 +72,7 @@ void mbilog::backendCout::ProcessMessage(const mbilog::LogMessage& l)
   else
     formatSmart(l);
 }
-  
+
 void mbilog::backendCout::formatSmart(const LogMessage &l,int threadID)
 {
   switch(l.level)
@@ -79,19 +80,19 @@ void mbilog::backendCout::formatSmart(const LogMessage &l,int threadID)
     case mbilog::Info:
       printf("INFO");
       break;
-      
+
     case mbilog::Warn:
       printf("WARN");
       break;
-      
+
     case mbilog::Error:
       printf("ERROR");
       break;
-      
+
     case mbilog::Fatal:
       printf("FATAL");
       break;
-      
+
     case mbilog::Debug:
       printf("DEBUG");
       break;
@@ -110,23 +111,23 @@ void mbilog::backendCout::formatSmart(const LogMessage &l,int threadID)
   }
   else
   {
-    if(strcmp(l.moduleName,"n/a"))
+    if(std::strcmp(l.moduleName,"n/a"))
     {
       printf(":%s",l.moduleName);
     }
   }
-  
+
   printf("] ");
-  
+
   std::string msg=l.message;
-  
+
   int s=msg.size();
-  
+
   if(s>0)
     if(msg[s-1]=='\n')
       msg = msg.substr(0,s-1);
-  
-  printf("%s\n",msg.c_str());  
+
+  printf("%s\n",msg.c_str());
 
 }
 
@@ -144,7 +145,7 @@ void mbilog::backendCout::formatFull(const LogMessage &l,int threadID)
   if(strcmp(l.moduleName,"n/a"))
   {
     printf(" module '%s'",l.moduleName);
-  }        
+  }
 
   if(l.category.size()>0)
   {
@@ -158,31 +159,31 @@ void mbilog::backendCout::formatFull(const LogMessage &l,int threadID)
     case mbilog::Info:
       printf("INFO: ");
       break;
-      
+
     case mbilog::Warn:
       printf("WARN: ");
       break;
-      
+
     case mbilog::Error:
       printf("ERROR: ");
       break;
-      
+
     case mbilog::Fatal:
       printf("FATAL: ");
       break;
-      
+
     case mbilog::Debug:
       printf("DEBUG: ");
       break;
   }
 
   std::string msg=l.message;
-  
+
   int s=msg.size();
-  
+
   if(s>0)
     if(msg[s-1]=='\n')
       msg = msg.substr(0,s-1);
-  
-  printf("%s\n",msg.c_str());  
+
+  printf("%s\n",msg.c_str());
 }

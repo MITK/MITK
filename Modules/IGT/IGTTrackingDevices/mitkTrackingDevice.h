@@ -125,7 +125,7 @@ namespace mitk {
       bool m_StopTracking;       ///< signal stop to tracking thread
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
-      itk::FastMutexLock::Pointer m_ModeMutex; ///< mutex to controll access to m_Mode
+      itk::FastMutexLock::Pointer m_ModeMutex; ///< mutex to control access to m_Mode
       std::string m_ErrorMessage; ///< current error message
     };
 } // namespace mitk

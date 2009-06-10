@@ -121,7 +121,7 @@ void mitk::TrackingDeviceSource::Connect()
   if (m_TrackingDevice.IsNull())
     throw std::invalid_argument("mitk::TrackingDeviceSource: No tracking device set");
   if (m_TrackingDevice->OpenConnection() == false)
-    throw std::runtime_error("mitk::TrackingDeviceSource: Could not open connection to tracking device");
+    throw std::runtime_error(std::string("mitk::TrackingDeviceSource: Could not open connection to tracking device. Error: ") + m_TrackingDevice->GetErrorMessage());
   
   /* NDI Aurora needs a connection to discover tools that are connected to it. 
      Therefore we need to create outputs for these tools now */

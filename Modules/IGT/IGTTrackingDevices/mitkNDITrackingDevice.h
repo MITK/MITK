@@ -145,7 +145,6 @@ namespace mitk
     virtual bool Beep(unsigned char count);   ///< Beep the tracking device 1 to 9 times
 
     NDIErrorCode GetErrorCode(const std::string* input);  ///< returns the error code for a string that contains an error code in hexadecimal format
-    itkGetStringMacro(ErrorMessage);  ///< return current error message
 
     virtual bool SetOperationMode(OperationMode mode);  ///< set operation mode to 6D tool tracking, 3D marker tracking or 6D&3D hybrid tracking (see OperationMode)
     virtual OperationMode GetOperationMode();           ///< get current operation mode

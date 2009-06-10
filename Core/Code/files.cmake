@@ -173,6 +173,7 @@ SET(CPP_FILES
   IO/mitkXMLReader.cpp
   IO/mitkXMLWriter.cpp
   IO/vtkPointSetXMLParser.cpp
+  IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkBaseVtkMapper2D.cpp
   Rendering/mitkBaseVtkMapper3D.cpp

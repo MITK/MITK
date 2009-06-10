@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 //add only those headers here that are really necessary for all classes!
 #include "itkObject.h"
 #include "mitkConfig.h"
+#include "mbilog.h"
 
 #ifndef MITK_UNMANGLE_IPPIC
 #define ipPicDescriptor mitkIpPicDescriptor

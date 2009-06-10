@@ -56,6 +56,7 @@ ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" ON)
 IF(MITK_USE_OPENCHERRY)
+  SET(MBILOG_DIR "${MBILOG_BINARY_DIR}")
   ADD_SUBDIRECTORY(openCherry)
   SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/openCherry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
   INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
@@ -99,7 +100,7 @@ SET(${KITNAME}_CORE_LIBRARIES ${${KITNAME}_CORE_LIBRARIES} mitkCore)
 SET(${KITNAME}_INCLUDE_DIRS ${PROJECT_BINARY_DIR} ${${KITNAME}_INCLUDE_DIRS} ${ITK_INCLUDE_DIRS} ${VTK_INCLUDE_DIRS})
 
 FOREACH(dir Utilities Utilities/ipPic
-Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml)
+Utilities/IIL4MITK Utilities/pic2vtk Utilities/tinyxml Utilities/mbilog)
   SET(${KITNAME}_INCLUDE_DIRS ${${KITNAME}_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/${dir})
 ENDFOREACH(dir)
   

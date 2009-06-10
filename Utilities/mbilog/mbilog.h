@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
   #ifdef mbilog_EXPORTS
     #define MBILOG_DLL_API __declspec(dllexport)
   #else
-    #define MBILOG_DLL_API __declspec(dllimport) 
+    #define MBILOG_DLL_API __declspec(dllimport)
   #endif
 #else
   #define MBILOG_DLL_API
@@ -48,9 +48,9 @@ namespace mbilog {
   };
 
   class MBILOG_DLL_API LogMessage {
-    
+
     public:
-    
+
       int level;
       const char* filePath;
       int lineNumber;
@@ -65,26 +65,26 @@ namespace mbilog {
     virtual ~AbstractBackend(){}
     virtual void ProcessMessage(const mbilog::LogMessage& )=0;
   };
-  
-  class MBILOG_DLL_API backendCout : public AbstractBackend
+
+  class MBILOG_DLL_API BackendCout : public AbstractBackend
   {
     public:
-    
-      backendCout();
-      ~backendCout();
-      virtual void ProcessMessage(const mbilog::LogMessage &l );
-      
-      void setFull(bool full);
 
-      static void formatSmart(const LogMessage &l,int threadID=0);
-      static void formatFull(const LogMessage &l,int threadID=0);   
-      
+      BackendCout();
+      ~BackendCout();
+      virtual void ProcessMessage(const mbilog::LogMessage &l );
+
+      void SetFull(bool full);
+
+      static void FormatSmart(const LogMessage &l,int threadID=0);
+      static void FormatFull(const LogMessage &l,int threadID=0);
+
     private:
-    
+
       bool useFullOutput;
-      
+
   };
-  
+
   void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API DistributeToBackends(const LogMessage &l);
@@ -93,16 +93,16 @@ namespace mbilog {
   class MBILOG_DLL_API PseudoStream {
 
     protected:
-    
+
       LogMessage msg;
-      bool disabled;  
-            
+      bool disabled;
+
     public:
 
       inline PseudoStream( int level,
                     const char* filePath,
                     int lineNumber,
-                    const char* functionName) 
+                    const char* functionName)
                           : disabled(false)
       {
         msg.level = level;
@@ -111,7 +111,7 @@ namespace mbilog {
         msg.functionName = functionName;
         msg.category = "";
         msg.message = "";
-      }     
+      }
 
       inline ~PseudoStream()
       {
@@ -119,7 +119,7 @@ namespace mbilog {
         {
           msg.moduleName = MBILOG_MODULENAME;
           DistributeToBackends(msg);
-        }  
+        }
       }
 
       template <class T> inline PseudoStream& operator<<(const T& data)
@@ -129,10 +129,10 @@ namespace mbilog {
           std::stringstream ss(std::stringstream::out);
           ss << data;
           msg.message += ss.str();
-        }                 
+        }
         return *this;
       }
-     
+
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
@@ -140,10 +140,10 @@ namespace mbilog {
           std::stringstream ss(std::stringstream::out);
           ss << func;
           msg.message += ss.str();
-        }                 
+        }
         return *this;
       }
-      
+
       inline PseudoStream& operator()(const char *category)
       {
         if(!disabled)
@@ -151,7 +151,7 @@ namespace mbilog {
           if(msg.category.length())
             msg.category+=".";
           msg.category+=category;
-        }                 
+        }
         return *this;
       }
 
@@ -167,43 +167,48 @@ namespace mbilog {
     public:
 
       template <class T> inline NullStream& operator<<(const T& data)
-      {       
-        return *this;
-      }
-      inline NullStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         return *this;
       }
-      inline NullStream& operator()(const char *category)
+      inline NullStream& operator<<(std::ostream& (*/*func*/)(std::ostream&))
       {
         return *this;
       }
-      inline NullStream& operator()(bool enabled)
+      inline NullStream& operator()(const char */*category*/)
+      {
+        return *this;
+      }
+      inline NullStream& operator()(bool /*enabled*/)
       {
         return *this;
       }
   };
-  
-                   /*
-  template<typename T>
-  struct DelegateBackend : public AbstractBackend
-  {
-    typedef void(T::*Func)(const mbilog::LogMessage&);
-    
-    T* m_obj;
-    
-    DelegateBackend(T* obj, T::Func func) : obj(obj), m_Func(func)
-    { 
-    }
-    
-    void ProcessMessage(const mbilog::LogMessage& msg)
-    {
-      obj->*m_Func(msg);
-    }
-  };  
-                   */
 
-} 
+//
+//  template<typename T>
+//  struct DelegateBackend : public AbstractBackend
+//  {
+//
+//    typedef void(T::*Callback)(const mbilog::LogMessage&);
+//
+//    DelegateBackend(T* obj, Callback callback) : m_Obj(obj), m_Callback(callback)
+//    {
+//    }
+//
+//    void ProcessMessage(const mbilog::LogMessage& msg)
+//    {
+//      m_Obj->*m_Callback(msg);
+//    }
+//
+//  private:
+//
+//    T* m_Obj;
+//    Callback m_Callback;
+//  };
+
+
+}
+
 
 #define LOG_INFO mbilog::PseudoStream(mbilog::Info,__FILE__,__LINE__,__FUNCTION__)
 #define LOG_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
@@ -214,7 +219,7 @@ namespace mbilog {
 #define LOG_DEBUG mbilog::PseudoStream(mbilog::Debug,__FILE__,__LINE__,__FUNCTION__)
 #else
 #define LOG_DEBUG true ? mbilog::NullStream() : mbilog::NullStream()
-#endif              
-              
-              
+#endif
+
+
 #endif

@@ -14,11 +14,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <list>
 #include <ctime>
-#include <stdio.h>
+#include <string>
+#include <iomanip>
 
 #include "mbilog.h"
 
 static std::list<mbilog::AbstractBackend*> backends;
+
+namespace mbilog {
+static const std::string NA_STRING = "n/a";
+}
 
 void mbilog::RegisterBackend(mbilog::AbstractBackend* backend)
 {
@@ -39,9 +44,9 @@ void mbilog::DistributeToBackends(const mbilog::LogMessage &l)
     if(!warningNoBackend)
     {
       warningNoBackend = true;
-      printf("mbilog ... receiving log messages, but still no backend registered, sending to std::cout\n");
+      std::cout << "mbilog ... receiving log messages, but still no backend registered, sending to std::cout\n";
     }
-    mbilog::backendCout::formatFull(l);
+    mbilog::BackendCout::FormatFull(l);
     return;
   }
 
@@ -51,87 +56,86 @@ void mbilog::DistributeToBackends(const mbilog::LogMessage &l)
     (*i)->ProcessMessage(l);
 }
 
-mbilog::backendCout::backendCout()
+mbilog::BackendCout::BackendCout()
 {
   useFullOutput=false;
 }
 
-mbilog::backendCout::~backendCout()
+mbilog::BackendCout::~BackendCout()
 {
 }
 
-void mbilog::backendCout::setFull(bool full)
+void mbilog::BackendCout::SetFull(bool full)
 {
   useFullOutput = full;
 }
 
-void mbilog::backendCout::ProcessMessage(const mbilog::LogMessage& l)
+void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
 {
   if(useFullOutput)
-    formatFull(l);
+    FormatFull(l);
   else
-    formatSmart(l);
+    FormatSmart(l);
 }
 
-void mbilog::backendCout::formatSmart(const LogMessage &l,int threadID)
+void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
 {
   switch(l.level)
   {
     case mbilog::Info:
-      printf("INFO");
+      std::cout << "INFO";
       break;
 
     case mbilog::Warn:
-      printf("WARN");
+      std::cout << "WARN";
       break;
 
     case mbilog::Error:
-      printf("ERROR");
+      std::cout << "ERROR";
       break;
 
     case mbilog::Fatal:
-      printf("FATAL");
+      std::cout << "FATAL";
       break;
 
     case mbilog::Debug:
-      printf("DEBUG");
+      std::cout << "DEBUG";
       break;
   }
 
-  printf("[% 7.3f",((double)clock())/CLOCKS_PER_SEC);
+  std::cout << "[" << std::setw(7) << std::setprecision(3) << ((double)clock())/CLOCKS_PER_SEC;
 
   if(threadID)
   {
-    printf(":%x",threadID);
+    std::cout << ":" << std::hex << threadID;
   }
 
-  if(l.category.size()>0)
+  if(!l.category.empty())
   {
-    printf(":%s",l.category.c_str());
+    std::cout << ":" << l.category;
   }
   else
   {
-    if(strcmp(l.moduleName,"n/a"))
+    if(NA_STRING != l.moduleName)
     {
-      printf(":%s",l.moduleName);
+      std::cout << ":" << std::string(l.moduleName);
     }
   }
 
-  printf("] ");
+  std::cout << "] ";
 
-  std::string msg=l.message;
+  std::string msg(l.message);
 
   int s=msg.size();
 
-  if(s>0)
-    if(msg[s-1]=='\n')
-      msg = msg.substr(0,s-1);
+  while(s>0 && msg[s-1]=='\n')
+      msg = msg.substr(0,--s);
 
-  printf("%s\n",msg.c_str());
+  std::cout << msg << std::endl;
 
 }
 
-void mbilog::backendCout::formatFull(const LogMessage &l,int threadID)
+void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)
 {
   printf("%s(%d)",l.filePath,l.lineNumber);
 

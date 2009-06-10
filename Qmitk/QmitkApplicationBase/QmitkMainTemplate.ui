@@ -42,12 +42,9 @@
         <action name="fileOpenImageSequenceAction"/>
         <action name="fileOpenRawImageAction"/>
         <action name="fileOpenRawImageSequenceAction"/>
-        <action name="fileOpenProjectAction"/>
         <separator/>
         <action name="fileUploadToPACSAction"/>
         <action name="fileDownloadFromPACSAction"/>
-        <action name="fileSaveProjectAction"/>
-        <action name="fileSaveProjectAsAction"/>
         <action name="fileCloseProjectAction"/>
         <separator/>
         <action name="fileExitAction"/>
@@ -76,7 +73,7 @@
         <action name="optionsSystem_InformationAction"/>
         <action name="optionsShow_OptionsAction"/>
         <action name="optionsToolbarsAction"/>
-        <item text="Toolbars" name="popupMenu_30" accel="">
+        <item text="Toolbars" name="popupMenu_34" accel="">
             <action name="options_showMainToolbarAction"/>
             <action name="options_showSearchToolbarAction"/>
             <action name="options_ShowDropdownToolbarAction"/>
@@ -209,37 +206,6 @@
         </property>
         <property name="menuText">
             <string>&amp;Download file from PACS...</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileSaveProjectAction</cstring>
-        </property>
-        <property name="iconSet">
-            <iconset>image3</iconset>
-        </property>
-        <property name="text">
-            <string>Save Project</string>
-        </property>
-        <property name="menuText">
-            <string>&amp;Save Project</string>
-        </property>
-        <property name="accel">
-            <string>Ctrl+S</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileSaveProjectAsAction</cstring>
-        </property>
-        <property name="text">
-            <string>Save Project &amp;As...</string>
-        </property>
-        <property name="menuText">
-            <string>Save Project &amp;As...</string>
-        </property>
-        <property name="accel">
-            <string></string>
         </property>
     </action>
     <action>
@@ -493,7 +459,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image4</iconset>
+            <iconset>image3</iconset>
         </property>
         <property name="text">
             <string>Fullscreen</string>
@@ -513,7 +479,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image5</iconset>
+            <iconset>image4</iconset>
         </property>
         <property name="text">
             <string>Hide Planes</string>
@@ -530,7 +496,7 @@
             <bool>true</bool>
         </property>
         <property name="iconSet">
-            <iconset>image6</iconset>
+            <iconset>image5</iconset>
         </property>
         <property name="text">
             <string>Lock Planes</string>
@@ -621,23 +587,6 @@
         </property>
         <property name="menuText">
             <string>MITK System &amp;Information</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
-            <cstring>fileOpenProjectAction</cstring>
-        </property>
-        <property name="on">
-            <bool>false</bool>
-        </property>
-        <property name="text">
-            <string>Open Project</string>
-        </property>
-        <property name="menuText">
-            <string>Open &amp;Project</string>
-        </property>
-        <property name="toolTip">
-            <string>Open existing project file</string>
         </property>
     </action>
     <action>
@@ -905,7 +854,7 @@
                 <bool>true</bool>
             </property>
             <property name="iconSet">
-                <iconset>image7</iconset>
+                <iconset>image6</iconset>
             </property>
             <property name="text">
                 <string>Plane slicing mode</string>
@@ -922,7 +871,7 @@
                 <bool>true</bool>
             </property>
             <property name="iconSet">
-                <iconset>image8</iconset>
+                <iconset>image7</iconset>
             </property>
             <property name="text">
                 <string>Plane rotation mode</string>
@@ -939,7 +888,7 @@
                 <bool>true</bool>
             </property>
             <property name="iconSet">
-                <iconset>image9</iconset>
+                <iconset>image8</iconset>
             </property>
             <property name="text">
                 <string>Plane swivel mode</string>
@@ -1073,24 +1022,21 @@
         <data format="PNG" length="233">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000b049444154388db594310e43210c436df4879e897b75fa53d5bbf94c1d2ad185afa6802891829708102f9623a024ec50da42dd093ebc1772cec5ae25b13d974417f8ba346a2489b629a38667a1921892711b0f5033fe979b170a0004504a0180722d41ae716706eaf0be5080b513bb7d4ff3648c3beb5c69e478adce35ccd89bf548c38c2df4f9006e07f07aafd5fbf913452cd43c905868e7380a6ac0b1501b6e28d4388e85768ebd9afd1561ff71ab0fa524b6cd8efff1610000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="PNG" length="326">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000010d49444154388db595bd8ac3301084c741c5967e1e0bf256a98ee3082155de2ae0edf22e2aaed842705738ab4491f5179c6decc168f46918db0333e3136300609aa6bf2d4d9979302a2e67403cf0fd03ccd7196408e265d9daa3a8ed6471e31bc40becde0200766a2c1e20f3d855bc2c37be53df27589159cca32705d251463872204300104875b2c44a0247a0df312173e4227d3a2e7126c6afc44aa29ba94656c7eb03632e63250b27c8661cafcf12e7c9d6f5ebfa6ac6ad6d68266e256dcef8744cab531b7db99e89931eabf9b3eeb92651bc63b2762d121fbeba9288e2488cd78e539af93a877bbbb7f55644952b4d6f8f5b89bb7bdc4a5cebf1dbc4b56fc5a0ffbcad7e4fcc3c44c65bcf3f79fbd584b969dcb60000000049454e44ae426082</data>
-    </image>
-    <image name="image4">
         <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000100000000d0806000000a0bbee240000003149444154289163646060f8cf400160a24433550c6041e61c3b768c91184d565656706f0fbc17460d6060606418f2291100e23a0619b9b941d30000000049454e44ae426082</data>
     </image>
-    <image name="image5">
+    <image name="image4">
         <data format="PNG" length="152">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000005f49444154388d633c76ec18032d00134d4c25c5609b5fe1ff6d7e85ffa7bac1a4825183470dc6042c308690bd2dde347ae4e0614662d4bd83aaa3998b19892d2b60b9ee08db4a4662d40fbdc81b3578081bcc42580904109b7e6180662e060028c31735ecfe305f0000000049454e44ae426082</data>
     </image>
-    <image name="image6">
+    <image name="image5">
         <data format="PNG" length="285">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000e449444154388dcd93610a82401085df6a1da214a16b2c0b1ec34b768948f610fdb1c4f20e42d99f467769976610a107a2b8c337cfe78cb2d6620d25ab5025603354a319aa915bbf615b489fec52e01fa2908a1fc547f94e4f3977bd55b13a91e36bfef86aa2b50efe503698a0c561be00a06d80105c7116843e9f60d6ce11b867eefb29e3ac34f119bdcc8fb76d02b8b5ce59569af17eaa9507e6a86d00e0c5aa9dc0d429a41c7e86c5819af87219e239a69ce91e93184c4e438e1781b98ec59bf7cba908dcf556c5366c11180092f31e0050a7c7e8f478f5121712b11d739d925673fc06e63944ddabc8fce10000000049454e44ae426082</data>
     </image>
-    <image name="image7">
+    <image name="image6">
         <data format="PNG" length="243">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000ba49444154388dcd95510ec42008449dcd9e8afb876bb13fc54c69856a6ab2f327a54f64a485aab61dfa6ca1fe055844ec75b08898994dc14bb0435b6b6d069e8219ea7a0aff660f551500cc81007a7ca962ae8821aa0a5e67955fc04f8daaf2c093c73df563bbb8151cf3dcd89edee36854346d14a34d8de11dec46bd55f1a9c707fcb48e2fc4d81df402667875a5aa3c549f4d777df61ea7033232341a75a774a463cf0fe8fae48de071934c692b02bc3c3eab346f55db7e4d3fedc0a661957787700000000049454e44ae426082</data>
     </image>
-    <image name="image8">
+    <image name="image7">
         <data format="PNG" length="246">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000bd49444154388dd595b11582401044ffa06d6821f70cecc27635d946ecc2c03571e1d013e180804948e0cfdcb2033233d650b30a15d88fbdf1f4b838c0f37c07c0ccb40838e4ee0048f22183c960495f0666a69452cf6832381e8cc4ee8e247f5feb13970c227dae595b91522a426146e2507efcc5c0432bb75a41b6076e671c0b9eeb5f6d4781a16b13fc7edb63551c85a45969a1b06e92da9a42fd387ae0489ad7340c9aeba10e9c270b387473dfdd8ef589737d7ec5a626d6e6fe792f01a759d24982ab9f0000000049454e44ae426082</data>
     </image>
-    <image name="image9">
+    <image name="image8">
         <data format="PNG" length="272">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000000d749444154388db5955112c42008434d674fe5fd078fe5fe14368b54a5d3f2d55a796248152252de88e3156a29e5b33bb1d6daf55944f008b8d6da7b376e01d057f02558a1c08f73be4fe15330431902a0afe0b734de89101c419cc67970d0a81006c0b4d63196e50facd0d61a78814847de95ce63cd0f9ee8bbbf1b006c07bae0a37f1e17b5ed8a2b90ef874a61601101fbf32e3cacd8c16dfccac3d4b4013e48a1704ed0457cb28e738e7d9b9dc7ec94c831b3b362ea8ab392a1d248d314d8ff859958dacd6f3f3aedc2bccc9da7eed8b94152e04c7c01b077aa3e2dbf3ec40000000049454e44ae426082</data>
     </image>
 </images>
@@ -1112,18 +1058,6 @@
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>fileExit()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveProjectAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSave()</slot>
-    </connection>
-    <connection>
-        <sender>fileSaveProjectAsAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileSaveProjectAs()</slot>
     </connection>
     <connection>
         <sender>fileOpenAction</sender>
@@ -1214,12 +1148,6 @@
         <signal>activated()</signal>
         <receiver>QmitkMainTemplate</receiver>
         <slot>optionsSystem_InformationAction_activated()</slot>
-    </connection>
-    <connection>
-        <sender>fileOpenProjectAction</sender>
-        <signal>activated()</signal>
-        <receiver>QmitkMainTemplate</receiver>
-        <slot>fileOpenProject()</slot>
     </connection>
     <connection>
         <sender>editUndoAction</sender>
@@ -1400,7 +1328,6 @@
     <variable>bool m_FirstFileOpen;</variable>
     <variable>mitk::StringProperty::Pointer m_DefaultDatasetPath;</variable>
     <variable>std::string m_HelpPagesPath;</variable>
-    <variable>QString m_ProjectFileName;</variable>
     <variable access="public">mitk::PropertyList::Pointer m_Options;</variable>
     <variable access="private">bool m_FineUndoEnabled;</variable>
     <variable access="private">bool m_NoMITKOptions;</variable>
@@ -1420,9 +1347,6 @@
 <slots>
     <slot>fileOpen()</slot>
     <slot>fileOpenImageSequence()</slot>
-    <slot>fileOpenProject()</slot>
-    <slot>fileSaveProjectAs()</slot>
-    <slot>fileSave()</slot>
     <slot>fileExit()</slot>
     <slot>changeTo2DImagesUpLayout()</slot>
     <slot>changeTo2DImagesLeftLayout()</slot>
@@ -1435,7 +1359,6 @@
     <slot>changeToRowWidget3n4Layout()</slot>
     <slot>changeTo2x2Dand3DLayout()</slot>
     <slot>changeToLeft2DAnd3DRight2DLayout()</slot>
-    <slot>FullScreenMode( bool fullscreen )</slot>
     <slot>enableFineUndo( bool enabled )</slot>
     <slot>optionsSystem_InformationAction_activated()</slot>
     <slot>editUndo()</slot>
@@ -1448,9 +1371,6 @@
     <slot>toolbarPositionOrientation_toggled( bool on )</slot>
     <slot>changeToRowWidgetSmall3nBig4Layout()</slot>
     <slot>changeToSmallUpperWidget2Big3n4Layout()</slot>
-    <slot>OnFileLoadFromPACS()</slot>
-    <slot>OnUploadFileToPACS()</slot>
-    <slot>OnDownloadFileFromPACS()</slot>
     <slot>fileOpenRawImage()</slot>
     <slot>fileOpenRawImage( const char * fileName )</slot>
     <slot>fileOpenRawImageSequence()</slot>
@@ -1467,6 +1387,10 @@
     <slot>showDropdownbar( bool on )</slot>
     <slot>showIconbar( bool on )</slot>
     <slot>showFavoritesbar( bool on )</slot>
+    <slot>OnFileLoadFromPACS()</slot>
+    <slot>OnUploadFileToPACS()</slot>
+    <slot>OnDownloadFileFromPACS()</slot>
+    <slot>FullScreenMode( bool fullscreen )</slot>
 </slots>
 <functions>
     <function>fileOpen( const char * fileName )</function>

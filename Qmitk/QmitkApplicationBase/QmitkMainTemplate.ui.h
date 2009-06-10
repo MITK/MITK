@@ -102,7 +102,6 @@ However, it is nice to actually replace the nonsense :-)
 #include <mitkDICOMFileReader.h>
 #include <mitkDSRFileReader.h>
 #include <mitkCylindricToCartesianFilter.h>
-#include <QmitkSaveProjectWidget.h>
 #include <itksys/SystemTools.hxx>
 #else
 #include <itkImage.h>
@@ -387,10 +386,6 @@ public:
 
 QmitkMainTemplate* QmitkMainTemplate::m_Instance = NULL;
 
-#ifdef MBI_INTERNAL
-QmitkSaveProjectWidget* m_SceneWidget;
-#endif
-
 void QmitkMainTemplate::fileOpen()
 {
   try
@@ -588,121 +583,6 @@ void QmitkMainTemplate::fileOpenGetFactoryOutput( mitk::DataTreeNodeFactory & fa
         m_MultiWidget->changeLayoutToWidget1();
       }
   }
-}
-
-void QmitkMainTemplate::fileOpenProject()
-{
-#ifdef MBI_INTERNAL
-  QString filename = QFileDialog::getOpenFileName( QString::null, "XML Project description (*.xml)",0,
-    "Open Project File", "Choose a file to open");
-  if ( !filename.isEmpty() ) {
-    try
-    {
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      mitk::DataTree::Load(&it, filename);
-      mitk::RenderingManager::GetInstance()->InitializeViews( &it );
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-      itkGenericOutputMacro( << "Exception during file open project: " << ex );
-    }
-  }
-#else
-  QString fileName = QFileDialog::getOpenFileName(NULL,"MITK Project File (*.mitk)");
-
-  if ( !fileName.isNull() )
-  {
-    try
-    {
-      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      mitk::DataTree::Load( &it, fileName.ascii() );
-      mitk::RenderingManager::GetInstance()->InitializeViews( &it );
-      m_ProjectFileName = fileName;
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-      itkGenericOutputMacro( << "Exception during file open project: " << ex );
-    }
-    QApplication::restoreOverrideCursor();
-  }
-#endif
-}
-
-void QmitkMainTemplate::fileSaveProjectAs()
-{
-#ifdef MBI_INTERNAL
-  try
-  {
-    m_SceneWidget = new QmitkSaveProjectWidget(m_Tree, 0);
-    m_SceneWidget->show();
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open project: " << ex );
-  }
-#else
-  QString fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
-
-  if ( !fileName.isNull() )
-  {
-    try
-    {
-      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      mitk::DataTree::Save( &it, fileName.ascii() );
-
-      m_ProjectFileName = fileName;
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-      itkGenericOutputMacro( << "Exception during file open project: " << ex );
-    }
-  }
-  QApplication::restoreOverrideCursor();
-#endif
-}
-
-void QmitkMainTemplate::fileSave()
-{
-#ifdef MBI_INTERNAL
-  try
-  {
-    m_SceneWidget = new QmitkSaveProjectWidget(m_Tree, 0);
-    m_SceneWidget->show();
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open project: " << ex );
-  }
-#else
-  QString fileName;
-
-  if ( m_ProjectFileName.length() > 5 )
-    fileName = m_ProjectFileName;
-  else
-    fileName = fileName = QFileDialog::getSaveFileName(NULL,"MITK Project File (*.mitk)");
-
-  if ( !fileName.isNull() )
-  {
-    try
-    {
-      QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
-
-      mitk::DataTreePreOrderIterator it(m_Tree);
-      mitk::DataTree::Save( &it, fileName.ascii() );
-
-      m_ProjectFileName = fileName;
-    }
-    catch ( itk::ExceptionObject & ex )
-    {
-      itkGenericOutputMacro( << "Exception during file open project: " << ex );
-    }
-  }
-  QApplication::restoreOverrideCursor();
-#endif
 }
 
 void QmitkMainTemplate::fileExit()

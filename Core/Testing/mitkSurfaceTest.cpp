@@ -210,29 +210,20 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   int numberoftimesteps = surface->GetTimeSteps();
   mitk::Surface::Pointer dummy = mitk::Surface::New();
   dummy->Graft(surface);
-
+  std::cout << "polyData != NULL ??" << std::endl;
   if (dummy->GetVtkPolyData() == NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  std::cout << "polyData != NULL" << std::endl;
-
+  
+  std::cout << "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps() << std::endl;
   if (dummy->GetTimeSteps() != numberoftimesteps)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  std::cout << "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps() << std::endl;
-
-  if (dummy->GetVtkPolyData(3)->GetLength() != surface->GetVtkPolyData(3)->GetLength() )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout << "orig-length of PolyData:" << surface->GetVtkPolyData(3)->GetLength() << "  copy-length of PolyData:" << dummy->GetVtkPolyData(3)->GetLength() << std::endl;
-
-
+  
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

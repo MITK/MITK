@@ -103,7 +103,7 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       break;
   }
 
-  std::cout << "[" << std::setw(7) << std::setprecision(3) << ((double)clock())/CLOCKS_PER_SEC;
+  std::cout << "[" << std::setw(7) << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
 
   if(threadID)
   {
@@ -124,70 +124,57 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
 
   std::cout << "] ";
 
-  std::string msg(l.message);
-
-  int s=msg.size();
-
-  while(s>0 && msg[s-1]=='\n')
-      msg = msg.substr(0,--s);
-
-  std::cout << msg << std::endl;
+  std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
+  std::cout << ((i =! std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
 
 }
 
 void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)
 {
-  printf("%s(%d)",l.filePath,l.lineNumber);
+  std::cout << std::string(l.filePath) << "(" << l.lineNumber << ")";
 
-  printf(" func '%s'",l.functionName);
+  std::cout << " func '" << std::string(l.functionName) << "'";
 
   if(threadID)
   {
-    printf(" thread %x",threadID);
+    std::cout << " thread " << std::hex << threadID;
   }
 
-  if(strcmp(l.moduleName,"n/a"))
+  if(NA_STRING != l.moduleName)
   {
-    printf(" module '%s'",l.moduleName);
+    std::cout << " module '" << std::string(l.moduleName) << "'";
   }
 
-  if(l.category.size()>0)
+  if(!l.category.empty())
   {
-    printf(" category '%s'",l.category.c_str());
+    std::cout << " category '" << l.category << "'";
   }
 
-  printf(" %.3fs\n",((double)clock())/CLOCKS_PER_SEC);
+  std::cout << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << "s\n";
 
   switch(l.level)
   {
     case mbilog::Info:
-      printf("INFO: ");
+      std::cout << "INFO: ";
       break;
 
     case mbilog::Warn:
-      printf("WARN: ");
+      std::cout << "WARN: ";
       break;
 
     case mbilog::Error:
-      printf("ERROR: ");
+      std::cout << "ERROR: ";
       break;
 
     case mbilog::Fatal:
-      printf("FATAL: ");
+      std::cout << "FATAL: ";
       break;
 
     case mbilog::Debug:
-      printf("DEBUG: ");
+      std::cout << "DEBUG: ";
       break;
   }
 
-  std::string msg=l.message;
-
-  int s=msg.size();
-
-  if(s>0)
-    if(msg[s-1]=='\n')
-      msg = msg.substr(0,s-1);
-
-  printf("%s\n",msg.c_str());
+  std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
+  std::cout << ((i =! std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
 }

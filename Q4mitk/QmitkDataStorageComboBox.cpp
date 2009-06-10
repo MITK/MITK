@@ -243,7 +243,10 @@ const int QmitkDataStorageComboBox::Find( const mitk::DataTreeNode* _DataTreeNod
 //#PROTECTED SETTER
 void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
 {
-  emit OnSelectionChanged(this->GetSelectedNode());
+  if (index >= 0)
+  {
+    emit OnSelectionChanged(this->GetSelectedNode());
+  }
 }
 
 void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _DataTreeNode)

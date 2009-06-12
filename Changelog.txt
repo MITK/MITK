@@ -10,6 +10,17 @@ of release notes for the next release.
 
 - more flexible GUI presentation of renderwindows
 
+======== Changes in release 0.12.2 (2009-Jun-12) ========
+
+0.12.2 is a bugfix release for 0.12. Issues fixed:
+
+- The source packages from SourceForge produced CMake configuration
+  errors
+  - ImageCropper functionality/bundle took too much time for cropping
+  - Segmentation tools were deactivated during segmentation
+  - Accept All did not work for interpolations
+  - The broken "File/Save Project..." menu entry was misleading
+
 ======== Changes in release 0.12 (2009-May-08) ========
 
 - Application module "deformable registration"
@@ -21,8 +32,8 @@ of release notes for the next release.
 - DataStorage: new events, can be used without DataTree for rendering
 - new histogram and plot widgets based on Qwt
 - Qt4 version: many many impovements, nearly complete MainApp,
-               most functionalities have been ported from Qt3,
-			   bundle generator (similar to Qt3 functionality generator)
+  - most functionalities have been ported from Qt3,
+  - bundle generator (similar to Qt3 functionality generator)
 - gcc 4.3 compatibility (Ubuntu 8.10, Fedora 9)
 - VTK 5.2 and VTK 5.4 compatibility
 - ITK 3.10 and ITK 3.12 compatibility

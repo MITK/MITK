@@ -9,7 +9,7 @@ MACRO(MITK_GENERATE_TOOLS_LIBRARY)
   ENDIF (${ARGC} EQUAL 2)
 
   # if used inside MITK core, we fill variables in files.cmake
-  INCLUDE(files.cmake OPTIONAL)
+  INCLUDE(tools.cmake OPTIONAL)
 
 
 
@@ -23,7 +23,7 @@ MACRO(MITK_GENERATE_TOOLS_LIBRARY)
 
       # construct tool name from file name
       STRING(REGEX REPLACE ".*(^|[/\\])mitk(.+)\\.c(pp|xx)$" "\\2" TOOL_NAME ${TOOL_FILE})
-      MESSAGE(STATUS "Adding tool ${TOOL_NAME}")
+      MESSAGE(STATUS "Adding segmentation tool: ${TOOL_NAME}")
 
       # source file names for this tool
       SET( TOOL_CPPS ${TOOL_FILE} ${TOOL_CPPS} )
@@ -58,7 +58,7 @@ ${FACTORY_INCLUDE_LINES}" )
       # construct tool name from file name
       STRING(REGEX REPLACE "^Qmitk(.+)GUI\\.c(pp|xx)$" "\\1" TOOL_NAME ${TOOL_GUI_FILE})
       STRING(REGEX REPLACE "\\.c(pp|xx)$" ".h" TOOL_GUI_HEADER ${TOOL_GUI_FILE})
-      MESSAGE(STATUS "Adding tool GUI ${TOOL_NAME}")
+      MESSAGE(STATUS "Adding GUI for segmentation tool: ${TOOL_NAME}")
 
       # source file names for this tool
       SET( TOOL_GUI_CPPS ${TOOL_GUI_FILE} ${TOOL_GUI_CPPS} )

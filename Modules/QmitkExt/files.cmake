@@ -113,7 +113,7 @@ SET(MOC_H_FILES
  QmitkToolSelectionBox.h  
  # QmitkPropertyListPopup.h
  QmitkToolWorkingDataSelectionBox.h  
- QmitkSelectableGLWidget.h  
+ #QmitkSelectableGLWidget.h  
  QmitkNewSegmentationDialog.h
  QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
@@ -130,12 +130,5 @@ SET(UI_FILES
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
-)
-
-SET(TOOL_QT4GUI_FILES
-  QmitkBinaryThresholdToolGUI.cpp
-  QmitkDrawPaintbrushToolGUI.cpp
-  QmitkErasePaintbrushToolGUI.cpp
-  QmitkCalculateGrayValueStatisticsToolGUI.cpp
 )
 

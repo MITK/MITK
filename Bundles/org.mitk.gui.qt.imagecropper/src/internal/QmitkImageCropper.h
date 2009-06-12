@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkOperationActor.h>
 #include <mitkOperation.h>
 #include <mitkAffineInteractor.h>
+#include "mitkWeakPointer.h"
 #include <itkImage.h>
 #include <QProgressDialog>
 
@@ -150,12 +151,10 @@ public slots:
 
   // from QmitkImageCropperControls
   virtual void ImageSelectionChanged();
-  virtual void ImageNodeChanged( const mitk::DataTreeNode::Pointer item );
+  virtual void ImageNodeChanged( const mitk::DataTreeNode* item );
   virtual void ChkInformationToggled( bool on );
 
 protected:
-  //mitk::DataTree::Pointer m_DataTree;
-  //mitk::DataTreeIteratorClone 	m_DataTreeIterator;
 
   /*!
   * Default main widget containing 4 windows showing 3
@@ -172,12 +171,12 @@ protected:
   /*!
   * \brief A pointer to the node of the image to be croped.
   */
-  mitk::DataTreeNode::Pointer m_ImageNode;
+  mitk::WeakPointer<mitk::DataTreeNode> m_ImageNode;
 
   /*!
   * \brief A pointer to the image to be cropped.
   */
-  mitk::Image::Pointer m_ImageToCrop;
+  mitk::WeakPointer<mitk::Image> m_ImageToCrop;
 
   /*!
   * \brief The cuboid used for cropping.
@@ -202,7 +201,7 @@ protected:
   /*!
    * \brief Finds the given node in the data tree and fits the cuboid to it
    */
-  virtual void AddBoundingObjectToNode(mitk::DataTreeNode::Pointer node);
+  virtual void AddBoundingObjectToNode(mitk::DataTreeNode* node);
 
   /*!
    * \brief Removes the cuboid from any node and hides it from the user.

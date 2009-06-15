@@ -52,9 +52,6 @@ namespace mitk {
 
     itkNewMacro(Self);
   
-    //
-    typedef double ScalarType;
-
     /** 
     *\brief Set points used as source points for landmark transform.
     *
@@ -71,37 +68,37 @@ namespace mitk {
     *\brief Returns the Fiducial Registration Error
     *
     */
-    ScalarType GetFRE() const;
+    mitk::ScalarType GetFRE() const;
 
     /** 
     *\brief Returns the standard deviation of the Fiducial Registration Error
     *
     */
-    ScalarType GetFREStdDev() const;
+    mitk::ScalarType GetFREStdDev() const;
     
     /** 
     *\brief Returns the Root Mean Square of the registration error
     *
     */    
-    ScalarType GetRMSError() const;
+    mitk::ScalarType GetRMSError() const;
     
     /** 
     *\brief Returns the minimum registration error / best fitting landmark distance
     *
     */    
-    ScalarType GetMinError() const;
+    mitk::ScalarType GetMinError() const;
     
     /** 
     *\brief Returns the maximum registration error / worst fitting landmark distance
     *
     */   
-    ScalarType GetMaxError() const;
+    mitk::ScalarType GetMaxError() const;
     
     /** 
     *\brief Returns the absolute maximum registration error
     *
     */    
-    ScalarType GetAbsMaxError() const;
+    mitk::ScalarType GetAbsMaxError() const;
 
   protected:
     typedef itk::Image< signed short, 3>  ImageType;       // only because itk::LandmarkBasedTransformInitializer must be templated over two imagetypes
@@ -121,12 +118,12 @@ namespace mitk {
 
     void AccumulateStatistics(std::vector<mitk::ScalarType>& vector); ///< calculate error metrics for the transforms. 
 
-    ScalarType m_ErrorMean;     ///< Fiducial Registration Error
-    ScalarType m_ErrorStdDev;   ///< standard deviation of the Fiducial Registration Error
-    ScalarType m_ErrorRMS;      ///< Root Mean Square of the registration error
-    ScalarType m_ErrorMin;      ///< minimum registration error / best fitting landmark distance
-    ScalarType m_ErrorMax;      ///< maximum registration error / worst fitting landmark distance
-    ScalarType m_ErrorAbsMax;   ///< the absolute maximum registration error
+    mitk::ScalarType m_ErrorMean;     ///< Fiducial Registration Error
+    mitk::ScalarType m_ErrorStdDev;   ///< standard deviation of the Fiducial Registration Error
+    mitk::ScalarType m_ErrorRMS;      ///< Root Mean Square of the registration error
+    mitk::ScalarType m_ErrorMin;      ///< minimum registration error / best fitting landmark distance
+    mitk::ScalarType m_ErrorMax;      ///< maximum registration error / worst fitting landmark distance
+    mitk::ScalarType m_ErrorAbsMax;   ///< the absolute maximum registration error
 
     TransformInitializerType::LandmarkPointContainer m_SourcePoints;      ///<  positions of the source points
     TransformInitializerType::LandmarkPointContainer m_TargetPoints;      ///<  positions of the target points

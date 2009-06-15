@@ -57,7 +57,7 @@ void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
 
     /* Calculate error statistics for the transform */
     TransformInitializerType::LandmarkPointType curData;
-    std::vector< ScalarType > errors;
+    std::vector< mitk::ScalarType > errors;
     for (TransformInitializerType::LandmarkPointContainer::size_type index = 0; index < m_SourcePoints.size(); index++)
     {
       curData = m_ITKLandmarkTransform->TransformPoint(m_SourcePoints.at(index));
@@ -127,27 +127,27 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
 }
 
 
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFRE() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFRE() const
 {
   return m_ErrorMean;
 }
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFREStdDev() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFREStdDev() const
 {
   return m_ErrorStdDev;
 }
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetRMSError() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetRMSError() const
 {
   return m_ErrorRMS;
 }
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMinError() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMinError() const
 {
   return m_ErrorMin;
 }
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMaxError() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMaxError() const
 {
   return m_ErrorMax;
 }
-mitk::NavigationDataLandmarkTransformFilter::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetAbsMaxError() const
+mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetAbsMaxError() const
 {
   return m_ErrorAbsMax;
 }

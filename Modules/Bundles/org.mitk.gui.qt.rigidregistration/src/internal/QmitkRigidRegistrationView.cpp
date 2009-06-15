@@ -428,10 +428,13 @@ void QmitkRigidRegistrationView::reinitMovingClicked()
 
 void QmitkRigidRegistrationView::globalReinitClicked()
 {
-  if(m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
-  {
-    mitk::RenderingManager::GetInstance()->InitializeViews();
-  }
+  /* get all nodes that have not set "includeInBoundingBox" to false */
+  mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+  /* calculate bounding geometry of these nodes */
+  mitk::Geometry3D::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  /* initialize the views to the bounding geometry */
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
 bool QmitkRigidRegistrationView::CheckCalculate()

@@ -52,22 +52,81 @@ namespace mitk {
 
     itkNewMacro(Self);
   
-    /**Documentation 
+    //
+    typedef double ScalarType;
+
+    /** 
     *\brief Set points used as source points for landmark transform.
     *
     */
     void SetSourcePoints(mitk::PointSet::Pointer sourcePointSet);
     
-    /**Documentation 
+    /** 
     *\brief Set points used as target points for landmark transform
     *
     */
     void SetTargetPoints(mitk::PointSet::Pointer targetPointSet);
 
+    /** 
+    *\brief Returns the Fiducial Registration Error
+    *
+    */
+    ScalarType GetFRE() const;
+
+    /** 
+    *\brief Returns the standard deviation of the Fiducial Registration Error
+    *
+    */
+    ScalarType GetFREStdDev() const;
+    
+    /** 
+    *\brief Returns the Root Mean Square of the registration error
+    *
+    */    
+    ScalarType GetRMSError() const;
+    
+    /** 
+    *\brief Returns the minimum registration error / best fitting landmark distance
+    *
+    */    
+    ScalarType GetMinError() const;
+    
+    /** 
+    *\brief Returns the maximum registration error / worst fitting landmark distance
+    *
+    */   
+    ScalarType GetMaxError() const;
+    
+    /** 
+    *\brief Returns the absolute maximum registration error
+    *
+    */    
+    ScalarType GetAbsMaxError() const;
+
   protected:
     typedef itk::Image< signed short, 3>  ImageType;       // only because itk::LandmarkBasedTransformInitializer must be templated over two imagetypes
     typedef itk::VersorRigid3DTransform< double > ITKVersorTransformType;
     typedef itk::LandmarkBasedTransformInitializer< ITKVersorTransformType, ImageType, ImageType > TransformInitializerType;
+    
+    /**
+    * \brief transforms input NDs according to the calculated LandmarkTransform 
+    * 
+    */
+    virtual void GenerateData();
+
+    /**
+    * \brief initializes the transform using source and target PointSets
+    */
+    void InitializeLandmarkTransform();
+
+    void AccumulateStatistics(std::vector<mitk::ScalarType>& vector); ///< calculate error metrics for the transforms. 
+
+    ScalarType m_ErrorMean;     ///< Fiducial Registration Error
+    ScalarType m_ErrorStdDev;   ///< standard deviation of the Fiducial Registration Error
+    ScalarType m_ErrorRMS;      ///< Root Mean Square of the registration error
+    ScalarType m_ErrorMin;      ///< minimum registration error / best fitting landmark distance
+    ScalarType m_ErrorMax;      ///< maximum registration error / worst fitting landmark distance
+    ScalarType m_ErrorAbsMax;   ///< the absolute maximum registration error
 
     TransformInitializerType::LandmarkPointContainer m_SourcePoints;      ///<  positions of the source points
     TransformInitializerType::LandmarkPointContainer m_TargetPoints;      ///<  positions of the target points
@@ -77,16 +136,6 @@ namespace mitk {
     itk::QuaternionRigidTransform<double>::Pointer m_QuatLandmarkTransform; ///< transform needed to rotate orientation
     itk::QuaternionRigidTransform<double>::Pointer m_QuatTransform;         ///< further transform needed to rotate orientation
 
-    /**
-    * \brief transforms input NDs according to the calculated landmarktransform 
-    * 
-    */
-    virtual void GenerateData();
-
-    /**
-    * \brief initializes the transform using source and target pointsets 
-    */
-    void InitializeLandmarkTransform();
 
     bool m_SourcePointsAreSet; ///< bool to store if source points were set
     bool m_TargetPointsAreSet; ///< bool to store if target points were set 

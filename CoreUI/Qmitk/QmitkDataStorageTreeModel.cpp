@@ -22,7 +22,8 @@
 #include "mitkNodePredicateAND.h"
 
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel(mitk::NodePredicateBase* pred, QObject* parent)
- : QAbstractItemModel(parent), m_NodePredicate(pred), m_ViewMode(DSVW_Hirarchy), m_DataStorage(NULL)
+ : QAbstractItemModel(parent),  m_DataStorage(NULL), m_DataNodes(NULL), 
+   m_NodePredicate(pred), m_ViewMode(DSVW_Hirarchy)
 {
 }
 
@@ -95,7 +96,6 @@ int QmitkDataStorageTreeModel::rowCount(const QModelIndex& parent) const
 		else
 		{
       mitk::NodePredicateFirstLevel::Pointer p1 = mitk::NodePredicateFirstLevel::New(m_DataStorage);
-			int num  = m_DataStorage->GetSubset(p1)->Size();
 			return m_DataStorage->GetSubset(p1)->Size();
 		}
 	}
@@ -122,7 +122,7 @@ QModelIndex QmitkDataStorageTreeModel::parent ( const QModelIndex & index ) cons
 	return QModelIndex();
 }
 
-QModelIndex QmitkDataStorageTreeModel::index ( int row, int column, const QModelIndex & parent ) const
+QModelIndex QmitkDataStorageTreeModel::index( unsigned int row, unsigned int column, const QModelIndex & parent /*= QModelIndex() */ ) const
 {
 	if (!hasIndex(row, column, parent))
 		return QModelIndex();

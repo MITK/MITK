@@ -19,13 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationData.h"
 
 
-mitk::NavigationData::NavigationData() 
-: itk::DataObject(), 
-  m_TimeStamp(0.0),
-  m_Orientation(0.0, 0.0, 0.0, 0.0),
-  m_HasPosition(true),
-  m_HasOrientation(true),
-  m_DataValid(false) 
+mitk::NavigationData::NavigationData() : itk::DataObject(), 
+m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
+m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0)
 {
   m_Position.Fill(0.0);
   m_CovErrorMatrix.SetIdentity();

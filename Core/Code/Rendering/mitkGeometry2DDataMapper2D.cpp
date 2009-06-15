@@ -31,11 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::Geometry2DDataMapper2D::Geometry2DDataMapper2D()
-: m_SurfaceMapper( NULL ),
-  m_RenderOrientationArrows( false ),
-  m_ArrowOrientationPositive( true ),
-  m_ParentNode(NULL),
-  m_DataStorage(NULL)
+: m_SurfaceMapper( NULL ), m_DataStorage(NULL), m_ParentNode(NULL),
+  m_OtherGeometry2Ds(), m_RenderOrientationArrows( false ),
+  m_ArrowOrientationPositive( true )
 {
 }
 

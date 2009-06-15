@@ -47,14 +47,14 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  int count = 1;
+  unsigned int count = 1;
   //Create Action
   mitk::Action::Pointer firstAction = mitk::Action::New(count);
   transition->AddAction(firstAction);
 
   //check ActionCount
   std::cout << "Check ActionCount after first addition of an action: ";
-  if (transition->GetActionCount()!=count)
+  if (transition->GetActionCount() != count)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -69,7 +69,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
 
   //check ActionCount
   std::cout << "check action Count after second addition of an action: ";
-  if (transition->GetActionCount()!=count)
+  if (transition->GetActionCount() != count)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

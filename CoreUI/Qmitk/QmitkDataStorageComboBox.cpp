@@ -222,7 +222,7 @@ void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object 
 }
 
 //#PROTECTED GETTER
-const bool QmitkDataStorageComboBox::HasIndex(int index) const
+const bool QmitkDataStorageComboBox::HasIndex(unsigned int index) const
 {
   return (m_Nodes.size() > 0 && index < m_Nodes.size());
 }

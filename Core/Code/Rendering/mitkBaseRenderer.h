@@ -112,8 +112,7 @@ public:
     return m_VtkRenderer;
   }
 
-  vtkRenderWindow* m_RenderWindow;
-  vtkRenderer*     m_VtkRenderer;
+
 
   //##Documentation
   //## @brief Default mapper id to use.
@@ -384,12 +383,15 @@ protected:
   //## @brief Call update of all mappers. To be implemented in subclasses.
   virtual void Update() = 0;
 
+  vtkRenderWindow* m_RenderWindow;
+  vtkRenderer*     m_VtkRenderer;
+
   //##Documentation
   //## @brief MapperSlotId to use. Defines which kind of mapper (e.g., 2D or 3D) shoud be used.
   MapperSlotId m_MapperID;
 
   //##Documentation
-  //## @brief The DataStorage that is used for renderering.
+  //## @brief The DataStorage that is used for rendering.
   mitk::DataStorage::Pointer m_DataStorage;
 
   //##Documentation

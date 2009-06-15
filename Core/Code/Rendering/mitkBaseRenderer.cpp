@@ -118,13 +118,14 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
 
 
 mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-  m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL),
-  m_LastUpdateTime(0), m_CameraController(NULL), m_Focused(false),
-  m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL),
-  m_CurrentWorldGeometry2D(NULL), m_Slice(0), m_TimeStep(0),
-  m_EmptyWorldGeometry(true),
-  m_NumberOfVisibleLODEnabledMappers( 0 ), m_DepthPeelingEnabled(true),
-  m_MaxNumberOfPeels(100)
+m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_LastUpdateTime(0),
+m_CameraController(NULL), m_SliceNavigationController(NULL), m_CameraRotationController(NULL), /*m_Size(),*/
+ m_Focused(false), m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL),
+m_DisplayGeometry(NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdateTime(), m_DisplayGeometryUpdateTime(),
+m_TimeStepUpdateTime(), m_WorldGeometryData(NULL), m_DisplayGeometryData(NULL), m_CurrentWorldGeometry2DData(NULL),
+m_WorldGeometryNode(NULL), m_DisplayGeometryNode(NULL), m_CurrentWorldGeometry2DNode(NULL), m_DisplayGeometryTransformTime(0),
+m_CurrentWorldGeometry2DTransformTime(0), m_Name(name), /*m_Bounds(),*/ m_EmptyWorldGeometry(true), m_DepthPeelingEnabled(true),
+m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -536,7 +537,7 @@ const double* mitk::BaseRenderer::GetBounds() const
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   //set the Focus on the renderer
-  bool success = mitk::GlobalInteraction::GetInstance()->SetFocus(this);
+  /*bool success =*/ mitk::GlobalInteraction::GetInstance()->SetFocus(this);
   /*
   if (! success) 
     mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");

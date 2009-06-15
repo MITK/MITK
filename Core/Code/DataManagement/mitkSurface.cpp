@@ -393,7 +393,7 @@ void mitk::Surface::Graft( const DataObject* data )
   //clear list of PolyData's
   m_PolyDataSeries.clear();
   // do copy
-  for (int i=0; i<surface->GetSizeOfPolyDataSeries(); i++)
+  for (unsigned int i=0; i<surface->GetSizeOfPolyDataSeries(); i++)
     {
       m_PolyDataSeries.push_back(vtkPolyData::New());
       m_PolyDataSeries.back()->DeepCopy( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );

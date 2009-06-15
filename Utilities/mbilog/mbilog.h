@@ -170,11 +170,11 @@ namespace mbilog {
       {
         return *this;
       }
-      inline NullStream& operator<<(std::ostream& (*/*func*/)(std::ostream&))
+      inline NullStream& operator<<(std::ostream& (* /*func*/)(std::ostream&))
       {
         return *this;
       }
-      inline NullStream& operator()(const char */*category*/)
+      inline NullStream& operator()(const char * /*category*/)
       {
         return *this;
       }

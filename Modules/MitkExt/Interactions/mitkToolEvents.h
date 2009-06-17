@@ -15,7 +15,11 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#ifndef MITK_TOOL_EVENTS_H
+#define MITK_TOOL_EVENTS_H
+
 #include <itkEventObject.h>
+
 
 namespace mitk {
 
@@ -280,5 +284,8 @@ class eventname : public TwoParameterToolEvent<paramtype1, paramtype2> \
 \
     eventname();\
 };
+
+
+#endif
 
 

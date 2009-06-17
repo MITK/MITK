@@ -4,10 +4,14 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkDataManagerView.cpp 
+  QmitkDelKeyFilter.cpp 
+  QmitkInfoDialog.cpp 
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkDataManagerView.h
+  src/internal/QmitkDelKeyFilter.h
+  src/internal/QmitkInfoDialog.h
 )
 
 SET(CPP_FILES manifest.cpp)

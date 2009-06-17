@@ -20,6 +20,8 @@
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkStdMultiWidgetEditor.h>
 #include <QmitkCommonFunctionality.h>
+#include <src/internal/QmitkDelKeyFilter.h>
+#include <src/internal/QmitkInfoDialog.h>
 //## Cherry
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
@@ -43,6 +45,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QKeyEvent>
 
 QmitkDataManagerView::QmitkDataManagerView()
 {
@@ -99,6 +102,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_RemoveAction = m_NodeMenu->addAction(QIcon(":/datamanager/remove.xpm"), "Remove");
   m_ReinitAction = m_NodeMenu->addAction(QIcon(":/datamanager/refresh.xpm"), "Reinit");
   m_ToggleSelectedVisibility = m_NodeMenu->addAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png"), "Toggle visibility of selected nodes");
+  m_ActionShowInfoDialog = m_NodeMenu->addAction(QIcon(":/datamanager/show-data-info.png"), "Show additional infos for selected nodes");
 
   // NodeProperties
   QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane);
@@ -146,6 +150,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTableView->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTableView->horizontalHeader()->setStretchLastSection(true);
+  m_NodeTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
+  m_NodeTableView->installEventFilter(new QmitkDelKeyFilter(this));
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
@@ -163,6 +169,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeToolbar->addAction(m_RemoveAction);
   m_NodeToolbar->addAction(m_ReinitAction);
   m_NodeToolbar->addAction(m_ToggleSelectedVisibility);
+  m_NodeToolbar->addAction(m_ActionShowInfoDialog);
 
   _NodeButtonLayout->addWidget(m_BtnLoad);
   _NodeButtonLayout->addWidget(m_BtnGlobalReinit);
@@ -200,6 +207,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
     , this, SLOT( ActionToggleSelectedVisibilityTriggered(bool) ) );
+
+  QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
+    , this, SLOT( ActionShowInfoDialogTriggered(bool) ) );
 
   QObject::connect( m_BtnLoad, SIGNAL( clicked(bool) )
     , this, SLOT( BtnLoadClicked(bool) ) );
@@ -391,6 +401,26 @@ void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked
     node->SetVisibility(!isVisible);
   }
   BtnGlobalReinitClicked();
+}
+
+void QmitkDataManagerView::ActionShowInfoDialogTriggered( bool checked /*= false */ )
+{
+  QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
+  std::vector<mitk::DataTreeNode*> selectedNodes;
+
+  mitk::DataTreeNode* node = 0;
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = 0;
+    node = m_NodeTableModel->GetNode(*it);
+    // if node is not defined or if the node contains geometry data do not remove it
+    if ( node != 0 )
+      selectedNodes.push_back(node);
+  }
+
+  QmitkInfoDialog _QmitkInfoDialog(selectedNodes, this->m_Parent);
+  _QmitkInfoDialog.exec();
 }
 
 void QmitkDataManagerView::BtnLoadClicked( bool checked /*= false */ )

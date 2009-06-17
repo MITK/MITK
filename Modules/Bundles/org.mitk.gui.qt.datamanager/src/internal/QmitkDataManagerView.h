@@ -26,6 +26,7 @@ class QToolBar;
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
 class QmitkPredicateEditor;
+class QmitkDelKeyFilter;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -40,6 +41,10 @@ class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkFun
 {
   Q_OBJECT
 
+  ///
+  /// QmitkDelKeyFilter should be able to call ActionRemoveTriggered().
+  ///
+  friend class QmitkDelKeyFilter;
 public:
 
   ///
@@ -98,6 +103,10 @@ protected slots:
   /// \brief Invoked when the visibility of the selected nodes should be toggled.
   ///
   void ActionToggleSelectedVisibilityTriggered ( bool checked = false );
+  ///
+  /// \brief Invoked when infos of the selected nodes should be shown in a dialog.
+  ///
+  void ActionShowInfoDialogTriggered ( bool checked = false );
   ///
   /// \brief Shows a load dialog.
   ///
@@ -162,6 +171,10 @@ private:
   /// \brief Action that is triggered when the visibility of the selected nodes should be toggled.
   ///
   QAction* m_ToggleSelectedVisibility;
+  ///
+  /// \brief Action that is triggered when an info dialog for a selected node should be shown.
+  ///
+  QAction* m_ActionShowInfoDialog;
   ///
   /// \brief A button to load new nodes.
   ///

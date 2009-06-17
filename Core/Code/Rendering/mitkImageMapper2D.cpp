@@ -115,13 +115,13 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   //GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
   //GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
   //  + 2.0 * rendererInfo.m_Overlap[0]/* - rendererInfo.m_PixelsPerMM[0]*/ };
-  //std::cout << "X: " << rendererInfo.m_Extent[0]
+  //LOG_INFO << "X: " << rendererInfo.m_Extent[0]
   //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] << std::endl;
 
   //GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
   //GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
   //  + 2.0 * rendererInfo.m_Overlap[1]/* - rendererInfo.m_PixelsPerMM[1]*/ };
-  //std::cout << "Y:" << rendererInfo.m_Extent[1]
+  //LOG_INFO << "Y:" << rendererInfo.m_Extent[1]
   //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] << std::endl;
 
   // IW commented out the previous lines and reverted to rev. 9358

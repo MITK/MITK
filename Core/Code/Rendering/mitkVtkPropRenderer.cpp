@@ -496,7 +496,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
        TNodePredicateDataType<Surface> isSurface;
 
        DataStorage::SetOfObjects::ConstPointer allSurfaces = dataStorage->GetSubset( isSurface );
-       std::cout << "in picking: got " << allSurfaces->size() << " surfaces." << std::endl;
+       LOG_INFO << "in picking: got " << allSurfaces->size() << " surfaces." << std::endl;
 
        for (DataStorage::SetOfObjects::const_iterator iter = allSurfaces->begin();
             iter != allSurfaces->end();
@@ -509,13 +509,13 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
            vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetViewProp() );
            if (actor)
            {
-             std::cout << "a" << std::flush;
+             LOG_INFO << "a" << std::flush;
              pickingRenderer->AddActor( actor );
            }
          }
        }
 
-       std::cout << ";" << std::endl;
+       LOG_INFO << ";" << std::endl;
        */
        m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
        vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
@@ -674,10 +674,10 @@ void mitk::VtkPropRenderer::checkState()
       glWorkAroundGlobalCount++;
       if (glWorkAroundGlobalCount == 2)
       {
-        //std::cout << "GIMR ON\n";
+        //LOG_INFO << "GIMR ON\n";
           vtkMapper::GlobalImmediateModeRenderingOn();
       }
-    //std::cout << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
+    //LOG_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
     }
   }
   else
@@ -688,11 +688,11 @@ void mitk::VtkPropRenderer::checkState()
     glWorkAroundGlobalCount--;
     if(glWorkAroundGlobalCount==1)
     {
-      //std::cout << "GIMR OFF\n";
+      //LOG_INFO << "GIMR OFF\n";
       vtkMapper::GlobalImmediateModeRenderingOff();
     }
 
-    //std::cout << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
+    //LOG_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
     
     }
    }

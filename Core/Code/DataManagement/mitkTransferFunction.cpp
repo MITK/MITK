@@ -86,7 +86,7 @@ void mitk::TransferFunction::SetRGBPoints(mitk::TransferFunction::RGBControlPoin
 
 void mitk::TransferFunction::AddPoint(int channel, double x, double value)
 { 
-  //std::cout<<"mitk::TransferFunction::AddPoint( "<<channel<<", "<<x<<", "<<value<<")"<<std::endl;
+  //LOG_INFO<<"mitk::TransferFunction::AddPoint( "<<channel<<", "<<x<<", "<<value<<")"<<std::endl;
   switch ( channel )
   {
     case 0: //scalar opacity
@@ -113,7 +113,7 @@ void mitk::TransferFunction::AddPoint(int channel, double x, double value)
 
 void mitk::TransferFunction::AddRGBPoint(double x, double r, double g, double b)
 {
-  //std::cout<<"mitk::TransferFunction::AddRGBPoint( "<<x<<", "<<r<<", "<<g<<", "<<b<<")"<<std::endl;
+  //LOG_INFO<<"mitk::TransferFunction::AddRGBPoint( "<<x<<", "<<r<<", "<<g<<", "<<b<<")"<<std::endl;
   double rgb[] = {r,g,b};
   m_RGBPoints.push_back(std::make_pair(x, rgb));
   m_ColorTransferFunction->AddRGBPoint(x, r, g, b);
@@ -135,7 +135,7 @@ mitk::TransferFunction::ControlPoints mitk::TransferFunction::GetPoints(int chan
     
     default:
     {
-      std::cout<<"channel not found, returning scalar opacity control points!";
+      LOG_INFO<<"channel not found, returning scalar opacity control points!";
       return m_ScalarOpacityPoints;
     }
   }
@@ -248,7 +248,7 @@ void mitk::TransferFunction::InitializeByItkHistogram(const itk::Statistics::His
   m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
   m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
   m_ColorTransferFunction->SetColorSpaceToHSV();
-  std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+  LOG_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
 }
 
 void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
@@ -275,7 +275,7 @@ void mitk::TransferFunction::InitializeByMitkImage( const mitk::Image * image )
   m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
   m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
   m_ColorTransferFunction->SetColorSpaceToHSV();
-  //std::cout << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+  //LOG_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
 }
 
 

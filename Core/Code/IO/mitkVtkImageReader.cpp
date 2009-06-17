@@ -34,7 +34,7 @@ void mitk::VtkImageReader::GenerateData()
 {
   if( m_FileName != "")
   {
-    std::cout << "Loading " << m_FileName << " as vtk" << std::endl;
+    LOG_INFO << "Loading " << m_FileName << " as vtk" << std::endl;
 
     ///We create a Generic Reader to test de .vtk/
     vtkDataReader *chooser=vtkDataReader::New();
@@ -43,7 +43,7 @@ void mitk::VtkImageReader::GenerateData()
     if(chooser->IsFileStructuredPoints())
     {
       ///StructuredPoints/
-      std::cout << "StructuredPoints"<< std::endl;
+      LOG_INFO << "StructuredPoints"<< std::endl;
       vtkStructuredPointsReader *reader=vtkStructuredPointsReader::New();
       reader->SetFileName(m_FileName.c_str());
       reader->Update();

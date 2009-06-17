@@ -245,7 +245,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
     mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
     if (tempGeometry == NULL)
     {
-      std::cout<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
+      LOG_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
       return;
     }
     tempGeometry->WorldToIndex( point, indexPoint );
@@ -412,7 +412,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
       if (geometry == NULL)
       {
-        std::cout<<"mitkPointSet.cpp::L362: GetGeometry returned NULL!\n";
+        LOG_INFO<<"mitkPointSet.cpp::L362: GetGeometry returned NULL!\n";
         return;
       }
       geometry->WorldToIndex(pt, pt);

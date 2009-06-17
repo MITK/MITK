@@ -48,7 +48,7 @@ void mitk::VtkInteractorCameraController::Resize(int w, int h)
 
 void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
 {
-  std::cout<<"Called MousePressEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
+  LOG_INFO<<"Called MousePressEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
   if(m_VtkInteractor)
   {
     if (!m_VtkInteractor->GetEnabled())
@@ -104,7 +104,7 @@ void mitk::VtkInteractorCameraController::MousePressEvent(mitk::MouseEvent *me)
 
 void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me)
 {
-  std::cout<<"Called MouseReleaseEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
+  LOG_INFO<<"Called MouseReleaseEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
   if(m_VtkInteractor)
   {
     if (!m_VtkInteractor->GetEnabled())
@@ -160,7 +160,7 @@ void mitk::VtkInteractorCameraController::MouseReleaseEvent(mitk::MouseEvent *me
 
 void mitk::VtkInteractorCameraController::MouseMoveEvent(mitk::MouseEvent *me)
 {
-  std::cout<<"Called MouseMoveEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
+  LOG_INFO<<"Called MouseMoveEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
   if(m_VtkInteractor)
   {
     if (!m_VtkInteractor->GetEnabled())

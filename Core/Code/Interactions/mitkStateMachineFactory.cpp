@@ -159,7 +159,7 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
       mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
       if (nextState == states->end())
       {
-        std::cout<<std::endl<<"Didn't find a state in StateMap! Check your statemachine behavior file!"<<std::endl;
+        LOG_INFO<<std::endl<<"Didn't find a state in StateMap! Check your statemachine behavior file!"<<std::endl;
         //you don't really see the warning in output! itkWarningMacro not possible due to this pointer!
         ok = false;
       }
@@ -234,8 +234,8 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
 
     if ( ok.second == false ) 
     { 
-      std::cout<<std::endl;
-      std::cout<<"Warning from StateMachineFactory: STATE_ID was not unique or something else didn't work in insert!"<<std::endl;
+      LOG_INFO<<std::endl;
+      LOG_INFO<<"Warning from StateMachineFactory: STATE_ID was not unique or something else didn't work in insert!"<<std::endl;
       return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
     }
     if ( ReadXMLBooleanAttribut( START_STATE, atts ) )

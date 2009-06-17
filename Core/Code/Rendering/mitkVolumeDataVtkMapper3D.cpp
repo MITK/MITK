@@ -269,7 +269,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
                 vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
                 m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
                 mipFunction->Delete();
-                std::cout <<"in switch" <<std::endl;
+                LOG_INFO <<"in switch" <<std::endl;
                 break;
             }
             

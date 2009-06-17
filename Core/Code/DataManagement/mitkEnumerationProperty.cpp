@@ -177,7 +177,7 @@ bool mitk::EnumerationProperty::ReadXMLData( XMLReader& xmlReader )
   std::string m_EnumValueString;
   xmlReader.GetAttribute( VALUE, m_EnumValueString );
   SetValue(m_EnumValueString);
-  std::cout << "EnumerationProperty: " << GetValueAsString() << std::endl;
+  LOG_INFO << "EnumerationProperty: " << GetValueAsString() << std::endl;
   return true;
 }
   

@@ -135,7 +135,7 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
     #define MBISB_CORE_EXPORT __declspec(dllexport)
   #else
     #define MBISB_CORE_EXPORT __declspec(dllimport)
-  #endif
+  #endif   
   #ifdef QmitkSB_EXPORTS
     #define QMITK_SB_EXPORT __declspec(dllexport)
   #else

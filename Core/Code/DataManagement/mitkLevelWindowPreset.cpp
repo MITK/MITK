@@ -53,7 +53,7 @@ bool LevelWindowPreset::LoadPreset(std::string fileName)
   if ( !vtkXMLParser::Parse() )
   {
 #ifdef INTERDEBUG
-    std::cout<<"LevelWindowPreset::LoadPreset xml file cannot parse!"<<std::endl;
+    LOG_INFO<<"LevelWindowPreset::LoadPreset xml file cannot parse!"<<std::endl;
 #endif
   }
 

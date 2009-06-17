@@ -1148,7 +1148,7 @@ bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
   BaseData::ReadXMLData( xmlReader );
   std::string fileName;
   xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-  std::cout << fileName << std::endl;
+  LOG_INFO << fileName << std::endl;
 
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
 

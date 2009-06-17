@@ -341,13 +341,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
         DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
-        // std::cout << i << ":" << std::endl;
+        // LOG_INFO << i << ":" << std::endl;
 
         Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
         displayGeometry->Map( m_CenterOfRotation, point2DWorld );
         displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
-        // std::cout << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
+        // LOG_INFO << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
 
         const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
         const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
@@ -395,16 +395,16 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
         Vector2D origin = displayGeometry->GetOriginInMM();
-        // std::cout << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
-        // std::cout << "  Diff   - " << vector2DDisplayDiff << std::endl;
-        // std::cout << "  Origin - " << origin << std::endl;
+        // LOG_INFO << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
+        // LOG_INFO << "  Diff   - " << vector2DDisplayDiff << std::endl;
+        // LOG_INFO << "  Origin - " << origin << std::endl;
         ++i;
 
         displayGeometry->MoveBy( vector2DDisplayDiff );
 
         (*iter)->SendCreatedWorldGeometryUpdate();
       } 
-      // std::cout << "--------------------------------" << std::endl;
+      // LOG_INFO << "--------------------------------" << std::endl;
 
       
       
@@ -418,10 +418,10 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       //displayGeometry->Map( m_CenterOfRotation, point2DWorld );
       //displayGeometry->WorldToDisplay( point2DWorld, point2DDisplay );
 
-      //std::cout << "RotationCenter: " << m_CenterOfRotation << std::endl;
-      //std::cout << "PointWorld:     " << point2DWorld << std::endl;
-      //std::cout << "PointDisplay:   " << point2DDisplay << std::endl;
-      //std::cout << "--------------------------------------------" << std::endl;
+      //LOG_INFO << "RotationCenter: " << m_CenterOfRotation << std::endl;
+      //LOG_INFO << "PointWorld:     " << point2DWorld << std::endl;
+      //LOG_INFO << "PointDisplay:   " << point2DDisplay << std::endl;
+      //LOG_INFO << "--------------------------------------------" << std::endl;
 
 
 

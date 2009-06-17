@@ -28,7 +28,7 @@ const std::string XMLIO::CLASS_NAME = "CLASS_NAME";
 bool XMLIO::WriteXML( XMLWriter& xmlWriter ) 
 {
   const std::string& nodeName = GetXMLNodeName();
-  std::cout << nodeName.c_str() << std::endl; // test
+  LOG_INFO << nodeName.c_str() << std::endl; // test
   xmlWriter.BeginNode( nodeName );
   xmlWriter.WriteProperty( CLASS_NAME, this->GetNameOfClass() );
 

@@ -288,7 +288,7 @@ bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::str
   // First check the extension
   if(  filename == "" )
   {
-      //std::cout<<"No filename specified."<<std::endl;
+      //LOG_INFO<<"No filename specified."<<std::endl;
     return false;
   }
 
@@ -327,7 +327,7 @@ bool mitk::PicFileReader::CanReadFile(const std::string filename, const std::str
 
   if( !extensionFound )
     {
-      //std::cout<<"The filename extension is not recognized."<<std::endl;
+      //LOG_INFO<<"The filename extension is not recognized."<<std::endl;
     return false;
     }
 

@@ -110,7 +110,7 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
   int noValues = m_LookupTable->GetNumberOfTableValues ();
   if (index>noValues)
   {
-    std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
+    LOG_INFO << "could not change opacity. index exceed size of lut ... " << std::endl;
     return;
   }
 
@@ -132,7 +132,7 @@ vtkLookupTable* mitk::LookupTable::GetVtkLookupTable() const
 mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() const
 {
 
-  if (m_LookupTable==NULL) std::cout << "uuups..." << std::endl;
+  if (m_LookupTable==NULL) LOG_INFO << "uuups..." << std::endl;
   return m_LookupTable->GetPointer( 0 );
 };
 
@@ -382,7 +382,7 @@ bool mitk::LookupTable::ReadXMLData( XMLReader& xmlReader )
     this->UpdateOutputInformation();
     xmlReader.GotoParent();
   }
-  std::cout << "read mitk::LookupTable: " << " " << std::endl;
+  LOG_INFO << "read mitk::LookupTable: " << " " << std::endl;
 
   return true;
 }

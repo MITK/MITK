@@ -51,13 +51,27 @@ namespace mbilog {
 
     public:
 
-      int level;
+      const int level;
       const char* filePath;
-      int lineNumber;
+      const int lineNumber;
       const char* functionName;
+      
       const char* moduleName;
       std::string category;
       std::string message;
+
+      LogMessage(
+        const int _level,
+        const char* _filePath,
+        const int _lineNumber,
+        const char* _functionName
+      )
+        : level(_level)
+        , filePath(_filePath)
+        , lineNumber(_lineNumber)
+        , functionName(_functionName)
+      {
+      }
   };
 
   struct MBILOG_DLL_API AbstractBackend
@@ -88,7 +102,6 @@ namespace mbilog {
   void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API DistributeToBackends(const LogMessage &l);
-  void MBILOG_DLL_API backend_std_cout_smart(const LogMessage &l);
 
   class MBILOG_DLL_API PseudoStream {
 
@@ -96,6 +109,7 @@ namespace mbilog {
 
       LogMessage msg;
       bool disabled;
+      std::stringstream ss;
 
     public:
 
@@ -104,43 +118,39 @@ namespace mbilog {
                     int lineNumber,
                     const char* functionName)
                           : disabled(false)
+                          , ss(std::stringstream(std::stringstream::out))
+                          , msg(LogMessage(level,filePath,lineNumber,functionName))
       {
-        msg.level = level;
-        msg.filePath = filePath;
-        msg.lineNumber = lineNumber;
-        msg.functionName = functionName;
-        msg.category = "";
-        msg.message = "";
       }
 
       inline ~PseudoStream()
       {
         if(!disabled)
         {
+          msg.message = ss.str();
           msg.moduleName = MBILOG_MODULENAME;
           DistributeToBackends(msg);
         }
       }
 
-      template <class T> inline PseudoStream& operator<<(const T& data)
+      template <class T> inline PseudoStream& operator<<(const T& data) 
       {
         if(!disabled)
-        {
-          std::stringstream ss(std::stringstream::out);
           ss << data;
-          msg.message += ss.str();
-        }
+        return *this;
+      }
+      
+      template <class T> inline PseudoStream& operator<<(T& data)
+      {
+        if(!disabled)
+          ss << data;
         return *this;
       }
 
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
-        {
-          std::stringstream ss(std::stringstream::out);
           ss << func;
-          msg.message += ss.str();
-        }
         return *this;
       }
 
@@ -170,15 +180,19 @@ namespace mbilog {
       {
         return *this;
       }
-      inline NullStream& operator<<(std::ostream& (* /*func*/)(std::ostream&))
+      template <class T> inline NullStream& operator<<(T& data)
       {
         return *this;
       }
-      inline NullStream& operator()(const char * /*category*/)
+      inline NullStream& operator<<(std::ostream& (*)(std::ostream&))
       {
         return *this;
       }
-      inline NullStream& operator()(bool /*enabled*/)
+      inline NullStream& operator()(const char *)
+      {
+        return *this;
+      }
+      inline NullStream& operator()(bool)
       {
         return *this;
       }

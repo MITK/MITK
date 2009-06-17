@@ -42,7 +42,7 @@ void mitk::ItkImageFileReader::GenerateData()
   const unsigned int MINDIM = 2;
   const unsigned int MAXDIM = 4;
 
-  std::cout << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
+  LOG_INFO << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
 
   // Check to see if we can read the file given the name or prefix
   if ( m_FileName == "" )
@@ -110,7 +110,7 @@ void mitk::ItkImageFileReader::GenerateData()
   ioRegion.SetSize( ioSize );
   ioRegion.SetIndex( ioStart );
 
-  std::cout << "ioRegion: " << ioRegion << std::endl;
+  LOG_INFO << "ioRegion: " << ioRegion << std::endl;
   imageIO->SetIORegion( ioRegion );
   void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
   imageIO->Read( buffer );
@@ -145,7 +145,7 @@ void mitk::ItkImageFileReader::GenerateData()
   image->GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, image->GetDimension(3));
 
   buffer = NULL;
-  std::cout << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
+  LOG_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 //  mitk::DataTreeNode::Pointer node = this->GetOutput();
 //  node->SetData( image );
 
@@ -154,7 +154,7 @@ void mitk::ItkImageFileReader::GenerateData()
   //{
   //  SetDefaultImageProperties( node );
   //} 
-  std::cout << "...finished!" << std::endl;
+  LOG_INFO << "...finished!" << std::endl;
 }
 
 

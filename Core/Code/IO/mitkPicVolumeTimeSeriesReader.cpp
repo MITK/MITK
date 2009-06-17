@@ -106,7 +106,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
     for ( unsigned int t = 0 ; t < m_MatchedFileNames.size() ; ++t )
     {
         char* filename = const_cast< char* >( m_MatchedFileNames[ t ].c_str() );
-        std::cout << "Reading file " << filename << "..." << std::endl;
+        LOG_INFO << "Reading file " << filename << "..." << std::endl;
         volume3d = MITKipPicGet( filename, NULL );
 
         if ( volume3d == NULL )

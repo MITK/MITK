@@ -238,7 +238,7 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
-  std::cout << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
+  LOG_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
 
   typedef itk::Image<short, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
@@ -247,7 +247,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   typedef itk::GDCMSeriesFileNames NameGeneratorType;
 
   std::string dir = this->GetDirectory();
-  std::cout << "dir: " << dir << std::endl;
+  LOG_INFO << "dir: " << dir << std::endl;
 
   IOType::Pointer dicomIO = IOType::New();
 
@@ -269,10 +269,10 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   StringContainer::const_iterator seriesItr = seriesUID.begin();
   StringContainer::const_iterator seriesEnd = seriesUID.end();
 
-  std::cout << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
+  LOG_INFO << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
   while ( seriesItr != seriesEnd )
   {
-    std::cout << *seriesItr << std::endl;
+    LOG_INFO << *seriesItr << std::endl;
     seriesItr++;
   }
 
@@ -281,13 +281,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   unsigned int size = seriesUID.size();
   for ( unsigned int i = 0 ; i < size ; ++i )
   {
-    std::cout << "Reading series #" << i << ": " << seriesUID[ i ] << std::endl;
+    LOG_INFO << "Reading series #" << i << ": " << seriesUID[ i ] << std::endl;
     StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
     StringContainer::const_iterator fnItr = fileNames.begin();
     StringContainer::const_iterator fnEnd = fileNames.end();
     while ( fnItr != fnEnd )
     {
-      std::cout << *fnItr << std::endl;
+      LOG_INFO << *fnItr << std::endl;
       ++fnItr;
     }
     ReaderType::Pointer reader = ReaderType::New();
@@ -299,7 +299,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
       if(reader->GetOutput() == NULL)
       {
-        std::cout << "no image returned by reader for series #" << i << std::endl;
+        LOG_INFO << "no image returned by reader for series #" << i << std::endl;
         continue;
       }
 
@@ -323,7 +323,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     catch ( const std::exception & e )
     {
       itkWarningMacro( << e.what() );
-      std::cout << "skipping series #" << i << " due to exception" << std::endl;
+      LOG_ERROR << "skipping series #" << i << " due to exception" << std::endl;
       reader->ResetPipeline();
     }
   }

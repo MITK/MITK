@@ -107,8 +107,8 @@ namespace mbilog {
 
     protected:
 
-      LogMessage msg;
       bool disabled;
+      LogMessage msg;
       std::stringstream ss;
 
     public:
@@ -118,8 +118,8 @@ namespace mbilog {
                     int lineNumber,
                     const char* functionName)
                           : disabled(false)
-                          , ss(std::stringstream(std::stringstream::out))
                           , msg(LogMessage(level,filePath,lineNumber,functionName))
+                          , ss(std::stringstream::out)
       {
       }
 

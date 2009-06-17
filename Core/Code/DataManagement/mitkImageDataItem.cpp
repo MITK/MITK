@@ -37,8 +37,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ipFunc/ipFunc.h"
 
-#include "omp.h"
-
 #define __IMG_DAT_ITEM__CEIL_ZERO_ONE__(val) (val) =       \
   ( (val) < 0 ) ? ( 0 ) : ( ( (val)>1 ) ? ( 1 ) : ( (val) ) );
 

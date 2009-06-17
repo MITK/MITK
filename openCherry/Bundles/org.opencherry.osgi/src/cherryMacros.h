@@ -53,10 +53,30 @@ PURPOSE.  See the above copyright notices for more information.
 #define cherryNewMacro(x) \
 static Pointer New(void) \
 { \
-  Pointer smartPtr = new x; \
+  Pointer smartPtr(new x); \
   return smartPtr; \
 } \
 
+#define cherryNewMacro1Param(x, type1) \
+static Pointer New(type1 param1) \
+{ \
+  Pointer smartPtr(new x(param1)); \
+  return smartPtr; \
+} \
+
+#define cherryNewMacro2Param(x, type1, type2) \
+static Pointer New(type1 param1, type2 param2) \
+{ \
+  Pointer smartPtr(new x(param1, param2)); \
+  return smartPtr; \
+} \
+
+#define cherryNewMacro3Param(x, type1, type2, type3) \
+static Pointer New(type1 param1, type2 param2, type3 param3) \
+{ \
+  Pointer smartPtr (new x(param1, param2, param3)); \
+  return smartPtr; \
+} \
 
 #ifndef CHERRY_NO_TYPESAFE_FLAGS
 

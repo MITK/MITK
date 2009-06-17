@@ -15,5 +15,6 @@
      <file>data-type-planegeometry3-24.png</file>
      <file>data-type-pointset-24.png</file> 
      <file>data-type-unknown-24.png</file> 
+     <file>show-data-info.png</file>      
  </qresource>
  </RCC>

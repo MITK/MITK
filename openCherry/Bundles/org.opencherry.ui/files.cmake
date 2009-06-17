@@ -40,6 +40,7 @@ SET(SRC_CPP_FILES
   cherryWindow.cpp
   cherryWorkbenchPart.cpp
   cherryWorkbenchWindow.cpp
+  cherryXMLMemento.cpp
   
   #application
   application/cherryActionBarAdvisor.cpp

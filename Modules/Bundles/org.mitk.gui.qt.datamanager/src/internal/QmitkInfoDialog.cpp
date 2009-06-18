@@ -15,7 +15,7 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidg
   QGridLayout* parentLayout = new QGridLayout;
   QmitkDataStorageComboBox* _QmitkDataStorageComboBox = new QmitkDataStorageComboBox(this, true);
   m_TextBrowser = new QTextBrowser(this);
-  QPushButton* m_CancelButton = new QPushButton("Cancel", this);
+  QPushButton* _CancelButton = new QPushButton("Cancel", this);
 
   // SET
   this->setLayout(parentLayout);
@@ -24,7 +24,7 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidg
   
   parentLayout->addWidget(_QmitkDataStorageComboBox, 0, 0);
   parentLayout->addWidget(m_TextBrowser, 1, 0);
-  parentLayout->addWidget(m_CancelButton, 2, 0);
+  parentLayout->addWidget(_CancelButton, 2, 0);
 
   QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnSelectionChanged( const mitk::DataTreeNode* ) )
     , this, SLOT( OnSelectionChanged( const mitk::DataTreeNode* ) ) );
@@ -35,10 +35,10 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidg
     _QmitkDataStorageComboBox->AddNode(*it);
   }
 
-  QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnCancelButtonClicked( bool checked ) )
-    , this, SLOT( OnCancelButtonClicked( bool checked ) ) );
+  QObject::connect( _CancelButton, SIGNAL( clicked ( bool ) )
+    , this, SLOT( OnCancelButtonClicked( bool ) ) );
 
-  m_CancelButton->setDefault(true);
+  _CancelButton->setDefault(true);
 }
 
 void QmitkInfoDialog::OnSelectionChanged( const mitk::DataTreeNode* node )
@@ -53,5 +53,5 @@ void QmitkInfoDialog::OnSelectionChanged( const mitk::DataTreeNode* node )
 
 void QmitkInfoDialog::OnCancelButtonClicked( bool checked /*= false */ )
 {
-  this->reject();
+  this->done(0);
 }

@@ -37,7 +37,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
   :QWidget(parent,f),
-  m_Settings(NULL)
+  m_Settings(NULL),
+  m_Layout(NULL),
+  m_FullScreenMode(false),
+  m_LayoutDesign(0),
+  m_OldLayoutDesign(0)
 {
   //Create Menu Widget
   this->CreateMenuWidget();
@@ -145,29 +149,98 @@ void QmitkRenderWindowMenu::CreateMenuBar()
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
 {
-     m_Settings = new QMenu(this);
-    QAction* transversalAction = new QAction( "Transversal", m_Settings );
-    transversalAction->setDisabled( true );
-    QAction* saggitalAction = new QAction("Saggital", m_Settings);
-    saggitalAction->setDisabled( true );
-    QAction* coronalAction = new QAction("Coronal", m_Settings);
-    coronalAction->setDisabled( true );
-    QAction* threeDAction = new QAction("3D", m_Settings);
-    threeDAction->setDisabled( true );
+    m_Settings = new QMenu(this);
+
+    m_TransversalAction = new QAction( "Transversal", m_Settings );
+    m_TransversalAction->setDisabled( true );
+
+    m_SagittalAction = new QAction("Sagittal", m_Settings);
+    m_SagittalAction->setDisabled( true );
+
+    m_CoronalAction = new QAction("Coronal", m_Settings);
+    m_CoronalAction->setDisabled( true );
+
+    m_ThreeDAction = new QAction("3D", m_Settings);
+    m_ThreeDAction->setDisabled( true );
     
-    QAction* defaultLayoutAction = new QAction( "Default Layout", m_Settings );
-    defaultLayoutAction->setDisabled( true );
+
+
+    m_DefaultLayoutAction = new QAction( "standard layout", m_Settings );
+    m_DefaultLayoutAction->setDisabled( true );
+
+    m_2DImagesUpLayoutAction = new QAction( "2D images up, 3D bottom", m_Settings );
+    m_2DImagesUpLayoutAction->setDisabled( false );
+
+    m_2DImagesLeftLayoutAction = new QAction( "2D images left, 3D right", m_Settings );
+    m_2DImagesLeftLayoutAction->setDisabled( false );
+
+    m_Big3DLayoutAction = new QAction( "Big 3D", m_Settings );
+    m_Big3DLayoutAction->setDisabled( false );
+
+    m_Widget1LayoutAction = new QAction( "Transversal plane", m_Settings );
+    m_Widget1LayoutAction->setDisabled( false );
+
+    m_Widget2LayoutAction = new QAction( "Sagittal plane", m_Settings );
+    m_Widget2LayoutAction->setDisabled( false );
+
+    m_Widget3LayoutAction = new QAction( "Coronal plane", m_Settings );
+    m_Widget3LayoutAction->setDisabled( false );
+
+    m_RowWidget3And4LayoutAction = new QAction( "Coronal up, 3D bottom", m_Settings );
+    m_RowWidget3And4LayoutAction->setDisabled( false );
+
+    m_ColumnWidget3And4LayoutAction = new QAction( "Coronal left, 3D right", m_Settings );
+    m_ColumnWidget3And4LayoutAction->setDisabled( false );
+
+    m_SmallUpperWidget2Big3and4LayoutAction = new QAction( "Sagittal up, Coronal n 3D bottom", m_Settings );
+    m_SmallUpperWidget2Big3and4LayoutAction->setDisabled( false );
+
+    m_2x2Dand3DWidgetLayoutAction = new QAction( "Transversal n Sagittal left, 3D right", m_Settings );
+    m_2x2Dand3DWidgetLayoutAction->setDisabled( false );
+
+    m_Left2Dand3DRight2DLayoutAction = new QAction( "Transversal n 3D left, Sagittal right", m_Settings );
+    m_Left2Dand3DRight2DLayoutAction->setDisabled( false );
        
-    m_Settings->addAction(transversalAction);
-    m_Settings->addAction(saggitalAction);
-    m_Settings->addAction(coronalAction);
-    m_Settings->addAction(threeDAction);
+    m_Settings->addAction(m_TransversalAction);
+    m_Settings->addAction(m_SagittalAction);
+    m_Settings->addAction(m_CoronalAction);
+    m_Settings->addAction(m_ThreeDAction);
     m_Settings->addSeparator();
-    m_Settings->addAction(defaultLayoutAction);
+    m_Settings->addAction(m_DefaultLayoutAction);
+    m_Settings->addAction(m_2DImagesUpLayoutAction);
+    m_Settings->addAction(m_2DImagesLeftLayoutAction);
+    m_Settings->addAction(m_Big3DLayoutAction);
+    m_Settings->addAction(m_Widget1LayoutAction);
+    m_Settings->addAction(m_Widget2LayoutAction);
+    m_Settings->addAction(m_Widget3LayoutAction);
+    m_Settings->addAction(m_RowWidget3And4LayoutAction);
+    m_Settings->addAction(m_ColumnWidget3And4LayoutAction);
+    m_Settings->addAction(m_SmallUpperWidget2Big3and4LayoutAction);
+    m_Settings->addAction(m_2x2Dand3DWidgetLayoutAction);
+    m_Settings->addAction(m_Left2Dand3DRight2DLayoutAction);
 
     m_Settings->setVisible( false );
 
-    //Create Connections -- comming Soon.
+    //Create Connections.
+    connect( m_TransversalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToTransversal(bool)) );
+    connect( m_SagittalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToSagittal(bool)) );
+    connect( m_CoronalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToCoronal(bool)) );
+    connect( m_ThreeDAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToThreeD(bool)) );
+
+
+    connect( m_DefaultLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToDefault(bool)) );
+    connect( m_2DImagesUpLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutTo2DImagesUp(bool)) );
+    connect( m_2DImagesLeftLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutTo2DImagesLeft(bool)) );
+    connect( m_Big3DLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToBig3D(bool)) );
+    connect( m_Widget1LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget1(bool)) );
+    connect( m_Widget2LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget2(bool)) );
+    connect( m_Widget3LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget3(bool)) );
+    connect( m_RowWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToRowWidget3And4(bool)) );
+    connect( m_ColumnWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)) );
+    connect( m_SmallUpperWidget2Big3and4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToSmallUpperWidget2Big3and4(bool)) );
+    connect( m_2x2Dand3DWidgetLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutTo2x2Dand3DWidget(bool)) );
+    connect( m_Left2Dand3DRight2DLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToLeft2Dand3DRight2D(bool)) );
+
 }
 
 void QmitkRenderWindowMenu::paintEvent( QPaintEvent* e )
@@ -176,6 +249,12 @@ void QmitkRenderWindowMenu::paintEvent( QPaintEvent* e )
   QColor semiTransparentColor = Qt::black;
   semiTransparentColor.setAlpha(255);
   painter.fillRect(rect(), semiTransparentColor);
+}
+
+void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
+{
+  m_Layout = layoutIndex;
+  this->UpdateLayoutList();
 }
 
 /// \brief
@@ -193,7 +272,41 @@ void QmitkRenderWindowMenu::OnVertiSplitButton( bool checked )
 /// \brief
 void QmitkRenderWindowMenu::OnFullScreenButton( bool checked )
 {
-  std::cout << "Show widget in FullScreen. not implemented yet... " << std::endl;
+  if( !m_FullScreenMode )
+  {
+    m_FullScreenMode = true;
+    m_OldLayoutDesign = m_LayoutDesign;
+
+    switch( m_Layout )
+    {
+    case TRANSVERSAL:
+      {
+        emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
+        break;
+      }
+
+    case SAGITTAL:
+      {
+        emit SignalChangeLayoutDesign( LAYOUT_SAGITTAL );
+        break;
+      }
+    case CORONAL:
+      {
+        emit SignalChangeLayoutDesign( LAYOUT_CORONAL );
+        break;
+      }
+    case THREE_D:
+      {
+        emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
+        break;
+      }
+    }
+  }
+  else
+  {
+    m_FullScreenMode = false;
+    emit SignalChangeLayoutDesign( m_OldLayoutDesign );
+  }
 }
 
 /// \brief
@@ -211,4 +324,371 @@ void QmitkRenderWindowMenu::OnSettingsButton( bool checked )
 void QmitkRenderWindowMenu::OnCloseButton( bool checked )
 {
   std::cout << "Close widget. not implemented yet... " << std::endl;
+}
+
+void QmitkRenderWindowMenu::UpdateLayoutList()
+{
+  if( m_Settings == NULL )
+    this->CreateSettingsWidget();
+
+  switch( m_Layout )
+  {
+  case TRANSVERSAL:
+    {
+      m_TransversalAction->setEnabled( false );
+      m_SagittalAction->setEnabled( true );
+      m_CoronalAction->setEnabled( true );
+      m_ThreeDAction->setEnabled( true );
+      break;
+    }
+
+  case SAGITTAL:
+    {
+      m_TransversalAction->setEnabled( true );
+      m_SagittalAction->setEnabled( false );
+      m_CoronalAction->setEnabled( true );
+      m_ThreeDAction->setEnabled( true );
+      break;
+    }
+  case CORONAL:
+    {
+      m_TransversalAction->setEnabled( true );
+      m_SagittalAction->setEnabled( true );
+      m_CoronalAction->setEnabled( false );
+      m_ThreeDAction->setEnabled( true );
+      break;
+    }
+  case THREE_D:
+    {
+      m_TransversalAction->setEnabled( true );
+      m_SagittalAction->setEnabled( true );
+      m_CoronalAction->setEnabled( true );
+      m_ThreeDAction->setEnabled( false );
+      break;
+    }
+  }
+}
+
+void QmitkRenderWindowMenu::OnChangeDirectionToTransversal(bool)
+{
+  std::cout << "Change Widget Direction to Transversal. not implemented yet... " << std::endl;
+}
+
+void QmitkRenderWindowMenu::OnChangeDirectionToSagittal(bool)
+{
+  std::cout << "Change Widget Direction to Sagittal. not implemented yet... " << std::endl;
+}
+
+void QmitkRenderWindowMenu::OnChangeDirectionToCoronal(bool)
+{
+  std::cout << "Change Widget Direction to Coronal. not implemented yet... " << std::endl;
+}
+
+void QmitkRenderWindowMenu::OnChangeDirectionToThreeD(bool)
+{
+  std::cout << "Change Widget Direction to 3D. not implemented yet... " << std::endl;
+}
+
+
+void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+  
+  m_LayoutDesign = LAYOUT_2DIMAGEUP;
+  emit SignalChangeLayoutDesign( LAYOUT_2DIMAGEUP );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_2DIMAGELEFT;
+  emit SignalChangeLayoutDesign( LAYOUT_2DIMAGELEFT );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+  
+  m_LayoutDesign = LAYOUT_DEFAULT;
+  emit SignalChangeLayoutDesign( LAYOUT_DEFAULT );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
+{ 
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_BIG3D;
+  emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_TRANSVERSAL;
+  emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_SAGITTAL;
+  emit SignalChangeLayoutDesign( LAYOUT_SAGITTAL );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_CORONAL;
+  emit SignalChangeLayoutDesign( LAYOUT_CORONAL );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_ROWWIDGET3AND4;
+  emit SignalChangeLayoutDesign( LAYOUT_ROWWIDGET3AND4 );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_COLUMNWIDGET3AND4;
+  emit SignalChangeLayoutDesign( LAYOUT_COLUMNWIDGET3AND4 );
+}
+
+void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_SMALLUPPERWIDGET2BIGAND4;
+  emit SignalChangeLayoutDesign( LAYOUT_SMALLUPPERWIDGET2BIGAND4 );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_2X2DAND3DWIDGET;
+  emit SignalChangeLayoutDesign( LAYOUT_2X2DAND3DWIDGET );
+}
+void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
+{
+  //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
+  m_FullScreenMode = false;
+
+  m_LayoutDesign = LAYOUT_LEFT2DAND3DRIGHT2D;
+  emit SignalChangeLayoutDesign( LAYOUT_LEFT2DAND3DRIGHT2D );
+}
+
+void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
+{
+  m_LayoutDesign = layoutDesignIndex;
+  
+  if( m_Settings == NULL )
+    this->CreateSettingsWidget();
+
+  switch( m_LayoutDesign )
+  {
+  case LAYOUT_DEFAULT:
+    {
+      m_DefaultLayoutAction->setEnabled(false);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+
+  case LAYOUT_2DIMAGEUP:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(false);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_2DIMAGELEFT:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(false);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_BIG3D:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(false);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_TRANSVERSAL:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(false);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_SAGITTAL:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(false);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_CORONAL:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(false);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_2X2DAND3DWIDGET:
+    { 
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(false);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_ROWWIDGET3AND4:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(false);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_COLUMNWIDGET3AND4:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(false);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_SMALLUPPERWIDGET2BIGAND4:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(false);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
+      break;
+    }
+  case LAYOUT_LEFT2DAND3DRIGHT2D:
+    {
+      m_DefaultLayoutAction->setEnabled(true);
+      m_2DImagesUpLayoutAction->setEnabled(true);
+      m_2DImagesLeftLayoutAction->setEnabled(true);
+      m_Big3DLayoutAction->setEnabled(true);
+      m_Widget1LayoutAction->setEnabled(true);
+      m_Widget2LayoutAction->setEnabled(true);
+      m_Widget3LayoutAction->setEnabled(true);
+      m_RowWidget3And4LayoutAction->setEnabled(true);
+      m_ColumnWidget3And4LayoutAction->setEnabled(true);
+      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
+      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
+      m_Left2Dand3DRight2DLayoutAction->setEnabled(false);
+      break;
+    }
+  }
 }

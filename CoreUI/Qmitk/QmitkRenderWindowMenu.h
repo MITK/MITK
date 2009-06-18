@@ -39,6 +39,29 @@ class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
 
 public:
 
+  typedef enum {
+    TRANSVERSAL,
+    SAGITTAL,
+    CORONAL,
+    THREE_D
+  };
+
+  typedef enum{
+    LAYOUT_DEFAULT,
+    LAYOUT_2DIMAGEUP,
+    LAYOUT_2DIMAGELEFT,
+    LAYOUT_BIG3D,
+    LAYOUT_TRANSVERSAL,
+    LAYOUT_SAGITTAL,
+    LAYOUT_CORONAL,
+    LAYOUT_2X2DAND3DWIDGET,
+    LAYOUT_ROWWIDGET3AND4,
+    LAYOUT_COLUMNWIDGET3AND4,
+    LAYOUT_ROWWIDGETSMALL3ANDBIG4, //not in use in this class, but we need it here to synchronize with the SdtMultiWidget.
+    LAYOUT_SMALLUPPERWIDGET2BIGAND4,
+    LAYOUT_LEFT2DAND3DRIGHT2D
+  };
+
   QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0 );
   virtual ~QmitkRenderWindowMenu();
 
@@ -50,6 +73,13 @@ public:
       return m_Settings->isVisible();  
   }
 
+  void SetLayoutIndex( unsigned int layoutIndex );
+  
+  unsigned int GetLayoutIndex()
+  {  return m_Layout;  }
+
+  /** */
+  void UpdateLayoutDesignList( int layoutDesignIndex );
 
 protected:
 
@@ -65,6 +95,13 @@ protected:
   /** */
   void paintEvent(QPaintEvent *event);
 
+  /** */
+  void UpdateLayoutList();
+
+signals:
+  
+  /** */
+  void SignalChangeLayoutDesign( int layoutDesign );
 
 protected slots:  
 
@@ -83,6 +120,27 @@ protected slots:
   /// \brief
   void OnCloseButton( bool checked );
 
+
+  /// \brief change Layout slots
+  void OnChangeDirectionToTransversal(bool);
+  void OnChangeDirectionToSagittal(bool);
+  void OnChangeDirectionToCoronal(bool);
+  void OnChangeDirectionToThreeD(bool);
+
+  /// \brief change Layout slots
+  void OnChangeLayoutToDefault(bool);
+  void OnChangeLayoutTo2DImagesUp(bool);
+  void OnChangeLayoutTo2DImagesLeft(bool);
+  void OnChangeLayoutToBig3D(bool);
+  void OnChangeLayoutToWidget1(bool);
+  void OnChangeLayoutToWidget2(bool);
+  void OnChangeLayoutToWidget3(bool);
+  void OnChangeLayoutToRowWidget3And4(bool);
+  void OnChangeLayoutToColumnWidget3And4(bool);
+  void OnChangeLayoutToSmallUpperWidget2Big3and4(bool);
+  void OnChangeLayoutTo2x2Dand3DWidget(bool);
+  void OnChangeLayoutToLeft2Dand3DRight2D(bool);
+
 protected:
 
   /** */
@@ -92,6 +150,26 @@ protected:
   QPushButton*        m_SettingsButton;
   QPushButton*        m_CloseButton;
 
+  /** WidgetLayout */
+  QAction* m_TransversalAction;
+  QAction* m_SagittalAction;
+  QAction* m_CoronalAction;
+  QAction* m_ThreeDAction;
+
+  /** Layouts */
+  QAction* m_DefaultLayoutAction;
+  QAction* m_2DImagesUpLayoutAction;
+  QAction* m_2DImagesLeftLayoutAction;
+  QAction* m_Big3DLayoutAction;
+  QAction* m_Widget1LayoutAction;
+  QAction* m_Widget2LayoutAction;
+  QAction* m_Widget3LayoutAction;
+  QAction* m_RowWidget3And4LayoutAction;
+  QAction* m_ColumnWidget3And4LayoutAction;
+  QAction* m_SmallUpperWidget2Big3and4LayoutAction;
+  QAction* m_2x2Dand3DWidgetLayoutAction;
+  QAction* m_Left2Dand3DRight2DLayoutAction;
+
 
   /** */
   QMenuBar*           m_MenuBar; 
@@ -99,6 +177,17 @@ protected:
   /** */
   QMenu*              m_Settings;
 
+  /** */
+  unsigned int        m_Layout;
+
+  /** */
+  unsigned int        m_LayoutDesign;
+
+  /** */
+  unsigned int        m_OldLayoutDesign;
+
+  /** */
+  bool                m_FullScreenMode;
 
 };
 

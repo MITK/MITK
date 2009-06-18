@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGET_H_
 #define QMITKSTDMULTIWIDGET_H_
 
-//#include "ui_QmitkStdMultiWidget.h" //we create the GUI manual
-
 #include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
@@ -43,7 +41,7 @@ class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 
-class QMITK_EXPORT QmitkStdMultiWidget : public QWidget //, public Ui::QmitkStdMultiWidgetUi
+class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 

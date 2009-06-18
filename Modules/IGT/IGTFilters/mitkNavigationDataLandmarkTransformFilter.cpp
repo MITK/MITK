@@ -76,7 +76,7 @@ void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
 void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet::Pointer mitkSourcePointSet)
 {
   m_SourcePoints.clear();
-  mitk::Point3D mitkSourcePoint;
+  mitk::PointSet::PointType mitkSourcePoint;
   TransformInitializerType::LandmarkPointType lPoint;
  
   int mitkPointSetSize = mitkSourcePointSet->GetPointSet()->GetNumberOfPoints();
@@ -93,8 +93,9 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
   if (m_SourcePoints.size() > 2)
     m_SourcePointsAreSet = true;
   else
+  {
     itkExceptionMacro("SourcePointSet must contain at least 3 points");
-
+  }
   
   if (m_TargetPointsAreSet)
     this->InitializeLandmarkTransform();
@@ -104,7 +105,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
 void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet::Pointer mitkTargetPointSet)
 {
   m_TargetPoints.clear();
-  mitk::Point3D mitkTargetPoint;
+  mitk::PointSet::PointType mitkTargetPoint;
   TransformInitializerType::LandmarkPointType lPoint;
 
   int mitkPointSetSize = mitkTargetPointSet->GetPointSet()->GetNumberOfPoints();
@@ -118,10 +119,11 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
   }
 
   if (m_TargetPoints.size() > 2)
-    m_TargetPointsAreSet=true;
+    m_TargetPointsAreSet = true;
   else
+  {
     itkExceptionMacro("TargetPointSet must contain at least 3 points");
-
+  }
   if (m_SourcePointsAreSet)
     this->InitializeLandmarkTransform();
 }
@@ -206,7 +208,8 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
       continue;
     }
     output->Graft(input); // First, copy all information from input to output
-    if ((m_SourcePointsAreSet == false) || (m_TargetPointsAreSet == false)) // as long as there is no valid transformation matrix, only graft the outputs
+    
+    if (this->IsInitialized() == false) // as long as there is no valid transformation matrix, only graft the outputs
       continue;
 
     mitk::NavigationData::PositionType tempCoordinate;
@@ -235,4 +238,10 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
     output->SetOrientation(quatOut); // update output navigation data with new orientation
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.
   }
+}
+
+
+bool mitk::NavigationDataLandmarkTransformFilter::IsInitialized() const
+{
+  return m_SourcePointsAreSet && m_TargetPointsAreSet;
 }

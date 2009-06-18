@@ -143,11 +143,6 @@ namespace mitk
     bool m_MatchHistograms;
     MaskType::Pointer m_BrainMask;
 
-    mitk::TransformParameters::Pointer ParseTransformParameters(itk::Array<double> transformValues);
-    mitk::MetricParameters::Pointer ParseMetricParameters(itk::Array<double> metricValues);
-    mitk::OptimizerParameters::Pointer ParseOptimizerParameters(itk::Array<double> optimizerValues);    
-  
-    
        
   };
 }

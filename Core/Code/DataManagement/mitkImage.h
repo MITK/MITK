@@ -406,6 +406,8 @@ public:
   //## is (or can be) inside of the image
   virtual bool IsValidChannel(int n = 0) const;
 
+  bool IsRotated() const;
+
   //##Documentation
   //## @brief Get the sizes of all dimensions as an integer-array.
   //##

@@ -1403,3 +1403,31 @@ void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 
   Superclass::PrintSelf(os,indent);
 }
+
+bool mitk::Image::IsRotated() const
+{
+  const mitk::Geometry3D* geo = this->GetGeometry();
+  bool ret = false;
+
+  if(geo)
+  {
+    const vnl_matrix_fixed<float, 3, 3> & mx = geo->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+    float ref = 0;
+    for(short k = 0; k < 3; ++k)
+      ref += mx[k][k];
+    ref/=1000;  // Arbitrary value; if a non-diagonal (nd) element is bigger then this, matrix is considered nd.
+
+    for(short i = 0; i < 3; ++i)
+    {
+      for(short j = 0; j < 3; ++j)
+      {
+        if(i != j)
+        {
+          if(abs(mx[i][j]) > ref) // matrix is nd
+            ret = true;
+        }
+      }
+    }
+  }
+  return ret;
+}

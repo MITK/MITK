@@ -39,29 +39,6 @@ class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget
 
 public:
 
-  typedef enum {
-    TRANSVERSAL,
-    SAGITTAL,
-    CORONAL,
-    THREE_D
-  };
-
-  typedef enum{
-    LAYOUT_DEFAULT,
-    LAYOUT_2DIMAGEUP,
-    LAYOUT_2DIMAGELEFT,
-    LAYOUT_BIG3D,
-    LAYOUT_TRANSVERSAL,
-    LAYOUT_SAGITTAL,
-    LAYOUT_CORONAL,
-    LAYOUT_2X2DAND3DWIDGET,
-    LAYOUT_ROWWIDGET3AND4,
-    LAYOUT_COLUMNWIDGET3AND4,
-    LAYOUT_ROWWIDGETSMALL3ANDBIG4, //not in use in this class, but we need it here to synchronize with the SdtMultiWidget.
-    LAYOUT_SMALLUPPERWIDGET2BIGAND4,
-    LAYOUT_LEFT2DAND3DRIGHT2D
-  };
-
   QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0 );
   virtual ~QmitkRenderWindowMenu();
 
@@ -140,6 +117,34 @@ protected slots:
   void OnChangeLayoutToSmallUpperWidget2Big3and4(bool);
   void OnChangeLayoutTo2x2Dand3DWidget(bool);
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
+
+public:
+  
+  //enum for layout direction
+  enum {
+    TRANSVERSAL,
+    SAGITTAL,
+    CORONAL,
+    THREE_D
+  };
+
+  //enum for layout design
+  enum {
+    LAYOUT_DEFAULT,
+    LAYOUT_2DIMAGEUP,
+    LAYOUT_2DIMAGELEFT,
+    LAYOUT_BIG3D,
+    LAYOUT_TRANSVERSAL,
+    LAYOUT_SAGITTAL,
+    LAYOUT_CORONAL,
+    LAYOUT_2X2DAND3DWIDGET,
+    LAYOUT_ROWWIDGET3AND4,
+    LAYOUT_COLUMNWIDGET3AND4,
+    LAYOUT_ROWWIDGETSMALL3ANDBIG4, //not in use in this class, but we need it here to synchronize with the SdtMultiWidget.
+    LAYOUT_SMALLUPPERWIDGET2BIGAND4,
+    LAYOUT_LEFT2DAND3DRIGHT2D
+  };
+
 
 protected:
 

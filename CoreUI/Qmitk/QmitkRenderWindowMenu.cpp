@@ -39,9 +39,9 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f 
   :QWidget(parent,f),
   m_Settings(NULL),
   m_Layout(NULL),
-  m_FullScreenMode(false),
   m_LayoutDesign(0),
-  m_OldLayoutDesign(0)
+  m_OldLayoutDesign(0),
+  m_FullScreenMode(false)
 {
   //Create Menu Widget
   this->CreateMenuWidget();

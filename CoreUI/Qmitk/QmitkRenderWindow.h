@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
  */
 class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
 {
+  Q_OBJECT
+
 public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL);
@@ -68,6 +70,14 @@ public:
    */
   virtual void SetResendQtEvents(bool resend);
 
+  // Set Layout Index to define the Layout Type
+  void SetLayoutIndex( unsigned int layoutIndex );
+    
+  // Get Layout Index to define the Layout Type
+  unsigned int GetLayoutIndex();
+
+  void LayoutDesignListChanged( int layoutDesignIndex );
+  
 protected:
 
     // overloaded resize handler
@@ -92,6 +102,13 @@ protected:
     virtual void wheelEvent(QWheelEvent*);
 #endif
 
+signals:
+
+  void SignalLayoutDesignChanged( int layoutDesignIndex );
+
+protected slots:  
+
+  void OnChangeLayoutDesign(int layoutDesignIndex);
 
 private:
   
@@ -103,8 +120,7 @@ private:
 
   bool                           m_ResendQtEvents;
 
-  QmitkRenderWindowMenu*              m_MenuWidget;
-
+  QmitkRenderWindowMenu*         m_MenuWidget;
 };
 
 #endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */

@@ -16,8 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
-
 #include "mitkImageRegistrationMethod.h"
 
 #include "mitkMetricFactory.h"
@@ -31,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkResampleImageFilter.h"
 #include "itkImageRegistrationMethod.h"
 #include "itkMultiResolutionImageRegistrationMethod.h"
-#include "itkMultiResolutionPyramidImageFilter.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkImage.h"
@@ -42,10 +39,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkNormalizeImageFilter.h"
 #include "itkDiscreteGaussianImageFilter.h"
 
+
+
+
 namespace mitk {
+
+ 
   template<typename TPixel, unsigned int VImageDimension>
-    void ImageRegistrationMethod::GenerateData2(itk::Image<TPixel, VImageDimension>* itkImage1)
-  {
+  void ImageRegistrationMethod::GenerateData2(itk::Image<TPixel, VImageDimension>* itkImage1)
+  {    
+   
 
     if (m_MetricParameters->GetMetric() != mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC 
     || m_MetricParameters->GetUseNormalizerAndSmootherMutualInformation() == false)
@@ -104,6 +107,7 @@ namespace mitk {
       registration->SetFixedImage(fixedImage);
       registration->SetMovingImage(movingImage);
       registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
+     
       if(transFac->GetTransformParameters()->GetInitialParameters().size())
       {
         registration->SetInitialTransformParameters( transFac->GetTransformParameters()->GetInitialParameters() );
@@ -113,7 +117,12 @@ namespace mitk {
         itk::Array<double> zeroInitial;
         zeroInitial.set_size(transform->GetNumberOfParameters());
         zeroInitial.fill(0.0);
-        registration->SetInitialTransformParameters( zeroInitial );
+        zeroInitial[0] = 1.0;
+        zeroInitial[4] = 1.0;
+        zeroInitial[8] = 1.0;
+        registration->SetInitialTransformParameters( zeroInitial );   
+        optimizer->SetInitialPosition( zeroInitial );
+        
       }
 
       if (m_Interpolator == LINEARINTERPOLATOR)
@@ -278,6 +287,13 @@ namespace mitk {
       {
         m_Observer->SetRemainingProgress(5);
       }
+
+
     }
-  }
+     
+
+  } 
+
+
+
 } // end namespace

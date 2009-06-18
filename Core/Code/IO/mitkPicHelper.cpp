@@ -127,6 +127,23 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
   return false;
 }
 
+bool mitk::PicHelper::GetTimeSpacing(const ipPicDescriptor* aPic, float& timeSpacing)
+{
+
+  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+
+  ipPicTSV_t *tsv;
+
+  tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
+  if(tsv)
+  {
+    timeSpacing = ((ipFloat4_t*)tsv->value)[3];
+    if( timeSpacing <=0 ) timeSpacing = 1;
+  }
+  else timeSpacing = 1;
+  return true;
+}
+
 bool mitk::PicHelper::SetSpacing(const ipPicDescriptor* aPic, SlicedGeometry3D* slicedgeometry)
 {
   ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
@@ -198,9 +215,11 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
 
   if(pic->dim>=4)
   {
+    float ts = 0;
+    GetTimeSpacing(pic, ts);
     TimeBounds timebounds;
     timebounds[0] = 0.0;
-    timebounds[1] = 1.0;
+    timebounds[1] = ts;
     slicedgeometry->SetTimeBounds(timebounds);
   }
 }

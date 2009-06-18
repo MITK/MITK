@@ -282,7 +282,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
                 break;
             }
             default:
-                std::cerr <<"Warning: invalid volume rendering option.  " << std::endl;
+                LOG_ERROR <<"Warning: invalid volume rendering option.  " << std::endl;
 
         }
     m_VolumeLOD->VisibilityOn();

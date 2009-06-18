@@ -48,7 +48,7 @@ std::vector<BaseData::Pointer> BaseDataIO::LoadBaseDataFromFile(const std::strin
     }
     else
     {
-      std::cerr << "Error BaseDataIO factory did not return an IOAdapterBase: "
+      LOG_ERROR << "Error BaseDataIO factory did not return an IOAdapterBase: "
         << (*i)->GetNameOfClass() 
         << std::endl;
     }

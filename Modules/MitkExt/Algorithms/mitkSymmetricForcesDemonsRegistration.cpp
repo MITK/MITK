@@ -243,7 +243,7 @@ namespace mitk {
         }
         catch( itk::ExceptionObject & excp )
         {
-          std::cerr << excp << std::endl;
+          LOG_ERROR << excp << std::endl;
         }
       }
       else

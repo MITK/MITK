@@ -53,7 +53,7 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
 
     if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) && constrainToInside )
     {
-      std::cout << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
+      LOG_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
     }
 
     projectedContour->AddVertex( projectedPointIn2D );

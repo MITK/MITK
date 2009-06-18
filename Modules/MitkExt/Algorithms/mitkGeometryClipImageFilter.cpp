@@ -152,10 +152,10 @@ void mitk::_InternalComputeClippedImage(itk::Image<TPixel, VImageDimension>* inp
       {
       // invert meaning of above --> left is always the "above" side
       above = !above;
-    std::cout << leftMostPoint << " is BELOW geometry. Inverting meaning of above" << std::endl;
+    LOG_INFO << leftMostPoint << " is BELOW geometry. Inverting meaning of above" << std::endl;
     }
     else
-    std::cout << leftMostPoint << " is above geometry" << std::endl;
+    LOG_INFO << leftMostPoint << " is above geometry" << std::endl;
   }
 
   typename ItkOutputImageType::PixelType aboveLabel = (typename ItkOutputImageType::PixelType)geometryClipper->GetAboveGeometryLabel();

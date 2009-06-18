@@ -200,7 +200,7 @@ void mitk::VtkInteractorCameraController::MouseMoveEvent(mitk::MouseEvent *me)
 
 void mitk::VtkInteractorCameraController::KeyPressEvent(mitk::KeyEvent *ke)
 {
-    std::cout<<"Called KeyPressEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
+    LOG_INFO<<"Called KeyPressEvent() in VtkInteractorCameraController. Seems to be obsolete after QVTK restructuring (bug #1503, bug #954)"<<std::endl;
   if(m_VtkInteractor)
   {
     if (!m_VtkInteractor->GetEnabled())

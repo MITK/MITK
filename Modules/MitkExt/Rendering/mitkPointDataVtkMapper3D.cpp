@@ -61,7 +61,7 @@ void mitk::PointDataVtkMapper3D::GenerateData()
     mitk::PointData::Pointer input = dynamic_cast< mitk::PointData* >( this->GetData() );
 
   mitk::Point3D point = input->GetPoint3D();
-//  std::cout<<point[0]<<" "<<point[1]<<" "<<point[2]<<std::endl;
+//  LOG_INFO<<point[0]<<" "<<point[1]<<" "<<point[2]<<std::endl;
 
   m_PointActor->SetPosition( point[0], point[1], point[2] );
 

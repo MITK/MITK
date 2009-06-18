@@ -215,20 +215,19 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
 {
-  std::cout << "********************************************************************************" << std::endl;
-  std::cout << " " << message << std::endl;
-  std::cout << "********************************************************************************" << std::endl;
-  std::cout << "  " << std::endl;
-  std::cout << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl;
-  std::cout << "  " << std::endl;
-  std::cout << " Please file a BUG REPORT: " << std::endl;
-  std::cout << " http://makalu.inet.dkfz-heidelberg.de/bugzilla/enter_bug.cgi?product=ReLiver&component=QmitkInteractiveSegmentation&assigned_to=d.maleike%40dkfz-heidelberg.de" << std::endl;
-  std::cout << " Contain the following information:" << std::endl;
-  std::cout << "  - What image were you working on?" << std::endl;
-  std::cout << "  - Which region of the image?" << std::endl;
-  std::cout << "  - Which tool did you use?" << std::endl;
-  std::cout << "  - What did you do?" << std::endl;
-  std::cout << "  - What happened (not)? What did you expect?" << std::endl;
-  std::cout << "  " << std::endl;
+  LOG_ERROR << "********************************************************************************" << std::endl
+            << " " << message << std::endl
+            << "********************************************************************************" << std::endl
+            << "  " << std::endl
+            << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
+            << "  " << std::endl
+            << " Please file a BUG REPORT: " << std::endl
+            << " http://makalu.inet.dkfz-heidelberg.de/bugzilla/enter_bug.cgi?product=ReLiver&component=QmitkInteractiveSegmentation&assigned_to=d.maleike%40dkfz-heidelberg.de" << std::endl
+            << " Contain the following information:" << std::endl
+            << "  - What image were you working on?" << std::endl
+            << "  - Which region of the image?" << std::endl
+            << "  - Which tool did you use?" << std::endl
+            << "  - What did you do?" << std::endl
+            << "  - What happened (not)? What did you expect?" << std::endl;
 }
 

@@ -85,8 +85,8 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   if ( stupidClone->n[0] <= pixelWidth || stupidClone->n[1] <= pixelHeight )
   {
-    std::cout << "Brush size is bigger than your working image. Reconsider this...\n"
-                 "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
+    LOG_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
+                "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
     ipPicFree( stupidClone );
     return;
   }
@@ -139,7 +139,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
     newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
     newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
     newPoint[2] = 0;
-    //std::cout << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
+    //LOG_INFO << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
     contourInImageIndexCoordinates->AddVertex( newPoint );
   }
@@ -253,7 +253,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   }
   else
   {
-    //std::cout << "." << std::flush;
+    //LOG_INFO << "." << std::flush;
     return false;
   }
 

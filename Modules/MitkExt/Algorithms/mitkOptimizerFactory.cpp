@@ -53,7 +53,7 @@ namespace mitk {
   {
     if( m_OptimizerParameters.IsNull() ) 
     {
-      std::cerr << "No parameters set! Returning\n";
+      LOG_ERROR << "No parameters set! Returning\n";
       return NULL;
     }
     int optimizer = m_OptimizerParameters->GetOptimizer();

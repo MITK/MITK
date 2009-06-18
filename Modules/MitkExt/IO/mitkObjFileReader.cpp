@@ -34,7 +34,7 @@ void mitk::ObjFileReader::GenerateData()
 
   if( m_FileName != "")
   {
-    std::cout << "Loading " << m_FileName << " as obj..." << std::endl;
+    LOG_INFO << "Loading " << m_FileName << " as obj..." << std::endl;
 
     vtkOBJReader *reader = vtkOBJReader::New();
     reader->SetFileName( m_FileName.c_str() );
@@ -45,7 +45,7 @@ void mitk::ObjFileReader::GenerateData()
 
     reader->Delete();
 
-    std::cout << "...finished!" << std::endl;
+    LOG_INFO << "...finished!" << std::endl;
   }
 }
 
@@ -55,7 +55,7 @@ bool mitk::ObjFileReader::CanReadFile(const std::string filename, const std::str
   //std::string filename = file;
   if(  filename == "" )
     {
-      //std::cout<<"No filename specified."<<std::endl;
+      //LOG_INFO<<"No filename specified."<<std::endl;
     return false;
     }
 
@@ -76,7 +76,7 @@ bool mitk::ObjFileReader::CanReadFile(const std::string filename, const std::str
 
   if( !extensionFound )
     {
-      //std::cout<<"The filename extension is not recognized."<<std::endl;
+      //LOG_INFO<<"The filename extension is not recognized."<<std::endl;
     return false;
     }
 

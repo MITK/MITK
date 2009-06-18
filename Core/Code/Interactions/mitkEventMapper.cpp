@@ -550,7 +550,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 #ifdef INTERDEBUG
     //itkWarningMacro("mitk::EventMapper::LoadBehavior xml file cannot parse!" );
     //static function LoadBehavior has no this pointer!
-    std::cout<<"mitk::EventMapper::LoadBehavior xml file cannot parse!"<<std::endl;
+    LOG_INFO<<"mitk::EventMapper::LoadBehavior xml file cannot parse!"<<std::endl;
 #endif
   }
 

@@ -58,7 +58,7 @@ void mitk::VtkImageReader::GenerateData()
     }
     else
     {
-      std::cerr << " ... sorry, this .vtk format is not supported yet."<<std::endl;
+      LOG_ERROR << " ... sorry, this .vtk format is not supported yet."<<std::endl;
     }
     chooser->Delete();
   }

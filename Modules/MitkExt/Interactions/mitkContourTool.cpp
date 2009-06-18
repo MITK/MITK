@@ -115,7 +115,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
     if ( slice.IsNull() )
     {
-      std::cerr << "Unable to extract slice." << std::endl;
+      LOG_ERROR << "Unable to extract slice." << std::endl;
       return false;
     }
 

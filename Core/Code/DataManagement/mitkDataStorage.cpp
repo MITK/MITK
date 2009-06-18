@@ -315,7 +315,7 @@ mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const Se
     }
     catch(itk::ExceptionObject e)
     {
-      std::cerr << e << std::endl;
+      LOG_ERROR << e << std::endl;
     }
   }
 
@@ -420,7 +420,7 @@ mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const ch
         }
         catch(itk::ExceptionObject e)
         {
-          std::cerr << e << std::endl;
+          LOG_ERROR << e << std::endl;
         }
       }
     }

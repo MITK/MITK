@@ -82,8 +82,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 //#if (VTK_MAJOR_VERSION >= 5)
 //  if (m_Decimate == Decimate )
 //  {
-//    std::cerr << "vtkDecimate not available for VTK 5.0 and above.";
-//    std::cerr << " Using vtkDecimatePro instead." << std::endl;
+//    LOG_ERROR << "vtkDecimate not available for VTK 5.0 and above.";
+//    LOG_ERROR << " Using vtkDecimatePro instead." << std::endl;
 //    m_Decimate = DecimatePro;
 //  }
 //#endif

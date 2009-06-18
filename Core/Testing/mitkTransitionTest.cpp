@@ -47,7 +47,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  unsigned int count = 1;
+  int count = 1;
   //Create Action
   mitk::Action::Pointer firstAction = mitk::Action::New(count);
   transition->AddAction(firstAction);

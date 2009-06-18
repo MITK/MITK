@@ -545,6 +545,7 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
   splitterSize.push_back(1000);
   splitterUp->setSizes( splitterSize );
   splitterBottom->setSizes( splitterSize );
+  vSplit->setSizes( splitterSize );
 
   //add widget Splitter to main Splitter
   mainSplit->addWidget( vSplit );

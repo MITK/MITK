@@ -245,6 +245,21 @@ void FileTest::testFileAttributes2()
 }
 
 
+void FileTest::testFileAttributes3()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	File f("/dev/console");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	File f("CON");
+#endif
+
+	assert (f.isDevice());
+	assert (!f.isFile());
+	assert (!f.isDirectory());
+	assert (!f.isLink());
+}
+
+
 void FileTest::testCompare()
 {
 	File f1("abc.txt");
@@ -511,6 +526,7 @@ CppUnit::Test* FileTest::suite()
 
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
+	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
 	CppUnit_addTest(pSuite, FileTest, testCompare);
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);

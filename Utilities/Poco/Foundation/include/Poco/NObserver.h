@@ -42,7 +42,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
-#include "Poco/AutoPtr.h"
 
 
 namespace Poco {

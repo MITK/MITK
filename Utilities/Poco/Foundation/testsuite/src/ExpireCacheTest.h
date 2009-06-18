@@ -49,6 +49,8 @@ public:
 	void testDuplicateAdd();
 	void testExpire0();
 	void testExpireN();
+	void testAccessExpireN();
+	void testExpireWithHas();
 
 	
 	void setUp();

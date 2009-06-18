@@ -26,8 +26,8 @@ SET(CPP_BASE_FILENAMES
 	TestPlugin DummyDelegate BasicEventTest FIFOEventTest PriorityEventTest EventTestSuite 
 	LRUCacheTest ExpireCacheTest ExpireLRUCacheTest CacheTestSuite AnyTest FormatTest 
 	HashingTestSuite HashTableTest SimpleHashTableTest LinearHashTableTest 
-	HashSetTest HashMapTest SharedMemoryTest 
-	UniqueExpireCacheTest UniqueExpireLRUCacheTest 
+	HashSetTest HashMapTest SharedMemoryTest PriorityNotificationQueueTest
+	UniqueExpireCacheTest UniqueExpireLRUCacheTest TimedNotificationQueueTest
 	TuplesTest NamedTuplesTest TypeListTest DynamicAnyTest FileStreamTest
 )
 

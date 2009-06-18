@@ -64,6 +64,7 @@ protected:
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
+	bool isDeviceImpl() const;
 	bool isHiddenImpl() const;
 	Timestamp createdImpl() const;
 	Timestamp getLastModifiedImpl() const;

@@ -46,11 +46,14 @@ public:
 	~UniqueExpireCacheTest();
 
 	void testClear();
+	void testAccessClear();
 	void testDuplicateAdd();
+	void testAccessDuplicateAdd();
 	void testExpire0();
+	void testAccessExpire0();
 	void testExpireN();
 	void testExpirationDecorator();
-
+	void testAccessUpdate();
 	
 	void setUp();
 	void tearDown();

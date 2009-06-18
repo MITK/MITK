@@ -7,6 +7,7 @@ SET(CPP_BASE_FILENAMES
  OptionsTestSuite PropertyFileConfigurationTest
  SystemConfigurationTest UtilTestSuite XMLConfigurationTest
  FilesystemConfigurationTest ValidatorTest
+ TimerTestSuite TimerTest
 )
 
 SET(CPP_FILES "")

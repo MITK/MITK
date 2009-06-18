@@ -101,7 +101,7 @@ bool RotateByIntervalStrategy::mustRotate(LogFile* pFile)
 		{
 			_lastRotate.update();
 			std::string tag(ROTATE_TEXT);
-			tag += DateTimeFormatter::format(_lastRotate, DateTimeFormat::RFC1036_FORMAT);
+			DateTimeFormatter::append(tag, _lastRotate, DateTimeFormat::RFC1036_FORMAT);
 			pFile->write(tag);
 		}
 	}

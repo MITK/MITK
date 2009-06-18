@@ -206,8 +206,6 @@ public:
 				typeid(T).name()));
 	}
 
-
-
 	template <typename T> 
 	DynamicAny& operator = (const T& other)
 		/// Assignment operator for assigning POD to DynamicAny

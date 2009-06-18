@@ -160,6 +160,12 @@ bool File::isLink() const
 }
 
 
+bool File::isDevice() const
+{
+	return isDeviceImpl();
+}
+
+
 bool File::isHidden() const
 {
 	return isHiddenImpl();
@@ -219,7 +225,7 @@ void File::copyTo(const std::string& path) const
 	Path src(getPathImpl());
 	Path dest(path);
 	File destFile(path);
-	if (destFile.exists() && destFile.isDirectory() || dest.isDirectory())
+	if ((destFile.exists() && destFile.isDirectory()) || dest.isDirectory())
 	{
 		dest.makeDirectory();
 		dest.setFileName(src.getFileName());

@@ -129,6 +129,9 @@ public:
 		
 	bool isDirectory() const;
 		/// Returns true iff the file is a directory.
+		
+	bool isDevice() const;
+		/// Returns true iff the file is a device.
 
 	bool isHidden() const;
 		/// Returns true if the file is hidden.

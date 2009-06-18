@@ -84,6 +84,7 @@ namespace
 		{
 			return _number;
 		}
+		
 	private:
 		int _number;
 	};
@@ -114,8 +115,10 @@ void SharedPtrTest::testSharedPtr()
 	}
 	assert (pTO1 < pTO2);
 	ptr1 = pTO1;
+	assert (ptr1.referenceCount() == 1);
 	SharedPtr<TestObject> ptr2 = pTO2;
 	SharedPtr<TestObject> ptr3 = ptr1;
+	assert (ptr1.referenceCount() == 2);
 	SharedPtr<TestObject> ptr4;
 	assert (ptr1.get() == pTO1);
 	assert (ptr1 == pTO1);
@@ -198,6 +201,7 @@ void SharedPtrTest::testImplicitCast()
 	assert (TestObject::count() == 0);
 }
 
+
 void SharedPtrTest::testExplicitCast()
 {
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
@@ -211,6 +215,7 @@ void SharedPtrTest::testExplicitCast()
 	assert (TestObject::count() == 1);
 	assert (ptr2.get() == 0);
 }
+
 
 void SharedPtrTest::setUp()
 {

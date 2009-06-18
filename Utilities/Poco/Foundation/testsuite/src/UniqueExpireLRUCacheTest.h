@@ -46,6 +46,7 @@ public:
 	~UniqueExpireLRUCacheTest();
 
 	void testClear();
+	void testAccessClear();
 	void testExpire0();
 	void testExpireN();
 	void testCacheSize0();

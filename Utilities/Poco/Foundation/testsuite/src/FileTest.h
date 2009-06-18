@@ -49,6 +49,7 @@ public:
 	void testFileAttributes1();
 	void testCreateFile();
 	void testFileAttributes2();
+	void testFileAttributes3();
 	void testCompare();
 	void testSwap();
 	void testSize();

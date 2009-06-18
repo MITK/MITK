@@ -116,6 +116,9 @@ public:
 		/// Enables Unix-style options. Both short and long option names
 		/// are printed if Unix-style is set. Otherwise, only long option
 		/// names are printed.
+		///
+		/// After calling setUnixStyle(), setAutoIndent() should be called
+		/// as well to ensure proper help text formatting.
 		
 	bool isUnixStyle() const;
 		/// Returns if Unix-style options are set.

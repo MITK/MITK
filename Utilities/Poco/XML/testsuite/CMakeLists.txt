@@ -1,7 +1,7 @@
 INCLUDE(files.cmake)
 
 ADD_Executable(PocoTestRunnerXML ${CPP_FILES})
-TARGET_LINK_LIBRARIES(PocoTestRunnerXML PocoXML debug PocoXMLd PocoFoundation debug PocoFoundationd PocoCppUnit debug PocoCppUnitd)
+TARGET_LINK_LIBRARIES(PocoTestRunnerXML PocoXML PocoFoundation CppUnit)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../Foundation/include
@@ -9,4 +9,4 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../CppUnit/include
 )
 
-SET_TARGET_PROPERTIES(PocoTestRunnerXML PROPERTIES COMPILE_FLAGS "${POCO_UNIX_COMPILE_FLAGS}")
+#SET_TARGET_PROPERTIES(PocoTestRunnerXML PROPERTIES COMPILE_FLAGS "${POCO_UNIX_COMPILE_FLAGS}")

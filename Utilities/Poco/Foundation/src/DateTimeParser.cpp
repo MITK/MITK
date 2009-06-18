@@ -65,6 +65,7 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	int minute = 0;
 	int second = 0;
 	int millis = 0;
+	int micros = 0;
 	int tzd    = 0;
 
 	std::string::const_iterator it   = str.begin();
@@ -103,14 +104,11 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					break;					 
 				case 'y':
 					SKIP_JUNK();
-					PARSE_NUMBER(year);
-					if (year < 1000)
-					{
-						if (year >= 70) 
-							year += 1900;
-						else
-							year += 2000;
-					}
+					PARSE_NUMBER_N(year, 2);
+					if (year >= 70) 
+						year += 1900;
+					else
+						year += 2000;
 					break;
 				case 'Y':
 					SKIP_JUNK();
@@ -142,6 +140,11 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 					PARSE_NUMBER_N(millis, 1);
 					millis *= 100;
 					break;
+				case 'F':
+					SKIP_JUNK();
+					PARSE_NUMBER_N(millis, 3);
+					PARSE_NUMBER_N(micros, 3);
+					break;
 				case 'z':
 				case 'Z':
 					tzd = parseTZD(it, end);
@@ -154,8 +157,8 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& str, DateT
 	}
 	if (month == 0) month = 1;
 	if (day == 0) day = 1;
-	if (DateTime::isValid(year, month, day, hour, minute, second, millis))
-		dateTime.assign(year, month, day, hour, minute, second, millis);
+	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
+		dateTime.assign(year, month, day, hour, minute, second, millis, micros);
 	else 
 		throw SyntaxException("date/time component out of range");
 	timeZoneDifferential = tzd;
@@ -303,7 +306,7 @@ int DateTimeParser::parseTZD(std::string::const_iterator& it, const std::string:
 int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string month;
-	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
+	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
 	bool isFirst = true;
 	while (it != end && std::isalpha(*it)) 
 	{
@@ -324,7 +327,7 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
 	std::string dow;
-	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
+	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
 	bool isFirst = true;
 	while (it != end && std::isalpha(*it)) 
 	{
@@ -345,7 +348,7 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string::const_iterator& end, int hour)
 {
 	std::string ampm;
-	while (it != end && std::isspace(*it) || std::ispunct(*it)) ++it;
+	while ((it != end && std::isspace(*it)) || std::ispunct(*it)) ++it;
 	while (it != end && std::isalpha(*it)) 
 	{
 		char ch = (*it++);

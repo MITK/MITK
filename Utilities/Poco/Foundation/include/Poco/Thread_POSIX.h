@@ -47,6 +47,8 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <pthread.h>
+// must be limits.h (not <climits>) for PTHREAD_STACK_MIN on Solaris
+#include <limits.h>
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
@@ -108,6 +110,31 @@ protected:
 	static int reverseMapPrio(int osPrio);
 
 private:
+	class CurrentThreadHolder
+	{
+	public:
+		CurrentThreadHolder()
+		{
+			if (pthread_key_create(&_key, NULL))
+				throw SystemException("cannot allocate thread context key");
+		}
+		~CurrentThreadHolder()
+		{
+			pthread_key_delete(_key);
+		}
+		ThreadImpl* get() const
+		{
+			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));
+		}
+		void set(ThreadImpl* pThread)
+		{
+			pthread_setspecific(_key, pThread);
+		}
+	
+	private:
+		pthread_key_t _key;
+	};
+
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
@@ -131,8 +158,7 @@ private:
 
 	AutoPtr<ThreadData> _pData;
 
-	static pthread_key_t _currentKey;
-	static bool          _haveCurrentKey;
+	static CurrentThreadHolder _currentThreadHolder;
 	
 #if defined(POCO_OS_FAMILY_UNIX)
 	SignalHandler::JumpBufferVec _jumpBufferVec;
@@ -153,23 +179,6 @@ inline int ThreadImpl::getPriorityImpl() const
 inline int ThreadImpl::getOSPriorityImpl() const
 {
 	return _pData->osPrio;
-}
-
-
-inline void ThreadImpl::sleepImpl(long milliseconds)
-{
-#if defined(__VMS) || defined(__digital__)
-		// This is specific to DECThreads
-		struct timespec interval;
-		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000; 
-		pthread_delay_np(&interval);
-#else 
-		struct timeval tv;
-		tv.tv_sec  = milliseconds / 1000;
-		tv.tv_usec = (milliseconds % 1000) * 1000;
-		select(0, NULL, NULL, NULL, &tv); 	
-#endif
 }
 
 

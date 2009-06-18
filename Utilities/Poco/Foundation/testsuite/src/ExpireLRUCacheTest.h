@@ -48,6 +48,7 @@ public:
 	void testClear();
 	void testExpire0();
 	void testExpireN();
+	void testAccessExpireN();
 	void testCacheSize0();
 	void testCacheSize1();
 	void testCacheSize2();

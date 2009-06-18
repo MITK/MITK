@@ -53,6 +53,7 @@ public:
 	void testMatchRange();
 	void testMisc();
 	void testGlob();
+	void testCaseless();
 
 	void setUp();
 	void tearDown();

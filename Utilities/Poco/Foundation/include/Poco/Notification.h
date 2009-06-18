@@ -43,6 +43,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/AutoPtr.h"
 
 
 namespace Poco {
@@ -56,6 +57,8 @@ class Foundation_API Notification: public RefCountedObject
 	/// template class.
 {
 public:
+	typedef AutoPtr<Notification> Ptr;
+	
 	Notification();
 		/// Creates the notification.
 

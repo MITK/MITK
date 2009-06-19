@@ -2,12 +2,15 @@ set(LIBNAME "PocoFoundation")
 #set(LIBNAMED "${LIBNAME}d")
 
 set( BASE_SRCS 
+  
+  src/AtomicCounter.cpp
+  
   src/ASCIIEncoding.cpp
   src/AbstractObserver.cpp
   src/ActiveDispatcher.cpp
   src/ArchiveStrategy.cpp
   src/AsyncChannel.cpp
-  src/AtomicCounter.cpp
+  
   src/Base64Decoder.cpp
   src/Base64Encoder.cpp
   src/BinaryReader.cpp

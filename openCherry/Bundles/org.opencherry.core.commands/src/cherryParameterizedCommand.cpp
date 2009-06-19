@@ -59,7 +59,7 @@ ParameterizedCommand::ParameterizedCommand(const SmartPointer<Command> command,
   try
   {
     parameters = command->GetParameters();
-  } catch (const NotDefinedException* e)
+  } catch (const NotDefinedException* /*e*/)
   {
     // This should not happen.
   }
@@ -97,7 +97,7 @@ bool ParameterizedCommand::operator<(const Object* object) const
     }
     return compareTo < 0;
   }
-  catch (const NotDefinedException* e)
+  catch (const NotDefinedException* /*e*/)
   {
     throw CommandException(
         "Concurrent modification of a command's defined state");
@@ -158,7 +158,7 @@ std::string ParameterizedCommand::GetName() const throw(NotDefinedException)
       {
         nameBuffer << parameterization.GetValueName();
       }
-      catch (const ParameterValuesException* e)
+      catch (const ParameterValuesException* /*e*/)
       {
         /*
          * Just let it go for now. If someone complains we can
@@ -339,10 +339,10 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
     ParameterizedCommand::Pointer pCmd(new ParameterizedCommand(command, parms));
     return pCmd;
   }
-  catch (const NotDefinedException* e)
+  catch (const NotDefinedException* /*e*/)
   {
   }
-  catch (const ParameterValueConversionException* e)
+  catch (const ParameterValueConversionException* /*e*/)
   {
   }
   return ParameterizedCommand::Pointer(0);

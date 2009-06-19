@@ -105,7 +105,7 @@ bool DefaultSaveable::Show(IWorkbenchPage::Pointer page)
           ->GetViewSite()->GetSecondaryId(),
           IWorkbenchPage::VIEW_ACTIVATE);
     }
-    catch (PartInitException& e)
+    catch (PartInitException& /*e*/)
     {
       return false;
     }

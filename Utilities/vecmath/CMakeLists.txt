@@ -1,1 +1,2 @@
+MITK_CREATE_MODULE_CONF(vecmath)
 

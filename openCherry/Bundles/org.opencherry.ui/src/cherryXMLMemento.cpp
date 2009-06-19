@@ -37,23 +37,18 @@ cherry::XMLMemento::XMLMemento(Poco::XML::Document* document, Poco::XML::Element
   element = elem;
 }
 
-//static XMLMemento::Pointer XMLMemento::CreateReadRoot(Reader reader) throw(WorkbenchException)
 cherry::XMLMemento::Pointer cherry::XMLMemento::CreateReadRoot(cherry::XMLMemento::XMLByteInputStream& reader) throw(WorkbenchException)
 {
   return CreateReadRoot(reader, "");
-  //return CreateReadRoot(reader, null);
 }
 
 cherry::XMLMemento::Pointer cherry::XMLMemento::CreateReadRoot(cherry::XMLMemento::XMLByteInputStream& reader, const std::string& baseDir) throw(WorkbenchException)
 {
-    //
-
-    //try
+    //TODO try catch blog
     
       Poco::XML::NamePool* namePool = new Poco::XML::NamePool();  
       Poco::XML::Document* doc = new Poco::XML::Document(namePool);
       Poco::XML::DOMParser* parser = new Poco::XML::DOMParser();
-      //Poco::XML::DOMBuilder* builder = new Poco::XML::DOMBuilder(parser,namePool);
       Poco::XML::InputSource* source = new Poco::XML::InputSource(reader);
 
 
@@ -63,53 +58,11 @@ cherry::XMLMemento::Pointer cherry::XMLMemento::CreateReadRoot(cherry::XMLMement
       Poco::XML::Element* elem = doc->documentElement(); //TODO really documentElement?
 
       return cherry::XMLMemento::New(doc, elem);
-      
-      //Poco::XML::NamedNodeMap* nodes = factory->childNodes();
-
-    
-  //String errorMessage = null;
-  //Exception exception = null;
-
-  //try {
-  //  DocumentBuilderFactory factory = DocumentBuilderFactory
-  //    .newInstance();
-  //  DocumentBuilder parser = factory.newDocumentBuilder();
-  //  InputSource source = new InputSource(reader);
-  //  if (baseDir != null) {
-  //    source.setSystemId(baseDir);
-  //  }
-  //  Document document = parser.parse(source);
-  //  NodeList list = document.getChildNodes();
-  //  for (int i = 0; i < list.getLength(); i++) {
-  //    Node node = list.item(i);
-  //    if (node instanceof Element) {
-  //      return new XMLMemento(document, (Element) node);
-  //    }
-  //  }
-  //} catch (ParserConfigurationException e) {
-  //  exception = e;
-  //  errorMessage = WorkbenchMessages.XMLMemento_parserConfigError;
-  //} catch (IOException e) {
-  //  exception = e;
-  //  errorMessage = WorkbenchMessages.XMLMemento_ioError;
-  //} catch (SAXException e) {
-  //  exception = e;
-  //  errorMessage = WorkbenchMessages.XMLMemento_formatError;
-  //}
-
-  //String problemText = null;
-  //if (exception != null) {
-  //  problemText = exception.getMessage();
-  //}
-  //if (problemText == null || problemText.length() == 0) {
-  //  problemText = errorMessage != null ? errorMessage
-  //    : WorkbenchMessages.XMLMemento_noElement;
-  //}
-  //throw new WorkbenchException(problemText, exception);
 }
 
-cherry::XMLMemento::Pointer cherry::XMLMemento::CreateWriteRoot(const std::string& type) {
-
+cherry::XMLMemento::Pointer cherry::XMLMemento::CreateWriteRoot(const std::string& type) 
+{
+// TODO
 //  try{
     Poco::XML::NamePool* namePool = new Poco::XML::NamePool();  
     Poco::XML::Document* doc = new Poco::XML::Document(namePool);
@@ -120,18 +73,6 @@ cherry::XMLMemento::Pointer cherry::XMLMemento::CreateWriteRoot(const std::strin
     return cherry::XMLMemento::New(doc, elem);
   //}catch() //TODO: look for poco exceptions
   //{
-  //}
-
-  //Document document;
-  //try {
-  //  document = DocumentBuilderFactory.newInstance()
-  //    .newDocumentBuilder().newDocument();
-  //  Element element = document.createElement(type);
-  //  document.appendChild(element);
-  //  return new XMLMemento(document, element);
-  //} catch (ParserConfigurationException e) {
-  //  //            throw new Error(e);
-  //  throw new Error(e.getMessage());
   //}
 }
 
@@ -159,11 +100,7 @@ cherry::IMemento::Pointer cherry::XMLMemento::CopyChild(IMemento::Pointer child)
   Poco::XML::Element* newElement = dynamic_cast<Poco::XML::Element*>(factory->importNode(elem,true));
   element->appendChild(newElement);
   return XMLMemento::New(factory, newElement);
-  
-  //Element childElement = ((XMLMemento) child).element;
-  //Element newElement = (Element) factory.importNode(childElement, true);
-  //element.appendChild(newElement);
-  //return new XMLMemento(factory, newElement);
+
 }
 
 cherry::IMemento::Pointer cherry::XMLMemento::GetChild(const std::string& type) const
@@ -192,31 +129,7 @@ std::vector< cherry::IMemento::Pointer > cherry::XMLMemento::GetChildren(const s
   }
 
   return mementos;
-  //// Get the nodes.
-  //NodeList nodes = element.getChildNodes();
-  //int size = nodes.getLength();
-  //if (size == 0) {
-  //  return new IMemento[0];}
 
-  //// Extract each node with given type.
-  //ArrayList list = new ArrayList(size);
-  //for (int nX = 0; nX < size; nX++) {
-  //  Node node = nodes.item(nX);
-  //  if (node instanceof Element) {
-  //    Element element = (Element) node;
-  //    if (element.getNodeName().equals(type)) {
-  //      list.add(element);
-  //    }
-  //  }
-  //}
-
-  //// Create a memento for each node.
-  //size = list.size();
-  //IMemento[] results = new IMemento[size];
-  //for (int x = 0; x < size; x++) {
-  //  results[x] = new XMLMemento(factory, (Element) list.get(x));
-  //}
-  //return results;
 }
 
 
@@ -230,17 +143,7 @@ float cherry::XMLMemento::GetFloat(const std::string& key) const
  // attr >> ss >> val;
 
   return val;
-  //Attr attr = element.getAttributeNode(key);
-  //if (attr == null) {
-  //  return null;}
-  //String strValue = attr.getValue();
-  //try {
-  //  return new Float(strValue);
-  //} catch (NumberFormatException e) {
-  //  WorkbenchPlugin.log("Memento problem - Invalid float for key: " //$NON-NLS-1$
-  //    + key + " value: " + strValue, e); //$NON-NLS-1$
-  //  return null;
-  //}
+
 }
 
 const std::string& cherry::XMLMemento::GetType() const
@@ -252,10 +155,6 @@ const std::string& cherry::XMLMemento::GetID() const
 {
 
   //TODO: make error handling!
-  //std::string attr = element->getAttribute(TAG_ID);
-
-  //return attr;
-
   return element->getAttribute(TAG_ID);
 }
 
@@ -269,28 +168,12 @@ int cherry::XMLMemento::GetInteger(const std::string& key) const
   ss >> val;
 
   return val;
-  //Attr attr = element.getAttributeNode(key);
-  //if (attr == null) {
-  //  return null;}
-  //String strValue = attr.getValue();
-  //try {
-  //  return new Integer(strValue);
-  //} catch (NumberFormatException e) {
-  //  WorkbenchPlugin
-  //    .log("Memento problem - invalid integer for key: " + key //$NON-NLS-1$
-  //    + " value: " + strValue, e); //$NON-NLS-1$
-  //  return null;
-  //}
+
 }
 
 const std::string& cherry::XMLMemento::GetString(const std::string& key) const 
 {
-  //std::string attr = element->getAttribute(key);
   return element->getAttribute(key);
-  //Attr attr = element.getAttributeNode(key);
-  //if (attr == null) {
-  //  return null;}
-  //return attr.getValue();
 }
 
 bool cherry::XMLMemento::GetBoolean(const std::string& key) const
@@ -301,10 +184,6 @@ bool cherry::XMLMemento::GetBoolean(const std::string& key) const
     return true;
   else
     return false;
-  //Attr attr = element.getAttributeNode(key);
-  //if (attr == null) {
-  //  return null;}
-  //return Boolean.valueOf(attr.getValue());
 }
 
 const std::string& cherry::XMLMemento::GetTextData() const
@@ -316,12 +195,8 @@ const std::string& cherry::XMLMemento::GetTextData() const
     return textNode->getData();
   }
 
-  return NULL;
-  //Text textNode = getTextNode();
-  //if (textNode != null) {
-  //  return textNode.getData();
-  //}
-  //return null;
+  return ""; //TODO check if NULL or better ""
+
 }
 
 std::vector< std::string > cherry::XMLMemento::GetAttributeKeys() const
@@ -344,7 +219,6 @@ Poco::XML::Text* cherry::XMLMemento::GetTextNode()  const
 
   //Get the nodes
   Poco::XML::NodeList* nodes = element->childNodes();
-  Poco::XML::Text* text;
 
   unsigned long size = nodes->length();
   
@@ -382,9 +256,6 @@ void cherry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
   Poco::XML::NodeList* nodes = dynamic_cast<Poco::XML::NodeList*>(element->attributes());
   size = nodes->length();
 
-  //Poco::XML::Element* elem;
-  //cherry::XMLMemento::Pointer child;
-
   bool needToCopyText = copyText;
   for (unsigned long index = 0; index < size; index++)
   {
@@ -413,28 +284,6 @@ void cherry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
       break;
     }
   }
-  //NamedNodeMap nodeMap = element.getAttributes();
-  //int size = nodeMap.getLength();
-  //for (int i = 0; i < size; i++) {
-  //  Attr attr = (Attr) nodeMap.item(i);
-  //  putString(attr.getName(), attr.getValue());
-  //}
-
-  //NodeList nodes = element.getChildNodes();
-  //size = nodes.getLength();
-  //// Copy first text node (fixes bug 113659).
-  //// Note that text data will be added as the first child (see putTextData)
-  //boolean needToCopyText = copyText;
-  //for (int i = 0; i < size; i++) {
-  //  Node node = nodes.item(i);
-  //  if (node instanceof Element) {
-  //    XMLMemento child = (XMLMemento) createChild(node.getNodeName());
-  //    child.putElement((Element) node, true);
-  //  } else if (node instanceof Text && needToCopyText) {
-  //    putTextData(((Text) node).getData());
-  //    needToCopyText = false;
-  //  }
-  //}
 }
 
 void cherry::XMLMemento::PutFloat(const std::string& key, float value)
@@ -485,7 +334,6 @@ void cherry::XMLMemento::PutBoolean(const std::string& key, bool value)
   {
     element->setAttribute(key, "false");
   }
-  //element.setAttribute(key, value ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$
 }
 
 void cherry::XMLMemento::PutTextData(const std::string& data) 
@@ -500,14 +348,6 @@ void cherry::XMLMemento::PutTextData(const std::string& data)
   {
     textNode->setData(data);
   }
-  //Text textNode = getTextNode();
-  //if (textNode == null) {
-  //  textNode = factory.createTextNode(data);
-  //  // Always add the text node as the first child (fixes bug 93718)
-  //  element.insertBefore(textNode, element.getFirstChild());
-  //} else {
-  //  textNode.setData(data);
-  //}
 }
 
 void cherry::XMLMemento::Save(cherry::XMLMemento::XMLByteOutputStream& writer)
@@ -515,20 +355,13 @@ void cherry::XMLMemento::Save(cherry::XMLMemento::XMLByteOutputStream& writer)
   if (writer.good())
   {
     Poco::XML::DOMWriter* out = new Poco::XML::DOMWriter();
-    out->setOptions(3); //write declaration
-    //out->setOptions(2); //make pretty print
+    out->setOptions(3); //write declaration and pretty print
     out->writeNode(writer, factory);
   }
   else
   {
     //TODO
   }
-  //DOMWriter out = new DOMWriter(writer);
-  //try {
-  //  out.print(element);
-  //} finally {
-  //  out.close();
-  //}
 }
 Poco::XML::Element* cherry::XMLMemento::GetElement() const
 {

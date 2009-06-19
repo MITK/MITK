@@ -189,7 +189,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     stencil->Update();
     mitk::Image::Pointer output = this->GetOutput();
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
-    std::cout << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
+    LOG_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
 
     stencil->Delete();
   }

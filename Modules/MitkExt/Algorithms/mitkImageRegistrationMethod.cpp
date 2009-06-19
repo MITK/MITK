@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageRegistrationMethod.h"
 
+
 namespace mitk {
 
   ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0)
@@ -27,11 +28,22 @@ namespace mitk {
     m_MetricParameters = MetricParameters::New();
     m_ReferenceImage = Image::New();
 
-   
+    m_Preset = new mitk::RigidRegistrationPreset();
+
+    bool succeed = m_Preset->LoadPreset();
+    if(!succeed)
+    {
+       std::cout << "RigidRegistrationParameters.xml is empty or does not exist. There are no presets to select." << std::endl;
+       return;
+    }
+    
+    m_UseMask = false;
+
   }
 
   ImageRegistrationMethod::~ImageRegistrationMethod()
   {
+ 
   }
 
   void ImageRegistrationMethod::GenerateData()
@@ -58,5 +70,8 @@ namespace mitk {
     SetNthInput(1, m_ReferenceImage);
     Modified();
   }
+
+
+ 
 
 } // end namespace

@@ -58,7 +58,7 @@ QmitkStdMultiWidget.h
 )
 SET(UI_FILES
 QmitkLevelWindowPresetDefinition.ui  QmitkLevelWindowWidget.ui  
-QmitkLevelWindowRangeChange.ui        QmitkStdMultiWidget.ui
+QmitkLevelWindowRangeChange.ui
 )
 
 SET(RES_FILES

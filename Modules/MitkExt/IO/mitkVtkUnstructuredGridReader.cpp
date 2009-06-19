@@ -38,7 +38,7 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
   if( m_FileName != "")
   {
     bool success = false;
-    std::cout << "Loading " << m_FileName << " as vtk unstructured grid" << std::endl;
+    LOG_INFO << "Loading " << m_FileName << " as vtk unstructured grid" << std::endl;
 
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
     ext = itksys::SystemTools::LowerCase(ext);

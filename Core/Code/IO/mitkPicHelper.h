@@ -39,6 +39,8 @@ public:
 
   static bool SetSpacing(const ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);
 
+  static bool GetTimeSpacing(const ipPicDescriptor* pic, float& timeSpacing);
+
   static void InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
   static bool SetGeometry2D(const ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);

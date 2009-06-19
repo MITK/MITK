@@ -32,7 +32,7 @@ UIDGenerator::UIDGenerator(const char* prefix, unsigned int lengthOfRandomPart)
 {
   if (lengthOfRandomPart < 5)
   {
-    std::cerr << lengthOfRandomPart << " are not really unique, right?" << std::endl;
+    LOG_ERROR << lengthOfRandomPart << " are not really unique, right?" << std::endl;
     throw std::invalid_argument("To few digits requested");
   }
 

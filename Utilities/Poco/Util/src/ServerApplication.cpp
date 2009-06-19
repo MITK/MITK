@@ -43,11 +43,13 @@
 #include "Poco/NamedEvent.h"
 #include "Poco/Logger.h"
 #if defined(POCO_OS_FAMILY_UNIX)
+#include "Poco/TemporaryFile.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Util/WinService.h"
 #include "Poco/UnWindows.h"
@@ -221,7 +223,7 @@ void ServerApplication::waitForTerminationRequest()
 {
 	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
 	std::string evName("POCOTRM");
-	evName.append(NumberFormatter::formatHex(Process::id(), 8));
+	NumberFormatter::appendHex(evName, Process::id(), 8);
 	NamedEvent ev(evName);
 	ev.wait();
 	_terminated.set();
@@ -421,7 +423,8 @@ int ServerApplication::run(int argc, char** argv)
 		init(argc, argv);
 		if (runAsDaemon)
 		{
-			chdir("/");
+			int rc = chdir("/");
+			if (rc != 0) return EXIT_OSERR;
 		}
 	}
 	catch (Exception& exc)
@@ -465,9 +468,17 @@ void ServerApplication::beDaemon()
 	
 	setsid();
 	umask(0);
-	close(0);
-	close(1);
-	close(2);
+	
+	// attach stdin, stdout, stderr to /dev/null
+	// instead of just closing them. This avoids
+	// issues with third party/legacy code writing
+	// stuff to stdout/stderr.
+	FILE* fin  = freopen("/dev/null", "r+", stdin);
+	if (!fin) throw Poco::OpenFileException("Cannot attach stdin to /dev/null");
+	FILE* fout = freopen("/dev/null", "r+", stdout);
+	if (!fout) throw Poco::OpenFileException("Cannot attach stdout to /dev/null");
+	FILE* ferr = freopen("/dev/null", "r+", stderr);
+	if (!ferr) throw Poco::OpenFileException("Cannot attach stderr to /dev/null");
 }
 
 
@@ -479,6 +490,12 @@ void ServerApplication::defineOptions(OptionSet& options)
 		Option("daemon", "", "run application as a daemon")
 			.required(false)
 			.repeatable(false));
+
+	options.addOption(
+		Option("pidfile", "", "write PID to given file")
+			.required(false)
+			.repeatable(false)
+			.argument("path"));
 }
 
 
@@ -487,6 +504,15 @@ void ServerApplication::handleOption(const std::string& name, const std::string&
 	if (name == "daemon")
 	{
 		config().setBool("application.runAsDaemon", true);
+	}
+	else if (name == "pidfile")
+	{
+		std::ofstream ostr(value.c_str());
+		if (ostr.good())
+			ostr << Poco::Process::id() << std::endl;
+		else
+			throw Poco::CreateFileException("Cannot write PID to file", value);
+		Poco::TemporaryFile::registerForDeletion(value);
 	}
 	else Application::handleOption(name, value);
 }
@@ -526,7 +552,7 @@ void ServerApplication::waitForTerminationRequest()
 	sys$qiow(0, ioChan, IO$_SETMODE | IO$M_CTRLCAST, 0, 0, 0, terminate, 0, 0, 0, 0, 0);
 
 	std::string evName("POCOTRM");
-	evName.append(NumberFormatter::formatHex(Process::id(), 8));
+	NumberFormatter::appendHex(evName, Process::id(), 8);
 	NamedEvent ev(evName);
 	try
 	{

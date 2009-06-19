@@ -57,12 +57,14 @@ namespace mitk {
     *
     */
     void SetSourcePoints(mitk::PointSet::Pointer sourcePointSet);
-    
+
     /** 
     *\brief Set points used as target points for landmark transform
     *
     */
     void SetTargetPoints(mitk::PointSet::Pointer targetPointSet);
+
+    bool IsInitialized() const;
 
     /** 
     *\brief Returns the Fiducial Registration Error

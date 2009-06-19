@@ -93,7 +93,7 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
     }
     else
     {
-      std::cerr << "ERROR: There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
+      LOG_ERROR << "There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
       return NULL; // people should see and fix this error
     }
   }
@@ -110,35 +110,6 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetReferenceDataPreference() c
 mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() const
 {
   return m_IsSegmentationPredicate.GetPointer();
-}
-
-//--------------------------------------------------------------------------------
-//----          ToolLogger
-//--------------------------------------------------------------------------------
-
-unsigned int mitk::Tool::ToolLogger::s_Verboseness = 0;
-mitk::Tool::ToolLogger::NullStream mitk::Tool::ToolLogger::s_NullStream;
-
-std::ostream& mitk::Tool::ToolLogger::Logger(unsigned int verboseness)
-{
-  if (verboseness <= s_Verboseness)
-  {
-    return std::cout;
-  }
-  else
-  {
-    return s_NullStream;
-  }
-}
-
-unsigned int mitk::Tool::ToolLogger::GetVerboseness()
-{
-  return s_Verboseness;
-}
-
-void mitk::Tool::ToolLogger::SetVerboseness( unsigned int verboseness )
-{
-  s_Verboseness = verboseness;
 }
 
 mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName )

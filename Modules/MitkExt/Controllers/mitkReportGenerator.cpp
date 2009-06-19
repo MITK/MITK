@@ -30,7 +30,7 @@ void mitk::ReportGenerator::Generate() {
   int i=0;
   if (templateFile) {
     while (!std::getline(templateFile,line).eof()) {
-      std::cout << "orig " << ++i << ":" << line << std::endl;
+      LOG_INFO << "orig " << ++i << ":" << line << std::endl;
       for (KeyValueMapType::iterator it = m_KeyValueMap.begin(); it != m_KeyValueMap.end() ; it++) {
         std::string key = it->first ;    
         std::string::size_type idx = line.find(key);
@@ -39,7 +39,7 @@ void mitk::ReportGenerator::Generate() {
           line.replace(idx, value.size(), value);
         }
       }
-      std::cout << "new  " << ++i << ":" << line << std::endl;
+      LOG_INFO << "new  " << ++i << ":" << line << std::endl;
     } 
   }
 }

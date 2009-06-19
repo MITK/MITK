@@ -47,6 +47,7 @@ public:
 	~XMLConfigurationTest();
 
 	void testLoad();
+	void testSave();
 
 	void setUp();
 	void tearDown();

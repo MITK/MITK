@@ -78,7 +78,7 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
     {
       // Accept only if the two types are matching. For replacing, use 
       // ReplaceProperty.
-      std::cerr << "In " __FILE__ ", l." << __LINE__ 
+      LOG_ERROR << "In " __FILE__ ", l." << __LINE__ 
         << ": Trying to set existing property to a property with different type." 
         << " Use ReplaceProperty() instead."
         << std::endl;

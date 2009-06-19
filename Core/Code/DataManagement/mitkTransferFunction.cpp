@@ -69,7 +69,7 @@ void mitk::TransferFunction::SetPoints(int channel, mitk::TransferFunction::Cont
     }
     default:
     {
-      std::cerr<<"cannot access channel "<<channel<<std::endl;
+      LOG_ERROR<<"cannot access channel "<<channel<<std::endl;
     }
   }
 }
@@ -105,7 +105,7 @@ void mitk::TransferFunction::AddPoint(int channel, double x, double value)
     
     default:
     {
-      std::cerr<<"cannot access channel "<<channel<<std::endl;
+      LOG_ERROR<<"cannot access channel "<<channel<<std::endl;
     }
   }
 }
@@ -180,7 +180,7 @@ void mitk::TransferFunction::RemovePoint(int channel, double x)
     
     default:
     {
-      std::cerr<<"cannot access channel "<<channel<<std::endl;
+      LOG_ERROR<<"cannot access channel "<<channel<<std::endl;
     }
   }
 }
@@ -218,7 +218,7 @@ void mitk::TransferFunction::ClearPoints(int channel)
     
     default:
     {
-      std::cerr<<"cannot access channel "<<channel<<std::endl;
+      LOG_ERROR<<"cannot access channel "<<channel<<std::endl;
     }
   }
 }

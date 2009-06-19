@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGET_H_
 #define QMITKSTDMULTIWIDGET_H_
 
-//#include "ui_QmitkStdMultiWidget.h" //we create the GUI manual
-
 #include "mitkPositionTracker.h"
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
@@ -31,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 
 #include <qwidget.h>
+#include <qsplitter.h>
 
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
@@ -42,7 +41,7 @@ class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
 
-class QMITK_EXPORT QmitkStdMultiWidget : public QWidget //, public Ui::QmitkStdMultiWidgetUi
+class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 
@@ -173,6 +172,9 @@ public slots:
 
   void SetWidgetPlaneModeToSwivel( bool activate );
 
+  void OnLayoutDesignChanged( int layoutDesignIndex );
+
+
 signals:
 
   void WheelMoved( QWheelEvent* );
@@ -202,6 +204,13 @@ public:
     LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4,
     LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,
     LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET };
+
+  enum {
+    TRANSVERSAL,
+    SAGITTAL,
+    CORONAL,
+    THREE_D
+  };
 
 
 protected:
@@ -241,6 +250,12 @@ protected:
   mitk::DataTreeNode::Pointer m_PlaneNode2;
   mitk::DataTreeNode::Pointer m_PlaneNode3;
   mitk::DataTreeNode::Pointer m_Node;
+
+  QSplitter *mainSplit;
+  QSplitter *vSplit;
+  QSplitter *hSplit;
+  QSplitter *splitterUp;
+  QSplitter *splitterBottom;
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

@@ -62,11 +62,11 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
       vtkUGrid->GetPointCells(pointId, cellIds);
       double numIds = (double)cellIds->GetNumberOfIds();
       double scalar = data->GetComponent(pointId, 0);
-      //std::cout << "scalar value: " << scalar;
+      //LOG_INFO << "scalar value: " << scalar;
       int bin = numBins - 1;
       if (scalar != upperBound[0])
         bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
-      //std::cout << " bin: " << bin << std::endl;
+      //LOG_INFO << " bin: " << bin << std::endl;
       this->IncreaseFrequency(bin, scalar/numIds);
       cellIds->Reset();
     }
@@ -76,11 +76,11 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
   {
     for (vtkIdType cellId = 0; cellId < vtkUGrid->GetNumberOfCells(); cellId++) {
       double scalar = data->GetComponent(cellId, 0);
-      //std::cout << "scalar value: " << scalar;
+      //LOG_INFO << "scalar value: " << scalar;
       int bin = numBins - 1;
       if (scalar != upperBound[0])
         bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
-      //std::cout << " bin: " << bin << std::endl;
+      //LOG_INFO << " bin: " << bin << std::endl;
       this->IncreaseFrequency(bin, scalar);
     }
   }

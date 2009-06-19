@@ -174,6 +174,12 @@ bool FileImpl::isLinkImpl() const
 }
 
 
+bool FileImpl::isLinkImpl() const
+{
+	return false;
+}
+
+
 bool FileImpl::isHiddenImpl() const
 {
 	return false;

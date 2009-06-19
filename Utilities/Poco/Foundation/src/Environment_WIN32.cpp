@@ -37,6 +37,7 @@
 #include "Poco/Environment_WIN32.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#include <cstring>
 #include "Poco/UnWindows.h"
 #include <iphlpapi.h>
 

@@ -64,6 +64,9 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 
   //crate Renderwindow MenuBar for split, close Window or set new setting.
   m_MenuWidget = new QmitkRenderWindowMenu(this);
+  
+  //create Signal/Slot Connection
+  connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -82,6 +85,26 @@ mitk::VtkPropRenderer* QmitkRenderWindow::GetRenderer()
 void QmitkRenderWindow::SetResendQtEvents(bool resend)
 {
   m_ResendQtEvents = resend;
+}
+
+void QmitkRenderWindow::SetLayoutIndex( unsigned int layoutIndex )
+{
+  if( m_MenuWidget )
+    m_MenuWidget->SetLayoutIndex(layoutIndex);
+}
+
+unsigned int QmitkRenderWindow::GetLayoutIndex()
+{ 
+  if( m_MenuWidget )
+    return m_MenuWidget->GetLayoutIndex();
+  else
+    return NULL;
+}
+
+void QmitkRenderWindow::LayoutDesignListChanged( int layoutDesignIndex )
+{ 
+  if( m_MenuWidget ) 
+    m_MenuWidget->UpdateLayoutDesignList( layoutDesignIndex );  
 }
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
@@ -240,3 +263,8 @@ mitk::BaseController * QmitkRenderWindow::GetController()
   }
 }
 
+
+void QmitkRenderWindow::OnChangeLayoutDesign( int layoutDesignIndex )
+{
+  emit SignalLayoutDesignChanged( layoutDesignIndex );
+}

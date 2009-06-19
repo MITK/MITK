@@ -407,6 +407,12 @@ public:
   virtual bool IsValidChannel(int n = 0) const;
 
   //##Documentation
+  //## @brief Returns true if an image is rotated, i.e. its geometry's 
+  //## transformation matrix has nonzero elements besides the diagonal.
+  //## Non-diagonal elements are checked if larger then 1/1000 of the matrix' trace.
+  bool IsRotated() const;
+
+  //##Documentation
   //## @brief Get the sizes of all dimensions as an integer-array.
   //##
   //## @sa GetDimension(int i);

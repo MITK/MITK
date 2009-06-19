@@ -549,7 +549,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       }
 
-      if (!newStateEvent) std::cerr << "rotation would be nice but is impossible... (in l. " << __LINE__ << " of " << __FILE__ << std::endl;
+      if (!newStateEvent) LOG_ERROR << "rotation would be nice but is impossible... " << std::endl;
       
       this->HandleEvent( newStateEvent );
       delete newStateEvent;

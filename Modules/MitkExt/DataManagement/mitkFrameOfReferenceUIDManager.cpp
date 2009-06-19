@@ -34,7 +34,7 @@ mitk::FrameOfReferenceUIDManager::~FrameOfReferenceUIDManager()
 unsigned int mitk::FrameOfReferenceUIDManager::AddFrameOfReferenceUID(const char* forUID)
 {
   std::string forUIDstring=forUID;
-  int i;
+  unsigned int i;
   size_t size;
   size = m_FrameOfReferenceUIDs.size();
   std::vector<std::string>::iterator it;

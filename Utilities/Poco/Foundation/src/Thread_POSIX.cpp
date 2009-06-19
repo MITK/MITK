@@ -37,12 +37,13 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
+#include "Poco/Timespan.h"
+#include "Poco/Timestamp.h"
 #include <signal.h>
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
 #	endif
-#	include <limits.h>
 #endif
 
 
@@ -75,19 +76,12 @@ namespace
 namespace Poco {
 
 
-pthread_key_t ThreadImpl::_currentKey;
-bool ThreadImpl::_haveCurrentKey = false;
+ThreadImpl::CurrentThreadHolder ThreadImpl::_currentThreadHolder;
 
 
 ThreadImpl::ThreadImpl():
 	_pData(new ThreadData)
 {
-	if (!_haveCurrentKey)
-	{
-		if (pthread_key_create(&_currentKey, NULL))
-			throw SystemException("cannot allocate thread context key");
-		_haveCurrentKey = true;
-	}
 }
 
 			
@@ -263,16 +257,47 @@ bool ThreadImpl::joinImpl(long milliseconds)
 
 ThreadImpl* ThreadImpl::currentImpl()
 {
-	if (_haveCurrentKey)
-		return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_currentKey));
-	else
-		return 0;
+	return _currentThreadHolder.get();
+}
+
+
+void ThreadImpl::sleepImpl(long milliseconds)
+{
+#if defined(__VMS) || defined(__digital__)
+		// This is specific to DECThreads
+		struct timespec interval;
+		interval.tv_sec  = milliseconds / 1000;
+		interval.tv_nsec = (milliseconds % 1000)*1000000; 
+		pthread_delay_np(&interval);
+#else 
+	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
+	int rc;
+	do
+	{
+		struct timeval tv;
+		tv.tv_sec  = (long) remainingTime.totalSeconds();
+		tv.tv_usec = (long) remainingTime.useconds();
+		Poco::Timestamp start;
+		rc = ::select(0, NULL, NULL, NULL, &tv);
+		if (rc < 0 && errno == EINTR)
+		{
+			Poco::Timestamp end;
+			Poco::Timespan waited = start.elapsed();
+			if (waited < remainingTime)
+				remainingTime -= waited;
+			else
+				remainingTime = 0;
+		}
+	}
+	while (remainingTime > 0 && rc < 0 && errno == EINTR);
+	if (rc < 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+#endif
 }
 
 
 void* ThreadImpl::runnableEntry(void* pThread)
 {
-	pthread_setspecific(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	sigset_t sset;
@@ -310,7 +335,7 @@ void* ThreadImpl::runnableEntry(void* pThread)
 
 void* ThreadImpl::callableEntry(void* pThread)
 {
-	pthread_setspecific(_currentKey, pThread);
+	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	sigset_t sset;

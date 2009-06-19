@@ -24,6 +24,9 @@ void QmitkPropertyDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 {
 
   QVariant data = index.data(Qt::DisplayRole);
+
+  QString name = data.value<QString>();
+
   if(index.column() == 1 && data.type() == QVariant::Color)
   {
     QColor qcol = data.value<QColor>();
@@ -51,6 +54,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 {
   QVariant data = index.data(Qt::EditRole);
   QVariant displayData = index.data(Qt::DisplayRole);
+  QString name = index.model()->data(index.model()->index(index.row(), index.column()-1)).value<QString>();
 
   if(data.isValid())
   {
@@ -99,6 +103,12 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
       spinBox->setDecimals(2);
       spinBox->setSingleStep(0.1);
+      if(name == "opacity")
+      {
+        spinBox->setMinimum(0.0);
+        spinBox->setMaximum(1.0);
+      }
+      
       return spinBox;
     }
 

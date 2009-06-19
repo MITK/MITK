@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 #include <iostream>
-#include "../resources/icon.xpm"
 
 #include "QmitkImageCropper.h"
 //!#include "QmitkImageCropperControls.h"

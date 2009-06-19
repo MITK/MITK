@@ -152,48 +152,6 @@ class MITKEXT_CORE_EXPORT Tool : public StateMachine
 
     friend class ToolManager;
 
-    /**
-      \brief Logging helper class for Tools.
-      Implementations of tools can send debug output to this class (C++ streaming IO).
-      To get a stream, clients call Logger(verboseness).
-      The verboseness parameter should be higher for more detailed messages,
-      lower for everyday output.
-      The default is 1.
-
-      At the moment the verboseness-level is defined at compile-time
-      (and by default 0 - nearly no messages get to the commandline).
-     */
-    class MITKEXT_CORE_EXPORT ToolLogger
-    {
-
-      struct NullStream: std::ostream
-      {
-
-        NullStream()
-        :std::ios(0),
-         std::ostream(0)
-        {
-        }
-
-      };
-
-      public:
-
-        /**
-         \return A valid std::ostream which might or might not be redirected to the commandline.
-         \param verboseness 0 for "always". Increasing numbers for more detailed debugging messages.
-        */
-        static std::ostream& Logger(unsigned int verboseness = 1);
-
-        static unsigned int GetVerboseness();
-        static void SetVerboseness( unsigned int verboseness );
-
-      protected:
-
-        static unsigned int s_Verboseness;
-        static NullStream s_NullStream;
-    };
-
     virtual void SetToolManager(ToolManager*);
 
     /**

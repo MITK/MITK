@@ -822,7 +822,7 @@ void PathTest::testParseWindows4()
 	
 	try
 	{
-		p.parse("ü:\\", Path::PATH_WINDOWS);
+		p.parse("~:\\", Path::PATH_WINDOWS);
 		fail("bad path - must throw exception");
 	}
 	catch (PathSyntaxException&)

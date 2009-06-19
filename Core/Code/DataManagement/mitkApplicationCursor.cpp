@@ -51,7 +51,7 @@ void ApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY
   }
   else
   {
-    std::cerr << "in mitk::ApplicationCursor::PushCursor(): no implementation registered." << std::endl;
+    LOG_ERROR << "in mitk::ApplicationCursor::PushCursor(): no implementation registered." << std::endl;
   }
 }
 
@@ -63,7 +63,7 @@ void ApplicationCursor::PopCursor()
   }
   else
   {
-    std::cerr << "in mitk::ApplicationCursor::PopCursor(): no implementation registered." << std::endl;
+    LOG_ERROR << "in mitk::ApplicationCursor::PopCursor(): no implementation registered." << std::endl;
   }
 }
 

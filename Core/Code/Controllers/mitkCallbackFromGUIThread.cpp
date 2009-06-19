@@ -49,7 +49,7 @@ void CallbackFromGUIThread::CallThisFromGUIThread(itk::Command* cmd, itk::EventO
   }
   else
   {
-    std::cerr << "in mitk::CallbackFromGUIThread::CallbackFromGUIThread(): no implementation registered." << std::endl;
+    LOG_ERROR << "in mitk::CallbackFromGUIThread::CallbackFromGUIThread(): no implementation registered." << std::endl;
   }
 }
 

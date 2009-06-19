@@ -207,7 +207,7 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Testing copying a Surface with Graft()" << std::endl;
 
-  int numberoftimesteps = surface->GetTimeSteps();
+  unsigned int numberoftimesteps = surface->GetTimeSteps();
   mitk::Surface::Pointer dummy = mitk::Surface::New();
   dummy->Graft(surface);
   std::cout << "polyData != NULL ??" << std::endl;

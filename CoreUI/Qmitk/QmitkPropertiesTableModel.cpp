@@ -105,7 +105,7 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
   // empty data by default
   QVariant data;
 
-  if(!index.isValid() || m_SelectedProperties.empty() || index.row() > (m_SelectedProperties.size()-1))
+  if(!index.isValid() || m_SelectedProperties.empty() || index.row() > (int)(m_SelectedProperties.size()-1))
     return data;
 
   // the properties name
@@ -276,7 +276,7 @@ void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const
 
 bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if (index.isValid() && !m_SelectedProperties.empty() && index.row() < m_SelectedProperties.size() && role == Qt::EditRole) 
+  if (index.isValid() && !m_SelectedProperties.empty() && index.row() < (int)(m_SelectedProperties.size()) && role == Qt::EditRole) 
   {
     // block all events now!
     m_BlockEvents = true;

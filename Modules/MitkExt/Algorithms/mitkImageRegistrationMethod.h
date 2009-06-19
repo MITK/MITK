@@ -30,6 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransformParameters.h"
 #include "mitkMetricParameters.h"
 
+#include "itkImageMaskSpatialObject.h"
+#include "mitkRigidRegistrationPreset.h"
+
+
 
 namespace mitk
 {
@@ -49,6 +53,10 @@ namespace mitk
   {
 
   public:
+
+    typedef itk::SingleValuedNonLinearOptimizer         OptimizerType;
+    typedef itk::ImageMaskSpatialObject< 3 >            MaskType;
+       
     
     mitkClassMacro(ImageRegistrationMethod, ImageToImageFilter);
 
@@ -57,7 +65,7 @@ namespace mitk
     static const int LINEARINTERPOLATOR = 0;
     static const int NEARESTNEIGHBORINTERPOLATOR = 1;
 
-    typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
+    
 
     void SetObserver(RigidRegistrationObserver::Pointer observer);
 
@@ -95,7 +103,18 @@ namespace mitk
     MetricParameters::Pointer GetMetricParameters()
     {
       return m_MetricParameters;
+    }   
+
+    void SetPresets(std::vector<std::string> presets)
+    {
+      m_Presets = presets;
     }
+    
+    
+    itkSetMacro(MatchHistograms, bool);
+    itkGetMacro(Preset, mitk::RigidRegistrationPreset*);
+
+   
 
   protected:
     ImageRegistrationMethod();
@@ -108,12 +127,27 @@ namespace mitk
     int m_Interpolator;
     Image::Pointer m_ReferenceImage;
 
+
+    
+
   private:
     OptimizerParameters::Pointer m_OptimizerParameters;
     TransformParameters::Pointer m_TransformParameters;
     MetricParameters::Pointer m_MetricParameters;
 
+    std::vector<std::string> m_Presets;
+    mitk::RigidRegistrationPreset* m_Preset;
+    
+       
+    bool m_UseMask;   
+    bool m_MatchHistograms;
+    MaskType::Pointer m_BrainMask;
+
+       
   };
 }
 
+//#include "mitkImageRegistrationMethod.txx"
+
 #endif // MITKIMAGEREGISTRATIONMETHOD_H
+

@@ -193,6 +193,19 @@ bool FileImpl::isLinkImpl() const
 }
 
 
+bool FileImpl::isDeviceImpl() const
+{
+	poco_assert (!_path.empty());
+
+	struct stat st;
+	if (stat(_path.c_str(), &st) == 0)
+		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
+	else
+		handleLastErrorImpl(_path);
+	return false;
+}
+
+
 bool FileImpl::isHiddenImpl() const
 {
 	poco_assert (!_path.empty());
@@ -207,7 +220,7 @@ Timestamp FileImpl::createdImpl() const
 {
 	poco_assert (!_path.empty());
 
-#if defined(__APPLE__) && defined(st_birthtime) // st_birthtime is available only on 10.5
+#if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);
@@ -443,8 +456,10 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("no space left on device", path);
 	case EDQUOT:
 		throw FileException("disk quota exceeded", path);
+#if !defined(_AIX)
 	case ENOTEMPTY:
 		throw FileException("directory not empty", path);
+#endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path);
 	case ENFILE:

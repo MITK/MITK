@@ -392,7 +392,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
   if ( timeStep < 0 )
   {
-    std::cerr << "Time step (" << timeStep << ") outside of PointSet time bounds" << std::endl;
+    LOG_ERROR << "Time step (" << timeStep << ") outside of PointSet time bounds" << std::endl;
     return;
   }
 

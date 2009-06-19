@@ -49,6 +49,7 @@ public:
 	void testFormat();
 	void testFormat0();
 	void testFormatHex();
+	void testFormatFloat();
 	
 	void setUp();
 	void tearDown();

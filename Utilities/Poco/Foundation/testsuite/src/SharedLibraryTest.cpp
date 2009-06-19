@@ -60,6 +60,7 @@ void SharedLibraryTest::testSharedLibrary1()
 {
 	std::string path = "TestLibrary";
 	path.append(SharedLibrary::suffix());
+  
 	SharedLibrary sl;
 	assert (!sl.isLoaded());
 	sl.load(path);

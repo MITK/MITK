@@ -58,8 +58,15 @@ namespace cherry {
   public:
     cherryObjectMacro(XMLMemento);
     cherryNewMacro2Param(XMLMemento, Poco::XML::Document*, Poco::XML::Element*);
-    //TODO Docu
+
+    /**
+     * Defines a std::ostream as XML output stream
+     */
     typedef std::ostream XMLByteOutputStream;
+
+    /**
+     * Defines a std::istream as XML input stream
+     */
     typedef std::istream XMLByteInputStream;
 
     /**
@@ -75,46 +82,55 @@ namespace cherry {
     */
     XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem);
 
-    //TODO Docu
-    XMLMemento();
+    /**
+     * Creates a <code>Document</code> from the <code>Reader</code>
+     * and returns a memento on the first <code>Element</code> for reading
+     * the document.
+     *
+     * @param reader the <code>Reader</code> used to create the memento's document
+     * @return a memento on the first <code>Element</code> for reading the document
+     * @throws WorkbenchException if IO problems, invalid format, or no element.
+    */
     static XMLMemento::Pointer CreateReadRoot(cherry::XMLMemento::XMLByteInputStream& reader) throw(WorkbenchException);
 
     /**
-    * Creates a <code>Document</code> from the <code>Reader</code>
-    * and returns a memento on the first <code>Element</code> for reading
-    * the document.
-    *
-    * @param reader the <code>Reader</code> used to create the memento's document
-    * @param baseDir the directory used to resolve relative file names
-    *    in the XML document. This directory must exist and include the
-    *    trailing separator. The directory format, including the separators,
-    *    must be valid for the platform. Can be <code>null</code> if not
-    *    needed.
-    * @return a memento on the first <code>Element</code> for reading the document
-    * @throws WorkbenchException if IO problems, invalid format, or no element.
+     * Creates a <code>Document</code> from the <code>Reader</code>
+     * and returns a memento on the first <code>Element</code> for reading
+     * the document.
+     *
+     * @param reader the <code>Reader</code> used to create the memento's document
+     * @param baseDir the directory used to resolve relative file names
+     *    in the XML document. This directory must exist and include the
+     *    trailing separator. The directory format, including the separators,
+     *    must be valid for the platform. Can be <code>null</code> if not
+     *    needed.
+     * @return a memento on the first <code>Element</code> for reading the document
+     * @throws WorkbenchException if IO problems, invalid format, or no element.
     */
     static XMLMemento::Pointer CreateReadRoot(cherry::XMLMemento::XMLByteInputStream& reader, const std::string& baseDir) throw(WorkbenchException);
 
     /**
-    * Returns a root memento for writing a document.
-    *
-    * @param type the element node type to create on the document
-    * @return the root memento for writing a document
+     * Returns a root memento for writing a document.
+     *
+     * @param type the element node type to create on the document
+     * @return the root memento for writing a document
     */
     static XMLMemento::Pointer CreateWriteRoot(const std::string& type);
 
+    /** 
+     * Copies another Memento into this memento
+     *
+     * @param child the new child memento
+     * @return the new child memento
+    */
+    IMemento::Pointer CopyChild(IMemento::Pointer child);
 
-
-      /* (non-Javadoc)
-      * Method declared in IMemento.
-      */
-      //TODO: not defined in IMemento!
-      IMemento::Pointer CopyChild(IMemento::Pointer child);
-
-
-      /* (non-Javadoc)
-      * Method declared in IMemento.
-      */
+    /**
+     * Creates a new child of this memento with the given type
+     *
+     * @param type the type
+     * @return a new child memento with the given type
+    */
     virtual IMemento::Pointer CreateChild(const std::string& type);
 
     /**
@@ -149,7 +165,6 @@ namespace cherry {
      */
     virtual std::vector< IMemento::Pointer > GetChildren(const std::string& type) const;
 
-
     /**
      * Returns the floating point value of the given key.
      *
@@ -158,12 +173,17 @@ namespace cherry {
      *   but was not a floating point number
      */
     virtual float GetFloat(const std::string& key) const;
-
-    //TODO: docu
+    
+    /**
+     * Returns the Type of this memento
+    */
     virtual const std::string& GetType() const;
 
-    //TODO: docu
+    /**
+     * Returns the ID of this memento
+    */
     virtual const std::string& GetID() const;
+
     /**
      * Returns the integer value of the given key.
      *
@@ -182,21 +202,19 @@ namespace cherry {
     virtual const std::string& GetString(const std::string& key) const;
 
     /**
-	 * Returns the boolean value of the given key.
-	 * 
-	 * @param key the key
-	 * @return the value, or <code>null</code> if the key was not found
-     * @since 3.4
-	 */
+	   * Returns the boolean value of the given key.
+	   * 
+	   * @param key the key
+	   * @return the value, or <code>null</code> if the key was not found
+	   */
 	  virtual bool GetBoolean(const std::string& key) const;
 
-	/**
+	  /**
      * Returns the data of the Text node of the memento. Each memento is allowed
      * only one Text node.
      * 
      * @return the data of the Text node of the memento, or <code>null</code>
      * if the memento has no Text node.
-     * @since 2.0
      */
     virtual const std::string& GetTextData() const;
 	
@@ -204,75 +222,92 @@ namespace cherry {
      * Returns an array of all the attribute keys of the memento. This will not
      * be <code>null</code>. If there are no keys, an array of length zero will
      * be returned. 
-     * @return an array with all the attribute keys of the memento
-     * @since 3.4
+     * @return an vector with all the attribute keys of the memento
      */
     virtual std::vector< std::string > GetAttributeKeys() const;
 
-
-      /* (non-Javadoc)
-      * Method declared in IMemento.
-      */
-      virtual void PutFloat(const std::string& key, float value);
-
-     /* (non-Javadoc)
-     * Method declared in IMemento.
+    /**
+     * Puts a float in this memento
+     *
+     * @param key the key
+     * @param value the value
      */
-     virtual void PutInteger(const std::string& key, int value);
+    virtual void PutFloat(const std::string& key, float value);
 
-     /* (non-Javadoc)
-     * Method declared in IMemento.
+    /** 
+     * Puts a integer in this memento
+     *
+     * @param key the key
+     * @param value the value
      */
-     virtual void PutMemento(IMemento::Pointer memento);
+    virtual void PutInteger(const std::string& key, int value);
 
-     /* (non-Javadoc)
-     * Method declared in IMemento.
+    /** 
+     * Puts another memento in this memento as a child
+     *
+     * @param key the key
+     * @param value the value
      */
-     virtual void PutString(const std::string& key, const std::string& value);
+    virtual void PutMemento(IMemento::Pointer memento);
 
-     /* (non-Javadoc)
-     * Method declared in IMemento.
+    /** 
+     * Puts a string in this memento
+     *
+     * @param key the key
+     * @param value the value
      */
-     virtual void PutBoolean(const std::string& key, bool value);
+    virtual void PutString(const std::string& key, const std::string& value);
 
-     /* (non-Javadoc)
-     * Method declared in IMemento.
+    /** 
+     * Puts a boolean in this memento
+     *
+     * @param key the key
+     * @param value the value
      */
-     virtual void PutTextData(const std::string& data);
+    virtual void PutBoolean(const std::string& key, bool value);
 
-      /**
-      * Saves this memento's document current values to the
-      * specified writer.
-      *
-      * @param writer the writer used to save the memento's document
-      * @throws IOException if there is a problem serializing the document to the stream.
-      */
+    /** 
+     * Puts a text in this memento
+     *
+     * @param data the text
+     */
+    virtual void PutTextData(const std::string& data);
 
-     //TODO: throw(IOException)
-      //void Save(Writer writer) throw(IOException);
-     void Save(XMLByteOutputStream& writer);
+    /**
+     * Saves this memento's document current values to the
+     * specified writer.
+     *
+     * @param writer the writer used to save the memento's document
+     * @throws IOException if there is a problem serializing the document to the stream.
+     */
+    void Save(XMLByteOutputStream& writer); //TODO: throw(IOException)
 
-     virtual Poco::XML::Element* GetElement() const;
+    /**
+     * Returns the element of the memento
+     * 
+     * @return the xml element
+     */
+    virtual Poco::XML::Element* GetElement() const;
 
-private:         
-  /**
-  * Returns the Text node of the memento. Each memento is allowed only
-  * one Text node.
-  *
-  * @return the Text node of the memento, or <code>null</code> if
-  * the memento has no Text node.
-  */
-  Poco::XML::Text* GetTextNode() const; 
+private:   
 
-  /**
-  * Places the element's attributes into the document.
-  * @param copyText true if the first text node should be copied
-  */
-  void PutElement(Poco::XML::Element* element, bool copyText);
+    /**
+     * Returns the Text node of the memento. Each memento is allowed only
+     * one Text node.
+     *
+     * @return the Text node of the memento, or <code>null</code> if
+     * the memento has no Text node.
+     */
+    Poco::XML::Text* GetTextNode() const; 
 
+    /**
+     * Places the element's attributes into the document.
+     * @param copyText true if the first text node should be copied
+     */
+    void PutElement(Poco::XML::Element* element, bool copyText);
 
-  Poco::XML::Document* factory;
-  Poco::XML::Element* element;
+    Poco::XML::Document* factory;
+    Poco::XML::Element* element;
 };
 }//namespace cherry
 #endif /* CHERRYXMLMEMENTO_H_ */

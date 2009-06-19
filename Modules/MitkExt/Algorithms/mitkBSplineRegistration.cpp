@@ -149,9 +149,10 @@ namespace mitk {
     OptimizerType::Pointer optimizer = optFac->GetOptimizer();    
 
     typename FixedImageType::Pointer fixedImage = FixedImageType::New();
-    mitk::CastToItkImage(m_ReferenceImage, fixedImage);
-    typename FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
+    mitk::CastToItkImage(m_ReferenceImage, fixedImage);    
     typename MovingImageType::Pointer movingImage = itkImage1;
+    typename FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
+    typename MovingImageType::RegionType movingRegion = movingImage->GetBufferedRegion();
 
     registration->SetMetric(          metric        );
     registration->SetOptimizer(       optimizer     );
@@ -181,6 +182,7 @@ namespace mitk {
     // We now pass the parameters of the current transform as the initial
     // parameters to be used when the registration process starts.
     registration->SetInitialTransformParameters( transform->GetParameters() );
+    
     std::cout << "Intial Parameters = " << std::endl;
     std::cout << transform->GetParameters() << std::endl;
  
@@ -220,16 +222,16 @@ namespace mitk {
 
 
     // Generate deformation field
-    typename DeformationFieldType::Pointer field = DeformationFieldType::New();
-    field->SetRegions( fixedRegion );
-    field->SetOrigin( fixedImage->GetOrigin() );
-    field->SetSpacing( fixedImage->GetSpacing() );
-    field->SetDirection( fixedImage->GetDirection() );
+    typename DeformationFieldType::Pointer field = DeformationFieldType::New();    
+    field->SetRegions( movingRegion );
+    field->SetOrigin( movingImage->GetOrigin() );
+    field->SetSpacing( movingImage->GetSpacing() );
+    field->SetDirection( movingImage->GetDirection() );   
     field->Allocate();
 
-    typedef itk::ImageRegionIterator< DeformationFieldType > FieldIterator;
-    FieldIterator fi( field, fixedRegion );
 
+    typedef itk::ImageRegionIterator< DeformationFieldType > FieldIterator;
+    FieldIterator fi( field, movingRegion );
     fi.GoToBegin();
 
     typename TransformType::InputPointType  fixedPoint;
@@ -250,18 +252,16 @@ namespace mitk {
 
 
     // Use the deformation field to warp the moving image
-    typename WarperType::Pointer warper = WarperType::New();
-    
+    typename WarperType::Pointer warper = WarperType::New();    
     warper->SetInput( movingImage );
     warper->SetInterpolator( interpolator );
-    warper->SetOutputSpacing( fixedImage->GetSpacing() );
-    warper->SetOutputOrigin( fixedImage->GetOrigin() );
+    warper->SetOutputSpacing( movingImage->GetSpacing() );
+    warper->SetOutputOrigin( movingImage->GetOrigin() );
+    warper->SetOutputDirection( movingImage->GetDirection() );
     warper->SetDeformationField( field );
     warper->Update();
 
-    typename MovingImageType::Pointer result = warper->GetOutput();
-
-    
+    typename MovingImageType::Pointer result = warper->GetOutput();    
 
     if(m_UpdateInputImage)
     {   

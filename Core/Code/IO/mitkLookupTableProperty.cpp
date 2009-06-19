@@ -25,7 +25,7 @@ mitk::LookupTableProperty::LookupTableProperty()
 
 mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable::Pointer lut)
 {
-    std::cout << "created mitk::LookupTableProperty::New..." << std::endl;
+    LOG_INFO << "created mitk::LookupTableProperty::New..." << std::endl;
     this->SetLookupTable(lut);
 }
 
@@ -50,7 +50,7 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)
 {
-//    std::cout << "setting LUT property ... " << std::endl;
+//    LOG_INFO << "setting LUT property ... " << std::endl;
    
     if((m_LookupTable != aLookupTable) || (*m_LookupTable != *aLookupTable))
     {
@@ -58,7 +58,7 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
         Modified();
     }
           
-//    std::cout << "setting LUT property OK! " << std::endl;    
+//    LOG_INFO << "setting LUT property OK! " << std::endl;    
 }
 
 bool mitk::LookupTableProperty::WriteXMLData(XMLWriter &xmlWriter)

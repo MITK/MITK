@@ -30,12 +30,12 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
   }
 
   mitk::Surface::Pointer output = this->GetOutput();
-  std::cout << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
+  LOG_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
   output->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
   {
     std::string fileName = m_MatchedFileNames[i];
-    std::cout << "Loading " << fileName << " as vtk..." << std::endl;
+    LOG_INFO << "Loading " << fileName << " as vtk..." << std::endl;
 
     VtkSurfaceReader::Pointer vtkReader = VtkSurfaceReader::New();
     vtkReader->SetFileName( fileName.c_str() );

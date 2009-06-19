@@ -117,7 +117,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
 
     if ( m_WorkingSlice.IsNull() )
     {
-      std::cerr << "Unable to extract slice." << std::endl;
+      LOG_ERROR << "Unable to extract slice." << std::endl;
       return false;
     }
 
@@ -130,7 +130,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased(Action* action, const StateEvent* st
     }
     catch ( std::exception& e )
     {
-      std::cout << "Caught exception '" << e.what() << "'" << std::endl;
+      LOG_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
     }
 
 

@@ -33,6 +33,8 @@
 #include "NotificationsTestSuite.h"
 #include "NotificationCenterTest.h"
 #include "NotificationQueueTest.h"
+#include "PriorityNotificationQueueTest.h"
+#include "TimedNotificationQueueTest.h"
 
 
 CppUnit::Test* NotificationsTestSuite::suite()
@@ -41,6 +43,8 @@ CppUnit::Test* NotificationsTestSuite::suite()
 
 	pSuite->addTest(NotificationCenterTest::suite());
 	pSuite->addTest(NotificationQueueTest::suite());
+	pSuite->addTest(PriorityNotificationQueueTest::suite());
+	pSuite->addTest(TimedNotificationQueueTest::suite());
 
 	return pSuite;
 }

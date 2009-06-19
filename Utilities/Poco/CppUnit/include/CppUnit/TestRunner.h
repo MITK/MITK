@@ -12,6 +12,7 @@
 #include "CppUnit/CppUnit.h"
 #include <vector>
 #include <string>
+#include <ostream>
 
 
 namespace CppUnit {
@@ -41,6 +42,7 @@ class CppUnit_API TestRunner
 
 public:
 	TestRunner();
+	TestRunner(std::ostream& ostr);
 	~TestRunner();
 
 	bool run(const std::vector<std::string>& args);
@@ -53,6 +55,7 @@ protected:
 	Test* find(const std::string& name, Test* pTest, const std::string& testName);
 
 private:
+	std::ostream& _ostr;
 	Mappings _mappings;
 };
 

@@ -16,8 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkMeasurement.h"
-#include <qaction.h>
-#include "../../resources/icon.xpm"
+// #include <qaction.h>
 
 #include <mitkGlobalInteraction.h>
 

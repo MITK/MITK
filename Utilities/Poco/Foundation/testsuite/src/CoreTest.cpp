@@ -37,13 +37,48 @@
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
 #include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Buffer.h"
+#include "Poco/AtomicCounter.h"
 #include <iostream>
+#include <vector>
+#include <cstring>
 
 
 using Poco::Bugcheck;
 using Poco::Exception;
 using Poco::Environment;
 using Poco::Thread;
+using Poco::Runnable;
+using Poco::Buffer;
+using Poco::AtomicCounter;
+
+
+namespace
+{
+	class ACTRunnable: public Poco::Runnable
+	{
+	public:
+		ACTRunnable(AtomicCounter& counter):
+			_counter(counter)
+		{
+		}
+		
+		void run()
+		{
+			for (int i = 0; i < 100000; ++i)
+			{
+				_counter++;
+				_counter--;
+				++_counter;
+				--_counter;
+			}
+		}
+		
+	private:
+		AtomicCounter& _counter;
+	};
+}
 
 
 //
@@ -139,6 +174,70 @@ void CoreTest::testEnvironment()
 	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
 	std::cout << "OS Architecture: " << Environment::osArchitecture() << std::endl;
 	std::cout << "Node Name:       " << Environment::nodeName() << std::endl;
+	std::cout << "Node ID:         " << Environment::nodeId() << std::endl;
+}
+
+
+void CoreTest::testBuffer()
+{
+	std::size_t s = 10;
+	Buffer<int> b(s);
+	std::vector<int> v;
+	for (int i = 0; i < s; ++i)
+		v.push_back(i);
+
+	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+
+	assert (s == b.size());
+	for (int i = 0; i < s; ++i)
+		assert (b[i] == i);
+
+#if ENABLE_BUGCHECK_TEST
+	try { int i = b[s]; fail ("must fail"); }
+	catch (Exception&) { }
+#endif
+}
+
+
+void CoreTest::testAtomicCounter()
+{
+	AtomicCounter ac;
+	
+	assert (ac.value() == 0);
+	assert (ac++ == 0);
+	assert (ac-- == 1);
+	assert (++ac == 1);
+	assert (--ac == 0);
+	
+	ac = 2;
+	assert (ac.value() == 2);
+	
+	ac = 0;
+	assert (ac.value() == 0);
+	
+	AtomicCounter ac2(2);
+	assert (ac2.value() == 2);
+	
+	ACTRunnable act(ac);
+	Thread t1;
+	Thread t2;
+	Thread t3;
+	Thread t4;
+	Thread t5;
+	
+	t1.start(act);
+	t2.start(act);
+	t3.start(act);
+	t4.start(act);
+	t5.start(act);
+	
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+	t5.join();
+	
+	assert (ac.value() == 0);
 }
 
 
@@ -160,6 +259,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testFixedLength);
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
+	CppUnit_addTest(pSuite, CoreTest, testBuffer);
+	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 
 	return pSuite;
 }

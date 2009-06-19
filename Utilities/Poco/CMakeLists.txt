@@ -1,51 +1,113 @@
-SET(CMAKE_DEBUG_POSTFIX d)
+PROJECT(poco)
 
-SET(Poco_INCLUDE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    CACHE PATH
-    "top-level directory containing the poco include directories. E.g /usr/local/include/ or c:\\poco\\include\\poco-1.3.2")
+cmake_minimum_required(VERSION 2.6)
 
-SET(Poco_LIBRARY_DIR
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-    CACHE PATH
-    "top-level directory containing the poco libraries.")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "3")
+set(CPACK_PACKAGE_VERSION_PATCH "5")
+set(COMPLETE_VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+set(RELEASE_NAME "Poco 1.3.5")
+set(PROJECT_VERSION ${COMPLETE_VERSION})
 
-# POCO relies on the flags _DEBUG and NDEBUG to be set accordingly.
-# These are Microsoft specific flags and not automatically defined by gcc or
-# others, so we have to define them by ourselves.
-IF(CMAKE_BUILD_TYPE)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "" CACHE PATH "The single directory for all runtime files")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "" CACHE PATH "The single directory for all library files")
 
-  STRING(TOUPPER ${CMAKE_BUILD_TYPE} buildtype)
-  IF(buildtype STREQUAL "DEBUG")
-    SET(DEBUG_FLAG "-D_DEBUG")
-  ELSE(buildtype STREQUAL "DEBUG")
-    SET(DEBUG_FLAG "-DNDEBUG")
-  ENDIF(buildtype STREQUAL "DEBUG")
 
-ELSE(CMAKE_BUILD_TYPE)
+#set(COMMON_CXX "-Wall -Wno-sign-compare")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "${COMMON_CXX} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
-  #SET(DEBUG_FLAG "-D_DEBUG")
-  #default build type is release
-  
-ENDIF(CMAKE_BUILD_TYPE)
+# Set the library postfix
+set(CMAKE_DEBUG_POSTFIX "d")
 
-#SET(POCO_UNIX_COMPILE_FLAGS "-D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE ${DEBUG_FLAG} -w")
-IF(APPLE)
-  SET(POCO_UNIX_COMPILE_FLAGS "-D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE ${DEBUG_FLAG} -w -D_DARWIN_C_SOURCE -DPOCO_HAVE_IPv6")
-ELSE(APPLE)
-  SET(POCO_UNIX_COMPILE_FLAGS "-D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE ${DEBUG_FLAG} -w")
-ENDIF(APPLE)
+# Uncomment from next two lines to force statitc or dynamic library, default is autodetection
+if(POCO_STATIC)
+    set( LIB_MODE STATIC )
+else(POCO_STATIC)
+    set( LIB_MODE SHARED )
+endif(POCO_STATIC)
 
-SET(POCO_UNIX_COMPILE_FLAGS "${POCO_UNIX_COMPILE_FLAGS}")
+# whether unit tests should be build
+set (POCO_ENABLE_TESTS FALSE CACHE BOOL "Build the Poco unit tests")
+  mark_as_advanced(POCO_ENABLE_TESTS)
+set(ENABLE_TESTS ${POCO_ENABLE_TESTS})
 
-SET(Poco_BUILD_TESTSUITES OFF CACHE BOOL "Build the Poco testsuites")
-MARK_AS_ADVANCED(Poco_BUILD_TESTSUITES)
+IF (ENABLE_TESTS)
+  ENABLE_TESTING()
+ENDIF (ENABLE_TESTS)
 
-ADD_SUBDIRECTORY(Foundation)
-ADD_SUBDIRECTORY(XML)
-ADD_SUBDIRECTORY(Util)
+# Set local include path
+#include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include)
+include_directories( CppUnit/include Foundation/include XML/include Util/include )
 
-IF(Poco_BUILD_TESTSUITES)
-  ADD_SUBDIRECTORY(CppUnit)
-ENDIF(Poco_BUILD_TESTSUITES)
+include(CheckTypeSize)
+include(FindCygwin)
+#include(FindOpenSSL)
+include(CMakeDetermineCompilerId)
+
+#include(contrib/cmake/FindMySQL.cmake)
+#include(contrib/cmake/FindAPR.cmake)
+#include(contrib/cmake/FindApache2.cmake)
+
+# OS Detection
+if(CMAKE_SYSTEM MATCHES "Windows")
+ add_definitions( -DPOCO_OS_FAMILY_WINDOWS )# -DPOCO_WIN32_UTF8)
+  set(SYSLIBS iphlpapi gdi32)
+endif(CMAKE_SYSTEM MATCHES "Windows")
+
+if (CMAKE_SYSTEM MATCHES "Linux")
+  add_definitions( -DPOCO_OS_FAMILY_UNIX )
+  # Standard 'must be' defines
+  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64)
+  set(SYSLIBS  pthread dl rt)
+endif(CMAKE_SYSTEM MATCHES "Linux")
+
+if (CMAKE_SYSTEM MATCHES "SunOS")
+  add_definitions( -DPOCO_OS_FAMILY_UNIX )
+  # Standard 'must be' defines
+  add_definitions( -D_XOPEN_SOURCE=500 -D_REENTRANT -D_THREAD_SAFE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
+  set(SYSLIBS  pthread socket xnet nsl resolv rt dl)
+endif(CMAKE_SYSTEM MATCHES "SunOS")
+
+if (CMAKE_COMPILER_IS_MINGW)
+    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+    add_definitions(-mno-cygwin -D_WIN32 -DMINGW32 -DWINVER=0x500 -DODBCVER=0x0300 -DPOCO_THREAD_STACK_SIZE -DFoundation_Config_INCLUDED )
+  #link_directories(/usr/local/lib /usr/lib)
+  #include_directories(/usr/local/include /usr/include)
+endif (CMAKE_COMPILER_IS_MINGW)
+
+if (CMAKE_COMPILER_IS_CYGWIN)
+#    add_definitions(-DWC_NO_BEST_FIT_CHARS=0x400)
+endif (CMAKE_COMPILER_IS_CYGWIN)
+
+# SunPro C++
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+  add_definitions( -D_BSD_SOURCE -library=stlport4)
+endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
+
+add_subdirectory(Foundation)
+add_subdirectory(XML)
+add_subdirectory(Util)
+#add_subdirectory(Net)
+
+#if(OPENSSL_FOUND)
+#    add_subdirectory(NetSSL_OpenSSL)
+#    add_subdirectory(Crypto)
+#endif(OPENSSL_FOUND)
+
+#add_subdirectory(Data)
+#add_subdirectory(WebWidgets)
+#add_subdirectory(Zip)
+
+if (ENABLE_TESTS)
+  add_subdirectory(CppUnit)
+  add_subdirectory(Foundation/testsuite)
+  add_subdirectory(XML/testsuite)
+  add_subdirectory(Util/testsuite)
+endif (ENABLE_TESTS)
+
+
+# Enable packaging
+
+INCLUDE(InstallRequiredSystemLibraries)
 

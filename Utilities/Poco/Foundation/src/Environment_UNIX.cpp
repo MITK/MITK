@@ -1,4 +1,4 @@
-//
+
 // Environment_UNIX.cpp
 //
 // $Id$
@@ -40,6 +40,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
+#include <sys/param.h>
 #include <cstring>
 
 

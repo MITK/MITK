@@ -49,7 +49,7 @@ IPresentablePart::Pointer PresentationSerializer::GetPart(const std::string& id)
 
     return result;
 
-  } catch (Poco::SyntaxException& e)
+  } catch (Poco::SyntaxException& /*e*/)
   {
   }
 

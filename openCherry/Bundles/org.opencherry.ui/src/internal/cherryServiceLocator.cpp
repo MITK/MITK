@@ -42,7 +42,7 @@ Object::Pointer ServiceLocator::ParentLocator::GetService(
     try {
       return locator.Lock()->GetService(key);
     }
-    catch (const BadWeakPointerException& e)
+    catch (const BadWeakPointerException& /*e*/)
     {
 
     }

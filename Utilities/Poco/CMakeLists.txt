@@ -51,7 +51,7 @@ include(CMakeDetermineCompilerId)
 
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
- add_definitions( -DPOCO_OS_FAMILY_WINDOWS -DPOCO_WIN32_UTF8)
+ add_definitions( -DPOCO_OS_FAMILY_WINDOWS )# -DPOCO_WIN32_UTF8)
   set(SYSLIBS iphlpapi gdi32)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 

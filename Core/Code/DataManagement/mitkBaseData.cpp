@@ -311,9 +311,10 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
+    Superclass::CopyInformation(data);
+   /* itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
       << typeid(data).name() << " to "
-      << typeid(Self*).name() );
+      << typeid(Self*).name() );*/
   }
 
 }

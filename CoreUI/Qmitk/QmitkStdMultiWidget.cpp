@@ -59,26 +59,23 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
   splitterBottom = new QSplitter( vSplit );
  
   //Create RenderWindows 1
-  mitkWidget1 = new QmitkRenderWindow();
+  mitkWidget1 = new QmitkRenderWindow(splitterUp);
   mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( TRANSVERSAL );
-  //m_RenderWindowLayout->addWidget( mitkWidget1, 0, 0 );
- 
+   
   //Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow();
+  mitkWidget2 = new QmitkRenderWindow(splitterUp);
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
-  //m_RenderWindowLayout->addWidget( mitkWidget2, 0, 1 );
- 
+   
   //Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow();
+  mitkWidget3 = new QmitkRenderWindow(splitterBottom);
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
-  //m_RenderWindowLayout->addWidget( mitkWidget3, 1, 0 );
-
+  
   //Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow();
+  mitkWidget4 = new QmitkRenderWindow(splitterBottom);
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   //m_RenderWindowLayout->addWidget( mitkWidget4, 1, 1 );

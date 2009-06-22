@@ -115,7 +115,8 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
     assert(output);
     const mitk::NavigationData* input = this->GetInput(i);
     assert(input);
-
+    if (input->IsDataValid() == false)  // don't add point if input is invalid
+      continue;
     mitk::PointSet::PointType pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
     output->InsertPoint(output->GetSize(), pos);  // add point with current position of input NavigationData to the output PointSet
     // \TODO: regard ringbuffersize

@@ -91,18 +91,19 @@ namespace mitk {
     /**
     * \brief Sets the mode of this filter.
     *
-    * See OperationMode for the behaviour in the different modes
+    * See OperationMode for the behavior in the different modes
     */
     virtual void SetOperationMode(OperationMode mode);
 
     /**
     * \brief returns the mode of this filter.
     *
-    * See OperationMode for the behaviour in the different modes
+    * See OperationMode for the behavior in the different modes
     */
     itkGetConstMacro(OperationMode, OperationMode);
 
-    //virtual void SetOperationMode(OperationMode mode);
+    
+    void GenerateOutputInformation() {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
 
   protected:
     NavigationDataToPointSetFilter();

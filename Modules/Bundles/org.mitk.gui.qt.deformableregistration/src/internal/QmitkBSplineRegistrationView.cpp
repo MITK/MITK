@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkBSplineRegistrationViewControls.h"
 #include "mitkBSplineRegistration.h"
 #include "itkImageFileReader.h"
-#include "mitkOptimizerParameters.h"
+
 
 typedef itk::Vector< float, 3 >       VectorType;
 typedef itk::Image< VectorType, 3 >   DeformationFieldType;
@@ -53,6 +53,9 @@ m_FixedNode(NULL), m_MovingNode(NULL)
               SIGNAL(clicked()), 
               (QObject*) this,
               SLOT(SelectDeformationField()) );
+
+  connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), m_Controls.m_OptimizerWidgetStack, SLOT(setCurrentIndex(int)));
+  connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), this, SLOT(OptimizerSelected(int)));
   
 }
 
@@ -61,6 +64,24 @@ QmitkBSplineRegistrationView::~QmitkBSplineRegistrationView()
 }
 
 
+void QmitkBSplineRegistrationView::OptimizerSelected(int optimizer)
+{
+  HideAllOptimizerFrames();
+  if(optimizer == 0)
+  {
+    m_Controls.m_LBFGSFrame->show();
+  }
+  else if(optimizer == 1)
+  {
+    m_Controls.m_GradientDescentFrame->show();
+  }
+}
+
+void QmitkBSplineRegistrationView::HideAllOptimizerFrames()
+{
+  m_Controls.m_LBFGSFrame->hide();
+  m_Controls.m_GradientDescentFrame->hide();
+}
 
 void QmitkBSplineRegistrationView::SelectDeformationField()
 { 
@@ -125,19 +146,10 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
     registration->SetInput(mimage);
     
     // Read out optimizer parameters from the interface
-    mitk::OptimizerParameters::Pointer optimizerParameters = mitk::OptimizerParameters::New();
-   
-    if(m_Controls.m_OptimizerSelector->currentText() == "LBFGSOptimizer")
-    {
-      optimizerParameters->SetOptimizer(mitk::OptimizerParameters::LBFGSOPTIMIZER);
-      optimizerParameters->SetGradientConvergenceToleranceLBFGS( m_Controls.m_GradConvTolerance->text().toFloat() );
-      optimizerParameters->SetLineSearchAccuracyLBFGS( m_Controls.m_LineSearchAccuracy->text().toFloat() );
-      optimizerParameters->SetDefaultStepLengthLBFGS( m_Controls.m_DefaultStepLength->text().toFloat() );
-      optimizerParameters->SetNumberOfIterationsLBFGS( m_Controls.m_FunctionEvaluations->text().toInt() );
-    }
+    setOptimizerParameters();    
 
     registration->SetNumberOfGridPoints( m_Controls.m_NumberOfGridNodes->text().toInt() );
-    registration->SetOptimizerParameters(optimizerParameters);
+    registration->SetOptimizerParameters(m_OptimizerParameters);
     registration->SetUpdateInputImage(true);
 
     if(m_Controls.m_SaveDeformFieldCheck->isChecked())
@@ -173,6 +185,25 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
   } 
 }
 
+void QmitkBSplineRegistrationView::setOptimizerParameters()
+{
+  m_OptimizerParameters = mitk::OptimizerParameters::New();
+
+  if(m_Controls.m_OptimizerSelector->currentText() == "LBFGSOptimizer")
+  {
+    m_OptimizerParameters->SetOptimizer(mitk::OptimizerParameters::LBFGSOPTIMIZER);
+    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS( m_Controls.m_GradConvTolerance->text().toFloat() );
+    m_OptimizerParameters->SetLineSearchAccuracyLBFGS( m_Controls.m_LineSearchAccuracy->text().toFloat() );
+    m_OptimizerParameters->SetDefaultStepLengthLBFGS( m_Controls.m_DefaultStepLength->text().toFloat() );
+    m_OptimizerParameters->SetNumberOfIterationsLBFGS( m_Controls.m_FunctionEvaluations->text().toInt() );
+  }
+  else if(m_Controls.m_OptimizerSelector->currentText() == "Gradient Descent")
+  {
+    m_OptimizerParameters->SetOptimizer(mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER);
+    m_OptimizerParameters->SetLearningRateGradientDescent( m_Controls.m_LearningRateGradientDescent->text().toFloat() );
+    m_OptimizerParameters->SetNumberOfIterationsGradientDescent (m_Controls.m_NumberOfIterationsGradientDescent->text().toInt() );
+  }
+}
 
 
 void QmitkBSplineRegistrationView::SetFixedNode( mitk::DataTreeNode * fixedNode )

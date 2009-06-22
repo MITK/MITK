@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>287</width>
-    <height>562</height>
+    <width>343</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -27,105 +27,188 @@
     <rect>
      <x>9</x>
      <y>9</y>
-     <width>269</width>
-     <height>201</height>
+     <width>325</width>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
     <string>Optimizer</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QStackedWidget" name="m_OptimizerWidgetStack">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>275</width>
-      <height>151</height>
+      <y>50</y>
+      <width>311</width>
+      <height>171</height>
      </rect>
     </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QComboBox" name="m_OptimizerSelector">
-       <item>
-        <property name="text">
-         <string>LBFGSOptimizer</string>
-        </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="m_LBFGS">
+     <widget class="QFrame" name="m_LBFGSFrame">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>10</y>
+        <width>295</width>
+        <height>145</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Gradient Convergence Tolerance</string>
+         </property>
+        </widget>
        </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Gradient Convergence Tolerance</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="m_GradConvTolerance">
-       <property name="text">
-        <string>0.00001</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Line Search Accuracy</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="m_LineSearchAccuracy">
-       <property name="text">
-        <string>0.9</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Default Step Length</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="m_DefaultStepLength">
-       <property name="text">
-        <string>1.0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Max # Function Evaluations</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="m_FunctionEvaluations">
-       <property name="text">
-        <string>1000</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="QCheckBox" name="m_TraceOn">
-       <property name="text">
-        <string>Print out information on every iteration step</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="m_GradConvTolerance">
+         <property name="text">
+          <string>0.00001</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Line Search Accuracy</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="m_LineSearchAccuracy">
+         <property name="text">
+          <string>0.9</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Default Step Length</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="m_DefaultStepLength">
+         <property name="text">
+          <string>1.0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Max # Function Evaluations</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="m_FunctionEvaluations">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QCheckBox" name="m_TraceOn">
+         <property name="text">
+          <string>Print out information on every iteration step</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="m_GradientDescent">
+     <widget class="QFrame" name="m_GradientDescentFrame">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>236</width>
+        <height>68</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Learning rate</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="m_LearningRateGradientDescent">
+         <property name="text">
+          <string>0.01</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Number of iterations</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="m_NumberOfIterationsGradientDescent">
+         <property name="text">
+          <string>100</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QComboBox" name="m_OptimizerSelector">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>25</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>LBFGSOptimizer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Gradient Descent</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>220</y>
-     <width>271</width>
-     <height>80</height>
+     <x>9</x>
+     <y>243</y>
+     <width>325</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="title">
@@ -161,16 +244,16 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>310</y>
-     <width>271</width>
-     <height>181</height>
+     <x>9</x>
+     <y>390</y>
+     <width>325</width>
+     <height>184</height>
     </rect>
    </property>
    <property name="title">
     <string>Deformation Field</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>

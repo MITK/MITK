@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkBSplineRegistrationViewControls.h"
 #include "qobject.h"
 #include "../DeformableregistrationDll.h"
+#include "mitkOptimizerParameters.h"
 
 
 /*!
@@ -65,13 +66,18 @@ protected slots:
    */
   void SelectDeformationField();
 
+  void OptimizerSelected(int optimizer);
+  void HideAllOptimizerFrames();
+
 
 protected:
   
   mitk::DataTreeNode* m_FixedNode;
   mitk::DataTreeNode* m_MovingNode;
+  mitk::OptimizerParameters::Pointer m_OptimizerParameters;
 
  
+  void setOptimizerParameters();
 };
 
 #endif

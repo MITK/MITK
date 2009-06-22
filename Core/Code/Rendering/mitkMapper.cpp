@@ -41,7 +41,7 @@ mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
 {
   itkDebugMacro("returning DataTreeNode address " << this->m_DataTreeNode );
   return this->m_DataTreeNode.GetPointer();
-} 
+}
 
 
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
@@ -113,7 +113,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   assert(node!=NULL);
 
   this->CalculateTimeStep( renderer );
-  
+
   //safety cause there are datatreenodes that have no defined data (video-nodes and root)
   unsigned int dataMTime = 0;
   mitk::BaseData::Pointer data = static_cast<mitk::BaseData *>(node->GetData());
@@ -126,7 +126,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
       (m_LastUpdateTime < GetMTime()) ||
       (m_LastUpdateTime < node->GetDataReferenceChangedTime()) ||
       (m_LastUpdateTime < dataMTime) ||
-      (m_LastUpdateTime < renderer->GetTimeStepUpdateTime())
+      (renderer && (m_LastUpdateTime < renderer->GetTimeStepUpdateTime()))
     )
   {
     this->GenerateData();

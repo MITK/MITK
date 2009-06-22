@@ -310,11 +310,11 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   }
   else
   {
-    // pointer could not be cast back down
-    Superclass::CopyInformation(data);
-   /* itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
+    // pointer could not be cast back down; this can be the case if your filters input
+    // and output objects differ in type; then you have to write your own GenerateOutputInformation method
+    itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
       << typeid(data).name() << " to "
-      << typeid(Self*).name() );*/
+      << typeid(Self*).name() );
   }
 
 }
@@ -346,3 +346,4 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
   else
     GetTimeSlicedGeometry()->Print(os, indent);
 }
+

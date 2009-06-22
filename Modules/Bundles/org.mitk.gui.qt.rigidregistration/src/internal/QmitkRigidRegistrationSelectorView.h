@@ -50,7 +50,7 @@ public:
     void SetMovingNode( mitk::DataTreeNode * movingNode );
     void SetMovingDimension(int dimension );
     int GetSelectedTransform();
-    void CalculateTransformation(unsigned int timestep);
+    void CalculateTransformation(unsigned int timestep = 0);
     void StopOptimization(bool stopOptimization);
 
   protected slots:

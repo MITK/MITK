@@ -311,6 +311,11 @@ void QmitkRigidRegistrationView::FixedSelected(int)
   }
   m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
   this->CheckCalculateEnabled();
+  if(this->GetActiveStdMultiWidget())
+  {
+    m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls.timeSlider, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromRigidRegistration");
+    connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
+  }
 }
 
 void QmitkRigidRegistrationView::MovingSelected(int)
@@ -391,11 +396,6 @@ void QmitkRigidRegistrationView::MovingSelected(int)
     m_Controls.m_ShowMovingImage->setEnabled(false);
   }
   this->CheckCalculateEnabled();
-  if(this->GetActiveStdMultiWidget())
-  {
-    m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls.timeSlider, GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromRigidRegistration");
-    connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
-  }
 }
 
 void QmitkRigidRegistrationView::reinitFixedClicked()
@@ -742,7 +742,7 @@ void QmitkRigidRegistrationView::CheckCalculateEnabled()
     && m_Controls.m_RigidTransform->tabText(m_Controls.m_RigidTransform->currentIndex()) != "Manual")
   {
     m_Controls.m_CalculateTransformation->setEnabled(true);
-    if (m_FixedDimension != m_MovingDimension || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
+    if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
     {
       m_Controls.m_CalculateTransformation->setEnabled(false);
     }
@@ -750,7 +750,7 @@ void QmitkRigidRegistrationView::CheckCalculateEnabled()
     {
       m_Controls.m_CalculateTransformation->setEnabled(false);
     }
-    else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && m_FixedDimension != 3)
+    else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && !(m_FixedDimension > 2))
     {
       m_Controls.m_CalculateTransformation->setEnabled(false);
     }

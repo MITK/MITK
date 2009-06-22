@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
+#include "mitkStringProperty.h"
 #include <iostream>
 
 /// \TODO DataTree based scene writing is deprecated and will be replaced by a new mechanism. Therefore

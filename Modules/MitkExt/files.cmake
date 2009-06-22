@@ -42,6 +42,7 @@ SET(CPP_FILES
   Algorithms/mitkPointSetToGeometryDataFilter.cpp
   Algorithms/mitkPolygonToRingFilter.cpp
   Algorithms/mitkProbeFilter.cpp
+  Algorithms/mitkPyramidalRegistrationMethod.cpp
   Algorithms/mitkRegistrationBase.cpp
   Algorithms/mitkRigidRegistrationObserver.cpp
   Algorithms/mitkRigidRegistrationPreset.cpp
@@ -178,3 +179,4 @@ IF(MITK_USE_TD_MOUSE)
 ENDIF(MITK_USE_TD_MOUSE)
 
 MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp ) 
+MITK_MULTIPLEX_PICTYPE( Algorithms/mitkPyramidalRegistrationMethod-TYPE.cpp ) 

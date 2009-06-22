@@ -17,8 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkDelegateProperty.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 mitk::DelegateProperty::DelegateProperty( const char* string ) 
 : mitk::StringProperty(string)
@@ -40,18 +38,6 @@ bool mitk::DelegateProperty::operator==(const DelegateProperty& property ) const
   if(other==NULL) return false;
 
   return other->m_Value==m_Value;
-}
-
-bool mitk::DelegateProperty::WriteXMLData( XMLWriter& xmlWriter )
-{
-  xmlWriter.WriteProperty( VALUE, m_Value );
-  return true;
-}
-
-bool mitk::DelegateProperty::ReadXMLData( XMLReader& xmlReader )
-{
-  xmlReader.GetAttribute( VALUE, m_Value );
-  return true;
 }
 
 mitk::DelegateProperty& mitk::DelegateProperty::operator=(const DelegateProperty& other)

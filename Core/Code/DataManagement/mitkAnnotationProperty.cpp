@@ -18,14 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAnnotationProperty.h"
 
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
-
-
-const char* mitk::AnnotationProperty::LABEL = "LABEL";
-const char* mitk::AnnotationProperty::POSITION = "POSITION";
-
-
 mitk::AnnotationProperty::AnnotationProperty()
 {
 }
@@ -105,20 +97,4 @@ std::string mitk::AnnotationProperty::GetValueAsString() const
 
   myStr << this->GetLabel() << this->GetPosition();
   return myStr.str(); 
-}
-
-
-bool mitk::AnnotationProperty::WriteXMLData( XMLWriter &xmlWriter )
-{
-  xmlWriter.WriteProperty( LABEL, m_Label );
-  xmlWriter.WriteProperty( POSITION, m_Position );
-  return true;
-}
-
-
-bool mitk::AnnotationProperty::ReadXMLData( XMLReader &xmlReader )
-{
-  xmlReader.GetAttribute( LABEL, m_Label );
-  xmlReader.GetAttribute( POSITION, m_Position );
-  return true;
 }

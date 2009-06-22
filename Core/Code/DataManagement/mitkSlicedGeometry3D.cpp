@@ -17,21 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSlicedGeometry3D.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 #include "mitkRotationOperation.h"
 #include "mitkPlaneOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
-
-const std::string
-  mitk::SlicedGeometry3D::DIRECTION_VECTOR = "DIRECTION_VECTOR";
-
-const std::string
-  mitk::SlicedGeometry3D::EVENLY_SPACED = "EVENLY_SPACED";
-
-const std::string
-  mitk::SlicedGeometry3D::SLICES = "SLICES";
 
 
 mitk::SlicedGeometry3D::SlicedGeometry3D()
@@ -692,91 +681,6 @@ mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const
     this->GetGeometry2D(0)->Print(os, indent);
   }
 }
-
-bool
-mitk::SlicedGeometry3D::WriteXMLData( XMLWriter& xmlWriter )
-{
-  Geometry3D::WriteXMLData( xmlWriter );
-
-  xmlWriter.WriteProperty( DIRECTION_VECTOR, m_DirectionVector );
-  xmlWriter.WriteProperty( EVENLY_SPACED, m_EvenlySpaced );
-  xmlWriter.WriteProperty( SLICES, (int) m_Slices );
-
-  if ( m_EvenlySpaced )
-  {  
-    if ( m_Geometry2Ds.size() > 0 )
-    {
-      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
-
-      if ( geometry2D.IsNotNull() )
-      {
-        geometry2D->WriteXML( xmlWriter );
-      }
-    }
-  }
-  else
-  {  
-    std::vector<Geometry2D::Pointer>::iterator i = m_Geometry2Ds.begin();
-    const std::vector<Geometry2D::Pointer>::iterator end = m_Geometry2Ds.end();
-  
-    while ( i != end )
-    {
-      if ( (*i).IsNotNull() )
-      {
-        (*i)->WriteXML( xmlWriter );
-      }
-      i++;
-    }
-  }
-  return true;
-}
-
-
-bool
-mitk::SlicedGeometry3D::ReadXMLData( XMLReader& xmlReader )
-{
-  Geometry3D::ReadXMLData( xmlReader );
-  xmlReader.GetAttribute( DIRECTION_VECTOR, m_DirectionVector );
-  xmlReader.GetAttribute( EVENLY_SPACED, m_EvenlySpaced );
-
-  int slices;
-  xmlReader.GetAttribute( "SLICES", slices );
-
-  m_Slices = slices;
-
-  if ( m_EvenlySpaced )
-  {
-    if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) )
-    {
-      Geometry2D::Pointer geometry2D = dynamic_cast< Geometry2D * >(
-        xmlReader.CreateObject().GetPointer() );
-
-      if ( geometry2D.IsNotNull() )
-      {
-        geometry2D->ReadXMLData( xmlReader );
-      }
-      InitializeEvenlySpaced( geometry2D, GetSlices() );
-      xmlReader.GotoParent();
-    }
-  } else if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) )
-  {
-    do {
-      Geometry2D::Pointer geometry2D = dynamic_cast< Geometry2D * >(
-        xmlReader.CreateObject().GetPointer() );
-      if ( geometry2D.IsNotNull() )
-      {
-        geometry2D->ReadXMLData( xmlReader );
-      }
-      m_Geometry2Ds.push_back( geometry2D );
-
-    } while ( xmlReader.GotoNext() );
-
-    xmlReader.GotoParent();
-  }
-
-  return false;
-}
-
 
 void
 mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)

@@ -185,34 +185,35 @@ namespace mitk {
 
   bool RigidRegistrationPreset::save()
   {
-    XMLWriter writer(m_XmlFileName.c_str());
-    return saveXML(writer);
+    //XMLWriter writer(m_XmlFileName.c_str());
+    //return saveXML(writer);
+    return false;
   }
 
-  bool RigidRegistrationPreset::saveXML(mitk::XMLWriter& xmlWriter)
-  {
-    xmlWriter.BeginNode("mitkRigidRegistrationPresets");
-    for( std::map<std::string, itk::Array<double> >::iterator iter = m_TransformValues.begin(); iter != m_TransformValues.end(); iter++ ) {
-      std::string item = ((*iter).first.c_str());
-      xmlWriter.BeginNode("preset");
-      xmlWriter.WriteProperty("NAME", item);
-      xmlWriter.BeginNode("transform");
-      this->saveTransformValues(xmlWriter, item);
-      xmlWriter.EndNode();
-      xmlWriter.BeginNode("metric");
-      this->saveMetricValues(xmlWriter, item);
-      xmlWriter.EndNode();
-      xmlWriter.BeginNode("optimizer");
-      this->saveOptimizerValues(xmlWriter, item);
-      xmlWriter.EndNode();
-      xmlWriter.BeginNode("interpolator");
-      this->saveInterpolatorValues(xmlWriter, item);
-      xmlWriter.EndNode();
-      xmlWriter.EndNode();
-    }
-    xmlWriter.EndNode();
-    return true;
-  }
+  //bool RigidRegistrationPreset::saveXML(mitk::XMLWriter& xmlWriter)
+  //{
+  //  xmlWriter.BeginNode("mitkRigidRegistrationPresets");
+  //  for( std::map<std::string, itk::Array<double> >::iterator iter = m_TransformValues.begin(); iter != m_TransformValues.end(); iter++ ) {
+  //    std::string item = ((*iter).first.c_str());
+  //    xmlWriter.BeginNode("preset");
+  //    xmlWriter.WriteProperty("NAME", item);
+  //    xmlWriter.BeginNode("transform");
+  //    this->saveTransformValues(xmlWriter, item);
+  //    xmlWriter.EndNode();
+  //    xmlWriter.BeginNode("metric");
+  //    this->saveMetricValues(xmlWriter, item);
+  //    xmlWriter.EndNode();
+  //    xmlWriter.BeginNode("optimizer");
+  //    this->saveOptimizerValues(xmlWriter, item);
+  //    xmlWriter.EndNode();
+  //    xmlWriter.BeginNode("interpolator");
+  //    this->saveInterpolatorValues(xmlWriter, item);
+  //    xmlWriter.EndNode();
+  //    xmlWriter.EndNode();
+  //  }
+  //  xmlWriter.EndNode();
+  //  return true;
+  //}
 
   bool RigidRegistrationPreset::newPresets(std::map<std::string, itk::Array<double> > newTransformValues, std::map<std::string, itk::Array<double> > newMetricValues,
     std::map<std::string, itk::Array<double> > newOptimizerValues, std::map<std::string, itk::Array<double> > newInterpolatorValues, std::string fileName)
@@ -228,296 +229,296 @@ namespace mitk {
     return save();
   }
 
-  void RigidRegistrationPreset::saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item)
-  {
-    itk::Array<double> transformValues = m_TransformValues[item];
-    double transform = transformValues[0];
-    xmlWriter.WriteProperty("TRANSFORM", transformValues[0]);
-    if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM || 
-          transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM || transform == mitk::TransformParameters::VERSORTRANSFORM ||
-          transform == mitk::TransformParameters::RIGID2DTRANSFORM || transform == mitk::TransformParameters::EULER2DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-    }
-    else if (transform == mitk::TransformParameters::AFFINETRANSFORM || transform == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("SCALE7", transformValues[8]);
-      xmlWriter.WriteProperty("SCALE8", transformValues[9]);
-      xmlWriter.WriteProperty("SCALE9", transformValues[10]);
-      xmlWriter.WriteProperty("SCALE10", transformValues[11]);
-      xmlWriter.WriteProperty("SCALE11", transformValues[12]);
-      xmlWriter.WriteProperty("SCALE12", transformValues[13]);
-     /* xmlWriter.WriteProperty("SCALE13", transformValues[14]);
-      xmlWriter.WriteProperty("SCALE14", transformValues[15]);
-      xmlWriter.WriteProperty("SCALE15", transformValues[16]);
-      xmlWriter.WriteProperty("SCALE16", transformValues[17]);*/
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[14]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[15]);
-    }
-    else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("SCALE7", transformValues[8]);
-      xmlWriter.WriteProperty("SCALE8", transformValues[9]);
-      xmlWriter.WriteProperty("SCALE9", transformValues[10]);
-      xmlWriter.WriteProperty("SCALE10", transformValues[11]);
-      xmlWriter.WriteProperty("SCALE11", transformValues[12]);
-      xmlWriter.WriteProperty("SCALE12", transformValues[13]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[14]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[15]);
-    }
-    else if (transform == mitk::TransformParameters::EULER3DTRANSFORM || transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM
-          || transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
-    }
-    else if (transform == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM || transform == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("SCALE7", transformValues[8]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[9]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[10]);
-    }
-    else if (transform == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("SCALE7", transformValues[8]);
-      xmlWriter.WriteProperty("SCALE8", transformValues[9]);
-      xmlWriter.WriteProperty("SCALE9", transformValues[10]);
-      xmlWriter.WriteProperty("SCALE10", transformValues[11]);
-      xmlWriter.WriteProperty("SCALE11", transformValues[12]);
-      xmlWriter.WriteProperty("SCALE12", transformValues[13]);
-      xmlWriter.WriteProperty("SCALE13", transformValues[14]);
-      xmlWriter.WriteProperty("SCALE14", transformValues[15]);
-      xmlWriter.WriteProperty("SCALE15", transformValues[16]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[17]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[18]);
-    }
-    else if (transform == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("ANGLE", transformValues[7]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
-    }
-    else if (transform == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE", transformValues[6]);
-      xmlWriter.WriteProperty("ANGLE", transformValues[7]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
-    }
-    else if (transform == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
-    {
-      xmlWriter.WriteProperty("USESCALES", transformValues[1]);
-      xmlWriter.WriteProperty("SCALE1", transformValues[2]);
-      xmlWriter.WriteProperty("SCALE2", transformValues[3]);
-      xmlWriter.WriteProperty("SCALE3", transformValues[4]);
-      xmlWriter.WriteProperty("SCALE4", transformValues[5]);
-      xmlWriter.WriteProperty("SCALE5", transformValues[6]);
-      xmlWriter.WriteProperty("SCALE6", transformValues[7]);
-      xmlWriter.WriteProperty("SCALE", transformValues[8]);
-      xmlWriter.WriteProperty("ANGLE", transformValues[9]);
-      xmlWriter.WriteProperty("USEINITIALIZER", transformValues[10]);
-      xmlWriter.WriteProperty("USEMOMENTS", transformValues[11]);
-    }
-  }
+  //void RigidRegistrationPreset::saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item)
+  //{
+  //  itk::Array<double> transformValues = m_TransformValues[item];
+  //  double transform = transformValues[0];
+  //  xmlWriter.WriteProperty("TRANSFORM", transformValues[0]);
+  //  if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM || 
+  //        transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM || transform == mitk::TransformParameters::VERSORTRANSFORM ||
+  //        transform == mitk::TransformParameters::RIGID2DTRANSFORM || transform == mitk::TransformParameters::EULER2DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::AFFINETRANSFORM || transform == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("SCALE7", transformValues[8]);
+  //    xmlWriter.WriteProperty("SCALE8", transformValues[9]);
+  //    xmlWriter.WriteProperty("SCALE9", transformValues[10]);
+  //    xmlWriter.WriteProperty("SCALE10", transformValues[11]);
+  //    xmlWriter.WriteProperty("SCALE11", transformValues[12]);
+  //    xmlWriter.WriteProperty("SCALE12", transformValues[13]);
+  //   /* xmlWriter.WriteProperty("SCALE13", transformValues[14]);
+  //    xmlWriter.WriteProperty("SCALE14", transformValues[15]);
+  //    xmlWriter.WriteProperty("SCALE15", transformValues[16]);
+  //    xmlWriter.WriteProperty("SCALE16", transformValues[17]);*/
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[14]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[15]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::RIGID3DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("SCALE7", transformValues[8]);
+  //    xmlWriter.WriteProperty("SCALE8", transformValues[9]);
+  //    xmlWriter.WriteProperty("SCALE9", transformValues[10]);
+  //    xmlWriter.WriteProperty("SCALE10", transformValues[11]);
+  //    xmlWriter.WriteProperty("SCALE11", transformValues[12]);
+  //    xmlWriter.WriteProperty("SCALE12", transformValues[13]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[14]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[15]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::EULER3DTRANSFORM || transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM
+  //        || transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM || transform == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("SCALE7", transformValues[8]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[9]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[10]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("SCALE7", transformValues[8]);
+  //    xmlWriter.WriteProperty("SCALE8", transformValues[9]);
+  //    xmlWriter.WriteProperty("SCALE9", transformValues[10]);
+  //    xmlWriter.WriteProperty("SCALE10", transformValues[11]);
+  //    xmlWriter.WriteProperty("SCALE11", transformValues[12]);
+  //    xmlWriter.WriteProperty("SCALE12", transformValues[13]);
+  //    xmlWriter.WriteProperty("SCALE13", transformValues[14]);
+  //    xmlWriter.WriteProperty("SCALE14", transformValues[15]);
+  //    xmlWriter.WriteProperty("SCALE15", transformValues[16]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[17]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[18]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("ANGLE", transformValues[7]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE", transformValues[6]);
+  //    xmlWriter.WriteProperty("ANGLE", transformValues[7]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[8]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[9]);
+  //  }
+  //  else if (transform == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
+  //  {
+  //    xmlWriter.WriteProperty("USESCALES", transformValues[1]);
+  //    xmlWriter.WriteProperty("SCALE1", transformValues[2]);
+  //    xmlWriter.WriteProperty("SCALE2", transformValues[3]);
+  //    xmlWriter.WriteProperty("SCALE3", transformValues[4]);
+  //    xmlWriter.WriteProperty("SCALE4", transformValues[5]);
+  //    xmlWriter.WriteProperty("SCALE5", transformValues[6]);
+  //    xmlWriter.WriteProperty("SCALE6", transformValues[7]);
+  //    xmlWriter.WriteProperty("SCALE", transformValues[8]);
+  //    xmlWriter.WriteProperty("ANGLE", transformValues[9]);
+  //    xmlWriter.WriteProperty("USEINITIALIZER", transformValues[10]);
+  //    xmlWriter.WriteProperty("USEMOMENTS", transformValues[11]);
+  //  }
+  //}
 
-  void RigidRegistrationPreset::saveMetricValues(mitk::XMLWriter& xmlWriter, std::string item)
-  {
-    itk::Array<double> metricValues = m_MetricValues[item];
-    double metric = metricValues[0];
-    xmlWriter.WriteProperty("METRIC", metricValues[0]);
-    xmlWriter.WriteProperty("COMPUTEGRADIENT", metricValues[1]);
-    if (metric == mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC
-        || metric == mitk::MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC
-        || metric == mitk::MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC)
-    {
-    }
-    else if (metric == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
-    {
-      xmlWriter.WriteProperty("HISTOGRAMBINS", metricValues[2]);
-    }
-    else if (metric == mitk::MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
-    {
-      xmlWriter.WriteProperty("USESAMPLING", metricValues[2]);
-      xmlWriter.WriteProperty("SPATIALSAMPLES", metricValues[3]);
-      xmlWriter.WriteProperty("HISTOGRAMBINS", metricValues[4]);
-    }
-    else if (metric == mitk::MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC)
-    {
-      xmlWriter.WriteProperty("LAMBDA", metricValues[2]);
-    }
-    else if (metric == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC)
-    {
-      xmlWriter.WriteProperty("SPATIALSAMPLES", metricValues[2]);
-      xmlWriter.WriteProperty("FIXEDSTANDARDDEVIATION", metricValues[3]);
-      xmlWriter.WriteProperty("MOVINGSTANDARDDEVIATION", metricValues[4]);
-      xmlWriter.WriteProperty("USENORMALIZERANDSMOOTHER", metricValues[5]);
-      xmlWriter.WriteProperty("FIXEDSMOOTHERVARIANCE", metricValues[6]);
-      xmlWriter.WriteProperty("MOVINGSMOOTHERVARIANCE", metricValues[7]);
-    }
-  }
+  //void RigidRegistrationPreset::saveMetricValues(mitk::XMLWriter& xmlWriter, std::string item)
+  //{
+  //  itk::Array<double> metricValues = m_MetricValues[item];
+  //  double metric = metricValues[0];
+  //  xmlWriter.WriteProperty("METRIC", metricValues[0]);
+  //  xmlWriter.WriteProperty("COMPUTEGRADIENT", metricValues[1]);
+  //  if (metric == mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC
+  //      || metric == mitk::MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC
+  //      || metric == mitk::MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC)
+  //  {
+  //  }
+  //  else if (metric == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC
+  //    || metric == mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC
+  //    || metric == mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC
+  //    || metric == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC
+  //    || metric == mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
+  //  {
+  //    xmlWriter.WriteProperty("HISTOGRAMBINS", metricValues[2]);
+  //  }
+  //  else if (metric == mitk::MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
+  //  {
+  //    xmlWriter.WriteProperty("USESAMPLING", metricValues[2]);
+  //    xmlWriter.WriteProperty("SPATIALSAMPLES", metricValues[3]);
+  //    xmlWriter.WriteProperty("HISTOGRAMBINS", metricValues[4]);
+  //  }
+  //  else if (metric == mitk::MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC)
+  //  {
+  //    xmlWriter.WriteProperty("LAMBDA", metricValues[2]);
+  //  }
+  //  else if (metric == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC)
+  //  {
+  //    xmlWriter.WriteProperty("SPATIALSAMPLES", metricValues[2]);
+  //    xmlWriter.WriteProperty("FIXEDSTANDARDDEVIATION", metricValues[3]);
+  //    xmlWriter.WriteProperty("MOVINGSTANDARDDEVIATION", metricValues[4]);
+  //    xmlWriter.WriteProperty("USENORMALIZERANDSMOOTHER", metricValues[5]);
+  //    xmlWriter.WriteProperty("FIXEDSMOOTHERVARIANCE", metricValues[6]);
+  //    xmlWriter.WriteProperty("MOVINGSMOOTHERVARIANCE", metricValues[7]);
+  //  }
+  //}
 
-  void RigidRegistrationPreset::saveOptimizerValues(mitk::XMLWriter& xmlWriter, std::string item)
-  {
-    itk::Array<double> optimizerValues = m_OptimizerValues[item];
-    double optimizer = optimizerValues[0];
-    xmlWriter.WriteProperty("OPTIMIZER", optimizerValues[0]);
-    xmlWriter.WriteProperty("MAXIMIZE", optimizerValues[1]);
-    if (optimizer == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[2]);
-      xmlWriter.WriteProperty("NUMBEROFSTEPS", optimizerValues[3]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER
-            || optimizer == mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("LEARNINGRATE", optimizerValues[2]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[3]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
-    {
-    }
-    else if (optimizer == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("SHRINKFACTOR", optimizerValues[2]);
-      xmlWriter.WriteProperty("GROWTHFACTOR", optimizerValues[3]);
-      xmlWriter.WriteProperty("EPSILON", optimizerValues[4]);
-      xmlWriter.WriteProperty("INITIALRADIUS", optimizerValues[5]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[6]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::POWELLOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[2]);
-      xmlWriter.WriteProperty("STEPTOLERANCE", optimizerValues[3]);
-      xmlWriter.WriteProperty("VALUETOLERANCE", optimizerValues[4]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::FRPROPTIMIZER)
-    {
-      xmlWriter.WriteProperty("USEFLETCHREEVES", optimizerValues[2]);
-      xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[3]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[4]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::REGULARSTEPGRADIENTDESCENTOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("GRADIENTMAGNITUDETOLERANCE", optimizerValues[2]);
-      xmlWriter.WriteProperty("MINSTEPLENGTH", optimizerValues[3]);
-      xmlWriter.WriteProperty("MAXSTEPLENGTH", optimizerValues[4]);
-      xmlWriter.WriteProperty("RELAXATIONFACTOR", optimizerValues[5]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[6]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER || optimizer == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("GRADIENTMAGNITUDETOLERANCE", optimizerValues[2]);
-      xmlWriter.WriteProperty("MINSTEPLENGTH", optimizerValues[3]);
-      xmlWriter.WriteProperty("MAXSTEPLENGTH", optimizerValues[4]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::AMOEBAOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("SIMPLEXDELTA1", optimizerValues[2]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA2", optimizerValues[3]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA3", optimizerValues[4]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA4", optimizerValues[5]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA5", optimizerValues[6]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA6", optimizerValues[7]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA7", optimizerValues[8]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA8", optimizerValues[9]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA9", optimizerValues[10]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA10", optimizerValues[11]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA11", optimizerValues[12]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA12", optimizerValues[13]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA13", optimizerValues[14]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA14", optimizerValues[15]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA15", optimizerValues[16]);
-      xmlWriter.WriteProperty("SIMPLEXDELTA16", optimizerValues[17]);
-      xmlWriter.WriteProperty("PARAMETERSCONVERGENCETOLERANCE", optimizerValues[18]);
-      xmlWriter.WriteProperty("FUNCTIONCONVERGENCETOLERANCE", optimizerValues[19]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[20]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::CONJUGATEGRADIENTOPTIMIZER)
-    {
-    }
-    else if (optimizer == mitk::OptimizerParameters::LBFGSOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("GRADIENTCONVERGENCETOLERANCE", optimizerValues[2]);
-      xmlWriter.WriteProperty("LINESEARCHACCURACY", optimizerValues[3]);
-      xmlWriter.WriteProperty("DEFAULTSTEPLENGTH", optimizerValues[4]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
-      xmlWriter.WriteProperty("USETRACE", optimizerValues[6]);
-    }
-    else if (optimizer == mitk::OptimizerParameters::SPSAOPTIMIZER)
-    {
-      xmlWriter.WriteProperty("a", optimizerValues[2]);
-      xmlWriter.WriteProperty("A", optimizerValues[3]);
-      xmlWriter.WriteProperty("ALPHA", optimizerValues[4]);
-      xmlWriter.WriteProperty("c", optimizerValues[5]);
-      xmlWriter.WriteProperty("GAMMA", optimizerValues[6]);
-      xmlWriter.WriteProperty("TOLERANCE", optimizerValues[7]);
-      xmlWriter.WriteProperty("STATEOFCONVERGENCEDECAYRATE", optimizerValues[8]);
-      xmlWriter.WriteProperty("MINNUMBERITERATIONS", optimizerValues[9]);
-      xmlWriter.WriteProperty("NUMBERPERTURBATIONS", optimizerValues[10]);
-      xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[11]);
-    }
-  }
+  //void RigidRegistrationPreset::saveOptimizerValues(mitk::XMLWriter& xmlWriter, std::string item)
+  //{
+  //  itk::Array<double> optimizerValues = m_OptimizerValues[item];
+  //  double optimizer = optimizerValues[0];
+  //  xmlWriter.WriteProperty("OPTIMIZER", optimizerValues[0]);
+  //  xmlWriter.WriteProperty("MAXIMIZE", optimizerValues[1]);
+  //  if (optimizer == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("NUMBEROFSTEPS", optimizerValues[3]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER
+  //          || optimizer == mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("LEARNINGRATE", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[3]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
+  //  {
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("SHRINKFACTOR", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("GROWTHFACTOR", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("EPSILON", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("INITIALRADIUS", optimizerValues[5]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[6]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::POWELLOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("STEPTOLERANCE", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("VALUETOLERANCE", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::FRPROPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("USEFLETCHREEVES", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("STEPLENGTH", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[4]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::REGULARSTEPGRADIENTDESCENTOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("GRADIENTMAGNITUDETOLERANCE", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("MINSTEPLENGTH", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("MAXSTEPLENGTH", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("RELAXATIONFACTOR", optimizerValues[5]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[6]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER || optimizer == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("GRADIENTMAGNITUDETOLERANCE", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("MINSTEPLENGTH", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("MAXSTEPLENGTH", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::AMOEBAOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA1", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA2", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA3", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA4", optimizerValues[5]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA5", optimizerValues[6]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA6", optimizerValues[7]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA7", optimizerValues[8]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA8", optimizerValues[9]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA9", optimizerValues[10]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA10", optimizerValues[11]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA11", optimizerValues[12]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA12", optimizerValues[13]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA13", optimizerValues[14]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA14", optimizerValues[15]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA15", optimizerValues[16]);
+  //    xmlWriter.WriteProperty("SIMPLEXDELTA16", optimizerValues[17]);
+  //    xmlWriter.WriteProperty("PARAMETERSCONVERGENCETOLERANCE", optimizerValues[18]);
+  //    xmlWriter.WriteProperty("FUNCTIONCONVERGENCETOLERANCE", optimizerValues[19]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[20]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::CONJUGATEGRADIENTOPTIMIZER)
+  //  {
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::LBFGSOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("GRADIENTCONVERGENCETOLERANCE", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("LINESEARCHACCURACY", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("DEFAULTSTEPLENGTH", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[5]);
+  //    xmlWriter.WriteProperty("USETRACE", optimizerValues[6]);
+  //  }
+  //  else if (optimizer == mitk::OptimizerParameters::SPSAOPTIMIZER)
+  //  {
+  //    xmlWriter.WriteProperty("a", optimizerValues[2]);
+  //    xmlWriter.WriteProperty("A", optimizerValues[3]);
+  //    xmlWriter.WriteProperty("ALPHA", optimizerValues[4]);
+  //    xmlWriter.WriteProperty("c", optimizerValues[5]);
+  //    xmlWriter.WriteProperty("GAMMA", optimizerValues[6]);
+  //    xmlWriter.WriteProperty("TOLERANCE", optimizerValues[7]);
+  //    xmlWriter.WriteProperty("STATEOFCONVERGENCEDECAYRATE", optimizerValues[8]);
+  //    xmlWriter.WriteProperty("MINNUMBERITERATIONS", optimizerValues[9]);
+  //    xmlWriter.WriteProperty("NUMBERPERTURBATIONS", optimizerValues[10]);
+  //    xmlWriter.WriteProperty("NUMBERITERATIONS", optimizerValues[11]);
+  //  }
+  //}
 
-  void RigidRegistrationPreset::saveInterpolatorValues(mitk::XMLWriter& xmlWriter, std::string item)
-  {
-    itk::Array<double> interpolatorValues = m_InterpolatorValues[item];
-    xmlWriter.WriteProperty("INTERPOLATOR", interpolatorValues[0]);
-  }
+  //void RigidRegistrationPreset::saveInterpolatorValues(mitk::XMLWriter& xmlWriter, std::string item)
+  //{
+  //  itk::Array<double> interpolatorValues = m_InterpolatorValues[item];
+  //  xmlWriter.WriteProperty("INTERPOLATOR", interpolatorValues[0]);
+  //}
 
   itk::Array<double> RigidRegistrationPreset::loadTransformValues(itk::Array<double> transformValues, double transform, const char **atts)
   {

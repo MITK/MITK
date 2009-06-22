@@ -27,8 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 namespace mitk {
 
@@ -116,10 +114,6 @@ class GenericLookupTableProperty : public BaseProperty
       return *this;
      }
 
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
   protected:
     GenericLookupTableProperty() {}
     GenericLookupTableProperty(ValueType *x) : m_Value(x) {}
@@ -127,20 +121,6 @@ class GenericLookupTableProperty : public BaseProperty
     
     typename ValueType::Pointer m_Value;
 };
-
-template <class T>
-bool GenericLookupTableProperty<T>::WriteXMLData( XMLWriter& /*xmlWriter*/ )
-{
-  //TODO: implement writer for generic lookup tables (c.f. mitkLookupTableProperty)
-  return true;
-}
-
-template <class T>
-bool GenericLookupTableProperty<T>::ReadXMLData( XMLReader& /*xmlReader*/ )
-{
-  //TODO: implement reader for generic lookup tables (c.f. mitkLookupTableProperty)
-  return true;
-}
 
 } // namespace mitk
 

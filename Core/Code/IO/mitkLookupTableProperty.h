@@ -55,9 +55,6 @@ namespace mitk {
 
     void SetLookupTable(const mitk::LookupTable::Pointer aLookupTable);
 
-    virtual bool WriteXMLData(XMLWriter &xmlWriter);
-
-    virtual bool ReadXMLData(XMLReader &xmlReader);
   };
 
 } // namespace mitk

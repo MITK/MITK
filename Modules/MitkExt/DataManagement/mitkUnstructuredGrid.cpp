@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUnstructuredGrid.h"
 #include "mitkBaseProcess.h"
 #include "vtkUnstructuredGrid.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 #include "mitkUnstructuredGridVtkWriter.h"
 #include "mitkDataTreeNodeFactory.h"
 #include <vtkUnstructuredGridWriter.h>
@@ -228,79 +226,4 @@ void mitk::UnstructuredGrid::Update()
     }
   }
   Superclass::Update();
-}
-
-
-bool mitk::UnstructuredGrid::WriteXMLData( XMLWriter& xmlWriter )
-{
-  BaseData::WriteXMLData( xmlWriter );
-  std::string fileName = xmlWriter.GetRelativePath();
-
-  if(xmlWriter.IsFileExtension(".vtk", fileName))
-  {
-    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
-    if(xmlWriter.SaveSourceFiles()){
-      mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::Pointer writer = mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::New();
-      writer->SetInput( this );
-      fileName = xmlWriter.GetAbsolutePath();
-      if(!xmlWriter.IsFileExtension(".vtk", fileName))
-        fileName += ".vtk";
-      writer->SetFileName( fileName.c_str() );
-      writer->Write();
-    }
-  }
-  else
-  {
-    if(!xmlWriter.IsFileExtension(".vtu", fileName))
-      fileName += ".vtu";
-    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
-    if(xmlWriter.SaveSourceFiles()){
-      mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::Pointer writer = mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::New();
-      writer->SetInput( this );
-      fileName = xmlWriter.GetAbsolutePath();
-      if(!xmlWriter.IsFileExtension(".stl", fileName))
-        fileName += ".stl";
-      writer->SetFileName( fileName.c_str() );
-      writer->Write();
-    }
-  }
-  return true;
-}
-
-
-bool mitk::UnstructuredGrid::ReadXMLData( XMLReader& xmlReader )
-{
-  BaseData::ReadXMLData( xmlReader );
-  std::string fileName;
-  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-
-  LOG_INFO << fileName << std::endl;
-
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-  try
-  {
-    factory->SetFileName( fileName.c_str() );
-    factory->Update();
-    mitk::DataTreeNode::Pointer tmpNode = factory->GetOutput( 0 );
-
-    if ( tmpNode.IsNull() )
-      return false;
-
-    mitk::UnstructuredGrid::Pointer tmpUG = dynamic_cast<mitk::UnstructuredGrid*>(tmpNode->GetData());
-
-    if ( tmpUG )
-      SetVtkUnstructuredGrid( tmpUG->GetVtkUnstructuredGrid() );
-
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open: " << ex );
-    return false;
-  }
-
-  
-  return true;
 }

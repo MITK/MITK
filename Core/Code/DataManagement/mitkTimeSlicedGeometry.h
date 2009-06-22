@@ -94,9 +94,6 @@ public:
   //## @brief Convert time step to time in ms
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
   //##Documentation
   //## @brief Completely initialize this instance as evenly-timed with
   //## \a timeSteps geometries of type Geometry3D, each initialized by

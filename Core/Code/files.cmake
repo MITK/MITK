@@ -111,7 +111,7 @@ SET(CPP_FILES
   DataManagement/mitkVtkScalarModeProperty.cpp
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
-  DataManagement/mitkXMLIO.cpp
+  #DataManagement/mitkXMLIO.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
@@ -133,7 +133,7 @@ SET(CPP_FILES
   Interactions/mitkStateMachineFactory.cpp
   Interactions/mitkTransition.cpp
   IO/mitkBaseDataIOFactory.cpp
-  IO/mitkBaseXMLWriter.cpp
+  #IO/mitkBaseXMLWriter.cpp
   IO/mitkFileReader.cpp
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
@@ -170,8 +170,8 @@ SET(CPP_FILES
   IO/mitkVtkImageReader.cpp
   IO/mitkVtkSurfaceIOFactory.cpp
   IO/mitkVtkSurfaceReader.cpp
-  IO/mitkXMLReader.cpp
-  IO/mitkXMLWriter.cpp
+  #IO/mitkXMLReader.cpp
+  #IO/mitkXMLWriter.cpp
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp

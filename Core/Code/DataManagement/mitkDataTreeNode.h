@@ -42,7 +42,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 #include <set>
 #include "mitkLevelWindow.h"
-#include "mitkXMLIO.h"
 
 class vtkLinearTransform;
 
@@ -62,7 +61,7 @@ class BaseRenderer;
 //##
 //## @warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
 //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
-class MITK_CORE_EXPORT DataTreeNode : public itk::DataObject, public XMLIO
+class MITK_CORE_EXPORT DataTreeNode : public itk::DataObject
 {
 public:
 
@@ -467,15 +466,6 @@ public:
   //## @brief Tests, if the interactor is already added to mitk::GlobalInteraction
   //##
   virtual bool IsInteractorEnabled() const;
-
-  //##
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
-  virtual const std::string& GetXMLNodeName() const;
-
-  static const std::string XML_NODE_NAME;
 
 protected:
   DataTreeNode();

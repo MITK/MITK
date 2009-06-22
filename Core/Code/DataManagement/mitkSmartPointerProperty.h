@@ -55,9 +55,6 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     
     virtual BaseProperty& operator=(const BaseProperty& property);
 
-    /// XML input
-    virtual bool ReadXMLData(XMLReader&);
-
     static void PostProcessXMLReading();
 
     /// Return the number of SmartPointerProperties that reference the object given as parameter
@@ -65,8 +62,6 @@ class MITK_CORE_EXPORT SmartPointerProperty : public BaseProperty
     static std::string GetReferenceUIDFor(itk::Object*);
     static void RegisterPointerTarget(itk::Object*, const std::string uid);
 
-    static const char* XML_SMARTPOINTER_TARGET_NODE;
-    static const char* XML_SMARTPOINTER_TARGET_KEY;
 
   protected:
     

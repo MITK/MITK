@@ -59,15 +59,8 @@ public:
   virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
 
 protected:
-  static const char *LABEL;
-  static const char *POSITION;
 
   std::string m_Label;
   Point3D m_Position;

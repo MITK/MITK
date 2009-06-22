@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObject.h"
 #include "mitkLevelWindow.h"
 #include "itkWeakPointer.h"
-#include "mitkXMLIO.h"
 
 //Just included to get VTK version
 #include <vtkConfigure.h>
@@ -44,7 +43,7 @@ namespace mitk {
   //## that interface to the graphics library (e.g., OpenGL, vtk). 
   //## @todo Should Mapper be a subclass of ImageSource?
   //## @ingroup Mapper
-  class MITK_CORE_EXPORT Mapper : public itk::Object, public XMLIO
+  class MITK_CORE_EXPORT Mapper : public itk::Object
   {
   public:
 
@@ -125,9 +124,6 @@ namespace mitk {
     */
     virtual void ReleaseGraphicsResources(vtkWindow*) { };
 
-    //##Documentation
-    virtual const std::string& GetXMLNodeName() const;
-
     /** \brief Set default values of properties used by this mapper
     * to \a node
     *
@@ -167,9 +163,6 @@ namespace mitk {
     //##Documentation
     //## @brief timestamp of last update of stored data
     itk::TimeStamp m_LastUpdateTime;
-
-    //##Documentation
-    static const std::string XML_NODE_NAME;
 
   private:
 

@@ -57,15 +57,8 @@ public:
   virtual bool operator==(const BaseProperty& property ) const;
   virtual std::string GetValueAsString() const;
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
 
 protected:
-  static const char *ORIGIN;
-  static const char *NORMAL;
 
   bool m_ClippingEnabled;
   

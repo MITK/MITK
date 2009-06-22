@@ -179,8 +179,6 @@ public:
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
   static const std::string SLICES;
   const static std::string DIRECTION_VECTOR;
   const static std::string EVENLY_SPACED;
@@ -271,8 +269,6 @@ protected:
 
   ScalarType GetLargestExtent( const Geometry3D *geometry );
 
-
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
 
   virtual void InitializeGeometry(Self * newGeometry) const;
 

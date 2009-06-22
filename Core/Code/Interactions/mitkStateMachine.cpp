@@ -26,12 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAction.h"
 #include "mitkUndoController.h"
 #include <itkMacro.h>
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
-
-const std::string mitk::StateMachine::XML_NODE_NAME = "stateMachine";
-const std::string mitk::StateMachine::STATE_MACHINE_TYPE = "STATE_MACHINE_TYPE";
-const std::string mitk::StateMachine::STATE_ID = "STATE_ID";
 
 
 /**
@@ -243,34 +237,6 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
   default:
     ;
   }
-}
-
-bool mitk::StateMachine::WriteXMLData( XMLWriter& xmlWriter )
-{
-  xmlWriter.WriteProperty( STATE_MACHINE_TYPE, GetType() );
-  xmlWriter.WriteProperty( STATE_ID, GetCurrentState()->GetId() );
-  return true;
-}
-
-bool mitk::StateMachine::ReadXMLData( XMLReader& xmlReader )
-{
-  std::string stateMachineType;
-  int stateId;
-
-  if ( xmlReader.GetAttribute( STATE_MACHINE_TYPE, stateMachineType ) && xmlReader.GetAttribute( STATE_ID, stateId ) )
-  {
-    m_CurrentStateVector[m_TimeStep] = StateMachineFactory::GetState( stateMachineType.c_str(), stateId );
-
-    if ( m_CurrentStateVector[m_TimeStep].IsNotNull() )
-      return true;
-  }
-
-  return false;
-}
-
-const std::string& mitk::StateMachine::GetXMLNodeName() const
-{
-  return XML_NODE_NAME;
 }
 
 void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)

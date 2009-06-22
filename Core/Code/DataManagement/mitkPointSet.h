@@ -220,8 +220,6 @@ public:
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
   virtual bool VerifyRequestedRegion();
   virtual void SetRequestedRegion(itk::DataObject *data);
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  virtual bool ReadXMLData( XMLReader& xmlReader );
 
   //Method for subclasses
   virtual void OnPointSetChange(){};

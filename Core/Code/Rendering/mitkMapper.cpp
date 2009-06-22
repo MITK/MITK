@@ -21,8 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkProperties.h"
 
-const std::string mitk::Mapper::XML_NODE_NAME = "mapper";
-
 mitk::Mapper::Mapper()
   : m_VtkBased( true ), m_TimeStep( 0 )
 {
@@ -136,11 +134,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   }
 
   this->GenerateData(renderer);
-}
-
-const std::string& mitk::Mapper::GetXMLNodeName() const
-{
-  return XML_NODE_NAME;
 }
 
 void mitk::Mapper::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)

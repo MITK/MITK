@@ -21,8 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationActor.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 #include "mitkPointSetWriter.h"
 #include "mitkPointSetReader.h"
 #include "mitkRenderingManager.h"
@@ -617,52 +615,4 @@ bool mitk::PointSet::VerifyRequestedRegion()
 
 void mitk::PointSet::SetRequestedRegion( itk::DataObject * )
 {
-}
-
-bool mitk::PointSet::WriteXMLData( XMLWriter& xmlWriter )
-{
-  BaseData::WriteXMLData( xmlWriter );
-  std::string fileName = xmlWriter.GetRelativePath();
-  if(!xmlWriter.IsFileExtension(".mps", fileName))
-    fileName += ".mps";
-  
-  if(xmlWriter.SaveSourceFiles()){
-    PointSetWriter::Pointer writer = PointSetWriter::New();
-    fileName = xmlWriter.GetAbsolutePath();
-    if(!xmlWriter.IsFileExtension(".mps", fileName))
-      fileName += ".mps";
-    writer->SetFileName( fileName.c_str() );
-    writer->SetInput( this );
-    writer->Update();
-  }
-  xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-  return true;
-}
-
-bool mitk::PointSet::ReadXMLData( XMLReader& xmlReader )
-{
-  BaseData::ReadXMLData( xmlReader );
-
-  std::string fileName;
-  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-
-  if ( fileName.empty() )
-    return false;
-
-  PointSetReader::Pointer reader = PointSetReader::New();
-  reader->SetFileName( fileName.c_str() );
-  reader->Update();
-  mitk::PointSet::Pointer psp =
-    dynamic_cast<mitk::PointSet*>( reader->GetOutput() );
-  if (psp.IsNotNull())
-  {
-    m_PointSetSeries[0] = psp->GetPointSet();
-  }
-
-  if ( m_PointSetSeries[0].IsNull() )
-  {
-    return false;
-  }
-
-  return true;
 }

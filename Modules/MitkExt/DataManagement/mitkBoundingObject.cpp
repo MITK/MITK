@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBoundingObject.h"
 #include "mitkBaseProcess.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 
 mitk::BoundingObject::BoundingObject()
   : Surface(), m_Positive(true)
@@ -51,19 +49,4 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
     size[i] = aGeometry3D->GetExtentInMM(i)/2.0;
   GetGeometry()->SetSpacing( size );
   GetTimeSlicedGeometry()->UpdateInformation();
-}
-
-bool mitk::BoundingObject::WriteXMLData( XMLWriter& xmlWriter )
-{
-  Surface::WriteXMLData( xmlWriter );
-  xmlWriter.WriteProperty("Positive", m_Positive );  
-  return true;
-}
-
-
-bool mitk::BoundingObject::ReadXMLData( XMLReader& xmlReader )
-{
-  Surface::ReadXMLData( xmlReader );
-  xmlReader.GetAttribute("Positive", m_Positive );  
-  return true;
 }

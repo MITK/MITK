@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometryData.h"
 #include "mitkBaseProcess.h"
-#include "mitkXMLReader.h"
 
 mitk::GeometryData::GeometryData()
 {
@@ -60,29 +59,6 @@ void mitk::GeometryData::SetRequestedRegion(itk::DataObject *)
 
 void mitk::GeometryData::CopyInformation(const itk::DataObject *)
 {
-}
-
-bool mitk::GeometryData::WriteXMLData( XMLWriter& xmlWriter )
-{
-  mitk::Geometry3D* geometry = GetGeometry();
-
-  if ( geometry )
-    geometry->WriteXML( xmlWriter );
-
-  return true;
-}
-  
-bool mitk::GeometryData::ReadXMLData( XMLReader& xmlReader )
-{
-  if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) 
-  {
-    Geometry3D::Pointer geometry = dynamic_cast<mitk::Geometry3D*>( xmlReader.CreateObject().GetPointer() );
-    if ( geometry.IsNotNull() ) geometry->ReadXMLData( xmlReader );
-    SetGeometry(geometry);
-    xmlReader.GotoParent();
-  }
-
-  return true;
 }
 
 

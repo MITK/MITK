@@ -219,8 +219,6 @@ public:
 
   virtual AffineGeometryFrame3D::Pointer Clone() const;
 
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
   /**
    * \brief Set the geometrical frame of reference in which this Geometry2D
    * is placed.
@@ -245,11 +243,6 @@ protected:
   virtual void InitializeGeometry(Self * newGeometry) const;
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
-
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-  static std::string SCALAR_FACTOR_MM_PRT_UNIT_X;
-  static std::string SCALAR_FACTOR_MM_PRT_UNIT_Y;
 
   /**
    * \brief factor to convert x-coordinates from mm to units and vice versa

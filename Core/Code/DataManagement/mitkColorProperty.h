@@ -71,10 +71,6 @@ public:
   void SetColor(const mitk::Color & color );
   void SetColor( float red, float green, float blue );
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
 };
 
 } // namespace mitk

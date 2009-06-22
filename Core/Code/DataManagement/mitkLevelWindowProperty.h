@@ -54,10 +54,6 @@ public:
 
     virtual std::string GetValueAsString() const;
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
 };
 
 } // namespace mitk

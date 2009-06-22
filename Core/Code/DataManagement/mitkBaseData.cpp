@@ -18,16 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseData.h"
 #include "mitkBaseProcess.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 #include <itkObjectFactoryBase.h>
 #include <itkSmartPointerForwardReference.txx>
 
 //template class itk::SmartPointerForwardReference<mitk::BaseProcess>;
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
-
-const std::string mitk::BaseData::XML_NODE_NAME = "data";
 
 mitk::BaseData::BaseData() : 
   m_RequestedRegionInitialized(false), m_SmartSourcePointer(NULL), 
@@ -348,28 +344,4 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << "NULL" << std::endl;
   else
     GetTimeSlicedGeometry()->Print(os, indent);
-}
-
-bool mitk::BaseData::WriteXMLData( XMLWriter& xmlWriter ) 
-{
-  if ( m_TimeSlicedGeometry )
-    this->m_TimeSlicedGeometry->WriteXML( xmlWriter );
-
-  return true;
-}
-
-bool mitk::BaseData::ReadXMLData( XMLReader& xmlReader ) 
-{
-  if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) 
-  {
-    this->m_TimeSlicedGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( xmlReader.CreateObject().GetPointer() );
-    if ( this->m_TimeSlicedGeometry.IsNotNull() ) this->m_TimeSlicedGeometry->ReadXMLData( xmlReader );
-    xmlReader.GotoParent();
-  }
-  return true;
-}
-
-const std::string& mitk::BaseData::GetXMLNodeName() const
-{ 
-  return XML_NODE_NAME;
 }

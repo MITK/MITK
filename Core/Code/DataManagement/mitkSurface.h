@@ -88,12 +88,6 @@ namespace mitk {
       return m_RequestedRegion;
     }
 
-    //## 
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    //##
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
     void CalculateBoundingBox();
 
   virtual void ExecuteOperation(Operation *operation);

@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkBaseProcess.h"
 #include "vtkPolyData.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 #include <vtkPolyDataWriter.h>
 //#include <vtkPolyDataReader.h>
 #include <vtkSTLWriter.h>
@@ -262,78 +260,6 @@ void mitk::Surface::Expand( unsigned int timeSteps )
     m_PolyDataSeries.resize( timeSteps, pdnull );
     m_CalculateBoundingBox = true;
   }
-}
-
-bool mitk::Surface::WriteXMLData( XMLWriter& xmlWriter )
-{
-  BaseData::WriteXMLData( xmlWriter );
-  std::string fileName = xmlWriter.GetRelativePath();
-
-  if(xmlWriter.IsFileExtension(".vtk", fileName))
-  {
-    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
-    if(xmlWriter.SaveSourceFiles()){
-      mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-      writer->SetInput( this );
-      fileName = xmlWriter.GetAbsolutePath();
-      if(!xmlWriter.IsFileExtension(".vtk", fileName))
-        fileName += ".vtk";
-      writer->SetFileName( fileName.c_str() );
-      writer->Write();
-    }
-  }
-  else
-  {
-    if(!xmlWriter.IsFileExtension(".stl", fileName))
-      fileName += ".stl";
-    xmlWriter.WriteProperty( XMLReader::FILENAME, fileName.c_str() );
-
-    if(xmlWriter.SaveSourceFiles()){
-      mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer = mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-      writer->SetInput( this );
-      fileName = xmlWriter.GetAbsolutePath();
-      if(!xmlWriter.IsFileExtension(".stl", fileName))
-        fileName += ".stl";
-      writer->SetFileName( fileName.c_str() );
-      writer->Write();
-    }
-  }
-  return true;
-}
-
-bool mitk::Surface::ReadXMLData( XMLReader& xmlReader )
-{
-  BaseData::ReadXMLData( xmlReader );
-  std::string fileName;
-  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-
-  LOG_INFO << fileName << std::endl;
-
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-  try
-  {
-    factory->SetFileName( fileName.c_str() );
-    factory->Update();
-    mitk::DataTreeNode::Pointer tmpNode = factory->GetOutput( 0 );
-
-    if ( tmpNode.IsNull() )
-      return false;
-
-    mitk::Surface::Pointer tmpSurface = dynamic_cast<mitk::Surface*>(tmpNode->GetData());
-
-    if ( tmpSurface )
-      SetVtkPolyData( tmpSurface->GetVtkPolyData() );
-
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open: " << ex );
-    return false;
-  }
-
-  return true;
 }
 
 void mitk::Surface::ExecuteOperation(Operation *operation)

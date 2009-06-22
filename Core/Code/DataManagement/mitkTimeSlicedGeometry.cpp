@@ -17,11 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkTimeSlicedGeometry.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
-
-const std::string mitk::TimeSlicedGeometry::EVENLY_TIMED = "EVENLY_TIMED";
-const std::string mitk::TimeSlicedGeometry::TIME_STEPS = "TIME_STEPS";
 
 void mitk::TimeSlicedGeometry::UpdateInformation()
 {
@@ -357,56 +352,6 @@ void mitk::TimeSlicedGeometry::PrintSelf(std::ostream& os, itk::Indent indent) c
     os << "NULL" << std::endl;
   else
     GetGeometry3D(0)->Print(os, indent);
-}
-
-
-bool mitk::TimeSlicedGeometry::WriteXMLData( XMLWriter& xmlWriter )
-{
-  Geometry3D::WriteXMLData( xmlWriter );
-
-  xmlWriter.WriteProperty( EVENLY_TIMED, m_EvenlyTimed );
-
-  xmlWriter.WriteProperty( TIME_STEPS, (int) m_TimeSteps );
-
-  std::vector<Geometry3D::Pointer>::iterator i = m_Geometry3Ds.begin();
-  const std::vector<Geometry3D::Pointer>::iterator end = m_Geometry3Ds.end();
-
-  while ( i != end )
-  {
-    (*i)->WriteXML( xmlWriter );
-    i++;
-  }
-
-  return true;
-}
-
-bool mitk::TimeSlicedGeometry::ReadXMLData( XMLReader& xmlReader )
-{ 
-  Geometry3D::ReadXMLData( xmlReader );
-  xmlReader.GetAttribute( EVENLY_TIMED, m_EvenlyTimed ); 
-  int timeSteps = -1;
-  xmlReader.GetAttribute( TIME_STEPS, timeSteps );
-  m_TimeSteps = timeSteps;
-
-  if ( m_EvenlyTimed )
-  {
-    if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) {
-      Geometry3D::Pointer geometry3D = dynamic_cast<mitk::Geometry3D*>( xmlReader.CreateObject().GetPointer() );
-      if ( geometry3D.IsNotNull() ) geometry3D->ReadXMLData( xmlReader );
-      InitializeEvenlyTimed( geometry3D, GetTimeSteps() );
-      xmlReader.GotoParent();
-    }
-  } else if ( xmlReader.Goto( Geometry3D::XML_NODE_NAME ) ) {
-
-    do {
-      Geometry3D::Pointer geometry3D = dynamic_cast<mitk::Geometry3D*>( xmlReader.CreateObject().GetPointer() );
-      if ( geometry3D.IsNotNull() ) geometry3D->ReadXMLData( xmlReader );
-      m_Geometry3Ds.push_back( geometry3D );
-    } while ( xmlReader.GotoNext() );
-    xmlReader.GotoParent();
-  }
-
-  return true;
 }
 
 void mitk::TimeSlicedGeometry::ExecuteOperation(Operation* operation)

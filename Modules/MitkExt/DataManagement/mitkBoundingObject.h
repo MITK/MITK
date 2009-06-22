@@ -40,8 +40,6 @@ public:
   itkGetMacro(Positive, bool);
   itkSetMacro(Positive, bool);
   itkBooleanMacro(Positive);
-  bool ReadXMLData( XMLReader& xmlReader );
-
 
   //##Documentation
   //## @brief Sets the Geometry3D of the bounding object to fit the given

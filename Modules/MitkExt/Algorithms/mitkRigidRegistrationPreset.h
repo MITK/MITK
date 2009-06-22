@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRIGIDREGISTRATIONPRESET_H_HEADER
 
 #include <vtkXMLParser.h>
-#include <mitkXMLWriter.h>
 #include <map>
 #include <string>
 #include <itkArray.h>
@@ -108,7 +107,7 @@ namespace mitk {
       /**
       * \brief Saves all preset attributes to xml file.
       */
-      bool saveXML(mitk::XMLWriter& xmlWriter);
+      //bool saveXML(mitk::XMLWriter& xmlWriter);
       /**
       * \brief Saves all preset attributes to xml file.
       */
@@ -116,19 +115,19 @@ namespace mitk {
       /**
       * \brief Saves the transform values for one preset to the xml file.
       */
-      void saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item);
+      //void saveTransformValues(mitk::XMLWriter& xmlWriter, std::string item);
       /**
       * \brief Saves the metric values for one preset to the xml file.
       */
-      void saveMetricValues(mitk::XMLWriter& xmlWriter, std::string item);
+      //void saveMetricValues(mitk::XMLWriter& xmlWriter, std::string item);
       /**
       * \brief Saves the optimizer values for one preset to the xml file.
       */
-      void saveOptimizerValues(mitk::XMLWriter& xmlWriter, std::string item);
+      //void saveOptimizerValues(mitk::XMLWriter& xmlWriter, std::string item);
       /**
       * \brief Saves the interpolator values for one preset to the xml file.
       */
-      void saveInterpolatorValues(mitk::XMLWriter& xmlWriter, std::string item);
+      //void saveInterpolatorValues(mitk::XMLWriter& xmlWriter, std::string item);
 
       /**
       * \brief Loads the transform values for one preset from the xml file.

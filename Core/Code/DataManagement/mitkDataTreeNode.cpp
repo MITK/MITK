@@ -30,15 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
 #include "mitkRenderingManager.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 #include "mitkGlobalInteraction.h"
 #include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
 
 #include "mitkCoreObjectFactory.h"
 
-const std::string mitk::DataTreeNode::XML_NODE_NAME = "dataTreeNode";
 
 mitk::Mapper* mitk::DataTreeNode::GetMapper(MapperSlotId id) const
 {
@@ -451,150 +448,6 @@ unsigned long mitk::DataTreeNode::GetMTime() const
     }
   }
   return time;
-}
-
-bool mitk::DataTreeNode::WriteXMLData( XMLWriter& xmlWriter ) 
-{
-  xmlWriter.BeginNode( SmartPointerProperty::XML_SMARTPOINTER_TARGET_NODE );
-  if ( SmartPointerProperty::GetReferenceCountFor(this) > 0 )
-  {
-    xmlWriter.WriteProperty( SmartPointerProperty::XML_SMARTPOINTER_TARGET_KEY, SmartPointerProperty::GetReferenceUIDFor(this) );
-  }
-  xmlWriter.EndNode();
-
-  // PropertyLists
-  MapOfPropertyLists::iterator i = m_MapOfPropertyLists.begin();
-  const MapOfPropertyLists::iterator end = m_MapOfPropertyLists.end();
-
-  while ( i != end )
-  {
-    mitk::PropertyList* propertyList = (*i).second;
-
-    if ( propertyList != NULL && propertyList->GetMap()->size() > 0 )
-    {
-      xmlWriter.BeginNode("renderer");
-
-      if ( (*i).first != NULL )
-        xmlWriter.WriteProperty( "RENDERE_NAME", (*i).first->GetName() );
-      else
-        xmlWriter.WriteProperty( "rendererName", "" );
-
-      if ( propertyList )
-        propertyList->WriteXML( xmlWriter );
-
-      xmlWriter.EndNode(); // Renderer
-    }
-    i++;
-  }
-
-  mitk::PropertyList* propertyList = GetPropertyList();
-
-  if ( propertyList )
-    propertyList->WriteXML( xmlWriter );
-
-  // Data
-  BaseData* data = GetData();
-
-  if ( data )
-    data->WriteXML( xmlWriter );
-
-  // mapperList
-  xmlWriter.BeginNode("mapperList");
-  int mappercount = m_Mappers.size();
-
-  for ( int i=0; i<mappercount; i++ )
-  {
-    mitk::Mapper* mapper = GetMapper( i );
-
-    if ( mapper )
-    {
-      xmlWriter.BeginNode("mapperSlot");
-      xmlWriter.WriteProperty( "id", i );
-      mapper->WriteXML( xmlWriter );
-      xmlWriter.EndNode(); // mapperSlot
-    }
-  }
-  xmlWriter.EndNode(); // mapperList
-
-  // Interactor
-  Interactor::Pointer interactor = GetInteractor();
-
-  if ( interactor.IsNotNull() )
-    interactor->WriteXML( xmlWriter );
-  
-  return true;    
-}
-
-bool mitk::DataTreeNode::ReadXMLData( XMLReader& xmlReader ) 
-{
-  if ( xmlReader.Goto( BaseData::XML_NODE_NAME ) ) {
-    m_Data = dynamic_cast<mitk::BaseData*>( xmlReader.CreateObject().GetPointer() );
-    if ( m_Data.IsNotNull() ) m_Data->ReadXMLData( xmlReader );
-    xmlReader.GotoParent();
-  }
-  if ( xmlReader.Goto( SmartPointerProperty::XML_SMARTPOINTER_TARGET_NODE ) ) {
-    std::string uid;
-    if ( xmlReader.GetAttribute( SmartPointerProperty::XML_SMARTPOINTER_TARGET_KEY, uid ) )
-    {
-      SmartPointerProperty::RegisterPointerTarget( this, uid );
-    }
-    xmlReader.GotoParent();
-  }
-  if ( xmlReader.Goto( Interactor::XML_NODE_NAME ) ) {
-    m_Interactor = dynamic_cast<mitk::Interactor*>( xmlReader.CreateObject().GetPointer() );
-    if ( m_Interactor.IsNotNull() ) 
-    {
-      m_Interactor->ReadXMLData( xmlReader );
-      m_Interactor->SetDataTreeNode( this );
-      mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
-    }
-    xmlReader.GotoParent();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-
-  if ( xmlReader.Goto( PropertyList::XML_NODE_NAME ) ) {
-    m_PropertyList = dynamic_cast<mitk::PropertyList*>( xmlReader.CreateObject().GetPointer() );
-    if ( m_PropertyList.IsNotNull() ) m_PropertyList->ReadXMLData( xmlReader );
-    xmlReader.GotoParent();
-  }
-
-  // additional property settings prevent update problems
-  // the advantage to manipulate the property path here is that you get the SourceFilePath from relative - negative is that the XML file contains old information
-  mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( xmlReader.GetSourceFilePath() );
-  this->SetProperty( StringProperty::PATH, pathProp );
-  // fixes the update problem of colorProperty and materialProperty
-  mitk::MaterialProperty::Pointer material = dynamic_cast<mitk::MaterialProperty*>(m_PropertyList->GetProperty("material"));
-  if(material)
-    material->SetDataTreeNode(this);
-
-  if ( xmlReader.Goto( "mapperList" ) ) {
-
-    if ( xmlReader.Goto( "mapperSlot" ) ) {
-    
-      do{
-        int id = -1;
-        xmlReader.GetAttribute( "id", id );
-
-        if ( xmlReader.Goto( "mapper" ) ) {
-          Mapper::Pointer mapper = dynamic_cast<mitk::Mapper*>( xmlReader.CreateObject().GetPointer() );
-          if ( mapper.IsNotNull() ) {
-            mapper->ReadXMLData( xmlReader );
-            SetMapper( id, mapper );
-          }
-          xmlReader.GotoParent();
-        }
-      
-      }while ( xmlReader.GotoNext() );
-      xmlReader.GotoParent();
-    }
-    xmlReader.GotoParent();
-  }
-  return true;
-}
-
-const std::string& mitk::DataTreeNode::GetXMLNodeName() const
-{
-  return XML_NODE_NAME;
 }
 
 void mitk::DataTreeNode::SetSelected(bool selected, mitk::BaseRenderer* renderer)

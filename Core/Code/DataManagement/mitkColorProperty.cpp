@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <sstream>
 #include "mitkColorProperty.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 mitk::ColorProperty::ColorProperty() 
 : m_Color()
@@ -120,31 +118,4 @@ std::string mitk::ColorProperty::GetValueAsString() const {
 const mitk::Color & mitk::ColorProperty::GetValue() const
 {
     return GetColor();
-}
-
-bool mitk::ColorProperty::WriteXMLData( XMLWriter& xmlWriter )
-{
-  mitk::Point3D value;
-  value[0] = m_Color[0];
-  value[1] = m_Color[1];
-  value[2] = m_Color[2];
-  xmlWriter.WriteProperty( VALUE, value );
-  return true;
-}
-
-bool mitk::ColorProperty::ReadXMLData( XMLReader& xmlReader )
-{
-  mitk::Point3D value;
-
-  if ( xmlReader.GetAttribute( VALUE, value ) )
-  {
-    mitk::Color color;
-    color[0] = value[0];
-    color[1] = value[1];
-    color[2] = value[2];
-    SetColor( color );
-    //LOG_INFO << "read mitk::ColorProperty: " << GetValueAsString () << std::endl;
-    return true;
-  }
-  return false;
 }

@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkLookupTable.h"
 #include <itkDataObject.h>
 #include <itkObjectFactory.h>
-#include <mitkXMLIO.h>
 
 class vtkColorTransferFunction;
 class vtkPiecewiseFunction;
@@ -36,7 +35,7 @@ namespace mitk
 //## @brief LookupTable containing a vtkLookupTable
 //## @ingroup Data
 //##
-class MITK_CORE_EXPORT LookupTable : public itk::DataObject, public XMLIO
+class MITK_CORE_EXPORT LookupTable : public itk::DataObject
 {
 public:
     /** 
@@ -118,34 +117,7 @@ public:
     void CreateOpacityTransferFunction(vtkPiecewiseFunction*& opacityFunction);
     void CreateGradientTransferFunction(vtkPiecewiseFunction*& gradientFunction);
 
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
-    static const std::string XML_NODE_NAME;
-    static const std::string TABLE_RANGE;
-    static const std::string TABLE_VALUE;
-    static const std::string NUMBER_OF_COLORS;
-    static const std::string TABLE_LOWER_RANGE;
-    static const std::string TABLE_UPPER_RANGE;
-    static const std::string VALUE_RANGE;
-    static const std::string VALUE_LOWER_RANGE;
-    static const std::string VALUE_UPPER_RANGE;
-    static const std::string HUE_RANGE;
-    static const std::string HUE_LOWER_RANGE;
-    static const std::string HUE_UPPER_RANGE;
-    static const std::string SATURATION_RANGE;
-    static const std::string SATURATION_LOWER_RANGE;
-    static const std::string SATURATION_UPPER_RANGE;
-    static const std::string ALPHA_RANGE;
-    static const std::string ALPHA_LOWER_RANGE;
-    static const std::string ALPHA_UPPER_RANGE;
-    static const std::string SCALE;
-    static const std::string RAMP;
-
 protected:
-
-    virtual const std::string& GetXMLNodeName() const;
 
     vtkLookupTable* m_LookupTable;
 

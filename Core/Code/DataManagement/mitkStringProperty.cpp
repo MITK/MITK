@@ -17,11 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkStringProperty.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 const char* mitk::StringProperty::PATH = "path";
-
 mitk::StringProperty::StringProperty( const char* string ) 
 : m_Value()
 {
@@ -47,18 +44,6 @@ bool mitk::StringProperty::operator==(const BaseProperty& property ) const
 std::string mitk::StringProperty::GetValueAsString() const 
 {
   return m_Value;
-}
-
-bool mitk::StringProperty::WriteXMLData( XMLWriter& xmlWriter )
-{
-  xmlWriter.WriteProperty( VALUE, m_Value );
-  return true;
-}
-
-bool mitk::StringProperty::ReadXMLData( XMLReader& xmlReader )
-{
-  xmlReader.GetAttribute( VALUE, m_Value );
-  return true;
 }
 
 bool mitk::StringProperty::Assignable(const BaseProperty& other) const

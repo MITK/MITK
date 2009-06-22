@@ -17,13 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkDataTree.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 #include <mitkSmartPointerProperty.h>
 #include <mitkProperties.h>
-
-const std::string mitk::DataTree::XML_NODE_NAME = "mitkDataTree";
-const std::string mitk::DataTree::XML_TAG_TREE_NODE = "treeNode";
 
 mitk::DataTree::DataTree() : 
 DataTreeBase( )
@@ -298,74 +293,4 @@ mitk::TimeBounds mitk::DataTree::ComputeTimeBounds(mitk::DataTreeIteratorBase* i
   }
 
   return timeBounds;
-}
-
-bool mitk::DataTree::Load( const mitk::DataTreeIteratorBase* it, const char* filename )
-{
-  PropertyList::PrepareXML_IO(); // to get "shared" properties right  
-  bool result = XMLReader::Load( filename, it );
-  SmartPointerProperty::PostProcessXMLReading(); // to get "shared" properties right  
-
-  return result;
-}
-
-bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, const char* fileName, bool writeRootNodeToo ) 
-{
-  if ( fileName == NULL || it == NULL || it->IsAtEnd() )
-    return false;
-  
-  XMLWriter writer( fileName );
-
-  if ( !Save( it, writer, writeRootNodeToo ) )
-    writer.WriteComment( "Error" );
-
-  return true;
-}
-
-bool mitk::DataTree::SaveNext( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo ) 
-{
-  if ( it == NULL || it->IsAtEnd() )
-    return false;
-
-  DataTreeNode* node = it->Get();
-  xmlWriter.BeginNode(XML_TAG_TREE_NODE);
-
-  if (node) 
-  {
-
-    if (writeRootNodeToo)
-    {
-      StringProperty* sprop = dynamic_cast<StringProperty*>( node->GetProperty("FILENAME"));
-      if (sprop) // if this property is set, then use it as a filename
-      {
-        xmlWriter.SetSourceFileName( sprop->GetValue() );      
-      }
-
-      node->WriteXML( xmlWriter );
-    }
-
-    if ( it->HasChild() ) 
-    {
-      DataTreeChildIterator children(*it);
-
-      while (!children.IsAtEnd())
-      {
-        SaveNext( &children, xmlWriter, true );
-        ++children;
-      }
-    }
-  }
-
-  xmlWriter.EndNode(); // TreeNode
-
-  return true;
-}
-
-bool mitk::DataTree::Save( const mitk::DataTreeIteratorBase* it, mitk::XMLWriter& xmlWriter, bool writeRootNodeToo ) 
-{
-  PropertyList::PrepareXML_IO(); // to get "shared" properties right  
-  xmlWriter.BeginNode(XML_NODE_NAME);
-  bool result = SaveNext( it, xmlWriter, writeRootNodeToo );
-  xmlWriter.EndNode(); // mitkDataTree
-  return result;
 }

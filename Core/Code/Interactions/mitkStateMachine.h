@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include "mitkState.h"
 #include "mitkUndoModel.h"
-#include <mitkXMLIO.h>
 
 namespace mitk {
 
@@ -127,7 +126,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
   map and call the appropriate method in your derived class.
 
 **/
-  class MITK_CORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor, public XMLIO
+  class MITK_CORE_EXPORT StateMachine : public itk::Object, public mitk::OperationActor
   {
 
   public:
@@ -175,17 +174,6 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     **/
     friend class UndoModel;
 
-    /**
-    * @brief To be able to save a StateMachine to an xml-file.
-    **/
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    /**
-    * @brief To be able to read a StateMachine from an xml-file.
-    **/
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
-    static const std::string XML_NODE_NAME;
 
   protected:
     /**
@@ -270,11 +258,6 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * @brief Current TimeStep if the data which is to be interacted on, has more than 1 TimeStep
     **/
     unsigned int m_TimeStep;
-
-    virtual const std::string& GetXMLNodeName() const;
-
-    static const std::string STATE_MACHINE_TYPE;
-    static const std::string STATE_ID;
 
   private:
     /**

@@ -56,10 +56,7 @@ namespace mitk {
 
       bool Assignable(const BaseProperty& other) const;
       virtual BaseProperty& operator=(const BaseProperty& other);
-
-      virtual bool WriteXMLData( XMLWriter& xmlWriter );
-      virtual bool ReadXMLData( XMLReader& xmlReader );
-
+      
       static const char* PATH;
   };
 

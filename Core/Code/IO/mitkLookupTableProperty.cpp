@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkLookupTableProperty.h"
-#include <mitkXMLReader.h>
 
 mitk::LookupTableProperty::LookupTableProperty()
 {
@@ -59,31 +58,4 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
     }
           
 //    LOG_INFO << "setting LUT property OK! " << std::endl;    
-}
-
-bool mitk::LookupTableProperty::WriteXMLData(XMLWriter &xmlWriter)
-{
-    m_LookupTable->WriteXML( xmlWriter );
-    return true;
-}
-
-bool mitk::LookupTableProperty::ReadXMLData(XMLReader &xmlReader)
-{
-  int value;
-
-  if ( xmlReader.Goto( mitk::LookupTable::XML_NODE_NAME ) ) {
-    mitk::LookupTable::Pointer lookupTable = dynamic_cast<LookupTable*>(xmlReader.CreateObject().GetPointer()); 
-    lookupTable->GetVtkLookupTable()->Allocate();
-    lookupTable->GetVtkLookupTable()->Build();
-    if (xmlReader.GetAttribute(mitk::LookupTable::NUMBER_OF_COLORS, value))
-      lookupTable->GetVtkLookupTable()->SetNumberOfColors(value);
-    if (xmlReader.GetAttribute(mitk::LookupTable::SCALE, value))
-      lookupTable->GetVtkLookupTable()->SetScale(value);
-    if (xmlReader.GetAttribute(mitk::LookupTable::RAMP, value))
-      lookupTable->GetVtkLookupTable()->SetRamp(value);
-    lookupTable->ReadXMLData(xmlReader);
-    xmlReader.GotoParent(); // now we are back on tag <lookupTable>
-    xmlReader.GotoParent(); // now we are back on tag <property>
-  }
-return true;
 }

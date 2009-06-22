@@ -22,17 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
 //#include "mitkStatusBar.h"
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
 
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
-
-const std::string mitk::Geometry3D::XML_NODE_NAME = "geometry";
-const std::string mitk::Geometry3D::INDEX_TO_OBJECT_TRANSFORM = "INDEX_TO_OBJECT_TRANSFORM";
-const std::string mitk::Geometry3D::OBJECT_TO_NODE_TRANSFORM = "OBJECT_TO_NODE_TRANSFORM";
-const std::string mitk::Geometry3D::INDEX_TO_NODE_TRANSFORM = "INDEX_TO_NODE_TRANSFORM";
-const std::string mitk::Geometry3D::INDEX_TO_WORLD_TRANSFORM = "INDEX_TO_WORLD_TRANSFORM";
 
 // Standard constructor for the New() macro. Sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D()
@@ -488,42 +480,6 @@ const char* mitk::Geometry3D::GetTransformAsString( TransformType* transformType
 
   return buffer;
 }
-
-bool mitk::Geometry3D::WriteXMLData( XMLWriter& xmlWriter )
-{
-  if ( m_IndexToObjectTransform.IsNotNull() )
-    xmlWriter.WriteProperty( INDEX_TO_OBJECT_TRANSFORM, GetTransformAsString( m_IndexToObjectTransform.GetPointer() ) );
-
-  if ( m_ObjectToNodeTransform.IsNotNull() )
-    xmlWriter.WriteProperty( OBJECT_TO_NODE_TRANSFORM, GetTransformAsString( m_ObjectToNodeTransform.GetPointer() ) );
-
-  if ( m_IndexToNodeTransform.IsNotNull() )
-    xmlWriter.WriteProperty( INDEX_TO_NODE_TRANSFORM, GetTransformAsString( m_IndexToNodeTransform.GetPointer() ) );
-
-  if ( m_IndexToWorldTransform.IsNotNull() )
-    xmlWriter.WriteProperty( INDEX_TO_WORLD_TRANSFORM, GetTransformAsString( m_IndexToWorldTransform.GetPointer() ) );  
-
-  return true;
-}
-
-bool mitk::Geometry3D::ReadXMLData( XMLReader& xmlReader ) 
-{ 
-  xmlReader.GetAttribute( INDEX_TO_OBJECT_TRANSFORM, *m_IndexToObjectTransform.GetPointer() );
-  xmlReader.GetAttribute( OBJECT_TO_NODE_TRANSFORM, *m_ObjectToNodeTransform.GetPointer() );
-  xmlReader.GetAttribute( INDEX_TO_NODE_TRANSFORM, *m_IndexToNodeTransform.GetPointer() );
-  xmlReader.GetAttribute( INDEX_TO_WORLD_TRANSFORM, *m_IndexToWorldTransform.GetPointer() );
-  TransferItkToVtkTransform();
-  return true;
-}
-
-/**
- *
- */
-const std::string& mitk::Geometry3D::GetXMLNodeName() const
-{
-  return XML_NODE_NAME;
-}
-
 
 void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
 {

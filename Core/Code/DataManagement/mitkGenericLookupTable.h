@@ -27,11 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVector.h"
 #include "mitkCommon.h"
-#include "mitkXMLIO.h"
 
-
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 namespace mitk {
 
@@ -48,7 +44,7 @@ namespace mitk {
  * tables to mappers to configure the rendering process.
  */
 template <typename T>
-class GenericLookupTable : public itk::DataObject, public XMLIO
+class GenericLookupTable : public itk::DataObject
 {
   public:
 
@@ -104,30 +100,11 @@ class GenericLookupTable : public itk::DataObject, public XMLIO
       }
     }
 
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
   protected:
     GenericLookupTable() {}
-    
-    
+        
     LookupTableType m_LookupTable;
 };
-
-template <class T>
-bool GenericLookupTable<T>::WriteXMLData( XMLWriter& xmlWriter )
-{
-  //TODO
-  return true;
-}
-
-template <class T>
-bool GenericLookupTable<T>::ReadXMLData( XMLReader& xmlReader )
-{
-  //TODO
-  return true;
-}
 
 } // namespace mitk
 

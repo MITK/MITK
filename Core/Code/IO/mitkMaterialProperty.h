@@ -403,10 +403,6 @@ public:
      */
     itkGetConstMacro( Name, std::string );
 
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-
 protected:
 
   /**

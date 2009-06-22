@@ -514,11 +514,6 @@ public:
   //## @warning for internal use only
   virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  //##
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  //##
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
   template < typename ItkImageType >
     friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 

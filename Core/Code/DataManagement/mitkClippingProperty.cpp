@@ -18,16 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkClippingProperty.h"
 
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
-
 
 namespace mitk
 {
-
-const char* ClippingProperty::ORIGIN = "ORIGIN";
-const char* ClippingProperty::NORMAL = "NORMAL";
-
 
 ClippingProperty::ClippingProperty()
 : m_ClippingEnabled( false )
@@ -98,23 +91,5 @@ std::string ClippingProperty::GetValueAsString() const
   myStr << this->GetOrigin() << this->GetNormal();
   return myStr.str(); 
 }
-
-
-bool ClippingProperty::WriteXMLData( XMLWriter &xmlWriter )
-{
-  xmlWriter.WriteProperty( ORIGIN, m_Origin );
-  xmlWriter.WriteProperty( NORMAL, m_Normal );
-  return true;
-}
-
-
-bool ClippingProperty::ReadXMLData( XMLReader &xmlReader )
-{
-  xmlReader.GetAttribute( ORIGIN, m_Origin );
-  xmlReader.GetAttribute( NORMAL, m_Normal );
-  return true;
-}
-
-
 } // namespace
 

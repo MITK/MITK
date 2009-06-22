@@ -47,9 +47,6 @@ namespace mitk {
       virtual bool operator==(const DelegateProperty& property ) const;
       virtual DelegateProperty& operator=(const DelegateProperty& other);
 
-      virtual bool WriteXMLData( XMLWriter& xmlWriter );
-      virtual bool ReadXMLData( XMLReader& xmlReader );
-
   };
 
 } // namespace mitk

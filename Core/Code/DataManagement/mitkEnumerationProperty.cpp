@@ -17,8 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkEnumerationProperty.h"
 #include <algorithm>
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 // static map members of EnumerationProperty. These Maps point to per-classname-maps of ID <-> String. Accessed by GetEnumIds() and GetEnumString().
 mitk::EnumerationProperty::IdMapForClassNameContainerType     mitk::EnumerationProperty::s_IdMapForClassName;
@@ -162,23 +160,6 @@ bool mitk::EnumerationProperty::IsValidEnumerationValue( const IdType& val ) con
 bool mitk::EnumerationProperty::IsValidEnumerationValue( const std::string& val ) const
 {
   return ( GetEnumStrings().find( val ) != GetEnumStrings().end() );
-}
-
-
-bool mitk::EnumerationProperty::WriteXMLData( XMLWriter& xmlWriter )
-{
-  xmlWriter.WriteProperty( VALUE, GetValueAsString() );
-  return true;
-}
-
-
-bool mitk::EnumerationProperty::ReadXMLData( XMLReader& xmlReader )
-{
-  std::string m_EnumValueString;
-  xmlReader.GetAttribute( VALUE, m_EnumValueString );
-  SetValue(m_EnumValueString);
-  LOG_INFO << "EnumerationProperty: " << GetValueAsString() << std::endl;
-  return true;
 }
   
 

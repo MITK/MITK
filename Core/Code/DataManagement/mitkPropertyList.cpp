@@ -22,16 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkVector.h"
 
-#include "mitkXMLWriter.h"
-#include "mitkXMLReader.h"
-
-const std::string mitk::PropertyList::XML_NODE_NAME = "propertyList";
-const std::string mitk::PropertyList::XML_ALREADY_SEEN = "PROPERTY_REFERENCE";
-
-// static maps for XML reading/writing
-mitk::UIDGenerator mitk::PropertyList::m_UIDGenerator;
-std::map<std::string, mitk::BaseProperty*> mitk::PropertyList::m_AlreadyReadFromXML;
-std::map<mitk::BaseProperty*, std::string> mitk::PropertyList::m_AlreadyWrittenToXML;
 
 mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyKey) const
 {
@@ -195,119 +185,6 @@ void mitk::PropertyList::Clear()
   }
   m_Properties.clear();
 }
-
-
-bool mitk::PropertyList::WriteXMLData( mitk::XMLWriter& xmlWriter ) 
-{
-  for ( PropertyMap::const_iterator iter = m_Properties.begin();
-        iter != m_Properties.end();
-        ++iter )
-  {
-
-    BaseProperty* property( iter->second.first.GetPointer() ); 
-    std::string property_name( iter->first );
-    
-    xmlWriter.BeginNode( property->GetXMLNodeName() );
-    xmlWriter.WriteProperty( XMLIO::CLASS_NAME, property->GetNameOfClass() );
-    xmlWriter.WriteProperty( XMLReader::PROPERTY_KEY, property_name.c_str() );
- 
-    // lookup pointer in m_AlreadyWrittenToXML
-    if ( m_AlreadyWrittenToXML.find( property ) == m_AlreadyWrittenToXML.end() )
-    {
-      // pointer has not been written before 
-      std::string uid = m_UIDGenerator.GetUID();
-      xmlWriter.WriteProperty( XMLReader::PROPERTY_UID, uid);
-     
-      property->WriteXMLData( xmlWriter );
-      
-      m_AlreadyWrittenToXML[ property ] = uid;
-    } 
-    else
-    {
-      // pointer has already been written
-      // just write a reference to the node that is already written
-      xmlWriter.WriteProperty( XML_ALREADY_SEEN, m_AlreadyWrittenToXML.find( property )->second );
-    }
- 
-    if( property_name == StringProperty::PATH )
-      xmlWriter.SetOriginPath( property->GetValueAsString() );
-    
-    xmlWriter.EndNode();
-  } 
-
-  return true;
-}
-
-
-bool mitk::PropertyList::ReadXMLData( XMLReader& xmlReader )
-{
-
-  if ( xmlReader.Goto( BaseProperty::XML_NODE_NAME ) ) {
-
-    do 
-    {
-      // attempt to create a property object
-      BaseProperty::Pointer property = dynamic_cast<BaseProperty*>( xmlReader.CreateObject().GetPointer() );
-
-      if ( property.IsNotNull() ) 
-      {
-        std::string referenced_uid; 
-        xmlReader.GetAttribute( XML_ALREADY_SEEN, referenced_uid );
-
-        if ( referenced_uid.empty() )
-        {
-          // object could be created
-          property->ReadXMLData( xmlReader );
-         
-          // if there is also a name for this property, store it to our list
-          std::string property_name;
-          xmlReader.GetAttribute( XMLReader::PROPERTY_KEY, property_name );
-          if ( !property_name.empty() )
-            SetProperty( property_name.c_str(), property );
-         
-          // try to get a UID for this property, in case it is referenced later
-          std::string uid;
-          xmlReader.GetAttribute( XMLReader::PROPERTY_UID, uid );
-          m_AlreadyReadFromXML[uid] = property.GetPointer();
-        }
-        else
-        {
-          // no object was created, so this is perhaps a reference to another (already created) property
-
-          // find out, which property is referenced
-          if ( m_AlreadyReadFromXML.find(referenced_uid) != m_AlreadyReadFromXML.end() )
-          {
-            // ok, this property is alredy created
-            std::string property_name;
-            xmlReader.GetAttribute( XMLReader::PROPERTY_KEY, property_name );
-            if ( !property_name.empty() )
-            {
-              SetProperty( property_name.c_str(), m_AlreadyReadFromXML[referenced_uid] );
-            }
-          }
-        }
-      }
-    } while ( xmlReader.GotoNext() );
-
-    xmlReader.GotoParent();
-  }
-
-  return true;
-}
-
-
-void mitk::PropertyList::PrepareXML_IO()
-{
-  m_AlreadyReadFromXML.clear();
-  m_AlreadyWrittenToXML.clear();
-}
-
-
-const std::string& mitk::PropertyList::GetXMLNodeName() const
-{
-  return XML_NODE_NAME;
-}
-
 
 bool mitk::PropertyList::IsEnabled(const std::string& propertyKey) 
 {

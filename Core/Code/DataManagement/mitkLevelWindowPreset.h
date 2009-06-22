@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define LEVELWINDOWPRESET_H_HEADER
 
 #include <vtkXMLParser.h>
-#include <mitkXMLWriter.h>
+#include <mitkCommon.h>
 #include <map>
 #include <string>
 
@@ -47,7 +47,7 @@ private:
   //## @brief method used in XLM-Reading; gets called when a start-tag is read
   void StartElement (const char *elementName, const char **atts);
 
-  void saveXML(mitk::XMLWriter& xmlWriter);
+  //void saveXML(mitk::XMLWriter& xmlWriter);
   void save();
 
   //##Documentation

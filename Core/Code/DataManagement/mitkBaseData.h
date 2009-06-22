@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkCommon.h"
 #include "mitkOperationActor.h"
-#include "mitkXMLIO.h"
 #include "mitkPropertyList.h"
 #include <map>
 
@@ -38,7 +37,7 @@ class BaseProcess;
 //## from itk::DataObject and thus can be included in a pipeline.
 //## Inherits also from OperationActor and can be used as a destination for Undo
 //## @ingroup Data
-class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor, public XMLIO
+class MITK_CORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
   mitkClassMacro(BaseData,itk::DataObject)
@@ -328,15 +327,6 @@ public:
   //## this data object or its geometry.
   virtual unsigned long GetMTime() const;
 
-  //## 
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-
-
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-
-  //##
-  static const std::string XML_NODE_NAME;
-
 protected:
   BaseData();
   ~BaseData();
@@ -358,9 +348,6 @@ protected:
   //## @brief for internal use only. Helps to deal with the
   //## weak-pointer-problem.
   virtual void ConnectSource(itk::ProcessObject *arg, unsigned int idx) const;
-
-  //## XML
-  virtual const std::string& GetXMLNodeName() const;
 
   bool m_Initialized;
 

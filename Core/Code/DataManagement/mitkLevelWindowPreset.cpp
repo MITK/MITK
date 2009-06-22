@@ -119,24 +119,8 @@ std::map<std::string, double>& LevelWindowPreset::getWindowPresets()
 
 void LevelWindowPreset::save()
 {
-  XMLWriter writer(m_XmlFileName.c_str());
-  saveXML(writer);
-}
-
-void LevelWindowPreset::saveXML(mitk::XMLWriter& xmlWriter)
-{
-  xmlWriter.BeginNode("mitkLevelWindowPresets");
-  for( std::map<std::string, double>::iterator iter = m_Level.begin(); iter != m_Level.end(); iter++ ) {
-    std::string item = ((*iter).first.c_str());
-    xmlWriter.BeginNode("preset");
-    xmlWriter.WriteProperty("NAME", item);
-    double levItem = m_Level[item];
-    xmlWriter.WriteProperty("LEVEL", levItem);
-    double winItem = m_Window[item];
-    xmlWriter.WriteProperty("WINDOW", winItem);
-    xmlWriter.EndNode();
-  }
-  xmlWriter.EndNode();
+  //XMLWriter writer(m_XmlFileName.c_str());
+  //saveXML(writer);
 }
 
 void LevelWindowPreset::newPresets(std::map<std::string, double> newLevel, std::map<std::string, double> newWindow)

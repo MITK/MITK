@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
-#include "mitkXMLIO.h"
 #include "mitkUIDGenerator.h"
 
 #include <itkObjectFactory.h>
@@ -62,7 +61,7 @@ class XMLWriter;
  * 
  * @ingroup DataManagement
  */
-class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
+class MITK_CORE_EXPORT PropertyList : public itk::Object
 {
 
   public:
@@ -194,14 +193,9 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
 
     virtual void Clear();
 
-    static void PrepareXML_IO();
-
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-    virtual bool ReadXMLData( XMLReader& xmlReader );
     virtual bool IsEnabled(const std::string& propertyKey);
     virtual void SetEnabled(const std::string& propertyKey,bool enabled);
 
-    static const std::string XML_NODE_NAME;
 
   protected:
 
@@ -215,25 +209,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object, public XMLIO
      */
     PropertyMap m_Properties;
 
-    virtual const std::string& GetXMLNodeName() const;
-  private:
-
-    /**
-     * Needed for XML writing. Generates UIDs to identify memory addresses.
-     */
-    static UIDGenerator m_UIDGenerator;
-
-    /**
-     * Used during XML reading. Stores, which properties have already been read/created.
-     */
-    static std::map<std::string, BaseProperty*> m_AlreadyReadFromXML;
-
-    /*
-     * Used during XML writing. Stores, which properties have already been written, so that each property is only written once.
-     */
-    static std::map<BaseProperty*, std::string> m_AlreadyWrittenToXML;
-
-    static const std::string XML_ALREADY_SEEN;
 };
 
 } // namespace mitk

@@ -29,8 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/ipFunc.h"
 #include <itkSmartPointerForwardReference.txx>
 #include <vtkImageData.h>
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
 
@@ -1112,66 +1110,6 @@ void mitk::Image::Clear()
   Superclass::Clear();
   delete [] m_Dimensions;
   m_Dimensions = NULL;
-}
-
-bool mitk::Image::WriteXMLData( XMLWriter& xmlWriter ) 
-{
-  std::string fileName = xmlWriter.GetRelativePath();
-  std::string imageExtension = xmlWriter.GetImageExtension();
-  if(!xmlWriter.IsFileExtension(imageExtension, fileName))
-    fileName += imageExtension;
-
-  if(xmlWriter.SaveSourceFiles()){
-    mitk::ImageWriter::Pointer imageWriter = mitk::ImageWriter::New();
-    imageWriter->SetInput( this );
-    std::string absolutePath = xmlWriter.GetAbsolutePath().c_str();
-    if(xmlWriter.IsFileExtension(imageExtension, absolutePath))
-      // remove file extension
-      absolutePath.erase(absolutePath.find(imageExtension), absolutePath.length()-absolutePath.find(imageExtension));
-    imageWriter->SetFileName( absolutePath.c_str() );
-    imageWriter->SetExtension( imageExtension.c_str() );
-    imageWriter->Write();
-    fileName = absolutePath + imageExtension;
-  }
-  xmlWriter.WriteProperty( "FILENAME", fileName.c_str() );
-
-  mitk::Geometry3D* geomety = GetGeometry();
-
-  if ( geomety )
-    geomety->WriteXML( xmlWriter );
-
-  return true;
-}
-
-bool mitk::Image::ReadXMLData( XMLReader& xmlReader )
-{
-  BaseData::ReadXMLData( xmlReader );
-  std::string fileName;
-  xmlReader.GetAttribute( XMLReader::FILENAME, fileName );
-  LOG_INFO << fileName << std::endl;
-
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
-
-  try
-  {
-    factory->SetFileName( fileName.c_str() );
-    factory->Update();
-    mitk::DataTreeNode::Pointer tmpNode = factory->GetOutput( 0 );
-
-    if ( tmpNode.IsNull() )
-      return false;
-
-    mitk::Image::Pointer tmpImage = dynamic_cast<mitk::Image*>(tmpNode->GetData());
-    Initialize( tmpImage.GetPointer() );
-    SetPicVolume( tmpImage->GetPic() );    
-  }
-  catch ( itk::ExceptionObject & ex )
-  {
-    itkGenericOutputMacro( << "Exception during file open: " << ex );
-    return false;
-  }
-
-  return true;
 }
 
 void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)

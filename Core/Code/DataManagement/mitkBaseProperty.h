@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <itkObjectFactory.h>
 #include "mitkCommon.h"
-#include <mitkXMLIO.h>
 
 namespace mitk {
 
@@ -38,7 +37,7 @@ namespace mitk {
     Subclasses must implement an operator==(const BaseProperty& property), which
     is used by PropertyList to check whether a property has been changed.
 */
-class MITK_CORE_EXPORT BaseProperty : public itk::Object, public XMLIO
+class MITK_CORE_EXPORT BaseProperty : public itk::Object
 {
   public:
 
@@ -54,15 +53,6 @@ class MITK_CORE_EXPORT BaseProperty : public itk::Object, public XMLIO
     virtual std::string GetValueAsString() const;
     
     virtual bool Assignable(const BaseProperty& ) const;
-    
-    virtual bool WriteXMLData( XMLWriter& xmlWriter );
-    
-    virtual bool ReadXMLData( XMLReader& xmlReader );
-    
-    virtual const std::string& GetXMLNodeName() const;
-
-
-    static const std::string XML_NODE_NAME;
 
   protected:
     BaseProperty();

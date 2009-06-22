@@ -21,8 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseProperty.h"
 #include "mitkTransferFunction.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
 
 
 namespace mitk {
@@ -58,22 +56,6 @@ namespace mitk {
         std::stringstream myStr;
         myStr << GetValue() ;
         return myStr.str(); 
-      }
-
-      /**
-       *
-       */
-      virtual bool WriteXMLData( XMLWriter& /*xmlWriter*/ )
-      {
-        return true;
-      }
-
-      /**
-       *
-       */
-      virtual bool ReadXMLData( XMLReader& /*xmlReader*/ )
-      {
-        return true;
       }
 
       protected:

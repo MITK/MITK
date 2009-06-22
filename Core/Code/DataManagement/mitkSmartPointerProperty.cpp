@@ -17,11 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSmartPointerProperty.h"
-#include <mitkXMLWriter.h>
-#include <mitkXMLReader.h>
-    
-const char* mitk::SmartPointerProperty::XML_SMARTPOINTER_TARGET_NODE = "smartPointerTarget";
-const char* mitk::SmartPointerProperty::XML_SMARTPOINTER_TARGET_KEY = "POINTERTARGET_ID";
 
 mitk::SmartPointerProperty::ReferenceCountMapType          mitk::SmartPointerProperty::m_ReferenceCount;
 mitk::SmartPointerProperty::ReferencesUIDMapType           mitk::SmartPointerProperty::m_ReferencesUID;
@@ -158,19 +153,5 @@ mitk::BaseProperty& mitk::SmartPointerProperty::operator=(const BaseProperty& ot
   }
 
   return *this;
-}
-
-
-bool mitk::SmartPointerProperty::ReadXMLData( XMLReader& xmlReader)
-{
-  std::string pointedAt;
-  xmlReader.GetAttribute( VALUE, pointedAt );
-
-  if ( pointedAt != "NULL" )
-  {
-    m_ReadInInstances[this] = pointedAt;
-  }
-  
-  return true;
 }
 

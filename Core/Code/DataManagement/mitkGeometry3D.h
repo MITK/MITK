@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkVector.h"
 #include "mitkOperationActor.h"
-#include "mitkXMLIO.h"
 
 #include <itkIndex.h>
 #include <itkBoundingBox.h>
@@ -89,7 +88,7 @@ typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 //## 
 //## Rule: everything is in mm (ms) if not stated otherwise.
 //## @ingroup Geometry
-class MITK_CORE_EXPORT Geometry3D : public AffineGeometryFrame3D, public OperationActor, public XMLIO
+class MITK_CORE_EXPORT Geometry3D : public AffineGeometryFrame3D, public OperationActor
 {
 public:
   mitkClassMacro(Geometry3D, AffineGeometryFrame3D);
@@ -557,11 +556,6 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //##@brief executes affine operations (translate, rotate, scale)
   virtual void ExecuteOperation(Operation* operation); 
-
-  virtual bool WriteXMLData( XMLWriter& xmlWriter );
-  virtual bool ReadXMLData( XMLReader& xmlReader );
-  const std::string& GetXMLNodeName() const;
-  static const std::string XML_NODE_NAME;
 
 protected:
   Geometry3D();

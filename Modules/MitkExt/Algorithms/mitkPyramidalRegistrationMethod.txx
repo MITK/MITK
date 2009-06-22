@@ -113,7 +113,7 @@ namespace mitk {
       gaussianFilter->Update();
       movingImage = gaussianFilter->GetOutput();
     } else{
-      CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+      typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
       castImageFilter->SetInput(itkImage1);
       castImageFilter->Update();
       movingImage = castImageFilter->GetOutput();

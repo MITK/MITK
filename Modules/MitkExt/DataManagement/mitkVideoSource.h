@@ -46,6 +46,7 @@ namespace mitk
       ////##Documentation
       ////## @brief stops the video capturing.
       virtual void StopCapturing();
+
       ////##Documentation
       ////## @brief returns true if video capturing is active.
       bool IsCapturingEnabled();

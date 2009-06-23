@@ -52,7 +52,7 @@ struct VideoBackgroundVectorInfo
  * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
  * background.
  */
-class QMITK_EXPORT QmitkVideoBackground : public QObject
+class QMITKEXT_EXPORT QmitkVideoBackground : public QObject
 {
   Q_OBJECT
 

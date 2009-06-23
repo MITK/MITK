@@ -73,6 +73,8 @@ SET(CPP_FILES
  QmitkHistogramWidget.cpp
  QmitkPlotWidget.cpp
  QmitkPlotDialog.cpp
+ 
+ QmitkVideoBackground.cpp
 )
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
@@ -119,6 +121,7 @@ SET(MOC_H_FILES
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkHistogramWidget.h
+ QmitkVideoBackground.h
 )
 
 SET(UI_FILES

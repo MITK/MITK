@@ -108,6 +108,10 @@ protected:
   mitk::Geometry3D* m_MovingGeometry;
   mitk::AffineGeometryFrame3D::Pointer m_ImageGeometry;
   mitk::RigidRegistrationObserver::Pointer m_Observer;
+
+  itk::Array2D<unsigned int> ParseSchedule(std::string s);
+  void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");
+
 };
 
 #endif

@@ -32,8 +32,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "qmessagebox.h"
 #include "QmitkLoadPresetDialog.h"
 #include <itkArray.h>
+#include "mitkRigidRegistrationPreset.h"
 
 #include "QmitkRigidRegistrationSelectorView.h"
+#include "mitkPyramidalRegistrationMethod.h"
 
 QmitkRigidRegistrationSelectorView::QmitkRigidRegistrationSelectorView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
 m_FixedNode(NULL), m_MovingNode(NULL), m_OptimizerParameters(NULL), m_TransformParameters(NULL), m_MetricParameters(NULL),
@@ -41,6 +43,8 @@ m_FixedDimension(0), m_MovingDimension(0), m_StopOptimization(false), m_Geometry
 m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeometry(NULL)
 {
   m_Controls.setupUi(parent);
+
+  
 
   //// create connections
   connect( m_Controls.m_TransformGroup, SIGNAL(clicked(bool)), m_Controls.m_TransformFrame, SLOT(setVisible(bool)));
@@ -53,6 +57,8 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   connect( m_Controls.m_OptimizerBox, SIGNAL(activated(int)), m_Controls.m_OptimizerWidgetStack, SLOT(setCurrentIndex(int)));
   connect( m_Controls.m_OptimizerBox, SIGNAL(activated(int)), this, SLOT(OptimizerSelected(int)));
   connect( m_Controls.m_InterpolatorGroup, SIGNAL(toggled(bool)), m_Controls.m_InterpolatorFrame, SLOT(setVisible(bool)));
+  connect( m_Controls.m_PyramidGroup, SIGNAL(clicked(bool)), m_Controls.m_PyramidFrame, SLOT(setVisible(bool)));
+  connect( m_Controls.m_PreprocessingGroup, SIGNAL(clicked(bool)), m_Controls.m_PreprocessingFrame, SLOT(setVisible(bool)));
   connect( m_Controls.m_UseSamplingMattesMutualInformation, SIGNAL(clicked(bool)), m_Controls.textLabel1, SLOT(setEnabled(bool)));
   connect( m_Controls.m_UseSamplingMattesMutualInformation, SIGNAL(clicked(bool)), m_Controls.m_NumberOfSpatialSamplesMattesMutualInformation, SLOT(setEnabled(bool)));
 
@@ -73,7 +79,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_IterationsRegularStepGradientDescent->setValidator(validatorLineEditInput);
   m_Controls.m_IterationsVersorTransform->setValidator(validatorLineEditInput);
   m_Controls.m_IterationsAmoeba->setValidator(validatorLineEditInput);
-  m_Controls.m_IterationsLBFGS->setValidator(validatorLineEditInput);
+  m_Controls.m_MaximumEvaluationsLBFGS->setValidator(validatorLineEditInput);
   m_Controls.m_MinimumNumberOfIterationsSPSA->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfPerturbationsSPSA->setValidator(validatorLineEditInput);
   m_Controls.m_IterationsSPSA->setValidator(validatorLineEditInput);
@@ -86,6 +92,8 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_NumberOfHistogramBinsMattesMutualInformation->setValidator(validatorLineEditInput);
   m_Controls.m_LambdaMeanReciprocalSquareDifference->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfSpatialSamplesMutualInformation->setValidator(validatorLineEditInput);
+  m_Controls.m_IterationsLBFGSB->setValidator(validatorLineEditInput);
+  
 
   QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_StepLengthExhaustive->setValidator(validatorLineEditInputFloat);
@@ -125,7 +133,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_SimplexDeltaAmoeba15->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ParametersConvergenceToleranceAmoeba->setValidator(validatorLineEditInputFloat);
   m_Controls.m_FunctionConvergenceToleranceAmoeba->setValidator(validatorLineEditInputFloat);
-  m_Controls.m_GradientConvergenceToleranceLBFGS->setValidator(validatorLineEditInputFloat);
+  m_Controls.m_GradientMagnitudeToleranceLBFGS->setValidator(validatorLineEditInputFloat);
   m_Controls.m_LineSearchAccuracyLBFGS->setValidator(validatorLineEditInputFloat);
   m_Controls.m_DefaultStepLengthLBFGS->setValidator(validatorLineEditInputFloat);
   m_Controls.m_aSPSA->setValidator(validatorLineEditInputFloat);
@@ -139,10 +147,10 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_MovingImageStandardDeviationMutualInformation->setValidator(validatorLineEditInputFloat);
   m_Controls.m_FixedSmootherVarianceMutualInformation->setValidator(validatorLineEditInput);
   m_Controls.m_MovingSmootherVarianceMutualInformation->setValidator(validatorLineEditInput);
-  m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
-  m_Controls.m_MinimumStepLengthVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
-  m_Controls.m_MaximumStepLengthVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
-  m_Controls.m_IterationsVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
+  m_Controls.m_GradientConvergenceToleranceLBFGSB->setValidator(validatorLineEditInputFloat);
+  m_Controls.m_DefaultStepLengthLBFGSB->setValidator(validatorLineEditInputFloat);
+  m_Controls.m_LineSearchAccuracyLBFGSB->setValidator(validatorLineEditInputFloat);
+  
 
   // for Transformations
   m_Controls.m_ScalesTranslationTransformTranslationX->setValidator(validatorLineEditInputFloat);
@@ -268,10 +276,13 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_MetricFrame->setEnabled(true);
   m_Controls.m_OptimizerFrame->setEnabled(true);
   m_Controls.m_InterpolatorFrame->setEnabled(true);
+
   m_Controls.m_TransformFrame->hide();
   m_Controls.m_MetricFrame->hide();
   m_Controls.m_OptimizerFrame->hide();
   m_Controls.m_InterpolatorFrame->hide();
+  m_Controls.m_PyramidFrame->hide();
+  m_Controls.m_PreprocessingFrame->hide();
   m_Controls.m_TransformWidgetStack->setCurrentIndex(0);
   m_Controls.m_MetricWidgetStack->setCurrentIndex(0);
   m_Controls.m_OptimizerWidgetStack->setCurrentIndex(0);
@@ -370,26 +381,159 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     command->SetCallbackFunction(this, &QmitkRigidRegistrationSelectorView::SetOptimizerValue);
     int observer = m_Observer->AddObserver( itk::AnyEvent(), command );
 
-    // init parameters
-    this->setTransformParameters();
-    this->setMetricParameters();
-    this->setOptimizerParameters();
 
-    // init registration method
-    mitk::ImageRegistrationMethod::Pointer registration = mitk::ImageRegistrationMethod::New();
-    registration->SetObserver(m_Observer);
-    registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
-    registration->SetReferenceImage(fimage);
-    registration->SetInput(mimage);    
-    registration->SetTransformParameters(m_TransformParameters);
-    registration->SetMetricParameters(m_MetricParameters);
-    registration->SetOptimizerParameters(m_OptimizerParameters);
-    registration->Update();
+
+
+    
+    
+    // Actually not necessary, but depending on itk some initial transform might be necessary
+    // which is passed to the registration method in transform parameters.
+    this->setTransformParameters();  
+
+    std::vector<std::string> presets;
+
+    if( m_Controls.m_PyramidGroup->isChecked() ){
+      mitk::PyramidalRegistrationMethod::Pointer registration = mitk::PyramidalRegistrationMethod::New();
+      
+      // Set Presets
+      std::string pre = m_Controls.m_Presets->text().toStdString();      
+      Tokenize(pre, presets, ",");
+      registration->SetPresets(presets);
+
+      // We need this information about the type of transform later in the SetOptimizerValue method
+      // to see which type of transform we have to update in the moving image geometry.
+      mitk::RigidRegistrationPreset* preset = registration->GetPreset();
+      itk::Array<double> transformValues = preset->getTransformValues(presets[0]);  
+      m_TransformParameters->SetTransform(transformValues[0]);
+
+      // Set Schedules
+      std::string movingSchedule = m_Controls.m_MovingSchedule->text().toStdString();
+      std::string fixedSchedule = m_Controls.m_FixedSchedule->text().toStdString();
+      itk::Array2D<unsigned int> mSchedule = ParseSchedule(movingSchedule);
+      itk::Array2D<unsigned int> fSchedule = ParseSchedule(fixedSchedule);      
+      
+      if(m_Controls.m_MatchHistograms->isChecked())
+      {
+        registration->SetMatchHistograms(true);
+      } else{
+        registration->SetMatchHistograms(false);
+      }
+      
+
+      registration->SetMovingSchedule(mSchedule);
+      registration->SetFixedSchedule(fSchedule);
+      registration->SetObserver(m_Observer);
+      registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
+      registration->SetReferenceImage(fimage);
+      registration->SetInput(mimage);
+
+      // m_Transform is needed for the initial transform
+      registration->SetTransformParameters(m_TransformParameters); 
+
+
+      double time(0.0);
+      double tstart(0.0);
+      tstart = clock();
+
+      registration->Update();
+
+      time += clock() - tstart;
+      time = time / CLOCKS_PER_SEC;
+
+      //printOut of the Time
+      LOG_INFO << "Registration Time: " << time;
+     
+
+    }
+    else{
+      // init registration method
+      mitk::ImageRegistrationMethod::Pointer registration = mitk::ImageRegistrationMethod::New();
+      this->setMetricParameters();
+      this->setOptimizerParameters();  
+
+      registration->SetObserver(m_Observer);
+      registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
+      registration->SetReferenceImage(fimage);
+      registration->SetInput(mimage);    
+      registration->SetTransformParameters(m_TransformParameters);
+      registration->SetMetricParameters(m_MetricParameters);
+      registration->SetOptimizerParameters(m_OptimizerParameters);
+      
+      
+      
+      
+      double time(0.0);
+      double tstart(0.0);
+      tstart = clock();
+     
+ 
+      registration->Update();
+      
+      time += clock() - tstart;
+      time = time / CLOCKS_PER_SEC;
+
+      //printOut of the Time
+      LOG_INFO << "Registration Time: " << time;
+    }
+     
+    
+
+    
 
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }  
 }
+
+itk::Array2D<unsigned int> QmitkRigidRegistrationSelectorView::ParseSchedule(std::string s)
+{
+  
+   // READ OUT THE SCHEDULE: First separate every level of the schedule 
+  std::vector<std::string> tokens;
+  std::string delimiter = ";";
+  Tokenize(s, tokens, delimiter);
+
+  std::vector< std::vector<std::string> > levels;
+  std::vector<std::string> level;
+  delimiter = ",";
+  // Then separate every dimension         
+  for(unsigned int i=0; i<tokens.size(); i++)
+  {          
+    Tokenize(tokens[i], level, delimiter);
+    levels.push_back(level);
+    level.clear();
+  }
+
+  // Build up the schedule
+  itk::Array2D<unsigned int> schedule;   
+  
+  schedule.SetSize(levels.size(), levels[0].size());
+  for(unsigned int i=0; i<levels.size(); i++)
+  {
+    for(unsigned int j=0; j<levels[i].size(); j++)
+    {
+      schedule[i][j] = atoi( levels[i].at(j).c_str() );
+      cout << "Schedule: " << schedule[i][j] << endl;
+    }
+  }   
+
+  return schedule;
+}
+
+void QmitkRigidRegistrationSelectorView::Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
+{
+  
+  std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);      
+  std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
+
+  while (std::string::npos != pos || std::string::npos != lastPos)
+  {        
+    tokens.push_back(str.substr(lastPos, pos - lastPos));       
+    lastPos = str.find_first_not_of(delimiters, pos);       
+    pos = str.find_first_of(delimiters, lastPos);
+  }
+}
+
 
 void QmitkRigidRegistrationSelectorView::SetFixedNode( mitk::DataTreeNode * fixedNode )
 {
@@ -487,6 +631,8 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     m_StopOptimization = false;
   }
 
+  
+
   // retreive optimizer value for the current transformation
   double value = m_Observer->GetCurrentOptimizerValue();
 
@@ -503,7 +649,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
 
   if (m_MovingNode != NULL)
   {
-    if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
+    if (m_TransformParameters->GetTransform() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
     {
       if (transformParams.size() == 2)
       {
@@ -515,7 +661,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
         std::cout<<"Translation is: "<<transformParams[0] << transformParams[1] << transformParams[2] << std::endl;
       }
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::SCALETRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::SCALETRANSFORM)
     {
       for( unsigned int i=0; i<transformParams.size(); i++)
       {
@@ -523,7 +669,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       }
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM)
     {
       for( unsigned int i=0; i<transformParams.size(); i++)
       {
@@ -531,7 +677,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       }
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::AFFINETRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::AFFINETRANSFORM)
     {
 
       // -  the 9 rotation-coefficients are copied to the
@@ -572,7 +718,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       // set the transform matrix to init the transform
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
     {
       int m = 0;
       for (int i = 0; i < m_FixedDimension; i++)
@@ -603,7 +749,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       }
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::RIGID3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::RIGID3DTRANSFORM)
     {
       int m = 0;
       for (int i = 0; i < 3; i++)
@@ -626,7 +772,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2] + transformParams[11]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::EULER3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::EULER3DTRANSFORM)
     {
       mitk::ScalarType angleX = transformParams[0] * 45.0 / atan(1.0);
       mitk::ScalarType angleY = transformParams[1] * 45.0 / atan(1.0);
@@ -640,7 +786,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[3], transformParams[4], transformParams[5]);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM)
     {
       mitk::ScalarType angleX = transformParams[0] * 45.0 / atan(1.0);
       mitk::ScalarType angleY = transformParams[1] * 45.0 / atan(1.0);
@@ -654,7 +800,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[3], transformParams[4], transformParams[5]);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM)
     {
       itk::QuaternionRigidTransform<double>::Pointer quaternionTransform = itk::QuaternionRigidTransform<double>::New();
       quaternionTransform->SetParameters(transformParams);
@@ -678,7 +824,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2] + transformParams[6]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::VERSORTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::VERSORTRANSFORM)
     {
       itk::VersorTransform<double>::Pointer versorTransform = itk::VersorTransform<double>::New();
       versorTransform->SetParameters(transformParams);
@@ -702,7 +848,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
     {
       itk::VersorRigid3DTransform<double>::Pointer versorTransform = itk::VersorRigid3DTransform<double>::New();
       versorTransform->SetParameters(transformParams);
@@ -726,7 +872,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2] + transformParams[5]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
     {
       itk::ScaleSkewVersor3DTransform<double>::Pointer versorTransform = itk::ScaleSkewVersor3DTransform<double>::New();
       versorTransform->SetParameters(transformParams);
@@ -750,7 +896,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2] + transformParams[5]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
     {
       itk::Similarity3DTransform<double>::Pointer similarityTransform = itk::Similarity3DTransform<double>::New();
       similarityTransform->SetParameters(transformParams);
@@ -774,7 +920,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtkmatrix->SetElement(2, 3, -translation[2] + center[2] + transformParams[6]);
       vtktransform->SetMatrix(vtkmatrix);
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::RIGID2DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::RIGID2DTRANSFORM)
     {
       mitk::ScalarType angle = transformParams[0] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
@@ -782,7 +928,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[1], transformParams[2], 0);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
     {      
       mitk::ScalarType angle = transformParams[0] * 45.0 / atan(1.0);;
       vtktransform->PostMultiply();
@@ -792,7 +938,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[3], transformParams[4], 0);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::EULER2DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::EULER2DTRANSFORM)
     {
       mitk::ScalarType angle = transformParams[0] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
@@ -800,7 +946,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[1], transformParams[2], 0);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
     {
       mitk::ScalarType angle = transformParams[1] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
@@ -809,7 +955,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->Translate(transformParams[2], transformParams[3], 0);
       vtktransform->PreMultiply();
     }
-    else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
+    else if (m_TransformParameters->GetTransform() == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
     {
       mitk::ScalarType angle = transformParams[1] * 45.0 / atan(1.0);
       vtktransform->PostMultiply();
@@ -839,20 +985,31 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     mitk::Geometry3D::TransformType::OutputVectorType offset = m_MovingGeometry->GetIndexToWorldTransform()->GetOffset();
     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
 
-    // go to itk physical space before applying the registration result
-    m_MovingGeometry->Compose(m_GeometryWorldToItkPhysicalTransform, 1);
+  
+    m_MovingGeometry->GetIndexToWorldTransform()->SetIdentity();
+    // Set moving image geometry to registration result
+    m_MovingGeometry->SetIndexToWorldTransformByVtkMatrix(vtkmatrix_inv);
+    
+   
+    #if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
+      // the next few lines: Phi(Phys2World)*Phi(Result)*Phi(World2Phy)*Phi(Initial)
+      // go to itk physical space before applying the registration result
+      m_MovingGeometry->Compose(m_GeometryWorldToItkPhysicalTransform, 1);
 
-    // right in the beginning, transform by initial moving image geometry
-    m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
+      // right in the beginning, transform by initial moving image geometry
+      m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
 
-    // in the end, go back to world space
-    m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);
+      // in the end, go back to world space
+      m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
+        
+    #else     
+      m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
+    #endif
 
-    std::cout << std::endl;
-    std::cout << m_MovingGeometry->GetIndexToWorldTransform()->GetMatrix();
+
+    std::cout << std::endl << m_MovingGeometry->GetIndexToWorldTransform()->GetMatrix();
     offset = m_MovingGeometry->GetIndexToWorldTransform()->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    std::cout << std::endl;
+    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl << std::endl;
 
     //m_MovingGeometry->Print(std::cout, 0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1096,9 +1253,9 @@ void QmitkRigidRegistrationSelectorView::OptimizerSelected( int optimizer )
   {
     m_Controls.m_QuaternionRigidTransformGradientDescentFrame->show();
   }
-  else if (optimizer == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
+  else if (optimizer == mitk::OptimizerParameters::LBFGSOPTIMIZER)
   {
-    m_Controls.m_LBFGSBFrame->show();
+    m_Controls.m_LBFGSFrame->show();
   }
   else if (optimizer == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
   {
@@ -1128,9 +1285,9 @@ void QmitkRigidRegistrationSelectorView::OptimizerSelected( int optimizer )
   {
     m_Controls.m_ConjugateGradientFrame->show();
   }
-  else if (optimizer == mitk::OptimizerParameters::LBFGSOPTIMIZER)
+  else if (optimizer == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
   {
-    m_Controls.m_LBFGSFrame->show();
+    m_Controls.m_LBFGSBFrame->show();
   }
   else if (optimizer == mitk::OptimizerParameters::SPSAOPTIMIZER)
   {
@@ -1266,11 +1423,14 @@ void QmitkRigidRegistrationSelectorView::setTransformParameters()
 
     m_TransformParameters->SetTransformInitializerOn(m_Controls.m_CenterForInitializerAffine->isChecked());
 
-    mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
-    initialTransform->SetIdentity();
-    initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
-    initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
-    m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());
+    #if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
+      mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
+      initialTransform->SetIdentity();
+      initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
+      initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
+      m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());  
+    #endif
+    
     m_TransformParameters->SetMomentsOn(m_Controls.m_MomentsAffine->isChecked());
   }
   else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
@@ -1583,6 +1743,7 @@ void QmitkRigidRegistrationSelectorView::setOptimizerParameters()
   }
   else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::LBFGSBOPTIMIZER)
   {
+
   }
   else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
   {
@@ -1650,10 +1811,10 @@ void QmitkRigidRegistrationSelectorView::setOptimizerParameters()
   }
   else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::LBFGSOPTIMIZER)
   {
-    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS(m_Controls.m_GradientConvergenceToleranceLBFGS->text().toFloat());
+    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS(m_Controls.m_GradientMagnitudeToleranceLBFGS->text().toFloat());
     m_OptimizerParameters->SetLineSearchAccuracyLBFGS(m_Controls.m_LineSearchAccuracyLBFGS->text().toFloat());
     m_OptimizerParameters->SetDefaultStepLengthLBFGS(m_Controls.m_DefaultStepLengthLBFGS->text().toFloat());
-    m_OptimizerParameters->SetNumberOfIterationsLBFGS(m_Controls.m_IterationsLBFGS->text().toInt());
+    m_OptimizerParameters->SetNumberOfIterationsLBFGS(m_Controls.m_MaximumEvaluationsLBFGS->text().toInt());
     m_OptimizerParameters->SetTraceOnLBFGS(m_Controls.m_TraceOnLBFGS->isChecked());
   }
   else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::SPSAOPTIMIZER)
@@ -1671,10 +1832,12 @@ void QmitkRigidRegistrationSelectorView::setOptimizerParameters()
   }
   else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
   {
-    m_OptimizerParameters->SetGradientMagnitudeToleranceVersorRigid3DTransform(m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat());
+    //TODO: CREATE INTERFACE FOR THIS. THE INTERFACE COMPONENTS USED HERE WERE PART OF THE LBFGS OPTIMIZER FRAME
+    //WHICH WAS CHANGED BECAUSE IT DIDN'T MATCH THE LBFGS OPTIMIZER PARAMETERS.
+    /*m_OptimizerParameters->SetGradientMagnitudeToleranceVersorRigid3DTransform(m_Controls.m_GradientConvergenceToleranceLBFGSB->text().toFloat());
     m_OptimizerParameters->SetMinimumStepLengthVersorRigid3DTransform(m_Controls.m_MinimumStepLengthVersorRigid3DTransform->text().toFloat());
     m_OptimizerParameters->SetMaximumStepLengthVersorRigid3DTransform(m_Controls.m_MaximumStepLengthVersorRigid3DTransform->text().toFloat());
-    m_OptimizerParameters->SetNumberOfIterationsVersorRigid3DTransform(m_Controls.m_IterationsVersorRigid3DTransform->text().toInt());
+    m_OptimizerParameters->SetNumberOfIterationsVersorRigid3DTransform(m_Controls.m_IterationsVersorRigid3DTransform->text().toInt());*/
   }
 }
 
@@ -2392,10 +2555,10 @@ void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationParameter()
   }
   else if (optimizerValues[0] == mitk::OptimizerParameters::LBFGSOPTIMIZER)
   {
-    m_Controls.m_GradientConvergenceToleranceLBFGS->setText(QString::number(optimizerValues[2]));
+    m_Controls.m_GradientMagnitudeToleranceLBFGS->setText(QString::number(optimizerValues[2]));
     m_Controls.m_LineSearchAccuracyLBFGS->setText(QString::number(optimizerValues[3]));
     m_Controls.m_DefaultStepLengthLBFGS->setText(QString::number(optimizerValues[4]));
-    m_Controls.m_IterationsLBFGS->setText(QString::number(optimizerValues[5]));
+    m_Controls.m_MaximumEvaluationsLBFGS->setText(QString::number(optimizerValues[5]));
     m_Controls.m_TraceOnLBFGS->setChecked(optimizerValues[6]);
   }
   else if (optimizerValues[0] == mitk::OptimizerParameters::SPSAOPTIMIZER)
@@ -2413,10 +2576,10 @@ void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationParameter()
   }
   else if (optimizerValues[0] == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
   {
-    m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->setText(QString::number(optimizerValues[2]));
+    /*m_Controls.m_GradientConvergenceToleranceLBFGSB->setText(QString::number(optimizerValues[2]));
     m_Controls.m_MinimumStepLengthVersorRigid3DTransform->setText(QString::number(optimizerValues[3]));
     m_Controls.m_MaximumStepLengthVersorRigid3DTransform->setText(QString::number(optimizerValues[4]));
-    m_Controls.m_IterationsVersorRigid3DTransform->setText(QString::number(optimizerValues[5]));
+    m_Controls.m_IterationsVersorRigid3DTransform->setText(QString::number(optimizerValues[5]));*/
   }
 
   itk::Array<double> interpolatorValues = m_Preset->getInterpolatorValues(dialog.GetPresetName());
@@ -2805,10 +2968,10 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
     }
     else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::LBFGSOPTIMIZER)
     {
-      optimizerValues[2] = m_Controls.m_GradientConvergenceToleranceLBFGS->text().toFloat();
+      optimizerValues[2] = m_Controls.m_GradientMagnitudeToleranceLBFGS->text().toFloat();
       optimizerValues[3] = m_Controls.m_LineSearchAccuracyLBFGS->text().toFloat();
       optimizerValues[4] = m_Controls.m_DefaultStepLengthLBFGS->text().toFloat();
-      optimizerValues[5] = m_Controls.m_IterationsLBFGS->text().toInt();
+      optimizerValues[5] = m_Controls.m_MaximumEvaluationsLBFGS->text().toInt();
       optimizerValues[6] = m_Controls.m_TraceOnLBFGS->isChecked();
     }
     else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::SPSAOPTIMIZER)
@@ -2826,10 +2989,10 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
     }
     else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
     {
-      optimizerValues[2] = m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat();
+     /* optimizerValues[2] = m_Controls.m_GradientConvergenceToleranceLBFGSB->text().toFloat();
       optimizerValues[3] = m_Controls.m_MinimumStepLengthVersorRigid3DTransform->text().toFloat();
       optimizerValues[4] = m_Controls.m_MaximumStepLengthVersorRigid3DTransform->text().toFloat();
-      optimizerValues[5] = m_Controls.m_IterationsVersorRigid3DTransform->text().toInt();
+      optimizerValues[5] = m_Controls.m_IterationsVersorRigid3DTransform->text().toInt();*/
     }
 
     std::map<std::string, itk::Array<double> > optimizerMap = m_Preset->getOptimizerValuesPresets();

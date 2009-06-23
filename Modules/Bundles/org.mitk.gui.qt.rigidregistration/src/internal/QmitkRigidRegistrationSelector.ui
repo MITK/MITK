@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>566</width>
-    <height>1284</height>
+    <height>1732</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,13 +28,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_95">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="margin">
-       <number>0</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout_121">
       <item>
        <widget class="QGroupBox" name="m_TransformGroup">
         <property name="title">
@@ -46,7 +40,7 @@
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_94">
+        <layout class="QVBoxLayout" name="verticalLayout_95">
          <item>
           <widget class="QFrame" name="m_TransformFrame">
            <property name="enabled">
@@ -4491,7 +4485,7 @@
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QVBoxLayout" name="verticalLayout_94">
          <item>
           <widget class="QFrame" name="m_MetricFrame">
            <property name="enabled">
@@ -4504,12 +4498,6 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_13">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="margin">
-             <number>0</number>
-            </property>
             <item>
              <widget class="QComboBox" name="m_MetricBox">
               <property name="enabled">
@@ -4588,7 +4576,7 @@
             <item>
              <widget class="QStackedWidget" name="m_MetricWidgetStack">
               <property name="currentIndex">
-               <number>2</number>
+               <number>8</number>
               </property>
               <widget class="QWidget" name="MeanSquares">
                <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -4863,7 +4851,7 @@
                </layout>
               </widget>
               <widget class="QWidget" name="MattesMutualInformation">
-               <layout class="QVBoxLayout" name="verticalLayout_27">
+               <layout class="QVBoxLayout" name="verticalLayout_26">
                 <item>
                  <widget class="QFrame" name="m_MattesMutualInformationFrame">
                   <property name="frameShape">
@@ -4872,13 +4860,7 @@
                   <property name="frameShadow">
                    <enum>QFrame::Raised</enum>
                   </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_26">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                   <property name="margin">
-                    <number>0</number>
-                   </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_27">
                    <item>
                     <widget class="QGroupBox" name="m_UseSamplingMattesMutualInformation">
                      <property name="title">
@@ -4952,6 +4934,16 @@
                     </widget>
                    </item>
                   </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="m_ComputeGradient">
+                  <property name="text">
+                   <string>Compute Gradient</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -5205,16 +5197,6 @@
               </widget>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="m_ComputeGradient">
-              <property name="text">
-               <string>Compute Gradient</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
            </layout>
           </widget>
          </item>
@@ -5340,7 +5322,7 @@
                <number>1</number>
               </property>
               <property name="currentIndex">
-               <number>10</number>
+               <number>11</number>
               </property>
               <widget class="QWidget" name="Exhaustive">
                <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -5632,7 +5614,7 @@
                        <item>
                         <layout class="QVBoxLayout" name="_74">
                          <item>
-                          <widget class="QLineEdit" name="m_GradientConvergenceToleranceLBFGS">
+                          <widget class="QLineEdit" name="m_GradientConvergenceToleranceLBFGSB">
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5642,7 +5624,7 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLineEdit" name="m_LineSearchAccuracyLBFGS">
+                          <widget class="QLineEdit" name="m_LineSearchAccuracyLBFGSB">
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5652,7 +5634,7 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLineEdit" name="m_DefaultStepLengthLBFGS">
+                          <widget class="QLineEdit" name="m_DefaultStepLengthLBFGSB">
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5662,7 +5644,7 @@
                           </widget>
                          </item>
                          <item>
-                          <widget class="QLineEdit" name="m_IterationsLBFGS">
+                          <widget class="QLineEdit" name="m_IterationsLBFGSB">
                            <property name="text">
                             <string>200</string>
                            </property>
@@ -6765,7 +6747,7 @@
                        <item>
                         <widget class="QLabel" name="textLabel19_2">
                          <property name="text">
-                          <string>Minimum Step Length:</string>
+                          <string>Line Search Accuracy</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>
@@ -6775,7 +6757,7 @@
                        <item>
                         <widget class="QLabel" name="textLabel20_2">
                          <property name="text">
-                          <string>Maximum Step Length:</string>
+                          <string>Default Step Length</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>
@@ -6785,7 +6767,7 @@
                        <item>
                         <widget class="QLabel" name="textLabel21_2">
                          <property name="text">
-                          <string>Number of Iterations:</string>
+                          <string>Max # Function Evaluations</string>
                          </property>
                          <property name="wordWrap">
                           <bool>false</bool>
@@ -6800,7 +6782,7 @@
                         <number>0</number>
                        </property>
                        <item>
-                        <widget class="QLineEdit" name="m_GradientMagnitudeToleranceVersorRigid3DTransform">
+                        <widget class="QLineEdit" name="m_GradientMagnitudeToleranceLBFGS">
                          <property name="text">
                           <string>0.0001</string>
                          </property>
@@ -6810,9 +6792,9 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="m_MinimumStepLengthVersorRigid3DTransform">
+                        <widget class="QLineEdit" name="m_LineSearchAccuracyLBFGS">
                          <property name="text">
-                          <string>0.0001</string>
+                          <string>0.1</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignRight</set>
@@ -6820,9 +6802,9 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="m_MaximumStepLengthVersorRigid3DTransform">
+                        <widget class="QLineEdit" name="m_DefaultStepLengthLBFGS">
                          <property name="text">
-                          <string>4.0</string>
+                          <string>1.0</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignRight</set>
@@ -6830,7 +6812,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLineEdit" name="m_IterationsVersorRigid3DTransform">
+                        <widget class="QLineEdit" name="m_MaximumEvaluationsLBFGS">
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -7194,7 +7176,7 @@
         <property name="checked">
          <bool>false</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QFrame" name="m_InterpolatorFrame">
            <property name="enabled">
@@ -7234,6 +7216,132 @@
                 <string>NearestNeighbor</string>
                </property>
               </item>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="m_PyramidGroup">
+        <property name="title">
+         <string>Pyramid</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_116">
+         <item>
+          <widget class="QFrame" name="m_PyramidFrame">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Number of levels</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="m_NumberOfLevels">
+              <property name="text">
+               <string>3</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Settings</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Fixed Schedule</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLineEdit" name="m_FixedSchedule">
+              <property name="text">
+               <string>4,4,4;2,2,2;1,1,1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Moving schedule</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLineEdit" name="m_MovingSchedule">
+              <property name="text">
+               <string>4,4,4;2,2,2;1,1,1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="m_Presets">
+              <property name="text">
+               <string>TestSettings1,TestSettings2,TestSettings3</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="m_PreprocessingGroup">
+        <property name="title">
+         <string>Preprocessing</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QFrame" name="m_PreprocessingFrame">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_120">
+            <item>
+             <widget class="QCheckBox" name="m_MatchHistograms">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Match Histograms</string>
+              </property>
              </widget>
             </item>
            </layout>

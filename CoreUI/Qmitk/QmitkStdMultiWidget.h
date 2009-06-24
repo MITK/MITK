@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qwidget.h>
 #include <qsplitter.h>
+#include <QFrame>
 
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
@@ -90,6 +91,12 @@ public:
   void AddPlanesToDataStorage();
 
   void SetDataStorage( mitk::DataStorage* ds );
+  
+protected:
+
+  void UpdateAllWidgets();
+
+  void HideAllWidgetToolbars();
 
 public slots:
 
@@ -251,11 +258,16 @@ protected:
   mitk::DataTreeNode::Pointer m_PlaneNode3;
   mitk::DataTreeNode::Pointer m_Node;
 
-  QSplitter *mainSplit;
-  QSplitter *vSplit;
-  QSplitter *hSplit;
-  QSplitter *splitterUp;
-  QSplitter *splitterBottom;
+  QSplitter *m_MainSplit;
+  QSplitter *m_LayoutSplit;
+  QSplitter *m_SubSplit1;
+  QSplitter *m_SubSplit2;
+  
+  QWidget *mitkWidget1Container;
+  QWidget *mitkWidget2Container;
+  QWidget *mitkWidget3Container;
+  QWidget *mitkWidget4Container;
+  
     
 };
 #endif /*QMITKSTDMULTIWIDGET_H_*/

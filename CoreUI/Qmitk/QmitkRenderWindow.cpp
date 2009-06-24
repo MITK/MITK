@@ -268,3 +268,9 @@ void QmitkRenderWindow::OnChangeLayoutDesign( int layoutDesignIndex )
 {
   emit SignalLayoutDesignChanged( layoutDesignIndex );
 }
+
+void QmitkRenderWindow::HideMenuWidget()
+{
+  if( m_MenuWidget )
+    m_MenuWidget->hide();
+}

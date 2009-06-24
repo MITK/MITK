@@ -78,6 +78,8 @@ public:
 
   void LayoutDesignListChanged( int layoutDesignIndex );
   
+  void HideMenuWidget();
+  
 protected:
 
     // overloaded resize handler

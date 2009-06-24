@@ -190,7 +190,10 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
     std::string errorMsg = exception.displayText();
     errorMsg
-        += "\n\n- Check your shared library for unresolved symbols\n- Check your import/export macros (Windows only)\n- Check your class attribute in your plugin.xml file\n- Check your manifest.cpp file";
+        += "<ul><li>Check your shared library for unresolved symbols</li>"
+            "<li>Check your class attribute in your plugin.xml file</li>"
+            "<li>Check your manifest.cpp file</li></ul>"
+            "</br>For a comprehensive check-list, see <a href=\"http://www.mitk.org/wiki/How_to_fix_your_plug-in_DLL\">http://www.mitk.org/wiki/How_to_fix_your_plug-in_DLL</a>";
     ErrorViewPart::Pointer part(new ErrorViewPart(errorTitle, errorMsg));
 
     //PartPane pane = getPane();
@@ -367,7 +370,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     //            element.getDeclaringExtension(), view,
     //            IExtensionTracker.REF_WEAK);
     //      }
-  } catch (std::exception e)
+  } catch (const Poco::Exception& e)
   {
     //      if ((e instanceof Error) && !(e instanceof LinkageError)) {
     //        throw (Error) e;
@@ -417,6 +420,10 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
     //        }
     //      }
 
+    throw PartInitException(e.message(), e, e.code());
+  }
+  catch (const std::exception& e)
+  {
     throw PartInitException(e.what());
   }
 

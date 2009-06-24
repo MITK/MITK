@@ -38,7 +38,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
   public:
 
     /** This struct contain the plugin capabilities. */
-    struct PACSPluginCapability
+    struct MITKEXT_CORE_EXPORT PACSPluginCapability
     {
       bool IsPACSFunctional;  // is there actually a real PACS connectivity implemented, configured and working right now?
       bool HasLoadCapability; // can the current implementation load data from a PACS?
@@ -46,7 +46,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     };
 
     /** Information about a patient in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.2 **/
-    class PatientInformation
+    class MITKEXT_CORE_EXPORT PatientInformation
     {
       public:
         std::string PatientsName;       // tag 0010,0010
@@ -60,7 +60,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<PatientInformation> PatientInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.3 **/
-    class StudyInformation
+    class MITKEXT_CORE_EXPORT StudyInformation
     {
       public:
         std::string StudyInstanceUID;   // tag 0020,000D
@@ -76,7 +76,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<StudyInformation> StudyInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.4 **/
-    class SeriesInformation
+    class MITKEXT_CORE_EXPORT SeriesInformation
     {
       public:
         std::string SeriesInstanceUID;  // tag 0020,000E
@@ -104,7 +104,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<SeriesInformation> SeriesInformationList;
 
     /** Information about a document in a series. Very roughly corresponds to DICOM PS 3.3-2008 Annex C.24 */
-    class DocumentInformation
+    class MITKEXT_CORE_EXPORT DocumentInformation
     {
       public:
         std::string SeriesInstanceUID;  // tag 0020,000E

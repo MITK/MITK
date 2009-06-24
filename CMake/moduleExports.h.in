@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
   #else
     #define @MODULE_EXPORT_DEFINE@
   #endif
+  #ifdef MITK_MODULENAME
+    #undef MITK_MODULENAME
+  #endif
   #define MITK_MODULENAME "@MODULE_NAME@"
 #endif
 

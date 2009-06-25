@@ -1,7 +1,7 @@
 PROJECT(OpenCherryPluginGenerator)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
-MARK_AS_ADVANCED(CMAKE_LIBRARY_OUTPUT_DIRECTORY EXECUTABLE_OUTPUT_PATH RUNTIME_OUTPUT_PATH
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+MARK_AS_ADVANCED(
 CMAKE_BACKWARDS_COMPATIBILITY CMAKE_INSTALL_PREFIX CMAKE_BUILD_TYPE)
 
 FIND_FILE(PLUGIN_TEMPLATE BundleTemplate
@@ -83,7 +83,7 @@ ENDIF(NOT EXISTS "${PLUGIN_TEMPLATE}/META-INF/MANIFEST_TEMPLATE.MF")
 
 # ====================== PROJECT FILES ===============================
 
-IF(EXISTS "${PLUGIN_TEMPLATE}/project/CMakeListsTemplate.txt")
+IF(CUSTOM_PROJECT_NAME AND EXISTS "${PLUGIN_TEMPLATE}/project/CMakeListsTemplate.txt")
 
     SET(CUSTOM_PROJECT_EXECUTABLE ${CUSTOM_PROJECT_NAME} CACHE STRING "the name of your project's executable")
 
@@ -112,7 +112,7 @@ IF(EXISTS "${PLUGIN_TEMPLATE}/project/CMakeListsTemplate.txt")
                    "${PROJECT_DIR}/${CUSTOM_PROJECT_EXECUTABLE}.cpp" @ONLY)
 
     CONFIGURE_FILE("${PLUGIN_TEMPLATE}/project/AppTemplate.ini"
-                   "${PROJECT_DIR}/${CUSTOM_PROJECT_EXECUTABLE}.ini" @ONLY)
+                   "${PROJECT_DIR}/${CUSTOM_PROJECT_EXECUTABLE}.ini" COPYONLY)
 
     CONFIGURE_FILE("${PLUGIN_TEMPLATE}/project/startAppTemplate.bat"
                    "${PROJECT_DIR}/start${CUSTOM_PROJECT_EXECUTABLE}.bat.in" @ONLY)
@@ -120,7 +120,7 @@ IF(EXISTS "${PLUGIN_TEMPLATE}/project/CMakeListsTemplate.txt")
     CONFIGURE_FILE("${PLUGIN_TEMPLATE}/project/startVS2008Template.bat"
                    "${PROJECT_DIR}/startVS2008.bat.in" @ONLY)
 
-ENDIF(EXISTS "${PLUGIN_TEMPLATE}/project/CMakeListsTemplate.txt")
+ENDIF()
 
 
 # ====================== END PROJECT FILES ===========================

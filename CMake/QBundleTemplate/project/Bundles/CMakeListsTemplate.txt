@@ -1,4 +1,4 @@
 # Go through all directories in the current directory
 # and if it contains a plug-in configure it
 MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Bundles
-                      CACHE_PLUGIN_BINARY_DIRS @CUSTOM_PROJECT_NAME@_PLUGIN_BINARY_DIRS)
+                      CACHE_PLUGIN_OUTPUT_DIRS @CUSTOM_PROJECT_NAME@_PLUGIN_OUTPUT_DIRS)

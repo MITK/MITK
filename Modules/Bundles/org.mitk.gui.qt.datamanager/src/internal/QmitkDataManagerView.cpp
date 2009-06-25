@@ -61,21 +61,19 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //# Dim/Get
 
   //# Base
-  QGridLayout* parentLayout = new QGridLayout;
-  m_BasePane = new QWidget(parent);
-  QGridLayout* _BasePaneLayout = new QGridLayout;
+  QGridLayout* _ParentLayout = new QGridLayout;
 
   //# DataStorageSelection
-  QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_BasePane);
+  QGroupBox* _DataStorageSelectionGroupBox = new QGroupBox("Data Storage Selection", m_Parent);
   QGridLayout* _DataStorageSelectionLayout = new QGridLayout;
   m_DataStorageSelectionComboBox = new QComboBox(_DataStorageSelectionGroupBox);
 
   //# setup qsplitter
-  QSplitter *_SplitterNodeViewPropertiesView = new QSplitter(m_BasePane);
+  QSplitter *_SplitterNodeViewPropertiesView = new QSplitter(m_Parent);
   _SplitterNodeViewPropertiesView->setMargin(0);
 
   //# NodeView
-  QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes (Use Right Mouse Button for a Context Menu)", m_BasePane);
+  QGroupBox* _NodeViewGroupBox = new QGroupBox("Selected Nodes (Use Right Mouse Button for a Context Menu)", m_Parent);
   m_NodeToolbar = new QToolBar(_NodeViewGroupBox);
   QVBoxLayout* _NodeViewLayout = new QVBoxLayout;
   m_NodeTableView = new QTableView(_NodeViewGroupBox);
@@ -105,18 +103,15 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_ActionShowInfoDialog = m_NodeMenu->addAction(QIcon(":/datamanager/show-data-info.png"), "Show additional infos for selected nodes");
 
   // NodeProperties
-  QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_BasePane);
+  QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_Parent);
   QHBoxLayout* _NodePropertiesLayout = new QHBoxLayout;
   m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);
 
   //// Set
 
   // Base
-  parent->setLayout(parentLayout);
-  //parentLayout->setMargin(0);
-  parentLayout->addWidget(m_BasePane, 0, 0);
-  m_BasePane->setLayout(_BasePaneLayout);
-  _BasePaneLayout->addWidget(_DataStorageSelectionGroupBox, 0, 0);
+  m_Parent->setLayout(_ParentLayout);
+  _ParentLayout->addWidget(_DataStorageSelectionGroupBox, 0, 0);
 
   _SplitterNodeViewPropertiesView->setOrientation(Qt::Vertical);
   //_SplitterNodeViewPropertiesView->setHandleWidth(5);
@@ -125,10 +120,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   //_SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodeViewGroupBox), 1);
   //_SplitterNodeViewPropertiesView->setStretchFactor(_SplitterNodeViewPropertiesView->indexOf(_NodePropertiesGroupBox), 2);
 
-  _BasePaneLayout->addWidget(_SplitterNodeViewPropertiesView, 1, 0);
-  // _BasePaneLayout->addWidget(_NodeSelectionGroupBox, 1, 0);
-  //_BasePaneLayout->addWidget(_NodeViewGroupBox, 1, 0);
-  // _BasePaneLayout->addWidget(_NodePropertiesGroupBox, 2, 0);
+  _ParentLayout->addWidget(_SplitterNodeViewPropertiesView, 1, 0);
+  // _ParentLayout->addWidget(_NodeSelectionGroupBox, 1, 0);
+  //_ParentLayout->addWidget(_NodeViewGroupBox, 1, 0);
+  // _ParentLayout->addWidget(_NodePropertiesGroupBox, 2, 0);
 
   // DataStorageSelection
   _DataStorageSelectionGroupBox->setLayout(_DataStorageSelectionLayout);
@@ -346,31 +341,38 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
   std::vector<mitk::DataTreeNode*> selectedNodes;
 
   mitk::DataTreeNode* node = 0;
+  QString question = tr("Do you really want to delete ");
+
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); it++)
   {
     node = m_NodeTableModel->GetNode(*it);
     // if node is not defined or if the node contains geometry data do not remove it
     if ( node != 0 /*& strcmp(node->GetData()->GetNameOfClass(), "Geometry2DData") != 0*/ )
-      selectedNodes.push_back(node);
-  }
-
-  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
-    ; it != selectedNodes.end(); it++)
-  {
-    node = *it;
-    switch(QMessageBox::question(m_Parent, tr("DataManager")
-      , tr("Do you really want to delete the item '").append(node->GetName().c_str()).append("' ?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
     {
-      case QMessageBox::Yes: //Remove the item from view and tree
-        this->GetDataStorage()->Remove(node);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        break;
+      selectedNodes.push_back(node);
+      question.append(QString::fromStdString(node->GetName()));
+      question.append(", ");
+    }
+  }
+  // remove the last two characters = ", "
+  question = question.remove(question.size()-2, 2);
+  question.append("?");
 
-      case QMessageBox::No:
-      case QMessageBox::Cancel:
-	  default:
-	   break;
+  QMessageBox::StandardButton answerButton = QMessageBox::question( m_Parent
+    , tr("DataManager")
+    , question
+    , QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+  if(answerButton == QMessageBox::Yes)
+  {
+    for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+      ; it != selectedNodes.end(); it++)
+    {
+      node = *it;
+      this->GetDataStorage()->Remove(node);
+      this->BtnGlobalReinitClicked(false);
+
     }
   }
 }

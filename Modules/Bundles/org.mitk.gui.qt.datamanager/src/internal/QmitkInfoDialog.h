@@ -11,6 +11,7 @@ namespace mitk
   class DataTreeNode;
 }
 class QTextBrowser;
+class QLineEdit;
 
 ///
 /// A small class which "eats" all Del-Key-pressed events on the node table.
@@ -24,8 +25,14 @@ class QmitkInfoDialog : public QDialog
     QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
   public slots:
     void OnSelectionChanged(const mitk::DataTreeNode*);
+    void OnSearchButtonClicked ( bool checked = false );
     void OnCancelButtonClicked ( bool checked = false );
+    void KeyWordTextChanged(const QString & text);
   protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+  protected:
+    QLineEdit* m_KeyWord;
+    QPushButton* m_SearchButton;
     QTextBrowser* m_TextBrowser;
 };
 

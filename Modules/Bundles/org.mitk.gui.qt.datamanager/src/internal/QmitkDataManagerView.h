@@ -128,10 +128,6 @@ protected:
 
 private:
   ///
-  /// \brief A plain widget as the base pane.
-  ///
-  QWidget* m_BasePane;
-  ///
   /// \brief A combobox for the datastorage selection.
   ///
   QComboBox* m_DataStorageSelectionComboBox;

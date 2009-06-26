@@ -88,7 +88,7 @@ bool QmitkInfoDialog::eventFilter( QObject *obj, QEvent *event )
   if (event->type() == QEvent::KeyPress) 
   {
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    if(keyEvent->key() == Qt::Key_F3)
+    if(keyEvent->key() == Qt::Key_F3  || keyEvent->key() == Qt::Key_Return)
     {
       // trigger deletion of selected node(s)
       this->OnSearchButtonClicked(true);

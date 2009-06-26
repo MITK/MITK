@@ -174,7 +174,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
       std::cout << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
       }
-      catch (BundleStateException exc)
+      catch (const BundleStateException& exc)
       {
         std::cout << exc.displayText() << std::endl;
       }

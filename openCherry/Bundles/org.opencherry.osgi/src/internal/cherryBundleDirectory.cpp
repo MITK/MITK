@@ -74,6 +74,10 @@ BundleDirectory::List(const std::string& path, std::vector<std::string>& files) 
   {
     std::cout << "Warning: " << exc.displayText() << std::endl;
   }
+  catch (const Poco::PathNotFoundException& exc)
+  {
+    std::cout << "Warning: " << exc.displayText() << std::endl;
+  }
 }
 
 bool BundleDirectory::IsDirectory(const std::string& path) const

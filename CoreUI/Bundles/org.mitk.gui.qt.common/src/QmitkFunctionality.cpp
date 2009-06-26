@@ -80,21 +80,37 @@ mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 
 void QmitkFunctionality::CreatePartControl(void* parent)
 {
-  // add a scroll area as parent for all widgets
-  QWidget* parentQWidget = static_cast<QWidget*>(parent);
-  QVBoxLayout* parentLayout = new QVBoxLayout(parentQWidget);
-  QScrollArea* scrollArea = new QScrollArea(static_cast<QWidget*>(parentQWidget));  
-  m_Parent = scrollArea;
 
-  // dont show shadow
+  // scrollArea
+  QScrollArea* scrollArea = new QScrollArea;  
+  //QVBoxLayout* scrollAreaLayout = new QVBoxLayout(scrollArea);
   scrollArea->setFrameShadow(QFrame::Plain);
   scrollArea->setFrameShape(QFrame::NoFrame);
-  parentQWidget->setLayout(parentLayout);
+  scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+  // m_Parent
+  m_Parent = new QWidget;
+  //m_Parent->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding));
+  this->CreateQtPartControl(m_Parent);
+
+  //scrollAreaLayout->addWidget(m_Parent);
+  //scrollArea->setLayout(scrollAreaLayout);
+
+  // set the widget now
+  scrollArea->setWidgetResizable(true);
+  scrollArea->setWidget(m_Parent);
+
+  // add the scroll area to the real parent (the view tabbar)
+  QWidget* parentQWidget = static_cast<QWidget*>(parent);
+  QVBoxLayout* parentLayout = new QVBoxLayout(parentQWidget);
   parentLayout->setMargin(0);
   parentLayout->setSpacing(0);
-  parentLayout->addWidget(m_Parent);
+  parentLayout->addWidget(scrollArea);
 
-  this->CreateQtPartControl(m_Parent);
+  // finally set the layout containing the scroll area to the parent widget (= show it)
+  parentQWidget->setLayout(parentLayout);
+
   this->AfterCreateQtPartControl();
 }
 

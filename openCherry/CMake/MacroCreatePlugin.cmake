@@ -120,18 +120,18 @@ MACRO(MACRO_CREATE_PLUGIN)
 
   # we need to explicitly state the debug versions of the libraries
   # we are linking to in the TARGET_LINK_LIBRARIES command.
-  # Although we set CMAKE_DEBUG_POSTFIX to d, CMake automatically
+  # Although we set the debug postfix to d, CMake automatically
   # appends it in a TARGET_LINK_LIBRARIES(target lib1) command only
   # if lib1 has been build within the same project.
   # External projects using this macro would therefore always link
   # to lib1, instead of lib1d in debug configurations
   SET(_debug_linklibs "")
   FOREACH(_linklib ${PLUGIN_LINK_LIBRARIES})
-    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${CMAKE_DEBUG_POSTFIX}")
+    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${OPENCHERRY_DEBUG_POSTFIX}")
   ENDFOREACH(_linklib)
   #MESSAGE(STATUS "${PLUGIN_TARGET} deps: ${_linklibs}")
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})
-  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized "PocoFoundation" debug "PocoFoundation${CMAKE_DEBUG_POSTFIX}")
+  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized "PocoFoundation" debug "PocoFoundation${OPENCHERRY_DEBUG_POSTFIX}")
 
   #SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
   SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib)

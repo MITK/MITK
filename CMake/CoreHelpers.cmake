@@ -287,7 +287,7 @@ MACRO(MITK_USE_MODULE)
   ENDFOREACH(dependency)
 
   FOREACH(package ${PACKAGE_DEPENDS})  
-    INCLUDE(${MITK_SOURCE_DIR}/CMake/MITK_${package}_Config.cmake)
+    INCLUDE(MITK_${package}_Config)
     #SET(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} ${${package}_INCLUDE_DIRS})
     # SET(ALL_LIBRARIES ${ALL_LIBRARIES} ${${package}_LIBRARIES})
   ENDFOREACH(package)

@@ -6,28 +6,34 @@ The BundleGenerator is a tool to simplify the process of creating your own MITK 
 
 \par Introduction
 This how-to will show you how to create a new MITK project together with a new plug-in. You will not need to touch
-either the MITK source tree or any MITK binary tree.
-
-\par
-You will get a ready to use plug-in which integrates into any openCherry Workbench configured with the MITK plug-ins.
-Start by building MITK with openCherry enabled. If everything works you have to think about a name and an id for your new plugin and/or
-your new project. The generator uses the CMake GUI for configuration.
+either the MITK source tree or any MITK binary tree. MITK will be used in the sense of a Software Development Kit (SDK), 
+providing only header files and binaries (shared objects). 
 
 \par Limitations
 The CMake based generator will generate only very few classes for you. It can generate an Activator class and a View class for GUI contributions. 
-Nevertheless, you are advised to use it because it generates the correct plugin directory structure. In the future, there will be a more
+Nevertheless, you are advised to use it because it generates the correct plug-in directory structure. In the future, there will be a more
 sophisticated generator available.
+
+\par Prerequisites
+We will use MITK as a SDK, which we have to set up first. Since there is no SDK package available 
+yet which you could download and install, we have to follow the steps in
+ <a href="http://www.mitk.org/wiki/SetupMitkQt4OpenCherry">SetupMitkQt4OpenCherry</a>. 
+This will set up a binary MITK tree which we can be used later on to link our plug-ins to. 
+
+\par
+After you have build MITK, you have to think about a name and an id for your new plug-in and/or
+your new project. The generator uses the CMake GUI for configuration.
 
 \par Windows
 \li Start the CMake GUI
-\li Choose \c Build/Tools/BundleGenerator as source directory
+\li Choose \c \<MITK-SRC-DIR\>/Build/Tools/BundleGenerator as source directory
 \li Choose a directory for the source code of your project and/or plug-in (create it if it doesn't exist)
 \li Press "Configure" and don't care about the generator
 \li Follow the steps for "All"
 
 \par Linux
 \li Create a directory for the source code of your project and/or plug-in and cd into it. 
-\li Start <tt>ccmake</tt> with <tt>Build/Tools/BundleGenerator</tt> as source directory
+\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>Build/Tools/BundleGenerator</tt> as source directory
 \li Press "Configure" 
 
 \par All

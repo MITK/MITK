@@ -36,7 +36,7 @@ SET(ACTIVATOR_CLASS "" CACHE STRING "class name for your plugin activator (optio
 
 IF(GUI_SUPPORT)
 
-  STRING(REPLACE " " "" _view_baseid "${PLUGIN_NAME}")
+  STRING(REGEX REPLACE "[^a-zA-Z_]" "" _view_baseid "${PLUGIN_NAME}")
   STRING(TOLOWER ${_view_baseid} _lview_baseid)
 
   SET(_default_view_class_name "${DEFAULT_VIEW_CLASS_BEGIN}${_view_baseid}View")

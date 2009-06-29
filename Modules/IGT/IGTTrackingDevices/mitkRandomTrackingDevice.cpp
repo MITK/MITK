@@ -17,18 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRandomTrackingDevice.h"
 
-//#include <itksys/SystemTools.hxx>
-//#include <iostream>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <mitkTimeStamp.h>
-
-//for the pause 
 #include <itksys/SystemTools.hxx>
 
-mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice()
+
+mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice(), 
+  m_AllTools(), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(20), m_NumberOfControlPoints(20),
+  m_Interpolators(), m_SplineLengths(), m_ToolSpeeds()
 {
   //set the type of this tracking device
   this->m_Type = mitk::TrackingSystemNotSpecified;
@@ -66,6 +64,7 @@ mitk::TrackingTool* mitk::RandomTrackingDevice::AddTool(const char* toolName)
   mitk::InternalTrackingTool::Pointer t = mitk::InternalTrackingTool::New();
   t->SetToolName(toolName);
   m_AllTools.push_back(t);
+  m_ToolSpeeds.push_back(0.1); // standard speed of the tool is 10 seconds per cycle
   return t;
 }
 
@@ -121,19 +120,40 @@ mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber)
 
 bool mitk::RandomTrackingDevice::OpenConnection()
 {
-  bool returnValue = true;
-  //There must be no connection for a random device
-  
-
-  if (returnValue) 
-  {    
-    this->SetMode(Ready);
-  } 
-  else 
+  /* create bspline for all tools */
+  if (m_NumberOfControlPoints < 1)
   {
-    //reset everything
+    this->SetErrorMessage("to few control points for spline interpolation");
+    return false;
   }
-  return returnValue;
+  //Init Random
+  srand(time(NULL));
+
+  for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)  // for each tool
+  {
+    SplineType::Pointer spline = SplineType::New(); // create spline
+    SplineType::ControlPointListType controlPoints;
+    controlPoints.push_back(this->GetRandomPoint()); // insert point 0
+    double length = 0.0;  // estimate spline lenght by calculating line segments lengths
+    for (unsigned int i = 1; i < m_NumberOfControlPoints - 1; ++i) // set points 1..n-2
+    {
+      SplineType::ControlPointType pos;
+      pos = this->GetRandomPoint();        
+      length += controlPoints.at(i-1).EuclideanDistanceTo(pos);
+      controlPoints.push_back(pos);
+    }
+    controlPoints.push_back(controlPoints.at(0));  // close spline --> insert point n-1
+    length += controlPoints.at(controlPoints.size() - 2).EuclideanDistanceTo(controlPoints.at(controlPoints.size() - 1));
+    spline->SetPoints(controlPoints); // SetControlPoints() ???
+    m_Interpolators.push_back(spline);
+    m_SplineLengths.push_back(length);
+  }
+  std::cout << "Splines: number: " << m_Interpolators.size() << "\n";
+  for (unsigned int i = 0; i < m_Interpolators.size(); ++i)
+    std::cout << "Splines " << i << ": " << m_Interpolators[i] << ", Points: " << /*m_Interpolators[i]->GetPoints() << */".\n"; 
+
+  this->SetMode(Ready);
+  return true;
 }
 
 
@@ -151,13 +171,28 @@ bool mitk::RandomTrackingDevice::CloseConnection()
 }
 
 
+mitk::ScalarType mitk::RandomTrackingDevice::GetSplineChordLength(unsigned int idx)
+{
+  if (idx >= m_SplineLengths.size())
+    throw std::invalid_argument("No chord length available for this index");
+  return m_SplineLengths.at(idx);
+}
+
+void mitk::RandomTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond)
+{
+  if (idx >= m_ToolSpeeds.size())
+    throw std::invalid_argument("No tool available for this index");
+  if (roundsPerSecond < 0.0001)
+    throw std::invalid_argument("Minimum tool speed is 0.0001 rounds per second");
+
+  m_ToolSpeeds.at(idx) = roundsPerSecond;
+}
+
+
 void mitk::RandomTrackingDevice::TrackTools()
 {
   try
   {
-    //Init Random
-    srand(time(NULL));
-
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
     m_TrackingFinishedMutex->Lock();
 
@@ -167,20 +202,15 @@ void mitk::RandomTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Unlock();
     while ((this->GetMode() == Tracking) && (localStopTracking == false))
     {
-      std::vector<mitk::InternalTrackingTool::Pointer>::iterator itAllTools;
-      for(itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
+      for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
       {
         mitk::InternalTrackingTool::Pointer currentTool = *itAllTools;
 
         mitk::Point3D pos;
         mitk::Quaternion quat;
 
-        //generate numbers between 0 and 99 for each direction
-        
-          
-        pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
-        pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
-        pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z
+// TODO: read position from spline
+        pos = this->GetRandomPoint();
         currentTool->SetPosition(pos);
 
         //generate numbers between 0 and 1
@@ -189,6 +219,7 @@ void mitk::RandomTrackingDevice::TrackTools()
         quat[2] = rand() / (RAND_MAX + 1.0);
         quat[3] = rand() / (RAND_MAX + 1.0);       
         currentTool->SetOrientation(quat);
+// todo: rotate once per cylcle around fixed rotation vector
 
         currentTool->SetTrackingError( 2 * (rand() / (RAND_MAX + 1.0)));  // tracking errror in 0 .. 2 Range
         currentTool->SetDataValid(true);
@@ -228,4 +259,14 @@ ITK_THREAD_RETURN_TYPE mitk::RandomTrackingDevice::ThreadStartTracking(void* pIn
     trackingDevice->TrackTools();
 
   return ITK_THREAD_RETURN_VALUE;
+}
+
+
+mitk::Point3D mitk::RandomTrackingDevice::GetRandomPoint()
+{
+  mitk::Point3D pos;
+  pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
+  pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
+  pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z
+  return pos;
 }

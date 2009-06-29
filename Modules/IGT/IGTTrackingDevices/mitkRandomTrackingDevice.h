@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTrackingDevice.h>
 #include <mitkInternalTrackingTool.h>
 #include <itkMultiThreader.h>
+#include <itkNonUniformBSpline.h>
 
 
 namespace mitk
@@ -67,6 +68,10 @@ namespace mitk
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
+    *
+    * This method will initialize a closed spline path for each tool. After StartTracking() is called,
+    * the tools will move on their spline paths with a constant velocity that can be set with 
+    * SetToolSpeed(). The standard velocity is 10 seconds for one complete cycle along the spline path.
     */
     virtual bool OpenConnection();
 
@@ -113,7 +118,29 @@ namespace mitk
     {
       return m_Bounds;
     };
+
+    /**
+    * \brief return the approximate length of the spline for tool with index idx in milimeter
+    *
+    * The call to OpenConnection() will initialize a spline path for each tool.
+    * If GetSplineChordLength() is called before OpenConnection() or if the idx is out of range of 
+    * valid tool indices, a std::invalid_argument exception is thrown. 
+    * GetSplineChordLength() returns the distance between all control points of the 
+    * spline in milimeter. This can be used as an approximation for the length of the spline path.
+    */
+    mitk::ScalarType GetSplineChordLength(unsigned int idx);
   
+    /**
+    * \brief sets the speed of the tool idx in rounds per second
+    *
+    * The virtual tools will travel along a closed spline path. 
+    * This method sets the speed of a tool as a factor of how many rounds per second
+    * the tool should move. A setting of 1.0 will indicate one complete round per second.
+    * Together with GetSplineChordLength(), the speed in milimeter per second can be estimated. 
+    * roundsPerSecond must be positive and larger than 0.0001. 
+    */
+    void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
+
   protected:
     RandomTrackingDevice();
     ~RandomTrackingDevice();
@@ -124,14 +151,23 @@ namespace mitk
     void TrackTools();
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
-  
-    std::vector<InternalTrackingTool::Pointer> m_AllTools;
+
+    mitk::Point3D GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
+
+    typedef std::vector<InternalTrackingTool::Pointer> ToolContainer;
+    ToolContainer m_AllTools;
 
     itk::MultiThreader::Pointer m_MultiThreader;
     int m_ThreadID;
     
     unsigned int m_RefreshRate;
+    unsigned int m_NumberOfControlPoints;
 
+    typedef itk::NonUniformBSpline<3> SplineType;
+    typedef std::vector<SplineType::Pointer> SplineVectorType;
+    SplineVectorType m_Interpolators;
+    std::vector<mitk::ScalarType> m_SplineLengths;
+    std::vector<mitk::ScalarType> m_ToolSpeeds;
     mitk::ScalarType m_Bounds[6];
   };   
 }//mitk

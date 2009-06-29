@@ -77,6 +77,6 @@ SET(${KITNAME}_CUSTOM_TESTS
 
 MITK_CREATE_DEFAULT_TESTS()
 
-TARGET_LINK_LIBRARIES(${KITNAME}TestDriver mitkIGT tinyxml)
+TARGET_LINK_LIBRARIES(${KITNAME}TestDriver tinyxml)
 
 # ADD_TEST(mitkLabeledImageToSurfaceFilterTest ${EXECUTABLE_OUTPUT_PATH}/${KITNAME}TestDriver mitkLabeledImageToSurfaceFilterTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/BallBinary30x30x30.pic.gz)

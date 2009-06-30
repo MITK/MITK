@@ -38,7 +38,7 @@ ENDIF (ENABLE_TESTS)
 
 # Set local include path
 #include_directories( CppUnit/include Foundation/include XML/include Net/include NetSSL_OpenSSL/include Util/include Data/include WebWidgets/include Zip/include)
-include_directories( CppUnit/include Foundation/include XML/include Util/include )
+include_directories( CppUnit/include Foundation/include XML/include Util/include Zip/include)
 
 include(CheckTypeSize)
 include(FindCygwin)
@@ -97,13 +97,14 @@ add_subdirectory(Util)
 
 #add_subdirectory(Data)
 #add_subdirectory(WebWidgets)
-#add_subdirectory(Zip)
+add_subdirectory(Zip)
 
 if (ENABLE_TESTS)
   add_subdirectory(CppUnit)
   add_subdirectory(Foundation/testsuite)
   add_subdirectory(XML/testsuite)
   add_subdirectory(Util/testsuite)
+  add_subdirectory(Zip/testsuite)
 endif (ENABLE_TESTS)
 
 

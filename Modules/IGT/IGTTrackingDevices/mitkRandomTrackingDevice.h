@@ -141,6 +141,14 @@ namespace mitk
     */
     void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
 
+typedef itk::NonUniformBSpline<3> SplineType;
+SplineType::Pointer GetSpline(unsigned int index)
+    {
+      if (index >= m_Interpolators.size())
+        throw std::invalid_argument("index out of range");
+      return m_Interpolators.at(index);
+    };
+
   protected:
     RandomTrackingDevice();
     ~RandomTrackingDevice();
@@ -163,7 +171,7 @@ namespace mitk
     unsigned int m_RefreshRate;
     unsigned int m_NumberOfControlPoints;
 
-    typedef itk::NonUniformBSpline<3> SplineType;
+    
     typedef std::vector<SplineType::Pointer> SplineVectorType;
     SplineVectorType m_Interpolators;
     std::vector<mitk::ScalarType> m_SplineLengths;

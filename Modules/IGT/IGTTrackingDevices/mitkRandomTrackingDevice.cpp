@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice(), 
-  m_AllTools(), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(20), m_NumberOfControlPoints(20),
+  m_AllTools(), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(50), m_NumberOfControlPoints(20),
   m_Interpolators(), m_SplineLengths(), m_ToolSpeeds()
 {
   //set the type of this tracking device
@@ -120,38 +120,43 @@ mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber)
 
 bool mitk::RandomTrackingDevice::OpenConnection()
 {
-  /* create bspline for all tools */
   if (m_NumberOfControlPoints < 1)
   {
     this->SetErrorMessage("to few control points for spline interpolation");
     return false;
   }
-  //Init Random
-  srand(time(NULL));
-
+  srand(time(NULL)); //Init random number generator
+  
+  /* create spline for all tools */
   for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)  // for each tool
   {
     SplineType::Pointer spline = SplineType::New(); // create spline
+    /* create random control points */
     SplineType::ControlPointListType controlPoints;
     controlPoints.push_back(this->GetRandomPoint()); // insert point 0
-    double length = 0.0;  // estimate spline lenght by calculating line segments lengths
+    double length = 0.0;  // estimate spline length by calculating line segments lengths
     for (unsigned int i = 1; i < m_NumberOfControlPoints - 1; ++i) // set points 1..n-2
     {
       SplineType::ControlPointType pos;
-      pos = this->GetRandomPoint();        
-      length += controlPoints.at(i-1).EuclideanDistanceTo(pos);
+      pos = this->GetRandomPoint();
+      length += controlPoints.at(i - 1).EuclideanDistanceTo(pos);
       controlPoints.push_back(pos);
     }
-    controlPoints.push_back(controlPoints.at(0));  // close spline --> insert point n-1
+    controlPoints.push_back(controlPoints.at(0));  // close spline --> insert point last control point with same value as first control point
     length += controlPoints.at(controlPoints.size() - 2).EuclideanDistanceTo(controlPoints.at(controlPoints.size() - 1));
-    spline->SetPoints(controlPoints); // SetControlPoints() ???
+
+    /* Create knot list. TODO: rethink knot list values and list size. Is there a better solution? */
+    SplineType::KnotListType knotList;
+    knotList.push_back(0.0);
+    for (unsigned int i = 1; i < controlPoints.size() + spline->GetSplineOrder() + 1; ++i)
+      knotList.push_back(i);
+    knotList.push_back(controlPoints.size() + spline->GetSplineOrder() + 1);
+
+    spline->SetControlPoints(controlPoints);
+    spline->SetKnots(knotList);
     m_Interpolators.push_back(spline);
     m_SplineLengths.push_back(length);
   }
-  std::cout << "Splines: number: " << m_Interpolators.size() << "\n";
-  for (unsigned int i = 0; i < m_Interpolators.size(); ++i)
-    std::cout << "Splines " << i << ": " << m_Interpolators[i] << ", Points: " << /*m_Interpolators[i]->GetPoints() << */".\n"; 
-
   this->SetMode(Ready);
   return true;
 }
@@ -162,9 +167,6 @@ bool mitk::RandomTrackingDevice::CloseConnection()
   bool returnValue = true; 
   if(this->GetMode() == Setup)
     return true;
-
-//  returnValue = m_Device->StopTracking();
-//  delete m_Device;
 
   this->SetMode(Setup);
   return returnValue;
@@ -191,37 +193,43 @@ void mitk::RandomTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType
 
 void mitk::RandomTrackingDevice::TrackTools()
 {
+  if (m_Interpolators.size() != m_AllTools.size())
+    throw std::logic_error("mismatch between tool count and interpolator count");
   try
   {
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
     m_TrackingFinishedMutex->Lock();
-
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
+    double t = 0.0;
     while ((this->GetMode() == Tracking) && (localStopTracking == false))
     {
+      SplineVectorType::iterator splineIt = m_Interpolators.begin();
       for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
       {
         mitk::InternalTrackingTool::Pointer currentTool = *itAllTools;
-
         mitk::Point3D pos;
-        mitk::Quaternion quat;
-
-// TODO: read position from spline
-        pos = this->GetRandomPoint();
+        /* calculate tool position with spline interpolation */
+        pos = (*splineIt)->EvaluateSpline(t);
         currentTool->SetPosition(pos);
+        splineIt++;
+        // Currently, a constant speed is used. TODO: use tool velocity setting
+        t += 0.001;
+        if (t >= 1.0)
+          t = 0.0;
 
-        //generate numbers between 0 and 1
-        quat[0] = rand() / (RAND_MAX + 1.0);
-        quat[1] = rand() / (RAND_MAX + 1.0);
-        quat[2] = rand() / (RAND_MAX + 1.0);
-        quat[3] = rand() / (RAND_MAX + 1.0);       
+        mitk::Quaternion quat;
+        /* fix quaternion rotation */
+        quat.x() = 1.0;
+        quat.y() = 1.0;
+        quat.z() = 1.0;
+        quat.r() = 1.0;
         currentTool->SetOrientation(quat);
-// todo: rotate once per cylcle around fixed rotation vector
+        // TODO: rotate once per cycle around a fixed rotation vector
 
-        currentTool->SetTrackingError( 2 * (rand() / (RAND_MAX + 1.0)));  // tracking errror in 0 .. 2 Range
+        currentTool->SetTrackingError( 2 * (rand() / (RAND_MAX + 1.0)));  // tracking error in 0 .. 2 Range
         currentTool->SetDataValid(true);
       }
       itksys::SystemTools::Delay(m_RefreshRate);

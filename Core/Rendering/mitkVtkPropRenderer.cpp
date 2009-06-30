@@ -660,6 +660,9 @@ void mitk::VtkPropRenderer::InitPathTraversal()
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
+  if (!m_PickingObjects) //safety to catch seg-faults on F-key (=fly)
+    return NULL;
+
   if ( m_PickingObjectsIterator == m_PickingObjects->end() )
   {
     return NULL;

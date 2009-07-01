@@ -402,7 +402,6 @@ void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked
     node->GetBoolProperty("visible", isVisible);
     node->SetVisibility(!isVisible);
   }
-  BtnGlobalReinitClicked();
 }
 
 void QmitkDataManagerView::ActionShowInfoDialogTriggered( bool checked /*= false */ )

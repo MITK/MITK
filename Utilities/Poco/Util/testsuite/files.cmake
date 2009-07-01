@@ -10,6 +10,14 @@ SET(CPP_BASE_FILENAMES
  TimerTestSuite TimerTest
 )
 
+IF(WIN32)
+SET(CPP_BASE_FILENAMES
+  WinDriver WindowsTestSuite WinConfigurationTest WinRegistryTest
+  ${CPP_BASE_FILENAMES}
+)
+ENDIF(WIN32)
+
+
 SET(CPP_FILES "")
 FOREACH(basename ${CPP_BASE_FILENAMES})
   SET(CPP_FILES ${CPP_FILES} src/${basename})

@@ -16,4 +16,5 @@ MITK_CREATE_MODULE( MitkExt
 )
 
 
+ADD_SUBDIRECTORY(Testing)
 

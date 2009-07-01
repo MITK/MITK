@@ -360,17 +360,17 @@ IF(BUILD_TESTING)
     ADD_TEST(${TName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName})
   ENDFOREACH( test )
 
-  FOREACH(image ${${KITNAME}_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
+  FOREACH(image ${MODULE_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
     IF(EXISTS ${image})
       SET(IMAGE_FULL_PATH ${image})
     ELSE(EXISTS ${image})
       # todo: maybe search other paths as well
       # yes, please in mitk/Testing/Data, too
-      SET(IMAGE_FULL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Data/${image})
+      SET(IMAGE_FULL_PATH ${MITK_SOURCE_DIR}/Core/Testing/Data/${image})
     ENDIF(EXISTS ${image})
 
     IF(EXISTS ${IMAGE_FULL_PATH})
-    FOREACH( test ${${KITNAME}_IMAGE_TESTS} )
+    FOREACH( test MODULE_IMAGE_TESTS} )
       GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
       GET_FILENAME_COMPONENT(ImageName ${IMAGE_FULL_PATH} NAME)
       ADD_TEST(${TName}_${ImageName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${KITNAME}TestDriver ${TName} ${IMAGE_FULL_PATH})

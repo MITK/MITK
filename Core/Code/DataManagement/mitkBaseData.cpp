@@ -340,6 +340,7 @@ void mitk::BaseData::ExecuteOperation(mitk::Operation* /*operation*/)
 
 void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
+  os << std::endl;
   os << indent << " TimeSlicedGeometry: ";
   if(GetTimeSlicedGeometry() == NULL)
     os << "NULL" << std::endl;

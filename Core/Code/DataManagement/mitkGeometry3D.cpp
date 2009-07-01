@@ -487,20 +487,62 @@ void mitk::Geometry3D::PrintSelf(std::ostream& os, itk::Indent indent) const
   if(m_IndexToWorldTransform.IsNull())
     os << "NULL" << std::endl;
   else
-    m_IndexToWorldTransform->Print(os, indent);
+  {
+    // from itk::MatrixOffsetTransformBase
+    unsigned int i, j;
+    os << std::endl;
+    os << indent << "Matrix: " << std::endl;
+    for (i = 0; i < 3; i++) 
+    {
+      os << indent.GetNextIndent();
+      for (j = 0; j < 3; j++)
+      {
+        os << m_IndexToWorldTransform->GetMatrix()[i][j] << " ";
+      }
+      os << std::endl;
+    }
+
+    os << indent << "Offset: " << m_IndexToWorldTransform->GetOffset() << std::endl;
+    os << indent << "Center: " << m_IndexToWorldTransform->GetCenter() << std::endl;
+    os << indent << "Translation: " << m_IndexToWorldTransform->GetTranslation() << std::endl;
+
+    os << indent << "Inverse: " << std::endl;
+    for (i = 0; i < 3; i++) 
+    {
+      os << indent.GetNextIndent();
+      for (j = 0; j < 3; j++)
+      {
+        os << m_IndexToWorldTransform->GetInverseMatrix()[i][j] << " ";
+      }
+      os << std::endl;
+    }
+
+    // from itk::ScalableAffineTransform
+    os << indent << "Scale : ";
+    for (i = 0; i < 3; i++) 
+    {
+      os << m_IndexToWorldTransform->GetScale()[i] << " ";
+    }
+    os << std::endl;
+  }
 
   os << indent << " BoundingBox: ";
   if(m_BoundingBox.IsNull())
     os << "NULL" << std::endl;
   else
-    m_BoundingBox->Print(os, indent);
+  {
+    os << indent << "( ";
+    for (unsigned int i=0; i<3; i++)
+    {
+      os << m_BoundingBox->GetBounds()[2*i] << "," << m_BoundingBox->GetBounds()[2*i+1] << " ";
+    }
+    os << " )" << std::endl;
+  }
 
   os << indent << " Origin: " << m_Origin << std::endl;
   os << indent << " ImageGeometry: " << m_ImageGeometry << std::endl;
   os << indent << " Spacing: " << m_Spacing << std::endl;
   os << indent << " TimeBounds: " << m_TimeBounds << std::endl;
-
-  Superclass::PrintSelf(os,indent);
 }
 
 mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const

@@ -343,10 +343,11 @@ void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
 
 void mitk::TimeSlicedGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
-  Superclass::PrintSelf(os,indent);
+  //Superclass::PrintSelf(os,indent);
   os << indent << " EvenlyTimed: " << m_EvenlyTimed << std::endl;
   os << indent << " TimeSteps: " << m_TimeSteps << std::endl;
 
+  os << std::endl;
   os << indent << " GetGeometry3D(0): ";
   if(GetGeometry3D(0)==NULL)
     os << "NULL" << std::endl;

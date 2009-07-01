@@ -671,6 +671,7 @@ mitk::SlicedGeometry3D::PrintSelf( std::ostream& os, itk::Indent indent ) const
   }
   os << indent << " Slices: " << m_Slices << std::endl;
 
+  os << std::endl;
   os << indent << " GetGeometry2D(0): ";
   if ( this->GetGeometry2D(0) == NULL )
   {

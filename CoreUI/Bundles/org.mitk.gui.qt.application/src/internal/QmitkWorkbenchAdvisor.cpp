@@ -15,7 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+
 #include "QmitkWorkbenchAdvisor.h"
+
+#include <QApplication>
 
 #include <QmitkRegisterClasses.h>
 
@@ -42,4 +45,17 @@ std::string
 QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
   return DEFAULT_PERSP_ID;
+}
+
+void QmitkWorkbenchAdvisor::PreStartup()
+{
+// Todo: define nice qt style sheets and make them work
+//#ifndef Q_WS_X11
+//  QFile file(":/org_mitk_gui_qt_application/pagefold.qss");
+//  file.open(QFile::ReadOnly);
+//  QString styleSheet = QLatin1String(file.readAll());
+//
+//  qApp->setStyleSheet(styleSheet);
+// 
+//#endif
 }

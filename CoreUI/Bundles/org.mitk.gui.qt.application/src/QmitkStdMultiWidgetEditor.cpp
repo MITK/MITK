@@ -58,9 +58,15 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 {
   if (m_StdMultiWidget == 0)
   {
-    m_StdMultiWidget = new QmitkStdMultiWidget(parent);
+    m_DndFrameWidget = new QmitkDnDFrameWidget(parent);
     QVBoxLayout* layout = new QVBoxLayout(parent);
-    layout->addWidget(m_StdMultiWidget);
+    layout->addWidget(m_DndFrameWidget);
+    layout->setContentsMargins(0,0,0,0); 
+
+    m_StdMultiWidget = new QmitkStdMultiWidget(m_DndFrameWidget);
+    QVBoxLayout* layout2 = new QVBoxLayout(m_DndFrameWidget);
+    layout2->addWidget(m_StdMultiWidget);
+    layout2->setContentsMargins(0,0,0,0); 
 
     mitk::DataStorage::Pointer ds = this->GetEditorInput().Cast<mitk::DataStorageEditorInput>()
       ->GetDataStorageReference()->GetDataStorage();

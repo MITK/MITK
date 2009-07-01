@@ -29,9 +29,9 @@ namespace cherry {
 QtControlWidget::QtControlWidget(QWidget* parent, Shell::Pointer shell, Qt::WindowFlags f)
  : QFrame(parent, f)
 {
-  this->setFrameStyle(QFrame::NoFrame);
-
   controller = new QtWidgetController(shell);
+
+  this->setFrameStyle(QFrame::NoFrame);
 
   // TODO WeakPointer: QVariant should hold a weak pointer
   QVariant variant(QVariant::UserType);
@@ -47,11 +47,12 @@ QtControlWidget::~QtControlWidget()
 void QtControlWidget::changeEvent(QEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
-  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+  
   switch (event->type())
   {
   case QEvent::WindowActivate:
   {
+    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
     ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
     for (ListenerList::iterator listener = activatedListeners.begin();
          listener != activatedListeners.end(); ++listener)
@@ -66,6 +67,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     break;
   case QEvent::WindowDeactivate:
   {
+    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
     ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
     for (ListenerList::iterator listener = deactivatedListeners.begin();
          listener != deactivatedListeners.end(); ++listener)
@@ -80,6 +82,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     break;
   case QEvent::WindowStateChange:
   {
+    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
     QWindowStateChangeEvent* stateEvent = dynamic_cast<QWindowStateChangeEvent*>(event);
     Qt::WindowStates oldState = stateEvent->oldState();
     if (this->isMinimized() && !(oldState & Qt::WindowMinimized))

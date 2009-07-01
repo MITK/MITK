@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2009-02-10 14:14:32 +0100 (Di, 10 Feb 2009) $
+Version:   $Revision: 16224 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -15,25 +15,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QMITKWORKBENCHADVISOR_H_
-#define QMITKWORKBENCHADVISOR_H_
+#ifndef QmitkDndFrameWidget_h
+#define QmitkDndFrameWidget_h
 
-#include <cherryQtWorkbenchAdvisor.h>
+#include <QWidget>
+//drag&drop
+class QDragEnterEvent;
+class QDropEvent;
+class QMouseEvent;
 
-class QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
+class QmitkDnDFrameWidget : public QWidget
 {
+  Q_OBJECT
+
 public:
+  QmitkDnDFrameWidget(QWidget *parent);
+  
 
-  static const std::string DEFAULT_PERSP_ID;
+private:
+  void dragEnterEvent( QDragEnterEvent *event );
+  void dropEvent( QDropEvent * event );
 
-  void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
-
-  void PreStartup();
-
-  cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-        cherry::IWorkbenchWindowConfigurer::Pointer configurer);
-
-  std::string GetInitialWindowPerspectiveId();
+ 
 };
 
-#endif /*QMITKWORKBENCHADVISOR_H_*/
+
+#endif 

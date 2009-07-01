@@ -75,7 +75,40 @@ int mitkPointSetWriterTest(int /* argc */, char* /*argv*/[])
     std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
+
+
+  MITK_TEST_OUTPUT( << "Check if filename can be set correctly: ");
+  myPointSetWriter->SetFileName("filename");
+  const char * filename = myPointSetWriter->GetFileName();
+  MITK_TEST_CONDITION_REQUIRED(filename == "filename", "Filename set correctly?");
+
+  MITK_TEST_OUTPUT( << "Check if prefix can be set correctly: ");
+  myPointSetWriter->SetFilePrefix("pre");
+  const char * prefix = myPointSetWriter->GetFilePrefix();
+  MITK_TEST_CONDITION_REQUIRED(prefix == "pre", "Prefix set correctly?");
+
+  MITK_TEST_OUTPUT( << "Check if pattern can be set correctly: ");
+  myPointSetWriter->SetFilePattern("pattern");
+  const char * pattern = myPointSetWriter->GetFilePattern();
+  MITK_TEST_CONDITION_REQUIRED(prefix == "pattern", "Pattern set correctly?");
+
   
+  MITK_TEST_OUTPUT( << "Check if input can be set correctly: ");
+  myPointSetWriter->SetInput(pointSet);
+  mitk::PointSet::Pointer pointSet2 = mitk::PointSet::New();
+  pointSet2 = myPointSetWriter->GetInput();
+
+  MITK_TEST_CONDITION_REQUIRED( pointSet->GetSize() == pointSet2->GetSize(), "Pointsets have unequal size" ); 
+  
+  for(int i=0; i<pointSet->GetSize(); i++)
+  {
+    mitk::Point3D p1 = pointSet->GetPoint(i);
+    mitk::Point3D p2 = pointSet2->GetPoint(i);
+    MITK_TEST_CONDITION_REQUIRED( p1[0] == p2[0] && p1[0] == p2[0] && p1[0] == p2[0], "Pointsets aren't equal" );
+  }
+
+  std::vector< std::string > extensions = myPointSetWriter->GetPossibleFileExtensions();
+
   // always end with this!
   MITK_TEST_END()
 }

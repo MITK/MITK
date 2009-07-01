@@ -203,7 +203,7 @@ void mitk::RandomTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
-    double t = 0.0;
+    mitk::ScalarType t = 0.0;
     while ((this->GetMode() == Tracking) && (localStopTracking == false))
     {
       SplineVectorType::iterator splineIt = m_Interpolators.begin();
@@ -270,9 +270,9 @@ ITK_THREAD_RETURN_TYPE mitk::RandomTrackingDevice::ThreadStartTracking(void* pIn
 }
 
 
-mitk::Point3D mitk::RandomTrackingDevice::GetRandomPoint()
+mitk::RandomTrackingDevice::SplineType::ControlPointType mitk::RandomTrackingDevice::GetRandomPoint()
 {
-  mitk::Point3D pos;
+  SplineType::ControlPointType pos;
   pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
   pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
   pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z

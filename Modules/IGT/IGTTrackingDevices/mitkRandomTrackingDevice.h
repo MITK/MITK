@@ -160,7 +160,7 @@ SplineType::Pointer GetSpline(unsigned int index)
 
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
 
-    mitk::Point3D GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
+    SplineType::ControlPointType GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
 
     typedef std::vector<InternalTrackingTool::Pointer> ToolContainer;
     ToolContainer m_AllTools;

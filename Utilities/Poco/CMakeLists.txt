@@ -97,14 +97,14 @@ add_subdirectory(Util)
 
 #add_subdirectory(Data)
 #add_subdirectory(WebWidgets)
-#add_subdirectory(Zip)
+add_subdirectory(Zip)
 
 if (ENABLE_TESTS)
   add_subdirectory(CppUnit)
   add_subdirectory(Foundation/testsuite)
   add_subdirectory(XML/testsuite)
   add_subdirectory(Util/testsuite)
-#  add_subdirectory(Zip/testsuite)
+  add_subdirectory(Zip/testsuite)
 endif (ENABLE_TESTS)
 
 

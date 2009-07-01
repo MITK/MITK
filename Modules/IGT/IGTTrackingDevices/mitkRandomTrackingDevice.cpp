@@ -210,10 +210,12 @@ void mitk::RandomTrackingDevice::TrackTools()
       for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
       {
         mitk::InternalTrackingTool::Pointer currentTool = *itAllTools;
-        mitk::Point3D pos;
+        SplineType::PointType pos;
         /* calculate tool position with spline interpolation */
         pos = (*splineIt)->EvaluateSpline(t);
-        currentTool->SetPosition(pos);
+        mitk::Point3D mp;
+        mitk::itk2vtk(pos, mp); // convert from SplineType::PointType to mitk::Point3D
+        currentTool->SetPosition(mp);
         splineIt++;
         // Currently, a constant speed is used. TODO: use tool velocity setting
         t += 0.001;

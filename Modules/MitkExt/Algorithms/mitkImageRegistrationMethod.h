@@ -56,8 +56,8 @@ namespace mitk
 
     typedef itk::SingleValuedNonLinearOptimizer         OptimizerType;
     typedef itk::ImageMaskSpatialObject< 3 >            MaskType;
-       
-    
+
+
     mitkClassMacro(ImageRegistrationMethod, ImageToImageFilter);
 
     itkNewMacro(Self);
@@ -65,12 +65,12 @@ namespace mitk
     static const int LINEARINTERPOLATOR = 0;
     static const int NEARESTNEIGHBORINTERPOLATOR = 1;
 
-    
+
 
     void SetObserver(RigidRegistrationObserver::Pointer observer);
 
     void SetInterpolator(int interpolator);
-    
+
     virtual void GenerateData();
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
@@ -109,26 +109,25 @@ namespace mitk
     {
       m_Presets = presets;
     }
-    
-    
+
+
     itkSetMacro(MatchHistograms, bool);
     itkGetMacro(Preset, mitk::RigidRegistrationPreset*);
 
-   
+
 
   protected:
     ImageRegistrationMethod();
     virtual ~ImageRegistrationMethod();
 
     template < typename TPixel, unsigned int VImageDimension >
-      void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
+    void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
 
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;
     Image::Pointer m_ReferenceImage;
 
-
-    
+    virtual void GenerateOutputInformation(){};
 
   private:
     OptimizerParameters::Pointer m_OptimizerParameters;
@@ -137,13 +136,13 @@ namespace mitk
 
     std::vector<std::string> m_Presets;
     mitk::RigidRegistrationPreset* m_Preset;
-    
-       
+
+
     bool m_UseMask;   
     bool m_MatchHistograms;
     MaskType::Pointer m_BrainMask;
 
-       
+
   };
 }
 

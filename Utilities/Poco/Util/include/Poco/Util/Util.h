@@ -44,6 +44,14 @@
 
 #include "Poco/Foundation.h"
 
+//
+// Ensure that POCO_DLL is default unless POCO_STATIC is defined
+//
+#if defined(_WIN32) && defined(_DLL)
+	#if !defined(POCO_DLL) && !defined(POCO_STATIC)
+		#define POCO_DLL
+	#endif
+#endif
 
 //
 // The following block is the standard way of creating macros which make exporting

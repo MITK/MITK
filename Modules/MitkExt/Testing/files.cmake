@@ -33,9 +33,9 @@ SET(MODULE_IMAGE_TESTS
   mitkCompressedImageContainerTest.cpp  
   mitkCylindricToCartesianFilterTest.cpp
   # failing test
-  # mitkExtractImageFilterTest.cpp  
+  mitkExtractImageFilterTest.cpp  
   mitkManualSegmentationToSurfaceFilterTest.cpp
-  # mitkOverwriteSliceImageFilterTest.cpp  
+  mitkOverwriteSliceImageFilterTest.cpp  
   mitkSurfaceToImageFilterTest.cpp
 )
 SET(MODULE_TESTIMAGES

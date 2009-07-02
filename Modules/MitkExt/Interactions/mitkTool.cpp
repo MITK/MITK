@@ -121,6 +121,7 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* orig
   PixelType pixelType( typeid(DefaultSegmentationDataType) );
   Image::Pointer segmentation = Image::New();
   segmentation->SetProperty( "organ type", OrganTypeProperty::New( organType ) );
+ 
   segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );
 
   unsigned int byteSize = sizeof(DefaultSegmentationDataType);
@@ -173,7 +174,8 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, co
   segmentationNode->SetProperty( "opacity", FloatProperty::New(0.3) );
   segmentationNode->SetProperty( "segmentation", BoolProperty::New(true) );
   segmentationNode->SetProperty( "reslice interpolation", VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
-
+  segmentationNode->SetProperty( "showVolume", BoolProperty::New( false ) );
+  
   return segmentationNode;
 }
 

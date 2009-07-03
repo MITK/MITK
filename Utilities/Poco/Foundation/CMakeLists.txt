@@ -187,6 +187,10 @@ else (CMAKE_SYSTEM MATCHES "Windows")
  add_definitions( -DPCRE_STATIC)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 
+if(CMAKE_COMPILER_IS_MINGW)
+ add_definitions( -DPOCO_NO_FPENVIRONMENT -DPCRE_STATIC)
+endif()
+
 add_library( ${LIBNAME} ${LIB_MODE} ${SRCS} )
 set_target_properties( ${LIBNAME} PROPERTIES
         DEFINE_SYMBOL Foundation_EXPORTS

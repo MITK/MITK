@@ -86,7 +86,7 @@ void QmitkSceneSerializationView::SerializeSelected()
 {
   mitk::SceneIO::Pointer sceneio = mitk::SceneIO::New();
 
-  /* 
+  /*  TODO respect user selection in list view
    *  intermediate step: create new data storage, add all selected nodes
    *  OR: create a predicate ORing all selected nodes
    */

@@ -24,8 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
 
+class TiXmlElement;
+
 namespace mitk
 {
+
+class BaseData;
+class PropertyList;
 
 class SceneSerialization_EXPORT SceneIO : public itk::Object
 {
@@ -55,7 +60,7 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
      *
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
-     * 
+     *
      * \param storage a DataStorage containing all nodes that should be saved
      * \param filename full filename of the scene file
      * \param predicate defining which items of the datastorage to use and which not
@@ -65,7 +70,17 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
                             NodePredicateBase* predicate = NULL );
 
   protected:
+    
+    SceneIO();
+    virtual ~SceneIO();
 
+    std::string CreateEmptyTempDirectory();
+
+    TiXmlElement* SaveBaseData( BaseData* data, const std::string& filenamehint );
+    TiXmlElement* SavePropertyList( PropertyList* propertyList, const std::string& filenamehint );
+
+
+    std::string m_WorkingDirectory;
 };
 
 }

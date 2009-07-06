@@ -109,6 +109,7 @@ IF(Poco_INCLUDE_DIR)
       ${Poco_INCLUDE_DIR}/Net/include
       ${Poco_INCLUDE_DIR}/Util/include
       ${Poco_INCLUDE_DIR}/XML/include
+      ${Poco_INCLUDE_DIR}/Zip/include
     )
     SET(Poco_FOUND 1)
   ELSEIF(EXISTS "${Poco_INCLUDE_DIR}/Poco/Poco.h")

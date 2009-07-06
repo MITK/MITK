@@ -136,13 +136,13 @@ void mitk::SplineVtkMapper3D::ApplyProperties()
     lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("line width"))->GetValue();
   m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
 
+  //already done in superclass but to m_ContourActor and not to SplineActor
   float opacity;
   if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity")) == NULL)
     opacity = 1.0;
   else
     opacity = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("opacity"))->GetValue();
   m_SplinesActor->GetProperty()->SetOpacity(opacity);
-
   
   m_SplineUpdateTime.Modified();
 }

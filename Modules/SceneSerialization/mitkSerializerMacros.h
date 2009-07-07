@@ -70,11 +70,11 @@ class classname ## Factory : public ::itk::ObjectFactoryBase \
  \
     classname ## RegistrationMethod() \
     { \
-      std::cout << #classname "RegistrationMethod" << std::endl; \
+      std::cout << "(II) Register " #classname << std::endl; \
       itk::ObjectFactoryBase::RegisterFactory( classname ## Factory::New() ); \
     } \
   }; \
 } \
  \
-static mitk::classname ## RegistrationMethod somestaticinitializer;
+static mitk::classname ## RegistrationMethod somestaticinitializer_ ## classname ;
 

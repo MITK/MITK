@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSceneIO.h"
 #include "mitkBaseDataSerializer.h"
+#include "mitkPropertyListSerializer.h"
 
 #include "mitkProgressBar.h"
 #include "mitkBaseRenderer.h"
@@ -281,8 +282,9 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   // find correct serializer
   // the serilizer must
   //  - create a file containing all information to recreate the BaseData object --> needs to know where to put this file (and a filename?)
-  //  - what to do about writers that creates one file per timestep?
+  //  - TODO what to do about writers that creates one file per timestep?
   TiXmlElement* element = new TiXmlElement("data");
+  element->SetAttribute( "type", data->GetNameOfClass() );
  
   // construct name of serializer class
   std::string serializername(data->GetNameOfClass());
@@ -327,8 +329,24 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
 {
   assert(propertyList);
   
+  //  - TODO what to do about shared properties (same object in two lists or behind several keys)?
   TiXmlElement* element = new TiXmlElement("properties");
-  element->SetAttribute("file", filenamehint);
+ 
+  // construct name of serializer class
+  PropertyListSerializer::Pointer serializer = PropertyListSerializer::New();
+  
+  serializer->SetPropertyList(propertyList);
+  serializer->SetFilenameHint(filenamehint);
+  serializer->SetWorkingDirectory( m_WorkingDirectory );
+  try
+  {
+    std::string writtenfilename = serializer->Serialize();
+    element->SetAttribute("file", writtenfilename);
+  }
+  catch (std::exception& e)
+  {
+    LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+  }
     
   return element;
 }

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSerializeBaseData_h_included
 
 #include "SceneSerializationExports.h"
-#include "mitkBaseDataSerializerMacros.h"
+#include "mitkSerializerMacros.h"
 
 #include <itkObjectFactoryBase.h>
 #include "mitkBaseData.h"
@@ -44,7 +44,6 @@ class SceneSerialization_EXPORT BaseDataSerializer : public itk::Object
   public:
     
     mitkClassMacro( BaseDataSerializer, itk::Object );
-    itkNewMacro(Self); // is this needed? should never be instantiated, only subclasses should
 
     itkSetStringMacro(FilenameHint);
     itkGetStringMacro(FilenameHint);
@@ -52,7 +51,7 @@ class SceneSerialization_EXPORT BaseDataSerializer : public itk::Object
     itkSetStringMacro(WorkingDirectory);
     itkGetStringMacro(WorkingDirectory);
     
-    itkSetObjectMacro(Data, BaseData);
+    itkSetConstObjectMacro(Data, BaseData);
 
     /**
       \brief Serializes given BaseData object.
@@ -66,10 +65,12 @@ class SceneSerialization_EXPORT BaseDataSerializer : public itk::Object
 
     BaseDataSerializer();
     virtual ~BaseDataSerializer();
+
+    std::string GetUniqueFilenameInWorkingDirectory();
     
     std::string m_FilenameHint;
     std::string m_WorkingDirectory;
-    BaseData::Pointer m_Data;
+    BaseData::ConstPointer m_Data;
 };
 
 } // namespace

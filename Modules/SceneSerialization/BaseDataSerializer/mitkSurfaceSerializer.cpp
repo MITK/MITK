@@ -16,9 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/TemporaryFile.h>
-#include <Poco/Path.h>
-
 #include "mitkSurfaceSerializer.h"
 
 #include "mitkSurfaceVtkWriter.h"
@@ -38,20 +35,19 @@ mitk::SurfaceSerializer::~SurfaceSerializer()
 std::string mitk::SurfaceSerializer::Serialize()
 {
   LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (void*) this->m_Data
+           << " is asked to serialize an object " << (const void*) this->m_Data
            << " into a directory " << m_WorkingDirectory
            << " using a filename hint " << m_FilenameHint;
 
-  Surface* surface = dynamic_cast<Surface*>( m_Data.GetPointer() );
+  const Surface* surface = dynamic_cast<const Surface*>( m_Data.GetPointer() );
   if (!surface)
   {
-    LOG_ERROR << " Object at " << (void*) this->m_Data
+    LOG_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::Surface. Cannot serialize as surface.";
     return "";
   }
 
-  Poco::Path newname( Poco::TemporaryFile::tempName() );
-  std::string filename( newname.getFileName() );
+  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
 std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
@@ -66,12 +62,12 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
     SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer = SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
     writer->SetFileName( fullname );
     //writer->SetExtension(".vtp");
-    writer->SetInput( surface );
+    writer->SetInput( const_cast<Surface*>( surface ) );
     writer->Write();
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << " Error serializing object at " << (void*) this->m_Data
+    LOG_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to " 
               << fullname 
               << ": " 

@@ -16,9 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/TemporaryFile.h>
-#include <Poco/Path.h>
-
 #include "mitkImageSerializer.h"
 
 #include "mitkImageWriter.h"
@@ -36,20 +33,19 @@ mitk::ImageSerializer::~ImageSerializer()
 std::string mitk::ImageSerializer::Serialize()
 {
   LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (void*) this->m_Data
+           << " is asked to serialize an object " << (const void*) this->m_Data
            << " into a directory " << m_WorkingDirectory
            << " using a filename hint " << m_FilenameHint;
 
-  Image* image = dynamic_cast<Image*>( m_Data.GetPointer() );
+  const Image* image = dynamic_cast<const Image*>( m_Data.GetPointer() );
   if (!image)
   {
-    LOG_ERROR << " Object at " << (void*) this->m_Data
+    LOG_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::Image. Cannot serialize as image.";
     return "";
   }
 
-  Poco::Path newname( Poco::TemporaryFile::tempName() );
-  std::string filename( newname.getFileName() );
+  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
 std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
@@ -63,12 +59,12 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
     ImageWriter::Pointer writer = ImageWriter::New();
     writer->SetFileName( fullname );
     writer->SetExtension(".pic");
-    writer->SetInput( image );
+    writer->SetInput( const_cast<Image*>(image) ); // bad writer design??
     writer->Write();
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << " Error serializing object at " << (void*) this->m_Data
+    LOG_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to " 
               << fullname 
               << ": " 

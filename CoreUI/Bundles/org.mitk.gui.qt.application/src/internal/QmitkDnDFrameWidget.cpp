@@ -34,7 +34,8 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     return;
   
   QList<QUrl> fileNames = event->mimeData()->urls();
-  mitk::DataTreeNode::Pointer node;
+  
+  bool dsmodified = false;
   for (QList<QUrl>::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
@@ -43,15 +44,23 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     {
       nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
       nodeReader->Update();
-      node = nodeReader->GetOutput();
-      ds->Add(node);
+      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+      {
+        mitk::DataTreeNode::Pointer node;
+        node = nodeReader->GetOutput(i);
+        if ( node->GetData() != NULL )
+        {  
+          ds->Add(node);
+          dsmodified = true;
+        }
+      }
     }
     catch(...)
     {
 
     }
   }
-  if(node.IsNotNull() && node->GetData() != 0)
+  if(dsmodified)
   {
     mitk::RenderingManager::GetInstance()->InitializeViews(ds->ComputeBoundingGeometry3D());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

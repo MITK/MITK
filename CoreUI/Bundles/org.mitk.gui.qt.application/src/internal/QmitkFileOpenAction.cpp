@@ -70,7 +70,7 @@ void QmitkFileOpenAction::Run()
     dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
   }
 
-  mitk::DataTreeNode::Pointer node;
+  bool dsmodified = false;
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
@@ -79,15 +79,23 @@ void QmitkFileOpenAction::Run()
     {
       nodeReader->SetFileName(fileName->toStdString());
       nodeReader->Update();
-      node = nodeReader->GetOutput();
-      dataStorage->Add(node);
+      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+      {
+        mitk::DataTreeNode::Pointer node;
+        node = nodeReader->GetOutput(i);
+        if ( node->GetData() != NULL )
+        {  
+          dataStorage->Add(node);
+          dsmodified = true;
+        }
+      }
     }
     catch(...)
     {
 
     }
   }
-
+  
   if (multiWidgetEditor.IsNull())
   {
     cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
@@ -96,11 +104,13 @@ void QmitkFileOpenAction::Run()
   else
   {
     multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-  }        
+  }
 
-  if(node.IsNotNull() && node->GetData() != 0)
+  if(dsmodified)
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews(dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll()));
+    mitk::RenderingManager::GetInstance()->InitializeViews(dataStorage->ComputeBoundingGeometry3D());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+ 
 }

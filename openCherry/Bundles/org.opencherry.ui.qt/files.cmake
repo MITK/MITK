@@ -27,17 +27,17 @@ SET(INTERNAL_CPP_FILES
   util/cherryTabFolderEvent.cpp
 
   cherryLogView.cpp
-
+  cherryQtLogView.cpp
+  cherryQtPlatformLogModel.cpp
+  
   cherryQtControlWidget.cpp
   cherryQtDnDTweaklet.cpp
   cherryQtFileImageDescriptor.cpp
   cherryQtGlobalEventFilter.cpp
   cherryQtIconImageDescriptor.cpp
   cherryQtImageTweaklet.cpp
-  cherryQtLogView.cpp
   cherryQtMainWindowControl.cpp
   cherryQtMissingImageDescriptor.cpp
-  cherryQtPlatformLogModel.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp
   cherryQtShowViewAction.cpp
@@ -65,6 +65,9 @@ SET(MOC_H_FILES
   src/internal/cherryQtShowViewAction.h
   src/internal/cherryQtTracker.h
   src/internal/cherryQtWidgetsTweakletImpl.h
+  src/internal/cherryQtLogView.h
+  src/internal/cherryQtPlatformLogModel.h
+  
 )
 
 SET(UI_FILES
@@ -75,6 +78,10 @@ SET(UI_FILES
 
 SET(RES_FILES
   resources/org_opencherry_ui_qt.qrc
+)
+
+SET(RESOURCE_FILES
+  resources/save.png
 )
 
 SET(CPP_FILES manifest.cpp)

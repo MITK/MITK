@@ -10,5 +10,6 @@
      <file>icon_missing.png</file>
      <file>tab_close_icon.png</file>
      <file>tab_close_icon-active.png</file>
+     <file>save.png</file>
  </qresource>
  </RCC>

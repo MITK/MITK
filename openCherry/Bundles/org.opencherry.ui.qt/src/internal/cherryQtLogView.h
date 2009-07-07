@@ -18,23 +18,34 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTLOGVIEW_H
 #define CHERRYQTLOGVIEW_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QWidget>           
+#include <QSortFilterProxyModel>
 
 #include "../cherryUiQtDll.h"
 
 #include "ui_cherryQtLogView.h"
 
+#include "cherryQtPlatformLogModel.h"
+
 namespace cherry {
 
 class CHERRY_UI_QT QtLogView : public QWidget
 {
-
+    Q_OBJECT
+    
 public:
     QtLogView(QWidget *parent = 0);
     ~QtLogView();
-
+	  QtPlatformLogModel *model;
+	  QSortFilterProxyModel *filterModel;
+	  
 private:
     Ui::QtLogViewClass ui;
+    
+protected slots:
+    void slotFilterChange( const QString& );
+    void slotRowAdded( const QModelIndex & , int , int  );
+    
 };
 
 }

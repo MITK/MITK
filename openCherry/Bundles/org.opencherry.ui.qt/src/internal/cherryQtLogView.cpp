@@ -27,14 +27,43 @@ QtLogView::QtLogView(QWidget *parent)
     : QWidget(parent)
 {
 	ui.setupUi(this);
-	ui.tableView->setModel(QtUIPlugin::GetInstance()->GetLogModel());
 	
+	model = QtUIPlugin::GetInstance()->GetLogModel();
+	
+  filterModel = new QSortFilterProxyModel(this);
+  filterModel->setSourceModel(model);
+	filterModel->setFilterKeyColumn(-1);
+
+	ui.tableView->setModel(filterModel);
+
 	ui.tableView->verticalHeader()->setVisible(false);
+	           
+	connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
+	connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
+           
+	ui.tableView->resizeColumnsToContents();
+	ui.tableView->resizeRowsToContents();
 }
 
 QtLogView::~QtLogView()
 {
-
 }
+
+void QtLogView::slotFilterChange( const QString& q )
+{
+  filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
+}
+
+
+void QtLogView::slotRowAdded ( const QModelIndex & parent, int start, int end )
+{
+  for(int r=start;r<=end;r++)
+  {
+    ui.tableView->resizeRowToContents(r);
+  }
+  
+  ui.tableView->scrollToBottom();
+}
+
 
 }

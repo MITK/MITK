@@ -101,7 +101,7 @@ namespace mbilog {
 
   void MBILOG_DLL_API RegisterBackend(AbstractBackend* backend);
   void MBILOG_DLL_API UnregisterBackend(AbstractBackend* backend);
-  void MBILOG_DLL_API DistributeToBackends(const LogMessage &l);
+  void MBILOG_DLL_API DistributeToBackends(LogMessage &l);
 
   class MBILOG_DLL_API PseudoStream {
 

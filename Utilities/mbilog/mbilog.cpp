@@ -37,8 +37,15 @@ void mbilog::UnregisterBackend(mbilog::AbstractBackend* backend)
 
 static bool warningNoBackend = false;
 
-void mbilog::DistributeToBackends(const mbilog::LogMessage &l)
+void mbilog::DistributeToBackends(mbilog::LogMessage &l)
 {
+
+  // Crop Message
+  {
+    std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
+    l.message = (i != std::string::npos) ? l.message.substr(0, i+1) : "";
+  }
+  
   if(backends.empty())
   {
     if(!warningNoBackend)
@@ -122,10 +129,7 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
     }
   }
 
-  std::cout << "] ";
-
-  std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
-  std::cout << ((i =! std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
+  std::cout << "] " << l.message << std::endl;
 
 }
 
@@ -175,6 +179,5 @@ void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)
       break;
   }
 
-  std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
-  std::cout << ((i != std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
+  std::cout << l.message << std::endl;
 }

@@ -30,10 +30,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mbilog.h"
 
+#include <QMutex>
+
+
 namespace cherry {
 
 class QtPlatformLogModel : public QAbstractTableModel
 {
+  Q_OBJECT
 
 public:
 
@@ -46,7 +50,6 @@ public:
 
   QVariant headerData(int section, Qt::Orientation orientation, int) const;
 
-
   void addLogEntry(const mbilog::LogMessage &msg);
 
 private:
@@ -55,22 +58,22 @@ private:
 
   void addLogEntry(const PlatformEvent& event);
 
-
   struct LogEntry {
     LogEntry(const std::string& msg, const std::string& src, std::time_t t)
-    : message(msg.c_str()), source(src.c_str())
-    { time.setTime_t(t); }
+    : message(msg.c_str()), moduleName(src.c_str()),time(std::clock())
+    { 
+    }
 
     QString message;
-    QString source;
-    QDateTime time;
+    clock_t time;
 
     QString level;
     QString filePath;
     QString lineNumber;
     QString moduleName;
     QString category;
-  
+    QString function;
+    
     LogEntry(const mbilog::LogMessage &msg)
     {
       message = msg.message.c_str();
@@ -102,14 +105,13 @@ private:
             
       std::stringstream out;
       out << msg.lineNumber;
-      std::string s = out.str(); 
-      lineNumber = s.c_str();
+      lineNumber = out.str().c_str();
       
       moduleName = msg.moduleName;
       category = msg.category.c_str();
-      source = msg.functionName;
+      function = msg.functionName;
       
-      time.setTime_t(std::time(NULL)); 
+      time=std::clock(); 
     }
   };
     
@@ -131,7 +133,7 @@ private:
       void ProcessMessage(const mbilog::LogMessage &l )
       {
         myModel->addLogEntry(l);
-      }
+      }                             
       
     private:
     
@@ -139,6 +141,19 @@ private:
   } *myBackend;
 
   std::vector<LogEntry> m_Entries;
+  std::list<mbilog::LogMessage> *m_Active,*m_Pending;
+  
+  QMutex m_Mutex;
+  
+  signals:
+  
+    void signalFlushLogEntries();
+
+  protected slots:
+  
+    void slotFlushLogEntries();
+  
+  
 };
 
 }

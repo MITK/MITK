@@ -55,8 +55,6 @@ void QtPlatformLogModel::slotFlushLogEntries()
   
   if(num>0)
   {
-    std::cout << "flushing " << num << " entries\n";
-  
     int row = m_Entries.size();
     this->beginInsertRows(QModelIndex(), row, row+num-1);
     do {

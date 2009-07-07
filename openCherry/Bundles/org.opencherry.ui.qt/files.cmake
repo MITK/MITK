@@ -80,10 +80,6 @@ SET(RES_FILES
   resources/org_opencherry_ui_qt.qrc
 )
 
-SET(RESOURCE_FILES
-  resources/save.png
-)
-
 SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})

@@ -176,5 +176,5 @@ void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)
   }
 
   std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
-  std::cout << ((i =! std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
+  std::cout << ((i != std::string::npos) ? l.message.substr(0, i+1) : "") << std::endl;
 }

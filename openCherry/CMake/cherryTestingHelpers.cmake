@@ -29,6 +29,9 @@ MACRO(OPENCHERRY_CREATE_TESTS)
   ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_SOURCE_DIR}/Testing/cherryTestManager.cpp)
   TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized ${plugin_target} debug ${plugin_target}${OPENCHERRY_DEBUG_POSTFIX})
   TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized PocoFoundation debug PocoFoundationd )
+  GET_TARGET_PROPERTY(TESTDRIVER_LOCATION TestDriver_${plugin_target} LOCATION)
+  MESSAGE("OPENCHERRY: LOCATION: ${TESTDRIVER_LOCATION}")
+  MESSAGE("OPENCHERRY: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
   #
   # Now tell CMake which tests should be run. This is done automatically 
   # for all tests in CHERRY_TESTS 

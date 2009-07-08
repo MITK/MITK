@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <qstatusbar.h>
 #include "mitkQtAppDll.h"
+#include <QLabel>
 
 //##Documentation
 //## @brief QT-Toolkit/GUI dependent class that provides to send a Message to the QT's StatusBar
@@ -59,6 +60,7 @@ public:
     virtual void DisplayWarningText(const char *t, int ms) { this->DisplayText(t, ms); };
     virtual void DisplayGenericOutputText(const char *t) {this->DisplayText(t);}
     virtual void DisplayDebugText(const char *t) { this->DisplayText(t); };
+    virtual void DisplayGreyValueText(const char *t);
 
     //##Documentation
     //## @brief removes any temporary message being shown.
@@ -73,6 +75,7 @@ public:
 private:
     //static Pointer m_Instance;
     QStatusBar* m_StatusBar;
+    QLabel* m_GreyValueLabel;
 
 };
 

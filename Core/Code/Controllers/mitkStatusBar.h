@@ -62,6 +62,7 @@ public:
   void DisplayWarningText(const char *t, int ms);
   void DisplayGenericOutputText(const char *t);
   void DisplayDebugText(const char *t);
+  void DisplayGreyValueText(const char *t);
 
   //##Documentation
   //## @brief removes any temporary message being shown.

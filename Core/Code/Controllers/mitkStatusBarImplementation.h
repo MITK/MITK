@@ -45,6 +45,8 @@ public:
   virtual void DisplayWarningText(const char *t, int ms) = 0;
   virtual void DisplayGenericOutputText(const char *t) = 0;
   virtual void DisplayDebugText(const char *t) = 0;
+  virtual void DisplayGreyValueText(const char *t) = 0;
+
 
   //##Documentation
   //## @brief removes any temporary message being shown.

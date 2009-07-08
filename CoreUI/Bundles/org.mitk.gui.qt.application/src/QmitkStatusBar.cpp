@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactory.h>
 
 
-
 /**
  * Display the text in the statusbar of the applikation
  */
@@ -47,7 +46,14 @@ void QmitkStatusBar::DisplayText(const char* t, int ms)
   // TODO bug #1357
   //qApp->processEvents(); // produces crashes!
 }
-
+/**
+ * Show the grey value text in the statusbar
+ */
+void QmitkStatusBar::DisplayGreyValueText(const char* t)
+{
+  QString text(t);
+  m_GreyValueLabel->setText(text);
+}
 /**
  * Clear the text in the StatusBar
  */
@@ -73,6 +79,8 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
+    m_GreyValueLabel = new QLabel(m_StatusBar,0);
+    m_StatusBar->addPermanentWidget(m_GreyValueLabel);
     mitk::StatusBar::SetImplementation(this);
 }
 

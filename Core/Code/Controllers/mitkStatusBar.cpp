@@ -69,7 +69,11 @@ void StatusBar::DisplayDebugText(const char *t)
   if (m_Implementation != NULL)
     m_Implementation->DisplayDebugText(t);
 }
-
+void StatusBar::DisplayGreyValueText(const char *t)
+{
+  if (m_Implementation != NULL)
+    m_Implementation->DisplayGreyValueText(t);
+}
 void StatusBar::Clear()
 {
   if ( m_Implementation != NULL)

@@ -117,9 +117,17 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   //safety cause there are datatreenodes that have no defined data (video-nodes and root)
   unsigned int dataMTime = 0;
   mitk::BaseData::Pointer data = static_cast<mitk::BaseData *>(node->GetData());
+
   if (data.IsNotNull())
   {
     dataMTime = data->GetMTime();
+  }
+
+  // Check if time step is valid; TODO: Check if invalid data is still visualized
+  if(!(data->GetTimeSlicedGeometry()->IsValidTime(m_TimeStep)))
+  {
+    itkWarningMacro(<< "Warning: " << data << " is not defined at this timestep!");
+    return;
   }
 
   if(

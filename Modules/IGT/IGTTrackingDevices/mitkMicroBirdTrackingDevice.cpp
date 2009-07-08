@@ -274,11 +274,16 @@ bool mitk::MicroBirdTrackingDevice::CloseConnection()
     HandleError(errorCode);
 
   // Delete configuration
-  if (m_TransmitterConfig)
+  if (m_TransmitterConfig != NULL)
+  {
     delete [] m_TransmitterConfig;
-  if (m_SensorConfig)
+    m_TransmitterConfig = NULL;
+  }
+  if (m_SensorConfig != NULL)
+  {
     delete [] m_SensorConfig;
-
+    m_SensorConfig = NULL;
+  }
   // Change mode and release mutex
   this->SetMode(Setup);
   m_ModeMutex->Unlock();

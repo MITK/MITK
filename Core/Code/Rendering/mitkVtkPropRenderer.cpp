@@ -420,12 +420,6 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 */
 void mitk::VtkPropRenderer::Resize(int w, int h)
 {
-  glViewport (0, 0, w, h);
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  glOrtho( 0.0, w, 0.0, h , 0.0 , 1.0);
-  glMatrixMode( GL_MODELVIEW );
-
   BaseRenderer::Resize(w, h);
    
   Update();

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryCodeCache.h"
 
 #include "Poco/Path.h"
@@ -28,7 +30,7 @@ namespace cherry {
 
 CodeCache::CodeCache(const std::string& path) : m_CachePath(path)
 {
-  std::cout << "Creating CodeCache with path: " << path << std::endl;
+  CHERRY_INFO << "Creating CodeCache with path: " << path << std::endl;
   if (!m_CachePath.exists())
   {
     m_CachePath.createDirectory();
@@ -44,7 +46,7 @@ CodeCache::~CodeCache()
 void
 CodeCache::Clear()
 {
-  std::cout << "Clearing code cache\n";
+  CHERRY_INFO << "Clearing code cache\n";
   std::vector<Poco::File> files;
   m_CachePath.list(files);
   for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
@@ -56,7 +58,7 @@ CodeCache::Clear()
 bool
 CodeCache::HasLibrary(const std::string& name)
 {
-  //std::cout << "HasLibrary checks for: " << name;
+  //CHERRY_INFO << "HasLibrary checks for: " << name;
 
   std::vector<std::string> files;
   m_CachePath.list(files);
@@ -68,19 +70,19 @@ CodeCache::HasLibrary(const std::string& name)
   for (iter = files.begin(); iter != files.end(); iter++)
   {
     if ((*iter) == libName) {
-      //std::cout << " FOUND\n";
+      //CHERRY_INFO << " FOUND\n";
       return true;
     }
   }
 
-  //std::cout << " NOT FOUND\n";
+  //CHERRY_INFO << " NOT FOUND\n";
   return false;
 }
 
 void
 CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 {
-  //std::cout << "Installing library " << name << " to " << this->GetPathForLibrary(name).toString() << std::endl;
+  //CHERRY_INFO << "Installing library " << name << " to " << this->GetPathForLibrary(name).toString() << std::endl;
   std::ofstream ostr(this->GetPathForLibrary(name).toString().c_str(), std::ios::binary | std::ios::trunc);
 
   ostr << istr.rdbuf();
@@ -89,7 +91,7 @@ CodeCache::InstallLibrary(const std::string& name, std::istream& istr)
 void
 CodeCache::InstallLibrary(const std::string& name, const Poco::File& path)
 {
-  //std::cout << "Registering library " << name << " in " << path.path() << std::endl;
+  //CHERRY_INFO << "Registering library " << name << " in " << path.path() << std::endl;
   m_LibPaths.insert(std::make_pair(name, path));
 }
 
@@ -118,7 +120,7 @@ CodeCache::GetPathForLibrary(const std::string& name)
   std::string libName(name);
   std::replace(libName.begin(), libName.end(), '.', '_');
 
-  //std::cout << "Getting path for library: " << libName << std::endl;
+  //CHERRY_INFO << "Getting path for library: " << libName << std::endl;
   if (m_LibPaths.find(libName) != m_LibPaths.end())
   {
     return Poco::Path(m_LibPaths[libName].path(), libName + Poco::SharedLibrary::suffix());

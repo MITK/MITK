@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryTypeExtensionManager.h"
 
 #include "cherryExpressions.h"
@@ -63,7 +65,7 @@ namespace cherry {
       {
         if (Expressions::TRACING)
         {
-          std::cout << "[Type Extension] - method " <<
+          CHERRY_INFO << "[Type Extension] - method " <<
           receiver->ToString() << "#" << method <<
           " found in cache: " <<
           (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";
@@ -87,7 +89,7 @@ namespace cherry {
     fPropertyCache->Put(result);
     if (Expressions::TRACING)
     {
-      std::cout << "[Type Extension] - method " <<
+      CHERRY_INFO << "[Type Extension] - method " <<
       typeid(receiver).name() << "#" << method <<
       " not found in cache: " <<
       (double(std::clock() - start))/(CLOCKS_PER_SEC/1000) << " ms.";

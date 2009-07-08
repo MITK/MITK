@@ -1077,16 +1077,16 @@ void PartSashContainer::Stack(StackablePart::Pointer newPart,
       StackablePart::Pointer fpp = pres->FindPart(vRef->GetId(),
           vRef->GetSecondaryId());
 
-      std::cout << "Stacking part\n";
+      CHERRY_INFO << "Stacking part\n";
 
       if (fpp != 0)
       {
         // Remove the part from old container.
-        std::cout << "Calling DerefPart(StackablePart::Pointer)\n";
+        CHERRY_INFO << "Calling DerefPart(StackablePart::Pointer)\n";
         this->DerefPart(newPart);
       }
       else {
-        std::cout << "fpp is NULL\n";
+        CHERRY_INFO << "fpp is NULL\n";
       }
     }
   }
@@ -1107,19 +1107,19 @@ void PartSashContainer::Stack(StackablePart::Pointer newPart,
 void PartSashContainer::DerefPart(StackablePart::Pointer sourcePart)
 {
   IStackableContainer::Pointer container = sourcePart->GetContainer();
-  //std::cout << "Dereferencing part (container is " << (container == 0 ? "NULL" : "NOT null") << ")\n";
+  //CHERRY_INFO << "Dereferencing part (container is " << (container == 0 ? "NULL" : "NOT null") << ")\n";
   if (container != 0)
   {
     container->Remove(sourcePart);
 
     if (this->IsStackType(container) && container.Cast<LayoutPart> () != 0)
     {
-      //std::cout << "LayoutPart container size: " << container->GetChildren().size() << std::endl;
+      //CHERRY_INFO << "LayoutPart container size: " << container->GetChildren().size() << std::endl;
       if (container->GetChildren().size() == 0)
       {
         LayoutPart::Pointer stack = container.Cast<LayoutPart> ();
         this->Remove(stack);
-        //std::cout << "IN DerefPart: stack reference count : " << container->GetReferenceCount() << std::endl;
+        //CHERRY_INFO << "IN DerefPart: stack reference count : " << container->GetReferenceCount() << std::endl;
         stack->Dispose();
       }
     }

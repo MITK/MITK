@@ -1268,7 +1268,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       {
 //        StatusManager.getManager().handle(
 //            StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
-        std::cout << e.displayText() << std::endl;
+        CHERRY_ERROR << e.displayText() << std::endl;
       }
       return IEditorReference::Pointer(0);
     }

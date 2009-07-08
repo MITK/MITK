@@ -82,7 +82,7 @@ void PartStack::PartStackDropResult::Drop()
       } catch (PartInitException& e)
       {
         //e.printStackTrace();
-        std::cout << e.displayText();
+        CHERRY_ERROR << e.displayText();
       }
 
     }
@@ -679,7 +679,7 @@ void PartStack::SavePresentationState()
 
 PartStack::~PartStack()
 {
-  //std::cout << "DELETING PARTSTACK\n";
+  //CHERRY_INFO << "DELETING PARTSTACK\n";
 }
 
 void PartStack::Dispose()

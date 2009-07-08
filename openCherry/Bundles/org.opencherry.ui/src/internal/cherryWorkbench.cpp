@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryWorkbench.h"
 
 #include "../tweaklets/cherryWorkbenchTweaklet.h"
@@ -428,7 +430,7 @@ void Workbench::OpenFirstTimeWindow()
     //        WorkbenchMessages.Problems_Opening_Page, e.getMessage(), e
     //            .getStatus());
     //  }});
-    std::cout << "Error: Problems opening page. " << e.displayText() << std::endl;
+    CHERRY_ERROR << "Error: Problems opening page. " << e.displayText() << std::endl;
   }
 }
 

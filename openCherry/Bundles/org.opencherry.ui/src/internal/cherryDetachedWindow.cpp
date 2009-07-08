@@ -90,7 +90,7 @@ void DetachedWindow::Create()
   windowShell = page->GetWorkbenchWindow().Cast<WorkbenchWindow>()
        ->GetDetachedWindowPool()->AllocateShell(shellListener);
 #ifdef CHERRY_DEBUG_SMARTPOINTER
-  std::cout << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
+  CHERRY_INFO << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
 #endif
   windowShell->SetData(Object::Pointer(this));
   windowShell->SetText(""); //$NON-NLS-1$

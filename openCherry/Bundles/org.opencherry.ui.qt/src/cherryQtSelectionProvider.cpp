@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryQtSelectionProvider.h"
 
 #include "cherryQtItemSelection.h"
@@ -94,7 +96,7 @@ QtSelectionProvider
 
 void QtSelectionProvider::SetItemSelectionModel(QItemSelectionModel* selModel)
 {
-  std::cout << "Setting item selection model for provider: " << selModel << std::endl;
+  CHERRY_INFO << "Setting item selection model for provider: " << selModel << std::endl;
   if (qSelectionModel)
   {
     qSelectionModel->disconnect(this);

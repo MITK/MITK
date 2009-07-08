@@ -171,7 +171,7 @@ PresentablePartFolder::~PresentablePartFolder()
     (*iter)->RemovePropertyListener(childPropertyChangeListener);
   }
 
-  std::cout << "DELETING PresentablePartFolder and contentProxy\n";
+  CHERRY_INFO << "DELETING PresentablePartFolder and contentProxy\n";
 
   delete folder;
 }
@@ -219,7 +219,7 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(currentWidget, contentListener);
   }
   folder->SetContent(contentProxy);
-  std::cout << "listener add: " << i << std::endl;
+  CHERRY_INFO << "listener add: " << i << std::endl;
 }
 
 std::vector<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()

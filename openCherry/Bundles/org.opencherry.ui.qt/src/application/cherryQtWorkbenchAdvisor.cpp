@@ -34,7 +34,7 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   char** argv;
   int& argc = Platform::GetRawApplicationArgs(argv);
 
- // std::cout << "QtWorkbenchAdvisor::Initialize argv[0] = " << argv[0] << " argv[1] = " << argv[1] << std::endl;
+ // CHERRY_INFO << "QtWorkbenchAdvisor::Initialize argv[0] = " << argv[0] << " argv[1] = " << argv[1] << std::endl;
 
   QApplication* app = new QApplication(argc, argv);
   QObject* eventFilter = new QtGlobalEventFilter(app);

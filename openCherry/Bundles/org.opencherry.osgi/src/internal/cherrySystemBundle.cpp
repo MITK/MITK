@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherrySystemBundle.h"
 
 #include "Poco/Exception.h"
@@ -45,7 +47,7 @@ void SystemBundle::Resume()
   }
   catch (Poco::Exception exc)
   {
-    std::cout << exc.displayText() << std::endl;
+    CHERRY_ERROR << exc.displayText() << std::endl;
   }
   
   // start all plugins with lazy-start: false
@@ -55,7 +57,7 @@ void SystemBundle::Resume()
   }
   catch (Poco::Exception exc)
   {
-    std::cout << exc.displayText() << std::endl;
+    CHERRY_ERROR << exc.displayText() << std::endl;
   }
 
 }

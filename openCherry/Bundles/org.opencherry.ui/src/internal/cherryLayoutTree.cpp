@@ -236,10 +236,10 @@ int LayoutTree::ComputeMinimumSize(bool width, int availablePerpendicular)
 }
 void LayoutTree::PrintCacheStatistics()
 {
-  std::cout << "minimize cache " << minCacheHits << " / " << (minCacheHits
+  CHERRY_INFO << "minimize cache " << minCacheHits << " / " << (minCacheHits
       + minCacheMisses) << " hits " <<
       (minCacheHits * 100 / (minCacheHits + minCacheMisses)) << "%\n";
-  std::cout  << "maximize cache " << maxCacheHits << " / " << (maxCacheHits
+  CHERRY_INFO  << "maximize cache " << maxCacheHits << " / " << (maxCacheHits
       + maxCacheMisses) << " hits" <<
       (maxCacheHits * 100 / (maxCacheHits + maxCacheMisses)) << "%\n";
 }

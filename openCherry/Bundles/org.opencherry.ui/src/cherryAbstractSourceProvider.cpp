@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryAbstractSourceProvider.h"
 #include "services/cherryIServiceLocator.h"
 
@@ -41,7 +43,7 @@ void AbstractSourceProvider::LogDebuggingInfo(const std::string& message)
 {
   if (DEBUG && (message != ""))
   {
-    std::cout << "SOURCES" << " >>> " << message;
+    CHERRY_INFO << "SOURCES" << " >>> " << message;
   }
 }
 

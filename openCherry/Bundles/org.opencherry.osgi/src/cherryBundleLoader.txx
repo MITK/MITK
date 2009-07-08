@@ -28,7 +28,7 @@ template<class C>
 C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className)
 {
   m_Logger.information("Trying to load class " + className + " from plugin " + bundleName);
-  std::cout << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName << std::endl;
+  CHERRY_INFO << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName << std::endl;
   BundleInfo& bundleInfo = m_BundleMap[bundleName];
 
   // check that bundle is started
@@ -37,7 +37,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   Poco::Any* any = bundleInfo.m_ClassLoaderMap[typeid(C).name()];
   if (any == 0)
   {
-    std::cout << "Creating new classloader for type: " << typeid(C).name() << std::endl;
+    CHERRY_INFO << "Creating new classloader for type: " << typeid(C).name() << std::endl;
     any = new Poco::Any(Poco::SharedPtr<Poco::ClassLoader<C> >(new Poco::ClassLoader<C>()));
     bundleInfo.m_ClassLoaderMap[typeid(C).name()] = any;
   }
@@ -51,12 +51,12 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   if (!cl->isLibraryLoaded(libPath.toString()))
   {
     m_Logger.information("Loading library: " + libPath.toString());
-    std::cout << "Loading library: " << libPath.toString() << std::endl;
+    CHERRY_INFO << "Loading library: " << libPath.toString() << std::endl;
     
     cl->loadLibrary(libPath.toString(), C::GetManifestName());
   }
   else {
-    std::cout << "Library " << libPath.toString() << " already loaded\n";
+    CHERRY_INFO << "Library " << libPath.toString() << " already loaded\n";
   }
 
   return cl->create(className);

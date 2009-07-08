@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryWorkbenchServiceRegistry.h"
 
 #include "../cherryISources.h"
@@ -129,7 +131,7 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
   } catch (CoreException& e)
   {
     //StatusManager.getManager().handle(e.getStatus());
-    std::cout << "CoreException: " << e.displayText() << std::endl;
+    CHERRY_ERROR << "CoreException: " << e.displayText() << std::endl;
   }
   return result;
 }
@@ -242,7 +244,7 @@ std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProvide
       } catch (CoreException& e)
       {
         //StatusManager.getManager().handle(e.getStatus());
-        std::cout << "CoreException: " << e.displayText() << std::endl;
+        CHERRY_ERROR << "CoreException: " << e.displayText() << std::endl;
       }
     }
   }

@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryQtSash.h"
 
 #include <cherryConstants.h>
@@ -39,7 +41,7 @@ QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool opaque) :
 
 QtSash::~QtSash()
 {
-  std::cout << "DELETING Sash Widget\n";
+  CHERRY_INFO << "DELETING Sash Widget\n";
 }
 
 void QtSash::AddSelectionListener(GuiTk::ISelectionListener::Pointer listener)

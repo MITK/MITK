@@ -421,7 +421,7 @@ void EditorReference::ReportMalfunction(const std::string& string)
     errorMessage += ": " + string; //$NON-NLS-1$
 
     //StatusManager.getManager().handle(StatusUtil.newStatus(getDescriptor().getPluginId(), errorMessage, null));
-    std::cout << errorMessage << std::endl;
+    CHERRY_ERROR << errorMessage << std::endl;
   }
 }
 
@@ -536,7 +536,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
   {
     //StatusManager.getManager().handle(
     //    StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
-    std::cout << e.what() << std::endl;
+    CHERRY_ERROR << e.what() << std::endl;
     return IEditorPart::Pointer(0);
   }
 

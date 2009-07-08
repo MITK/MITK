@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryWorkbenchPlugin.h"
 
 #include "cherryWorkbenchRegistryConstants.h"
@@ -209,13 +211,13 @@ IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
 
 void WorkbenchPlugin::Log(const std::string& message)
 {
-  std::cout << "LOG: " << message << std::endl;
+  CHERRY_INFO << "LOG: " << message << std::endl;
   //inst->GetLog().log(message);
 }
 
 void WorkbenchPlugin::Log(const Poco::RuntimeException& exc)
 {
-  std::cout << "LOG: " << exc.message() << std::endl;
+  CHERRY_INFO << "LOG: " << exc.message() << std::endl;
   //inst->GetLog().log(exc);
 }
 
@@ -240,7 +242,7 @@ void WorkbenchPlugin::Start(IBundleContext::Pointer context)
 {
   //context.addBundleListener(getBundleListener());
   AbstractUIPlugin::Start(context);
-  std::cout << "\nStarting WorkbenchPlugin...\n\n";
+  CHERRY_INFO << "\nStarting WorkbenchPlugin...\n\n";
   bundleContext = context;
 
 

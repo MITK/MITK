@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
 
 #include "Poco/Exception.h"
 
@@ -43,7 +44,7 @@ Bundle::Bundle(BundleLoader& loader, IBundleStorage::Pointer storage) :
   }
   catch (Poco::FileException& exc)
   {
-    std::cout << "Exception: " << exc.displayText() << std::endl;
+    CHERRY_ERROR << "Exception: " << exc.displayText() << std::endl;
     m_State = BUNDLE_UNINSTALLED;
   }
 }
@@ -179,7 +180,7 @@ Bundle::Resolve()
     IBundleManifest::Dependencies::const_iterator iter;
     for (iter =  this->GetRequiredBundles().begin(); iter !=  this->GetRequiredBundles().end(); ++iter)
     {
-      std::cout << "Checking dependency:" << iter->symbolicName << ";\n";
+      CHERRY_INFO << "Checking dependency:" << iter->symbolicName << ";\n";
       IBundle::Pointer bundle = m_BundleLoader.FindBundle(iter->symbolicName);
       if (bundle.IsNull())
         throw BundleResolveException("The bundle " + this->GetSymbolicName() + " depends on missing bundle:", iter->symbolicName);
@@ -198,7 +199,7 @@ Bundle::Start()
   if (m_State == BUNDLE_RESOLVED)
   {
     Poco::Mutex::ScopedLock lock(m_Mutex);
-    std::cout << "Starting bundle: " << this->GetSymbolicName() << std::endl;
+    CHERRY_INFO << "Starting bundle: " << this->GetSymbolicName() << std::endl;
 
     m_State = BUNDLE_STARTING;
 //    BundleEvent starting(this, BundleEvent::EV_BUNDLE_STARTING);
@@ -206,7 +207,7 @@ Bundle::Start()
 
     m_Activator->Start(m_BundleLoader.GetContextForBundle(IBundle::Pointer(this)));
 
-    std::cout << "Activator started!\n";
+    CHERRY_INFO << "Activator started!\n";
     m_State = BUNDLE_ACTIVE;
 //    BundleEvent started(this, BundleEvent::EV_BUNDLE_STARTED);
 //    this->GetEvents().bundleStarted(this, started);

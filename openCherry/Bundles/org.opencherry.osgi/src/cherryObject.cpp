@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryObject.h"
 
 #include <list>
@@ -182,9 +184,8 @@ Object
     // this point anyway.  Also this is the least-derived class so the
     // whole object has been destroyed by this point anyway.  Just
     // issue a warning.
-    std::cout << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n";
-    std::cout << this->GetClassName() << " (" << this << "): Trying to delete object with non-zero reference count.";
-    std::cout << "\n\n";
+    CHERRY_WARN << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n"
+                << this->GetClassName() << " (" << this << "): Trying to delete object with non-zero reference count.";
     }
 
     /**

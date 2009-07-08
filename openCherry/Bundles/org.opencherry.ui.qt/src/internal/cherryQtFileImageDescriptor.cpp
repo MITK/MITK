@@ -46,7 +46,7 @@ void* QtFileImageDescriptor::CreateImage(bool returnMissingImageOnError)
       return this->CreateFromStream(&fs);
     } catch (const Poco::FileNotFoundException* e)
     {
-      std::cout << e->displayText() << std::endl;
+      CHERRY_ERROR << e->displayText() << std::endl;
       if (returnMissingImageOnError)
         return GetMissingImageDescriptor()->CreateImage();
     }

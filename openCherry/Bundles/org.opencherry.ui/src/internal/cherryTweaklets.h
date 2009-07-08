@@ -166,7 +166,7 @@ private:
         {
           //StatusManager.getManager().handle(
           //    StatusUtil.newStatus(IStatus.ERR,
-          std::cout << "Error with extension " << elements[i] << e.what();
+          CHERRY_ERROR << "Error with extension " << elements[i] << e.what();
           //    StatusManager.LOG);
         }
       }

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryBundleDirectory.h"
 
 #include <iostream>
@@ -51,7 +53,7 @@ BundleDirectory::GetResource(const std::string& path) const
 {
   Poco::Path resPath(m_RootPath);
   std::string resStr = resPath.append(Path(path)).toString();
-  //std::cout << "Getting resource: " << resStr << std::endl;
+  //CHERRY_INFO << "Getting resource: " << resStr << std::endl;
   try {
     return new Poco::FileInputStream(resStr);
   }
@@ -72,11 +74,11 @@ BundleDirectory::List(const std::string& path, std::vector<std::string>& files) 
   }
   catch (Poco::FileNotFoundException& exc)
   {
-    std::cout << "Warning: " << exc.displayText() << std::endl;
+    CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
   }
   catch (const Poco::PathNotFoundException& exc)
   {
-    std::cout << "Warning: " << exc.displayText() << std::endl;
+    CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
   }
 }
 
@@ -85,7 +87,7 @@ bool BundleDirectory::IsDirectory(const std::string& path) const
   Poco::Path fullPath(m_RootPath);
   fullPath.append(path);
   Poco::File file(fullPath.makeDirectory());
-  std::cout << "Testing " << file.path() << " for directory: " << (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
+  CHERRY_INFO << "Testing " << file.path() << " for directory: " << (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
   return file.exists() && file.isDirectory();
 }
 

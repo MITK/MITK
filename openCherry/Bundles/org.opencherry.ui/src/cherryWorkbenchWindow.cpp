@@ -88,10 +88,10 @@ WorkbenchWindow::~WorkbenchWindow()
 
   Shell::Pointer shell = detachedWindowShells->availableShells.front();
 
-  std::cout << "Detached shell pointers: ";
+  CHERRY_INFO << "Detached shell pointers: ";
   DebugUtil::PrintSmartPointerIDs(shell.GetPointer());
 #ifdef CHERRY_DEBUG_SMARTPOINTER
-  std::cout << " Known pointer: " << shell.GetId() << std::endl;
+  CHERRY_INFO << " Known pointer: " << shell.GetId() << std::endl;
 #endif
 }
 

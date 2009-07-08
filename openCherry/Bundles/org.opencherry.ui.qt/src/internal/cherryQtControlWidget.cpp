@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryQtControlWidget.h"
 
 #include <cherryShell.h>
@@ -41,7 +43,7 @@ QtControlWidget::QtControlWidget(QWidget* parent, Shell::Pointer shell, Qt::Wind
 
 QtControlWidget::~QtControlWidget()
 {
-  std::cout << "DELETING control widget: " << qPrintable(this->objectName()) << std::endl;
+  CHERRY_INFO << "DELETING control widget: " << qPrintable(this->objectName()) << std::endl;
 }
 
 void QtControlWidget::changeEvent(QEvent* event)

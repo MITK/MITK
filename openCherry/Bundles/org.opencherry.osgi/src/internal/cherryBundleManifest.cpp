@@ -133,7 +133,7 @@ BundleManifest::ParseActivator(const std::string& activator)
 void 
 BundleManifest::ParseManifest(std::istream* istr)
 {
-  //std::cout << "Start parsing manifest\n";
+  //CHERRY_INFO << "Start parsing manifest\n";
   Poco::AutoPtr<Poco::Util::PropertyFileConfiguration> config(new Poco::Util::PropertyFileConfiguration(*istr));
   
   if (config->hasProperty(BUNDLE_ACTIVATOR))

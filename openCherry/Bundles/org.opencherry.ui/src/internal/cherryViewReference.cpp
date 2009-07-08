@@ -207,7 +207,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
       part->Init(site);
     } catch (PartInitException e)
     {
-      std::cout << e.displayText();
+      CHERRY_ERROR << e.displayText();
       //StatusUtil.handleStatus(e, StatusManager.SHOW
       //    | StatusManager.LOG);
       return IWorkbenchPart::Pointer(0);
@@ -221,7 +221,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
       part->CreatePartControl(parent);
     } catch (std::exception e)
     {
-      std::cout << "Error creating view: " << e.what() << std::endl;
+      CHERRY_ERROR << "Error creating view: " << e.what() << std::endl;
       //          StatusUtil.handleStatus(e, StatusManager.SHOW
       //              | StatusManager.LOG);
       return IWorkbenchPart::Pointer(0);

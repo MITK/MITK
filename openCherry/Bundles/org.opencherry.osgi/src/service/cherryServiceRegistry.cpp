@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryServiceRegistry.h"
 
 #include "Poco/Exception.h"
@@ -35,7 +37,7 @@ void ServiceRegistry::RegisterService(const std::string& id, Service::Pointer se
     throw Poco::ExistsException("The following service is already registered:", id);
   
   m_ServiceMap[id] = service;
-  std::cout << "Service " << id << " registered\n";
+  CHERRY_INFO << "Service " << id << " registered\n";
 }
 
 void ServiceRegistry::UnRegisterService(const std::string& /*id*/)

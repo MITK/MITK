@@ -831,22 +831,22 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
       // it
       if (oldContainer.Cast<LayoutPart> () != 0)
       {
-        //std::cout << "No children left, removing container\n";
+        //CHERRY_INFO << "No children left, removing container\n";
 
         LayoutPart::Pointer parent = oldContainer.Cast<LayoutPart>();
         ILayoutContainer::Pointer parentContainer = parent->GetContainer();
         if (parentContainer != 0)
         {
-          //std::cout << "Calling remove of parent container\n";
+          //CHERRY_INFO << "Calling remove of parent container\n";
           parentContainer->Remove(parent);
           parent->Print(std::cout);
 #if defined(CHERRY_DEBUG_SMARTPOINTER)
-          std::cout << "Parent container traceid: " << parent->GetTraceId() << std::endl;
+          CHERRY_INFO << "Parent container traceid: " << parent->GetTraceId() << std::endl;
           std::list<int> knownIDs;
           //knownIDs.push_back(oldContainer.GetId());
           //knownIDs.push_back(parent.GetId());
           DebugUtil::PrintSmartPointerIDs(oldContainer.GetPointer(), std::cout, knownIDs);
-          std::cout << "Known pointer: " << oldContainer.GetId() << ", " << parent.GetId() << std::endl;
+          CHERRY_INFO << "Known pointer: " << oldContainer.GetId() << ", " << parent.GetId() << std::endl;
 #endif
           parent->Dispose();
         }
@@ -1068,7 +1068,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     const std::string& secondaryId)
 {
 
-  //std::cout << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
+  //CHERRY_INFO << "Looking for part: " << primaryId << ":" << secondaryId << std::endl;
 
   // check main window.
   std::vector<MatchingPart> matchingParts;
@@ -1107,7 +1107,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& primaryId,
     }
   }
 
-  //std::cout << "Looking through the matched parts (count: " << matchingParts.size() << ")\n";
+  //CHERRY_INFO << "Looking through the matched parts (count: " << matchingParts.size() << ")\n";
 
   // sort the matching parts
   if (matchingParts.size()> 0)
@@ -1126,7 +1126,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     std::vector<MatchingPart>& matchingParts)
 {
 
-  //std::cout << "Looking for part " << id << " in a list of layout parts with size " << parts.size() << std::endl;
+  //CHERRY_INFO << "Looking for part " << id << " in a list of layout parts with size " << parts.size() << std::endl;
   for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
@@ -1144,7 +1144,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
       if (result != 0) return result;
     }
   }
-  //std::cout << "Returning 0\n";
+  //CHERRY_INFO << "Returning 0\n";
   return StackablePart::Pointer(0);
 }
 
@@ -1179,7 +1179,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     const std::list<StackablePart::Pointer>& parts,
     std::vector<MatchingPart>& matchingParts)
 {
-  //std::cout << "Looking for part " << id << " in a list of stackable parts with size " << parts.size() << std::endl;
+  //CHERRY_INFO << "Looking for part " << id << " in a list of stackable parts with size " << parts.size() << std::endl;
   for (std::list<StackablePart::Pointer>::const_iterator iter = parts.begin();
       iter != parts.end(); ++iter)
   {
@@ -1216,7 +1216,7 @@ StackablePart::Pointer PerspectiveHelper::FindPart(const std::string& id,
     }
   }
 
-  //std::cout << "Returning 0\n";
+  //CHERRY_INFO << "Returning 0\n";
   return StackablePart::Pointer(0);
 }
 

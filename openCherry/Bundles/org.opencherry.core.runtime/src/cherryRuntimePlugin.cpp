@@ -32,7 +32,7 @@ const std::string RuntimePlugin::PLUGIN_ID = "org.opencherry.core.runtime";
 void 
 RuntimePlugin::Start(IBundleContext::Pointer /*context*/)
 {
-  std::cout << "Runtime plugin activated!\n";
+  CHERRY_INFO << "Runtime plugin activated!\n";
   
   //Platform::GetEvents().platformStarted += 
   //  Poco::Delegate<RuntimePlugin, PlatformEvent>(this, &RuntimePlugin::onPlatformStarted);

@@ -29,7 +29,7 @@ std::set<unsigned long> DebugUtil::m_TracedObjects;
 void DebugUtil::TraceObject(const Object* object)
 {
 #ifdef CHERRY_DEBUG_SMARTPOINTER
-  std::cout << "Tracing enabled for: " << object->GetTraceId() << std::endl;
+  CHERRY_INFO << "Tracing enabled for: " << object->GetTraceId() << std::endl;
   m_TracedObjects.insert(object->GetTraceId());
 #endif
 }

@@ -52,7 +52,7 @@ void QtShowViewAction::Run()
     }
     catch (PartInitException e)
     {
-      std::cout << "Error: " << e.displayText() << std::endl;
+      CHERRY_ERROR << "Error: " << e.displayText() << std::endl;
     }
   }
 }

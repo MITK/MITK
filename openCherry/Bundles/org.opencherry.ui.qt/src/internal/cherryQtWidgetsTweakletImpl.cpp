@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryQtWidgetsTweakletImpl.h"
 
 #include "cherryQtSash.h"
@@ -48,7 +50,7 @@ void QtSelectionListenerWrapper::AddListener(GuiTk::ISelectionListener::Pointer 
     selectionEvents.AddListener(listener);
   }
 
-  std::cout << "WARNING: QtWidgetsTweaklet: no suitable type for listening for selections found!\n";
+  CHERRY_WARN << "WARNING: QtWidgetsTweaklet: no suitable type for listening for selections found!\n";
 
 }
 

@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <windows.h>
 #endif
 
+#include "cherryLog.h"
+
 #include "cherryBundleLoader.h"
 
 #include "internal/cherryBundleContext.h"
@@ -164,15 +166,15 @@ BundleLoader::ResolveBundle(IBundle::Pointer bundle)
 {
   try
   {
-    std::cout << "\nTrying to resolve bundle " << bundle->GetSymbolicName() << std::endl;
+    CHERRY_INFO << "\nTrying to resolve bundle " << bundle->GetSymbolicName() << std::endl;
     bundle->Resolve();
     m_Logger.information("Bundle " + bundle->GetSymbolicName() + " resolved");
-    std::cout << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString() << "\n\n";
+    CHERRY_INFO << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString() << "\n\n";
   }
   catch (BundleResolveException exc)
   {
     m_Logger.log(exc);
-    std::cout << exc.displayText() << std::endl;
+    CHERRY_INFO << exc.displayText() << std::endl;
   }
 
 //  if (bundle->IsResolved())
@@ -206,7 +208,7 @@ BundleLoader::ListLibraries(IBundle::Pointer bundle, std::vector<std::string>& l
   {
     if (bundle->GetStorage().IsDirectory(baseDir + *iter))
     {
-      //std::cout << "Found directory: " << (baseDir + *iter) << std::endl;
+      //CHERRY_INFO << "Found directory: " << (baseDir + *iter) << std::endl;
       this->ListLibraries(bundle, list, baseDir + *iter + "/");
       iter = tmpList.erase(iter);
     }
@@ -240,7 +242,7 @@ BundleLoader::InstallLibraries(IBundle::Pointer bundle, bool copy)
   {
     if (iter->empty()) continue;
 
-    //std::cout << "Testing CodeCache for: " << *iter << std::endl;
+    //CHERRY_INFO << "Testing CodeCache for: " << *iter << std::endl;
 
     std::size_t separator = iter->find_last_of("/");
     std::string libFileName = *iter;
@@ -290,15 +292,15 @@ BundleLoader::InstallLibraries(IBundle::Pointer bundle, bool copy)
         DWORD size = GetEnvironmentVariableA("path", 0, 0);
         char* currPath = new char[size];
         DWORD currSize = GetEnvironmentVariableA("path", currPath, size);
-        //std::cout << "Current path: " << currPath << std::endl;
+        //CHERRY_INFO << "Current path: " << currPath << std::endl;
         char* newPath = new char[currSize + bundlePath.toString().length() + 2];
         std::memcpy(newPath, currPath, currSize);
         newPath[currSize] = ';';
         std::memcpy(newPath + currSize + 1, bundlePath.toString().c_str(), bundlePath.toString().length());
         newPath[currSize+bundlePath.toString().length()+1] = '\0';
-        //std::cout << "Setting additional path: " << newPath;
+        //CHERRY_INFO << "Setting additional path: " << newPath;
         /*bool success =*/ SetEnvironmentVariableA("path", newPath);
-        //std::cout << " " << (success ? "SUCCESS" : "FAILED") << std::endl;
+        //CHERRY_INFO << " " << (success ? "SUCCESS" : "FAILED") << std::endl;
 
         delete[] newPath;
         delete[] currPath;
@@ -423,21 +425,21 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
   Poco::Path libPath = this->GetLibraryPathFor(bundleInfo.m_Bundle);
   std::string strLibPath(libPath.toString());
   m_Logger.information("Loading activator library: " + strLibPath);
-  std::cout << "Loading activator library: " << strLibPath << std::endl;
+  CHERRY_INFO << "Loading activator library: " << strLibPath << std::endl;
   try
   {
 #ifdef CHERRY_OS_FAMILY_WINDOWS
     char cDllPath[512];
     GetDllDirectory(512, cDllPath);
-    std::cout << "Dll Path: " << cDllPath << std::endl;
+    CHERRY_INFO << "Dll Path: " << cDllPath << std::endl;
 #endif
     bundleInfo.m_ClassLoader->loadLibrary(strLibPath);
     return bundleInfo.m_ClassLoader->create(activator);
   }
   catch (Poco::LibraryLoadException exc)
   {
-    std::cout << "Could not create Plugin activator. Did you export the class \"" << activator << "\" ?\n";
-    std::cout << "  Exception displayText(): " << exc.displayText() << std::endl;
+    CHERRY_ERROR << "Could not create Plugin activator. Did you export the class \"" << activator << "\" ?\n"
+                 << "  Exception displayText(): " << exc.displayText() << std::endl;
     exc.rethrow();
   }
 

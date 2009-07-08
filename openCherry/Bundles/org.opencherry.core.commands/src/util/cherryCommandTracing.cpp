@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryCommandTracing.h"
 
 #include <iostream>
@@ -35,7 +37,7 @@ void CommandTracing::PrintTrace(const std::string& component,
   {
     buffer += message;
   }
-  std::cout << buffer;
+  CHERRY_INFO << buffer;
 }
 
 CommandTracing::CommandTracing()

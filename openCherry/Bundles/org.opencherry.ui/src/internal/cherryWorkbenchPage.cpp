@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryWorkbenchPage.h"
 #include "cherryPartSite.h"
 #include "cherryWorkbenchRegistryConstants.h"

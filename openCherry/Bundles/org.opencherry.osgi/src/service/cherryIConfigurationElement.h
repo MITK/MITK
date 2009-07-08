@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYIEXTENSIONELEMENT_H_
 #define CHERRYIEXTENSIONELEMENT_H_
 
+#include "cherryLog.h"
 
 #include "../cherryOSGiDll.h"
 
@@ -63,7 +64,7 @@ public:
       }
       catch (Poco::Exception* e)
       {
-        std::cout << "Error loading class: " << e->displayText() << std::endl;
+        CHERRY_ERROR << "Error loading class: " << e->displayText() << std::endl;
         exit(1);
       }
     }

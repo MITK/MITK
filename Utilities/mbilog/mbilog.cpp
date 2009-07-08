@@ -35,8 +35,6 @@ void mbilog::UnregisterBackend(mbilog::AbstractBackend* backend)
   backends.remove(backend);
 }
 
-static bool warningNoBackend = false;
-
 void mbilog::DistributeToBackends(mbilog::LogMessage &l)
 {
 
@@ -48,12 +46,7 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
   
   if(backends.empty())
   {
-    if(!warningNoBackend)
-    {
-      warningNoBackend = true;
-      std::cout << "mbilog ... receiving log messages, but still no backend registered, sending to std::cout\n";
-    }
-    mbilog::BackendCout::FormatFull(l);
+    mbilog::BackendCout::FormatSmart(l);
     return;
   }
 
@@ -87,31 +80,39 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
 
 void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
 {
+  char *c_open="[";
+  char *c_close="]";
+  
+
   switch(l.level)
   {
     case mbilog::Info:
-      std::cout << "INFO";
       break;
 
     case mbilog::Warn:
-      std::cout << "WARN";
+      c_open="!";
+      c_close="!";
       break;
 
     case mbilog::Error:
-      std::cout << "ERROR";
+      c_open="-";
+      c_close="-";
       break;
 
     case mbilog::Fatal:
-      std::cout << "FATAL";
+      c_open="*";
+      c_close="*";
       break;
 
     case mbilog::Debug:
-      std::cout << "DEBUG";
+      c_open="(";
+      c_close=")";
       break;
   }
 
-  std::cout << "[" << std::setw(7) << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
+  std::cout << c_open << std::setw(6) << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
 
+/*
   if(threadID)
   {
     std::cout << ":" << std::hex << threadID;
@@ -128,9 +129,32 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       std::cout << ":" << std::string(l.moduleName);
     }
   }
+   */
+  std::cout << c_close << " ";
+  
+  switch(l.level)
+  {
+    case mbilog::Info:
+      break;
 
-  std::cout << "] " << l.message << std::endl;
+    case mbilog::Warn:
+      std::cout << "WARNING: ";
+      break;
 
+    case mbilog::Error:
+      std::cout << "ERROR: ";
+      break;
+
+    case mbilog::Fatal:
+      std::cout << "FATAL: ";
+      break;
+
+    case mbilog::Debug:
+      std::cout << "DEBUG: ";
+      break;
+  }
+
+  std::cout << l.message << std::endl;
 }
 
 void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryStarter.h"
 
 #include "../cherryPlatform.h"
@@ -64,13 +66,13 @@ int Starter::Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* conf
   IApplication* app = 0;
   if (extensions.size() == 0)
   {
-    std::cout << "No extensions configured into extension-point 'org.opencherry.core.runtime.applications' found. Aborting.\n";
+    CHERRY_FATAL << "No extensions configured into extension-point 'org.opencherry.core.runtime.applications' found. Aborting.\n";
     return 0;
   }
   else if (extensions.size() == 1)
   {
     if (!argApplication.empty())
-      std::cout << "One 'org.opencherry.core.runtime.applications' extension found, ignoring -application argument.\n";
+      CHERRY_INFO << "One 'org.opencherry.core.runtime.applications' extension found, ignoring -application argument.\n";
     std::vector<IConfigurationElement::Pointer> runs(extensions[0]->GetChildren("run"));
     app = runs.front()->CreateExecutableExtension<IApplication>("class");
   }
@@ -78,17 +80,17 @@ int Starter::Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* conf
   {
     if (argApplication.empty())
     {
-      std::cout << "You must provide an application id via \"-application <id>\"\n";
+      CHERRY_INFO << "You must provide an application id via \"-application <id>\"\n";
       return 0;
     }
     for (iter = extensions.begin(); iter != extensions.end(); ++iter)
     {
-      std::cout << "Checking applications extension from: " << (*iter)->GetContributor() << std::endl;
+      CHERRY_INFO << "Checking applications extension from: " << (*iter)->GetContributor() << std::endl;
 
       std::string appid;
       if ((*iter)->GetAttribute("id", appid))
       {
-        std::cout << "Found id: " << appid << std::endl;
+        CHERRY_INFO << "Found id: " << appid << std::endl;
         if (appid.size() > 0 && appid == argApplication)
         {
           std::vector<IConfigurationElement::Pointer> runs((*iter)->GetChildren("run"));
@@ -103,7 +105,7 @@ int Starter::Run(int& argc, char** argv, Poco::Util::AbstractConfiguration* conf
 
   if (app == 0)
   {
-    std::cout << "Could not create executable application extension for id: " << argApplication << std::endl;
+    CHERRY_INFO << "Could not create executable application extension for id: " << argApplication << std::endl;
   }
   else
   {

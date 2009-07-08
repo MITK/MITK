@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherrySystemBundleActivator.h"
 
 #include "../cherryIBundleContext.h"
@@ -32,7 +34,7 @@ void SystemBundleActivator::Start(IBundleContext::Pointer context)
   Service::Pointer service(new ExtensionPointService(&systemBundle->GetBundleLoader()));
   Platform::GetServiceRegistry().RegisterService(
       IExtensionPointService::SERVICE_ID, service);
-  std::cout << "Extension point service registered\n";
+  CHERRY_INFO << "Extension point service registered\n";
 }
 
 void SystemBundleActivator::Stop(IBundleContext::Pointer /*context*/)

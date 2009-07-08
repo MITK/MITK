@@ -15,6 +15,8 @@
 
  =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryTabbedStackPresentation.h"
 #include "cherryAbstractTabItem.h"
 #include "cherryLeftToRightTabOrder.h"
@@ -61,7 +63,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
   else if (type == TabFolderEvent::EVENT_CLOSE)
   {
     IPresentablePart::Pointer part = folder->GetPartForTab(e->tab);
-    std::cout << "TabFolderEvent::EVENT_CLOSE part = " << (part != 0) << std::endl;
+    CHERRY_INFO << "TabFolderEvent::EVENT_CLOSE part = " << (part != 0) << std::endl;
     if (part != 0)
     {
       std::vector<IPresentablePart::Pointer> parts;
@@ -317,7 +319,7 @@ TabbedStackPresentation::~TabbedStackPresentation()
 //  // Dispose the tab folder's widgetry
 //  folder.getTabFolder().getControl().dispose();
 
-  std::cout << "DELETING TabbedStackPresentation\n";
+  CHERRY_INFO << "DELETING TabbedStackPresentation\n";
 
   delete tabs;
   delete dragBehavior;

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryExtensionPointService.h"
 #include "cherryConfigurationElement.h"
 #include "cherryExtensionPoint.h"
@@ -94,7 +96,7 @@ ExtensionPointService::AddContribution(std::istream& istr,
 
     m_ExtensionPointMap[xp->GetUniqueIdentifier()] = xp;
 
-    std::cout << "Extension-Point found: " << xp->GetUniqueIdentifier() << " (from " << xp->GetContributor() << ")\n";
+    CHERRY_INFO << "Extension-Point found: " << xp->GetUniqueIdentifier() << " (from " << xp->GetContributor() << ")\n";
 
     attributes->release();
   }
@@ -108,10 +110,10 @@ ExtensionPointService::AddContribution(std::istream& istr,
     if (attr == 0) continue;
 
     std::string xp = attr->nodeValue();
-    std::cout << "Extension found for extension-point: " << xp << " (from " << contributor << ")\n";
+    CHERRY_INFO << "Extension found for extension-point: " << xp << " (from " << contributor << ")\n";
     if (m_ExtensionPointMap[xp].IsNull())
     {
-      std::cout << "Extension-point unknown, extension skipped.\n";
+      CHERRY_INFO << "Extension-point unknown, extension skipped.\n";
       continue;
     }
 
@@ -167,7 +169,7 @@ ExtensionPointService::HasContributionFrom(const std::string& name) const
 const std::vector<IConfigurationElement::Pointer>
 ExtensionPointService::GetConfigurationElementsFor(const std::string& extensionPointId) const
 {
-  std::cout << "Getting configuration elements for point: " << extensionPointId << std::endl;
+  CHERRY_INFO << "Getting configuration elements for point: " << extensionPointId << std::endl;
 
   std::vector<IConfigurationElement::Pointer> configs;
   const IExtensionPoint* xp = this->GetExtensionPoint(extensionPointId);

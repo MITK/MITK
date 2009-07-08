@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include "cherryLog.h"
+
 #include "cherryEnablementExpression.h"
 
 #include "cherryExpressions.h"
@@ -50,7 +52,7 @@ EnablementExpression::Evaluate(IEvaluationContext* context)
   
   if (Expressions::TRACING)
   {
-    std::cout << "[Enablement Expression] - evaluation time: " << 
+    CHERRY_INFO << "[Enablement Expression] - evaluation time: " << 
         (double(std::clock() - start)/(CLOCKS_PER_SEC/1000)) << " ms.";
   }
   

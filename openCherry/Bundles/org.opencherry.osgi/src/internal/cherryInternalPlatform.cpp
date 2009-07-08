@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "cherryInternalPlatform.h"
+#include "cherryLog.h"
 
 #include <Poco/Exception.h>
 #include <Poco/File.h>
@@ -139,16 +140,15 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
          pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
     {
-      std::cout << "Plugin base directory: " << *pluginBaseDir;
+      CHERRY_INFO << "Plugin base directory: " << *pluginBaseDir;
       Poco::File pluginDir(*pluginBaseDir);
 
       if (!pluginDir.exists() || !pluginDir.isDirectory())
       {
-        std::cout << " not a direcotry or does not exist. SKIPPED.\n";
+        CHERRY_WARN << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
         continue;
       }
-      else std::cout << std::endl;
-
+	  
       std::vector<std::string> pluginList;
       pluginDir.list(pluginList);
 

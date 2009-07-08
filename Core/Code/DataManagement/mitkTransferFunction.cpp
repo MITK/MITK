@@ -90,7 +90,6 @@ void TransferFunction::AddGradientOpacityPoint(double x, double value)
 
 void TransferFunction::AddRGBPoint(double x, double r, double g, double b)
 {
-  double rgb[] = {r,g,b};
   m_ColorTransferFunction->AddRGBPoint(x, r, g, b);
 }
 

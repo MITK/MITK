@@ -128,6 +128,42 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage, "scene.zip" ),
                                 "Saving scene file" );
 
+  mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
+  if (failedNodes.IsNotNull())
+  {
+    std::cout << "The following nodes could not be serialized:" << std::endl;
+    for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+          iter != failedNodes->end();
+          ++iter )
+    {
+      std::cout << " - ";
+      if ( mitk::BaseData* data =(*iter)->GetData() )
+      {
+        std::cout << data->GetNameOfClass();
+      }
+      else
+      {
+        std::cout << "(NULL)";
+      }
+
+      std::cout << " contained in node '" << (*iter)->GetName() << "'" << std::endl;
+    }
+  }
+
+  mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
+  if (failedProperties.IsNotNull())
+  {
+    std::cout << "The following properties could not be serialized:" << std::endl;
+    const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
+    for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
+          iter != propmap->end();
+          ++iter )
+    {
+      std::cout << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
+    }
+  }
+
+
   MITK_TEST_END()
 }
 

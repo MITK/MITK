@@ -54,6 +54,8 @@ class SceneSerialization_EXPORT PropertyListSerializer : public itk::Object
       */
     virtual std::string Serialize();
 
+    PropertyList* GetFailedProperties();
+
   protected:
 
     PropertyListSerializer();
@@ -64,6 +66,8 @@ class SceneSerialization_EXPORT PropertyListSerializer : public itk::Object
     std::string m_FilenameHint;
     std::string m_WorkingDirectory;
     PropertyList::Pointer m_PropertyList;
+    
+    PropertyList::Pointer m_FailedProperties;
 };
 
 } // namespace

@@ -75,6 +75,9 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
                                const std::string& filename,
                                NodePredicateBase* predicate )
 {
+  m_FailedNodes = DataStorage::SetOfObjects::New();
+  m_FailedProperties = PropertyList::New();
+
   if (!storage) 
   {
     LOG_ERROR << "No data storage given. Not possible to save scene.";
@@ -195,13 +198,18 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
         if ( BaseData* data = node->GetData() )
         {
           std::string filenameHint( node->GetName() );
-          TiXmlElement* dataElement( SaveBaseData( data, filenameHint ) ); // returns a reference to a file
+          bool error(false);
+          TiXmlElement* dataElement( SaveBaseData( data, filenameHint, error ) ); // returns a reference to a file
+          if (error)
+          {
+            m_FailedNodes->push_back( node );
+          }
 
           // store basedata properties
           PropertyList* propertyList = data->GetPropertyList();
           if (propertyList && !propertyList->IsEmpty() )
           {
-            TiXmlElement* baseDataPropertiesElement( SavePropertyList( propertyList, filenameHint + "-data" ) ); // returns a reference to a file
+            TiXmlElement* baseDataPropertiesElement( SavePropertyList( propertyList, filenameHint + "-data") ); // returns a reference to a file
             dataElement->LinkEndChild( baseDataPropertiesElement );
           }
 
@@ -221,7 +229,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
             PropertyList* propertyList = node->GetPropertyList(renderer);
             if ( propertyList && !propertyList->IsEmpty() )
             {
-              TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName ) ); // returns a reference to a file
+              TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
               renderWindowPropertiesElement->SetAttribute("render window", renderWindowName);
               nodeElement->LinkEndChild( renderWindowPropertiesElement );
             }
@@ -275,9 +283,10 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
   }
 }
 
-TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& filenamehint )
+TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error )
 {
   assert(data);
+  error = true;
 
   // find correct serializer
   // the serilizer must
@@ -313,6 +322,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
       {
         std::string writtenfilename = serializer->Serialize();
         element->SetAttribute("file", writtenfilename);
+        error = false;
       }
       catch (std::exception& e)
       {
@@ -325,7 +335,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   return element;
 }
 
-TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const std::string& filenamehint )
+TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const std::string& filenamehint)
 {
   assert(propertyList);
   
@@ -342,6 +352,12 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
   {
     std::string writtenfilename = serializer->Serialize();
     element->SetAttribute("file", writtenfilename);
+    PropertyList::Pointer failedProperties = serializer->GetFailedProperties();
+    if (failedProperties.IsNotNull())
+    {
+      // move failed properties to global list
+      m_FailedProperties->ConcatenatePropertyList( failedProperties, true );
+    }
   }
   catch (std::exception& e)
   {
@@ -351,3 +367,13 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
   return element;
 }
 
+    
+const mitk::SceneIO::FailedBaseDataListType* mitk::SceneIO::GetFailedNodes() 
+{ 
+  return m_FailedNodes.GetPointer(); 
+}
+    
+const mitk::PropertyList* mitk::SceneIO::GetFailedProperties() 
+{ 
+  return m_FailedProperties; 
+}

@@ -39,9 +39,11 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
     mitkClassMacro( SceneIO, itk::Object );
     itkNewMacro(Self);
 
+    typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
+
     /**
      * \brief Load a scene of objects from file
-     * \return DataStorage with all scene objects and their relations
+     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and GetFailedProperties() for more detail.
      *
      * Attempts to read the provided file and create objects with 
      * parent/child relations into a DataStorage.
@@ -56,7 +58,7 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     /**
      * \brief Save a scene of objects to file
-     * \return success or not
+     * \return Success or not. If writing failed, query GetFailedNodes() and GetFailedProperties() for more detail.
      *
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
@@ -69,6 +71,27 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
                             const std::string& filename,
                             NodePredicateBase* predicate = NULL );
 
+    /** 
+     * \brief Get a list of nodes (BaseData containers) that failed to be read/written.
+     *
+     * FailedBaseDataListType hold all those nodes that contain BaseData objects
+     * which could not be read or written during the last call to LoadScene or SaveScene.
+     */
+    const FailedBaseDataListType*   GetFailedNodes();
+
+    /** 
+     * \brief Get a list of properties that failed to be read/written.
+     *
+     * Each entry corresponds to a property which could not
+     * be (de)serialized. The properties may come from either of
+     * <ul>
+     *   <li> The BaseData's PropertyList
+     *   <li> The DataTreeNodes's PropertyList
+     *   <li> Any of a DataTreeNodes's render window specific PropertyLists
+     * </ul>
+     */
+    const PropertyList* GetFailedProperties();
+
   protected:
     
     SceneIO();
@@ -76,9 +99,11 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     std::string CreateEmptyTempDirectory();
 
-    TiXmlElement* SaveBaseData( BaseData* data, const std::string& filenamehint );
+    TiXmlElement* SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error);
     TiXmlElement* SavePropertyList( PropertyList* propertyList, const std::string& filenamehint );
 
+    FailedBaseDataListType::Pointer m_FailedNodes;
+    PropertyList::Pointer           m_FailedProperties;
 
     std::string m_WorkingDirectory;
 };

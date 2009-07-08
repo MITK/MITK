@@ -36,6 +36,8 @@ mitk::PropertyListSerializer::~PropertyListSerializer()
 
 std::string mitk::PropertyListSerializer::Serialize()
 {
+  m_FailedProperties = PropertyList::New();
+
   LOG_INFO << this->GetNameOfClass() 
            << " is asked to serialize a property list " << (void*) this->m_PropertyList
            << " into a directory " << m_WorkingDirectory
@@ -80,6 +82,11 @@ std::string mitk::PropertyListSerializer::Serialize()
     if (element)
     {
       document.LinkEndChild( element );
+      // TODO test serializer for error
+    }
+    else
+    {
+      m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
     }
   }
  
@@ -107,6 +114,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   if (thingsThatCanSerializeThis.size() < 1)
   {
     LOG_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
+    m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
   }
   if (thingsThatCanSerializeThis.size() > 1)
   {
@@ -127,15 +135,32 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
         {
           keyelement->LinkEndChild( valueelement );
         }
+        else
+        {
+          m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
+        }
       }
       catch (std::exception& e)
       {
         LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+        m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
       }
       break;
     }
   }
 
   return keyelement;
+}
+
+mitk::PropertyList* mitk::PropertyListSerializer::GetFailedProperties()
+{
+  if (m_FailedProperties.IsNotNull() && !m_FailedProperties->IsEmpty())
+  {
+    return m_FailedProperties;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 

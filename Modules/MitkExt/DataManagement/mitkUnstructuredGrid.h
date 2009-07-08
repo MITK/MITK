@@ -35,7 +35,7 @@ class MITKEXT_CORE_EXPORT UnstructuredGrid : public BaseData
 {
 
 public:
-  // not yet the best chioce of a region-type for surfaces, but it works for the time being
+  // not yet the best choice of a region-type for surfaces, but it works for the time being
   typedef itk::ImageRegion< 5 >  RegionType;  
   
   mitkClassMacro(UnstructuredGrid, BaseData);
@@ -61,7 +61,6 @@ public:
   virtual void CopyInformation(const itk::DataObject *data);
   
   virtual void Update();
-  
 
   const RegionType& GetLargestPossibleRegion() const
   {
@@ -86,12 +85,16 @@ protected:
   typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
  
   // Initialize should not be called manually;
-  // The poly data vector is initialized automatically when enlarged;
-  virtual void Initialize( unsigned int timeSteps = 1 );
+  // The polydata vector is initialized automatically when enlarged;
+  virtual void Expand( unsigned int timeSteps = 1 );
  
   UnstructuredGrid();
   
   virtual ~UnstructuredGrid();
+
+  virtual void ClearData();
+
+  virtual void InitializeEmpty();
 
   VTKUnstructuredGridSeries m_GridSeries;
 

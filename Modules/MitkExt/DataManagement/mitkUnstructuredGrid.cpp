@@ -27,14 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )
 {
-  // check if the vector is long enouth to contain the new element
-  // at the given position. If not, expand it with sufficient zero-filled elements.
-  if ( t >= m_GridSeries.size() )
-  {
-    vtkUnstructuredGrid* pdnull = 0;
-    m_GridSeries.resize( t + 1, pdnull );
-    Initialize( t + 1 );
-  }
+  this->Expand(t);
 
   if(m_GridSeries[ t ] != NULL)
   {
@@ -42,6 +35,9 @@ void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, 
   }
   
   m_GridSeries[ t ] = grid;
+
+  // call m_VtkPolyData->Register(NULL) to tell the reference counting that we 
+  // want to keep a reference on the object
   if (m_GridSeries[t] != 0)
     m_GridSeries[t]->Register(grid);
   
@@ -49,19 +45,38 @@ void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, 
   m_CalculateBoundingBox = true;
 }
 
-void mitk::UnstructuredGrid::Initialize(unsigned int timeSteps)
+void mitk::UnstructuredGrid::Expand(unsigned int timeSteps)
 {
-  mitk::TimeSlicedGeometry::Pointer timeGeometry = this->GetTimeSlicedGeometry();
+  // check if the vector is long enough to contain the new element
+  // at the given position. If not, expand it with sufficient zero-filled elements.
+  if(timeSteps > m_GridSeries.size())
+  {
+    Superclass::Expand(timeSteps);
+    vtkUnstructuredGrid* pdnull = 0;
+    m_GridSeries.resize( timeSteps, pdnull );
+    m_CalculateBoundingBox = true;
+  }
+}
 
-  mitk::Geometry3D::Pointer g3d = mitk::Geometry3D::New();
-  g3d->Initialize();
-  mitk::ScalarType timeBounds[] = {0.0, 1.0};
-  g3d->SetTimeBounds( timeBounds );
-  //
-  // The geometry is propagated automatically to the other items,
-  // if EvenlyTimed is true...
-  //
-  timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+void mitk::UnstructuredGrid::ClearData()
+{
+  for ( VTKUnstructuredGridSeries::iterator it = m_GridSeries.begin(); it != m_GridSeries.end(); ++it )
+  {
+    if ( ( *it ) != 0 )
+      ( *it )->Delete();
+  }
+  m_GridSeries.clear();
+
+  Superclass::ClearData();
+}
+
+void mitk::UnstructuredGrid::InitializeEmpty()
+{
+  vtkUnstructuredGrid* pdnull = 0;
+  m_GridSeries.resize( 1, pdnull );
+  Superclass::InitializeTimeSlicedGeometry(1);
+
+  m_Initialized = true;
 }
 
 vtkUnstructuredGrid* mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int t)
@@ -86,19 +101,12 @@ vtkUnstructuredGrid* mitk::UnstructuredGrid::GetVtkUnstructuredGrid(unsigned int
 
 mitk::UnstructuredGrid::UnstructuredGrid() : m_CalculateBoundingBox( false )
 {
-  vtkUnstructuredGrid* pdnull = 0;
-  m_GridSeries.resize( 1, pdnull );
-  Initialize(1);
+  this->InitializeEmpty();
 }
 
 mitk::UnstructuredGrid::~UnstructuredGrid()
 {
-  for ( VTKUnstructuredGridSeries::iterator it = m_GridSeries.begin(); it != m_GridSeries.end(); ++it )
-  {
-    if ( ( *it ) != 0 )
-      ( *it )->Delete();
-  }
-  m_GridSeries.clear();
+  this->ClearData();
 }
 
 void mitk::UnstructuredGrid::UpdateOutputInformation()

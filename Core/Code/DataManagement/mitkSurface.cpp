@@ -29,17 +29,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceOperation.h"
 
 
-mitk::Surface::Surface() : m_CalculateBoundingBox( false )
+mitk::Surface::Surface() : 
+m_CalculateBoundingBox( false )
 {
-  m_Initialized = false;
-  vtkPolyData* pdnull = NULL;
-  m_PolyDataSeries.resize( 1, pdnull );
-  Superclass::InitializeTimeSlicedGeometry(1);
-
-  m_Initialized = true;
+  this->InitializeEmpty();
 }
 
 mitk::Surface::~Surface()
+{
+  this->ClearData();
+}
+
+void mitk::Surface::ClearData()
 {
   for ( VTKPolyDataSeries::iterator it = m_PolyDataSeries.begin(); it != m_PolyDataSeries.end(); ++it )
   {
@@ -47,6 +48,17 @@ mitk::Surface::~Surface()
       ( *it )->Delete();
   }
   m_PolyDataSeries.clear();
+
+  Superclass::ClearData();
+}
+
+void mitk::Surface::InitializeEmpty()
+{
+  vtkPolyData* pdnull = NULL;
+  m_PolyDataSeries.resize( 1, pdnull );
+  Superclass::InitializeTimeSlicedGeometry(1);
+
+  m_Initialized = true;
 }
 
 void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
@@ -232,8 +244,6 @@ void mitk::Surface::CopyInformation( const itk::DataObject * data)
     // pointer could not be cast back down
     itkExceptionMacro( << "mitk::Surface::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(surfaceData).name() );
   }
-  
-
 }
 
 void mitk::Surface::Update()
@@ -251,7 +261,7 @@ void mitk::Surface::Update()
 
 void mitk::Surface::Expand( unsigned int timeSteps )
 {  
-  // check if the vector is long enouth to contain the new element
+  // check if the vector is long enough to contain the new element
   // at the given position. If not, expand it with sufficient zero-filled elements.
   if ( timeSteps > m_PolyDataSeries.size() )
   {

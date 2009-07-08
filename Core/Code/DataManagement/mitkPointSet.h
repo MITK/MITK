@@ -229,6 +229,10 @@ protected:
 
   virtual ~PointSet();
 
+  virtual void ClearData();
+
+  virtual void InitializeEmpty();
+
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;

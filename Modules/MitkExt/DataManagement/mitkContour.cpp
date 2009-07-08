@@ -27,7 +27,7 @@ mitk::Contour::Contour() :
   m_Selected ( false ),
   m_Width (3.0)
 {
-  GetTimeSlicedGeometry()->Initialize(1);
+  Superclass::InitializeTimeSlicedGeometry();
 }
 
 mitk::Contour::~Contour()

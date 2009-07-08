@@ -418,8 +418,6 @@ public:
   //## @sa GetDimension(int i);
   unsigned int* GetDimensions() const;
 
-  virtual void Clear();
-
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   virtual const HistogramType* GetScalarHistogram(int t=0) const;
@@ -541,6 +539,8 @@ protected:
   Image();
 
   virtual ~Image();
+
+  virtual void Clear();
 
   //## @warning Has to be called by every Initialize method!
   virtual void Initialize();

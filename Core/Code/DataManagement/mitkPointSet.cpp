@@ -30,7 +30,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PointSet::PointSet()
 {
-  m_Initialized = true;
+  this->InitializeEmpty();
+}
+
+mitk::PointSet::~PointSet()
+{
+  this->ClearData();
+}
+
+void mitk::PointSet::ClearData()
+{
+  m_PointSetSeries.clear();
+  Superclass::ClearData();
+}
+
+void mitk::PointSet::InitializeEmpty()
+{
   m_PointSetSeries.resize( 1 );
 
   m_PointSetSeries[0] = DataType::New();
@@ -39,15 +54,12 @@ mitk::PointSet::PointSet()
   m_CalculateBoundingBox = false;
 
   Superclass::InitializeTimeSlicedGeometry(1);
-}
-
-mitk::PointSet::~PointSet()
-{
+  m_Initialized = true;
 }
 
 bool mitk::PointSet::IsEmpty(unsigned int t) const
 {
-  return IsInitialized() && (GetSize(t) <= 0);
+  return IsInitialized() && (GetSize(t) == 0);
 }
 
 void mitk::PointSet::Expand( unsigned int timeSteps )
@@ -74,7 +86,7 @@ void mitk::PointSet::Expand( unsigned int timeSteps )
       m_PointSetSeries[i]->SetPointData( pointData );
     }
 
-    //if the size changes, then compute the boundingbox
+    //if the size changes, then compute the bounding box
     m_CalculateBoundingBox = true;
 
     this->InvokeEvent( PointSetExtendTimeRangeEvent() );
@@ -154,7 +166,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
     {
       return -1;
     }
-    else if ( indexPoint == out ) //if totaly equal
+    else if ( indexPoint == out ) //if totally equal
     {
       return it->Index();
     }

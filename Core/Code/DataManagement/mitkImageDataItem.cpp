@@ -37,6 +37,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ipFunc/ipFunc.h"
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
+
 #define __IMG_DAT_ITEM__CEIL_ZERO_ONE__(val) (val) =       \
   ( (val) < 0 ) ? ( 0 ) : ( ( (val)>1 ) ? ( 1 ) : ( (val) ) );
 
@@ -265,7 +269,9 @@ unsigned char *mitk::ImageDataItem::ConvertTensorsToRGB() const
   const int pixelsize = sizeof(TPixeltype);
   const int numIts = m_Size/pixelsize;
 
+#ifdef _OPENMP
 #pragma omp parallel for
+#endif
   for(int i=0; i<numIts; i++)
   {
     const TPixeltype* tensor = static_cast<TPixeltype* >((void*)(p+i*pixelsize));

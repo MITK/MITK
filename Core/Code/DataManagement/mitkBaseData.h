@@ -193,7 +193,10 @@ public:
   virtual bool IsInitialized() const;
 
   //##Documentation
-  //## @brief reset to non-initialized state, release memory
+  //## @brief Calls ClearData() and InitializeEmpty(); 
+  //## \warning Only use in subclasses that reimplemented these methods.
+  //## Just calling Clear from BaseData will reset an object to a not initialized,
+  //## invalid state.
   virtual void Clear();
 
   //##Documentation
@@ -336,6 +339,17 @@ protected:
   //## The TimeSlicedGeometry is initialized empty and evenly timed.
   //## In many cases it will be necessary to overwrite this in sub-classes.
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
+
+  //##Documentation
+  //## @brief reset to non-initialized state, release memory
+  virtual void ClearData();
+
+  //##Documentation
+  //## @brief Pure virtual; Must be used in subclasses to get a data object to a 
+  //## valid state. Should at least create one empty object and call 
+  //## Superclass::InitializeTimeSlicedGeometry() to ensure an existing valid geometry  
+  virtual void InitializeEmpty(){};
+
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

@@ -326,6 +326,12 @@ bool mitk::BaseData::IsInitialized() const
 
 void mitk::BaseData::Clear()
 {
+  this->ClearData();
+  this->InitializeEmpty();
+}
+
+void mitk::BaseData::ClearData()
+{
   if(m_Initialized)
   {
     ReleaseData();

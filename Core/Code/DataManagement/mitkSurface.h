@@ -100,6 +100,10 @@ namespace mitk {
 
     virtual ~Surface();
 
+    virtual void ClearData();
+
+    virtual void InitializeEmpty();
+
     VTKPolyDataSeries m_PolyDataSeries;
 
     mutable RegionType m_LargestPossibleRegion;

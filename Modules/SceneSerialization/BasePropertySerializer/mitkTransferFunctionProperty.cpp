@@ -42,27 +42,42 @@ class SceneSerialization_EXPORT TransferFunctionPropertySerializer : public Base
 
         TiXmlElement* element = new TiXmlElement("TransferFunction");
 
-        // serialize scalar and gradient opacity functions
-        for (int channel = 0; channel < 2; ++channel)
+        // serialize scalar opacity function
+        TiXmlElement* scalarOpacityPointlist = new TiXmlElement( "ScalarOpacity" );
+
+        TransferFunction::ControlPoints scalarOpacityPoints = 
+          tranferfunction->GetScalarOpacityPoints();
+        for ( TransferFunction::ControlPoints::iterator iter = scalarOpacityPoints.begin();
+          iter != scalarOpacityPoints.end();
+          ++iter )
         {
-          std::string name( channel == 1 ? "GradientOpacity" : "ScalarOpacity" );
-
-          TiXmlElement* pointlist = new TiXmlElement(name);
-
-          TransferFunction::ControlPoints points = tranferfunction->GetPoints(channel);
-          for ( TransferFunction::ControlPoints::iterator iter = points.begin();
-                iter != points.end();
-                ++iter )
-          {
-            TiXmlElement* pointel = new TiXmlElement("point");
-            pointel->SetDoubleAttribute("x", iter->first);
-            pointel->SetDoubleAttribute("y", iter->second);
-            pointlist->LinkEndChild( pointel );
-          }
-
-          element->LinkEndChild( pointlist );
+          TiXmlElement* pointel = new TiXmlElement("point");
+          pointel->SetDoubleAttribute("x", iter->first);
+          pointel->SetDoubleAttribute("y", iter->second);
+          scalarOpacityPointlist->LinkEndChild( pointel );
         }
-          
+
+        element->LinkEndChild( scalarOpacityPointlist );
+
+
+        // serialize gradient opacity function
+        TiXmlElement* gradientOpacityPointlist = new TiXmlElement( "GradientOpacity" );
+
+        TransferFunction::ControlPoints gradientOpacityPoints = 
+          tranferfunction->GetGradientOpacityPoints();
+        for ( TransferFunction::ControlPoints::iterator iter = gradientOpacityPoints.begin();
+          iter != gradientOpacityPoints.end();
+          ++iter )
+        {
+          TiXmlElement* pointel = new TiXmlElement("point");
+          pointel->SetDoubleAttribute("x", iter->first);
+          pointel->SetDoubleAttribute("y", iter->second);
+          gradientOpacityPointlist->LinkEndChild( pointel );
+        }
+
+        element->LinkEndChild( gradientOpacityPointlist );
+
+
         // serialize color function
         TransferFunction::RGBControlPoints points = tranferfunction->GetRGBPoints();
         TiXmlElement* pointlist = new TiXmlElement("RGB");

@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeSlicedGeometry.h"
 #include <itkEventObject.h>
 #include <itkCommand.h>
+#include <ipPicTypeMultiplex.h>
+#include <sstream>
+
 
 namespace mitk {
 
@@ -432,6 +435,34 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
   protected:
     SliceNavigationController(const char * type = NULL);
     virtual ~SliceNavigationController();
+
+    template <class T>
+    static void buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)
+    {
+      std::string value;
+      std::stringstream stream;
+      stream<<s<<"; Pixelvalue: ";
+
+      if ( (p[0]>=0 && p[1] >=0 && p[2]>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] )
+      {
+        if(pic->bpe!=24)
+        {
+          stream<<(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
+        }
+        else
+        {
+          stream<<(((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+          stream<<(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+          stream<<(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
+        }
+        
+        s = stream.str();
+      }
+      else
+      {
+        s+= "point out of data";
+      }
+    };
 
     mitk::Geometry3D::ConstPointer m_InputWorldGeometry;
     mitk::Geometry3D::Pointer m_ExtendedInputWorldGeometry;

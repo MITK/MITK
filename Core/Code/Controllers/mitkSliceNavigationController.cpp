@@ -37,6 +37,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneOperation.h"
 #include "mitkUndoController.h"
 #include "mitkOperationEvent.h"
+#include "mitkNodePredicateDataType.h"
+#include "mitkStatusBar.h"
+#include <ipPicTypeMultiplex.h>
+
 
 #include <itkCommand.h>
 
@@ -614,10 +618,69 @@ SliceNavigationController
               m_UndoController->SetOperationEvent(operationEvent);
             }
 
-            this->ExecuteOperation( doOp ); 
+            this->ExecuteOperation( doOp );
+            if(baseRenderer == m_Renderer)
+            {
+              {
+                std::string statusText;
+                mitk::Image* image = NULL;      
+                TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
+
+                mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
+                mitk::Point3D worldposition = posEvent->GetWorldPosition();
+                int  maxlayer = -32768;
+                mitk::Image::Pointer image3D;
+                for (unsigned int x = 0; x < nodes->size(); x++)
+                {
+                  if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition))
+                  {
+                    int layer = 0;
+                    if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+                    if(layer > maxlayer)
+                    {
+                      maxlayer = layer;
+                      image3D = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+                    }
+                  }
+                }
+                mitk::Point3D p;
+                if(image3D.IsNotNull())
+                {
+                  image3D->GetGeometry()->WorldToIndex(posEvent->GetWorldPosition(), p);
+                  {
+                    std::stringstream stream;
+                    stream<<'<'<<floor(p[0] * 100.0 + .5)/100.0<<"; "<<floor(p[1] * 100.0 + .5)/100.0<<"; "<<floor(p[2] * 100.0 + .5)/100.0<<"> mm";
+                    statusText = stream.str(); 
+                  }
+
+                  ipPicDescriptor* pic = image3D->GetPic();
+                  if ( pic )
+                  {
+                    mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
+                    if ( image3D->GetGeometry()->IsIndexInside(p) )
+                    {
+                      itk::Point<int, 3> pi;
+                      mitk::itk2vtk(p, pi);
+                      if(pic->bpe!=24)
+                      {
+                        mitkIpPicTypeMultiplex2(buildstring, pic, pi, statusText);
+                      }
+                      else
+                        buildstring(pic, pi, statusText, (unsigned char) 1);
+                    }
+                  }
+                  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+                }
+                else
+                {
+                  mitk::StatusBar::GetInstance()->DisplayGreyValueText("No Image!");
+                }
+              }
+
+            }
+            ok = true;
+            break;
           }
-          ok = true;
-          break;
       }
     default:
       ok = true;

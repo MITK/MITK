@@ -342,6 +342,8 @@ int Workbench::RunUI()
   //startPlugins();
 
   //addStartupRegistryListener();
+  
+  CHERRY_INFO << "openCherry Workbench ready";
 
   // spin event loop
   return Tweaklets::Get(WorkbenchTweaklet::KEY)->RunEventLoop();

@@ -31,23 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-/// mbilog integration - begin
-
-
-void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
-{
-  m_Mutex.lock();
-  mbilog::BackendCout::FormatSmart(msg);
-  m_Active->push_back(msg);
-  m_Mutex.unlock();
-
-  emit signalFlushLogEntries();
-}
-
 void QtPlatformLogModel::slotFlushLogEntries()
 {
   m_Mutex.lock();
-  std::list<mbilog::LogMessage> *tmp=m_Active;
+  std::list<ExtendedLogMessage> *tmp=m_Active;
   m_Active=m_Pending; m_Pending=tmp;
   m_Mutex.unlock();
 
@@ -58,19 +45,38 @@ void QtPlatformLogModel::slotFlushLogEntries()
     int row = m_Entries.size();
     this->beginInsertRows(QModelIndex(), row, row+num-1);
     do {
-      m_Entries.push_back(LogEntry(m_Pending->front()));
+      m_Entries.push_back(m_Pending->front());
       m_Pending->pop_front();
     } while(--num);
     this->endInsertRows();
   }
 }
 
-/// mbilog integration - end
+void QtPlatformLogModel::addLogEntry(const mbilog::LogMessage &msg)
+{
+  m_Mutex.lock();
+  mbilog::BackendCout::FormatSmart(msg);
+  m_Active->push_back(ExtendedLogMessage(msg));
+  m_Mutex.unlock();
+
+  emit signalFlushLogEntries();
+}
+
+void
+QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
+{
+  const Poco::Message& entry = Poco::RefAnyCast<const Poco::Message>(*event.GetData());
+  mbilog::LogMessage msg(mbilog::Info,"n/a",-1,"n/a");
+  msg.message += entry.getText();
+  msg.category = "openCherry."+entry.getSource();
+  msg.moduleName = "n/a";
+  addLogEntry(msg);
+}
 
 QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(parent)
 {
-  m_Active=new std::list<mbilog::LogMessage>;
-  m_Pending=new std::list<mbilog::LogMessage>;
+  m_Active=new std::list<ExtendedLogMessage>;
+  m_Pending=new std::list<ExtendedLogMessage>;
   connect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ), Qt::QueuedConnection );  
   Platform::GetEvents().logged += PlatformEventDelegate(this, &QtPlatformLogModel::addLogEntry);
   myBackend = new QtLogBackend(this);
@@ -78,22 +84,19 @@ QtPlatformLogModel::QtPlatformLogModel(QObject* parent) : QAbstractTableModel(pa
 
 QtPlatformLogModel::~QtPlatformLogModel()
 {
-
-  delete myBackend;
-
+  disconnect(this, SIGNAL(signalFlushLogEntries()), this, SLOT( slotFlushLogEntries() ));
+  
+  // dont delete and unregister backend, only deactivate it to avoid thread syncronization issues cause mbilog::UnregisterBackend is not threadsafe 
+  // will be fixed.
+  //  delete myBackend;
+  //  delete m_Active;
+  //  delete m_Pending;
+  m_Mutex.lock();
+  myBackend->Deactivate();
+  m_Mutex.unlock();
 }
 
-void
-QtPlatformLogModel::addLogEntry(const PlatformEvent& event)
-{
-  const Poco::Message& entry = Poco::RefAnyCast<const Poco::Message>(*event.GetData());
-
-  int row = m_Entries.size();
-
-  this->beginInsertRows(QModelIndex(), row, row);
-  m_Entries.push_back(LogEntry(entry.getText(), entry.getSource(),entry.getTime().epochTime()));
-  this->endInsertRows();
-}
+// QT Binding
 
 int
 QtPlatformLogModel::rowCount(const QModelIndex&) const
@@ -106,25 +109,107 @@ QtPlatformLogModel::columnCount(const QModelIndex&) const
 {
   return 8;
 }
+          /*
+  struct LogEntry {
+    LogEntry(const std::string& msg, const std::string& src, std::time_t t)
+    : message(msg.c_str()), moduleName(src.c_str()),time(std::clock())
+    { 
+    }
+
+    QString message;
+    clock_t time;
+
+    QString level;
+    QString filePath;
+    QString lineNumber;
+    QString moduleName;
+    QString category;
+    QString function;
+    
+    LogEntry(const mbilog::LogMessage &msg)
+    {
+      message = msg.message.c_str();
+      
+                                                           
+      filePath = msg.filePath;
+            
+      std::stringstream out;
+      out << msg.lineNumber;
+      lineNumber = out.str().c_str();
+      
+      moduleName = msg.moduleName;
+      category = msg.category.c_str();
+      function = msg.functionName;
+      
+      time=std::clock(); 
+    }
+  };        */
+
 
 QVariant
 QtPlatformLogModel::data(const QModelIndex& index, int role) const
 {
+  const ExtendedLogMessage *msg = &m_Entries[index.row()]; 
   if (role == Qt::DisplayRole)
   {
     switch (index.column()) {
-    case 0: {
-      std::stringstream ss;
-      ss << std::setw(7) << std::setprecision(3) << std::fixed << ((double)m_Entries[index.row()].time)/CLOCKS_PER_SEC;
-      return QVariant(QString(ss.str().c_str()));
-    }
-    case 1: return QVariant(m_Entries[index.row()].level);
-    case 2: return QVariant(m_Entries[index.row()].message);
-    case 3: return QVariant(m_Entries[index.row()].category);
-    case 4: return QVariant(m_Entries[index.row()].moduleName);
-    case 5: return QVariant(m_Entries[index.row()].function);
-    case 6: return QVariant(m_Entries[index.row()].filePath);
-    case 7: return QVariant(m_Entries[index.row()].lineNumber);
+    
+      case 0: {
+        std::stringstream ss;
+        ss << std::setw(7) << std::setprecision(3) << std::fixed << ((double)msg->time)/CLOCKS_PER_SEC;
+        return QVariant(QString(ss.str().c_str()));
+      }
+      
+      case 1: 
+        {
+          char *level;
+          switch(msg->message.level)
+          {
+            default:
+            case mbilog::Info:
+              level="INFO";
+              break;
+          
+            case mbilog::Warn:
+              level="WARN";
+              break;
+              
+            case mbilog::Error:
+              level="ERROR";
+              break;
+              
+            case mbilog::Fatal:
+              level="FATAL";
+              break;
+              
+            case mbilog::Debug:
+              level="DEBUG";
+              break;
+          }
+          return QVariant(QString(level));
+        }
+        
+      case 2: 
+        return QVariant(QString(msg->message.message.c_str()));
+        
+      case 3: 
+        return QVariant(QString(msg->message.category.c_str()));
+    
+      case 4: 
+        return QVariant(QString(msg->message.moduleName));
+    
+      case 5: 
+        return QVariant(QString(msg->message.functionName));
+    
+      case 6: 
+        return QVariant(QString(msg->message.filePath));
+    
+      case 7: 
+      {
+        std::stringstream out;
+        out << msg->message.lineNumber;
+        return QVariant(QString(out.str().c_str()));
+      }
     }
   }
 

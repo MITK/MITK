@@ -41,8 +41,6 @@ QtLogView::QtLogView(QWidget *parent)
 	connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
 	connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
            
-	ui.tableView->resizeColumnsToContents();
-	ui.tableView->resizeRowsToContents();
 }
 
 QtLogView::~QtLogView()
@@ -57,11 +55,21 @@ void QtLogView::slotFilterChange( const QString& q )
 
 void QtLogView::slotRowAdded ( const QModelIndex & parent, int start, int end )
 {
-  for(int r=start;r<=end;r++)
-  {
-    ui.tableView->resizeRowToContents(r);
-  }
   
+  static int first=false;
+
+  if(!first)
+  {
+    first=true;
+	  ui.tableView->resizeColumnsToContents();
+	  ui.tableView->resizeRowsToContents();
+  }
+  else
+    for(int r=start;r<=end;r++)
+    {
+      ui.tableView->resizeRowToContents(r);
+    }
+
   ui.tableView->scrollToBottom();
 }
 

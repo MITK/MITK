@@ -110,7 +110,7 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       break;
   }
 
-  std::cout << c_open << std::setw(6) << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
+  std::cout << c_open << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC;
 
 /*
   if(threadID)

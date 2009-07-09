@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTPLATFORMLOGMODEL_H_
 #define CHERRYQTPLATFORMLOGMODEL_H_
 
+#include "cherryLog.h"
+
 #include <QtCore/QAbstractTableModel>
 #include <QtCore/QDateTime>
 
@@ -51,68 +53,30 @@ public:
   QVariant headerData(int section, Qt::Orientation orientation, int) const;
 
   void addLogEntry(const mbilog::LogMessage &msg);
+  void addLogEntry(const PlatformEvent& event);
 
 private:
 
   typedef MessageDelegate1<QtPlatformLogModel, const PlatformEvent&> PlatformEventDelegate;
 
-  void addLogEntry(const PlatformEvent& event);
-
-  struct LogEntry {
-    LogEntry(const std::string& msg, const std::string& src, std::time_t t)
-    : message(msg.c_str()), moduleName(src.c_str()),time(std::clock())
-    { 
-    }
-
-    QString message;
+  struct ExtendedLogMessage {
+    mbilog::LogMessage message;
     clock_t time;
-
-    QString level;
-    QString filePath;
-    QString lineNumber;
-    QString moduleName;
-    QString category;
-    QString function;
+    int threadid;
     
-    LogEntry(const mbilog::LogMessage &msg)
+    ExtendedLogMessage(const ExtendedLogMessage &src):message(src.message),time(src.time),threadid(src.threadid)
     {
-      message = msg.message.c_str();
-      
-      switch(msg.level)
-      {
-        case mbilog::Info:
-          level="INFO";
-          break;
-      
-        case mbilog::Warn:
-          level="WARN";
-          break;
-          
-        case mbilog::Error:
-          level="ERROR";
-          break;
-          
-        case mbilog::Fatal:
-          level="FATAL";
-          break;
-          
-        case mbilog::Debug:
-          level="DEBUG";
-          break;
-      }
-                                                           
-      filePath = msg.filePath;
-            
-      std::stringstream out;
-      out << msg.lineNumber;
-      lineNumber = out.str().c_str();
-      
-      moduleName = msg.moduleName;
-      category = msg.category.c_str();
-      function = msg.functionName;
-      
-      time=std::clock(); 
     }
+    
+    ExtendedLogMessage(const mbilog::LogMessage &msg):message(msg),time(std::clock()),threadid(0)
+    {
+    }
+    
+    ExtendedLogMessage operator = (const ExtendedLogMessage& src)
+    {
+      return ExtendedLogMessage(src);
+    }
+    
   };
     
   class QtLogBackend : public mbilog::AbstractBackend
@@ -122,7 +86,9 @@ private:
       QtLogBackend(QtPlatformLogModel *_myModel)
       {
         myModel=_myModel;
+        deactivated = false;
         mbilog::RegisterBackend(this);
+        CHERRY_INFO << "openCherry mbilog backend registered";
       }
       
       ~QtLogBackend()
@@ -132,16 +98,24 @@ private:
       
       void ProcessMessage(const mbilog::LogMessage &l )
       {
-        myModel->addLogEntry(l);
+        if(!deactivated)
+          myModel->addLogEntry(l);
+      }
+      
+      void Deactivate()
+      {
+        deactivated=true;
       }                             
       
     private:
     
       QtPlatformLogModel *myModel;
+      bool deactivated;
+      
   } *myBackend;
 
-  std::vector<LogEntry> m_Entries;
-  std::list<mbilog::LogMessage> *m_Active,*m_Pending;
+  std::vector<ExtendedLogMessage> m_Entries;
+  std::list<ExtendedLogMessage> *m_Active,*m_Pending;
   
   QMutex m_Mutex;
   
@@ -152,8 +126,6 @@ private:
   protected slots:
   
     void slotFlushLogEntries();
-  
-  
 };
 
 }

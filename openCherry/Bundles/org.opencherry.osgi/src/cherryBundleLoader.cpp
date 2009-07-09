@@ -166,15 +166,13 @@ BundleLoader::ResolveBundle(IBundle::Pointer bundle)
 {
   try
   {
-    CHERRY_INFO << "\nTrying to resolve bundle " << bundle->GetSymbolicName() << std::endl;
+    CHERRY_INFO << "Trying to resolve bundle " << bundle->GetSymbolicName();
     bundle->Resolve();
-    m_Logger.information("Bundle " + bundle->GetSymbolicName() + " resolved");
-    CHERRY_INFO << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString() << "\n\n";
+    CHERRY_INFO << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString();
   }
   catch (BundleResolveException exc)
   {
-    m_Logger.log(exc);
-    CHERRY_INFO << exc.displayText() << std::endl;
+    CHERRY_ERROR << "Bundle resolve failed: " << exc.displayText();
   }
 
 //  if (bundle->IsResolved())

@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include"iconHoriSplit.xpm"
 #include"iconSettings.xpm"
 #include"iconVertiSplit.xpm"
+#include"iconLeaveFullScreen.xpm"
 
 
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
@@ -306,13 +307,22 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool checked )
 				break;
 			}
 		}
-	}
+    this->MoveWidgetToCorrectPos();
+
+    //change icon
+    this->ChangeFullScreenIcon();
+
+  }
 	else
 	{
 		m_FullScreenMode = false;
 		emit SignalChangeLayoutDesign( m_OldLayoutDesign );
+
+    //change icon
+    this->ChangeFullScreenIcon();
 	}
 }
+
 
 /// \brief
 void QmitkRenderWindowMenu::OnSettingsButton( bool checked )
@@ -431,6 +441,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_2DIMAGEUP;
 	emit SignalChangeLayoutDesign( LAYOUT_2DIMAGEUP );
@@ -439,6 +450,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_2DIMAGELEFT;
 	emit SignalChangeLayoutDesign( LAYOUT_2DIMAGELEFT );
@@ -447,6 +459,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_DEFAULT;
 	emit SignalChangeLayoutDesign( LAYOUT_DEFAULT );
@@ -455,6 +468,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
 { 
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_BIG3D;
 	emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
@@ -463,6 +477,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_TRANSVERSAL;
 	emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
@@ -471,6 +486,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_SAGITTAL;
 	emit SignalChangeLayoutDesign( LAYOUT_SAGITTAL );
@@ -479,6 +495,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_CORONAL;
 	emit SignalChangeLayoutDesign( LAYOUT_CORONAL );
@@ -487,6 +504,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_ROWWIDGET3AND4;
 	emit SignalChangeLayoutDesign( LAYOUT_ROWWIDGET3AND4 );
@@ -495,6 +513,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_COLUMNWIDGET3AND4;
 	emit SignalChangeLayoutDesign( LAYOUT_COLUMNWIDGET3AND4 );
@@ -504,6 +523,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_SMALLUPPERWIDGET2BIGAND4;
 	emit SignalChangeLayoutDesign( LAYOUT_SMALLUPPERWIDGET2BIGAND4 );
@@ -512,6 +532,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_2X2DAND3DWIDGET;
 	emit SignalChangeLayoutDesign( LAYOUT_2X2DAND3DWIDGET );
@@ -520,6 +541,7 @@ void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 {
 	//set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
 	m_FullScreenMode = false;
+  this->ChangeFullScreenIcon();
 
 	m_LayoutDesign = LAYOUT_LEFT2DAND3DRIGHT2D;
 	emit SignalChangeLayoutDesign( LAYOUT_LEFT2DAND3DRIGHT2D );
@@ -728,4 +750,28 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
 			break;
 		}
 	}
+}
+
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
+{
+  int moveX= floor( double(this->parentWidget()->width() - this->width() - 4.0) );
+  this->move( moveX, 3 );
+  this->show();
+}
+
+void QmitkRenderWindowMenu::ChangeFullScreenIcon()
+{
+
+ if( m_FullScreenMode )
+ {   
+   const QIcon icon( iconLeaveFullScreen_xpm );
+   m_FullScreenButton->setIcon(icon);
+ }
+  else
+  {
+    const QIcon icon( iconFullScreen_xpm );
+    m_FullScreenButton->setIcon(icon);
+ }
+
+  
 }

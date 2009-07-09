@@ -91,6 +91,8 @@ protected slots:
   /// \brief
   void OnFullScreenButton( bool checked );
 
+  void ChangeFullScreenIcon();
+  void MoveWidgetToCorrectPos();
   /// \brief
   void OnSettingsButton( bool checked );
 

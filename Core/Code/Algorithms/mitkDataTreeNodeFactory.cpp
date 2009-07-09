@@ -167,23 +167,8 @@ void mitk::DataTreeNodeFactory::GenerateData()
       if( baseData.IsNotNull() )
       {
         usedNewDTNF = true;
-        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();//this->GetOutput();
+        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
         node->SetData(baseData);
-        
-        //mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-        //if(image.IsNotNull())
-        //  //SetDefaultImageProperties(node);
-       
-        //mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(node);
-        //mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
-        //if(surface.IsNotNull())
-        //  this->SetDefaultSurfaceProperties(node);
-
-        ////beware! mitkCoreObjectFactory opens an *.mps file as a mesh, not as a pointset! Thus mitkMestVtkMapper3D is used to map the data
-        //mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(node->GetData());
-        //if(pointset.IsNotNull())
-        //  this->SetDefaultPointSetProperties(node);
-
         this->SetDefaultCommonProperties( node );
 
         this->SetOutput(i, node);
@@ -479,16 +464,28 @@ void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::P
   node->SetProperty( StringProperty::PATH, pathProp );
 
 
-  // name
+  // name already defined?
   mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
   if(nameProp.IsNull() || (strcmp(nameProp->GetValue(),"No Name!")==0))
   {
-    if (FileNameEndsWith( ".gz" ))
-      m_FileName = m_FileName.substr( 0, m_FileName.length()-3 );
-    
-    nameProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
+    // name already defined in BaseData
+    mitk::StringProperty::Pointer baseDataNameProp = dynamic_cast<mitk::StringProperty*>(node->GetData()->GetProperty("name").GetPointer() );
+    if(baseDataNameProp.IsNull() || (strcmp(baseDataNameProp->GetValue(),"No Name!")==0))
+    {
+      // name neither defined in node, nor in BaseData -> name = filename
+      if (FileNameEndsWith( ".gz" ))
+        m_FileName = m_FileName.substr( 0, m_FileName.length()-3 );
 
-    node->SetProperty( "name", nameProp );
+      nameProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenameWithoutLastExtension( m_FileName ) );
+
+      node->SetProperty( "name", nameProp );
+    }
+    else
+    {
+      // name defined in BaseData!
+      nameProp = mitk::StringProperty::New( baseDataNameProp->GetValue() );
+      node->SetProperty( "name", nameProp );
+    }
   }
   
   // visibility

@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "QmitkIGTExampleView.h"
 //#include "QmitkIGTExampleViewControls.h"
-#include "resources\icon.xpm"
+#include "resources/icon.xpm"
 
 #include "QmitkStdMultiWidget.h"
 //#include "QmitkTreeNodeSelector.h"
@@ -709,7 +709,7 @@ void QmitkIGTExampleView::OnShowErrorPlot()
   m_Controls->m_ErrorPlot->SetAxisTitle( QwtPlot::xBottom, "Timestamp" ); 
   m_Controls->m_ErrorPlot->SetAxisTitle( QwtPlot::yLeft, "Error" ); 
   int curveId = m_Controls->m_ErrorPlot->InsertCurve( "Error value of tool 1" ); 
-  m_Controls->m_ErrorPlot->SetCurvePen( curveId, QPen( Qt::GlobalColor::red ) ); 
+  m_Controls->m_ErrorPlot->SetCurvePen( curveId, QPen( Qt::red ) ); 
   m_XValues.clear();
   m_YValues.clear();
   m_Controls->m_ErrorPlot->setEnabled(true);

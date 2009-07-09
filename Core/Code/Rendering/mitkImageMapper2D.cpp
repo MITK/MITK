@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkModalityProperty.h"
 #include "mitkVolumeCalculator.h"
 
 #include "mitkAbstractTransformGeometry.h"
@@ -954,7 +955,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       this->GetLevelWindow( levelWindow, renderer );
     }
 
-    image->setExtrema( levelWindow.GetMin(), levelWindow.GetMax() ); 
+    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() ); 
   }
 
   bool useColor = false;
@@ -1156,7 +1157,53 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
+  // check whether the modalityProp is set for the image
+  mitk::ModalityProperty::Pointer modalityProp = dynamic_cast<mitk::ModalityProperty*>( image->GetProperty("modality").GetPointer() );
+  if ( modalityProp.IsNotNull() )
+  {
+    // if modality is color doppler, set properties specific for this modality
+    if ( modalityProp->GetValueAsId() == 6 )
+    {     
+      // set modalityProperty for node
+      node->SetProperty( "modality", mitk::ModalityProperty::New("Color Doppler") );
+      node->SetProperty( "use color", mitk::BoolProperty::New( false ) );
+      node->SetProperty( "opacity"  , mitk::FloatProperty::New(0.5));
+      node->SetProperty( "visible", mitk::BoolProperty::New( false ) );
+      // define a lookup table for color doppler data; TODO: improve LUT
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+      vtkLut->SetHueRange(0.0, 1.0);
+      vtkLut->SetTableRange(0.0, 256.0);
+      vtkLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+    }
+
+    // if modality is power doppler, set properties specific for this modality
+    else if ( modalityProp->GetValueAsId() == 7 )
+    { 
+      // set modalityProperty for node
+      node->SetProperty( "modality", mitk::ModalityProperty::New("Power Doppler") );
+      node->SetProperty( "use color", mitk::BoolProperty::New( false ) );
+      node->SetProperty( "opacity"  , mitk::FloatProperty::New(0.5));
+      // define a adequate lookup table for color doppler data
+      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+      vtkLut->SetValueRange(0.2,1.0);
+      vtkLut->SetHueRange(0.0, 0.1);
+      vtkLut->SetTableRange(0.0, 255.0);
+      vtkLut->Build();
+      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+      mitkLutProp->SetLookupTable(mitkLut);
+      node->SetProperty( "LookupTable", mitkLutProp );
+    }
+  }
+  // if modality is not set, it is undefined
+  node->AddProperty( "modality", mitk::ModalityProperty::New("undefined"), renderer, false );
+
   // Properties common for both images and segmentations
+  // properties defined here are modality independant!!
   node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );

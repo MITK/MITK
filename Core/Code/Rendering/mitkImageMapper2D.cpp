@@ -955,7 +955,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       this->GetLevelWindow( levelWindow, renderer );
     }
 
-    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() ); 
+    image->setExtrema( levelWindow.GetMin(), levelWindow.GetMax() ); 
   }
 
   bool useColor = false;

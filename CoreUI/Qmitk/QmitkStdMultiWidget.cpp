@@ -41,14 +41,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f), 
-m_PlaneNode1(NULL), 
-m_PlaneNode2(NULL), 
-m_PlaneNode3(NULL), 
-m_Node(NULL),
 mitkWidget1(NULL),
 mitkWidget2(NULL),
 mitkWidget3(NULL),
-mitkWidget4(NULL)
+mitkWidget4(NULL),
+m_PlaneNode1(NULL), 
+m_PlaneNode2(NULL), 
+m_PlaneNode3(NULL), 
+m_Node(NULL)
 {
   /*******************************/
   //Create Widget manually

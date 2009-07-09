@@ -402,6 +402,7 @@ void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked
     node->GetBoolProperty("visible", isVisible);
     node->SetVisibility(!isVisible);
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ActionShowInfoDialogTriggered( bool checked /*= false */ )

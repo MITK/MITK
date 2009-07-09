@@ -113,7 +113,7 @@ TransferFunction::ControlPoints TransferFunction::GetGradientOpacityPoints()
   // Retrieve data points from VTK transfer function and store them in a vector
   m_GradientOpacityPoints.clear();
   vtkFloatingPointType *data = m_GradientOpacityFunction->GetDataPointer();
-  for ( int i = 0; i < m_ScalarOpacityFunction->GetSize(); ++i )
+  for ( int i = 0; i < m_GradientOpacityFunction->GetSize(); ++i )
   {
     m_GradientOpacityPoints.push_back( std::make_pair( data[i*2], data[i*2+1] ));
   }

@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include"iconVertiSplit.xpm"
 #include"iconLeaveFullScreen.xpm"
 
+#include <math.h>
+
 
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
 :QWidget(parent,f),

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFileDialog>
 #include <mitkDataTreeNodeFactory.h>
 
+#include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
@@ -40,17 +41,18 @@ QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer windo
 
 void QmitkFileOpenAction::Run()
 {
-  QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
-  dialog.setFileMode(QFileDialog::ExistingFiles);
-  QStringList filters;
-  filters << "Images (*.pic *.pic.gz *.vti *.dcm *.nhdr *.nrrd *.mhd)" 
-    << "Surfaces (*.stl *.vtk *.vtp)"
-    << "MITK Pointset (*.mps)"
-    << "All Files (*.*)";
-  dialog.setFilters(filters);
-  QStringList fileNames;
-  if (dialog.exec())
-    fileNames = dialog.selectedFiles();
+  //QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
+  //dialog.setFileMode(QFileDialog::ExistingFiles);
+  //QStringList filters;
+  //filters << "Images (*.pic *.pic.gz *.vti *.dcm *.nhdr *.nrrd *.mhd)" 
+  //  << "Surfaces (*.stl *.vtk *.vtp)"
+  //  << "MITK Pointset (*.mps)"
+  //  << "All Files (*.*)";
+  //dialog.setFilters(filters);
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open","/",mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+
+  //if (dialog.exec())
+  //  fileNames = dialog.selectedFiles();
 
   if (fileNames.empty()) 
     return;

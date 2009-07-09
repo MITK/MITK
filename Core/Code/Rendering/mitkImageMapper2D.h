@@ -62,6 +62,7 @@ namespace mitk {
 
  * Properties that can be set for images and influence the imageMapper2D are:
  *
+ *   - \b "modality": (mitkModalityProperty) Modality of the image
  *   - \b "opacity": (FloatProperty) Opacity of the image
  *   - \b "color": (ColorProperty) Color of the image
  *   - \b "use color": (BoolProperty) Use the color of the image or not
@@ -73,7 +74,7 @@ namespace mitk {
  *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
  *   - \b "layer": (IntProperty) Layer of the image
 
- The default properties are:
+ * The default properties are:
 
  *   - \b "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite )
  *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
@@ -85,6 +86,9 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
+
+ * If the modality-property is set for an image, the mapper uses modality-specific default properties,
+ * e.g. color maps, if they are defined.
 
  * \ingroup Mapper
  */

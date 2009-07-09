@@ -74,6 +74,7 @@ SET(CPP_FILES
   DataManagement/mitkLevelWindowProperty.cpp
   DataManagement/mitkLookupTable.cpp
   DataManagement/mitkMemoryUtilities.cpp
+  DataManagement/mitkModalityProperty.cpp
   DataManagement/mitkModeOperation.cpp
   DataManagement/mitkNodePredicateAND.cpp
   DataManagement/mitkNodePredicateBase.cpp

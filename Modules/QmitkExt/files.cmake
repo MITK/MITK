@@ -14,7 +14,6 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkBoolPropertyView.cpp
  QmitkPropertyObservers/QmitkColorPropertyEditor.cpp
  QmitkPropertyObservers/QmitkColorPropertyView.cpp
- QmitkPropertyObservers/QmitkDataTreeComboBox.cpp
  QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
  QmitkPropertyObservers/QmitkNumberPropertyView.cpp
  QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
@@ -88,7 +87,6 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkBoolPropertyView.h
  QmitkPropertyObservers/QmitkColorPropertyEditor.h
  QmitkPropertyObservers/QmitkColorPropertyView.h
- QmitkPropertyObservers/QmitkDataTreeComboBox.h
  QmitkPropertyObservers/QmitkNumberPropertyEditor.h
  QmitkPropertyObservers/QmitkNumberPropertyView.h
  QmitkPropertyObservers/QmitkPropertyViewFactory.h

@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkCommonFunctionality.h>
 #include <QmitkSelectableGLWidget.h>
 #include <QmitkStdMultiWidget.h>
-#include <QmitkDataTreeComboBox.h>
 
 //Qt-GUI headers
 #include <qaction.h>

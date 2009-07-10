@@ -47,7 +47,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateDataType.h>
 
 #include <QmitkStdMultiWidget.h>
-#include <QmitkDataTreeComboBox.h>
 #include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>

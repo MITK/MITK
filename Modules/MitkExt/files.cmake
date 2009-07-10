@@ -76,9 +76,6 @@ SET(CPP_FILES
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkCuboid.cpp
   DataManagement/mitkCylinder.cpp
-  DataManagement/mitkDataTreeFilter.cpp
-  DataManagement/mitkDataTreeFilterFunctions.cpp
-  DataManagement/mitkDataTreeHelper.cpp
   DataManagement/mitkDelegateManager.cpp
   DataManagement/mitkDelegateProperty.cpp
   DataManagement/mitkDrawOperation.cpp

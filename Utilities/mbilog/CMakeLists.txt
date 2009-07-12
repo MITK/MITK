@@ -24,3 +24,6 @@ CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/mbilogConfig.cmake.in"
 
 # mbilog is independent of mitk, and cant use mitk macros i.e. MITK_CREATE_MODULE_CONF( mbilog )
 # configuring happens through ../CMakeList.txt and mbilogConfig.cmake.in
+
+# cpack installer
+MITK_INSTALL_TARGETS(mbilog)

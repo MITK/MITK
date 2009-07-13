@@ -199,23 +199,21 @@ Bundle::Start()
   if (m_State == BUNDLE_RESOLVED)
   {
     Poco::Mutex::ScopedLock lock(m_Mutex);
-    CHERRY_INFO << "Starting bundle: " << this->GetSymbolicName() << std::endl;
 
     m_State = BUNDLE_STARTING;
 //    BundleEvent starting(this, BundleEvent::EV_BUNDLE_STARTING);
 //    this->GetEvents().bundleStarting(this, starting);
-
+    CHERRY_INFO << "Bundle " << this->GetSymbolicName() << " is starting";
     m_Activator->Start(m_BundleLoader.GetContextForBundle(IBundle::Pointer(this)));
 
-    CHERRY_INFO << "Activator started!\n";
     m_State = BUNDLE_ACTIVE;
 //    BundleEvent started(this, BundleEvent::EV_BUNDLE_STARTED);
 //    this->GetEvents().bundleStarted(this, started);
-
+//    CHERRY_INFO << "Bundle " << this->GetSymbolicName() << " is active";
   }
   else
   {
-    throw BundleStateException("The bundle " + this->GetSymbolicName() +
+    throw BundleStateException("Bundle " + this->GetSymbolicName() +
         " could not be started, because it is not in state RESOLVED.");
   }
 }

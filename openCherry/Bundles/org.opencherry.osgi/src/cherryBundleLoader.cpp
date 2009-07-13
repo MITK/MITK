@@ -426,18 +426,20 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
   CHERRY_INFO << "Loading activator library: " << strLibPath;
   try
   {
+  /* retrieves only an empty string and its not required 
 #ifdef CHERRY_OS_FAMILY_WINDOWS
     char cDllPath[512];
     GetDllDirectory(512, cDllPath);
     CHERRY_INFO << "Dll Path: " << cDllPath << std::endl;
 #endif
+  */
     bundleInfo.m_ClassLoader->loadLibrary(strLibPath);
     return bundleInfo.m_ClassLoader->create(activator);
   }
   catch (Poco::LibraryLoadException exc)
   {
     CHERRY_ERROR << "Could not create Plugin activator. Did you export the class \"" << activator << "\" ?\n"
-                 << "  Exception displayText(): " << exc.displayText() << std::endl;
+                 << "  Exception displayText(): " << exc.displayText();
     exc.rethrow();
   }
 

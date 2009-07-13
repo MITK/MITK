@@ -28,8 +28,7 @@ namespace cherry {
 template<class C>
 C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className)
 {
-  m_Logger.information("Trying to load class " + className + " from plugin " + bundleName);
-  CHERRY_INFO << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName << std::endl;
+  CHERRY_INFO << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName;
   BundleInfo& bundleInfo = m_BundleMap[bundleName];
 
   // check that bundle is started
@@ -44,20 +43,19 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   }
 
   Poco::SharedPtr<Poco::ClassLoader<C> >& cl =
-    Poco::RefAnyCast<Poco::SharedPtr<Poco::ClassLoader<C> > >(*any);
+  Poco::RefAnyCast<Poco::SharedPtr<Poco::ClassLoader<C> > >(*any);
 
   std::string libName = "lib" + bundleInfo.m_Bundle->GetSymbolicName();
-  Poco::Path libPath(bundleInfo.m_Context->GetPathForLibrary(libName));
+    Poco::Path libPath(bundleInfo.m_Context->GetPathForLibrary(libName));
 
   if (!cl->isLibraryLoaded(libPath.toString()))
   {
-    m_Logger.information("Loading library: " + libPath.toString());
-    CHERRY_INFO << "Loading library: " << libPath.toString() << std::endl;
+    CHERRY_INFO << "Loading library: " << libPath.toString();
     
     cl->loadLibrary(libPath.toString(), C::GetManifestName());
   }
   else {
-    CHERRY_INFO << "Library " << libPath.toString() << " already loaded\n";
+    CHERRY_INFO << "Library " << libPath.toString() << " already loaded";
   }
 
   return cl->create(className);

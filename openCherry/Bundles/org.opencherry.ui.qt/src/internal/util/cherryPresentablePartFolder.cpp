@@ -219,7 +219,8 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(currentWidget, contentListener);
   }
   folder->SetContent(contentProxy);
-  CHERRY_INFO << "listener add: " << i << std::endl;
+  
+  //CHERRY_INFO << "listener add: " << i << std::endl;
 }
 
 std::vector<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()

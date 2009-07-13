@@ -422,8 +422,8 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
 
   Poco::Path libPath = this->GetLibraryPathFor(bundleInfo.m_Bundle);
   std::string strLibPath(libPath.toString());
-  m_Logger.information("Loading activator library: " + strLibPath);
-  CHERRY_INFO << "Loading activator library: " << strLibPath << std::endl;
+  
+  CHERRY_INFO << "Loading activator library: " << strLibPath;
   try
   {
 #ifdef CHERRY_OS_FAMILY_WINDOWS

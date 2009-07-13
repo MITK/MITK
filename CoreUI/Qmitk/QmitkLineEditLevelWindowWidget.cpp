@@ -59,10 +59,8 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   layout->addWidget(m_WindowInput);
 
   // signals and slots connections
-  connect( m_LevelInput, SIGNAL( returnPressed() ), this, SLOT( SetLevelValue() ) );
-  connect( m_LevelInput, SIGNAL( lostFocus() ), this, SLOT( SetLevelValue() ) );
-  connect( m_WindowInput, SIGNAL( returnPressed() ), this, SLOT( SetWindowValue() ) );
-  connect( m_WindowInput, SIGNAL( lostFocus() ), this, SLOT( SetWindowValue() ) );
+  connect( m_LevelInput, SIGNAL(editingFinished()), this, SLOT( SetLevelValue() ) );
+  connect( m_WindowInput, SIGNAL(editingFinished()), this, SLOT( SetWindowValue() ) );
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
   QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);

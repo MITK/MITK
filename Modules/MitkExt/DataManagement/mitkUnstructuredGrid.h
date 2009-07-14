@@ -19,9 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_UNSTRUCTURED_GRID_H_
 #define _MITK_UNSTRUCTURED_GRID_H_
 
-#include "mitkCommon.h"
 #include "mitkBaseData.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "itkImageRegion.h"
 
 class vtkUnstructuredGrid;

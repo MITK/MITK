@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 
 #include <itkDataObject.h>
+
+#include "mitkBaseProcess.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkCommon.h"
 #include "mitkOperationActor.h"
 #include "mitkPropertyList.h"
-#include <map>
 
 namespace mitk {
 

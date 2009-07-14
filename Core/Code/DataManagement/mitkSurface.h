@@ -19,11 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSURFACEDATA_H_HEADER_INCLUDED
 #define MITKSURFACEDATA_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
 #include "mitkBaseData.h"
-#include "mitkTimeSlicedGeometry.h"
 #include "itkImageRegion.h"
-#include <vector>
 
 class vtkPolyData;
 

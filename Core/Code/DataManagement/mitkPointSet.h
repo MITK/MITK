@@ -19,16 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPointSet_H_HEADER_INCLUDED
 #define MITKPointSet_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
-#include "mitkVector.h"
 #include "mitkBaseData.h"
 
-#include <itkPointSet.h>
 #include <itkMesh.h>
 #include <itkDefaultDynamicMeshTraits.h>
-#include <itkCommand.h>
-
-#include <vector>
 
 
 namespace mitk {

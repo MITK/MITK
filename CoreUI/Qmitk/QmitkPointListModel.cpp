@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkPointListModel.h"
+#include <itkCommand.h>
     
 QmitkPointListModel::QmitkPointListModel( const mitk::PointSet* pointSet, int t, QObject* parent )
 :QAbstractListModel(parent),

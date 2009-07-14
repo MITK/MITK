@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseData.h"
-#include "mitkBaseProcess.h"
 #include <itkObjectFactoryBase.h>
 #include <itkSmartPointerForwardReference.txx>
 

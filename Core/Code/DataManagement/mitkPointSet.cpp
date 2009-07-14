@@ -17,13 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPointSet.h"
-#include "mitkOperation.h"
-#include "mitkOperationActor.h"
 #include "mitkPointOperation.h"
 #include "mitkInteractionConst.h"
-#include "mitkPointSetWriter.h"
-#include "mitkPointSetReader.h"
-#include "mitkRenderingManager.h"
 
 #include <itkSmartPointerForwardReference.txx>
 

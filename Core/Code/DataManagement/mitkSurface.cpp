@@ -17,16 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSurface.h"
-#include "mitkBaseProcess.h"
-#include "vtkPolyData.h"
-#include <vtkPolyDataWriter.h>
-//#include <vtkPolyDataReader.h>
-#include <vtkSTLWriter.h>
-#include "mitkSurfaceVtkWriter.h"
-#include "mitkDataTreeNodeFactory.h"
-#include <itkSmartPointerForwardReference.txx>
 #include "mitkInteractionConst.h"
 #include "mitkSurfaceOperation.h"
+
+#include <vtkPolyData.h>
+
+#include <itkSmartPointerForwardReference.txx>
+
 
 
 mitk::Surface::Surface() : 

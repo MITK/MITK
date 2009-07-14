@@ -17,12 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkUnstructuredGrid.h"
-#include "mitkBaseProcess.h"
-#include "vtkUnstructuredGrid.h"
-#include "mitkUnstructuredGridVtkWriter.h"
-#include "mitkDataTreeNodeFactory.h"
-#include <vtkUnstructuredGridWriter.h>
-#include <vtkXMLUnstructuredGridWriter.h>
+
+#include <vtkUnstructuredGrid.h>
+
 #include <itkSmartPointerForwardReference.txx>
 
 void mitk::UnstructuredGrid::SetVtkUnstructuredGrid( vtkUnstructuredGrid* grid, unsigned int t )

@@ -272,6 +272,8 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       Poco::Path tmpdir( m_WorkingDirectory );
       zipper.addRecursive( tmpdir );
       zipper.close();
+      Poco::File deleteDir( m_WorkingDirectory );
+      deleteDir.remove(true); // recursive
     }
     catch(std::exception& /*e*/)
     {

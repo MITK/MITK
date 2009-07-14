@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchConfigurer.h"
 #include "../application/cherryWorkbenchAdvisor.h"
 
+#include "cherryIStackableContainer.h"
+
 #include "cherryServiceLocator.h"
 
 #include <Poco/Exception.h>
@@ -44,7 +46,7 @@ class WorkbenchWindowConfigurer;
  * \ingroup org_opencherry_ui
  *
  * The workbench class represents the top of the openCherry user interface. Its
- * primary responsability is the management of workbench windows, dialogs,
+ * primary responsibility is the management of workbench windows, dialogs,
  * wizards, and other workbench-related windows.
  * <p>
  * Note that any code that is run during the creation of a workbench instance

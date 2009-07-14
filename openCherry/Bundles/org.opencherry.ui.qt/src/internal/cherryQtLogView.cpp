@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QHeaderView>
 
+#include <QTimer.h>
+
 namespace cherry {
 
 QtLogView::QtLogView(QWidget *parent)
@@ -47,15 +49,18 @@ QtLogView::~QtLogView()
 {
 }
 
+void QtLogView::slotScrollDown( )
+{
+  ui.tableView->scrollToBottom();
+}
+
 void QtLogView::slotFilterChange( const QString& q )
 {
   filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
 }
 
-
 void QtLogView::slotRowAdded ( const QModelIndex & parent, int start, int end )
 {
-  
   static int first=false;
 
   if(!first)
@@ -70,7 +75,7 @@ void QtLogView::slotRowAdded ( const QModelIndex & parent, int start, int end )
       ui.tableView->resizeRowToContents(r);
     }
 
-  ui.tableView->scrollToBottom();
+  QTimer::singleShot(0,this,SLOT( slotScrollDown() ) );
 }
 
 

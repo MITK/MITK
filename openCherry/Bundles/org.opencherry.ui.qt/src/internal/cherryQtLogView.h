@@ -45,6 +45,7 @@ private:
 protected slots:
     void slotFilterChange( const QString& );
     void slotRowAdded( const QModelIndex & , int , int  );
+    void slotScrollDown( );
     
 };
 

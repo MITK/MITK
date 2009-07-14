@@ -273,7 +273,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       zipper.addRecursive( tmpdir );
       zipper.close();
     }
-    catch(std::exception& e)
+    catch(std::exception& /*e*/)
     {
       LOG_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
       return false;

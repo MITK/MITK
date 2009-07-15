@@ -31,7 +31,7 @@ class Image;
 //##Documentation
 //## @brief Class to store level/window values
 //##
-//## Current min and max value are stored in m_Min and m_Max.
+//## Current min and max value are stored in m_LowerWindowBound and m_UpperWindowBound.
 //## The maximum and minimum of valid value range is stored in
 //## m_RangeMin and m_RangeMax.
 //## m_DefaultLevel amd m_DefaultWindow store the initial Level/Window values for the image.
@@ -49,50 +49,50 @@ public:
   virtual ~LevelWindow();
 
   /*!
-  * \brief method returns the level value, i.e. the center of
-  * current grey value interval
+  * \brief method that returns the level value, i.e. the center of
+  * the current grey value interval
   */
   ScalarType GetLevel() const;
 
   /*!
-  * \brief returns the current window size
+  * \brief returns the current window size, i.e the range size of the current grey value interval
   */
   ScalarType GetWindow() const;
 
   /*!
-  * \brief method returns the default level value for image
+  * \brief method returns the default level value for the image
   */
   ScalarType GetDefaultLevel() const;
 
   /*!
-  * \brief returns the default window size for image
+  * \brief returns the default window size for the image
   */
   ScalarType GetDefaultWindow() const;
 
   /*!
-  * \brief the default level and window for image will be reset
+  * \brief Resets the level and the window value to the default values 
   */
   void ResetDefaultLevelWindow();
 
   /*!
-  * getter for window minimum value
+  * Returns the minimum Value of the window
   */
-  ScalarType GetMin() const;
+  ScalarType GetLowerWindowBound() const;
 
   /*!
-  * getter for window maximum value
+  * Returns the upper window bound value of the window
   */
-  ScalarType GetMax() const;
+  ScalarType GetUpperWindowBound() const;
 
   /*!
-  * setter for level and window value
+  * To set the level and the window value
   */
   void SetLevelWindow(ScalarType level, ScalarType window);
 
   /*!
-  * setter for window min and max values
+  * Set the lower and upper bound of the window
   */
-  void SetMinMax(ScalarType min, ScalarType max);
+  void SetWindowBounds(ScalarType lowerBound, ScalarType upperBound);
 
   /*!
   * sets the window to its maximum Size in scaleRange
@@ -100,27 +100,27 @@ public:
   void SetToMaxWindowSize();
 
   /*!
-  * setter for total range minimum and maximum value
+  * Set the range minimum and maximum value
   */
   void SetRangeMinMax(ScalarType min, ScalarType max);
 
   /*!
-  * getter for total range minimum value
+  * Get the range minimum value
   */
   ScalarType GetRangeMin() const;
 
   /*!
-  * getter for default total range minimum value
-  */
-  ScalarType GetDefaultRangeMin() const;
-
-  /*!
-  * getter for total range maximum value
+  * Get the range maximum value
   */
   ScalarType GetRangeMax() const;
 
   /*!
-  * getter for default total range maximum value
+  * Get the default range minimum value
+  */
+  ScalarType GetDefaultRangeMin() const;
+
+  /*!
+  * Get the default range maximum value
   */
   ScalarType GetDefaultRangeMax() const;
 
@@ -130,17 +130,17 @@ public:
   void ResetDefaultRangeMinMax();
 
   /**!
-  * \brief method returns the size of the grey value range
+  * \brief returns the size of the grey value range
   */
   ScalarType GetRange() const;
 
   /*!
-  * setter for default level and window value
+  * set the default level and window value
   */
   void SetDefaultLevelWindow(ScalarType level, ScalarType window);
 
   /*!
-  * setter for default total range maximum value
+  * set the default total range maximum value
   */
   void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
 
@@ -167,12 +167,12 @@ public:
   bool IsFixed() const;
 
   /*!
-  * \brief equality operator implementation
+  * \brief equality operator implementation that allows to compare two level windows
   */
   virtual bool operator==(const LevelWindow& levWin) const;
 
   /*!
-  * \brief non equality operator implementation
+  * \brief non equality operator implementation that allows to compare two level windows
   */
   virtual bool operator!=(const LevelWindow& levWin) const;
 
@@ -191,14 +191,14 @@ protected:
   bool SetAutoByPicTags(const ipPicDescriptor* pic);
 
   /*!
-  * lower limit of current window
+  * lower bound of current window
   */
-  ScalarType m_Min;
+  ScalarType m_LowerWindowBound;
 
   /*!
-  * upper limit of current window
+  * upper bound of current window
   */
-  ScalarType m_Max;
+  ScalarType m_UpperWindowBound;
 
   /*!
   * minimum gray value of the window
@@ -236,41 +236,42 @@ protected:
    */
   bool m_Fixed;
 
+
   /*!
   * confidence tests
   *
-  * if m_Min > m_Max, then the values for m_Min and m_Max will be exchanged
+  * if m_LowerWindowBound > m_UpperWindowBound, then the values for m_LowerWindowBound and m_UpperWindowBound will be exchanged
   *
-  * if m_Min < m_RangeMin, m_Min will be set to m_RangeMin. m_Max will be decreased the same as m_Min will be increased, but minimum value for m_Max is also m_RangeMin.
+  * if m_LowerWindowBound < m_RangeMin, m_LowerWindowBound will be set to m_RangeMin. m_UpperWindowBound will be decreased the same as m_LowerWindowBound will be increased, but minimum value for m_UpperWindowBound is also m_RangeMin.
   * 
-  * if m_Max > m_RangeMax, m_Max will be set to m_RangeMax. m_Min will be increased the same as m_Max will be decreased, but maximum value for m_Min is also m_RangeMax.
+  * if m_UpperWindowBound > m_RangeMax, m_UpperWindowBound will be set to m_RangeMax. m_LowerWindowBound will be increased the same as m_UpperWindowBound will be decreased, but maximum value for m_LowerWindowBound is also m_RangeMax.
   *
   */
   inline void testValues()
   {
-    if ( m_Min > m_Max )
-      std::swap(m_Min,m_Max);
-    else if (m_Min == m_Max )
-      m_Min = m_Max - 1;
+    if ( m_LowerWindowBound > m_UpperWindowBound )
+      std::swap(m_LowerWindowBound,m_UpperWindowBound);
+    else if (m_LowerWindowBound == m_UpperWindowBound )
+      m_LowerWindowBound = m_UpperWindowBound - 1;
     ScalarType diff;
-    if ( m_Min < m_RangeMin )
+    if ( m_LowerWindowBound < m_RangeMin )
     {
-      diff = m_RangeMin - m_Min;
-      m_Min = m_RangeMin;
-      if (!((m_Max - diff) > m_RangeMin))
-        m_Max = m_RangeMin + 1;
+      diff = m_RangeMin - m_LowerWindowBound;
+      m_LowerWindowBound = m_RangeMin;
+      if (!((m_UpperWindowBound - diff) > m_RangeMin))
+        m_UpperWindowBound = m_RangeMin + 1;
       else
-        m_Max -= diff;
+        m_UpperWindowBound -= diff;
     }
 
-    if ( m_Max > m_RangeMax )
+    if ( m_UpperWindowBound > m_RangeMax )
     {
-      diff = m_Max - m_RangeMax;
-      m_Max = m_RangeMax;
-      if (!((m_Min + diff) < m_RangeMax))
-        m_Min = m_RangeMax - 1;
+      diff = m_UpperWindowBound - m_RangeMax;
+      m_UpperWindowBound = m_RangeMax;
+      if (!((m_LowerWindowBound + diff) < m_RangeMax))
+        m_LowerWindowBound = m_RangeMax - 1;
       else
-        m_Min += diff;
+        m_LowerWindowBound += diff;
     }
   }
   

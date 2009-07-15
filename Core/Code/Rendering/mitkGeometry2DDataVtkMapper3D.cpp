@@ -672,8 +672,8 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataTreeNode * node, BaseRenderer* 
               if( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
                 || node->GetLevelWindow( levelWindow, planeRenderer ) )
               {
-                windowMin = levelWindow.GetMin();
-                windowMax = levelWindow.GetMax();
+                windowMin = levelWindow.GetLowerWindowBound();
+                windowMax = levelWindow.GetUpperWindowBound();
               }
 
               vtkLookupTable *lookupTableSource;

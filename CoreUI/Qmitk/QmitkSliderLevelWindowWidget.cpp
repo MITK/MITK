@@ -467,10 +467,10 @@ void QmitkSliderLevelWindowWidget::update() {
   if ( rectHeight < 15 )
     rectHeight = 15;
 
-  if ( m_LevelWindow.GetMin() < 0 )
-    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetMax() - m_LevelWindow.GetRangeMin()) * fact) , rectWidth, (int) rectHeight );
+  if ( m_LevelWindow.GetLowerWindowBound() < 0 )
+    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact) , rectWidth, (int) rectHeight );
   else
-    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetMax() - m_LevelWindow.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
+    m_Rect.setRect( 2, (int) (m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact), rectWidth, (int) rectHeight );
   
   QWidget::repaint();
 }

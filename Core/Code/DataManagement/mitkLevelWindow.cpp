@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-: m_Min( level - window / 2.0 ), m_Max( level + window / 2.0 ),
+: m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
   m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
   m_DefaultRangeMin( -2048.0 ), m_DefaultRangeMax( 4096.0 ),
   m_DefaultLevel( level ), m_DefaultWindow( window ),
@@ -43,12 +43,12 @@ mitk::LevelWindow::~LevelWindow()
 
 mitk::ScalarType mitk::LevelWindow::GetLevel() const
 {
-  return (m_Max-m_Min) / 2.0 + m_Min;
+  return (m_UpperWindowBound-m_LowerWindowBound) / 2.0 + m_LowerWindowBound;
 }
 
 mitk::ScalarType mitk::LevelWindow::GetWindow() const
 {
-  return (m_Max-m_Min);
+  return (m_UpperWindowBound-m_LowerWindowBound);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultLevel() const
@@ -68,14 +68,14 @@ void mitk::LevelWindow::ResetDefaultLevelWindow()
   SetLevelWindow(m_DefaultLevel, m_DefaultWindow);
 }
 
-mitk::ScalarType mitk::LevelWindow::GetMin() const
+mitk::ScalarType mitk::LevelWindow::GetLowerWindowBound() const
 {
-  return m_Min;
+  return m_LowerWindowBound;
 }
 
-mitk::ScalarType mitk::LevelWindow::GetMax() const
+mitk::ScalarType mitk::LevelWindow::GetUpperWindowBound() const
 {
-  return m_Max;
+  return m_UpperWindowBound;
 }
 
 void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
@@ -92,37 +92,37 @@ void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType 
   if ( IsFixed() )
     return;
   
-  m_Min = level - window / 2.0;
-  m_Max = level + window / 2.0;
+  m_LowerWindowBound = level - window / 2.0;
+  m_UpperWindowBound = level + window / 2.0;
 
   testValues();
 }
 
-void mitk::LevelWindow::SetMinMax(mitk::ScalarType min, mitk::ScalarType max)
+void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound)
 {
   if ( IsFixed() )
     return;
   
-  if(min>max)
-    std::swap(min,max);
+  if(lowerBound>upperBound)
+    std::swap(lowerBound,upperBound);
 
-  m_Min = min;
-  m_Max = max;
-  if (m_Min < m_RangeMin)
-    m_Min = m_RangeMin;
-  if (m_Min >= m_RangeMax)
-    m_Min = m_RangeMax - 1;
-  if (m_Max > m_RangeMax)
-    m_Max = m_RangeMax;
-  if (m_Max <= m_RangeMin)
-    m_Max = m_RangeMin + 1;
+  m_LowerWindowBound = lowerBound;
+  m_UpperWindowBound = upperBound;
+  if (m_LowerWindowBound < m_RangeMin)
+    m_LowerWindowBound = m_RangeMin;
+  if (m_LowerWindowBound >= m_RangeMax)
+    m_LowerWindowBound = m_RangeMax - 1;
+  if (m_UpperWindowBound > m_RangeMax)
+    m_UpperWindowBound = m_RangeMax;
+  if (m_UpperWindowBound <= m_RangeMin)
+    m_UpperWindowBound = m_RangeMin + 1;
   testValues();
 }
 
 void mitk::LevelWindow::SetToMaxWindowSize()
 {
- m_Max = m_RangeMax;
- m_Min = m_RangeMin;
+ m_UpperWindowBound = m_RangeMax;
+ m_LowerWindowBound = m_RangeMin;
 }
 
 void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
@@ -136,14 +136,14 @@ void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType ma
   m_RangeMax = max;
   if ( m_RangeMin == m_RangeMax)
     m_RangeMin = m_RangeMax - 1;
-  if (m_Min < m_RangeMin)
-    m_Min = m_RangeMin;
-  if (m_Min >= m_RangeMax)
-    m_Min = m_RangeMax - 1;
-  if (m_Max > m_RangeMax)
-    m_Max = m_RangeMax;
-  if (m_Max <= m_RangeMin)
-    m_Max = m_RangeMin + 1;
+  if (m_LowerWindowBound < m_RangeMin)
+    m_LowerWindowBound = m_RangeMin;
+  if (m_LowerWindowBound >= m_RangeMax)
+    m_LowerWindowBound = m_RangeMax - 1;
+  if (m_UpperWindowBound > m_RangeMax)
+    m_UpperWindowBound = m_RangeMax;
+  if (m_UpperWindowBound <= m_RangeMin)
+    m_UpperWindowBound = m_RangeMin + 1;
 
   testValues();
 }
@@ -340,7 +340,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
       maxValue = max2ndValue;
     }
   }
-  SetMinMax(minValue, maxValue);
+  SetWindowBounds(minValue, maxValue);
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
 }
 
@@ -403,7 +403,7 @@ bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
   if ( m_RangeMin == levWin.GetRangeMin() && 
     m_RangeMax == levWin.GetRangeMax() && 
-    m_Min == levWin.GetMin() && m_Max == levWin.GetMax() &&
+    m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
     m_DefaultLevel == levWin.GetDefaultLevel() && m_DefaultWindow == levWin.GetDefaultWindow() &&
     m_DefaultRangeMin == levWin.GetDefaultRangeMin() && m_DefaultRangeMax == levWin.GetDefaultRangeMax() && m_Fixed == levWin.IsFixed() ) {
 
@@ -427,8 +427,8 @@ mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
   else {
     m_RangeMin = levWin.GetRangeMin();
     m_RangeMax = levWin.GetRangeMax();
-    m_Min= levWin.GetMin();
-    m_Max= levWin.GetMax();
+    m_LowerWindowBound= levWin.GetLowerWindowBound();
+    m_UpperWindowBound= levWin.GetUpperWindowBound();
     m_DefaultLevel = levWin.GetDefaultLevel();
     m_DefaultWindow = levWin.GetDefaultWindow();
     m_DefaultRangeMin = levWin.GetDefaultRangeMin();

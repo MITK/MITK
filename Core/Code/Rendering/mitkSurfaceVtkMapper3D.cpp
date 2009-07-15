@@ -198,12 +198,12 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   mitk::LevelWindow levelWindow;
   if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
   {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
   else
   if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer))
   {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetMin(),levelWindow.GetMax());
+    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
   
   mitk::VtkRepresentationProperty* representationProperty;

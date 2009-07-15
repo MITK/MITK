@@ -234,6 +234,8 @@ void mitk::ParRecFileReader::GenerateData()
     //}
     free(data);
   }
+
+  fclose(f);
 }
 
 bool mitk::ParRecFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 

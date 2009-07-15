@@ -79,7 +79,15 @@ class QmitkIGTExampleView : public QObject, public QmitkFunctionality
   */  
   //Port virtual QAction * CreateAction(QActionGroup *parent);
 
+  /*!  
+  \brief method is called when the bundle is started
+  */  
   virtual void Activated();
+
+  /*!  
+  \brief method is called when the bundle is closed
+  */  
+  virtual void Deactivated();
 
 #ifdef BUILD_TESTING
   /**
@@ -207,15 +215,20 @@ protected slots:
    void OnErrorValueChanged(mitk::NavigationData::CovarianceMatrixType v, unsigned int index);
 
    /**Documentation
-   * \brief Callback method of the NavigationDataToMessageFilter
+   * \brief Shows a file dialog for choosing tool description files
    *
-   * This method will be called by NavigationDataToMessageFilter when the
-   * error value of its input navigation data object changes. 
-   * The method calculates an overall error value and adds it both to an
-   * error plot widget and to a progress bar. If the error is above a hardcoded
-   * threshold, a warning is also displayed in the text output widget
+   * This method is called when the m_ToolBtn is pressed and a tracking
+   * device was selected which needs tool description data.
+   * 
    */
    void OnLoadTool();
+
+   /**Documentation
+   * \brief Chooses the current tracking device
+   *
+   * This method is called when the m_TrackingDevice selector changed.
+   */
+   void OnTrackingDeviceTextChanged( const QString & );
 
 protected:  
 
@@ -241,6 +254,6 @@ protected:
   QTimer* m_RecordingTimer; ///< timer for continuous recording
   QTimer* m_PlayingTimer; ///< timer for continuous playing
 
-  QStringList m_ToolList;
+  QStringList m_ToolList; ///< list to the tool description files
 };
 #endif // !defined(QmitkIGTExampleView_H__INCLUDED)

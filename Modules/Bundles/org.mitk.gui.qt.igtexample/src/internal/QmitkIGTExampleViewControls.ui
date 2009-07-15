@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
+    <width>510</width>
     <height>645</height>
    </rect>
   </property>
@@ -50,7 +50,7 @@
         </item>
         <item>
          <property name="text">
-          <string>RandomTrackingDevice</string>
+          <string>VirtualTrackingDevice</string>
          </property>
         </item>
        </widget>
@@ -311,70 +311,5 @@
   <include location="local">QmitkPlotWidget.h</include>
  </includes>
  <resources/>
- <connections>
-  <connection>
-   <sender>m_ChangeOffset</sender>
-   <signal>clicked()</signal>
-   <receiver>QmitkIGTExampleControls</receiver>
-   <slot>m_ChangeOffset_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>m_TrackingDevice</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>QmitkIGTExampleControls</receiver>
-   <slot>m_TrackingDevice_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>m_LoadToolBtn</sender>
-   <signal>clicked()</signal>
-   <receiver>QmitkIGTExampleControls</receiver>
-   <slot>m_LoadToolBtn_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>m_TrackingDevice</sender>
-   <signal>activated(QString)</signal>
-   <receiver>QmitkIGTExampleControls</receiver>
-   <slot>m_TrackingDevice_textChanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

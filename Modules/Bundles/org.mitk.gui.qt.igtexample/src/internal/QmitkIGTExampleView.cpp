@@ -61,14 +61,12 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkIGTExampleView::QmitkIGTExampleView(QObject *parent, const char *name)
  : QmitkFunctionality()
 {
-  //Port SetAvailability(true);
   m_Timer = new QTimer(this);
   m_RecordingTimer = new QTimer(this);
   m_PlayingTimer = new QTimer(this);
   m_XValues.clear();
   m_YValues.clear();
   m_Controls = NULL;
-  //Port m_MultiWidget = GetActiveStdMultiWidget();
 }
 
 
@@ -94,6 +92,7 @@ void QmitkIGTExampleView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_TextOutput->setTextFormat(Qt::PlainText);
     out = m_Controls->m_TextOutput;
     
+    CreateConnections();
     //mitk::Vector3D offset;
 
     //if (GetFunctionalityOptionsList()->GetPropertyValue<mitk::Vector3D>("NavigationDataDisplacementFilter_Offset", offset) == true)
@@ -123,13 +122,17 @@ void QmitkIGTExampleView::CreateConnections()
 {
   if ( m_Controls )
   {
+    connect((QObject*)(m_Controls->m_ChangeOffset), SIGNAL(clicked()), (QObject*) this, SLOT(OnParametersChanged())); // update filter parameters with values from the GUI widget
+    connect((QObject*)(m_Controls->m_TrackingDevice), SIGNAL(textChanged(QString)), (QObject*) this, SLOT(OnTrackingDeviceTextChanged(QString)));
+    connect((QObject*)(m_Controls->m_TrackingDevice), SIGNAL(activated(QString)),(QObject*) this, SLOT(OnTrackingDeviceTextChanged(QString)));
+
     connect( (QObject*)(m_Controls->m_StartTrackingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnTestTracking()));  // execute tracking test code
-    connect( (QObject*)(m_Controls->m_LoadToolBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnLoadTool()));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_LoadToolBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnLoadTool()));  // load tools for specific tracking devices
     connect( (QObject*)(m_Controls->m_StartNavigationButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnTestNavigation())); // build and initialize navigation filter pipeline
     connect( (QObject*)(m_Controls->m_MeasureBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnMeasure())); // execute navigation filter pipeline to read transformed tracking data
     connect( (QObject*)(m_Controls->m_MeasureContinuously), SIGNAL(clicked()),(QObject*) this, SLOT(OnMeasureContinuously())); // execute navigation filter pipeline to read transformed tracking data
     connect( (QObject*)(m_Controls->m_StopBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnStop())); // cleanup navigation filter pipeline
-    connect( (QObject*)(m_Controls), SIGNAL(ParametersChanged()),(QObject*) this, SLOT(OnParametersChanged()));  // update filter parameters with values from the GUI widget
+    //connect( (QObject*)(m_Controls), SIGNAL(ParametersChanged()),(QObject*) this, SLOT(OnParametersChanged()));  // update filter parameters with values from the GUI widget
     connect( m_Timer, SIGNAL(timeout()), this, SLOT(OnMeasure()) );
     connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
     connect( m_PlayingTimer, SIGNAL(timeout()), this, SLOT(OnPlaying()) );
@@ -139,19 +142,14 @@ void QmitkIGTExampleView::CreateConnections()
   }
 }
 
-//Port
-//QAction * QmitkIGTExampleView::CreateAction(QActionGroup *parent)
-//{
-//  QAction* action;
-//  action = new QAction( tr( "Example IGT functionality" ), QPixmap((const char**)icon_xpm), tr( "QmitkIGTExampleView menu" ), 0, parent, "QmitkIGTExampleView" );
-//  return action;
-//}
-
 void QmitkIGTExampleView::Activated()
 {
   QmitkFunctionality::Activated();
 }
-
+void QmitkIGTExampleView::Deactivated()
+{
+  QmitkFunctionality::Deactivated();
+}
 void QmitkIGTExampleView::OnTestTracking()
 {
     mitk::NDITrackingDevice::Pointer trak = mitk::NDITrackingDevice::New(); // TEST
@@ -368,7 +366,7 @@ void QmitkIGTExampleView::OnTestNavigation()
   m_Controls->m_StartNavigationButton->setEnabled(false);
 
   //Initialize the views if no data was loaded yet
-  //Port? mitk::RenderingManager::GetInstance()->InitializeViews(m_DataTreeIterator.GetPointer());
+  mitk::RenderingManager::GetInstance()->InitializeViews();
 
   out->append("Tracking Pipeline ready. Click on Measure! button to get most current navigation data");
   WaitCursorOff();  // restore normal mouse cursor after you finished
@@ -471,29 +469,21 @@ void QmitkIGTExampleView::OnStop()
 
 void QmitkIGTExampleView::OnParametersChanged()
 {
-  //Port
-  //TODO: save all data in datastorage
-  ///* Check if needed objects exist */
-  //if (m_Controls->m_Parameters.IsNull() /*|| m_Displacer.IsNull()*/)
-  //  return;
+  mitk::Vector3D v;
+  v[0] = m_Controls->m_X->text().toFloat();
+  v[1] = m_Controls->m_Y->text().toFloat();
+  v[2] = m_Controls->m_Z->text().toFloat();
 
-  ///* get all filter parameters in the form of a PropertyList and pass it to the filter */
-  ////m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
-  ////out->append("Using GUI Parameters for Displacement Filter.");
-
-  ///* add the filter PropertyList to the functionalities List, so that it will be saved on application exit
-  //this will be restored at the next restart.
-  //*/
-  //GetFunctionalityOptionsList()->ConcatenatePropertyList(m_Controls->m_Parameters.GetPointer(), true);
-  //out->append("Adding GUI parameters to persistence storage.");
-  //m_Displacer->SetParameters(m_Controls->m_Parameters.GetPointer());
-  //out->append("Setting GUI parameters to filter.");
+  mitk::PropertyList::Pointer parameters = mitk::PropertyList::New();
+  parameters->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(v));
+  m_Displacer->SetParameters(parameters.GetPointer());
 }
 
 
 void QmitkIGTExampleView::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
 {
-  //Port
+  //Due to porting to Qt4 this feature is not ported yet
+
   //QmitkFunctionality::AddToFunctionalityOptionsList(pl);  // let the super class add the properties
 
   //// then initialize everything according to the properties
@@ -752,4 +742,35 @@ void QmitkIGTExampleView::OnErrorValueChanged(mitk::NavigationData::CovarianceMa
   mitk::ScalarType progressClampError = (errorValue < 1.0) ? errorValue* 100 : 100;// use primitive mapping of error values to the progress bar range of 0..100. needs to be adjusted to meaningful values
   m_Controls->m_ErrorBar->setProgress(progressClampError); 
 
+}
+void QmitkIGTExampleView::OnTrackingDeviceTextChanged( const QString & )
+{
+  if (m_Controls->m_TrackingDevice->currentText() == "NDI Polaris")
+  {
+    m_Controls->m_LoadToolBtn->setEnabled(true);
+    m_Controls->m_ToolFileName->setEnabled(true);
+    m_Controls->m_PortLabel->setEnabled(true);
+    m_Controls->m_Port->setEnabled(true);
+  }
+  else if (m_Controls->m_TrackingDevice->currentText() == "NDI Aurora")
+  {
+    m_Controls->m_LoadToolBtn->setEnabled(false);
+    m_Controls->m_ToolFileName->setEnabled(false);
+    m_Controls->m_PortLabel->setEnabled(true);
+    m_Controls->m_Port->setEnabled(true);
+  }
+  else if (m_Controls->m_TrackingDevice->currentText() == "Micron Tracker")
+  {
+    m_Controls->m_LoadToolBtn->setEnabled(true);
+    m_Controls->m_ToolFileName->setEnabled(true);
+    m_Controls->m_PortLabel->setEnabled(false);
+    m_Controls->m_Port->setEnabled(false);
+  }
+  else
+  {
+    m_Controls->m_LoadToolBtn->setEnabled(false);
+    m_Controls->m_ToolFileName->setEnabled(false);
+    m_Controls->m_PortLabel->setEnabled(false);
+    m_Controls->m_Port->setEnabled(false);
+  }
 }

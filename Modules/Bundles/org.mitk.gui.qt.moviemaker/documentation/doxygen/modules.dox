@@ -1,0 +1,32 @@
+/**
+  \defgroup org_mitk_gui_qt_moviemaker org.mitk.gui.qt.moviemaker Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_moviemaker_internal Internal
+  \ingroup org_mitk_gui_qt_moviemaker
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.moviemaker plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/
+/**
+  \defgroup org_mitk_gui_qt_moviemaker org.mitk.gui.qt.moviemaker Plugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_moviemaker_internal Internal
+  \ingroup org_mitk_gui_qt_moviemaker
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.moviemaker plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

@@ -43,6 +43,7 @@ SET(${KITNAME}_TESTS
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp
+  mitkTransferFunctionTest.cpp
   #mitkAbstractTransformGeometryTest.cpp
   #mitkPicFileIOTest.cpp
   #mitkStepperTest.cpp

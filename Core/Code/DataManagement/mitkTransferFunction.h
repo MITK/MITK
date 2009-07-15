@@ -124,25 +124,25 @@ public:
   
 
   /** \brief Get a copy of the scalar opacity transfer function control-points. */
-  TransferFunction::ControlPoints GetScalarOpacityPoints();
+  TransferFunction::ControlPoints &GetScalarOpacityPoints();
   
   /** \brief Get a copy of the gradient opacity transfer function control-points. */
-  TransferFunction::ControlPoints GetGradientOpacityPoints();
+  TransferFunction::ControlPoints &GetGradientOpacityPoints();
 
   /** \brief Get a copy of the color transfer function control-points. */
-  TransferFunction::RGBControlPoints GetRGBPoints();
+  TransferFunction::RGBControlPoints &GetRGBPoints();
   
 
   /** \brief Remove the specified control point from the scalar opacity transfer
    * function. */
-  void RemoveScalarOpacityPoint(double x);
+  int RemoveScalarOpacityPoint(double x);
   
   /** \brief Remove the specified control point from the gradient opacity transfer
    * function. */
-  void RemoveGradientOpacityPoint(double x);
+  int RemoveGradientOpacityPoint(double x);
 
   /** \brief Remove the specified control point from the color transfer function. */
-  void RemoveRGBPoint(double x);
+  int RemoveRGBPoint(double x);
   
 
   /** \brief Removes all control points from the scalar opacity transfer function. */

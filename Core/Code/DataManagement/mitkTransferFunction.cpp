@@ -94,7 +94,7 @@ void TransferFunction::AddRGBPoint(double x, double r, double g, double b)
 }
 
 
-TransferFunction::ControlPoints TransferFunction::GetScalarOpacityPoints()
+TransferFunction::ControlPoints &TransferFunction::GetScalarOpacityPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_ScalarOpacityPoints.clear();
@@ -108,7 +108,7 @@ TransferFunction::ControlPoints TransferFunction::GetScalarOpacityPoints()
 }
 
 
-TransferFunction::ControlPoints TransferFunction::GetGradientOpacityPoints()
+TransferFunction::ControlPoints &TransferFunction::GetGradientOpacityPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_GradientOpacityPoints.clear();
@@ -122,36 +122,36 @@ TransferFunction::ControlPoints TransferFunction::GetGradientOpacityPoints()
 }
 
 
-TransferFunction::RGBControlPoints TransferFunction::GetRGBPoints()
+TransferFunction::RGBControlPoints &TransferFunction::GetRGBPoints()
 {
   // Retrieve data points from VTK transfer function and store them in a vector
   m_RGBPoints.clear();
   vtkFloatingPointType *data = m_ColorTransferFunction->GetDataPointer();
   for ( int i = 0; i < m_ColorTransferFunction->GetSize(); ++i )
   {
-    double rgb[] = { data[i*2+1], data[i*2+2], data[i*2+3] };
-    m_RGBPoints.push_back( std::make_pair( data[i*2], rgb ));
+    double rgb[] = { data[i*4+1], data[i*4+2], data[i*4+3] };
+    m_RGBPoints.push_back( std::make_pair( data[i*4], rgb ));
   }
 
   return m_RGBPoints;
 }
 
 
-void TransferFunction::RemoveScalarOpacityPoint(double x)
+int TransferFunction::RemoveScalarOpacityPoint(double x)
 {
-  m_ScalarOpacityFunction->RemovePoint(x);
+  return m_ScalarOpacityFunction->RemovePoint(x);
 }
 
 
-void TransferFunction::RemoveGradientOpacityPoint(double x)
+int TransferFunction::RemoveGradientOpacityPoint(double x)
 {
-  m_GradientOpacityFunction->RemovePoint(x);
+  return m_GradientOpacityFunction->RemovePoint(x);
 }
 
 
-void TransferFunction::RemoveRGBPoint(double x)
+int TransferFunction::RemoveRGBPoint(double x)
 {
-  m_ColorTransferFunction->RemovePoint(x);
+  return m_ColorTransferFunction->RemovePoint(x);
 }
 
 

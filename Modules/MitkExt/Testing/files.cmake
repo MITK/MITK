@@ -1,18 +1,18 @@
 SET(MODULE_TESTS 
-  itkGraphCutSegmentationFilterTest.cpp
-  itkImageToTreeFilterTest.cpp
-  itkThreadPoolTest.cpp
+  # itkGraphCutSegmentationFilterTest.cpp
+  # itkImageToTreeFilterTest.cpp
+  # itkThreadPoolTest.cpp
   mitkAutoCropImageFilterTest.cpp
-  mitkClosedSplineTest.cpp
+  # mitkClosedSplineTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   # mitkDataTreeFilterTest.cpp
   # mitkDataTreeTest.cpp
   mitkDemonsRegistrationTest.cpp
   mitkExternalToolsTest.cpp
-  mitkGeometryTest.cpp
+  # mitkGeometryTest.cpp
   mitkHistogramMatchingTest.cpp
-  mitkLabeledImageToSurfaceFilterTest.cpp
+  # mitkLabeledImageToSurfaceFilterTest.cpp
   mitkMeshTest.cpp
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp

@@ -588,7 +588,7 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataTreeNode * node, BaseRenderer* 
             texture = vtkTexture::New();
             texture->InterpolateOn();
             texture->SetLookupTable( lookupTable );
-            texture->MapColorScalarsThroughLookupTableOn();
+            texture->MapColorScalarsThroughLookupTableOff();
             texture->RepeatOff();
 
             imageActor = vtkActor::New();

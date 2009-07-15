@@ -26,9 +26,9 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
 
   //building up necessary objects
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();
-  mitk::FocusManager::FocusElement::Pointer element1 = mitk::VtkPropRenderer::New( "renderer1", renderWindow );
-  mitk::FocusManager::FocusElement::Pointer element2 = mitk::VtkPropRenderer::New( "renderer2", renderWindow );
-  mitk::FocusManager::FocusElement::Pointer element3 = mitk::VtkPropRenderer::New( "renderer3", renderWindow );
+  mitk::VtkPropRenderer::Pointer element1 = mitk::VtkPropRenderer::New( "renderer1", renderWindow );
+  mitk::VtkPropRenderer::Pointer element2 = mitk::VtkPropRenderer::New( "renderer2", renderWindow );
+  mitk::VtkPropRenderer::Pointer element3 = mitk::VtkPropRenderer::New( "renderer3", renderWindow );
 
   //the FocusManager itself
   mitk::FocusManager::Pointer focusManager = mitk::FocusManager::New();

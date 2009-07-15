@@ -268,12 +268,27 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
     {
       // create zip at filename
       std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
-      Poco::Zip::Compress zipper( file, true );
-      Poco::Path tmpdir( m_WorkingDirectory );
-      zipper.addRecursive( tmpdir );
-      zipper.close();
-      Poco::File deleteDir( m_WorkingDirectory );
-      deleteDir.remove(true); // recursive
+      if (!file.good())
+      {
+        LOG_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+      }
+      else
+      {
+        Poco::Zip::Compress zipper( file, true );
+        Poco::Path tmpdir( m_WorkingDirectory );
+        zipper.addRecursive( tmpdir );
+        zipper.close();
+      }
+      try
+      {
+        Poco::File deleteDir( m_WorkingDirectory );
+        deleteDir.remove(true); // recursive
+      }
+      catch(...)
+      {
+        LOG_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+        return true; // ok?
+      }
     }
     catch(std::exception& /*e*/)
     {

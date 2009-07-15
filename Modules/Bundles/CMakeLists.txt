@@ -10,6 +10,11 @@ IF(MITK_USE_OPENCHERRY)
   IF(QT4_FOUND)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext")
   ENDIF()
+  
+  SET(PLUGIN_EXCLUDE_LIST 
+    # movie maker module not working yet
+    org.mitk.gui.qt.moviemaker
+  )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles
                         CACHE_PLUGIN_SOURCE_DIRS MITK_MODULES_PLUGIN_SOURCE_DIRS
@@ -18,6 +23,7 @@ IF(MITK_USE_OPENCHERRY)
                         BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKModulesBundleList.cmake" 
                         CMAKE_CACHE_PREFIX "MITK"
                         PLUGIN_DEFAULT_ON ${_mitk_bundles_default}
+                        PLUGIN_EXCLUDES ${PLUGIN_EXCLUDE_LIST}
                         ${MITK_BUILD_ALL_PLUGINS_OPTION})
    
 ENDIF(MITK_USE_OPENCHERRY)

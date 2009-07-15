@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInternalTrackingTool.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
-#include "mitkRandomTrackingDevice.h"
+#include "mitkVirtualTrackingDevice.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"
 #ifdef MITK_USE_MICROBIRD_TRACKER
 #include "mitkMicroBirdTrackingDevice.h"
@@ -567,13 +567,13 @@ mitk::TrackingDevice::Pointer QmitkIGTExampleView::ConfigureTrackingDevice()
     out->append("MicroBird support not available in this version. Please select a different tracking device");
 #endif // MITK_USE_MICROBIRD_TRACKER
   }
-  else if (selectedDevice == "RandomTrackingDevice")
+  else if (selectedDevice == "VirtualTrackingDevice")
   {
-    mitk::RandomTrackingDevice::Pointer trackerRandom = mitk::RandomTrackingDevice::New();
-    trackerRandom->AddTool("toolRandom1");
-    trackerRandom->AddTool("toolRandom2");
-    tracker = trackerRandom;
-    out->append("creating virtual random tracking device with two tools");
+    mitk::VirtualTrackingDevice::Pointer trackerVirtual = mitk::VirtualTrackingDevice::New();
+    trackerVirtual->AddTool("toolRandom1");
+    trackerVirtual->AddTool("toolRandom2");
+    tracker = trackerVirtual;
+    out->append("creating virtual tracking device with two tools");
   }
   else
   {

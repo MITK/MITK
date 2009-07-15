@@ -59,10 +59,12 @@ mitk::MicroBirdTrackingDevice::~MicroBirdTrackingDevice()
     m_ToolsMutex->Unlock();
   m_ToolsMutex = NULL;
 
+  this->StopTracking();
+  this->CloseConnection();
 
-  if (m_TransmitterConfig)
+  if (m_TransmitterConfig != NULL)
     delete [] m_TransmitterConfig;
-  if (m_SensorConfig)
+  if (m_SensorConfig != NULL)
     delete [] m_SensorConfig;
 
   //\TODO: Do we need to clean up the pointers to PCIBird data like DOUBLE_POSITION_QUATERNION_TIME_Q_RECORD?

@@ -133,22 +133,32 @@ mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFRE() const
 {
   return m_ErrorMean;
 }
+
+
 mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetFREStdDev() const
 {
   return m_ErrorStdDev;
 }
+
+
 mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetRMSError() const
 {
   return m_ErrorRMS;
 }
+
+
 mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMinError() const
 {
   return m_ErrorMin;
 }
+
+
 mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetMaxError() const
 {
   return m_ErrorMax;
 }
+
+
 mitk::ScalarType mitk::NavigationDataLandmarkTransformFilter::GetAbsMaxError() const
 {
   return m_ErrorAbsMax;

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImage.h"
-#include "mitkGeometry.h"
+//#include "mitkGeometry.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
 

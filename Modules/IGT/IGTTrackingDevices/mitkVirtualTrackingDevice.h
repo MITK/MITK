@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkRandomTrackingDevice.h,v $
+Module:    $RCSfile: mitkVirtualTrackingDevice.h,v $
 Language:  C++
 Date:      $Date: 2009-02-11 18:22:32 +0100 (Mi, 11 Feb 2009) $
 Version:   $Revision: 16250 $
@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef MITKRandomTrackingDevice_H_HEADER_INCLUDED_
-#define MITKRandomTrackingDevice_H_HEADER_INCLUDED_
+#ifndef MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
+#define MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
 
 #include <vector>
 #include <mitkConfig.h>
@@ -30,29 +30,34 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
   /** Documentation
-  * \brief Class representing a tracking device which generates random positions / orientations. No hardware is needed for tracking device.
+  * \brief Class representing a tracking device which generates random positions / orientations. 
+  *        No hardware is needed for tracking device.
   *
-  * 
+  * This TrackingDevice class does not interface with a physical tracking device. It simulates 
+  * a tracking device by moving the tools on a randomly generated spline path.
+  *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT RandomTrackingDevice : public TrackingDevice
+  class MITK_IGT_EXPORT VirtualTrackingDevice : public TrackingDevice
   {
   public:
 
-    mitkClassMacro(RandomTrackingDevice, TrackingDevice);
+    mitkClassMacro(VirtualTrackingDevice, TrackingDevice);
     itkNewMacro(Self);
+
+    typedef itk::NonUniformBSpline<3> SplineType; ///< spline type used for tool path interpolation
 
     /**
     * \brief Sets the refresh rate of the virtual tracking device in ms
     * \return Sets the refresh rate of the virtual tracking device in ms
     */
-    itkSetMacro(RefreshRate,unsigned int)
+    itkSetMacro(RefreshRate, unsigned int)
 
     /**
     * \brief Returns the refresh rate in ms.
     * \return Returns the refresh rate in ms.
     */
-    itkGetConstMacro(RefreshRate,unsigned int)
+    itkGetConstMacro(RefreshRate, unsigned int)
 
     /**
     * \brief Starts the tracking.
@@ -120,13 +125,13 @@ namespace mitk
     };
 
     /**
-    * \brief return the approximate length of the spline for tool with index idx in milimeter
+    * \brief return the approximate length of the spline for tool with index idx in millimeter
     *
     * The call to OpenConnection() will initialize a spline path for each tool.
     * If GetSplineChordLength() is called before OpenConnection() or if the idx is out of range of 
     * valid tool indices, a std::invalid_argument exception is thrown. 
     * GetSplineChordLength() returns the distance between all control points of the 
-    * spline in milimeter. This can be used as an approximation for the length of the spline path.
+    * spline in millimeter. This can be used as an approximation for the length of the spline path.
     */
     mitk::ScalarType GetSplineChordLength(unsigned int idx);
   
@@ -136,47 +141,40 @@ namespace mitk
     * The virtual tools will travel along a closed spline path. 
     * This method sets the speed of a tool as a factor of how many rounds per second
     * the tool should move. A setting of 1.0 will indicate one complete round per second.
-    * Together with GetSplineChordLength(), the speed in milimeter per second can be estimated. 
+    * Together with GetSplineChordLength(), the speed in millimeter per second can be estimated. 
     * roundsPerSecond must be positive and larger than 0.0001. 
+    * \warning Tool speed is currently not used. 
+    * \TODO: use tool speed
     */
     void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
 
-typedef itk::NonUniformBSpline<3> SplineType;
-SplineType::Pointer GetSpline(unsigned int index)
-    {
-      if (index >= m_Interpolators.size())
-        throw std::invalid_argument("index out of range");
-      return m_Interpolators.at(index);
-    };
-
   protected:
-    RandomTrackingDevice();
-    ~RandomTrackingDevice();
+    VirtualTrackingDevice();
+    ~VirtualTrackingDevice();
     /**
     * \brief This method tracks tools as long as the variable m_Mode is set to "Tracking".
     * Tracking tools means generating random numbers for the tool position and orientation.
     */
     void TrackTools();
 
-    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
+    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data); ///< static start method for tracking thread
 
     SplineType::ControlPointType GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
 
-    typedef std::vector<InternalTrackingTool::Pointer> ToolContainer;
-    ToolContainer m_AllTools;
+    typedef std::vector<InternalTrackingTool::Pointer> ToolContainer; ///< container type for tracking tools
+    ToolContainer m_AllTools;                       ///< container for all tracking tools
 
-    itk::MultiThreader::Pointer m_MultiThreader;
+    itk::MultiThreader::Pointer m_MultiThreader;    ///< MultiThreader that starts continuous tracking update
     int m_ThreadID;
     
-    unsigned int m_RefreshRate;
-    unsigned int m_NumberOfControlPoints;
+    unsigned int m_RefreshRate;                     ///< refresh rate of the internal tracking thread in milliseconds
+    unsigned int m_NumberOfControlPoints;           ///< number of control points for the random path generation
 
-    
-    typedef std::vector<SplineType::Pointer> SplineVectorType;
-    SplineVectorType m_Interpolators;
-    std::vector<mitk::ScalarType> m_SplineLengths;
-    std::vector<mitk::ScalarType> m_ToolSpeeds;
-    mitk::ScalarType m_Bounds[6];
+    typedef std::vector<SplineType::Pointer> SplineVectorType; ///< storage container type for splines. 
+    SplineVectorType m_Interpolators;               ///< storage container for splines. \TODO: each tool should manage its own spline
+    std::vector<mitk::ScalarType> m_SplineLengths;  ///< storage container for splines lengths. \TODO: each tool should manage its own spline length
+    std::vector<mitk::ScalarType> m_ToolVelocities; ///< storage container for splines velocities. \TODO: each tool should manage its own spline velocity
+    mitk::ScalarType m_Bounds[6];                   ///< bounding box of the tracking volume stored as {xMin, xMax, yMin, yMax, zMin, zMax}
   };   
 }//mitk
-#endif /* MITKRandomTrackingDevice_H_HEADER_INCLUDED_ */
+#endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */

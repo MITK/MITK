@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
-#include "mitkRandomTrackingDevice.h"
+#include "mitkVirtualTrackingDevice.h"
 #include "mitkStandardFileLocations.h"
 #include "mitkSerialCommunication.h"
 #include "mitkCone.h"
@@ -135,10 +135,12 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
     //tracker->Add6DTool(tool); //Add the tool to the TrackingDevice object.
 /**************** End of Variant 1 ****************/
 
-/**************** Variant 2: Emulate a Tracking Device with mitk::RandomTrackingDevice ****************/
-    // For tests, it is useful to simulate a tracking device in software. This is what mitk::RandomTrackingDevice does.
+/**************** Variant 2: Emulate a Tracking Device with mitk::VirtualTrackingDevice ****************/
+    // For tests, it is useful to simulate a tracking device in software. This is what mitk::VirtualTrackingDevice does.
     // It will produce random position, orientation and error values for each tool that is added.
-    mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New(); // create virtual tracker
+    mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New(); // create virtual tracker
+    mitk::ScalarType bounds[] = {0.0, 200.0, 0.0, 200.0, 0.0, 200.0};
+    tracker->SetBounds(bounds);
     tracker->AddTool("MyInstrument");      // add a tool to tracker
 /**************** End of Variant 2 ****************/
 
@@ -157,6 +159,7 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
     m_Source->SetTrackingDevice(tracker); //Here we set the tracking device to the source of the pipeline.
     m_Source->Connect();                  //Now we connect to the tracking system.
                                           //Note we do not call this on the TrackingDevice object
+
 
     //As we wish to visualize our tool we need to have a PolyData which shows us the movement of our tool.
     //Here we take a cone shaped PolyData. In MITK you have to add the PolyData as a node into the DataStorage

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkRandomTrackingDevice.h>
+#include <mitkVirtualTrackingDevice.h>
 #include <mitkInternalTrackingTool.h>
 
 #include <mitkNavigationData.h>
@@ -48,13 +48,13 @@ int main(int argc, char* argv[])
   //*************************************************************************
   //First of all create a tracking device object and two tools for this "device".
 
-  //Here we take the RandomTrackingDevice. This is not a real tracking device it just delivers random 
+  //Here we take the VirtualTrackingDevice. This is not a real tracking device it just delivers random 
   //positions and orientations. You can use other/real tracking devices if you replace the following 
   //code with different tracking devices, e.g. mitk::NDITrackingDevice. The tools represent the
   //sensors of the tracking device. The TrackingDevice fills the tools with data.
   std::cout << "Generating TrackingDevice ..." << std::endl;
 
-  mitk::RandomTrackingDevice::Pointer tracker = mitk::RandomTrackingDevice::New();
+  mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   tracker->AddTool("tool1");
   tracker->AddTool("tool2");
 

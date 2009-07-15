@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkRandomTrackingDevice.h"
+#include "mitkVirtualTrackingDevice.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,9 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 
 
-mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice(), 
+mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(), 
   m_AllTools(), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(50), m_NumberOfControlPoints(20),
-  m_Interpolators(), m_SplineLengths(), m_ToolSpeeds()
+  m_Interpolators(), m_SplineLengths(), m_ToolVelocities()
 {
   //set the type of this tracking device
   this->m_Type = mitk::TrackingSystemNotSpecified;
@@ -35,11 +35,10 @@ mitk::RandomTrackingDevice::RandomTrackingDevice() : mitk::TrackingDevice(),
   m_Bounds[1] = m_Bounds[3] = m_Bounds[5] =  400.0;
   
   m_RefreshRate = 20;
-  this->m_MultiThreader = itk::MultiThreader::New();
 }
 
 
-mitk::RandomTrackingDevice::~RandomTrackingDevice()
+mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
 {
   if (GetMode() == Tracking)
   {
@@ -50,26 +49,26 @@ mitk::RandomTrackingDevice::~RandomTrackingDevice()
     this->CloseConnection();
   }
   /* cleanup tracking thread */
-  if ((m_ThreadID != 0) && (m_MultiThreader.IsNotNull()))
+  if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
   {
     m_MultiThreader->TerminateThread(m_ThreadID);
-  }
-  m_MultiThreader = NULL;
+    m_MultiThreader = NULL;
+  }  
   m_AllTools.clear();
 }
 
 
-mitk::TrackingTool* mitk::RandomTrackingDevice::AddTool(const char* toolName)
+mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
 {
   mitk::InternalTrackingTool::Pointer t = mitk::InternalTrackingTool::New();
   t->SetToolName(toolName);
   m_AllTools.push_back(t);
-  m_ToolSpeeds.push_back(0.1); // standard speed of the tool is 10 seconds per cycle
+  m_ToolVelocities.push_back(0.1); // standard speed of the tool is 10 seconds per cycle
   return t;
 }
 
 
-bool mitk::RandomTrackingDevice::StartTracking()
+bool mitk::VirtualTrackingDevice::StartTracking()
 {
 
   this->SetMode(Tracking);            // go to mode Tracking
@@ -81,12 +80,18 @@ bool mitk::RandomTrackingDevice::StartTracking()
 
   mitk::TimeStamp::GetInstance()->StartTracking(this);
 
+  
+  if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
+    m_MultiThreader->TerminateThread(m_ThreadID);
+  if (m_MultiThreader.IsNull())
+    m_MultiThreader = itk::MultiThreader::New();
+
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
   return true;
 }
 
 
-bool mitk::RandomTrackingDevice::StopTracking()
+bool mitk::VirtualTrackingDevice::StopTracking()
 {
   if (this->GetMode() == Tracking) // Only if the object is in the correct state
   {
@@ -103,13 +108,13 @@ bool mitk::RandomTrackingDevice::StopTracking()
 }
 
 
-unsigned int mitk::RandomTrackingDevice::GetToolCount() const
+unsigned int mitk::VirtualTrackingDevice::GetToolCount() const
 {
   return (unsigned int)this->m_AllTools.size();
 }
 
 
-mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber) const
+mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if ( toolNumber >= this->GetToolCount()) 
     return NULL;
@@ -118,7 +123,7 @@ mitk::TrackingTool* mitk::RandomTrackingDevice::GetTool(unsigned int toolNumber)
 }
 
 
-bool mitk::RandomTrackingDevice::OpenConnection()
+bool mitk::VirtualTrackingDevice::OpenConnection()
 {
   if (m_NumberOfControlPoints < 1)
   {
@@ -162,7 +167,7 @@ bool mitk::RandomTrackingDevice::OpenConnection()
 }
 
 
-bool mitk::RandomTrackingDevice::CloseConnection()
+bool mitk::VirtualTrackingDevice::CloseConnection()
 {
   bool returnValue = true; 
   if(this->GetMode() == Setup)
@@ -173,25 +178,25 @@ bool mitk::RandomTrackingDevice::CloseConnection()
 }
 
 
-mitk::ScalarType mitk::RandomTrackingDevice::GetSplineChordLength(unsigned int idx)
+mitk::ScalarType mitk::VirtualTrackingDevice::GetSplineChordLength(unsigned int idx)
 {
   if (idx >= m_SplineLengths.size())
     throw std::invalid_argument("No chord length available for this index");
   return m_SplineLengths.at(idx);
 }
 
-void mitk::RandomTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond)
+void mitk::VirtualTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond)
 {
-  if (idx >= m_ToolSpeeds.size())
+  if (idx >= m_ToolVelocities.size())
     throw std::invalid_argument("No tool available for this index");
   if (roundsPerSecond < 0.0001)
     throw std::invalid_argument("Minimum tool speed is 0.0001 rounds per second");
 
-  m_ToolSpeeds.at(idx) = roundsPerSecond;
+  m_ToolVelocities.at(idx) = roundsPerSecond;
 }
 
 
-void mitk::RandomTrackingDevice::TrackTools()
+void mitk::VirtualTrackingDevice::TrackTools()
 {
   if (m_Interpolators.size() != m_AllTools.size())
     throw std::logic_error("mismatch between tool count and interpolator count");
@@ -251,7 +256,7 @@ void mitk::RandomTrackingDevice::TrackTools()
 }
 
 
-ITK_THREAD_RETURN_TYPE mitk::RandomTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+ITK_THREAD_RETURN_TYPE mitk::VirtualTrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
@@ -263,16 +268,17 @@ ITK_THREAD_RETURN_TYPE mitk::RandomTrackingDevice::ThreadStartTracking(void* pIn
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  RandomTrackingDevice *trackingDevice = static_cast<RandomTrackingDevice*>(pInfo->UserData);
+  VirtualTrackingDevice *trackingDevice = static_cast<VirtualTrackingDevice*>(pInfo->UserData);
 
   if (trackingDevice != NULL) 
     trackingDevice->TrackTools();
 
+  trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here
   return ITK_THREAD_RETURN_VALUE;
 }
 
 
-mitk::RandomTrackingDevice::SplineType::ControlPointType mitk::RandomTrackingDevice::GetRandomPoint()
+mitk::VirtualTrackingDevice::SplineType::ControlPointType mitk::VirtualTrackingDevice::GetRandomPoint()
 {
   SplineType::ControlPointType pos;
   pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)

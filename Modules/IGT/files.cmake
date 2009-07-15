@@ -25,7 +25,7 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp
   IGTTrackingDevices/mitkTrackingVolume.cpp
-  IGTTrackingDevices/mitkRandomTrackingDevice.cpp
+  IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
 )
 
 IF(MITK_USE_MICRON_TRACKER)

@@ -623,3 +623,30 @@ bool mitk::PointSet::VerifyRequestedRegion()
 void mitk::PointSet::SetRequestedRegion( itk::DataObject * )
 {
 }
+
+
+void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << "Number timesteps: " << m_PointSetSeries.size() << "\n";
+  unsigned int i = 0;
+  for (PointSetSeries::const_iterator it = m_PointSetSeries.begin(); it != m_PointSetSeries.end(); ++it)
+  {
+    os << indent << "Timestep " << i++ << ": \n";
+    MeshType::Pointer ps = *it;
+    itk::Indent nextIndent = indent.GetNextIndent();
+    ps->Print(os, nextIndent);
+    MeshType::PointsContainer* points = ps->GetPoints();
+    for (MeshType::PointsContainer::iterator it2 = points->begin(); it2 != points->end(); ++it2)
+    {
+      os << nextIndent << "Point " << it2->first << ": [";
+      os << it2->second.GetElement(0);
+      for (unsigned int i = 1; i < PointType::GetPointDimension(); ++i)
+      {
+        os << ", " << it2->second.GetElement(i);
+      }
+      os << "]\n";
+    }
+  }
+}

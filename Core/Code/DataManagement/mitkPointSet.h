@@ -220,8 +220,9 @@ public:
 
 protected:
   PointSet();
-
   virtual ~PointSet();
+  
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const; ///< print content of the object to os
 
   virtual void ClearData();
 

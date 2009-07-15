@@ -107,7 +107,7 @@ double mitk::Image::GetPixelValue(const mitk::Point3D &position, unsigned int ti
   {
     timestep = this->GetTimeSteps();
   }
-  mitkIpPicTypeMultiplex2(AccessPixel, pic, position, value, timestep);
+  mitkIpPicTypeMultiplex3(AccessPixel, pic, position, value, timestep);
   return value;
 }
 

@@ -13,6 +13,7 @@ SET(${KITNAME}_TESTS
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventTest.cpp
+  mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp

@@ -79,7 +79,7 @@ void QmitkToolReferenceDataSelectionBox::UpdateDataDisplay()
   {
     m_ReferenceDataSelectionBox->GetFilter()->SetSelectMostRecentItemMode( true ); // automagically select new items
   }
-  EnsureOnlyReferenceImageIsVisibile();
+  //EnsureOnlyReferenceImageIsVisibile();
 }
 
 void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::DataTreeFilter::Item* item)
@@ -92,7 +92,7 @@ void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::Dat
   m_ToolManager->SetReferenceData(selectedNode); // maybe NULL
   m_SelfCall = false;
 
-  EnsureOnlyReferenceImageIsVisibile();
+  //EnsureOnlyReferenceImageIsVisibile();
 }
 
 void QmitkToolReferenceDataSelectionBox::EnsureOnlyReferenceImageIsVisibile()

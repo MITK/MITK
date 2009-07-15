@@ -100,6 +100,11 @@ public:
   //## use one of the SubImageSelector classes.
   virtual void* GetData();
 
+  //## @brief Get the pixel value at one specific position.
+  //##
+  //## The pixel type is always being converted to double.
+  double GetPixelValue(const mitk::Point3D &position, unsigned int timestep = 0);
+
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
   virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
@@ -516,6 +521,9 @@ public:
     friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 
 protected:
+  template <class T>
+  void AccessPixel(ipPicDescriptor* pic, mitk::Point3D p, double& value, int timestep = 0);
+  
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
   int GetVolumeIndex(int t = 0, int n = 0) const;
@@ -571,6 +579,34 @@ protected:
 
   itk::TimeStamp m_LastRecomputeTimeStamp;
 
+};
+
+//## @brief Get the pixel value at one specific position.
+//##
+//## The pixel type is always being converted to double.
+template <class T>
+void Image::AccessPixel(ipPicDescriptor* pic, mitk::Point3D p, double& value, int timestep)
+{  
+  itk::Point<int, 3> pi;
+  mitk::itk2vtk(p, pi);
+  if ( (pi[0]>=0 && pi[1] >=0 && pi[2]>=0 && timestep>=0) && (unsigned int)pi[0] < pic->n[0] && (unsigned int)pi[1] < pic->n[1] && (unsigned int)pi[2] < pic->n[2] && (unsigned int)timestep < pic->n[3] )
+  {
+    if(pic->bpe!=24)
+    {
+      value = (double) (((T*) pic->data)[ pi[0] + pi[1]*pic->n[0] + pi[2]*pic->n[0]*pic->n[1] + timestep*pic->n[0]*pic->n[1]*pic->n[2] ]);
+    }
+    else
+    {
+      double returnvalue = (((T*) pic->data)[pi[0]*3 + 0 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3 ]);
+      returnvalue += (((T*) pic->data)[pi[0]*3 + 1 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
+      returnvalue += (((T*) pic->data)[pi[0]*3 + 2 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
+      value = returnvalue;
+    }    
+  }
+  else
+  {
+    value = 0;
+  }
 };
 
 //##Documentation

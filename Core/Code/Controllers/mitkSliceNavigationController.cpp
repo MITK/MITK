@@ -619,17 +619,19 @@ SliceNavigationController
             }
 
             this->ExecuteOperation( doOp );
+
+            // If click was performed in this render window than we have to update the status bar information about position and pixel value.
             if(baseRenderer == m_Renderer)
             {
               {
-                std::string statusText;
-                mitk::Image* image = NULL;      
+                std::string statusText;     
                 TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
 
                 mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
                 mitk::Point3D worldposition = posEvent->GetWorldPosition();
                 int  maxlayer = -32768;
                 mitk::Image::Pointer image3D;
+                // find image with largest layer, that is the image shown on top in the render window 
                 for (unsigned int x = 0; x < nodes->size(); x++)
                 {
                   if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition))
@@ -643,37 +645,22 @@ SliceNavigationController
                     }
                   }
                 }
+                // get the position and gray value from the image and build up status bar text
                 mitk::Point3D p;
                 if(image3D.IsNotNull())
                 {
                   image3D->GetGeometry()->WorldToIndex(posEvent->GetWorldPosition(), p);
                   {
                     std::stringstream stream;
-                    stream<<'<'<<floor(p[0] * 100.0 + .5)/100.0<<"; "<<floor(p[1] * 100.0 + .5)/100.0<<"; "<<floor(p[2] * 100.0 + .5)/100.0<<"> mm";
+                    stream<<"Position: <"<<floor(p[0] * 100.0 + .5)/100.0<<"; "<<floor(p[1] * 100.0 + .5)/100.0<<"; "<<floor(p[2] * 100.0 + .5)/100.0<<"> mm";
+                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValue(p, baseRenderer->GetTimeStep())<<"  ";
                     statusText = stream.str(); 
-                  }
-
-                  ipPicDescriptor* pic = image3D->GetPic();
-                  if ( pic )
-                  {
-                    mitk::FillVector3D(p, (int)(p[0]+0.5), (int)(p[1]+0.5), (int)(p[2]+0.5));
-                    if ( image3D->GetGeometry()->IsIndexInside(p) )
-                    {
-                      itk::Point<int, 3> pi;
-                      mitk::itk2vtk(p, pi);
-                      if(pic->bpe!=24)
-                      {
-                        mitkIpPicTypeMultiplex2(buildstring, pic, pi, statusText);
-                      }
-                      else
-                        buildstring(pic, pi, statusText, (unsigned char) 1);
-                    }
-                  }
+                  }                  
                   mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
                 }
                 else
                 {
-                  mitk::StatusBar::GetInstance()->DisplayGreyValueText("No Image!");
+                  mitk::StatusBar::GetInstance()->DisplayGreyValueText("No image information at this position!");
                 }
               }
 

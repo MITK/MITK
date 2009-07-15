@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
+#include <ipPicTypeMultiplex.h>
 
 
 //template class itk::SmartPointerForwardReference<ImageDataItem>;
@@ -97,6 +98,19 @@ void* mitk::Image::GetData()
   m_CompleteData=GetChannelData();
   return m_CompleteData->GetData();
 }
+
+double mitk::Image::GetPixelValue(const mitk::Point3D &position, unsigned int timestep)
+{
+  ipPicDescriptor* pic = this->GetPic();
+  double value = 0;
+  if (this->GetTimeSteps() < timestep)
+  {
+    timestep = this->GetTimeSteps();
+  }
+  mitkIpPicTypeMultiplex2(AccessPixel, pic, position, value, timestep);
+  return value;
+}
+
 
 vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
 {

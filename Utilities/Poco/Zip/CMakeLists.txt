@@ -26,7 +26,9 @@ install(
     
 install(
     TARGETS ${LIBNAME} #${LIBNAMED}
-    DESTINATION lib
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
     )
 
 #add_subdirectory(samples)

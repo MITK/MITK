@@ -198,6 +198,8 @@ ELSE(WIN32)
   SET(CPACK_GENERATOR "NSIS;ZIP")
 ENDIF(NOT NSIS_MAKENSIS)
 
+SET(MITK_CPACK_PACKAGE_EXECUTABLES "ExtApp;MITK - Ext Application\"\"CoreApp;MITK - Core Application" CACHE INTERNAL "Collecting windows shortcuts to executables")
+
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/MITKCPackOptions.cmake.in ${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
 
 SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake")
@@ -269,7 +271,7 @@ IF(WIN32)
   FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
   FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
   INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
-  INSTALL(FILES ${itkdreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
+  INSTALL(FILES ${itkreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
   
   #OpenCherry
   IF(MITK_USE_OPENCHERRY)

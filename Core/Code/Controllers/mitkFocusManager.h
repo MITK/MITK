@@ -59,7 +59,7 @@ namespace mitk {
 
   //##Documentation
   //## Adds the widget into the set of managed Widgets after the focused
-  //## widget and sets the focus to the added one
+  //## widget and sets the focus to the added one if the list was empty before
   bool AddElement(FocusElement* element);
 
   //##Documentation

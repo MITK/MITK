@@ -11,6 +11,9 @@ ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 
 SET(TOOL_CPPS "")
+IF(MITK_TEST_COVERAGE)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+ENDIF(MITK_TEST_COVERAGE)
 
 MITK_CREATE_MODULE( Mitk
   INCLUDE_DIRS Algorithms DataManagement Controllers Interactions IO Rendering ${MITK_BINARY_DIR}

@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/QmitkMovieMakerView" >
+        <file>QmitkMovieMakerClasses.png</file>
+        <file>QmitkMovieMakerGUI.png</file>
+        <file>icon.xpm</file>
+        <file>pause.xpm</file>
+        <file>play.xpm</file>
+        <file>stop.xpm</file>
+    </qresource>
+</RCC>

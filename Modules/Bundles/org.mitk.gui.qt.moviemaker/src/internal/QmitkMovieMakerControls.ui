@@ -1,0 +1,416 @@
+<ui version="4.0" >
+ <class>QmitkMovieMakerControls</class>
+ <widget class="QWidget" name="QmitkMovieMakerControls" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>268</width>
+    <height>665</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MovieMaker</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QLabel" name="textLabel3" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Window for stepping</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="cmbSelectedStepperWindow" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="textLabel3_2" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Window for recording</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="cmbSelectedRecordingWindow" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title" >
+      <string>Recording options</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="textLabel1" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font/>
+          </property>
+          <property name="text" >
+           <string>Step</string>
+          </property>
+          <property name="wordWrap" >
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QmitkSliderNavigatorWidget" native="1" name="slidAngle" />
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QToolButton" name="btnPlay" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../../resources/QmitkMovieMaker.qrc" >:/QmitkMovieMakerView/play.xpm</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnPause" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../../resources/QmitkMovieMaker.qrc" >:/QmitkMovieMakerView/pause.xpm</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnStop" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font" >
+           <font/>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+          <property name="icon" >
+           <iconset resource="../../resources/QmitkMovieMaker.qrc" >:/QmitkMovieMakerView/stop.xpm</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnMovie" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="text" >
+         <string>Write Movie (MS Windows only) ...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnScreenshot" >
+        <property name="font" >
+         <font/>
+        </property>
+        <property name="toolTip" >
+         <string>Writes a screenshot of the selected window.</string>
+        </property>
+        <property name="text" >
+         <string>Write Screenshot ...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="title" >
+      <string>Playing options</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QWidget" native="1" name="buttonGroup1" >
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QRadioButton" name="rbtnSpatial" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Spatial</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnTemporal" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Temporal</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnCombined" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Combined</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <item>
+            <widget class="QLabel" name="textLabel2_2" >
+             <property name="font" >
+              <font/>
+             </property>
+             <property name="text" >
+              <string>S/T Relation</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spatialTimeRelation" >
+             <property name="font" >
+              <font/>
+             </property>
+             <property name="minimum" >
+              <number>-10</number>
+             </property>
+             <property name="maximum" >
+              <number>10</number>
+             </property>
+             <property name="value" >
+              <number>0</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line2" >
+        <property name="frameShape" >
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" native="1" name="buttonGroup2" >
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QRadioButton" name="rbtnForward" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Forward</string>
+           </property>
+           <property name="checked" >
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnBackward" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Backward</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnPingPong" >
+           <property name="font" >
+            <font/>
+           </property>
+           <property name="text" >
+            <string>Ping-Pong</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" >
+           <item>
+            <widget class="QLabel" name="textLabel2" >
+             <property name="font" >
+              <font/>
+             </property>
+             <property name="text" >
+              <string>Cycle (sec)</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spnDuration" >
+             <property name="font" >
+              <font/>
+             </property>
+             <property name="minimum" >
+              <number>1</number>
+             </property>
+             <property name="maximum" >
+              <number>200</number>
+             </property>
+             <property name="value" >
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>31</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSliderNavigatorWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSliderNavigatorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>rbtnForward</tabstop>
+  <tabstop>rbtnBackward</tabstop>
+  <tabstop>rbtnPingPong</tabstop>
+  <tabstop>rbtnSpatial</tabstop>
+  <tabstop>rbtnTemporal</tabstop>
+  <tabstop>cmbSelectedStepperWindow</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../resources/QmitkMovieMaker.qrc" />
+ </resources>
+ <connections/>
+</ui>

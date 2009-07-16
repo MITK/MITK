@@ -113,7 +113,8 @@ void SampleApp::InitializeFunctionality()
     }
 
     // add all known functionalities
-    for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_iterator it = qff.GetCreateFunctionalityPtrMap().begin() ; it != qff.GetCreateFunctionalityPtrMap().end(); it++)
+    //changing from const_iterator to const_reverse_iterator to get right order of functionalities
+    for (QmitkFunctionalityFactory::CreateFunctionalityPtrMap::const_reverse_iterator it = qff.GetCreateFunctionalityPtrMap().rbegin() ; it != qff.GetCreateFunctionalityPtrMap().rend(); it++)
     {
       if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL )
       {

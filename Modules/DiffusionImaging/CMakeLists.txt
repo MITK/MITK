@@ -1,4 +1,4 @@
 MITK_CREATE_MODULE( MitkDiffusionImaging
-  INCLUDE_DIRS Algorithms DicomImport DiffusionWeightedImages Reconstruction Tractography Rendering
+  INCLUDE_DIRS Algorithms DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures Reconstruction Tractography Rendering
   DEPENDS Mitk
 )

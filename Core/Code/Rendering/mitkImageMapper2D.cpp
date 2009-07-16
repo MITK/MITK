@@ -14,7 +14,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
+     
 #include "mitkImageMapper2D.h"
 #include "widget.h"
 #include "picimage.h"
@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkModalityProperty.h"
 #include "mitkVolumeCalculator.h"
 
 #include "mitkAbstractTransformGeometry.h"
@@ -185,87 +184,47 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
     ipPicDescriptor* pic = image->image();
 
     // search object border in current slice
-    int i = 0;
-    int numberOfPixels = pic->n[0] * pic->n[1];
-    bool hasObject = false;
-    switch ( pic->bpe )
-    {
-    case 8:
-      {
-        ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
-        while ( i < numberOfPixels )
-        {
-          if ( *current > 0 )
-          {
-            hasObject = true;
-            break;
-          }
-          ++i;
-          ++current;
-        }
-        break;
-      }
+    
+    int s_x = 0;
+    int s_y = 0;
+    int s_n = 0;
 
-    case 16:
+    for(int y=0;y<pic->n[1];y++)
+      for(int x=0;x<pic->n[0];x++)
       {
-        ipInt2_t *current = static_cast< ipInt2_t *>( pic->data );
-        while ( i < numberOfPixels )
+        bool set=false;
+        switch ( pic->bpe )
         {
-          if ( *current > 0 )
-          {
-            hasObject = true;
-            break;
-          }
-          ++i;
-          ++current;
+        case 8: {
+            ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
+            current += y*pic->n[0] + x;
+            if(current[0]) set=true;
+            break; }
+        case 16: {
+            ipInt2_t *current = static_cast< ipInt2_t *>( pic->data );
+            current += y*pic->n[0] + x;
+            if(current[0]) set=true;
+            break; }
+        case 24: {
+            ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
+            current += ( y*pic->n[0] + x )*3;
+            if(current[0]||current[1]||current[2]) set=true;
+            break; }
         }
-        break;
-      }
-
-    case 24:
-      {
-        ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
-        while ( i < numberOfPixels * 3 )
+        if(set)
         {
-          if ( *current > 0 )
-          {
-            hasObject = true;
-            break;
-          }
-          ++i;
-          ++current;
+          s_x+=x;
+          s_y+=y;
+          s_n++;
         }
-        i /= 3;
-        break;
       }
-    }
-
+    
     // if an object has been found, draw annotation
-    if ( hasObject )
+    if ( s_n>0 )
     {
-      float x = i % pic->n[0];
-      float y = i / pic->n[0];
-
-      // draw a callout line and text
-      glBegin(GL_LINES);  
-      glLineWidth(3);
-
-      // origin of the first line segment
-      glVertex3f(x, y, 0.0f);
-
-      // ending point of the first line segment
-      glVertex3f(x + (size / 20.0), y - (size / 20.0), 0.0f);
-
-      // origin  point of the second line segment
-      glVertex3f(x + (size / 20.0), y - (size / 20.0), 0.0f);
-
-      // ending point of the second line segment
-      glVertex3f(x + (size / 10.0), y - (size / 20.0), 0.0f);
-
-      glEnd( );
-
       // make sure a segmentation volume is present
       if( segmentationVolume <= 0 )
+      {
         // if not, check if the image is truly binary
         if( mitkimage->GetScalarValueMax( renderer->GetTimeStep() ) == 1 )
         {
@@ -273,22 +232,34 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
           segmentationVolume = mitk::VolumeCalculator::ComputeVolume(
             mitkimage->GetSlicedGeometry()->GetSpacing(), mitkimage->GetCountOfMaxValuedVoxelsNoRecompute(renderer->GetTimeStep()));
         }
+      }
 
-        // create text
-        std::stringstream volumeString; 
-        volumeString << std::fixed << std::setprecision(1) << segmentationVolume << " ml";
+      // create text
+      std::stringstream volumeString; 
+      volumeString << std::fixed << std::setprecision(1) << segmentationVolume << " ml";
 
-        // draw text
-        mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+      // draw text
+      mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
 
-        Point2D pt2D;
-        pt2D[0] = x + (size / 9.0);
-        pt2D[1] = y - (size / 19.0);
-        displayGeometry->IndexToWorld( pt2D, pt2D );
-        displayGeometry->WorldToDisplay( pt2D, pt2D );
-
-        OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0], pt2D[1]);
+      //calc index pos
+      Point2D pt2D;
+      
+      pt2D[0] = s_x/double(s_n);
+      pt2D[1] = s_y/double(s_n);
+      
+      //calc index pos with spacing
+      const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+      pt2D[0] /= rendererInfo.m_PixelsPerMM[0];
+      pt2D[1] /= rendererInfo.m_PixelsPerMM[1];
+      
+      //calc display coord
+      worldGeometry->IndexToWorld( pt2D, pt2D );
+      displayGeometry->WorldToDisplay( pt2D, pt2D );
+            
+      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]+1, pt2D[1]-1,0,0,0);
+      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]  , pt2D[1]  ,0,1,0);
     }
+
   }
 
   //glPushMatrix();
@@ -1157,53 +1128,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-  // check whether the modalityProp is set for the image
-  mitk::ModalityProperty::Pointer modalityProp = dynamic_cast<mitk::ModalityProperty*>( image->GetProperty("modality").GetPointer() );
-  if ( modalityProp.IsNotNull() )
-  {
-    // if modality is color doppler, set properties specific for this modality
-    if ( modalityProp->GetValueAsId() == 6 )
-    {     
-      // set modalityProperty for node
-      node->SetProperty( "modality", mitk::ModalityProperty::New("Color Doppler") );
-      node->SetProperty( "use color", mitk::BoolProperty::New( false ) );
-      node->SetProperty( "opacity"  , mitk::FloatProperty::New(0.5));
-      node->SetProperty( "visible", mitk::BoolProperty::New( false ) );
-      // define a lookup table for color doppler data; TODO: improve LUT
-      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-      vtkLut->SetHueRange(0.0, 1.0);
-      vtkLut->SetTableRange(0.0, 256.0);
-      vtkLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-      mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
-    }
-
-    // if modality is power doppler, set properties specific for this modality
-    else if ( modalityProp->GetValueAsId() == 7 )
-    { 
-      // set modalityProperty for node
-      node->SetProperty( "modality", mitk::ModalityProperty::New("Power Doppler") );
-      node->SetProperty( "use color", mitk::BoolProperty::New( false ) );
-      node->SetProperty( "opacity"  , mitk::FloatProperty::New(0.5));
-      // define a adequate lookup table for color doppler data
-      mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-      vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-      vtkLut->SetValueRange(0.2,1.0);
-      vtkLut->SetHueRange(0.0, 0.1);
-      vtkLut->SetTableRange(0.0, 255.0);
-      vtkLut->Build();
-      mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-      mitkLutProp->SetLookupTable(mitkLut);
-      node->SetProperty( "LookupTable", mitkLutProp );
-    }
-  }
-  // if modality is not set, it is undefined
-  node->AddProperty( "modality", mitk::ModalityProperty::New("undefined"), renderer, false );
-
   // Properties common for both images and segmentations
-  // properties defined here are modality independant!!
   node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );

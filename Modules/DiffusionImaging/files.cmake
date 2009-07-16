@@ -6,13 +6,13 @@ SET(CPP_FILES
   DicomImport/mitkPhilipsDicomDiffusionVolumeHeaderReader.cpp
   DicomImport/mitkSiemensDicomDiffusionVolumeHeaderReader.cpp
   DicomImport/mitkSiemensMosaicDicomDiffusionVolumeHeaderReader.cpp
-  DiffusionWeightedImages/mitkDiffusionVolumeHeaderInformation.cpp
-  DiffusionWeightedImages/mitkDiffusionVolumesSource.cpp
-  DiffusionWeightedImages/mitkNrrdDiffusionVolumesReader.cpp
-  DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriter.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumeHeaderInformation.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumesSource.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesReader.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriter.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesIOFactory.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriterFactory.cpp
   DiffusionWeightedImages/mitkDiffusionImagingObjectFactory.cpp
-  DiffusionWeightedImages/mitkNrrdDiffusionVolumesIOFactory.cpp
-  DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriterFactory.cpp
 )
 
 SET(H_FILES 

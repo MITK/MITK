@@ -29,12 +29,12 @@ PURPOSE.  See the above copyright notices for more information.
   public:
     mitkClassMacro(MyNavigationDataSourceTest, mitk::NavigationDataSource);
     itkNewMacro(Self);
-    CreateOutput()
+    void CreateOutput()
     {
       this->SetNumberOfOutputs(1);
-      this->MakeOutput(0);
+      this->SetNthOutput(0, this->MakeOutput(0));
     };
-  }
+  };
 
 /**Documentation
  *  test for the class "NavigationDataSource".
@@ -51,12 +51,10 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(), "Testing instantiation");
 
-  mitk::NavigationDataSource::DataObjectPointerArray inputs = myFilter->GetInputs();
-  MITK_TEST_CONDITION(inputs.size() == 0, "testing initial number of inputs");
-  mitk::NavigationDataSource::DataObjectPointerArray outputs = myFilter->GetOutputs();
-  MITK_TEST_CONDITION(outputs.size() == 0, "testing initial number of outputs");
+  MITK_TEST_CONDITION(myFilter->GetInputs().size() == 0, "testing initial number of inputs"); 
+  MITK_TEST_CONDITION(myFilter->GetOutputs().size() == 0, "testing initial number of outputs");
   myFilter->CreateOutput();
-  MITK_TEST_CONDITION(outputs.size() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
+  MITK_TEST_CONDITION(myFilter->GetOutputs().size() == 1, "testing SetNumberOfOutputs() and MakeOutput()");
   MITK_TEST_CONDITION(dynamic_cast<mitk::NavigationData*>(myFilter->GetOutput()) != NULL, "test GetOutput() returning valid output object");
 
 
@@ -76,9 +74,9 @@ int mitkNavigationDataSourceTest(int /* argc */, char* /*argv*/[])
   mitk::NavigationData::Pointer out = myFilter->GetOutput();
   MITK_TEST_CONDITION(out.GetPointer() != nd1.GetPointer(), "testing if output is same object as source of graft");
   MITK_TEST_CONDITION( mitk::Equal(out->GetPosition(), nd1->GetPosition()) &&
-                       mitk::Equal(out->->GetOrientation(), nd1->GetOrientation()) &&
-                       out->GetCovErrorMatrix() == nd1->GetCovErrorMatrix() &&
-                       out->IsDataValid() == nd1->IsDataValid() &&
+                       mitk::Equal(out->GetOrientation(), nd1->GetOrientation()) &&
+                       (out->GetCovErrorMatrix() == nd1->GetCovErrorMatrix()) &&
+                       (out->IsDataValid() == nd1->IsDataValid()) &&
                        mitk::Equal(out->GetTimeStamp(), nd1->GetTimeStamp()), "testing if content of output is equal to input of Graft");
 
   mitk::PropertyList::ConstPointer list = myFilter->GetParameters();

@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkCameraVisualization.h"
-#include "mitkContour.h"
 #include "mitkNavigationData.h"
 #include "mitkTestingMacros.h"
 #include "mitkVtkPropRenderer.h"
@@ -34,7 +33,6 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("CameraVisualization")
 
   // let's create an object of our class  
-  //mitk::Contour::Pointer contour = mitk::Contour::New();
   mitk::CameraVisualization::Pointer myFilter = mitk::CameraVisualization::New();
   
   // first test: did this work?

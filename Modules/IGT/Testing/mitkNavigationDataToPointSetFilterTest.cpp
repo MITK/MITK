@@ -43,27 +43,33 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
   mitk::NavigationData::Pointer nd2 = mitk::NavigationData::New();
   mitk::NavigationData::Pointer nd3 = mitk::NavigationData::New();
 
-  mitk::NavigationData::PositionType point;
+  mitk::NavigationData::PositionType point0;
+  point0[0] = 1.0;
+  point0[1] = 2.0;
+  point0[2] = 3.0;
+  nd0->SetPosition(point0);
+  nd0->SetDataValid(true);
 
-  point[0] = 1.0;
-  point[1] = 2.0;
-  point[2] = 3.0;
-  nd0->SetPosition(point);
+  mitk::NavigationData::PositionType point1;
+  point1[0] = 4.0;
+  point1[1] = 5.0;
+  point1[2] = 6.0;
+  nd1->SetPosition(point1);
+  nd1->SetDataValid(true);
 
-  point[0] = 4.0;
-  point[1] = 5.0;
-  point[2] = 6.0;
-  nd1->SetPosition(point);
+  mitk::NavigationData::PositionType point2;
+  point2[0] = 7.0;
+  point2[1] = 8.0;
+  point2[2] = 9.0;
+  nd2->SetPosition(point2);
+  nd2->SetDataValid(true);
 
-  point[0] = 7.0;
-  point[1] = 8.0;
-  point[2] = 9.0;
-  nd2->SetPosition(point);
-
-  point[0] = 10.0;
-  point[1] = 11.0;
-  point[2] = 12.0;
-  nd3->SetPosition(point);
+  mitk::NavigationData::PositionType point3;
+  point3[0] = 10.0;
+  point3[1] = 11.0;
+  point3[2] = 12.0;
+  nd3->SetPosition(point3);
+  nd3->SetDataValid(true);
 
   myNavigationDataToPointSetFilter->SetInput(0, nd0);
   myNavigationDataToPointSetFilter->SetInput(1, nd1);
@@ -78,11 +84,17 @@ static void TestMode3D(mitk::NavigationDataToPointSetFilter::Pointer myNavigatio
 
   pointSet0->Update();
 
-  MITK_TEST_CONDITION(pointSet0->GetPoint(0)[0] == 1.0  && pointSet0->GetPoint(0)[1] == 2.0  && pointSet0->GetPoint(0)[2] == 3.0 &&
-                      pointSet1->GetPoint(0)[0] == 4.0  && pointSet1->GetPoint(0)[1] == 5.0  && pointSet1->GetPoint(0)[2] == 6.0 &&
-                      pointSet2->GetPoint(0)[0] == 7.0  && pointSet2->GetPoint(0)[1] == 8.0  && pointSet2->GetPoint(0)[2] == 9.0 &&
-                      pointSet3->GetPoint(0)[0] == 10.0 && pointSet3->GetPoint(0)[1] == 11.0 && pointSet3->GetPoint(0)[2] == 12.0 
-    , "Testing the conversion of navigation data object to PointSets in Mode 3D" );
+  MITK_TEST_OUTPUT(<< "Testing the conversion of navigation data object to PointSets in Mode 3D:");
+  MITK_TEST_CONDITION(mitk::Equal(pointSet0->GetPoint(0), point0), "Pointset 0 correct?");
+  MITK_TEST_CONDITION(mitk::Equal(pointSet1->GetPoint(0), point1), "Pointset 1 correct?");
+  MITK_TEST_CONDITION(mitk::Equal(pointSet2->GetPoint(0), point2), "Pointset 2 correct?");
+  MITK_TEST_CONDITION(mitk::Equal(pointSet3->GetPoint(0), point3), "Pointset 3 correct?");
+
+    //pointSet0->GetPoint(0)[0] == 1.0  && pointSet0->GetPoint(0)[1] == 2.0  && pointSet0->GetPoint(0)[2] == 3.0 &&
+    //                  pointSet1->GetPoint(0)[0] == 4.0  && pointSet1->GetPoint(0)[1] == 5.0  && pointSet1->GetPoint(0)[2] == 6.0 &&
+    //                  pointSet2->GetPoint(0)[0] == 7.0  && pointSet2->GetPoint(0)[1] == 8.0  && pointSet2->GetPoint(0)[2] == 9.0 &&
+    //                  pointSet3->GetPoint(0)[0] == 10.0 && pointSet3->GetPoint(0)[1] == 11.0 && pointSet3->GetPoint(0)[2] == 12.0 
+    //, "Testing the conversion of navigation data object to PointSets in Mode 3D" );
 
 }
 

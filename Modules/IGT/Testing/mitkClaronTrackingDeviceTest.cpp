@@ -42,7 +42,7 @@ public:
 
   static void TestToolConfiguration()
   {
-    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronTool", "Testing/Data/");
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronTool", "Modules/IGT/Testing/Data/");
     MITK_TEST_CONDITION(toolFileName.empty() == false, "Check if tool calibration file exists");
 
     mitk::ClaronTrackingDevice::Pointer testInstance = mitk::ClaronTrackingDevice::New();

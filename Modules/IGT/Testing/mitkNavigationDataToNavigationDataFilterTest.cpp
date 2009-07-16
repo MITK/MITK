@@ -20,6 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 
+/**Documentation
+* \brief test class to be able to instantiate the normally abstract (private constructor) mitk::NavigationDataToNavigationDataFilter
+*/
+class NavigationDataToNavigationDataFilterTestClass : public mitk::NavigationDataToNavigationDataFilter
+{
+public:
+  mitkClassMacro(NavigationDataToNavigationDataFilterTestClass, NavigationDataToNavigationDataFilter);
+  itkNewMacro(Self);
+};
 
 /**Documentation
  *  test for the class "NavigationDataToNavigationDataFilter".
@@ -29,7 +38,7 @@ int mitkNavigationDataToNavigationDataFilterTest(int /* argc */, char* /*argv*/[
   MITK_TEST_BEGIN("NavigationDataToNavigationDataFilter")
 
   // let's create an object of our class  
-  mitk::NavigationDataToNavigationDataFilter::Pointer myFilter = mitk::NavigationDataToNavigationDataFilter::New();
+  mitk::NavigationDataToNavigationDataFilter::Pointer myFilter = NavigationDataToNavigationDataFilterTestClass::New().GetPointer(); // create testing subclass, but treat it like the real NavigationDataToNavigationDataFilter
   
   MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(),"Testing instantiation");
 

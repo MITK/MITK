@@ -31,7 +31,8 @@ class MessageReceiverClass
 
     MessageReceiverClass(unsigned int numberOfNavigationDatas)
     {
-      for (unsigned int i = 0; i < numberOfNavigationDatas, ++i)
+      m_ReceivedData.resize(numberOfNavigationDatas);
+      for (unsigned int i = 0; i < numberOfNavigationDatas; ++i)
         m_ReceivedData[i] = mitk::NavigationData::New();
       
       m_MessagesReceived = 0;
@@ -163,13 +164,13 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     nd0->SetDataValid(true);
 
     mitk::FillVector3D(initialPos, 2.0, 2.0, 2.0);
-    mitk::NavigationData::OrientationType initialOri2(1.0, 1.0, 1.0, 1.0)
+    mitk::NavigationData::OrientationType initialOri2(1.0, 1.0, 1.0, 1.0);
     mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
     nd1->SetPosition(initialPos);
     nd1->SetOrientation(initialOri2);
     nd1->SetPositionAccuracy(22.222);
     nd1->SetTimeStamp(222.2);
-    nd1->SetDataValid(false);
+    nd1->SetDataValid(true);
   
     myFilter->SetInput(0, nd0);
     myFilter->SetInput(1, nd1);
@@ -178,8 +179,8 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
 
     mitk::NavigationData* output0 = myFilter->GetOutput(0);
     mitk::NavigationData* output1 = myFilter->GetOutput(1);
-    MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput(0)");
-    MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput(1)");
+    MITK_TEST_CONDITION_REQUIRED(output0 != NULL, "Testing GetOutput(0)");
+    MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput(1)");
 
     /* register message receiver */
     MessageReceiverClass answers(2);
@@ -201,7 +202,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), nd1->GetTimeStamp()), "Testing TimeStampChanged message");
     MITK_TEST_CONDITION( answers.m_ReceivedData[1]->IsDataValid() == nd1->IsDataValid(), "Testing PositionChanged message");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 10, "Correct number of messages send?");
-
+    MITK_TEST_OUTPUT( << "answers.m_MessagesReceived = " << answers.m_MessagesReceived);
     /* change one input parameter */
     nd0->SetDataValid(false);
     output0->Update(); // re-execute filter
@@ -217,7 +218,7 @@ int mitkNavigationDataToMessageFilterTest(int /* argc */, char* /*argv*/[])
     MITK_TEST_CONDITION( mitk::Equal(answers.m_ReceivedData[1]->GetTimeStamp(), oldValue), "Testing if TimeStamp message is _not_ send after RemoveListener (== old value)");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 11, "no new messages send?");  // no new message send?
     /* other messages are still send? */
-    nd1->SetDataValid(true);
+    nd1->SetDataValid(false);
     myFilter->Update();
     MITK_TEST_CONDITION( answers.m_ReceivedData[1]->IsDataValid() == nd1->IsDataValid(), "Other messages still send? ->Testing PositionChanged message for input 1 again");
     MITK_TEST_CONDITION( answers.m_MessagesReceived == 12, "only necessary messages send?");  // only DataValid message for input 1 re-send

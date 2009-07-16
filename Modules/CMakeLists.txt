@@ -3,6 +3,7 @@ ADD_SUBDIRECTORY(MitkExt)
 ADD_SUBDIRECTORY(QmitkExt)
 ADD_SUBDIRECTORY(DiffusionImaging)
 ADD_SUBDIRECTORY(SceneSerialization)
+ADD_SUBDIRECTORY(GPGPU)
 
 OPTION(MITK_BUILD_IGT "Build the MITK image guided therapy library" OFF)
 IF(MITK_BUILD_IGT)

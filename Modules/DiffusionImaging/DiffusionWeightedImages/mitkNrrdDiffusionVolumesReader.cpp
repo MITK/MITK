@@ -48,7 +48,8 @@ namespace mitk
       itkWarningMacro("Tree cache is empty!");    
     }
 
-    typename OutputType::Pointer output = this->GetOutput();
+    typedef OutputType::Pointer OutputTypePointer;
+    OutputType::Pointer output = this->GetOutput();
     output->SetImage(m_OutputCache->GetImage());
     output->SetB_Value(m_OutputCache->GetB_Value());
     output->SetDirections(m_OutputCache->GetDirections());
@@ -58,7 +59,7 @@ namespace mitk
   template <class TPixelType>
   void NrrdDiffusionVolumesReader<TPixelType>::GenerateOutputInformation()
   {
-    OutputType::Pointer outputForCache = OutputType::New();
+    typename OutputType::Pointer outputForCache = OutputType::New();
     if ( m_FileName == "") 
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");

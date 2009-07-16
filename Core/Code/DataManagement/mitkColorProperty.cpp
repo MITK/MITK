@@ -23,7 +23,7 @@ mitk::ColorProperty::ColorProperty()
 : m_Color()
 {
 
-
+}
 
 mitk::ColorProperty::ColorProperty(const float color[3]) : m_Color(color)
 {

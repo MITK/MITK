@@ -48,7 +48,7 @@ namespace mitk
       itkWarningMacro("Tree cache is empty!");    
     }
 
-    OutputType::Pointer output = this->GetOutput();
+    typename OutputType::Pointer output = this->GetOutput();
     output->SetImage(m_OutputCache->GetImage());
     output->SetB_Value(m_OutputCache->GetB_Value());
     output->SetDirections(m_OutputCache->GetDirections());

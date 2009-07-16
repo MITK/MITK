@@ -1,0 +1,9 @@
+how to obtain GLEW:
+
+- download latest release from http://glew.sourceforge.net/
+- extract the archive to the directory "external" 
+
+how to strip down GLEW distribution:
+
+- delete all top folders EXCEPT "src" and "include"
+- delete all files in folder "src" EXCEPT glew.c

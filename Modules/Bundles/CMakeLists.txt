@@ -6,7 +6,7 @@ IF(MITK_USE_OPENCHERRY)
 
   INCLUDE("${MITK_BINARY_DIR}/Bundles/MITKCoreBundleList.cmake")
   
-  SET(_mitk_bundles_default "org.mitk.core.ext")
+  SET(_mitk_bundles_default "org.mitk.core.ext" "org.mitk.diffusionimaging")
   IF(QT4_FOUND)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext")
   ENDIF()

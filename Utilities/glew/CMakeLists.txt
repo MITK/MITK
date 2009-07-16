@@ -1,0 +1,6 @@
+MITK_CREATE_MODULE(glew
+  PROVIDES glew
+  INCLUDE_DIRS external/include
+  INTERNAL_INCLUDE_DIRS external/include
+  PACKAGE_DEPENDS VTK
+)

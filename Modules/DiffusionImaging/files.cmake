@@ -10,6 +10,9 @@ SET(CPP_FILES
   DiffusionWeightedImages/mitkDiffusionVolumesSource.cpp
   DiffusionWeightedImages/mitkNrrdDiffusionVolumesReader.cpp
   DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriter.cpp
+  DiffusionWeightedImages/mitkDiffusionImagingObjectFactory.cpp
+  DiffusionWeightedImages/mitkNrrdDiffusionVolumesIOFactory.cpp
+  DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriterFactory.cpp
 )
 
 SET(H_FILES 

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
+#define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
 
 #include "mitkDiffusionVolumesSource.h"
 #include "mitkDiffusionVolumes.h"
@@ -99,3 +101,4 @@ void mitk::DiffusionVolumesSource<TPixelType>::GraftNthOutput(unsigned int idx, 
   }
 }
 
+#endif //__MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__

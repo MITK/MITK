@@ -18,8 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkNrrdDiffusionVolumesReader_h
 
 #include "mitkCommon.h"
-#include "itkImageSource.h"
 #include "itkVectorContainer.h"
+#include "mitkFileReader.h"
+#include "vnl/vnl_vector_fixed.h"
+#include "mitkDiffusionVolumesSource.h"
+#include "itkVectorImage.h"
 
 namespace mitk
 {
@@ -27,38 +30,43 @@ namespace mitk
   /** \brief 
   */
 
-  template < class TImageType >
-  class NrrdDiffusionVolumesReader : public itk::ImageSource< TImageType >
+  template < class TPixelType >
+  class NrrdDiffusionVolumesReader : public mitk::DiffusionVolumesSource<TPixelType>, public FileReader
   {
   public:
 
-    typedef itk::ImageSource< TImageType > ImageSourceType;
-
-    typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
+    typedef itk::VectorImage<TPixelType,3>     ImageType;
+    typedef DiffusionVolumesSource<TPixelType> DiffVolSourceType;
+    typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, 
       GradientDirectionType >                  GradientDirectionContainerType;
 
-    mitkClassMacro( NrrdDiffusionVolumesReader, ImageSourceType );
+    mitkClassMacro( NrrdDiffusionVolumesReader, DiffVolSourceType );
     itkNewMacro(Self);
 
-    itkGetMacro(FileName, std::string);
-    itkSetMacro(FileName, std::string);
+    const char* GetFileName() const;
+    void SetFileName(const char* aFileName);
+    const char* GetFilePrefix() const;
+    void SetFilePrefix(const char* aFilePrefix);
+    const char* GetFilePattern() const;
+    void SetFilePattern(const char* aFilePattern);
 
-    GradientDirectionContainerType::Pointer GetDiffusionVectors()
-    { return m_DiffusionVectors; }
-
-    itkGetMacro(B_Value, float);
-    itkSetMacro(B_Value, float);
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
   protected:
 
     /** Does the real work. */
     virtual void GenerateData();
+    virtual void GenerateOutputInformation();
 
     std::string m_FileName;
+    std::string m_FilePrefix;
+    std::string m_FilePattern;
+
+    typename OutputType::Pointer m_OutputCache;
+    itk::TimeStamp m_CacheTime;
 
     GradientDirectionContainerType::Pointer m_DiffusionVectors;
-
     float m_B_Value;
 
   private:

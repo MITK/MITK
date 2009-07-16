@@ -1,86 +1,133 @@
 /*=========================================================================
-
-Program:   Insight Segmentation & Registration Toolkit
-Module:    $RCSfile: itkImageSeriesReader.h,v $
+ 
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2007-08-24 13:35:59 $
-Version:   $Revision: 1.14 $
-
-Copyright (c) Insight Software Consortium. All rights reserved.
-See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even 
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+Date:      $Date: 2008-08-27 17:18:46 +0200 (Mi, 27 Aug 2008) $
+Version:   $Revision: 15096 $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
-
+ 
 =========================================================================*/
-#ifndef __mitkNrrdDiffusionVolumesWriter_h
-#define __mitkNrrdDiffusionVolumesWriter_h
 
-// itk includes
-#include "itkObject.h"
-#include "itkVectorContainer.h"
+#ifndef _MITK_NRRDDIFFVOL_WRITER__H_
+#define _MITK_NRRDDIFFVOL_WRITER__H_
 
-// mitk includes
-#include "mitkCommon.h"
+#include <itkProcessObject.h>
+#include <mitkFileWriterWithInformation.h>
+#include <mitkDiffusionVolumes.h>
 
-// vnl includes
-#include "vnl/vnl_vector_fixed.h"
 
 namespace mitk
 {
 
-  /** \brief 
-  */
+/**
+ * Writes diffusion volumes to a file
+ * @ingroup Process
+ */
+template < class TPixelType >
+class NrrdDiffusionVolumesWriter : public mitk::FileWriterWithInformation
+{
+public:
 
-  template <class TImageType>
-  class NrrdDiffusionVolumesWriter : public itk::Object
-  {
-  public:
+    mitkClassMacro( NrrdDiffusionVolumesWriter, mitk::FileWriterWithInformation );
 
-    mitkClassMacro( NrrdDiffusionVolumesWriter, itk::Object );
-    itkNewMacro(Self);
+    mitkWriterMacro;
 
-    typedef vnl_vector_fixed< double, 3 >            GradientDirectionType;
-    typedef itk::VectorContainer< unsigned int, 
-      GradientDirectionType >                  GradientDirectionContainerType;
+    itkNewMacro( Self );
+    
+    typedef mitk::DiffusionVolumes<TPixelType> InputType;
+    
+    /**
+     * Sets the filename of the file to write.
+     * @param FileName the name of the file to write.
+     */
+    itkSetStringMacro( FileName );
 
-    virtual void Update(void);
+    /**
+     * @returns the name of the file to be written to disk.
+     */
+    itkGetStringMacro( FileName );
 
-    typename TImageType::Pointer GetInput()
-    { return m_Input; }
-    void SetInput( typename TImageType::Pointer input )
-    { m_Input = input; }
+    /**
+     * @warning multiple write not (yet) supported
+     */
+    itkSetStringMacro( FilePrefix );
 
-    GradientDirectionContainerType::Pointer GetDirections()
-    { return m_Directions; }
-    void SetDirections( GradientDirectionContainerType::Pointer directions )
-    { m_Directions = directions; }
+    /**
+     * @warning multiple write not (yet) supported
+     */
+    itkGetStringMacro( FilePrefix );
 
-    itkGetMacro(B_Value, float);
-    itkSetMacro(B_Value, float);
+    /**
+     * @warning multiple write not (yet) supported
+     */
+    itkSetStringMacro( FilePattern );
 
-    itkGetMacro(FileName, std::string);
-    itkSetMacro(FileName, std::string);
+    /**
+     * @warning multiple write not (yet) supported
+     */
+    itkGetStringMacro( FilePattern );
 
-  protected:
+    /**
+     * Sets the input object for the filter.
+     * @param input the diffusion volumes to write to file.
+     */
+    void SetInput( InputType* input );
 
-    typename TImageType::Pointer m_Input;
+    /**
+     * @returns the 0'th input object of the filter.
+     */
+    InputType* GetInput();
 
+    /**
+     * Returns false if an error happened during writing
+     */
+    itkGetMacro( Success, bool );
+   
+    /**
+    * @return possible file extensions for the data type associated with the writer
+    */
+    virtual std::vector<std::string> GetPossibleFileExtensions();
+
+    // FileWriterWithInformation methods
+    virtual const char * GetDefaultFilename() { return "DiffusionWeightedImages.dwi"; }
+    virtual const char * GetFileDialogPattern() { return "Diffusion Weighted Images (*.dwi *.hdwi)"; }
+    virtual const char * GetDefaultExtension() { return ".dwi"; }
+    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::DiffusionVolumes<TPixelType>*>(data.GetPointer()) != NULL); };  
+    virtual void DoWrite(BaseData::Pointer data) { 
+      if (CanWriteDataType(data)) {
+        this->SetInput(dynamic_cast<mitk::DiffusionVolumes<TPixelType>*>(data.GetPointer())); 
+        this->Update(); 
+      }
+    };
+
+protected:
+        
+    NrrdDiffusionVolumesWriter();
+
+    virtual ~NrrdDiffusionVolumesWriter();
+
+    virtual void GenerateData();
+    
     std::string m_FileName;
 
-    /** A list of gradient directions. */
-    GradientDirectionContainerType::Pointer m_Directions;
+    std::string m_FilePrefix;
 
-    /** b-value */
-    float m_B_Value;
+    std::string m_FilePattern;
+    
+    bool m_Success;
+            
+};    
+       
 
-  private:
-    void operator=(const Self&); //purposely not implemented
-  };
-
-} //namespace MITK
+} // end of namespace mitk
 
 #include "mitkNrrdDiffusionVolumesWriter.cpp"
 
-#endif // __mitkNrrdDiffusionVolumesWriter_h
+#endif

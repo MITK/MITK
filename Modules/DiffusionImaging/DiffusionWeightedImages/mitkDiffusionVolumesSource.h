@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_DIFFUSION_VOLUMES_DATA_SOURCE_H_HEADER_
 
 #include "mitkBaseProcess.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk {
 
@@ -41,27 +42,28 @@ namespace mitk {
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class DiffusionVolumesSource : public BaseProcess
+class MitkDiffusionImaging_EXPORT DiffusionVolumesSource : public BaseProcess
 {
 public:
   mitkClassMacro(DiffusionVolumesSource, BaseProcess);
 
   itkNewMacro(Self);  
 
+  typedef DiffusionVolumes<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
 
 
-  void SetOutput(mitk::DiffusionVolumes<TPixelType>* output);
+  void SetOutput(OutputType* output);
 
-  mitk::DiffusionVolumes<TPixelType>* GetOutput();
+  OutputType* GetOutput();
 
-  mitk::DiffusionVolumes<TPixelType>* GetOutput(unsigned int idx);
+  OutputType* GetOutput(unsigned int idx);
 
-  virtual void GraftOutput(mitk::DiffusionVolumes<TPixelType>* graft);
+  virtual void GraftOutput(OutputType* graft);
 
-  virtual void GraftNthOutput(unsigned int idx, mitk::DiffusionVolumes<TPixelType> *graft);
+  virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
   DiffusionVolumesSource();
@@ -71,6 +73,7 @@ protected:
 
 } // namespace mitk
 
+#include "mitkDiffusionVolumesSource.cpp"
 
 
 #endif /* _MITK_DIFFUSION_VOLUMES_DATA_SOURCE_H_HEADER_ */

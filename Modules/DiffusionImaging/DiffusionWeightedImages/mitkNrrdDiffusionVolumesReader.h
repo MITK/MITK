@@ -35,6 +35,7 @@ namespace mitk
   {
   public:
 
+    typedef mitk::DiffusionVolumesSource<TPixelType> OutputType;
     typedef itk::VectorImage<TPixelType,3>     ImageType;
     typedef DiffusionVolumesSource<TPixelType> DiffVolSourceType;
     typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;

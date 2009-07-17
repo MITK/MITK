@@ -21,9 +21,11 @@
 
 #include <Poco/Runnable.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
-class Display
+class CHERRY_UI Display
 {
 
 public:

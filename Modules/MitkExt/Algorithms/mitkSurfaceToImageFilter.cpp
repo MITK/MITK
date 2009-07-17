@@ -30,7 +30,6 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
-#include <vtkImageCast.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPolyDataNormals.h>
 
@@ -68,7 +67,7 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
      (inputImage->IsInitialized() == false) || 
      (inputImage->GetTimeSlicedGeometry() == NULL)) return;
 
-  output->Initialize(PixelType(typeid(int)), *inputImage->GetTimeSlicedGeometry());
+  output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
 
   output->SetPropertyList(inputImage->GetPropertyList()->Clone());    
 }
@@ -99,7 +98,7 @@ void mitk::SurfaceToImageFilter::GenerateData()
   }
   else 
   {
-      Stencil3DImage( 0 );
+    Stencil3DImage( 0 );
   }
 }
 
@@ -107,7 +106,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 {
   const mitk::TimeSlicedGeometry *surfaceTimeGeometry = GetInput()->GetTimeSlicedGeometry();
   const mitk::TimeSlicedGeometry *imageTimeGeometry = GetImage()->GetTimeSlicedGeometry();
-  
+
   // Convert time step from image time-frame to surface time-frame
   int surfaceTimeStep = surfaceTimeGeometry->TimeStepToTimeStep( imageTimeGeometry, time );
   
@@ -150,12 +149,6 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   indexCoordinatesImageFilter->SetOutputSpacing(1.0,1.0,1.0);
   indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
 
-  vtkImageCast * castFilter = vtkImageCast::New();
-  castFilter->ReleaseDataFlagOn();
-  castFilter->SetOutputScalarTypeToInt();
-  castFilter->SetInput( indexCoordinatesImageFilter->GetOutput() );
-  indexCoordinatesImageFilter->Delete();
-
   vtkImageStencil * stencil = vtkImageStencil::New();
   stencil->SetBackgroundValue( m_BackgroundValue );
   stencil->ReverseStencilOff();
@@ -164,8 +157,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   stencil->SetStencil( surfaceConverter->GetOutput() );
   surfaceConverter->Delete();
 
-  stencil->SetInput( castFilter->GetOutput() );
-  castFilter->Delete();
+  stencil->SetInput( indexCoordinatesImageFilter->GetOutput() );
 
   if (m_MakeOutputBinary)
   {
@@ -177,7 +169,6 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     threshold->ReplaceOutOn();
     threshold->SetInValue(1);
     threshold->SetOutValue(0);
-//    threshold->SetOutputScalarTypeToUnsignedChar();
     threshold->Update();
 
     mitk::Image::Pointer output = this->GetOutput();

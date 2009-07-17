@@ -2,7 +2,7 @@ SET(SRC_CPP_FILES
   cherryAbstractSourceProvider.cpp
   cherryAbstractUIPlugin.cpp
   cherryConstants.cpp
-  #cherryDisplay.cpp
+  cherryDisplay.cpp
   cherryEditorPart.cpp
   cherryFileEditorInput.cpp
   cherryGeometry.cpp

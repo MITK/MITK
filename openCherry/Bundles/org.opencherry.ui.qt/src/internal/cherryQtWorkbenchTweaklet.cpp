@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMainWindow>
 
 #include "cherryQtShowViewDialog.h"
+#include "cherryQtDisplay.h"
 
 #include <cherryPlatform.h>
 #include <cherryPlatformUI.h>
@@ -33,6 +34,8 @@ namespace cherry {
 int
 QtWorkbenchTweaklet::RunEventLoop()
 {
+  QtDisplay display;
+
   // spin Qt event loop
   return QApplication::instance()->exec();
 }

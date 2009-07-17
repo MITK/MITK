@@ -70,7 +70,7 @@ public:
     unsigned int max = 100;
 
     testInstance = mitk::ClaronTrackingDevice::New();
-    for (int i = 0; i < max; i++) 
+    for (unsigned int i = 0; i < max; i++) 
       testInstance->AddTool("Tool", toolFileName.c_str());
     if ((testInstance->GetToolCount() != max)) 
       failed = true;

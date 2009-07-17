@@ -64,11 +64,14 @@ void mitk::NavigationDataSource::GraftNthOutput(unsigned int idx, itk::DataObjec
 
   if ( !graft )
   {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+    itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
   }
 
   itk::DataObject* output = this->GetOutput(idx);
-
+  if ( !output )
+  {
+    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+  }
   // Call Graft on NavigationData to copy member data
   output->Graft( graft );
 }

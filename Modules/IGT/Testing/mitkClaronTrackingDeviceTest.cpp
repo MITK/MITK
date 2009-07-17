@@ -67,7 +67,7 @@ public:
     MITK_TEST_CONDITION(testInstance->GetToolCount() == 100, "Testing adding 100 tools");
 
     bool failed = false;
-    int max = 100;
+    unsigned int max = 100;
 
     testInstance = mitk::ClaronTrackingDevice::New();
     for (int i = 0; i < max; i++) 

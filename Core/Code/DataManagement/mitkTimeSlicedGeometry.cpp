@@ -189,6 +189,25 @@ mitk::ScalarType mitk::TimeSlicedGeometry::TimeStepToMS(int timestep) const
   }
 }
 
+int mitk::TimeSlicedGeometry::TimeStepToTimeStep(
+  const mitk::TimeSlicedGeometry *referenceGeometry, int t) const
+{
+  int timeStep;
+  if ( referenceGeometry->GetTimeSteps() > 1 )
+  {
+    // referenceGeometry is nD+t
+    timeStep = this->MSToTimeStep( referenceGeometry->TimeStepToMS( t ) );
+  }
+  else
+  {
+    // referenceGEometry is nD (only one time step)
+    timeStep = 0;
+  }
+
+  return timeStep;
+}
+
+
 void mitk::TimeSlicedGeometry::Initialize(unsigned int timeSteps)
 {
   Geometry3D::Pointer geometry3D = Geometry3D::New();

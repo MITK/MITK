@@ -95,6 +95,11 @@ public:
   virtual mitk::ScalarType TimeStepToMS(int timestep) const;
 
   //##Documentation
+  //## @brief Convert time step in the reference TimeSlicedGeometry to time step
+  //## in this TimeSlicedGeometry.
+  virtual int TimeStepToTimeStep(const mitk::TimeSlicedGeometry *referenceGeometry, int t) const;
+
+  //##Documentation
   //## @brief Completely initialize this instance as evenly-timed with
   //## \a timeSteps geometries of type Geometry3D, each initialized by
   //## Geometry3D::Initialize().

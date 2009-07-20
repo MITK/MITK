@@ -40,6 +40,7 @@ SET(${KITNAME}_TESTS
   mitkStateMachineFactoryTest.cpp
   #mitkStateTest.cpp
   mitkSurfaceTest.cpp
+  mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp

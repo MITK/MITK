@@ -85,7 +85,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   std::cout << "[SUCCESS] : Size of PolyDataSeries of input and output are identical." << std::endl;
 
   std::cout << "Testing removeInputs() : " << std::endl;
-  int numOfInputs = filter->GetNumberOfInputs();
+  unsigned int numOfInputs = filter->GetNumberOfInputs();
   filter->RemoveInputs( mitk::Surface::New() );
   if ( filter->GetNumberOfInputs() != numOfInputs )
   {

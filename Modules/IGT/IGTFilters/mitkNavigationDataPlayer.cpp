@@ -40,7 +40,7 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_PauseTimeStamp = 0.0;
 
   //To get a start time
-  mitk::TimeStamp::GetInstance()->StartTracking(this);
+  mitk::TimeStamp::GetInstance()->Start(this);
 
 
 }

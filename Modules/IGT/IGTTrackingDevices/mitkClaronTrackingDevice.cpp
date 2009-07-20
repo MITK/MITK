@@ -121,7 +121,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
   if (m_Device->StartTracking())
   {
-    mitk::TimeStamp::GetInstance()->StartTracking(this);
+    mitk::TimeStamp::GetInstance()->Start(this);
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }
@@ -144,7 +144,7 @@ bool mitk::ClaronTrackingDevice::StopTracking()
   }
 
   m_TrackingFinishedMutex->Lock();
-  mitk::TimeStamp::GetInstance()->StopTracking(this);
+  mitk::TimeStamp::GetInstance()->Stop(this);
 
   //delete all files in the tool files directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());

@@ -36,17 +36,17 @@ namespace mitk {
   * It is a Singleton class, that internally uses a mitkRealTimeClock() for
   * time-acquisition. 
   *
-  * First you have to call StartTracking() in order to set the reference-time to the current time.
+  * First you have to call Start() in order to set the reference-time to the current time.
   * If the user has not created and set his own "RealTimeClock", initialize() will be called and a
   * default mitkRealTimeClock() is created.
   * In addition the TimeStamp() saves a pointer to the device calling and the respective offset-time.
   * The first device will have an offset of 0, the following's offset will be the time elapsed since the 
   * starting of the first device. This offset can be prompted by calling GetOffset();
   *
-  * You can always get the time elapsed since calling StartTracking() with GetElapsed(). It returns the 
+  * You can always get the time elapsed since calling Start() with GetElapsed(). It returns the 
   * time spent in milliseconds as a double.
   *
-  * When the TimeStamp is no longer used, you can call StopTracking(). This erases the pointer to the device 
+  * When the TimeStamp is no longer used, you can call Stop(). This erases the pointer to the device 
   * and the offset. When all devices have "stopped tracking" the reference-time and the current-time are reset to 0.
   *
   * \ingroup IGT
@@ -80,29 +80,45 @@ namespace mitk {
     * in use.
     *
     */
-    void StartTracking( itk::Object::Pointer Device );
+    void Start( itk::Object::Pointer device );
 
     /**
     * \brief stops the time-acqusition
     *
-    * Each device has to call StopTracking() when it has finished and its
+    * Each device has to call Stop() when it has finished and its
     * pointer will be erased from the map. When the last device has "stopped"
     * the reference-time and the current-time will be reset to 0.
     *
     */
-    void StopTracking( itk::Object::Pointer Device );
+    void Stop( itk::Object::Pointer device );
 
     /**
-    * \brief returns the time elapsed since calling StartTracking() for the first time in milliseconds
+    * \brief returns the time elapsed since calling Start() for the first time in milliseconds
     *
+    * GetElapsed() returns the time elapsed since Start() has been called first, no matter
+    * which itk::Object did the call. 
+    * This method-call can be used if you want to need to have several processes you want to 
+    * monitor and need timestamps in the same space of time, e.g. when using two tracking-devices
+    * on the same experiment.
     */
     double GetElapsed();
+
+    /**
+    * \brief returns the time elapsed since 'device' called Start() in milliseconds
+    *
+    * GetElapsed(itk::Object device) returns the time elapsed since the given itk::Object called 
+    * Start(). 
+    * This overloaded method should be used when you only have one independent process to keep 
+    * track of, e.g. when you want to measure how long it takes to execute a piece of code.
+    */
+    double GetElapsed(itk::Object::Pointer device);
+
 
     /**
     * \brief returns the offset of this device's starting-time to the 
     *  reference-time in ms
     *
-    * Device 'A' is the first device to call StartTracking. Device 'B' calls StartTracking
+    * Device 'A' is the first device to call Start(). Device 'B' calls Start()
     * some time later. This time-difference is the offset, that each device has realtive to the 
     * device that started the time-acquisition.
     * Each device's offset is stored in a map with a pointer to the device.
@@ -145,7 +161,7 @@ namespace mitk {
     double m_Time;
 
     /*
-      the timestamp in ms acquired when StartTracking() was called.
+      the timestamp in ms acquired when Start() was called.
     */
     double m_ReferenceTime;
 
@@ -160,7 +176,7 @@ namespace mitk {
     static mitk::TimeStamp::Pointer s_Instance;
 
     /*
-      map, in which pointer to all devices calling StartTracking(), are saved
+      map, in which pointer to all devices calling Start(), are saved
     */
     std::map<itk::Object::Pointer, double> m_DeviceMap;
 

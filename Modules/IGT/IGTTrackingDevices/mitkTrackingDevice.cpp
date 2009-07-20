@@ -55,7 +55,7 @@ bool mitk::TrackingDevice::StopTracking()
     m_StopTrackingMutex->Unlock();
     //we have to wait here that the other thread recognizes the STOP-command and executes it
     m_TrackingFinishedMutex->Lock();
-    mitk::TimeStamp::GetInstance()->StopTracking(this); // notify realtime clock
+    mitk::TimeStamp::GetInstance()->Stop(this); // notify realtime clock
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
     this->SetMode(Ready);

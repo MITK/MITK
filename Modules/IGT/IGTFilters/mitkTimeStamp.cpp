@@ -91,7 +91,7 @@ mitk::TimeStamp* mitk::TimeStamp::GetInstance()
 * starting-time.
 * Then the calling device is added to the map of itk::Objects.
 */
-void mitk::TimeStamp::StartTracking(itk::Object::Pointer Device)
+void mitk::TimeStamp::Start(itk::Object::Pointer device)
 {
   if (m_RealTimeClock.IsNull())
   {
@@ -104,11 +104,11 @@ void mitk::TimeStamp::StartTracking(itk::Object::Pointer Device)
       m_ReferenceTime = GetCurrentStamp();
       m_Time = 0.0;
     } 
-    m_DeviceMap.insert( std::pair<itk::Object::Pointer, double>(Device, this->GetElapsed()) );
+    m_DeviceMap.insert( std::pair<itk::Object::Pointer, double>(device, this->GetElapsed()) );
   }
   else
   {
-    itkGenericOutputMacro("Trying to use mitk::TimeStamp::StartTracking() " 
+    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Start() " 
         << "without an available singleton instance. Either no instance has "
         << "been created (use TimeStamp::CreateInstance) or it has already "
         << "been destroyed.");
@@ -122,11 +122,11 @@ void mitk::TimeStamp::StartTracking(itk::Object::Pointer Device)
 * of devices. When the map is empty, the reference-time and the current timestamp 
 * are reset to 0.
 */
-void mitk::TimeStamp::StopTracking(itk::Object::Pointer Device)
+void mitk::TimeStamp::Stop(itk::Object::Pointer device)
 {
   if ( s_Instance.IsNotNull() )
   {
-    m_MapIterator =  m_DeviceMap.find(Device);
+    m_MapIterator =  m_DeviceMap.find(device);
     if ( m_MapIterator != m_DeviceMap.end() )
     {
       m_DeviceMap.erase( m_MapIterator );
@@ -140,7 +140,7 @@ void mitk::TimeStamp::StopTracking(itk::Object::Pointer Device)
   }
   else
   {
-    itkGenericOutputMacro("Trying to use mitk::TimeStamp::StopTracking() " 
+    itkGenericOutputMacro("Trying to use mitk::TimeStamp::Stop() " 
         << "without an available singleton instance. Either no instance has "
         << "been created (use TimeStamp::CreateInstance) or it has already "
         << "been destroyed.");    
@@ -157,6 +157,22 @@ double mitk::TimeStamp::GetElapsed()
   }
   return (double) m_Time;
 }
+
+
+double mitk::TimeStamp::GetElapsed(itk::Object::Pointer device)
+{
+  double offset = this->GetOffset( device );
+  if ( offset > -1 )
+  {
+    double time = this->GetElapsed();
+    return (double) time - this->GetOffset(device);
+  }
+  else
+  {
+    return (double) -1;
+  }
+}
+
 
 /**
 * \brief returns the current time acquired from the defined RealTimeClock
@@ -191,9 +207,9 @@ void mitk::TimeStamp::SetRealTimeClock(mitk::RealTimeClock::Pointer Clock)
 /**
 * 
 *
-* This method returns the time acquired when StartTracking() was called.
+* This method returns the time acquired when Start was called.
 * This is the offset, that each device will have in relation to the device that 
-* started the time acqusition, that means, called StartTracking() first.
+* started the time acqusition, that means, called Start first.
 * Thus absolute time-values can be calculated for each device by subtracting the offset 
 * of all timeStamps.
 *

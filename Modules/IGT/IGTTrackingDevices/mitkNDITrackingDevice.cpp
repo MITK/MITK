@@ -666,7 +666,7 @@ bool mitk::NDITrackingDevice::StartTracking()
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
-  mitk::TimeStamp::GetInstance()->StartTracking(this);
+  mitk::TimeStamp::GetInstance()->Start(this);
 
   this->m_ModeMutex->Unlock();
   return true;

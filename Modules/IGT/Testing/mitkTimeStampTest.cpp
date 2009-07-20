@@ -44,7 +44,7 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   itk::Object::Pointer tester2 = itk::Object::New();
 
   //start-tracking sets the reference-time, timestamps are relative to this time
-  mitk::TimeStamp::GetInstance()->StartTracking(tester);
+  mitk::TimeStamp::GetInstance()->Start(tester);
   std::cout << "first device has started tracking\n";
 
   //sleeps for 20 ms
@@ -56,7 +56,7 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
 
   std::cout << "supposed to have waited 20ms \n";
 
-  double time_elapsed;
+  double time_elapsed, relative_time_elapsed;
 
   //gets time elapsed since start
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();
@@ -68,22 +68,29 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   //MITK_TEST_CONDITION_REQUIRED((time_elapsed-20) < 10 , "Testing if elapsed time is correct (+10)");
 
   //second "device" starts tracking
-  mitk::TimeStamp::GetInstance()->StartTracking(tester2);
+  mitk::TimeStamp::GetInstance()->Start(tester2);
   std::cout << "second device has started\n";
   //first device stops
-  mitk::TimeStamp::GetInstance()->StopTracking(tester);
+  mitk::TimeStamp::GetInstance()->Stop(tester);
   std::cout << "first device has stopped tracking\n";
 
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();
+  relative_time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed(tester2);
 
   std::cout << "time elapsed supposed to be greater than 20 ms\n";
   std::cout << time_elapsed << " actually elapsed\n";
 
+  std::cout << "relative time elapsed supposed to be smaller than absolute time elapsed : \n";
+  std::cout << relative_time_elapsed << " actually elapsed\n";
+
+  //relative timespan must be smaller than absolute timespan
+  MITK_TEST_CONDITION_REQUIRED( time_elapsed > relative_time_elapsed , " testing if relative timespan is shorter than absolute timespan");
+
   //timestamp still has to be valid (tester2 still tracking), and has to be larger than 20ms
   //MITK_TEST_CONDITION_REQUIRED( time_elapsed > 15 , "testing if second device is still keeping the TimeStamp \"alive\"");
 
-  mitk::TimeStamp::GetInstance()->StopTracking(tester2);
-  std::cout << "sedond device has stopped tracking\n";
+  mitk::TimeStamp::GetInstance()->Stop(tester2);
+  std::cout << " second device has stopped tracking\n";
   time_elapsed = mitk::TimeStamp::GetInstance()->GetElapsed();
 
   //when all devices have stopped, -1 has to be returned

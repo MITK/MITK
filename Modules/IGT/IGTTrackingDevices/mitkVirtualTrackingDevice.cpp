@@ -78,7 +78,7 @@ bool mitk::VirtualTrackingDevice::StartTracking()
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
-  mitk::TimeStamp::GetInstance()->StartTracking(this);
+  mitk::TimeStamp::GetInstance()->Start(this);
 
   
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
@@ -101,7 +101,7 @@ bool mitk::VirtualTrackingDevice::StopTracking()
     this->SetMode(Ready);
   }
 
-  mitk::TimeStamp::GetInstance()->StopTracking(this);
+  mitk::TimeStamp::GetInstance()->Stop(this);
   m_TrackingFinishedMutex->Lock();
 
   return true;

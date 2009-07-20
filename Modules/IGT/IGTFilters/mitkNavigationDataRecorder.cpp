@@ -33,7 +33,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_FileName = "";
 
   //To get a start time
-  mitk::TimeStamp::GetInstance()->StartTracking(this);
+  mitk::TimeStamp::GetInstance()->Start(this);
 
 }
 

@@ -33,10 +33,10 @@ class Surface;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::mitkSurfaceToSurfaceFilter.
 //## @ingroup Process
-class MITK_CORE_EXPORT mitkSurfaceToSurfaceFilter : public mitk::SurfaceSource
+class MITK_CORE_EXPORT SurfaceToSurfaceFilter : public mitk::SurfaceSource
 {
 public:
-  mitkClassMacro(mitkSurfaceToSurfaceFilter, mitk::SurfaceSource);
+  mitkClassMacro(SurfaceToSurfaceFilter, mitk::SurfaceSource);
 
   itkNewMacro(Self);  
 
@@ -52,10 +52,12 @@ public:
 
   virtual void CreateOutputsForAllInputs(unsigned int idx);
 
-protected:
-  mitkSurfaceToSurfaceFilter();
+  virtual void RemoveInputs(mitk::Surface* input);
 
-  virtual ~mitkSurfaceToSurfaceFilter();
+protected:
+  SurfaceToSurfaceFilter();
+
+  virtual ~SurfaceToSurfaceFilter();
 };
 
 } // namespace mitk

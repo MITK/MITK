@@ -19,32 +19,34 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceToSurfaceFilter.h"
 #include "mitkSurface.h"
 
-mitk::mitkSurfaceToSurfaceFilter::mitkSurfaceToSurfaceFilter()
+mitk::SurfaceToSurfaceFilter::SurfaceToSurfaceFilter()
 : SurfaceSource()
 {
 }
 
-mitk::mitkSurfaceToSurfaceFilter::~mitkSurfaceToSurfaceFilter()
+mitk::SurfaceToSurfaceFilter::~SurfaceToSurfaceFilter()
 {
 }
 
 
-void mitk::mitkSurfaceToSurfaceFilter::SetInput( const mitk::Surface* surface )
+void mitk::SurfaceToSurfaceFilter::SetInput( const mitk::Surface* surface )
 {
-  this->SetNthInput( 0, const_cast<mitk::Surface*>( surface ) );
+  this->SetInput( 0, const_cast<mitk::Surface*>( surface ) );
 }
 
 
-void mitk::mitkSurfaceToSurfaceFilter::SetInput( unsigned int idx, const mitk::Surface* surface )
+void mitk::SurfaceToSurfaceFilter::SetInput( unsigned int idx, const mitk::Surface* surface )
 {
-  this->SetNthInput( idx, const_cast<mitk::Surface*>( surface ) );
-  this->CreateOutputsForAllInputs(idx);
-  this->Modified();
+  if ( this->GetInput(idx) != surface )
+  {
+    this->SetNthInput( idx, const_cast<mitk::Surface*>( surface ) );
+    this->CreateOutputsForAllInputs(idx);
+    this->Modified();
+  }
 }
 
 
-
-const mitk::Surface* mitk::mitkSurfaceToSurfaceFilter::GetInput()
+const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -52,7 +54,8 @@ const mitk::Surface* mitk::mitkSurfaceToSurfaceFilter::GetInput()
   return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(0));
 }
 
-const mitk::Surface* mitk::mitkSurfaceToSurfaceFilter::GetInput( unsigned int idx)
+
+const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput( unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -60,7 +63,8 @@ const mitk::Surface* mitk::mitkSurfaceToSurfaceFilter::GetInput( unsigned int id
   return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(idx));
 }
 
-void mitk::mitkSurfaceToSurfaceFilter::CreateOutputsForAllInputs(unsigned int idx)
+
+void mitk::SurfaceToSurfaceFilter::CreateOutputsForAllInputs(unsigned int idx)
 {
   this->SetNumberOfOutputs( this->GetNumberOfInputs() );
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
@@ -72,3 +76,8 @@ void mitk::mitkSurfaceToSurfaceFilter::CreateOutputsForAllInputs(unsigned int id
   this->Modified();
 }
 
+
+void mitk::SurfaceToSurfaceFilter::RemoveInputs(mitk::Surface* input)
+{
+  this->RemoveInput(input);
+}

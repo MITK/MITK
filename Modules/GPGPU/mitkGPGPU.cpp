@@ -297,7 +297,7 @@ mitk::GPGPU::Shader::Shader(char *source)
      {
         infoLog = (char *)malloc(infologLength);
         glGetProgramInfoLog(glHandleProgram, infologLength, &charsWritten, infoLog);
-        printf("SHADER CREATION FAILED INFOLOG:\n%s\n",infoLog);
+        GPGPU_ERROR << "SHADER CREATION FAILED INFOLOG:\n" << infoLog;
         free(infoLog);
      }
   }

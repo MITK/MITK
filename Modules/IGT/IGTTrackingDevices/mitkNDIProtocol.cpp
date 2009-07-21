@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <sstream>
 #include <itksys/SystemTools.hxx>
+#include <stdio.h>
 
 
 mitk::NDIProtocol::NDIProtocol() 

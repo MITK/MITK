@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNDITrackingDevice.h"
 #include "mitkTimeStamp.h"
+#include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
 

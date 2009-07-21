@@ -45,7 +45,7 @@ public:
   QmitkPropertiesTableModel* getModel() const;
 
   protected slots:
-    void PropertyFilterKeyWordEditingFinished();
+    void PropertyFilterKeyWordTextChanged(const QString & text);
 protected:  
   ///
   /// Initialise empty GUI.

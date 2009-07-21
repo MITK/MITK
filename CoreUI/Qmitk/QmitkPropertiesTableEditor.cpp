@@ -124,12 +124,12 @@ void QmitkPropertiesTableEditor::init()
   m_NodePropertiesTableView->setSortingEnabled(true);
   m_NodePropertiesTableView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
-  QObject::connect( m_TxtPropertyFilterKeyWord, SIGNAL( editingFinished() )
-    , this, SLOT( PropertyFilterKeyWordEditingFinished() ) );
+  QObject::connect( m_TxtPropertyFilterKeyWord, SIGNAL( textChanged(const QString &) )
+    , this, SLOT( PropertyFilterKeyWordTextChanged(const QString &) ) );
 
 }
 
-void QmitkPropertiesTableEditor::PropertyFilterKeyWordEditingFinished()
+void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged( const QString & text )
 {
   m_Model->SetFilterPropertiesKeyWord(m_TxtPropertyFilterKeyWord->text().toStdString());
 }

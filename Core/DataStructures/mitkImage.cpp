@@ -330,7 +330,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
       ch->SetComplete(true);
       size_t size=m_OffsetTable[m_Dimension-1]*(m_PixelType.GetBpe()/8);
       unsigned int t;
-      unsigned int sliceStart = 0;
       ImageDataItemPointerArray::iterator slicesIt = m_Slices.begin()+n*m_Dimensions[2]*m_Dimensions[3];
       for(t=0;t<m_Dimensions[3];++t)
       {

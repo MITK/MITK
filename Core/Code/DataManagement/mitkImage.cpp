@@ -343,6 +343,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
       ch->SetComplete(true);
       size_t size=m_OffsetTable[m_Dimension-1]*(m_PixelType.GetBpe()/8);
       unsigned int t;
+      ImageDataItemPointerArray::iterator slicesIt = m_Slices.begin()+n*m_Dimensions[2]*m_Dimensions[3];
       for(t=0;t<m_Dimensions[3];++t)
       {
         int posVol;
@@ -365,10 +366,15 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
           ipFuncCopyTags(vol->GetPicDescriptor(), pic);
 
           m_Volumes[posVol]=vol;
+
+          // get rid of slices - they may point to old volume
+          ImageDataItemPointer dnull=NULL;
+          for(unsigned int i = 0; i < m_Dimensions[2]; ++i, ++slicesIt)
+          {
+            assert(slicesIt != m_Slices.end());
+            *slicesIt = dnull;
+          }
         }
-        // get rid of slices - they may point to old volume
-        ImageDataItemPointer dnull=NULL;
-        m_Slices.assign(GetNumberOfChannels()*m_Dimensions[3]*m_Dimensions[2], dnull);
       }
       if(ch->GetPicDescriptor()->info->tags_head==NULL)
         ipFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());

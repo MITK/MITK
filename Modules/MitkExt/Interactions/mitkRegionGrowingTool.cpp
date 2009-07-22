@@ -35,7 +35,6 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_InitialLowerThreshold(200),
  m_InitialUpperThreshold(200),
  m_ScreenYPositionAtStart(0),
- m_LastScreenYPosition(0),
  m_OriginalPicSlice(NULL),
  m_SeedPointMemoryOffset(0),
  m_VisibleWindow(0),
@@ -256,7 +255,6 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
     // 3.2.1 Remember Y cursor position and initial seed point
     m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
-    m_LastScreenYPosition = m_ScreenYPositionAtStart;
 
    
     m_SeedPointMemoryOffset = projectedPointIn2D[1] * m_OriginalPicSlice->n[0] + projectedPointIn2D[0];
@@ -329,18 +327,17 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         // The factor is being adapted to the mouse movement speed, faster movement means higher magnification.
 
         float screenYDifference = positionEvent->GetDisplayPosition()[1] - m_ScreenYPositionAtStart;
-        float lastscreenYDifference = positionEvent->GetDisplayPosition()[1] - m_LastScreenYPosition;
         int velocityScaling = 1;
-        if(abs(lastscreenYDifference) > 50)
+        if(abs(screenYDifference) > 50)
         {
           velocityScaling = 2;
-          if(abs(lastscreenYDifference) > 150)
+          if(abs(screenYDifference) > 150)
           {
             velocityScaling = 5;
           }
         }
 
-        m_LowerThreshold = m_LowerThreshold + static_cast<int>( lastscreenYDifference * velocityScaling * m_MouseDistanceScaleFactor );
+        m_LowerThreshold = m_LowerThreshold + static_cast<int>( screenYDifference * velocityScaling * m_MouseDistanceScaleFactor );
         if (m_LowerThreshold < 0) m_LowerThreshold = 0;
         if (m_LowerThreshold > m_DefaultWindow) m_LowerThreshold = m_DefaultWindow;
         m_UpperThreshold = m_LowerThreshold;

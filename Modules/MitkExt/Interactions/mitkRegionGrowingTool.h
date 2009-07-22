@@ -86,7 +86,6 @@ class MITKEXT_CORE_EXPORT RegionGrowingTool : public FeedbackContourTool
     int m_InitialUpperThreshold;
 
     int m_ScreenYPositionAtStart;
-    int m_LastScreenYPosition;
 
   private:
 

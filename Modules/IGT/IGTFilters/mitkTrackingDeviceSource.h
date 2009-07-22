@@ -92,13 +92,6 @@ namespace mitk {
     void StopTracking();
 
     /**
-    * \brief returns the number of connected tools
-    *
-    * If the tracking device is not connected, 0 is returned
-    */
-    virtual unsigned int GetToolCount(); 
-
-    /**
     * \brief returns true if a connection to the tracking device is established
     *
     */

@@ -99,10 +99,17 @@ void mitk::TrackingDeviceSource::SetTrackingDevice( mitk::TrackingDevice* td )
 
 void mitk::TrackingDeviceSource::CreateOutputs(){
   //if outputs are set then delete them
-  for (unsigned int numOP = this->GetNumberOfOutputs(); numOP>0; numOP--)
-    this->RemoveOutput(this->GetOutput(numOP));
+  if (this->GetNumberOfOutputs() > 0)
+  {
+    for (unsigned int numOP = this->GetNumberOfOutputs(); numOP>0; numOP--)
+      this->RemoveOutput(this->GetOutput(numOP));
+    this->Modified();
+  }
+  
+  //fill the outputs if a valid tracking device is set
+  if (m_TrackingDevice.IsNull())
+    return;
 
-  //fill the outputs
   this->SetNumberOfOutputs(m_TrackingDevice->GetToolCount());  // create outputs for all tools
   unsigned int numberOfOutputs = this->GetNumberOfOutputs();
   for (unsigned int idx = 0; idx < numberOfOutputs; ++idx)
@@ -111,8 +118,8 @@ void mitk::TrackingDeviceSource::CreateOutputs(){
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
-    }
-    this->Modified();
+      this->Modified();
+    }    
   }
 }
 
@@ -164,12 +171,12 @@ void mitk::TrackingDeviceSource::UpdateOutputInformation()
 }
 
 
-unsigned int mitk::TrackingDeviceSource::GetToolCount()
-{
-  if (m_TrackingDevice) 
-    return m_TrackingDevice->GetToolCount(); 
-  return 0;
-}
+//unsigned int mitk::TrackingDeviceSource::GetToolCount()
+//{
+//  if (m_TrackingDevice) 
+//    return m_TrackingDevice->GetToolCount(); 
+//  return 0;
+//}
 
 
 bool mitk::TrackingDeviceSource::IsConnected()
@@ -177,7 +184,7 @@ bool mitk::TrackingDeviceSource::IsConnected()
   if (m_TrackingDevice.IsNull())
     return false;
   
-  return m_TrackingDevice->GetMode() == mitk::TrackingDevice::Setup;
+  return (m_TrackingDevice->GetMode() == mitk::TrackingDevice::Ready) || (m_TrackingDevice->GetMode() == mitk::TrackingDevice::Tracking);
 }
 
 

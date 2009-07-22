@@ -278,8 +278,8 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
   // TODO "line width" "show contour" "contourcolor" "contoursize" "close contour" "show label", "label"
   // TODO "show points" vs "visibility"  - is visibility evaluated at all? in a superclass maybe? 
   // TODO create lookup tables for all properties that should be evaluated per point. also create editor widgets for these lookup tables!
-  // TODO check if property changes and pointset changes are reflected in the renderwindow immediately.
-  // TODO check behaviour with large pointsets
+  // TODO check if property changes and pointset changes are reflected in the render window immediately.
+  // TODO check behavior with large PointSets
   // TODO check for memory leaks on adding/deleting points
 }
 
@@ -307,8 +307,9 @@ void mitk::EnhancedPointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode*
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);
-  node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  //red
-  node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow
+  node->AddProperty( "selectedcolor", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);  //yellow for selected
+  node->AddProperty( "unselectedcolor", mitk::ColorProperty::New(0.5f, 1.0f, 0.5f), renderer, overwrite);  // middle green for unselected
+  node->AddProperty( "color", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);  // red as standard
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "contourcolor", mitk::ColorProperty::New(1.0f, 0.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );

@@ -235,7 +235,30 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
   mitk::Point3D indexPoint;
   this->GetGeometry( t )->WorldToIndex( point, indexPoint );
   m_PointSetSeries[t]->SetPoint( id, indexPoint );
+  PointDataType defaultPointData;
+  defaultPointData.id = id;
+  defaultPointData.selected = false;
+  defaultPointData.pointSpec = mitk::PTUNDEFINED;
+  m_PointSetSeries[t]->SetPointData( id, defaultPointData );
+  //boundingbox has to be computed anyway
+  m_CalculateBoundingBox = true;
+  this->Modified();
+}
 
+
+void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t )
+{
+  // Adapt the size of the data vector if necessary
+  this->Expand( t+1 );
+
+  mitk::Point3D indexPoint;
+  this->GetGeometry( t )->WorldToIndex( point, indexPoint );
+  m_PointSetSeries[t]->SetPoint( id, indexPoint );
+  PointDataType defaultPointData;
+  defaultPointData.id = id;
+  defaultPointData.selected = false;
+  defaultPointData.pointSpec = spec;
+  m_PointSetSeries[t]->SetPointData( id, defaultPointData );
   //boundingbox has to be computed anyway
   m_CalculateBoundingBox = true;
   this->Modified();
@@ -255,12 +278,44 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, int t )
     }
     tempGeometry->WorldToIndex( point, indexPoint );
     m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
-    
+    PointDataType defaultPointData;
+    defaultPointData.id = id;
+    defaultPointData.selected = false;
+    defaultPointData.pointSpec = mitk::PTUNDEFINED;
+    m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
+
     //boundingbox has to be computed anyway
     m_CalculateBoundingBox = true;
     this->Modified();
   }
 }
+
+
+void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t )
+{
+  if ( (unsigned int) t < m_PointSetSeries.size() )
+  {
+    mitk::Point3D indexPoint;
+    mitk::Geometry3D* tempGeometry = this->GetGeometry( t );
+    if (tempGeometry == NULL)
+    {
+      LOG_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
+      return;
+    }
+    tempGeometry->WorldToIndex( point, indexPoint );
+    m_PointSetSeries[t]->GetPoints()->InsertElement( id, indexPoint );
+    PointDataType defaultPointData;
+    defaultPointData.id = id;
+    defaultPointData.selected = false;
+    defaultPointData.pointSpec = spec;
+    m_PointSetSeries[t]->GetPointData()->InsertElement(id, defaultPointData);
+
+    //boundingbox has to be computed anyway
+    m_CalculateBoundingBox = true;
+    this->Modified();
+  }
+}
+
 
 void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
 {

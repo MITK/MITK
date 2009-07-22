@@ -170,10 +170,20 @@ public:
   void SetPoint( PointIdentifier id, PointType point, int t = 0 );
 
   /**
+  * \brief Set the given  point in world coordinate system with the given PointSpecificationType
+  */
+  void SetPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t = 0 );
+
+  /**
    * \brief Set the given point in world coordinate system into the itkPointSet.
    */
   void InsertPoint( PointIdentifier id, PointType point, int t = 0 );
-
+  
+  /**
+  * \brief Set the given point in world coordinate system with given PointSpecificationType
+  */  
+  void InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t );
+  
   void SwapPointPosition( PointIdentifier id, bool moveUpwards, int t = 0 );
 
 

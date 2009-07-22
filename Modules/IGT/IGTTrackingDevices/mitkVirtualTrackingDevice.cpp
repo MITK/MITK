@@ -70,7 +70,6 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
 
 bool mitk::VirtualTrackingDevice::StartTracking()
 {
-
   this->SetMode(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  
   this->m_StopTracking = false;
@@ -132,6 +131,11 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
   }
   srand(time(NULL)); //Init random number generator
   
+  /* reset interpolator containers */
+  m_Interpolators.clear();
+  m_SplineLengths.clear();
+  m_ToolVelocities.clear();
+
   /* create spline for all tools */
   for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)  // for each tool
   {

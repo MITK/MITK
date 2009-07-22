@@ -49,7 +49,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
   if (argc<1)
   {
     LOG_INFO<<"Command line argument missing";
-    return;
+    return 0;
   }
   // create contour by reading the file given in argv[1]
   mitk::UnstructuredGrid::Pointer unstructuredGrid;
@@ -63,7 +63,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
   catch (itk::ExceptionObject e)
   {
     LOG_INFO<<e.GetDescription();
-    return;
+    return 0;
   }
 
     try{  

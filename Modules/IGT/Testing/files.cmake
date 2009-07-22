@@ -14,5 +14,6 @@ SET(MODULE_TESTS
    mitkNavigationDataTransformFilterTest.cpp  
    mitkNDIPassiveToolTest.cpp
    mitkTimeStampTest.cpp
+   mitkTrackingDeviceSourceTest.cpp
    mitkTrackingVolumeTest.cpp
 )

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include "mitkUnstructuredGrid.h"
 
-#include <vtkUnstructuredGridReader.h>
+#include <mitkVtkUnstructuredGridReader.h>
 #include <vtkUnstructuredGridWriter.h>
 
 #include <iostream>
@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkUnstructuredGridVtkWriterTest(int /*argc*/ , char* argv[])
+int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("UnstructuredGridVtkWriter")
@@ -46,37 +46,45 @@ int mitkUnstructuredGridVtkWriterTest(int /*argc*/ , char* argv[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myUnstructuredGridVtkWriter.IsNotNull(),"Testing instantiation") 
 
-    // create contour
-    vtkUnstructuredGridReader* reader = vtkUnstructuredGridReader::New();
-  reader->SetFileName(argv[1]);
-  reader->Update();
-  if (reader->GetOutput())
+  if (argc<1)
   {
-    mitk::UnstructuredGrid::Pointer unstructuredGrid = mitk::UnstructuredGrid::New();
-    unstructuredGrid->SetVtkUnstructuredGrid(reader->GetOutput());
-    unstructuredGrid->Update();
-
-    MITK_TEST_CONDITION_REQUIRED(unstructuredGrid.IsNotNull(),"UnstructuredGrid creation")
-
-      try{  
-        // test for exception handling
-        MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-          myUnstructuredGridVtkWriter->SetInput(unstructuredGrid);
-        myUnstructuredGridVtkWriter->SetFileName("/usr/bin");
-        myUnstructuredGridVtkWriter->Update(); 
-        MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
-    }
-    catch(...) {
-      //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
-      std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
-      return EXIT_FAILURE;
-    }
-
-    //write your own tests here and use the macros from mitkTestingMacros.h !!!
-    //do not write to std::cout and do not return from this function yourself!
-
-    //always end with this!
+    LOG_INFO<<"Command line argument missing";
+    return EXIT_FAILURE;
   }
+  // create contour by reading the file given in argv[1]
+  mitk::UnstructuredGrid::Pointer unstructuredGrid;
+  mitk::VtkUnstructuredGridReader::Pointer reader = mitk::VtkUnstructuredGridReader::New();
+  
+  try {
+    reader->SetFileName(argv[1]);
+    reader->Update();
+    unstructuredGrid = reader->GetOutput();
+  }
+  catch (itk::ExceptionObject e)
+  {
+    LOG_INFO<<e.GetDescription();
+    return EXIT_FAILURE;
+  }
+
+    try{  
+      // test if exception is thrown when unstructured grid is tried to be saved in an non-existing/non-writable folder/file
+      MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+        myUnstructuredGridVtkWriter->SetInput(unstructuredGrid);
+      // set non-existing (windows), non-writable (linux) file name
+      myUnstructuredGridVtkWriter->SetFileName("/usr/bin");
+      myUnstructuredGridVtkWriter->Update(); 
+      MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  }
+  catch(...) {
+    //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
+    LOG_INFO << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  //write your own tests here and use the macros from mitkTestingMacros.h !!!
+  //do not write to std::cout and do not return from this function yourself!
+
+  //always end with this!
   MITK_TEST_END()
 }
 

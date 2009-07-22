@@ -88,7 +88,7 @@ void mitk::VtkUnstructuredGridReader::GenerateData()
 #endif
     if(!success)
     {
-      itkWarningMacro( << " ... sorry, this .vtk format is not supported yet." );
+      itkExceptionMacro( << " ... sorry, this .vtk format is not supported yet." );
     }
   }
 }

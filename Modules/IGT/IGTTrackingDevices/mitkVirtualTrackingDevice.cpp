@@ -177,6 +177,10 @@ bool mitk::VirtualTrackingDevice::CloseConnection()
   if(this->GetMode() == Setup)
     return true;
 
+  m_Interpolators.clear();
+  m_SplineLengths.clear();
+  m_ToolVelocities.clear();
+  
   this->SetMode(Setup);
   return returnValue;
 }

@@ -58,6 +58,13 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char* argv[])
       std::cout<<"[TEST DONE]"<<std::endl;
       return EXIT_SUCCESS;
     }
+    else if(image->GetPixelType() != mitk::PixelType(typeid(char)) 
+      || image->GetPixelType() != mitk::PixelType(typeid(unsigned char)) )
+    {
+      std::cout<<"file not a char or unsigned char image - test will not be applied [PASSED]"<<std::endl;
+      std::cout<<"[TEST DONE]"<<std::endl;
+      return EXIT_SUCCESS;
+    }
   }
   catch ( itk::ExceptionObject & ex )
   {

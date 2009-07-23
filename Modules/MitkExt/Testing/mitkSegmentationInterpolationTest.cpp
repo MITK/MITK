@@ -245,7 +245,7 @@ bool mitkSegmentationInterpolationTestClass::DeleteInterpolator()
 
 bool mitkSegmentationInterpolationTestClass::LoadTestImages()
 {
-  std::string filename1 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_manual.pic.gz", "../mitk/Testing/Data/");
+  std::string filename1 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_manual.pic.gz", "../mitk/Core/Testing/Data/");
   if ( filename1.empty() )
   {
     filename1 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_manual.pic.gz", "Testing/Data/");
@@ -253,7 +253,7 @@ bool mitkSegmentationInterpolationTestClass::LoadTestImages()
   
   std::cout << "Found test image (manual slices) in '" << filename1 << "'" << std::endl;
   
-  std::string filename2 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_result.pic.gz", "../mitk/Testing/Data/");
+  std::string filename2 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_result.pic.gz", "../mitk/Core/Testing/Data/");
   if ( filename2.empty() )
   {
     filename2 = mitk::StandardFileLocations::GetInstance()->FindFile("interpolation_test_result.pic.gz", "Testing/Data/");

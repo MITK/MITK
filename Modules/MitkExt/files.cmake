@@ -56,7 +56,6 @@ SET(CPP_FILES
   Algorithms/mitkUnstructuredGridSource.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
-  Controllers/mitkReportGenerator.cpp
   Controllers/mitkSegmentationInterpolationController.cpp
   Controllers/mitkToolManager.cpp
   DataManagement/mitkAffineTransformationOperation.cpp
@@ -64,7 +63,6 @@ SET(CPP_FILES
   DataManagement/mitkBoundingObject.cpp
   DataManagement/mitkBoundingObjectGroup.cpp
   DataManagement/mitkCellOperation.cpp
-#DataManagement/mitkClosedSpline.cpp
   DataManagement/mitkColorConversions.cpp
   DataManagement/mitkColorSequence.cpp
   DataManagement/mitkColorSequenceCycleH.cpp
@@ -94,7 +92,6 @@ SET(CPP_FILES
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkPropertyObserver.cpp
-#DataManagement/mitkRingSpline.cpp
   DataManagement/mitkSeedsImage.cpp
   DataManagement/mitkSeedsImageLookupTableSource.cpp
   DataManagement/mitkSphereLandmarkProjector.cpp

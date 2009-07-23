@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkToolManager.h"
+#include "mitkStandaloneDataStorage.h"
 #include "mitkCoreObjectFactory.h"
 
 /// ctest entry point
@@ -30,7 +31,8 @@ int mitkToolManagerTest(int /*argc*/, char* /*argv*/[])
     std::cout << "Instantiation" << std::endl;
 
   // instantiation
-    mitk::ToolManager::Pointer filter = mitk::ToolManager::New();
+    mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
+    mitk::ToolManager::Pointer filter = mitk::ToolManager::New(dataStorage.GetPointer());
     if (filter.IsNotNull())
     {
       std::cout << "  (II) Instantiation works." << std::endl;

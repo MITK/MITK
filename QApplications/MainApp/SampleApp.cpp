@@ -109,6 +109,8 @@ void SampleApp::InitializeFunctionality()
     if (createFunction) 
     {
       QmitkFunctionality* functionalityInstance = createFunction(qfm,m_MultiWidget,&iterator);
+      //if a functionality doesn't have this signal, then an error message is printed
+      QObject::connect( functionalityInstance, SIGNAL( SwitchToNextFunctionality() ), this, SLOT( NextFunctionality() ) );
       qfm->AddFunctionality(functionalityInstance);
     }
 
@@ -119,6 +121,8 @@ void SampleApp::InitializeFunctionality()
       if ( qfm->GetFunctionalityByName( (*it).first.c_str() ) == NULL )
       {
         QmitkFunctionality* functionalityInstance = ((*it).second)(qfm,m_MultiWidget,&iterator);
+        //if a functionality doesn't have this signal, then an error message is printed
+        QObject::connect( functionalityInstance, SIGNAL( SwitchToNextFunctionality() ), this, SLOT( NextFunctionality() ) );
         qfm->AddFunctionality(functionalityInstance);
       }
     }
@@ -212,3 +216,13 @@ void SampleApp::InitializeQfm()
   }
 }
 
+void SampleApp::NextFunctionality()
+{
+  //change to next functionality
+  int nextId = qfm->GetActiveFunctionalityId()+1;
+  QmitkFunctionality * nextFunctionality = qfm->GetFunctionalityById(nextId);
+  if(nextFunctionality != NULL)
+  {
+    qfm->RaiseFunctionality(nextId);
+  }
+}

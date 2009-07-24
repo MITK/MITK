@@ -51,5 +51,9 @@ public:
   virtual void InitializeQfm();
 
   virtual void SetDefaultWidgetSize();
+  
+  protected slots:
+    void NextFunctionality();
+
 };
 

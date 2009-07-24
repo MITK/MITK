@@ -83,7 +83,7 @@ public:
   void SetMenuWidgetActivated( bool state )
   {  m_MenuWidgetActivated = state; }
 
-  void GetMenuWidgetActivated()
+  bool GetMenuWidgetActivated()
   {  return m_MenuWidgetActivated; }
 
 protected:

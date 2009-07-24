@@ -362,7 +362,7 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
   QMessageBox::StandardButton answerButton = QMessageBox::question( m_Parent
     , tr("DataManager")
     , question
-    , QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
   if(answerButton == QMessageBox::Yes)
   {

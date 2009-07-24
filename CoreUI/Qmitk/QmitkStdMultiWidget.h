@@ -91,6 +91,9 @@ public:
   void AddPlanesToDataStorage();
 
   void SetDataStorage( mitk::DataStorage* ds );
+
+  /// activate Menu Widget. true: activated, false: deactivated
+  void ActivateMenuWidget( bool state );
   
 protected:
 
@@ -194,7 +197,7 @@ signals:
   void WidgetPlaneModeSlicing(bool);
   void WidgetPlaneModeRotation(bool);
   void WidgetPlaneModeSwivel(bool);
-
+ 
 public:
 
   /** Define RenderWindow (public)*/ 

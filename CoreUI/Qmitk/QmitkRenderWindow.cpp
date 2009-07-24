@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
-: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true)
+: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(true)
 {
   if(m_Renderer.IsNull())
   {
@@ -188,7 +188,7 @@ void QmitkRenderWindow::enterEvent( QEvent *e )
   QVTKWidget::enterEvent(e);
 
   //show Menu Widget
-  if( m_MenuWidget->isHidden() )
+  if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
   {
     /* //Window position. Is used, if m_MenuWidge is a Window and not a Widget.
     QPoint widgetOrigin = this->mapToGlobal( this->geometry().topLeft() );
@@ -207,7 +207,7 @@ void QmitkRenderWindow::leaveEvent( QEvent *e )
   QVTKWidget::leaveEvent(e);
 
   //hide Menu Widget
-  if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() )
+  if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
     m_MenuWidget->hide();
 }
 

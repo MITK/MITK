@@ -1809,3 +1809,11 @@ void QmitkStdMultiWidget::HideAllWidgetToolbars()
   mitkWidget3->HideMenuWidget();
   mitkWidget4->HideMenuWidget();
 }
+
+void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
+{
+  mitkWidget1->SetMenuWidgetActivated( state );
+  mitkWidget2->SetMenuWidgetActivated( state );
+  mitkWidget3->SetMenuWidgetActivated( state );
+  mitkWidget4->SetMenuWidgetActivated( state );
+}

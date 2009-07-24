@@ -80,6 +80,12 @@ public:
   
   void HideMenuWidget();
   
+  void SetMenuWidgetActivated( bool state )
+  {  m_MenuWidgetActivated = state; }
+
+  void GetMenuWidgetActivated()
+  {  return m_MenuWidgetActivated; }
+
 protected:
 
     // overloaded resize handler
@@ -123,6 +129,8 @@ private:
   bool                           m_ResendQtEvents;
 
   QmitkRenderWindowMenu*         m_MenuWidget;
+
+  bool                           m_MenuWidgetActivated;
 };
 
 #endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */

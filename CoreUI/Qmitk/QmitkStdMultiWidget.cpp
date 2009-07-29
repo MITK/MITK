@@ -144,6 +144,11 @@ m_Node(NULL)
   connect( mitkWidget2, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   connect( mitkWidget3, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
+  
+  connect( mitkWidget1, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
+  connect( mitkWidget1, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
+  connect( mitkWidget1, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
+  connect( mitkWidget1, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SLOT( SetWidgetPlanesRotationLinked(bool) ) );
 
   //Create Level Window Widget
   levelWindowWidget = new QmitkLevelWindowWidget( m_MainSplit ); //this
@@ -1592,6 +1597,8 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 
 void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
 {
+  LOG_INFO << "Changing crosshair mode to " << mode;
+
   // Do nothing if mode didn't change
   if ( m_PlaneMode == mode )
   {
@@ -1817,3 +1824,12 @@ void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
   mitkWidget3->SetMenuWidgetActivated( state );
   mitkWidget4->SetMenuWidgetActivated( state );
 }
+ 
+void QmitkStdMultiWidget::ResetCrosshair()
+{
+  if (m_DataStorage.IsNotNull())
+  {
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
+  }
+}
+

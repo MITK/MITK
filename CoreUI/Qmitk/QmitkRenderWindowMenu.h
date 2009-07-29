@@ -64,9 +64,6 @@ protected:
   void CreateMenuWidget();
 
   /** */
-  void CreateMenuBar();
-
-  /** */
   void CreateSettingsWidget();
 
   /** */
@@ -77,10 +74,23 @@ protected:
 
 signals:
   
+  void ShowCrosshair(bool show);
+  void ResetView(); // == "global reinit"
+  
+  // \brief int parameters are enum from QmitkStdMultiWidget
+  void ChangeCrosshairRotationMode(int); 
+  void SetCrosshairRotationLinked(bool);
+
   /** */
   void SignalChangeLayoutDesign( int layoutDesign );
 
 protected slots:  
+
+  /// \brief 
+  void OnShowHideCrossHairToggled(bool show);
+  void OnCrosshairRotationModeSelected(QAction*); 
+  
+  void OnResetView();
 
   /// \brief
   void OnHoriSplitButton( bool checked );
@@ -151,6 +161,7 @@ public:
 protected:
 
   /** */
+  QPushButton*        m_CrosshairModeButton;
   QPushButton*        m_HoriSplitButton;
   QPushButton*        m_VertiSplitButton;
   QPushButton*        m_FullScreenButton;

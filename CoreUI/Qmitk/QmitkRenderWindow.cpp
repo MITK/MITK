@@ -67,6 +67,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   
   //create Signal/Slot Connection
   connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
+  connect( m_MenuWidget, SIGNAL( ShowCrosshair(bool) ), this, SIGNAL( ShowCrosshair(bool)) );
+  connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
+  connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );
+  connect( m_MenuWidget, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SIGNAL( SetCrosshairRotationLinked(bool)) );
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()

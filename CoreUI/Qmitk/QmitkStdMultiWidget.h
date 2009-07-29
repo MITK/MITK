@@ -184,6 +184,7 @@ public slots:
 
   void OnLayoutDesignChanged( int layoutDesignIndex );
 
+  void ResetCrosshair();
 
 signals:
 

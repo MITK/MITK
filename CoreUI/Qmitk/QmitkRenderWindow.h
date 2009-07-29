@@ -111,7 +111,12 @@ protected:
 #endif
 
 signals:
-
+  
+  void ShowCrosshair(bool show);
+  void ResetView();
+  // \brief int parameters are enum from QmitkStdMultiWidget
+  void ChangeCrosshairRotationMode(int); 
+  void SetCrosshairRotationLinked(bool);
   void SignalLayoutDesignChanged( int layoutDesignIndex );
 
 protected slots:  

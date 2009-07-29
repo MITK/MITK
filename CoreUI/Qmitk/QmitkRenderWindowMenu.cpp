@@ -28,8 +28,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include<QAction>
 #include<QLine>
 
+#include "QmitkStdMultiWidget.h"
+
 #include"iconClose.xpm"
 #include"iconFullScreen.xpm"
+#include"iconCrosshairMode.xpm"
 #include"iconHoriSplit.xpm"
 #include"iconSettings.xpm"
 #include"iconVertiSplit.xpm"
@@ -73,6 +76,72 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   layout->setContentsMargins(1,1,1,1);
 
   QSize size( 13, 13 );
+
+  static QMenu* crosshairModesMenu = NULL;
+  if ( !crosshairModesMenu )
+  {
+    crosshairModesMenu = new QMenu(NULL); // is shared by all menubars TODO should be deleted somehow
+    crosshairModesMenu->setTearOffEnabled(true);
+
+    QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
+    showHideCrosshairVisibilityAction->setText("Show crosshair");
+    showHideCrosshairVisibilityAction->setCheckable(true);
+    showHideCrosshairVisibilityAction->setChecked(true); // TODO observe current status
+    connect( showHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SIGNAL(ShowCrosshair(bool)));
+    crosshairModesMenu->addAction( showHideCrosshairVisibilityAction );
+
+    QAction* resetViewAction = new QAction(crosshairModesMenu);
+    resetViewAction->setText("Reset view");
+    connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
+    crosshairModesMenu->addAction( resetViewAction );
+
+    QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
+    rotationGroupSeparator->setSeparator(true);
+    rotationGroupSeparator->setText("Rotation mode");
+    crosshairModesMenu->addAction( rotationGroupSeparator );
+
+    QActionGroup* rotationModeActionGroup = new QActionGroup(crosshairModesMenu);
+    rotationModeActionGroup->setExclusive(true);
+    connect( rotationModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnCrosshairRotationModeSelected(QAction*)) ); 
+
+    QAction* noCrosshairRotation = new QAction(crosshairModesMenu);
+    noCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    noCrosshairRotation->setText("No crosshair rotation");
+    noCrosshairRotation->setCheckable(true);
+    noCrosshairRotation->setChecked(true); // TODO observe current status
+    noCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_SLICING );
+    crosshairModesMenu->addAction( noCrosshairRotation );
+
+    QAction* singleCrosshairRotation = new QAction(crosshairModesMenu);
+    singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    singleCrosshairRotation->setText("Single crosshair rotation");
+    singleCrosshairRotation->setCheckable(true);
+    singleCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_ROTATION  );
+    crosshairModesMenu->addAction( singleCrosshairRotation );
+
+    QAction* coupledCrosshairRotation = new QAction(crosshairModesMenu);
+    coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    coupledCrosshairRotation->setText("Coupled crosshair rotation");
+    coupledCrosshairRotation->setCheckable(true);
+    coupledCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_ROTATION );
+    crosshairModesMenu->addAction( coupledCrosshairRotation );
+
+    QAction* swivelMode = new QAction(crosshairModesMenu);
+    swivelMode->setActionGroup(rotationModeActionGroup);
+    swivelMode->setText("Swivel mode");
+    swivelMode->setCheckable(true);
+    swivelMode->setData( QmitkStdMultiWidget::PLANE_MODE_SWIVEL );
+    crosshairModesMenu->addAction( swivelMode );
+  }
+
+  // button for changing rotation mode
+  m_CrosshairModeButton = new QPushButton();
+  m_CrosshairModeButton->setMaximumSize(15, 15);
+  m_CrosshairModeButton->setIconSize(size);
+  m_CrosshairModeButton->setFlat( true );
+  m_CrosshairModeButton->setMenu( crosshairModesMenu );
+  m_CrosshairModeButton->setIcon( QIcon( iconCrosshairMode_xpm ) );
+  layout->addWidget( m_CrosshairModeButton );
 
   //HoriSplitButton
   m_HoriSplitButton = new QPushButton();
@@ -119,7 +188,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_CloseButton->setIcon(iconClose);
   layout->addWidget( m_CloseButton );
 
-  //Create Connections -- comming Soon!
+  //Create Connections -- coming soon?
   connect( m_HoriSplitButton, SIGNAL( clicked(bool) ), this, SLOT(OnHoriSplitButton(bool)) );
   connect( m_VertiSplitButton, SIGNAL( clicked(bool) ), this, SLOT(OnVertiSplitButton(bool)) );
   connect( m_FullScreenButton, SIGNAL( clicked(bool) ), this, SLOT(OnFullScreenButton(bool)) );
@@ -131,28 +200,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_VertiSplitButton->setDisabled( true );
   m_CloseButton->setDisabled( true );
 
-}
-
-void QmitkRenderWindowMenu::CreateMenuBar()
-{
-  //create Render Window MenuBar.
-  m_MenuBar = new QMenuBar(this);
-
-  m_MenuBar->setContentsMargins(0,0,0,0);
-  m_MenuBar->setMouseTracking( true );
-
-  QAction* horiSplitAction = new QAction(QIcon(iconHoriSplit_xpm), "horiSplit", m_MenuBar);
-  QAction* vertiSplitAction = new QAction(QIcon(iconVertiSplit_xpm), "vertiSplit", m_MenuBar);
-  QAction* fullScreenAction = new QAction(QIcon(iconFullScreen_xpm), "FullScreen", m_MenuBar);
-  QAction* settingsAction = new QAction(QIcon(iconSettings_xpm), "Settings", m_MenuBar);
-  QAction* closeAction = new QAction(QIcon(iconClose_xpm), "close", m_MenuBar);
-  m_MenuBar->addAction(horiSplitAction);
-  m_MenuBar->addAction(vertiSplitAction);
-  m_MenuBar->addAction(fullScreenAction);
-  m_MenuBar->addAction(settingsAction);
-  m_MenuBar->addAction(closeAction);  
-
-  //Create Connections -- comming Soon.
 }
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
@@ -774,6 +821,11 @@ void QmitkRenderWindowMenu::ChangeFullScreenIcon()
     const QIcon icon( iconFullScreen_xpm );
     m_FullScreenButton->setIcon(icon);
  }
-
-  
 }
+
+void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
+{
+  emit ChangeCrosshairRotationMode( action->data().toInt() );
+  emit SetCrosshairRotationLinked( action->text().contains("Coupled") );
+}
+  

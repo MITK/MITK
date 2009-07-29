@@ -87,10 +87,7 @@ signals:
 protected slots:  
 
   /// \brief 
-  void OnShowHideCrossHairToggled(bool show);
   void OnCrosshairRotationModeSelected(QAction*); 
-  
-  void OnResetView();
 
   /// \brief
   void OnHoriSplitButton( bool checked );

@@ -282,6 +282,7 @@ signals:
   void Signal_dummy();
   void AvailabilityChanged(QmitkFunctionality*);
   void AvailabilityChanged();
+  void SwitchToNextFunctionality();
 
 
 protected:

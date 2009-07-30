@@ -496,7 +496,7 @@ void QmitkIGTExampleView::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
 }
 void QmitkIGTExampleView::OnLoadTool()
 {
-  QStringList s = QFileDialog::getOpenFileNames(m_Parent,"tool definition file (*.*)",QDir::currentPath(), "open file dialog");
+  QStringList s = QFileDialog::getOpenFileNames(m_Parent, "Select one or more tool definition files",QDir::currentPath(), "NDI Tool Definition Files (*.rom);;All files (*.*)");
   if (s.empty() == false)
   { 
     m_Controls->m_ToolFileName->setText(s.front());

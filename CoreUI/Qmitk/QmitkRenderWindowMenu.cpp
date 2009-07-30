@@ -114,7 +114,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
     QAction* singleCrosshairRotation = new QAction(crosshairModesMenu);
     singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
-    singleCrosshairRotation->setText("Single crosshair rotation");
+    singleCrosshairRotation->setText("Crosshair rotation");
     singleCrosshairRotation->setCheckable(true);
     singleCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_ROTATION  );
     crosshairModesMenu->addAction( singleCrosshairRotation );

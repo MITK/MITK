@@ -43,7 +43,11 @@ namespace mitk {
  * set to \a true all voxels inside the surface are set to one and all 
  * outside voxel are set to zero.
  *
- * The pixel type of the output image is currently always integer.
+ * NOTE: Since the reference input image is passed to the vtkStencil in
+ * any case, the image needs to be initialized with pixel values greater than
+ * the numerical minimum of the used pixel type (e.g. at least -127 for
+ * unsigned char images, etc.) to produce a correct binary image
+ * representation of the surface in MakeOutputBinary mode.
  * 
  * @ingroup SurfaceFilters
  * @ingroup Process

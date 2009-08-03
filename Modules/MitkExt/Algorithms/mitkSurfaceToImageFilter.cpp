@@ -30,17 +30,15 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #include <vtkDataSetTriangleFilter.h>
 #include <vtkImageThreshold.h>
 #include <vtkImageMathematics.h>
-#include <vtkImageChangeInformation.h>
 #include <vtkPolyDataNormals.h>
-
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
-#include <vtkImageChangeInformation.h>
+
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
+: m_MakeOutputBinary( false ),
+  m_BackgroundValue( -10000 )
 {
-  m_MakeOutputBinary = false;
-  m_BackgroundValue = -10000;
 }
 
 mitk::SurfaceToImageFilter::~SurfaceToImageFilter()
@@ -144,31 +142,27 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   surfaceConverter->SetInput( normalsFilter->GetOutput() );
   normalsFilter->Delete();
 
-  vtkImageChangeInformation *indexCoordinatesImageFilter = vtkImageChangeInformation::New();
-  indexCoordinatesImageFilter->SetInput(( (mitk::Image*)GetImage() )->GetVtkImageData( time ));
-  indexCoordinatesImageFilter->SetOutputSpacing(1.0,1.0,1.0);
-  indexCoordinatesImageFilter->SetOutputOrigin(0.0,0.0,0.0);
-
+  vtkImageData *image = const_cast< mitk::Image * >(this->GetImage())->GetVtkImageData( time );
+  
+  // Create stencil and use numerical minimum of pixel type as background value
   vtkImageStencil * stencil = vtkImageStencil::New();
-  stencil->SetBackgroundValue( m_BackgroundValue );
+  stencil->SetInput( image );
   stencil->ReverseStencilOff();
   stencil->ReleaseDataFlagOn();
-
   stencil->SetStencil( surfaceConverter->GetOutput() );
   surfaceConverter->Delete();
 
-  stencil->SetInput( indexCoordinatesImageFilter->GetOutput() );
-
   if (m_MakeOutputBinary)
   {
+    stencil->SetBackgroundValue( image->GetScalarTypeMin() );
+
     vtkImageThreshold * threshold = vtkImageThreshold::New();
     threshold->SetInput( stencil->GetOutput() );
-    stencil->Delete();
-    threshold->ThresholdByUpper(1);
+    threshold->ThresholdByLower( image->GetScalarTypeMin() );
     threshold->ReplaceInOn();
     threshold->ReplaceOutOn();
-    threshold->SetInValue(1);
-    threshold->SetOutValue(0);
+    threshold->SetInValue( 0 );
+    threshold->SetOutValue( 1 );
     threshold->Update();
 
     mitk::Image::Pointer output = this->GetOutput();
@@ -178,13 +172,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   }
   else
   {
+    stencil->SetBackgroundValue( m_BackgroundValue );
     stencil->Update();
+
     mitk::Image::Pointer output = this->GetOutput();
     output->SetVolume( stencil->GetOutput()->GetScalarPointer(), time );
     LOG_INFO << "stencil ref count: " << stencil->GetReferenceCount() << std::endl;
-
-    stencil->Delete();
   }
+  stencil->Delete();
 }
 
 

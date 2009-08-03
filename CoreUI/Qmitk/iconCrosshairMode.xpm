@@ -1,5 +1,5 @@
 /* XPM */
-static char * iconCrosshairMode_xpm[] = {
+static const char * iconCrosshairMode_xpm[] = {
 "15 15 4 1",
 " 	c None",
 ".	c #6999D1",

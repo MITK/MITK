@@ -1819,10 +1819,10 @@ void QmitkStdMultiWidget::HideAllWidgetToolbars()
 
 void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
 {
-  mitkWidget1->SetMenuWidgetActivated( state );
-  mitkWidget2->SetMenuWidgetActivated( state );
-  mitkWidget3->SetMenuWidgetActivated( state );
-  mitkWidget4->SetMenuWidgetActivated( state );
+  mitkWidget1->ActivateMenuWidget( state );
+  mitkWidget2->ActivateMenuWidget( state );
+  mitkWidget3->ActivateMenuWidget( state );
+  mitkWidget4->ActivateMenuWidget( state );
 }
  
 void QmitkStdMultiWidget::ResetCrosshair()

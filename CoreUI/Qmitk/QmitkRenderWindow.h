@@ -76,14 +76,17 @@ public:
   // Get Layout Index to define the Layout Type
   unsigned int GetLayoutIndex();
 
+  //MenuWidget need to update the Layout Design List when Layout had changed
   void LayoutDesignListChanged( int layoutDesignIndex );
   
+  //Hide Menu Widget manual e.g. when layout had changed
   void HideMenuWidget();
   
-  void SetMenuWidgetActivated( bool state )
+  //Activate or Deactivate MenuWidget. 
+  void ActivateMenuWidget( bool state )
   {  m_MenuWidgetActivated = state; }
 
-  bool GetMenuWidgetActivated()
+  bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
 protected:

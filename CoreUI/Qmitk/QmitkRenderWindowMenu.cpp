@@ -81,7 +81,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   if ( !crosshairModesMenu )
   {
     crosshairModesMenu = new QMenu(NULL); // is shared by all menubars TODO should be deleted somehow
-    crosshairModesMenu->setTearOffEnabled(true);
+    //crosshairModesMenu->setTearOffEnabled(true);
 
     QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
     showHideCrosshairVisibilityAction->setText("Show crosshair");
@@ -194,13 +194,14 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   connect( m_FullScreenButton, SIGNAL( clicked(bool) ), this, SLOT(OnFullScreenButton(bool)) );
   connect( m_SettingsButton, SIGNAL( clicked(bool) ), this, SLOT(OnSettingsButton(bool)) );
   connect( m_CloseButton, SIGNAL( clicked(bool) ), this, SLOT(OnCloseButton(bool)) );
-
+  
   //set unused Actions disable
   m_HoriSplitButton->setDisabled( true );
   m_VertiSplitButton->setDisabled( true );
   m_CloseButton->setDisabled( true );
 
 }
+
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
 {
@@ -457,12 +458,12 @@ void QmitkRenderWindowMenu::UpdateLayoutList()
     }
   }
 
-  //set all to disable, because the buttons aren't working now.
-  m_TransversalAction->setEnabled( false );
-  m_SagittalAction->setEnabled( false );
-  m_CoronalAction->setEnabled( false );
-  m_ThreeDAction->setEnabled( false );
-  
+
+	//set all to disable, because the actions aren't working now.
+	m_TransversalAction->setEnabled( false );
+	m_SagittalAction->setEnabled( false );
+	m_CoronalAction->setEnabled( false );
+	m_ThreeDAction->setEnabled( false );
 }
 
 void QmitkRenderWindowMenu::OnChangeDirectionToTransversal(bool)
@@ -828,4 +829,4 @@ void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
   emit ChangeCrosshairRotationMode( action->data().toInt() );
   emit SetCrosshairRotationLinked( action->text().contains("Coupled") );
 }
-  
+

@@ -15,37 +15,37 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "cherryQtUIPlugin.h"
+#include "cherryQtLogPlugin.h"
 
 namespace cherry {
 
-QtUIPlugin* QtUIPlugin::instance = 0;
+QtLogPlugin* QtLogPlugin::instance = 0;
 
-QtUIPlugin::QtUIPlugin()
+QtLogPlugin::QtLogPlugin()
 {
   instance = this;
 }
 
 void 
-QtUIPlugin::Start(IBundleContext::Pointer /*context*/)
+QtLogPlugin::Start(IBundleContext::Pointer /*context*/)
 {
   m_LogModel = new QtPlatformLogModel();
 }
 
 void 
-QtUIPlugin::Stop(IBundleContext::Pointer /*context*/)
+QtLogPlugin::Stop(IBundleContext::Pointer /*context*/)
 {
   delete m_LogModel;
 }
   
-QtUIPlugin* 
-QtUIPlugin::GetInstance()
+QtLogPlugin*
+QtLogPlugin::GetInstance()
 {
   return instance;
 }
 
 QtPlatformLogModel* 
-QtUIPlugin::GetLogModel()
+QtLogPlugin::GetLogModel()
 {
   return m_LogModel;
 }

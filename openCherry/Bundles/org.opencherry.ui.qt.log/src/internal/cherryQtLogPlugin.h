@@ -15,36 +15,35 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef CHERRYUIPLUGIN_H_
-#define CHERRYUIPLUGIN_H_
+#ifndef CHERRYLOGPLUGIN_H_
+#define CHERRYLOGPLUGIN_H_
 
 #include <cherryPlugin.h>
 
 #include "cherryQtPlatformLogModel.h"
 
-#include "../cherryUiQtDll.h"
 
 namespace cherry {
 
-class CHERRY_UI_QT QtUIPlugin : public Plugin
+class QtLogPlugin : public Plugin
 {
 public:
 
-  QtUIPlugin();
+  QtLogPlugin();
 
   void Start(IBundleContext::Pointer context);
   void Stop(IBundleContext::Pointer context);
 
-  static QtUIPlugin* GetInstance();
+  static QtLogPlugin* GetInstance();
 
   QtPlatformLogModel* GetLogModel();
 
 private:
-  static QtUIPlugin* instance;
+  static QtLogPlugin* instance;
   QtPlatformLogModel* m_LogModel;
 
 };
 
 }
 
-#endif /*CHERRYUIPLUGIN_H_*/
+#endif /*CHERRYLOGPLUGIN_H_*/

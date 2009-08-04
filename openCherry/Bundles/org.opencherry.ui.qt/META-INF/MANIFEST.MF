@@ -3,5 +3,4 @@ Bundle-Name: openCherry Qt User Interface Plugin
 Bundle-SymbolicName: org.opencherry.ui.qt
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Bundle-Activator: cherry::QtUIPlugin
 Require-Bundle: org.opencherry.ui

@@ -25,10 +25,6 @@ SET(INTERNAL_CPP_FILES
   util/cherryReplaceDragHandler.cpp
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
-
-  cherryLogView.cpp
-  cherryQtLogView.cpp
-  cherryQtPlatformLogModel.cpp
   
   cherryQtControlWidget.cpp
   cherryQtDisplay.cpp
@@ -44,7 +40,6 @@ SET(INTERNAL_CPP_FILES
   cherryQtShowViewAction.cpp
   cherryQtShowViewDialog.cpp
   cherryQtTracker.cpp
-  cherryQtUIPlugin.cpp
   cherryQtWidgetController.cpp
   cherryQtWidgetsTweaklet.cpp
   cherryQtWidgetsTweakletImpl.cpp
@@ -67,15 +62,11 @@ SET(MOC_H_FILES
   src/internal/cherryQtShowViewAction.h
   src/internal/cherryQtTracker.h
   src/internal/cherryQtWidgetsTweakletImpl.h
-  src/internal/cherryQtLogView.h
-  src/internal/cherryQtPlatformLogModel.h
-  
 )
 
 SET(UI_FILES
   src/internal/cherryQtShowViewDialog.ui
   src/internal/cherryQtStatusPart.ui
-  src/internal/cherryQtLogView.ui
 )
 
 SET(RES_FILES

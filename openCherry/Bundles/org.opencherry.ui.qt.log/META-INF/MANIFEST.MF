@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: openCherry Qt Logging Plug-in
+Bundle-SymbolicName: org.opencherry.ui.qt.log
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: cherry::QtLogPlugin
+Require-Bundle: org.opencherry.ui.qt

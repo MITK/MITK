@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtLogView.h"
 
-#include "cherryQtUIPlugin.h"
+#include "cherryQtLogPlugin.h"
 
 #include <QHeaderView>
 
@@ -30,7 +30,7 @@ QtLogView::QtLogView(QWidget *parent)
 {
 	ui.setupUi(this);
 	
-	model = QtUIPlugin::GetInstance()->GetLogModel();
+	model = QtLogPlugin::GetInstance()->GetLogModel();
 	
   filterModel = new QSortFilterProxyModel(this);
   filterModel->setSourceModel(model);

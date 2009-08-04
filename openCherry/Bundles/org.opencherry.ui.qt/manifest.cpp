@@ -17,9 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIBundleActivator.h>
-#include "src/internal/cherryQtUIPlugin.h"
-
 #include "src/internal/cherryQtWorkbenchTweaklet.h"
 #include "src/internal/cherryQtWorkbenchPageTweaklet.h"
 #include "src/internal/cherryQtDnDTweaklet.h"
@@ -27,12 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/internal/cherryQtImageTweaklet.h"
 #include "src/internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
 
-#include <cherryIViewPart.h>
-#include "src/internal/cherryLogView.h"
-
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::QtUIPlugin)
-POCO_END_MANIFEST
 
 //****  Tweaklets  ****************
 
@@ -56,11 +47,6 @@ POCO_BEGIN_NAMED_MANIFEST(cherryImageTweaklet, cherry::ImageTweaklet)
   POCO_EXPORT_CLASS(cherry::QtImageTweaklet)
 POCO_END_MANIFEST
 
-
-//**** Views  **********************
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(cherry::LogView)
-POCO_END_MANIFEST
 
 //**** Presentation Factories *********
 POCO_BEGIN_NAMED_MANIFEST(cherryIPresentationFactory, cherry::IPresentationFactory)

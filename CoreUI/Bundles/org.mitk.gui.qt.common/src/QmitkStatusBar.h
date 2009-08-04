@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKSTATUSBAR_H
 #include <mitkStatusBarImplementation.h>
 #include <mitkCommon.h>
-#include <qstatusbar.h>
-#include "mitkQtAppDll.h"
+#include <QStatusBar>
+#include "mitkQtCommonDll.h"
 #include <QLabel>
 
 //##Documentation
@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 //##
 //## All mitk-classes will call this class for output:
 //## mitk::StatusBar::GetInstance();
-class MITK_QT_APP QmitkStatusBar : public mitk::StatusBarImplementation
+class MITK_QT_COMMON QmitkStatusBar : public mitk::StatusBarImplementation
 {
 public:
 

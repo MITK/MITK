@@ -1,17 +1,24 @@
 SET(SRC_CPP_FILES
   QmitkDataTreeNodeSelectionProvider.cpp
+  QmitkFileOpenAction.cpp
   QmitkFunctionality.cpp
+  QmitkProgressBar.cpp
+  QmitkStatusBar.cpp
+  QmitkStdMultiWidgetEditor.cpp
 )
 
 SET(INTERNAL_CPP_FILES
   QmitkDataTreeNodeSelection.cpp
+  QmitkDnDFrameWidget.cpp
 )
 
 SET(MOC_H_FILES
-  
+  src/QmitkFileOpenAction.h
+  src/QmitkProgressBar.h
+  src/internal/QmitkDnDFrameWidget.h
 )
 
-#SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIWorkbenchWindow.h>
 
 #include <internal/cherryQtShowViewAction.h>
-#include "QmitkFileOpenAction.h"
+#include <QmitkFileOpenAction.h>
 
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>

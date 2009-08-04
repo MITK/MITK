@@ -1,25 +1,16 @@
 SET(SRC_CPP_FILES
   QmitkApplication.cpp
   QmitkDefaultPerspective.cpp
-  QmitkStdMultiWidgetEditor.cpp
-  QmitkStatusBar.cpp
-  QmitkProgressBar.cpp
-
-  
 )
 
 SET(INTERNAL_CPP_FILES
   QmitkActionBarAdvisor.cpp
-  QmitkFileOpenAction.cpp
   QmitkWorkbenchAdvisor.cpp
   QmitkWorkbenchWindowAdvisor.cpp
-  QmitkDnDFrameWidget.cpp
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkFileOpenAction.h
-  src/QmitkProgressBar.h
-  src/internal/QmitkDnDFrameWidget.h
+  
 )
 
 # todo: add some qt style sheet resources

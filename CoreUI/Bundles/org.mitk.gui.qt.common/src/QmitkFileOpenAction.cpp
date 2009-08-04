@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
 
-#include "../QmitkStdMultiWidgetEditor.h"
+#include "QmitkStdMultiWidgetEditor.h"
 
 QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
 : QAction(0)

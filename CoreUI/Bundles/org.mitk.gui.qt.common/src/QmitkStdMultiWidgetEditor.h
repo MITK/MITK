@@ -24,9 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStdMultiWidget.h>
 #include <internal/QmitkDnDFrameWidget.h>
 
-#include "mitkQtAppDll.h"
+#include "mitkQtCommonDll.h"
 
-class MITK_QT_APP QmitkStdMultiWidgetEditor : public cherry::QtEditorPart, virtual public cherry::IPartListener
+class MITK_QT_COMMON QmitkStdMultiWidgetEditor : public cherry::QtEditorPart, virtual public cherry::IPartListener
 {
 public:
   cherryObjectMacro(QmitkStdMultiWidgetEditor);

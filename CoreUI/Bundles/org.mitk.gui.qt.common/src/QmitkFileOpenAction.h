@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QAction>
 
+#include "mitkQtCommonDll.h"
+
 #include <cherryIWorkbenchWindow.h>
 
-class QmitkFileOpenAction : public QAction
+class MITK_QT_COMMON QmitkFileOpenAction : public QAction
 {
   Q_OBJECT
 

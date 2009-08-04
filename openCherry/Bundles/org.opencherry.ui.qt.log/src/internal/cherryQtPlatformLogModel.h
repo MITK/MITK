@@ -117,6 +117,12 @@ private:
   std::vector<ExtendedLogMessage> m_Entries;
   std::list<ExtendedLogMessage> *m_Active,*m_Pending;
   
+  static const QString Error;
+  static const QString Warn;
+  static const QString Fatal;
+  static const QString Info;
+  static const QString Debug;
+
   QMutex m_Mutex;
   
   signals:

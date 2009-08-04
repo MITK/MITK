@@ -31,6 +31,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
+const QString QtPlatformLogModel::Error = QString("Error");
+const QString QtPlatformLogModel::Warn = QString("Warn");
+const QString QtPlatformLogModel::Fatal = QString("Fatal");
+const QString QtPlatformLogModel::Info = QString("Info");
+const QString QtPlatformLogModel::Debug = QString("Debug");
+
 void QtPlatformLogModel::slotFlushLogEntries()
 {
   m_Mutex.lock();
@@ -162,31 +168,24 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
       
       case 1: 
         {
-          char *level;
           switch(msg->message.level)
           {
             default:
             case mbilog::Info:
-              level="INFO";
-              break;
-          
+              return QVariant(Info);
+
             case mbilog::Warn:
-              level="WARN";
-              break;
+              return QVariant(Warn);
               
             case mbilog::Error:
-              level="ERROR";
-              break;
+              return QVariant(Error);
               
             case mbilog::Fatal:
-              level="FATAL";
-              break;
+              return QVariant(Fatal);
               
             case mbilog::Debug:
-              level="DEBUG";
-              break;
+              return QVariant(Debug);
           }
-          return QVariant(QString(level));
         }
         
       case 2: 

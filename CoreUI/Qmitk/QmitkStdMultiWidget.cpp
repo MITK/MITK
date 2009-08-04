@@ -171,6 +171,9 @@ m_Node(NULL)
 
   //Initialize the widgets.
   this->InitializeWidget();
+
+  //Activate Widget Menu
+  this->ActivateMenuWidget( true );
 }
 
 void QmitkStdMultiWidget::InitializeWidget()

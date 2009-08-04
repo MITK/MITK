@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
-: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(true)
+: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(false)
 {
   if(m_Renderer.IsNull())
   {

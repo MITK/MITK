@@ -4,7 +4,7 @@
 #include <cmath>
 
 iil4mitkPicImage::iil4mitkPicImage (unsigned int size)
-        : iil4mitkImage(size), _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false)
+        : iil4mitkImage(size), _pic (NULL), _min (0.0), _max (0.0), _colors (NULL), _binary (false), _mask (false), _outline(false), _outlineWidth(1.0)
 {
 }
 
@@ -108,6 +108,15 @@ iil4mitkPicImage::setOutline (const bool on)
 		_outline = on;
 	}
 }
+
+void 
+iil4mitkPicImage::setOutlineWidth(float width)
+{
+	if (_binary) {
+		_outlineWidth = width;
+	}
+}
+
 
 bool 
 iil4mitkPicImage::outline () const
@@ -496,6 +505,7 @@ iil4mitkPicImage::display (iil4mitkWidget* widget)
         glColor4f ( red(), green(), blue(), alpha() );
         //glColor4f( 1.0, 0.0, 0.0, 1.0 );
         glTranslatef( x(), y(), 0.0 );
+        glLineWidth(_outlineWidth);
         glBegin( GL_LINES );
 		
 		int line = _pic->n[0];
@@ -529,6 +539,7 @@ iil4mitkPicImage::display (iil4mitkWidget* widget)
 			}
 		}
         glEnd ();
+        glLineWidth(1.0f);
         glPopMatrix ();
 	}
 }

@@ -917,6 +917,11 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     if (this->GetDataTreeNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
     {
       image->setOutline(binaryOutline);
+      float binaryOutlineWidth(1.0);
+      if (this->GetDataTreeNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+      {
+        image->setOutlineWidth(binaryOutlineWidth);
+      }
     }
   }
   else 
@@ -1131,6 +1136,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
   // Properties common for both images and segmentations
   node->AddProperty( "use color", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "outline binary", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "outline width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
   else node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)

@@ -101,6 +101,11 @@ public:
 	to be displayed as outline. Only possible with binary data!
     */
     void setOutline (const bool on);
+    /*!
+	\brief Sets the line width used to draw the binary
+	outline. Requires the outline flag to be set via setOutline(true) first.
+    */
+    void setOutlineWidth (float width);
 
     /*!
 	\brief Checks if the outline flag is set.
@@ -171,6 +176,10 @@ private:
 	will be displayed with lines showing the outline.
 	*/
 	bool _outline;
+	/*!
+	\brief If the outline flag is set, this attribute controls the line width
+	*/
+	float _outlineWidth;
 };
 
 #endif

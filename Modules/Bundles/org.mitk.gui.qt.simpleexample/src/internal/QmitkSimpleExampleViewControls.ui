@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>208</width>
-    <height>585</height>
+    <width>231</width>
+    <height>610</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -137,20 +137,21 @@
      <item>
       <layout class="QVBoxLayout">
        <item>
-        <spacer name="spacer2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <widget class="QPushButton" name="m_TakeScreenshotBtn">
+         <property name="text">
+          <string>Take Screenshot</string>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_TakeHighResScreenShotBtn">
+         <property name="toolTip">
+          <string>Screenshot will be 4 times larger than current render window size</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
+         <property name="text">
+          <string>Take HighDef 3D Screenshot</string>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="genMovieButton">

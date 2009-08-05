@@ -30,8 +30,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateNOT.h"
 #include "mitkProperties.h"
 #include <QmitkStepperAdapter.h>
-#include <qfiledialog.h>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QDir>
+
+
 #include <vtkRenderWindow.h>
+#include "vtkImageWriter.h"
+#include "vtkPNGWriter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkRenderLargeImage.h"
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
@@ -85,6 +93,8 @@ void QmitkSimpleExampleView::CreateConnections()
     connect(m_Controls->m_RenderWindow2Button, SIGNAL(clicked()), this, SLOT(OnRenderWindow2Clicked()) );
     connect(m_Controls->m_RenderWindow3Button, SIGNAL(clicked()), this, SLOT(OnRenderWindow3Clicked()) );
     connect(m_Controls->m_RenderWindow4Button, SIGNAL(clicked()), this, SLOT(OnRenderWindow4Clicked()) );
+    connect(m_Controls->m_TakeScreenshotBtn, SIGNAL(clicked()), this, SLOT(OnTakeScreenshot()) );
+    connect(m_Controls->m_TakeHighResScreenShotBtn, SIGNAL(clicked()), this, SLOT(OnTakeHighResolutionScreenshot()) );
   }
 }
 
@@ -209,4 +219,77 @@ void QmitkSimpleExampleView::OnRenderWindow4Clicked()
   m_Controls->m_RenderWindow2Button->setChecked(false);
   m_Controls->m_RenderWindow3Button->setChecked(false);
   m_Controls->m_RenderWindow1Button->setChecked(false);
+}
+
+
+void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
+{
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+
+  QmitkRenderWindow* renWin = m_MultiWidget->GetRenderWindow4(); // high res is always the 3D view
+  if (renWin == NULL)
+    return;
+
+  vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
+  if (renderer == NULL)
+    return;
+  this->TakeScreenshot(renderer, 4, fileName);
+}
+
+void QmitkSimpleExampleView::OnTakeScreenshot()
+{
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  
+  QmitkRenderWindow* renWin = this->GetMovieRenderWindow();
+  if (renWin == NULL)
+    return;
+
+  vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
+  if (renderer == NULL)
+    return;
+  this->TakeScreenshot(renderer, 1, fileName);
+}
+
+
+void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
+{
+  if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
+    return;
+
+  vtkImageWriter* fileWriter;
+
+  QFileInfo fi(fileName);
+  QString suffix = fi.suffix();
+  if (suffix.compare("png", Qt::CaseInsensitive) == 0)
+  {
+    fileWriter = vtkPNGWriter::New();
+  }
+  else  // default is jpeg
+  {
+    vtkJPEGWriter* w = vtkJPEGWriter::New();
+    w->SetQuality(100);
+    w->ProgressiveOff();
+    fileWriter = w;
+  }
+  vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
+  magnifier->SetInput(renderer);
+  magnifier->SetMagnification(magnificationFactor);
+  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetFileName(fileName.toLatin1());
+
+  // vtkRenderLargeImage has problems with different layers, therefore we have to 
+  // temporarily deactivate all other layers.
+  // we set the background to white, because it is nicer than black...
+  double oldBackground[3];
+  renderer->GetBackground(oldBackground);
+  double white[] = {1.0, 1.0, 1.0};
+  renderer->SetBackground(white);
+  m_MultiWidget->DisableColoredRectangles();
+  m_MultiWidget->DisableDepartmentLogo();
+  m_MultiWidget->DisableGradientBackground();
+  fileWriter->Write();  
+  m_MultiWidget->EnableColoredRectangles();
+  m_MultiWidget->EnableDepartmentLogo();
+  m_MultiWidget->EnableGradientBackground();
+  renderer->SetBackground(oldBackground);
 }

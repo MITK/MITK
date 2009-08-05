@@ -88,18 +88,17 @@ protected slots:
   void OnRenderWindow2Clicked();
   void OnRenderWindow3Clicked();
   void OnRenderWindow4Clicked();
-
+  void OnTakeHighResolutionScreenshot(); ///< takes screenshot of the 3D window in 4x resolution of the render window
+  void OnTakeScreenshot(); ///< takes screenshot of the selected render window
+ 
 protected:
 
   Ui::QmitkSimpleExampleViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
+  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName); ///< writes a screenshot in JPEG or PNG format to the file fileName
+
   bool m_NavigatorsInitialized;
 };
-
-
-
-
 #endif // _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
-

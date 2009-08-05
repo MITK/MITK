@@ -32,22 +32,21 @@ void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension
       count++;
     }
   }
-  if (m_Image->GetDimension() == 3) 
+  if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 3) 
   {
-    Vector3D spacing = m_Image->GetSlicedGeometry()->GetSpacing();
-    m_Volume = count / 1000.0 * spacing[0] * spacing[1] * spacing[2];
+    m_Volume = count / 1000.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1] * itkImage->GetSpacing()[2];
   } 
-  else if (m_Image->GetDimension() == 2) 
+  else if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 2) 
   {
-    Vector3D spacing = m_Image->GetGeometry()->GetSpacing();
-    m_Volume = count / 100.0 * spacing[0] * spacing[1];
+    m_Volume = count / 100.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1];
   }
   m_VoxelCount = count;
 }
 
 mitk::VolumeCalculator::VolumeCalculator() 
 : m_Image(NULL), 
-  m_Threshold(0)
+  m_Threshold(0),
+  m_Volume(0)
 {
   m_TimeSelector = ImageTimeSelector::New();
 }

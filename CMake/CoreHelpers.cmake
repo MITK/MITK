@@ -371,7 +371,7 @@ IF(BUILD_TESTING)
     ELSE(EXISTS ${image})
       # todo: maybe search other paths as well
       # yes, please in mitk/Testing/Data, too
-      SET(IMAGE_FULL_PATH ${MITK_SOURCE_DIR}/Core/Testing/Data/${image})
+      SET(IMAGE_FULL_PATH ${MITK_SOURCE_DIR}/Core/Code/Testing/Data/${image})
     ENDIF(EXISTS ${image})
 
     IF(EXISTS ${IMAGE_FULL_PATH})

@@ -22,11 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryQtViewPart.h"
 
-#include "../cherryUiQtDll.h"
-
 namespace cherry {
 
-class CHERRY_UI_QT LogView : public QtViewPart
+class LogView : public QtViewPart
 {
 public:
 

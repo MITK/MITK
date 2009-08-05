@@ -21,15 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QtGui/QWidget>           
 #include <QSortFilterProxyModel>
 
-#include "../cherryUiQtDll.h"
-
 #include "ui_cherryQtLogView.h"
 
 #include "cherryQtPlatformLogModel.h"
 
 namespace cherry {
 
-class CHERRY_UI_QT QtLogView : public QWidget
+class QtLogView : public QWidget
 {
     Q_OBJECT
     

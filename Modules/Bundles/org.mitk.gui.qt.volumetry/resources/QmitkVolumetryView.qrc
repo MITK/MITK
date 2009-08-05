@@ -1,0 +1,5 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/QmitkVolumetryView">
+     <file>volumetryIcon.xpm</file>
+ </qresource>
+ </RCC>

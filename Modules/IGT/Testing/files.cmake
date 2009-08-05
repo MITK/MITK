@@ -13,6 +13,8 @@ SET(MODULE_TESTS
    mitkNavigationDataToPointSetFilterTest.cpp
    mitkNavigationDataTransformFilterTest.cpp  
    mitkNDIPassiveToolTest.cpp
+   mitkNDIProtocolTest.cpp
+   mitkNDITrackingDeviceTest.cpp
    mitkTimeStampTest.cpp
    #mitkTrackingDeviceSourceTest.cpp
    mitkTrackingVolumeTest.cpp

@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 
+#include "mitkStandardFileLocations.h"
+
 #include <iostream>
 
 /**Documentation
@@ -31,10 +33,12 @@ class NDIPassiveToolTestClass : public mitk::NDIPassiveTool
 {
 public:
   mitkClassMacro(NDIPassiveToolTestClass, NDIPassiveTool);
+
   /** make a public constructor, so that the test is able
   *   to instantiate NDIPassiveTool
   */
   itkNewMacro(Self);
+
 protected:
   NDIPassiveToolTestClass() : mitk::NDIPassiveTool()  
   {
@@ -42,8 +46,8 @@ protected:
 };
 
 /**Documentation
- *  Test for mitk::NDIPassiveTool
- */
+*  Test for mitk::NDIPassiveTool
+*/
 int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
@@ -51,22 +55,33 @@ int mitkNDIPassiveToolTest(int /* argc */, char* /*argv*/[])
 
   // let's create an object of our class  
   mitk::NDIPassiveTool::Pointer myNDIPassiveTool = NDIPassiveToolTestClass::New().GetPointer();
-  
-  // first test: did this work?
+
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myNDIPassiveTool.IsNotNull(),"Testing instantiation");
 
-    myNDIPassiveTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
+  myNDIPassiveTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
   MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::NDIPassiveTool::Dynamic,"Testing Set/GetTrackingPriority() with 'Dynamic'");
+
   myNDIPassiveTool->SetTrackingPriority(mitk::NDIPassiveTool::ButtonBox);
   MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::NDIPassiveTool::ButtonBox,"Testing Set/GetTrackingPriority() with 'ButtonBox'");
+
   myNDIPassiveTool->SetTrackingPriority(mitk::NDIPassiveTool::Static);
   MITK_TEST_CONDITION(myNDIPassiveTool->GetTrackingPriority()==mitk::NDIPassiveTool::Static,"Testing Set/GetTrackingPriority() with 'Static'");
 
-  // write your own tests here and use the macros from mitkTestingMacros.h !!!
-  // do not write to std::cout and do not return from this function yourself!
-  
+  std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
+  const char *name = file.c_str();
+  const char *name2 = "";
+  MITK_TEST_CONDITION(myNDIPassiveTool->LoadSROMFile(name) == true ,"Test LoadSROMFile() with valid file")
+
+  const unsigned char *temp = myNDIPassiveTool->GetSROMData();
+  unsigned int templen = myNDIPassiveTool->GetSROMDataLength();
+
+  MITK_TEST_CONDITION(myNDIPassiveTool->LoadSROMFile(name2) == false ,"Test LoadSROMFile() without file")
+
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMData()== temp, "Test GetSROMData() returns same after failed load") 
+  MITK_TEST_CONDITION(myNDIPassiveTool->GetSROMDataLength()== templen,"Test GetSROMDataLength() returns same after failed load") 
+
   // always end with this!
   MITK_TEST_END();
 }

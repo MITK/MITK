@@ -12,8 +12,8 @@ IF(MITK_USE_OPENCHERRY)
   ENDIF()
   
   SET(PLUGIN_EXCLUDE_LIST 
-    # movie maker module not working yet
-    #org.mitk.gui.qt.moviemaker
+    # simple example compile error
+    org.mitk.gui.qt.simpleexample
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

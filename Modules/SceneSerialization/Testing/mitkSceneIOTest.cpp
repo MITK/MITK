@@ -37,7 +37,7 @@ static std::string LocateFile(const std::string& filename)
 {
   mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
   MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
-  return locator->FindFile(filename.c_str(), "Core/Testing/Data");
+  return locator->FindFile(filename.c_str(), "Core/Code/Testing/Data");
 }
 
 static mitk::BaseData::Pointer LoadBaseData(const std::string& filename)

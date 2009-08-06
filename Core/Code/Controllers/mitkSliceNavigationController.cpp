@@ -41,6 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStatusBar.h"
 #include <ipPicTypeMultiplex.h>
 
+#include "mitkMemoryUtilities.h"
+
 
 #include <itkCommand.h>
 
@@ -645,23 +647,27 @@ SliceNavigationController
                     }
                   }
                 }
+                
+                std::stringstream stream;
+                    
                 // get the position and gray value from the image and build up status bar text
                 mitk::Point3D p;
                 if(image3D.IsNotNull())
                 {
                   image3D->GetGeometry()->WorldToIndex(posEvent->GetWorldPosition(), p);
-                  {
-                    std::stringstream stream;
-                    stream<<"Position: <"<<floor(p[0] * 100.0 + .5)/100.0<<"; "<<floor(p[1] * 100.0 + .5)/100.0<<"; "<<floor(p[2] * 100.0 + .5)/100.0<<"> mm";
-                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValue(p, baseRenderer->GetTimeStep())<<"  ";
-                    statusText = stream.str(); 
-                  }                  
-                  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+                  stream<<"Position: <"<<floor(p[0] * 100.0 + .5)/100.0<<"; "<<floor(p[1] * 100.0 + .5)/100.0<<"; "<<floor(p[2] * 100.0 + .5)/100.0<<"> mm";
+                  stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValue(p, baseRenderer->GetTimeStep())<<"  ";
                 }
                 else
                 {
-                  mitk::StatusBar::GetInstance()->DisplayGreyValueText("No image information at this position!");
+                  stream << "No image information at this position!";
                 }
+
+                stream << " (" << mitk::MemoryUtilities::GetProcessMemoryUsage() / (1024.0*1024.0) << "mb usage)";
+
+                statusText = stream.str(); 
+                mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+             
               }
 
             }

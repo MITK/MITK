@@ -16,6 +16,7 @@ SET(MODULE_TESTS
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
   mitkImageTest.cpp
+  mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp

@@ -159,6 +159,10 @@ public slots:
   void EnableDepartmentLogo();
 
   void DisableDepartmentLogo();
+  
+  void EnableColoredRectangles();
+
+  void DisableColoredRectangles();
 
   void SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer=NULL);
 

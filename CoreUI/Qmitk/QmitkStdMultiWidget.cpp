@@ -1836,3 +1836,18 @@ void QmitkStdMultiWidget::ResetCrosshair()
   }
 }
 
+void QmitkStdMultiWidget::EnableColoredRectangles()
+{
+  m_RectangleRendering1->Enable(1.0, 0.0, 0.0);
+  m_RectangleRendering2->Enable(0.0, 1.0, 0.0);
+  m_RectangleRendering3->Enable(0.0, 0.0, 1.0);
+  m_RectangleRendering4->Enable(1.0, 1.0, 0.0);
+}
+
+void QmitkStdMultiWidget::DisableColoredRectangles()
+{
+  m_RectangleRendering1->Disable();
+  m_RectangleRendering2->Disable();
+  m_RectangleRendering3->Disable();
+  m_RectangleRendering4->Disable();
+}

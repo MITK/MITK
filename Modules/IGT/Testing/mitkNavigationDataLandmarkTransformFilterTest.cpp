@@ -242,6 +242,57 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     mitk::Equal(output1->GetOrientation(), resultQuat),
     "Testing ND1 orientation correctly transformed ");
   
+  //------------------------test FRE calculation------------------------
+  mitk::PointSet::Pointer refSet = mitk::PointSet::New();
+  mitk::PointSet::Pointer movSet = mitk::PointSet::New();
+
+  mitk::Point3D refPoint;
+  mitk::Point3D movPoint;
+
+  //Point 0
+  refPoint.Fill(0); refSet->SetPoint(0, refPoint);
+  movPoint.Fill(1); movSet->SetPoint(0, movPoint);
+
+  //Point 1
+  refPoint[0]=3; refPoint[1]=0; refPoint[2]=0; refSet->SetPoint(1, refPoint);
+  movPoint[0]=2; movPoint[1]=1; movPoint[2]=1; movSet->SetPoint(1, movPoint);
+
+  //Point 2
+  refPoint[0]=0; refPoint[1]=0; refPoint[2]=3; refSet->SetPoint(2, refPoint);
+  movPoint[0]=1; movPoint[1]=1; movPoint[2]=2; movSet->SetPoint(2, movPoint);
+
+  //Point 3
+  refPoint[0]=3; refPoint[1]=0; refPoint[2]=3; refSet->SetPoint(3, refPoint);
+  movPoint[0]=2; movPoint[1]=1; movPoint[2]=2; movSet->SetPoint(3, movPoint);
+
+
+  //Point 4
+  refPoint[0]=0; refPoint[1]=3; refPoint[2]=0; refSet->SetPoint(4, refPoint);
+  movPoint[0]=1; movPoint[1]=2; movPoint[2]=1; movSet->SetPoint(4, movPoint);
+
+  //Point 5
+  refPoint[0]=3; refPoint[1]=3; refPoint[2]=0; refSet->SetPoint(5, refPoint);
+  movPoint[0]=2; movPoint[1]=2; movPoint[2]=1; movSet->SetPoint(5, movPoint);
+
+  //Point 6
+  refPoint[0]=0; refPoint[1]=3; refPoint[2]=3; refSet->SetPoint(6, refPoint);
+  movPoint[0]=1; movPoint[1]=2; movPoint[2]=2; movSet->SetPoint(6, movPoint);
+
+  //Point 7
+  refPoint[0]=3; refPoint[1]=3; refPoint[2]=3; refSet->SetPoint(7, refPoint);
+  movPoint[0]=2; movPoint[1]=2; movPoint[2]=2; movSet->SetPoint(7, movPoint);
+
+  mitk::NavigationDataLandmarkTransformFilter::Pointer myFREFilter = mitk::NavigationDataLandmarkTransformFilter::New();
+  myFREFilter->SetSourcePoints(refSet);
+  myFREFilter->SetTargetPoints(movSet);
+  
+  MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFRE() == (float) sqrt(3.0),"Testing mean error calculation")
+  MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMaxError() == (float) sqrt(3.0),"Testing mean error calculation")
+  MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMinError() == (float) sqrt(3.0),"Testing mean error calculation")
+  MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetRMSError() == (float) sqrt(3.0),"Testing mean error calculation")
+  MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFREStdDev() == (float) 0.0,"Testing mean error calculation")
+
+
     // always end with this!
   MITK_TEST_END();
 

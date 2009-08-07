@@ -53,7 +53,7 @@ void QmitkPointListView::SetPointSet( mitk::PointSet* pointSet )
   m_PointListModel->SetPointSet( pointSet );
 }
 
-const mitk::PointSet* QmitkPointListView::GetPointSet()
+const mitk::PointSet* QmitkPointListView::GetPointSet() const
 {
   return m_PointListModel->GetPointSet();
 }
@@ -62,6 +62,13 @@ void QmitkPointListView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_MultiWidget = multiWidget;
 }
+
+
+QmitkStdMultiWidget* QmitkPointListView::GetMultiWidget() const
+{
+  return m_MultiWidget;
+}
+
 
 void QmitkPointListView::OnPointSetSelectionChanged()
 {
@@ -137,4 +144,3 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
-

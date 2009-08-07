@@ -50,10 +50,11 @@ class QMITK_EXPORT QmitkPointListView : public QListView
     void SetPointSet( mitk::PointSet* pointSet );
 
     /// which point set to work on
-    const mitk::PointSet* GetPointSet();
+    const mitk::PointSet* GetPointSet() const;
     
     /// assign a QmitkStdMultiWidget for updating render window crosshair
     void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
+    QmitkStdMultiWidget* GetMultiWidget() const;
   
   protected slots:
 

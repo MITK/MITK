@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class WheelEvent;
-
 class MITK_CORE_EXPORT BaseEvent 
 {
 public:
@@ -41,6 +39,7 @@ protected:
 };
 
 typedef DisplayPositionEvent MouseEvent;
+typedef DisplayPositionEvent WheelEvent;
 
 class MITK_CORE_EXPORT KeyEvent : public BaseEvent 
 {

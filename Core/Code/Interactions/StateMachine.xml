@@ -24,6 +24,8 @@
     <event NAME="CTRL+rightBN" ID="7" TYPE="Type_MouseButtonPress" BUTTON="BS_RightButton" BUTTONSTATE="0x0200" KEY="Key_none" />
     <!-- left MouseButton DoubleClick-->
     <event NAME="left MouseBN DC" ID="8" TYPE="Type_MouseButtonDblClick" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!-- MouseWheel-->
+    <event NAME="MouseWheel" ID="9" TYPE="Type_Wheel" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- Strg + N -->
     <event NAME="Strg + N" ID="10" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0200" KEY="Key_N" />
     <!-- Strg + E -->
@@ -2899,6 +2901,40 @@
       </transition>
       <transition NAME="delete" NEXT_STATE_ID="0" EVENT_ID="12">
         <action ID="103" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="OnePointMouseMoveInteraction">
+    <state NAME="empty" ID="0" START_STATE="TRUE">
+      <transition NAME="mousemove" NEXT_STATE_ID="1" EVENT_ID="520">
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+        <action ID="10" /> <!-- Add Point -->
+      </transition>
+      <transition NAME="mousewheelmove" NEXT_STATE_ID="1" EVENT_ID="9">
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
+        <action ID="10" />
+        <!-- Add Point -->
+      </transition>
+      <transition NAME="deleteSafety" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="103" /> <!-- Remove Point -->
+        <action ID="1100" /> <!--AcMODEDESELECT-->
+      </transition>
+    </state>
+    <state NAME="point available" ID="1">
+      <transition NAME="mousemove" NEXT_STATE_ID="1" EVENT_ID="520">
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+        <action ID="103" /> <!-- Remove Point -->
+        <action ID="10" /> <!-- Add Point -->
+      </transition>
+      <transition NAME="mousewheelmove" NEXT_STATE_ID="1" EVENT_ID="9">
+        <action ID="1101" /> <!--AcMODE_SELECT-->
+        <action ID="103" /> <!-- Remove Point -->
+        <action ID="10" /> <!-- Add Point -->
+      </transition>
+      <transition NAME="delete" NEXT_STATE_ID="0" EVENT_ID="12">
+        <action ID="103" /> <!-- Remove Point -->
+        <action ID="1100" /> <!--AcMODEDESELECT-->
       </transition>
     </state>
   </stateMachine>

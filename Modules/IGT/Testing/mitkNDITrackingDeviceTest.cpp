@@ -95,16 +95,16 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( (myNDITrackingDevice->RemoveTool(testtool)), "Testing RemoveTool()for tool 0.");
 
   //SetOperationMode(OperationMode mode)
-  MITK_TEST_CONDITION( (myNDITrackingDevice->SetOperationMode( mitk::OperationMode::MarkerTracking3D )==true ), "Testing behavior of method SetOperationMode().\n");
+  MITK_TEST_CONDITION( (myNDITrackingDevice->SetOperationMode( mitk::MarkerTracking3D )== true ), "Testing behavior of method SetOperationMode().\n");
 
   //GetOperationMode()
-  myNDITrackingDevice->SetOperationMode(mitk::OperationMode::MarkerTracking3D);
+  myNDITrackingDevice->SetOperationMode(mitk::MarkerTracking3D);
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==2),"" );
 
-  myNDITrackingDevice->SetOperationMode(mitk::OperationMode::ToolTracking5D);
+  myNDITrackingDevice->SetOperationMode(mitk::ToolTracking5D);
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==1),"" );
 
-  myNDITrackingDevice->SetOperationMode(mitk::OperationMode::HybridTracking);
+  myNDITrackingDevice->SetOperationMode(mitk::HybridTracking);
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==3), "Testing behavior of method GetOperationMode().\n");
 
   //GetMarkerPositions(MarkerPointContainerType* markerpositions)

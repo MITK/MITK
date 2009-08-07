@@ -1113,6 +1113,77 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
   this->UpdateAllWidgets();
 }
 
+void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
+{
+  std::cout << "changing layout to 2D up and 3D down" << std::endl;
+
+  //Hide all Menu Widgets
+  this->HideAllWidgetToolbars();
+
+  delete QmitkStdMultiWidgetLayout ;
+
+  //create Main Layout
+  QmitkStdMultiWidgetLayout =  new QHBoxLayout( this );
+
+  //Set Layout to widget
+  this->setLayout(QmitkStdMultiWidgetLayout);
+
+  //create main splitter
+  m_MainSplit = new QSplitter( this );
+  QmitkStdMultiWidgetLayout->addWidget( m_MainSplit );
+
+  //create m_LayoutSplit  and add to the mainSplit
+  m_LayoutSplit = new QSplitter( Qt::Vertical, m_MainSplit );
+  m_MainSplit->addWidget( m_LayoutSplit );
+
+  //add LevelWindow Widget to mainSplitter
+  m_MainSplit->addWidget( levelWindowWidget );
+
+  //create m_SubSplit1 and m_SubSplit2  
+  m_SubSplit1 = new QSplitter( m_LayoutSplit );
+  m_SubSplit2 = new QSplitter( m_LayoutSplit );
+
+  //insert Widget Container into splitter top
+  m_SubSplit1->addWidget( mitkWidget1Container );
+
+  //set SplitterSize for splitter top
+   QList<int> splitterSize;
+//   splitterSize.push_back(1000);
+//   splitterSize.push_back(1000);
+//   splitterSize.push_back(1000);
+//   m_SubSplit1->setSizes( splitterSize );
+
+  //insert Widget Container into splitter bottom
+  m_SubSplit2->addWidget( mitkWidget4Container );
+
+  //set SplitterSize for splitter m_LayoutSplit
+  splitterSize.clear();
+  splitterSize.push_back(700);
+  splitterSize.push_back(700);
+  m_LayoutSplit->setSizes( splitterSize );
+
+  //show mainSplitt
+  m_MainSplit->show();
+
+  //show/hide Widgets
+  if ( mitkWidget1->isHidden() ) mitkWidget1->show();
+  mitkWidget2->hide();
+  mitkWidget3->hide();
+  if ( mitkWidget4->isHidden() ) mitkWidget4->show();
+
+  m_Layout = LAYOUT_2D_UP_AND_3D_DOWN;
+
+  //update Layout Design List
+  mitkWidget1->LayoutDesignListChanged( LAYOUT_2D_UP_AND_3D_DOWN );
+  mitkWidget2->LayoutDesignListChanged( LAYOUT_2D_UP_AND_3D_DOWN );
+  mitkWidget3->LayoutDesignListChanged( LAYOUT_2D_UP_AND_3D_DOWN );
+  mitkWidget4->LayoutDesignListChanged( LAYOUT_2D_UP_AND_3D_DOWN );
+
+  //update all Widgets
+  this->UpdateAllWidgets();
+}
+
+
 
 void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 {

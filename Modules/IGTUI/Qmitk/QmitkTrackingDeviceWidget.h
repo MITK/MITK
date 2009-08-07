@@ -15,7 +15,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
+/*
 #ifndef QMITKTRACKINGDEVICEWIDGET_H
 #define QMITKTRACKINGDEVICEWIDGET_H
 
@@ -30,3 +30,4 @@ class mitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget
 };
 
 #endif
+*/

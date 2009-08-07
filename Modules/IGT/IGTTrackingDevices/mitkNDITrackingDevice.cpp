@@ -48,28 +48,35 @@ m_ErrorMessage(""), m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTr
 
 bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
 {
-  mitk::NDIPassiveTool* ndiTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
-  if (ndiTool == NULL)
-    return false;
+  if (this->GetMode() != Setup)
+  {
+    mitk::NDIPassiveTool* ndiTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
+    if (ndiTool == NULL)
+      return false;
 
-  std::string portHandle = ndiTool->GetPortHandle();
+    std::string portHandle = ndiTool->GetPortHandle();
 
-  //return false if the SROM Data has not been set
-  if (ndiTool->GetSROMData() == NULL)
-    return false;
-  
-  NDIErrorCode returnvalue;
-  returnvalue = m_DeviceProtocol->PVWR(&portHandle, ndiTool->GetSROMData(), ndiTool->GetSROMDataLength());
-  if (returnvalue != NDIOKAY)
-    return false;
-  returnvalue = m_DeviceProtocol->PINIT(&portHandle);
-  if (returnvalue != NDIOKAY)
-    return false;
-  returnvalue = m_DeviceProtocol->PENA(&portHandle, ndiTool->GetTrackingPriority()); // Enable tool
-  if (returnvalue != NDIOKAY)
-    return false;
+    //return false if the SROM Data has not been set
+    if (ndiTool->GetSROMData() == NULL)
+      return false;
 
-  return true;
+    NDIErrorCode returnvalue;
+    returnvalue = m_DeviceProtocol->PVWR(&portHandle, ndiTool->GetSROMData(), ndiTool->GetSROMDataLength());
+    if (returnvalue != NDIOKAY)
+      return false;
+    returnvalue = m_DeviceProtocol->PINIT(&portHandle);
+    if (returnvalue != NDIOKAY)
+      return false;
+    returnvalue = m_DeviceProtocol->PENA(&portHandle, ndiTool->GetTrackingPriority()); // Enable tool
+    if (returnvalue != NDIOKAY)
+      return false;
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 
@@ -853,7 +860,14 @@ unsigned int mitk::NDITrackingDevice::GetToolCount() const
 
 bool mitk::NDITrackingDevice::Beep(unsigned char count)
 {
-  return (m_DeviceProtocol->BEEP(count) == NDIOKAY);
+  if (this->GetMode() != Setup)
+  {
+    return (m_DeviceProtocol->BEEP(count) == NDIOKAY);
+  }
+  else
+  {
+    return false;
+  }
 }
 
 mitk::TrackingTool* mitk::NDITrackingDevice::AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )

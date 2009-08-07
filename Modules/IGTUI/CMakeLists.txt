@@ -1,0 +1,10 @@
+MITK_CREATE_MODULE(MitkIGTUI
+  INCLUDE_DIRS Qmitk
+  DEPENDS MitkIGT Qmitk
+  PROVIDES mitkIGTUI
+)
+
+## create IGTUI config
+CONFIGURE_FILE(mitkIGTUIConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTUIConfig.h @ONLY)
+
+

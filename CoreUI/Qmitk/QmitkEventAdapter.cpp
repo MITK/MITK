@@ -60,6 +60,36 @@ QmitkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mous
   return mitkEvent;
 }
 
+mitk::WheelEvent 
+QmitkEventAdapter::AdaptWheelEvent(mitk::BaseRenderer* sender, QWheelEvent* wheelEvent)
+{
+  mitk::Point2D p;
+  p[0] = wheelEvent->x(); 
+  p[1] = wheelEvent->y();
+
+  int modifiers = wheelEvent->modifiers();
+  int state = 0;
+
+  state = wheelEvent->buttons();
+
+  if (modifiers & Qt::ShiftModifier)
+    state |= mitk::BS_ShiftButton;
+  if (modifiers & Qt::ControlModifier)
+    state |= mitk::BS_ControlButton;
+  if (modifiers & Qt::AltModifier)
+    state |= mitk::BS_AltButton;
+  if (modifiers & Qt::MetaModifier)
+    state |= mitk::BS_MetaButton;
+  if (modifiers & Qt::KeypadModifier)
+    state |= mitk::BS_Keypad;
+
+  mitk::WheelEvent mitkEvent(sender, wheelEvent->type(), wheelEvent->buttons(), 
+    state, mitk::Key_none, p);
+
+  return mitkEvent;
+}
+
+
 mitk::KeyEvent 
 QmitkEventAdapter::AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& cp)
 {

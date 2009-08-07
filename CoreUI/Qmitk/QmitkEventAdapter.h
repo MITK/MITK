@@ -27,6 +27,7 @@ class QMITK_EXPORT QmitkEventAdapter
 public:
   
   static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mouseEvent);
+  static mitk::MouseEvent AdaptWheelEvent(mitk::BaseRenderer* sender, QWheelEvent* wheelEvent);
   static mitk::KeyEvent AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& point);
 };
 

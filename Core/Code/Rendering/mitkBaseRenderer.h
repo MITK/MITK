@@ -334,7 +334,7 @@ public:
   //##Documentation
   //## @brief Wheel event dispatcher
   //## @note for internal use only. preliminary.
-  virtual void WheelEvent(mitk::WheelEvent*);
+  virtual void WheelEvent(mitk::WheelEvent* we);
   //##Documentation
   //## @brief Key event dispatcher
   //## @note for internal use only. preliminary.

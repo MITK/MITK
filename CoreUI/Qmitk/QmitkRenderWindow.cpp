@@ -169,7 +169,16 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
     stepper->Previous();
   }
 
-  if (m_ResendQtEvents) we->ignore();
+  //also send to Renderer to send if to MITK interaction mechanism
+  QVTKWidget::wheelEvent(we);
+  if (m_Renderer.IsNotNull()) 
+  {
+    mitk::WheelEvent event(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
+    m_Renderer->WheelEvent(&event);
+  }
+
+  if (m_ResendQtEvents) 
+    we->ignore();
 }
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)

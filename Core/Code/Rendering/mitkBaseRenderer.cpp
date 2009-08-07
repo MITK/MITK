@@ -632,10 +632,26 @@ void mitk::BaseRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk:
   GetDisplayGeometry()->Map(worldPoint2D, worldPoint);
 }
 
-void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent *)
+void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
 {
-  //mitk::Event event(this, ke->type(), Qt::NoButton, Qt::NoButton, ke->key());
-  //mitk::EventMapper::MapEvent(&event);
+  if(m_MapperID==1)
+  {
+    Point2D p(we->GetDisplayPosition());
+    Point2D p_mm;
+    Point3D position;
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    GetDisplayGeometry()->DisplayToWorld(p, p_mm);
+    GetDisplayGeometry()->Map(p_mm, position);
+    mitk::PositionEvent event(this, we->GetType(), we->GetButton(), we->GetButtonState(), mitk::Key_unknown, p, position);
+    mitk::EventMapper::MapEvent(&event);
+  }
+  else if(m_MapperID==2)
+  {
+    Point2D p(we->GetDisplayPosition());
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    we->SetDisplayPosition(p);
+    mitk::EventMapper::MapEvent(we);
+  }
 }
 
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)

@@ -97,6 +97,8 @@ void QmitkPointListModel::ObserveNewPointset( const mitk::PointSet* pointSet )
 void QmitkPointListModel::OnPointSetChanged( const itk::EventObject & e )
 {
   //std::cout << "point set changed" << std::endl;
+  //emit QAbstractListModel::dataChanged();
+  this->reset();
   emit QAbstractListModel::layoutChanged();
   emit UpdateSelection();
 }
@@ -116,7 +118,7 @@ int QmitkPointListModel::rowCount( const QModelIndex& parent ) const
 {
   if ( m_PointSet != NULL )
   {
-    return m_PointSet->GetSize();
+    return m_PointSet->GetSize(m_TimeStep);
   }
   else
   {
@@ -143,12 +145,37 @@ QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
 
   if (role == Qt::DisplayRole)
   {
-    mitk::Point3D p = m_PointSet->GetPoint( index.row() );
-    QString s = QString("(%1, %2, %3)")
-                  .arg( p[0], 0, 'f', 3 )
-                  .arg( p[1], 0, 'f', 3 )
-                  .arg( p[2], 0, 'f', 3 );
-    return QVariant(s);
+    //mitk::Point3D p;
+    //bool exists = m_PointSet->GetPointIfExists( index.row(), &p, m_TimeStep );
+    //if (exists == false)
+    //  return QVariant();
+
+    // get the nth. element, we can not use the index directly, because PointSet uses a map container, where the index is not necessarily the same as the key.
+    mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet()->GetPoints()->Begin();
+    for (unsigned int i = 0; i < index.row(); ++i)
+    {
+      ++it;
+      if (it == m_PointSet->GetPointSet()->GetPoints()->End())
+        break;
+    }
+    if (it != m_PointSet->GetPointSet()->GetPoints()->End())
+    {
+      mitk::Point3D p = it->Value();
+      mitk::PointSet::PointsContainer::ElementIdentifier id = it->Index();
+      QString s = QString("%0: (%1, %2, %3)")
+        .arg( id, 3)
+        .arg( p[0], 0, 'f', 3 )
+        .arg( p[1], 0, 'f', 3 )
+        .arg( p[2], 0, 'f', 3 );
+      return QVariant(s);
+    }
+    else
+    {
+      // corresponding point for index not found. should we report this as an error?
+      return QVariant();
+    }
+      
+
   }
   else
   {

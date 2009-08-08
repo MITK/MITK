@@ -82,7 +82,7 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
     // check for edges of image
     int offset;
     int numberOfValidOffsets = 0;
-    PicType baseCol = 0;
+    int baseCol = 0;
     offset = startOfs;           if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
     offset = startOfs+1;         if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }
     offset = startOfs+1-line;    if ( (offset >= 0) && (offset < (int)(src->n[0] * src->n[1])) ) { baseCol += *((PicType*)(src->data)+offset); ++numberOfValidOffsets; }

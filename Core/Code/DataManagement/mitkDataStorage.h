@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorContainer.h"
 #include "mitkDataTreeNode.h"
 #include "mitkGeometry3D.h"
-#include "itkSimpleFastMutexLock.h"
 #include <map>
 
 namespace mitk {
@@ -192,9 +191,6 @@ namespace mitk {
     //## @brief Returns a list of used grouptags
     //##
     const DataTreeNode::GroupTagList GetGroupTags() const;
-
-    /* ITK Mutex */
-    itk::SimpleFastMutexLock m_dataStorageMutex; 
 
     /* Public Events */
     typedef Message1<const mitk::DataTreeNode*> DataStorageEvent;

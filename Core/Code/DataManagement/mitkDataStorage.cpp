@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
-#include "itkScopedLock.h"
+
 #include "itkCommand.h"
 
 
@@ -45,7 +45,6 @@ mitk::DataStorage::~DataStorage()
 
 void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent)
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex); 
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
   parents->InsertElement(0, parent);
   this->Add(node, parents);
@@ -54,7 +53,6 @@ void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent
 
 void mitk::DataStorage::Remove(const mitk::DataStorage::SetOfObjects* nodes)
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex); 
   if (nodes == NULL)
     return;
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); it++)
@@ -71,10 +69,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
 
 mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   if (name == NULL)
     return NULL;
-  
+
   mitk::StringProperty::Pointer s(mitk::StringProperty::New(name));
   mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("name", s);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(p);
@@ -87,7 +84,6 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
 
 mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) const
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   if (condition == NULL)
     return NULL;
   
@@ -100,8 +96,6 @@ mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* conditio
 
 mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations) const
 {
-  
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   if (name == NULL)
     return NULL;
 
@@ -117,7 +111,6 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, con
 
 void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   //Superclass::PrintSelf(os, indent);
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetAll();
   os << indent << "DataStorage " << this << " is managing " << all->Size() << " objects. List of objects:" << std::endl;
@@ -159,13 +152,13 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
   mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
     if (condition->CheckNode(it.Value()) == true)
-      result->InsertElement(result->Size(), it.Value());  return mitk::DataStorage::SetOfObjects::ConstPointer(result);
+      result->InsertElement(result->Size(), it.Value());
+  return mitk::DataStorage::SetOfObjects::ConstPointer(result);
 }
 
 
 const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const > locked(m_dataStorageMutex) ; 
   DataTreeNode::GroupTagList result;
   SetOfObjects::ConstPointer all = this->GetAll();
   if (all.IsNull())
@@ -185,21 +178,17 @@ const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 
 void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataTreeNode* node)
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   AddNodeEvent.Send(node);
 }
 
 
 void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataTreeNode* node)
-
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ; 
   RemoveNodeEvent.Send(node);
 }
 
 void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, const itk::EventObject &event )
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   if(m_BlockNodeModifiedEvents)
     return;
 
@@ -217,7 +206,6 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
 
 void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   // node must not be 0 and must not be yet registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) == m_NodeModifiedObserverTags.end())
   {
@@ -239,7 +227,6 @@ void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 
 void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   // node must not be 0 and must be registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) != m_NodeModifiedObserverTags.end())
   {
@@ -254,7 +241,6 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 
 mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const SetOfObjects* input)
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   if (input == NULL)
     throw std::invalid_argument("DataStorage: input is invalid");
 
@@ -473,14 +459,12 @@ mitk::Geometry3D::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const ch
 
 mitk::Geometry3D::Pointer mitk::DataStorage::ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer, const char* boolPropertyKey )
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   return ComputeBoundingGeometry3D( "visible", renderer, boolPropertyKey );
 }
 
 
 mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
 {
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
   BoundingBox::PointsContainer::Pointer pointscontainer=BoundingBox::PointsContainer::New();
 
   BoundingBox::PointIdentifier pointid=0;
@@ -524,8 +508,7 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
 
 
 mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyKey, mitk::BaseRenderer* renderer, const char* boolPropertyKey2)
-{ 
-  itk::ScopedLock<itk::SimpleFastMutexLock const> locked(m_dataStorageMutex) ;
+{
   TimeBounds timeBounds;
 
   ScalarType stmin, stmax, cur;

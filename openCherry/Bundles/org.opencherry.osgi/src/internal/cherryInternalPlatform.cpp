@@ -314,7 +314,7 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   options.addOption(cleanOption);
 
   Poco::Util::Option appOption(Platform::ARG_APPLICATION, Platform::ARG_APPLICATION, "the id of the application extension to be executed");
-     appOption.binding(Platform::ARG_APPLICATION);
+  appOption.argument(Platform::ARG_APPLICATION).binding(Platform::ARG_APPLICATION);
   options.addOption(appOption);
 
   Poco::Util::Application::defineOptions(options);

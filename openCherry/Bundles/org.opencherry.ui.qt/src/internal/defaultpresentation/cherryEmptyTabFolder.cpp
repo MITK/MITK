@@ -21,6 +21,7 @@
 #include <QHBoxLayout>
 #include <QRect>
 #include <QWidget>
+#include <QFrame>
 
 namespace cherry
 {
@@ -28,9 +29,12 @@ namespace cherry
 EmptyTabFolder::EmptyTabFolder(QWidget* parent, bool showborder) :
   control(0), childControl(0)
 {
-  control = new QWidget(parent);
+  control = new QFrame(parent);
+  control->setObjectName("StandaloneViewForm");
   QHBoxLayout* layout = new QHBoxLayout(control);
+  layout->setContentsMargins(0,0,0,0);
   control->setLayout(layout);
+
   //borderColor = parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
   //        if (showborder) {
   //            layout.xmargin = 1;
@@ -65,7 +69,13 @@ QWidget* EmptyTabFolder::GetContentParent()
 
 void EmptyTabFolder::SetContent(QWidget* newContent)
 {
+  if (childControl)
+  {
+    childControl->setParent(0);
+  }
+
   childControl = newContent;
+  control->layout()->addWidget(childControl);
 }
 
 std::vector<AbstractTabItem*> EmptyTabFolder::GetItems()

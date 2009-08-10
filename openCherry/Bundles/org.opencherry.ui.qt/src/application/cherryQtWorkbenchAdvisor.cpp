@@ -87,6 +87,9 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
       "border: 1px solid palette(mid); "
       "border-top-left-radius: 8px; "
       "border-top-right-radius: 8px; }"
+
+      "QWidget#StandaloneViewForm {"
+      "border: 1px solid palette(mid); }"
   );
 
 }

@@ -13,6 +13,7 @@ QmitkLevelWindowWidget.cpp
 QmitkLineEditLevelWindowWidget.cpp
 # QmitkMaterialEditor.cpp
 # QmitkMaterialShowcase.cpp
+QmitkMemoryUsageIndicatorView.cpp
 QmitkPointListModel.cpp
 QmitkPointListView.cpp
 QmitkPointListWidget.cpp
@@ -42,6 +43,7 @@ QmitkLevelWindowWidget.h
 QmitkLineEditLevelWindowWidget.h
 # QmitkMaterialEditor.h
 # QmitkMaterialShowcase.h
+QmitkMemoryUsageIndicatorView.h
 QmitkPointListModel.h
 QmitkPointListView.h
 QmitkPointListWidget.h
@@ -60,6 +62,7 @@ SET(UI_FILES
 QmitkLevelWindowPresetDefinition.ui  
 QmitkLevelWindowWidget.ui  
 QmitkLevelWindowRangeChange.ui
+QmitkMemoryUsageIndicator.ui
 )
 
 SET(RES_FILES

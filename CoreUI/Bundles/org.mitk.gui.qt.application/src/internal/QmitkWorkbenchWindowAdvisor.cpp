@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
-//#include <QmitkMemoryUsageIndicator.h>
+#include <QmitkMemoryUsageIndicatorView.h>
 
 QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
  : cherry::WorkbenchWindowAdvisor(configurer)
@@ -84,7 +84,7 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   progBar->hide();
   mainWindow->setStatusBar(qStatusBar);
 
-  //QmitkMemoryUsageIndicator* memoryIndicator = new QmitkMemoryUsageIndicator();
-  //this->statusBar()->addWidget(memoryIndicator, 0, true);
+  QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+  qStatusBar->addPermanentWidget(memoryIndicator, 0);
 
 }

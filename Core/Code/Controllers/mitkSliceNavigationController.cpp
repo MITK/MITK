@@ -663,8 +663,6 @@ SliceNavigationController
                   stream << "No image information at this position!";
                 }
 
-                stream << " (" << mitk::MemoryUtilities::GetProcessMemoryUsage() / (1024.0*1024.0) << "mb usage)";
-
                 statusText = stream.str(); 
                 mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
              

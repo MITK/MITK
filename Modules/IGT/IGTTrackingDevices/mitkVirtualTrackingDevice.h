@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
 
 #include <vector>
-#include <mitkConfig.h>
+#include <MitkIGTExports.h>
 #include <mitkTrackingDevice.h>
 #include <mitkInternalTrackingTool.h>
 #include <itkMultiThreader.h>
@@ -38,7 +38,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT VirtualTrackingDevice : public TrackingDevice
+  class MitkIGT_EXPORT VirtualTrackingDevice : public TrackingDevice
   {
   public:
 

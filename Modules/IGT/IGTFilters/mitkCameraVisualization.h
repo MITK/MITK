@@ -31,7 +31,7 @@ namespace mitk {
   * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
   *
   * \ingroup IGT
-  */  class MITK_IGT_EXPORT CameraVisualization : public NavigationDataToNavigationDataFilter
+  */  class MitkIGT_EXPORT CameraVisualization : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(CameraVisualization, NavigationDataToNavigationDataFilter);

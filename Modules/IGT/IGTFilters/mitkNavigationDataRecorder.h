@@ -42,7 +42,7 @@ namespace mitk
  * \ingroup IGT
  */
 
-class MITK_IGT_EXPORT NavigationDataRecorder : public itk::ProcessObject
+class MitkIGT_EXPORT NavigationDataRecorder : public itk::ProcessObject
 {
 public:
     mitkClassMacro( NavigationDataRecorder, itk::ProcessObject );

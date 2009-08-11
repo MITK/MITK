@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTrackingDevice.h"
 
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
 #include <itkMultiThreader.h>
 
 #include <list>
@@ -43,7 +43,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT MicroBirdTrackingDevice : public TrackingDevice
+  class MitkIGT_EXPORT MicroBirdTrackingDevice : public TrackingDevice
   {
   public:
     mitkClassMacro(MicroBirdTrackingDevice, TrackingDevice);

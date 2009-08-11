@@ -22,10 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <string>
 
-#include "mitkCommon.h"
+#include <MitkIGTExports.h>
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+#include "mitkCommon.h"
 
 typedef int mtHandle;
 
@@ -40,11 +41,11 @@ namespace mitk
   *       methods.
   *   \ingroup IGT
   */
-  class MITK_IGT_EXPORT ClaronInterface : public itk::Object
+  class MitkIGT_EXPORT ClaronInterface : public itk::Object
   {
   public:
 
-    mitkClassMacro(ClaronInterface,itk::Object);
+    mitkClassMacro(ClaronInterface, itk::Object);
     itkNewMacro(Self);
     /**
     * \brief Initialization of claroninterface.

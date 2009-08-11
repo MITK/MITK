@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
 
 #include "mitkRealTimeClock.h"
 
@@ -51,7 +51,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT TimeStamp : public itk::Object
+  class MitkIGT_EXPORT TimeStamp : public itk::Object
   {
   public:
     

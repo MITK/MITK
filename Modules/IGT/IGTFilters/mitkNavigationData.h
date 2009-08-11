@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNAVIGATIONDATA_H_HEADER_INCLUDED_
 #define MITKNAVIGATIONDATA_H_HEADER_INCLUDED_
 #include <itkDataObject.h>
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
 #include <mitkVector.h>
 
 namespace mitk {
@@ -34,7 +34,7 @@ namespace mitk {
     * 
     * \ingroup IGT
     */
-  class MITK_IGT_EXPORT NavigationData : public itk::DataObject
+  class MitkIGT_EXPORT NavigationData : public itk::DataObject
     {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);

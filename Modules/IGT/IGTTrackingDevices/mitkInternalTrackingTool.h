@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKINTERNALTRACKINGTOOL_H_HEADER_INCLUDED_
 
 #include <mitkTrackingTool.h>
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 
@@ -38,7 +38,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT InternalTrackingTool : public TrackingTool
+  class MitkIGT_EXPORT InternalTrackingTool : public TrackingTool
   {
     friend class MicroBirdTrackingDevice; // Add all TrackingDevice subclasses that use InternalTrackingDevice directly
     friend class VirtualTrackingDevice;

@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <mitkCommon.h>
-
+#include "MitkIGTExports.h"
+#include "mitkCommon.h"
 
 namespace mitk {
 
@@ -31,13 +31,13 @@ namespace mitk {
   * \brief RealTimeClock is a superclass to WindowsRealTimeClock, LinuxRealTimeClock, etc.
   *
   * When mitk::RealTimeClock::New() is called, a new instance of a RealTimeClock will be
-  * instanciated. WindowsRealTimeClock on a Windows-system and a LinuxRealTimeClock on a 
+  * instantiated. WindowsRealTimeClock on a Windows-system and a LinuxRealTimeClock on a 
   * Linux-system
   *
   * \ingroup IGT
   */
 
-  class MITK_IGT_EXPORT RealTimeClock : public itk::Object
+  class MitkIGT_EXPORT RealTimeClock : public itk::Object
   {
   public:
     mitkClassMacro(RealTimeClock, itk::Object);
@@ -48,8 +48,6 @@ namespace mitk {
     static Pointer New(void);
 
     virtual double GetCurrentStamp() = 0;
-
-  }; //namespace
-}
-
+  };
+} //namespace
 #endif /* MITKWREALTIMECLOCK_H_HEADER_INCLUDED_ */

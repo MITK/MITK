@@ -111,16 +111,6 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #else
     #define MITKEXT_CORE_EXPORT __declspec(dllimport)
   #endif
-  #ifdef mitkIGT_EXPORTS
-    #define MITK_IGT_EXPORT __declspec(dllexport)
-  #else
-    #define MITK_IGT_EXPORT __declspec(dllimport)
-  #endif
-  #ifdef mitkMBIIGT_EXPORTS
-    #define MitkMBIIGT_EXPORT __declspec(dllexport)
-  #else
-    #define MitkMBIIGT_EXPORT __declspec(dllimport)
-  #endif
   #ifdef Qmitk_EXPORTS
     #define QMITK_EXPORT __declspec(dllexport)
   #else
@@ -141,16 +131,9 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
   #else
     #define QMITK_SB_EXPORT __declspec(dllimport)
   #endif
-  #ifdef mitkIGTUI_EXPORTS
-    #define mitkIGTUI_EXPORT __declspec(dllexport)
-  #else
-    #define mitkIGTUI_EXPORT __declspec(dllimport)
-  #endif
 #else
   #define MITK_CORE_EXPORT
   #define MITKEXT_CORE_EXPORT
-  #define MITK_IGT_EXPORT
-  #define MBI_IGT_EXPORT
   #define MBISB_CORE_EXPORT
   #define QMITK_EXPORT
   #define QMITKEXT_EXPORT

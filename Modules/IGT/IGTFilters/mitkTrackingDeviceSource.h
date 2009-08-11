@@ -42,7 +42,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT TrackingDeviceSource : public NavigationDataSource
+  class MitkIGT_EXPORT TrackingDeviceSource : public NavigationDataSource
   {
   public:
     mitkClassMacro(TrackingDeviceSource, NavigationDataSource);

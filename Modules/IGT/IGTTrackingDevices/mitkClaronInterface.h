@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <string>
 
+#include <MitkIGTExports.h>
 #include "mitkCommon.h"
 
 #include <itkObject.h>
@@ -41,7 +42,7 @@ namespace mitk
   *          by a stub class called "ClaronInterfaceStub". 
   *   \ingroup IGT
   */
-  class MITK_IGT_EXPORT ClaronInterface : public itk::Object
+  class MitkIGT_EXPORT ClaronInterface : public itk::Object
   {
   public:
     

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKTRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKTRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
 
-
+#include <MitkIGTExports.h>
 #include "itkObject.h"
 #include "mitkCommon.h"
 #include "mitkTrackingTypes.h"
@@ -37,7 +37,7 @@ namespace mitk {
     * 
     *  \ingroup IGT
     */
-    class MITK_IGT_EXPORT TrackingDevice : public itk::Object
+    class MitkIGT_EXPORT TrackingDevice : public itk::Object
     {
     public:
       mitkClassMacro(TrackingDevice, itk::Object);

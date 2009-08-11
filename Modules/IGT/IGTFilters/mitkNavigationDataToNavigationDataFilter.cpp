@@ -47,13 +47,13 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, con
 }
 
 
-const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( void )
+const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( void ) const
 {
   return this->GetInput(0);
 }
 
 
-const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( unsigned int idx )
+const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( unsigned int idx ) const
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;

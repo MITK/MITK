@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKTRACKINGTOOL_H_HEADER_INCLUDED_
 
 #include <itkObject.h>
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
 #include <mitkVector.h>
 #include <itkFastMutexLock.h>
 
@@ -34,7 +34,7 @@ namespace mitk
   * 
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT TrackingTool : public itk::Object
+  class MitkIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
     mitkClassMacro(TrackingTool, itk::Object);

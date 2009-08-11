@@ -35,7 +35,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT NavigationDataToNavigationDataFilter : public NavigationDataSource
+  class MitkIGT_EXPORT NavigationDataToNavigationDataFilter : public NavigationDataSource
   {
   public:
     mitkClassMacro(NavigationDataToNavigationDataFilter, NavigationDataSource);
@@ -66,12 +66,12 @@ namespace mitk
     /**
     * \brief Get the input of this filter
     */
-    const NavigationData* GetInput(void);
+    const NavigationData* GetInput(void) const;
 
     /**
     * \brief Get the input with id idx of this filter
     */
-    const NavigationData* GetInput(unsigned int idx);
+    const NavigationData* GetInput(unsigned int idx) const;
 
   protected:
     NavigationDataToNavigationDataFilter();

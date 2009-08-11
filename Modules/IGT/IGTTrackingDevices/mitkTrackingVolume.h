@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include <MitkIGTExports.h>
+
 #include "mitkSurface.h"
 #include "vtkPolyData.h"
 #include "mitkTrackingTypes.h"
@@ -40,7 +42,7 @@ namespace mitk
   *  \ingroup IGT
   */
 
-  class MITK_IGT_EXPORT TrackingVolume : public mitk::Surface
+  class MitkIGT_EXPORT TrackingVolume : public mitk::Surface
   {
   public:
     mitkClassMacro(TrackingVolume, mitk::Surface);

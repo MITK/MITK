@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKWINDOWSREALTIMECLOCK_H_HEADER_INCLUDED_
 #define MITKWINDOWSREALTIMECLOCK_H_HEADER_INCLUDED_
 
+#include "MitkIGTExports.h"
 #include "mitkRealTimeClock.h"
+
 
 namespace mitk {
 
@@ -34,7 +36,7 @@ namespace mitk {
   * \ingroup Navigation
   */
 
-  class MITK_IGT_EXPORT WindowsRealTimeClock : public RealTimeClock
+  class MitkIGT_EXPORT WindowsRealTimeClock : public RealTimeClock
   {
   public:
     mitkClassMacro(WindowsRealTimeClock, mitk::RealTimeClock);

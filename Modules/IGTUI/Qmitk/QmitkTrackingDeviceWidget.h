@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKTRACKINGDEVICEWIDGET_H
 #define QMITKTRACKINGDEVICEWIDGET_H
 
-#include "mitkCommon.h"
+#include "MitkIGTUIExports.h"
 #include <QWidget>
 
 class mitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget

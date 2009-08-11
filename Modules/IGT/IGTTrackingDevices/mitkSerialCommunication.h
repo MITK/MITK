@@ -20,7 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
 #define MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
 
-#include <mitkCommon.h>
+#include <MitkIGTExports.h>
+#include "mitkCommon.h"
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
@@ -47,7 +48,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MITK_IGT_EXPORT SerialCommunication : public itk::Object
+  class MitkIGT_EXPORT SerialCommunication : public itk::Object
   {
   public:
     mitkClassMacro(SerialCommunication, itk::Object);

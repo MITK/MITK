@@ -32,7 +32,7 @@ namespace mitk
   *           continuously update the tool coordinates.
   *   \ingroup IGT
   */
-  class MITK_IGT_EXPORT ClaronTool : public InternalTrackingTool
+  class MitkIGT_EXPORT ClaronTool : public InternalTrackingTool
   {
   public:
     friend class ClaronTrackingDevice;

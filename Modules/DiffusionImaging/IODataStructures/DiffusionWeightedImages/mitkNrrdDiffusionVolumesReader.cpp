@@ -231,6 +231,7 @@ namespace mitk
         }
       }
     }
+    return false;
   }
 
 } //namespace MITK

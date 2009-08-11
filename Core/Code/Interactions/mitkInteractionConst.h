@@ -269,6 +269,7 @@ enum EActions
   AcREMOVELINE = 102,
   AcREMOVEALL = 103,
   AcREMOVESELECTEDSUBOBJECT = 104,  // used in VesselGraphInteractor
+  AcWHEEL = 105,
   AcDELETEPOINT = 120,
   AcCLEAR = 130,  // clear all elements from a list
   AcINSERTPOINT = 110,

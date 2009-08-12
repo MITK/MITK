@@ -43,14 +43,14 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkWorkbenchWindowAdvisorHelperHack* QmitkWorkbenchWindowAdvisorHelperHack::undohack = new QmitkWorkbenchWindowAdvisorHelperHack();
 
 QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
- : cherry::WorkbenchWindowAdvisor(configurer)
+: cherry::WorkbenchWindowAdvisor(configurer)
 {
 
 }
 
 cherry::ActionBarAdvisor::Pointer
 QmitkWorkbenchWindowAdvisor::CreateActionBarAdvisor(
-    cherry::IActionBarConfigurer::Pointer configurer)
+  cherry::IActionBarConfigurer::Pointer configurer)
 {
   cherry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkActionBarAdvisor(configurer));
   return actionBarAdvisor;
@@ -78,10 +78,20 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   QMenu* viewMenu = menuBar->addMenu("Show &View");
 
+  // sort elements (converting vector to map...)
   std::vector<cherry::IViewDescriptor::Pointer>::const_iterator iter;
+  std::map<std::string, cherry::IViewDescriptor::Pointer> VDMap;
+
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
-    cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window, *iter);
+    std::pair<std::string, cherry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
+    VDMap.insert(p);
+  }
+
+  std::map<std::string, cherry::IViewDescriptor::Pointer>::const_iterator MapIter;
+  for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
+  {
+    cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window, (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
   }

@@ -24,12 +24,12 @@ class QmitkWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
 {
 public:
 
-  QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+    QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-  cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-      cherry::IActionBarConfigurer::Pointer configurer);
+    cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
+        cherry::IActionBarConfigurer::Pointer configurer);
 
-  void PostWindowCreate();
+    void PostWindowCreate();
 };
 
 #endif /*QMITKWORKBENCHWINDOWADVISOR_H_*/

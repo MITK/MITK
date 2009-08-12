@@ -34,6 +34,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
 
+
+// UGLYYY
+#include "QmitkWorkbenchWindowAdvisorHack.h"
+#include "mitkUndoController.h"
+#include "mitkVerboseLimitedLinearUndo.h"
+  
+QmitkWorkbenchWindowAdvisorHelperHack* QmitkWorkbenchWindowAdvisorHelperHack::undohack = new QmitkWorkbenchWindowAdvisorHelperHack();
+
 QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
  : cherry::WorkbenchWindowAdvisor(configurer)
 {
@@ -62,6 +70,12 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   cherry::IViewRegistry* viewRegistry = cherry::PlatformUI::GetWorkbench()->GetViewRegistry();
   const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
 
+  // another bad hack to get an edit/undo menu... 
+  QMenu* editMenu = menuBar->addMenu("&Edit");
+  QAction* undoAction = editMenu->addAction("&Undo", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onUndo()), QKeySequence("CTRL+Z"));
+  QAction* redoAction = editMenu->addAction("&Redo", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onRedo()), QKeySequence("CTRL+Y"));
+
+
   QMenu* viewMenu = menuBar->addMenu("Show &View");
 
   std::vector<cherry::IViewDescriptor::Pointer>::const_iterator iter;
@@ -71,7 +85,7 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
   }
-
+  
   QStatusBar* qStatusBar = new QStatusBar();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
@@ -86,5 +100,57 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
   qStatusBar->addPermanentWidget(memoryIndicator, 0);
-
 }
+    
+//--------------------------------------------------------------------------------
+// Ugly hack from here on. Feel free to delete when command framework 
+// and undo buttons are done.
+//--------------------------------------------------------------------------------
+
+QmitkWorkbenchWindowAdvisorHelperHack::QmitkWorkbenchWindowAdvisorHelperHack()
+:QObject()
+{
+}
+    
+void QmitkWorkbenchWindowAdvisorHelperHack::onUndo()
+{
+  mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
+  if (model)
+  {
+    if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
+    {
+      mitk::VerboseLimitedLinearUndo::StackDescription descriptions = verboseundo->GetUndoDescriptions();
+      if (descriptions.size() >= 1)
+      {
+        LOG_INFO << "Undo " << descriptions.front().second;
+      }
+    }
+    model->Undo();
+  }
+  else
+  {
+    LOG_ERROR << "No undo model instantiated";
+  }
+}
+
+void QmitkWorkbenchWindowAdvisorHelperHack::onRedo()
+{
+  mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
+  if (model)
+  {
+    if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
+    {
+      mitk::VerboseLimitedLinearUndo::StackDescription descriptions = verboseundo->GetRedoDescriptions();
+      if (descriptions.size() >= 1)
+      {
+        LOG_INFO << "Redo " << descriptions.front().second;
+      }
+    }
+    model->Redo();
+  }
+  else
+  {
+    LOG_ERROR << "No undo model instantiated";
+  }
+}
+

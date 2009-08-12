@@ -131,7 +131,5 @@ SET(UI_FILES
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
-  QmitkBuildSuperGUI.ui
-  BlaGUI.ui
 )
 

@@ -118,6 +118,10 @@ MACRO(MACRO_CREATE_PLUGIN)
     ARCHIVE_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
     DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
 
+  IF(mbilog_FOUND)
+    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} mbilog)
+  ENDIF()
+
   # we need to explicitly state the debug versions of the libraries
   # we are linking to in the TARGET_LINK_LIBRARIES command.
   # Although we set the debug postfix to d, CMake automatically

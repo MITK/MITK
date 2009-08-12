@@ -68,6 +68,48 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
                                                      DataStorage* storage, 
                                                      bool clearStorageFirst )
 {
+  // test if filename exists
+
+  // get new temporary directory
+
+  // unzip all filenames contents to temp dir
+
+  // test if index.xml exists
+
+  // parse index.xml with TinyXML
+
+  // find version node --> note version in some variable
+
+  // iterate all nodes
+
+  // first level nodes should be <node> elements. for each
+  //   1. create a new, empty node
+  //   2. check child nodes
+  //   3. if there is a <source>, remember parent objects
+  //   4. if there is a <data type="..." file="..."> element,
+  //        - construct a name for the appropriate deserializer
+  //        - try to instantiate this deserializer via itk object factory
+  //        - if deserializer could be created, use it to read the file into a BaseData object
+  //        - if successful, call the new node's SetData(..)
+  //   5. if there are <properties> nodes, 
+  //        - instantiate the appropriate PropertyListDeSerializer
+  //        - use them to construct PropertyList objects
+  //        - add these properties to the node (if necessary, use renderwindow name)
+
+  // create a new empty datastorage
+
+  // repeat
+  //   for all created nodes
+  //     find all nodes that
+  //      - do not have any parents or
+  //      - have all their parents already in DataStorage
+  //     add these to datastorage
+  // repeat above block until there are no nodes left for adding
+  
+  // prepare to detect errors (such as cycles) from wrongly written or edited xml files
+
+  // return new datastorage, even if empty or uncomplete (return as much as possible but notify calling method)
+
   return NULL;
 }
     

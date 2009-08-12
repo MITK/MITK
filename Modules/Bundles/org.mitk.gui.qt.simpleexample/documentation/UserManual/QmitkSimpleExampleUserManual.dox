@@ -1,0 +1,32 @@
+/**
+\page QmitkSimpleExampleFunctionalityUserManual The "simple example" functionality
+
+Available sections:
+  - \ref QmitkSimpleExampleFunctionalityUserManualOverview 
+  - \ref QmitkSimpleExampleFunctionalityUserManualFeatures 
+  - \ref QmitkSimpleExampleFunctionalityUserManualUsage 
+
+\section QmitkSimpleExampleFunctionalityUserManualOverview Overview
+
+SimpleExampleFunctionality is a functionality for ...
+
+\section QmitkSimpleExampleFunctionalityUserManualFeatures Features
+
+<ul>
+  <li> This
+  <ul>
+    <li> thing
+    <li> stuff
+  </ul>
+  <li> and that
+  <ul>
+    <li> to be replaced
+  </ul>
+</ul>
+    
+\section QmitkSimpleExampleFunctionalityUserManualUsage Usage
+
+\todo This must still be written
+
+*/
+

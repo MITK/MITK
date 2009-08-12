@@ -308,11 +308,13 @@ void QmitkMovieMaker::PausePlaying()
 
 void QmitkMovieMaker::StopPlaying()
 {
-
   m_Controls->slidAngle->setDisabled(false);
   m_Controls->btnMovie->setEnabled(true);
   m_Controls->btnPlay->setEnabled(true);
   m_Controls->btnScreenshot->setEnabled(true);
+
+  m_Controls->btnPlay->setHidden(false);
+  m_Controls->btnPause->setHidden(true);
 
   m_Timer->stop();
   switch (m_Direction)
@@ -479,6 +481,7 @@ void QmitkMovieMaker::GenerateMovie()
 
     if (movieFileName.isEmpty() == false)
     {
+      mitk::RenderingManager::GetInstance()->RequestImmediateUpdateAll();
       m_movieGenerator->SetFileName(movieFileName.toAscii());
       m_movieGenerator->WriteMovie();
     }

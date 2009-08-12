@@ -14,9 +14,6 @@ QmitkLineEditLevelWindowWidget.cpp
 # QmitkMaterialEditor.cpp
 # QmitkMaterialShowcase.cpp
 QmitkMemoryUsageIndicatorView.cpp
-QmitkPointListModel.cpp
-QmitkPointListView.cpp
-QmitkPointListWidget.cpp
 QmitkRenderWindowMenu.cpp
 QmitkPropertiesTableEditor.cpp
 QmitkPropertiesTableModel.cpp
@@ -44,9 +41,6 @@ QmitkLineEditLevelWindowWidget.h
 # QmitkMaterialEditor.h
 # QmitkMaterialShowcase.h
 QmitkMemoryUsageIndicatorView.h
-QmitkPointListModel.h
-QmitkPointListView.h
-QmitkPointListWidget.h
 QmitkRenderWindowMenu.h
 QmitkPropertiesTableEditor.h
 QmitkPropertiesTableModel.h

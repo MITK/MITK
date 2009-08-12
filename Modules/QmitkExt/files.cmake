@@ -72,7 +72,9 @@ SET(CPP_FILES
  QmitkHistogramWidget.cpp
  QmitkPlotWidget.cpp
  QmitkPlotDialog.cpp
- 
+ QmitkPointListModel.cpp
+ QmitkPointListView.cpp
+ QmitkPointListWidget.cpp
  QmitkVideoBackground.cpp
 )
 
@@ -118,6 +120,9 @@ SET(MOC_H_FILES
  QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
+ QmitkPointListModel.h
+ QmitkPointListView.h
+ QmitkPointListWidget.h
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
 )

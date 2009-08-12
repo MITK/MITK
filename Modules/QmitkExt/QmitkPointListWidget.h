@@ -47,7 +47,7 @@ class QPushButton;
  * currently selected point, the widget user has to provide
  * a QmitkStdMultiWidget object.
  */
-class QMITK_EXPORT QmitkPointListWidget : public QWidget
+class QMITKEXT_EXPORT QmitkPointListWidget : public QWidget
 {
   Q_OBJECT
 

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointSet.h"
 
-class QMITK_EXPORT QmitkPointListModel : public QAbstractListModel
+class QMITKEXT_EXPORT QmitkPointListModel : public QAbstractListModel
 {
   Q_OBJECT
 

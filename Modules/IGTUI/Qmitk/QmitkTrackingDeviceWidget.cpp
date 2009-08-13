@@ -19,8 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTrackingDeviceWidget.h"
 
 
-/*
-QmitkTrackingDeviceWidget::QmitkTrackingDeviceWidget():QWidget()
+
+QmitkTrackingDeviceWidget::QmitkTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f)
+  : QWidget(parent, f)
 {
 }
 
@@ -28,4 +29,4 @@ QmitkTrackingDeviceWidget::QmitkTrackingDeviceWidget():QWidget()
 QmitkTrackingDeviceWidget::~QmitkTrackingDeviceWidget()
 {
 }
-*/
+

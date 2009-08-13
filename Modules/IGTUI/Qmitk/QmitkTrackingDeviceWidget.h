@@ -15,19 +15,21 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-/*
+
 #ifndef QMITKTRACKINGDEVICEWIDGET_H
 #define QMITKTRACKINGDEVICEWIDGET_H
 
-#include "MitkIGTUIExports.h"
 #include <QWidget>
+#include "MitkIGTUIExports.h"
 
-class mitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget
+class MitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MitkIGTUI_EXPORT
 {
-//Q_OBJECT
+  Q_OBJECT
+
+  public:
+    QmitkTrackingDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    ~QmitkTrackingDeviceWidget();
 
 
 };
-
 #endif
-*/

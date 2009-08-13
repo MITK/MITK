@@ -317,9 +317,9 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpec
 }
 
 
-void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
+bool mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
 {
-  if(GetSize(t) > 1 && GetNumberOfSelected(t) == 1)
+  if(IndexExists(id, t) )
   {
     PointType point = GetPoint(id,t);
 
@@ -327,19 +327,24 @@ void mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, in
     {//up
       if(IndexExists(id-1,t))
       {
-        m_PointSetSeries[t]->GetPoints()->DeleteIndex(id);
+        InsertPoint(id, GetPoint(id - 1, t), t);
         InsertPoint(id-1,point,t);
+        this->Modified();
+        return true;
       }
     }
     else
     {//down
       if(IndexExists(id+1,t))
       {
-        m_PointSetSeries[t]->GetPoints()->DeleteIndex(id);
-        InsertPoint(id,point,t);
+        InsertPoint(id, GetPoint(id + 1, t), t);
+        InsertPoint(id+1,point,t);
+        this->Modified();
+        return true;
       }
     }
-    this->Modified();
+
+    return false;
   }
 }
 

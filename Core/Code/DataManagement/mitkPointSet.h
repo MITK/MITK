@@ -183,8 +183,12 @@ public:
   * \brief Set the given point in world coordinate system with given PointSpecificationType
   */  
   void InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t );
-  
-  void SwapPointPosition( PointIdentifier id, bool moveUpwards, int t = 0 );
+
+  /**
+  * \brief Swap a point at the given position (id) with the upper point (moveUpwards=true) or with the lower point (moveUpwards=false). 
+  * If upper or lower index does not exist false is returned, if swap was successful true.
+  */  
+  bool SwapPointPosition( PointIdentifier id, bool moveUpwards, int t = 0 );
 
 
   /**

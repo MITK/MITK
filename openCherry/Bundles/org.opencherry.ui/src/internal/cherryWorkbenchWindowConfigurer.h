@@ -43,6 +43,8 @@ class WorkbenchWindow;
  */
 class WorkbenchWindowConfigurer : public IWorkbenchWindowConfigurer {
 
+	friend class WorkbenchWindow;
+	
 public:
   cherryObjectMacro(WorkbenchWindowConfigurer);
 
@@ -121,7 +123,7 @@ public:
      * Action bar configurer that changes this workbench window.
      * This implementation keeps track of of cool bar items
      */
-    public:
+    private:
     class WindowActionBarConfigurer : public IActionBarConfigurer {
 
         private: IActionBarConfigurer::Pointer proxy;

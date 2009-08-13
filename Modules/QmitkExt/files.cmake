@@ -1,7 +1,7 @@
 SET(CPP_FILES
 
  QmitkApplicationBase/QmitkCommonFunctionality.cpp
- 
+
  #QmitkModels/QmitkDataStorageListModel.cpp
  #QmitkModels/QmitkPropertiesTableModel.cpp
  #QmitkModels/QmitkDataStorageTreeModel.cpp
@@ -30,9 +30,9 @@ SET(CPP_FILES
  # QmitkRenderingManager.cpp
  # QmitkRenderingManagerFactory.cpp
  # QmitkRenderWindow.cpp
- 
+
  # QmitkEventAdapter.cpp
- 
+
  QmitkColorTransferFunctionCanvas.cpp
  QmitkSlicesInterpolator.cpp
  QmitkStandardViews.cpp
@@ -46,7 +46,7 @@ SET(CPP_FILES
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
   #QmitkLevelWindowRangeChangeDialog.cpp
- 
+
  #QmitkLevelWindowPresetDefinitionDialog.cpp
  # QmitkLevelWindowWidgetContextMenu.cpp
  # QmitkSliceWidget.cpp
@@ -67,7 +67,7 @@ SET(CPP_FILES
  # QmitkPropertiesTableEditor.cpp
  QmitkPrimitiveMovieNavigatorWidget.cpp
  # QmitkDataStorageComboBox.cpp
- 
+
  QmitkHistogram.cpp
  QmitkHistogramWidget.cpp
  QmitkPlotWidget.cpp
@@ -82,8 +82,8 @@ QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
 
 
 SET(MOC_H_FILES
- 
- 
+
+
  QmitkPropertyObservers/QmitkBasePropertyView.h
  QmitkPropertyObservers/QmitkBoolPropertyEditor.h
  QmitkPropertyObservers/QmitkBoolPropertyView.h
@@ -91,7 +91,6 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkColorPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertyEditor.h
  QmitkPropertyObservers/QmitkNumberPropertyView.h
- QmitkPropertyObservers/QmitkPropertyViewFactory.h
  QmitkPropertyObservers/QmitkStringPropertyEditor.h
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
  QmitkPropertyObservers/QmitkStringPropertyView.h
@@ -99,7 +98,7 @@ SET(MOC_H_FILES
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
- 
+
  QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
@@ -111,11 +110,11 @@ SET(MOC_H_FILES
  QmitkTransferFunctionWidget.h
  QmitkToolGUIArea.h
  QmitkToolGUI.h
- QmitkToolReferenceDataSelectionBox.h  
- QmitkToolSelectionBox.h  
+ QmitkToolReferenceDataSelectionBox.h
+ QmitkToolSelectionBox.h
  # QmitkPropertyListPopup.h
- QmitkToolWorkingDataSelectionBox.h  
- #QmitkSelectableGLWidget.h  
+ QmitkToolWorkingDataSelectionBox.h
+ #QmitkSelectableGLWidget.h
  QmitkNewSegmentationDialog.h
  QmitkPaintbrushToolGUI.h
  QmitkCopyToClipBoardDialog.h
@@ -137,4 +136,3 @@ SET(UI_FILES
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
 )
-

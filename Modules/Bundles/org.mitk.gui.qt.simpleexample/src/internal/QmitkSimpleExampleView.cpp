@@ -226,7 +226,7 @@ void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 {
   QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
-  QmitkRenderWindow* renWin = m_MultiWidget->GetRenderWindow4(); // high res is always the 3D view
+  QmitkRenderWindow* renWin = this->GetMovieRenderWindow();
   if (renWin == NULL)
     return;
 
@@ -256,6 +256,9 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
     return;
 
+  bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
+  renderer->GetRenderWindow()->DoubleBufferOff();
+
   vtkImageWriter* fileWriter;
 
   QFileInfo fi(fileName);
@@ -274,6 +277,7 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
   magnifier->SetInput(renderer);
   magnifier->SetMagnification(magnificationFactor);
+  //magnifier->Update();
   fileWriter->SetInput(magnifier->GetOutput());
   fileWriter->SetFileName(fileName.toLatin1());
 
@@ -287,9 +291,14 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   m_MultiWidget->DisableColoredRectangles();
   m_MultiWidget->DisableDepartmentLogo();
   m_MultiWidget->DisableGradientBackground();
+
   fileWriter->Write();  
+  fileWriter->Delete();  
+
   m_MultiWidget->EnableColoredRectangles();
   m_MultiWidget->EnableDepartmentLogo();
   m_MultiWidget->EnableGradientBackground();
   renderer->SetBackground(oldBackground);
+  
+  renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }

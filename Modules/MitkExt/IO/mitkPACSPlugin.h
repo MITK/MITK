@@ -49,6 +49,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     class MITKEXT_CORE_EXPORT PatientInformation
     {
       public:
+        std::string UID; // application specific
         std::string PatientsName;       // tag 0010,0010
         std::string PatientID;          // tag 0010,0020
         std::string PatientsBirthDate;  // tag 0010,0030

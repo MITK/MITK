@@ -284,7 +284,6 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
-  delete doOp;
   std::cout<<"[PASSED]"<<std::endl;
 
 

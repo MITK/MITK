@@ -35,7 +35,7 @@ mitk::NDIPassiveTool::~NDIPassiveTool()
 {
   if (m_SROMData != NULL)
   {
-    delete m_SROMData;
+    delete[] m_SROMData;
     m_SROMData = NULL;
   }
 }

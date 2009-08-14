@@ -149,4 +149,5 @@ void mitk::NavigationDataToPointSetFilter::SetOperationMode( OperationMode mode 
   if (m_OperationMode == Mode4D)
     m_CurrentTimeStep = 0;
   this->Modified();
+  this->CreateOutputsForAllInputs();
 }

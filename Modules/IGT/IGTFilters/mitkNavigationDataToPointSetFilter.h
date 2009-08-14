@@ -92,6 +92,9 @@ namespace mitk {
     * \brief Sets the mode of this filter.
     *
     * See OperationMode for the behavior in the different modes
+    * \warn A call to this method will change the number of outputs of the filter.
+    * After calling this method, all previously acquired pointers to outputs are invalid
+    * Always set the operation mode first, then get the outputs with GetOutput()
     */
     virtual void SetOperationMode(OperationMode mode);
 

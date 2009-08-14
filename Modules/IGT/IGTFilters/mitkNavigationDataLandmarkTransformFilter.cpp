@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationDataLandmarkTransformFilter.h"
-
+#include "itkIndent.h"
 
 mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() 
 : mitk::NavigationDataToNavigationDataFilter(), 
@@ -29,8 +29,8 @@ mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilt
   m_LandmarkTransformInitializer->SetTransform(m_ITKLandmarkTransform);
 
   //transform to rotate orientation 
-   m_QuatLandmarkTransform = itk::QuaternionRigidTransform<double>::New();
-   m_QuatTransform = itk::QuaternionRigidTransform<double>::New();
+   m_QuatLandmarkTransform = QuaternionTransformType::New();
+   m_QuatTransform = QuaternionTransformType::New();
 
 
 }
@@ -45,23 +45,23 @@ mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFil
 }
 
 
-void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform()
+void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform( LandmarkPointContainer sources, LandmarkPointContainer targets )
 {
   try
   {
     /* calculate transform from landmarks */
-    m_LandmarkTransformInitializer->SetMovingLandmarks(m_TargetPoints);
-    m_LandmarkTransformInitializer->SetFixedLandmarks(m_SourcePoints);
+    m_LandmarkTransformInitializer->SetMovingLandmarks(targets);
+    m_LandmarkTransformInitializer->SetFixedLandmarks(sources);
     m_ITKLandmarkTransform->SetIdentity();
     m_LandmarkTransformInitializer->InitializeTransform();
 
     /* Calculate error statistics for the transform */
     TransformInitializerType::LandmarkPointType curData;
     std::vector< mitk::ScalarType > errors;
-    for (TransformInitializerType::LandmarkPointContainer::size_type index = 0; index < m_SourcePoints.size(); index++)
+    for (LandmarkPointContainer::size_type index = 0; index < sources.size(); index++)
     {
-      curData = m_ITKLandmarkTransform->TransformPoint(m_SourcePoints.at(index));
-      errors.push_back(curData.EuclideanDistanceTo(m_TargetPoints.at(index)));
+      curData = m_ITKLandmarkTransform->TransformPoint(sources.at(index));
+      errors.push_back(curData.EuclideanDistanceTo(targets.at(index)));
     }
     this->AccumulateStatistics(errors);
     this->Modified();
@@ -98,7 +98,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
   }
   
   if (m_TargetPointsAreSet)
-    this->InitializeLandmarkTransform();
+    this->InitializeLandmarkTransform(m_SourcePoints, m_TargetPoints);
 }
 
 
@@ -125,7 +125,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
     itkExceptionMacro("TargetPointSet must contain at least 3 points");
   }
   if (m_SourcePointsAreSet)
-    this->InitializeLandmarkTransform();
+    this->InitializeLandmarkTransform(m_SourcePoints, m_TargetPoints);
 }
 
 
@@ -254,4 +254,48 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
 bool mitk::NavigationDataLandmarkTransformFilter::IsInitialized() const
 {
   return m_SourcePointsAreSet && m_TargetPointsAreSet;
+}
+
+
+void mitk::NavigationDataLandmarkTransformFilter::PrintSelf( std::ostream& os, itk::Indent indent ) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << this->GetNameOfClass() << ":\n";
+  os << indent << m_SourcePoints.size() << " SourcePoints exist: \n";
+  itk::Indent nextIndent = indent.GetNextIndent();
+  unsigned int i = 0;
+  for (LandmarkPointContainer::const_iterator it = m_SourcePoints.begin(); it != m_SourcePoints.end(); ++it)
+  {
+    os << nextIndent << "Point " << i++ << ": [";
+    os << it->GetElement(0);
+    for (unsigned int i = 1; i < TransformInitializerType::LandmarkPointType::GetPointDimension(); ++i)
+    {
+      os << ", " << it->GetElement(i);
+    }
+    os << "]\n";
+  }
+
+  os << indent << m_TargetPoints.size() << " TargetPoints exist: \n";
+  i = 0;
+  for (LandmarkPointContainer::const_iterator it = m_TargetPoints.begin(); it != m_TargetPoints.end(); ++it)
+  {
+    os << nextIndent << "Point " << i++ << ": [";
+    os << it->GetElement(0);
+    for (unsigned int i = 1; i < TransformInitializerType::LandmarkPointType::GetPointDimension(); ++i)
+    {
+      os << ", " << it->GetElement(i);
+    }
+    os << "]\n";
+  }
+  os << indent << "Landmarktransform initialized: " << this->IsInitialized() << "\n";  
+  if (this->IsInitialized() == true)
+    m_ITKLandmarkTransform->Print(os, nextIndent);
+  os << indent << "Registration error statistics:\n";
+  os << nextIndent << "FRE: " << this->GetFRE() << "\n";
+  os << nextIndent << "FRE std.dev.: " << this->GetFREStdDev() << "\n";
+  os << nextIndent << "FRE RMS: " << this->GetRMSError() << "\n";
+  os << nextIndent << "Minimum registration error: " << this->GetMinError() << "\n";
+  os << nextIndent << "Maximum registration error: " << this->GetMaxError() << "\n";
+  os << nextIndent << "Absolute Maximum registration error: " << this->GetAbsMaxError() << "\n";
 }

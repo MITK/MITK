@@ -21,7 +21,7 @@ This document will tell you how to install the plug-in for eclipse and how to us
 First of all you have to install Eclipse (Eclipse Classic) and the plug-in Graphical Editing Framework (GEF). Furthermore we need the packages JDOM
 (jdom.jar) and Java3D (vecmath.jar).
 
-Now you have to unzip the file StateMachines.zip into your eclipse folder. The file is located in your SVN checkout mitk/core/interactions.
+Now you have to unzip the file StateMachines.zip into your eclipse folder. The file is located in your SVN checkout mitk\Modules\MitkExt\Interactions.
 
 Start Eclipse and select "File" -> "Import...".
 

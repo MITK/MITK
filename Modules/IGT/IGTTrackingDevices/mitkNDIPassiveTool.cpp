@@ -61,11 +61,11 @@ bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
   file.close();
   if (file.fail() == true)                      // reading of data unsuccessful?
   {
-    delete newData;
+    delete[] newData;
     return false;
   }
   if (m_SROMData != NULL)                       // reading was successful, delete old data
-    delete m_SROMData;
+    delete[] m_SROMData;
   m_SROMDataLength = newLength;                 // set member variables to new values
   m_SROMData = (unsigned char*) newData;
   this->Modified();

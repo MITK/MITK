@@ -240,6 +240,7 @@ double mitk::TimeStamp::GetOffset(itk::Object::Pointer Device)
 */
 void mitk::TimeStamp::Initialize()
 {
-  m_RealTimeClock = mitk::RealTimeClock::New();
+  if ( m_RealTimeClock.IsNull() )
+    m_RealTimeClock = mitk::RealTimeClock::New();
 }
 

@@ -146,14 +146,14 @@ namespace mitk {
     */
     void SetRealTimeClock(mitk::RealTimeClock::Pointer Clock);
  
+    void Initialize();
+
   protected:
     TimeStamp();
 
     virtual ~TimeStamp();
 
     double GetCurrentStamp();
-
-    void Initialize();
 
     /*
       the current timestamp when GetCurrentStamp() is called.

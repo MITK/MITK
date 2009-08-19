@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #pragma warning( disable : 4250 )
 
 #include "QmitkFunctionality.h"
-#include <mitkBoundingObject.h>
+#include <mitkCuboid.h>
 #include <mitkOperationActor.h>
 #include <mitkOperation.h>
 #include <mitkAffineInteractor.h>
@@ -181,7 +181,7 @@ protected:
   /*!
   * \brief The cuboid used for cropping.
   */
-  mitk::BoundingObject::Pointer m_CroppingObject;
+  mitk::Cuboid::Pointer m_CroppingObject;
 
   /*!
   * \brief Tree node of the cuboid used for cropping.

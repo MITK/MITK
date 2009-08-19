@@ -28,11 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkRenderingManager.h>
-#include <mitkCuboid.h>
 #include <mitkProperties.h>
 #include <mitkGlobalInteraction.h>
 #include "mitkUndoController.h"
-#include "mitkBoundingObjectCutter.h"
+#include "mitkCuboidObjectCutter.h"
 #include "mitkDataTreeHelper.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
@@ -279,7 +278,7 @@ void QmitkImageCropper::CropImage()
   }
 
   // image and bounding object ok
-  mitk::BoundingObjectCutter::Pointer cutter = mitk::BoundingObjectCutter::New();
+  mitk::CuboidObjectCutter::Pointer cutter = mitk::CuboidObjectCutter::New();
   cutter->SetBoundingObject( m_CroppingObject );
   cutter->SetInput( m_ImageToCrop );
   cutter->AutoOutsideValueOff();

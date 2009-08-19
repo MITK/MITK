@@ -115,26 +115,26 @@ m_Node(NULL)
   m_SubSplit2->addWidget( mitkWidget4Container );
 
   //Create RenderWindows 1
-  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container);
+  mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1");
   mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( TRANSVERSAL );
   mitkWidgetLayout1->addWidget(mitkWidget1); 
 
   //Create RenderWindows 2
-  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container);
+  mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2");
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
-  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container);
+  mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3");
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3); 
 
   //Create RenderWindows 4
-  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container);
+  mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4");
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4); 
@@ -159,7 +159,7 @@ m_Node(NULL)
   sizePolicy.setHeightForWidth(levelWindowWidget->sizePolicy().hasHeightForWidth());
   levelWindowWidget->setSizePolicy(sizePolicy);
   levelWindowWidget->setMaximumSize(QSize(50, 2000));
-
+  
   //add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget( levelWindowWidget );
 

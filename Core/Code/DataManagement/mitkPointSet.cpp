@@ -181,7 +181,7 @@ int mitk::PointSet::SearchPoint( Point3D point, float distance, int t  ) const
 }
 
 mitk::PointSet::PointType 
-mitk::PointSet::GetPoint( int position, int t ) const
+mitk::PointSet::GetPoint( PointIdentifier id, int t ) const
 {
   PointType out;
   out.Fill(0);
@@ -191,12 +191,10 @@ mitk::PointSet::GetPoint( int position, int t ) const
     return out;
   }
 
-  if ( m_PointSetSeries[t]->GetPoints()->IndexExists(position) )
+  if ( m_PointSetSeries[t]->GetPoints()->IndexExists(id) )
   {
-    m_PointSetSeries[t]->GetPoint( position, &out );
-
+    m_PointSetSeries[t]->GetPoint( id, &out );
     this->GetGeometry(t)->IndexToWorld( out, out );
-
     return out;
   }
   else

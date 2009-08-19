@@ -152,15 +152,17 @@ public:
   virtual DataType::Pointer GetPointSet( int t = 0 ) const;
 
   /**
-   * \brief Get the point on the given position in world coordinates
+   * \brief Get the point with ID id in world coordinates
    *
-   * check if index exists. If it doesn't exist, then return 0,0,0
+   * check if the ID exists. If it doesn't exist, then return 0,0,0
    */
-  PointType GetPoint( int position, int t = 0 ) const;
+  PointType GetPoint( PointIdentifier id, int t = 0 ) const;
 
   /**
-   * \brief If the Id exists in mitkData, then point is set and true is
-   * returned in world coordinates
+   * \brief Get the point with ID id in world coordinates
+   * 
+   * If a point exists for the ID id, the point is returned in the parameter point 
+   * and the method returns true. If the ID does not exist, the method returns false
    */
   bool GetPointIfExists( PointIdentifier id, PointType* point, int t = 0 ) const;
 

@@ -406,6 +406,7 @@ void TabbedStackPresentation::MovePart(IPresentablePart::Pointer toMove,
 
     if (insertionPoint == folder->IndexOf(toMove))
     {
+      --ignoreSelectionChanges;
       return;
     }
 

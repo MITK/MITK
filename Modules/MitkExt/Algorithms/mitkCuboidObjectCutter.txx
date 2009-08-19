@@ -144,7 +144,7 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
         }
         else
         {
-          outputIt.Set(outsideValue);
+          outputIt.Set(cutter->m_OutsideValue);
           ++cutter->m_OutsidePixelCount;
         }
       }
@@ -163,7 +163,7 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
         }
         else
         {
-          outputIt.Set( outsideValue );
+          outputIt.Set( cutter->m_OutsideValue );
           ++cutter->m_OutsidePixelCount;
         }
       }

@@ -1885,7 +1885,7 @@ IViewPart::Pointer WorkbenchPage::FindView(const std::string& id)
 IViewReference::Pointer WorkbenchPage::FindViewReference(
     const std::string& viewId)
 {
-  return this->FindViewReference(viewId, 0);
+  return this->FindViewReference(viewId, "");
 }
 
 IViewReference::Pointer WorkbenchPage::FindViewReference(

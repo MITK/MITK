@@ -51,8 +51,10 @@ m_FullScreenMode(false)
 {
   //Create Menu Widget
   this->CreateMenuWidget();
-  this->hide();
+  this->setMinimumWidth(122);
   this->setAutoFillBackground( true );
+  this->hide();
+  
   //this->setAttribute( Qt::WA_NoSystemBackground  );
   //this->setBackgroundRole( QPalette::Dark );
   //this->update();
@@ -148,8 +150,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_HoriSplitButton->setMaximumSize(15, 15);
   m_HoriSplitButton->setIconSize(size);
   m_HoriSplitButton->setFlat( true );
-  const QIcon iconHoriSplit( iconHoriSplit_xpm );
-  m_HoriSplitButton->setIcon(iconHoriSplit);
+  m_HoriSplitButton->setIcon( QIcon( iconHoriSplit_xpm ));
   layout->addWidget( m_HoriSplitButton );
 
   //VertiSplitButton
@@ -157,8 +158,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_VertiSplitButton->setMaximumSize(15, 15);
   m_VertiSplitButton->setIconSize(size);
   m_VertiSplitButton->setFlat( true );
-  const QIcon iconVertiSplit( iconVertiSplit_xpm );
-  m_VertiSplitButton->setIcon(iconVertiSplit);
+  m_VertiSplitButton->setIcon( QIcon( iconVertiSplit_xpm ));
   layout->addWidget( m_VertiSplitButton );
 
   //fullScreenButton
@@ -166,8 +166,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
   m_FullScreenButton->setFlat( true );
-  const QIcon iconFullScreen( iconFullScreen_xpm );
-  m_FullScreenButton->setIcon(iconFullScreen);
+  m_FullScreenButton->setIcon( QIcon( iconFullScreen_xpm ));
   layout->addWidget( m_FullScreenButton );
 
   //settingsButton
@@ -175,8 +174,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_SettingsButton->setMaximumSize(15, 15);
   m_SettingsButton->setIconSize(size);
   m_SettingsButton->setFlat( true );
-  const QIcon iconSettings( iconSettings_xpm );
-  m_SettingsButton->setIcon(iconSettings);
+  m_SettingsButton->setIcon( QIcon( iconSettings_xpm ));
   layout->addWidget( m_SettingsButton );
 
   //closeButton
@@ -184,8 +182,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_CloseButton->setMaximumSize(15, 15);
   m_CloseButton->setIconSize(size);
   m_CloseButton->setFlat( true );
-  const QIcon iconClose( iconClose_xpm );
-  m_CloseButton->setIcon(iconClose);
+  m_CloseButton->setIcon( QIcon( iconClose_xpm ));
   layout->addWidget( m_CloseButton );
 
   //Create Connections -- coming soon?

@@ -127,10 +127,10 @@ protected:
   void SetHandleMultipleDataStorages(bool multiple);
   bool HandlesMultipleDataStorages() const;
 
-  mitk::DataStorage::Pointer GetDataStorage() const;
-  mitk::DataStorage::Pointer GetDefaultDataStorage() const;
+  virtual mitk::DataStorage::Pointer GetDataStorage() const;
+  virtual mitk::DataStorage::Pointer GetDefaultDataStorage() const;
 
-  QmitkStdMultiWidget* GetActiveStdMultiWidget();
+  virtual QmitkStdMultiWidget* GetActiveStdMultiWidget();
 
   QWidget* m_Parent;
 private:

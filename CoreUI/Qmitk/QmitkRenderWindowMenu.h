@@ -73,6 +73,11 @@ public:
   to disable and all other to enable. */
   void UpdateLayoutDesignList( int layoutDesignIndex );
 
+  /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
+  is activated.*/
+  void MoveWidgetToCorrectPos();
+
+
 protected:
 
   /*! Create menu widget. The menu contains five QPushButtons (hori-split, verti-split, full-screen, settings and close button)
@@ -94,9 +99,6 @@ protected:
   /*! Change Icon of full-screen button depending on full-screen mode. */
   void ChangeFullScreenIcon();
 
-  /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
-  is activated.*/
-  void MoveWidgetToCorrectPos();
 
 signals:
   

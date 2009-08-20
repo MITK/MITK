@@ -203,13 +203,7 @@ void QmitkRenderWindow::enterEvent( QEvent *e )
   //show Menu Widget
   if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
   {
-    /* //Window position. Is used, if m_MenuWidge is a Window and not a Widget.
-    QPoint widgetOrigin = this->mapToGlobal( this->geometry().topLeft() );
-    int moveX = floor( double( widgetOrigin.x() + ( this->width() - m_MenuWidget->width() - 6.0 ) ) );*/
-
-    int moveX= floor( double(this->width() - m_MenuWidget->width() - 4.0) );
-    m_MenuWidget->move( moveX, 3 );
-
+    m_MenuWidget->MoveWidgetToCorrectPos();
     m_MenuWidget->show();
     m_MenuWidget->update();
   }

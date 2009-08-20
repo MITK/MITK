@@ -75,7 +75,7 @@ void mitk::NavigationDataRecorder::Update()
     for (unsigned int index = 0; index < inputs.size(); index++)
     {
       mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer());
-      nd->Update();
+      nd->Update(); // call update to propagate update to previous filters
 
       mitk::NavigationData::PositionType position;
       mitk::NavigationData::OrientationType orientation(0.0, 0.0, 0.0, 0.0);

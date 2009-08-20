@@ -134,6 +134,8 @@ SET(CPP_FILES
   Interactions/mitkStateMachine.cpp
   Interactions/mitkStateMachineFactory.cpp
   Interactions/mitkTransition.cpp
+  Interactions/mitkWheelEvent.cpp
+  Interactions/mitkKeyEvent.cpp
   IO/mitkBaseDataIOFactory.cpp
   #IO/mitkBaseXMLWriter.cpp
   IO/mitkFileReader.cpp

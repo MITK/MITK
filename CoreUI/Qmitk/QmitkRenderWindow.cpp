@@ -187,10 +187,9 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   if (m_Renderer.IsNotNull())
   {
     QPoint cp = mapFromGlobal(QCursor::pos());
-    mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(ke, cp));
+    mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
     m_Renderer->KeyPressEvent(&mke);
-    if(mke.isAccepted())
-      ke->accept();
+    ke->accept();
   }
 
   if (m_ResendQtEvents) ke->ignore();

@@ -22,7 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseController.h"
-#include "mitkEventTypedefs.h"
+#include "mitkDisplayPositionEvent.h"
+#include "mitkKeyEvent.h"
 
 namespace mitk {
 

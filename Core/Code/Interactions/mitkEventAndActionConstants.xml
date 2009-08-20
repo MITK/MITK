@@ -42,9 +42,7 @@
       <event NAME="EIDSHIFTANDMIDDLEMOUSEPRESS" ID="2003" />
       <event NAME="EIDSHIFTANDMIDDLEMOUSEMOVE" ID="2004" />
       <event NAME="EIDSHIFTANDMIDDLEMOUSERELEASE" ID="2005" />
-      <event NAME="EIDMOUSEWHEEL" ID="9">
-        <!---->
-      </event>
+      <event NAME="EIDMOUSEWHEEL" ID="9" />
     </eventCategory>
     <eventCategory NAME="NoMouseEvents">
       <event NAME="EIDSTRGANDN" ID="10" />
@@ -68,6 +66,12 @@
       <event NAME="EIDSTRGANDALTANDS" ID="40" />
       <event NAME="EIDALT" ID="90" />
       <event NAME="EIDSTRGANDB" ID="91" />
+      <event NAME="EIDPLUS" ID="26">
+        <!---->
+      </event>
+      <event NAME="EIDMINUS" ID="27">
+        <!---->
+      </event>
     </eventCategory>
     <eventCategory NAME="own thrown events">
       <event NAME="EIDNEW" ID="1000" />
@@ -332,7 +336,11 @@
         <!--For restoring a mesh after an update-->
       </action>
       <action NAME="AcONTDMOUSEINPUT" ID="4002" />
-      <action NAME="AcWHEEL" ID="105">
+      <action NAME="AcWHEEL" ID="105" />
+      <action NAME="AcPLUS" ID="106">
+        <!---->
+      </action>
+      <action NAME="AcMINUS" ID="107">
         <!---->
       </action>
     </actionCategory>

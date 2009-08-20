@@ -656,10 +656,24 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
 
 void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 {
-  //if (m_CameraController)
-  //  m_CameraController->KeyPressEvent(ke);
-  mitk::Event event(this, ke->type(), BS_NoButton, BS_NoButton, ke->key());
-  mitk::EventMapper::MapEvent(&event);
+  if(m_MapperID==1)
+  {
+    Point2D p(ke->GetDisplayPosition());
+    Point2D p_mm;
+    Point3D position;
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    GetDisplayGeometry()->DisplayToWorld(p, p_mm);
+    GetDisplayGeometry()->Map(p_mm, position);
+    mitk::KeyEvent event(this, ke->GetType(), ke->GetButton(), ke->GetButtonState(), ke->GetKey(), ke->GetText(), p);
+    mitk::EventMapper::MapEvent(&event);
+  }
+  else if(m_MapperID==2)
+  {
+    Point2D p(ke->GetDisplayPosition());
+    GetDisplayGeometry()->ULDisplayToDisplay(p,p);
+    ke->SetDisplayPosition(p);
+    mitk::EventMapper::MapEvent(ke);
+  }
 }
 
 void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))

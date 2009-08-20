@@ -20,15 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include <mitkEventTypedefs.h>
+#include <mitkKeyEvent.h>
+#include <mitkWheelEvent.h>
+#include <mitkDisplayPositionEvent.h>
 
 class QMITK_EXPORT QmitkEventAdapter
 {
 public:
   
   static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mouseEvent);
-  static mitk::MouseEvent AdaptWheelEvent(mitk::BaseRenderer* sender, QWheelEvent* wheelEvent);
-  static mitk::KeyEvent AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& point);
+  static mitk::WheelEvent AdaptWheelEvent(mitk::BaseRenderer* sender, QWheelEvent* wheelEvent);
+  static mitk::KeyEvent AdaptKeyEvent(mitk::BaseRenderer* sender, QKeyEvent* keyEvent, const QPoint& point);
 };
 
 #endif /*QMITKEVENTADAPTER_H_*/

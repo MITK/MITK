@@ -95,6 +95,8 @@ enum EEventIds
   Return = 23,
   Enter = 24,
   Space = 25,
+  EIDPLUS = 26,
+  EIDMINUS = 27,
   EIDSTRGANDALTANDH = 30,
   EIDSTRGANDALTANDI = 31,
   EIDSTRGANDALTANDS = 40,
@@ -270,6 +272,8 @@ enum EActions
   AcREMOVEALL = 103,
   AcREMOVESELECTEDSUBOBJECT = 104,  // used in VesselGraphInteractor
   AcWHEEL = 105,
+  AcPLUS = 106,
+  AcMINUS = 107,
   AcDELETEPOINT = 120,
   AcCLEAR = 130,  // clear all elements from a list
   AcINSERTPOINT = 110,

@@ -58,6 +58,10 @@
     <event NAME="Enter" ID="24" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Enter" />
     <!-- Space -->
     <event NAME="Space" ID="25" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Space" />
+    <!-- Plus -->
+    <event NAME="Plus" ID="26" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Plus" />
+    <!-- Minus -->
+    <event NAME="Minus" ID="27" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Minus" />
     <!-- Strg + Alt + H -->
     <event NAME="Strg+Alt+H" ID="30" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_H" />
     <!-- Strg + Alt + I -->
@@ -3091,6 +3095,12 @@
       <transition NAME="MouseMove" EVENT_ID="520" NEXT_STATE_ID="1">
         <action ID="92" />
       </transition>
+      <transition NAME="name" EVENT_ID="26" NEXT_STATE_ID="1">
+        <action ID="106" />
+      </transition>
+      <transition NAME="name" EVENT_ID="27" NEXT_STATE_ID="1">
+        <action ID="107" />
+      </transition>
     </state>
     <state NAME="ToolInUse" ID="2" X_POS="511" Y_POS="372" WIDTH="100" HEIGHT="50">
       <transition NAME="send Koordinates move" NEXT_STATE_ID="2" EVENT_ID="530">
@@ -3101,6 +3111,12 @@
       </transition>
       <transition NAME="MouseWheel" EVENT_ID="9" NEXT_STATE_ID="2">
         <action ID="105" />
+      </transition>
+      <transition NAME="name" EVENT_ID="26" NEXT_STATE_ID="2">
+        <action ID="106" />
+      </transition>
+      <transition NAME="name" EVENT_ID="27" NEXT_STATE_ID="2">
+        <action ID="107" />
       </transition>
     </state>
   </stateMachine>

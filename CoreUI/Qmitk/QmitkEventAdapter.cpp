@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkEventAdapter.h"
 #include <mitkInteractionConst.h>
+#include <mitkWheelEvent.h>
 
 #include <QPoint>
 #include <QCursor>
@@ -84,14 +85,14 @@ QmitkEventAdapter::AdaptWheelEvent(mitk::BaseRenderer* sender, QWheelEvent* whee
     state |= mitk::BS_Keypad;
 
   mitk::WheelEvent mitkEvent(sender, wheelEvent->type(), wheelEvent->buttons(), 
-    state, mitk::Key_none, p);
+    state, mitk::Key_none, p, wheelEvent->delta());
 
   return mitkEvent;
 }
 
 
 mitk::KeyEvent 
-QmitkEventAdapter::AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& cp)
+QmitkEventAdapter::AdaptKeyEvent(mitk::BaseRenderer* sender, QKeyEvent* keyEvent, const QPoint& cp)
 {
   int key = keyEvent->key();
   
@@ -100,10 +101,25 @@ QmitkEventAdapter::AdaptKeyEvent(QKeyEvent* keyEvent, const QPoint& cp)
     key -= (0x01000000 - 0x1000);
   else if(key >= 0x01001120 && key <= 0x01001262)
     key -= 0x01000000;
-  
-  mitk::KeyEvent mke(keyEvent->type(), key, keyEvent->modifiers(),
-      keyEvent->text().toStdString(), keyEvent->isAutoRepeat(),
-      keyEvent->count(), cp.x(), cp.y(), QCursor::pos().x(), QCursor::pos().y());
+
+  mitk::Point2D p;
+  p[0] = cp.x(); 
+  p[1] = cp.y();
+
+  int modifiers = keyEvent->modifiers();
+  int state = 0;
+  if (modifiers & Qt::ShiftModifier)
+    state |= mitk::BS_ShiftButton;
+  if (modifiers & Qt::ControlModifier)
+    state |= mitk::BS_ControlButton;
+  if (modifiers & Qt::AltModifier)
+    state |= mitk::BS_AltButton;
+  if (modifiers & Qt::MetaModifier)
+    state |= mitk::BS_MetaButton;
+  //if (modifiers & Qt::KeypadModifier)
+  //  state |= mitk::BS_Keypad;
+
+  mitk::KeyEvent mke(sender, keyEvent->type(), mitk::BS_NoButton, state, key, keyEvent->text().toStdString(), p);
   
   return mke;
 }

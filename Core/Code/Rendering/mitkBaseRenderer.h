@@ -25,7 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDisplayGeometry.h"
 #include "mitkGeometry2DData.h"
 #include "mitkCameraController.h"
-#include "mitkEventTypedefs.h"
+#include "mitkDisplayPositionEvent.h"
+#include "mitkWheelEvent.h"
 
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraController.h"

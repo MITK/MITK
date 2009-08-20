@@ -58,6 +58,8 @@ class MITK_CORE_EXPORT DisplayPositionEvent : public Event
     mutable bool m_WorldPositionIsSet;
 };
 
+typedef DisplayPositionEvent MouseEvent;
+
 } // namespace mitk
 
 #endif /* DISPLAYPOSITIONozsiEVENT_H_HEADER_INCLUDED_C184F366 */

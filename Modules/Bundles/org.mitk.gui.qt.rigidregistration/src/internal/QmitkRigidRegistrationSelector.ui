@@ -64,6 +64,12 @@
               <property name="enabled">
                <bool>true</bool>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="duplicatesEnabled">
                <bool>false</bool>
               </property>
@@ -165,7 +171,7 @@
                <bool>true</bool>
               </property>
               <property name="currentIndex">
-               <number>12</number>
+               <number>13</number>
               </property>
               <widget class="QWidget" name="TranslationTransform">
                <layout class="QVBoxLayout" name="verticalLayout_114">
@@ -251,6 +257,12 @@
                          <layout class="QVBoxLayout" name="_16">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesTranslationTransformTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -261,6 +273,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesTranslationTransformTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -271,6 +289,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesTranslationTransformTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -375,6 +399,12 @@
                          <layout class="QVBoxLayout" name="_34">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleTransformScaleX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -385,6 +415,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleTransformScaleY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -395,6 +431,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleTransformScaleZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -499,6 +541,12 @@
                          <layout class="QVBoxLayout" name="_48">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleLogarithmicTransformScaleX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -509,6 +557,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleLogarithmicTransformScaleY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -519,6 +573,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleLogarithmicTransformScaleZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -710,6 +770,12 @@
                          <layout class="QVBoxLayout" name="_68">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -720,6 +786,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -730,6 +802,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -740,6 +818,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -750,6 +834,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale5">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -760,6 +850,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale6">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -770,6 +866,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale7">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -780,6 +882,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale8">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -790,6 +898,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScale9">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -800,6 +914,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -810,6 +930,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -820,6 +946,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesAffineTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -864,6 +996,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -873,6 +1011,12 @@
                        <widget class="QRadioButton" name="m_MomentsAffine">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -1061,6 +1205,12 @@
                          <layout class="QVBoxLayout" name="_91">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1071,6 +1221,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1081,6 +1237,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1091,6 +1253,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1101,6 +1269,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale5">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1111,6 +1285,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale6">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1121,6 +1301,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale7">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1131,6 +1317,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale8">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1141,6 +1333,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScale9">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1151,6 +1349,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1161,6 +1365,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1171,6 +1381,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1215,6 +1431,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -1224,6 +1446,12 @@
                        <widget class="QRadioButton" name="m_MomentsFixedCenterOfRotationAffine">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -1412,6 +1640,12 @@
                          <layout class="QVBoxLayout" name="_99">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1422,6 +1656,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1432,6 +1672,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1442,6 +1688,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1452,6 +1704,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale5">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1462,6 +1720,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale6">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1472,6 +1736,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale7">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1482,6 +1752,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale8">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1492,6 +1768,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScale9">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1502,6 +1784,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1512,6 +1800,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1522,6 +1816,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1566,6 +1866,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -1575,6 +1881,12 @@
                        <widget class="QRadioButton" name="m_MomentsRigid3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -1703,6 +2015,12 @@
                          <layout class="QVBoxLayout" name="_106">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1713,6 +2031,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1723,6 +2047,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1733,6 +2063,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1743,6 +2079,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1753,6 +2095,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesEuler3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1797,6 +2145,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -1806,6 +2160,12 @@
                        <widget class="QRadioButton" name="m_MomentsEuler3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -1934,6 +2294,12 @@
                          <layout class="QVBoxLayout" name="_113">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1944,6 +2310,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1954,6 +2326,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -1964,6 +2342,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1974,6 +2358,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -1984,6 +2374,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredEuler3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2028,6 +2424,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -2037,6 +2439,12 @@
                        <widget class="QRadioButton" name="m_MomentsCenteredEuler3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -2175,6 +2583,12 @@
                          <layout class="QVBoxLayout" name="_120">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2185,6 +2599,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2195,6 +2615,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2205,6 +2631,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2215,6 +2647,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2225,6 +2663,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2235,6 +2679,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesQuaternionRigidTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2279,6 +2729,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -2288,6 +2744,12 @@
                        <widget class="QRadioButton" name="m_MomentsQuaternionRigid">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -2386,6 +2848,12 @@
                          <layout class="QVBoxLayout" name="_127">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2396,6 +2864,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2406,6 +2880,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2450,6 +2930,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -2459,6 +2945,12 @@
                        <widget class="QRadioButton" name="m_MomentsVersor">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -2587,6 +3079,12 @@
                          <layout class="QVBoxLayout" name="_134">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2597,6 +3095,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2607,6 +3111,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2617,6 +3127,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2627,6 +3143,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2637,6 +3159,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesVersorRigid3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2681,6 +3209,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -2690,6 +3224,12 @@
                        <widget class="QRadioButton" name="m_MomentsVersorRigid3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -2908,6 +3448,12 @@
                          <layout class="QVBoxLayout" name="_141">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2918,6 +3464,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2928,6 +3480,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2938,6 +3496,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2948,6 +3512,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScaleScaleSkewVersorRigid3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2958,6 +3528,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -2968,6 +3544,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale7">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2978,6 +3560,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale8">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2988,6 +3576,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale9">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -2998,6 +3592,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale10">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3008,6 +3608,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale11">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3018,6 +3624,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale12">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3028,6 +3640,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale13">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3038,6 +3656,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale14">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3048,6 +3672,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesScaleSkewVersorRigid3DTransformScale15">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3092,6 +3722,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -3101,6 +3737,12 @@
                        <widget class="QRadioButton" name="m_MomentsScaleSkewVersorRigid3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -3239,6 +3881,12 @@
                          <layout class="QVBoxLayout" name="_148">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3249,6 +3897,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3259,6 +3913,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3269,6 +3929,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3279,6 +3945,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3289,6 +3961,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3299,6 +3977,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesSimilarity3DTransformScaleTranslationZ">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3343,6 +4027,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -3352,6 +4042,12 @@
                        <widget class="QRadioButton" name="m_MomentsSimilarity3D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -3450,6 +4146,12 @@
                          <layout class="QVBoxLayout" name="_155">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid2DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3460,6 +4162,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid2DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3470,6 +4178,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesRigid2DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3514,6 +4228,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -3523,6 +4243,12 @@
                        <widget class="QRadioButton" name="m_MomentsRigid2D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -3571,6 +4297,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_AngleCenteredRigid2D">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>0.0</string>
                        </property>
@@ -3665,6 +4397,12 @@
                          <layout class="QVBoxLayout" name="_163">
                           <item>
                            <widget class="QLineEdit" name="m_RotationScaleCenteredRigid2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3675,6 +4413,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_CenterXScaleCenteredRigid2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3685,6 +4429,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_CenterYScaleCenteredRigid2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3695,6 +4445,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationXScaleCenteredRigid2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3705,6 +4461,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationYScaleCenteredRigid2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3749,6 +4511,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -3758,6 +4526,12 @@
                        <widget class="QRadioButton" name="m_MomentsCenteredRigid2D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -3856,6 +4630,12 @@
                          <layout class="QVBoxLayout" name="_170">
                           <item>
                            <widget class="QLineEdit" name="m_RotationScaleEuler2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -3866,6 +4646,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationXScaleEuler2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3876,6 +4662,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationYScaleEuler2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -3920,6 +4712,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -3929,6 +4727,12 @@
                        <widget class="QRadioButton" name="m_MomentsEuler2D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -3993,6 +4797,12 @@
                       <layout class="QVBoxLayout" name="_176">
                        <item>
                         <widget class="QLineEdit" name="m_InitialScaleSimilarity2D">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -4003,6 +4813,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_AngleSimilarity2D">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0</string>
                          </property>
@@ -4086,6 +4902,12 @@
                          <layout class="QVBoxLayout" name="_180">
                           <item>
                            <widget class="QLineEdit" name="m_ScalingScaleSimilarity2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>10.0</string>
                             </property>
@@ -4096,6 +4918,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_RotationScaleSimilarity2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -4106,6 +4934,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationXScaleSimilarity2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4116,6 +4950,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_TranslationYScaleSimilarity2D">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4157,6 +4997,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -4166,6 +5012,12 @@
                        <widget class="QRadioButton" name="m_MomentsSimilarity2D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -4230,6 +5082,12 @@
                       <layout class="QVBoxLayout" name="_186">
                        <item>
                         <widget class="QLineEdit" name="m_InitialScaleCenteredSimilarity2D">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -4240,6 +5098,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_AngleCenteredSimilarity2D">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0</string>
                          </property>
@@ -4346,6 +5210,12 @@
                          <layout class="QVBoxLayout" name="_190">
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScale1">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>10.0</string>
                             </property>
@@ -4356,6 +5226,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScale2">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>1.0</string>
                             </property>
@@ -4366,6 +5242,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScale3">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4376,6 +5258,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScale4">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4386,6 +5274,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScaleTranslationX">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4396,6 +5290,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_ScalesCenteredSimilarity2DTransformScaleTranslationY">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>0.001</string>
                             </property>
@@ -4440,6 +5340,12 @@
                         <property name="enabled">
                          <bool>true</bool>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
+                        </property>
                         <property name="text">
                          <string>Geometry</string>
                         </property>
@@ -4449,6 +5355,12 @@
                        <widget class="QRadioButton" name="m_MomentsCenteredSimilarity2D">
                         <property name="enabled">
                          <bool>true</bool>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>20</height>
+                         </size>
                         </property>
                         <property name="text">
                          <string>Moments</string>
@@ -4502,6 +5414,12 @@
              <widget class="QComboBox" name="m_MetricBox">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="duplicatesEnabled">
                <bool>false</bool>
@@ -4576,7 +5494,7 @@
             <item>
              <widget class="QStackedWidget" name="m_MetricWidgetStack">
               <property name="currentIndex">
-               <number>8</number>
+               <number>4</number>
               </property>
               <widget class="QWidget" name="MeanSquares">
                <layout class="QVBoxLayout" name="verticalLayout_19">
@@ -4651,6 +5569,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>256</string>
                        </property>
@@ -4697,6 +5621,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_NumberOfHistogramBinsCorrelationCoefficientHistogram">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>256</string>
                        </property>
@@ -4743,6 +5673,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_NumberOfHistogramBinsMeanSquaresHistogram">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>256</string>
                        </property>
@@ -4789,6 +5725,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_NumberOfHistogramBinsMutualInformationHistogram">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>256</string>
                        </property>
@@ -4835,6 +5777,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_NumberOfHistogramBinsNormalizedMutualInformationHistogram">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>256</string>
                        </property>
@@ -4908,6 +5856,12 @@
                           </item>
                           <item row="0" column="1">
                            <widget class="QLineEdit" name="m_NumberOfSpatialSamplesMattesMutualInformation">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>10000</string>
                             </property>
@@ -4918,6 +5872,12 @@
                           </item>
                           <item row="1" column="1">
                            <widget class="QLineEdit" name="m_NumberOfHistogramBinsMattesMutualInformation">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>24</string>
                             </property>
@@ -4934,16 +5894,6 @@
                     </widget>
                    </item>
                   </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="m_ComputeGradient">
-                  <property name="text">
-                   <string>Compute Gradient</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
                  </widget>
                 </item>
                </layout>
@@ -4979,6 +5929,12 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="m_LambdaMeanReciprocalSquareDifference">
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>20</height>
+                        </size>
+                       </property>
                        <property name="text">
                         <string>10</string>
                        </property>
@@ -5051,6 +6007,12 @@
                       <layout class="QVBoxLayout" name="_33">
                        <item>
                         <widget class="QLineEdit" name="m_NumberOfSpatialSamplesMutualInformation">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1</string>
                          </property>
@@ -5061,6 +6023,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_FixedImageStandardDeviationMutualInformation">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.4</string>
                          </property>
@@ -5071,6 +6039,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MovingImageStandardDeviationMutualInformation">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.4</string>
                          </property>
@@ -5137,6 +6111,12 @@
                          <layout class="QVBoxLayout" name="_37">
                           <item>
                            <widget class="QLineEdit" name="m_FixedSmootherVarianceMutualInformation">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>2.0</string>
                             </property>
@@ -5147,6 +6127,12 @@
                           </item>
                           <item>
                            <widget class="QLineEdit" name="m_MovingSmootherVarianceMutualInformation">
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>2.0</string>
                             </property>
@@ -5197,6 +6183,22 @@
               </widget>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="m_ComputeGradient">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Compute Gradient</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -5237,6 +6239,12 @@
              <widget class="QComboBox" name="m_OptimizerBox">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="duplicatesEnabled">
                <bool>false</bool>
@@ -5322,7 +6330,7 @@
                <number>1</number>
               </property>
               <property name="currentIndex">
-               <number>11</number>
+               <number>2</number>
               </property>
               <widget class="QWidget" name="Exhaustive">
                <layout class="QVBoxLayout" name="verticalLayout_41">
@@ -5374,6 +6382,12 @@
                        </property>
                        <item>
                         <widget class="QLineEdit" name="m_StepLengthExhaustive">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -5384,6 +6398,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_NumberOfStepsExhaustive">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>10</string>
                          </property>
@@ -5445,6 +6465,12 @@
                       <layout class="QVBoxLayout" name="verticalLayout_44">
                        <item>
                         <widget class="QLineEdit" name="m_LearningRateGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.01</string>
                          </property>
@@ -5455,6 +6481,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -5519,6 +6551,12 @@
                       <layout class="QVBoxLayout" name="_22">
                        <item>
                         <widget class="QLineEdit" name="m_LearningRateQuaternionRigidTransformGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.01</string>
                          </property>
@@ -5529,6 +6567,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsQuaternionRigidTransformGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -5615,6 +6659,12 @@
                         <layout class="QVBoxLayout" name="_74">
                          <item>
                           <widget class="QLineEdit" name="m_GradientConvergenceToleranceLBFGSB">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5625,6 +6675,12 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="m_LineSearchAccuracyLBFGSB">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5635,6 +6691,12 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="m_DefaultStepLengthLBFGSB">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -5645,6 +6707,12 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="m_IterationsLBFGSB">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>200</string>
                            </property>
@@ -5751,6 +6819,12 @@
                       <layout class="QVBoxLayout" name="_39">
                        <item>
                         <widget class="QLineEdit" name="m_ShrinkFactorOnePlusOneEvolutionary">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.98787654742307407</string>
                          </property>
@@ -5761,6 +6835,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_GrowthFactorOnePlusOneEvolutionary">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.05</string>
                          </property>
@@ -5771,6 +6851,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_EpsilonOnePlusOneEvolutionary">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -5781,6 +6867,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_InitialRadiusOnePlusOneEvolutionary">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>10</string>
                          </property>
@@ -5791,6 +6883,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsOnePlusOneEvolutionary">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -5875,6 +6973,12 @@
                       <layout class="QVBoxLayout" name="_44">
                        <item>
                         <widget class="QLineEdit" name="m_StepLengthPowell">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.01</string>
                          </property>
@@ -5885,6 +6989,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_StepTolerancePowell">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.001</string>
                          </property>
@@ -5895,6 +7005,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_ValueTolerancePowell">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.001</string>
                          </property>
@@ -5905,6 +7021,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsPowell">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -5972,6 +7094,12 @@
                             <property name="enabled">
                              <bool>true</bool>
                             </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
+                            </property>
                             <property name="text">
                              <string>Fletch Reeves</string>
                             </property>
@@ -5984,6 +7112,12 @@
                            <widget class="QRadioButton" name="m_PolakRibiereFRPR">
                             <property name="enabled">
                              <bool>true</bool>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>20</height>
+                             </size>
                             </property>
                             <property name="text">
                              <string>Polak Ribiere</string>
@@ -6025,6 +7159,12 @@
                         <layout class="QVBoxLayout" name="_52">
                          <item>
                           <widget class="QLineEdit" name="m_StepLengthFRPR">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>0.01</string>
                            </property>
@@ -6035,6 +7175,12 @@
                          </item>
                          <item>
                           <widget class="QLineEdit" name="m_IterationsFRPR">
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>20</height>
+                            </size>
+                           </property>
                            <property name="text">
                             <string>200</string>
                            </property>
@@ -6131,6 +7277,12 @@
                       <layout class="QVBoxLayout" name="_57">
                        <item>
                         <widget class="QLineEdit" name="m_GradientMagnitudeToleranceRegularStepGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0001</string>
                          </property>
@@ -6141,6 +7293,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MinimumStepLengthRegularStepGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.001</string>
                          </property>
@@ -6151,6 +7309,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MaximumStepLengthRegularStepGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -6161,6 +7325,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_RelaxationFactorRegularStepGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.5</string>
                          </property>
@@ -6171,6 +7341,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsRegularStepGradientDescent">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>100</string>
                          </property>
@@ -6255,6 +7431,12 @@
                       <layout class="QVBoxLayout" name="_62">
                        <item>
                         <widget class="QLineEdit" name="m_GradientMagnitudeToleranceVersorTransform">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0001</string>
                          </property>
@@ -6265,6 +7447,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MinimumStepLengthVersorTransform">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0001</string>
                          </property>
@@ -6275,6 +7463,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MaximumStepLengthVersorTransform">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>4.0</string>
                          </property>
@@ -6285,6 +7479,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsVersorTransform">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -6512,6 +7712,12 @@
                        </property>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba1">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6522,6 +7728,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba2">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6532,6 +7744,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba3">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6542,6 +7760,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba4">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6552,6 +7776,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba5">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6562,6 +7792,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba6">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6572,6 +7808,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba7">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6582,6 +7824,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba8">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6592,6 +7840,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba9">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6602,6 +7856,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba10">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6612,6 +7872,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba11">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6622,6 +7888,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba12">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6632,6 +7904,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba13">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6642,6 +7920,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba14">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6652,6 +7936,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_SimplexDeltaAmoeba15">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>5.0</string>
                          </property>
@@ -6662,6 +7952,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_ParametersConvergenceToleranceAmoeba">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.01</string>
                          </property>
@@ -6672,6 +7968,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_FunctionConvergenceToleranceAmoeba">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.001</string>
                          </property>
@@ -6682,6 +7984,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_IterationsAmoeba">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -6783,6 +8091,12 @@
                        </property>
                        <item>
                         <widget class="QLineEdit" name="m_GradientMagnitudeToleranceLBFGS">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.0001</string>
                          </property>
@@ -6793,6 +8107,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_LineSearchAccuracyLBFGS">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.1</string>
                          </property>
@@ -6803,6 +8123,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_DefaultStepLengthLBFGS">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -6813,6 +8139,12 @@
                        </item>
                        <item>
                         <widget class="QLineEdit" name="m_MaximumEvaluationsLBFGS">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>200</string>
                          </property>
@@ -6996,6 +8328,12 @@
                          <property name="enabled">
                           <bool>true</bool>
                          </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1.0</string>
                          </property>
@@ -7008,6 +8346,12 @@
                         <widget class="QLineEdit" name="m_ASPSA">
                          <property name="enabled">
                           <bool>true</bool>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
                          </property>
                          <property name="text">
                           <string>10.0</string>
@@ -7022,6 +8366,12 @@
                          <property name="enabled">
                           <bool>true</bool>
                          </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.602</string>
                          </property>
@@ -7034,6 +8384,12 @@
                         <widget class="QLineEdit" name="m_cSPSA">
                          <property name="enabled">
                           <bool>true</bool>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
                          </property>
                          <property name="text">
                           <string>0.0001</string>
@@ -7048,6 +8404,12 @@
                          <property name="enabled">
                           <bool>true</bool>
                          </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.101</string>
                          </property>
@@ -7060,6 +8422,12 @@
                         <widget class="QLineEdit" name="m_ToleranceSPSA">
                          <property name="enabled">
                           <bool>true</bool>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
                          </property>
                          <property name="text">
                           <string>1e-5</string>
@@ -7074,6 +8442,12 @@
                          <property name="enabled">
                           <bool>true</bool>
                          </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>0.5</string>
                          </property>
@@ -7086,6 +8460,12 @@
                         <widget class="QLineEdit" name="m_MinimumNumberOfIterationsSPSA">
                          <property name="enabled">
                           <bool>true</bool>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
                          </property>
                          <property name="text">
                           <string>10</string>
@@ -7100,6 +8480,12 @@
                          <property name="enabled">
                           <bool>true</bool>
                          </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
+                         </property>
                          <property name="text">
                           <string>1</string>
                          </property>
@@ -7112,6 +8498,12 @@
                         <widget class="QLineEdit" name="m_IterationsSPSA">
                          <property name="enabled">
                           <bool>true</bool>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>20</height>
+                          </size>
                          </property>
                          <property name="text">
                           <string>200</string>
@@ -7150,6 +8542,12 @@
              <widget class="QCheckBox" name="m_Maximize">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="text">
                <string>Maximize Optimizer Value</string>
@@ -7202,6 +8600,12 @@
              <widget class="QComboBox" name="m_InterpolatorBox">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="duplicatesEnabled">
                <bool>false</bool>
@@ -7257,6 +8661,12 @@
             </item>
             <item row="0" column="1">
              <widget class="QLineEdit" name="m_NumberOfLevels">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>3</string>
               </property>
@@ -7278,6 +8688,12 @@
             </item>
             <item row="2" column="1">
              <widget class="QLineEdit" name="m_FixedSchedule">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>4,4,4;2,2,2;1,1,1</string>
               </property>
@@ -7292,6 +8708,12 @@
             </item>
             <item row="3" column="1">
              <widget class="QLineEdit" name="m_MovingSchedule">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>4,4,4;2,2,2;1,1,1</string>
               </property>
@@ -7299,6 +8721,12 @@
             </item>
             <item row="1" column="1">
              <widget class="QLineEdit" name="m_Presets">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="text">
                <string>TestSettings1,TestSettings2,TestSettings3</string>
               </property>
@@ -7338,6 +8766,12 @@
              <widget class="QCheckBox" name="m_MatchHistograms">
               <property name="enabled">
                <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="text">
                <string>Match Histograms</string>

@@ -341,9 +341,8 @@ bool mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, in
         return true;
       }
     }
-
-    return false;
   }
+  return false;
 }
 
 bool mitk::PointSet::IndexExists( int position, int t ) const

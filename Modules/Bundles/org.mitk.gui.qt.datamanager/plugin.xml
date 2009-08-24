@@ -12,4 +12,19 @@
       icon="resources/datamanager.xpm"
       class="QmitkDataManagerView" />
   </extension>
+
+  <extension point="org.opencherry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.DataManagerPreferencePage" name="DataManager" class="QmitkDataManagerPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords"></keywordreference>
+    </page>
+    <page id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPage" name="Hotkeys" class="QmitkDataManagerHotkeysPrefPage" category="org.mitk.gui.qt.application.DataManagerPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords"></keywordreference>
+    </page>	
+  </extension>
+
+  <extension point="org.opencherry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager"></keyword>
+    <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys"></keyword>
+  </extension>
+
 </plugin>

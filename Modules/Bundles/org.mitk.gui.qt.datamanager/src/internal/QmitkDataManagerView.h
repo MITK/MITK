@@ -5,11 +5,15 @@
 #include "cherryIPartListener.h"
 #include "cherryISelection.h"
 #include "cherryISelectionProvider.h"
+#include "cherryIPreferencesService.h"
+
 /// Qmitk
 #include "QmitkFunctionality.h"
 #include "QmitkDataTreeNodeSelectionProvider.h"
 // #include "QmitkStandardViews.h"
 #include "../mitkQtDataManagerDll.h"
+
+
 
 // Forward declarations
 class QComboBox;
@@ -26,7 +30,7 @@ class QToolBar;
 class QmitkDataStorageTableModel;
 class QmitkPropertiesTableEditor;
 class QmitkPredicateEditor;
-class QmitkDelKeyFilter;
+class QmitkNodeTableViewKeyFilter;
 
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
@@ -42,9 +46,9 @@ class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkFun
   Q_OBJECT
 
   ///
-  /// QmitkDelKeyFilter should be able to call ActionRemoveTriggered().
+  /// QmitkNodeTableViewKeyFilter should be able to call ActionRemoveTriggered().
   ///
-  friend class QmitkDelKeyFilter;
+  friend class QmitkNodeTableViewKeyFilter;
 public:
 
   ///
@@ -99,6 +103,10 @@ protected slots:
   /// \brief Invoked when an element should be saved to the pacs.
   ///
   void ActionSaveToPacsTriggered ( bool checked = false );
+  ///
+  /// \brief Invoked when the visibility of the selected nodes should be toggled.
+  ///
+  void ActionMakeAllNodesInvisible ( bool checked = false );
   ///
   /// \brief Invoked when the visibility of the selected nodes should be toggled.
   ///

@@ -20,7 +20,7 @@
 #include <QmitkPropertiesTableEditor.h>
 #include <QmitkStdMultiWidgetEditor.h>
 #include <QmitkCommonFunctionality.h>
-#include <src/internal/QmitkDelKeyFilter.h>
+#include <src/internal/QmitkNodeTableViewKeyFilter.h>
 #include <src/internal/QmitkInfoDialog.h>
 //## Cherry
 #include <cherryIEditorPart.h>
@@ -146,7 +146,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTableView->horizontalHeader()->setStretchLastSection(true);
   m_NodeTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
-  m_NodeTableView->installEventFilter(new QmitkDelKeyFilter(this));
+  m_NodeTableView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
@@ -375,6 +375,18 @@ void QmitkDataManagerView::ActionRemoveTriggered( bool checked /*= false */ )
 
     }
   }
+}
+
+void QmitkDataManagerView::ActionMakeAllNodesInvisible( bool checked /*= false */ )
+{
+  std::vector<mitk::DataTreeNode*> nodes = m_NodeTableModel->GetNodeSet();
+
+  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+    ; it != nodes.end(); it++)
+  {
+    (*it)->SetVisibility(false);
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ActionToggleSelectedVisibilityTriggered( bool checked /*= false */ )

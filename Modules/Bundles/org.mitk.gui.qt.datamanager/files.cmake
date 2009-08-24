@@ -1,17 +1,23 @@
 SET(SRC_CPP_FILES
   cherrySingleNodeSelection.cpp
+  QmitkDataManagerPreferencePage.cpp
+  QmitkDataManagerHotkeysPrefPage.cpp
+  QmitkHotkeyLineEdit.cpp
 )
 
 SET(INTERNAL_CPP_FILES
   QmitkDataManagerView.cpp 
-  QmitkDelKeyFilter.cpp 
+  QmitkNodeTableViewKeyFilter.cpp 
   QmitkInfoDialog.cpp 
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkDataManagerView.h
-  src/internal/QmitkDelKeyFilter.h
+  src/QmitkHotkeyLineEdit.h
+  src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
+  src/QmitkDataManagerPreferencePage.h
+  src/QmitkDataManagerHotkeysPrefPage.h
 )
 
 SET(CPP_FILES manifest.cpp)

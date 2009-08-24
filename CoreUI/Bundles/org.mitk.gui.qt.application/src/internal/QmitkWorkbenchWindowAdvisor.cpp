@@ -24,8 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMainWindow>
 #include <QStatusBar>
 
+#include <cherryPlatform.h>
 #include <cherryPlatformUI.h>
 #include <cherryIWorkbenchWindow.h>
+#include <cherryIPreferencesService.h>
 
 #include <internal/cherryQtShowViewAction.h>
 #include <QmitkFileOpenAction.h>
@@ -33,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
+#include "QmitkPreferencesDialog.h"
 
 
 // UGLYYY
@@ -61,6 +64,16 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   // very bad hack...
   cherry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
+
+  // show maximized if preference is set
+  cherry::IPreferencesService::Pointer prefService 
+    = cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  cherry::IPreferences::Pointer _GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
+  bool startMaximized = _GeneralPreferencesNode->GetBool("startMaximized", false);
+  if(startMaximized)
+    mainWindow->setWindowState(mainWindow->windowState() ^ Qt::WindowMaximized);
+
+
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("&File");
@@ -74,6 +87,8 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* editMenu = menuBar->addMenu("&Edit");
   QAction* undoAction = editMenu->addAction("&Undo", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onUndo()), QKeySequence("CTRL+Z"));
   QAction* redoAction = editMenu->addAction("&Redo", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onRedo()), QKeySequence("CTRL+Y"));
+  editMenu->addSeparator();
+  QAction* preferencesAction = editMenu->addAction("&Preferences...", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onEditPreferences()), QKeySequence("CTRL+P"));
 
 
   QMenu* viewMenu = menuBar->addMenu("Show &View");
@@ -164,3 +179,8 @@ void QmitkWorkbenchWindowAdvisorHelperHack::onRedo()
   }
 }
 
+void QmitkWorkbenchWindowAdvisorHelperHack::onEditPreferences()
+{
+  QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+  _PreferencesDialog.exec();
+}

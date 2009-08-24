@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/org.mitk.gui.qt.application">
+    <file>document-save.png</file> 
+	<file>edit-redo.png</file> 
+	<file>edit-undo.png</file> 
+	<file>preferences-system.png</file> 
+	<file>system-log-out.png</file>
+ </qresource>
+ </RCC>

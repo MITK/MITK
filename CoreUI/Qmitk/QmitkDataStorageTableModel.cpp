@@ -481,6 +481,11 @@ void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::A
   //}
 }
 
+std::vector<mitk::DataTreeNode*> QmitkDataStorageTableModel::GetNodeSet() const
+{
+  return m_NodeSet;
+}
+
 QmitkDataStorageTableModel::DataTreeNodeCompareFunction::DataTreeNodeCompareFunction( CompareCriteria _CompareCriteria
                                                                                           , CompareOperator _CompareOperator )
                                                                                           : m_CompareCriteria(_CompareCriteria)

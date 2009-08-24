@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "src/QmitkApplication.h"
 #include "src/QmitkDefaultPerspective.h"
+#include "src/QmitkGeneralPreferencePage.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
   POCO_EXPORT_CLASS(QmitkApplication)
@@ -28,4 +29,8 @@ POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
   POCO_EXPORT_CLASS(QmitkDefaultPerspective)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIQtPreferencePage, cherry::IQtPreferencePage)
+  POCO_EXPORT_CLASS(QmitkGeneralPreferencePage)
 POCO_END_MANIFEST

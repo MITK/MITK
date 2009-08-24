@@ -1,5 +1,7 @@
 #include <QObject>
 
+class QmitkPreferencesDialog;
+
 class QmitkWorkbenchWindowAdvisorHelperHack : public QObject
 {
   Q_OBJECT
@@ -8,6 +10,7 @@ class QmitkWorkbenchWindowAdvisorHelperHack : public QObject
 
     void onUndo();
     void onRedo();
+    void onEditPreferences();
   public:
 
     QmitkWorkbenchWindowAdvisorHelperHack();

@@ -100,6 +100,10 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     ///
     virtual void RemoveNode(const mitk::DataTreeNode* node);
     ///
+    /// Returns a copy of the node-vector that is shown by this model
+    ///
+    virtual std::vector<mitk::DataTreeNode*> GetNodeSet() const;
+    ///
     /// \brief Called when a single property was changed.
     /// The function searches through the list of nodes in this model for the changed
     /// property. If the property was found a dataChanged signal is emitted forcing

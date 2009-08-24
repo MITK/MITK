@@ -1,13 +1,18 @@
 SET(SRC_CPP_FILES
   cherryIAdaptable.cpp
   cherryIAdapterManager.cpp
+  cherryIPreferencesService.cpp
   cherryPlatformObject.cpp
   cherryRuntime.cpp
   cherryRuntimePlugin.cpp
+  cherryBackingStoreException.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-
+  cherryPreferencesService.cpp
+  cherryAbstractPreferencesStorage.cpp  
+  cherryPreferences.cpp
+  cherryXMLPreferencesStorage.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

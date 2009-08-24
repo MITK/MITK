@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryPlatform.h"
 #include "service/cherryIExtensionPointService.h"
 #include "event/cherryPlatformEvents.h"
+#include "internal/cherryPreferencesService.h"
 
 #include "Poco/Delegate.h"
 
@@ -30,13 +31,15 @@ namespace cherry {
 const std::string RuntimePlugin::PLUGIN_ID = "org.opencherry.core.runtime";
 
 void 
-RuntimePlugin::Start(IBundleContext::Pointer /*context*/)
+RuntimePlugin::Start(IBundleContext::Pointer context)
 {
   CHERRY_INFO << "Runtime plugin activated!\n";
   
   //Platform::GetEvents().platformStarted += 
   //  Poco::Delegate<RuntimePlugin, PlatformEvent>(this, &RuntimePlugin::onPlatformStarted);
-  
+
+  PreferencesService::Pointer _PreferencesService(new PreferencesService());
+  context->RegisterService(IPreferencesService::ID, _PreferencesService);
 }
 
 

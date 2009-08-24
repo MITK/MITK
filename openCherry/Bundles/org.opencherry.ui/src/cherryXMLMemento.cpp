@@ -357,6 +357,7 @@ void cherry::XMLMemento::Save(cherry::XMLMemento::XMLByteOutputStream& writer)
     Poco::XML::DOMWriter* out = new Poco::XML::DOMWriter();
     out->setOptions(3); //write declaration and pretty print
     out->writeNode(writer, factory);
+    delete out;
   }
   else
   {

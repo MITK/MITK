@@ -4,7 +4,9 @@
    <extension-point id="commands" name="Commands" schema="schema/commands.exsd"/>
    <extension-point id="editors" name="Editors" schema="schema/editors.exsd"/>
    <extension-point id="handlers" name="Handlers" schema="schema/handlers.exsd"/>
+   <extension-point id="preferencePages" name="Preference Pages" schema="schema/preferencePages.exsd"/>
    <extension-point id="views" name="Views" schema="schema/views.exsd"/>
+   <extension-point id="keywords" name="keywords" schema="schema/keywords.exsd"/>
    <extension-point id="tweaklets" name="Tweaklets" schema="schema/tweaklets.exsd"/>
    <extension-point id="perspectives" name="Perspectives" schema="schema/perspectives.exsd"/>
    <extension-point id="presentationFactories" name="Presentation Factories" schema="schema/presentationFactories.exsd"/>

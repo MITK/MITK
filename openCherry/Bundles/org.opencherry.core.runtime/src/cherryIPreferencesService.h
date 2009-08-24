@@ -1,7 +1,7 @@
 #ifndef CHERRYIPREFERENCESSERVICE_H_
 #define CHERRYIPREFERENCESSERVICE_H_
 
-#include "cherryService.h"
+#include "service/cherryService.h"
 #include "cherryRuntimeDll.h"
 #include "cherryIPreferences.h"
 

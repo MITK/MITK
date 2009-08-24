@@ -1,0 +1,83 @@
+<ui version="4.0" >
+ <exportmacro>QMITKEXT_EXPORT</exportmacro>
+ <class>QmitkFunctionalityComponentContainerGUI</class>
+ <widget class="QWidget" name="QmitkFunctionalityComponentContainerGUI" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>698</width>
+    <height>808</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>ComponentContainer</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QGroupBox" native="1" name="m_ContainerBorder" >
+     <property name="title" stdset="0" >
+      <string>Select Image</string>
+     </property>
+     <property name="checkable" stdset="0" >
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QGroupBox" name="m_ImageContent" >
+        <property name="title" >
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" >
+         <item>
+          <widget class="QmitkDataStorageComboBox" native="1" name="m_TreeNodeSelector" >
+           <property name="minimumSize" >
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="font" >
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="m_WidgetStack" >
+     <property name="font" >
+      <font/>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QWidget</extends>
+   <header location="global" >QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="local" >mitkCommon.h</include>
+  <include location="local" >mitkDataTree.h</include>
+ </includes>
+ <resources/>
+ <connections/>
+</ui>

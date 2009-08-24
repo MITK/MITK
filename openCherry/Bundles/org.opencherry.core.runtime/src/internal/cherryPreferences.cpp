@@ -111,7 +111,7 @@ namespace cherry
     return m_Storage;
   }
 
-  void Preferences::Clear() 
+  void Preferences::Clear() throw(Poco::Exception, BackingStoreException)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -260,7 +260,7 @@ namespace cherry
     return node;
   }
 
-  bool Preferences::NodeExists(string pathName) const
+  bool Preferences::NodeExists(string pathName) const throw(Poco::Exception, BackingStoreException)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -370,7 +370,7 @@ namespace cherry
       m_Properties.erase(it);
   }
 
-  void Preferences::RemoveNode() 
+  void Preferences::RemoveNode() throw(Poco::Exception, BackingStoreException)
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     AssertValid();
@@ -466,7 +466,7 @@ namespace cherry
 
 namespace Base64 
 {
-  string Base64::encode(const string &sString) 
+  string encode(const string &sString)
   {
     static const string base64Table(
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
@@ -513,7 +513,7 @@ namespace Base64
     return result;
   }
 
-  string Base64::decode(const string &sString) 
+  string decode(const string &sString)
   {
     static const string::size_type np = string::npos;
 

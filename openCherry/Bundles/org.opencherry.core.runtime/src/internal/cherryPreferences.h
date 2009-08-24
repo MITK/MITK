@@ -105,7 +105,7 @@ namespace cherry
     ///
     /// \see IPreferences::Clear()
     ///    
-    virtual void Clear();
+    virtual void Clear() throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Flush()
@@ -165,7 +165,7 @@ namespace cherry
     ///
     /// \see IPreferences::NodeExists()
     ///    
-    virtual bool NodeExists(std::string pathName) const;
+    virtual bool NodeExists(std::string pathName) const throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Parent()
@@ -215,7 +215,7 @@ namespace cherry
     ///
     /// \see IPreferences::RemoveNode()
     ///    
-    virtual void RemoveNode();
+    virtual void RemoveNode() throw(Poco::Exception, BackingStoreException);
 
     ///
     /// \see IPreferences::Sync()

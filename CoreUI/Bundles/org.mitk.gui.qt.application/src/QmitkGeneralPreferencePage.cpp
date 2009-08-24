@@ -21,7 +21,7 @@
 #include "cherryPlatform.h"
 
 #include <QLabel>
-#include <QCheckbox>
+#include <QCheckBox>
 #include <QGridLayout>
 #include <QSpacerItem>
 

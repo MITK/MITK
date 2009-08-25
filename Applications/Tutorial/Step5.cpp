@@ -6,7 +6,7 @@
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
-#include "mitkDataStorage.h"
+#include "mitkStandaloneDataStorage.h"
 
 #include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   // Part I: Basic initialization
   //*************************************************************************
 
-  // Create a DataStorage  
+  // Create a DataStorage
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
   //*************************************************************************
@@ -147,7 +147,8 @@ int main(int argc, char* argv[])
   // Tell the QmitkSliceWidget which (part of) the tree to render.
   // By default, it slices the data transversally
   view2.SetDataStorage(ds);
-
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetAll();
+  view2.SetData(rs->Begin(), mitk::SliceNavigationController::Transversal);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
   ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
@@ -162,8 +163,9 @@ int main(int argc, char* argv[])
   layout.addWidget(&view3);
 
   // Tell the QmitkSliceWidget which (part of) the tree to render
-  // and to slice sagitally
-  view3.SetDataStorage(ds, mitk::SliceNavigationController::Sagittal);
+  // and to slice sagitall
+  view3.SetDataStorage(ds);
+  view3.SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!

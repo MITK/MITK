@@ -32,13 +32,13 @@ protected:
   template < typename TPixel, unsigned int VImageDimension >
     friend void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6);
 
-  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::StandaloneDataStorage::Pointer m_DataStorage;
   mitk::Image::Pointer m_FirstImage;
   mitk::PointSet::Pointer m_Seeds;
 
   mitk::Image::Pointer m_ResultImage;
   mitk::DataTreeNode::Pointer m_ResultNode;
- 
+
   QLineEdit *m_LineEditThresholdMin;
   QLineEdit *m_LineEditThresholdMax;
 

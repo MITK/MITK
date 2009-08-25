@@ -25,6 +25,7 @@ void Step7::StartRegionGrowing()
 {
   Step6::StartRegionGrowing();
 
+  std::cout << "7";
   if(m_ResultImage.IsNotNull())
   {
     m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(false));
@@ -42,7 +43,11 @@ void Step7::StartRegionGrowing()
     m_DataStorage->Add(surfaceNode);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    std::cout << "8";
   }
+
+  std::cout << "9";
+
 }
 
 /**

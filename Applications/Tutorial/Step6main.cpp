@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
     return qtapplication.exec();
   else
     return QtTesting();
+
 }
 /**
 \example Step6main.cpp

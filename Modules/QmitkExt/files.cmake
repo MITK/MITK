@@ -49,7 +49,7 @@ SET(CPP_FILES
 
  #QmitkLevelWindowPresetDefinitionDialog.cpp
  # QmitkLevelWindowWidgetContextMenu.cpp
- # QmitkSliceWidget.cpp
+ QmitkSliceWidget.cpp
  # QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
  QmitkSelectableGLWidget.cpp
@@ -102,7 +102,7 @@ SET(MOC_H_FILES
  QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
- # QmitkSliceWidget.h
+ QmitkSliceWidget.h
  QmitkSlicesInterpolator.h
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
@@ -131,7 +131,7 @@ SET(UI_FILES
   # QmitkLevelWindowRangeChange.ui
   # QmitkLevelWindowPresetDefinition.ui
   # QmitkLevelWindowWidget.ui
-  # QmitkSliceWidget.ui
+  QmitkSliceWidget.ui
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui

@@ -106,9 +106,9 @@ void TestDataStorage( mitk::DataStorage* ds )
   // create some DataTreeNodes to fill the ds
   mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();   // node with image and name property
   mitk::Image::Pointer image = mitk::Image::New();
-  unsigned int imageDimensions[] = { 10, 10, 10, 10};
+  unsigned int imageDimensions[] = { 10, 10, 10 };
   mitk::PixelType pt(typeid(int));
-  image->Initialize( pt, 4, imageDimensions );
+  image->Initialize( pt, 3, imageDimensions );
   n1->SetData(image);
   n1->SetProperty("name", mitk::StringProperty::New("Node 1 - Image Node"));
   mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();

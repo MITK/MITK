@@ -236,12 +236,7 @@ namespace mitk {
     //## @brief Compute the axis-parallel bounding geometry of the input objects
     //##
     //## Throws std::invalid_argument exception if input is NULL
-    //## @param input set of objects of the DataStorage to be included in the bounding geometry
-    //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
-    //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    //## @param renderer see @a boolPropertyKey
-    //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeSlicedGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::Geometry3D::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input);
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -252,7 +247,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeSlicedGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::Geometry3D::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
@@ -263,7 +258,7 @@ namespace mitk {
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    mitk::TimeSlicedGeometry::Pointer ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
+    mitk::Geometry3D::Pointer ComputeVisibleBoundingGeometry3D( mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
 
     //##Documentation
     //## @brief Compute the bounding box of data tree structure

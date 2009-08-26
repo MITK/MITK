@@ -112,27 +112,27 @@ void QmitkFileOpenAction::Run()
   {
     mitk::Geometry3D::Pointer geometry = dataStorage->ComputeBoundingGeometry3D();
 
-    //if ( geometry.IsNotNull() )
-    //{
-    //  // let's see if we have data with a limited live-span ...
-    //  mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-    //  if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-    //  {
-    //    mitk::ScalarType duration = timebounds[1]-timebounds[0];
+    if ( geometry.IsNotNull() )
+    {
+      // let's see if we have data with a limited live-span ...
+      mitk::TimeBounds timebounds = geometry->GetTimeBounds();
+      if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
+      {
+        mitk::ScalarType duration = timebounds[1]-timebounds[0];
 
-    //    mitk::TimeSlicedGeometry::Pointer timegeometry =
-    //      mitk::TimeSlicedGeometry::New();
-    //    timegeometry->InitializeEvenlyTimed(
-    //      geometry, (unsigned int) duration );
-    //    timegeometry->SetTimeBounds( timebounds );
+        mitk::TimeSlicedGeometry::Pointer timegeometry =
+          mitk::TimeSlicedGeometry::New();
+        timegeometry->InitializeEvenlyTimed(
+          geometry, (unsigned int) duration );
+        timegeometry->SetTimeBounds( timebounds );
 
-    //    timebounds[1] = timebounds[0] + 1.0;
-    //    geometry->SetTimeBounds( timebounds );
+        timebounds[1] = timebounds[0] + 1.0;
+        geometry->SetTimeBounds( timebounds );
 
-    //    geometry = timegeometry;
-    //  }
-    //}
-    mitk::RenderingManager::GetInstance()->InitializeViews(geometry,mitk::RenderingManager::REQUEST_UPDATE_ALL,true);
+        geometry = timegeometry;
+      }
+    }
+    mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 

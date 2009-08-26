@@ -699,29 +699,6 @@ void TestDataStorage( mitk::DataStorage* ds )
     MITK_TEST_FAILED_MSG( << "Exception during object removal methods");
   }
 
-  ///*Checking ComputeBoundingGeometry3D method*/
-  //const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
-  //mitk::TimeSlicedGeometry* geometry = ds->ComputeBoundingGeometry3D();
-  //MITK_TEST_CONDITION(geometry->GetTimeSteps()==10, "Test for number or time steps with ComputeBoundingGeometry()");
-  //mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-  //MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==10),"Test for timebounds with ComputeBoundingGeometry()");
-  //for (int i=0; i<geometry->GetTimeSteps(); i++)
-  //{
-  //  mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometry3D(i);
-  //  mitk::TimeBounds bounds = subGeometry->GetTimeBounds();
-  //  MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
-  //}
-  //geometry = ds->ComputeBoundingGeometry3D(all);
-  //MITK_TEST_CONDITION(geometry->GetTimeSteps()==10, "Test for number or time steps with ComputeBoundingGeometry(allNodes)");
-  //timebounds = geometry->GetTimeBounds();
-  //MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==10),"Test for timebounds with ComputeBoundingGeometry(allNodes)");
-  //for (int i=0; i<geometry->GetTimeSteps(); i++)
-  //{
-  //  mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometry3D(i);
-  //  mitk::TimeBounds bounds = subGeometry->GetTimeBounds();
-  //  MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
-  //}
-
   /* Clear DataStorage */
   ds->Remove(ds->GetAll());
   MITK_TEST_CONDITION(ds->GetAll()->Size() == 0, "Checking Clear DataStorage");

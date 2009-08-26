@@ -3,6 +3,7 @@
 
 #include "Poco/ScopedLock.h"
 #include "Poco/DirectoryIterator.h"
+#include "cherryPlatform.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ const std::type_info& cherry::PreferencesService::GetType() const
 std::string cherry::PreferencesService::GetDefaultPreferencesDirPath()
 {
   string _PreferencesDirPath;
-  _PreferencesDirPath = Poco::Path::home() + ".BlueBerryPrefs";
+  _PreferencesDirPath = Platform::GetUserPath().getFileName() + ".BlueBerryPrefs";
   return _PreferencesDirPath;
 }
 

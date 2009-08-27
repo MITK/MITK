@@ -474,7 +474,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       mitk::Geometry3D* geometry = this->GetGeometry( timeStep );
       if (geometry == NULL)
       {
-        LOG_INFO<<"mitkPointSet.cpp::L362: GetGeometry returned NULL!\n";
+        LOG_INFO<<"GetGeometry returned NULL!\n";
         return;
       }
       geometry->WorldToIndex(pt, pt);
@@ -524,10 +524,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
   case OpREMOVE://removes the point at given by position 
     {
-      m_PointSetSeries[timeStep]->GetPoints()
-        ->DeleteIndex((unsigned)pointOp->GetIndex());
-      m_PointSetSeries[timeStep]->GetPointData()
-        ->DeleteIndex((unsigned)pointOp->GetIndex());
+      m_PointSetSeries[timeStep]->GetPoints()->DeleteIndex((unsigned)pointOp->GetIndex());
+      m_PointSetSeries[timeStep]->GetPointData()->DeleteIndex((unsigned)pointOp->GetIndex());
 
       this->OnPointSetChange();
 
@@ -569,33 +567,40 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     }
     break;
 
-  case OpMOVEPOINTUP: // move point position within the pointset 
+  case OpMOVEPOINTUP: // swap content of point with ID pointOp->GetIndex() with the point preceding it in the container // move point position within the pointset 
     {
-      int position = SearchPoint(pointOp->GetPoint(), 0.0, timeStep);
-      mitk::Point3D point1 = pointOp->GetPoint();
-        
-      if(position >= 1)
-      {        
-        mitk::Point3D point2 = m_PointSetSeries[timeStep]->GetPoints()->GetElement(position-1);
-        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position-1,point1);
-        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position,point2);
+      PointIdentifier currentID = pointOp->GetIndex();
+      /* search for point with this id and point that precedes this one in the data container */
+      PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
+      PointsContainer::STLContainerType::iterator it = points.find(currentID);
+      if (it == points.end()) // ID not found
+        break;
+      if (it == points.begin()) // we are at the first element, there is no previous element
+        break;
+
+      /* get and cache current point & pointdata and previous point & pointdata */
+      --it; 
+      PointIdentifier prevID = it->first;
+      if (this->SwapPointContents(prevID, currentID, timeStep) == true)
         this->Modified();
-      }
-      
     }
     break;
   case OpMOVEPOINTDOWN: // move point position within the pointset 
     {
-      int position = SearchPoint(pointOp->GetPoint(), 0.0, timeStep);
-      mitk::Point3D point1 = pointOp->GetPoint();
+      PointIdentifier currentID = pointOp->GetIndex();
+      /* search for point with this id and point that succeeds this one in the data container */
+      PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
+      PointsContainer::STLContainerType::iterator it = points.find(currentID);
+      if (it == points.end()) // ID not found
+        break;
+      ++it;
+      if (it == points.end()) // ID is already the last element, there is no succeeding element
+        break;
 
-      if(position >= 0 && GetSize(timeStep) > position)
-      {        
-        mitk::Point3D point2 = m_PointSetSeries[timeStep]->GetPoints()->GetElement(position+1);
-        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position+1,point1);
-        m_PointSetSeries[timeStep]->GetPoints()->InsertElement(position,point2);
+      /* get and cache current point & pointdata and previous point & pointdata */
+      PointIdentifier nextID = it->first;
+      if (this->SwapPointContents(nextID, currentID, timeStep) == true)
         this->Modified();
-      }
     }
     break;
 
@@ -604,7 +609,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
     break;
   }
   
-  //to tell the mappers, that the data is modifierd and has to be updated 
+  //to tell the mappers, that the data is modified and has to be updated 
   //only call modified if anything is done, so call in cases
   //this->Modified();
 
@@ -695,15 +700,43 @@ void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
     itk::Indent nextIndent = indent.GetNextIndent();
     ps->Print(os, nextIndent);
     MeshType::PointsContainer* points = ps->GetPoints();
-    for (MeshType::PointsContainer::iterator it2 = points->begin(); it2 != points->end(); ++it2)
+    MeshType::PointDataContainer* datas = ps->GetPointData();
+    MeshType::PointDataContainer::Iterator dataIterator = datas->Begin();
+    for (MeshType::PointsContainer::Iterator pointIterator = points->Begin();
+      pointIterator != points->End(); 
+      ++pointIterator, ++dataIterator)
     {
-      os << nextIndent << "Point " << it2->first << ": [";
-      os << it2->second.GetElement(0);
+      os << nextIndent << "Point " << pointIterator->Index() << ": [";
+      os << pointIterator->Value().GetElement(0);
       for (unsigned int i = 1; i < PointType::GetPointDimension(); ++i)
       {
-        os << ", " << it2->second.GetElement(i);
+        os << ", " << pointIterator->Value().GetElement(i);
       }
-      os << "]\n";
+      os << "]";
+      os << ", selected: " << dataIterator->Value().selected << ", point spec: " << dataIterator->Value().pointSpec << "\n";
     }
   }
+}
+
+bool mitk::PointSet::SwapPointContents(PointIdentifier id1, PointIdentifier id2, int timeStep)
+{
+  /* search and cache contents */
+  PointType p1;
+  if (m_PointSetSeries[timeStep]->GetPoint(id1, &p1) == false)
+    return false;
+  PointDataType data1;
+  if (m_PointSetSeries[timeStep]->GetPointData(id1, &data1) == false)
+    return false;
+  PointType p2;
+  if (m_PointSetSeries[timeStep]->GetPoint(id2, &p2) == false)
+    return false;
+  PointDataType data2;
+  if (m_PointSetSeries[timeStep]->GetPointData(id2, &data2) == false)
+    return false;
+  /* now swap contents */
+  m_PointSetSeries[timeStep]->SetPoint(id1, p2);
+  m_PointSetSeries[timeStep]->SetPointData(id1, data2);
+  m_PointSetSeries[timeStep]->SetPoint(id2, p1);
+  m_PointSetSeries[timeStep]->SetPointData(id2, data1);
+  return true;
 }

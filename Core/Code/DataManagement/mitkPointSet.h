@@ -244,6 +244,9 @@ protected:
 
   virtual void InitializeEmpty();
 
+  /** \brief swaps point coordinates and point data of the points with identifiers id1 and id2 */
+  bool SwapPointContents(PointIdentifier id1, PointIdentifier id2,  int t = 0 );
+
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;
@@ -252,9 +255,7 @@ protected:
   * @brief flag to indicate the right time to call SetBounds
   **/
   bool m_CalculateBoundingBox;
-
 };
-
 
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );

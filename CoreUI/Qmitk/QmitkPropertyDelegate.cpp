@@ -66,9 +66,9 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       
       QColor result = QColorDialog::getColor(color);
       if(result.isValid())
-      {
+      {       
         QPalette palette = colorBtn->palette();
-        palette.setColor(QPalette::Window, result);
+        palette.setColor(QPalette::Button, result);
         colorBtn->setPalette(palette);
         colorBtn->setStyleSheet(QString("background-color: %1;foreground-color: %1; border-style: none;").arg(result.name()));
         //colorBtn->setFlat(true);
@@ -208,7 +208,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
     {
       QWidget *colorBtn = qobject_cast<QWidget *>(editor);
       QVariant colorVariant;
-      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Window));
+      colorVariant.setValue<QColor>(colorBtn->palette().color(QPalette::Button));
       model->setData(index, colorVariant);
     }
 

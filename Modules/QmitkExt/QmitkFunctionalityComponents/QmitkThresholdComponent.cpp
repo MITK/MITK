@@ -175,7 +175,7 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
   m_ShowThresholdGroupBox = new QGroupBox("m_ShowThresholdGroupBox", m_ContainerContent);
   m_ThresholdInputNumber = new QLineEdit(m_ShowThresholdGroupBox);
   m_ThresholdInputSlider = new QSlider(m_ShowThresholdGroupBox);
-  m_ThresholdInputSlider->setOrientation(Qt::Orientation::Horizontal);
+  m_ThresholdInputSlider->setOrientation(Qt::Horizontal);
   m_ThresholdValueContent = new QGroupBox("m_ThresholdValueContent", m_ShowThresholdGroupBox);
   m_CreateSegmentationButton = new QPushButton("Create Segmentation", m_ThresholdValueContent);
   m_DeleateImageIfDeactivatedCheckBox = new QCheckBox("Deleate Threshold Image if \nComponent is deactivated", m_ThresholdValueContent);

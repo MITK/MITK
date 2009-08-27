@@ -36,6 +36,11 @@ void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeNode::Po
 {
 }
 
+void QmitkBaseFunctionalityComponent::DataStorageChanged(mitk::DataStorage::Pointer ds)
+{
+
+}
+
 mitk::DataStorage::Pointer QmitkBaseFunctionalityComponent::GetDefaultDataStorage()
 {
   return m_DataStorage;

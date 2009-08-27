@@ -175,6 +175,45 @@ mitk::DataStorage::Pointer QmitkFunctionalityComponentContainer::GetDataStorage(
   return m_DataStorage;
 }
 
+/***************     DATA STORAGE CHANGED     ***************/
+void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage::Pointer ds)
+{
+  if(m_FunctionalityComponentContainerGUI != NULL)
+  {
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+    {
+      QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->DataStorageChanged(ds);
+    }   
+  }
+
+  if(m_FunctionalityComponentContainerGUI)
+  {
+    if(!ds)
+      return;
+    if(!ds->GetNode())
+      return;
+    if(!ds->GetNode()->GetData())
+      return;
+    m_ParentMitkImage = static_cast<mitk::Image*> (ds->GetNode()->GetData());
+
+
+    if(m_FunctionalityComponentContainerGUI != NULL)
+    {
+      for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
+      {
+        QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+        if (functionalityComponent != NULL)
+        {
+          functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (ds->GetNode()->GetData());
+        }
+      }   
+    }
+  }
+  TreeChanged();
+}
+
 /***************     IMAGE SELECTED     ***************/
 void QmitkFunctionalityComponentContainer::ImageSelected(mitk::DataTreeNode::Pointer item)
 {

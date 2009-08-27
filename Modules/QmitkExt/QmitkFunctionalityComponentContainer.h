@@ -183,7 +183,7 @@ public slots:
   virtual void TreeChanged();
 
   /***************      OHTER METHODS     ***************/
-//  virtual  void DataStorageChanged(mitk::DataStorage::Pointer ds);
+ virtual  void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   void ImageSelected(const mitk::DataTreeNode::Pointer item);

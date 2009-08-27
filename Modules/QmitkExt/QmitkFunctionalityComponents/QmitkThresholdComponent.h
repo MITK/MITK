@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkThresholdComponentControls.h"
 class QmitkStdMultiWidget;
 
+#include "qcheckbox.h"
+
 /**
 * \brief ComponentClass to find an adequate threshold for a selected image
 * \ingroup QmitkFunctionalityComponent
@@ -98,6 +100,8 @@ virtual QGroupBox* GetImageContent();
 
 public slots:  
   /***************      OHTER METHODS     ***************/
+
+  void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
 	void ImageSelected(const mitk::DataTreeNode::Pointer item);
@@ -181,6 +185,19 @@ private:
   * Segmentation made with thresholdSegmentation 
   */
   mitk::Image::Pointer m_ThresholdSegmentationImage;
+
+  /*******GUI ELEMENTS******/
+  QGroupBox* m_ThresholdFinder;
+  QGroupBox* m_ThresholdSelectDataGroupBox;
+  QGroupBox* m_ImageContent;
+  QGroupBox* m_ContainerContent;
+  QGroupBox* m_ShowThresholdGroupBox;
+  QLineEdit* m_ThresholdInputNumber;
+  QSlider*   m_ThresholdInputSlider;
+  QGroupBox* m_ThresholdValueContent;
+  QPushButton* m_CreateSegmentationButton;
+  QCheckBox* m_DeleateImageIfDeactivatedCheckBox;
+  QmitkDataStorageComboBox*m_TreeNodeSelector;
 
 };
 

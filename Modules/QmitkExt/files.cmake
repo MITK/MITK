@@ -9,6 +9,20 @@ SET(CPP_FILES
  #QmitkModels/QmitkPropertyDelegate.cpp
  #QmitkModels/QmitkPointListModel.cpp
 
+ #QmitkAlgorithmFunctionalityComponent.cpp
+ #QmitkBaseAlgorithmComponent.cpp
+ QmitkBaseComponent.cpp
+ QmitkBaseFunctionalityComponent.cpp
+ QmitkFunctionalityComponentContainer.cpp
+
+ QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
+				#QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
+							#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
+								#QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
+						#QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
+							#QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
+		#QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
+
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
  QmitkPropertyObservers/QmitkBoolPropertyView.cpp
@@ -96,9 +110,22 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
 
+ QmitkFunctionalityComponents/QmitkThresholdComponent.h
+							# QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
+											#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
+									# QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
+						# QmitkFunctionalityComponents/QmitkImageCropperComponent.h
+																# QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
+												# QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
+
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
 
+ #QmitkAlgorithmFunctionalityComponent.h
+ #QmitkBaseAlgorithmComponent.h
+ QmitkBaseComponent.h
+ QmitkBaseFunctionalityComponent.h
+ QmitkFunctionalityComponentContainer.h
  QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
@@ -135,4 +162,6 @@ SET(UI_FILES
   QmitkTransferFunctionWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
+  QmitkFunctionalityComponentContainerControls.ui
+  QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
 )

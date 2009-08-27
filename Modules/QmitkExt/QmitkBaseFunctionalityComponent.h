@@ -71,6 +71,8 @@ public:
 
 
   /***************      OHTER METHODS     ***************/
+
+  void DataStorageChanged(mitk::DataStorage::Pointer ds);
   
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
   void ImageSelected(const mitk::DataTreeNode::Pointer item);

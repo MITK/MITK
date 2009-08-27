@@ -61,6 +61,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkGDCMImageIO.h>
 #include <itkGDCMSeriesFileNames.h>
 #include <itkNumericSeriesFileNames.h>
+#include <itkCommand.h>
 
 // MITK-related includes
 #include "mitkSurface.h"
@@ -80,6 +81,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCoreObjectFactory.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkProgressBar.h"
 
 bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
@@ -221,6 +223,37 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
     return std::string( "" );
 }
 
+
+// a progress callback
+void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::EventObject &) {
+  //// Get the value of the progress
+  itk::ProcessObject* _ProcessObject = dynamic_cast<itk::ProcessObject*>(source);
+  if(!_ProcessObject)
+    return;
+
+  float progress = _ProcessObject->GetProgress();
+  unsigned int iProgress = static_cast<unsigned int>(progress * 100);
+
+  mitk::ProgressBar::GetInstance()->Progress(iProgress);
+
+  //// Update the progress bar and value in the MITK progress bar
+  //m_mitkProgressMeter->value(100 * progress);
+  //m_mitkOutProgressCounter->value(100 * progress);
+
+  //// Show or hide progress bar if necessary
+  //if(progress < 1.0f && !m_mitkProgressBar->visible())
+  //{
+  //  m_mitkProgressBar->show();
+  //}
+  //else if (progress == 1.0f && m_mitkProgressBar->visible())
+  //{
+  //  m_mitkProgressBar->hide();
+  //}
+
+
+  std::cout << "progress" << std::endl;
+}
+
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
   LOG_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
@@ -275,11 +308,19 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       LOG_INFO << *fnItr << std::endl;
       ++fnItr;
     }
+
+    // a progress command
+    itk::MemberCommand<Self>::Pointer  progressCommand = itk::MemberCommand<Self>::New(); 
+    progressCommand->SetCallbackFunction( this, &Self::OnITKProgressEvent );
+
     ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileNames( fileNames );
     reader->SetImageIO( dicomIO );
+    reader->AddObserver(itk::ProgressEvent(),progressCommand);
+
     try
     {
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
       reader->Update();
 
       if(reader->GetOutput() == NULL)

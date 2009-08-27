@@ -176,6 +176,8 @@ protected:
 
   virtual void ReadFileSeriesTypeITKImageSeriesReader();
 
+  void OnITKProgressEvent(itk::Object *source, const itk::EventObject &);
+
   bool m_UseSeriesDetails;
   std::vector<std::string> m_SeriesRestrictions;
 

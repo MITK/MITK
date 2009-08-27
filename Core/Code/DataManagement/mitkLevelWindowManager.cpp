@@ -97,11 +97,8 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
   }
   int maxLayer = itk::NumericTraits<int>::min();
   m_LevelWindowProperty = NULL;
-  mitk::NodePredicateDataType::Pointer p1 = mitk::NodePredicateDataType::New("Image");
-  mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("layer");
-  mitk::NodePredicateProperty::Pointer p3 = mitk::NodePredicateProperty::New("visible", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAND::Pointer pred = mitk::NodePredicateAND::New(p1, p2, p3);
-  mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(pred);
+
+  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     mitk::DataTreeNode::Pointer node = it->Value();
@@ -197,8 +194,8 @@ void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataTreeNode* itk
   }
 
   /* listen to changes  in visible property of all images */
-  mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("Image");
-  mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(p);
+
+  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     if (it->Value().IsNull())

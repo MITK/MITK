@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkBaseFunctionalityComponent.h"
  
 #include <qwidget.h>
- #include <QStackedWidget.h>
+ #include <qstackedwidget.h>
 #include <qpushbutton.h>
 #include <qstring.h>
 #include <qobject.h>
@@ -183,6 +183,8 @@ public slots:
   virtual void TreeChanged();
 
   /***************      OHTER METHODS     ***************/
+//  virtual  void DataStorageChanged(mitk::DataStorage::Pointer ds);
+
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
   void ImageSelected(const mitk::DataTreeNode::Pointer item);
 

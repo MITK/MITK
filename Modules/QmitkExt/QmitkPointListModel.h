@@ -53,7 +53,7 @@ class QMITKEXT_EXPORT QmitkPointListModel : public QAbstractListModel
     void SetTimeStep(int t);
     
     /// which time step to display/model
-    int GetTimeStep();
+    int GetTimeStep() const;
 
     /// itk observer for point set "modified" events
     void OnPointSetChanged( const itk::EventObject & e );
@@ -76,7 +76,7 @@ class QMITKEXT_EXPORT QmitkPointListModel : public QAbstractListModel
     * \param[out] mitk::PointSet::PointIdentifier& id If a valid point is found, the corresponding ID will be stored in id
     * \return Returns true, if a valid point was found, false otherwise
     */
-    bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p, mitk::PointSet::PointIdentifier& id) const;
+    bool GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p, mitk::PointSet::PointIdentifier& id) const;
 
     /**Documentation
     * \brief returns a QModelIndex for a given point ID

@@ -60,7 +60,7 @@ void QmitkPointListModel::SetTimeStep(int t)
 }
 
 
-int QmitkPointListModel::GetTimeStep()
+int QmitkPointListModel::GetTimeStep() const
 {
   return m_TimeStep;
 }
@@ -203,7 +203,7 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
   // where the index is not necessarily the same as the key.
   // Therefore we have to count the elements
   mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin();
-  for (unsigned int i = 0; i < index.row(); ++i)
+  for (int i = 0; i < index.row(); ++i)
   {
     ++it;
     if (it == m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End())

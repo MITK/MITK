@@ -52,9 +52,10 @@ class QMITKEXT_EXPORT QmitkPointListView : public QListView
     /// which point set to work on
     const mitk::PointSet* GetPointSet() const;
     
-    /// assign a QmitkStdMultiWidget for updating render window crosshair
-    void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
-    QmitkStdMultiWidget* GetMultiWidget() const;
+    
+    void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); ///< assign a QmitkStdMultiWidget for updating render window crosshair
+
+    QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
   
   protected slots:
 
@@ -63,8 +64,9 @@ class QMITKEXT_EXPORT QmitkPointListView : public QListView
 
     /// called when the selection of the view widget changes
     void OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-
+    
   protected:
+    void keyPressEvent( QKeyEvent * e ); ///< react to F2, F3 and DEL keys
 
     QmitkPointListModel* m_PointListModel;
     bool m_SelfCall;
@@ -72,6 +74,4 @@ class QMITKEXT_EXPORT QmitkPointListView : public QListView
     /// used to position the planes on a selected point
     QmitkStdMultiWidget* m_MultiWidget;
 };
-
 #endif
-

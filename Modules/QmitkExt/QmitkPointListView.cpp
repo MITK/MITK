@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 
+#include <QKeyEvent>
+
 QmitkPointListView::QmitkPointListView( QWidget* parent )
 :QListView( parent ),
  m_PointListModel( new QmitkPointListModel() ),
@@ -72,75 +74,91 @@ QmitkStdMultiWidget* QmitkPointListView::GetMultiWidget() const
 
 void QmitkPointListView::OnPointSetSelectionChanged()
 {
-  if (m_SelfCall) return;
+  if (m_SelfCall) 
+    return;
 
-  m_SelfCall = true;
+
+  const mitk::PointSet* pointSet = m_PointListModel->GetPointSet();
+  if (pointSet == NULL)
+    return;
 
   // update this view's selection status as a result to changes in the point set data structure
-  //std::cout << "update view selection from point set" << std::endl;
-  const mitk::PointSet* pointSet = m_PointListModel->GetPointSet();
-  if (pointSet)
+  m_SelfCall = true;
+  int timeStep = m_PointListModel->GetTimeStep();
+
+  if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
   {
-    int timeStep = m_PointListModel->GetTimeStep();
-
-    if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
-    {
-      /// @TODO use logging as soon as available
-      std::cerr << "Point set has multiple selected points. This view is not designed for more than one selected point." << std::endl;
-    }
-
-    int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
-
-    QListView::selectionModel()->select( m_PointListModel->index( selectedIndex ),
-                                         QItemSelectionModel::SelectCurrent );
+    /// @TODO use logging as soon as available
+    std::cerr << "Point set has multiple selected points. This view is not designed for more than one selected point." << std::endl;
   }
+
+  int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
+  if (selectedIndex == -1) // no selected point is found
+  {
+    m_SelfCall = false;
+    return;
+  }
+  QModelIndex index;
+  bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
+  if (modelIndexOkay == true)
+    QListView::selectionModel()->select( m_PointListModel->index( selectedIndex ), QItemSelectionModel::SelectCurrent );
   
   m_SelfCall = false;
 }
 
+
 void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-  if (m_SelfCall) return;
+  if (m_SelfCall) 
+    return;
 
   mitk::PointSet* pointSet = const_cast<mitk::PointSet*>( m_PointListModel->GetPointSet() );
   int timeStep = m_PointListModel->GetTimeStep();
 
-  if (!pointSet) return;
+  if (pointSet == NULL) 
+    return;
 
-  // select point in point set
   // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
   m_SelfCall = true;
 
+  /* update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others */
   QModelIndexList selectedIndexes = selected.indexes();
-  for (int i = 0; i < selectedIndexes.size(); ++i) 
+  for (mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->Begin(); it != pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->End(); ++it)
   {
-    QModelIndex index = selectedIndexes.at(i);
-    if ( index.isValid() )
+    QModelIndex index;
+    m_PointListModel->GetModelIndexForPointID(it->Index(), index);
+    if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
     {
-      int selectedIndex = index.row();
-      pointSet->SetSelectInfo( selectedIndex, true, timeStep );
-      //std::cout << "  select row " << selectedIndex << std::endl;
-
-      // move crosshair to selected point
-      if ( m_MultiWidget )
-      {
-        m_MultiWidget->MoveCrossToPosition( pointSet->GetPoint( selectedIndex, timeStep ) );
-      }
+      pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
+      if ( m_MultiWidget != NULL)
+        m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
     }
-  }
-
-  QModelIndexList deselectedIndexes = deselected.indexes();
-  for (int i = 0; i < deselectedIndexes.size(); ++i) 
-  {
-    QModelIndex index = deselectedIndexes.at(i);
-    if ( index.isValid() )
-    {
-      int selectedIndex = index.row();
-      pointSet->SetSelectInfo( selectedIndex, false, timeStep );
-      //std::cout << "  deselect row " << selectedIndex << std::endl;
-    }
+    else
+      pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
   }
   m_SelfCall = false;
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+
+void QmitkPointListView::keyPressEvent( QKeyEvent * e )
+{
+  if (m_PointListModel == NULL)
+    return;
+
+  int key = e->key();
+  switch (key)
+  {
+    case Qt::Key_F2:
+     m_PointListModel->MoveSelectedPointUp();
+     break;
+    case Qt::Key_F3:
+      m_PointListModel->MoveSelectedPointDown();
+      break;
+    case Qt::Key_Delete:
+      m_PointListModel->RemoveSelectedPoint();
+      break;
+    default:
+    break;
+  }
 }

@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QPushButton>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QKeyEvent>
 
 #include "btnSetPoints.xpm"
 #include "btnClear.xpm"
@@ -44,7 +45,7 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   
   m_ListView = new QmitkPointListView( this );
   layout->addWidget( m_ListView, 0, 0, 1, 4 ); // span 4 cols
-
+  m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down");
   const QIcon iconEdit( btnSetPoints_xpm ); // installs/removes pointset interactor
   m_BtnEdit = new QPushButton( iconEdit, "", this );
   m_BtnEdit->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
@@ -54,7 +55,7 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
 
   const QIcon iconClear( btnClear_xpm ); // clears whole point set
   m_BtnClear = new QPushButton( iconClear, "", this );
-  m_BtnClear->setToolTip("Erase all points from list");
+  m_BtnClear->setToolTip("Erase all points from list. Use the delete key to delete the selected point.");
   connect( m_BtnClear, SIGNAL(clicked()), this, SLOT(OnClearPointSetButtonClicked()) );
   layout->addWidget( m_BtnClear, 1, 1 ); 
 
@@ -264,16 +265,19 @@ void QmitkPointListWidget::OnLoadPointSetButtonClicked()
 
 void QmitkPointListWidget::OnSavePointSetButtonClicked()
 {
-  if (!m_PointSetNode) return;
+  if (!m_PointSetNode) 
+    return;
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>( m_PointSetNode->GetData() );
-  if (!pointSet) return; // don't write empty point sets. If application logic requires something else then do something else.
-  if (pointSet->GetSize() == 0) return; 
+  if (!pointSet) 
+    return; // don't write empty point sets. If application logic requires something else then do something else.
+  if (pointSet->GetSize() == 0) 
+    return; 
   
   // let the user choose a file
   std::string name("");
 
-  QString fileNameProposal = "PointSet.mps";
-  QString aFilename = QFileDialog::getSaveFileName( NULL, "Save point set", fileNameProposal, "MITK Pointset (*.mps)" );
+  QString fileNameProposal = QString("/%1.mps").arg(m_PointSetNode->GetName().c_str()); //"PointSet.mps";
+  QString aFilename = QFileDialog::getSaveFileName( NULL, "Save point set", QDir::currentPath() + fileNameProposal, "MITK Pointset (*.mps)" );
   if ( aFilename.isEmpty() ) 
     return;
 

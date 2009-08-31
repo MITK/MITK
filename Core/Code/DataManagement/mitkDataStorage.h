@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorContainer.h"
 #include "mitkDataTreeNode.h"
 #include "mitkGeometry3D.h"
+#include "itkSimpleFastMutexLock.h"
 #include <map>
 
 namespace mitk {
@@ -192,6 +193,9 @@ namespace mitk {
     //##
     const DataTreeNode::GroupTagList GetGroupTags() const;
 
+    /*ITK Mutex */
+    mutable itk::SimpleFastMutexLock m_MutexOne; 
+
     /* Public Events */
     typedef Message1<const mitk::DataTreeNode*> DataStorageEvent;
     //##Documentation
@@ -201,6 +205,9 @@ namespace mitk {
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
     //## Observers should unregister by calling myDataStorage->AddNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Note: AddEvents are _not_ emitted if a node is added to DataStorage by adding it to the the underlying DataTree!
+
+    // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
+    // a Message1 object which is thread safe 
     DataStorageEvent AddNodeEvent;
 
     //##Documentation
@@ -210,6 +217,9 @@ namespace mitk {
     //## After registering, myObject->MyMethod() will be called every time a new node has been added to the DataStorage.
     //## Observers should unregister by calling myDataStorage->RemoveNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Note: RemoveEvents are also emitted if a node was removed from the DataStorage by deleting it from the underlying DataTree
+
+    // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
+    // a Message1 object which is thread safe 
     DataStorageEvent RemoveNodeEvent;
 
     //##Documentation
@@ -220,6 +230,9 @@ namespace mitk {
     //## Observers should unregister by calling myDataStorage->ChangedNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Internally the DataStorage listens to itk::ModifiedEvents on the nodes and forwards them
     //## to the listeners of this event.
+
+    // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
+    // a Message1 object which is thread safe 
     DataStorageEvent ChangedNodeEvent;
 
     //##Documentation
@@ -230,6 +243,9 @@ namespace mitk {
     //## Observers should unregister by calling myDataStorage->DeleteNodeEvent.RemoveListener(myObject, MyObject::MyMethod).
     //## Internally the DataStorage listens to itk::DeleteEvents on the nodes and forwards them
     //## to the listeners of this event.
+
+    // member variable is not needed to be locked in multi threaded scenarios since the DataStorageEvent is a typedef for
+    // a Message1 object which is thread safe 
     DataStorageEvent DeleteNodeEvent;
 
     //##Documentation

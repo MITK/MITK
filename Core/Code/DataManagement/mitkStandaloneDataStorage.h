@@ -89,6 +89,9 @@ namespace mitk {
     //##
     SetOfObjects::ConstPointer GetAll() const;
 
+    /*ITK Mutex */
+    mutable itk::SimpleFastMutexLock m_Mutex; 
+
   protected:
 
     //##Documentation

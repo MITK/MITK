@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/AutoPtr.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 #include <Poco/StringTokenizer.h>
-#include <Poco/Environment.h>
 
 #include <iostream>
 
@@ -91,33 +90,24 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   	m_InstallPath.assign(m_InstancePath);
   }
 
-  try{
-    m_UserPath.assign(Poco::Path::home());
-  }
-  catch(Poco::NotFoundException)
-  {
-    Poco::Environment::set( "homedrive", Poco::Path::temp() );
-    m_UserPath.assign(Poco::Path::home());
-  }
-
+  m_UserPath.assign(Poco::Path::home());
   m_UserPath.pushDirectory("." + this->commandName());
   Poco::File userFile(m_UserPath); 
   
-  try{
-    userFile.canWrite();
-    
-  }
-  catch(Poco::FileException)
+  try
   {
-    Poco::Environment::set( "homedrive", Poco::Path::temp() );
-    m_UserPath.assign(Poco::Path::home());
+    userFile.canWrite();
+  }
+  catch(const Poco::IOException& e)
+  {
+    CHERRY_WARN << e.displayText();
+    m_UserPath.assign(Poco::Path::temp());
     m_UserPath.pushDirectory("." + this->commandName());
     userFile = m_UserPath;
   }
   
   userFile.createDirectory();  
    
-  
   m_BaseStatePath = m_UserPath;
   m_BaseStatePath.pushDirectory(".metadata");
   m_BaseStatePath.pushDirectory(".plugins");

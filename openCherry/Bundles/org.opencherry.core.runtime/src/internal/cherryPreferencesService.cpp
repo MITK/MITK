@@ -21,7 +21,7 @@ const std::type_info& cherry::PreferencesService::GetType() const
 std::string cherry::PreferencesService::GetDefaultPreferencesDirPath()
 {
   string _PreferencesDirPath;
-  _PreferencesDirPath = Platform::GetUserPath().getFileName() + ".BlueBerryPrefs";
+  _PreferencesDirPath = Platform::GetUserPath().toString() + ".BlueBerryPrefs";
   return _PreferencesDirPath;
 }
 

@@ -80,7 +80,8 @@ QFrame* QmitkSliceWidget::GetSelectionFrame()
 	return SelectionFrame;
 }
 
-void QmitkSliceWidget::SetDataStorage(mitk::StandaloneDataStorage::Pointer storage)
+void QmitkSliceWidget::SetDataStorage(
+		mitk::StandaloneDataStorage::Pointer storage)
 {
 	m_DataStorage = storage;
 	m_Renderer->SetDataStorage(m_DataStorage);
@@ -98,12 +99,15 @@ mitk::StandaloneDataStorage* QmitkSliceWidget::GetDataStorage()
 	}
 }
 
-void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it)
+void QmitkSliceWidget::SetData(
+		mitk::DataStorage::SetOfObjects::ConstIterator it)
 {
 	SetData(it->Value(), m_View);
 }
 
-void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::SliceNavigationController::ViewDirection view)
+void QmitkSliceWidget::SetData(
+		mitk::DataStorage::SetOfObjects::ConstIterator it,
+		mitk::SliceNavigationController::ViewDirection view)
 {
 	SetData(it->Value(), view);
 }
@@ -147,13 +151,8 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer treeNode,
 							"Image"));
 			mitk::DataStorage::SetOfObjects::ConstIterator it;
 			bool noVisibleImage = true;
-			std::cout << "1" << std::endl;
-//			std::cout << rs->Begin()->Value() << std::endl;
-//			std::cout << rs->End()->Value() << std::endl;
 			for (it = rs->Begin(); it != rs->End(); ++it)
 			{
-				std::cout << "2" << std::endl;
-
 				mitk::DataTreeNode::Pointer node = it.Value();
 				node->SetName("currentImage");
 				mitk::Image::Pointer image = m_DataStorage->GetNamedObject<
@@ -161,8 +160,6 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer treeNode,
 
 				if (image.IsNotNull() && node->IsVisible(GetRenderer()))
 				{
-					std::cout << "3" << std::endl;
-
 					m_SlicedGeometry = image->GetSlicedGeometry();
 					mitk::LevelWindow picLevelWindow;
 					node->GetLevelWindow(picLevelWindow, NULL);
@@ -170,8 +167,6 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer treeNode,
 					break;
 				}
 			}
-
-			std::cout << "4" << std::endl;
 
 			if (noVisibleImage)
 				LOG_INFO << " No image visible!";

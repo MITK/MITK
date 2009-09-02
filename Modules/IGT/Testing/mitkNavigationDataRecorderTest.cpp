@@ -59,8 +59,8 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
     naviData->SetPosition(pnt);
     //naviData->Modified();
     recorder->Update();
-
-    Sleep(80 + i*10);
+    
+    //Sleep(80 + i*10);
 
   }
 

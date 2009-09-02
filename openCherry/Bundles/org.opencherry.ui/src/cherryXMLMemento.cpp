@@ -17,6 +17,9 @@
 
 #include "cherryXMLMemento.h"
 
+#include "internal/cherryWorkbenchPlugin.h"
+
+#include "Poco/NumberParser.h"
 #include "Poco/DOM/NodeList.h" 
 #include "Poco/XML/NamePool.h"
 #include "Poco/DOM/NamedNodeMap.h"
@@ -29,7 +32,7 @@
 
 #include <sstream>
 
-const std::string TAG_ID = "IMemento.internal.id";
+const std::string EMPTY_STRING;
 
 cherry::XMLMemento::XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem) 
 {
@@ -75,8 +78,6 @@ cherry::XMLMemento::Pointer cherry::XMLMemento::CreateWriteRoot(const std::strin
   //{
   //}
 }
-
-
 
 cherry::IMemento::Pointer cherry::XMLMemento::CreateChild(const std::string& type)
 {
@@ -133,57 +134,72 @@ std::vector< cherry::IMemento::Pointer > cherry::XMLMemento::GetChildren(const s
 }
 
 
-float cherry::XMLMemento::GetFloat(const std::string& key) const
+bool cherry::XMLMemento::GetFloat(const std::string& key, double& value) const
 {
-  //TODO: check typeconversion and make error handling!
-  std::stringstream ss;
-  float val=0;
   const std::string& attr = element->getAttribute(key);
 
- // attr >> ss >> val;
+  try {
+    value = Poco::NumberParser::parseFloat(attr);
+  } catch (const Poco::SyntaxException& e) {
+    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
+                            + " value: " + attr, e);
+    return false;
+  }
 
-  return val;
-
+  return true;
 }
 
-const std::string& cherry::XMLMemento::GetType() const
+std::string cherry::XMLMemento::GetType() const
 {
   return element->nodeName();
 }
 
-const std::string& cherry::XMLMemento::GetID() const
+std::string cherry::XMLMemento::GetID() const
 {
-
   //TODO: make error handling!
   return element->getAttribute(TAG_ID);
 }
 
-int cherry::XMLMemento::GetInteger(const std::string& key) const
+bool cherry::XMLMemento::GetInteger(const std::string& key, int& value) const
 {
-  std::stringstream ss;
-  int val=0;
-  std::string attr = element->getAttribute(key);
+  const std::string& attr = element->getAttribute(key);
 
-  ss << attr;
-  ss >> val;
+  try
+  {
+    value = Poco::NumberParser::parse(attr);
+  }
+  catch (const Poco::SyntaxException& e) {
+     WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
+                            + " value: " + attr, e);
+     return false;
+  }
 
-  return val;
-
+  return true;
 }
 
-const std::string& cherry::XMLMemento::GetString(const std::string& key) const 
+bool cherry::XMLMemento::GetBoolean(const std::string& key, bool& value) const
 {
-  return element->getAttribute(key);
-}
-
-bool cherry::XMLMemento::GetBoolean(const std::string& key) const
-{
-  //TODO: what if attr contains something else then "false"?
   std::string attr = element->getAttribute(key);
-  if (attr == "true")
+  if (attr.empty()) return false;
+  else if (attr == "true")
+  {
+    value = true;
     return true;
+  }
   else
-    return false;
+  {
+    value = false;
+    return true;
+  }
+}
+
+bool cherry::XMLMemento::GetString(const std::string& key, std::string& value) const
+{
+  std::string v = element->getAttribute(key);
+  if (v.empty()) return false;
+
+  value = v;
+  return true;
 }
 
 const std::string& cherry::XMLMemento::GetTextData() const
@@ -195,7 +211,7 @@ const std::string& cherry::XMLMemento::GetTextData() const
     return textNode->getData();
   }
 
-  return ""; //TODO check if NULL or better ""
+  return EMPTY_STRING; //TODO check if NULL or better ""
 
 }
 

@@ -8,6 +8,7 @@ SET(SRC_CPP_FILES
   cherryGeometry.cpp
   cherryIEditorRegistry.cpp
   cherryImageDescriptor.cpp
+  cherryIMemento.cpp
   cherryIPageLayout.cpp
   cherryIPartListener.cpp
   cherryIPerspectiveListener.cpp

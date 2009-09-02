@@ -2,3 +2,11 @@
 MACRO_CREATE_PLUGIN()
 
 TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized PocoUtil debug PocoUtild optimized PocoXML debug PocoXMLd)
+
+ADD_EXECUTABLE(${OSGI_APP} "src/application/cherryMain.cpp")
+TARGET_LINK_LIBRARIES(${OSGI_APP} ${PLUGIN_TARGET})
+
+SET(OPENCHERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
+
+CONFIGURE_FILE(src/application/solstice.ini
+               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.ini)

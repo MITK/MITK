@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryLog.h"
 
 #include "cherryBundleDirectory.h"
+#include "cherryInternalPlatform.h"
 
 #include <iostream>
 
@@ -87,7 +88,9 @@ bool BundleDirectory::IsDirectory(const std::string& path) const
   Poco::Path fullPath(m_RootPath);
   fullPath.append(path);
   Poco::File file(fullPath.makeDirectory());
-  CHERRY_INFO << "Testing " << file.path() << " for directory: " << (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
+  CHERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) <<
+    "Testing " << file.path() << " for directory: " <<
+    (file.exists() && file.isDirectory() ? "true" : "false") << std::endl;
   return file.exists() && file.isDirectory();
 }
 

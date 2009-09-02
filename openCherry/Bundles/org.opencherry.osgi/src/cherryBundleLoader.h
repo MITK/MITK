@@ -68,6 +68,8 @@ private:
 
   mutable Poco::Mutex m_Mutex;
 
+  bool m_ConsoleLog;
+
   IBundleActivator* LoadActivator(BundleInfo& bundleInfo);
 
   friend class InternalPlatform;

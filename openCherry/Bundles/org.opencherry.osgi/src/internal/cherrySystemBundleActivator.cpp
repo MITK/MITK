@@ -34,7 +34,7 @@ void SystemBundleActivator::Start(IBundleContext::Pointer context)
   Service::Pointer service(new ExtensionPointService(&systemBundle->GetBundleLoader()));
   Platform::GetServiceRegistry().RegisterService(
       IExtensionPointService::SERVICE_ID, service);
-  CHERRY_INFO << "Extension point service registered\n";
+  //CHERRY_INFO << "Extension point service registered\n";
 }
 
 void SystemBundleActivator::Stop(IBundleContext::Pointer /*context*/)

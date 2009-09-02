@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/Exception.h"
 
 #include "cherryBundle.h"
+#include "cherryInternalPlatform.h"
 #include "../cherryBundleLoader.h"
 #include "cherryBundleManifest.h"
 #include "../cherryIBundleActivator.h"
@@ -180,7 +181,7 @@ Bundle::Resolve()
     IBundleManifest::Dependencies::const_iterator iter;
     for (iter =  this->GetRequiredBundles().begin(); iter !=  this->GetRequiredBundles().end(); ++iter)
     {
-      CHERRY_INFO << "Checking dependency:" << iter->symbolicName << ";\n";
+      //CHERRY_INFO << "Checking dependency:" << iter->symbolicName << ";\n";
       IBundle::Pointer bundle = m_BundleLoader.FindBundle(iter->symbolicName);
       if (bundle.IsNull())
         throw BundleResolveException("The bundle " + this->GetSymbolicName() + " depends on missing bundle:", iter->symbolicName);
@@ -203,7 +204,7 @@ Bundle::Start()
     m_State = BUNDLE_STARTING;
 //    BundleEvent starting(this, BundleEvent::EV_BUNDLE_STARTING);
 //    this->GetEvents().bundleStarting(this, starting);
-    CHERRY_INFO << "Bundle " << this->GetSymbolicName() << " is starting";
+    CHERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Bundle " << this->GetSymbolicName() << " is starting";
     m_Activator->Start(m_BundleLoader.GetContextForBundle(IBundle::Pointer(this)));
 
     m_State = BUNDLE_ACTIVE;

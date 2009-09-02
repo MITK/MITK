@@ -223,6 +223,9 @@ public:
   static std::string ARG_PLUGIN_CACHE;
   static std::string ARG_PLUGIN_DIRS;
 
+  static std::string ARG_CONSOLELOG;
+  static std::string ARG_TESTPLUGIN;
+
   static SmartPointer<IExtensionPointService> GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();
 

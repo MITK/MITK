@@ -28,7 +28,7 @@ namespace cherry {
 template<class C>
 C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className)
 {
-  CHERRY_INFO << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName;
+  CHERRY_INFO(m_ConsoleLog) << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName;
   BundleInfo& bundleInfo = m_BundleMap[bundleName];
 
   // check that bundle is started
@@ -37,7 +37,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   Poco::Any* any = bundleInfo.m_ClassLoaderMap[typeid(C).name()];
   if (any == 0)
   {
-    CHERRY_INFO << "Creating new classloader for type: " << typeid(C).name() << std::endl;
+    CHERRY_INFO(m_ConsoleLog) << "Creating new classloader for type: " << typeid(C).name() << std::endl;
     any = new Poco::Any(Poco::SharedPtr<Poco::ClassLoader<C> >(new Poco::ClassLoader<C>()));
     bundleInfo.m_ClassLoaderMap[typeid(C).name()] = any;
   }
@@ -50,12 +50,17 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
 
   if (!cl->isLibraryLoaded(libPath.toString()))
   {
-    CHERRY_INFO << "Loading library: " << libPath.toString();
+    CHERRY_INFO(m_ConsoleLog) << "Loading library: " << libPath.toString();
     
+    try {
     cl->loadLibrary(libPath.toString(), C::GetManifestName());
+    }
+    catch (const Poco::LibraryLoadException& e){
+      CHERRY_ERROR << e.displayText();
+    }
   }
   else {
-    CHERRY_INFO << "Library " << libPath.toString() << " already loaded";
+    CHERRY_INFO(m_ConsoleLog) << "Library " << libPath.toString() << " already loaded";
   }
 
   return cl->create(className);

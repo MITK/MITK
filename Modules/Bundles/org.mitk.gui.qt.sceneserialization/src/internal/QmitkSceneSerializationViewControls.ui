@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>285</width>
-    <height>383</height>
+    <height>337</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -58,6 +58,16 @@
      </property>
      <property name="expandsOnDoubleClick">
       <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnLoadSceneFile">
+     <property name="toolTip">
+      <string>start dumb segmentation</string>
+     </property>
+     <property name="text">
+      <string>Load a scene file</string>
      </property>
     </widget>
    </item>

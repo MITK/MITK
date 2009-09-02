@@ -64,8 +64,11 @@ class QmitkSceneSerializationView : public QObject, public QmitkFunctionality
 
 protected slots:
 
-  /// \brief Called when the user clicks the GUI button
+  /// \brief Called when the user clicks a GUI button
   void SerializeSelected();
+  
+  /// \brief Called when the user clicks a GUI button
+  void LoadSceneFile();
 
 protected:
 

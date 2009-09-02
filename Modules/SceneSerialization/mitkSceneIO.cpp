@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/TemporaryFile.h>
 #include <Poco/Path.h>
+#include <Poco/Delegate.h>
 #include <Poco/Zip/Compress.h>
+#include <Poco/Zip/Decompress.h>
 
 #include "mitkSceneIO.h"
 #include "mitkBaseDataSerializer.h"
@@ -27,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProgressBar.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkStandaloneDataStorage.h"
 
 #include <itkObjectFactoryBase.h>
 
@@ -35,7 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
     
 mitk::SceneIO::SceneIO()
-:m_WorkingDirectory("")
+:m_WorkingDirectory(""),
+ m_UnzipErrors(0)
 {
 }
 
@@ -65,14 +69,65 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
 }
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename, 
-                                                     DataStorage* storage, 
+                                                     DataStorage* pStorage, 
                                                      bool clearStorageFirst )
 {
-  // test if filename exists
+  // prepare data storage
+  DataStorage::Pointer storage = pStorage;
+  if ( storage.IsNull() )
+  {
+    storage = StandaloneDataStorage::New().GetPointer();
+  }
 
+  if ( clearStorageFirst )
+  {
+    try
+    {
+      storage->Remove( storage->GetAll() );
+    }
+    catch(...)
+    {
+      LOG_ERROR << "DataStorage cannot be cleared properly.";
+    }
+  }
+
+  // test input filename
+  if ( filename.empty() )
+  {
+    LOG_ERROR << "No filename given. Not possible to load scene.";
+    return NULL;
+  }
+  
+  // test if filename can be read
+  std::ifstream file( filename.c_str(), std::ios::binary );
+  if (!file.good())
+  {
+    LOG_ERROR << "Cannot open '" << filename << "' for reading";
+    return NULL;
+  }
+  
   // get new temporary directory
+  m_WorkingDirectory = CreateEmptyTempDirectory();
+  if (m_WorkingDirectory.empty())
+  {
+    LOG_ERROR << "Could not create temporary directory. Cannot open scene files.";
+    return NULL;
+  }
+  LOG_INFO << "Unzipping scene file to " << m_WorkingDirectory;
 
   // unzip all filenames contents to temp dir
+  m_UnzipErrors = 0;
+  Poco::Zip::Decompress unzipper( file, Poco::Path( m_WorkingDirectory ) );
+  unzipper.EError += Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &SceneIO::OnUnzipError);
+  unzipper.EOk    += Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> >(this, &SceneIO::OnUnzipOk);
+  unzipper.decompressAllFiles();
+  unzipper.EError -= Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> >(this, &SceneIO::OnUnzipError);
+  unzipper.EOk    -= Poco::Delegate<SceneIO, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> >(this, &SceneIO::OnUnzipOk);
+
+  if ( m_UnzipErrors )
+  {
+    LOG_ERROR << "There were " << m_UnzipErrors << " errors unzipping '" << filename << "'. Will attempt to read whatever could be unzipped.";
+  }
 
   // test if index.xml exists
 
@@ -82,6 +137,50 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // iterate all nodes
 
+
+  return storage;
+/*
+  TiXmlDocument document(.c_str()); // TODO m_WorkingDirectory + "/index.xml"
+  if (!document.LoadFile())
+  {
+    LOG_ERROR << "Could not open/read/parse " << fullFilename << std::endl;
+    return NULL;
+  }
+
+  TiXmlNode* xmlNode = &document;
+
+  m_MagicallyFilledOutputVector.clear(); // ok, we won't do that in reality
+  
+  int version = 1;
+  TiXmlElement* versionObject = document.FirstChildElement("Version");
+  if (versionObject)
+  {
+    if ( versionObject->QueryIntAttribute( "FileVersion", &version ) != TIXML_SUCCESS )
+    {
+      std::cerr << "Scene file " << fullFilename << " does not contain version information! Trying version 1 format." << std::endl;
+    }
+  }
+
+  ReliverSceneReader::Pointer sceneReader;
+  // read version information
+  switch (version)
+  {
+    case 1:
+      {
+        sceneReader = ReliverSceneReaderV1::New().GetPointer();
+      }
+      break;
+
+
+    default:
+      {
+        std::cerr << __FILE__ << " l. " << __LINE__ << ": Version of scene file (" << version << ") not supported." << std::endl;
+        return false;
+      }
+  }
+  
+  sceneReader->CreateScene( xmlNode, storage, tmpDir, m_MagicallyFilledOutputVector );
+*/
   // first level nodes should be <node> elements. for each
   //   1. create a new, empty node
   //   2. check child nodes
@@ -436,3 +535,15 @@ const mitk::PropertyList* mitk::SceneIO::GetFailedProperties()
 { 
   return m_FailedProperties; 
 }
+
+void mitk::SceneIO::OnUnzipError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
+{
+  ++m_UnzipErrors;
+  LOG_ERROR << "Error while unzipping: " << info.second;
+}
+
+void mitk::SceneIO::OnUnzipOk(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
+{
+  LOG_INFO << "Unzipped ok: " << info.second.toString();
+}
+

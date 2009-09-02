@@ -116,6 +116,8 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     virtual void OnDataTreeNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
 
+   
+
   signals:
     ///
     /// \brief Throw a signal when the _DataTreeNode selection changed.
@@ -141,6 +143,13 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Slot for signal when the user selects another item.
     ///
     void OnCurrentIndexChanged(int);
+
+  //#PUBLIC SETTER
+  public slots:
+    ///
+    /// \brief Slot for signal when user wants to set a node as current selected node.
+    ///
+    void SetSelectedNode(mitk::DataTreeNode::Pointer item);
 
   protected:
     ///

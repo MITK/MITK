@@ -333,3 +333,20 @@ void mitk::Surface::Graft( const DataObject* data )
       //CopyStructure( const_cast<mitk::Surface*>(surface)->GetVtkPolyData( i ) );
     }
 }
+
+void mitk::Surface::PrintSelf( std::ostream& os, itk::Indent indent ) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << "Number PolyDatas: " << m_PolyDataSeries.size() << "\n";
+  unsigned int i = 0;
+  for (VTKPolyDataSeries::const_iterator it = m_PolyDataSeries.begin(); it != m_PolyDataSeries.end(); ++it)
+  {
+    vtkPolyData* pd = *it;
+    os << "\n";
+    os << indent << "Number of cells " << pd->GetNumberOfCells() << ": \n";
+    os << indent << "Number of points " << pd->GetNumberOfPoints() << ": \n\n";
+    os << indent << "VTKPolyData : \n";
+    pd->Print(os);
+  }
+}

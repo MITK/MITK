@@ -87,7 +87,9 @@ namespace mitk {
 
     void CalculateBoundingBox();
 
-  virtual void ExecuteOperation(Operation *operation);
+    virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
+
+    virtual void ExecuteOperation(Operation *operation);
 
   protected:
 

@@ -32,7 +32,6 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataPlayer");
   std::string tmp = "";
-  std::ostringstream* stream = new std::ostringstream( std::ostringstream::trunc );
 
   // let's create an object of our class  
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();

@@ -19,9 +19,14 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     cherry::IPreferences::Pointer nodeTableKeyPrefs = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
 
-    QKeySequence _MakeAllInvisible = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+V")));
+    QKeySequence _MakeAllInvisible = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+, V")));
     QKeySequence _ToggleVisibility = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V")));
     QKeySequence _DeleteSelectedNodes = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Delete selected nodes", "Del")));
+    QKeySequence _Reinit = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Reinit", "R")));
+    QKeySequence _GlobalReinit = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("GlobalReinit", "Ctrl+, R")));
+    QKeySequence _Save = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Save", "Ctrl+, S")));
+    QKeySequence _Load = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Load", "Ctrl+, L")));
+    QKeySequence _ShowInfo = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("ShowInfo", "Ctrl+, I")));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
@@ -49,6 +54,31 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
       // trigger deletion of selected node(s)
       _DataManagerView->ActionToggleSelectedVisibilityTriggered(false);
       // return true: this means the delete key event is not send to the table
+      return true;
+    }    
+    else if(_KeySequence == _Reinit)
+    {
+      _DataManagerView->ActionReinitTriggered(false);
+      return true;
+    }    
+    else if(_KeySequence == _GlobalReinit)
+    {
+      _DataManagerView->BtnGlobalReinitClicked(false);
+      return true;
+    }    
+    else if(_KeySequence == _Save)
+    {
+      _DataManagerView->SaveActionTriggered(false);
+      return true;
+    }    
+    else if(_KeySequence == _Load)
+    {
+      _DataManagerView->BtnLoadClicked(false);
+      return true;
+    }
+    else if(_KeySequence == _ShowInfo)
+    {
+      _DataManagerView->ActionShowInfoDialogTriggered(false);
       return true;
     }
   }

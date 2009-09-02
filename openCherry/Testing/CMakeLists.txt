@@ -1,3 +1,4 @@
+INCLUDE(cherryTestingHelpers)
 
 INCLUDE(${OPENCHERRY_BINARY_DIR}/openCherryBundleList.cmake)
 

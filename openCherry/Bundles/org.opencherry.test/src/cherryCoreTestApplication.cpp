@@ -32,7 +32,7 @@ int CoreTestApplication::Start() {
   catch (const Poco::NotFoundException& e)
   {
     CHERRY_ERROR << "You must specify a test plug-in id via " << Platform::ARG_TESTPLUGIN << "=<id>";
-    return IApplication::EXIT_OK;
+    return 1;
   }
 
   return OpenCherryTestDriver::Run(testPlugin);

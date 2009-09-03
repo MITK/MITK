@@ -62,13 +62,13 @@ class GenericLookupTable : public itk::DataObject
 
     bool ValueExists(IdentifierType id) const
     {
-      LookupTableType::const_iterator it = m_LookupTable.find(id);
+      typename LookupTableType::const_iterator it = m_LookupTable.find(id);
       return (it != m_LookupTable.end());
     }
 
     ValueType GetTableValue( IdentifierType id ) const
     {
-      LookupTableType::const_iterator it = m_LookupTable.find(id);
+      typename LookupTableType::const_iterator it = m_LookupTable.find(id);
       if (it != m_LookupTable.end())
         return it->second;
       else

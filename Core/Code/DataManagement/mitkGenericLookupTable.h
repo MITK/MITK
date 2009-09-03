@@ -47,44 +47,41 @@ template <typename T>
 class GenericLookupTable : public itk::DataObject
 {
   public:
-
+    typedef unsigned int IdentifierType;
     typedef T ValueType;
-    typedef std::map< unsigned int, ValueType > LookupTableType;
+    typedef std::map< IdentifierType, ValueType > LookupTableType;
 
     mitkClassMacro(GenericLookupTable, itk::DataObject);
-    mitkNewMacro1Param(GenericLookupTable<T>, T);
     itkNewMacro(Self);
     
-    virtual ~GenericLookupTable() 
-    {
-    }
-
-    void SetTableValue( unsigned int id, ValueType value )
+    void SetTableValue( IdentifierType id, ValueType value )
     {
       m_LookupTable[id] = value;
     }
 
-    ValueType &GetTableValue( unsigned int id )
+    bool ValueExists(IdentifierType id) const
     {
-      return m_LookupTable[id];
+      LookupTableType::const_iterator it = m_LookupTable.find(id);
+      return (it != m_LookupTable.end());
     }
 
-    LookupTableType *GetLookupTable()
+    ValueType GetTableValue( IdentifierType id ) const
     {
-      return m_LookupTable;
+      LookupTableType::const_iterator it = m_LookupTable.find(id);
+      if (it != m_LookupTable.end())
+        return it->second;
+      else
+        throw std::range_error("id does not exist in the lookup table");
     }
 
+    //const LookupTableType& GetLookupTable() const
+    //{
+    //  return m_LookupTable;
+    //}
 
     bool operator==( const Self& lookupTable ) const
     {
-      if ( m_LookupTable == lookupTable.GetLookupTable() )
-      {
-        return true;
-      }
-      else
-      {
-        return false;
-      }
+      return (m_LookupTable == lookupTable.m_LookupTable);
     }
 
     virtual Self& operator=(const Self& other)
@@ -102,11 +99,30 @@ class GenericLookupTable : public itk::DataObject
 
   protected:
     GenericLookupTable() {}
-        
+    virtual ~GenericLookupTable() 
+    {
+    }
+
     LookupTableType m_LookupTable;
 };
-
 } // namespace mitk
 
+/**
+* Generates a specialized subclass of mitk::GenericLookupTable. 
+* This way, GetNameOfClass() returns the value provided by LookupTableName.
+* Please see mitkProperties.h for examples.
+* @param LookupTableName the name of the instantiation of GenericLookupTable
+* @param Type the value type of the GenericLookupTable
+*/
+#define mitkSpecializeGenericLookupTable(LookupTableName,Type)  \
+class MITK_CORE_EXPORT LookupTableName: public GenericLookupTable< Type >    \
+{                                                               \
+public:                                                         \
+  mitkClassMacro(LookupTableName, GenericLookupTable< Type >);  \
+  itkNewMacro(LookupTableName);                                 \
+protected:                                                      \
+  LookupTableName() {}                                          \
+  virtual ~LookupTableName() {}                                 \
+};
 
 #endif

@@ -173,7 +173,7 @@ void mitk::RGBToRGBACastImageFilter::InternalCast(
   typename TPixel::ComponentType defaultAlpha )
 {
   typedef TPixel InputPixelType;
-  typedef typename itk::RGBAPixel< TPixel::ComponentType > OutputPixelType;
+  typedef itk::RGBAPixel< typename TPixel::ComponentType > OutputPixelType;
   typedef itk::Image< InputPixelType, VImageDimension > InputImageType;
   typedef itk::Image< OutputPixelType, VImageDimension > OutputImageType;
 
@@ -196,8 +196,8 @@ void mitk::RGBToRGBACastImageFilter::InternalCast(
         !inputIt.IsAtEnd(); 
         ++inputIt, ++outputIt )
   {
-    InputPixelType::Iterator pixelInputIt = inputIt.Get().Begin();
-    OutputPixelType::Iterator pixelOutputIt = outputIt.Get().Begin();
+    typename InputPixelType::Iterator pixelInputIt = inputIt.Get().Begin();
+    typename OutputPixelType::Iterator pixelOutputIt = outputIt.Get().Begin();
 
     *pixelOutputIt++ = *pixelInputIt++;
     *pixelOutputIt++ = *pixelInputIt++;

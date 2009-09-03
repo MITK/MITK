@@ -21,9 +21,9 @@
 #include <cherryQtViewPart.h>
 #include <cherryIWorkbenchPartReference.h>
 #include <cherryIPartListener.h>
+#include <cherryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
-
 #include "mitkQtCommonDll.h"
 
 //!mm-added
@@ -123,6 +123,10 @@ public:
   void WaitCursorOff();
 
 protected:
+  ///
+  /// Returns an IPreferences for this Functionality. The path for the is "/<this->GetViewSite()->GetId()>"
+  ///
+  cherry::IPreferences::Pointer GetPreferences() const;
 
   void SetHandleMultipleDataStorages(bool multiple);
   bool HandlesMultipleDataStorages() const;
@@ -143,6 +147,11 @@ private:
   /// Saves if this view is the currently active one.
   ///
   bool m_IsActive;
+
+  ///
+  /// The Preferences Service to retrieve and store preferences.
+  ///
+  cherry::IPreferencesService::WeakPtr m_PreferencesService;
 };
 
 #endif /*QMITKFUNCTIONALITY_H_*/

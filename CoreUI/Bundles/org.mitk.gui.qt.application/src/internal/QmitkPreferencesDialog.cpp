@@ -243,6 +243,11 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
           {
             Poco::File f(fileNames.at(0).toStdString());
             cherryPrefService->ImportPreferences(f, "");
+            cherry::IQtPreferencePage* prefPage 
+              = dynamic_cast<cherry::IQtPreferencePage*>(m_PreferencesPanel->currentWidget());
+            if(prefPage)
+              prefPage->Update();
+
             LOG_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
           }
         }

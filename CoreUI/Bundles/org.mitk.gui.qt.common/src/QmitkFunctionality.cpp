@@ -17,6 +17,9 @@
 
 #include "QmitkFunctionality.h"
 
+// other includes
+#include "mbilog.h"
+
 // mitk Includes
 #include "mitkMessage.h"
 #include "mitkIDataStorageService.h"
@@ -40,6 +43,8 @@ QmitkFunctionality::QmitkFunctionality()
  , m_InDataStorageChanged(false)
  , m_IsActive(false)
 {
+  m_PreferencesService = 
+    cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
 }
   
 void QmitkFunctionality::SetHandleMultipleDataStorages(bool multiple)
@@ -286,7 +291,8 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
 
 void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
 {
-  itkGenericOutputMacro( << "Exception caught: " << str );
+  //itkGenericOutputMacro( << "Exception caught: " << str );
+  LOG_ERROR << str;
   if ( showDialog )
   {
     QMessageBox::critical ( parent, "Exception caught!", str );
@@ -312,4 +318,12 @@ void QmitkFunctionality::WaitCursorOn()
 void QmitkFunctionality::WaitCursorOff()
 {
   QApplication::restoreOverrideCursor();
+}
+
+cherry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
+{
+  cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
+  std::string id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
+  return prefService.IsNotNull() ? prefService->GetSystemPreferences()->Node(id): cherry::IPreferences::Pointer(0);
 }

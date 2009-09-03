@@ -35,7 +35,6 @@ QmitkGeneralPreferencePage::QmitkGeneralPreferencePage( QWidget* parent, Qt::Win
   m_GeneralPreferencesNode = _GeneralPreferencesNode;
 
   m_StartMaximized = new QCheckBox("Start Main Window &Maximized", this);
-  m_StartMaximized->setChecked(_GeneralPreferencesNode->GetBool("startMaximized", false));
 
   QGridLayout* layout = new QGridLayout;
   layout->addWidget(m_StartMaximized, 0,0);
@@ -43,6 +42,7 @@ QmitkGeneralPreferencePage::QmitkGeneralPreferencePage( QWidget* parent, Qt::Win
   layout->setRowStretch(1, 20);
 
   this->setLayout(layout);
+  this->Update();
 }
 
 bool QmitkGeneralPreferencePage::PerformOk()
@@ -60,4 +60,11 @@ bool QmitkGeneralPreferencePage::PerformOk()
 void QmitkGeneralPreferencePage::PerformCancel()
 {
 
+}
+
+void QmitkGeneralPreferencePage::Update()
+{
+  IPreferences::Pointer _GeneralPreferencesNode = m_GeneralPreferencesNode.Lock();
+  if(_GeneralPreferencesNode.IsNotNull())
+    m_StartMaximized->setChecked(_GeneralPreferencesNode->GetBool("startMaximized", false));
 }

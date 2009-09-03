@@ -35,3 +35,8 @@ void QmitkDataManagerPreferencePage::PerformCancel()
 {
 
 }
+
+void QmitkDataManagerPreferencePage::Update()
+{
+
+}

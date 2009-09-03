@@ -32,14 +32,19 @@ public:
   QmitkDataManagerPreferencePage(QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   ///
-  /// Invoked when the OK button was clicked in the preferences dialog
+  /// \see IPreferencePage::PerformOk()
   ///
   virtual bool PerformOk();
 
   ///
-  /// Invoked when the Cancel button was clicked in the preferences dialog
+  /// \see IPreferencePage::PerformCancel()
   ///
   virtual void PerformCancel();
+
+  ///
+  /// \see IPreferencePage::Update()
+  ///
+  virtual void Update();
 
 };
 

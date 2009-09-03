@@ -39,30 +39,21 @@ QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage( QWidget* paren
   cherry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = _DataManagerHotkeysPreferencesNode;
 
-  m_HotkeyEditors["Make all nodes invisible"] 
-    = new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Make all nodes invisible", "Ctrl+, V")));
+  m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+, V");
 
-  m_HotkeyEditors["Toggle visibility of selected nodes"] 
-    = new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Toggle visibility of selected nodes", "V")));
+  m_HotkeyEditors["Toggle visibility of selected nodes"] = new QmitkHotkeyLineEdit("V");
 
-  m_HotkeyEditors["Delete selected nodes"] 
-    = new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Delete selected nodes", "Del")));
+  m_HotkeyEditors["Delete selected nodes"] = new QmitkHotkeyLineEdit("Del");
 
-  m_HotkeyEditors["Reinit selected nodes"] =
-    new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Reinit", "R")));
+  m_HotkeyEditors["Reinit selected nodes"] = new QmitkHotkeyLineEdit("R");
 
-  m_HotkeyEditors["Global Reinit"] =
-    new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("GlobalReinit", "Ctrl+, R")));
+  m_HotkeyEditors["Global Reinit"] = new QmitkHotkeyLineEdit("Ctrl+, R");
 
-  m_HotkeyEditors["Save selected nodes"] =
-    new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Saves", "Ctrl+, S")));
+  m_HotkeyEditors["Save selected nodes"] = new QmitkHotkeyLineEdit("Ctrl+, S");
 
-  m_HotkeyEditors["Load"] =
-    new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("Load", "Ctrl+, L")));
+  m_HotkeyEditors["Load"] = new QmitkHotkeyLineEdit("Ctrl+, L");
 
-  m_HotkeyEditors["Show Node Information"] =
-    new QmitkHotkeyLineEdit(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get("ShowInfo", "Ctrl+, I")));
-
+  m_HotkeyEditors["Show Node Information"] = new QmitkHotkeyLineEdit("Ctrl+, I");
 
   QGridLayout* layout = new QGridLayout;
   int i = 0;
@@ -133,4 +124,18 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
 void QmitkDataManagerHotkeysPrefPage::PerformCancel()
 {
 
+}
+
+void QmitkDataManagerHotkeysPrefPage::Update()
+{
+  IPreferences::Pointer _DataManagerHotkeysPreferencesNode = m_DataManagerHotkeysPreferencesNode.Lock();
+  if(_DataManagerHotkeysPreferencesNode.IsNotNull())
+  {
+    for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
+      ; it != m_HotkeyEditors.end(); ++it)
+    {
+      it->second->setText(QString::fromStdString(_DataManagerHotkeysPreferencesNode->Get(it->first.toStdString()
+        , it->second->text().toStdString())));
+    }
+  }
 }

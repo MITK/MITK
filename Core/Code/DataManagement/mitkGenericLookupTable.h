@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <sstream>
 #include <stdlib.h>
+#include <map>
 
 #include <itkDataObject.h>
 

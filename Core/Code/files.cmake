@@ -74,6 +74,7 @@ SET(CPP_FILES
   DataManagement/mitkLevelWindowPreset.cpp
   DataManagement/mitkLevelWindowProperty.cpp
   DataManagement/mitkLookupTable.cpp
+  DataManagement/mitkLookupTables.cpp # specializations of GenericLookupTable
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
   DataManagement/mitkModeOperation.cpp

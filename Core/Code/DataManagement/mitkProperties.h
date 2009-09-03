@@ -20,8 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPROPERTIES_H_HEADER_INCLUDED
 
 #include "mitkGenericProperty.h"
-#include "mitkGenericLookupTableProperty.h"
 #include "mitkVector.h"
+#include "mitkLookupTables.h"
 
 namespace mitk {
 
@@ -40,14 +40,15 @@ namespace mitk {
    mitkSpecializeGenericProperty(Point4dProperty,Point4D,Point4D::BaseArray::Filled(0.0f).GetDataPointer() );
 
    mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
+   
+   mitkSpecializeGenericProperty(FloatLookupTableProperty,  FloatLookupTable::Pointer ,  FloatLookupTable::New());
+   mitkSpecializeGenericProperty(BoolLookupTableProperty,   BoolLookupTable::Pointer ,   BoolLookupTable::New());
+   mitkSpecializeGenericProperty(IntLookupTableProperty,    IntLookupTable::Pointer ,    IntLookupTable::New());
+   mitkSpecializeGenericProperty(StringLookupTableProperty, StringLookupTable::Pointer , StringLookupTable::New());
 
    /**
    * \warning If you add more specialization of GenericProperty, you must also add these to the
    * templated GetPropertyValue() method in mitkPropertyList.cpp!
    */
-
-   mitkSpecializeGenericLookupTableProperty(FloatLookupTableProperty,float);
-
 } // namespace mitk
-
 #endif /* MITKPROPERTIES_H_HEADER_INCLUDED */

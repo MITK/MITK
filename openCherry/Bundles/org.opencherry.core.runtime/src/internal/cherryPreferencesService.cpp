@@ -4,6 +4,8 @@
 #include "Poco/ScopedLock.h"
 #include "Poco/DirectoryIterator.h"
 #include "cherryPlatform.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
 
 using namespace std;
 
@@ -136,10 +138,48 @@ void cherry::PreferencesService::ImportPreferences( Poco::File f, std::string na
     this->GetUserPreferences(name);
   }
 
-  Poco::File defaultFile = it->second->GetFile();
+  //Poco::File defaultFile = it->second->GetFile();
   XMLPreferencesStorage::Pointer storage(new XMLPreferencesStorage(f));
-  m_PreferencesStorages[name] = storage;
-  storage->SetFile(defaultFile);
+
+  IPreferences::Pointer rootOfImportedPrefs = storage->GetRoot();
+  IPreferences::Pointer rootOfOldPrefs = m_PreferencesStorages[name]->GetRoot();
+
+  // make backup of old
+  std::string exportFilePath = Poco::DateTimeFormatter::format(Poco::DateTime(), "%Y.%m.%d-%H%M%S");
+  exportFilePath = GetDefaultPreferencesDirPath() + Poco::Path::separator() + exportFilePath + "prefs.xml";
+  Poco::File exportFile(exportFilePath);
+  this->ExportPreferences(exportFile, name);
+
+  if(rootOfImportedPrefs.IsNotNull())
+  {
+    this->ImportNode(rootOfImportedPrefs, rootOfOldPrefs);
+  }
+}
+
+void cherry::PreferencesService::ImportNode( IPreferences::Pointer nodeToImport
+                                            , IPreferences::Pointer rootOfOldPrefs )
+{
+  //# overwrite properties
+  IPreferences::Pointer oldNode 
+    = rootOfOldPrefs->Node(nodeToImport->AbsolutePath()); // get corresponding node in "old" tree
+
+  std::vector<std::string> keys = nodeToImport->Keys(); // get all keys for properties
+  for (vector<string>::const_iterator it = keys.begin()
+    ; it != keys.end(); ++it)
+  {
+    oldNode->Put((*it), nodeToImport->Get((*it), ""));// set property in old node to the value of the imported.
+                                                // properties not existing in imported are left untouched
+     
+  }
+
+  // do it for all children
+  vector<string> childrenNames = nodeToImport->ChildrenNames();
+  for (vector<string>::const_iterator it = childrenNames.begin()
+    ; it != childrenNames.end(); ++it)
+  {
+    // with node->Node(<childName>) you get the child node with the name <childName>
+    this->ImportNode(nodeToImport->Node((*it)), rootOfOldPrefs);
+  }
 }
 
 void cherry::PreferencesService::ExportPreferences( Poco::File f, std::string name )

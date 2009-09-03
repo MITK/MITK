@@ -42,6 +42,12 @@ struct IPreferencePage : virtual public Object
   /// Invoked when the Cancel button was clicked in the preferences dialog
   ///
   virtual void PerformCancel() = 0;
+
+  ///
+  /// Invoked when the user performed an import. As the values of the preferences may have changed
+  /// you should read all values again from the preferences service.
+  ///
+  virtual void Update() = 0;
 };
 
 }

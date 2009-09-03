@@ -40,15 +40,6 @@ public:
   {
   }
 
-  ///
-  /// Invoked when the OK button was clicked in the preferences dialog
-  ///
-  virtual bool PerformOk() = 0;
-
-  ///
-  /// Invoked when the Cancel button was clicked in the preferences dialog
-  ///
-  virtual void PerformCancel() = 0;
 };
 
 }

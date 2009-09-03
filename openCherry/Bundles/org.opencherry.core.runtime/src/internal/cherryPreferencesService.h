@@ -72,6 +72,10 @@ namespace cherry
     virtual void ExportPreferences(Poco::File f, std::string name="");
   protected:
     ///
+    /// Helper func for ImportPreferences(). Imports all nodes of an IPreferences tree recursively
+    ///
+    void ImportNode( IPreferences::Pointer nodeToImport , IPreferences::Pointer rootOfOldPrefs );
+    ///
     /// Holds the directory where the preferences files will be stored
     ///
     std::string m_PreferencesDir;

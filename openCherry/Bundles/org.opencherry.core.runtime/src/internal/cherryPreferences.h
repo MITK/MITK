@@ -2,7 +2,7 @@
 #define CHERRYPREFERENCES_H_
 
 #include "../cherryRuntimeDll.h"
-#include "cherryIPreferences.h"
+#include "cherryICherryPreferences.h"
 
 #include <map>
 #include <vector>
@@ -17,7 +17,7 @@ namespace cherry
   /// Implementation of the OSGI Preferences Interface.
   /// Wraps a DOMNode.
   ///  
-  class CHERRY_RUNTIME Preferences: public IPreferences 
+  class CHERRY_RUNTIME Preferences: public ICherryPreferences 
   {
 
   public:

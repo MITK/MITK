@@ -20,6 +20,7 @@ SET(CPP_FILES
   Algorithms/mitkImageTimeSelector.cpp
   Algorithms/mitkImageToImageFilter.cpp
   Algorithms/mitkPointSetSource.cpp
+  Algorithms/mitkRGBToRGBACastImageFilter.cpp
   Algorithms/mitkSubImageSelector.cpp
   Algorithms/mitkSurfaceSource.cpp
   Algorithms/mitkSurfaceToSurfaceFilter.cpp

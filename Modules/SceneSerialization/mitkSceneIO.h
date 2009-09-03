@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkNodePredicateBase.h"
 
+#include <Poco/Zip/ZipLocalFileHeader.h>
+
 class TiXmlElement;
 
 namespace mitk
@@ -102,10 +104,14 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
     TiXmlElement* SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error);
     TiXmlElement* SavePropertyList( PropertyList* propertyList, const std::string& filenamehint );
 
+    void OnUnzipError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
+    void OnUnzipOk(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info);
+
     FailedBaseDataListType::Pointer m_FailedNodes;
     PropertyList::Pointer           m_FailedProperties;
 
-    std::string m_WorkingDirectory;
+    std::string  m_WorkingDirectory;
+    unsigned int m_UnzipErrors;
 };
 
 }

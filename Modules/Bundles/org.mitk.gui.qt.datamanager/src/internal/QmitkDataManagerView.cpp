@@ -464,6 +464,10 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
       if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
       {
         this->GetDataStorage()->Add(node, parentNode);
+        mitk::BaseData::Pointer basedata = node->GetData();
+        mitk::RenderingManager::GetInstance()->InitializeViews(
+          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }

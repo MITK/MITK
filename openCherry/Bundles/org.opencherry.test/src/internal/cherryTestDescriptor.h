@@ -38,6 +38,8 @@ public:
   std::string GetContributor() const;
   std::string GetDescription() const;
 
+  bool IsUITest() const;
+
 private:
 
   IConfigurationElement::Pointer configElem;

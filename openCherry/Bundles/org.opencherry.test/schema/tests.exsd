@@ -75,6 +75,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="uitest" type="boolean">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

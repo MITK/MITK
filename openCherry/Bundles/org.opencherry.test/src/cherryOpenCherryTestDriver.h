@@ -19,6 +19,8 @@
 #ifndef CHERRYOPENCHERRYTESTDRIVER_H_
 #define CHERRYOPENCHERRYTESTDRIVER_H_
 
+#include "cherryTestDll.h"
+
 #include "cherryITestDescriptor.h"
 
 #include <vector>
@@ -31,19 +33,20 @@ namespace cherry
  * running standalone.
  * Example call: TODO
  */
-class OpenCherryTestDriver
+class CHERRY_TEST_EXPORT OpenCherryTestDriver
 {
 public:
 
-  OpenCherryTestDriver(const std::vector<ITestDescriptor::Pointer>& descriptors, const std::string& testName="", bool wait=false);
+  OpenCherryTestDriver(const std::vector<ITestDescriptor::Pointer>& descriptors, bool uitests = false, const std::string& testName="", bool wait=false);
 
   int Run();
 
-  static int Run(const std::string& pluginId);
+  static int Run(const std::string& pluginId, bool uitests = false);
 
 protected:
 
   std::vector<ITestDescriptor::Pointer> descriptors;
+  bool uitests;
   std::string testName;
   bool wait;
 };

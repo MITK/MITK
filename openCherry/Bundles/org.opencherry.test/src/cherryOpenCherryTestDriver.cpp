@@ -25,9 +25,11 @@ namespace cherry
 {
 
 OpenCherryTestDriver::OpenCherryTestDriver(const std::vector<
-    ITestDescriptor::Pointer>& descriptors, const std::string& testName,
+    ITestDescriptor::Pointer>& descriptors,
+    bool uitests,
+    const std::string& testName,
     bool wait) :
-  descriptors(descriptors), testName(testName), wait(wait)
+  descriptors(descriptors), uitests(uitests), testName(testName), wait(wait)
 {
 
 }
@@ -40,8 +42,11 @@ int OpenCherryTestDriver::Run()
       != descriptors.end(); ++i)
   {
     ITestDescriptor::Pointer descr(*i);
-    ITest::Pointer test(descr->CreateTest());
-    runner.addTest(descr->GetId(), test->GetTest());
+    if (descr->IsUITest() == uitests)
+    {
+      ITest::Pointer test(descr->CreateTest());
+      runner.addTest(descr->GetId(), test->GetTest());
+    }
   }
 
   std::vector<std::string> args;
@@ -56,7 +61,7 @@ int OpenCherryTestDriver::Run()
   return runner.run(args) ? 0 : 1;
 }
 
-int OpenCherryTestDriver::Run(const std::string& pluginId)
+int OpenCherryTestDriver::Run(const std::string& pluginId, bool uitests)
 {
   TestRegistry testRegistry;
   const std::vector<ITestDescriptor::Pointer>& tests = testRegistry.GetTestsForId(
@@ -69,7 +74,7 @@ int OpenCherryTestDriver::Run(const std::string& pluginId)
     return 0;
   }
 
-  OpenCherryTestDriver driver(tests);
+  OpenCherryTestDriver driver(tests, uitests);
   return driver.Run();
 }
 

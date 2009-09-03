@@ -34,6 +34,8 @@ struct ITestDescriptor : public Object
   virtual std::string GetId() const = 0;
   virtual std::string GetContributor() const = 0;
   virtual std::string GetDescription() const = 0;
+
+  virtual bool IsUITest() const = 0;
 };
 
 }

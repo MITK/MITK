@@ -48,8 +48,6 @@ void Step8::SetupWidgets()
 			m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
-	//  mitk::RenderingManager::GetInstance()->InitializeViews();
-
 	// Initialize bottom-right view as 3D view
 	multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
 			mitk::BaseRenderer::Standard3D);
@@ -59,6 +57,8 @@ void Step8::SetupWidgets()
 
 	// Add the displayed views to the DataStorage to see their positions in 2D and 3D
 	multiWidget->AddDisplayPlaneSubTree();
+	multiWidget->AddPlanesToDataStorage();
+	multiWidget->SetWidgetPlanesVisibility(true);
 
 	//*************************************************************************
 	// Part II: Setup standard interaction with the mouse

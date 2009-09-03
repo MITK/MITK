@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/AutoPtr.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 #include <Poco/StringTokenizer.h>
-#include <Poco/Environment.h>
 #include <Poco/Util/HelpFormatter.h>
 
 #include <iostream>

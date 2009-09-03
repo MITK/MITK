@@ -28,6 +28,7 @@ const std::string TestRegistry::TAG_TEST = "test";
 const std::string TestRegistry::ATT_ID = "id";
 const std::string TestRegistry::ATT_CLASS = "class";
 const std::string TestRegistry::ATT_DESCRIPTION = "description";
+const std::string TestRegistry::ATT_UITEST = "uitest";
 
 TestRegistry::TestRegistry()
 {

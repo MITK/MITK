@@ -18,6 +18,8 @@
 #include "cherryTestDescriptor.h"
 #include "cherryTestRegistry.h"
 
+#include <Poco/String.h>
+
 namespace cherry
 {
 
@@ -51,6 +53,17 @@ std::string TestDescriptor::GetDescription() const
   std::string descr;
   configElem->GetAttribute(TestRegistry::ATT_DESCRIPTION, descr);
   return descr;
+}
+
+bool TestDescriptor::IsUITest() const
+{
+  std::string isUi;
+  if (configElem->GetAttribute(TestRegistry::ATT_UITEST, isUi))
+  {
+    return !Poco::icompare(isUi, "true");
+  }
+
+  return false;
 }
 
 }

@@ -39,22 +39,8 @@ namespace cherry {
  *
  * @see IMemento
  */
-  class CHERRY_UI XMLMemento : public IMemento {
+class CHERRY_UI XMLMemento : public IMemento {
 
-
-
-    /**
-    * Creates a <code>Document</code> from the <code>Reader</code>
-    * and returns a memento on the first <code>Element</code> for reading
-    * the document.
-    * <p>
-    * Same as calling createReadRoot(reader, null)
-    * </p>
-    *
-    * @param reader the <code>Reader</code> used to create the memento's document
-    * @return a memento on the first <code>Element</code> for reading the document
-    * @throws WorkbenchException if IO problems, invalid format, or no element.
-    */
   public:
     cherryObjectMacro(XMLMemento);
     cherryNewMacro2Param(XMLMemento, Poco::XML::Document*, Poco::XML::Element*);
@@ -72,8 +58,8 @@ namespace cherry {
     /**
     * Creates a memento for the specified document and element.
     * <p>
-    * Clients should use <code>createReadRoot</code> and
-    * <code>createWriteRoot</code> to create the initial
+    * Clients should use <code>CreateReadRoot</code> and
+    * <code>CreateWriteRoot</code> to create the initial
     * memento on a document.
     * </p>
     *
@@ -81,6 +67,8 @@ namespace cherry {
     * @param element the element node for the memento
     */
     XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem);
+
+    ~XMLMemento();
 
     /**
      * Creates a <code>Document</code> from the <code>Reader</code>
@@ -164,50 +152,36 @@ namespace cherry {
      * @return an array of children with the given type
      */
     virtual std::vector< IMemento::Pointer > GetChildren(const std::string& type) const;
-
-    /**
-     * Returns the floating point value of the given key.
-     *
-     * @param key the key
-     * @return the value, or <code>null</code> if the key was not found or was found
-     *   but was not a floating point number
-     */
-    virtual float GetFloat(const std::string& key) const;
     
     /**
      * Returns the Type of this memento
     */
-    virtual const std::string& GetType() const;
+    virtual std::string GetType() const;
 
     /**
      * Returns the ID of this memento
-    */
-    virtual const std::string& GetID() const;
-
-    /**
-     * Returns the integer value of the given key.
-     *
-     * @param key the key
-     * @return the value, or <code>null</code> if the key was not found or was found
-     *   but was not an integer
      */
-    virtual int GetInteger(const std::string& key) const;
+    virtual std::string GetID() const;
 
     /**
-     * Returns the string value of the given key.
-     *
-     * @param key the key
-     * @return the value, or <code>null</code> if the key was not found
+     * @see IMemento#GetInteger
      */
-    virtual const std::string& GetString(const std::string& key) const;
+    virtual bool GetInteger(const std::string& key, int& value) const;
 
     /**
-	   * Returns the boolean value of the given key.
-	   * 
-	   * @param key the key
-	   * @return the value, or <code>null</code> if the key was not found
+     * @see IMemento#GetFloat
+     */
+    virtual bool GetFloat(const std::string& key, double& value) const;
+
+    /**
+     * @see IMemento#GetString
+     */
+    virtual bool GetString(const std::string& key, std::string& value) const;
+
+    /**
+	   * @see IMemento#GetString
 	   */
-	  virtual bool GetBoolean(const std::string& key) const;
+	  virtual bool GetBoolean(const std::string& key, bool& value) const;
 
 	  /**
      * Returns the data of the Text node of the memento. Each memento is allowed
@@ -308,6 +282,7 @@ private:
 
     Poco::XML::Document* factory;
     Poco::XML::Element* element;
+
 };
 }//namespace cherry
 #endif /* CHERRYXMLMEMENTO_H_ */

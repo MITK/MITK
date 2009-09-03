@@ -69,6 +69,7 @@ void QmitkSceneSerializationView::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->btnSerializeSelected), SIGNAL(clicked()), this, SLOT(SerializeSelected()) );
+    connect( (QObject*)(m_Controls->btnLoadSceneFile),     SIGNAL(clicked()), this, SLOT(LoadSceneFile()) );
   }
 }
 
@@ -92,6 +93,7 @@ void QmitkSceneSerializationView::SerializeSelected()
    */
   mitk::DataStorage::Pointer storage = this->GetDefaultDataStorage();
 
+  /*  TODO ask the user for a file name */
   sceneIO->SaveScene( storage, "scene.zip" );
 
   mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
@@ -131,4 +133,14 @@ void QmitkSceneSerializationView::SerializeSelected()
 
 }
 
+void QmitkSceneSerializationView::LoadSceneFile()
+{
+  mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
 
+  mitk::DataStorage::Pointer storage = this->GetDefaultDataStorage();
+
+  /*  TODO ask the user for a file name */
+  mitk::DataStorage::Pointer newStorage = sceneIO->LoadScene( "scene.zip", storage );
+
+  assert( newStorage.GetPointer() == storage.GetPointer() );
+}

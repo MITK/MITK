@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
+#include "itkSimpleFastMutexLock.h"
+#include "itkMutexLockHolder.h"
 
 
 mitk::StandaloneDataStorage::StandaloneDataStorage() 
@@ -50,41 +52,44 @@ bool mitk::StandaloneDataStorage::IsInitialized() const
 
 void mitk::StandaloneDataStorage::Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents)
 {
-  if (!IsInitialized())
-    throw 1;  // insert exception handling here
-  /* check if node is in its own list of sources */
-  if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
-    throw 3;  
-  /* check if node already exists in StandaloneDataStorage */
-  if (m_SourceNodes.find(node) != m_SourceNodes.end())
-    throw 4; // node already in StandaloneDataStorage! insert exception handling here
-
-  /* create parent list if it does not exist */
-  mitk::DataStorage::SetOfObjects::ConstPointer sp;
-  if (parents != NULL)
-    sp = parents;
-  else
-    sp = mitk::DataStorage::SetOfObjects::New();
-  /* Store node and parent list in sources adjacency list */
-  m_SourceNodes.insert(std::make_pair(node, sp));
-
-  /* Store node and an empty children list in derivations adjacency list */
-  mitk::DataStorage::SetOfObjects::Pointer children = mitk::DataStorage::SetOfObjects::New();
-  m_DerivedNodes.insert(std::make_pair(node, children));
-
-  /* create entry in derivations adjacency list for each parent of the new node */
-  for (SetOfObjects::ConstIterator it = sp->Begin(); it != sp->End(); it++)
   {
-    mitk::DataTreeNode::ConstPointer parent = it.Value().GetPointer();
-    mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects = m_DerivedNodes[parent]; // get or create pointer to list of derived objects for that parent node
-    if (derivedObjects.IsNull())
-      m_DerivedNodes[parent] = mitk::DataStorage::SetOfObjects::New();  // Create a set of Objects, if it does not already exist
-    mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
-    deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
-  }
+    itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
+    if (!IsInitialized())
+      throw 1;  // insert exception handling here
+    /* check if node is in its own list of sources */
+    if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
+      throw 3;
+    /* check if node already exists in StandaloneDataStorage */
+    if (m_SourceNodes.find(node) != m_SourceNodes.end())
+      throw 4; // node already in StandaloneDataStorage! insert exception handling here
 
-  // register for ITK changed events
-  this->AddListeners(node);
+    /* create parent list if it does not exist */
+    mitk::DataStorage::SetOfObjects::ConstPointer sp;
+    if (parents != NULL)
+      sp = parents;
+    else
+      sp = mitk::DataStorage::SetOfObjects::New();
+    /* Store node and parent list in sources adjacency list */
+    m_SourceNodes.insert(std::make_pair(node, sp));
+
+    /* Store node and an empty children list in derivations adjacency list */
+    mitk::DataStorage::SetOfObjects::Pointer children = mitk::DataStorage::SetOfObjects::New();
+    m_DerivedNodes.insert(std::make_pair(node, children));
+
+    /* create entry in derivations adjacency list for each parent of the new node */
+    for (SetOfObjects::ConstIterator it = sp->Begin(); it != sp->End(); it++)
+    {
+      mitk::DataTreeNode::ConstPointer parent = it.Value().GetPointer();
+      mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects = m_DerivedNodes[parent]; // get or create pointer to list of derived objects for that parent node
+      if (derivedObjects.IsNull())
+        m_DerivedNodes[parent] = mitk::DataStorage::SetOfObjects::New();  // Create a set of Objects, if it does not already exist
+      mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
+      deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
+    }
+
+    // register for ITK changed events
+    this->AddListeners(node);
+  }
 
   /* Notify observers */
   EmitAddNodeEvent(node);
@@ -104,14 +109,17 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataTreeNode* node)
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
-  
-  /* remove node from both relation adjacency lists */
-  this->RemoveFromRelation(node, m_SourceNodes);
-  this->RemoveFromRelation(node, m_DerivedNodes);
+  {
+    itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
+    /* remove node from both relation adjacency lists */
+    this->RemoveFromRelation(node, m_SourceNodes);
+    this->RemoveFromRelation(node, m_DerivedNodes);
+  }
 }
 
 bool mitk::StandaloneDataStorage::Exists(const mitk::DataTreeNode* node) const
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return (m_SourceNodes.find(node) != m_SourceNodes.end());
 }
 
@@ -135,6 +143,7 @@ void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataTreeNode* n
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAll() const
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock > locked(m_Mutex);
   if (!IsInitialized())
     throw 1;  // insert exception handling here
     
@@ -214,12 +223,14 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition, bool onlyDirectSources) const
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return this->GetRelations(node, m_SourceNodes, condition, onlyDirectSources);
 }
 
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetDerivations(const mitk::DataTreeNode* node, const NodePredicateBase* condition, bool onlyDirectDerivations) const
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock>locked(m_Mutex);
   return this->GetRelations(node, m_DerivedNodes, condition, onlyDirectDerivations);
 }
 

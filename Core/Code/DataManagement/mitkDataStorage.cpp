@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkGroupTagProperty.h"
+#include "itkMutexLockHolder.h"
 
 #include "itkCommand.h"
 
@@ -68,6 +69,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
 
 
 mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
+
 {
   if (name == NULL)
     return NULL;
@@ -206,6 +208,7 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
 
 void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) == m_NodeModifiedObserverTags.end())
   {
@@ -227,6 +230,7 @@ void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 
 void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
 {
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne) ;
   // node must not be 0 and must be registered
   if(_Node && m_NodeModifiedObserverTags.find(_Node) != m_NodeModifiedObserverTags.end())
   {

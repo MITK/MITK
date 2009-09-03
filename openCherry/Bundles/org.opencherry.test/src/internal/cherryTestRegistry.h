@@ -36,6 +36,7 @@ public:
   static const std::string ATT_ID; // = "id"
   static const std::string ATT_CLASS; // = "class"
   static const std::string ATT_DESCRIPTION; // = "description"
+  static const std::string ATT_UITEST; // = "uitest"
 
   TestRegistry();
 

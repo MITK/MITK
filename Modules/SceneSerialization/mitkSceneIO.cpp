@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSceneIO.h"
 #include "mitkBaseDataSerializer.h"
 #include "mitkPropertyListSerializer.h"
+#include "mitkSceneReader.h"
 
 #include "mitkProgressBar.h"
 #include "mitkBaseRenderer.h"
@@ -36,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <tinyxml.h>
 
 #include <fstream>
+#include <sstream>
     
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
@@ -130,86 +132,68 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   }
 
   // test if index.xml exists
-
   // parse index.xml with TinyXML
-
-  // find version node --> note version in some variable
-
-  // iterate all nodes
-
-
-  return storage;
-/*
-  TiXmlDocument document(.c_str()); // TODO m_WorkingDirectory + "/index.xml"
+  LOG_INFO << "Reading " << m_WorkingDirectory << "/index.xml" << std::endl;
+  TiXmlDocument document( m_WorkingDirectory + "/index.xml" );
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << fullFilename << std::endl;
+    LOG_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return NULL;
   }
 
-  TiXmlNode* xmlNode = &document;
-
-  m_MagicallyFilledOutputVector.clear(); // ok, we won't do that in reality
-  
-  int version = 1;
+  // find version node --> note version in some variable
+  int fileVersion = 1;
   TiXmlElement* versionObject = document.FirstChildElement("Version");
   if (versionObject)
   {
-    if ( versionObject->QueryIntAttribute( "FileVersion", &version ) != TIXML_SUCCESS )
+    if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
     {
-      std::cerr << "Scene file " << fullFilename << " does not contain version information! Trying version 1 format." << std::endl;
+      LOG_ERROR << "Scene file " << m_WorkingDirectory + "/index.xml" << " does not contain version information! Trying version 1 format." << std::endl;
     }
   }
-
-  ReliverSceneReader::Pointer sceneReader;
-  // read version information
-  switch (version)
+  
+  std::stringstream sceneReaderClassName;
+  sceneReaderClassName << "SceneReaderV" << fileVersion;
+  LOG_INFO << "Trying to instantiate reader '" << sceneReaderClassName.str() << "'" << std::endl;
+  
+  std::list<itk::LightObject::Pointer> sceneReaders = itk::ObjectFactoryBase::CreateAllInstance(sceneReaderClassName.str().c_str());
+  if (sceneReaders.size() < 1)
   {
-    case 1:
+    LOG_ERROR << "No scene reader found for scene file version " << fileVersion;
+  }
+  if (sceneReaders.size() > 1)
+  {
+    LOG_ERROR << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
+  }
+
+  for ( std::list<itk::LightObject::Pointer>::iterator iter = sceneReaders.begin();
+        iter != sceneReaders.end();
+        ++iter )
+  {
+    if (SceneReader* reader = dynamic_cast<SceneReader*>( iter->GetPointer() ) )
+    {
+      if ( !reader->LoadScene( document, m_WorkingDirectory, storage ) )
       {
-        sceneReader = ReliverSceneReaderV1::New().GetPointer();
+        LOG_ERROR << "There were errors while loding scene file " << filename << ". Your data may be corrupted";
       }
       break;
-
-
-    default:
-      {
-        std::cerr << __FILE__ << " l. " << __LINE__ << ": Version of scene file (" << version << ") not supported." << std::endl;
-        return false;
-      }
+    }
   }
   
-  sceneReader->CreateScene( xmlNode, storage, tmpDir, m_MagicallyFilledOutputVector );
-*/
-  // first level nodes should be <node> elements. for each
-  //   1. create a new, empty node
-  //   2. check child nodes
-  //   3. if there is a <source>, remember parent objects
-  //   4. if there is a <data type="..." file="..."> element,
-  //        - construct a name for the appropriate deserializer
-  //        - try to instantiate this deserializer via itk object factory
-  //        - if deserializer could be created, use it to read the file into a BaseData object
-  //        - if successful, call the new node's SetData(..)
-  //   5. if there are <properties> nodes, 
-  //        - instantiate the appropriate PropertyListDeSerializer
-  //        - use them to construct PropertyList objects
-  //        - add these properties to the node (if necessary, use renderwindow name)
+  // delete temp directory
+  try
+  {
+    Poco::File deleteDir( m_WorkingDirectory );
+    deleteDir.remove(true); // recursive
+  }
+  catch(...)
+  {
+    LOG_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+  }
 
-  // create a new empty datastorage
+  // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
+  return storage;
 
-  // repeat
-  //   for all created nodes
-  //     find all nodes that
-  //      - do not have any parents or
-  //      - have all their parents already in DataStorage
-  //     add these to datastorage
-  // repeat above block until there are no nodes left for adding
-  
-  // prepare to detect errors (such as cycles) from wrongly written or edited xml files
-
-  // return new datastorage, even if empty or uncomplete (return as much as possible but notify calling method)
-
-  return NULL;
 }
     
 bool mitk::SceneIO::SaveScene( DataStorage* storage,
@@ -371,7 +355,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
             if ( propertyList && !propertyList->IsEmpty() )
             {
               TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
-              renderWindowPropertiesElement->SetAttribute("render window", renderWindowName);
+              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
               nodeElement->LinkEndChild( renderWindowPropertiesElement );
             }
           }

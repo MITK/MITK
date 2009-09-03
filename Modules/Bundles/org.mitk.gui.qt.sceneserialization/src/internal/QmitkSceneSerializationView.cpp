@@ -142,5 +142,5 @@ void QmitkSceneSerializationView::LoadSceneFile()
   /*  TODO ask the user for a file name */
   mitk::DataStorage::Pointer newStorage = sceneIO->LoadScene( "scene.zip", storage );
 
-  assert( newStorage.GetPointer() == storage.GetPointer() );
+  assert( newStorage.GetPointer() == NULL || newStorage.GetPointer() == storage.GetPointer() );
 }

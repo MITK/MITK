@@ -76,6 +76,7 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
   // feed the point set into the mitk point locator
   std::cout << "Building mitkPointLocator ";
   mitk::PointLocator::Pointer mitkPointLocator = mitk::PointLocator::New();
+  mitk::PointLocator::Pointer mitkPointLocator2 = mitk::PointLocator::New();
   if ( mitkPointLocator.IsNull() )
   {
     std::cout << "[FAILED]" << std::endl;
@@ -85,9 +86,20 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
   {
     std::cout << "[PASSED]" << std::endl;  
   }
+
+  mitk::PointSet::Pointer mitkPointSet = mitk::PointSet::New();
+  for ( int i=0; i<pointSet->GetNumberOfPoints();i++ )
+  {
+    mitk::Point3D pnt;
+    pnt[0] = pointSet->GetPoint( i )[0];
+    pnt[1] = pointSet->GetPoint( i )[1];
+    pnt[2] = pointSet->GetPoint( i )[2];
+    mitkPointSet->InsertPoint(i, pnt );
+  }
   
   std::cout << "Setting random point set ";
   mitkPointLocator->SetPoints( pointSet );
+  mitkPointLocator2->SetPoints( mitkPointSet );
   std::cout << "[PASSED]" << std::endl;  
   
   std::cout << "Testing 1000 random points ";
@@ -95,15 +107,21 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
   // points with both the vtk and mitk pointlocator.
   // verify, that the point ids are the same.
   vtkFloatingPointType p[3], x, y, z;
+  mitk::PointSet::PointType pointType;
   for ( unsigned int i = 0 ; i < 1000 ; ++i )
   {
     GenerateRandomPoint( x, y, z );
     p[0] = x;
     p[1] = y;
     p[2] = z;
+    pointType[0] = p[0];
+    pointType[1] = p[1];
+    pointType[2] = p[2];
     int closestPoint1 = vtkPointLoc->FindClosestPoint(p);
     int closestPoint2 = mitkPointLocator->FindClosestPoint(p);
     int closestPoint3 = mitkPointLocator->FindClosestPoint(x, y, z);
+    int closestPoint4 = mitkPointLocator2->FindClosestPoint(p);
+    int closestPoint5 = mitkPointLocator2->FindClosestPoint(pointType);
     
     if ( closestPoint1 != closestPoint2 )
     {
@@ -115,6 +133,17 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
       std::cout << "There is a mismatch between passing coords as array and as single x/y/z coords. [FAILED]" << std::endl;  
       return EXIT_FAILURE;
     }    
+    if ( closestPoint2 != closestPoint4 )
+    {
+      std::cout << "There is a mismatch between passing the points as mitkPointSet and vtkPointSet. [FAILED]" << std::endl;  
+      return EXIT_FAILURE;
+    }
+    if ( closestPoint4 != closestPoint5 )
+    {
+      std::cout << "There is a mismatch between passing coords as array and as single x/y/z coords when using MITK-Types. [FAILED]" << std::endl;  
+      return EXIT_FAILURE;
+    }    
+
   }  
 
   vtkPointLoc->Delete();

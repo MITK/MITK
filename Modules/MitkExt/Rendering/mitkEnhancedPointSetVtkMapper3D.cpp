@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNode.h"
 #include "mitkProperties.h"
+#include "mitkLookupTables.h"
+
 #include "mitkColorProperty.h"
 //#include "mitkVtkPropRenderer.h"
 
@@ -203,7 +205,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
   mitk::DataTreeNode* n = this->GetDataTreeNode();
   assert(n != NULL);
 
-  for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)
+  for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)  // for each point in the pointset
   {
     PointIdentifier pointID = pIt->Index();
     assert (pointID == pdIt->Index());
@@ -219,12 +221,57 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
 
     /* update properties */
     // visibility
-    a->SetVisibility(n->IsVisible(renderer, "show points"));  //TODO look for visibility lookup table for point wise visibility instead of global visibility property
+    bool pointVisibility = true;
+    bool visValueFound = false;
+    mitk::BaseProperty* visProp = n->GetProperty("visibility", renderer);
+    mitk::BoolLookupTableProperty* visLTProp = dynamic_cast<mitk::BoolLookupTableProperty*>(visProp);
+    if (visLTProp != NULL)
+    {
+      mitk::BoolLookupTable* visLookupTable = visLTProp->GetValue();
+      if (visLookupTable != NULL)
+      {
+        try
+        {
+          pointVisibility = visLookupTable->GetTableValue(pointID);
+          visValueFound = true;
+        }
+        catch (...)
+        {
+        }
+      }
+    }
+    if (visValueFound == false)
+    {
+      pointVisibility = n->IsVisible(renderer, "show points");  // use BoolProperty instead
+    }
+    a->SetVisibility(pointVisibility);
 
     // opacity
     float opacity = 1.0;
-    n->GetOpacity(opacity, renderer);
-    a->GetProperty()->SetOpacity(opacity); // TODO use opacity lookup table
+    bool opValueFound = false;
+    mitk::BaseProperty* opProp = n->GetProperty("opacity", renderer);
+    mitk::FloatLookupTableProperty* opLTProp = dynamic_cast<mitk::FloatLookupTableProperty*>(opProp);
+    if (opLTProp != NULL)
+    {
+      mitk::FloatLookupTable* opLookupTable = opLTProp->GetValue();
+      if (opLookupTable != NULL)
+      {
+        try
+        {
+          opacity = opLookupTable->GetTableValue(pointID);
+          opValueFound = true;
+        }
+        catch (...)
+        {
+        }
+      }
+    }
+    if (opValueFound == false)
+    {
+      n->GetOpacity(opacity, renderer);
+    }
+    a->GetProperty()->SetOpacity(opacity);
+////////////////////// continue here ///////////////////
 
     // pointsize & point position
     float pointSize = 1.0;

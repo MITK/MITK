@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>TrackingDeviceConfigurationWidget</class>
- <widget class="QWidget" name="TrackingDeviceConfigurationWidget" >
+ <class>QmitkTrackingDeviceConfigurationWidgetControls</class>
+ <widget class="QWidget" name="QmitkTrackingDeviceConfigurationWidgetControls" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -94,7 +94,7 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
      <property name="currentIndex" >
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="polaris_page" >
       <layout class="QVBoxLayout" name="verticalLayout_4" >
@@ -142,7 +142,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QSpinBox" name="m_comPortSpinBoxPolaris" >
                <property name="suffix" >
-                <string> </string>
+                <string/>
                </property>
                <property name="prefix" >
                 <string>COM </string>
@@ -274,7 +274,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="text" >
-              <string>Test Connection</string>
+              <string>test connection</string>
              </property>
             </widget>
            </item>
@@ -407,7 +407,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="text" >
-              <string>Test Connection</string>
+              <string>test connection</string>
              </property>
             </widget>
            </item>
@@ -514,7 +514,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="text" >
-              <string>Test Connection</string>
+              <string>test connection</string>
              </property>
             </widget>
            </item>

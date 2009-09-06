@@ -28,7 +28,13 @@ namespace cherry {
 template<class C>
 C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className)
 {
-  CHERRY_INFO(m_ConsoleLog) << "Trying to load class " << className << " with manifest name " << C::GetManifestName() << " from bundle " << bundleName;
+  return LoadClass<C>(bundleName, className, C::GetManifestName());
+}
+
+template<class C>
+C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className, const std::string& manifestName)
+{
+  CHERRY_INFO(m_ConsoleLog) << "Trying to load class " << className << " with manifest name " << manifestName << " from bundle " << bundleName;
   BundleInfo& bundleInfo = m_BundleMap[bundleName];
 
   // check that bundle is started
@@ -53,7 +59,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
     CHERRY_INFO(m_ConsoleLog) << "Loading library: " << libPath.toString();
     
     try {
-    cl->loadLibrary(libPath.toString(), C::GetManifestName());
+    cl->loadLibrary(libPath.toString(), manifestName);
     }
     catch (const Poco::LibraryLoadException& e){
       CHERRY_ERROR << e.displayText();

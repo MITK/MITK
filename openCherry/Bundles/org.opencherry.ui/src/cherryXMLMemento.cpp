@@ -19,24 +19,25 @@
 
 #include "internal/cherryWorkbenchPlugin.h"
 
-#include "Poco/NumberParser.h"
-#include "Poco/DOM/NodeList.h" 
-#include "Poco/XML/NamePool.h"
-#include "Poco/DOM/NamedNodeMap.h"
-#include "Poco/DOM/Text.h"
-#include "Poco/DOM/Attr.h"
-#include "Poco/DOM/DOMWriter.h"
-#include "Poco/DOM/DOMParser.h"
-#include "Poco/DOM/DOMBuilder.h"
-#include "Poco/SAX/InputSource.h"
+#include <Poco/NumberParser.h>
+#include <Poco/DOM/NodeList.h>
+#include <Poco/XML/NamePool.h>
+#include <Poco/DOM/NamedNodeMap.h>
+#include <Poco/DOM/Text.h>
+#include <Poco/DOM/Attr.h>
+#include <Poco/DOM/DOMWriter.h>
+#include <Poco/DOM/DOMParser.h>
+#include <Poco/DOM/DOMBuilder.h>
+#include <Poco/SAX/InputSource.h>
+#include <Poco/SAX/SAXException.h>
 
 #include <sstream>
 
 const std::string EMPTY_STRING;
 
 cherry::XMLMemento::XMLMemento(Poco::XML::Document* document,
-    Poco::XML::Element* elem)
- : factory(document), element(elem)
+    Poco::XML::Element* elem) :
+  factory(document), element(elem)
 {
   factory->duplicate();
   element->duplicate();
@@ -58,21 +59,37 @@ cherry::XMLMemento::Pointer cherry::XMLMemento::CreateReadRoot(
     cherry::XMLMemento::XMLByteInputStream& reader, const std::string& baseDir)
     throw (WorkbenchException)
 {
-  //TODO try catch blog
+  std::string errorMessage;
+  Poco::Exception exception("");
 
-  Poco::XML::DOMParser parser;
-  Poco::XML::InputSource source(reader);
+  try
+  {
+    Poco::XML::DOMParser parser;
+    Poco::XML::InputSource source(reader);
 
-  source.setSystemId(baseDir);
-  Poco::XML::Document* doc = parser.parse(&source);
+    source.setSystemId(baseDir);
+    Poco::XML::Document* doc = parser.parse(&source);
 
-  Poco::XML::Element* elem = doc->documentElement();
+    Poco::XML::Element* elem = doc->documentElement();
 
-  XMLMemento::Pointer memento = XMLMemento::New(doc, elem);
+    XMLMemento::Pointer memento = XMLMemento::New(doc, elem);
 
-  doc->release();
+    doc->release();
 
-  return memento;
+    return memento;
+  } catch (Poco::XML::SAXParseException& e)
+  {
+    errorMessage = "Could not parse content of XML file.";
+    exception = e;
+  }
+
+  std::string problemText = exception.message();
+  if (problemText.empty())
+  {
+    problemText = errorMessage.empty() ? "Could not find root element node of XML file." : errorMessage;
+  }
+  throw WorkbenchException(problemText, exception);
+
 }
 
 cherry::XMLMemento::Pointer cherry::XMLMemento::CreateWriteRoot(
@@ -160,7 +177,7 @@ bool cherry::XMLMemento::GetFloat(const std::string& key, double& value) const
     value = Poco::NumberParser::parseFloat(attr);
   } catch (const Poco::SyntaxException& e)
   {
-    WorkbenchPlugin::Log("Memento problem - invalid integer for key: " + key
+    WorkbenchPlugin::Log("Memento problem - invalid float for key: " + key
         + " value: " + attr, e);
     return false;
   }
@@ -232,8 +249,7 @@ const std::string& cherry::XMLMemento::GetTextData() const
     return textNode->getData();
   }
 
-  return EMPTY_STRING; //TODO check if NULL or better ""
-
+  return EMPTY_STRING;
 }
 
 std::vector<std::string> cherry::XMLMemento::GetAttributeKeys() const
@@ -281,26 +297,34 @@ void cherry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
   Poco::XML::NamedNodeMap* nodeMap = element->attributes();
   unsigned long size = nodeMap->length();
 
-  bool needToCopyText = copyText;
-
   for (unsigned long index = 0; index < size; index++)
   {
     Poco::XML::Node* node = nodeMap->item(index);
-    unsigned short nodeType = node->nodeType();
+    Poco::XML::Attr* attr = dynamic_cast<Poco::XML::Attr*> (node);
+    PutString(attr->nodeName(), attr->nodeValue());
+  }
+  nodeMap->release();
+
+  bool needToCopyText = copyText;
+  Poco::XML::Node* child = element->firstChild();
+  while (child)
+  {
+    unsigned short nodeType = child->nodeType();
 
     switch (nodeType)
     {
-    case Poco::XML::Node::ATTRIBUTE_NODE:
+    case Poco::XML::Node::ELEMENT_NODE:
     {
-      Poco::XML::Attr* attr = dynamic_cast<Poco::XML::Attr*> (node);
-      PutString(attr->nodeName(), attr->nodeValue());
-
+      Poco::XML::Element* elem = dynamic_cast<Poco::XML::Element*> (child);
+      XMLMemento::Pointer child = CreateChild(elem->nodeName()).Cast<
+          cherry::XMLMemento> ();
+      child->PutElement(elem, true);
     }
-      break;
+    break;
     case Poco::XML::Node::TEXT_NODE:
       if (needToCopyText)
       {
-        Poco::XML::Text* text = dynamic_cast<Poco::XML::Text*> (node);
+        Poco::XML::Text* text = dynamic_cast<Poco::XML::Text*> (child);
         PutTextData(text->getData());
         needToCopyText = false;
       }
@@ -309,22 +333,9 @@ void cherry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
     default:
       break;
     }
-  }
-  nodeMap->release();
 
-  Poco::XML::Node* child = element->firstChild();
-  while (child)
-  {
-    if (child->nodeType() == Poco::XML::Node::ELEMENT_NODE)
-    {
-      Poco::XML::Element* elem = dynamic_cast<Poco::XML::Element*> (child);
-      XMLMemento::Pointer child = CreateChild(elem->nodeName()).Cast<
-          cherry::XMLMemento> ();
-      child->PutElement(elem, true);
-    }
     child = child->nextSibling();
   }
-
 }
 
 void cherry::XMLMemento::PutFloat(const std::string& key, float value)
@@ -353,7 +364,6 @@ void cherry::XMLMemento::PutMemento(IMemento::Pointer memento)
 {
   // Do not copy the element's top level text node (this would overwrite the existing text).
   // Text nodes of children are copied.
-  //TODO check cast throw cast error
   PutElement(memento.Cast<cherry::XMLMemento> ()->GetElement(), false);
 }
 
@@ -384,7 +394,7 @@ void cherry::XMLMemento::PutTextData(const std::string& data)
   if (textNode == NULL)
   {
     textNode = factory->createTextNode(data);
-    element->insertBefore(textNode, element->firstChild());
+    element->insertBefore(textNode, element->firstChild())->release();
   }
   else
   {

@@ -15,11 +15,11 @@
  
  =========================================================================*/
 
-#include "cherrySmartPointerTestSuite.h"
+
+#ifndef CHERRYSMARTPOINTERTEST_H_
+#define CHERRYSMARTPOINTERTEST_H_
 
 #include <CppUnit/TestCase.h>
-#include <CppUnit/TestSuite.h>
-#include <CppUnit/TestCaller.h>
 
 namespace cherry {
 
@@ -27,28 +27,17 @@ class SmartPointerTest : public CppUnit::TestCase
 {
 public:
 
-  SmartPointerTest(const std::string& name) : CppUnit::TestCase(name) {}
+  SmartPointerTest(const std::string& testName);
 
-  static CppUnit::Test* Suite()
-  {
-    CppUnit::TestSuite* suite = new CppUnit::TestSuite("SmartPointerTest");
+  static CppUnit::Test* Suite();
 
-    CppUnit_addTest(suite, SmartPointerTest, testReferenceCount);
-
-    return suite;
-  }
-
-  void testReferenceCount()
-  {
-    assert(1 == 1);
-  }
-
+  void TestConstructors();
+  void TestCasting();
+  void TestReferenceCounting();
+  void TestOperators();
 
 };
 
-CppUnit::Test* SmartPointerTestSuite::GetTest() const
-{
-  return SmartPointerTest::Suite();
 }
 
-}
+#endif /* CHERRYSMARTPOINTERTEST_H_ */

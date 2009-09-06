@@ -1,51 +1,40 @@
-# Create TestDriver and default tests for openCherry
+
+# Call this macro after calling MACRO_CREATE_PLUGIN in your CMakeLists.txt
 #
-# CMake variables used:
+# Variables:
 #
-# ${CHERRY_TESTS} : filenames of all tests that run without a parameter
-# ${CHERRY_CUSTOM_TESTS} : filenames of custom tests which are just added to the TestDriver. Execution
-#                              of these has to be specified manually with the ADD_TEST CMake command.
+# - OPENCHERRY_TEST_APP contains the name of the executable which will start the OSGi framework
 #
-MACRO(OPENCHERRY_CREATE_TESTS)
-
-  _MACRO_CREATE_PLUGIN_NAME(plugin_name
-                            INPUT ${CMAKE_CURRENT_SOURCE_DIR}
-                            BASEDIR ${OPENCHERRY_SOURCE_DIR}/Testing)
-  STRING(REPLACE . _ plugin_target ${plugin_name})
-
-  INCLUDE_DIRECTORIES(${OPENCHERRY_SOURCE_DIR}/Testing)
-  INCLUDE_DIRECTORIES(${Poco_INCLUDE_DIRS})
-  LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
-
-  MACRO_PARSE_MANIFEST(${OPENCHERRY_PLUGINS_SOURCE_DIR}/${plugin_name}/META-INF/MANIFEST.MF)
-  LINK_DIRECTORIES("${${BUNDLE-SYMBOLICNAME}_OUT_DIR}/bin")
-
-  #
-  # Create the TestDriver binary which contains all the tests.
-  #
-  CREATE_TEST_SOURCELIST(cherry_test_sources TestDriver_${plugin_target}.cpp
-    ${OPENCHERRY_TESTS} ${OPENCHERRY_CUSTOM_TESTS} )
-
-  ADD_EXECUTABLE(TestDriver_${plugin_target} ${cherry_test_sources} ${OPENCHERRY_SOURCE_DIR}/Testing/cherryTestManager.cpp)
-  TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized ${plugin_target} debug ${plugin_target}${OPENCHERRY_DEBUG_POSTFIX})
-  TARGET_LINK_LIBRARIES(TestDriver_${plugin_target} optimized PocoFoundation debug PocoFoundationd )
-  #
-  # Now tell CMake which tests should be run. This is done automatically
-  # for all tests in CHERRY_TESTS
-  #
-  FOREACH( test ${OPENCHERRY_TESTS} )
-    GET_FILENAME_COMPONENT(TName ${test} NAME_WE)
-    ADD_TEST(${TName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestDriver_${plugin_target} ${TName})
-  ENDFOREACH( test )
-
-ENDMACRO(OPENCHERRY_CREATE_TESTS)
-
 MACRO(MACRO_TEST_PLUGIN)
 
   IF(WIN32)
-    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OSGI_APP} /openCherry.application=coretestapplication /openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OPENCHERRY_TEST_APP} /openCherry.application=coretestapplication /openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
   ELSE()
-    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OSGI_APP} --openCherry.application=coretestapplication --openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OPENCHERRY_TEST_APP} --openCherry.application=coretestapplication --openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
   ENDIF()
   
 ENDMACRO(MACRO_TEST_PLUGIN)
+
+# Variables:
+#
+# - OPENCHERRY_TEST_APP contains the name of the executable which will start the OSGi framework
+# - OPENCHERRY_TEST_APP_ID contains the application id of the application to test. If empty,
+#                          a minimalistic default application will be started
+MACRO(MACRO_TEST_UIPLUGIN)
+
+  IF(OPENCHERRY_TEST_APP_ID)
+    SET(_app_id_arg "openCherry.testapplication=${OPENCHERRY_TEST_APP_ID}")
+    IF(WIN32)
+      SET(_app_id_arg "/${_app_id_arg}")
+    ELSE()
+      SET(_app_id_arg "--${_app_id_arg}")
+    ENDIF()
+  ENDIF()
+
+  IF(WIN32)
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OPENCHERRY_TEST_APP} /openCherry.application=uitestapplication ${_app_id_arg} /openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
+  ELSE()
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${OPENCHERRY_TEST_APP} --openCherry.application=uitestapplication ${_app_id_arg} --openCherry.testplugin=${BUNDLE-SYMBOLICNAME})
+  ENDIF()
+  
+ENDMACRO(MACRO_TEST_UIPLUGIN)

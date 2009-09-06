@@ -2,6 +2,6 @@
 <?openCherry version="0.1"?>
 <plugin>
   <extension point="org.opencherry.tests">
-    <test id="UiApiTestSuite" class="cherry::UiApiTestSuite" />
+    <test id="UiTestSuite" class="cherry::UiTestSuite" uitest="true"/>
   </extension>
 </plugin>

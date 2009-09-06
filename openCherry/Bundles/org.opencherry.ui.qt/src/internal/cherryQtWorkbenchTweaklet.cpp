@@ -30,14 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-
-int
-QtWorkbenchTweaklet::RunEventLoop()
+Display* QtWorkbenchTweaklet::CreateDisplay()
 {
-  QtDisplay display;
-
-  // spin Qt event loop
-  return QApplication::instance()->exec();
+  return new QtDisplay();
 }
 
 bool QtWorkbenchTweaklet::IsRunning()

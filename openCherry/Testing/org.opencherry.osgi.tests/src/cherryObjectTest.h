@@ -15,21 +15,27 @@
  
  =========================================================================*/
 
-#include "cherryUiApiTestSuite.h"
 
-#include "cherryXMLMementoTest.h"
+#ifndef CHERRYOBJECTTEST_H_
+#define CHERRYOBJECTTEST_H_
 
-#include <CppUnit/TestSuite.h>
+#include <CppUnit/TestCase.h>
 
 namespace cherry {
 
-CppUnit::Test* UiApiTestSuite::GetTest() const
+class ObjectTest : public CppUnit::TestCase
 {
-  CppUnit::TestSuite* apiTestSuite = new CppUnit::TestSuite("UI API TestSuite");
+public:
 
-  apiTestSuite->addTest(XMLMementoTest::Suite());
+  static CppUnit::Test* Suite();
 
-  return apiTestSuite;
+  ObjectTest(const std::string& testName);
+
+  void TestReferenceCount();
+  void TestAddDestroyListener();
+  void TestRemoveDestroyListener();
+};
+
 }
 
-}
+#endif /* CHERRYOBJECTTEST_H_ */

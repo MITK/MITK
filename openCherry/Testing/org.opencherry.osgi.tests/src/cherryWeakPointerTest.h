@@ -16,18 +16,26 @@
  =========================================================================*/
 
 
-#ifndef CHERRYUIAPITESTSUITE_H_
-#define CHERRYUIAPITESTSUITE_H_
+#ifndef CHERRYWEAKPOINTERTEST_H_
+#define CHERRYWEAKPOINTERTEST_H_
 
-#include <cherryITest.h>
+#include <CppUnit/TestCase.h>
 
 namespace cherry {
 
-struct UiApiTestSuite : public ITest
+class WeakPointerTest : public CppUnit::TestCase
 {
-  CppUnit::Test* GetTest() const;
+public:
+
+  WeakPointerTest(const std::string& testName);
+
+  static CppUnit::Test* Suite();
+
+  void TestReferenceCounting();
+  void TestConstructorAndLock();
+  void TestOperators();
 };
 
 }
 
-#endif /* CHERRYUIAPITESTSUITE_H_ */
+#endif /* CHERRYWEAKPOINTERTEST_H_ */

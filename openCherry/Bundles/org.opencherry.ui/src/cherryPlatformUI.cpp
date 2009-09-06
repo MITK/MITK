@@ -39,7 +39,7 @@ const int PlatformUI::RETURN_UNSTARTABLE = 2;
 const int PlatformUI::RETURN_EMERGENCY_CLOSE = 3;
 
 int
-PlatformUI::CreateAndRunWorkbench(WorkbenchAdvisor* advisor)
+PlatformUI::CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor)
 {
 //  std::vector<IConfigurationElement::Pointer> extensions(
 //    Platform::GetExtensionPointService()->GetConfigurationElementsFor(PlatformUI::XP_WORKBENCH));
@@ -57,7 +57,12 @@ PlatformUI::CreateAndRunWorkbench(WorkbenchAdvisor* advisor)
 //
 //  throw WorkbenchException("No registered workbench extension found");
 
-  return Workbench::CreateAndRunWorkbench(advisor);
+  return Workbench::CreateAndRunWorkbench(display, advisor);
+}
+
+Display* PlatformUI::CreateDisplay()
+{
+  return Workbench::CreateDisplay();
 }
 
 IWorkbench*
@@ -76,6 +81,12 @@ PlatformUI::IsWorkbenchRunning()
 {
   return Workbench::GetInstance() != 0
          && Workbench::GetInstance()->IsRunning();
+}
+
+TestableObject::Pointer
+PlatformUI::GetTestableObject()
+{
+  return Workbench::GetWorkbenchTestable();
 }
 
 PlatformUI::PlatformUI()

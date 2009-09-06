@@ -16,23 +16,21 @@
  =========================================================================*/
 
 
-#ifndef CHERRYITEST_H_
-#define CHERRYITEST_H_
+#ifndef CHERRYUIAPITESTSUITE_H_
+#define CHERRYUIAPITESTSUITE_H_
 
-#include <cherryObject.h>
-#include <cherryMacros.h>
-
-#include <CppUnit/Test.h>
+#include <CppUnit/TestSuite.h>
 
 namespace cherry {
 
-struct ITest : public Object
+class UiApiTestSuite : public CppUnit::TestSuite
 {
-  cherryInterfaceMacro(ITest, cherry)
 
-  virtual CppUnit::Test* GetTest() const = 0;
+public:
+
+  UiApiTestSuite();
 };
 
 }
 
-#endif /* CHERRYITEST_H_ */
+#endif /* CHERRYUIAPITESTSUITE_H_ */

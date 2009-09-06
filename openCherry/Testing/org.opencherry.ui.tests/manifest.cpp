@@ -17,8 +17,8 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include "src/cherryUiApiTestSuite.h"
+#include "src/cherryUiTestSuite.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryITest, cherry::ITest)
-  POCO_EXPORT_CLASS(cherry::UiApiTestSuite)
+POCO_BEGIN_NAMED_MANIFEST(CppUnitTest, CppUnit::Test)
+  POCO_EXPORT_CLASS(cherry::UiTestSuite)
 POCO_END_MANIFEST

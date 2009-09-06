@@ -38,6 +38,8 @@ public:
   static const std::string ATT_DESCRIPTION; // = "description"
   static const std::string ATT_UITEST; // = "uitest"
 
+  static const std::string TEST_MANIFEST; // = "CppUnitTest"
+
   TestRegistry();
 
   const std::vector<ITestDescriptor::Pointer>& GetTestsForId(const std::string& pluginid);

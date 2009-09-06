@@ -31,7 +31,8 @@ public:
 
   cherryObjectMacro(QtWorkbenchTweaklet);
 
-  int RunEventLoop();
+  Display* CreateDisplay();
+
   bool IsRunning();
 
   void* CreatePageComposite(void* parent);

@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWindowManager.h"
 #include "cherryWorkbenchConfigurer.h"
 #include "../application/cherryWorkbenchAdvisor.h"
+#include "cherryWorkbenchTestable.h"
 
 #include "cherryIStackableContainer.h"
 
@@ -67,7 +68,13 @@ public:
    * This method is intended to be called by <code>PlatformUI</code>. Fails
    * if the workbench UI has already been created.
    * </p>
+   * <p>
+   * The display passed in must be the default display.
+   * </p>
    *
+   * @param display
+   *            the display to be used for all UI interactions with the
+   *            workbench
    * @param advisor
    *            the application-specific advisor that configures and
    *            specializes the workbench
@@ -77,7 +84,14 @@ public:
    *         {@link IWorkbench#restart IWorkbench.restart}; other values
    *         reserved for future use
    */
-  static int CreateAndRunWorkbench(WorkbenchAdvisor* advisor);
+  static int CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor);
+
+  /**
+   * Creates the <code>Display</code> to be used by the workbench.
+   *
+   * @return the display
+   */
+  static Display* CreateDisplay();
 
   /**
    * Returns the one and only instance of the workbench, if there is one.
@@ -107,6 +121,14 @@ public:
    * Method declared on IWorkbench.
    */
   bool Close();
+
+  /**
+   * Returns the testable object facade, for use by the test harness.
+   *
+   * @return the testable object facade
+   * @since 3.0
+   */
+  static WorkbenchTestable::Pointer GetWorkbenchTestable();
 
   /*
    *  Method declared on IWorkbench.
@@ -363,6 +385,11 @@ private:
    */
   static Workbench* instance;
 
+  /**
+   * The testable object facade.
+   */
+  static WorkbenchTestable::Pointer testableObject;
+
   IWorkbenchListener::Events workbenchEvents;
   IWindowListener::Events windowEvents;
 
@@ -399,6 +426,12 @@ private:
    */
   int largeUpdates;
 
+
+  /**
+   * The display used for all UI interactions with this workbench.
+   */
+  Display* display;
+
   WindowManager windowManager;
   SmartPointer<WorkbenchWindow> activatedWindow;
 
@@ -412,11 +445,19 @@ private:
   /**
    * Creates a new workbench.
    *
+   * @param display
+   *            the display to be used for all UI interactions with the
+   *            workbench
    * @param advisor
    *            the application-specific advisor that configures and
    *            specializes this workbench instance
    */
-  Workbench(WorkbenchAdvisor* advisor);
+  Workbench(Display*, WorkbenchAdvisor* advisor);
+
+  /**
+   * see IWorkbench#GetDisplay
+   */
+  Display* GetDisplay();
 
   /*
    * Creates a new workbench window.

@@ -225,6 +225,7 @@ public:
 
   static std::string ARG_CONSOLELOG;
   static std::string ARG_TESTPLUGIN;
+  static std::string ARG_TESTAPPLICATION;
 
   static SmartPointer<IExtensionPointService> GetExtensionPointService();
   // static IPreferenceService GetPreferenceService();

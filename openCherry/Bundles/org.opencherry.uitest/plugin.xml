@@ -6,4 +6,17 @@
       <run class="cherry::UITestApplication"/>
     </application>
   </extension>
+  
+  <extension point="org.opencherry.ui.perspectives">
+      <perspective
+            name="Performance Empty Perspective"
+            class="cherry::EmptyPerspective"
+            id="org.opencherry.uitest.util.EmptyPerspective">
+      </perspective>
+      <perspective
+            name="Performance Empty Perspective 2"
+            class="cherry::EmptyPerspective"
+            id="org.opencherry.uitest.util.EmptyPerspective2">
+      </perspective>
+	</extension>
 </plugin>

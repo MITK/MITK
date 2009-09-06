@@ -22,7 +22,7 @@
 #include <cherryObject.h>
 #include <cherryMacros.h>
 
-#include "cherryITest.h"
+#include <CppUnit/Test.h>
 
 namespace cherry {
 
@@ -30,7 +30,7 @@ struct ITestDescriptor : public Object
 {
   cherryInterfaceMacro(ITestDescriptor, cherry)
 
-  virtual ITest::Pointer CreateTest() = 0;
+  virtual CppUnit::Test* CreateTest() = 0;
   virtual std::string GetId() const = 0;
   virtual std::string GetContributor() const = 0;
   virtual std::string GetDescription() const = 0;

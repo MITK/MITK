@@ -347,6 +347,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);
   options.addOption(testPluginOption);
 
+  Poco::Util::Option testAppOption(Platform::ARG_TESTAPPLICATION, "", "the application to be tested");
+  testAppOption.argument("<id>").binding(Platform::ARG_TESTAPPLICATION);
+  options.addOption(testAppOption);
+
   Poco::Util::Application::defineOptions(options);
 }
 

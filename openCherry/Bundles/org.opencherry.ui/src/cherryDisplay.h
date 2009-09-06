@@ -42,6 +42,9 @@ public:
   virtual void AsyncExec(Poco::Runnable*) = 0;
   virtual void SyncExec(Poco::Runnable*) = 0;
 
+  virtual int RunEventLoop() = 0;
+  virtual void ExitEventLoop(int code) = 0;
+
 protected:
 
   /**

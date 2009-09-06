@@ -15,10 +15,16 @@
 
  =========================================================================*/
 
-#include <cherryTestingMacros.h>
+#include "cherryMessageTest.h"
 
 #include <cherryMessage.h>
-#include <cstdlib>
+//#include <cstdlib>
+
+#include <CppUnit/TestSuite.h>
+#include <CppUnit/TestCaller.h>
+
+namespace cherry
+{
 
 struct MessageReceiver
 {
@@ -43,11 +49,31 @@ struct MessageReceiver
 
 };
 
-int cherryMessageTest(int /*argc*/, char* /*argv*/[])
+MessageTest::MessageTest(const std::string& testName)
+: CppUnit::TestCase(testName)
 {
-  CHERRY_TEST_BEGIN("Message")
 
-  // Message test
+}
+
+CppUnit::Test* MessageTest::Suite()
+{
+  CppUnit::TestSuite* suite = new CppUnit::TestSuite("MessageTest");
+
+  CppUnit_addTest(suite, MessageTest, TestMessage);
+  CppUnit_addTest(suite, MessageTest, TestMessageWithReturn);
+  CppUnit_addTest(suite, MessageTest, TestMessage1);
+  CppUnit_addTest(suite, MessageTest, TestMessage1WithReturn);
+  CppUnit_addTest(suite, MessageTest, TestMessage2);
+  CppUnit_addTest(suite, MessageTest, TestMessage2WithReturn);
+  CppUnit_addTest(suite, MessageTest, TestMessage3);
+  CppUnit_addTest(suite, MessageTest, TestMessage3WithReturn);
+  CppUnit_addTest(suite, MessageTest, TestMessage4);
+  CppUnit_addTest(suite, MessageTest, TestMessage4WithReturn);
+
+  return suite;
+}
+
+  void MessageTest::TestMessage()
   {
     cherry::Message<> msg;
 
@@ -57,25 +83,25 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate<MessageReceiver> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::PureSignal);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Adding listener")
+    assertEqual(1, msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::PureSignal);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::PureSignal);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 2, "Adding duplicate listener")
+    assertEqual(2, msg.GetListeners().size());
 
     msg.Send();
-    CHERRY_TEST_CONDITION(receiver.received && receiver2.received, "Receiving signal")
+    assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::PureSignal);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Removing listener")
+    assertEqual(1, msg.GetListeners().size());
 
     msg.Send();
-    CHERRY_TEST_CONDITION(receiver.received == false && receiver2.received, "Receiving signal")
+    assert(receiver.received == false && receiver2.received);
   }
 
-  // Message with return type test
+  void MessageTest::TestMessageWithReturn()
   {
     cherry::Message<bool> msg;
 
@@ -83,7 +109,7 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate<MessageReceiver, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::PureSignalWithReturn);
     msg();
-    CHERRY_TEST_CONDITION(receiver.received, "Receiving signal with return type")
+    assert(receiver.received);
 
     receiver.received = false;
     typedef cherry::Message<bool>::ListenerList Listeners;
@@ -95,10 +121,10 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
       valueReturned = (*iter)->Execute();
       if (valueReturned) break;
     }
-    CHERRY_TEST_CONDITION(valueReturned, "Handling return values")
+    assert(valueReturned);
   }
 
-  // Message1 test
+  void MessageTest::TestMessage1()
   {
     cherry::Message1<int> msg;
 
@@ -108,25 +134,25 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate1<MessageReceiver, int> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message1);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Adding listener")
+    assertEqual(1, msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message1);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message1);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 2, "Adding duplicate listener")
+    assertEqual(2, msg.GetListeners().size());
 
     msg.Send(1);
-    CHERRY_TEST_CONDITION(receiver.received && receiver2.received, "Receiving message1")
+    assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message1);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Removing listener")
+    assertEqual(1, msg.GetListeners().size());
 
     msg.Send(1);
-    CHERRY_TEST_CONDITION(receiver.received == false && receiver2.received, "Receiving message1")
+    assert(receiver.received == false && receiver2.received);
   }
 
-  // Message1 with return type test
+  void MessageTest::TestMessage1WithReturn()
   {
     cherry::Message1<int, bool> msg;
 
@@ -134,7 +160,7 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate1<MessageReceiver, int, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::Message1WithReturn);
     msg(1);
-    CHERRY_TEST_CONDITION(receiver.received, "Receiving message1 with return type")
+    assert(receiver.received);
 
     receiver.received = false;
     typedef cherry::Message1<int,bool>::ListenerList Listeners;
@@ -146,10 +172,10 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
       valueReturned = (*iter)->Execute(1);
       if (valueReturned) break;
     }
-    CHERRY_TEST_CONDITION(valueReturned, "Handling return values")
+    assert(valueReturned);
   }
 
-  // Message2 test
+  void MessageTest::TestMessage2()
   {
     cherry::Message2<int, float> msg;
 
@@ -159,25 +185,25 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate2<MessageReceiver, int, float> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message2);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Adding listener")
+    assertEqual(1, msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message2);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message2);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 2, "Adding duplicate listener")
+    assertEqual(2, msg.GetListeners().size());
 
     msg.Send(1, 1.0);
-    CHERRY_TEST_CONDITION(receiver.received && receiver2.received, "Receiving message2")
+    assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message2);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Removing listener")
+    assertEqual(1, msg.GetListeners().size());
 
     msg.Send(1, 1.0);
-    CHERRY_TEST_CONDITION(receiver.received == false && receiver2.received, "Receiving message2")
+    assert(receiver.received == false && receiver2.received);
   }
 
-  // Message2 with return type test
+  void MessageTest::TestMessage2WithReturn()
   {
     cherry::Message2<int, float, bool> msg;
 
@@ -185,7 +211,7 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate2<MessageReceiver, int, float, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::Message2WithReturn);
     msg(1, 2);
-    CHERRY_TEST_CONDITION(receiver.received, "Receiving message2 with return type")
+    assert(receiver.received);
 
     receiver.received = false;
     typedef cherry::Message2<int,float,bool>::ListenerList Listeners;
@@ -197,10 +223,10 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
       valueReturned = (*iter)->Execute(1, 0.4);
       if (valueReturned) break;
     }
-    CHERRY_TEST_CONDITION(valueReturned, "Handling return values")
+    assert(valueReturned);
   }
 
-  // Message3 test
+  void MessageTest::TestMessage3()
   {
     cherry::Message3<int, float, double> msg;
 
@@ -210,25 +236,25 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate3<MessageReceiver, int, float, double> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message3);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Adding listener")
+    assertEqual(1, msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message3);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message3);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 2, "Adding duplicate listener")
+    assertEqual(2, msg.GetListeners().size());
 
     msg.Send(1, 1.0, 2.0);
-    CHERRY_TEST_CONDITION(receiver.received && receiver2.received, "Receiving message3")
+    assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message3);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Removing listener")
+    assertEqual(1, msg.GetListeners().size());
 
     msg.Send(1, -1.0, 5.0);
-    CHERRY_TEST_CONDITION(receiver.received == false && receiver2.received, "Receiving message3")
+    assert(receiver.received == false && receiver2.received);
   }
 
-  // Message3 with return type test
+  void MessageTest::TestMessage3WithReturn()
   {
     cherry::Message3<int, float, double, bool> msg;
 
@@ -236,7 +262,7 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate3<MessageReceiver, int, float, double, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::Message3WithReturn);
     msg(1, -2, 0.2);
-    CHERRY_TEST_CONDITION(receiver.received, "Receiving message3 with return type")
+    assert(receiver.received);
 
     receiver.received = false;
     typedef cherry::Message3<int,float,double,bool>::ListenerList Listeners;
@@ -248,10 +274,10 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
       valueReturned = (*iter)->Execute(1, 23.5, -12.2);
       if (valueReturned) break;
     }
-    CHERRY_TEST_CONDITION(valueReturned, "Handling return values")
+    assert(valueReturned);
   }
 
-  // Message4 test
+  void MessageTest::TestMessage4()
   {
     cherry::Message4<int, float, double, bool> msg;
 
@@ -261,25 +287,25 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate4<MessageReceiver, int, float, double, bool> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message4);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Adding listener")
+    assertEqual(1, msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message4);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message4);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 2, "Adding duplicate listener")
+    assertEqual(2, msg.GetListeners().size());
 
     msg.Send(1, 5.4, -1.0, true);
-    CHERRY_TEST_CONDITION(receiver.received && receiver2.received, "Receiving message4")
+    assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message4);
-    CHERRY_TEST_CONDITION(msg.GetListeners().size() == 1, "Removing listener")
+    assertEqual(1, msg.GetListeners().size());
 
     msg.Send(1, 0.2, 12.0, true);
-    CHERRY_TEST_CONDITION(receiver.received == false && receiver2.received, "Receiving message4")
+    assert(receiver.received == false && receiver2.received);
   }
 
-  // Message4 with return type test
+  void MessageTest::TestMessage4WithReturn()
   {
     cherry::Message4<int, float, double, bool, bool> msg;
 
@@ -287,7 +313,7 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
     typedef cherry::MessageDelegate4<MessageReceiver, int, float, double, bool, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::Message4WithReturn);
     msg(1, 4.1, -1, true);
-    CHERRY_TEST_CONDITION(receiver.received, "Receiving message4 with return type")
+    assert(receiver.received);
 
     receiver.received = false;
     typedef cherry::Message4<int,float,double,bool,bool>::ListenerList Listeners;
@@ -299,8 +325,8 @@ int cherryMessageTest(int /*argc*/, char* /*argv*/[])
       valueReturned = (*iter)->Execute(1, -34.21, 2, true);
       if (valueReturned) break;
     }
-    CHERRY_TEST_CONDITION(valueReturned, "Handling return values")
+    assert(valueReturned);
   }
 
-  CHERRY_TEST_END()
+
 }

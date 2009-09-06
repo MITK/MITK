@@ -30,6 +30,8 @@ const std::string TestRegistry::ATT_CLASS = "class";
 const std::string TestRegistry::ATT_DESCRIPTION = "description";
 const std::string TestRegistry::ATT_UITEST = "uitest";
 
+const std::string TestRegistry::TEST_MANIFEST = "CppUnitTest";
+
 TestRegistry::TestRegistry()
 {
   std::vector<IConfigurationElement::Pointer> elements(

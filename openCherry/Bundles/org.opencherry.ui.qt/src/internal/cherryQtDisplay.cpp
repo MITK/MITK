@@ -17,6 +17,10 @@
 
 #include "cherryQtDisplay.h"
 
+#include <cherryPlatform.h>
+
+#include <QApplication>
+
 namespace cherry {
 
 QtDisplay::QtDisplay()
@@ -31,12 +35,22 @@ bool QtDisplay::InDisplayThread()
 
   void QtDisplay::AsyncExec(Poco::Runnable* runnable)
   {
-    emit NewRunnable(runnable);
+    emit NewAsyncRunnable(runnable);
   }
 
-  void QtDisplay::SyncExec(Poco::Runnable*)
+  void QtDisplay::SyncExec(Poco::Runnable* runnable)
   {
+    emit NewSyncRunnable(runnable);
+  }
 
+  int QtDisplay::RunEventLoop()
+  {
+    return QApplication::exec();
+  }
+
+  void QtDisplay::ExitEventLoop(int code)
+  {
+    QApplication::exit(code);
   }
 
   void QtDisplay::CreateDisplay()
@@ -44,7 +58,13 @@ bool QtDisplay::InDisplayThread()
     Display::instance = this;
     displayThread = QThread::currentThread();
 
-    connect(this, SIGNAL(NewRunnable(Poco::Runnable*)), this, SLOT(ExecuteRunnable(Poco::Runnable*)));
+    char** argv;
+    int& argc = Platform::GetRawApplicationArgs(argv);
+
+    QApplication* app = new QApplication(argc, argv);
+
+    connect(this, SIGNAL(NewAsyncRunnable(Poco::Runnable*)), this, SLOT(ExecuteRunnable(Poco::Runnable*)));
+    connect(this, SIGNAL(NewSyncRunnable(Poco::Runnable*)), this, SLOT(ExecuteRunnable(Poco::Runnable*)), Qt::BlockingQueuedConnection);
   }
 
   void QtDisplay::ExecuteRunnable(Poco::Runnable* runnable)

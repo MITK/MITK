@@ -38,15 +38,24 @@ int OpenCherryTestDriver::Run()
 {
   CppUnit::TestRunner runner;
 
+  unsigned int testCounter = 0;
   for (std::vector<ITestDescriptor::Pointer>::iterator i = descriptors.begin(); i
       != descriptors.end(); ++i)
   {
     ITestDescriptor::Pointer descr(*i);
     if (descr->IsUITest() == uitests)
     {
-      ITest::Pointer test(descr->CreateTest());
-      runner.addTest(descr->GetId(), test->GetTest());
+      CppUnit::Test* test = descr->CreateTest();
+      runner.addTest(descr->GetId(), test);
+      ++testCounter;
     }
+  }
+
+  if (testCounter == 0)
+  {
+    std::cout << "No " << (uitests ? "UI " : "") << "tests registered."
+        << std::endl;
+    return 0;
   }
 
   std::vector<std::string> args;
@@ -66,13 +75,6 @@ int OpenCherryTestDriver::Run(const std::string& pluginId, bool uitests)
   TestRegistry testRegistry;
   const std::vector<ITestDescriptor::Pointer>& tests = testRegistry.GetTestsForId(
       pluginId);
-
-  if (tests.empty())
-  {
-    std::cout << "No tests for plugin " << pluginId << " registered."
-        << std::endl;
-    return 0;
-  }
 
   OpenCherryTestDriver driver(tests, uitests);
   return driver.Run();

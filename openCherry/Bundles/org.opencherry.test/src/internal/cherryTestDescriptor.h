@@ -33,7 +33,7 @@ public:
 
   TestDescriptor(IConfigurationElement::Pointer elem);
 
-  ITest::Pointer CreateTest();
+  CppUnit::Test* CreateTest();
   std::string GetId() const;
   std::string GetContributor() const;
   std::string GetDescription() const;

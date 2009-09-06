@@ -2,6 +2,6 @@
 <?openCherry version="0.1"?>
 <plugin>
   <extension point="org.opencherry.tests">
-    <test id="SmartPointerTestSuite" class="cherry::SmartPointerTestSuite" />
+    <test id="OSGiCoreTestSuite" class="cherry::OSGiCoreTestSuite" />
   </extension>
 </plugin>

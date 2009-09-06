@@ -1,6 +1,12 @@
 SET(SRC_CPP_FILES
-  cherryUiApiTestSuite.cpp
-  cherryXMLMementoTest.cpp
+
+  cherryUiTestSuite.cpp
+
+  # API Tests
+  api/cherryIPageLayoutTest.cpp
+  api/cherryUiApiTestSuite.cpp
+  api/cherryXMLMementoTest.cpp
+  
 )
 
 SET(INTERNAL_CPP_FILES

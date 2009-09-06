@@ -15,22 +15,26 @@
  
  =========================================================================*/
 
+#include "cherryUITestWorkbenchAdvisor.h"
+#include "cherryUITestWorkbenchWindowAdvisor.h"
 
-#ifndef CHERRYSMARTPOINTERTESTSUITE_H_
-#define CHERRYSMARTPOINTERTESTSUITE_H_
-
-#include <cherryITest.h>
-#include <CppUnit/Test.h>
-
-namespace cherry {
-
-class SmartPointerTestSuite : public ITest
+namespace cherry
 {
-public:
 
-  CppUnit::Test* GetTest() const;
-};
+UITestWorkbenchAdvisor::UITestWorkbenchAdvisor()
+{
 
 }
 
-#endif /* CHERRYSMARTPOINTERTESTSUITE_H_ */
+WorkbenchWindowAdvisor* UITestWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
+    IWorkbenchWindowConfigurer::Pointer configurer)
+{
+  return new UITestWorkbenchWindowAdvisor(configurer);
+}
+
+std::string UITestWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+{
+  return "";
+}
+
+}

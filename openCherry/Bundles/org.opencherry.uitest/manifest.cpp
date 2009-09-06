@@ -20,6 +20,13 @@
 #include <cherryIApplication.h>
 #include "src/cherryUITestApplication.h"
 
+#include <cherryIPerspectiveFactory.h>
+#include "src/util/cherryEmptyPerspective.h"
+
 POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
   POCO_EXPORT_CLASS(cherry::UITestApplication)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
+  POCO_EXPORT_CLASS(cherry::EmptyPerspective)
 POCO_END_MANIFEST

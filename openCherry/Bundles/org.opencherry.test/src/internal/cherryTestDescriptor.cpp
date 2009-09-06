@@ -29,10 +29,10 @@ TestDescriptor::TestDescriptor(IConfigurationElement::Pointer elem) :
 
 }
 
-ITest::Pointer TestDescriptor::CreateTest()
+CppUnit::Test* TestDescriptor::CreateTest()
 {
-  ITest::Pointer test(configElem->CreateExecutableExtension<ITest> (
-      TestRegistry::ATT_CLASS));
+  CppUnit::Test* test = configElem->CreateExecutableExtension<CppUnit::Test> (
+      TestRegistry::ATT_CLASS, TestRegistry::TEST_MANIFEST);
   return test;
 }
 

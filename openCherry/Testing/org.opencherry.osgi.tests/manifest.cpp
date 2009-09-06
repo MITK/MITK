@@ -17,8 +17,8 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include "src/cherrySmartPointerTestSuite.h"
+#include "src/cherryOSGiCoreTestSuite.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryITest, cherry::ITest)
-  POCO_EXPORT_CLASS(cherry::SmartPointerTestSuite)
+POCO_BEGIN_NAMED_MANIFEST(CppUnitTest, CppUnit::Test)
+  POCO_EXPORT_CLASS(cherry::OSGiCoreTestSuite)
 POCO_END_MANIFEST

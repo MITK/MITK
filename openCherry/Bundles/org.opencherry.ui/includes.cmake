@@ -6,5 +6,6 @@ SET(ADDITIONAL_INCLUDE_DIRECTORIES
   src/handlers
   src/presentations
   src/services
+  src/testing
   src/tweaklets
 )

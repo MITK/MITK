@@ -15,15 +15,20 @@
  
  =========================================================================*/
 
-
 #ifndef CHERRYUITESTAPPLICATION_H_
 #define CHERRYUITESTAPPLICATION_H_
 
 #include <cherryIApplication.h>
+#include <cherryITestHarness.h>
+#include <cherryTestableObject.h>
+#include <cherryPlatformException.h>
 
-namespace cherry {
+#include "cherryUITestDll.h"
 
-class UITestApplication : public IApplication
+namespace cherry
+{
+
+class CHERRY_UITEST_EXPORT UITestApplication: public IApplication, public ITestHarness
 {
 
 public:
@@ -32,20 +37,44 @@ public:
 
   void Stop();
 
+  /*
+   * @see cherry#ITestHarness#RunTests()
+   */
+  void RunTests();
+
 private:
+
+  TestableObject::Pointer testableObject;
+  int testDriverResult;
+  std::string testPlugin;
 
   /*
    * return the application to run, or null if not even the default application
    * is found.
    */
-//  IApplication::Pointer GetApplication() throw(CoreException) {
-//
-//    const IExtension* extension =
-//    Platform::GetExtensionPointService()->GetExtension(
-//        Platform::PI_RUNTIME,
-//        Platform::PT_APPLICATIONS,
-//        getApplicationToRun(args));
-//  }
+  IApplication* GetApplication() throw (CoreException);
+
+  /**
+   * The -openCherry.testApplication argument specifies the application to be run.
+   * If the argument is not set, an empty string is returned and the UITestApplication
+   * itself will be started.
+   */
+  std::string GetApplicationToRun();
+
+  int RunApplication(IApplication* application);
+
+  int RunUITestWorkbench();
+
+  struct TestRunnable: public Poco::Runnable
+  {
+    TestRunnable(UITestApplication* app, const std::string& testPlugin);
+
+    void run();
+
+  private:
+    UITestApplication* app;
+    std::string testPlugin;
+  };
 };
 
 }

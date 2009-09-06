@@ -60,6 +60,7 @@ std::string Platform::ARG_PLUGIN_CACHE = "openCherry.plugin_cache_dir";
 std::string Platform::ARG_PLUGIN_DIRS = "openCherry.plugin_dirs";
 std::string Platform::ARG_CONSOLELOG = "openCherry.consoleLog";
 std::string Platform::ARG_TESTPLUGIN = "openCherry.testplugin";
+std::string Platform::ARG_TESTAPPLICATION = "openCherry.testapplication";
 
 const Poco::Path& Platform::GetConfigurationPath()
 {

@@ -64,7 +64,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":cherryITest"/>
+                  <meta.attribute kind="java" basedOn="CppUnitTest:"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -115,7 +115,7 @@
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         Test classes must subclass &lt;code&gt;cherry::ITest&lt;/code&gt;.
+         Test classes must be a subclass of &lt;code&gt;CppUnit::Test&lt;/code&gt;.
       </documentation>
    </annotation>
 

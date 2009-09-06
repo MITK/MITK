@@ -23,7 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 int QmitkApplication::Start()
 {
-  int code = cherry::PlatformUI::CreateAndRunWorkbench(new QmitkWorkbenchAdvisor());
+  cherry::Display* display = cherry::PlatformUI::CreateDisplay();
+
+  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
   
   // exit the application with an appropriate return code
   return code == cherry::PlatformUI::RETURN_RESTART

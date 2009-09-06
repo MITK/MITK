@@ -19,7 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYPLATFORMUI_H_
 
 #include "cherryUiDll.h"
+
+#include "cherryDisplay.h"
 #include "application/cherryWorkbenchAdvisor.h"
+#include "testing/cherryTestableObject.h"
 
 namespace cherry {
 
@@ -111,9 +114,17 @@ public:
    * not be started;
    * {@link #RETURN_EMERGENCY_CLOSE RETURN_EMERGENCY_CLOSE} if the UI quit
    * because of an emergency; other values reserved for future use
-   * @since 3.0
    */
-  static int CreateAndRunWorkbench(WorkbenchAdvisor* advisor);
+  static int CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor);
+
+  /**
+   * Creates the <code>Display</code> to be used by the workbench.
+   * It is the caller's responsibility to dispose the resulting <code>Display</code>,
+   * not the workbench's.
+   *
+   * @return the display
+   */
+  static Display* CreateDisplay();
 
   /**
    * Returns the workbench. Fails if the workbench has not been created yet.
@@ -140,6 +151,18 @@ public:
    * @since 3.0
    */
   static bool IsWorkbenchRunning();
+
+  /**
+   * Returns the testable object facade, for use by the test harness.
+   * <p>
+   * IMPORTANT: This method is only for use by the test harness.
+   * Applications and regular plug-ins should not call this method.
+   * </p>
+   *
+   * @return the testable object facade
+   * @since 3.0
+   */
+  static TestableObject::Pointer GetTestableObject();
 
 private:
 

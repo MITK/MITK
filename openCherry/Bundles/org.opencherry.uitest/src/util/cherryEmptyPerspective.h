@@ -20,6 +20,8 @@
 
 #include <cherryIPerspectiveFactory.h>
 
+#include "../cherryUITestDll.h"
+
 namespace cherry
 {
 
@@ -27,7 +29,7 @@ namespace cherry
  * This perspective is used for testing api.  It defines an initial
  * layout with no parts, just an editor area.
  */
-class EmptyPerspective: public IPerspectiveFactory
+class CHERRY_UITEST_EXPORT EmptyPerspective: public IPerspectiveFactory
 {
 
 private:

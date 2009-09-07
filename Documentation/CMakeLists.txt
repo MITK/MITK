@@ -2,16 +2,17 @@
 # Variables:
 #  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
 
+FIND_PACKAGE(Doxygen)
+
+IF(DOXYGEN_FOUND)
 
 OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
 MARK_AS_ADVANCED(USE_DOT)
 
 SET(HAVE_DOT "NO")
-IF(DOT)
-  IF(USE_DOT)
-    SET(HAVE_DOT "YES")
-  ENDIF(USE_DOT)
-ENDIF(DOT)
+IF(DOXYGEN_DOT_FOUND AND USE_DOT)
+  SET(HAVE_DOT "YES")
+ENDIF()
 
 
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
@@ -37,10 +38,7 @@ CONFIGURE_FILE(helpPages.conf.in
 
 # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
 #                ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf)
-FIND_PACKAGE(Doxygen)
 
-# Doxygen config file requires only the path to DOT, not DOT itself
-GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH CACHE)
 
 ADD_CUSTOM_TARGET(doc 
                   ${DOXYGEN} 
@@ -66,6 +64,5 @@ ADD_CUSTOM_TARGET(helpPages
                   ${PROJECT_BINARY_DIR}/Documentation/helpPages.conf
                   )
 
-
-
+ENDIF(DOXYGEN_FOUND)
 

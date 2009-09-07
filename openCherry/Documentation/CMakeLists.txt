@@ -2,15 +2,17 @@
 # Variables:
 #  OPENCHERRY_DOCS_OUTPUT_DIR: documentation output directory (optional)
 
+FIND_PACKAGE(Doxygen)
+
+IF(DOXYGEN_FOUND)
+
 OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
 MARK_AS_ADVANCED(USE_DOT)
 
 SET(HAVE_DOT "NO")
-IF(DOT)
-  IF(USE_DOT)
-    SET(HAVE_DOT "YES")
-  ENDIF(USE_DOT)
-ENDIF(DOT)
+IF(DOXYGEN_DOT_FOUND AND USE_DOT)
+  SET(HAVE_DOT "YES")
+ENDIF()
 
 SET(OPENCHERRY_DOCS_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "openCherry output directory for all generated documentation.")
 SET(OPENCHERRY_DOXYGEN_OUTPUT_DIR ${OPENCHERRY_DOCS_OUTPUT_DIR}/reference/api CACHE INTERNAL "openCherry doxygen output directory")
@@ -49,9 +51,6 @@ CONFIGURE_FILE(reference/extension-points/index.dox.in
 
 FIND_PACKAGE(Doxygen)
 
-# Doxygen config file requires only the path to DOT, not DOT itself
-GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH CACHE)
-
 ADD_CUSTOM_TARGET(openCherryDoc 
                   ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf
                   DEPENDS ${_openCherryDoc_depends}
@@ -69,3 +68,5 @@ IF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
 ENDIF(ANT_FOUND AND OPENCHERRY_DOC_TOOLS_DIR)
 
 CONFIGURE_FILE(schema.css ${OPENCHERRY_DOCS_OUTPUT_DIR}/schema.css)
+
+ENDIF(DOXYGEN_FOUND)

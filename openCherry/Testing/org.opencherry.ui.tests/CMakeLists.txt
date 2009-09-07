@@ -1,2 +1,4 @@
 MACRO_CREATE_PLUGIN()
-MACRO_TEST_UIPLUGIN()
+# disabled because graphical tests cannot be
+# run on Linux clients yet
+# MACRO_TEST_UIPLUGIN()

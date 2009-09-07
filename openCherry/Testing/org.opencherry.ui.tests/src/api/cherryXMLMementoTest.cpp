@@ -15,6 +15,8 @@
  
  =========================================================================*/
 
+#define NOMINMAX
+
 #include "cherryXMLMementoTest.h"
 
 #include <CppUnit/TestSuite.h>

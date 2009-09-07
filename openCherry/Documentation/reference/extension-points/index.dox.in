@@ -21,6 +21,8 @@ of the platform infrastructure:
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_perspectives.html">org.opencherry.ui.perspectives</a></li>
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_presentationFactories.html">org.opencherry.ui.presentationFactories</a></li>
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_services.html">org.opencherry.ui.services</a></li>
+	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_keywords.html">org.opencherry.ui.keywords</a></li>
+	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_preferencePages.html">org.opencherry.ui.preferencePages</a></li>
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_tweaklets.html">org.opencherry.ui.tweaklets</a></li>
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_ui_views.html">org.opencherry.ui.views</a></li>
 </ul>
@@ -30,7 +32,9 @@ of the platform infrastructure:
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_core_expressions_definitions.html">org.opencherry.core.expressions.definitions</a></li>
 	<li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_core_expressions_propertyTesters.html">org.opencherry.core.expressions.propertyTesters</a></li>
 </ul>
-
+<ul>
+    <li><a href="@OPENCHERRY_DOXYGEN_XP_RELATIVEDIR@/org_opencherry_tests.html">org.opencherry.tests</a></li>
+</ul>
 
 
 */

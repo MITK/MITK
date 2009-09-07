@@ -1,6 +1,7 @@
 
 SET(_default_plugins
   org.opencherry.osgi
+  org.opencherry.solstice.common
   org.opencherry.core.runtime
   org.opencherry.core.expressions
   org.opencherry.core.commands

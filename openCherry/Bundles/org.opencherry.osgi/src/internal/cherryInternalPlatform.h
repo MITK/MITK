@@ -47,6 +47,8 @@ private:
   bool m_Initialized;
   bool m_Running;
 
+  bool m_ConsoleLog;
+
   ServiceRegistry m_ServiceRegistry;
 
   Poco::Path m_BaseStatePath;
@@ -102,6 +104,7 @@ public:
   /// by the platform
   IExtensionPointService::Pointer GetExtensionPointService();
 
+  bool ConsoleLog() const;
 
   const Poco::Path& GetConfigurationPath();
 

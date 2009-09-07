@@ -28,27 +28,47 @@
 #include "../dialogs/cherryMessageDialog.h"
 #include "../cherryWorkbenchWindow.h"
 #include "../cherryImageDescriptor.h"
+#include "../cherryDisplay.h"
 #include "../services/cherryIServiceFactory.h"
 
 #include "cherryWorkbenchPlugin.h"
 #include "cherryWorkbenchConstants.h"
 
+#include <Poco/Thread.h>
 #include <Poco/Bugcheck.h>
 
 namespace cherry
 {
 
 Workbench* Workbench::instance = 0;
+WorkbenchTestable::Pointer Workbench::testableObject;
 
-int Workbench::CreateAndRunWorkbench(WorkbenchAdvisor* advisor)
+int Workbench::CreateAndRunWorkbench(Display* display, WorkbenchAdvisor* advisor)
 {
   // create the workbench instance
-  Workbench workbench(advisor);
+  Workbench workbench(display, advisor);
   // run the workbench event loop
   int returnCode = workbench.RunUI();
 
   return returnCode;
 }
+
+Display* Workbench::CreateDisplay() {
+
+    // create the display
+    Display* newDisplay = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateDisplay();
+
+    // workaround for 1GEZ9UR and 1GF07HN
+    //newDisplay.setWarnings(false);
+
+    // Set the priority higher than normal so as to be higher
+    // than the JobManager.
+    //Poco::Thread::current()->setPriority(Poco::Thread::PRIO_HIGH);
+
+    //initializeImages();
+
+    return newDisplay;
+  }
 
 Workbench::ServiceLocatorOwner::ServiceLocatorOwner(Workbench* wb)
  : workbench(wb)
@@ -65,9 +85,10 @@ void Workbench::ServiceLocatorOwner::Dispose() {
 }
 
 
-Workbench::Workbench(WorkbenchAdvisor* advisor)
+Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
  : serviceLocatorOwner(new ServiceLocatorOwner(this)), largeUpdates(0), isStarting(true), isClosing(false)
 {
+  poco_check_ptr(display);
   poco_check_ptr(advisor);
 
   // the reference count to the one and only workbench instance
@@ -75,6 +96,7 @@ Workbench::Workbench(WorkbenchAdvisor* advisor)
   // do not delete it
   this->Register();
 
+  this->display = display;
   this->advisor = advisor;
   Workbench::instance = this;
 
@@ -87,10 +109,22 @@ Workbench::Workbench(WorkbenchAdvisor* advisor)
   returnCode = PlatformUI::RETURN_UNSTARTABLE;
 }
 
+Display* Workbench::GetDisplay()
+{
+  return display;
+}
+
 Workbench* Workbench::GetInstance()
 {
   return instance;
 }
+
+WorkbenchTestable::Pointer Workbench::GetWorkbenchTestable() {
+    if (!testableObject) {
+      testableObject = new WorkbenchTestable();
+    }
+    return testableObject;
+  }
 
 Workbench::~Workbench()
 {
@@ -342,11 +376,13 @@ int Workbench::RunUI()
   //startPlugins();
 
   //addStartupRegistryListener();
-  
+
   CHERRY_INFO << "openCherry Workbench ready";
 
+  this->GetWorkbenchTestable()->Init(Display::GetDefault(), this);
+
   // spin event loop
-  return Tweaklets::Get(WorkbenchTweaklet::KEY)->RunEventLoop();
+  return display->RunEventLoop();
 }
 
 std::string Workbench::GetDefaultPerspectiveId()
@@ -520,7 +556,8 @@ bool Workbench::BusyClose(bool force) {
         std::vector<IWorkbenchWindow::Pointer> windows = this->GetWorkbenchWindows();
         for (unsigned int i = 0; i < windows.size(); i++) {
           IWorkbenchPage::Pointer page = windows[i]->GetActivePage();
-          isClosing = isClosing && page->CloseAllEditors(false);
+          if (page)
+            isClosing = isClosing && page->CloseAllEditors(false);
         }
      // }
     //});
@@ -572,7 +609,7 @@ bool Workbench::BusyClose(bool force) {
 
   this->Shutdown();
 
-  //runEventLoop = false;
+  display->ExitEventLoop(0);
   return true;
 }
 

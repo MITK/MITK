@@ -1,10 +1,11 @@
-INCLUDE("${OPENCHERRY_BINARY_DIR}/openCherryConfig.cmake")
+INCLUDE(cherryTestingHelpers)
 
-SET(TEST_BUNDLES
- org.opencherry.osgi
- #org.opencherry.core.runtime
-)
+INCLUDE(${OPENCHERRY_BINARY_DIR}/openCherryBundleList.cmake)
 
-FOREACH(testbundle ${TEST_BUNDLES})
-  ADD_SUBDIRECTORY(${testbundle})
-ENDFOREACH(testbundle ${TEST_BUNDLES})
+SET(OPENCHERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
+
+MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${OPENCHERRY_PLUGINS_OUTPUT_DIR}
+                      CACHE_PLUGIN_TARGETS OPENCHERRY_ENABLED_PLUGINS
+                      BUNDLE_LIST_PATH "${OPENCHERRY_BINARY_DIR}/openCherryTestBundleList.cmake"
+                      CMAKE_CACHE_PREFIX "OPENCHERRY_TEST"
+                      ${OPENCHERRY_BUILD_ALL_PLUGINS_OPTION})

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryIWorkbenchWindow.h"
 #include "cherryIWorkbenchListener.h"
 #include "cherryIWindowListener.h"
+#include "cherryDisplay.h"
 
 namespace cherry {
 
@@ -84,6 +85,18 @@ struct IWorkbenchPage;
 struct CHERRY_UI IWorkbench : public IServiceLocator {
 
   virtual ~IWorkbench() {}
+
+  /**
+   * Returns the display for this workbench.
+   * <p>
+   * Code should always ask the workbench for the display rather than rely on
+   * {@link Display#getDefault Display.getDefault()}.
+   * </p>
+   *
+   * @return the display to be used for all UI interactions with this
+   *         workbench
+   */
+  virtual Display* GetDisplay() = 0;
 
   /**
    * Adds a workbench listener.

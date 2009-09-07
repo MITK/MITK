@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryLog.h"
 
 #include "cherryCodeCache.h"
+#include "cherryInternalPlatform.h"
 
 #include "Poco/Path.h"
 #include "Poco/SharedLibrary.h"
@@ -30,7 +31,7 @@ namespace cherry {
 
 CodeCache::CodeCache(const std::string& path) : m_CachePath(path)
 {
-  CHERRY_INFO << "Creating CodeCache with path: " << path << std::endl;
+  CHERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Creating CodeCache with path: " << path << std::endl;
   if (!m_CachePath.exists())
   {
     m_CachePath.createDirectory();
@@ -46,7 +47,7 @@ CodeCache::~CodeCache()
 void
 CodeCache::Clear()
 {
-  CHERRY_INFO << "Clearing code cache\n";
+  CHERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Clearing code cache\n";
   std::vector<Poco::File> files;
   m_CachePath.list(files);
   for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)

@@ -98,6 +98,9 @@ SET(SRC_CPP_FILES
   presentations/cherryStackDropResult.cpp
   presentations/cherryStackPresentation.cpp
   
+  #testing
+  testing/cherryTestableObject.cpp
+  
 )
 
 
@@ -173,6 +176,7 @@ SET(INTERNAL_CPP_FILES
   cherryWorkbenchPlugin.cpp
   cherryWorkbenchRegistryConstants.cpp
   cherryWorkbenchServiceRegistry.cpp
+  cherryWorkbenchTestable.cpp
   cherryWorkbenchWindowConfigurer.cpp
 )
 

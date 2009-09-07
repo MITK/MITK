@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryExtensionPointService.h"
 #include "cherryConfigurationElement.h"
 #include "cherryExtensionPoint.h"
+#include "cherryInternalPlatform.h"
 
 #include "Poco/Exception.h"
 
@@ -50,9 +51,9 @@ ExtensionPointService::GetType() const
 }
 
 ExtensionPointService::ExtensionPointService(BundleLoader* loader)
-  : m_BundleLoader(loader)
+  : m_BundleLoader(loader), m_ConsoleLog(false)
 {
-
+  m_ConsoleLog = InternalPlatform::GetInstance()->ConsoleLog();
 }
 
 void
@@ -96,7 +97,7 @@ ExtensionPointService::AddContribution(std::istream& istr,
 
     m_ExtensionPointMap[xp->GetUniqueIdentifier()] = xp;
 
-    CHERRY_INFO << "Extension-Point found: " << xp->GetUniqueIdentifier() << " (from " << xp->GetContributor() << ")\n";
+    CHERRY_INFO(m_ConsoleLog) << "Extension-Point found: " << xp->GetUniqueIdentifier() << " (from " << xp->GetContributor() << ")\n";
 
     attributes->release();
   }
@@ -110,10 +111,10 @@ ExtensionPointService::AddContribution(std::istream& istr,
     if (attr == 0) continue;
 
     std::string xp = attr->nodeValue();
-    CHERRY_INFO << "Extension found for extension-point: " << xp << " (from " << contributor << ")\n";
+    CHERRY_INFO(m_ConsoleLog) << "Extension found for extension-point: " << xp << " (from " << contributor << ")\n";
     if (m_ExtensionPointMap[xp].IsNull())
     {
-      CHERRY_INFO << "Extension-point unknown, extension skipped.\n";
+      CHERRY_INFO(m_ConsoleLog) << "Extension-point unknown, extension skipped.\n";
       continue;
     }
 
@@ -169,7 +170,7 @@ ExtensionPointService::HasContributionFrom(const std::string& name) const
 const std::vector<IConfigurationElement::Pointer>
 ExtensionPointService::GetConfigurationElementsFor(const std::string& extensionPointId) const
 {
-  CHERRY_INFO << "Getting configuration elements for point: " << extensionPointId << std::endl;
+  CHERRY_INFO(m_ConsoleLog) << "Getting configuration elements for point: " << extensionPointId << std::endl;
 
   std::vector<IConfigurationElement::Pointer> configs;
   const IExtensionPoint* xp = this->GetExtensionPoint(extensionPointId);

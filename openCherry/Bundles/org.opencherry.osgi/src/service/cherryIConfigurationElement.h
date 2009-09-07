@@ -44,14 +44,14 @@ public:
   typedef std::vector<IConfigurationElement::Pointer> vector;
 
   template<class C>
-  C* CreateExecutableExtension(const std::string& propertyName)
+  C* CreateExecutableExtension(const std::string& propertyName, const std::string& manifestName)
   {
     std::string className;
     if (this->GetAttribute(propertyName, className))
     {
       try
       {
-        C* cl = m_ClassLoader->LoadClass<C>(m_Contributor, className);
+        C* cl = m_ClassLoader->LoadClass<C>(m_Contributor, className, manifestName);
 
         // check if we have extension adapter and initialize
         if (dynamic_cast<IExecutableExtension*>(cl) != 0) {
@@ -70,6 +70,12 @@ public:
     }
 
     throw CoreException("Missing attribute", propertyName);
+  }
+
+  template<class C>
+  C* CreateExecutableExtension(const std::string& propertyName)
+  {
+    return CreateExecutableExtension<C>(propertyName, C::GetManifestName());
   }
 
   virtual bool GetAttribute(const std::string& name, std::string& value) const = 0;

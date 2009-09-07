@@ -40,9 +40,13 @@ public:
   void AsyncExec(Poco::Runnable*);
   void SyncExec(Poco::Runnable*);
 
+  int RunEventLoop();
+  void ExitEventLoop(int code);
+
 signals:
 
-void NewRunnable(Poco::Runnable*);
+void NewAsyncRunnable(Poco::Runnable*);
+void NewSyncRunnable(Poco::Runnable*);
 
 protected:
 

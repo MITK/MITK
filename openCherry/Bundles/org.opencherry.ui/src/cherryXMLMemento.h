@@ -58,8 +58,8 @@ class CHERRY_UI XMLMemento : public IMemento {
     /**
     * Creates a memento for the specified document and element.
     * <p>
-    * Clients should use <code>createReadRoot</code> and
-    * <code>createWriteRoot</code> to create the initial
+    * Clients should use <code>CreateReadRoot</code> and
+    * <code>CreateWriteRoot</code> to create the initial
     * memento on a document.
     * </p>
     *
@@ -67,6 +67,8 @@ class CHERRY_UI XMLMemento : public IMemento {
     * @param element the element node for the memento
     */
     XMLMemento(Poco::XML::Document* document, Poco::XML::Element* elem);
+
+    ~XMLMemento();
 
     /**
      * Creates a <code>Document</code> from the <code>Reader</code>

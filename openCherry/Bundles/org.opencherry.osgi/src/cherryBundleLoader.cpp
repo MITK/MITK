@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/cherrySystemBundleActivator.h"
 #include "internal/cherryCodeCache.h"
 
+#include "internal/cherryInternalPlatform.h"
+
 #include "cherryPlugin.h"
 #include "cherryPlatform.h"
 #include "cherryPlatformException.h"
@@ -43,9 +45,9 @@ namespace cherry {
 
 
 BundleLoader::BundleLoader(CodeCache* codeCache, Poco::Logger& logger) //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
- : m_CodeCache(codeCache), m_Logger(logger)
+ : m_CodeCache(codeCache), m_Logger(logger), m_ConsoleLog(false)
 {
-
+  m_ConsoleLog = InternalPlatform::GetInstance()->ConsoleLog();
 }
 
 BundleLoader::~BundleLoader()
@@ -166,9 +168,9 @@ BundleLoader::ResolveBundle(IBundle::Pointer bundle)
 {
   try
   {
-    CHERRY_INFO << "Trying to resolve bundle " << bundle->GetSymbolicName();
+    CHERRY_INFO(m_ConsoleLog) << "Trying to resolve bundle " << bundle->GetSymbolicName();
     bundle->Resolve();
-    CHERRY_INFO << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString();
+    CHERRY_INFO(m_ConsoleLog) << "Bundle " << bundle->GetSymbolicName() << ": " << bundle->GetStateString();
   }
   catch (BundleResolveException exc)
   {
@@ -423,7 +425,7 @@ BundleLoader::LoadActivator(BundleInfo& bundleInfo)
   Poco::Path libPath = this->GetLibraryPathFor(bundleInfo.m_Bundle);
   std::string strLibPath(libPath.toString());
   
-  CHERRY_INFO << "Loading activator library: " << strLibPath;
+  CHERRY_INFO(m_ConsoleLog) << "Loading activator library: " << strLibPath;
   try
   {
   /* retrieves only an empty string and its not required 

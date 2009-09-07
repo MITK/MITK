@@ -31,15 +31,9 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 {
   WorkbenchAdvisor::Initialize(configurer);
 
-  char** argv;
-  int& argc = Platform::GetRawApplicationArgs(argv);
-
- // CHERRY_INFO << "QtWorkbenchAdvisor::Initialize argv[0] = " << argv[0] << " argv[1] = " << argv[1] << std::endl;
-
-  QApplication* app = new QApplication(argc, argv);
-  QObject* eventFilter = new QtGlobalEventFilter(app);
-  app->installEventFilter(eventFilter);
-  app->setStyleSheet("cherry--QCTabBar::tab { "
+  QObject* eventFilter = new QtGlobalEventFilter(qApp);
+  qApp->installEventFilter(eventFilter);
+  qApp->setStyleSheet("cherry--QCTabBar::tab { "
       "background: palette(window); "
       "min-height: 24px; "
       "border-top: 1px solid palette(mid); "

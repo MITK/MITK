@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/AutoPtr.h>
 #include <Poco/Util/PropertyFileConfiguration.h>
 #include <Poco/StringTokenizer.h>
+#include <Poco/Util/HelpFormatter.h>
 
 #include <iostream>
 
@@ -41,6 +42,7 @@ namespace cherry {
 Poco::Mutex InternalPlatform::m_Mutex;
 
 InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
+  m_ConsoleLog(false),
   m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
   m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
@@ -56,6 +58,11 @@ InternalPlatform* InternalPlatform::GetInstance()
   Poco::Mutex::ScopedLock lock(m_Mutex);
   static InternalPlatform instance;
   return &instance;
+}
+
+bool InternalPlatform::ConsoleLog() const
+{
+  return m_ConsoleLog;
 }
 
 ServiceRegistry& InternalPlatform::GetServiceRegistry()
@@ -78,6 +85,8 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     this->config().add(config, 50, false);
   }
+
+  m_ConsoleLog = this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG);
 
   m_ConfigPath.assign(this->GetConfiguration().getString("application.configDir"));
   m_InstancePath.assign(this->GetConfiguration().getString("application.dir"));
@@ -153,12 +162,12 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     for (std::vector<std::string>::iterator pluginBaseDir = pluginBaseDirs.begin();
          pluginBaseDir != pluginBaseDirs.end(); ++pluginBaseDir)
     {
-      CHERRY_INFO << "Plugin base directory: " << *pluginBaseDir;
+      CHERRY_INFO(m_ConsoleLog) << "Plugin base directory: " << *pluginBaseDir;
       Poco::File pluginDir(*pluginBaseDir);
 
       if (!pluginDir.exists() || !pluginDir.isDirectory())
       {
-        CHERRY_WARN << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
+        CHERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
         continue;
       }
 	  
@@ -185,11 +194,11 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       try
       {
       Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-      std::cout << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      CHERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
       }
       catch (const BundleStateException& exc)
       {
-        std::cout << exc.displayText() << std::endl;
+        CHERRY_WARN << exc.displayText() << std::endl;
       }
     }
 
@@ -322,13 +331,25 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   helpOption.callback(Poco::Util::OptionCallback<InternalPlatform>(this, &InternalPlatform::PrintHelp));
   options.addOption(helpOption);
 
-  Poco::Util::Option cleanOption(Platform::ARG_CLEAN, Platform::ARG_CLEAN, "cleans the plugin cache");
+  Poco::Util::Option cleanOption(Platform::ARG_CLEAN, "", "cleans the plugin cache");
   cleanOption.binding(Platform::ARG_CLEAN);
   options.addOption(cleanOption);
 
-  Poco::Util::Option appOption(Platform::ARG_APPLICATION, Platform::ARG_APPLICATION, "the id of the application extension to be executed");
-  appOption.argument(Platform::ARG_APPLICATION).binding(Platform::ARG_APPLICATION);
+  Poco::Util::Option appOption(Platform::ARG_APPLICATION, "", "the id of the application extension to be executed");
+  appOption.argument("<id>").binding(Platform::ARG_APPLICATION);
   options.addOption(appOption);
+
+  Poco::Util::Option consoleLogOption(Platform::ARG_CONSOLELOG, "", "log messages to the console");
+  consoleLogOption.binding(Platform::ARG_CONSOLELOG);
+  options.addOption(consoleLogOption);
+
+  Poco::Util::Option testPluginOption(Platform::ARG_TESTPLUGIN, "", "the plug-in to be tested");
+  testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);
+  options.addOption(testPluginOption);
+
+  Poco::Util::Option testAppOption(Platform::ARG_TESTAPPLICATION, "", "the application to be tested");
+  testAppOption.argument("<id>").binding(Platform::ARG_TESTAPPLICATION);
+  options.addOption(testAppOption);
 
   Poco::Util::Application::defineOptions(options);
 }
@@ -350,31 +371,11 @@ int InternalPlatform::main(const std::vector<std::string>& args)
 
 void InternalPlatform::PrintHelp(const std::string&, const std::string&)
 {
-  std::cout << "Usage: " << this->commandName() << " [OPTION]...\n";
+  Poco::Util::HelpFormatter help(this->options());
+  help.setAutoIndent();
+  help.setCommand(this->commandName());
+  help.format(std::cout);
 
-  const Poco::Util::OptionSet& opts = this->options();
-  for (Poco::Util::OptionSet::Iterator option = opts.begin();
-       option != opts.end(); ++option)
-  {
-#ifdef CHERRY_OS_FAMILY_WINDOWS
-    std::string optionPostFix = "/";
-#else
-    std::string optionPostFix = "-";
-#endif
-
-    std::cout.width(35);
-    std::cout.setf(std::ios_base::left, std::ios_base::adjustfield);
-    if (option->takesArgument())
-    {
-      std::cout << (" " + optionPostFix + option->fullName() + "=<value>");
-    }
-    else
-    {
-      std::cout << (" " + optionPostFix + option->fullName());
-    }
-
-    std::cout << option->description() << std::endl;
-  }
   exit(EXIT_OK);
 }
 

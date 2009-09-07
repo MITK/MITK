@@ -68,6 +68,8 @@ private:
 
   mutable Poco::Mutex m_Mutex;
 
+  bool m_ConsoleLog;
+
   IBundleActivator* LoadActivator(BundleInfo& bundleInfo);
 
   friend class InternalPlatform;
@@ -111,6 +113,9 @@ public:
 
   template<class C>
   C* LoadClass(const std::string& bundleName, const std::string& className);
+
+  template<class C>
+  C* LoadClass(const std::string& bundleName, const std::string& className, const std::string& manifestName);
 
 
 };

@@ -69,6 +69,8 @@ private:
   
   Poco::XML::DOMParser m_DOMParser;
   Poco::XML::InputSource m_XMLInputSource;
+
+  bool m_ConsoleLog;
 };
 
 }  // namespace cherry

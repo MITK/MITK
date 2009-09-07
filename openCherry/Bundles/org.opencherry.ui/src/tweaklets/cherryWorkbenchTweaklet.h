@@ -22,6 +22,7 @@
 #include "../internal/cherryTweaklets.h"
 
 #include "../cherryShell.h"
+#include "../cherryDisplay.h"
 #include "../dialogs/cherryIDialog.h"
 
 namespace cherry
@@ -37,7 +38,7 @@ struct CHERRY_UI WorkbenchTweaklet : public Object
 
   static const std::string DIALOG_ID_SHOW_VIEW; // = "org.opencherry.ui.dialogs.showview";
 
-  virtual int RunEventLoop() = 0;
+  virtual Display* CreateDisplay() = 0;
 
   virtual bool IsRunning() = 0;
 

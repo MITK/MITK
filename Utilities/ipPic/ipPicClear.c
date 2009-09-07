@@ -79,12 +79,12 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicClear\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicClear\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-void ipPicClear( ipPicDescriptor *pic )
+void mitkIpPicClear( mitkIpPicDescriptor *pic )
 {
   if( pic != NULL )
     {
@@ -96,32 +96,32 @@ void ipPicClear( ipPicDescriptor *pic )
 
       if( pic->info != NULL )
         {
-          _ipPicFreeTags( pic->info->tags_head );
+          _mitkIpPicFreeTags( pic->info->tags_head );
           pic->info->tags_head = NULL;
 
           /*free( pic->info );
           pic->info = NULL;*/
         }
-      pic->type = ipPicUnknown;
+      pic->type = mitkIpPicUnknown;
     }
 }
 
-void _ipPicFreeTags( _ipPicTagsElement_t *head )
+void _mitkIpPicFreeTags( _mitkIpPicTagsElement_t *head )
 {
-  _ipPicTagsElement_t *current;
+  _mitkIpPicTagsElement_t *current;
 
   current = head;
   while( current != NULL )
     {
-      _ipPicTagsElement_t *this = current;
+      _mitkIpPicTagsElement_t *this = current;
       current = current->next;
 
       if( this->tsv != NULL )
         {
           if( this->tsv->value != NULL )
             {
-              if( this->tsv->type == ipPicTSV )
-                _ipPicFreeTags( this->tsv->value );
+              if( this->tsv->type == mitkIpPicTSV )
+                _mitkIpPicFreeTags( this->tsv->value );
               else
                 free( this->tsv->value );
             }

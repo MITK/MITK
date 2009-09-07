@@ -53,8 +53,8 @@
  *     @param pic_old     pointer to the image 
  *     @param sc_fact     vector that contains the scaling factors for each dimension
  *     @param sc_kind     parameter for the kind of interpolation
- *     @arg @c                 ipFuncScaleNN:  next neighbour interpolation
- *     @arg @c                 ipFuncScaleBl:  bilinear interpolation
+ *     @arg @c                 mitkIpFuncScaleNN:  next neighbour interpolation
+ *     @arg @c                 mitkIpFuncScaleBl:  bilinear interpolation
  *  
  * @return pointer to the scaled image
  *
@@ -63,20 +63,20 @@
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScale ( mitkIpPicDescriptor *pic_old,
                                ipFloat8_t      sc_fact[_mitkIpPicNDIM],
-                               ipFuncFlagI_t   sc_kind ) ;
+                               mitkIpFuncFlagI_t   sc_kind ) ;
 #ifndef DOXYGEN_IGNORE
  
-ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScale ( mitkIpPicDescriptor *pic_old,
                                ipFloat8_t      sc_fact[_mitkIpPicNDIM],
-                               ipFuncFlagI_t   sc_kind ) 
+                               mitkIpFuncFlagI_t   sc_kind ) 
 {
 
   ipUInt4_t        i;             /* loop index               */
-  ipPicDescriptor  *pic_new;      /* pointer to scaled image  */
+  mitkIpPicDescriptor  *pic_new;      /* pointer to scaled image  */
 
   char            is_color=0;
 
@@ -89,17 +89,17 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
 	  is_color=1;
   }
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if(is_color)
 	  pic_old->bpe=24;
                                         
   /* allocate pic_new                                         */
 
-  pic_new = ipPicCopyHeader ( pic_old, NULL );
+  pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -114,23 +114,23 @@ ipPicDescriptor *ipFuncScale ( ipPicDescriptor *pic_old,
   
   /* call scaling routines                                    */
 
-  if ( sc_kind == ipFuncScaleNN )
-    pic_new = _ipFuncScNN ( pic_old, pic_new );
-  else if ( sc_kind == ipFuncScaleBl ) {
-    pic_new = _ipFuncScBL ( pic_old, pic_new ); 
-    /*printf("using NN due to error in _ipFuncScaleBL ... ");
-      pic_new = _ipFuncScNN ( pic_old, pic_new );*/
+  if ( sc_kind == mitkIpFuncScaleNN )
+    pic_new = _mitkIpFuncScNN ( pic_old, pic_new );
+  else if ( sc_kind == mitkIpFuncScaleBl ) {
+    pic_new = _mitkIpFuncScBL ( pic_old, pic_new ); 
+    /*printf("using NN due to error in _mitkIpFuncScaleBL ... ");
+      pic_new = _mitkIpFuncScNN ( pic_old, pic_new );*/
   }
   else
     {
-      ipPicFree ( pic_new );
-      _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+      mitkIpPicFree ( pic_new );
+      _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
       return ( mitkIpFuncERROR );
     }
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                         

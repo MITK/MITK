@@ -54,7 +54,7 @@
 
  *  Sets the greyvalue of pixels that are smaller than gv_low to this value and
  *  those larger than gv_up to that value. Very similar to
- *  and used by ipFuncLevWin().
+ *  and used by mitkIpFuncLevWin().
  *
  *  @param pic_old    pointer to original image
  *  @param gv_low     lower greyvalue of range
@@ -69,12 +69,12 @@
 
 /* include files                                                            */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
                                ipFloat8_t      gv_low,
                                ipFloat8_t      gv_up, 
-                               ipPicDescriptor *pic_return ) ;
+                               mitkIpPicDescriptor *pic_return ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -94,7 +94,7 @@ ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
                                                                              \
   /* transform greyvalues                                                  */\
                                                                              \
-  no_elem = _ipPicElements ( pic );                                          \
+  no_elem = _mitkIpPicElements ( pic );                                          \
   for ( i = 0; i < no_elem; i++ )                                            \
     {                                                                        \
        help = (( type * )pic->data )[i];                                     \
@@ -110,46 +110,46 @@ ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncSelMM ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
                                ipFloat8_t      gv_low,
                                ipFloat8_t      gv_up, 
-                               ipPicDescriptor *pic_return ) 
+                               mitkIpPicDescriptor *pic_return ) 
 {
   ipFloat8_t       min_gv, max_gv;  /* max and min possible greyvalues      */
-  ipPicDescriptor  *pic_new;        /* pointer to transformed image         */
+  mitkIpPicDescriptor  *pic_new;        /* pointer to transformed image         */
 
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR )
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR )
     return ( mitkIpFuncERROR );
 
   /* check whether data are correct                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( gv_low >= gv_up )  
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
  
   if ( min_gv > gv_low || max_gv < gv_up ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* allocate memory for the transformed image                              */
 
-   pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
+   pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
    if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to transform the image                                           */
 
   mitkIpPicFORALL_4 ( SELECT, pic_old, gv_low, gv_up, min_gv, max_gv );
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
      
 

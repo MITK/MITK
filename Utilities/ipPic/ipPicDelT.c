@@ -49,7 +49,7 @@
  *   deletes a tsv from the pic
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicDelTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicDelTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -58,44 +58,44 @@
 
 
 
-static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
-                                    _ipPicTagsElement_t *which,
+static mitkIpPicTSV_t *_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head,
+                                    _mitkIpPicTagsElement_t *which,
                                     const char *tag );
 
-ipPicTSV_t *
-ipPicDelTag( ipPicDescriptor *pic, const char *tag )
+mitkIpPicTSV_t *
+mitkIpPicDelTag( mitkIpPicDescriptor *pic, const char *tag )
 {
-  _ipPicTagsElement_t *which;
+  _mitkIpPicTagsElement_t *which;
 
-  which = _ipPicFindTag( pic->info->tags_head, tag );
+  which = _mitkIpPicFindTag( pic->info->tags_head, tag );
 
-  return( _ipPicRemoveTag( &(pic->info->tags_head), which, tag ) );
+  return( _mitkIpPicRemoveTag( &(pic->info->tags_head), which, tag ) );
 }
 
-ipPicTSV_t *
-ipPicDelSubTag( ipPicTSV_t *parent, const char *tag )
+mitkIpPicTSV_t *
+mitkIpPicDelSubTag( mitkIpPicTSV_t *parent, const char *tag )
 {
-  _ipPicTagsElement_t *which;
+  _mitkIpPicTagsElement_t *which;
 
-  if( parent->type != ipPicTSV )
+  if( parent->type != mitkIpPicTSV )
     return( NULL );
 
-  which = _ipPicFindTag( parent->value, tag );
+  which = _mitkIpPicFindTag( parent->value, tag );
 
   if( !which )
     return( NULL );
 
-  if( which->tsv->type == ipPicTSV )
+  if( which->tsv->type == mitkIpPicTSV )
     return( NULL );
 
   parent->n[0]--;
-  return( _ipPicRemoveTag( (_ipPicTagsElement_t **)&(parent->value), which, tag ) );
+  return( _mitkIpPicRemoveTag( (_mitkIpPicTagsElement_t **)&(parent->value), which, tag ) );
 }
 
-ipPicTSV_t *
-_ipPicRemoveTag( _ipPicTagsElement_t **head, _ipPicTagsElement_t *which, const char *tag )
+mitkIpPicTSV_t *
+_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head, _mitkIpPicTagsElement_t *which, const char *tag )
 {
-  ipPicTSV_t *tsv = NULL;
+  mitkIpPicTSV_t *tsv = NULL;
 
   if( which != NULL )
     {

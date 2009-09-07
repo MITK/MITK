@@ -56,8 +56,8 @@
  *  @param pic_old   pointer to original image
  *  @param dim_mask  dimension of mask (2 or 3)
  *  @param border    tells how the edge is handled
- *  @arg @c         ipFuncBorderOld  : keep greyvalues
- *  @arg @c         ipFuncBorderZero : set greyvalues to zero
+ *  @arg @c         mitkIpFuncBorderOld  : keep greyvalues
+ *  @arg @c         mitkIpFuncBorderZero : set greyvalues to zero
  *
  * @return pointer to transformed image
  *
@@ -66,11 +66,11 @@
 
 /* include files                                                         */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border );
+                                 mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -124,15 +124,15 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
 
 /* --------------------------------------------------------------------- */
 /* 
-** function ipFuncRoberts                                               
+** function mitkIpFuncRoberts                                               
 */
 /* --------------------------------------------------------------------- */
  
-ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border )
+                                 mitkIpFuncFlagI_t   border )
 {
-  ipPicDescriptor *pic_new;          /* pointer to new image structure   */
+  mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
   ipInt4_t        *off_vekt;         /* offsets for the image pixels that*/
                                      /* are needed for the operation     */
   ipInt4_t        offset;            /* used to calculate off_vekt       */
@@ -145,10 +145,10 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_old->dim < dim_mask ) || ( dim_mask < 1 ) )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -175,7 +175,7 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
   off_mask  = 0;
   if ( off_vekt == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -208,32 +208,32 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
 
   /* allocate new image                                                  */
      
-  if ( border == ipFuncBorderOld )
-    pic_new = ipPicClone ( pic_old );
-  else if ( border == ipFuncBorderZero )
+  if ( border == mitkIpFuncBorderOld )
+    pic_new = mitkIpPicClone ( pic_old );
+  else if ( border == mitkIpFuncBorderZero )
     {
-       pic_new = ipPicCopyHeader ( pic_old, 0 );
-       pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+       pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
+       pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
     }
   else 
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_new->data == NULL )
     {
        free ( off_vekt );
-       ipPicFree ( pic_new ); 
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_new ); 
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -251,7 +251,7 @@ ipPicDescriptor *ipFuncRoberts ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

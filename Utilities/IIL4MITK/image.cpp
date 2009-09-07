@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <ipFunc/ipFunc.h>
+#include <ipFunc/mitkIpFunc.h>
 #include "widget.h"
 #include "texture.h"
 #include "image.h"
@@ -356,16 +356,16 @@ iil4mitkImage::updateTexture (_iil4mitkTexture* texture, unsigned int x, unsigne
   /*
   char filename [255];
   sprintf (filename, "tile_%u_%u.pic", x, y);
-  ipPicDescriptor* pic = ipPicNew ();
-  pic->type = ipPicUInt;
+  mitkIpPicDescriptor* pic = mitkIpPicNew ();
+  pic->type = mitkIpPicUInt;
   pic->bpe = 8;
   pic->dim = 2;
   pic->n [0] = p2w;
   pic->n [1] = p2h;
   pic->data = region;
-  ipPicPut (filename, pic);
+  mitkIpPicPut (filename, pic);
   pic->data = NULL;
-  ipPicFree (pic);
+  mitkIpPicFree (pic);
   */
 
   free (region);

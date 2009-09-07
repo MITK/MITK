@@ -5,8 +5,8 @@ win32:CONFIG	= qt warn_on release
 HEADERS		= gradient.h \
 		  ipAdministrative.h \
 		  ipArithmeticAndLogical.h \
-		  ipFunc.h \
-		  ipFuncP.h \
+		  mitkIpFunc.h \
+		  mitkIpFuncP.h \
 		  ipGeometrical.h \
 		  ipLocal.h \
 		  ipMorphological.h \

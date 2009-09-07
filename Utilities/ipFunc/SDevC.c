@@ -67,9 +67,9 @@
 
 /* include files */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncSDevC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius );
 
@@ -81,20 +81,20 @@ ipFloat8_t ipFuncSDevC  ( ipPicDescriptor *pic_old,
  
 /* include files */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 
 /*
-** ipFuncSDevC
+** mitkIpFuncSDevC
 */
-ipFloat8_t ipFuncSDevC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius )
 {
    ipFloat8_t   s_dev;
    ipFloat8_t   var;
 
-   var = ipFuncVarC ( pic_old, center, radius );
+   var = mitkIpFuncVarC ( pic_old, center, radius );
 
    if ( var < 0 ) return ( mitkIpFuncERROR );
 

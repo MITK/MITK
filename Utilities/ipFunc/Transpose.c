@@ -63,7 +63,7 @@
  *
  * $Log$
  * Revision 1.3  2003/01/30 14:30:53  mark
- * in Scale.c _ipFuncScaleBL auskommentiert, wegen Fehler
+ * in Scale.c _mitkIpFuncScaleBL auskommentiert, wegen Fehler
  *
  * Revision 1.2  2000/05/24 15:29:43  tobiask
  * Changed the installation paths of the package.
@@ -76,7 +76,7 @@
  *
  * Revision 1.2  2000/02/18 14:58:08  ivo
  * Tags are now copied into newly allocated images.
- * Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ * Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  1998/07/16  12:04:50  antje
  * initial import
@@ -88,16 +88,16 @@
 /*
 ** ipFunc includefiles
 */ 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
  
-ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
-                              ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
+                              mitkIpPicDescriptor *pic_old,
                               int *permutations_vector )
 ;
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncTranspose\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
+  static char *what = { "@(#)mitkIpFuncTranspose\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
 #endif 
  
 
@@ -106,12 +106,12 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
 /* 
 **  the action starts here
 */
-ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
-                              ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
+                              mitkIpPicDescriptor *pic_old,
                               int *permutations_vector )
 
 {
-  ipPicDescriptor *pic_return;
+  mitkIpPicDescriptor *pic_return;
   ipUInt4_t size  [_mitkIpPicNDIM];
   ipUInt4_t r_size[_mitkIpPicNDIM];
   ipUInt4_t index [_mitkIpPicNDIM];
@@ -172,8 +172,8 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
   /* 
   ** take over image header structure and allocate memory 
   */
-  ipPicFree( pic_old );
-  pic_return = ipPicCopyHeader( pic, NULL );
+  mitkIpPicFree( pic_old );
+  pic_return = mitkIpPicCopyHeader( pic, NULL );
   if (!pic_return)
     {
       if (default_perm)
@@ -181,12 +181,12 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
       return (0);
     }
 
-  pic_return->data = malloc( _ipPicSize(pic_return) );
+  pic_return->data = malloc( _mitkIpPicSize(pic_return) );
   if (!pic_return->data)
     {
       if (default_perm)
         free ((void *) permutations_vector);
-      ipPicFree (pic_return);
+      mitkIpPicFree (pic_return);
       return (0);
     }
 
@@ -243,7 +243,7 @@ ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_return, pic);
+  mitkIpFuncCopyTags(pic_return, pic);
 
   return( pic_return );
 }

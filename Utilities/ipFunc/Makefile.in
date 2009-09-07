@@ -74,8 +74,8 @@ EXTRA_DIST = libipFunc.dsp ipFunc.dsp ipFunc.dox
 
 bin_PROGRAMS = ipFunc
 lib_LIBRARIES = libipFunc.a
-pkginclude_HEADERS = ipFunc.h
-noinst_HEADERS =        gradient.h               	      ipArithmeticAndLogical.h 	      ipFuncP.h                	      ipGeometrical.h          	      ipLocal.h                	      ipMorphological.h        	      ipPointOperators.h       	      ipStatistical.h                  ipAdministrative.h
+pkginclude_HEADERS = mitkIpFunc.h
+noinst_HEADERS =        gradient.h               	      ipArithmeticAndLogical.h 	      mitkIpFuncP.h                	      ipGeometrical.h          	      ipLocal.h                	      ipMorphological.h        	      ipPointOperators.h       	      ipStatistical.h                  ipAdministrative.h
 
 
 ipFunc_LDADD = ./libipFunc.a ../ipPic/libipPic.a

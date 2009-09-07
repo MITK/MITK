@@ -27,12 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicHelper.h"
 #include "mitkImageTimeSelector.h"
 
-#include "ipFunc/ipFunc.h"
+#include "ipFunc/mitkIpFunc.h"
 #include <itkSmartPointerForwardReference.txx>
 #include <vtkImageData.h>
 #include <mitkImageWriter.h>
 #include "mitkDataTreeNodeFactory.h"
-#include <ipPicTypeMultiplex.h>
+#include <mitkIpPicTypeMultiplex.h>
 
 
 //template class itk::SmartPointerForwardReference<ImageDataItem>;
@@ -101,7 +101,7 @@ void* mitk::Image::GetData()
 
 double mitk::Image::GetPixelValue(const mitk::Point3D &position, unsigned int timestep)
 {
-  ipPicDescriptor* pic = this->GetPic();
+  mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
   if (this->GetTimeSteps() < timestep)
   {
@@ -135,7 +135,7 @@ vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
   return volume->GetVtkImageData();
 }
 
-ipPicDescriptor* mitk::Image::GetPic()
+mitkIpPicDescriptor* mitk::Image::GetPic()
 {
   if(m_Initialized==false)
   {
@@ -271,17 +271,17 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
           size_t offset = ((size_t) s)*size;
           memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
 
-          ipPicDescriptor * pic = sl->GetPicDescriptor();
+          mitkIpPicDescriptor * pic = sl->GetPicDescriptor();
 
           // replace old slice with reference to volume
           sl=new ImageDataItem(*vol, 2, data, importMemoryManagement == ManageMemory, ((size_t) s)*size);
           sl->SetComplete(true);
-          ipFuncCopyTags(sl->GetPicDescriptor(), pic);
+          mitkIpFuncCopyTags(sl->GetPicDescriptor(), pic);
           m_Slices[posSl]=sl;
         }
       }
       if(vol->GetPicDescriptor()->info->tags_head==NULL)
-        ipFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
+        mitkIpFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
     }
     return m_Volumes[pos]=vol;
   }
@@ -358,12 +358,12 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
           size_t offset = ((size_t) t)*m_OffsetTable[3]*(m_PixelType.GetBpe()/8);
           memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
-          ipPicDescriptor * pic = vol->GetPicDescriptor();
+          mitkIpPicDescriptor * pic = vol->GetPicDescriptor();
 
           // replace old volume with reference to channel
           vol=new ImageDataItem(*ch, 3, data, importMemoryManagement == ManageMemory, offset);
           vol->SetComplete(true);
-          ipFuncCopyTags(vol->GetPicDescriptor(), pic);
+          mitkIpFuncCopyTags(vol->GetPicDescriptor(), pic);
 
           m_Volumes[posVol]=vol;
 
@@ -377,7 +377,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
         }
       }
       if(ch->GetPicDescriptor()->info->tags_head==NULL)
-        ipFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
+        mitkIpFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
     }
     return m_Channels[n]=ch;
   }
@@ -583,7 +583,7 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
   return true;
 }
 
-bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
+bool mitk::Image::SetPicSlice(const mitkIpPicDescriptor *pic, int s, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if(pic->dim!=2) return false;
@@ -592,14 +592,14 @@ bool mitk::Image::SetPicSlice(const ipPicDescriptor *pic, int s, int t, int n, I
   {
     ImageDataItemPointer sl;
     sl=GetSliceData(s,t,n,NULL,CopyMemory);
-    ipFuncCopyTags(sl->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
+    mitkIpFuncCopyTags(sl->GetPicDescriptor(), const_cast<mitkIpPicDescriptor *>(pic));
     return true;
   }
   else
     return false;
 }
 
-bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
+bool mitk::Image::SetPicVolume(const mitkIpPicDescriptor *pic, int t, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if((pic->dim==2) && ((m_Dimension==2) || ((m_Dimension>2) && (m_Dimensions[2]==1)))) return SetPicSlice(pic, 0, t, n);
@@ -609,14 +609,14 @@ bool mitk::Image::SetPicVolume(const ipPicDescriptor *pic, int t, int n, ImportM
   {
     ImageDataItemPointer vol;
     vol=GetVolumeData(t,n,NULL,CopyMemory);
-    ipFuncCopyTags(vol->GetPicDescriptor(), const_cast<ipPicDescriptor *>(pic));
+    mitkIpFuncCopyTags(vol->GetPicDescriptor(), const_cast<mitkIpPicDescriptor *>(pic));
     return true;
   }
   else
     return false;
 }
 
-bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryManagementType /*importMemoryManagement*/)
+bool mitk::Image::SetPicChannel(const mitkIpPicDescriptor *pic, int n, ImportMemoryManagementType /*importMemoryManagement*/)
 {
   if(pic==NULL) return false;
   if(pic->dim<=3) return SetPicVolume(pic, 0, n);
@@ -632,7 +632,7 @@ bool mitk::Image::SetPicChannel(const ipPicDescriptor *pic, int n, ImportMemoryM
     ch=GetChannelData(n,NULL,CopyMemory);
     // commented the next line, because 
     // it crashes when called from mitkDICOMFileReader for the Live3D data
-    // ipFuncCopyTags(ch->GetPicDescriptor(), pic);
+    // mitkIpFuncCopyTags(ch->GetPicDescriptor(), pic);
     return true;
   }
   else
@@ -919,7 +919,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   delete [] tmpDimensions;
 }
 
-void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim, int sDim)
+void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int tDim, int sDim)
 {
   if(pic==NULL) return;
 

@@ -41,13 +41,13 @@ public:
 
 	static vtkImageData* loadVtkImage( char* fileName );
 	static vtkImageData* loadImage( char* fileName, bool littleEndian = true );
-	static vtkImageData* convert( ipPicDescriptor* pic );
-	static vtkImageData* convert( ipPicDescriptor* pic, unsigned long mask, int move );
-	static ipPicDescriptor* convert( vtkImageData* vtkImage );
-	static ipPicDescriptor* convertSigned2Unsigned( ipPicDescriptor*, unsigned long* offset = NULL );
+	static vtkImageData* convert( mitkIpPicDescriptor* pic );
+	static vtkImageData* convert( mitkIpPicDescriptor* pic, unsigned long mask, int move );
+	static mitkIpPicDescriptor* convert( vtkImageData* vtkImage );
+	static mitkIpPicDescriptor* convertSigned2Unsigned( mitkIpPicDescriptor*, unsigned long* offset = NULL );
 
-	static vtkImageData* convertVectorImage( ipPicDescriptor* pic );
-	static ipPicDescriptor* convertVectorImage( vtkImageData* vtkImage );
+	static vtkImageData* convertVectorImage( mitkIpPicDescriptor* pic );
+	static mitkIpPicDescriptor* convertVectorImage( vtkImageData* vtkImage );
 
 };
 

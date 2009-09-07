@@ -60,41 +60,41 @@
  *  @param pic_old  pointer to the original image
  *  @param mask    pointer to the kernel
  *  @param border  tells how the edge is transformed
- *  @arg @c  ipFuncBorderOld  :   original greyvalues
- *  @arg @c  ipFuncBorderZero :   edge is set to zero
+ *  @arg @c  mitkIpFuncBorderOld  :   original greyvalues
+ *  @arg @c  mitkIpFuncBorderZero :   edge is set to zero
  *
  *  @return pointer to the transformed image
  *
  * @par Uses
- *  @arg _ipFuncError()     - check the image data          
- *  @arg _ipFuncCompressM() - compress filtering mask
+ *  @arg _mitkIpFuncError()     - check the image data          
+ *  @arg _mitkIpFuncCompressM() - compress filtering mask
  *
  * AUTHOR & DATE
  */
 
 /* include files */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncEro ( ipPicDescriptor *pic_old,
-                             ipPicDescriptor *pic_mask,
-                             ipFuncFlagI_t   border );
+mitkIpPicDescriptor *mitkIpFuncEro ( mitkIpPicDescriptor *pic_old,
+                             mitkIpPicDescriptor *pic_mask,
+                             mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
-ipPicDescriptor *ipFuncEro ( ipPicDescriptor *pic_old,
-                             ipPicDescriptor *pic_mask,
-                             ipFuncFlagI_t   border )
+mitkIpPicDescriptor *mitkIpFuncEro ( mitkIpPicDescriptor *pic_old,
+                             mitkIpPicDescriptor *pic_mask,
+                             mitkIpFuncFlagI_t   border )
 { 
-   ipPicDescriptor *pic_new;
+   mitkIpPicDescriptor *pic_new;
 
-   pic_new = _ipFuncMorph ( pic_old, pic_mask, ipFuncEroF, border );
-   if ( border == ipFuncBorderZero )
-     pic_new = ipFuncBorder ( pic_new, pic_mask, pic_new );
+   pic_new = _mitkIpFuncMorph ( pic_old, pic_mask, mitkIpFuncEroF, border );
+   if ( border == mitkIpFuncBorderZero )
+     pic_new = mitkIpFuncBorder ( pic_new, pic_mask, pic_new );
 
    /* Copy Tags */
 
-   ipFuncCopyTags(pic_new, pic_old);
+   mitkIpFuncCopyTags(pic_new, pic_old);
    
    
 

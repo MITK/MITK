@@ -62,9 +62,9 @@
  * AUTHOR & DATE
  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t  ipFuncMeanR  ( ipPicDescriptor *pic_old,
+ipFloat8_t  mitkIpFuncMeanR  ( mitkIpPicDescriptor *pic_old,
                            ipUInt4_t       *begin, 
                            ipUInt4_t       *length );
 #ifndef DOXYGEN_IGNORE
@@ -74,18 +74,18 @@ ipFloat8_t  ipFuncMeanR  ( ipPicDescriptor *pic_old,
 #endif
 
 
-ipFloat8_t  ipFuncMeanR  ( ipPicDescriptor *pic_old,
+ipFloat8_t  mitkIpFuncMeanR  ( mitkIpPicDescriptor *pic_old,
                            ipUInt4_t       *begin, 
                            ipUInt4_t       *length )
 {
    ipFloat8_t      mean;        /* mean value          */
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
 
-   pic_help = ipFuncWindow ( pic_old, begin, length );
+   pic_help = mitkIpFuncWindow ( pic_old, begin, length );
 
-   mean = ipFuncMean ( pic_help );
+   mean = mitkIpFuncMean ( pic_help );
 
-   ipPicFree ( pic_help );
+   mitkIpPicFree ( pic_help );
 
    return ( mean );
 }

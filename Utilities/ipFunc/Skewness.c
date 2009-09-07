@@ -62,11 +62,11 @@
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
  
 /* definition of extreme value macro                          */
 
-ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic );
+ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -76,7 +76,7 @@ ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic );
                                                                \
     skew = 0.;                                               \
                                                                \
-    no_elem = _ipPicElements ( pic );                          \
+    no_elem = _mitkIpPicElements ( pic );                          \
     for ( i = 0; i < no_elem; i++ )                            \
       {                                                        \
         skew = ( ( ( type * ) pic->data ) [i] - mean ) *     \
@@ -93,7 +93,7 @@ ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic );
 */
 /* ========================================================== */
 
-ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic )
+ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic )
 {
 
   ipFloat8_t var;             
@@ -103,18 +103,18 @@ ipFloat8_t ipFuncSkewness ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
 
-  if (  _ipPicElements ( pic ) == 1 ) var = 0;
+  if (  _mitkIpPicElements ( pic ) == 1 ) var = 0;
   else
     {
        
-       mean =  ipFuncMean ( pic );
-	   std = ipFuncSDev( pic );
+       mean =  mitkIpFuncMean ( pic );
+	   std = mitkIpFuncSDev( pic );
 
        mitkIpPicFORALL_2( SKEWNESS, pic, mean,  skew );   
   
-       var =   skew / (( ipFloat8_t ) (( _ipPicElements ( pic ) - 1 ) *std*std*std));
+       var =   skew / (( ipFloat8_t ) (( _mitkIpPicElements ( pic ) - 1 ) *std*std*std));
     }
 
   return( var );

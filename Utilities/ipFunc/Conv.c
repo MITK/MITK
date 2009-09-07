@@ -52,8 +52,8 @@
  *  @param pic_old pointer to the image that should be convolved   
  *  @param mask pointer to the mask that is used for convolution
  *  @param border tells how the edge is transformed              
- *  @arg @c ipFuncFlagBorderOld  : original greyvalues         
- *  @arg @c ipFuncFlagBorderZero : edge is set to minimal greyvalue
+ *  @arg @c mitkIpFuncFlagBorderOld  : original greyvalues         
+ *  @arg @c mitkIpFuncFlagBorderZero : edge is set to minimal greyvalue
  *
  *  @return pointer to the convolved image 
  *
@@ -62,16 +62,16 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,           
-                             ipPicDescriptor *pic_mask, 
-                             ipFuncFlagI_t   border );
+mitkIpPicDescriptor *mitkIpFuncConv( mitkIpPicDescriptor *pic_old,           
+                             mitkIpPicDescriptor *pic_mask, 
+                             mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncConv\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncConv\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -89,7 +89,7 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
                                                                          \
    /* calculate max. and min. possible greyvalues                     */ \
                                                                          \
-   _ipFuncExtT ( pic->type, pic->bpe, &min_gv, &max_gv );                \
+   _mitkIpFuncExtT ( pic->type, pic->bpe, &min_gv, &max_gv );                \
    data = pic->data;                                                     \
    data_new = pic_new->data;                                             \
                                                                          \
@@ -156,27 +156,27 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,           
-                             ipPicDescriptor *pic_mask, 
-                             ipFuncFlagI_t   border )
+mitkIpPicDescriptor *mitkIpFuncConv( mitkIpPicDescriptor *pic_old,           
+                             mitkIpPicDescriptor *pic_mask, 
+                             mitkIpFuncFlagI_t   border )
 {
 
-  ipPicDescriptor *pic_new;           /* convolved  image               */
+  mitkIpPicDescriptor *pic_new;           /* convolved  image               */
   ipUInt4_t       i;                  /* loopindex                      */
   ipInt4_t        beg[_mitkIpPicNDIM];
   ipInt4_t        end[_mitkIpPicNDIM];
-  ipFuncMasc_t    *m;                 /* length of mask and offsets     */
+  mitkIpFuncMasc_t    *m;                 /* length of mask and offsets     */
   ipUInt4_t       size[_mitkIpPicNDIM];                                    
 
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old  ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old  ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( ( pic_mask->dim > pic_old->dim ) || ( pic_mask->dim < 1 ) )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
   
@@ -184,33 +184,33 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
     {
        if ( pic_mask->n[i] > pic_old->n[i] )
          {
-            _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
             return ( mitkIpFuncERROR );
          }
     }
 
   /* create a new picture, copy the header, allocate memory             */
 
-  if ( border == ipFuncBorderOld ) 
+  if ( border == mitkIpFuncBorderOld ) 
     {
-     /*pic_new = _ipFuncBorder ( pic_old, pic_mask, ipFuncBorderOld );*/
-       pic_new = ipPicClone ( pic_old );          
+     /*pic_new = _mitkIpFuncBorder ( pic_old, pic_mask, mitkIpFuncBorderOld );*/
+       pic_new = mitkIpPicClone ( pic_old );          
     }
-  else if ( border == ipFuncBorderZero )
+  else if ( border == mitkIpFuncBorderZero )
     { 
-   /*  pic_new = _ipFuncBorder ( pic_old, pic_mask, ipFuncBorderZero ); */ 
-       pic_new = ipPicCopyHeader ( pic_old, 0 );
-       pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe/8  );    
+   /*  pic_new = _mitkIpFuncBorder ( pic_old, pic_mask, mitkIpFuncBorderZero ); */ 
+       pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
+       pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe/8  );    
     }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
  
@@ -221,7 +221,7 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
 
   /* compress mask                                                      */
 
-  m =  _ipFuncCompressM ( pic_mask, pic_old, ipFuncReflect, beg, end );  
+  m =  _mitkIpFuncCompressM ( pic_mask, pic_old, mitkIpFuncReflect, beg, end );  
   if ( m == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to convolve  an image (for all data types)                   */
@@ -233,7 +233,7 @@ ipPicDescriptor *ipFuncConv( ipPicDescriptor *pic_old,
   free ( m->mask_vekt );
   free ( m );
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
      
 

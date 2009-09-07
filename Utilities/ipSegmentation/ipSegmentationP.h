@@ -29,7 +29,7 @@ extern "C"
 #endif
 
 #define ipMITKSegmentationTYPE ipUInt1_t
-#define ipMITKSegmentationTYPE_ID ipPicUInt
+#define ipMITKSegmentationTYPE_ID mitkIpPicUInt
 #define ipMITKSegmentationBPE 8
 #define tagSEGMENTATION_EMPTY "SEGMENTATION_EMPTY"
 
@@ -40,8 +40,8 @@ enum LogicalOp {
     IPSEGMENTATION_XOR  /*! the exclusive-or operator */
 };
 
-extern void ipMITKSegmentationUndoSave (ipPicDescriptor* segmentation);
-extern ipBool_t ipMITKSegmentationUndoIsEnabled (ipPicDescriptor* segmentation);
+extern void ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation);
+extern ipBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

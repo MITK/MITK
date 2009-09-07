@@ -46,7 +46,7 @@
 
 /* include files                                                         */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 #ifdef _WIN32
 #define strcasecmp _stricmp
@@ -60,18 +60,18 @@ main (int argc, char **argv)
 {
 	/* variables                                                          */
 	
-	ipPicDescriptor *pic_new=NULL;   /* image descriptors            */
-	ipPicDescriptor *pic_ret=NULL;   /* image descriptors            */
-	ipPicDescriptor *pic_hlp=NULL;   /* image descriptors            */
-	ipPicDescriptor *pic_old=NULL;   /* image descriptors            */
-	ipPicDescriptor *pic_mask=NULL;  /* convolution mask             */
-	ipPicDescriptor *mask_1=NULL, *mask_2=NULL;     /* convolution mask             */
+	mitkIpPicDescriptor *pic_new=NULL;   /* image descriptors            */
+	mitkIpPicDescriptor *pic_ret=NULL;   /* image descriptors            */
+	mitkIpPicDescriptor *pic_hlp=NULL;   /* image descriptors            */
+	mitkIpPicDescriptor *pic_old=NULL;   /* image descriptors            */
+	mitkIpPicDescriptor *pic_mask=NULL;  /* convolution mask             */
+	mitkIpPicDescriptor *mask_1=NULL, *mask_2=NULL;     /* convolution mask             */
 	char            operation[PATH_MAX];  /* image processing operation   */
 	char            pic_name[PATH_MAX];   /* file name of original image  */
 	char            pic_name_t[PATH_MAX]; /* file name of transformed im. */
 	char            mask_name[PATH_MAX];  /* file name of transformed im. */
 	char            error_nr[PATH_MAX];   /* file name of transformed im. */
-	ipPicType_t     type;
+	mitkIpPicType_t     type;
 	ipUInt4_t       range;                /* result of range function     */
 	ipUInt4_t       no_label;
 	ipUInt4_t       border;               /* handling of the borders      */
@@ -129,7 +129,7 @@ main (int argc, char **argv)
 	if( ((unsigned int) argc != 2) && (strcasecmp (argv[2], "-h") != 0))
 	{
 		strcpy ( pic_name, argv[2]);
-		pic_old = ipPicGet ( pic_name, NULL );
+		pic_old = mitkIpPicGet ( pic_name, NULL );
 		pic_ret = pic_old;
 		if ( pic_old == NULL )
 		{
@@ -144,7 +144,7 @@ main (int argc, char **argv)
             printf ( " usage: ipFunc Inv infile outfile \n" );
             exit ( 1 );
 		}
-		pic_new = ipFuncInv ( pic_old, pic_ret );
+		pic_new = mitkIpFuncInv ( pic_old, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Label" ) == 0 )
 	{
@@ -153,7 +153,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Label infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncLabel ( pic_old, &no_label );
+		pic_new = mitkIpFuncLabel ( pic_old, &no_label );
 		printf ("Number of Labels: %d \n", no_label );
 	}
     else if ( strcasecmp ( operation, "RegGrow" ) == 0 )
@@ -180,7 +180,7 @@ main (int argc, char **argv)
 		s_der=atof(argv[6+pic_old->dim*2]);
 		sscanf  ( argv[7+pic_old->dim*2], "%d", &kind );
 
-		pic_new = ipFuncRegGrow ( pic_old, pic_old->dim, begin, length, blabel, rlabel, s_der, kind );
+		pic_new = mitkIpFuncRegGrow ( pic_old, pic_old->dim, begin, length, blabel, rlabel, s_der, kind );
 		free ( begin );
 		free ( length );
 	}
@@ -192,15 +192,15 @@ main (int argc, char **argv)
 		{
             printf("Usage: ipFunc convert infile outfile type bpe \n");
 			printf("type must be given as number\n");
-			printf("type:     ipPicInt           =   3\n");
-			printf("          ipPicUInt          =   4\n");
-			printf("          ipPicFloat         =   5\n");
+			printf("type:     mitkIpPicInt           =   3\n");
+			printf("          mitkIpPicUInt          =   4\n");
+			printf("          mitkIpPicFloat         =   5\n");
 			exit(1);
 		}
 		sscanf  ( argv[4],"%d", &rank );
 		sscanf  ( argv[5],"%d", &range );
 		type = rank;
-		pic_new = ipFuncConvert ( pic_old, rank, range );
+		pic_new = mitkIpFuncConvert ( pic_old, rank, range );
 	}
     else if ( strcasecmp ( operation, "Refl" ) == 0 )
 	{
@@ -216,7 +216,7 @@ main (int argc, char **argv)
 			exit(1);
 		}
 		sscanf  ( argv[4], "%d", &axis );
-		pic_new = ipFuncRefl ( pic_old, axis );
+		pic_new = mitkIpFuncRefl ( pic_old, axis );
 	}
     else if ( strcasecmp ( operation, "Sqrt" ) == 0 )
 	{
@@ -225,8 +225,8 @@ main (int argc, char **argv)
 			printf ( " ipFunc Sqrt infile outfile \n" );
 			exit ( 1 );
 		}
-		keep = ipFuncKeep; 
-		pic_new = ipFuncSqrt ( pic_old, keep, pic_ret );
+		keep = mitkIpFuncKeep; 
+		pic_new = mitkIpFuncSqrt ( pic_old, keep, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Pot" ) == 0 )
 	{
@@ -237,10 +237,10 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc Pot infile outfile exponent \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		sscanf  ( argv[4], "%lf", &value );
-		pic_new = ipFuncPot ( pic_old, value, keep, pic_ret );
-		printf ( " Fehler : %d \n", ipFuncErrno );
+		pic_new = mitkIpFuncPot ( pic_old, value, keep, pic_ret );
+		printf ( " Fehler : %d \n", mitkIpFuncErrno );
 	}
     else if ( strcasecmp ( operation, "DivC" ) == 0 )
 	{
@@ -251,9 +251,9 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc DivC infile outfile value \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		sscanf  ( argv[4], "%lf", &value );
-		pic_new = ipFuncDivC ( pic_old, value, keep, pic_ret  );
+		pic_new = mitkIpFuncDivC ( pic_old, value, keep, pic_ret  );
 	}
     else if ( strcasecmp ( operation, "MultC" ) == 0 )
 	{
@@ -264,9 +264,9 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc MultC infile outfile value \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		sscanf  ( argv[4], "%lf", &value );
-		pic_new = ipFuncMultC ( pic_old, value, keep, pic_ret );
+		pic_new = mitkIpFuncMultC ( pic_old, value, keep, pic_ret );
 	}
     else if ( strcasecmp ( operation, "SubC" ) == 0 )
 	{
@@ -277,9 +277,9 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc SubC infile outfile value    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		sscanf  ( argv[4], "%lf", &value );
-		pic_new = ipFuncSubC ( pic_old, value, keep, pic_ret );
+		pic_new = mitkIpFuncSubC ( pic_old, value, keep, pic_ret );
 	}
     else if ( strcasecmp ( operation, "AddC" ) == 0 )
 	{
@@ -290,9 +290,9 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc AddC infile outfile value    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		sscanf  ( argv[4], "%lf", &value );
-		pic_new = ipFuncAddC ( pic_old, value, keep, pic_ret );
+		pic_new = mitkIpFuncAddC ( pic_old, value, keep, pic_ret );
 	}
     else if ( strcasecmp ( operation, "AddSl" ) == 0 )
 	{
@@ -303,8 +303,8 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc AddSl infile outfile    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
-		pic_new = ipFuncAddSl ( pic_old, keep );                
+		keep = mitkIpFuncKeep; 
+		pic_new = mitkIpFuncAddSl ( pic_old, keep );                
 	}
     else if ( strcasecmp ( operation, "DivI" ) == 0 )
 	{
@@ -315,12 +315,12 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc DivI infile outfile image    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncDivI ( pic_old, pic_hlp, keep, pic_ret );
+			pic_new = mitkIpFuncDivI ( pic_old, pic_hlp, keep, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -333,12 +333,12 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc MultI infile outfile image    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncMultI ( pic_old, pic_hlp, keep, pic_ret );
+			pic_new = mitkIpFuncMultI ( pic_old, pic_hlp, keep, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -351,12 +351,12 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc AddI infile outfile image    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncAddI ( pic_old, pic_hlp, keep, pic_ret );
+			pic_new = mitkIpFuncAddI ( pic_old, pic_hlp, keep, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -369,12 +369,12 @@ main (int argc, char **argv)
 			printf("Usage: ipFunc SubI infile outfile image    \n");
 			exit(1);
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncSubI ( pic_old, pic_hlp, keep, pic_ret );
+			pic_new = mitkIpFuncSubI ( pic_old, pic_hlp, keep, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -389,9 +389,9 @@ main (int argc, char **argv)
 		}
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncOr ( pic_old, pic_hlp, pic_ret );
+			pic_new = mitkIpFuncOr ( pic_old, pic_hlp, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -406,9 +406,9 @@ main (int argc, char **argv)
 		}
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_hlp != NULL ) 
-			pic_new = ipFuncAnd ( pic_old, pic_hlp, pic_ret );
+			pic_new = mitkIpFuncAnd ( pic_old, pic_hlp, pic_ret );
 		else 
 			printf ( " iamge doesn't exist \n" ); 
 	}
@@ -419,7 +419,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Not infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncNot ( pic_old, NULL );
+		pic_new = mitkIpFuncNot ( pic_old, NULL );
 	}
     else if ( strcasecmp ( operation, "Close" ) == 0 )
 	{
@@ -431,15 +431,15 @@ main (int argc, char **argv)
 			printf("  mask must be the name of a PIC-file containing the mask \n" );
 			exit(1);
 		}
-		border = ipFuncBorderZero;
+		border = mitkIpFuncBorderZero;
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_mask = ipPicGet ( mask_name, NULL );
-        ipPicPut ( "Test.mask", pic_mask );
+		pic_mask = mitkIpPicGet ( mask_name, NULL );
+        mitkIpPicPut ( "Test.mask", pic_mask );
 		if ( pic_mask != NULL )
 		{
-			pic_new = ipFuncClose( pic_old, pic_mask, border );
-			ipPicFree ( pic_mask );
+			pic_new = mitkIpFuncClose( pic_old, pic_mask, border );
+			mitkIpPicFree ( pic_mask );
 		}
 		else
 			printf ( " iamge doesn't exist \n" );
@@ -454,14 +454,14 @@ main (int argc, char **argv)
 			printf("  mask must be the name of a PIC-file containing the mask \n" );
 			exit(1);
 		}
-		border = ipFuncBorderZero;
+		border = mitkIpFuncBorderZero;
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_mask = ipPicGet ( mask_name, NULL );
+		pic_mask = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_mask != NULL )
 		{
-			pic_new = ipFuncOpen ( pic_old, pic_mask, border );
-			ipPicFree ( pic_mask );
+			pic_new = mitkIpFuncOpen ( pic_old, pic_mask, border );
+			mitkIpPicFree ( pic_mask );
 		}
 		else
 			printf ( " iamge doesn't exist \n" );
@@ -476,14 +476,14 @@ main (int argc, char **argv)
 			printf("  mask must be the name of a PIC-file containing the mask \n" );
 			exit(1);
 		}
-		border = ipFuncBorderZero;
+		border = mitkIpFuncBorderZero;
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_mask = ipPicGet ( mask_name, NULL );
+		pic_mask = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_mask != NULL )
 		{
-			pic_new = ipFuncDila  ( pic_old, pic_mask, border );
-			ipPicFree ( pic_mask );
+			pic_new = mitkIpFuncDila  ( pic_old, pic_mask, border );
+			mitkIpPicFree ( pic_mask );
 		}
 		else
 			printf ( " iamge doesn't exist \n" );
@@ -498,14 +498,14 @@ main (int argc, char **argv)
 			printf("  mask must be the name of a PIC-file containing the mask \n" );
 			exit(1);
 		}
-		border = ipFuncBorderZero;
+		border = mitkIpFuncBorderZero;
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_mask = ipPicGet ( mask_name, NULL );
+		pic_mask = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_mask != NULL )
 		{
-			pic_new = ipFuncEro   ( pic_old, pic_mask, border );
-			ipPicFree ( pic_mask );
+			pic_new = mitkIpFuncEro   ( pic_old, pic_mask, border );
+			mitkIpPicFree ( pic_mask );
 		}
 		else
 			printf ( " iamge doesn't exist \n" );
@@ -515,11 +515,11 @@ main (int argc, char **argv)
 	strcpy ( mask_name, "" );
 	printf ( " mask name 1     : " );
 	scanf  ( "%s", mask_name );
-	mask_1 = ipPicGet ( mask_name, NULL );
+	mask_1 = mitkIpPicGet ( mask_name, NULL );
 	if ( mask_1 != NULL )
 	{
-	pic_new = ipFuncHitMissI( pic_old, mask_1, ipFuncBorderZero );
-	ipPicFree ( mask_1 );
+	pic_new = mitkIpFuncHitMissI( pic_old, mask_1, mitkIpFuncBorderZero );
+	mitkIpPicFree ( mask_1 );
 	}
 	else 
 	printf ( " iamge doesn't exist \n" ); 
@@ -543,7 +543,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%lf", &sc[i] );
 		}
         sscanf ( argv[4+pic_old->dim], "%d", &keep );
-		pic_new = ipFuncScale ( pic_old, sc, keep );
+		pic_new = mitkIpFuncScale ( pic_old, sc, keep );
 		pic_ret = NULL;
 		free(sc);
 	}
@@ -562,7 +562,7 @@ main (int argc, char **argv)
 		{
 			sscanf  ( argv[4+i], "%d", &perm[i] );
 		}
-		pic_new = ipFuncTranspose ( pic_old, NULL, perm );
+		pic_new = mitkIpFuncTranspose ( pic_old, NULL, perm );
 		pic_ret = NULL;
 		free(perm);
 	}
@@ -577,7 +577,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncRoberts ( pic_old, dim_mask, border  );
+		pic_new = mitkIpFuncRoberts ( pic_old, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "GaussF" ) == 0 )
 	{
@@ -591,7 +591,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%d", &len_mask );
 		sscanf  ( argv[5], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncGausF ( pic_old, len_mask, dim_mask, border  );
+		pic_new = mitkIpFuncGausF ( pic_old, len_mask, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "Canny" ) == 0 )
 	{
@@ -606,8 +606,8 @@ main (int argc, char **argv)
 		sscanf  ( argv[5], "%d", &dim_mask );
 		sscanf  ( argv[6], "%lf", &threshold );
 		border = 3;
-		if ( pic_new != NULL ) ipPicFree ( pic_new );
-		pic_new = ipFuncCanny ( pic_old, dim_mask, len_mask,
+		if ( pic_new != NULL ) mitkIpPicFree ( pic_new );
+		pic_new = mitkIpFuncCanny ( pic_old, dim_mask, len_mask,
 			threshold, border );
 	}
     else if ( strcasecmp ( operation, "Rank" ) == 0 )
@@ -623,7 +623,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[5], "%d", &dim_mask );
 		sscanf  ( argv[6], "%d", &rank );
 		border = 3;
-		pic_new = ipFuncRank ( pic_old, rank, dim_mask, len_mask, border  );
+		pic_new = mitkIpFuncRank ( pic_old, rank, dim_mask, len_mask, border  );
 	}
     else if ( strcasecmp ( operation, "MeanF" ) == 0 )
 	{
@@ -637,7 +637,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%d", &len_mask );
 		sscanf  ( argv[5], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncMeanF ( pic_old, len_mask, dim_mask, border  );
+		pic_new = mitkIpFuncMeanF ( pic_old, len_mask, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "Shp" ) == 0 )
 	{
@@ -651,7 +651,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%d", &len_mask );
 		sscanf  ( argv[5], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncShp ( pic_old, dim_mask, border, len_mask  );
+		pic_new = mitkIpFuncShp ( pic_old, dim_mask, border, len_mask  );
 	}
     else if ( strcasecmp ( operation, "Laplace" ) == 0 )
 	{
@@ -664,7 +664,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncLaplace ( pic_old, dim_mask, border  );
+		pic_new = mitkIpFuncLaplace ( pic_old, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "Sobel" ) == 0 )
 	{
@@ -677,7 +677,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncSobel ( pic_old, dim_mask, border  );
+		pic_new = mitkIpFuncSobel ( pic_old, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "Grad" ) == 0 )
 	{
@@ -690,7 +690,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%d", &dim_mask );
 		border = 3;
-		pic_new = ipFuncGrad ( pic_old, dim_mask, border  );
+		pic_new = mitkIpFuncGrad ( pic_old, dim_mask, border  );
 	}
     else if ( strcasecmp ( operation, "Thresh" ) == 0 )
 	{
@@ -702,7 +702,7 @@ main (int argc, char **argv)
 			exit(1);
 		}
 		sscanf  ( argv[4], "%lf", &threshold );
-		pic_new = ipFuncThresh ( pic_old, threshold, pic_ret );
+		pic_new = mitkIpFuncThresh ( pic_old, threshold, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Conv" ) == 0 )
 	{
@@ -716,13 +716,13 @@ main (int argc, char **argv)
 		}
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		border = ipFuncBorderZero;
+		border = mitkIpFuncBorderZero;
 		
-		pic_mask = ipPicGet ( mask_name, NULL );
+		pic_mask = mitkIpPicGet ( mask_name, NULL );
 		if ( pic_mask != NULL )
 		{
-			pic_new = ipFuncConv ( pic_old, pic_mask, border );
-			ipPicFree ( pic_mask );
+			pic_new = mitkIpFuncConv ( pic_old, pic_mask, border );
+			mitkIpPicFree ( pic_mask );
 		}
 	}
     else if ( strcasecmp ( operation, "ZeroCr" ) == 0 )
@@ -732,7 +732,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc ZeroCr infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncZeroCr ( pic_old );
+		pic_new = mitkIpFuncZeroCr ( pic_old );
 	}
     else if ( strcasecmp ( operation, "Exp" ) == 0 )
 	{
@@ -741,7 +741,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Exp infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncExp ( pic_old, ipFuncMinMax, pic_ret );
+		pic_new = mitkIpFuncExp ( pic_old, mitkIpFuncMinMax, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Log" ) == 0 )
 	{
@@ -750,7 +750,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Log infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncLog ( pic_old );
+		pic_new = mitkIpFuncLog ( pic_old );
 	}
     else if ( strcasecmp ( operation, "LN" ) == 0 )
 	{
@@ -759,7 +759,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc LN infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncLN ( pic_old );
+		pic_new = mitkIpFuncLN ( pic_old );
 	}
     else if ( strcasecmp ( operation, "Norm" ) == 0 )
 	{
@@ -768,7 +768,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Norm infile outfile \n" );
 			exit ( 1 );
 		}
-		pic_new = ipFuncNorm ( pic_old, pic_ret );
+		pic_new = mitkIpFuncNorm ( pic_old, pic_ret );
 	}
     else if ( strcasecmp ( operation, "NormXY" ) == 0 )
 	{
@@ -781,7 +781,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4],"%lf", &min_gv );
 		sscanf  ( argv[5],"%lf", &max_gv );
-		pic_new = ipFuncNormXY ( pic_old, min_gv, max_gv, pic_ret );
+		pic_new = mitkIpFuncNormXY ( pic_old, min_gv, max_gv, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Equal" ) == 0 )
 	{
@@ -790,8 +790,8 @@ main (int argc, char **argv)
 			printf ( " ipFunc Equal infile outfile \n" );
 			exit ( 1 );
 		}
-		keep    = ipFuncMinMax;
-		pic_new = ipFuncEqual ( pic_old, keep, pic_ret );
+		keep    = mitkIpFuncMinMax;
+		pic_new = mitkIpFuncEqual ( pic_old, keep, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Extr" ) == 0 )
 	{
@@ -800,7 +800,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Extr infile  \n" );
 			exit ( 1 );
 		}
-		ipFuncExtr ( pic_old, &min, &max );
+		mitkIpFuncExtr ( pic_old, &min, &max );
         picput_flag = ipFalse;
 		printf  ( " min: %12.2lf max: %12.2lf \n", min, max );
 	}
@@ -812,7 +812,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Inertia infile  \n" );
 			exit ( 1 );
 		}
-		ipFuncInertia ( pic_old, &inertia, &ev );
+		mitkIpFuncInertia ( pic_old, &inertia, &ev );
         picput_flag = ipFalse;
         for ( i = 0; i < pic_old->dim; i++ ) 
 			printf  ( " eigenvalue[%d] = %lf \n", i, ev[i] );
@@ -827,7 +827,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Grav infile  \n" );
 			exit ( 1 );
 		}
-		grav = ipFuncGrav ( pic_old );
+		grav = mitkIpFuncGrav ( pic_old );
         picput_flag = ipFalse;
         for ( i = 0; i < pic_old->dim; i++ ) 
 			printf  ( " center of gravity[%d] = %lf \n", i, grav[i] );
@@ -839,7 +839,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Median infile  \n" );
 			exit ( 1 );
 		}
-		mean = ipFuncMedI ( pic_old );
+		mean = mitkIpFuncMedI ( pic_old );
 		printf  ( " median: %lf\n", mean );
 	}
     else if ( strcasecmp ( operation, "Mean" ) == 0 )
@@ -849,7 +849,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Mean infile  \n" );
 			exit ( 1 );
 		}
-		mean = ipFuncMean ( pic_old );
+		mean = mitkIpFuncMean ( pic_old );
 		printf  ( " mean: %lf\n", mean );
 	}
     else if ( strcasecmp ( operation, "Var" ) == 0 )
@@ -859,7 +859,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc Var infile  \n" );
 			exit ( 1 );
 		}
-		var = ipFuncVar ( pic_old );
+		var = mitkIpFuncVar ( pic_old );
 		printf  ( " variance : %lf\n", var );
 	}
     else if ( strcasecmp ( operation, "SDev" ) == 0 )
@@ -869,7 +869,7 @@ main (int argc, char **argv)
 			printf ( " ipFunc SDev infile  \n" );
 			exit ( 1 );
 		}
-		s_der = ipFuncSDev ( pic_old );
+		s_der = mitkIpFuncSDev ( pic_old );
 		printf  ( " standard derivation : %lf\n", s_der );
 	}
     else if ( strcasecmp ( operation, "SelMM" ) == 0 )
@@ -883,7 +883,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%lf", &gv_low );
 		sscanf  ( argv[5], "%lf", &gv_up );
-		pic_new = ipFuncSelMM ( pic_old, gv_low, gv_up, pic_ret );
+		pic_new = mitkIpFuncSelMM ( pic_old, gv_low, gv_up, pic_ret );
 	}
     /*
 	else if ( strcasecmp ( operation, "sel_mm_inv" ) == 0 )
@@ -896,7 +896,7 @@ main (int argc, char **argv)
 	scanf  ( "%lf", &gv_new_low );
 	printf ( " upper greyvalue (new): " );
 	scanf  ( "%lf", &gv_new_up );
-	pic_new = ipFuncSelMM_Inv ( pic_old, gv_low, gv_up, gv_new_low, gv_new_up, pic_ret );
+	pic_new = mitkIpFuncSelMM_Inv ( pic_old, gv_low, gv_up, gv_new_low, gv_new_up, pic_ret );
 	}
     */
     else if ( strcasecmp ( operation, "Select" ) == 0 )
@@ -911,7 +911,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%lf", &gv_low );
 		sscanf  ( argv[5], "%lf", &gv_up );
 		sscanf  ( argv[6], "%lf", &gv );
-		pic_new = ipFuncSelect ( pic_old, gv_low, gv_up, gv, pic_ret );
+		pic_new = mitkIpFuncSelect ( pic_old, gv_low, gv_up, gv, pic_ret );
 	}
     else if ( strcasecmp ( operation, "SelInv" ) == 0 )
 	{
@@ -925,7 +925,7 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%lf", &gv_low );
 		sscanf  ( argv[5], "%lf", &gv_up );
 		sscanf  ( argv[6], "%lf", &gv );
-		pic_new = ipFuncSelInv ( pic_old, gv_low, gv_up, gv, pic_ret );
+		pic_new = mitkIpFuncSelInv ( pic_old, gv_low, gv_up, gv, pic_ret );
 	}
     else if ( strcasecmp ( operation, "LevWin" ) == 0 )
 	{
@@ -938,7 +938,7 @@ main (int argc, char **argv)
 		}
 		sscanf  ( argv[4], "%lf", &gv_low );
 		sscanf  ( argv[5], "%lf", &gv_up );
-		pic_new = ipFuncLevWin ( pic_old, gv_low, gv_up, pic_ret );
+		pic_new = mitkIpFuncLevWin ( pic_old, gv_low, gv_up, pic_ret );
 	}
     else if ( strcasecmp ( operation, "Box" ) == 0 )
 	{
@@ -948,7 +948,7 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
         picput_flag = ipFalse; length=NULL;
-        ipFuncBox ( pic_old, &begin, &length );
+        mitkIpFuncBox ( pic_old, &begin, &length );
         for ( i =0; i < pic_old->dim; i++ )
 			printf ( " [%d]\t links oben  %d \t\t rechts unten: %d \n", i, begin[i], length[i] );
 	}
@@ -967,14 +967,14 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		}
         sscanf ( argv[4+pic_old->dim], "%lf", &value );
-        pic_mask = ipPicNew ();
+        pic_mask = mitkIpPicNew ();
         pic_mask->type = 3;
         pic_mask->bpe  = 16;
         pic_mask->dim  = pic_old->dim;  
 		for ( i = 0; i < pic_old->dim; i++ )
 			pic_mask->n[i] = begin[i] *2 + 1;
-		pic_new = ipFuncBorderX ( pic_old, pic_mask, value, NULL );                
-        ipPicFree ( pic_mask );
+		pic_new = mitkIpFuncBorderX ( pic_old, pic_mask, value, NULL );                
+        mitkIpPicFree ( pic_mask );
 		free ( begin );
 	}
     else if ( strcasecmp ( operation, "Frame" ) == 0 )
@@ -992,7 +992,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		}
         sscanf ( argv[4+pic_old->dim], "%lf", &value );
-		pic_new = ipFuncFrame ( pic_old, begin, value );                
+		pic_new = mitkIpFuncFrame ( pic_old, begin, value );                
 		free ( begin );
 	}
     else if ( strcasecmp ( operation, "WindowR" ) == 0 )
@@ -1004,16 +1004,16 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc WindowR infile outfile image beg1...begn \n" );
 			exit ( 1 );
 		}
-		keep = ipFuncKeep; 
+		keep = mitkIpFuncKeep; 
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
-		pic_hlp = ipPicGet ( mask_name, NULL );
+		pic_hlp = mitkIpPicGet ( mask_name, NULL );
 		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[5+i], "%d", &begin[i] );
 		}
-		pic_new = ipFuncWindowR ( pic_old, pic_hlp, begin, ipFuncNoKeep );
+		pic_new = mitkIpFuncWindowR ( pic_old, pic_hlp, begin, mitkIpFuncNoKeep );
 		free ( begin );
 	}
     else if ( strcasecmp ( operation, "Rotate" ) == 0 )
@@ -1031,7 +1031,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &grad[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &order[i] );
-		pic_new = ipFuncRotate ( pic_old, NULL, grad, order );
+		pic_new = mitkIpFuncRotate ( pic_old, NULL, grad, order );
 		free ( grad );
 		free ( order );
 	}
@@ -1051,7 +1051,7 @@ main (int argc, char **argv)
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
         printf ( " %d %d %d       %d %d %d \n", begin[0], begin[1], begin[2], length[0], length[1], length[2] );
-		pic_new = ipFuncWindow ( pic_old, begin, length );
+		pic_new = mitkIpFuncWindow ( pic_old, begin, length );
 		free ( begin );
 		free ( length );
 	}
@@ -1075,7 +1075,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[5+i], "%d", &begin[i] );
 		for ( i = 0; i < radius; i++ )
 			sscanf  ( argv[5+radius+i], "%d", &length[i] );
-		pic_new = ipFuncDrawPoly ( pic_old, begin, length, radius );
+		pic_new = mitkIpFuncDrawPoly ( pic_old, begin, length, radius );
 		free ( begin );
 		free ( length );
 	}
@@ -1095,7 +1095,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
-		mean = ipFuncMeanROI ( pic_old, begin, length, radius );
+		mean = mitkIpFuncMeanROI ( pic_old, begin, length, radius );
 		printf ( " mean: %lf \n", mean );
 		free ( begin );
 		free ( length );
@@ -1116,7 +1116,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
-		var = ipFuncVarROI ( pic_old, begin, length, radius );
+		var = mitkIpFuncVarROI ( pic_old, begin, length, radius );
 		printf ( " var: %lf \n", var );
 		free ( begin );
 		free ( length );
@@ -1137,7 +1137,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
-		var = ipFuncSDevROI ( pic_old, begin, length, radius );
+		var = mitkIpFuncSDevROI ( pic_old, begin, length, radius );
 		printf ( " var: %lf \n", var );
 		free ( begin );
 		free ( length );
@@ -1158,7 +1158,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+pic_old->dim+i], "%d", &length[i] );
-		ipFuncExtrROI ( pic_old, &min, &max, begin, length, radius );
+		mitkIpFuncExtrROI ( pic_old, &min, &max, begin, length, radius );
 		printf ( " min: %lf max: %lf\n", min, max );
 		free ( begin );
 		free ( length );
@@ -1178,7 +1178,7 @@ main (int argc, char **argv)
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+pic_old->dim+i], "%d", &length[i] );
-		var  = ipFuncVarR ( pic_old, begin, length );
+		var  = mitkIpFuncVarR ( pic_old, begin, length );
 		printf ( " var: %lf \n", var );
 		free ( begin );
 		free ( length );
@@ -1198,8 +1198,8 @@ main (int argc, char **argv)
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+pic_old->dim+i], "%d", &length[i] );
-		var  = ipFuncVarR ( pic_old, begin, length );
-		s_der = ipFuncSDevR ( pic_old, begin, length );
+		var  = mitkIpFuncVarR ( pic_old, begin, length );
+		s_der = mitkIpFuncSDevR ( pic_old, begin, length );
 		printf ( " s_der: %lf \n", s_der );
 		free ( begin );
 		free ( length );
@@ -1219,8 +1219,8 @@ main (int argc, char **argv)
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+pic_old->dim+i], "%d", &length[i] );
-		var  = ipFuncVarR ( pic_old, begin, length );
-		mean = ipFuncMeanR ( pic_old, begin, length );
+		var  = mitkIpFuncVarR ( pic_old, begin, length );
+		mean = mitkIpFuncMeanR ( pic_old, begin, length );
 		printf ( " mean: %lf \n", mean );
 		free ( begin );
 		free ( length );
@@ -1240,8 +1240,8 @@ main (int argc, char **argv)
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+pic_old->dim+i], "%d", &length[i] );
-		var  = ipFuncVarR ( pic_old, begin, length );
-		ipFuncExtrR ( pic_old, &min, &max, begin, length );
+		var  = mitkIpFuncVarR ( pic_old, begin, length );
+		mitkIpFuncExtrR ( pic_old, &min, &max, begin, length );
 		printf ( " min: %lf max: %lf \n", min, max );
 		free ( begin );
 		free ( length );
@@ -1259,7 +1259,7 @@ main (int argc, char **argv)
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
-		s_der = ipFuncSDevC ( pic_old, begin, radius );
+		s_der = mitkIpFuncSDevC ( pic_old, begin, radius );
 		printf ( " s_dev: %lf \n", s_der );
 		free ( begin );
 	}
@@ -1276,7 +1276,7 @@ main (int argc, char **argv)
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
-		var = ipFuncVarC ( pic_old, begin, radius );
+		var = mitkIpFuncVarC ( pic_old, begin, radius );
 		printf ( " var: %lf \n", var );
 		free ( begin );
 	}
@@ -1293,7 +1293,7 @@ main (int argc, char **argv)
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
-		mean = ipFuncMeanC ( pic_old, begin, radius );
+		mean = mitkIpFuncMeanC ( pic_old, begin, radius );
 		printf ( " mean: %lf \n", mean );
 		free ( begin );
 	}
@@ -1310,7 +1310,7 @@ main (int argc, char **argv)
 		for ( i = 0; i < pic_old->dim; i++ )
 			scanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
-		ipFuncExtrC ( pic_old, &min, &max, begin, radius );
+		mitkIpFuncExtrC ( pic_old, &min, &max, begin, radius );
 		printf ( " min: %lf max: %lf \n", min, max );
 		free ( begin );
 	}
@@ -1326,44 +1326,44 @@ main (int argc, char **argv)
 		sscanf  ( argv[4], "%d", &dim_mask );
 		sscanf  ( argv[5], "%d", &mask_size );
 
-		pic_new=ipPicCopyHeader(pic_old,NULL);
+		pic_new=mitkIpPicCopyHeader(pic_old,NULL);
 		pic_new->dim=dim_mask;
 		for ( i = 0; i < pic_old->dim; i++ )
 			pic_new->n[i]=mask_size;
-		pic_new->data  = calloc ( _ipPicSize(pic_new), 1 );
-		ipFuncAddC(pic_new, 1.0, ipFuncKeep, pic_new);
+		pic_new->data  = calloc ( _mitkIpPicSize(pic_new), 1 );
+		mitkIpFuncAddC(pic_new, 1.0, mitkIpFuncKeep, pic_new);
 	}
     else
 		printf ( " illegal operation \n" );
 	
 	
-    if ( ipFuncErrno > ipOK )
+    if ( mitkIpFuncErrno > ipOK )
 	{
-        ipFuncPError ( error_nr );
+        mitkIpFuncPError ( error_nr );
         exit ( 1 );
 	}
     if ( ( pic_new != 0 ) && ( picput_flag ) )
 	{
         strcpy ( pic_name_t, argv[3] );                   
-		ipPicPut ( pic_name_t, pic_new );
+		mitkIpPicPut ( pic_name_t, pic_new );
         picput_flag = ipTrue;
 	}
 	
 	
     if ( pic_ret )      
 	{
-		ipPicFree ( pic_ret );
+		mitkIpPicFree ( pic_ret );
 		pic_old = NULL;
 		pic_ret = NULL;
 		pic_new = NULL;
 	}
     else
 	{
-		if ( pic_old != NULL ) ipPicFree  ( pic_old );
+		if ( pic_old != NULL ) mitkIpPicFree  ( pic_old );
 		pic_old = NULL;
-		if ( pic_new != NULL ) ipPicFree  ( pic_new );
+		if ( pic_new != NULL ) mitkIpPicFree  ( pic_new );
 		pic_new = NULL;
-		if ( pic_hlp != NULL ) ipPicFree  ( pic_hlp );
+		if ( pic_hlp != NULL ) mitkIpPicFree  ( pic_hlp );
 		pic_hlp = NULL;
 	}
 

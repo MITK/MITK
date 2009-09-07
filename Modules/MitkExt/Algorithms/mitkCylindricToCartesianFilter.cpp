@@ -22,10 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
-#include <ipPic/ipPicTypeMultiplex.h>
+#include <ipPic/mitkIpPicTypeMultiplex.h>
 
 template <class T>
-void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, ipPicDescriptor *coneCutOff_pic)  //...t=truncated
+void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outsideValue, float *fr, float *fphi, float *fz, short *rt, unsigned int *phit, unsigned int *zt, mitkIpPicDescriptor *coneCutOff_pic)  //...t=truncated
 {
   T outsideValue = static_cast<T>(_outsideValue);
   register float f, ft, f0, f1, f2, f3;
@@ -55,7 +55,7 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue
   dest_start=dp=((T*)dest->data)+nxy_size*(nz_size-1);
 
   ipInt2_t y;
-  //  int size=_ipPicElements(pic);
+  //  int size=_mitkIpPicElements(pic);
 
   register ipInt2_t x,z;
   for(y=0;y<ny_size;++y)
@@ -150,37 +150,37 @@ void _transform(ipPicDescriptor *pic, ipPicDescriptor *dest, float _outsideValue
   }
 }
 
-void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, ipPicDescriptor * &rt_pic, ipPicDescriptor * &phit_pic, ipPicDescriptor * &fr_pic, ipPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz)
+void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, mitkIpPicDescriptor * &rt_pic, mitkIpPicDescriptor * &phit_pic, mitkIpPicDescriptor * &fr_pic, mitkIpPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz)
 {
   --orig_zsize;
 
-  rt_pic=ipPicNew();
-  rt_pic->type=ipPicInt;
+  rt_pic=mitkIpPicNew();
+  rt_pic->type=mitkIpPicInt;
   rt_pic->bpe=16;
   rt_pic->dim=2;
   rt_pic->n[0]=rt_pic->n[1]=new_xsize;
-  rt_pic->data=malloc(_ipPicSize(rt_pic));
+  rt_pic->data=malloc(_mitkIpPicSize(rt_pic));
 
-  phit_pic=ipPicNew();
-  phit_pic->type=ipPicUInt;
+  phit_pic=mitkIpPicNew();
+  phit_pic->type=mitkIpPicUInt;
   phit_pic->bpe=32;
   phit_pic->dim=2;
   phit_pic->n[0]=phit_pic->n[1]=new_xsize;
-  phit_pic->data=malloc(_ipPicSize(phit_pic));
+  phit_pic->data=malloc(_mitkIpPicSize(phit_pic));
 
-  fr_pic=ipPicNew();
-  fr_pic->type=ipPicFloat;
+  fr_pic=mitkIpPicNew();
+  fr_pic->type=mitkIpPicFloat;
   fr_pic->bpe=32;
   fr_pic->dim=2;
   fr_pic->n[0]=fr_pic->n[1]=new_xsize;
-  fr_pic->data=malloc(_ipPicSize(fr_pic));
+  fr_pic->data=malloc(_mitkIpPicSize(fr_pic));
 
-  fphi_pic=ipPicNew();
-  fphi_pic->type=ipPicFloat;
+  fphi_pic=mitkIpPicNew();
+  fphi_pic->type=mitkIpPicFloat;
   fphi_pic->bpe=32;
   fphi_pic->dim=2;
   fphi_pic->n[0]=fphi_pic->n[1]=new_xsize;
-  fphi_pic->data=malloc(_ipPicSize(fphi_pic));
+  fphi_pic->data=malloc(_mitkIpPicSize(fphi_pic));
 
   ipInt2_t  *rtp=(ipInt2_t*)rt_pic->data, *rt_xzero, rt, phit;
   ipUInt4_t  *phitp=(ipUInt4_t*)phit_pic->data;
@@ -266,16 +266,16 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
   }
 }
 
-void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, int orig_ysize, ipPicDescriptor *rt_pic, ipPicDescriptor *fr_pic, float a, float b, ipPicDescriptor * &coneCutOff_pic)
+void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, int orig_ysize, mitkIpPicDescriptor *rt_pic, mitkIpPicDescriptor *fr_pic, float a, float b, mitkIpPicDescriptor * &coneCutOff_pic)
 {
-  coneCutOff_pic=ipPicNew();
-  coneCutOff_pic->type=ipPicInt;
+  coneCutOff_pic=mitkIpPicNew();
+  coneCutOff_pic->type=mitkIpPicInt;
   coneCutOff_pic->bpe=16;
   coneCutOff_pic->dim=2;
   coneCutOff_pic->n[0]=coneCutOff_pic->n[1]=rt_pic->n[0];
-  coneCutOff_pic->data=malloc(_ipPicSize(coneCutOff_pic));
+  coneCutOff_pic->data=malloc(_mitkIpPicSize(coneCutOff_pic));
 
-  int i, size=_ipPicElements(rt_pic);
+  int i, size=_mitkIpPicElements(rt_pic);
   ipInt2_t *rt, *ccop, ohx_size, nz_size;
   ipFloat4_t *fr;
 
@@ -373,15 +373,15 @@ void mitk::CylindricToCartesianFilter::GenerateData()
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
   timeSelector->SetInput(input);
 
-  ipPicDescriptor* pic_transformed=NULL;
-  pic_transformed = ipPicNew();
+  mitkIpPicDescriptor* pic_transformed=NULL;
+  pic_transformed = mitkIpPicNew();
   pic_transformed->dim=3;
   pic_transformed->bpe  = output->GetPixelType().GetBpe();
   pic_transformed->type = output->GetPixelType().GetType();
   pic_transformed->n[0] = output->GetDimension(0);
   pic_transformed->n[1] = output->GetDimension(1);
   pic_transformed->n[2] = output->GetDimension(2);
-  pic_transformed->data=malloc(_ipPicSize(pic_transformed));
+  pic_transformed->data=malloc(_mitkIpPicSize(pic_transformed));
 
   int nstart, nmax;
   int tstart, tmax;
@@ -411,8 +411,8 @@ void mitk::CylindricToCartesianFilter::GenerateData()
       b = prop->GetValue();
 
     buildConeCutOffShortCut(input->GetDimension(0),input->GetDimension(1), rt_pic, fr_pic, a, b, coneCutOff_pic);
-    //    ipPicPut("C:\\temp\\rt_90.pic",rt_pic);
-    //ipPicPut("C:\\temp\\coneCutOff.pic", coneCutOff_pic);
+    //    mitkIpPicPut("C:\\temp\\rt_90.pic",rt_pic);
+    //mitkIpPicPut("C:\\temp\\coneCutOff.pic", coneCutOff_pic);
   }
 
   int n,t;
@@ -426,29 +426,29 @@ void mitk::CylindricToCartesianFilter::GenerateData()
 
       timeSelector->Update();
 
-      _ipPicFreeTags(pic_transformed->info->tags_head);
-      pic_transformed->info->tags_head = _ipPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
+      _mitkIpPicFreeTags(pic_transformed->info->tags_head);
+      pic_transformed->info->tags_head = _mitkIpPicCloneTags(timeSelector->GetOutput()->GetPic()->info->tags_head);
       if(input->GetDimension(2)>1)
       {
 
         mitkIpPicTypeMultiplex9(_transform, timeSelector->GetOutput()->GetPic(), pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
-        //  ipPicPut("1trf.pic",pic_transformed);  
+        //  mitkIpPicPut("1trf.pic",pic_transformed);  
       }
       else
       {
-        ipPicDescriptor *doubleSlice=ipPicCopyHeader(timeSelector->GetOutput()->GetPic(), NULL);
+        mitkIpPicDescriptor *doubleSlice=mitkIpPicCopyHeader(timeSelector->GetOutput()->GetPic(), NULL);
         doubleSlice->dim=3;
         doubleSlice->n[2]=2;
-        doubleSlice->data=malloc(_ipPicSize(doubleSlice));
-        memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _ipPicSize(doubleSlice)/2);
+        doubleSlice->data=malloc(_mitkIpPicSize(doubleSlice));
+        memcpy(doubleSlice->data, timeSelector->GetOutput()->GetPic()->data, _mitkIpPicSize(doubleSlice)/2);
         mitkIpPicTypeMultiplex9(_transform, doubleSlice, pic_transformed, m_OutsideValue, (float*)fr_pic->data, (float*)fphi_pic->data, fz, (short *)rt_pic->data, (unsigned int *)phit_pic->data, zt, coneCutOff_pic);
-        ipPicFree(doubleSlice);
+        mitkIpPicFree(doubleSlice);
       }
       output->SetPicVolume(pic_transformed, t, n);
     }
   }
-  //ipPicPut("outzzzzzzzz.pic",pic_transformed);  
-  ipPicFree(pic_transformed);
+  //mitkIpPicPut("outzzzzzzzz.pic",pic_transformed);  
+  mitkIpPicFree(pic_transformed);
   m_TimeOfHeaderInitialization.Modified();
 }
 
@@ -462,11 +462,11 @@ mitk::CylindricToCartesianFilter::CylindricToCartesianFilter()
 
 mitk::CylindricToCartesianFilter::~CylindricToCartesianFilter()
 {
-  if(rt_pic!=NULL)  ipPicFree(rt_pic);
-  if(phit_pic!=NULL)  ipPicFree(phit_pic);
-  if(fr_pic!=NULL)  ipPicFree(fr_pic);
-  if(fphi_pic!=NULL)  ipPicFree(fphi_pic);
-  if(coneCutOff_pic!=NULL)  ipPicFree(coneCutOff_pic);
+  if(rt_pic!=NULL)  mitkIpPicFree(rt_pic);
+  if(phit_pic!=NULL)  mitkIpPicFree(phit_pic);
+  if(fr_pic!=NULL)  mitkIpPicFree(fr_pic);
+  if(fphi_pic!=NULL)  mitkIpPicFree(fphi_pic);
+  if(coneCutOff_pic!=NULL)  mitkIpPicFree(coneCutOff_pic);
   if(zt != NULL)  free(zt);
   if(fz != NULL)  free (fz);
 }

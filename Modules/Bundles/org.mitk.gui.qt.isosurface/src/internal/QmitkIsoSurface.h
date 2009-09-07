@@ -42,6 +42,8 @@ class QmitkIsoSurface : public QObject, public QmitkFunctionality
       */
     QmitkIsoSurface(QObject *parent=0, const char *name=0);
 
+    virtual ~QmitkIsoSurface();
+
     /*!
       \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
       */

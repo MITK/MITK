@@ -45,7 +45,7 @@
 *****************************************************************************/
 
 /*
- * _ipFuncBox2d 
+ * _mitkIpFuncBox2d 
  *---------------------------------------------------------------------
  * DESCRIPTION
  *   This Function calulates the bounding box                               
@@ -59,7 +59,7 @@
  *
  * RETURN VALUES
  *   mitkIpFuncOK     - no error occured
- *   mitkIpFuncERROR  - error occured (description of error in ipFuncErrno)
+ *   mitkIpFuncERROR  - error occured (description of error in mitkIpFuncErrno)
  *
  * UPDATES
  *   this version could only be used for 3D images, in later version 
@@ -73,7 +73,7 @@
  */
 /* include Files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 /* definition of Box-macro                                              */
 
@@ -137,7 +137,7 @@
 */
 /* -------------------------------------------------------------------  */
 
-ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
+ipUInt4_t _mitkIpFuncBox2d ( mitkIpPicDescriptor *pic_old,
                          ipUInt4_t       **beg,
                          ipUInt4_t       **end )            
 {
@@ -149,11 +149,11 @@ ipUInt4_t _ipFuncBox2d ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    
   if ( pic_old->dim > 2 )   /* just in for the first version */
     {
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 

@@ -46,17 +46,17 @@
 
 /** @file
  *  initialisation of an array that maps the 
- *  ipPicType_t types to printable strings
+ *  mitkIpPicType_t types to printable strings
  */
 
 #ifndef lint
-  static char *what = { "@(#)ipPicType\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicType\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
 /** initialisation of an array that maps the 
- *  ipPicType_t types to printable strings
+ *  mitkIpPicType_t types to printable strings
  * 
  *  @param type  	the type
  *
@@ -70,23 +70,23 @@
  *
  */
 
-static const char *_ipPicTypeName[_ipPicTypeMax] =
+static const char *_mitkIpPicTypeName[_mitkIpPicTypeMax] =
 {
-  "ipPicUnknown",
-  "ipPicBool",
-  "ipPicASCII",
-  "ipPicInt",
-  "ipPicUInt",
-  "ipPicFloat",
-  "ipPicUnknown",
-  "ipPicNonUniform",
-  "ipPicTSV"
+  "mitkIpPicUnknown",
+  "mitkIpPicBool",
+  "mitkIpPicASCII",
+  "mitkIpPicInt",
+  "mitkIpPicUInt",
+  "mitkIpPicFloat",
+  "mitkIpPicUnknown",
+  "mitkIpPicNonUniform",
+  "mitkIpPicTSV"
 };
 
-const char *ipPicTypeName( ipUInt4_t type )
+const char *mitkIpPicTypeName( ipUInt4_t type )
 {
-  if( type > _ipPicTypeMax )
-    return( _ipPicTypeName[0] );
+  if( type > _mitkIpPicTypeMax )
+    return( _mitkIpPicTypeName[0] );
   else
-    return( _ipPicTypeName[type] );
+    return( _mitkIpPicTypeName[type] );
 }

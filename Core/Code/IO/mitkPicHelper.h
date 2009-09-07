@@ -35,15 +35,15 @@ class MITK_CORE_EXPORT PicHelper
 public:
   static const char *GetNameOfClass() { return "PicHelper"; }
 
-  static bool GetSpacing(const ipPicDescriptor* pic, Vector3D & spacing);
+  static bool GetSpacing(const mitkIpPicDescriptor* pic, Vector3D & spacing);
 
-  static bool SetSpacing(const ipPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);
+  static bool SetSpacing(const mitkIpPicDescriptor* pic, SlicedGeometry3D* slicedgeometry);
 
-  static bool GetTimeSpacing(const ipPicDescriptor* pic, float& timeSpacing);
+  static bool GetTimeSpacing(const mitkIpPicDescriptor* pic, float& timeSpacing);
 
-  static void InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
+  static void InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry);
 
-  static bool SetGeometry2D(const ipPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
+  static bool SetGeometry2D(const mitkIpPicDescriptor* pic, int s, SlicedGeometry3D* slicedgeometry);
 };
 
 } // namespace mitk

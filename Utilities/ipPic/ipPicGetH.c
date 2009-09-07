@@ -90,24 +90,24 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicGetHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicGetHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-ipPicDescriptor *
-ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
+mitkIpPicDescriptor *
+mitkIpPicGetHeader( const char *infile_name, mitkIpPicDescriptor *pic )
 {
   mitkIpPicFile_t  infile;
 
-  ipPicTag_t tag_name;
+  mitkIpPicTag_t tag_name;
   ipUInt4_t len;
 
-  infile = _ipPicOpenPicFileIn( infile_name );
+  infile = _mitkIpPicOpenPicFileIn( infile_name );
 
   if( infile == NULL )
     {
-      /*ipPrintErr( "ipPicGetHeader: sorry, error opening infile\n" );*/
+      /*ipPrintErr( "mitkIpPicGetHeader: sorry, error opening infile\n" );*/
       return( NULL );
     }
 
@@ -116,16 +116,16 @@ ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
-      fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
+      fprintf( stderr, "mitkIpPicGetHeader: sorry, can't read compressed file\n" );
       return( NULL );
     }
   else if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( pic == NULL )
-        pic = _ipPicOldGetHeader( infile,
+        pic = _mitkIpPicOldGetHeader( infile,
                                   NULL );
       else
-        _ipPicOldGetHeader( infile,
+        _mitkIpPicOldGetHeader( infile,
                             pic );
       if( infile != stdin )
         mitkIpPicFClose( infile );
@@ -133,13 +133,13 @@ ipPicGetHeader( const char *infile_name, ipPicDescriptor *pic )
     }
 
   if( pic == NULL )
-    pic = ipPicNew();
+    pic = mitkIpPicNew();
 
-  ipPicClear( pic );
+  mitkIpPicClear( pic );
 
   pic->info->write_protect = ipTrue;
 
-  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
   mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );

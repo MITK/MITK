@@ -28,12 +28,12 @@ public:
 
     \note Is the model needed here?
     */
-    void setImage (ipPicDescriptor* pic, int model = INTENSITY);
+    void setImage (mitkIpPicDescriptor* pic, int model = INTENSITY);
 
     /*!
     \brief Gets the PIC image.
     */
-    ipPicDescriptor* image () const;
+    mitkIpPicDescriptor* image () const;
 
     /*!
     \brief Sets the range of the intensities which will be displayed.
@@ -145,7 +145,7 @@ private:
     /*!
     \brief The PIC image.
     */
-    ipPicDescriptor* _pic;
+    mitkIpPicDescriptor* _pic;
 
     /*!
     \brief The extremal values.

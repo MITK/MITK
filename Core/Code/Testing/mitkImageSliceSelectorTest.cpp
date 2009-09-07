@@ -87,14 +87,14 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
 
   if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
   {
-    std::cout << "Testing whether the slice is identical with a slice loaded by ipPicGetSlice:";
-    ipPicDescriptor *picslice = ipPicGetSlice(argv[1], NULL, (image->GetDimension(2)-1-slice_nr)+1);
-    int i, size = _ipPicSize(picslice);
+    std::cout << "Testing whether the slice is identical with a slice loaded by mitkIpPicGetSlice:";
+    mitkIpPicDescriptor *picslice = mitkIpPicGetSlice(argv[1], NULL, (image->GetDimension(2)-1-slice_nr)+1);
+    int i, size = _mitkIpPicSize(picslice);
     char * p1 = (char*)slice->GetPic()->data;
     char * p2 = (char*)picslice->data;
     //picslice->info->write_protect=ipFalse;
-    //ipPicPut("C:\\1aaaaIPPIC.pic", picslice);
-    //ipPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
+    //mitkIpPicPut("C:\\1aaaaIPPIC.pic", picslice);
+    //mitkIpPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
     for(i=0; i<size; ++i, ++p1, ++p2)
     {
       if((*p1) != (*p2))
@@ -104,7 +104,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
       }
     }
     std::cout<<"[PASSED]"<<std::endl;
-    ipPicFree(picslice);
+    mitkIpPicFree(picslice);
   }
 
   try

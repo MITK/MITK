@@ -54,7 +54,7 @@
 
 #include <stdio.h>
 
-#include "ipTypes.h"
+#include "mitkIpTypes.h"
 
 /** maps ipError_t type values to printable strings
  *  @param error	 the error number
@@ -63,7 +63,7 @@
  *  AUTHOR & DATE
  */
 
-char *ipErrorStr( ipError_t error )
+char *mitkIpErrorStr( ipError_t error )
 {
   char *str;
 
@@ -77,7 +77,7 @@ char *ipErrorStr( ipError_t error )
         break;
       default:
         str = "ipError: Unknown Error";
-        fprintf( stderr, "ipErrorStr: sorry, unknown error (#%i)\n", error );
+        fprintf( stderr, "mitkIpErrorStr: sorry, unknown error (#%i)\n", error );
         break;
     }
 

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <assert.h>
 #include <queue>
-#include <ipPic/ipPicTypeMultiplex.h>
+#include <ipPic/mitkIpPicTypeMultiplex.h>
 #include "ipSegmentation.h"
 
 /*  
@@ -33,8 +33,8 @@ history data is written to that buffer: the seed pixel gets a 1, all direct neig
 not cleared in this function and can thus hold history data of several growing processes in different areas.
 */
 template<typename PicType>
-ipPicDescriptor*
-tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBoundFlt, float upperBoundFlt, int maxIterations, ipPicDescriptor *segBuffer, int &contourOfs, float &startCol, ipPicDescriptor *histBuffer )
+mitkIpPicDescriptor*
+tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBoundFlt, float upperBoundFlt, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer )
 {
   PicType lowerBound = static_cast<PicType>(lowerBoundFlt);
   PicType upperBound = static_cast<PicType>(upperBoundFlt);
@@ -43,10 +43,10 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
   if (maxIterations <= 0) maxIterations = 32000;
   if (!src) return 0;
   if (!segBuffer) {
-    segBuffer = ipPicCopyHeader( src, segBuffer );
-    segBuffer->type = ipPicUInt;
+    segBuffer = mitkIpPicCopyHeader( src, segBuffer );
+    segBuffer->type = mitkIpPicUInt;
     segBuffer->bpe = 8; 
-    ipUInt4_t size = _ipPicSize( segBuffer );
+    ipUInt4_t size = _mitkIpPicSize( segBuffer );
     segBuffer->data = malloc( size );
   }
   else {
@@ -54,7 +54,7 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
     if (segBuffer->n[0] != src->n[0] || segBuffer->n[1] != src->n[1]) {
       segBuffer->n[0] = src->n[0];
       segBuffer->n[1] = src->n[1];
-      ipUInt4_t size = _ipPicSize( segBuffer );
+      ipUInt4_t size = _mitkIpPicSize( segBuffer );
       segBuffer->data = realloc( segBuffer->data, size );
       if (segBuffer->data == 0) return 0;
     }
@@ -64,7 +64,7 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
     if (histBuffer->n[0] != src->n[0] || histBuffer->n[1] != src->n[1]) {
       histBuffer->n[0] = src->n[0];
       histBuffer->n[1] = src->n[1];
-      ipUInt4_t size = _ipPicSize( histBuffer );
+      ipUInt4_t size = _mitkIpPicSize( histBuffer );
       histBuffer->data = realloc( histBuffer->data, size );
       if (histBuffer->data == 0) return 0;
       memset( histBuffer->data, 0, size );  // clear buffer
@@ -106,7 +106,7 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
     startCol = 0.0f;
   }
 
-  memset( segBuffer->data, 0, _ipPicSize(segBuffer) );  // clear buffer
+  memset( segBuffer->data, 0, _mitkIpPicSize(segBuffer) );  // clear buffer
     
   PicType value = *((PicType*)src->data+startOfs);
   if ( value >=lowest && value <=highest ) {
@@ -193,10 +193,10 @@ tmGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float l
 }
 
 
-ipPicDescriptor*
-ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, ipPicDescriptor *segBuffer, ipPicDescriptor *histBuffer )
+mitkIpPicDescriptor*
+ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer )
 {
-  ipPicDescriptor *result = 0;
+  mitkIpPicDescriptor *result = 0;
   int contourOfs;
   float startCol;
   
@@ -210,10 +210,10 @@ ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativ
 
 
 
-ipPicDescriptor*
-ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, ipPicDescriptor *segBuffer, int &contourOfs, float &startCol, ipPicDescriptor *histBuffer )
+mitkIpPicDescriptor*
+ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer )
 {
-  ipPicDescriptor *result = 0;
+  mitkIpPicDescriptor *result = 0;
 
   if (ipMITKSegmentationUndoIsEnabled (segBuffer)) {
     ipMITKSegmentationUndoSave (segBuffer);

@@ -18,32 +18,32 @@ LIBS = -lipPic -lz
 
 .o:.c
 
-all = ipPicInfo.o ipPicType.o                           \
-      ipPicAddT.o ipPicQueryT.o ipPicDelT.o ipPicGetT.o \
-      ipPicOldGet.o ipPicOldGetH.o ipPicOldGetS.o       \
-      ipPicGet.o ipPicGetH.o ipPicGetS.o                \
-      ipPicPut.o ipPicPutS.o                            \
-      ipPicGetMem.o ipPicPutMem.o                       \
-      ipPicCopyS.o ipPicCopyH.o                         \
-      ipPicNew.o ipPicClear.o ipPicFree.o ipPicClone.o  \
+all = mitkIpPicInfo.o mitkIpPicType.o                           \
+      mitkIpPicAddT.o mitkIpPicQueryT.o mitkIpPicDelT.o mitkIpPicGetT.o \
+      mitkIpPicOldGet.o mitkIpPicOldGetH.o mitkIpPicOldGetS.o       \
+      mitkIpPicGet.o mitkIpPicGetH.o mitkIpPicGetS.o                \
+      mitkIpPicPut.o mitkIpPicPutS.o                            \
+      mitkIpPicGetMem.o mitkIpPicPutMem.o                       \
+      mitkIpPicCopyS.o mitkIpPicCopyH.o                         \
+      mitkIpPicNew.o mitkIpPicClear.o mitkIpPicFree.o mitkIpPicClone.o  \
       ipEndian.o ipFRead.o ipFWrite.o                   \
       ipError.o                                         \
-      ipPicSize.o ipPicElements.o                       \
-      ipPicTSVSize.o ipPicTSVElements.o
+      mitkIpPicSize.o mitkIpPicElements.o                       \
+      mitkIpPicTSVSize.o mitkIpPicTSVElements.o
 
 DISTFILES = Makefile                                                     \
-            ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h              \
-            ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c                  \
-            ipPicGet.c ipPicGetH.c ipPicGetS.c                           \
-            ipPicPut.c ipPicPutS.c                                       \
-            ipPicGetMem.c ipPicPutMem.c                                  \
-            ipPicCopyS.c ipPicCopyH.c                                    \
-            ipPicNew.c ipPicClear.c ipPicFree.c ipPicClone.c             \
-            ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c            \
+            mitkIpPic.h mitkIpTypes.h mitkIpPicOldP.h mitkIpPicAnnotation.h              \
+            mitkIpPicOldGet.c mitkIpPicOldGetH.c mitkIpPicOldGetS.c                  \
+            mitkIpPicGet.c mitkIpPicGetH.c mitkIpPicGetS.c                           \
+            mitkIpPicPut.c mitkIpPicPutS.c                                       \
+            mitkIpPicGetMem.c mitkIpPicPutMem.c                                  \
+            mitkIpPicCopyS.c mitkIpPicCopyH.c                                    \
+            mitkIpPicNew.c mitkIpPicClear.c mitkIpPicFree.c mitkIpPicClone.c             \
+            mitkIpPicAddT.c mitkIpPicQueryT.c mitkIpPicDelT.c mitkIpPicGetT.c            \
             ipEndian.c ipFRead.c ipFWrite.c                              \
             ipError.c                                                    \
-            ipPicInfo.c ipPicType.c                                      \
-            ipPicSize.c ipPicElements.c ipPicTSVSize.c ipPicTSVElements.c\
+            mitkIpPicInfo.c mitkIpPicType.c                                      \
+            mitkIpPicSize.c mitkIpPicElements.c mitkIpPicTSVSize.c mitkIpPicTSVElements.c\
             *.ps
 
 all:	libipPic.a picinfo pic2seq
@@ -62,8 +62,8 @@ libipPic.a	:$(all)
 		-ranlib libipPic.a
 
 install	:libipPic.a picinfo pic2seq
-	cp ipPic.h /usr/local/include/ipPic
-	cp ipTypes.h /usr/local/include/ipPic
+	cp mitkIpPic.h /usr/local/include/ipPic
+	cp mitkIpTypes.h /usr/local/include/ipPic
 	cp libipPic.a /usr/local/lib
 	cp picinfo /usr/local/bin
 	cp pic2seq /usr/local/bin
@@ -94,68 +94,68 @@ dist:$(DISTFILES)
 	@gzip $(distdir).tar
 	@rm -rf $(distdir)
 
-picinfo.o	:picinfo.c ipPic.h
+picinfo.o	:picinfo.c mitkIpPic.h
 
-pic2seq.o	:pic2seq.c ipPic.h
+pic2seq.o	:pic2seq.c mitkIpPic.h
 
-test.o	:test.c ipPic.h
+test.o	:test.c mitkIpPic.h
 
-ipPic.h	:ipTypes.h
-	touch ipPic.h
+mitkIpPic.h	:mitkIpTypes.h
+	touch mitkIpPic.h
 
-ipPicInfo.o :ipPicInfo.c ipPic.h
+mitkIpPicInfo.o :mitkIpPicInfo.c mitkIpPic.h
 
-ipPicType.o :ipPicType.c ipPic.h
+mitkIpPicType.o :mitkIpPicType.c mitkIpPic.h
 
-ipEndian.o :ipEndian.c ipPic.h
+ipEndian.o :ipEndian.c mitkIpPic.h
 
-ipPicGetT.o :ipPicGetT.c ipPic.h
+mitkIpPicGetT.o :mitkIpPicGetT.c mitkIpPic.h
 
-ipPicAddT.o :ipPicAddT.c ipPic.h
+mitkIpPicAddT.o :mitkIpPicAddT.c mitkIpPic.h
 
-ipPicQueryT.o :ipPicQueryT.c ipPic.h
+mitkIpPicQueryT.o :mitkIpPicQueryT.c mitkIpPic.h
 
-ipPicDelT.o :ipPicDelT.c ipPic.h
+mitkIpPicDelT.o :mitkIpPicDelT.c mitkIpPic.h
 
-ipPicOldGet.o :ipPicOldGet.c ipPic.h ipPicOldP.h
+mitkIpPicOldGet.o :mitkIpPicOldGet.c mitkIpPic.h mitkIpPicOldP.h
 
-ipPicPut.o :ipPicPut.c ipPic.h
+mitkIpPicPut.o :mitkIpPicPut.c mitkIpPic.h
 
-ipPicGet.o :ipPicGet.c ipPic.h
+mitkIpPicGet.o :mitkIpPicGet.c mitkIpPic.h
 
-ipPicGetH.o :ipPicGetH.c ipPic.h
+mitkIpPicGetH.o :mitkIpPicGetH.c mitkIpPic.h
 
-ipPicOldGetH.o :ipPicOldGetH.c ipPic.h ipPicOldP.h
+mitkIpPicOldGetH.o :mitkIpPicOldGetH.c mitkIpPic.h mitkIpPicOldP.h
 
-ipPicPutS.o :ipPicPutS.c ipPic.h
+mitkIpPicPutS.o :mitkIpPicPutS.c mitkIpPic.h
 
-ipPicGetS.o :ipPicGetS.c ipPic.h
+mitkIpPicGetS.o :mitkIpPicGetS.c mitkIpPic.h
 
-ipPicOldGetS.o :ipPicOldGetS.c ipPic.h ipPicOldP.h
+mitkIpPicOldGetS.o :mitkIpPicOldGetS.c mitkIpPic.h mitkIpPicOldP.h
 
-ipFRead.o :ipFRead.c ipPic.h
+ipFRead.o :ipFRead.c mitkIpPic.h
 
-ipFWrite.o :ipFWrite.c ipPic.h
+ipFWrite.o :ipFWrite.c mitkIpPic.h
 
-ipPicSize.o :ipPicSize.c ipPic.h
+mitkIpPicSize.o :mitkIpPicSize.c mitkIpPic.h
 
-ipPicElements.o :ipPicElements.c ipPic.h
+mitkIpPicElements.o :mitkIpPicElements.c mitkIpPic.h
 
-ipPicTSVSize.o :ipPicTSVSize.c ipPic.h
+mitkIpPicTSVSize.o :mitkIpPicTSVSize.c mitkIpPic.h
 
-ipPicTSVElements.o :ipPicTSVElements.c ipPic.h
+mitkIpPicTSVElements.o :mitkIpPicTSVElements.c mitkIpPic.h
 
-ipPicNew.o :ipPicNew.c ipPic.h
+mitkIpPicNew.o :mitkIpPicNew.c mitkIpPic.h
 
-ipPicClear.o :ipPicClear.c ipPic.h
+mitkIpPicClear.o :mitkIpPicClear.c mitkIpPic.h
 
-ipPicFree.o :ipPicFree.c ipPic.h
+mitkIpPicFree.o :mitkIpPicFree.c mitkIpPic.h
 
-ipPicClone.o :ipPicClone.c ipPic.h
+mitkIpPicClone.o :mitkIpPicClone.c mitkIpPic.h
 
-ipPicCopyS.o :ipPicCopyS.c ipPic.h
+mitkIpPicCopyS.o :mitkIpPicCopyS.c mitkIpPic.h
 
-ipPicCopyH.o :ipPicCopyH.c ipPic.h
+mitkIpPicCopyH.o :mitkIpPicCopyH.c mitkIpPic.h
 
 depend:
 	for i in *.c;do $(CC) $(CFLAGS) -MM $$i;done > t

@@ -84,20 +84,20 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipPicOldGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpPicOldGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
 #ifdef DOS
-#include "ipPicOP.h"
+#include "mitkIpPicOP.h"
 #else
-#include "ipPicOldP.h"
+#include "mitkIpPicOldP.h"
 #endif
 
-ipPicDescriptor * _ipPicOldGet( FILE *infile, ipPicDescriptor *pic )
+mitkIpPicDescriptor * _mitkIpPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
 {
-  _ipPicOldHeader old_pic;
+  _mitkIpPicOldHeader old_pic;
 #ifdef WIN
   HANDLE hbuff;
 #endif
@@ -144,15 +144,15 @@ ipPicDescriptor * _ipPicOldGet( FILE *infile, ipPicDescriptor *pic )
   /* convert to the new pic3 format */
 
   if( pic == NULL )
-    pic = ipPicNew();
+    pic = mitkIpPicNew();
 
-  ipPicClear( pic );
+  mitkIpPicClear( pic );
 
   pic->data = (void *)buff;
   if( old_pic.type == 1 )
-    pic->type = ipPicUInt;
+    pic->type = mitkIpPicUInt;
   else
-    pic->type = (ipPicType_t)old_pic.conv;
+    pic->type = (mitkIpPicType_t)old_pic.conv;
   pic->bpe = old_pic.type*8;
   pic->dim = old_pic.rank;
   pic->n[0] = old_pic.n1;

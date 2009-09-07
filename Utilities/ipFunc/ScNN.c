@@ -68,10 +68,10 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,           
-                             ipPicDescriptor *pic_new ) ;
+mitkIpPicDescriptor *_mitkIpFuncScNN( mitkIpPicDescriptor *pic_old,           
+                             mitkIpPicDescriptor *pic_new ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -153,8 +153,8 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,           
-                             ipPicDescriptor *pic_new ) 
+mitkIpPicDescriptor *_mitkIpFuncScNN( mitkIpPicDescriptor *pic_old,           
+                             mitkIpPicDescriptor *pic_new ) 
 {
 
   ipUInt4_t       i;               /* loopindex                      */
@@ -172,11 +172,11 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 	  pic_old->bpe=pic_new->bpe=8;
   }
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim != pic_new->dim ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -203,12 +203,12 @@ ipPicDescriptor *_ipFuncScNN( ipPicDescriptor *pic_old,
 
   pic_new->bpe  = pic_old->bpe*(is_color!=0?3:1);
   pic_new->type = pic_old->type;
-  pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+  pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
 
   if ( pic_new->data == NULL )
     {
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                   
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                   
        return ( mitkIpFuncERROR );
     }
  

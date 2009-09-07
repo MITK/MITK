@@ -49,31 +49,31 @@
 #include <strings.h>
 
 #include "mitkIpPic.h"
-#include "ipPicAnnotation.h"
+#include "mitkIpPicAnnotation.h"
 
 int main( int argc, char *argv[] )
 {
-  ipPicDescriptor *pic;
-  ipPicDescriptor *pic2;
-  ipPicTSV_t *tsv;
-  ipPicTSV_t *tsv2;
-  ipPicTSV_t *tsv3;
-  ipPicAnnotation_t	a;
+  mitkIpPicDescriptor *pic;
+  mitkIpPicDescriptor *pic2;
+  mitkIpPicTSV_t *tsv;
+  mitkIpPicTSV_t *tsv2;
+  mitkIpPicTSV_t *tsv3;
+  mitkIpPicAnnotation_t	a;
   char buff[] = "test test";
 
-  printf( "%s\n", _ipEndian()==_ipEndianBig?"BigEndian":"LittleEndian" );
+  printf( "%s\n", _mitkIpEndian()==_ipEndianBig?"BigEndian":"LittleEndian" );
 
   if( argc != 3 )
     exit(-1);
 
-  pic = ipPicGet( argv[1],
+  pic = mitkIpPicGet( argv[1],
                   NULL );
 
-  ipPicSetWriteCompression( ipTrue );
-  ipPicPut( argv[2],
+  mitkIpPicSetWriteCompression( ipTrue );
+  mitkIpPicPut( argv[2],
             pic );
 
-  ipPicFree( pic );
+  mitkIpPicFree( pic );
 
   return(0);
 }

@@ -49,7 +49,7 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)_ipPicTSVSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpPicTSVSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -68,7 +68,7 @@
  */
 
 
-ipUInt4_t _ipPicTSVSize( ipPicTSV_t *tsv )
+ipUInt4_t _mitkIpPicTSVSize( mitkIpPicTSV_t *tsv )
 {
   ipUInt4_t i;
   ipUInt4_t elements;

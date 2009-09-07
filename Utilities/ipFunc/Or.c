@@ -62,11 +62,11 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,   
-                              ipPicDescriptor *pic_2,
-                              ipPicDescriptor *pic_return ) ;
+mitkIpPicDescriptor *mitkIpFuncOr   ( mitkIpPicDescriptor *pic_1,   
+                              mitkIpPicDescriptor *pic_2,
+                              mitkIpPicDescriptor *pic_return ) ;
 #ifndef DOXYGEN_IGNORE
 
 /* definition of invert-macro                                           */
@@ -75,7 +75,7 @@ ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,
 {                                                                        \
   ipUInt4_t  i, no_elem;                                                 \
                                                                          \
-  no_elem = _ipPicElements ( pic_1 );                                    \
+  no_elem = _mitkIpPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
        (( type * ) pic_new->data ) [i] =                                 \
@@ -91,21 +91,21 @@ ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,   
-                              ipPicDescriptor *pic_2,
-                              ipPicDescriptor *pic_return ) 
+mitkIpPicDescriptor *mitkIpFuncOr   ( mitkIpPicDescriptor *pic_1,   
+                              mitkIpPicDescriptor *pic_2,
+                              mitkIpPicDescriptor *pic_return ) 
 {
 
-  ipPicDescriptor *pic_new;  /* pointer to new image                    */
+  mitkIpPicDescriptor *pic_new;  /* pointer to new image                    */
   ipUInt4_t       i;         /* loop index                              */
 
   /* check whether images have the same size                            */
 
-  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_1->type != pic_2->type ) || ( pic_1->bpe != pic_2->bpe ) )
     {
-      _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+      _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
       return NULL;
     }
   if ( pic_1->dim == pic_2->dim )
@@ -113,19 +113,19 @@ ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,
       {
         if ( pic_1->n[i] != pic_2->n[i] )
           {
-             _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+             _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
              return NULL;
           }
       }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
        return NULL;
     }
 
   /* allocate new iumage                                                */
 
-  pic_new = _ipFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to connect two images using AND                              */
@@ -134,7 +134,7 @@ ipPicDescriptor *ipFuncOr   ( ipPicDescriptor *pic_1,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_1);
+  mitkIpFuncCopyTags(pic_new, pic_1);
                         
   return pic_new;
 }

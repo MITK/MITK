@@ -52,8 +52,8 @@
  *
  *  @param pic_old   pointer to the image that should be inverted
  *  @param kind   determines 
- *                 ipFuncTotal => transformation of all greyvalues
- *                 ipFuncMinMax=> transformation of greyvalues between min and max 
+ *                 mitkIpFuncTotal => transformation of all greyvalues
+ *                 mitkIpFuncMinMax=> transformation of greyvalues between min and max 
  *  @param pic_return  memory used to store return image ( if pic_return == NULL
  *                new memory is allocated )
  *
@@ -64,17 +64,17 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
-                             ipFuncFlagI_t   kind,
-                             ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncExp ( mitkIpPicDescriptor *pic_old,
+                             mitkIpFuncFlagI_t   kind,
+                             mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncExp\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncExp\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -89,7 +89,7 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
                                                                          \
   a =  log ( max_gv - min_gv + 1 ) / ( max_gv - min_gv );                \
                                                                          \
-  no_elem = _ipPicElements ( pic );                                      \
+  no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
       (( type * ) pic_new->data ) [i] =                                  \
@@ -102,16 +102,16 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 
 /* -------------------------------------------------------------------  */
 /*
-**  function ipFuncExp:                                                  
+**  function mitkIpFuncExp:                                                  
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
-                             ipFuncFlagI_t   kind,
-                             ipPicDescriptor *pic_return )
+mitkIpPicDescriptor *mitkIpFuncExp ( mitkIpPicDescriptor *pic_old,
+                             mitkIpFuncFlagI_t   kind,
+                             mitkIpPicDescriptor *pic_return )
 {
 
-  ipPicDescriptor *pic_new;  /* inverted picture                        */
+  mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
   ipUInt4_t       i;         /* loopindex                               */
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
@@ -120,29 +120,29 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. or min possible greyvalue for datatype              */
 
-  if ( kind == ipFuncTotal )
+  if ( kind == mitkIpFuncTotal )
     {
-       if ( _ipFuncExtT( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+       if ( _mitkIpFuncExtT( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
          return ( mitkIpFuncERROR );
     }
-  else if ( kind == ipFuncMinMax )
+  else if ( kind == mitkIpFuncMinMax )
     {
-       if ( ipFuncExtr ( pic_old, &min_gv, &max_gv ) != mitkIpFuncOK )
+       if ( mitkIpFuncExtr ( pic_old, &min_gv, &max_gv ) != mitkIpFuncOK )
          return ( mitkIpFuncERROR );
     }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
        
   /* macro to invert the picture (for all data types)                   */
@@ -151,7 +151,7 @@ ipPicDescriptor *ipFuncExp ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

@@ -64,51 +64,51 @@
  *  @return pointer to the transformed image
  *
  *  @par Uses
- *  @arg ipFuncSelMM
+ *  @arg mitkIpFuncSelMM
  *
  * AUTHOR & DATE
  */
 
 /* include files                                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      level, 
                                 ipFloat8_t      window,
-                                ipPicDescriptor *pic_return );
+                                mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncLevWin\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncLevWin\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 
 /* -------------------------------------------------------------------------  */
 /*
-** ipFunclevWin
+** mitkIpFunclevWin
 */
 /* -------------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      level, 
                                 ipFloat8_t      window,
-                                ipPicDescriptor *pic_return )
+                                mitkIpPicDescriptor *pic_return )
 {
-   ipPicDescriptor *pic_new;         /* pointer to new image                  */ 
+   mitkIpPicDescriptor *pic_new;         /* pointer to new image                  */ 
    ipFloat8_t      gv_low;           /* lower greyvalue of range              */
    ipFloat8_t      gv_up;            /* upper greyvalue of range              */
    ipFloat8_t      max_gv, min_gv;   /* max and min possible greyvalues       */
 
    /* check image data                                                        */
 
-   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
    /* calculate max and min possible greyvalues                               */
 
-   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+   if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
      return ( mitkIpFuncERROR );
    /* calculate lower and upper greyvalue of range with level and window      */
 
@@ -126,13 +126,13 @@ ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,
    else if ( gv_up > max_gv )
      gv_up = max_gv;
 
-   /* calculate new image in Function ipFuncSelect                            */
+   /* calculate new image in Function mitkIpFuncSelect                            */
 
-   pic_new = ipFuncSelMM ( pic_old, gv_low, gv_up, pic_return  );
+   pic_new = mitkIpFuncSelMM ( pic_old, gv_low, gv_up, pic_return  );
 
    /* Copy Tags */
  
-   ipFuncCopyTags(pic_new, pic_old);
+   mitkIpFuncCopyTags(pic_new, pic_old);
    
    
                               

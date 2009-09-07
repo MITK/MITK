@@ -47,11 +47,11 @@
 /** @file 
  *  Operators to calculate statistical values.
  *  This header is for grouping purposes for the
- *  documentation only. Don't use it, use ipFunc.h instead.
+ *  documentation only. Don't use it, use mitkIpFunc.h instead.
  */
 
 #ifndef DOXYGEN_IGNORE
-#include <ipFunc.h>
+#include <mitkIpFunc.h>
 #endif
 
 #ifndef _mitkIpFunc_h
@@ -63,103 +63,103 @@
 extern "C" {
 #endif
 
-ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
+ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
                       ipUInt4_t       **beg,
                       ipUInt4_t       **end );
 
-ipFloat8_t      ipFuncMedI    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncMedI    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncMean    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncMean    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncVar     ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncVar     ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncSDev    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncSDev    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      *ipFuncGrav   ( ipPicDescriptor *pic_old );
+ipFloat8_t      *mitkIpFuncGrav   ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t       ipFuncMeanC  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanC  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipFloat8_t       ipFuncVarC   ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarC   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipFloat8_t       ipFuncSDevC  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipUInt4_t        ipFuncExtrC  ( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrC  ( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max,  
                                 ipUInt4_t       *center,  
                                 ipUInt4_t       radius );
 
-ipFloat8_t       ipFuncMeanROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncVarROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncSDevROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t      ipFuncSkewness ( ipPicDescriptor *pic );
+ipFloat8_t      mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
 
-ipFloat8_t      ipFuncCurtosis ( ipPicDescriptor *pic );
+ipFloat8_t      mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
 
-ipFloat8_t      ipFuncSkewnessR ( ipPicDescriptor *pic_old,
+ipFloat8_t      mitkIpFuncSkewnessR ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *begin, 
                                   ipUInt4_t       *length );
 
-double          ipFuncCurtosisR ( ipPicDescriptor *pic_old,
+double          mitkIpFuncCurtosisR ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *begin, 
                                   ipUInt4_t       *length );
 
-ipUInt4_t        ipFuncExtrROI( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrROI( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max, 
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncMeanR  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanR  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipFloat8_t       ipFuncVarR   ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipFloat8_t       ipFuncSDevR  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevR  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipUInt4_t        ipFuncExtrR  ( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max,  
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipUInt4_t       ipFuncRange   ( ipPicDescriptor *pic, 
+ipUInt4_t       mitkIpFuncRange   ( mitkIpPicDescriptor *pic, 
                                 ipFloat8_t gv_low,
                                 ipFloat8_t gv_up );
 
-ipInt4_t        ipFuncExtr    ( ipPicDescriptor *pic, 
+ipInt4_t        mitkIpFuncExtr    ( mitkIpPicDescriptor *pic, 
                                 ipFloat8_t *min,
                                 ipFloat8_t *max );
 
-ipInt4_t       ipFuncInertia ( ipPicDescriptor *pic_old,   
+ipInt4_t       mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,   
                                ipFloat8_t      **eigen_vect,
                                ipFloat8_t      **eigen_val );
 
-ipInt4_t       ipFuncHist   ( ipPicDescriptor *pic_old,   
+ipInt4_t       mitkIpFuncHist   ( mitkIpPicDescriptor *pic_old,   
                               ipFloat8_t      min_gv,  
                               ipFloat8_t      max_gv,
                               ipUInt4_t       **hist,

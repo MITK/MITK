@@ -50,7 +50,7 @@
 
 /** @brief sets a tag into an image
  *  If the tag does not exist, it is created. Otherwise the existing
- *  tag is replaced by the new one. If type==ipPicASCII and the last
+ *  tag is replaced by the new one. If type==mitkIpPicASCII and the last
  *  byte is not \0, a \0 is added.
  *
  *  @param pic image into which the tag is set
@@ -65,12 +65,12 @@
  *
  *  @b Examples:
  *	@code 
- *  ipFuncSetTag(pic, "OUTSIDE_VALUE", ipPicInt, sizeof(ipInt4_t), 1, &outside_value);
+ *  mitkIpFuncSetTag(pic, "OUTSIDE_VALUE", mitkIpPicInt, sizeof(ipInt4_t), 1, &outside_value);
  *
  *  char startpoint[11];
  *  memset(startpoint, 0, 11);
  *  sprintf(startpoint,"(%u/%u)",*x,*y);
- *  ipFuncSetTag(p, "STARTPOINT", ipPicASCII, 11, 1, startpoint);
+ *  mitkIpFuncSetTag(p, "STARTPOINT", mitkIpPicASCII, 11, 1, startpoint);
  *  @endcode
  *  @warning not yet extensively tested.
  *
@@ -79,21 +79,21 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-int ipFuncSetTag( ipPicDescriptor *pic, char *name, int type, int size, 
+int mitkIpFuncSetTag( mitkIpPicDescriptor *pic, char *name, int type, int size, 
                   int el_size, void *data )
 {
-  ipPicTSV_t *tsv;
+  mitkIpPicTSV_t *tsv;
   int alloc_size;
   int add_new;
 
   if((pic==NULL) || (data==NULL)) return 0;
 
   alloc_size=size;
-  if((type==ipPicASCII) && (((char*)data)[size-1]!=0)) alloc_size++;
+  if((type==mitkIpPicASCII) && (((char*)data)[size-1]!=0)) alloc_size++;
 
-  tsv = ipPicQueryTag(pic, name);
+  tsv = mitkIpPicQueryTag(pic, name);
   if (tsv != NULL)
   {
     tsv->value = realloc(tsv->value, alloc_size * el_size );
@@ -101,7 +101,7 @@ int ipFuncSetTag( ipPicDescriptor *pic, char *name, int type, int size,
   }
   else
   {
-    tsv = malloc( sizeof(ipPicTSV_t) );
+    tsv = malloc( sizeof(mitkIpPicTSV_t) );
     tsv->value = malloc( alloc_size * el_size );
 	strcpy( tsv->tag, name);
     add_new = 1;
@@ -114,7 +114,7 @@ int ipFuncSetTag( ipPicDescriptor *pic, char *name, int type, int size,
   if(alloc_size!=size) ((char*)tsv->value)[size]=0;
 
   if(add_new==1)
-    ipPicAddTag( pic, tsv );
+    mitkIpPicAddTag( pic, tsv );
 
   return add_new+1;
 }

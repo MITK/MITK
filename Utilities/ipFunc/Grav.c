@@ -64,9 +64,9 @@
 
 /* include Files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old );
+ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old );
 
 #ifndef DOXYGEN_IGNORE 
 
@@ -124,7 +124,7 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old );
 */
 /* -------------------------------------------------------------------  */
 
-ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old )            
+ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old )            
 {
 
   ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
@@ -135,7 +135,7 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old )
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
  
   /* initialisation of vectors                                          */
 
@@ -151,7 +151,7 @@ ipFloat8_t *ipFuncGrav ( ipPicDescriptor *pic_old )
   gravity = ( ipFloat8_t * ) malloc ( 8 * sizeof ( ipFloat8_t ) );
   if ( gravity == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 

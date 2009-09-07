@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkIpPic.h>
 
-void ipMITKSegmentationFree (ipPicDescriptor* segmentation)
+void ipMITKSegmentationFree (mitkIpPicDescriptor* segmentation)
 {
     if (!segmentation) return;
 
-    ipPicFree (segmentation);
+    mitkIpPicFree (segmentation);
 }
 
 

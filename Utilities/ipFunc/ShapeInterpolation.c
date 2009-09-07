@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <math.h>
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 /*!
 The algorithm implements the shape-based interpolation technique.
@@ -13,7 +13,7 @@ IEEE Computer Graphics & Applications, pp. 69-79,May 1992
 #define MAX 2048
 
 extern float truncf (float x);
-static ipPicDescriptor* setup (ipPicDescriptor* pic_old, const ipFloat4_t threshold);
+static mitkIpPicDescriptor* setup (mitkIpPicDescriptor* pic_old, const ipFloat4_t threshold);
 static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* mask_dist, const ipInt2_t* mask_offset, const ipUInt4_t mask_elements);
 
 #define INTERPOLATE(TYPE, RESULT, PIC0, PIC1)							\
@@ -56,7 +56,7 @@ static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* ma
     for (i=0; i< mask_elements; i++) {								\
         mask_offset [i] = -mask_offset [i];							\
     }												\
-    pixel_out = (TYPE *) result->data + _ipPicElements(result) - 1;				\
+    pixel_out = (TYPE *) result->data + _mitkIpPicElements(result) - 1;				\
     for (y = last_y; y >= first_y; y--) {							\
 	    pixel [0] = (ipInt2_t *) (PIC0)->data + (last_x + y * (PIC0)->n [0]);		\
 	    pixel [1] = (ipInt2_t *) (PIC1)->data + (last_x + y * (PIC1)->n [0]);		\
@@ -78,20 +78,20 @@ static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* ma
 image equals to pic1 or pic2 if the ratio is zero and one, respectively 
 @returns the intermediate image
 */
-ipPicDescriptor*
-ipFuncShapeInterpolation (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ipFloat4_t threshold, const ipFloat4_t ratio, ipPicDescriptor* result)
+mitkIpPicDescriptor*
+mitkIpFuncShapeInterpolation (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pic2, const ipFloat4_t threshold, const ipFloat4_t ratio, mitkIpPicDescriptor* result)
 {
-    ipPicDescriptor *pic[2];                   /* pointer to image data */
+    mitkIpPicDescriptor *pic[2];                   /* pointer to image data */
 
     /* prepare the images */
-    result = ipPicCopyHeader(pic1, NULL);
+    result = mitkIpPicCopyHeader(pic1, NULL);
     if (result == NULL) {
 	return NULL;
     }
-    result->data = malloc (_ipPicSize (result)); 
+    result->data = malloc (_mitkIpPicSize (result)); 
     if (result->data == NULL) {
-	_ipFuncSetErrno (mitkIpFuncMALLOC_ERROR);
-	ipPicFree (result);	
+	_mitkIpFuncSetErrno (mitkIpFuncMALLOC_ERROR);
+	mitkIpPicFree (result);	
 	return NULL;
     }
     pic[0] = setup (pic1, threshold); 
@@ -99,8 +99,8 @@ ipFuncShapeInterpolation (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ip
 
     mitkIpPicFORALL_2(INTERPOLATE, result, pic[0], pic[1]);
 
-    ipPicFree(pic [0]);
-    ipPicFree(pic [1]);
+    mitkIpPicFree(pic [0]);
+    mitkIpPicFree(pic [1]);
     return result;
 }
 
@@ -118,21 +118,21 @@ ipFuncShapeInterpolation (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ip
 	}								\
 }
 
-static ipPicDescriptor*
-setup (ipPicDescriptor* pic_old, const ipFloat4_t threshold)
+static mitkIpPicDescriptor*
+setup (mitkIpPicDescriptor* pic_old, const ipFloat4_t threshold)
 {
-	ipPicDescriptor* pic;
+	mitkIpPicDescriptor* pic;
 	ipInt2_t* dst;
 	ipUInt4_t x, y;
 
 	/* Allocate new image for distance transform */
 
-	pic = ipPicCopyHeader (pic_old, NULL);
-	pic->type = ipPicInt;
+	pic = mitkIpPicCopyHeader (pic_old, NULL);
+	pic->type = mitkIpPicInt;
 	pic->bpe = 16;
 	pic->n[0] += 2;
 	pic->n[1] += 2;
-	pic->data = malloc (_ipPicSize (pic));
+	pic->data = malloc (_mitkIpPicSize (pic));
 
 	/* Set the frame to -1 */
 
@@ -140,7 +140,7 @@ setup (ipPicDescriptor* pic_old, const ipFloat4_t threshold)
 	for (x = 0; x < pic->n[0]; x++) {
 		*dst++ = -MAX;
 	}	
-	dst = (ipInt2_t *) pic->data + _ipPicElements (pic) - pic->n[0];
+	dst = (ipInt2_t *) pic->data + _mitkIpPicElements (pic) - pic->n[0];
 	for (x = 0; x < pic->n[0]; x++) {
 		*dst++ = -MAX;
 	}	

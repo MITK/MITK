@@ -60,8 +60,8 @@
  *                  the image or not
  *  @param border tells how the edge is transformed        
  *
- *  @arg @c ipFuncBorderOld  : original greyvalues        
- *  @arg @c ipFuncBorderZero : edge is set to minimal greyvalue
+ *  @arg @c mitkIpFuncBorderOld  : original greyvalues        
+ *  @arg @c mitkIpFuncBorderZero : edge is set to minimal greyvalue
  *
  *  @return pointer to transformed iamge ( of type ipFloat8_t )
  *
@@ -71,18 +71,18 @@
 
 /* include files                                                     */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
                               ipUInt4_t       dim_mask,
                               ipUInt4_t       len_mask,
                               ipFloat8_t      threshold,
-                              ipFuncFlagI_t   border ) ;
+                              mitkIpFuncFlagI_t   border ) ;
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncCanny\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncCanny\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -232,7 +232,7 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
    ipUInt4_t  i;                    /* loop variable                    */ \
    ipUInt4_t  no_elem;              /* number of pixels                 */ \
                                                                            \
-   no_elem =  _ipPicElements ( pic_help2 );                                \
+   no_elem =  _mitkIpPicElements ( pic_help2 );                                \
    for ( i = 0; i < no_elem; i++ )                                         \
      (( type_h * )pic_help3->data )[i] =                                   \
         ( ( (( type_h * ) pic_help3->data )[i] != 0 ) &&                   \
@@ -242,28 +242,28 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
 /* ----------------------------------------------------------------- */
 /*
-** ipFuncCanny
+** mitkIpFuncCanny
 */
 /* ----------------------------------------------------------------- */
 
-ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
                               ipUInt4_t       dim_mask,
                               ipUInt4_t       len_mask,
                               ipFloat8_t      threshold,
-                              ipFuncFlagI_t   border ) 
+                              mitkIpFuncFlagI_t   border ) 
 {
   #include "gradient.h"
 
-  ipPicDescriptor *pic_help1;         /* pointer to image               */
-  ipPicDescriptor *pic_help2;         /* pointer to image               */
-  ipPicDescriptor *pic_help3;         /* pointer to image               */
-  ipPicDescriptor *pic_help4;         /* pointer to image               */
-  ipPicDescriptor *pic_new;           /* pointer to image               */
-  ipPicDescriptor *pic_mask;          /* sobel mask                     */
+  mitkIpPicDescriptor *pic_help1;         /* pointer to image               */
+  mitkIpPicDescriptor *pic_help2;         /* pointer to image               */
+  mitkIpPicDescriptor *pic_help3;         /* pointer to image               */
+  mitkIpPicDescriptor *pic_help4;         /* pointer to image               */
+  mitkIpPicDescriptor *pic_new;           /* pointer to image               */
+  mitkIpPicDescriptor *pic_mask;          /* sobel mask                     */
   ipUInt4_t       pos;                /* position in m->off_vekt        */
   ipUInt4_t       i, j;               /* loopindex                      */
   ipUInt4_t       off_mask;           /* loopindex                      */
-  ipFuncMasc_t    *m;                 /* compressed mask                */
+  mitkIpFuncMasc_t    *m;                 /* compressed mask                */
   ipInt4_t        offset;                 
   ipInt4_t        beg[_mitkIpPicNDIM];
   ipInt4_t        end[_mitkIpPicNDIM];
@@ -275,30 +275,30 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( ( dim_mask < 1 ) || ( dim_mask > 4 ) )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_old->dim < dim_mask ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* initialisation of pic_mask                                         */
 
-  pic_mask = ipPicNew ();
+  pic_mask = mitkIpPicNew ();
   if ( pic_mask == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  pic_mask->type = ipPicInt;
+  pic_mask->type = mitkIpPicInt;
   pic_mask->bpe  = 16;
   pic_mask->dim  = dim_mask+1;
   for ( i = 0; i < dim_mask; i++ )
@@ -344,119 +344,119 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_help2 = ipPicCopyHeader ( pic_old, NULL );
+  pic_help2 = mitkIpPicCopyHeader ( pic_old, NULL );
   if ( pic_help2 == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       mitkIpPicFree ( pic_mask);
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
-  if ( pic_old->type == ipPicUInt || pic_old->type == ipPicInt ) 
+  if ( pic_old->type == mitkIpPicUInt || pic_old->type == mitkIpPicInt ) 
     {
-       pic_help2->type = ipPicFloat;
+       pic_help2->type = mitkIpPicFloat;
        pic_help2->bpe  = 64;
     }
-  pic_help2->data = calloc ( _ipPicElements ( pic_help2 ), pic_help2->bpe / 8 );
+  pic_help2->data = calloc ( _mitkIpPicElements ( pic_help2 ), pic_help2->bpe / 8 );
   if ( pic_help2->data == NULL )
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_mask);
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  pic_help1 = ipPicCopyHeader ( pic_help2, NULL );
+  pic_help1 = mitkIpPicCopyHeader ( pic_help2, NULL );
   if ( pic_help1 == NULL )
     {
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2);
+       mitkIpPicFree ( pic_help2);
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       mitkIpPicFree ( pic_mask);
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
   pic_help1->dim = pic_help2->dim + 1;
   pic_help1->n[pic_help1->dim-1] = dim_mask;
-  pic_help1->data = calloc ( _ipPicElements ( pic_help1 ), pic_help1->bpe / 8 );
+  pic_help1->data = calloc ( _mitkIpPicElements ( pic_help1 ), pic_help1->bpe / 8 );
   if ( pic_help1->data == NULL ) 
     {
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2);
+       mitkIpPicFree ( pic_help2);
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask);
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_mask);
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   
-  pic_help3 = ipPicCopyHeader ( pic_help2, NULL );
+  pic_help3 = mitkIpPicCopyHeader ( pic_help2, NULL );
   if ( pic_help3 == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask );
+       mitkIpPicFree ( pic_mask );
        pic_help1->data = NULL;
-       ipPicFree ( pic_help1 );
+       mitkIpPicFree ( pic_help1 );
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       mitkIpPicFree ( pic_help2 );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
-  pic_help3->data = calloc ( _ipPicElements ( pic_help3 ), pic_help3->bpe / 8 );
+  pic_help3->data = calloc ( _mitkIpPicElements ( pic_help3 ), pic_help3->bpe / 8 );
   if ( pic_help3->data == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask );
+       mitkIpPicFree ( pic_mask );
        pic_help1->data = NULL;
-       ipPicFree ( pic_help1 );
+       mitkIpPicFree ( pic_help1 );
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_help2 );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* allocate mask-structure                                            */
 
-  m = malloc ( sizeof ( ipFuncMasc_t ) );
+  m = malloc ( sizeof ( mitkIpFuncMasc_t ) );
   if ( m == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask );
+       mitkIpPicFree ( pic_mask );
        pic_help1->data = NULL;
-       ipPicFree ( pic_help1 );
+       mitkIpPicFree ( pic_help1 );
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2 );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_help2 );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->off_vekt  = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
+  m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
   if ( m->off_vekt == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask );
+       mitkIpPicFree ( pic_mask );
        pic_help1->data = NULL;
-       ipPicFree ( pic_help1 );
+       mitkIpPicFree ( pic_help1 );
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2 );
+       mitkIpPicFree ( pic_help2 );
        pic_help3->data = NULL;
-       ipPicFree ( pic_help3 );
+       mitkIpPicFree ( pic_help3 );
        free ( m );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->mask_vekt = malloc ( _ipPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
+  m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
   if ( m->mask_vekt == NULL ) 
     {
        pic_mask->data = NULL;
-       ipPicFree ( pic_mask );
+       mitkIpPicFree ( pic_mask );
        pic_help1->data = NULL;
-       ipPicFree ( pic_help1 );
+       mitkIpPicFree ( pic_help1 );
        pic_help2->data = NULL;
-       ipPicFree ( pic_help2 );
+       mitkIpPicFree ( pic_help2 );
        pic_help3->data = NULL;
-       ipPicFree ( pic_help3 );
+       mitkIpPicFree ( pic_help3 );
        free ( m->off_vekt );
        free ( m );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -494,7 +494,7 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
   /* smooth image using a binomial filter                              */
 
-  pic_new = ipFuncGausF ( pic_old, len_mask, dim_mask, border );
+  pic_new = mitkIpFuncGausF ( pic_old, len_mask, dim_mask, border );
 
   /* calculate second derivation                                       */
 
@@ -505,7 +505,7 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
 
   /* zero crossing                                                     */
 
-  pic_help4 = ipFuncZeroCr ( pic_help3 );
+  pic_help4 = mitkIpFuncZeroCr ( pic_help3 );
  
   mitkIpPicFORALL_2 ( CANNY3, pic_help2, pic_help4, threshold );
 
@@ -514,16 +514,16 @@ ipPicDescriptor *ipFuncCanny( ipPicDescriptor *pic_old,
   free ( m->off_vekt );
   free ( m->mask_vekt );
   free ( m );
-  ipPicFree ( pic_new );
-  ipPicFree ( pic_help1 );
-  ipPicFree ( pic_help2 );
-  ipPicFree ( pic_help3 );
+  mitkIpPicFree ( pic_new );
+  mitkIpPicFree ( pic_help1 );
+  mitkIpPicFree ( pic_help2 );
+  mitkIpPicFree ( pic_help3 );
   pic_mask->data = NULL;
-  ipPicFree ( pic_mask );
+  mitkIpPicFree ( pic_mask );
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_help4, pic_old);
+  mitkIpFuncCopyTags(pic_help4, pic_old);
 
   return ( pic_help4 );
 }

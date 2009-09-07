@@ -44,7 +44,7 @@
 
 *****************************************************************************/
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 ipUInt4_t _ipGetANew( ipUInt4_t aNew[],  ipUInt4_t Index)
 {

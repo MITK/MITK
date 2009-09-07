@@ -61,10 +61,10 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
-                             ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncNot ( mitkIpPicDescriptor *pic_old,
+                             mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -74,7 +74,7 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 {                                                                        \
   ipUInt4_t  i, no_elem;                                                 \
                                                                          \
-  no_elem = _ipPicElements ( pic );                                      \
+  no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
   {                                                                      \
     (( type * ) pic_new->data ) [i] = ! ( (( type * ) pic->data ) [i] ); \
@@ -88,20 +88,20 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
-                             ipPicDescriptor *pic_return )
+mitkIpPicDescriptor *mitkIpFuncNot ( mitkIpPicDescriptor *pic_old,
+                             mitkIpPicDescriptor *pic_return )
 {
 
-  ipPicDescriptor *pic_new;  /* inverted picture                        */
+  mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
 
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to invert the picture (for all data types)                   */
@@ -110,7 +110,7 @@ ipPicDescriptor *ipFuncNot ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                         

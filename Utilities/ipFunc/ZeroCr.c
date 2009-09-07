@@ -59,9 +59,9 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old ) ;
+mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -126,10 +126,10 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old ) ;
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )          
+mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )          
 {
 
-  ipPicDescriptor *pic_new;           /* convoluted image               */
+  mitkIpPicDescriptor *pic_new;           /* convoluted image               */
   ipUInt4_t       i, j;               /* loopindex                      */
   ipInt4_t        size[_mitkIpPicNDIM];
   ipUInt4_t       n[_mitkIpPicNDIM];
@@ -137,7 +137,7 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* initialisation of vectors                                          */
   
@@ -156,7 +156,7 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
   off_vekt = malloc ( 2 * pic_old->dim * sizeof ( ipInt4_t ) );
   if ( off_vekt == NULL ) 
     {  
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -170,20 +170,20 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = ipPicCopyHeader ( pic_old, 0 );
+  pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
   if ( pic_new == NULL )
     {
        free ( off_vekt );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
        free ( off_vekt );
        return ( mitkIpFuncERROR );
     }
-  pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe/8  );
+  pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe/8  );
   if ( pic_new->data == NULL )
     {
        free ( off_vekt );
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                
        free ( off_vekt );
        return ( mitkIpFuncERROR );
     }
@@ -197,7 +197,7 @@ ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old )
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                         

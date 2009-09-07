@@ -68,10 +68,10 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,           
-                              ipPicDescriptor *pic_new ) ;
+mitkIpPicDescriptor *_mitkIpFuncScBL( mitkIpPicDescriptor *pic_old,           
+                              mitkIpPicDescriptor *pic_new ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -110,7 +110,7 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
    for ( i = pic_new->dim; i < _mitkIpPicNDIM; i++ )                         \
      n_i[i] = 1;                                                         \
                                                                          \
-   pic_elements = _ipPicElements(pic_old)*step;                          \
+   pic_elements = _mitkIpPicElements(pic_old)*step;                          \
    off_new = 0;                                                          \
    switch ( pic_new->dim )                                               \
    {                                                                     \
@@ -294,8 +294,8 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,           
-                              ipPicDescriptor *pic_new ) 
+mitkIpPicDescriptor *_mitkIpFuncScBL( mitkIpPicDescriptor *pic_old,           
+                              mitkIpPicDescriptor *pic_new ) 
 {
 
   ipUInt4_t       i;                  /* loopindex                      */
@@ -314,11 +314,11 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 	  pic_old->bpe=pic_new->bpe=8;
   }
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_new ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim != pic_new->dim )
     {  
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -354,23 +354,23 @@ ipPicDescriptor *_ipFuncScBL( ipPicDescriptor *pic_old,
 
   pic_new->bpe  = pic_old->bpe*(is_color!=0?3:1);
   pic_new->type = pic_old->type;
-  pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+  pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_new->data == NULL )
     {
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
  
   /* macro to scale an image ( for all data types )s)                   */
 
-  if(pic_old->type==ipPicFloat)
+  if(pic_old->type==mitkIpPicFloat)
   {
 	if(is_color==0)
 	{

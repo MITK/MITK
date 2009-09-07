@@ -42,7 +42,7 @@ class ImageTimeSelector;
 //## @brief Image class for storing images
 //##
 //## Can be asked for header information, the data vector, 
-//## the ipPicDescriptor struct or vtkImageData objects. If not the complete
+//## the mitkIpPicDescriptor struct or vtkImageData objects. If not the complete
 //## data is required, the appropriate SubImageSelector class should be used
 //## for access.
 //## Image organizes sets of slices (s x 2D), volumes (t x 3D) and channels (n
@@ -110,11 +110,11 @@ public:
   virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
 
   //##Documentation
-  //## @brief Get the complete image, i.e., all channels linked together, as a @a ipPicDescriptor.
+  //## @brief Get the complete image, i.e., all channels linked together, as a @a mitkIpPicDescriptor.
   //##
   //## If you only want to access a slice, volume at a specific time or single channel
   //## use one of the SubImageSelector classes.
-  virtual ipPicDescriptor* GetPic();
+  virtual mitkIpPicDescriptor* GetPic();
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is set
@@ -206,7 +206,7 @@ public:
   //## @return @a false : dimensions and/or data-type of @a pic does not
   //## comply with image 
   //## @a true success
-  virtual bool SetPicSlice(const ipPicDescriptor *pic, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
+  virtual bool SetPicSlice(const mitkIpPicDescriptor *pic, int s = 0, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## @brief Set @a pic as volume at time @a t in channel @a n.
@@ -217,7 +217,7 @@ public:
   //## @return @a false : dimensions and/or data-type of @a pic does not
   //## comply with image 
   //## @a true success
-  virtual bool SetPicVolume(const ipPicDescriptor *pic, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
+  virtual bool SetPicVolume(const mitkIpPicDescriptor *pic, int t = 0, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## @brief Set @a pic in channel @a n. 
@@ -228,7 +228,7 @@ public:
   //## @return @a false : dimensions and/or data-type of @a pic does not
   //## comply with image 
   //## @a true success
-  virtual bool SetPicChannel(const ipPicDescriptor *pic, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
+  virtual bool SetPicChannel(const mitkIpPicDescriptor *pic, int n = 0, ImportMemoryManagementType importMemoryManagement = CopyMemory );
 
   //##Documentation
   //## initialize new (or re-initialize) image information
@@ -268,7 +268,7 @@ public:
   //## @param tDim override time dimension (@a n[3]) in @a pic (if >0)
   //## @param sDim override z-space dimension (@a n[2]) in @a pic (if >0)
   //## @warning Initialize() by pic assumes a plane, evenly spaced geometry starting at (0,0,0).
-  virtual void Initialize(const ipPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
+  virtual void Initialize(const mitkIpPicDescriptor* pic, int channels = 1, int tDim = -1, int sDim = -1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a vtkimagedata,
@@ -522,7 +522,7 @@ public:
 
 protected:
   template <class T>
-  void AccessPixel(ipPicDescriptor* pic, mitk::Point3D p, double& value, int timestep = 0);
+  void AccessPixel(mitkIpPicDescriptor* pic, mitk::Point3D p, double& value, int timestep = 0);
   
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
@@ -585,7 +585,7 @@ protected:
 //##
 //## The pixel type is always being converted to double.
 template <class T>
-void Image::AccessPixel(ipPicDescriptor* pic, mitk::Point3D p, double& value, int timestep)
+void Image::AccessPixel(mitkIpPicDescriptor* pic, mitk::Point3D p, double& value, int timestep)
 {  
   itk::Point<int, 3> pi;
   mitk::itk2vtk(p, pi);

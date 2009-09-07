@@ -54,8 +54,8 @@
  *  @param pic_masks    pointer to a set of hit and miss masks
  *                 ( if pic_masks = NULL -> default masks are used )
  *  @param border      tells how the edge is transformed
- *  @arg @c ipFuncBorderOld  original greyvalues        
- *  @arg @c ipFuncBorderZero : edge is set to minimal greyvalue
+ *  @arg @c mitkIpFuncBorderOld  original greyvalues        
+ *  @arg @c mitkIpFuncBorderZero : edge is set to minimal greyvalue
  *
  *  @return pointer to image after hit and miss operation 
  *
@@ -64,32 +64,32 @@
 
 /* include files                                                      */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncHitMiss ( ipPicDescriptor *pic_old, 
-                                 ipPicDescriptor *pic_masks,
-                                 ipFuncFlagI_t   border );
+mitkIpPicDescriptor *mitkIpFuncHitMiss ( mitkIpPicDescriptor *pic_old, 
+                                 mitkIpPicDescriptor *pic_masks,
+                                 mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncHitMiss\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncHitMiss\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 
 /* ------------------------------------------------------------------ */
 /*
-** ipFuncHitMiss         
+** mitkIpFuncHitMiss         
 */
 /* ------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncHitMiss ( ipPicDescriptor *pic_old, 
-                                 ipPicDescriptor *pic_masks,
-                                 ipFuncFlagI_t   border )
+mitkIpPicDescriptor *mitkIpFuncHitMiss ( mitkIpPicDescriptor *pic_old, 
+                                 mitkIpPicDescriptor *pic_masks,
+                                 mitkIpFuncFlagI_t   border )
 {
   ipBool_t          allocated=ipFalse;
-  ipPicDescriptor   *pic_new;  /* pointer to new image                */
+  mitkIpPicDescriptor   *pic_new;  /* pointer to new image                */
   ipUInt1_t         mask[] =   /* hit and miss mask (edge detection)  */
                     { 0, 0, 0, 0, 1, 0, 0, 0, 0, 
                       0, 1, 0, 0, 0, 0, 0, 0, 0,
@@ -104,31 +104,31 @@ ipPicDescriptor *ipFuncHitMiss ( ipPicDescriptor *pic_old,
   if ( pic_masks == NULL )
     {
        allocated = ipTrue;
-       pic_masks = ipPicNew ();
+       pic_masks = mitkIpPicNew ();
        if ( pic_masks == NULL ) 
          {
-           _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
            return ( mitkIpFuncERROR );
          }
        pic_masks->dim  = 3;
-       pic_masks->type = ipPicUInt;
+       pic_masks->type = mitkIpPicUInt;
        pic_masks->bpe  = 8;
        pic_masks->n[0] = 3;
        pic_masks->n[1] = 3;
        pic_masks->n[2] = 8;
        pic_masks->data = mask;
     } 
-  pic_new = _ipFuncHitMissI ( pic_old, pic_masks, border );
+  pic_new = _mitkIpFuncHitMissI ( pic_old, pic_masks, border );
   
   if ( allocated )
     {
        pic_masks->data = NULL;
-       ipPicFree ( pic_masks );
+       mitkIpPicFree ( pic_masks );
     }
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
         
 

@@ -23,23 +23,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipDicom/ipDicom.h"
 #endif /* HAVE_IPDICOM */
 
-bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing)
+bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spacing)
 {
-  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
 
-  ipPicTSV_t *tsv;
+  mitkIpPicTSV_t *tsv;
   bool pixelSize = false;
 
-  tsv = ipPicQueryTag( pic, "REAL PIXEL SIZE" );
+  tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZE" );
   if(tsv==NULL)
   {
-    tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
+    tsv = mitkIpPicQueryTag( pic, "PIXEL SIZE" );
     pixelSize = true;
   }
   if(tsv)
   {
     bool tagFound = false;
-    if((tsv->dim*tsv->n[0]>=3) && (tsv->type==ipPicFloat))
+    if((tsv->dim*tsv->n[0]>=3) && (tsv->type==mitkIpPicFloat))
     {
       if(tsv->bpe==32)
       {
@@ -55,11 +55,11 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
     }
     if(tagFound && pixelSize)
     {
-      tsv = ipPicQueryTag( pic, "PIXEL SPACING" );
+      tsv = mitkIpPicQueryTag( pic, "PIXEL SPACING" );
       if(tsv)
       {
         mitk::ScalarType zSpacing = 0;
-        if((tsv->dim*tsv->n[0]>=3) && (tsv->type==ipPicFloat))
+        if((tsv->dim*tsv->n[0]>=3) && (tsv->type==mitkIpPicFloat))
         {
           if(tsv->bpe==32)
           {
@@ -80,7 +80,7 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
     if(tagFound) return true;
   }
 #ifdef HAVE_IPDICOM
-  tsv = ipPicQueryTag( pic, "SOURCE HEADER" );
+  tsv = mitkIpPicQueryTag( pic, "SOURCE HEADER" );
   if( tsv )
   {
     void *data;
@@ -127,14 +127,14 @@ bool mitk::PicHelper::GetSpacing(const ipPicDescriptor* aPic, Vector3D & spacing
   return false;
 }
 
-bool mitk::PicHelper::GetTimeSpacing(const ipPicDescriptor* aPic, float& timeSpacing)
+bool mitk::PicHelper::GetTimeSpacing(const mitkIpPicDescriptor* aPic, float& timeSpacing)
 {
 
-  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
 
-  ipPicTSV_t *tsv;
+  mitkIpPicTSV_t *tsv;
 
-  tsv = ipPicQueryTag( pic, "PIXEL SIZE" );
+  tsv = mitkIpPicQueryTag( pic, "PIXEL SIZE" );
   if(tsv)
   {
     timeSpacing = ((ipFloat4_t*)tsv->value)[3];
@@ -144,14 +144,14 @@ bool mitk::PicHelper::GetTimeSpacing(const ipPicDescriptor* aPic, float& timeSpa
   return true;
 }
 
-bool mitk::PicHelper::SetSpacing(const ipPicDescriptor* aPic, SlicedGeometry3D* slicedgeometry)
+bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor* aPic, SlicedGeometry3D* slicedgeometry)
 {
-  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
 
   Vector3D spacing(slicedgeometry->GetSpacing());
 
-  ipPicTSV_t *tsv;
-  if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
+  mitkIpPicTSV_t *tsv;
+  if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
   {    
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
@@ -179,15 +179,15 @@ bool mitk::PicHelper::SetSpacing(const ipPicDescriptor* aPic, SlicedGeometry3D* 
     return false;
 }
 
-void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry)
+void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry)
 {
   assert(pic!=NULL);
   assert(slicedgeometry!=NULL);
 
   mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
 
-  ipPicTSV_t *geometryTag;
-  if ( (geometryTag = ipPicQueryTag( const_cast<ipPicDescriptor*>(pic), "ISG" )) != NULL)
+  mitkIpPicTSV_t *geometryTag;
+  if ( (geometryTag = mitkIpPicQueryTag( const_cast<mitkIpPicDescriptor*>(pic), "ISG" )) != NULL)
   {    
     mitk::Point3D  origin;
     mitk::Vector3D rightVector;
@@ -224,16 +224,16 @@ void mitk::PicHelper::InitializeEvenlySpaced(const ipPicDescriptor* pic, unsigne
   }
 }
 
-bool mitk::PicHelper::SetGeometry2D(const ipPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
+bool mitk::PicHelper::SetGeometry2D(const mitkIpPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
 {
-  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
   if((pic!=NULL) && (slicedgeometry->IsValidSlice(s)))
   {
     //construct standard view
     mitk::Point3D origin;
     mitk::Vector3D rightDV, bottomDV;
-    ipPicTSV_t *tsv;
-    if ( (tsv = ipPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
+    mitkIpPicTSV_t *tsv;
+    if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
     {    
       unsigned int count = (unsigned int) tsv->n[1];
       float* value = (float*) tsv->value;

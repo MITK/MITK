@@ -101,107 +101,107 @@ SOURCE=.\ipFWrite.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicAddT.c
+SOURCE=.\mitkIpPicAddT.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicClear.c
+SOURCE=.\mitkIpPicClear.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicClone.c
+SOURCE=.\mitkIpPicClone.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicCopyH.c
+SOURCE=.\mitkIpPicCopyH.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicCopyS.c
+SOURCE=.\mitkIpPicCopyS.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicDelT.c
+SOURCE=.\mitkIpPicDelT.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicElements.c
+SOURCE=.\mitkIpPicElements.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicFree.c
+SOURCE=.\mitkIpPicFree.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicGet.c
+SOURCE=.\mitkIpPicGet.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicGetH.c
+SOURCE=.\mitkIpPicGetH.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicGetMem.c
+SOURCE=.\mitkIpPicGetMem.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicGetS.c
+SOURCE=.\mitkIpPicGetS.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicGetT.c
+SOURCE=.\mitkIpPicGetT.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicInfo.c
+SOURCE=.\mitkIpPicInfo.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicNew.c
+SOURCE=.\mitkIpPicNew.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicOldGet.c
+SOURCE=.\mitkIpPicOldGet.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicOldGetH.c
+SOURCE=.\mitkIpPicOldGetH.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicOldGetS.c
+SOURCE=.\mitkIpPicOldGetS.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicPut.c
+SOURCE=.\mitkIpPicPut.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicPutMem.c
+SOURCE=.\mitkIpPicPutMem.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicPutS.c
+SOURCE=.\mitkIpPicPutS.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicQueryT.c
+SOURCE=.\mitkIpPicQueryT.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicSize.c
+SOURCE=.\mitkIpPicSize.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicTSVElements.c
+SOURCE=.\mitkIpPicTSVElements.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicTSVSize.c
+SOURCE=.\mitkIpPicTSVSize.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicType.c
+SOURCE=.\mitkIpPicType.c
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"
@@ -209,19 +209,19 @@ SOURCE=.\ipPicType.c
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\ipPic.h
+SOURCE=.\mitkIpPic.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicAnnotation.h
+SOURCE=.\mitkIpPicAnnotation.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipPicOldP.h
+SOURCE=.\mitkIpPicOldP.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipTypes.h
+SOURCE=.\mitkIpTypes.h
 # End Source File
 # End Group
 # Begin Source File

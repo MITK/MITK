@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindow.h"
 #include "vtkPolyData.h"
 
-struct ipPicDescriptor;
+struct mitkIpPicDescriptor;
 
 namespace mitk
 {
@@ -203,7 +203,7 @@ namespace CommonFunctionality
   * \brief creates a datatreenode for th PIC image and adds the node to 
   * the referenced datatree
   */
-  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
+  QMITKEXT_EXPORT mitk::DataTreeNode::Pointer AddPicImageToDataTree(mitkIpPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str);
 
   QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
   QMITKEXT_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const char *fileExtensions );

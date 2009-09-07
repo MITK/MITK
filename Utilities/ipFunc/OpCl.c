@@ -61,26 +61,26 @@
  *  @arg  @c      0 (mitkIpOPEN)  :   opening
  *  @arg @c       1 (mitkIpCLOSE) :   closing 
  *  @param border   tells how the edge is transformed
- *  @arg @c       ipFuncBorderOld  :   original greyvalues
- *  @arg @c       ipFuncBorderZero :   edge is set to zero
+ *  @arg @c       mitkIpFuncBorderOld  :   original greyvalues
+ *  @arg @c       mitkIpFuncBorderZero :   edge is set to zero
  *
  * @return pointer to the transformed image
  *
  * USES
- *  function _ipFuncError     - checks the image data          
- *  function _ipFuncMorph     - performs morphological operations
+ *  function _mitkIpFuncError     - checks the image data          
+ *  function _mitkIpFuncMorph     - performs morphological operations
  *
  * AUTHOR & DATE
  */
 
 /* include files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *_ipFuncOpCl  ( ipPicDescriptor *pic_old,
-                               ipPicDescriptor *mask,
-                               _ipFuncFlagF_t    kind, 
-                               ipFuncFlagI_t   border );
+mitkIpPicDescriptor *_mitkIpFuncOpCl  ( mitkIpPicDescriptor *pic_old,
+                               mitkIpPicDescriptor *mask,
+                               _mitkIpFuncFlagF_t    kind, 
+                               mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
@@ -92,61 +92,61 @@ ipPicDescriptor *_ipFuncOpCl  ( ipPicDescriptor *pic_old,
 
 /* ---------------------------------------------------------------------- */
 /* 
-** function ipFuncOpCl 
+** function mitkIpFuncOpCl 
 */
 /* ---------------------------------------------------------------------- */
 
-ipPicDescriptor *_ipFuncOpCl  ( ipPicDescriptor *pic_old,
-                               ipPicDescriptor *mask,
-                               _ipFuncFlagF_t    kind, 
-                               ipFuncFlagI_t   border )
+mitkIpPicDescriptor *_mitkIpFuncOpCl  ( mitkIpPicDescriptor *pic_old,
+                               mitkIpPicDescriptor *mask,
+                               _mitkIpFuncFlagF_t    kind, 
+                               mitkIpFuncFlagI_t   border )
 {
-  ipPicDescriptor *pic_new1;       /* pointer to transformed image         */
-  ipPicDescriptor *pic_new2;       /* pointer to transformed image         */
+  mitkIpPicDescriptor *pic_new1;       /* pointer to transformed image         */
+  mitkIpPicDescriptor *pic_new2;       /* pointer to transformed image         */
   ipUInt4_t       i;               /* loop index                           */
 
   /* check image data                                                      */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( mask->dim > pic_old->dim ) 
     { 
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
   for ( i = 0; i < mask->dim; i++ )
     if ( mask->n[i] > pic_old->n[i] ) 
       { 
-         _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+         _mitkIpFuncSetErrno ( mitkIpFuncSIZE_ERROR );
          return ( mitkIpFuncERROR );
       }
 
   /* check whether opening or closing operation should be performed       */
 
-  if ( kind == ipFuncOpenF )
+  if ( kind == mitkIpFuncOpenF )
     {
-       pic_new1 = _ipFuncMorph ( pic_old, mask, ipFuncEroF, border );
-       if ( border == ipFuncBorderZero )
-         pic_new1 = ipFuncBorder ( pic_new1, mask, pic_new1 );
-       pic_new2 = _ipFuncMorph ( pic_new1, mask, ipFuncDilaF, border );
-       if ( border == ipFuncBorderZero )
-         pic_new2 = ipFuncBorder ( pic_new2, mask, pic_new2 );
+       pic_new1 = _mitkIpFuncMorph ( pic_old, mask, mitkIpFuncEroF, border );
+       if ( border == mitkIpFuncBorderZero )
+         pic_new1 = mitkIpFuncBorder ( pic_new1, mask, pic_new1 );
+       pic_new2 = _mitkIpFuncMorph ( pic_new1, mask, mitkIpFuncDilaF, border );
+       if ( border == mitkIpFuncBorderZero )
+         pic_new2 = mitkIpFuncBorder ( pic_new2, mask, pic_new2 );
     }
-  else if ( kind == ipFuncCloseF )
+  else if ( kind == mitkIpFuncCloseF )
     {
-       pic_new1 = _ipFuncMorph ( pic_old, mask, ipFuncDilaF, border );
-       if ( border == ipFuncBorderZero )
-         pic_new1 = ipFuncBorder ( pic_new1, mask, pic_new1 );
-       pic_new2 = _ipFuncMorph ( pic_new1, mask, ipFuncEroF, border );
-       if ( border == ipFuncBorderZero )
-         pic_new2 = ipFuncBorder ( pic_new2, mask, pic_new2 );
+       pic_new1 = _mitkIpFuncMorph ( pic_old, mask, mitkIpFuncDilaF, border );
+       if ( border == mitkIpFuncBorderZero )
+         pic_new1 = mitkIpFuncBorder ( pic_new1, mask, pic_new1 );
+       pic_new2 = _mitkIpFuncMorph ( pic_new1, mask, mitkIpFuncEroF, border );
+       if ( border == mitkIpFuncBorderZero )
+         pic_new2 = mitkIpFuncBorder ( pic_new2, mask, pic_new2 );
     }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
-  ipPicFree ( pic_new1 );
+  mitkIpPicFree ( pic_new1 );
 
   return ( pic_new2 );
 }

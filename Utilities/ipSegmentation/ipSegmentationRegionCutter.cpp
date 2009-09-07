@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <ipPic/ipPicTypeMultiplex.h>
+#include <ipPic/mitkIpPicTypeMultiplex.h>
 #include <ANN/ANN.h>
 #include "ipSegmentation.h"
 
@@ -53,7 +53,7 @@ static ANNdistArray dists;
   }
 
 
-float ipMITKSegmentationGetDistGradient( int ofs, ipPicDescriptor *seg )
+float ipMITKSegmentationGetDistGradient( int ofs, mitkIpPicDescriptor *seg )
 {
   ipUInt4_t unsignedOfs = ofs < 0 ? seg->n[0]*seg->n[1] - seg->n[0] : ofs;
   if (unsignedOfs < seg->n[0] || unsignedOfs >= seg->n[0]*seg->n[1] - seg->n[0]) // exclude image borders
@@ -90,7 +90,7 @@ float ipMITKSegmentationGetDistGradient( int ofs, ipPicDescriptor *seg )
 
 
 
-tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor *history, int ofs )
+tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDescriptor *history, int ofs )
 {
   bool debug(false);
   tCutResult res;

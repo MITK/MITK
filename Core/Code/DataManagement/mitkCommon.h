@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mbilog.h"
 
 #ifndef MITK_UNMANGLE_IPPIC
-#define ipPicDescriptor mitkIpPicDescriptor
+#define mitkIpPicDescriptor mitkIpPicDescriptor
 #endif
 
 typedef unsigned int MapperSlotId;

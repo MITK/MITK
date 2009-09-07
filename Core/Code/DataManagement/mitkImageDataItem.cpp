@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkDiffusionTensor3D.h"
 
-#include "ipFunc/ipFunc.h"
+#include "ipFunc/mitkIpFunc.h"
 
 #ifdef _OPENMP
 #include "omp.h"
@@ -49,15 +49,15 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_Parent(&aParent)
 {
   m_PixelType = aParent.GetPixelType();
-  m_PicDescriptor=ipPicNew();
+  m_PicDescriptor=mitkIpPicNew();
   m_PicDescriptor->bpe=m_PixelType.GetBpe();
   m_PicDescriptor->type=m_PixelType.GetType();
   m_PicDescriptor->dim=dimension;
   memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(ipUInt4_t)*_mitkIpPicNDIM);
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
-  ipFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
+  mitkIpFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
 
-  m_Size = _ipPicSize(m_PicDescriptor);
+  m_Size = _mitkIpPicSize(m_PicDescriptor);
   if(data != NULL)
   {
     memcpy(m_Data, data, m_Size);
@@ -79,7 +79,7 @@ mitk::ImageDataItem::~ImageDataItem()
   if(m_PicDescriptor!=NULL)
   {
     m_PicDescriptor->data=NULL;
-    ipPicFree(m_PicDescriptor);
+    mitkIpPicFree(m_PicDescriptor);
   }
   if(m_Parent.IsNull())
   {
@@ -94,7 +94,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
 {
   //const std::type_info & typeId=*type.GetTypeId();
   m_PixelType = type;
-  m_PicDescriptor=ipPicNew();
+  m_PicDescriptor=mitkIpPicNew();
   m_PicDescriptor->bpe=m_PixelType.GetBpe();
   m_PicDescriptor->type=m_PixelType.GetType();
   m_PicDescriptor->dim=dimension;
@@ -102,7 +102,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   unsigned char i;
   for(i=dimension; i < _mitkIpPicNDIM; ++i)
     m_PicDescriptor->n[i] = 1;
-  m_Size = _ipPicSize(m_PicDescriptor);
+  m_Size = _mitkIpPicSize(m_PicDescriptor);
   if(m_Data == NULL)
   {
     m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
@@ -158,57 +158,57 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
 
     inData->SetNumberOfScalarComponents(m_PixelType.GetNumberOfComponents());
 
-    if ( ( m_PixelType.GetType() == ipPicInt || m_PixelType.GetType() == ipPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
+    if ( ( m_PixelType.GetType() == mitkIpPicInt || m_PixelType.GetType() == mitkIpPicUInt ) && m_PixelType.GetBitsPerComponent() == 1 )
     {
       inData->SetScalarType( VTK_BIT );
       scalars = vtkBitArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicInt && m_PixelType.GetBitsPerComponent() == 8 )
+    else if ( m_PixelType.GetType() == mitkIpPicInt && m_PixelType.GetBitsPerComponent() == 8 )
     {
       inData->SetScalarType( VTK_CHAR );
       scalars = vtkCharArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicUInt && m_PixelType.GetBitsPerComponent() == 8 )
+    else if ( m_PixelType.GetType() == mitkIpPicUInt && m_PixelType.GetBitsPerComponent() == 8 )
     {
       inData->SetScalarType( VTK_UNSIGNED_CHAR );
       scalars = vtkUnsignedCharArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicInt && m_PixelType.GetBitsPerComponent() == 16 )
+    else if ( m_PixelType.GetType() == mitkIpPicInt && m_PixelType.GetBitsPerComponent() == 16 )
     {
       inData->SetScalarType( VTK_SHORT );
       scalars = vtkShortArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicUInt && m_PixelType.GetBitsPerComponent() == 16 )
+    else if ( m_PixelType.GetType() == mitkIpPicUInt && m_PixelType.GetBitsPerComponent() == 16 )
     {
       inData->SetScalarType( VTK_UNSIGNED_SHORT );
       scalars = vtkUnsignedShortArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicInt && m_PixelType.GetBitsPerComponent() == 32 )
+    else if ( m_PixelType.GetType() == mitkIpPicInt && m_PixelType.GetBitsPerComponent() == 32 )
     {
       inData->SetScalarType( VTK_INT );
       scalars = vtkIntArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicUInt && m_PixelType.GetBitsPerComponent() == 32 )
+    else if ( m_PixelType.GetType() == mitkIpPicUInt && m_PixelType.GetBitsPerComponent() == 32 )
     {
       inData->SetScalarType( VTK_UNSIGNED_INT );
       scalars = vtkUnsignedIntArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicInt && m_PixelType.GetBitsPerComponent() == 64 )
+    else if ( m_PixelType.GetType() == mitkIpPicInt && m_PixelType.GetBitsPerComponent() == 64 )
     {
       inData->SetScalarType( VTK_LONG );
       scalars = vtkLongArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicUInt && m_PixelType.GetBitsPerComponent() == 64 )
+    else if ( m_PixelType.GetType() == mitkIpPicUInt && m_PixelType.GetBitsPerComponent() == 64 )
     {
       inData->SetScalarType( VTK_UNSIGNED_LONG );
       scalars = vtkUnsignedLongArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicFloat && m_PixelType.GetBitsPerComponent() == 32 )
+    else if ( m_PixelType.GetType() == mitkIpPicFloat && m_PixelType.GetBitsPerComponent() == 32 )
     {
       inData->SetScalarType( VTK_FLOAT );
       scalars = vtkFloatArray::New();
     }
-    else if ( m_PixelType.GetType() == ipPicFloat && m_PixelType.GetBitsPerComponent() == 64 )
+    else if ( m_PixelType.GetType() == mitkIpPicFloat && m_PixelType.GetBitsPerComponent() == 64 )
     {
       inData->SetScalarType( VTK_DOUBLE );
       scalars = vtkDoubleArray::New();
@@ -224,7 +224,7 @@ void mitk::ImageDataItem::ConstructVtkImageData() const
     // allocate the new scalars
     scalars->SetNumberOfComponents(m_VtkImageData->GetNumberOfScalarComponents());
 
-    scalars->SetVoidArray(m_PicDescriptor->data, _ipPicElements(m_PicDescriptor)*m_VtkImageData->GetNumberOfScalarComponents(), 1);
+    scalars->SetVoidArray(m_PicDescriptor->data, _mitkIpPicElements(m_PicDescriptor)*m_VtkImageData->GetNumberOfScalarComponents(), 1);
 
     m_VtkImageData->GetPointData()->SetScalars(scalars);
     scalars->Delete();

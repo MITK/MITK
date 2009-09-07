@@ -20,17 +20,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipSegmentation.h"
 
 
-ipPicDescriptor*
-ipMITKSegmentationCreateGrowerHistory( ipPicDescriptor *seg, int startOfs, ipPicDescriptor *histBuffer )
+mitkIpPicDescriptor*
+ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, mitkIpPicDescriptor *histBuffer )
 {
   std::queue<int> ofsQueue;
 
   if (!seg) return 0;
   if (!histBuffer) {
-    histBuffer = ipPicCopyHeader( seg, histBuffer );
-    histBuffer->type = ipPicUInt;
+    histBuffer = mitkIpPicCopyHeader( seg, histBuffer );
+    histBuffer->type = mitkIpPicUInt;
     histBuffer->bpe = 16; 
-    ipUInt4_t size = _ipPicSize( histBuffer );
+    ipUInt4_t size = _mitkIpPicSize( histBuffer );
     histBuffer->data = malloc( size );
     memset( histBuffer->data, 0, size );  // clear buffer
   }
@@ -39,7 +39,7 @@ ipMITKSegmentationCreateGrowerHistory( ipPicDescriptor *seg, int startOfs, ipPic
     if (histBuffer->n[0] != seg->n[0] || histBuffer->n[1] != seg->n[1]) {
       histBuffer->n[0] = seg->n[0];
       histBuffer->n[1] = seg->n[1];
-      ipUInt4_t size = _ipPicSize( histBuffer );
+      ipUInt4_t size = _mitkIpPicSize( histBuffer );
       histBuffer->data = realloc( histBuffer->data, size );
       if (histBuffer->data == 0) return 0;
       memset( histBuffer->data, 0, size );  // clear buffer
@@ -48,8 +48,8 @@ ipMITKSegmentationCreateGrowerHistory( ipPicDescriptor *seg, int startOfs, ipPic
 
   // create a clear buffer to check wether a point has already been visited
   // (seg cannot be modifier and histBuffer can contain any value)
-  ipPicDescriptor *flagBuffer = ipPicCopyHeader( seg, 0 );
-  ipUInt4_t size = _ipPicSize( flagBuffer );
+  mitkIpPicDescriptor *flagBuffer = mitkIpPicCopyHeader( seg, 0 );
+  ipUInt4_t size = _mitkIpPicSize( flagBuffer );
   flagBuffer->data = malloc( size );
   memset( flagBuffer->data, 0, size );
   *((ipUInt1_t*)flagBuffer->data+startOfs) = 1;    // flag pixel as visited
@@ -122,6 +122,6 @@ ipMITKSegmentationCreateGrowerHistory( ipPicDescriptor *seg, int startOfs, ipPic
     }
   }
 
-  ipPicFree( flagBuffer );
+  mitkIpPicFree( flagBuffer );
   return histBuffer;
 }

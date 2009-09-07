@@ -50,12 +50,12 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)ipPicPutHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicPutHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
+void mitkIpPicPutHeader( char *outfile_name, mitkIpPicDescriptor *pic )
 {
   FILE *outfile;
 
@@ -70,7 +70,7 @@ void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
 
   if( outfile == NULL )
     {
-      /*ipPrintErr( "ipPicPut: sorry, error opening outfile\n" );*/
+      /*ipPrintErr( "mitkIpPicPut: sorry, error opening outfile\n" );*/
       return;
     }
 
@@ -78,7 +78,7 @@ void ipPicPutHeader( char *outfile_name, ipPicDescriptor *pic )
         + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
-  fwrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  fwrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
 
   mitkIpFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 

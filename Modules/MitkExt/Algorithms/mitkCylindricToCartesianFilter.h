@@ -61,14 +61,14 @@ public:
   //##Documentation
   //## @brief Build some tables to speed up transformation, e.g., to avoid repeated calulations of the same sinus/cosinus.
   //## @todo Free tables if they were already previously allocated
-  void buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, ipPicDescriptor * &rt_pic, ipPicDescriptor * &phit_pic, ipPicDescriptor * &fr_pic, ipPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz);
+  void buildTransformShortCuts(int orig_xsize, int orig_ysize, int orig_zsize, int new_xsize, mitkIpPicDescriptor * &rt_pic, mitkIpPicDescriptor * &phit_pic, mitkIpPicDescriptor * &fr_pic, mitkIpPicDescriptor * &fphi_pic, unsigned int * &zt, float * &fz);
 
   //##Documentation
   //## @brief Build some tables to speed up transformation of images that only contain data within a sector
   //## @todo Free tables if they were already previously allocated
-  void buildConeCutOffShortCut(int orig_xsize, int orig_ysize, ipPicDescriptor *rt_pic, ipPicDescriptor *fr_pic, float a, float b, ipPicDescriptor * &coneCutOff_pic);
+  void buildConeCutOffShortCut(int orig_xsize, int orig_ysize, mitkIpPicDescriptor *rt_pic, mitkIpPicDescriptor *fr_pic, float a, float b, mitkIpPicDescriptor * &coneCutOff_pic);
 protected:
-  ipPicDescriptor * rt_pic, * phit_pic, *fr_pic, * fphi_pic, * coneCutOff_pic;
+  mitkIpPicDescriptor * rt_pic, * phit_pic, *fr_pic, * fphi_pic, * coneCutOff_pic;
   float * fz;
   unsigned int * zt;
   //##Description 

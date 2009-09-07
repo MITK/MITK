@@ -49,40 +49,40 @@
  *  inserts a tsv into the pic
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicAddTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicAddTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
 
 void
-ipPicAddTag( ipPicDescriptor *pic, ipPicTSV_t *tsv )
+mitkIpPicAddTag( mitkIpPicDescriptor *pic, mitkIpPicTSV_t *tsv )
 {
-  pic->info->tags_head = _ipPicInsertTag( pic->info->tags_head, tsv );
+  pic->info->tags_head = _mitkIpPicInsertTag( pic->info->tags_head, tsv );
 }
 
 void
-ipPicAddSubTag( ipPicTSV_t *parent, ipPicTSV_t *tsv )
+mitkIpPicAddSubTag( mitkIpPicTSV_t *parent, mitkIpPicTSV_t *tsv )
 {
-  if( parent->type != ipPicTSV )
+  if( parent->type != mitkIpPicTSV )
     return;
 
   parent->n[0]++;
-  parent->value = _ipPicInsertTag( parent->value, tsv );
+  parent->value = _mitkIpPicInsertTag( parent->value, tsv );
 }
 
-_ipPicTagsElement_t *
-_ipPicInsertTag( _ipPicTagsElement_t *head, ipPicTSV_t *tsv )
+_mitkIpPicTagsElement_t *
+_mitkIpPicInsertTag( _mitkIpPicTagsElement_t *head, mitkIpPicTSV_t *tsv )
 {
   int i;
-  _ipPicTagsElement_t *new;
-  _ipPicTagsElement_t *current;
+  _mitkIpPicTagsElement_t *new;
+  _mitkIpPicTagsElement_t *current;
 
   tsv->tag[_mitkIpPicTAGLEN] = '\0';
   for( i=strlen(tsv->tag); i<_mitkIpPicTAGLEN; i++ )
     tsv->tag[i] = ' ';
 
-  new = malloc( sizeof(_ipPicTagsElement_t) );
+  new = malloc( sizeof(_mitkIpPicTagsElement_t) );
 
   new->tsv = tsv;
   new->prev = NULL;

@@ -62,24 +62,24 @@
  *  @return pointer to new image
  *
  * USES
- *  function _ipFuncError  - checks image data
- *  function _ipFuncExtr   - calculates extreme greyvalues
- *  function _ipFuncHist   - calculates greyvalue histogram
+ *  function _mitkIpFuncError  - checks image data
+ *  function _mitkIpFuncExtr   - calculates extreme greyvalues
+ *  function _mitkIpFuncHist   - calculates greyvalue histogram
  *
  * AUTHOR & DATE 
  */
 
 /* include files                                                       */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
                                ipUInt4_t       *no_lab );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncLabel\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncLabel\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -96,7 +96,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   offset   = 0;                                                         \
   no_label = 0;                                                         \
                                                                         \
-  end    = _ipPicElements ( pic_old ) / pic_old->n[0];                  \
+  end    = _mitkIpPicElements ( pic_old ) / pic_old->n[0];                  \
   for ( j = 0; j < end; j++ )                                           \
     for ( i = 0, in_lab = ipFalse; i < pic_old->n[0]; i++ )             \
       {                                                                 \
@@ -132,7 +132,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   for ( l = 1; l < pic_new->dim; l++ )                                  \
     {                                                                   \
        dist = size[l];                                                  \
-       end  = _ipPicElements ( pic_new ) / size[l+1];                   \
+       end  = _mitkIpPicElements ( pic_new ) / size[l+1];                   \
        for ( k = 0; k < end; k++ )                                      \
          for ( j = 1; j < pic_new->n[l]; j++ )                          \
            {                                                            \
@@ -171,7 +171,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   ipUInt4_t       i;           /* loop index                         */ \
   ipUInt4_t       no_elem;                                              \
                                                                         \
-  no_elem = _ipPicElements ( pic_new );                                 \
+  no_elem = _mitkIpPicElements ( pic_new );                                 \
   for ( i = 0; i < no_elem; i++ )                                       \
     (( type * )pic_new->data )[i] =                                     \
        ( type ) a_sort[a[( ipUInt4_t ) (( type * )pic_new->data )[i]]]; \
@@ -180,14 +180,14 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
 /* ------------------------------------------------------------------- */
 /* 
-**  ipFuncLabel                     
+**  mitkIpFuncLabel                     
 */
 /* ------------------------------------------------------------------- */
 
-ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
                                ipUInt4_t       *no_lab )
 {
-  ipPicDescriptor *pic_new;      /* pointer to new image structure     */
+  mitkIpPicDescriptor *pic_new;      /* pointer to new image structure     */
   ipUInt4_t       i;             /* loop index                         */
   ipUInt4_t       *a;            /* pointer to list with all anchestors*/
   ipUInt4_t       *a_new;        /* look up table for new labels       */
@@ -199,17 +199,17 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   
   /* check image data                                                  */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate extreme greyvalues in image                             */
-  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( mitkIpFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* check whether image is binary                                     */
   /*
-  ipFuncHist ( pic_old, min, max, &hist, &size_hist );
+  mitkIpFuncHist ( pic_old, min, max, &hist, &size_hist );
   if ( hist == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -224,20 +224,20 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   if ( no_gv != 2 ) 
     {
        free ( hist );
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
   */
 
   /* allocate memory for new image                                     */
 
-  pic_new = ipPicCopyHeader ( pic_old, NULL );
-  pic_new->type = ipPicInt;
+  pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
+  pic_new->type = mitkIpPicInt;
   pic_new->bpe  = 16;
-  pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
+  pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe / 8 );
   if ( pic_new == NULL )
     {
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
 
@@ -247,14 +247,14 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
   if(no_label>SHRT_MAX)
   {
-	  ipPicFree(pic_new);
-	  pic_new = ipPicCopyHeader ( pic_old, NULL );
-	  pic_new->type = ipPicUInt;
+	  mitkIpPicFree(pic_new);
+	  pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
+	  pic_new->type = mitkIpPicUInt;
 	  pic_new->bpe  = 32;
-	  pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe / 8 );
+	  pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe / 8 );
 	  if ( pic_new == NULL )
 		{
-			_ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+			_mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
 			return ( mitkIpFuncERROR );
 		}
 	  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipUInt4_t );
@@ -265,16 +265,16 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
   a      = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a == NULL ) 
     {
-        ipPicFree ( pic_new );
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        mitkIpPicFree ( pic_new );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
   a_new  = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
   if ( a_new == NULL )
     {
         free ( a );
-        ipPicFree ( pic_new );
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        mitkIpPicFree ( pic_new );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
   a_sort = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
@@ -282,8 +282,8 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
     {
         free ( a );
         free ( a_new );
-        ipPicFree ( pic_new );
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        mitkIpPicFree ( pic_new );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
 
@@ -344,9 +344,9 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
   if((new_label<=SHRT_MAX) && ( pic_new->bpe != 16 ))
   {
-     ipPicDescriptor * tmp;
-     tmp=ipFuncConvert(pic_new, ipPicInt, 16);
-     ipPicFree(pic_new);
+     mitkIpPicDescriptor * tmp;
+     tmp=mitkIpFuncConvert(pic_new, mitkIpPicInt, 16);
+     mitkIpPicFree(pic_new);
      pic_new=tmp;
   }
 
@@ -355,7 +355,7 @@ ipPicDescriptor *ipFuncLabel ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                               

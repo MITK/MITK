@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFeedbackContourTool.h"
 
-struct ipPicDescriptor;
+struct mitkIpPicDescriptor;
 
 namespace mitk
 {
@@ -70,12 +70,12 @@ class MITKEXT_CORE_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual void Deactivated();
     
     virtual bool OnMousePressed (Action*, const StateEvent*);
-    virtual bool OnMousePressedInside (Action*, const StateEvent*, ipPicDescriptor* workingPicSlice, int initialWorkingOffset);
+    virtual bool OnMousePressedInside (Action*, const StateEvent*, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
     virtual bool OnMousePressedOutside (Action*, const StateEvent*);
     virtual bool OnMouseMoved   (Action*, const StateEvent*);
     virtual bool OnMouseReleased(Action*, const StateEvent*);
 
-    ipPicDescriptor* PerformRegionGrowingAndUpdateContour();
+    mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour();
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;
@@ -89,10 +89,10 @@ class MITKEXT_CORE_EXPORT RegionGrowingTool : public FeedbackContourTool
 
   private:
 
-    ipPicDescriptor* SmoothIPPicBinaryImage( ipPicDescriptor* image, int &contourOfs, ipPicDescriptor* dest = NULL );
-    void SmoothIPPicBinaryImageHelperForRows( ipPicDescriptor* source, ipPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset );
+    mitkIpPicDescriptor* SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest = NULL );
+    void SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* source, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset );
     
-    ipPicDescriptor* m_OriginalPicSlice;
+    mitkIpPicDescriptor* m_OriginalPicSlice;
     int m_SeedPointMemoryOffset;
 
     ScalarType m_VisibleWindow;

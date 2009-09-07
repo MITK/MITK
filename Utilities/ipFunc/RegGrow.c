@@ -74,7 +74,7 @@
  * @return pointer to new image
  *
  * USES
- *  function _ipFuncError - check image data
+ *  function _mitkIpFuncError - check image data
  *
  * AUTHOR & DATE
  * UPDATES
@@ -91,7 +91,7 @@
  *
  * Revision 1.2  2000/02/18 14:58:06  ivo
  * Tags are now copied into newly allocated images.
- * Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ * Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  2000/02/18  15:22:50  ivo
  * in macro REGGROW line if(diff<std_win) changed to if ( diff <= std_win ),
@@ -102,9 +102,9 @@
 
 /* include files                                                              */
  
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       dim_seed,
                                  ipUInt4_t       *beg_seed,
                                  ipUInt4_t       *end_seed,
@@ -122,7 +122,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
 
 /* include files                                                              */
  
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 /* definition of macros                                                       */
 
@@ -349,19 +349,19 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
   }                                                                            \
   if ( kind == 0 )                                                             \
     {                                                                          \
-       ipPicFree ( pic_new );                                                  \
-       pic_new = ipPicClone ( pic_old );                                       \
+       mitkIpPicFree ( pic_new );                                                  \
+       pic_new = mitkIpPicClone ( pic_old );                                       \
        for ( i = 0; i < border_len; i++ )                                      \
          (( type * )pic_new->data )[border[i]] = border_label;                 \
     }                                                                          \
 }
 /* -------------------------------------------------------------------------- */
 /*
-** ipFuncRegGrow
+** mitkIpFuncRegGrow
 */
 /* -------------------------------------------------------------------------- */ 
 
-ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       dim_seed,
                                  ipUInt4_t       *beg_seed,
                                  ipUInt4_t       *end_seed,
@@ -370,7 +370,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
                                  ipFloat8_t      std_fact,  
                                  ipUInt4_t       kind ) 
 {
-  ipPicDescriptor *pic_new;           /* pointer to new image                */
+  mitkIpPicDescriptor *pic_new;           /* pointer to new image                */
   ipUInt4_t        i;                     /* loop index                          */
   ipInt4_t         ind[_mitkIpPicNDIM];   /* loop index vector                   */
   ipInt4_t         beg[_mitkIpPicNDIM];   /* beginning and end of seed region    */
@@ -403,7 +403,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
   
   /* check image data                                                        */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );               
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );               
 
   /* check parameters                                                        */
 
@@ -413,7 +413,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
        if ( end_seed[i] <= beg_seed[i] || end_seed[i] > pic_old->n[i] ||
             beg_seed[i] < 0 )           
          {
-            _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
             return ( mitkIpFuncERROR );
          }
     }
@@ -425,70 +425,70 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
   off_vekt = malloc ( no_neigh * sizeof ( ipInt4_t ) );
   if ( off_vekt == NULL ) 
     { 
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   
-  acpt = malloc ( _ipPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  acpt = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
   if ( acpt == NULL ) 
     { 
        free ( off_vekt );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  next = malloc ( _ipPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  next = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
   if ( next == NULL )
     { 
        free ( off_vekt );
        free ( acpt );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /*
-  help = malloc ( _ipPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  help = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
   if ( help == NULL ) 
     { 
        free ( off_vekt );
        free ( acpt );
        free ( next );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   */
 
-  border = malloc ( _ipPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  border = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
   if ( border == NULL ) 
     { 
        free ( off_vekt );
        free ( acpt );
        free ( next );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   
   /* allocate pic_new and initialize it to zero                              */
 
-  pic_new = ipPicCopyHeader ( pic_old, NULL );
+  pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL ) 
     { 
        free ( off_vekt );
        free ( acpt );
        free ( next );
        free ( border );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
-  pic_new->data = calloc ( _ipPicElements (pic_new), pic_new->bpe / 8 );
+  pic_new->data = calloc ( _mitkIpPicElements (pic_new), pic_new->bpe / 8 );
   if ( pic_new->data == NULL ) 
     { 
        free ( off_vekt );
        free ( acpt );
        free ( next );
        free ( border );
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -588,7 +588,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
   /* Copy Tags */
 
   strncpy( pic_new->info->version, pic_old->info->version, _mitkIpPicTAGLEN );
-  pic_new->info->tags_head = _ipPicCloneTags( pic_old->info->tags_head );
+  pic_new->info->tags_head = _mitkIpPicCloneTags( pic_old->info->tags_head );
   pic_new->info->write_protect = pic_old->info->write_protect;
                         
   return ( pic_new );

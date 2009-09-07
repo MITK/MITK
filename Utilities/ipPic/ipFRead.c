@@ -112,36 +112,36 @@
 #include "mitkIpPic.h"
 
 size_t
-ipFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
+mitkIpFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 {
   size_t bytes_return;
 
   bytes_return = fread( ptr, size, nitems, stream );
-  _ipCvtEndian( ptr, size*nitems, size );
+  _mitkIpCvtEndian( ptr, size*nitems, size );
 
   return( bytes_return );
 }
 
 #ifdef USE_ZLIB
-ipBool_t _ipPicCanReadCompressed = ipTrue;
+ipBool_t _mitkIpPicCanReadCompressed = ipTrue;
 #else
-ipBool_t _ipPicCanReadCompressed = ipFalse;
+ipBool_t _mitkIpPicCanReadCompressed = ipFalse;
 #endif
 
 size_t
-ipPicFReadCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
+mitkIpPicFReadCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
 {
   size_t bytes_return;
 
   bytes_return = mitkIpPicFRead( ptr, size, nitems, stream );
 
-  _ipCvtEndian( ptr, size*nitems, size );
+  _mitkIpCvtEndian( ptr, size*nitems, size );
 
   return( bytes_return );
 }
 
 int
-ipPicAccess( const char *path, int mode )
+mitkIpPicAccess( const char *path, int mode )
 {
   int status;
 
@@ -159,7 +159,7 @@ ipPicAccess( const char *path, int mode )
   return( status );
 }
 int
-ipPicRemoveFile( const char *path )
+mitkIpPicRemoveFile( const char *path )
 {
   int status;
 

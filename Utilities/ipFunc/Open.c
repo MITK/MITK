@@ -54,8 +54,8 @@
  *  @param pic_old      pointer to the original image
  *  @param mask       pointer to the kernel
  *  @param border    tells how the edge is transformed
- *  @arg @c               ipFuncBorderOld  :   original greyvalues
- *  @arg @c              ipFuncBorderZero :   edge is set to zero
+ *  @arg @c               mitkIpFuncBorderOld  :   original greyvalues
+ *  @arg @c              mitkIpFuncBorderZero :   edge is set to zero
  *
  * @return pointer to transformed iamge
  *
@@ -64,11 +64,11 @@
 
 /* include /files */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncOpen ( ipPicDescriptor *pic_old,
-                              ipPicDescriptor *pic_mask,
-                              ipFuncFlagI_t   border );
+mitkIpPicDescriptor *mitkIpFuncOpen ( mitkIpPicDescriptor *pic_old,
+                              mitkIpPicDescriptor *pic_mask,
+                              mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
@@ -77,17 +77,17 @@ ipPicDescriptor *ipFuncOpen ( ipPicDescriptor *pic_old,
 
 
 
-ipPicDescriptor *ipFuncOpen ( ipPicDescriptor *pic_old,
-                              ipPicDescriptor *pic_mask,
-                              ipFuncFlagI_t   border )
+mitkIpPicDescriptor *mitkIpFuncOpen ( mitkIpPicDescriptor *pic_old,
+                              mitkIpPicDescriptor *pic_mask,
+                              mitkIpFuncFlagI_t   border )
 { 
-   ipPicDescriptor *pic_new;
+   mitkIpPicDescriptor *pic_new;
 
-   pic_new = _ipFuncOpCl ( pic_old, pic_mask, ipFuncOpenF, border );
+   pic_new = _mitkIpFuncOpCl ( pic_old, pic_mask, mitkIpFuncOpenF, border );
 
    /* Copy Tags */
 
-   ipFuncCopyTags(pic_new, pic_old);
+   mitkIpFuncCopyTags(pic_new, pic_old);
    
    
                         

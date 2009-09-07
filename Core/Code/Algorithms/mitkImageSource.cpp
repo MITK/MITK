@@ -260,7 +260,7 @@ void* mitk::ImageSource::GetData()
     return GetOutput()->GetData();
 }
 
-ipPicDescriptor* mitk::ImageSource::GetPic()
+mitkIpPicDescriptor* mitk::ImageSource::GetPic()
 {
     Update();
     return GetOutput()->GetPic();

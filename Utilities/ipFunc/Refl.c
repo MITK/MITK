@@ -62,9 +62,9 @@
  */
 /* include Files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis );
+mitkIpPicDescriptor *mitkIpFuncRefl ( mitkIpPicDescriptor *pic_old, int axis );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -119,10 +119,10 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis );
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
+mitkIpPicDescriptor *mitkIpFuncRefl ( mitkIpPicDescriptor *pic_old, int axis )
 {
 
-  ipPicDescriptor *pic_new;               /* inverted picture           */
+  mitkIpPicDescriptor *pic_new;               /* inverted picture           */
   ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loop index vector           */
   ipUInt4_t       length_vect[_mitkIpPicNDIM];
   ipUInt4_t       axis_vect[_mitkIpPicNDIM];               
@@ -133,10 +133,10 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( axis < 1 || axis > pic_old->dim ) 
      {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
  
@@ -171,17 +171,17 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = ipPicCopyHeader ( pic_old, 0 );
+  pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
-  pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+  pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
   if ( pic_new->data == NULL )
     {
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -199,7 +199,7 @@ ipPicDescriptor *ipFuncRefl ( ipPicDescriptor *pic_old, int axis )
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                         

@@ -117,15 +117,15 @@ void mitk::AngleCorrectByPointFilter::GenerateData()
   int yDim = input->GetDimension(1);
   int zDim = input->GetDimension(2);
 
-  ipPicDescriptor* pic_out;
-  pic_out = ipPicNew();
+  mitkIpPicDescriptor* pic_out;
+  pic_out = mitkIpPicNew();
   pic_out->dim = 3;
   pic_out->bpe  = output->GetPixelType().GetBpe();
   pic_out->type = output->GetPixelType().GetType();
   pic_out->n[0] = xDim;
   pic_out->n[1] = yDim;
   pic_out->n[2] = zDim;
-  pic_out->data = malloc(_ipPicSize(pic_out));
+  pic_out->data = malloc(_mitkIpPicSize(pic_out));
 
   //go!
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();

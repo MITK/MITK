@@ -66,7 +66,7 @@
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
  
 
 /* ========================================================== */
@@ -76,18 +76,18 @@
 */
 /* ========================================================== */
 
-double ipFuncCurtosisR ( ipPicDescriptor *pic_old,
+double mitkIpFuncCurtosisR ( mitkIpPicDescriptor *pic_old,
 						    ipUInt4_t       *begin, 
                             ipUInt4_t       *length ) {
 
    ipFloat8_t var;
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
 
-   pic_help = ipFuncWindow ( pic_old, begin, length );
+   pic_help = mitkIpFuncWindow ( pic_old, begin, length );
 
-   var  = ipFuncCurtosis  ( pic_help );
+   var  = mitkIpFuncCurtosis  ( pic_help );
 
-   ipPicFree ( pic_help );
+   mitkIpPicFree ( pic_help );
 
    return ( var );
 }                       

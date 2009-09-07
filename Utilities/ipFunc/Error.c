@@ -62,9 +62,9 @@
 
 /* include files                                                      */
 
-# include "ipFuncP.h"
+# include "mitkIpFuncP.h"
 
-ipUInt4_t _ipFuncError ( ipPicDescriptor *pic );
+ipUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic );
 
 
 #ifndef DOXYGEN_IGNORE
@@ -79,7 +79,7 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic );
 */
 /*-------------------------------------------------------------------*/
 
-ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
+ipUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic )
 {
   ipUInt4_t   i;                      /* loop index                  */
 
@@ -87,7 +87,7 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
 
   if ( !pic ) 
     {
-      _ipFuncSetErrno ( mitkIpFuncNOPIC_ERROR );
+      _mitkIpFuncSetErrno ( mitkIpFuncNOPIC_ERROR );
       return ( mitkIpFuncERROR );
     }
 
@@ -95,7 +95,7 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
 
   if ( pic->dim < 1 || pic->dim > _mitkIpPicNDIM )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -104,7 +104,7 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
   for ( i = 0; i < pic->dim; i++ )
     if ( pic->n[i] < 1 )
       {
-         _ipFuncSetErrno ( mitkIpFuncSIZE_ERROR );
+         _mitkIpFuncSetErrno ( mitkIpFuncSIZE_ERROR );
          return ( mitkIpFuncERROR );
       }
   for ( i = pic->dim; i < _mitkIpPicNDIM; i++ ) 
@@ -112,25 +112,25 @@ ipUInt4_t _ipFuncError ( ipPicDescriptor *pic )
    
   /* is image data type correct ?                                     */
 
-  if ( pic->type == ipPicInt || pic->type == ipPicUInt )
+  if ( pic->type == mitkIpPicInt || pic->type == mitkIpPicUInt )
     {
        if ( pic->bpe != 8 && pic->bpe != 16 && pic->bpe != 32 )
          {
-           _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
            return ( mitkIpFuncERROR );
          }
     }
-  else if ( pic->type == ipPicFloat )
+  else if ( pic->type == mitkIpPicFloat )
     {
        if ( pic->bpe != 32 && pic->bpe != 64 )
          {
-            _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
             return ( mitkIpFuncERROR );
          }
     }
   else 
     {
-      _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+      _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
       return ( mitkIpFuncERROR );
     }
   

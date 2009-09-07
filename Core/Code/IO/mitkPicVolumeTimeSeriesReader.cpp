@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 extern "C" 
 {
-ipPicDescriptor * MITKipPicGet( char *infile_name, ipPicDescriptor *pic );
-ipPicDescriptor * MITKipPicGetTags( char *infile_name, ipPicDescriptor *pic );
+mitkIpPicDescriptor * MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic );
+mitkIpPicDescriptor * MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic );
 }
 
 
@@ -48,7 +48,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
     // other volumes. @TODO Integrate support for different sizes and spacings
     //
     char* filename = const_cast<char *> ( m_MatchedFileNames[ 0 ].c_str() );
-    ipPicDescriptor * header = ipPicGetHeader( filename, NULL );
+    mitkIpPicDescriptor * header = mitkIpPicGetHeader( filename, NULL );
     header = MITKipPicGetTags( filename, header );
 
     if ( header == NULL )
@@ -75,7 +75,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateOutputInformation()
 
     output->Initialize( header );
 
-    ipPicFree( header );
+    mitkIpPicFree( header );
 
     m_ReadHeaderTime.Modified();
 }
@@ -102,7 +102,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
     //
     // read 3d volumes and copy them to the 4d volume
     //
-    ipPicDescriptor* volume3d = NULL;
+    mitkIpPicDescriptor* volume3d = NULL;
     for ( unsigned int t = 0 ; t < m_MatchedFileNames.size() ; ++t )
     {
         char* filename = const_cast< char* >( m_MatchedFileNames[ t ].c_str() );
@@ -136,7 +136,7 @@ void mitk::PicVolumeTimeSeriesReader::GenerateData()
                   << "Volume of time frame " << t << " did not match size of other time frames.";
           throw itk::ImageFileReaderException( __FILE__, __LINE__, message.str().c_str() );
         }
-        ipPicFree ( volume3d );
+        mitkIpPicFree ( volume3d );
     }
 }
 

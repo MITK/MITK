@@ -345,7 +345,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   // 1. Check the result
   vtkImageData* reslicedImage = m_Reslicer->GetOutput();
 
-  ipPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
+  mitkIpPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
 
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
   {
@@ -363,7 +363,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   resultImage->SetSpacing( spacingVector );
   resultImage->SetPicVolume( pic );
 
-  ipPicFree(pic);
+  mitkIpPicFree(pic);
   
   /*unsigned int dimensions[2];
   dimensions[0] = (unsigned int)extent[0]; dimensions[1] = (unsigned int)extent[1];

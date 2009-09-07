@@ -63,9 +63,9 @@
  */
 /* include files                                                                  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncVarC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius );
 
@@ -142,7 +142,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------------ */
 
-ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncVarC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius )
 {
@@ -159,11 +159,11 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( radius <= 0 ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -172,7 +172,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
       help = center[i] - radius;
       if ( help < 0 )
         {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
         
@@ -181,7 +181,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
       help = center[i] + radius;
       if ( (ipUInt4_t) help > pic_old->n[i] )
         {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
        
@@ -206,7 +206,7 @@ ipFloat8_t ipFuncVarC  ( ipPicDescriptor *pic_old,
 
   /* allocate image structure                                                     */
 
-  mean  = ipFuncMeanC ( pic_old, centr, radius );
+  mean  = mitkIpFuncMeanC ( pic_old, centr, radius );
   mean2 = 0;
   count = 0;
 

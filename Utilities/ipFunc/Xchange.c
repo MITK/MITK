@@ -71,7 +71,7 @@
  *
  * Revision 1.2  2000/02/18 14:58:09  ivo
  * Tags are now copied into newly allocated images.
- * Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ * Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  1998/07/16  12:04:50  antje
  * initial import
@@ -85,15 +85,15 @@
  /*
 ** ipFunc includefiles
 */ 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-void ipFuncXchange( ipPicDescriptor **pic1,
-                ipPicDescriptor **pic2 );
+void mitkIpFuncXchange( mitkIpPicDescriptor **pic1,
+                mitkIpPicDescriptor **pic2 );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncXchange\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
+  static char *what = { "@(#)mitkIpFuncXchange\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
 #endif 
  
 
@@ -105,12 +105,12 @@ void ipFuncXchange( ipPicDescriptor **pic1,
 /* 
 **  the action starts here
 */
-void ipFuncXchange( ipPicDescriptor **pic1,
-                ipPicDescriptor **pic2 )
+void mitkIpFuncXchange( mitkIpPicDescriptor **pic1,
+                mitkIpPicDescriptor **pic2 )
 
 {
 
-  ipPicDescriptor *tmp_pic;
+  mitkIpPicDescriptor *tmp_pic;
  
   tmp_pic = *pic1;
   *pic1   = *pic2;

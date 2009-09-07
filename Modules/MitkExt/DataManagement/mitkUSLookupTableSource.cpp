@@ -56,7 +56,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
 
      std::cout << "  creating HP LookupTable ... " << std::endl;
 
-     ipPicDescriptor *HPMap;
+     mitkIpPicDescriptor *HPMap;
 
         char MapFilename[ 20 ] = "a.map";
         int failed ;

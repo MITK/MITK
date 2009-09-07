@@ -53,8 +53,8 @@
  *
  *  @param pic_old    pointer to the image that should be equalized
  *  @param kind      intervall of transformation
- *  @arg @c ipFuncMinMax       (extreme greyvalues)
- *  @arg @c ipFuncTotal        (max. and min. possible       
+ *  @arg @c mitkIpFuncMinMax       (extreme greyvalues)
+ *  @arg @c mitkIpFuncTotal        (max. and min. possible       
  *                                           greyvalues) 
  *  @param pic_return  memory used to store return image ( if pic_return == NULL
  *                new memory is allocated )
@@ -66,17 +66,17 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
-                               ipFuncFlagI_t   kind,
-                               ipPicDescriptor *pic_return ) ;
+mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
+                               mitkIpFuncFlagI_t   kind,
+                               mitkIpPicDescriptor *pic_return ) ;
 
 #ifndef DOXYGEN_IGNORE
 
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncEqual\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncEqual\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -97,7 +97,7 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
   hist_cp =  calloc( size_hist + 1, sizeof( type ) );                    \
   if ( hist_cp == NULL )                                                 \
     {                                                                    \
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                            \
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                            \
        return ( NULL );                                                  \
     }                                                                    \
                                                                          \
@@ -110,19 +110,19 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
                                                                          \
   /* check wether linerisation in [min_gv, max_gv] or in [min_max]  */   \
                                                                          \
-  if ( kind == ipFuncMinMax )                                            \
+  if ( kind == mitkIpFuncMinMax )                                            \
     {                                                                    \
-      if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK )                  \
+      if ( mitkIpFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK )                  \
         return ( mitkIpFuncERROR );                                              \
     }                                                                    \
-  else if ( kind == ipFuncTotal )                                        \
+  else if ( kind == mitkIpFuncTotal )                                        \
     {                                                                    \
       max = max_gv;                                                      \
       min = min_gv;                                                      \
     }                                                                    \
   else                                                                   \
     {                                                                    \
-      _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );                              \
+      _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );                              \
       free ( hist_cp );                                                  \
       free ( hist );                                                     \
       return ( mitkIpFuncERROR );                                                \
@@ -130,14 +130,14 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
                                                                          \
   /* transformation of histogram                                    */   \
                                                                          \
-  a = ( ipFloat8_t ) _ipPicElements ( pic ) / ( max - min );             \
+  a = ( ipFloat8_t ) _mitkIpPicElements ( pic ) / ( max - min );             \
   b = - a * min;                                                         \
   for ( i = 0; i <= size_hist; i++ )                                     \
      hist_cp[i] =  ( type ) ( ( ( ipFloat8_t )hist[i] - b ) / a );       \
                                                                          \
   /* transform greyvalues                                           */   \
                                                                          \
-  no_elem = _ipPicElements ( pic );                                      \
+  no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
        index = ( ipUInt4_t )                                             \
@@ -154,12 +154,12 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
-                               ipFuncFlagI_t   kind,
-                               ipPicDescriptor *pic_return ) 
+mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
+                               mitkIpFuncFlagI_t   kind,
+                               mitkIpPicDescriptor *pic_return ) 
 {
 
-  ipPicDescriptor *pic_new;  /* inverted picture                        */
+  mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
   ipUInt4_t       *hist;     /* greylevel histogram                     */
@@ -169,27 +169,27 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
   
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                        */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
     {
-       ipPicFree ( pic_new );
+       mitkIpPicFree ( pic_new );
        return ( NULL );
     }
 
   /* calculate greylevel histogram                                      */
 
-  ipFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
+  mitkIpFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
   if ( hist == 0 ) 
     {
-       ipPicFree ( pic_new );
+       mitkIpPicFree ( pic_new );
        return ( NULL );
     }
 
@@ -197,15 +197,15 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
 
   help = fabs ( min_gv );
 
-  if ( pic_old->type == ipPicFloat ) 
+  if ( pic_old->type == mitkIpPicFloat ) 
     factor = 1000.;                              
-  else if ( pic_old->type == ipPicInt || pic_old->type == ipPicUInt )
+  else if ( pic_old->type == mitkIpPicInt || pic_old->type == mitkIpPicUInt )
     factor = 1.;
   else 
     {
-       ipPicFree ( pic_new );
+       mitkIpPicFree ( pic_new );
        free ( hist );
-       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
        return ( NULL );
     }
 
@@ -217,7 +217,7 @@ ipPicDescriptor *ipFuncEqual ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

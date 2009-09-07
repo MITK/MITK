@@ -86,7 +86,7 @@
  *
  *   Revision 1.2  2000/02/18 14:58:06  ivo
  *   Tags are now copied into newly allocated images.
- *   Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ *   Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  1998/07/16  12:04:49  antje
  * initial import
@@ -98,16 +98,16 @@
 /*
 ** ipFunc includefiles
 */ 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
-                               ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRotate( mitkIpPicDescriptor *pic,
+                               mitkIpPicDescriptor *pic_old,
                                int *grad, int *order );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncRotate\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
+  static char *what = { "@(#)mitkIpFuncRotate\tDKFZ (Dept. MBI) $Revision$ "__DATE__ };
 #endif 
  
  
@@ -120,12 +120,12 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
 /* 
 **  the action starts here
 */
-ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
-                               ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRotate( mitkIpPicDescriptor *pic,
+                               mitkIpPicDescriptor *pic_old,
                                int *grad, int *order )
 
 {
-  ipPicDescriptor *pic_return;
+  mitkIpPicDescriptor *pic_return;
   ipUInt4_t *p_index[_mitkIpPicNDIM];
   ipUInt4_t index[_mitkIpPicNDIM];
   ipUInt4_t coeff_sum[_mitkIpPicNDIM];
@@ -141,13 +141,13 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
   if( pic->dim < 2 || pic->dim > _mitkIpPicNDIM ) return( NULL );
 
   /*  take over image header structure and allocate memory */
-  ipPicFree( pic_old );
-  pic_return = ipPicCopyHeader( pic, NULL );
+  mitkIpPicFree( pic_old );
+  pic_return = mitkIpPicCopyHeader( pic, NULL );
   if( !pic_return ) return( NULL );
-  pic_return->data = malloc( _ipPicSize(pic_return) );
+  pic_return->data = malloc( _mitkIpPicSize(pic_return) );
   if( !pic_return->data )
     {
-      ipPicFree( pic_return );
+      mitkIpPicFree( pic_return );
       return( NULL );
     }
 
@@ -173,7 +173,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
       order = (int *) malloc( pic->dim * sizeof( int ) );
       if( !order )
         {
-          ipPicFree( pic_return );
+          mitkIpPicFree( pic_return );
           return( NULL );
         }
       order_alloc = 1;
@@ -204,7 +204,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
         }
       if( i > _mitkIpPicNDIM  )
         {
-          ipPicFree( pic_return );
+          mitkIpPicFree( pic_return );
           return( NULL );
         }
     }
@@ -250,7 +250,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
                    {
                      if( order_alloc == 1 )
                        free( (void *) order );
-                     ipPicFree( pic_return );
+                     mitkIpPicFree( pic_return );
                      return( NULL );
                      break;
                    }
@@ -296,7 +296,7 @@ ipPicDescriptor *ipFuncRotate( ipPicDescriptor *pic,
   /* Copy Tags */
 
   strncpy( pic_return->info->version, pic->info->version, _mitkIpPicTAGLEN );
-  pic_return->info->tags_head = _ipPicCloneTags( pic->info->tags_head );
+  pic_return->info->tags_head = _mitkIpPicCloneTags( pic->info->tags_head );
   pic_return->info->write_protect = pic->info->write_protect;
                         
   return( pic_return );

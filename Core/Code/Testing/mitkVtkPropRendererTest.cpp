@@ -42,11 +42,11 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkVtkPropRendererTest(int argc, char* argv[])
 {
   //independently read header of pic file
-  ipPicDescriptor *picheader = NULL;
+  mitkIpPicDescriptor *picheader = NULL;
   if (argc >= 1)
   {
     if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
-      picheader = ipPicGetHeader(argv[1], NULL);
+      picheader = mitkIpPicGetHeader(argv[1], NULL);
   }
   if( picheader==NULL)
   {
@@ -59,7 +59,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   std::string argv_str(argv[1]);
 
-  ipPicGetTags(argv[1], picheader);
+  mitkIpPicGetTags(argv[1], picheader);
 
   //Read pic-Image from file
   std::cout << "Reading image: ";

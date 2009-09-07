@@ -62,9 +62,9 @@
 
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
+ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
                       ipFloat8_t      *min, 
                       ipFloat8_t      *max );
 
@@ -72,7 +72,7 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
 
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncExtr\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncExtr\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -86,7 +86,7 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
     ipUInt4_t   no_elem;                                       \
     ipFloat8_t  help;                                          \
                                                                \
-    no_elem = _ipPicElements ( pic );                          \
+    no_elem = _mitkIpPicElements ( pic );                          \
     max_c = ( ipFloat8_t )( ( type * ) pic->data ) [0];        \
     min_c = ( ipFloat8_t )( ( type * ) pic->data ) [0];        \
                                                                \
@@ -104,7 +104,7 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
 */
 /* ========================================================== */
 
-ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
+ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
                       ipFloat8_t      *min, 
                       ipFloat8_t      *max )
 {
@@ -114,7 +114,7 @@ ipInt4_t ipFuncExtr ( ipPicDescriptor *pic,
 
   /* check data                                               */
 
-  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* macro to calculate extreme values ( for all data types   */
 

@@ -79,7 +79,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   Image::Pointer temporarySlice = Image::New();
   CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-  ipPicDescriptor* stupidClone = ipPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
+  mitkIpPicDescriptor* stupidClone = mitkIpPicClone( temporarySlice->GetSliceData()->GetPicDescriptor() );
   unsigned int pixelWidth  = m_Size + 1;
   unsigned int pixelHeight = m_Size + 1;
 
@@ -87,7 +87,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   {
     LOG_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
                 "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
-    ipPicFree( stupidClone );
+    mitkIpPicFree( stupidClone );
     return;
   }
   
@@ -126,7 +126,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   float* contourPoints = ipMITKSegmentationGetContour8N( stupidClone, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
   if (!contourPoints) 
   {
-    ipPicFree( stupidClone );
+    mitkIpPicFree( stupidClone );
     return;
   }
 
@@ -148,7 +148,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   m_MasterContour = contourInImageIndexCoordinates;
 
-  ipPicFree( stupidClone );
+  mitkIpPicFree( stupidClone );
 }
 
 

@@ -64,9 +64,9 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipInt4_t _ipFuncExtT ( ipPicType_t type,
+ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
                       ipUInt4_t   bpe,
                       ipFloat8_t  *min_gv,
                       ipFloat8_t  *max_gv );
@@ -74,7 +74,7 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)_ipFuncExtT\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)_mitkIpFuncExtT\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -102,7 +102,7 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t _ipFuncExtT ( ipPicType_t type,
+ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
                       ipUInt4_t   bpe,
                       ipFloat8_t  *min_gv,
                       ipFloat8_t  *max_gv )
@@ -110,19 +110,19 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
 
   /* calculate max. or min possible greyvalue for datatype              */
 
-  if ( type == ipPicInt )
+  if ( type == mitkIpPicInt )
     {
        EXP( max_gv, bpe - 1 )
        *max_gv = *max_gv - 1;
        *min_gv = - *max_gv;
     }
-  else if ( type == ipPicUInt )
+  else if ( type == mitkIpPicUInt )
     {
        EXP (max_gv, bpe )
        *max_gv = *max_gv - 1;
        *min_gv = 0;
     }
-  else if ( type == ipPicFloat )
+  else if ( type == mitkIpPicFloat )
     {
        if ( bpe = 32 )
          {
@@ -137,7 +137,7 @@ ipInt4_t _ipFuncExtT ( ipPicType_t type,
     }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
        return ( mitkIpFuncERROR );
     }
 

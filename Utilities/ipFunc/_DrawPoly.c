@@ -51,7 +51,7 @@
  *  this function draws the edge of an ROI to an image
  *
  * FUNCTION DECLARATION
- *  ipPicDescriptor  *_ipFuncDrawPoly( ipPicDescriptor *pic_old,
+ *  mitkIpPicDescriptor  *_mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,
  *                                     ipUInt4_t       *pol_x,
  *                                     ipUInt4_t       *pol_y,  
  *                                     ipUInt4_t       no_pts, 
@@ -84,21 +84,21 @@
  * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipFuncDrawPoly\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)_mitkIpFuncDrawPoly\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 /* include files                                                       */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 
 /* -------------------------------------------------------------------- */
 
 /*
-** ipFuncDrawPoly
+** mitkIpFuncDrawPoly
 */
 
-ipPicDescriptor *_ipFuncDrawPoly ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
                                    ipUInt4_t       *pol_x,
                                    ipUInt4_t       *pol_y,
                                    ipUInt4_t       no_pts, 
@@ -106,26 +106,26 @@ ipPicDescriptor *_ipFuncDrawPoly ( ipPicDescriptor *pic_old,
                                   ipFloat8_t      *b )
 {
 
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
    ipUInt4_t       i, j;
    ipUInt4_t       y;
    ipUInt4_t       beg, end;
 
    /* allocate memory for pic help                                      */
 
-   pic_help = ipPicCopyHeader ( pic_old, NULL );
+   pic_help = mitkIpPicCopyHeader ( pic_old, NULL );
    if ( pic_help == NULL )
      {
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
      }
-   pic_help->type = ipPicUInt;
+   pic_help->type = mitkIpPicUInt;
    pic_help->bpe  = 8;
-   pic_help->data = calloc ( _ipPicElements ( pic_help ), pic_help->bpe / 8 );
+   pic_help->data = calloc ( _mitkIpPicElements ( pic_help ), pic_help->bpe / 8 );
    if ( pic_help->data == NULL )
      {
-        ipPicFree ( pic_help );
-        _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+        mitkIpPicFree ( pic_help );
+        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
         return ( mitkIpFuncERROR );
      }
 

@@ -96,7 +96,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   }
 }
     
-void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(ipPicDescriptor* pic)
+void mitk::CorrectorAlgorithm::TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic)
 {
 /*!
 Some documentation (not by the original author)
@@ -311,7 +311,7 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   delete[] _points;
 }
 
-bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, ipPicDescriptor *pic, int* _ofsArray )
+bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, mitkIpPicDescriptor *pic, int* _ofsArray )
 {
   // offsets for pixels right, top, left, bottom
   int nbDelta4[4];
@@ -330,8 +330,8 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
   ipMITKSegmentationTYPE newState = ((!state)&1) + 2; // probably equal to: ipMITKSegmentationTYPE newState = 3 - state; 
 
   // make two copies of pic:
-  ipPicDescriptor *seg1 = ipPicClone( pic );
-  ipPicDescriptor *seg2 = ipPicClone( pic );
+  mitkIpPicDescriptor *seg1 = mitkIpPicClone( pic );
+  mitkIpPicDescriptor *seg2 = mitkIpPicClone( pic );
 
   int i;
 
@@ -446,8 +446,8 @@ bool mitk::CorrectorAlgorithm::modifySegment( int lineStart, int lineEnd, ipMITK
   *(picdata + _ofsArray[lineStart]) = saveStart;
   *(picdata + _ofsArray[lineEnd]) = saveEnd;
   
-  ipPicFree( seg1 );
-  ipPicFree( seg2 );
+  mitkIpPicFree( seg1 );
+  mitkIpPicFree( seg2 );
 
   return modified;
 }

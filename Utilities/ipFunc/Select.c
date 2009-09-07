@@ -69,13 +69,13 @@
 
 /* include files                                                            */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncSelect ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      gv_low,
                                 ipFloat8_t      gv_up,
                                 ipFloat8_t      gv,
-                                ipPicDescriptor *pic_return );
+                                mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -94,7 +94,7 @@ ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
                                                                              \
   /* transform greyvalues                                                  */\
                                                                              \
-  for ( i = 0; i < _ipPicElements ( pic ); i++ )                             \
+  for ( i = 0; i < _mitkIpPicElements ( pic ); i++ )                             \
     {                                                                        \
        help = (( type * )pic->data )[i];                                     \
        (( type * )pic_new->data )[i] =                                       \
@@ -110,54 +110,54 @@ ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncSelect ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      gv_low,
                                 ipFloat8_t      gv_up,
                                 ipFloat8_t      gv,
-                                ipPicDescriptor *pic_return ) 
+                                mitkIpPicDescriptor *pic_return ) 
 {
   ipFloat8_t       min_gv, max_gv;  /* max and min possible greyvalues      */
-  ipPicDescriptor  *pic_new;        /* pointer to transformed image         */
+  mitkIpPicDescriptor  *pic_new;        /* pointer to transformed image         */
 
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR )
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR )
     return ( mitkIpFuncERROR );
 
   /* check whether data are correct                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( gv_low > gv_up ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 /* iw - commented out on 3.8.2000 
    if ( min_gv > gv_low || max_gv < gv_up ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 */
   if ( min_gv > gv || max_gv < gv ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* allocate memory for the transformed image                              */
 
 
-   pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+   pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
    if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to transform the image                                           */
 
   mitkIpPicFORALL_3 ( SELECT, pic_old, gv_low, gv_up, gv );
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
      
 

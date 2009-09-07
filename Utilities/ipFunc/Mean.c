@@ -62,14 +62,14 @@
 
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncMean ( ipPicDescriptor *pic );
+ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
  
 #ifndef lint
-  static char *what = { "@(#)ipFuncMean\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncMean\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -81,13 +81,13 @@ ipFloat8_t ipFuncMean ( ipPicDescriptor *pic );
     ipUInt4_t   i, no_elem;                                    \
                                                                \
     mean = 0.;                                                 \
-    no_elem = _ipPicElements ( pic );                          \
+    no_elem = _mitkIpPicElements ( pic );                          \
                                                                \
     for ( i = 0; i < no_elem; i++ )                            \
       {                                                        \
         mean = ( ( type * ) pic->data ) [i] + mean;            \
       }                                                        \
-    mean = mean /  _ipPicElements ( pic );                     \
+    mean = mean /  _mitkIpPicElements ( pic );                     \
   }
  
 /* ========================================================== */
@@ -95,14 +95,14 @@ ipFloat8_t ipFuncMean ( ipPicDescriptor *pic );
 */
 /* ========================================================== */
 
-ipFloat8_t ipFuncMean ( ipPicDescriptor *pic )
+ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic )
 {
 
   ipFloat8_t mean = 0.0;            
 
   /* check data                                               */ 
 
-  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   mitkIpPicFORALL_1( MEAN, pic, mean )
 

@@ -66,7 +66,7 @@
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
  
 
 /* ========================================================== */
@@ -76,18 +76,18 @@
 */
 /* ========================================================== */
 
-ipFloat8_t ipFuncSkewnessR ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncSkewnessR ( mitkIpPicDescriptor *pic_old,
 						    ipUInt4_t       *begin, 
                             ipUInt4_t       *length ) {
 
    ipFloat8_t   var;     
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
 
-   pic_help = ipFuncWindow ( pic_old, begin, length );
+   pic_help = mitkIpFuncWindow ( pic_old, begin, length );
    
-   var = ipFuncSkewness ( pic_help );
+   var = mitkIpFuncSkewness ( pic_help );
 
-   ipPicFree ( pic_help );
+   mitkIpPicFree ( pic_help );
 
    return  var ;
 }                       

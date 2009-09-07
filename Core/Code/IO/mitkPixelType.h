@@ -43,9 +43,9 @@ public:
 
   PixelType(const std::type_info& aTypeId, int numberOfComponents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
 
-  PixelType(ipPicType_t type, int bpe, int numberOfComponents = 1);
+  PixelType(mitkIpPicType_t type, int bpe, int numberOfComponents = 1);
 
-  PixelType(const ipPicDescriptor* pic);
+  PixelType(const mitkIpPicDescriptor* pic);
   PixelType(const mitk::PixelType & aPixelType);
   /** \brief Get the \a type_info of the scalar (!) type. Each element
   * may contain m_NumberOfComponents (more than one) of these scalars.
@@ -66,13 +66,13 @@ public:
     return m_ItkTypeId;
   }
 
-  /** \brief Get the \a ipPicType_t of the scalar (!) component type. Each element
+  /** \brief Get the \a mitkIpPicType_t of the scalar (!) component type. Each element
   * may contain m_NumberOfComponents (more than one) of these scalars.
   *
   * \sa GetItkTypeId
   * \sa GetTypeId
   */
-  inline ipPicType_t GetType() const
+  inline mitkIpPicType_t GetType() const
   {
     return m_Type;
   }
@@ -136,7 +136,7 @@ public:
 
   void Initialize(const std::type_info& aTypeId, int numberOfCompontents = 1, ItkIOPixelType anItkIoPixelType = itk::ImageIOBase::UNKNOWNPIXELTYPE);
 
-  void Initialize(ipPicType_t type, int bpe, int numberOfComponents = 1);
+  void Initialize(mitkIpPicType_t type, int bpe, int numberOfComponents = 1);
 
   virtual ~PixelType() {}
 
@@ -154,7 +154,7 @@ private:
    */
   const std::type_info* m_ItkTypeId;
 
-  ipPicType_t m_Type;
+  mitkIpPicType_t m_Type;
 
   int m_Bpe;
   

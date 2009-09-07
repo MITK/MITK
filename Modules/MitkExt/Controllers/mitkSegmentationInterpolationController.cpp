@@ -200,7 +200,7 @@ void mitk::SegmentationInterpolationController::SetChangedSlice( const Image* sl
       dim0 = 1; dim1 = 2; break;
   }
 
-  ipPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
+  mitkIpPicDescriptor* rawSlice = const_cast<Image*>(sliceDiff)->GetSliceData()->GetPicDescriptor(); // we promise not to change anything!
   if (!rawSlice) return;
 
   AccessFixedDimensionByItk_1( sliceDiff, ScanChangedSlice, 2, SetChangedSliceOptions(sliceDimension, sliceIndex, dim0, dim1, timeStep, rawSlice->data) );

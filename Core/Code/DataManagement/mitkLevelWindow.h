@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVector.h"
 #include "mitkCommon.h"
 
-struct ipPicDescriptor;
+struct mitkIpPicDescriptor;
 
 namespace mitk {
 
@@ -185,10 +185,10 @@ public:
 protected:
 
   /**!
-  * \brief sets level/window according to the tags in the given ipPicDescriptor
+  * \brief sets level/window according to the tags in the given mitkIpPicDescriptor
   * \return @a true if tags where found
   */
-  bool SetAutoByPicTags(const ipPicDescriptor* pic);
+  bool SetAutoByPicTags(const mitkIpPicDescriptor* pic);
 
   /*!
   * lower bound of current window

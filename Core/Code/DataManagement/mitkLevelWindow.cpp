@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindow.h"
 #include "mitkImageSliceSelector.h"
 
-#include <ipFunc/ipFunc.h>
+#include <ipFunc/mitkIpFunc.h>
 #include <mitkIpPic.h>
 #include <algorithm>
 
@@ -268,7 +268,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType().GetType() == ipPicInt && image->GetPixelType().GetBpe() >= 8)
+  if (image->GetPixelType().GetType() == mitkIpPicInt && image->GetPixelType().GetBpe() >= 8)
   {
     if (minValue == -(pow((double)2.0,image->GetPixelType().GetBpe())/2))
     {
@@ -285,7 +285,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   SetRangeMinMax(minValue, maxValue);
   SetDefaultRangeMinMax(minValue, maxValue);
 
-  if ( tryPicTags ) // level and window will be set by informations provided directly by the ipPicDescriptor
+  if ( tryPicTags ) // level and window will be set by informations provided directly by the mitkIpPicDescriptor
   {
     if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
     {
@@ -344,17 +344,17 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
 }
 
-bool mitk::LevelWindow::SetAutoByPicTags(const ipPicDescriptor* aPic)
+bool mitk::LevelWindow::SetAutoByPicTags(const mitkIpPicDescriptor* aPic)
 {
   if ( IsFixed() )
     return false;
   
-  ipPicDescriptor* pic = const_cast<ipPicDescriptor*>(aPic);
+  mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
   if ( pic == NULL )
   {
     return false;
   }
-  ipPicTSV_t *tsv = ipPicQueryTag( pic, "LEVEL/WINDOW" );
+  mitkIpPicTSV_t *tsv = mitkIpPicQueryTag( pic, "LEVEL/WINDOW" );
   if( tsv != NULL )
   {
     double level = 0;

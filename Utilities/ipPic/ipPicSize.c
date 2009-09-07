@@ -49,7 +49,7 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)_ipPicSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpPicSize\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -81,11 +81,11 @@
  * Initial revision, NO error checking
  */
 
-ipUInt4_t _ipPicSize(
+ipUInt4_t _mitkIpPicSize(
 #if defined(__cplusplus) || defined(c_plusplus)
                          const
 #endif
-                         ipPicDescriptor *pic )
+                         mitkIpPicDescriptor *pic )
 {
   ipUInt4_t i;
   ipUInt4_t elements;

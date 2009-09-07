@@ -18,8 +18,8 @@ win32 {
 HEADERS		= gradient.h \
 		  ipAdministrative.h \
 		  ipArithmeticAndLogical.h \
-		  ipFunc.h \
-		  ipFuncP.h \
+		  mitkIpFunc.h \
+		  mitkIpFuncP.h \
 		  ipGeometrical.h \
 		  ipLocal.h \
 		  ipMorphological.h \

@@ -45,7 +45,7 @@
 *****************************************************************************/
 
 /*
- * ipFuncBorder
+ * mitkIpFuncBorder
  *---------------------------------------------------------------------
  * DESCRIPTION
  *
@@ -65,7 +65,7 @@
  *
  * Revision 1.3  2000/07/24 13:06:26  ivo
  * June 26, 2000
- * iw - function ipFuncSetTag added.
+ * iw - function mitkIpFuncSetTag added.
  *
  * July 8, 2000
  * iw - Visual C++ 6.0 SP3 compiler crashes at "static char *what..." lines.
@@ -82,7 +82,7 @@
  *
  * Revision 1.2  2000/02/18 14:58:09  ivo
  * Tags are now copied into newly allocated images.
- * Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ * Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  2000/02/18  15:40:34  ivo
  * the dimension sizes n[i] that are not used must be set to zero,
@@ -98,7 +98,7 @@
 
 /* include files                                                                  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 /* definition of macros                                                           */
 
@@ -203,11 +203,11 @@
 */
 /* ------------------------------------------------------------------------------ */
 
-ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *_mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *edge,
                                   ipFloat8_t      value )
 {
-  ipPicDescriptor *pic_new;            /* pointer to transformed image            */
+  mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipUInt4_t       i;                   /* loop index                              */
   ipUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
   ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
@@ -215,12 +215,12 @@ ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
-  pic_new = ipPicCopyHeader ( pic_old, NULL );
+  pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   else 
@@ -230,24 +230,24 @@ ipPicDescriptor *_ipFuncBorderX ( ipPicDescriptor *pic_old,
 
        for ( i = 0; i < pic_old->dim; i++ )
          pic_new->n[i] = pic_old->n[i] + 2 * edge[i];
-       pic_new->data = calloc ( _ipPicElements ( pic_new ), pic_new->bpe/8 );
+       pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe/8 );
        if ( pic_new->data == NULL )
          {
-            _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
-            ipPicFree ( pic_new );
+            _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+            mitkIpPicFree ( pic_new );
             return  ( mitkIpFuncERROR );
          }
     }
 
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
   if ( ( value > max_gv ) ||  ( value < min_gv ) )
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
     

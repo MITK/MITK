@@ -62,9 +62,9 @@
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic );
+ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
 
 /* definition of extreme value macro                          */
 
@@ -72,7 +72,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic );
 
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
  
 /* definition of extreme value macro                          */
 
@@ -82,7 +82,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic );
                                                                \
     excess = 0.;                                               \
                                                                \
-    no_elem = _ipPicElements ( pic );                          \
+    no_elem = _mitkIpPicElements ( pic );                          \
     for ( i = 0; i < no_elem; i++ )                            \
       {                                                        \
         excess = ( ( ( type * ) pic->data ) [i] - mean ) *     \
@@ -93,7 +93,7 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic );
       }                                                        \
   }
  
-ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
+ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic )
 {
 
   ipFloat8_t curt;
@@ -102,18 +102,18 @@ ipFloat8_t ipFuncCurtosis ( ipPicDescriptor *pic )
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
 
   curt = 0.0;
-  if (  _ipPicElements ( pic ) != 1 ) 
+  if (  _mitkIpPicElements ( pic ) != 1 ) 
     {
        
-       mean =  ipFuncMean ( pic );
-	   std = ipFuncSDev( pic );
+       mean =  mitkIpFuncMean ( pic );
+	   std = mitkIpFuncSDev( pic );
 
        mitkIpPicFORALL_2( CURTOSIS, pic, mean,  curt );   
   
-       curt =   curt / ((( ipFloat8_t )(_ipPicElements ( pic ) - 1 )) *std*std*std*std) -3;
+       curt =   curt / ((( ipFloat8_t )(_mitkIpPicElements ( pic ) - 1 )) *std*std*std*std) -3;
     }
 
   return( curt );

@@ -38,6 +38,6 @@ void ipMITKSegmentationError (int error);
 \brief Checks the segmentation image.
 @param segmentation the segmentation image.
 */
-void ipMITKSegmentationCheck (ipPicDescriptor* segmentation);
+void ipMITKSegmentationCheck (mitkIpPicDescriptor* segmentation);
 
 #endif

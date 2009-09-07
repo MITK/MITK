@@ -47,11 +47,11 @@
 /** @file 
  *  Administrative Functions
  *  This header is for grouping purposes for the
- *  documentation only. Don't use it, use ipFunc.h instead.
+ *  documentation only. Don't use it, use mitkIpFunc.h instead.
  */
 
 #ifndef DOXYGEN_IGNORE
-#include <ipFunc.h>
+#include <mitkIpFunc.h>
 #endif
 
 #ifndef _mitkIpFunc_h
@@ -63,18 +63,18 @@
 extern "C" {
 #endif
 
-char            *ipFuncMakePicName ( char *pic_name, char *extension );
+char            *mitkIpFuncMakePicName ( char *pic_name, char *extension );
 
-void ipFuncCopyTags(ipPicDescriptor *pic_new, ipPicDescriptor *pic_old);
+void mitkIpFuncCopyTags(mitkIpPicDescriptor *pic_new, mitkIpPicDescriptor *pic_old);
 
-ipPicDescriptor *ipFuncConvert( ipPicDescriptor *pic_old,
-                                ipPicType_t     type,
+mitkIpPicDescriptor *mitkIpFuncConvert( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicType_t     type,
                                 ipUInt4_t       bpe );
 
-void            ipFuncXchange   ( ipPicDescriptor **pic1,
-                                  ipPicDescriptor **pic2 );
+void            mitkIpFuncXchange   ( mitkIpPicDescriptor **pic1,
+                                  mitkIpPicDescriptor **pic2 );
 
-void            ipFuncPError   ( char            *string );
+void            mitkIpFuncPError   ( char            *string );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

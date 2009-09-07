@@ -509,11 +509,11 @@ SOURCE=.\ipArithmeticAndLogical.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipFunc.h
+SOURCE=.\mitkIpFunc.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\ipFuncP.h
+SOURCE=.\mitkIpFuncP.h
 # End Source File
 # Begin Source File
 

@@ -51,10 +51,10 @@ mitk::ContourInteractor::~ContourInteractor()
 
 }
 
-//mitk::Contour::Pointer ContourInteractor::ExtractContour(ipPicDescriptor* pic)
+//mitk::Contour::Pointer ContourInteractor::ExtractContour(mitkIpPicDescriptor* pic)
 //{
 //  int idx;
-//  int size = _ipPicElements (pic);
+//  int size = _mitkIpPicElements (pic);
 //  for (idx = 0; idx < size; idx++)
 //    if ( ((ipUInt1_t*) pic->data)[idx]> 0) break;
 //

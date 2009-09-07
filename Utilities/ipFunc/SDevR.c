@@ -62,9 +62,9 @@
  * AUTHOR & DATE
  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t  ipFuncSDevR ( ipPicDescriptor *pic_old,
+ipFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *begin, 
                           ipUInt4_t       *length );
 
@@ -76,19 +76,19 @@ ipFloat8_t  ipFuncSDevR ( ipPicDescriptor *pic_old,
 
 
 
-ipFloat8_t  ipFuncSDevR ( ipPicDescriptor *pic_old,
+ipFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *begin, 
                           ipUInt4_t       *length )
 {
    ipFloat8_t   sder;    /* standard deviation  */
 
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
 
-   pic_help = ipFuncWindow ( pic_old, begin, length );
+   pic_help = mitkIpFuncWindow ( pic_old, begin, length );
 
-   sder  = ipFuncSDev ( pic_help );
+   sder  = mitkIpFuncSDev ( pic_help );
 
-   ipPicFree ( pic_help );
+   mitkIpPicFree ( pic_help );
 
    return ( sder );
 }

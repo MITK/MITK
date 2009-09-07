@@ -61,16 +61,16 @@
  *              occured
  *
  * USES
- *  function ipFuncExtr : to calculate extreme greyvalues of the image
+ *  function mitkIpFuncExtr : to calculate extreme greyvalues of the image
  *
  * AUTHOR & DATE
  */
 
 /* include files                                                            */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipUInt4_t  ipFuncRange ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
                          ipFloat8_t      gv_low,
                          ipFloat8_t      gv_up );
 #ifndef DOXYGEN_IGNORE
@@ -82,11 +82,11 @@ ipUInt4_t  ipFuncRange ( ipPicDescriptor *pic_old,
 
 /* ------------------------------------------------------------------------ */
 /*
-** function ipFuncRange
+** function mitkIpFuncRange
 */
 /* ------------------------------------------------------------------------ */
 
-ipUInt4_t  ipFuncRange ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
                          ipFloat8_t      gv_low,
                          ipFloat8_t      gv_up )
 {
@@ -94,16 +94,16 @@ ipUInt4_t  ipFuncRange ( ipPicDescriptor *pic_old,
 
   /* check image data                                                       */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( gv_low > gv_up )
     { 
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( ipFuncExtr ( pic_old, &min, &max) == mitkIpFuncERROR ) return ( mitkIpFuncERROR );
+  if ( mitkIpFuncExtr ( pic_old, &min, &max) == mitkIpFuncERROR ) return ( mitkIpFuncERROR );
 
   if ( min > gv_low || max < gv_up ) return ( mitkIpFuncOK );
   else return ( mitkIpFuncERROR );

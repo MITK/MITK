@@ -47,11 +47,11 @@
 /** @file 
  *  Local Operators.
  *  This header is for grouping purposes for the
- *  documentation only. Don't use it, use ipFunc.h instead.
+ *  documentation only. Don't use it, use mitkIpFunc.h instead.
  */
 
 #ifndef DOXYGEN_IGNORE
-#include <ipFunc.h>
+#include <mitkIpFunc.h>
 #endif
 
 #ifndef _mitkIpFunc_h
@@ -63,52 +63,52 @@
 extern "C" {
 #endif
 
-ipPicDescriptor *ipFuncConv   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncConv   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncGausF  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncGausF  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       len_mask,
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncCanny  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncCanny  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
                                 ipUInt4_t       len_mask,
                                 ipFloat8_t      threshold,
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncRank   ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncRank   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       rank,
                                 ipUInt4_t       dim_mask, 
                                 ipUInt4_t       len_mask,
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncMeanF  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncMeanF  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       len_mask,
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncShp    ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncShp    ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border,
+                                mitkIpFuncFlagI_t   border,
                                 ipUInt4_t       mask_nr );
 
-ipPicDescriptor *ipFuncLaplace( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncSobel  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncSobel  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncGrad   ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncGrad   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncRoberts( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncRoberts( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

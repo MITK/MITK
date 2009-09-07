@@ -45,14 +45,14 @@
 *****************************************************************************/
 
 /*
- * ipFuncInertia
+ * mitkIpFuncInertia
  *---------------------------------------------------------------------
  * DESCRIPTION
  *  function to calculate the moments of inertia of a region of
  *  interest
  *
  * FUNCTION DECLARATION
- *  ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
+ *  ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
  *                           ipFloat8_t     **eigen_vekt,
  *                           ipFloat8_t     **eigen_val )            
  *
@@ -78,7 +78,7 @@
  */
 /* include Files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 #ifdef MESCHACH
 #include <float.h>
@@ -139,7 +139,7 @@
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
+ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
                          ipFloat8_t     **eigen_vekt,
                          ipFloat8_t     **eigen_val )            
 {
@@ -158,7 +158,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
 
   /* check data  */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
  
   /* initialisation of vectors  */
 
@@ -176,14 +176,14 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   gravity = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( gravity == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
  
   dist    = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( dist == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        return ( mitkIpFuncERROR );
     }
@@ -191,7 +191,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   s_diag  = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( s_diag == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );    
        return ( mitkIpFuncERROR );
@@ -200,7 +200,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   s = ( ipFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( ipFloat8_t ) );
   if ( s == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
@@ -210,7 +210,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   tt = m_get ( pic_old->dim, pic_old->dim );
   if ( tt == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
@@ -221,7 +221,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   ev = m_get ( pic_old->dim, pic_old->dim );
   if ( ev == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
@@ -233,7 +233,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
   ew = v_get ( pic_old->dim-1 );
   if ( ew == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        free ( dist );   
        free ( s_diag );
@@ -245,7 +245,7 @@ ipInt4_t ipFuncInertia ( ipPicDescriptor *pic_old,
 
   /* calculate center of gravity  */
 
-  gravity = ipFuncGrav ( pic_old );
+  gravity = mitkIpFuncGrav ( pic_old );
 
   /* Initialization of vectors */
 

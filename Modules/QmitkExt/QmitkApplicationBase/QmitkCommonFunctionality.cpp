@@ -296,7 +296,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddVtkMeshToDataTree(vtkPolyDat
   return node;
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(ipPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str)
+mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(mitkIpPicDescriptor * pic, mitk::DataTreeIteratorBase* iterator, std::string str)
 {
   mitk::DataTreeIteratorClone it=iterator;
 

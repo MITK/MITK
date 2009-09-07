@@ -54,24 +54,24 @@
  *  @param len_mask  number of pixels for each dimension
  *  @param dim_mask   number of dimensions of filter in mask
  *  @param border   handling of the edge
- *   @arg @c     ipFuncBorderOld  : original greyvalues
- *   @arg @c     ipFuncBorderZero : edge pixels are set to zero
+ *   @arg @c     mitkIpFuncBorderOld  : original greyvalues
+ *   @arg @c     mitkIpFuncBorderZero : edge pixels are set to zero
  *
  *  @return pointer to the smoothed image
  *
- * @par Uses @arg ipFuncConv() convolve image with mask
+ * @par Uses @arg mitkIpFuncConv() convolve image with mask
  *
  * AUTHOR & DATE
  */
 
 /* include files                                                         */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       len_mask,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border );
+                                 mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -87,69 +87,69 @@ ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
 */
 /* --------------------------------------------------------------------- */
  
-ipPicDescriptor *ipFuncMeanF   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       len_mask,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border )
+                                 mitkIpFuncFlagI_t   border )
 {
-  ipPicDescriptor *pic_new;          /* pointer to new image structure   */
-  ipPicDescriptor *pic_mask;         /* pointer to mask                  */
+  mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
+  mitkIpPicDescriptor *pic_mask;         /* pointer to mask                  */
   ipUInt4_t       i;                 /* loop index                       */
   ipUInt4_t       no_elem;
   ipFloat8_t      help;
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim < dim_mask || dim_mask < 1 )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
   if ( len_mask % 2 != 1 ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );   
     }
 
   /* initialize mask                                                     */
   
-  pic_mask       = ipPicNew();
+  pic_mask       = mitkIpPicNew();
   
   if ( pic_mask == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  pic_mask->type = ipPicFloat;
+  pic_mask->type = mitkIpPicFloat;
   pic_mask->bpe  = 64;
   pic_mask->dim  = dim_mask;
 
   for ( i = 0; i < dim_mask; i++ ) pic_mask->n[i] = len_mask;
 
-  pic_mask->data = malloc ( _ipPicSize ( pic_mask ) );
+  pic_mask->data = malloc ( _mitkIpPicSize ( pic_mask ) );
   if ( pic_mask->data == NULL )
     {
-       ipPicFree ( pic_mask->data );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_mask->data );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  no_elem        = _ipPicElements ( pic_mask );
+  no_elem        = _mitkIpPicElements ( pic_mask );
   help           = 1. / ( ipFloat8_t ) no_elem;                       
   for ( i = 0; i < no_elem; i++ )                       
     (( ipFloat8_t * ) pic_mask->data ) [i] = help;
 
   /* convolve image with filtering mask                                 */
 
-  pic_new = ipFuncConv ( pic_old, pic_mask, border );
+  pic_new = mitkIpFuncConv ( pic_old, pic_mask, border );
 
-  ipPicFree ( pic_mask );
+  mitkIpPicFree ( pic_mask );
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

@@ -110,7 +110,7 @@ protected:
 
     virtual void GenerateData();
     
-    virtual int MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic );
+    virtual int MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *pic );
 
     std::string m_FileName;
 

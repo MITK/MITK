@@ -69,7 +69,7 @@ public:
     return m_Parent;
   }
 
-  ipPicDescriptor* GetPicDescriptor() const
+  mitkIpPicDescriptor* GetPicDescriptor() const
   {
     return m_PicDescriptor;
   }
@@ -102,7 +102,7 @@ protected:
   
   bool m_ManageMemory;
 
-  ipPicDescriptor* m_PicDescriptor;
+  mitkIpPicDescriptor* m_PicDescriptor;
   mutable vtkImageData* m_VtkImageData;
   int m_Offset;
 

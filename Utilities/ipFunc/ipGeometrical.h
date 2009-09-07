@@ -47,11 +47,11 @@
 /** @file 
  *  Geometrical Operators.
  *  This header is for grouping purposes for the
- *  documentation only. Don't use it, use ipFunc.h instead.
+ *  documentation only. Don't use it, use mitkIpFunc.h instead.
  */
 
 #ifndef DOXYGEN_IGNORE
-#include <ipFunc.h>
+#include <mitkIpFunc.h>
 #endif
 
 #ifndef _mitkIpFunc_h
@@ -63,52 +63,52 @@
 extern "C" {
 #endif
 
-ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
+ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
                       ipUInt4_t       **beg,
                       ipUInt4_t       **end );
 
-ipPicDescriptor *ipFuncRefl   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRefl   ( mitkIpPicDescriptor *pic_old,
                                 ipInt4_t         axis );
 
-ipPicDescriptor *ipFuncFrame  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncFrame  ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *edge,     
                                 ipFloat8_t      value );      
 
-ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *mask,     
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *mask,     
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
-                                 ipPicDescriptor *mask,     
+mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
+                                 mitkIpPicDescriptor *mask,     
                                  ipFloat8_t      value,
-                                 ipPicDescriptor *pic_return );
+                                 mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncScale  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScale  ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      sc_fact[_mitkIpPicNDIM],
-                                ipFuncFlagI_t   sc_kind );
+                                mitkIpFuncFlagI_t   sc_kind );
 
-ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScFact ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      factor,               
-                                ipFuncFlagI_t   sc_kind );
+                                mitkIpFuncFlagI_t   sc_kind );
 
-ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncWindow ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipPicDescriptor *ipFuncWindowR( ipPicDescriptor *pic_1,        
-                                ipPicDescriptor *pic_2,
+mitkIpPicDescriptor *mitkIpFuncWindowR( mitkIpPicDescriptor *pic_1,        
+                                mitkIpPicDescriptor *pic_2,
                                 ipUInt4_t       *begin,   
-                                ipFuncFlagI_t   keep );    
+                                mitkIpFuncFlagI_t   keep );    
 
-ipPicDescriptor *ipFuncRotate  ( ipPicDescriptor *pic,
-                                 ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRotate  ( mitkIpPicDescriptor *pic,
+                                 mitkIpPicDescriptor *pic_old,
                                  int *grad, int *order );
 
-ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
-                                  ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
+                                  mitkIpPicDescriptor *pic_old,
                                   int *permutations_vector);
       
-ipPicDescriptor *ipFuncDrawPoly( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );

@@ -66,9 +66,9 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old, 
+ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
                        ipFloat8_t      *min_gv,
                        ipFloat8_t      *max_gv,
                        ipUInt4_t       **hist,
@@ -86,7 +86,7 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
                                                                          \
   /* calculate histogram                                             */  \
                                                                          \
-  no_elem =  _ipPicElements ( pic );                                     \
+  no_elem =  _mitkIpPicElements ( pic );                                     \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
        index = ( ipUInt4_t )                                             \
@@ -103,7 +103,7 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old, 
+ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
                        ipFloat8_t      *min_gv,
                        ipFloat8_t      *max_gv,
                        ipUInt4_t       **hist,
@@ -117,10 +117,10 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( *min_gv == 0 && *max_gv == 0 )
     {
-       if ( ipFuncExtr ( pic_old, min_gv, max_gv ) != mitkIpFuncOK ) 
+       if ( mitkIpFuncExtr ( pic_old, min_gv, max_gv ) != mitkIpFuncOK ) 
 	{
 	printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
 	return ( mitkIpFuncERROR );
@@ -130,17 +130,17 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
     {
        if ( *min_gv > *max_gv ) 
          {
-            _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
 	    printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
             return ( mitkIpFuncERROR );
          }
-       if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+       if ( mitkIpFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
        if ( *min_gv < min || *max_gv > max )
          {
 	    printf("ipFunc: Probleme mit dem von ipFunc Extrema berechnete Intervall\n");
 	    printf("ipFunc: Von Extrema: %f %f \n", *min_gv, *max_gv);
 	   /*
-            _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
             return ( mitkIpFuncERROR );
 	   */
          }
@@ -151,14 +151,14 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
 
   help = fabs ( *min_gv );
 
-  if ( pic_old->type == ipPicInt || pic_old->type == ipPicUInt )
+  if ( pic_old->type == mitkIpPicInt || pic_old->type == mitkIpPicUInt )
     factor = 1;
-  else if ( pic_old->type == ipPicFloat )
+  else if ( pic_old->type == mitkIpPicFloat )
     factor = 1000;
   else 
     {
        printf("ipFunc: Probleme mit dem von ipFunc Extrema berechnete Intervall\n");
-       _ipFuncSetErrno (mitkIpFuncTYPE_ERROR );
+       _mitkIpFuncSetErrno (mitkIpFuncTYPE_ERROR );
        return ( mitkIpFuncERROR );
     }
   
@@ -172,7 +172,7 @@ ipInt4_t  ipFuncHisto( ipPicDescriptor *pic_old,
   if ( hist_help == NULL ) 
     {
        printf("ipFunc: Probleme mit dem Allokieren von Platz\n");
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
        return ( mitkIpFuncERROR );
     }
 

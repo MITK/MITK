@@ -108,13 +108,13 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicGet\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
 mitkIpPicFile_t
-_ipPicOpenPicFileIn( const char *path )
+_mitkIpPicOpenPicFileIn( const char *path )
 {
   mitkIpPicFile_t infile;
 
@@ -137,21 +137,21 @@ _ipPicOpenPicFileIn( const char *path )
   return( infile );
 }
 
-ipPicDescriptor *
-ipPicGet( const char *infile_name, ipPicDescriptor *pic )
+mitkIpPicDescriptor *
+mitkIpPicGet( const char *infile_name, mitkIpPicDescriptor *pic )
 {
   mitkIpPicFile_t infile;
 
-  ipPicTag_t tag_name;
+  mitkIpPicTag_t tag_name;
   ipUInt4_t len;
 
   ipUInt4_t to_read;
 
-  infile = _ipPicOpenPicFileIn( infile_name );
+  infile = _mitkIpPicOpenPicFileIn( infile_name );
 
   if( !infile )
     {
-      /*ipPrintErr( "ipPicGet: sorry, error opening infile\n" );*/
+      /*ipPrintErr( "mitkIpPicGet: sorry, error opening infile\n" );*/
       return( NULL );
     }
 
@@ -160,16 +160,16 @@ ipPicGet( const char *infile_name, ipPicDescriptor *pic )
 
   if( strncmp( "\037\213", tag_name, 2 ) == 0 )
     {
-      fprintf( stderr, "ipPicGetHeader: sorry, can't read compressed file\n" );
+      fprintf( stderr, "mitkIpPicGetHeader: sorry, can't read compressed file\n" );
       return( NULL );
     }
   else if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
       if( pic == NULL )
-        pic = _ipPicOldGet( infile,
+        pic = _mitkIpPicOldGet( infile,
                             NULL );
       else
-        _ipPicOldGet( infile,
+        _mitkIpPicOldGet( infile,
                       pic );
       if( infile != stdin )
         mitkIpPicFClose( infile );
@@ -177,11 +177,11 @@ ipPicGet( const char *infile_name, ipPicDescriptor *pic )
     }
 
   if( pic == NULL )
-    pic = ipPicNew();
+    pic = mitkIpPicNew();
 
-  ipPicClear( pic );
+  mitkIpPicClear( pic );
 
-  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
   mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
@@ -198,23 +198,23 @@ ipPicGet( const char *infile_name, ipPicDescriptor *pic )
 #if 0
   mitkIpPicFSeek( infile, to_read, SEEK_CUR );
 #else
-  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
+  pic->info->tags_head = _mitkIpPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 #endif
 
   pic->info->write_protect = ipFalse;
 
 #ifdef WIN
-  if ((pic->hdata = GlobalAlloc( GMEM_MOVEABLE, _ipPicSize(pic) )) != 0)
+  if ((pic->hdata = GlobalAlloc( GMEM_MOVEABLE, _mitkIpPicSize(pic) )) != 0)
     pic->data = GlobalLock( pic->hdata );
 #else
-  pic->data = malloc( _ipPicSize(pic) );
+  pic->data = malloc( _mitkIpPicSize(pic) );
 #endif
 
   pic->info->pixel_start_in_file = mitkIpPicFTell( infile );
-  if( pic->type == ipPicNonUniform )
-    mitkIpPicFRead( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+  if( pic->type == mitkIpPicNonUniform )
+    mitkIpPicFRead( pic->data, pic->bpe / 8, _mitkIpPicElements(pic), infile );
   else
-    mitkIpPicFReadLE( pic->data, pic->bpe / 8, _ipPicElements(pic), infile );
+    mitkIpPicFReadLE( pic->data, pic->bpe / 8, _mitkIpPicElements(pic), infile );
 
   if( infile != stdin )
     mitkIpPicFClose( infile );
@@ -226,21 +226,21 @@ ipPicGet( const char *infile_name, ipPicDescriptor *pic )
   return( pic );
 }
 
-_ipPicTagsElement_t *
-_ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
+_mitkIpPicTagsElement_t *
+_mitkIpPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
 {
   while( bytes_to_read > 0 )
     {
-      ipPicTSV_t *tsv;
+      mitkIpPicTSV_t *tsv;
 
-      ipPicTag_t tag_name;
+      mitkIpPicTag_t tag_name;
       ipUInt4_t len;
 
       /*printf( "bytes_to_read: %i\n", bytes_to_read ); */
 
-      tsv = malloc( sizeof(ipPicTSV_t) );
+      tsv = malloc( sizeof(mitkIpPicTSV_t) );
 
-      mitkIpPicFRead( &tag_name, 1, sizeof(ipPicTag_t), stream );
+      mitkIpPicFRead( &tag_name, 1, sizeof(mitkIpPicTag_t), stream );
       strncpy( tsv->tag, tag_name, _mitkIpPicTAGLEN );
       tsv->tag[_mitkIpPicTAGLEN] = '\0';
 
@@ -262,10 +262,10 @@ _ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream
               tsv->n[0],
               tsv->n[1] ); */
 
-      if( tsv->type == ipPicTSV )
+      if( tsv->type == mitkIpPicTSV )
         {
           tsv->value = NULL;
-          tsv->value = _ipPicReadTags( tsv->value,
+          tsv->value = _mitkIpPicReadTags( tsv->value,
                                        len -        3 * sizeof(ipUInt4_t)
                                            - tsv->dim * sizeof(ipUInt4_t),
                                        stream,
@@ -275,31 +275,31 @@ _ipPicReadTags( _ipPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream
         {
           ipUInt4_t  elements;
 
-          elements = _ipPicTSVElements( tsv );
+          elements = _mitkIpPicTSVElements( tsv );
 
-          if( tsv->type == ipPicASCII
-              || tsv->type == ipPicNonUniform )
+          if( tsv->type == mitkIpPicASCII
+              || tsv->type == mitkIpPicNonUniform )
             tsv->bpe = 8;
 
 assert( elements * tsv->bpe / 8 == len
                                    -        3 * sizeof(ipUInt4_t)
                                    - tsv->dim * sizeof(ipUInt4_t) );
 
-          if( tsv->type == ipPicASCII )
+          if( tsv->type == mitkIpPicASCII )
             tsv->value = malloc( elements+1 * tsv->bpe / 8 );
           else
             tsv->value = malloc( elements * tsv->bpe / 8 );
 
           mitkIpPicFReadLE( tsv->value, tsv->bpe / 8, elements, stream );
 
-          if( tsv->type == ipPicASCII )
+          if( tsv->type == mitkIpPicASCII )
             ((char *)(tsv->value))[elements] = '\0';
 
           if( encryption_type == 'e'
-              && ( tsv->type == ipPicASCII
-                   || tsv->type == ipPicNonUniform ) )
+              && ( tsv->type == mitkIpPicASCII
+                   || tsv->type == mitkIpPicNonUniform ) )
             {
-              if( tsv->type == ipPicNonUniform )
+              if( tsv->type == mitkIpPicNonUniform )
                 {
                   sprintf( tsv->tag, "*** ENCRYPTED ***" );
                   tsv->tag[_mitkIpPicTAGLEN] = '\0';
@@ -309,12 +309,12 @@ assert( elements * tsv->bpe / 8 == len
 
               tsv->value = strdup( "*** ENCRYPTED ***" );
               tsv->n[0] = strlen(tsv->value);
-              tsv->type = ipPicASCII;
+              tsv->type = mitkIpPicASCII;
               tsv->dim = 1;
             }
         }
 
-      head = _ipPicInsertTag( head, tsv );
+      head = _mitkIpPicInsertTag( head, tsv );
 
       bytes_to_read -= 32                  /* name      */
                        + sizeof(ipUInt4_t) /* len       */

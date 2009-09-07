@@ -78,23 +78,23 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicNew\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicNew\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-ipPicDescriptor *ipPicNew( void )
+mitkIpPicDescriptor *mitkIpPicNew( void )
 {
-  ipPicDescriptor *pic;
+  mitkIpPicDescriptor *pic;
 
-  pic = malloc( sizeof(ipPicDescriptor) );
+  pic = malloc( sizeof(mitkIpPicDescriptor) );
 
   if( pic != NULL )
     {
       pic->data = NULL;
-      pic->type = ipPicUnknown;
+      pic->type = mitkIpPicUnknown;
 
-      pic->info = malloc( sizeof(_ipPicInfo_t) );
+      pic->info = malloc( sizeof(_mitkIpPicInfo_t) );
 
       strncpy( pic->info->version, mitkIpPicVERSION, _mitkIpPicTAGLEN );
 

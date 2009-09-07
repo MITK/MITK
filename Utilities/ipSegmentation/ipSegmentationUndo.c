@@ -24,60 +24,60 @@ static char* tagUNDO = "SEGMENTATION_UNDO";
 static char* tagUNDO_DATA = "DATA";
 static char* tagUNDO_LEVEL = "LEVEL";
 
-// Implemented in ipPicDelT.c 
-static ipPicTSV_t *_ipPicRemoveTag( _ipPicTagsElement_t **head,
-                                    _ipPicTagsElement_t *which,
+// Implemented in mitkIpPicDelT.c 
+static mitkIpPicTSV_t *_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head,
+                                    _mitkIpPicTagsElement_t *which,
                                     char *tag );
 
 void
-ipMITKSegmentationUndoEnable (ipPicDescriptor* segmentation, const ipUInt1_t level)
+ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t level)
 {
-    ipPicTSV_t *undo, *data, *max;
+    mitkIpPicTSV_t *undo, *data, *max;
 
     assert (segmentation);
-    undo = ipPicQueryTag (segmentation, tagUNDO);
+    undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     if (!undo) {
-        undo = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
+        undo = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
         if (!undo) {
             ipMITKSegmentationError (ipMITKSegmentationOUT_OF_MEMORY);
         }
         strcpy (undo->tag, tagUNDO);
-        undo->type = ipPicTSV;
+        undo->type = mitkIpPicTSV;
         undo->bpe = 32;
         undo->dim = 1;
         undo->n[0] = 0;
         undo->value = NULL;
-        ipPicAddTag (segmentation, undo);
+        mitkIpPicAddTag (segmentation, undo);
     }
 
-    data = ipPicQuerySubTag (undo, tagUNDO_DATA);
+    data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
     if (!data) {
-        data = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
+        data = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
         if (!data) {
             ipMITKSegmentationError (ipMITKSegmentationOUT_OF_MEMORY);
         }
         strcpy (data->tag, tagUNDO_DATA);
-        data->type = ipPicTSV;
+        data->type = mitkIpPicTSV;
         data->bpe = 32;
         data->dim = 1;
         data->n[0] = 0;
         data->value = NULL;
-        ipPicAddSubTag (undo, data);
+        mitkIpPicAddSubTag (undo, data);
     }
     if (data->n[0] > level) {
         /* remove levels which exceed the maximum */
         ipUInt1_t i;
 
         for (i = data->n[0] - level; i > 0; i--) {
-            _ipPicTagsElement_t *head = (_ipPicTagsElement_t *) data->value;
-            ipPicTSV_t* tag = _ipPicRemoveTag (&head, head, head->tsv->tag);
+            _mitkIpPicTagsElement_t *head = (_mitkIpPicTagsElement_t *) data->value;
+            mitkIpPicTSV_t* tag = _mitkIpPicRemoveTag (&head, head, head->tsv->tag);
       data->value = head;
       data->n[0]--;
-            ipPicFreeTag (tag);
+            mitkIpPicFreeTag (tag);
         }
     }
 
-    max = ipPicQuerySubTag (undo, tagUNDO_LEVEL);
+    max = mitkIpPicQuerySubTag (undo, tagUNDO_LEVEL);
     if (max) {
         /* change the maximum of levels */
         ipUInt1_t* value = (ipUInt1_t *) max->value;
@@ -89,66 +89,66 @@ ipMITKSegmentationUndoEnable (ipPicDescriptor* segmentation, const ipUInt1_t lev
         }
         *value = level;
 
-        max = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
+        max = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
         if (!max) {
             ipMITKSegmentationError (ipMITKSegmentationOUT_OF_MEMORY);
         }
         strcpy (max->tag, tagUNDO_LEVEL);
-        max->type = ipPicUInt;
+        max->type = mitkIpPicUInt;
         max->bpe = 8;
         max->dim = 1;
         max->n[0] = 1;
         max->value = value;
-        ipPicAddSubTag (undo, max);
+        mitkIpPicAddSubTag (undo, max);
     }
 }
 
 void
-ipMITKSegmentationUndoDisable (ipPicDescriptor* segmentation)
+ipMITKSegmentationUndoDisable (mitkIpPicDescriptor* segmentation)
 {
-    ipPicTSV_t *undo;
+    mitkIpPicTSV_t *undo;
 
     assert (segmentation);
-    undo = ipPicDelTag (segmentation, tagUNDO);
-    ipPicFreeTag (undo);
+    undo = mitkIpPicDelTag (segmentation, tagUNDO);
+    mitkIpPicFreeTag (undo);
 }
 
 ipBool_t
-ipMITKSegmentationUndoIsEnabled (ipPicDescriptor* segmentation)
+ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation)
 {
-    ipPicTSV_t *undo = NULL;
+    mitkIpPicTSV_t *undo = NULL;
 
     if (segmentation) {
-  undo = ipPicQueryTag (segmentation, tagUNDO);
+  undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     }
     return (undo ? ipTrue : ipFalse);
 }
 
 void
-ipMITKSegmentationUndoSave (ipPicDescriptor* segmentation)
+ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation)
 {
-    ipPicTSV_t *undo, *data, *level, *tag;
+    mitkIpPicTSV_t *undo, *data, *level, *tag;
 
     assert (segmentation);
-    undo = ipPicQueryTag (segmentation, tagUNDO);
+    undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     if (!undo) {
         ipMITKSegmentationError (ipMITKSegmentationUNDO_DISABLED);
     }
 
     /* if no level is available ... */
-    data = ipPicQuerySubTag (undo, tagUNDO_DATA);
-    level = ipPicQuerySubTag (undo, tagUNDO_LEVEL);
+    data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
+    level = mitkIpPicQuerySubTag (undo, tagUNDO_LEVEL);
     if (*((ipUInt1_t *) level->value) > 0) {
         if (data->n[0] == *((ipUInt1_t *) level->value)) {
             /* ... remove the first one. */
-            _ipPicTagsElement_t* head = (_ipPicTagsElement_t *) data->value;
-            ipPicTSV_t* tag = _ipPicRemoveTag (&head, head, head->tsv->tag);
+            _mitkIpPicTagsElement_t* head = (_mitkIpPicTagsElement_t *) data->value;
+            mitkIpPicTSV_t* tag = _mitkIpPicRemoveTag (&head, head, head->tsv->tag);
       data->value = head;
       data->n[0]--;
-            ipPicFreeTag (tag);
+            mitkIpPicFreeTag (tag);
         }
         /* build and store the level */
-        tag = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
+        tag = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
         if (!tag) {
             ipMITKSegmentationError (ipMITKSegmentationOUT_OF_MEMORY);
         }
@@ -158,65 +158,65 @@ ipMITKSegmentationUndoSave (ipPicDescriptor* segmentation)
         tag->dim = segmentation->dim;
         tag->n[0] = segmentation->n[0];
         tag->n[1] = segmentation->n[1];
-        tag->value = malloc (_ipPicSize (segmentation));
-        memcpy (tag->value, segmentation->data, _ipPicSize (segmentation));
-        ipPicAddSubTag (data, tag);
+        tag->value = malloc (_mitkIpPicSize (segmentation));
+        memcpy (tag->value, segmentation->data, _mitkIpPicSize (segmentation));
+        mitkIpPicAddSubTag (data, tag);
     }
 }
 
 void
-ipMITKSegmentationUndo (ipPicDescriptor* segmentation)
+ipMITKSegmentationUndo (mitkIpPicDescriptor* segmentation)
 {
-    ipPicTSV_t *undo, *data;
+    mitkIpPicTSV_t *undo, *data;
 
     assert (segmentation);
-    undo = ipPicQueryTag (segmentation, tagUNDO);
+    undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     if (!undo) {
         ipMITKSegmentationError (ipMITKSegmentationUNDO_DISABLED);
     }
 
     /* if any level is stored ... */
-    data = ipPicQuerySubTag (undo, tagUNDO_DATA);
+    data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
     if (data->n[0]) {
         /* ... replace the image data and remove this level */
-        _ipPicTagsElement_t* head = (_ipPicTagsElement_t *) data->value;
-        _ipPicTagsElement_t* current = head;
-        ipPicTSV_t* tag;
+        _mitkIpPicTagsElement_t* head = (_mitkIpPicTagsElement_t *) data->value;
+        _mitkIpPicTagsElement_t* current = head;
+        mitkIpPicTSV_t* tag;
 
         while( current->next != NULL ) {
             current = current->next;
         }
-        tag = _ipPicRemoveTag (&head, current, current->tsv->tag);
+        tag = _mitkIpPicRemoveTag (&head, current, current->tsv->tag);
   data->value = head;
   data->n[0]--;
-        memcpy (segmentation->data, tag->value, _ipPicSize (segmentation));
-        ipPicFreeTag (tag);
+        memcpy (segmentation->data, tag->value, _mitkIpPicSize (segmentation));
+        mitkIpPicFreeTag (tag);
 
-  tag = ipPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
+  tag = mitkIpPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
   if (tag) {
-    ipPicFreeTag (tag);
+    mitkIpPicFreeTag (tag);
   }
     }
 }
 
 ipBool_t
-ipMITKSegmentationUndoAvailable (ipPicDescriptor* segmentation)
+ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation)
 {
-    ipPicTSV_t *undo, *data;
+    mitkIpPicTSV_t *undo, *data;
 
     assert (segmentation);
-    undo = ipPicQueryTag (segmentation, tagUNDO);
+    undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     if (!undo) {
         ipMITKSegmentationError (ipMITKSegmentationUNDO_DISABLED);
     }
-    data = ipPicQuerySubTag (undo, tagUNDO_DATA);
+    data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
     return (data->n[0] ? ipTrue : ipFalse);
 }
 
-ipPicTSV_t *
-_ipPicRemoveTag( _ipPicTagsElement_t **head, _ipPicTagsElement_t *which, char *tag)
+mitkIpPicTSV_t *
+_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head, _mitkIpPicTagsElement_t *which, char *tag)
 {
-  ipPicTSV_t *tsv = NULL;
+  mitkIpPicTSV_t *tsv = NULL;
 
   if( which != NULL )
     {

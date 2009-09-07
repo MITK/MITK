@@ -181,7 +181,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
     )
   {
     // calculate screen position for text by searching for the object border
-    ipPicDescriptor* pic = image->image();
+    mitkIpPicDescriptor* pic = image->image();
 
     // search object border in current slice
     
@@ -656,7 +656,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
 
   // 2. Convert the resampling result to PIC image format
-  ipPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
+  mitkIpPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
 
   if (pic == NULL)
   {
@@ -1088,7 +1088,7 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
   m_iil4mitkImage = NULL;
   if ( m_Pic != NULL )
   {
-    ipPicFree(m_Pic);
+    mitkIpPicFree(m_Pic);
     m_Pic = NULL;
   }
   if ( m_Image != NULL )

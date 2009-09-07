@@ -46,7 +46,7 @@ public:
 
     virtual void EnlargeOutputRequestedRegion(itk::DataObject *output);
 
-    static void ConvertHandedness(ipPicDescriptor* pic);
+    static void ConvertHandedness(mitkIpPicDescriptor* pic);
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 

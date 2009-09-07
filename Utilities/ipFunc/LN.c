@@ -61,14 +61,14 @@
 
 /* include files                                                            */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old );
+mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncLN\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncLN\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -82,7 +82,7 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old );
                                                                              \
   a = max_gv / log ( max_gv + 1. );                                          \
                                                                              \
-  no_elem = _ipPicElements ( pic );                                          \
+  no_elem = _mitkIpPicElements ( pic );                                          \
   for ( i = 0; i < no_elem; i++ )                                            \
     (( type * )pic_new->data )[i] =                                          \
         ( type ) ( a * log ( 1. + (( type * )pic->data )[i] ) );             \
@@ -90,33 +90,33 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old );
 
 /* ------------------------------------------------------------------------ */
 /*
-** function ipFuncLN
+** function mitkIpFuncLN
 */
 /* ------------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
+mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
 {
   ipFloat8_t       min_gv, max_gv;  /* max and min posiible greyvalues      */
-  ipPicDescriptor  *pic_new;        /* pointer to transformed image         */
+  mitkIpPicDescriptor  *pic_new;        /* pointer to transformed image         */
   ipUInt4_t        i;               /* loop index                           */
   ipUInt4_t        no_elem;         /* loop index                           */
 
   /* check whether data are correct                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                            */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
     return ( mitkIpFuncERROR );
 
   /* check datatype of image                                                */
 
-  no_elem = _ipPicElements ( pic_old );
-  if ( pic_old->type == ipPicUInt )
+  no_elem = _mitkIpPicElements ( pic_old );
+  if ( pic_old->type == mitkIpPicUInt )
     {
-       pic_new = ipPicCopyHeader ( pic_old, NULL );
-       pic_new->data = malloc ( _ipPicSize ( pic_old ) );
+       pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
+       pic_new->data = malloc ( _mitkIpPicSize ( pic_old ) );
               
        if ( ( pic_new != NULL ) && ( pic_new->data != NULL ) )
          {
@@ -124,28 +124,28 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
          }
        else 
          {
-            _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+            _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
             return ( mitkIpFuncERROR );
          }
     }
 
-  /* ipPicInt images are copied to ipPicUInt iamges to avoid negative      */
+  /* mitkIpPicInt images are copied to mitkIpPicUInt iamges to avoid negative      */
   /* greyvalues                                                            */
 
-  else if ( pic_old->type == ipPicInt )
+  else if ( pic_old->type == mitkIpPicInt )
     {
-       pic_new = ipPicNew ();
+       pic_new = mitkIpPicNew ();
        if  ( pic_new != NULL )
          {
-            pic_new->type  = ipPicUInt;
+            pic_new->type  = mitkIpPicUInt;
             pic_new->bpe   = pic_old->bpe;
             pic_new->dim   = pic_old->dim;
             for ( i = 0; i < pic_new->dim; i++ ) pic_new->n[i] = pic_old->n[i];
-            pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+            pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
             if ( pic_new->data == NULL )
               {
-                 ipPicFree ( pic_new );
-                 _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );  
+                 mitkIpPicFree ( pic_new );
+                 _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );  
                  return ( mitkIpFuncERROR );
               }
 
@@ -174,8 +174,8 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
 
             else 
               {
-                 ipPicFree ( pic_new );
-                 _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR ); 
+                 mitkIpPicFree ( pic_new );
+                 _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR ); 
                  return ( mitkIpFuncERROR );
               }
 
@@ -185,7 +185,7 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
 
             /* transform unsigned integer image to an integer image           */
 
-            pic_new->type = ipPicInt;
+            pic_new->type = mitkIpPicInt;
 
             if ( pic_new->bpe == 8 )
               { 
@@ -213,13 +213,13 @@ ipPicDescriptor *ipFuncLN ( ipPicDescriptor *pic_old )
      }
    else
      {
-         _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+         _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
          return ( mitkIpFuncERROR );
      }
 
     /* Copy Tags */
 
-   ipFuncCopyTags(pic_new, pic_old);
+   mitkIpFuncCopyTags(pic_new, pic_old);
    
    
 

@@ -20,18 +20,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipSegmentation.h"
 
 int
-ipMITKSegmentationReplaceRegion4N( ipPicDescriptor *seg, int startOfs, ipInt1_t newValue )
+ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt1_t newValue )
 {
-  ipPicTSV_t* tag;
+  mitkIpPicTSV_t* tag;
 
   std::queue<int> ofsQueue;
 
   if (ipMITKSegmentationUndoIsEnabled (seg)) {
     ipMITKSegmentationUndoSave (seg);
   }
-  tag = ipPicDelTag (seg, tagSEGMENTATION_EMPTY);
+  tag = mitkIpPicDelTag (seg, tagSEGMENTATION_EMPTY);
   if (tag) {
-    ipPicFreeTag (tag);
+    mitkIpPicFreeTag (tag);
   }
 
   if (seg->bpe != 8) return 0;

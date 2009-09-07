@@ -48,7 +48,7 @@
  *  creates the clone of a pic
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicClone\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicClone\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -64,16 +64,16 @@
  *
  */
 
-ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
+mitkIpPicDescriptor *mitkIpPicClone( mitkIpPicDescriptor *pic )
 {
-  ipPicDescriptor *clone;
+  mitkIpPicDescriptor *clone;
 
-  clone = ipPicCopyHeader( pic,
+  clone = mitkIpPicCopyHeader( pic,
                            NULL );
 
   strncpy( clone->info->version, pic->info->version, _mitkIpPicTAGLEN );
 
-  clone->info->tags_head = _ipPicCloneTags( pic->info->tags_head );
+  clone->info->tags_head = _mitkIpPicCloneTags( pic->info->tags_head );
 
   clone->info->write_protect = pic->info->write_protect;
 
@@ -85,7 +85,7 @@ ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
     {
       ipUInt4_t size;
 
-      size = _ipPicSize( pic );
+      size = _mitkIpPicSize( pic );
 
       clone->data = malloc( size );
       if ( ! ( clone->data ) )
@@ -96,29 +96,29 @@ ipPicDescriptor *ipPicClone( ipPicDescriptor *pic )
   return( clone );
 }
 
-_ipPicTagsElement_t *_ipPicCloneTags( _ipPicTagsElement_t *head )
+_mitkIpPicTagsElement_t *_mitkIpPicCloneTags( _mitkIpPicTagsElement_t *head )
 {
-  _ipPicTagsElement_t *new;
-  _ipPicTagsElement_t *current;
+  _mitkIpPicTagsElement_t *new;
+  _mitkIpPicTagsElement_t *current;
 
   new = NULL;
   current = head;
   while( current != NULL )
     {
-      new = _ipPicInsertTag( new, _ipPicCloneTag(current->tsv) );
+      new = _mitkIpPicInsertTag( new, _mitkIpPicCloneTag(current->tsv) );
 
       current = current->next;
     }
   return( new );
 }
 
-ipPicTSV_t *_ipPicCloneTag( ipPicTSV_t *source )
+mitkIpPicTSV_t *_mitkIpPicCloneTag( mitkIpPicTSV_t *source )
 {
-  ipPicTSV_t *new;
+  mitkIpPicTSV_t *new;
 
   ipUInt4_t i;
 
-  new = malloc( sizeof(ipPicTSV_t) );
+  new = malloc( sizeof(mitkIpPicTSV_t) );
 
   strncpy( new->tag, source->tag, _mitkIpPicTAGLEN );
 
@@ -129,15 +129,15 @@ ipPicTSV_t *_ipPicCloneTag( ipPicTSV_t *source )
   for( i = 0; i < source->dim; i++ )
     new->n[i] = source->n[i];
 
-  if( source->type == ipPicTSV )
+  if( source->type == mitkIpPicTSV )
     {
-      new->value = _ipPicCloneTags( source->value );
+      new->value = _mitkIpPicCloneTags( source->value );
     }
   else
     {
       ipUInt4_t  size;
 
-      size = _ipPicTSVSize( new );
+      size = _mitkIpPicTSVSize( new );
 
       new->value = malloc( size );
       memcpy( new->value, source->value, size );

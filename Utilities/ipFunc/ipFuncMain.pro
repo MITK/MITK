@@ -1,6 +1,6 @@
 TEMPLATE	= app
 CONFIG		= console warn_on release
-HEADERS		= ipFunc.h 
+HEADERS		= mitkIpFunc.h 
 
 SOURCES		= ipFunc.c 
 

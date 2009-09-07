@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 extern "C" 
 {
-size_t _ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
+size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
 }
 
 mitk::PicFileWriter::PicFileWriter()
@@ -59,24 +59,24 @@ void mitk::PicFileWriter::GenerateData()
 
   Image::Pointer input = const_cast<Image*>(this->GetInput());
 
-  ipPicDescriptor * picImage = input->GetPic();
+  mitkIpPicDescriptor * picImage = input->GetPic();
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
   {
     //set tag "REAL PIXEL SIZE"
     const Vector3D & spacing = slicedGeometry->GetSpacing();
-    ipPicTSV_t *pixelSizeTag;
-    pixelSizeTag = ipPicQueryTag( picImage, "REAL PIXEL SIZE" );
+    mitkIpPicTSV_t *pixelSizeTag;
+    pixelSizeTag = mitkIpPicQueryTag( picImage, "REAL PIXEL SIZE" );
     if (!pixelSizeTag)
     {
-      pixelSizeTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-      pixelSizeTag->type = ipPicFloat;
+      pixelSizeTag = (mitkIpPicTSV_t *) malloc( sizeof(mitkIpPicTSV_t) );
+      pixelSizeTag->type = mitkIpPicFloat;
       pixelSizeTag->bpe = 32;
       strcpy(pixelSizeTag->tag, "REAL PIXEL SIZE");
       pixelSizeTag->dim = 1;
       pixelSizeTag->n[0] = 3;
       pixelSizeTag->value = malloc( sizeof(float) * 3 );
-      ipPicAddTag (picImage, pixelSizeTag);
+      mitkIpPicAddTag (picImage, pixelSizeTag);
     }
     ((float*)pixelSizeTag->value)[0] = spacing[0];
     ((float*)pixelSizeTag->value)[1] = spacing[1];
@@ -84,19 +84,19 @@ void mitk::PicFileWriter::GenerateData()
     //set tag "ISG"
     //ISG == offset/origin           transformationmatrix(matrix)                                                              spancings
     //ISG == offset0 offset1 offset2 spalte0_0 spalte0_1 spalte0_2 spalte1_0 spalte1_1 spalte1_2 spalte2_0 spalte2_1 spalte2_2 spacing0 spacing1 spacing2
-    ipPicTSV_t *geometryTag;
-    geometryTag = ipPicQueryTag( picImage, "ISG" );
+    mitkIpPicTSV_t *geometryTag;
+    geometryTag = mitkIpPicQueryTag( picImage, "ISG" );
     if (!geometryTag)
     {
-      geometryTag = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
-      geometryTag->type = ipPicFloat;
+      geometryTag = (mitkIpPicTSV_t *) malloc( sizeof(mitkIpPicTSV_t) );
+      geometryTag->type = mitkIpPicFloat;
       geometryTag->bpe = 32;
       strcpy(geometryTag->tag, "ISG");
       geometryTag->dim = 2;
       geometryTag->n[0] = 3;
       geometryTag->n[1] = 4;
       geometryTag->value = malloc( sizeof(float) * 3 * 4 );
-      ipPicAddTag (picImage, geometryTag);
+      mitkIpPicAddTag (picImage, geometryTag);
     }
     const AffineTransform3D::OffsetType& offset = slicedGeometry->GetIndexToWorldTransform()->GetOffset();
     ((float*)geometryTag->value)[0] = offset[0];
@@ -158,7 +158,7 @@ const mitk::Image* mitk::PicFileWriter::GetInput()
   }
 }
 
-int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic )
+int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *pic )
 {
   FILE* outfile;
 
@@ -167,13 +167,13 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
 
   if( pic->info->write_protect )
   {
-    fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
+    fprintf( stderr, "mitkIpPicPut: sorry, can't write (missing tags !!!)\n" );
     //return( -1 );
   }
 
   if( mitkIpPicEncryptionType(pic) != ' ' )
   {
-    fprintf( stderr, "ipPicPut: warning: was encrypted !!!\n" );
+    fprintf( stderr, "mitkIpPicPut: warning: was encrypted !!!\n" );
   }
 
   if( outfile_name == NULL )
@@ -182,13 +182,13 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     outfile = stdout;
   else
   {
-    ipPicRemoveFile( outfile_name );
+    mitkIpPicRemoveFile( outfile_name );
     // Removed due to linker problems when compiling
     // an mitk chili plugin using msvc: there appear
     // unsresolved external symbol errors to function
     // _ipPicGetWriteCompression()
     /*
-    if( ipPicGetWriteCompression() )
+    if( mitkIpPicGetWriteCompression() )
     {
       char buff[1024];
 
@@ -203,20 +203,20 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
 
   if( outfile == NULL )
   {
-    fprintf( stderr, "ipPicPut: sorry, error opening outfile\n" );
+    fprintf( stderr, "mitkIpPicPut: sorry, error opening outfile\n" );
     return( -1 );
   }
 
-  tags_len = _ipPicTagsSize( pic->info->tags_head );
+  tags_len = _mitkIpPicTagsSize( pic->info->tags_head );
 
   len = tags_len +        3 * sizeof(ipUInt4_t)
       + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
   if( mitkIpPicEncryptionType(pic) == ' ' )
-    mitkIpPicFWrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+    mitkIpPicFWrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
   else
-    mitkIpPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
+    mitkIpPicFWrite( pic->info->version, 1, sizeof(mitkIpPicTag_t), outfile );
 
   mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
@@ -226,13 +226,13 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
 
   mitkIpPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
-  _ipPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
+  _mitkIpPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
    // Removed due to linker problems when compiling
    // an mitk chili plugin using msvc: there appear
    // unsresolved external symbol errors to function
    // _ipPicGetWriteCompression()
   /*
-  if( ipPicGetWriteCompression() )
+  if( mitkIpPicGetWriteCompression() )
     pic->info->pixel_start_in_file = mitkIpPicFTell( outfile );
   else
   */
@@ -240,7 +240,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
 
   if( pic->data )
   {
-    size_t number_of_elements = _ipPicElements(pic);
+    size_t number_of_elements = _mitkIpPicElements(pic);
     size_t bytes_per_element = pic->bpe / 8;
     size_t number_of_bytes = number_of_elements * bytes_per_element;
     size_t block_size = 1024*1024; /* Use 1 MB blocks. Make sure that block size is smaller than 2^31 */
@@ -252,7 +252,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
       
     assert( data != NULL );
       
-    if( pic->type == ipPicNonUniform )
+    if( pic->type == mitkIpPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
         bytes_written += mitkIpPicFWrite( data + ( block_nr * block_size ), 1, block_size, outfile );
@@ -280,7 +280,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, ipPicDescriptor *pic 
     // unsresolved external symbol errors to function
     // _ipPicGetWriteCompression()
     /*    
-    if( ipPicGetWriteCompression() )
+    if( mitkIpPicGetWriteCompression() )
       mitkIpPicFClose( outfile );
     else
     */

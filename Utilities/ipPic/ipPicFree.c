@@ -62,7 +62,7 @@
  * some doxygen comments.
  *
  * Revision 1.4  1998/09/16  18:37:34  andre
- * added ipPicFreeTag
+ * added mitkIpPicFreeTag
  *
  * Revision 1.3  1998/09/16  18:32:45  andre
  * *** empty log message ***
@@ -84,16 +84,16 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicFree\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicFree\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-void ipPicFree( ipPicDescriptor *pic )
+void mitkIpPicFree( mitkIpPicDescriptor *pic )
 {
   if( pic != NULL )
     {
-      ipPicClear( pic );
+      mitkIpPicClear( pic );
 
       if( pic->info != NULL )
         {
@@ -107,7 +107,7 @@ void ipPicFree( ipPicDescriptor *pic )
 }
 
 void
-ipPicFreeTag( ipPicTSV_t *tsv )
+mitkIpPicFreeTag( mitkIpPicTSV_t *tsv )
 {
   if( tsv )
     {  

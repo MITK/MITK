@@ -47,11 +47,11 @@
 /** @file 
  *  Morphological Operators.
  *  This header is for grouping purposes for the
- *  documentation only. Don't use it, use ipFunc.h instead.
+ *  documentation only. Don't use it, use mitkIpFunc.h instead.
  */
 
 #ifndef DOXYGEN_IGNORE
-#include <ipFunc.h>
+#include <mitkIpFunc.h>
 #endif
 
 #ifndef _mitkIpFunc_h
@@ -63,30 +63,30 @@
 extern "C" {
 #endif
 
-ipPicDescriptor *ipFuncEro    ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncEro    ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncDila   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncDila   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncOpen   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncOpen   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncClose  ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncClose  ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncHitMiss( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_masks,  
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncHitMiss( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_masks,  
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncLabel  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLabel  ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *no_label );
 
-ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t        dim_seed,
                                  ipUInt4_t       *beg_seed,
                                  ipUInt4_t       *end_seed,
@@ -95,7 +95,7 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
                                  ipFloat8_t       std_fact, 
                                  ipUInt4_t        kind );
 
-ipPicDescriptor *ipFuncDrawPoly( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );

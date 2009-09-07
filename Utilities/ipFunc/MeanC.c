@@ -59,16 +59,16 @@
 
 /* include files                                                                  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncMeanC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncMeanC\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncMeanC\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -136,7 +136,7 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------------ */
 
-ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncMeanC  ( mitkIpPicDescriptor *pic_old,
                           ipUInt4_t       *center,
                           ipUInt4_t       radius )
 {
@@ -151,11 +151,11 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( radius <= 0 ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -164,7 +164,7 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
       help = (ipInt4_t *) center[i] - (ipInt4_t *) radius;
       if ( help < 0 )
          {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
       else begin[i] = help;
@@ -172,7 +172,7 @@ ipFloat8_t ipFuncMeanC  ( ipPicDescriptor *pic_old,
       help = center[i] + radius;
       if ( (ipUInt4_t) help > pic_old->n[i] )
         {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
       else end[i] = help + 1;

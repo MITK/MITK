@@ -70,9 +70,9 @@
 
 /* include files                                                                  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncExtrC ( mitkIpPicDescriptor *pic_old,
                          ipFloat8_t      *min,
                          ipFloat8_t      *max,
                          ipUInt4_t       *center,
@@ -81,7 +81,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncExtrC\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncExtrC\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -159,7 +159,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------------ */
 
-ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncExtrC ( mitkIpPicDescriptor *pic_old,
                          ipFloat8_t      *min,
                          ipFloat8_t      *max,
                          ipUInt4_t       *center,
@@ -174,10 +174,10 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( radius <= 0 ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -186,7 +186,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
       help = center[i] - radius;
       if ( help < 0 )
         {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
       else begin[i] = ( ipUInt4_t )help;
@@ -194,7 +194,7 @@ ipUInt4_t  ipFuncExtrC ( ipPicDescriptor *pic_old,
       help = center[i] + radius;
       if ( (ipUInt4_t) help > pic_old->n[i] )
         {
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
       else end[i] = ( ipUInt4_t )help + 1;

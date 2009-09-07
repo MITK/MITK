@@ -85,7 +85,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)_ipFWrite\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpFWrite\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include <stdio.h>
@@ -94,38 +94,38 @@
 #include "mitkIpPic.h"
 
 #ifdef USE_ZLIB
-ipBool_t _ipPicCanWriteCompressed = ipTrue;
+ipBool_t _mitkIpPicCanWriteCompressed = ipTrue;
 #else
-ipBool_t _ipPicCanWriteCompressed = ipFalse;
+ipBool_t _mitkIpPicCanWriteCompressed = ipFalse;
 #endif
 
 
-static ipBool_t write_compressed = ipFalse;
+static ipBool_t mitk_write_compressed = ipFalse;
 
 ipBool_t
-ipPicGetWriteCompression( void )
+mitkIpPicGetWriteCompression( void )
 {
-  return( write_compressed );
+  return( mitk_write_compressed );
 }
 
 ipBool_t
-ipPicSetWriteCompression( ipBool_t compression )
+mitkIpPicSetWriteCompression( ipBool_t compression )
 {
-  ipBool_t compression_old = write_compressed;
+  ipBool_t compression_old = mitk_write_compressed;
 
-  write_compressed = compression;
+  mitk_write_compressed = compression;
 
   return( compression_old );
 }
 
 size_t
-ipFWriteCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
+mitkIpFWriteCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 {
   size_t bytes_return;
 
   void *buff;
   buff = malloc( size * nitems );
-  _ipCpCvtEndian( ptr, buff, size*nitems, size );
+  _mitkIpCpCvtEndian( ptr, buff, size*nitems, size );
   bytes_return = fwrite( buff, size, nitems, stream);
   free( buff );
 
@@ -133,12 +133,12 @@ ipFWriteCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 }
 
 size_t
-_ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream)
+_mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream)
 {
   size_t bytes_return;
 
 #ifdef USE_ZLIB
-  if( write_compressed )
+  if( mitk_write_compressed )
     bytes_return = gzwrite( stream, (void *)ptr, size*nitems);
   else
 #endif
@@ -148,13 +148,13 @@ _ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t strea
 }
 
 size_t
-ipPicFWriteCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
+mitkIpPicFWriteCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream )
 {
   size_t bytes_return;
 
   void *buff;
   buff = malloc( size * nitems );
-  _ipCpCvtEndian( ptr, buff, size*nitems, size );
+  _mitkIpCpCvtEndian( ptr, buff, size*nitems, size );
   bytes_return = mitkIpPicFWrite( buff, size, nitems, stream);
   free( buff );
 

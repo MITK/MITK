@@ -65,9 +65,9 @@
 
 /* include files                                                       */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *pol_x,
                                   ipUInt4_t       *pol_y,
                                   ipUInt4_t       no_pts );
@@ -75,7 +75,7 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncDrawPoly\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncDrawPoly\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -250,10 +250,10 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 /* -------------------------------------------------------------------- */
 
 /*
-** ipFuncDrawPoly
+** mitkIpFuncDrawPoly
 */
 
-ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *pol_x,
                                   ipUInt4_t       *pol_y,
                                   ipUInt4_t       no_pts )
@@ -264,19 +264,19 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    ipFloat8_t      min_gv, max_gv;
    ipFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
    ipFloat8_t      diff;            /* difference between two points    */
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
    ipUInt4_t       i;
 
    /* check data                                                        */
 
-   if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
    if ( pic_old->dim > 2 ) 
      {
-        _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+        _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
         return ( mitkIpFuncERROR );
      }
 
-   if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
+   if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
      return ( mitkIpFuncERROR );
 
    /* calculate min. and max. coordiantes of ROI                        */
@@ -298,28 +298,28 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    /* Expression is always false.
    if ( min_x < 0 ) 
      {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_x > pic_old->n[0] ) 
      {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
 
    /* Expression is always false.
    if ( min_y < 0 ) 
      {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
    */
 
    if ( max_y > pic_old->n[1] ) 
      {
-       _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
 
@@ -328,14 +328,14 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
    a = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !a )
      {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
      }
    b = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
    if ( !b )
      {
        free ( a );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
      }
 
@@ -371,12 +371,12 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 
    /* allocate memory for pic help                                      */
 
-   pic_help = ipPicClone ( pic_old );
+   pic_help = mitkIpPicClone ( pic_old );
    if ( pic_help == NULL )
      {
         free ( a );
         free ( b );
-        _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
      }
 
@@ -387,7 +387,7 @@ ipPicDescriptor *ipFuncDrawPoly ( ipPicDescriptor *pic_old,
 
    /* Copy Tags */
 
-   ipFuncCopyTags(pic_help, pic_old);
+   mitkIpFuncCopyTags(pic_help, pic_old);
 
    return ( pic_help );
 }

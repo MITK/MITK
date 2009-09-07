@@ -81,8 +81,8 @@ class MITKEXT_CORE_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     // does the actual processing
     virtual void GenerateData();
 
-    void TobiasHeimannCorrectionAlgorithm(ipPicDescriptor* pic);
-    bool modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, ipPicDescriptor *pic, int* _ofsArray );
+    void TobiasHeimannCorrectionAlgorithm(mitkIpPicDescriptor* pic);
+    bool modifySegment( int lineStart, int lineEnd, ipMITKSegmentationTYPE state, mitkIpPicDescriptor *pic, int* _ofsArray );
 
     void CalculateDifferenceImage( Image* modifiedImage, Image* originalImage );
     template<typename TPixel, unsigned int VImageDimension>

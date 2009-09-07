@@ -45,7 +45,7 @@
 *****************************************************************************/
 
 /*
- * ipPicAnnotation.h
+ * mitkIpPicAnnotation.h
  *---------------------------------------------------------------------
  * DESCRIPTION
  *  declarations for the annotations in the pic format
@@ -65,15 +65,15 @@
 
 typedef enum
   {
-    ipPicAUnknown	= 0,
-    ipPicAText		= 1
-  } ipPicAnnotationType_t;
+    mitkIpPicAUnknown	= 0,
+    mitkIpPicAText		= 1
+  } mitkIpPicAnnotationType_t;
 
 typedef struct
   {
                 ipUInt4_t  _magic;
 
-    ipPicAnnotationType_t  type;
+    mitkIpPicAnnotationType_t  type;
 
                 ipUInt4_t  location_x;
                 ipUInt4_t  location_y;
@@ -81,7 +81,7 @@ typedef struct
                 ipUInt4_t  position_x;
                 ipUInt4_t  position_y;
                      char *text;
-  } ipPicAnnotation_t;
+  } mitkIpPicAnnotation_t;
 
 #endif  /* _mitkIpPicAnnotation_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

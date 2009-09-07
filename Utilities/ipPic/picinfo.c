@@ -126,7 +126,7 @@ typedef int Bool;
 
 
 #define MIN_MAX(min, max, type)            \
-  for( i=0; i<_ipPicElements(pic); i++ )   \
+  for( i=0; i<_mitkIpPicElements(pic); i++ )   \
     {                                      \
       type pixel = ((type *)pic->data)[i]; \
                                            \
@@ -161,7 +161,7 @@ int main( int argc, char *argv[] )
 
   char picfile_name[FILENAME_MAX];
 
-  ipPicDescriptor *pic;
+  mitkIpPicDescriptor *pic;
 
 
   /*--------------- commandline scaning starts here -----------*/
@@ -222,13 +222,13 @@ int main( int argc, char *argv[] )
 
   /* read picfile */
   if( use_stdin )
-    pic = ipPicGetHeader( "stdin",
+    pic = mitkIpPicGetHeader( "stdin",
                           NULL );
   else
     {
-      pic = ipPicGetHeader( picfile_name,
+      pic = mitkIpPicGetHeader( picfile_name,
                             NULL );
-      pic = ipPicGetTags( picfile_name,
+      pic = mitkIpPicGetTags( picfile_name,
                           pic );
     }
 
@@ -244,7 +244,7 @@ int main( int argc, char *argv[] )
   printf(  "%.*s\n", _mitkIpPicTAGLEN, pic->info->version );
   printf(  "--------------------\n" );
 
-  printf(  "type: %s [%i]\n", ipPicTypeName(pic->type), pic->type );
+  printf(  "type: %s [%i]\n", mitkIpPicTypeName(pic->type), pic->type );
 
   printf(  "bpe : %i\n", pic->bpe );
 
@@ -257,47 +257,47 @@ int main( int argc, char *argv[] )
       && pic->info->tags_head != NULL )
     printf(  "--------------------\n" );
 
-  _ipPicInfoPrintTags( stdout,
+  _mitkIpPicInfoPrintTags( stdout,
                        pic->info->tags_head,
                        1,
                        flags );
 
   printf(  "--------------------\n" );
-  printf(  "size of the image data: %u\n", _ipPicSize( pic ) );
+  printf(  "size of the image data: %u\n", _mitkIpPicSize( pic ) );
 
 
   if( show_extrema )
     {
-      pic = ipPicGet( picfile_name,
+      pic = mitkIpPicGet( picfile_name,
                       pic );
 
       switch( mitkIpPicDR( pic->type, pic->bpe ) )
         {
-          case mitkIpPicDR( ipPicUInt, 8 ):
+          case mitkIpPicDR( mitkIpPicUInt, 8 ):
             {
               MIN_MAX( min_i, max_i, ipUInt1_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case mitkIpPicDR( ipPicInt, 16 ):
+          case mitkIpPicDR( mitkIpPicInt, 16 ):
             {
               MIN_MAX( min_i, max_i, ipInt2_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case mitkIpPicDR( ipPicInt, 32 ):
+          case mitkIpPicDR( mitkIpPicInt, 32 ):
             {
               MIN_MAX( min_i, max_i, ipInt4_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
-          case mitkIpPicDR( ipPicFloat, 32 ):
+          case mitkIpPicDR( mitkIpPicFloat, 32 ):
             {
               MIN_MAX( min_f, max_f, ipFloat4_t );
               printf( "min: %f, max: %f\n", min_f, max_f );
             }
             break;
-          case mitkIpPicDR( ipPicFloat, 64 ):
+          case mitkIpPicDR( mitkIpPicFloat, 64 ):
             {
               MIN_MAX( min_f, max_f, ipFloat8_t );
               printf( "min: %f, max: %f\n", min_f, max_f );
@@ -309,7 +309,7 @@ int main( int argc, char *argv[] )
         }
     }
 
-  ipPicFree( pic );
+  mitkIpPicFree( pic );
 
   return( 0 );
 }

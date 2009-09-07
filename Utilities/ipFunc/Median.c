@@ -59,25 +59,25 @@
 
 /* include files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old );
+ipFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncMedI\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncMedI\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 
 /* -------------------------------------------------------------------  */
 /*
-**  function ipFuncMedI:                                             
+**  function mitkIpFuncMedI:                                             
 */
 /* -------------------------------------------------------------------  */
 
-ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
+ipFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old )
 {
 
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
@@ -92,18 +92,18 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
 
   /* check whether image data are ok                                    */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues                        */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR ) 
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) == mitkIpFuncERROR ) 
     {
        return ( mitkIpFuncERROR );
     }
 
   /* calculate greylevel histogram                                      */
 
-  ipFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
+  mitkIpFuncHist ( pic_old, min_gv, max_gv, &hist, &size_hist ); 
   if ( hist == 0 ) 
     {
        return ( mitkIpFuncERROR );
@@ -111,20 +111,20 @@ ipFloat8_t ipFuncMedI ( ipPicDescriptor *pic_old )
 
   /* factor to calculate the greyvalue belonging to an histogram index  */
  
-  if ( pic_old->type == ipPicFloat ) 
+  if ( pic_old->type == mitkIpPicFloat ) 
     factor = 0.001;                              
-  else if ( pic_old->type == ipPicInt || pic_old->type == ipPicUInt )
+  else if ( pic_old->type == mitkIpPicInt || pic_old->type == mitkIpPicUInt )
     factor = 1.;
   else 
     {
        free ( hist );
-       _ipFuncSetErrno ( mitkIpFuncTYPE_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncTYPE_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* find median                                                        */
 
-  limit = _ipPicElements ( pic_old ) / 2;
+  limit = _mitkIpPicElements ( pic_old ) / 2;
   for ( i = 0, sum = 0; sum < limit; i++ )
     sum = sum + hist [i];
 

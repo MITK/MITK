@@ -73,7 +73,7 @@ void main( int argc, char *argv[] )
 	char outfile_name[FILENAME_MAX],
 		outfile_string[FILENAME_MAX];
 	
-	ipPicDescriptor *pic = NULL,*header;
+	mitkIpPicDescriptor *pic = NULL,*header;
 	
 	
 	/*--------------- commandline scaning starts here -----------*/ 
@@ -165,7 +165,7 @@ void main( int argc, char *argv[] )
 			fgets(infile_names[i], FILENAME_MAX, f);
 			nl=infile_names[i]+strlen(infile_names[i])-1;
 			if(*nl=='\n') *nl=0;
-			if(ipPicAccess(infile_names[i], 4)==0)
+			if(mitkIpPicAccess(infile_names[i], 4)==0)
 				++i;
 			else
 			{
@@ -191,7 +191,7 @@ void main( int argc, char *argv[] )
 			strcat( outfile_name, ".seq" );
 	if( append )
 	{
-		pic = ipPicGetHeader( argv[aoffset+1],
+		pic = mitkIpPicGetHeader( argv[aoffset+1],
 			pic );
 		if( pic != NULL )
 			soffset = pic->n[pic->dim-1];
@@ -199,18 +199,18 @@ void main( int argc, char *argv[] )
 			soffset = 0;
 	}
 
-	header=ipPicGetHeader( infile_names[0], NULL);
-	header = ipPicGetTags( infile_names[0], header );
+	header=mitkIpPicGetHeader( infile_names[0], NULL);
+	header = mitkIpPicGetTags( infile_names[0], header );
 
 	for( i=0; i<n_infiles; i++ )
 	{
 		printf( "%.3i %s\n", i, infile_names[i] );
 		
 		
-/*		pic = ipPicGetSlice( infile_names[i],
+/*		pic = mitkIpPicGetSlice( infile_names[i],
 			pic,
 			1 );*/
-		pic = ipPicGet( infile_names[i],
+		pic = mitkIpPicGet( infile_names[i],
 			pic);
 		
 		if( pic == NULL )
@@ -219,14 +219,14 @@ void main( int argc, char *argv[] )
 			exit( -1 );
 		}
 		pic->info->write_protect = ipFalse;
-		pic->info->tags_head = _ipPicCloneTags(header->info->tags_head );
+		pic->info->tags_head = _mitkIpPicCloneTags(header->info->tags_head );
 		if((i==0) && (!append))
 		{
 			pic->dim++; pic->n[pic->dim-1]=1;
-			ipPicPut(argv[aoffset+1], pic);	
+			mitkIpPicPut(argv[aoffset+1], pic);	
 		}
 		else
-			ipPicPutSlice( argv[aoffset+1],
+			mitkIpPicPutSlice( argv[aoffset+1],
 				pic,
 				soffset + i + 1 );
 		

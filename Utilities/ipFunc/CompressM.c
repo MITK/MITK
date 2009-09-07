@@ -67,18 +67,18 @@
  * AUTHOR & DATE
  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask, 
-                                ipPicDescriptor *pic_old,
-                                ipFuncFlagI_t   kind, 
+mitkIpFuncMasc_t *_mitkIpFuncCompressM ( mitkIpPicDescriptor *mask, 
+                                mitkIpPicDescriptor *pic_old,
+                                mitkIpFuncFlagI_t   kind, 
                                 ipInt4_t        beg[_mitkIpPicNDIM],  
                                 ipInt4_t        end[_mitkIpPicNDIM] ) ;
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncCompressM\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncCompressM\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -107,12 +107,12 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
                                                                          \
   /* calculate offsets from actual pixel for each mask element       */ \
                                                                          \
-  if ( kind == ipFuncNoReflect )                                         \
+  if ( kind == mitkIpFuncNoReflect )                                         \
     {                                                                    \
        off_mask = 0;                                                     \
        incr     = 1;                                                     \
     }                                                                    \
-  else if ( kind == ipFuncReflect )                                      \
+  else if ( kind == mitkIpFuncReflect )                                      \
     {                                                                    \
        off_mask = size_m[pic_mask->dim] -1;                              \
        incr     = -1;                                                    \
@@ -167,21 +167,21 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
 */
 /* -------------------------------------------------------------------  */
  
-ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask, 
-                                ipPicDescriptor *pic_old,
-                                ipFuncFlagI_t   kind, 
+mitkIpFuncMasc_t *_mitkIpFuncCompressM ( mitkIpPicDescriptor *mask, 
+                                mitkIpPicDescriptor *pic_old,
+                                mitkIpFuncFlagI_t   kind, 
                                 ipInt4_t        beg[_mitkIpPicNDIM],  
                                 ipInt4_t        end[_mitkIpPicNDIM] ) 
 {
   ipUInt4_t       i;                  /* loop index                     */
-  ipFuncMasc_t    *m;                 /* length of mask and offsets     */
+  mitkIpFuncMasc_t    *m;                 /* length of mask and offsets     */
   ipUInt4_t       size[_mitkIpPicNDIM];
 
 
   /* check whether data are correct                                     */
 
-  if ( _ipFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* initialization of vectors                                          */
   
@@ -205,25 +205,25 @@ ipFuncMasc_t *_ipFuncCompressM ( ipPicDescriptor *mask,
 
   /* allocate mask structure                                            */
 
-  m = malloc ( sizeof ( ipFuncMasc_t ) );
+  m = malloc ( sizeof ( mitkIpFuncMasc_t ) );
   if ( m == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->off_vekt  = malloc ( _ipPicElements( mask )  * sizeof ( ipInt4_t ) );
+  m->off_vekt  = malloc ( _mitkIpPicElements( mask )  * sizeof ( ipInt4_t ) );
   if ( m->off_vekt == NULL ) 
     {
        free ( m );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->mask_vekt = malloc ( _ipPicElements( mask )  * sizeof ( ipFloat8_t ) );
+  m->mask_vekt = malloc ( _mitkIpPicElements( mask )  * sizeof ( ipFloat8_t ) );
   if ( m->mask_vekt == NULL ) 
     {
        free ( m->off_vekt );
        free ( m );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 

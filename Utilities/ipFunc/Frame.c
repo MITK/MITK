@@ -73,18 +73,18 @@
  *
  * Revision 1.2  2000/02/18 14:58:02  ivo
  * Tags are now copied into newly allocated images.
- * Bugs fixed in ipFuncFrame, ipFuncRegGrow, _ipFuncBorderX and ipFuncHitMiss.
+ * Bugs fixed in mitkIpFuncFrame, mitkIpFuncRegGrow, _mitkIpFuncBorderX and mitkIpFuncHitMiss.
  *
  * Revision 1.1.1.1  2000/02/18  15:30:50  ivo
- * memory leak removed: ipFuncKeep in call of ipFuncWindowR substituted
- * by ipFuncKeep (pic_new is already a new image!).
+ * memory leak removed: mitkIpFuncKeep in call of mitkIpFuncWindowR substituted
+ * by mitkIpFuncKeep (pic_new is already a new image!).
  *
  *
  * AUTHOR & DATE
  */
 
-#include "ipFuncP.h"
-ipPicDescriptor *ipFuncFrame ( ipPicDescriptor *pic_old,
+#include "mitkIpFuncP.h"
+mitkIpPicDescriptor *mitkIpFuncFrame ( mitkIpPicDescriptor *pic_old,
                                ipUInt4_t       *edge,
                                ipFloat8_t      value );
 #ifndef DOXYGEN_IGNORE
@@ -102,22 +102,22 @@ ipPicDescriptor *ipFuncFrame ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncFrame ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncFrame ( mitkIpPicDescriptor *pic_old,
                                ipUInt4_t       *edge,
                                ipFloat8_t      value )
 {
-  ipPicDescriptor *pic_new;            /* pointer to transformed image            */
+  mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
 
-  pic_new = _ipFuncBorderX ( pic_old, edge, value );
-  if ( ipFuncErrno > mitkIpFuncOK )
+  pic_new = _mitkIpFuncBorderX ( pic_old, edge, value );
+  if ( mitkIpFuncErrno > mitkIpFuncOK )
     return ( mitkIpFuncERROR );
   else 
-    pic_new = ipFuncWindowR ( pic_new, pic_old, edge, ipFuncNoKeep );
+    pic_new = mitkIpFuncWindowR ( pic_new, pic_old, edge, mitkIpFuncNoKeep );
 
   /* Copy Tags */
 
   strncpy( pic_new->info->version, pic_old->info->version, _mitkIpPicTAGLEN );
-  pic_new->info->tags_head = _ipPicCloneTags( pic_old->info->tags_head );
+  pic_new->info->tags_head = _mitkIpPicCloneTags( pic_old->info->tags_head );
   pic_new->info->write_protect = pic_old->info->write_protect;
 
   return ( pic_new );

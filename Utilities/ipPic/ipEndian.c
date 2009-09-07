@@ -43,7 +43,7 @@
 
 #include "mitkIpPic.h"
 
-_ipEndian_t _ipEndian( void )
+_ipEndian_t _mitkIpEndian( void )
 {
   static union
   { ipUInt2_t s;
@@ -56,12 +56,12 @@ _ipEndian_t _ipEndian( void )
     return( _ipEndianLittle );
   else
     {
-      fprintf( stderr, "%s:_ipEndian: WARNING: unknown endian !!!\n", __FILE__ );
+      fprintf( stderr, "%s:_mitkIpEndian: WARNING: unknown endian !!!\n", __FILE__ );
       return( _ipEndianUnknown );
     }
 }
 
-void _ipCp( void *source, void *destination, unsigned long int len )
+void _mitkIpCp( void *source, void *destination, unsigned long int len )
 {    
   if( !source )
     return; 
@@ -71,7 +71,7 @@ void _ipCp( void *source, void *destination, unsigned long int len )
   memcpy( destination, source, len );
 }
 
-void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes )
+void _mitkIpCvtEndian( void *data, unsigned long int len, unsigned char bytes )
 {
   unsigned long int i;
   unsigned char i2;
@@ -89,7 +89,7 @@ void _ipCvtEndian( void *data, unsigned long int len, unsigned char bytes )
       }
 }
 
-void _ipCpCvtEndian( void *source, void *destination, unsigned long int len, unsigned char bytes )
+void _mitkIpCpCvtEndian( void *source, void *destination, unsigned long int len, unsigned char bytes )
 {
   unsigned long int i;
   unsigned char i2;

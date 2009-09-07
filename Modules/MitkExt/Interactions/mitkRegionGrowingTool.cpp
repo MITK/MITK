@@ -130,7 +130,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
         //  temporarySlice = ImportItkImage( correctPixelTypeImage );
           CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-          ipPicDescriptor* workingPicSlice = temporarySlice->GetSliceData()->GetPicDescriptor();
+          mitkIpPicDescriptor* workingPicSlice = temporarySlice->GetSliceData()->GetPicDescriptor();
          
           int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 
@@ -178,7 +178,7 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
    3.1.1 Call a ipSegmentation algorithm to create a nice cut
    3.1.2 Set the result of this algorithm as the feedback contour
 */ 
-bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, ipPicDescriptor* workingPicSlice, int initialWorkingOffset)
+bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ), const StateEvent* stateEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
   // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
@@ -186,11 +186,11 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
   // generate contour to remove
   // set m_ReferenceSlice = NULL so nothing will happen during mouse move
   // remember to fill the contour with 0 in mouserelease
-  ipPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice, m_LastWorkingSeed, NULL ); // free again
+  mitkIpPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice, m_LastWorkingSeed, NULL ); // free again
   if (segmentationHistory)
   {
     tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory, initialWorkingOffset ); // tCutResult is a ipSegmentation type
-    ipPicFree( segmentationHistory );
+    mitkIpPicFree( segmentationHistory );
     if (cutContour.cutIt) 
     {
       // 3.1.2 copy point from float* to mitk::Contour 
@@ -293,7 +293,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       }
 
       // 3.2.3. Actually perform region growing
-      ipPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
+      mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
       ipMITKSegmentationFree( result);
 
       // display the contour
@@ -345,7 +345,7 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
         // LOG_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << std::endl;
         
         // 2. Perform region growing again and show the result
-        ipPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
+        mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();
         ipMITKSegmentationFree( result );
 
         // 3. Update the contour
@@ -424,7 +424,7 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 Uses ipSegmentation algorithms to do the actual region growing. The result (binary image) is first smoothed by a 5x5 circle mask, then
 its contour is extracted and converted to MITK coordinates.
 */
-ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
+mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
 {
   // 1. m_OriginalPicSlice and m_SeedPointMemoryOffset are set to sensitive values, as well as m_LowerThreshold and m_UpperThreshold
   assert (m_OriginalPicSlice);
@@ -434,7 +434,7 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
   // 2. ipSegmentation is used to perform region growing
   float ignored;
   int oneContourOffset( 0 );
-  ipPicDescriptor* regionGrowerResult = ipMITKSegmentationGrowRegion4N( m_OriginalPicSlice,
+  mitkIpPicDescriptor* regionGrowerResult = ipMITKSegmentationGrowRegion4N( m_OriginalPicSlice,
                                                                         m_SeedPointMemoryOffset,       // seed point
                                                                         true,              // grayvalue interval relative to seed point gray value?
                                                                         m_LowerThreshold,
@@ -457,7 +457,7 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
 
   // 3. We smooth the result a little to reduce contour complexity
   bool smoothResult( true ); // currently fixed, perhaps remove else block
-  ipPicDescriptor* smoothedRegionGrowerResult;
+  mitkIpPicDescriptor* smoothedRegionGrowerResult;
   if (smoothResult)
   {
     // Smooth the result (otherwise very detailed contour)
@@ -545,7 +545,7 @@ ipPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateContour()
   \param startOffset First pixel that should be smoothed using this mask.
   \param endOffset Last pixel that should be smoothed using this mask.
 */
-void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( ipPicDescriptor* sourceImage, ipPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset )
+void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( mitkIpPicDescriptor* sourceImage, mitkIpPicDescriptor* dest, int &contourOfs, int* maskOffsets, int maskSize, int startOffset, int endOffset )
 {
   // work on the very first row
   ipMITKSegmentationTYPE* current;
@@ -580,7 +580,7 @@ void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( ipPicDescript
 /**
 Smoothes a binary ipPic image with a 5x5 mask. The image borders (some first and last rows) are treated differently.
 */
-ipPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( ipPicDescriptor* image, int &contourOfs, ipPicDescriptor* dest )
+mitkIpPicDescriptor* mitk::RegionGrowingTool::SmoothIPPicBinaryImage( mitkIpPicDescriptor* image, int &contourOfs, mitkIpPicDescriptor* dest )
 {
   if (!image) return NULL;
 

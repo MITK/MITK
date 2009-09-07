@@ -150,7 +150,7 @@ JAVADOC_AUTOBRIEF    = YES
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                = . ipFunc.h ipArithmeticAndLogical.h ipGeometrical.h ipLocal.h ipStatistical.h ipMorphological.h ipPointOperators.h ipAdministrative.h
+INPUT                = . mitkIpFunc.h ipArithmeticAndLogical.h ipGeometrical.h ipLocal.h ipStatistical.h ipMorphological.h ipPointOperators.h ipAdministrative.h
 
 
 # If the value of the INPUT tag contains directories, you can use the 

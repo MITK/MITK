@@ -71,9 +71,9 @@
 
 /* include files                                                       */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipFloat8_t ipFuncSDevROI ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
                            ipUInt4_t       *pol_x,
                            ipUInt4_t       *pol_y,
                            ipUInt4_t       no_pts ) ;
@@ -81,17 +81,17 @@ ipFloat8_t ipFuncSDevROI ( ipPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncSDevROI\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncSDevROI\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 
 
 /*
-** ipFuncSDevROI
+** mitkIpFuncSDevROI
 */
 
-ipFloat8_t ipFuncSDevROI ( ipPicDescriptor *pic_old,
+ipFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
                            ipUInt4_t       *pol_x,
                            ipUInt4_t       *pol_y,
                            ipUInt4_t       no_pts ) 
@@ -99,7 +99,7 @@ ipFloat8_t ipFuncSDevROI ( ipPicDescriptor *pic_old,
    ipFloat8_t      var;             /* variance  of greyvalues in ROI   */
    ipFloat8_t      s_dev;           /* standard dev.of greyvalues in ROI*/
 
-   var = ipFuncVarROI ( pic_old, pol_x, pol_y, no_pts );
+   var = mitkIpFuncVarROI ( pic_old, pol_x, pol_y, no_pts );
 
    s_dev = sqrt ( var );
 

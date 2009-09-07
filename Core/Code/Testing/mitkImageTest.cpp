@@ -106,7 +106,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   //----
-  ipPicDescriptor *pic_slice=ipPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
+  mitkIpPicDescriptor *pic_slice=mitkIpPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
 	imgMem=mitk::Image::New();
 
   std::cout << "Testing reinitializing via Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
@@ -146,7 +146,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Setting a copy of the volume once again: ";
-  imgMem->SetPicVolume(ipPicClone(imgMem->GetVolumeData(0)->GetPicDescriptor()),0);
+  imgMem->SetPicVolume(mitkIpPicClone(imgMem->GetVolumeData(0)->GetPicDescriptor()),0);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Set a slice with different content via SetPicSlice(): ";
@@ -203,7 +203,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   //imgMem->SetVolume(data);
   //std::cout<<"[PASSED]"<<std::endl;
 
-  ipPicFree(pic_slice);
+  mitkIpPicFree(pic_slice);
 
   //-----------------
   // geometry information for image
@@ -351,7 +351,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   //  void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
   //  void mitk::Image::Initialize(const mitk::Image* image) 
   //  void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
-  //  void mitk::Image::Initialize(const ipPicDescriptor* pic, int channels, int tDim, int sDim)
+  //  void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int tDim, int sDim)
 
   //mitk::Image::Pointer vecImg = mitk::Image::New();
   //vecImg->Initialize(PixelType(typeid(float), 6, itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );

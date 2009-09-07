@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipSegmentationP.h"
 
 void 
-ipMITKSegmentationClear (ipPicDescriptor* segmentation)
+ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
 {
   ipMITKSegmentationTYPE *cur, *last; 
-  ipPicTSV_t* tag; 
+  mitkIpPicTSV_t* tag; 
   const char *src; 
   ipUInt1_t *dst;
   ipUInt4_t i, j;
@@ -36,39 +36,39 @@ ipMITKSegmentationClear (ipPicDescriptor* segmentation)
   /* clear the image data */
 
   cur = (ipMITKSegmentationTYPE *) segmentation->data;
-  last = cur + _ipPicElements (segmentation);
+  last = cur + _mitkIpPicElements (segmentation);
   while (cur < last) {
     *cur++ = 0;
   }
 
   /* create an 'empty' tag */
 
-  tag = ipPicQueryTag (segmentation, tagSEGMENTATION_EMPTY);
+  tag = mitkIpPicQueryTag (segmentation, tagSEGMENTATION_EMPTY);
   if (!tag) {
-    tag = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
+    tag = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
     strcpy (tag->tag, tagSEGMENTATION_EMPTY);
-    tag->type = ipPicBool;
+    tag->type = mitkIpPicBool;
     tag->bpe = sizeof (ipBool_t) / 8;
     tag->dim = 1;
     tag->n[0] = 1;
     tag->value = malloc (sizeof (ipBool_t)); 
     *((ipBool_t *) tag->value) = ipTrue;
-    ipPicAddTag (segmentation, tag);
+    mitkIpPicAddTag (segmentation, tag);
   }
 
   /* create an `empty` icon */
 
-  tag = ipPicQueryTag (segmentation, "ICON80x80");
+  tag = mitkIpPicQueryTag (segmentation, "ICON80x80");
   if (!tag) {
-    tag = (ipPicTSV_t *) malloc (sizeof (ipPicTSV_t));
-    tag->type = ipPicUInt;
+    tag = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
+    tag->type = mitkIpPicUInt;
     tag->bpe = 8;
     tag->dim = 2;
     tag->n[0] = 80;
     tag->n[1] = 80;  
     tag->value = malloc (tag->n[0] * tag->n[1] * sizeof (ipUInt1_t));
     strcpy (tag->tag, "ICON80x80");
-    ipPicAddTag (segmentation, tag);
+    mitkIpPicAddTag (segmentation, tag);
   }
   dst = (ipUInt1_t *) tag->value;
   for (i = 0; i < 80; i++) {

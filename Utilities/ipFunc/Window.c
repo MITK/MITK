@@ -63,9 +63,9 @@
 
 /* include files                                                                  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncWindow ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *begin,
                                 ipUInt4_t       *length );
 
@@ -129,11 +129,11 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------------ */
 
-ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncWindow ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *begin,
                                 ipUInt4_t       *length )
 {
-  ipPicDescriptor *pic_new;            /* pointer to transformed image            */
+  mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
   ipUInt4_t      i;                    /* loop index                              */
   ipUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
   ipUInt4_t      beg[_mitkIpPicNDIM];      /* end of image                            */
@@ -141,19 +141,19 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 
   /* check whether data are correct                                               */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   for ( i = 0; i < pic_old->dim; i++ )
     {
       if ( begin[i] < 0 || begin[i] > pic_old->n[i] ) 
         {  
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
       beg[i] = begin[i];
       end[i] = begin[i] + length[i];
       if ( length[i] < 0 || end[i] > pic_old->n[i] )
         {  
-           _ipFuncSetErrno ( mitkIpFuncDATA_ERROR );
+           _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
            return ( mitkIpFuncERROR );
         }
     }
@@ -174,11 +174,11 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 
   /* allocate image structure                                                     */
 
-  pic_new = ipPicNew ( );
+  pic_new = mitkIpPicNew ( );
 
   if ( pic_new == NULL )
     {
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                    
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                    
        return ( mitkIpFuncERROR );
     }
 
@@ -187,11 +187,11 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
   pic_new->bpe  = pic_old->bpe;
   for ( i = 0; i < pic_new->dim; i++ )
     pic_new->n[i] = length[i];
-  pic_new->data = malloc ( _ipPicSize ( pic_new ) );
+  pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
   if ( pic_new->data == NULL )
     {
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
        return ( mitkIpFuncERROR );
     }
 
@@ -199,7 +199,7 @@ ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
                         

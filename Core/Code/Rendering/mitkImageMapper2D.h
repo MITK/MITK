@@ -142,8 +142,8 @@ public:
     /** \brief timestamp of last update of stored data */
     itk::TimeStamp m_LastUpdateTime;
 
-    /** \brief stored data as a ipPicDescriptor */
-    ipPicDescriptor *m_Pic;
+    /** \brief stored data as a mitkIpPicDescriptor */
+    mitkIpPicDescriptor *m_Pic;
 
     /** \brief number of pixels per mm in x- and y-direction of the resampled */
     Vector2D m_PixelsPerMM;

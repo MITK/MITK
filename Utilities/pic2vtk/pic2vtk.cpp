@@ -8,12 +8,12 @@
 /**
  * konvertiert ein vtkImageReader in ein pic-Image 
  */ 
-ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
+mitkIpPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 	if ( vtkImage == NULL )
 		return NULL;
 
-	ipPicDescriptor* pic = ipPicNew();
+	mitkIpPicDescriptor* pic = mitkIpPicNew();
 
 	if ( pic == NULL )
 		return NULL;
@@ -41,7 +41,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 
 	case VTK_BIT: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 8;
 		unsigned int vtkSize = size>>3;
 
@@ -52,7 +52,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 		register char *a = (char*) malloc(sizeof(char)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -69,14 +69,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_CHAR: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 8*vtkImage->GetNumberOfScalarComponents();
 
 		register char *s = (char*) vtkImage->GetScalarPointer();	
 		register char *a = (char*) malloc(sizeof(char)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -88,14 +88,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_CHAR: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 8*vtkImage->GetNumberOfScalarComponents();
 
 		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();	
 		register unsigned char *a = (unsigned char*) malloc(sizeof(unsigned char)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -107,14 +107,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_SHORT: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 16;
 
 		register short *s = (short*) vtkImage->GetScalarPointer();	
 		register short *a = (short*) malloc(sizeof(short)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -126,14 +126,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_SHORT: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 16;
 
 		register unsigned short *s = (unsigned short*) vtkImage->GetScalarPointer();	
 		register unsigned short *a = (unsigned short*) malloc(sizeof(unsigned short)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -146,14 +146,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_INT: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 32;
 
 		register int *s = (int*) vtkImage->GetScalarPointer();	
 		register int *a = (int*) malloc(sizeof(int)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -165,14 +165,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_INT: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 32;
 
 		register unsigned int *s = (unsigned int*) vtkImage->GetScalarPointer();	
 		register unsigned int *a = (unsigned int*) malloc(sizeof(unsigned int)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -184,14 +184,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_LONG: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 64;
 
 		register long *s = (long*) vtkImage->GetScalarPointer();	
 		register long *a = (long*) malloc(sizeof(long)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -203,14 +203,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_LONG: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 64;
 
 		register unsigned long *s = (unsigned long*) vtkImage->GetScalarPointer();	
 		register unsigned long *a = (unsigned long*) malloc(sizeof(unsigned long)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -222,14 +222,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_FLOAT: {
 
-		pic->type = ipPicFloat;
+		pic->type = mitkIpPicFloat;
 		pic->bpe = 32;
 
 		register float *s = (float*) vtkImage->GetScalarPointer();	
 		register float *a = (float*) malloc(sizeof(float)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -241,14 +241,14 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 	}
 	case VTK_DOUBLE: {
 
-		pic->type = ipPicFloat;
+		pic->type = mitkIpPicFloat;
 		pic->bpe = 64;
 
 		register double *s = (double*) vtkImage->GetScalarPointer();	
 		register double *a = (double*) malloc(sizeof(double)* size);
     if(a==NULL)
     {
-      ipPicFree( pic );
+      mitkIpPicFree( pic );
       return NULL;	
     }
 		pic->data = a;
@@ -260,7 +260,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 		break;
 	}
 	default:
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		return NULL;	
 	}
 
@@ -273,7 +273,7 @@ ipPicDescriptor* Pic2vtk::convert( vtkImageData* vtkImage ) {
 /**
  * konvertiert ein vektorwertiges vtkImageData in ein vector pic-Image
  */
-ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
+mitkIpPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 
 	std::cout << "Pic2vtk::convertVectorImage()... converting  vector vtkImage to vector pic image" << std::endl;
 	
@@ -283,7 +283,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	std::cout << "   vtk dimension: " << vtkImage->GetDataDimension() << std::endl;
 	std::cout << "   vtk vector dim = " << vtkImage->GetNumberOfScalarComponents() << std::endl;
 		
-	ipPicDescriptor* pic = ipPicNew();
+	mitkIpPicDescriptor* pic = mitkIpPicNew();
 
 	if ( pic == NULL )
 		return NULL;
@@ -340,7 +340,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 
 			std::cout << "WARNING: VTK_BIT vector images not supported yet ... " << std::endl;
 			
-//		pic->type = ipPicInt;
+//		pic->type = mitkIpPicInt;
 //		pic->bpe = 8;
 //		unsigned int vtkSize = size>>3;
 //
@@ -363,7 +363,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_CHAR: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 8;
 
 		register char *s = (char*) vtkImage->GetScalarPointer();
@@ -387,7 +387,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_CHAR: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 8;
 
 		register unsigned char *s = (unsigned char*) vtkImage->GetScalarPointer();
@@ -400,7 +400,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_SHORT: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 16;
 
 		register short *s = (short*) vtkImage->GetScalarPointer();
@@ -413,7 +413,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_SHORT: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 16;
 
 		register unsigned short *s = (unsigned short*) vtkImage->GetScalarPointer();
@@ -427,7 +427,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_INT: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 32;
 
 		register int *s = (int*) vtkImage->GetScalarPointer();
@@ -440,7 +440,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_INT: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 32;
 
 		register unsigned int *s = (unsigned int*) vtkImage->GetScalarPointer();
@@ -453,7 +453,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_LONG: {
 
-		pic->type = ipPicInt;
+		pic->type = mitkIpPicInt;
 		pic->bpe = 64;
 
 		register long *s = (long*) vtkImage->GetScalarPointer();
@@ -466,7 +466,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_UNSIGNED_LONG: {
 
-		pic->type = ipPicUInt;
+		pic->type = mitkIpPicUInt;
 		pic->bpe = 64;
 
 		register unsigned long *s = (unsigned long*) vtkImage->GetScalarPointer();
@@ -479,7 +479,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_FLOAT: {
 
-		pic->type = ipPicFloat;
+		pic->type = mitkIpPicFloat;
 		pic->bpe = 32;
 
 		register float *s = (float*) vtkImage->GetScalarPointer();
@@ -492,7 +492,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 	}
 	case VTK_DOUBLE: {
 
-		pic->type = ipPicFloat;
+		pic->type = mitkIpPicFloat;
 		pic->bpe = 64;
 
 		register double *s = (double*) vtkImage->GetScalarPointer();
@@ -504,20 +504,20 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 		break;
 	}
 	default:
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		return NULL;
 	}
 
 	// add tag tp result pic
-  ipPicTSV_t *tsv;
-  tsv = (ipPicTSV_t *) malloc( sizeof(ipPicTSV_t) );
+  mitkIpPicTSV_t *tsv;
+  tsv = (mitkIpPicTSV_t *) malloc( sizeof(mitkIpPicTSV_t) );
   strcpy( tsv->tag, "VectorValued" );
-  tsv->type = ipPicASCII;
+  tsv->type = mitkIpPicASCII;
   tsv->bpe = 8;
   tsv->dim = 1;
   tsv->value = strdup( "." );
   tsv->n[0] = strlen((char *) tsv->value);
-  ipPicAddTag( pic, tsv );
+  mitkIpPicAddTag( pic, tsv );
 
 	return pic;
 }
@@ -527,7 +527,7 @@ ipPicDescriptor* Pic2vtk::convertVectorImage( vtkImageData* vtkImage ) {
 /**
  * konvertiert ein pic-Image in ein vtkImageReader
  */ 
-vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
+vtkImageData* Pic2vtk::convert( mitkIpPicDescriptor* pic ) {
 
 	if ( pic == NULL )
 		return NULL;
@@ -562,7 +562,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 	inData->SetNumberOfScalarComponents(1);
 
 
-	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
+	if ( ( pic->type == mitkIpPicInt || pic->type == mitkIpPicUInt ) && pic->bpe == 1 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 		size = size>>3;
@@ -572,7 +572,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_CHAR );
 		inData->AllocateScalars();
 
@@ -582,7 +582,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_UNSIGNED_CHAR );
 		inData->AllocateScalars();
 
@@ -593,7 +593,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 			*a++ = *s++;
 
 		
-	} else if ( pic->type == ipPicUInt && pic->bpe == 24 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 24 ) {
     inData->SetNumberOfScalarComponents(3);
 		inData->SetScalarType( VTK_UNSIGNED_CHAR );
 		inData->AllocateScalars();
@@ -605,7 +605,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 			*a++ = *s++;
 
 		
-	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_SHORT );
 		inData->AllocateScalars();
 
@@ -615,7 +615,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_UNSIGNED_SHORT );
 		inData->AllocateScalars();
 
@@ -625,7 +625,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ ) 
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_INT );
 		inData->AllocateScalars();
 
@@ -635,7 +635,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ ) 
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_UNSIGNED_INT );
 		inData->AllocateScalars();
 
@@ -645,7 +645,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_LONG );
 		inData->AllocateScalars();
 
@@ -655,7 +655,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_UNSIGNED_LONG );
 		inData->AllocateScalars();
 
@@ -665,7 +665,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_FLOAT );
 		inData->AllocateScalars();
 
@@ -675,7 +675,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 		for ( register unsigned long i = 0; i < size ; i++ )
 			*a++ = *s++;
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_DOUBLE );
 		inData->AllocateScalars();
 
@@ -697,7 +697,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic ) {
 /**
  * konvertiert ein vector pic-Image in ein vector vtkImageData
  */
-vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
+vtkImageData* Pic2vtk::convertVectorImage( mitkIpPicDescriptor* pic ) {
 
 	std::cout << "Pic2vtk::convertVectorImage()... converting vector pic image to vector vtkImage " << std::endl;
 
@@ -747,7 +747,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 	//inData->SetNumberOfScalarComponents(vectorDim);
 	inData->SetNumberOfScalarComponents(3);
 
-	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
+	if ( ( pic->type == mitkIpPicInt || pic->type == mitkIpPicUInt ) && pic->bpe == 1 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 		size = size>>3;
@@ -762,7 +762,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 //				*a++ = *(s + i*size);
 //			}
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_CHAR );
 		inData->AllocateScalars();
 
@@ -782,7 +782,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 			COPYVECTORDATAPIC2VTK
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_UNSIGNED_CHAR );
 		inData->AllocateScalars();
 
@@ -791,7 +791,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_SHORT );
 		inData->AllocateScalars();
 
@@ -800,7 +800,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_UNSIGNED_SHORT );
 		inData->AllocateScalars();
 		std::cout << " memory = " << inData->GetActualMemorySize() << std::endl;
@@ -813,7 +813,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 
 		
-	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_INT );
 		inData->AllocateScalars();
 
@@ -822,7 +822,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_UNSIGNED_INT );
 		inData->AllocateScalars();
 
@@ -831,7 +831,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 		
-	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_LONG );
 		inData->AllocateScalars();
 
@@ -840,7 +840,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 		
-	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_UNSIGNED_LONG );
 		inData->AllocateScalars();
 
@@ -849,7 +849,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 
 		COPYVECTORDATAPIC2VTK
 		
-	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_FLOAT );
 		inData->AllocateScalars();
 
@@ -857,7 +857,7 @@ vtkImageData* Pic2vtk::convertVectorImage( ipPicDescriptor* pic ) {
 		register float* a = (float*) inData->GetScalarPointer();
 
 		COPYVECTORDATAPIC2VTK
-	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_DOUBLE );
 		inData->AllocateScalars();
 
@@ -883,7 +883,7 @@ vtkImageData* Pic2vtk::loadImage( char* fileName, bool littleEndian ) {
 	if ( fileName == NULL )
 		return NULL;
 
-	ipPicDescriptor* pic = ipPicGetHeader( fileName, NULL );
+	mitkIpPicDescriptor* pic = mitkIpPicGetHeader( fileName, NULL );
 
 	if ( pic == NULL )
 		return NULL;
@@ -891,16 +891,16 @@ vtkImageData* Pic2vtk::loadImage( char* fileName, bool littleEndian ) {
 	if ( pic->info->pixel_start_in_file == 0 ) {
 		// komprimierte Date
 		
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		pic = NULL;				
 		
-		pic = ipPicGet( fileName, NULL );
+		pic = mitkIpPicGet( fileName, NULL );
 
 		if ( pic == NULL )
 			return NULL;
 
 		vtkImageData* vtkImage = convert( pic );	
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		return vtkImage;
 	}
 
@@ -930,47 +930,47 @@ vtkImageData* Pic2vtk::loadImage( char* fileName, bool littleEndian ) {
 		reader->SetDataExtent( 0, pic->n[0] - 1, 0, pic->n[1] - 1, 0, pic->n[2] - 1 );
 	} else {
 		reader->Delete () ;
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		return NULL;
 	}
 
 	// Datatype 
-	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
+	if ( ( pic->type == mitkIpPicInt || pic->type == mitkIpPicUInt ) && pic->bpe == 1 ) {
 		reader->SetDataScalarType( VTK_BIT );
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 8 ) {
 		reader->SetDataScalarType( VTK_CHAR );
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 8 ) {
 		reader->SetDataScalarType( VTK_UNSIGNED_CHAR );
 		
-	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 16 ) {
 		reader->SetDataScalarType( VTK_SHORT );
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 16 ) {
 		reader->SetDataScalarType( VTK_UNSIGNED_SHORT );
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 32 ) {
 		reader->SetDataScalarType( VTK_INT );
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 32 ) {
 		reader->SetDataScalarType( VTK_UNSIGNED_INT );
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 64 ) {
 		reader->SetDataScalarType( VTK_LONG );
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 64 ) {
 		reader->SetDataScalarType( VTK_UNSIGNED_LONG );
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 32 ) {
 		reader->SetDataScalarType( VTK_FLOAT );
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 64 ) {
 		reader->SetDataScalarType( VTK_DOUBLE );
 
 	} else {
 		reader->Delete();
-		ipPicFree( pic );
+		mitkIpPicFree( pic );
 		return NULL;
 	}
 
@@ -979,7 +979,7 @@ vtkImageData* Pic2vtk::loadImage( char* fileName, bool littleEndian ) {
 
 	reader->SetFileName( fileName );
 	reader->UpdateWholeExtent();
-	ipPicFree( pic );
+	mitkIpPicFree( pic );
 
 	vtkImageData* vtkImage = reader->GetOutput();
 	reader->Delete();
@@ -992,7 +992,7 @@ vtkImageData* Pic2vtk::loadImage( char* fileName, bool littleEndian ) {
  * mask erwartet ein Bittmuster, das im Zielbild eingeblendet wird.
  * move gibt die Verschiebung an, mit der das Bitmuster im Zielbilt plaziert wird.
  */ 
-vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int move ) {
+vtkImageData* Pic2vtk::convert( mitkIpPicDescriptor* pic, unsigned long mask, int move ) {
 
 	if ( pic == NULL )
 		return NULL;
@@ -1028,7 +1028,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 	inData->SetNumberOfScalarComponents(1);
 
 
-	if ( ( pic->type == ipPicInt || pic->type == ipPicUInt ) && pic->bpe == 1 ) {
+	if ( ( pic->type == mitkIpPicInt || pic->type == mitkIpPicUInt ) && pic->bpe == 1 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1047,7 +1047,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1066,7 +1066,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 8 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 8 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1085,7 +1085,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 		}
 
 		
-	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1103,7 +1103,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 16 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1121,7 +1121,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1139,7 +1139,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 32 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1157,7 +1157,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1175,7 +1175,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicUInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicUInt && pic->bpe == 64 ) {
 		inData->SetScalarType( VTK_BIT );
 		inData->AllocateScalars();
 
@@ -1193,12 +1193,12 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 			*a++ = v;
 		}
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 32 ) {
 
 		inData->Delete();
 		return NULL;
 
-	} else if ( pic->type == ipPicFloat && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicFloat && pic->bpe == 64 ) {
 
 		inData->Delete();
 		return NULL;
@@ -1214,20 +1214,20 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 /**
  * 
  */
- ipPicDescriptor* Pic2vtk::convertSigned2Unsigned( ipPicDescriptor* pic, unsigned long* offset  ) {
+ mitkIpPicDescriptor* Pic2vtk::convertSigned2Unsigned( mitkIpPicDescriptor* pic, unsigned long* offset  ) {
  
 	if ( pic == NULL )
 		return NULL;
 
-	if ( pic->type == ipPicUInt )
+	if ( pic->type == mitkIpPicUInt )
 		return pic;
 
-	ipPicDescriptor* newPic = ipPicCopyHeader( pic, NULL );	
-	const unsigned int size = _ipPicElements( pic );
+	mitkIpPicDescriptor* newPic = mitkIpPicCopyHeader( pic, NULL );	
+	const unsigned int size = _mitkIpPicElements( pic );
 
-	if ( pic->type == ipPicInt && pic->bpe == 8 ) {
+	if ( pic->type == mitkIpPicInt && pic->bpe == 8 ) {
 
-		newPic->type = ipPicUInt;
+		newPic->type = mitkIpPicUInt;
 		newPic->data = new unsigned char[ size ];
 
 		register char* s = (char*) pic->data;
@@ -1240,9 +1240,9 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 		if ( offset ) 
 			*offset = localOffset;
 	
-	} else if ( pic->type == ipPicInt && pic->bpe == 16 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 16 ) {
 
-		newPic->type = ipPicUInt;
+		newPic->type = mitkIpPicUInt;
 		newPic->data = new unsigned short[ size ];
 
 		register short* s = (short*) pic->data;
@@ -1255,9 +1255,9 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 		if ( offset ) 
 			*offset = localOffset;
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 32 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 32 ) {
 
-		newPic->type = ipPicUInt;
+		newPic->type = mitkIpPicUInt;
 		newPic->data = new unsigned int[ size ];
 
 		register int* s = (int*) pic->data;
@@ -1270,7 +1270,7 @@ vtkImageData* Pic2vtk::convert( ipPicDescriptor* pic, unsigned long mask, int mo
 		if ( offset ) 
 			*offset = localOffset;
 
-	} else if ( pic->type == ipPicInt && pic->bpe == 64 ) {
+	} else if ( pic->type == mitkIpPicInt && pic->bpe == 64 ) {
     assert(false);
 	}
 

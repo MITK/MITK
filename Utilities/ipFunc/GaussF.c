@@ -56,8 +56,8 @@
  *  @param len_mask   number of mask elements for each dimension
  *  @param dim_mask   dimension of mask
  *  @param border    handling of the edge
- *  @arg @c   ipFuncBorderZero :  set edge pixels to zero
- *  @arg @c   ipFuncBorderOld  :  keep greyvalues of original image
+ *  @arg @c   mitkIpFuncBorderZero :  set edge pixels to zero
+ *  @arg @c   mitkIpFuncBorderOld  :  keep greyvalues of original image
  *
  *  @return pointer to smoothed image
  *
@@ -66,32 +66,32 @@
 
 /* include files                                                         */
 
-#include "ipFuncP.h"
-ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
+#include "mitkIpFuncP.h"
+mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       len_mask,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border );
+                                 mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncGaussF\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncGaussF\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 
 /* --------------------------------------------------------------------- */
 /* 
-** function ipFuncGausF                                                 
+** function mitkIpFuncGausF                                                 
 */
 /* --------------------------------------------------------------------- */
  
-ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t       len_mask,
                                  ipUInt4_t       dim_mask,  
-                                 ipFuncFlagI_t   border )
+                                 mitkIpFuncFlagI_t   border )
 {
-  ipPicDescriptor *pic_new;          /* pointer to new image structure   */
-  ipPicDescriptor *pic_mask;         /* pointer to mask                  */
+  mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
+  mitkIpPicDescriptor *pic_mask;         /* pointer to mask                  */
   ipUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
   ipUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
   ipUInt4_t       i, k;              /* loop index                       */
@@ -104,15 +104,15 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
 
   /* check data                                                          */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( pic_old->dim < dim_mask || dim_mask < 1 )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
   if ( len_mask % 2 != 1 )
     {
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -121,7 +121,7 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
   bin       = malloc ( len_mask * sizeof ( ipUInt4_t ) );
   if ( bin == NULL ) 
     {
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -140,28 +140,28 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
 
   /* initialize mask                                                     */
   
-  pic_mask       = ipPicNew();
+  pic_mask       = mitkIpPicNew();
   
   if ( pic_mask == NULL )
     {
        free ( bin );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  pic_mask->type = ipPicFloat;
+  pic_mask->type = mitkIpPicFloat;
   pic_mask->bpe  = 64;
   pic_mask->dim  = dim_mask;
 
   for ( i = 0; i < dim_mask; i++ ) pic_mask->n[i] = len_mask;
 
-  pic_mask->data = malloc ( _ipPicSize ( pic_mask ) );
+  pic_mask->data = malloc ( _mitkIpPicSize ( pic_mask ) );
 
   if ( pic_mask->data == NULL )
     {
        free ( bin );
-       ipPicFree ( pic_mask );
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       mitkIpPicFree ( pic_mask );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -195,20 +195,20 @@ ipPicDescriptor *ipFuncGausF   ( ipPicDescriptor *pic_old,
                     offset++;
                   }
 
-  no_elem = _ipPicElements ( pic_mask );
+  no_elem = _mitkIpPicElements ( pic_mask );
   for ( i = 0; i < no_elem; i++ )                          
     (( ipFloat8_t * ) pic_mask->data ) [i] =  
        (( ipFloat8_t * ) pic_mask->data ) [i] / ( ipFloat8_t ) sum;
 
   /* convolve image with Gausian mask                                  */
 
-  pic_new = ipFuncConv ( pic_old, pic_mask, border );
+  pic_new = mitkIpFuncConv ( pic_old, pic_mask, border );
 
-  ipPicFree ( pic_mask );
+  mitkIpPicFree ( pic_mask );
   free ( bin );
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

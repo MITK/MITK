@@ -54,7 +54,7 @@
  *new ipPic added.
  *
  *Revision 1.5  2002/04/23 11:06:25  ivo
- *ipPicCopySlice behaves now in the same way as ipPicGetSlice:
+ *mitkIpPicCopySlice behaves now in the same way as mitkIpPicGetSlice:
  *2D-slices are copied, no longer hyper-planes of dimension dim-1.
  *
  *Revision 1.4  2000/05/04 12:52:36  ivo
@@ -77,19 +77,19 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicCopySlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicCopySlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-ipPicDescriptor *_ipPicCopySlice( ipPicDescriptor *pic, ipPicDescriptor *pic_in, ipUInt4_t slice )
+mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_in, ipUInt4_t slice )
 {
   ipUInt4_t picsize;
 
   if( pic == NULL )
-    pic = ipPicNew();
+    pic = mitkIpPicNew();
 
-  ipPicClear( pic );
+  mitkIpPicClear( pic );
 
   pic->type = pic_in->type;
   pic->bpe = pic_in->bpe;
@@ -98,12 +98,12 @@ ipPicDescriptor *_ipPicCopySlice( ipPicDescriptor *pic, ipPicDescriptor *pic_in,
   pic->n[1] = pic_in->n[1];
   pic->data = NULL;
 
-  picsize = _ipPicSize(pic);
+  picsize = _mitkIpPicSize(pic);
 
   if( slice < 1
-      || slice > _ipPicSize(pic_in) / picsize )
+      || slice > _mitkIpPicSize(pic_in) / picsize )
     {
-	  ipPicClear(pic);
+	  mitkIpPicClear(pic);
       return( pic );
     }
 

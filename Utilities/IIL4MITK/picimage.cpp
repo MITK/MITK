@@ -13,7 +13,7 @@ iil4mitkPicImage::~iil4mitkPicImage ()
 }
 
 void
-iil4mitkPicImage::setImage (ipPicDescriptor* pic, int model)
+iil4mitkPicImage::setImage (mitkIpPicDescriptor* pic, int model)
 {
     assert (pic);
     assert (pic->dim >= 2);
@@ -22,7 +22,7 @@ iil4mitkPicImage::setImage (ipPicDescriptor* pic, int model)
     iil4mitkImage::setImage (pic->n[0], pic->n[1], model, (unsigned char *) pic->data);
 }
 
-ipPicDescriptor*
+mitkIpPicDescriptor*
 iil4mitkPicImage::image () const
 {
 	return _pic;
@@ -465,7 +465,7 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
 		mitkIpPicFORALL(BINARY_INTENSITIES, _pic);
 	} else {
 #ifdef USE_MMX
-		if (mitkIpPicDR(_pic->type, _pic->bpe) == mitkIpPicDR(ipPicInt, 16)) {
+		if (mitkIpPicDR(_pic->type, _pic->bpe) == mitkIpPicDR(mitkIpPicInt, 16)) {
 			unsigned char* d = dst;
 			unsigned char* s = src;
 			if (w / 16) {

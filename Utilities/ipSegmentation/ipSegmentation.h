@@ -42,7 +42,7 @@ extern "C"
     \brief Defines the data type of the segmentation images.
     */
 #define ipMITKSegmentationTYPE ipUInt1_t
-#define ipMITKSegmentationTYPE_ID ipPicUInt
+#define ipMITKSegmentationTYPE_ID mitkIpPicUInt
 #define ipMITKSegmentationBPE 8
 #define tagSEGMENTATION_EMPTY "SEGMENTATION_EMPTY"
 
@@ -51,20 +51,20 @@ extern "C"
     @param image the original image which will be segmented
     @return the segmentation.
     */
-  extern ipPicDescriptor* ipMITKSegmentationNew (ipPicDescriptor* image);
+  extern mitkIpPicDescriptor* ipMITKSegmentationNew (mitkIpPicDescriptor* image);
 
   /*!
     \brief Destroys the segmentation.
     @param segmentation the segmentation.
     */
-  extern void ipMITKSegmentationFree (ipPicDescriptor* segmentation);
+  extern void ipMITKSegmentationFree (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Clears the segmentation data, i.e. the pixels will
     be set to zero.
     @param segmentation the segmentation
     */
-  extern void ipMITKSegmentationClear (ipPicDescriptor* segmentation);
+  extern void ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Interpolates the shape of segmentations.
@@ -72,7 +72,7 @@ extern "C"
     @param ratio the ratio of the images, the ratios 0.0 and 1.0 will 
     produce pic1 and pic2, accordingly.
     */
-  extern ipPicDescriptor* ipMITKSegmentationInterpolate (ipPicDescriptor* pic1, ipPicDescriptor* pic2, const ipFloat4_t ratio);
+  extern mitkIpPicDescriptor* ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pic2, const ipFloat4_t ratio);
 
   /*!
     \brief The type of logical operation.
@@ -95,45 +95,45 @@ extern "C"
     @param value the operand value of the operation
     \note The last point is automatically connected with the first one.
     */
-  extern void ipMITKSegmentationCombineRegion (ipPicDescriptor* segmentation, const ipInt4_t* const points, const int num, ipPicDescriptor* mask, const int operation, int value);
+  extern void ipMITKSegmentationCombineRegion (mitkIpPicDescriptor* segmentation, const ipInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value);
 
   /*!
     \brief Enables the undo operation for the specified segmentation.
     @param segmentation the segmentation 
     @param level the number of undo levels
     */
-  extern void ipMITKSegmentationUndoEnable (ipPicDescriptor* segmentation, const ipUInt1_t level);
+  extern void ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t level);
 
   /*!
     \brief Disables the undo operation for the specified segmentation.
     The available data will be discarded.
     @param segmentation the segmentation 
     */
-  extern void ipMITKSegmentationUndoDisable (ipPicDescriptor* segmentation);
+  extern void ipMITKSegmentationUndoDisable (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Checks if the undo operation is enabled.
     @param segmentation the segmentation
     */
-  extern ipBool_t ipMITKSegmentationUndoIsEnabled (ipPicDescriptor* segmentation);
+  extern ipBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Checks if any data for undo is available.
     pending?
     */
-  extern ipBool_t ipMITKSegmentationUndoAvailable (ipPicDescriptor* segmentation);
+  extern ipBool_t ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Save the segmentation image before it is changed.
     @param segmentation the segmentation
     */
-  extern void ipMITKSegmentationUndoSave (ipPicDescriptor* segmentation);
+  extern void ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Steps to the previous undo level. The data which has been saved 
     before the last modifications will be restored.
     */
-  extern void ipMITKSegmentationUndo (ipPicDescriptor* segmentation);
+  extern void ipMITKSegmentationUndo (mitkIpPicDescriptor* segmentation);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }
@@ -146,11 +146,11 @@ extern "C"
   If maxIterations is > 0, the growing process is stopped after maxIterations.
   If segBuffer is 0, new memory for the segmented image is allocated and returned, else the segBuffer is used
   to store the result (has to be an 8-bit datatype, e.g. ipUInt1_t).
-  histBuffer must be 0 or a pointer to a 16-bit ipPicUInt image of the same size as src. In case of the latter, 
+  histBuffer must be 0 or a pointer to a 16-bit mitkIpPicUInt image of the same size as src. In case of the latter, 
   history data is written to that buffer: the seed pixel gets a 1, all direct neighbours 2 etc. The buffer is
   not cleared in this function and can thus hold history data of several growing processes in different areas.
   */
-extern ipPicDescriptor* ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, ipPicDescriptor *segBuffer, ipPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer=0 );
 
 /*!
   Same as the other ipMITKSegmentationGrowRegion4N with two additional return values:
@@ -158,19 +158,19 @@ extern ipPicDescriptor* ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, in
   Take care: if the region could not grow at all (e.g. with fixed borders) contourOfs will be -1 !!!
   startCol holds the color that was used as base if relativeBounds is true
   */
-extern ipPicDescriptor* ipMITKSegmentationGrowRegion4N( ipPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, ipPicDescriptor *segBuffer, int &contourOfs, float &startCol, ipPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer=0 );
 
 /*!
   Replaces the 4 neighbourhood region around startOfs (y*picWidth+x) of the 2D segmented image seg with newValue.
   Seg has to be an 8-bit datatype, e.g. ipUInt1_t.
   Returns the number of replaced pixels. If newValue is the same as the old value, the function returns 0.
   */
-extern int ipMITKSegmentationReplaceRegion4N( ipPicDescriptor *seg, int startOfs, ipInt1_t newValue );
+extern int ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt1_t newValue );
 
 /*!
   Same as above, but for the 8 neighbourhood contour.
   */
-extern float* ipMITKSegmentationGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=0 );
+extern float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=0 );
 
 
 typedef struct {
@@ -190,14 +190,14 @@ typedef struct {
   and can later be used to split the segmentation. This funtion is useful for detecting and removing leaks in
   region growing.
   */
-extern tCutResult ipMITKSegmentationGetCutPoints( ipPicDescriptor *seg, ipPicDescriptor *history, int ofs );
+extern tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDescriptor *history, int ofs );
 
 /*!
   Creates a grower history (i.e. the order in which a region grower would have segmented the area) of the given
   segmentation, origin of the grower is startOfs. histBuffer must be a 16bit unsigned int or 0, in the latter
   case the pic is created.
   */
-extern ipPicDescriptor* ipMITKSegmentationCreateGrowerHistory( ipPicDescriptor *seg, int startOfs, ipPicDescriptor *histBuffer );
+extern mitkIpPicDescriptor* ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, mitkIpPicDescriptor *histBuffer );
 
 /*!
   Splits a contour in two parts. contour is the original contour, cutCoords a pointer to an x1-y1-x2-y2 array that

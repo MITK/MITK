@@ -57,29 +57,29 @@
  * @return  standard deviation
  *
  * USES
- *     function ipFuncVar: to calculate the variance of an image
+ *     function mitkIpFuncVar: to calculate the variance of an image
  *
  * AUTHOR
  */
  
 /* include-files                                              */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
- ipFloat8_t ipFuncSDev ( ipPicDescriptor *pic );
+ ipFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
 
-ipFloat8_t ipFuncSDev ( ipPicDescriptor *pic )
+ipFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic )
 {
 
   ipFloat8_t s_der;           /* standard deviation          */
 
   /* check image data                                         */
 
-  if ( _ipFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
-  s_der = sqrt ( ipFuncVar ( pic ) );
+  s_der = sqrt ( mitkIpFuncVar ( pic ) );
   
   return( s_der );
 }

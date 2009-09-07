@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <ipPic/ipPicTypeMultiplex.h>
+#include <ipPic/mitkIpPicTypeMultiplex.h>
 #include "ipSegmentation.h"
 
 
@@ -48,7 +48,7 @@ if (numPts==resSize) {              \
 }
 
 template<typename PicType>
-float* tmGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPts, int &resSize, float *result )
+float* tmGetContour4N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts, int &resSize, float *result )
 // returns the number of contour points (xy-pairs) in result
 // optimized macros: DON'T TOUCH THE CODE (removed smiley, this is not funny but cruel for any maintainer!)
 {
@@ -103,7 +103,7 @@ float* tmGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
 }
 
 
-float* ipMITKSegmentationGetContour4N( const ipPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
+float* ipMITKSegmentationGetContour4N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
 {
   float *newBuffer = NULL;
   mitkIpPicTypeMultiplexR4( tmGetContour4N, seg, newBuffer, startOfs, numPoints, sizeBuffer, pointBuffer );
@@ -112,7 +112,7 @@ float* ipMITKSegmentationGetContour4N( const ipPicDescriptor *seg, int startOfs,
 
 
 template<typename PicType>
-float* tmGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPts, int &resSize, float *result )
+float* tmGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts, int &resSize, float *result )
 // returns the number of contour points (xy-pairs) in result
 // optimized macros: DON'T TOUCH THE CODE ;-)
 {
@@ -192,7 +192,7 @@ float* tmGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPts, in
 }
 
 
-float* ipMITKSegmentationGetContour8N( const ipPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
+float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer )
 {
   float *newBuffer = NULL;
   mitkIpPicTypeMultiplexR4( tmGetContour8N, seg, newBuffer, startOfs, numPoints, sizeBuffer, pointBuffer );

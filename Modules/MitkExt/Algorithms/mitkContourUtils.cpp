@@ -108,8 +108,8 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   }
 
   assert( sliceImage->GetSliceData() );
-  ipPicDescriptor* originalPicSlice = sliceImage->GetSliceData()->GetPicDescriptor();
-  ipPicDescriptor* picSlice = ipMITKSegmentationNew( originalPicSlice );
+  mitkIpPicDescriptor* originalPicSlice = sliceImage->GetSliceData()->GetPicDescriptor();
+  mitkIpPicDescriptor* picSlice = ipMITKSegmentationNew( originalPicSlice );
   ipMITKSegmentationClear( picSlice );
 
   assert( originalPicSlice && picSlice );

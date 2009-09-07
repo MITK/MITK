@@ -51,7 +51,7 @@
 /** @brief calculates the square root of all pixels
  *
  *  @param pic_1      pointer to the first image
- *  @param keep       tells whether the image type could be changed to ipPicFloat
+ *  @param keep       tells whether the image type could be changed to mitkIpPicFloat
  *                  keep =  : image data type could be changed
  *                  keep =  : image data type of original pictures is
  *                             kept (if there will be an over-/underflow
@@ -66,11 +66,11 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
-                              ipFuncFlagI_t    keep,
-                              ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncSqrt ( mitkIpPicDescriptor *pic_1,
+                              mitkIpFuncFlagI_t    keep,
+                              mitkIpPicDescriptor *pic_return );
 #ifndef DOXYGEN_IGNORE
 
 /* definition of macros                                                 */
@@ -86,7 +86,7 @@ ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
   ipUInt4_t  i, no_elem;                                                 \
   ipFloat8_t help;                                                       \
                                                                          \
-  no_elem = _ipPicElements ( pic_1 );                                    \
+  no_elem = _mitkIpPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
        help  = ( ipFloat8_t ) (( type_1 * ) pic_1->data ) [i];           \
@@ -102,60 +102,60 @@ ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
-                              ipFuncFlagI_t    keep,
-                              ipPicDescriptor *pic_return )
+mitkIpPicDescriptor *mitkIpFuncSqrt ( mitkIpPicDescriptor *pic_1,
+                              mitkIpFuncFlagI_t    keep,
+                              mitkIpPicDescriptor *pic_return )
 {
 
-  ipPicDescriptor *pic_new;         /* pointer to new image             */
+  mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
   ipUInt4_t       i;                /* loop index                       */
   ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
 
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. greyvalues of both images                  */
 
-  if ( ipFuncExtr ( pic_1, &min1, &max1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( mitkIpFuncExtr ( pic_1, &min1, &max1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. and min. possible greyvalues for data type of images*/
 
   /* find out data type of new iamge                                    */
 
-  if ( keep == ipFuncKeep )
+  if ( keep == mitkIpFuncKeep )
     {
-       pic_new = _ipFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );
+       pic_new = _mitkIpFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );
        if ( pic_new == NULL ) return ( mitkIpFuncERROR );
     }
-  else if ( keep == ipFuncNoKeep )
+  else if ( keep == mitkIpFuncNoKeep )
     {
-       pic_new = ipPicNew ();
+       pic_new = mitkIpPicNew ();
        pic_new->dim  = pic_1->dim;
        pic_new->bpe  = 64;
-       pic_new->type = ipPicFloat;
+       pic_new->type = mitkIpPicFloat;
        for ( i = 0; i < pic_new->dim; i++ ) 
           pic_new->n[i] = pic_1->n[i];
     }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   if ( pic_new == NULL )
     {  
-       _ipFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
-  if ( keep == ipFuncNoKeep )
-    pic_new->data = malloc ( _ipPicSize  ( pic_new ) );
+  if ( keep == mitkIpFuncNoKeep )
+    pic_new->data = malloc ( _mitkIpPicSize  ( pic_new ) );
   if ( pic_new->data == NULL )
     {
-       ipPicFree ( pic_new );
-       _ipFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
+       mitkIpPicFree ( pic_new );
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 
@@ -165,7 +165,7 @@ ipPicDescriptor *ipFuncSqrt ( ipPicDescriptor *pic_1,
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_1);
+  mitkIpFuncCopyTags(pic_new, pic_1);
                         
   return pic_new;
 }

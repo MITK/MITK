@@ -4,11 +4,11 @@ EXTRA_DIST = libipFunc.dsp ipFunc.dsp ipFunc.dox
 
 bin_PROGRAMS = ipFunc
 lib_LIBRARIES = libipFunc.a
-pkginclude_HEADERS = ipFunc.h
+pkginclude_HEADERS = mitkIpFunc.h
 noinst_HEADERS =		\
       gradient.h               	\
       ipArithmeticAndLogical.h 	\
-      ipFuncP.h                	\
+      mitkIpFuncP.h                	\
       ipGeometrical.h          	\
       ipLocal.h                	\
       ipMorphological.h        	\

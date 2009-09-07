@@ -24,7 +24,7 @@
 
 #include <assert.h>
 #include <math.h>
-#include <ipFunc/ipFunc.h>
+#include <ipFunc/mitkIpFunc.h>
 #include "GraphicsGems.h"
 #include "ipSegmentationP.h"
 
@@ -194,21 +194,21 @@ int compare_active(arg1, arg2) const void *arg1, *arg2;
 }
 
 
-void ipMITKSegmentationCombineRegion   (ipPicDescriptor* segmentation, const ipInt4_t* const points, const int num, ipPicDescriptor* mask, const int operation, int value)
+void ipMITKSegmentationCombineRegion   (mitkIpPicDescriptor* segmentation, const ipInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value)
 {
     int idx;
     Point2* pl;
     Window *win;
-    ipPicTSV_t* tag;
+    mitkIpPicTSV_t* tag;
 
     assert (segmentation);
     if (ipMITKSegmentationUndoIsEnabled (segmentation)) {
 	  ipMITKSegmentationUndoSave (segmentation);
 	}
-	tag = ipPicQueryTag (segmentation, tagSEGMENTATION_EMPTY);
-	tag = ipPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
+	tag = mitkIpPicQueryTag (segmentation, tagSEGMENTATION_EMPTY);
+	tag = mitkIpPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
 	if (tag) {
-		ipPicFreeTag (tag);
+		mitkIpPicFreeTag (tag);
 	}
 
     win = (Window *) malloc (sizeof (Window));

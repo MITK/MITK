@@ -27,11 +27,11 @@ PURPOSE.  See the above copyright notices for more information.
 int mitkPicFileReaderTest(int argc, char* argv[])
 {
   //independently read header of pic file
-  ipPicDescriptor *picheader=NULL;
+  mitkIpPicDescriptor *picheader=NULL;
   if(argc>=1)
   {
     if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
-      picheader = ipPicGetHeader(argv[1], NULL);
+      picheader = mitkIpPicGetHeader(argv[1], NULL);
   }
   if(picheader==NULL)
   {
@@ -39,7 +39,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
     std::cout<<"[TEST DONE]"<<std::endl;
     return EXIT_SUCCESS;
   }
-  ipPicGetTags(argv[1], picheader);
+  mitkIpPicGetTags(argv[1], picheader);
 
   //Read pic-Image from file
 	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
@@ -176,7 +176,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
     std::cout<<"[PASSED]"<<std::endl;
   }
 
-  ipPicFree(picheader);
+  mitkIpPicFree(picheader);
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

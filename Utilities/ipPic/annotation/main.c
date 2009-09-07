@@ -73,7 +73,7 @@ main( int argc, char *argv[] )
   XtSetArg( args[n], XmNx, 0 ); n++;
   XtSetArg( args[n], XmNy, 0 ); n++;
   XtSetArg( args[n], XipNquantisation, True ); n++;
-  XtSetArg( args[n], XipNpic, ipPicGet( "../b.pic", NULL ) ); n++;
+  XtSetArg( args[n], XipNpic, mitkIpPicGet( "../b.pic", NULL ) ); n++;
   pic = XtCreateManagedWidget( "pic",
                                xipPicWidgetClass,
                                bb,
@@ -82,29 +82,29 @@ main( int argc, char *argv[] )
   XtRealizeWidget( toplevel );
 /**************/
   {
-    ipPicDescriptor *pic;
-    _ipPicTagsElement_t *head;
-    ipPicTSV_t *tsv;
+    mitkIpPicDescriptor *pic;
+    _mitkIpPicTagsElement_t *head;
+    mitkIpPicTSV_t *tsv;
 
-    pic = ipPicGetTags( "../b.pic",
+    pic = mitkIpPicGetTags( "../b.pic",
                         NULL );
-    tsv = ipPicQueryTag( pic, "ANNOTATION" );
+    tsv = mitkIpPicQueryTag( pic, "ANNOTATION" );
     if( tsv != NULL )
       {
         head = tsv->value;
 
-        tsv = _ipPicFindTag( head, "TEXT" )->tsv;
+        tsv = _mitkIpPicFindTag( head, "TEXT" )->tsv;
         text = malloc( strlen(tsv->value) );
         strcpy( text, tsv->value );
         printf( "%s\n", text );
 
-        tsv = _ipPicFindTag( head, "POSITION" )->tsv;
+        tsv = _mitkIpPicFindTag( head, "POSITION" )->tsv;
         x = ((ipUInt4_t *)(tsv->value))[0];
         y = ((ipUInt4_t *)(tsv->value))[1];
         printf( "%i %i\n", x, y );
       }
 
-    ipPicFree( pic );
+    mitkIpPicFree( pic );
   }
 /**************/
   XtVaSetValues( annotation,

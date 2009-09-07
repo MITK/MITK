@@ -70,7 +70,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   mitk::Image::Pointer newMitkImage = mitk::Image::New();
   mitk::CastToMitkImage( outputItk, newMitkImage );
 
-  ipPicDescriptor* image3D = newMitkImage->GetVolumeData(0)->GetPicDescriptor();
+  mitkIpPicDescriptor* image3D = newMitkImage->GetVolumeData(0)->GetPicDescriptor();
   this->GetOutput()->SetPicVolume( image3D , timestep );
 }
 

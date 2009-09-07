@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeSlicedGeometry.h"
 #include <itkEventObject.h>
 #include <itkCommand.h>
-#include <ipPicTypeMultiplex.h>
+#include <mitkIpPicTypeMultiplex.h>
 #include <sstream>
 
 
@@ -437,7 +437,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     virtual ~SliceNavigationController();
 
     template <class T>
-    static void buildstring( ipPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)
+    static void buildstring( mitkIpPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)
     {
       std::string value;
       std::stringstream stream;

@@ -8,22 +8,22 @@ OBJECTS_DIR = obj
 DESTDIR = .
 
 SOURCES = \
-      ipPicInfo.c ipPicType.c                           \
-      ipPicAddT.c ipPicQueryT.c ipPicDelT.c ipPicGetT.c \
-      ipPicOldGet.c ipPicOldGetH.c ipPicOldGetS.c       \
-      ipPicGet.c ipPicGetH.c ipPicGetS.c                \
-      ipPicPut.c ipPicPutS.c                            \
-      ipPicGetMem.c ipPicPutMem.c                       \
-      ipPicCopyS.c ipPicCopyH.c                         \
-      ipPicNew.c ipPicClear.c ipPicFree.c ipPicClone.c  \
+      mitkIpPicInfo.c mitkIpPicType.c                           \
+      mitkIpPicAddT.c mitkIpPicQueryT.c mitkIpPicDelT.c mitkIpPicGetT.c \
+      mitkIpPicOldGet.c mitkIpPicOldGetH.c mitkIpPicOldGetS.c       \
+      mitkIpPicGet.c mitkIpPicGetH.c mitkIpPicGetS.c                \
+      mitkIpPicPut.c mitkIpPicPutS.c                            \
+      mitkIpPicGetMem.c mitkIpPicPutMem.c                       \
+      mitkIpPicCopyS.c mitkIpPicCopyH.c                         \
+      mitkIpPicNew.c mitkIpPicClear.c mitkIpPicFree.c mitkIpPicClone.c  \
       ipEndian.c ipFRead.c ipFWrite.c                   \
       ipError.c                                         \
-      ipPicSize.c ipPicElements.c                       \
-      ipPicTSVSize.c ipPicTSVElements.c
+      mitkIpPicSize.c mitkIpPicElements.c                       \
+      mitkIpPicTSVSize.c mitkIpPicTSVElements.c
 
 win32:SOURCES+= win32/zlib.lib
 
-HEADERS = ipPic.h ipTypes.h ipPicOldP.h ipPicAnnotation.h 
+HEADERS = mitkIpPic.h mitkIpTypes.h mitkIpPicOldP.h mitkIpPicAnnotation.h 
 
 INCLUDEPATH = .. .
 win32:INCLUDEPATH+=win32

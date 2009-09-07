@@ -92,7 +92,7 @@
  * switched to new what string format
  *
  * Revision 1.2  1997/09/15  10:24:13  andre
- * ipPicPut now returns status
+ * mitkIpPicPut now returns status
  *
  * Revision 0.1  1993/04/02  16:18:39  andre
  * now works on PC, SUN and DECstation
@@ -105,16 +105,16 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicPut\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicPut\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
 extern size_t
-_ipPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
+_mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
 
 int
-ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
+mitkIpPicPut( const char *outfile_name, mitkIpPicDescriptor *pic )
 {
   FILE *outfile;
 
@@ -123,13 +123,13 @@ ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
 
   if( pic->info->write_protect )
     {
-      fprintf( stderr, "ipPicPut: sorry, can't write (missing tags !!!)\n" );
+      fprintf( stderr, "mitkIpPicPut: sorry, can't write (missing tags !!!)\n" );
       return( -1 );
     }
 
   if( mitkIpPicEncryptionType(pic) != ' ' )
     {
-      fprintf( stderr, "ipPicPut: warning: was encrypted !!!\n" );
+      fprintf( stderr, "mitkIpPicPut: warning: was encrypted !!!\n" );
     }
 
   if( outfile_name == NULL )
@@ -138,9 +138,9 @@ ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
     outfile = stdout;
   else
     {
-      ipPicRemoveFile( outfile_name );
+      mitkIpPicRemoveFile( outfile_name );
 
-      if( ipPicGetWriteCompression() )
+      if( mitkIpPicGetWriteCompression() )
         {
           char buff[1024];
 
@@ -154,20 +154,20 @@ ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
 
   if( outfile == NULL )
     {
-      fprintf( stderr, "ipPicPut: sorry, error opening outfile\n" );
+      fprintf( stderr, "mitkIpPicPut: sorry, error opening outfile\n" );
       return( -1 );
     }
 
-  tags_len = _ipPicTagsSize( pic->info->tags_head );
+  tags_len = _mitkIpPicTagsSize( pic->info->tags_head );
 
   len = tags_len +        3 * sizeof(ipUInt4_t)
                  + pic->dim * sizeof(ipUInt4_t);
 
   /* write oufile */
   if( mitkIpPicEncryptionType(pic) == ' ' )
-    mitkIpPicFWrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+    mitkIpPicFWrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
   else
-    mitkIpPicFWrite( pic->info->version, 1, sizeof(ipPicTag_t), outfile );
+    mitkIpPicFWrite( pic->info->version, 1, sizeof(mitkIpPicTag_t), outfile );
 
   mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
 
@@ -177,24 +177,24 @@ ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
 
   mitkIpPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
 
-  _ipPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
+  _mitkIpPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
 
-  if( ipPicGetWriteCompression() )
+  if( mitkIpPicGetWriteCompression() )
     pic->info->pixel_start_in_file = mitkIpPicFTell( outfile );
   else
     pic->info->pixel_start_in_file = ftell( outfile );
 
   if( pic->data )
     {
-      if( pic->type == ipPicNonUniform )
-        mitkIpPicFWrite( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+      if( pic->type == mitkIpPicNonUniform )
+        mitkIpPicFWrite( pic->data, pic->bpe / 8, _mitkIpPicElements(pic), outfile );
       else
-        mitkIpPicFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+        mitkIpPicFWriteLE( pic->data, pic->bpe / 8, _mitkIpPicElements(pic), outfile );
     }
 
   if( outfile != stdout )
     {
-      if( ipPicGetWriteCompression() )
+      if( mitkIpPicGetWriteCompression() )
         mitkIpPicFClose( outfile );
       else
         fclose( outfile );
@@ -203,9 +203,9 @@ ipPicPut( const char *outfile_name, ipPicDescriptor *pic )
   return( 0 );
 }
 
-ipUInt4_t _ipPicTagsSize( _ipPicTagsElement_t *head )
+ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
 {
-  _ipPicTagsElement_t *current = head;
+  _mitkIpPicTagsElement_t *current = head;
   ipUInt4_t tags_len;
 
   tags_len = 0;
@@ -213,26 +213,26 @@ ipUInt4_t _ipPicTagsSize( _ipPicTagsElement_t *head )
     {
       ipUInt4_t  len;
 
-      if( current->tsv->type == ipPicTSV )
+      if( current->tsv->type == mitkIpPicTSV )
         {
           if( current->tsv->dim == 0 )
             {
-              current->tsv->n[0] = _ipPicTagsNumber(current->tsv->value);
+              current->tsv->n[0] = _mitkIpPicTagsNumber(current->tsv->value);
 
               if( current->tsv->n[0] > 0 )
                 current->tsv->dim = 1;
             }
 
-          len = _ipPicTagsSize( (_ipPicTagsElement_t *)current->tsv->value );
+          len = _mitkIpPicTagsSize( (_mitkIpPicTagsElement_t *)current->tsv->value );
         }
       else
         {
           ipUInt4_t  elements;
 
-          elements = _ipPicTSVElements( current->tsv );
+          elements = _mitkIpPicTSVElements( current->tsv );
 
-          if( current->tsv->type == ipPicASCII
-              || current->tsv->type == ipPicNonUniform )
+          if( current->tsv->type == mitkIpPicASCII
+              || current->tsv->type == mitkIpPicNonUniform )
             current->tsv->bpe = 8;
 
           len = elements * current->tsv->bpe / 8;
@@ -249,9 +249,9 @@ ipUInt4_t _ipPicTagsSize( _ipPicTagsElement_t *head )
   return( tags_len );
 }
 
-ipUInt4_t _ipPicTagsNumber( _ipPicTagsElement_t *head )
+ipUInt4_t _mitkIpPicTagsNumber( _mitkIpPicTagsElement_t *head )
 {
-  _ipPicTagsElement_t *current = head;
+  _mitkIpPicTagsElement_t *current = head;
   ipUInt4_t tags_number;
 
   tags_number = 0;
@@ -264,35 +264,35 @@ ipUInt4_t _ipPicTagsNumber( _ipPicTagsElement_t *head )
   return( tags_number );
 }
 
-void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_type )
+void _mitkIpPicWriteTags( _mitkIpPicTagsElement_t *head, FILE *stream, char encryption_type )
 {
-  _ipPicTagsElement_t *current = head;
+  _mitkIpPicTagsElement_t *current = head;
 
   while( current != NULL )
     {
       ipUInt4_t  elements;
       ipUInt4_t  len;
 
-      elements = _ipPicTSVElements( current->tsv );
+      elements = _mitkIpPicTSVElements( current->tsv );
 
-      if( current->tsv->type == ipPicTSV )
+      if( current->tsv->type == mitkIpPicTSV )
         {
           if( current->tsv->dim == 0 )
             {
-              current->tsv->n[0] = _ipPicTagsNumber(current->tsv->value);
+              current->tsv->n[0] = _mitkIpPicTagsNumber(current->tsv->value);
 
               if( current->tsv->n[0] > 0 )
                 current->tsv->dim = 1;
             }
 
-          assert( elements == _ipPicTagsNumber(current->tsv->value) );
+          assert( elements == _mitkIpPicTagsNumber(current->tsv->value) );
 
-          len = _ipPicTagsSize( current->tsv->value );
+          len = _mitkIpPicTagsSize( current->tsv->value );
         }
       else
         {
-          if( current->tsv->type == ipPicASCII
-              || current->tsv->type == ipPicNonUniform )
+          if( current->tsv->type == mitkIpPicASCII
+              || current->tsv->type == mitkIpPicNonUniform )
             current->tsv->bpe = 8;
 
           len = elements * current->tsv->bpe / 8;
@@ -302,7 +302,7 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
       len +=                   3 * sizeof(ipUInt4_t)  /* type, bpe, dim */
              + current->tsv->dim * sizeof(ipUInt4_t); /* n[]            */
 
-      mitkIpPicFWrite( current->tsv->tag, 1, sizeof(ipPicTag_t), stream );
+      mitkIpPicFWrite( current->tsv->tag, 1, sizeof(mitkIpPicTag_t), stream );
 
       mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, stream );
 
@@ -311,9 +311,9 @@ void _ipPicWriteTags( _ipPicTagsElement_t *head, FILE *stream, char encryption_t
       mitkIpPicFWriteLE( &(current->tsv->dim), sizeof(ipUInt4_t), 1, stream );
       mitkIpPicFWriteLE( &(current->tsv->n), sizeof(ipUInt4_t), current->tsv->dim, stream );
 
-      if( current->tsv->type == ipPicTSV )
+      if( current->tsv->type == mitkIpPicTSV )
         {
-          _ipPicWriteTags( current->tsv->value,
+          _mitkIpPicWriteTags( current->tsv->value,
                            stream,
                            encryption_type );
         }

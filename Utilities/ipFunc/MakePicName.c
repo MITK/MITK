@@ -59,7 +59,7 @@
  *
  * AUTHOR & DATE
  */
-char *ipFuncMakePicName ( char *pic_name, char *extension );
+char *mitkIpFuncMakePicName ( char *pic_name, char *extension );
 
 #ifndef lint
   static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
@@ -79,7 +79,7 @@ char *ipFuncMakePicName ( char *pic_name, char *extension );
 /* ===================================================================*/
 
 
-char *ipFuncMakePicName ( char *pic_name, char *extension )
+char *mitkIpFuncMakePicName ( char *pic_name, char *extension )
 {
 
    char *result_name;

@@ -93,6 +93,6 @@ typedef struct
               type,
               ntxt,
               ltxt;
-  } _ipPicOldHeader;
+  } _mitkIpPicOldHeader;
 #endif    /* ifdef _mitkIpPicOldP_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

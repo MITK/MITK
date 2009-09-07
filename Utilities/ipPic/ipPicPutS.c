@@ -93,7 +93,7 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicPutSlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicPutSlice\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -101,15 +101,15 @@
 #include <stddef.h>
 
 
-void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t slice )
+void mitkIpPicPutSlice( const char *outfile_name, mitkIpPicDescriptor *pic, ipUInt4_t slice )
 {
-  ipPicDescriptor *pic_in;
+  mitkIpPicDescriptor *pic_in;
 
   FILE *outfile;
   
   size_t ignored;
 
-  pic_in = ipPicGetHeader( outfile_name,
+  pic_in = mitkIpPicGetHeader( outfile_name,
                            NULL );
 
   if( pic_in == NULL )
@@ -121,9 +121,9 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
           pic->n[pic->dim] = 1;
           pic->dim += 1;
 
-          compression = ipPicSetWriteCompression( ipFalse );
-          ipPicPut( outfile_name, pic );
-          ipPicSetWriteCompression( compression );
+          compression = mitkIpPicSetWriteCompression( ipFalse );
+          mitkIpPicPut( outfile_name, pic );
+          mitkIpPicSetWriteCompression( compression );
 
           pic->dim -= 1;
           pic->n[pic->dim] = 0;
@@ -134,14 +134,14 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
         return;
     }
 
-  pic_in = ipPicGetTags( outfile_name,
+  pic_in = mitkIpPicGetTags( outfile_name,
                          pic_in );
 
   outfile = fopen( outfile_name, "r+b" );
 
   if( outfile == NULL )
     {
-      /*ipPrintErr( "ipPicPut: sorry, error opening outfile\n" );*/
+      /*ipPrintErr( "mitkIpPicPut: sorry, error opening outfile\n" );*/
       /*return();*/
     }
 
@@ -167,7 +167,7 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
   /* write outfile */
   /*fseek( outfile, 0, SEEK_SET );*/
   rewind( outfile );
-  ignored = fwrite( mitkIpPicVERSION, 1, sizeof(ipPicTag_t), outfile );
+  ignored = fwrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
 
   fseek( outfile, sizeof(ipUInt4_t), SEEK_CUR ); /* skip tags_len */
 
@@ -177,15 +177,15 @@ void ipPicPutSlice( const char *outfile_name, ipPicDescriptor *pic, ipUInt4_t sl
 
   ignored = mitkIpFWriteLE( pic_in->n, sizeof(ipUInt4_t), pic_in->dim, outfile );
 
-  fseek( outfile, pic_in->info->pixel_start_in_file + _ipPicSize(pic) * (slice - 1), SEEK_SET );
+  fseek( outfile, pic_in->info->pixel_start_in_file + _mitkIpPicSize(pic) * (slice - 1), SEEK_SET );
 
-  ignored = mitkIpFWriteLE( pic->data, pic->bpe / 8, _ipPicElements(pic), outfile );
+  ignored = mitkIpFWriteLE( pic->data, pic->bpe / 8, _mitkIpPicElements(pic), outfile );
 
   /*fseek( outfile, 0, SEEK_END );*/
 
   fclose( outfile );
 
-  ipPicFree(pic_in);
+  mitkIpPicFree(pic_in);
 
   /*return();*/
 }

@@ -65,9 +65,9 @@
  *
  * AUTHOR & DATE
  */
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipUInt4_t  ipFuncExtrR  ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
                           ipFloat8_t      *min,   
                           ipFloat8_t      *max, 
                           ipUInt4_t       *begin,
@@ -76,28 +76,28 @@ ipUInt4_t  ipFuncExtrR  ( ipPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncExtrR\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncExtrR\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
-ipUInt4_t  ipFuncExtrR  ( ipPicDescriptor *pic_old,
+ipUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
                           ipFloat8_t      *min,   
                           ipFloat8_t      *max, 
                           ipUInt4_t       *begin,
                           ipUInt4_t       *length )
 {
 
-   ipPicDescriptor *pic_help;
+   mitkIpPicDescriptor *pic_help;
    ipInt4_t        error;
 
-   pic_help = ipFuncWindow ( pic_old, begin, length );
+   pic_help = mitkIpFuncWindow ( pic_old, begin, length );
 
    if ( pic_help )
-      error = ipFuncExtr ( pic_help, min, max );
+      error = mitkIpFuncExtr ( pic_help, min, max );
    else 
      return ( mitkIpFuncERROR );
 
-   ipPicFree ( pic_help );
+   mitkIpPicFree ( pic_help );
 
    return ( error );
 }

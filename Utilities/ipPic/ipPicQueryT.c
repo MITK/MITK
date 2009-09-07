@@ -49,7 +49,7 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)ipPicQueryTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicQueryTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -67,24 +67,24 @@
  *  none
  */
 
-ipPicTSV_t *
-ipPicQueryTag( ipPicDescriptor *pic, const char *tag )
+mitkIpPicTSV_t *
+mitkIpPicQueryTag( mitkIpPicDescriptor *pic, const char *tag )
 {
-  _ipPicTagsElement_t *found;
+  _mitkIpPicTagsElement_t *found;
 
-  found = _ipPicFindTag( pic->info->tags_head, tag );
+  found = _mitkIpPicFindTag( pic->info->tags_head, tag );
 
   if( found == NULL )
     return( NULL );
   else
     return( found->tsv );
 }
-ipPicTSV_t *
-ipPicQuerySubTag( ipPicTSV_t *parent, const char *tag )
+mitkIpPicTSV_t *
+mitkIpPicQuerySubTag( mitkIpPicTSV_t *parent, const char *tag )
 {
-  _ipPicTagsElement_t *found;
+  _mitkIpPicTagsElement_t *found;
 
-  found = _ipPicFindTag( parent->value, tag );
+  found = _mitkIpPicFindTag( parent->value, tag );
 
   if( found == NULL )
     return( NULL );
@@ -92,12 +92,12 @@ ipPicQuerySubTag( ipPicTSV_t *parent, const char *tag )
     return( found->tsv );
 }
 
-_ipPicTagsElement_t *
-_ipPicFindTag( _ipPicTagsElement_t *head, const char *tag )
+_mitkIpPicTagsElement_t *
+_mitkIpPicFindTag( _mitkIpPicTagsElement_t *head, const char *tag )
 {
   int i;
   char name[_mitkIpPicTAGLEN+1];
-  _ipPicTagsElement_t *current;
+  _mitkIpPicTagsElement_t *current;
 
   if( !tag )
     return( NULL );

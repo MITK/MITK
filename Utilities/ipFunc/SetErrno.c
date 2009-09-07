@@ -45,11 +45,11 @@
 *****************************************************************************/
 
 /**@file
- *   this functions sets a global error-number (ipFuncErrno) if an error
+ *   this functions sets a global error-number (mitkIpFuncErrno) if an error
  *   occured     
  */
 
-/**  this functions sets a global error-number (ipFuncErrno) if an error
+/**  this functions sets a global error-number (mitkIpFuncErrno) if an error
  *   occured     
  *
  *   @param error_no  number which describes the error
@@ -61,29 +61,29 @@
 
 /* include files */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)_ipFuncSetErrno\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)_mitkIpFuncSetErrno\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
 /* gloabal variables */
 
-int ipFuncErrno;
+int mitkIpFuncErrno;
 
 /* ------------------------------------------------------------------- */
 
 /*
-** _ipFuncSetErrno
+** _mitkIpFuncSetErrno
 */
 
-void _ipFuncSetErrno ( int error_no )
+void _mitkIpFuncSetErrno ( int error_no )
 {
-   ipFuncErrno = error_no;
+   mitkIpFuncErrno = error_no;
 
    return;
 }
@@ -91,15 +91,15 @@ void _ipFuncSetErrno ( int error_no )
 /* ------------------------------------------------------------------- */
 
 /*
-** ipFuncPError       
+** mitkIpFuncPError       
 */
 
 
-void ipFuncPError ( char *string )
+void mitkIpFuncPError ( char *string )
 {
    char *err_string=NULL;
 
-   switch ( ipFuncErrno )
+   switch ( mitkIpFuncErrno )
      {
         case mitkIpFuncOK :
              err_string = "ipFunc: no error occured";

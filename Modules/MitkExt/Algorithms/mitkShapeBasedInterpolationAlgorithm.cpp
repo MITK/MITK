@@ -46,19 +46,19 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   correctPixelTypeLowerITKSlice->SetDirection(imageDirection);
   correctPixelTypeUpperITKSlice->SetDirection(imageDirection);
 
-  // back-convert to MITK images to access a ipPicDescriptor
+  // back-convert to MITK images to access a mitkIpPicDescriptor
   Image::Pointer correctPixelTypeLowerMITKSlice = Image::New();
   CastToMitkImage( correctPixelTypeLowerITKSlice, correctPixelTypeLowerMITKSlice );
-  ipPicDescriptor* lowerPICSlice = correctPixelTypeLowerMITKSlice->GetSliceData()->GetPicDescriptor();
+  mitkIpPicDescriptor* lowerPICSlice = correctPixelTypeLowerMITKSlice->GetSliceData()->GetPicDescriptor();
   
   Image::Pointer correctPixelTypeUpperMITKSlice = Image::New();
   CastToMitkImage( correctPixelTypeUpperITKSlice, correctPixelTypeUpperMITKSlice );
-  ipPicDescriptor* upperPICSlice = correctPixelTypeUpperMITKSlice->GetSliceData()->GetPicDescriptor();
+  mitkIpPicDescriptor* upperPICSlice = correctPixelTypeUpperMITKSlice->GetSliceData()->GetPicDescriptor();
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
 
-  ipPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
+  mitkIpPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
   if (!ipPicResult) return NULL;
 
   Geometry3D::Pointer originalGeometry = resultImage->GetGeometry();
@@ -66,7 +66,7 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   resultImage->SetPicSlice( ipPicResult );
   resultImage->SetGeometry( originalGeometry );
 
-  ipPicFree( ipPicResult );
+  mitkIpPicFree( ipPicResult );
 
   return resultImage;
 }

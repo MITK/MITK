@@ -45,16 +45,16 @@
 *****************************************************************************/
 
 /** @file
- *  prints information about an ipPicDescriptor
+ *  prints information about an mitkIpPicDescriptor
  */
 
 #ifndef lint
-  static char *what = { "@(#)_ipPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpPicInfo\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-/** prints information about an ipPicDescriptor
+/** prints information about an mitkIpPicDescriptor
  *
  *  @param stream	the output FILE*
  *  @param pic		the pic	
@@ -77,14 +77,14 @@
 #define Min(x, y) (((x) < (y)) ? (x) : (y))
 #define Max(x, y) (((x) > (y)) ? (x) : (y))
 
-void _ipPicInfo( FILE *stream, ipPicDescriptor *pic, ipUInt4_t flags )
+void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, ipUInt4_t flags )
 {
   ipUInt4_t i;
 
   fprintf( stream, "%.*s\n", _mitkIpPicTAGLEN, pic->info->version );
   fprintf( stream, "--------------------\n" );
 
-  fprintf( stream, "type: %s [%i]\n", ipPicTypeName(pic->type), pic->type );
+  fprintf( stream, "type: %s [%i]\n", mitkIpPicTypeName(pic->type), pic->type );
 
   fprintf( stream, "bpe : %i\n", pic->bpe );
 
@@ -97,19 +97,19 @@ void _ipPicInfo( FILE *stream, ipPicDescriptor *pic, ipUInt4_t flags )
       && pic->info->tags_head != NULL )
     fprintf( stream, "--------------------\n" );
 
-  _ipPicInfoPrintTags( stream,
+  _mitkIpPicInfoPrintTags( stream,
                        pic->info->tags_head,
                        1,
                        flags );
 
   fprintf( stream, "--------------------\n" );
-  fprintf( stream, "size of the image data: %u\n", _ipPicSize( pic ) );
+  fprintf( stream, "size of the image data: %u\n", _mitkIpPicSize( pic ) );
 }
 
-void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t level, ipUInt4_t flags )
+void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUInt4_t level, ipUInt4_t flags )
 {
   ipUInt4_t i;
-  _ipPicTagsElement_t *current;
+  _mitkIpPicTagsElement_t *current;
 
   char *indent;
 
@@ -125,7 +125,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
       if( !(flags & _mitkIpPicInfoSHORT) )
         {
           fprintf( stream, "%s  type: %s [%i]\n", indent,
-                           ipPicTypeName(current->tsv->type), current->tsv->type );
+                           mitkIpPicTypeName(current->tsv->type), current->tsv->type );
           fprintf( stream, "%s  bpe : %i\n", indent, current->tsv->bpe );
           fprintf( stream, "%s  dim : %i ", indent, current->tsv->dim );
 
@@ -134,9 +134,9 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
           fprintf( stream, "\n" );
         }
 
-      if( current->tsv->type == ipPicTSV )
+      if( current->tsv->type == mitkIpPicTSV )
         {
-          _ipPicInfoPrintTags( stream,
+          _mitkIpPicInfoPrintTags( stream,
                                current->tsv->value,
                                level+1,
                                flags );
@@ -147,7 +147,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
 
           switch( current->tsv->type )
             {
-              case ipPicASCII:
+              case mitkIpPicASCII:
                 if( current->tsv->n[0] > ASCII_MAX )
                   fprintf( stream, "\"%.*s\"...\n",
                                    ASCII_MAX,
@@ -157,7 +157,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                                    (int)current->tsv->n[0],
                                    (char *)current->tsv->value );
                 break;
-              case ipPicUInt:
+              case mitkIpPicUInt:
                 for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {
@@ -187,7 +187,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                     fprintf( stream, "%s          .\n", indent );
                   }
                 break;
-              case ipPicInt:
+              case mitkIpPicInt:
                 for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {
@@ -217,7 +217,7 @@ void _ipPicInfoPrintTags( FILE *stream, _ipPicTagsElement_t* head, ipUInt4_t lev
                     fprintf( stream, "%s          .\n", indent );
                   }
                 break;
-              case ipPicFloat:
+              case mitkIpPicFloat:
                 for( i = 0; i < Min( INT_MAXIMUM, current->tsv->n[0] ); i++ )
                   switch( current->tsv->bpe )
                     {

@@ -52,7 +52,7 @@
 /** @mainpage
  * @section QuickReference Quick Reference
  *
- * @link ipFunc.h List of all functions @endlink
+ * @link mitkIpFunc.h List of all functions @endlink
  *
  * @link ipArithmeticAndLogical.h Arithmetic and Logical Operators @endlink
  *
@@ -134,7 +134,7 @@
 #endif
 #include <mitkIpPic.h>
 /* 
-   Diese Datei wird in der ipFuncP.h includet
+   Diese Datei wird in der mitkIpFuncP.h includet
    #include <meschach/matrix2.h>
 */
 #ifndef M_PI
@@ -166,22 +166,22 @@
 
 /* type definitions */
 
-typedef enum /* ipFuncFlagI_t */
+typedef enum /* mitkIpFuncFlagI_t */
   {
-    ipFuncReflect    = 0,
-    ipFuncNoReflect  = 1,
-    ipFuncBorderZero = 2,
-    ipFuncBorderOld  = 3,
-    ipFuncKeep       = 4,
-    ipFuncNoKeep     = 5,
-    ipFuncScaleBl    = 6,
-    ipFuncScaleNN    = 7, 
-    ipFuncTotal      = 8,
-    ipFuncMinMax     = 9,
-    ipFuncAbove      = 10,
-    ipFuncBeneath    = 11,
-    ipFuncFlagI_MAX
-  } ipFuncFlagI_t;
+    mitkIpFuncReflect    = 0,
+    mitkIpFuncNoReflect  = 1,
+    mitkIpFuncBorderZero = 2,
+    mitkIpFuncBorderOld  = 3,
+    mitkIpFuncKeep       = 4,
+    mitkIpFuncNoKeep     = 5,
+    mitkIpFuncScaleBl    = 6,
+    mitkIpFuncScaleNN    = 7, 
+    mitkIpFuncTotal      = 8,
+    mitkIpFuncMinMax     = 9,
+    mitkIpFuncAbove      = 10,
+    mitkIpFuncBeneath    = 11,
+    mitkIpFuncFlagI_MAX
+  } mitkIpFuncFlagI_t;
 
 typedef struct
   {
@@ -191,7 +191,7 @@ typedef struct
      ipUInt4_t    y1;
      ipUInt4_t    z0;
      ipUInt4_t    z1;
-   } ipFuncBox_t;
+   } mitkIpFuncBox_t;
 
 
 /* macros */
@@ -203,340 +203,340 @@ extern "C" {
 #endif
 /* extern gloabal variables */
 
-extern int ipFuncErrno;
+extern int mitkIpFuncErrno;
 
 
 /* function prototypes */
 
-ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
+ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
                       ipUInt4_t       **beg,
                       ipUInt4_t       **end );
 
-ipPicDescriptor *ipFuncConvert( ipPicDescriptor *pic_old,
-                                ipPicType_t     type,
+mitkIpPicDescriptor *mitkIpFuncConvert( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicType_t     type,
                                 ipUInt4_t       bpe );
 
-void             ipFuncCopyTags(ipPicDescriptor *pic_new, ipPicDescriptor *pic_old);
+void             mitkIpFuncCopyTags(mitkIpPicDescriptor *pic_new, mitkIpPicDescriptor *pic_old);
 
-int ipFuncSetTag( ipPicDescriptor *pic, char *name, int type, int size, 
+int mitkIpFuncSetTag( mitkIpPicDescriptor *pic, char *name, int type, int size, 
                   int el_size, void *data );
 
-ipPicDescriptor *ipFuncInv    ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncInv    ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncEqual  ( ipPicDescriptor *pic_old,   
-                                ipFuncFlagI_t   kind,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncEqual  ( mitkIpPicDescriptor *pic_old,   
+                                mitkIpFuncFlagI_t   kind,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncRefl   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRefl   ( mitkIpPicDescriptor *pic_old,
                                 ipInt4_t         axis );
 
-ipFloat8_t      ipFuncMedI    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncMedI    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncMean    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncMean    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncVar     ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncVar     ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      ipFuncSDev    ( ipPicDescriptor *pic_old );
+ipFloat8_t      mitkIpFuncSDev    ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t      *ipFuncGrav   ( ipPicDescriptor *pic_old );
+ipFloat8_t      *mitkIpFuncGrav   ( mitkIpPicDescriptor *pic_old );
 
-ipFloat8_t       ipFuncMeanC  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanC  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipFloat8_t       ipFuncVarC   ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarC   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipFloat8_t       ipFuncSDevC  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       radius  );
 
-ipUInt4_t        ipFuncExtrC  ( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrC  ( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max,  
                                 ipUInt4_t       *center,  
                                 ipUInt4_t       radius );
 
-ipPicDescriptor *ipFuncDrawPoly( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncMeanROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncVarROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncSDevROI( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevROI( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipUInt4_t        ipFuncExtrROI( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrROI( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max, 
                                 ipUInt4_t       *pol_x,   
                                 ipUInt4_t       *pol_y,    
                                 ipUInt4_t       no_pts );
 
-ipFloat8_t       ipFuncMeanR  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncMeanR  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipFloat8_t       ipFuncVarR   ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipFloat8_t       ipFuncSDevR  ( ipPicDescriptor *pic_old,        
+ipFloat8_t       mitkIpFuncSDevR  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipUInt4_t        ipFuncExtrR  ( ipPicDescriptor *pic_old,        
+ipUInt4_t        mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,        
                                 ipFloat8_t      *min,
                                 ipFloat8_t      *max,  
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipPicDescriptor *ipFuncFrame  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncFrame  ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *edge,     
                                 ipFloat8_t      value );      
 
-ipPicDescriptor *ipFuncBorder ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *mask,     
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *mask,     
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncBorderX ( ipPicDescriptor *pic_old,
-                                 ipPicDescriptor *mask,     
+mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
+                                 mitkIpPicDescriptor *mask,     
                                  ipFloat8_t      value,
-                                 ipPicDescriptor *pic_return );
+                                 mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncAddC   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncAddC   ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t       value,
-                                ipFuncFlagI_t    keep,
-                                ipPicDescriptor *pic_return );
+                                mitkIpFuncFlagI_t    keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncSubC   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncSubC   ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t       value,
-                                ipFuncFlagI_t    keep,
-                                ipPicDescriptor *pic_return );
+                                mitkIpFuncFlagI_t    keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncMultC  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncMultC  ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t       value,  
-                                ipFuncFlagI_t    keep,
-                                ipPicDescriptor *pic_return );
+                                mitkIpFuncFlagI_t    keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncDivC   ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncDivC   ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t       value,  
-                                ipFuncFlagI_t    keep,
-                                ipPicDescriptor *pic_return );
+                                mitkIpFuncFlagI_t    keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncMultI  ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_new,
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncMultI  ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_new,
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncDivI   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_new,
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncDivI   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_new,
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncAddI   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_new,  
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncAddI   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_new,  
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncAddSl  ( ipPicDescriptor *pic_old,
-                                ipFuncFlagI_t   keep );
+mitkIpPicDescriptor *mitkIpFuncAddSl  ( mitkIpPicDescriptor *pic_old,
+                                mitkIpFuncFlagI_t   keep );
 
-ipPicDescriptor *ipFuncSubI   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_new,  
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncSubI   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_new,  
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncPot    ( ipPicDescriptor *pic_1,
+mitkIpPicDescriptor *mitkIpFuncPot    ( mitkIpPicDescriptor *pic_1,
                                 ipFloat8_t      exponent,
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncSqrt   ( ipPicDescriptor *pic_1,
-                                ipFuncFlagI_t   keep,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncSqrt   ( mitkIpPicDescriptor *pic_1,
+                                mitkIpFuncFlagI_t   keep,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncAnd    ( ipPicDescriptor *pic_1,
-                                ipPicDescriptor *pic_2,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncAnd    ( mitkIpPicDescriptor *pic_1,
+                                mitkIpPicDescriptor *pic_2,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncOr     ( ipPicDescriptor *pic_1,
-                                ipPicDescriptor *pic_2,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncOr     ( mitkIpPicDescriptor *pic_1,
+                                mitkIpPicDescriptor *pic_2,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncNot    ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncNot    ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncLabel  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncLabel  ( mitkIpPicDescriptor *pic_old,
                                 ipUInt4_t       *no_label );
 
-ipPicDescriptor *ipFuncThresh ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t       threshold,
-                                ipPicDescriptor *pic_return );
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncConv   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncConv   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
  
-ipPicDescriptor *ipFuncEro    ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncEro    ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncDila   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncDila   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncOpen   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncOpen   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncClose  ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_mask,   
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncClose  ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_mask,   
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncHitMiss( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_masks,  
-                                ipFuncFlagI_t    border );
+mitkIpPicDescriptor *mitkIpFuncHitMiss( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_masks,  
+                                mitkIpFuncFlagI_t    border );
 
-ipPicDescriptor *ipFuncScale  ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScale  ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      sc_fact[_mitkIpPicNDIM],
-                                ipFuncFlagI_t   sc_kind );
+                                mitkIpFuncFlagI_t   sc_kind );
 
-ipPicDescriptor *ipFuncScFact ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncScFact ( mitkIpPicDescriptor *pic_old,
                                 ipFloat8_t      factor,               
-                                ipFuncFlagI_t   sc_kind );
+                                mitkIpFuncFlagI_t   sc_kind );
 
-ipPicDescriptor *ipFuncGausF  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncGausF  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       len_mask,
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncCanny  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncCanny  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
                                 ipUInt4_t       len_mask,
                                 ipFloat8_t      threshold,
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncRank   ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncRank   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       rank,
                                 ipUInt4_t       dim_mask, 
                                 ipUInt4_t       len_mask,
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncMeanF  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncMeanF  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       len_mask,
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncShp    ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncShp    ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border,
+                                mitkIpFuncFlagI_t   border,
                                 ipUInt4_t       mask_nr );
 
-ipPicDescriptor *ipFuncLaplace( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncSobel  ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncSobel  ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncGrad   ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncGrad   ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncRoberts( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncRoberts( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       dim_mask, 
-                                ipFuncFlagI_t   border );
+                                mitkIpFuncFlagI_t   border );
 
-ipPicDescriptor *ipFuncZeroCr ( ipPicDescriptor *pic_old );
+mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old );
 
-ipPicDescriptor *ipFuncExp    ( ipPicDescriptor *pic_old,
-                                ipFuncFlagI_t   kind,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncExp    ( mitkIpPicDescriptor *pic_old,
+                                mitkIpFuncFlagI_t   kind,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncLN     ( ipPicDescriptor *pic_old );
+mitkIpPicDescriptor *mitkIpFuncLN     ( mitkIpPicDescriptor *pic_old );
 
-ipPicDescriptor *ipFuncLog    ( ipPicDescriptor *pic_old );
+mitkIpPicDescriptor *mitkIpFuncLog    ( mitkIpPicDescriptor *pic_old );
 
-ipPicDescriptor *ipFuncNorm   ( ipPicDescriptor *pic_old,
-                                ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncNorm   ( mitkIpPicDescriptor *pic_old,
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncNormXY ( ipPicDescriptor *pic, 
+mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic, 
                                 ipFloat8_t min_gv,
                                 ipFloat8_t max_gv,
-                                ipPicDescriptor *pic_return );
+                                mitkIpPicDescriptor *pic_return );
 
-ipUInt4_t       ipFuncRange   ( ipPicDescriptor *pic, 
+ipUInt4_t       mitkIpFuncRange   ( mitkIpPicDescriptor *pic, 
                                 ipFloat8_t gv_low,
                                 ipFloat8_t gv_up );
 
-ipInt4_t        ipFuncExtr    ( ipPicDescriptor *pic, 
+ipInt4_t        mitkIpFuncExtr    ( mitkIpPicDescriptor *pic, 
                                 ipFloat8_t *min,
                                 ipFloat8_t *max );
 
-ipInt4_t       ipFuncInertia ( ipPicDescriptor *pic_old,   
+ipInt4_t       mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,   
                                ipFloat8_t      **eigen_vect,
                                ipFloat8_t      **eigen_val );
 
-ipInt4_t       ipFuncHist   ( ipPicDescriptor *pic_old,   
+ipInt4_t       mitkIpFuncHist   ( mitkIpPicDescriptor *pic_old,   
                               ipFloat8_t      min_gv,  
                               ipFloat8_t      max_gv,
                               ipUInt4_t       **hist,
                               ipUInt4_t       *size_hist );
 
-ipInt4_t       ipFuncHisto  ( ipPicDescriptor *pic_old,   
+ipInt4_t       mitkIpFuncHisto  ( mitkIpPicDescriptor *pic_old,   
                               ipFloat8_t      *min_gv,  
                               ipFloat8_t      *max_gv,
                               ipUInt4_t       **hist,
                               ipUInt4_t       *size_hist );
 
-ipPicDescriptor *ipFuncSelInv ( ipPicDescriptor *pic_old,   
+mitkIpPicDescriptor *mitkIpFuncSelInv ( mitkIpPicDescriptor *pic_old,   
                                 ipFloat8_t      gv_low,  
                                 ipFloat8_t      gv_up, 
                                 ipFloat8_t      gv,
-                                ipPicDescriptor *pic_return );           
+                                mitkIpPicDescriptor *pic_return );           
 
-ipPicDescriptor *ipFuncSelect ( ipPicDescriptor *pic_old,   
+mitkIpPicDescriptor *mitkIpFuncSelect ( mitkIpPicDescriptor *pic_old,   
                                 ipFloat8_t      gv_low,  
                                 ipFloat8_t      gv_up, 
                                 ipFloat8_t      gv,
-                                ipPicDescriptor *pic_return );           
+                                mitkIpPicDescriptor *pic_return );           
 
-ipPicDescriptor *ipFuncSelMM  ( ipPicDescriptor *pic_old,   
+mitkIpPicDescriptor *mitkIpFuncSelMM  ( mitkIpPicDescriptor *pic_old,   
                                 ipFloat8_t      gv_low,  
                                 ipFloat8_t      gv_up,
-                                ipPicDescriptor *pic_return );
+                                mitkIpPicDescriptor *pic_return );
 
-ipPicDescriptor *ipFuncLevWin ( ipPicDescriptor *pic_old,   
+mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,   
                                 ipFloat8_t      level,   
                                 ipFloat8_t      window,
-                                ipPicDescriptor *pic_return );           
+                                mitkIpPicDescriptor *pic_return );           
 
-ipPicDescriptor *ipFuncWindow ( ipPicDescriptor *pic_old,        
+mitkIpPicDescriptor *mitkIpFuncWindow ( mitkIpPicDescriptor *pic_old,        
                                 ipUInt4_t       *begin,   
                                 ipUInt4_t       *length );
 
-ipPicDescriptor *ipFuncWindowR( ipPicDescriptor *pic_1,        
-                                ipPicDescriptor *pic_2,
+mitkIpPicDescriptor *mitkIpFuncWindowR( mitkIpPicDescriptor *pic_1,        
+                                mitkIpPicDescriptor *pic_2,
                                 ipUInt4_t       *begin,   
-                                ipFuncFlagI_t   keep );    
+                                mitkIpFuncFlagI_t   keep );    
 
 
-ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  ipUInt4_t        dim_seed,
                                  ipUInt4_t       *beg_seed,
                                  ipUInt4_t       *end_seed,
@@ -545,37 +545,37 @@ ipPicDescriptor *ipFuncRegGrow ( ipPicDescriptor *pic_old,
                                  ipFloat8_t       std_fact, 
                                  ipUInt4_t        kind );
 
-void            ipFuncPError   ( char            *string );
+void            mitkIpFuncPError   ( char            *string );
 
-ipPicDescriptor *ipFuncRotate  ( ipPicDescriptor *pic,
-                                 ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncRotate  ( mitkIpPicDescriptor *pic,
+                                 mitkIpPicDescriptor *pic_old,
                                  int *grad, int *order );
 
-ipPicDescriptor *ipFuncTranspose( ipPicDescriptor *pic,
-                                  ipPicDescriptor *pic_old,
+mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
+                                  mitkIpPicDescriptor *pic_old,
                                   int *permutations_vector);
       
-void            ipFuncXchange   ( ipPicDescriptor **pic1,
-                                  ipPicDescriptor **pic2 );
+void            mitkIpFuncXchange   ( mitkIpPicDescriptor **pic1,
+                                  mitkIpPicDescriptor **pic2 );
 
-ipFloat8_t      ipFuncSkewness ( ipPicDescriptor *pic );
-ipFloat8_t      ipFuncCurtosis ( ipPicDescriptor *pic );
+ipFloat8_t      mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
+ipFloat8_t      mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
 
-ipFloat8_t      ipFuncSkewnessR ( ipPicDescriptor *pic_old,
+ipFloat8_t      mitkIpFuncSkewnessR ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *begin, 
                                   ipUInt4_t       *length );
 
-double          ipFuncCurtosisR ( ipPicDescriptor *pic_old,
+double          mitkIpFuncCurtosisR ( mitkIpPicDescriptor *pic_old,
                                   ipUInt4_t       *begin, 
                                   ipUInt4_t       *length );
 
-ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
-                                  ipFuncBox_t     box,
+mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
+                                  mitkIpFuncBox_t     box,
                                   ipFloat8_t      value, 
-                                  ipFuncFlagI_t   over,
-                                  ipPicDescriptor *pic_return );
+                                  mitkIpFuncFlagI_t   over,
+                                  mitkIpPicDescriptor *pic_return );
 
-char            *ipFuncMakePicName ( char *pic_name, char *extension );
+char            *mitkIpFuncMakePicName ( char *pic_name, char *extension );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

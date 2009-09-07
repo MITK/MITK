@@ -56,7 +56,7 @@
  *  @param  end pointer to right lower corner
  *
  *  @return @arg @c mitkIpFuncOK no error occured
- *  @arg @c mitkIpFuncERROR error occured (description of error in ipFuncErrno)
+ *  @arg @c mitkIpFuncERROR error occured (description of error in mitkIpFuncErrno)
  *
  * @warning  this version could only be used for 2D and 3D images, in  
  *            later version it should be possible to use it for every dimension
@@ -64,15 +64,15 @@
  * AUTHOR & DATE
  */
 
-#include "ipFuncP.h"
+#include "mitkIpFuncP.h"
 
-ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
+ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
                       ipUInt4_t       **beg,
                       ipUInt4_t       **end )       ;
 
 #ifndef DOXYGEN_IGNORE
 
-ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
+ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
                       ipUInt4_t       **beg,
                       ipUInt4_t       **end )            
 {
@@ -81,19 +81,19 @@ ipUInt4_t ipFuncBox ( ipPicDescriptor *pic_old,
 
   if ( pic_old->dim == 2 )
     {
-       _ipFuncBox2d ( pic_old, beg, end );
-       if ( ipFuncErrno > mitkIpFuncOK )
+       _mitkIpFuncBox2d ( pic_old, beg, end );
+       if ( mitkIpFuncErrno > mitkIpFuncOK )
           return ( mitkIpFuncERROR );
     }
   else if ( pic_old->dim == 3 )
     {
-       _ipFuncBox3d ( pic_old, beg, end );
-       if ( ipFuncErrno > mitkIpFuncOK )
+       _mitkIpFuncBox3d ( pic_old, beg, end );
+       if ( mitkIpFuncErrno > mitkIpFuncOK )
           return ( mitkIpFuncERROR );
     }
   else 
     { 
-       _ipFuncSetErrno ( mitkIpFuncDIM_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
        return ( mitkIpFuncERROR );
     }
  

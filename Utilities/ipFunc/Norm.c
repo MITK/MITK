@@ -60,10 +60,10 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
 
-ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
-                              ipPicDescriptor *pic_return );
+mitkIpPicDescriptor *mitkIpFuncNorm ( mitkIpPicDescriptor *pic_old,
+                              mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -78,7 +78,7 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
   a = ( ipFloat8_t ) ( max_gv - min_gv ) / ( max - min );                \
   b = ( ipFloat8_t ) ( max_gv ) - a * max;                               \
                                                                          \
-  no_elem = _ipPicElements ( pic );                                      \
+  no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
       (( type * ) pic_new->data ) [i] =                                  \
@@ -95,11 +95,11 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
-                              ipPicDescriptor *pic_return )
+mitkIpPicDescriptor *mitkIpFuncNorm ( mitkIpPicDescriptor *pic_old,
+                              mitkIpPicDescriptor *pic_return )
 {
 
-  ipPicDescriptor *pic_new;  /* inverted picture                        */
+  mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
   ipFloat8_t      max, min;  /* extreme greyvalues in the image         */
   ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
   ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
@@ -107,15 +107,15 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
 
   /* check image data                                                   */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate extreme grevalues of the image                           */
 
-  if ( ipFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( mitkIpFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* calculate max. or min possible greyvalue for datatype              */
 
-  if ( _ipFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
+  if ( _mitkIpFuncExtT ( pic_old->type, pic_old->bpe, &min_gv, &max_gv ) != mitkIpFuncOK ) 
     return ( mitkIpFuncERROR );
 
   /* test whether normalisation is necessary                            */
@@ -125,7 +125,7 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to invert the picture (for all data types)                   */
@@ -134,7 +134,7 @@ ipPicDescriptor *ipFuncNorm ( ipPicDescriptor *pic_old,
                         
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

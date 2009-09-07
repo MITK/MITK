@@ -90,17 +90,17 @@
  *  COPYRIGHT (c) 1993 by DKFZ (Dept. MBI) Heidelberg, FRG
  */
 #ifndef lint
-  static char *what = { "@(#)ipPicGetTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicGetTag\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-ipPicDescriptor *
-ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
+mitkIpPicDescriptor *
+mitkIpPicGetTags( const char *infile_name, mitkIpPicDescriptor *pic )
 {
   mitkIpPicFile_t infile;
 
-  ipPicTag_t tag_name;
+  mitkIpPicTag_t tag_name;
   ipUInt4_t dummy;
   ipUInt4_t len;
   ipUInt4_t dim;
@@ -108,11 +108,11 @@ ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
 
   ipUInt4_t to_read;
 
-  infile = _ipPicOpenPicFileIn( infile_name );
+  infile = _mitkIpPicOpenPicFileIn( infile_name );
 
   if( infile == NULL )
     {
-      /*ipPrintErr( "ipPicGetTags: sorry, error opening infile\n" );*/
+      /*ipPrintErr( "mitkIpPicGetTags: sorry, error opening infile\n" );*/
       return( NULL );
     }
 
@@ -130,9 +130,9 @@ ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
     }
 
   if( pic == NULL )
-    pic = ipPicNew();
+    pic = mitkIpPicNew();
 
-  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(ipPicTag_t)-4, infile );
+  mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   /*strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );*/
 
   mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
@@ -147,7 +147,7 @@ ipPicGetTags( const char *infile_name, ipPicDescriptor *pic )
   to_read = len -        3 * sizeof(ipUInt4_t)
                 -      dim * sizeof(ipUInt4_t);
 
-  pic->info->tags_head = _ipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
+  pic->info->tags_head = _mitkIpPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 
   pic->info->pixel_start_in_file = mitkIpPicFTell( infile );
 

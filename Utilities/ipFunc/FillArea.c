@@ -62,7 +62,7 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
 /* definition of macros and constants                                   */
 
@@ -113,14 +113,14 @@
 */
 /* -------------------------------------------------------------------  */
 
-ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
-                                  ipFuncBox_t     box,
+mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
+                                  mitkIpFuncBox_t     box,
                                   ipFloat8_t      value, 
-                                  ipFuncFlagI_t   over,
-                                  ipPicDescriptor *pic_return )
+                                  mitkIpFuncFlagI_t   over,
+                                  mitkIpPicDescriptor *pic_return )
 {
 
-  ipPicDescriptor *pic_new;  /* inverted picture                        */
+  mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
   ipFloat8_t      a, b;      /* parameter der Gerade y = ax + b         */
   ipUInt4_t       beg[2];    /* Anfangswerte                            */
   ipUInt4_t       end[2];    /* Endwerte                                */
@@ -128,15 +128,15 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 
   /* check data                                                         */
 
-  if ( _ipFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _ipFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
   if ( pic_new != pic_old )
     {
-       memcpy ( pic_new->data, pic_old->data, _ipPicElements ( pic_old ) * pic_old->bpe /8 );
+       memcpy ( pic_new->data, pic_old->data, _mitkIpPicElements ( pic_old ) * pic_old->bpe /8 );
     }
 
   /* Gerade durch die beiden Punkte                                     */
@@ -148,7 +148,7 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 
   /* check which region (above/beneath) has to be changed               */
 
-  if ( over == ipFuncAbove )
+  if ( over == mitkIpFuncAbove )
     {
         beg[0] = 0; 	    end[0] = pic_old->n[0];
         beg[1] = 0; 	    end[1] = MIN ( box.y0, box.y1 );
@@ -168,7 +168,7 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
 /*      printf ( "1.Dreieck:  beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
         mitkIpPicFORALL_6 ( TRI, pic_new, beg, end, value, a, b, KL );
     }
-  else if ( over == ipFuncBeneath )
+  else if ( over == mitkIpFuncBeneath )
     {
         beg[0] = 0;                          end[0] = pic_old->n[0];
         beg[1] = MAX ( box.y0, box.y1 ); end[1] = pic_old->n[1];
@@ -190,13 +190,13 @@ ipPicDescriptor *ipFuncFillArea ( ipPicDescriptor *pic_old,
     }
   else
     {
-       _ipFuncSetErrno ( mitkIpFuncFLAG_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );   
     }
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_old);
+  mitkIpFuncCopyTags(pic_new, pic_old);
   
   
 

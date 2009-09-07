@@ -64,16 +64,16 @@
 
 /* include-Files                                                        */
 
-#include "ipFuncP.h"   
+#include "mitkIpFuncP.h"   
  
-  ipPicDescriptor *ipFuncAnd  ( ipPicDescriptor *pic_1,   
-                              ipPicDescriptor *pic_2,  
-                              ipPicDescriptor *pic_return );
+  mitkIpPicDescriptor *mitkIpFuncAnd  ( mitkIpPicDescriptor *pic_1,   
+                              mitkIpPicDescriptor *pic_2,  
+                              mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)ipFuncAnd\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncAnd\t\tDKFZ (Dept. MBI)\t"__DATE__ };
 #endif
 
 
@@ -85,7 +85,7 @@
   ipUInt4_t  i;                                                          \
                                                                          \
                                                                          \
-  for ( i = 0; i < _ipPicElements ( pic_1 ); i++ )                       \
+  for ( i = 0; i < _mitkIpPicElements ( pic_1 ); i++ )                       \
     {                                                                    \
        (( type * ) pic_new->data ) [i] =                                 \
            ( (( type * ) pic_1->data ) [i] &&                            \
@@ -101,21 +101,21 @@
 /* -------------------------------------------------------------------  */
 
 
-  ipPicDescriptor *ipFuncAnd  ( ipPicDescriptor *pic_1,   
-                              ipPicDescriptor *pic_2,  
-                              ipPicDescriptor *pic_return )
+  mitkIpPicDescriptor *mitkIpFuncAnd  ( mitkIpPicDescriptor *pic_1,   
+                              mitkIpPicDescriptor *pic_2,  
+                              mitkIpPicDescriptor *pic_return )
   {
-  ipPicDescriptor *pic_new;  /* pointer to new image                    */
+  mitkIpPicDescriptor *pic_new;  /* pointer to new image                    */
   ipUInt4_t       i;         /* loop index                              */
 
   /* check whether images have the same size                            */
 
-  if ( _ipFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( _ipFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_1 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic_2 ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   if ( ( pic_1->type != pic_2->type ) || ( pic_1->bpe != pic_2->bpe ) )
     {
-      _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+      _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
       return NULL;
     }
   if ( pic_1->dim == pic_2->dim )
@@ -123,19 +123,19 @@
       {
         if ( pic_1->n[i] != pic_2->n[i] )
           {
-             _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+             _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
              return NULL;
           }
       }
   else 
     {
-       _ipFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
+       _mitkIpFuncSetErrno ( mitkIpFuncUNFIT_ERROR );
        return NULL;
     }
 
   /* allocate new iumage                                                */
 
-  pic_new = _ipFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_1, pic_return, mitkIpOVERWRITE );     
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
 
   /* macro to connect two images using AND                              */
@@ -144,7 +144,7 @@
 
   /* Copy Tags */
 
-  ipFuncCopyTags(pic_new, pic_1);
+  mitkIpFuncCopyTags(pic_new, pic_1);
 
   return pic_new;
 }

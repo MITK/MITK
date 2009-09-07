@@ -50,12 +50,12 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)_ipPicElements\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)_mitkIpPicElements\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
 
-ipUInt4_t _ipPicElements( ipPicDescriptor *pic )
+ipUInt4_t _mitkIpPicElements( mitkIpPicDescriptor *pic )
 {
   unsigned int i;
   ipUInt4_t elements;

@@ -50,7 +50,7 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)ipPicCopyHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpPicCopyHeader\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include "mitkIpPic.h"
@@ -59,14 +59,14 @@
  *
  */
 
-ipPicDescriptor *ipPicCopyHeader( ipPicDescriptor *pic, ipPicDescriptor *pic_new )
+mitkIpPicDescriptor *mitkIpPicCopyHeader( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_new )
 {
   ipUInt4_t i;
 
   if( pic_new == NULL )
-    pic_new = ipPicNew();
+    pic_new = mitkIpPicNew();
 
-  ipPicClear( pic_new );
+  mitkIpPicClear( pic_new );
 
 
   pic_new->type = pic->type;

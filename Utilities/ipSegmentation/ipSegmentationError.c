@@ -48,7 +48,7 @@ ipMITKSegmentationError (int error)
 }
 
 void
-ipMITKSegmentationCheckImage (ipPicDescriptor* segmentation) 
+ipMITKSegmentationCheckImage (mitkIpPicDescriptor* segmentation) 
 {
   if ((segmentation->type != ipMITKSegmentationTYPE_ID) || (segmentation->bpe != ipMITKSegmentationBPE)) {
     ipMITKSegmentationError (ipMITKSegmentationWRONG_TYPE);

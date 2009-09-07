@@ -25,7 +25,7 @@ namespace cherry
 MultiStatus::MultiStatus(const std::string& pluginId, int code,
     const std::vector<IStatus::Pointer>& newChildren,
     const std::string& message, const std::exception& exception) :
-  Status(OK, pluginId, code, message, exception), children(newChildren)
+  Status(OK_TYPE, pluginId, code, message, exception), children(newChildren)
 {
   Severity maxSeverity = this->GetSeverity();
   for (unsigned int i = 0; i < newChildren.size(); i++)
@@ -39,7 +39,7 @@ MultiStatus::MultiStatus(const std::string& pluginId, int code,
 }
 
 MultiStatus::MultiStatus(const std::string& pluginId, int code, const std::string& message, const std::exception& exception)
-: Status(OK, pluginId, code, message, exception)
+: Status(OK_TYPE, pluginId, code, message, exception)
 {
 
 }

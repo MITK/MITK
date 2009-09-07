@@ -64,19 +64,19 @@ struct IStatus: public Object
     /** Status severity constant (value 0) indicating this status represents the nominal case.
      * This constant is also used as the status code representing the nominal case.
      */
-    OK = 0x00,
+    OK_TYPE = 0x00,
 
     /** Status type severity (bit mask, value 1) indicating this status is informational only. */
-    INFO = 0x01,
+    INFO_TYPE = 0x01,
 
     /** Status type severity (bit mask, value 2) indicating this status represents a warning. */
-    WARNING = 0x02,
+    WARNING_TYPE = 0x02,
 
     /** Status type severity (bit mask, value 4) indicating this status represents an error. */
-    ERROR = 0x04,
+    ERROR_TYPE = 0x04,
 
     /** Status type severity (bit mask, value 8) indicating this status represents a cancelation. */
-    CANCEL = 0x08
+    CANCEL_TYPE = 0x08
   };
 
   CHERRY_DECLARE_FLAGS(Severities, Severity)
@@ -127,11 +127,11 @@ struct IStatus: public Object
    * Returns the severity. The severities are as follows (in
    * descending order):
    * <ul>
-   * <li><code>CANCEL</code> - cancelation occurred</li>
-   * <li><code>ERROR</code> - a serious error (most severe)</li>
-   * <li><code>WARNING</code> - a warning (less severe)</li>
-   * <li><code>INFO</code> - an informational ("fyi") message (least severe)</li>
-   * <li><code>OK</code> - everything is just fine</li>
+   * <li><code>CANCEL_TYPE</code> - cancelation occurred</li>
+   * <li><code>ERROR_TYPE</code> - a serious error (most severe)</li>
+   * <li><code>WARNING_TYPE</code> - a warning (less severe)</li>
+   * <li><code>INFO_TYPE</code> - an informational ("fyi") message (least severe)</li>
+   * <li><code>OK_TYPE</code> - everything is just fine</li>
    * </ul>
    * <p>
    * The severity of a multi-status is defined to be the maximum
@@ -139,8 +139,8 @@ struct IStatus: public Object
    * no children.
    * </p>
    *
-   * @return the severity: one of <code>OK</code>, <code>ERROR</code>,
-   * <code>INFO</code>, <code>WARNING</code>,  or <code>CANCEL</code>
+   * @return the severity: one of <code>OK_TYPE</code>, <code>ERROR_TYPE</code>,
+   * <code>INFO_TYPE</code>, <code>WARNING_TYPE</code>,  or <code>CANCEL_TYPE</code>
    * @see #matches(int)
    */
   virtual Severity GetSeverity() const = 0;
@@ -152,7 +152,7 @@ struct IStatus: public Object
    * <p>
    * The severity of a multi-status is derived from the severities
    * of its children; a multi-status with no children is
-   * <code>OK</code> by definition.
+   * <code>OK_TYPE</code> by definition.
    * A multi-status carries a plug-in identifier, a status code,
    * a message, and an optional exception. Clients may treat
    * multi-status objects in a multi-status unaware way.
@@ -175,20 +175,20 @@ struct IStatus: public Object
 
   /**
    * Returns whether the severity of this status matches the given
-   * severity mask. Note that a status with severity <code>OK</code>
+   * severity mask. Note that a status with severity <code>OK_TYPE</code>
    * will never match; use <code>isOK</code> instead to detect
    * a status with a severity of <code>OK</code>.
    *
    * @param severityMask a mask formed by bitwise or'ing severity mask
-   *    constants (<code>ERROR</code>, <code>WARNING</code>,
-   *    <code>INFO</code>, <code>CANCEL</code>)
+   *    constants (<code>ERROR_TYPE</code>, <code>WARNING_TYPE</code>,
+   *    <code>INFO_TYPE</code>, <code>CANCEL_TYPE</code>)
    * @return <code>true</code> if there is at least one match,
    *    <code>false</code> if there are no matches
    * @see #getSeverity()
-   * @see #CANCEL
-   * @see #ERROR
-   * @see #WARNING
-   * @see #INFO
+   * @see #CANCEL_TYPE
+   * @see #ERROR_TYPE
+   * @see #WARNING_TYPE
+   * @see #INFO_TYPE
    */
   virtual bool Matches(const Severities& severityMask) const = 0;
 };

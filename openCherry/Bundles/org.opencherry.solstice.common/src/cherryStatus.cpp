@@ -26,9 +26,9 @@ namespace cherry
 
 const std::vector<IStatus::Pointer> Status::theEmptyStatusArray = std::vector<IStatus::Pointer>();
 
-const IStatus::Pointer Status::OK_STATUS(new Status(IStatus::OK,
+const IStatus::Pointer Status::OK_STATUS(new Status(IStatus::OK_TYPE,
     IRuntimeConstants::PI_RUNTIME(), 0, "OK"));
-const IStatus::Pointer Status::CANCEL_STATUS(new Status(IStatus::CANCEL,
+const IStatus::Pointer Status::CANCEL_STATUS(new Status(IStatus::CANCEL_TYPE,
     IRuntimeConstants::PI_RUNTIME(), 1, ""));
 
 Status::Status(const Severity& severity, const std::string& pluginId, int code,
@@ -91,7 +91,7 @@ bool Status::IsMultiStatus() const
 
 bool Status::IsOK() const
 {
-  return severity == OK;
+  return severity == OK_TYPE;
 }
 
 bool Status::Matches(const Severities& severityMask) const
@@ -132,19 +132,19 @@ std::string Status::ToString() const
   ss << "Status ";
   switch (severity)
   {
-    case OK:
+    case OK_TYPE:
     ss << "OK";
     break;
-    case ERROR:
+    case ERROR_TYPE:
     ss << "ERROR";
     break;
-    case WARNING:
+    case WARNING_TYPE:
     ss << "WARNING";
     break;
-    case INFO:
+    case INFO_TYPE:
     ss << "INFO";
     break;
-    case CANCEL:
+    case CANCEL_TYPE:
     ss << "CANCEL";
     break;
     default:

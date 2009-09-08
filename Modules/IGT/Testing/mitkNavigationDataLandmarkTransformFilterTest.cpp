@@ -178,6 +178,63 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
     mitk::Equal(output2->GetPosition(),  resultPos2),
     "Testing ND2 position correctly transformed after sourcePointSet changed");
 
+  //--------------------- Test ICP initialization --------------------------
+  {
+    mitk::PointSet::Pointer sourcePoints = mitk::PointSet::New();
+    mitk::Point3D s1, s2, s3, s4, s5, s6;
+    mitk::FillVector3D(s1, 1.1, 1.1, 1.1);
+    mitk::FillVector3D(s2, 2.2, 2.2, 2.2);
+    mitk::FillVector3D(s3, 3.3, 3.3, 3.3);
+    mitk::FillVector3D(s4, 4.4, 4.4, 4.4);
+    mitk::FillVector3D(s5, 5.5, 5.5, 5.5);
+    mitk::FillVector3D(s6, 6.6, 6.6, 6.6);
+    sourcePoints->SetPoint(1, s4);  // use random source point order
+    sourcePoints->SetPoint(2, s6);
+    sourcePoints->SetPoint(3, s3);
+    sourcePoints->SetPoint(4, s1);
+    sourcePoints->SetPoint(5, s2);
+    sourcePoints->SetPoint(6, s5);
+    
+    mitk::PointSet::Pointer targetPoints = mitk::PointSet::New();
+    mitk::Point3D t1, t2, t3, t4, t5, t6;
+    mitk::FillVector3D(t1, 2.1, 2.1, 102.1);  // ==> targets have offset [1, 1, 101]
+    mitk::FillVector3D(t2, 3.2, 3.2, 103.2);
+    mitk::FillVector3D(t3, 4.3, 4.3, 104.3);
+    mitk::FillVector3D(t4, 5.4, 5.4, 105.4);
+    mitk::FillVector3D(t5, 6.5, 6.5, 106.5);
+    mitk::FillVector3D(t6, 7.6, 7.6, 107.6);
+    targetPoints->SetPoint(1, t1);
+    targetPoints->SetPoint(2, t2);
+    targetPoints->SetPoint(3, t3);
+    targetPoints->SetPoint(4, t4);  
+    targetPoints->SetPoint(5, t5);
+    targetPoints->SetPoint(6, t6);
+
+    mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter = mitk::NavigationDataLandmarkTransformFilter::New();
+    myFilter->UseICPInitializationOn();
+    myFilter->SetSourcePoints(sourcePoints);
+    myFilter->SetTargetPoints(targetPoints);  // errors would raise exceptions
+
+    // prepare input
+    mitk::NavigationData::PositionType initialPos1, resultPos1;
+    mitk::FillVector3D(initialPos1, 1.1, 1.1, 1.1);
+    mitk::FillVector3D(resultPos1, 2.1, 2.1, 102.1);
+    mitk::NavigationData::OrientationType initialOri(0.1, 0.1, 0.1, 0.1);
+    mitk::ScalarType initialError(0.0);
+    bool initialValid(true);
+    mitk::NavigationData::Pointer nd1 = mitk::NavigationData::New();
+    nd1->SetPosition(initialPos1);
+    nd1->SetOrientation(initialOri);
+    nd1->SetPositionAccuracy(initialError);
+    nd1->SetDataValid(initialValid);
+
+    myFilter->SetInput(0, nd1);
+    mitk::NavigationData::Pointer output = myFilter->GetOutput(0);
+
+    output->Update();
+
+    MITK_TEST_CONDITION(mitk::Equal(output->GetPosition(),  resultPos1), "Testing ND1 position correctly transformed after ICP initialization");
+  }
 
   //------------------------catch exception --> source points < 3------------------------
   mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter2 = mitk::NavigationDataLandmarkTransformFilter::New();
@@ -292,9 +349,6 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetRMSError() == (float) sqrt(3.0),"Testing mean error calculation")
   MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFREStdDev() == (float) 0.0,"Testing mean error calculation")
 
-
     // always end with this!
   MITK_TEST_END();
-
 }
-

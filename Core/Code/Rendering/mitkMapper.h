@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkConfigure.h>
 
 class vtkWindow;
+class vtkProp;
 
 namespace mitk {
 
@@ -116,6 +117,16 @@ namespace mitk {
     bool IsVtkBased() const
     {
       return m_VtkBased;
+    }
+
+    /** \brief Returns true if this mapper owns the specified vtkProp for
+     * the given BaseRenderer.
+     *
+     * Note: returns false by default; should be implemented for VTK-based
+     * Mapper subclasses. */
+    virtual bool HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const 
+    { 
+      return false; 
     }
 
     /** 

@@ -104,8 +104,9 @@ public:
 
   virtual const mitk::Surface* GetInput();
 
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+  virtual bool HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const;
 
+  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 

@@ -140,6 +140,12 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Actor->VisibilityOn();
 }
 
+bool mitk::SurfaceVtkMapper3D::HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const
+{
+  return ( m_Actor == prop );
+}
+
+
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::MaterialProperty* materialProperty;

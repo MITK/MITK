@@ -113,69 +113,70 @@ void QmitkRenderWindow::LayoutDesignListChanged( int layoutDesignIndex )
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
-  QVTKWidget::mousePressEvent(me);
   if (m_Renderer.IsNotNull())
   {
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MousePressEvent(&event);
   }
+  QVTKWidget::mousePressEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
-  QVTKWidget::mouseReleaseEvent(me);
   if (m_Renderer.IsNotNull())
   {
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MouseReleaseEvent(&event);
   }
+  QVTKWidget::mouseReleaseEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
-  QVTKWidget::mouseMoveEvent(me);
   if (m_Renderer.IsNotNull()) {
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MouseMoveEvent(&event);
   }
+  QVTKWidget::mouseMoveEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
+  //QVTKWidget::wheelEvent(we);
+
+  if ( !GetSliceNavigationController()->GetSliceLocked() )
+  {
+    mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
+
+    if (stepper->GetSteps() <= 1)
+    {
+      stepper = GetSliceNavigationController()->GetTime();
+    }
+
+    if (we->orientation() * we->delta()  > 0)
+    {
+      stepper->Next();
+    }
+    else
+    {
+      stepper->Previous();
+    }
+
+    //also send to Renderer to send if to MITK interaction mechanism
+    if (m_Renderer.IsNotNull()) 
+    {
+      mitk::WheelEvent event(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
+      m_Renderer->WheelEvent(&event);
+    }
+  }
+
   QVTKWidget::wheelEvent(we);
-
-  if ( GetSliceNavigationController()->GetSliceLocked() )
-    return;
-
-  mitk::Stepper* stepper = GetSliceNavigationController()->GetSlice();
-
-  if (stepper->GetSteps() <= 1)
-  {
-    stepper = GetSliceNavigationController()->GetTime();
-  }
-
-  if (we->orientation() * we->delta()  > 0)
-  {
-    stepper->Next();
-  }
-  else
-  {
-    stepper->Previous();
-  }
-
-  //also send to Renderer to send if to MITK interaction mechanism
-  QVTKWidget::wheelEvent(we);
-  if (m_Renderer.IsNotNull()) 
-  {
-    mitk::WheelEvent event(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
-    m_Renderer->WheelEvent(&event);
-  }
 
   if (m_ResendQtEvents) 
     we->ignore();
@@ -183,7 +184,6 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 {
-  QVTKWidget::keyPressEvent(ke);
   if (m_Renderer.IsNotNull())
   {
     QPoint cp = mapFromGlobal(QCursor::pos());
@@ -192,13 +192,13 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
     ke->accept();
   }
 
+  QVTKWidget::keyPressEvent(ke);
+
   if (m_ResendQtEvents) ke->ignore();
 }
 
 void QmitkRenderWindow::enterEvent( QEvent *e )
 {
-  QVTKWidget::enterEvent(e);
-
   //show Menu Widget
   if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
   {
@@ -206,15 +206,17 @@ void QmitkRenderWindow::enterEvent( QEvent *e )
     m_MenuWidget->show();
     m_MenuWidget->update();
   }
+
+  QVTKWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
-  QVTKWidget::leaveEvent(e);
-
   //hide Menu Widget
   if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
     m_MenuWidget->hide();
+
+  QVTKWidget::leaveEvent(e);
 }
 
 void QmitkRenderWindow::InitRenderer()

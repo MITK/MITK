@@ -393,8 +393,8 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   for (LandmarkPointContainer::const_iterator targetsIt = targets.begin(); targetsIt != targets.end(); ++targetsIt)
   {
     double minDistance = itk::NumericTraits<double>::max();
-    LandmarkPointContainer::const_iterator minDistanceIterator = sources.end();
-    for (LandmarkPointContainer::const_iterator sourcesIt = sources.begin(); sourcesIt != sources.end(); ++sourcesIt)
+    LandmarkPointContainer::iterator minDistanceIterator = sources.end();
+    for (LandmarkPointContainer::iterator sourcesIt = sources.begin(); sourcesIt != sources.end(); ++sourcesIt)
     {
       TransformInitializerType::LandmarkPointType transformedSource = transform->TransformPoint(*sourcesIt);
       double dist = targetsIt->EuclideanDistanceTo(transformedSource);

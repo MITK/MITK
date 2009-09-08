@@ -154,6 +154,9 @@ SET(CPP_FILES
   Rendering/mitkUnstructuredGridMapper2D.cpp
   Rendering/mitkUnstructuredGridVtkMapper3D.cpp
   Rendering/vtkUnstructuredGridMapper.cpp
+  Rendering/vtkMitkVolumeTextureMapper3D.cpp
+  Rendering/vtkMitkOpenGLVolumeTextureMapper3D.cpp
+  Rendering/mitkGPUVolumeMapper3D.cpp
 )
 
 IF(WIN32)

@@ -34,6 +34,7 @@ class vtkLight;
 class vtkLightKit;
 class vtkWorldPointPicker;
 class vtkPointPicker;
+class vtkPropPicker;
 class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
@@ -92,7 +93,9 @@ public:
   enum PickingMode{ WorldPointPicking, PointPicking };
   itkSetMacro( PickingMode, PickingMode );
   itkGetMacro( PickingMode, PickingMode );
+
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
+  virtual mitk::DataTreeNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0);
@@ -124,6 +127,7 @@ public:
 
   vtkWorldPointPicker* GetWorldPointPicker();
   vtkPointPicker* GetPointPicker();
+  vtkPropPicker* GetPropPicker();
 
   /**
   * \brief Release vtk-based graphics resources. Called by
@@ -156,6 +160,8 @@ private:
   // Picking
   vtkWorldPointPicker     * m_WorldPointPicker;
   vtkPointPicker          * m_PointPicker;
+  vtkPropPicker           * m_PropPicker;
+
   PickingMode               m_PickingMode;
 
   mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;

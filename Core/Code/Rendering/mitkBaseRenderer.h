@@ -289,6 +289,13 @@ public:
   //## m_DisplayGeometry
   virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const;
 
+  /** \brief Determines the object (mitk::DataTreeNode) closest to the current
+   * position by means of picking
+   *
+   * \warning Implementation currently empty for 2D rendering; intended to be
+   * implemented for 3D renderers */
+  virtual mitk::DataTreeNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const { return NULL; };
+
   //##Documentation
   //## @brief Get the MapperSlotId to use.
   itkGetMacro(MapperID, MapperSlotId);

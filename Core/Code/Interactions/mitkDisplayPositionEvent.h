@@ -22,40 +22,56 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkEvent.h"
 #include "mitkVector.h"
+#include "mitkDataTreeNode.h"
 
 
 namespace mitk {
 
-//##Documentation
-//## @brief Event that stores coordinates
-//## 
-//## Stores display position of the mouse. If requested, the correspondent 
-//## 3D world position in mm is calculated via picking (delegated to the 
-//## BaseRenderer).
-//## @ingroup Interaction
+/**
+ * \brief Event that stores coordinates
+ * 
+ * Stores display position of the mouse.
+ *
+ * If requested, the correspondent 3D world position in mm is calculated via
+ * picking (delegated to the BaseRenderer). Additionally, the mitk::BaseData or
+ * mitk::DataTreeNode corresponding to the picked object in the (3D) scene can
+ * be retrieved.
+ * \ingroup Interaction
+ */
 class MITK_CORE_EXPORT DisplayPositionEvent : public Event
 {
-  public:
-    //##Documentation
-    //## @brief Constructor with all necessary arguments.
-    //##
-    //## @param sender is the renderer that caused that event
-    //## @param type, button, buttonState, key: information from the Event
-    //## @param displPosition is the 2D Position of the mouse
-    DisplayPositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition);
+public:
+  /** \brief Constructor with all necessary arguments.
+   * 
+   * \param sender is the renderer that caused that event
+   * \param type, button, buttonState, key: information from the Event
+   * \param displPosition is the 2D Position of the mouse
+   */
+  DisplayPositionEvent(BaseRenderer* sender, int type, int button, int buttonState, int key, const Point2D& displPosition);
 
-    const Point2D& GetDisplayPosition() const
-    {
-        return m_DisplayPosition;
-    }
+  const Point2D& GetDisplayPosition() const
+  {
+      return m_DisplayPosition;
+  }
 
-    void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
+  void SetDisplayPosition(const Point2D& displPosition) { m_DisplayPosition = displPosition; }
 
-    const Point3D& GetWorldPosition() const;
-  protected:
-    Point2D m_DisplayPosition;
-    mutable Point3D m_WorldPosition;
-    mutable bool m_WorldPositionIsSet;
+  const Point3D& GetWorldPosition() const;
+
+  /** Returns node with object at the current position (NULL if not applicable) */
+  mitk::DataTreeNode *GetPickedObjectNode() const;
+
+  /** Returns object at the current position (NULL if not applicable) */
+  mitk::BaseData *GetPickedObject() const;
+
+
+protected:
+  Point2D m_DisplayPosition;
+  mutable Point3D m_WorldPosition;
+  mutable bool m_WorldPositionIsSet;
+
+  mutable mitk::DataTreeNode::Pointer m_PickedObjectNode;
+  mutable bool m_PickedObjectIsSet;
 };
 
 typedef DisplayPositionEvent MouseEvent;

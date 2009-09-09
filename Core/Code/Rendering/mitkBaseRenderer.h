@@ -93,11 +93,11 @@ public:
   enum StandardMapperSlot{Standard2D=1, Standard3D=2};
 
 
-  virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering
+  virtual void SetDataStorage( DataStorage* storage );  ///< set the datastorage that will be used for rendering
 
   //##Documentation
   //## return the DataStorage that is used for rendering
-  virtual mitk::DataStorage::Pointer GetDataStorage() const
+  virtual DataStorage::Pointer GetDataStorage() const
   {
     return m_DataStorage.GetPointer();
   };
@@ -294,7 +294,7 @@ public:
    *
    * \warning Implementation currently empty for 2D rendering; intended to be
    * implemented for 3D renderers */
-  virtual mitk::DataTreeNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const { return NULL; };
+  virtual DataTreeNode* PickObject( const Point2D& /*displayPosition*/, Point3D& /*worldPosition*/ ) const { return NULL; };
 
   //##Documentation
   //## @brief Get the MapperSlotId to use.
@@ -400,7 +400,7 @@ protected:
 
   //##Documentation
   //## @brief The DataStorage that is used for rendering.
-  mitk::DataStorage::Pointer m_DataStorage;
+  DataStorage::Pointer m_DataStorage;
 
   //##Documentation
   //## @brief Timestamp of last call of Update().

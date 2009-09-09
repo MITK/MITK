@@ -52,7 +52,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Set the DataTreeNode containing the data to map
-    itkSetObjectMacro(DataTreeNode, mitk::DataTreeNode);
+    itkSetObjectMacro(DataTreeNode, DataTreeNode);
 
     //##Documentation
     //## @brief Get the data to map
@@ -69,26 +69,26 @@ namespace mitk {
     //## @brief Convenience access method for color properties (instances of
     //## ColorProperty)
     //## @return @a true property was found
-    virtual bool GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name = "color") const;
+    virtual bool GetColor(float rgb[3], BaseRenderer* renderer, const char* name = "color") const;
 
     //##Documentation
     //## @brief Convenience access method for visibility properties (instances
     //## of BoolProperty)
     //## @return @a true property was found
     //## @sa IsVisible
-    virtual bool GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name = "visible") const;
+    virtual bool GetVisibility(bool &visible, BaseRenderer* renderer, const char* name = "visible") const;
 
     //##Documentation
     //## @brief Convenience access method for opacity properties (instances of
     //## FloatProperty)
     //## @return @a true property was found
-    virtual bool GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name = "opacity") const;
+    virtual bool GetOpacity(float &opacity, BaseRenderer* renderer, const char* name = "opacity") const;
 
     //##Documentation
     //## @brief Convenience access method for color properties (instances of
     //## LevelWindoProperty)
     //## @return @a true property was found
-    virtual bool GetLevelWindow(mitk::LevelWindow &levelWindow, mitk::BaseRenderer* renderer, const char* name = "levelwindow") const;
+    virtual bool GetLevelWindow(LevelWindow &levelWindow, BaseRenderer* renderer, const char* name = "levelwindow") const;
 
     //##Documentation
     //## @brief Convenience access method for visibility properties (instances
@@ -99,16 +99,16 @@ namespace mitk {
     //## Thus, the return value has a different meaning than in the
     //## GetVisibility method!
     //## @sa GetVisibility
-    virtual bool IsVisible(mitk::BaseRenderer* renderer, const char* name = "visible") const;
+    virtual bool IsVisible(BaseRenderer* renderer, const char* name = "visible") const;
 
-    virtual void Update(mitk::BaseRenderer* renderer);
+    virtual void Update(BaseRenderer* renderer);
 
-    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer) = 0;
-    virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) = 0;
-    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) = 0;
+    virtual void MitkRenderOverlay(BaseRenderer* renderer) = 0;
+    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) = 0;
+    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) = 0;
     
     #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-      virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer) = 0;
+      virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) = 0;
     #endif
 
     /** 
@@ -124,7 +124,7 @@ namespace mitk {
      *
      * Note: returns false by default; should be implemented for VTK-based
      * Mapper subclasses. */
-    virtual bool HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const 
+    virtual bool HasVtkProp( const vtkProp* /*prop*/, const BaseRenderer* /*renderer*/ ) const 
     { 
       return false; 
     }
@@ -143,7 +143,7 @@ namespace mitk {
     * \param renderer defines which property list of node is used 
     * (default: \a NULL, i.e. default property list)
     */
-    static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
     int GetTimestep() const {return m_TimeStep;}; 
@@ -165,11 +165,11 @@ namespace mitk {
     virtual void GenerateData();
     //##Documentation
     //## @brief Generate the data needed for rendering into @a renderer
-    virtual void GenerateData(mitk::BaseRenderer *renderer);
+    virtual void GenerateData(BaseRenderer *renderer);
 
     bool m_VtkBased;
 
-    itk::WeakPointer<mitk::DataTreeNode> m_DataTreeNode;
+    itk::WeakPointer<DataTreeNode> m_DataTreeNode;
 
     //##Documentation
     //## @brief timestamp of last update of stored data
@@ -178,7 +178,7 @@ namespace mitk {
   private:
 
     //## Updates the time step, which is sometimes needed in subclasses
-    virtual void CalculateTimeStep( mitk::BaseRenderer *renderer );
+    virtual void CalculateTimeStep( BaseRenderer *renderer );
 
     //## The current time step of the dataset to be rendered, for use in subclasses
     //## The momentary timestep can be accessed via the GetTimestep() method.

@@ -129,6 +129,11 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
     */
    void EnableInterpolation(bool);
 
+    /**
+      Call this from the outside to accept all interpolations
+    */
+   void FinishInterpolation();
+
   protected slots:
 
     /**

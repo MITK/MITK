@@ -223,8 +223,10 @@ INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
 
 # directory has to be created to make sure the installer does not report
 # an error if doxygen was not invoked before.
-FILE(MAKE_DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html)
-INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
+IF (MITK_HELPPAGES_OUTPUT_DIR)
+  FILE(MAKE_DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html)
+  INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
+ENDIF (MITK_HELPPAGES_OUTPUT_DIR)
 
 #OPENCV DLLs may be added elsewhere to install target
 

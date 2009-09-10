@@ -92,7 +92,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="stackedWidget" >
+    <widget class="QStackedWidget" name="m_TrackingSystemWidget" >
      <property name="currentIndex" >
       <number>0</number>
      </property>
@@ -252,7 +252,8 @@ p, li { white-space: pre-wrap; }
 &lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
 &lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;" bgcolor="#000000">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" text-decoration: underline; color:#ffffff;">output:&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" text-decoration: underline; color:#ffffff;">output:&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; text-decoration: underline; color:#ffffff;">&lt;span style=" text-decoration:none;">NDI Polaris selected&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
              </property>
              <property name="textInteractionFlags" >
               <set>Qt::NoTextInteraction</set>
@@ -562,14 +563,14 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="m_resetButton_2" >
+      <widget class="QPushButton" name="m_resetButton" >
        <property name="text" >
         <string>reset</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="m_finishedButton_2" >
+      <widget class="QPushButton" name="m_finishedButton" >
        <property name="text" >
         <string>finished</string>
        </property>

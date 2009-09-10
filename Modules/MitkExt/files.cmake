@@ -18,6 +18,7 @@ SET(CPP_FILES
   Algorithms/mitkExtractImageFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
+  Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
   Algorithms/mitkHistogramMatching.cpp
   Algorithms/mitkImageRegistrationMethod.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
@@ -90,6 +91,7 @@ SET(CPP_FILES
   DataManagement/mitkMesh.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
+  DataManagement/mitkPlane.cpp
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkPropertyObserver.cpp
@@ -120,6 +122,7 @@ SET(CPP_FILES
   #Interactions/mitkCoordinateSupplier.cpp
   #Interactions/mitkDisplayCoordinateOperation.cpp
   #Interactions/mitkDisplayInteractor.cpp
+  Interactions/mitkAffineInteractor3D.cpp
   Interactions/mitkDisplayPointSetInteractor.cpp
   #Interactions/mitkDisplayVectorInteractor.cpp
   Interactions/mitkExtrudedContourInteractor.cpp
@@ -135,6 +138,7 @@ SET(CPP_FILES
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSocketClient.cpp
+  Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
   Rendering/mitkContourMapper2D.cpp

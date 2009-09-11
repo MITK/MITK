@@ -441,10 +441,14 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
-void QmitkSlicesInterpolator::FinishInterpolation()
+void QmitkSlicesInterpolator::FinishInterpolation(int windowID)
 {
   //this redirect is for calling from outside
-  OnAcceptAllInterpolationsClicked();
+
+  if (windowID < 0)
+    OnAcceptAllInterpolationsClicked();
+  else
+    AcceptAllInterpolations( (unsigned int)windowID );
 }
 
 void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()

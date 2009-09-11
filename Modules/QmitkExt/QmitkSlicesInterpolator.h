@@ -132,7 +132,7 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
     /**
       Call this from the outside to accept all interpolations
     */
-   void FinishInterpolation();
+   void FinishInterpolation(int windowID = -1);
 
   protected slots:
 

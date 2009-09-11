@@ -3120,6 +3120,47 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="AffineInteractor3D">
+    <state NAME="Start" ID="1" START_STATE="TRUE" X_POS="65" Y_POS="267" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="31" />
+      </transition>
+    </state>
+    <state NAME="IsOverObject" ID="2" X_POS="352" Y_POS="267" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1">
+        <action ID="70" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="3">
+        <action ID="60" />
+      </transition>
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="2">
+        <action ID="49014" />
+      </transition>
+    </state>
+    <state NAME="ObjectSelected" ID="3" X_POS="719" Y_POS="268" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="31" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="4">
+        <action ID="9" />
+      </transition>
+      <transition NAME="name" EVENT_ID="9" NEXT_STATE_ID="3">
+        <action ID="49014" />
+      </transition>
+    </state>
+    <state NAME="ObjectInteraction" ID="4" X_POS="598" Y_POS="629" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="4">
+        <action ID="92" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="2">
+        <action ID="31" />
+      </transition>
+      <transition NAME="name" EVENT_ID="521" NEXT_STATE_ID="4">
+        <action ID="49014" />
+        <action ID="92" />
+      </transition>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

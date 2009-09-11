@@ -84,7 +84,7 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
  m_T2DMapper->SetUseCompressedTexture(true);
  
  m_T2DMapper->SetPreferredMethodToFragmentProgram();
-  m_T2DMapper->SetSampleDistance(1.25); // 4 rays for every pixel
+  m_T2DMapper->SetSampleDistance(1.0); // 4 rays for every pixel
  
   m_HiResMapper = vtkFixedPointVolumeRayCastMapper::New();
   m_HiResMapper->SetSampleDistance(1); // 4 rays for every pixel
@@ -310,27 +310,20 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   this->SetPreferences();
-                 /*
+                 
   switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
     default:
       LOG_WARN << "invalid lod level";
-      m_VolumeLOD->SetSelectedLODID( m_LowResID );
+    case 1:
+      m_T2DMapper->SetSampleDistance(0.75);
       break;
 
     case 0:
-      m_VolumeLOD->SetSelectedLODID( m_LowResID );
+      m_T2DMapper->SetSampleDistance(2.0);
       break;
-
-    case 1:
-      m_VolumeLOD->SetSelectedLODID( m_MedResID );
-      break;
-           
-    case 2: 
-      m_VolumeLOD->SetSelectedLODID( m_HiResID );
-      break;  
   }
-              */
+              
   const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);
 

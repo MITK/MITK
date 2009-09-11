@@ -293,15 +293,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
   case 0:
-  default:
     m_VolumeLOD->SetSelectedLODID(m_MedResID);  /*m_LowResID );*/
     break;
 
+  default:
   case 1:
-    m_VolumeLOD->SetSelectedLODID( m_MedResID );
-    break;
-
-  case 2:
     m_VolumeLOD->SetSelectedLODID( m_HiResID );
     break;
   }

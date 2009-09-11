@@ -10,7 +10,7 @@ OPTION(USE_DOT "Use dot program for generating graphical class diagrams with dox
 MARK_AS_ADVANCED(USE_DOT)
 
 SET(HAVE_DOT "NO")
-IF(DOXYGEN_DOT_FOUND AND USE_DOT)
+IF(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
   SET(HAVE_DOT "YES")
 ENDIF()
 

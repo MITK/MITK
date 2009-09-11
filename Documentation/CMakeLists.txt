@@ -10,10 +10,9 @@ OPTION(USE_DOT "Use dot program for generating graphical class diagrams with dox
 MARK_AS_ADVANCED(USE_DOT)
 
 SET(HAVE_DOT "NO")
-IF(DOXYGEN_DOT_FOUND AND USE_DOT)
+IF(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
   SET(HAVE_DOT "YES")
 ENDIF()
-
 
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 SET(MITK_HELPPAGES_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeFactory.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkCoreObjectFactory.h>
+#include <mitkITKImageImport.h>
 
 // C-Standard library includes
 #include <stdlib.h>
@@ -128,6 +129,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       {
         std::string message("File does not exist, or cannot be read. Filename = ");
         message += m_FileName;
+        LOG_ERROR << message;
         itkExceptionMacro( << message );
       }
     }
@@ -265,7 +267,6 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   typedef itk::GDCMSeriesFileNames NameGeneratorType;
 
   std::string dir = this->GetDirectory();
-  LOG_INFO << "dir: " << dir << std::endl;
 
   IOType::Pointer dicomIO = IOType::New();
 
@@ -283,9 +284,9 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     nameGenerator->AddSeriesRestriction( *it );
   }
 
-  const StringContainer & seriesUID = nameGenerator->GetSeriesUIDs();
-  StringContainer::const_iterator seriesItr = seriesUID.begin();
-  StringContainer::const_iterator seriesEnd = seriesUID.end();
+  const StringContainer & seriesUIDs = nameGenerator->GetSeriesUIDs();
+  StringContainer::const_iterator seriesItr = seriesUIDs.begin();
+  StringContainer::const_iterator seriesEnd = seriesUIDs.end();
 
   LOG_INFO << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
   while ( seriesItr != seriesEnd )
@@ -294,13 +295,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     seriesItr++;
   }
 
-  this->ResizeOutputs( seriesUID.size() );
+  unsigned int size = seriesUIDs.size();
+  this->ResizeOutputs( size );
 
-  unsigned int size = seriesUID.size();
   for ( unsigned int i = 0 ; i < size ; ++i )
   {
-    LOG_INFO << "Reading series #" << i << ": " << seriesUID[ i ] << std::endl;
-    StringContainer fileNames = nameGenerator->GetFileNames( seriesUID[ i ] );
+    LOG_INFO << "Reading series #" << i << ": " << seriesUIDs[ i ] << std::endl;
+    StringContainer fileNames = nameGenerator->GetFileNames( seriesUIDs[ i ] );
     StringContainer::const_iterator fnItr = fileNames.begin();
     StringContainer::const_iterator fnEnd = fileNames.end();
     while ( fnItr != fnEnd )
@@ -330,9 +331,9 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       }
 
       //Initialize mitk image from itk
-      mitk::Image::Pointer image = mitk::Image::New();
-      image->InitializeByItk( reader->GetOutput() );
-      image->SetVolume( reader->GetOutput()->GetBufferPointer() );
+      Image::Pointer image = mitk::Image::New();
+      image = ImportItkImage(reader->GetOutput());
+      image->DisconnectPipeline();
 
       //add the mitk image to the node
       mitk::DataTreeNode::Pointer node = this->GetOutput( i );
@@ -342,7 +343,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
       // set filename without path as string property
       std::string filename = std::string( this->GetBaseFilePrefix() );
-      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( seriesUID[ i ] );
+      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( seriesUIDs[ i ] );
       node->SetProperty( "name", nameProp );
 
     }

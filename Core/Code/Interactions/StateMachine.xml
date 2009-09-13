@@ -82,6 +82,12 @@
     <event NAME="left MouseBNRelease+Shift" ID="508" TYPE="Type_MouseButtonRelease" BUTTON="BS_LeftButton" BUTTONSTATE="0x0101" KEY="Key_none" />
     <!-- MouseMove -->
     <event NAME="MouseMove" ID="520" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!-- left MouseButton and MouseWheel -->
+    <event NAME="leftBN+MouseWheel" ID="521" TYPE="Type_Wheel" BUTTON="BS_LeftButton" BUTTONSTATE="0x0001" KEY="Key_none" />
+    <!-- right MouseButton and MouseWheel -->
+    <event NAME="rightBN+MouseWheel" ID="522" TYPE="Type_Wheel" BUTTON="BS_RightButton" BUTTONSTATE="0x0002" KEY="Key_none" />
+    <!-- middle MouseButton and MouseWheel -->
+    <event NAME="middleBN+MouseWheel" ID="523" TYPE="Type_Wheel" BUTTON="BS_MidButton" BUTTONSTATE="0x0004" KEY="Key_none" />
     <!-- left MouseButton and MouseMove -->
     <event NAME="leftBN+MouseMove" ID="530" TYPE="Type_MouseMove" BUTTON="BS_NoButton" BUTTONSTATE="0x0001" KEY="Key_none" />
     <!-- right MouseButton and MouseMove -->

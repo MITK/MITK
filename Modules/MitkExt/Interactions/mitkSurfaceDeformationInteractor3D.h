@@ -89,8 +89,11 @@ private:
   Point2D m_CurrentInteractionPointDisplay;
   vtkFloatingPointType m_CurrentInteractionPointWorld[4];
 
+  DataTreeNode *m_PickedSurfaceNode;
   Surface *m_PickedSurface;
   vtkPolyData *m_OriginalPolyData;
+
+  double m_GaussSigma;
 
 };
 

@@ -18,7 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSurfaceDeformationInteractor3D.h"
 #include "mitkPointOperation.h"
-#include "mitkPositionEvent.h"
+#include "mitkDisplayPositionEvent.h"
+#include "mitkWheelEvent.h"
 #include "mitkStatusBar.h"
 #include "mitkDataTreeNode.h"
 #include "mitkInteractionConst.h"
@@ -44,7 +45,10 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::SurfaceDeformationInteractor3D
 ::SurfaceDeformationInteractor3D(const char * type, DataTreeNode* dataTreeNode, int /* n */ )
 : Interactor( type, dataTreeNode ),
-  m_Precision( 6.5 )
+  m_Precision( 6.5 ),
+  m_PickedSurfaceNode( NULL ),
+  m_PickedSurface( NULL ),
+  m_GaussSigma( 30.0 )
 {
   m_OriginalPolyData = vtkPolyData::New();
 }
@@ -192,15 +196,15 @@ bool mitk::SurfaceDeformationInteractor3D
 
       // Check if an object is present at the current mouse position
       m_PickedSurface = NULL;
-      mitk::DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
+      m_PickedSurfaceNode = dpe->GetPickedObjectNode();
 
-      if ( pickedNode != NULL )
+      if ( m_PickedSurfaceNode != NULL )
       {
-        m_PickedSurface = dynamic_cast< mitk::Surface * >( pickedNode->GetData() );
+        m_PickedSurface = dynamic_cast< mitk::Surface * >( m_PickedSurfaceNode->GetData() );
       }
 
       mitk::StateEvent *newStateEvent;
-      if ( (pickedNode == m_DataTreeNode) && (m_PickedSurface != NULL) )
+      if ( (m_PickedSurfaceNode == m_DataTreeNode) && (m_PickedSurface != NULL) )
       {
         // Yes: object will be selected
         newStateEvent = new mitk::StateEvent( EIDYES );
@@ -254,10 +258,8 @@ bool mitk::SurfaceDeformationInteractor3D
 
       mitk::DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
       m_InitialInteractionPickedPoint = dpe->GetWorldPosition();
-      std::cout << "PickPoint: " << m_InitialInteractionPickedPoint << std::endl;
-
-
       m_InitialInteractionPointDisplay = dpe->GetDisplayPosition();
+
       if ( renderWindowInteractor != NULL )
       {
         vtkInteractorObserver::ComputeDisplayToWorld(
@@ -327,6 +329,7 @@ bool mitk::SurfaceDeformationInteractor3D
       vtkPoints *deformedPoints = m_PickedSurface->GetVtkPolyData( timeStep )->GetPoints();
 
 
+      double denom = m_GaussSigma * m_GaussSigma * 2;
       double point[3];
       for ( unsigned int i = 0; i < deformedPoints->GetNumberOfPoints(); ++i )
       {
@@ -341,7 +344,7 @@ bool mitk::SurfaceDeformationInteractor3D
         // Calculate distance of this point from line through picked point
         double d = itk::CrossProduct( objectNormal, (v1 - v0) ).GetNorm();
 
-        mitk::Vector3D t = v2 * exp( -0.0005 * d * d );
+        mitk::Vector3D t = v2 * exp( - d * d / denom );
 
         point[0] = originalPoint[0] + t[0];
         point[1] = originalPoint[1] + t[1];
@@ -358,6 +361,33 @@ bool mitk::SurfaceDeformationInteractor3D
       break;
     }
 
+  case AcMODIFY:
+    {
+      // Check if we have an mitk::WheelEvent
+      const mitk::WheelEvent *we = 
+        dynamic_cast< const mitk::WheelEvent * >( stateEvent->GetEvent() );     
+      if ( we == NULL )
+      {
+        ok = true;
+        break;
+      }
+
+      m_GaussSigma += (double) (we->GetDelta()) / 20;;
+      if ( m_GaussSigma < 10.0 )
+      {
+        m_GaussSigma = 10.0;
+      }
+      else if ( m_GaussSigma > 128.0 )
+      {
+        m_GaussSigma = 128.0;
+      }
+
+      
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+        mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
+      ok = true;
+      break;
+    }
 
 
   default:

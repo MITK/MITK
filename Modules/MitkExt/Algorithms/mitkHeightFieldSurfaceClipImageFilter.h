@@ -83,8 +83,8 @@ protected:
 
   ScalarType m_OutsideValue;
 
-  unsigned int m_HeightFieldResolutionX;
-  unsigned int m_HeightFieldResolutionY;
+  int m_HeightFieldResolutionX;
+  int m_HeightFieldResolutionY;
 
   double m_MaxHeight;
 

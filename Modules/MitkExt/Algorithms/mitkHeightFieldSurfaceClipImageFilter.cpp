@@ -187,7 +187,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
     {
       vtkFloatingPointType p0[3], p1[3], surfacePoint[3], pcoords[3];
       p0[0] = x0 + xWidth * x / (double) m_HeightFieldResolutionX;
-      p0[1] = y0 + xWidth * y / (double) m_HeightFieldResolutionY;
+      p0[1] = y0 + yWidth * y / (double) m_HeightFieldResolutionY;
       p0[2] = -m_MaxHeight;
 
       p1[0] = p0[0];
@@ -196,7 +196,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
 
       double t, distance;
       int subId;
-      if ( cellLocator->IntersectWithLine( p0, p1, 0.0, t, surfacePoint, pcoords, subId ) )
+      if ( cellLocator->IntersectWithLine( p0, p1, 0.1, t, surfacePoint, pcoords, subId ) )
       {
         distance = (2.0 * t - 1.0) * m_MaxHeight;
       }
@@ -227,14 +227,14 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
 
       Point3D planePoint = imageToPlaneTransform->TransformPoint( imagePoint );
 
-      unsigned int x = (unsigned int) m_HeightFieldResolutionX * (planePoint[0] - x0) / xWidth;
-      unsigned int y = (unsigned int) m_HeightFieldResolutionY * (planePoint[1] - y0) / yWidth;
+      int x = (int) ((double)(m_HeightFieldResolutionX) * (planePoint[0] - x0) / xWidth);
+      int y = (int) ((double)(m_HeightFieldResolutionY) * (planePoint[1] - y0) / yWidth);
 
       bool clip;
       if ( (x < 0) || (x >= m_HeightFieldResolutionX)
         || (y < 0) || (y >= m_HeightFieldResolutionY) )
       {
-        clip = true;        
+        clip = true;
       }
       else
       {
@@ -254,7 +254,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
       }
       else
       {
-        outputIt.Set( 1 );
+        outputIt.Set( inputIt.Get() );
       }
     }
   }

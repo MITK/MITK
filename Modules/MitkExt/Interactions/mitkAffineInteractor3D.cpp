@@ -372,7 +372,7 @@ bool AffineInteractor3D
           double rotationAngle = 360.0 * sqrt(l2/(size[0]*size[0]+size[1]*size[1]));
 
           // Use center of data bounding box as center of rotation
-          Point3D rotationCenter = m_OriginalGeometry->GetBoundingBox()->GetCenter();;
+          Point3D rotationCenter = m_OriginalGeometry->GetCenter();;
 
           // Reset current Geometry3D to original state (pre-interaction) and
           // apply rotation

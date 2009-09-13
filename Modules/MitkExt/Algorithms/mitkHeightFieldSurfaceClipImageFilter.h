@@ -54,9 +54,22 @@ public:
   void SetClippingSurface( Surface *clippingSurface );
   const Surface *GetClippingSurface() const;
 
-  itkSetMacro( OutsideValue, ScalarType );
-  itkGetConstMacro( OutsideValue, ScalarType );
+  enum
+  {
+    CLIPPING_MODE_CONSTANT = 0,
+    CLIPPING_MODE_MULTIPLYBYFACTOR,
+  };
 
+  void SetClippingMode( int mode );
+  int GetClippingMode();
+  void SetClippingModeToConstant();
+  void SetClippingModeToMultiplyByFactor();
+
+  itkSetMacro( ClippingConstant, ScalarType );
+  itkGetConstMacro( ClippingConstant, ScalarType );
+
+  itkSetMacro( MultiplicationFactor, ScalarType );
+  itkGetConstMacro( MultiplicationFactor, ScalarType );
 
 protected:
   HeightFieldSurfaceClipImageFilter();
@@ -81,7 +94,10 @@ protected:
   ImageTimeSelector::Pointer m_InputTimeSelector;
   ImageTimeSelector::Pointer m_OutputTimeSelector;
 
-  ScalarType m_OutsideValue;
+  int m_ClippingMode;
+  
+  ScalarType m_ClippingConstant;
+  ScalarType m_MultiplicationFactor;
 
   int m_HeightFieldResolutionX;
   int m_HeightFieldResolutionY;

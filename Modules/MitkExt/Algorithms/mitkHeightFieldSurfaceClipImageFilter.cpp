@@ -37,7 +37,9 @@ namespace mitk
 {
 
 HeightFieldSurfaceClipImageFilter::HeightFieldSurfaceClipImageFilter() 
-: m_OutsideValue( 0.0 ),
+: m_ClippingMode( CLIPPING_MODE_CONSTANT ),
+  m_ClippingConstant( 0.0 ),
+  m_MultiplicationFactor( 2.0 ),
   m_HeightFieldResolutionX( 512 ),
   m_HeightFieldResolutionY( 512 ),
   m_MaxHeight( 1024.0 )
@@ -153,9 +155,6 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   ItkInputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
-  typename ItkOutputImageType::PixelType outsideValue = clipImageFilter->m_OutsideValue;
-
-
   // Get bounds of clipping data
   clippingPolyData->ComputeBounds();
   vtkFloatingPointType *bounds = clippingPolyData->GetBounds();
@@ -212,11 +211,17 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   // Walk through entire input image and for each point determine its distance
   // from the x/y plane.
   LOG_INFO << "Performing clipping..." << std::endl;
+
+  TPixel factor = static_cast< TPixel >( clipImageFilter->m_MultiplicationFactor );
+  TPixel clippingConstant = clipImageFilter->m_ClippingConstant;
+
+
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {
-    if ( (typename ItkOutputImageType::PixelType)inputIt.Get() == outsideValue )
+    if ( (clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT)
+      && ((TPixel)inputIt.Get() == clippingConstant ) )
     {
-      outputIt.Set( outsideValue );
+      outputIt.Set( clippingConstant );
     }
     else
     {
@@ -250,7 +255,14 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
 
       if ( clip )
       {
-        outputIt.Set( 0 );
+        if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT )
+        {
+          outputIt.Set( clipImageFilter->m_ClippingConstant );
+        }
+        else if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_MULTIPLYBYFACTOR )
+        {
+          outputIt.Set( inputIt.Get() * factor );
+        }
       }
       else
       {

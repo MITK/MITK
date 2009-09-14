@@ -74,6 +74,30 @@ const Surface* HeightFieldSurfaceClipImageFilter::GetClippingSurface() const
 }
 
 
+void HeightFieldSurfaceClipImageFilter::SetClippingMode( int mode )
+{
+  m_ClippingMode = mode;
+}
+
+
+int HeightFieldSurfaceClipImageFilter::GetClippingMode()
+{
+  return m_ClippingMode;
+}
+
+
+void HeightFieldSurfaceClipImageFilter::SetClippingModeToConstant()
+{
+  m_ClippingMode = CLIPPING_MODE_CONSTANT;
+}
+
+
+void HeightFieldSurfaceClipImageFilter::SetClippingModeToMultiplyByFactor()
+{
+  m_ClippingMode = CLIPPING_MODE_MULTIPLYBYFACTOR;
+}
+
+
 void HeightFieldSurfaceClipImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();

@@ -55,6 +55,7 @@ SET(CPP_FILES
   Algorithms/mitkTransformParameters.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
+  Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
   Algorithms/mitkCuboidObjectCutter.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp

@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qslider.h>
 #include <qgroupbox.h>
 #include <qcheckbox.h>
+#include <QIntValidator>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkIpPicTypeMultiplex.h>
@@ -50,7 +51,6 @@ m_ThresholdNodeExisting(false)
   SetAvailability(true);
 
   SetComponentName("ThresholdFinder");
-  m_Node = this->GetDefaultDataStorage()->GetNode();
 }
 
 /***************        DESTRUCTOR      ***************/
@@ -88,7 +88,7 @@ void QmitkThresholdComponent::CreateConnections()
 {
   if ( m_ThresholdComponentGUI )
   {
-    connect( (QObject*)(m_TreeNodeSelector), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataTreeNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeNode *)));
     connect( (QObject*)(m_ThresholdFinder), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThresholdFinderContent(bool)));     
     connect( (QObject*)(m_ThresholdSelectDataGroupBox), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
 
@@ -105,14 +105,35 @@ void QmitkThresholdComponent::CreateConnections()
 /***************     DATA STORAGE CHANGED     ***************/
 void  QmitkThresholdComponent::DataStorageChanged(mitk::DataStorage::Pointer ds)
 {
+  if(!ds)
+    return;
+  m_DataStorage = ds;
+  m_TreeNodeSelector->SetDataStorage(ds);
 
+  if(m_ThresholdComponentGUI != NULL)
+  {
+    for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
+    {
+      QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
+      if (functionalityComponent != NULL)
+        functionalityComponent->DataStorageChanged(ds);
+    }
+  }
+  if(!ds)
+    return;
+
+  DataObjectSelected();
+  SetSliderRange();
+  ShowThreshold();
 }
 
 /***************     IMAGE SELECTED     ***************/
-void QmitkThresholdComponent::ImageSelected(mitk::DataTreeNode::Pointer item)
+void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeNode* item)
 {
   if(m_ThresholdComponentGUI != NULL)
   {
+    mitk::DataTreeNode::Pointer selectedItem = const_cast< mitk::DataTreeNode*>(item);
+    m_TreeNodeSelector->SetSelectedNode(selectedItem);
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
       QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
@@ -120,7 +141,6 @@ void QmitkThresholdComponent::ImageSelected(mitk::DataTreeNode::Pointer item)
         functionalityComponent->ImageSelected(item);
     }
   }
-  m_Node = item;
   DataObjectSelected();
   SetSliderRange();
   ShowThreshold();
@@ -133,12 +153,12 @@ void QmitkThresholdComponent::DataObjectSelected()
   {
     if(m_ThresholdNodeExisting)
     {
-      m_ThresholdImageNode->SetData(m_Node->GetData());
+      m_ThresholdImageNode->SetData(m_TreeNodeSelector->GetSelectedNode()->GetData());
     }
     else
     {
       CreateThresholdImageNode();
-      m_ThresholdImageNode->SetData(m_Node->GetData());
+      m_ThresholdImageNode->SetData(m_TreeNodeSelector->GetSelectedNode()->GetData());
     }
     ShowThreshold();
   }
@@ -153,7 +173,7 @@ void QmitkThresholdComponent::SetDataStorage(mitk::DataStorage::Pointer dataStor
 /** \brief Method to get the DataStorage*/
 mitk::DataStorage::Pointer QmitkThresholdComponent::GetDataStorage()
 {
- return m_DataStorage;
+  return m_DataStorage;
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
@@ -162,11 +182,11 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
   m_GUI = new QWidget;
   m_ThresholdComponentGUI = new Ui::QmitkThresholdComponentControls;
   m_ThresholdComponentGUI->setupUi(m_GUI);
-  
-  
+
+
 
   /*CREATE GUI ELEMENTS*/
-  
+
   m_ThresholdFinder = new QGroupBox("2. Find Threshold", m_GUI);
   m_ThresholdSelectDataGroupBox = new QGroupBox("Show Image Selector", m_ThresholdFinder);
   m_TreeNodeSelector = new QmitkDataStorageComboBox(m_ThresholdSelectDataGroupBox);
@@ -182,24 +202,30 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
 
   m_ThresholdFinder->setCheckable(true);
   m_ThresholdFinder->setChecked(true);
+  
   m_ThresholdSelectDataGroupBox->setCheckable(true);
   m_ThresholdSelectDataGroupBox->setChecked(true);
+  
   m_ThresholdInputNumber->setFixedSize(40, 20);
+  QIntValidator* intValid = new QIntValidator(-32000, 5000, m_ThresholdInputNumber);
+  m_ThresholdInputNumber->setValidator(intValid);
+  m_ThresholdInputNumber->setText("0");
+
   m_ThresholdValueContent->setMaximumHeight(90);
 
- // m_ThresholdSelectDataGroupBox->setContentsMargins(0,9,9,9);
- // m_ImageContent->setContentsMargins(0,9,9,9);
- // m_ContainerContent->setContentsMargins(0,9,9,9);
- // m_ShowThresholdGroupBox->setContentsMargins(0,9,9,9);
- //m_ThresholdValueContent->setContentsMargins(0,9,9,9);
+  // m_ThresholdSelectDataGroupBox->setContentsMargins(0,9,9,9);
+  // m_ImageContent->setContentsMargins(0,9,9,9);
+  // m_ContainerContent->setContentsMargins(0,9,9,9);
+  // m_ShowThresholdGroupBox->setContentsMargins(0,9,9,9);
+  //m_ThresholdValueContent->setContentsMargins(0,9,9,9);
 
- //m_ThresholdFinder->setFlat(true);
- //m_ThresholdSelectDataGroupBox->setFlat(true);
- //m_ImageContent->setFlat(true);
- //m_ContainerContent->setFlat(true);
- //m_ShowThresholdGroupBox->setFlat(true);
- //m_ThresholdValueContent->setFlat(true);
- 
+  //m_ThresholdFinder->setFlat(true);
+  //m_ThresholdSelectDataGroupBox->setFlat(true);
+  //m_ImageContent->setFlat(true);
+  //m_ContainerContent->setFlat(true);
+  //m_ShowThresholdGroupBox->setFlat(true);
+  //m_ThresholdValueContent->setFlat(true);
+
 
 
   QVBoxLayout* guiLayout = new QVBoxLayout(m_GUI);
@@ -216,7 +242,7 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
   thresholdSelectDataGroupBoxLayout->setContentsMargins(0,9,0,9);
   m_ThresholdSelectDataGroupBox->setLayout(thresholdSelectDataGroupBoxLayout);
   thresholdSelectDataGroupBoxLayout->addWidget(m_TreeNodeSelector);
-  
+
 
   QVBoxLayout* imageContentLayout = new QVBoxLayout(m_ImageContent);
   imageContentLayout->setContentsMargins(0,9,0,9);
@@ -248,9 +274,6 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
 
   m_TreeNodeSelector->SetDataStorage(dataStorage);
   m_TreeNodeSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-//  m_GUI = m_ThresholdComponentGUI;
-
-  //   m_TreeNodeSelector->SetDataTree(GetDataTreeIterator());
 
   if(m_ShowSelector)
   {
@@ -259,8 +282,8 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataSto
   }
   else
   {
-     m_ThresholdSelectDataGroupBox->setShown(m_ShowSelector);
-     //m_ThresholdSelectDataGroupBox->setShown(true);
+    m_ThresholdSelectDataGroupBox->setShown(m_ShowSelector);
+    //m_ThresholdSelectDataGroupBox->setShown(true);
   }
 
   // m_TreeNodeSelector->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
@@ -331,8 +354,8 @@ void QmitkThresholdComponent::ShowThresholdFinderContent(bool)
 
   if(m_ShowSelector)
   {
-     //m_ThresholdSelectDataGroupBox->setShown( m_ThresholdSelectDataGroupBox->isChecked());
-     //m_ThresholdSelectDataGroupBox->setShown( true);
+    //m_ThresholdSelectDataGroupBox->setShown( m_ThresholdSelectDataGroupBox->isChecked());
+    //m_ThresholdSelectDataGroupBox->setShown( true);
     m_ThresholdSelectDataGroupBox->setShown(m_ThresholdFinder->isChecked());
   }
 
@@ -342,17 +365,17 @@ void QmitkThresholdComponent::ShowThresholdFinderContent(bool)
 ///***************    SHOW IMAGE CONTENT   **************/
 void QmitkThresholdComponent::ShowImageContent(bool)
 {
-   //m_ImageContent->setShown( m_ThresholdSelectDataGroupBox->isChecked());
+  //m_ImageContent->setShown( m_ThresholdSelectDataGroupBox->isChecked());
   m_ImageContent->setShown( true);
 
   if(m_ShowSelector)
   {
-     //m_ImageContent->setShown( m_ThresholdSelectDataGroupBox->isChecked());
-     m_ImageContent->setShown( true);
+    //m_ImageContent->setShown( m_ThresholdSelectDataGroupBox->isChecked());
+    m_ImageContent->setShown( true);
   }
   else
   {
-     //m_ThresholdSelectDataGroupBox->setShown(m_ShowSelector);
+    //m_ThresholdSelectDataGroupBox->setShown(m_ShowSelector);
     m_ThresholdSelectDataGroupBox->setShown(true);
   }
 }
@@ -387,7 +410,7 @@ void QmitkThresholdComponent::ThresholdSliderChanged(int)
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(value,1));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-   m_ThresholdInputNumber->setText(QString::number(value)); 
+  m_ThresholdInputNumber->setText(QString::number(value)); 
 }
 
 ///*************** THRESHOLD VALUE CHANGED **************/
@@ -400,7 +423,7 @@ void QmitkThresholdComponent::ThresholdValueChanged( )
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(value,1));
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-   m_ThresholdInputSlider->setValue(value);
+  m_ThresholdInputSlider->setValue(value);
 }
 
 
@@ -411,7 +434,11 @@ void QmitkThresholdComponent::SetSliderRange()
   {
     if( m_ThresholdFinder->isChecked()==true)
     {
-      mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_ThresholdImageNode->GetData());
+      if(!m_TreeNodeSelector->GetSelectedNode())
+        return;
+      if(!m_TreeNodeSelector->GetSelectedNode()->GetData())
+        return;
+      mitk::Image* currentImage = dynamic_cast<mitk::Image*>(m_TreeNodeSelector->GetSelectedNode()->GetData());
       if(currentImage)
       {
         int min = (int) currentImage->GetScalarValueMin();
@@ -422,10 +449,22 @@ void QmitkThresholdComponent::SetSliderRange()
           min = (int) currentImage->GetScalarValue2ndMin();
           max = (int) currentImage->GetScalarValue2ndMaxNoRecompute();
         }
-         m_ThresholdInputSlider->setMinValue(min);
-         m_ThresholdInputSlider->setMaxValue(max);
+
+        QIntValidator* intValid = new QIntValidator(min-150, max+150, m_ThresholdInputNumber);
+        m_ThresholdInputNumber->setValidator(intValid);
+        m_ThresholdInputNumber->setText("1");
+        
+        m_ThresholdInputSlider->setMinValue(min-150);
+        m_ThresholdInputSlider->setMaxValue(max+150);
+        m_ThresholdInputSlider->setRange(min-150, max+150);
+        m_ThresholdInputSlider->setPageStep(1);
+        m_ThresholdInputSlider->setValue(1);
+
+        m_GUI->repaint();
+        //m_ThresholdInputSlider->resize();
+
         /* m_ThresholdInputSlider->setMinValue((int)currentImage->GetScalarValueMin());
-         m_ThresholdInputSlider->setMaxValue((int)currentImage->GetScalarValueMaxNoRecompute());*/
+        m_ThresholdInputSlider->setMaxValue((int)currentImage->GetScalarValueMaxNoRecompute());*/
       }
     }
   }
@@ -437,7 +476,7 @@ void QmitkThresholdComponent::DeleteThresholdNode()
   if(m_ThresholdImageNode)
   {
 
-    mitk::DataTreeNode::Pointer foundNode = GetDefaultDataStorage()->GetNamedNode("Thresholdview image");
+    mitk::DataTreeNode::Pointer foundNode = m_DataStorage->GetNamedNode("Thresholdview image");
     foundNode->Delete();
 
 
@@ -445,203 +484,186 @@ void QmitkThresholdComponent::DeleteThresholdNode()
     return;
   }
 }
-  ///*************CREATE THRESHOLD IMAGE NODE************/
-  void QmitkThresholdComponent::CreateThresholdImageNode()
-  { 
-    if(m_Active)
+///*************CREATE THRESHOLD IMAGE NODE************/
+void QmitkThresholdComponent::CreateThresholdImageNode()
+{ 
+  if(m_Active)
+  {
+    if( m_ThresholdNodeExisting)
+      return;
+    if(!m_TreeNodeSelector)
+      return;
+    if(!m_TreeNodeSelector->GetSelectedNode())
+      return;
+    m_ThresholdImageNode = mitk::DataTreeNode::New();
+    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("Thresholdview image" );
+    m_ThresholdImageNode->SetProperty( "name", nameProp );
+    mitk::BoolProperty::Pointer componentThresholdImageProp = mitk::BoolProperty::New(true);
+    m_ThresholdImageNode->SetProperty( "isComponentThresholdImage", componentThresholdImageProp );
+    m_ThresholdImageNode->SetData(m_TreeNodeSelector->GetSelectedNode()->GetData());
+    m_ThresholdImageNode->SetColor(0.0,1.0,0.0);
+    m_ThresholdImageNode->SetOpacity(.25);
+    int layer = 0;
+    m_ThresholdImageNode->GetIntProperty("layer", layer);
+    m_ThresholdImageNode->SetIntProperty("layer", layer+1);
+    m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(atoi( m_ThresholdInputNumber->text()),1));
+    m_ThresholdNodeExisting = true;
+    m_DataStorage->Add(m_ThresholdImageNode);
+    
+  }
+}
+
+/*************CREAET THRESHOLD SEGMENTATION************/
+void QmitkThresholdComponent::CreateThresholdSegmentation()
+{
+  mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
+  segmentationNode->SetData(m_TreeNodeSelector->GetSelectedNode()->GetData());
+  m_MitkImage = dynamic_cast<mitk::Image*>(m_TreeNodeSelector->GetSelectedNode()->GetData());
+  if  
+    (segmentationNode.IsNotNull())
+  {
+    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("TH segmentation" );
+    segmentationNode->SetProperty( "name", nameProp );
+    segmentationNode->GetPropertyList()->SetProperty("binary", mitk::BoolProperty::New(true));
+    mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = mitk::BoolProperty::New(true);
+    segmentationNode->SetProperty( "segmentation", thresholdBasedSegmentationProp );
+    segmentationNode->GetPropertyList()->SetProperty("layer",mitk::IntProperty::New(1));
+    segmentationNode->SetColor(1.0,0.0,0.0);
+    segmentationNode->SetOpacity(.25);
+
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( segmentationNode->GetData() );
+    if (image.IsNotNull())
     {
-      if(!m_ThresholdNodeExisting)
-      {
-        if (m_Node)
-        {
-          m_ThresholdImageNode = mitk::DataTreeNode::New();
-          mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("Thresholdview image" );
-          m_ThresholdImageNode->SetProperty( "name", nameProp );
-          mitk::BoolProperty::Pointer componentThresholdImageProp = mitk::BoolProperty::New(true);
-          m_ThresholdImageNode->SetProperty( "isComponentThresholdImage", componentThresholdImageProp );
 
-          m_ThresholdImageNode->SetData(m_Node->GetData());
-          m_ThresholdImageNode->SetColor(0.0,1.0,0.0);
-          m_ThresholdImageNode->SetOpacity(.25);
-          int layer = 0;
-          m_Node->GetIntProperty("layer", layer);
-          m_ThresholdImageNode->SetIntProperty("layer", layer+1);
-          m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(atoi( m_ThresholdInputNumber->text()),1));
 
-          GetDefaultDataStorage()->Add(m_ThresholdImageNode);
-          m_ThresholdNodeExisting = true;
+      // ask the user about an organ type and name, add this information to the image's (!) propertylist
 
-        }
-      }
+      // create a new image of the same dimensions and smallest possible pixel type
+      AccessFixedDimensionByItk_2(m_MitkImage, /*the actual selected image */
+        ThresholdSegmentation, /*called template-method */
+        3, /*dimension */
+        image, /*passed segmentation */
+        this /* the QmitkSurfaceCreator-object */);
+
+
+      //mitk::DataTreeNode::Pointer segmentation = CreateEmptySegmentationNode(image);
+      if (!m_ThresholdSegmentationImage) return; // could be aborted by user
+
+
+      segmentationNode->SetData(m_ThresholdSegmentationImage);
+
+      mitk::DataTreeNode::Pointer origNode =  m_TreeNodeSelector->GetSelectedNode();
+      m_DataStorage->Add(segmentationNode, origNode);
+
     }
   }
 
-  /*************CREAET THRESHOLD SEGMENTATION************/
-  void QmitkThresholdComponent::CreateThresholdSegmentation()
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateEmptySegmentationNode( mitk::Image* image)
+{
+  //if (!image) return NULL;
+  //// actually create a new empty segmentation
+  //mitk::PixelType pixelType( typeid(short int) );
+  //mitk::Image::Pointer segmentation = mitk::Image::New();
+  //segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
+  //memset( segmentation->GetData(), 0, sizeof(short int) * segmentation->GetDimension(0) * segmentation->GetDimension(1) * segmentation->GetDimension(2) );
+
+  //if (image->GetGeometry() )
+  //{
+  //            mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF =  image->GetGeometry()->Clone();
+  //            mitk::Geometry3D::Pointer originalGeometry = dynamic_cast<mitk::Geometry3D*>( originalGeometryAGF.GetPointer() );
+  //            segmentation->SetGeometry( originalGeometry );
+  //}
+
+  return CreateSegmentationNode(image);
+}
+
+mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode( mitk::Image* image)
+{
+  if (!image) return NULL;
+
+  // decorate the datatreenode with some properties
+  mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
+  segmentationNode->SetData( image );
+
+  // visualization properties
+
+  segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
+  segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
+  segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
+
+  segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+  segmentationNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 0.0) );
+
+  return segmentationNode;
+}
+
+//*************************************TEMPLATE FOR THRESHOLDSEGMENTATION******************************
+//
+// to create a new segmentation that contains those areas above the threshold
+// called from NewThresholdSegmentation
+
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/)
+{
+  // iterator on m_MitkImage
+  typedef itk::Image< TPixel, VImageDimension > ItkImageType;
+  itk::ImageRegionConstIterator<ItkImageType> itMitkImage(itkImage, itkImage->GetLargestPossibleRegion() );
+
+  // pointer on segmentation
+  typedef itk::Image< unsigned char, VImageDimension > ItkSegmentationImageType;
+  typename ItkSegmentationImageType::Pointer itkSegmentation;
+
+  // cast segmentation from mitk-image to itk-image
+  if(segmentation != NULL)
   {
+    mitk::CastToItkImage(segmentation, itkSegmentation);
+  }
 
-    //mitk::DataTreeNode::Pointer segmentationNode = m_Controls->m_ToolDataSelectionBox->GetToolManager()->GetReferenceData(0);
-    mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
-    segmentationNode->SetData(m_Node->GetData());
-    m_MitkImage = dynamic_cast<mitk::Image*>(m_Node->GetData());
-    if  
-      (segmentationNode.IsNotNull())
+  // new pointer on segmentation: itkThresholdSegmentedImage
+  typename ItkSegmentationImageType::Pointer itkThresholdSegmentedImage = ItkSegmentationImageType::New();
+
+  // properties for itkThresholdSegmentedImage:
+  itkThresholdSegmentedImage->SetRegions(itkImage->GetLargestPossibleRegion());
+  itkThresholdSegmentedImage->Allocate();
+
+  // iterator on itkThresholdSegmentedImage: itSegmented
+  itk::ImageRegionIterator<ItkSegmentationImageType> itSegmented(itkThresholdSegmentedImage, itkThresholdSegmentedImage->GetLargestPossibleRegion() );
+
+
+  int thresholdValue(0);//Threshold above that the segmentation shall be created
+
+  // threshold-input from GUI:
+  thresholdValue = atoi( m_ThresholdInputNumber->text());
+
+  while(!(itMitkImage.IsAtEnd()))
+  {
+    if((signed)itMitkImage.Get() >= thresholdValue)
+      //if the pixel-value of the m_Mitk-Image is higher or equals the threshold
     {
-      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("TH segmentation" );
-      segmentationNode->SetProperty( "name", nameProp );
-      segmentationNode->GetPropertyList()->SetProperty("binary", mitk::BoolProperty::New(true));
-      mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = mitk::BoolProperty::New(true);
-      segmentationNode->SetProperty( "segmentation", thresholdBasedSegmentationProp );
-      segmentationNode->GetPropertyList()->SetProperty("layer",mitk::IntProperty::New(1));
-      segmentationNode->SetColor(1.0,0.0,0.0);
-      segmentationNode->SetOpacity(.25);
-
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( segmentationNode->GetData() );
-      if (image.IsNotNull())
-      {
-
-
-        // ask the user about an organ type and name, add this information to the image's (!) propertylist
-
-        // create a new image of the same dimensions and smallest possible pixel type
-        AccessFixedDimensionByItk_2(m_MitkImage, /*the actual selected image */
-          ThresholdSegmentation, /*called template-method */
-          3, /*dimension */
-          image, /*passed segmentation */
-          this /* the QmitkSurfaceCreator-object */);
-
-
-        //mitk::DataTreeNode::Pointer segmentation = CreateEmptySegmentationNode(image);
-        if (!m_ThresholdSegmentationImage) return; // could be aborted by user
-
-
-        segmentationNode->SetData(m_ThresholdSegmentationImage);
-
-        mitk::DataTreeNode::Pointer origNode =  m_TreeNodeSelector->GetSelectedNode();
-        GetDefaultDataStorage()->Add(segmentationNode, origNode);
-
-        //mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIterator;
-        //iteratorClone->GoToBegin();
-        //while ( !iteratorClone->IsAtEnd() )
-        //{
-        //  mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-        //  if (  node == m_Node )
-        //  {
-        //    iteratorClone->Add(segmentationNode);
-        //  }
-        //  ++iteratorClone;
-
-        //}
-      }
+      itSegmented.Set(1);
+      // set the pixel-value at the segmentation to "1"
     }
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  }
-
-  mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateEmptySegmentationNode( mitk::Image* image)
-  {
-    //if (!image) return NULL;
-    //// actually create a new empty segmentation
-    //mitk::PixelType pixelType( typeid(short int) );
-    //mitk::Image::Pointer segmentation = mitk::Image::New();
-    //segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
-    //memset( segmentation->GetData(), 0, sizeof(short int) * segmentation->GetDimension(0) * segmentation->GetDimension(1) * segmentation->GetDimension(2) );
-
-    //if (image->GetGeometry() )
-    //{
-    //            mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF =  image->GetGeometry()->Clone();
-    //            mitk::Geometry3D::Pointer originalGeometry = dynamic_cast<mitk::Geometry3D*>( originalGeometryAGF.GetPointer() );
-    //            segmentation->SetGeometry( originalGeometry );
-    //}
-
-    return CreateSegmentationNode(image);
-  }
-
-  mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode(  
-    mitk::Image* image)
-  {
-    if (!image) return NULL;
-
-    // decorate the datatreenode with some properties
-    mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
-    segmentationNode->SetData( image );
-
-    // visualization properties
-
-    segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-    segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
-    segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
-    segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
-
-    segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-    segmentationNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 0.0) );
-
-    return segmentationNode;
-  }
-
-  //*************************************TEMPLATE FOR THRESHOLDSEGMENTATION******************************
-  //
-  // to create a new segmentation that contains those areas above the threshold
-  // called from NewThresholdSegmentation
-
-  template < typename TPixel, unsigned int VImageDimension >
-  void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/)
-  {
-    // iterator on m_MitkImage
-    typedef itk::Image< TPixel, VImageDimension > ItkImageType;
-    itk::ImageRegionConstIterator<ItkImageType> itMitkImage(itkImage, itkImage->GetLargestPossibleRegion() );
-
-    // pointer on segmentation
-    typedef itk::Image< unsigned char, VImageDimension > ItkSegmentationImageType;
-    typename ItkSegmentationImageType::Pointer itkSegmentation;
-
-    // cast segmentation from mitk-image to itk-image
-    if(segmentation != NULL)
+    else
     {
-      mitk::CastToItkImage(segmentation, itkSegmentation);
+      itSegmented.Set(0);
+      // else set the pixel-value at the segmentation to "0"
     }
+    ++itMitkImage;
+    ++itSegmented;
+    //TODO: die Segmentierung aus der Methode returnen
+  }//end of while (!(itMitkImage.IsAtEnd()))
 
-    // new pointer on segmentation: itkThresholdSegmentedImage
-    typename ItkSegmentationImageType::Pointer itkThresholdSegmentedImage = ItkSegmentationImageType::New();
+  // create new mitk-Image: m_ThresholdSegmentationImage
+  m_ThresholdSegmentationImage = mitk::Image::New(); 
 
-    // properties for itkThresholdSegmentedImage:
-    itkThresholdSegmentedImage->SetRegions(itkImage->GetLargestPossibleRegion());
-    itkThresholdSegmentedImage->Allocate();
+  // fill m_ThresholdSegmentationImage with itkThresholdSegmentedImage:
+  mitk::CastToMitkImage(itkThresholdSegmentedImage, m_ThresholdSegmentationImage);
 
-    // iterator on itkThresholdSegmentedImage: itSegmented
-    itk::ImageRegionIterator<ItkSegmentationImageType> itSegmented(itkThresholdSegmentedImage, itkThresholdSegmentedImage->GetLargestPossibleRegion() );
-
-
-    int thresholdValue(0);//Threshold above that the segmentation shall be created
-
-    // threshold-input from GUI:
-    thresholdValue = atoi( m_ThresholdInputNumber->text());
-
-    while(!(itMitkImage.IsAtEnd()))
-    {
-      if((signed)itMitkImage.Get() >= thresholdValue)
-        //if the pixel-value of the m_Mitk-Image is higher or equals the threshold
-      {
-        itSegmented.Set(1);
-        // set the pixel-value at the segmentation to "1"
-      }
-      else
-      {
-        itSegmented.Set(0);
-        // else set the pixel-value at the segmentation to "0"
-      }
-      ++itMitkImage;
-      ++itSegmented;
-      //TODO: die Segmentierung aus der Methode returnen
-    }//end of while (!(itMitkImage.IsAtEnd()))
-
-    // create new mitk-Image: m_ThresholdSegmentationImage
-    m_ThresholdSegmentationImage = mitk::Image::New(); 
-
-    // fill m_ThresholdSegmentationImage with itkThresholdSegmentedImage:
-    mitk::CastToMitkImage(itkThresholdSegmentedImage, m_ThresholdSegmentationImage);
-
-  }
+}
 
 
 

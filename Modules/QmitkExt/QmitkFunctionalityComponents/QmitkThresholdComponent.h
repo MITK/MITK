@@ -76,7 +76,7 @@ public:
   virtual QmitkDataStorageComboBox* GetTreeNodeSelector();
 
   /** \brief Method to set the DataStorage*/
-  virtual void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+  virtual void SetDataStorage(mitk::DataStorage::Pointer dataStorage/*, mitk::DataTreeNode::Pointer dtn = NULL*/);
 
   /** \brief Method to get the DataStorage*/
   virtual mitk::DataStorage::Pointer GetDataStorage();
@@ -101,10 +101,10 @@ virtual QGroupBox* GetImageContent();
 public slots:  
   /***************      OHTER METHODS     ***************/
 
-  void DataStorageChanged(mitk::DataStorage::Pointer ds);
+  virtual void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
-	void ImageSelected(const mitk::DataTreeNode::Pointer item);
+	void ImageSelected(const mitk::DataTreeNode* item);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowThreshold(bool show = true);
@@ -144,11 +144,6 @@ protected:
 
   /** \brief Item on the actual selected Image in the TreeNodeSelector */
   mitk::DataStorage::Pointer m_DataStorage;
-
-  /*!
-  a reference to the current ImageNode
-  */
-  mitk::DataTreeNode::Pointer m_Node;
 
   /*!
   a reference to the node with the thresholdImage and adjusted preferences to show the threshold
@@ -197,7 +192,7 @@ private:
   QGroupBox* m_ThresholdValueContent;
   QPushButton* m_CreateSegmentationButton;
   QCheckBox* m_DeleateImageIfDeactivatedCheckBox;
-  QmitkDataStorageComboBox*m_TreeNodeSelector;
+  QmitkDataStorageComboBox* m_TreeNodeSelector;
 
 };
 

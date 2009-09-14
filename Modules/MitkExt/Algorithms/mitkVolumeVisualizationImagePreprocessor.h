@@ -97,7 +97,7 @@ protected:
   ~VolumeVisualizationImagePreprocessor();
 
 
-  void Composite( CTImage::Pointer work,
+  CTImage::Pointer Composite( CTImage::Pointer work,
     BinImage::Pointer mask,
     BinImage::Pointer dilated,
     BinImage::Pointer eroded );

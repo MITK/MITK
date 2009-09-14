@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVolumeVisualizationImagePreprocessor.h"
 
+#include <itkAddConstantToImageFilter.h>
+
 
 
 namespace mitk
@@ -59,9 +61,8 @@ VolumeVisualizationImagePreprocessor::Process(
 
   // Image::Pointer imageBorder = ImportItkImage(CTImageWork);
 
-  Composite(CTImageWork,BinImageMask,BinImageMaskDilate,BinImageMaskErode);
 
-  return Crop(ImportItkImage(Gaussian(CTImageWork)));
+  return Crop(ImportItkImage(Gaussian(Composite(CTImageWork,BinImageMask,BinImageMaskDilate,BinImageMaskErode))));
 }
 
 
@@ -212,12 +213,17 @@ BinImage::Pointer BinImageMaskDilate = BinImage::New();
 BinImage::Pointer BinImageMaskErode = BinImage::New();
 */
 
-void VolumeVisualizationImagePreprocessor::Composite( CTImage::Pointer work,
+mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualizationImagePreprocessor::Composite( CTImage::Pointer input,
                        BinImage::Pointer mask,
                        BinImage::Pointer dilated,
                        BinImage::Pointer eroded)
 {
   LOG_INFO << "Compositing...";
+  itk::AddConstantToImageFilter<CTImage, short, CTImage>::Pointer nullFilter= itk::AddConstantToImageFilter<CTImage, short, CTImage>::New();
+  nullFilter->SetInput( input );
+  nullFilter->SetConstant( 0 );
+  nullFilter->UpdateLargestPossibleRegion();
+  CTImage::Pointer work = nullFilter->GetOutput();
 
   CTIteratorType workIt( work, work->GetRequestedRegion() );
   BinIteratorType maskIt( mask, mask->GetRequestedRegion() );
@@ -314,7 +320,8 @@ void VolumeVisualizationImagePreprocessor::Composite( CTImage::Pointer work,
     
   LOG_INFO << "real surface value: " << m_realSurfaceValue;
 
-
+  work->DisconnectPipeline();
+  return work;
 }
 
 

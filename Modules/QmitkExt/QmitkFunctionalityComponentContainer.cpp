@@ -158,7 +158,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 {
   if ( m_FunctionalityComponentContainerGUI )
   {
-    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_TreeNodeSelector), SIGNAL(activated(const mitk::DataTreeFilter::Item *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeFilter::Item *)));
+    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataTreeNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeNode *)));
     connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_ContainerBorder),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));    
   }
 }
@@ -184,19 +184,21 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
     {
       QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
       if (functionalityComponent != NULL)
+      {
         functionalityComponent->DataStorageChanged(ds);
+      }
     }   
   }
 
   if(m_FunctionalityComponentContainerGUI)
   {
-    if(!ds)
+    if(!m_FunctionalityComponentContainerGUI->m_TreeNodeSelector)
       return;
-    if(!ds->GetNode())
+    if(!m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode())
       return;
-    if(!ds->GetNode()->GetData())
+    if(!m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData())
       return;
-    m_ParentMitkImage = static_cast<mitk::Image*> (ds->GetNode()->GetData());
+    m_ParentMitkImage = static_cast<mitk::Image*> (m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData());
 
 
     if(m_FunctionalityComponentContainerGUI != NULL)
@@ -206,24 +208,32 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
         QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
         if (functionalityComponent != NULL)
         {
-          functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (ds->GetNode()->GetData());
+          if(!m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData())
+            return;
+          functionalityComponent->m_ParentMitkImage = static_cast<mitk::Image*> (m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->GetSelectedNode()->GetData());
+
         }
       }   
     }
   }
-  TreeChanged();
+  //TreeChanged(;)
 }
 
 /***************     IMAGE SELECTED     ***************/
-void QmitkFunctionalityComponentContainer::ImageSelected(mitk::DataTreeNode::Pointer item)
+void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeNode* item)
 {
 
   if(m_FunctionalityComponentContainerGUI != NULL)
   {
+    mitk::DataTreeNode::Pointer selectedItem = const_cast< mitk::DataTreeNode*>(item);
+    GetTreeNodeSelector()->SetSelectedNode(selectedItem);
+
+//    m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->changeItem();
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++)
     {
       QmitkBaseFunctionalityComponent* functionalityComponent = dynamic_cast<QmitkBaseFunctionalityComponent*>(m_AddedChildList[i]);
       if (functionalityComponent != NULL)
+        //functionalityComponent->GetTreeNodeSelector()->SetSelectedNode(selectedItem);
         functionalityComponent->ImageSelected(item);
     }   
   }

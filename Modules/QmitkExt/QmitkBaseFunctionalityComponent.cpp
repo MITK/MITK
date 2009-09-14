@@ -32,8 +32,9 @@ QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
 {
 }
 
-void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeNode::Pointer item)
+void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeNode* item)
 {
+
 }
 
 void QmitkBaseFunctionalityComponent::DataStorageChanged(mitk::DataStorage::Pointer ds)

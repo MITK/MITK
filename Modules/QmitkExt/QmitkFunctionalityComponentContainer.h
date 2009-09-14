@@ -170,6 +170,9 @@ QPushButton* GetBackButton();
   /** \brief Attribute to decide whether the selector shall be shown or not */
   bool m_ShowSelector;
 
+  /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
+  void ImageSelected(const mitk::DataTreeNode* item);
+
 protected slots:  
 
 
@@ -185,8 +188,7 @@ public slots:
   /***************      OHTER METHODS     ***************/
  virtual  void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
-  /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
-  void ImageSelected(const mitk::DataTreeNode::Pointer item);
+
 
   //void NextButtonPressed();
   //void BackButtonPressed();

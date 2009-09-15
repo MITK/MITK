@@ -52,13 +52,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <vtkWorldPointPicker.h>
 #include <vtkPointPicker.h>
-#include <vtkPropPicker.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkProp.h>
 #include <vtkAssemblyPath.h>
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
+#include <vtkProperty.h>
 
 
 
@@ -71,8 +71,9 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
   didCount=false;
 
   m_WorldPointPicker = vtkWorldPointPicker::New();
+
   m_PointPicker = vtkPointPicker::New();
-  m_PropPicker = vtkPropPicker::New();
+  m_PointPicker->SetTolerance( 0.0025 );
 
   mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
   m_CurrentWorldGeometry2DMapper = geometryMapper;
@@ -119,8 +120,6 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_WorldPointPicker->Delete();
   if (m_PointPicker != NULL)
     m_PointPicker->Delete();
-  if (m_PropPicker != NULL)
-    m_PropPicker->Delete();
   if (m_TextRenderer != NULL)
     m_TextRenderer->Delete();
 }
@@ -527,28 +526,62 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
   }
 }
 
+
 mitk::DataTreeNode *
 mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const 
 {
   if ( m_VtkMapperPresent )
   {
+    m_PointPicker->InitializePickList();
+
+    // Iterate over all DataStorage objects to determine all vtkProps intended
+    // for picking
+    DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
+    for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
+          it != allObjects->End(); 
+          ++it )
+    {
+      DataTreeNode *node = it->Value();
+      if ( node == NULL )
+        continue;
+
+      bool pickable = false;
+      node->GetBoolProperty( "pickable", pickable );
+      if ( !pickable )
+        continue;
+
+      BaseVtkMapper3D *mapper = dynamic_cast< BaseVtkMapper3D * >
+        ( node->GetMapper( m_MapperID ) );
+      if ( mapper == NULL )
+        continue;
+
+      vtkProp *prop = mapper->GetProp();
+      if ( prop == NULL )
+        continue;
+
+      m_PointPicker->AddPickList( prop );
+    }  
+
+
     // Do the picking and retrieve the picked vtkProp (if any)
-    m_PropPicker->Pick( displayPosition[0], displayPosition[1], 0, m_VtkRenderer );
-    vtk2itk( m_PropPicker->GetPickPosition(), worldPosition );
-    vtkProp *prop = m_PropPicker->GetViewProp();
+    m_PointPicker->PickFromListOn();
+    m_PointPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
+    m_PointPicker->PickFromListOff();
+
+    vtk2itk( m_PointPicker->GetPickPosition(), worldPosition );
+    vtkProp *prop = m_PointPicker->GetViewProp();
     
     if ( prop == NULL )
     {
       return NULL;
     }
 
+
     // Iterate over all DataStorage objects to determine if the retrieved
     // vtkProp is owned by any associated mapper.
-    DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
-
     for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
           it != allObjects->End(); 
-          ++it)
+          ++it )
     {
       DataTreeNode::Pointer node = it->Value();
       if ( node.IsNull() )
@@ -693,11 +726,6 @@ vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()
 vtkPointPicker* mitk::VtkPropRenderer::GetPointPicker()
 {
   return m_PointPicker;
-}
-
-vtkPropPicker* mitk::VtkPropRenderer::GetPropPicker()
-{
-  return m_PropPicker;
 }
 
 

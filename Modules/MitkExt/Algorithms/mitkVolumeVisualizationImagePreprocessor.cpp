@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVolumeVisualizationImagePreprocessor.h"
 
-#include <itkAddConstantToImageFilter.h>
+#include <itkOrImageFilter.h>
 
 
 
@@ -219,9 +219,9 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
                        BinImage::Pointer eroded)
 {
   LOG_INFO << "Compositing...";
-  itk::AddConstantToImageFilter<CTImage, short, CTImage>::Pointer nullFilter= itk::AddConstantToImageFilter<CTImage, short, CTImage>::New();
-  nullFilter->SetInput( input );
-  nullFilter->SetConstant( 0 );
+  itk::OrImageFilter<CTImage, CTImage, CTImage>::Pointer nullFilter= itk::OrImageFilter<CTImage, CTImage, CTImage>::New();
+  nullFilter->SetInput1( input );
+  nullFilter->SetInput2( input );
   nullFilter->UpdateLargestPossibleRegion();
   CTImage::Pointer work = nullFilter->GetOutput();
 

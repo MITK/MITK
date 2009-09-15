@@ -75,22 +75,40 @@ protected:
   virtual bool ExecuteAction( Action* action, 
     mitk::StateEvent const* stateEvent );
 
+  enum
+  {
+    COLORIZATION_GAUSS,
+    COLORIZATION_CONSTANT
+  };
+  
+  bool ColorizeSurface( vtkPolyData *polyData, const Point3D &pickedPoint,
+    int mode, double scalar = 0.0 );
+
 
 private:
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
 
-  Point3D m_InitialInteractionPickedPoint;
+  Point3D m_InitialPickedPoint;
+  Point2D m_InitialPickedDisplayPoint;
+  vtkFloatingPointType m_InitialPickedPointWorld[4];
 
-  Point2D m_InitialInteractionPointDisplay;
-  vtkFloatingPointType m_InitialInteractionPointWorld[4];
+  Point3D m_CurrentPickedPoint;
+  Point2D m_CurrentPickedDisplayPoint;
+  vtkFloatingPointType m_CurrentPickedPointWorld[4];
 
-  Point2D m_CurrentInteractionPointDisplay;
-  vtkFloatingPointType m_CurrentInteractionPointWorld[4];
+  Vector3D m_ObjectNormal;
+  
+  Geometry3D::Pointer m_Geometry;
+
+  Surface *m_Surface;
+  vtkPolyData *m_PolyData;
 
   DataTreeNode *m_PickedSurfaceNode;
   Surface *m_PickedSurface;
+  vtkPolyData *m_PickedPolyData;
+
   vtkPolyData *m_OriginalPolyData;
 
   double m_GaussSigma;

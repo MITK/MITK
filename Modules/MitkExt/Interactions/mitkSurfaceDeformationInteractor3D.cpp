@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyle.h>
 #include <vtkPolyData.h>
+#include <vtkPointData.h>
+#include <vtkDataArray.h>
 
 
 //how precise must the user pick the point
@@ -51,6 +53,11 @@ mitk::SurfaceDeformationInteractor3D
   m_GaussSigma( 30.0 )
 {
   m_OriginalPolyData = vtkPolyData::New();
+
+  // Initialize vector arithmetic
+  m_ObjectNormal[0] = 0.0;
+  m_ObjectNormal[1] = 0.0;
+  m_ObjectNormal[2] = 1.0;
 }
 
 mitk::SurfaceDeformationInteractor3D::~SurfaceDeformationInteractor3D()
@@ -149,6 +156,17 @@ bool mitk::SurfaceDeformationInteractor3D
     }
   }
 
+  // Check if we have a DisplayPositionEvent
+  const mitk::DisplayPositionEvent *dpe = 
+    dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );     
+  if ( dpe != NULL )
+  {
+    m_PickedSurfaceNode = dpe->GetPickedObjectNode();
+    m_CurrentPickedPoint = dpe->GetWorldPosition();
+    m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
+  }
+
+
   // Get data object
   mitk::BaseData *data = m_DataTreeNode->GetData();
 
@@ -161,8 +179,19 @@ bool mitk::SurfaceDeformationInteractor3D
     timeInMS = renderer->GetTime();
   }
 
+  // Extract surface
+  m_Surface = dynamic_cast< Surface * >( data );
+  if ( m_Surface != NULL )
+  {
+    m_PolyData = m_Surface->GetVtkPolyData( timeStep );
+  }
+  else
+  {
+    m_PolyData = NULL;
+  }
+
   // Get geometry object
-  mitk::Geometry3D *geometry = data->GetGeometry( timeStep );
+  m_Geometry = data->GetGeometry( timeStep );
 
 
   // Make sure that the data (if time-resolved) has enough entries;
@@ -179,28 +208,17 @@ bool mitk::SurfaceDeformationInteractor3D
 
   case AcCHECKOBJECT:
     {
-      // Re-enable VTK interactor (may have been disabled previously)
-      if ( renderWindowInteractor != NULL )
-      {
-        renderWindowInteractor->Enable();
-      }
-
-      // Check if we have a DisplayPositionEvent
-      const mitk::DisplayPositionEvent *dpe = 
-        dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );     
-      if ( dpe == NULL )
-      {
-        ok = true;
-        break;
-      }
-
       // Check if an object is present at the current mouse position
       m_PickedSurface = NULL;
-      m_PickedSurfaceNode = dpe->GetPickedObjectNode();
+      m_PickedPolyData = NULL;
 
       if ( m_PickedSurfaceNode != NULL )
       {
         m_PickedSurface = dynamic_cast< mitk::Surface * >( m_PickedSurfaceNode->GetData() );
+        if ( m_PickedSurface != NULL )
+        {
+          m_PickedPolyData = m_PickedSurface->GetVtkPolyData( timeStep );
+        }
       }
 
       mitk::StateEvent *newStateEvent;
@@ -208,11 +226,23 @@ bool mitk::SurfaceDeformationInteractor3D
       {
         // Yes: object will be selected
         newStateEvent = new mitk::StateEvent( EIDYES );
+      
+        // Disable VTK interactor until MITK interaction has been completed
+        if ( renderWindowInteractor != NULL )
+        {
+          renderWindowInteractor->Disable();
+        }
       }
       else
       {
         // No: back to start state
         newStateEvent = new mitk::StateEvent( EIDNO );
+
+        // Re-enable VTK interactor (may have been disabled previously)
+        if ( renderWindowInteractor != NULL )
+        {
+          renderWindowInteractor->Enable();
+        }
       }
 
       this->HandleEvent( newStateEvent );
@@ -226,6 +256,11 @@ bool mitk::SurfaceDeformationInteractor3D
       // Color object white
       m_DataTreeNode->SetColor( 1.0, 1.0, 1.0 );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      // Colorize surface / wireframe as inactive
+      this->ColorizeSurface( m_PolyData,
+        m_CurrentPickedPoint, COLORIZATION_CONSTANT, -1.0 );
+
       ok = true;
       break;
     }
@@ -235,99 +270,74 @@ bool mitk::SurfaceDeformationInteractor3D
       // Color object red
       m_DataTreeNode->SetColor( 1.0, 0.0, 0.0 );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      // Colorize surface / wireframe dependend on distance from picked point
+      this->ColorizeSurface( m_PolyData,
+        m_CurrentPickedPoint, COLORIZATION_GAUSS );
+
       ok = true;  
       break;
     }
 
   case AcINITMOVE:
     {
-      // Disable VTK interactor until MITK interaction has been completed
-      if ( renderWindowInteractor != NULL )
-      {
-        renderWindowInteractor->Disable();
-      }
-
-      // Check if we have a DisplayPositionEvent
-      const mitk::DisplayPositionEvent *dpe = 
-        dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );     
-      if ( dpe == NULL )
-      {
-        ok = true;
-        break;
-      }
-
-      mitk::DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
-      m_InitialInteractionPickedPoint = dpe->GetWorldPosition();
-      m_InitialInteractionPointDisplay = dpe->GetDisplayPosition();
+      // Store current picked point
+      m_InitialPickedPoint = m_CurrentPickedPoint;
+      m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
 
       if ( renderWindowInteractor != NULL )
       {
         vtkInteractorObserver::ComputeDisplayToWorld(
           renderWindowInteractor->GetInteractorStyle()->GetCurrentRenderer(),
-          m_InitialInteractionPointDisplay[0],
-          m_InitialInteractionPointDisplay[1],
+          m_InitialPickedDisplayPoint[0],
+          m_InitialPickedDisplayPoint[1],
           0.0, //m_InitialInteractionPickedPoint[2],
-          m_InitialInteractionPointWorld );
+          m_InitialPickedPointWorld );
       }
 
 
       // Make deep copy of vtkPolyData interacted on
-      m_OriginalPolyData->DeepCopy( m_PickedSurface->GetVtkPolyData( timeStep ) );
+      m_OriginalPolyData->DeepCopy( m_PolyData );
+
       ok = true;
       break;
     }
 
   case AcMOVE:
     {
-      // Check if we have a DisplayPositionEvent
-      const mitk::DisplayPositionEvent *dpe = 
-        dynamic_cast< const mitk::DisplayPositionEvent * >( stateEvent->GetEvent() );     
-      if ( dpe == NULL )
-      {
-        ok = true;
-        break;
-      }
-
-      m_CurrentInteractionPointDisplay = dpe->GetDisplayPosition();
       if ( renderWindowInteractor != NULL )
       {
         vtkInteractorObserver::ComputeDisplayToWorld(
           renderWindowInteractor->GetInteractorStyle()->GetCurrentRenderer(),
-          m_CurrentInteractionPointDisplay[0],
-          m_CurrentInteractionPointDisplay[1],
+          m_CurrentPickedDisplayPoint[0],
+          m_CurrentPickedDisplayPoint[1],
           0.0, //m_InitialInteractionPickedPoint[2],
-          m_CurrentInteractionPointWorld );
+          m_CurrentPickedPointWorld );
       }
 
 
       // Calculate mouse move in 3D space
       mitk::Vector3D interactionMove;
-      interactionMove[0] = m_CurrentInteractionPointWorld[0] - m_InitialInteractionPointWorld[0];
-      interactionMove[1] = m_CurrentInteractionPointWorld[1] - m_InitialInteractionPointWorld[1];
-      interactionMove[2] = m_CurrentInteractionPointWorld[2] - m_InitialInteractionPointWorld[2];
+      interactionMove[0] = m_CurrentPickedPointWorld[0] - m_InitialPickedPointWorld[0];
+      interactionMove[1] = m_CurrentPickedPointWorld[1] - m_InitialPickedPointWorld[1];
+      interactionMove[2] = m_CurrentPickedPointWorld[2] - m_InitialPickedPointWorld[2];
 
       // Transform mouse move into geometry space
       data->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
       mitk::Point3D origin; origin.Fill( 0.0 );
-      geometry->WorldToIndex( origin, interactionMove, interactionMove );
+      m_Geometry->WorldToIndex( origin, interactionMove, interactionMove );
 
-
-      Vector3D objectNormal;
-      objectNormal[0] = 0.0;
-      objectNormal[1] = 0.0;
-      objectNormal[2] = 1.0;
 
       // Get picked point and transform into local coordinates
       mitk::Point3D pickedPoint;
-      geometry->WorldToIndex( m_InitialInteractionPickedPoint, pickedPoint );
+      m_Geometry->WorldToIndex( m_InitialPickedPoint, pickedPoint );
       mitk::Vector3D v1 = pickedPoint.GetVectorFromOrigin();
 
-      mitk::Vector3D v2 = objectNormal * (interactionMove * objectNormal);
+      mitk::Vector3D v2 = m_ObjectNormal * (interactionMove * m_ObjectNormal);
 
 
       vtkPoints *originalPoints = m_OriginalPolyData->GetPoints();
-      vtkPoints *deformedPoints = m_PickedSurface->GetVtkPolyData( timeStep )->GetPoints();
-
+      vtkPoints *deformedPoints = m_PolyData->GetPoints();
 
       double denom = m_GaussSigma * m_GaussSigma * 2;
       double point[3];
@@ -342,7 +352,7 @@ bool mitk::SurfaceDeformationInteractor3D
 
 
         // Calculate distance of this point from line through picked point
-        double d = itk::CrossProduct( objectNormal, (v1 - v0) ).GetNorm();
+        double d = itk::CrossProduct( m_ObjectNormal, (v1 - v0) ).GetNorm();
 
         mitk::Vector3D t = v2 * exp( - d * d / denom );
 
@@ -352,8 +362,8 @@ bool mitk::SurfaceDeformationInteractor3D
         deformedPoints->SetPoint( i, point );
       }
 
-      m_PickedSurface->Modified();
-      m_PickedSurface->GetVtkPolyData( timeStep )->Modified();
+      m_PolyData->Modified();
+      m_Surface->Modified();
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(
         mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
@@ -382,6 +392,10 @@ bool mitk::SurfaceDeformationInteractor3D
         m_GaussSigma = 128.0;
       }
 
+      // Colorize surface / wireframe dependend on sigma and distance from picked point
+      this->ColorizeSurface( m_PolyData,
+        m_InitialPickedPoint, COLORIZATION_GAUSS );
+
       
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(
         mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
@@ -395,4 +409,64 @@ bool mitk::SurfaceDeformationInteractor3D
   }
 
   return ok;
+}
+
+
+bool mitk::SurfaceDeformationInteractor3D::ColorizeSurface( vtkPolyData *polyData, 
+  const Point3D &pickedPoint, int mode, double scalar )
+{
+  if ( polyData == NULL )
+  {
+    return false;
+  }
+
+  vtkPoints *points = polyData->GetPoints();
+  vtkPointData *pointData = polyData->GetPointData();
+  if ( pointData == NULL )
+  {
+    return false;
+  }
+
+  vtkDataArray *scalars = pointData->GetScalars();
+  if ( scalars == NULL )
+  {
+    return false;
+  }
+
+  if ( mode == COLORIZATION_GAUSS )
+  {
+    // Get picked point and transform into local coordinates
+    mitk::Point3D localPickedPoint;
+    m_Geometry->WorldToIndex( pickedPoint, localPickedPoint );
+    mitk::Vector3D v1 = localPickedPoint.GetVectorFromOrigin();
+
+    double denom = m_GaussSigma * m_GaussSigma * 2;
+    for ( unsigned int i = 0; i < points->GetNumberOfPoints(); ++i )
+    {
+      // Get original point
+      vtkFloatingPointType *point = points->GetPoint( i );
+      mitk::Vector3D v0;
+      v0[0] = point[0];
+      v0[1] = point[1];
+      v0[2] = point[2];
+
+      // Calculate distance of this point from line through picked point
+      double d = itk::CrossProduct( m_ObjectNormal, (v1 - v0) ).GetNorm();
+      double t = exp( - d * d / denom );
+
+      scalars->SetComponent( i, 0, t );
+    }
+  }
+  else if ( mode == COLORIZATION_CONSTANT )
+  {
+    for ( unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i )
+    {
+      scalars->SetComponent( i, 0, scalar );
+    }
+  }
+
+  polyData->Modified();
+  pointData->Update();
+
+  return true;
 }

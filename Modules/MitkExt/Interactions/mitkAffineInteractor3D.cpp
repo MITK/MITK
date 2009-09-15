@@ -37,6 +37,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkInteractorStyle.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include <vtkPoints.h>
+#include <vtkPointData.h>
+#include <vtkDataArray.h>
 
 
 namespace mitk
@@ -188,6 +191,15 @@ bool AffineInteractor3D
     }
   }
 
+  // Check if we have a DisplayPositionEvent
+  const DisplayPositionEvent *dpe = 
+    dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );     
+  if ( dpe != NULL )
+  {
+    m_CurrentPickedPoint = dpe->GetWorldPosition();
+    m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
+  }
+
   // Get the timestep to also support 3D+t
   int timeStep = 0;
   ScalarType timeInMS = 0.0;
@@ -196,6 +208,17 @@ bool AffineInteractor3D
     timeStep = renderer->GetTimeStep( data );
     timeInMS = renderer->GetTime();
   }
+
+  // If data is an mitk::Surface, extract it
+  Surface *surface = dynamic_cast< Surface * >( data );
+  vtkPolyData *polyData = NULL;
+  if ( surface != NULL )
+  {
+    polyData = surface->GetVtkPolyData( timeStep );
+  }
+
+  // Get geometry object
+  m_Geometry = data->GetGeometry( timeStep );
 
 
   // Make sure that the data (if time-resolved) has enough entries;
@@ -252,6 +275,11 @@ bool AffineInteractor3D
       // Color object white
       m_DataTreeNode->SetColor( 1.0, 1.0, 1.0 );
       RenderingManager::GetInstance()->RequestUpdateAll();
+  
+      // Colorize surface / wireframe as inactive
+      this->ColorizeSurface( polyData,
+        m_CurrentPickedPoint, -1.0 );
+
       ok = true;
       break;
     }
@@ -261,6 +289,11 @@ bool AffineInteractor3D
       // Color object red
       m_DataTreeNode->SetColor( 1.0, 0.0, 0.0 );
       RenderingManager::GetInstance()->RequestUpdateAll();
+
+      // Colorize surface / wireframe dependend on distance from picked point
+      this->ColorizeSurface( polyData,
+        m_CurrentPickedPoint, 0.0 );
+
       ok = true;  
       break;
     }
@@ -283,18 +316,18 @@ bool AffineInteractor3D
       }
 
       DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
-      m_InitialInteractionPickedPoint = dpe->GetWorldPosition();
+      
+      m_InitialPickedPoint = m_CurrentPickedPoint;
+      m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
 
-
-      m_InitialInteractionPointDisplay = dpe->GetDisplayPosition();
       if ( currentVtkRenderer != NULL )
       {
         vtkInteractorObserver::ComputeDisplayToWorld(
           currentVtkRenderer,
-          m_InitialInteractionPointDisplay[0],
-          m_InitialInteractionPointDisplay[1],
+          m_InitialPickedDisplayPoint[0],
+          m_InitialPickedDisplayPoint[1],
           0.0, //m_InitialInteractionPickedPoint[2],
-          m_InitialInteractionPointWorld );
+          m_InitialPickedPointWorld );
       }
 
 
@@ -318,22 +351,21 @@ bool AffineInteractor3D
         break;
       }
 
-      m_CurrentInteractionPointDisplay = dpe->GetDisplayPosition();
       if ( currentVtkRenderer != NULL )
       {
         vtkInteractorObserver::ComputeDisplayToWorld(
           currentVtkRenderer,
-          m_CurrentInteractionPointDisplay[0],
-          m_CurrentInteractionPointDisplay[1],
+          m_CurrentPickedDisplayPoint[0],
+          m_CurrentPickedDisplayPoint[1],
           0.0, //m_InitialInteractionPickedPoint[2],
-          m_CurrentInteractionPointWorld );
+          m_CurrentPickedPointWorld );
       }
 
 
       Vector3D interactionMove;
-      interactionMove[0] = m_CurrentInteractionPointWorld[0] - m_InitialInteractionPointWorld[0];
-      interactionMove[1] = m_CurrentInteractionPointWorld[1] - m_InitialInteractionPointWorld[1];
-      interactionMove[2] = m_CurrentInteractionPointWorld[2] - m_InitialInteractionPointWorld[2];
+      interactionMove[0] = m_CurrentPickedPointWorld[0] - m_InitialPickedPointWorld[0];
+      interactionMove[1] = m_CurrentPickedPointWorld[1] - m_InitialPickedPointWorld[1];
+      interactionMove[2] = m_CurrentPickedPointWorld[2] - m_InitialPickedPointWorld[2];
 
       if ( m_InteractionMode == INTERACTION_MODE_TRANSLATION )
       {
@@ -364,10 +396,10 @@ bool AffineInteractor3D
 
           int *size = currentVtkRenderer->GetSize();
           double l2 =
-            (m_CurrentInteractionPointDisplay[0] - m_InitialInteractionPointDisplay[0]) *
-            (m_CurrentInteractionPointDisplay[0] - m_InitialInteractionPointDisplay[0]) +
-            (m_CurrentInteractionPointDisplay[1] - m_InitialInteractionPointDisplay[1]) *
-            (m_CurrentInteractionPointDisplay[1] - m_InitialInteractionPointDisplay[1]);
+            (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
+            (m_CurrentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
+            (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
+            (m_CurrentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
 
           double rotationAngle = 360.0 * sqrt(l2/(size[0]*size[0]+size[1]*size[1]));
 
@@ -398,5 +430,38 @@ bool AffineInteractor3D
 
   return ok;
 }
+
+bool AffineInteractor3D::ColorizeSurface( vtkPolyData *polyData, 
+  const Point3D &pickedPoint, double scalar )
+{
+  if ( polyData == NULL )
+  {
+    return false;
+  }
+
+  vtkPoints *points = polyData->GetPoints();
+  vtkPointData *pointData = polyData->GetPointData();
+  if ( pointData == NULL )
+  {
+    return false;
+  }
+
+  vtkDataArray *scalars = pointData->GetScalars();
+  if ( scalars == NULL )
+  {
+    return false;
+  }
+
+  for ( unsigned int i = 0; i < pointData->GetNumberOfTuples(); ++i )
+  {
+    scalars->SetComponent( i, 0, scalar );
+  }
+
+  polyData->Modified();
+  pointData->Update();
+
+  return true;
+}
+
 
 } // namespace

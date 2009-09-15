@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkInteractor.h"
 #include "mitkCommon.h"
+#include "mitkSurface.h"
 
+#include <vtkPolyData.h>
 #include <vtkType.h>
 
 namespace mitk
@@ -80,6 +82,9 @@ protected:
   virtual bool ExecuteAction( Action* action, 
     mitk::StateEvent const* stateEvent );
 
+  bool ColorizeSurface( vtkPolyData *polyData, const Point3D &pickedPoint,
+    double scalar = 0.0 );
+
 
 private:
 
@@ -88,13 +93,15 @@ private:
 
   bool m_InteractionMode;
 
-  Point3D m_InitialInteractionPickedPoint;
+  Point3D m_InitialPickedPoint;
+  Point2D m_InitialPickedDisplayPoint;
+  vtkFloatingPointType m_InitialPickedPointWorld[4];
 
-  Point2D m_InitialInteractionPointDisplay;
-  vtkFloatingPointType m_InitialInteractionPointWorld[4];
+  Point3D m_CurrentPickedPoint;
+  Point2D m_CurrentPickedDisplayPoint;
+  vtkFloatingPointType m_CurrentPickedPointWorld[4];
 
-  Point2D m_CurrentInteractionPointDisplay;
-  vtkFloatingPointType m_CurrentInteractionPointWorld[4];
+  Geometry3D::Pointer m_Geometry;
 
   Geometry3D::Pointer m_OriginalGeometry;
 

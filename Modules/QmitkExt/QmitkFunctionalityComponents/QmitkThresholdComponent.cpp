@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkDataTreeFilterFunctions.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkImageTimeSelector.h"
 #include "mitkLevelWindowProperty.h"
 
 #include <mitkNodePredicateDataType.h>
@@ -37,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QIntValidator>
 
 #include <mitkImageAccessByItk.h>
-#include <mitkIpPicTypeMultiplex.h>
+//#include <mitkIpPicTypeMultiplex.h>
 #include <itkImageConstIteratorWithIndex.h>
 
 
@@ -98,7 +99,7 @@ void QmitkThresholdComponent::CreateConnections()
 
     //to connect the toplevel checkable GroupBox with the method SetContentContainerVisibility to inform all containing komponent to shrink or to expand
     connect( (QObject*)(m_ThresholdFinder),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool))); 
-    connect( (QObject*)(m_CreateSegmentationButton),  SIGNAL(pressed()), (QObject*) this, SLOT(CreateThresholdSegmentation())); 
+    connect( (QObject*)(m_CreateSegmentationButton),  SIGNAL(released()), (QObject*) this, SLOT(CreateThresholdSegmentation())); 
   }
 }
 
@@ -516,154 +517,125 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
 /*************CREAET THRESHOLD SEGMENTATION************/
 void QmitkThresholdComponent::CreateThresholdSegmentation()
 {
-  mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
-  segmentationNode->SetData(m_TreeNodeSelector->GetSelectedNode()->GetData());
-  m_MitkImage = dynamic_cast<mitk::Image*>(m_TreeNodeSelector->GetSelectedNode()->GetData());
-  if  
-    (segmentationNode.IsNotNull())
+  mitk::Image::Pointer original = dynamic_cast<mitk::Image*>(m_TreeNodeSelector->GetSelectedNode()->GetData());
+  // we NEED a reference image for size etc.
+  if (!original) return;
+
+  // actually create a new empty segmentation
+  mitk::PixelType pixelType( typeid(DefaultSegmentationDataType) );
+  mitk::Image::Pointer segmentation = mitk::Image::New();
+  //segmentation->SetProperty( "organ type", OrganTypeProperty::New( organType ) );
+
+  segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );
+
+  unsigned int byteSize = sizeof(DefaultSegmentationDataType);
+  for (unsigned int dim = 0; dim < segmentation->GetDimension(); ++dim) 
   {
-    mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("TH segmentation" );
-    segmentationNode->SetProperty( "name", nameProp );
-    segmentationNode->GetPropertyList()->SetProperty("binary", mitk::BoolProperty::New(true));
-    mitk::BoolProperty::Pointer thresholdBasedSegmentationProp = mitk::BoolProperty::New(true);
-    segmentationNode->SetProperty( "segmentation", thresholdBasedSegmentationProp );
-    segmentationNode->GetPropertyList()->SetProperty("layer",mitk::IntProperty::New(1));
-    segmentationNode->SetColor(1.0,0.0,0.0);
-    segmentationNode->SetOpacity(.25);
+    byteSize *= segmentation->GetDimension(dim);
+  }
+  memset( segmentation->GetData(), 0, byteSize );
 
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( segmentationNode->GetData() );
-    if (image.IsNotNull())
-    {
-
-
-      // ask the user about an organ type and name, add this information to the image's (!) propertylist
-
-      // create a new image of the same dimensions and smallest possible pixel type
-      AccessFixedDimensionByItk_2(m_MitkImage, /*the actual selected image */
-        ThresholdSegmentation, /*called template-method */
-        3, /*dimension */
-        image, /*passed segmentation */
-        this /* the QmitkSurfaceCreator-object */);
-
-
-      //mitk::DataTreeNode::Pointer segmentation = CreateEmptySegmentationNode(image);
-      if (!m_ThresholdSegmentationImage) return; // could be aborted by user
-
-
-      segmentationNode->SetData(m_ThresholdSegmentationImage);
-
-      mitk::DataTreeNode::Pointer origNode =  m_TreeNodeSelector->GetSelectedNode();
-      m_DataStorage->Add(segmentationNode, origNode);
-
-    }
+  if (original->GetTimeSlicedGeometry() )
+  {
+    mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF = original->GetTimeSlicedGeometry()->Clone();
+    mitk::TimeSlicedGeometry::Pointer originalGeometry = dynamic_cast<mitk::TimeSlicedGeometry*>( originalGeometryAGF.GetPointer() );
+    segmentation->SetGeometry( originalGeometry );
+  }
+  else
+  {
+    LOG_INFO<<"Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.";
+    return ;
   }
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
+  mitk::DataTreeNode::Pointer emptySegmentationNode = CreateSegmentationNode( segmentation);
 
-mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateEmptySegmentationNode( mitk::Image* image)
-{
-  //if (!image) return NULL;
-  //// actually create a new empty segmentation
-  //mitk::PixelType pixelType( typeid(short int) );
-  //mitk::Image::Pointer segmentation = mitk::Image::New();
-  //segmentation->Initialize( pixelType, image->GetDimension(), image->GetDimensions() );
-  //memset( segmentation->GetData(), 0, sizeof(short int) * segmentation->GetDimension(0) * segmentation->GetDimension(1) * segmentation->GetDimension(2) );
+  if (emptySegmentationNode)
+  {
+    // actually perform a thresholding and ask for an organ type
+    for (unsigned int timeStep = 0; timeStep < original->GetTimeSteps(); ++timeStep)
+    {
+      try
+      {
+        mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+        timeSelector->SetInput( original );
+        timeSelector->SetTimeNr( timeStep );
+        timeSelector->UpdateLargestPossibleRegion();
+        mitk::Image::Pointer image3D = timeSelector->GetOutput();
 
-  //if (image->GetGeometry() )
-  //{
-  //            mitk::AffineGeometryFrame3D::Pointer originalGeometryAGF =  image->GetGeometry()->Clone();
-  //            mitk::Geometry3D::Pointer originalGeometry = dynamic_cast<mitk::Geometry3D*>( originalGeometryAGF.GetPointer() );
-  //            segmentation->SetGeometry( originalGeometry );
-  //}
+        AccessFixedDimensionByItk_2( image3D, ITKThresholding, 3, dynamic_cast<mitk::Image*>(emptySegmentationNode->GetData()), timeStep );
+      }
+      catch(...)
+      {
+        LOG_INFO<<"Error accessing single time steps of the original image. Cannot create segmentation.";
+      }
+    }
 
-  return CreateSegmentationNode(image);
+    mitk::DataTreeNode::Pointer originalNode = m_TreeNodeSelector->GetSelectedNode();
+    m_DataStorage->Add( emptySegmentationNode, originalNode ); // add as a child, because the segmentation "derives" from the original
+   
+  }
 }
 
 mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode( mitk::Image* image)
 {
+
   if (!image) return NULL;
 
   // decorate the datatreenode with some properties
   mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
   segmentationNode->SetData( image );
 
+  // name
+  segmentationNode->SetProperty( "name", mitk::StringProperty::New( "TH segmentation from ThresholdFinder" ) );
+
   // visualization properties
-
   segmentationNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-  segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
-  segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
-  segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
-
-  segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
   segmentationNode->SetProperty( "color", mitk::ColorProperty::New(0.0, 1.0, 0.0) );
+  segmentationNode->SetProperty( "texture interpolation", mitk::BoolProperty::New(false) );
+  segmentationNode->SetProperty( "layer", mitk::IntProperty::New(10) );
+  segmentationNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0.5, 1) ) );
+  segmentationNode->SetProperty( "opacity", mitk::FloatProperty::New(0.3) );
+  segmentationNode->SetProperty( "segmentation", mitk::BoolProperty::New(true) );
+  segmentationNode->SetProperty( "showVolume", mitk::BoolProperty::New( false ) );
 
   return segmentationNode;
 }
 
-//*************************************TEMPLATE FOR THRESHOLDSEGMENTATION******************************
-//
-// to create a new segmentation that contains those areas above the threshold
-// called from NewThresholdSegmentation
-
-template < typename TPixel, unsigned int VImageDimension >
-void QmitkThresholdComponent::ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/)
+template <typename TPixel, unsigned int VImageDimension>
+void QmitkThresholdComponent::ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep )
 {
-  // iterator on m_MitkImage
-  typedef itk::Image< TPixel, VImageDimension > ItkImageType;
-  itk::ImageRegionConstIterator<ItkImageType> itMitkImage(itkImage, itkImage->GetLargestPossibleRegion() );
+  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+  timeSelector->SetInput( segmentation );
+  timeSelector->SetTimeNr( timeStep );
+  timeSelector->UpdateLargestPossibleRegion();
+  mitk::Image::Pointer segmentation3D = timeSelector->GetOutput();
 
-  // pointer on segmentation
-  typedef itk::Image< unsigned char, VImageDimension > ItkSegmentationImageType;
-  typename ItkSegmentationImageType::Pointer itkSegmentation;
+  typedef itk::Image< DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
+  SegmentationType::Pointer itkSegmentation;
+  CastToItkImage( segmentation3D, itkSegmentation );
 
-  // cast segmentation from mitk-image to itk-image
-  if(segmentation != NULL)
+  // iterate over original and segmentation
+  typedef itk::ImageRegionConstIterator< itk::Image<TPixel, VImageDimension> >     InputIteratorType;
+  typedef itk::ImageRegionIterator< SegmentationType >     SegmentationIteratorType;
+
+  InputIteratorType inputIterator( originalImage, originalImage->GetLargestPossibleRegion() );
+  SegmentationIteratorType outputIterator( itkSegmentation, itkSegmentation->GetLargestPossibleRegion() );
+
+  inputIterator.GoToBegin();
+  outputIterator.GoToBegin();
+
+  while (!outputIterator.IsAtEnd())
   {
-    mitk::CastToItkImage(segmentation, itkSegmentation);
-  }
-
-  // new pointer on segmentation: itkThresholdSegmentedImage
-  typename ItkSegmentationImageType::Pointer itkThresholdSegmentedImage = ItkSegmentationImageType::New();
-
-  // properties for itkThresholdSegmentedImage:
-  itkThresholdSegmentedImage->SetRegions(itkImage->GetLargestPossibleRegion());
-  itkThresholdSegmentedImage->Allocate();
-
-  // iterator on itkThresholdSegmentedImage: itSegmented
-  itk::ImageRegionIterator<ItkSegmentationImageType> itSegmented(itkThresholdSegmentedImage, itkThresholdSegmentedImage->GetLargestPossibleRegion() );
-
-
-  int thresholdValue(0);//Threshold above that the segmentation shall be created
-
-  // threshold-input from GUI:
-  thresholdValue = atoi( m_ThresholdInputNumber->text());
-
-  while(!(itMitkImage.IsAtEnd()))
-  {
-    if((signed)itMitkImage.Get() >= thresholdValue)
-      //if the pixel-value of the m_Mitk-Image is higher or equals the threshold
+    if ( (signed)inputIterator.Get() >= atoi( m_ThresholdInputNumber->text()) )
     {
-      itSegmented.Set(1);
-      // set the pixel-value at the segmentation to "1"
+      outputIterator.Set( 1 );
     }
     else
     {
-      itSegmented.Set(0);
-      // else set the pixel-value at the segmentation to "0"
+      outputIterator.Set( 0 );
     }
-    ++itMitkImage;
-    ++itSegmented;
-    //TODO: die Segmentierung aus der Methode returnen
-  }//end of while (!(itMitkImage.IsAtEnd()))
 
-  // create new mitk-Image: m_ThresholdSegmentationImage
-  m_ThresholdSegmentationImage = mitk::Image::New(); 
-
-  // fill m_ThresholdSegmentationImage with itkThresholdSegmentedImage:
-  mitk::CastToMitkImage(itkThresholdSegmentedImage, m_ThresholdSegmentationImage);
-
+    ++inputIterator;
+    ++outputIterator;
+  }
 }
-
-
-

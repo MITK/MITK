@@ -128,11 +128,6 @@ public slots:
 protected:
 
   /*!
-  Method to create a new Segmentation
-  */
-  mitk::DataTreeNode::Pointer CreateEmptySegmentationNode( mitk::Image* image);
-
-  /*!
   Method to create the node for the thresholdbased segmentation
   */
   mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image);
@@ -162,11 +157,14 @@ private:
   /** \brief Method to to delete ThresholdNode if Component is deactivated*/
   void DeleteThresholdNode();
 
-  /*!
-  \brief template to create thresholdSegmentation
-  */
- template < typename TPixel, unsigned int VImageDimension >
- void ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/);
+ // /*!
+ // \brief template to create thresholdSegmentation
+ // */
+ //template < typename TPixel, unsigned int VImageDimension >
+ //void ThresholdSegmentation(itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* segmentation, QmitkThresholdComponent * /*thresholdComponent*/);
+
+  template <typename TPixel, unsigned int VImageDimension>
+  void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
 
   /***************        ATTRIBUTES      ***************/
 
@@ -193,6 +191,8 @@ private:
   QPushButton* m_CreateSegmentationButton;
   QCheckBox* m_DeleateImageIfDeactivatedCheckBox;
   QmitkDataStorageComboBox* m_TreeNodeSelector;
+
+  typedef unsigned char DefaultSegmentationDataType;
 
 };
 

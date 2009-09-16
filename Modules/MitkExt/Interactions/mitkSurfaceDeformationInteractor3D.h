@@ -98,6 +98,8 @@ private:
   Point2D m_CurrentPickedDisplayPoint;
   vtkFloatingPointType m_CurrentPickedPointWorld[4];
 
+  Point3D m_SurfaceColorizationCenter;
+
   Vector3D m_ObjectNormal;
   
   Geometry3D::Pointer m_Geometry;

@@ -252,6 +252,9 @@ bool mitk::SurfaceDeformationInteractor3D
 
       this->HandleEvent( newStateEvent );
 
+      // Colorized surface at current picked position
+      m_SurfaceColorizationCenter = m_CurrentPickedPoint;
+
       ok = true;
       break;
     }
@@ -264,7 +267,7 @@ bool mitk::SurfaceDeformationInteractor3D
 
       // Colorize surface / wireframe as inactive
       this->ColorizeSurface( m_PolyData,
-        m_CurrentPickedPoint, COLORIZATION_CONSTANT, -1.0 );
+        m_SurfaceColorizationCenter, COLORIZATION_CONSTANT, -1.0 );
 
       ok = true;
       break;
@@ -278,7 +281,7 @@ bool mitk::SurfaceDeformationInteractor3D
 
       // Colorize surface / wireframe dependend on distance from picked point
       this->ColorizeSurface( m_PolyData,
-        m_CurrentPickedPoint, COLORIZATION_GAUSS );
+        m_SurfaceColorizationCenter, COLORIZATION_GAUSS );
 
       ok = true;  
       break;
@@ -367,6 +370,10 @@ bool mitk::SurfaceDeformationInteractor3D
         deformedPoints->SetPoint( i, point );
       }
 
+      // Make sure that surface is colorized at initial picked position
+      // as long as we are in deformation state
+      m_SurfaceColorizationCenter = m_InitialPickedPoint;
+
       m_PolyData->Modified();
       m_Surface->Modified();
 
@@ -399,7 +406,7 @@ bool mitk::SurfaceDeformationInteractor3D
 
       // Colorize surface / wireframe dependend on sigma and distance from picked point
       this->ColorizeSurface( m_PolyData,
-        m_InitialPickedPoint, COLORIZATION_GAUSS );
+        m_SurfaceColorizationCenter, COLORIZATION_GAUSS );
 
       
       mitk::RenderingManager::GetInstance()->RequestUpdateAll(

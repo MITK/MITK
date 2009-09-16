@@ -160,6 +160,11 @@ bool AffineInteractor3D
 
   // Get data object
   BaseData *data = m_DataTreeNode->GetData();
+  if ( data == NULL )
+  {
+    LOG_ERROR << "No data object present!";
+    return ok;
+  }
 
   // Get Event and extract renderer
   const Event *event = stateEvent->GetEvent();

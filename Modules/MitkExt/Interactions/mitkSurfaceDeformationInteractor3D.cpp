@@ -137,6 +137,14 @@ bool mitk::SurfaceDeformationInteractor3D
 {
   bool ok = false;
 
+  // Get data object
+  mitk::BaseData *data = m_DataTreeNode->GetData();
+  if ( data == NULL )
+  {
+    LOG_ERROR << "No data object present!";
+    return ok;
+  }
+
   // Get mitk::Event and extract renderer
   const mitk::Event *event = stateEvent->GetEvent();
   mitk::BaseRenderer *renderer = NULL;
@@ -166,9 +174,6 @@ bool mitk::SurfaceDeformationInteractor3D
     m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
   }
 
-
-  // Get data object
-  mitk::BaseData *data = m_DataTreeNode->GetData();
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;

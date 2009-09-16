@@ -25,6 +25,7 @@ SET(CPP_FILES
   Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
   Algorithms/mitkLabeledImageToSurfaceFilter.cpp
+  Algorithms/mitkLabeledImageVolumeCalculator.cpp
   Algorithms/mitkLookupTableSource.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkMaskImageFilter.cpp

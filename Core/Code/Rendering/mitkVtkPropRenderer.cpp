@@ -52,6 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <vtkWorldPointPicker.h>
 #include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
 #include <vtkProp.h>
@@ -74,6 +75,9 @@ mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renW
 
   m_PointPicker = vtkPointPicker::New();
   m_PointPicker->SetTolerance( 0.0025 );
+
+  m_CellPicker = vtkCellPicker::New();
+  m_CellPicker->SetTolerance( 0.0025 );
 
   mitk::Geometry2DDataVtkMapper3D::Pointer geometryMapper = mitk::Geometry2DDataVtkMapper3D::New();
   m_CurrentWorldGeometry2DMapper = geometryMapper;
@@ -532,7 +536,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
 {
   if ( m_VtkMapperPresent )
   {
-    m_PointPicker->InitializePickList();
+    m_CellPicker->InitializePickList();
 
     // Iterate over all DataStorage objects to determine all vtkProps intended
     // for picking
@@ -559,18 +563,18 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
       if ( prop == NULL )
         continue;
 
-      m_PointPicker->AddPickList( prop );
+      m_CellPicker->AddPickList( prop );
     }  
 
 
     // Do the picking and retrieve the picked vtkProp (if any)
-    m_PointPicker->PickFromListOn();
-    m_PointPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
-    m_PointPicker->PickFromListOff();
+    m_CellPicker->PickFromListOn();
+    m_CellPicker->Pick( displayPosition[0], displayPosition[1], 0.0, m_VtkRenderer );
+    m_CellPicker->PickFromListOff();
 
-    vtk2itk( m_PointPicker->GetPickPosition(), worldPosition );
-    vtkProp *prop = m_PointPicker->GetViewProp();
-    
+    vtk2itk( m_CellPicker->GetPickPosition(), worldPosition );
+    vtkProp *prop = m_CellPicker->GetViewProp();
+  
     if ( prop == NULL )
     {
       return NULL;
@@ -717,15 +721,21 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
 }
 
 
-vtkWorldPointPicker* mitk::VtkPropRenderer::GetWorldPointPicker()
+const vtkWorldPointPicker *mitk::VtkPropRenderer::GetWorldPointPicker() const
 {
   return m_WorldPointPicker;
 }
 
 
-vtkPointPicker* mitk::VtkPropRenderer::GetPointPicker()
+const vtkPointPicker *mitk::VtkPropRenderer::GetPointPicker() const
 {
   return m_PointPicker;
+}
+
+
+const vtkCellPicker *mitk::VtkPropRenderer::GetCellPicker() const
+{
+  return m_CellPicker;
 }
 
 

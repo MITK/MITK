@@ -34,7 +34,7 @@ class vtkLight;
 class vtkLightKit;
 class vtkWorldPointPicker;
 class vtkPointPicker;
-class vtkPropPicker;
+class vtkCellPicker;
 class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
@@ -125,9 +125,9 @@ public:
    */
   vtkAssemblyPath* GetNextPath();
 
-  vtkWorldPointPicker* GetWorldPointPicker();
-  vtkPointPicker* GetPointPicker();
-  vtkPropPicker* GetPropPicker();
+  const vtkWorldPointPicker *GetWorldPointPicker() const;
+  const vtkPointPicker *GetPointPicker() const;
+  const vtkCellPicker *GetCellPicker() const;
 
   /**
   * \brief Release vtk-based graphics resources. Called by
@@ -160,7 +160,7 @@ private:
   // Picking
   vtkWorldPointPicker     * m_WorldPointPicker;
   vtkPointPicker          * m_PointPicker;
-  vtkPropPicker           * m_PropPicker;
+  vtkCellPicker           * m_CellPicker;
 
   PickingMode               m_PickingMode;
 

@@ -434,8 +434,15 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       double time(0.0);
       double tstart(0.0);
       tstart = clock();
-
-      registration->Update();
+      try
+      {
+        registration->Update();
+      }
+      catch (itk::ExceptionObject e)
+      {
+        std::cout<<"Caught exception: "<<e<<std::endl;
+        LOG_INFO << "Caught exception: "<<e;
+      }
 
       time += clock() - tstart;
       time = time / CLOCKS_PER_SEC;
@@ -466,8 +473,15 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       double tstart(0.0);
       tstart = clock();
      
- 
-      registration->Update();
+      try
+      {
+        registration->Update();
+      }
+      catch (itk::ExceptionObject e)
+      {
+        std::cout<<"Caught exception: "<<e<<std::endl;
+        LOG_INFO << "Caught exception: "<<e;
+      }
       
       time += clock() - tstart;
       time = time / CLOCKS_PER_SEC;

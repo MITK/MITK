@@ -18,6 +18,7 @@
 #include "Poco/DOM/NodeList.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/Exception.h"
+#include "Poco/SAX/SAXException.h"
 
 using Poco::XML::DOMParser;
 using Poco::XML::InputSource;
@@ -40,13 +41,24 @@ namespace cherry
     : AbstractPreferencesStorage(_File)
   {
     // file already exists
-    if(_File.exists())
+    try{
+      if(_File.exists())
+      {
+        // build preferences tree from file
+        InputSource src(_File.path());
+        DOMParser parser;
+        AutoPtr<Document> pDoc = parser.parse(&src);
+        this->ToPreferencesTree(pDoc->documentElement(), 0);
+      }
+    }
+    catch (Poco::XML::SAXParseException& exc)
     {
-      // build preferences tree from file
-      InputSource src(_File.path());
-      DOMParser parser;
-      AutoPtr<Document> pDoc = parser.parse(&src);
-      this->ToPreferencesTree(pDoc->documentElement(), 0);
+      const std::string tempString = _File.path()+".backup";
+      LOG_INFO << "Preferences could not be loaded."; 
+      LOG_INFO << "Creating " << tempString; 
+      LOG_INFO << "and resetting to default values.";
+      _File.copyTo(tempString);
+      this->m_Root = NULL;
     }
 
     // if root is null make new one

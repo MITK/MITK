@@ -12,19 +12,19 @@ SET(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriter.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesIOFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriterFactory.cpp
- # IODataStructures/QBallImages/mitkQBallVolumeSource.cpp
- # IODataStructures/QBallImages/mitkNrrdQBallVolumeReader.cpp
- # IODataStructures/QBallImages/mitkNrrdQBallVolumeWriter.cpp
- # IODataStructures/QBallImages/mitkNrrdQBallVolumeIOFactory.cpp
- # IODataStructures/QBallImages/mitkNrrdQBallVolumeWriterFactory.cpp
+  IODataStructures/QBallImages/mitkQBallImageSource.cpp
+  IODataStructures/QBallImages/mitkNrrdQBallImageReader.cpp
+  IODataStructures/QBallImages/mitkNrrdQBallImageWriter.cpp
+  IODataStructures/QBallImages/mitkNrrdQBallImageIOFactory.cpp
+  IODataStructures/QBallImages/mitkNrrdQBallImageWriterFactory.cpp
   IODataStructures/mitkDiffusionImagingObjectFactory.cpp
+  IODataStructures/QBallImages/mitkQBallImage.cpp
 )
 
 SET(H_FILES 
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumes.h 
- # IODataStructures/QBallImages/mitkQBallVolume.h
 )
 
 SET( TOOL_FILES

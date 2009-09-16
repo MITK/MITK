@@ -26,6 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdDiffusionVolumesWriter.h"
 #include "mitkDiffusionVolumes.h"
 
+#include "mitkNrrdQBallImageIOFactory.h"
+#include "mitkNrrdQBallImageWriterFactory.h"
+#include "mitkNrrdQBallImageWriter.h"
+#include "mitkQBallImage.h"
+
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionVolumes<DiffusionPixelType> DiffusionVolumesShort;
 
@@ -34,9 +39,11 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 {
   m_ExternalFileExtensions = Superclass::GetFileExtensions();
   m_ExternalFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_ExternalFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
   
   m_SaveFileExtensions = Superclass::GetSaveFileExtensions();
   m_SaveFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_SaveFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -45,9 +52,13 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     RegisterIOFactories();
 
     itk::ObjectFactoryBase::RegisterFactory( NrrdDiffusionVolumesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( NrrdQBallImageIOFactory::New() );
+
     mitk::NrrdDiffusionVolumesWriterFactory::RegisterOneFactory();
+    mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
      
     m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
+    m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
 
     alreadyDone = true;
   }
@@ -71,7 +82,8 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
 
   if ( className == "" )
     return NULL;
-  CREATE_ITK( DiffusionVolumesShort, "DiffusionVolumes" )
+    CREATE_ITK( DiffusionVolumesShort, "DiffusionVolumes" )
+    CREATE_ITK( QBallImage, "QBallImage" )
 //  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
   else
     pointer = Superclass::CreateCoreObject( className );

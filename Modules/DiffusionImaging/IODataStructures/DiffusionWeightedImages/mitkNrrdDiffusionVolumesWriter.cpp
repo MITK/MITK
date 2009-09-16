@@ -71,7 +71,7 @@ void mitk::NrrdDiffusionVolumesWriter<TPixelType>::GenerateData()
       itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
     }
 
-    for(int i=0; i<input->GetDirections()->Size(); i++)
+    for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
     {
       sprintf( keybuffer, "DWMRI_gradient_%04d", i );
 

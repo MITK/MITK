@@ -95,7 +95,7 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
 mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id) 
 {
   mitk::Mapper::Pointer newMapper=NULL;
-  mitk::BaseData *data = node->GetData();
+  //mitk::BaseData *data = node->GetData();
 
   //if ( id == mitk::BaseRenderer::Standard2D )
   //{

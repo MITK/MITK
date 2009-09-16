@@ -133,15 +133,17 @@ void LabeledImageVolumeCalculator::_InternalCalculateVolumes(
   double voxelVolume = spacing[0] * spacing[1] * spacing[2];
 
   // Calculate centroid (in world coordinates) and volumes for all labels
-  
   for ( unsigned int i = 0; i < m_VolumeVector.size(); ++i )
   {
-    m_CentroidVector[i][0] /= m_VolumeVector[i];
-    m_CentroidVector[i][1] /= m_VolumeVector[i];
-    m_CentroidVector[i][2] /= m_VolumeVector[i];
-    geometry->IndexToWorld( m_CentroidVector[i], m_CentroidVector[i] );
+    if ( m_VolumeVector[i] > 0.0 )
+    {
+      m_CentroidVector[i][0] /= m_VolumeVector[i];
+      m_CentroidVector[i][1] /= m_VolumeVector[i];
+      m_CentroidVector[i][2] /= m_VolumeVector[i];
+      geometry->IndexToWorld( m_CentroidVector[i], m_CentroidVector[i] );
 
-    m_VolumeVector[i] *= voxelVolume;
+      m_VolumeVector[i] *= voxelVolume;
+    }
   }
 }
 

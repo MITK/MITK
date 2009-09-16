@@ -84,7 +84,7 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
  m_T2DMapper->SetUseCompressedTexture(true);
  
  m_T2DMapper->SetPreferredMethodToFragmentProgram();
-  m_T2DMapper->SetSampleDistance(1.0); // 4 rays for every pixel
+  m_T2DMapper->SetSampleDistance(0.8); // 4 rays for every pixel
  
   m_HiResMapper = vtkFixedPointVolumeRayCastMapper::New();
   m_HiResMapper->SetSampleDistance(1); // 4 rays for every pixel
@@ -310,7 +310,8 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   this->SetPreferences();
-                 
+
+/*                 
   switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
     default:
@@ -323,6 +324,7 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
       m_T2DMapper->SetSampleDistance(2.0);
       break;
   }
+  */
               
   const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);

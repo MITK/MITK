@@ -289,11 +289,11 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   this->SetPreferences();
-
+/*
   switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
   {
   case 0:
-    m_VolumeLOD->SetSelectedLODID(m_MedResID);  /*m_LowResID );*/
+    m_VolumeLOD->SetSelectedLODID(m_MedResID);  /*m_LowResID );
     break;
 
   default:
@@ -301,6 +301,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     m_VolumeLOD->SetSelectedLODID( m_HiResID );
     break;
   }
+*/  
+      m_VolumeLOD->SetSelectedLODID( m_HiResID );
+
 
   const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);

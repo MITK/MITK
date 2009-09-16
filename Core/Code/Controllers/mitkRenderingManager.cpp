@@ -39,7 +39,7 @@ RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 RenderingManager
 ::RenderingManager()
 : m_UpdatePending( false ),
-  m_MaxLOD( 1 ),
+  m_MaxLOD( 0 ),
   m_LODIncreaseBlocked( false ),
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),

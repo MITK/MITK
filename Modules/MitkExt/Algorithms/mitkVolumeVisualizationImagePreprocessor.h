@@ -80,7 +80,13 @@ public:
     return m_MaxThreshold;
   }
                                 
-  mitk::TransferFunction::Pointer GetTransferFunction( double treshold );
+  double GetLastUsedThreshold() const
+  {
+    return m_LastUsedTreshold;
+  }
+                                
+  mitk::TransferFunction::Pointer GetInitialTransferFunction( );
+  void UpdateTransferFunction( mitk::TransferFunction::Pointer tf , int treshold );
 
 
 protected:
@@ -89,6 +95,7 @@ protected:
   typedef itk::Image<unsigned char, 3 > BinImage;
 
   typedef itk::ImageRegionIterator< CTImage  > CTIteratorType;
+  typedef itk::ImageRegionIteratorWithIndex< CTImage  > CTIteratorIndexType;
   typedef itk::ImageRegionIterator< BinImage > BinIteratorType;
 
 
@@ -102,7 +109,7 @@ protected:
     BinImage::Pointer dilated,
     BinImage::Pointer eroded );
 
-  mitk::Image::Pointer Crop(mitk::Image::Pointer src );
+  CTImage::Pointer Crop(CTImage::Pointer src );
 
 
 
@@ -130,7 +137,17 @@ protected:
 
   //maximum treshold value 
   double m_MaxThreshold;
+  
+  int m_MinX;
+  int m_MinY;
+  int m_MinZ;
 
+  int m_MaxX;
+  int m_MaxY;
+  int m_MaxZ;
+
+  int m_LastUsedTreshold;
+  
 };
 
 

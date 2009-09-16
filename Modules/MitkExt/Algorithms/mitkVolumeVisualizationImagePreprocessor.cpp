@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeVisualizationImagePreprocessor.h"
 
 #include <itkOrImageFilter.h>
+#include <itkRegionOfInterestImageFilter.h>
 
 
 
@@ -41,34 +42,12 @@ VolumeVisualizationImagePreprocessor::~VolumeVisualizationImagePreprocessor()
 }
 
 
-Image::Pointer
-VolumeVisualizationImagePreprocessor::Process(
-  Image::Pointer m_originalCT, Image::Pointer m_originalLiverMask)
-{
-  LOG_INFO << "Processing...";
-
-  // converting mitk image -> itk image
-  CTImage::Pointer CTImageWork = CTImage::New();
-  CastToItkImage( m_originalCT, CTImageWork );
-
-  // converting mitk image -> itk image
-  BinImage::Pointer BinImageMask = BinImage::New();
-  CastToItkImage( m_originalLiverMask, BinImageMask );
-
-  BinImage::Pointer BinImageMaskDilate = Dilate(BinImageMask);
-
-  BinImage::Pointer BinImageMaskErode = Erode(BinImageMask);
-
-  // Image::Pointer imageBorder = ImportItkImage(CTImageWork);
-
-
-  return Crop(ImportItkImage(Gaussian(Composite(CTImageWork,BinImageMask,BinImageMaskDilate,BinImageMaskErode))));
-}
-
 
 TransferFunction::Pointer
-VolumeVisualizationImagePreprocessor::GetTransferFunction( double treshold )
+VolumeVisualizationImagePreprocessor::GetInitialTransferFunction(  )
 {
+  int treshold = m_EstimatedThreshold;
+
   double opacity = 0.005;
 
   double maskValue = m_OutOfLiverValue;
@@ -91,6 +70,7 @@ VolumeVisualizationImagePreprocessor::GetTransferFunction( double treshold )
     f->AddPoint(realSurfaceValue,opacity);
     f->AddPoint(treshold-1,opacity); 
     f->AddPoint(treshold+4,0.8); 
+    f->AddPoint(m_MaxThreshold+1,0.8); 
     f->ClampingOn();
     f->Modified();
   }  
@@ -116,13 +96,54 @@ VolumeVisualizationImagePreprocessor::GetTransferFunction( double treshold )
 
     ctf->AddRGBPoint( treshold-32, 0.2, 0.0, 0.0 );
     ctf->AddRGBPoint( treshold, 251/255.0, 1.0, 0.0 );
+    ctf->AddRGBPoint( m_MaxThreshold+1, 251/255.0, 1.0, 0.0 );
+
     ctf->ClampingOn();
     ctf->Modified();
   }
 
+  m_LastUsedTreshold = treshold;
+
   return tf;
 }
 
+
+void VolumeVisualizationImagePreprocessor::UpdateTransferFunction( TransferFunction::Pointer tf, int treshold  )
+{
+  double opacity = 0.005;
+
+  double maskValue = m_OutOfLiverValue;
+  double surfaceValue = m_surfaceValue;
+  double realSurfaceValue = m_realSurfaceValue;
+
+  double surfaceSteepness = 0.0;
+
+  LOG_INFO << "changing to threshold of " << treshold << " and opacity of " << opacity;
+
+  // grayvalue->opacity
+  {   
+    vtkPiecewiseFunction *f=tf->GetScalarOpacityFunction();
+    
+    f->RemovePoint( m_LastUsedTreshold-1 );
+    f->AddPoint(treshold-1,opacity); 
+   
+    f->RemovePoint( m_LastUsedTreshold+4 );
+    f->AddPoint(treshold+4,0.8); 
+  }  
+
+  // grayvalue->color
+  {  
+    vtkColorTransferFunction *ctf=tf->GetColorTransferFunction();
+
+    ctf->RemovePoint( m_LastUsedTreshold-32 );
+    ctf->AddRGBPoint( treshold-32, 0.2, 0.0, 0.0 );
+    
+    ctf->RemovePoint( m_LastUsedTreshold );
+    ctf->AddRGBPoint( treshold, 251/255.0, 1.0, 0.0 );
+  }
+
+  m_LastUsedTreshold = treshold;
+}
 
 VolumeVisualizationImagePreprocessor::BinImage::Pointer 
 VolumeVisualizationImagePreprocessor::Dilate(BinImage::Pointer src)
@@ -178,28 +199,56 @@ VolumeVisualizationImagePreprocessor::Gaussian(CTImage::Pointer src)
 
   GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
   gaussianFilter->SetInput( src );
-  gaussianFilter->SetVariance( 2 );
+  gaussianFilter->SetVariance( 1 );
   //   gaussianFilter->SetMaximumError( 0.1 );
 
-  gaussianFilter->SetMaximumKernelWidth ( 32 ); 
+  gaussianFilter->SetMaximumKernelWidth ( 8 ); 
   gaussianFilter->UpdateLargestPossibleRegion();
-  return gaussianFilter->GetOutput();
+  
+  CTImage::Pointer dst = gaussianFilter->GetOutput(); 
+  dst->DisconnectPipeline();
+
+  return dst;
 
 }
 
-Image::Pointer VolumeVisualizationImagePreprocessor::Crop(Image::Pointer src )
+VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualizationImagePreprocessor::Crop(VolumeVisualizationImagePreprocessor::CTImage::Pointer src )
 {
   LOG_INFO << "Cropping...";
 
-  AutoCropImageFilter::Pointer cropFilter = AutoCropImageFilter::New();
-  cropFilter->SetInput ( src );
-  cropFilter->SetBackgroundValue ( m_OutOfLiverValue );
-  cropFilter->SetMarginFactor ( 1.0 );
-  cropFilter->UpdateLargestPossibleRegion();
+  typedef itk::RegionOfInterestImageFilter<CTImage,CTImage> FilterType;
   
-  Image::Pointer dest = cropFilter->GetOutput();
-  dest->DisconnectPipeline();
-  return dest;
+  FilterType::Pointer cropFilter = FilterType::New();
+
+  cropFilter->SetInput( src );
+  
+  CTImage::RegionType region;
+  CTImage::SizeType        size;
+  CTImage::IndexType    index;
+
+  index.SetElement(0,m_MinX);
+  index.SetElement(1,m_MinY);
+  index.SetElement(2,m_MinZ);
+     
+  size.SetElement(0,m_MaxX-m_MinX+1);
+  size.SetElement(1,m_MaxY-m_MinY+1);
+  size.SetElement(2,m_MaxZ-m_MinZ+1);
+  
+  region.SetIndex(index);
+  region.SetSize(size);
+  
+  
+  LOG_INFO << "Cropping Region" << " m_MinX: " << m_MinX << " m_MaxX: " << m_MaxX
+                                << "\n m_MinY: " << m_MinY << " m_MaxY: " << m_MaxY
+                                << "\n m_MinZ: " << m_MinZ << " m_MaxZ: " << m_MaxZ;
+
+  cropFilter->SetRegionOfInterest(region);
+    cropFilter->Update();
+
+  CTImage::Pointer dst = cropFilter->GetOutput(); 
+  dst->DisconnectPipeline();
+
+  return dst;
 }
 
 /*
@@ -225,7 +274,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
   nullFilter->UpdateLargestPossibleRegion();
   CTImage::Pointer work = nullFilter->GetOutput();
 
-  CTIteratorType workIt( work, work->GetRequestedRegion() );
+  CTIteratorIndexType workIt( work, work->GetRequestedRegion() );
   BinIteratorType maskIt( mask, mask->GetRequestedRegion() );
   BinIteratorType dilateIt( dilated, dilated->GetRequestedRegion() );
   BinIteratorType erodeIt( eroded, eroded->GetRequestedRegion() );
@@ -244,6 +293,12 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
   int _min=32767,_max=-32768;
 
   memset(histogramm,0,sizeof(int)*65536);
+  
+  // Initialize Bounding Box
+  {
+    m_MinX=m_MinY=m_MinZ =  1000000;
+    m_MaxX=m_MaxY=m_MaxZ = -1000000;    
+  }
 
   while ( ! ( workIt.IsAtEnd() || maskIt.IsAtEnd() || dilateIt.IsAtEnd() || erodeIt.IsAtEnd() ) )
   {
@@ -269,7 +324,23 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
     
     if(erode == 0 && dilate != 0 )
     {
-      value = -256;
+      value = -1024;
+
+      // determining bounding box     
+      {
+        CTIteratorIndexType::IndexType idx = workIt.GetIndex();
+        int x=idx.GetElement(0);
+        int y=idx.GetElement(1);
+        int z=idx.GetElement(2);  
+        
+        if(x<m_MinX) m_MinX=x;
+        if(y<m_MinY) m_MinY=y;
+        if(z<m_MinZ) m_MinZ=z;
+        
+        if(x>m_MaxX) m_MaxX=x;
+        if(y>m_MaxY) m_MaxY=y;
+        if(z>m_MaxZ) m_MaxZ=z;              
+      }
     }
     else if( erode != 0 && mask != 0 )
     {
@@ -277,7 +348,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
     }
     else
     {
-      value = -512;
+      value = -2048;
     }
   
     workIt.Set(value);
@@ -290,7 +361,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
 
   LOG_INFO << "liver consists of " << total << " samples.";
   
-  int oberen = total * 0.15;
+  int oberen = total * 0.10;
   
   for( int r = 32767 ; r >= -32768 ; r-- )
   {
@@ -301,7 +372,6 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
     if(oberen <= 0)
     {
       m_EstimatedThreshold = r;
-      LOG_INFO << "Histogramm found treshold " << r;
       break;
     }
     
@@ -310,6 +380,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
   m_MaxThreshold=_max;
   m_MinThreshold=_min;
   
+  LOG_INFO << "threshold range: " << m_MinThreshold  << "-" << m_MaxThreshold << " estimated vessel threshold: " << m_EstimatedThreshold ;
 
   delete histogramm;
 
@@ -317,13 +388,64 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
     m_realSurfaceValue=sum/num;
   else
     m_realSurfaceValue=0;
+
+  m_surfaceValue = _min - 20;
+  m_OutOfLiverValue = m_surfaceValue - 20;
+
+  workIt.GoToBegin();
+  while ( ! workIt.IsAtEnd() )
+  {
+    int value = workIt.Get();
     
+    if(value == -1024 )
+    {
+      value = m_surfaceValue;
+    }
+    else if( value == -2048 )
+    {
+      value = m_OutOfLiverValue;
+    }
+  
+    workIt.Set(value);
+        
+    ++workIt;
+  }
+
+    
+  LOG_INFO << "OutOfLiver value: " << m_OutOfLiverValue;
+  LOG_INFO << "surface value: " << m_surfaceValue;
   LOG_INFO << "real surface value: " << m_realSurfaceValue;
 
   work->DisconnectPipeline();
+  
+  
+  
+  
   return work;
 }
 
 
+
+Image::Pointer
+VolumeVisualizationImagePreprocessor::Process(
+  Image::Pointer m_originalCT, Image::Pointer m_originalLiverMask)
+{
+  LOG_INFO << "Processing...";
+
+  // converting mitk image -> itk image
+  CTImage::Pointer CTImageWork = CTImage::New();
+  CastToItkImage( m_originalCT, CTImageWork );
+
+  // converting mitk image -> itk image
+  BinImage::Pointer BinImageMask = BinImage::New();
+  CastToItkImage( m_originalLiverMask, BinImageMask );
+
+CTImage::Pointer itkResult =Gaussian(Crop(Composite(CTImageWork,BinImageMask,Dilate(BinImageMask),Erode(BinImageMask))));
+mitk::Image::Pointer mitkResult= mitk::Image::New();
+               mitk::CastToMitkImage( itkResult, mitkResult ); //TODO here we can perhaps save memory
+
+
+  return mitkResult;
+}
 
 }

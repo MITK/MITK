@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindow.h>
 #include <vtkPNGWriter.h>
 
-void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName)
+void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
   if (! fileWriter->CanWriteDataType(data) ) {
     QMessageBox::critical(NULL,"ERROR","Could not write file. Invalid data type for file writer.");
@@ -45,7 +45,16 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
   QString fileName;
   if (aFileName == NULL)
   {
-    fileName = QFileDialog::getSaveFileName(QString(fileWriter->GetDefaultFilename()),fileWriter->GetFileDialogPattern());
+    QString proposedName("");
+    if(propFileName == NULL)
+    {
+      proposedName.append(fileWriter->GetDefaultFilename());
+    }
+    else
+    {
+      proposedName.append(propFileName).append(fileWriter->GetDefaultExtension());
+    }
+    fileName = QFileDialog::getSaveFileName(proposedName,fileWriter->GetFileDialogPattern());
 
     // Check if an extension exists already and if not, append the default extension
     if ( fileName.find( '.' ) == -1 )
@@ -136,7 +145,8 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     if (data != NULL)
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
-      if(image.IsNotNull())
+      QString classname(data->GetNameOfClass());
+      if(image.IsNotNull() && classname.compare("Image")==0)
       {
         fileNameUsed = CommonFunctionality::SaveImage(image, aFileName, true);
         if(!(fileNameUsed.length()>0)){
@@ -215,7 +225,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             {
               if ( (*it)->CanWriteDataType(data) ) {
                 writerFound = true;
-                SaveToFileWriter(*it, data, NULL); 
+                SaveToFileWriter(*it, data, NULL, aFileName); 
                 fileNameUsed = (*it)->GetFileName();
                 // correct writer has been found->break
                 if(!(fileNameUsed.length()>0)){

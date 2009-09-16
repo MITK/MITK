@@ -228,7 +228,7 @@ namespace CommonFunctionality
    */
   QMITKEXT_EXPORT std::string SaveScreenshot( vtkRenderWindow* renderWindow , const char* filename = NULL );
 
-  QMITKEXT_EXPORT void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName);
+  QMITKEXT_EXPORT void SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName);
 
   // internal vessel graph save code removed ...
   

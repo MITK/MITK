@@ -44,8 +44,8 @@ HeightFieldSurfaceClipImageFilter::HeightFieldSurfaceClipImageFilter()
   m_HeightFieldResolutionY( 512 ),
   m_MaxHeight( 1024.0 )
 {
-  //this->SetNumberOfInputs(2);
-  //this->SetNumberOfRequiredInputs(2);
+  this->SetNumberOfInputs(2);
+  this->SetNumberOfRequiredInputs(2);
 
   m_InputTimeSelector = ImageTimeSelector::New();
   m_OutputTimeSelector = ImageTimeSelector::New();
@@ -60,17 +60,13 @@ HeightFieldSurfaceClipImageFilter::~HeightFieldSurfaceClipImageFilter()
 void HeightFieldSurfaceClipImageFilter::SetClippingSurface( 
   Surface *clippingSurface )
 {
-  if ( clippingSurface != m_ClippingSurface.GetPointer() )
-  {
-    m_ClippingSurface = clippingSurface;
-    this->Modified();
-  }
+  this->SetNthInput( 1, clippingSurface );
 }
 
 
 const Surface* HeightFieldSurfaceClipImageFilter::GetClippingSurface() const 
 {
-  return m_ClippingSurface;
+  return dynamic_cast< const Surface * >( itk::ProcessObject::GetInput( 1 ) );
 }
 
 
@@ -100,27 +96,27 @@ void HeightFieldSurfaceClipImageFilter::SetClippingModeToMultiplyByFactor()
 
 void HeightFieldSurfaceClipImageFilter::GenerateInputRequestedRegion()
 {
-  Superclass::GenerateInputRequestedRegion();
+  Image *outputImage = this->GetOutput();
+  Image *inputImage = const_cast< Image * >( this->GetInput( 0 ) );
+  const Surface *inputSurface = dynamic_cast< const Surface * >( this->GetInput( 1 ) );
 
-  Image *output = this->GetOutput();
-  Image *input = const_cast< Image * > ( this->GetInput() );
-  if ( !output->IsInitialized() || m_ClippingSurface.IsNull() )
+  if ( !outputImage->IsInitialized() || inputSurface == NULL )
   {
     return;
   }
 
-  input->SetRequestedRegionToLargestPossibleRegion();
+  inputImage->SetRequestedRegionToLargestPossibleRegion();
 
-  GenerateTimeInInputRegion( output, input );
+  GenerateTimeInInputRegion( outputImage, inputImage );
 }
 
 
 void HeightFieldSurfaceClipImageFilter::GenerateOutputInformation()
 {
-  Image::ConstPointer input = this->GetInput();
-  Image::Pointer output = this->GetOutput();
+  const Image *inputImage = this->GetInput( 0 );
+  Image *outputImage = this->GetOutput();
 
-  if ( output->IsInitialized()
+  if ( outputImage->IsInitialized()
     && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()) )
   {
     return;
@@ -129,24 +125,24 @@ void HeightFieldSurfaceClipImageFilter::GenerateOutputInformation()
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   unsigned int i;
-  unsigned int *tmpDimensions = new unsigned int[input->GetDimension()];
+  unsigned int *tmpDimensions = new unsigned int[inputImage->GetDimension()];
 
-  for ( i = 0; i < input->GetDimension(); ++i )
+  for ( i = 0; i < inputImage->GetDimension(); ++i )
   {
-    tmpDimensions[i] = input->GetDimension( i );
+    tmpDimensions[i] = inputImage->GetDimension( i );
   }
 
-  output->Initialize( input->GetPixelType(),
-    input->GetDimension(),
+  outputImage->Initialize( inputImage->GetPixelType(),
+    inputImage->GetDimension(),
     tmpDimensions,
-    input->GetNumberOfChannels() );
+    inputImage->GetNumberOfChannels() );
 
   delete[] tmpDimensions;
 
-  output->SetGeometry( 
-    static_cast< Geometry3D * >( input->GetGeometry()->Clone().GetPointer() ) );
+  outputImage->SetGeometry( 
+    static_cast< Geometry3D * >( inputImage->GetGeometry()->Clone().GetPointer() ) );
 
-  output->SetPropertyList( input->GetPropertyList()->Clone() );
+  outputImage->SetPropertyList( inputImage->GetPropertyList()->Clone() );
 
   m_TimeOfHeaderInitialization.Modified();
 }
@@ -239,7 +235,6 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   TPixel factor = static_cast< TPixel >( clipImageFilter->m_MultiplicationFactor );
   TPixel clippingConstant = clipImageFilter->m_ClippingConstant;
 
-
   for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
   {
     if ( (clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT)
@@ -305,22 +300,26 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
 
 void HeightFieldSurfaceClipImageFilter::GenerateData()
 {
-  Image::ConstPointer input = this->GetInput();
-  Image::Pointer output = this->GetOutput();
+  const Image *inputImage = this->GetInput( 0 );
+  Surface *inputSurface = const_cast< Surface * >(
+    dynamic_cast< Surface * >( itk::ProcessObject::GetInput( 1 ) ) );
+
+  const Image *outputImage = this->GetOutput();
 
   LOG_INFO << "Clipping: Start\n";
 
-  if ( !output->IsInitialized() || m_ClippingSurface.IsNull() )
+  if ( !outputImage->IsInitialized() || inputSurface == NULL )
     return;
+
 
   const Geometry2D *clippingGeometryOfCurrentTimeStep = NULL;
 
-  m_InputTimeSelector->SetInput( input );
-  m_OutputTimeSelector->SetInput( output );
+  m_InputTimeSelector->SetInput( inputImage );
+  m_OutputTimeSelector->SetInput( outputImage );
 
-  Image::RegionType outputRegion = output->GetRequestedRegion();
-  const TimeSlicedGeometry *outputTimeGeometry = output->GetTimeSlicedGeometry();
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  Image::RegionType outputRegion = outputImage->GetRequestedRegion();
+  const TimeSlicedGeometry *outputTimeGeometry = outputImage->GetTimeSlicedGeometry();
+  const TimeSlicedGeometry *inputTimeGeometry = inputImage->GetTimeSlicedGeometry();
   ScalarType timeInMS;
 
   int timestep = 0;
@@ -341,11 +340,15 @@ void HeightFieldSurfaceClipImageFilter::GenerateData()
     // Compose IndexToWorld transform of image with WorldToIndexTransform of
     // clipping data for conversion from image index space to plane index space
     AffineTransform3D::Pointer planeWorldToIndexTransform = AffineTransform3D::New();
-    m_ClippingSurface->GetGeometry( t )->GetIndexToWorldTransform()
+    inputSurface->GetGeometry( t )->GetIndexToWorldTransform()
       ->GetInverse( planeWorldToIndexTransform );
-    
-    AffineTransform3D *imageToPlaneTransform =
-      inputTimeGeometry->GetGeometry3D( t )->GetIndexToWorldTransform();
+   
+    AffineTransform3D::Pointer imageToPlaneTransform =
+      AffineTransform3D::New();
+    imageToPlaneTransform->SetIdentity();
+
+    imageToPlaneTransform->Compose(
+      inputTimeGeometry->GetGeometry3D( t )->GetIndexToWorldTransform() );
     imageToPlaneTransform->Compose( planeWorldToIndexTransform );
 
     LOG_INFO << "Accessing ITK function...\n";
@@ -353,7 +356,7 @@ void HeightFieldSurfaceClipImageFilter::GenerateData()
       m_InputTimeSelector->GetOutput(),
       _InternalComputeClippedImage,
       this,
-      m_ClippingSurface->GetVtkPolyData( t ),
+      inputSurface->GetVtkPolyData( t ),
       imageToPlaneTransform );
   }
 

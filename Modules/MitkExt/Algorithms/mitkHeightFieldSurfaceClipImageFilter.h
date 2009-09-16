@@ -89,8 +89,6 @@ protected:
     vtkPolyData *clippingPolyData,
     AffineTransform3D *imageToPlaneTransform );
 
-  Surface::Pointer m_ClippingSurface;
-
   ImageTimeSelector::Pointer m_InputTimeSelector;
   ImageTimeSelector::Pointer m_OutputTimeSelector;
 

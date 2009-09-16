@@ -523,11 +523,11 @@ void QmitkPointBasedRegistrationView::HideFixedImage(bool hide)
   }
   if (hide)
   {
-    this->reinitMovingClicked();
+    //this->reinitMovingClicked();
   }
   if (!m_HideMovingImage && !m_HideFixedImage)
   {
-    this->globalReinitClicked();
+    //this->globalReinitClicked();
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -541,11 +541,11 @@ void QmitkPointBasedRegistrationView::HideMovingImage(bool hide)
   }
   if (hide)
   {
-    this->reinitFixedClicked();
+    //this->reinitFixedClicked();
   }
   if (!m_HideMovingImage && !m_HideFixedImage)
   {
-    this->globalReinitClicked();
+    //this->globalReinitClicked();
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

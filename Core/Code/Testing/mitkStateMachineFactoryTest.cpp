@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStateMachineFactory.h>
 #include <mitkState.h>
-
 /**
 *http://msdn.microsoft.com/en-us/library/e5ewb1h3.aspx
 * VS9 memory leakage detection
@@ -59,13 +58,6 @@ int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
   statemachineFactory->Delete();
 
   std::cout<<"[TEST DONE]"<<std::endl;
-
-  //#ifdef WIN32
-  //#ifdef _DEBUG
-  ////memory leakage detection
-  //_CrtDumpMemoryLeaks();
-  //#endif
-  //#endif
 
   return EXIT_SUCCESS;
 }

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <map>
 #include <set>
 #include <itkObject.h>
+#include <itkWeakPointer.h>
 #include <itkObjectFactory.h>
 #include "mitkTransition.h"
 
@@ -34,7 +35,7 @@ namespace mitk {
   *
   * Name and ID are stored. Also methods for building up, connecting and
   * parsing for well formed statemachines are present.
-  * This class holds a map of transitions to next States. 
+  * This class holds a map of transitions to next States.
   * @ingroup Interaction
   **/
   class MITK_CORE_EXPORT State : public itk::Object
@@ -48,7 +49,7 @@ namespace mitk {
     mitkNewMacro2Param(Self, std::string, int);
 
     typedef std::map<int, mitk::State::Pointer> StateMap;
-    typedef std::map<int, mitk::Transition::Pointer> TransitionMap;
+    typedef std::map<int, itk::WeakPointer<mitk::Transition> > TransitionMap;
 
     typedef StateMap::iterator StateMapIter;
     typedef TransitionMap::iterator TransMapIter;
@@ -57,6 +58,8 @@ namespace mitk {
 
     /**
     * @brief Add a transition to the map of transitions.
+    *
+    * Instances of all added transitions are freed in destructor of this class.
     **/
     bool AddTransition( Transition* transition );
 
@@ -81,12 +84,12 @@ namespace mitk {
     std::set<int> GetAllNextStates() const;
 
     /**
-    * @brief Check, if this event (eventId) leads to a state. 
+    * @brief Check, if this event (eventId) leads to a state.
     **/
     bool IsValidEvent(int eventId) const;
 
     /**
-    * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions. 
+    * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions.
     * Required for this is a List of all build States of that StateMachine (allStates). This way the StateMachine can be build up.
     **/
     bool ConnectTransitions(StateMap* allStates);
@@ -94,15 +97,15 @@ namespace mitk {
   protected:
     /**
     * @brief Default Constructor. Use ::New instead!
-    * Set the name and the Id of the state. 
+    * Set the name and the Id of the state.
     * Name is to maintain readability during debug and Id is to identify this state inside the StateMachinePattern
     **/
     State(std::string name, int id);
-    
+
     /**
     * @brief Default Destructor
     **/
-    ~State(){}
+    ~State();
 
   private:
     /**

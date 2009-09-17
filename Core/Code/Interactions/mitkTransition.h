@@ -22,9 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include <string>
 #include <vector>
-#include <itkObject.h>
-#include <itkObjectFactory.h>
-#include <itkSmartPointerForwardReference.h>
+#include <itkWeakPointer.h>
 #include "mitkAction.h"
 
 
@@ -38,15 +36,9 @@ namespace mitk {
   * Several actions are stored, that have to be executed after the statechange.
   * @ingroup Interaction
   **/
-  class MITK_CORE_EXPORT Transition : public itk::Object
+  class MITK_CORE_EXPORT Transition 
   {
   public:
-    mitkClassMacro(Transition, itk::Object);
-    
-    /**
-    * @brief static New method to use SmartPointer
-    **/
-    mitkNewMacro3Param(Self, std::string, int, int);
 
     typedef std::vector< mitk::Action::Pointer > ActionVectorType;
     typedef ActionVectorType::iterator ActionVectorIterator;
@@ -102,9 +94,8 @@ namespace mitk {
     **/
     void SetNextState(State* state);
 
-  protected:
     /**
-    * @brief Default Constructor but use ::New() instead! 
+    * @brief Default Constructor 
     * Sets the necessary informations name (to enhance readability during debug), 
     * nextStateId (the Id of the next state) and eventId (the Id of the event that causes the statechange).
     **/
@@ -113,7 +104,7 @@ namespace mitk {
     /**
     * @brief Default Denstructor 
     **/
-    ~Transition(){};
+    ~Transition();
 
   private:
     /**
@@ -124,7 +115,7 @@ namespace mitk {
     /**
     * @brief a Pointer to the next state of this object.
     **/
-    itk::SmartPointerForwardReference<mitk::State> m_NextState;
+    itk::WeakPointer<mitk::State> m_NextState;
 
     /**
     * @brief The Id of the next state.

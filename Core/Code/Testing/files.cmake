@@ -34,7 +34,7 @@ SET(MODULE_TESTS
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
   mitkStateMachineFactoryTest.cpp
-  #mitkStateTest.cpp
+  mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeSlicedGeometryTest.cpp

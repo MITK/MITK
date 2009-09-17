@@ -247,7 +247,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     std::string transitionName = ReadXMLStringAttribut( NAME, atts ) ;
     int nextStateId = ReadXMLIntegerAttribut( NEXT_STATE_ID, atts );
     int eventId = ReadXMLIntegerAttribut( EVENT_ID, atts );
-    m_AktTransition = Transition::New(transitionName, nextStateId, eventId);
+    m_AktTransition = new Transition(transitionName, nextStateId, eventId);
     if ( m_AktState )
       m_AktState->AddTransition( m_AktTransition );  
   }

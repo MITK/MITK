@@ -27,7 +27,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   int eventId = 100;
   
   //Create Transition
-  mitk::Transition::Pointer transition = mitk::Transition::New("transitionname", nextStateId, eventId);
+  itk::WeakPointer<mitk::Transition> transition = new mitk::Transition("transitionname", nextStateId, eventId);
 
   //check nextStateId
   std::cout << "Check StateId: ";
@@ -106,6 +106,8 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  //delete the instanciated transition
+  delete transition;
 
   //well done!!! Passed!
   std::cout<<"[ALL PASSED]"<<std::endl;

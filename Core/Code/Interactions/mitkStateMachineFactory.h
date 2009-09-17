@@ -178,7 +178,7 @@ namespace mitk {
     /**
     * @brief A pointer to a Transition to help building up the pattern
     **/
-    Transition::Pointer m_AktTransition;
+    itk::WeakPointer<Transition> m_AktTransition;
 
     /**
     * @brief A pointer to an Action to help building up the pattern

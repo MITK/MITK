@@ -18,11 +18,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTransition.h"
 #include "mitkState.h"
-#include <itkSmartPointerForwardReference.txx>
 
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
   : m_Name(name), m_NextState(NULL),  m_NextStateId(nextStateId), m_EventId(eventId)
 {}
+
+mitk::Transition::~Transition()
+{
+  //needed for correct reference counting of mitkState
+  m_NextState = NULL;
+  m_Actions.clear();
+}
 
 void mitk::Transition::AddAction( Action* action ) 
 {

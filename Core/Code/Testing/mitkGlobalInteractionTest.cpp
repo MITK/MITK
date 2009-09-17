@@ -29,11 +29,11 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
   mitk::PointSetInteractor::Pointer firstInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 1);
   mitk::PointSetInteractor::Pointer secondInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 10);
 
-  globalInteraction->AddInteractor(firstInteractor.GetPointer());
-  globalInteraction->AddInteractor(secondInteractor.GetPointer());
+  globalInteraction->AddInteractor(firstInteractor);
+  globalInteraction->AddInteractor(secondInteractor);
   std::cout << "Add two interactors to globalInteraction and check if they were registered: ";
-  if ( !globalInteraction->InteractorRegistered(firstInteractor.GetPointer()) ||
-       !globalInteraction->InteractorRegistered(secondInteractor.GetPointer()) )
+  if ( !globalInteraction->InteractorRegistered(firstInteractor) ||
+       !globalInteraction->InteractorRegistered(secondInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -42,7 +42,7 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 
   //remove Interactor
   std::cout << "Remove the first Interactor: ";
-  if ( !globalInteraction->RemoveInteractor(firstInteractor.GetPointer()) )
+  if ( !globalInteraction->RemoveInteractor(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -51,7 +51,7 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 
   //check if really removed
   std::cout << "Check if the first is still registered: ";
-  if ( globalInteraction->InteractorRegistered(firstInteractor.GetPointer()) )
+  if ( globalInteraction->InteractorRegistered(firstInteractor) )
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

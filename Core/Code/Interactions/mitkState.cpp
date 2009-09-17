@@ -24,6 +24,21 @@ mitk::State::State(std::string stateName, int stateId)
 {
 }
 
+mitk::State::~State()
+{
+  //delete all transitions
+  while (!m_Transitions.empty())
+  {
+    //copy first
+    mitk::Transition* tempTransition = m_Transitions.begin()->second;
+    //deleting it from map
+    m_Transitions.erase(m_Transitions.begin());
+    //deleting transition
+    delete tempTransition;
+  }
+}
+
+
 bool mitk::State::AddTransition( Transition* transition )
 {
   std::pair<TransMapIter,bool> ok = m_Transitions.insert(TransitionMap::value_type( transition->GetEventId(), transition ));

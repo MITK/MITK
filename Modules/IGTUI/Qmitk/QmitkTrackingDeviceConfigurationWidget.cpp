@@ -34,7 +34,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   //reset a few things
   ResetOutput();
   AddOutput("<br>NDI Polaris selected");
-  m_Controls->configuration_finished_label->setVisible(false);
 }
 
 
@@ -116,7 +115,7 @@ void QmitkTrackingDeviceConfigurationWidget::Finished()
   m_Controls->m_TrackingSystemWidget->setEnabled(false);
   m_Controls->m_trackingDeviceChooser->setEnabled(false);
   m_Controls->choose_tracking_device_label->setEnabled(false);
-  m_Controls->configuration_finished_label->setVisible(true);
+  m_Controls->configuration_finished_label->setText("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p align=\"right\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><span style=\" font-weight:600;\">Configuration finished</span></p></body></html>");
   emit TrackingDeviceConfigurationFinished();
   }
 
@@ -126,7 +125,7 @@ void QmitkTrackingDeviceConfigurationWidget::Reset()
   m_Controls->m_TrackingSystemWidget->setEnabled(true);
   m_Controls->m_trackingDeviceChooser->setEnabled(true);
   m_Controls->choose_tracking_device_label->setEnabled(true);
-  m_Controls->configuration_finished_label->setVisible(false);
+  m_Controls->configuration_finished_label->setText("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p align=\"right\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><span style=\" font-weight:600;\">Press \"Finished\" to confirm configuration</span></p></body></html>");
   emit TrackingDeviceConfigurationReseted();
   }
 

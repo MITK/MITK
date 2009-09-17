@@ -74,12 +74,12 @@ namespace mitk {
     * Returns NULL if no entry with name type is found.
     * Here a Smartpointer is returned to ensure, that StateMachines are also considered during reference counting.
     **/    
-    static State* GetStartState(const char* type);
+    State* GetStartState(const char* type);
 
     /**
     * @brief loads the xml file filename and generates the necessary instances
     **/
-    static bool LoadBehavior(std::string fileName);
+    bool LoadBehavior(std::string fileName);
 
     /**
     * @brief Try to load standard behavior file "StateMachine.xml"
@@ -90,11 +90,11 @@ namespace mitk {
     * \li try via source directory (using MITKROOT from cmake-created 
     * mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
     **/
-    static bool LoadStandardBehavior();
+    bool LoadStandardBehavior();
 
-    static const std::string& GetLastLoadedBehavior()
+    const std::string& GetLastLoadedBehavior()
     {
-      return s_LastLoadedBehavior;
+      return m_LastLoadedBehavior;
     }
 
     /**
@@ -148,22 +148,22 @@ namespace mitk {
     /**
     * @brief Returns a Pointer to the desired state if found. 
     **/
-    static mitk::State* GetState( const char* type, int StateId );
+    mitk::State* GetState( const char* type, int StateId );
 
     /**
     * @brief Sets the pointers in Transition (setNextState(..)) according to the extracted xml-file content
     **/
-    static bool ConnectStates(mitk::State::StateMap* states);
+    bool ConnectStates(mitk::State::StateMap* states);
 
     /**
     * @brief Recusive method, that parses this pattern of the stateMachine and returns true if correct
     **/
-    static bool RParse(mitk::State::StateMap* states, mitk::State::StateMapIter thisState, HistorySet *history);
+    bool RParse(mitk::State::StateMap* states, mitk::State::StateMapIter thisState, HistorySet *history);
 
      /**
     * @brief Holds all created States that are defined as StartState
     **/
-    static StartStateMap m_StartStates;
+    StartStateMap m_StartStates;
 
     /**
     * @brief Holds all States of one StateMachine to build up the pattern.
@@ -188,33 +188,11 @@ namespace mitk {
     /**
     * @brief map to hold all statemachines to call GetState for friends
     **/
-    static AllStateMachineMapType m_AllStateMachineMap;
+    AllStateMachineMapType m_AllStateMachineMap;
 
-    static std::string s_LastLoadedBehavior;
+    std::string m_LastLoadedBehavior;
 
     std::string m_AktStateMachineName;
-
-    static const std::string STYLE;
-    static const std::string NAME;
-    static const std::string ID;    
-    static const std::string START_STATE;
-    static const std::string NEXT_STATE_ID;
-    static const std::string EVENT_ID;
-    static const std::string SIDE_EFFECT_ID;
-    static const std::string ISTRUE;
-    static const std::string ISFALSE;
-    static const std::string STATE_MACHINE;
-    static const std::string TRANSITION;    
-    static const std::string STATE;
-    static const std::string STATE_MACHINE_NAME;
-    static const std::string ACTION;
-    static const std::string BOOL_PARAMETER;
-    static const std::string INT_PARAMETER;
-    static const std::string FLOAT_PARAMETER;
-    static const std::string DOUBLE_PARAMETER;
-    static const std::string STRING_PARAMETER;
-    static const std::string VALUE;
-
   };
 
 } // namespace mitk

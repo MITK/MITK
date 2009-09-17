@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStateMachineFactory.h"
 #include "mitkGlobalInteraction.h"
-//#include <mitkStatusBar.h>
 #include <vtkXMLDataElement.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
@@ -28,31 +27,31 @@ PURPOSE.  See the above copyright notices for more information.
 * @brief This class builds up all the necessary structures for a statemachine.
 * and stores one start-state for all built statemachines.
 **/
-mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
-mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
-std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
+//mitk::StateMachineFactory::StartStateMap mitk::StateMachineFactory::m_StartStates;
+//mitk::StateMachineFactory::AllStateMachineMapType mitk::StateMachineFactory::m_AllStateMachineMap;
+//std::string mitk::StateMachineFactory::s_LastLoadedBehavior;
 
 //XML StateMachine
-const std::string mitk::StateMachineFactory::STYLE = "STYLE";
-const std::string mitk::StateMachineFactory::NAME = "NAME";
-const std::string mitk::StateMachineFactory::ID = "ID";    
-const std::string mitk::StateMachineFactory::START_STATE = "START_STATE";
-const std::string mitk::StateMachineFactory::NEXT_STATE_ID = "NEXT_STATE_ID";
-const std::string mitk::StateMachineFactory::EVENT_ID = "EVENT_ID";
-const std::string mitk::StateMachineFactory::SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
-const std::string mitk::StateMachineFactory::ISTRUE = "TRUE";
-const std::string mitk::StateMachineFactory::ISFALSE = "FALSE";
-const std::string mitk::StateMachineFactory::STATE_MACHINE = "stateMachine";
-const std::string mitk::StateMachineFactory::STATE = "state";
-const std::string mitk::StateMachineFactory::TRANSITION = "transition";
-const std::string mitk::StateMachineFactory::STATE_MACHINE_NAME = "stateMachine";
-const std::string mitk::StateMachineFactory::ACTION = "action";
-const std::string mitk::StateMachineFactory::BOOL_PARAMETER = "boolParameter";
-const std::string mitk::StateMachineFactory::INT_PARAMETER = "intParameter";
-const std::string mitk::StateMachineFactory::FLOAT_PARAMETER = "floatParameter";
-const std::string mitk::StateMachineFactory::DOUBLE_PARAMETER = "doubleParameter";
-const std::string mitk::StateMachineFactory::STRING_PARAMETER = "stringParameter";
-const std::string mitk::StateMachineFactory::VALUE = "VALUE";
+const std::string STYLE = "STYLE";
+const std::string NAME = "NAME";
+const std::string ID = "ID";    
+const std::string START_STATE = "START_STATE";
+const std::string NEXT_STATE_ID = "NEXT_STATE_ID";
+const std::string EVENT_ID = "EVENT_ID";
+const std::string SIDE_EFFECT_ID = "SIDE_EFFECT_ID";
+const std::string ISTRUE = "TRUE";
+const std::string ISFALSE = "FALSE";
+const std::string STATE_MACHINE = "stateMachine";
+const std::string STATE = "state";
+const std::string TRANSITION = "transition";
+const std::string STATE_MACHINE_NAME = "stateMachine";
+const std::string ACTION = "action";
+const std::string BOOL_PARAMETER = "boolParameter";
+const std::string INT_PARAMETER = "intParameter";
+const std::string FLOAT_PARAMETER = "floatParameter";
+const std::string DOUBLE_PARAMETER = "doubleParameter";
+const std::string STRING_PARAMETER = "stringParameter";
+const std::string VALUE = "VALUE";
 
 #include <vtkObjectFactory.h>
 namespace mitk
@@ -66,6 +65,16 @@ mitk::StateMachineFactory::StateMachineFactory()
 
 mitk::StateMachineFactory::~StateMachineFactory()
 {
+  //free memory
+
+  while (!m_AllStateMachineMap.empty())
+  {
+    StateMachineMapType* temp = m_AllStateMachineMap.begin()->second;
+    m_AllStateMachineMap.erase(m_AllStateMachineMap.begin());
+    delete temp;
+  }
+  if (m_AktTransition)
+    delete m_AktTransition;
 }
 
 
@@ -77,17 +86,7 @@ mitk::State* mitk::StateMachineFactory::GetStartState(const char * type)
   StartStateMapIter tempState = m_StartStates.find(type);
   if( tempState != m_StartStates.end() )
     return (tempState)->second.GetPointer();
-  else
-  {
-    if(m_StartStates.size() == 0)
-    {
-      mitk::GlobalInteraction::StandardInteractionSetup();
-      tempState = m_StartStates.find(type);
-      if( tempState != m_StartStates.end() )
-        return (tempState)->second.GetPointer();
-    }
-    itkGenericOutputMacro(<< "Start state not found for state-machine \"" << type << "\".");
-  }
+
   return NULL;
 }
 
@@ -99,20 +98,11 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   if ( fileName.empty() )
     return false;
 
-  s_LastLoadedBehavior = fileName;
+  m_LastLoadedBehavior = fileName;
 
-  //call a new instance of this class and let it build up static containers
-  mitk::StateMachineFactory* stateMachineFactory = StateMachineFactory::New();
-  stateMachineFactory->SetFileName( fileName.c_str() );
+  this->SetFileName(fileName.c_str());
 
-  //parse the XML input. Method is implemented in vtkXMLParser
-  if ( ! stateMachineFactory->Parse() )    
-  {
-    //mitk::StatusBar::GetInstance()->DisplayErrorText( "Could not parse behavior!" );
-  }
-
-  stateMachineFactory->Delete();
-  return true;
+  return this->Parse();
 }
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()
@@ -120,7 +110,7 @@ bool mitk::StateMachineFactory::LoadStandardBehavior()
   std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
 
   if (!xmlFileName.empty()) 
-    return LoadBehavior(xmlFileName);
+    return this->LoadBehavior(xmlFileName);
   else
     return false;
 }
@@ -326,7 +316,7 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   } 
   else if ( name == TRANSITION ) 
   {
-    m_AktTransition = NULL;
+    m_AktTransition = NULL; //pointer stored in its state. memory will be freed in destructor of class state
   } 
   else if ( name == ACTION ) 
   {

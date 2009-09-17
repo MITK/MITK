@@ -174,6 +174,8 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     **/
     friend class UndoModel;
 
+    friend class GlobalInteraction;
+
 
   protected:
     /**
@@ -237,17 +239,15 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     **/
     void ResetStatemachineToStartState(unsigned int timeStep = 0);
 
-
-    /**
-    * @brief Initialize the vector of StartStates with the right number of elements according to the timesteps of the data
-    * @param[in] timeSteps Number of elements in the vector of StartStates to be created
-    **/
-    void InitializeStartStates(unsigned int timeSteps = 1);
-
     /**
     * @brief Check if the number of timeSteps is equal to the number of stored StartStates. Nothing is changed if the number is equal.
     **/
     void ExpandStartStateVector(unsigned int timeSteps);
+
+    /**
+    * @brief initializes m_CurrentStateVector
+    **/
+    void InitializeStartStates(unsigned int timeSteps);
 
     /**
     * @brief Update the TimeStep of the statemachine with undo-support if undo enabled

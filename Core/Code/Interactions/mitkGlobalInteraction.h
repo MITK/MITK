@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFocusManager.h"
 #include "mitkCommon.h"
-//#include "mitkStateMachine.h"
+#include "mitkStateMachineFactory.h"
 #include "mitkInteractor.h"
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
-    mitkNewMacro1Param(Self, const char*);
+    mitkNewMacro2Param(Self, const char*, const char*);
 
     typedef std::vector<StateMachine::Pointer>  StateMachineList;
     typedef std::vector<StateMachine*>  StateMachineCPointerList;
@@ -132,16 +132,23 @@ namespace mitk {
     //## to add the observer for an event
     FocusManager* GetFocusManager();
 
-    static bool StandardInteractionSetup(const char * XMLbehaviorFile = NULL, const char * globalInteractionName = NULL);
+    /**
+    * @brief Return StateMachineFactory
+    **/
+    StateMachineFactory* GetStateMachineFactory();
+    
+    /**
+    * @brief Returns the StartState of the StateMachine with the name type;
+    *
+    * Asks member StateMachineFactory for the StartState.
+    * Returns NULL if no entry with name type is found.
+    **/    
+    State* GetStartState(const char* type);
 
     //##Documentation
     //## @brief Returns the global (singleton) instance of
     //## GlobalInteraction. Create it, if it does not exist.
-    static GlobalInteraction* GetInstance();
-
-    //##Documentation
-    //## @brief Returns whether an instance exists
-    static bool HasInstance();
+    static GlobalInteraction* GetInstance(const char* globalInteractionName = NULL, const char* XMLbehaviorFile = NULL);
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;
@@ -149,8 +156,10 @@ namespace mitk {
   protected:
     /**
     * @brief Default Constructor with type to load the StateMachinePattern of the StateMachine
+    * @param XMLbehaviorFile the file which contains the statemachine and event patterns 
+    * @param type the name of the statemachine pattern this class shall use
     **/
-    GlobalInteraction(const char * type);
+    GlobalInteraction(const char* type, const char* XMLbehaviorFile);
     
     /**
     * @brief Default destructor.
@@ -223,10 +232,13 @@ namespace mitk {
     //## @brief holds a list of BaseRenderer and one focused
     FocusManager::Pointer m_FocusManager;
 
+    /**
+    * @brief StatemachineFactory loads statemachine patterns and provides start states
+    **/
+    StateMachineFactory* m_StateMachineFactory;
+
     bool m_CurrentlyInInformListenersLoop;
     bool m_CurrentlyInInformInteractorsLoop;
-
-    static GlobalInteraction::Pointer s_GlobalInteraction;
   };
 } // namespace mitk
 

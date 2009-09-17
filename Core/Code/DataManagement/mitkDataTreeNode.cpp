@@ -96,7 +96,7 @@ mitk::DataTreeNode::~DataTreeNode()
 {
   Interactor* interactor = this->GetInteractor();
 
-  if ( ( interactor ) && ( mitk::GlobalInteraction::HasInstance() ) )
+  if ( interactor )
   {
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );  
   }

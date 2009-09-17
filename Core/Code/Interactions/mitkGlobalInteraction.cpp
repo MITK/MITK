@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGlobalInteraction.h"
+#include <mitkStateMachineFactory.h>
+#include <mitkEventMapper.h>
 #include "mitkInteractionConst.h"
 #include "mitkEvent.h"
 #include "mitkAction.h"
@@ -25,19 +27,44 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkWorldPointPicker.h>
 
 
-mitk::GlobalInteraction::Pointer mitk::GlobalInteraction::s_GlobalInteraction(NULL);
-
-
-mitk::GlobalInteraction::GlobalInteraction(const char * type)
+mitk::GlobalInteraction::GlobalInteraction(const char* type, const char* XMLbehaviorFile)
 : StateMachine(type),
   m_CurrentlyInInformListenersLoop(false)
 {
   m_FocusManager = FocusManager::New();
+
+  // instancialte m_StateMachineFactory and load interaction patterns from XML-file
+  m_StateMachineFactory = StateMachineFactory::New();
+  
+  //load standard behaviour from file
+  if (XMLbehaviorFile==NULL)
+    m_StateMachineFactory->LoadStandardBehavior();
+  else 
+    m_StateMachineFactory->LoadBehavior(XMLbehaviorFile);
+
+  // load event-mappings from XML-file
+  if(XMLbehaviorFile==NULL)
+    mitk::EventMapper::LoadStandardBehavior();
+  else
+    mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
+
+  //now instanciate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+  
+  //get the startstate of the pattern
+  State::Pointer startState = m_StateMachineFactory->GetStartState(type);
+
+  //clear the vector
+  m_CurrentStateVector.clear();
+  //add the startstate pointer for the first timestep to the list
+  m_CurrentStateVector.push_back(startState);
 }
 
 mitk::GlobalInteraction::~GlobalInteraction()
 {
   //s_GlobalInteraction doesn't have to be set = NULL;
+  m_FocusManager = NULL;
+  if (m_StateMachineFactory)
+    m_StateMachineFactory->Delete();
 }
 
 
@@ -299,51 +326,25 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
   return ok;
 }
 
-#include <mitkStateMachineFactory.h>
-#include <mitkEventMapper.h>
-bool mitk::GlobalInteraction::StandardInteractionSetup(const char * XMLbehaviorFile, const char * globalInteractionName)
-{
-  bool result;
-  // load interaction patterns from XML-file
-  if(XMLbehaviorFile==NULL)
-    result=mitk::StateMachineFactory::LoadStandardBehavior();
-  else
-    result=mitk::StateMachineFactory::LoadBehavior(XMLbehaviorFile);
-  if(result==false)
-  {
-    s_GlobalInteraction = mitk::GlobalInteraction::New(NULL);
-    return false;
-  }
-  // load event-mappings from XML-file
-  if(XMLbehaviorFile==NULL)
-    result=mitk::EventMapper::LoadStandardBehavior();
-  else
-    result=mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
-  if(result==false)
-  {
-    s_GlobalInteraction = mitk::GlobalInteraction::New(NULL);
-    return false;
-  }
-  // setup interaction mechanism by creating GlobalInteraction
-  if(globalInteractionName == NULL)
-    s_GlobalInteraction = mitk::GlobalInteraction::New("global");
-  else
-    s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName);
-  return true;
-}
 
-mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
+mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance(const char* globalInteractionName, const char* XMLbehaviorFile)
 {
-  if(s_GlobalInteraction.IsNull())
-  {
-    mitk::GlobalInteraction::StandardInteractionSetup();
-  }
+  //if not specified, then set to standard pattern "global"
+  if (globalInteractionName == NULL)
+    globalInteractionName = "global";
+
+  //first call influences behavior file and interaction name
+  static mitk::GlobalInteraction::Pointer s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName, XMLbehaviorFile);
   return s_GlobalInteraction.GetPointer();
 }
 
-bool mitk::GlobalInteraction::HasInstance()
+
+mitk::State* mitk::GlobalInteraction::GetStartState(const char* type)
 {
-  return s_GlobalInteraction.IsNotNull();
+  if (m_StateMachineFactory != NULL)
+    return m_StateMachineFactory->GetStartState(type);
+
+  return NULL;
 }
 
 bool mitk::GlobalInteraction::AddToSelectedInteractors(mitk::Interactor* interactor)
@@ -375,4 +376,8 @@ bool mitk::GlobalInteraction::RemoveFromSelectedInteractors(mitk::Interactor* in
     return false;
 }
 
+mitk::StateMachineFactory* mitk::GlobalInteraction::GetStateMachineFactory()
+{
+  return m_StateMachineFactory;
+}
 

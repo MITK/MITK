@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkStateMachine.h"
-#include "mitkStateMachineFactory.h"
 #include "mitkStateTransitionOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkInteractor.h"
@@ -26,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAction.h"
 #include "mitkUndoController.h"
 #include <itkMacro.h>
+#include "mitkGlobalInteraction.h"
 
 
 /**
@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 * it to a StateMachine of Type type;
 **/
 mitk::StateMachine::StateMachine(const char * type)
+: m_UndoController(NULL)
 {
   if(type!=NULL)
   {
@@ -42,13 +43,11 @@ mitk::StateMachine::StateMachine(const char * type)
     //the statemachine doesn't know yet anything about the number of timesteps of the data. So we initialize it with one element.
     this->InitializeStartStates(1);
   }
-  /*else
-    itkWarningMacro("Error from "<<this->GetNameOfClass()<<"; Message: Type of StateMachine is NULL!");*/
-  //\*todo: check the process with BaseControllers, cause they are always instantiated with type ==NULL! So here we can't check and warn the user.
-  //\*todo: @todo:why are the basecontrollers statemachines then??? <ingmar 18.12.06>
-  
-  m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
-  m_UndoEnabled = true;
+  if (!m_UndoController)
+  {
+    m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
+    m_UndoEnabled = true;
+  }
 
   m_TimeStep = 0;
 }
@@ -80,7 +79,7 @@ const mitk::State* mitk::StateMachine::GetCurrentState(unsigned int timeStep) co
 
 void mitk::StateMachine::ResetStatemachineToStartState(unsigned int timeStep)
 {
-  mitk::State* startState = mitk::StateMachineFactory::GetStartState((const char *)(&m_Type[0]));
+  mitk::State* startState = mitk::GlobalInteraction::GetInstance()->GetStartState((const char *)(&m_Type[0]));
 
   if ( m_UndoEnabled )  //write to UndoMechanism if Undo is enabled
   {
@@ -241,8 +240,12 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 
 void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
 {
+  if (mitk::GlobalInteraction::GetInstance() == NULL)
+    return;
+  
   //get the startstate of the pattern
-  State::Pointer startState = mitk::StateMachineFactory::GetStartState((const char *)(&m_Type[0]));
+  State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState((const char *)(&m_Type[0]));
+
   //clear the vector
   m_CurrentStateVector.clear();
   //add n=timesteps pointers pointing to to the startstate
@@ -263,7 +266,7 @@ void mitk::StateMachine::ExpandStartStateVector(unsigned int timeSteps)
 
   if ( timeSteps > oldSize )
   {
-    State::Pointer startState = mitk::StateMachineFactory::GetStartState((const char *)(&m_Type[0]));
+    State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState((const char *)(&m_Type[0]));
     for ( unsigned int i = oldSize; i < timeSteps; ++i )
       m_CurrentStateVector.insert(m_CurrentStateVector.end(), startState);
   }

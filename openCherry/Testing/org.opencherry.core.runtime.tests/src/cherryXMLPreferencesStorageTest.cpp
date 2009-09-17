@@ -34,35 +34,9 @@ namespace cherry
   {
     CppUnit::TestSuite* suite = new CppUnit::TestSuite("XMLPreferencesStorageTest");
 
-    CppUnit_addTest(suite, XMLPreferencesStorageTest, TestLoadFile);
     CppUnit_addTest(suite, XMLPreferencesStorageTest, TestCreateFile);
+    CppUnit_addTest(suite, XMLPreferencesStorageTest, TestLoadFile);
     return suite;
-  }
-
-
-  void XMLPreferencesStorageTest::TestLoadFile()
-  {
-    // file exists, test parsing etc.
-    cherry::XMLPreferencesStorage storage(m_File);
-    cherry::IPreferences::Pointer prefRoot = storage.GetRoot();
-    assert(prefRoot.IsNotNull());
-
-    // try to find nodes that were create by testCreateFile
-    assert(prefRoot->NodeExists("/Text Editor"));
-    assert(prefRoot->NodeExists("/Text Editor"));
-    assert(prefRoot->NodeExists("/Text Editor"));
-    assert(prefRoot->NodeExists("/Text Editor"));
-
-    // try to get some properties
-    cherry::IPreferences::Pointer cppEditor = prefRoot->Node("/Text Editor/C++");
-    assert(cppEditor->GetBool("Show Line Numbers", false) == true);
-    assert(cppEditor->Get("File Extension", "") == "txt rtf xml");
-    assert(cppEditor->GetInt("Show margin at column", 0) == 80);
-
-    cherry::IPreferences::Pointer jsEditor = prefRoot->Node("/Text Editor/Java/Javascript");
-    assert(jsEditor->GetBool("Show Line Numbers", false) == true);
-    assert(jsEditor->Get("File Extension", "") == "js");
-    assert(jsEditor->GetInt("Show margin at column", 0) == 70);
   }
 
   void XMLPreferencesStorageTest::TestCreateFile()
@@ -98,6 +72,28 @@ namespace cherry
     assert(m_File.exists());
   }
 
+  void XMLPreferencesStorageTest::TestLoadFile()
+  {
+    // file exists, test parsing etc.
+    cherry::XMLPreferencesStorage storage(m_File);
+    cherry::IPreferences::Pointer prefRoot = storage.GetRoot();
+    assert(prefRoot.IsNotNull());
+
+    // try to find nodes that were create by testCreateFile
+    assert(prefRoot->NodeExists("/Text Editor"));
+
+    // try to get some properties
+    cherry::IPreferences::Pointer cppEditor = prefRoot->Node("/Text Editor/C++");
+    assert(cppEditor->GetBool("Show Line Numbers", false) == true);
+    assert(cppEditor->Get("File Extension", "") == "txt rtf xml");
+    assert(cppEditor->GetInt("Show margin at column", 0) == 80);
+
+    cherry::IPreferences::Pointer jsEditor = prefRoot->Node("/Text Editor/Java/Javascript");
+    assert(jsEditor->GetBool("Show Line Numbers", false) == true);
+    assert(jsEditor->Get("File Extension", "") == "js");
+    assert(jsEditor->GetInt("Show margin at column", 0) == 70);
+  }
+  
   void cherry::XMLPreferencesStorageTest::setUp()
   {
     Poco::Path path("prefs.xml");

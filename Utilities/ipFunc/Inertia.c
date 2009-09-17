@@ -52,9 +52,9 @@
  *  interest
  *
  * FUNCTION DECLARATION
- *  ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
- *                           ipFloat8_t     **eigen_vekt,
- *                           ipFloat8_t     **eigen_val )            
+ *  mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
+ *                           mitkIpFloat8_t     **eigen_vekt,
+ *                           mitkIpFloat8_t     **eigen_val )            
  *
  * PARAMETERS
  *  pic_old	- pointer to an image structure which contains the ROI
@@ -87,10 +87,10 @@
 
 #define GRAV( type, pic, index, s, s_diag, dist )                         \
 {                                                                         \
-  ipUInt4_t   i;                                                          \
-  ipUInt4_t   no;                                                         \
-  ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_mitkIpPicNDIM];                                              \
+  mitkIpUInt4_t   i;                                                          \
+  mitkIpUInt4_t   no;                                                         \
+  mitkIpUInt4_t   offset_refl;                                                \
+  mitkIpInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
@@ -139,22 +139,22 @@
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
-                         ipFloat8_t     **eigen_vekt,
-                         ipFloat8_t     **eigen_val )            
+mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
+                         mitkIpFloat8_t     **eigen_vekt,
+                         mitkIpFloat8_t     **eigen_val )            
 {
 
-  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
-  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
+  mitkIpUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  mitkIpInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       i, j;                   /* loop index                 */
-  ipFloat8_t      *gravity;               /* center of gravity          */
-  ipFloat8_t      *help_vekt;             /* pointer to eigen_vekt      */
-  ipFloat8_t      *help_val;              /* pointer to eigen_val       */
+  mitkIpUInt4_t       i, j;                   /* loop index                 */
+  mitkIpFloat8_t      *gravity;               /* center of gravity          */
+  mitkIpFloat8_t      *help_vekt;             /* pointer to eigen_vekt      */
+  mitkIpFloat8_t      *help_val;              /* pointer to eigen_val       */
   MAT             *ev;                    /* eigenvector                */
   MAT             *tt;                    /* tensor of inertia          */
   VEC             *ew;                    /* eigenvalue                 */
-  ipFloat8_t      *s, *s_diag, *dist;     /* used to calculate tt       */
+  mitkIpFloat8_t      *s, *s_diag, *dist;     /* used to calculate tt       */
 
   /* check data  */
 
@@ -173,14 +173,14 @@ ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
 
   /* memory allocation */
 
-  gravity = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
+  gravity = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   if ( gravity == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
  
-  dist    = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
+  dist    = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   if ( dist == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
@@ -188,7 +188,7 @@ ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
        return ( mitkIpFuncERROR );
     }
  
-  s_diag  = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
+  s_diag  = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   if ( s_diag == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
@@ -197,7 +197,7 @@ ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
        return ( mitkIpFuncERROR );
     }
  
-  s = ( ipFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( ipFloat8_t ) );
+  s = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   if ( s == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
@@ -281,9 +281,9 @@ ipInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
 
   ew = symmeig ( tt, ev, ew );
 
-  *eigen_vekt = ( ipFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( ipFloat8_t ) );
+  *eigen_vekt = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   help_vekt   = *eigen_vekt;
-  *eigen_val  = ( ipFloat8_t * ) malloc ( pic_old->dim * sizeof ( ipFloat8_t ) );
+  *eigen_val  = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
   help_val    = *eigen_val;
 
   for ( i = 0; i < pic_old->dim; i++ )

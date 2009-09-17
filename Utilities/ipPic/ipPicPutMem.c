@@ -72,14 +72,14 @@
 
 
 
-void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, ipUInt1_t **mem_ptr )
+void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt1_t **mem_ptr )
 {
   _mitkIpPicTagsElement_t *current = head;
 
   while( current != NULL )
     {
-      ipUInt4_t  elements;
-      ipUInt4_t  len;
+      mitkIpUInt4_t  elements;
+      mitkIpUInt4_t  len;
 
       elements = _mitkIpPicTSVElements( current->tsv );
 
@@ -107,22 +107,22 @@ void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, ipUInt1_t **mem_ptr 
 
          }
 
-      len +=                   3 * sizeof(ipUInt4_t)  /* type, bpe, dim */
-             + current->tsv->dim * sizeof(ipUInt4_t); /* n[]            */
+      len +=                   3 * sizeof(mitkIpUInt4_t)  /* type, bpe, dim */
+             + current->tsv->dim * sizeof(mitkIpUInt4_t); /* n[]            */
 
       memcpy( *mem_ptr, current->tsv->tag, sizeof(mitkIpPicTag_t) );
       *mem_ptr += sizeof(mitkIpPicTag_t);
-      memcpy( *mem_ptr, &len, sizeof(ipUInt4_t) );
-      *mem_ptr += sizeof(ipUInt4_t);
-      memcpy( *mem_ptr, &(current->tsv->type), sizeof(ipUInt4_t) );
-      *mem_ptr += sizeof(ipUInt4_t);
-      memcpy( *mem_ptr, &(current->tsv->bpe), sizeof(ipUInt4_t) );
-      *mem_ptr += sizeof(ipUInt4_t);
-      memcpy( *mem_ptr, &(current->tsv->dim), sizeof(ipUInt4_t) );
-      *mem_ptr += sizeof(ipUInt4_t);
+      memcpy( *mem_ptr, &len, sizeof(mitkIpUInt4_t) );
+      *mem_ptr += sizeof(mitkIpUInt4_t);
+      memcpy( *mem_ptr, &(current->tsv->type), sizeof(mitkIpUInt4_t) );
+      *mem_ptr += sizeof(mitkIpUInt4_t);
+      memcpy( *mem_ptr, &(current->tsv->bpe), sizeof(mitkIpUInt4_t) );
+      *mem_ptr += sizeof(mitkIpUInt4_t);
+      memcpy( *mem_ptr, &(current->tsv->dim), sizeof(mitkIpUInt4_t) );
+      *mem_ptr += sizeof(mitkIpUInt4_t);
       memcpy( *mem_ptr, &(current->tsv->n), 
-	       current->tsv->dim*sizeof(ipUInt4_t) );
-      *mem_ptr += current->tsv->dim*sizeof(ipUInt4_t);
+	       current->tsv->dim*sizeof(mitkIpUInt4_t) );
+      *mem_ptr += current->tsv->dim*sizeof(mitkIpUInt4_t);
 
       if( current->tsv->type == mitkIpPicTSV )
         {
@@ -140,22 +140,22 @@ void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, ipUInt1_t **mem_ptr 
   
 }
 
-ipUInt1_t *
+mitkIpUInt1_t *
 mitkIpPicPutMem( mitkIpPicDescriptor *pic, int *mem_size )
 {
-  ipUInt4_t  len;
-  ipUInt4_t  tags_len;
-  ipUInt1_t *mem_pic = NULL;
-  ipUInt1_t *mem_ptr;
+  mitkIpUInt4_t  len;
+  mitkIpUInt4_t  tags_len;
+  mitkIpUInt1_t *mem_pic = NULL;
+  mitkIpUInt1_t *mem_ptr;
 
   tags_len = _mitkIpPicTagsSize( pic->info->tags_head );
 
-  len = tags_len +        3 * sizeof(ipUInt4_t)
-                 + pic->dim * sizeof(ipUInt4_t);
+  len = tags_len +        3 * sizeof(mitkIpUInt4_t)
+                 + pic->dim * sizeof(mitkIpUInt4_t);
 
   *mem_size = 
     sizeof(mitkIpPicTag_t) +               /* pic version     */
-    sizeof(ipUInt4_t) +                /* pic data offset */
+    sizeof(mitkIpUInt4_t) +                /* pic data offset */
     len +                              /* header + tags   */
     _mitkIpPicSize( pic );                 /* size of data    */
 
@@ -166,16 +166,16 @@ mitkIpPicPutMem( mitkIpPicDescriptor *pic, int *mem_size )
   mem_ptr = mem_pic;
   memcpy( mem_ptr, mitkIpPicVERSION, sizeof(mitkIpPicTag_t) );
   mem_ptr += sizeof(mitkIpPicTag_t);
-  memcpy( mem_ptr, &len, sizeof(ipUInt4_t) );
-  mem_ptr += sizeof(ipUInt4_t);
-  memcpy( mem_ptr, &(pic->type), sizeof(ipUInt4_t) );
-  mem_ptr += sizeof(ipUInt4_t);
-  memcpy( mem_ptr, &(pic->bpe), sizeof(ipUInt4_t) );
-  mem_ptr += sizeof(ipUInt4_t);
-  memcpy( mem_ptr, &(pic->dim), sizeof(ipUInt4_t) );
-  mem_ptr += sizeof(ipUInt4_t);
-  memcpy( mem_ptr, &(pic->n), pic->dim*sizeof(ipUInt4_t) );
-  mem_ptr += pic->dim*sizeof(ipUInt4_t);
+  memcpy( mem_ptr, &len, sizeof(mitkIpUInt4_t) );
+  mem_ptr += sizeof(mitkIpUInt4_t);
+  memcpy( mem_ptr, &(pic->type), sizeof(mitkIpUInt4_t) );
+  mem_ptr += sizeof(mitkIpUInt4_t);
+  memcpy( mem_ptr, &(pic->bpe), sizeof(mitkIpUInt4_t) );
+  mem_ptr += sizeof(mitkIpUInt4_t);
+  memcpy( mem_ptr, &(pic->dim), sizeof(mitkIpUInt4_t) );
+  mem_ptr += sizeof(mitkIpUInt4_t);
+  memcpy( mem_ptr, &(pic->n), pic->dim*sizeof(mitkIpUInt4_t) );
+  mem_ptr += pic->dim*sizeof(mitkIpUInt4_t);
 
   _mitkIpPicWriteTagsMem( pic->info->tags_head, &mem_ptr );
 

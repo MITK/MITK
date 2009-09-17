@@ -70,9 +70,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
-                         ipFloat8_t      gv_low,
-                         ipFloat8_t      gv_up );
+mitkIpUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
+                         mitkIpFloat8_t      gv_low,
+                         mitkIpFloat8_t      gv_up );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
@@ -86,11 +86,11 @@ ipUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
 */
 /* ------------------------------------------------------------------------ */
 
-ipUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
-                         ipFloat8_t      gv_low,
-                         ipFloat8_t      gv_up )
+mitkIpUInt4_t  mitkIpFuncRange ( mitkIpPicDescriptor *pic_old,
+                         mitkIpFloat8_t      gv_low,
+                         mitkIpFloat8_t      gv_up )
 {
-  ipFloat8_t       min, max;        /* extreme greyvalues                   */
+  mitkIpFloat8_t       min, max;        /* extreme greyvalues                   */
 
   /* check image data                                                       */
 

@@ -61,7 +61,7 @@
 
 mitkIpPicDescriptor *mitkIpPicCopyHeader( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_new )
 {
-  ipUInt4_t i;
+  mitkIpUInt4_t i;
 
   if( pic_new == NULL )
     pic_new = mitkIpPicNew();

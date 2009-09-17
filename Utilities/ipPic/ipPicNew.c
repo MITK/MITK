@@ -100,7 +100,7 @@ mitkIpPicDescriptor *mitkIpPicNew( void )
 
       pic->info->tags_head = NULL;
 
-      pic->info->write_protect = ipFalse;
+      pic->info->write_protect = mitkIpFalse;
       pic->info->pixel_start_in_file = 0;
       pic->info->lender = 0;
       pic->info->borrower = 0;

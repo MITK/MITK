@@ -128,7 +128,7 @@ int mitkPicFileReaderTest(int argc, char* argv[])
   std::cout << "Testing extent in units of image of TimeSlicedGeometry: ";
   if((fabs(timegeometry->GetExtent(0)-picheader->n[0])>mitk::eps) || (fabs(timegeometry->GetExtent(1)-picheader->n[1])>mitk::eps)
     || (picheader->dim>2 && (fabs(timegeometry->GetExtent(2)-picheader->n[2])>mitk::eps))
-    || (picheader->dim>3 && (abs((ipInt4_t) timegeometry->GetTimeSteps()- (ipInt4_t) picheader->n[3])>0))
+    || (picheader->dim>3 && (abs((mitkIpInt4_t) timegeometry->GetTimeSteps()- (mitkIpInt4_t) picheader->n[3])>0))
     )
   {
     std::cout<<"[FAILED]"<<std::endl;

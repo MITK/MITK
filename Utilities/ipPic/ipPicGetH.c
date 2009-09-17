@@ -101,7 +101,7 @@ mitkIpPicGetHeader( const char *infile_name, mitkIpPicDescriptor *pic )
   mitkIpPicFile_t  infile;
 
   mitkIpPicTag_t tag_name;
-  ipUInt4_t len;
+  mitkIpUInt4_t len;
 
   infile = _mitkIpPicOpenPicFileIn( infile_name );
 
@@ -137,18 +137,18 @@ mitkIpPicGetHeader( const char *infile_name, mitkIpPicDescriptor *pic )
 
   mitkIpPicClear( pic );
 
-  pic->info->write_protect = ipTrue;
+  pic->info->write_protect = mitkIpTrue;
 
   mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  mitkIpPicFReadLE( &(pic->n), sizeof(mitkIpUInt4_t), pic->dim, infile );
 
 
   if( infile != stdin )

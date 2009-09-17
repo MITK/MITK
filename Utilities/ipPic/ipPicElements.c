@@ -55,10 +55,10 @@
 
 #include "mitkIpPic.h"
 
-ipUInt4_t _mitkIpPicElements( mitkIpPicDescriptor *pic )
+mitkIpUInt4_t _mitkIpPicElements( mitkIpPicDescriptor *pic )
 {
   unsigned int i;
-  ipUInt4_t elements;
+  mitkIpUInt4_t elements;
 
   if( pic->dim == 0 )
     return( 0 );

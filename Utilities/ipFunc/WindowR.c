@@ -66,7 +66,7 @@
 
 mitkIpPicDescriptor *mitkIpFuncWindowR ( mitkIpPicDescriptor *pic_1,  
                                  mitkIpPicDescriptor *pic_2,
-                                 ipUInt4_t       *begin,
+                                 mitkIpUInt4_t       *begin,
                                  mitkIpFuncFlagI_t    keep );
 
 #ifndef DOXYGEN_IGNORE
@@ -82,9 +82,9 @@ mitkIpPicDescriptor *mitkIpFuncWindowR ( mitkIpPicDescriptor *pic_1,
 
 #define WINDR( type, pic, beg, end, size )                                         \
 {                                                                                  \
-  ipUInt4_t      offset;           /* offset of pixels in pic_new               */ \
-  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
+  mitkIpUInt4_t      offset;           /* offset of pixels in pic_new               */ \
+  mitkIpUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  mitkIpUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
   offset = 0;                                                                      \
   for ( ind[7] = beg[7] ; ind[7] < end[7]; ind[7]++ )                              \
@@ -133,13 +133,13 @@ mitkIpPicDescriptor *mitkIpFuncWindowR ( mitkIpPicDescriptor *pic_1,
 
 mitkIpPicDescriptor *mitkIpFuncWindowR ( mitkIpPicDescriptor *pic_1,  
                                  mitkIpPicDescriptor *pic_2,
-                                 ipUInt4_t       *begin,
+                                 mitkIpUInt4_t       *begin,
                                  mitkIpFuncFlagI_t    keep )
 {
   mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
-  ipUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
-  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
+  mitkIpInt4_t       i;                    /* loop index                              */
+  mitkIpUInt4_t      end[_mitkIpPicNDIM];      /* end of image                            */
+  mitkIpUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whether data are correct                                               */
 

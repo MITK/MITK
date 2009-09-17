@@ -88,9 +88,9 @@ mitkIpPicDescriptor *mitkIpFuncHitMiss ( mitkIpPicDescriptor *pic_old,
                                  mitkIpPicDescriptor *pic_masks,
                                  mitkIpFuncFlagI_t   border )
 {
-  ipBool_t          allocated=ipFalse;
+  mitkIpBool_t          allocated=mitkIpFalse;
   mitkIpPicDescriptor   *pic_new;  /* pointer to new image                */
-  ipUInt1_t         mask[] =   /* hit and miss mask (edge detection)  */
+  mitkIpUInt1_t         mask[] =   /* hit and miss mask (edge detection)  */
                     { 0, 0, 0, 0, 1, 0, 0, 0, 0, 
                       0, 1, 0, 0, 0, 0, 0, 0, 0,
                       0, 0, 0, 0, 1, 0, 0, 0, 0,
@@ -103,7 +103,7 @@ mitkIpPicDescriptor *mitkIpFuncHitMiss ( mitkIpPicDescriptor *pic_old,
 
   if ( pic_masks == NULL )
     {
-       allocated = ipTrue;
+       allocated = mitkIpTrue;
        pic_masks = mitkIpPicNew ();
        if ( pic_masks == NULL ) 
          {

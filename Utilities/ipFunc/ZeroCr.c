@@ -69,9 +69,9 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old ) ;
 
 #define ZERO( type, pic, size, off, n )                                  \
 {                                                                        \
-   ipUInt4_t        ind[_mitkIpPicNDIM];                                     \
-   ipUInt4_t        i, j;                                                \
-   ipInt4_t         offset;                                              \
+   mitkIpUInt4_t        ind[_mitkIpPicNDIM];                                     \
+   mitkIpUInt4_t        i, j;                                                \
+   mitkIpInt4_t         offset;                                              \
    type             help1, help2, help3, help;                           \
                                                                          \
    /* test whether there is a zero crossing in each direction         */ \
@@ -130,10 +130,10 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
 {
 
   mitkIpPicDescriptor *pic_new;           /* convoluted image               */
-  ipUInt4_t       i, j;               /* loopindex                      */
-  ipInt4_t        size[_mitkIpPicNDIM];
-  ipUInt4_t       n[_mitkIpPicNDIM];
-  ipInt4_t        *off_vekt;          /* offset vector                  */
+  mitkIpUInt4_t       i, j;               /* loopindex                      */
+  mitkIpInt4_t        size[_mitkIpPicNDIM];
+  mitkIpUInt4_t       n[_mitkIpPicNDIM];
+  mitkIpInt4_t        *off_vekt;          /* offset vector                  */
 
   /* check image data                                                   */
 
@@ -153,7 +153,7 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
                                                                           
   /* allocate and calculate offset vector                               */
 
-  off_vekt = malloc ( 2 * pic_old->dim * sizeof ( ipInt4_t ) );
+  off_vekt = malloc ( 2 * pic_old->dim * sizeof ( mitkIpInt4_t ) );
   if ( off_vekt == NULL ) 
     {  
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );

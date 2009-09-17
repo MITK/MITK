@@ -70,7 +70,7 @@
 #include "mitkIpFuncP.h"   
 
 mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,           
-                               ipUInt4_t       dim_mask, 
+                               mitkIpUInt4_t       dim_mask, 
                                mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
  
@@ -78,16 +78,16 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
 
 #define SOBEL( typ, pic, size, mask_anz, m )                             \
 {                                                                        \
-   ipInt4_t         ind[_mitkIpPicNDIM];                                     \
-   ipInt4_t         n[_mitkIpPicNDIM];                                       \
-   ipUInt4_t        i,j;                                                 \
-   ipInt4_t         offset;                                              \
-   ipInt4_t         *beg;                                                \
-   ipFloat8_t       help, help2, min_gv, max_gv;                         \
+   mitkIpInt4_t         ind[_mitkIpPicNDIM];                                     \
+   mitkIpInt4_t         n[_mitkIpPicNDIM];                                       \
+   mitkIpUInt4_t        i,j;                                                 \
+   mitkIpInt4_t         offset;                                              \
+   mitkIpInt4_t         *beg;                                                \
+   mitkIpFloat8_t       help, help2, min_gv, max_gv;                         \
                                                                          \
   /* calculate begin and end of the single masks                      */ \
                                                                          \
-  beg = malloc ( ( mask_anz + 1 ) * sizeof ( ipInt4_t ) );               \
+  beg = malloc ( ( mask_anz + 1 ) * sizeof ( mitkIpInt4_t ) );               \
                                                                          \
   beg[0] = 0;                                                            \
   for ( i = 1; i <= mask_anz; i++ )                                      \
@@ -146,24 +146,24 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------  */
 
 mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,           
-                               ipUInt4_t       dim_mask, 
+                               mitkIpUInt4_t       dim_mask, 
                                mitkIpFuncFlagI_t   border )
 {
 
   mitkIpPicDescriptor *pic_new;           /* convolved  image               */
   mitkIpPicDescriptor *pic_mask;          /* sobel mask                     */
-  ipInt4_t        offset, off_mask;
-  ipUInt4_t       i, j;               /* loopindex                      */
-  ipUInt4_t       pos;
-  ipUInt1_t       mask_anz;           /* number of masks                */ 
-  ipInt4_t        n[_mitkIpPicNDIM];
-  ipInt4_t        ind[_mitkIpPicNDIM];    /* vector of loop indices (image) */ 
+  mitkIpInt4_t        offset, off_mask;
+  mitkIpUInt4_t       i, j;               /* loopindex                      */
+  mitkIpUInt4_t       pos;
+  mitkIpUInt1_t       mask_anz;           /* number of masks                */ 
+  mitkIpInt4_t        n[_mitkIpPicNDIM];
+  mitkIpInt4_t        ind[_mitkIpPicNDIM];    /* vector of loop indices (image) */ 
   mitkIpFuncMasc_t    *m;                 /* length of mask and offsets     */
-  ipUInt4_t       size[_mitkIpPicNDIM];                                    
-  ipInt2_t        sobel2[] =          /* 2D Sobel mask                  */
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];                                    
+  mitkIpInt2_t        sobel2[] =          /* 2D Sobel mask                  */
                   {  1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  2,  1,  0,  0,  0, -1, -2, -1  };
-  ipInt2_t        sobel3[] =          /* 3D Sobel mask                  */
+  mitkIpInt2_t        sobel3[] =          /* 3D Sobel mask                  */
                   {  1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  0, -1,  2,  0, -2,  1,  0, -1,
@@ -250,7 +250,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
-  m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
+  m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpInt4_t ) );
   if ( m->off_vekt == NULL ) 
     {
        free ( m );
@@ -259,7 +259,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
-  m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
+  m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpFloat8_t ) );
   if ( m->mask_vekt == NULL ) 
     {
        free ( m->off_vekt );
@@ -311,7 +311,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
       for ( ind[1] = -1; ind[1] < n[1]; ind[1]++ )
         for ( ind[0] = -1; ind[0] < n[0]; ind[0]++ )
           {
-            if ( (( ipInt2_t * )pic_mask->data)[off_mask] != 0 )
+            if ( (( mitkIpInt2_t * )pic_mask->data)[off_mask] != 0 )
               {
                  offset = 0;
                  for ( j = 0; j < dim_mask; j++ )
@@ -327,8 +327,8 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
   pos = 0;                                                               
   for ( i = 0; i < m->length; i++ )                                      
     {                                                                    
-      while ( (( ipInt2_t * )pic_mask->data)[pos] == 0 ) pos++;           
-      m->mask_vekt[i] = ( ipFloat8_t )(( ipInt2_t * )pic_mask->data)[pos]; 
+      while ( (( mitkIpInt2_t * )pic_mask->data)[pos] == 0 ) pos++;           
+      m->mask_vekt[i] = ( mitkIpFloat8_t )(( mitkIpInt2_t * )pic_mask->data)[pos]; 
       pos++;                                                             
     }                                                                    
                                                                          

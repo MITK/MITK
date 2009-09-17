@@ -66,15 +66,15 @@
 
 #include "mitkIpFuncP.h"
 
-ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
-                      ipUInt4_t       **beg,
-                      ipUInt4_t       **end )       ;
+mitkIpUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
+                      mitkIpUInt4_t       **beg,
+                      mitkIpUInt4_t       **end )       ;
 
 #ifndef DOXYGEN_IGNORE
 
-ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
-                      ipUInt4_t       **beg,
-                      ipUInt4_t       **end )            
+mitkIpUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
+                      mitkIpUInt4_t       **beg,
+                      mitkIpUInt4_t       **end )            
 {
 
   /* check data                                                         */

@@ -76,11 +76,11 @@
 */
 /* ========================================================== */
 
-ipFloat8_t mitkIpFuncSkewnessR ( mitkIpPicDescriptor *pic_old,
-						    ipUInt4_t       *begin, 
-                            ipUInt4_t       *length ) {
+mitkIpFloat8_t mitkIpFuncSkewnessR ( mitkIpPicDescriptor *pic_old,
+						    mitkIpUInt4_t       *begin, 
+                            mitkIpUInt4_t       *length ) {
 
-   ipFloat8_t   var;     
+   mitkIpFloat8_t   var;     
    mitkIpPicDescriptor *pic_help;
 
    pic_help = mitkIpFuncWindow ( pic_old, begin, length );

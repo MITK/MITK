@@ -43,21 +43,21 @@
 
 #include "mitkIpPic.h"
 
-_ipEndian_t _mitkIpEndian( void )
+_mitkIpEndian_t _mitkIpEndian( void )
 {
   static union
-  { ipUInt2_t s;
-    ipUInt1_t b;
+  { mitkIpUInt2_t s;
+    mitkIpUInt1_t b;
   } t = { 0x1234 };
 
   if( t.b == 0x12 )
-    return( _ipEndianBig );
+    return( _mitkIpEndianBig );
   if( t.b == 0x34 )
-    return( _ipEndianLittle );
+    return( _mitkIpEndianLittle );
   else
     {
       fprintf( stderr, "%s:_mitkIpEndian: WARNING: unknown endian !!!\n", __FILE__ );
-      return( _ipEndianUnknown );
+      return( _mitkIpEndianUnknown );
     }
 }
 

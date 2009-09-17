@@ -83,7 +83,7 @@ mitkIpPicDescriptor *mitkIpPicClone( mitkIpPicDescriptor *pic )
     }
   else
     {
-      ipUInt4_t size;
+      mitkIpUInt4_t size;
 
       size = _mitkIpPicSize( pic );
 
@@ -116,7 +116,7 @@ mitkIpPicTSV_t *_mitkIpPicCloneTag( mitkIpPicTSV_t *source )
 {
   mitkIpPicTSV_t *new;
 
-  ipUInt4_t i;
+  mitkIpUInt4_t i;
 
   new = malloc( sizeof(mitkIpPicTSV_t) );
 
@@ -135,7 +135,7 @@ mitkIpPicTSV_t *_mitkIpPicCloneTag( mitkIpPicTSV_t *source )
     }
   else
     {
-      ipUInt4_t  size;
+      mitkIpUInt4_t  size;
 
       size = _mitkIpPicTSVSize( new );
 

@@ -59,25 +59,25 @@
 #define _mitkIpTypes_h
 
 #if defined (__mips) || (_IBMR2) || (sun) || (__i386__) || (__convex__) || (__alpha) || (__hppa) || (WIN32) || (_WIN32) || defined (__PPC__) || defined (__x86_64__) || defined (__APPLE__)
-  typedef    signed char  ipInt1_t;
-  typedef   signed short  ipInt2_t;
-  typedef     signed int  ipInt4_t;
-  typedef  unsigned char  ipUInt1_t;
-  typedef unsigned short  ipUInt2_t;
-  typedef   unsigned int  ipUInt4_t;
-  typedef          float  ipFloat4_t;
-  typedef         double  ipFloat8_t;
+  typedef    signed char  mitkIpInt1_t;
+  typedef   signed short  mitkIpInt2_t;
+  typedef     signed int  mitkIpInt4_t;
+  typedef  unsigned char  mitkIpUInt1_t;
+  typedef unsigned short  mitkIpUInt2_t;
+  typedef   unsigned int  mitkIpUInt4_t;
+  typedef          float  mitkIpFloat4_t;
+  typedef         double  mitkIpFloat8_t;
 #endif
 
 #ifdef DOS
-  typedef       signed char  ipInt1_t;
-  typedef        signed int  ipInt2_t;
-  typedef   signed long int  ipInt4_t;
-  typedef     unsigned char  ipUInt1_t;
-  typedef      unsigned int  ipUInt2_t;
-  typedef unsigned long int  ipUInt4_t;
-  typedef             float  ipFloat4_t;
-  typedef            double  ipFloat8_t;
+  typedef       signed char  mitkIpInt1_t;
+  typedef        signed int  mitkIpInt2_t;
+  typedef   signed long int  mitkIpInt4_t;
+  typedef     unsigned char  mitkIpUInt1_t;
+  typedef      unsigned int  mitkIpUInt2_t;
+  typedef unsigned long int  mitkIpUInt4_t;
+  typedef             float  mitkIpFloat4_t;
+  typedef            double  mitkIpFloat8_t;
 #endif
 
 /*
@@ -85,45 +85,45 @@
 ** it is NOT intended for 1 bit images !!!
 */
 typedef enum
-  { ipFalse = 0,
-    ipTrue  = 1
-  } ipBool_t;
+  { mitkIpFalse = 0,
+    mitkIpTrue  = 1
+  } mitkIpBool_t;
 
 typedef enum
   {
-    ipError = -1,            /* general error              */
-    ipOK    =  0,            /* no error                   */
-    ipEDIM  =  1000          /* wrong number of dimensions */
-  } ipError_t;
+    mitkIpError = -1,            /* general error              */
+    mitkIpOK    =  0,            /* no error                   */
+    mitkIpEDIM  =  1000          /* wrong number of dimensions */
+  } mitkIpError_t;
 
 
 typedef enum
   {
-    _ipEndianUnknown = 0,
-    _ipEndianLittle  = 1,
-    _ipEndianBig     = 2
-  } _ipEndian_t;
+    _mitkIpEndianUnknown = 0,
+    _mitkIpEndianLittle  = 1,
+    _mitkIpEndianBig     = 2
+  } _mitkIpEndian_t;
 
 typedef enum
   {
-    ipTypeUnknown = 0,
-    ipTypeStringPtr,
-    ipTypeString,
-    ipTypeInt1,
-    ipTypeInt2,
-    ipTypeInt4,
-    ipTypeUInt1,
-    ipTypeUInt2,
-    ipTypeUInt4,
-    ipTypeFloat4,
-    ipTypeFloat8,
-    ipTypeNBytes,
-    ipTypeArray,
-    ipTypeList,
-    ipTypePic,
-    ipTypePicTag,
-    _ipTypeMAX
-  } ipType_t;
+    mitkIpTypeUnknown = 0,
+    mitkIpTypeStringPtr,
+    mitkIpTypeString,
+    mitkIpTypeInt1,
+    mitkIpTypeInt2,
+    mitkIpTypeInt4,
+    mitkIpTypeUInt1,
+    mitkIpTypeUInt2,
+    mitkIpTypeUInt4,
+    mitkIpTypeFloat4,
+    mitkIpTypeFloat8,
+    mitkIpTypeNBytes,
+    mitkIpTypeArray,
+    mitkIpTypeList,
+    mitkIpTypePic,
+    mitkIpTypePicTag,
+    _mitkIpTypeMAX
+  } mitkIpType_t;
 
 #endif  /* _mitkIpTypes_h */
 /* DON'T ADD ANYTHING AFTER THIS #endif */

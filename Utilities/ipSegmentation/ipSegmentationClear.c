@@ -25,8 +25,8 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
   ipMITKSegmentationTYPE *cur, *last; 
   mitkIpPicTSV_t* tag; 
   const char *src; 
-  ipUInt1_t *dst;
-  ipUInt4_t i, j;
+  mitkIpUInt1_t *dst;
+  mitkIpUInt4_t i, j;
 
   assert (segmentation);
   if (ipMITKSegmentationUndoIsEnabled (segmentation)) {
@@ -48,11 +48,11 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
     tag = (mitkIpPicTSV_t *) malloc (sizeof (mitkIpPicTSV_t));
     strcpy (tag->tag, tagSEGMENTATION_EMPTY);
     tag->type = mitkIpPicBool;
-    tag->bpe = sizeof (ipBool_t) / 8;
+    tag->bpe = sizeof (mitkIpBool_t) / 8;
     tag->dim = 1;
     tag->n[0] = 1;
-    tag->value = malloc (sizeof (ipBool_t)); 
-    *((ipBool_t *) tag->value) = ipTrue;
+    tag->value = malloc (sizeof (mitkIpBool_t)); 
+    *((mitkIpBool_t *) tag->value) = mitkIpTrue;
     mitkIpPicAddTag (segmentation, tag);
   }
 
@@ -66,11 +66,11 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
     tag->dim = 2;
     tag->n[0] = 80;
     tag->n[1] = 80;  
-    tag->value = malloc (tag->n[0] * tag->n[1] * sizeof (ipUInt1_t));
+    tag->value = malloc (tag->n[0] * tag->n[1] * sizeof (mitkIpUInt1_t));
     strcpy (tag->tag, "ICON80x80");
     mitkIpPicAddTag (segmentation, tag);
   }
-  dst = (ipUInt1_t *) tag->value;
+  dst = (mitkIpUInt1_t *) tag->value;
   for (i = 0; i < 80; i++) {
     src = empty_xpm [3+i];
     for (j = 0; j < 80; j++) {

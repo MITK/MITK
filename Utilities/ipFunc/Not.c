@@ -72,7 +72,7 @@ mitkIpPicDescriptor *mitkIpFuncNot ( mitkIpPicDescriptor *pic_old,
 
 #define NOT( type, pic )                                                 \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
+  mitkIpUInt4_t  i, no_elem;                                                 \
                                                                          \
   no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \

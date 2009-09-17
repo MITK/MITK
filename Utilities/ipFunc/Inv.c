@@ -78,7 +78,7 @@ mitkIpPicDescriptor *mitkIpFuncInv ( mitkIpPicDescriptor *pic_old,
 
 #define INV( type, pic )                                                 \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
+  mitkIpUInt4_t  i, no_elem;                                                 \
   type       help;                                                       \
                                                                          \
   /* calculate min. and max.                                           */\

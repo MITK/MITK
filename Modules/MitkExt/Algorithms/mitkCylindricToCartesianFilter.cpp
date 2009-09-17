@@ -30,13 +30,13 @@ void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outs
   T outsideValue = static_cast<T>(_outsideValue);
   register float f, ft, f0, f1, f2, f3;
 
-  ipInt2_t ox_size;
-  ipInt2_t nx_size, ny_size, nz_size;
+  mitkIpInt2_t ox_size;
+  mitkIpInt2_t nx_size, ny_size, nz_size;
   int oxy_size, nxy_size;
 
   T* orig, *dp, *dest_start;
 
-  ipInt2_t* coneCutOff=(ipInt2_t*)coneCutOff_pic->data;
+  mitkIpInt2_t* coneCutOff=(mitkIpInt2_t*)coneCutOff_pic->data;
 
   orig=(T*)pic->data;
   ox_size=pic->n[0];
@@ -54,14 +54,14 @@ void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outs
 
   dest_start=dp=((T*)dest->data)+nxy_size*(nz_size-1);
 
-  ipInt2_t y;
+  mitkIpInt2_t y;
   //  int size=_mitkIpPicElements(pic);
 
-  register ipInt2_t x,z;
+  register mitkIpInt2_t x,z;
   for(y=0;y<ny_size;++y)
   {
-    ipInt2_t x_start;
-    register ipInt2_t x_end;
+    mitkIpInt2_t x_start;
+    register mitkIpInt2_t x_end;
     int r0plusphi0=*rt;
     if(r0plusphi0>=0)
     {
@@ -101,7 +101,7 @@ void _transform(mitkIpPicDescriptor *pic, mitkIpPicDescriptor *dest, float _outs
 
       r0plusphi0=*rt+*phit;
 
-      ipInt2_t z_start;
+      mitkIpInt2_t z_start;
 
       z_start=*coneCutOff;
 
@@ -182,12 +182,12 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
   fphi_pic->n[0]=fphi_pic->n[1]=new_xsize;
   fphi_pic->data=malloc(_mitkIpPicSize(fphi_pic));
 
-  ipInt2_t  *rtp=(ipInt2_t*)rt_pic->data, *rt_xzero, rt, phit;
-  ipUInt4_t  *phitp=(ipUInt4_t*)phit_pic->data;
-  ipFloat4_t *fr=(ipFloat4_t *)fr_pic->data;
-  ipFloat4_t *fphi=(ipFloat4_t *)fphi_pic->data;
+  mitkIpInt2_t  *rtp=(mitkIpInt2_t*)rt_pic->data, *rt_xzero, rt, phit;
+  mitkIpUInt4_t  *phitp=(mitkIpUInt4_t*)phit_pic->data;
+  mitkIpFloat4_t *fr=(mitkIpFloat4_t *)fr_pic->data;
+  mitkIpFloat4_t *fphi=(mitkIpFloat4_t *)fphi_pic->data;
 
-  ipFloat4_t r, phi, scale=(double)orig_xsize/(double)new_xsize;
+  mitkIpFloat4_t r, phi, scale=(double)orig_xsize/(double)new_xsize;
 
   int x,y,xy0,xy0_orig, oxy_size, new_zsize;
   oxy_size=orig_xsize*orig_ysize;
@@ -206,14 +206,14 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
       r=sqrt( (double) (xq*xq+yq*yq));
 
       //      float rtest=-(xy0-sqrt(xy0*xy0-yq*yq))-0.5;
-      rt=(ipInt2_t)(-(xy0-sqrt((double) (xy0*xy0-yq*yq)))-0.5);/*in rt steht der Index des Endes der zu �berspringenden Punkte=>anfangen bei -rt+1!*/
+      rt=(mitkIpInt2_t)(-(xy0-sqrt((double) (xy0*xy0-yq*yq)))-0.5);/*in rt steht der Index des Endes der zu �berspringenden Punkte=>anfangen bei -rt+1!*/
       //      if((x>=-rt) && (x<new_xsize+rt))
       {
         if(y!=xy0)
           r=r*(y>xy0?1.0:-1.0)*scale+xy0_orig;
         else
           r=r*(x>xy0?-1.0:1.0)*scale+xy0_orig;
-        rt=(ipInt2_t)r;
+        rt=(mitkIpInt2_t)r;
         int xtmp=x;
         if(x>xy0)
           xtmp=new_xsize-x;
@@ -241,7 +241,7 @@ void mitk::CylindricToCartesianFilter::buildTransformShortCuts(int orig_xsize, i
       //        *fr=0;
 
       phi=orig_zsize-(yq==0?1:-atan((float)xq/yq)/M_PI+0.5)*orig_zsize;
-      phit=(ipUInt4_t)phi;
+      phit=(mitkIpUInt4_t)phi;
       *fphi=phi-phit;
 
       *rtp=rt;
@@ -276,8 +276,8 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
   coneCutOff_pic->data=malloc(_mitkIpPicSize(coneCutOff_pic));
 
   int i, size=_mitkIpPicElements(rt_pic);
-  ipInt2_t *rt, *ccop, ohx_size, nz_size;
-  ipFloat4_t *fr;
+  mitkIpInt2_t *rt, *ccop, ohx_size, nz_size;
+  mitkIpFloat4_t *fr;
 
   a*=(float)rt_pic->n[0]/orig_xsize;
   b*=(float)rt_pic->n[0]/orig_xsize;
@@ -285,15 +285,15 @@ void mitk::CylindricToCartesianFilter::buildConeCutOffShortCut(int orig_xsize, i
   ohx_size=orig_xsize/2;
   nz_size=orig_ysize*rt_pic->n[0]/orig_xsize;
 
-  rt=(ipInt2_t *)rt_pic->data; fr=(ipFloat4_t*)fr_pic->data; ccop=(ipInt2_t *)coneCutOff_pic->data;
+  rt=(mitkIpInt2_t *)rt_pic->data; fr=(mitkIpFloat4_t*)fr_pic->data; ccop=(mitkIpInt2_t *)coneCutOff_pic->data;
 
   for(i=0; i<size; ++i, ++rt, ++ccop)
   {
-    register ipInt2_t cco;
+    register mitkIpInt2_t cco;
     if(*rt<=ohx_size)
-      cco=(ipInt2_t)(a*(*rt+*fr)+b);
+      cco=(mitkIpInt2_t)(a*(*rt+*fr)+b);
     else
-      cco=(ipInt2_t)(a*(orig_xsize-(*rt+*fr))+b);
+      cco=(mitkIpInt2_t)(a*(orig_xsize-(*rt+*fr))+b);
     if(cco<0)
       cco=0;
     if(cco>=nz_size) 

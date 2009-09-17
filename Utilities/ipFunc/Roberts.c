@@ -69,7 +69,7 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
@@ -84,10 +84,10 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 
 #define ROBERTS( type, pic, msize, n, off, size )                         \
 {                                                                         \
-  ipUInt4_t       i;                /* loop index                      */ \
-  ipUInt4_t       end;              /*                                 */ \
-  ipUInt4_t       off_imag;         /* offset of pixels                */ \
-  ipUInt4_t       ind[_mitkIpPicNDIM];  /* loop index vector               */ \
+  mitkIpUInt4_t       i;                /* loop index                      */ \
+  mitkIpUInt4_t       end;              /*                                 */ \
+  mitkIpUInt4_t       off_imag;         /* offset of pixels                */ \
+  mitkIpUInt4_t       ind[_mitkIpPicNDIM];  /* loop index vector               */ \
   type            help, help2;      /* used to calculate new greyvalue */ \
                                                                           \
   end = msize / 2;                                                        \
@@ -112,7 +112,7 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
                     help = 0;                                             \
                     for ( i = 0; i < end; i++ )                           \
                       {                                                   \
-                        help2 = ( type ) fabs ( ( ipFloat8_t ) (          \
+                        help2 = ( type ) fabs ( ( mitkIpFloat8_t ) (          \
                          ((type *)pic->data)[off_imag+off[i]] -           \
                          ((type *)pic->data)[off_imag+off[msize-i]]));    \
                         help = ( help > help2 ) ? help : help2;           \
@@ -129,19 +129,19 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 /* --------------------------------------------------------------------- */
  
 mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
-  ipInt4_t        *off_vekt;         /* offsets for the image pixels that*/
+  mitkIpInt4_t        *off_vekt;         /* offsets for the image pixels that*/
                                      /* are needed for the operation     */
-  ipInt4_t        offset;            /* used to calculate off_vekt       */
-  ipUInt4_t       off_mask;          /* offset of mask elements          */
-  ipUInt4_t       mask_size;         /* number of elements in mask       */
-  ipUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
-  ipUInt4_t       size[_mitkIpPicNDIM];  /*                                  */
-  ipUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
-  ipUInt4_t       i;                 /* loop index                       */
+  mitkIpInt4_t        offset;            /* used to calculate off_vekt       */
+  mitkIpUInt4_t       off_mask;          /* offset of mask elements          */
+  mitkIpUInt4_t       mask_size;         /* number of elements in mask       */
+  mitkIpUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];  /*                                  */
+  mitkIpUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
+  mitkIpUInt4_t       i;                 /* loop index                       */
 
   /* check data                                                          */
 
@@ -170,8 +170,8 @@ mitkIpPicDescriptor *mitkIpFuncRoberts ( mitkIpPicDescriptor *pic_old,
 
   /* calculate offset vector                                             */
 
-  mask_size = ( ipUInt4_t ) pow ( 2., ( ipFloat8_t ) dim_mask );
-  off_vekt  = calloc ( mask_size, sizeof( ipInt4_t ) );
+  mask_size = ( mitkIpUInt4_t ) pow ( 2., ( mitkIpFloat8_t ) dim_mask );
+  off_vekt  = calloc ( mask_size, sizeof( mitkIpInt4_t ) );
   off_mask  = 0;
   if ( off_vekt == NULL ) 
     {

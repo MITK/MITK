@@ -46,9 +46,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipUInt4_t _ipGetANew( ipUInt4_t aNew[],  ipUInt4_t Index)
+mitkIpUInt4_t _ipGetANew( mitkIpUInt4_t aNew[],  mitkIpUInt4_t Index)
 {
-ipUInt4_t  NewIndex;
+mitkIpUInt4_t  NewIndex;
 
    /* return original Index */
    if (aNew[Index] == Index) return (Index);

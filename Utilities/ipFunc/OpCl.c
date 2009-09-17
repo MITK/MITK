@@ -103,7 +103,7 @@ mitkIpPicDescriptor *_mitkIpFuncOpCl  ( mitkIpPicDescriptor *pic_old,
 {
   mitkIpPicDescriptor *pic_new1;       /* pointer to transformed image         */
   mitkIpPicDescriptor *pic_new2;       /* pointer to transformed image         */
-  ipUInt4_t       i;               /* loop index                           */
+  mitkIpUInt4_t       i;               /* loop index                           */
 
   /* check image data                                                      */
 

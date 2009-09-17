@@ -83,7 +83,7 @@ static const char *_mitkIpPicTypeName[_mitkIpPicTypeMax] =
   "mitkIpPicTSV"
 };
 
-const char *mitkIpPicTypeName( ipUInt4_t type )
+const char *mitkIpPicTypeName( mitkIpUInt4_t type )
 {
   if( type > _mitkIpPicTypeMax )
     return( _mitkIpPicTypeName[0] );

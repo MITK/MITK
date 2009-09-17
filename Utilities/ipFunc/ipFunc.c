@@ -72,35 +72,35 @@ main (int argc, char **argv)
 	char            mask_name[PATH_MAX];  /* file name of transformed im. */
 	char            error_nr[PATH_MAX];   /* file name of transformed im. */
 	mitkIpPicType_t     type;
-	ipUInt4_t       range;                /* result of range function     */
-	ipUInt4_t       no_label;
-	ipUInt4_t       border;               /* handling of the borders      */
-	ipUInt4_t       rank;                 /*                              */
-	ipUInt4_t       keep;                 /*                              */
-	ipUInt4_t       radius;               /*                              */
-	ipUInt4_t       *begin;               /* start of window              */
-	ipUInt4_t       *length;              /* length of window             */
-	ipUInt4_t       len_mask;             /* length of mask               */
-	ipUInt4_t       dim_mask;             /* dimension of mask            */
-	ipInt4_t        axis;                 /* reflection axis              */
-	ipUInt4_t       i;
-	ipFloat8_t      min, max;             /* extreme greyvalues           */
-	ipFloat8_t      min_gv, max_gv;       /* extreme greyvalues           */
-	ipFloat8_t      gv_low, gv_up;        /*                              */
-	ipFloat8_t      threshold;         
-	ipFloat8_t      value;                /* value that is added to image */
-	ipFloat8_t      mean;                 /* mean greyvalue               */
-	ipFloat8_t      var;                  /* variance of greyvalues       */
-	ipFloat8_t      gv;                   /* new greyvalue                */
-	ipFloat8_t      s_der;                /* standard derivation          */
-	ipFloat8_t      *sc;                  /* standard derivation          */
+	mitkIpUInt4_t       range;                /* result of range function     */
+	mitkIpUInt4_t       no_label;
+	mitkIpUInt4_t       border;               /* handling of the borders      */
+	mitkIpUInt4_t       rank;                 /*                              */
+	mitkIpUInt4_t       keep;                 /*                              */
+	mitkIpUInt4_t       radius;               /*                              */
+	mitkIpUInt4_t       *begin;               /* start of window              */
+	mitkIpUInt4_t       *length;              /* length of window             */
+	mitkIpUInt4_t       len_mask;             /* length of mask               */
+	mitkIpUInt4_t       dim_mask;             /* dimension of mask            */
+	mitkIpInt4_t        axis;                 /* reflection axis              */
+	mitkIpUInt4_t       i;
+	mitkIpFloat8_t      min, max;             /* extreme greyvalues           */
+	mitkIpFloat8_t      min_gv, max_gv;       /* extreme greyvalues           */
+	mitkIpFloat8_t      gv_low, gv_up;        /*                              */
+	mitkIpFloat8_t      threshold;         
+	mitkIpFloat8_t      value;                /* value that is added to image */
+	mitkIpFloat8_t      mean;                 /* mean greyvalue               */
+	mitkIpFloat8_t      var;                  /* variance of greyvalues       */
+	mitkIpFloat8_t      gv;                   /* new greyvalue                */
+	mitkIpFloat8_t      s_der;                /* standard derivation          */
+	mitkIpFloat8_t      *sc;                  /* standard derivation          */
 	int             *perm;                /* permutation vector for transpose */
-	ipFloat8_t      *grav;                /* center of gravity            */
-	ipFloat8_t      *inertia, *ev;
-	ipUInt4_t       *hist;                /* greylevel histogram          */
-	ipUInt4_t       size_hist;            /* no. of elements in histogram */
-	ipUInt4_t       mask_size;            /* size of transformation mask  */
-	ipBool_t        picput_flag=ipTrue;   /* */
+	mitkIpFloat8_t      *grav;                /* center of gravity            */
+	mitkIpFloat8_t      *inertia, *ev;
+	mitkIpUInt4_t       *hist;                /* greylevel histogram          */
+	mitkIpUInt4_t       size_hist;            /* no. of elements in histogram */
+	mitkIpUInt4_t       mask_size;            /* size of transformation mask  */
+	mitkIpBool_t        picput_flag=mitkIpTrue;   /* */
 	int             *grad, *order;
 	
 	/* input of operation and image file name                             */
@@ -158,7 +158,7 @@ main (int argc, char **argv)
 	}
     else if ( strcasecmp ( operation, "RegGrow" ) == 0 )
 	{
-		ipUInt4_t blabel, rlabel, kind;
+		mitkIpUInt4_t blabel, rlabel, kind;
 
 		if ( ( (unsigned int) argc == 2 ) || 
 			( ( (unsigned int) argc == 3 ) && ( strcasecmp (argv[2], "-h") == 0 ) ) ||
@@ -167,8 +167,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc RegGrow infile outfile beg_seed1...beg_seedn end_seed1...end_seedn border_label region_label std_dev_factor(double!!) kind(0=show border,1=show region)\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
-		length = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -537,7 +537,7 @@ main (int argc, char **argv)
             printf("      bilinear              :   6 \n" ); 
 			exit(1);
 		}
-		sc  = malloc ( _mitkIpPicNDIM * sizeof ( ipFloat8_t ) );
+		sc  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpFloat8_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%lf", &sc[i] );
@@ -557,7 +557,7 @@ main (int argc, char **argv)
 			printf("  perm_1 ... perm_n must be a permutation vector, e.g., 4 2 1 3 \n" );
 			exit(1);
 		}
-		perm  = malloc ( _mitkIpPicNDIM * sizeof ( ipFloat8_t ) );
+		perm  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpFloat8_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &perm[i] );
@@ -801,7 +801,7 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		mitkIpFuncExtr ( pic_old, &min, &max );
-        picput_flag = ipFalse;
+        picput_flag = mitkIpFalse;
 		printf  ( " min: %12.2lf max: %12.2lf \n", min, max );
 	}
 #ifdef MESCHACH
@@ -813,7 +813,7 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		mitkIpFuncInertia ( pic_old, &inertia, &ev );
-        picput_flag = ipFalse;
+        picput_flag = mitkIpFalse;
         for ( i = 0; i < pic_old->dim; i++ ) 
 			printf  ( " eigenvalue[%d] = %lf \n", i, ev[i] );
         for ( i = 0; i < pic_old->dim * pic_old->dim; i++ ) 
@@ -828,7 +828,7 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		grav = mitkIpFuncGrav ( pic_old );
-        picput_flag = ipFalse;
+        picput_flag = mitkIpFalse;
         for ( i = 0; i < pic_old->dim; i++ ) 
 			printf  ( " center of gravity[%d] = %lf \n", i, grav[i] );
 	}
@@ -947,7 +947,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Box infile \n" );
 			exit ( 1 );
 		}
-        picput_flag = ipFalse; length=NULL;
+        picput_flag = mitkIpFalse; length=NULL;
         mitkIpFuncBox ( pic_old, &begin, &length );
         for ( i =0; i < pic_old->dim; i++ )
 			printf ( " [%d]\t links oben  %d \t\t rechts unten: %d \n", i, begin[i], length[i] );
@@ -961,7 +961,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc BorderX infile outfile edge1...edgen value\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &begin[i] );
@@ -986,7 +986,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Edge infile outfile edge1...edgen value\n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[4+i], "%d", &begin[i] );
@@ -1008,7 +1008,7 @@ main (int argc, char **argv)
 		strcpy ( mask_name, "" );
 		sscanf  ( argv[4], "%s", mask_name );
 		pic_hlp = mitkIpPicGet ( mask_name, NULL );
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 		{
 			sscanf  ( argv[5+i], "%d", &begin[i] );
@@ -1044,8 +1044,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc Window infile outfile beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
-		length = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1069,8 +1069,8 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		sscanf ( argv[4], "%d", &radius );
-		begin  = malloc ( radius * sizeof ( ipUInt4_t ) );
-		length = malloc ( radius * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < radius; i++ )
 			sscanf  ( argv[5+i], "%d", &begin[i] );
 		for ( i = 0; i < radius; i++ )
@@ -1089,8 +1089,8 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		sscanf ( argv[3], "%d", &radius );
-		begin  = malloc ( radius * sizeof ( ipUInt4_t ) );
-		length = malloc ( radius * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1110,8 +1110,8 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		sscanf ( argv[3], "%d", &radius );
-		begin  = malloc ( radius * sizeof ( ipUInt4_t ) );
-		length = malloc ( radius * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1131,8 +1131,8 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		sscanf ( argv[3], "%d", &radius );
-		begin  = malloc ( radius * sizeof ( ipUInt4_t ) );
-		length = malloc ( radius * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1152,8 +1152,8 @@ main (int argc, char **argv)
 			exit ( 1 );
 		}
 		sscanf ( argv[3], "%d", &radius );
-		begin  = malloc ( radius * sizeof ( ipUInt4_t ) );
-		length = malloc ( radius * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( radius * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1172,8 +1172,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc VarR infile  beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
-		length = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1192,8 +1192,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc SDevR infile  beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
-		length = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1213,8 +1213,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc MeanR infile  beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
-		length = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1234,8 +1234,8 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc ExtrR infile  beg1...begn length1...lengthn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
-		length = malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
+		length = malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[3+i], "%d", &begin[i] );
 		for ( i = 0; i < pic_old->dim; i++ )
@@ -1255,7 +1255,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc SDevR infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1272,7 +1272,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc VarC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1289,7 +1289,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc MeanC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			sscanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1306,7 +1306,7 @@ main (int argc, char **argv)
 			printf ( " usage: ipFunc ExtrC infile radius begin1...beginn \n" );
 			exit ( 1 );
 		}
-		begin  = malloc ( _mitkIpPicNDIM * sizeof ( ipUInt4_t ) );
+		begin  = malloc ( _mitkIpPicNDIM * sizeof ( mitkIpUInt4_t ) );
 		for ( i = 0; i < pic_old->dim; i++ )
 			scanf  ( argv[4+i], "%d", &begin[i] );
 		sscanf  ( argv[3], "%d", &radius );
@@ -1337,7 +1337,7 @@ main (int argc, char **argv)
 		printf ( " illegal operation \n" );
 	
 	
-    if ( mitkIpFuncErrno > ipOK )
+    if ( mitkIpFuncErrno > mitkIpOK )
 	{
         mitkIpFuncPError ( error_nr );
         exit ( 1 );
@@ -1346,7 +1346,7 @@ main (int argc, char **argv)
 	{
         strcpy ( pic_name_t, argv[3] );                   
 		mitkIpPicPut ( pic_name_t, pic_new );
-        picput_flag = ipTrue;
+        picput_flag = mitkIpTrue;
 	}
 	
 	

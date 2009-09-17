@@ -27,8 +27,8 @@ If relativeBounds is true, the region grows in [base-lowerBound, base+upperBound
 color of the 9 pixels around startOfs. If relativeBounds is false, the region grows in [lowerBound, upperBound].
 If maxIterations is > 0, the growing process is stopped after maxIterations.
 If segBuffer is 0, new memory for the segmented image is allocated and returned, else the segBuffer is used
-to store the result (has to be an 8-bit datatype, e.g. ipUInt1_t).
-histBuffer must be 0 or a pointer to a 16-bit ipUInt1_t image of the same size as src. In case of the latter, 
+to store the result (has to be an 8-bit datatype, e.g. mitkIpUInt1_t).
+histBuffer must be 0 or a pointer to a 16-bit mitkIpUInt1_t image of the same size as src. In case of the latter, 
 history data is written to that buffer: the seed pixel gets a 1, all direct neighbours 2 etc. The buffer is
 not cleared in this function and can thus hold history data of several growing processes in different areas.
 */
@@ -46,7 +46,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
     segBuffer = mitkIpPicCopyHeader( src, segBuffer );
     segBuffer->type = mitkIpPicUInt;
     segBuffer->bpe = 8; 
-    ipUInt4_t size = _mitkIpPicSize( segBuffer );
+    mitkIpUInt4_t size = _mitkIpPicSize( segBuffer );
     segBuffer->data = malloc( size );
   }
   else {
@@ -54,7 +54,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
     if (segBuffer->n[0] != src->n[0] || segBuffer->n[1] != src->n[1]) {
       segBuffer->n[0] = src->n[0];
       segBuffer->n[1] = src->n[1];
-      ipUInt4_t size = _mitkIpPicSize( segBuffer );
+      mitkIpUInt4_t size = _mitkIpPicSize( segBuffer );
       segBuffer->data = realloc( segBuffer->data, size );
       if (segBuffer->data == 0) return 0;
     }
@@ -64,7 +64,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
     if (histBuffer->n[0] != src->n[0] || histBuffer->n[1] != src->n[1]) {
       histBuffer->n[0] = src->n[0];
       histBuffer->n[1] = src->n[1];
-      ipUInt4_t size = _mitkIpPicSize( histBuffer );
+      mitkIpUInt4_t size = _mitkIpPicSize( histBuffer );
       histBuffer->data = realloc( histBuffer->data, size );
       if (histBuffer->data == 0) return 0;
       memset( histBuffer->data, 0, size );  // clear buffer
@@ -115,7 +115,7 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
 
   contourOfs = -1;
   int testOfs;
-  ipUInt1_t segVal;
+  mitkIpUInt1_t segVal;
   int iteration = 0;
   int currentWave = 1;
   int nextWave = 0;
@@ -124,60 +124,60 @@ tmGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, flo
     int nextOfs = ofsQueue.front();
     ofsQueue.pop();
     currentWave--;
-    *((ipUInt1_t*)segBuffer->data+nextOfs) = 1;
+    *((mitkIpUInt1_t*)segBuffer->data+nextOfs) = 1;
     if (histBuffer) {
-      *((ipUInt2_t*)histBuffer->data+nextOfs) = (ipUInt2_t)(iteration+1);  // seed point should get history = 1
+      *((mitkIpUInt2_t*)histBuffer->data+nextOfs) = (mitkIpUInt2_t)(iteration+1);  // seed point should get history = 1
     }
     if (nextOfs > contourOfs) contourOfs = nextOfs;
     // check right:
     testOfs = nextOfs+1;
     if (testOfs%line!=0) {
-      segVal = *((ipUInt1_t*)segBuffer->data+testOfs);
+      segVal = *((mitkIpUInt1_t*)segBuffer->data+testOfs);
       if ( segVal == 0 ) {
         value = *((PicType*)src->data+testOfs);
         if ( value >=lowest && value <=highest ) {
           ofsQueue.push( testOfs );
           nextWave++;
-          *((ipUInt1_t*)segBuffer->data+testOfs) = 2;
+          *((mitkIpUInt1_t*)segBuffer->data+testOfs) = 2;
         }
       }
     }
     // check top:
     testOfs = nextOfs-line;
     if (testOfs > 0) {
-      segVal = *((ipUInt1_t*)segBuffer->data+testOfs);
+      segVal = *((mitkIpUInt1_t*)segBuffer->data+testOfs);
       if ( segVal == 0 ) {
         value = *((PicType*)src->data+testOfs);
         if ( value >=lowest && value <=highest ) {
           ofsQueue.push( testOfs );
           nextWave++;
-          *((ipUInt1_t*)segBuffer->data+testOfs) = 2;
+          *((mitkIpUInt1_t*)segBuffer->data+testOfs) = 2;
         }
       }
     }
     // check left:
     testOfs = nextOfs-1;
     if (nextOfs%line!=0) {
-      segVal = *((ipUInt1_t*)segBuffer->data+testOfs);
+      segVal = *((mitkIpUInt1_t*)segBuffer->data+testOfs);
       if ( segVal == 0 ) {
         value = *((PicType*)src->data+testOfs);
         if ( value >=lowest && value <=highest ) {
           ofsQueue.push( testOfs );
           nextWave++;
-          *((ipUInt1_t*)segBuffer->data+testOfs) = 2;
+          *((mitkIpUInt1_t*)segBuffer->data+testOfs) = 2;
         }
       }
     }
     // check bottom:
     testOfs = nextOfs+line;
     if (testOfs < maxOfs) {
-      segVal = *((ipUInt1_t*)segBuffer->data+testOfs);
+      segVal = *((mitkIpUInt1_t*)segBuffer->data+testOfs);
       if ( segVal == 0 ) {
         value = *((PicType*)src->data+testOfs);
         if ( value >=lowest && value <=highest ) {
           ofsQueue.push( testOfs );
           nextWave++;
-          *((ipUInt1_t*)segBuffer->data+testOfs) = 2;
+          *((mitkIpUInt1_t*)segBuffer->data+testOfs) = 2;
         }
       }
     }

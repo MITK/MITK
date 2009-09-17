@@ -60,7 +60,7 @@
  *
  * $Log$
  * Revision 1.7  2004/07/02 11:40:49  max
- * Fixed bug resulting in ipUInt4_t range overflow using float volumes of a size larger than 512x512x512.
+ * Fixed bug resulting in mitkIpUInt4_t range overflow using float volumes of a size larger than 512x512x512.
  *
  * Revision 1.6  2002/11/13 17:53:00  ivo
  * new ipPic added.
@@ -81,15 +81,15 @@
  * Initial revision, NO error checking
  */
 
-ipUInt4_t _mitkIpPicSize(
+mitkIpUInt4_t _mitkIpPicSize(
 #if defined(__cplusplus) || defined(c_plusplus)
                          const
 #endif
                          mitkIpPicDescriptor *pic )
 {
-  ipUInt4_t i;
-  ipUInt4_t elements;
-  ipUInt4_t bytesPerElement;
+  mitkIpUInt4_t i;
+  mitkIpUInt4_t elements;
+  mitkIpUInt4_t bytesPerElement;
   if( pic->dim == 0 )
     return( 0 );
 

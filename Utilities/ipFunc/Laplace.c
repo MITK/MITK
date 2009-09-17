@@ -71,7 +71,7 @@
 #include "mitkIpFuncP.h"   
 
 mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,           
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
@@ -83,16 +83,16 @@ mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,
 
  
 mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,           
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border )
 {
 
   mitkIpPicDescriptor *pic_new;           /* convolved  image               */
   mitkIpPicDescriptor *pic_mask;          /* laplace mask                   */
-  ipUInt4_t       i;                  /* loop index                     */
-  ipInt2_t        laplace2[] =        /* 2D laplace-mask                */
+  mitkIpUInt4_t       i;                  /* loop index                     */
+  mitkIpInt2_t        laplace2[] =        /* 2D laplace-mask                */
                   {  0, -1,  0, -1,  4, -1,  0, -1,  0 };
-  ipInt2_t        laplace3[] =        /* 3D laplace-mask                */
+  mitkIpInt2_t        laplace3[] =        /* 3D laplace-mask                */
                   {  0,  0,  0,  0, -1,  0,  0,  0,  0,
                      0, -1,  0, -1,  6, -1,  0, -1,  0, 
                      0,  0,  0,  0, -1,  0,  0,  0,  0 };

@@ -71,7 +71,7 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      value, 
+                               mitkIpFloat8_t      value, 
                                mitkIpFuncFlagI_t   keep,
                                mitkIpPicDescriptor *pic_return );
 #ifndef DOXYGEN_IGNORE
@@ -90,8 +90,8 @@ mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
 
 #define MULTC2( type_n, pic_new, pic_1, type_1, value )                  \
 {                                                                        \
-  ipUInt4_t  i;                  /* loop index                         */\
-  ipUInt4_t  no_elem;                                                    \
+  mitkIpUInt4_t  i;                  /* loop index                         */\
+  mitkIpUInt4_t  no_elem;                                                    \
                                                                          \
                                                                          \
   /* multiply greyvalues of both images                                */\
@@ -100,16 +100,16 @@ mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
        (( type_n * ) pic_new->data ) [i] =  ( type_n )                   \
-             ( ( ipFloat8_t ) (( type_1 * ) pic_1->data ) [i] *          \
+             ( ( mitkIpFloat8_t ) (( type_1 * ) pic_1->data ) [i] *          \
              value );                                                    \
     }                                                                    \
 }
 
 #define MULTC3( type_n, pic_1, pic_new, value )                          \
 {                                                                        \
-  ipUInt4_t  i;                  /* loop index                         */\
-  ipFloat8_t help;               /* greyvalue of actual pixel          */\
-  ipUInt4_t  no_elem;                                                    \
+  mitkIpUInt4_t  i;                  /* loop index                         */\
+  mitkIpFloat8_t help;               /* greyvalue of actual pixel          */\
+  mitkIpUInt4_t  no_elem;                                                    \
                                                                          \
                                                                          \
   /* multiply greyvalues of both images                                */\
@@ -117,10 +117,10 @@ mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
   no_elem = _mitkIpPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
-       help  = ( ipFloat8_t ) (( type_n * ) pic_1->data ) [i] * value;   \
+       help  = ( mitkIpFloat8_t ) (( type_n * ) pic_1->data ) [i] * value;   \
        (( type_n * ) pic_new->data ) [i] =                               \
-          ( max_gv > ( ipFloat8_t ) help         ) ?                     \
-             (( min_gv < ( ipFloat8_t ) help         ) ?                 \
+          ( max_gv > ( mitkIpFloat8_t ) help         ) ?                     \
+             (( min_gv < ( mitkIpFloat8_t ) help         ) ?                 \
                  ( (type_n) ( help         ) ) : ( type_n ) min_gv ) :   \
              ( type_n ) max_gv;                                          \
     }                                                                    \
@@ -134,16 +134,16 @@ mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------  */
 
 mitkIpPicDescriptor *mitkIpFuncMultC ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      value, 
+                               mitkIpFloat8_t      value, 
                                mitkIpFuncFlagI_t   keep,
                                mitkIpPicDescriptor *pic_return )
 {
 
   mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
-  ipFloat8_t      max_gv;           /* max. possible greyvalue          */
-  ipFloat8_t      min_gv;           /* min. possible greyvalue          */
-  ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
-  ipFloat8_t      smin, smax;       /* product of extreme greyvalues    */
+  mitkIpFloat8_t      max_gv;           /* max. possible greyvalue          */
+  mitkIpFloat8_t      min_gv;           /* min. possible greyvalue          */
+  mitkIpFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
+  mitkIpFloat8_t      smin, smax;       /* product of extreme greyvalues    */
 
 
   /* check image data                                                   */

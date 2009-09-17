@@ -69,7 +69,7 @@ void mitkIpFuncCopyTags(mitkIpPicDescriptor *pic_new, mitkIpPicDescriptor *pic_o
 
 mitkIpPicDescriptor *mitkIpFuncConvert( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicType_t     type,
-                                ipUInt4_t       bpe );
+                                mitkIpUInt4_t       bpe );
 
 void            mitkIpFuncXchange   ( mitkIpPicDescriptor **pic1,
                                   mitkIpPicDescriptor **pic2 );

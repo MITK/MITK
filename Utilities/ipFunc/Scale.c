@@ -66,16 +66,16 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncScale ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      sc_fact[_mitkIpPicNDIM],
+                               mitkIpFloat8_t      sc_fact[_mitkIpPicNDIM],
                                mitkIpFuncFlagI_t   sc_kind ) ;
 #ifndef DOXYGEN_IGNORE
  
 mitkIpPicDescriptor *mitkIpFuncScale ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      sc_fact[_mitkIpPicNDIM],
+                               mitkIpFloat8_t      sc_fact[_mitkIpPicNDIM],
                                mitkIpFuncFlagI_t   sc_kind ) 
 {
 
-  ipUInt4_t        i;             /* loop index               */
+  mitkIpUInt4_t        i;             /* loop index               */
   mitkIpPicDescriptor  *pic_new;      /* pointer to scaled image  */
 
   char            is_color=0;
@@ -110,7 +110,7 @@ mitkIpPicDescriptor *mitkIpFuncScale ( mitkIpPicDescriptor *pic_old,
     pic_new->n[i] = 
        ( sc_fact[i] == 0 ) ?
          pic_old->n[i] :
-         ( ipUInt4_t ) ( sc_fact[i] * pic_old->n[i] );
+         ( mitkIpUInt4_t ) ( sc_fact[i] * pic_old->n[i] );
   
   /* call scaling routines                                    */
 

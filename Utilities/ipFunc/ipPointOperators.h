@@ -72,7 +72,7 @@ mitkIpPicDescriptor *mitkIpFuncEqual  ( mitkIpPicDescriptor *pic_old,
 
 
 mitkIpPicDescriptor *mitkIpFuncPot    ( mitkIpPicDescriptor *pic_1,
-                                ipFloat8_t      exponent,
+                                mitkIpFloat8_t      exponent,
                                 mitkIpFuncFlagI_t   keep,
                                 mitkIpPicDescriptor *pic_return );
 
@@ -81,7 +81,7 @@ mitkIpPicDescriptor *mitkIpFuncSqrt   ( mitkIpPicDescriptor *pic_1,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t       threshold,
+                                mitkIpFloat8_t       threshold,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old );
@@ -98,30 +98,30 @@ mitkIpPicDescriptor *mitkIpFuncNorm   ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic, 
-                                ipFloat8_t min_gv,
-                                ipFloat8_t max_gv,
+                                mitkIpFloat8_t min_gv,
+                                mitkIpFloat8_t max_gv,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncSelInv ( mitkIpPicDescriptor *pic_old,   
-                                ipFloat8_t      gv_low,  
-                                ipFloat8_t      gv_up, 
-                                ipFloat8_t      gv,
+                                mitkIpFloat8_t      gv_low,  
+                                mitkIpFloat8_t      gv_up, 
+                                mitkIpFloat8_t      gv,
                                 mitkIpPicDescriptor *pic_return );           
 
 mitkIpPicDescriptor *mitkIpFuncSelect ( mitkIpPicDescriptor *pic_old,   
-                                ipFloat8_t      gv_low,  
-                                ipFloat8_t      gv_up, 
-                                ipFloat8_t      gv,
+                                mitkIpFloat8_t      gv_low,  
+                                mitkIpFloat8_t      gv_up, 
+                                mitkIpFloat8_t      gv,
                                 mitkIpPicDescriptor *pic_return );           
 
 mitkIpPicDescriptor *mitkIpFuncSelMM  ( mitkIpPicDescriptor *pic_old,   
-                                ipFloat8_t      gv_low,  
-                                ipFloat8_t      gv_up,
+                                mitkIpFloat8_t      gv_low,  
+                                mitkIpFloat8_t      gv_up,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,   
-                                ipFloat8_t      level,   
-                                ipFloat8_t      window,
+                                mitkIpFloat8_t      level,   
+                                mitkIpFloat8_t      window,
                                 mitkIpPicDescriptor *pic_return );           
       
 void            mitkIpFuncXchange   ( mitkIpPicDescriptor **pic1,
@@ -129,7 +129,7 @@ void            mitkIpFuncXchange   ( mitkIpPicDescriptor **pic1,
 
 mitkIpPicDescriptor *mitkIpFuncConvert( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicType_t     type,
-                                ipUInt4_t       bpe );
+                                mitkIpUInt4_t       bpe );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

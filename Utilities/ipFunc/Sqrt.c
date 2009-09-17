@@ -83,13 +83,13 @@ mitkIpPicDescriptor *mitkIpFuncSqrt ( mitkIpPicDescriptor *pic_1,
 
 #define SQRT2( type_n, pic_new, pic_1, type_1 )                          \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
-  ipFloat8_t help;                                                       \
+  mitkIpUInt4_t  i, no_elem;                                                 \
+  mitkIpFloat8_t help;                                                       \
                                                                          \
   no_elem = _mitkIpPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
-       help  = ( ipFloat8_t ) (( type_1 * ) pic_1->data ) [i];           \
+       help  = ( mitkIpFloat8_t ) (( type_1 * ) pic_1->data ) [i];           \
        (( type_n * ) pic_new->data ) [i] =                               \
           ( help < 0. ) ? 0 : ( type_n ) sqrt ( help );                  \
     }                                                                    \
@@ -108,8 +108,8 @@ mitkIpPicDescriptor *mitkIpFuncSqrt ( mitkIpPicDescriptor *pic_1,
 {
 
   mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
-  ipUInt4_t       i;                /* loop index                       */
-  ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
+  mitkIpUInt4_t       i;                /* loop index                       */
+  mitkIpFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
 
 
   /* check image data                                                   */

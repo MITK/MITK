@@ -65,7 +65,7 @@
  *
  *  @b Examples:
  *	@code 
- *  mitkIpFuncSetTag(pic, "OUTSIDE_VALUE", mitkIpPicInt, sizeof(ipInt4_t), 1, &outside_value);
+ *  mitkIpFuncSetTag(pic, "OUTSIDE_VALUE", mitkIpPicInt, sizeof(mitkIpInt4_t), 1, &outside_value);
  *
  *  char startpoint[11];
  *  memset(startpoint, 0, 11);

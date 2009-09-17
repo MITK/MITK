@@ -45,38 +45,38 @@
 *****************************************************************************/
 
 /** @file 
-  * maps @c ipError_t type values to printable strings
+  * maps @c mitkIpError_t type values to printable strings
 */
 
 #ifndef lint
-  static char *what = { "@(#)ipError\t\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
+  static char *what = { "@(#)mitkIpError\t\t\tDKFZ (Dept. MBI)\t"__DATE__"\t$Revision$" };
 #endif
 
 #include <stdio.h>
 
 #include "mitkIpTypes.h"
 
-/** maps ipError_t type values to printable strings
+/** maps mitkIpError_t type values to printable strings
  *  @param error	 the error number
  *  @return the printable string
  *
  *  AUTHOR & DATE
  */
 
-char *mitkIpErrorStr( ipError_t error )
+char *mitkIpErrorStr( mitkIpError_t error )
 {
   char *str;
 
   switch( error )
     {
-      case ipError :
+      case mitkIpError :
         str = "generic error";
         break;
-      case ipOK :
+      case mitkIpOK :
         str = "No Error";
         break;
       default:
-        str = "ipError: Unknown Error";
+        str = "mitkIpError: Unknown Error";
         fprintf( stderr, "mitkIpErrorStr: sorry, unknown error (#%i)\n", error );
         break;
     }

@@ -103,9 +103,9 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
           p=strchr(s,':')+1;
           int bpe=atoi(p);
           if(bpe==8)
-            type=typeid(ipUInt1_t);
+            type=typeid(mitkIpUInt1_t);
           else
-            type=typeid(ipUInt2_t);
+            type=typeid(mitkIpUInt2_t);
         }
         else
         if(strstr(s,"Recon resolution"))

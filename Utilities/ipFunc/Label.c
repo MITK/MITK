@@ -74,7 +74,7 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
-                               ipUInt4_t       *no_lab );
+                               mitkIpUInt4_t       *no_lab );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -88,17 +88,17 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 
 #define LABEL1( type, pic_old, pic_new, no_label, type_new )            \
 {                                                                       \
-  ipUInt4_t       i, j;        /* loop index                         */ \
-  ipUInt4_t       offset;      /* offset of actual pixel             */ \
-  ipBool_t        in_lab;      /* currently in label flag            */ \
-  ipUInt4_t       end;                                                  \
+  mitkIpUInt4_t       i, j;        /* loop index                         */ \
+  mitkIpUInt4_t       offset;      /* offset of actual pixel             */ \
+  mitkIpBool_t        in_lab;      /* currently in label flag            */ \
+  mitkIpUInt4_t       end;                                                  \
                                                                         \
   offset   = 0;                                                         \
   no_label = 0;                                                         \
                                                                         \
   end    = _mitkIpPicElements ( pic_old ) / pic_old->n[0];                  \
   for ( j = 0; j < end; j++ )                                           \
-    for ( i = 0, in_lab = ipFalse; i < pic_old->n[0]; i++ )             \
+    for ( i = 0, in_lab = mitkIpFalse; i < pic_old->n[0]; i++ )             \
       {                                                                 \
        /*if ( (( type * )pic_old->data )[offset]  == max )  */          \
          if ( (( type * )pic_old->data )[offset]  )                     \
@@ -108,25 +108,25 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
                                               (type_new) no_label;      \
               else                                                      \
                 {                                                       \
-                   in_lab = ipTrue;                                     \
+                   in_lab = mitkIpTrue;                                     \
                    no_label++;                                          \
                    (( type_new * )pic_new->data )[offset] =             \
                                                  (type_new) no_label;   \
                 }                                                       \
             }                                                           \
-         else in_lab = ipFalse;                                         \
+         else in_lab = mitkIpFalse;                                         \
          offset++;                                                      \
       }                                                                 \
 }
 
 #define LABEL2( type, pic_new, a, a_new, a_sort, size )                 \
 {                                                                       \
-  ipUInt4_t       aa;          /* actual anchestor                   */ \
-  ipUInt4_t       al;          /* actual label                       */ \
-  ipUInt4_t       i, j, k, l;  /* loop index                         */ \
-  ipUInt4_t       end;                                                  \
-  ipInt4_t        off;         /* offset of actual pixel             */ \
-  ipInt4_t        dist;        /* distnace between actual and        */ \
+  mitkIpUInt4_t       aa;          /* actual anchestor                   */ \
+  mitkIpUInt4_t       al;          /* actual label                       */ \
+  mitkIpUInt4_t       i, j, k, l;  /* loop index                         */ \
+  mitkIpUInt4_t       end;                                                  \
+  mitkIpInt4_t        off;         /* offset of actual pixel             */ \
+  mitkIpInt4_t        dist;        /* distnace between actual and        */ \
                                /* neighbour pixel                    */ \
                                                                         \
   for ( l = 1; l < pic_new->dim; l++ )                                  \
@@ -168,13 +168,13 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 
 #define LABEL3( type, pic_new, a, a_sort )                              \
 {                                                                       \
-  ipUInt4_t       i;           /* loop index                         */ \
-  ipUInt4_t       no_elem;                                              \
+  mitkIpUInt4_t       i;           /* loop index                         */ \
+  mitkIpUInt4_t       no_elem;                                              \
                                                                         \
   no_elem = _mitkIpPicElements ( pic_new );                                 \
   for ( i = 0; i < no_elem; i++ )                                       \
     (( type * )pic_new->data )[i] =                                     \
-       ( type ) a_sort[a[( ipUInt4_t ) (( type * )pic_new->data )[i]]]; \
+       ( type ) a_sort[a[( mitkIpUInt4_t ) (( type * )pic_new->data )[i]]]; \
 }
 
 
@@ -185,17 +185,17 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 /* ------------------------------------------------------------------- */
 
 mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
-                               ipUInt4_t       *no_lab )
+                               mitkIpUInt4_t       *no_lab )
 {
   mitkIpPicDescriptor *pic_new;      /* pointer to new image structure     */
-  ipUInt4_t       i;             /* loop index                         */
-  ipUInt4_t       *a;            /* pointer to list with all anchestors*/
-  ipUInt4_t       *a_new;        /* look up table for new labels       */
-  ipUInt4_t       *a_sort;       /* pointer to list of sorted anchest. */
-  ipUInt4_t       no_label;      /* number of labels                   */
-  ipUInt4_t       new_label;     /*                                    */
-  ipUInt4_t       size[_mitkIpPicNDIM];
-  ipFloat8_t      min, max;      /* extreme greyvalues in image        */
+  mitkIpUInt4_t       i;             /* loop index                         */
+  mitkIpUInt4_t       *a;            /* pointer to list with all anchestors*/
+  mitkIpUInt4_t       *a_new;        /* look up table for new labels       */
+  mitkIpUInt4_t       *a_sort;       /* pointer to list of sorted anchest. */
+  mitkIpUInt4_t       no_label;      /* number of labels                   */
+  mitkIpUInt4_t       new_label;     /*                                    */
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];
+  mitkIpFloat8_t      min, max;      /* extreme greyvalues in image        */
   
   /* check image data                                                  */
 
@@ -215,7 +215,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 
   i     = 0;
   no_gv = 0;
-  while ( i <= ( ipUInt4_t ) ( fabs ( min ) + max ) && no_gv < 3 )
+  while ( i <= ( mitkIpUInt4_t ) ( fabs ( min ) + max ) && no_gv < 3 )
     {
        if ( hist [i] != 0 ) no_gv++;
        i++;
@@ -243,7 +243,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 
   /* preparation of image                                              */
 
-  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipInt2_t );
+  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, mitkIpInt2_t );
 
   if(no_label>SHRT_MAX)
   {
@@ -257,19 +257,19 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
 			_mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
 			return ( mitkIpFuncERROR );
 		}
-	  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, ipUInt4_t );
+	  mitkIpPicFORALL_3 ( LABEL1, pic_old, pic_new, no_label, mitkIpUInt4_t );
   }
 
   /* allocation and initialisation of vectors                          */
  
-  a      = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
+  a      = malloc ( ( no_label + 1 ) * sizeof ( mitkIpUInt4_t ) );
   if ( a == NULL ) 
     {
         mitkIpPicFree ( pic_new );
         _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
-  a_new  = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
+  a_new  = malloc ( ( no_label + 1 ) * sizeof ( mitkIpUInt4_t ) );
   if ( a_new == NULL )
     {
         free ( a );
@@ -277,7 +277,7 @@ mitkIpPicDescriptor *mitkIpFuncLabel ( mitkIpPicDescriptor *pic_old,
         _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
         return ( mitkIpFuncERROR );
     }
-  a_sort = malloc ( ( no_label + 1 ) * sizeof ( ipUInt4_t ) );
+  a_sort = malloc ( ( no_label + 1 ) * sizeof ( mitkIpUInt4_t ) );
   if ( a_sort == NULL )
     {
         free ( a );

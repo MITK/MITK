@@ -61,7 +61,7 @@ int main( int argc, char *argv[] )
   mitkIpPicAnnotation_t	a;
   char buff[] = "test test";
 
-  printf( "%s\n", _mitkIpEndian()==_ipEndianBig?"BigEndian":"LittleEndian" );
+  printf( "%s\n", _mitkIpEndian()==_mitkIpEndianBig?"BigEndian":"LittleEndian" );
 
   if( argc != 3 )
     exit(-1);
@@ -69,7 +69,7 @@ int main( int argc, char *argv[] )
   pic = mitkIpPicGet( argv[1],
                   NULL );
 
-  mitkIpPicSetWriteCompression( ipTrue );
+  mitkIpPicSetWriteCompression( mitkIpTrue );
   mitkIpPicPut( argv[2],
             pic );
 

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipSegmentation.h"
 
 int
-ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt1_t newValue )
+ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, mitkIpInt1_t newValue )
 {
   mitkIpPicTSV_t* tag;
 
@@ -39,12 +39,12 @@ ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt
   int line = seg->n[0];
   int maxOfs = (int)(line * seg->n[1]);
   int testOfs;
-  ipInt1_t replaceMe = *((ipInt1_t*)seg->data + startOfs);
+  mitkIpInt1_t replaceMe = *((mitkIpInt1_t*)seg->data + startOfs);
   if (replaceMe == newValue) return 0;
   
-  ipInt1_t segVal;
+  mitkIpInt1_t segVal;
   ofsQueue.push( startOfs );
-  *((ipInt1_t*)seg->data+startOfs) = newValue;
+  *((mitkIpInt1_t*)seg->data+startOfs) = newValue;
   int regionSize = 0;
 
   while (!ofsQueue.empty()) {
@@ -54,37 +54,37 @@ ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt
     // check right:
     testOfs = nextOfs+1;
     if (testOfs%line!=0) {
-      segVal = *((ipInt1_t*)seg->data+testOfs);
+      segVal = *((mitkIpInt1_t*)seg->data+testOfs);
       if ( segVal == replaceMe ) {
         ofsQueue.push( testOfs );
-        *((ipInt1_t*)seg->data+testOfs) = newValue;
+        *((mitkIpInt1_t*)seg->data+testOfs) = newValue;
       }
     }
     // check top:
     testOfs = nextOfs-line;
     if (testOfs >= 0) {
-      segVal = *((ipInt1_t*)seg->data+testOfs);
+      segVal = *((mitkIpInt1_t*)seg->data+testOfs);
       if ( segVal == replaceMe ) {
         ofsQueue.push( testOfs );
-        *((ipInt1_t*)seg->data+testOfs) = newValue;
+        *((mitkIpInt1_t*)seg->data+testOfs) = newValue;
       }
     }
     // check left:
     testOfs = nextOfs-1;
     if (nextOfs%line!=0) {
-      segVal = *((ipInt1_t*)seg->data+testOfs);
+      segVal = *((mitkIpInt1_t*)seg->data+testOfs);
       if ( segVal == replaceMe ) {
         ofsQueue.push( testOfs );
-        *((ipInt1_t*)seg->data+testOfs) = newValue;
+        *((mitkIpInt1_t*)seg->data+testOfs) = newValue;
       }
     }
     // check bottom:
     testOfs = nextOfs+line;
     if (testOfs < maxOfs) {
-      segVal = *((ipInt1_t*)seg->data+testOfs);
+      segVal = *((mitkIpInt1_t*)seg->data+testOfs);
       if ( segVal == replaceMe ) {
         ofsQueue.push( testOfs );
-        *((ipInt1_t*)seg->data+testOfs) = newValue;
+        *((mitkIpInt1_t*)seg->data+testOfs) = newValue;
       }
     }
   }

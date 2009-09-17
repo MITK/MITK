@@ -64,7 +64,7 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic );
+mitkIpFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
  
@@ -78,7 +78,7 @@ ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic );
 
 #define MEAN( type, pic, mean )                                \
   {                                                            \
-    ipUInt4_t   i, no_elem;                                    \
+    mitkIpUInt4_t   i, no_elem;                                    \
                                                                \
     mean = 0.;                                                 \
     no_elem = _mitkIpPicElements ( pic );                          \
@@ -95,10 +95,10 @@ ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic );
 */
 /* ========================================================== */
 
-ipFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic )
+mitkIpFloat8_t mitkIpFuncMean ( mitkIpPicDescriptor *pic )
 {
 
-  ipFloat8_t mean = 0.0;            
+  mitkIpFloat8_t mean = 0.0;            
 
   /* check data                                               */ 
 

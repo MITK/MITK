@@ -68,8 +68,8 @@
 
 #include "mitkIpFuncP.h"
 mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       len_mask,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       len_mask,
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
@@ -86,21 +86,21 @@ mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
 /* --------------------------------------------------------------------- */
  
 mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       len_mask,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       len_mask,
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
   mitkIpPicDescriptor *pic_mask;         /* pointer to mask                  */
-  ipUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
-  ipUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
-  ipUInt4_t       i, k;              /* loop index                       */
-  ipUInt4_t       no_elem;           /* number of mask elements          */
-  ipUInt4_t       offset;            /* offset of pixels                 */
-  ipUInt4_t       element;           /* used to calculate mask elements  */
-  ipUInt4_t       sum;               /* sum of all mask elements         */
-  ipUInt4_t       nn, nfac, kfac;    /* used to calculate bin. coeff     */
-  ipUInt4_t       *bin;              /* binomial coeffizients            */
+  mitkIpUInt4_t       n[_mitkIpPicNDIM];     /* size of each dimension           */
+  mitkIpUInt4_t       ind[_mitkIpPicNDIM];   /* loop index vector                */
+  mitkIpUInt4_t       i, k;              /* loop index                       */
+  mitkIpUInt4_t       no_elem;           /* number of mask elements          */
+  mitkIpUInt4_t       offset;            /* offset of pixels                 */
+  mitkIpUInt4_t       element;           /* used to calculate mask elements  */
+  mitkIpUInt4_t       sum;               /* sum of all mask elements         */
+  mitkIpUInt4_t       nn, nfac, kfac;    /* used to calculate bin. coeff     */
+  mitkIpUInt4_t       *bin;              /* binomial coeffizients            */
 
   /* check data                                                          */
 
@@ -118,7 +118,7 @@ mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
 
   /* calculate binomial coefficient                                      */
 
-  bin       = malloc ( len_mask * sizeof ( ipUInt4_t ) );
+  bin       = malloc ( len_mask * sizeof ( mitkIpUInt4_t ) );
   if ( bin == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
@@ -189,16 +189,16 @@ mitkIpPicDescriptor *mitkIpFuncGausF   ( mitkIpPicDescriptor *pic_old,
                     for ( i = 0; i < pic_mask->dim; i++ )
                       element = element * bin[ind[i]];
 
-                    (( ipFloat8_t * )pic_mask->data)[offset] = 
-                       ( ipFloat8_t ) element;
+                    (( mitkIpFloat8_t * )pic_mask->data)[offset] = 
+                       ( mitkIpFloat8_t ) element;
                     sum = sum + element;
                     offset++;
                   }
 
   no_elem = _mitkIpPicElements ( pic_mask );
   for ( i = 0; i < no_elem; i++ )                          
-    (( ipFloat8_t * ) pic_mask->data ) [i] =  
-       (( ipFloat8_t * ) pic_mask->data ) [i] / ( ipFloat8_t ) sum;
+    (( mitkIpFloat8_t * ) pic_mask->data ) [i] =  
+       (( mitkIpFloat8_t * ) pic_mask->data ) [i] / ( mitkIpFloat8_t ) sum;
 
   /* convolve image with Gausian mask                                  */
 

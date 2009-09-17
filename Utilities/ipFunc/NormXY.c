@@ -66,8 +66,8 @@
 #include "mitkIpFuncP.h"   
  
 mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic_old, 
-                                ipFloat8_t      low,   
-                                ipFloat8_t      up,
+                                mitkIpFloat8_t      low,   
+                                mitkIpFloat8_t      up,
                                 mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
@@ -76,11 +76,11 @@ mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic_old,
 
 #define NORM( type, pic, min, max, min_gv, max_gv )                      \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
-  ipFloat8_t a, b;                                                       \
+  mitkIpUInt4_t  i, no_elem;                                                 \
+  mitkIpFloat8_t a, b;                                                       \
                                                                          \
-  a = ( ipFloat8_t ) ( max_gv - min_gv ) / ( max - min );                \
-  b = ( ipFloat8_t ) ( max_gv ) - a * max;                               \
+  a = ( mitkIpFloat8_t ) ( max_gv - min_gv ) / ( max - min );                \
+  b = ( mitkIpFloat8_t ) ( max_gv ) - a * max;                               \
                                                                          \
   no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -100,15 +100,15 @@ mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------  */
 
 mitkIpPicDescriptor *mitkIpFuncNormXY ( mitkIpPicDescriptor *pic_old, 
-                                ipFloat8_t      low,   
-                                ipFloat8_t      up,
+                                mitkIpFloat8_t      low,   
+                                mitkIpFloat8_t      up,
                                 mitkIpPicDescriptor *pic_return )
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
-  ipFloat8_t      max, min;  /* extreme greyvalues in the image         */
-  ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
-  ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
+  mitkIpFloat8_t      max, min;  /* extreme greyvalues in the image         */
+  mitkIpFloat8_t      max_gv;    /* max. possible greyvalue                 */
+  mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
 
 
   /* check whether data are ok                                          */

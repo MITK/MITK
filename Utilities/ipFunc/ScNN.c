@@ -91,38 +91,38 @@ mitkIpPicDescriptor *_mitkIpFuncScNN( mitkIpPicDescriptor *pic_old,
    off_new = 0;                                                          \
    for ( ind[7] = 0; ind[7] < n[7]; ind[7]++ )                           \
      {                                                                   \
-       offset[7] = ( ipUInt4_t ) ( ( ipFloat8_t ) ind[7] *               \
+       offset[7] = ( mitkIpUInt4_t ) ( ( mitkIpFloat8_t ) ind[7] *               \
                      weights[7] + 0.5 ) * size[7];                       \
        for ( ind[6] = 0; ind[6] < n[6]; ind[6]++ )                       \
          {                                                               \
-           offset[6] = ( ipUInt4_t ) ( ( ipFloat8_t ) ind[6] *           \
+           offset[6] = ( mitkIpUInt4_t ) ( ( mitkIpFloat8_t ) ind[6] *           \
                          weights[6] + 0.5 ) * size[6];                   \
            for ( ind[5] = 0; ind[5] < n[5]; ind[5]++ )                   \
              {                                                           \
-               offset[5] = ( ipUInt4_t )  ( ( ipFloat8_t ) ind[5] *      \
+               offset[5] = ( mitkIpUInt4_t )  ( ( mitkIpFloat8_t ) ind[5] *      \
                              weights[5] + 0.5 ) * size[5];               \
                for ( ind[4] = 0; ind[4] < n[4]; ind[4]++ )               \
                  {                                                       \
-                   offset[4] = ( ipUInt4_t ) ( ( ipFloat8_t ) ind[4] *   \
+                   offset[4] = ( mitkIpUInt4_t ) ( ( mitkIpFloat8_t ) ind[4] *   \
                                  weights[4] + 0.5 ) * size[4];           \
                    for ( ind[3] = 0; ind[3] < n[3]; ind[3]++ )           \
                      {                                                   \
-                       offset[3] = ( ipUInt4_t ) ( ( ipFloat8_t ) ind[3]*\
+                       offset[3] = ( mitkIpUInt4_t ) ( ( mitkIpFloat8_t ) ind[3]*\
                                      weights[3] + 0.5 ) * size[3];       \
                        for ( ind[2] = 0; ind[2] < n[2]; ind[2]++ )       \
                          {                                               \
-                            offset[2] = ( ipUInt4_t )                    \
-                                        ( ( ipFloat8_t ) ind[2] *        \
+                            offset[2] = ( mitkIpUInt4_t )                    \
+                                        ( ( mitkIpFloat8_t ) ind[2] *        \
                                         weights[2] + 0.5 ) * size[2];    \
                            for ( ind[1] = 0; ind[1] < n[1]; ind[1]++ )   \
                              {                                           \
-                               offset[1] = ( ipUInt4_t )                 \
-                                           ( ( ipFloat8_t ) ind[1] *     \
+                               offset[1] = ( mitkIpUInt4_t )                 \
+                                           ( ( mitkIpFloat8_t ) ind[1] *     \
                                            weights[1]+0.5 ) * size[1];   \
                                for ( ind[0] = 0; ind[0] < n[0]; ind[0]++)\
                                  {                                       \
-                                   offset[0] = ( ipUInt4_t )             \
-                                               ( ( ipFloat8_t ) ind[0] * \
+                                   offset[0] = ( mitkIpUInt4_t )             \
+                                               ( ( mitkIpFloat8_t ) ind[0] * \
                                                weights[0] + 0.5)*size[0];\
                                    off_orig = 0;                         \
                                    for ( i = 0; i < pic_old->dim; i++ )  \
@@ -157,10 +157,10 @@ mitkIpPicDescriptor *_mitkIpFuncScNN( mitkIpPicDescriptor *pic_old,
                              mitkIpPicDescriptor *pic_new ) 
 {
 
-  ipUInt4_t       i;               /* loopindex                      */
-  ipUInt4_t       n[_mitkIpPicNDIM];      /* no. of pixels in each dimension*/
-  ipFloat8_t      weights[_mitkIpPicNDIM];
-  ipUInt4_t       size[_mitkIpPicNDIM];                                    
+  mitkIpUInt4_t       i;               /* loopindex                      */
+  mitkIpUInt4_t       n[_mitkIpPicNDIM];      /* no. of pixels in each dimension*/
+  mitkIpFloat8_t      weights[_mitkIpPicNDIM];
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];                                    
   char            is_color=0;
 
 
@@ -193,8 +193,8 @@ mitkIpPicDescriptor *_mitkIpFuncScNN( mitkIpPicDescriptor *pic_old,
     size[i] = size[i-1] * pic_old->n[i-1];
 
   for ( i = 0; i < pic_old->dim; i++ )
-    weights[i] = ( ipFloat8_t ) ( pic_old->n[i] - 1 ) / 
-                 ( ipFloat8_t ) ( pic_new->n[i] - 1 );
+    weights[i] = ( mitkIpFloat8_t ) ( pic_old->n[i] - 1 ) / 
+                 ( mitkIpFloat8_t ) ( pic_new->n[i] - 1 );
  
   for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     weights[i] = 0.;

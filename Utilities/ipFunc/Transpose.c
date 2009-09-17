@@ -112,12 +112,12 @@ mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
 
 {
   mitkIpPicDescriptor *pic_return;
-  ipUInt4_t size  [_mitkIpPicNDIM];
-  ipUInt4_t r_size[_mitkIpPicNDIM];
-  ipUInt4_t index [_mitkIpPicNDIM];
-  ipUInt4_t **r_index;
-  ipUInt4_t i;
-  ipUInt4_t r_offset;
+  mitkIpUInt4_t size  [_mitkIpPicNDIM];
+  mitkIpUInt4_t r_size[_mitkIpPicNDIM];
+  mitkIpUInt4_t index [_mitkIpPicNDIM];
+  mitkIpUInt4_t **r_index;
+  mitkIpUInt4_t i;
+  mitkIpUInt4_t r_offset;
   int default_perm = 0;
 
 
@@ -218,7 +218,7 @@ mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
   /*
   ** index vectors
   */
-  r_index = (ipUInt4_t **) malloc( _mitkIpPicNDIM * sizeof( ipUInt4_t * ) );
+  r_index = (mitkIpUInt4_t **) malloc( _mitkIpPicNDIM * sizeof( mitkIpUInt4_t * ) );
   for( i=0; i<_mitkIpPicNDIM; i++)
     r_index[i] = &( index[i] );
   for( i=0; i<pic->dim; i++ ) 

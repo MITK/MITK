@@ -69,8 +69,8 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       len_mask,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       len_mask,
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
@@ -88,15 +88,15 @@ mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
 /* --------------------------------------------------------------------- */
  
 mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       len_mask,
-                                 ipUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       len_mask,
+                                 mitkIpUInt4_t       dim_mask,  
                                  mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
   mitkIpPicDescriptor *pic_mask;         /* pointer to mask                  */
-  ipUInt4_t       i;                 /* loop index                       */
-  ipUInt4_t       no_elem;
-  ipFloat8_t      help;
+  mitkIpUInt4_t       i;                 /* loop index                       */
+  mitkIpUInt4_t       no_elem;
+  mitkIpFloat8_t      help;
 
   /* check data                                                          */
 
@@ -137,9 +137,9 @@ mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
     }
 
   no_elem        = _mitkIpPicElements ( pic_mask );
-  help           = 1. / ( ipFloat8_t ) no_elem;                       
+  help           = 1. / ( mitkIpFloat8_t ) no_elem;                       
   for ( i = 0; i < no_elem; i++ )                       
-    (( ipFloat8_t * ) pic_mask->data ) [i] = help;
+    (( mitkIpFloat8_t * ) pic_mask->data ) [i] = help;
 
   /* convolve image with filtering mask                                 */
 

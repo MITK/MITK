@@ -83,9 +83,9 @@ mitkIpPicDescriptor *mitkIpFuncAddSl( mitkIpPicDescriptor *pic_old,
 
 #define ADDSL2( type_new, pic_new, pic_old, type_old )                   \
 {                                                                        \
-   ipUInt4_t    i, j;          /* loop counter                        */ \
-   ipUInt4_t    off_old;       /* offset in 3D image                  */ \
-   ipUInt4_t    slice_size;    /* size of one image slice             */ \
+   mitkIpUInt4_t    i, j;          /* loop counter                        */ \
+   mitkIpUInt4_t    off_old;       /* offset in 3D image                  */ \
+   mitkIpUInt4_t    slice_size;    /* size of one image slice             */ \
                                                                          \
    slice_size = _mitkIpPicElements ( pic_new );                              \
    for ( i = 0; i < pic_old->n[2]; i++ )                                 \
@@ -100,9 +100,9 @@ mitkIpPicDescriptor *mitkIpFuncAddSl( mitkIpPicDescriptor *pic_old,
 
 #define ADDSL3( type, pic_old, pic_new )                                 \
 {                                                                        \
-   ipUInt4_t    i, j;          /* loop counter                        */ \
-   ipUInt4_t    off_old;       /* offset in 3D image                  */ \
-   ipUInt4_t    slice_size;    /* size of one image slice             */ \
+   mitkIpUInt4_t    i, j;          /* loop counter                        */ \
+   mitkIpUInt4_t    off_old;       /* offset in 3D image                  */ \
+   mitkIpUInt4_t    slice_size;    /* size of one image slice             */ \
    type         help, help2;                                             \
                                                                          \
    slice_size = _mitkIpPicElements ( pic_new );                              \
@@ -114,8 +114,8 @@ mitkIpPicDescriptor *mitkIpFuncAddSl( mitkIpPicDescriptor *pic_old,
              help = (( type *)pic_old->data)[j+off_old];                 \
              help2 = (( type *)pic_new->data)[j];                        \
              (( type *)pic_new->data)[j] =                               \
-                 ( max_gv > ( ipFloat8_t ) help + help2 ) ?              \
-                    (( min_gv < ( ipFloat8_t ) help + help2 ) ?          \
+                 ( max_gv > ( mitkIpFloat8_t ) help + help2 ) ?              \
+                    (( min_gv < ( mitkIpFloat8_t ) help + help2 ) ?          \
                         ( (type)help + (type)help2 ) : (type) min_gv ) : \
                     (type) max_gv;                                       \
           }                                                              \
@@ -133,10 +133,10 @@ mitkIpPicDescriptor *mitkIpFuncAddSl( mitkIpPicDescriptor *pic_old,
 {
 
   mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
-  ipFloat8_t      max_gv;           /* max. possible greyvalue          */
-  ipFloat8_t      min_gv;           /* min. possible greyvalue          */
-  ipFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
-  ipFloat8_t      smin, smax;       /* product of extreme greyvalues    */
+  mitkIpFloat8_t      max_gv;           /* max. possible greyvalue          */
+  mitkIpFloat8_t      min_gv;           /* min. possible greyvalue          */
+  mitkIpFloat8_t      min1, max1;       /* extreme greyvalues of 1. image   */ 
+  mitkIpFloat8_t      smin, smax;       /* product of extreme greyvalues    */
 
 
   /* check image data                                                   */

@@ -82,7 +82,7 @@
 
 #define AND( type, pic_1, pic_2, pic_new )                               \
 {                                                                        \
-  ipUInt4_t  i;                                                          \
+  mitkIpUInt4_t  i;                                                          \
                                                                          \
                                                                          \
   for ( i = 0; i < _mitkIpPicElements ( pic_1 ); i++ )                       \
@@ -106,7 +106,7 @@
                               mitkIpPicDescriptor *pic_return )
   {
   mitkIpPicDescriptor *pic_new;  /* pointer to new image                    */
-  ipUInt4_t       i;         /* loop index                              */
+  mitkIpUInt4_t       i;         /* loop index                              */
 
   /* check whether images have the same size                            */
 

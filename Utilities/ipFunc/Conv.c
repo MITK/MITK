@@ -80,11 +80,11 @@ mitkIpPicDescriptor *mitkIpFuncConv( mitkIpPicDescriptor *pic_old,
 
 #define CONV( typ, pic, size, mask, beg, end, m)                         \
 {                                                                        \
-   ipInt4_t         ind[_mitkIpPicNDIM];                                     \
-   ipInt4_t         off[_mitkIpPicNDIM];                                     \
-   ipUInt4_t        i;                                                   \
-   ipInt4_t         offset;                                              \
-   ipFloat8_t       help, min_gv, max_gv;                                \
+   mitkIpInt4_t         ind[_mitkIpPicNDIM];                                     \
+   mitkIpInt4_t         off[_mitkIpPicNDIM];                                     \
+   mitkIpUInt4_t        i;                                                   \
+   mitkIpInt4_t         offset;                                              \
+   mitkIpFloat8_t       help, min_gv, max_gv;                                \
    typ              *data, *data_new;                                    \
                                                                          \
    /* calculate max. and min. possible greyvalues                     */ \
@@ -162,11 +162,11 @@ mitkIpPicDescriptor *mitkIpFuncConv( mitkIpPicDescriptor *pic_old,
 {
 
   mitkIpPicDescriptor *pic_new;           /* convolved  image               */
-  ipUInt4_t       i;                  /* loopindex                      */
-  ipInt4_t        beg[_mitkIpPicNDIM];
-  ipInt4_t        end[_mitkIpPicNDIM];
+  mitkIpUInt4_t       i;                  /* loopindex                      */
+  mitkIpInt4_t        beg[_mitkIpPicNDIM];
+  mitkIpInt4_t        end[_mitkIpPicNDIM];
   mitkIpFuncMasc_t    *m;                 /* length of mask and offsets     */
-  ipUInt4_t       size[_mitkIpPicNDIM];                                    
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];                                    
 
 
   /* check whether data are correct                                     */

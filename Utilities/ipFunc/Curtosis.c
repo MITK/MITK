@@ -64,7 +64,7 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
+mitkIpFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
 
 /* definition of extreme value macro                          */
 
@@ -78,7 +78,7 @@ ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
 
 #define CURTOSIS( type, pic, mean, excess )                      \
   {                                                            \
-    ipUInt4_t   i, no_elem;                                    \
+    mitkIpUInt4_t   i, no_elem;                                    \
                                                                \
     excess = 0.;                                               \
                                                                \
@@ -93,16 +93,16 @@ ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic );
       }                                                        \
   }
  
-ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic )
+mitkIpFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic )
 {
 
-  ipFloat8_t curt;
-  ipFloat8_t mean, std;            
+  mitkIpFloat8_t curt;
+  mitkIpFloat8_t mean, std;            
              
 
   /* check image data                                         */
 
-  if ( _mitkIpFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != mitkIpOK ) return ( mitkIpFuncERROR );
 
   curt = 0.0;
   if (  _mitkIpPicElements ( pic ) != 1 ) 
@@ -113,7 +113,7 @@ ipFloat8_t mitkIpFuncCurtosis ( mitkIpPicDescriptor *pic )
 
        mitkIpPicFORALL_2( CURTOSIS, pic, mean,  curt );   
   
-       curt =   curt / ((( ipFloat8_t )(_mitkIpPicElements ( pic ) - 1 )) *std*std*std*std) -3;
+       curt =   curt / ((( mitkIpFloat8_t )(_mitkIpPicElements ( pic ) - 1 )) *std*std*std*std) -3;
     }
 
   return( curt );

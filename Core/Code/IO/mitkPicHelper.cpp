@@ -43,13 +43,13 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
     {
       if(tsv->bpe==32)
       {
-        FillVector3D(spacing,((ipFloat4_t*)tsv->value)[0], ((ipFloat4_t*)tsv->value)[1],((ipFloat4_t*)tsv->value)[2]);
+        FillVector3D(spacing,((mitkIpFloat4_t*)tsv->value)[0], ((mitkIpFloat4_t*)tsv->value)[1],((mitkIpFloat4_t*)tsv->value)[2]);
         tagFound = true;
       }
       else
       if(tsv->bpe==64)
       {
-        FillVector3D(spacing,((ipFloat8_t*)tsv->value)[0], ((ipFloat8_t*)tsv->value)[1],((ipFloat8_t*)tsv->value)[2]);
+        FillVector3D(spacing,((mitkIpFloat8_t*)tsv->value)[0], ((mitkIpFloat8_t*)tsv->value)[1],((mitkIpFloat8_t*)tsv->value)[2]);
         tagFound = true;
       }
     }
@@ -63,12 +63,12 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
         {
           if(tsv->bpe==32)
           {
-            zSpacing = ((ipFloat4_t*)tsv->value)[2];
+            zSpacing = ((mitkIpFloat4_t*)tsv->value)[2];
           }
           else
           if(tsv->bpe==64)
           {
-            zSpacing = ((ipFloat8_t*)tsv->value)[2];
+            zSpacing = ((mitkIpFloat8_t*)tsv->value)[2];
           }
           if(zSpacing != 0)
           {
@@ -84,11 +84,11 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
   if( tsv )
   {
     void *data;
-    ipUInt4_t len;
-    ipFloat8_t spacing_z = 0;
-    ipFloat8_t thickness = 1;
-    ipFloat8_t fx = 1;
-    ipFloat8_t fy = 1;
+    mitkIpUInt4_t len;
+    mitkIpFloat8_t spacing_z = 0;
+    mitkIpFloat8_t thickness = 1;
+    mitkIpFloat8_t fx = 1;
+    mitkIpFloat8_t fy = 1;
     bool ok=false;
 
     if( dicomFindElement( (unsigned char *) tsv->value, 0x0018, 0x0088, &data, &len ) )
@@ -137,7 +137,7 @@ bool mitk::PicHelper::GetTimeSpacing(const mitkIpPicDescriptor* aPic, float& tim
   tsv = mitkIpPicQueryTag( pic, "PIXEL SIZE" );
   if(tsv)
   {
-    timeSpacing = ((ipFloat4_t*)tsv->value)[3];
+    timeSpacing = ((mitkIpFloat4_t*)tsv->value)[3];
     if( timeSpacing <=0 ) timeSpacing = 1;
   }
   else timeSpacing = 1;

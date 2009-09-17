@@ -64,9 +64,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t  mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *begin, 
-                           ipUInt4_t       *length );
+mitkIpFloat8_t  mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *begin, 
+                           mitkIpUInt4_t       *length );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
@@ -74,12 +74,12 @@ ipFloat8_t  mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,
 #endif
 
 
-ipFloat8_t  mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *begin, 
-                           ipUInt4_t       *length )
+mitkIpFloat8_t  mitkIpFuncVarR   ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *begin, 
+                           mitkIpUInt4_t       *length )
 {
 
-   ipFloat8_t   var;     /* variance            */
+   mitkIpFloat8_t   var;     /* variance            */
    mitkIpPicDescriptor *pic_help;
 
    pic_help = mitkIpFuncWindow ( pic_old, begin, length );

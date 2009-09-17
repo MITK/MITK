@@ -53,7 +53,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, unsigned int di
   m_PicDescriptor->bpe=m_PixelType.GetBpe();
   m_PicDescriptor->type=m_PixelType.GetType();
   m_PicDescriptor->dim=dimension;
-  memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(ipUInt4_t)*_mitkIpPicNDIM);
+  memcpy(m_PicDescriptor->n, aParent.GetPicDescriptor()->n, sizeof(mitkIpUInt4_t)*_mitkIpPicNDIM);
   m_PicDescriptor->data=m_Data=static_cast<unsigned char*>(aParent.GetData())+offset;
   mitkIpFuncCopyTags(m_PicDescriptor, aParent.GetPicDescriptor());
 
@@ -98,7 +98,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, unsigned int dim
   m_PicDescriptor->bpe=m_PixelType.GetBpe();
   m_PicDescriptor->type=m_PixelType.GetType();
   m_PicDescriptor->dim=dimension;
-  memcpy(m_PicDescriptor->n, dimensions, sizeof(ipUInt4_t)*(dimension<=_mitkIpPicNDIM?dimension:_mitkIpPicNDIM));
+  memcpy(m_PicDescriptor->n, dimensions, sizeof(mitkIpUInt4_t)*(dimension<=_mitkIpPicNDIM?dimension:_mitkIpPicNDIM));
   unsigned char i;
   for(i=dimension; i < _mitkIpPicNDIM; ++i)
     m_PicDescriptor->n[i] = 1;

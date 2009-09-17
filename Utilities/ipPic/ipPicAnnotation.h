@@ -71,15 +71,15 @@ typedef enum
 
 typedef struct
   {
-                ipUInt4_t  _magic;
+                mitkIpUInt4_t  _magic;
 
     mitkIpPicAnnotationType_t  type;
 
-                ipUInt4_t  location_x;
-                ipUInt4_t  location_y;
+                mitkIpUInt4_t  location_x;
+                mitkIpUInt4_t  location_y;
 
-                ipUInt4_t  position_x;
-                ipUInt4_t  position_y;
+                mitkIpUInt4_t  position_x;
+                mitkIpUInt4_t  position_y;
                      char *text;
   } mitkIpPicAnnotation_t;
 

@@ -57,8 +57,8 @@
  *   @param pic_old     pointer to original image
  *   @param pic_return  pointer to the memory which should be reused
  *   @param over_write  tells whether the memory could be reused
- *   @arg @c ipTrue  => memory could be reused
- *   @arg @c ipFalse => new memory must be allocated
+ *   @arg @c mitkIpTrue  => memory could be reused
+ *   @arg @c mitkIpFalse => new memory must be allocated
  *                 
  *   @return  pointer to the memory for transformed image
  *
@@ -71,7 +71,7 @@
 
 mitkIpPicDescriptor *_mitkIpFuncMalloc ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *pic_return,
-                                ipBool_t        over_write );
+                                mitkIpBool_t        over_write );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -88,10 +88,10 @@ mitkIpPicDescriptor *_mitkIpFuncMalloc ( mitkIpPicDescriptor *pic_old,
 
 mitkIpPicDescriptor *_mitkIpFuncMalloc ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *pic_return,
-                                ipBool_t        over_write )
+                                mitkIpBool_t        over_write )
 {
-   ipBool_t   okay=ipTrue;
-   ipUInt4_t  i;
+   mitkIpBool_t   okay=mitkIpTrue;
+   mitkIpUInt4_t  i;
 
    if ( pic_return == NULL || ( !over_write ) )
      {
@@ -111,11 +111,11 @@ mitkIpPicDescriptor *_mitkIpFuncMalloc ( mitkIpPicDescriptor *pic_old,
      } 
    else 
      {
-        if ( pic_old->type != pic_return->type ) okay = ipFalse;
-        if ( pic_old->bpe  != pic_return->bpe  ) okay = ipFalse;
-        if ( pic_old->dim  != pic_return->dim  ) okay = ipFalse;
+        if ( pic_old->type != pic_return->type ) okay = mitkIpFalse;
+        if ( pic_old->bpe  != pic_return->bpe  ) okay = mitkIpFalse;
+        if ( pic_old->dim  != pic_return->dim  ) okay = mitkIpFalse;
         for ( i = 0; i < pic_old->dim; i++ )
-          if ( pic_old->n[i] != pic_return->n[i] ) okay = ipFalse;
+          if ( pic_old->n[i] != pic_return->n[i] ) okay = mitkIpFalse;
      }
 
    if ( !okay )

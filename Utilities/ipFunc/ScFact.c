@@ -66,17 +66,17 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncScFact ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      factor,
+                                mitkIpFloat8_t      factor,
                                 mitkIpFuncFlagI_t   sc_kind ) ;
 
 #ifndef DOXYGEN_IGNORE
  
 mitkIpPicDescriptor *mitkIpFuncScFact ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      factor,
+                                mitkIpFloat8_t      factor,
                                 mitkIpFuncFlagI_t   sc_kind ) 
 {
 
-  ipUInt4_t        i;             /* loop index               */
+  mitkIpUInt4_t        i;             /* loop index               */
   mitkIpPicDescriptor  *pic_new;      /* pointer to scaled image  */
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );

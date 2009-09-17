@@ -99,8 +99,8 @@ main( int argc, char *argv[] )
         printf( "%s\n", text );
 
         tsv = _mitkIpPicFindTag( head, "POSITION" )->tsv;
-        x = ((ipUInt4_t *)(tsv->value))[0];
-        y = ((ipUInt4_t *)(tsv->value))[1];
+        x = ((mitkIpUInt4_t *)(tsv->value))[0];
+        y = ((mitkIpUInt4_t *)(tsv->value))[1];
         printf( "%i %i\n", x, y );
       }
 

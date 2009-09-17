@@ -61,7 +61,7 @@
 
 #include "mitkIpFuncP.h"   
 
-ipFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old );
+mitkIpFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -77,18 +77,18 @@ ipFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old );
 */
 /* -------------------------------------------------------------------  */
 
-ipFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old )
+mitkIpFloat8_t mitkIpFuncMedI ( mitkIpPicDescriptor *pic_old )
 {
 
-  ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
-  ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
-  ipUInt4_t       *hist;     /* greylevel histogram                     */
-  ipUInt4_t       size_hist; /* no. of elements in histogram            */
-  ipUInt4_t       i;         /* loop index                              */
-  ipUInt4_t       sum;       /* sum of histogram elements               */
-  ipUInt4_t       limit;     /*                                         */
-  ipFloat4_t      factor;  
-  ipFloat8_t      median;    /* median of image data                    */
+  mitkIpFloat8_t      max_gv;    /* max. possible greyvalue                 */
+  mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
+  mitkIpUInt4_t       *hist;     /* greylevel histogram                     */
+  mitkIpUInt4_t       size_hist; /* no. of elements in histogram            */
+  mitkIpUInt4_t       i;         /* loop index                              */
+  mitkIpUInt4_t       sum;       /* sum of histogram elements               */
+  mitkIpUInt4_t       limit;     /*                                         */
+  mitkIpFloat4_t      factor;  
+  mitkIpFloat8_t      median;    /* median of image data                    */
 
   /* check whether image data are ok                                    */
 

@@ -68,11 +68,11 @@
 
 #include "mitkIpFuncP.h"   
 
-ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
-                       ipFloat8_t      *min_gv,
-                       ipFloat8_t      *max_gv,
-                       ipUInt4_t       **hist,
-                       ipUInt4_t       *size_hist ) ;
+mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
+                       mitkIpFloat8_t      *min_gv,
+                       mitkIpFloat8_t      *max_gv,
+                       mitkIpUInt4_t       **hist,
+                       mitkIpUInt4_t       *size_hist ) ;
 
 #ifndef DOXYGEN_IGNORE
  
@@ -80,16 +80,16 @@ ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
 
 #define HIST( type, pic, help, factor )                                  \
 {                                                                        \
-  ipUInt4_t  i;                                                          \
-  ipUInt4_t  no_elem;                                                    \
-  ipUInt4_t  index;                                                      \
+  mitkIpUInt4_t  i;                                                          \
+  mitkIpUInt4_t  no_elem;                                                    \
+  mitkIpUInt4_t  index;                                                      \
                                                                          \
   /* calculate histogram                                             */  \
                                                                          \
   no_elem =  _mitkIpPicElements ( pic );                                     \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
-       index = ( ipUInt4_t )                                             \
+       index = ( mitkIpUInt4_t )                                             \
                ( factor * ( (( type * ) pic->data)[i] - ( type )*min_gv ) );\
        if ( ( index <= *size_hist ) )                                    \
           ( hist_help[index] )++;                                        \
@@ -103,16 +103,16 @@ ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
-                       ipFloat8_t      *min_gv,
-                       ipFloat8_t      *max_gv,
-                       ipUInt4_t       **hist,
-                       ipUInt4_t       *size_hist ) 
+mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
+                       mitkIpFloat8_t      *min_gv,
+                       mitkIpFloat8_t      *max_gv,
+                       mitkIpUInt4_t       **hist,
+                       mitkIpUInt4_t       *size_hist ) 
 {
-  ipUInt4_t       *hist_help;
-  ipFloat8_t      help;            /* absolute of min_gv                */
-  ipFloat8_t      min, max;        /* extreme greyvalues                */
-  ipUInt4_t       factor;          /* factor to calculate histogram of  */
+  mitkIpUInt4_t       *hist_help;
+  mitkIpFloat8_t      help;            /* absolute of min_gv                */
+  mitkIpFloat8_t      min, max;        /* extreme greyvalues                */
+  mitkIpUInt4_t       factor;          /* factor to calculate histogram of  */
                                    /* float images                      */
 
   /* check whether data are correct                                     */
@@ -164,10 +164,10 @@ ipInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
   
   /* allocate memory                                                    */
 
-  *size_hist = 1 + factor * (ipUInt4_t ) ( ( ipInt4_t )  *max_gv - ( ipInt4_t ) *min_gv );
+  *size_hist = 1 + factor * (mitkIpUInt4_t ) ( ( mitkIpInt4_t )  *max_gv - ( mitkIpInt4_t ) *min_gv );
 
-/*hist  = ( ipUInt4_t ** ) malloc ( sizeof ( ipUInt4_t * ) );*/
-  *hist = ( ipUInt4_t * )  calloc ( *size_hist+1, sizeof ( ipUInt4_t ) );
+/*hist  = ( mitkIpUInt4_t ** ) malloc ( sizeof ( mitkIpUInt4_t * ) );*/
+  *hist = ( mitkIpUInt4_t * )  calloc ( *size_hist+1, sizeof ( mitkIpUInt4_t ) );
   hist_help = *hist;
   if ( hist_help == NULL ) 
     {

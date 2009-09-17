@@ -84,8 +84,8 @@ mitkIpPicDescriptor *mitkIpFuncExp ( mitkIpPicDescriptor *pic_old,
 
 #define EXP( type, pic, min_gv, max_gv )                                 \
 {                                                                        \
-  ipUInt4_t  no_elem;                                                    \
-  ipFloat8_t a;                                                          \
+  mitkIpUInt4_t  no_elem;                                                    \
+  mitkIpFloat8_t a;                                                          \
                                                                          \
   a =  log ( max_gv - min_gv + 1 ) / ( max_gv - min_gv );                \
                                                                          \
@@ -112,9 +112,9 @@ mitkIpPicDescriptor *mitkIpFuncExp ( mitkIpPicDescriptor *pic_old,
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
-  ipUInt4_t       i;         /* loopindex                               */
-  ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
-  ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
+  mitkIpUInt4_t       i;         /* loopindex                               */
+  mitkIpFloat8_t      max_gv;    /* max. possible greyvalue                 */
+  mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
 
 
 

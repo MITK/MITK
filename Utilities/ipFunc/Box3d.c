@@ -79,7 +79,7 @@
 
 #define BOX3( type, pic, help_beg, help_end, n, size )                    \
 {                                                                         \
-  ipUInt4_t   offset1, offset2;                                           \
+  mitkIpUInt4_t   offset1, offset2;                                           \
                                                                           \
   for ( l = 0; l < pic->dim; l++ )                                        \
    {                                                                      \
@@ -88,9 +88,9 @@
                                                                           \
   for ( l = 0; l < pic->dim; l++ )                                        \
     {                                                                     \
-       stop     = ipFalse;                                                \
-       stop_beg = ipFalse;                                                \
-       stop_end = ipFalse;                                                \
+       stop     = mitkIpFalse;                                                \
+       stop_beg = mitkIpFalse;                                                \
+       stop_end = mitkIpFalse;                                                \
        k = 0;                                                             \
        while ( k < n[order[2+pic_old->dim*l]] && ( !stop ) )              \
          {                                                                \
@@ -111,20 +111,20 @@
                                 ( n[order[2+pic_old->dim*l]] - k - 1 ) *  \
                                      size[order[2+pic_old->dim*l]];       \
                                                                           \
-                      if ( ( stop_beg == ipFalse ) &&                     \
+                      if ( ( stop_beg == mitkIpFalse ) &&                     \
                            ( ( type * )pic->data )[offset1] )             \
                         {                                                 \
                            help_beg[order[2+pic->dim*l]] = k;             \
-                           stop_beg = ipTrue;                             \
+                           stop_beg = mitkIpTrue;                             \
                         }                                                 \
-                      if ( ( stop_end == ipFalse ) &&                     \
+                      if ( ( stop_end == mitkIpFalse ) &&                     \
                            ( ( type * )pic->data )[offset2] )             \
                         {                                                 \
                            help_end[order[2+pic->dim*l]] =                \
                                   n[order[2+pic->dim*l]] - k;             \
-                           stop_end = ipTrue;                             \
+                           stop_end = mitkIpTrue;                             \
                         }                                                 \
-                      if ( stop_beg && stop_end ) stop = ipTrue;          \
+                      if ( stop_beg && stop_end ) stop = mitkIpTrue;          \
                       i++;                                                \
                    }                                                      \
                  j++;                                                     \
@@ -142,20 +142,20 @@
 */
 /* -------------------------------------------------------------------  */
 
-ipUInt4_t _mitkIpFuncBox3d ( mitkIpPicDescriptor *pic_old,
-                         ipUInt4_t       **beg,
-                         ipUInt4_t       **end )            
+mitkIpUInt4_t _mitkIpFuncBox3d ( mitkIpPicDescriptor *pic_old,
+                         mitkIpUInt4_t       **beg,
+                         mitkIpUInt4_t       **end )            
 {
 
-  ipUInt4_t       n[_mitkIpPicNDIM];          /* number of pixels in each   */
+  mitkIpUInt4_t       n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       size[_mitkIpPicNDIM];       /* size of each direction     */
-  ipUInt4_t       i, j, k, l;             /* loop index                 */
-  ipUInt4_t       order[] = { 0, 1, 2,    /* order of indizes for each  */
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];       /* size of each direction     */
+  mitkIpUInt4_t       i, j, k, l;             /* loop index                 */
+  mitkIpUInt4_t       order[] = { 0, 1, 2,    /* order of indizes for each  */
                               2, 1, 0,    /* direction                  */
                               0, 2, 1 };
-  ipBool_t        stop, stop_beg, stop_end;/* finish calculation?       */
-  ipUInt4_t       *help_beg, *help_end;
+  mitkIpBool_t        stop, stop_beg, stop_end;/* finish calculation?       */
+  mitkIpUInt4_t       *help_beg, *help_end;
 
   /* check data                                                         */
 
@@ -182,9 +182,9 @@ ipUInt4_t _mitkIpFuncBox3d ( mitkIpPicDescriptor *pic_old,
 
   /* allocation of result vectors                                       */
 
-  *beg = ( ipUInt4_t * ) malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+  *beg = ( mitkIpUInt4_t * ) malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
   help_beg = *beg;
-  *end = ( ipUInt4_t * ) malloc ( pic_old->dim * sizeof ( ipUInt4_t ) );
+  *end = ( mitkIpUInt4_t * ) malloc ( pic_old->dim * sizeof ( mitkIpUInt4_t ) );
   help_end = *end;
 
   mitkIpPicFORALL_4 ( BOX3, pic_old, help_beg, help_end, n, size );             

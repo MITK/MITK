@@ -71,7 +71,7 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             HPMap = usReadMap( "a.map", ".", -1000, -1000 );
 
             vtkLookupTable *vtkLookupTable = vtkLookupTable::New();
-            ipUInt1_t *data = ( ( ipUInt1_t * ) HPMap->data );
+            mitkIpUInt1_t *data = ( ( mitkIpUInt1_t * ) HPMap->data );
 
             vtkLookupTable->SetTableRange(0,255);
 
@@ -81,9 +81,9 @@ vtkLookupTable* mitk::USLookupTableSource::BuildDSRDopplerLookupTable()
             vtkLookupTable->SetNumberOfColors( LookupTablesize );
             for ( int i = 0; i < LookupTablesize; i++ )
             {
-                rgba[ 0 ] = ( ( ipUInt1_t * ) data ) [ 0 + i * 3 * LookupTablesize ] / 255.0f;
-                rgba[ 1 ] = ( ( ipUInt1_t * ) data ) [ 1 + i * 3 * LookupTablesize ] / 255.0f ;
-                rgba[ 2 ] = ( ( ipUInt1_t * ) data ) [ 2 + i * 3 * LookupTablesize ] / 255.0f ;
+                rgba[ 0 ] = ( ( mitkIpUInt1_t * ) data ) [ 0 + i * 3 * LookupTablesize ] / 255.0f;
+                rgba[ 1 ] = ( ( mitkIpUInt1_t * ) data ) [ 1 + i * 3 * LookupTablesize ] / 255.0f ;
+                rgba[ 2 ] = ( ( mitkIpUInt1_t * ) data ) [ 2 + i * 3 * LookupTablesize ] / 255.0f ;
                 rgba[ 3 ] = 1;
                 vtkLookupTable->SetTableValue ( i, rgba );
             }

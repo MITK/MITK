@@ -72,9 +72,9 @@ mitkIpPicDescriptor *mitkIpFuncRefl ( mitkIpPicDescriptor *pic_old, int axis );
 
 #define ForLoop( type, pic, pic_new, index, offset_orig, offset_func )    \
 {                                                                         \
-  ipUInt4_t   i;                                                          \
-  ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_mitkIpPicNDIM];                                              \
+  mitkIpUInt4_t   i;                                                          \
+  mitkIpUInt4_t   offset_refl;                                                \
+  mitkIpInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
@@ -123,13 +123,13 @@ mitkIpPicDescriptor *mitkIpFuncRefl ( mitkIpPicDescriptor *pic_old, int axis )
 {
 
   mitkIpPicDescriptor *pic_new;               /* inverted picture           */
-  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loop index vector           */
-  ipUInt4_t       length_vect[_mitkIpPicNDIM];
-  ipUInt4_t       axis_vect[_mitkIpPicNDIM];               
-  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
+  mitkIpUInt4_t       index_vect[_mitkIpPicNDIM]; /* loop index vector           */
+  mitkIpUInt4_t       length_vect[_mitkIpPicNDIM];
+  mitkIpUInt4_t       axis_vect[_mitkIpPicNDIM];               
+  mitkIpInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       i;                      /* loop index                 */
-  ipUInt4_t       offset_orig;
+  mitkIpUInt4_t       i;                      /* loop index                 */
+  mitkIpUInt4_t       offset_orig;
 
   /* check data                                                         */
 

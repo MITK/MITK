@@ -148,15 +148,15 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   }
   
   // convert the projected contour into a ipSegmentation format
-  ipInt4_t* _points = new ipInt4_t[2 * projectedContour->GetNumberOfPoints()];
+  mitkIpInt4_t* _points = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
   const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
   for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
-    _points[ 2 * index + 0 ] = static_cast<ipInt4_t>( (*iter)[0] + 1.0 );
-    _points[ 2 * index + 1 ] = static_cast<ipInt4_t>( (*iter)[1] + 1.0 );
+    _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 1.0 );
+    _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 1.0 );
   }
  
   // store ofsets of the drawn line in array
@@ -261,11 +261,11 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
     {
       // start point and end point both inside or both outside any segmentation
       // normal paint operation
-      ipInt4_t* p = new ipInt4_t[2 * num];
+      mitkIpInt4_t* p = new mitkIpInt4_t[2 * num];
       for (unsigned int i = 0; i < num; i++) 
       {
-        p[2 * i] = (ipInt4_t) _points [2 * i];
-        p[2 * i + 1] = (ipInt4_t) _points [2 * i + 1];
+        p[2 * i] = (mitkIpInt4_t) _points [2 * i];
+        p[2 * i + 1] = (mitkIpInt4_t) _points [2 * i + 1];
       }
 
       if (state == 0) ipMITKSegmentationCombineRegion (pic, p, num, 0, IPSEGMENTATION_OR,  1);

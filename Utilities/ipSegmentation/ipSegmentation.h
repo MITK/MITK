@@ -41,7 +41,7 @@ extern "C"
   /*!
     \brief Defines the data type of the segmentation images.
     */
-#define ipMITKSegmentationTYPE ipUInt1_t
+#define ipMITKSegmentationTYPE mitkIpUInt1_t
 #define ipMITKSegmentationTYPE_ID mitkIpPicUInt
 #define ipMITKSegmentationBPE 8
 #define tagSEGMENTATION_EMPTY "SEGMENTATION_EMPTY"
@@ -72,7 +72,7 @@ extern "C"
     @param ratio the ratio of the images, the ratios 0.0 and 1.0 will 
     produce pic1 and pic2, accordingly.
     */
-  extern mitkIpPicDescriptor* ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pic2, const ipFloat4_t ratio);
+  extern mitkIpPicDescriptor* ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pic2, const mitkIpFloat4_t ratio);
 
   /*!
     \brief The type of logical operation.
@@ -95,14 +95,14 @@ extern "C"
     @param value the operand value of the operation
     \note The last point is automatically connected with the first one.
     */
-  extern void ipMITKSegmentationCombineRegion (mitkIpPicDescriptor* segmentation, const ipInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value);
+  extern void ipMITKSegmentationCombineRegion (mitkIpPicDescriptor* segmentation, const mitkIpInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value);
 
   /*!
     \brief Enables the undo operation for the specified segmentation.
     @param segmentation the segmentation 
     @param level the number of undo levels
     */
-  extern void ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t level);
+  extern void ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const mitkIpUInt1_t level);
 
   /*!
     \brief Disables the undo operation for the specified segmentation.
@@ -115,13 +115,13 @@ extern "C"
     \brief Checks if the undo operation is enabled.
     @param segmentation the segmentation
     */
-  extern ipBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
+  extern mitkIpBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Checks if any data for undo is available.
     pending?
     */
-  extern ipBool_t ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation);
+  extern mitkIpBool_t ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation);
 
   /*!
     \brief Save the segmentation image before it is changed.
@@ -145,7 +145,7 @@ extern "C"
   color of the 9 pixels around startOfs. If relativeBounds is false, the region grows in [lowerBound, upperBound].
   If maxIterations is > 0, the growing process is stopped after maxIterations.
   If segBuffer is 0, new memory for the segmented image is allocated and returned, else the segBuffer is used
-  to store the result (has to be an 8-bit datatype, e.g. ipUInt1_t).
+  to store the result (has to be an 8-bit datatype, e.g. mitkIpUInt1_t).
   histBuffer must be 0 or a pointer to a 16-bit mitkIpPicUInt image of the same size as src. In case of the latter, 
   history data is written to that buffer: the seed pixel gets a 1, all direct neighbours 2 etc. The buffer is
   not cleared in this function and can thus hold history data of several growing processes in different areas.
@@ -162,10 +162,10 @@ extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor 
 
 /*!
   Replaces the 4 neighbourhood region around startOfs (y*picWidth+x) of the 2D segmented image seg with newValue.
-  Seg has to be an 8-bit datatype, e.g. ipUInt1_t.
+  Seg has to be an 8-bit datatype, e.g. mitkIpUInt1_t.
   Returns the number of replaced pixels. If newValue is the same as the old value, the function returns 0.
   */
-extern int ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, ipInt1_t newValue );
+extern int ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, mitkIpInt1_t newValue );
 
 /*!
   Same as above, but for the 8 neighbourhood contour.

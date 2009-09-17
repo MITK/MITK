@@ -68,10 +68,10 @@
  */
 
 
-ipUInt4_t _mitkIpPicTSVSize( mitkIpPicTSV_t *tsv )
+mitkIpUInt4_t _mitkIpPicTSVSize( mitkIpPicTSV_t *tsv )
 {
-  ipUInt4_t i;
-  ipUInt4_t elements;
+  mitkIpUInt4_t i;
+  mitkIpUInt4_t elements;
 
   if( tsv->dim == 0 )
     return( 0 );

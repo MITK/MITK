@@ -47,12 +47,12 @@
 
 /** @file
  *  this function converts one image to an image of another data type
- *  (at the moment only datatype ipUInt1_t, ipInt2_t, ipFloat8_t ) are
+ *  (at the moment only datatype mitkIpUInt1_t, mitkIpInt2_t, mitkIpFloat8_t ) are
  *  supported.
  */
  
  /**  this function converts one image to an image of another data type
- *  (at the moment only datatype ipUInt1_t, ipInt2_t, ipFloat8_t ) are
+ *  (at the moment only datatype mitkIpUInt1_t, mitkIpInt2_t, mitkIpFloat8_t ) are
  *  supported.
  *
  *  @param pic_old      pointer to input image
@@ -74,7 +74,7 @@
 
 mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
                                  mitkIpPicType_t     type,
-                                 ipUInt4_t       bpe );
+                                 mitkIpUInt4_t       bpe );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -120,8 +120,8 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
     {                                                                    \
        help  = (( type_old * ) pic_old->data ) [i];                      \
        (( type_new * ) pic_new->data ) [i] =                             \
-          ( max_gv > ( ipFloat8_t ) help ) ?                             \
-             ( min_gv < ( ipFloat8_t ) help  ?                           \
+          ( max_gv > ( mitkIpFloat8_t ) help ) ?                             \
+             ( min_gv < ( mitkIpFloat8_t ) help  ?                           \
                  ( type_new )help : ( type_new ) min_gv ) :              \
              ( type_new ) max_gv;                                        \
     }                                                                    \
@@ -136,12 +136,12 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
 
 mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
                                  mitkIpPicType_t     type,
-                                 ipUInt4_t       bpe )
+                                 mitkIpUInt4_t       bpe )
 
 {
-  ipFloat8_t      min, max;         /* extreme greyvalues of 1. image   */ 
-  ipFloat8_t      max_gv;
-  ipFloat8_t      min_gv;           /* min. possible greyvalue          */
+  mitkIpFloat8_t      min, max;         /* extreme greyvalues of 1. image   */ 
+  mitkIpFloat8_t      max_gv;
+  mitkIpFloat8_t      min_gv;           /* min. possible greyvalue          */
   mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
 
 

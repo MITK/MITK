@@ -65,7 +65,7 @@
 
 #include "mitkIpFuncP.h"
  
-ipFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic );
+mitkIpFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -73,7 +73,7 @@ ipFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic );
 
 #define MEAN_2( type, pic, mean, mean_2 )                      \
   {                                                            \
-    ipUInt4_t   i, no_elem;                                    \
+    mitkIpUInt4_t   i, no_elem;                                    \
                                                                \
     mean_2 = 0.;                                               \
                                                                \
@@ -93,12 +93,12 @@ ipFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic );
 */
 /* ========================================================== */
 
-ipFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic )
+mitkIpFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic )
 {
 
-  ipFloat8_t var;             
-  ipFloat8_t mean;            
-  ipFloat8_t mean_2;           
+  mitkIpFloat8_t var;             
+  mitkIpFloat8_t mean;            
+  mitkIpFloat8_t mean_2;           
 
   /* check image data                                         */
 
@@ -114,7 +114,7 @@ ipFloat8_t mitkIpFuncVar ( mitkIpPicDescriptor *pic )
 
        mitkIpPicFORALL_2( MEAN_2, pic, mean, mean_2 );   
   
-       var =  mean_2 / ( ipFloat8_t ) ( _mitkIpPicElements ( pic ) - 1 );
+       var =  mean_2 / ( mitkIpFloat8_t ) ( _mitkIpPicElements ( pic ) - 1 );
     }
 
   return( var );

@@ -67,7 +67,7 @@
 #include "mitkIpFuncP.h"   
  
 mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old, 
-                                ipFloat8_t      threshold,
+                                mitkIpFloat8_t      threshold,
                                 mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
@@ -76,7 +76,7 @@ mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old,
 
 #define THRESH( type, pic )                                              \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
+  mitkIpUInt4_t  i, no_elem;                                                 \
                                                                          \
   no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -96,13 +96,13 @@ mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------  */
 
 mitkIpPicDescriptor *mitkIpFuncThresh ( mitkIpPicDescriptor *pic_old, 
-                                ipFloat8_t      threshold,
+                                mitkIpFloat8_t      threshold,
                                 mitkIpPicDescriptor *pic_return )
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
-  ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
-  ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
+  mitkIpFloat8_t      max_gv;    /* max. possible greyvalue                 */
+  mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
 
 
   /* check image data                                                   */

@@ -151,7 +151,7 @@ MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic )
 }
 
 _mitkIpPicTagsElement_t *
-_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
+_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_read, FILE *stream, char encryption_type )
 {
   return _mitkIpPicReadTags(head, bytes_to_read, stream, encryption_type);
 }
@@ -209,7 +209,7 @@ char * MITKstrdup (const char * string)
 }
 
 _mitkIpPicTagsElement_t *
-_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type );
+_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_read, FILE *stream, char encryption_type );
 
 mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
 {
@@ -230,7 +230,7 @@ mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
 
   size_t ignored;
 
-  ipUInt1_t* data;
+  mitkIpUInt1_t* data;
 
   if( pic == NULL )
     pic = mitkIpPicNew();
@@ -242,18 +242,18 @@ mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
   }
 
   /* read infile */
-  ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(mitkIpUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
+  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(mitkIpUInt4_t), old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(mitkIpUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       fseek( infile, old_pic.ltxt, SEEK_CUR );
@@ -287,7 +287,7 @@ mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
   bytes_read = 0;
   block_nr = 0;
   
-  data = (ipUInt1_t*) pic->data;
+  data = (mitkIpUInt1_t*) pic->data;
   for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
     bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
   bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
@@ -315,10 +315,10 @@ mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
   return( pic );
 }
 
-ipUInt4_t _MITKipPicTSVElements( mitkIpPicTSV_t *tsv )
+mitkIpUInt4_t _MITKipPicTSVElements( mitkIpPicTSV_t *tsv )
 {
-  ipUInt4_t i;
-  ipUInt4_t elements;
+  mitkIpUInt4_t i;
+  mitkIpUInt4_t elements;
 
   if( tsv->dim == 0 )
     return( 0 );
@@ -332,14 +332,14 @@ ipUInt4_t _MITKipPicTSVElements( mitkIpPicTSV_t *tsv )
 
 
 _mitkIpPicTagsElement_t *
-_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type )
+_MITKipPicReadTags( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_read, FILE *stream, char encryption_type )
 {
   while( bytes_to_read > 0 )
     {
       mitkIpPicTSV_t *tsv;
 
       mitkIpPicTag_t tag_name;
-      ipUInt4_t len;
+      mitkIpUInt4_t len;
 
       size_t ignored;
 
@@ -351,27 +351,27 @@ _MITKipPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE
       strncpy( tsv->tag, tag_name, _mitkIpPicTAGLEN );
       tsv->tag[_mitkIpPicTAGLEN] = '\0';
 
-      ignored = mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, stream );
 
-      ignored = mitkIpPicFReadLE( &(tsv->type), sizeof(ipUInt4_t), 1, stream );
-      ignored = mitkIpPicFReadLE( &(tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      ignored = mitkIpPicFReadLE( &(tsv->dim), sizeof(ipUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->type), sizeof(mitkIpUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->bpe), sizeof(mitkIpUInt4_t), 1, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->dim), sizeof(mitkIpUInt4_t), 1, stream );
 
 
-      ignored = mitkIpPicFReadLE( &(tsv->n), sizeof(ipUInt4_t), tsv->dim, stream );
+      ignored = mitkIpPicFReadLE( &(tsv->n), sizeof(mitkIpUInt4_t), tsv->dim, stream );
 
       if( tsv->type == mitkIpPicTSV )
         {
           tsv->value = NULL;
           tsv->value = _mitkIpPicReadTags( tsv->value,
-                                       len -        3 * sizeof(ipUInt4_t)
-                                           - tsv->dim * sizeof(ipUInt4_t),
+                                       len -        3 * sizeof(mitkIpUInt4_t)
+                                           - tsv->dim * sizeof(mitkIpUInt4_t),
                                        stream,
                                        encryption_type );
         }
       else
         {
-          ipUInt4_t  elements;
+          mitkIpUInt4_t  elements;
 
           elements = _MITKipPicTSVElements( tsv );
 
@@ -380,8 +380,8 @@ _MITKipPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE
             tsv->bpe = 8;
 
 assert( elements * tsv->bpe / 8 == len
-                                   -        3 * sizeof(ipUInt4_t)
-                                   - tsv->dim * sizeof(ipUInt4_t) );
+                                   -        3 * sizeof(mitkIpUInt4_t)
+                                   - tsv->dim * sizeof(mitkIpUInt4_t) );
 
           if( tsv->type == mitkIpPicASCII )
             tsv->value = malloc( elements+1 * tsv->bpe / 8 );
@@ -415,7 +415,7 @@ assert( elements * tsv->bpe / 8 == len
       head = _mitkIpPicInsertTag( head, tsv );
 
       bytes_to_read -= 32                  /* name      */
-                       + sizeof(ipUInt4_t) /* len       */
+                       + sizeof(mitkIpUInt4_t) /* len       */
                        + len;              /* type + bpe + dim + n[] + data */
     }
   return( head );
@@ -427,12 +427,12 @@ MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic )
   mitkIpPicFile_t infile;
 
   mitkIpPicTag_t tag_name;
-  ipUInt4_t dummy;
-  ipUInt4_t len;
-  ipUInt4_t dim;
-  ipUInt4_t n[_mitkIpPicNDIM];
+  mitkIpUInt4_t dummy;
+  mitkIpUInt4_t len;
+  mitkIpUInt4_t dim;
+  mitkIpUInt4_t n[_mitkIpPicNDIM];
 
-  ipUInt4_t to_read;
+  mitkIpUInt4_t to_read;
 
   size_t ignored;
 
@@ -445,7 +445,7 @@ MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic )
     }
 
   if( pic != NULL )
-    pic->info->write_protect = ipFalse;
+    pic->info->write_protect = mitkIpFalse;
 
   /* read infile */
   ignored = mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
@@ -463,17 +463,17 @@ MITKipPicGetTags( char *infile_name, mitkIpPicDescriptor *pic )
   ignored = mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   /*strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );*/
 
-  ignored = mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, infile );
 
-  ignored = mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ignored = mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  ignored = mitkIpPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &dummy, sizeof(mitkIpUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &dummy, sizeof(mitkIpUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &dim, sizeof(mitkIpUInt4_t), 1, infile );
 
-  ignored = mitkIpPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
+  ignored = mitkIpPicFReadLE( n, sizeof(mitkIpUInt4_t), dim, infile );
 
 
-  to_read = len -        3 * sizeof(ipUInt4_t)
-                -      dim * sizeof(ipUInt4_t);
+  to_read = len -        3 * sizeof(mitkIpUInt4_t)
+                -      dim * sizeof(mitkIpUInt4_t);
 
   pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 
@@ -491,9 +491,9 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
   mitkIpPicFile_t infile;
 
   mitkIpPicTag_t tag_name;
-  ipUInt4_t len;
+  mitkIpUInt4_t len;
 
-  ipUInt4_t to_read;
+  mitkIpUInt4_t to_read;
   size_t size;
 
   size_t number_of_elements;
@@ -505,7 +505,7 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
   size_t bytes_read;
   size_t block_nr;
 
-  ipUInt1_t* data;
+  mitkIpUInt1_t* data;
 
   size_t ignored;
 
@@ -561,24 +561,24 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
   ignored = mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  ignored = mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, infile );
 
-  ignored = mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  ignored = mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  ignored = mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, infile );
+  ignored = mitkIpPicFReadLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, infile );
 
-  ignored = mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  ignored = mitkIpPicFReadLE( &(pic->n), sizeof(mitkIpUInt4_t), pic->dim, infile );
 
 
-  to_read = len -        3 * sizeof(ipUInt4_t)
-                - pic->dim * sizeof(ipUInt4_t);
+  to_read = len -        3 * sizeof(mitkIpUInt4_t)
+                - pic->dim * sizeof(mitkIpUInt4_t);
 #if 0
   mitkIpPicFSeek( infile, to_read, SEEK_CUR );
 #else
   pic->info->tags_head = _MITKipPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 #endif
 
-  pic->info->write_protect = ipFalse;
+  pic->info->write_protect = mitkIpFalse;
 
   if((size == 0) || (size != _mitkIpPicSize(pic)))
     {
@@ -610,7 +610,7 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
   block_nr = 0;
   /*printf( "mitkIpPicGet: number of blocks to read is %ul.\n", number_of_blocks ); */
   
-  data = (ipUInt1_t*) pic->data;
+  data = (mitkIpUInt1_t*) pic->data;
   if( pic->type == mitkIpPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )

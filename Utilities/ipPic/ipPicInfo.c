@@ -77,9 +77,9 @@
 #define Min(x, y) (((x) < (y)) ? (x) : (y))
 #define Max(x, y) (((x) > (y)) ? (x) : (y))
 
-void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, ipUInt4_t flags )
+void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, mitkIpUInt4_t flags )
 {
-  ipUInt4_t i;
+  mitkIpUInt4_t i;
 
   fprintf( stream, "%.*s\n", _mitkIpPicTAGLEN, pic->info->version );
   fprintf( stream, "--------------------\n" );
@@ -106,9 +106,9 @@ void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, ipUInt4_t flags )
   fprintf( stream, "size of the image data: %u\n", _mitkIpPicSize( pic ) );
 }
 
-void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUInt4_t level, ipUInt4_t flags )
+void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, mitkIpUInt4_t level, mitkIpUInt4_t flags )
 {
-  ipUInt4_t i;
+  mitkIpUInt4_t i;
   _mitkIpPicTagsElement_t *current;
 
   char *indent;
@@ -163,15 +163,15 @@ void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUIn
                     {
                       case 8:
                         fprintf( stream, "%3u  ",
-                                         ((ipUInt1_t *)current->tsv->value)[i] );
+                                         ((mitkIpUInt1_t *)current->tsv->value)[i] );
                         break;
                       case 16:
                         fprintf( stream, "%5u  ",
-                                         ((ipUInt2_t *)current->tsv->value)[i] );
+                                         ((mitkIpUInt2_t *)current->tsv->value)[i] );
                         break;
                       case 32:
                         fprintf( stream, "%11u  ",
-                                         ((ipUInt4_t *)current->tsv->value)[i] );
+                                         ((mitkIpUInt4_t *)current->tsv->value)[i] );
                         break;
                       default:
                         fprintf( stream, "???" );
@@ -193,15 +193,15 @@ void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUIn
                     {
                       case 8:
                         fprintf( stream, "%3i  ",
-                                         ((ipInt1_t *)current->tsv->value)[i] );
+                                         ((mitkIpInt1_t *)current->tsv->value)[i] );
                         break;
                       case 16:
                         fprintf( stream, "%5i  ",
-                                         ((ipInt2_t *)current->tsv->value)[i] );
+                                         ((mitkIpInt2_t *)current->tsv->value)[i] );
                         break;
                       case 32:
                         fprintf( stream, "%11i  ",
-                                         ((ipInt4_t *)current->tsv->value)[i] );
+                                         ((mitkIpInt4_t *)current->tsv->value)[i] );
                         break;
                       default:
                         fprintf( stream, "???" );
@@ -223,11 +223,11 @@ void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUIn
                     {
                       case 32:
                         fprintf( stream, "%5.5f  ",
-                                         ((ipFloat4_t *)current->tsv->value)[i] );
+                                         ((mitkIpFloat4_t *)current->tsv->value)[i] );
                         break;
                       case 64:
                         fprintf( stream, "%5.5f  ",
-                                         ((ipFloat8_t *)current->tsv->value)[i] );
+                                         ((mitkIpFloat8_t *)current->tsv->value)[i] );
                         break;
                       default:
                         fprintf( stream, "???" );

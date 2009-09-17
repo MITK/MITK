@@ -63,7 +63,7 @@
  *  @arg @c mitkIpFuncBorderOld  : original greyvalues        
  *  @arg @c mitkIpFuncBorderZero : edge is set to minimal greyvalue
  *
- *  @return pointer to transformed iamge ( of type ipFloat8_t )
+ *  @return pointer to transformed iamge ( of type mitkIpFloat8_t )
  *
  * AUTHOR & DATE
  
@@ -74,9 +74,9 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
-                              ipUInt4_t       dim_mask,
-                              ipUInt4_t       len_mask,
-                              ipFloat8_t      threshold,
+                              mitkIpUInt4_t       dim_mask,
+                              mitkIpUInt4_t       len_mask,
+                              mitkIpFloat8_t      threshold,
                               mitkIpFuncFlagI_t   border ) ;
 
 #ifndef DOXYGEN_IGNORE
@@ -95,13 +95,13 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
 
 #define CANNY1( type_h, pic_help1, pic_old, pic_help2, pic_help3, m, type_o )\
 {                                                                          \
-  ipUInt4_t     i, j;                /* loop index                      */ \
-  ipUInt4_t     len_m;                                                     \
-  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
-  ipUInt4_t     off_m;               /* offset in mask                  */ \
-  ipFloat8_t    help[_mitkIpPicNDIM];                                          \
-  ipFloat8_t    help2;                                                     \
+  mitkIpUInt4_t     i, j;                /* loop index                      */ \
+  mitkIpUInt4_t     len_m;                                                     \
+  mitkIpInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  mitkIpUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
+  mitkIpUInt4_t     off_m;               /* offset in mask                  */ \
+  mitkIpFloat8_t    help[_mitkIpPicNDIM];                                          \
+  mitkIpFloat8_t    help2;                                                     \
                                                                            \
                                                                            \
   /* transformation of image                                            */ \
@@ -136,7 +136,7 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
                   for ( i = 0; i < dim_mask; i++ )                         \
                     for ( j = 0; j < len_m; j++ )                          \
                     {                                                      \
-                       help[i] = ( ipFloat8_t )m->mask_vekt[off_m] *       \
+                       help[i] = ( mitkIpFloat8_t )m->mask_vekt[off_m] *       \
                                    (( type_o * ) pic_old->data )           \
                                      [off[0]+m->off_vekt[off_m]] + help[i];\
                        off_m++;                                            \
@@ -163,13 +163,13 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
 
 #define CANNY2( type_h, pic_help2, pic_help3, pic_help1, m )               \
 {                                                                          \
-  ipUInt4_t     i, j;                /* loop index                      */ \
-  ipUInt4_t     len_m;                                                     \
-  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
-  ipUInt4_t     off_m;               /* offset in mask                  */ \
-  ipFloat8_t    help[_mitkIpPicNDIM];                                          \
-  ipFloat8_t    help2;                                                     \
+  mitkIpUInt4_t     i, j;                /* loop index                      */ \
+  mitkIpUInt4_t     len_m;                                                     \
+  mitkIpInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  mitkIpUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
+  mitkIpUInt4_t     off_m;               /* offset in mask                  */ \
+  mitkIpFloat8_t    help[_mitkIpPicNDIM];                                          \
+  mitkIpFloat8_t    help2;                                                     \
                                                                            \
                                                                            \
   /* transformation of image                                            */ \
@@ -204,7 +204,7 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
                   for ( i = 0; i < dim_mask; i++ )                         \
                     for ( j = 0; j < len_m; j++ )                          \
                     {                                                      \
-                       help[i] = help[i] + ( ipFloat8_t )m->mask_vekt[off_m] *\
+                       help[i] = help[i] + ( mitkIpFloat8_t )m->mask_vekt[off_m] *\
                                  (( type_h * ) pic_help2->data )           \
                                                [off[0]+m->off_vekt[off_m]];\
                        off_m++;                                            \
@@ -229,8 +229,8 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
 
 #define CANNY3( type_h, pic_help2, pic_help3, threshold )                  \
 {                                                                          \
-   ipUInt4_t  i;                    /* loop variable                    */ \
-   ipUInt4_t  no_elem;              /* number of pixels                 */ \
+   mitkIpUInt4_t  i;                    /* loop variable                    */ \
+   mitkIpUInt4_t  no_elem;              /* number of pixels                 */ \
                                                                            \
    no_elem =  _mitkIpPicElements ( pic_help2 );                                \
    for ( i = 0; i < no_elem; i++ )                                         \
@@ -247,9 +247,9 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
 /* ----------------------------------------------------------------- */
 
 mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
-                              ipUInt4_t       dim_mask,
-                              ipUInt4_t       len_mask,
-                              ipFloat8_t      threshold,
+                              mitkIpUInt4_t       dim_mask,
+                              mitkIpUInt4_t       len_mask,
+                              mitkIpFloat8_t      threshold,
                               mitkIpFuncFlagI_t   border ) 
 {
   #include "gradient.h"
@@ -260,18 +260,18 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
   mitkIpPicDescriptor *pic_help4;         /* pointer to image               */
   mitkIpPicDescriptor *pic_new;           /* pointer to image               */
   mitkIpPicDescriptor *pic_mask;          /* sobel mask                     */
-  ipUInt4_t       pos;                /* position in m->off_vekt        */
-  ipUInt4_t       i, j;               /* loopindex                      */
-  ipUInt4_t       off_mask;           /* loopindex                      */
+  mitkIpUInt4_t       pos;                /* position in m->off_vekt        */
+  mitkIpUInt4_t       i, j;               /* loopindex                      */
+  mitkIpUInt4_t       off_mask;           /* loopindex                      */
   mitkIpFuncMasc_t    *m;                 /* compressed mask                */
-  ipInt4_t        offset;                 
-  ipInt4_t        beg[_mitkIpPicNDIM];
-  ipInt4_t        end[_mitkIpPicNDIM];
-  ipInt4_t        ind[_mitkIpPicNDIM];
-  ipUInt4_t       size[_mitkIpPicNDIM];
-  ipInt4_t        n[_mitkIpPicNDIM];
-  ipUInt4_t       off_p[_mitkIpPicNDIM];  /* offsets to calculate help1     */
-  ipUInt4_t       offset_h;           /* offset in pic_help1            */
+  mitkIpInt4_t        offset;                 
+  mitkIpInt4_t        beg[_mitkIpPicNDIM];
+  mitkIpInt4_t        end[_mitkIpPicNDIM];
+  mitkIpInt4_t        ind[_mitkIpPicNDIM];
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];
+  mitkIpInt4_t        n[_mitkIpPicNDIM];
+  mitkIpUInt4_t       off_p[_mitkIpPicNDIM];  /* offsets to calculate help1     */
+  mitkIpUInt4_t       offset_h;           /* offset in pic_help1            */
 
   /* check whether data are correct                                     */
 
@@ -428,7 +428,7 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipInt4_t ) );
+  m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpInt4_t ) );
   if ( m->off_vekt == NULL ) 
     {
        pic_mask->data = NULL;
@@ -443,7 +443,7 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( ipFloat8_t ) );
+  m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpFloat8_t ) );
   if ( m->mask_vekt == NULL ) 
     {
        pic_mask->data = NULL;
@@ -471,7 +471,7 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
         for ( ind[1] = -1; ind[1] < n[1]; ind[1]++ )
           for ( ind[0] = -1; ind[0] < n[0]; ind[0]++ )
             {
-              if ( (( ipInt2_t * )pic_mask->data)[off_mask] != 0 )
+              if ( (( mitkIpInt2_t * )pic_mask->data)[off_mask] != 0 )
                 {
                    offset = 0;
                    for ( j = 0; j < dim_mask; j++ )
@@ -487,8 +487,8 @@ mitkIpPicDescriptor *mitkIpFuncCanny( mitkIpPicDescriptor *pic_old,
   pos = 0;
   for ( i = 0; i < m->length; i++ )
     {
-      while ( (( ipInt2_t * )pic_mask->data)[pos] == 0 ) pos++;
-      m->mask_vekt[i] = ( ipFloat8_t )(( ipInt2_t * )pic_mask->data)[pos];
+      while ( (( mitkIpInt2_t * )pic_mask->data)[pos] == 0 ) pos++;
+      m->mask_vekt[i] = ( mitkIpFloat8_t )(( mitkIpInt2_t * )pic_mask->data)[pos];
       pos++;
     }
 

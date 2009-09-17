@@ -71,8 +71,8 @@ typedef enum
 
 typedef struct
   {
-    ipUInt4_t  xpos;
-    ipUInt4_t  ypos;
+    mitkIpUInt4_t  xpos;
+    mitkIpUInt4_t  ypos;
          char *text;
   } mitkIpPicAnnotation;
 

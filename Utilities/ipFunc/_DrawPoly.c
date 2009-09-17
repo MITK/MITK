@@ -52,11 +52,11 @@
  *
  * FUNCTION DECLARATION
  *  mitkIpPicDescriptor  *_mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,
- *                                     ipUInt4_t       *pol_x,
- *                                     ipUInt4_t       *pol_y,  
- *                                     ipUInt4_t       no_pts, 
- *                                     ipFloat8_t      *a,
- *                                     ipFloat8_t      *b);
+ *                                     mitkIpUInt4_t       *pol_x,
+ *                                     mitkIpUInt4_t       *pol_y,  
+ *                                     mitkIpUInt4_t       no_pts, 
+ *                                     mitkIpFloat8_t      *a,
+ *                                     mitkIpFloat8_t      *b);
  *
  * PARAMETERS
  *  pic_old   - pointer to original image
@@ -99,17 +99,17 @@
 */
 
 mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
-                                   ipUInt4_t       *pol_x,
-                                   ipUInt4_t       *pol_y,
-                                   ipUInt4_t       no_pts, 
-                                   ipFloat8_t      *a,
-                                  ipFloat8_t      *b )
+                                   mitkIpUInt4_t       *pol_x,
+                                   mitkIpUInt4_t       *pol_y,
+                                   mitkIpUInt4_t       no_pts, 
+                                   mitkIpFloat8_t      *a,
+                                  mitkIpFloat8_t      *b )
 {
 
    mitkIpPicDescriptor *pic_help;
-   ipUInt4_t       i, j;
-   ipUInt4_t       y;
-   ipUInt4_t       beg, end;
+   mitkIpUInt4_t       i, j;
+   mitkIpUInt4_t       y;
+   mitkIpUInt4_t       beg, end;
 
    /* allocate memory for pic help                                      */
 
@@ -146,7 +146,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
                   beg = pol_y[i+1];
                }
              for ( j = beg; j < end; j++ ) 
-                (( ipUInt1_t * )pic_help->data )[ j * pic_help->n[1] + pol_x[i]] = 100;
+                (( mitkIpUInt1_t * )pic_help->data )[ j * pic_help->n[1] + pol_x[i]] = 100;
           }
         else 
           {
@@ -165,7 +165,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
              for ( j = beg; j <= end; j++ )
                {
                   y = a[i] * j + b[i];
-                  (( ipUInt1_t * )pic_help->data )[ y * pic_help->n[1] + j ] = 100;
+                  (( mitkIpUInt1_t * )pic_help->data )[ y * pic_help->n[1] + j ] = 100;
                }
           }
         
@@ -183,7 +183,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
                }
 
              for ( j = beg; j < end; j++ ) 
-                (( ipUInt1_t * )pic_help->data )[ j + pic_help->n[1] * pol_y[i]] = 100;
+                (( mitkIpUInt1_t * )pic_help->data )[ j + pic_help->n[1] * pol_y[i]] = 100;
           }
         else 
           {
@@ -202,7 +202,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
              for ( j = beg; j <= end; j++ )
                {
                   y =  ( j - b[i] ) / a[i];
-                  (( ipUInt1_t * )pic_help->data )[ j * pic_help->n[1] + y ] = 100;
+                  (( mitkIpUInt1_t * )pic_help->data )[ j * pic_help->n[1] + y ] = 100;
                }
           }
      }
@@ -221,7 +221,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
           }
 
         for ( j = beg; j < end; j++ ) 
-           (( ipUInt1_t * )pic_help->data )[ j * pic_help->n[1] + pol_x[no_pts-1]] = 100;
+           (( mitkIpUInt1_t * )pic_help->data )[ j * pic_help->n[1] + pol_x[no_pts-1]] = 100;
      }
    else 
      {
@@ -240,7 +240,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
         for ( j = beg; j <= end; j++ )
           {
              y = a[no_pts-1] * j + b[no_pts-1];
-             (( ipUInt1_t * )pic_help->data )[ y * pic_help->n[1] + j ] = 100;
+             (( mitkIpUInt1_t * )pic_help->data )[ y * pic_help->n[1] + j ] = 100;
           }
      }
    
@@ -258,7 +258,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
           }
 
         for ( j = beg; j < end; j++ ) 
-           (( ipUInt1_t * )pic_help->data )[ j + pic_help->n[1] * pol_y[no_pts-1]] = 100;
+           (( mitkIpUInt1_t * )pic_help->data )[ j + pic_help->n[1] * pol_y[no_pts-1]] = 100;
      }
    else 
      {
@@ -277,7 +277,7 @@ mitkIpPicDescriptor *_mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
         for ( j = beg; j <= end; j++ )
           {
              y =  ( j - b[no_pts-1] ) / a[no_pts-1];
-             (( ipUInt1_t * )pic_help->data )[ j * pic_help->n[1] + y ] = 100;
+             (( mitkIpUInt1_t * )pic_help->data )[ j * pic_help->n[1] + y ] = 100;
           }
      }
 

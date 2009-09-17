@@ -101,7 +101,7 @@
 #include <stddef.h>
 
 
-void mitkIpPicPutSlice( const char *outfile_name, mitkIpPicDescriptor *pic, ipUInt4_t slice )
+void mitkIpPicPutSlice( const char *outfile_name, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice )
 {
   mitkIpPicDescriptor *pic_in;
 
@@ -116,12 +116,12 @@ void mitkIpPicPutSlice( const char *outfile_name, mitkIpPicDescriptor *pic, ipUI
     {
       if( slice == 1 )
         {
-          ipBool_t compression;
+          mitkIpBool_t compression;
 
           pic->n[pic->dim] = 1;
           pic->dim += 1;
 
-          compression = mitkIpPicSetWriteCompression( ipFalse );
+          compression = mitkIpPicSetWriteCompression( mitkIpFalse );
           mitkIpPicPut( outfile_name, pic );
           mitkIpPicSetWriteCompression( compression );
 
@@ -169,13 +169,13 @@ void mitkIpPicPutSlice( const char *outfile_name, mitkIpPicDescriptor *pic, ipUI
   rewind( outfile );
   ignored = fwrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
 
-  fseek( outfile, sizeof(ipUInt4_t), SEEK_CUR ); /* skip tags_len */
+  fseek( outfile, sizeof(mitkIpUInt4_t), SEEK_CUR ); /* skip tags_len */
 
-  ignored = mitkIpFWriteLE( &(pic_in->type), sizeof(ipUInt4_t), 1, outfile );
-  ignored = mitkIpFWriteLE( &(pic_in->bpe), sizeof(ipUInt4_t), 1, outfile );
-  ignored = mitkIpFWriteLE( &(pic_in->dim), sizeof(ipUInt4_t), 1, outfile );
+  ignored = mitkIpFWriteLE( &(pic_in->type), sizeof(mitkIpUInt4_t), 1, outfile );
+  ignored = mitkIpFWriteLE( &(pic_in->bpe), sizeof(mitkIpUInt4_t), 1, outfile );
+  ignored = mitkIpFWriteLE( &(pic_in->dim), sizeof(mitkIpUInt4_t), 1, outfile );
 
-  ignored = mitkIpFWriteLE( pic_in->n, sizeof(ipUInt4_t), pic_in->dim, outfile );
+  ignored = mitkIpFWriteLE( pic_in->n, sizeof(mitkIpUInt4_t), pic_in->dim, outfile );
 
   fseek( outfile, pic_in->info->pixel_start_in_file + _mitkIpPicSize(pic) * (slice - 1), SEEK_SET );
 

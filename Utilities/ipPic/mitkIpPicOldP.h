@@ -77,7 +77,7 @@
 
 typedef struct
   {
-    ipUInt4_t id,
+    mitkIpUInt4_t id,
               dummy1,
               dummy2,
               conv,

@@ -74,8 +74,8 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      level, 
-                                ipFloat8_t      window,
+                                mitkIpFloat8_t      level, 
+                                mitkIpFloat8_t      window,
                                 mitkIpPicDescriptor *pic_return );
 
 #ifndef DOXYGEN_IGNORE
@@ -93,14 +93,14 @@ mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------------  */
 
 mitkIpPicDescriptor *mitkIpFuncLevWin ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      level, 
-                                ipFloat8_t      window,
+                                mitkIpFloat8_t      level, 
+                                mitkIpFloat8_t      window,
                                 mitkIpPicDescriptor *pic_return )
 {
    mitkIpPicDescriptor *pic_new;         /* pointer to new image                  */ 
-   ipFloat8_t      gv_low;           /* lower greyvalue of range              */
-   ipFloat8_t      gv_up;            /* upper greyvalue of range              */
-   ipFloat8_t      max_gv, min_gv;   /* max and min possible greyvalues       */
+   mitkIpFloat8_t      gv_low;           /* lower greyvalue of range              */
+   mitkIpFloat8_t      gv_up;            /* upper greyvalue of range              */
+   mitkIpFloat8_t      max_gv, min_gv;   /* max and min possible greyvalues       */
 
    /* check image data                                                        */
 

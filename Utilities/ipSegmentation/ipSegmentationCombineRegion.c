@@ -194,7 +194,7 @@ int compare_active(arg1, arg2) const void *arg1, *arg2;
 }
 
 
-void ipMITKSegmentationCombineRegion   (mitkIpPicDescriptor* segmentation, const ipInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value)
+void ipMITKSegmentationCombineRegion   (mitkIpPicDescriptor* segmentation, const mitkIpInt4_t* const points, const int num, mitkIpPicDescriptor* mask, const int operation, int value)
 {
     int idx;
     Point2* pl;

@@ -126,12 +126,12 @@ mitkIpPicDescriptor *mitkIpFuncRotate( mitkIpPicDescriptor *pic,
 
 {
   mitkIpPicDescriptor *pic_return;
-  ipUInt4_t *p_index[_mitkIpPicNDIM];
-  ipUInt4_t index[_mitkIpPicNDIM];
-  ipUInt4_t coeff_sum[_mitkIpPicNDIM];
-  ipUInt1_t coefficient[_mitkIpPicNDIM]; 
-  ipUInt4_t r_size[_mitkIpPicNDIM];
-  ipUInt4_t r_offset,i;
+  mitkIpUInt4_t *p_index[_mitkIpPicNDIM];
+  mitkIpUInt4_t index[_mitkIpPicNDIM];
+  mitkIpUInt4_t coeff_sum[_mitkIpPicNDIM];
+  mitkIpUInt1_t coefficient[_mitkIpPicNDIM]; 
+  mitkIpUInt4_t r_size[_mitkIpPicNDIM];
+  mitkIpUInt4_t r_offset,i;
   int  order_alloc = 0;
 
   /*
@@ -189,7 +189,7 @@ mitkIpPicDescriptor *mitkIpFuncRotate( mitkIpPicDescriptor *pic,
       for( i=0; i<_mitkIpPicNDIM; i++ ) tt[i] = 0;
       for( i=0; i< pic->dim; i++ ) 
         { 
-          if( order[i] > 0 && order[i]<= (ipInt4_t) pic->dim )
+          if( order[i] > 0 && order[i]<= (mitkIpInt4_t) pic->dim )
             tt[ order[i]-1 ]++;
           else
             i = _mitkIpPicNDIM + 1;
@@ -215,10 +215,10 @@ mitkIpPicDescriptor *mitkIpFuncRotate( mitkIpPicDescriptor *pic,
   for( i = 0; i<pic->dim; i++ )
     {
       int d1,d2;
-      ipUInt4_t *tmp;
+      mitkIpUInt4_t *tmp;
 
       d1 = order [i]-1; 
-      d2 = (d1+1 >= (ipInt4_t) pic->dim ) ? ( 0 ) : ( d1+1 ); 
+      d2 = (d1+1 >= (mitkIpInt4_t) pic->dim ) ? ( 0 ) : ( d1+1 ); 
 
       switch( grad[d1]  )
         {

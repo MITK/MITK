@@ -92,7 +92,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     int i, size = _mitkIpPicSize(picslice);
     char * p1 = (char*)slice->GetPic()->data;
     char * p2 = (char*)picslice->data;
-    //picslice->info->write_protect=ipFalse;
+    //picslice->info->write_protect=mitkIpFalse;
     //mitkIpPicPut("C:\\1aaaaIPPIC.pic", picslice);
     //mitkIpPicPut("C:\\1aaaaSEL.pic", slice->GetPic());
     for(i=0; i<size; ++i, ++p1, ++p2)

@@ -66,13 +66,13 @@
  
 /* definition of extreme value macro                          */
 
-ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
+mitkIpFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
 
 #define SKEWNESS( type, pic, mean, skew )                      \
   {                                                            \
-    ipUInt4_t   i, no_elem;                                    \
+    mitkIpUInt4_t   i, no_elem;                                    \
                                                                \
     skew = 0.;                                               \
                                                                \
@@ -93,17 +93,17 @@ ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic );
 */
 /* ========================================================== */
 
-ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic )
+mitkIpFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic )
 {
 
-  ipFloat8_t var;             
-  ipFloat8_t mean, std;            
-  ipFloat8_t skew;           
+  mitkIpFloat8_t var;             
+  mitkIpFloat8_t mean, std;            
+  mitkIpFloat8_t skew;           
 
 
   /* check image data                                         */
 
-  if ( _mitkIpFuncError ( pic ) != ipOK ) return ( mitkIpFuncERROR );
+  if ( _mitkIpFuncError ( pic ) != mitkIpOK ) return ( mitkIpFuncERROR );
 
   if (  _mitkIpPicElements ( pic ) == 1 ) var = 0;
   else
@@ -114,7 +114,7 @@ ipFloat8_t mitkIpFuncSkewness ( mitkIpPicDescriptor *pic )
 
        mitkIpPicFORALL_2( SKEWNESS, pic, mean,  skew );   
   
-       var =   skew / (( ipFloat8_t ) (( _mitkIpPicElements ( pic ) - 1 ) *std*std*std));
+       var =   skew / (( mitkIpFloat8_t ) (( _mitkIpPicElements ( pic ) - 1 ) *std*std*std));
     }
 
   return( var );

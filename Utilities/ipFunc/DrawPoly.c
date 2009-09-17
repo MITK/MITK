@@ -68,9 +68,9 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
-                                  ipUInt4_t       *pol_x,
-                                  ipUInt4_t       *pol_y,
-                                  ipUInt4_t       no_pts );
+                                  mitkIpUInt4_t       *pol_x,
+                                  mitkIpUInt4_t       *pol_y,
+                                  mitkIpUInt4_t       no_pts );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -87,10 +87,10 @@ mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
 
 #define DRAW( type, pic_help, a, b, pol_x, pol_y )                       \
 {                                                                        \
-   ipUInt4_t   beg;                                                      \
-   ipUInt4_t   end;                                                      \
-   ipUInt4_t   i, j;                                                     \
-   ipUInt4_t   y;                                                        \
+   mitkIpUInt4_t   beg;                                                      \
+   mitkIpUInt4_t   end;                                                      \
+   mitkIpUInt4_t   i, j;                                                     \
+   mitkIpUInt4_t   y;                                                        \
    type        max;                                                      \
                                                                          \
    max = ( type ) max_gv;                                                \
@@ -254,18 +254,18 @@ mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
 */
 
 mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
-                                  ipUInt4_t       *pol_x,
-                                  ipUInt4_t       *pol_y,
-                                  ipUInt4_t       no_pts )
+                                  mitkIpUInt4_t       *pol_x,
+                                  mitkIpUInt4_t       *pol_y,
+                                  mitkIpUInt4_t       no_pts )
 {
 
-   ipUInt4_t       min_x, max_x;    /* min, max x-coordinate of ROI     */
-   ipUInt4_t       min_y, max_y;    /* min, max y-coordinate of ROI     */
-   ipFloat8_t      min_gv, max_gv;
-   ipFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
-   ipFloat8_t      diff;            /* difference between two points    */
+   mitkIpUInt4_t       min_x, max_x;    /* min, max x-coordinate of ROI     */
+   mitkIpUInt4_t       min_y, max_y;    /* min, max y-coordinate of ROI     */
+   mitkIpFloat8_t      min_gv, max_gv;
+   mitkIpFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
+   mitkIpFloat8_t      diff;            /* difference between two points    */
    mitkIpPicDescriptor *pic_help;
-   ipUInt4_t       i;
+   mitkIpUInt4_t       i;
 
    /* check data                                                        */
 
@@ -325,13 +325,13 @@ mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
 
    /* allocate memory for a and b                                       */
 
-   a = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
+   a = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
    if ( !a )
      {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
      }
-   b = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
+   b = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
    if ( !b )
      {
        free ( a );
@@ -343,12 +343,12 @@ mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
 
    for ( i = 0; i < no_pts-1;  i++ )
      {
-        diff = ( ipFloat8_t ) pol_x[i+1] - ( ipFloat8_t ) pol_x[i];
+        diff = ( mitkIpFloat8_t ) pol_x[i+1] - ( mitkIpFloat8_t ) pol_x[i];
         if ( diff )
           {
-            a[i] = ( ( ipFloat8_t ) pol_y[i+1] - ( ipFloat8_t ) pol_y[i] ) / diff;
+            a[i] = ( ( mitkIpFloat8_t ) pol_y[i+1] - ( mitkIpFloat8_t ) pol_y[i] ) / diff;
 
-            b[i] = ( ( ipFloat8_t ) pol_y[i] - a[i] * ( ipFloat8_t )pol_x[i] );
+            b[i] = ( ( mitkIpFloat8_t ) pol_y[i] - a[i] * ( mitkIpFloat8_t )pol_x[i] );
           }
         else
           {
@@ -356,10 +356,10 @@ mitkIpPicDescriptor *mitkIpFuncDrawPoly ( mitkIpPicDescriptor *pic_old,
             a[i] = 0.;
            }
      }
-   diff = ( ipFloat8_t ) pol_x[no_pts-1] - ( ipFloat8_t )  pol_x[0];
+   diff = ( mitkIpFloat8_t ) pol_x[no_pts-1] - ( mitkIpFloat8_t )  pol_x[0];
    if ( diff )
      {
-        a[no_pts-1] = ( ( ipFloat8_t ) pol_y[no_pts-1] - ( ipFloat8_t ) pol_y[0] ) / diff;
+        a[no_pts-1] = ( ( mitkIpFloat8_t ) pol_y[no_pts-1] - ( mitkIpFloat8_t ) pol_y[0] ) / diff;
         b[no_pts-1] = ( pol_y[no_pts-1] - a[no_pts-1] * pol_x[no_pts-1] );
      }
    else

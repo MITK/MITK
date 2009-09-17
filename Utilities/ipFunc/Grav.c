@@ -66,7 +66,7 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old );
+mitkIpFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old );
 
 #ifndef DOXYGEN_IGNORE 
 
@@ -74,10 +74,10 @@ ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old );
 
 #define GRAV( type, pic, index )                                          \
 {                                                                         \
-  ipUInt4_t   i;                                                          \
-  ipUInt4_t   no;                                                         \
-  ipUInt4_t   offset_refl;                                                \
-  ipInt4_t    n[_mitkIpPicNDIM];                                              \
+  mitkIpUInt4_t   i;                                                          \
+  mitkIpUInt4_t   no;                                                         \
+  mitkIpUInt4_t   offset_refl;                                                \
+  mitkIpInt4_t    n[_mitkIpPicNDIM];                                              \
                                                                           \
   for ( i = 0; i < pic_old->dim; i++ )                                    \
     n[i] = pic_old->n[i];                                                 \
@@ -124,14 +124,14 @@ ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old );
 */
 /* -------------------------------------------------------------------  */
 
-ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old )            
+mitkIpFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old )            
 {
 
-  ipUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
-  ipInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
+  mitkIpUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
+  mitkIpInt4_t        n[_mitkIpPicNDIM];          /* number of pixels in each   */
                                           /* dimension                  */
-  ipUInt4_t       i;                      /* loop index                 */
-  ipFloat8_t      *gravity;
+  mitkIpUInt4_t       i;                      /* loop index                 */
+  mitkIpFloat8_t      *gravity;
 
   /* check data                                                         */
 
@@ -148,7 +148,7 @@ ipFloat8_t *mitkIpFuncGrav ( mitkIpPicDescriptor *pic_old )
   for ( i = 0; i < _mitkIpPicNDIM; i++ )
     index_vect[i] = 0;
 
-  gravity = ( ipFloat8_t * ) malloc ( 8 * sizeof ( ipFloat8_t ) );
+  gravity = ( mitkIpFloat8_t * ) malloc ( 8 * sizeof ( mitkIpFloat8_t ) );
   if ( gravity == NULL ) 
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );

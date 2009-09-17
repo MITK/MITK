@@ -511,9 +511,9 @@ iil4mitkPicImage::display (iil4mitkWidget* widget)
 		int line = _pic->n[0];
 		float fLine = (float)line;
 		float x=0.0, y=0.0;
-		ipInt1_t *current;
-		ipInt1_t *end = ((ipInt1_t*)_pic->data) + (_pic->n[0]*_pic->n[1]);
-		for (current = (ipInt1_t*)_pic->data; current<end; current++) {
+		mitkIpInt1_t *current;
+		mitkIpInt1_t *end = ((mitkIpInt1_t*)_pic->data) + (_pic->n[0]*_pic->n[1]);
+		for (current = (mitkIpInt1_t*)_pic->data; current<end; current++) {
 			if (*current != 0) {
 				if (*(current-line) == 0) {
 					glVertex3f( x,     y, 0.0 );

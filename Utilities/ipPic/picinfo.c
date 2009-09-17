@@ -153,7 +153,7 @@ int main( int argc, char *argv[] )
   Bool use_stdin;
 
   Bool show_extrema;
-  ipUInt4_t flags;
+  mitkIpUInt4_t flags;
 
 #ifndef FILENAME_MAX
 #define FILENAME_MAX 256
@@ -210,7 +210,7 @@ int main( int argc, char *argv[] )
       fprintf( stderr, "  -e         calculate the extrema\n" );
       fprintf( stderr, "  -s         short output\n" );
       fprintf( stderr, "  picfile    the picfile to examine, if not given stdin is used\n" );
-      exit( ipError );
+      exit( mitkIpError );
     }
 
   /*--------------- commandline scaning ends here -------------*/
@@ -235,7 +235,7 @@ int main( int argc, char *argv[] )
   if( pic == NULL )
     {
       fprintf( stderr, "sorry, can't read %s\n", picfile_name );
-      exit( ipError );
+      exit( mitkIpError );
     }
 
   printf( "\n" );
@@ -275,31 +275,31 @@ int main( int argc, char *argv[] )
         {
           case mitkIpPicDR( mitkIpPicUInt, 8 ):
             {
-              MIN_MAX( min_i, max_i, ipUInt1_t );
+              MIN_MAX( min_i, max_i, mitkIpUInt1_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
           case mitkIpPicDR( mitkIpPicInt, 16 ):
             {
-              MIN_MAX( min_i, max_i, ipInt2_t );
+              MIN_MAX( min_i, max_i, mitkIpInt2_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
           case mitkIpPicDR( mitkIpPicInt, 32 ):
             {
-              MIN_MAX( min_i, max_i, ipInt4_t );
+              MIN_MAX( min_i, max_i, mitkIpInt4_t );
               printf( "min: %li, max: %li\n", min_i, max_i );
             }
             break;
           case mitkIpPicDR( mitkIpPicFloat, 32 ):
             {
-              MIN_MAX( min_f, max_f, ipFloat4_t );
+              MIN_MAX( min_f, max_f, mitkIpFloat4_t );
               printf( "min: %f, max: %f\n", min_f, max_f );
             }
             break;
           case mitkIpPicDR( mitkIpPicFloat, 64 ):
             {
-              MIN_MAX( min_f, max_f, ipFloat8_t );
+              MIN_MAX( min_f, max_f, mitkIpFloat8_t );
               printf( "min: %f, max: %f\n", min_f, max_f );
             }
             break;

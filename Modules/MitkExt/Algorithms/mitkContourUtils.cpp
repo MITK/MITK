@@ -96,15 +96,15 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   //    We don't work on the "real" working data, because ipSegmentation would restrict us to 8 bit images
   
   // convert the projected contour into a ipSegmentation format
-  ipInt4_t* picContour = new ipInt4_t[2 * projectedContour->GetNumberOfPoints()];
+  mitkIpInt4_t* picContour = new mitkIpInt4_t[2 * projectedContour->GetNumberOfPoints()];
   const Contour::PathType::VertexListType* pointsIn2D = projectedContour->GetContourPath()->GetVertexList();
   unsigned int index(0);
   for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
-    picContour[ 2 * index + 0 ] = static_cast<ipInt4_t>( (*iter)[0] + 0.5 );
-    picContour[ 2 * index + 1 ] = static_cast<ipInt4_t>( (*iter)[1] + 0.5 );
+    picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 0.5 );
+    picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 0.5 );
   }
 
   assert( sliceImage->GetSliceData() );

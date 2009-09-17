@@ -72,8 +72,8 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      gv_low,
-                               ipFloat8_t      gv_up, 
+                               mitkIpFloat8_t      gv_low,
+                               mitkIpFloat8_t      gv_up, 
                                mitkIpPicDescriptor *pic_return ) ;
 
 #ifndef DOXYGEN_IGNORE
@@ -88,8 +88,8 @@ mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
 
 #define SELECT( type, pic, gv_low, gv_up, min_gv, max_gv )                   \
 {                                                                            \
-  ipUInt4_t    i;                 /* loopindex                             */\
-  ipUInt4_t    no_elem;           /* loopindex                             */\
+  mitkIpUInt4_t    i;                 /* loopindex                             */\
+  mitkIpUInt4_t    no_elem;           /* loopindex                             */\
   type         help;              /* element that should be transformed    */\
                                                                              \
   /* transform greyvalues                                                  */\
@@ -111,11 +111,11 @@ mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
 /* ------------------------------------------------------------------------ */
 
 mitkIpPicDescriptor *mitkIpFuncSelMM ( mitkIpPicDescriptor *pic_old,
-                               ipFloat8_t      gv_low,
-                               ipFloat8_t      gv_up, 
+                               mitkIpFloat8_t      gv_low,
+                               mitkIpFloat8_t      gv_up, 
                                mitkIpPicDescriptor *pic_return ) 
 {
-  ipFloat8_t       min_gv, max_gv;  /* max and min possible greyvalues      */
+  mitkIpFloat8_t       min_gv, max_gv;  /* max and min possible greyvalues      */
   mitkIpPicDescriptor  *pic_new;        /* pointer to transformed image         */
 
 

@@ -82,9 +82,9 @@
 
 #include "mitkIpPic.h"
 
-mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_in, ipUInt4_t slice )
+mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_in, mitkIpUInt4_t slice )
 {
-  ipUInt4_t picsize;
+  mitkIpUInt4_t picsize;
 
   if( pic == NULL )
     pic = mitkIpPicNew();

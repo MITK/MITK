@@ -28,7 +28,7 @@ extern "C"
 {
 #endif
 
-#define ipMITKSegmentationTYPE ipUInt1_t
+#define ipMITKSegmentationTYPE mitkIpUInt1_t
 #define ipMITKSegmentationTYPE_ID mitkIpPicUInt
 #define ipMITKSegmentationBPE 8
 #define tagSEGMENTATION_EMPTY "SEGMENTATION_EMPTY"
@@ -41,7 +41,7 @@ enum LogicalOp {
 };
 
 extern void ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation);
-extern ipBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
+extern mitkIpBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }
@@ -52,40 +52,40 @@ extern ipBool_t ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentati
 #define AND(TYPE, PIC, VALUE, X, Y)                                       \
 {                                                                         \
   TYPE* data = (TYPE*) (PIC)->data;                                       \
-  ipUInt4_t  width = (PIC)->n[0];                                         \
-  int temp =  (int) data [width * (ipUInt4_t) Y + (ipUInt4_t)  X];        \
+  mitkIpUInt4_t  width = (PIC)->n[0];                                         \
+  int temp =  (int) data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X];        \
   temp &= (int) VALUE;                                                    \
-  data [width * (ipUInt4_t) Y + (ipUInt4_t)  X] = temp;                   \
+  data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X] = temp;                   \
 }                                                                         \
 
 #define OR(TYPE, PIC, VALUE, X, Y)                                        \
 {                                                                         \
   TYPE* data = (TYPE*) (PIC)->data;                                       \
-   ipUInt4_t  width = (PIC)->n[0];                                        \
-  int temp =  (int) data [width * (ipUInt4_t) Y + (ipUInt4_t)  X];        \
+   mitkIpUInt4_t  width = (PIC)->n[0];                                        \
+  int temp =  (int) data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X];        \
   temp |= (int) VALUE;                                                    \
-   data [width * (ipUInt4_t) Y + (ipUInt4_t)  X]  = temp;                 \
+   data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X]  = temp;                 \
 }                                                                         \
 
 #define  XOR(TYPE, PIC, VALUE, X, Y)                                      \
 {                                                                         \
   TYPE* data = (TYPE*) (PIC)->data;                                       \
-  ipUInt4_t width = (PIC)->n[0];                                          \
-  int temp =  (int) data [width * (ipUInt4_t) Y + (ipUInt4_t)  X];        \
+  mitkIpUInt4_t width = (PIC)->n[0];                                          \
+  int temp =  (int) data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X];        \
   temp ^= (int) VALUE;                                                    \
-  data [width * (ipUInt4_t) Y + (ipUInt4_t)  X]  = temp;                  \
+  data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X]  = temp;                  \
 }                                                                         \
 
 #define OP(TYPE, PIC, VALUE, X, Y)                                        \
 {                                                                         \
   TYPE* data = (TYPE*) (PIC)->data;                                       \
-  ipUInt4_t width = (PIC)->n[0];                                          \
-  data [width * (ipUInt4_t) Y + (ipUInt4_t)  X] = VALUE;                  \
+  mitkIpUInt4_t width = (PIC)->n[0];                                          \
+  data [width * (mitkIpUInt4_t) Y + (mitkIpUInt4_t)  X] = VALUE;                  \
 }                                                                         \
 
 #define MASK(TYPE, PIC, MSK, VALUE, X, Y, CMD)          \
 {                    \
-if (!(MSK) || (((ipMITKSegmentationTYPE *)(MSK)->data)[(PIC)->n[0] * (ipUInt4_t) (Y) + (ipUInt4_t)  (X)] > 0.0)) \
+if (!(MSK) || (((ipMITKSegmentationTYPE *)(MSK)->data)[(PIC)->n[0] * (mitkIpUInt4_t) (Y) + (mitkIpUInt4_t)  (X)] > 0.0)) \
 CMD(TYPE, PIC, VALUE, X, Y)              \
 }
 

@@ -94,24 +94,24 @@
 #include "mitkIpPic.h"
 
 #ifdef USE_ZLIB
-ipBool_t _mitkIpPicCanWriteCompressed = ipTrue;
+mitkIpBool_t _mitkIpPicCanWriteCompressed = mitkIpTrue;
 #else
-ipBool_t _mitkIpPicCanWriteCompressed = ipFalse;
+mitkIpBool_t _mitkIpPicCanWriteCompressed = mitkIpFalse;
 #endif
 
 
-static ipBool_t mitk_write_compressed = ipFalse;
+static mitkIpBool_t mitk_write_compressed = mitkIpFalse;
 
-ipBool_t
+mitkIpBool_t
 mitkIpPicGetWriteCompression( void )
 {
   return( mitk_write_compressed );
 }
 
-ipBool_t
-mitkIpPicSetWriteCompression( ipBool_t compression )
+mitkIpBool_t
+mitkIpPicSetWriteCompression( mitkIpBool_t compression )
 {
-  ipBool_t compression_old = mitk_write_compressed;
+  mitkIpBool_t compression_old = mitk_write_compressed;
 
   mitk_write_compressed = compression;
 

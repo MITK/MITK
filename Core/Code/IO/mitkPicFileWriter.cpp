@@ -162,8 +162,8 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
 {
   FILE* outfile;
 
-  ipUInt4_t len;
-  ipUInt4_t tags_len;
+  mitkIpUInt4_t len;
+  mitkIpUInt4_t tags_len;
 
   if( pic->info->write_protect )
   {
@@ -209,8 +209,8 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
 
   tags_len = _mitkIpPicTagsSize( pic->info->tags_head );
 
-  len = tags_len +        3 * sizeof(ipUInt4_t)
-      + pic->dim * sizeof(ipUInt4_t);
+  len = tags_len +        3 * sizeof(mitkIpUInt4_t)
+      + pic->dim * sizeof(mitkIpUInt4_t);
 
   /* write oufile */
   if( mitkIpPicEncryptionType(pic) == ' ' )
@@ -218,13 +218,13 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
   else
     mitkIpPicFWrite( pic->info->version, 1, sizeof(mitkIpPicTag_t), outfile );
 
-  mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &len, sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  mitkIpPicFWriteLE( pic->n, sizeof(mitkIpUInt4_t), pic->dim, outfile );
 
   _mitkIpPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
    // Removed due to linker problems when compiling
@@ -248,7 +248,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
     size_t remaining_bytes = number_of_bytes % block_size;
     size_t bytes_written = 0;
     size_t block_nr = 0;
-    ipUInt1_t* data = (ipUInt1_t*) pic->data;
+    mitkIpUInt1_t* data = (mitkIpUInt1_t*) pic->data;
       
     assert( data != NULL );
       

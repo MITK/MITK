@@ -73,7 +73,7 @@ mitkIpPicDescriptor *mitkIpFuncOr   ( mitkIpPicDescriptor *pic_1,
 
 #define OR( type, pic_1, pic_2, pic_new )                                \
 {                                                                        \
-  ipUInt4_t  i, no_elem;                                                 \
+  mitkIpUInt4_t  i, no_elem;                                                 \
                                                                          \
   no_elem = _mitkIpPicElements ( pic_1 );                                    \
   for ( i = 0; i < no_elem; i++ )                                        \
@@ -97,7 +97,7 @@ mitkIpPicDescriptor *mitkIpFuncOr   ( mitkIpPicDescriptor *pic_1,
 {
 
   mitkIpPicDescriptor *pic_new;  /* pointer to new image                    */
-  ipUInt4_t       i;         /* loop index                              */
+  mitkIpUInt4_t       i;         /* loop index                              */
 
   /* check whether images have the same size                            */
 

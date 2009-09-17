@@ -71,10 +71,10 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *pol_x,
-                           ipUInt4_t       *pol_y,
-                           ipUInt4_t       no_pts ) ;
+mitkIpFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *pol_x,
+                           mitkIpUInt4_t       *pol_y,
+                           mitkIpUInt4_t       no_pts ) ;
 #ifndef DOXYGEN_IGNORE
 
 
@@ -90,21 +90,21 @@ ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
 #define MIN( x, y ) ( x < y ) ? x : y  
 #define ROI( type, pic, pic_help, sum, count )                          \
 {                                                                       \
-   ipBool_t     in;                                                     \
-   ipUInt4_t    i, j;                                                   \
-   ipUInt4_t    offset;                                                 \
+   mitkIpBool_t     in;                                                     \
+   mitkIpUInt4_t    i, j;                                                   \
+   mitkIpUInt4_t    offset;                                                 \
                                                                         \
    for ( i = min_y; i <= max_y; i++ )                                   \
      {                                                                  \
-        in = ipFalse;                                                   \
+        in = mitkIpFalse;                                                   \
         offset = i * pic->n[0] + min_x;                                 \
         for ( j = min_x; j <= max_x; j++ )                              \
           {                                                             \
-             if ( (( ipUInt1_t * )pic_help->data )[offset] && ( !in ) ) \
-               in = ipTrue;                                          \
-             else if ( (( ipUInt1_t * )pic_help->data )[offset] && ( in ) ) \
+             if ( (( mitkIpUInt1_t * )pic_help->data )[offset] && ( !in ) ) \
+               in = mitkIpTrue;                                          \
+             else if ( (( mitkIpUInt1_t * )pic_help->data )[offset] && ( in ) ) \
                {                                                        \
-                  in = ipFalse;                                         \
+                  in = mitkIpFalse;                                         \
                   sum = sum + (( type * )pic->data )[offset];           \
                   count++;                                              \
                }                                                        \
@@ -124,20 +124,20 @@ ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
 ** mitkIpFuncMeanROI
 */
 
-ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *pol_x,
-                           ipUInt4_t       *pol_y,
-                           ipUInt4_t       no_pts ) 
+mitkIpFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *pol_x,
+                           mitkIpUInt4_t       *pol_y,
+                           mitkIpUInt4_t       no_pts ) 
 {
-   ipFloat8_t      mean;            /* mean of greyvalues in ROI        */
-   ipFloat8_t      sum=0;           /* sum  of greyvalues in ROI        */
-   ipFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
+   mitkIpFloat8_t      mean;            /* mean of greyvalues in ROI        */
+   mitkIpFloat8_t      sum=0;           /* sum  of greyvalues in ROI        */
+   mitkIpFloat8_t      *a, *b;          /* Gerade y = ax+b                  */
    mitkIpPicDescriptor *pic_help;       /* contains edge of ROI             */
-   ipUInt4_t       min_x, max_x;    /* min, max x-coordinate of ROI     */
-   ipUInt4_t       min_y, max_y;    /* min, max y-coordinate of ROI     */
-   ipUInt4_t       i;               /* loop variable                    */
-   ipUInt4_t       count=0;         /* number of pixels in ROI          */
-   ipFloat8_t      diff;            /* difference between two points    */
+   mitkIpUInt4_t       min_x, max_x;    /* min, max x-coordinate of ROI     */
+   mitkIpUInt4_t       min_y, max_y;    /* min, max y-coordinate of ROI     */
+   mitkIpUInt4_t       i;               /* loop variable                    */
+   mitkIpUInt4_t       count=0;         /* number of pixels in ROI          */
+   mitkIpFloat8_t      diff;            /* difference between two points    */
 
    /* check image data                                                  */
 
@@ -195,18 +195,18 @@ ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
 
    /* allocate memory for a and b                                       */
 
-   a = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
-   b = ( ipFloat8_t * ) malloc ( no_pts * sizeof ( ipFloat8_t ) );
+   a = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
+   b = ( mitkIpFloat8_t * ) malloc ( no_pts * sizeof ( mitkIpFloat8_t ) );
   
    /* Geraden zwischen zwei benachbarten Punkten berechnen              */
   
    for ( i = 0; i < no_pts-1;  i++ )
      {
-        diff = ( ipFloat8_t ) pol_x[i+1] - ( ipFloat8_t ) pol_x[i];
+        diff = ( mitkIpFloat8_t ) pol_x[i+1] - ( mitkIpFloat8_t ) pol_x[i];
         if ( diff )
           {
-            a[i] = ( ( ipFloat8_t ) pol_y[i+1] - ( ipFloat8_t ) pol_y[i] ) / diff;
-            b[i] = ( ( ipFloat8_t ) pol_y[i] - a[i] * ( ipFloat8_t )pol_x[i] );
+            a[i] = ( ( mitkIpFloat8_t ) pol_y[i+1] - ( mitkIpFloat8_t ) pol_y[i] ) / diff;
+            b[i] = ( ( mitkIpFloat8_t ) pol_y[i] - a[i] * ( mitkIpFloat8_t )pol_x[i] );
           }
         else
           {
@@ -214,10 +214,10 @@ ipFloat8_t mitkIpFuncMeanROI ( mitkIpPicDescriptor *pic_old,
             a[i] = 0.;
            }
      }
-   diff = ( ipFloat8_t ) pol_x[no_pts-1] - ( ipFloat8_t )  pol_x[0]; 
+   diff = ( mitkIpFloat8_t ) pol_x[no_pts-1] - ( mitkIpFloat8_t )  pol_x[0]; 
    if ( diff )
      {
-        a[no_pts-1] = ( ( ipFloat8_t ) pol_y[no_pts-1] - ( ipFloat8_t ) pol_y[0] ) / diff;
+        a[no_pts-1] = ( ( mitkIpFloat8_t ) pol_y[no_pts-1] - ( mitkIpFloat8_t ) pol_y[0] ) / diff;
         b[no_pts-1] = ( pol_y[no_pts-1] - a[no_pts-1] * pol_x[no_pts-1] );
      }
    else

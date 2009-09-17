@@ -269,16 +269,16 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 #endif
 
 
-#define mitkIpPicVersionMajor(pic) (ipUInt1_t)(pic->info->version[12] - '0')
-#define mitkIpPicVersionMinor(pic) (ipUInt1_t)(10 * (pic->info->version[14]-'0' ) \
+#define mitkIpPicVersionMajor(pic) (mitkIpUInt1_t)(pic->info->version[12] - '0')
+#define mitkIpPicVersionMinor(pic) (mitkIpUInt1_t)(10 * (pic->info->version[14]-'0' ) \
                                            + pic->info->version[15]-'0')
 #define mitkIpPicEncryptionType(pic) (pic->info->version[16])
 
 /*#define mitkIpPicIsPic(pic) (( (pic)->magic == mitkIpPicPicDescriptor_m) \
-                             ? ipTrue : ipFalse )*/
+                             ? mitkIpTrue : mitkIpFalse )*/
 
 
-#define mitkIpPicDR(type,len) (ipUInt4_t)( ((type)<<16) + (len) )
+#define mitkIpPicDR(type,len) (mitkIpUInt4_t)( ((type)<<16) + (len) )
 
 #define mitkIpPicFOR_TYPE( _ipPIC_TYPE, _ipPIC_CMD, _ipPIC_PIC) \
   _ipPIC_CMD(_ipPIC_TYPE,_ipPIC_PIC)
@@ -287,28 +287,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC);                                        \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC);                                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC);                                       \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC);                                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC);                                        \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC);                                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC);                                       \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC);                                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC);                                        \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC);                                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC);                                       \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC);                                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC);                                      \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC);                                      \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC);                                      \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC);                                      \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -321,28 +321,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1);                                    \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1);                                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1);                                   \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1);                                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1);                                    \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1);                                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1);                                   \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1);                                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1);                                    \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1);                                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1);                                   \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1);                                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1);                                  \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1);                                  \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1);                                  \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1);                                  \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -355,28 +355,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1, A2);                                \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1, A2);                                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1, A2);                               \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1, A2);                               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1, A2);                                \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1, A2);                                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1, A2);                               \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1, A2);                               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1, A2);                                \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1, A2);                                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1, A2);                               \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1, A2);                               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1, A2);                              \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1, A2);                              \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1, A2);                              \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1, A2);                              \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -389,28 +389,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1, A2, A3);                            \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1, A2, A3);                            \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1, A2, A3);                           \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1, A2, A3);                           \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1, A2, A3);                            \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1, A2, A3);                            \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1, A2, A3);                           \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1, A2, A3);                           \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1, A2, A3);                            \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1, A2, A3);                            \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1, A2, A3);                           \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1, A2, A3);                           \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1, A2, A3);                          \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1, A2, A3);                          \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1, A2, A3);                          \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1, A2, A3);                          \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -423,28 +423,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1, A2, A3, A4);                        \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1, A2, A3, A4);                       \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1, A2, A3, A4);                      \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1, A2, A3, A4);                      \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1, A2, A3, A4);                      \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1, A2, A3, A4);                      \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -457,28 +457,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                    \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                   \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                  \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                  \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                  \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1, A2, A3, A4, A5);                  \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -491,28 +491,28 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
   switch( mitkIpPicDR((_ipPIC_PIC)->type, (_ipPIC_PIC)->bpe) )                       \
     {                                                                            \
       case mitkIpPicDR( mitkIpPicInt, 8 ):                                               \
-        _ipPIC_CMD(ipInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
+        _ipPIC_CMD(mitkIpInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 8 ):                                              \
-        _ipPIC_CMD(ipUInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
+        _ipPIC_CMD(mitkIpUInt1_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 16 ):                                              \
-        _ipPIC_CMD(ipInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
+        _ipPIC_CMD(mitkIpInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 16 ):                                             \
-        _ipPIC_CMD(ipUInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
+        _ipPIC_CMD(mitkIpUInt2_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicInt, 32 ):                                              \
-        _ipPIC_CMD(ipInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
+        _ipPIC_CMD(mitkIpInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);                \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicUInt, 32 ):                                             \
-        _ipPIC_CMD(ipUInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
+        _ipPIC_CMD(mitkIpUInt4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);               \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 32 ):                                            \
-        _ipPIC_CMD(ipFloat4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);              \
+        _ipPIC_CMD(mitkIpFloat4_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);              \
         break;                                                                   \
       case mitkIpPicDR( mitkIpPicFloat, 64 ):                                            \
-        _ipPIC_CMD(ipFloat8_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);              \
+        _ipPIC_CMD(mitkIpFloat8_t, _ipPIC_PIC, A1, A2, A3, A4, A5, A6);              \
         break;                                                                   \
       default:                                                                   \
         fprintf( stderr,                                                         \
@@ -547,7 +547,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 
 #define _mitkIpPicGET_PIXEL_RGB(TYPE,PIC,X,Y,R,G,B)                \
 {                                                              \
-  ipUInt4_t skip = (PIC)->n[0] * (PIC)->n[1];                  \
+  mitkIpUInt4_t skip = (PIC)->n[0] * (PIC)->n[1];                  \
   TYPE* data = (TYPE *) (PIC)->data + (X) + (Y) * (PIC)->n[0]; \
   R = *(data);                                                 \
   G = *(data + skip);                                          \
@@ -556,7 +556,7 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 
 #define _mitkIpPicPUT_PIXEL_RGB(TYPE,PIC,X,Y,R,G,B)                \
 {                                                              \
-  ipUInt4_t skip = (PIC)->n[0] * (PIC)->n[1];                  \
+  mitkIpUInt4_t skip = (PIC)->n[0] * (PIC)->n[1];                  \
   TYPE* data = (TYPE *) (PIC)->data + (X) + (Y) * (PIC)->n[0]; \
   *data = (R);                                                 \
   *(data + skip) = (G);                                        \
@@ -686,12 +686,12 @@ extern DWORD ipWinFread(LPSTR ptr, DWORD size, DWORD n, FILE *stream);
 ** maybe ipEndianSwap should be used
 */
 #ifdef _mitkIpENDIAN_IS_LITTLE
-#  define mitkIpInt2FromLE(from, to) *((ipInt2_t *)(to)) = *((ipInt2_t *)(from))
-#  define mitkIpInt4FromLE(from, to) *((ipInt4_t *)(to)) = *((ipInt4_t *)(from))
+#  define mitkIpInt2FromLE(from, to) *((mitkIpInt2_t *)(to)) = *((mitkIpInt2_t *)(from))
+#  define mitkIpInt4FromLE(from, to) *((mitkIpInt4_t *)(to)) = *((mitkIpInt4_t *)(from))
 #  define mitkIpUInt2FromLE(from, to) mitkIpInt2FromLE(from, to)
 #  define mitkIpUInt4FromLE(from, to) mitkIpInt4FromLE(from, to)
 #  define mitkIpFloat4FromLE(from, to) mitkIpInt4FromLE(from, to)
-#  define mitkIpFloat8FromLE(from, to) *((ipFloat8_t *)(to)) = *((ipFloat8_t *)(from))
+#  define mitkIpFloat8FromLE(from, to) *((mitkIpFloat8_t *)(to)) = *((mitkIpFloat8_t *)(from))
 #else
 #  define mitkIpInt2FromLE(from, to)  ((char *)(to))[0] = ((char *)(from))[1]; \
                                   ((char *)(to))[1] = ((char *)(from))[0];
@@ -758,9 +758,9 @@ typedef struct
   {
              char  tag[_mitkIpPicTAGLEN+1]; /* name of this tag                 */
       mitkIpPicType_t  type;                /* datatype of the value            */
-        ipUInt4_t  bpe;                 /* bits per element                 */
-        ipUInt4_t  dim;                 /* number of dimensions             */
-        ipUInt4_t  n[_mitkIpPicNDIM];       /* size of dimension n[i]           */
+        mitkIpUInt4_t  bpe;                 /* bits per element                 */
+        mitkIpUInt4_t  dim;                 /* number of dimensions             */
+        mitkIpUInt4_t  n[_mitkIpPicNDIM];       /* size of dimension n[i]           */
              void *value;               /* the value                        */
   } mitkIpPicTSV_t;                         /* Tag Structure Value              */
 
@@ -775,11 +775,11 @@ typedef struct
   {
              mitkIpPicTag_t  version;
     _mitkIpPicTagsElement_t *tags_head;
-               ipBool_t  write_protect;
+               mitkIpBool_t  write_protect;
                    long  pixel_start_in_file;
  struct mitkIpPicDescriptor *lender;              /* lender of image data    */
-              ipUInt4_t  borrower;            /* borrower of image data  */ 
-              ipUInt4_t  ref;                 /* reference counter       */
+              mitkIpUInt4_t  borrower;            /* borrower of image data  */ 
+              mitkIpUInt4_t  ref;                 /* reference counter       */
   } _mitkIpPicInfo_t;
 
 typedef struct mitkIpPicDescriptor
@@ -787,9 +787,9 @@ typedef struct mitkIpPicDescriptor
              void *data;          /* pointer to 'image' data          */
      _mitkIpPicInfo_t *info;          /* pointer to the PicInfo structure */
       mitkIpPicType_t  type;          /* datatype of the data             */
-        ipUInt4_t  bpe;           /* bits per element                 */
-        ipUInt4_t  dim;           /* number of dimensions             */
-        ipUInt4_t  n[_mitkIpPicNDIM]; /* size of dimension n[i]           */
+        mitkIpUInt4_t  bpe;           /* bits per element                 */
+        mitkIpUInt4_t  dim;           /* number of dimensions             */
+        mitkIpUInt4_t  n[_mitkIpPicNDIM]; /* size of dimension n[i]           */
 #ifdef WIN
            HANDLE  hdata;
 #endif
@@ -800,7 +800,7 @@ typedef struct mitkIpPicDescriptor
 extern "C" {
 #endif
 
-extern _ipEndian_t _mitkIpEndian( void );
+extern _mitkIpEndian_t _mitkIpEndian( void );
 
 extern void _mitkIpCp( void *source, void *destination, unsigned long int len );
 extern void _mitkIpCvtEndian( void *data, unsigned long int len, unsigned char bytes );
@@ -810,55 +810,55 @@ extern mitkIpPicFile_t _mitkIpPicOpenPicFileIn( const char *path );
 extern int mitkIpPicAccess( const char *path, int mode );
 extern int mitkIpPicRemoveFile( const char *path );
 
-extern ipBool_t mitkIpPicGetWriteCompression( void );
-extern ipBool_t mitkIpPicSetWriteCompression( ipBool_t compression );
+extern mitkIpBool_t mitkIpPicGetWriteCompression( void );
+extern mitkIpBool_t mitkIpPicSetWriteCompression( mitkIpBool_t compression );
 
 extern size_t mitkIpFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream );
 extern size_t _mitkIpFWrite( void *ptr, size_t size, size_t nitems, FILE *stream );
 
 #define _mitkIpPicHAS_CAN_READ_COMPRESSED
-extern ipBool_t _mitkIpPicCanReadCompressed;
+extern mitkIpBool_t _mitkIpPicCanReadCompressed;
 extern size_t mitkIpPicFReadCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream );
 
 #define _mitkIpPicHAS_CAN_WRITE_COMPRESSED
-extern ipBool_t _mitkIpPicCanWriteCompressed;
+extern mitkIpBool_t _mitkIpPicCanWriteCompressed;
 extern size_t mitkIpPicFWriteCvt( void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream );
 
 extern mitkIpPicDescriptor *mitkIpPicNew( void );
 extern void mitkIpPicClear( mitkIpPicDescriptor *pic );
 extern void mitkIpPicFree( mitkIpPicDescriptor *pic );
 
-extern ipUInt4_t _mitkIpPicSize(
+extern mitkIpUInt4_t _mitkIpPicSize(
 #if defined(__cplusplus) || defined(c_plusplus)
                              const
 #endif
                              mitkIpPicDescriptor *pic );
 
-extern ipUInt4_t _mitkIpPicElements( mitkIpPicDescriptor *pic );
+extern mitkIpUInt4_t _mitkIpPicElements( mitkIpPicDescriptor *pic );
 
-extern ipUInt4_t _mitkIpPicTSVSize( mitkIpPicTSV_t *tsv );
-extern ipUInt4_t _mitkIpPicTSVElements( mitkIpPicTSV_t *tsv );
+extern mitkIpUInt4_t _mitkIpPicTSVSize( mitkIpPicTSV_t *tsv );
+extern mitkIpUInt4_t _mitkIpPicTSVElements( mitkIpPicTSV_t *tsv );
 
 extern mitkIpPicDescriptor *mitkIpPicClone( mitkIpPicDescriptor *pic );
 
-extern mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_in, ipUInt4_t slice );
+extern mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_in, mitkIpUInt4_t slice );
 
 extern mitkIpPicDescriptor *_mitkIpPicOldGet( FILE *infile, mitkIpPicDescriptor *pic );
 extern mitkIpPicDescriptor *_mitkIpPicOldGetHeader( FILE *infile, mitkIpPicDescriptor *pic );
-extern mitkIpPicDescriptor *_mitkIpPicOldGetSlice( FILE *infile, mitkIpPicDescriptor *pic, ipUInt4_t slice );
+extern mitkIpPicDescriptor *_mitkIpPicOldGetSlice( FILE *infile, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice );
 
 
 extern mitkIpPicDescriptor *mitkIpPicCopyHeader( mitkIpPicDescriptor *pic, mitkIpPicDescriptor *pic_new );
 
 extern mitkIpPicDescriptor *mitkIpPicGet( const char *picfile_name, mitkIpPicDescriptor *pic );
 extern mitkIpPicDescriptor *mitkIpPicGetHeader( const char *picfile_name, mitkIpPicDescriptor *pic );
-extern mitkIpPicDescriptor *mitkIpPicGetSlice( const char *picfile_name, mitkIpPicDescriptor *pic, ipUInt4_t slice );
+extern mitkIpPicDescriptor *mitkIpPicGetSlice( const char *picfile_name, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice );
 
-extern _mitkIpPicTagsElement_t *_mitkIpPicReadTags( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, FILE *stream, char encryption_type );
+extern _mitkIpPicTagsElement_t *_mitkIpPicReadTags( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_read, FILE *stream, char encryption_type );
 extern _mitkIpPicTagsElement_t *_mitkIpPicInsertTag( _mitkIpPicTagsElement_t *head, mitkIpPicTSV_t *tsv );
 extern _mitkIpPicTagsElement_t *_mitkIpPicFindTag( _mitkIpPicTagsElement_t *head, const char *tag );
-extern ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head );
-extern ipUInt4_t _mitkIpPicTagsNumber( _mitkIpPicTagsElement_t *head );
+extern mitkIpUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head );
+extern mitkIpUInt4_t _mitkIpPicTagsNumber( _mitkIpPicTagsElement_t *head );
 extern void _mitkIpPicWriteTags( _mitkIpPicTagsElement_t *head, FILE *stream, char encryption_type );
 extern void _mitkIpPicFreeTags( _mitkIpPicTagsElement_t *head );
 extern mitkIpPicTSV_t *_mitkIpPicCloneTag( mitkIpPicTSV_t *source );
@@ -874,21 +874,21 @@ extern mitkIpPicTSV_t *mitkIpPicQuerySubTag( mitkIpPicTSV_t *parent, const char 
 extern void mitkIpPicFreeTag( mitkIpPicTSV_t *tsv );
 
 
-extern _mitkIpPicTagsElement_t * _mitkIpPicReadTagsMem( _mitkIpPicTagsElement_t *head, ipUInt4_t bytes_to_read, ipUInt1_t **mem_ptr, char encryption_type );
-extern mitkIpPicDescriptor *mitkIpPicGetMem( ipUInt1_t *mem_pic );
-extern void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, ipUInt1_t **mem_ptr );
-extern ipUInt1_t *mitkIpPicPutMem( mitkIpPicDescriptor *pic, int *mem_size );
+extern _mitkIpPicTagsElement_t * _mitkIpPicReadTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_read, mitkIpUInt1_t **mem_ptr, char encryption_type );
+extern mitkIpPicDescriptor *mitkIpPicGetMem( mitkIpUInt1_t *mem_pic );
+extern void _mitkIpPicWriteTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt1_t **mem_ptr );
+extern mitkIpUInt1_t *mitkIpPicPutMem( mitkIpPicDescriptor *pic, int *mem_size );
 
 
 extern int mitkIpPicPut( const char *picfile_name, mitkIpPicDescriptor *pic );
-extern void mitkIpPicPutSlice( const char *picfile_name, mitkIpPicDescriptor *pic, ipUInt4_t slice );
+extern void mitkIpPicPutSlice( const char *picfile_name, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice );
 
 #define _mitkIpPicInfoNORMAL	0
 #define _mitkIpPicInfoSHORT		(1 << 0)
-void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, ipUInt4_t flags );
-void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, ipUInt4_t level, ipUInt4_t flags );
+void _mitkIpPicInfo( FILE *stream, mitkIpPicDescriptor *pic, mitkIpUInt4_t flags );
+void _mitkIpPicInfoPrintTags( FILE *stream, _mitkIpPicTagsElement_t* head, mitkIpUInt4_t level, mitkIpUInt4_t flags );
 
-extern const char *mitkIpPicTypeName( ipUInt4_t type );
+extern const char *mitkIpPicTypeName( mitkIpUInt4_t type );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

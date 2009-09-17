@@ -37,8 +37,8 @@ static ANNdistArray dists;
 
 
 #define PROCESS_PIXEL                        \
-  histVal = *((ipUInt2_t*)history->data+testOfs);          \
-  segVal = *((ipUInt1_t*)seg->data+testOfs);            \
+  histVal = *((mitkIpUInt2_t*)history->data+testOfs);          \
+  segVal = *((mitkIpUInt1_t*)seg->data+testOfs);            \
   if ( segVal > 0 && histVal <= maxHist && testOfs!=oldOfs ) {  \
     grad = ipMITKSegmentationGetDistGradient( testOfs, seg );    \
     QUERY_DIST(testOfs)                      \
@@ -55,34 +55,34 @@ static ANNdistArray dists;
 
 float ipMITKSegmentationGetDistGradient( int ofs, mitkIpPicDescriptor *seg )
 {
-  ipUInt4_t unsignedOfs = ofs < 0 ? seg->n[0]*seg->n[1] - seg->n[0] : ofs;
+  mitkIpUInt4_t unsignedOfs = ofs < 0 ? seg->n[0]*seg->n[1] - seg->n[0] : ofs;
   if (unsignedOfs < seg->n[0] || unsignedOfs >= seg->n[0]*seg->n[1] - seg->n[0]) // exclude image borders
   {
     return 1.0; // initialization value of minGrad (high gradient)
   }
   float x = (float)(ofs % seg->n[0]) + 0.5;
         float y = (float)(ofs / seg->n[0]) + 0.5;
-  ipUInt1_t segVal = 0; // initialize to stop valgrind's warning about "Conditional jump or move depends on uninitialised value(s)"
+  mitkIpUInt1_t segVal = 0; // initialize to stop valgrind's warning about "Conditional jump or move depends on uninitialised value(s)"
 
   queryPt[0] = x+1;    queryPt[1] = y;
     annTree->annkSearch( queryPt, 1, nnIdx, dists );    
   float d1 = sqrt( dists[0] );  // right dist
-  segVal = *((ipUInt1_t*)seg->data+ofs+1);
+  segVal = *((mitkIpUInt1_t*)seg->data+ofs+1);
   if (!segVal) d1 = -10.0;
   queryPt[0] = x-1;    queryPt[1] = y;
     annTree->annkSearch( queryPt, 1, nnIdx, dists );    
   float d2 = sqrt( dists[0] );  // left dist
-  segVal = *((ipUInt1_t*)seg->data+ofs-1);
+  segVal = *((mitkIpUInt1_t*)seg->data+ofs-1);
   if (!segVal) d2 = -10.0;
   queryPt[0] = x;      queryPt[1] = y+1;
     annTree->annkSearch( queryPt, 1, nnIdx, dists );    
   float d3 = sqrt( dists[0] );  // lower dist
-  segVal = *((ipUInt1_t*)seg->data+ofs+seg->n[0]);
+  segVal = *((mitkIpUInt1_t*)seg->data+ofs+seg->n[0]);
   if (!segVal) d3 = -10.0;
   queryPt[0] = x;      queryPt[1] = y-1;
     annTree->annkSearch( queryPt, 1, nnIdx, dists );    
   float d4 = sqrt( dists[0] );  // upper dist
-  segVal = *((ipUInt1_t*)seg->data+ofs-seg->n[0]);
+  segVal = *((mitkIpUInt1_t*)seg->data+ofs-seg->n[0]);
   if (!segVal) d4 = -10.0;
   float res = 0.5*(float)sqrt( (d1-d2)*(d1-d2) + (d3-d4)*(d3-d4) );
   return res;
@@ -103,10 +103,10 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
   res.deleteCurve = 0;
 
   if (!history) return res;                  // no history!
-  if (*((ipUInt2_t*)history->data + ofs) == 0) return res;  // ofs not inside known history
+  if (*((mitkIpUInt2_t*)history->data + ofs) == 0) return res;  // ofs not inside known history
 
   // get one point on the contour:
-  ipUInt1_t *ptr = (ipUInt1_t*)seg->data + ofs;
+  mitkIpUInt1_t *ptr = (mitkIpUInt1_t*)seg->data + ofs;
     int endLine = ((ofs / seg->n[0]) + 1) * seg->n[0] -1;
   int contourOfs = ofs;
   while (contourOfs!=endLine && *ptr!=0) {
@@ -142,9 +142,9 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
   int oldOfs, testOfs, gradCand=-1;
   float grad, minGrad;
   bool skelettonReached = false;
-  ipUInt2_t histVal;
-  ipUInt1_t segVal;
-  ipUInt2_t maxHist = 10000;
+  mitkIpUInt2_t histVal;
+  mitkIpUInt1_t segVal;
+  mitkIpUInt2_t maxHist = 10000;
   if (maxHist==0 && debug) printf( "maxHist = 0!\n" );
   do {
     oldOfs = nextOfs;
@@ -160,7 +160,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
       {
         printf( "(%.f,%.f): H=%i, G=%i\n", res.traceline[2*res.numPoints], 
         res.traceline[2*res.numPoints+1], 
-        *((ipUInt2_t*)history->data+nextOfs), 
+        *((mitkIpUInt2_t*)history->data+nextOfs), 
         res.onGradient[res.numPoints] );
       }
       res.numPoints++;
@@ -179,7 +179,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
       }
     }
 
-    maxHist = *((ipUInt2_t*)history->data + nextOfs);  // don't exceed this history!
+    maxHist = *((mitkIpUInt2_t*)history->data + nextOfs);  // don't exceed this history!
     maxDist = 0;  // clear maxDist
     minGrad = 1.0;  // clear minGrad
 
@@ -255,7 +255,7 @@ tCutResult ipMITKSegmentationGetCutPoints( mitkIpPicDescriptor *seg, mitkIpPicDe
 //  int cutX = (int)(res.traceline[2*res.absMin]-0.5); 
 //  int cutY = (int)(res.traceline[2*res.absMin+1]-0.5);
 //  int cutOfs = cutX + line*cutY;
-//  histVal = *((ipUInt2_t*)history->data+cutOfs);
+//  histVal = *((mitkIpUInt2_t*)history->data+cutOfs);
 //  printf( "histVal at Cut=%i\n", histVal );
 //  if (histVal > 1) {
     res.cutIt = true;

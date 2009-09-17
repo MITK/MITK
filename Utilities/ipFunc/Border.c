@@ -84,11 +84,11 @@ mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
 
 #define BORDER( type, pic, size )                                                  \
 {                                                                                  \
-  ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      anf[_mitkIpPicNDIM];  /*                                           */ \
-  ipUInt4_t      end[_mitkIpPicNDIM];  /*                                           */ \
-  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
+  mitkIpUInt4_t      i;                /* loop index                                */ \
+  mitkIpUInt4_t      anf[_mitkIpPicNDIM];  /*                                           */ \
+  mitkIpUInt4_t      end[_mitkIpPicNDIM];  /*                                           */ \
+  mitkIpUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  mitkIpUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
                                                                                    \
                                                                                    \
   for ( i = 0; i < pic->dim; i++ )                                                 \
@@ -188,8 +188,8 @@ mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *pic_rtn )
 {
   mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipUInt4_t       i;                   /* loop index                              */
-  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
+  mitkIpUInt4_t       i;                   /* loop index                              */
+  mitkIpUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
 
   /* check whEther data are correct                                               */
 

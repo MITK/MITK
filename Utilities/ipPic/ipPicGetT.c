@@ -101,12 +101,12 @@ mitkIpPicGetTags( const char *infile_name, mitkIpPicDescriptor *pic )
   mitkIpPicFile_t infile;
 
   mitkIpPicTag_t tag_name;
-  ipUInt4_t dummy;
-  ipUInt4_t len;
-  ipUInt4_t dim;
-  ipUInt4_t n[_mitkIpPicNDIM];
+  mitkIpUInt4_t dummy;
+  mitkIpUInt4_t len;
+  mitkIpUInt4_t dim;
+  mitkIpUInt4_t n[_mitkIpPicNDIM];
 
-  ipUInt4_t to_read;
+  mitkIpUInt4_t to_read;
 
   infile = _mitkIpPicOpenPicFileIn( infile_name );
 
@@ -117,7 +117,7 @@ mitkIpPicGetTags( const char *infile_name, mitkIpPicDescriptor *pic )
     }
 
   if( pic != NULL )
-    pic->info->write_protect = ipFalse;
+    pic->info->write_protect = mitkIpFalse;
 
   /* read infile */
   mitkIpPicFRead( &(tag_name[0]), 1, 4, infile );
@@ -135,17 +135,17 @@ mitkIpPicGetTags( const char *infile_name, mitkIpPicDescriptor *pic )
   mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   /*strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );*/
 
-  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &dummy, sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &dim, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dummy, sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &dim, sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( n, sizeof(ipUInt4_t), dim, infile );
+  mitkIpPicFReadLE( n, sizeof(mitkIpUInt4_t), dim, infile );
 
 
-  to_read = len -        3 * sizeof(ipUInt4_t)
-                -      dim * sizeof(ipUInt4_t);
+  to_read = len -        3 * sizeof(mitkIpUInt4_t)
+                -      dim * sizeof(mitkIpUInt4_t);
 
   pic->info->tags_head = _mitkIpPicReadTags( pic->info->tags_head, to_read, infile, mitkIpPicEncryptionType(pic) );
 

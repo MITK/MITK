@@ -72,28 +72,28 @@
 #include "mitkIpFuncP.h"   
  
 mitkIpPicDescriptor *mitkIpFuncShp ( mitkIpPicDescriptor *pic_old,           
-                             ipUInt4_t       dim_mask, 
+                             mitkIpUInt4_t       dim_mask, 
                              mitkIpFuncFlagI_t   border,
-                             ipUInt4_t       mask_nr ) ;
+                             mitkIpUInt4_t       mask_nr ) ;
 #ifndef DOXYGEN_IGNORE
 
 mitkIpPicDescriptor *mitkIpFuncShp ( mitkIpPicDescriptor *pic_old,           
-                             ipUInt4_t       dim_mask, 
+                             mitkIpUInt4_t       dim_mask, 
                              mitkIpFuncFlagI_t   border,
-                             ipUInt4_t       mask_nr ) 
+                             mitkIpUInt4_t       mask_nr ) 
 {
 
   mitkIpPicDescriptor *pic_new;           /* convolved  image               */
   mitkIpPicDescriptor *pic_mask;          /* high pass mask                 */
-  ipUInt4_t       i;                  /* loop index                     */
-  ipInt2_t        mask2[] =           /* 2D masks                       */
+  mitkIpUInt4_t       i;                  /* loop index                     */
+  mitkIpInt2_t        mask2[] =           /* 2D masks                       */
                   {  0, -1,  0, -1,  5, -1,  0, -1,  0,    /* mask 0    */
 
                      1, -2,  1, -2,  5, -2,  1, -2,  1,    /* mask 1    */
 
                     -1, -1, -1, -1,  9, -1, -1, -1, -1 };  /* mask 2    */
 
-  ipInt2_t        mask3[] =           /* 3D masks                       */
+  mitkIpInt2_t        mask3[] =           /* 3D masks                       */
                   {  0,  0,  0,  0, -1,  0,  0,  0,  0,    /* mask 0    */
                      0, -1,  0, -1,  7, -1,  0, -1,  0, 
                      0,  0,  0,  0, -1,  0,  0,  0,  0,  

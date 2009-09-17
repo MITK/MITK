@@ -64,7 +64,7 @@
 
 # include "mitkIpFuncP.h"
 
-ipUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic );
+mitkIpUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic );
 
 
 #ifndef DOXYGEN_IGNORE
@@ -79,9 +79,9 @@ ipUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic );
 */
 /*-------------------------------------------------------------------*/
 
-ipUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic )
+mitkIpUInt4_t _mitkIpFuncError ( mitkIpPicDescriptor *pic )
 {
-  ipUInt4_t   i;                      /* loop index                  */
+  mitkIpUInt4_t   i;                      /* loop index                  */
 
   /* is image existing ?                                             */
 

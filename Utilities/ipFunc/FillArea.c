@@ -74,8 +74,8 @@
 
 #define RECT( type, pic, beg, end, value )                               \
 {                                                                        \
-  ipUInt4_t  i, j, n;                                                    \
-  ipUInt4_t  offset;                                                     \
+  mitkIpUInt4_t  i, j, n;                                                    \
+  mitkIpUInt4_t  offset;                                                     \
                                                                          \
   n = pic->n[0];                                                         \
   for ( j = beg[1]; j < end[1]; j++ )                                    \
@@ -87,9 +87,9 @@
 } 
 #define TRI( type, pic, beg, end, value, a, b, OP )                      \
 {                                                                        \
-  ipUInt4_t  i, j, n;                                                    \
-  ipUInt4_t  offset;                                                     \
-  ipFloat8_t help;                                                       \
+  mitkIpUInt4_t  i, j, n;                                                    \
+  mitkIpUInt4_t  offset;                                                     \
+  mitkIpFloat8_t help;                                                       \
                                                                          \
   n = pic->n[0];                                                         \
   for ( j = beg[1]; j < end[1]; j++ )                                    \
@@ -115,15 +115,15 @@
 
 mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
                                   mitkIpFuncBox_t     box,
-                                  ipFloat8_t      value, 
+                                  mitkIpFloat8_t      value, 
                                   mitkIpFuncFlagI_t   over,
                                   mitkIpPicDescriptor *pic_return )
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
-  ipFloat8_t      a, b;      /* parameter der Gerade y = ax + b         */
-  ipUInt4_t       beg[2];    /* Anfangswerte                            */
-  ipUInt4_t       end[2];    /* Endwerte                                */
+  mitkIpFloat8_t      a, b;      /* parameter der Gerade y = ax + b         */
+  mitkIpUInt4_t       beg[2];    /* Anfangswerte                            */
+  mitkIpUInt4_t       end[2];    /* Endwerte                                */
 
 
   /* check data                                                         */
@@ -141,10 +141,10 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
 
   /* Gerade durch die beiden Punkte                                     */
   
-  a = ( ( ipFloat8_t ) box.y1 - ( ipFloat8_t ) box.y0 ) / 
-      ( ( ipFloat8_t ) box.x1 - ( ipFloat8_t ) box.x0 );
+  a = ( ( mitkIpFloat8_t ) box.y1 - ( mitkIpFloat8_t ) box.y0 ) / 
+      ( ( mitkIpFloat8_t ) box.x1 - ( mitkIpFloat8_t ) box.x0 );
 
-  b = ( ipFloat8_t ) box.y0 - a *  box.x0;
+  b = ( mitkIpFloat8_t ) box.y0 - a *  box.x0;
 
   /* check which region (above/beneath) has to be changed               */
 

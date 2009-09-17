@@ -87,10 +87,10 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 #define EQUAL( type, pic, pic_new, kind, factor, hist, help, size_hist ) \
 {                                                                        \
   type       *hist_cp;                                                   \
-  ipUInt4_t  i, no_elem;                                                 \
-  ipUInt4_t  index;                                                      \
-  ipFloat8_t a, b;                                                       \
-  ipFloat8_t min, max;   /* intervall for transformation           */    \
+  mitkIpUInt4_t  i, no_elem;                                                 \
+  mitkIpUInt4_t  index;                                                      \
+  mitkIpFloat8_t a, b;                                                       \
+  mitkIpFloat8_t min, max;   /* intervall for transformation           */    \
                                                                          \
   /* allocate memory for the transformed histogram                 */    \
                                                                          \
@@ -130,17 +130,17 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
                                                                          \
   /* transformation of histogram                                    */   \
                                                                          \
-  a = ( ipFloat8_t ) _mitkIpPicElements ( pic ) / ( max - min );             \
+  a = ( mitkIpFloat8_t ) _mitkIpPicElements ( pic ) / ( max - min );             \
   b = - a * min;                                                         \
   for ( i = 0; i <= size_hist; i++ )                                     \
-     hist_cp[i] =  ( type ) ( ( ( ipFloat8_t )hist[i] - b ) / a );       \
+     hist_cp[i] =  ( type ) ( ( ( mitkIpFloat8_t )hist[i] - b ) / a );       \
                                                                          \
   /* transform greyvalues                                           */   \
                                                                          \
   no_elem = _mitkIpPicElements ( pic );                                      \
   for ( i = 0; i < no_elem; i++ )                                        \
     {                                                                    \
-       index = ( ipUInt4_t )                                             \
+       index = ( mitkIpUInt4_t )                                             \
                ( factor * ((( type * ) pic->data )[i] + ( type )help ) );\
        ( ( type * ) pic_new->data )[i] = ( type ) hist_cp[index];        \
     }                                                                    \
@@ -160,12 +160,12 @@ mitkIpPicDescriptor *mitkIpFuncEqual ( mitkIpPicDescriptor *pic_old,
 {
 
   mitkIpPicDescriptor *pic_new;  /* inverted picture                        */
-  ipFloat8_t      max_gv;    /* max. possible greyvalue                 */
-  ipFloat8_t      min_gv;    /* min. possible greyvalue                 */
-  ipUInt4_t       *hist;     /* greylevel histogram                     */
-  ipUInt4_t       size_hist; /* no. of elements in histogram            */
-  ipFloat4_t      factor;  
-  ipFloat8_t      help;
+  mitkIpFloat8_t      max_gv;    /* max. possible greyvalue                 */
+  mitkIpFloat8_t      min_gv;    /* min. possible greyvalue                 */
+  mitkIpUInt4_t       *hist;     /* greylevel histogram                     */
+  mitkIpUInt4_t       size_hist; /* no. of elements in histogram            */
+  mitkIpFloat4_t      factor;  
+  mitkIpFloat8_t      help;
 
   /* check data                                                         */
   

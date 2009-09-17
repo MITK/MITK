@@ -69,9 +69,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
-                          ipUInt4_t       *center,
-                          ipUInt4_t       radius );
+mitkIpFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
+                          mitkIpUInt4_t       *center,
+                          mitkIpUInt4_t       radius );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -87,12 +87,12 @@ ipFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
 /*
 ** mitkIpFuncSDevC
 */
-ipFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
-                          ipUInt4_t       *center,
-                          ipUInt4_t       radius )
+mitkIpFloat8_t mitkIpFuncSDevC  ( mitkIpPicDescriptor *pic_old,
+                          mitkIpUInt4_t       *center,
+                          mitkIpUInt4_t       radius )
 {
-   ipFloat8_t   s_dev;
-   ipFloat8_t   var;
+   mitkIpFloat8_t   s_dev;
+   mitkIpFloat8_t   var;
 
    var = mitkIpFuncVarC ( pic_old, center, radius );
 

@@ -66,10 +66,10 @@
 
 #include "mitkIpFuncP.h"   
 
-ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
-                      ipUInt4_t   bpe,
-                      ipFloat8_t  *min_gv,
-                      ipFloat8_t  *max_gv );
+mitkIpInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
+                      mitkIpUInt4_t   bpe,
+                      mitkIpFloat8_t  *min_gv,
+                      mitkIpFloat8_t  *max_gv );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -88,7 +88,7 @@ ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
 
 #define EXP( max_gv, bpe )                                               \
 {                                                                        \
-  ipUInt4_t i;                                                           \
+  mitkIpUInt4_t i;                                                           \
                                                                          \
   *max_gv = 1;                                                           \
   for ( i = 1; i <= bpe; i++ )                                           \
@@ -102,10 +102,10 @@ ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
 */
 /* -------------------------------------------------------------------  */
 
-ipInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
-                      ipUInt4_t   bpe,
-                      ipFloat8_t  *min_gv,
-                      ipFloat8_t  *max_gv )
+mitkIpInt4_t _mitkIpFuncExtT ( mitkIpPicType_t type,
+                      mitkIpUInt4_t   bpe,
+                      mitkIpFloat8_t  *min_gv,
+                      mitkIpFloat8_t  *max_gv )
 {
 
   /* calculate max. or min possible greyvalue for datatype              */

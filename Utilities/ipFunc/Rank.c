@@ -74,9 +74,9 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
-                              ipUInt4_t       rank,
-                              ipUInt4_t       mask_dim,
-                              ipUInt4_t       mask_size,
+                              mitkIpUInt4_t       rank,
+                              mitkIpUInt4_t       mask_dim,
+                              mitkIpUInt4_t       mask_size,
                               mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
@@ -90,29 +90,29 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
 
 /* definition of macros                                                           */
 
-#define INDEX0( typ, pic ) ( ipUInt4_t ) ( factor * (( typ * ) pic->data )         \
+#define INDEX0( typ, pic ) ( mitkIpUInt4_t ) ( factor * (( typ * ) pic->data )         \
                                   [off_vekt[i] + off[0]] + help )        
-#define INDEX2( typ, pic ) ( ipUInt4_t ) ( factor * (( typ * ) pic->data )         \
+#define INDEX2( typ, pic ) ( mitkIpUInt4_t ) ( factor * (( typ * ) pic->data )         \
                                   [off_vekt[i] + off[0]] + help )      
-#define INDEX3( typ, pic ) ( ipUInt4_t ) ( factor * (( typ * ) pic->data )         \
+#define INDEX3( typ, pic ) ( mitkIpUInt4_t ) ( factor * (( typ * ) pic->data )         \
                                   [off[0] - off_vekt[i]] + help )        
 #define RANK( typ, pic, begin, no_elem, size, rank )                               \
 {                                                                                  \
-  ipUInt4_t      n[_mitkIpPicNDIM];    /* size of each dimension                    */ \
-  ipUInt4_t      i;                /* loop index                                */ \
-  ipUInt4_t      *hist;            /* greyvalue histogram                       */ \
-  ipUInt4_t      sum;              /* used to calculate rank                    */ \
-  ipUInt4_t      end;              /* number of elements that change            */ \
-  ipUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
-  ipUInt4_t      beg;              /* beginning of the loops                    */ \
-  ipUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
-  ipFloat8_t     min_gv, max_gv;   /* min./max. possible greyvalues             */ \
-  ipFloat8_t     help, factor;                                                     \
-  ipUInt4_t      hist_size;                                                        \
+  mitkIpUInt4_t      n[_mitkIpPicNDIM];    /* size of each dimension                    */ \
+  mitkIpUInt4_t      i;                /* loop index                                */ \
+  mitkIpUInt4_t      *hist;            /* greyvalue histogram                       */ \
+  mitkIpUInt4_t      sum;              /* used to calculate rank                    */ \
+  mitkIpUInt4_t      end;              /* number of elements that change            */ \
+  mitkIpUInt4_t      ind[_mitkIpPicNDIM];  /* loop index vector                         */ \
+  mitkIpUInt4_t      beg;              /* beginning of the loops                    */ \
+  mitkIpUInt4_t      off[_mitkIpPicNDIM];  /* used to calculate offset of image pixels  */ \
+  mitkIpFloat8_t     min_gv, max_gv;   /* min./max. possible greyvalues             */ \
+  mitkIpFloat8_t     help, factor;                                                     \
+  mitkIpUInt4_t      hist_size;                                                        \
                                                                                    \
   /* initialize vectors                                                         */ \
                                                                                    \
-  beg    = ( ipUInt4_t ) begin;                                                    \
+  beg    = ( mitkIpUInt4_t ) begin;                                                    \
   for ( i = 0; i < _mitkIpPicNDIM; i++ ) off[i] = 0;                                   \
   for ( i = 0; i < pic->dim; i++ ) n[i] = pic->n[i] - beg;                         \
   for ( i = pic->dim; i < _mitkIpPicNDIM; i++ )                                        \
@@ -136,9 +136,9 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
   end    = no_elem / mask_size;                                                    \
   factor = ( pic->type == mitkIpPicFloat ) ? 1000. : 1.;                               \
   help   = fabs ( min_gv );                                                        \
-  hist_size = ( ipUInt4_t ) ( factor * ( fabs ( max_gv ) + help ) );               \
+  hist_size = ( mitkIpUInt4_t ) ( factor * ( fabs ( max_gv ) + help ) );               \
   help   = help * factor;                                                          \
-/*hist   = calloc ( hist_size+1, sizeof ( ipUInt4_t ) );                           \
+/*hist   = calloc ( hist_size+1, sizeof ( mitkIpUInt4_t ) );                           \
   if ( hist == NULL )                                                              \
     {                                                                              \
        free ( off_vekt );                                                          \
@@ -175,11 +175,11 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
                 off[1] = size[1] * ind[1] + off[2];                                \
                 off[0] = off[1] + beg;                                             \
               /*memset ( hist, 0, hist_size );*/                                   \
-  hist   = calloc ( hist_size+1, sizeof ( ipUInt4_t ) );                           \
+  hist   = calloc ( hist_size+1, sizeof ( mitkIpUInt4_t ) );                           \
                 for ( i = 0; i < no_elem; i++ ) hist[INDEX0 ( typ, pic )]++;       \
                 for ( i = 0, sum = 0; sum < rank; i++ ) sum = sum + hist[i];       \
                 (( typ * ) pic_new->data )[off[0]] = ( typ )                       \
-                                       ( ( ( ipFloat8_t ) i - help ) / factor );   \
+                                       ( ( ( mitkIpFloat8_t ) i - help ) / factor );   \
                 for ( ind[0] =  beg+1; ind[0] < n[0]; ind[0]++ )                   \
                 {                                                                  \
                   /* change histogram for each column                           */ \
@@ -189,7 +189,7 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
                   for ( i = 0; i < end; i++ ) hist[INDEX3 ( typ, pic )]++;         \
                   for ( i = 0, sum = 0; sum < rank; i++ ) sum = sum + hist[i];     \
                   (( typ * ) pic_new->data )[off[0]] = ( typ )                     \
-                                       ( ( ( ipFloat8_t ) i - help -1.) / factor );\
+                                       ( ( ( mitkIpFloat8_t ) i - help -1.) / factor );\
                 }                                                                  \
                 free ( hist );\
               }                                                                    \
@@ -210,22 +210,22 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
 /* ------------------------------------------------------------------------------ */
  
 mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
-                              ipUInt4_t       rank,
-                              ipUInt4_t       mask_dim,
-                              ipUInt4_t       mask_size,
+                              mitkIpUInt4_t       rank,
+                              mitkIpUInt4_t       mask_dim,
+                              mitkIpUInt4_t       mask_size,
                               mitkIpFuncFlagI_t   border )
 {
   
   mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
-  ipInt4_t       i;                    /* loop index                              */
-  ipInt4_t       offset;               /* offset of image                         */
-  ipInt4_t       ind[_mitkIpPicNDIM];      /* loop index vector                       */
-  ipInt4_t       *off_vekt;            /* pointer to offset vector                */
-  ipInt4_t       begin;                /* 0.5 * mask_size                         */
-  ipUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
-  ipInt4_t       n[_mitkIpPicNDIM];        /* size of each dimension                  */
-  ipUInt4_t      no_elem;              /* number of elements in mask              */
-  ipUInt4_t      len;                  /* length of offset vector                 */
+  mitkIpInt4_t       i;                    /* loop index                              */
+  mitkIpInt4_t       offset;               /* offset of image                         */
+  mitkIpInt4_t       ind[_mitkIpPicNDIM];      /* loop index vector                       */
+  mitkIpInt4_t       *off_vekt;            /* pointer to offset vector                */
+  mitkIpInt4_t       begin;                /* 0.5 * mask_size                         */
+  mitkIpUInt4_t      size[_mitkIpPicNDIM];     /*                                         */
+  mitkIpInt4_t       n[_mitkIpPicNDIM];        /* size of each dimension                  */
+  mitkIpUInt4_t      no_elem;              /* number of elements in mask              */
+  mitkIpUInt4_t      len;                  /* length of offset vector                 */
 
   /* calculate number of elements in mask                                         */
 
@@ -289,7 +289,7 @@ mitkIpPicDescriptor *mitkIpFuncRank ( mitkIpPicDescriptor *pic_old,
 
   /* allocate offset vector                                                       */
 
-  off_vekt = malloc ( no_elem * sizeof ( ipUInt4_t ) );
+  off_vekt = malloc ( no_elem * sizeof ( mitkIpUInt4_t ) );
   if ( off_vekt == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );

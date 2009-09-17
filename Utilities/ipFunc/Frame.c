@@ -85,8 +85,8 @@
 
 #include "mitkIpFuncP.h"
 mitkIpPicDescriptor *mitkIpFuncFrame ( mitkIpPicDescriptor *pic_old,
-                               ipUInt4_t       *edge,
-                               ipFloat8_t      value );
+                               mitkIpUInt4_t       *edge,
+                               mitkIpFloat8_t      value );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
@@ -103,8 +103,8 @@ mitkIpPicDescriptor *mitkIpFuncFrame ( mitkIpPicDescriptor *pic_old,
 /* ------------------------------------------------------------------------------ */
 
 mitkIpPicDescriptor *mitkIpFuncFrame ( mitkIpPicDescriptor *pic_old,
-                               ipUInt4_t       *edge,
-                               ipFloat8_t      value )
+                               mitkIpUInt4_t       *edge,
+                               mitkIpFloat8_t      value )
 {
   mitkIpPicDescriptor *pic_new;            /* pointer to transformed image            */
 

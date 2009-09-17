@@ -218,7 +218,7 @@ void main( int argc, char *argv[] )
 			fprintf( stderr, "sorry, can't open %s\n", infile_names[i] );
 			exit( -1 );
 		}
-		pic->info->write_protect = ipFalse;
+		pic->info->write_protect = mitkIpFalse;
 		pic->info->tags_head = _mitkIpPicCloneTags(header->info->tags_head );
 		if((i==0) && (!append))
 		{

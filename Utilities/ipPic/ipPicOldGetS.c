@@ -95,7 +95,7 @@
 #include "mitkIpPicOldP.h"
 #endif
 
-mitkIpPicDescriptor * _mitkIpPicOldGetSlice( FILE *infile, mitkIpPicDescriptor *pic, ipUInt4_t slice )
+mitkIpPicDescriptor * _mitkIpPicOldGetSlice( FILE *infile, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice )
 {
   _mitkIpPicOldHeader old_pic;
 
@@ -105,18 +105,18 @@ mitkIpPicDescriptor * _mitkIpPicOldGetSlice( FILE *infile, mitkIpPicDescriptor *
   unsigned long int elements;
 
   /* read infile */
-  size_t ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(ipUInt4_t), 4, infile );
+  size_t ignored = mitkIpFReadLE( &(old_pic.dummy1), sizeof(mitkIpUInt4_t), 4, infile );
   if( old_pic.conv <= 0 || old_pic.conv > 6 )
     {
       old_pic.conv = 3;
       old_pic.rank = 2;
     }
 
-  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(ipUInt4_t), old_pic.rank, infile );
+  ignored = mitkIpFReadLE( &(old_pic.n1), sizeof(mitkIpUInt4_t), old_pic.rank, infile );
   if( old_pic.rank == 3 && old_pic.n3 == 1 )
     old_pic.rank = 2;
 
-  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(ipUInt4_t), 3, infile );
+  ignored = mitkIpFReadLE( &(old_pic.type), sizeof(mitkIpUInt4_t), 3, infile );
   if( old_pic.ntxt )
     {
       /*text = (unsigned char *)malloc( old_pic.ltxt );

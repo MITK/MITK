@@ -196,17 +196,17 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
         switch ( pic->bpe )
         {
         case 8: {
-            ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
+            mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
             current += y*pic->n[0] + x;
             if(current[0]) set=true;
             break; }
         case 16: {
-            ipInt2_t *current = static_cast< ipInt2_t *>( pic->data );
+            mitkIpInt2_t *current = static_cast< mitkIpInt2_t *>( pic->data );
             current += y*pic->n[0] + x;
             if(current[0]) set=true;
             break; }
         case 24: {
-            ipInt1_t *current = static_cast< ipInt1_t *>( pic->data );
+            mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
             current += ( y*pic->n[0] + x )*3;
             if(current[0]||current[1]||current[2]) set=true;
             break; }

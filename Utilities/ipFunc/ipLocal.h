@@ -68,46 +68,46 @@ mitkIpPicDescriptor *mitkIpFuncConv   ( mitkIpPicDescriptor *pic_old,
                                 mitkIpFuncFlagI_t    border );
 
 mitkIpPicDescriptor *mitkIpFuncGausF  ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       len_mask,
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       len_mask,
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncCanny  ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
-                                ipUInt4_t       len_mask,
-                                ipFloat8_t      threshold,
+                                mitkIpUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       len_mask,
+                                mitkIpFloat8_t      threshold,
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncRank   ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       rank,
-                                ipUInt4_t       dim_mask, 
-                                ipUInt4_t       len_mask,
+                                mitkIpUInt4_t       rank,
+                                mitkIpUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       len_mask,
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncMeanF  ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       len_mask,
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       len_mask,
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncShp    ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border,
-                                ipUInt4_t       mask_nr );
+                                mitkIpUInt4_t       mask_nr );
 
 mitkIpPicDescriptor *mitkIpFuncLaplace( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncSobel  ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncGrad   ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 mitkIpPicDescriptor *mitkIpFuncRoberts( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       dim_mask, 
+                                mitkIpUInt4_t       dim_mask, 
                                 mitkIpFuncFlagI_t   border );
 
 #if defined(__cplusplus) || defined(c_plusplus)

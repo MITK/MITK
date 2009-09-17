@@ -118,8 +118,8 @@ mitkIpPicPut( const char *outfile_name, mitkIpPicDescriptor *pic )
 {
   FILE *outfile;
 
-  ipUInt4_t len;
-  ipUInt4_t tags_len;
+  mitkIpUInt4_t len;
+  mitkIpUInt4_t tags_len;
 
   if( pic->info->write_protect )
     {
@@ -160,8 +160,8 @@ mitkIpPicPut( const char *outfile_name, mitkIpPicDescriptor *pic )
 
   tags_len = _mitkIpPicTagsSize( pic->info->tags_head );
 
-  len = tags_len +        3 * sizeof(ipUInt4_t)
-                 + pic->dim * sizeof(ipUInt4_t);
+  len = tags_len +        3 * sizeof(mitkIpUInt4_t)
+                 + pic->dim * sizeof(mitkIpUInt4_t);
 
   /* write oufile */
   if( mitkIpPicEncryptionType(pic) == ' ' )
@@ -169,13 +169,13 @@ mitkIpPicPut( const char *outfile_name, mitkIpPicDescriptor *pic )
   else
     mitkIpPicFWrite( pic->info->version, 1, sizeof(mitkIpPicTag_t), outfile );
 
-  mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &len, sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpPicFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpPicFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpPicFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpPicFWriteLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpPicFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  mitkIpPicFWriteLE( pic->n, sizeof(mitkIpUInt4_t), pic->dim, outfile );
 
   _mitkIpPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
 
@@ -203,15 +203,15 @@ mitkIpPicPut( const char *outfile_name, mitkIpPicDescriptor *pic )
   return( 0 );
 }
 
-ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
+mitkIpUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
 {
   _mitkIpPicTagsElement_t *current = head;
-  ipUInt4_t tags_len;
+  mitkIpUInt4_t tags_len;
 
   tags_len = 0;
   while( current != NULL )
     {
-      ipUInt4_t  len;
+      mitkIpUInt4_t  len;
 
       if( current->tsv->type == mitkIpPicTSV )
         {
@@ -227,7 +227,7 @@ ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
         }
       else
         {
-          ipUInt4_t  elements;
+          mitkIpUInt4_t  elements;
 
           elements = _mitkIpPicTSVElements( current->tsv );
 
@@ -239,9 +239,9 @@ ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
         }
 
       tags_len += 32                                       /* name           */
-                  +                     sizeof( ipUInt4_t) /* len            */
-                  +                 3 * sizeof( ipUInt4_t) /* type, bpe, dim */
-                  + current->tsv->dim * sizeof( ipUInt4_t) /* n[]            */
+                  +                     sizeof( mitkIpUInt4_t) /* len            */
+                  +                 3 * sizeof( mitkIpUInt4_t) /* type, bpe, dim */
+                  + current->tsv->dim * sizeof( mitkIpUInt4_t) /* n[]            */
                   + len;                                   /* data           */
 
       current = current->next;
@@ -249,10 +249,10 @@ ipUInt4_t _mitkIpPicTagsSize( _mitkIpPicTagsElement_t *head )
   return( tags_len );
 }
 
-ipUInt4_t _mitkIpPicTagsNumber( _mitkIpPicTagsElement_t *head )
+mitkIpUInt4_t _mitkIpPicTagsNumber( _mitkIpPicTagsElement_t *head )
 {
   _mitkIpPicTagsElement_t *current = head;
-  ipUInt4_t tags_number;
+  mitkIpUInt4_t tags_number;
 
   tags_number = 0;
   while( current != NULL )
@@ -270,8 +270,8 @@ void _mitkIpPicWriteTags( _mitkIpPicTagsElement_t *head, FILE *stream, char encr
 
   while( current != NULL )
     {
-      ipUInt4_t  elements;
-      ipUInt4_t  len;
+      mitkIpUInt4_t  elements;
+      mitkIpUInt4_t  len;
 
       elements = _mitkIpPicTSVElements( current->tsv );
 
@@ -299,17 +299,17 @@ void _mitkIpPicWriteTags( _mitkIpPicTagsElement_t *head, FILE *stream, char encr
 
          }
 
-      len +=                   3 * sizeof(ipUInt4_t)  /* type, bpe, dim */
-             + current->tsv->dim * sizeof(ipUInt4_t); /* n[]            */
+      len +=                   3 * sizeof(mitkIpUInt4_t)  /* type, bpe, dim */
+             + current->tsv->dim * sizeof(mitkIpUInt4_t); /* n[]            */
 
       mitkIpPicFWrite( current->tsv->tag, 1, sizeof(mitkIpPicTag_t), stream );
 
-      mitkIpPicFWriteLE( &len, sizeof(ipUInt4_t), 1, stream );
+      mitkIpPicFWriteLE( &len, sizeof(mitkIpUInt4_t), 1, stream );
 
-      mitkIpPicFWriteLE( &(current->tsv->type), sizeof(ipUInt4_t), 1, stream );
-      mitkIpPicFWriteLE( &(current->tsv->bpe), sizeof(ipUInt4_t), 1, stream );
-      mitkIpPicFWriteLE( &(current->tsv->dim), sizeof(ipUInt4_t), 1, stream );
-      mitkIpPicFWriteLE( &(current->tsv->n), sizeof(ipUInt4_t), current->tsv->dim, stream );
+      mitkIpPicFWriteLE( &(current->tsv->type), sizeof(mitkIpUInt4_t), 1, stream );
+      mitkIpPicFWriteLE( &(current->tsv->bpe), sizeof(mitkIpUInt4_t), 1, stream );
+      mitkIpPicFWriteLE( &(current->tsv->dim), sizeof(mitkIpUInt4_t), 1, stream );
+      mitkIpPicFWriteLE( &(current->tsv->n), sizeof(mitkIpUInt4_t), current->tsv->dim, stream );
 
       if( current->tsv->type == mitkIpPicTSV )
         {

@@ -33,7 +33,7 @@ IEEE Computer Graphics & Applications, pp. 69-79,May 1992
 
 extern float truncf (float x);
 static mitkIpPicDescriptor* setup (mitkIpPicDescriptor* pic_old);
-static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* mask_dist, const ipInt2_t* mask_offset, const ipUInt4_t mask_elements);
+static mitkIpInt2_t distance (const mitkIpInt2_t* const old_distance, const mitkIpInt2_t* mask_dist, const mitkIpInt2_t* mask_offset, const mitkIpUInt4_t mask_elements);
 
 // DON'T ever touch this code again - rather rewrite it! Then use ITK or some other library!
 
@@ -135,22 +135,22 @@ ipMITKSegmentationShrinkBy1Pixel (mitkIpPicDescriptor* pic_in )
 }
 
 mitkIpPicDescriptor*
-ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pPic1, mitkIpPicDescriptor* pPic2, const ipFloat4_t ratio)
+ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pPic1, mitkIpPicDescriptor* pPic2, const mitkIpFloat4_t ratio)
 {
     mitkIpPicDescriptor *pic_out, *pic[2];         /* pointer to image data */
-    ipUInt4_t frame [_mitkIpPicNDIM];              /* pointer for definition of frame-size */
-    ipInt4_t x, y;
-    ipUInt4_t i;                               /* loop counters */
-    ipFloat4_t weight[] = {1.0f-ratio, ratio}; /* weights of the interpolants */ 
-    ipInt2_t mask_width = 1;                   /* mask width from center to border       */
-    ipInt2_t mask_x[] = {0, -1, +1,  0, -1};   /* relativ position in x-axis of mask */
-    ipInt2_t mask_y[] = {0,  0, -1, -1, -1};   /* relativ position in y-axis of mask */
-    ipInt2_t mask_dist[] = {0, 10, 14, 10, 14};/* distance to central element */
-    ipInt2_t mask_offset [5];                  /* relative start position in given image */
-    ipUInt4_t mask_elements = 5;               /* elements in distance mask */
-    ipInt2_t first_x, first_y;                 /* first pixel for distance calculation in enlarged image version */
-    ipInt2_t last_x, last_y;                   /* last pixel for distance calculation in enlarged image version */
-    ipInt2_t *pixel[2];                        /* pointer to the current pixels */
+    mitkIpUInt4_t frame [_mitkIpPicNDIM];              /* pointer for definition of frame-size */
+    mitkIpInt4_t x, y;
+    mitkIpUInt4_t i;                               /* loop counters */
+    mitkIpFloat4_t weight[] = {1.0f-ratio, ratio}; /* weights of the interpolants */ 
+    mitkIpInt2_t mask_width = 1;                   /* mask width from center to border       */
+    mitkIpInt2_t mask_x[] = {0, -1, +1,  0, -1};   /* relativ position in x-axis of mask */
+    mitkIpInt2_t mask_y[] = {0,  0, -1, -1, -1};   /* relativ position in y-axis of mask */
+    mitkIpInt2_t mask_dist[] = {0, 10, 14, 10, 14};/* distance to central element */
+    mitkIpInt2_t mask_offset [5];                  /* relative start position in given image */
+    mitkIpUInt4_t mask_elements = 5;               /* elements in distance mask */
+    mitkIpInt2_t first_x, first_y;                 /* first pixel for distance calculation in enlarged image version */
+    mitkIpInt2_t last_x, last_y;                   /* last pixel for distance calculation in enlarged image version */
+    mitkIpInt2_t *pixel[2];                        /* pointer to the current pixels */
     ipMITKSegmentationTYPE* pixel_out;
 	mitkIpPicDescriptor* returnImage;
 
@@ -182,8 +182,8 @@ ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pPic1, mitkIpPicDescriptor* 
     last_y = pic[0]->n[1] - mask_width-1;
     /* top-left to bottom-right, borders are neglected */
     for (y = first_y; y <= last_y; y++) {
-        pixel [0] = (ipInt2_t *) pic [0]->data + (first_x + y * pic [0]->n [0]); 
-        pixel [1] = (ipInt2_t *) pic [1]->data + (first_x + y * pic [1]->n [0]); 
+        pixel [0] = (mitkIpInt2_t *) pic [0]->data + (first_x + y * pic [0]->n [0]); 
+        pixel [1] = (mitkIpInt2_t *) pic [1]->data + (first_x + y * pic [1]->n [0]); 
         for (x = first_x; x <= last_x; x++) {
       *(pixel [0])++ = distance (pixel [0], mask_dist, mask_offset, mask_elements);
       *(pixel [1])++ = distance (pixel [1], mask_dist, mask_offset, mask_elements);
@@ -195,8 +195,8 @@ ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pPic1, mitkIpPicDescriptor* 
     }
     pixel_out = (ipMITKSegmentationTYPE *) pic_out->data + _mitkIpPicElements(pic_out) - 1;
     for (y = last_y; y >= first_y; y--) {
-      pixel [0] = (ipInt2_t *) pic [0]->data + (last_x + y * pic [0]->n [0]);
-      pixel [1] = (ipInt2_t *) pic [1]->data + (last_x + y * pic [1]->n [0]);
+      pixel [0] = (mitkIpInt2_t *) pic [0]->data + (last_x + y * pic [0]->n [0]);
+      pixel [1] = (mitkIpInt2_t *) pic [1]->data + (last_x + y * pic [1]->n [0]);
         for (x = last_x; x >= first_x; x--) {
       *(pixel [0]) = distance (pixel [0], mask_dist, mask_offset, mask_elements);
       *(pixel [1]) = distance (pixel [1], mask_dist, mask_offset, mask_elements);
@@ -223,8 +223,8 @@ setup (mitkIpPicDescriptor* pic_old)
 {
   mitkIpPicDescriptor* pic;
   ipMITKSegmentationTYPE* src;
-  ipInt2_t* dst;
-  ipUInt4_t x, y;
+  mitkIpInt2_t* dst;
+  mitkIpUInt4_t x, y;
 
   /* Allocate new image for distance transform */
 
@@ -237,20 +237,20 @@ setup (mitkIpPicDescriptor* pic_old)
 
   /* Set the frame to -1 */
 
-  dst = (ipInt2_t *) pic->data;
+  dst = (mitkIpInt2_t *) pic->data;
   for (x = 0; x < pic->n[0]; x++) {
     *dst++ = -MAX;
   }  
-  dst = (ipInt2_t *) pic->data + _mitkIpPicElements (pic) - pic->n[0];
+  dst = (mitkIpInt2_t *) pic->data + _mitkIpPicElements (pic) - pic->n[0];
   for (x = 0; x < pic->n[0]; x++) {
     *dst++ = -MAX;
   }  
-  dst = (ipInt2_t *) pic->data;
+  dst = (mitkIpInt2_t *) pic->data;
   for (y = 0; y < pic->n[1]; y++) {
     *dst = -MAX;
     dst += pic->n[0];
   }
-  dst = (ipInt2_t *) pic->data + (pic->n[0] - 1);
+  dst = (mitkIpInt2_t *) pic->data + (pic->n[0] - 1);
   for (y = 0; y < pic->n[1]; y++) {
     *dst = -MAX;
     dst += pic->n[0];
@@ -259,14 +259,14 @@ setup (mitkIpPicDescriptor* pic_old)
   /* Set the image data to initial values */
 
   src = (ipMITKSegmentationTYPE *) pic_old->data;
-  dst = (ipInt2_t *) pic->data + (1 + pic->n[0]);
+  dst = (mitkIpInt2_t *) pic->data + (1 + pic->n[0]);
   for (y = 0; y < pic_old->n[1]; y++) {
     for (x = 0; x < pic_old->n[0]; x++) {
       *dst++ = (*src++ > 0 ? MAX : -MAX);
     }
     dst += 2;
   }
-  dst = (ipInt2_t *) pic->data + (1 + pic->n[0]);
+  dst = (mitkIpInt2_t *) pic->data + (1 + pic->n[0]);
   for (y = 0; y < pic_old->n[1]; y++) {
     for (x = 0; x < pic_old->n[0]; x++) {
       if ((dst[0] < dst[1]) || (dst[0] < dst[pic->n[0]])) {
@@ -294,10 +294,10 @@ setup (mitkIpPicDescriptor* pic_old)
   return pic;
 }
 
-static ipInt2_t distance (const ipInt2_t* const old_distance, const ipInt2_t* mask_dist, const ipInt2_t* mask_offset, const ipUInt4_t mask_elements)
+static mitkIpInt2_t distance (const mitkIpInt2_t* const old_distance, const mitkIpInt2_t* mask_dist, const mitkIpInt2_t* mask_offset, const mitkIpUInt4_t mask_elements)
 {
-    ipInt2_t cur_distance, new_distance;
-    ipUInt4_t i;
+    mitkIpInt2_t cur_distance, new_distance;
+    mitkIpUInt4_t i;
 
     cur_distance = old_distance [0];
     if (abs (cur_distance) != 5) {

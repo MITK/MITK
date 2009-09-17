@@ -84,21 +84,21 @@ mitkIpPicDescriptor *mitkIpFuncHitMiss( mitkIpPicDescriptor *pic_old,
                                 mitkIpFuncFlagI_t    border );
 
 mitkIpPicDescriptor *mitkIpFuncLabel  ( mitkIpPicDescriptor *pic_old,
-                                ipUInt4_t       *no_label );
+                                mitkIpUInt4_t       *no_label );
 
 mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t        dim_seed,
-                                 ipUInt4_t       *beg_seed,
-                                 ipUInt4_t       *end_seed,
-                                 ipUInt4_t        border_label,
-                                 ipUInt4_t        region_label,
-                                 ipFloat8_t       std_fact, 
-                                 ipUInt4_t        kind );
+                                 mitkIpUInt4_t        dim_seed,
+                                 mitkIpUInt4_t       *beg_seed,
+                                 mitkIpUInt4_t       *end_seed,
+                                 mitkIpUInt4_t        border_label,
+                                 mitkIpUInt4_t        region_label,
+                                 mitkIpFloat8_t       std_fact, 
+                                 mitkIpUInt4_t        kind );
 
 mitkIpPicDescriptor *mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       *pol_x,   
-                                ipUInt4_t       *pol_y,    
-                                ipUInt4_t       no_pts );
+                                mitkIpUInt4_t       *pol_x,   
+                                mitkIpUInt4_t       *pol_y,    
+                                mitkIpUInt4_t       no_pts );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

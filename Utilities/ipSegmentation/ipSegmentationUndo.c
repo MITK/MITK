@@ -30,7 +30,7 @@ static mitkIpPicTSV_t *_mitkIpPicRemoveTag( _mitkIpPicTagsElement_t **head,
                                     char *tag );
 
 void
-ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t level)
+ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const mitkIpUInt1_t level)
 {
     mitkIpPicTSV_t *undo, *data, *max;
 
@@ -66,7 +66,7 @@ ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t
     }
     if (data->n[0] > level) {
         /* remove levels which exceed the maximum */
-        ipUInt1_t i;
+        mitkIpUInt1_t i;
 
         for (i = data->n[0] - level; i > 0; i--) {
             _mitkIpPicTagsElement_t *head = (_mitkIpPicTagsElement_t *) data->value;
@@ -80,10 +80,10 @@ ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const ipUInt1_t
     max = mitkIpPicQuerySubTag (undo, tagUNDO_LEVEL);
     if (max) {
         /* change the maximum of levels */
-        ipUInt1_t* value = (ipUInt1_t *) max->value;
+        mitkIpUInt1_t* value = (mitkIpUInt1_t *) max->value;
         *value = level;
     } else {
-        ipUInt1_t* value = (ipUInt1_t *) malloc (sizeof (ipUInt1_t));
+        mitkIpUInt1_t* value = (mitkIpUInt1_t *) malloc (sizeof (mitkIpUInt1_t));
         if (!value) {
             ipMITKSegmentationError (ipMITKSegmentationOUT_OF_MEMORY);
         }
@@ -113,7 +113,7 @@ ipMITKSegmentationUndoDisable (mitkIpPicDescriptor* segmentation)
     mitkIpPicFreeTag (undo);
 }
 
-ipBool_t
+mitkIpBool_t
 ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation)
 {
     mitkIpPicTSV_t *undo = NULL;
@@ -121,7 +121,7 @@ ipMITKSegmentationUndoIsEnabled (mitkIpPicDescriptor* segmentation)
     if (segmentation) {
   undo = mitkIpPicQueryTag (segmentation, tagUNDO);
     }
-    return (undo ? ipTrue : ipFalse);
+    return (undo ? mitkIpTrue : mitkIpFalse);
 }
 
 void
@@ -138,8 +138,8 @@ ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation)
     /* if no level is available ... */
     data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
     level = mitkIpPicQuerySubTag (undo, tagUNDO_LEVEL);
-    if (*((ipUInt1_t *) level->value) > 0) {
-        if (data->n[0] == *((ipUInt1_t *) level->value)) {
+    if (*((mitkIpUInt1_t *) level->value) > 0) {
+        if (data->n[0] == *((mitkIpUInt1_t *) level->value)) {
             /* ... remove the first one. */
             _mitkIpPicTagsElement_t* head = (_mitkIpPicTagsElement_t *) data->value;
             mitkIpPicTSV_t* tag = _mitkIpPicRemoveTag (&head, head, head->tsv->tag);
@@ -199,7 +199,7 @@ ipMITKSegmentationUndo (mitkIpPicDescriptor* segmentation)
     }
 }
 
-ipBool_t
+mitkIpBool_t
 ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation)
 {
     mitkIpPicTSV_t *undo, *data;
@@ -210,7 +210,7 @@ ipMITKSegmentationUndoAvailable (mitkIpPicDescriptor* segmentation)
         ipMITKSegmentationError (ipMITKSegmentationUNDO_DISABLED);
     }
     data = mitkIpPicQuerySubTag (undo, tagUNDO_DATA);
-    return (data->n[0] ? ipTrue : ipFalse);
+    return (data->n[0] ? mitkIpTrue : mitkIpFalse);
 }
 
 mitkIpPicTSV_t *

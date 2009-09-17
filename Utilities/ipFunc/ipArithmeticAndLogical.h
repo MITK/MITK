@@ -71,22 +71,22 @@ mitkIpPicDescriptor *mitkIpFuncEqual  ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncAddC   ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t       value,
+                                mitkIpFloat8_t       value,
                                 mitkIpFuncFlagI_t    keep,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncSubC   ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t       value,
+                                mitkIpFloat8_t       value,
                                 mitkIpFuncFlagI_t    keep,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncMultC  ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t       value,  
+                                mitkIpFloat8_t       value,  
                                 mitkIpFuncFlagI_t    keep,
                                 mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncDivC   ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t       value,  
+                                mitkIpFloat8_t       value,  
                                 mitkIpFuncFlagI_t    keep,
                                 mitkIpPicDescriptor *pic_return );
 

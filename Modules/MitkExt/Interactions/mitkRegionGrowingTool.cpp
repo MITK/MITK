@@ -556,7 +556,7 @@ void mitk::RegionGrowingTool::SmoothIPPicBinaryImageHelperForRows( mitkIpPicDesc
 
   for (current = ((ipMITKSegmentationTYPE*)dest->data) + startOffset; current<end; current++) 
   {
-    ipInt1_t sum( 0 );
+    mitkIpInt1_t sum( 0 );
     for (int i = 0; i < maskSize; ++i) 
     {
       sum += *(source+maskOffsets[i]);

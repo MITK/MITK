@@ -64,9 +64,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
-                      ipFloat8_t      *min, 
-                      ipFloat8_t      *max );
+mitkIpInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
+                      mitkIpFloat8_t      *min, 
+                      mitkIpFloat8_t      *max );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -82,17 +82,17 @@ ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
 
 #define EXTR( type, pic, min_c, max_c )                        \
   {                                                            \
-    ipUInt4_t   i;                                             \
-    ipUInt4_t   no_elem;                                       \
-    ipFloat8_t  help;                                          \
+    mitkIpUInt4_t   i;                                             \
+    mitkIpUInt4_t   no_elem;                                       \
+    mitkIpFloat8_t  help;                                          \
                                                                \
     no_elem = _mitkIpPicElements ( pic );                          \
-    max_c = ( ipFloat8_t )( ( type * ) pic->data ) [0];        \
-    min_c = ( ipFloat8_t )( ( type * ) pic->data ) [0];        \
+    max_c = ( mitkIpFloat8_t )( ( type * ) pic->data ) [0];        \
+    min_c = ( mitkIpFloat8_t )( ( type * ) pic->data ) [0];        \
                                                                \
     for ( i = 1; i < no_elem; i++ )                            \
       {                                                        \
-        help   = ( ipFloat8_t )( ( type * ) pic->data ) [i];   \
+        help   = ( mitkIpFloat8_t )( ( type * ) pic->data ) [i];   \
         max_c  = ( help > max_c ) ? help : max_c;              \
         min_c  = ( help < min_c ) ? help : min_c;              \
                                                                \
@@ -104,13 +104,13 @@ ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
 */
 /* ========================================================== */
 
-ipInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
-                      ipFloat8_t      *min, 
-                      ipFloat8_t      *max )
+mitkIpInt4_t mitkIpFuncExtr ( mitkIpPicDescriptor *pic,
+                      mitkIpFloat8_t      *min, 
+                      mitkIpFloat8_t      *max )
 {
 
-  ipFloat8_t min_c = 0.0;            
-  ipFloat8_t max_c = 0.0;
+  mitkIpFloat8_t min_c = 0.0;            
+  mitkIpFloat8_t max_c = 0.0;
 
   /* check data                                               */
 

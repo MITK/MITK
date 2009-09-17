@@ -63,16 +63,16 @@
 extern "C" {
 #endif
 
-ipUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
-                      ipUInt4_t       **beg,
-                      ipUInt4_t       **end );
+mitkIpUInt4_t mitkIpFuncBox ( mitkIpPicDescriptor *pic_old,
+                      mitkIpUInt4_t       **beg,
+                      mitkIpUInt4_t       **end );
 
 mitkIpPicDescriptor *mitkIpFuncRefl   ( mitkIpPicDescriptor *pic_old,
-                                ipInt4_t         axis );
+                                mitkIpInt4_t         axis );
 
 mitkIpPicDescriptor *mitkIpFuncFrame  ( mitkIpPicDescriptor *pic_old,
-                                ipUInt4_t       *edge,     
-                                ipFloat8_t      value );      
+                                mitkIpUInt4_t       *edge,     
+                                mitkIpFloat8_t      value );      
 
 mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
                                 mitkIpPicDescriptor *mask,     
@@ -80,24 +80,24 @@ mitkIpPicDescriptor *mitkIpFuncBorder ( mitkIpPicDescriptor *pic_old,
 
 mitkIpPicDescriptor *mitkIpFuncBorderX ( mitkIpPicDescriptor *pic_old,
                                  mitkIpPicDescriptor *mask,     
-                                 ipFloat8_t      value,
+                                 mitkIpFloat8_t      value,
                                  mitkIpPicDescriptor *pic_return );
 
 mitkIpPicDescriptor *mitkIpFuncScale  ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      sc_fact[_mitkIpPicNDIM],
+                                mitkIpFloat8_t      sc_fact[_mitkIpPicNDIM],
                                 mitkIpFuncFlagI_t   sc_kind );
 
 mitkIpPicDescriptor *mitkIpFuncScFact ( mitkIpPicDescriptor *pic_old,
-                                ipFloat8_t      factor,               
+                                mitkIpFloat8_t      factor,               
                                 mitkIpFuncFlagI_t   sc_kind );
 
 mitkIpPicDescriptor *mitkIpFuncWindow ( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       *begin,   
-                                ipUInt4_t       *length );
+                                mitkIpUInt4_t       *begin,   
+                                mitkIpUInt4_t       *length );
 
 mitkIpPicDescriptor *mitkIpFuncWindowR( mitkIpPicDescriptor *pic_1,        
                                 mitkIpPicDescriptor *pic_2,
-                                ipUInt4_t       *begin,   
+                                mitkIpUInt4_t       *begin,   
                                 mitkIpFuncFlagI_t   keep );    
 
 mitkIpPicDescriptor *mitkIpFuncRotate  ( mitkIpPicDescriptor *pic,
@@ -109,9 +109,9 @@ mitkIpPicDescriptor *mitkIpFuncTranspose( mitkIpPicDescriptor *pic,
                                   int *permutations_vector);
       
 mitkIpPicDescriptor *mitkIpFuncDrawPoly( mitkIpPicDescriptor *pic_old,        
-                                ipUInt4_t       *pol_x,   
-                                ipUInt4_t       *pol_y,    
-                                ipUInt4_t       no_pts );
+                                mitkIpUInt4_t       *pol_x,   
+                                mitkIpUInt4_t       *pol_y,    
+                                mitkIpUInt4_t       no_pts );
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

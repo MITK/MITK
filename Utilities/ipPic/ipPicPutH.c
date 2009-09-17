@@ -59,7 +59,7 @@ void mitkIpPicPutHeader( char *outfile_name, mitkIpPicDescriptor *pic )
 {
   FILE *outfile;
 
-  ipUInt4_t len;
+  mitkIpUInt4_t len;
 
   if( outfile_name == NULL )
     outfile = stdout;
@@ -74,19 +74,19 @@ void mitkIpPicPutHeader( char *outfile_name, mitkIpPicDescriptor *pic )
       return;
     }
 
-  len =          3 * sizeof(ipUInt4_t)
-        + pic->dim * sizeof(ipUInt4_t);
+  len =          3 * sizeof(mitkIpUInt4_t)
+        + pic->dim * sizeof(mitkIpUInt4_t);
 
   /* write oufile */
   fwrite( mitkIpPicVERSION, 1, sizeof(mitkIpPicTag_t), outfile );
 
-  mitkIpFWriteLE( &len, sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &len, sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpFWriteLE( &(pic->type), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpFWriteLE( &(pic->bpe), sizeof(ipUInt4_t), 1, outfile );
-  mitkIpFWriteLE( &(pic->dim), sizeof(ipUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, outfile );
+  mitkIpFWriteLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, outfile );
 
-  mitkIpFWriteLE( pic->n, sizeof(ipUInt4_t), pic->dim, outfile );
+  mitkIpFWriteLE( pic->n, sizeof(mitkIpUInt4_t), pic->dim, outfile );
 
   if( outfile != stdout )
     fclose( outfile );

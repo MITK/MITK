@@ -123,9 +123,9 @@ mitkIpFReadCvt( void *ptr, size_t size, size_t nitems, FILE *stream )
 }
 
 #ifdef USE_ZLIB
-ipBool_t _mitkIpPicCanReadCompressed = ipTrue;
+mitkIpBool_t _mitkIpPicCanReadCompressed = mitkIpTrue;
 #else
-ipBool_t _mitkIpPicCanReadCompressed = ipFalse;
+mitkIpBool_t _mitkIpPicCanReadCompressed = mitkIpFalse;
 #endif
 
 size_t

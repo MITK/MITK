@@ -64,9 +64,9 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
-                          ipUInt4_t       *begin, 
-                          ipUInt4_t       *length );
+mitkIpFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
+                          mitkIpUInt4_t       *begin, 
+                          mitkIpUInt4_t       *length );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -76,11 +76,11 @@ ipFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
 
 
 
-ipFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
-                          ipUInt4_t       *begin, 
-                          ipUInt4_t       *length )
+mitkIpFloat8_t  mitkIpFuncSDevR ( mitkIpPicDescriptor *pic_old,
+                          mitkIpUInt4_t       *begin, 
+                          mitkIpUInt4_t       *length )
 {
-   ipFloat8_t   sder;    /* standard deviation  */
+   mitkIpFloat8_t   sder;    /* standard deviation  */
 
    mitkIpPicDescriptor *pic_help;
 

@@ -73,10 +73,10 @@
 
 #include "mitkIpFuncP.h"
 
-ipFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *pol_x,
-                           ipUInt4_t       *pol_y,
-                           ipUInt4_t       no_pts ) ;
+mitkIpFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *pol_x,
+                           mitkIpUInt4_t       *pol_y,
+                           mitkIpUInt4_t       no_pts ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -91,13 +91,13 @@ ipFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
 ** mitkIpFuncSDevROI
 */
 
-ipFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
-                           ipUInt4_t       *pol_x,
-                           ipUInt4_t       *pol_y,
-                           ipUInt4_t       no_pts ) 
+mitkIpFloat8_t mitkIpFuncSDevROI ( mitkIpPicDescriptor *pic_old,
+                           mitkIpUInt4_t       *pol_x,
+                           mitkIpUInt4_t       *pol_y,
+                           mitkIpUInt4_t       no_pts ) 
 {
-   ipFloat8_t      var;             /* variance  of greyvalues in ROI   */
-   ipFloat8_t      s_dev;           /* standard dev.of greyvalues in ROI*/
+   mitkIpFloat8_t      var;             /* variance  of greyvalues in ROI   */
+   mitkIpFloat8_t      s_dev;           /* standard dev.of greyvalues in ROI*/
 
    var = mitkIpFuncVarROI ( pic_old, pol_x, pol_y, no_pts );
 

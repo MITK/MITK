@@ -101,13 +101,13 @@
 
 #include "mitkIpPic.h"
 
-mitkIpPicDescriptor *mitkIpPicGetSlice( const char *infile_name, mitkIpPicDescriptor *pic, ipUInt4_t slice )
+mitkIpPicDescriptor *mitkIpPicGetSlice( const char *infile_name, mitkIpPicDescriptor *pic, mitkIpUInt4_t slice )
 {
   mitkIpPicFile_t infile;
 
   mitkIpPicTag_t tag_name;
-  ipUInt4_t len;
-  ipUInt4_t skip;
+  mitkIpUInt4_t len;
+  mitkIpUInt4_t skip;
 
   int number = 1;
 
@@ -159,16 +159,16 @@ mitkIpPicDescriptor *mitkIpPicGetSlice( const char *infile_name, mitkIpPicDescri
   mitkIpPicFRead( &(tag_name[4]), 1, sizeof(mitkIpPicTag_t)-4, infile );
   strncpy( pic->info->version, tag_name, _mitkIpPicTAGLEN );
 
-  mitkIpPicFReadLE( &len, sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &len, sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( &(pic->type), sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &(pic->bpe), sizeof(ipUInt4_t), 1, infile );
-  mitkIpPicFReadLE( &(pic->dim), sizeof(ipUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->type), sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->bpe), sizeof(mitkIpUInt4_t), 1, infile );
+  mitkIpPicFReadLE( &(pic->dim), sizeof(mitkIpUInt4_t), 1, infile );
 
-  mitkIpPicFReadLE( &(pic->n), sizeof(ipUInt4_t), pic->dim, infile );
+  mitkIpPicFReadLE( &(pic->n), sizeof(mitkIpUInt4_t), pic->dim, infile );
 
-  skip = len -        3 * sizeof(ipUInt4_t)
-             - pic->dim * sizeof(ipUInt4_t);
+  skip = len -        3 * sizeof(mitkIpUInt4_t)
+             - pic->dim * sizeof(mitkIpUInt4_t);
   mitkIpPicFSeek( infile, skip, SEEK_CUR );
 
   picsize = _mitkIpPicSize(pic);
@@ -189,7 +189,7 @@ mitkIpPicDescriptor *mitkIpPicGetSlice( const char *infile_name, mitkIpPicDescri
     number = pic->n[2] - slice + 1;
 
 
-  pic->info->write_protect = ipTrue;
+  pic->info->write_protect = mitkIpTrue;
 
   picsize = _mitkIpPicSize(pic);
 

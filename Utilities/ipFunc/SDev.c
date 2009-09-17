@@ -66,14 +66,14 @@
 
 #include "mitkIpFuncP.h"
 
- ipFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic );
+ mitkIpFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic );
 
 #ifndef DOXYGEN_IGNORE
 
-ipFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic )
+mitkIpFloat8_t mitkIpFuncSDev ( mitkIpPicDescriptor *pic )
 {
 
-  ipFloat8_t s_der;           /* standard deviation          */
+  mitkIpFloat8_t s_der;           /* standard deviation          */
 
   /* check image data                                         */
 

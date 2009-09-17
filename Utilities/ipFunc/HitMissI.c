@@ -76,8 +76,8 @@
 
 #define C_MASC( typ, pic_masks, m1, m2, end_m, beg_m1, beg_m2 )                \
 {                                                                              \
-  ipUInt4_t     no_elem;                                                       \
-  ipUInt4_t     i;                        /* loop variable                  */ \
+  mitkIpUInt4_t     no_elem;                                                       \
+  mitkIpUInt4_t     i;                        /* loop variable                  */ \
                                                                                \
   /* copy pic_masks to mask_1 and mask_2                                    */ \
                                                                                \
@@ -111,14 +111,14 @@
 #define HITMISS( type_i, pic_old, pic_new, pic_inv )                           \
 {                                                                              \
   type_i        help;                                                          \
-  ipUInt4_t     i;                       /* loop index                      */ \
-  ipUInt4_t     end_m;                   /* loop index                      */ \
-  ipUInt4_t     beg_m1;                  /*                                 */ \
-  ipUInt4_t     beg_m2;                  /*                                 */ \
-  ipUInt4_t     size[_mitkIpPicNDIM];        /*                                 */ \
-  ipInt4_t      ind[_mitkIpPicNDIM];         /* loop index vector               */ \
-  ipUInt4_t     off[_mitkIpPicNDIM];         /* offset vector                   */ \
-  ipFloat8_t    max, min;                /* max and min possible greyvalue  */ \
+  mitkIpUInt4_t     i;                       /* loop index                      */ \
+  mitkIpUInt4_t     end_m;                   /* loop index                      */ \
+  mitkIpUInt4_t     beg_m1;                  /*                                 */ \
+  mitkIpUInt4_t     beg_m2;                  /*                                 */ \
+  mitkIpUInt4_t     size[_mitkIpPicNDIM];        /*                                 */ \
+  mitkIpInt4_t      ind[_mitkIpPicNDIM];         /* loop index vector               */ \
+  mitkIpUInt4_t     off[_mitkIpPicNDIM];         /* offset vector                   */ \
+  mitkIpFloat8_t    max, min;                /* max and min possible greyvalue  */ \
                                                                                \
   /* initialisation of vectors                                              */ \
                                                                                \
@@ -222,11 +222,11 @@
    mitkIpPicDescriptor *pic_1;           /* image after hit and miss              */ 
    mitkIpPicDescriptor *mask_1;          /* hit mask                              */ 
    mitkIpPicDescriptor *mask_2;          /* miss mask                             */ 
-   ipInt4_t        beg[_mitkIpPicNDIM];  /*                                       */
-   ipInt4_t        end[_mitkIpPicNDIM];  /*                                       */
+   mitkIpInt4_t        beg[_mitkIpPicNDIM];  /*                                       */
+   mitkIpInt4_t        end[_mitkIpPicNDIM];  /*                                       */
    mitkIpFuncMasc_t    *m1, *m2;         /* compressed masks                      */
-   ipUInt4_t       dim;              /* dimension of mask                     */
-   ipUInt4_t       j;                /* loop variable                         */
+   mitkIpUInt4_t       dim;              /* dimension of mask                     */
+   mitkIpUInt4_t       j;                /* loop variable                         */
 
    /* check image data and mask data                                          */
 

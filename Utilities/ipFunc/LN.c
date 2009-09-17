@@ -76,9 +76,9 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old );
 
 #define LN( type, pic, max_gv )                                              \
 {                                                                            \
-  ipUInt4_t    i;           /* loopindex                                   */\
-  ipUInt4_t    no_elem;     /* number of pixels                            */\
-  ipFloat8_t   a;           /* factor to calculate the logaritm            */\
+  mitkIpUInt4_t    i;           /* loopindex                                   */\
+  mitkIpUInt4_t    no_elem;     /* number of pixels                            */\
+  mitkIpFloat8_t   a;           /* factor to calculate the logaritm            */\
                                                                              \
   a = max_gv / log ( max_gv + 1. );                                          \
                                                                              \
@@ -96,10 +96,10 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old );
 
 mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
 {
-  ipFloat8_t       min_gv, max_gv;  /* max and min posiible greyvalues      */
+  mitkIpFloat8_t       min_gv, max_gv;  /* max and min posiible greyvalues      */
   mitkIpPicDescriptor  *pic_new;        /* pointer to transformed image         */
-  ipUInt4_t        i;               /* loop index                           */
-  ipUInt4_t        no_elem;         /* loop index                           */
+  mitkIpUInt4_t        i;               /* loop index                           */
+  mitkIpUInt4_t        no_elem;         /* loop index                           */
 
   /* check whether data are correct                                         */
 
@@ -154,22 +154,22 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
             if ( pic_new->bpe == 8 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipUInt1_t * )pic_new->data )[i] =
-                     (( ipInt1_t * )pic_old->data )[i] - min_gv;
+                  (( mitkIpUInt1_t * )pic_new->data )[i] =
+                     (( mitkIpInt1_t * )pic_old->data )[i] - min_gv;
               } 
 
             else if ( pic_new->bpe == 16 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipUInt2_t * )pic_new->data )[i] =
-                    (( ipInt2_t * )pic_old->data )[i] - min_gv;
+                  (( mitkIpUInt2_t * )pic_new->data )[i] =
+                    (( mitkIpInt2_t * )pic_old->data )[i] - min_gv;
               } 
 
             else if ( pic_new->bpe == 32 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipUInt4_t * )pic_new->data )[i] =
-                    (( ipInt4_t * )pic_old->data )[i] - min_gv;
+                  (( mitkIpUInt4_t * )pic_new->data )[i] =
+                    (( mitkIpInt4_t * )pic_old->data )[i] - min_gv;
               } 
 
             else 
@@ -190,22 +190,22 @@ mitkIpPicDescriptor *mitkIpFuncLN ( mitkIpPicDescriptor *pic_old )
             if ( pic_new->bpe == 8 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipInt1_t * )pic_new->data )[i] =
-                    (( ipUInt1_t * )pic_new->data )[i] + min_gv;
+                  (( mitkIpInt1_t * )pic_new->data )[i] =
+                    (( mitkIpUInt1_t * )pic_new->data )[i] + min_gv;
               } 
 
             else if ( pic_new->bpe == 16 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipInt2_t * )pic_new->data )[i] =
-                    (( ipUInt2_t * )pic_new->data )[i] + min_gv;
+                  (( mitkIpInt2_t * )pic_new->data )[i] =
+                    (( mitkIpUInt2_t * )pic_new->data )[i] + min_gv;
               } 
 
             else if ( pic_new->bpe == 32 )
               { 
                 for ( i = 0; i < no_elem; i++ )                     
-                  (( ipInt4_t * )pic_new->data )[i] =
-                    (( ipUInt4_t * )pic_new->data )[i] + min_gv;
+                  (( mitkIpInt4_t * )pic_new->data )[i] =
+                    (( mitkIpUInt4_t * )pic_new->data )[i] + min_gv;
               } 
 
          }

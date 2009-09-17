@@ -105,13 +105,13 @@
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       dim_seed,
-                                 ipUInt4_t       *beg_seed,
-                                 ipUInt4_t       *end_seed,
-                                 ipUInt4_t       border_label,
-                                 ipUInt4_t       region_label,
-                                 ipFloat8_t      std_fact,  
-                                 ipUInt4_t       kind ) ;
+                                 mitkIpUInt4_t       dim_seed,
+                                 mitkIpUInt4_t       *beg_seed,
+                                 mitkIpUInt4_t       *end_seed,
+                                 mitkIpUInt4_t       border_label,
+                                 mitkIpUInt4_t       region_label,
+                                 mitkIpFloat8_t      std_fact,  
+                                 mitkIpUInt4_t       kind ) ;
 
 #ifndef DOXYGEN_IGNORE
 
@@ -128,12 +128,12 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 
 #define STAT( type, pic_old, pic_new, mean, std_win, size_seed, beg, end )     \
 {                                                                              \
-  ipInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
-  ipInt4_t     off[_mitkIpPicNDIM];    /* used to calculate offset vector       */ \
-  ipFloat8_t   sum;                /* sum of greyvalues in seed region      */ \
-  ipFloat8_t   saq;                /* sum of deviation squares              */ \
-  ipFloat8_t   diff;               /* used to calculate saq                 */ \
-  ipFloat8_t   std_dev;            /* standard deviation                    */ \
+  mitkIpInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
+  mitkIpInt4_t     off[_mitkIpPicNDIM];    /* used to calculate offset vector       */ \
+  mitkIpFloat8_t   sum;                /* sum of greyvalues in seed region      */ \
+  mitkIpFloat8_t   saq;                /* sum of deviation squares              */ \
+  mitkIpFloat8_t   diff;               /* used to calculate saq                 */ \
+  mitkIpFloat8_t   std_dev;            /* standard deviation                    */ \
                                                                                \
                                                                                \
   /* calculate mean                                                         */ \
@@ -164,7 +164,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                 for ( ind[0] = beg[0]; ind[0] < end[0]; ind[0]++ )             \
                 {                                                              \
                    sum = sum +                                                 \
-                         ( ipFloat8_t ) (( type * ) pic_old->data) [off[0]];   \
+                         ( mitkIpFloat8_t ) (( type * ) pic_old->data) [off[0]];   \
                    off[0]++;                                                   \
                 }                                                              \
               }                                                                \
@@ -174,7 +174,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
       }                                                                        \
     }                                                                          \
   }                                                                            \
-  mean = sum / ( ipFloat8_t ) size_seed;                                       \
+  mean = sum / ( mitkIpFloat8_t ) size_seed;                                       \
                                                                                \
                                                                                \
   /* standard deviation                                                     */ \
@@ -204,7 +204,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                 off[0] = off[1] + beg[0];                                      \
                 for ( ind[0] = beg[0]; ind[0] < end[0]; ind[0]++ )             \
                 {                                                              \
-                   diff = ( ipFloat8_t ) (( type * ) pic_old->data )[off[0]] - \
+                   diff = ( mitkIpFloat8_t ) (( type * ) pic_old->data )[off[0]] - \
                             mean;                                              \
                    saq = saq + diff * diff;                                    \
                    off[0]++;                                                   \
@@ -216,16 +216,16 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
       }                                                                        \
     }                                                                          \
   }                                                                            \
-  std_dev = sqrt ( saq / ( ipFloat8_t ) ( size_seed - 1 ) );                   \
+  std_dev = sqrt ( saq / ( mitkIpFloat8_t ) ( size_seed - 1 ) );                   \
   std_win = std_dev * std_fact;                                                \
   printf ( "mean: %lf std_win: %lf \n", mean, std_win);\
 }
 
 #define ACPT( type, pic_old, pic_new, acpt, acpt_len, region_label, std_win )  \
 {                                                                              \
-  ipInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
-  ipUInt4_t    off[_mitkIpPicNDIM];    /* used to calculate offset              */ \
-  ipFloat8_t   diff;               /* difference between pixel and mean     */ \
+  mitkIpInt4_t     ind[_mitkIpPicNDIM];    /* loop index vector                     */ \
+  mitkIpUInt4_t    off[_mitkIpPicNDIM];    /* used to calculate offset              */ \
+  mitkIpFloat8_t   diff;               /* difference between pixel and mean     */ \
                                                                                \
   /* find pixels in seed region which are accepted                          */ \
                                                                                \
@@ -253,7 +253,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                 off[0] = off[1] + beg[0];                                      \
                 for ( ind[0] = beg[0]; ind[0] < end[0]; ind[0]++ )             \
                 {                                                              \
-                   diff = fabs ( ( ipFloat8_t )                                \
+                   diff = fabs ( ( mitkIpFloat8_t )                                \
                                  (( type * )pic_old->data )[off[0]] - mean );  \
                                                                                \
                    /* pixel accepted                                        */ \
@@ -279,43 +279,43 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 #define REGGROW( type, pic_old, pic_new, acpt, acpt_len,                       \
                  border, border_len, std_win )                                 \
 {                                                                              \
-  ipUInt4_t   i, j;             /* loop variables                           */ \
-  ipInt4_t    k;                /* loop variable                            */ \
-  ipInt4_t    rest;             /*                                          */ \
-  ipInt4_t    z2;               /*                                          */ \
-  ipInt4_t    z[_mitkIpPicNDIM];    /*                                          */ \
-  ipBool_t    found;            /* found flag                               */ \
-  ipBool_t    out;              /* offset out of image flag                 */ \
-  ipFloat8_t  diff;             /* difference between pixel and mean        */ \
-  ipUInt4_t   offset;           /* offset of pixel in image                 */ \
+  mitkIpUInt4_t   i, j;             /* loop variables                           */ \
+  mitkIpInt4_t    k;                /* loop variable                            */ \
+  mitkIpInt4_t    rest;             /*                                          */ \
+  mitkIpInt4_t    z2;               /*                                          */ \
+  mitkIpInt4_t    z[_mitkIpPicNDIM];    /*                                          */ \
+  mitkIpBool_t    found;            /* found flag                               */ \
+  mitkIpBool_t    out;              /* offset out of image flag                 */ \
+  mitkIpFloat8_t  diff;             /* difference between pixel and mean        */ \
+  mitkIpUInt4_t   offset;           /* offset of pixel in image                 */ \
                                                                                \
   while ( acpt_len > 0 )                                                       \
   {                                                                            \
      for ( i = 0; i < acpt_len; i++ )                                          \
      {                                                                         \
-       rest = ( ipInt4_t ) acpt[i];                                            \
+       rest = ( mitkIpInt4_t ) acpt[i];                                            \
        for ( k = pic_old->dim-1; k >= 0; k-- )                                 \
          {                                                                     \
-             z[k] = rest / ( ipInt4_t )size[k];                                \
-             rest = rest % ( ipInt4_t )size[k];                                \
+             z[k] = rest / ( mitkIpInt4_t )size[k];                                \
+             rest = rest % ( mitkIpInt4_t )size[k];                                \
          }                                                                     \
                                                                                \
        for ( j = 0; j < no_neigh; j++ )                                        \
        {                                                                       \
          rest = off_vekt[j];                                                   \
-         out  = ipFalse;                                                       \
+         out  = mitkIpFalse;                                                       \
          for ( k = pic_old->dim-1; k >= 0; k-- )                               \
            {                                                                   \
-              z2   = rest / ( ipInt4_t )size[k] + z[k];                        \
-              rest = rest % ( ipInt4_t )size[k];                               \
-              if ( z2 >= ( ipInt4_t ) pic_old->n[k] || z2 < 0 ) out = ipTrue;  \
+              z2   = rest / ( mitkIpInt4_t )size[k] + z[k];                        \
+              rest = rest % ( mitkIpInt4_t )size[k];                               \
+              if ( z2 >= ( mitkIpInt4_t ) pic_old->n[k] || z2 < 0 ) out = mitkIpTrue;  \
            }                                                                   \
                                                                                \
-         offset = ( ipUInt4_t )( ( ipInt4_t ) acpt[i] + off_vekt[j] );         \
+         offset = ( mitkIpUInt4_t )( ( mitkIpInt4_t ) acpt[i] + off_vekt[j] );         \
          if ( ( !out ) &&                                                      \
               (( type * )pic_new->data )[offset] != ( type ) region_label )    \
            {                                                                   \
-               diff = fabs ( ( ipFloat8_t )                                    \
+               diff = fabs ( ( mitkIpFloat8_t )                                    \
                              (( type * )pic_old->data )[offset] - mean );      \
                if ( diff <= std_win )                                          \
                  {                                                             \
@@ -325,11 +325,11 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                  }                                                             \
                else                                                            \
                  {                                                             \
-                    found = ipFalse;                                           \
+                    found = mitkIpFalse;                                           \
                     k     = 0;                                                 \
                     while ( ( !found ) && k < border_len )                     \
                       {                                                        \
-                         if ( border[k] == offset ) found = ipTrue;            \
+                         if ( border[k] == offset ) found = mitkIpTrue;            \
                          k++;                                                  \
                       }                                                        \
                     if ( !found )                                              \
@@ -362,44 +362,44 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 /* -------------------------------------------------------------------------- */ 
 
 mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
-                                 ipUInt4_t       dim_seed,
-                                 ipUInt4_t       *beg_seed,
-                                 ipUInt4_t       *end_seed,
-                                 ipUInt4_t       border_label,
-                                 ipUInt4_t       region_label,
-                                 ipFloat8_t      std_fact,  
-                                 ipUInt4_t       kind ) 
+                                 mitkIpUInt4_t       dim_seed,
+                                 mitkIpUInt4_t       *beg_seed,
+                                 mitkIpUInt4_t       *end_seed,
+                                 mitkIpUInt4_t       border_label,
+                                 mitkIpUInt4_t       region_label,
+                                 mitkIpFloat8_t      std_fact,  
+                                 mitkIpUInt4_t       kind ) 
 {
   mitkIpPicDescriptor *pic_new;           /* pointer to new image                */
-  ipUInt4_t        i;                     /* loop index                          */
-  ipInt4_t         ind[_mitkIpPicNDIM];   /* loop index vector                   */
-  ipInt4_t         beg[_mitkIpPicNDIM];   /* beginning and end of seed region    */
-  ipInt4_t         end[_mitkIpPicNDIM];   /* for each dimension                  */
-  ipUInt4_t        size[_mitkIpPicNDIM];  /*                                     */
-  ipInt4_t         off[_mitkIpPicNDIM];   /* used to calculate offsets           */
-  ipInt4_t         offset_v;              /* offset                              */
-  ipInt4_t         *off_vekt;         /* offsets of all neighbour pixels     */
-  ipUInt4_t        no_neigh;          /* number of neighbour pixels          */
+  mitkIpUInt4_t        i;                     /* loop index                          */
+  mitkIpInt4_t         ind[_mitkIpPicNDIM];   /* loop index vector                   */
+  mitkIpInt4_t         beg[_mitkIpPicNDIM];   /* beginning and end of seed region    */
+  mitkIpInt4_t         end[_mitkIpPicNDIM];   /* for each dimension                  */
+  mitkIpUInt4_t        size[_mitkIpPicNDIM];  /*                                     */
+  mitkIpInt4_t         off[_mitkIpPicNDIM];   /* used to calculate offsets           */
+  mitkIpInt4_t         offset_v;              /* offset                              */
+  mitkIpInt4_t         *off_vekt;         /* offsets of all neighbour pixels     */
+  mitkIpUInt4_t        no_neigh;          /* number of neighbour pixels          */
   
   /* parameters of seed region                                               */
 
-  ipFloat8_t       mean;              /* mean of greyvalues in seed region   */
-  /*ipFloat8_t       std_dev; */          /* standard deviation                  */
-  ipFloat8_t       std_win;           /* value for growing criteria          */
-  /*ipFloat8_t       sum; */              /* sum of greyvalues in seed region    */
-  /*ipFloat8_t       diff; */            /* difference between greyvalue, mean  */
-  /*ipFloat8_t       saq; */              /* sum of deviation squares            */
-  ipUInt4_t        size_seed;         /* number of pixels in seed region     */
+  mitkIpFloat8_t       mean;              /* mean of greyvalues in seed region   */
+  /*mitkIpFloat8_t       std_dev; */          /* standard deviation                  */
+  mitkIpFloat8_t       std_win;           /* value for growing criteria          */
+  /*mitkIpFloat8_t       sum; */              /* sum of greyvalues in seed region    */
+  /*mitkIpFloat8_t       diff; */            /* difference between greyvalue, mean  */
+  /*mitkIpFloat8_t       saq; */              /* sum of deviation squares            */
+  mitkIpUInt4_t        size_seed;         /* number of pixels in seed region     */
 
   /* variables for region growing                                            */
 
-  ipUInt4_t        acpt_len;          /* number of accepted pixels           */
-  ipUInt4_t        next_len;          /* number of acc. pixels for next step */
-  ipUInt4_t        border_len;        /* number of border pixels             */
-  ipUInt4_t        *acpt;             /* offsets of all accepted pixels      */
-  ipUInt4_t        *next;             /* offsets of acc. pixels for next step*/
-  ipUInt4_t        *help;             /*                                     */
-  ipUInt4_t        *border;           /* offsets of all border pixels        */
+  mitkIpUInt4_t        acpt_len;          /* number of accepted pixels           */
+  mitkIpUInt4_t        next_len;          /* number of acc. pixels for next step */
+  mitkIpUInt4_t        border_len;        /* number of border pixels             */
+  mitkIpUInt4_t        *acpt;             /* offsets of all accepted pixels      */
+  mitkIpUInt4_t        *next;             /* offsets of acc. pixels for next step*/
+  mitkIpUInt4_t        *help;             /*                                     */
+  mitkIpUInt4_t        *border;           /* offsets of all border pixels        */
   
   /* check image data                                                        */
 
@@ -420,16 +420,16 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 
   /* allocate vectors                                                        */
 
-  no_neigh = ( ipUInt4_t ) pow ( 3., pic_old->dim );        
+  no_neigh = ( mitkIpUInt4_t ) pow ( 3., pic_old->dim );        
 
-  off_vekt = malloc ( no_neigh * sizeof ( ipInt4_t ) );
+  off_vekt = malloc ( no_neigh * sizeof ( mitkIpInt4_t ) );
   if ( off_vekt == NULL ) 
     { 
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
   
-  acpt = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  acpt = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
   if ( acpt == NULL ) 
     { 
        free ( off_vekt );
@@ -437,7 +437,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
        return ( mitkIpFuncERROR );
     }
 
-  next = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  next = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
   if ( next == NULL )
     { 
        free ( off_vekt );
@@ -447,7 +447,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
     }
 
   /*
-  help = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  help = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
   if ( help == NULL ) 
     { 
        free ( off_vekt );
@@ -458,7 +458,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
     }
   */
 
-  border = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( ipUInt4_t ) );
+  border = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
   if ( border == NULL ) 
     { 
        free ( off_vekt );

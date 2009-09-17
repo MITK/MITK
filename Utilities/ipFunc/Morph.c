@@ -103,8 +103,8 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
 #define INIT( type, pic_new )                                              \
 {                                                                          \
-  ipUInt4_t     i;                   /* loop variable                   */ \
-  ipUInt4_t     no_elem;                                                   \
+  mitkIpUInt4_t     i;                   /* loop variable                   */ \
+  mitkIpUInt4_t     no_elem;                                                   \
                                                                            \
   no_elem = _mitkIpPicElements ( pic_new );                                    \
   for ( i = 0; i < no_elem; i++ )                                          \
@@ -114,10 +114,10 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
 #define MORPH_B( type, pic_old, pic_new, m, beg, end, OP )                 \
 {                                                                          \
-  ipUInt4_t     i;                   /* loop index                      */ \
-  ipUInt4_t     offset;              /* offset                          */ \
-  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
+  mitkIpUInt4_t     i;                   /* loop index                      */ \
+  mitkIpUInt4_t     offset;              /* offset                          */ \
+  mitkIpInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  mitkIpUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
                                                                            \
   /* transformation of image                                            */ \
                                                                            \
@@ -165,9 +165,9 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
 #define MORPH_G( type, pic_old, pic_new, m, beg, end, OP )                 \
 {                                                                          \
-  ipUInt4_t     i;                   /* loop index                      */ \
-  ipInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
-  ipUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
+  mitkIpUInt4_t     i;                   /* loop index                      */ \
+  mitkIpInt4_t      ind[_mitkIpPicNDIM];     /* loop index vector               */ \
+  mitkIpUInt4_t     off[_mitkIpPicNDIM];     /* offset vector                   */ \
   type          help, help2;                                               \
                                                                            \
                                                                            \
@@ -229,14 +229,14 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 {
   mitkIpPicDescriptor *pic_new;        /* pointer to transformed image         */
   mitkIpFuncMasc_t    *m;              /* compressed mask and belonging offsets*/
-  ipInt4_t        beg[_mitkIpPicNDIM];
-  ipInt4_t        end[_mitkIpPicNDIM];
-  ipUInt4_t       size[_mitkIpPicNDIM];    /*                                  */  
-  ipUInt4_t       no_gv;           /* number of different greyvalues       */
-  ipUInt4_t       i;               /* loop index                           */
-  ipUInt4_t       size_hist;       /* number of elements in histogram      */
-  ipUInt4_t       *hist;           /* pointer to greyvalue histogram       */
-  ipFloat8_t      min, max;        /* extreme greyvalues in image          */
+  mitkIpInt4_t        beg[_mitkIpPicNDIM];
+  mitkIpInt4_t        end[_mitkIpPicNDIM];
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];    /*                                  */  
+  mitkIpUInt4_t       no_gv;           /* number of different greyvalues       */
+  mitkIpUInt4_t       i;               /* loop index                           */
+  mitkIpUInt4_t       size_hist;       /* number of elements in histogram      */
+  mitkIpUInt4_t       *hist;           /* pointer to greyvalue histogram       */
+  mitkIpFloat8_t      min, max;        /* extreme greyvalues in image          */
 
   /* check image data                                                      */
 
@@ -323,7 +323,7 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
   i     = 0;
   no_gv = 0;
-  while ( i <= ( ipUInt4_t ) ( fabs ( min ) + max ) && no_gv < 3 )
+  while ( i <= ( mitkIpUInt4_t ) ( fabs ( min ) + max ) && no_gv < 3 )
     {
        if ( hist [i] != 0 ) no_gv++;
        i++;

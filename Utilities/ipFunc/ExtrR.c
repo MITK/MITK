@@ -67,11 +67,11 @@
  */
 #include "mitkIpFuncP.h"
 
-ipUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
-                          ipFloat8_t      *min,   
-                          ipFloat8_t      *max, 
-                          ipUInt4_t       *begin,
-                          ipUInt4_t       *length );
+mitkIpUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
+                          mitkIpFloat8_t      *min,   
+                          mitkIpFloat8_t      *max, 
+                          mitkIpUInt4_t       *begin,
+                          mitkIpUInt4_t       *length );
 
 #ifndef DOXYGEN_IGNORE
 
@@ -80,15 +80,15 @@ ipUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
 #endif
 
 
-ipUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
-                          ipFloat8_t      *min,   
-                          ipFloat8_t      *max, 
-                          ipUInt4_t       *begin,
-                          ipUInt4_t       *length )
+mitkIpUInt4_t  mitkIpFuncExtrR  ( mitkIpPicDescriptor *pic_old,
+                          mitkIpFloat8_t      *min,   
+                          mitkIpFloat8_t      *max, 
+                          mitkIpUInt4_t       *begin,
+                          mitkIpUInt4_t       *length )
 {
 
    mitkIpPicDescriptor *pic_help;
-   ipInt4_t        error;
+   mitkIpInt4_t        error;
 
    pic_help = mitkIpFuncWindow ( pic_old, begin, length );
 

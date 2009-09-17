@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
  /** Documentation:
   *   \brief An object of this class offers a UI to configurate
   *          a tracking device. If the user finished the configuration process and
-  *          a fully configurated tracking device is availiabe the object sends a
+  *          a fully configurated tracking device is availiabe the object emits a
   *          signal "TrackingDeviceConfigurationFinished()". You can then get the
   *          tracking device by calling the method GetTrackingDevice().
   *          
@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
   *          the UI to allow the user for configuring a new device. The method Reset()
   *          can be called and there is also a button "reset" which can be pressed by
   *          the user. In both cases a signal "TrackingDeviceConfigurationReseted()"
-  *          is sent and you may wait for a new configurated tracking device.
+  *          is emitted and you may wait for a new configurated tracking device.
   *
   *          The possibility to reset the configuration by the user can also be switched
   *          of by calling the method EnableUserReset(boolean enable).
@@ -89,15 +89,37 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     Ui::QmitkTrackingDeviceConfigurationWidgetControls* m_Controls;
 
+    std::stringstream m_output;
+
     mitk::TrackingDevice::Pointer m_TrackingDevice;
     bool m_TrackingDeviceConfigurated;
+
+    //######################### internal help methods #######################################
+    void ResetOutput();
+    void AddOutput(std::string s);
+    mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
   protected slots:
     /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
               It then sets the correct widget for the selected tracking device.*/
     void TrackingDeviceChanged();
 
+    /* @brief This method is called when the user presses the button "test connection". The method will then create a temporary tracking device,
+     *        try to open a connection and start tracking. The user can see the result of the connection test on the small output window.
+     */
     void TestConnection();
+
+    /* @brief This method is called when the user presses the button "finished". A new tracking device will be created in this case and will then
+     *        then be availiable by calling GetTrackingDevice(). Also a signal TrackingDeviceConfigurationFinished() will be emitted. After this the
+     *        UI will be disablet until the widget is reseted to configure a new tracking device.
+     */
+    void Finished();
+
+    /* @brief This method is called when the user presses the button "reset". He can configure a new tracking device then. The signal
+     *        TrackingDeviceConfigurationReseted() will be emitted if this method is called. The method GetTrackingDevice() will return
+     *        NULL until a new tracking device is configured.
+     */
+    void ResetByUser();
 
 };
 #endif

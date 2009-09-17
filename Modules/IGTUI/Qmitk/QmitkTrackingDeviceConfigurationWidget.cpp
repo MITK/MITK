@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkClaronTrackingDevice.h"
 #include "mitkNDITrackingDevice.h"
 #include "mitkSerialCommunication.h"
+#include "qscrollbar.h"
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
@@ -27,8 +28,13 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   : QWidget(parent, f)
 {
   m_Controls = NULL;
-  this->CreateQtPartControl(this);
-  this->CreateConnections();
+  CreateQtPartControl(this);
+  CreateConnections();
+  
+  //reset a few things
+  ResetOutput();
+  AddOutput("<br>NDI Polaris selected");
+  m_Controls->configuration_finished_label->setVisible(false);
 }
 
 
@@ -37,17 +43,13 @@ QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget(
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
-{
-  
+{ 
   if (!m_Controls)
   {
   // create GUI widgets
   m_Controls = new Ui::QmitkTrackingDeviceConfigurationWidgetControls;
   m_Controls->setupUi(parent);
   }
-
-  //create connections
-  CreateConnections();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
@@ -55,6 +57,11 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_trackingDeviceChooser), SIGNAL(currentIndexChanged(int)), this, SLOT(TrackingDeviceChanged()) );
+    connect( (QObject*)(m_Controls->m_testConnectionPolaris), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    connect( (QObject*)(m_Controls->m_testConnectionAurora), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
+    connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
   }
 }
 
@@ -66,37 +73,13 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   //the new trackingdevice is not configurated yet
   m_TrackingDeviceConfigurated = false;
   
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
-      {
-      m_Controls->m_outputTextPolaris->setHtml("<body bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u><br> NDI Polaris selected");
-      //m_Controls->m_outputTextPolaris->toPlainText().append(
-      /* => später zu finished verschieben!
-      mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-      tempTrackingDevice->SetType(mitk::NDIPolaris);
-      
-      switch (m_Controls->m_comPortSpinBoxPolaris->value())
-        {
-        case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
-        case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
-        case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
-        case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
-        case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
-        case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
-        case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
-        case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
-        }
-      
-      m_TrackingDevice = tempTrackingDevice;
-      */
-      } 
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)//NDI Aurora
-      {
-        m_Controls->m_outputTextAurora->setHtml("<body bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u><br> NDI Aurora selected");
-      }
-  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
-      {
-        m_Controls->m_outputTextMicronTracker->setHtml("<body bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u><br> MicronTracker selected");
-      }
+  //reset output
+  ResetOutput();
+
+  //print output
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) AddOutput("<br>NDI Polaris selected");        //NDI Polaris
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) AddOutput("<br>NDI Aurora selected");    //NDI Aurora
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) AddOutput("<br>Microntracker selected"); //ClaronTechnology MicronTracker 2
 }
 
 void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)
@@ -107,16 +90,120 @@ void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)
 
 void QmitkTrackingDeviceConfigurationWidget::TestConnection()
 {
-if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
-      {
-      }
-else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)//NDI Aurora
-      {
-      }
-else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
-      {
-      mitk::ClaronTrackingDevice::Pointer tempTrackingDevice = mitk::ClaronTrackingDevice::New();
-      m_Controls->m_outputTextMicronTracker->setHtml(m_Controls->m_outputTextMicronTracker->toHtml().append("<br>Testing connect..."));
-      }
+//#### Step 1: construct a tracking device:
+mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
 
+//#### Step 2: test connection and start tracking, generate output
+AddOutput("<br>testing connection <br>  ...");
+if (testTrackingDevice->OpenConnection())
+  {
+  AddOutput(" OK");
+  AddOutput("<br>testing tracking <br>  ...");
+  if (testTrackingDevice->StartTracking()) 
+    {
+    AddOutput(" OK");
+    if (!testTrackingDevice->StopTracking())AddOutput("<br>ERROR while stop tracking<br>");
+    }
+  else AddOutput(" ERROR!");
+  if (!testTrackingDevice->CloseConnection())AddOutput("<br>ERROR while closing connection<br>");
+  }
+else AddOutput(" ERROR!");
 }
+
+void QmitkTrackingDeviceConfigurationWidget::Finished()
+  {
+  m_TrackingDevice = ConstructTrackingDevice();
+  m_Controls->m_TrackingSystemWidget->setEnabled(false);
+  m_Controls->m_trackingDeviceChooser->setEnabled(false);
+  m_Controls->choose_tracking_device_label->setEnabled(false);
+  m_Controls->configuration_finished_label->setVisible(true);
+  emit TrackingDeviceConfigurationFinished();
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::Reset()
+  {
+  m_TrackingDevice = NULL;
+  m_Controls->m_TrackingSystemWidget->setEnabled(true);
+  m_Controls->m_trackingDeviceChooser->setEnabled(true);
+  m_Controls->choose_tracking_device_label->setEnabled(true);
+  m_Controls->configuration_finished_label->setVisible(false);
+  emit TrackingDeviceConfigurationReseted();
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::ResetByUser()
+  {
+  Reset();
+  }
+
+//######################### internal help methods #######################################
+void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
+  {
+  m_output.str("");
+  m_output <<"<body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; font-weight:400; font-style:normal;\" bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u>";
+  m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
+  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
+  m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
+  }
+void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
+  {
+  //print output
+  m_output << s;
+  m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
+  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
+  m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
+  m_Controls->m_outputTextPolaris->verticalScrollBar()->setValue(m_Controls->m_outputTextPolaris->verticalScrollBar()->maximum());
+  m_Controls->m_outputTextAurora->verticalScrollBar()->setValue(m_Controls->m_outputTextAurora->verticalScrollBar()->maximum());
+  m_Controls->m_outputTextMicronTracker->verticalScrollBar()->setValue(m_Controls->m_outputTextMicronTracker->verticalScrollBar()->maximum());
+  repaint();
+  }
+mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
+  {
+  mitk::TrackingDevice::Pointer returnValue;
+  //#### Step 1: configure tracking device:
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==0)//NDI Polaris
+      {
+      if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
+        {
+        //not yet in the open source part
+        }
+      else //6D Tracking
+        {
+        mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
+        tempTrackingDevice->SetType(mitk::NDIPolaris);
+        switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
+          {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... Alfred
+          case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
+          case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
+          case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
+          case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
+          case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
+          case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
+          case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
+          case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
+          }
+        returnValue = tempTrackingDevice;
+        }
+      }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)//NDI Aurora
+        {
+        mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
+          tempTrackingDevice->SetType(mitk::NDIAurora);
+          switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
+            {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... Alfred
+            case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
+            case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
+            case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
+            case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
+            case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
+            case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
+            case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
+            case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
+            }
+          returnValue = tempTrackingDevice;
+        }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
+        {
+        returnValue = mitk::ClaronTrackingDevice::New();
+        }
+  return returnValue;
+  }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?openCherry version="0.1"?>
+<plugin>
+  <extension point="org.opencherry.tests">
+    <test id="CoreRuntimeTestSuite" class="cherry::CoreRuntimeTestSuite" />
+  </extension>
+</plugin>

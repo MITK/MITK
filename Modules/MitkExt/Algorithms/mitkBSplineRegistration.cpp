@@ -141,7 +141,7 @@ namespace mitk {
     typename MetricType::Pointer         metric        = MetricType::New();
     
     metric->SetNumberOfHistogramBins( 24);
-    metric->SetNumberOfSpatialSamples(100000);
+    metric->SetNumberOfSpatialSamples(10000);
      
     typename OptimizerFactory::Pointer optFac = OptimizerFactory::New();
     optFac->SetOptimizerParameters(m_OptimizerParameters);
@@ -190,8 +190,12 @@ namespace mitk {
     std::cout << std::endl << "Starting Registration" << std::endl;
 
     try 
-    {      
-      registration->StartRegistration();       
+    { 
+      double tstart(clock());     
+      registration->StartRegistration();    
+      double time = clock() - tstart;
+      time = time / CLOCKS_PER_SEC;
+      LOG_INFO << "Registration time: " << time;
     } 
     catch( itk::ExceptionObject & err ) 
     { 

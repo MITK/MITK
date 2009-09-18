@@ -54,6 +54,7 @@ namespace cherry
     catch (Poco::XML::SAXParseException& exc)
     {
       const std::string tempString = _File.path()+".backup";
+      LOG_INFO << exc.what();
       LOG_INFO << "Preferences could not be loaded."; 
       LOG_INFO << "Creating " << tempString; 
       LOG_INFO << "and resetting to default values.";

@@ -329,13 +329,27 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
 
 mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance(const char* globalInteractionName, const char* XMLbehaviorFile)
 {
-  //if not specified, then set to standard pattern "global"
-  if (globalInteractionName == NULL)
-    globalInteractionName = "global";
+  static mitk::GlobalInteraction::Pointer s_GlobalInteraction;
 
-  //first call influences behavior file and interaction name
-  static mitk::GlobalInteraction::Pointer s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName, XMLbehaviorFile);
-  return s_GlobalInteraction.GetPointer();
+  if (s_GlobalInteraction.IsNull())
+  {
+    //if the globalInteraction gets initialized we return into this method during buildup (StateMachine Constructor).
+    //to not recursively run into this method a static bool flag is used
+    static bool inGlobalInteractionBuildUp = false;
+    if (!inGlobalInteractionBuildUp)
+    {
+      inGlobalInteractionBuildUp = true;
+      //if not specified, then set to standard pattern "global"
+      if (globalInteractionName == NULL)
+        globalInteractionName = "global";
+
+      //first call influences behavior file and interaction name
+      s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName, XMLbehaviorFile);
+    }
+    else
+      return NULL;
+  }
+  return s_GlobalInteraction;
 }
 
 

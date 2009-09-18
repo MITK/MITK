@@ -242,7 +242,7 @@ namespace mitk {
     // the reference Image
     typedef itk::Image<T, Dim>  ImageType;
     typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> FilterType;
-    typedef itk::HistogramMatchingImageFilter<ImageType,ImageType> HEFilterType;
+   
     typedef itk::HistogramMatchingImageFilter<ImageType,ImageType> HEFilterType;
 
     typename FilterType::Pointer inputRescalefilter = FilterType::New();  

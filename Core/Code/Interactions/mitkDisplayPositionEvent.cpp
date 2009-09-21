@@ -34,12 +34,13 @@ const mitk::Point3D& mitk::DisplayPositionEvent::GetWorldPosition() const
   // Method performs position picking and sets world position
   if ( m_WorldPositionIsSet )
     return m_WorldPosition;
-
-  m_WorldPositionIsSet = true;
-  
+ 
   assert( m_Sender != NULL );
   
   m_Sender->PickWorldPoint( m_DisplayPosition, m_WorldPosition );
+
+  m_WorldPositionIsSet = true;
+
   return m_WorldPosition;
 }
 
@@ -50,12 +51,14 @@ mitk::DataTreeNode *mitk::DisplayPositionEvent::GetPickedObjectNode() const
   {
     return m_PickedObjectNode;
   }
-  m_PickedObjectIsSet = true;
-  m_WorldPositionIsSet = true;
-
+ 
   assert( m_Sender != NULL );
 
   m_PickedObjectNode = m_Sender->PickObject( m_DisplayPosition, m_WorldPosition );
+
+  m_PickedObjectIsSet = true;
+  m_WorldPositionIsSet = true;
+
   return m_PickedObjectNode;
 }
 

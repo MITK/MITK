@@ -14,7 +14,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
+                                                          
 
 #ifndef BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
 #define BASERENDERER_H_HEADER_INCLUDED_C1CCA0F4
@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraController.h"
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
+
+//#include "mitkMapper.h"
 
 #include "mitkSliceNavigationController.h"
 #include "mitkCameraController.h"
@@ -46,6 +48,8 @@ class SliceNavigationController;
 class CameraRotationController;
 class CameraController;
 class DataStorage;
+class Mapper;
+class BaseLocalStorageHandler;
 
 //##Documentation
 //## @brief Organizes the rendering process
@@ -542,6 +546,18 @@ protected:
    * rendering enabled */
   unsigned int m_NumberOfVisibleLODEnabledMappers;
 
+  // Local Storage Handling for mappers
+ 
+  protected: 
+  
+    std::list<mitk::BaseLocalStorageHandler*> m_RegisteredLocalStorageHandlers;
+  
+  public:
+  
+    void RemoveAllLocalStorages();
+    void RegisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh );
+    void UnregisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh );
+  
 };
 
 } // namespace mitk

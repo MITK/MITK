@@ -85,13 +85,13 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
       vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
-        vtkMapper->GetProp() );
+        vtkMapper->GetVtkProp(m_VtkPropRenderer) );
       if ( propAssembly )
       {
         propAssembly->InitPathTraversal();
       }
 
-      if (vtkMapper->GetProp()->HasTranslucentPolygonalGeometry()==1)
+      if (vtkMapper->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1)
         return 1;
     }
 

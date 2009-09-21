@@ -386,7 +386,8 @@ void mitk::PointSetVtkMapper3D::GenerateData()
 
 void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
-
+  SetVtkMapperImmediateModeRendering(m_VtkSelectedPolyDataMapper);
+  SetVtkMapperImmediateModeRendering(m_VtkUnselectedPolyDataMapper);
 
   mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
   mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("contoursize"));
@@ -461,12 +462,12 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 }
 
-vtkProp* mitk::PointSetVtkMapper3D::GetProp()
+vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   return m_PointsAssembly;
 }
 
-void mitk::PointSetVtkMapper3D::UpdateVtkTransform()
+void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());

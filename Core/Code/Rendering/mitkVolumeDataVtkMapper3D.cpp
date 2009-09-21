@@ -146,9 +146,6 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
   //m_Prop3D = m_Prop3DAssembly;
 
-  m_Prop3D = m_VolumeLOD;
-  m_Prop3D->Register(NULL);
-
   m_ImageCast = vtkImageShiftScale::New();
   m_ImageCast->SetOutputScalarTypeToUnsignedShort();
   m_ImageCast->ClampOverflowOn();
@@ -169,6 +166,10 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   this->CreateDefaultTransferFunctions();
 }
 
+vtkProp *mitk::VolumeDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+{
+  return m_VolumeLOD;
+}
 
 mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 {
@@ -200,6 +201,8 @@ mitk::VolumeDataVtkMapper3D::~VolumeDataVtkMapper3D()
 
 void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
+  SetVtkMapperImmediateModeRendering(m_BoundingBoxMapper);
+
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   if ( !input || !input->IsInitialized() )
     return;

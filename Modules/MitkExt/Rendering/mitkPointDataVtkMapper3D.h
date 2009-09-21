@@ -52,6 +52,8 @@ public:
     itkSetMacro( Radius, float);
 
     itkGetMacro( Radius, float);
+    
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
 protected:
 

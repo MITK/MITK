@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 #include "mitkMapper3D.h"
 #include "mitkBaseRenderer.h"
+#include "vtkMapper.h"
 
 class vtkProp;
 class vtkProp3D;
@@ -43,8 +44,9 @@ class MITK_CORE_EXPORT BaseVtkMapper3D : public Mapper3D
 public:
   mitkClassMacro(BaseVtkMapper3D, Mapper3D);
 
-  virtual vtkProp *GetProp();
-  virtual vtkProp *GetLabelProp();
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
+
+  static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
   void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
   void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
@@ -59,7 +61,7 @@ public:
   //##
   //## Called by mitk::VtkPropRenderer::Update before rendering
   //##
-  virtual void UpdateVtkTransform();
+  virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
   //##Documentation
   //## @brief Apply color and opacity read from the PropertyList
@@ -71,6 +73,15 @@ public:
   */
   virtual void ReleaseGraphicsResources(vtkWindow *renWin);
 
+  
+  /** \brief Returns true if this mapper owns the specified vtkProp for
+   * the given BaseRenderer.
+   *
+   * Note: returns false by default; should be implemented for VTK-based
+   * Mapper subclasses. */
+  virtual bool HasVtkProp( const vtkProp *prop, BaseRenderer *renderer );
+  
+
 protected:
   BaseVtkMapper3D();
 
@@ -78,7 +89,7 @@ protected:
 
   /** Checks whether the specified property is a AnnotationProperty and if yes,
   * adds it to m_LabelActorCollection (internal method). */
-  virtual void CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer );
+ // virtual void CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer );
 
 public:
 
@@ -89,8 +100,8 @@ protected:
   Geometry3D::Pointer m_Geometry;
   LevelWindow m_LevelWindow;
 
-  vtkProp3D *m_Prop3D;
-  vtkProp3DCollection *m_LabelActorCollection;
+  //vtkProp3D *m_Prop3D;
+  //vtkProp3DCollection *m_LabelActorCollection;
 };
 
 } // namespace mitk

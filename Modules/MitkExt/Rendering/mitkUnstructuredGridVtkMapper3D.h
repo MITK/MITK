@@ -53,6 +53,8 @@ public:
   itkNewMacro(Self);
 
   virtual const mitk::UnstructuredGrid* GetInput();
+
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
   
 
 protected:

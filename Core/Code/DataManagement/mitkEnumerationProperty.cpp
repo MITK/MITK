@@ -49,6 +49,7 @@ bool mitk::EnumerationProperty::SetValue( const std::string& name )
   if ( IsValidEnumerationValue( name ) )
   {
     m_CurrentValue = GetEnumId( name );
+    Modified();
     return true;
   }
   else
@@ -62,6 +63,7 @@ bool mitk::EnumerationProperty::SetValue( const IdType& id )
   if ( IsValidEnumerationValue( id ) )
   {
     m_CurrentValue = id;
+    Modified();
     return true;
   }
   else

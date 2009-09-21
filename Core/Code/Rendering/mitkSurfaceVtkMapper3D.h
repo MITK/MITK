@@ -24,10 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
 
-class vtkActor;
-class vtkPolyDataMapper;
-class vtkPolyDataNormals;
-class vtkPlaneCollection;
+#include <vtkActor.h>
+#include <vtkPainterPolyDataMapper.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkPlaneCollection.h>
 
 namespace mitk {
 
@@ -104,7 +105,7 @@ public:
 
   virtual const mitk::Surface* GetInput();
 
-  virtual bool HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const;
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
@@ -119,20 +120,47 @@ protected:
 
   /** Checks whether the specified property is a ClippingProperty and if yes,
    * adds it to m_ClippingPlaneCollection (internal method). */
-  virtual void CheckForClippingProperty( mitk::BaseProperty *property );
+  virtual void CheckForClippingProperty( mitk::BaseRenderer* renderer, mitk::BaseProperty *property );
 
   bool m_GenerateNormals;
 
-  vtkActor* m_Actor;
-
-  vtkPolyDataMapper *m_VtkPolyDataMapper;
-
-  vtkPolyDataNormals *m_VtkPolyDataNormals;
-
-  vtkPlaneCollection *m_ClippingPlaneCollection;
-
   //enable ImmediateModeRendering for the vtkMapper
   int m_ImmediateModeRenderingOn;
+  
+public:
+    
+  class LocalStorage : public mitk::Mapper::BaseLocalStorage
+  {
+    public:
+
+      vtkActor* m_Actor;
+      vtkPolyDataMapper *m_VtkPolyDataMapper;
+      vtkPolyDataNormals *m_VtkPolyDataNormals;
+      vtkPlaneCollection *m_ClippingPlaneCollection;
+      
+      itk::TimeStamp m_ShaderTimestampUpdate;
+
+      LocalStorage()
+      {
+        m_VtkPolyDataMapper = vtkPainterPolyDataMapper::New();
+        m_VtkPolyDataNormals = vtkPolyDataNormals::New();
+        m_Actor = vtkActor::New();
+        m_ClippingPlaneCollection = vtkPlaneCollection::New();
+
+        m_Actor->SetMapper(m_VtkPolyDataMapper);
+      }
+      
+      ~LocalStorage()
+      {
+        m_VtkPolyDataMapper->Delete();
+        m_VtkPolyDataNormals->Delete();
+        m_Actor->Delete();                                  
+        m_ClippingPlaneCollection->Delete();
+      }
+  };  
+    
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
+  
 };
 
 } // namespace mitk

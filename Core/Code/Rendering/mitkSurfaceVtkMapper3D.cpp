@@ -27,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkClippingProperty.h"
 
+#include "mitkShaderEnumProperty.h"
+#include "mitkShaderRepository.h"
+
 
 #include <vtkActor.h>
 #include <vtkProperty.h>
@@ -44,37 +47,25 @@ const mitk::Surface* mitk::SurfaceVtkMapper3D::GetInput()
 
 mitk::SurfaceVtkMapper3D::SurfaceVtkMapper3D()
 {
-  m_VtkPolyDataMapper = vtkPolyDataMapper::New();
-  m_VtkPolyDataNormals = vtkPolyDataNormals::New();
-
-  m_Actor = vtkActor::New();
-  m_Actor->SetMapper(m_VtkPolyDataMapper);
-
-  m_Prop3D = m_Actor;
-
+ // m_Prop3D = vtkActor::New();
   m_GenerateNormals = false;
-
-  m_ClippingPlaneCollection = vtkPlaneCollection::New();
 }
 
 mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 {
-  m_VtkPolyDataMapper->Delete();
-  m_VtkPolyDataNormals->Delete();
-
-  if(m_Prop3D != m_Actor)
-    m_Actor->Delete();                                  
-
-  m_ClippingPlaneCollection->Delete();
+ // m_Prop3D->Delete();                                  
 }
 
 void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+//  m_Prop3D = ls->m_Actor;
+  
   bool visible = IsVisible(renderer);
 
   if(visible==false)
   {
-    m_Actor->VisibilityOff();
+    ls->m_Actor->VisibilityOff();
     return;
   }
 
@@ -85,7 +76,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
   {
-    m_Actor->VisibilityOff();
+    ls->m_Actor->VisibilityOff();
     return;
   }
 
@@ -104,7 +95,7 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     timestep = inputTimeGeometry->MSToTimeStep( time );
   if( inputTimeGeometry->IsValidTime( timestep ) == false )
   {
-    m_Actor->VisibilityOff();
+    ls->m_Actor->VisibilityOff();
     return;
   }
 //  LOG_INFO << "time: "<< time << std::endl;
@@ -117,38 +108,37 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   vtkPolyData * polydata = input->GetVtkPolyData( timestep );
   if(polydata == NULL) 
   {
-    m_Actor->VisibilityOff();
+    ls->m_Actor->VisibilityOff();
     return;
   }
 
   if ( m_GenerateNormals )
   {
-    m_VtkPolyDataNormals->SetInput( polydata );
-    m_VtkPolyDataMapper->SetInput( m_VtkPolyDataNormals->GetOutput() );
+    ls->m_VtkPolyDataNormals->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInput( ls->m_VtkPolyDataNormals->GetOutput() );
   }
   else
   {
-    m_VtkPolyDataMapper->SetInput( polydata );
+    ls->m_VtkPolyDataMapper->SetInput( polydata );
   }
 
   //
   // apply properties read from the PropertyList
   //
-  ApplyProperties(m_Actor, renderer);
+  ApplyProperties(ls->m_Actor, renderer);
 
   if(visible)
-    m_Actor->VisibilityOn();
-}
-
-bool mitk::SurfaceVtkMapper3D::HasVtkProp( const vtkProp *prop, const mitk::BaseRenderer *renderer ) const
-{
-  return ( m_Actor == prop );
+    ls->m_Actor->VisibilityOn();
 }
 
 
 void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+//  m_Prop3D = ls->m_Actor;
+    
   mitk::MaterialProperty* materialProperty;
+  
   //first check render specific property, then the regular one
   bool setMaterial = false;
   
@@ -164,7 +154,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     
   if (setMaterial)
   {
-    vtkProperty* property = m_Actor->GetProperty();
+    vtkProperty* property = ls->m_Actor->GetProperty();
     //property->SetColor( materialProperty->GetColor().GetDataPointer() );
     property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );    
     property->SetAmbient( materialProperty->GetColorCoefficient() );    
@@ -180,9 +170,9 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   }
   else
   {
-    Superclass::ApplyProperties( m_Actor, renderer ) ;
+    Superclass::ApplyProperties( ls->m_Actor, renderer ) ;
     //reset the default values in case no material is used
-    vtkProperty* property = m_Actor->GetProperty();
+    vtkProperty* property = ls->m_Actor->GetProperty();
 
     property->SetAmbient( 0.0f );    
     property->SetDiffuse( 1.0f );
@@ -191,54 +181,56 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 
     float lineWidth = 1;
     this->GetDataTreeNode()->GetFloatProperty("wireframe line width", lineWidth);
-    m_Actor->GetProperty()->SetLineWidth( lineWidth );
+    ls->m_Actor->GetProperty()->SetLineWidth( lineWidth );
   }
+
+  mitk::ShaderRepository::GetGlobalShaderRepository()->ApplyProperties(this->GetDataTreeNode(),ls->m_Actor,renderer,ls->m_ShaderTimestampUpdate);
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
   this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
   if (lookupTableProp.IsNotNull() )
   {
-    m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
+    ls->m_VtkPolyDataMapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
   }
 
   mitk::LevelWindow levelWindow;
   if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
   {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+    ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
   else
   if(this->GetDataTreeNode()->GetLevelWindow(levelWindow, renderer))
   {
-    m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+    ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
   
   mitk::VtkRepresentationProperty* representationProperty;
   this->GetDataTreeNode()->GetProperty(representationProperty, "representation", renderer);
   if ( representationProperty != NULL )
-    m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
+    ls->m_Actor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
   
   mitk::VtkInterpolationProperty* interpolationProperty;
   this->GetDataTreeNode()->GetProperty(interpolationProperty, "interpolation", renderer);
   if ( interpolationProperty != NULL )
-    m_Actor->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
+    ls->m_Actor->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
   
   bool scalarVisibility = false;
   this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
-  m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
+  ls->m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
 
   if(scalarVisibility)
   {
     mitk::VtkScalarModeProperty* scalarMode;
     if(this->GetDataTreeNode()->GetProperty(scalarMode, "scalar mode", renderer))
     {
-      m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+      ls->m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
     }
     else
-      m_VtkPolyDataMapper->SetScalarModeToDefault();
+      ls->m_VtkPolyDataMapper->SetScalarModeToDefault();
 
     bool colorMode = false;
     this->GetDataTreeNode()->GetBoolProperty("color mode", colorMode);
-    m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
+    ls->m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
 
     float scalarsMin = 0;
     if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
@@ -248,7 +240,7 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
       scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
-    m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
   }
 
   // deprecated settings
@@ -257,16 +249,16 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
 
   bool deprecatedUsePointData = false;
   this->GetDataTreeNode()->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
-
+                  
   if (deprecatedUseCellData)
   {
-    m_VtkPolyDataMapper->SetColorModeToDefault();
-    m_VtkPolyDataMapper->SetScalarRange(0,255);
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-    m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (50);
-    m_Actor->GetProperty()->SetInterpolationToPhong();
+    ls->m_VtkPolyDataMapper->SetColorModeToDefault();
+    ls->m_VtkPolyDataMapper->SetScalarRange(0,255);
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_VtkPolyDataMapper->SetScalarModeToUseCellData();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetInterpolationToPhong();
   }
   else if (deprecatedUsePointData)
   {
@@ -278,21 +270,21 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
     if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
       scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
-    m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
-    m_VtkPolyDataMapper->SetColorModeToMapScalars();
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (50);
-    m_Actor->GetProperty()->SetInterpolationToPhong();
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    ls->m_VtkPolyDataMapper->SetColorModeToMapScalars();
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetInterpolationToPhong();
   }
 
   int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
   if(this->GetDataTreeNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
   {
-    m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
-    m_VtkPolyDataMapper->ScalarVisibilityOn();
-    m_Actor->GetProperty()->SetSpecular (1);
-    m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
     //m_Actor->GetProperty()->SetInterpolationToPhong();
   }
 
@@ -304,31 +296,42 @@ void mitk::SurfaceVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRe
   const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
 
   // Add clipping planes (if any)
-  m_ClippingPlaneCollection->RemoveAllItems();
+  ls->m_ClippingPlaneCollection->RemoveAllItems();
   
   PropertyList::PropertyMap::const_iterator it;
   for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
   {
-    this->CheckForClippingProperty( (*it).second.first.GetPointer() );
+    this->CheckForClippingProperty( renderer,(*it).second.first.GetPointer() );
   }
 
   for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
   {
-    this->CheckForClippingProperty( (*it).second.first.GetPointer() );
+    this->CheckForClippingProperty( renderer,(*it).second.first.GetPointer() );
   }
 
-  if ( m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
+  if ( ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
   {
-    m_VtkPolyDataMapper->SetClippingPlanes( m_ClippingPlaneCollection );
+    ls->m_VtkPolyDataMapper->SetClippingPlanes( ls->m_ClippingPlaneCollection );
   }
   else
   {
-    m_VtkPolyDataMapper->RemoveAllClippingPlanes();
+    ls->m_VtkPolyDataMapper->RemoveAllClippingPlanes();
   }
+  
+  
 }
 
-void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseProperty *property )
+vtkProp *mitk::SurfaceVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  return ls->m_Actor;
+}
+
+void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* renderer, mitk::BaseProperty *property )
+{
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+//  m_Prop3D = ls->m_Actor;
+
   ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >( property );
 
   if ( (clippingProperty != NULL)
@@ -341,7 +344,7 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseProperty *pro
     clippingPlane->SetOrigin( origin[0], origin[1], origin[2] );
     clippingPlane->SetNormal( normal[0], normal[1], normal[2] );
 
-    m_ClippingPlaneCollection->AddItem( clippingPlane );
+    ls->m_ClippingPlaneCollection->AddItem( clippingPlane );
 
     clippingPlane->UnRegister( NULL );
   }
@@ -350,6 +353,8 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseProperty *pro
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
+  mitk::ShaderRepository::GetGlobalShaderRepository()->AddDefaultProperties(node,renderer,overwrite);
+
   node->AddProperty( "wireframe line width", mitk::FloatProperty::New(1.0), renderer, overwrite );
   node->AddProperty( "material", mitk::MaterialProperty::New( 1.0, 1.0, 1.0, 1.0, node ), renderer, overwrite );
   node->AddProperty( "scalar visibility", mitk::BoolProperty::New(false), renderer, overwrite );
@@ -371,6 +376,8 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mi
 
 void mitk::SurfaceVtkMapper3D::SetImmediateModeRenderingOn(int on)
 {
+/*
   if (m_VtkPolyDataMapper != NULL) 
     m_VtkPolyDataMapper->SetImmediateModeRendering(on);
+*/
 }

@@ -47,8 +47,8 @@ public:
 
     itkNewMacro( Self );
 
-    virtual vtkProp* GetProp();
-    virtual void UpdateVtkTransform();
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer *renderer);
+    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
     bool SplinesAreAvailable();
     

@@ -20,9 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MAPPER_H_HEADER_INCLUDED_C1E6EA08
 
 #include "mitkCommon.h"
-#include "itkObject.h"
+#include "mitkBaseRenderer.h"
 #include "mitkLevelWindow.h"
-#include "itkWeakPointer.h"
+
+#include <itkObject.h>
+#include <itkWeakPointer.h>
 
 //Just included to get VTK version
 #include <vtkConfigure.h>
@@ -35,6 +37,16 @@ namespace mitk {
   class BaseRenderer;
   class BaseData;
   class DataTreeNode;
+  
+
+  /** \brief Interface for accessing (templated) LocalStorageHandler instances.
+   */
+  class BaseLocalStorageHandler
+  {
+    public:
+      virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )=0;
+  };
+
 
   //##Documentation
   //## @brief Base class of all mappers, 2D as well as 3D
@@ -124,7 +136,7 @@ namespace mitk {
      *
      * Note: returns false by default; should be implemented for VTK-based
      * Mapper subclasses. */
-    virtual bool HasVtkProp( const vtkProp* /*prop*/, const BaseRenderer* /*renderer*/ ) const 
+    virtual bool HasVtkProp( const vtkProp* /*prop*/, BaseRenderer* /*renderer*/ )
     { 
       return false; 
     }
@@ -183,6 +195,80 @@ namespace mitk {
     //## The current time step of the dataset to be rendered, for use in subclasses
     //## The momentary timestep can be accessed via the GetTimestep() method.
     int m_TimeStep;
+
+
+  public:
+
+    /** \brief Base class for mapper specific rendering ressources.
+     */
+    class BaseLocalStorage
+    {
+    };
+
+     
+    /** \brief Templated class for management of LocalStorage implementations in Mappers.
+     *
+     * The LocalStorageHandler is responsible for providing a LocalStorage to a
+     * concrete mitk::Mapper subclass. Each RenderWindow / mitk::BaseRenderer is
+     * assigned its own LocalStorage instance so that all contained ressources
+     * (actors, shaders, textures, ...) are provided individually per window.
+     * 
+     */
+    template<class L> class LocalStorageHandler : public mitk::BaseLocalStorageHandler
+    {
+      protected:
+    
+        std::map<mitk::BaseRenderer *,L*> m_BaseRenderer2LS;
+      
+      public:
+
+        /** \brief deallocates a local storage for a specifc BaseRenderer (if the
+         * BaseRenderer is itself deallocating it in its destructor, it has to set
+         * unregisterFromBaseRenderer=false) 
+         */
+        virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )
+        {
+          LOG_INFO << "deleting a localstorage on a mapper request";
+          if(unregisterFromBaseRenderer)
+            renderer->UnregisterLocalStorageHandler( this );
+          L *l = m_BaseRenderer2LS[renderer];
+          m_BaseRenderer2LS.erase( renderer );
+          delete l;
+        }
+      
+        /** \brief Retrieves a LocalStorage for a specific BaseRenderer.
+         *
+         * Should be used by mappers in GenerateData() and ApplyProperties()
+         */
+        L *GetLocalStorage(mitk::BaseRenderer *forRenderer)
+        {
+          L *l = m_BaseRenderer2LS[ forRenderer ];
+          if(!l)
+          {
+            LOG_INFO << "creating new localstorage";
+            l = new L;
+            m_BaseRenderer2LS[ forRenderer ] = l;
+            forRenderer->RegisterLocalStorageHandler( this );
+          }
+          return l;
+        }
+        
+        ~LocalStorageHandler()
+        {
+          typename std::map<mitk::BaseRenderer *,L*>::iterator it;
+
+          for ( it=m_BaseRenderer2LS.begin() ; it != m_BaseRenderer2LS.end(); it++ )
+          {
+            (*it).first->UnregisterLocalStorageHandler(this);
+            delete (*it).second;
+          }
+          
+          m_BaseRenderer2LS.clear();
+        }
+             
+    };
+
+
 
 
   };

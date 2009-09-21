@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageSource.h"
 #include "mitkBaseData.h"
-#include "mitkMapper.h"
+//#include "mitkMapper.h"
 #include "mitkInteractor.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
@@ -37,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
-#include "mitkMapper.h"
+//#include "mitkMapper.h"
 
 #include <map>
 #include <set>
@@ -48,6 +48,8 @@ class vtkLinearTransform;
 namespace mitk {
 
 class BaseRenderer;
+class Mapper;
+
 
 //##Documentation
 //## @brief Class for nodes of the DataTree
@@ -66,7 +68,7 @@ class MITK_CORE_EXPORT DataTreeNode : public itk::DataObject
 public:
 
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
-  typedef std::vector<Mapper::Pointer> MapperVector;
+  typedef std::vector< itk::SmartPointer< Mapper > > MapperVector;
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
   typedef std::set<std::string> GroupTagList;
 

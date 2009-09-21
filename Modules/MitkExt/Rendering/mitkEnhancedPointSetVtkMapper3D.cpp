@@ -55,12 +55,15 @@ mitk::EnhancedPointSetVtkMapper3D::EnhancedPointSetVtkMapper3D()
   m_Contour = vtkActor::New();
   m_ContourSource = vtkTubeFilter::New();
   m_PropAssembly = vtkAssembly::New();
-  m_Prop3D = m_PropAssembly;
+}
+
+vtkProp* mitk::EnhancedPointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  return m_PropAssembly;
 }
 
 mitk::EnhancedPointSetVtkMapper3D::~EnhancedPointSetVtkMapper3D()
 {
-  m_Prop3D = NULL;
   m_Contour->Delete();
   m_ContourSource->Delete();
   m_PropAssembly->Delete();
@@ -219,6 +222,8 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
     vtkActor* a = aIt->second.first;
     assert(a != NULL);
 
+    SetVtkMapperImmediateModeRendering(a->GetMapper());
+
     /* update properties */
     // visibility
     bool pointVisibility = true;
@@ -337,7 +342,7 @@ void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * rende
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform()
+void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   // TODO: apply new transform if time step changed
 

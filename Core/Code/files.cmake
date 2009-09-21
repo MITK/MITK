@@ -115,6 +115,7 @@ SET(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   #DataManagement/mitkXMLIO.cpp
+  DataManagement/mitkShaderEnumProperty.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
@@ -203,5 +204,6 @@ SET(CPP_FILES
   Rendering/mitkVtkWidgetRendering.cpp
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
+  Rendering/mitkShaderRepository.cpp
 )
 

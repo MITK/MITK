@@ -41,12 +41,12 @@ const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
   return static_cast<const mitk::Mesh * > ( GetData() );
 }
 
-vtkProp* mitk::MeshVtkMapper3D::GetProp()
+vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   return m_PropAssembly;
 }
 
-void mitk::MeshVtkMapper3D::UpdateVtkTransform()
+void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
@@ -74,7 +74,6 @@ mitk::MeshVtkMapper3D::MeshVtkMapper3D()
 
   // a vtkPropAssembly is not a sub-class of vtkProp3D, so
   // we cannot use m_Prop3D.
-  m_Prop3D = NULL;
 }
 
 mitk::MeshVtkMapper3D::~MeshVtkMapper3D()
@@ -189,6 +188,9 @@ void mitk::MeshVtkMapper3D::GenerateData()
 
 void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
+  SetVtkMapperImmediateModeRendering(m_ContourMapper);
+  SetVtkMapperImmediateModeRendering(m_SpheresMapper);
+
   if(IsVisible(renderer)==false)
   {
     m_SpheresActor->VisibilityOff();

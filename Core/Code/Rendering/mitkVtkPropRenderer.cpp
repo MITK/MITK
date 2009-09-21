@@ -59,7 +59,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkAssemblyPath.h>
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
-#include <vtkProperty.h>
 
 
 
@@ -124,6 +123,8 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_WorldPointPicker->Delete();
   if (m_PointPicker != NULL)
     m_PointPicker->Delete();
+  if (m_CellPicker != NULL)
+    m_CellPicker->Delete();
   if (m_TextRenderer != NULL)
     m_TextRenderer->Delete();
 }
@@ -193,8 +194,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
       if(vtkMapper)
       {
-         vtkMapper->GetProp()->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
-         //vtkMapper->GetProp()->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
+         vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
+         //vtkMapper->GetVtkProp(this)->PokeMatrix(NULL); //B/ ToDo ??: VtkUserTransform
       }
       if(lastVtkBased == false)
       {
@@ -374,7 +375,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataTreeNode* datatreenode)
         if(vtkmapper3d != NULL)
         {
           vtkmapper3d->Update(this);
-          vtkmapper3d->UpdateVtkTransform();
+          vtkmapper3d->UpdateVtkTransform(this);
           m_VtkMapperPresent=true;
         }
       }
@@ -530,7 +531,6 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
   }
 }
 
-
 mitk::DataTreeNode *
 mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const 
 {
@@ -559,7 +559,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
       if ( mapper == NULL )
         continue;
 
-      vtkProp *prop = mapper->GetProp();
+      vtkProp *prop = mapper->GetVtkProp( (mitk::BaseRenderer *)this );
       if ( prop == NULL )
         continue;
 
@@ -580,12 +580,11 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
       return NULL;
     }
 
-
     // Iterate over all DataStorage objects to determine if the retrieved
     // vtkProp is owned by any associated mapper.
     for ( DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();
           it != allObjects->End(); 
-          ++it )
+          ++it)
     {
       DataTreeNode::Pointer node = it->Value();
       if ( node.IsNull() )
@@ -595,7 +594,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
       if ( mapper.IsNull() )
         continue;
 
-      if ( mapper->HasVtkProp( prop, this ) )
+      if ( mapper->HasVtkProp( prop, const_cast< mitk::VtkPropRenderer * >( this ) ) )
       {
         return node;
       }
@@ -675,7 +674,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
         BaseVtkMapper3D* vtkmapper = dynamic_cast<BaseVtkMapper3D*>( mapper );
         if (vtkmapper)
         {
-          vtkProp* prop = vtkmapper->GetProp();
+          vtkProp* prop = vtkmapper->GetVtkProp(this);
           if ( prop && prop->GetVisibility() )
           {
             // add to assembly path
@@ -751,6 +750,11 @@ mitk::VtkPropRenderer::MappersMapType mitk::VtkPropRenderer::GetMappersMap() con
 
 static int glWorkAroundGlobalCount = 0;
 
+bool mitk::VtkPropRenderer::useImmediateModeRendering()
+{
+  return glWorkAroundGlobalCount>1;
+}
+
 void mitk::VtkPropRenderer::checkState()
 {
   if (m_MapperID == Standard3D)
@@ -759,28 +763,28 @@ void mitk::VtkPropRenderer::checkState()
     {
       didCount = true;
       glWorkAroundGlobalCount++;
+      
       if (glWorkAroundGlobalCount == 2)
       {
-        //LOG_INFO << "GIMR ON\n";
-          vtkMapper::GlobalImmediateModeRenderingOn();
+        LOG_INFO << "Multiple 3D Renderwindows active...: turning Immediate Rendering ON for legacy mappers";
+//          vtkMapper::GlobalImmediateModeRenderingOn();
       }
-    //LOG_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
+      //LOG_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
+      
     }
   }
   else
   {
     if(didCount)
     {
-    didCount=false;
-    glWorkAroundGlobalCount--;
-    if(glWorkAroundGlobalCount==1)
-    {
-      //LOG_INFO << "GIMR OFF\n";
-      vtkMapper::GlobalImmediateModeRenderingOff();
-    }
-
-    //LOG_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
-    
+      didCount=false;
+      glWorkAroundGlobalCount--;
+      if(glWorkAroundGlobalCount==1)
+      {
+        LOG_INFO << "Single 3D Renderwindow active...: turning Immediate Rendering OFF for legacy mappers";
+//        vtkMapper::GlobalImmediateModeRenderingOff();
+      }
+      //LOG_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
     }
    }
 }

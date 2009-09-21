@@ -46,6 +46,8 @@ class MITKEXT_CORE_EXPORT ContourSetVtkMapper3D : public BaseVtkMapper3D
 
     virtual const mitk::ContourSet* GetInput();
 
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
   protected:
    
     ContourSetVtkMapper3D();

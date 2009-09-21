@@ -75,7 +75,9 @@ namespace mitk {
 
     virtual const mitk::PointSet* GetInput();
 
-    virtual void UpdateVtkTransform();
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
+    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
     static void SetDefaultProperties(mitk::DataTreeNode* node, 
       mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -115,7 +117,7 @@ namespace mitk {
     vtkActor* m_Contour;
     vtkTubeFilter* m_ContourSource;
 
-    vtkAssembly* m_PropAssembly;  // this contains everything, this will be returned by GetProp()
+    vtkAssembly* m_PropAssembly;  // this contains everything, this will be returned by GetVtkProp()
   };
 } // namespace mitk
 

@@ -74,6 +74,8 @@ public:
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+
   virtual void EnableMask();
   virtual void DisableMask();
   Image::Pointer GetMask();

@@ -86,6 +86,8 @@ public:
    * ProgressEvent on BaseRenderer. */
   virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
 
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+
 protected:
 
 

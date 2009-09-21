@@ -50,7 +50,6 @@ mitk::ContourVtkMapper3D::ContourVtkMapper3D()
   m_VtkPointList = vtkAppendPolyData::New();
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
-  m_Prop3D = m_Actor;
 
   m_Contour = NULL;
   m_TubeFilter = vtkTubeFilter::New();
@@ -62,6 +61,11 @@ mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
   m_VtkPointList->Delete();
   if ( m_Contour!=NULL )
     m_Contour->Delete();
+}
+
+vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  return m_Actor;
 }
 
 void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
@@ -169,6 +173,8 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     m_Actor->GetProperty()->SetColor(rgba);
     m_Actor->SetMapper(m_VtkPolyDataMapper);
   }
+  
+  SetVtkMapperImmediateModeRendering(m_VtkPolyDataMapper);
 }
 
 const mitk::Contour* mitk::ContourVtkMapper3D::GetInput()

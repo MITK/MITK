@@ -44,6 +44,8 @@ public:
 
   virtual const mitk::Contour* GetInput();
 
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
 protected:
   ContourVtkMapper3D();
   virtual ~ContourVtkMapper3D();

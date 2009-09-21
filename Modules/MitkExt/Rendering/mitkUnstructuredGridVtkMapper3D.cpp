@@ -70,7 +70,6 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
   m_Assembly->AddPart(m_Actor);
   m_Assembly->AddPart(m_ActorWireframe);
   m_Assembly->AddPart(m_Volume);
-  m_Prop3D = m_Assembly;
 
   m_VtkVolumeRayCastMapper = 0;
   #if (VTK_MAJOR_VERSION >= 5)
@@ -105,7 +104,7 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
   if (m_VtkDataSetMapper2 != 0)
       m_VtkDataSetMapper2->Delete();
 
-  if(m_Prop3D != m_Assembly)
+  if (m_Assembly != 0)
     m_Assembly->Delete();
 
   if (m_Actor != 0)
@@ -117,6 +116,11 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
   if (m_Volume != 0)
     m_Volume->Delete();
 
+}
+
+vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  return m_Assembly;
 }
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateData()

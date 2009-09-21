@@ -83,8 +83,8 @@ public:
    * transformed after generation of poly data, but before (vertex coordinates
    * only)
    */
-  virtual vtkProp *GetProp();
-  virtual void UpdateVtkTransform();
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+  virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
 
   /**
    *  \brief Get the Geometry2DData to map

@@ -27,8 +27,7 @@ public:
   ///
   /// Constructs a new QmitkDataStorageTableModel 
   /// and sets the DataTreeNode for this TableModel.
-  QmitkPropertiesTableEditor(mitk::DataTreeNode::Pointer _Node = 0
-    , QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkPropertiesTableEditor(QWidget* parent = 0, Qt::WindowFlags f = 0,mitk::DataTreeNode::Pointer _Node = 0);
 
   ///
   /// Standard dtor. Nothing to do here.

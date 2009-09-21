@@ -170,9 +170,7 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
   //m_Prop3DAssembly->AddPart( m_BoundingBoxActor );
   //m_Prop3D = m_Prop3DAssembly;
 
-  m_Prop3D = m_VolumeLOD;
-  m_Prop3D->Register(NULL);
-                                 /*
+                                /*
   m_ImageCast = vtkImageShiftScale::New();
   m_ImageCast->SetOutputScalarTypeToUnsignedShort();
   m_ImageCast->ClampOverflowOn();
@@ -191,6 +189,11 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
 
 
   this->CreateDefaultTransferFunctions();
+}
+
+vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+{
+  return m_VolumeLOD;
 }
 
 

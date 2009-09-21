@@ -39,8 +39,11 @@ class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
 
+
 namespace mitk 
 {
+
+class Mapper;
 
 /*!
 \brief VtkPropRenderer
@@ -58,6 +61,7 @@ class MITK_CORE_EXPORT VtkPropRenderer : public BaseRenderer
 private:
   bool didCount;
   void checkState();
+
   // Workaround END
 
 public:
@@ -138,6 +142,9 @@ public:
   #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
   MappersMapType GetMappersMap() const;
   #endif
+
+  static bool useImmediateModeRendering();
+
 protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL);
   virtual ~VtkPropRenderer();
@@ -164,7 +171,8 @@ private:
 
   PickingMode               m_PickingMode;
 
-  mitk::Mapper::Pointer m_CurrentWorldGeometry2DMapper;
+  // Explicit use of SmartPointer to avoid circular #includes
+  itk::SmartPointer< mitk::Mapper > m_CurrentWorldGeometry2DMapper;
 
   vtkLightKit* m_LightKit;
 

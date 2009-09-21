@@ -105,7 +105,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // NodeProperties
   QGroupBox* _NodePropertiesGroupBox = new QGroupBox("Properties", m_Parent);
   QHBoxLayout* _NodePropertiesLayout = new QHBoxLayout;
-  m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(0, _NodePropertiesGroupBox);
+  m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor(_NodePropertiesGroupBox);
 
   //// Set
 

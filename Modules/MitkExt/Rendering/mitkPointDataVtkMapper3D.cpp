@@ -44,7 +44,6 @@ mitk::PointDataVtkMapper3D::PointDataVtkMapper3D()
   m_PointActor->SetMapper( m_PointMapper );
   m_PointActor->GetProperty()->SetColor(0.0,0.0,1.0);
 
-  m_Prop3D = m_PointActor;
 }
 
 mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
@@ -53,6 +52,12 @@ mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
   m_CellArray->Delete();
   m_PolyData->Delete();
   m_PointMapper->Delete();
+}
+
+vtkProp* mitk::PointDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  return m_PointActor;
+
 }
 
 void mitk::PointDataVtkMapper3D::GenerateData()
@@ -66,4 +71,7 @@ void mitk::PointDataVtkMapper3D::GenerateData()
   m_PointActor->SetPosition( point[0], point[1], point[2] );
 
   m_PolyData->Update();
+  
+  SetVtkMapperImmediateModeRendering(m_PointMapper);
+
 }

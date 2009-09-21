@@ -200,6 +200,9 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
 {
+    return NULL;
+    /*
+
     mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
     if ( node.IsNull() )
         return NULL;
@@ -210,12 +213,13 @@ vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
 
     mitkMapper->Update(NULL);
 
-    vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetProp() );
+    vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetVtkProp(0) );
 
     if ( actor == NULL )
         return NULL;
 
     return dynamic_cast<vtkPolyDataMapper*>( actor->GetMapper() );
+  */
 }
 
 

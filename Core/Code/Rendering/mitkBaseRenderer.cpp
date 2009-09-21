@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseRenderer.h"
+#include "mitkMapper.h"
 
 // Geometries
 #include "mitkPlaneGeometry.h"
@@ -228,9 +229,10 @@ mitk::BaseRenderer::~BaseRenderer()
   mitk::GlobalInteraction::GetInstance()->RemoveFocusElement(this);
 
   mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
+
+  RemoveAllLocalStorages();
+    
   
-  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
- 
   m_DataStorage = NULL;
 
   if(m_RenderWindow!=NULL)
@@ -238,6 +240,27 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = NULL;
   }
+}
+
+void mitk::BaseRenderer::RemoveAllLocalStorages()
+{
+  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
+  
+  std::list<mitk::BaseLocalStorageHandler*>::iterator it;
+  for ( it=m_RegisteredLocalStorageHandlers.begin() ; it != m_RegisteredLocalStorageHandlers.end(); it++ )
+    (*it)->ClearLocalStorage(this,false);
+  m_RegisteredLocalStorageHandlers.clear();  
+}
+
+void mitk::BaseRenderer::RegisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh )
+{
+  m_RegisteredLocalStorageHandlers.push_back(lsh);
+  
+}
+
+void mitk::BaseRenderer::UnregisterLocalStorageHandler( mitk::BaseLocalStorageHandler *lsh )
+{
+  m_RegisteredLocalStorageHandlers.remove(lsh);
 }
 
 
@@ -282,7 +305,8 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow* renderwindow)
   {
     m_RenderWindow->Register(NULL);
   }
-  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
+  
+  RemoveAllLocalStorages();
   
   if(m_CameraController.IsNotNull())
   {

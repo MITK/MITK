@@ -399,6 +399,11 @@ vtkAbstractMapper3D*
 mitk::UnstructuredGridMapper2D
 ::GetVtkAbstractMapper3D(mitk::BaseRenderer * renderer)
 {
+
+  return NULL;
+  
+  /*
+
   //LOG_INFO << "GETVTKABSTRACTMAPPER3D\n";
   mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
   if ( node.IsNull() )
@@ -412,18 +417,20 @@ mitk::UnstructuredGridMapper2D
 
   mitkMapper->Update(renderer);
 
-  vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetProp() );
+  vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetVtkProp() );
   if (actor)
   {
     return dynamic_cast<vtkAbstractMapper3D*>( actor->GetMapper() );
   }
-  vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetProp() );
+  
+  vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetVtkProp() );
   if (volume)
   {
     return dynamic_cast<vtkAbstractMapper3D*>( volume->GetMapper() );
   }
 
   return 0;
+  */
 }
 
 
@@ -487,14 +494,14 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
 
     mitkMapper->Update(renderer);
 
-    vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetProp() );
+    vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetVtkProp(renderer) );
     if (volume)
     {
       //LOG_INFO << "found volume prop\n";
       return static_cast<vtkScalarsToColors*>(volume->GetProperty()->GetRGBTransferFunction());
     }
     
-    vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetProp());
+    vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetVtkProp(renderer));
     if (assembly)
     {
       //LOG_INFO << "found assembly prop\n";

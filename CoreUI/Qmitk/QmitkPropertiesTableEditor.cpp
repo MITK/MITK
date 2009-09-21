@@ -16,8 +16,8 @@
 
 #include <vtkRenderWindow.h>
 
-QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(mitk::DataTreeNode::Pointer _Node, QWidget* parent
-                                                       , Qt::WindowFlags f)
+QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(QWidget* parent
+                                                       , Qt::WindowFlags f,mitk::DataTreeNode::Pointer _Node)
 : QWidget(parent, f)
 , m_NodePropertiesTableView(0)
 , m_Model(0)

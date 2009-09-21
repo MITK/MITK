@@ -38,8 +38,8 @@ m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitia
   m_LandmarkTransformInitializer->SetTransform(m_LandmarkTransform);
 
   //transform to rotate orientation 
-   m_QuatLandmarkTransform = QuaternionTransformType::New();
-   m_QuatTransform = QuaternionTransformType::New();
+  m_QuatLandmarkTransform = QuaternionTransformType::New();
+  m_QuatTransform = QuaternionTransformType::New();
 }
 
 
@@ -70,7 +70,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
   TransformInitializerType::LandmarkPointType lPoint;
 
   for (mitk::PointSet::PointsContainer::ConstIterator it = mitkSourcePointSet->GetPointSet()->GetPoints()->Begin(); 
-       it != mitkSourcePointSet->GetPointSet()->GetPoints()->End(); ++it)
+    it != mitkSourcePointSet->GetPointSet()->GetPoints()->End(); ++it)
   {
     mitk::FillVector3D(lPoint, it->Value().GetElement(0), it->Value().GetElement(1), it->Value().GetElement(2));
     m_SourcePoints.push_back(lPoint);
@@ -80,7 +80,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
   {
     itkExceptionMacro("SourcePointSet must contain at least 3 points");
   }
-  
+
   if ((m_SourcePoints.size() >= 3) && (m_TargetPoints.size() >= 3))
     this->InitializeLandmarkTransform(m_SourcePoints, m_TargetPoints);
 }
@@ -91,7 +91,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
   m_TargetPoints.clear();
   TransformInitializerType::LandmarkPointType lPoint;
   for (mitk::PointSet::PointsContainer::ConstIterator it = mitkTargetPointSet->GetPointSet()->GetPoints()->Begin(); 
-       it != mitkTargetPointSet->GetPointSet()->GetPoints()->End(); ++it)
+    it != mitkTargetPointSet->GetPointSet()->GetPoints()->End(); ++it)
   {
     mitk::FillVector3D(lPoint, it->Value().GetElement(0), it->Value().GetElement(1), it->Value().GetElement(2));
     m_TargetPoints.push_back(lPoint);
@@ -196,7 +196,7 @@ void mitk::NavigationDataLandmarkTransformFilter::GenerateData()
       continue;
     }
     output->Graft(input); // First, copy all information from input to output
-    
+
     if (this->IsInitialized() == false) // as long as there is no valid transformation matrix, only graft the outputs
       continue;
 
@@ -289,7 +289,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
 {
   if (sources.size() < 6 || targets.size() < 6)
     return false;
-    //throw std::invalid_argument("ICP correspondence finding needs at least 6 landmarks");
+  //throw std::invalid_argument("ICP correspondence finding needs at least 6 landmarks");
 
   /* lots of type definitions */
   typedef itk::PointSet<mitk::ScalarType, 3> PointSetType;
@@ -308,12 +308,20 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   PointSetType::Pointer sourcePointSet = PointSetType::New();
   unsigned int i = 0;
   for (LandmarkPointContainer::const_iterator it = sources.begin(); it != sources.end(); ++it)
-    sourcePointSet->SetPoint(i++, *it);
+  {
+    PointSetType::PointType doublePoint;
+    mitk::itk2vtk(*it, doublePoint); // copy mitk::ScalarType point into double point as workaround to ITK 3.10 bug
+    sourcePointSet->SetPoint(i++, doublePoint /**it*/);
+  }
 
   i = 0;
   PointSetType::Pointer targetPointSet = PointSetType::New();
   for (LandmarkPointContainer::const_iterator it = targets.begin(); it != targets.end(); ++it)
-    targetPointSet->SetPoint(i++, *it);
+  {
+    PointSetType::PointType doublePoint;
+    mitk::itk2vtk(*it, doublePoint); // copy mitk::ScalarType point into double point as workaround to ITK 3.10 bug
+    targetPointSet->SetPoint(i++, doublePoint /**it*/);
+  }
 
   /* get centroid and extends of our pointsets */
   //BoundingBoxType::Pointer sourceBoundingBox = BoundingBoxType::New();
@@ -380,7 +388,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   }
   LOG_INFO << "ICP successful: Solution = " << transform->GetParameters() << std::endl;
   LOG_INFO << "Metric value: " << metric->GetValue(transform->GetParameters());
-  
+
   /* find point correspondences */
   //mitk::PointLocator::Pointer pointLocator = mitk::PointLocator::New();  // <<- use mitk::PointLocator instead of searching manually?
   //pointLocator->SetPoints()

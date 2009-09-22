@@ -49,7 +49,8 @@ BaseVtkMapper3D::~BaseVtkMapper3D()
 
 void BaseVtkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
 {
-  mapper->SetImmediateModeRendering(mitk::VtkPropRenderer::useImmediateModeRendering());
+  if(mapper)
+    mapper->SetImmediateModeRendering(mitk::VtkPropRenderer::useImmediateModeRendering());
 }
 
 

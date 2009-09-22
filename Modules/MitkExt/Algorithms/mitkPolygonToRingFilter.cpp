@@ -77,7 +77,7 @@ void mitk::PolygonToRingFilter::GenerateData()
     mitk::Mesh::PointType thisPoint;
 
     // iterate through all cells and build tubes
-    Mesh::CellIterator cellIt, cellEnd;
+    Mesh::ConstCellIterator cellIt, cellEnd;
     cellEnd = input->GetMesh( t )->GetCells()->End();
     for ( cellIt = input->GetMesh( t )->GetCells()->Begin();
           cellIt != cellEnd; 

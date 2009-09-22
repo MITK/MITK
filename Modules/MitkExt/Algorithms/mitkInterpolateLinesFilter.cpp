@@ -72,7 +72,7 @@ void mitk::InterpolateLinesFilter::GenerateData()
   m_Length = 0.0;
 
   //iterate through all cells and build tubes
-  Mesh::CellIterator cellIt, cellEnd;
+  Mesh::ConstCellIterator cellIt, cellEnd;
   cellEnd = input->GetMesh()->GetCells()->End();
   for( cellIt = input->GetMesh()->GetCells()->Begin(); cellIt != cellEnd; ++cellIt )
   {

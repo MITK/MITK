@@ -101,7 +101,7 @@ void mitk::PlanesPerpendicularToLinesFilter::GenerateData()
   {
     int i, size;
     //iterate through all cells and build planes
-    Mesh::CellIterator cellIt, cellEnd;
+    Mesh::ConstCellIterator cellIt, cellEnd;
     cellEnd = input->GetMesh()->GetCells()->End();
     for( cellIt = input->GetMesh()->GetCells()->Begin(); cellIt != cellEnd; ++cellIt )
     {

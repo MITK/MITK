@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
 
+#include "mitkStandardFileLocations.h"
+
 mitk::ShaderRepository::ShaderRepository()
 {
   LoadShaders();
@@ -53,9 +55,22 @@ void mitk::ShaderRepository::LoadShaders()
 {
   itk::Directory::Pointer dir = itk::Directory::New();
   
-  char * dirPath = "./vtk_shader"; 
+  std::string mitkLighting = mitk::StandardFileLocations::GetInstance()->FindFile("mitkShaderLighting.xml", "Core/Code/Rendering");
+
+  std::string dirPath = "./vtk_shader"; 
   
-  if( dir->Load( dirPath ) )
+  
+  if(mitkLighting.size() > 0)
+  {
+    // we found the default shader
+    dirPath = itksys::SystemTools::GetFilenamePath( mitkLighting );
+    
+    LOG_INFO << "shader repository found default mitk shader at '" << dirPath << "'";
+  }
+  
+  
+  
+  if( dir->Load( dirPath.c_str() ) )
   {  
     int n = dir->GetNumberOfFiles();
     for(int r=0;r<n;r++)

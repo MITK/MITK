@@ -210,7 +210,8 @@ void QmitkPointListWidget::OnClearPointSetButtonClicked()
 
         //dummy call to update PointSetVtkMapper3D (bug fix oder better bug work around #2436)
         mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, pointSet->GetPoint(0), 0, false);
-        pointSet->ExecuteOperation(doOp);;
+        pointSet->ExecuteOperation(doOp);
+        delete doOp;
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;

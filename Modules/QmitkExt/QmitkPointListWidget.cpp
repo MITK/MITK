@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 #include "mitkPointSetReader.h"
 #include "mitkPointSetWriter.h"
+#include "mitkInteractionConst.h"
+#include "mitkPointOperation.h"
 
 #include <QGridLayout>
 #include <QPushButton>
@@ -205,6 +207,10 @@ void QmitkPointListWidget::OnClearPointSetButtonClicked()
       {
         mitk::PointSet::DataType::PointsContainer::Pointer pointsContainer = pointSet->GetPointSet()->GetPoints();
         pointsContainer->Initialize(); // a call to initialize results in clearing the points container
+
+        //dummy call to update PointSetVtkMapper3D (bug fix oder better bug work around #2436)
+        mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, pointSet->GetPoint(0), 0, false);
+        pointSet->ExecuteOperation(doOp);;
       }
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;

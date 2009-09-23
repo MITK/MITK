@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkWindowToImageFilter.h>
 #include <vtkRenderWindow.h>
 #include <vtkPNGWriter.h>
+#include <vtkCellArray.h>
+#include <vtkTriangleFilter.h>
 
 void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Pointer fileWriter, mitk::BaseData::Pointer data, const char* aFileName, const char* propFileName)
 { 
@@ -605,6 +607,20 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
     if(qfileName.endsWith(".stl")==true)
     {
       mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+      
+      // check if surface actually consists of triangles; if not, the writer will not do anything; so, convert to triangles...
+      vtkPolyData* polys = surface->GetVtkPolyData();
+      if( polys->GetNumberOfStrips() > 0 )
+      {
+        vtkTriangleFilter* triangleFilter = vtkTriangleFilter::New();
+        triangleFilter->SetInput(polys);
+        triangleFilter->Update();
+        polys = triangleFilter->GetOutput();
+        polys->Register(NULL);
+        triangleFilter->Delete();
+        surface->SetVtkPolyData(polys);
+      }
+
       writer->SetInput( surface );
       writer->SetFileName(qfileName.latin1());
       writer->GetVtkWriter()->SetFileTypeToBinary();

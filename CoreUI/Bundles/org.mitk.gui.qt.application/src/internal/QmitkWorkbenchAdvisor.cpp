@@ -31,6 +31,7 @@ QmitkWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configur
 {
   cherry::QtWorkbenchAdvisor::Initialize(configurer);
 
+  configurer->SetSaveAndRestore(true);
   QmitkRegisterClasses();
 }
 

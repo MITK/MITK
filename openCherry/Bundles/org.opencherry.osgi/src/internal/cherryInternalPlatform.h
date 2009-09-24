@@ -112,7 +112,7 @@ public:
 
   const Poco::Path& GetInstancePath();
 
-  Poco::Path GetStatePath(SmartPointer<IBundle> bundle);
+  bool GetStatePath(Poco::Path& statePath, SmartPointer<IBundle> bundle, bool create = true);
 
   const Poco::Path& GetUserPath();
 

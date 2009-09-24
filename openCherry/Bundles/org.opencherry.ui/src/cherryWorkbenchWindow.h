@@ -538,6 +538,8 @@ private:
    */
   Workbench* GetWorkbenchImpl();
 
+  bool UnableToRestorePage(IMemento::Pointer pageMem);
+
   /**
    * Close the window.
    *

@@ -72,6 +72,8 @@ public:
      */
     std::list<StackablePart::Pointer> GetChildren() const;
 
+    std::string GetID() const;
+
     /**
      * getFocus method comment.
      */

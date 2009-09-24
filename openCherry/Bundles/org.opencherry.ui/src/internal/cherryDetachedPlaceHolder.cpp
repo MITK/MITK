@@ -19,6 +19,7 @@
 
 #include "cherryILayoutContainer.h"
 #include "cherryPartPlaceholder.h"
+#include "cherryWorkbenchConstants.h"
 
 namespace cherry
 {
@@ -68,48 +69,45 @@ void DetachedPlaceHolder::Replace(StackablePart::Pointer oldPart,
 
 void DetachedPlaceHolder::RestoreState(IMemento::Pointer memento)
 {
+  // Read the bounds.
+  int x = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_X, x);
+  int y = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_Y, y);
+  int width = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_WIDTH, width);
+  int height = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, height);
 
-  //TODO DetachedPlaceHolder restore state
-  //     // Read the bounds.
-  //     Integer bigInt;
-  //     bigInt = memento.getInteger(IWorkbenchConstants.TAG_X);
-  //     int x = bigInt.intValue();
-  //     bigInt = memento.getInteger(IWorkbenchConstants.TAG_Y);
-  //     int y = bigInt.intValue();
-  //     bigInt = memento.getInteger(IWorkbenchConstants.TAG_WIDTH);
-  //     int width = bigInt.intValue();
-  //     bigInt = memento.getInteger(IWorkbenchConstants.TAG_HEIGHT);
-  //     int height = bigInt.intValue();
-  //
-  //     bounds = new Rectangle(x, y, width, height);
-  //
-  //     // Restore the placeholders.
-  //     IMemento childrenMem[] = memento
-  //             .getChildren(IWorkbenchConstants.TAG_VIEW);
-  //     for (int i = 0; i < childrenMem.length; i++) {
-  //         PartPlaceholder holder = new PartPlaceholder(childrenMem[i]
-  //                 .getString(IWorkbenchConstants.TAG_ID));
-  //         holder.setContainer(this);
-  //         children.add(holder);
-  //     }
+  bounds = Rectangle(x, y, width, height);
+
+  // Restore the placeholders.
+  std::vector<IMemento::Pointer> childrenMem(memento
+         ->GetChildren(WorkbenchConstants::TAG_VIEW));
+  for (std::size_t i = 0; i < childrenMem.size(); i++) {
+     std::string id;
+     childrenMem[i]->GetString(WorkbenchConstants::TAG_ID, id);
+     PartPlaceholder::Pointer holder(new PartPlaceholder(id));
+     holder->SetContainer(IStackableContainer::Pointer(this));
+     children.push_back(holder);
+  }
 }
 
 void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
 {
-  //TODO DetachedPlaceHolder save state
-  //     // Save the bounds.
-  //     memento.putInteger(IWorkbenchConstants.TAG_X, bounds.x);
-  //     memento.putInteger(IWorkbenchConstants.TAG_Y, bounds.y);
-  //     memento.putInteger(IWorkbenchConstants.TAG_WIDTH, bounds.width);
-  //     memento.putInteger(IWorkbenchConstants.TAG_HEIGHT, bounds.height);
-  //
-  //     // Save the views.
-  //     for (int i = 0; i < children.size(); i++) {
-  //         IMemento childMem = memento
-  //                 .createChild(IWorkbenchConstants.TAG_VIEW);
-  //         LayoutPart child = (LayoutPart) children.get(i);
-  //         childMem.putString(IWorkbenchConstants.TAG_ID, child.getID());
-  //     }
+  // Save the bounds.
+  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
+  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
+
+  // Save the views.
+  for (std::list<StackablePart::Pointer>::iterator i = children.begin();
+      i != children.end(); ++i) {
+     IMemento::Pointer childMem = memento
+             ->CreateChild(WorkbenchConstants::TAG_VIEW);
+     childMem->PutString(WorkbenchConstants::TAG_ID, (*i)->GetId());
+  }
 }
 
 void DetachedPlaceHolder::FindSashes(LayoutPart::Pointer part,

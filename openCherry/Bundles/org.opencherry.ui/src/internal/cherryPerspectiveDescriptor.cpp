@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryWorkbenchRegistryConstants.h"
 #include "cherryWorkbenchPlugin.h"
+#include "cherryWorkbenchConstants.h"
 #include "cherryPerspectiveRegistry.h"
 
 namespace cherry
@@ -198,28 +199,29 @@ bool PerspectiveDescriptor::IsSingleton()
 
 bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
 {
-//  IMemento childMem = memento
-//  .getChild(IWorkbenchConstants.TAG_DESCRIPTOR);
-//  if (childMem != null)
-//  {
-//    id = childMem.getString(IWorkbenchConstants.TAG_ID);
-//    originalId = childMem.getString(IWorkbenchConstants.TAG_DESCRIPTOR);
-//    label = childMem.getString(IWorkbenchConstants.TAG_LABEL);
-//    className = childMem.getString(IWorkbenchConstants.TAG_CLASS);
-//    singleton
-//        = (childMem.getInteger(IWorkbenchConstants.TAG_SINGLETON) != null);
-//
-//    // Find a descriptor in the registry.
-//    IPerspectiveDescriptor descriptor = WorkbenchPlugin.getDefault()
-//    .getPerspectiveRegistry().findPerspectiveWithId(getOriginalId());
-//
-//    if (descriptor != null)
-//    {
-//      // Copy the state from the registred descriptor.
-//      image = descriptor.getImageDescriptor();
-//    }
-//  }
-//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+  IMemento::Pointer childMem(memento->GetChild(WorkbenchConstants::TAG_DESCRIPTOR));
+  if (childMem)
+  {
+    childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    childMem->GetString(WorkbenchConstants::TAG_DESCRIPTOR, originalId);
+    childMem->GetString(WorkbenchConstants::TAG_LABEL, label);
+    childMem->GetString(WorkbenchConstants::TAG_CLASS, className);
+    int singletonVal;
+    singleton
+        = childMem->GetInteger(WorkbenchConstants::TAG_SINGLETON, singletonVal);
+
+    // Find a descriptor in the registry.
+    IPerspectiveDescriptor::Pointer descriptor = WorkbenchPlugin::GetDefault()
+    ->GetPerspectiveRegistry()->FindPerspectiveWithId(this->GetOriginalId());
+
+    if (descriptor)
+    {
+      // Copy the state from the registred descriptor.
+      //TODO Perspective image descriptor
+      //image = descriptor->GetImageDescriptor();
+    }
+  }
+  //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
   return true;
 }
 
@@ -233,20 +235,19 @@ void PerspectiveDescriptor::RevertToPredefined()
 
 bool PerspectiveDescriptor::SaveState(IMemento::Pointer memento)
 {
-//  IMemento childMem = memento
-//  .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
-//  childMem.putString(IWorkbenchConstants.TAG_ID, getId());
-//  if (originalId != null)
-//  {
-//    childMem.putString(IWorkbenchConstants.TAG_DESCRIPTOR, originalId);
-//  }
-//  childMem.putString(IWorkbenchConstants.TAG_LABEL, getLabel());
-//  childMem.putString(IWorkbenchConstants.TAG_CLASS, getClassName());
-//  if (singleton)
-//  {
-//    childMem.putInteger(IWorkbenchConstants.TAG_SINGLETON, 1);
-//  }
-//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+  IMemento::Pointer childMem(memento->CreateChild(WorkbenchConstants::TAG_DESCRIPTOR));
+  childMem->PutString(WorkbenchConstants::TAG_ID, GetId());
+  if (!originalId.empty())
+  {
+    childMem->PutString(WorkbenchConstants::TAG_DESCRIPTOR, originalId);
+  }
+  childMem->PutString(WorkbenchConstants::TAG_LABEL, GetLabel());
+  childMem->PutString(WorkbenchConstants::TAG_CLASS, GetClassName());
+  if (singleton)
+  {
+    childMem->PutInteger(WorkbenchConstants::TAG_SINGLETON, 1);
+  }
+  //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null);
   return true;
 }
 

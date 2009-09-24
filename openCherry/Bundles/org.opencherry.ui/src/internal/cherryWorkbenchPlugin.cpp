@@ -41,12 +41,15 @@ WorkbenchPlugin::WorkbenchPlugin()
 {
   inst = this;
   presentationFactory = 0;
+  editorRegistry = 0;
+  viewRegistry = 0;
   perspRegistry = 0;
 }
 
 WorkbenchPlugin::~WorkbenchPlugin()
 {
-
+  delete editorRegistry;
+  delete viewRegistry;
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
@@ -134,6 +137,13 @@ WorkbenchPlugin* WorkbenchPlugin::GetDefault()
   return inst;
 }
 
+std::size_t WorkbenchPlugin::GetBundleCount()
+{
+  // TODO BundleContext GetBundles
+  //return bundleContext->GetBundles().size();
+  return 0;
+}
+
 
 //    ImageRegistry createImageRegistry() {
 //        return WorkbenchImages.getImageRegistry();
@@ -187,12 +197,18 @@ IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry() {
 
 IViewRegistry* WorkbenchPlugin::GetViewRegistry()
 {
-  return &viewRegistry;
+  if (!viewRegistry)
+    viewRegistry = new ViewRegistry();
+
+  return viewRegistry;
 }
 
 IEditorRegistry* WorkbenchPlugin::GetEditorRegistry()
 {
-  return &editorRegistry;
+  if (!editorRegistry)
+    editorRegistry = new EditorRegistry();
+
+  return editorRegistry;
 }
 
 IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
@@ -288,9 +304,9 @@ void WorkbenchPlugin::Stop(IBundleContext::Pointer context)
   delete perspRegistry;
 }
 
-Poco::Path* WorkbenchPlugin::GetDataPath()
+bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
 {
-  return this->GetStatePath();
+  return this->GetStatePath(path);
 }
 
 }

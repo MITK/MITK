@@ -91,6 +91,13 @@ struct CHERRY_UI IViewDescriptor : public IWorkbenchPartDescriptor, public IAdap
    */
   virtual bool GetAllowMultiple() const = 0;
 
+  /**
+   * Returns whether this view can be restored upon workbench restart.
+   *
+   * @return whether whether this view can be restored upon workbench restart
+   */
+  virtual bool IsRestorable() const = 0;
+
   virtual bool operator==(const Object*) const = 0;
 };
 

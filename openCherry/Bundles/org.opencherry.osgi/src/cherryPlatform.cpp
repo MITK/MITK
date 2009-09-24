@@ -142,9 +142,9 @@ bool Platform::IsVMS()
 #endif
 }
 
-Poco::Path Platform::GetStatePath(IBundle::Pointer bundle)
+bool Platform::GetStatePath(Poco::Path& statePath, IBundle::Pointer bundle, bool create)
 {
-  return InternalPlatform::GetInstance()->GetStatePath(bundle);
+  return InternalPlatform::GetInstance()->GetStatePath(statePath, bundle, create);
 }
 
 const Poco::Path& Platform::GetUserPath()

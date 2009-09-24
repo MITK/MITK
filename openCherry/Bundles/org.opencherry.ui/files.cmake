@@ -101,6 +101,9 @@ SET(SRC_CPP_FILES
   #testing
   testing/cherryTestableObject.cpp
   
+  #util
+  util/cherrySafeRunnable.cpp
+  
 )
 
 

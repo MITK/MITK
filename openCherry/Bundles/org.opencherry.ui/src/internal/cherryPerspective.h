@@ -370,7 +370,7 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     public: bool RestoreState(IMemento::Pointer memento);
 
-    bool CreateReferences(std::vector<IMemento::Pointer> views);
+    bool CreateReferences(const std::vector<IMemento::Pointer>& views);
 
     /**
      * Fills a presentation with layout data.

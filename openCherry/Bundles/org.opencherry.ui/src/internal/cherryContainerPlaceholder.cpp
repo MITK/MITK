@@ -60,6 +60,11 @@ std::list<StackablePart::Pointer> ContainerPlaceholder::GetChildren() const
   return realContainer->GetChildren();
 }
 
+std::string ContainerPlaceholder::GetID() const
+{
+  return LayoutPart::GetID();
+}
+
 IStackableContainer::Pointer ContainerPlaceholder::GetRealContainer()
 {
   return realContainer;

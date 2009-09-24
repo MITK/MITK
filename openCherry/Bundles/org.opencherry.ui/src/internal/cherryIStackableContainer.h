@@ -44,6 +44,11 @@ struct IStackableContainer : virtual public Object {
      */
   virtual void Add(StackablePart::Pointer newPart) = 0;
 
+  /**
+   * Returnd the id for this stackable container
+   */
+  virtual std::string GetID() const = 0;
+
     /**
      * Returns a list of layout children.
      */

@@ -24,6 +24,9 @@
 #include "cherryDragUtil.h"
 #include "cherryEditorAreaHelper.h"
 #include "cherryPerspectiveHelper.h"
+#include "cherryWorkbenchConstants.h"
+
+#include "../cherryXMLMemento.h"
 
 #include "../cherryIWorkbenchPartConstants.h"
 #include "../cherryGeometry.h"
@@ -32,6 +35,8 @@
 
 #include <cherryObjects.h>
 #include <cherryDebugUtil.h>
+
+#include <Poco/HashSet.h>
 
 namespace cherry
 {
@@ -129,8 +134,8 @@ void PartStack::MyStackPresentationSite::Close(IPresentablePart::Pointer part)
   partStack->Close(part);
 }
 
-void PartStack::MyStackPresentationSite::Close(
-    const std::vector<IPresentablePart::Pointer>& parts)
+void PartStack::MyStackPresentationSite::Close(const std::vector<
+    IPresentablePart::Pointer>& parts)
 {
   partStack->Close(parts);
 }
@@ -312,6 +317,11 @@ int PartStack::GetAppearance() const
   return appearance;
 }
 
+std::string PartStack::GetID() const
+{
+  return LayoutPart::GetID();
+}
+
 bool PartStack::IsStandalone()
 {
   return (appearance == PresentationFactoryUtil::ROLE_STANDALONE || appearance
@@ -342,7 +352,8 @@ void PartStack::TestInvariants()
     StackablePart::Pointer child = *iter;
 
     // No 0 children allowed
-    poco_assert(child != 0); // "0 children are not allowed in PartStack"
+    poco_assert(child != 0)
+;   // "0 children are not allowed in PartStack"
 
     // Ensure that all the PartPanes have an associated presentable part
     IPresentablePart::Pointer part = this->GetPresentablePart(child);
@@ -661,20 +672,19 @@ void PartStack::SavePresentationState()
     return;
   }
 
-  //TODO Save Presentation State
-  //  {// Save the presentation's state before disposing it
-  //      XMLMemento memento = XMLMemento
-  //              .createWriteRoot(IWorkbenchConstants.TAG_PRESENTATION);
-  //      memento.putString(IWorkbenchConstants.TAG_ID, getFactory().getId());
-  //
-  //      PresentationSerializer serializer = new PresentationSerializer(
-  //              getPresentableParts());
-  //
-  //      getPresentation().saveState(serializer, memento);
-  //
-  //      // Store the memento in savedPresentationState
-  //      savedPresentationState = memento;
-  //  }
+  {// Save the presentation's state before disposing it
+    XMLMemento::Pointer memento = XMLMemento
+    ::CreateWriteRoot(WorkbenchConstants::TAG_PRESENTATION);
+    memento->PutString(WorkbenchConstants::TAG_ID, this->GetFactory()->GetId());
+
+    std::list<IPresentablePart::Pointer> parts(this->GetPresentableParts());
+    PresentationSerializer serializer(std::vector<IPresentablePart::Pointer>(parts.begin(), parts.end()));
+
+    this->GetPresentation()->SaveState(&serializer, memento);
+
+    // Store the memento in savedPresentationState
+    savedPresentationState = memento;
+  }
 }
 
 PartStack::~PartStack()
@@ -691,11 +701,11 @@ void PartStack::Dispose()
 
   this->SavePresentationState();
 
-//  for (PresentableVector::iterator iter = presentableParts.begin();
-//       iter != presentableParts.end(); ++iter)
-//  {
-//    iter->Cast<PresentablePart>()->Dispose();
-//  }
+  //  for (PresentableVector::iterator iter = presentableParts.begin();
+  //       iter != presentableParts.end(); ++iter)
+  //  {
+  //    iter->Cast<PresentablePart>()->Dispose();
+  //  }
   presentableParts.clear();
 
   presentationCurrent = 0;
@@ -922,94 +932,88 @@ int PartStack::GetSizeFlags(bool horizontal)
 
 bool PartStack::RestoreState(IMemento::Pointer memento)
 {
-  //TODO restore state (PartStack)
-  //  // Read the active tab.
-  //  std::string activeTabID = memento
-  //  .getString(IWorkbenchConstants.TAG_ACTIVE_PAGE_ID);
-  //
-  //  // Read the page elements.
-  //  std::vector<IMemento::Pointer> children = memento.getChildren(IWorkbenchConstants.TAG_PAGE);
-  //  if (children != 0)
-  //  {
-  //    // Loop through the page elements.
-  //    for (int i = 0; i < children.length; i++)
-  //    {
-  //      // Get the info details.
-  //      IMemento childMem = children[i];
-  //      String partID = childMem
-  //      .getString(IWorkbenchConstants.TAG_CONTENT);
-  //
-  //      // Create the part.
-  //      LayoutPart part = new PartPlaceholder(partID);
-  //      part.setContainer(this);
-  //      add(part);
-  //      //1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
-  //      //part.setContainer(this);
-  //      if (partID.equals(activeTabID))
-  //      {
-  //        setSelection(part);
-  //        // Mark this as the active part.
-  //        //current = part;
-  //      }
-  //    }
-  //  }
-  //
-  //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
-  //  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
-  //  const Integer expanded = memento.getInteger(IWorkbenchConstants.TAG_EXPANDED);
-  //  if (useNewMinMax && expanded != 0)
-  //  {
-  //    //StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //    //    {
-  //    //      void runWithException() throws Throwable
-  //    //      {
-  //    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
-  //        : IStackPresentationSite.STATE_MINIMIZED);
-  //    //      }
-  //    //    });
-  //  }
-  //  else
-  //  {
-  //    setState((expanded == 0 || expanded.intValue() != IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_RESTORED
-  //        : IStackPresentationSite.STATE_MINIMIZED);
-  //  }
-  //
-  //  Integer appearance = memento
-  //  .getInteger(IWorkbenchConstants.TAG_APPEARANCE);
-  //  if (appearance != 0)
-  //  {
-  //    this.appearance = appearance.intValue();
-  //  }
-  //
-  //  // Determine if the presentation has saved any info here
-  //  savedPresentationState = 0;
-  //  std::vector<IMemento::Pointer> presentationMementos = memento
-  //  .getChildren(IWorkbenchConstants.TAG_PRESENTATION);
-  //
-  //  for (int idx = 0; idx < presentationMementos.length; idx++)
-  //  {
-  //    IMemento child = presentationMementos[idx];
-  //
-  //    String id = child.getString(IWorkbenchConstants.TAG_ID);
-  //
-  //    if (Util.equals(id, getFactory().getId()))
-  //    {
-  //      savedPresentationState = child;
-  //      break;
-  //    }
-  //  }
-  //
-  //  IMemento propertiesState = memento.getChild(IWorkbenchConstants.TAG_PROPERTIES);
-  //  if (propertiesState != 0)
-  //  {
-  //    std::vector<IMemento::Pointer> props = propertiesState.getChildren(IWorkbenchConstants.TAG_PROPERTY);
-  //    for (int i = 0; i < props.length; i++)
-  //    {
-  //      properties.put(props[i].getID(), props[i].getTextData());
-  //    }
-  //  }
-  //
-  //  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
+  // Read the active tab.
+  std::string activeTabID; memento->GetString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, activeTabID);
+
+  // Read the page elements.
+  std::vector<IMemento::Pointer> children = memento->GetChildren(WorkbenchConstants::TAG_PAGE);
+
+  // Loop through the page elements.
+  for (std::size_t i = 0; i < children.size(); i++)
+  {
+    // Get the info details.
+    IMemento::Pointer childMem = children[i];
+    std::string partID; childMem->GetString(WorkbenchConstants::TAG_CONTENT, partID);
+
+    // Create the part.
+    StackablePart::Pointer part(new PartPlaceholder(partID));
+    part->SetContainer(IStackableContainer::Pointer(this));
+    this->Add(part);
+    //1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
+    //part.setContainer(this);
+    if (partID == activeTabID)
+    {
+      this->SetSelection(part);
+      // Mark this as the active part.
+      //current = part;
+    }
+  }
+
+  //IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
+  //boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
+  int expanded;
+  if (memento->GetInteger(WorkbenchConstants::TAG_EXPANDED, expanded))
+  {
+    //StartupThreading.runWithoutExceptions(new StartupRunnable()
+    //    {
+    //      void runWithException() throws Throwable
+    //      {
+    SetState(expanded != IStackPresentationSite::STATE_MINIMIZED ? IStackPresentationSite::STATE_RESTORED
+        : IStackPresentationSite::STATE_MINIMIZED);
+    //      }
+    //    });
+  }
+  else
+  {
+    SetState(IStackPresentationSite::STATE_RESTORED);
+  }
+
+  int appearance;
+  if (memento->GetInteger(WorkbenchConstants::TAG_APPEARANCE, appearance))
+  {
+    this->appearance = appearance;
+  }
+
+  // Determine if the presentation has saved any info here
+  savedPresentationState = 0;
+  std::vector<IMemento::Pointer> presentationMementos(memento
+      ->GetChildren(WorkbenchConstants::TAG_PRESENTATION));
+
+  for (std::size_t idx = 0; idx < presentationMementos.size(); idx++)
+  {
+    IMemento::Pointer child = presentationMementos[idx];
+
+    std::string id; child->GetString(WorkbenchConstants::TAG_ID, id);
+
+    if (id == GetFactory()->GetId())
+    {
+      savedPresentationState = child;
+      break;
+    }
+  }
+
+  IMemento::Pointer propertiesState = memento->GetChild(WorkbenchConstants::TAG_PROPERTIES);
+  if (propertiesState)
+  {
+    std::vector<IMemento::Pointer> props(propertiesState->GetChildren(WorkbenchConstants::TAG_PROPERTY));
+    for (std::size_t i = 0; i < props.size(); i++)
+    {
+      std::string id = props[i]->GetID();
+      properties.insert(std::make_pair(id, props[i]->GetTextData()));
+    }
+  }
+
+  //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
   return true;
 }
 
@@ -1063,66 +1067,65 @@ void PartStack::SetVisible(bool makeVisible)
 bool PartStack::SaveState(IMemento::Pointer memento)
 {
 
-  //TODO save state (PartStack)
-  //  // Save the active tab.
-  //  if (requestedCurrent != 0)
-  //  {
-  //    memento.putString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, requestedCurrent
-  //        .getCompoundId());
-  //  }
-  //
-  //  // Write out the presentable parts (in order)
-  //  Set cachedIds = new HashSet();
-  //  Iterator ppIter = getPresentableParts().iterator();
-  //  while (ppIter.hasNext())
-  //  {
-  //    PresentablePart presPart = (PresentablePart) ppIter.next();
-  //
-  //    IMemento childMem = memento
-  //    .createChild(IWorkbenchConstants.TAG_PAGE);
-  //    PartPane part = presPart.getPane();
-  //    String tabText = part.getPartReference().getPartName();
-  //
-  //    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
-  //    childMem.putString(IWorkbenchConstants.TAG_CONTENT, presPart.getPane().getPlaceHolderId());
-  //
-  //    // Cache the id so we don't write it out later
-  //    cachedIds.add(presPart.getPane().getPlaceHolderId());
-  //  }
-  //
-  //  Iterator iter = children.iterator();
-  //  while (iter.hasNext())
-  //  {
-  //    LayoutPart next = (LayoutPart) iter.next();
-  //
-  //    PartPane part = 0;
-  //    if (next.Cast<PartPane>() != 0)
-  //    {
-  //      // Have we already written it out?
-  //      if (cachedIds.contains(((PartPane)next).getPlaceHolderId()))
-  //      continue;
-  //
-  //      part = (PartPane)next;
-  //    }
-  //
-  //    IMemento childMem = memento
-  //    .createChild(IWorkbenchConstants.TAG_PAGE);
-  //
-  //    String tabText = "LabelNotFound"; //$NON-NLS-1$
-  //    if (part != 0)
-  //    {
-  //      tabText = part.getPartReference().getPartName();
-  //    }
-  //    childMem.putString(IWorkbenchConstants.TAG_LABEL, tabText);
-  //    childMem.putString(IWorkbenchConstants.TAG_CONTENT, next
-  //        .getCompoundId());
-  //  }
-  //
+  if (GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
+  {
+    // Save the active tab.
+    if (requestedCurrent)
+    {
+      memento->PutString(WorkbenchConstants::TAG_ACTIVE_PAGE_ID, requestedCurrent
+          ->GetCompoundId());
+    }
+
+    // Write out the presentable parts (in order)
+    Poco::HashSet<std::string> cachedIds;
+    PartStack::PresentableVector pparts(GetPresentableParts());
+    for (PartStack::PresentableVector::iterator ppIter = pparts.begin();
+        ppIter != pparts.end(); ++ppIter)
+    {
+      PresentablePart::Pointer presPart = ppIter->Cast<PresentablePart>();
+
+      IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_PAGE);
+      PartPane::Pointer part = presPart->GetPane();
+      std::string tabText = part->GetPartReference()->GetPartName();
+
+      childMem->PutString(WorkbenchConstants::TAG_LABEL, tabText);
+      childMem->PutString(WorkbenchConstants::TAG_CONTENT, presPart->GetPane()->GetPlaceHolderId());
+
+      // Cache the id so we don't write it out later
+      cachedIds.insert(presPart->GetPane()->GetPlaceHolderId());
+    }
+
+    for (ChildVector::iterator iter = children.begin();
+        iter != children.end(); ++iter)
+    {
+      StackablePart::Pointer next = *iter;
+
+      PartPane::Pointer part;
+      if (part = next.Cast<PartPane>())
+      {
+        // Have we already written it out?
+        if (cachedIds.find(part->GetPlaceHolderId()) != cachedIds.end())
+        continue;
+      }
+
+      IMemento::Pointer childMem = memento
+      ->CreateChild(WorkbenchConstants::TAG_PAGE);
+
+      std::string tabText = "LabelNotFound";
+      if (part)
+      {
+        tabText = part->GetPartReference()->GetPartName();
+      }
+      childMem->PutString(WorkbenchConstants::TAG_LABEL, tabText);
+      childMem->PutString(WorkbenchConstants::TAG_CONTENT, next->GetId());
+    }
+  }
+
   //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
   //  boolean useNewMinMax = preferenceStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
   //  if (useNewMinMax)
   //  {
-  //    memento.putInteger(IWorkbenchConstants.TAG_EXPANDED, presentationSite.getState());
+  memento->PutInteger(WorkbenchConstants::TAG_EXPANDED, presentationSite->GetState());
   //  }
   //  else
   //  {
@@ -1132,34 +1135,32 @@ bool PartStack::SaveState(IMemento::Pointer memento)
   //        (presentationSite.getState() == IStackPresentationSite.STATE_MINIMIZED) ? IStackPresentationSite.STATE_MINIMIZED
   //        : IStackPresentationSite.STATE_RESTORED);
   //  }
-  //
-  //  memento.putInteger(IWorkbenchConstants.TAG_APPEARANCE, appearance);
-  //
-  //  savePresentationState();
-  //
-  //  if (savedPresentationState != 0)
-  //  {
-  //    IMemento presentationState = memento
-  //    .createChild(IWorkbenchConstants.TAG_PRESENTATION);
-  //    presentationState.putMemento(savedPresentationState);
-  //  }
-  //
-  //  if (!properties.isEmpty())
-  //  {
-  //    IMemento propertiesState = memento.createChild(IWorkbenchConstants.TAG_PROPERTIES);
-  //    Set ids = properties.keySet();
-  //    for (Iterator iterator = ids.iterator(); iterator.hasNext();)
-  //    {
-  //      String id = (String)iterator.next();
-  //
-  //      if (properties.get(id) == 0) continue;
-  //
-  //      IMemento prop = propertiesState.createChild(IWorkbenchConstants.TAG_PROPERTY, id);
-  //      prop.putTextData((String)properties.get(id));
-  //    }
-  //  }
-  //
-  //  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
+
+  memento->PutInteger(WorkbenchConstants::TAG_APPEARANCE, appearance);
+
+  this->SavePresentationState();
+
+  if (savedPresentationState)
+  {
+    IMemento::Pointer presentationState = memento
+    ->CreateChild(WorkbenchConstants::TAG_PRESENTATION);
+    presentationState->PutMemento(savedPresentationState);
+  }
+
+  if (!properties.empty())
+  {
+    IMemento::Pointer propertiesState = memento->CreateChild(WorkbenchConstants::TAG_PROPERTIES);
+    for (std::map<std::string, std::string>::iterator iterator = properties.begin();
+        iterator != properties.end(); ++iterator)
+    {
+      if (iterator->second.empty()) continue;
+
+      IMemento::Pointer prop = propertiesState->CreateChild(WorkbenchConstants::TAG_PROPERTY, iterator->first);
+      prop->PutTextData(iterator->second);
+    }
+  }
+
+  //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0);
   return true;
 }
 
@@ -1568,7 +1569,7 @@ void PartStack::FireInternalPropertyChange(int id)
   ObjectInt::Pointer val(new ObjectInt(id));
   Object::Pointer source(this);
   PropertyChangeEvent::Pointer event(new PropertyChangeEvent(source,
-      IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
+          IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
   propEvents.propertyChange(event);
 }
 

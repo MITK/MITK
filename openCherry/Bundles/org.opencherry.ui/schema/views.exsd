@@ -153,6 +153,16 @@ be associated with the view.
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="restorable" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  flag indicating whether this view allows to be restored upon workbench restart. If set to false, the view will not be open after a workbench restart. The default is true.
+&lt;p&gt;
+Since: 3.4
+&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

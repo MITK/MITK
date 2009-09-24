@@ -278,7 +278,7 @@ public:
    * @return a local file system path
    * TODO Investigate the usage of a service factory
    */
-  static Poco::Path GetStatePath(SmartPointer<IBundle> bundle);
+  static bool GetStatePath(Poco::Path& statePath, SmartPointer<IBundle> bundle, bool create = true);
 
   /**
    * Returns the path of the platform's user data area.  The user data area is a location on the system

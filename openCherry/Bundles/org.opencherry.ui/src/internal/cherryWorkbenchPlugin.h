@@ -69,7 +69,7 @@ private:
     IPresentationFactory* presentationFactory;
 
     // Manager that maps resources to descriptors of editors to use
-    EditorRegistry editorRegistry;
+    EditorRegistry* editorRegistry;
 
     // The context within which this plugin was started.
     IBundleContext::Pointer bundleContext;
@@ -77,7 +77,7 @@ private:
     // Other data.
     //WorkbenchPreferenceManager preferenceManager;
 
-    ViewRegistry viewRegistry;
+    ViewRegistry* viewRegistry;
 
     PerspectiveRegistry* perspRegistry;
 
@@ -220,6 +220,8 @@ public:
      * @see AbstractUIPlugin for the typical implementation pattern for plugin classes.
      */
     static WorkbenchPlugin* GetDefault();
+
+    std::size_t GetBundleCount();
 
     /**
      * Answer the manager that maps resource types to a the
@@ -444,7 +446,7 @@ public:
      * location is available.
      * @since 3.1
      */
-    Poco::Path* GetDataPath();
+    bool GetDataPath(Poco::Path& path);
 
 };
 

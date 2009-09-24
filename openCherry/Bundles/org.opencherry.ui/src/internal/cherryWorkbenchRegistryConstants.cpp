@@ -31,6 +31,8 @@ namespace cherry {
 
   const std::string WorkbenchRegistryConstants::ATT_ALLOW_MULTIPLE = "allowMultiple"; //$NON-NLS-1$
 
+  const std::string WorkbenchRegistryConstants::ATT_RESTORABLE = "restorable";
+
   const std::string WorkbenchRegistryConstants::ATT_CAN_FINISH_EARLY = "canFinishEarly"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_CATEGORY = "category"; //$NON-NLS-1$

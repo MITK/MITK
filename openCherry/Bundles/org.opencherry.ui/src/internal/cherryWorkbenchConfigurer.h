@@ -57,7 +57,7 @@ private:
     bool saveAndRestore;
 
     /**
-     * Indicates whether the workbench is being force to close. During
+     * Indicates whether the workbench is being forced to close. During
      * an emergency close, no interaction with the user should be done.
      */
     bool isEmergencyClosing;

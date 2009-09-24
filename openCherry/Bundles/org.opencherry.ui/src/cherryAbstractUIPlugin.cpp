@@ -178,6 +178,7 @@ IWorkbench* AbstractUIPlugin::GetWorkbench()
 
 void AbstractUIPlugin::Start(IBundleContext::Pointer context)
 {
+  std::cout << "In AbstractUIPlugin::Start()" << std::endl;
   Plugin::Start(context);
 
   // Should only attempt refreshPluginActions() once the bundle

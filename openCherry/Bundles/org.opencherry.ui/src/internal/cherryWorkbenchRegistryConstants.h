@@ -56,6 +56,11 @@ struct WorkbenchRegistryConstants {
 	static const std::string ATT_ALLOW_MULTIPLE; // "allowMultiple"; //$NON-NLS-1$
 
 	/**
+   * Attribute that specifies whether a view gets restored upon workbench restart. Value <code>restorable</code>.
+   */
+  static const std::string ATT_RESTORABLE; // = "restorable";
+
+	/**
 	 * Attribute that specifies whether a wizard is immediately capable of
 	 * finishing. Value <code>canFinishEarly</code>.
 	 */

@@ -91,7 +91,7 @@ public:
    * and returns the left children.
    */
   virtual LayoutPart::Pointer ComputeRelation(
-      std::list<PartSashContainer::RelationshipInfo> relations);
+      std::list<PartSashContainer::RelationshipInfo>& relations);
 
   /**
    * Locates the part that intersects the given point

@@ -21,6 +21,8 @@
 #include <cherryObject.h>
 #include <cherryMacros.h>
 
+#include "cherryCommonRuntimeDll.h"
+
 namespace cherry
 {
 
@@ -36,7 +38,7 @@ namespace cherry
  * </p>
  * @see SafeRunner#run(ISafeRunnable)
  */
-struct ISafeRunnable: public Object
+struct CHERRY_COMMON_RUNTIME ISafeRunnable: public Object
 {
 
 cherryInterfaceMacro(ISafeRunnable, cherry)
@@ -69,22 +71,30 @@ cherryInterfaceMacro(ISafeRunnable, cherry)
 template<typename R>
 struct SafeRunnableDelegate: public ISafeRunnable
 {
-  typedef void(R::*CallbackFunc)();
+  typedef void(R::*RunCallback)();
+  typedef void(R::*HandleExcCallback)(const std::exception&);
 
-  SafeRunnableDelegate(R* runnable, CallbackFunc func) :
-    m_Runnable(runnable), m_Func(func)
+  SafeRunnableDelegate(R* runnable, RunCallback func, HandleExcCallback handleFunc = 0) :
+    m_Runnable(runnable), m_RunFunc(func), m_HandleExcFunc(handleFunc)
   {
   }
 
   void Run()
   {
-    m_Runnable->*m_Func();
+    m_Runnable->*m_RunFunc();
+  }
+
+  void HandleException(const std::exception& exception)
+  {
+    if (m_HandleExcFunc)
+      m_Runnable->*m_HandleExcFunc(exception);
   }
 
 private:
 
   R* m_Runnable;
-  CallbackFunc m_Func;
+  RunCallback m_RunFunc;
+  HandleExcCallback m_HandleExcFunc;
 
 };
 

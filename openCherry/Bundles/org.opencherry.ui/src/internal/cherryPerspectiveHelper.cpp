@@ -22,6 +22,7 @@
 #include "cherryEditorSashContainer.h"
 #include "cherryDragUtil.h"
 #include "cherryPresentationFactoryUtil.h"
+#include "cherryWorkbenchConstants.h"
 
 #include <cherryDebugUtil.h>
 
@@ -568,9 +569,7 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
       // iterate through sub containers to find sub-parts
       std::vector<PartPlaceholder::Pointer> newParts = this->CollectPlaceholders(
           part.Cast<ILayoutContainer>()->GetChildren());
-      std::vector<PartPlaceholder::Pointer> newResult = result;
-      std::copy(newParts.begin(), newParts.end(), newResult.end());
-      result = newResult;
+      result.insert(result.end(), newParts.begin(), newParts.end());
     }
     else if (part.Cast<IStackableContainer> () != 0)
     {
@@ -581,6 +580,59 @@ std::vector<PartPlaceholder::Pointer> PerspectiveHelper::CollectPlaceholders(
         if (partIter->Cast<PartPlaceholder>() != 0)
         result.push_back(partIter->Cast<PartPlaceholder>());
       }
+    }
+  }
+
+  return result;
+}
+
+std::vector<ContainerPlaceholder::Pointer> PerspectiveHelper::CollectContainerPlaceholders()
+{
+  // Scan the main window.
+  std::vector<ContainerPlaceholder::Pointer> results(this->CollectContainerPlaceholders(
+      mainLayout->GetChildren()));
+
+//  // Scan each detached window.
+//  if (detachable)
+//  {
+//    for (DetachedWindowsType::iterator winIter = detachedWindowList.begin();
+//        winIter != detachedWindowList.end(); ++winIter)
+//    {
+//      DetachedWindow::Pointer win = *winIter;
+//      std::list<StackablePart::Pointer> moreResults = win->GetChildren();
+//      if (moreResults.size()> 0)
+//      {
+//        for (std::list<StackablePart::Pointer>::iterator iter = moreResults.begin();
+//            iter != moreResults.end(); ++iter)
+//        {
+//          if (iter->Cast<PartPlaceholder>() != 0)
+//          results.push_back(iter->Cast<PartPlaceholder>());
+//        }
+//      }
+//    }
+//  }
+  return results;
+}
+
+std::vector<ContainerPlaceholder::Pointer> PerspectiveHelper::CollectContainerPlaceholders(
+    const std::list<LayoutPart::Pointer>& parts)
+{
+  std::vector<ContainerPlaceholder::Pointer> result;
+
+  for (std::list<LayoutPart::Pointer>::const_iterator iter = parts.begin();
+      iter != parts.end(); ++iter)
+  {
+    LayoutPart::Pointer part = *iter;
+    if (part.Cast<ILayoutContainer> () != 0)
+    {
+      // iterate through sub containers to find sub-parts
+      std::vector<ContainerPlaceholder::Pointer> newParts = this->CollectContainerPlaceholders(
+          part.Cast<ILayoutContainer>()->GetChildren());
+      result.insert(result.end(), newParts.begin(), newParts.end());
+    }
+    else if (part.Cast<ContainerPlaceholder> () != 0)
+    {
+      result.push_back(part.Cast<ContainerPlaceholder>());
     }
   }
 
@@ -1478,83 +1530,121 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(StackablePart::Pointer part)
 
 }
 
+void PerspectiveHelper::ReplacePlaceholderWithPart(LayoutPart::Pointer part)
+{
+  // Look for a ContainerPlaceholder that will tell us how to position this
+  // object
+  std::vector<ContainerPlaceholder::Pointer> placeholders(this->CollectContainerPlaceholders());
+  for (std::size_t i = 0; i < placeholders.size(); i++)
+  {
+    if (placeholders[i]->GetID() == part->GetID())
+    {
+      // found a matching placeholder which we can replace with the
+      // new container
+      ILayoutContainer::Pointer container = placeholders[i]->GetContainer();
+      if (container != 0)
+      {
+//        if (container.Cast<ContainerPlaceholder> () != 0)
+//        {
+//          // One of the children is now visible so replace the
+//          // ContainerPlaceholder with the real container
+//          ContainerPlaceholder::Pointer containerPlaceholder =
+//          container.Cast<ContainerPlaceholder>();
+//          ILayoutContainer::Pointer parentContainer =
+//          containerPlaceholder->GetContainer();
+//          container
+//          = containerPlaceholder->GetRealContainer();
+//          if (container.Cast<LayoutPart> () != 0)
+//          {
+//            parentContainer->Replace(containerPlaceholder,
+//                container.Cast<LayoutPart>());
+//          }
+//          containerPlaceholder->SetRealContainer(IStackableContainer::Pointer(0));
+//        }
+        container->Replace(placeholders[i], part);
+        return;
+      }
+    }
+  }
+}
+
 bool PerspectiveHelper::RestoreState(IMemento::Pointer memento)
 {
-  //TODO PerspectiveHelper restore state
-  //  // Restore main window.
-  //  IMemento::Pointer childMem = memento .getChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
-  //  IStatus r = mainLayout.restoreState(childMem);
-  //
-  //  // Restore each floating window.
-  //  if (detachable)
-  //  {
-  //    IMemento detachedWindows[] = memento .getChildren(
-  //        IWorkbenchConstants.TAG_DETACHED_WINDOW);
-  //    for (int nX = 0; nX < detachedWindows.length; nX++)
-  //    {
-  //      DetachedWindow win = new DetachedWindow(page);
-  //      detachedWindowList.add(win);
-  //      win.restoreState(detachedWindows[nX]);
-  //    }
-  //    IMemento childrenMem[] = memento .getChildren(
-  //        IWorkbenchConstants.TAG_HIDDEN_WINDOW);
-  //    for (int i = 0, length = childrenMem.length; i < length; i++)
-  //    {
-  //      DetachedPlaceHolder holder =
-  //          new DetachedPlaceHolder("", new Rectangle(0, 0, 0, 0)); //$NON-NLS-1$
-  //      holder.restoreState(childrenMem[i]);
-  //      detachedPlaceHolderList.add(holder);
-  //    }
-  //  }
-  //
-  //  // Get the cached id of the currently maximized stack
-  //  maximizedStackId = childMem.getString(IWorkbenchConstants.TAG_MAXIMIZED);
-  //
-  //  return r;
-  return true;
+  // Restore main window.
+  IMemento::Pointer childMem = memento->GetChild(WorkbenchConstants::TAG_MAIN_WINDOW);
+  //IStatus r = mainLayout->RestoreState(childMem);
+  bool r = mainLayout->RestoreState(childMem);
+
+  // Restore each floating window.
+  if (detachable)
+  {
+    std::vector<IMemento::Pointer> detachedWindows(memento->GetChildren(
+        WorkbenchConstants::TAG_DETACHED_WINDOW));
+    for (std::vector<IMemento::Pointer>::iterator iter = detachedWindows.begin();
+        iter != detachedWindows.end(); ++iter)
+    {
+      DetachedWindow::Pointer win(new DetachedWindow(page));
+      detachedWindowList.push_back(win);
+      win->RestoreState(*iter);
+    }
+
+    std::vector<IMemento::Pointer> childrenMem(memento->GetChildren(
+        WorkbenchConstants::TAG_HIDDEN_WINDOW));
+    for (std::vector<IMemento::Pointer>::iterator iter = childrenMem.begin();
+        iter != childrenMem.end(); ++iter)
+    {
+      DetachedPlaceHolder::Pointer holder(
+          new DetachedPlaceHolder("", Rectangle(0, 0, 0, 0)));
+      holder->RestoreState(*iter);
+      detachedPlaceHolderList.push_back(holder);
+    }
+  }
+
+  // Get the cached id of the currently maximized stack
+  //maximizedStackId = childMem.getString(IWorkbenchConstants.TAG_MAXIMIZED);
+
+  return r;
 }
 
 bool PerspectiveHelper::SaveState(IMemento::Pointer memento)
 {
-  //TODO PerspectiveHelper save state
-  //  // Persist main window.
-  //  IMemento childMem = memento .createChild(IWorkbenchConstants.TAG_MAIN_WINDOW);
-  //  IStatus r = mainLayout.saveState(childMem);
-  //
-  //  if (detachable)
-  //  {
-  //    // Persist each detached window.
-  //    for (int i = 0, length = detachedWindowList.size(); i < length; i++)
-  //    {
-  //      DetachedWindow window = (DetachedWindow) detachedWindowList .get(i);
-  //      childMem = memento .createChild(IWorkbenchConstants.TAG_DETACHED_WINDOW);
-  //      window.saveState(childMem);
-  //    }
-  //    for (int i = 0, length = detachedPlaceHolderList.size(); i < length; i++)
-  //    {
-  //      DetachedPlaceHolder holder =
-  //          (DetachedPlaceHolder) detachedPlaceHolderList .get(i);
-  //      childMem = memento .createChild(IWorkbenchConstants.TAG_HIDDEN_WINDOW);
-  //      holder.saveState(childMem);
-  //    }
-  //  }
-  //
-  //  // Write out the id of the maximized (View) stack (if any)
-  //  // NOTE: we only write this out if it's a ViewStack since the
-  //  // Editor Area is handled by the perspective
-  //  if (maximizedStack.Cast<PartStack> () != 0)
-  //  {
-  //    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED,
-  //        maximizedStack.getID());
-  //  }
-  //  else if (maximizedStackId != 0)
-  //  {
-  //    // Maintain the cache if the perspective has never been activated
-  //    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED, maximizedStackId);
-  //  }
-  //
-  //  return r;
-  return true;
+  // Persist main window.
+  IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_MAIN_WINDOW);
+  //IStatus r = mainLayout->SaveState(childMem);
+  bool r = mainLayout->SaveState(childMem);
+
+  if (detachable)
+  {
+    // Persist each detached window.
+    for (DetachedWindowsType::iterator iter = detachedWindowList.begin();
+        iter != detachedWindowList.end(); ++iter)
+    {
+      childMem = memento->CreateChild(WorkbenchConstants::TAG_DETACHED_WINDOW);
+      (*iter)->SaveState(childMem);
+    }
+    for (DetachedPlaceHoldersType::iterator iter = detachedPlaceHolderList.begin();
+        iter != detachedPlaceHolderList.end(); ++iter)
+    {
+      childMem = memento->CreateChild(WorkbenchConstants::TAG_HIDDEN_WINDOW);
+      (*iter)->SaveState(childMem);
+    }
+  }
+
+  // Write out the id of the maximized (View) stack (if any)
+  // NOTE: we only write this out if it's a ViewStack since the
+  // Editor Area is handled by the perspective
+//  if (maximizedStack.Cast<PartStack> () != 0)
+//  {
+//    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED,
+//        maximizedStack.getID());
+//  }
+//  else if (maximizedStackId != 0)
+//  {
+//    // Maintain the cache if the perspective has never been activated
+//    childMem.putString(IWorkbenchConstants.TAG_MAXIMIZED, maximizedStackId);
+//  }
+
+  return r;
 }
 
 void PerspectiveHelper::UpdateBoundsMap()

@@ -51,7 +51,7 @@ LayoutTree::LayoutTree(LayoutPart::Pointer part)
 }
 
 LayoutPart::Pointer LayoutTree::ComputeRelation(
-    std::list<PartSashContainer::RelationshipInfo> relations)
+    std::list<PartSashContainer::RelationshipInfo>& relations)
 {
   return part;
 }

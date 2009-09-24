@@ -1,5 +1,7 @@
 SET(SRC_CPP_FILES
   cherryMultiStatus.cpp
+  cherrySafeRunner.cpp
+  cherrySolsticeExceptions.cpp
   cherryStatus.cpp
 )
 

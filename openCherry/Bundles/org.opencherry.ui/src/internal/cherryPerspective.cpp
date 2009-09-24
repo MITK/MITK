@@ -19,10 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryPerspectiveHelper.h"
 #include "cherryWorkbenchPlugin.h"
+#include "cherryWorkbenchConstants.h"
 #include "cherryPerspectiveExtensionReader.h"
 #include "cherryEditorSashContainer.h"
 #include "cherryPartSite.h"
+#include "cherryViewSite.h"
 #include "cherryEditorAreaHelper.h"
+#include "../dialogs/cherryMessageDialog.h"
 #include "../cherryWorkbenchWindow.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
@@ -349,18 +352,16 @@ void Perspective::UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
   // customized portion.
   persp->DeleteCustomDefinition();
   std::string title = "Restoring problems";
-  std::string msg = "Unable to read workbench state";
+  std::string msg = "Unable to read workbench state.";
   if (status == "")
   {
-    //TODO message dialog
-    //MessageDialog.openError((Shell) 0, title, msg);
-    WorkbenchPlugin::Log(title + ": " + msg);
+    MessageDialog::OpenError(Shell::Pointer(0), title, msg);
   }
   else
   {
-    //TODO message dialog
+    //TODO error dialog
     //ErrorDialog.openError((Shell) 0, title, msg, status);
-    WorkbenchPlugin::Log(status);
+    MessageDialog::OpenError(Shell::Pointer(0), title, msg + "\n" + status);
   }
 }
 
@@ -700,299 +701,299 @@ void Perspective::PerformedShowIn(const std::string& partId)
 
 bool Perspective::RestoreState(IMemento::Pointer memento)
 {
-  //TODO Perspective restore state
+
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsRestoringPerspective, 0);
-//
-//  // Create persp descriptor.
-//  descriptor = new PerspectiveDescriptor(0, 0, 0);
-//  result.add(descriptor.restoreState(memento));
-//  PerspectiveDescriptor desc = (PerspectiveDescriptor) WorkbenchPlugin
-//  .getDefault().getPerspectiveRegistry().findPerspectiveWithId(
-//      descriptor.getId());
-//  if (desc != 0)
-//  {
-//    descriptor = desc;
-//  }
-//
-//  this.memento = memento;
-//  // Add the visible views.
-//  IMemento views[] = memento.getChildren(IWorkbenchConstants.TAG_VIEW);
-//  result.merge(createReferences(views));
-//
-//  memento = memento.getChild(IWorkbenchConstants.TAG_FAST_VIEWS);
-//  if (memento != 0)
-//  {
-//    views = memento.getChildren(IWorkbenchConstants.TAG_VIEW);
-//    result.merge(createReferences(views));
-//  }
-//  return result;
-  return true;
+  bool result = true;
+
+  // Create persp descriptor.
+  descriptor = new PerspectiveDescriptor("", "", PerspectiveDescriptor::Pointer(0));
+  //result.add(descriptor.restoreState(memento));
+  result &= descriptor->RestoreState(memento);
+  PerspectiveDescriptor::Pointer desc = WorkbenchPlugin::GetDefault()->
+      GetPerspectiveRegistry()->FindPerspectiveWithId(descriptor->GetId()).Cast<PerspectiveDescriptor>();
+  if (desc)
+  {
+    descriptor = desc;
+  }
+
+  this->memento = memento;
+  // Add the visible views.
+  std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+  //result.merge(createReferences(views));
+  result &= this->CreateReferences(views);
+
+  memento = memento->GetChild(WorkbenchConstants::TAG_FAST_VIEWS);
+  if (memento)
+  {
+    views = memento->GetChildren(WorkbenchConstants::TAG_VIEW);
+    //result.merge(createReferences(views));
+    result &= this->CreateReferences(views);
+  }
+  return result;
 }
 
-bool Perspective::CreateReferences(std::vector<IMemento::Pointer> views)
+bool Perspective::CreateReferences(const std::vector<IMemento::Pointer>& views)
 {
-  //TODO Perspective create references
 //  MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsRestoringViews, 0);
-//
-//  for (int x = 0; x < views.length; x++)
-//  {
-//    // Get the view details.
-//    IMemento childMem = views[x];
-//    String id = childMem.getString(IWorkbenchConstants.TAG_ID);
-//    // skip creation of the intro reference -  it's handled elsewhere.
-//    if (id.equals(IIntroConstants.INTRO_VIEW_ID))
+  bool result = true;
+
+  for (std::size_t x = 0; x < views.size(); x++)
+  {
+    // Get the view details.
+    IMemento::Pointer childMem = views[x];
+    std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    // skip creation of the intro reference -  it's handled elsewhere.
+//    if (id == IIntroConstants::INTRO_VIEW_ID)
 //    {
 //      continue;
 //    }
-//
-//    String secondaryId = ViewFactory.extractSecondaryId(id);
-//    if (secondaryId != 0)
-//    {
-//      id = ViewFactory.extractPrimaryId(id);
-//    }
-//    // Create and open the view.
-//    try
-//    {
-//      if (!"true".equals(childMem.getString(IWorkbenchConstants.TAG_REMOVED)))
-//      { //$NON-NLS-1$
-//        viewFactory.createView(id, secondaryId);
-//      }
-//    }
-//    catch (PartInitException e)
-//    {
-//      childMem.putString(IWorkbenchConstants.TAG_REMOVED, "true"); //$NON-NLS-1$
+
+    std::string secondaryId(ViewFactory::ExtractSecondaryId(id));
+    if (!secondaryId.empty())
+    {
+      id = ViewFactory::ExtractPrimaryId(id);
+    }
+    // Create and open the view.
+    try
+    {
+      std::string rm; childMem->GetString(WorkbenchConstants::TAG_REMOVED, rm);
+      if (rm != "true")
+      {
+        viewFactory->CreateView(id, secondaryId);
+      }
+    }
+    catch (const PartInitException& e)
+    {
+      childMem->PutString(WorkbenchConstants::TAG_REMOVED, "true");
 //      result.add(StatusUtil.newStatus(IStatus.ERR,
 //              e.getMessage() == 0 ? "" : e.getMessage(), //$NON-NLS-1$
 //              e));
-//    }
-//  }
-//  return result;
-  return true;
+      WorkbenchPlugin::Log(e.displayText(), e);
+      result &= true;
+    }
+  }
+  return result;
 }
 
 bool Perspective::RestoreState()
 {
-  //TODO Perspective restore state
-//  if (this.memento == 0)
-//  {
-//    return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
-//  }
-//
+  if (this->memento == 0)
+  {
+    //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", 0); //$NON-NLS-1$
+    return true;
+  }
+
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsRestoringPerspective, 0);
-//
-//  IMemento memento = this.memento;
-//  this.memento = 0;
-//
-//  const IMemento boundsMem = memento.getChild(IWorkbenchConstants.TAG_WINDOW);
-//  if (boundsMem != 0)
-//  {
-//    Rectangle r = new Rectangle(0, 0, 0, 0);
-//    r.x = boundsMem.getInteger(IWorkbenchConstants.TAG_X).intValue();
-//    r.y = boundsMem.getInteger(IWorkbenchConstants.TAG_Y).intValue();
-//    r.height = boundsMem.getInteger(IWorkbenchConstants.TAG_HEIGHT)
-//    .intValue();
-//    r.width = boundsMem.getInteger(IWorkbenchConstants.TAG_WIDTH)
-//    .intValue();
-//    //StartupThreading.runWithoutExceptions(new StartupRunnable()
-//    //    {
-//
-//    //      void runWithException() throws Throwable
-//    //      {
-//            if (page.getWorkbenchWindow().getPages().length == 0)
-//            {
-//              page.getWorkbenchWindow().getShell().setBounds(r);
-//            }
-//    //      }
-//    //    });
-//
-//  }
-//
-//  // Create an empty presentation..
-//  PerspectiveHelper* pres;
-//  //StartupThreading.runWithoutExceptions(new StartupRunnable()
-//  //    {
-//
-//  //      void runWithException() throws Throwable
-//  //      {
-//          ViewSashContainer mainLayout = new ViewSashContainer(page, getClientComposite());
-//          pres = new PerspectiveHelper(page, mainLayout, this);
-//  //      }});
-//
-//
-//  // Read the layout.
+  bool result = true;
+
+  IMemento::Pointer memento = this->memento;
+  this->memento = 0;
+
+  const IMemento::Pointer boundsMem(memento->GetChild(WorkbenchConstants::TAG_WINDOW));
+  if (boundsMem)
+  {
+    Rectangle r(0, 0, 0, 0);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_X, r.x);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_Y, r.y);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_HEIGHT, r.height);
+    boundsMem->GetInteger(WorkbenchConstants::TAG_WIDTH, r.width);
+    //StartupThreading.runWithoutExceptions(new StartupRunnable()
+    //    {
+
+    //      void runWithException() throws Throwable
+    //      {
+            if (page->GetWorkbenchWindow()->GetActivePage() == 0)
+            {
+              page->GetWorkbenchWindow()->GetShell()->SetBounds(r);
+            }
+    //      }
+    //    });
+
+  }
+
+  // Create an empty presentation..
+  PerspectiveHelper* pres;
+  //StartupThreading.runWithoutExceptions(new StartupRunnable()
+  //    {
+
+  //      void runWithException() throws Throwable
+  //      {
+          ViewSashContainer::Pointer mainLayout(new ViewSashContainer(page, this->GetClientComposite()));
+          pres = new PerspectiveHelper(page, mainLayout, Perspective::Pointer(this));
+  //      }});
+
+
+  // Read the layout.
 //  result.merge(pres.restoreState(memento
 //          .getChild(IWorkbenchConstants.TAG_LAYOUT)));
-//
-//  //StartupThreading.runWithoutExceptions(new StartupRunnable()
-//  //    {
-//
-//  //      void runWithException() throws Throwable
-//  //      {
-//          // Add the editor workbook. Do not hide it now.
-//          pres.replacePlaceholderWithPart(editorArea);
-//  //      }});
-//
-//  // Add the visible views.
-//  std::vector<IMemento::Pointer> views = memento.getChildren(IWorkbenchConstants.TAG_VIEW);
-//
-//  for (int x = 0; x < views.length; x++)
-//  {
-//    // Get the view details.
-//    IMemento childMem = views[x];
-//    String id = childMem.getString(IWorkbenchConstants.TAG_ID);
-//    String secondaryId = ViewFactory.extractSecondaryId(id);
-//    if (secondaryId != 0)
-//    {
-//      id = ViewFactory.extractPrimaryId(id);
-//    }
-//
+  result &= pres->RestoreState(memento->GetChild(WorkbenchConstants::TAG_LAYOUT));
+
+  //StartupThreading.runWithoutExceptions(new StartupRunnable()
+  //    {
+
+  //      void runWithException() throws Throwable
+  //      {
+          // Add the editor workbook. Do not hide it now.
+          pres->ReplacePlaceholderWithPart(editorArea);
+  //      }});
+
+  // Add the visible views.
+  std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+
+  for (std::size_t x = 0; x < views.size(); x++)
+  {
+    // Get the view details.
+    IMemento::Pointer childMem = views[x];
+    std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+    std::string secondaryId(ViewFactory::ExtractSecondaryId(id));
+    if (!secondaryId.empty())
+    {
+      id = ViewFactory::ExtractPrimaryId(id);
+    }
+
 //    // skip the intro as it is restored higher up in workbench.
-//    if (id.equals(IIntroConstants.INTRO_VIEW_ID))
+//    if (id == IIntroConstants::INTRO_VIEW_ID))
 //    {
 //      continue;
 //    }
-//
-//    // Create and open the view.
-//    IViewReference viewRef = viewFactory.getView(id, secondaryId);
-//    WorkbenchPartReference ref = (WorkbenchPartReference) viewRef;
-//
-//    // report error
-//    if (ref == 0)
-//    {
-//      String key = ViewFactory.getKey(id, secondaryId);
+
+    // Create and open the view.
+    IViewReference::Pointer viewRef = viewFactory->GetView(id, secondaryId);
+    WorkbenchPartReference::Pointer ref = viewRef.Cast<WorkbenchPartReference>();
+
+    // report error
+    if (ref == 0)
+    {
+      std::string key = ViewFactory::GetKey(id, secondaryId);
 //      result.add(new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0,
 //              NLS.bind(WorkbenchMessages.Perspective_couldNotFind, key ), 0));
-//      continue;
-//    }
-//    bool willPartBeVisible = pres.willPartBeVisible(ref.getId(),
-//        secondaryId);
-//    if (willPartBeVisible)
-//    {
-//      IViewPart view = (IViewPart) ref.getPart(true);
-//      if (view != 0)
-//      {
-//        ViewSite site = (ViewSite) view.getSite();
-//        ViewPane pane = (ViewPane) site.getPane();
-//        pres.replacePlaceholderWithPart(pane);
-//      }
-//    }
-//    else
-//    {
-//      pres.replacePlaceholderWithPart(ref.getPane());
-//    }
-//  }
-//
+      WorkbenchPlugin::Log("Could not find view: " + key);
+      continue;
+    }
+    bool willPartBeVisible = pres->WillPartBeVisible(ref->GetId(),
+        secondaryId);
+    if (willPartBeVisible)
+    {
+      IViewPart::Pointer view = ref->GetPart(true).Cast<IViewPart>();
+      if (view)
+      {
+        ViewSite::Pointer site = view->GetSite().Cast<ViewSite>();
+        pres->ReplacePlaceholderWithPart(site->GetPane().Cast<StackablePart>());
+      }
+    }
+    else
+    {
+      pres->ReplacePlaceholderWithPart(ref->GetPane().Cast<StackablePart>());
+    }
+  }
+
 //  // Load the fast views
 //  if (fastViewManager != 0)
 //  fastViewManager.restoreState(memento, result);
-//
-//  // Load the view layout recs
-//  std::vector<IMemento::Pointer> recMementos = memento
-//  .getChildren(IWorkbenchConstants.TAG_VIEW_LAYOUT_REC);
-//  for (int i = 0; i < recMementos.length; i++)
-//  {
-//    IMemento recMemento = recMementos[i];
-//    String compoundId = recMemento
-//    .getString(IWorkbenchConstants.TAG_ID);
-//    if (compoundId != 0)
+
+  // Load the view layout recs
+  std::vector<IMemento::Pointer> recMementos(memento
+  ->GetChildren(WorkbenchConstants::TAG_VIEW_LAYOUT_REC));
+  for (std::size_t i = 0; i < recMementos.size(); i++)
+  {
+    IMemento::Pointer recMemento = recMementos[i];
+    std::string compoundId;
+    if (recMemento->GetString(WorkbenchConstants::TAG_ID, compoundId))
+    {
+      ViewLayoutRec::Pointer rec = GetViewLayoutRec(compoundId, true);
+      std::string closeablestr; recMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
+      if (WorkbenchConstants::FALSE_VAL == closeablestr)
+      {
+        rec->isCloseable = false;
+      }
+      std::string moveablestr; recMemento->GetString(WorkbenchConstants::TAG_MOVEABLE, moveablestr);
+      if (WorkbenchConstants::FALSE_VAL == moveablestr)
+      {
+        rec->isMoveable = false;
+      }
+      std::string standalonestr; recMemento->GetString(WorkbenchConstants::TAG_STANDALONE, standalonestr);
+      if (WorkbenchConstants::TRUE_VAL == standalonestr)
+      {
+        rec->isStandalone = true;
+        std::string showstr; recMemento->GetString(WorkbenchConstants::TAG_SHOW_TITLE, showstr);
+        rec->showTitle = WorkbenchConstants::FALSE_VAL != showstr;
+      }
+    }
+  }
+
+  //final IContextService service = (IContextService)page.getWorkbenchWindow().getService(IContextService.class);
+  try
+  { // one big try block, don't kill me here
+//    // defer context events
+//    if (service != 0)
 //    {
-//      ViewLayoutRec rec = getViewLayoutRec(compoundId, true);
-//      if (IWorkbenchConstants.FALSE.equals(recMemento
-//              .getString(IWorkbenchConstants.TAG_CLOSEABLE)))
-//      {
-//        rec.isCloseable = false;
-//      }
-//      if (IWorkbenchConstants.FALSE.equals(recMemento
-//              .getString(IWorkbenchConstants.TAG_MOVEABLE)))
-//      {
-//        rec.isMoveable = false;
-//      }
-//      if (IWorkbenchConstants.TRUE.equals(recMemento
-//              .getString(IWorkbenchConstants.TAG_STANDALONE)))
-//      {
-//        rec.isStandalone = true;
-//        rec.showTitle = !IWorkbenchConstants.FALSE
-//        .equals(recMemento
-//            .getString(IWorkbenchConstants.TAG_SHOW_TITLE));
-//      }
+//      service.activateContext(ContextAuthority.DEFER_EVENTS);
 //    }
-//  }
 //
-//  //final IContextService service = (IContextService)page.getWorkbenchWindow().getService(IContextService.class);
-//  try
-//  { // one big try block, don't kill me here
-////    // defer context events
-////    if (service != 0)
-////    {
-////      service.activateContext(ContextAuthority.DEFER_EVENTS);
-////    }
-////
-////    HashSet knownActionSetIds = new HashSet();
-////
-////    // Load the always on action sets.
-////    IMemento[] actions = memento
-////    .getChildren(IWorkbenchConstants.TAG_ALWAYS_ON_ACTION_SET);
-////    for (int x = 0; x < actions.length; x++)
-////    {
-////      String actionSetID = actions[x]
-////      .getString(IWorkbenchConstants.TAG_ID);
-////      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
-////      .getActionSetRegistry().findActionSet(actionSetID);
-////      if (d != 0)
-////      {
-////        StartupThreading
-////        .runWithoutExceptions(new StartupRunnable()
-////            {
-////              void runWithException() throws Throwable
-////              {
-////                addAlwaysOn(d);
-////              }
-////            });
-////
-////        knownActionSetIds.add(actionSetID);
-////      }
-////    }
-////
-////    // Load the always off action sets.
-////    actions = memento
-////    .getChildren(IWorkbenchConstants.TAG_ALWAYS_OFF_ACTION_SET);
-////    for (int x = 0; x < actions.length; x++)
-////    {
-////      String actionSetID = actions[x]
-////      .getString(IWorkbenchConstants.TAG_ID);
-////      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
-////      .getActionSetRegistry().findActionSet(actionSetID);
-////      if (d != 0)
-////      {
-////        StartupThreading
-////        .runWithoutExceptions(new StartupRunnable()
-////            {
-////              void runWithException() throws Throwable
-////              {
-////                addAlwaysOff(d);
-////              }
-////            });
-////        knownActionSetIds.add(actionSetID);
-////      }
-////    }
+//    HashSet knownActionSetIds = new HashSet();
 //
-//    // Load "show view actions".
-//    actions = memento
-//    .getChildren(IWorkbenchConstants.TAG_SHOW_VIEW_ACTION);
-//    showViewShortcuts = new ArrayList(actions.length);
+//    // Load the always on action sets.
+    std::vector<IMemento::Pointer> actions; // = memento
+//    .getChildren(IWorkbenchConstants.TAG_ALWAYS_ON_ACTION_SET);
 //    for (int x = 0; x < actions.length; x++)
 //    {
-//      String id = actions[x].getString(IWorkbenchConstants.TAG_ID);
-//      showViewShortcuts.add(id);
+//      String actionSetID = actions[x]
+//      .getString(IWorkbenchConstants.TAG_ID);
+//      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
+//      .getActionSetRegistry().findActionSet(actionSetID);
+//      if (d != 0)
+//      {
+//        StartupThreading
+//        .runWithoutExceptions(new StartupRunnable()
+//            {
+//              void runWithException() throws Throwable
+//              {
+//                addAlwaysOn(d);
+//              }
+//            });
+//
+//        knownActionSetIds.add(actionSetID);
+//      }
 //    }
 //
+//    // Load the always off action sets.
+//    actions = memento
+//    .getChildren(IWorkbenchConstants.TAG_ALWAYS_OFF_ACTION_SET);
+//    for (int x = 0; x < actions.length; x++)
+//    {
+//      String actionSetID = actions[x]
+//      .getString(IWorkbenchConstants.TAG_ID);
+//      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
+//      .getActionSetRegistry().findActionSet(actionSetID);
+//      if (d != 0)
+//      {
+//        StartupThreading
+//        .runWithoutExceptions(new StartupRunnable()
+//            {
+//              void runWithException() throws Throwable
+//              {
+//                addAlwaysOff(d);
+//              }
+//            });
+//        knownActionSetIds.add(actionSetID);
+//      }
+//    }
+
+    // Load "show view actions".
+    actions = memento->GetChildren(WorkbenchConstants::TAG_SHOW_VIEW_ACTION);
+    for (std::size_t x = 0; x < actions.size(); x++)
+    {
+      std::string id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
+      showViewShortcuts.push_back(id);
+    }
+
 //    // Load "show in times".
 //    actions = memento.getChildren(IWorkbenchConstants.TAG_SHOW_IN_TIME);
 //    for (int x = 0; x < actions.length; x++)
@@ -1013,10 +1014,10 @@ bool Perspective::RestoreState()
 //        }
 //      }
 //    }
-//
-//    // Load "show in parts" from registry, not memento
-//    showInPartIds = getShowInIdsFromRegistry();
-//
+
+    // Load "show in parts" from registry, not memento
+    showInPartIds = this->GetShowInIdsFromRegistry();
+
 //    // Load "new wizard actions".
 //    actions = memento
 //    .getChildren(IWorkbenchConstants.TAG_NEW_WIZARD_ACTION);
@@ -1026,89 +1027,86 @@ bool Perspective::RestoreState()
 //      String id = actions[x].getString(IWorkbenchConstants.TAG_ID);
 //      newWizardShortcuts.add(id);
 //    }
-//
-//    // Load "perspective actions".
-//    actions = memento
-//    .getChildren(IWorkbenchConstants.TAG_PERSPECTIVE_ACTION);
-//    perspectiveShortcuts = new ArrayList(actions.length);
-//    for (int x = 0; x < actions.length; x++)
+
+    // Load "perspective actions".
+    actions = memento->GetChildren(WorkbenchConstants::TAG_PERSPECTIVE_ACTION);
+    for (std::size_t x = 0; x < actions.size(); x++)
+    {
+      std::string id; actions[x]->GetString(WorkbenchConstants::TAG_ID, id);
+      perspectiveShortcuts.push_back(id);
+    }
+
+//    ArrayList extActionSets = getPerspectiveExtensionActionSets();
+//    for (int i = 0; i < extActionSets.size(); i++)
 //    {
-//      String id = actions[x].getString(IWorkbenchConstants.TAG_ID);
-//      perspectiveShortcuts.add(id);
+//      String actionSetID = (String) extActionSets.get(i);
+//      if (knownActionSetIds.contains(actionSetID))
+//      {
+//        continue;
+//      }
+//      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
+//      .getActionSetRegistry().findActionSet(actionSetID);
+//      if (d != 0)
+//      {
+//        StartupThreading
+//        .runWithoutExceptions(new StartupRunnable()
+//            {
+//              void runWithException() throws Throwable
+//              {
+//                addAlwaysOn(d);
+//              }
+//            });
+//        knownActionSetIds.add(d.getId());
+//      }
 //    }
-//
-////    ArrayList extActionSets = getPerspectiveExtensionActionSets();
-////    for (int i = 0; i < extActionSets.size(); i++)
-////    {
-////      String actionSetID = (String) extActionSets.get(i);
-////      if (knownActionSetIds.contains(actionSetID))
-////      {
-////        continue;
-////      }
-////      final IActionSetDescriptor d = WorkbenchPlugin.getDefault()
-////      .getActionSetRegistry().findActionSet(actionSetID);
-////      if (d != 0)
-////      {
-////        StartupThreading
-////        .runWithoutExceptions(new StartupRunnable()
-////            {
-////              void runWithException() throws Throwable
-////              {
-////                addAlwaysOn(d);
-////              }
-////            });
-////        knownActionSetIds.add(d.getId());
-////      }
-////    }
-//
-////    // Add the visible set of action sets to our knownActionSetIds
-////    // Now go through the registry to ensure we pick up any new action
-////    // sets
-////    // that have been added but not yet considered by this perspective.
-////    ActionSetRegistry reg = WorkbenchPlugin.getDefault()
-////    .getActionSetRegistry();
-////    IActionSetDescriptor[] array = reg.getActionSets();
-////    int count = array.length;
-////    for (int i = 0; i < count; i++)
-////    {
-////      IActionSetDescriptor desc = array[i];
-////      if ((!knownActionSetIds.contains(desc.getId()))
-////          && (desc.isInitiallyVisible()))
-////      {
-////        addActionSet(desc);
-////      }
-////    }
-//  }
-//  catch (...)
-//  {
-////    // restart context changes
-////    if (service != 0)
-////    {
-////      StartupThreading.runWithoutExceptions(new StartupRunnable()
-////          {
-////            void runWithException() throws Throwable
-////            {
-////              service.activateContext(ContextAuthority.SEND_EVENTS);
-////            }
-////          });
-////    }
-//  }
-//
-//  // Save presentation.
-//  presentation = pres;
-//
-//  // Hide the editor area if needed. Need to wait for the
-//  // presentation to be fully setup first.
-//  Integer areaVisible = memento
-//  .getInteger(IWorkbenchConstants.TAG_AREA_VISIBLE);
-//  // Rather than hiding the editors now we must wait until after their
-//  // controls
-//  // are created. This ensures that if an editor is instantiated,
-//  // createPartControl
-//  // is also called. See bug 20166.
-//  shouldHideEditorsOnActivate = (areaVisible != 0 && areaVisible
-//      .intValue() == 0);
-//
+
+//    // Add the visible set of action sets to our knownActionSetIds
+//    // Now go through the registry to ensure we pick up any new action
+//    // sets
+//    // that have been added but not yet considered by this perspective.
+//    ActionSetRegistry reg = WorkbenchPlugin.getDefault()
+//    .getActionSetRegistry();
+//    IActionSetDescriptor[] array = reg.getActionSets();
+//    int count = array.length;
+//    for (int i = 0; i < count; i++)
+//    {
+//      IActionSetDescriptor desc = array[i];
+//      if ((!knownActionSetIds.contains(desc.getId()))
+//          && (desc.isInitiallyVisible()))
+//      {
+//        addActionSet(desc);
+//      }
+//    }
+  }
+  catch (...)
+  {
+//    // restart context changes
+//    if (service != 0)
+//    {
+//      StartupThreading.runWithoutExceptions(new StartupRunnable()
+//          {
+//            void runWithException() throws Throwable
+//            {
+//              service.activateContext(ContextAuthority.SEND_EVENTS);
+//            }
+//          });
+//    }
+  }
+
+  // Save presentation.
+  presentation = pres;
+
+  // Hide the editor area if needed. Need to wait for the
+  // presentation to be fully setup first.
+  int areaVisible = 0;
+  bool areaVisibleExists = memento->GetInteger(WorkbenchConstants::TAG_AREA_VISIBLE, areaVisible);
+  // Rather than hiding the editors now we must wait until after their
+  // controls
+  // are created. This ensures that if an editor is instantiated,
+  // createPartControl
+  // is also called. See bug 20166.
+  shouldHideEditorsOnActivate = (areaVisibleExists && areaVisible == 0);
+
 //  // Restore the trim state of the editor area
 //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 //  bool useNewMinMax = preferenceStore.getbool(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
@@ -1121,20 +1119,20 @@ bool Perspective::RestoreState()
 //      editorAreaRestoreOnUnzoom = (trimStateInt.intValue() & 4) != 0;
 //    }
 //  }
-//
-//  // restore the fixed state
-//  Integer isFixed = memento.getInteger(IWorkbenchConstants.TAG_FIXED);
-//  fixed = (isFixed != 0 && isFixed.intValue() == 1);
-//
-//  return result;
+
+  // restore the fixed state
+  int isFixed = 0;
+  fixed = (memento->GetInteger(WorkbenchConstants::TAG_FIXED, isFixed) && isFixed == 1);
+
   return true;
 }
 
 std::vector<std::string> Perspective::GetShowInIdsFromRegistry()
 {
   PerspectiveExtensionReader reader;
-  //reader.setIncludeOnlyTags(new String[]
-  //    { IWorkbenchRegistryConstants.TAG_SHOW_IN_PART});
+  std::vector<std::string> tags;
+  tags.push_back(WorkbenchRegistryConstants::TAG_SHOW_IN_PART);
+  reader.SetIncludeOnlyTags(tags);
   PageLayout::Pointer layout(new PageLayout());
   reader.ExtendLayout(descriptor->GetOriginalId(), layout);
   return layout->GetShowInPartIds();
@@ -1194,32 +1192,34 @@ bool Perspective::SaveState(IMemento::Pointer memento)
 bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointer p,
     bool saveInnerViewState)
 {
-  //TODO Perspective save state
+
 //  MultiStatus result = new MultiStatus(
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsSavingPerspective, 0);
-//
-//  if (this.memento != 0)
-//  {
-//    memento.putMemento(this.memento);
-//    return result;
-//  }
-//
-//  // Save the version number.
-//  memento.putString(IWorkbenchConstants.TAG_VERSION, VERSION_STRING);
-//  result.add(p.saveState(memento));
-//  if (!saveInnerViewState)
-//  {
-//    Rectangle bounds = page.getWorkbenchWindow().getShell().getBounds();
-//    IMemento boundsMem = memento
-//    .createChild(IWorkbenchConstants.TAG_WINDOW);
-//    boundsMem.putInteger(IWorkbenchConstants.TAG_X, bounds.x);
-//    boundsMem.putInteger(IWorkbenchConstants.TAG_Y, bounds.y);
-//    boundsMem.putInteger(IWorkbenchConstants.TAG_HEIGHT, bounds.height);
-//    boundsMem.putInteger(IWorkbenchConstants.TAG_WIDTH, bounds.width);
-//  }
-//
+  bool result = true;
+
+  if (this->memento)
+  {
+    memento->PutMemento(this->memento);
+    return result;
+  }
+
+  // Save the version number.
+  memento->PutString(WorkbenchConstants::TAG_VERSION, VERSION_STRING);
+  //result.add(p.saveState(memento));
+  result &= p->SaveState(memento);
+  if (!saveInnerViewState)
+  {
+    Rectangle bounds(page->GetWorkbenchWindow()->GetShell()->GetBounds());
+    IMemento::Pointer boundsMem = memento
+    ->CreateChild(WorkbenchConstants::TAG_WINDOW);
+    boundsMem->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
+    boundsMem->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
+    boundsMem->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
+    boundsMem->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
+  }
+
 //  // Save the "always on" action sets.
 //  Iterator itr = alwaysOnActionSets.iterator();
 //  while (itr.hasNext())
@@ -1229,7 +1229,7 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //    .createChild(IWorkbenchConstants.TAG_ALWAYS_ON_ACTION_SET);
 //    child.putString(IWorkbenchConstants.TAG_ID, desc.getId());
 //  }
-//
+
 //  // Save the "always off" action sets.
 //  itr = alwaysOffActionSets.iterator();
 //  while (itr.hasNext())
@@ -1239,17 +1239,16 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //    .createChild(IWorkbenchConstants.TAG_ALWAYS_OFF_ACTION_SET);
 //    child.putString(IWorkbenchConstants.TAG_ID, desc.getId());
 //  }
-//
-//  // Save "show view actions"
-//  itr = showViewShortcuts.iterator();
-//  while (itr.hasNext())
-//  {
-//    String str = (String) itr.next();
-//    IMemento child = memento
-//    .createChild(IWorkbenchConstants.TAG_SHOW_VIEW_ACTION);
-//    child.putString(IWorkbenchConstants.TAG_ID, str);
-//  }
-//
+
+  // Save "show view actions"
+  for (std::vector<std::string>::iterator itr = showViewShortcuts.begin();
+      itr != showViewShortcuts.end(); ++itr)
+  {
+    IMemento::Pointer child = memento
+    ->CreateChild(WorkbenchConstants::TAG_SHOW_VIEW_ACTION);
+    child->PutString(WorkbenchConstants::TAG_ID, *itr);
+  }
+
 //  // Save "show in times"
 //  itr = showInTimes.keySet().iterator();
 //  while (itr.hasNext())
@@ -1261,7 +1260,7 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //    child.putString(IWorkbenchConstants.TAG_ID, id);
 //    child.putString(IWorkbenchConstants.TAG_TIME, time.toString());
 //  }
-//
+
 //  // Save "new wizard actions".
 //  itr = newWizardShortcuts.iterator();
 //  while (itr.hasNext())
@@ -1271,100 +1270,85 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //    .createChild(IWorkbenchConstants.TAG_NEW_WIZARD_ACTION);
 //    child.putString(IWorkbenchConstants.TAG_ID, str);
 //  }
-//
-//  // Save "perspective actions".
-//  itr = perspectiveShortcuts.iterator();
-//  while (itr.hasNext())
-//  {
-//    String str = (String) itr.next();
-//    IMemento child = memento
-//    .createChild(IWorkbenchConstants.TAG_PERSPECTIVE_ACTION);
-//    child.putString(IWorkbenchConstants.TAG_ID, str);
-//  }
-//
-//  // Get visible views.
-//  List viewPanes = new ArrayList(5);
-//  presentation.collectViewPanes(viewPanes);
-//
-//  // Save the views.
-//  itr = viewPanes.iterator();
-//  int errors = 0;
-//  while (itr.hasNext())
-//  {
-//    ViewPane pane = (ViewPane) itr.next();
-//    IViewReference ref = pane.getViewReference();
-//    bool restorable = page.getViewFactory().getViewRegistry().find(
-//        ref.getId()).isRestorable();
-//    if(restorable)
-//    {
-//      IMemento viewMemento = memento
-//      .createChild(IWorkbenchConstants.TAG_VIEW);
-//      viewMemento.putString(IWorkbenchConstants.TAG_ID, ViewFactory
-//          .getKey(ref));
-//    }
-//  }
-//
+
+  // Save "perspective actions".
+  for (std::vector<std::string>::iterator itr = perspectiveShortcuts.begin();
+      itr != perspectiveShortcuts.end(); ++itr)
+  {
+    IMemento::Pointer child = memento
+    ->CreateChild(WorkbenchConstants::TAG_PERSPECTIVE_ACTION);
+    child->PutString(WorkbenchConstants::TAG_ID, *itr);
+  }
+
+  // Get visible views.
+  std::vector<PartPane::Pointer> viewPanes;
+  presentation->CollectViewPanes(viewPanes);
+
+  // Save the views.
+  for (std::vector<PartPane::Pointer>::iterator itr = viewPanes.begin();
+      itr != viewPanes.end(); ++itr)
+  {
+    IWorkbenchPartReference::Pointer ref((*itr)->GetPartReference());
+    bool restorable = page->GetViewFactory()->GetViewRegistry()->Find(
+        ref->GetId())->IsRestorable();
+    if(restorable)
+    {
+      IMemento::Pointer viewMemento = memento
+      ->CreateChild(WorkbenchConstants::TAG_VIEW);
+      viewMemento->PutString(WorkbenchConstants::TAG_ID, ViewFactory::GetKey(ref.Cast<IViewReference>()));
+    }
+  }
+
 //  // save all fastview state
 //  if (fastViewManager != 0)
 //  fastViewManager.saveState(memento);
-//
-//  // Save the view layout recs.
-//  for (Iterator i = mapIDtoViewLayoutRec.keySet().iterator(); i.hasNext();)
-//  {
-//    String compoundId = (String) i.next();
-//    ViewLayoutRec rec = (ViewLayoutRec) mapIDtoViewLayoutRec
-//    .get(compoundId);
-//    if (rec != 0
-//        && (!rec.isCloseable || !rec.isMoveable || rec.isStandalone))
-//    {
-//      IMemento layoutMemento = memento
-//      .createChild(IWorkbenchConstants.TAG_VIEW_LAYOUT_REC);
-//      layoutMemento.putString(IWorkbenchConstants.TAG_ID, compoundId);
-//      if (!rec.isCloseable)
-//      {
-//        layoutMemento.putString(IWorkbenchConstants.TAG_CLOSEABLE,
-//            IWorkbenchConstants.FALSE);
-//      }
-//      if (!rec.isMoveable)
-//      {
-//        layoutMemento.putString(IWorkbenchConstants.TAG_MOVEABLE,
-//            IWorkbenchConstants.FALSE);
-//      }
-//      if (rec.isStandalone)
-//      {
-//        layoutMemento.putString(IWorkbenchConstants.TAG_STANDALONE,
-//            IWorkbenchConstants.TRUE);
-//        layoutMemento.putString(IWorkbenchConstants.TAG_SHOW_TITLE,
-//            String.valueOf(rec.showTitle));
-//      }
-//    }
-//  }
-//
-//  if (errors> 0)
-//  {
-//    String message = WorkbenchMessages.Perspective_multipleErrors;
-//    if (errors == 1)
-//    {
-//      message = WorkbenchMessages.Perspective_oneError;
-//    }
-//    MessageDialog.openError(0,
-//        WorkbenchMessages.Error, message);
-//  }
-//
-//  // Save the layout.
-//  IMemento childMem = memento.createChild(IWorkbenchConstants.TAG_LAYOUT);
-//  result.add(presentation.saveState(childMem));
-//
-//  // Save the editor visibility state
-//  if (isEditorAreaVisible())
-//  {
-//    memento.putInteger(IWorkbenchConstants.TAG_AREA_VISIBLE, 1);
-//  }
-//  else
-//  {
-//    memento.putInteger(IWorkbenchConstants.TAG_AREA_VISIBLE, 0);
-//  }
-//
+
+  // Save the view layout recs.
+  for (std::map<std::string, ViewLayoutRec::Pointer>::iterator i = mapIDtoViewLayoutRec.begin();
+      i != mapIDtoViewLayoutRec.end(); ++i)
+  {
+    std::string compoundId(i->first);
+    ViewLayoutRec::Pointer rec(i->second);
+    if (rec && (!rec->isCloseable || !rec->isMoveable || rec->isStandalone))
+    {
+      IMemento::Pointer layoutMemento(memento
+      ->CreateChild(WorkbenchConstants::TAG_VIEW_LAYOUT_REC));
+      layoutMemento->PutString(WorkbenchConstants::TAG_ID, compoundId);
+      if (!rec->isCloseable)
+      {
+        layoutMemento->PutString(WorkbenchConstants::TAG_CLOSEABLE,
+            WorkbenchConstants::FALSE_VAL);
+      }
+      if (!rec->isMoveable)
+      {
+        layoutMemento->PutString(WorkbenchConstants::TAG_MOVEABLE,
+            WorkbenchConstants::FALSE_VAL);
+      }
+      if (rec->isStandalone)
+      {
+        layoutMemento->PutString(WorkbenchConstants::TAG_STANDALONE,
+            WorkbenchConstants::TRUE_VAL);
+        layoutMemento->PutString(WorkbenchConstants::TAG_SHOW_TITLE,
+            rec->showTitle ? WorkbenchConstants::TRUE_VAL : WorkbenchConstants::FALSE_VAL);
+      }
+    }
+  }
+
+  // Save the layout.
+  IMemento::Pointer childMem(memento->CreateChild(WorkbenchConstants::TAG_LAYOUT));
+  //result.add(presentation.saveState(childMem));
+  result &= presentation->SaveState(childMem);
+
+  // Save the editor visibility state
+  if (this->IsEditorAreaVisible())
+  {
+    memento->PutInteger(WorkbenchConstants::TAG_AREA_VISIBLE, 1);
+  }
+  else
+  {
+    memento->PutInteger(WorkbenchConstants::TAG_AREA_VISIBLE, 0);
+  }
+
 //  // Save the trim state of the editor area if using the new min/max
 //  IPreferenceStore preferenceStore = PrefUtil.getAPIPreferenceStore();
 //  bool useNewMinMax = preferenceStore.getbool(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
@@ -1374,19 +1358,18 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
 //    trimState |= editorAreaRestoreOnUnzoom ? 4 : 0;
 //    memento.putInteger(IWorkbenchConstants.TAG_AREA_TRIM_STATE, trimState);
 //  }
-//
-//  // Save the fixed state
-//  if (fixed)
-//  {
-//    memento.putInteger(IWorkbenchConstants.TAG_FIXED, 1);
-//  }
-//  else
-//  {
-//    memento.putInteger(IWorkbenchConstants.TAG_FIXED, 0);
-//  }
-//
-//  return result;
-  return true;
+
+  // Save the fixed state
+  if (fixed)
+  {
+    memento->PutInteger(WorkbenchConstants::TAG_FIXED, 1);
+  }
+  else
+  {
+    memento->PutInteger(WorkbenchConstants::TAG_FIXED, 0);
+  }
+
+  return result;
 }
 
 void Perspective::SetPerspectiveActionIds(const std::vector<std::string>& list)

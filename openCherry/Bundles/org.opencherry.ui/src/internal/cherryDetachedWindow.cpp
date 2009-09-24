@@ -24,6 +24,7 @@
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
+#include "cherryWorkbenchConstants.h"
 #include "cherryEditorManager.h"
 #include "cherryDragUtil.h"
 
@@ -52,7 +53,8 @@ DetachedWindow::ShellControlListener::ShellControlListener(DetachedWindow* wnd) 
 void DetachedWindow::ShellControlListener::ControlResized(
     GuiTk::ControlEvent::Pointer e)
 {
-  window->folder->SetBounds(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetClientArea(e->item));
+  window->folder->SetBounds(
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetClientArea(e->item));
 }
 
 DetachedWindow::DetachedWindow(WorkbenchPage::Pointer workbenchPage)
@@ -87,15 +89,17 @@ void DetachedWindow::Create()
 {
   folder->AddListener(IPropertyChangeListener::Pointer(this));
 
-  windowShell = page->GetWorkbenchWindow().Cast<WorkbenchWindow>()
-       ->GetDetachedWindowPool()->AllocateShell(shellListener);
+  windowShell
+      = page->GetWorkbenchWindow().Cast<WorkbenchWindow> () ->GetDetachedWindowPool()->AllocateShell(
+          shellListener);
 #ifdef CHERRY_DEBUG_SMARTPOINTER
   CHERRY_INFO << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
 #endif
   windowShell->SetData(Object::Pointer(this));
   windowShell->SetText(""); //$NON-NLS-1$
 
-  DragUtil::AddDragTarget(windowShell->GetControl(), IDragOverListener::Pointer(this));
+  DragUtil::AddDragTarget(windowShell->GetControl(),
+      IDragOverListener::Pointer(this));
   hideViewsOnClose = true;
   if (bounds.IsEmpty())
   {
@@ -106,7 +110,8 @@ void DetachedWindow::Create()
   }
 
   // Force the rect into the current display
-  Rectangle dispBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetScreenSize();
+  Rectangle dispBounds =
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetScreenSize();
   if (bounds.width > dispBounds.width)
     bounds.width = dispBounds.width;
   if (bounds.height > dispBounds.height)
@@ -182,7 +187,8 @@ IDropTarget::Pointer DetachedWindow::Drag(void* /*currentControl*/,
           DragUtil::GetDisplayBounds(folder->GetControl());
       if (displayBounds.Contains(position))
       {
-        StackDropResult::Pointer stackDropResult(new StackDropResult(displayBounds, Object::Pointer(0)));
+        StackDropResult::Pointer stackDropResult(new StackDropResult(
+            displayBounds, Object::Pointer(0)));
         target = folder->CreateDropTarget(sourcePart, stackDropResult);
       }
       else
@@ -207,51 +213,51 @@ WorkbenchPage::Pointer DetachedWindow::GetWorkbenchPage()
 
 void DetachedWindow::RestoreState(IMemento::Pointer memento)
 {
-  //TODO DetachedWindow restore state
-  //  // Read the bounds.
-  //  Integer bigInt;
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_X);
-  //  int x = bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_Y);
-  //  int y = bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_WIDTH);
-  //  int width = bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_HEIGHT);
-  //  int height = bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_FLOAT);
-  //
-  //  // Set the bounds.
-  //  bounds = new Rectangle(x, y, width, height);
-  //  if (getShell() != 0)
-  //  {
-  //    getShell().setBounds(bounds);
-  //  }
-  //
-  //  // Create the folder.
-  //  IMemento childMem = memento.getChild(IWorkbenchConstants.TAG_FOLDER);
-  //  if (childMem != 0)
-  //  {
-  //    folder.restoreState(childMem);
-  //  }
+  // Read the bounds.
+  int x = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_X, x);
+  int y = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_Y, y);
+  int width = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_WIDTH, width);
+  int height = 0;
+  memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, height);
+
+  // memento->GetInteger(WorkbenchConstants::TAG_FLOAT);
+
+  // Set the bounds.
+  bounds = Rectangle(x, y, width, height);
+  if (GetShell())
+  {
+    GetShell()->SetBounds(bounds);
+  }
+
+  // Create the folder.
+  IMemento::Pointer childMem =
+      memento->GetChild(WorkbenchConstants::TAG_FOLDER);
+  if (childMem)
+  {
+    folder->RestoreState(childMem);
+  }
 }
 
 void DetachedWindow::SaveState(IMemento::Pointer memento)
 {
-  //TODO DetachedWindow save state
-  //  if (getShell() != 0)
-  //  {
-  //    bounds = getShell().getBounds();
-  //  }
-  //
-  //  // Save the bounds.
-  //  memento.putInteger(IWorkbenchConstants.TAG_X, bounds.x);
-  //  memento.putInteger(IWorkbenchConstants.TAG_Y, bounds.y);
-  //  memento.putInteger(IWorkbenchConstants.TAG_WIDTH, bounds.width);
-  //  memento.putInteger(IWorkbenchConstants.TAG_HEIGHT, bounds.height);
-  //
-  //  // Save the views.
-  //  IMemento childMem = memento.createChild(IWorkbenchConstants.TAG_FOLDER);
-  //  folder.saveState(childMem);
+  if (GetShell())
+  {
+    bounds = GetShell()->GetBounds();
+  }
+
+  // Save the bounds.
+  memento->PutInteger(WorkbenchConstants::TAG_X, bounds.x);
+  memento->PutInteger(WorkbenchConstants::TAG_Y, bounds.y);
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, bounds.width);
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, bounds.height);
+
+  // Save the views.
+  IMemento::Pointer childMem = memento->CreateChild(
+      WorkbenchConstants::TAG_FOLDER);
+  folder->SaveState(childMem);
 }
 
 void* DetachedWindow::GetControl()
@@ -302,7 +308,8 @@ void DetachedWindow::ConfigureShell(Shell::Pointer shell)
 {
   this->UpdateTitle();
 
-  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(shell->GetControl(), resizeListener);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(
+      shell->GetControl(), resizeListener);
   //shell.addListener(SWT.Activate, activationListener);
   //shell.addListener(SWT.Deactivate, activationListener);
 
@@ -452,11 +459,13 @@ bool DetachedWindow::HandleClose()
 
   if (windowShell != 0)
   {
-    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(windowShell->GetControl(), resizeListener);
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(
+        windowShell->GetControl(), resizeListener);
     //    windowShell.removeListener(SWT.Activate, activationListener);
     //    windowShell.removeListener(SWT.Deactivate, activationListener);
 
-    DragUtil::RemoveDragTarget(windowShell->GetControl(), IDragOverListener::Pointer(this));
+    DragUtil::RemoveDragTarget(windowShell->GetControl(),
+        IDragOverListener::Pointer(this));
     bounds = windowShell->GetBounds();
 
     //TODO DetachedWindow unregister key bindings

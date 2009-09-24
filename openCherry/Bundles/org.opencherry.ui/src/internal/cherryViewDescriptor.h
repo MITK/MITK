@@ -111,6 +111,11 @@ public:
    */
   bool GetAllowMultiple() const;
 
+  /* (non-Javadoc)
+   * @see org.eclipse.ui.views.IViewDescriptor#getRestorable()
+   */
+  bool IsRestorable() const;
+
   bool operator==(const Object*) const;
 
   /**

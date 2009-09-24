@@ -21,7 +21,12 @@
 #include "cherryPerspectiveHelper.h"
 #include "cherryLayoutTree.h"
 
+#include "cherryWorkbenchConstants.h"
+#include "cherryWorkbenchPlugin.h"
+
 #include "../cherryImageDescriptor.h"
+
+#include <Poco/HashMap.h>
 
 namespace cherry
 {
@@ -48,175 +53,136 @@ bool ViewSashContainer::RestoreState(IMemento::Pointer memento)
   //      result =
   //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsRestoringPerspective, null);
   //
-  //  // Read the info elements.
-  //  IMemento[] children = memento.getChildren(IWorkbenchConstants.TAG_INFO);
-  //
-  //  // Create a part ID to part hashtable.
-  //  final Map mapIDtoPart = new HashMap(children.length);
-  //
-  //  // Loop through the info elements.
-  //  for (int i = 0; i < children.length; i++)
-  //  {
-  //    // Get the info details.
-  //    IMemento childMem = children[i];
-  //    String partID = childMem.getString(IWorkbenchConstants.TAG_PART);
-  //    final String relativeID = childMem
-  //    .getString(IWorkbenchConstants.TAG_RELATIVE);
-  //    int relationship = 0;
-  //    float ratio = 0.0f;
-  //    int left = 0, right = 0;
-  //    if (relativeID != null)
-  //    {
-  //      relationship
-  //          = childMem.getInteger(IWorkbenchConstants.TAG_RELATIONSHIP).intValue();
-  //
-  //      // Note: the ratio is used for reading pre-3.0 eclipse workspaces. It should be ignored
-  //      // if "left" and "right" are available.
-  //      Float ratioFloat = childMem .getFloat(IWorkbenchConstants.TAG_RATIO);
-  //      Integer leftInt =
-  //          childMem .getInteger(IWorkbenchConstants.TAG_RATIO_LEFT);
-  //      Integer rightInt = childMem .getInteger(
-  //          IWorkbenchConstants.TAG_RATIO_RIGHT);
-  //      if (leftInt != null && rightInt != null)
-  //      {
-  //        left = leftInt.intValue();
-  //        right = rightInt.intValue();
-  //      }
-  //      else
-  //      {
-  //        if (ratioFloat != null)
-  //        {
-  //          ratio = ratioFloat.floatValue();
-  //        }
-  //      }
-  //    }
-  //    String strFolder = childMem .getString(IWorkbenchConstants.TAG_FOLDER);
-  //
-  //    // Create the part.
-  //    LayoutPart part = null;
-  //    if (strFolder == null)
-  //    {
-  //      part = new PartPlaceholder(partID);
-  //    }
-  //    else
-  //    {
-  //      ViewStack folder = new ViewStack(page);
-  //      folder.setID(partID);
-  //      result.add(folder.restoreState(childMem .getChild(
-  //          IWorkbenchConstants.TAG_FOLDER)));
-  //      ContainerPlaceholder placeholder = new ContainerPlaceholder(partID);
-  //      placeholder.setRealContainer(folder);
-  //      part = placeholder;
-  //    }
-  //    // 1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
-  //    part.setContainer(this);
-  //
-  //    final int myLeft = left, myRight = right, myRelationship = relationship;
-  //    final float myRatio = ratio;
-  //    final LayoutPart myPart = part;
-  //
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //        {
-  //
-  //        public void runWithException() throws Throwable
-  //          {
-  //            // Add the part to the layout
-  //            if (relativeID == null)
-  //            {
-  //              add(myPart);
-  //            }
-  //            else
-  //            {
-  //              LayoutPart refPart = (LayoutPart) mapIDtoPart.get(relativeID);
-  //              if (refPart != null)
-  //              {
-  //                if (myLeft != 0)
-  //                {
-  //                  add(myPart, myRelationship, myLeft, myRight, refPart);
-  //                }
-  //                else
-  //                {
-  //                  add(myPart, myRelationship, myRatio, refPart);
-  //                }
-  //              }
-  //              else
-  //              {
-  //                WorkbenchPlugin
-  //                .log("Unable to find part for ID: " + relativeID);//$NON-NLS-1$
-  //              }
-  //            }
-  //          }}
-  //        );
-  //
-  //        mapIDtoPart.put(partID, part);
-  //      }
-  //      return result;
-  return true;
+  bool result = true;
+  // Read the info elements.
+  std::vector<IMemento::Pointer> children(memento->GetChildren(WorkbenchConstants::TAG_INFO));
+
+  // Create a part ID to part hashtable.
+  Poco::HashMap<std::string, LayoutPart::Pointer> mapIDtoPart(children.size());
+
+  // Loop through the info elements.
+  for (std::size_t i = 0; i < children.size(); i++)
+  {
+  // Get the info details.
+  IMemento::Pointer childMem = children[i];
+  std::string partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
+  std::string relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
+  int relationship = 0;
+  int left = 0, right = 0;
+  if (!relativeID.empty())
+  {
+    childMem->GetInteger(WorkbenchConstants::TAG_RELATIONSHIP, relationship);
+
+    childMem->GetInteger(WorkbenchConstants::TAG_RATIO_LEFT, left);
+    childMem->GetInteger(WorkbenchConstants::TAG_RATIO_RIGHT, right);
+  }
+  std::string strFolder; childMem->GetString(WorkbenchConstants::TAG_FOLDER, strFolder);
+
+  // Create the part.
+  LayoutPart::Pointer part;
+
+  if (strFolder.empty())
+  {
+    // this is the editor area
+    ContainerPlaceholder::Pointer placeholder(new ContainerPlaceholder(partID));
+    part = placeholder;
+  }
+  else
+  {
+    PartStack::Pointer folder(new PartStack(page));
+    folder->SetID(partID);
+    //result.add(folder->RestoreState(childMem->GetChild(WorkbenchConstants::TAG_FOLDER)));
+    result &= folder->RestoreState(childMem->GetChild(WorkbenchConstants::TAG_FOLDER));
+    ContainerPlaceholder::Pointer placeholder(new ContainerPlaceholder(partID));
+    placeholder->SetRealContainer(folder);
+    part = placeholder;
+  }
+
+  // 1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
+  part->SetContainer(ILayoutContainer::Pointer(this));
+
+  const int myLeft = left, myRight = right, myRelationship = relationship;
+  LayoutPart::Pointer myPart = part;
+
+//  StartupThreading.runWithoutExceptions(new StartupRunnable()
+//    {
+//
+//    public void runWithException() throws Throwable
+//      {
+        // Add the part to the layout
+        if (relativeID.empty())
+        {
+          this->Add(myPart);
+        }
+        else
+        {
+          LayoutPart::Pointer refPart = mapIDtoPart[relativeID];
+          if (refPart)
+          {
+            this->Add(myPart, myRelationship, myLeft, myRight, refPart);
+          }
+          else
+          {
+            WorkbenchPlugin::Log("Unable to find part for ID: " + relativeID);
+          }
+        }
+//      }}
+//    );
+
+    mapIDtoPart[partID] = part;
+  }
+  return result;
 }
 
 bool ViewSashContainer::SaveState(IMemento::Pointer memento)
 {
-  //TODO ViewSashContainer save state
-  //      RelationshipInfo[] relationships = computeRelation();
-  //
-  //      MultiStatus
-  //          result =
-  //              new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, null);
-  //
-  //      // Loop through the relationship array.
-  //      for (int i = 0; i < relationships.length; i++)
-  //      {
-  //        // Save the relationship info ..
-  //        //    private LayoutPart part;
-  //        //    private int relationship;
-  //        //    private float ratio;
-  //        //    private LayoutPart relative;
-  //        RelationshipInfo info = relationships[i];
-  //        IMemento childMem = memento .createChild(IWorkbenchConstants.TAG_INFO);
-  //        childMem.putString(IWorkbenchConstants.TAG_PART, info.part.getID());
-  //        if (info.relative != null)
-  //        {
-  //          childMem.putString(IWorkbenchConstants.TAG_RELATIVE,
-  //              info.relative.getID());
-  //          childMem.putInteger(IWorkbenchConstants.TAG_RELATIONSHIP,
-  //              info.relationship);
-  //          childMem.putInteger(IWorkbenchConstants.TAG_RATIO_LEFT, info.left);
-  //          childMem.putInteger(IWorkbenchConstants.TAG_RATIO_RIGHT, info.right);
-  //
-  //          // The ratio is only needed for saving workspaces that can be read by old versions
-  //          // of Eclipse. It is not used in newer versions of Eclipse, which use the "left"
-  //          // and "right" attributes instead.
-  //          childMem.putFloat(IWorkbenchConstants.TAG_RATIO, info .getRatio());
-  //        }
-  //
-  //        // Is this part a folder or a placeholder for one?
-  //        ViewStack folder = null;
-  //        if (info.part instanceof ViewStack)
-  //        {
-  //          folder = (ViewStack) info.part;
-  //        }
-  //        else if (info.part instanceof ContainerPlaceholder)
-  //        {
-  //          LayoutPart part = ((ContainerPlaceholder) info.part)
-  //          .getRealContainer();
-  //          if (part instanceof ViewStack)
-  //          {
-  //            folder = (ViewStack) part;
-  //          }
-  //        }
-  //
-  //        // If this is a folder (ViewStack) save the contents.
-  //        if (folder != null)
-  //        {
-  //          childMem.putString(IWorkbenchConstants.TAG_FOLDER, "true");//$NON-NLS-1$
-  //
-  //          IMemento folderMem = childMem .createChild(
-  //              IWorkbenchConstants.TAG_FOLDER);
-  //          result.add(folder.saveState(folderMem));
-  //        }
-  //      }
-  //      return result;
-  return true;
+  std::vector<RelationshipInfo> relationships = this->ComputeRelation();
+
+  bool result = true;
+//  MultiStatus
+//      result =
+//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, null);
+
+  // Loop through the relationship array.
+  for (std::size_t i = 0; i < relationships.size(); ++i)
+  {
+    // Save the relationship info ..
+    //    private LayoutPart part;
+    //    private int relationship;
+    //    private float ratio;
+    //    private LayoutPart relative;
+    RelationshipInfo& info = relationships[i];
+    IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_INFO);
+    childMem->PutString(WorkbenchConstants::TAG_PART, info.part->GetID());
+    if (info.relative)
+    {
+      childMem->PutString(WorkbenchConstants::TAG_RELATIVE,
+          info.relative->GetID());
+      childMem->PutInteger(WorkbenchConstants::TAG_RELATIONSHIP,
+          info.relationship);
+      childMem->PutInteger(WorkbenchConstants::TAG_RATIO_LEFT, info.left);
+      childMem->PutInteger(WorkbenchConstants::TAG_RATIO_RIGHT, info.right);
+    }
+
+    // Is this part a folder or a placeholder for one?
+    PartStack::Pointer folder(info.part.Cast<PartStack>());
+    if (!folder && info.part.Cast<ContainerPlaceholder>())
+    {
+      IStackableContainer::Pointer part = info.part.Cast<ContainerPlaceholder>()->GetRealContainer();
+      folder = part.Cast<PartStack>();
+    }
+
+    // If this is a folder (PartStack) save the contents.
+    if (folder)
+    {
+      childMem->PutString(WorkbenchConstants::TAG_FOLDER, "true");
+
+      IMemento::Pointer folderMem(childMem->CreateChild(WorkbenchConstants::TAG_FOLDER));
+      //result.add(folder.saveState(folderMem));
+      result = folder->SaveState(folderMem);
+    }
+  }
+  return result;
 }
 
 bool ViewSashContainer::IsStackType(IStackableContainer::Pointer toTest)

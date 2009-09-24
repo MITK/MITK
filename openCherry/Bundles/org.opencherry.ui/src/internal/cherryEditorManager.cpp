@@ -27,8 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryEditorSite.h"
 #include "cherryEditorReference.h"
 #include "cherryWorkbenchPlugin.h"
+#include "cherryWorkbenchConstants.h"
 #include "cherryNullEditorInput.h"
 #include "cherryEditorAreaHelper.h"
+#include "cherryPartStack.h"
 
 
 #include <Poco/Bugcheck.h>
@@ -701,73 +703,73 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 
     bool EditorManager::RestoreState(IMemento::Pointer memento)
     {
-//      // Restore the editor area workbooks layout/relationship
-//      final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
+      // Restore the editor area workbooks layout/relationship
+//      MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
 //          IStatus.OK,
 //          WorkbenchMessages.EditorManager_problemsRestoringEditors, null);
-//      final String activeWorkbookID[] = new String[1];
-//      final ArrayList visibleEditors = new ArrayList(5);
-//      final IEditorReference activeEditor[] = new IEditorReference[1];
-//
-//      IMemento areaMem = memento.getChild(IWorkbenchConstants.TAG_AREA);
-//      if (areaMem != null)
-//      {
-//        result.add(editorPresentation.restoreState(areaMem));
-//        activeWorkbookID[0] = areaMem
-//        .getString(IWorkbenchConstants.TAG_ACTIVE_WORKBOOK);
-//      }
-//
-//      // Loop through the editors.
-//
-//      IMemento[] editorMems = memento
-//      .getChildren(IWorkbenchConstants.TAG_EDITOR);
-//      for (int x = 0; x < editorMems.length; x++)
-//      {
-//        // for dynamic UI - call restoreEditorState to replace code which is
-//        // commented out
-//        restoreEditorState(editorMems[x], visibleEditors, activeEditor, result);
-//      }
-//
-//      // restore the presentation
-//      if (areaMem != null)
-//      {
-//        result.add(editorPresentation.restorePresentationState(areaMem));
-//      }
-//      try
-//      {
+      bool result = true;
+
+      std::string activeWorkbookID;
+      std::vector<IEditorReference::Pointer> visibleEditors;
+      std::vector<IEditorReference::Pointer> activeEditor;
+
+      IMemento::Pointer areaMem = memento->GetChild(WorkbenchConstants::TAG_AREA);
+      if (areaMem)
+      {
+        //result.add(editorPresentation.restoreState(areaMem));
+        editorPresentation->RestoreState(areaMem);
+        areaMem->GetString(WorkbenchConstants::TAG_ACTIVE_WORKBOOK, activeWorkbookID);
+      }
+
+      // Loop through the editors.
+
+      std::vector<IMemento::Pointer> editorMems(memento->GetChildren(WorkbenchConstants::TAG_EDITOR));
+      for (std::size_t x = 0; x < editorMems.size(); x++)
+      {
+        // for dynamic UI - call restoreEditorState to replace code which is
+        // commented out
+        RestoreEditorState(editorMems[x], visibleEditors, activeEditor); //, result);
+      }
+
+      // restore the presentation
+      if (areaMem)
+      {
+        //result.add(editorPresentation.restorePresentationState(areaMem));
+        result &= editorPresentation->RestorePresentationState(areaMem);
+      }
+      try
+      {
 //        StartupThreading.runWithThrowable(new StartupRunnable()
 //            {
 //
 //            public void runWithException() throws Throwable
 //              {
-//                // Update each workbook with its visible editor.
-//                for (int i = 0; i < visibleEditors.size(); i++)
-//                {
-//                  setVisibleEditor((IEditorReference) visibleEditors.get(i),
-//                      false);
-//                }
-//
-//                // Update the active workbook
-//                if (activeWorkbookID[0] != null)
-//                {
-//                  editorPresentation
-//                  .setActiveEditorWorkbookFromID(activeWorkbookID[0]);
-//                }
-//
-//                if (activeEditor[0] != null)
-//                {
-//                  IWorkbenchPart editor = activeEditor[0].getPart(true);
-//
-//                  if (editor != null)
-//                  {
-//                    page.activate(editor);
-//                  }
-//                }
+                // Update each workbook with its visible editor.
+                for (std::size_t i = 0; i < visibleEditors.size(); i++)
+                {
+                  SetVisibleEditor(visibleEditors[i], false);
+                }
+
+                // Update the active workbook
+                if (!activeWorkbookID.empty())
+                {
+                  editorPresentation->SetActiveEditorWorkbookFromID(activeWorkbookID);
+                }
+
+                if (!activeEditor.empty() && activeEditor[0])
+                {
+                  IWorkbenchPart::Pointer editor = activeEditor[0]->GetPart(true);
+
+                  if (editor)
+                  {
+                    page->Activate(editor);
+                  }
+                }
 //              }});
-//      }
-//      catch (Throwable t)
-//      {
-//        // The exception is already logged.
+      }
+      catch (...)
+      {
+        // The exception is already logged.
 //        result
 //        .add(new Status(
 //                IStatus.ERR,
@@ -775,9 +777,10 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //                0,
 //                WorkbenchMessages.EditorManager_exceptionRestoringEditor,
 //                t));
-//      }
+        result &= false;
+      }
 
-      return true;
+      return result;
     }
 
     bool EditorManager::SaveAll(bool confirm, bool closing,
@@ -1007,50 +1010,51 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //      final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
 //          IStatus.OK,
 //          WorkbenchMessages.EditorManager_problemsSavingEditors, null);
-//
-//      // Save the editor area workbooks layout/relationship
-//      IMemento editorAreaMem = memento
-//      .createChild(IWorkbenchConstants.TAG_AREA);
-//      result.add(editorPresentation.saveState(editorAreaMem));
-//
-//      // Save the active workbook id
-//      editorAreaMem.putString(IWorkbenchConstants.TAG_ACTIVE_WORKBOOK,
-//          editorPresentation.getActiveEditorWorkbookID());
-//
-//      // Get each workbook
-//      ArrayList workbooks = editorPresentation.getWorkbooks();
-//
-//      for (Iterator iter = workbooks.iterator(); iter.hasNext();)
-//      {
-//        EditorStack workbook = (EditorStack) iter.next();
-//
-//        // Use the list of editors found in EditorStack; fix for 24091
-//        EditorPane editorPanes[] = workbook.getEditors();
-//
-//        for (int i = 0; i < editorPanes.length; i++)
-//        {
-//          // Save each open editor.
-//          IEditorReference editorReference = editorPanes[i]
-//          .getEditorReference();
-//          EditorReference e = (EditorReference) editorReference;
-//          final IEditorPart editor = editorReference.getEditor(false);
-//          if (editor == null)
-//          {
-//            if (e.getMemento() != null)
-//            {
-//              IMemento editorMem = memento
-//              .createChild(IWorkbenchConstants.TAG_EDITOR);
-//              editorMem.putMemento(e.getMemento());
-//            }
-//            continue;
-//          }
-//
-//          // for dynamic UI - add the next line to replace the subsequent
-//          // code which is commented out
-//          saveEditorState(memento, e, result);
-//        }
-//      }
-      return true;
+      bool result = true;
+
+      // Save the editor area workbooks layout/relationship
+      IMemento::Pointer editorAreaMem = memento->CreateChild(WorkbenchConstants::TAG_AREA);
+      //result.add(editorPresentation.saveState(editorAreaMem));
+      result &= editorPresentation->SaveState(editorAreaMem);
+
+      // Save the active workbook id
+      editorAreaMem->PutString(WorkbenchConstants::TAG_ACTIVE_WORKBOOK,
+          editorPresentation->GetActiveEditorWorkbookID());
+
+      // Get each workbook
+      std::list<PartStack::Pointer> workbooks(editorPresentation->GetWorkbooks());
+
+      for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();
+          iter != workbooks.end(); ++iter)
+      {
+        PartStack::Pointer workbook = *iter;
+
+        // Use the list of editors found in EditorStack; fix for 24091
+        std::list<StackablePart::Pointer> editorPanes(workbook->GetChildren());
+
+        for (std::list<StackablePart::Pointer>::iterator i = editorPanes.begin();
+            i != editorPanes.end(); ++i)
+        {
+          // Save each open editor.
+          EditorReference::Pointer editorReference = i->Cast<PartPane>()->GetPartReference().Cast<EditorReference>();
+          IEditorPart::Pointer editor = editorReference->GetEditor(false);
+          if (!editor)
+          {
+            if (editorReference->GetMemento())
+            {
+              IMemento::Pointer editorMem = memento
+              ->CreateChild(WorkbenchConstants::TAG_EDITOR);
+              editorMem->PutMemento(editorReference->GetMemento());
+            }
+            continue;
+          }
+
+          // for dynamic UI - add the next line to replace the subsequent
+          // code which is commented out
+          SaveEditorState(memento, editorReference); //, result);
+        }
+      }
+      return result;
     }
 
     bool EditorManager::SetVisibleEditor(IEditorReference::Pointer newEd,
@@ -1078,6 +1082,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     {
       // MultiStatus result) {
 
+      //TODO Restore editor state
       // String strFocus = editorMem.getString(IWorkbenchConstants.TAG_FOCUS);
       // boolean visibleEditor = "true".equals(strFocus); //$NON-NLS-1$
 //      EditorReference::Pointer e = new EditorReference(this, editorMem);
@@ -1116,6 +1121,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     void EditorManager::SaveEditorState(IMemento::Pointer mem,
         IEditorReference::Pointer ed)
     {
+      //TODO Save editor state
 //      final EditorReference editorRef = (EditorReference) ed;
 //      final IEditorPart editor = ed.getEditor(false);
 //      final IMemento memento = mem;

@@ -124,7 +124,7 @@ protected: SmartPointer<ILayoutContainer> container;
     /**
      * Gets the ID for this part.
      */
-    public: virtual std::string GetID();
+    public: virtual std::string GetID() const;
 
     public: virtual bool IsCompressible();
 

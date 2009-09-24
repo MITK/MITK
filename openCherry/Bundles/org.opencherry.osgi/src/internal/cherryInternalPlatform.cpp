@@ -268,15 +268,15 @@ const Poco::Path& InternalPlatform::GetInstancePath()
   return m_InstancePath;
 }
 
-Poco::Path InternalPlatform::GetStatePath(IBundle::Pointer bundle)
+bool InternalPlatform::GetStatePath(Poco::Path& statePath, IBundle::Pointer bundle, bool create)
 {
-  Poco::Path statePath(m_BaseStatePath);
+  statePath = m_BaseStatePath;
   statePath.pushDirectory(bundle->GetSymbolicName());
   Poco::File stateFile(statePath);
-  if (!stateFile.exists())
+  if (!stateFile.exists() && create)
     stateFile.createDirectories();
 
-  return statePath;
+  return true;
 }
 
 PlatformEvents& InternalPlatform::GetEvents()

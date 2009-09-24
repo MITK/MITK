@@ -537,8 +537,8 @@ bool EditorRegistry::ReadEditors(
     std::map<std::string, EditorDescriptor::Pointer>& editorTable)
 {
   //Get the workbench plugin's working directory
-  Poco::Path* workbenchStatePath = WorkbenchPlugin::GetDefault()->GetDataPath();
-  if (workbenchStatePath == 0)
+  Poco::Path workbenchStatePath;
+  if (!WorkbenchPlugin::GetDefault()->GetDataPath(workbenchStatePath))
   {
     return false;
   }
@@ -784,9 +784,9 @@ bool EditorRegistry::ReadResources(
     std::map<std::string, EditorDescriptor::Pointer>& editorTable)
 {
   //Get the workbench plugin's working directory
-  Poco::Path* workbenchStatePath = WorkbenchPlugin::GetDefault()->GetDataPath();
+  Poco::Path workbenchStatePath;
   // XXX: nobody cares about this return value
-  if (workbenchStatePath == 0)
+  if (WorkbenchPlugin::GetDefault()->GetDataPath(workbenchStatePath))
   {
     return false;
   }

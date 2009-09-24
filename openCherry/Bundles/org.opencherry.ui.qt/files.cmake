@@ -34,6 +34,7 @@ SET(INTERNAL_CPP_FILES
   cherryQtIconImageDescriptor.cpp
   cherryQtImageTweaklet.cpp
   cherryQtMainWindowControl.cpp
+  cherryQtMessageDialogTweaklet.cpp
   cherryQtMissingImageDescriptor.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp

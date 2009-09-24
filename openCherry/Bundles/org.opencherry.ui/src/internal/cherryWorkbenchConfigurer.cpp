@@ -58,14 +58,14 @@ void WorkbenchConfigurer::SetSaveAndRestore(bool enabled)
 
 void WorkbenchConfigurer::EmergencyClose()
 {
-  //        if (!isEmergencyClosing) {
-  //            isEmergencyClosing = true;
-  //            if (Workbench::GetInstance() != 0
-  //                    && !Workbench::GetInstance()->IsClosing()) {
-  //                Workbench::GetInstance()->Close(
-  //                        PlatformUI::RETURN_EMERGENCY_CLOSE, true);
-  //            }
-  //        }
+  if (!isEmergencyClosing) {
+      isEmergencyClosing = true;
+      if (Workbench::GetInstance() != 0
+              && !Workbench::GetInstance()->IsClosing()) {
+          Workbench::GetInstance()->Close(
+                  PlatformUI::RETURN_EMERGENCY_CLOSE, true);
+      }
+  }
 }
 
 bool WorkbenchConfigurer::EmergencyClosing()
@@ -75,8 +75,7 @@ bool WorkbenchConfigurer::EmergencyClosing()
 
 bool WorkbenchConfigurer::RestoreState()
 {
-  //return ((Workbench) getWorkbench()).restoreState();
-  return false;
+  return dynamic_cast<Workbench*>(GetWorkbench())->RestoreState();
 }
 
 void WorkbenchConfigurer::OpenFirstTimeWindow()

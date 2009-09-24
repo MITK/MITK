@@ -243,6 +243,8 @@ public: cherryObjectMacro(PartStack);
 
     public: int GetAppearance() const;
 
+    public: std::string GetID() const;
+
     protected: bool IsStandalone();
 
     /**

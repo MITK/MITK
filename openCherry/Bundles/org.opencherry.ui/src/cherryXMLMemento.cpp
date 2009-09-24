@@ -170,6 +170,8 @@ std::vector<cherry::IMemento::Pointer> cherry::XMLMemento::GetChildren(
 
 bool cherry::XMLMemento::GetFloat(const std::string& key, double& value) const
 {
+  if (!element->hasAttribute(key)) return false;
+
   const std::string& attr = element->getAttribute(key);
 
   try
@@ -198,6 +200,8 @@ std::string cherry::XMLMemento::GetID() const
 
 bool cherry::XMLMemento::GetInteger(const std::string& key, int& value) const
 {
+  if (!element->hasAttribute(key)) return false;
+
   const std::string& attr = element->getAttribute(key);
 
   try

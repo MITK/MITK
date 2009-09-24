@@ -37,6 +37,13 @@
          description="Qt specific image tweaks" 
          definition="cherryImageTweaklet" 
          implementation="cherry::QtImageTweaklet" />
+         
+       <tweaklet 
+         id="org.opencherry.ui.qt.tweaklets.MessageDialogTweaklet" 
+         name="Qt Message Dialog Tweaklet" 
+         description="Qt specific message dialogs" 
+         definition="cherryMessageDialogTweaklet" 
+         implementation="cherry::QtMessageDialogTweaklet" />
    </extension>
    
    <extension

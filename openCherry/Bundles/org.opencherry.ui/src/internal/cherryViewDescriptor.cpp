@@ -124,6 +124,17 @@ bool ViewDescriptor::GetAllowMultiple() const
   return allow;
 }
 
+bool ViewDescriptor::IsRestorable() const {
+  std::string string;
+  if (configElement->GetAttribute(WorkbenchRegistryConstants::ATT_RESTORABLE, string))
+  {
+    return Poco::icompare(string, "true") == 0;
+  }
+  else {
+    return true;
+  }
+}
+
 Poco::Any ViewDescriptor::GetAdapter(const std::string& adapter)
 {
   if (adapter == IConfigurationElement::GetStaticClassName())

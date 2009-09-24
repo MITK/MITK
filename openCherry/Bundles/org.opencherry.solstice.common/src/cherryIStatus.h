@@ -22,6 +22,8 @@
 #include <cherryMacros.h>
 #include <cherryFlags.h>
 
+#include "cherryCommonRuntimeDll.h"
+
 namespace cherry
 {
 
@@ -54,7 +56,7 @@ namespace cherry
  * @see MultiStatus
  * @see Status
  */
-struct IStatus: public Object
+struct CHERRY_COMMON_RUNTIME IStatus: public Object
 {
 
   cherryInterfaceMacro(IStatus, cherry)

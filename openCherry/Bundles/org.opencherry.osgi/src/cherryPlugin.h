@@ -40,7 +40,7 @@ public:
   SmartPointer<IBundle> GetBundle();
   //Poco::Logger& GetLog();
 
-  Poco::Path* GetStatePath();
+  bool GetStatePath(Poco::Path& path);
 
 protected:
 

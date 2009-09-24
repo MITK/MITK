@@ -34,10 +34,6 @@ namespace cherry {
 
 /**
  * A dialog for showing messages to the user.
- * <p>
- * This concrete dialog class can be instantiated as is, or further subclassed
- * as required.
- * </p>
  */
 struct CHERRY_UI MessageDialogTweaklet : public Object
 {

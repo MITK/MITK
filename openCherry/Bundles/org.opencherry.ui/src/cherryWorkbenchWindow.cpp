@@ -24,6 +24,7 @@
 #include "internal/cherryWorkbenchPlugin.h"
 #include "internal/cherryWorkbenchPage.h"
 #include "internal/cherryWorkbench.h"
+#include "internal/cherryWorkbenchConstants.h"
 #include "internal/cherryPartSite.h"
 #include "internal/cherryIServiceLocatorCreator.h"
 
@@ -386,6 +387,8 @@ bool WorkbenchWindow::Close()
 
 bool WorkbenchWindow::BusyClose()
 {
+  std::cout << "WorkbenchWindow::BusyClose()" << std::endl;
+
   // Whether the window was actually closed or not
   bool windowClosed = false;
 
@@ -400,17 +403,25 @@ bool WorkbenchWindow::BusyClose()
     // via the workbench as the workbench will check this itself.
     Workbench* workbench = this->GetWorkbenchImpl();
     int count = workbench->GetWorkbenchWindowCount();
+
+    std::cout << "workbench is starting: " << workbench->IsStarting() << std::endl;
+    std::cout << "workbench is closing: " << workbench->IsClosing() << std::endl;
+    std::cout << "window count: " << count << std::endl;
+    std::cout << "exit on last window close: " << workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose() << std::endl;
+
     // also check for starting - if the first window dies on startup
     // then we'll need to open a default window.
     if (!workbench->IsStarting() && !workbench->IsClosing() && count <= 1
         && workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose())
     {
+      std::cout << "Calling Workbench::Close()" << std::endl;
       windowClosed = workbench->Close();
     }
     else
     {
       if (this->OkToClose())
       {
+        std::cout << "Calling this->HardClose()" << std::endl;
         windowClosed = this->HardClose();
       }
     }
@@ -648,378 +659,390 @@ void WorkbenchWindow::CreateDefaultContents(Shell::Pointer shell)
   this->CreatePageComposite(shell->GetControl());
 }
 
+bool WorkbenchWindow::UnableToRestorePage(IMemento::Pointer pageMem)
+{
+  std::string pageName;
+  pageMem->GetString(WorkbenchConstants::TAG_LABEL, pageName);
+
+//  return new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
+//      WorkbenchMessages.WorkbenchWindow_unableToRestorePerspective,
+//      pageName), null);
+  WorkbenchPlugin::Log("Unable to restore perspective: " + pageName);
+  return false;
+}
+
 bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     IPerspectiveDescriptor::Pointer activeDescriptor)
 {
   //TODO WorkbenchWindow restore state
-  //  Assert.isNotNull(getShell());
-  //
+  poco_assert(GetShell());
+
+//  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
+//      WorkbenchMessages.WorkbenchWindow_problemsRestoringWindow, null);
   bool result = true;
-  //  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-  //      WorkbenchMessages.WorkbenchWindow_problemsRestoringWindow, null);
-  //
-  //  // Restore the window advisor state.
-  //  IMemento windowAdvisorState = memento
-  //      .getChild(IWorkbenchConstants.TAG_WORKBENCH_WINDOW_ADVISOR);
-  //  if (windowAdvisorState != null) {
-  //    result.add(getWindowAdvisor().restoreState(windowAdvisorState));
-  //  }
-  //
-  //  // Restore actionbar advisor state.
-  //  IMemento actionBarAdvisorState = memento
-  //      .getChild(IWorkbenchConstants.TAG_ACTION_BAR_ADVISOR);
-  //  if (actionBarAdvisorState != null) {
-  //    result.add(getActionBarAdvisor()
-  //        .restoreState(actionBarAdvisorState));
-  //  }
-  //
-  //  // Read window's bounds and state.
-  //  final Rectangle [] displayBounds = new Rectangle[1];
-  //  StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //    public void runWithException() {
-  //      displayBounds[0] = getShell().getDisplay().getBounds();
-  //
-  //    }});
-  //  final Rectangle shellBounds = new Rectangle(0, 0, 0, 0);
-  //
-  //  final IMemento fastViewMem = memento
-  //      .getChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
-  //  if (fastViewMem != null) {
-  //    if (fastViewBar != null) {
-  //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //        public void runWithException() {
-  //          fastViewBar.restoreState(fastViewMem);
-  //        }});
-  //
-  //    }
-  //  }
-  //  Integer bigInt = memento.getInteger(IWorkbenchConstants.TAG_X);
-  //  shellBounds.x = bigInt == null ? 0 : bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_Y);
-  //  shellBounds.y = bigInt == null ? 0 : bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_WIDTH);
-  //  shellBounds.width = bigInt == null ? 0 : bigInt.intValue();
-  //  bigInt = memento.getInteger(IWorkbenchConstants.TAG_HEIGHT);
-  //  shellBounds.height = bigInt == null ? 0 : bigInt.intValue();
-  //  if (!shellBounds.isEmpty()) {
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() {
-  //        if (!shellBounds.intersects(displayBounds[0])) {
-  //          Rectangle clientArea = getShell().getDisplay().getClientArea();
-  //          shellBounds.x = clientArea.x;
-  //          shellBounds.y = clientArea.y;
-  //        }
-  //        getShell().setBounds(shellBounds);
-  //      }});
-  //  }
-  //  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MAXIMIZED))) { //$NON-NLS-1$
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() {
-  //        getShell().setMaximized(true);
-  //      }});
-  //
-  //  }
-  //  if ("true".equals(memento.getString(IWorkbenchConstants.TAG_MINIMIZED))) { //$NON-NLS-1$
-  //    // getShell().setMinimized(true);
-  //  }
-  //
-  //  // restore the width of the perspective bar
-  //  if (perspectiveSwitcher != null) {
-  //    perspectiveSwitcher.restoreState(memento);
-  //  }
-  //
-  //  // Restore the cool bar order by creating all the tool bar contribution
-  //  // items
-  //  // This needs to be done before pages are created to ensure proper
-  //  // canonical creation
-  //  // of cool items
-  //  final ICoolBarManager2 coolBarMgr = (ICoolBarManager2) getCoolBarManager2();
-  //      if (coolBarMgr != null) {
-  //    IMemento coolBarMem = memento
-  //        .getChild(IWorkbenchConstants.TAG_COOLBAR_LAYOUT);
-  //    if (coolBarMem != null) {
-  //      // Check if the layout is locked
-  //      final Integer lockedInt = coolBarMem
-  //          .getInteger(IWorkbenchConstants.TAG_LOCKED);
-  //      StartupThreading.runWithoutExceptions(new StartupRunnable(){
-  //
-  //        public void runWithException() {
-  //          if ((lockedInt != null) && (lockedInt.intValue() == 1)) {
-  //            coolBarMgr.setLockLayout(true);
-  //          } else {
-  //            coolBarMgr.setLockLayout(false);
-  //          }
-  //        }});
-  //
-  //      // The new layout of the cool bar manager
-  //      ArrayList coolBarLayout = new ArrayList();
-  //      // Traverse through all the cool item in the memento
-  //      IMemento contributionMems[] = coolBarMem
-  //          .getChildren(IWorkbenchConstants.TAG_COOLITEM);
-  //      for (int i = 0; i < contributionMems.length; i++) {
-  //        IMemento contributionMem = contributionMems[i];
-  //        String type = contributionMem
-  //            .getString(IWorkbenchConstants.TAG_ITEM_TYPE);
-  //        if (type == null) {
-  //          // Do not recognize that type
-  //          continue;
-  //        }
-  //        String id = contributionMem
-  //            .getString(IWorkbenchConstants.TAG_ID);
-  //
-  //        // Prevent duplicate items from being read back in.
-  //        IContributionItem existingItem = coolBarMgr.find(id);
-  //        if ((id != null) && (existingItem != null)) {
-  //          if (Policy.DEBUG_TOOLBAR_DISPOSAL) {
-  //            System.out
-  //                .println("Not loading duplicate cool bar item: " + id); //$NON-NLS-1$
-  //          }
-  //          coolBarLayout.add(existingItem);
-  //          continue;
-  //        }
-  //        IContributionItem newItem = null;
-  //        if (type.equals(IWorkbenchConstants.TAG_TYPE_SEPARATOR)) {
-  //          if (id != null) {
-  //            newItem = new Separator(id);
-  //          } else {
-  //            newItem = new Separator();
-  //          }
-  //        } else if (id != null) {
-  //          if (type
-  //              .equals(IWorkbenchConstants.TAG_TYPE_GROUPMARKER)) {
-  //            newItem = new GroupMarker(id);
-  //
-  //          } else if (type
-  //              .equals(IWorkbenchConstants.TAG_TYPE_TOOLBARCONTRIBUTION)
-  //              || type
-  //                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
-  //
-  //            // Get Width and height
-  //            Integer width = contributionMem
-  //                .getInteger(IWorkbenchConstants.TAG_ITEM_X);
-  //            Integer height = contributionMem
-  //                .getInteger(IWorkbenchConstants.TAG_ITEM_Y);
-  //            // Look for the object in the current cool bar
-  //            // manager
-  //            IContributionItem oldItem = coolBarMgr.find(id);
-  //            // If a tool bar contribution item already exists
-  //            // for this id then use the old object
-  //            if (oldItem != null) {
-  //              newItem = oldItem;
-  //            } else {
-  //              IActionBarPresentationFactory actionBarPresentation = getActionBarPresentationFactory();
-  //              newItem = actionBarPresentation.createToolBarContributionItem(
-  //                  actionBarPresentation.createToolBarManager(), id);
-  //              if (type
-  //                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
-  //                IToolBarContributionItem newToolBarItem = (IToolBarContributionItem) newItem;
-  //                if (height != null) {
-  //                  newToolBarItem.setCurrentHeight(height
-  //                      .intValue());
-  //                }
-  //                if (width != null) {
-  //                  newToolBarItem.setCurrentWidth(width
-  //                      .intValue());
-  //                }
-  //                newItem = new PlaceholderContributionItem(
-  //                    newToolBarItem);
-  //              }
-  //              // make it invisible by default
-  //              newItem.setVisible(false);
-  //              // Need to add the item to the cool bar manager
-  //              // so that its canonical order can be preserved
-  //              IContributionItem refItem = findAlphabeticalOrder(
-  //                  IWorkbenchActionConstants.MB_ADDITIONS,
-  //                  id, coolBarMgr);
-  //              if (refItem != null) {
-  //                coolBarMgr.insertAfter(refItem.getId(),
-  //                    newItem);
-  //              } else {
-  //                coolBarMgr.add(newItem);
-  //              }
-  //            }
-  //            // Set the current height and width
-  //            if ((width != null)
-  //                && (newItem instanceof IToolBarContributionItem)) {
-  //              ((IToolBarContributionItem) newItem)
-  //                  .setCurrentWidth(width.intValue());
-  //            }
-  //            if ((height != null)
-  //                && (newItem instanceof IToolBarContributionItem)) {
-  //              ((IToolBarContributionItem) newItem)
-  //                  .setCurrentHeight(height.intValue());
-  //            }
-  //          }
-  //        }
-  //        // Add new item into cool bar manager
-  //        if (newItem != null) {
-  //          coolBarLayout.add(newItem);
-  //          newItem.setParent(coolBarMgr);
-  //          coolBarMgr.markDirty();
-  //        }
-  //      }
-  //
-  //      // We need to check if we have everything we need in the layout.
-  //      boolean newlyAddedItems = false;
-  //      IContributionItem[] existingItems = coolBarMgr.getItems();
-  //      for (int i = 0; i < existingItems.length && !newlyAddedItems; i++) {
-  //        IContributionItem existingItem = existingItems[i];
-  //
-  //        /*
-  //         * This line shouldn't be necessary, but is here for
-  //         * robustness.
-  //         */
-  //        if (existingItem == null) {
-  //          continue;
-  //        }
-  //
-  //        boolean found = false;
-  //        Iterator layoutItemItr = coolBarLayout.iterator();
-  //        while (layoutItemItr.hasNext()) {
-  //          IContributionItem layoutItem = (IContributionItem) layoutItemItr
-  //              .next();
-  //          if ((layoutItem != null)
-  //              && (layoutItem.equals(existingItem))) {
-  //            found = true;
-  //            break;
-  //          }
-  //        }
-  //
-  //        if (!found) {
-  //          if (existingItem != null) {
-  //            newlyAddedItems = true;
-  //          }
-  //        }
-  //      }
-  //
-  //      // Set the cool bar layout to the given layout.
-  //      if (!newlyAddedItems) {
-  //        final IContributionItem[] itemsToSet = new IContributionItem[coolBarLayout
-  //            .size()];
-  //        coolBarLayout.toArray(itemsToSet);
-  //        StartupThreading
-  //            .runWithoutExceptions(new StartupRunnable() {
-  //
-  //              public void runWithException() {
-  //                coolBarMgr.setItems(itemsToSet);
-  //              }
-  //            });
-  //      }
-  //
-  //    } else {
-  //      // For older workbenchs
-  //      coolBarMem = memento
-  //          .getChild(IWorkbenchConstants.TAG_TOOLBAR_LAYOUT);
-  //      if (coolBarMem != null) {
-  //        // Restore an older layout
-  //        restoreOldCoolBar(coolBarMem);
-  //      }
-  //    }
-  //  }
-  //
-  //  // Recreate each page in the window.
+
+  // Restore the window advisor state.
+  IMemento::Pointer windowAdvisorState = memento
+      ->GetChild(WorkbenchConstants::TAG_WORKBENCH_WINDOW_ADVISOR);
+  if (windowAdvisorState) {
+    //result.add(getWindowAdvisor().restoreState(windowAdvisorState));
+    result &= GetWindowAdvisor()->RestoreState(windowAdvisorState);
+  }
+
+  // Restore actionbar advisor state.
+  IMemento::Pointer actionBarAdvisorState = memento
+      ->GetChild(WorkbenchConstants::TAG_ACTION_BAR_ADVISOR);
+  if (actionBarAdvisorState) {
+//    result.add(getActionBarAdvisor()
+//        .restoreState(actionBarAdvisorState));
+    result &= GetActionBarAdvisor()
+        ->RestoreState(actionBarAdvisorState);
+  }
+
+  // Read window's bounds and state.
+  Rectangle displayBounds;
+//  StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//    public void runWithException() {
+      displayBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetScreenSize();
+      //displayBounds = GetShell()->GetDisplay()->GetBounds();
+
+//    }});
+  Rectangle shellBounds;
+
+//  final IMemento fastViewMem = memento
+//      .getChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
+//  if (fastViewMem != null) {
+//    if (fastViewBar != null) {
+//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//        public void runWithException() {
+//          fastViewBar.restoreState(fastViewMem);
+//        }});
+//
+//    }
+//  }
+
+  memento->GetInteger(WorkbenchConstants::TAG_X, shellBounds.x);
+  memento->GetInteger(WorkbenchConstants::TAG_Y, shellBounds.y);
+  memento->GetInteger(WorkbenchConstants::TAG_WIDTH, shellBounds.width);
+  memento->GetInteger(WorkbenchConstants::TAG_HEIGHT, shellBounds.height);
+  if (!shellBounds.IsEmpty()) {
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+        if (!shellBounds.Intersects(displayBounds)) {
+          Rectangle clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
+          shellBounds.x = clientArea.x;
+          shellBounds.y = clientArea.y;
+        }
+        GetShell()->SetBounds(shellBounds);
+//      }});
+  }
+  std::string maximized; memento->GetString(WorkbenchConstants::TAG_MAXIMIZED, maximized);
+  if (maximized == "true") {
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() {
+        GetShell()->SetMaximized(true);
+//      }});
+
+  }
+  std::string minimized; memento->GetString(WorkbenchConstants::TAG_MINIMIZED, minimized);
+  if (minimized == "true") {
+    // getShell().setMinimized(true);
+  }
+
+//  // restore the width of the perspective bar
+//  if (perspectiveSwitcher != null) {
+//    perspectiveSwitcher.restoreState(memento);
+//  }
+
+//  // Restore the cool bar order by creating all the tool bar contribution
+//  // items
+//  // This needs to be done before pages are created to ensure proper
+//  // canonical creation
+//  // of cool items
+//  final ICoolBarManager2 coolBarMgr = (ICoolBarManager2) getCoolBarManager2();
+//      if (coolBarMgr != null) {
+//    IMemento coolBarMem = memento
+//        .getChild(IWorkbenchConstants.TAG_COOLBAR_LAYOUT);
+//    if (coolBarMem != null) {
+//      // Check if the layout is locked
+//      final Integer lockedInt = coolBarMem
+//          .getInteger(IWorkbenchConstants.TAG_LOCKED);
+//      StartupThreading.runWithoutExceptions(new StartupRunnable(){
+//
+//        public void runWithException() {
+//          if ((lockedInt != null) && (lockedInt.intValue() == 1)) {
+//            coolBarMgr.setLockLayout(true);
+//          } else {
+//            coolBarMgr.setLockLayout(false);
+//          }
+//        }});
+//
+//      // The new layout of the cool bar manager
+//      ArrayList coolBarLayout = new ArrayList();
+//      // Traverse through all the cool item in the memento
+//      IMemento contributionMems[] = coolBarMem
+//          .getChildren(IWorkbenchConstants.TAG_COOLITEM);
+//      for (int i = 0; i < contributionMems.length; i++) {
+//        IMemento contributionMem = contributionMems[i];
+//        String type = contributionMem
+//            .getString(IWorkbenchConstants.TAG_ITEM_TYPE);
+//        if (type == null) {
+//          // Do not recognize that type
+//          continue;
+//        }
+//        String id = contributionMem
+//            .getString(IWorkbenchConstants.TAG_ID);
+//
+//        // Prevent duplicate items from being read back in.
+//        IContributionItem existingItem = coolBarMgr.find(id);
+//        if ((id != null) && (existingItem != null)) {
+//          if (Policy.DEBUG_TOOLBAR_DISPOSAL) {
+//            System.out
+//                .println("Not loading duplicate cool bar item: " + id); //$NON-NLS-1$
+//          }
+//          coolBarLayout.add(existingItem);
+//          continue;
+//        }
+//        IContributionItem newItem = null;
+//        if (type.equals(IWorkbenchConstants.TAG_TYPE_SEPARATOR)) {
+//          if (id != null) {
+//            newItem = new Separator(id);
+//          } else {
+//            newItem = new Separator();
+//          }
+//        } else if (id != null) {
+//          if (type
+//              .equals(IWorkbenchConstants.TAG_TYPE_GROUPMARKER)) {
+//            newItem = new GroupMarker(id);
+//
+//          } else if (type
+//              .equals(IWorkbenchConstants.TAG_TYPE_TOOLBARCONTRIBUTION)
+//              || type
+//                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
+//
+//            // Get Width and height
+//            Integer width = contributionMem
+//                .getInteger(IWorkbenchConstants.TAG_ITEM_X);
+//            Integer height = contributionMem
+//                .getInteger(IWorkbenchConstants.TAG_ITEM_Y);
+//            // Look for the object in the current cool bar
+//            // manager
+//            IContributionItem oldItem = coolBarMgr.find(id);
+//            // If a tool bar contribution item already exists
+//            // for this id then use the old object
+//            if (oldItem != null) {
+//              newItem = oldItem;
+//            } else {
+//              IActionBarPresentationFactory actionBarPresentation = getActionBarPresentationFactory();
+//              newItem = actionBarPresentation.createToolBarContributionItem(
+//                  actionBarPresentation.createToolBarManager(), id);
+//              if (type
+//                  .equals(IWorkbenchConstants.TAG_TYPE_PLACEHOLDER)) {
+//                IToolBarContributionItem newToolBarItem = (IToolBarContributionItem) newItem;
+//                if (height != null) {
+//                  newToolBarItem.setCurrentHeight(height
+//                      .intValue());
+//                }
+//                if (width != null) {
+//                  newToolBarItem.setCurrentWidth(width
+//                      .intValue());
+//                }
+//                newItem = new PlaceholderContributionItem(
+//                    newToolBarItem);
+//              }
+//              // make it invisible by default
+//              newItem.setVisible(false);
+//              // Need to add the item to the cool bar manager
+//              // so that its canonical order can be preserved
+//              IContributionItem refItem = findAlphabeticalOrder(
+//                  IWorkbenchActionConstants.MB_ADDITIONS,
+//                  id, coolBarMgr);
+//              if (refItem != null) {
+//                coolBarMgr.insertAfter(refItem.getId(),
+//                    newItem);
+//              } else {
+//                coolBarMgr.add(newItem);
+//              }
+//            }
+//            // Set the current height and width
+//            if ((width != null)
+//                && (newItem instanceof IToolBarContributionItem)) {
+//              ((IToolBarContributionItem) newItem)
+//                  .setCurrentWidth(width.intValue());
+//            }
+//            if ((height != null)
+//                && (newItem instanceof IToolBarContributionItem)) {
+//              ((IToolBarContributionItem) newItem)
+//                  .setCurrentHeight(height.intValue());
+//            }
+//          }
+//        }
+//        // Add new item into cool bar manager
+//        if (newItem != null) {
+//          coolBarLayout.add(newItem);
+//          newItem.setParent(coolBarMgr);
+//          coolBarMgr.markDirty();
+//        }
+//      }
+//
+//      // We need to check if we have everything we need in the layout.
+//      boolean newlyAddedItems = false;
+//      IContributionItem[] existingItems = coolBarMgr.getItems();
+//      for (int i = 0; i < existingItems.length && !newlyAddedItems; i++) {
+//        IContributionItem existingItem = existingItems[i];
+//
+//        /*
+//         * This line shouldn't be necessary, but is here for
+//         * robustness.
+//         */
+//        if (existingItem == null) {
+//          continue;
+//        }
+//
+//        boolean found = false;
+//        Iterator layoutItemItr = coolBarLayout.iterator();
+//        while (layoutItemItr.hasNext()) {
+//          IContributionItem layoutItem = (IContributionItem) layoutItemItr
+//              .next();
+//          if ((layoutItem != null)
+//              && (layoutItem.equals(existingItem))) {
+//            found = true;
+//            break;
+//          }
+//        }
+//
+//        if (!found) {
+//          if (existingItem != null) {
+//            newlyAddedItems = true;
+//          }
+//        }
+//      }
+//
+//      // Set the cool bar layout to the given layout.
+//      if (!newlyAddedItems) {
+//        final IContributionItem[] itemsToSet = new IContributionItem[coolBarLayout
+//            .size()];
+//        coolBarLayout.toArray(itemsToSet);
+//        StartupThreading
+//            .runWithoutExceptions(new StartupRunnable() {
+//
+//              public void runWithException() {
+//                coolBarMgr.setItems(itemsToSet);
+//              }
+//            });
+//      }
+//
+//    } else {
+//      // For older workbenchs
+//      coolBarMem = memento
+//          .getChild(IWorkbenchConstants.TAG_TOOLBAR_LAYOUT);
+//      if (coolBarMem != null) {
+//        // Restore an older layout
+//        restoreOldCoolBar(coolBarMem);
+//      }
+//    }
+//  }
+
+  // Recreate each page in the window.
   IWorkbenchPage::Pointer newActivePage;
-  //  IMemento[] pageArray = memento
-  //      .getChildren(IWorkbenchConstants.TAG_PAGE);
-  //  for (int i = 0; i < pageArray.length; i++) {
-  //    final IMemento pageMem = pageArray[i];
-  //    String strFocus = pageMem.getString(IWorkbenchConstants.TAG_FOCUS);
-  //    if (strFocus == null || strFocus.length() == 0) {
-  //      continue;
-  //    }
-  //
-  //    // Get the input factory.
-  //    final IAdaptable [] input = new IAdaptable[1];
-  //    final IMemento inputMem = pageMem.getChild(IWorkbenchConstants.TAG_INPUT);
-  //    if (inputMem != null) {
-  //      final String factoryID = inputMem
-  //          .getString(IWorkbenchConstants.TAG_FACTORY_ID);
-  //      if (factoryID == null) {
-  //        WorkbenchPlugin
-  //            .log("Unable to restore page - no input factory ID."); //$NON-NLS-1$
-  //        result.add(unableToRestorePage(pageMem));
-  //        continue;
-  //      }
-  //      try {
-  //        UIStats.start(UIStats.RESTORE_WORKBENCH,
-  //            "WorkbenchPageFactory"); //$NON-NLS-1$
-  //        StartupThreading
-  //            .runWithoutExceptions(new StartupRunnable() {
-  //
-  //              public void runWithException() throws Throwable {
-  //                IElementFactory factory = PlatformUI
-  //                    .getWorkbench().getElementFactory(
-  //                        factoryID);
-  //                if (factory == null) {
-  //                  WorkbenchPlugin
-  //                      .log("Unable to restore page - cannot instantiate input factory: " + factoryID); //$NON-NLS-1$
-  //                  result
-  //                      .add(unableToRestorePage(pageMem));
-  //                  return;
-  //                }
-  //
-  //                // Get the input element.
-  //                input[0] = factory.createElement(inputMem);
-  //              }
-  //            });
-  //
-  //        if (input[0] == null) {
-  //          WorkbenchPlugin
-  //              .log("Unable to restore page - cannot instantiate input element: " + factoryID); //$NON-NLS-1$
-  //          result.add(unableToRestorePage(pageMem));
-  //          continue;
-  //        }
-  //      } finally {
-  //        UIStats.end(UIStats.RESTORE_WORKBENCH, factoryID,
-  //            "WorkbenchPageFactory"); //$NON-NLS-1$
-  //      }
-  //    }
-  //    // Open the perspective.
-  //    final IAdaptable finalInput = input[0];
-  //    final WorkbenchPage [] newPage = new WorkbenchPage[1];
-  //    try {
-  //      StartupThreading.runWithWorkbenchExceptions(new StartupRunnable(){
-  //
-  //        public void runWithException() throws WorkbenchException {
-  //          newPage[0] = ((WorkbenchImplementation) Tweaklets
-  //              .get(WorkbenchImplementation.KEY)).createWorkbenchPage(WorkbenchWindow.this, finalInput);
-  //        }});
-  //
-  //      result.add(newPage[0].restoreState(pageMem, activeDescriptor));
-  //      pageList.add(newPage[0]);
-  //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //        public void runWithException() throws Throwable {
-  //          firePageOpened(newPage[0]);
-  //        }});
-  //
-  //    } catch (WorkbenchException e) {
-  //      WorkbenchPlugin
-  //          .log(
-  //              "Unable to restore perspective - constructor failed.", e); //$NON-NLS-1$
-  //      result.add(e.getStatus());
-  //      continue;
-  //    }
-  //
-  //    if (strFocus != null && strFocus.length() > 0) {
-  //      newActivePage = newPage[0];
-  //    }
-  //  }
+  std::vector<IMemento::Pointer> pageArray = memento
+      ->GetChildren(WorkbenchConstants::TAG_PAGE);
+  for (std::size_t i = 0; i < pageArray.size(); i++) {
+    IMemento::Pointer pageMem = pageArray[i];
+    std::string strFocus; pageMem->GetString(WorkbenchConstants::TAG_FOCUS, strFocus);
+    if (strFocus.empty()) {
+      continue;
+    }
+
+    // Get the input factory.
+    IAdaptable* input = 0;
+    IMemento::Pointer inputMem = pageMem->GetChild(WorkbenchConstants::TAG_INPUT);
+    if (inputMem) {
+      std::string factoryID; inputMem->GetString(WorkbenchConstants::TAG_FACTORY_ID, factoryID);
+      if (factoryID.empty()) {
+        WorkbenchPlugin
+            ::Log("Unable to restore page - no input factory ID.");
+        //result.add(unableToRestorePage(pageMem));
+        result &= UnableToRestorePage(pageMem);
+        continue;
+      }
+//      try {
+//        UIStats.start(UIStats.RESTORE_WORKBENCH,
+//            "WorkbenchPageFactory"); //$NON-NLS-1$
+//        StartupThreading
+//            .runWithoutExceptions(new StartupRunnable() {
+//
+//              public void runWithException() throws Throwable {
+//                IElementFactory factory = PlatformUI
+//                    .getWorkbench().getElementFactory(
+//                        factoryID);
+//                if (factory == null) {
+//                  WorkbenchPlugin
+//                      .log("Unable to restore page - cannot instantiate input factory: " + factoryID); //$NON-NLS-1$
+//                  result
+//                      .add(unableToRestorePage(pageMem));
+//                  return;
+//                }
+//
+//                // Get the input element.
+//                input[0] = factory.createElement(inputMem);
+//              }
+//            });
+//
+//        if (input[0] == null) {
+//          WorkbenchPlugin
+//              .log("Unable to restore page - cannot instantiate input element: " + factoryID); //$NON-NLS-1$
+//          result.add(unableToRestorePage(pageMem));
+//          continue;
+//        }
+//      } finally {
+//        UIStats.end(UIStats.RESTORE_WORKBENCH, factoryID,
+//            "WorkbenchPageFactory"); //$NON-NLS-1$
+//      }
+    }
+    // Open the perspective.
+    IAdaptable* finalInput = input;
+    WorkbenchPage::Pointer newPage;
+    try {
+//      StartupThreading.runWithWorkbenchExceptions(new StartupRunnable(){
+//
+//        public void runWithException() throws WorkbenchException {
+          newPage = new WorkbenchPage(this, finalInput);
+//        }});
+
+      //result.add(newPage[0].restoreState(pageMem, activeDescriptor));
+      result &= newPage->RestoreState(pageMem, activeDescriptor);
+      pageList.Add(newPage);
+//      StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//        public void runWithException() throws Throwable {
+//          firePageOpened(newPage[0]);
+//        }});
+
+    } catch (const WorkbenchException& e) {
+      WorkbenchPlugin::Log(
+              "Unable to restore perspective - constructor failed.", e); //$NON-NLS-1$
+      //result.add(e.getStatus());
+      continue;
+    }
+
+    if (!strFocus.empty()) {
+      newActivePage = newPage;
+    }
+  }
 
   // If there are no pages create a default.
   if (pageList.IsEmpty())
   {
     try
     {
-      //TODO perspective
-      //      final String defPerspID = getWorkbenchImpl().getPerspectiveRegistry()
-      //          .getDefaultPerspective();
-      std::string defPerspID = "";
-      //if (defPerspID != null) {
+      const std::string defPerspID = this->GetWorkbenchImpl()->GetPerspectiveRegistry()
+                ->GetDefaultPerspective();
+      if (!defPerspID.empty()) {
       WorkbenchPage::Pointer newPage;
       //StartupThreading.runWithWorkbenchExceptions(new StartupRunnable() {
 
@@ -1034,14 +1057,15 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
       //  public void runWithException() throws Throwable {
       //    firePageOpened(newPage[0]);
       //  }});
-      //}
+      }
     }
     catch (WorkbenchException& e)
     {
       WorkbenchPlugin
       ::Log(
-          "Unable to create default perspective - constructor failed.", e); //$NON-NLS-1$
+          "Unable to create default perspective - constructor failed.", e);
       result = false;
+      //TODO set product name
       //      String productName = WorkbenchPlugin.getDefault()
       //          .getProductName();
       //      if (productName == null) {
@@ -1227,81 +1251,178 @@ void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
 
 bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
 {
-  //TODO WorkbenchWindow save state
-  //  IWorkbenchPage activePage = getActivePage();
-  //  if (activePage != null
-  //      && activePage.findView(IIntroConstants.INTRO_VIEW_ID) != null) {
-  //    IMemento introMem = memento
-  //        .createChild(IWorkbenchConstants.TAG_INTRO);
-  //    boolean isStandby = getWorkbench()
-  //        .getIntroManager()
-  //        .isIntroStandby(getWorkbench().getIntroManager().getIntro());
-  //    introMem.putString(IWorkbenchConstants.TAG_STANDBY, String
-  //        .valueOf(isStandby));
-  //  }
-  //
-  //  // save the width of the perspective bar
-  //  IMemento persBarMem = memento
-  //      .createChild(IWorkbenchConstants.TAG_PERSPECTIVE_BAR);
-  //  if (perspectiveSwitcher != null) {
-  //    perspectiveSwitcher.saveState(persBarMem);
-  //  }
-  //
-  //
-  //  // Save each page.
-  //  Iterator itr = pageList.iterator();
-  //  while (itr.hasNext()) {
-  //    WorkbenchPage page = (WorkbenchPage) itr.next();
-  //
-  //    // Save perspective.
-  //    IMemento pageMem = memento
-  //        .createChild(IWorkbenchConstants.TAG_PAGE);
-  //    pageMem.putString(IWorkbenchConstants.TAG_LABEL, page.getLabel());
-  //    result.add(page.saveState(pageMem));
-  //
-  //    if (page == getActiveWorkbenchPage()) {
-  //      pageMem.putString(IWorkbenchConstants.TAG_FOCUS, "true"); //$NON-NLS-1$
-  //    }
-  //
-  //    // Get the input.
-  //    IAdaptable input = page.getInput();
-  //    if (input != null) {
-  //      IPersistableElement persistable = (IPersistableElement) Util.getAdapter(input,
-  //          IPersistableElement.class);
-  //      if (persistable == null) {
-  //        WorkbenchPlugin
-  //            .log("Unable to save page input: " //$NON-NLS-1$
-  //                + input
-  //                + ", because it does not adapt to IPersistableElement"); //$NON-NLS-1$
-  //      } else {
-  //        // Save input.
-  //        IMemento inputMem = pageMem
-  //            .createChild(IWorkbenchConstants.TAG_INPUT);
-  //        inputMem.putString(IWorkbenchConstants.TAG_FACTORY_ID,
-  //            persistable.getFactoryId());
-  //        persistable.saveState(inputMem);
-  //      }
-  //    }
-  //  }
-  //
-  //  // Save window advisor state.
-  //  IMemento windowAdvisorState = memento
-  //      .createChild(IWorkbenchConstants.TAG_WORKBENCH_WINDOW_ADVISOR);
-  //  result.add(getWindowAdvisor().saveState(windowAdvisorState));
-  //
-  //  // Save actionbar advisor state.
-  //  IMemento actionBarAdvisorState = memento
-  //      .createChild(IWorkbenchConstants.TAG_ACTION_BAR_ADVISOR);
-  //  result.add(getActionBarAdvisor().saveState(actionBarAdvisorState));
-  //
-  //  // Only save the trim state if we're using the default layout
-  //  if (defaultLayout != null) {
-  //    IMemento trimState = memento.createChild(IWorkbenchConstants.TAG_TRIM);
-  //    result.add(saveTrimState(trimState));
-  //  }
-  //
-  //  return result;
-  return true;
+//  MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
+//        WorkbenchMessages.WorkbenchWindow_problemsSavingWindow, null);
+  bool result = true;
+
+  // Save the window's state and bounds.
+  if (GetShell()->GetMaximized() || asMaximizedState) {
+    memento->PutString(WorkbenchConstants::TAG_MAXIMIZED, "true");
+  }
+  if (GetShell()->GetMinimized()) {
+    memento->PutString(WorkbenchConstants::TAG_MINIMIZED, "true");
+  }
+  if (normalBounds.IsEmpty()) {
+    normalBounds = GetShell()->GetBounds();
+  }
+
+//  IMemento fastViewBarMem = memento
+//      .createChild(IWorkbenchConstants.TAG_FAST_VIEW_DATA);
+//  if (fastViewBar != null) {
+//    fastViewBar.saveState(fastViewBarMem);
+//  }
+
+  memento->PutInteger(WorkbenchConstants::TAG_X, normalBounds.x);
+  memento->PutInteger(WorkbenchConstants::TAG_Y, normalBounds.y);
+  memento->PutInteger(WorkbenchConstants::TAG_WIDTH, normalBounds.width);
+  memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, normalBounds.height);
+
+//  IWorkbenchPage::Pointer activePage = GetActivePage();
+//  if (activePage
+//      && activePage->FindView(IIntroConstants.INTRO_VIEW_ID) != null) {
+//    IMemento introMem = memento
+//        .createChild(IWorkbenchConstants.TAG_INTRO);
+//    boolean isStandby = getWorkbench()
+//        .getIntroManager()
+//        .isIntroStandby(getWorkbench().getIntroManager().getIntro());
+//    introMem.putString(IWorkbenchConstants.TAG_STANDBY, String
+//        .valueOf(isStandby));
+//  }
+
+//  // save the width of the perspective bar
+//  IMemento persBarMem = memento
+//      .createChild(IWorkbenchConstants.TAG_PERSPECTIVE_BAR);
+//  if (perspectiveSwitcher != null) {
+//    perspectiveSwitcher.saveState(persBarMem);
+//  }
+
+//  // / Save the order of the cool bar contribution items
+//        ICoolBarManager2 coolBarMgr = (ICoolBarManager2) getCoolBarManager2();
+//        if (coolBarMgr != null) {
+//          coolBarMgr.refresh();
+//      IMemento coolBarMem = memento
+//          .createChild(IWorkbenchConstants.TAG_COOLBAR_LAYOUT);
+//            if (coolBarMgr.getLockLayout() == true) {
+//        coolBarMem.putInteger(IWorkbenchConstants.TAG_LOCKED, 1);
+//      } else {
+//        coolBarMem.putInteger(IWorkbenchConstants.TAG_LOCKED, 0);
+//      }
+//            IContributionItem[] items = coolBarMgr.getItems();
+//      for (int i = 0; i < items.length; i++) {
+//        IMemento coolItemMem = coolBarMem
+//            .createChild(IWorkbenchConstants.TAG_COOLITEM);
+//        IContributionItem item = items[i];
+//        // The id of the contribution item
+//        if (item.getId() != null) {
+//          coolItemMem.putString(IWorkbenchConstants.TAG_ID, item
+//              .getId());
+//        }
+//        // Write out type and size if applicable
+//        if (item.isSeparator()) {
+//          coolItemMem.putString(IWorkbenchConstants.TAG_ITEM_TYPE,
+//              IWorkbenchConstants.TAG_TYPE_SEPARATOR);
+//        } else if (item.isGroupMarker() && !item.isSeparator()) {
+//          coolItemMem.putString(IWorkbenchConstants.TAG_ITEM_TYPE,
+//              IWorkbenchConstants.TAG_TYPE_GROUPMARKER);
+//        } else {
+//          if (item instanceof PlaceholderContributionItem) {
+//            coolItemMem.putString(
+//                IWorkbenchConstants.TAG_ITEM_TYPE,
+//                IWorkbenchConstants.TAG_TYPE_PLACEHOLDER);
+//          } else {
+//            // Store the identifier.
+//            coolItemMem
+//                .putString(
+//                    IWorkbenchConstants.TAG_ITEM_TYPE,
+//                    IWorkbenchConstants.TAG_TYPE_TOOLBARCONTRIBUTION);
+//          }
+//
+//          /*
+//           * Retrieve a reasonable approximation of the height and
+//           * width, if possible.
+//           */
+//          final int height;
+//          final int width;
+//          if (item instanceof IToolBarContributionItem) {
+//            IToolBarContributionItem toolBarItem = (IToolBarContributionItem) item;
+//            toolBarItem.saveWidgetState();
+//            height = toolBarItem.getCurrentHeight();
+//            width = toolBarItem.getCurrentWidth();
+//          } else if (item instanceof PlaceholderContributionItem) {
+//            PlaceholderContributionItem placeholder = (PlaceholderContributionItem) item;
+//            height = placeholder.getHeight();
+//            width = placeholder.getWidth();
+//          } else {
+//            height = -1;
+//            width = -1;
+//          }
+//
+//          // Store the height and width.
+//          coolItemMem.putInteger(IWorkbenchConstants.TAG_ITEM_X,
+//              width);
+//          coolItemMem.putInteger(IWorkbenchConstants.TAG_ITEM_Y,
+//              height);
+//        }
+//      }
+//    }
+
+
+  // Save each page.
+  for (PageList::iterator itr = pageList.Begin();
+      itr != pageList.End(); ++itr) {
+    WorkbenchPage::Pointer page = itr->Cast<WorkbenchPage>();
+
+    // Save perspective.
+    IMemento::Pointer pageMem = memento
+        ->CreateChild(WorkbenchConstants::TAG_PAGE);
+    pageMem->PutString(WorkbenchConstants::TAG_LABEL, page->GetLabel());
+    //result.add(page.saveState(pageMem));
+    result &= page->SaveState(pageMem);
+
+    if (page == GetActivePage().Cast<WorkbenchPage>()) {
+      pageMem->PutString(WorkbenchConstants::TAG_FOCUS, "true");
+    }
+
+//    // Get the input.
+//    IAdaptable* input = page->GetInput();
+//    if (input != 0) {
+//      IPersistableElement persistable = (IPersistableElement) Util.getAdapter(input,
+//          IPersistableElement.class);
+//      if (persistable == null) {
+//        WorkbenchPlugin
+//            .log("Unable to save page input: " //$NON-NLS-1$
+//                + input
+//                + ", because it does not adapt to IPersistableElement"); //$NON-NLS-1$
+//      } else {
+//        // Save input.
+//        IMemento inputMem = pageMem
+//            .createChild(IWorkbenchConstants.TAG_INPUT);
+//        inputMem.putString(IWorkbenchConstants.TAG_FACTORY_ID,
+//            persistable.getFactoryId());
+//        persistable.saveState(inputMem);
+//      }
+//    }
+  }
+
+  // Save window advisor state.
+  IMemento::Pointer windowAdvisorState = memento
+      ->CreateChild(WorkbenchConstants::TAG_WORKBENCH_WINDOW_ADVISOR);
+  //result.add(getWindowAdvisor().saveState(windowAdvisorState));
+  result &= GetWindowAdvisor()->SaveState(windowAdvisorState);
+
+  // Save actionbar advisor state.
+  IMemento::Pointer actionBarAdvisorState = memento
+      ->CreateChild(WorkbenchConstants::TAG_ACTION_BAR_ADVISOR);
+  //result.add(getActionBarAdvisor().saveState(actionBarAdvisorState));
+  result &= GetActionBarAdvisor()->SaveState(actionBarAdvisorState);
+
+//  // Only save the trim state if we're using the default layout
+//  if (defaultLayout != null) {
+//    IMemento trimState = memento.createChild(IWorkbenchConstants.TAG_TRIM);
+//    result.add(saveTrimState(trimState));
+//  }
+
+  return result;
 }
 
 WorkbenchWindowConfigurer::Pointer WorkbenchWindow::GetWindowConfigurer()

@@ -68,7 +68,7 @@ ILayoutContainer::Pointer LayoutPart::GetContainer()
   return container;
 }
 
-std::string LayoutPart::GetID()
+std::string LayoutPart::GetID() const
 {
   return id;
 }

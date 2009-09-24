@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../cherryWorkbenchWindow.h"
 #include "../cherryIWorkbenchPage.h"
 #include "../cherryIWorkbenchPartReference.h"
+#include "../cherryXMLMemento.h"
 
 #include "../cherryPartPane.h"
 #include "cherryEditorAreaHelper.h"
@@ -36,6 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryServiceLocator.h"
 
 #include <Poco/Exception.h>
+#include <Poco/File.h>
 
 namespace cherry {
 
@@ -59,6 +61,8 @@ class CHERRY_UI Workbench : public IWorkbench
 public:
 
   cherryObjectMacro(Workbench);
+
+  friend class RestoreStateRunnable;
 
   /**
    * Creates the workbench and associates it with the the given display and
@@ -266,6 +270,16 @@ protected:
 
   bool Init();
 
+  /*
+   * Restores the workbench UI from the workbench state file (workbench.xml).
+   *
+   * @return a status object indicating OK if a window was opened,
+   * RESTORE_CODE_RESET if no window was opened but one should be, and
+   * RESTORE_CODE_EXIT if the workbench should close immediately
+   */
+  /* package */
+  bool RestoreState();
+
   /**
    * Closes the workbench, returning the given return code from the run
    * method. If forced, the workbench is closed no matter what.
@@ -389,6 +403,11 @@ private:
    * The testable object facade.
    */
   static WorkbenchTestable::Pointer testableObject;
+  
+  static const unsigned int VERSION_STRING_COUNT; // = 1;
+  static const std::string VERSION_STRING[1];
+
+  static const std::string DEFAULT_WORKBENCH_STATE_FILENAME; // = "workbench.xml";
 
   IWorkbenchListener::Events workbenchEvents;
   IWindowListener::Events windowEvents;
@@ -401,6 +420,19 @@ private:
    * initialized during workbench during the <code>init</code> method.
    */
   ServiceLocator::Pointer serviceLocator;
+
+  /**
+   * A count of how many plug-ins were loaded while restoring the workbench
+   * state. Initially -1 for unknown number.
+   */
+  int progressCount;
+
+  /**
+   * A field to hold the workbench windows that have been restored. In the
+   * event that not all windows have been restored, this field allows the
+   * openWindowsAfterRestore method to open some windows.
+   */
+  std::vector<WorkbenchWindow::Pointer> createdWindows;
 
   struct ServiceLocatorOwner : public IDisposable
   {
@@ -466,6 +498,8 @@ private:
    */
   SmartPointer<WorkbenchWindow> NewWorkbenchWindow();
 
+  void OpenWindowsAfterRestore();
+
   /*
    * Returns the number for a new window. This will be the first number > 0
    * which is not used to identify another window in the workbench.
@@ -488,6 +522,33 @@ private:
    * @return true if the close succeeded, and false otherwise
    */
   bool BusyClose(bool force);
+
+  /*
+   * Record the workbench UI in a document
+   */
+  XMLMemento::Pointer RecordWorkbenchState();
+
+  /*
+   * Restores the state of the previously saved workbench
+   */
+  bool RestoreState(IMemento::Pointer memento);
+
+  void DoRestoreState(IMemento::Pointer memento, bool& result);
+
+  /*
+   * Saves the current state of the workbench so it can be restored later on
+   */
+  bool SaveState(IMemento::Pointer memento);
+
+  /*
+   * Save the workbench UI in a persistence file.
+   */
+  bool SaveMementoToFile(XMLMemento::Pointer memento);
+
+  /*
+   * Answer the workbench state file.
+   */
+  bool GetWorkbenchStateFile(Poco::File& file);
 
   /*
    * Shuts down the application.

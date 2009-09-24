@@ -124,7 +124,8 @@ BundleLoader::LoadBundle(Bundle::Pointer bundle)
       BundleInfo bundleInfo;
       bundleInfo.m_Bundle = bundle;
       bundleInfo.m_ClassLoader = new ActivatorClassLoader();
-      bundleInfo.m_Context = new BundleContext(*this, bundle, Platform::GetStatePath(bundle));
+      Poco::Path path; Platform::GetStatePath(path, bundle);
+      bundleInfo.m_Context = new BundleContext(*this, bundle, path);
       m_BundleMap[bundle->GetSymbolicName()] = bundleInfo;
 
       this->InstallLibraries(bundle);

@@ -8,4 +8,5 @@ SET(ADDITIONAL_INCLUDE_DIRECTORIES
   src/services
   src/testing
   src/tweaklets
+  src/util
 )

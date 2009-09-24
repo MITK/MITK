@@ -18,11 +18,13 @@
 #include "cherryEditorSashContainer.h"
 
 #include "cherryPresentationSerializer.h"
-
+#include "cherryWorkbenchConstants.h"
+#include "cherryWorkbenchPlugin.h"
 #include "cherryLayoutTree.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
+#include <Poco/HashMap.h>
 #include <sstream>
 
 namespace cherry
@@ -300,184 +302,154 @@ void EditorSashContainer::RemoveEditor(PartPane::Pointer pane)
 bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
 {
   //TODO EditorSashContainer restore state
-  //  MultiStatus
-  //      result =
-  //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsRestoringPerspective, 0);
-  //
-  //  // Remove the default editor workbook that is
-  //  // initialy created with the editor area.
-  //  if (children != 0)
-  //  {
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //        {
-  //
-  //        public void runWithException() throws Throwable
-  //          {
-  //            EditorStack defaultWorkbook = 0;
-  //            for (int i = 0; i < children.size(); i++)
-  //            {
-  //              LayoutPart child = (LayoutPart) children.get(i);
-  //              if (child.getID() == DEFAULT_WORKBOOK_ID)
-  //              {
-  //                defaultWorkbook = (EditorStack) child;
-  //                if (defaultWorkbook.getItemCount()> 0)
-  //                {
-  //                  defaultWorkbook = 0;
-  //                }
-  //              }
-  //            }
-  //            if (defaultWorkbook != 0)
-  //            {
-  //              remove(defaultWorkbook);
-  //            }
-  //          }}
-  //        );
-  //
-  //      }
-  //
-  //  // Restore the relationship/layout
-  //  IMemento[] infos = memento.getChildren(IWorkbenchConstants.TAG_INFO);
-  //  final Map mapIDtoPart = new HashMap(infos.length);
-  //
-  //  for (int i = 0; i < infos.length; i++)
-  //  {
-  //    // Get the info details.
-  //    IMemento childMem = infos[i];
-  //    final String partID = childMem.getString(IWorkbenchConstants.TAG_PART);
-  //    final String relativeID = childMem
-  //    .getString(IWorkbenchConstants.TAG_RELATIVE);
-  //    int relationship = 0;
-  //    int left = 0, right = 0;
-  //    float ratio = 0.5f;
-  //    if (relativeID != 0)
-  //    {
-  //      relationship
-  //          = childMem.getInteger(IWorkbenchConstants.TAG_RELATIONSHIP).intValue();
-  //      Float ratioFloat = childMem .getFloat(IWorkbenchConstants.TAG_RATIO);
-  //      Integer leftInt =
-  //          childMem .getInteger(IWorkbenchConstants.TAG_RATIO_LEFT);
-  //      Integer rightInt = childMem .getInteger(
-  //          IWorkbenchConstants.TAG_RATIO_RIGHT);
-  //      if (leftInt != 0 && rightInt != 0)
-  //      {
-  //        left = leftInt.intValue();
-  //        right = rightInt.intValue();
-  //      }
-  //      else if (ratioFloat != 0)
-  //      {
-  //        ratio = ratioFloat.floatValue();
-  //      }
-  //    }
-  //
-  //    final EditorStack workbook [] = new EditorStack[1];
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //        {
-  //
-  //        public void runWithException() throws Throwable
-  //          {
-  //            // Create the part.
-  //            workbook[0] = EditorStack.newEditorWorkbook(EditorSashContainer.this, page);
-  //            workbook[0].setID(partID);
-  //            // 1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
-  //            workbook[0].setContainer(EditorSashContainer.this);
-  //          }}
-  //        );
-  //
-  //        IMemento workbookMemento = childMem .getChild(
-  //            IWorkbenchConstants.TAG_FOLDER);
-  //        if (workbookMemento != 0)
-  //        {
-  //          result.add(workbook[0].restoreState(workbookMemento));
-  //        }
-  //
-  //        final int myLeft = left, myRight = right, myRelationship = relationship;
-  //        final float myRatio = ratio;
-  //        StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //            {
-  //
-  //            public void runWithException() throws Throwable
-  //              {
-  //                // Add the part to the layout
-  //                if (relativeID == 0)
-  //                {
-  //                  add(workbook[0]);
-  //                }
-  //                else
-  //                {
-  //                  LayoutPart refPart = (LayoutPart) mapIDtoPart.get(relativeID);
-  //                  if (refPart != 0)
-  //                  {
-  //                    //$TODO pass in left and right
-  //                    if (myLeft == 0 || myRight == 0)
-  //                    {
-  //                      add(workbook[0], myRelationship, myRatio, refPart);
-  //                    }
-  //                    else
-  //                    {
-  //                      add(workbook[0], myRelationship, myLeft, myRight, refPart);
-  //                    }
-  //                  }
-  //                  else
-  //                  {
-  //                    WorkbenchPlugin
-  //                    .log("Unable to find part for ID: " + relativeID);//$NON-NLS-1$
-  //                  }
-  //                }
-  //              }}
-  //            );
-  //
-  //            mapIDtoPart.put(partID, workbook[0]);
-  //          }
-  //
-  //          return result;
-  return true;
+//  MultiStatus
+//      result =
+//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsRestoringPerspective, 0);
+  bool result = true;
+
+  // Remove the default editor workbook that is
+  // initialy created with the editor area.
+
+//    StartupThreading.runWithoutExceptions(new StartupRunnable()
+//        {
+//
+//        public void runWithException() throws Throwable
+//        {
+            PartStack::Pointer defaultWorkbook;
+            for (ILayoutContainer::ChildrenType::iterator i = children.begin();
+                i != children.end(); ++i)
+            {
+              LayoutPart::Pointer child = *i;
+              if (child->GetID() == DEFAULT_WORKBOOK_ID)
+              {
+                defaultWorkbook = child.Cast<PartStack>();
+                if (defaultWorkbook->GetItemCount() > 0)
+                {
+                  defaultWorkbook = 0;
+                }
+              }
+            }
+            if (defaultWorkbook)
+            {
+              Remove(defaultWorkbook);
+            }
+//          }}
+//        );
+
+
+
+  // Restore the relationship/layout
+  std::vector<IMemento::Pointer> infos(memento->GetChildren(WorkbenchConstants::TAG_INFO));
+  Poco::HashMap<std::string, LayoutPart::Pointer> mapIDtoPart(infos.size());
+
+  for (std::size_t i = 0; i < infos.size(); i++)
+  {
+    // Get the info details.
+    IMemento::Pointer childMem = infos[i];
+    std::string partID; childMem->GetString(WorkbenchConstants::TAG_PART, partID);
+    std::string relativeID; childMem->GetString(WorkbenchConstants::TAG_RELATIVE, relativeID);
+    int relationship = 0;
+    int left = 0, right = 0;
+    if (!relativeID.empty())
+    {
+      childMem->GetInteger(WorkbenchConstants::TAG_RELATIONSHIP, relationship);
+      childMem->GetInteger(WorkbenchConstants::TAG_RATIO_LEFT, left);
+      childMem->GetInteger(WorkbenchConstants::TAG_RATIO_RIGHT, right);
+    }
+
+    PartStack::Pointer workbook;
+//    StartupThreading.runWithoutExceptions(new StartupRunnable()
+//        {
+//
+//        public void runWithException() throws Throwable
+//          {
+            // Create the part.
+            workbook = NewEditorWorkbook();
+            workbook->SetID(partID);
+            // 1FUN70C: ITPUI:WIN - Shouldn't set Container when not active
+            workbook->SetContainer(ILayoutContainer::Pointer(this));
+//          }}
+//        );
+
+        IMemento::Pointer workbookMemento = childMem->GetChild(
+            WorkbenchConstants::TAG_FOLDER);
+        if (workbookMemento)
+        {
+          //result.add(workbook[0].restoreState(workbookMemento));
+          result &= workbook->RestoreState(workbookMemento);
+        }
+
+        const int myLeft = left, myRight = right, myRelationship = relationship;
+//        StartupThreading.runWithoutExceptions(new StartupRunnable()
+//            {
+//
+//            public void runWithException() throws Throwable
+//              {
+                // Add the part to the layout
+                if (relativeID.empty())
+                {
+                  Add(workbook);
+                }
+                else
+                {
+                  LayoutPart::Pointer refPart = mapIDtoPart[relativeID];
+                  if (refPart)
+                  {
+                    Add(workbook, myRelationship, myLeft, myRight, refPart);
+                  }
+                  else
+                  {
+                    WorkbenchPlugin::Log("Unable to find part for ID: " + relativeID);
+                  }
+                }
+//              }}
+//            );
+
+            mapIDtoPart[partID] = workbook;
+          }
+
+          return result;
 }
 
 bool EditorSashContainer::SaveState(IMemento::Pointer memento)
 {
-  //TODO EditorSashContainer save state
-  //          RelationshipInfo[] relationships = computeRelation();
-  //          MultiStatus
-  //              result =
-  //                  new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, 0);
-  //
-  //          for (int i = 0; i < relationships.length; i++)
-  //          {
-  //            // Save the relationship info ..
-  //            //    private LayoutPart part;
-  //            //    private int relationship;
-  //            //    private float ratio;
-  //            //    private LayoutPart relative;
-  //            RelationshipInfo info = relationships[i];
-  //            IMemento childMem = memento .createChild(
-  //                IWorkbenchConstants.TAG_INFO);
-  //            childMem.putString(IWorkbenchConstants.TAG_PART, info.part.getID());
-  //
-  //            EditorStack stack = (EditorStack) info.part;
-  //            if (stack != 0)
-  //            {
-  //              IMemento folderMem = childMem .createChild(
-  //                  IWorkbenchConstants.TAG_FOLDER);
-  //              result.add(stack.saveState(folderMem));
-  //            }
-  //
-  //            if (info.relative != 0)
-  //            {
-  //              childMem.putString(IWorkbenchConstants.TAG_RELATIVE,
-  //                  info.relative.getID());
-  //              childMem.putInteger(IWorkbenchConstants.TAG_RELATIONSHIP,
-  //                  info.relationship);
-  //              childMem.putInteger(IWorkbenchConstants.TAG_RATIO_LEFT, info.left);
-  //              childMem.putInteger(IWorkbenchConstants.TAG_RATIO_RIGHT,
-  //                  info.right);
-  //              // Note: "ratio" is not used in newer versions of Eclipse, which use "left"
-  //              // and "right" (above) instead
-  //              childMem.putFloat(IWorkbenchConstants.TAG_RATIO, info .getRatio());
-  //            }
-  //          }
-  //
-  //          return result;
-  return true;
+  std::vector<RelationshipInfo> relationships(ComputeRelation());
+//  MultiStatus
+//      result =
+//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, WorkbenchMessages.RootLayoutContainer_problemsSavingPerspective, 0);
+  bool result = true;
+
+  for (std::size_t i = 0; i < relationships.size(); i++)
+  {
+    // Save the relationship info ..
+    //    private LayoutPart part;
+    //    private int relationship;
+    //    private float ratio;
+    //    private LayoutPart relative;
+    const RelationshipInfo& info = relationships[i];
+    IMemento::Pointer childMem = memento->CreateChild(
+        WorkbenchConstants::TAG_INFO);
+    childMem->PutString(WorkbenchConstants::TAG_PART, info.part->GetID());
+
+    PartStack::Pointer stack = info.part.Cast<PartStack>();
+    if (stack)
+    {
+      IMemento::Pointer folderMem = childMem->CreateChild(
+          WorkbenchConstants::TAG_FOLDER);
+      //result.add(stack.saveState(folderMem));
+      result &= stack->SaveState(folderMem);
+    }
+
+    if (info.relative != 0)
+    {
+      childMem->PutString(WorkbenchConstants::TAG_RELATIVE, info.relative->GetID());
+      childMem->PutInteger(WorkbenchConstants::TAG_RELATIONSHIP, info.relationship);
+      childMem->PutInteger(WorkbenchConstants::TAG_RATIO_LEFT, info.left);
+      childMem->PutInteger(WorkbenchConstants::TAG_RATIO_RIGHT, info.right);
+    }
+  }
+
+  return result;
 }
 
 void EditorSashContainer::SetActiveWorkbook(PartStack::Pointer newWorkbook,

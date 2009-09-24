@@ -250,11 +250,18 @@ public:
 private:
   std::vector<PartPlaceholder::Pointer> CollectPlaceholders();
 
+private:
+  std::vector<ContainerPlaceholder::Pointer> CollectContainerPlaceholders();
+
   /**
    * Answer a list of the PartPlaceholder objects.
    */
 private:
   std::vector<PartPlaceholder::Pointer> CollectPlaceholders(
+      const std::list<LayoutPart::Pointer>& parts);
+
+private:
+  std::vector<ContainerPlaceholder::Pointer> CollectContainerPlaceholders(
       const std::list<LayoutPart::Pointer>& parts);
 
   /**
@@ -491,6 +498,7 @@ public:
    */
 public:
   void ReplacePlaceholderWithPart(StackablePart::Pointer part);
+  void ReplacePlaceholderWithPart(LayoutPart::Pointer container);
 
   /**
    * @see org.opencherry.ui.IPersistable

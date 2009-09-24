@@ -28,6 +28,7 @@
 #include "cherryPerspectiveHelper.h"
 #include "cherryLayoutTreeNode.h"
 #include "cherryWorkbench.h"
+#include "cherryWorkbenchConstants.h"
 #include "cherryPartService.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
@@ -709,7 +710,9 @@ WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, IAdaptable* input)
  : activationList(this)
 {
+  this->Register();
   this->Init(w, "", input, false);
+  this->UnRegister(false);
 }
 
 void WorkbenchPage::Activate(IWorkbenchPart::Pointer part)
@@ -2836,246 +2839,256 @@ void WorkbenchPage::ResetPerspective()
   //    }
 }
 
-bool WorkbenchPage::RestoreState(IMemento::Pointer /*memento*/,
-    const IPerspectiveDescriptor::Pointer /*activeDescriptor*/)
+bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
+    const IPerspectiveDescriptor::Pointer activeDescriptor)
 {
-  //TODO WorkbenchPage restore state
-  //  //    StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //  //        {
-  //  //
-  //  //        public void WorkbenchPage::runWithException() throws Throwable
-  //  //          {
-  //  deferUpdates(true);
-  //  //        }});
-  //
-  //  try
-  //  {
-  //    // Restore working set
-  //    String pageName = memento.getString(IWorkbenchConstants.TAG_LABEL);
-  //
-  //    String label = 0; // debugging only
-  //    if (UIStats.isDebugging(UIStats.RESTORE_WORKBENCH))
-  //    {
-  //      label = pageName == 0 ? "" : "::" + pageName; //$NON-NLS-1$ //$NON-NLS-2$
-  //    }
-  //
-  //    try
-  //    {
-  //      UIStats.start(UIStats.RESTORE_WORKBENCH, "WorkbenchPage" + label); //$NON-NLS-1$
-  //      if (pageName == 0)
-  //      {
-  //        pageName = ""; //$NON-NLS-1$
-  //      }
-  //      MultiStatus result =
-  //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
-  //              WorkbenchMessages.WorkbenchPage_unableToRestorePerspective,
-  //              pageName), 0);
-  //
-  //      String workingSetName = memento .getString(
-  //          IWorkbenchConstants.TAG_WORKING_SET);
-  //      if (workingSetName != 0)
-  //      {
-  //        AbstractWorkingSetManager
-  //            workingSetManager =
-  //                (AbstractWorkingSetManager) getWorkbenchWindow() .getWorkbench().getWorkingSetManager();
-  //        setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
-  //      }
-  //
-  //      IMemento workingSetMem = memento .getChild(
-  //          IWorkbenchConstants.TAG_WORKING_SETS);
-  //      if (workingSetMem != 0)
-  //      {
-  //        std::vector<IMemento::Pointer> workingSetChildren =
-  //            workingSetMem .getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-  //        List workingSetList = new ArrayList(workingSetChildren.length);
-  //        for (int i = 0; i < workingSetChildren.length; i++)
+  //    StartupThreading.runWithoutExceptions(new StartupRunnable()
   //        {
-  //          IWorkingSet
-  //              set =
-  //                  getWorkbenchWindow().getWorkbench() .getWorkingSetManager().getWorkingSet(
-  //                      workingSetChildren[i].getID());
-  //          if (set != 0)
+  //
+  //        public void WorkbenchPage::runWithException() throws Throwable
   //          {
-  //            workingSetList.add(set);
-  //          }
-  //        }
-  //
-  //        workingSets = (IWorkingSet[]) workingSetList .toArray(
-  //            new IWorkingSet[workingSetList.size()]);
-  //      }
-  //
-  //      aggregateWorkingSetId = memento.getString(ATT_AGGREGATE_WORKING_SET_ID);
-  //
-  //      IWorkingSet setWithId =
-  //          window.getWorkbench().getWorkingSetManager().getWorkingSet(
-  //              aggregateWorkingSetId);
-  //
-  //      // check to see if the set has already been made and assign it if it has
-  //      if (setWithId.Cast<AggregateWorkingSet> () != 0)
-  //      {
-  //        aggregateWorkingSet = (AggregateWorkingSet) setWithId;
-  //      }
-  //      // Restore editor manager.
-  //      IMemento childMem = memento .getChild(IWorkbenchConstants.TAG_EDITORS);
-  //      result.merge(getEditorManager().restoreState(childMem));
-  //
-  //      childMem = memento.getChild(IWorkbenchConstants.TAG_VIEWS);
-  //      if (childMem != 0)
-  //      {
-  //        result.merge(getViewFactory().restoreState(childMem));
-  //      }
-  //
-  //      // Get persp block.
-  //      childMem = memento.getChild(IWorkbenchConstants.TAG_PERSPECTIVES);
-  //      String activePartID = childMem .getString(
-  //          IWorkbenchConstants.TAG_ACTIVE_PART);
-  //      String activePartSecondaryID = 0;
-  //      if (activePartID != 0)
-  //      {
-  //        activePartSecondaryID = ViewFactory .extractSecondaryId(activePartID);
-  //        if (activePartSecondaryID != 0)
-  //        {
-  //          activePartID = ViewFactory.extractPrimaryId(activePartID);
-  //        }
-  //      }
-  //      String activePerspectiveID = childMem .getString(
-  //          IWorkbenchConstants.TAG_ACTIVE_PERSPECTIVE);
-  //
-  //      // Restore perspectives.
-  //      IMemento perspMems[] = childMem .getChildren(
-  //          IWorkbenchConstants.TAG_PERSPECTIVE);
-  //      Perspective activePerspectiveArray[] = new Perspective[1];
-  //
-  //      for (int i = 0; i < perspMems.length; i++)
-  //      {
-  //
-  //        IMemento current = perspMems[i];
-  //        //          StartupThreading
-  //        //          .runWithoutExceptions(new StartupRunnable()
-  //        //              {
-  //        //
-  //        //              public void WorkbenchPage::runWithException() throws Throwable
-  //        //                {
-  //        Perspective persp = ((WorkbenchImplementation) Tweaklets .get(
-  //            WorkbenchImplementation.KEY)).createPerspective(0, this);
-  //        result.merge(persp.restoreState(current));
-  //        IPerspectiveDescriptor desc = persp .getDesc();
-  //        if (desc.equals(activeDescriptor))
-  //        {
-  //          activePerspectiveArray[0] = persp;
-  //        }
-  //        else if ((activePerspectiveArray[0] == 0) && desc.getId().equals(
-  //            activePerspectiveID))
-  //        {
-  //          activePerspectiveArray[0] = persp;
-  //        }
-  //        perspList.add(persp);
-  //        window.firePerspectiveOpened(this, desc);
-  //        //                }
-  //        //              });
-  //      }
-  //      Perspective activePerspective = activePerspectiveArray[0];
-  //      boolean restoreActivePerspective = false;
-  //      if (activeDescriptor == 0)
-  //      {
-  //        restoreActivePerspective = true;
-  //
-  //      }
-  //      else if (activePerspective != 0 && activePerspective.getDesc().equals(
-  //          activeDescriptor))
-  //      {
-  //        restoreActivePerspective = true;
-  //      }
-  //      else
-  //      {
-  //        restoreActivePerspective = false;
-  //        activePerspective = createPerspective(
-  //            (PerspectiveDescriptor) activeDescriptor, true);
-  //        if (activePerspective == 0)
-  //        {
-  //          result .merge(
-  //              new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
-  //                  WorkbenchMessages.Workbench_showPerspectiveError,
-  //                  activeDescriptor.getId()), 0));
-  //        }
-  //      }
-  //
-  //      perspList.setActive(activePerspective);
-  //
-  //      // Make sure we have a valid perspective to work with,
-  //      // otherwise return.
-  //      activePerspective = perspList.getActive();
-  //      if (activePerspective == 0)
-  //      {
-  //        activePerspective = perspList.getNextActive();
-  //        perspList.setActive(activePerspective);
-  //      }
-  //      if (activePerspective != 0 && restoreActivePerspective)
-  //      {
-  //        result.merge(activePerspective.restoreState());
-  //      }
-  //
-  //      if (activePerspective != 0)
-  //      {
-  //        Perspective myPerspective = activePerspective;
-  //        String myActivePartId = activePartID, mySecondaryId =
-  //            activePartSecondaryID;
-  //        //          StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //        //              {
-  //        //
-  //        //              public void WorkbenchPage::runWithException() throws Throwable
-  //        //                {
-  //        window.firePerspectiveActivated(this, myPerspective .getDesc());
-  //
-  //        // Restore active part.
-  //        if (myActivePartId != 0)
-  //        {
-  //          IViewReference ref = myPerspective.findView(myActivePartId,
-  //              mySecondaryId);
-  //
-  //          if (ref != 0)
-  //          {
-  //            activationList.setActive(ref);
-  //          }
-  //        }
-  //        // }});
-  //
-  //      }
-  //
-  //      childMem = memento .getChild(IWorkbenchConstants.TAG_NAVIGATION_HISTORY);
-  //      if (childMem != 0)
-  //      {
-  //        navigationHistory.restoreState(childMem);
-  //      }
-  //      else if (getActiveEditor() != 0)
-  //      {
-  //        navigationHistory.markEditor(getActiveEditor());
-  //      }
-  //
-  //      // restore sticky view state
-  //      stickyViewMan.restore(memento);
-  //
-  //      return result;
-  //    } catch (std::exception& e)
-  //    {
-  //      String blame = activeDescriptor == 0 ? pageName
-  //          : activeDescriptor.getId();
-  //      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
-  //      throw e;
-  //    }
-  //  } catch (std::exception& e)
-  //  {
-  //    //      StartupThreading.runWithoutExceptions(new StartupRunnable()
-  //    //                {
-  //    //                public void WorkbenchPage::runWithException() throws Throwable
-  //    //                  {
-  //    deferUpdates(false);
-  //    //            }
-  //    //          });
-  //
-  //    throw e;
-  //  }
-  return true;
+  this->DeferUpdates(true);
+  //        }});
+
+  try
+  {
+    // Restore working set
+    std::string pageName; memento->GetString(WorkbenchConstants::TAG_LABEL, pageName);
+
+//    String label = 0; // debugging only
+//    if (UIStats.isDebugging(UIStats.RESTORE_WORKBENCH))
+//    {
+//      label = pageName == 0 ? "" : "::" + pageName; //$NON-NLS-1$ //$NON-NLS-2$
+//    }
+
+    try
+    {
+      //UIStats.start(UIStats.RESTORE_WORKBENCH, "WorkbenchPage" + label); //$NON-NLS-1$
+//      MultiStatus result =
+//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
+//              WorkbenchMessages.WorkbenchPage_unableToRestorePerspective,
+//              pageName), 0);
+      bool result = true;
+
+//      String workingSetName = memento .getString(
+//          IWorkbenchConstants.TAG_WORKING_SET);
+//      if (workingSetName != 0)
+//      {
+//        AbstractWorkingSetManager
+//            workingSetManager =
+//                (AbstractWorkingSetManager) getWorkbenchWindow() .getWorkbench().getWorkingSetManager();
+//        setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
+//      }
+//
+//      IMemento workingSetMem = memento .getChild(
+//          IWorkbenchConstants.TAG_WORKING_SETS);
+//      if (workingSetMem != 0)
+//      {
+//        std::vector<IMemento::Pointer> workingSetChildren =
+//            workingSetMem .getChildren(IWorkbenchConstants.TAG_WORKING_SET);
+//        List workingSetList = new ArrayList(workingSetChildren.length);
+//        for (int i = 0; i < workingSetChildren.length; i++)
+//        {
+//          IWorkingSet
+//              set =
+//                  getWorkbenchWindow().getWorkbench() .getWorkingSetManager().getWorkingSet(
+//                      workingSetChildren[i].getID());
+//          if (set != 0)
+//          {
+//            workingSetList.add(set);
+//          }
+//        }
+//
+//        workingSets = (IWorkingSet[]) workingSetList .toArray(
+//            new IWorkingSet[workingSetList.size()]);
+//      }
+//
+//      aggregateWorkingSetId = memento.getString(ATT_AGGREGATE_WORKING_SET_ID);
+//
+//      IWorkingSet setWithId =
+//          window.getWorkbench().getWorkingSetManager().getWorkingSet(
+//              aggregateWorkingSetId);
+//
+//      // check to see if the set has already been made and assign it if it has
+//      if (setWithId.Cast<AggregateWorkingSet> () != 0)
+//      {
+//        aggregateWorkingSet = (AggregateWorkingSet) setWithId;
+//      }
+
+      // Restore editor manager.
+      IMemento::Pointer childMem = memento->GetChild(WorkbenchConstants::TAG_EDITORS);
+      //result.merge(getEditorManager().restoreState(childMem));
+      result &= this->GetEditorManager()->RestoreState(childMem);
+
+      childMem = memento->GetChild(WorkbenchConstants::TAG_VIEWS);
+      if (childMem)
+      {
+        //result.merge(getViewFactory().restoreState(childMem));
+        result &= this->GetViewFactory()->RestoreState(childMem);
+      }
+
+      // Get persp block.
+      childMem = memento->GetChild(WorkbenchConstants::TAG_PERSPECTIVES);
+      std::string activePartID;
+      childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PART, activePartID);
+      std::string activePartSecondaryID;
+      if (!activePartID.empty())
+      {
+        activePartSecondaryID = ViewFactory::ExtractSecondaryId(activePartID);
+        if (!activePartSecondaryID.empty())
+        {
+          activePartID = ViewFactory::ExtractPrimaryId(activePartID);
+        }
+      }
+      std::string activePerspectiveID;
+      childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE, activePerspectiveID);
+
+      // Restore perspectives.
+      std::vector<IMemento::Pointer> perspMems(childMem->GetChildren(
+          WorkbenchConstants::TAG_PERSPECTIVE));
+      Perspective::Pointer activePerspective;
+
+      for (std::size_t i = 0; i < perspMems.size(); i++)
+      {
+
+        IMemento::Pointer current = perspMems[i];
+        //          StartupThreading
+        //          .runWithoutExceptions(new StartupRunnable()
+        //              {
+        //
+        //              public void WorkbenchPage::runWithException() throws Throwable
+        //                {
+        Perspective::Pointer persp(new Perspective(PerspectiveDescriptor::Pointer(0), WorkbenchPage::Pointer(this)));
+        //result.merge(persp.restoreState(current));
+        result &= persp->RestoreState(current);
+        IPerspectiveDescriptor::Pointer desc = persp->GetDesc();
+        if (desc == activeDescriptor)
+        {
+          activePerspective = persp;
+        }
+        else if ((activePerspective == 0) && desc->GetId() == activePerspectiveID)
+        {
+          activePerspective = persp;
+        }
+        perspList.Add(persp);
+        window->FirePerspectiveOpened(WorkbenchPage::Pointer(this), desc);
+        //                }
+        //              });
+      }
+      bool restoreActivePerspective = false;
+      if (!activeDescriptor)
+      {
+        restoreActivePerspective = true;
+
+      }
+      else if (activePerspective && activePerspective->GetDesc() ==
+          activeDescriptor)
+      {
+        restoreActivePerspective = true;
+      }
+      else
+      {
+        restoreActivePerspective = false;
+        activePerspective = this->CreatePerspective(
+            activeDescriptor.Cast<PerspectiveDescriptor>(), true);
+        if (activePerspective == 0)
+        {
+//          result .merge(
+//              new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
+//                  WorkbenchMessages.Workbench_showPerspectiveError,
+//                  activeDescriptor.getId()), 0));
+          result &= false;
+        }
+      }
+
+      perspList.SetActive(activePerspective);
+
+      // Make sure we have a valid perspective to work with,
+      // otherwise return.
+      activePerspective = perspList.GetActive();
+      if (activePerspective == 0)
+      {
+        activePerspective = perspList.GetNextActive();
+        perspList.SetActive(activePerspective);
+      }
+      if (activePerspective && restoreActivePerspective)
+      {
+        //result.merge(activePerspective.restoreState());
+        result &= activePerspective->RestoreState();
+      }
+
+      if (activePerspective)
+      {
+        Perspective::Pointer myPerspective = activePerspective;
+        std::string myActivePartId = activePartID;
+        std::string mySecondaryId = activePartSecondaryID;
+        //          StartupThreading.runWithoutExceptions(new StartupRunnable()
+        //              {
+        //
+        //              public void WorkbenchPage::runWithException() throws Throwable
+        //                {
+        window->FirePerspectiveActivated(WorkbenchPage::Pointer(this), myPerspective->GetDesc());
+
+        // Restore active part.
+        if (!myActivePartId.empty())
+        {
+          IWorkbenchPartReference::Pointer ref = myPerspective->FindView(myActivePartId,
+              mySecondaryId);
+
+          if (ref)
+          {
+            activationList.SetActive(ref);
+          }
+        }
+        // }});
+
+      }
+
+//      childMem = memento->GetChild(WorkbenchConstants::TAG_NAVIGATION_HISTORY);
+//      if (childMem)
+//      {
+//        navigationHistory.restoreState(childMem);
+//      }
+//      else if (GetActiveEditor())
+//      {
+//        navigationHistory.markEditor(getActiveEditor());
+//      }
+//
+//      // restore sticky view state
+//      stickyViewMan.restore(memento);
+
+//      std::string blame = activeDescriptor == 0 ? pageName
+//          : activeDescriptor.getId();
+//      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
+
+      //      StartupThreading.runWithoutExceptions(new StartupRunnable()
+    //                {
+    //                public void WorkbenchPage::runWithException() throws Throwable
+    //                  {
+    DeferUpdates(false);
+    //            }
+    //          });
+
+      return result;
+    } catch (...)
+    {
+//      std::string blame = activeDescriptor == 0 ? pageName
+//          : activeDescriptor.getId();
+//      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
+      throw;
+    }
+  } catch (...)
+  {
+    //      StartupThreading.runWithoutExceptions(new StartupRunnable()
+    //                {
+    //                public void WorkbenchPage::runWithException() throws Throwable
+    //                  {
+    DeferUpdates(false);
+    //            }
+    //          });
+
+    throw;
+  }
 
 }
 
@@ -3147,90 +3160,91 @@ void WorkbenchPage::SavePerspectiveAs(IPerspectiveDescriptor::Pointer newDesc)
 /**
  * Save the state of the page.
  */
-bool WorkbenchPage::SaveState(IMemento::Pointer /*memento*/)
+bool WorkbenchPage::SaveState(IMemento::Pointer memento)
 {
-  //TODO WorkbenchPage save state
-  //  // We must unzoom to get correct layout.
-  //  if (isZoomed())
-  //  {
-  //    zoomOut();
-  //  }
-  //
-  //  MultiStatus
-  //      result =
-  //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
-  //              WorkbenchMessages.WorkbenchPage_unableToSavePerspective,
-  //              getLabel()), 0);
-  //
-  //  // Save editor manager.
-  //  IMemento childMem = memento .createChild(IWorkbenchConstants.TAG_EDITORS);
-  //  result.merge(editorMgr.saveState(childMem));
-  //
-  //  childMem = memento.createChild(IWorkbenchConstants.TAG_VIEWS);
-  //  result.merge(getViewFactory().saveState(childMem));
-  //
-  //  // Create persp block.
-  //  childMem = memento.createChild(IWorkbenchConstants.TAG_PERSPECTIVES);
-  //  if (getPerspective() != 0)
-  //  {
-  //    childMem.putString(IWorkbenchConstants.TAG_ACTIVE_PERSPECTIVE,
-  //        getPerspective().getId());
-  //  }
-  //  if (getActivePart() != 0)
-  //  {
-  //    if (getActivePart().Cast<IViewPart> () != 0)
-  //    {
-  //      IViewReference ref = (IViewReference) getReference(getActivePart());
-  //      if (ref != 0)
-  //      {
-  //        childMem.putString(IWorkbenchConstants.TAG_ACTIVE_PART,
-  //            ViewFactory.getKey(ref));
-  //      }
-  //    }
-  //    else
-  //    {
-  //      childMem.putString(IWorkbenchConstants.TAG_ACTIVE_PART,
-  //          getActivePart().getSite().getId());
-  //    }
-  //  }
-  //
-  //  // Save each perspective in opened order
-  //  Iterator itr = perspList.iterator();
-  //  while (itr.hasNext())
-  //  {
-  //    Perspective persp = (Perspective) itr.next();
-  //    IMemento gChildMem = childMem .createChild(
-  //        IWorkbenchConstants.TAG_PERSPECTIVE);
-  //    result.merge(persp.saveState(gChildMem));
-  //  }
-  //  // Save working set if set
-  //  if (workingSet != 0)
-  //  {
-  //    memento.putString(IWorkbenchConstants.TAG_WORKING_SET,
-  //        workingSet .getName());
-  //  }
-  //
-  //  IMemento workingSetMem = memento .createChild(
-  //      IWorkbenchConstants.TAG_WORKING_SETS);
-  //  for (int i = 0; i < workingSets.length; i++)
-  //  {
-  //    workingSetMem.createChild(IWorkbenchConstants.TAG_WORKING_SET,
-  //        workingSets[i].getName());
-  //  }
-  //
-  //  if (aggregateWorkingSetId != 0)
-  //  {
-  //    memento.putString(ATT_AGGREGATE_WORKING_SET_ID, aggregateWorkingSetId);
-  //  }
-  //
-  //  navigationHistory.saveState(memento .createChild(
-  //      IWorkbenchConstants.TAG_NAVIGATION_HISTORY));
-  //
-  //  // save the sticky activation state
-  //  stickyViewMan.save(memento);
-  //
-  //  return result;
-  return true;
+//  // We must unzoom to get correct layout.
+//  if (isZoomed())
+//  {
+//    zoomOut();
+//  }
+
+//  MultiStatus
+//      result =
+//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
+//              WorkbenchMessages.WorkbenchPage_unableToSavePerspective,
+//              getLabel()), 0);
+  bool result = true;
+
+  // Save editor manager.
+  IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_EDITORS);
+  //result.merge(editorMgr.saveState(childMem));
+  result &= editorMgr->SaveState(childMem);
+
+  childMem = memento->CreateChild(WorkbenchConstants::TAG_VIEWS);
+  //result.merge(getViewFactory().saveState(childMem));
+  result &= this->GetViewFactory()->SaveState(childMem);
+
+  // Create persp block.
+  childMem = memento->CreateChild(WorkbenchConstants::TAG_PERSPECTIVES);
+  if (this->GetPerspective())
+  {
+    childMem->PutString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE,
+        this->GetPerspective()->GetId());
+  }
+  if (this->GetActivePart() != 0)
+  {
+    if (this->GetActivePart().Cast<IViewPart> ())
+    {
+      IViewReference::Pointer ref = this->GetReference(this->GetActivePart()).Cast<IViewReference>();
+      if (ref)
+      {
+        childMem->PutString(WorkbenchConstants::TAG_ACTIVE_PART,
+            ViewFactory::GetKey(ref));
+      }
+    }
+    else
+    {
+      childMem->PutString(WorkbenchConstants::TAG_ACTIVE_PART,
+          this->GetActivePart()->GetSite()->GetId());
+    }
+  }
+
+  // Save each perspective in opened order
+  for (PerspectiveList::PerspectiveListType::iterator itr = perspList.Begin();
+      itr != perspList.End(); ++itr)
+  {
+    IMemento::Pointer gChildMem = childMem->CreateChild(
+        WorkbenchConstants::TAG_PERSPECTIVE);
+    //result.merge(persp.saveState(gChildMem));
+    result &= (*itr)->SaveState(gChildMem);
+  }
+//  // Save working set if set
+//  if (workingSet != 0)
+//  {
+//    memento.putString(IWorkbenchConstants.TAG_WORKING_SET,
+//        workingSet .getName());
+//  }
+//
+//  IMemento workingSetMem = memento .createChild(
+//      IWorkbenchConstants.TAG_WORKING_SETS);
+//  for (int i = 0; i < workingSets.length; i++)
+//  {
+//    workingSetMem.createChild(IWorkbenchConstants.TAG_WORKING_SET,
+//        workingSets[i].getName());
+//  }
+//
+//  if (aggregateWorkingSetId != 0)
+//  {
+//    memento.putString(ATT_AGGREGATE_WORKING_SET_ID, aggregateWorkingSetId);
+//  }
+//
+//  navigationHistory.saveState(memento .createChild(
+//      IWorkbenchConstants.TAG_NAVIGATION_HISTORY));
+//
+//  // save the sticky activation state
+//  stickyViewMan.save(memento);
+
+  return result;
 }
 
 std::string WorkbenchPage::GetId(IWorkbenchPart::Pointer part)

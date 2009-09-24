@@ -163,42 +163,19 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
       {
       if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
         {
-        //not yet in the open source part
+        //not yet in the open source part so we'll only get NULL here.
+        returnValue = ConfigureNDI5DTrackingDevice();
         }
       else //6D Tracking
         {
-        mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-        tempTrackingDevice->SetType(mitk::NDIPolaris);
-        switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
-          {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... Alfred
-          case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
-          case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
-          case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
-          case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
-          case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
-          case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
-          case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
-          case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
-          }
-        returnValue = tempTrackingDevice;
+        returnValue = ConfigureNDI6DTrackingDevice();
+        returnValue->SetType(mitk::NDIPolaris);
         }
       }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1)//NDI Aurora
         {
-        mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-          tempTrackingDevice->SetType(mitk::NDIAurora);
-          switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
-            {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... Alfred
-            case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
-            case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
-            case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
-            case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
-            case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
-            case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
-            case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
-            case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
-            }
-          returnValue = tempTrackingDevice;
+        returnValue = ConfigureNDI6DTrackingDevice();
+        returnValue->SetType(mitk::NDIAurora);
         }
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2)//ClaronTechnology MicronTracker 2
         {
@@ -206,3 +183,26 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
         }
   return returnValue;
   }
+
+mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI5DTrackingDevice()
+  {
+  return NULL;
+  }
+
+mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
+  {
+  mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
+  switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
+    {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... (Alfred)
+    case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
+    case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
+    case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
+    case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
+    case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
+    case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
+    case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
+    case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
+    }
+  return tempTrackingDevice;
+  }
+

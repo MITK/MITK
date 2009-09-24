@@ -96,7 +96,7 @@ protected:
   vtkRenderWindow *RenderWindow;
   
   bool SupportsCompressedTexture;
-  bool SupportsNonPowerOfTwoTextures;
+ // bool SupportsNonPowerOfTwoTextures;
   
   // Actual internal texture format (uncompressed vs compressed)
   // Computed in Render()

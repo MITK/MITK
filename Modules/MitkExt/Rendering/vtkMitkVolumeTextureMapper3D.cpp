@@ -13,6 +13,9 @@
 
 =========================================================================*/
 #include "vtkMitkVolumeTextureMapper3D.h"
+#include "mitkCommon.h"
+
+#define GPU_LOG LOG_INFO(false)("VR")
 
 #include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"
@@ -66,6 +69,8 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
                                                unsigned char *volume1,
                                                unsigned char *volume2)
 {
+  GPU_LOG << "vtkVolumeTextureMapper3DComputeScalars";
+
   T              *inPtr;
   unsigned char  *outPtr, *outPtr2;
   int             i, j, k;
@@ -403,6 +408,9 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
                                                  unsigned char *volume2,
                                                  unsigned char *volume3)
 {
+  GPU_LOG << "vtkVolumeTextureMapper3DComputeGradients";
+
+
   int                 x, y, z;
   int                 offset, outputOffset;
   int                 x_start, x_limit;
@@ -640,6 +648,8 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
 {
+  GPU_LOG << "vtkMitkVolumeTextureMapper3D";
+
   this->PolygonBuffer                 = NULL;
   this->IntersectionBuffer            = NULL;
   this->NumberOfPolygons              = 0;
@@ -678,11 +688,15 @@ vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
   
   this->UseCompressedTexture          = false;
   this->SupportsNonPowerOfTwoTextures = false;
+
+  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
 }
 
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D::~vtkMitkVolumeTextureMapper3D()
 {
+  GPU_LOG << "~vtkMitkVolumeTextureMapper3D";
+
   delete [] this->PolygonBuffer;
   delete [] this->IntersectionBuffer;
   delete [] this->Volume1;
@@ -694,7 +708,9 @@ vtkMitkVolumeTextureMapper3D::~vtkMitkVolumeTextureMapper3D()
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D *vtkMitkVolumeTextureMapper3D::New()
 {
-  // First try to create the object from the vtkObjectFactory
+  GPU_LOG << "New";
+ 
+   // First try to create the object from the vtkObjectFactory
   vtkObject* ret = 
     vtkVolumeRenderingFactory::CreateInstance("vtkMitkVolumeTextureMapper3D");
   return static_cast<vtkMitkVolumeTextureMapper3D *>(ret);
@@ -705,6 +721,8 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
                                                 vtkVolume *vol,
                                                 double inBounds[6] )
 {
+  GPU_LOG << "ComputePolygons";
+
   // Get the camera position and focal point
   double focalPoint[4], position[4];
   double plane[4];
@@ -1012,18 +1030,30 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
 //-----------------------------------------------------------------------------
 int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
 {
+  GPU_LOG << "UpdateVolumes";
+
   int needToUpdate = 0;
 
   // Get the image data
   vtkImageData *input = this->GetInput();
   input->Update();
  
+  GPU_LOG << "saved texture mtime " << this->SavedTextureMTime.GetMTime();
+  GPU_LOG << "input mtime " << input->GetMTime();
+  
+ 
   // Has the volume changed in some way?
   if ( this->SavedTextureInput != input ||
        this->SavedTextureMTime.GetMTime() < input->GetMTime() )
     {
+      GPU_LOG(this->SavedTextureInput != input) << "Update forced 1";
+      GPU_LOG(this->SavedTextureMTime.GetMTime() < input->GetMTime()) << "Update forced 2";
+    
+    
     needToUpdate = 1;
     }
+ 
+  
  
   if ( !needToUpdate )
     {
@@ -1040,16 +1070,31 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   int components = input->GetNumberOfScalarComponents();
   
   int powerOfTwoDim[3];
+
+  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
   
   if(this->SupportsNonPowerOfTwoTextures)
     {
+      GPU_LOG << "Using NP2 partly...";
+    
+    
      for ( int i = 0; i < 3; i++ )
        {
        powerOfTwoDim[i]=dim[i];
        }
+    
+  
+    
+      powerOfTwoDim[0] = 32; while ( powerOfTwoDim[0] < dim[0] ) powerOfTwoDim[0] *= 2;
+  //    powerOfTwoDim[1] = 32; while ( powerOfTwoDim[1] < dim[1] ) powerOfTwoDim[1] *= 2;
+ //     powerOfTwoDim[2] = 32; while ( powerOfTwoDim[2] < dim[2] ) powerOfTwoDim[2] *= 2;
+    
+    
     }
   else
     {
+      GPU_LOG << "Using P2";
+
     for ( int i = 0; i < 3; i++ )
       {
       powerOfTwoDim[i] = 32;
@@ -1062,6 +1107,8 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
  
   while ( ! this->IsTextureSizeSupported( powerOfTwoDim,components ) )
     {
+      GPU_LOG << "Downsampling";
+
     if ( powerOfTwoDim[0] >= powerOfTwoDim[1] &&
          powerOfTwoDim[0] >= powerOfTwoDim[2] )
       {
@@ -1078,6 +1125,8 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
       }
     }
  
+    GPU_LOG << "ALLOCATING TEXTURE VOLUMEs " << powerOfTwoDim[0] << "/" << powerOfTwoDim[1] << "/" << powerOfTwoDim[2];
+
   int neededSize = powerOfTwoDim[0] * powerOfTwoDim[1] * powerOfTwoDim[2];
  
   // What is the spacing?
@@ -1094,17 +1143,20 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
     switch (components)
       {
       case 1:
+        GPU_LOG << "allocate 1";
         this->Volume1 = new unsigned char [2*neededSize];
         this->Volume2 = new unsigned char [3*neededSize];
         this->Volume3 = NULL;
         break;
       case 2:
+        GPU_LOG << "allocate 2";
         this->Volume1 = new unsigned char [3*neededSize];
         this->Volume2 = new unsigned char [3*neededSize];
         this->Volume3 = NULL;
         break;
       case 3:
       case 4:
+        GPU_LOG << "allocate 3/4";
         this->Volume1 = new unsigned char [3*neededSize];
         this->Volume2 = new unsigned char [2*neededSize];
         this->Volume3 = new unsigned char [3*neededSize];
@@ -1197,6 +1249,8 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
 //-----------------------------------------------------------------------------
 int vtkMitkVolumeTextureMapper3D::UpdateColorLookup( vtkVolume *vol )
 {
+  GPU_LOG << "UpdateColorLookup";
+
   int needToUpdate = 0;
 
   // Get the image data

@@ -71,17 +71,10 @@ public:
   itkNewMacro(Self);
 
   virtual const mitk::Image* GetInput();
-
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
-
+  
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
 
-  virtual void EnableMask();
-  virtual void DisableMask();
-  Image::Pointer GetMask();
-  bool SetMask(const Image* mask);
-  virtual void UpdateMask();
-
+  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
   static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
@@ -91,60 +84,22 @@ public:
 
 protected:
 
-
   GPUVolumeMapper3D();
-
-
   virtual ~GPUVolumeMapper3D();
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   void CreateDefaultTransferFunctions();
-
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
 
-  void SetPreferences();
-
-  void SetClippingPlane(vtkRenderWindowInteractor* interactor);
-  void DelClippingPlane();
-
-  vtkImageShiftScale* m_ImageCast;
   vtkImageChangeInformation* m_UnitSpacingImageFilter;
   vtkVolumeProperty* m_VolumePropertyLow;
-  vtkVolumeProperty* m_VolumePropertyMed;
-  vtkVolumeProperty* m_VolumePropertyHigh;
   vtkMitkVolumeTextureMapper3D* m_T2DMapper;
-  vtkFixedPointVolumeRayCastMapper* m_HiResMapper;
-  vtkImageResample* m_Resampler;
-  
   vtkVolume * m_VolumeLOD;
   
-  vtkCubeSource *m_BoundingBox;
-  vtkPolyDataMapper *m_BoundingBoxMapper;
-  vtkActor *m_BoundingBoxActor;
-
-  vtkAssembly *m_Prop3DAssembly;
-
-  vtkPlane* m_ClippingPlane;
-  vtkImplicitPlaneWidget* m_PlaneWidget;
-
-  vtkImageData *m_Mask;
-  vtkImageMask *m_ImageMaskFilter;
-
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *m_DefaultColorTransferFunction;
-
-  int m_LowResID;
-  int m_MedResID;
-  int m_HiResID;
-  bool m_PlaneSet;
-  double m_PlaneNormalA;
-  double m_PlaneNormalB;
-  double m_PlaneNormalC;
-
-  std::set< vtkRenderWindow * > m_RenderWindowInitialized;
-
 };
 
 } // namespace mitk

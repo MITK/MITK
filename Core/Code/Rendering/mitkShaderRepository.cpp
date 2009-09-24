@@ -300,6 +300,12 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
   
   mitk::ShaderEnumProperty *sep=(mitk::ShaderEnumProperty *)node->GetProperty("shader",renderer);
 
+  if(!sep)
+  {
+    property->ShadingOff();
+    return;
+  }
+
   std::string shader=sep->GetValueAsString();
   
   // Need update pipeline mode

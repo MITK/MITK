@@ -64,7 +64,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 
 
-#define GPU_LOG LOG_INFO("VR")(false)
+#define GPU_LOG LOG_INFO(false)("VR")
 
 
 
@@ -132,7 +132,7 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   
-  LOG_INFO << "mitk image mtime: " << input->GetMTime();
+  GPU_LOG << "mitk image mtime: " << input->GetMTime();
   
   
   if ( !input || !input->IsInitialized() )
@@ -175,20 +175,10 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   vtkImageData *inputData = input->GetVtkImageData(timestep);
   if(inputData==NULL)
     return;
-      LOG_INFO << "input data mtime1: " << inputData->GetMTime();
 
-inputData = input->GetVtkImageData(timestep);
-  if(inputData==NULL)
-    return;
-  LOG_INFO << "input data mtime2: " << inputData->GetMTime();
+   GPU_LOG << "input data mtime1: " << inputData->GetMTime();
 
-inputData = input->GetVtkImageData(timestep);
-  if(inputData==NULL)
-    return;
-
-  LOG_INFO << "input data mtime3: " << inputData->GetMTime();
-
-  m_UnitSpacingImageFilter->SetInput( inputData );
+   m_UnitSpacingImageFilter->SetInput( inputData );
               
   UpdateTransferFunctions( renderer );
 }

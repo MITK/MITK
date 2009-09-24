@@ -204,7 +204,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
     case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
     }
 
-  mitk::TrackingDevice::Pointer returnValue = dynamic_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
+  mitk::TrackingDevice::Pointer returnValue = (mitk::TrackingDevice*)(tempTrackingDevice);
   return returnValue;
   }
 

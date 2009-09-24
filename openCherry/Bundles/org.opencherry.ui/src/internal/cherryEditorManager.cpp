@@ -338,7 +338,7 @@ void EditorManager::FindEditors(
   // Phase 2: check materialized editors (without their own matching
   // strategy)
   for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
-       i != editorList.end(); ++i)
+       i != editorList.end();)
   {
     EditorReference::Pointer editor = i->Cast<EditorReference>();
     IEditorPart::Pointer part = editor->GetPart(false).Cast<IEditorPart>();
@@ -351,6 +351,7 @@ void EditorManager::FindEditors(
         result.push_back(editor);
       }
     }
+    else ++i;
   }
 
   // Phase 3: check unmaterialized editors for input equality,

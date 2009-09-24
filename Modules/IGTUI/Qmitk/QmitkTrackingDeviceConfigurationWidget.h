@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDevice.h"
 
  /** Documentation:
-  *   \brief An object of this class offers a UI to configurate
+  *   \brief An object of this class offers an UI to configurate
   *          a tracking device. If the user finished the configuration process and
   *          a fully configurated tracking device is availiabe the object emits a
   *          signal "TrackingDeviceConfigurationFinished()". You can then get the

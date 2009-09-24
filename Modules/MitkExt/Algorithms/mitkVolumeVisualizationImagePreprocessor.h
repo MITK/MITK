@@ -39,7 +39,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkDataObject.h>
 
 #include <itkDiscreteGaussianImageFilter.h>
-                    
+#include <itkConnectedComponentImageFilter.h>
+#include <itkRelabelComponentImageFilter.h>
+#include <itkThresholdLabelerImageFilter.h>
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryErodeImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
@@ -92,11 +94,15 @@ public:
 protected:
 
   typedef itk::Image<short, 3>          CTImage;
-  typedef itk::Image<unsigned char, 3 > BinImage;
-
   typedef itk::ImageRegionIterator< CTImage  > CTIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< CTImage  > CTIteratorIndexType;
+  
+  typedef itk::Image<unsigned char, 3 > BinImage;
   typedef itk::ImageRegionIterator< BinImage > BinIteratorType;
+  typedef itk::ImageRegionIteratorWithIndex< BinImage > BinIteratorIndexType;
+
+  typedef itk::Image<unsigned short, 3 > LabelImage;
+  typedef itk::ImageRegionIterator< LabelImage > LabelIteratorType;
 
 
   VolumeVisualizationImagePreprocessor();
@@ -109,7 +115,12 @@ protected:
     BinImage::Pointer dilated,
     BinImage::Pointer eroded );
 
+
+  void DetermineBoundingBox( BinImage::Pointer mask );
+
   CTImage::Pointer Crop(CTImage::Pointer src );
+  BinImage::Pointer Crop(BinImage::Pointer src );
+
 
 
 
@@ -117,6 +128,10 @@ protected:
   BinImage::Pointer Dilate(BinImage::Pointer src);
   BinImage::Pointer Erode(BinImage::Pointer src);
   CTImage::Pointer Gaussian(CTImage::Pointer src);
+  LabelImage::Pointer ConnectComponents(BinImage::Pointer src);
+  LabelImage::Pointer RelabelComponents(LabelImage::Pointer src);
+  BinImage::Pointer Threshold(CTImage::Pointer src, int threshold);
+
 
 
 
@@ -129,8 +144,13 @@ protected:
   // average of all grayvalues located on the liver surface 
   double m_realSurfaceValue;
 
+  double m_realInLiverValue;
+  
   //estimated treshold value 
   double m_EstimatedThreshold;
+  
+  double m_GreatestStructureThreshold;
+
 
   //minimum treshold value 
   double m_MinThreshold;
@@ -148,6 +168,14 @@ protected:
 
   int m_LastUsedTreshold;
   
+  int histogramm[65536];
+  int total;
+
+  
+  int GetHistogrammValueFromTop( double part );
+  int GetHistogrammValueFromBottom( double part );
+  
+
 };
 
 

@@ -67,6 +67,14 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   for (prefPagesIt = prefPages.begin(); prefPagesIt != prefPages.end(); ++prefPagesIt)
   {
     keywords.clear();
+    id.clear();
+    name.clear();
+    className.clear();
+    category.clear();
+    keywordRefId.clear();
+    keywordId.clear();
+    keywordLabels.clear();
+
     if((*prefPagesIt)->GetAttribute("id", id)
       && (*prefPagesIt)->GetAttribute("name", name)
       && (*prefPagesIt)->GetAttribute("class", className))

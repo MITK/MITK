@@ -42,8 +42,6 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
 
   MITK_TEST_CONDITION(recorder->GetInputs().size() == 0, "testing initial number of inputs"); 
   MITK_TEST_CONDITION(recorder->GetOutputs().size() == 0, "testing initial number of outputs");
-  
-  std::vector<mitk::NavigationData::Pointer> naviDatas;
 
   mitk::NavigationData::Pointer naviData = mitk::NavigationData::New();
   recorder->AddNavigationData( naviData );

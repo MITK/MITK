@@ -3016,80 +3016,106 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="SeedpointCorrection">
+ <stateMachine NAME="SeedpointCorrection">
     <state NAME="position check" ID="0" START_STATE="TRUE" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="nothing found" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="48008" />
+        <action ID="48008"/>
       </transition>
       <transition NAME="inside" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="31" />
-        <transition NAME="check position" NEXT_STATE_ID="0" EVENT_ID="520">
-          <action ID="5000" />
-        </transition>
-        <transition NAME="check position 2" NEXT_STATE_ID="0" EVENT_ID="530">
-          <action ID="5000" />
-        </transition>
-        <transition NAME="change BoundingBox" NEXT_STATE_ID="3" EVENT_ID="1013">
-          <action ID="65" />
-        </transition>
+        <action ID="31"/>
+      <transition NAME="check position" NEXT_STATE_ID="0" EVENT_ID="520">
+        <action ID="5000"/>
+      </transition>
+       <transition NAME="check position 2" NEXT_STATE_ID="0" EVENT_ID="530">
+        <action ID="5000"/>
+      </transition>
+      <transition NAME="change BoundingBox" NEXT_STATE_ID="3" EVENT_ID="1013">
+        <action ID="65"/>
+      </transition>
       </transition>
     </state>
     <state NAME="edit seedpoints" ID="1" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="back to start" NEXT_STATE_ID="0" EVENT_ID="520">
-        <action ID="12" />
+        <action ID="12"/>
       </transition>
       <transition NAME="initialize correction" NEXT_STATE_ID="2" EVENT_ID="530">
-        <action ID="5001" />
+        <action ID="5001"/>
       </transition>
     </state>
     <state NAME="correct segmentation" ID="2" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="draw contour" NEXT_STATE_ID="2" EVENT_ID="530">
-        <action ID="92" />
+        <action ID="92"/>
       </transition>
       <transition NAME="calculate result" NEXT_STATE_ID="0" EVENT_ID="505">
-        <action ID="5002" />
+        <action ID="5002"/>
       </transition>
     </state>
     <state NAME="init BoundingBox Resizing" ID="3" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="back to start 2" NEXT_STATE_ID="0" EVENT_ID="520">
-        <action ID="5000" />
+        <action ID="5000"/>
       </transition>
       <transition NAME="add boundingboxinteractor" NEXT_STATE_ID="4" EVENT_ID="1">
-        <action ID="5003" />
+        <action ID="5003"/>
       </transition>
     </state>
     <state NAME="BoundingBox Resizing" ID="4" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
       <transition NAME="calculate result 2" NEXT_STATE_ID="0" EVENT_ID="23">
-        <action ID="5004" />
+        <action ID="5004"/>
       </transition>
     </state>
-  </stateMachine>
+      </stateMachine>
   <stateMachine NAME="BoundingBox Interaction">
-    <state NAME="position check" ID="0" START_STATE="TRUE" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
-      <transition NAME="nothing found" NEXT_STATE_ID="0" EVENT_ID="1003">
-        <action ID="0" />
+    <state NAME="position check" ID="0"  START_STATE="TRUE" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="test" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="5000"/>
       </transition>
-      <transition NAME="init resizing" NEXT_STATE_ID="1" EVENT_ID="1004">
-        <action ID="8" />
-      </transition>
-      <transition NAME="position check" NEXT_STATE_ID="0" EVENT_ID="530">
-        <action ID="5000" />
-      </transition>
+      <transition NAME="test" NEXT_STATE_ID="3" EVENT_ID="520">
+        <action ID="5000"/>
+      </transition>  
     </state>
     <state NAME="boundingbox resizing initialization" ID="1" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
-      <transition NAME="init resizing" NEXT_STATE_ID="2" EVENT_ID="530">
-        <action ID="8" />
+      <transition NAME="nothing found" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="47"/>
+      </transition>
+      <transition NAME="something found" NEXT_STATE_ID="2" EVENT_ID="1004">
+        <action ID="94"/>
+        <action ID="110"/>
       </transition>
     </state>
-    <state NAME="boundingbox resizing" ID="2" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
-      <transition NAME="resizing" NEXT_STATE_ID="2" EVENT_ID="530">
-        <action ID="92" />
+    <state NAME="teststate" ID="2" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="test 2" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="11"/>
       </transition>
-      <transition NAME="back to position check" NEXT_STATE_ID="0" EVENT_ID="1">
-        <action ID="102" />
+      <transition NAME="test 3" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="5"/>
+      </transition>
+      <transition NAME="test 9" NEXT_STATE_ID="4" EVENT_ID="1003">
+        <action ID="0"/>
       </transition>
     </state>
-  </stateMachine>
+    <state NAME="teststate 2" ID="3" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="test 4" NEXT_STATE_ID="3" EVENT_ID="1004">
+        <action ID="94"/>
+      </transition>
+      <transition NAME="test 5" NEXT_STATE_ID="0" EVENT_ID="520">
+        <action ID="5000"/>
+      </transition>
+      <transition NAME="test 6" NEXT_STATE_ID="0" EVENT_ID="1003">
+        <action ID="47"/>
+      </transition>
+      <transition NAME="test 7" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="5000"/>
+      </transition>
+    </state>
+        <state NAME="teststate 2" ID="4" X_POS="18" Y_POS="336" WIDTH="197" HEIGHT="50">
+      <transition NAME="test 8" NEXT_STATE_ID="4" EVENT_ID="530">
+        <action ID="0"/>
+      </transition>
+      <transition NAME="test 9" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="0"/>
+      </transition>
+    </state>
+    </stateMachine>
   <stateMachine NAME="ToolWithWheelInteraction">
     <state NAME="ToolIdle" ID="1" START_STATE="TRUE" X_POS="167" Y_POS="365" WIDTH="100" HEIGHT="50">
       <transition NAME="MouseWheel" EVENT_ID="9" NEXT_STATE_ID="1">

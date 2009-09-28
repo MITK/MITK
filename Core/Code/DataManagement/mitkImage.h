@@ -292,6 +292,7 @@ public:
   {
     if(itkimage==NULL) return;
 
+    LOG_DEBUG << "Initializing MITK image from ITK image.";
     // build array with dimensions in each direction with at least 4 entries
     m_Dimension=itkimage->GetImageDimension();
     unsigned int i, *tmpDimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
@@ -318,6 +319,7 @@ public:
       channels);
     const typename itkImageType::SpacingType & itkspacing = itkimage->GetSpacing();  
 
+    LOG_DEBUG << "ITK spacing " << itkspacing;
     // access spacing of itk::Image
     Vector3D spacing;
     FillVector3D(spacing, itkspacing[0], 1.0, 1.0);
@@ -329,6 +331,7 @@ public:
     // access origin of itk::Image
     Point3D origin;
     const typename itkImageType::PointType & itkorigin = itkimage->GetOrigin();  
+    LOG_DEBUG << "ITK origin " << itkorigin;
     FillVector3D(origin, itkorigin[0], 0.0, 0.0);
     if(m_Dimension>=2)
       origin[1]=itkorigin[1];
@@ -337,6 +340,7 @@ public:
 
     // access direction of itk::Image and include spacing
     const typename itkImageType::DirectionType & itkdirection = itkimage->GetDirection();  
+    LOG_DEBUG << "ITK direction " << itkdirection;
     mitk::Matrix3D matrix;
     matrix.SetIdentity();
     unsigned int j, itkDimMax3 = (m_Dimension >= 3? 3 : m_Dimension);
@@ -356,13 +360,13 @@ public:
       }
       if(spacing[j] < mitk::eps)
       {
-        itkWarningMacro(<< "Illegal value of itk::Image::GetSpacing()[" << j <<"]=" << spacing[j] << ". Using 1.0 instead.");
+        LOG_ERROR << "Illegal value of itk::Image::GetSpacing()[" << j <<"]=" << spacing[j] << ". Using 1.0 instead.";
         spacing[j] = 1.0;
       }
     }
     if(itkdirectionOk == false)
     {
-      itkWarningMacro(<< "Illegal matrix returned by itk::Image::GetDirection():" << itkdirection << " Using identity instead.");
+      LOG_ERROR << "Illegal matrix returned by itk::Image::GetDirection():" << itkdirection << " Using identity instead.";
       for ( i=0; i < itkDimMax3; ++i)
         for( j=0; j < itkDimMax3; ++j )
           if ( i == j )

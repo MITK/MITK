@@ -93,6 +93,9 @@ namespace mbilog {
       static void FormatSmart(const LogMessage &l,int threadID=0);
       static void FormatFull(const LogMessage &l,int threadID=0);
 
+      static void FormatSmart(std::ostream &out, const LogMessage &l,int threadID=0);
+      static void FormatFull(std::ostream &out, const LogMessage &l,int threadID=0);
+
     private:
 
       bool useFullOutput;

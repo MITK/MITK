@@ -80,8 +80,8 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
 
 void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
 {
-  char *c_open="[";
-  char *c_close="]";
+  char c_open='[';
+  char c_close=']';
   
 
   switch(l.level)
@@ -90,23 +90,23 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       break;
 
     case mbilog::Warn:
-      c_open="!";
-      c_close="!";
+      c_open='!';
+      c_close='!';
       break;
 
     case mbilog::Error:
-      c_open="-";
-      c_close="-";
+      c_open='-';
+      c_close='-';
       break;
 
     case mbilog::Fatal:
-      c_open="*";
-      c_close="*";
+      c_open='*';
+      c_close='*';
       break;
 
     case mbilog::Debug:
-      c_open="(";
-      c_close=")";
+      c_open='(';
+      c_close=')';
       break;
   }
 

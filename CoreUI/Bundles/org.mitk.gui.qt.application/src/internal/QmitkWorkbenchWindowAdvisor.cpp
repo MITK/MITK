@@ -79,6 +79,8 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* fileMenu = menuBar->addMenu("&File");
 
   fileMenu->addAction(new QmitkFileOpenAction(window));
+  fileMenu->addSeparator();
+  fileMenu->addAction("&Quit", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onQuit()));
 
   cherry::IViewRegistry* viewRegistry = cherry::PlatformUI::GetWorkbench()->GetViewRegistry();
   const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
@@ -183,4 +185,9 @@ void QmitkWorkbenchWindowAdvisorHelperHack::onEditPreferences()
 {
   QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
   _PreferencesDialog.exec();
+}
+
+void QmitkWorkbenchWindowAdvisorHelperHack::onQuit()
+{
+  cherry::PlatformUI::GetWorkbench()->Close();
 }

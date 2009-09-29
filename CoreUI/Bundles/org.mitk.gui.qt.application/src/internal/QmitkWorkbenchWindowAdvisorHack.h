@@ -11,6 +11,8 @@ class QmitkWorkbenchWindowAdvisorHelperHack : public QObject
     void onUndo();
     void onRedo();
     void onEditPreferences();
+    void onQuit();
+
   public:
 
     QmitkWorkbenchWindowAdvisorHelperHack();

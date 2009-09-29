@@ -16,50 +16,54 @@
  =========================================================================*/
 
 
-#ifndef CHERRYPAGESELECTIONSERVICE_H_
-#define CHERRYPAGESELECTIONSERVICE_H_
+#ifndef CHERRYWINDOWSELECTIONSERVICE_H_
+#define CHERRYWINDOWSELECTIONSERVICE_H_
 
 #include "cherryAbstractSelectionService.h"
 
 namespace cherry {
 
-struct IWorkbenchPage;
+struct IWorkbenchWindow;
 
 /**
- * The selection service for a page.
+ * The selection service for a window.
  */
-class PageSelectionService : public AbstractSelectionService
-{
+/* package */
+class WindowSelectionService : public AbstractSelectionService {
 
 private:
 
-  SmartPointer<IWorkbenchPage> page;
-
-  /**
-   * Sets the page.
-   */
-  void SetPage(SmartPointer<IWorkbenchPage> page);
-
-public:
-
     /**
-     * Creates a new selection service for a specific workbench page.
+     * The window.
      */
-    PageSelectionService(SmartPointer<IWorkbenchPage> page);
+    SmartPointer<IWorkbenchWindow> window;
+
+     /**
+     * Sets the window.
+     */
+    void SetWindow(SmartPointer<IWorkbenchWindow> window);
 
 protected:
 
     /**
-     * Returns the page.
+     * Returns the window.
      */
-    SmartPointer<IWorkbenchPage> GetPage() const;
+    SmartPointer<IWorkbenchWindow> GetWindow() const;
 
     /*
-     * @see AbstractSelectionService#CreatePartTracker(const std::string&)
+     * @see AbstractSelectionService#createPartTracker(String)
      */
     AbstractPartSelectionTracker::Pointer CreatePartTracker(const std::string& partId) const;
+
+public:
+
+    /**
+     * Creates a new selection service for the given window.
+     */
+    WindowSelectionService(SmartPointer<IWorkbenchWindow> window);
+
 };
 
 }
 
-#endif /* CHERRYPAGESELECTIONSERVICE_H_ */
+#endif /* CHERRYWINDOWSELECTIONSERVICE_H_ */

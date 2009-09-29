@@ -15,34 +15,36 @@
  
  =========================================================================*/
 
-#include "cherryPageSelectionService.h"
-#include "cherryPagePartSelectionTracker.h"
+#include "cherryWindowSelectionService.h"
 
-#include "../cherryIWorkbenchPage.h"
+#include "cherryWindowPartSelectionTracker.h"
+#include "../cherryIWorkbenchWindow.h"
 
 namespace cherry
 {
 
-void PageSelectionService::SetPage(SmartPointer<IWorkbenchPage> page)
+void WindowSelectionService::SetWindow(SmartPointer<IWorkbenchWindow> window)
 {
-  this->page = page;
+  this->window = window;
 }
 
-PageSelectionService::PageSelectionService(SmartPointer<IWorkbenchPage> page)
+SmartPointer<IWorkbenchWindow> WindowSelectionService::GetWindow() const
 {
-  SetPage(page);
+  return window;
 }
 
-SmartPointer<IWorkbenchPage> PageSelectionService::GetPage() const
-{
-  return page;
-}
-
-AbstractPartSelectionTracker::Pointer PageSelectionService::CreatePartTracker(
+AbstractPartSelectionTracker::Pointer WindowSelectionService::CreatePartTracker(
     const std::string& partId) const
 {
-  AbstractPartSelectionTracker::Pointer tracker(new PagePartSelectionTracker(GetPage(), partId));
+  AbstractPartSelectionTracker::Pointer tracker(new WindowPartSelectionTracker(
+      GetWindow(), partId));
   return tracker;
+}
+
+WindowSelectionService::WindowSelectionService(
+    SmartPointer<IWorkbenchWindow> window)
+{
+  SetWindow(window);
 }
 
 }

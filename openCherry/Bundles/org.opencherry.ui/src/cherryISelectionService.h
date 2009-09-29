@@ -57,7 +57,7 @@ struct CHERRY_UI ISelectionService {
 
   virtual ~ISelectionService() {}
 
-  virtual SelectionEvents& GetSelectionEvents(const std::string& partId = "") = 0;
+  //virtual SelectionEvents& GetSelectionEvents(const std::string& partId = "") = 0;
 
   /**
    * Adds the given selection listener.

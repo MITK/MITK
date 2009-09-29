@@ -27,6 +27,7 @@
 #include "internal/cherryWorkbenchWindowConfigurer.h"
 #include "internal/cherryShellPool.h"
 #include "internal/cherryServiceLocator.h"
+#include "internal/cherryWWinPartService.h"
 
 #include "application/cherryWorkbenchAdvisor.h"
 #include "application/cherryWorkbenchWindowAdvisor.h"
@@ -318,6 +319,8 @@ private:
   bool asMaximizedState;
 
   IPerspectiveListener::Events perspectiveEvents;
+
+  WWinPartService partService;
 
   struct ServiceLocatorOwner: public IDisposable
   {

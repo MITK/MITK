@@ -36,8 +36,6 @@ public:
   PartService(const std::string& debugListenersKey,
       const std::string& debugListeners2Key);
 
-  IPartListener::Events& GetPartEvents();
-
   /*
    * (non-Javadoc)
    * Method declared on IPartService

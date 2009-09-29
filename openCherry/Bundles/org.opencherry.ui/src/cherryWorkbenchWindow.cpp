@@ -51,6 +51,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
       updateDisabled(true), emptyWindowContentsCreated(false),
       emptyWindowContents(0),
       asMaximizedState(false),
+      partService(IWorkbenchWindow::Pointer(this)),
       serviceLocatorOwner(new ServiceLocatorOwner(this))
 {
   this->Register(); // increase the reference count to avoid deleting
@@ -138,6 +139,7 @@ bool WorkbenchWindow::ClosePage(IWorkbenchPage::Pointer in, bool save)
 
   // Close old page.
   pageList.Remove(oldPage);
+  partService.PageClosed(oldPage);
   //this->FirePageClosed(oldPage);
   //oldPage->Dispose();
 
@@ -573,6 +575,7 @@ void WorkbenchWindow::CloseAllPages()
   // Close all.
   for (PageList::iterator itr = oldList.Begin(); itr != oldList.End(); ++itr)
   {
+    partService.PageClosed(*itr);
     //(*itr)->FirePageClosed(page);
     //page.dispose();
   }
@@ -594,12 +597,12 @@ IWorkbench* WorkbenchWindow::GetWorkbench()
 
 IPartService* WorkbenchWindow::GetPartService()
 {
-  return this->GetActivePage().GetPointer();
+  return &partService;
 }
 
 ISelectionService* WorkbenchWindow::GetSelectionService()
 {
-  return this->GetActivePage().GetPointer();
+  return partService.GetSelectionService();
 }
 
 bool WorkbenchWindow::IsClosing()
@@ -1020,6 +1023,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
 //      StartupThreading.runWithoutExceptions(new StartupRunnable() {
 //
 //        public void runWithException() throws Throwable {
+      partService.PageOpened(newPage);
 //          firePageOpened(newPage[0]);
 //        }});
 
@@ -1056,6 +1060,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
 
       //  public void runWithException() throws Throwable {
       //    firePageOpened(newPage[0]);
+      partService.PageOpened(newPage);
       //  }});
       }
     }
@@ -1153,6 +1158,7 @@ IWorkbenchPage::Pointer WorkbenchWindow::BusyOpenPage(
     newPage = new WorkbenchPage(this, perspID, input);
     pageList.Add(newPage);
     //this->FirePageOpened(newPage);
+    partService.PageOpened(newPage);
     this->SetActivePage(newPage);
   }
   else
@@ -1215,6 +1221,7 @@ void WorkbenchWindow::SetActivePage(IWorkbenchPage::Pointer in)
     this->HideEmptyWindowContents();
     newPage->OnActivate();
     //this->FirePageActivated(newPage);
+    partService.PageActivated(newPage);
     //TODO perspective
     if (newPage->GetPerspective() != 0)
     {

@@ -42,15 +42,6 @@ struct CHERRY_UI IPartService {
   virtual ~IPartService() {}
 
   /**
-   * Returns the PartEvents object containing all possible events.
-   * This is used to register for individual events, instead of
-   * adding a whole class implementing IPartObserver.
-   *
-   * @return the PartEvents object containing all possible events
-   */
-  virtual IPartListener::Events& GetPartEvents() = 0;
-
-  /**
    * Adds the given observer for part lifecycle events.
    * Has no effect if an identical listener is already registered.
    * <p>

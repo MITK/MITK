@@ -108,6 +108,8 @@ SET(SRC_CPP_FILES
 
 
 SET(INTERNAL_CPP_FILES
+  cherryAbstractPartSelectionTracker.cpp
+  cherryAbstractSelectionService.cpp
   cherryBundleUtility.cpp
   cherryContainerPlaceholder.cpp
   cherryDetachedPlaceHolder.cpp
@@ -171,6 +173,8 @@ SET(INTERNAL_CPP_FILES
   cherryViewSite.cpp
   cherryWorkbenchPage.cpp
   cherryWindowManager.cpp
+  cherryWindowPartSelectionTracker.cpp
+  cherryWindowSelectionService.cpp
   cherryWorkbench.cpp
   cherryWorkbenchConfigurer.cpp
   cherryWorkbenchConstants.cpp
@@ -181,6 +185,7 @@ SET(INTERNAL_CPP_FILES
   cherryWorkbenchServiceRegistry.cpp
   cherryWorkbenchTestable.cpp
   cherryWorkbenchWindowConfigurer.cpp
+  cherryWWinPartService.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

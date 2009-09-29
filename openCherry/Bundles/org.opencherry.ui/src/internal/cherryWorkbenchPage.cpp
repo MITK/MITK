@@ -2074,10 +2074,10 @@ ISelection::ConstPointer WorkbenchPage::GetSelection(const std::string& partId)
   return selectionService->GetSelection(partId);
 }
 
-ISelectionService::SelectionEvents& WorkbenchPage::GetSelectionEvents(const std::string& partId)
-{
-  return selectionService->GetSelectionEvents(partId);
-}
+//ISelectionService::SelectionEvents& WorkbenchPage::GetSelectionEvents(const std::string& partId)
+//{
+//  return selectionService->GetSelectionEvents(partId);
+//}
 
 ViewFactory* WorkbenchPage::GetViewFactory()
 {
@@ -3572,11 +3572,6 @@ void WorkbenchPage::SetPerspective(IPerspectiveDescriptor::Pointer desc)
 
   if (exceptionOccured)
   throw exc;
-}
-
-IPartListener::Events& WorkbenchPage::GetPartEvents()
-{
-  return partList->GetPartService()->GetPartEvents();
 }
 
 PartService* WorkbenchPage::GetPartService()

@@ -70,6 +70,7 @@ protected:
   friend class ViewFactory;
   friend class WorkbenchWindow;
   friend class EditorAreaHelper;
+  friend class WWinPartService;
 
 private:
 
@@ -910,8 +911,8 @@ public:
 public:
   ISelection::ConstPointer GetSelection(const std::string& partId);
 
-public:
-  SelectionEvents& GetSelectionEvents(const std::string& partId = "");
+//public:
+//  SelectionEvents& GetSelectionEvents(const std::string& partId = "");
 
   /*
    * Returns the view factory.
@@ -1299,15 +1300,6 @@ private:
    */
 public:
   void SetPerspective(IPerspectiveDescriptor::Pointer desc);
-
-  /**
-   * Can be used to get hold of a IPartListener::Events object
-   * and register for individual part events.
-   *
-   * @return the part events for this page.
-   */
-public:
-  IPartListener::Events& GetPartEvents();
 
   /**
    * Restore the toolbar layout for the active perspective.

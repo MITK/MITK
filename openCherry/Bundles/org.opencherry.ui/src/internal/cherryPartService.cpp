@@ -22,11 +22,6 @@ void PartService::FirePartDeactivated(IWorkbenchPartReference::Pointer ref)
   partEvents.partDeactivated(ref);
 }
 
-IPartListener::Events& PartService::GetPartEvents()
-{
-  return partEvents;
-}
-
 PartService::PartService(const std::string& debugListenersKey,
     const std::string& debugListeners2Key)
 {

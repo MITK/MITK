@@ -78,11 +78,10 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
     FormatSmart(l);
 }
 
-void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
+void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int threadID)
 {
   char c_open='[';
   char c_close=']';
-  
 
   switch(l.level)
   {
@@ -110,27 +109,26 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       break;
   }
 
-  std::cout << c_open << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC;
-
+  out << c_open << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC;
 /*
   if(threadID)
   {
-    std::cout << ":" << std::hex << threadID;
+    out << ":" << std::hex << threadID;
   }
 
   if(!l.category.empty())
   {
-    std::cout << ":" << l.category;
+    out << ":" << l.category;
   }
   else
   {
     if(NA_STRING != l.moduleName)
     {
-      std::cout << ":" << std::string(l.moduleName);
+      out << ":" << std::string(l.moduleName);
     }
   }
    */
-  std::cout << c_close << " ";
+  out << c_close << " ";
   
   switch(l.level)
   {
@@ -138,70 +136,81 @@ void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
       break;
 
     case mbilog::Warn:
-      std::cout << "WARNING: ";
+      out << "WARNING: ";
       break;
 
     case mbilog::Error:
-      std::cout << "ERROR: ";
+      out << "ERROR: ";
       break;
 
     case mbilog::Fatal:
-      std::cout << "FATAL: ";
+      out << "FATAL: ";
       break;
 
     case mbilog::Debug:
-      std::cout << "DEBUG: ";
+      out << "DEBUG: ";
       break;
   }
 
-  std::cout << l.message << std::endl;
+  out << l.message << std::endl;
+}
+
+void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int threadID)
+{
+  switch(l.level)
+  {
+    case mbilog::Info:
+      out << "INFO";
+      break;
+
+    case mbilog::Warn:
+      out << "WARN";
+      break;
+
+    case mbilog::Error:
+      out << "ERROR";
+      break;
+
+    case mbilog::Fatal:
+      out << "FATAL";
+      break;
+
+    case mbilog::Debug:
+      out << "DEBUG";
+      break;
+  }
+
+  out << std::setprecision(3) << ":" << ((double)std::clock())/CLOCKS_PER_SEC;
+
+  out << "|" << std::string(l.filePath) << "(" << l.lineNumber << ")";
+
+  out << "|" << std::string(l.functionName);
+
+  //if(threadID)
+  {
+    out << "|" << std::hex << threadID;
+  }
+
+  //if(NA_STRING != l.moduleName)
+  {
+    out << "|" << std::string(l.moduleName);
+  }
+
+  //if(!l.category.empty())
+  {
+    out << "|" << l.category;
+  }
+
+
+  out << "\n" << l.message << std::endl;
+}
+
+void mbilog::BackendCout::FormatSmart(const LogMessage &l,int threadID)
+{
+  mbilog::BackendCout::FormatSmart(std::cout,l,threadID);
 }
 
 void mbilog::BackendCout::FormatFull(const LogMessage &l,int threadID)
 {
-  std::cout << std::string(l.filePath) << "(" << l.lineNumber << ")";
-
-  std::cout << " func '" << std::string(l.functionName) << "'";
-
-  if(threadID)
-  {
-    std::cout << " thread " << std::hex << threadID;
-  }
-
-  if(NA_STRING != l.moduleName)
-  {
-    std::cout << " module '" << std::string(l.moduleName) << "'";
-  }
-
-  if(!l.category.empty())
-  {
-    std::cout << " category '" << l.category << "'";
-  }
-
-  std::cout << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << "s\n";
-
-  switch(l.level)
-  {
-    case mbilog::Info:
-      std::cout << "INFO: ";
-      break;
-
-    case mbilog::Warn:
-      std::cout << "WARN: ";
-      break;
-
-    case mbilog::Error:
-      std::cout << "ERROR: ";
-      break;
-
-    case mbilog::Fatal:
-      std::cout << "FATAL: ";
-      break;
-
-    case mbilog::Debug:
-      std::cout << "DEBUG: ";
-      break;
-  }
-
-  std::cout << l.message << std::endl;
+  mbilog::BackendCout::FormatFull(std::cout,l,threadID);
 }

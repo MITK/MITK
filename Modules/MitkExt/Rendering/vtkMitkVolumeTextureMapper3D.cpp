@@ -79,8 +79,13 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   int   inputDimensions[3];
   double inputSpacing[3];
   vtkImageData *input = me->GetInput();
+
+  GPU_LOG << input->GetMTime();
+
   input->GetDimensions( inputDimensions );
   input->GetSpacing( inputSpacing );
+
+  GPU_LOG << input->GetMTime();
 
   int   outputDimensions[3];
   float outputSpacing[3];
@@ -88,6 +93,9 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   me->GetVolumeSpacing( outputSpacing );
 
   int components = input->GetNumberOfScalarComponents();
+
+  GPU_LOG << input->GetMTime();
+
 
   double wx, wy, wz;
   double fx, fy, fz;
@@ -108,6 +116,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
     inPtr = dataPtr;
     if ( components == 1 )
       {
+      GPU_LOG << "copying 1 component to volume1";
       outPtr = volume1;
       if ( scale == 1.0 )
         {
@@ -130,6 +139,8 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
       }
     else if ( components == 2 )
       {
+      GPU_LOG << "copying 2 component to volume1";
+
       outPtr = volume1;
       if ( scale == 1.0 )
         {
@@ -160,6 +171,8 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
       }
     else if ( components == 4 )
       {
+      GPU_LOG << "copying 4 component to volume1/2";
+
       outPtr = volume1;
       outPtr2 = volume2;
       if ( scale == 1.0 )
@@ -199,6 +212,9 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   // The sizes are different and interpolation is required
   else
     {
+      GPU_LOG << "interpolating";
+
+    
     outPtr  = volume1;
     outPtr2 = volume2;
  
@@ -396,6 +412,11 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
         }
       }
     }
+
+
+             
+  GPU_LOG << input->GetMTime();
+
 }
 
 
@@ -431,12 +452,18 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
 
 //  me->InvokeEvent( vtkEvent::VolumeMapperComputeGradientsStartEvent, NULL );
 
+
   float outputSpacing[3];
   me->GetVolumeSpacing( outputSpacing );
 
   double spacing[3];
   vtkImageData *input = me->GetInput();
+
+  GPU_LOG << input->GetMTime();
+
   input->GetSpacing( spacing );
+
+  GPU_LOG << input->GetMTime();
 
   double sampleRate[3];
   sampleRate[0] = outputSpacing[0] / static_cast<double>(spacing[0]);
@@ -486,6 +513,8 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
   x_limit = (x_limit>dim[0])?(outputDim[0]):(x_limit);
   y_limit = (y_limit>dim[1])?(outputDim[1]):(y_limit);
   z_limit = (z_limit>dim[2])?(outputDim[2]):(z_limit);
+
+  GPU_LOG << input->GetMTime();
 
 
   if ( components == 1 || components == 2 )
@@ -642,6 +671,9 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
 //      }
     }
 //  me->InvokeEvent( vtkEvent::VolumeMapperComputeGradientsEndEvent, NULL );
+
+
+  GPU_LOG << input->GetMTime();
 }
 
 
@@ -1061,7 +1093,6 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
     }
  
   this->SavedTextureInput = input;
-  this->SavedTextureMTime.Modified();
 
   // How big does the Volume need to be?
   int dim[3];
@@ -1080,12 +1111,12 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
     
      for ( int i = 0; i < 3; i++ )
        {
-       powerOfTwoDim[i]=dim[i];
+       powerOfTwoDim[i]=(dim[i]+3)&~3;
        }
     
   
     
-      powerOfTwoDim[0] = 32; while ( powerOfTwoDim[0] < dim[0] ) powerOfTwoDim[0] *= 2;
+  //    powerOfTwoDim[0] = 32; while ( powerOfTwoDim[0] < dim[0] ) powerOfTwoDim[0] *= 2;
   //    powerOfTwoDim[1] = 32; while ( powerOfTwoDim[1] < dim[1] ) powerOfTwoDim[1] *= 2;
  //     powerOfTwoDim[2] = 32; while ( powerOfTwoDim[2] < dim[2] ) powerOfTwoDim[2] *= 2;
     
@@ -1132,6 +1163,8 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   // What is the spacing?
   double spacing[3];
   input->GetSpacing(spacing);
+
+  GPU_LOG << input->GetMTime();
  
   // Is it the right size? If not, allocate it.
   if ( this->VolumeSize != neededSize ||
@@ -1241,6 +1274,10 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
         this->Volume2,
         this->Volume3));
     }
+
+  GPU_LOG << input->GetMTime();
+
+  this->SavedTextureMTime.Modified();
 
   return 1;
 }

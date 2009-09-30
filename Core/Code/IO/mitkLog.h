@@ -36,6 +36,7 @@ namespace mitk
       static void Register();
       static LogBackend *GetBackend();
       static void Unregister();
+      static void SetLogFile(char *file);
       
   };
   

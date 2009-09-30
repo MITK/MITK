@@ -66,8 +66,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #define GPU_LOG LOG_INFO(false)("VR")
 
-
-
 const mitk::Image* mitk::GPUVolumeMapper3D::GetInput()
 {
   return static_cast<const mitk::Image*> ( GetData() );
@@ -77,7 +75,6 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
 {
   GPU_LOG << "Instantiating GPUVolumeMapper3D";
   
-
   m_T2DMapper =  vtkMitkOpenGLVolumeTextureMapper3D::New();
   m_T2DMapper->SetUseCompressedTexture(true);
   m_T2DMapper->SetPreferredMethodToFragmentProgram();
@@ -86,9 +83,9 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
   m_VolumePropertyLow = vtkVolumeProperty::New();
 
   m_VolumePropertyLow->ShadeOn();
-  m_VolumePropertyLow->SetAmbient(0.1f);
-  m_VolumePropertyLow->SetDiffuse(0.7f);
-  m_VolumePropertyLow->SetSpecular(0.2f);
+  m_VolumePropertyLow->SetAmbient(0.2f);
+  m_VolumePropertyLow->SetDiffuse(0.5f);
+  m_VolumePropertyLow->SetSpecular(0.3f);
   m_VolumePropertyLow->SetSpecularPower(10.0f);
   m_VolumePropertyLow->SetInterpolationTypeToLinear();
     
@@ -129,11 +126,9 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
   GPU_LOG << "GenerateData";
   
-
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   
   GPU_LOG << "mitk image mtime: " << input->GetMTime();
-  
   
   if ( !input || !input->IsInitialized() )
     return;
@@ -180,7 +175,7 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 
    m_UnitSpacingImageFilter->SetInput( inputData );
               
-  UpdateTransferFunctions( renderer );
+   UpdateTransferFunctions( renderer );
 }
 
 

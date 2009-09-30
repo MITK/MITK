@@ -19,7 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkSimpleFastMutexLock.h"
 
+#include <iostream>
+#include <fstream>
+
 static itk::SimpleFastMutexLock logMutex;
+static std::ofstream *logFile = 0;
 
 void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
 {
@@ -29,6 +33,16 @@ void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
   #else
     mbilog::BackendCout::FormatSmart( l );
   #endif
+  
+  if(logFile)
+  {
+    #ifdef _WIN32
+      mbilog::BackendCout::FormatFull( *logFile, l, (int)GetCurrentThreadId() );
+    #else
+      mbilog::BackendCout::FormatFull( *logFile, l );
+    #endif
+  }
+  
   logMutex.Unlock();
 }
 
@@ -44,6 +58,7 @@ void mitk::LogBackend::Unregister()
 {
   if(mitkLogBackend)
   {
+    SetLogFile(0);
     mbilog::UnregisterBackend( mitkLogBackend );
     delete mitkLogBackend;
     mitkLogBackend=0;
@@ -53,6 +68,23 @@ void mitk::LogBackend::Unregister()
 mitk::LogBackend *mitk::LogBackend::GetBackend()
 {
   return mitkLogBackend;
+}
+
+
+void mitk::LogBackend::SetLogFile(char *file)
+{
+  logMutex.Lock();
+  if(logFile)
+  {
+    logFile->close();
+    delete logFile;
+    logFile = 0;
+  }
+  if(file)
+  {
+    logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::trunc  );
+  }
+  logMutex.Unlock();
 }
 
 

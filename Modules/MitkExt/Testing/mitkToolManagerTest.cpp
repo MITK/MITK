@@ -14,53 +14,80 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
+#include "mitkTestingMacros.h"
 #include "mitkToolManager.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkCoreObjectFactory.h"
+#include <mitkAddContourToolFactory.h>
+#include "mitkAddContourTool.h"
 
-/// ctest entry point
-int mitkToolManagerTest(int /*argc*/, char* /*argv*/[])
+class mitkToolManagerTestClass { public:
+
+static void TestToolManagerWithOutTools(mitk::ToolManager::Pointer toolManager)
 {
-  // one big variable to tell if anything went wrong
-    unsigned int numberFailed(0);
- 
-    std::cout << "Creating CoreObjectFactory" << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-
-    std::cout << "Instantiation" << std::endl;
-
-  // instantiation
-    mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
-    mitk::ToolManager::Pointer filter = mitk::ToolManager::New(dataStorage.GetPointer());
-    if (filter.IsNotNull())
-    {
-      std::cout << "  (II) Instantiation works." << std::endl;
-    }
-    else
-    {
-      ++numberFailed;
-      std::cout << numberFailed << " test failed, and it's the ugliest one!" << std::endl;
-      return EXIT_FAILURE;
-    }
-  
-    std::cout << "Object destruction" << std::endl;
-
-  // freeing
-    filter = NULL;
-      
-    std::cout << "  (II) Freeing works." << std::endl;
-
-    if (numberFailed > 0)
-    {
-      std::cout << numberFailed << " tests failed." << std::endl;
-      return EXIT_FAILURE;
-    }
-    else
-    {
-      std::cout << "PASSED all tests." << std::endl;
-      return EXIT_SUCCESS;
-    }
+  MITK_TEST_CONDITION( toolManager->GetTools().size() == 0, "Get empty tool list" )   
+  MITK_TEST_CONDITION( toolManager->GetToolById(0) == NULL, "Get empty tool by id" )
+  MITK_TEST_CONDITION( toolManager->ActivateTool(0) == false, "Activate not existant tool" )
 }
 
+static void TestToolManagerWithTools(mitk::ToolManager::Pointer toolManager)
+{
+  MITK_TEST_CONDITION( toolManager->GetTools().size() == 1, "Get tool list with size 1" )
+  MITK_TEST_CONDITION( toolManager->GetToolById(0) != NULL, "Test GetToolById() method" )
+  MITK_TEST_CONDITION( toolManager->ActivateTool(0) == true, "Activate tool" )
+  MITK_TEST_CONDITION( toolManager->GetActiveToolID() == 0, "Check for right tool id" )
 
+  mitk::AddContourTool* tool = dynamic_cast< mitk::AddContourTool* >( toolManager->GetActiveTool() );
+  MITK_TEST_CONDITION( tool != NULL, "Check for right tool" )
+}
+
+static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
+{
+  MITK_TEST_CONDITION( toolManager->GetReferenceData().size() == 0, "Get reference data size (0)" )
+
+  mitk::DataTreeNode::Pointer nodeEmpty = mitk::DataTreeNode::New();
+  toolManager->SetReferenceData(nodeEmpty);
+  MITK_TEST_CONDITION( toolManager->GetReferenceData().size() == 1, "Get reference data size (1)" )
+  MITK_TEST_CONDITION( toolManager->GetReferenceData(0) == nodeEmpty, "Check if it is the right reference data" )
+  MITK_TEST_CONDITION( toolManager->GetReferenceData()[0] == nodeEmpty, "Check if it is the right reference data vector" )
+  
+  mitk::DataTreeNode::Pointer nodeEmpty2 = mitk::DataTreeNode::New();
+  toolManager->SetWorkingData(nodeEmpty2);
+  MITK_TEST_CONDITION( toolManager->GetWorkingData().size() == 1, "Get working data size (1)" )
+  MITK_TEST_CONDITION( toolManager->GetWorkingData(0) == nodeEmpty2, "Check if it is the right working data" )
+  MITK_TEST_CONDITION( toolManager->GetWorkingData()[0] == nodeEmpty2, "Check if it is the right working data vector" )
+}
+
+};
+
+int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
+{
+  // always start with this!
+  MITK_TEST_BEGIN("AutoCropImageFilter")
+
+  // instantiation
+  mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
+  mitk::ToolManager::Pointer toolManager = mitk::ToolManager::New(dataStorage.GetPointer());
+
+  // first test: did this work?
+  // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
+  // it makes no sense to continue without an object.
+  MITK_TEST_CONDITION_REQUIRED(toolManager.IsNotNull(),"Testing instantiation") 
+
+  // write your own tests here and use the macros from mitkTestingMacros.h !!!
+  // do not write to std::cout and do not return from this function yourself!
+  mitkToolManagerTestClass::TestToolManagerWithOutTools(toolManager);
+
+  //now we add one tool
+  mitk::AddContourToolFactory::RegisterOneFactory();// contourToolFactory = mitk::AddContourToolFactory::New();
+  toolManager = mitk::ToolManager::New(dataStorage.GetPointer());
+ 
+  //start test with tool
+  mitkToolManagerTestClass::TestToolManagerWithTools(toolManager);
+  
+  //now the setter methods
+  mitkToolManagerTestClass::TestSetterMethods(toolManager);
+
+  // always end with this!
+  MITK_TEST_END()
+}

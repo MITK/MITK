@@ -110,6 +110,8 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
 bool mitk::ToolManager::ActivateTool(int id)
 {
   //LOG_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
+  if( GetToolById(id) == NULL ) return false;
+
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
   static int nextTool = -1;

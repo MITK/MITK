@@ -31,12 +31,25 @@ namespace mitk
   {
     public:
       
+     /** \brief overloaded method for receiving log message from mbilog
+      */
       void ProcessMessage(const mbilog::LogMessage& );
-      
+
+     /** \brief registers MITK logging backend at mbilog
+      */      
       static void Register();
-      static LogBackend *GetBackend();
+
+     /** \brief Unregisters MITK logging backend at mbilog
+      */      
       static void Unregister();
-      static void SetLogFile(char *file);
+
+     /** \brief Sets extra log file path (additionally to the console log)
+      */      
+      static void SetLogFile(const char *file);
+     
+     /** \brief Automatically extracts and removes the "--logfile <file>" parameters from the standard C main(argc,argv) parameter list and calls SetLogFile if needed
+      */      
+      static void CatchLogFileCommandLineParameter(int &argc,char **argv);
       
   };
   

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 
 static itk::SimpleFastMutexLock logMutex;
+static mitk::LogBackend *mitkLogBackend = 0;
 static std::ofstream *logFile = 0;
 
 void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
@@ -46,10 +47,10 @@ void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
   logMutex.Unlock();
 }
 
-static mitk::LogBackend *mitkLogBackend = 0;
-
 void mitk::LogBackend::Register()
 {
+  if(mitkLogBackend)
+    return;
   mitkLogBackend = new mitk::LogBackend();
   mbilog::RegisterBackend( mitkLogBackend );
 }
@@ -65,17 +66,12 @@ void mitk::LogBackend::Unregister()
   }
 }
 
-mitk::LogBackend *mitk::LogBackend::GetBackend()
-{
-  return mitkLogBackend;
-}
-
-
-void mitk::LogBackend::SetLogFile(char *file)
+void mitk::LogBackend::SetLogFile(const char *file)
 {
   logMutex.Lock();
   if(logFile)
   {
+    LOG_INFO << "closing logfile";
     logFile->close();
     delete logFile;
     logFile = 0;
@@ -83,8 +79,40 @@ void mitk::LogBackend::SetLogFile(char *file)
   if(file)
   {
     logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::trunc  );
+    if(logFile->fail())
+    {
+      LOG_ERROR << "opening logfile '" << file << "' for writing failed";
+      delete logFile;
+      logFile = 0;
+    }
+    else
+      LOG_INFO << "logging to '" << file << "'";
   }
   logMutex.Unlock();
 }
 
+void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
+{
+  int r;
+  
+  for(r=1;r<argc;r++)
+  {
+    if(std::string(argv[r])=="--logfile")
+    {
+      if(r+1>=argc)
+      {
+        --argc;
+        LOG_ERROR << "--logfile parameter found, but no file given";
+        return;
+      }
 
+      mitk::LogBackend::SetLogFile(argv[r+1]);
+     
+      for(r+=2;r<argc;r++)
+        argv[r-2]=argv[r];
+        
+      argc-=2;     
+      return;
+    }
+  }
+}

@@ -105,6 +105,8 @@ private:
 
   Geometry3D::Pointer m_OriginalGeometry;
 
+  Vector3D m_ObjectNormal;
+
 };
 
 }

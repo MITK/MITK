@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 class vtkPlaneSource;
+class vtkDoubleArray;
 
 namespace mitk {
 
@@ -53,7 +54,12 @@ protected:
   Plane();
   virtual ~Plane();
 
-  vtkPlaneSource *m_Plane;
+  vtkPlaneSource *m_PlaneSource;
+
+  vtkPolyData *m_Plane;
+
+  vtkDoubleArray *m_PlaneNormal;
+
 
 };
 

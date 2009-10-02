@@ -174,6 +174,7 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
       newMapper = mitk::PointDataVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
+    /*
     else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourVtkMapper3D::New();
@@ -184,6 +185,7 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataTreeNode(node);
     }
+    */
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridVtkMapper3D::New();

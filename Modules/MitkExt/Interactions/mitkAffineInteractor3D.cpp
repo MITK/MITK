@@ -54,6 +54,11 @@ AffineInteractor3D
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
 {
   m_OriginalGeometry = Geometry3D::New();
+
+  // Initialize vector arithmetic
+  m_ObjectNormal[0] = 0.0;
+  m_ObjectNormal[1] = 0.0;
+  m_ObjectNormal[2] = 1.0;
 }
 
 
@@ -220,6 +225,19 @@ bool AffineInteractor3D
   if ( surface != NULL )
   {
     polyData = surface->GetVtkPolyData( timeStep );
+
+    // Extract surface normal from surface (if existent, otherwise use default)
+    vtkPointData *pointData = polyData->GetPointData();
+    if ( pointData != NULL )
+    {
+      vtkDataArray *normal = polyData->GetPointData()->GetVectors( "planeNormal" );
+      if ( normal != NULL )
+      {
+        m_ObjectNormal[0] = normal->GetComponent( 0, 0 );
+        m_ObjectNormal[1] = normal->GetComponent( 0, 1 );
+        m_ObjectNormal[2] = normal->GetComponent( 0, 2 );
+      }
+    }
   }
 
   // Get geometry object
@@ -374,14 +392,14 @@ bool AffineInteractor3D
 
       if ( m_InteractionMode == INTERACTION_MODE_TRANSLATION )
       {
-        Vector3D objectNormal;
-        objectNormal.SetVnlVector( data->GetGeometry( timeStep )->GetMatrixColumn( 2 ) );
-        objectNormal.Normalize();
-
         Point3D origin = m_OriginalGeometry->GetOrigin();
 
+        Vector3D transformedObjectNormal;
+        data->GetGeometry( timeStep )->IndexToWorld(
+          origin, m_ObjectNormal, transformedObjectNormal );
+
         data->GetGeometry( timeStep )->SetOrigin(
-          origin + objectNormal * (interactionMove * objectNormal) );
+          origin + transformedObjectNormal * (interactionMove * transformedObjectNormal) );
       }
       else if ( m_InteractionMode == INTERACTION_MODE_ROTATION )
       {

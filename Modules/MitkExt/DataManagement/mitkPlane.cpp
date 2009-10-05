@@ -17,9 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlane.h"
-#include "vtkLinearTransform.h"
 #include "mitkVector.h"
-#include "vtkPlaneSource.h"
+
+#include <vtkLinearTransform.h>
+#include <vtkPlaneSource.h>
+#include <vtkDoubleArray.h>
+#include <vtkPointData.h>
 
 
 namespace mitk
@@ -29,49 +32,69 @@ Plane::Plane()
 : BoundingObject()
 {
   // Set up Plane Surface.
-  m_Plane = vtkPlaneSource::New();
-  m_Plane->SetOrigin( -32.0, -32.0, 0.0 );
-  m_Plane->SetPoint1( 32.0, -32.0, 0.0 );
-  m_Plane->SetPoint2( -32.0, 32.0, 0.0 );
-  m_Plane->SetResolution( 128, 128 );
-  m_Plane->Update();
+  m_PlaneSource = vtkPlaneSource::New();
+  m_PlaneSource->SetOrigin( -32.0, -32.0, 0.0 );
+  m_PlaneSource->SetPoint1( 32.0, -32.0, 0.0 );
+  m_PlaneSource->SetPoint2( -32.0, 32.0, 0.0 );
+  m_PlaneSource->SetResolution( 128, 128 );
+  m_PlaneSource->Update();
 
-  this->SetVtkPolyData( m_Plane->GetOutput() );
+  m_PlaneNormal = vtkDoubleArray::New();
+  m_PlaneNormal->SetNumberOfComponents( 3 );
+  m_PlaneNormal->SetNumberOfTuples( m_PlaneSource->GetOutput()->GetNumberOfPoints() );
+  m_PlaneNormal->SetTuple3( 0, 0.0, 0.0, 1.0 );
+  m_PlaneNormal->SetName( "planeNormal" );
+
+  m_Plane = vtkPolyData::New();
+  m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
+  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+
+  this->SetVtkPolyData( m_Plane );
 }
 
 
 Plane::~Plane()
 {
-  m_Plane->Delete(); 
+  m_PlaneSource->Delete();
+  m_Plane->Delete();
+  m_PlaneNormal->Delete();
 }
 
 
 void Plane::SetExtent( const double x, const double y )
 {
-  m_Plane->SetOrigin( -x / 2.0, -y / 2.0, 0.0 );
-  m_Plane->SetPoint1( x / 2.0, -y / 2.0, 0.0 );
-  m_Plane->SetPoint2( -x / 2.0, y / 2.0, 0.0 );
-  m_Plane->Update();
+  m_PlaneSource->SetOrigin( -x / 2.0, -y / 2.0, 0.0 );
+  m_PlaneSource->SetPoint1( x / 2.0, -y / 2.0, 0.0 );
+  m_PlaneSource->SetPoint2( -x / 2.0, y / 2.0, 0.0 );
+  m_PlaneSource->Update();
+
+  m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
+  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+
   this->Modified();
 }
 
 void Plane::GetExtent( double &x, double &y ) const
 {
-  x = m_Plane->GetPoint1()[0] - m_Plane->GetOrigin()[0];
-  y = m_Plane->GetPoint2()[1] - m_Plane->GetOrigin()[1];
+  x = m_PlaneSource->GetPoint1()[0] - m_PlaneSource->GetOrigin()[0];
+  y = m_PlaneSource->GetPoint2()[1] - m_PlaneSource->GetOrigin()[1];
 }
 
 void Plane::SetResolution( const int xR, const int yR )
 {
-  m_Plane->SetResolution( xR, yR );
-  m_Plane->Update();
+  m_PlaneSource->SetResolution( xR, yR );
+  m_PlaneSource->Update();
+
+  m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
+  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+
   this->Modified();
 }
 
 
 void Plane::GetResolution( int &xR, int &yR ) const
 {
-  m_Plane->GetResolution( xR, yR );
+  m_PlaneSource->GetResolution( xR, yR );
 }
 
 

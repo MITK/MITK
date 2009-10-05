@@ -40,6 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
+#include <vtkPointData.h>
+#include <vtkDataArray.h>
 
 
 //how precise must the user pick the point
@@ -193,6 +195,19 @@ bool mitk::SurfaceDeformationInteractor3D
   else
   {
     m_PolyData = NULL;
+  }
+
+  // Extract surface normal from surface (if existent, otherwise use default)
+  vtkPointData *pointData = m_PolyData->GetPointData();
+  if ( pointData != NULL )
+  {
+    vtkDataArray *normal = m_PolyData->GetPointData()->GetVectors( "planeNormal" );
+    if ( normal != NULL )
+    {
+      m_ObjectNormal[0] = normal->GetComponent( 0, 0 );
+      m_ObjectNormal[1] = normal->GetComponent( 0, 1 );
+      m_ObjectNormal[2] = normal->GetComponent( 0, 2 );
+    }
   }
 
   // Get geometry object

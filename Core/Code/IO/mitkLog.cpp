@@ -78,15 +78,21 @@ void mitk::LogBackend::SetLogFile(const char *file)
   }
   if(file)
   {
-    logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::trunc  );
-    if(logFile->fail())
+      logFile = new std::ofstream( file,  std::ios_base::out | std::ios_base::app );
+    /*
+    if(*logFile)
     {
+      std::cout << "opening logfile '" << file << "' for writing failed";
+      LOG_INFO << "logging to '" << file << "'";
+    }
+    else
+    {
+      std::cerr << "opening logfile '" << file << "' for writing failed";
       LOG_ERROR << "opening logfile '" << file << "' for writing failed";
       delete logFile;
       logFile = 0;
     }
-    else
-      LOG_INFO << "logging to '" << file << "'";
+    */
   }
   logMutex.Unlock();
 }
@@ -94,7 +100,7 @@ void mitk::LogBackend::SetLogFile(const char *file)
 void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
 {
   int r;
-  
+
   for(r=1;r<argc;r++)
   {
     if(std::string(argv[r])=="--logfile")

@@ -903,7 +903,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
           //CHERRY_INFO << "Calling remove of parent container\n";
           parentContainer->Remove(parent);
           parent->Print(std::cout);
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
           CHERRY_INFO << "Parent container traceid: " << parent->GetTraceId() << std::endl;
           std::list<int> knownIDs;
           //knownIDs.push_back(oldContainer.GetId());

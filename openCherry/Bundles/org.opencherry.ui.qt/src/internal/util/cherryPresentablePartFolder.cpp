@@ -33,6 +33,11 @@ PresentablePartFolder::ContentProxyListener::ContentProxyListener(
 {
 }
 
+GuiTk::IControlListener::Events::Types PresentablePartFolder::ContentProxyListener::GetEventTypes() const
+{
+  return Events::MOVED & Events::RESIZED;
+}
+
 void PresentablePartFolder::ContentProxyListener::ControlMoved(
     GuiTk::ControlEvent::Pointer e)
 {

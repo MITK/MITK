@@ -24,7 +24,9 @@
 #include "cherryOSGiDll.h"
 #include "cherryException.h"
 
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#include <cherryConfig.h>
+
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
 #include "cherryDebugUtil.h"
 #include <Poco/Mutex.h>
 #endif
@@ -55,7 +57,7 @@ public:
   SmartPointer() :
     m_Pointer(0)
   {
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
 
@@ -68,7 +70,7 @@ public:
     if (m_Pointer)
       this->Register();
 
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -79,7 +81,7 @@ public:
   {
     this->Register();
 
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -91,7 +93,7 @@ public:
     if (m_Pointer)
       this->Register();
 
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -104,7 +106,7 @@ public:
       this->m_Pointer = wp.m_Pointer;
       this->Register();
 
-      #if defined(CHERRY_DEBUG_SMARTPOINTER)
+      #if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
         DebugInitSmartPointer();
       #endif
     }
@@ -117,8 +119,8 @@ public:
   /** Destructor  */
   ~SmartPointer()
   {
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
-    DebugRemoveSmartPointer();
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+    if (m_Pointer) DebugRemoveSmartPointer();
 #endif
 
     this->UnRegister();
@@ -271,7 +273,7 @@ public:
   {
     if (m_Pointer != r)
     {
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
       DebugAssignSmartPointer(r, m_Pointer);
 #endif
       ObjectType* tmp = m_Pointer; //avoid recursive unregisters by retaining temporarily
@@ -314,7 +316,7 @@ private:
     }
   }
 
-#if defined(CHERRY_DEBUG_SMARTPOINTER)
+#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
 
   int m_Id;
   Poco::FastMutex m_Mutex;
@@ -323,7 +325,7 @@ private:
   {
     {
       Poco::FastMutex::ScopedLock lock(m_Mutex);
-      if (m_Pointer && DebugUtil::IsTraced(m_Pointer))
+      if (m_Pointer)
       {
         int& counter = DebugUtil::GetSmartPointerCounter();
         m_Id = ++counter;
@@ -345,8 +347,10 @@ private:
   void DebugAssignSmartPointer(const ObjectType* newObject, const ObjectType* oldObject)
   {
     Poco::FastMutex::ScopedLock lock(m_Mutex);
-    DebugUtil::UnregisterSmartPointer(m_Id, oldObject);
-    if (newObject && DebugUtil::IsTraced(newObject))
+    if (oldObject)
+      DebugUtil::UnregisterSmartPointer(m_Id, oldObject);
+
+    if (newObject)
     {
       if (m_Id < 0)
       {

@@ -25,6 +25,7 @@
 #include "../cherryImageDescriptor.h"
 
 #include "cherryWorkbenchPage.h"
+#include "cherryWorkbenchConstants.h"
 #include "cherryViewDescriptor.h"
 #include "cherryViewFactory.h"
 #include "cherryViewRegistry.h"
@@ -250,7 +251,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePartHelper()
   IMemento::Pointer stateMem;
   if (!memento.IsNull())
   {
-    //stateMem = memento.getChild(IWorkbenchConstants.TAG_VIEW_STATE);
+    stateMem = memento->GetChild(WorkbenchConstants::TAG_VIEW_STATE);
   }
 
   IViewDescriptor::Pointer desc = factory->GetViewRegistry()->Find(GetId());

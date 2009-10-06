@@ -71,6 +71,8 @@ protected:
   {
     ControlListener(PartSashContainer* partSashContainer);
 
+    Events::Types GetEventTypes() const;
+
     void ControlResized(GuiTk::ControlEvent::Pointer e);
 
   private: PartSashContainer* partSashContainer;

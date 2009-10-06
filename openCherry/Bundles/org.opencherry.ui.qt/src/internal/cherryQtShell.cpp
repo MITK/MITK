@@ -22,7 +22,6 @@
 #include "cherryQtControlWidget.h"
 
 #include <cherryConstants.h>
-#include <cherryDebugUtil.h>
 
 #include <QApplication>
 #include <QVariant>
@@ -44,7 +43,6 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
   }
   else
   {
-    DebugUtil::TraceObject(this);
     widget = new QtControlWidget(parent, thisShell, flags | Qt::Dialog);
     widget->setObjectName("shell widget");
   }

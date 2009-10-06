@@ -71,6 +71,8 @@ private:
 
     ShellControlListener(DetachedWindow* wnd);
 
+    Events::Types GetEventTypes() const;
+
     void ControlResized(GuiTk::ControlEvent::Pointer e);
 
   private:

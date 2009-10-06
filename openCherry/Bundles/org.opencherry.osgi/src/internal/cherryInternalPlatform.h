@@ -49,7 +49,7 @@ private:
 
   bool m_ConsoleLog;
 
-  ServiceRegistry m_ServiceRegistry;
+  ServiceRegistry* m_ServiceRegistry;
 
   Poco::Path m_BaseStatePath;
   Poco::Path m_InstallPath;

@@ -50,6 +50,11 @@ DetachedWindow::ShellControlListener::ShellControlListener(DetachedWindow* wnd) 
 
 }
 
+GuiTk::IControlListener::Events::Types DetachedWindow::ShellControlListener::GetEventTypes() const
+{
+  return Events::RESIZED;
+}
+
 void DetachedWindow::ShellControlListener::ControlResized(
     GuiTk::ControlEvent::Pointer e)
 {
@@ -92,7 +97,7 @@ void DetachedWindow::Create()
   windowShell
       = page->GetWorkbenchWindow().Cast<WorkbenchWindow> () ->GetDetachedWindowPool()->AllocateShell(
           shellListener);
-#ifdef CHERRY_DEBUG_SMARTPOINTER
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   CHERRY_INFO << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
 #endif
   windowShell->SetData(Object::Pointer(this));

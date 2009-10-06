@@ -595,6 +595,8 @@ private:
   {
     ControlResizeListener(WorkbenchWindow* window);
 
+    GuiTk::IControlListener::Events::Types GetEventTypes() const;
+
     void ControlMoved(GuiTk::ControlEvent::Pointer e);
 
     void ControlResized(GuiTk::ControlEvent::Pointer e);

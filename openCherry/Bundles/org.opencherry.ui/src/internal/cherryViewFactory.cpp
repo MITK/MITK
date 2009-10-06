@@ -1,19 +1,19 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryViewFactory.h"
 
@@ -24,6 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryViewReference.h"
 #include "cherryViewDescriptor.h"
 #include "cherryWorkbenchPage.h"
+#include "cherryWorkbenchConstants.h"
+#include "../util/cherrySafeRunnable.h"
+
+#include <cherrySafeRunner.h>
 
 namespace cherry
 {
@@ -66,8 +70,9 @@ bool ViewFactory::HasWildcard(const std::string& viewId)
   return viewId.find_first_of('*') != std::string::npos;
 }
 
-ViewFactory::ViewFactory(WorkbenchPage::Pointer p, IViewRegistry* reg)
-: page(p), viewReg(reg) {
+ViewFactory::ViewFactory(WorkbenchPage::Pointer p, IViewRegistry* reg) :
+  page(p), viewReg(reg)
+{
   //page.getExtensionTracker().registerHandler(this, null);
 }
 
@@ -96,7 +101,7 @@ IViewReference::Pointer ViewFactory::CreateView(const std::string& id,
     ref = new ViewReference(this, id, secondaryId, memento);
     mementoTable.erase(key);
     counter.Put(key, ref);
-    this->GetWorkbenchPage()->PartAdded(ref.Cast<ViewReference>());
+    this->GetWorkbenchPage()->PartAdded(ref.Cast<ViewReference> ());
   }
   else
   {
@@ -142,7 +147,8 @@ WorkbenchPage::Pointer ViewFactory::GetWorkbenchPage() const
   return page;
 }
 
-int ViewFactory::GetReferenceCount(IViewReference::Pointer viewRef) {
+int ViewFactory::GetReferenceCount(IViewReference::Pointer viewRef)
+{
   std::string key = this->GetKey(viewRef);
   IViewReference::Pointer ref = counter.Get(key);
   return ref.IsNull() ? 0 : counter.GetRef(key);
@@ -159,152 +165,161 @@ void ViewFactory::ReleaseView(IViewReference::Pointer viewRef)
   int count = counter.RemoveRef(key);
   if (count <= 0)
   {
-    this->GetWorkbenchPage()->PartRemoved(ref.Cast<ViewReference>());
+    this->GetWorkbenchPage()->PartRemoved(ref.Cast<ViewReference> ());
   }
 }
 
 bool ViewFactory::RestoreState(IMemento::Pointer memento)
 {
-//  IMemento mem[] = memento.getChildren(IWorkbenchConstants.TAG_VIEW);
-//  for (int i = 0; i < mem.length; i++)
-//  {
-//    //for dynamic UI - add the next line to replace subsequent code that is commented out
-//    restoreViewState(mem[i]);
-//  }
-//  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
+  std::vector<IMemento::Pointer> mem(memento->GetChildren(
+      WorkbenchConstants::TAG_VIEW));
+  for (std::size_t i = 0; i < mem.size(); i++)
+  {
+    //for dynamic UI - add the next line to replace subsequent code that is commented out
+    RestoreViewState(mem[i]);
+  }
+  //  return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
   return true;
 }
 
 bool ViewFactory::SaveState(IMemento::Pointer memento)
 {
-//  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
-//      IStatus.OK, WorkbenchMessages.ViewFactory_problemsSavingViews, null);
-//
-//  final IViewReference refs[] = getViews();
-//  for (int i = 0; i < refs.length; i++)
-//  {
-//    IViewDescriptor desc = viewReg.find(refs[i].getId());
-//    if (desc.isRestorable())
-//    {
-//      //for dynamic UI - add the following line to replace subsequent code which is commented out
-//      saveViewState(memento, refs[i], result);
-//    }
-//  }
-//  return result;
-  return true;
+  //  final MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID,
+  //      IStatus.OK, WorkbenchMessages.ViewFactory_problemsSavingViews, null);
+  bool result = true;
+  std::vector<IViewReference::Pointer> refs(GetViews());
+  for (std::size_t i = 0; i < refs.size(); i++)
+  {
+    IViewDescriptor::Pointer desc = viewReg->Find(refs[i]->GetId());
+    if (desc->IsRestorable())
+    {
+      //for dynamic UI - add the following line to replace subsequent code which is commented out
+      SaveViewState(memento, refs[i], result);
+    }
+  }
+  return result;
 }
+
+struct SaveViewRunnable: public SafeRunnable
+{
+  SaveViewRunnable(IViewPart::Pointer view, IMemento::Pointer viewMemento,
+      bool& result) :
+    view(view), viewMemento(viewMemento), result(result)
+  {
+  }
+
+  void Run()
+  {
+
+    const std::map<std::string, std::string>& properties =
+        view->GetPartProperties();
+    if (!properties.empty())
+    {
+      IMemento::Pointer propBag = viewMemento ->CreateChild(
+          WorkbenchConstants::TAG_PROPERTIES);
+      for (std::map<std::string, std::string>::const_iterator i =
+          properties.begin(); i != properties.end(); ++i)
+      {
+        IMemento::Pointer p = propBag->CreateChild(
+            WorkbenchConstants::TAG_PROPERTY, i->first);
+        p->PutTextData(i->second);
+      }
+    }
+
+    view->SaveState(viewMemento ->CreateChild(
+        WorkbenchConstants::TAG_VIEW_STATE));
+  }
+
+  void HandleException(const std::exception& e)
+  {
+    //            result
+    //            .add(new Status(
+    //                    IStatus.ERR,
+    //                    PlatformUI.PLUGIN_ID,
+    //                    0,
+    //                    NLS.bind(WorkbenchMessages.ViewFactory_couldNotSave, viewRef.getTitle() ),
+    //                    e));
+    result = false;
+  }
+
+private:
+
+  IViewPart::Pointer view;
+  IMemento::Pointer viewMemento;
+  bool& result;
+};
 
 //  for dynamic UI
 IMemento::Pointer ViewFactory::SaveViewState(IMemento::Pointer memento,
-    IViewReference::Pointer ref /*,MultiStatus res*/)
+    IViewReference::Pointer ref, bool& res)
 {
-//  final MultiStatus result = res;
-//  final IMemento viewMemento = memento
-//  .createChild(IWorkbenchConstants.TAG_VIEW);
-//  viewMemento.putString(IWorkbenchConstants.TAG_ID, ViewFactory
-//  .getKey(ref));
-//  if (ref instanceof ViewReference)
-//  {
-//    viewMemento.putString(IWorkbenchConstants.TAG_PART_NAME, ((ViewReference) ref).getPartName());
-//  }
-//  final IViewReference viewRef = ref;
-//  final IViewPart view = (IViewPart) ref.getPart(false);
-//  if (view != null)
-//  {
-//    SafeRunner.run(new SafeRunnable()
-//        {
-//        public void run()
-//          {
-//            if (view instanceof IWorkbenchPart3)
-//            {
-//              Map properties = ((IWorkbenchPart3) view)
-//              .getPartProperties();
-//              if (!properties.isEmpty())
-//              {
-//                IMemento propBag = viewMemento
-//                .createChild(IWorkbenchConstants.TAG_PROPERTIES);
-//                Iterator i = properties.entrySet().iterator();
-//                while (i.hasNext())
-//                {
-//                  Map.Entry entry = (Map.Entry) i.next();
-//                  IMemento p = propBag.createChild(
-//                      IWorkbenchConstants.TAG_PROPERTY,
-//                      (String) entry.getKey());
-//                  p.putTextData((String) entry.getValue());
-//                }
-//              }
-//            }
-//            view.saveState(viewMemento
-//                .createChild(IWorkbenchConstants.TAG_VIEW_STATE));
-//          }
-//
-//        public void handleException(Throwable e)
-//          {
-//            result
-//            .add(new Status(
-//                    IStatus.ERR,
-//                    PlatformUI.PLUGIN_ID,
-//                    0,
-//                    NLS.bind(WorkbenchMessages.ViewFactory_couldNotSave, viewRef.getTitle() ),
-//                    e));
-//          }
-//        }
-//        );
-//      }
-//  else
-//  {
-//    IMemento mem = null;
-//    IMemento props = null;
-//
-//    // if we've created the reference once, any previous workbench
-//    // state memento is there.  After once, there is no previous
-//    // session state, so it should be null.
-//    if (ref instanceof ViewReference)
-//    {
-//      mem = ((ViewReference) ref).getMemento();
-//      if (mem!=null)
-//      {
-//        props = mem.getChild(IWorkbenchConstants.TAG_PROPERTIES);
-//      }
-//      if (mem!=null)
-//      {
-//        mem = mem.getChild(IWorkbenchConstants.TAG_VIEW_STATE);
-//      }
-//    }
-//    if (props != null)
-//    {
-//      viewMemento.createChild(IWorkbenchConstants.TAG_PROPERTIES)
-//      .putMemento(props);
-//    }
-//    if (mem != null)
-//    {
-//      IMemento child = viewMemento
-//      .createChild(IWorkbenchConstants.TAG_VIEW_STATE);
-//      child.putMemento(mem);
-//    }
-//  }
-//  return viewMemento;
-  return IMemento::Pointer(0);
+  //final MultiStatus result = res;
+  bool& result = res;
+
+  IMemento::Pointer viewMemento = memento->CreateChild(
+      WorkbenchConstants::TAG_VIEW);
+  viewMemento->PutString(WorkbenchConstants::TAG_ID, ViewFactory::GetKey(ref));
+  if (ViewReference::Pointer viewRef = ref.Cast<ViewReference>())
+  {
+    viewMemento->PutString(WorkbenchConstants::TAG_PART_NAME,
+        viewRef->GetPartName());
+  }
+  const IViewReference::Pointer viewRef = ref;
+  const IViewPart::Pointer view = ref->GetPart(false).Cast<IViewPart> ();
+  if (view)
+  {
+    ISafeRunnable::Pointer runnable(new SaveViewRunnable(view, viewMemento,
+        result));
+    SafeRunner::Run(runnable);
+  }
+  else
+  {
+    IMemento::Pointer mem;
+    IMemento::Pointer props;
+
+    // if we've created the reference once, any previous workbench
+    // state memento is there.  After once, there is no previous
+    // session state, so it should be null.
+    if (ref.Cast<ViewReference> ())
+    {
+      mem = ref.Cast<ViewReference> ()->GetMemento();
+      if (mem)
+      {
+        props = mem->GetChild(WorkbenchConstants::TAG_PROPERTIES);
+        mem = mem->GetChild(WorkbenchConstants::TAG_VIEW_STATE);
+      }
+    }
+    if (props)
+    {
+      viewMemento->CreateChild(WorkbenchConstants::TAG_PROPERTIES) ->PutMemento(
+          props);
+    }
+    if (mem)
+    {
+      IMemento::Pointer child = viewMemento ->CreateChild(
+          WorkbenchConstants::TAG_VIEW_STATE);
+      child->PutMemento(mem);
+    }
+  }
+  return viewMemento;
 }
 
 // for dynamic UI
 void ViewFactory::RestoreViewState(IMemento::Pointer memento)
 {
-//  String compoundId = memento.getString(IWorkbenchConstants.TAG_ID);
-//  mementoTable.put(compoundId, memento);
+  std::string compoundId;
+  memento->GetString(WorkbenchConstants::TAG_ID, compoundId);
+  mementoTable.insert(std::make_pair(compoundId, memento));
 }
 
 IMemento::Pointer ViewFactory::GetViewState(const std::string& key)
 {
-//  IMemento memento = (IMemento) mementoTable.get(key);
-//
-//  if (memento == null)
-//  {
-//    return null;
-//  }
-//
-//  return memento.getChild(IWorkbenchConstants.TAG_VIEW_STATE);
-  return IMemento::Pointer(0);
+  IMemento::Pointer memento = mementoTable[key];
+
+  if (!memento)
+    return IMemento::Pointer(0);
+
+  return memento->GetChild(WorkbenchConstants::TAG_VIEW_STATE);
 }
 
 }

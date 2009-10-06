@@ -53,11 +53,24 @@ struct CHERRY_UI IControlListener: public virtual Object
 
   struct CHERRY_UI Events {
 
+    enum Type {
+     NONE      = 0x00000000,
+     MOVED     = 0x00000001,
+     RESIZED   = 0x00000002,
+     ACTIVATED = 0x00000004,
+     DESTROYED = 0x00000008,
+
+     ALL       = 0xffffffff
+    };
+
+    CHERRY_DECLARE_FLAGS(Types, Type)
+
     typedef Message1<ControlEvent::Pointer> EventType;
 
     EventType movedEvent;
     EventType resizedEvent;
     EventType activatedEvent;
+    EventType destroyedEvent;
 
     void AddListener(IControlListener::Pointer listener);
     void RemoveListener(IControlListener::Pointer listener);
@@ -69,6 +82,8 @@ struct CHERRY_UI IControlListener: public virtual Object
   virtual ~IControlListener()
   {
   }
+
+  virtual Events::Types GetEventTypes() const = 0;
 
   /**
    * Sent when the location (x, y) of a control changes relative
@@ -92,10 +107,137 @@ struct CHERRY_UI IControlListener: public virtual Object
   virtual void ControlActivated(ControlEvent::Pointer e)
   {
   }
+
+  virtual void ControlDestroyed(ControlEvent::Pointer e)
+  {
+  }
+
+};
+
+template<typename R>
+struct ControlMovedAdapter: public IControlListener
+{
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(ControlEvent::Pointer);
+
+  ControlMovedAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  Events::Types GetEventTypes() const
+  {
+    return Events::MOVED;
+  }
+
+  void ControlMoved(ControlEvent::Pointer e)
+  {
+    (listener->*callback)(e);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
+};
+
+template<typename R>
+struct ControlResizedAdapter: public IControlListener
+{
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(ControlEvent::Pointer);
+
+  ControlResizedAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  Events::Types GetEventTypes() const
+  {
+    return Events::RESIZED;
+  }
+
+  void ControlResized(ControlEvent::Pointer e)
+  {
+    (listener->*callback)(e);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
+};
+
+template<typename R>
+struct ControlActivatedAdapter: public IControlListener
+{
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(ControlEvent::Pointer);
+
+  ControlActivatedAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  Events::Types GetEventTypes() const
+  {
+    return Events::ACTIVATED;
+  }
+
+  void ControlActivated(ControlEvent::Pointer e)
+  {
+    (listener->*callback)(e);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
+};
+
+template<typename R>
+struct ControlDestroyedAdapter: public IControlListener
+{
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(ControlEvent::Pointer);
+
+  ControlDestroyedAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  Events::Types GetEventTypes() const
+  {
+    return Events::DESTROYED;
+  }
+
+  void ControlDestroyed(ControlEvent::Pointer e)
+  {
+    (listener->*callback)(e);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
 };
 
 }
 
 }
+
+CHERRY_DECLARE_OPERATORS_FOR_FLAGS(cherry::GuiTk::IControlListener::Events::Types)
 
 #endif /* CHERRYGUITKICONTROLLISTENER_H_ */

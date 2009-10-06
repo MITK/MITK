@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../cherryPlatform.h"
 #include "../cherryPlatformException.h"
+#include "../cherryDebugUtil.h"
 #include "../event/cherryPlatformEvents.h"
 #include "cherryPlatformLogChannel.h"
 #include "../cherryIBundle.h"
@@ -42,7 +43,7 @@ namespace cherry {
 Poco::Mutex InternalPlatform::m_Mutex;
 
 InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
-  m_ConsoleLog(false),
+  m_ConsoleLog(false), m_ServiceRegistry(0),
   m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
   m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
@@ -68,7 +69,7 @@ bool InternalPlatform::ConsoleLog() const
 ServiceRegistry& InternalPlatform::GetServiceRegistry()
 {
   AssertInitialized();
-  return m_ServiceRegistry;
+  return *m_ServiceRegistry;
 }
 
 void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractConfiguration* config)
@@ -85,6 +86,8 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   {
     this->config().add(config, 50, false);
   }
+
+  m_ServiceRegistry = new ServiceRegistry();
 
   m_ConsoleLog = this->GetConfiguration().hasProperty(Platform::ARG_CONSOLELOG);
 
@@ -210,6 +213,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     this->logger().log(exc);
   }
 
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+  DebugUtil::RestoreState();
+#endif
+
 }
 
 void InternalPlatform::Launch()
@@ -229,13 +236,15 @@ void InternalPlatform::Shutdown()
 
   AssertInitialized();
 
+  DebugUtil::SaveState();
+
   m_Initialized = false;
 
   this->uninitialize();
 
-  if (m_BundleLoader != 0) delete m_BundleLoader;
-  if (m_CodeCache != 0) delete m_CodeCache;
-
+  delete m_ServiceRegistry;
+  delete m_BundleLoader;
+  delete m_CodeCache;
 }
 
 
@@ -250,7 +259,7 @@ IExtensionPointService::Pointer InternalPlatform::GetExtensionPointService()
   Poco::Mutex::ScopedLock lock(m_Mutex);
   this->AssertInitialized();
 
-  return m_ServiceRegistry.GetServiceById<IExtensionPointService>(IExtensionPointService::SERVICE_ID);
+  return m_ServiceRegistry->GetServiceById<IExtensionPointService>(IExtensionPointService::SERVICE_ID);
 }
 
 const Poco::Path& InternalPlatform::GetConfigurationPath()

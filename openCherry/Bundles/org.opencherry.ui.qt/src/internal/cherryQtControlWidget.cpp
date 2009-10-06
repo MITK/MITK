@@ -157,4 +157,10 @@ void QtControlWidget::FireActivateEvent()
   controller->controlEvents.activatedEvent(controlEvent);
 }
 
+void QtControlWidget::ObjectDestroyed(QObject*)
+{
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this)));
+  controller->controlEvents.destroyedEvent(controlEvent);
+}
+
 }

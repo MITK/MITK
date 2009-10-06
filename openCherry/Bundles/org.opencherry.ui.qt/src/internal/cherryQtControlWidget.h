@@ -47,6 +47,10 @@ protected:
   void moveEvent(QMoveEvent* event);
   void resizeEvent(QResizeEvent* event);
 
+protected slots:
+
+  void ObjectDestroyed(QObject*);
+
 private:
 
   QtWidgetController::Pointer controller;

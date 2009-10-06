@@ -27,8 +27,10 @@ SET(SERVICE_CPP_FILES
 )
 
 SET(SRC_CPP_FILES
+  cherryDebugBreakpointManager.cpp
   cherryException.cpp
   cherryIBundleManifest.cpp
+  cherryIDebugObjectListener.cpp
   cherryBundleLoader.cpp
   cherryDebugUtil.cpp
   cherryObject.cpp

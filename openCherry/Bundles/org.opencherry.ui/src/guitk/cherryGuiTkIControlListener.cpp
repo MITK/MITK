@@ -27,9 +27,16 @@ IControlListener::Events
 {
   if (l.IsNull()) return;
 
-  movedEvent += Delegate(l.GetPointer(), &IControlListener::ControlMoved);
-  resizedEvent += Delegate(l.GetPointer(), &IControlListener::ControlResized);
-  activatedEvent += Delegate(l.GetPointer(), &IControlListener::ControlActivated);
+  Types types = l->GetEventTypes();
+
+  if (types & MOVED)
+    movedEvent += Delegate(l.GetPointer(), &IControlListener::ControlMoved);
+  if (types & RESIZED)
+    resizedEvent += Delegate(l.GetPointer(), &IControlListener::ControlResized);
+  if (types & ACTIVATED)
+    activatedEvent += Delegate(l.GetPointer(), &IControlListener::ControlActivated);
+  if (types & DESTROYED)
+    destroyedEvent += Delegate(l.GetPointer(), &IControlListener::ControlDestroyed);
 }
 
 void
@@ -41,6 +48,7 @@ IControlListener::Events
   movedEvent -= Delegate(l.GetPointer(), &IControlListener::ControlMoved);
   resizedEvent -= Delegate(l.GetPointer(), &IControlListener::ControlResized);
   activatedEvent -= Delegate(l.GetPointer(), &IControlListener::ControlActivated);
+  destroyedEvent -= Delegate(l.GetPointer(), &IControlListener::ControlDestroyed);
 }
 
 }

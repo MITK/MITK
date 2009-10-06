@@ -30,15 +30,22 @@ const std::string DragUtil::DROP_TARGET_ID =
 
 TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
 
-std::list<IDragOverListener::Pointer> DragUtil::defaultTargets =
-    std::list<IDragOverListener::Pointer>();
+std::list<IDragOverListener::Pointer> DragUtil::defaultTargets = std::list<
+    IDragOverListener::Pointer>();
 
-DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem, const Rectangle& sourceBounds,
-    const Point& initialLocation, bool allowSnapping)
- : allowSnapping(allowSnapping), draggedItem(draggedItem), sourceBounds(sourceBounds), initialLocation(initialLocation)
- {
+DragUtil::TrackerMoveListener::TrackerMoveListener(Object::Pointer draggedItem,
+    const Rectangle& sourceBounds, const Point& initialLocation,
+    bool allowSnapping) :
+  allowSnapping(allowSnapping), draggedItem(draggedItem), sourceBounds(
+      sourceBounds), initialLocation(initialLocation)
+{
 
- }
+}
+
+GuiTk::IControlListener::Events::Types DragUtil::TrackerMoveListener::GetEventTypes() const
+{
+  return Events::MOVED;
+}
 
 void DragUtil::TrackerMoveListener::ControlMoved(
     GuiTk::ControlEvent::Pointer event)
@@ -50,10 +57,11 @@ void DragUtil::TrackerMoveListener::ControlMoved(
   // Select a drop target; use the global one by default
   IDropTarget::Pointer target;
 
-  void* targetControl = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
+  void* targetControl =
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
 
   // Get the ITracker which fired the event
-  ITracker* tracker = static_cast<ITracker*>(event->item);
+  ITracker* tracker = static_cast<ITracker*> (event->item);
 
   // Get the drop target for this location
   target = DragUtil::GetDropTarget(targetControl, draggedItem, location,
@@ -77,9 +85,9 @@ void DragUtil::TrackerMoveListener::ControlMoved(
   {
     if (snapTarget.width == 0 || snapTarget.height == 0)
     {
-      snapTarget
-          = Rectangle(sourceBounds.x + location.x - initialLocation.x, sourceBounds.y
-              + location.y - initialLocation.y, sourceBounds.width, sourceBounds.height);
+      snapTarget = Rectangle(sourceBounds.x + location.x - initialLocation.x,
+          sourceBounds.y + location.y - initialLocation.y, sourceBounds.width,
+          sourceBounds.height);
     }
 
     // Try to prevent flicker: don't change the rectangles if they're already in
@@ -102,10 +110,10 @@ DragUtil::TargetListType::Pointer DragUtil::GetTargetList(void* control)
   return list;
 }
 
-IDropTarget::Pointer DragUtil::GetDropTarget(
-    const std::list<IDragOverListener::Pointer>& toSearch,
-    void* mostSpecificControl, Object::Pointer draggedObject,
-    const Point& position, const Rectangle& dragRectangle)
+IDropTarget::Pointer DragUtil::GetDropTarget(const std::list<
+    IDragOverListener::Pointer>& toSearch, void* mostSpecificControl,
+    Object::Pointer draggedObject, const Point& position,
+    const Rectangle& dragRectangle)
 {
 
   for (std::list<IDragOverListener::Pointer>::const_iterator iter =
@@ -227,8 +235,8 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   ITracker* tracker = Tweaklets::Get(DnDTweaklet::KEY)->CreateTracker();
   //tracker.setStippled(true);
 
-  GuiTk::IControlListener::Pointer trackerListener(new TrackerMoveListener(draggedItem,
-      sourceBounds, initialLocation, allowSnapping));
+  GuiTk::IControlListener::Pointer trackerListener(new TrackerMoveListener(
+      draggedItem, sourceBounds, initialLocation, allowSnapping));
 
   tracker->AddControlListener(trackerListener);
 
@@ -266,31 +274,33 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   // Tracking Loop...tracking is preformed on the 'SWT.Move' listener registered
   // against the tracker.
 
-//  // HACK:
-//  // Some control needs to capture the mouse during the drag or other
-//  // controls will interfere with the cursor
-//  Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-//  if (shell != null)
-//  {
-//    shell.setCapture(true);
-//  }
+  //  // HACK:
+  //  // Some control needs to capture the mouse during the drag or other
+  //  // controls will interfere with the cursor
+  //  Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+  //  if (shell != null)
+  //  {
+  //    shell.setCapture(true);
+  //  }
 
   // Run tracker until mouse up occurs or escape key pressed.
   bool trackingOk = tracker->Open();
 
-//  // HACK:
-//  // Release the mouse now
-//  if (shell != null)
-//  {
-//    shell.setCapture(false);
-//  }
+  //  // HACK:
+  //  // Release the mouse now
+  //  if (shell != null)
+  //  {
+  //    shell.setCapture(false);
+  //  }
 
   // Done tracking...
 
   // Get the current drop target
   IDropTarget::Pointer dropTarget;
-  Point finalLocation = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorLocation();
-  void* targetControl = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
+  Point finalLocation =
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorLocation();
+  void* targetControl =
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
   dropTarget = GetDropTarget(targetControl, draggedItem, finalLocation,
       tracker->GetRectangle());
 
@@ -325,8 +335,8 @@ IDropTarget::Pointer DragUtil::GetDropTarget(void* toSearch,
     if (targetList != 0)
       targets.assign(targetList->begin(), targetList->end());
 
-    IDropTarget::Pointer dropTarget = GetDropTarget(targets,
-        toSearch, draggedObject, position, dragRectangle);
+    IDropTarget::Pointer dropTarget = GetDropTarget(targets, toSearch,
+        draggedObject, position, dragRectangle);
 
     if (dropTarget != 0)
     {

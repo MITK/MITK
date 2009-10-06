@@ -92,7 +92,7 @@ WorkbenchWindow::~WorkbenchWindow()
 
   CHERRY_INFO << "Detached shell pointers: ";
   DebugUtil::PrintSmartPointerIDs(shell.GetPointer());
-#ifdef CHERRY_DEBUG_SMARTPOINTER
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   CHERRY_INFO << " Known pointer: " << shell.GetId() << std::endl;
 #endif
 }
@@ -1707,6 +1707,11 @@ void WorkbenchWindow::TrackShellActivation(Shell::Pointer shell)
 WorkbenchWindow::ControlResizeListener::ControlResizeListener(WorkbenchWindow* w)
 : window(w)
 {
+}
+
+GuiTk::IControlListener::Events::Types WorkbenchWindow::ControlResizeListener::GetEventTypes() const
+{
+  return Events::MOVED & Events::RESIZED;
 }
 
 void WorkbenchWindow::

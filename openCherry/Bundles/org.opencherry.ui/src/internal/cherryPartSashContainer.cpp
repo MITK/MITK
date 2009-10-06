@@ -42,6 +42,11 @@ PartSashContainer::ControlListener::ControlListener(
 
 }
 
+GuiTk::IControlListener::Events::Types PartSashContainer::ControlListener::GetEventTypes() const
+{
+  return Events::RESIZED;
+}
+
 void PartSashContainer::ControlListener::ControlResized(
     GuiTk::ControlEvent::Pointer /*e*/)
 {

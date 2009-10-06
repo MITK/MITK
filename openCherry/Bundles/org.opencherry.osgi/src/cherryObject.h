@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryMacros.h"
 #include "cherryMessage.h"
 
+#include <cherryConfig.h>
+
 #ifdef _MSC_VER
 // disable inheritance by dominance warnings
 #pragma warning( disable : 4250 4275 4251 )
@@ -150,27 +152,27 @@ public:
   virtual bool operator<(const Object*) const;
 
   /** Increase the reference count (mark as used by another object).  */
-  virtual void Register() const;
+  void Register() const;
 
   /** Decrease the reference count (release by another object).
    * Set del to false if you do not want the object to be deleted if
    * the reference count is zero (use with care!) */
-  virtual void UnRegister(bool del = true) const;
+  void UnRegister(bool del = true) const;
 
   /** Gets the reference count on this object. */
-  virtual int GetReferenceCount() const
+  int GetReferenceCount() const
     {return m_ReferenceCount;}
 
   /** Sets the reference count on this object. This is a dangerous
    * method, use it with care. */
-  virtual void SetReferenceCount(int);
+  void SetReferenceCount(int);
 
   /** A generic comparison method. Override this method in subclasses and
    * cast to your derived class to provide a more detailed comparison.
    */
   virtual bool operator==(const Object*) const;
 
-#ifdef CHERRY_DEBUG_SMARTPOINTER
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   unsigned long GetTraceId() const;
 private:
   unsigned long m_TraceId;

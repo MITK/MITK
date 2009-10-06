@@ -53,6 +53,9 @@ ENDIF()
 OPTION(OPENCHERRY_STATIC "Build all plugins as static libraries" OFF)
 MARK_AS_ADVANCED(OPENCHERRY_STATIC)
 
+OPTION(OPENCHERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
+MARK_AS_ADVANCED(OPENCHERRY_DEBUG_SMARTPOINTER)
+
 FIND_PACKAGE(Poco REQUIRED)
 FIND_PACKAGE(Ant)
 FIND_PACKAGE(Eclipse)
@@ -68,6 +71,9 @@ SET(OSGI_APP solstice)
 # Force should be removed after everybody has configured their old binary tree
 SET(OPENCHERRY_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/openCherry CACHE PATH "Directory where to build the openCherry Bundles" FORCE)
 MARK_AS_ADVANCED(OPENCHERRY_PLUGINS_OUTPUT_DIR)
+
+SET(OPENCHERRY_TEST_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/openCherryTests CACHE PATH "Directory where to build the openCherry test bundles")
+MARK_AS_ADVANCED(OPENCHERRY_TEST_PLUGINS_OUTPUT_DIR)
 
 # Clear the cache variables
 SET(OPENCHERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)

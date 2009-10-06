@@ -88,6 +88,8 @@ private:
       TrackerMoveListener(Object::Pointer draggedItem, const Rectangle& sourceBounds,
           const Point& initialLocation, bool allowSnapping);
 
+      Events::Types GetEventTypes() const;
+
       void ControlMoved(GuiTk::ControlEvent::Pointer event);
 
     private:

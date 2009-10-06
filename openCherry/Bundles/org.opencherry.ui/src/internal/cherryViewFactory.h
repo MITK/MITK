@@ -181,7 +181,7 @@ public:
     /*IStatus*/bool SaveState(IMemento::Pointer memento);
 
     //  for dynamic UI
-    IMemento::Pointer SaveViewState(IMemento::Pointer memento, IViewReference::Pointer ref /*,MultiStatus res*/);
+    IMemento::Pointer SaveViewState(IMemento::Pointer memento, IViewReference::Pointer ref, bool& res);
 
     // for dynamic UI
     void RestoreViewState(IMemento::Pointer memento);

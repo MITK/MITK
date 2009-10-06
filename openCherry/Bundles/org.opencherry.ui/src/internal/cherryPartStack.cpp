@@ -34,7 +34,6 @@
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 
 #include <cherryObjects.h>
-#include <cherryDebugUtil.h>
 
 #include <Poco/HashSet.h>
 
@@ -214,8 +213,6 @@ PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
   std::stringstream buf;
   buf << "PartStack@" << this;
   this->SetID(buf.str());
-
-  DebugUtil::TraceObject(this);
 
   presentationSite = new MyStackPresentationSite(this);
 }

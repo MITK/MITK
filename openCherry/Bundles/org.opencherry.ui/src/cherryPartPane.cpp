@@ -142,6 +142,11 @@ void PartPane::ControlActivated(GuiTk::ControlEvent::Pointer /*e*/)
   }
 }
 
+GuiTk::IControlListener::Events::Types PartPane::GetEventTypes() const
+{
+  return GuiTk::IControlListener::Events::ACTIVATED;
+}
+
 void PartPane::MoveAbove(void* refControl)
 {
   if (this->GetControl() != 0)

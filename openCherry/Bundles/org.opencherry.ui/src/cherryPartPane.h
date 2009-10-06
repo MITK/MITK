@@ -175,6 +175,10 @@ public:
      */
     public: void ControlActivated(GuiTk::ControlEvent::Pointer e);
 
+    /**
+     * @see GuiTk::IControlListener
+     */
+    public: GuiTk::IControlListener::Events::Types GetEventTypes() const;
 
     /**
      * Move the control over another one.

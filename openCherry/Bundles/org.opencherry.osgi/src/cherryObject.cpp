@@ -1,23 +1,27 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryLog.h"
 
 #include "cherryObject.h"
+
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+#include "cherryDebugUtil.h"
+#endif
 
 #include <list>
 #include <memory>
@@ -36,9 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace cherry
 {
 
-void
-Object
-::Delete()
+void Object::Delete()
 {
   this->UnRegister();
 }
@@ -73,48 +75,35 @@ Object
 }
 #endif
 
-
-void
-Object
-::Print(std::ostream& os, Indent indent) const
+void Object::Print(std::ostream& os, Indent indent) const
 {
   this->PrintHeader(os, indent);
   this->PrintSelf(os, indent.GetNextIndent());
   this->PrintTrailer(os, indent);
 }
 
-std::string
-Object
-::ToString() const
+std::string Object::ToString() const
 {
   return "";
 }
 
-std::size_t
-Object
-::HashCode() const
+std::size_t Object::HashCode() const
 {
-  return reinterpret_cast<std::size_t>(this);
+  return reinterpret_cast<std::size_t> (this);
 }
 
-bool
-Object
-::operator<(const Object* o) const
+bool Object::operator<(const Object* o) const
 {
   return this < o;
 }
 
-void
-Object
-::Register() const
+void Object::Register() const
 {
   Poco::Mutex::ScopedLock lock(m_ReferenceCountLock);
   m_ReferenceCount++;
 }
 
-void
-Object
-::UnRegister(bool del) const
+void Object::UnRegister(bool del) const
 {
   m_ReferenceCountLock.lock();
   int tmpReferenceCount = --m_ReferenceCount;
@@ -122,33 +111,30 @@ Object
 
   // ReferenceCount in now unlocked.  We may have a race condition
   // to delete the object.
-  if ( tmpReferenceCount <= 0 && del)
-    {
+  if (tmpReferenceCount <= 0 && del)
+  {
     delete this;
-    }
+  }
 }
 
-void
-Object
-::SetReferenceCount(int ref)
+void Object::SetReferenceCount(int ref)
 {
   m_ReferenceCountLock.lock();
   m_ReferenceCount = ref;
   m_ReferenceCountLock.unlock();
 
-  if ( m_ReferenceCount <= 0)
-    {
+  if (m_ReferenceCount <= 0)
+  {
     delete this;
-    }
+  }
 }
 
-bool
-Object::operator==(const Object* o) const
+bool Object::operator==(const Object* o) const
 {
   return this == o;
 }
 
-#ifdef CHERRY_DEBUG_SMARTPOINTER
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
 unsigned long Object::GetTraceId() const
 {
   return m_TraceId;
@@ -161,42 +147,45 @@ unsigned long& Object::GetTraceIdCounter() const
 }
 #endif
 
-Object::Object()
-  :m_ReferenceCount(0)
+Object::Object() :
+  m_ReferenceCount(0)
 {
-#ifdef CHERRY_DEBUG_SMARTPOINTER
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   unsigned long& id = GetTraceIdCounter();
   m_TraceId = ++id;
+  DebugUtil::RegisterObject(this);
 #endif
 }
 
-Object
-::~Object()
+Object::~Object()
 {
   /**
    * warn user if reference counting is on and the object is being referenced
    * by another object.
    */
-  if(m_ReferenceCount > 0)
-    {
+  if (m_ReferenceCount > 0)
+  {
     // A general exception safety rule is that destructors should
     // never throw.  Something is wrong with a program that reaches
     // this point anyway.  Also this is the least-derived class so the
     // whole object has been destroyed by this point anyway.  Just
     // issue a warning.
     CHERRY_WARN << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n"
-                << this->GetClassName() << " (" << this << "): Trying to delete object with non-zero reference count.";
-    }
+        << this->GetClassName() << " (" << this
+        << "): Trying to delete object with non-zero reference count.";
+  }
 
-    /**
-    * notifies the registered functions that the object is being destroyed
-    */
-    m_DestroyMessage.Send();
+  /**
+   * notifies the registered functions that the object is being destroyed
+   */
+  m_DestroyMessage.Send();
+
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+  DebugUtil::UnregisterObject(this);
+#endif
 }
 
-void
-Object
-::PrintSelf(std::ostream& os, Indent Indent) const
+void Object::PrintSelf(std::ostream& os, Indent Indent) const
 {
 #ifdef GCC_USEDEMANGLE
   char const * mangledName = typeid(*this).name();
@@ -206,14 +195,14 @@ Object
   os << Indent << "RTTI typeinfo:   ";
 
   if(status == 0)
-    {
+  {
     os << unmangled;
     free(unmangled);
-    }
+  }
   else
-    {
+  {
     os << mangledName;
-    }
+  }
 
   os << std::endl;
 #else
@@ -222,24 +211,18 @@ Object
   os << Indent << "Reference Count: " << m_ReferenceCount << std::endl;
 }
 
-
 /**
  * Define a default print header for all objects.
  */
-void
-Object
-::PrintHeader(std::ostream& os, Indent Indent) const
+void Object::PrintHeader(std::ostream& os, Indent Indent) const
 {
   os << Indent << this->GetClassName() << " (" << this << ")\n";
 }
 
-
 /**
  * Define a default print trailer for all objects.
  */
-void
-Object
-::PrintTrailer(std::ostream& /*os*/, Indent /*Indent*/) const
+void Object::PrintTrailer(std::ostream& /*os*/, Indent /*Indent*/) const
 {
 }
 
@@ -250,38 +233,31 @@ operator<<(std::ostream& os, const Object& o)
   return os;
 }
 
-
 // ============== Indent related implementations ==============
 
-static const char blanks[41] =
-"                                        ";
-
+static const char blanks[41] = "                                        ";
 
 Indent*
-Indent::
-New()
+Indent::New()
 {
   return new Self;
 }
 
-Indent
-Indent
-::GetNextIndent()
+Indent Indent::GetNextIndent()
 {
   int Indent = m_Indent + 2;
-  if ( Indent > 40 )
-    {
+  if (Indent > 40)
+  {
     Indent = 40;
-    }
+  }
   return Indent;
 }
 
 std::ostream&
 operator<<(std::ostream& os, const Indent& ind)
 {
-  os << blanks + (40-ind.m_Indent) ;
+  os << blanks + (40 - ind.m_Indent);
   return os;
 }
-
 
 }

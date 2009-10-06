@@ -91,7 +91,7 @@ public:
 private:
 
   IWorkbenchPartReference::Pointer partReference;
-  SmartPointer<IWorkbenchPart> part;
+  WeakPointer<IWorkbenchPart> part;
   SmartPointer<IWorkbenchPage> page;
   std::string extensionID;
   std::string pluginID;

@@ -82,15 +82,16 @@ bool SaveablesList::DecrementRefCount(
 bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
 {
   bool result = false;
-  Saveable::Set modelsForSource = modelMap[source];
-//  if (modelsForSource == 0)
-//  {
-//    logWarning(
-//        "Ignored attempt to remove a saveable when no saveables were known",
-//        source, model); //$NON-NLS-1$
-//  }
-//  else
-//  {
+  std::map<Object::Pointer, Saveable::Set>::iterator it = modelMap.find(source);
+  if (it == modelMap.end())
+  {
+    this->LogWarning(
+        "Ignored attempt to remove a saveable when no saveables were known",
+        source, model); //$NON-NLS-1$
+  }
+  else
+  {
+    Saveable::Set& modelsForSource = it->second;
     if (modelsForSource.erase(model) != 0)
     {
       result = this->DecrementRefCount(modelRefCounts, model);
@@ -105,7 +106,7 @@ bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
           "Ignored attempt to remove a saveable that was not registered",
           source, model); //$NON-NLS-1$
     }
-//  }
+  }
   return result;
 }
 
@@ -551,30 +552,33 @@ bool SaveablesList::SaveModels(const std::list<Saveable::Pointer>& finalModels
   return true;
 }
 
-void SaveablesList::PostClose(PostCloseInfo::Pointer postCloseInfoObject)
+void SaveablesList::PostClose(PostCloseInfo::Pointer postCloseInfo)
 {
-  //  PostCloseInfo postCloseInfo = (PostCloseInfo) postCloseInfoObject;
-  //  List removed = new ArrayList();
-  //  for (Iterator it = postCloseInfo.partsClosing.iterator(); it.hasNext();) {
-  //    IWorkbenchPart part = (IWorkbenchPart) it.next();
-  //    Set saveables = (Set) modelMap.get(part);
-  //    if (saveables != 0) {
-  //      // make a copy to avoid a ConcurrentModificationException - we
-  //      // will remove from the original set as we iterate
-  //      saveables = new HashSet(saveables);
-  //      for (Iterator it2 = saveables.iterator(); it2.hasNext();) {
-  //        Saveable saveable = (Saveable) it2.next();
-  //        if (removeModel(part, saveable)) {
-  //          removed.add(saveable);
-  //        }
-  //      }
-  //    }
-  //  }
-  //  if (removed.size() > 0) {
-  //    fireModelLifecycleEvent(new SaveablesLifecycleEvent(this,
-  //        SaveablesLifecycleEvent.POST_CLOSE, (Saveable[]) removed
-  //            .toArray(new Saveable[removed.size()]), false));
-  //  }
+  std::vector<Saveable::Pointer> removed;
+  for (std::list<WorkbenchPart::Pointer>::const_iterator it = postCloseInfo->partsClosing.begin();
+      it != postCloseInfo->partsClosing.end(); ++it)
+  {
+    IWorkbenchPart::Pointer part = *it;
+    std::map<Object::Pointer, Saveable::Set>::iterator it2 = modelMap.find(part);
+    if (it2 != modelMap.end()) {
+      // make a copy to avoid a ConcurrentModificationException - we
+      // will remove from the original set as we iterate
+      Saveable::Set saveables(it2->second);
+      for (Saveable::Set::const_iterator it3 = saveables.begin();
+          it3 != saveables.end(); ++it3)
+      {
+        if (RemoveModel(part, *it3)) {
+          removed.push_back(*it3);
+        }
+      }
+    }
+  }
+  if (!removed.empty()) {
+    Object::Pointer source(this);
+    SaveablesLifecycleEvent::Pointer event(new SaveablesLifecycleEvent(source,
+        SaveablesLifecycleEvent::POST_CLOSE, removed, false));
+    this->FireModelLifecycleEvent(event);
+  }
 }
 
 void SaveablesList::PostOpen(IWorkbenchPart::Pointer part)

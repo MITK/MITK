@@ -73,19 +73,18 @@ bool DefaultSaveable::IsDirty() const
 bool DefaultSaveable::operator<(const Saveable* obj) const
 {
   if (this == obj)
-  return true;
-  if (obj == 0)
   return false;
+  if (obj == 0)
+  return true;
 
   const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*>(obj);
   if (part == 0)
   {
     if (other->part != 0)
-    return false;
+      return true;
   }
-  else if (part != other->part)
-  return false;
-  return true;
+  else
+    return part < other->part;
 }
 
 bool DefaultSaveable::Show(IWorkbenchPage::Pointer page)

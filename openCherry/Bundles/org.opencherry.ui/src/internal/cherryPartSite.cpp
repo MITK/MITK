@@ -138,7 +138,7 @@ PartPane::Pointer PartSite::GetPane()
 
 IWorkbenchPart::Pointer PartSite::GetPart()
 {
-  return part;
+  return IWorkbenchPart::Pointer(part);
 }
 
 IWorkbenchPartReference::Pointer PartSite::GetPartReference()

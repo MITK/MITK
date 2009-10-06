@@ -5,7 +5,6 @@ SET(SRC_CPP_FILES
   cherryJobExceptions.cpp
   cherryJobStatus.cpp
   cherryMultiRule.cpp
-  cherryQualifiedName.cpp
   cherryNullProgressMonitor.cpp
   cherryProgressProvider.cpp
   cherryQualifiedName.cpp

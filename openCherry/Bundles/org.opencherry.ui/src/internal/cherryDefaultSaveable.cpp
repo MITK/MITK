@@ -26,7 +26,7 @@ namespace cherry
 {
 
 DefaultSaveable::DefaultSaveable(IWorkbenchPart::Pointer _part) :
- part(_part)
+  part(_part)
 {
 
 }
@@ -35,7 +35,7 @@ void DefaultSaveable::DoSave(/*IProgressMonitor monitor*/)
 {
   if (part.Cast<ISaveablePart> () != 0)
   {
-    part.Cast<ISaveablePart>()->DoSave(/*monitor*/);
+    part.Cast<ISaveablePart> ()->DoSave(/*monitor*/);
   }
 }
 
@@ -47,12 +47,12 @@ std::string DefaultSaveable::GetName() const
 ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
 {
   //TODO DefaultSaveable GetImageDescriptor
-//  Image image = part.getTitleImage();
-//  if (image == null)
-//  {
-//    return null;
-//  }
-//  return ImageDescriptor.createFromImage(image);
+  //  Image image = part.getTitleImage();
+  //  if (image == null)
+  //  {
+  //    return null;
+  //  }
+  //  return ImageDescriptor.createFromImage(image);
   return ImageDescriptor::Pointer(0);
 }
 
@@ -65,7 +65,7 @@ bool DefaultSaveable::IsDirty() const
 {
   if (part.Cast<ISaveablePart> () != 0)
   {
-    return part.Cast<ISaveablePart>()->IsDirty();
+    return part.Cast<ISaveablePart> ()->IsDirty();
   }
   return false;
 }
@@ -73,15 +73,14 @@ bool DefaultSaveable::IsDirty() const
 bool DefaultSaveable::operator<(const Saveable* obj) const
 {
   if (this == obj)
-  return false;
+    return false;
   if (obj == 0)
-  return true;
+    return true;
 
-  const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*>(obj);
+  const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*> (obj);
   if (part == 0)
   {
-    if (other->part != 0)
-      return true;
+    return other->part != 0;
   }
   else
     return part < other->part;
@@ -95,16 +94,15 @@ bool DefaultSaveable::Show(IWorkbenchPage::Pointer page)
     page->Activate(part);
     return true;
   }
-  if (part.Cast<IViewPart>() != 0)
+  if (part.Cast<IViewPart> () != 0)
   {
-    IViewPart::Pointer viewPart = part.Cast<IViewPart>();
+    IViewPart::Pointer viewPart = part.Cast<IViewPart> ();
     try
     {
-      page->ShowView(viewPart->GetViewSite()->GetId(), viewPart
-          ->GetViewSite()->GetSecondaryId(),
+      page->ShowView(viewPart->GetViewSite()->GetId(),
+          viewPart ->GetViewSite()->GetSecondaryId(),
           IWorkbenchPage::VIEW_ACTIVATE);
-    }
-    catch (PartInitException& /*e*/)
+    } catch (PartInitException& /*e*/)
     {
       return false;
     }

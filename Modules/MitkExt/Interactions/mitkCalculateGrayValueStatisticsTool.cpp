@@ -222,7 +222,12 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
 
   //initialize the histogram to the range of the cropped region
   HistogramType::SizeType size;
-  size.Fill(static_cast<HistogramType::SizeType::SizeValueType> (maximum - minimum + 1));
+#if defined(ITK_USE_REVIEW_STATISTICS)
+  typedef typename HistogramType::SizeType::ValueType HSizeValueType;
+#else
+  typedef typename HistogramType::SizeType::SizeValueType HSizeValueType;
+#endif
+  size.Fill(static_cast<HSizeValueType> (maximum - minimum + 1));
   HistogramType::MeasurementVectorType lowerBound;
   HistogramType::MeasurementVectorType upperBound;
   lowerBound[0] = minimum;

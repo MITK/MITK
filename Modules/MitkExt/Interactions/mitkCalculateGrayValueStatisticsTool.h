@@ -50,8 +50,12 @@ class MITKEXT_CORE_EXPORT CalculateGrayValueStatisticsTool : public Segmentation
   virtual const char* GetName() const;
 
   virtual std::string GetReport() const;
-
-  typedef itk::Statistics::Histogram<double, 1> HistogramType;
+  //
+  // Insight/Code/Review/Algorithms version of Histogram takes
+  // only one template parameter, and the 'release' version
+  // takes 2, but the default value for the second, 1, is what
+  // was specified here.
+  typedef itk::Statistics::Histogram<double> HistogramType;
   HistogramType::Pointer m_ITKHistogram;
 
   HistogramType::ConstPointer GetHistogram();

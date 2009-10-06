@@ -101,7 +101,11 @@ void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram
 
   for (unsigned int i = 0; i < size[0]; ++i)
   {
+#if !defined(ITK_USE_REVIEW_STATISTICS)
     index[0] = static_cast<HistogramType::IndexType::IndexValueType> (i);
+#else
+    index[0] = static_cast<HistogramType::IndexValueType> (i);
+#endif
     currentMeasurementVector = itkHistogram->GetMeasurementVector(index);
     if (currentMeasurementVector[0] != 0.0)
     {

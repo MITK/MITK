@@ -23,8 +23,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 
-#include "itkMITKScalarImageToHistogramGenerator.h"
 
+//
+// The new ITK Statistics framework has
+// a class with the same functionality as 
+// MITKScalarImageToHistogramGenerator.h, but
+// no longer has the classis the MITK class depends on.
+#if !defined(ITK_USE_REVIEW_STATISTICS)
+#include "itkMITKScalarImageToHistogramGenerator.h"
+#else
+#include "itkScalarImageToHistogramGenerator.h"
+#endif
 
 mitk::HistogramGenerator::HistogramGenerator() : m_Image(NULL), m_Size(256), m_Histogram(NULL)
 {
@@ -39,10 +48,15 @@ template < typename TPixel, unsigned int VImageDimension >
 void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
 {
   
+#if !defined(ITK_USE_REVIEW_STATISTICS)
   typedef itk::Statistics::MITKScalarImageToHistogramGenerator< 
                                               itk::Image< TPixel, VImageDimension >,
                                               double            >   HistogramGeneratorType;
-
+#else
+  typedef itk::Statistics::ScalarImageToHistogramGenerator< itk::Image< TPixel, VImageDimension > >
+  HistogramGeneratorType;
+                                               
+#endif
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
 
   histogramGenerator->SetInput( itkImage );
@@ -103,7 +117,10 @@ float mitk::HistogramGenerator::CalculateMaximumFrequency(const HistogramType* h
   float maxFreq = 0;
   while( itr != end )
     {
-    maxFreq = vnl_math_max(maxFreq,itr.GetFrequency());
+    maxFreq = vnl_math_max(maxFreq,
+                           // get rid of ambiguity with type signature
+                           // for vnl_math_max
+                           static_cast<float>(itr.GetFrequency()));
     ++itr;
     }
   return maxFreq;

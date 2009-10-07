@@ -309,8 +309,8 @@ protected:
   mitk::PointSet::Pointer m_MovingLandmarks;
   mitk::DataTreeNode::Pointer m_MovingPointSetNode;
   mitk::DataTreeNode::Pointer m_FixedPointSetNode;
-  mitk::DataTreeNode* m_MovingNode;
-  mitk::DataTreeNode* m_FixedNode;
+  mitk::DataTreeNode::Pointer m_MovingNode;
+  mitk::DataTreeNode::Pointer m_FixedNode;
   std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_UndoPointsGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;

@@ -257,7 +257,7 @@ void QmitkPointBasedRegistrationView::Deactivated()
   }
   m_InvisibleNodesList.clear();
   this->setImageColor(false);
-  if (m_MovingNode != NULL)
+  if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
     if (m_OldMovingLayerSet)
@@ -299,7 +299,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
     if (m_FixedNode != m_Controls.m_FixedSelector->GetSelectedNode())
     {
       // remove changes on previous selected node
-      if (m_FixedNode != NULL)
+      if (m_FixedNode.IsNotNull())
       {
         this->setImageColor(false);
         m_FixedNode->SetVisibility(false);
@@ -322,7 +322,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
       this->setImageColor(m_ShowRedGreen);
       m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(true));
 
-      if (m_MovingNode != NULL)
+      if (m_MovingNode.IsNotNull())
       {
         // safe MovingLayer only if we do not overwrite original MovingLayer
         if (!m_OldMovingLayerSet)
@@ -366,16 +366,48 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 
-    if (!m_HideFixedImage && m_FixedNode != NULL && m_FixedPointSetNode.IsNotNull())
+    if (!m_HideFixedImage && m_FixedNode.IsNotNull())
     {
-      if (m_FixedNode != NULL)
+      if (m_FixedNode.IsNotNull())
         m_FixedNode->SetVisibility(true);
       if (m_FixedPointSetNode.IsNotNull())
         m_FixedPointSetNode->SetVisibility(true);
+      else
+      {
+        bool hasPointSetNode = false;
+        mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
+        unsigned long size;
+        size = children->Size();
+        for (unsigned long i = 0; i < size; ++i)
+        {
+          mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(children->GetElement(i)->GetProperty("name"));
+          if(nameProp.IsNotNull() && nameProp->GetValueAsString()=="PointBasedRegistrationNode")
+          {
+            m_FixedPointSetNode=children->GetElement(i);
+            m_FixedLandmarks = dynamic_cast<mitk::PointSet*> (m_FixedPointSetNode->GetData());
+            this->GetDataStorage()->Remove(m_FixedPointSetNode);
+            hasPointSetNode = true;
+            break;
+          }
+        }
+        if (!hasPointSetNode)
+        {
+          m_FixedLandmarks = mitk::PointSet::New();
+          m_FixedPointSetNode = mitk::DataTreeNode::New();
+          m_FixedPointSetNode->SetData(m_FixedLandmarks);
+          m_FixedPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
+        }
+        m_FixedPointSetNode->GetStringProperty("label", m_OldFixedLabel);
+        m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New("F "));
+        m_FixedPointSetNode->SetProperty("color", mitk::ColorProperty::New(0.0f, 1.0f, 1.0f));
+        m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
+        this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      }
     }
     else
     {
-      if (m_FixedNode != NULL)
+      if (m_FixedNode.IsNotNull())
         m_FixedNode->SetVisibility(false);
     }
   }
@@ -402,7 +434,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
   {
     if (m_MovingNode != m_Controls.m_MovingSelector->GetSelectedNode())
     {
-      if (m_MovingNode != NULL)
+      if (m_MovingNode.IsNotNull())
       {
         m_MovingNode->SetOpacity(m_OriginalOpacity);
         this->setImageColor(false);
@@ -434,7 +466,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
       m_MovingNode->GetIntProperty("layer", m_OldMovingLayer);
       m_OldMovingLayerSet = true;
       // change MovingLayer to be one higher than FixedLayer -> MovingImage will be the upper image
-      if (m_FixedNode != NULL)
+      if (m_FixedNode.IsNotNull())
       {
         m_FixedNode->GetIntProperty("layer", m_NewMovingLayer);
         m_NewMovingLayer += 1;
@@ -478,14 +510,14 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
     }
     if (!m_HideMovingImage)
     {
-      if (m_MovingNode != NULL)
+      if (m_MovingNode.IsNotNull())
         m_MovingNode->SetVisibility(true);
       if (m_MovingPointSetNode.IsNotNull())
         m_MovingPointSetNode->SetVisibility(true);
     }
     else
     {
-      if (m_MovingNode != NULL)
+      if (m_MovingNode.IsNotNull())
         m_MovingNode->SetVisibility(false);
     }
   }
@@ -517,7 +549,7 @@ void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
 void QmitkPointBasedRegistrationView::HideFixedImage(bool hide)
 {
   m_HideFixedImage = hide;
-  if(m_FixedNode != NULL)
+  if(m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetVisibility(!hide);
   }
@@ -535,7 +567,7 @@ void QmitkPointBasedRegistrationView::HideFixedImage(bool hide)
 void QmitkPointBasedRegistrationView::HideMovingImage(bool hide)
 {
   m_HideMovingImage = hide;
-  if(m_MovingNode != NULL)
+  if(m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetVisibility(!hide);
   }
@@ -561,7 +593,7 @@ bool QmitkPointBasedRegistrationView::CheckCalculate()
 
 void QmitkPointBasedRegistrationView::SaveModel()
 {
-  if(m_MovingNode != NULL)
+  if(m_MovingNode.IsNotNull())
   {
     mitk::BaseData::Pointer data=m_MovingNode->GetData();
     if (data.IsNotNull())
@@ -658,19 +690,19 @@ void QmitkPointBasedRegistrationView::showRedGreen(bool redGreen)
 
 void QmitkPointBasedRegistrationView::setImageColor(bool redGreen)
 {
-  if (!redGreen && m_FixedNode != NULL)
+  if (!redGreen && m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetColor(m_FixedColor);
   }
-  if (!redGreen && m_MovingNode != NULL)
+  if (!redGreen && m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetColor(m_MovingColor);
   }
-  if (redGreen && m_FixedNode != NULL)
+  if (redGreen && m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetColor(1.0f, 0.0f, 0.0f);
   }
-  if (redGreen && m_MovingNode != NULL)
+  if (redGreen && m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetColor(0.0f, 1.0f, 0.0f);
   }
@@ -684,7 +716,7 @@ void QmitkPointBasedRegistrationView::OpacityUpdate(float opacity)
     opacity = opacity/100.0f;
   }
   m_Opacity = opacity;
-  if (m_MovingNode != NULL)
+  if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_Opacity);
   }
@@ -1095,7 +1127,7 @@ void QmitkPointBasedRegistrationView::globalReinitClicked()
   mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   /* calculate bounding geometry of these nodes */
-  mitk::Geometry3D::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
   /* initialize the views to the bounding geometry */
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

@@ -57,11 +57,13 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 
     mitk::NrrdDiffusionVolumesWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
-     
+    
+    /* commented out until core modification is checked in
     m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
+    */
     alreadyDone = true;
   }
 

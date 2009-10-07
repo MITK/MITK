@@ -23,10 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class MitkDiffusionImaging_EXPORT DiffusionImagingObjectFactory : public CoreObjectFactory
+class MitkDiffusionImaging_EXPORT DiffusionImagingObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(DiffusionImagingObjectFactory,CoreObjectFactory);
+    mitkClassMacro(DiffusionImagingObjectFactory,CoreObjectFactoryBase);
     itkNewMacro(DiffusionImagingObjectFactory);
     virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataTreeNode* node);

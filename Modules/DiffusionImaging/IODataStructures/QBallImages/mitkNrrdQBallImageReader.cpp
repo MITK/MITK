@@ -29,11 +29,7 @@ namespace mitk
 
   void NrrdQBallImageReader
     ::GenerateData()
-  {
-  }
-
-  void NrrdQBallImageReader::GenerateOutputInformation()
-  {
+  {    
     if ( m_FileName == "") 
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
@@ -88,6 +84,11 @@ namespace mitk
         throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, an error occurred while reading the requested vessel tree file!");
       }
     }
+  }
+
+  void NrrdQBallImageReader::GenerateOutputInformation()
+  {
+
   }
 
 

@@ -29,21 +29,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdQBallImageIOFactory.h"
 #include "mitkNrrdQBallImageWriterFactory.h"
 #include "mitkNrrdQBallImageWriter.h"
-#include "mitkQBallImage.h"
+//#include "mitkQBallImage.h"
+#include "mitkOdfVtkMapper2D.h"
+#include "mitkImageMapper2D.h"
 
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionVolumes<DiffusionPixelType> DiffusionVolumesShort;
 
 mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
-:CoreObjectFactory()
+:CoreObjectFactoryBase()
 {
-  m_ExternalFileExtensions = Superclass::GetFileExtensions();
-  m_ExternalFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
   m_ExternalFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
   
-  m_SaveFileExtensions = Superclass::GetSaveFileExtensions();
-  m_SaveFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
   m_SaveFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
+  m_SaveFileExtensions.append(";;XXXXXXXXXX (*.qxxx *.hqball)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -60,6 +61,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
 
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     alreadyDone = true;
   }
 
@@ -79,7 +81,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( const std::string& className )
 {
   itk::Object::Pointer pointer;
-
+  /*
   if ( className == "" )
     return NULL;
     CREATE_ITK( DiffusionVolumesShort, "DiffusionVolumes" )
@@ -87,7 +89,7 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
 //  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
   else
     pointer = Superclass::CreateCoreObject( className );
-
+*/
   return pointer;
 }
 
@@ -95,44 +97,39 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
 mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id) 
 {
   mitk::Mapper::Pointer newMapper=NULL;
-  //mitk::BaseData *data = node->GetData();
 
-  //if ( id == mitk::BaseRenderer::Standard2D )
-  //{
-  //  if((dynamic_cast<Mesh*>(data)!=NULL))
-  //  {
-  //    newMapper = mitk::MeshMapper2D::New();
-  //    newMapper->SetDataTreeNode(node);
-  //  }
-  //  else if((dynamic_cast<PointData*>(data)!=NULL))
-  //  {
-  //    newMapper = mitk::PolyDataGLMapper2D::New();
-  //    newMapper->SetDataTreeNode(node);
-  //  }
-  //}
-  //else if ( id == mitk::BaseRenderer::Standard3D )
-  //{
-  //  if((dynamic_cast<Mesh*>(data)!=NULL))
-  //  {
-  //    newMapper = mitk::MeshVtkMapper3D::New();
-  //    newMapper->SetDataTreeNode(node);
-  //  }
-  //  else if((dynamic_cast<PointData*>(data)!=NULL))
-  //  {
-  //    newMapper = mitk::PointDataVtkMapper3D::New();
-  //    newMapper->SetDataTreeNode(node);
-  //  }
-  //}
-
-  if (newMapper.IsNull()) {
-    newMapper = Superclass::CreateMapper(node,id);
+  if ( id == mitk::BaseRenderer::Standard2D )
+  {
+    std::string classname("QBallImage");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      LOG_INFO << "Mapper was created";
+      newMapper = mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::New();
+      newMapper->SetDataTreeNode(node);
+    }
   }
+  else if ( id == mitk::BaseRenderer::Standard3D )
+  {
+    // do nothing
+  }
+
   return newMapper;
 }
 
 void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
 {
-  Superclass::SetDefaultProperties(node);
+  std::string classname("DiffusionImages");
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    // do nothing
+  }
+
+  classname = "QBallImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node);
+    //mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+  }
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions() 

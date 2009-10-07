@@ -42,11 +42,11 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     TiXmlElement* dataElement = element->FirstChildElement("data");
     if (dataElement) 
     {
-      const char* filename( element->Attribute("file") );
+      const char* filename( dataElement->Attribute("file") );
       if ( filename )
       {
         DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-        factory->SetFileName( filename );
+        factory->SetFileName( workingDirectory + "/" + filename );
         
         try
         {

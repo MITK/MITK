@@ -95,8 +95,8 @@ private:
 
   static bool GetPersistencePath(Poco::Path& path);
 
-  static Poco::HashMap<unsigned int, std::list<unsigned int> > m_TraceIdToSmartPointerMap;
-  typedef Poco::HashMap<unsigned int, const Object*> TraceIdToObjectType;
+  static Poco::HashMap<Poco::UInt32, std::list<unsigned int> > m_TraceIdToSmartPointerMap;
+  typedef Poco::HashMap<Poco::UInt32, const Object* > TraceIdToObjectType;
   static TraceIdToObjectType m_TraceIdToObjectMap;
   static std::set<unsigned int> m_TracedObjects;
   static std::set<std::string> m_TracedClasses;

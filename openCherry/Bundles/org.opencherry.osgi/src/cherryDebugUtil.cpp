@@ -53,9 +53,9 @@ const std::string DebugUtil::TRACECLASS_TAG = "traceClass";
 const std::string DebugUtil::ID_ATTR = "id";
 const std::string DebugUtil::NAME_ATTR = "name";
 
-Poco::HashMap<unsigned int, std::list<unsigned int> >
+Poco::HashMap<Poco::UInt32, std::list<unsigned int> >
     DebugUtil::m_TraceIdToSmartPointerMap;
-Poco::HashMap<unsigned int, const Object*> DebugUtil::m_TraceIdToObjectMap;
+Poco::HashMap<Poco::UInt32, const Object*> DebugUtil::m_TraceIdToObjectMap;
 std::set<unsigned int> DebugUtil::m_TracedObjects;
 std::set<std::string> DebugUtil::m_TracedClasses;
 

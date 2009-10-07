@@ -118,9 +118,13 @@ public:
   virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartInputChanged (cherry::IWorkbenchPartReference::Pointer partRef);
 
-  // Convinient methods to set and reset a wait cursor ("hourglass")
+  // Convenient methods to set and reset a wait/busy cursor ("hourglass")
   void WaitCursorOn();
+  void BusyCursorOn();
   void WaitCursorOff();
+  void BusyCursorOff();
+
+  void RestoreOverrideCursor();
 
 protected:
   ///

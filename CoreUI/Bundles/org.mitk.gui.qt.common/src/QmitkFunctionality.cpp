@@ -315,7 +315,22 @@ void QmitkFunctionality::WaitCursorOn()
   QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
 }
 
+void QmitkFunctionality::BusyCursorOn()
+{
+  QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+}
+
 void QmitkFunctionality::WaitCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkFunctionality::BusyCursorOff()
+{
+  this->RestoreOverrideCursor();
+}
+
+void QmitkFunctionality::RestoreOverrideCursor()
 {
   QApplication::restoreOverrideCursor();
 }

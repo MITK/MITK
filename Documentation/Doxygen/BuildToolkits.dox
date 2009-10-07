@@ -1,0 +1,29 @@
+/**
+\page BuildToolkits Build Toolkits
+
+\section buildITK ITK
+
+For building ITK please refer to the ITK documentation 
+
+<a>http://www.itk.org/Wiki/ITK_Getting_Started</a>
+
+\section buildQT QT
+
+QT uses the same path for source and binaries. For detailed build instructions please refer to
+
+<a>http://doc.trolltech.com/4.5/installation.html</a>
+
+(If you are using a version other than QT 4.5 please change the link accordingly.)
+
+\section buildVTK VTK
+
+For building VTK please refer to the VTK documentation 
+
+<a>http://www.vtk.org/Wiki/VTK_Building_VTK</a>
+
+Please note, that you have to link VTK against your QT by checking:
+
+  - \b VTK_USE_GUISUPPORT 
+  - \b VTK_USE_QVTK 
+
+*/

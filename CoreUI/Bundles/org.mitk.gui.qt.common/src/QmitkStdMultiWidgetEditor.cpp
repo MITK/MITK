@@ -80,7 +80,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
 
     // Initialize views as transversal, sagittal, coronar to all data objects in DataStorage
     // (from top-left to bottom)
-    mitk::Geometry3D::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+    mitk::TimeSlicedGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
     mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
     // Initialize bottom-right view as 3D view

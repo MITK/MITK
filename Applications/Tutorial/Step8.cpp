@@ -44,7 +44,7 @@ void Step8::SetupWidgets()
 
 	// Initialize views as transversal, sagittal, coronar (from
 	// top-left to bottom)
-	mitk::Geometry3D::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(
+	mitk::TimeSlicedGeometry::Pointer geo = m_DataStorage->ComputeBoundingGeometry3D(
 			m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 

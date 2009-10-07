@@ -286,7 +286,7 @@ bool DebugUtil::PrintObjectSummary(const std::string& className, bool details)
     }
   }
   std::cout << " (" << count << " instances)" << std::endl;
-  return count;
+  return (count!=0);
 }
 
 unsigned int& DebugUtil::GetSmartPointerCounter()

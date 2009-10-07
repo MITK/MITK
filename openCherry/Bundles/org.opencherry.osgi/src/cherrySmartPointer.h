@@ -318,7 +318,7 @@ private:
 
 #if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
 
-  int m_Id;
+  unsigned int m_Id;
   Poco::FastMutex m_Mutex;
 
   void DebugInitSmartPointer()
@@ -327,11 +327,11 @@ private:
       Poco::FastMutex::ScopedLock lock(m_Mutex);
       if (m_Pointer)
       {
-        int& counter = DebugUtil::GetSmartPointerCounter();
+        unsigned int& counter = DebugUtil::GetSmartPointerCounter();
         m_Id = ++counter;
         DebugUtil::RegisterSmartPointer(m_Id, m_Pointer);
       }
-      else m_Id = -1;
+      else m_Id = 0;
     }
 
     //if (DebugUtil::GetSmartPointerCounter() == Platform::GetConfiguration().getInt(Platform::DEBUG_ARG_SMARTPOINTER_ID))
@@ -352,9 +352,9 @@ private:
 
     if (newObject)
     {
-      if (m_Id < 0)
+      if (m_Id < 1)
       {
-        int& counter = DebugUtil::GetSmartPointerCounter();
+        unsigned int& counter = DebugUtil::GetSmartPointerCounter();
         m_Id = ++counter;
       }
       DebugUtil::RegisterSmartPointer(m_Id, newObject);

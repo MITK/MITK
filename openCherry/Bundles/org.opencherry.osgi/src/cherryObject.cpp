@@ -135,14 +135,14 @@ bool Object::operator==(const Object* o) const
 }
 
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-unsigned long Object::GetTraceId() const
+unsigned int Object::GetTraceId() const
 {
   return m_TraceId;
 }
 
-unsigned long& Object::GetTraceIdCounter() const
+unsigned int& Object::GetTraceIdCounter() const
 {
-  static unsigned long traceId = 0;
+  static unsigned int traceId = 0;
   return traceId;
 }
 #endif
@@ -151,7 +151,7 @@ Object::Object() :
   m_ReferenceCount(0)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  unsigned long& id = GetTraceIdCounter();
+  unsigned int& id = GetTraceIdCounter();
   m_TraceId = ++id;
   DebugUtil::RegisterObject(this);
 #endif

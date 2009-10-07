@@ -173,10 +173,10 @@ public:
   virtual bool operator==(const Object*) const;
 
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  unsigned long GetTraceId() const;
+  unsigned int GetTraceId() const;
 private:
-  unsigned long m_TraceId;
-  unsigned long& GetTraceIdCounter() const;
+  unsigned int m_TraceId;
+  unsigned int& GetTraceIdCounter() const;
 public:
 #endif
 

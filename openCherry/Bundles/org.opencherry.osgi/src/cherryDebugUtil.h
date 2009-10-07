@@ -44,25 +44,25 @@ public:
   static DebugBreakpointManager* GetBreakpointManager();
 
   static void TraceObject(const Object*);
-  static void TraceObject(unsigned long traceId);
+  static void TraceObject(unsigned int traceId);
   static void TraceClass(const std::string& className);
 
-  static void StopTracing(unsigned long traceId);
+  static void StopTracing(unsigned int traceId);
   static void StopTracing(const Object* obj);
   static void StopTracing(const std::string& className);
 
   static bool IsTraced(const Object* object);
-  static bool IsTraced(unsigned long traceId);
+  static bool IsTraced(unsigned int traceId);
   static bool IsTraced(const std::string& className);
 
-  static const std::set<unsigned long>& GetTracedObjects();
+  static const std::set<unsigned int>& GetTracedObjects();
 
-  static const Object* GetObject(unsigned long traceId);
+  static const Object* GetObject(unsigned int traceId);
 
-  static std::list<int> GetSmartPointerIDs(const Object* objectPointer, const std::list<int>& excludeList = std::list<int>());
+  static std::list<unsigned int> GetSmartPointerIDs(const Object* objectPointer, const std::list<unsigned int>& excludeList = std::list<unsigned int>());
   static void GetRegisteredObjects(std::vector<const Object*>& list);
 
-  static void PrintSmartPointerIDs(const Object* objectPointer, std::ostream& = std::cout, const std::list<int>& excludeList = std::list<int>());
+  static void PrintSmartPointerIDs(const Object* objectPointer, std::ostream& = std::cout, const std::list<unsigned int>& excludeList = std::list<unsigned int>());
 
   static void ResetObjectSummary();
   static bool PrintObjectSummary(bool details = false);
@@ -75,9 +75,9 @@ public:
   static void RestoreState();
 
   // ******* for internal use only *************
-  static int& GetSmartPointerCounter();
-  static void RegisterSmartPointer(int smartPointerId, const Object* objectPointer, bool recordStack = false);
-  static void UnregisterSmartPointer(int smartPointerId, const Object* objectPointer);
+  static unsigned int& GetSmartPointerCounter();
+  static void RegisterSmartPointer(unsigned int smartPointerId, const Object* objectPointer, bool recordStack = false);
+  static void UnregisterSmartPointer(unsigned int smartPointerId, const Object* objectPointer);
   static void RegisterObject(const Object* objectPointer);
   static void UnregisterObject(const Object* objectPointer);
   // *******************************************
@@ -95,18 +95,10 @@ private:
 
   static bool GetPersistencePath(Poco::Path& path);
 
-  struct ObjectHash : public std::unary_function<const Object*, std::size_t>
-  {
-    std::size_t operator()(const Object* obj) const
-    {
-      return reinterpret_cast<std::size_t> (this);
-    }
-  };
-
-  static Poco::HashMap<unsigned long, std::list<int> > m_TraceIdToSmartPointerMap;
-  typedef Poco::HashMap<unsigned long, const Object*> TraceIdToObjectType;
+  static Poco::HashMap<unsigned int, std::list<unsigned int> > m_TraceIdToSmartPointerMap;
+  typedef Poco::HashMap<unsigned int, const Object*> TraceIdToObjectType;
   static TraceIdToObjectType m_TraceIdToObjectMap;
-  static std::set<unsigned long> m_TracedObjects;
+  static std::set<unsigned int> m_TracedObjects;
   static std::set<std::string> m_TracedClasses;
 };
 

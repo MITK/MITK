@@ -905,7 +905,7 @@ void PerspectiveHelper::DerefPart(StackablePart::Pointer part)
           parent->Print(std::cout);
 #if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
           CHERRY_INFO << "Parent container traceid: " << parent->GetTraceId() << std::endl;
-          std::list<int> knownIDs;
+          std::list<unsigned int> knownIDs;
           //knownIDs.push_back(oldContainer.GetId());
           //knownIDs.push_back(parent.GetId());
           DebugUtil::PrintSmartPointerIDs(oldContainer.GetPointer(), std::cout, knownIDs);

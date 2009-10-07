@@ -46,8 +46,8 @@ struct CHERRY_OSGI IDebugObjectListener: public Object
     CHERRY_DECLARE_FLAGS(Types, Type)
 
     typedef Message1<const Object*> ObjectEventType;
-    typedef Message3<unsigned long, bool, const Object*> TracingEventType;
-    typedef Message2<int, const Object*> SmartPointerEventType;
+    typedef Message3<unsigned int, bool, const Object*> TracingEventType;
+    typedef Message2<unsigned int, const Object*> SmartPointerEventType;
 
     ObjectEventType objCreatedEvent;
     ObjectEventType objDestroyedEvent;
@@ -59,8 +59,8 @@ struct CHERRY_OSGI IDebugObjectListener: public Object
     void RemoveListener(IDebugObjectListener::Pointer listener);
 
     typedef MessageDelegate1<IDebugObjectListener, const Object*> ObjDelegate;
-    typedef MessageDelegate3<IDebugObjectListener, unsigned long, bool, const Object*> TraceDelegate;
-    typedef MessageDelegate2<IDebugObjectListener, int, const Object*> SPDelegate;
+    typedef MessageDelegate3<IDebugObjectListener, unsigned int, bool, const Object*> TraceDelegate;
+    typedef MessageDelegate2<IDebugObjectListener, unsigned int, const Object*> SPDelegate;
   };
 
   virtual ~IDebugObjectListener()
@@ -77,15 +77,15 @@ struct CHERRY_OSGI IDebugObjectListener: public Object
   {
   }
 
-  virtual void ObjectTracingChanged(unsigned long traceId, bool enabled = true, const Object* obj = 0)
+  virtual void ObjectTracingChanged(unsigned int traceId, bool enabled = true, const Object* obj = 0)
   {
   }
 
-  virtual void SmartPointerCreated(int id, const Object* obj)
+  virtual void SmartPointerCreated(unsigned int id, const Object* obj)
   {
   }
 
-  virtual void SmartPointerDestroyed(int id, const Object* obj)
+  virtual void SmartPointerDestroyed(unsigned int id, const Object* obj)
   {
   }
 

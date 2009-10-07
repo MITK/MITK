@@ -53,10 +53,10 @@ const std::string DebugUtil::TRACECLASS_TAG = "traceClass";
 const std::string DebugUtil::ID_ATTR = "id";
 const std::string DebugUtil::NAME_ATTR = "name";
 
-Poco::HashMap<unsigned long, std::list<int> >
+Poco::HashMap<unsigned int, std::list<unsigned int> >
     DebugUtil::m_TraceIdToSmartPointerMap;
-Poco::HashMap<unsigned long, const Object*> DebugUtil::m_TraceIdToObjectMap;
-std::set<unsigned long> DebugUtil::m_TracedObjects;
+Poco::HashMap<unsigned int, const Object*> DebugUtil::m_TraceIdToObjectMap;
+std::set<unsigned int> DebugUtil::m_TracedObjects;
 std::set<std::string> DebugUtil::m_TracedClasses;
 
 
@@ -70,18 +70,18 @@ public:
     name(s)
   {
   }
-  bool operator()(Poco::HashMapEntry<unsigned long, const Object*>& entry) const
+  bool operator()(Poco::HashMapEntry<unsigned int, const Object*>& entry) const
   {
     return name != entry.second->GetClassName();
   }
 };
 
 class AccumulateClassNames: public std::binary_function<std::set<std::string>*,
-    Poco::HashMapEntry<unsigned long, const Object*>&, std::set<std::string>*>
+    Poco::HashMapEntry<unsigned int, const Object*>&, std::set<std::string>*>
 {
 public:
   std::set<std::string>* operator()(std::set<std::string>* names,
-      Poco::HashMapEntry<unsigned long, const Object*>& entry)
+      Poco::HashMapEntry<unsigned int, const Object*>& entry)
   {
     names->insert(entry.second->GetClassName());
     return names;
@@ -103,7 +103,7 @@ void DebugUtil::TraceObject(const Object* object)
 #endif
 }
 
-void DebugUtil::TraceObject(unsigned long traceId)
+void DebugUtil::TraceObject(unsigned int traceId)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   CHERRY_INFO << "Tracing enabled for: " << traceId << std::endl;
@@ -125,7 +125,7 @@ void DebugUtil::TraceClass(const std::string& className)
 #endif
 }
 
-void DebugUtil::StopTracing(unsigned long traceId)
+void DebugUtil::StopTracing(unsigned int traceId)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   CHERRY_INFO << "Tracing stopped for: " << traceId << std::endl;
@@ -165,7 +165,7 @@ bool DebugUtil::IsTraced(const Object* object)
 #endif
 }
 
-bool DebugUtil::IsTraced(unsigned long traceId)
+bool DebugUtil::IsTraced(unsigned int traceId)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   return m_TracedObjects.find(traceId) != m_TracedObjects.end();
@@ -183,45 +183,45 @@ bool DebugUtil::IsTraced(const std::string& className)
 #endif
 }
 
-const std::set<unsigned long>& DebugUtil::GetTracedObjects()
+const std::set<unsigned int>& DebugUtil::GetTracedObjects()
 {
   return m_TracedObjects;
 }
 
-const Object* DebugUtil::GetObject(unsigned long traceId)
+const Object* DebugUtil::GetObject(unsigned int traceId)
 {
   return m_TraceIdToObjectMap[traceId];
 }
 
-std::list<int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer,
-    const std::list<int>& excludeList)
+std::list<unsigned int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer,
+    const std::list<unsigned int>& excludeList)
 {
   poco_assert(objectPointer != 0);
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  std::list<int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
-  for (std::list<int>::const_iterator iter = excludeList.begin();
+  std::list<unsigned int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
+  for (std::list<unsigned int>::const_iterator iter = excludeList.begin();
       iter != excludeList.end(); ++iter)
   ids.remove(*iter);
   return ids;
 #else
-  return std::list<int>();
+  return std::list<unsigned int>();
 #endif
 }
 
 void DebugUtil::GetRegisteredObjects(std::vector<const Object*>& list)
 {
-  for (Poco::HashMap<unsigned long, const Object*>::ConstIterator i = m_TraceIdToObjectMap.begin();
+  for (TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.begin();
       i != m_TraceIdToObjectMap.end(); ++i)
   {
     list.push_back(i->second);
   }
 }
 
-void DebugUtil::PrintSmartPointerIDs(const Object* objectPointer, std::ostream& stream, const std::list<int>& excludeList)
+void DebugUtil::PrintSmartPointerIDs(const Object* objectPointer, std::ostream& stream, const std::list<unsigned int>& excludeList)
 {
   stream << "SmartPointer IDs [ ";
-  std::list<int> ids = GetSmartPointerIDs(objectPointer, excludeList);
-  for (std::list<int>::const_iterator iter = ids.begin();
+  std::list<unsigned int> ids = GetSmartPointerIDs(objectPointer, excludeList);
+  for (std::list<unsigned int>::const_iterator iter = ids.begin();
       iter != ids.end(); ++iter)
   {
     stream << *iter << " ";
@@ -254,7 +254,8 @@ bool DebugUtil::PrintObjectSummary(bool details)
 
   if (!names.empty())
   {
-    std::cout << "cherry::Object leakage summary:" << std::endl;
+    std::cout << std::endl << std::endl << "#########################################################" << std::endl;
+    std::cout <<                           "########     cherry::Object leakage summary:     ########" << std::endl << std::endl;
 
     for (std::set<std::string>::const_iterator i = names.begin();
         i != names.end(); ++i)
@@ -262,6 +263,8 @@ bool DebugUtil::PrintObjectSummary(bool details)
       PrintObjectSummary(*i, details);
       if (details) std::cout << std::endl;
     }
+
+    std::cout << std::endl << "#########################################################" << std::endl << std::endl;
   }
 
   return !names.empty();
@@ -269,14 +272,14 @@ bool DebugUtil::PrintObjectSummary(bool details)
 
 bool DebugUtil::PrintObjectSummary(const std::string& className, bool details)
 {
-  Poco::HashMap<unsigned long, const Object*>::ConstIterator endIter =
+  TraceIdToObjectType::ConstIterator endIter =
   std::remove_if(m_TraceIdToObjectMap.begin(), m_TraceIdToObjectMap.end(), NotClassName(className));
 
   std::cout << "Class: " << className;
   if (details) std::cout << std::endl;
 
   std::size_t count = 0;
-  for (Poco::HashMap<unsigned long, const Object*>::ConstIterator iter = m_TraceIdToObjectMap.begin();
+  for (TraceIdToObjectType::ConstIterator iter = m_TraceIdToObjectMap.begin();
       iter != endIter; ++iter, ++count)
   {
     if (details)
@@ -284,17 +287,17 @@ bool DebugUtil::PrintObjectSummary(const std::string& className, bool details)
       std::cout << *(iter->second);
     }
   }
-  std::cout << "(" << count << " instances)" << std::endl;
+  std::cout << " (" << count << " instances)" << std::endl;
   return count;
 }
 
-int& DebugUtil::GetSmartPointerCounter()
+unsigned int& DebugUtil::GetSmartPointerCounter()
 {
-  static int counter = 0;
+  static unsigned int counter = 0;
   return counter;
 }
 
-void DebugUtil::UnregisterSmartPointer(int smartPointerId, const Object* objectPointer)
+void DebugUtil::UnregisterSmartPointer(unsigned int smartPointerId, const Object* objectPointer)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   poco_assert(objectPointer != 0);
@@ -304,7 +307,7 @@ void DebugUtil::UnregisterSmartPointer(int smartPointerId, const Object* objectP
 #endif
 }
 
-void DebugUtil::RegisterSmartPointer(int smartPointerId, const Object* objectPointer, bool /*recordStack*/)
+void DebugUtil::RegisterSmartPointer(unsigned int smartPointerId, const Object* objectPointer, bool /*recordStack*/)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   poco_assert(objectPointer != 0);
@@ -356,7 +359,7 @@ void DebugUtil::SaveState()
   Poco::XML::Element* debugutil = doc->createElement(DEBUGUTIL_TAG);
   doc->appendChild(debugutil)->release();
 
-  for (std::set<unsigned long>::const_iterator i = m_TracedObjects.begin();
+  for (std::set<unsigned int>::const_iterator i = m_TracedObjects.begin();
       i != m_TracedObjects.end(); ++i)
   {
     Poco::XML::Element* traceObject = doc->createElement(TRACEOBJECT_TAG);

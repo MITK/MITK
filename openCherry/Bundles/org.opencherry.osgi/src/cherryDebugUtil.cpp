@@ -15,14 +15,12 @@
 
  =========================================================================*/
 
-#include "cherryDebugUtil.h"
+#include "cherryIDebugObjectListener.h"
 
+#include "cherryDebugUtil.h"
 #include "cherryObject.h"
 #include "cherryLog.h"
-
 #include "cherryPlatform.h"
-
-#include "cherryIDebugObjectListener.h"
 #include "cherryDebugBreakpointManager.h"
 
 #include <Poco/Bugcheck.h>

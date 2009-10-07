@@ -22,6 +22,8 @@
 #include <cherryObject.h>
 #include <cherryMacros.h>
 
+#include "cherryOSGiDll.h"
+
 namespace cherry
 {
 

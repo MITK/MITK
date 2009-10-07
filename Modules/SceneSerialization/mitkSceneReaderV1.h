@@ -29,6 +29,18 @@ class SceneReaderV1 : public SceneReader
     itkNewMacro( Self );
       
     virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage );
+  
+  protected:
+
+    typedef std::map<DataTreeNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
+    typedef std::map<std::string, DataTreeNode*> IDToNodeMappingType;
+    typedef std::map<DataTreeNode*, std::string> NodeToIDMappingType;
+
+    NodesAndParentsMapType  m_Nodes;
+    IDToNodeMappingType      m_NodeForID;
+    NodeToIDMappingType      m_IDForNode;
+
+    UIDGenerator m_UIDGen;
 };
 
 }

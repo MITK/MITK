@@ -163,7 +163,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   }
   if (sceneReaders.size() > 1)
   {
-    LOG_ERROR << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
+    LOG_WARN << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = sceneReaders.begin();
@@ -226,20 +226,20 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
   version->SetAttribute("FileVersion",  1 );
   document.LinkEndChild(version);
  
-  DataStorage::SetOfObjects::ConstPointer storedObjects = storage->GetSubset( predicate );
+  DataStorage::SetOfObjects::ConstPointer objectsToStore = storage->GetSubset( predicate );
 
-  if ( storedObjects.IsNull() )
+  if ( objectsToStore.IsNull() )
   {
     LOG_WARN << "Saving empty scene to " << filename;
   }
   else
   {
-    if ( storedObjects->size() == 0 )
+    if ( objectsToStore->size() == 0 )
     {
       LOG_WARN << "Saving empty scene to " << filename;
     }
 
-    LOG_INFO << "Storing scene with " << storedObjects->size() << " objects to " << filename;
+    LOG_INFO << "Storing scene with " << objectsToStore->size() << " objects to " << filename;
   
     m_WorkingDirectory = CreateEmptyTempDirectory();
     if (m_WorkingDirectory.empty())
@@ -248,7 +248,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       return false;
     }
    
-    ProgressBar::GetInstance()->AddStepsToDo( storedObjects->size() );
+    ProgressBar::GetInstance()->AddStepsToDo( objectsToStore->size() );
  
     // find out about dependencies
     typedef std::map< DataTreeNode*, std::string > UIDMapType;
@@ -259,8 +259,8 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
 
     UIDGenerator nodeUIDGen("OBJECT_");
 
-    for (DataStorage::SetOfObjects::const_iterator iter = storedObjects->begin();
-         iter != storedObjects->end();
+    for (DataStorage::SetOfObjects::const_iterator iter = objectsToStore->begin();
+         iter != objectsToStore->end();
          ++iter)
     {
       DataTreeNode* node = iter->GetPointer();
@@ -272,7 +272,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
             sourceIter != sourceObjects->end();
             ++sourceIter )
       {
-        if ( std::find( storedObjects->begin(), storedObjects->end(), *sourceIter ) == storedObjects->end() ) continue; // source is not saved, so don't generate a UID for this source
+        if ( std::find( objectsToStore->begin(), objectsToStore->end(), *sourceIter ) == objectsToStore->end() ) continue; // source is not saved, so don't generate a UID for this source
 
         // create a uid for the parent object
         if ( nodeUIDs[ *sourceIter ].empty() )
@@ -283,11 +283,16 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
         // store this dependency for writing 
         sourceUIDs[ node ].push_back( nodeUIDs[*sourceIter] );
       }
+
+      if ( nodeUIDs[ node ].empty() )
+      {
+        nodeUIDs[ node ] = nodeUIDGen.GetUID();
+      }
     }
    
     // write out objects, dependencies and properties
-    for (DataStorage::SetOfObjects::const_iterator iter = storedObjects->begin();
-         iter != storedObjects->end();
+    for (DataStorage::SetOfObjects::const_iterator iter = objectsToStore->begin();
+         iter != objectsToStore->end();
          ++iter)
     {
       DataTreeNode* node = iter->GetPointer();
@@ -380,7 +385,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       ProgressBar::GetInstance()->Progress();
     } // end for all nodes
 
-  } // end if storedObjects
+  } // end if objectsToStore
 
   if ( !document.SaveFile( m_WorkingDirectory + "/index.xml" ) )
   {

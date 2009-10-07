@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionIterator.h"
 #include "itkArray.h"
 #include "vnl/vnl_vector.h"
-#include "itkPointShell.h"
+//#include "itkPointShell.h"
 
 // #include "itkPointShell.h"
 

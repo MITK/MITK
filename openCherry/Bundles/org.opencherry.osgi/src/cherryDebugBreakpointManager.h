@@ -23,11 +23,13 @@
 #include <Poco/HashMap.h>
 #include <set>
 
+#include "cherryOSGiDll.h"
+
 namespace cherry {
 
 class Object;
 
-class DebugBreakpointManager
+class CHERRY_OSGI DebugBreakpointManager
 {
 public:
 

@@ -86,6 +86,8 @@ ObjectItem& ObjectItem::operator=(const ObjectItem& item)
     spId = item.spId;
     break;
   }
+
+  return *this;
 }
 
 bool ObjectItem::operator==(const ObjectItem& item) const

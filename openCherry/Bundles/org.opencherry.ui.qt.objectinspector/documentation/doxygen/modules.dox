@@ -1,0 +1,16 @@
+/**
+  \defgroup org_opencherry_ui_qt_objectinspector org.opencherry.ui.qt.objectinspector Plugin
+  \ingroup openCherryPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup org_opencherry_ui_qt_objectinspector_internal Internal
+  \ingroup org_opencherry_ui_qt_objectinspector
+
+  \brief This subcategory includes the internal classes of the org.opencherry.ui.qt.objectinspector plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

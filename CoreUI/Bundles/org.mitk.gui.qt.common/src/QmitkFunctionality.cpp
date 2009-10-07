@@ -261,6 +261,10 @@ void QmitkFunctionality::DataStorageChanged()
 
 QmitkFunctionality::~QmitkFunctionality()
 {
+  this->Register();
+  this->GetSite()->GetPage()->RemovePartListener(cherry::IPartListener::Pointer(this));
+  this->UnRegister(false);
+
   this->GetDefaultDataStorage()->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>
     ( this, &QmitkFunctionality::NodeAddedProxy ) );
   this->GetDefaultDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>

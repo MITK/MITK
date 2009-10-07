@@ -36,8 +36,12 @@ QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
 
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
-  if (m_StdMultiWidget != 0)
-    delete m_StdMultiWidget;
+  // we need to wrap the RemovePartListener call inside a
+  // register/unregister block to prevent infinite recursion
+  // due to the destruction of temporary smartpointer to this
+  this->Register();
+  this->GetSite()->GetPage()->RemovePartListener(cherry::IPartListener::Pointer(this));
+  this->UnRegister(false);
 }
 
 QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()

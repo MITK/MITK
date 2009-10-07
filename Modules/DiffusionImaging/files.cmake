@@ -19,12 +19,21 @@ SET(CPP_FILES
   IODataStructures/QBallImages/mitkNrrdQBallImageWriterFactory.cpp
   IODataStructures/mitkDiffusionImagingObjectFactory.cpp
   IODataStructures/QBallImages/mitkQBallImage.cpp
+  Rendering/vtkMaskedGlyph2D.cpp
+  Rendering/vtkMaskedGlyph3D.cpp
+  Rendering/vtkMaskedProgrammableGlyphFilter.cpp
+  Rendering/mitkVectorImageMapper2D.cpp
+  Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
+  Rendering/vtkOdfSource.cxx
+  Rendering/vtkThickPlane.cxx
 )
 
 SET(H_FILES 
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
+  Reconstruction/itkOrientationDistributionFunction.h
   IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumes.h 
+  Rendering/mitkOdfVtkMapper2D.h
 )
 
 SET( TOOL_FILES

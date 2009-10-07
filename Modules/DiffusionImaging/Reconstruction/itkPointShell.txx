@@ -1,5 +1,5 @@
-#ifndef __itkPointShell_cpp__
-#define __itkPointShell_cpp__
+#ifndef __itkPointShell_txx__
+#define __itkPointShell_txx__
 
 #include "vnl/vnl_vector_fixed.h"
 #include "vnl/vnl_matrix_fixed.h"
@@ -4082,4 +4082,4 @@ namespace itk
 
 }
 
-#endif //__itkPointShell_cpp__
+#endif //__itkPointShell_txx__

@@ -17,7 +17,7 @@ namespace itk
 
 }
 
-#include "itkPointShell.cpp"
+#include "itkPointShell.txx"
 //template class itk::PointShell<100, vnl_matrix_fixed<double,3,100> >;
 
 #endif //__itkPointShell_h__

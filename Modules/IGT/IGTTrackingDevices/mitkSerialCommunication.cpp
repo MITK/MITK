@@ -20,19 +20,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #ifdef WIN32
-#include <atlstr.h>
-#include <itksys/SystemTools.hxx>
+//#include <atlstr.h>
+  #include <itksys/SystemTools.hxx>
 #else // Posix
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <termios.h>
-#include <errno.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <sys/time.h>
+  #include <sys/ioctl.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <termios.h>
+  #include <errno.h>
 
-#define INVALID_HANDLE_VALUE -1
+  #define INVALID_HANDLE_VALUE -1
 #endif
 
 #define OK 1
@@ -265,9 +265,9 @@ int mitk::SerialCommunication::ApplyConfiguration()
     return ERROR_VALUE;
   }
 
-  CString deviceControlString;
-  deviceControlString.Format(_T("baud=%u parity=%c data=%d stop=%d"), m_BaudRate, m_Parity, m_DataBits, m_StopBits); // set baudrate, parity, data bits and stop bits setting
-  if (BuildCommDCBA(deviceControlString, &controlSettings)  == 0) // Build device-control block
+  std::ostringstream o;
+  o << "baud=" << m_BaudRate << " parity=" << static_cast<char>(m_Parity) << " data=" << m_DataBits << " stop=" << m_StopBits;  
+  if (BuildCommDCBA(o.str().c_str(), &controlSettings)  == 0) // Build device-control block
     return ERROR_VALUE;
 
   if (m_HardwareHandshake == HardwareHandshakeOn) // Modify hardware handshake values

@@ -40,11 +40,9 @@ class SceneReaderV1 : public SceneReader
                                                    bool& error );
 
     /**
-      \brief tries read the given file containing a propertylist and create all properties in the given DataTreeNode
+      \brief reads all the properties from the XML document and recreates them in node
     */
-    bool DecorateNodeWithProperties(DataTreeNode* node, 
-                                    const std::string& propertiesfile, 
-                                    PropertyList* propertyList);
+    bool DecorateNodeWithProperties(DataTreeNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
 
     typedef std::map<DataTreeNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
     typedef std::map<std::string, DataTreeNode*> IDToNodeMappingType;

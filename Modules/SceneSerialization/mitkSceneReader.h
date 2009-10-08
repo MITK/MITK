@@ -32,8 +32,9 @@ class SceneSerialization_EXPORT SceneReader : public itk::Object
   public:
     
     mitkClassMacro( SceneReader, itk::Object );
+    itkNewMacro( Self );
       
-    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage ) = 0;
+    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage );
 };
 
 }

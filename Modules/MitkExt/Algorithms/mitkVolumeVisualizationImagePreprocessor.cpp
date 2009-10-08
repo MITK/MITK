@@ -120,7 +120,7 @@ void VolumeVisualizationImagePreprocessor::UpdateTransferFunction( TransferFunct
 
   double surfaceSteepness = 0.0;
 
-  VVP_INFO << "changing to threshold of " << treshold << " and opacity of " << opacity;
+  //VVP_INFO << "changing to threshold of " << treshold << " and opacity of " << opacity;
 
   // grayvalue->opacity
   {   
@@ -446,19 +446,20 @@ void VolumeVisualizationImagePreprocessor::DetermineBoundingBox( BinImage::Point
 
 }
 
-mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualizationImagePreprocessor::Composite( CTImage::Pointer input,
+mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualizationImagePreprocessor::Composite( CTImage::Pointer work,
                        BinImage::Pointer mask,
                        BinImage::Pointer dilated,
                        BinImage::Pointer eroded)
 {
   VVP_INFO << "Compositing...";
   
+  /*
   itk::OrImageFilter<CTImage, CTImage, CTImage>::Pointer nullFilter= itk::OrImageFilter<CTImage, CTImage, CTImage>::New();
   nullFilter->SetInput1( input );
   nullFilter->SetInput2( input );
   nullFilter->UpdateLargestPossibleRegion();
   CTImage::Pointer work = nullFilter->GetOutput();
-
+  */
 
   CTIteratorIndexType workIt( work, work->GetRequestedRegion() );
   BinIteratorType maskIt( mask, mask->GetRequestedRegion() );
@@ -532,7 +533,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
   m_GreatestStructureThreshold = GetHistogrammValueFromTop(0.20);
   m_EstimatedThreshold = GetHistogrammValueFromTop(0.10);
   m_MaxThreshold=GetHistogrammValueFromTop(0.001);
-  m_MinThreshold=GetHistogrammValueFromBottom(0.10);
+  m_MinThreshold=GetHistogrammValueFromBottom(0.20);
   
   VVP_INFO << "threshold range: (" << m_MinThreshold  << ";" << m_MaxThreshold << ") estimated vessel threshold: " << m_EstimatedThreshold ;
   VVP_INFO << "m_GreatestStructureThreshold: " << m_GreatestStructureThreshold;
@@ -600,7 +601,7 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
 
   }
 
-  VVP_INFO << "gesetzt: " << numGesetzt << " --- gelassen: " << numGelassen;
+  //VVP_INFO << "gesetzt: " << numGesetzt << " --- gelassen: " << numGelassen;
       
   VVP_INFO << "OutOfLiver value: " << m_OutOfLiverValue;
   VVP_INFO << "surface value: " << m_surfaceValue;
@@ -629,6 +630,11 @@ VolumeVisualizationImagePreprocessor::Process(
   CastToItkImage( m_originalLiverMask, BinImageMask );
   
   DetermineBoundingBox( BinImageMask );
+  
+  if( m_MaxX < m_MinX
+   || m_MaxY < m_MinY
+   || m_MaxZ < m_MinZ )
+    return 0;
   
   CTImageWork = Gaussian(Crop( CTImageWork ));
   BinImageMask = Crop( BinImageMask );

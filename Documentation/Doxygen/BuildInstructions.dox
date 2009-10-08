@@ -6,7 +6,7 @@
 You need:
   -# A svn client, either command line or a graphical client (look <a href="http://subversion.tigris.org/links.html#clients">here [subversion.tigris.org]</a> for a list)
   -# <a href="http://www.cmake.org">CMake</a>
-  -# Qt 4.x
+  -# Qt 4.x (version 4.5 or above is recommended, we cannot guarantee compatibility with lower versions)
   -# An appropriate version of VTK that is linked against the above Qt version.
   -# ITK
   
@@ -112,13 +112,13 @@ For other system configurations, please adjust:
   - 32 Bit Windows MSVS does not need the /bigobj /MP flag
   - Other operating systems may need to change the environment variables
 
-To install MITK do:
+To configure MITK do:
   - Run the batchfile
   - start cmake from the called command line \code C:\svn\mitkBinary>cmake-gui  \endcode
   - press <B>Configure</B>
   - make sure ITK_DIR, VTK_DIR and DESIRED_QT_VERSION fit your system
   - press <B>Configure</B>
-  - activate BUILD_OPENCHERRY if you want to use MITK stand-alone
+  - disable MITK_USE_OPENCHERRY if you want to use MITK as a toolkit without the application framework
   - press <B>Configure</B> twice
   - press <B>Generate</B>
   - build it with e.g. Microsoft Visual Studio (Set MainApp as StartUp Project)
@@ -135,11 +135,11 @@ To install MITK do:
 
 If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get  a new project (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in the Documentation/Doxygen directory of your binary tree or in the MITK_DOXYGEN_OUTPUT_DIR if specified. See below.
 
-\section BISix Extend MITK on your own
+\section BISix Extend MITK on your own (using the application framework openCherry)
 
 \ref NewPluginPage
 
-\section BISeven Use MITK in your own project
+\section BISeven Use MITK in your own project (as a toolkit)
 
 In the binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
 

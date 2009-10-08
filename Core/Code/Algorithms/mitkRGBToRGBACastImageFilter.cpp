@@ -43,6 +43,22 @@ mitk::RGBToRGBACastImageFilter::~RGBToRGBACastImageFilter()
 }
 
 
+bool mitk::RGBToRGBACastImageFilter::IsRGBImage( const mitk::Image *image )
+{
+  const mitk::PixelType &inputPixelType = image->GetPixelType();
+
+  if ( (inputPixelType == typeid( UCRGBPixelType) ) 
+    || (inputPixelType == typeid( USRGBPixelType) ) 
+    || (inputPixelType == typeid( FloatRGBPixelType) ) 
+    || (inputPixelType == typeid( DoubleRGBPixelType) ) )
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
 void mitk::RGBToRGBACastImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();

@@ -40,6 +40,14 @@ public:
   itkNewMacro(Self);
 
 
+  /** Static convenience method to check if the passed mitk::Image is
+   * an RGB image in the sense of this converter filter.
+   * 
+   * Returns falsefor RGBA and all other images.
+   */
+  static bool IsRGBImage( const mitk::Image *image );
+
+
 protected:
   // Typedefs for supported RGB pixel types
   typedef itk::RGBPixel< unsigned char > UCRGBPixelType;

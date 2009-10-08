@@ -1,6 +1,8 @@
 SET(SRC_CPP_FILES
   cherryCoreTestApplication.cpp
   cherryOpenCherryTestDriver.cpp
+  
+  harness/cherryTestCase.cpp
 )
 
 SET(INTERNAL_CPP_FILES

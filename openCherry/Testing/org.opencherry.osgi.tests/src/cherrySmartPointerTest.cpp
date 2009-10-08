@@ -52,7 +52,7 @@ private:
 
 
 SmartPointerTest::SmartPointerTest(const std::string& testName)
-: CppUnit::TestCase(testName)
+: TestCase(testName)
 {}
 
 CppUnit::Test* SmartPointerTest::Suite()

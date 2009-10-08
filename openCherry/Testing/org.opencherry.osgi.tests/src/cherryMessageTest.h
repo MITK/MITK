@@ -19,11 +19,11 @@
 #ifndef CHERRYMESSAGETEST_H_
 #define CHERRYMESSAGETEST_H_
 
-#include <CppUnit/TestCase.h>
+#include <cherryTestCase.h>
 
 namespace cherry {
 
-class MessageTest : public CppUnit::TestCase {
+class MessageTest : public TestCase {
 
 public:
 

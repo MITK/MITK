@@ -18,8 +18,7 @@
 #ifndef CHERRYXMLMEMENTOTEST_H_
 #define CHERRYXMLMEMENTOTEST_H_
 
-#include <CppUnit/TestCase.h>
-
+#include <cherryTestCase.h>
 #include <cherryXMLMemento.h>
 
 namespace cherry
@@ -29,7 +28,7 @@ namespace cherry
  * Testing XMLMemento
  *
  */
-class XMLMementoTest: public CppUnit::TestCase
+class XMLMementoTest: public TestCase
 {
 
 private:

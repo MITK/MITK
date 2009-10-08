@@ -66,7 +66,7 @@ CppUnit::Test* ObjectTest::Suite()
 }
 
 ObjectTest::ObjectTest(const std::string& testName) :
-  CppUnit::TestCase(testName)
+  TestCase(testName)
 {
 
 }

@@ -444,7 +444,7 @@ CppUnit::Test* XMLMementoTest::Suite()
 }
 
 XMLMementoTest::XMLMementoTest(const std::string& testName) :
-  CppUnit::TestCase(testName)
+  TestCase(testName)
 {
 
 }

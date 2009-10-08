@@ -19,11 +19,11 @@
 #ifndef CHERRYWEAKPOINTERTEST_H_
 #define CHERRYWEAKPOINTERTEST_H_
 
-#include <CppUnit/TestCase.h>
+#include <cherryTestCase.h>
 
 namespace cherry {
 
-class WeakPointerTest : public CppUnit::TestCase
+class WeakPointerTest : public TestCase
 {
 public:
 

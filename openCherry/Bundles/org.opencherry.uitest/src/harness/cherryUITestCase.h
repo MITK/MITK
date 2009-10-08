@@ -18,7 +18,7 @@
 #ifndef CHERRYUITESTCASE_H_
 #define CHERRYUITESTCASE_H_
 
-#include <CppUnit/TestCase.h>
+#include <cherryTestCase.h>
 
 #include <cherryIWindowListener.h>
 #include <cherryIWorkbench.h>
@@ -37,7 +37,7 @@ namespace cherry
  * and pages.  It will also automatically close the test
  * windows when the tearDown method is called.
  */
-class CHERRY_UITEST_EXPORT UITestCase: public CppUnit::TestCase
+class CHERRY_UITEST_EXPORT UITestCase: public TestCase
 {
 
 public:
@@ -58,7 +58,7 @@ public:
    * The default implementation does nothing.
    * Subclasses may extend.
    */
-  void DoSetUp();
+  virtual void DoSetUp();
 
   /**
    * Tears down the fixture, for example, close a network connection.
@@ -67,7 +67,7 @@ public:
    * and after doing so.
    * Subclasses may extend.
    */
-  void DoTearDown();
+  virtual void DoTearDown();
 
   /**
    * Fails the test due to the given throwable.

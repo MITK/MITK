@@ -40,7 +40,7 @@ struct TestObject: public Object
 };
 
 WeakPointerTest::WeakPointerTest(const std::string& testName) :
-  CppUnit::TestCase(testName)
+  TestCase(testName)
 {
 
 }

@@ -22,162 +22,196 @@
 
 #include "../util/cherryEmptyPerspective.h"
 
-namespace cherry {
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+#include <cherryDebugUtil.h>
+#endif
 
- IAdaptable* UITestCase::GetPageInput() {
-    return 0;
+namespace cherry
+{
+
+IAdaptable* UITestCase::GetPageInput()
+{
+  return 0;
+}
+
+UITestCase::UITestCase(const std::string& testName) :
+  TestCase(testName)
+{
+  //    ErrorDialog.NO_UI = true;
+  fWorkbench = PlatformUI::GetWorkbench();
+}
+
+void UITestCase::failexc(const std::string& message, const std::exception& e,
+    long lineNumber, const std::string& fileName)
+{
+  //TODO IStatus
+  // If the exception is a CoreException with a multistatus
+  // then print out the multistatus so we can see all the info.
+  //    if (e instanceof CoreException) {
+  //      IStatus status = ((CoreException) e).getStatus();
+  //      write(status, 0);
+  //    } else
+  //      e.printStackTrace();
+  fail(message + ": " + e.what(), lineNumber, fileName);
+}
+
+IWorkbenchWindow::Pointer UITestCase::OpenTestWindow()
+{
+  return OpenTestWindow(EmptyPerspective::PERSP_ID);
+}
+
+IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(
+    const std::string& perspectiveId)
+{
+  try
+  {
+    IWorkbenchWindow::Pointer window = fWorkbench->OpenWorkbenchWindow(
+        perspectiveId, GetPageInput());
+    WaitOnShell(window->GetShell());
+    return window;
+  } catch (WorkbenchException& e)
+  {
+    failmsg(e.displayText());
+    return IWorkbenchWindow::Pointer(0);
   }
+}
 
-   UITestCase::UITestCase(const std::string& testName)
-   : CppUnit::TestCase(testName)
-   {
-        //    ErrorDialog.NO_UI = true;
-        fWorkbench = PlatformUI::GetWorkbench();
-    }
+void UITestCase::CloseAllTestWindows()
+{
+  //        Iterator iter = new ArrayList(testWindows).iterator();
+  //        while (iter.hasNext()) {
+  //            IWorkbenchWindow win = (IWorkbenchWindow) iter.next();
+  //            win.close();
+  //        }
+  //        testWindows.clear();
+}
 
-   void UITestCase::failexc(const std::string& message, const std::exception& e,
-      long lineNumber, const std::string& fileName ) {
-     //TODO IStatus
-    // If the exception is a CoreException with a multistatus
-    // then print out the multistatus so we can see all the info.
-//    if (e instanceof CoreException) {
-//      IStatus status = ((CoreException) e).getStatus();
-//      write(status, 0);
-//    } else
-//      e.printStackTrace();
-    fail(message + ": " + e.what(), lineNumber, fileName);
-  }
+IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer win)
+{
+  //        IWorkbenchPage[] pages = openTestPage(win, 1);
+  //        if (pages != null)
+  //            return pages[0];
+  //        else
+  return IWorkbenchPage::Pointer(0);
+}
 
-    IWorkbenchWindow::Pointer UITestCase::OpenTestWindow() {
-        return OpenTestWindow(EmptyPerspective::PERSP_ID);
-    }
+std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
+    IWorkbenchWindow::Pointer win, int pageTotal)
+{
+  //        try {
+  //            IWorkbenchPage[] pages = new IWorkbenchPage[pageTotal];
+  //            IAdaptable input = getPageInput();
+  //
+  //            for (int i = 0; i < pageTotal; i++) {
+  //                pages[i] = win.openPage(EmptyPerspective.PERSP_ID, input);
+  //            }
+  //            return pages;
+  //        } catch (WorkbenchException e) {
+  //            fail();
+  //            return null;
+  //        }
+  return std::vector<IWorkbenchPage::Pointer>();
+}
 
-    IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(const std::string& perspectiveId) {
-    try {
-      IWorkbenchWindow::Pointer window = fWorkbench->OpenWorkbenchWindow(
-          perspectiveId, GetPageInput());
-      WaitOnShell(window->GetShell());
-      return window;
-    } catch (WorkbenchException& e) {
-      failmsg(e.displayText());
-      return IWorkbenchWindow::Pointer(0);
-    }
-  }
+void UITestCase::CloseAllPages(IWorkbenchWindow::Pointer window)
+{
+  //        IWorkbenchPage[] pages = window.getPages();
+  //        for (int i = 0; i < pages.length; i++)
+  //            pages[i].close();
+}
 
-    void UITestCase::CloseAllTestWindows() {
-//        Iterator iter = new ArrayList(testWindows).iterator();
-//        while (iter.hasNext()) {
-//            IWorkbenchWindow win = (IWorkbenchWindow) iter.next();
-//            win.close();
-//        }
-//        testWindows.clear();
-    }
+void UITestCase::Trace(const std::string& msg)
+{
+  std::cerr << msg << std::endl;
+}
 
-    IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer win) {
-//        IWorkbenchPage[] pages = openTestPage(win, 1);
-//        if (pages != null)
-//            return pages[0];
-//        else
-            return IWorkbenchPage::Pointer(0);
-    }
+void UITestCase::setUp()
+{
+  Trace("----- " + this->name());
+  Trace(this->name() + ": setUp...");
+  AddWindowListener();
+  TestCase::setUp();
+}
 
-    std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(IWorkbenchWindow::Pointer win, int pageTotal) {
-//        try {
-//            IWorkbenchPage[] pages = new IWorkbenchPage[pageTotal];
-//            IAdaptable input = getPageInput();
-//
-//            for (int i = 0; i < pageTotal; i++) {
-//                pages[i] = win.openPage(EmptyPerspective.PERSP_ID, input);
-//            }
-//            return pages;
-//        } catch (WorkbenchException e) {
-//            fail();
-//            return null;
-//        }
-      return std::vector<IWorkbenchPage::Pointer>();
-    }
+void UITestCase::DoSetUp()
+{
+  // do nothing.
+}
 
-    void UITestCase::CloseAllPages(IWorkbenchWindow::Pointer window) {
-//        IWorkbenchPage[] pages = window.getPages();
-//        for (int i = 0; i < pages.length; i++)
-//            pages[i].close();
-    }
+void UITestCase::tearDown()
+{
+  Trace(this->name() + ": tearDown...\n");
+  RemoveWindowListener();
+  TestCase::tearDown();
+}
 
-    void UITestCase::Trace(const std::string& msg) {
-        std::cerr << msg << std::endl;
-    }
+void UITestCase::DoTearDown()
+{
+  ProcessEvents();
+  CloseAllTestWindows();
+  ProcessEvents();
+}
 
-    void UITestCase::setUp() {
-      CppUnit::TestCase::setUp();
-      Trace("----- " + this->name());
-        Trace(this->name() + ": setUp...");
-        AddWindowListener();
-        DoSetUp();
+void UITestCase::ProcessEvents()
+{
+  //        Display display = PlatformUI.getWorkbench().getDisplay();
+  //        if (display != null)
+  //            while (display.readAndDispatch())
+  //                ;
+}
 
-    }
+void UITestCase::ManageWindows(bool manage)
+{
+  windowListener->SetEnabled(manage);
+}
 
-    void UITestCase::DoSetUp() {
-        // do nothing.
-    }
+IWorkbench* UITestCase::GetWorkbench()
+{
+  return fWorkbench;
+}
 
-    void UITestCase::tearDown() {
-        CppUnit::TestCase::tearDown();
-        Trace(this->name() + ": tearDown...\n");
-        RemoveWindowListener();
-        DoTearDown();
-    }
+UITestCase::TestWindowListener::TestWindowListener(std::list<
+    IWorkbenchWindow::Pointer>& testWindows) :
+  enabled(true), testWindows(testWindows)
+{
+}
 
-    void UITestCase::DoTearDown() {
-        ProcessEvents();
-        CloseAllTestWindows();
-        ProcessEvents();
-    }
+void UITestCase::TestWindowListener::SetEnabled(bool enabled)
+{
+  this->enabled = enabled;
+}
 
-     void UITestCase::ProcessEvents() {
-//        Display display = PlatformUI.getWorkbench().getDisplay();
-//        if (display != null)
-//            while (display.readAndDispatch())
-//                ;
-    }
+void UITestCase::TestWindowListener::WindowActivated(
+    IWorkbenchWindow::Pointer window)
+{
+  // do nothing
+}
 
-    void UITestCase::ManageWindows(bool manage) {
-        windowListener->SetEnabled(manage);
-    }
+void UITestCase::TestWindowListener::WindowDeactivated(
+    IWorkbenchWindow::Pointer window)
+{
+  // do nothing
+}
 
-    IWorkbench* UITestCase::GetWorkbench() {
-        return fWorkbench;
-    }
+void UITestCase::TestWindowListener::WindowClosed(
+    IWorkbenchWindow::Pointer window)
+{
+  if (enabled)
+    testWindows.remove(window);
+}
 
-    UITestCase::TestWindowListener::TestWindowListener(std::list<IWorkbenchWindow::Pointer>& testWindows)
-    : enabled(true), testWindows(testWindows)
-    {}
+void UITestCase::TestWindowListener::WindowOpened(
+    IWorkbenchWindow::Pointer window)
+{
+  if (enabled)
+    testWindows.push_back(window);
+}
 
-    void UITestCase::TestWindowListener::SetEnabled(bool enabled) {
-            this->enabled = enabled;
-        }
-
-        void UITestCase::TestWindowListener::WindowActivated(IWorkbenchWindow::Pointer window) {
-            // do nothing
-        }
-
-        void UITestCase::TestWindowListener::WindowDeactivated(IWorkbenchWindow::Pointer window) {
-            // do nothing
-        }
-
-        void UITestCase::TestWindowListener::WindowClosed(IWorkbenchWindow::Pointer window) {
-            if (enabled)
-                testWindows.remove(window);
-        }
-
-        void UITestCase::TestWindowListener::WindowOpened(IWorkbenchWindow::Pointer window) {
-            if (enabled)
-                testWindows.push_back(window);
-        }
-
-   void UITestCase::Indent(std::ostream& output, unsigned int indent) {
-    for (unsigned int i = 0; i < indent; i++)
-        output << "  ";
-  }
+void UITestCase::Indent(std::ostream& output, unsigned int indent)
+{
+  for (unsigned int i = 0; i < indent; i++)
+    output << "  ";
+}
 
 //   void UITestCase::Write(IStatus status, unsigned int indent) {
 //    PrintStream output = System.out;
@@ -206,26 +240,30 @@ namespace cherry {
 //    }
 //  }
 
-    void UITestCase::AddWindowListener() {
-        windowListener = new TestWindowListener(testWindows);
-        fWorkbench->AddWindowListener(windowListener);
-    }
+void UITestCase::AddWindowListener()
+{
+  windowListener = new TestWindowListener(testWindows);
+  fWorkbench->AddWindowListener(windowListener);
+}
 
-    void UITestCase::RemoveWindowListener() {
-        if (windowListener) {
-            fWorkbench->RemoveWindowListener(windowListener);
-        }
-    }
-
-  void UITestCase::WaitOnShell(Shell::Pointer shell) {
-
-    ProcessEvents();
-//    long endTime = System.currentTimeMillis() + 5000;
-//
-//    while (shell.getDisplay().getActiveShell() != shell
-//        && System.currentTimeMillis() < endTime) {
-//      processEvents();
-//    }
+void UITestCase::RemoveWindowListener()
+{
+  if (windowListener)
+  {
+    fWorkbench->RemoveWindowListener(windowListener);
   }
+}
+
+void UITestCase::WaitOnShell(Shell::Pointer shell)
+{
+
+  ProcessEvents();
+  //    long endTime = System.currentTimeMillis() + 5000;
+  //
+  //    while (shell.getDisplay().getActiveShell() != shell
+  //        && System.currentTimeMillis() < endTime) {
+  //      processEvents();
+  //    }
+}
 
 }

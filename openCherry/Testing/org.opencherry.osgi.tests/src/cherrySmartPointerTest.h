@@ -19,11 +19,11 @@
 #ifndef CHERRYSMARTPOINTERTEST_H_
 #define CHERRYSMARTPOINTERTEST_H_
 
-#include <CppUnit/TestCase.h>
+#include <cherryTestCase.h>
 
 namespace cherry {
 
-class SmartPointerTest : public CppUnit::TestCase
+class SmartPointerTest : public TestCase
 {
 public:
 

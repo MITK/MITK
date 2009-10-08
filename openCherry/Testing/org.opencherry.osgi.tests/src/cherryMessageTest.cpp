@@ -50,7 +50,7 @@ struct MessageReceiver
 };
 
 MessageTest::MessageTest(const std::string& testName)
-: CppUnit::TestCase(testName)
+: TestCase(testName)
 {
 
 }

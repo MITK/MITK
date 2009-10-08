@@ -39,15 +39,14 @@ Plane::Plane()
   m_PlaneSource->SetResolution( 128, 128 );
   m_PlaneSource->Update();
 
-  m_PlaneNormal = vtkDoubleArray::New();
-  m_PlaneNormal->SetNumberOfComponents( 3 );
-  m_PlaneNormal->SetNumberOfTuples( m_PlaneSource->GetOutput()->GetNumberOfPoints() );
-  m_PlaneNormal->SetTuple3( 0, 0.0, 0.0, 1.0 );
-  m_PlaneNormal->SetName( "planeNormal" );
+  m_PlaneTransform = vtkDoubleArray::New();
+  m_PlaneTransform->SetNumberOfComponents( 1 );
+  m_PlaneTransform->SetNumberOfTuples( m_PlaneSource->GetOutput()->GetNumberOfPoints() );
+  m_PlaneTransform->SetName( "planeTransform" );
 
   m_Plane = vtkPolyData::New();
   m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
-  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+  m_Plane->GetPointData()->AddArray( m_PlaneTransform );
 
   this->SetVtkPolyData( m_Plane );
 }
@@ -57,7 +56,7 @@ Plane::~Plane()
 {
   m_PlaneSource->Delete();
   m_Plane->Delete();
-  m_PlaneNormal->Delete();
+  m_PlaneTransform->Delete();
 }
 
 
@@ -69,7 +68,7 @@ void Plane::SetExtent( const double x, const double y )
   m_PlaneSource->Update();
 
   m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
-  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+  m_Plane->GetPointData()->AddArray( m_PlaneTransform );
 
   this->Modified();
 }
@@ -86,7 +85,7 @@ void Plane::SetResolution( const int xR, const int yR )
   m_PlaneSource->Update();
 
   m_Plane->DeepCopy( m_PlaneSource->GetOutput() );
-  m_Plane->GetPointData()->SetVectors( m_PlaneNormal );
+  m_Plane->GetPointData()->AddArray( m_PlaneTransform );
 
   this->Modified();
 }

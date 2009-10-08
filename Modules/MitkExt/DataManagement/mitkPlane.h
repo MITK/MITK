@@ -58,7 +58,7 @@ protected:
 
   vtkPolyData *m_Plane;
 
-  vtkDoubleArray *m_PlaneNormal;
+  vtkDoubleArray *m_PlaneTransform;
 
 
 };

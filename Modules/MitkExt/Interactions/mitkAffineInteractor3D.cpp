@@ -225,19 +225,6 @@ bool AffineInteractor3D
   if ( surface != NULL )
   {
     polyData = surface->GetVtkPolyData( timeStep );
-
-    // Extract surface normal from surface (if existent, otherwise use default)
-    vtkPointData *pointData = polyData->GetPointData();
-    if ( pointData != NULL )
-    {
-      vtkDataArray *normal = polyData->GetPointData()->GetVectors( "planeNormal" );
-      if ( normal != NULL )
-      {
-        m_ObjectNormal[0] = normal->GetComponent( 0, 0 );
-        m_ObjectNormal[1] = normal->GetComponent( 0, 1 );
-        m_ObjectNormal[2] = normal->GetComponent( 0, 2 );
-      }
-    }
   }
 
   // Get geometry object

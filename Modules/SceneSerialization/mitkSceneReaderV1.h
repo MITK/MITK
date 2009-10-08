@@ -32,13 +32,28 @@ class SceneReaderV1 : public SceneReader
   
   protected:
 
+    /**
+      \brief tries to create one DataTreeNode from a given XML <node> element
+    */
+    DataTreeNode::Pointer LoadBaseDataFromDataTag( TiXmlElement* dataElement, 
+                                                   const std::string& workingDirectory, 
+                                                   bool& error );
+
+    /**
+      \brief tries read the given file containing a propertylist and create all properties in the given DataTreeNode
+    */
+    bool DecorateNodeWithProperties(DataTreeNode* node, 
+                                    const std::string& propertiesfile, 
+                                    const std::string& renderwindow, 
+                                    const std::string& workingDirectory);
+
     typedef std::map<DataTreeNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
     typedef std::map<std::string, DataTreeNode*> IDToNodeMappingType;
     typedef std::map<DataTreeNode*, std::string> NodeToIDMappingType;
 
     NodesAndParentsMapType  m_Nodes;
-    IDToNodeMappingType      m_NodeForID;
-    NodeToIDMappingType      m_IDForNode;
+    IDToNodeMappingType     m_NodeForID;
+    NodeToIDMappingType     m_IDForNode;
 
     UIDGenerator m_UIDGen;
 };

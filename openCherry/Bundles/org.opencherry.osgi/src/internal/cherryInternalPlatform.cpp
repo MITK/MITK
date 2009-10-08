@@ -281,9 +281,16 @@ bool InternalPlatform::GetStatePath(Poco::Path& statePath, IBundle::Pointer bund
 {
   statePath = m_BaseStatePath;
   statePath.pushDirectory(bundle->GetSymbolicName());
+  try
+  {
   Poco::File stateFile(statePath);
   if (!stateFile.exists() && create)
     stateFile.createDirectories();
+  }
+  catch (Poco::FileException&)
+  {
+    return false;
+  }
 
   return true;
 }

@@ -16,12 +16,14 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkPropertyListDeserializer_h_included
-#define mitkPropertyListDeserializer_h_included
+#ifndef mitkPropertyListDeserializerV1_h_included
+#define mitkPropertyListDeserializerV1_h_included
 
 #include "SceneSerializationExports.h"
 
 #include "mitkPropertyList.h"
+
+#include <itkObjectFactoryBase.h>
 
 namespace mitk
 {
@@ -29,15 +31,12 @@ namespace mitk
 /**
   \brief Deserializes a mitk::PropertyList
 */
-class SceneSerialization_EXPORT PropertyListDeserializer : public itk::Object
+class SceneSerialization_EXPORT PropertyListDeserializerV1 : public PropertyListDeserializer
 {
   public:
     
-    mitkClassMacro( PropertyListDeserializer, itk::Object );
+    mitkClassMacro( PropertyListDeserializerV1, PropertyListDeserializer );
     itkNewMacro(Self); // is this needed? should never be instantiated, only subclasses should
-
-    itkSetStringMacro(Filename);
-    itkGetStringMacro(Filename);
 
     /**
       \brief Reads a propertylist from file
@@ -49,11 +48,8 @@ class SceneSerialization_EXPORT PropertyListDeserializer : public itk::Object
 
   protected:
 
-    PropertyListDeserializer();
-    virtual ~PropertyListDeserializer();
-    
-    std::string m_Filename;
-    PropertyList::Pointer m_PropertyList;
+    PropertyListDeserializerV1();
+    virtual ~PropertyListDeserializerV1();
 };
 
 } // namespace

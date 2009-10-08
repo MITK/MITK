@@ -58,7 +58,6 @@ std::string mitk::PropertyListSerializer::Serialize()
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
   fullname += filename;
-  fullname += filename;
 
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....

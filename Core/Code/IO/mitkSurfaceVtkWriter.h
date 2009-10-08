@@ -155,6 +155,20 @@ public:
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
+
+    /** \brief Specify whether vtkPolyData are to be transformed by Geometry
+     * transform before writing (default: true). */
+    itkSetMacro( TransformPolyData, bool );
+
+    /** \brief Specify whether vtkPolyData are to be transformed by Geometry
+     * transform before writing (default: true). */
+    itkGetConstMacro( TransformPolyData, bool );
+
+    /** \brief Specify whether vtkPolyData are to be transformed by Geometry
+     * transform before writing (default: true). */
+    itkBooleanMacro( TransformPolyData );
+
+
 protected:
 
     /**
@@ -184,6 +198,8 @@ protected:
     VtkWriterType* m_VtkWriter;
   
     bool m_WriterWriteHasReturnValue;
+
+    bool m_TransformPolyData;
 };
 
 }

@@ -29,7 +29,8 @@ class vtkDataObject;
 
 template <class VTKWRITER>
 mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
-: m_WriterWriteHasReturnValue( false )
+: m_WriterWriteHasReturnValue( false ),
+  m_TransformPolyData( true )
 {
   this->SetNumberOfRequiredInputs( 1 );
 
@@ -114,11 +115,18 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     else 
       m_VtkWriter->SetFileName(m_FileName.c_str());
 
-    geometry->TransferItkToVtkTransform();
-    transformPolyData->SetInput(input->GetVtkPolyData(t));
-    transformPolyData->SetTransform(geometry->GetVtkTransform());
-    transformPolyData->UpdateWholeExtent();
-    polyData = transformPolyData->GetOutput();
+    if ( m_TransformPolyData == true )
+    {
+      geometry->TransferItkToVtkTransform();
+      transformPolyData->SetInput( input->GetVtkPolyData( t ) );
+      transformPolyData->SetTransform( geometry->GetVtkTransform() );
+      transformPolyData->UpdateWholeExtent();
+      polyData = transformPolyData->GetOutput();
+    }
+    else
+    {
+      polyData = input->GetVtkPolyData( t );
+    }
 
 #if VTK_MAJOR_VERSION >= 5 
     m_VtkWriter->SetInput((vtkDataObject*)polyData);
@@ -126,7 +134,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     m_VtkWriter->SetInput(polyData);
 #endif
 
-    ExecuteWrite( m_VtkWriter, transformPolyData );
+    this->ExecuteWrite( m_VtkWriter, transformPolyData );
   }
 
   transformPolyData->Delete();

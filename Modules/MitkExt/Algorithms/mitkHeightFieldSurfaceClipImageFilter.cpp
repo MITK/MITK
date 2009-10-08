@@ -267,8 +267,10 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
         }
         else
         {
-          int x0 = (int) ((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
-          int y0 = (int) ((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
+          double x = ((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
+          double y = ((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
+          int x0 = (int) x;
+          int y0 = (int) y;
 
           bool clip;
           if ( (x0 < 0) || (x0 >= m_HeightFieldResolutionX)
@@ -291,10 +293,10 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
             q11 = heightField[y1 * m_HeightFieldResolutionX + x1];
 
             ScalarType q =
-                q00 * ((double) x1 - planeP0[0]) * ((double) y1 - planeP0[1])
-              + q01 * (planeP0[0] - (double) x0) * ((double) y1 - planeP0[1])
-              + q10 * ((double) x1 - planeP0[0]) * (planeP0[1] - (double) y0)
-              + q11 * (planeP0[0] - (double) x0) * (planeP0[1] - (double) y0);
+                q00 * ((double) x1 - x) * ((double) y1 - y)
+              + q01 * (x - (double) x0) * ((double) y1 - y)
+              + q10 * ((double) x1 - x) * (y - (double) y0)
+              + q11 * (x - (double) x0) * (y - (double) y0);
 
             if ( q - planeP0[2] < 0 )
             {

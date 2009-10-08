@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include "SceneSerializationExports.h"
+
 #include <tinyxml.h>
 
 #include <itkObjectFactory.h>
@@ -25,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class SceneReader : public itk::Object
+class SceneSerialization_EXPORT SceneReader : public itk::Object
 {
   public:
     

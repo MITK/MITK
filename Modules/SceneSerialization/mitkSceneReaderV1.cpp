@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSceneReaderV1.h"
 #include "mitkSerializerMacros.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkBaseRenderer.h"
+#include "mitkPropertyListDeserializer.h"
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
     
@@ -78,13 +80,23 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - add these properties to the node (if necessary, use renderwindow name)
     for( TiXmlElement* properties = element->FirstChildElement("properties"); properties != NULL; properties = properties->NextSiblingElement("properties") )
     {
-      std::string propertiesfile( properties->Attribute("file");
-      std::string renderwindow( properties->Attribute("renderwindow");
+      std::string propertiesfile( properties->Attribute("file") );
+      std::string renderwindow( properties->Attribute("renderwindow") );
 
-      // clear all properties from node that might be set by DataTreeNodeFactory during loading 
-      node->GetPropertyList(renderwindow)->Clear(); // DataTreeNode implementation always returns a propertylist
-      
-      error &= DecorateNodeWithProperties(node, propertiesfile, renderwindow, workingDirectory);
+      BaseRenderer* renderer = BaseRenderer::GetByName( renderwindow );
+      if (renderer)
+      {
+        PropertyList::Pointer propertyList = node->GetPropertyList(renderer); // DataTreeNode implementation always returns a propertylist
+        // clear all properties from node that might be set by DataTreeNodeFactory during loading 
+        propertyList->Clear();
+        
+        error |= DecorateNodeWithProperties(node, workingDirectory + "/" + propertiesfile, propertyList);
+      }
+      else
+      {
+        LOG_ERROR << "Found properties for renderer " << renderwindow << " but there is no such renderer in current application. Ignoring those properties";
+        error = true;
+      }
     }
   } // end for all <node>
   
@@ -207,11 +219,20 @@ mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlE
 
   return node;
 }
-      
-bool mitk:SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, const std::string& propertiesfile, const std::string& renderwindow, const std::string& workingDirectory)
+
+bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, const std::string& propertiesfile, PropertyList* propertyList)
 {
+  assert(propertyList);
   bool error(false);
 
+  // construct name of serializer class
+  PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
+  
+  deserializer->SetFilename(propertiesfile);
+  error |= deserializer->Deserialize();
+  PropertyList::Pointer readProperties = deserializer->GetOutput();
+
+  propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
+ 
   return !error;
 }
-

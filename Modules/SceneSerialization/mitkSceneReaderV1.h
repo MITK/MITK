@@ -44,8 +44,7 @@ class SceneReaderV1 : public SceneReader
     */
     bool DecorateNodeWithProperties(DataTreeNode* node, 
                                     const std::string& propertiesfile, 
-                                    const std::string& renderwindow, 
-                                    const std::string& workingDirectory);
+                                    PropertyList* propertyList);
 
     typedef std::map<DataTreeNode::Pointer, std::list<std::string> >   NodesAndParentsMapType;
     typedef std::map<std::string, DataTreeNode*> IDToNodeMappingType;

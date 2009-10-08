@@ -92,6 +92,8 @@ private:
   QMenu m_ContextMenu;
 
   IMemento::Pointer m_StateMemento;
+
+  bool m_Useful;
 };
 
 } //namespace cherry

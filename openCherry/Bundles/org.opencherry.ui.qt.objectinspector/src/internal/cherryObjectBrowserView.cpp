@@ -35,7 +35,11 @@ ObjectBrowserView::ObjectBrowserView() :
   m_ActionToggleBreakpoint(this), m_ActionEnableBreakpoint(this),
       m_ActionDisableBreakpoint(this)
 {
-
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+  m_Useful = true;
+#else
+  m_Useful = false;
+#endif
 }
 
 void ObjectBrowserView::Init(IViewSite::Pointer site, IMemento::Pointer memento)
@@ -47,44 +51,50 @@ void ObjectBrowserView::Init(IViewSite::Pointer site, IMemento::Pointer memento)
 
 void ObjectBrowserView::CreateQtPartControl(QWidget* parent)
 {
-#ifndef OPENCHERRY_DEBUG_SMARTPOINTER
-  QVBoxLayout* layout = new QVBoxLayout(parent);
-  QLabel* label = new QLabel(parent);
-  label->setText("Set the CMake variable OPENCHERRY_DEBUG_SMARTPOINTER to ON for a useful object browser.");
-  layout->addWidget(label);
-#else
-  m_Controls.setupUi(parent);
+  if (m_Useful)
+  {
+    m_Controls.setupUi(parent);
 
-  m_ProxyModel = new QSortFilterProxyModel(m_Controls.m_TreeView);
-  m_ObjectModel = new QtObjectTableModel(m_ProxyModel);
+    m_ProxyModel = new QSortFilterProxyModel(m_Controls.m_TreeView);
+    m_ObjectModel = new QtObjectTableModel(m_ProxyModel);
 
-  m_ProxyModel->setSourceModel(m_ObjectModel);
-  m_Controls.m_TreeView->setModel(m_ProxyModel);
-  m_Controls.m_TreeView->setSortingEnabled(true);
-  m_Controls.m_TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_ProxyModel->setSourceModel(m_ObjectModel);
+    m_Controls.m_TreeView->setModel(m_ProxyModel);
+    m_Controls.m_TreeView->setSortingEnabled(true);
+    m_Controls.m_TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  m_ActionToggleBreakpoint.setText(QString("Toggle Breakpoint"));
-  m_ActionToggleBreakpoint.setCheckable(true);
-  m_ContextMenu.addAction(&m_ActionToggleBreakpoint);
+    m_ActionToggleBreakpoint.setText(QString("Toggle Breakpoint"));
+    m_ActionToggleBreakpoint.setCheckable(true);
+    m_ContextMenu.addAction(&m_ActionToggleBreakpoint);
 
-  QToolBar* toolbar = new QToolBar(parent);
-  QAction* resetAction = toolbar->addAction("Reset");
-  toolbar->addAction("Show Breakpoints Only");
+    QToolBar* toolbar = new QToolBar(parent);
+    QAction* resetAction = toolbar->addAction("Reset");
+    toolbar->addAction("Show Breakpoints Only");
 
-  connect(resetAction, SIGNAL(triggered(bool)), this, SLOT(ResetAction(bool)));
-  connect(m_Controls.m_TreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-      this, SLOT(SelectionChanged(const QItemSelection&, const QItemSelection&)));
-  connect(m_Controls.m_TreeView, SIGNAL(customContextMenuRequested(const QPoint&)),
-      this, SLOT(ContextMenuRequested(const QPoint&)));
+    connect(resetAction, SIGNAL(triggered(bool)), this, SLOT(ResetAction(bool)));
+    connect(m_Controls.m_TreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+        this, SLOT(SelectionChanged(const QItemSelection&, const QItemSelection&)));
+    connect(m_Controls.m_TreeView, SIGNAL(customContextMenuRequested(const QPoint&)),
+        this, SLOT(ContextMenuRequested(const QPoint&)));
 
-  // context menu actions
-  connect(&m_ActionToggleBreakpoint, SIGNAL(triggered(bool)), this, SLOT(ToggleBreakpoint(bool)));
+    // context menu actions
+    connect(&m_ActionToggleBreakpoint, SIGNAL(triggered(bool)), this, SLOT(ToggleBreakpoint(bool)));
 
-  parent->layout()->setMenuBar(toolbar);
+    parent->layout()->setMenuBar(toolbar);
 
-  RestoreGuiState(m_StateMemento);
-  m_StateMemento = 0;
-#endif
+    RestoreGuiState(m_StateMemento);
+    m_StateMemento = 0;
+  }
+  else
+  {
+    QVBoxLayout* layout = new QVBoxLayout(parent);
+    QLabel* label = new QLabel(parent);
+    label->setText(
+        "Set the CMake variable OPENCHERRY_DEBUG_SMARTPOINTER to ON for a useful object browser.");
+    label->setWordWrap(true);
+    label->setAlignment(Qt::AlignTop);
+    layout->addWidget(label);
+  }
 }
 
 void ObjectBrowserView::RestoreGuiState(IMemento::Pointer memento)
@@ -186,8 +196,9 @@ void ObjectBrowserView::ContextMenuRequested(const QPoint& p)
     if (!data.isValid())
       return;
 
-    const ObjectItem* item = static_cast<ObjectItem*>(data.value<void*>());
-    if (item->type == ObjectItem::CLASS) return;
+    const ObjectItem* item = static_cast<ObjectItem*> (data.value<void*> ());
+    if (item->type == ObjectItem::CLASS)
+      return;
 
     m_ContextMenu.exec(m_Controls.m_TreeView->mapToGlobal(p));
   }
@@ -202,14 +213,14 @@ void ObjectBrowserView::ToggleBreakpoint(bool checked)
     if (!data.isValid())
       return;
 
-    const ObjectItem* item = static_cast<ObjectItem*>(data.value<void*>());
+    const ObjectItem* item = static_cast<ObjectItem*> (data.value<void*> ());
     if (item->type == ObjectItem::INSTANCE)
     {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
       if (checked)
-        DebugUtil::GetBreakpointManager()->AddObjectBreakpoint(item->obj->GetTraceId());
+      DebugUtil::GetBreakpointManager()->AddObjectBreakpoint(item->obj->GetTraceId());
       else
-        DebugUtil::GetBreakpointManager()->RemoveObjectBreakpoint(item->obj->GetTraceId());
+      DebugUtil::GetBreakpointManager()->RemoveObjectBreakpoint(item->obj->GetTraceId());
 #endif
     }
     else if (item->type == ObjectItem::SMARTPOINTER)
@@ -217,18 +228,25 @@ void ObjectBrowserView::ToggleBreakpoint(bool checked)
       if (checked)
         DebugUtil::GetBreakpointManager()->AddSmartpointerBreakpoint(item->spId);
       else
-        DebugUtil::GetBreakpointManager()->RemoveSmartpointerBreakpoint(item->spId);
+        DebugUtil::GetBreakpointManager()->RemoveSmartpointerBreakpoint(
+            item->spId);
     }
   }
 }
 
 void ObjectBrowserView::SetFocus()
 {
-  m_Controls.m_TreeView->setFocus();
+  if (m_Useful)
+  {
+    m_Controls.m_TreeView->setFocus();
+  }
 }
 
 void ObjectBrowserView::SaveState(IMemento::Pointer memento)
 {
+  if (!m_Useful)
+    return;
+
   IMemento::Pointer cols = memento->CreateChild("columnWidths");
   cols->PutInteger("column0", m_Controls.m_TreeView->columnWidth(0));
   cols->PutInteger("column1", m_Controls.m_TreeView->columnWidth(1));

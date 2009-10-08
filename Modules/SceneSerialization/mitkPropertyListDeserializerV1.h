@@ -19,11 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkPropertyListDeserializerV1_h_included
 #define mitkPropertyListDeserializerV1_h_included
 
-#include "SceneSerializationExports.h"
-
-#include "mitkPropertyList.h"
-
-#include <itkObjectFactoryBase.h>
+#include "mitkPropertyListDeserializer.h"
 
 namespace mitk
 {
@@ -39,12 +35,10 @@ class SceneSerialization_EXPORT PropertyListDeserializerV1 : public PropertyList
     itkNewMacro(Self); // is this needed? should never be instantiated, only subclasses should
 
     /**
-      \brief Reads a propertylist from file
+      \brief Reads a propertylist from file. Get result via GetOutput()
       \return success of deserialization
       */
     virtual bool Deserialize();
-
-    virtual PropertyList::Pointer GetOutput();
 
   protected:
 

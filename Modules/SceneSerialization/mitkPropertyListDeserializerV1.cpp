@@ -54,7 +54,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
     const char* typea = propertyElement->Attribute("type");
     std::string type( typea ? typea : "");
 
-    LOG_INFO << "Parsing a property called " << key << " of type " << type;
+    LOG_INFO << "Parsing a property called '" << key << "' of type " << type;
 
     // hand propertyElement to specific reader
     std::stringstream propertyDeserializerClassName;

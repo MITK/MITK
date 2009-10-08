@@ -16,47 +16,45 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkColorPropertySerializer_h_included
-#define mitkColorPropertySerializer_h_included
+#ifndef mitkColorPropertyDeserializer_h_included
+#define mitkColorPropertyDeserializer_h_included
 
-#include "mitkBasePropertySerializer.h"
+#include "mitkBasePropertyDeserializer.h"
 
 #include "mitkColorProperty.h"
 
 namespace mitk
 {
 
-class SceneSerialization_EXPORT ColorPropertySerializer : public BasePropertySerializer
+class SceneSerialization_EXPORT ColorPropertyDeserializer : public BasePropertyDeserializer
 {
   public:
     
-    mitkClassMacro( ColorPropertySerializer, BasePropertySerializer );
+    mitkClassMacro( ColorPropertyDeserializer, BasePropertyDeserializer );
     itkNewMacro(Self);
 
-    virtual TiXmlElement* Serialize()
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {
-      if (const ColorProperty* prop = dynamic_cast<const ColorProperty*>(m_Property.GetPointer()))
-      {
-        TiXmlElement* element = new TiXmlElement("color");
-        Color color = prop->GetValue();
-        element->SetDoubleAttribute("r", color[0]);
-        element->SetDoubleAttribute("g", color[1]);
-        element->SetDoubleAttribute("b", color[2]);
-        return element;
-      }
-      else return NULL;
+      if (!element) return NULL;
+
+      Color c;
+      if ( element->QueryFloatAttribute( "r", &c[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "g", &c[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "b", &c[2] ) != TIXML_SUCCESS ) return NULL;
+
+      return ColorProperty::New( c ).GetPointer();
     }
 
   protected:
 
-    ColorPropertySerializer() {}
-    virtual ~ColorPropertySerializer() {}
+    ColorPropertyDeserializer() {}
+    virtual ~ColorPropertyDeserializer() {}
 };
 
 } // namespace
 
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
-MITK_REGISTER_SERIALIZER(ColorPropertySerializer);
+MITK_REGISTER_SERIALIZER(ColorPropertyDeserializer);
 
 #endif
 

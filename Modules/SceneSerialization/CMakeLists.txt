@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( SceneSerialization
   INCLUDE_DIRS BaseDataSerializer BasePropertySerializer BasePropertyDeserializer
-  DEPENDS Mitk 
+  DEPENDS Mitk MitkExt
   PACKAGE_DEPENDS Poco
   ADDITIONAL_LIBS PocoFoundation PocoZip
 )

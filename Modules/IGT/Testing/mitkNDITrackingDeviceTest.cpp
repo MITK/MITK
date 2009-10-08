@@ -63,7 +63,8 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice->GetMode() == mitk::TrackingDevice::Setup ,"Checking tracking device state == setup.\n");
 
   //OpenConnection
-  MITK_TEST_CONDITION( (!myNDITrackingDevice->OpenConnection()), "Testing behavior of method OpenConnection() (Errors should occur because Tracking Device is not activated).");
+  //MITK_TEST_CONDITION( (!myNDITrackingDevice->OpenConnection()), "Testing behavior of method OpenConnection() (Errors should occur because Tracking Device is not activated).");
+  // <-- this test is dangerous. It implies that no tracking device is connected to the dartclient pc, which could be wrong.
 
   //CloseConnection
   MITK_TEST_CONDITION( (myNDITrackingDevice->CloseConnection()), "Testing behavior of method CloseConnection().");

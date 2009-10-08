@@ -51,7 +51,10 @@ public:
 
   itkNewMacro(Self);
 
+  /** \brief Set/Get the surface defining a height field as a triangle mesh */
   void SetClippingSurface( Surface *clippingSurface );
+
+  /** \brief Set/Get the surface defining a height field as a triangle mesh */
   const Surface *GetClippingSurface() const;
 
   enum
@@ -60,16 +63,45 @@ public:
     CLIPPING_MODE_MULTIPLYBYFACTOR,
   };
 
+  /** \brief Specifies whether clipped part of the image shall be replaced
+   * by a constant or multiplied by a user-set factor */
   void SetClippingMode( int mode );
+
+  /** \brief Specifies whether clipped part of the image shall be replaced
+  * by a constant or multiplied by a user-set factor */
   int GetClippingMode();
+
+  /** \brief Specifies whether clipped part of the image shall be replaced
+  * by a constant or multiplied by a user-set factor */
   void SetClippingModeToConstant();
+
+  /** \brief Specifies whether clipped part of the image shall be replaced
+  * by a constant or multiplied by a user-set factor */
   void SetClippingModeToMultiplyByFactor();
 
+  /** \brief Set/Get constant gray-value for clipping in CONSTANT mode */
   itkSetMacro( ClippingConstant, ScalarType );
+
+  /** \brief Set/Get constant gray-value for clipping in CONSTANT mode */
   itkGetConstMacro( ClippingConstant, ScalarType );
 
+  /** \brief Set/Get multiplaction factor for clipping in MULTIPLYBYFACTOR mode */
   itkSetMacro( MultiplicationFactor, ScalarType );
+
+  /** \brief Set/Get multiplaction factor for clipping in MULTIPLYBYFACTOR mode */
   itkGetConstMacro( MultiplicationFactor, ScalarType );
+
+  /** \brief Set/Get x-resolution of height-field sampling (default: 256). */
+  itkSetMacro( HeightFieldResolutionX, unsigned int );
+
+  /** \brief Set/Get x-resolution of height-field sampling (default: 256). */
+  itkGetConstMacro( HeightFieldResolutionX, unsigned int );
+
+  /** \brief Set/Get y-resolution of height-field sampling (default: 256). */
+  itkSetMacro( HeightFieldResolutionY, unsigned int );
+
+  /** \brief Set/Get y-resolution of height-field sampling (default: 256). */
+  itkGetConstMacro( HeightFieldResolutionY, unsigned int );
 
 protected:
   HeightFieldSurfaceClipImageFilter();
@@ -97,8 +129,8 @@ protected:
   ScalarType m_ClippingConstant;
   ScalarType m_MultiplicationFactor;
 
-  int m_HeightFieldResolutionX;
-  int m_HeightFieldResolutionY;
+  unsigned int m_HeightFieldResolutionX;
+  unsigned int m_HeightFieldResolutionY;
 
   double m_MaxHeight;
 
@@ -110,5 +142,3 @@ protected:
 } // namespace mitk
 
 #endif /* MITKHEIGHTFIELDSURFACECLIPIMAGEFILTER_H_HEADER_INCLUDED */
-
-

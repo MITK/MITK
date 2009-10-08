@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
+#include <itkImageSliceConstIteratorWithIndex.h>
 
 #include <vtkPolyData.h>
 #include <vtkCellLocator.h>
@@ -40,8 +41,8 @@ HeightFieldSurfaceClipImageFilter::HeightFieldSurfaceClipImageFilter()
 : m_ClippingMode( CLIPPING_MODE_CONSTANT ),
   m_ClippingConstant( 0.0 ),
   m_MultiplicationFactor( 2.0 ),
-  m_HeightFieldResolutionX( 512 ),
-  m_HeightFieldResolutionY( 512 ),
+  m_HeightFieldResolutionX( 256 ),
+  m_HeightFieldResolutionY( 256 ),
   m_MaxHeight( 1024.0 )
 {
   this->SetNumberOfInputs(2);
@@ -158,7 +159,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   typedef itk::Image< TPixel, VImageDimension > ItkInputImageType;
   typedef itk::Image< TPixel, VImageDimension > ItkOutputImageType;
 
-  typedef itk::ImageRegionConstIteratorWithIndex< ItkInputImageType > ItkInputImageIteratorType;
+  typedef itk::ImageSliceConstIteratorWithIndex< ItkInputImageType > ItkInputImageIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
 
   typename ImageToItk<ItkOutputImageType >::Pointer outputimagetoitk = 
@@ -179,9 +180,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   clippingPolyData->ComputeBounds();
   vtkFloatingPointType *bounds = clippingPolyData->GetBounds();
 
-  double x0 = bounds[0];
   double xWidth = bounds[1] - bounds[0];
-  double y0 = bounds[2];
   double yWidth = bounds[3] - bounds[2];
 
   // Create vtkCellLocator for clipping poly data
@@ -205,8 +204,8 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
     for ( unsigned int x = 0; x < m_HeightFieldResolutionX; ++x )
     {
       vtkFloatingPointType p0[3], p1[3], surfacePoint[3], pcoords[3];
-      p0[0] = x0 + xWidth * x / (double) m_HeightFieldResolutionX;
-      p0[1] = y0 + yWidth * y / (double) m_HeightFieldResolutionY;
+      p0[0] = bounds[0] + xWidth * x / (double) m_HeightFieldResolutionX;
+      p0[1] = bounds[2] + yWidth * y / (double) m_HeightFieldResolutionY;
       p0[2] = -m_MaxHeight;
 
       p1[0] = p0[0];
@@ -235,57 +234,94 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   TPixel factor = static_cast< TPixel >( clipImageFilter->m_MultiplicationFactor );
   TPixel clippingConstant = clipImageFilter->m_ClippingConstant;
 
-  for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
+  inputIt.SetFirstDirection( 0 );
+  inputIt.SetSecondDirection( 1 );
+
+  for ( inputIt.GoToBegin(), outputIt.GoToBegin();
+        !inputIt.IsAtEnd(); 
+        inputIt.NextSlice() )
   {
-    if ( (clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT)
-      && ((TPixel)inputIt.Get() == clippingConstant ) )
+    for ( ; !inputIt.IsAtEndOfSlice(); inputIt.NextLine() )
     {
-      outputIt.Set( clippingConstant );
-    }
-    else
-    {
-      Point3D imagePoint;
-      imagePoint[0] = inputIt.GetIndex()[0];
-      imagePoint[1] = inputIt.GetIndex()[1];
-      imagePoint[2] = inputIt.GetIndex()[2];
+      Point3D imageP0, planeP0;
+      imageP0[0] = inputIt.GetIndex()[0];
+      imageP0[1] = inputIt.GetIndex()[1];
+      imageP0[2] = inputIt.GetIndex()[2];
+      planeP0 = imageToPlaneTransform->TransformPoint( imageP0 );
 
-      Point3D planePoint = imageToPlaneTransform->TransformPoint( imagePoint );
+      Point3D imageP1, planeP1;
+      imageP1[0] = imageP0[0] + inputRegionOfInterest.GetSize( 0 );
+      imageP1[1] = imageP0[1];
+      imageP1[2] = imageP0[2];
+      planeP1 = imageToPlaneTransform->TransformPoint( imageP1 );
 
-      int x = (int) ((double)(m_HeightFieldResolutionX) * (planePoint[0] - x0) / xWidth);
-      int y = (int) ((double)(m_HeightFieldResolutionY) * (planePoint[1] - y0) / yWidth);
+      Vector3D step = (planeP1 - planeP0) / (double) inputRegionOfInterest.GetSize( 0 );
 
-      bool clip;
-      if ( (x < 0) || (x >= m_HeightFieldResolutionX)
-        || (y < 0) || (y >= m_HeightFieldResolutionY) )
+
+      for ( ; !inputIt.IsAtEndOfLine(); ++inputIt, ++outputIt, planeP0 += step )
       {
-        clip = true;
-      }
-      else
-      {
-        if ( heightField[y * m_HeightFieldResolutionX + x] - planePoint[2] < 0 )
+        if ( (clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT)
+          && ((TPixel)inputIt.Get() == clippingConstant ) )
         {
-          clip = true;
+          outputIt.Set( clippingConstant );
         }
         else
         {
-          clip = false;
-        }
-      }
+          int x0 = (int) ((double)(m_HeightFieldResolutionX) * (planeP0[0] - bounds[0]) / xWidth);
+          int y0 = (int) ((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
 
-      if ( clip )
-      {
-        if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT )
-        {
-          outputIt.Set( clipImageFilter->m_ClippingConstant );
+          bool clip;
+          if ( (x0 < 0) || (x0 >= m_HeightFieldResolutionX)
+            || (y0 < 0) || (y0 >= m_HeightFieldResolutionY) )
+          {
+            clip = true;
+          }
+          else
+          {
+            // Calculate bilinearly interpolated height field value at plane point
+            int x1 = x0 + 1;
+            int y1 = y0 + 1;
+            if ( x1 >= m_HeightFieldResolutionX ) { x1 = x0; }
+            if ( y1 >= m_HeightFieldResolutionY ) { y1 = y0; }
+
+            ScalarType q00, q01, q10, q11;
+            q00 = heightField[y0 * m_HeightFieldResolutionX + x0];
+            q01 = heightField[y0 * m_HeightFieldResolutionX + x1];
+            q10 = heightField[y1 * m_HeightFieldResolutionX + x0];
+            q11 = heightField[y1 * m_HeightFieldResolutionX + x1];
+
+            ScalarType q =
+                q00 * ((double) x1 - planeP0[0]) * ((double) y1 - planeP0[1])
+              + q01 * (planeP0[0] - (double) x0) * ((double) y1 - planeP0[1])
+              + q10 * ((double) x1 - planeP0[0]) * (planeP0[1] - (double) y0)
+              + q11 * (planeP0[0] - (double) x0) * (planeP0[1] - (double) y0);
+
+            if ( q - planeP0[2] < 0 )
+            {
+              clip = true;
+            }
+            else
+            {
+              clip = false;
+            }
+          }
+
+          if ( clip )
+          {
+            if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_CONSTANT )
+            {
+              outputIt.Set( clipImageFilter->m_ClippingConstant );
+            }
+            else if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_MULTIPLYBYFACTOR )
+            {
+              outputIt.Set( inputIt.Get() * factor );
+            }
+          }
+          else
+          {
+            outputIt.Set( inputIt.Get() );
+          }
         }
-        else if ( clipImageFilter->m_ClippingMode == CLIPPING_MODE_MULTIPLYBYFACTOR )
-        {
-          outputIt.Set( inputIt.Get() * factor );
-        }
-      }
-      else
-      {
-        outputIt.Set( inputIt.Get() );
       }
     }
   }

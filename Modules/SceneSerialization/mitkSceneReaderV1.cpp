@@ -27,10 +27,12 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   assert(storage);
   bool error(false);
 
+  // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
+
   LOG_INFO << "Reading objects for MITK scene from '" << workingDirectory << "'";
 
   // iterate all nodes
-  // first level nodes should be <node> elements. for each
+  // first level nodes should be <node> elements
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
   {
     //   1. if there is a <data type="..." file="..."> element,
@@ -38,41 +40,8 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - try to instantiate this deserializer via itk object factory
     //        - if deserializer could be created, use it to read the file into a BaseData object
     //        - if successful, call the new node's SetData(..)
-    DataTreeNode::Pointer node;
-    TiXmlElement* dataElement = element->FirstChildElement("data");
-    if (dataElement) 
-    {
-      const char* filename( dataElement->Attribute("file") );
-      if ( filename )
-      {
-        DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-        factory->SetFileName( workingDirectory + "/" + filename );
-        
-        try
-        {
-          factory->Update();
-          node = factory->GetOutput();
-        }
-        catch (std::exception& e)
-        {
-          LOG_ERROR << "Error during attempt to read '" << filename << "'. Exception says: " << e.what();
-          error = true;
-        }
-
-        if (node.IsNull())
-        {
-          LOG_ERROR << "Error during attempt to read '" << filename << "'. Factory returned NULL object.";
-          error = true;
-        }
-      }
-    }
-
-    // in case there was no <data> element we create a new node for our propertylist
-    if (node.IsNull())
-    {
-      node = DataTreeNode::New();
-    }
-    
+    DataTreeNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
+   
     //   2. check child nodes
     const char* uida = element->Attribute("UID");
     std::string uid("");
@@ -102,13 +71,21 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       }
     }
 
-  // TODO
-  //   5. if there are <properties> nodes, 
-  //        - instantiate the appropriate PropertyListDeSerializer
-  //        - use them to construct PropertyList objects
-  //        - add these properties to the node (if necessary, use renderwindow name)
 
+    //   5. if there are <properties> nodes, 
+    //        - instantiate the appropriate PropertyListDeSerializer
+    //        - use them to construct PropertyList objects
+    //        - add these properties to the node (if necessary, use renderwindow name)
+    for( TiXmlElement* properties = element->FirstChildElement("properties"); properties != NULL; properties = properties->NextSiblingElement("properties") )
+    {
+      std::string propertiesfile( properties->Attribute("file");
+      std::string renderwindow( properties->Attribute("renderwindow");
 
+      // clear all properties from node that might be set by DataTreeNodeFactory during loading 
+      node->GetPropertyList(renderwindow)->Clear(); // DataTreeNode implementation always returns a propertylist
+      
+      error &= DecorateNodeWithProperties(node, propertiesfile, renderwindow, workingDirectory);
+    }
   } // end for all <node>
   
   // remove all unknown parent UIDs
@@ -188,7 +165,52 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     error = true;
   }
 
-  // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
+  return !error;
+}
+
+mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )
+{
+  DataTreeNode::Pointer node;
+
+  if (dataElement) 
+  {
+    const char* filename( dataElement->Attribute("file") );
+    if ( filename )
+    {
+      DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
+      factory->SetFileName( workingDirectory + "/" + filename );
+      
+      try
+      {
+        factory->Update();
+        node = factory->GetOutput();
+      }
+      catch (std::exception& e)
+      {
+        LOG_ERROR << "Error during attempt to read '" << filename << "'. Exception says: " << e.what();
+        error = true;
+      }
+
+      if (node.IsNull())
+      {
+        LOG_ERROR << "Error during attempt to read '" << filename << "'. Factory returned NULL object.";
+        error = true;
+      }
+    }
+  }
+
+  // in case there was no <data> element we create a new empty node (for appending a propertylist later)
+  if (node.IsNull())
+  {
+    node = DataTreeNode::New();
+  }
+
+  return node;
+}
+      
+bool mitk:SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, const std::string& propertiesfile, const std::string& renderwindow, const std::string& workingDirectory)
+{
+  bool error(false);
 
   return !error;
 }

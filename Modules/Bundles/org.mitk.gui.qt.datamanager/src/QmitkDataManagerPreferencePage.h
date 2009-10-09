@@ -19,10 +19,10 @@
 #ifndef QMITKDATAMANAGERPREFERENCEPAGE_H_
 #define QMITKDATAMANAGERPREFERENCEPAGE_H_
 
-#include <QWidget>
-
 #include "cherryIQtPreferencePage.h"
 #include "mitkQtDataManagerDll.h"
+
+#include <QWidget>
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public cherry::IQtPreferencePage
 {

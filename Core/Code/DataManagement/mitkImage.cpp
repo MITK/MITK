@@ -269,7 +269,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData(int t, int n, void 
         {
           // copy data of slices in volume
           size_t offset = ((size_t) s)*size;
-          memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
+          std::memcpy(static_cast<char*>(vol->GetData())+offset, sl->GetData(), size);
 
           mitkIpPicDescriptor * pic = sl->GetPicDescriptor();
 
@@ -356,7 +356,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData(int n, void *data,
         {
           // copy data of volume in channel
           size_t offset = ((size_t) t)*m_OffsetTable[3]*(m_PixelType.GetBpe()/8);
-          memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
+          std::memcpy(static_cast<char*>(ch->GetData())+offset, vol->GetData(), size);
 
           mitkIpPicDescriptor * pic = vol->GetPicDescriptor();
 
@@ -500,7 +500,7 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
       if(sl.GetPointer()==NULL) return false;
     }
     if ( sl->GetData() != data )
-      memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
+      std::memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
     sl->Modified();
     //we have changed the data: call Modified()! 
     Modified();
@@ -510,7 +510,7 @@ bool mitk::Image::SetImportSlice(void *data, int s, int t, int n, ImportMemoryMa
     sl=AllocateSliceData(s,t,n,data,importMemoryManagement);
     if(sl.GetPointer()==NULL) return false;
     if ( sl->GetData() != data )
-      memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));   
+      std::memcpy(sl->GetData(), data, m_OffsetTable[2]*(m_PixelType.GetBpe()/8));
     //we just added a missing slice, which is not regarded as modification.
     //Therefore, we do not call Modified()!
   }
@@ -530,7 +530,7 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
       if(vol.GetPointer()==NULL) return false;
     }
     if ( vol->GetData() != data )
-      memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+      std::memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
     vol->Modified();
     vol->SetComplete(true);
     //we have changed the data: call Modified()! 
@@ -542,7 +542,7 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
     if(vol.GetPointer()==NULL) return false;
     if ( vol->GetData() != data )
     { 
-      memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+      std::memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
     }
     vol->SetComplete(true);
     //we just added a missing Volume, which is not regarded as modification.
@@ -564,7 +564,7 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
       if(ch.GetPointer()==NULL) return false;
     }
     if ( ch->GetData() != data )
-      memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+      std::memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
     ch->Modified();
     ch->SetComplete(true);
     //we have changed the data: call Modified()! 
@@ -575,7 +575,7 @@ bool mitk::Image::SetImportChannel(void *data, int n, ImportMemoryManagementType
     ch=AllocateChannelData(n,data,importMemoryManagement);
     if(ch.GetPointer()==NULL) return false;
     if ( ch->GetData() != data )
-      memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+      std::memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
     ch->SetComplete(true);
     //we just added a missing Channel, which is not regarded as modification.
     //Therefore, we do not call Modified()!
@@ -692,7 +692,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
   }
 
   m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
-  memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
+  std::memcpy(m_Dimensions, dimensions, sizeof(unsigned int)*m_Dimension);
   if(m_Dimension<4)
   {
     unsigned int *p;
@@ -928,7 +928,7 @@ void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int t
   m_Dimension=pic->dim;
 
   m_Dimensions=new unsigned int[m_Dimension>4?m_Dimension:4];
-  memcpy(m_Dimensions, pic->n, sizeof(unsigned int)*m_Dimension);
+  std::memcpy(m_Dimensions, pic->n, sizeof(unsigned int)*m_Dimension);
   if(m_Dimension<4)
   {
     unsigned int i, *p;
@@ -1093,7 +1093,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData(int t, int n, 
   {
     vol=new ImageDataItem(m_PixelType, 3, m_Dimensions, NULL, true);
     if(data != NULL)
-      memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
+      std::memcpy(vol->GetData(), data, m_OffsetTable[3]*(m_PixelType.GetBpe()/8));
   }
   else
   {
@@ -1111,7 +1111,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData(int n, void *
   {
     ch=new ImageDataItem(m_PixelType, m_Dimension, m_Dimensions, NULL, true);
     if(data != NULL)
-      memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
+      std::memcpy(ch->GetData(), data, m_OffsetTable[4]*(m_PixelType.GetBpe()/8));
   }
   else
   {

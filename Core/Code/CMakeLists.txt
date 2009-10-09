@@ -24,12 +24,24 @@ MITK_CREATE_MODULE( Mitk
   PACKAGE_DEPENDS ITK VTK
 )
 
+# this is needed for libraries which link to mitkCore and need
+# symbols from explicitly instantiated templates like
+# mitk::SurfaceVtkWriter<vtkSTLWriter> which is referenced in
+# QmitkCommonFunctionality in the QmitkExt library.
+IF(MINGW)
+  GET_TARGET_PROPERTY(_mitkCore_MINGW_linkflags mitkCore LINK_FLAGS)
+  IF(NOT _mitkCore_MINGW_linkflags)
+    SET(_mitkCore_MINGW_linkflags "")
+  ENDIF(NOT _mitkCore_MINGW_linkflags)
+  SET_TARGET_PROPERTIES(mitkCore PROPERTIES LINK_FLAGS "${_mitkCore_MINGW_linkflags} -Wl,--export-all-symbols")
+ENDIF(MINGW)
+
 TARGET_LINK_LIBRARIES(mitkCore ${LIBRARIES_FOR_${KITNAME}_CORE}  ${IPFUNC_LIBRARY} ipSegmentation ann)
 TARGET_LINK_LIBRARIES(mitkCore ${OPENGL_LIBRARIES} )
 
-IF(MSVC_IDE OR MSVC_VERSION)
+IF(MSVC_IDE OR MSVC_VERSION OR MINGW)
   TARGET_LINK_LIBRARIES(mitkCore psapi.lib)
-ENDIF(MSVC_IDE OR MSVC_VERSION)
+ENDIF(MSVC_IDE OR MSVC_VERSION OR MINGW)
 
 OPTION(BUILD_TESTING "Build the MITK Core tests." ON)
 IF(BUILD_TESTING)

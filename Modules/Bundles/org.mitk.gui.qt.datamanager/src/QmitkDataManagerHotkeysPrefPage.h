@@ -19,10 +19,12 @@
 #ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
 #define QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
 
-#include <QWidget>
 #include "cherryIQtPreferencePage.h"
 #include "mitkQtDataManagerDll.h"
+
 #include <map>
+#include <QWidget>
+
 class QmitkHotkeyLineEdit;
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public cherry::IQtPreferencePage

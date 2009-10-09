@@ -15,6 +15,17 @@ MITK_CREATE_MODULE( MitkExt
                GENERATED_CPP ${TOOL_CPPS}
 )
 
+# this is needed for libraries which link to mitkCoreExt and need
+# symbols from explicitly instantiated templates like
+# mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter> which is referenced in
+# mitk::UnstructuredGridVtkWriterTest in the MitkExtTestDriver executable.
+IF(MINGW)
+  GET_TARGET_PROPERTY(_mitkCoreExt_MINGW_linkflags mitkCoreExt LINK_FLAGS)
+  IF(NOT _mitkCoreExt_MINGW_linkflags)
+    SET(_mitkCoreExt_MINGW_linkflags "")
+  ENDIF(NOT _mitkCoreExt_MINGW_linkflags)
+  SET_TARGET_PROPERTIES(mitkCoreExt PROPERTIES LINK_FLAGS "${_mitkCoreExt_MINGW_linkflags} -Wl,--export-all-symbols")
+ENDIF(MINGW)
 
 ADD_SUBDIRECTORY(Testing)
 

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMemoryUtilities.h"
 
 #include <stdio.h>
-#ifdef _MSC_VER 
+#if _MSC_VER || __MINGW32__
   #include <windows.h>
   #include <psapi.h>
 #elif defined(__APPLE__)
@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
  */
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 {
-#ifdef _MSC_VER 
+#if _MSC_VER || __MINGW32__
   size_t size = 0;
   DWORD pid = GetCurrentProcessId();
   PROCESS_MEMORY_COUNTERS pmc;
@@ -75,7 +75,7 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
  */
 size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 {
-#ifdef _MSC_VER 
+#if _MSC_VER || __MINGW32__
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof (statex);
   GlobalMemoryStatusEx (&statex);

@@ -15,6 +15,13 @@
  
  =========================================================================*/
 
+#ifdef __MINGW32__
+// We need to inlclude winbase.h here in order to declare
+// atomic intrinsics like InterlockedIncrement correctly.
+// Otherwhise, they would be declared wrong within qatomic_windows.h .
+#include <windows.h>
+#endif
+
 #include <QToolBar>
 #include <QSortFilterProxyModel>
 #include <QVBoxLayout>

@@ -1,8 +1,9 @@
 #ifndef QMITKNODETABLEVIEWKEYFILTER_H_
 #define QMITKNODETABLEVIEWKEYFILTER_H_
 
-#include <QObject>
 #include "cherryIPreferencesService.h"
+
+#include <QObject>
 
 ///
 /// A small class which "eats" all Del-Key-pressed events on the node table.

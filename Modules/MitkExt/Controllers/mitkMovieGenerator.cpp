@@ -21,11 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkConfig.h"
 
-#ifdef WIN32
+#if WIN32
 #ifndef __GNUC__
 //#if ! (_MSC_VER >= 1400)
 #include "mitkMovieGeneratorWin32.h"
 //#endif
+#else
+#include "GL/glext.h"
 #endif
 #endif
 #ifndef GL_BGR

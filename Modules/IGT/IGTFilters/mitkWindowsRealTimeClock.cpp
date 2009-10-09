@@ -61,7 +61,7 @@ double mitk::WindowsRealTimeClock::GetCurrentStamp()
   QueryPerformanceCounter( (LARGE_INTEGER*) &ticks);
   time = (ticks * 100000) / this->m_Frequency.QuadPart;
   double milliseconds = (double) (time & 0xffffffff);
-  (double) milliseconds /= 100.0;
+  milliseconds /= (double)100.0;
   return milliseconds;
 }
 

@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRealTimeClock.h"
 
-//checking if MS-Compiler is beeing used, thus checking if MITK runs on a Windows-System
-#if ( _MSC_VER > 800 )
+// check if MITK runs on a Windows-System
+#ifdef _WIN32
   #include "mitkWindowsRealTimeClock.h"
 #else // should be Linux or Mac OSX
   #include "mitkLinuxRealTimeClock.h"
@@ -29,7 +29,7 @@ mitk::RealTimeClock::Pointer mitk::RealTimeClock::New()
 {
   mitk::RealTimeClock::Pointer smartPtr;
 
-#if ( _MSC_VER > 800 )
+#ifdef _WIN32
   smartPtr = mitk::WindowsRealTimeClock::New();
 #else
   smartPtr = mitk::LinuxRealTimeClock::New();

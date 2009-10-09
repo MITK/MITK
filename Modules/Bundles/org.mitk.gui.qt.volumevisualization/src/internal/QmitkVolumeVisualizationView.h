@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKVOLUMEVISUALIZATIONVIEW_H_
 #define QMITKVOLUMEVISUALIZATIONVIEW_H_
 
-#include <QObject>
 #include <QmitkFunctionality.h>
 #include <mitkWeakPointer.h>
 

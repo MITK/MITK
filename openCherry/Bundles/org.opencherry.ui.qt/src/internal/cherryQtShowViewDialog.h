@@ -18,6 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef CHERRYQTSHOWVIEWDIALOG_H_
 #define CHERRYQTSHOWVIEWDIALOG_H_
 
+#ifdef __MINGW32__
+// We need to inlclude winbase.h here in order to declare
+// atomic intrinsics like InterlockedIncrement correctly.
+// Otherwhise, they would be declared wrong within qatomic_windows.h .
+#include <windows.h>
+#endif
+
 #include <QDialog>
 
 #include <cherryIViewRegistry.h>

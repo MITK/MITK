@@ -49,9 +49,17 @@ IF(MITK_USE_QT)
   FIND_PACKAGE(Qt4 REQUIRED)
 ENDIF()
 
-IF(NOT UNIX)
+IF(NOT UNIX AND NOT MINGW)
   SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 ENDIF()
+
+# we need to define a Windows version
+IF(CMAKE_CROSSCOMPILING)
+  IF(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0500")
+  ENDIF()
+ENDIF()
+
 ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" ON)
@@ -247,6 +255,10 @@ IF(WIN32)
     SET(qtreleasedlls)
     FOREACH(qtlib ${QT_LIBRARIES})
       GET_FILENAME_COMPONENT(qtdllname ${qtlib} NAME_WE)
+      # strip the leading "lib" from the filename for MINGW installs
+      IF(MINGW)
+        STRING(REPLACE "lib" "" qtdllname ${qtdllname})
+      ENDIF()
       STRING(REGEX MATCH ".*d4" debugmatch ${qtdllname})
       IF(debugmatch)
         LIST(APPEND qtdebugdlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
@@ -264,22 +276,50 @@ IF(WIN32)
   ENDIF(MITK_USE_QT)
  
   #VTK DLLs install target
-  FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
-  FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
+  IF(MINGW)
+    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
+    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
+  ELSE()
+    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
+    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
+  ENDIF()
+  
   INSTALL(FILES ${vtkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
   INSTALL(FILES ${vtkreleasedlllist} DESTINATION bin CONFIGURATIONS Release) 
   
   #ITK DLLs install target
-  FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
-  FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
+  IF(MINGW)
+    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/*.dll)
+    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/*.dll)
+  ELSE()
+    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
+    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
+  ENDIF()
+  
   INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
   INSTALL(FILES ${itkreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
   
   #OpenCherry
   IF(MITK_USE_OPENCHERRY)
-    INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-    INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+    IF(MINGW)
+      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+    ELSE()
+      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+    ENDIF()
   ENDIF()
+  
+  #MinGW dll
+  IF(MINGW)
+    FIND_LIBRARY(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
+    IF (MINGW_RUNTIME_DLL)
+      INSTALL(FILES ${MINGW_RUNTIME_DLL} DESTINATION bin)
+    ELSE()
+      MESSAGE(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
+    ENDIF()
+  ENDIF()
+
  
 ENDIF(WIN32)
    

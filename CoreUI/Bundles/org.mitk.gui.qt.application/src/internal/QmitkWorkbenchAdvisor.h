@@ -18,6 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKWORKBENCHADVISOR_H_
 #define QMITKWORKBENCHADVISOR_H_
 
+#ifdef __MINGW32__
+// We need to inlclude winbase.h here in order to declare
+// atomic intrinsics like InterlockedIncrement correctly.
+// Otherwhise, they would be declared wrong within qatomic_windows.h .
+#include <windows.h>
+#endif
+
 #include <cherryQtWorkbenchAdvisor.h>
 
 class QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor

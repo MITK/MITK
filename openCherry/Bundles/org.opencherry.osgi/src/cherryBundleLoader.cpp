@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <windows.h>
 #endif
 
+// for std::memcpy
+#include <cstring>
+
 #include "cherryLog.h"
 
 #include "cherryBundleLoader.h"

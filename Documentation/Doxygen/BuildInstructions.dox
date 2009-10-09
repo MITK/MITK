@@ -22,7 +22,7 @@ dashboard</a> at Kitware before checking out. If the build tree is not clean, yo
 To checkout MITK's current subversion repository do:
 
 <tt>
-svn co http://svn.mitk.org/trunk/mitk ./mitk
+svn co http://svn2.mitk.org/trunk/mitk ./mitk
 </tt>
 
 If you prefer a graphical client, use <tt>svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk</tt> as the repository URL for the trunk.
@@ -50,7 +50,7 @@ Essential variables to configure are ITK_DIR and VTK_DIR. If not configured by C
 
 We recommend using a batchfile to set the desired environment variables and parameters.
 
-Using Windows 64 bit and Microsoft Visual Studio 2008 it could look like this:
+Using Windows 32 bit and Microsoft Visual Studio 2008 it could look like this:
 
 \code
 
@@ -61,20 +61,20 @@ REM Set MITK Binary dir
 @SET MITK_DIR=C:\svn\mitkBinary
 
 REM Choose toolkit versions
-@SET VTK_DIR=V:\windows\x64\VTK-5.4.0_Qt451_VC9.0_Bin
-@SET ITK_DIR=V:\windows\x64\ITK-3.14.0_VC9.0_Bin
-@SET QT_DIR=V:\windows\x64\QT-4.5.1_VC9.0_Bin
-@SET BOOST_DIR=V:\windows\x64\boost
-@SET OSGI_RUNTIME=%MITK_DIR%\Utilities\openCherry\Bundles\org.opencherry.osgi
+@SET VTK_DIR=V:\windows\x32\VTK-5.4.0_Qt451_VC9.0_Bin
+@SET ITK_DIR=V:\windows\x32\ITK-3.14.0_VC9.0_Bin
+@SET QT_DIR=V:\windows\x32\QT-4.5.1_VC9.0_Bin
+REM @SET BOOST_DIR=V:\windows\x32\boost REM Only needed by MBI members
+@SET OSGI_RUNTIME=%MITK_DIR%\openCherry\Bundles\org.opencherry.osgi
 @SET CMAKE_DIR="C:\Program Files (x86)\CMake 2.6\bin"
 
 REM ----------- Setup configuration ---------------
 
 REM Disable VS2005 Secure C Runtime Library Warnings, Disable Microsoft c++ extensions, enable minimal rebuild
-@set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE /bigobj /MP
+@set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
 REM @set LINK=/LARGEADDRESSAWARE
 
-@call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" amd64
+@call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" 
 
 IF NOT DEFINED BUILDTYPE (SET BUILDTYPE=Debug)
 
@@ -95,7 +95,7 @@ REM | Change to working directory
 cd %MITK_DIR%
 
 REM | Cosmetics
-TITLE=QT4-Extern 64 Bit-%BUILDTYPE%
+TITLE=QT4-Extern 32 Bit-%BUILDTYPE%
 
 REM | Aliases, invoke by %alias%
 set start=MITK.sln
@@ -108,8 +108,8 @@ call cmd
 Usually you need to change the file paths to fit your setup.
 
 For other system configurations, please adjust:
-  - The editor call, for 32 Bit Windows using MSVS 2008 \code call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" \endcode
-  - 32 Bit Windows MSVS does not need the /bigobj /MP flag
+  - The editor call, for 64 Bit Windows using MSVS 2008 \code call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" amd64 \endcode
+  - 64 Bit Windows MSVS needs the /bigobj /MP flag \code @set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE /bigobj /MP \endcode
   - Other operating systems may need to change the environment variables
 
 To configure MITK do:
@@ -121,6 +121,7 @@ To configure MITK do:
   - disable MITK_USE_OPENCHERRY if you want to use MITK as a toolkit without the application framework
   - press <B>Configure</B> twice
   - press <B>Generate</B>
+  - start Visual Studio from the called command line \code C:\svn\mitkBinary>%start%  \endcode
   - build it with e.g. Microsoft Visual Studio (Set MainApp as StartUp Project)
   
 \section BIFour MITK specific configuration variables  

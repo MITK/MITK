@@ -187,7 +187,7 @@ bool
    if (m_Rule == ADD_RULE)
      return ( mitk::DataStorageAccessRule::ADD_RULE ) ;
    else {
-     return ( mitk::DataStorageAccessRule::RuleType::REMOVE_RULE ) ;
+     return ( mitk::DataStorageAccessRule::REMOVE_RULE ) ;
 
      }
    }

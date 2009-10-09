@@ -867,22 +867,22 @@ T itk::OrientationDistributionFunction<T, N>::GetGeneralizedGFA( int k, int p ) 
   double mean = 0;
   double std = 0;
   double rms = 0;
-  T max = NumericTraits<T>::NonpositiveMin();
+  double max = NumericTraits<double>::NonpositiveMin();
   for( unsigned int i=0; i<InternalDimension; i++) 
   {
-    T val = (*this)[i];
-    mean += pow(val,p);
+    double val = (double)(*this)[i];
+    mean += pow(val,(double)p);
     max = val > max ? val : max;
   }
-  max = pow(max,p);
+  max = pow(max,(double)p);
   mean /= N;
   for( unsigned int i=0; i<InternalDimension; i++) 
   {
-    T val = (*this)[i];
-    std += (pow(val,p) - mean) * (pow(val,p) - mean);
+    double val = (double)(*this)[i];
+    std += (pow(val,(double)p) - mean) * (pow(val,(double)p) - mean);
     if(k>0)
     {
-      rms += pow(val,p*k);
+      rms += pow(val,(double)(p*k));
     }
   }
   std /= N - 1;
@@ -891,7 +891,7 @@ T itk::OrientationDistributionFunction<T, N>::GetGeneralizedGFA( int k, int p ) 
   if(k>0)
   {
     rms /= N;
-    rms = pow(rms,1.0/k);
+    rms = pow(rms,(double)(1.0/k));
   }
   else if(k<0) // lim k->inf gives us the maximum
   {
@@ -908,7 +908,7 @@ T itk::OrientationDistributionFunction<T, N>::GetGeneralizedGFA( int k, int p ) 
   }
   else
   {
-    return std/rms;
+    return (T)(std/rms);
   }
 }
 
@@ -957,6 +957,8 @@ T itk::OrientationDistributionFunction<T, N>::GetStdDevByMaxValue() const
 template < typename T, unsigned int N >
 T itk::OrientationDistributionFunction<T, N>::GetPrincipleCurvature(double alphaMinDegree, double alphaMaxDegree, int invert) const
 {
+  // following loop only performed once
+  // (computing indices of each angular range)
   m_MutexAngularRange.Lock();
   if(m_AngularRangeIdxs == NULL)
   {
@@ -979,6 +981,7 @@ T itk::OrientationDistributionFunction<T, N>::GetPrincipleCurvature(double alpha
   }
   m_MutexAngularRange.Unlock();
   
+  // find the maximum (or minimum) direction (remember index and value)
   T mode;
   int pIdx = -1;
   if(invert > 0)
@@ -998,16 +1001,49 @@ T itk::OrientationDistributionFunction<T, N>::GetPrincipleCurvature(double alpha
       }
     }
   }
+  ////////////////
+  // compute median of mode and its neighbors to become more stable to noise
+  // compared to simply using the mode
+  ////////////////
+  
+  // values of mode and its neighbors
+  std::vector<int> nbs = GetNeighbors(pIdx);
+  std::vector<T> modeAndNeighborVals;
+  modeAndNeighborVals.push_back(mode);
+  int numNeighbors = nbs.size();
+  for(int i=0; i<numNeighbors; i++)
+  {
+    modeAndNeighborVals.push_back((*this)[nbs[i]]);
+  }
 
+  // sort by value
+  std::sort( modeAndNeighborVals.begin(), modeAndNeighborVals.end() );
+
+  // median of mode and neighbors
+  mode = modeAndNeighborVals[floor(0.5*(double)(numNeighbors+1)+0.5)];
+
+  ////////////////
+  // computing a quantile of the angular range 
+  ////////////////
+
+  // define quantile
+  double quantile = 0.05;
+
+  // collect all values in angular range of mode
   std::vector<T> odfValuesInAngularRange;
   int numInRange = m_AngularRangeIdxs->at(pIdx)->size();
   for(int i=0; i<numInRange; i++)
   {
     odfValuesInAngularRange.push_back((*this)[(*m_AngularRangeIdxs->at(pIdx))[i] ]);
   }
-  int numElements = odfValuesInAngularRange.size();
+  
+  // sort them by value
   std::sort( odfValuesInAngularRange.begin(), odfValuesInAngularRange.end() );
-  T median = odfValuesInAngularRange[floor(0.5*(double)numElements+0.5)];
+  
+  // median of angular range
+  T median = odfValuesInAngularRange[floor(quantile*(double)numInRange+0.5)];
+
+  // compute and return final value
   if(mode > median)
   {
     return mode/median - 1.0;

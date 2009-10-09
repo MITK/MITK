@@ -85,7 +85,10 @@ namespace mitk {
     static vtkDoubleArray* m_OdfVals;
     static vtkOdfSource* m_OdfSource;
     static float m_Scaling;
-    static float m_GlobalScaling;
+    static int m_Normalization;
+    static int m_ScaleBy;
+    static float m_IndexParam1;
+    static float m_IndexParam2;
 
     int m_ShowMaxNumber;
 

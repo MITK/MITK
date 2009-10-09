@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkMatrixConvert.h"
 #include "mitkGeometry3D.h"
+#include "mitkOdfNormalizationMethodProperty.h" 
+#include "mitkOdfScaleByProperty.h" 
 
 #include "vtkSphereSource.h"
 #include "vtkPropCollection.h"
@@ -75,7 +77,16 @@ template<class T, int N>
 float mitk::OdfVtkMapper2D<T,N>::m_Scaling;
 
 template<class T, int N>
-float mitk::OdfVtkMapper2D<T,N>::m_GlobalScaling;
+int mitk::OdfVtkMapper2D<T,N>::m_Normalization;
+
+template<class T, int N>
+int mitk::OdfVtkMapper2D<T,N>::m_ScaleBy;
+
+template<class T, int N>
+float mitk::OdfVtkMapper2D<T,N>::m_IndexParam1;
+
+template<class T, int N>
+float mitk::OdfVtkMapper2D<T,N>::m_IndexParam2;
 
 #define ODF_MAPPER_PI 3.1415926535897932384626433832795
 
@@ -312,8 +323,44 @@ void  mitk::OdfVtkMapper2D<T,N>
   m_OdfTransform->Identity();
   m_OdfTransform->Translate(point[0],point[1],point[2]);
 
+  typedef itk::OrientationDistributionFunction<float,N> OdfType;
+  OdfType odf;
+
   for(int i=0; i<N; i++)
-    m_OdfVals->SetComponent(0,i,(double)odfvals->GetComponent(id,i)*m_Scaling*m_GlobalScaling);
+    odf[i] = (double)odfvals->GetComponent(id,i);
+
+  switch(m_Normalization)
+  {
+  case ODFN_MINMAX:
+    odf = odf.MinMaxNormalize();
+    break;
+  case ODFN_MAX:
+    odf = odf.MaxNormalize();
+    break;
+  case ODFN_NONE:
+    // nothing
+    break;
+  case ODFN_GLOBAL_MAX:
+    // global max not implemented yet
+    break;
+  default:
+    odf = odf.MinMaxNormalize();
+  }
+
+  switch(m_ScaleBy)
+  {
+  case ODFSB_NONE:
+    break;
+  case ODFSB_GFA:
+    odf = odf * odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2);
+    break;
+  case ODFSB_PC:
+    odf = odf * odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 1);
+    break;
+  }
+
+  for(int i=0; i<N; i++)
+    m_OdfVals->SetComponent(0,i,0.5*odf[i]*m_Scaling);
 
   m_OdfSource->Modified();
 }
@@ -812,11 +859,6 @@ void  mitk::OdfVtkMapper2D<T,N>
   LOG_INFO << index;
 
   
-  // Global Scaling
-  float gscale;
-  this->GetDataTreeNode()->GetPropertyValue("global_scaling", gscale);
-  m_GlobalScaling = gscale;
-
   // Spacing adapted scaling
   double spacing[3];
   m_VtkImage->GetSpacing(spacing);
@@ -873,9 +915,28 @@ void  mitk::OdfVtkMapper2D<T,N>
   light->SetPosition(p2[0],p2[1],p2[2]);
   renderer->GetVtkRenderer()->AddLight(light);
 
-  this->GetDataTreeNode()->GetFloatProperty( "opacity", m_Scaling );
+  this->GetDataTreeNode()->GetFloatProperty( "Scaling", m_Scaling );
   this->GetDataTreeNode()->GetIntProperty( "ShowMaxNumber", m_ShowMaxNumber );
+  
+  OdfNormalizationMethodProperty* nmp = dynamic_cast
+    <OdfNormalizationMethodProperty*>(
+    this->GetDataTreeNode()->GetProperty( "Normalization" ));
+  if(nmp)
+  {
+    m_Normalization = nmp->GetNormalization();
+  }
 
+  OdfScaleByProperty* sbp = dynamic_cast
+    <OdfScaleByProperty*>(
+    this->GetDataTreeNode()->GetProperty( "ScaleBy" ));
+  if(sbp)
+  {
+    m_ScaleBy = sbp->GetScaleBy();
+  }
+  
+  this->GetDataTreeNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
+  this->GetDataTreeNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
+  
   if(IsVisible(renderer)==false)
   {
     m_OdfsActors[0]->VisibilityOff();
@@ -914,16 +975,16 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );
-  node->SetProperty ("layer", mitk::IntProperty::New(100));
-  node->SetProperty( "IndexParam1", mitk::FloatProperty::New(0));
-  node->SetProperty( "IndexParam2", mitk::FloatProperty::New(0));
-  node->SetProperty( "Normalization", mitk::FloatProperty::New(0));
-  node->SetProperty( "ScaleBy", mitk::FloatProperty::New(0));
   node->SetProperty( "ShowMaxNumber", mitk::IntProperty::New( 150 ) );
-  node->SetProperty( "global_scaling", mitk::FloatProperty::New( 1.0 ) );
+  node->SetProperty( "Scaling", mitk::FloatProperty::New( 1.0 ) );
+  node->SetProperty( "Normalization", mitk::OdfNormalizationMethodProperty::New());
+  node->SetProperty( "ScaleBy", mitk::OdfScaleByProperty::New());
+  node->SetProperty( "IndexParam1", mitk::FloatProperty::New(2));
+  node->SetProperty( "IndexParam2", mitk::FloatProperty::New(1));
+  node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
+  node->SetProperty ("layer", mitk::IntProperty::New(100));
+  node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
+  //node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );
 }
 
 #endif // __mitkOdfVtkMapper2D_txx__

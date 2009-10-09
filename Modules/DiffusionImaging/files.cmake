@@ -26,6 +26,8 @@ SET(CPP_FILES
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx
   Rendering/vtkThickPlane.cxx
+  Rendering/mitkOdfNormalizationMethodProperty.cpp
+  Rendering/mitkOdfScaleByProperty.cpp
 )
 
 SET(H_FILES 

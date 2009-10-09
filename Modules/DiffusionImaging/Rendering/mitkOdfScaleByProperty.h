@@ -15,79 +15,58 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef _MITK_OdfNormalizationMethodProperty__H_
-#define _MITK_OdfNormalizationMethodProperty__H_
+#ifndef _MITK_OdfScaleByProperty__H_
+#define _MITK_OdfScaleByProperty__H_
 
-#include "mitkEnumerationProperty.h"
 #include "MitkDiffusionImagingExports.h"
+#include "mitkEnumerationProperty.h"
 
 namespace mitk
 {
 
-  enum OdfNormalizationMethod
+  enum OdfScaleBy
   {
-    ODFN_MINMAX, 
-    ODFN_MAX, 
-    ODFN_NONE, 
-    ODFN_GLOBAL_MAX
+    ODFSB_NONE, 
+    ODFSB_GFA, 
+    ODFSB_PC
   };
 
 /**
  * Encapsulates the enumeration for ODF normalization. Valid values are 
- * ODFN_MINMAX, ODFN_MAX, ODFN_NONE ODFN_GLOBAL_MAX
- * Default is ODFN_MINMAX
+ *     ODFSB_NONE, ODFSB_GFA, ODFSB_PC
+ * Default is ODFSB_NONE
  */
-class MitkDiffusionImaging_EXPORT OdfNormalizationMethodProperty : public EnumerationProperty
+class MitkDiffusionImaging_EXPORT OdfScaleByProperty : public EnumerationProperty
 {
 public:
 
-  mitkClassMacro( OdfNormalizationMethodProperty, EnumerationProperty );
-  itkNewMacro(OdfNormalizationMethodProperty);
+  mitkClassMacro( OdfScaleByProperty, EnumerationProperty );
+  itkNewMacro(OdfScaleByProperty);
   
-  mitkNewMacro1Param(OdfNormalizationMethodProperty, const IdType&);
+  mitkNewMacro1Param(OdfScaleByProperty, const IdType&);
   
-  mitkNewMacro1Param(OdfNormalizationMethodProperty, const std::string&);
+  mitkNewMacro1Param(OdfScaleByProperty, const std::string&);
   
   /**
    * Returns the current interpolation value as defined by VTK constants.
    */
-  virtual int GetNormalization();
-
-  /**
-   * Sets the interpolation type to ODFN_MINMAX.
-   */
-  virtual void SetNormalizationToMinMax();
-  
-  /**
-   * Sets the interpolation type to ODFN_MAX.
-   */
-  virtual void SetNormalizationToMax();
-  
-  /**
-   * Sets the interpolation type to ODFN_NONE.
-   */
-  virtual void SetNormalizationToNone();
-
-  /**
-   * Sets the interpolation type to ODFN_GLOBAL_MAX.
-   */
-  virtual void SetNormalizationToGlobalMax();
+  virtual int GetScaleBy();
   
 protected:
   
-  /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
+  /** Sets reslice interpolation mode to default (ODFSB_NONE).
    */
-  OdfNormalizationMethodProperty( );
+  OdfScaleByProperty( );
   
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
-  OdfNormalizationMethodProperty( const IdType& value );
+  OdfScaleByProperty( const IdType& value );
   
   /**
    * Constructor. Sets reslice interpolation to the given value.
    */
-  OdfNormalizationMethodProperty( const std::string& value );
+  OdfScaleByProperty( const std::string& value );
 
   /**
    * this function is overridden as protected, so that the user may not add

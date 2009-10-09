@@ -15,19 +15,18 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <vtkProperty.h>
-#include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkOdfNormalizationMethodProperty.h"
 
+// ODFN_MINMAX, ODFN_MAX, ODFN_NONE ODFN_GLOBAL_MAX
 
-
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( )
+mitk::OdfNormalizationMethodProperty::OdfNormalizationMethodProperty( )
 {
   this->AddInterpolationTypes();
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+  this->SetValue( static_cast<IdType>( ODFN_MINMAX ) );
 }
 
 
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const IdType& value )
+mitk::OdfNormalizationMethodProperty::OdfNormalizationMethodProperty( const IdType& value )
 {
   this->AddInterpolationTypes();
   if ( IsValidEnumerationValue( value ) )
@@ -36,11 +35,11 @@ mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const Id
   }
   else
   {
-    this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+    this->SetValue( static_cast<IdType>( ODFN_MINMAX ) );
   }
 }
 
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const std::string& value )
+mitk::OdfNormalizationMethodProperty::OdfNormalizationMethodProperty( const std::string& value )
 {
   this->AddInterpolationTypes();
   if ( IsValidEnumerationValue( value ) )
@@ -49,44 +48,51 @@ mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const st
   }
   else
   {
-    this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+    this->SetValue( static_cast<IdType>( ODFN_MINMAX ) );
   }
 }
 
 
-int mitk::VtkResliceInterpolationProperty::GetInterpolation()
+int mitk::OdfNormalizationMethodProperty::GetNormalization()
 {
   return static_cast<int>( this->GetValueAsId() );
 }
 
 
-void mitk::VtkResliceInterpolationProperty::SetInterpolationToNearest()
+void mitk::OdfNormalizationMethodProperty::SetNormalizationToMinMax()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+  this->SetValue( static_cast<IdType>( ODFN_MINMAX ) );
 }
 
 
-void mitk::VtkResliceInterpolationProperty::SetInterpolationToLinear()
+void mitk::OdfNormalizationMethodProperty::SetNormalizationToMax()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_LINEAR ) );
+  this->SetValue( static_cast<IdType>( ODFN_MAX ) );
 }
 
 
-void mitk::VtkResliceInterpolationProperty::SetInterpolationToCubic()
+void mitk::OdfNormalizationMethodProperty::SetNormalizationToNone()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_CUBIC ) );
+  this->SetValue( static_cast<IdType>( ODFN_NONE ) );
 }
 
 
-void mitk::VtkResliceInterpolationProperty::AddInterpolationTypes()
+void mitk::OdfNormalizationMethodProperty::SetNormalizationToGlobalMax()
 {
-  AddEnum( "Nearest", static_cast<IdType>( VTK_RESLICE_NEAREST ) );
-  AddEnum( "Linear", static_cast<IdType>( VTK_RESLICE_LINEAR ) );
-  AddEnum( "Cubic", static_cast<IdType>( VTK_RESLICE_CUBIC ) );
+  this->SetValue( static_cast<IdType>( ODFN_GLOBAL_MAX ) );
 }
 
 
-bool mitk::VtkResliceInterpolationProperty::AddEnum( const std::string& name, const IdType& id )
+void mitk::OdfNormalizationMethodProperty::AddInterpolationTypes()
+{
+  AddEnum( "Min-Max", static_cast<IdType>( ODFN_MINMAX ) );
+  AddEnum( "Maximum", static_cast<IdType>( ODFN_MAX ) );
+  AddEnum( "None", static_cast<IdType>( ODFN_NONE ) );
+  AddEnum( "Global Maximum", static_cast<IdType>( ODFN_GLOBAL_MAX ) );
+}
+
+
+bool mitk::OdfNormalizationMethodProperty::AddEnum( const std::string& name, const IdType& id )
 {
   return Superclass::AddEnum( name, id );  
 }

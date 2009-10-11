@@ -30,6 +30,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdQBallImageWriterFactory.h"
 #include "mitkNrrdQBallImageWriter.h"
 //#include "mitkQBallImage.h"
+
+#include "mitkNrrdTensorImageIOFactory.h"
+#include "mitkNrrdTensorImageWriterFactory.h"
+#include "mitkNrrdTensorImageWriter.h"
+
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkImageMapper2D.h"
 
@@ -41,10 +46,11 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 {
   m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
   m_ExternalFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
+  m_ExternalFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
   
   m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
   m_SaveFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
-  m_SaveFileExtensions.append(";;XXXXXXXXXX (*.qxxx *.hqball)");
+  m_SaveFileExtensions.append(";;Q-Ball Images (*.dti *.hdti)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -54,16 +60,18 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 
     itk::ObjectFactoryBase::RegisterFactory( NrrdDiffusionVolumesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( NrrdQBallImageIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( NrrdTensorImageIOFactory::New() );
 
     mitk::NrrdDiffusionVolumesWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
+    mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     
-    /* commented out until core modification is checked in
     m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
     m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
-    */
+    
     alreadyDone = true;
   }
 
@@ -105,7 +113,6 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     std::string classname("QBallImage");
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      LOG_INFO << "Mapper was created";
       newMapper = mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::New();
       newMapper->SetDataTreeNode(node);
     }
@@ -131,6 +138,12 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNod
   {
     mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node);
     //mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+  }
+
+  classname = "TensorImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    // do nothing
   }
 }
 

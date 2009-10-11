@@ -36,6 +36,7 @@
 #include "vtkDelaunay2D.h"
 #include "vtkCleanPolyData.h"
 #include "vtkAppendPolyData.h"
+#include "vtkPlane.h"
 
 namespace itk
 {

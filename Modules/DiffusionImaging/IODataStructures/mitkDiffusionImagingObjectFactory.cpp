@@ -66,11 +66,11 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     
-    m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
-    m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
-    m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
+    //m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
+    //m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
+    //m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
 
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
+    //mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     
     alreadyDone = true;
   }

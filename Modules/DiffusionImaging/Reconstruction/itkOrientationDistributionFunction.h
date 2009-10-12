@@ -29,6 +29,7 @@
 #include "itkSymmetricEigenAnalysis.h"
 #include "itkPointShell.h"
 #include "itkSimpleFastMutexLock.h"
+#include "itkDiffusionTensor3D.h"
 
 #include "vtkPolyData.h"
 #include "vtkPoints.h"
@@ -141,6 +142,8 @@ public:
 
   /** Set the distribution to isotropic.*/
   void SetIsotropic();
+
+  void InitFromTensor(itk::DiffusionTensor3D<TComponent> tensor);
 
   /** Pre-Multiply by a Matrix as ResultingTensor = Matrix * ThisTensor. */
   Self PreMultiply( const MatrixType & m ) const;

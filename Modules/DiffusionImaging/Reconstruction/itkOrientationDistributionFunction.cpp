@@ -335,6 +335,41 @@ OrientationDistributionFunction<T, NOdfDirections>
 }
 
 /*
+* Set the Tensor to an Identity.
+* Set ones in the diagonal and zeroes every where else.
+*/
+template<class T, unsigned int NOdfDirections>
+void 
+OrientationDistributionFunction<T, NOdfDirections>
+::InitFromTensor(itk::DiffusionTensor3D<T> tensor) 
+{
+  for(int i=0; i<NOdfDirections; i++)
+  {
+    /*
+    *               | t0  t1  t2 |    g0
+    *  g0 g1 g2  *  | t1  t3  t4 | *  g1
+    *               | t2  t4  t5 |    g2
+    *
+    * =   g0 * (t0g0*t1g1*t2g2) 
+    *   + g1 * (t1g0+t3g1+t4g2) 
+    *   + g2 * (t2g0+t4g1+t5g2)
+    */
+    T g0 = (*m_Directions)(0,i);
+    T g1 = (*m_Directions)(1,i);
+    T g2 = (*m_Directions)(2,i);
+    T t0 = tensor[0];
+    T t1 = tensor[1];
+    T t2 = tensor[2];
+    T t3 = tensor[3];
+    T t4 = tensor[4];
+    T t5 = tensor[5];
+    (*this)[i] = g0 * (t0*g0+t1*g1+t2*g2) 
+            + g1 * (t1*g0+t3*g1+t4*g2) 
+            + g2 * (t2*g0+t4*g1+t5*g2);
+  }
+}
+
+/*
 * Normalization to PDF
 */
 template<class T, unsigned int NOdfDirections>
@@ -678,7 +713,8 @@ OrientationDistributionFunction<T, NOdfDirections>
 }
 
 template < typename TComponent, unsigned int NOdfDirections >
-vnl_vector_fixed<double,3> itk::OrientationDistributionFunction<TComponent, NOdfDirections>::GetDirection( int i )
+vnl_vector_fixed<double,3> itk::OrientationDistributionFunction<TComponent, NOdfDirections>
+::GetDirection( int i )
 {
   return m_Directions->get_column(i);
 }
@@ -862,7 +898,8 @@ OrientationDistributionFunction<T, NOdfDirections>
 
 
 template < typename T, unsigned int N>
-T itk::OrientationDistributionFunction<T, N>::GetGeneralizedGFA( int k, int p ) const
+T itk::OrientationDistributionFunction<T, N>
+::GetGeneralizedGFA( int k, int p ) const
 {
   double mean = 0;
   double std = 0;
@@ -916,8 +953,10 @@ T itk::OrientationDistributionFunction<T, N>::GetGeneralizedGFA( int k, int p ) 
 * Calculate Nematic Order Parameter
 */
 template < typename T, unsigned int N >
-T itk::OrientationDistributionFunction<T, N>::GetNematicOrderParameter() const
+T itk::OrientationDistributionFunction<T, N>
+::GetNematicOrderParameter() const
 {
+  // not yet implemented
   return 0;
 }
 
@@ -925,7 +964,8 @@ T itk::OrientationDistributionFunction<T, N>::GetNematicOrderParameter() const
 * Calculate StdDev by MaxValue
 */
 template < typename T, unsigned int N >
-T itk::OrientationDistributionFunction<T, N>::GetStdDevByMaxValue() const
+T itk::OrientationDistributionFunction<T, N>
+::GetStdDevByMaxValue() const
 {
   double mean = 0;
   double std = 0;
@@ -955,7 +995,8 @@ T itk::OrientationDistributionFunction<T, N>::GetStdDevByMaxValue() const
 }
 
 template < typename T, unsigned int N >
-T itk::OrientationDistributionFunction<T, N>::GetPrincipleCurvature(double alphaMinDegree, double alphaMaxDegree, int invert) const
+T itk::OrientationDistributionFunction<T, N>
+::GetPrincipleCurvature(double alphaMinDegree, double alphaMaxDegree, int invert) const
 {
   // following loop only performed once
   // (computing indices of each angular range)
@@ -1058,7 +1099,8 @@ T itk::OrientationDistributionFunction<T, N>::GetPrincipleCurvature(double alpha
 * Calculate Normalized Entropy
 */
 template < typename T, unsigned int N >
-T itk::OrientationDistributionFunction<T, N>::GetNormalizedEntropy() const
+T itk::OrientationDistributionFunction<T, N>
+::GetNormalizedEntropy() const
 {
   double mean = 0;
   for( unsigned int i=0; i<InternalDimension; i++) 

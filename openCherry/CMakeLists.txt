@@ -94,7 +94,18 @@ ADD_SUBDIRECTORY(Bundles)
 ADD_SUBDIRECTORY(Documentation)
 
 
+# Testing options
+
 OPTION(OPENCHERRY_BUILD_TESTING "Build the openCherry tests." OFF)
+
+IF(WIN32)
+  SET(_gui_testing_default "ON")
+ELSE()
+  SET(_gui_testing_default "OFF")
+ENDIF()
+
+OPTION(OPENCHERRY_ENABLE_GUI_TESTING "Enable the openCherry GUI tests" ${_gui_testing_default})
+MARK_AS_ADVANCED(OPENCHERRY_ENABLE_GUI_TESTING)
 
 IF(OPENCHERRY_BUILD_TESTING)
   ENABLE_TESTING()

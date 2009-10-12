@@ -24,7 +24,7 @@ namespace cherry
     /// Invoked when this node was changed, that is when a property
     /// was changed or when a new child node was inserted.
     ///
-    cherry::Message1<ICherryPreferences::Pointer> OnChanged;    
+    cherry::Message1<const ICherryPreferences*> OnChanged;    
     
   };
 

@@ -423,7 +423,7 @@ namespace cherry
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     m_Dirty = _Dirty;
     if(_Dirty)
-      this->OnChanged.Send(cherry::ICherryPreferences::Pointer(this));
+      this->OnChanged.Send(this);
 /*
     for (ChildrenList::iterator it = m_Children.begin()
     ; it != m_Children.end(); ++it)

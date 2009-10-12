@@ -57,7 +57,6 @@ Poco::HashMap<Poco::UInt32, const Object*> DebugUtil::m_TraceIdToObjectMap;
 std::set<unsigned int> DebugUtil::m_TracedObjects;
 std::set<std::string> DebugUtil::m_TracedClasses;
 
-
 class NotClassName: public std::unary_function<const Object*, bool>
 {
 
@@ -108,9 +107,9 @@ void DebugUtil::TraceObject(unsigned int traceId)
   m_TracedObjects.insert(traceId);
   TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.find(traceId);
   if (i != m_TraceIdToObjectMap.end())
-    _G_ObjectEvents.objTracingEvent(traceId, true, i->second);
+  _G_ObjectEvents.objTracingEvent(traceId, true, i->second);
   else
-    _G_ObjectEvents.objTracingEvent(traceId, true, 0);
+  _G_ObjectEvents.objTracingEvent(traceId, true, 0);
 #endif
 }
 
@@ -130,9 +129,9 @@ void DebugUtil::StopTracing(unsigned int traceId)
   m_TracedObjects.erase(traceId);
   TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.find(traceId);
   if (i != m_TraceIdToObjectMap.end())
-    _G_ObjectEvents.objTracingEvent(traceId, false, i->second);
+  _G_ObjectEvents.objTracingEvent(traceId, false, i->second);
   else
-    _G_ObjectEvents.objTracingEvent(traceId, false, 0);
+  _G_ObjectEvents.objTracingEvent(traceId, false, 0);
 #endif
 }
 
@@ -191,11 +190,11 @@ const Object* DebugUtil::GetObject(unsigned int traceId)
   return m_TraceIdToObjectMap[traceId];
 }
 
-std::list<unsigned int> DebugUtil::GetSmartPointerIDs(const Object* objectPointer,
-    const std::list<unsigned int>& excludeList)
+std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
+    const Object* objectPointer, const std::list<unsigned int>& excludeList)
 {
-  poco_assert(objectPointer != 0);
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+  poco_assert(objectPointer != 0)
+;#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   std::list<unsigned int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (std::list<unsigned int>::const_iterator iter = excludeList.begin();
       iter != excludeList.end(); ++iter)
@@ -253,7 +252,7 @@ bool DebugUtil::PrintObjectSummary(bool details)
   if (!names.empty())
   {
     std::cout << std::endl << std::endl << "#########################################################" << std::endl;
-    std::cout <<                           "########     cherry::Object leakage summary:     ########" << std::endl << std::endl;
+    std::cout << "########     cherry::Object leakage summary:     ########" << std::endl << std::endl;
 
     for (std::set<std::string>::const_iterator i = names.begin();
         i != names.end(); ++i)
@@ -318,7 +317,7 @@ void DebugUtil::RegisterSmartPointer(unsigned int smartPointerId, const Object* 
   }
 
   if (GetBreakpointManager()->BreakAtSmartpointer(smartPointerId))
-    poco_debugger_msg("SmartPointer Breakpoint reached");
+  poco_debugger_msg("SmartPointer Breakpoint reached");
 #endif
 }
 
@@ -329,7 +328,7 @@ void DebugUtil::RegisterObject(const Object* objectPointer)
   _G_ObjectEvents.objCreatedEvent(objectPointer);
 
   if (GetBreakpointManager()->BreakAtObject(objectPointer->GetTraceId()))
-    poco_debugger_msg("SmartPointer Breakpoint reached");
+  poco_debugger_msg("SmartPointer Breakpoint reached");
 #endif
 }
 
@@ -375,16 +374,24 @@ void DebugUtil::SaveState()
     traceClass->setAttribute(NAME_ATTR, *i);
   }
 
-  Poco::FileOutputStream writer(path.toString());
-  Poco::XML::DOMWriter out;
-  out.setOptions(3); //write declaration and pretty print
-  out.writeNode(writer, doc);
+  try
+  {
+    Poco::FileOutputStream writer(path.toString());
+    Poco::XML::DOMWriter out;
+    out.setOptions(3); //write declaration and pretty print
+    out.writeNode(writer, doc);
 
-  doc->release();
+    doc->release();
 
-  // save BreakpointManager
-  path.setFileName(DebugBreakpointManager::BREAKPOINTS_XML);
-  GetBreakpointManager()->SaveState(path);
+    // save BreakpointManager
+    path.setFileName(DebugBreakpointManager::BREAKPOINTS_XML);
+    GetBreakpointManager()->SaveState(path);
+  }
+  catch (Poco::FileException& e)
+  {
+    CHERRY_WARN << e.displayText();
+  }
+
 }
 
 void DebugUtil::RestoreState()
@@ -412,7 +419,7 @@ void DebugUtil::RestoreState()
       for (std::size_t i = 0; i < elementList->length(); i++)
       {
         Poco::XML::Element* elem =
-          dynamic_cast<Poco::XML::Element*> (elementList->item(i));
+        dynamic_cast<Poco::XML::Element*> (elementList->item(i));
 
         if (!elem->hasAttribute(ID_ATTR)) continue;
 
@@ -422,7 +429,8 @@ void DebugUtil::RestoreState()
         try
         {
           traceId = Poco::NumberParser::parse(attr);
-        } catch (const Poco::SyntaxException& e)
+        }
+        catch (const Poco::SyntaxException& e)
         {
           CHERRY_WARN << e.displayText();
         }
@@ -436,13 +444,13 @@ void DebugUtil::RestoreState()
       for (std::size_t i = 0; i < elementList->length(); i++)
       {
         Poco::XML::Element* elem =
-          dynamic_cast<Poco::XML::Element*> (elementList->item(i));
+        dynamic_cast<Poco::XML::Element*> (elementList->item(i));
 
         if (!elem->hasAttribute(NAME_ATTR)) continue;
 
         const std::string& traceClass = elem->getAttribute(NAME_ATTR);
         if (!traceClass.empty())
-          DebugUtil::TraceClass(traceClass);
+        DebugUtil::TraceClass(traceClass);
       }
       elementList->release();
 
@@ -450,7 +458,8 @@ void DebugUtil::RestoreState()
     }
 
     doc->release();
-  } catch (Poco::XML::SAXParseException& e)
+  }
+  catch (Poco::XML::SAXParseException& e)
   {
     CHERRY_WARN << e.displayText();
   }

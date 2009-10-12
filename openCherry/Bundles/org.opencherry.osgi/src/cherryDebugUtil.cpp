@@ -193,8 +193,8 @@ const Object* DebugUtil::GetObject(unsigned int traceId)
 std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
     const Object* objectPointer, const std::list<unsigned int>& excludeList)
 {
-  poco_assert(objectPointer != 0)
-;#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+  poco_assert(objectPointer != 0);
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   std::list<unsigned int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (std::list<unsigned int>::const_iterator iter = excludeList.begin();
       iter != excludeList.end(); ++iter)

@@ -33,6 +33,8 @@ public:
   /// Standard dtor. Nothing to do here.
   virtual ~QmitkPropertiesTableEditor();
 
+
+
   ///
   /// Convenience method. Sets the property list in the model.
   ///
@@ -42,6 +44,8 @@ public:
   /// Get the model.
   /// 
   QmitkPropertiesTableModel* getModel() const;
+
+  QTableView* getTable() const;
 
   protected slots:
     void PropertyFilterKeyWordTextChanged(const QString & text);

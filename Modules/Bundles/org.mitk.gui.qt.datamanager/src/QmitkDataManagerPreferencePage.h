@@ -21,8 +21,9 @@
 
 #include "cherryIQtPreferencePage.h"
 #include "mitkQtDataManagerDll.h"
+#include <cherryIPreferences.h>
 
-#include <QWidget>
+class QCheckBox;
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public cherry::IQtPreferencePage
 {
@@ -45,7 +46,9 @@ public:
   /// \see IPreferencePage::Update()
   ///
   virtual void Update();
-
+protected:
+  QCheckBox* m_EnableSingleEditing;
+  cherry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

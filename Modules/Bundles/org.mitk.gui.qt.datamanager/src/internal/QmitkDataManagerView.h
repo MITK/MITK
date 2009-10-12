@@ -6,6 +6,7 @@
 #include "cherryISelection.h"
 #include "cherryISelectionProvider.h"
 #include "cherryIPreferencesService.h"
+#include "cherryICherryPreferences.h"
 
 /// Qmitk
 #include "QmitkFunctionality.h"
@@ -123,7 +124,10 @@ protected slots:
   /// \brief Reinits everything.
   ///
   void BtnGlobalReinitClicked ( bool checked = false );
-  
+  ///
+  /// Invoked when the preferences were changed
+  ///
+  void OnPreferencesChanged(const cherry::ICherryPreferences*);
 protected:
   ///
   /// \brief Create the view here.
@@ -195,6 +199,10 @@ private:
   /// \brief The openCherry selection provider
   ///
   QmitkDataTreeNodeSelectionProvider::Pointer m_SelectionProvider;
+  ///
+  /// Holds the preferences for the datamanager. 
+  ///
+  cherry::ICherryPreferences::Pointer m_DataManagerPreferencesNode;
 
 };
 

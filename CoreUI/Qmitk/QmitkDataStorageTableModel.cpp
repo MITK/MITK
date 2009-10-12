@@ -88,9 +88,13 @@ Qt::ItemFlags QmitkDataStorageTableModel::flags(const QModelIndex &index) const
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
   // name & visibility is editable
-  if (index.column() == 0 || index.column() == 2)
+  if (index.column() == 0)
   {
     flags |= Qt::ItemIsEditable;
+  }
+  else if (index.column() == 2)
+  {
+    flags |= Qt::ItemIsUserCheckable;
   }
 
   return flags;
@@ -182,14 +186,10 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       // get visible property of mitk::BaseData
       bool visibility = false;
 
-      if(node->GetVisibility(visibility, 0))
+      if(node->GetVisibility(visibility, 0) && role == Qt::CheckStateRole)
       {
-        if (role == Qt::DisplayRole || role == Qt::EditRole)
-        {
-          data = visibility;
-        } // role == Qt::DisplayRole
-
-      } // node->GetVisibility(visibility, 0)
+        data = (visibility ? Qt::Checked : Qt::Unchecked);
+      } // node->GetVisibility(visibility, 0) && role == Qt::CheckStateRole
 
     } // index.column() == 2
 
@@ -377,7 +377,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
 {
   bool noErr = false;
 
-  if (index.isValid() && role == Qt::EditRole)
+  if (index.isValid() && (role == Qt::EditRole || role == Qt::CheckStateRole))
   {
     // any change events produced here should not be caught in this class
     // --> set m_BlockEvents to true
@@ -391,7 +391,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
     }
     else if(index.column() == 2)
     {
-      node->SetBoolProperty("visible", value.toBool());
+      node->SetBoolProperty("visible", (value.toInt() == Qt::Checked ? true : false));
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
 

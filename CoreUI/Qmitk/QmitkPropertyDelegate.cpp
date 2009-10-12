@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "QmitkPropertyDelegate.h"
 
 #include "QmitkCustomVariants.h"
@@ -94,6 +96,8 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
     {
       QSpinBox* spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
+      spinBox->setMinimum(std::numeric_limits<int>::min());
+      spinBox->setMaximum(std::numeric_limits<int>::max());
       return spinBox;
     }
     // see qt documentation. cast is correct, it would be obsolete if we 
@@ -107,6 +111,11 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       {
         spinBox->setMinimum(0.0);
         spinBox->setMaximum(1.0);
+      }
+      else
+      {
+        spinBox->setMinimum(std::numeric_limits<float>::min());
+        spinBox->setMaximum(std::numeric_limits<float>::max());
       }
       
       return spinBox;

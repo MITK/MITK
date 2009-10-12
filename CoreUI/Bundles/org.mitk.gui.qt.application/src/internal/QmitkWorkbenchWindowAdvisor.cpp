@@ -30,8 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIPreferencesService.h>
 
 #include <internal/cherryQtShowViewAction.h>
-#include <QmitkFileOpenAction.h>
 
+#include <QmitkFileOpenAction.h>
+#include <QmitkFileExitAction.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
@@ -42,7 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkWorkbenchWindowAdvisorHack.h"
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
-  
+#include <QToolBar>
+
 QmitkWorkbenchWindowAdvisorHelperHack* QmitkWorkbenchWindowAdvisorHelperHack::undohack = new QmitkWorkbenchWindowAdvisorHelperHack();
 
 QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
@@ -70,7 +72,7 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
     = cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
   cherry::IPreferences::Pointer _GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
   bool startMaximized = _GeneralPreferencesNode->GetBool("startMaximized", false);
-  if(startMaximized)
+  if(startMaximized && !mainWindow->isMaximized())
     mainWindow->setWindowState(mainWindow->windowState() ^ Qt::WindowMaximized);
 
 
@@ -80,7 +82,8 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   fileMenu->addAction(new QmitkFileOpenAction(window));
   fileMenu->addSeparator();
-  fileMenu->addAction("&Quit", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onQuit()));
+  fileMenu->addAction(new QmitkFileExitAction(window));
+  //fileMenu->addAction("&Quit", QmitkWorkbenchWindowAdvisorHelperHack::undohack, SLOT(onQuit()));
 
   cherry::IViewRegistry* viewRegistry = cherry::PlatformUI::GetWorkbench()->GetViewRegistry();
   const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
@@ -105,14 +108,19 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
     VDMap.insert(p);
   }
 
+  QToolBar* qToolbar = new QToolBar;
+  
   std::map<std::string, cherry::IViewDescriptor::Pointer>::const_iterator MapIter;
   for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
   {
     cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window, (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
+    qToolbar->addAction(viewAction);
   }
   
+  mainWindow->addToolBar(qToolbar);
+
   QStatusBar* qStatusBar = new QStatusBar();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar

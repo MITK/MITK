@@ -1,6 +1,7 @@
 SET(SRC_CPP_FILES
   QmitkDataTreeNodeSelectionProvider.cpp
   QmitkFileOpenAction.cpp
+  QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
   QmitkProgressBar.cpp
   QmitkStatusBar.cpp
@@ -14,6 +15,7 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/QmitkFileOpenAction.h
+  src/QmitkFileExitAction.h
   src/QmitkProgressBar.h
   src/internal/QmitkDnDFrameWidget.h
 )

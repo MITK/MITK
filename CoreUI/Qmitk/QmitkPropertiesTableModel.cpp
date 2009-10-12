@@ -64,11 +64,14 @@ Qt::ItemFlags QmitkPropertiesTableModel::flags(const QModelIndex& index) const
     // there are also read only property items -> do not allow editing them
     if(index.data(Qt::EditRole).isValid())
       flags |= Qt::ItemIsEditable;
+
+    if(index.data(Qt::CheckStateRole).isValid())
+      flags |= Qt::ItemIsUserCheckable;
   }
 
   if (index.column() == PROPERTY_ACTIVE_COLUMN)
   {
-    flags |= Qt::ItemIsEditable;
+    flags |= Qt::ItemIsUserCheckable;
   }
 
   return flags;
@@ -132,10 +135,8 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
 
     else if(mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
     {
-      if(role == Qt::DisplayRole)
-        data.setValue<bool>( boolProp->GetValue() );
-      else if(role == Qt::EditRole)
-        data.setValue<bool>( boolProp->GetValue() );
+      if(role == Qt::CheckStateRole)
+        data = boolProp->GetValue() ? Qt::Checked : Qt::Unchecked;
     }
 
     else if (mitk::StringProperty* stringProp = dynamic_cast<mitk::StringProperty*>(baseProp))
@@ -190,11 +191,8 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
   // enabled/disabled value
   else if(index.column() == PROPERTY_ACTIVE_COLUMN)
   {
-    if(role == Qt::DisplayRole)
-      data.setValue<bool>(m_SelectedProperties[index.row()].second.second);
-
-    else if(role == Qt::EditRole)
-      data.setValue<bool>(m_SelectedProperties[index.row()].second.second);
+    if (role == Qt::CheckStateRole)
+      data = (m_SelectedProperties[index.row()].second.second) ? Qt::Checked : Qt::Unchecked;
   }
 
   return data;
@@ -276,7 +274,8 @@ void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const
 
 bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if (index.isValid() && !m_SelectedProperties.empty() && index.row() < (int)(m_SelectedProperties.size()) && role == Qt::EditRole) 
+  if (index.isValid() && !m_SelectedProperties.empty() && index.row() < (int)(m_SelectedProperties.size())
+      && (role == Qt::EditRole || Qt::CheckStateRole))
   {
     // block all events now!
     m_BlockEvents = true;
@@ -306,7 +305,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
 
       else if(mitk::BoolProperty* boolProp = dynamic_cast<mitk::BoolProperty*>(baseProp))
       {
-        boolProp->SetValue(value.value<bool>());
+        boolProp->SetValue(value.toInt() == Qt::Checked ? true : false);
         m_PropertyList->InvokeEvent(itk::ModifiedEvent());
         m_PropertyList->Modified();
 
@@ -368,7 +367,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
     // enabled/disabled value
     else if(index.column() == PROPERTY_ACTIVE_COLUMN)
     {
-      bool active = value.value<bool>();
+      bool active = value.toInt() == Qt::Checked;
       std::string propertyName = m_SelectedProperties[index.row()].first;
 
       m_PropertyList->SetEnabled(propertyName, active);

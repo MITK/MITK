@@ -42,6 +42,7 @@ void QmitkPropertiesTableEditor::SetPropertyList( mitk::PropertyList::Pointer _L
     m_NodePropertiesTableView->resizeColumnsToContents();
     m_NodePropertiesTableView->resizeRowsToContents();
     m_NodePropertiesTableView->horizontalHeader()->setStretchLastSection(true);
+    m_NodePropertiesTableView->setEditTriggers(QAbstractItemView::CurrentChanged);
 
 /*
     // refill the combo boxes
@@ -117,6 +118,7 @@ void QmitkPropertiesTableEditor::init()
 
   m_NodePropertiesTableView->setSelectionMode( QAbstractItemView::SingleSelection );
   m_NodePropertiesTableView->setSelectionBehavior( QAbstractItemView::SelectItems );
+  //m_NodePropertiesTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
   m_NodePropertiesTableView->verticalHeader()->hide();
   m_NodePropertiesTableView->setItemDelegate(new QmitkPropertyDelegate(this));
   m_NodePropertiesTableView->setAlternatingRowColors(true);
@@ -134,6 +136,10 @@ void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged( const QString
   m_Model->SetFilterPropertiesKeyWord(m_TxtPropertyFilterKeyWord->text().toStdString());
 }
 
+QTableView* QmitkPropertiesTableEditor::getTable() const
+{
+  return m_NodePropertiesTableView;
+}
 /*
 void QmitkPropertiesTableEditor::ChkShowRenderPropertiesToggled( bool checked )
 {

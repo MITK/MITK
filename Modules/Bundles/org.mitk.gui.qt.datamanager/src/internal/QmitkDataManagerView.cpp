@@ -25,6 +25,8 @@
 //## Cherry
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
+#include <cherryIPreferencesService.h>
+#include <cherryPlatform.h>
 
 //# Toolkit Includes
 #include <QTableView>
@@ -54,11 +56,23 @@ QmitkDataManagerView::QmitkDataManagerView()
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
+  if(m_DataManagerPreferencesNode.IsNotNull())
+    m_DataManagerPreferencesNode->OnChanged
+    .RemoveListener(cherry::MessageDelegate1<QmitkDataManagerView, const cherry::ICherryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
+
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   //# Dim/Get
+  cherry::IPreferencesService::Pointer prefService 
+    = cherry::Platform::GetServiceRegistry()
+    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+
+  m_DataManagerPreferencesNode = (prefService->GetSystemPreferences()->Node("/DataManager")).Cast<cherry::ICherryPreferences>();
+  if(m_DataManagerPreferencesNode.IsNotNull())
+    m_DataManagerPreferencesNode->OnChanged
+      .AddListener(cherry::MessageDelegate1<QmitkDataManagerView, const cherry::ICherryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 
   //# Base
   QGridLayout* _ParentLayout = new QGridLayout;
@@ -145,7 +159,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTableView->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_NodeTableView->setSelectionBehavior( QAbstractItemView::SelectRows );
   m_NodeTableView->horizontalHeader()->setStretchLastSection(true);
-  m_NodeTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::EditKeyPressed);
   m_NodeTableView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   //m_NodeTableView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
@@ -215,6 +228,24 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_NodePropertiesTableEditor, SIGNAL( destroyed(QObject*) )
     , this, SLOT( QtObjectDestroyed(QObject*) ) );
 
+  this->OnPreferencesChanged(m_DataManagerPreferencesNode.GetPointer());
+}
+
+
+void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )
+{
+  if(prefs->GetBool("Single click property editing", true))
+  {
+    m_NodeTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
+      QAbstractItemView::EditKeyPressed);
+    m_NodePropertiesTableEditor->getTable()->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
+      QAbstractItemView::EditKeyPressed);
+  }
+  else
+  {
+    m_NodeTableView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+    m_NodePropertiesTableEditor->getTable()->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+  }
 }
 
 void QmitkDataManagerView::Activated()

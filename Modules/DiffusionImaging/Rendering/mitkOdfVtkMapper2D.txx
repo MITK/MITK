@@ -326,8 +326,24 @@ void  mitk::OdfVtkMapper2D<T,N>
   typedef itk::OrientationDistributionFunction<float,N> OdfType;
   OdfType odf;
 
-  for(int i=0; i<N; i++)
-    odf[i] = (double)odfvals->GetComponent(id,i);
+  if(odfvals->GetNumberOfComponents()==6)
+  {
+    float tensorelems[6] = {
+      (float)odfvals->GetComponent(id,0),
+      (float)odfvals->GetComponent(id,1),
+      (float)odfvals->GetComponent(id,2),
+      (float)odfvals->GetComponent(id,3),
+      (float)odfvals->GetComponent(id,4),
+      (float)odfvals->GetComponent(id,5),
+    };
+    itk::DiffusionTensor3D<float> tensor(tensorelems);
+    odf.InitFromTensor(tensor);
+  }
+  else
+  {
+    for(int i=0; i<N; i++)
+      odf[i] = (double)odfvals->GetComponent(id,i);
+  } 
 
   switch(m_Normalization)
   {
@@ -713,7 +729,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOverlay(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderOverlay(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible(renderer)==false ) 
+  if ( this->IsVisible(renderer, "VisibleOdfs")==false, "VisibleOdfs" ) 
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -727,7 +743,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible( renderer )==false ) 
+  if ( this->IsVisible( renderer, "VisibleOdfs" )==false ) 
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -792,7 +808,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderTranslucentGeometry(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible(renderer)==false ) 
+  if ( this->IsVisible(renderer, "VisibleOdfs")==false ) 
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -828,7 +844,8 @@ void  mitk::OdfVtkMapper2D<T,N>
       itkWarningMacro( << "m_VtkImage->GetPointData()->GetNumberOfArrays() is 0!" );
       return ;
     }
-    else if ( pointData->GetArray(0)->GetNumberOfComponents() != N)
+    else if ( pointData->GetArray(0)->GetNumberOfComponents() != N
+      && pointData->GetArray(0)->GetNumberOfComponents() != 6 /*for tensor visualization*/)
     {
       itkWarningMacro( << "number of components != number of directions in ODF!" );
       return;
@@ -856,9 +873,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   }
 
   int index = GetIndex(renderer);
-  LOG_INFO << index;
-
-  
+    
   // Spacing adapted scaling
   double spacing[3];
   m_VtkImage->GetSpacing(spacing);
@@ -937,7 +952,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   this->GetDataTreeNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
   this->GetDataTreeNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
   
-  if(IsVisible(renderer)==false)
+  if(IsVisible(renderer, "VisibleOdfs")==false)
   {
     m_OdfsActors[0]->VisibilityOff();
     m_OdfsActors[1]->VisibilityOff();
@@ -982,6 +997,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   node->SetProperty( "IndexParam1", mitk::FloatProperty::New(2));
   node->SetProperty( "IndexParam2", mitk::FloatProperty::New(1));
   node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
+  node->SetProperty( "VisibleOdfs", mitk::BoolProperty::New( true ) );
   node->SetProperty ("layer", mitk::IntProperty::New(100));
   node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
   //node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );

@@ -27,6 +27,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
+  class CopyImageMapper2D : public ImageMapper2D
+  {
+  public:
+    mitkClassMacro(CopyImageMapper2D,ImageMapper2D);
+    itkNewMacro(Self);
+
+    friend class CompositeMapper;
+  };
+
   //##Documentation
   //## @brief Composite pattern for combination of different mappers
   //## @ingroup Mapper
@@ -147,3 +156,4 @@ namespace mitk {
 
 
 #endif /* COMPOSITEMAPPER_H_HEADER_INCLUDED */
+

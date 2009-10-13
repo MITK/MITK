@@ -65,7 +65,7 @@ REM Choose toolkit versions
 @SET ITK_DIR=V:\windows\x32\ITK-3.14.0_VC9.0_Bin
 @SET QT_DIR=V:\windows\x32\QT-4.5.1_VC9.0_Bin
 REM @SET BOOST_DIR=V:\windows\x32\boost REM Only needed by MBI members
-@SET OSGI_RUNTIME=%MITK_DIR%\openCherry\Bundles\org.opencherry.osgi
+@SET OSGI_RUNTIME=%MITK_DIR%\bin\openCherry\org.opencherry.osgi
 @SET CMAKE_DIR="C:\Program Files (x86)\CMake 2.6\bin"
 
 REM ----------- Setup configuration ---------------
@@ -115,6 +115,7 @@ For other system configurations, please adjust:
 To configure MITK do:
   - Run the batchfile
   - start cmake from the called command line \code C:\svn\mitkBinary>cmake-gui  \endcode
+  - set source and binary directories
   - press <B>Configure</B>
   - make sure ITK_DIR, VTK_DIR and DESIRED_QT_VERSION fit your system
   - press <B>Configure</B>

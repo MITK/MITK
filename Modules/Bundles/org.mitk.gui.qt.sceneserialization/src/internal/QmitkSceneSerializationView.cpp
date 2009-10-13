@@ -98,11 +98,13 @@ void QmitkSceneSerializationView::SerializeSelected()
     bool niceFilenameFound(false);
     while (!niceFilenameFound)
     {
-      sceneFilename = QFileDialog::getSaveFileName( m_Parent, "Load MITK scene", QString::null, "MITK scene files (*.mitk)", NULL );
+      sceneFilename = QFileDialog::getSaveFileName( m_Parent, "Save MITK scene", QString::null, "MITK scene files (*.mitk)", NULL );
 
-      if (sceneFilename.isEmpty()) return;
+      if (sceneFilename.isEmpty()) 
+        return;
 
-      if ( sceneFilename.right(5) != ".mitk" ) sceneFilename += ".mitk";
+      if ( sceneFilename.right(5) != ".mitk" ) 
+        sceneFilename += ".mitk";
 
       std::ifstream exists( sceneFilename.toLocal8Bit().constData() );
       if (exists)
@@ -114,7 +116,8 @@ void QmitkSceneSerializationView::SerializeSelected()
                                            QMessageBox::No,
                                            QMessageBox::Cancel);
 
-        if (result == QMessageBox::Cancel) return;
+        if (result == QMessageBox::Cancel) 
+          return;
 
         niceFilenameFound = QMessageBox::Yes == result;
       }
@@ -137,8 +140,8 @@ void QmitkSceneSerializationView::SerializeSelected()
     if ( !sceneIO->SaveScene( storage, sceneFilename.toLocal8Bit().constData() ) )
     {
       QMessageBox::information(NULL,
-                            "Scene saving", 
-                            "Scene could not be written completely. Please check the log.", 
+                            "Scene saving",
+                            "Scene could not be written completely. Please check the log.",
                             QMessageBox::Ok);
 
     }

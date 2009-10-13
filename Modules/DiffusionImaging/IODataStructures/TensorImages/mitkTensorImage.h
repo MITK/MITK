@@ -42,11 +42,17 @@ namespace mitk
     mitkClassMacro( TensorImage, Image );
     itkNewMacro(Self);
     
-    //void CopyConstruct(mitk::Image::Pointer img);
+    virtual vtkImageData* GetNonRgbVtkImageData(int t = 0, int n = 0);
 
+    virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
+
+    virtual void ConstructRgbImage();
+    
   protected:
     TensorImage();
     virtual ~TensorImage();
+
+    mitk::Image::Pointer m_RgbImage;
   };
 
 } // namespace mitk

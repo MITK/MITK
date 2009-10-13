@@ -66,6 +66,9 @@ namespace mitk {
 
     static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
+    virtual void GenerateData();
+    virtual void GenerateData(mitk::BaseRenderer* renderer);
+
   protected:
     OdfVtkMapper2D();
 
@@ -105,10 +108,7 @@ namespace mitk {
 
     vtkImageData* m_VtkImage ;
 
-    virtual void GenerateData();
-    virtual void GenerateData(mitk::BaseRenderer* renderer);
-
-    const mitk::Image* GetInput();
+    mitk::Image* GetInput();
   };
 
 } // namespace mitk

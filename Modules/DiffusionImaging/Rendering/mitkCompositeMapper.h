@@ -27,60 +27,49 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  class CopyImageMapper2D : public ImageMapper2D
-  {
-  public:
-    mitkClassMacro(CopyImageMapper2D,ImageMapper2D);
-    itkNewMacro(Self);
-
-    friend class CompositeMapper;
-  };
-
   //##Documentation
   //## @brief Composite pattern for combination of different mappers
   //## @ingroup Mapper
-  class CompositeMapper : public GLMapper2D, public BaseVtkMapper2D
+  class CompositeMapper : public BaseVtkMapper2D
   {
   public:
 
-    typedef CompositeMapper                 Self;
-    typedef itk::SmartPointer<Self>         Pointer;
-    typedef itk::SmartPointer<const Self>   ConstPointer;
-    virtual const char *GetNameOfClass() const
-    {return "CompositeMapper";}
-
+    mitkClassMacro(CompositeMapper,BaseVtkMapper2D);
     itkNewMacro(Self);
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {
+      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOverlay(renderer);
+      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer)
     {
+      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
+      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
     }
 
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer)
     {
+      Enable2DOpenGL();
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
+      Disable2DOpenGL();
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer)
     {
+      Enable2DOpenGL();
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
+      Disable2DOpenGL();
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
     }
 #endif
-
-    void Paint(mitk::BaseRenderer *renderer)
-    {
-      m_ImgMapper->Paint(renderer);
-    }
 
     void SetDataTreeNode(DataTreeNode* node)
     {
@@ -105,10 +94,10 @@ namespace mitk {
       m_OdfMapper->ReleaseGraphicsResources(window);
     }
 
-    void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer, bool overwrite )
+    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
     {
-      m_ImgMapper->SetDefaultProperties(node, renderer, overwrite);
-      m_OdfMapper->SetDefaultProperties(node, renderer, overwrite);
+      mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
+      mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);
     }
 
     bool IsLODEnabled( BaseRenderer * renderer ) const 
@@ -127,11 +116,13 @@ namespace mitk {
       m_OdfMapper->SetGeometry3D(aGeometry3D);
     }
 
+    void Enable2DOpenGL();
+    void Disable2DOpenGL();
+
   protected:
 
     virtual void GenerateData()
     {
-      //m_ImgMapper->GenerateData();
       m_OdfMapper->GenerateData();
     }
 

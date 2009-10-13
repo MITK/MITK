@@ -25,8 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vnl/vnl_vector.h"
 #include "itkPointShell.h"
 
-// #include "itkPointShell.h"
-
 namespace itk {
 
 #define QBALL_RECON_PI       3.14159265358979323846

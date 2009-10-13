@@ -35,8 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTensorImageWriterFactory.h"
 #include "mitkNrrdTensorImageWriter.h"
 
-#include "mitkOdfVtkMapper2D.h"
-#include "mitkImageMapper2D.h"
+#include "mitkCompositeMapper.h"
 
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionVolumes<DiffusionPixelType> DiffusionVolumesShort;
@@ -110,10 +109,16 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    std::string classname("QBallImage");
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    std::string qballclassname("QBallImage");
+    if(node->GetData() && qballclassname.compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::New();
+      newMapper = mitk::CompositeMapper::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    std::string tensorclassname("TensorImage");
+    if(node->GetData() && tensorclassname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataTreeNode(node);
     }
   }
@@ -136,14 +141,13 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNod
   classname = "QBallImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node);
-    //mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
+    mitk::CompositeMapper::SetDefaultProperties(node);
   }
 
   classname = "TensorImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
-    // do nothing
+    mitk::CompositeMapper::SetDefaultProperties(node);
   }
 }
 

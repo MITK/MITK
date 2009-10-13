@@ -17,17 +17,16 @@
 #ifndef __itkOrientationDistributionFunction_h
 #define __itkOrientationDistributionFunction_h
 
-// Undefine an eventual OrientationDistributionFunction macro
-#ifdef OrientationDistributionFunction
-#undef OrientationDistributionFunction
-#endif
+//// Undefine an eventual OrientationDistributionFunction macro
+//#ifdef OrientationDistributionFunction
+//#undef OrientationDistributionFunction
+//#endif
 
 #include "MitkDiffusionImagingExports.h"
 #include "itkIndent.h"
 #include "itkFixedArray.h"
 #include "itkMatrix.h"
 #include "itkSymmetricEigenAnalysis.h"
-#include "itkPointShell.h"
 #include "itkSimpleFastMutexLock.h"
 #include "itkDiffusionTensor3D.h"
 
@@ -235,7 +234,7 @@ MitkDiffusionImaging_EXPORT InputStreamType& operator>>(InputStreamType& is,
 #endif
 
 #if ITK_TEMPLATE_TXX
-# include "itkOrientationDistributionFunction.cpp"
+# include "itkOrientationDistributionFunction.txx"
 #endif
 
 

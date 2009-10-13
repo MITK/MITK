@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry3D.h"
 #include "mitkOdfNormalizationMethodProperty.h" 
 #include "mitkOdfScaleByProperty.h" 
+#include "mitkProperties.h" 
+#include "mitkTensorImage.h" 
 
 #include "vtkSphereSource.h"
 #include "vtkPropCollection.h"
@@ -267,10 +269,10 @@ mitk::OdfVtkMapper2D<T,N>
 }
 
 template<class T, int N>
-const mitk::Image* mitk::OdfVtkMapper2D<T,N>
+mitk::Image* mitk::OdfVtkMapper2D<T,N>
 ::GetInput()
 {
-  return static_cast<const mitk::Image * > ( m_DataTreeNode->GetData() );
+  return static_cast<mitk::Image * > ( m_DataTreeNode->GetData() );
 }
 
 template<class T, int N>
@@ -729,7 +731,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOverlay(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderOverlay(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible(renderer, "VisibleOdfs")==false, "VisibleOdfs" ) 
+  if ( this->IsVisible(renderer, "VisibleOdfs")==false ) 
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -824,11 +826,20 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::GenerateData()
 {
-  //std::cout << "GenerateData()" << std::endl;
-
   mitk::Image::Pointer input = const_cast<mitk::Image*>( this->GetInput() );
   if ( input.IsNull() )  return ;
-  m_VtkImage = input->GetVtkImageData();
+
+  std::string classname("TensorImage");
+  if(classname.compare(input->GetNameOfClass())==0)
+  {
+    m_VtkImage = dynamic_cast<mitk::TensorImage*>( this->GetInput() )->GetNonRgbVtkImageData();
+  }
+
+  std::string qclassname("QBallImage");
+  if(qclassname.compare(input->GetNameOfClass())==0)
+  {
+    m_VtkImage = dynamic_cast<mitk::QBallImage*>( this->GetInput() )->GetNonRgbVtkImageData();
+  }
 
   if( m_VtkImage )
   {
@@ -961,6 +972,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   }
   else
   {
+    m_OdfsActors[0]->VisibilityOn();
+    m_OdfsActors[1]->VisibilityOn();
+    m_OdfsActors[2]->VisibilityOn();
     Slice(renderer);
   }
 

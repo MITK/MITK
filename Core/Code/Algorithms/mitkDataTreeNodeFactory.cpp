@@ -87,6 +87,7 @@ PURPOSE.  See the above copyright notices for more information.
 bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
+: m_UseSeriesDetails(true)
 {
   m_Serie = false;
   this->Modified();
@@ -272,11 +273,12 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
   // Get the DICOM filenames from the directory
   NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
-  nameGenerator->SetDirectory( dir.c_str() );
 
   // add more criteria to distinguish between different series
   nameGenerator->SetUseSeriesDetails( m_UseSeriesDetails );
 
+  nameGenerator->SetDirectory( dir.c_str() );
+ 
   // add series restrictions
   std::vector<std::string>::const_iterator it;
   for(it=m_SeriesRestrictions.begin(); it!=m_SeriesRestrictions.end(); it++)

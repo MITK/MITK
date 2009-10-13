@@ -24,7 +24,7 @@ namespace cherry {
 
 void* QtMissingImageDescriptor::CreateImage(bool returnMissingImageOnError)
 {
-  return new QIcon(":/resources/icon_missing.png");
+  return new QIcon(":/org.opencherry.ui.qt/icon_missing.png");
 }
 
 void QtMissingImageDescriptor::DestroyImage(void* img)

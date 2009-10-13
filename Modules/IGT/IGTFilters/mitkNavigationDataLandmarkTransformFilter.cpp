@@ -434,7 +434,6 @@ void mitk::NavigationDataLandmarkTransformFilter::UpdateLandmarkTransform(const 
     m_LandmarkTransform->SetIdentity();
     m_LandmarkTransformInitializer->InitializeTransform();
 
-    LOG_INFO << "Landmarktransform updated. New Parameters: " << m_LandmarkTransform->GetParameters();
     /* Calculate error statistics for the transform */
     TransformInitializerType::LandmarkPointType curData;
     m_Errors.clear();

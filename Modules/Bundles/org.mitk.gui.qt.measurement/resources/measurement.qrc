@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+ <qresource prefix="/measurement">
+    <file>four-point-angle.png</file>
+    <file>angle.png</file>
+    <file>arrow.png</file>
+    <file>ellipse.png</file>
+    <file>line.png</file>
+    <file>path.png</file>
+    <file>polygon.png</file>
+    <file>rectangle.png</file>
+    <file>text.png</file>
+ </qresource>
+ </RCC>

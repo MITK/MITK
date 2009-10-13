@@ -19,6 +19,7 @@ SET(RESOURCE_FILES
 )
 
 SET(RES_FILES
+  resources/measurement.qrc
 )
 
 

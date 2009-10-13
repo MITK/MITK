@@ -18,21 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QMITK_MEASUREMENT_H__INCLUDED)
 #define QMITK_MEASUREMENT_H__INCLUDED
 
-//#include "QmitkFunctionality.h"
-
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
-
 #include <mitkPointSetInteractor.h>
-//!mm
-#include "ui_QmitkMeasurementControls.h"
-//!
 
-class QmitkStdMultiWidget;
-//!mm
-//class QmitkMeasurementControls;
-//!
+class QGridLayout;
+class QMainWindow;
+class QToolBar;
+class QTableWidget;
 
 /*!
 \brief Measurement
@@ -45,88 +39,52 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 
-
   public:
-    virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
-
+    QmitkMeasurement();
     virtual ~QmitkMeasurement();
 
-  protected:
-    // Pseudo Ctor
-    void CreateQtPartControl(QWidget* parent);
-
   public:
-  /*!
-  \brief default constructor
-  */
-  //!mm
-  //QmitkMeasurement(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
-  // use this function as constructor
-  //!
+    void CreateQtPartControl(QWidget* parent);
+    virtual void Activated();
+    virtual void Deactivated();
+  
+  protected:
+    ///
+    /// Clears m_PointSetInteractor and m_CurrentPointSetNode
+    ///
+    void Reset();
 
-  /*!
-  \brief default destructor
-  */
-  //virtual ~QmitkMeasurement();
+    ///# draw actions
+  protected slots:
+    void ActionDrawLineTriggered( bool checked = false );
+    void ActionDrawPathTriggered( bool checked = false );
+    void ActionDrawAngleTriggered( bool checked = false );
+    void ActionDrawFourPointAngleTriggered( bool checked = false );
+    void ActionDrawEllipseTriggered( bool checked = false );
+    void ActionDrawRectangleTriggered( bool checked = false );
+    void ActionDrawPolygonTriggered( bool checked = false );
+    void ActionDrawArrowTriggered( bool checked = false );
+    void ActionDrawTextTriggered( bool checked = false ); 
 
-  /*!
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
-  */
-  //virtual QWidget * CreateControlWidget(QWidget *parent);
+  // fields
+  protected:
+    ///
+    /// Interactor for performing the measurements.
+    ///
+    mitk::PointSetInteractor::Pointer m_PointSetInteractor;
 
-  /*!
-  \brief method for creating the applications main widget
-  */
-  //virtual QWidget * CreateMainWidget(QWidget * parent);
+    ///
+    /// Node representing the PointSet last created. It is used to delete unused point sets.
+    ///
+    mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
 
-  /*!
-  \brief method for creating the connections of main and control widget
-  */
-  virtual void CreateConnections();
-
-  /*!
-  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
-  */
-  //virtual QAction * CreateAction(QActionGroup *parent);
-
-  virtual void Activated();
-  virtual void Deactivated();
-protected slots:
-  void TreeChanged();
-
-  void AddDistanceMeasurement();
-
-  void AddAngleMeasurement();
-
-  void AddPathMeasurement();
-
-protected:
-  // save the parent widget of our UI
-  QWidget* m_Parent;
-
-  //mitk::DataTreeIteratorClone m_DataTreeIterator;
-
-  /*!
-  * default main widget containing 4 windows showing 3
-  * orthogonal slices of the volume and a 3d render window
-  */
-  //QmitkStdMultiWidget * m_MultiWidget;
-
-  /*!
-  * controls containing sliders for scrolling through the slices
-  */
-  Ui::QmitkMeasurementControls * m_Controls;
-
-  /*
-   * Interactor for performing the measurements.
-   */
-  mitk::PointSetInteractor::Pointer m_PointSetInteractor;
-
-  /*
-   * Node representing the PointSet last created. It is used to delete empty point sets.
-   */
-  mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
+  // widgets
+  protected:
+    QMainWindow* m_MainWindow;
+    QGridLayout* m_Layout;
+    QToolBar* m_DrawActionsToolBar;
+    QToolBar* m_DrawActionsMainWindowToolBar;
+    QTableWidget* m_DrawItemsTableWidget;
 };
 
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

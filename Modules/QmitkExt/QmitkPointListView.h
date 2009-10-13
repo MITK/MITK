@@ -57,6 +57,8 @@ class QMITKEXT_EXPORT QmitkPointListView : public QListView
 
     QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
   
+  signals:
+      void PointSelectionChanged();  ///< this signal is emmitted, if the selection of a point in the pointset is changed
   protected slots:
 
     /// called when the point set data structure changes

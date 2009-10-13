@@ -73,6 +73,8 @@ class QMITKEXT_EXPORT QmitkPointListWidget : public QWidget
     /// signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not
     void EditPointSets(bool active);
 
+    /// signal to inform that the selection of a point in the pointset has changed
+    void PointSelectionChanged(); 
   public slots:
 
     void DeactivateInteractor(bool deactivate);

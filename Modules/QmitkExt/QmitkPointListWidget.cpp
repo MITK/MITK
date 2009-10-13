@@ -48,6 +48,7 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   m_ListView = new QmitkPointListView( this );
   layout->addWidget( m_ListView, 0, 0, 1, 4 ); // span 4 cols
   m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down");
+  connect( m_ListView, SIGNAL(PointSelectionChanged()), this, SIGNAL(PointSelectionChanged()) );  // forward signal from list view
   const QIcon iconEdit( btnSetPoints_xpm ); // installs/removes pointset interactor
   m_BtnEdit = new QPushButton( iconEdit, "", this );
   m_BtnEdit->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");

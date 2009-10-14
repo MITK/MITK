@@ -2,7 +2,7 @@
 
 #include <QKeyEvent>
 #include <QKeySequence>
-#include <src/internal/QmitkDataManagerView.h>
+#include "../QmitkDataManagerView.h"
 
 QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerView )
 : QObject(_DataManagerView)

@@ -103,6 +103,7 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::Smar
 //CAST_N_VEC(11)
 //CAST_N_VEC(12)
 CAST_N_VEC(3)
+CAST_N_VEC(6)
 CAST_N_VEC(42)
 CAST_N_VEC(92)
 CAST_N_VEC(162)

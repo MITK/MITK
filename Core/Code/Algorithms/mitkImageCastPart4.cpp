@@ -131,6 +131,7 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Imag
 //TYPE_N_VEC(11)
 //TYPE_N_VEC(12)
 TYPE_N_VEC(3)
+TYPE_N_VEC(6)
 TYPE_N_VEC(42)
 TYPE_N_VEC(92)
 TYPE_N_VEC(162)

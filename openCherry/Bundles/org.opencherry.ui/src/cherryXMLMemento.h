@@ -206,7 +206,7 @@ class CHERRY_UI XMLMemento : public IMemento {
      * @param key the key
      * @param value the value
      */
-    virtual void PutFloat(const std::string& key, float value);
+    virtual void PutFloat(const std::string& key, double value);
 
     /** 
      * Puts a integer in this memento

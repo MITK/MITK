@@ -200,7 +200,7 @@ cherryInterfaceMacro(IMemento, cherry)
    * @param key the key
    * @param value the value
    */
-  virtual void PutFloat(const std::string& key, float value) = 0;
+  virtual void PutFloat(const std::string& key, double value) = 0;
 
   /**
    * Sets the value of the given key to the given integer.

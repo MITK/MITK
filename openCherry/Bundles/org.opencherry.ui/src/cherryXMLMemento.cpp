@@ -20,6 +20,7 @@
 #include "internal/cherryWorkbenchPlugin.h"
 
 #include <Poco/NumberParser.h>
+#include <Poco/NumberFormatter.h>
 #include <Poco/DOM/NodeList.h>
 #include <Poco/XML/NamePool.h>
 #include <Poco/DOM/NamedNodeMap.h>
@@ -32,6 +33,7 @@
 #include <Poco/SAX/SAXException.h>
 
 #include <sstream>
+#include <limits>
 
 const std::string EMPTY_STRING;
 
@@ -179,6 +181,20 @@ bool cherry::XMLMemento::GetFloat(const std::string& key, double& value) const
     value = Poco::NumberParser::parseFloat(attr);
   } catch (const Poco::SyntaxException& e)
   {
+    std::string _qnan = Poco::NumberFormatter::format(std::numeric_limits<double>::quiet_NaN());
+    if (_qnan == attr)
+    {
+      value = std::numeric_limits<double>::quiet_NaN();
+      return true;
+    }
+
+    std::string _inf = Poco::NumberFormatter::format(std::numeric_limits<double>::infinity());
+    if (_inf == attr)
+    {
+      value = std::numeric_limits<double>::infinity();
+      return true;
+    }
+
     WorkbenchPlugin::Log("Memento problem - invalid float for key: " + key
         + " value: " + attr, e);
     return false;
@@ -342,26 +358,16 @@ void cherry::XMLMemento::PutElement(Poco::XML::Element* element, bool copyText)
   }
 }
 
-void cherry::XMLMemento::PutFloat(const std::string& key, float value)
+void cherry::XMLMemento::PutFloat(const std::string& key, double value)
 {
-  std::stringstream ss;
-  std::string xmlValue;
-
-  ss << value;
-  ss >> xmlValue;
+  std::string xmlValue = Poco::NumberFormatter::format(value);
   element->setAttribute(key, xmlValue);
-  //element.setAttribute(key, String.valueOf(f));
 }
 
 void cherry::XMLMemento::PutInteger(const std::string& key, int value)
 {
-  std::stringstream ss;
-  std::string xmlValue;
-
-  ss << value;
-  ss >> xmlValue;
+  std::string xmlValue = Poco::NumberFormatter::format(value);
   element->setAttribute(key, xmlValue);
-  //element.setAttribute(key, String.valueOf(n));
 }
 
 void cherry::XMLMemento::PutMemento(IMemento::Pointer memento)

@@ -482,7 +482,7 @@ void XMLMementoTest::CheckMemento(IMemento::Pointer memento,
 {
   double floatVal;
   memento->GetFloat("floatKey", floatVal);
-  assertEqualDelta(0.4, floatVal, 0.0);
+  assertEqualDelta(0.4, floatVal, 0.0001);
 
   int intVal;
   memento->GetInteger("integerKey", intVal);

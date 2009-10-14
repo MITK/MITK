@@ -20,7 +20,7 @@
 
 #include "cherryISchedulingRule.h"
 #include "cherryObject.h"
-#include "cherryJobsDll.h"
+#include "mitkJobsDll.h"
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
 #include "mitkStandaloneDataStorage.h"
@@ -82,7 +82,7 @@ namespace mitk {
 
 
 
-  class  DataStorageAccessRule : public cherry::ISchedulingRule {
+  class MITK_JOBS_EXPORT DataStorageAccessRule : public cherry::ISchedulingRule {
 
   public:
 

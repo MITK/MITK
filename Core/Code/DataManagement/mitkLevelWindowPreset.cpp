@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowPreset.h"
 #include "mitkStandardFileLocations.h"
 #include <vtkObjectFactory.h>
+#include <itksys/SystemTools.hxx>
 
 namespace mitk {
 
@@ -27,6 +28,7 @@ vtkStandardNewMacro(LevelWindowPreset);
 
 LevelWindowPreset::LevelWindowPreset()
 {
+  m_XmlFileName = "";
 }
 
 LevelWindowPreset::~LevelWindowPreset()
@@ -35,8 +37,19 @@ LevelWindowPreset::~LevelWindowPreset()
 
 bool LevelWindowPreset::LoadPreset()
 {
-  m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml", "Config");
-
+  //m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml", "Config");
+  if (m_XmlFileName.empty())
+  {
+    std::string locationAfterInstall1 = itksys::SystemTools::GetCurrentWorkingDirectory();
+    std::string locationAfterInstall2 = "/bin";
+    std::string locationAfterInstall = locationAfterInstall1 + locationAfterInstall2;
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(locationAfterInstall.c_str(), true);
+    m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml");
+  }
+  if (m_XmlFileName.empty())
+  {
+    m_XmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkLevelWindowPresets.xml", "Config");
+  }
   if (!m_XmlFileName.empty()) 
     return LoadPreset(m_XmlFileName);
   else

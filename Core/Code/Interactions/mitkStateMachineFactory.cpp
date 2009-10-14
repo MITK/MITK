@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkConfig.h>
 #include <mitkStandardFileLocations.h>
+#include <itksys/SystemTools.hxx>
 
 /**
 * @brief This class builds up all the necessary structures for a statemachine.
@@ -107,8 +108,21 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
 
 bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
-  std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
-
+  std::string xmlFileName ="";
+  //( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
+  if (xmlFileName.empty())
+  {
+    std::string locationAfterInstall1 = itksys::SystemTools::GetCurrentWorkingDirectory();
+    std::string locationAfterInstall2 = "/bin";
+    std::string locationAfterInstall = locationAfterInstall1 + locationAfterInstall2;
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(locationAfterInstall.c_str(), true);
+    xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml");
+  }
+  if (xmlFileName.empty())
+  {
+    xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions");
+  }
+  std::cout<<xmlFileName<<std::endl;
   if (!xmlFileName.empty()) 
     return this->LoadBehavior(xmlFileName);
   else

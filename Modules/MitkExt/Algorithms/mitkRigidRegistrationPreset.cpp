@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMetricParameters.h"
 #include "mitkOptimizerParameters.h"
 #include "mitkTransformParameters.h"
+#include <itksys/SystemTools.hxx>
 
 namespace mitk {
 
@@ -39,8 +40,20 @@ namespace mitk {
     std::string location2 = "/QFunctionalities/QmitkRigidRegistration";
     std::string location = location1 + location2;
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(location.c_str(), true);
-    std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml", "Config");
-
+    std::string xmlFileName = "";
+    //mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml", "Config");
+    if (xmlFileName.empty())
+    {
+      std::string locationAfterInstall1 = itksys::SystemTools::GetCurrentWorkingDirectory();
+      std::string locationAfterInstall2 = "/bin";
+      std::string locationAfterInstall = locationAfterInstall1 + locationAfterInstall2;
+      mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch(locationAfterInstall.c_str(), true);
+      xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml");
+    }
+    if (xmlFileName.empty())
+    {
+      xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("mitkRigidRegistrationPresets.xml", "Config");
+    }
     if (!xmlFileName.empty())
     {
       m_XmlFileName = xmlFileName;

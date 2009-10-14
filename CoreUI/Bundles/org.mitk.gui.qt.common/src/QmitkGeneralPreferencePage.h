@@ -29,11 +29,11 @@
 #include <QWidget>
 
 #include "cherryIQtPreferencePage.h"
-#include "mitkQtAppDll.h"
+#include "mitkQtCommonDll.h"
 
 class QCheckBox;
 
-struct MITK_QT_APP QmitkGeneralPreferencePage : public cherry::IQtPreferencePage
+struct MITK_QT_COMMON QmitkGeneralPreferencePage : public cherry::IQtPreferencePage
 {
   Q_OBJECT
 
@@ -56,7 +56,7 @@ public:
   virtual void Update();
 protected:
   cherry::IPreferences::WeakPtr m_GeneralPreferencesNode;
-  QCheckBox* m_StartMaximized;
+  //QCheckBox* m_StartMaximized;
 
 };
 

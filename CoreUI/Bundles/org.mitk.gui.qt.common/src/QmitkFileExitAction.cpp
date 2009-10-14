@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIWorkbenchPage.h>
 
 #include "QmitkStdMultiWidgetEditor.h"
+#include <cherryPlatformUI.h>
 
 QmitkFileExitAction::QmitkFileExitAction(cherry::IWorkbenchWindow::Pointer window)
 : QAction(0)
@@ -41,5 +42,5 @@ QmitkFileExitAction::QmitkFileExitAction(cherry::IWorkbenchWindow::Pointer windo
 
 void QmitkFileExitAction::Run()
 {
-  QApplication::exit();
+  cherry::PlatformUI::GetWorkbench()->Close();
 }

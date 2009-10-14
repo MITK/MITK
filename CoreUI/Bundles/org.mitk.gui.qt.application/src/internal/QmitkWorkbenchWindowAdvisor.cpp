@@ -67,15 +67,6 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   cherry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
 
-  // show maximized if preference is set
-  cherry::IPreferencesService::Pointer prefService 
-    = cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
-  cherry::IPreferences::Pointer _GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
-  bool startMaximized = _GeneralPreferencesNode->GetBool("startMaximized", false);
-  if(startMaximized && !mainWindow->isMaximized())
-    mainWindow->setWindowState(mainWindow->windowState() ^ Qt::WindowMaximized);
-
-
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("&File");

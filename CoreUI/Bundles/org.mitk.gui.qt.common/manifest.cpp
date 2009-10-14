@@ -20,7 +20,12 @@
 #include <cherryIEditorPart.h>
 
 #include "src/QmitkStdMultiWidgetEditor.h"
+#include "src/QmitkGeneralPreferencePage.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
   POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
+POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIQtPreferencePage, cherry::IQtPreferencePage)
+  POCO_EXPORT_CLASS(QmitkGeneralPreferencePage)
 POCO_END_MANIFEST

@@ -19,9 +19,10 @@
 #ifndef CHERRYQMITKPREFERENCESDIALOG_H_
 #define CHERRYQMITKPREFERENCESDIALOG_H_
 
-#include "cherryICherryPreferencesService.h"
-#include "cherryIQtPreferencePage.h"
-#include "cherryIConfigurationElement.h"
+#include <cherryICherryPreferencesService.h>
+#include <cherryIQtPreferencePage.h>
+#include <cherryIConfigurationElement.h>
+#include "mitkQtCommonDll.h"
 
 #include <QDialog>
 
@@ -39,7 +40,7 @@ class QStackedWidget;
 #include <map>
 #include <vector>
 
-class QmitkPreferencesDialog : public QDialog
+class MITK_QT_COMMON QmitkPreferencesDialog : public QDialog
 {
     Q_OBJECT
 

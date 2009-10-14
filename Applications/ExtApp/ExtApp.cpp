@@ -40,5 +40,6 @@ int main(int argc, char** argv)
 
   Poco::Util::MapConfiguration* extConfig(new Poco::Util::MapConfiguration());
   extConfig->setString(cherry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  extConfig->setString(cherry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
   return cherry::Starter::Run(argc, argv, extConfig);
 }

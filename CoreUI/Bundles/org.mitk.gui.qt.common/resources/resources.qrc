@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/org.mitk.gui.qt.application">
+ <qresource prefix="/org.mitk.gui.qt.common">
     <file>document-save.png</file> 
 	<file>edit-redo.png</file> 
 	<file>edit-undo.png</file> 

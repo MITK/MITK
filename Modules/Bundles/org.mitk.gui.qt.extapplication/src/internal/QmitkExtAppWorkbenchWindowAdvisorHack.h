@@ -2,7 +2,7 @@
 
 class QmitkPreferencesDialog;
 
-class QmitkWorkbenchWindowAdvisorHelperHack : public QObject
+class QmitkExtAppWorkbenchWindowAdvisorHack : public QObject
 {
   Q_OBJECT
 
@@ -15,8 +15,8 @@ class QmitkWorkbenchWindowAdvisorHelperHack : public QObject
 
   public:
 
-    QmitkWorkbenchWindowAdvisorHelperHack();
+    QmitkExtAppWorkbenchWindowAdvisorHack();
 
-    static QmitkWorkbenchWindowAdvisorHelperHack* undohack;
+    static QmitkExtAppWorkbenchWindowAdvisorHack* undohack;
 };
 

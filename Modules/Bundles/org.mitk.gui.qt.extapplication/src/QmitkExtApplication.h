@@ -1,25 +1,33 @@
 /*=========================================================================
-
-Program:   MITK Platform
+ 
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 17020 $
-
+Version:   $Revision$
+ 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
+ 
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
-
+ 
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
+#ifndef QMITKEXTAPPLICATION_H_
+#define QMITKEXTAPPLICATION_H_
 
-#include <cherryIBundleActivator.h>
-#include "src/internal/QmitkExtActivator.h"
+#include <cherryIApplication.h>
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(QmitkExtActivator)
-POCO_END_MANIFEST
+#include "mitkQtExtAppDll.h"
+
+class MITK_QT_EXTAPP QmitkExtApplication : public cherry::IApplication
+{
+public:
+  
+  int Start();
+  void Stop();
+};
+
+#endif /*QMITKEXTAPPLICATION_H_*/

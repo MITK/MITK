@@ -1,38 +1,41 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
-#include "QmitkApplication.h"
 
-#include <cherryPlatformUI.h>
+#include "QmitkExtAppWorkbenchAdvisor.h"
 
-#include "QmitkWorkbenchAdvisor.h"
+#include <QApplication>
 
-int QmitkApplication::Start()
+#include <QmitkExtRegisterClasses.h>
+
+#include "QmitkExtAppWorkbenchWindowAdvisor.h"
+
+const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSP_ID = "org.mitk.perspectives.default";
+
+void
+QmitkExtAppWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)
 {
-  cherry::Display* display = cherry::PlatformUI::CreateDisplay();
-
-  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
-  
-  // exit the application with an appropriate return code
-  return code == cherry::PlatformUI::RETURN_RESTART
-              ? EXIT_RESTART : EXIT_OK;
+  QmitkWorkbenchAdvisor::Initialize(configurer);
+  QmitkExtRegisterClasses();
 }
 
-void QmitkApplication::Stop()
+cherry::WorkbenchWindowAdvisor*
+QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
+        cherry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-  
+  return new QmitkExtAppWorkbenchWindowAdvisor(configurer);
 }

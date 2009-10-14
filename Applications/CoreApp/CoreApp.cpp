@@ -37,5 +37,6 @@ int main(int argc, char** argv)
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
   coreConfig->setString(cherry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  coreConfig->setString(cherry::Platform::ARG_APPLICATION, "org.mitk.qt.application");
   return cherry::Starter::Run(argc, argv, coreConfig);
 }

@@ -1,38 +1,36 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
-#include "QmitkApplication.h"
+#ifndef QMITKEXTAPPACTIONBARADVISOR_H_
+#define QMITKEXTAPPACTIONBARADVISOR_H_
 
-#include <cherryPlatformUI.h>
+#include <cherryActionBarAdvisor.h>
 
-#include "QmitkWorkbenchAdvisor.h"
+#include "mitkQtExtAppDll.h"
 
-int QmitkApplication::Start()
+class MITK_QT_EXTAPP QmitkExtAppActionBarAdvisor : public cherry::ActionBarAdvisor
 {
-  cherry::Display* display = cherry::PlatformUI::CreateDisplay();
+public:
 
-  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
-  
-  // exit the application with an appropriate return code
-  return code == cherry::PlatformUI::RETURN_RESTART
-              ? EXIT_RESTART : EXIT_OK;
-}
+  QmitkExtAppActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
 
-void QmitkApplication::Stop()
-{
-  
-}
+protected:
+
+  void FillMenuBar(void* menuBar);
+};
+
+#endif /*QMITKEXTAPPACTIONBARADVISOR_H_*/

@@ -27,15 +27,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryQtWorkbenchAdvisor.h>
 
-class QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
+#include "mitkQtAppDll.h"
+
+class MITK_QT_APP QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
 {
 public:
 
   static const std::string DEFAULT_PERSP_ID;
 
   void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
-
-  void PreStartup();
 
   cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
         cherry::IWorkbenchWindowConfigurer::Pointer configurer);

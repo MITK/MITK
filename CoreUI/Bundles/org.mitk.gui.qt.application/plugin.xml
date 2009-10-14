@@ -15,14 +15,4 @@
     </perspective>
   </extension>
   
-  <extension point="org.opencherry.ui.preferencePages">
-	  <page id="org.mitk.gui.qt.application.GeneralPreferencePage" name="General" class="QmitkGeneralPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.application.GeneralPreferencePageKeywords"></keywordreference>
-    </page>
-  </extension>
-
-  <extension point="org.opencherry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.GeneralPreferencePageKeywords" label="general preferences store"></keyword>
-  </extension>
-  
 </plugin>

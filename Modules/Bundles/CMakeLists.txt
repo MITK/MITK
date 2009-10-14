@@ -8,7 +8,7 @@ IF(MITK_USE_OPENCHERRY)
   
   SET(_mitk_bundles_default "org.mitk.core.ext" "org.mitk.diffusionimaging")
   IF(QT4_FOUND)
-    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext")
+    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.extapplication")
   ENDIF()
   
   SET(PLUGIN_EXCLUDE_LIST 

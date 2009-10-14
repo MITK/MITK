@@ -24,6 +24,11 @@ SET(MOC_H_FILES
   src/internal/QmitkDnDFrameWidget.h
 )
 
+# todo: add some qt style sheet resources
+SET(RES_FILES
+  resources/resources.qrc
+)
+
 SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})

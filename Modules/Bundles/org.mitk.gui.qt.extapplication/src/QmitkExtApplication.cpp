@@ -15,24 +15,24 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkApplication.h"
+#include "QmitkExtApplication.h"
 
 #include <cherryPlatformUI.h>
 
-#include "QmitkWorkbenchAdvisor.h"
+#include "QmitkExtAppWorkbenchAdvisor.h"
 
-int QmitkApplication::Start()
+int QmitkExtApplication::Start()
 {
   cherry::Display* display = cherry::PlatformUI::CreateDisplay();
 
-  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
+  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkExtAppWorkbenchAdvisor());
   
   // exit the application with an appropriate return code
   return code == cherry::PlatformUI::RETURN_RESTART
               ? EXIT_RESTART : EXIT_OK;
 }
 
-void QmitkApplication::Stop()
+void QmitkExtApplication::Stop()
 {
   
 }

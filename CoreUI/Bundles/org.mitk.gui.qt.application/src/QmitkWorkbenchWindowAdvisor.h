@@ -15,20 +15,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QMITKACTIONBARADVISOR_H_
-#define QMITKACTIONBARADVISOR_H_
+#ifndef QMITKWORKBENCHWINDOWADVISOR_H_
+#define QMITKWORKBENCHWINDOWADVISOR_H_
 
-#include <cherryActionBarAdvisor.h>
+#include <cherryWorkbenchWindowAdvisor.h>
 
-class QmitkActionBarAdvisor : public cherry::ActionBarAdvisor
+#include "mitkQtAppDll.h"
+
+class MITK_QT_APP QmitkWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
 {
 public:
 
-  QmitkActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
+    QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-protected:
+    cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
+        cherry::IActionBarConfigurer::Pointer configurer);
 
-  void FillMenuBar(void* menuBar);
+    void PostWindowCreate();
 };
 
-#endif /*QMITKACTIONBARADVISOR_H_*/
+#endif /*QMITKWORKBENCHWINDOWADVISOR_H_*/

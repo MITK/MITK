@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtExtAppDll.h"
 
-class MITK_QT_APP QmitkExtAppWorkbenchAdvisor : public QmitkWorkbenchAdvisor
+class MITK_QT_EXTAPP QmitkExtAppWorkbenchAdvisor : public QmitkWorkbenchAdvisor
 {
 public:
 

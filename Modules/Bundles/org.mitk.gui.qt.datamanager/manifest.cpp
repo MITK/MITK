@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryIViewPart.h>
 #include "src/internal/QmitkPropertyListView.h"
-#include "src/internal/QmitkDataManagerView.h"
+#include "src/QmitkDataManagerView.h"
 #include "src/QmitkDataManagerPreferencePage.h"
 #include "src/QmitkDataManagerHotkeysPrefPage.h"
 

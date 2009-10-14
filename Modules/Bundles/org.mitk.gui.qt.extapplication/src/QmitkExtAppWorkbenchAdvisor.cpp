@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkExtAppWorkbenchWindowAdvisor.h"
 
-const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSP_ID = "org.mitk.perspectives.default";
 
 void
 QmitkExtAppWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)

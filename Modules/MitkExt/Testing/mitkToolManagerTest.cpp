@@ -27,7 +27,6 @@ static void TestToolManagerWithOutTools(mitk::ToolManager::Pointer toolManager)
 {
   MITK_TEST_CONDITION( toolManager->GetTools().size() == 0, "Get empty tool list" )   
   MITK_TEST_CONDITION( toolManager->GetToolById(0) == NULL, "Get empty tool by id" )
-  MITK_TEST_CONDITION( toolManager->ActivateTool(0) == false, "Activate not existant tool" )
 }
 
 static void TestToolManagerWithTools(mitk::ToolManager::Pointer toolManager)
@@ -63,7 +62,7 @@ static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
 int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("AutoCropImageFilter")
+  MITK_TEST_BEGIN("ToolManager")
 
   // instantiation
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();

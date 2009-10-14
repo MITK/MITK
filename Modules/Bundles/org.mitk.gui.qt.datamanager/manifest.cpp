@@ -18,11 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include <cherryIViewPart.h>
+#include "src/internal/QmitkPropertyListView.h"
 #include "src/internal/QmitkDataManagerView.h"
 #include "src/QmitkDataManagerPreferencePage.h"
 #include "src/QmitkDataManagerHotkeysPrefPage.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+  POCO_EXPORT_CLASS(QmitkPropertyListView)
   POCO_EXPORT_CLASS(QmitkDataManagerView)
 POCO_END_MANIFEST
 

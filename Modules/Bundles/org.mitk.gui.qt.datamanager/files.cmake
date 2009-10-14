@@ -1,18 +1,19 @@
 SET(SRC_CPP_FILES
   cherrySingleNodeSelection.cpp
+  QmitkDataManagerView.cpp 
   QmitkDataManagerPreferencePage.cpp
   QmitkDataManagerHotkeysPrefPage.cpp
   QmitkHotkeyLineEdit.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkDataManagerView.cpp 
+  QmitkPropertyListView.cpp
   QmitkNodeTableViewKeyFilter.cpp 
   QmitkInfoDialog.cpp 
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkDataManagerView.h
+  src/QmitkDataManagerView.h
   src/QmitkHotkeyLineEdit.h
   src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
@@ -24,6 +25,7 @@ SET(CPP_FILES manifest.cpp)
 
 SET(RESOURCE_FILES
   resources/datamanager.xpm
+  resources/propertylist.png
 )
 
 SET(RES_FILES

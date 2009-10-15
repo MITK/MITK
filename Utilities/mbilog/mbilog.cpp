@@ -78,7 +78,7 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
     FormatSmart(l);
 }
 
-void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int threadID)
+void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int /*threadID*/)
 {
   char c_open='[';
   char c_close=']';

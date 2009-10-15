@@ -64,7 +64,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowActivated(IWorkbenchWindow::Pointer window) {};
+  virtual void WindowActivated(IWorkbenchWindow::Pointer /*window*/) {};
 
   /**
    * Notifies this listener that the given window has been deactivated.
@@ -75,7 +75,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    *
    * @param window the window that was activated
    */
-  virtual void WindowDeactivated(IWorkbenchWindow::Pointer window) {};
+  virtual void WindowDeactivated(IWorkbenchWindow::Pointer /*window*/) {};
 
   /**
    * Notifies this listener that the given window has been closed.
@@ -83,7 +83,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    * @param window the window that was closed
    * @see IWorkbenchWindow#close
    */
-  virtual void WindowClosed(IWorkbenchWindow::Pointer window) {};
+  virtual void WindowClosed(IWorkbenchWindow::Pointer /*window*/) {};
 
   /**
    * Notifies this listener that the given window has been opened.
@@ -91,7 +91,7 @@ struct CHERRY_UI IWindowListener : public virtual Object {
    * @param window the window that was opened
    * @see IWorkbench#openWorkbenchWindow
    */
-  virtual void WindowOpened(IWorkbenchWindow::Pointer window) {};
+  virtual void WindowOpened(IWorkbenchWindow::Pointer /*window*/) {};
 
 };
 

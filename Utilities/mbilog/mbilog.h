@@ -179,11 +179,11 @@ namespace mbilog {
 
     public:
 
-      template <class T> inline NullStream& operator<<(const T& data)
+      template <class T> inline NullStream& operator<<(const T& /*data*/)
       {
         return *this;
       }
-      template <class T> inline NullStream& operator<<(T& data)
+      template <class T> inline NullStream& operator<<(T& /*data*/)
       {
         return *this;
       }

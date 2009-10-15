@@ -750,7 +750,7 @@ void* PartStack::GetControl()
 /**
  * Answer the number of children.
  */
-int PartStack::GetItemCount()
+PartStack::ChildVector::size_type PartStack::GetItemCount()
 {
   if (this->GetPresentation() == 0)
   {
@@ -1420,7 +1420,7 @@ void PartStack::UpdateContainerVisibleTab()
       {
         IWorkbenchPartReference::Pointer part = partIter->Cast<PartPane>()
         ->GetPartReference();
-        int index = std::find(sortedParts.begin(), sortedParts.end(), part) - sortedParts.begin();
+        int index = static_cast<int>(std::find(sortedParts.begin(), sortedParts.end(), part) - sortedParts.begin());
         if (index >= topIndex)
         {
           topIndex = index;

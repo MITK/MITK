@@ -103,7 +103,7 @@ Perspective::~Perspective()
 
   // Release each view.
   std::vector<IViewReference::Pointer> refs(this->GetViewReferences());
-  for (unsigned int i = 0, length = refs.size(); i < length; i++)
+  for (std::vector<IViewReference::Pointer>::size_type i = 0, length = refs.size(); i < length; i++)
   {
     this->GetViewFactory()->ReleaseView(refs[i]);
   }

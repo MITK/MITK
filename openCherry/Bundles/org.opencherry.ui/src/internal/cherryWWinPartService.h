@@ -34,7 +34,7 @@ class WWinPartService: public IPartService
 
 private:
 
-  friend class WWinListener;
+  friend struct WWinListener;
 
   PartService partService; // (UIListenerLogging.WINDOW_PARTLISTENER_EVENTS, UIListenerLogging.WINDOW_PARTLISTENER2_EVENTS);
 

@@ -181,7 +181,7 @@ bool WorkbenchPage::PerspectiveList::Remove(Perspective::Pointer perspective)
     active = 0;
   }
   usedList.remove(perspective);
-  unsigned int origSize = openedList.size();
+  PerspectiveListType::size_type origSize = openedList.size();
   openedList.remove(perspective);
   return openedList.size() != origSize;
 }
@@ -238,7 +238,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
   }
 }
 
-int WorkbenchPage::PerspectiveList::Size()
+WorkbenchPage::PerspectiveList::PerspectiveListType::size_type WorkbenchPage::PerspectiveList::Size()
 {
   return openedList.size();
 }
@@ -300,7 +300,7 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartRefere
   }
   else
   {
-    unsigned int index = newIndex - parts.begin();
+    PartListType::size_type index = newIndex - parts.begin();
     parts.erase(std::find(parts.begin(), parts.end(), ref));
     PartListIter insertIndex = parts.begin() + index;
     parts.insert(insertIndex, ref);
@@ -2324,7 +2324,7 @@ void WorkbenchPage::OpenPerspectiveExtras()
   }
   // HACK: The perspective switcher currently adds the button for a new perspective to the beginning of the list.
   // So, we process the extra perspectives in reverse order here to have their buttons appear in the order declared.
-  for (int i = descs.size(); --i >= 0;)
+  for (std::vector<IPerspectiveDescriptor::Pointer>::size_type i = descs.size(); --i >= 0;)
   {
     PerspectiveDescriptor::Pointer desc =
     descs[i].Cast<PerspectiveDescriptor> ();
@@ -3795,12 +3795,12 @@ void WorkbenchPage::ResizeView(IViewPart::Pointer part, int width, int height)
   this->FindSashParts(tree, pane->FindSashes(), sashInfo);
 
   // first set the width
-  float deltaWidth = width - pane->GetBounds().width;
+  int deltaWidth = width - pane->GetBounds().width;
   if (sashInfo.right != 0)
   {
     Rectangle rightBounds = sashInfo.rightNode->GetBounds();
     // set the new ratio
-    sashInfo.right->SetRatio(((deltaWidth + sashInfo.right->GetBounds().x)
+    sashInfo.right->SetRatio(static_cast<float>((deltaWidth + sashInfo.right->GetBounds().x)
             - rightBounds.x) / rightBounds.width);
     // complete the resize
     sashInfo.rightNode->SetBounds(rightBounds);
@@ -3809,19 +3809,19 @@ void WorkbenchPage::ResizeView(IViewPart::Pointer part, int width, int height)
   {
     Rectangle leftBounds = sashInfo.leftNode->GetBounds();
     // set the ratio
-    sashInfo.left->SetRatio(((sashInfo.left->GetBounds().x - deltaWidth)
+    sashInfo.left->SetRatio(static_cast<float>((sashInfo.left->GetBounds().x - deltaWidth)
             - leftBounds.x) / leftBounds.width);
     // complete the resize
     sashInfo.leftNode->SetBounds(sashInfo.leftNode->GetBounds());
   }
 
   // next set the height
-  float deltaHeight = height - pane->GetBounds().height;
+  int deltaHeight = height - pane->GetBounds().height;
   if (sashInfo.bottom != 0)
   {
     Rectangle bottomBounds = sashInfo.bottomNode->GetBounds();
     // set the new ratio
-    sashInfo.bottom->SetRatio(((deltaHeight + sashInfo.bottom->GetBounds().y)
+    sashInfo.bottom->SetRatio(static_cast<float>((deltaHeight + sashInfo.bottom->GetBounds().y)
             - bottomBounds.y) / bottomBounds.height);
     // complete the resize
     sashInfo.bottomNode->SetBounds(bottomBounds);
@@ -3830,7 +3830,7 @@ void WorkbenchPage::ResizeView(IViewPart::Pointer part, int width, int height)
   {
     Rectangle topBounds = sashInfo.topNode->GetBounds();
     // set the ratio
-    sashInfo.top->SetRatio(((sashInfo.top->GetBounds().y - deltaHeight)
+    sashInfo.top->SetRatio(static_cast<float>((sashInfo.top->GetBounds().y - deltaHeight)
             - topBounds.y) / topBounds.height);
     // complete the resize
     sashInfo.topNode->SetBounds(topBounds);

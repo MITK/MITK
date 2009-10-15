@@ -344,7 +344,7 @@ private:
     /**
      * Returns the number of perspectives opened
      */
-    int Size();
+    PerspectiveListType::size_type Size();
 
     /**
      * Marks the specified perspective as the most recently used one in the

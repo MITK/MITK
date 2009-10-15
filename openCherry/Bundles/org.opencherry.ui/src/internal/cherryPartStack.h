@@ -339,7 +339,7 @@ public: cherryObjectMacro(PartStack);
     /**
      * Answer the number of children.
      */
-    public: int GetItemCount();
+    public: ChildVector::size_type GetItemCount();
 
     /**
      * Returns the LayoutPart for the given IPresentablePart, or null if the given

@@ -405,7 +405,7 @@ bool Workbench::RestoreState(IMemento::Pointer memento)
 
       // If we don't know how many plug-ins were loaded last time,
       // assume we are loading half of the installed plug-ins.
-      const int expectedProgressCount = std::max<int>(1,
+      const std::size_t expectedProgressCount = std::max<std::size_t>(1,
           lastProgressCount == -1 ? WorkbenchPlugin::GetDefault()->GetBundleCount() / 2
           : lastProgressCount);
 
@@ -504,7 +504,7 @@ void Workbench::DoRestoreState(IMemento::Pointer memento, bool& status) // final
       {
         newWindow->FireWindowRestored();
       }
-      catch (const WorkbenchException& e)
+      catch (const WorkbenchException& /*e*/)
       {
         //status.add(e.getStatus());
         status &= false;
@@ -1035,7 +1035,7 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
     Poco::FileOutputStream stream(stateFile.path());
     memento->Save(stream);
   }
-  catch (const Poco::IOException& e)
+  catch (const Poco::IOException& /*e*/)
   {
     stateFile.remove();
     MessageDialog::OpenError(Shell::Pointer(0),
@@ -1393,7 +1393,7 @@ int Workbench::GetNewWindowNumber()
 {
   // Get window list.
   std::vector<Window::Pointer> windows = windowManager.GetWindows();
-  int count = windows.size();
+  std::vector<Window::Pointer>::size_type count = windows.size();
 
   // Create an array of booleans (size = window count).
   // Cross off every number found in the window list.
@@ -1424,7 +1424,7 @@ int Workbench::GetNewWindowNumber()
   }
 
   delete[] checkArray;
-  return count + 1;
+  return static_cast<int>(count + 1);
 }
 
 IWorkbenchWindow::Pointer Workbench::BusyOpenWorkbenchWindow(

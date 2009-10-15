@@ -170,7 +170,7 @@ private:
     std::string sid;
     StackablePart::Pointer part;
     bool hasWildcard;
-    int len;
+    std::string::size_type len;
 
     MatchingPart(const std::string& pid, const std::string& sid,
         StackablePart::Pointer part);

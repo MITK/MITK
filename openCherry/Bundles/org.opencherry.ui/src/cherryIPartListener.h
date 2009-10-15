@@ -66,7 +66,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was activated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartActivated(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartActivated(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part has been brought to the top.
@@ -81,7 +81,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was surfaced
      * @see IWorkbenchPage#bringToTop
      */
-    virtual void PartBroughtToTop(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartBroughtToTop(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part has been closed.
@@ -94,7 +94,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was closed
      * @see IWorkbenchPage#hideView
      */
-    virtual void PartClosed(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartClosed(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part has been deactivated.
@@ -102,7 +102,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was deactivated
      * @see IWorkbenchPage#activate
      */
-    virtual void PartDeactivated(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartDeactivated(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part has been opened.
@@ -115,28 +115,28 @@ struct CHERRY_UI IPartListener : public virtual Object {
      * @param partRef the part that was opened
      * @see IWorkbenchPage#showView
      */
-    virtual void PartOpened(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartOpened(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part is hidden or obscured by another part.
      *
      * @param partRef the part that is hidden or obscured by another part
      */
-    virtual void PartHidden(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartHidden(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part is visible.
      *
      * @param partRef the part that is visible
      */
-    virtual void PartVisible(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartVisible(IWorkbenchPartReference::Pointer /*partRef*/) {};
 
     /**
      * Notifies this listener that the given part's input was changed.
      *
      * @param partRef the part whose input was changed
      */
-    virtual void PartInputChanged(IWorkbenchPartReference::Pointer partRef) {};
+    virtual void PartInputChanged(IWorkbenchPartReference::Pointer /*partRef*/) {};
 };
 
 }  // namespace cherry

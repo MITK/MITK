@@ -91,7 +91,7 @@ struct CHERRY_UI IControlListener: public virtual Object
    *
    * @param e an event containing information about the move
    */
-  virtual void ControlMoved(ControlEvent::Pointer e)
+  virtual void ControlMoved(ControlEvent::Pointer /*e*/)
   {
   }
 
@@ -100,15 +100,15 @@ struct CHERRY_UI IControlListener: public virtual Object
    *
    * @param e an event containing information about the resize
    */
-  virtual void ControlResized(ControlEvent::Pointer e)
+  virtual void ControlResized(ControlEvent::Pointer /*e*/)
   {
   }
 
-  virtual void ControlActivated(ControlEvent::Pointer e)
+  virtual void ControlActivated(ControlEvent::Pointer /*e*/)
   {
   }
 
-  virtual void ControlDestroyed(ControlEvent::Pointer e)
+  virtual void ControlDestroyed(ControlEvent::Pointer /*e*/)
   {
   }
 

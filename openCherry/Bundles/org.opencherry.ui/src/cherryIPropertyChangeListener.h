@@ -79,7 +79,7 @@ struct CHERRY_UI IPropertyChangeListener: public virtual Object
    */
   virtual void PropertyChange(PropertyChangeEvent::Pointer event);
 
-  virtual void PropertyChange(Object::Pointer source, int propId) {}
+  virtual void PropertyChange(Object::Pointer /*source*/, int /*propId*/) {}
 };
 
 }

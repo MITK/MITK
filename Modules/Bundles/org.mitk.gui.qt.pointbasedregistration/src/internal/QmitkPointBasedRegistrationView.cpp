@@ -536,12 +536,14 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
 
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
+  m_MovingLandmarks = (mitk::PointSet*)m_MovingPointSetNode->GetData();
   this->checkLandmarkError();
   this->CheckCalculate();
 }
 
 void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
 {
+  m_FixedLandmarks = (mitk::PointSet*)m_FixedPointSetNode->GetData();
   this->checkLandmarkError();
   this->CheckCalculate();
 }

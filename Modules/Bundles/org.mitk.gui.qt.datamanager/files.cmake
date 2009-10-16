@@ -17,8 +17,6 @@ SET(MOC_H_FILES
   src/QmitkHotkeyLineEdit.h
   src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
-  src/QmitkDataManagerPreferencePage.h
-  src/QmitkDataManagerHotkeysPrefPage.h
 )
 
 SET(CPP_FILES manifest.cpp)

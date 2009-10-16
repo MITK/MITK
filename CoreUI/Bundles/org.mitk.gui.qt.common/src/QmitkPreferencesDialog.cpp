@@ -41,7 +41,7 @@
 using namespace std;
 
 QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
-: QDialog(parent, f)
+: QDialog(parent, f), m_CurrentPage(0)
 {
   // m_PreferencesService
   m_PreferencesService = 
@@ -167,28 +167,28 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   //# m_ImportButton
   m_ImportButton = new QPushButton(QString(tr("Import ...")));
   QObject::connect(m_ImportButton, SIGNAL(clicked(bool)), this, SLOT(OnImportButtonClicked(bool)));
-  m_ImportButton->setIcon(QIcon(":/org.mitk.gui.qt.application/edit-redo.png"));
+  m_ImportButton->setIcon(QIcon(":/org.mitk.gui.qt.common/edit-redo.png"));
   m_ImportButton->setFlat(true);
   m_ImportButton->setDefault(false);
 
   //# m_ExportButton
   m_ExportButton = new QPushButton(QString(tr("Export ...")), this);
   QObject::connect(m_ExportButton, SIGNAL(clicked(bool)), this, SLOT(OnExportButtonClicked(bool)));
-  m_ExportButton->setIcon(QIcon(":/org.mitk.gui.qt.application/edit-undo.png"));
+  m_ExportButton->setIcon(QIcon(":/org.mitk.gui.qt.common/edit-undo.png"));
   m_ExportButton->setFlat(true);
   m_ExportButton->setDefault(false);
 
   //# m_ApplyButton
   m_ApplyButton = new QPushButton(QString(tr("Apply")), this);
   QObject::connect(m_ApplyButton, SIGNAL(clicked(bool)), this, SLOT(OnApplyButtonClicked(bool)));
-  m_ApplyButton->setIcon(QIcon(":/org.mitk.gui.qt.application/document-save.png"));
+  m_ApplyButton->setIcon(QIcon(":/org.mitk.gui.qt.common/document-save.png"));
   m_ApplyButton->setFlat(true);
   m_ApplyButton->setDefault(false);
 
   //# m_CloseButton
   m_CloseButton = new QPushButton(QString(tr("Close")), this);
   QObject::connect(m_CloseButton, SIGNAL(clicked(bool)), this, SLOT(OnCloseButtonClicked(bool)));
-  m_CloseButton->setIcon(QIcon(":/org.mitk.gui.qt.application/system-log-out.png"));
+  m_CloseButton->setIcon(QIcon(":/org.mitk.gui.qt.common/system-log-out.png"));
   m_CloseButton->setFlat(true);
   m_CloseButton->setDefault(true);
   m_CloseButton->setFocus();
@@ -209,7 +209,7 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   this->setModal(true);
   this->setSizeGripEnabled(true);
   this->setWhatsThis("Dialog to set application wide preferences");
-  this->setWindowIcon(QIcon(":/org.mitk.gui.qt.application/preferences-system.png"));
+  this->setWindowIcon(QIcon(":/org.mitk.gui.qt.common/preferences-system.png"));
   QRect parentGeometry = parent->geometry();
   int w = parentGeometry.width()/2; int h = parentGeometry.height()/2;
   int x = parentGeometry.x()+(parentGeometry.width()-w)/2; 
@@ -237,8 +237,8 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
     cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      cherry::ICherryPreferencesService* cherryPrefService
-        = dynamic_cast<cherry::ICherryPreferencesService*>(prefService.GetPointer());
+      cherry::ICherryPreferencesService::Pointer cherryPrefService
+        = prefService.Cast<cherry::ICherryPreferencesService>();
       if(cherryPrefService != 0)
       {
         QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
@@ -251,8 +251,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
           {
             Poco::File f(fileNames.at(0).toStdString());
             cherryPrefService->ImportPreferences(f, "");
-            cherry::IQtPreferencePage* prefPage 
-              = dynamic_cast<cherry::IQtPreferencePage*>(m_PreferencesPanel->currentWidget());
+            cherry::IQtPreferencePage::Pointer prefPage = m_PrefPages[m_CurrentPage].prefPage;
             if(prefPage)
               prefPage->Update();
 
@@ -281,8 +280,8 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool triggered )
     cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      cherry::ICherryPreferencesService* cherryPrefService
-        = dynamic_cast<cherry::ICherryPreferencesService*>(prefService.GetPointer());
+      cherry::ICherryPreferencesService::Pointer cherryPrefService
+        = prefService.Cast<cherry::ICherryPreferencesService>();
       if(cherryPrefService != 0)
       {
         QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
@@ -315,8 +314,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool triggered )
 
 void QmitkPreferencesDialog::OnApplyButtonClicked( bool triggered )
 {  
-  cherry::IQtPreferencePage* prefPage 
-    = dynamic_cast<cherry::IQtPreferencePage*>(m_PreferencesPanel->currentWidget());
+  cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
   if(prefPage)
     if(prefPage->PerformOk())
       this->done(QDialog::Accepted);
@@ -324,8 +322,7 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool triggered )
 
 void QmitkPreferencesDialog::OnCloseButtonClicked( bool triggered )
 {
-  cherry::IQtPreferencePage* prefPage 
-    = dynamic_cast<cherry::IQtPreferencePage*>(m_PreferencesPanel->currentWidget());
+  cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
   if(prefPage)
     prefPage->PerformCancel();
 
@@ -371,18 +368,20 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
   if(selectedItems.size()>0)
   {
 
+    m_CurrentPage = 0;
     for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-      it != m_PrefPages.end(); ++it)
+      it != m_PrefPages.end(); ++it, ++m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
       {
         m_Headline->setText(QString::fromStdString(it->name));
         if(it->prefPage == 0)
         {
-          it->prefPage = it->confElem->CreateExecutableExtension<cherry::IQtPreferencePage>("class");
-          m_PreferencesPanel->addWidget(it->prefPage);
+          it->prefPage = dynamic_cast<cherry::IQtPreferencePage*>(it->confElem->CreateExecutableExtension<cherry::IPreferencePage>("class"));
+          it->prefPage->CreateQtControl(m_PreferencesPanel);
+          m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }
-        m_PreferencesPanel->setCurrentWidget(it->prefPage);
+        m_PreferencesPanel->setCurrentWidget(it->prefPage->GetQtControl());
         
         break;
       }

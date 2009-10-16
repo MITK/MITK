@@ -25,8 +25,18 @@
 #include <cherryIPreferencesService.h>
 #include <cherryPlatform.h>
 
-QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage( QWidget* parent, Qt::WindowFlags f )
-: IQtPreferencePage(parent, f)
+QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
+: m_MainControl(0)
+{
+
+}
+
+void QmitkDataManagerPreferencePage::Init(cherry::IWorkbench::Pointer )
+{
+
+}
+
+void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 {
   cherry::IPreferencesService::Pointer prefService 
     = cherry::Platform::GetServiceRegistry()
@@ -34,13 +44,19 @@ QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage( QWidget* parent,
 
   m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager");
 
+  m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
-  formLayout->addRow(tr("&Single click property editing:"), m_EnableSingleEditing);
+  formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
   
-  this->setLayout(formLayout);
+  m_MainControl->setLayout(formLayout);
   this->Update();
+}
+
+QWidget* QmitkDataManagerPreferencePage::GetQtControl() const
+{
+  return m_MainControl;
 }
 
 bool QmitkDataManagerPreferencePage::PerformOk()

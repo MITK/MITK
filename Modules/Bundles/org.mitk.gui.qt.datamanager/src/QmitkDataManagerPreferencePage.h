@@ -23,14 +23,20 @@
 #include "mitkQtDataManagerDll.h"
 #include <cherryIPreferences.h>
 
+class QWidget;
 class QCheckBox;
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public cherry::IQtPreferencePage
 {
-  Q_OBJECT
 
 public:
-  QmitkDataManagerPreferencePage(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkDataManagerPreferencePage();
+
+  void Init(cherry::IWorkbench::Pointer workbench);
+
+  void CreateQtControl(QWidget* widget);
+
+  QWidget* GetQtControl() const;
 
   ///
   /// \see IPreferencePage::PerformOk()
@@ -47,6 +53,7 @@ public:
   ///
   virtual void Update();
 protected:
+  QWidget* m_MainControl;
   QCheckBox* m_EnableSingleEditing;
   cherry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };

@@ -26,19 +26,33 @@
 #include <windows.h>
 #endif
 
-#include <QWidget>
 
 #include "cherryIQtPreferencePage.h"
 #include "mitkQtCommonDll.h"
 
-class QCheckBox;
+//class QCheckBox;
 
 struct MITK_QT_COMMON QmitkGeneralPreferencePage : public cherry::IQtPreferencePage
 {
-  Q_OBJECT
 
 public:
-  QmitkGeneralPreferencePage(QWidget* parent = 0, Qt::WindowFlags f = 0);
+
+  QmitkGeneralPreferencePage();
+
+  /**
+   * \see IPreferencePage::Init(IWorkbench::Pointer)
+   */
+  virtual void Init(cherry::IWorkbench::Pointer workbench);
+
+  /**
+   * \see IQtPreferencePage::CreateQtControl(Qwidget*)
+   */
+  virtual void CreateQtControl(QWidget* parent);
+
+  /**
+   * \see IQtPreferencePage::GetQtControl()
+   */
+  virtual QWidget* GetQtControl() const;
 
   ///
   /// \see IPreferencePage::PerformOk()
@@ -57,6 +71,8 @@ public:
 protected:
   cherry::IPreferences::WeakPtr m_GeneralPreferencesNode;
   //QCheckBox* m_StartMaximized;
+
+  QWidget* m_MainControl;
 
 };
 

@@ -29,10 +29,15 @@ class QmitkHotkeyLineEdit;
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public cherry::IQtPreferencePage
 {
-  Q_OBJECT
 
 public:
-  QmitkDataManagerHotkeysPrefPage(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkDataManagerHotkeysPrefPage();
+
+  void Init(cherry::IWorkbench::Pointer workbench);
+
+  void CreateQtControl(QWidget* parent);
+
+  QWidget* GetQtControl() const;
 
   ///
   /// \see IPreferencePage::PerformOk()
@@ -58,6 +63,8 @@ protected:
   /// Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
   ///
   std::map<QString, QmitkHotkeyLineEdit*> m_HotkeyEditors;
+
+  QWidget* m_MainControl;
 };
 
 #endif /* QMITKDATAMANAGERHOTKEYSPREFPAGE_H_ */

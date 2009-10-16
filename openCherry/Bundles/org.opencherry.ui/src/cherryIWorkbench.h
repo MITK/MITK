@@ -84,6 +84,8 @@ struct IWorkbenchPage;
  */
 struct CHERRY_UI IWorkbench : public IServiceLocator {
 
+  cherryInterfaceMacro(IWorkbench, cherry)
+
   virtual ~IWorkbench() {}
 
   /**

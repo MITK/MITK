@@ -90,6 +90,7 @@ protected:
   /// Saves all treewidgetitems in a map, the key is the id of the preferencepage.
   ///
   std::vector<PrefPage> m_PrefPages;
+  std::size_t m_CurrentPage;
 
   //# QWidgets
   QGridLayout* m_Layout;

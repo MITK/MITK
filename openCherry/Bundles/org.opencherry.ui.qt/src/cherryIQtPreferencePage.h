@@ -36,16 +36,18 @@ namespace cherry
  * \ingroup org_opencherry_ui
  *
  */
-struct IQtPreferencePage : public QWidget, public IPreferencePage 
+struct IQtPreferencePage : public IPreferencePage
 {
 
   cherryInterfaceMacro(IQtPreferencePage, cherry);
 
-public:
-  IQtPreferencePage(QWidget * parent = 0, Qt::WindowFlags f = 0)
-    : QWidget(parent, f)
-  {
-  }
+  virtual void CreateQtControl(QWidget* parent) = 0;
+  virtual QWidget* GetQtControl() const = 0;
+
+protected:
+
+  void CreateControl(void* parent);
+  void* GetControl() const;
 
 };
 

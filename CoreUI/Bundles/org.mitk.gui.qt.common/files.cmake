@@ -20,7 +20,6 @@ SET(MOC_H_FILES
   src/QmitkFileOpenAction.h
   src/QmitkFileExitAction.h
   src/QmitkProgressBar.h
-  src/QmitkGeneralPreferencePage.h
   src/QmitkPreferencesDialog.h
   src/internal/QmitkDnDFrameWidget.h
 )

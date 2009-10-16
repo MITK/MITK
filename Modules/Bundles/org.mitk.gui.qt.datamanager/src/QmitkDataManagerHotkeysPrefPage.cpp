@@ -32,8 +32,18 @@
 
 using namespace cherry;
 
-QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage( QWidget* parent, Qt::WindowFlags f )
-: IQtPreferencePage(parent, f)
+QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
+: m_MainControl(0)
+{
+
+}
+
+void QmitkDataManagerHotkeysPrefPage::Init(cherry::IWorkbench::Pointer )
+{
+
+}
+
+void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
   IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
   cherry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
@@ -55,6 +65,8 @@ QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage( QWidget* paren
 
   m_HotkeyEditors["Show Node Information"] = new QmitkHotkeyLineEdit("Ctrl+, I");
 
+  m_MainControl = new QWidget(parent);
+
   QGridLayout* layout = new QGridLayout;
   int i = 0;
   for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
@@ -63,11 +75,16 @@ QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage( QWidget* paren
     layout->addWidget(new QLabel(it->first), i,0);
     layout->addWidget(it->second, i,1);
     layout->setRowStretch(i,0);
-  	++i;
+    ++i;
   }
   layout->setRowStretch(i+1,10);
 
-  this->setLayout(layout);
+  m_MainControl->setLayout(layout);
+}
+
+QWidget* QmitkDataManagerHotkeysPrefPage::GetQtControl() const
+{
+  return m_MainControl;
 }
 
 bool QmitkDataManagerHotkeysPrefPage::PerformOk()

@@ -22,13 +22,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStateMachine.h>
 #include <mitkTestingMacros.h>
+#include <mitkGlobalInteraction.h>
 
 /**
  *  Simple example for a test for the (non-existent) class "StateMachine".
  *  
  *  argc and argv are the command line parameters which were passed to 
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
- *  tests, argv is either empty for the simple tests or contains the filename
+ *  tests, argv is either empty f25or the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
 int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
@@ -37,8 +38,12 @@ int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("StateMachine")
 
   std::string name("global"); //respectively "global"
+
+  // Global interaction must(!) be initialized
+  mitk::GlobalInteraction::GetInstance()->Initialize(name.c_str(), NULL);
+
   // let's create an object of our class  
-  mitk::StateMachine::Pointer myStateMachine = mitk::StateMachine::New((const char *)(&name[0]));
+  mitk::StateMachine::Pointer myStateMachine = mitk::StateMachine::New(name.c_str());
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

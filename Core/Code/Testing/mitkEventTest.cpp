@@ -16,14 +16,18 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkEvent.h>
-#include <mitkVtkPropRenderer.h>
-#include <mitkTestingMacros.h>
+#include "mitkEvent.h"
+#include "mitkVtkPropRenderer.h"
+#include "mitkTestingMacros.h"
+#include "mitkGlobalInteraction.h"
 
 
 int mitkEventTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("Event")
+
+  // Global interaction must(!) be initialized if used
+  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationData.h"
 #include "mitkTestingMacros.h"
 #include "mitkVtkPropRenderer.h"
+#include "mitkGlobalInteraction.h"
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -34,6 +35,9 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // let's create an object of our class  
   mitk::CameraVisualization::Pointer myFilter = mitk::CameraVisualization::New();
+
+  // Global interaction must(!) be initialized if used
+  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

@@ -106,7 +106,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
     return false;
 
   if (m_CurrentStateVector[m_TimeStep].IsNull())
-    return false;//m_CurrentState needs to be initailized!
+    return false;//m_CurrentState needs to be initialized!
 
   //get the Transition from m_CurrentState which waits for this EventId
   const Transition *tempTransition = m_CurrentStateVector[m_TimeStep]->GetTransition(stateEvent->GetId());
@@ -244,7 +244,7 @@ void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
     return;
   
   //get the startstate of the pattern
-  State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState((const char *)(&m_Type[0]));
+  State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState(m_Type.c_str());
 
   //clear the vector
   m_CurrentStateVector.clear();
@@ -266,7 +266,7 @@ void mitk::StateMachine::ExpandStartStateVector(unsigned int timeSteps)
 
   if ( timeSteps > oldSize )
   {
-    State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState((const char *)(&m_Type[0]));
+    State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState(m_Type.c_str());
     for ( unsigned int i = oldSize; i < timeSteps; ++i )
       m_CurrentStateVector.insert(m_CurrentStateVector.end(), startState);
   }

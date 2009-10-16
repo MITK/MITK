@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGlobalInteraction.h"
 
 #include <QFile>
-#include <QDataStream>
 
 
 void

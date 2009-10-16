@@ -16,13 +16,17 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkFocusManager.h>
+#include "mitkFocusManager.h"
 #include "mitkTestingMacros.h"
-#include <mitkVtkPropRenderer.h>
+#include "mitkVtkPropRenderer.h"
+#include "mitkGlobalInteraction.h"
 
 int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("FocusManager");
+
+  // Global interaction must(!) be initialized if used
+  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
 
   //building up necessary objects
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();

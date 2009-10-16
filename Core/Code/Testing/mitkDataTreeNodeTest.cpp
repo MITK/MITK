@@ -17,10 +17,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNode.h"
 
-#include "vtkWindow.h"
-#include <mitkVtkPropRenderer.h>
+#include <vtkWindow.h>
+#include "mitkVtkPropRenderer.h"
 
 #include "mitkTestingMacros.h"
+#include "mitkGlobalInteraction.h"
 
 #include <iostream>
 
@@ -469,9 +470,12 @@ int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("DataTreeNode")
 
+  // Global interaction must(!) be initialized
+  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+
   // let's create an object of our class  
   mitk::DataTreeNode::Pointer myDataTreeNode = mitk::DataTreeNode::New();
-  
+
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
@@ -486,9 +490,6 @@ int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
   mitkDataTreeNodeTestClass::TestPropertyList(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestSelected(myDataTreeNode);
   mitkDataTreeNodeTestClass::TestGetMTime(myDataTreeNode);
-
- 
-
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

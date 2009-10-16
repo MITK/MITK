@@ -544,7 +544,7 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
 
   this->SetFileName( fileName.c_str() );
 
-  return ( ! this->Parse() );
+  return ( this->Parse() );
 }
 
 //##Documentation
@@ -555,14 +555,14 @@ bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
   if ( xmlString.empty() )
     return false;
 
-  return ( ! this->Parse(xmlString.c_str(), xmlString.length()) );
+  return ( this->Parse(xmlString.c_str(), xmlString.length()) );
 }
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
   // Search for StateMachine.xml, bypass relative path in mitkSourceTree for additional search
 
-  std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Interactions");
+  std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions");
   if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
     return LoadBehavior(xmlFileName);
 

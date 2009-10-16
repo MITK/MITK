@@ -16,16 +16,22 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include <mitkInteractor.h>
-#include <mitkEvent.h>
-#include <mitkStateEvent.h>
-#include <mitkInteractionConst.h>
-#include <iostream>
+#include "mitkInteractor.h"
+#include "mitkEvent.h"
+#include "mitkStateEvent.h"
+#include "mitkInteractionConst.h"
+#include "mitkGlobalInteraction.h"
 #include "mitkTestingMacros.h"
+
+#include <iostream>
+
 
 int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("Interactor")
+
+  // Global interaction must(!) be initialized if used
+  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
 
   //create interactor; use pattern InteractorTestPattern
   mitk::Interactor::Pointer interactor = mitk::Interactor::New("InteractorTestPattern", NULL);

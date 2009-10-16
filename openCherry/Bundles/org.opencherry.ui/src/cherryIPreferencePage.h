@@ -43,7 +43,7 @@ namespace cherry
  * </pre>
  * </p>
  */
-struct IPreferencePage: virtual public Object
+struct CHERRY_UI IPreferencePage: virtual public Object
 {
 
   cherryInterfaceMacro(IPreferencePage, cherry)

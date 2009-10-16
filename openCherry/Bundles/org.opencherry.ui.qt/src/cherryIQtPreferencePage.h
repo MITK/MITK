@@ -36,7 +36,7 @@ namespace cherry
  * \ingroup org_opencherry_ui
  *
  */
-struct IQtPreferencePage : public IPreferencePage
+struct CHERRY_UI IQtPreferencePage : public IPreferencePage
 {
 
   cherryInterfaceMacro(IQtPreferencePage, cherry);

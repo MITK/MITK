@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define ROUND(x)       (((x) > 0) ?   int((x) + 0.5) :   int((x) - 0.5))
 #define ROUND_SHORT(x) (((x) > 0) ? short((x) + 0.5) : short((x) - 0.5))
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* property, QWidget* parent, const char* name )
-: QSlider( parent, name ),
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* property, QWidget* parent, const char* /*name*/ )
+: QSlider( parent ),
   PropertyEditor( property ),
   m_IntProperty(property),
   m_DataType(DT_INT)
@@ -34,8 +34,8 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::IntProperty* propert
   initialize();
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* property, QWidget* parent, const char* name )
-: QSlider( parent, name ),
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* property, QWidget* parent, const char* /*name*/ )
+: QSlider( parent ),
   PropertyEditor( property ),
   m_FloatProperty(property),
   m_DataType(DT_FLOAT)
@@ -43,8 +43,8 @@ QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::FloatProperty* prope
   initialize();
 }
 
-QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::DoubleProperty* property, QWidget* parent, const char* name )
-: QSlider( parent, name ),
+QmitkNumberPropertySlider::QmitkNumberPropertySlider( mitk::DoubleProperty* property, QWidget* parent, const char* /*name*/ )
+: QSlider( parent ),
   PropertyEditor( property ),
   m_DoubleProperty(property),
   m_DataType(DT_DOUBLE)
@@ -104,8 +104,8 @@ void QmitkNumberPropertySlider::adjustFactors(short newDecimalPlaces, bool newSh
     //setSuffix("");
   }
   
-  setMinValue(oldMin);
-  setMaxValue(oldMax);
+  setMinimum(oldMin);
+  setMaximum(oldMax);
 }
 
 short QmitkNumberPropertySlider::getDecimalPlaces() const
@@ -157,22 +157,22 @@ void QmitkNumberPropertySlider::setShowPercent(bool showPercent)
 
 int QmitkNumberPropertySlider::minValue() const
 {
-  return ROUND( QSlider::minValue() / m_FactorPropertyToSlider );
+  return ROUND( QSlider::minimum() / m_FactorPropertyToSlider );
 }
 
 void QmitkNumberPropertySlider::setMinValue(int value)
 {
-  QSlider::setMinValue( ROUND(value * m_FactorPropertyToSlider ) );
+  QSlider::setMinimum( ROUND(value * m_FactorPropertyToSlider ) );
 }
 
 int QmitkNumberPropertySlider::maxValue() const
 {
-  return ROUND( QSlider::maxValue() / m_FactorPropertyToSlider );
+  return ROUND( QSlider::maximum() / m_FactorPropertyToSlider );
 }
 
 void QmitkNumberPropertySlider::setMaxValue(int value)
 {
-  QSlider::setMaxValue( ROUND( value * m_FactorPropertyToSlider ) );
+  QSlider::setMaximum( ROUND( value * m_FactorPropertyToSlider ) );
 }
 
 double QmitkNumberPropertySlider::doubleValue() const

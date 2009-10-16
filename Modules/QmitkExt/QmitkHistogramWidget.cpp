@@ -37,7 +37,7 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget *parent, bool showreport)
 
   //***histogram***
 
-  QGroupBox *hgroupbox = new QGroupBox("", this, "histogram");
+  QGroupBox *hgroupbox = new QGroupBox("", this);
 
   hgroupbox->setMinimumSize(900, 400);
 
@@ -61,11 +61,11 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget *parent, bool showreport)
   if (showreport == true)
   {
     //***report***
-    QGroupBox *rgroupbox = new QGroupBox("", this, "report");
+    QGroupBox *rgroupbox = new QGroupBox("", this);
 
     rgroupbox->setMinimumSize(900, 400);
 
-    QLabel *label = new QLabel("Gray  Value  Analysis", rgroupbox, "report");
+    QLabel *label = new QLabel("Gray  Value  Analysis", rgroupbox);
     label->setAlignment(Qt::AlignHCenter);
     label->setFont(QFont("Helvetica", 14, QFont::Bold));
 

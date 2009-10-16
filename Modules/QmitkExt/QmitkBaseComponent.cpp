@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qgroupbox.h>
 
 /***************       CONSTRUCTOR      ***************/
-QmitkBaseComponent::QmitkBaseComponent(QObject *parent, const char *name)
-: QObject(parent, name),
+QmitkBaseComponent::QmitkBaseComponent(QObject *parent, const char* name)
+: QObject(parent),
 m_FuncName(name),
 m_Parent(parent)
 {

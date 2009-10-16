@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 
-#include <Q3VBox>
+#include <QWidget>
 #include <map>
 
 namespace mitk
@@ -57,7 +57,7 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkSlicesInterpolator : public Q3VBox
+class QMITKEXT_EXPORT QmitkSlicesInterpolator : public QWidget
 {
   Q_OBJECT
 

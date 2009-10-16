@@ -364,7 +364,7 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
   {
     QWidget* componentWidget = component->CreateControlWidget(m_GUI);
     AddComponentListener(component);
-    m_GUI->layout()->add(componentWidget);
+    m_GUI->layout()->addWidget(componentWidget);
     component->CreateConnections();
     if(m_Spacer != NULL)
     {

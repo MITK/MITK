@@ -4,7 +4,7 @@
 #include <qlayout.h>
 
 QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent, const char* name)
-: QDialog(parent, name)
+: QDialog(parent)
 {
   QBoxLayout * layout = new QVBoxLayout( this );
   //!mmueller

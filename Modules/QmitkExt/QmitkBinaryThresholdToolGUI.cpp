@@ -38,7 +38,12 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   label->setFont( f );
   layout->addWidget(label);
 
-  m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
+  //m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
+  m_Slider = new QSlider( Qt::Horizontal, this );
+  m_Slider->setMinimum(5);
+  m_Slider->setMaximum(20);
+  m_Slider->setPageStep(1);
+  m_Slider->setValue(1);
   connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
   layout->addWidget( m_Slider );
 

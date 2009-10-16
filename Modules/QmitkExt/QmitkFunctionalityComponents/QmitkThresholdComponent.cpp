@@ -418,7 +418,7 @@ void QmitkThresholdComponent::ThresholdSliderChanged(int)
 //By LineEdit
 void QmitkThresholdComponent::ThresholdValueChanged( )
 {
-  int value = atoi( m_ThresholdInputNumber->text());
+  int value = atoi( m_ThresholdInputNumber->text().toLocal8Bit().constData() );
   if (m_ThresholdImageNode)
   {
     m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(value,1));
@@ -455,8 +455,8 @@ void QmitkThresholdComponent::SetSliderRange()
         m_ThresholdInputNumber->setValidator(intValid);
         m_ThresholdInputNumber->setText("1");
         
-        m_ThresholdInputSlider->setMinValue(min-150);
-        m_ThresholdInputSlider->setMaxValue(max+150);
+        m_ThresholdInputSlider->setMinimum(min-150);
+        m_ThresholdInputSlider->setMaximum(max+150);
         m_ThresholdInputSlider->setRange(min-150, max+150);
         m_ThresholdInputSlider->setPageStep(1);
         m_ThresholdInputSlider->setValue(1);
@@ -507,7 +507,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
     int layer = 0;
     m_ThresholdImageNode->GetIntProperty("layer", layer);
     m_ThresholdImageNode->SetIntProperty("layer", layer+1);
-    m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(atoi( m_ThresholdInputNumber->text()),1));
+    m_ThresholdImageNode->SetLevelWindow(mitk::LevelWindow(atoi( m_ThresholdInputNumber->text().toLocal8Bit().constData()),1));
     m_ThresholdNodeExisting = true;
     m_DataStorage->Add(m_ThresholdImageNode);
     
@@ -626,7 +626,7 @@ void QmitkThresholdComponent::ITKThresholding( itk::Image<TPixel, VImageDimensio
 
   while (!outputIterator.IsAtEnd())
   {
-    if ( (signed)inputIterator.Get() >= atoi( m_ThresholdInputNumber->text()) )
+    if ( (signed)inputIterator.Get() >= atoi( m_ThresholdInputNumber->text().toLocal8Bit().constData()) )
     {
       outputIterator.Set( 1 );
     }

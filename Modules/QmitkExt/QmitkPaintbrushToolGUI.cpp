@@ -46,7 +46,12 @@ QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI()
   m_SizeLabel->setFont( f );
   layout->addWidget(m_SizeLabel);
 
-  m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
+  //m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
+  m_Slider = new QSlider( Qt::Horizontal, this );
+  m_Slider->setMinimum(1);
+  m_Slider->setMaximum(50);
+  m_Slider->setPageStep(1);
+  m_Slider->setValue(10);
   connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
   layout->addWidget( m_Slider );
 

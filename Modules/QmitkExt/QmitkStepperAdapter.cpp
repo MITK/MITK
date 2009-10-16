@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStepperAdapter.h"
 
 QmitkStepperAdapter::QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper, const char * name )
-  : QObject( navigator, name ), m_Stepper(stepper)
+  : QObject( navigator ), m_Stepper(stepper)
 {
   connect(this, SIGNAL(SendStepper(mitk::Stepper *)), navigator, SLOT(SetStepper(mitk::Stepper *)));
   connect(this, SIGNAL(Refetch()), navigator, SLOT(Refetch()));

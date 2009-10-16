@@ -9,16 +9,16 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   this->setupUi(this);
 
   //insert Transfer Function Combo Box
-  m_TransferFunctionComboBox->insertItem( " choose Transferfunction ..");
-  m_TransferFunctionComboBox->insertItem( "Ramp between 25% & 50%, Tan");
-  m_TransferFunctionComboBox->insertItem( "Ramp between 25% & 75%, Tan");
-  m_TransferFunctionComboBox->insertItem( "CT AAA");
-  m_TransferFunctionComboBox->insertItem( "CT Bone");
-  m_TransferFunctionComboBox->insertItem( "CT Cardiac");
-  m_TransferFunctionComboBox->insertItem( "CT Coronary arteries");
-  m_TransferFunctionComboBox->insertItem( "MR Default");
-  m_TransferFunctionComboBox->insertItem( "MR MIP");
-  m_TransferFunctionComboBox->insertItem( "MITK Default");
+  m_TransferFunctionComboBox->addItem( " choose Transferfunction ..");
+  m_TransferFunctionComboBox->addItem( "Ramp between 25% & 50%, Tan");
+  m_TransferFunctionComboBox->addItem( "Ramp between 25% & 75%, Tan");
+  m_TransferFunctionComboBox->addItem( "CT AAA");
+  m_TransferFunctionComboBox->addItem( "CT Bone");
+  m_TransferFunctionComboBox->addItem( "CT Cardiac");
+  m_TransferFunctionComboBox->addItem( "CT Coronary arteries");
+  m_TransferFunctionComboBox->addItem( "MR Default");
+  m_TransferFunctionComboBox->addItem( "MR MIP");
+  m_TransferFunctionComboBox->addItem( "MITK Default");
 
   // signals and slots connections
   connect(m_XEdit, SIGNAL(returnPressed()), this, SLOT(SetXValue()));

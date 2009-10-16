@@ -48,8 +48,8 @@ void QmitkPrimitiveMovieNavigatorWidget::Refetch()
   if(!m_InRefetch)
   {
     m_InRefetch=true;
-    m_Controls.m_SpinBox->setMinValue( 0 );
-    m_Controls.m_SpinBox->setMaxValue( m_Stepper->GetSteps()-1 );
+    m_Controls.m_SpinBox->setMinimum( 0 );
+    m_Controls.m_SpinBox->setMaximum( m_Stepper->GetSteps()-1 );
     m_Controls.m_SpinBox->setValue( m_Stepper->GetPos() );
     m_InRefetch=false;
   }
@@ -113,7 +113,7 @@ void QmitkPrimitiveMovieNavigatorWidget::setTimerInterval( int timerIntervalInMS
     m_TimerIntervalInMS = timerIntervalInMS;
     if(m_Timer->isActive())
     {
-      m_Timer->changeInterval(m_TimerIntervalInMS);
+      m_Timer->setInterval(m_TimerIntervalInMS);
     }
   }
 }

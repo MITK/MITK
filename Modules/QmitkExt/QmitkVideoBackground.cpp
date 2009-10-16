@@ -48,7 +48,7 @@ mitk::QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int Timer
 void mitk::QmitkVideoBackground::ResetVideoBackground()
 {
   m_renderWindowVectorInfo.clear();
-  m_QTimer = new QTimer(this, "VideoTimer");
+  m_QTimer = new QTimer(this);
   connect( m_QTimer, SIGNAL(timeout()), SLOT(UpdateVideo()) );
 }
 

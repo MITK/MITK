@@ -56,16 +56,16 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     {
       proposedName.append(propFileName).append(fileWriter->GetDefaultExtension());
     }
-    fileName = QFileDialog::getSaveFileName(proposedName,fileWriter->GetFileDialogPattern());
+    fileName = QFileDialog::getSaveFileName(NULL, "Save file", proposedName,fileWriter->GetFileDialogPattern());
 
     // Check if an extension exists already and if not, append the default extension
-    if ( fileName.find( '.' ) == -1 )
+    if ( !fileName.contains( QRegExp("\\.\\w+$") ) )
     {
       fileName.append( fileWriter->GetDefaultExtension() );
     }
     else
     {
-      std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName.ascii() );
+      std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName.toLocal8Bit().constData() );
       if (!fileWriter->IsExtensionValid(extension))
       {
         QString message;
@@ -80,7 +80,7 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
     fileName = aFileName;
 
   //check if file is valid for writing
-  if(!IsFilenameValidForWriting(fileName.ascii()))
+  if(!IsFilenameValidForWriting(fileName.toLocal8Bit().constData()))
   {
     QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
     return;
@@ -88,7 +88,7 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
 
   if (fileName.isEmpty() == false )
   {
-    fileWriter->SetFileName( fileName.ascii() );
+    fileWriter->SetFileName( fileName.toLocal8Bit().constData() );
     fileWriter->DoWrite( data );
   }
 }
@@ -170,10 +170,10 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             fileName = aFileName;
           fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
           fileName += ".mps";
-          QString qfileName = QFileDialog::getSaveFileName(QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
+          QString qfileName = QFileDialog::getSaveFileName(NULL, "Save file", QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
 
           //check if file is valid for writing
-          if(!IsFilenameValidForWriting(qfileName.ascii()))
+          if(!IsFilenameValidForWriting(qfileName.toLocal8Bit().constData()))
           {
             QMessageBox::critical(NULL,"ERROR","Could not write file. Please choose a valid directory and name.");
             writingSuccessful = false;
@@ -181,7 +181,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
           }
 
           mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
-          std::string extension = itksys::SystemTools::GetFilenameLastExtension( qfileName.ascii() );
+          std::string extension = itksys::SystemTools::GetFilenameLastExtension( qfileName.toLocal8Bit().constData() );
           // check if extension is valid
           if (!writer->IsExtensionValid(extension))
           {
@@ -195,7 +195,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
           if (fileName.empty() == false )
           {
             writer->SetInput( pointset );
-            writer->SetFileName( qfileName.ascii() );
+            writer->SetFileName( qfileName.toLocal8Bit().constData() );
             writer->Update();
             fileNameUsed = writer->GetFileName();
             writingSuccessful = true;
@@ -341,6 +341,10 @@ mitk::DataTreeNode::Pointer CommonFunctionality::AddPicImageToDataTree(mitkIpPic
   return node;
 }
 
+mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const QString& fileName)
+{
+  return FileOpen( fileName.toLocal8Bit().constData() );
+}
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName )
 {
@@ -359,6 +363,10 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName
   }
 }
 
+mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const QString& aFileName)
+{
+  return FileOpenImageSequence( aFileName.toLocal8Bit().constData() );
+}
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const char* aFileName)
 {
@@ -369,21 +377,21 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const cha
   QString fileName = aFileName;
   if (!fileName.contains("dcm") && !fileName.contains("DCM"))
   {
-    int fnstart = fileName.findRev( QRegExp("[/\\\\]"), fileName.length() );
+    int fnstart = fileName.lastIndexOf( QRegExp("[/\\\\]"), fileName.length() );
     if(fnstart<0) fnstart=0;
-    int start = fileName.find( QRegExp("[0-9]"), fnstart );
+    int start = fileName.indexOf( QRegExp("[0-9]"), fnstart );
     if(start<0)
     {
-      return FileOpen(fileName.ascii());;
+      return FileOpen(fileName.toLocal8Bit().constData());;
     }
 
     char prefix[1024], pattern[1024];
 
-    strncpy(prefix, fileName.ascii(), start);
+    strncpy(prefix, fileName.toLocal8Bit().constData(), start);
     prefix[start]=0;
 
-    int stop=fileName.find( QRegExp("[^0-9]"), start );
-    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.ascii()+stop);
+    int stop=fileName.indexOf( QRegExp("[^0-9]"), start );
+    sprintf(pattern, "%%s%%0%uu%s",stop-start,fileName.toLocal8Bit().constData()+stop);
 
 
     factory->SetFilePattern( pattern );
@@ -392,8 +400,8 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const cha
   else
   {
     //    factory->SetFileName( fileName );
-    factory->SetFilePattern( fileName.ascii() );
-    factory->SetFilePrefix( fileName.ascii() );
+    factory->SetFilePattern( fileName.toLocal8Bit().constData() );
+    factory->SetFilePrefix( fileName.toLocal8Bit().constData() );
   }
   factory->Update();
   return factory->GetOutput( 0 );
@@ -418,13 +426,18 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen()
 {
   return CommonFunctionality::FileOpenSpecific( mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
 }
+  
+mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const QString& fileExtensions)
+{
+  return FileOpenSpecific( fileExtensions.toLocal8Bit().constData() );
+}
 
 mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const char *fileExtensions )
 {
   QString fileName = QFileDialog::getOpenFileName( NULL, fileExtensions );
   if ( !fileName.isNull() )
   {
-    mitk::DataTreeNode::Pointer result = FileOpen(fileName.ascii());
+    mitk::DataTreeNode::Pointer result = FileOpen(fileName.toLocal8Bit().constData());
     if ( result.IsNull() )
     {
       return FileOpenImageSequence(fileName);
@@ -594,7 +607,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 
   std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
   selectedItemsName += ".stl";
-  QString qfileName = QFileDialog::getSaveFileName(QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk *.vtp)");
+  QString qfileName = QFileDialog::getSaveFileName(NULL, "Save surface object", QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk *.vtp)");
   if (!(qfileName.isEmpty()) )
   {
     //check if file is valid for writing
@@ -622,7 +635,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       }
 
       writer->SetInput( surface );
-      writer->SetFileName(qfileName.latin1());
+      writer->SetFileName(qfileName.toLocal8Bit().constData());
       writer->GetVtkWriter()->SetFileTypeToBinary();
       writer->Write();
     }
@@ -631,7 +644,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
     {
       mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
       writer->SetInput( surface );
-      writer->SetFileName(qfileName.latin1());
+      writer->SetFileName(qfileName.toLocal8Bit().constData());
       writer->GetVtkWriter()->SetDataModeToBinary();
       writer->Write();
     }
@@ -641,7 +654,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
         qfileName += ".vtk";*/
       mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
       writer->SetInput( surface );
-      writer->SetFileName(qfileName.latin1());
+      writer->SetFileName(qfileName.toLocal8Bit().constData());
       writer->Write();
     }
     else
@@ -650,7 +663,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
       QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Surface data. Choose .vtk, .stl or .vtp");
       return "";
     }
-    fileName = qfileName.ascii();
+    fileName = qfileName.toLocal8Bit().constData();
   }
   else
   {
@@ -674,10 +687,10 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
     // prepend the last directory
     initialFilename = lastDirectory + initialFilename;
-    QString qfileName = QFileDialog::getSaveFileName( initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
+    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
     if (qfileName.isEmpty() )
       return "";
-    fileName = qfileName.ascii();
+    fileName = qfileName.toLocal8Bit().constData();
   }
   else
     fileName = aFileName;
@@ -803,10 +816,10 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
     //
     // show a file selector with the supported file formats
     //
-    QString qfileName = QFileDialog::getSaveFileName( QString( "" ), QString( ".png" ).lower() );
+    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save screenshot", QString( "" ), QString( ".png" ).toLocal8Bit().constData() );
     if ( qfileName.isEmpty() )
       return "";
-    concreteFilename = qfileName.latin1();
+    concreteFilename = qfileName.toLocal8Bit().constData();
   }
   else
     concreteFilename = filename;

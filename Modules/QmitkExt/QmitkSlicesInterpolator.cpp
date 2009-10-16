@@ -44,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QPushButton>
 #include <QMenu>
 #include <QCursor>
+#include <QVBoxLayout>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -58,7 +59,7 @@ const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSl
 
 
 QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* name)
-:Q3VBox(parent, name),
+:QWidget(parent),
  ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
  m_Interpolator( mitk::SegmentationInterpolationController::New() ),
  m_MultiWidget(NULL),
@@ -68,13 +69,17 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* na
  m_LastSliceIndex(0),
  m_InterpolationEnabled(false)
 {
+  QVBoxLayout* layout = new QVBoxLayout(this);
+
   m_BtnAcceptInterpolation = new QPushButton("Accept", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
+  layout->addWidget( m_BtnAcceptInterpolation );
 
   m_BtnAcceptAllInterpolations = new QPushButton("Accept all interpolations", this);
   m_BtnAcceptAllInterpolations->setEnabled( false );
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
+  layout->addWidget( m_BtnAcceptAllInterpolations );
 
   itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
   command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnInterpolationInfoChanged );
@@ -147,7 +152,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   {
     // set enabled only if a segmentation is selected
     mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
-    Q3VBox::setEnabled( node != NULL );
+    QWidget::setEnabled( node != NULL );
 
     // react whenever the set of selected segmentation changes
     m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSlicesInterpolator>( this, &QmitkSlicesInterpolator::OnToolManagerWorkingDataModified );
@@ -508,7 +513,7 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
   {
     mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
     mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
-    Q3VBox::setEnabled( workingNode != NULL );
+    QWidget::setEnabled( workingNode != NULL );
 
     m_BtnAcceptAllInterpolations->setEnabled( on );
     m_BtnAcceptInterpolation->setEnabled( on );

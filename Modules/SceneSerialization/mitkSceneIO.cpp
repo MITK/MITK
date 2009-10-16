@@ -163,16 +163,17 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
 }
     
-bool mitk::SceneIO::SaveScene( DataStorage* storage,
-                               const std::string& filename,
-                               NodePredicateBase* predicate )
+bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
+                                           const std::string& filename)
 {
-  m_FailedNodes = DataStorage::SetOfObjects::New();
-  m_FailedProperties = PropertyList::New();
-
+  if (!sceneNodes) 
+  {
+    LOG_ERROR << "No set of nodes given. Not possible to save scene.";
+    return false;
+  }
   if (!storage) 
   {
-    LOG_ERROR << "No data storage given. Not possible to save scene.";
+    LOG_ERROR << "No data storage given. Not possible to save scene.";  // \TODO: Technically, it would be possible to save the nodes without their relation
     return false;
   }
 
@@ -182,9 +183,12 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
     return false;
   }
 
+  m_FailedNodes = DataStorage::SetOfObjects::New();
+  m_FailedProperties = PropertyList::New();
+
   // start XML DOM
   TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" ); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
   document.LinkEndChild( decl );
 
   TiXmlElement* version = new TiXmlElement("Version");
@@ -193,20 +197,20 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
   version->SetAttribute("FileVersion",  1 );
   document.LinkEndChild(version);
  
-  DataStorage::SetOfObjects::ConstPointer objectsToStore = storage->GetSubset( predicate );
+  //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
-  if ( objectsToStore.IsNull() )
+  if ( sceneNodes.IsNull() )
   {
     LOG_WARN << "Saving empty scene to " << filename;
   }
   else
   {
-    if ( objectsToStore->size() == 0 )
+    if ( sceneNodes->size() == 0 )
     {
       LOG_WARN << "Saving empty scene to " << filename;
     }
 
-    LOG_INFO << "Storing scene with " << objectsToStore->size() << " objects to " << filename;
+    LOG_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
   
     m_WorkingDirectory = CreateEmptyTempDirectory();
     if (m_WorkingDirectory.empty())
@@ -215,7 +219,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       return false;
     }
    
-    ProgressBar::GetInstance()->AddStepsToDo( objectsToStore->size() );
+    ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
  
     // find out about dependencies
     typedef std::map< DataTreeNode*, std::string > UIDMapType;
@@ -226,12 +230,13 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
 
     UIDGenerator nodeUIDGen("OBJECT_");
 
-    for (DataStorage::SetOfObjects::const_iterator iter = objectsToStore->begin();
-         iter != objectsToStore->end();
+    for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
+         iter != sceneNodes->end();
          ++iter)
     {
       DataTreeNode* node = iter->GetPointer();
-      if (!node)  continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
+      if (!node)  
+        continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
     
       // generate UIDs for all source objects  
       DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources( node );
@@ -239,7 +244,8 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
             sourceIter != sourceObjects->end();
             ++sourceIter )
       {
-        if ( std::find( objectsToStore->begin(), objectsToStore->end(), *sourceIter ) == objectsToStore->end() ) continue; // source is not saved, so don't generate a UID for this source
+        if ( std::find( sceneNodes->begin(), sceneNodes->end(), *sourceIter ) == sceneNodes->end() ) 
+          continue; // source is not saved, so don't generate a UID for this source
 
         // create a uid for the parent object
         if ( nodeUIDs[ *sourceIter ].empty() )
@@ -258,8 +264,8 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
     }
    
     // write out objects, dependencies and properties
-    for (DataStorage::SetOfObjects::const_iterator iter = objectsToStore->begin();
-         iter != objectsToStore->end();
+    for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
+         iter != sceneNodes->end();
          ++iter)
     {
       DataTreeNode* node = iter->GetPointer();
@@ -340,8 +346,6 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
           TiXmlElement* propertiesElement( SavePropertyList( propertyList, filenameHint + "-node") ); // returns a reference to a file
           nodeElement->LinkEndChild( propertiesElement );
         }
-
-            
         document.LinkEndChild( nodeElement );
       }
       else
@@ -352,7 +356,7 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       ProgressBar::GetInstance()->Progress();
     } // end for all nodes
 
-  } // end if objectsToStore
+  } // end if sceneNodes
 
   if ( !document.SaveFile( m_WorkingDirectory + "/index.xml" ) )
   {
@@ -392,10 +396,10 @@ bool mitk::SceneIO::SaveScene( DataStorage* storage,
       LOG_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
       return false;
     }
-
     return true;
   }
 }
+
 
 TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error )
 {
@@ -403,7 +407,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   error = true;
 
   // find correct serializer
-  // the serilizer must
+  // the serializer must
   //  - create a file containing all information to recreate the BaseData object --> needs to know where to put this file (and a filename?)
   //  - TODO what to do about writers that creates one file per timestep?
   TiXmlElement* element = new TiXmlElement("data");

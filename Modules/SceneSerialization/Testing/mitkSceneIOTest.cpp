@@ -125,28 +125,29 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 
   SceneIOTestClass::FillStorage(storage);
 
-  MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage, "scene.zip" ),
+  MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, "scene.zip" ),
                                 "Saving scene file" );
 
   mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
   if (failedNodes.IsNotNull())
   {
-    std::cout << "The following nodes could not be serialized:" << std::endl;
+    MITK_TEST_OUTPUT( << "The following nodes could not be serialized:");
     for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
           iter != failedNodes->end();
           ++iter )
     {
-      std::cout << " - ";
+      MITK_TEST_OUTPUT_NO_ENDL( << " - ");
       if ( mitk::BaseData* data =(*iter)->GetData() )
       {
-        std::cout << data->GetNameOfClass();
+        MITK_TEST_OUTPUT_NO_ENDL( << data->GetNameOfClass());
       }
       else
       {
-        std::cout << "(NULL)";
+        MITK_TEST_OUTPUT_NO_ENDL( << "(NULL)");
       }
 
-      std::cout << " contained in node '" << (*iter)->GetName() << "'" << std::endl;
+      MITK_TEST_OUTPUT( << " contained in node '" << (*iter)->GetName() << "'");
+      // \TODO: should we fail the test case if failed properties exist?
     }
   }
 
@@ -159,11 +160,9 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
           iter != propmap->end();
           ++iter )
     {
-      std::cout << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
+      MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
+      // \TODO: should we fail the test case if failed properties exist?
     }
   }
-
-
   MITK_TEST_END()
 }
-

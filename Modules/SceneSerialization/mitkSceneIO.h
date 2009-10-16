@@ -60,7 +60,8 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     /**
      * \brief Save a scene of objects to file
-     * \return Success or not. If writing failed, query GetFailedNodes() and GetFailedProperties() for more detail.
+     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if false is returned,
+               it just will not contain every node/property. If writing failed, query GetFailedNodes() and GetFailedProperties() for more detail.
      *
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
@@ -69,9 +70,8 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
      * \param filename full filename of the scene file
      * \param predicate defining which items of the datastorage to use and which not
      */
-    virtual bool SaveScene( DataStorage* storage,
-                            const std::string& filename,
-                            NodePredicateBase* predicate = NULL );
+    virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
+                            const std::string& filename);
 
     /** 
      * \brief Get a list of nodes (BaseData containers) that failed to be read/written.

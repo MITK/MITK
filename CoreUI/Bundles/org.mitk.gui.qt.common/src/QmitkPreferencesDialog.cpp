@@ -251,7 +251,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
           {
             Poco::File f(fileNames.at(0).toStdString());
             cherryPrefService->ImportPreferences(f, "");
-            cherry::IQtPreferencePage::Pointer prefPage = m_PrefPages[m_CurrentPage].prefPage;
+            cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
             if(prefPage)
               prefPage->Update();
 

@@ -69,7 +69,7 @@ namespace mitk {
     typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
     //##Documentation
-    //## set the global StateMachine. If temporaryly changed,
+    //## set the global StateMachine. If temporarily changed,
     //## then copy the old statemachine with GetStateMachine()
     static void SetGlobalStateMachine(StateMachine* stateMachine);
 
@@ -77,8 +77,8 @@ namespace mitk {
 
     //##Documentation
     //## searches the Event in m_EventDescription
-    //## and if included transmitts the event to globalInteraction
-    //## the optinal parameter should be used in a conference to avoid a
+    //## and if included transmits the event to globalInteraction
+    //## the optional parameter should be used in a conference to avoid a
     //## feedback
     static bool MapEvent(Event* event, int mitkPostedEventID=0 );
     
@@ -91,7 +91,12 @@ namespace mitk {
     //##Documentation
     //## loads an XML-File containing Events into m_EventDescriptions
     //## also involved: EventMapper::startEvent(...)
-    static bool LoadBehavior(std::string fileName);
+    bool LoadBehavior(std::string fileName);
+
+    //##Documentation
+    //## loads Events into m_EventDescriptions from xml string
+    //## also involved: EventMapper::startEvent(...)
+    bool LoadBehaviorString(std::string xmlString);
 
     //##Documentation
     //## Try to load standard behavior file "StateMachine.xml"
@@ -101,7 +106,7 @@ namespace mitk {
     //## \li try "./StateMachine.xml"
     //## \li try via source directory (using MITKROOT from cmake-created
     //## mitkConfig.h) "MITKROOT/Interactions/mitkBaseInteraction/StateMachine.xml"
-    static bool LoadStandardBehavior();
+    bool LoadStandardBehavior();
 
     //##Documentation
     //## reads a Tag from an XML-file

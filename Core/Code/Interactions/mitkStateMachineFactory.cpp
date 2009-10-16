@@ -105,6 +105,19 @@ bool mitk::StateMachineFactory::LoadBehavior(std::string fileName)
   return this->Parse();
 }
 
+/**
+* @brief Loads the xml string and generates the necessary instances.
+**/
+bool mitk::StateMachineFactory::LoadBehaviorString(std::string xmlString)
+{
+  if ( xmlString.empty() )
+    return false;
+
+  m_LastLoadedBehavior = "String";
+
+  return ( ! this->Parse(xmlString.c_str(), xmlString.length()) );
+}
+
 bool mitk::StateMachineFactory::LoadStandardBehavior()
 {
   std::string xmlFileName( mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions") );
@@ -117,7 +130,7 @@ bool mitk::StateMachineFactory::LoadStandardBehavior()
 
 
 /**
-* @brief Recusive method, that parses this brand of 
+* @brief Recursive method, that parses this brand of 
 * the stateMachine; if the history has the same 
 * size at the end, then the StateMachine is correct
 **/

@@ -82,6 +82,11 @@ namespace mitk {
     bool LoadBehavior(std::string fileName);
 
     /**
+    * @brief loads the xml string and generates the necessary instances
+    **/
+    bool LoadBehaviorString(std::string xmlString);
+
+    /**
     * @brief Try to load standard behavior file "StateMachine.xml"
     *
     * Search strategy:

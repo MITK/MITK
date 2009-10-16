@@ -17,54 +17,37 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkGlobalInteraction.h"
-#include <mitkStateMachineFactory.h>
-#include <mitkEventMapper.h>
 #include "mitkInteractionConst.h"
 #include "mitkEvent.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
-#include <mitkPositionEvent.h>
+#include "mitkPositionEvent.h"
 #include <vtkWorldPointPicker.h>
 
 
-mitk::GlobalInteraction::GlobalInteraction(const char* type, const char* XMLbehaviorFile)
-: StateMachine(type),
-  m_CurrentlyInInformListenersLoop(false)
+mitk::GlobalInteraction::GlobalInteraction()
+: StateMachine(NULL), 
+  m_CurrentlyInInformListenersLoop(false), m_IsInitialized(false)
 {
-  m_FocusManager = FocusManager::New();
-
-  // instancialte m_StateMachineFactory and load interaction patterns from XML-file
-  m_StateMachineFactory = StateMachineFactory::New();
-  
-  //load standard behaviour from file
-  if (XMLbehaviorFile==NULL)
-    m_StateMachineFactory->LoadStandardBehavior();
-  else 
-    m_StateMachineFactory->LoadBehavior(XMLbehaviorFile);
-
-  // load event-mappings from XML-file
-  if(XMLbehaviorFile==NULL)
-    mitk::EventMapper::LoadStandardBehavior();
-  else
-    mitk::EventMapper::LoadBehavior(XMLbehaviorFile);
-
-  //now instanciate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
-  
-  //get the startstate of the pattern
-  State::Pointer startState = m_StateMachineFactory->GetStartState(type);
-
-  //clear the vector
-  m_CurrentStateVector.clear();
-  //add the startstate pointer for the first timestep to the list
-  m_CurrentStateVector.push_back(startState);
 }
 
 mitk::GlobalInteraction::~GlobalInteraction()
 {
   //s_GlobalInteraction doesn't have to be set = NULL;
+
   m_FocusManager = NULL;
+
+  // StateMachineFactory and EventMapper have to be deleted explicitly, as they inherit from Vtk
   if (m_StateMachineFactory)
+  {
     m_StateMachineFactory->Delete();
+    m_StateMachineFactory = NULL;
+  }
+  if (m_EventMapper)
+  {
+    m_EventMapper->Delete();
+    m_EventMapper = NULL;
+  }
 }
 
 
@@ -114,7 +97,7 @@ void mitk::GlobalInteraction::RemoveFlaggedListeners()
 {
   if (m_CurrentlyInInformListenersLoop) return;
 
-  // iterate flagged listeners, remove them if possibleA
+  // iterate flagged listeners, remove them if possible
   if (m_ListenersFlaggedForRemoval.empty()) return;
 
   for (StateMachineCPointerListIter it = m_ListenersFlaggedForRemoval.begin(); it != m_ListenersFlaggedForRemoval.end(); ++it)
@@ -327,27 +310,13 @@ bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent con
 }
 
 
-mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance(const char* globalInteractionName, const char* XMLbehaviorFile)
+mitk::GlobalInteraction* mitk::GlobalInteraction::GetInstance()
 {
   static mitk::GlobalInteraction::Pointer s_GlobalInteraction;
 
   if (s_GlobalInteraction.IsNull())
   {
-    //if the globalInteraction gets initialized we return into this method during buildup (StateMachine Constructor).
-    //to not recursively run into this method a static bool flag is used
-    static bool inGlobalInteractionBuildUp = false;
-    if (!inGlobalInteractionBuildUp)
-    {
-      inGlobalInteractionBuildUp = true;
-      //if not specified, then set to standard pattern "global"
-      if (globalInteractionName == NULL)
-        globalInteractionName = "global";
-
-      //first call influences behavior file and interaction name
-      s_GlobalInteraction = mitk::GlobalInteraction::New(globalInteractionName, XMLbehaviorFile);
-    }
-    else
-      return NULL;
+    s_GlobalInteraction = mitk::GlobalInteraction::New();
   }
   return s_GlobalInteraction;
 }
@@ -395,3 +364,91 @@ mitk::StateMachineFactory* mitk::GlobalInteraction::GetStateMachineFactory()
   return m_StateMachineFactory;
 }
 
+bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, std::string XMLbehaviorString)
+{
+  if (XMLbehaviorString == "")
+  {
+    itkExceptionMacro(<<"Global Interaction needs a valid XML pattern.");
+    return this->Initialize("global", NULL);
+  }
+  else if (this->IsInitialized())
+  {
+    itkExceptionMacro(<<"Global Interaction has already been initialized.");
+    return false;
+  }
+  else
+  {
+    m_FocusManager = FocusManager::New();
+
+    // instantiates m_StateMachineFactory and load interaction patterns from XML string
+    m_StateMachineFactory = StateMachineFactory::New();
+    m_EventMapper = EventMapper::New();
+
+    //load standard behavior from XML string
+    m_StateMachineFactory->LoadBehaviorString(XMLbehaviorString);
+
+    // load event-mappings from XML string
+    m_EventMapper->LoadBehaviorString(XMLbehaviorString);
+
+    // (Re-) Initialize Superclass (StateMachine), because type was not given at time of construction
+    m_Type = globalInteractionName;
+    Superclass::InitializeStartStates(1);
+
+    //now instantiate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+
+    //get the start state of the pattern
+    State::Pointer startState = m_StateMachineFactory->GetStartState(globalInteractionName);
+
+    //clear the vector
+    m_CurrentStateVector.clear();
+    //add the start state pointer for the first time step to the list
+    m_CurrentStateVector.push_back(startState);
+    m_IsInitialized = true;
+    return true;
+  }  
+}
+
+bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, const char* XMLbehaviorFile)
+{
+  if (this->IsInitialized())
+  {
+    itkExceptionMacro(<<"Global Interaction has already been initialized.");
+    return false;
+  }
+  else
+  {
+    m_FocusManager = FocusManager::New();
+
+    // instantiates m_StateMachineFactory and load interaction patterns from XML-file
+    m_StateMachineFactory = StateMachineFactory::New();
+    m_EventMapper = EventMapper::New();
+
+    //load standard behavior from file
+    if (XMLbehaviorFile==NULL)
+      m_StateMachineFactory->LoadStandardBehavior();
+    else 
+      m_StateMachineFactory->LoadBehavior(XMLbehaviorFile);
+
+    // load event-mappings from XML-file
+    if(XMLbehaviorFile==NULL)
+      m_EventMapper->LoadStandardBehavior();
+    else
+      m_EventMapper->LoadBehavior(XMLbehaviorFile);
+
+    // (Re-) Initialize Superclass (StateMachine), because type was not given at time of construction
+    m_Type = globalInteractionName;
+    Superclass::InitializeStartStates(1);
+
+    //now instantiate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+
+    //get the start state of the pattern
+    State::Pointer startState = m_StateMachineFactory->GetStartState(globalInteractionName);
+
+    //clear the vector
+    m_CurrentStateVector.clear();
+    //add the start state pointer for the first time step to the list
+    m_CurrentStateVector.push_back(startState);
+    m_IsInitialized = true;
+    return true;
+  }
+}

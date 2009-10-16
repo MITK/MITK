@@ -5,5 +5,7 @@
 	<file>edit-undo.png</file> 
 	<file>preferences-system.png</file> 
 	<file>system-log-out.png</file>
+	<file>StateMachine.xml</file>
  </qresource>
  </RCC>
+

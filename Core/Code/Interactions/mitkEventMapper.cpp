@@ -542,25 +542,26 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
   if ( fileName.empty() )
     return false;
 
-  mitk::EventMapper* eventMapper = EventMapper::New();
-  eventMapper->SetFileName( fileName.c_str() );
+  this->SetFileName( fileName.c_str() );
 
-  if ( ! eventMapper->Parse() )
-  {
-#ifdef INTERDEBUG
-    //itkWarningMacro("mitk::EventMapper::LoadBehavior xml file cannot parse!" );
-    //static function LoadBehavior has no this pointer!
-    LOG_INFO<<"mitk::EventMapper::LoadBehavior xml file cannot parse!"<<std::endl;
-#endif
-  }
+  return ( ! this->Parse() );
+}
 
-  eventMapper->Delete();
-  return true;
+//##Documentation
+//## loads Events into m_EventDescriptions from xml string
+//## also involved: EventMapper::startEvent(...)
+bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
+{
+  if ( xmlString.empty() )
+    return false;
+
+  return ( ! this->Parse(xmlString.c_str(), xmlString.length()) );
 }
 
 bool mitk::EventMapper::LoadStandardBehavior()
 {
   // Search for StateMachine.xml, bypass relative path in mitkSourceTree for additional search
+
   std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Interactions");
   if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
     return LoadBehavior(xmlFileName);

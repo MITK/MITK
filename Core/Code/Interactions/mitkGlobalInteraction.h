@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFocusManager.h"
 #include "mitkCommon.h"
 #include "mitkStateMachineFactory.h"
+#include "mitkEventMapper.h"
 #include "mitkInteractor.h"
 #include <string>
 #include <vector>
@@ -33,24 +34,24 @@ namespace mitk {
   //##Documentation
   //## @brief handles all global Events
   //##
-  //## superior statemachine, that spreads the events to all other Interactors
+  //## superior statemachine, that spreads the events to all other interactors
   //##
   //## Concept of sending events:
   //## In this concept of interaction, the statemachines can be divided into two main statemachines:
-  //## Listeners and Interactors.
-  //## Listeners only recieve the event to process it, but don't change any data. They want to listen to all events.
-  //## Interactors do change data according to the recieved event. They do not need to revieve all events, only
+  //## Listeners and interactors.
+  //## Listeners only receive the event to process it, but don't change any data. They want to listen to all events.
+  //## Interactors do change data according to the received event. They do not need to receive all events, only
   //## those they are interested in.
   //##
   //## To divide these two types of statemachine this class holds three lists and one map:
   //## m_ListenerList, m_InteractorList, m_SelectedList and m_JurisdictionMap
   //## The list m_ListenerList holds all listeners.
-  //## m_InteractorList holds all Interactors, and the List m_SelectedList holds all machines, that were set to SELECTED or SUBSELECTED.
+  //## m_InteractorList holds all interactors, and the List m_SelectedList holds all machines, that were set to SELECTED or SUBSELECTED.
   //## m_JurisdictionMap maps values returned from CalculateJurisdiction to the asked Interactors.
   //## Through this map stepping through interactors, that were not selected and could handle that event, can be done.
   //## 
   //## First the listeners are informed with the event.
-  //## Then the selected or subselected Interactors are asked if they can handle that event.
+  //## Then the selected or subselected interactors are asked if they can handle that event.
   //## They can handle it, if the mode of the interactor after HandleEvent(..) is still in SMSELECTED or SMSUBSELECTED.
   //## They can't handle it, if the mode changed to SMDESELECTED. Then the interactor is removed from the selected-list.
   //## In that case, all interactors are asked to calculate and return their area of jurisdiction.
@@ -61,7 +62,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(GlobalInteraction, StateMachine);
-    mitkNewMacro2Param(Self, const char*, const char*);
+    itkNewMacro(Self);
 
     typedef std::vector<StateMachine::Pointer>  StateMachineList;
     typedef std::vector<StateMachine*>  StateMachineCPointerList;
@@ -73,13 +74,13 @@ namespace mitk {
     typedef InteractorMap::iterator             InteractorMapIter;
     
     //##Documentation
-    //## @brief add an Interactor to the list of all Interactors that are asked for handling an event
+    //## @brief add an Interactor to the list of all interactors that are asked for handling an event
     //##
     //## returns true in case of success
     void AddInteractor(Interactor* interactor);
 
     //##Documentation
-    //## @brief remove a certain Interactor from the set of Interactors that are asked for handling an event
+    //## @brief remove a certain Interactor from the set of interactors that are asked for handling an event
     //##
     //## returns true in case of success
     bool RemoveInteractor(Interactor* interactor);
@@ -148,7 +149,17 @@ namespace mitk {
     //##Documentation
     //## @brief Returns the global (singleton) instance of
     //## GlobalInteraction. Create it, if it does not exist.
-    static GlobalInteraction* GetInstance(const char* globalInteractionName = NULL, const char* XMLbehaviorFile = NULL);
+    static GlobalInteraction* GetInstance();
+
+    //##Documentation
+    //## @brief Initializes the global (singleton) instance of
+    //## GlobalInteraction. Can be done only once.
+    bool Initialize(const char* globalInteractionName, std::string XMLbehaviourString);
+
+    //##Documentation
+    //## @brief Initializes the global (singleton) instance of
+    //## GlobalInteraction. Can be done only once.
+    bool Initialize(const char* globalInteractionName, const char* XMLbehaviorFile);
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;
@@ -159,7 +170,7 @@ namespace mitk {
     * @param XMLbehaviorFile the file which contains the statemachine and event patterns 
     * @param type the name of the statemachine pattern this class shall use
     **/
-    GlobalInteraction(const char* type, const char* XMLbehaviorFile);
+    GlobalInteraction();
     
     /**
     * @brief Default destructor.
@@ -204,10 +215,12 @@ namespace mitk {
 
     void RemoveFlaggedListeners();
 
+    bool IsInitialized() {return m_IsInitialized;};
+
     StateMachineCPointerList m_ListenersFlaggedForRemoval;
 
     //##Documentation
-    //## @brief list of all listening statemachines, that want to recieve all events
+    //## @brief list of all listening statemachines, that want to receive all events
     StateMachineList m_ListenerList;
 
     //##Documentation
@@ -237,8 +250,14 @@ namespace mitk {
     **/
     StateMachineFactory* m_StateMachineFactory;
 
+    /**
+    * @brief EventMapper loads event patterns
+    **/
+    EventMapper* m_EventMapper;
+
     bool m_CurrentlyInInformListenersLoop;
     bool m_CurrentlyInInformInteractorsLoop;
+    bool m_IsInitialized;
   };
 } // namespace mitk
 

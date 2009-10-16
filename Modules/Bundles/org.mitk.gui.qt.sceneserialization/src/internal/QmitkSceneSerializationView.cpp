@@ -137,7 +137,7 @@ void QmitkSceneSerializationView::SerializeSelected()
     mitk::DataStorage::Pointer storage = this->GetDefaultDataStorage();
 
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-    if ( !sceneIO->SaveScene( storage, sceneFilename.toLocal8Bit().constData() ) )
+    if ( !sceneIO->SaveScene( storage->GetAll(), storage, sceneFilename.toLocal8Bit().constData() ) )
     {
       QMessageBox::information(NULL,
                             "Scene saving",

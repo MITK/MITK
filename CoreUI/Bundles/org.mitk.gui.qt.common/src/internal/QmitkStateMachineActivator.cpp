@@ -34,6 +34,6 @@ QmitkStateMachineActivator::Start(cherry::IBundleContext::Pointer)
     file.close();
     mitk::GlobalInteraction::GetInstance()->Initialize("global", string.toStdString());
   }
-  else throw std::exception("Unable to initialize global interaction!");
+  else throw std::exception();
 }
 

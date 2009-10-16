@@ -2324,7 +2324,7 @@ void WorkbenchPage::OpenPerspectiveExtras()
   }
   // HACK: The perspective switcher currently adds the button for a new perspective to the beginning of the list.
   // So, we process the extra perspectives in reverse order here to have their buttons appear in the order declared.
-  for (std::vector<IPerspectiveDescriptor::Pointer>::size_type i = descs.size(); --i >= 0;)
+  for (int i = (int)descs.size(); --i >= 0;)
   {
     PerspectiveDescriptor::Pointer desc =
     descs[i].Cast<PerspectiveDescriptor> ();

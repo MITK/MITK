@@ -132,7 +132,7 @@ void* QtWorkbenchPresentationFactory::CreateSash(void* parent, int style)
   return sash;
 }
 
-int QtWorkbenchPresentationFactory::GetSashSize(int style)
+int QtWorkbenchPresentationFactory::GetSashSize(int  /*style*/)
 {
   return 3;
 }

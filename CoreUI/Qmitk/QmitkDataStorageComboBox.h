@@ -71,7 +71,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// Returns the AutoSelectNewItems.
     /// \see SetAutoSelectNewItems
     ///
-    virtual const bool GetAutoSelectNewItems();
+    virtual bool GetAutoSelectNewItems();
 
   //#PUBLIC SETTER
   public:
@@ -130,12 +130,12 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Checks if the given index is within the range of the m_Nodes vector.
     ///
-    const bool HasIndex(unsigned int index) const;
+    bool HasIndex(unsigned int index) const;
 
     ///
     /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
     ///
-    const int Find( const mitk::DataTreeNode* _DataTreeNode ) const;
+    int Find( const mitk::DataTreeNode* _DataTreeNode ) const;
 
   //#PROTECTED SETTER
   protected slots:

@@ -47,7 +47,7 @@ namespace mitk {
     virtual bool VerifyRequestedRegion(){return false;};
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return false;};
     virtual void SetRequestedRegionToLargestPossibleRegion(){};
-    virtual void SetRequestedRegion(itk::DataObject *data){};
+    virtual void SetRequestedRegion(itk::DataObject * /*data*/){};
 
     BaseDataImplementation(){};
     virtual ~BaseDataImplementation(){};

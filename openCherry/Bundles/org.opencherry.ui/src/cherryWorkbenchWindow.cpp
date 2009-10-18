@@ -1645,7 +1645,7 @@ window(w)
 {
 }
 
-void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointer event)
+void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointer  /*event*/)
 {
   WorkbenchWindow::Pointer wnd(window);
 
@@ -1672,7 +1672,7 @@ void WorkbenchWindow::ShellActivationListener::ShellActivated(ShellEvent::Pointe
   //liftRestrictions();
 }
 
-void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Pointer event)
+void WorkbenchWindow::ShellActivationListener::ShellDeactivated(ShellEvent::Pointer  /*event*/)
 {
   WorkbenchWindow::Pointer wnd(window);
 
@@ -1715,13 +1715,13 @@ GuiTk::IControlListener::Events::Types WorkbenchWindow::ControlResizeListener::G
 }
 
 void WorkbenchWindow::
-ControlResizeListener::ControlMoved(GuiTk::ControlEvent::Pointer e)
+ControlResizeListener::ControlMoved(GuiTk::ControlEvent::Pointer  /*e*/)
 {
   this->SaveBounds();
 }
 
 void WorkbenchWindow::
-ControlResizeListener::ControlResized(GuiTk::ControlEvent::Pointer e)
+ControlResizeListener::ControlResized(GuiTk::ControlEvent::Pointer  /*e*/)
 {
   this->SaveBounds();
 }

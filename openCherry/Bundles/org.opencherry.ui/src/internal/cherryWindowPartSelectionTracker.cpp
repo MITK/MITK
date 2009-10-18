@@ -47,7 +47,7 @@ WindowPartSelectionTracker::WindowPartSelectionTracker(SmartPointer<IWorkbenchWi
 }
 
 void WindowPartSelectionTracker::PageActivated(
-    SmartPointer<IWorkbenchPage> page)
+    SmartPointer<IWorkbenchPage>  /*page*/)
 {
 }
 

@@ -234,7 +234,7 @@ bool PartStack::IsMoveable(IPresentablePart::Pointer part)
   return true;
 }
 
-bool PartStack::SupportsState(int newState)
+bool PartStack::SupportsState(int  /*newState*/)
 {
   if (page->IsFixedLayout())
   {
@@ -476,7 +476,7 @@ void PartStack::Add(StackablePart::Pointer newChild, Object::Pointer cookie)
   this->ShowPart(newChild, cookie);
 }
 
-bool PartStack::AllowsAdd(StackablePart::Pointer toAdd)
+bool PartStack::AllowsAdd(StackablePart::Pointer  /*toAdd*/)
 {
   return !this->IsStandalone();
 }
@@ -618,7 +618,7 @@ void PartStack::SetActive(bool isActive)
   }
 }
 
-void PartStack::CreateControl(void* parent, StackPresentation::Pointer presentation)
+void PartStack::CreateControl(void*  /*parent*/, StackPresentation::Pointer presentation)
 {
 
   poco_assert(this->GetPresentation() == 0);
@@ -1202,7 +1202,7 @@ void PartStack::SetSelection(StackablePart::Pointer part)
   this->RefreshPresentationSelection();
 }
 
-void PartStack::UpdateActions(PresentablePart::Pointer current)
+void PartStack::UpdateActions(PresentablePart::Pointer  /*current*/)
 {
 
 }
@@ -1600,7 +1600,7 @@ void PartStack::CopyAppearanceProperties(PartStack::Pointer copyTo)
   }
 }
 
-void PartStack::ResizeChild(StackablePart::Pointer childThatChanged)
+void PartStack::ResizeChild(StackablePart::Pointer  /*childThatChanged*/)
 {
 
 }

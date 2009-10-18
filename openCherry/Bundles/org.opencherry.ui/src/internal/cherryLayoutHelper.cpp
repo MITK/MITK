@@ -29,7 +29,7 @@ LayoutHelper::LayoutHelper()
 }
 
 void LayoutHelper::AddViewActivator(PageLayout::Pointer pageLayout,
-    const std::string& viewId)
+    const std::string&  /*viewId*/)
 {
   // TODO View Activator
 //  if (viewId == null)

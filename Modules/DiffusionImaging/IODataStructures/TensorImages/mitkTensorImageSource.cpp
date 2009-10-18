@@ -29,7 +29,7 @@ mitk::TensorImageSource::TensorImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-mitk::TensorImageSource::DataObjectPointer mitk::TensorImageSource::MakeOutput( unsigned int idx )
+mitk::TensorImageSource::DataObjectPointer mitk::TensorImageSource::MakeOutput( unsigned int  /*idx*/ )
 {
   return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }

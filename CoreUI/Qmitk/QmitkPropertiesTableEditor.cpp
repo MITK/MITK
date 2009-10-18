@@ -17,7 +17,7 @@
 #include <vtkRenderWindow.h>
 
 QmitkPropertiesTableEditor::QmitkPropertiesTableEditor(QWidget* parent
-                                                       , Qt::WindowFlags f,mitk::DataTreeNode::Pointer _Node)
+                                                       , Qt::WindowFlags f,mitk::DataTreeNode::Pointer  /*_Node*/)
 : QWidget(parent, f)
 , m_NodePropertiesTableView(0)
 , m_Model(0)
@@ -131,7 +131,7 @@ void QmitkPropertiesTableEditor::init()
 
 }
 
-void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged( const QString & text )
+void QmitkPropertiesTableEditor::PropertyFilterKeyWordTextChanged( const QString &  /*text*/ )
 {
   m_Model->SetFilterPropertiesKeyWord(m_TxtPropertyFilterKeyWord->text().toStdString());
 }

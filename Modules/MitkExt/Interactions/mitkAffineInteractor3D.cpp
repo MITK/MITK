@@ -455,7 +455,7 @@ bool AffineInteractor3D
 }
 
 bool AffineInteractor3D::ColorizeSurface( vtkPolyData *polyData, 
-  const Point3D &pickedPoint, double scalar )
+  const Point3D & /*pickedPoint*/, double scalar )
 {
   if ( polyData == NULL )
   {

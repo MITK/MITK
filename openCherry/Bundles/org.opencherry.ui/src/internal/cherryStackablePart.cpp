@@ -67,7 +67,7 @@ void StackablePart::Reparent(void* newParent)
   }
 }
 
-void StackablePart::DescribeLayout(std::string& description) const
+void StackablePart::DescribeLayout(std::string& /*description*/) const
 {
 
 }

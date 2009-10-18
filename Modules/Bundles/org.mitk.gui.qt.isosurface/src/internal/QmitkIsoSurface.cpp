@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string.h>
 
 
-QmitkIsoSurface::QmitkIsoSurface(QObject *parent, const char *name)
+QmitkIsoSurface::QmitkIsoSurface(QObject * /*parent*/, const char * /*name*/)
 : QmitkFunctionality() ,
   m_Controls(NULL),
   m_MitkImage(NULL),
@@ -217,7 +217,7 @@ float QmitkIsoSurface::getThreshold()
   return m_Controls->thresholdLineEdit->text().toFloat();
 }
 
-void QmitkIsoSurface::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkIsoSurface::StdMultiWidgetAvailable( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
 {
   m_Parent->setEnabled(true);
 }

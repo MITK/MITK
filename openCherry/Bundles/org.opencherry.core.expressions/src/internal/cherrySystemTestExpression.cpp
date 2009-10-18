@@ -52,7 +52,7 @@ SystemTestExpression::SystemTestExpression(const std::string& property, const st
 }
 
 EvaluationResult
-SystemTestExpression::Evaluate(IEvaluationContext* context)
+SystemTestExpression::Evaluate(IEvaluationContext*  /*context*/)
 {
   std::string str = Platform::GetProperty(fProperty);
   if (str.size() == 0)

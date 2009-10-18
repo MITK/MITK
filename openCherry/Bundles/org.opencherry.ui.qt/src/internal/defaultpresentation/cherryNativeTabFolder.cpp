@@ -164,7 +164,7 @@ void NativeTabFolder::CloseButtonClicked(AbstractTabItem* item)
   this->FireEvent(TabFolderEvent::EVENT_CLOSE, item);
 }
 
-QSize NativeTabFolder::ComputeSize(int widthHint, int heightHint)
+QSize NativeTabFolder::ComputeSize(int  /*widthHint*/, int  /*heightHint*/)
 {
   return QSize(50,50);
 }
@@ -233,7 +233,7 @@ void NativeTabFolder::SetSelection(AbstractTabItem* toSelect)
   tabControl->setCurrentTab(toSelect);
 }
 
-void NativeTabFolder::SetSelectedInfo(const PartInfo& info)
+void NativeTabFolder::SetSelectedInfo(const PartInfo&  /*info*/)
 {
 //  if (!Util.equals(title.getText(), info.title))
 //  {
@@ -266,7 +266,7 @@ QWidget* NativeTabFolder::GetControl()
   return viewForm;
 }
 
-bool NativeTabFolder::IsOnBorder(const QPoint& globalPos)
+bool NativeTabFolder::IsOnBorder(const QPoint&  /*globalPos*/)
 {
 //  Point localPos = getControl().toControl(globalPos);
 //
@@ -305,12 +305,12 @@ QCTabBar* NativeTabFolder::GetTabFolder()
   return tabControl;
 }
 
-void NativeTabFolder::SetSelectedTitle(const QString& newTitle)
+void NativeTabFolder::SetSelectedTitle(const QString&  /*newTitle*/)
 {
   //title.setText(newTitle);
 }
 
-void NativeTabFolder::SetSelectedImage(const QPixmap* image)
+void NativeTabFolder::SetSelectedImage(const QPixmap*  /*image*/)
 {
   //title.setImage(image);
 }
@@ -324,7 +324,7 @@ AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
   return tabControl->getTab(index);
 }
 
-void NativeTabFolder::EnablePaneMenu(bool enabled)
+void NativeTabFolder::EnablePaneMenu(bool  /*enabled*/)
 {
   //systemToolbar.enablePaneMenu(enabled);
 }

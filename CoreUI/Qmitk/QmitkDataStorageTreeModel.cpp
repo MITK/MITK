@@ -77,7 +77,7 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex& index, int role) con
 return 0;
 }
 
-QVariant QmitkDataStorageTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkDataStorageTreeModel::headerData(int  /*section*/, Qt::Orientation  /*orientation*/, int  /*role*/) const
 {
   return QVariant("Scene Data");
 }
@@ -179,7 +179,7 @@ bool QmitkDataStorageTreeModel::hasChildren ( const QModelIndex & parent ) const
 	}
 }
 
-int QmitkDataStorageTreeModel::columnCount ( const QModelIndex & parent ) const
+int QmitkDataStorageTreeModel::columnCount ( const QModelIndex &  /*parent*/ ) const
 {
 	return 1;
 }

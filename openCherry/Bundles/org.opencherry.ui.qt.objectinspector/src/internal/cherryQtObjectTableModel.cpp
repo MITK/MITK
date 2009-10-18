@@ -55,7 +55,7 @@ public:
   }
 
   void ObjectTracingChanged(unsigned int traceId, bool enabled = true,
-      const Object* obj = 0)
+      const Object*  /*obj*/ = 0)
   {
   }
 

@@ -206,7 +206,7 @@ void PerspectiveRegistry::Load()
 //
 //}
 
-IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const std::string& id)
+IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const std::string&  /*id*/)
 {
   //TODO CustomPersp
 //  Reader reader = null;
@@ -279,7 +279,7 @@ PerspectiveRegistry::~PerspectiveRegistry()
 //      preferenceListener);
 }
 
-void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer desc)
+void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer  /*desc*/)
 {
   //TODO Preferences
   // remove the entry from the preference store.
@@ -294,7 +294,7 @@ void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer 
 
 }
 
-bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::Pointer desc)
+bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::Pointer  /*desc*/)
 {
   //TODO Preferences
   //IPreferenceStore store = WorkbenchPlugin::GetDefault()->GetPreferenceStore();

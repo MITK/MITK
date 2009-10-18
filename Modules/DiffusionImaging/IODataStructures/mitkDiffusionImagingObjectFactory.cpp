@@ -87,7 +87,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 #define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
 #define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
 
-itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( const std::string& className )
+itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( const std::string&  /*className*/ )
 {
   itk::Object::Pointer pointer;
   /*

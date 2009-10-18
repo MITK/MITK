@@ -63,7 +63,7 @@ protected:
 
      cherryObjectMacro(CONTINUE_)
 
-     bool Handles(const std::string& namespaze, const std::string& method) {
+     bool Handles(const std::string&  /*namespaze*/, const std::string&  /*method*/) {
        return false;
      }
      bool IsInstantiated() {
@@ -75,8 +75,8 @@ protected:
      IPropertyTester* Instantiate() {
        return this;
      }
-     bool Test(Object::Pointer receiver, const std::string& method,
-         std::vector<Object::Pointer>& args, Object::Pointer expectedValue) {
+     bool Test(Object::Pointer /*receiver*/, const std::string& /*method*/,
+         std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) {
        return false;
      }
    };
@@ -98,9 +98,9 @@ protected:
 class END_POINT_ : public TypeExtension
 {
 protected:
-  IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& manager,
-      const std::string& namespaze, const std::string& name,
-      bool staticMethod, bool forcePluginActivation)
+  IPropertyTester::Pointer FindTypeExtender(TypeExtensionManager& /*manager*/,
+      const std::string& /*namespaze*/, const std::string& /*name*/,
+      bool  /*staticMethod*/, bool  /*forcePluginActivation*/)
   {
     return CONTINUE_::Pointer(new CONTINUE_());
   }

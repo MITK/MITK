@@ -32,13 +32,13 @@ void WorkbenchPagePartList::FirePartClosed(IWorkbenchPartReference::Pointer part
   partService.FirePartClosed(part);
 }
 
-void WorkbenchPagePartList::FirePartAdded(IWorkbenchPartReference::Pointer part)
+void WorkbenchPagePartList::FirePartAdded(IWorkbenchPartReference::Pointer  /*part*/)
 {
   // TODO: There is no listener for workbench page additions yet
 }
 
 void WorkbenchPagePartList::FirePartRemoved(
-    IWorkbenchPartReference::Pointer part)
+    IWorkbenchPartReference::Pointer  /*part*/)
 {
   // TODO: There is no listener for workbench page removals yet
 }
@@ -53,7 +53,7 @@ void WorkbenchPagePartList::FireActiveEditorChanged(
 }
 
 void WorkbenchPagePartList::FireActivePartChanged(
-    IWorkbenchPartReference::Pointer oldRef,
+    IWorkbenchPartReference::Pointer /*oldRef*/,
     IWorkbenchPartReference::Pointer newRef)
 {
   partService.SetActivePart(newRef);

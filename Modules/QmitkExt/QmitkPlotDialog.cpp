@@ -3,7 +3,7 @@
 
 #include "QmitkPlotDialog.h"
 
-QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char* name): QDialog(parent) 
+QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char*  /*name*/): QDialog(parent) 
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QmitkPlotWidget( this, title ) ;

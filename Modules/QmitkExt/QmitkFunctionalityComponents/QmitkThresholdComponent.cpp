@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase* it)
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase*  /*it*/)
 : QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_ThresholdImageNode(NULL),
 m_ThresholdComponentGUI(NULL),
@@ -62,7 +62,7 @@ QmitkThresholdComponent::~QmitkThresholdComponent()
 
 
 /************** SET SELECTOR VISIBILITY ***************/
-void QmitkThresholdComponent::SetSelectorVisibility(bool visibility)
+void QmitkThresholdComponent::SetSelectorVisibility(bool  /*visibility*/)
 {
   if(m_ThresholdComponentGUI)
   {
@@ -178,7 +178,7 @@ mitk::DataStorage::Pointer QmitkThresholdComponent::GetDataStorage()
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-void QmitkThresholdComponent::CreateQtPartControl(QWidget *parent, mitk::DataStorage::Pointer dataStorage)
+void QmitkThresholdComponent::CreateQtPartControl(QWidget * /*parent*/, mitk::DataStorage::Pointer dataStorage)
 {
   m_GUI = new QWidget;
   m_ThresholdComponentGUI = new Ui::QmitkThresholdComponentControls;

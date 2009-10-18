@@ -290,7 +290,7 @@ void QmitkMITKSurfaceMaterialEditorView::SurfaceSelected()
   postRefresh();
 }
 
-void QmitkMITKSurfaceMaterialEditorView::shaderEnumChange(const itk::Object *caller, const itk::EventObject &event)
+void QmitkMITKSurfaceMaterialEditorView::shaderEnumChange(const itk::Object * /*caller*/, const itk::EventObject & /*event*/)
 {
   postRefresh();
 }

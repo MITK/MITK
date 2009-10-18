@@ -46,15 +46,15 @@ IShellListener::Events
   shellIconified -= Delegate(listener.GetPointer(), &IShellListener::ShellIconified);
 }
 
-void IShellListener::ShellActivated(ShellEvent::Pointer e) 
+void IShellListener::ShellActivated(ShellEvent::Pointer  /*e*/) 
 {}
-void IShellListener::ShellClosed(ShellEvent::Pointer e) 
+void IShellListener::ShellClosed(ShellEvent::Pointer  /*e*/) 
 {}
-void IShellListener::ShellDeactivated(ShellEvent::Pointer e) 
+void IShellListener::ShellDeactivated(ShellEvent::Pointer  /*e*/) 
 {}
-void IShellListener::ShellDeiconified(ShellEvent::Pointer e) 
+void IShellListener::ShellDeiconified(ShellEvent::Pointer  /*e*/) 
 {}
-void IShellListener::ShellIconified(ShellEvent::Pointer e) 
+void IShellListener::ShellIconified(ShellEvent::Pointer  /*e*/) 
 {}
 
 }

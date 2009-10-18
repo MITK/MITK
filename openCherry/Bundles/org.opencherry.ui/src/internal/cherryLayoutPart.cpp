@@ -85,18 +85,18 @@ Point LayoutPart::GetSize()
   return ptSize;
 }
 
-int LayoutPart::GetSizeFlags(bool horizontal)
+int LayoutPart::GetSizeFlags(bool  /*horizontal*/)
 {
   return Constants::MIN;
 }
 
 int LayoutPart::ComputePreferredSize(bool width, int availableParallel,
-    int availablePerpendicular, int preferredParallel)
+    int  /*availablePerpendicular*/, int preferredParallel)
 {
   return preferredParallel;
 }
 
-IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer draggedObject, const Point& displayCoordinates)
+IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer  /*draggedObject*/, const Point&  /*displayCoordinates*/)
 {
   return IDropTarget::Pointer(0);
 }
@@ -142,7 +142,7 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
 
 }
 
-void LayoutPart::MoveAbove(void* refControl)
+void LayoutPart::MoveAbove(void*  /*refControl*/)
 {
 }
 
@@ -217,7 +217,7 @@ void LayoutPart::SetVisible(bool makeVisible)
 }
 }
 
-bool LayoutPart::IsFocusAncestor(void* ctrl)
+bool LayoutPart::IsFocusAncestor(void*  /*ctrl*/)
 {
 //  Control f = ctrl.getDisplay().getFocusControl();
 //  while (f != null && f != ctrl)
@@ -297,7 +297,7 @@ bool LayoutPart::IsDeferred()
   return deferCount> 0;
 }
 
-void LayoutPart::DescribeLayout(std::string& buf) const
+void LayoutPart::DescribeLayout(std::string&  /*buf*/) const
 {
 
 }
@@ -307,7 +307,7 @@ std::string LayoutPart::GetPlaceHolderId()
   return this->GetID();
 }
 
-void LayoutPart::ResizeChild(LayoutPart::Pointer childThatChanged)
+void LayoutPart::ResizeChild(LayoutPart::Pointer  /*childThatChanged*/)
 {
 
 }
@@ -321,7 +321,7 @@ void LayoutPart::FlushLayout()
   }
 }
 
-bool LayoutPart::AllowsAdd(LayoutPart::Pointer toAdd)
+bool LayoutPart::AllowsAdd(LayoutPart::Pointer  /*toAdd*/)
 {
   return false;
 }

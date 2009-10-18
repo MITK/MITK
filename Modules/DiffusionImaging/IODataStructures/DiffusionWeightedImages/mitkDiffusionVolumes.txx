@@ -36,7 +36,7 @@ bool mitk::DiffusionVolumes<TPixelType>::RequestedRegionIsOutsideOfTheBufferedRe
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumes<TPixelType>::SetRequestedRegion(itk::DataObject *data)
+void mitk::DiffusionVolumes<TPixelType>::SetRequestedRegion(itk::DataObject * /*data*/)
 {
 }
 

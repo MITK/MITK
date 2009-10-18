@@ -471,7 +471,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   return resultVector;
 }
 
-void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, const QPoint& p, int )
+void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, const QPoint&  /*p*/, int )
 {
   if (item)
   {
@@ -693,7 +693,7 @@ bool QmitkToolWorkingDataSelectionBox::eventFilter( QObject *o, QEvent *e )
   return Q3ListView::eventFilter( o, e ); // default: reach through to parent
 }
 
-void QmitkToolWorkingDataSelectionBox::InstallKeyFilterOn( QObject* object )
+void QmitkToolWorkingDataSelectionBox::InstallKeyFilterOn( QObject*  /*object*/ )
 {
   //TODO crashes under linux in eventFilter(o,e), Q3ListView::eventFilter(o,e)
 //  if (m_LastKeyFilterObject)

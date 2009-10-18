@@ -423,7 +423,7 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
   return this->GetActiveReference(start, editorsOnly, false);
 }
 
-SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(PartListIter start, bool editorsOnly, bool skipPartsObscuredByZoom)
+SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(PartListIter start, bool editorsOnly, bool  /*skipPartsObscuredByZoom*/)
 {
   std::vector<IViewReference::Pointer> views = page->GetViewReferences();
   PartListReverseIter i(start);

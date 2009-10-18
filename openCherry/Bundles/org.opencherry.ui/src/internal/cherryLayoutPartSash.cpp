@@ -263,7 +263,7 @@ void LayoutPartSash::FlushCache()
   }
 }
 
-void LayoutPartSash::WidgetSelected(int x, int y, int width, int height)
+void LayoutPartSash::WidgetSelected(int x, int y, int  /*width*/, int  /*height*/)
 {
   if (!enabled)
   {

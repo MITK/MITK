@@ -64,7 +64,7 @@ std::vector<IPresentablePart::Pointer> LeftToRightTabOrder::GetPartList()
 }
 
 void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
-    IMemento::Pointer savedState)
+    IMemento::Pointer  /*savedState*/)
 {
   //TODO LeftToRightTabOrder restore state
 //  std::vector<IMemento::Pointer> parts = savedState->GetChildren(
@@ -87,7 +87,7 @@ void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
 }
 
 void LeftToRightTabOrder::SaveState(IPresentationSerializer* context,
-    IMemento::Pointer memento)
+    IMemento::Pointer  /*memento*/)
 {
 //TODO LeftToRightTabOrder save state
 //  std::vector<IPresentablePart::Pointer> parts(list->GetPartList());

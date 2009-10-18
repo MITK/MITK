@@ -63,7 +63,7 @@ mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
     m_Contour->Delete();
 }
 
-vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
 {
   return m_Actor;
 }

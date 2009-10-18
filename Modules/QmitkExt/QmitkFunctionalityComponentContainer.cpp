@@ -259,7 +259,7 @@ void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeNod
 }
 
 /*************** CREATE CONTAINER WIDGET **************/
-void QmitkFunctionalityComponentContainer::CreateQtPartControl(QWidget *parent, mitk::DataStorage::Pointer dataStorage)
+void QmitkFunctionalityComponentContainer::CreateQtPartControl(QWidget * /*parent*/, mitk::DataStorage::Pointer dataStorage)
 {
   if (m_FunctionalityComponentContainerGUI == NULL)
   {

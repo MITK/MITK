@@ -75,7 +75,7 @@ void QmitkProgressBar::Progress(unsigned int steps)
 }
 
 
-QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char * name)
+QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
 :QProgressBar(parent), ProgressBarImplementation()
 {
     m_TotalSteps = 0;

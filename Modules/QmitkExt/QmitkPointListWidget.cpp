@@ -165,7 +165,7 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
 }
 
 
-void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject & e )
+void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
 {
   m_PointSetNode = NULL;
   m_NodeObserverTag = 0;

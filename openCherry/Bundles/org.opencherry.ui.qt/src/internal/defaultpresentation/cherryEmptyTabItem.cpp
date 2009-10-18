@@ -25,7 +25,7 @@ QRect EmptyTabItem::GetBounds()
   return QRect();
 }
 
-void EmptyTabItem::SetInfo(const PartInfo& info)
+void EmptyTabItem::SetInfo(const PartInfo&  /*info*/)
 {
 
 }
@@ -40,7 +40,7 @@ Object::Pointer EmptyTabItem::GetData()
   return Object::Pointer(0);
 }
 
-void EmptyTabItem::SetData(Object::Pointer data)
+void EmptyTabItem::SetData(Object::Pointer  /*data*/)
 {
 
 }

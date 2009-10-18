@@ -66,7 +66,7 @@ void QtLogView::slotFilterChange( const QString& q )
   filterModel->setFilterRegExp(QRegExp(q, Qt::CaseInsensitive, QRegExp::FixedString));
 }
 
-void QtLogView::slotRowAdded ( const QModelIndex & parent, int start, int end )
+void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int end )
 {
   static int first=false;
 

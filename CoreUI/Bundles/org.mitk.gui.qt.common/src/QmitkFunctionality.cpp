@@ -147,7 +147,7 @@ void QmitkFunctionality::Deactivated()
 {
 }
 
-void QmitkFunctionality::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkFunctionality::StdMultiWidgetAvailable( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
 {
 }
 void QmitkFunctionality::StdMultiWidgetNotAvailable()
@@ -181,7 +181,7 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
   }
 }
 
-void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 
 }
@@ -199,23 +199,23 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
   }
 }
 
-void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 }
 
-void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 }
 
-void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 }
 
-void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 }
 
-void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
 {
 }
 
@@ -232,7 +232,7 @@ void QmitkFunctionality::NodeAddedProxy( const mitk::DataTreeNode* node )
 
 }
 
-void QmitkFunctionality::NodeAdded( const mitk::DataTreeNode* node )
+void QmitkFunctionality::NodeAdded( const mitk::DataTreeNode*  /*node*/ )
 {
 
 }
@@ -249,7 +249,7 @@ void QmitkFunctionality::NodeRemovedProxy( const mitk::DataTreeNode* node )
   }
 }
 
-void QmitkFunctionality::NodeRemoved( const mitk::DataTreeNode* node )
+void QmitkFunctionality::NodeRemoved( const mitk::DataTreeNode*  /*node*/ )
 {
 
 }
@@ -309,7 +309,7 @@ void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bo
   HandleException( e.what(), parent, showDialog );
 }
 
-void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkFunctionality::StdMultiWidgetClosed( QmitkStdMultiWidget&  /*stdMultiWidget*/ )
 {
   
 }

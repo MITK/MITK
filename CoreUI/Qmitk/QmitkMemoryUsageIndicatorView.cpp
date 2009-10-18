@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkMemoryUsageIndicatorImagesOrange.xpm"
 #include "QmitkMemoryUsageIndicatorImagesRed.xpm"
 
-QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView( QWidget * parent, Qt::WindowFlags f )
+QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView( QWidget *  /*parent*/, Qt::WindowFlags  /*f*/ )
 {
   this->setupUi(this);
 

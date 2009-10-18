@@ -58,7 +58,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 
 
-QmitkIGTExampleView::QmitkIGTExampleView(QObject *parent, const char *name)
+QmitkIGTExampleView::QmitkIGTExampleView(QObject * /*parent*/, const char * /*name*/)
  : QmitkFunctionality()
 {
   m_Timer = new QTimer(this);
@@ -480,7 +480,7 @@ void QmitkIGTExampleView::OnParametersChanged()
 }
 
 
-void QmitkIGTExampleView::AddToFunctionalityOptionsList(mitk::PropertyList* pl)
+void QmitkIGTExampleView::AddToFunctionalityOptionsList(mitk::PropertyList*  /*pl*/)
 {
   //Due to porting to Qt4 this feature is not ported yet
 
@@ -720,7 +720,7 @@ void QmitkIGTExampleView::OnShowErrorPlot()
 }
 
 
-void QmitkIGTExampleView::OnErrorValueChanged(mitk::NavigationData::CovarianceMatrixType v, unsigned int index)
+void QmitkIGTExampleView::OnErrorValueChanged(mitk::NavigationData::CovarianceMatrixType v, unsigned int  /*index*/)
 {
   /* calculate overall error (this should be replaced with a more meaningful implementation depending on the application requirements) */
   mitk::ScalarType errorValue = 0.0;

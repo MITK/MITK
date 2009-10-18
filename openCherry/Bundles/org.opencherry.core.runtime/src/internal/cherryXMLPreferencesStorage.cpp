@@ -71,7 +71,7 @@ namespace cherry
 
 
 
-  void XMLPreferencesStorage::Flush(IPreferences* _Preferences) throw(Poco::Exception, BackingStoreException)
+  void XMLPreferencesStorage::Flush(IPreferences*  /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
   {
     try
     {

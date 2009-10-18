@@ -225,7 +225,7 @@ QmitkPreferencesDialog::~QmitkPreferencesDialog()
 }
 
 
-void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
+void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
 {  
   int answer = QMessageBox::question(this, "Importing Preferences"
     , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
@@ -273,7 +273,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool triggered )
   }
 }
 
-void QmitkPreferencesDialog::OnExportButtonClicked( bool triggered )
+void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
 {
   try
   { 
@@ -312,7 +312,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool triggered )
   }
 }
 
-void QmitkPreferencesDialog::OnApplyButtonClicked( bool triggered )
+void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
 {  
   cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
   if(prefPage)
@@ -320,7 +320,7 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool triggered )
       this->done(QDialog::Accepted);
 }
 
-void QmitkPreferencesDialog::OnCloseButtonClicked( bool triggered )
+void QmitkPreferencesDialog::OnCloseButtonClicked( bool  /*triggered*/ )
 {
   cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
   if(prefPage)
@@ -329,7 +329,7 @@ void QmitkPreferencesDialog::OnCloseButtonClicked( bool triggered )
   this->done(QDialog::Accepted);
 }
 
-void QmitkPreferencesDialog::OnKeywordTextChanged(const QString & s)
+void QmitkPreferencesDialog::OnKeywordTextChanged(const QString &  /*s*/)
 {
   // search for text
   this->UpdateTree();

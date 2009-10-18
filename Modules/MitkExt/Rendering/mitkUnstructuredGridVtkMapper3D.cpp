@@ -118,7 +118,7 @@ mitk::UnstructuredGridVtkMapper3D::~UnstructuredGridVtkMapper3D()
 
 }
 
-vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+vtkProp* mitk::UnstructuredGridVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
 {
   return m_Assembly;
 }

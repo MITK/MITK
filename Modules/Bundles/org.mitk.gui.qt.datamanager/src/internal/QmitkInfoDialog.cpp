@@ -66,7 +66,7 @@ void QmitkInfoDialog::OnSelectionChanged( const mitk::DataTreeNode* node )
   m_TextBrowser->setPlainText(QString::fromStdString(s.str()));
 }
 
-void QmitkInfoDialog::OnSearchButtonClicked( bool checked /*= false */ )
+void QmitkInfoDialog::OnSearchButtonClicked( bool  /*checked*/ /*= false */ )
 {
   QString keyWord = m_KeyWord->text();
   QString text = m_TextBrowser->text();
@@ -78,7 +78,7 @@ void QmitkInfoDialog::OnSearchButtonClicked( bool checked /*= false */ )
   m_SearchButton->setText("Search Next(F3)");
 }
 
-void QmitkInfoDialog::OnCancelButtonClicked( bool checked /*= false */ )
+void QmitkInfoDialog::OnCancelButtonClicked( bool  /*checked*/ /*= false */ )
 {
   this->done(0);
 }
@@ -100,7 +100,7 @@ bool QmitkInfoDialog::eventFilter( QObject *obj, QEvent *event )
   return QObject::eventFilter(obj, event);
 }
 
-void QmitkInfoDialog::KeyWordTextChanged(const QString & text)
+void QmitkInfoDialog::KeyWordTextChanged(const QString &  /*text*/)
 {
   QTextCursor textCursor = m_TextBrowser->textCursor();
   textCursor.setPosition(0);

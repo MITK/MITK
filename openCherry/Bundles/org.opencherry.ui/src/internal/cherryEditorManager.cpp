@@ -437,14 +437,14 @@ bool EditorManager::IsSaveAllNeeded()
 }
 
 IEditorReference::Pointer EditorManager::FindReusableEditor(
-    EditorDescriptor::Pointer desc)
+    EditorDescriptor::Pointer  /*desc*/)
 {
   //return ((TabBehaviour)Tweaklets.get(TabBehaviour.KEY)).findReusableEditor(page);
   return IEditorReference::Pointer(0);
 }
 
 IEditorReference::Pointer EditorManager::OpenEditor(
-    const std::string& editorId, IEditorInput::Pointer input, bool setVisible,
+    const std::string& editorId, IEditorInput::Pointer input, bool /*setVisible*/,
     IMemento::Pointer editorState)
 {
   if (input.IsNull())
@@ -614,7 +614,7 @@ EditorSite::Pointer EditorManager::CreateSite(IEditorReference::Pointer ref,
 }
 
 IEditorReference::Pointer EditorManager::ReuseInternalEditor(
-    EditorDescriptor::Pointer desc, IEditorInput::Pointer input)
+    EditorDescriptor::Pointer  /*desc*/, IEditorInput::Pointer  /*input*/)
 {
 
 //  poco_assert(desc.IsNotNull()); // "descriptor must not be null"); //$NON-NLS-1$
@@ -784,8 +784,8 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       return result;
     }
 
-    bool EditorManager::SaveAll(bool confirm, bool closing,
-        bool addNonPartSources)
+    bool EditorManager::SaveAll(bool /*confirm*/, bool /*closing*/,
+        bool  /*addNonPartSources*/)
     {
       // Get the list of dirty editors and views. If it is
       // empty just return.
@@ -807,8 +807,8 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
     }
 
     bool EditorManager::SaveAll(
-        const std::vector<IWorkbenchPart::Pointer>& dirtyParts, bool confirm,
-        bool closing, bool addNonPartSources, IWorkbenchWindow::Pointer window)
+        const std::vector<IWorkbenchPart::Pointer>& /*dirtyParts*/, bool /*confirm*/,
+        bool  /*closing*/, bool  /*addNonPartSources*/, IWorkbenchWindow::Pointer  /*window*/)
     {
 //      // clone the input list
 //          dirtyParts = new ArrayList(dirtyParts);
@@ -998,7 +998,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       return true;
     }
 
-    bool EditorManager::SavePart(ISaveablePart::Pointer saveable, IWorkbenchPart::Pointer part, bool confirm)
+    bool EditorManager::SavePart(ISaveablePart::Pointer  /*saveable*/, IWorkbenchPart::Pointer  /*part*/, bool  /*confirm*/)
     {
       //TODO EditorManager save part (SaveableHelper)
       //return SaveableHelper.savePart(saveable, part, window, confirm);
@@ -1077,9 +1077,9 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       return IPathEditorInput::Pointer(0);
     }
 
-    void EditorManager::RestoreEditorState(IMemento::Pointer editorMem,
-        std::vector<IEditorReference::Pointer>& visibleEditors,
-        std::vector<IEditorReference::Pointer>& activeEditor)
+    void EditorManager::RestoreEditorState(IMemento::Pointer /*editorMem*/,
+        std::vector<IEditorReference::Pointer>& /*visibleEditors*/,
+        std::vector<IEditorReference::Pointer>&  /*activeEditor*/)
     {
       // MultiStatus result) {
 
@@ -1119,8 +1119,8 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //      }
     }
 
-    void EditorManager::SaveEditorState(IMemento::Pointer mem,
-        IEditorReference::Pointer ed)
+    void EditorManager::SaveEditorState(IMemento::Pointer /*mem*/,
+        IEditorReference::Pointer  /*ed*/)
     {
       //TODO Save editor state
 //      final EditorReference editorRef = (EditorReference) ed;

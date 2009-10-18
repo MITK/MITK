@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //##Documentation
 //## \brief A small console tutorial about MITK-IGT
-int main(int argc, char* argv[])
+int main(int  /*argc*/, char*  /*argv*/[])
 {
 
 

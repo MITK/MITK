@@ -1100,7 +1100,7 @@ IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(IAdaptable* input)
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
-    const std::string& perspectiveId, IWorkbenchWindow::Pointer window)
+    const std::string&  /*perspectiveId*/, IWorkbenchWindow::Pointer window)
 {
   // If the specified window has the requested perspective open, then the
   // window
@@ -1217,7 +1217,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
     const std::string& perspectiveId, IWorkbenchWindow::Pointer window,
-    IAdaptable* input)
+    IAdaptable*  /*input*/)
 {
   return IWorkbenchPage::Pointer(0);
   //    // If the specified window has the requested perspective open and the
@@ -1348,7 +1348,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   //    return newWindow.getActivePage();
 }
 
-bool Workbench::SaveAllEditors(bool confirm)
+bool Workbench::SaveAllEditors(bool  /*confirm*/)
 {
   return true;
 }

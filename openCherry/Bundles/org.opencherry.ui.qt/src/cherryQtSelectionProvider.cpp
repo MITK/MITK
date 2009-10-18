@@ -110,7 +110,7 @@ void QtSelectionProvider::SetItemSelectionModel(QItemSelectionModel* selModel)
   }
 }
 
-void QtSelectionProvider::FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QtSelectionProvider::FireSelectionChanged(const QItemSelection&  /*selected*/, const QItemSelection&  /*deselected*/)
 {
 
   QtItemSelection::Pointer sel(new QtItemSelection(this->GetQItemSelection()));

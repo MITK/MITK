@@ -110,7 +110,7 @@ public:
     
     void LoadPropertiesFromPath();
     
-    Uniform *GetUniform(char *id) { return 0; }
+    Uniform *GetUniform(char * /*id*/) { return 0; }
     
     std::list<Uniform::Pointer> *GetUniforms()
     {

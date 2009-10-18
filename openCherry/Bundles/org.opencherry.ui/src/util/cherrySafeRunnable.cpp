@@ -84,7 +84,7 @@ SafeRunnable::SafeRunnable(const std::string& message) :
 
 }
 
-void SafeRunnable::HandleException(const std::exception& e)
+void SafeRunnable::HandleException(const std::exception&  /*e*/)
 {
   // Workaround to avoid interactive error dialogs during
   // automated testing

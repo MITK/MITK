@@ -506,7 +506,7 @@ void mitk::NavigationDataPlayer::Resume()
 }
 
 
-void mitk::NavigationDataPlayer::SetStream( PlayerMode mode )
+void mitk::NavigationDataPlayer::SetStream( PlayerMode  /*mode*/ )
 {
   m_Stream = NULL;
 

@@ -31,7 +31,7 @@ ContainerPlaceholder::ContainerPlaceholder(const std::string& id) :
 
 }
 
-void ContainerPlaceholder::CreateControl(void* parent)
+void ContainerPlaceholder::CreateControl(void*  /*parent*/)
 {
 
 }
@@ -50,7 +50,7 @@ void ContainerPlaceholder::Add(StackablePart::Pointer child)
   realContainer->Add(child);
 }
 
-bool ContainerPlaceholder::AllowsAdd(StackablePart::Pointer toAdd)
+bool ContainerPlaceholder::AllowsAdd(StackablePart::Pointer  /*toAdd*/)
 {
   return false;
 }
@@ -130,7 +130,7 @@ void ContainerPlaceholder::FindSashes(PartPane::Sashes& sashes)
   }
 }
 
-void ContainerPlaceholder::ResizeChild(StackablePart::Pointer childThatChanged)
+void ContainerPlaceholder::ResizeChild(StackablePart::Pointer  /*childThatChanged*/)
 {
 
 }

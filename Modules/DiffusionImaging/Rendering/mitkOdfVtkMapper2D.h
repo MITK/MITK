@@ -58,7 +58,7 @@ namespace mitk {
     virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
 
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer){};
+    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
 #endif
 
     virtual void Slice(mitk::BaseRenderer* renderer);

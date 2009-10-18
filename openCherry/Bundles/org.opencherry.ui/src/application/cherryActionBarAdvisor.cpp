@@ -57,22 +57,22 @@ void ActionBarAdvisor::FillActionBars(int flags)
   //        }
 }
 
-void ActionBarAdvisor::MakeActions(IWorkbenchWindow::Pointer window)
+void ActionBarAdvisor::MakeActions(IWorkbenchWindow::Pointer  /*window*/)
 {
   // do nothing
 }
 
-void ActionBarAdvisor::FillMenuBar(void* menuBar)
+void ActionBarAdvisor::FillMenuBar(void*  /*menuBar*/)
 {
   // do nothing
 }
 
-bool ActionBarAdvisor::SaveState(IMemento::Pointer memento)
+bool ActionBarAdvisor::SaveState(IMemento::Pointer  /*memento*/)
 {
   return true;
 }
 
-bool ActionBarAdvisor::RestoreState(IMemento::Pointer memento)
+bool ActionBarAdvisor::RestoreState(IMemento::Pointer  /*memento*/)
 {
   return true;
 }

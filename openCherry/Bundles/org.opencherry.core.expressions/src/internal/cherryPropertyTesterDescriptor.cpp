@@ -107,7 +107,7 @@ PropertyTesterDescriptor::Instantiate()
 }
 
 bool
-PropertyTesterDescriptor::Test(Object::Pointer receiver, const std::string& method, std::vector<Object::Pointer>& args, Object::Pointer expectedValue)
+PropertyTesterDescriptor::Test(Object::Pointer  /*receiver*/, const std::string&  /*method*/, std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
 {
   poco_bugcheck_msg("Method should never be called");
   return false;

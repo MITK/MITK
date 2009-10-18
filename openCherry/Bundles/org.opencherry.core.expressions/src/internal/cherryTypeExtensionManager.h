@@ -43,7 +43,7 @@ private:
   class NULL_PROPERTY_TESTER_ : public IPropertyTester
   {
   public:
-    bool Handles(const std::string& namespaze, const std::string& property)
+    bool Handles(const std::string&  /*namespaze*/, const std::string&  /*property*/)
     {
       return false;
     }
@@ -59,8 +59,8 @@ private:
     {
       return this;
     }
-    bool Test(Object::Pointer, const std::string& property,
-        std::vector<Object::Pointer>& args, Object::Pointer expectedValue)
+    bool Test(Object::Pointer, const std::string& /*property*/,
+        std::vector<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
     {
       return false;
     }

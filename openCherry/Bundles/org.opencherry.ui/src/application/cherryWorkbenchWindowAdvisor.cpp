@@ -115,18 +115,18 @@ void WorkbenchWindowAdvisor::CreateWindowContents(Shell::Pointer shell)
   this->GetWindowConfigurer().Cast<WorkbenchWindowConfigurer>()->CreateDefaultContents(shell);
 }
 
-void* WorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
+void* WorkbenchWindowAdvisor::CreateEmptyWindowContents(void*  /*parent*/)
 {
   return 0;
 }
 
-bool WorkbenchWindowAdvisor::SaveState(IMemento::Pointer memento)
+bool WorkbenchWindowAdvisor::SaveState(IMemento::Pointer  /*memento*/)
 {
   // do nothing
   return true;
 }
 
-bool WorkbenchWindowAdvisor::RestoreState(IMemento::Pointer memento)
+bool WorkbenchWindowAdvisor::RestoreState(IMemento::Pointer  /*memento*/)
 {
   // do nothing
   return true;

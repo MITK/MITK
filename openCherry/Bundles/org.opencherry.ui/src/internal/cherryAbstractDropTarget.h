@@ -34,7 +34,7 @@ struct AbstractDropTarget : public IDropTarget
         return Rectangle();
     }
 
-    void DragFinished(bool dropPerformed)
+    void DragFinished(bool  /*dropPerformed*/)
     {
 
     }

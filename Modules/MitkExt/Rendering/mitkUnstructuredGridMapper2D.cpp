@@ -397,7 +397,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
 vtkAbstractMapper3D* 
 mitk::UnstructuredGridMapper2D
-::GetVtkAbstractMapper3D(mitk::BaseRenderer * renderer)
+::GetVtkAbstractMapper3D(mitk::BaseRenderer *  /*renderer*/)
 {
 
   return NULL;

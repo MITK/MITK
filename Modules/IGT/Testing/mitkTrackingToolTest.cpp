@@ -33,8 +33,8 @@ public:
   mitkClassMacro(TrackingToolTestClass, mitk::TrackingTool);
   itkNewMacro(Self);
 
-  virtual void GetPosition(mitk::Point3D &position) const {};
-  virtual void GetOrientation(mitk::Quaternion& orientation) const {};
+  virtual void GetPosition(mitk::Point3D & /*position*/) const {};
+  virtual void GetOrientation(mitk::Quaternion&  /*orientation*/) const {};
   virtual bool Enable() {return true;}
   virtual bool Disable() {return true;}
   virtual bool IsEnabled() const {return true;}

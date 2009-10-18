@@ -78,7 +78,7 @@ struct CHERRY_UI ISelectionListener: public virtual Object
    *
    * @param e an event containing information about the selection
    */
-  virtual void WidgetSelected(SelectionEvent::Pointer e) {}
+  virtual void WidgetSelected(SelectionEvent::Pointer  /*e*/) {}
 
   /**
    * Sent when default selection occurs in the control.
@@ -93,7 +93,7 @@ struct CHERRY_UI ISelectionListener: public virtual Object
    *
    * @param e an event containing information about the default selection
    */
-  virtual void WidgetDefaultSelected(SelectionEvent::Pointer e) {}
+  virtual void WidgetDefaultSelected(SelectionEvent::Pointer  /*e*/) {}
 };
 
 }

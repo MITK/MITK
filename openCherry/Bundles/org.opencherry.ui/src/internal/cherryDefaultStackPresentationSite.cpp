@@ -89,25 +89,25 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
     * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(org.opencherry.ui.internal.skins.IPresentablePart, boolean)
     */
    void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer beingDragged, Point& initialPosition,
-           bool keyboard) {
+           bool  /*keyboard*/) {
    }
 
    /* (non-Javadoc)
     * @see org.opencherry.ui.internal.skins.IPresentationSite#close(org.opencherry.ui.internal.skins.IPresentablePart)
     */
-   void DefaultStackPresentationSite::Close(IPresentablePart::Pointer toClose) {
+   void DefaultStackPresentationSite::Close(IPresentablePart::Pointer  /*toClose*/) {
    }
 
    /* (non-Javadoc)
     * @see org.opencherry.ui.internal.skins.IPresentationSite#dragStart(boolean)
     */
-   void DefaultStackPresentationSite::DragStart(Point& initialPosition, bool keyboard) {
+   void DefaultStackPresentationSite::DragStart(Point&  /*initialPosition*/, bool  /*keyboard*/) {
    }
 
    /* (non-Javadoc)
     * @see org.opencherry.ui.presentations.IStackPresentationSite#supportsState(int)
     */
-   bool DefaultStackPresentationSite::SupportsState(int state) {
+   bool DefaultStackPresentationSite::SupportsState(int  /*state*/) {
        return true;
    }
 

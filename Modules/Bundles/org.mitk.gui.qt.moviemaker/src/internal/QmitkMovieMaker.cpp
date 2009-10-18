@@ -72,7 +72,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include <qradiobutton.h>
 
-QmitkMovieMaker::QmitkMovieMaker(QObject *parent, const char *name)
+QmitkMovieMaker::QmitkMovieMaker(QObject *parent, const char * /*name*/)
 
 :
   QmitkFunctionality(), m_Controls(NULL),
@@ -642,7 +642,7 @@ void QmitkMovieMaker::BlockControls(bool blocked)
   m_Controls->btnScreenshot->setEnabled(!blocked);
 }
 
-void QmitkMovieMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget)
+void QmitkMovieMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget&  /*stdMultiWidget*/)
 {
   m_Parent->setEnabled(true);
 }

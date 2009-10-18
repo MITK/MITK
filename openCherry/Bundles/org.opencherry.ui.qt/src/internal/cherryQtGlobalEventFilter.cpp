@@ -33,7 +33,7 @@ QtGlobalEventFilter::QtGlobalEventFilter(QObject* parent)
 
 }
 
-bool QtGlobalEventFilter::eventFilter(QObject* obj, QEvent* event)
+bool QtGlobalEventFilter::eventFilter(QObject*  /*obj*/, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonPress)
   {

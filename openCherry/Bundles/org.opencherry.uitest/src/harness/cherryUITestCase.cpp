@@ -86,7 +86,7 @@ void UITestCase::CloseAllTestWindows()
   //        testWindows.clear();
 }
 
-IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer win)
+IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer  /*win*/)
 {
   //        IWorkbenchPage[] pages = openTestPage(win, 1);
   //        if (pages != null)
@@ -96,7 +96,7 @@ IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer win)
 }
 
 std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
-    IWorkbenchWindow::Pointer win, int pageTotal)
+    IWorkbenchWindow::Pointer  /*win*/, int  /*pageTotal*/)
 {
   //        try {
   //            IWorkbenchPage[] pages = new IWorkbenchPage[pageTotal];
@@ -113,7 +113,7 @@ std::vector<IWorkbenchPage::Pointer> UITestCase::OpenTestPage(
   return std::vector<IWorkbenchPage::Pointer>();
 }
 
-void UITestCase::CloseAllPages(IWorkbenchWindow::Pointer window)
+void UITestCase::CloseAllPages(IWorkbenchWindow::Pointer  /*window*/)
 {
   //        IWorkbenchPage[] pages = window.getPages();
   //        for (int i = 0; i < pages.length; i++)
@@ -182,13 +182,13 @@ void UITestCase::TestWindowListener::SetEnabled(bool enabled)
 }
 
 void UITestCase::TestWindowListener::WindowActivated(
-    IWorkbenchWindow::Pointer window)
+    IWorkbenchWindow::Pointer  /*window*/)
 {
   // do nothing
 }
 
 void UITestCase::TestWindowListener::WindowDeactivated(
-    IWorkbenchWindow::Pointer window)
+    IWorkbenchWindow::Pointer  /*window*/)
 {
   // do nothing
 }
@@ -254,7 +254,7 @@ void UITestCase::RemoveWindowListener()
   }
 }
 
-void UITestCase::WaitOnShell(Shell::Pointer shell)
+void UITestCase::WaitOnShell(Shell::Pointer  /*shell*/)
 {
 
   ProcessEvents();

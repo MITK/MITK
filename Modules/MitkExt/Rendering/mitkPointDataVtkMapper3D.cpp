@@ -54,7 +54,7 @@ mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
   m_PointMapper->Delete();
 }
 
-vtkProp* mitk::PointDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+vtkProp* mitk::PointDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
 {
   return m_PointActor;
 

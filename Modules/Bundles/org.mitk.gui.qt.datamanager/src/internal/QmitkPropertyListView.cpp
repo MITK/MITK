@@ -32,7 +32,7 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
     ->AddSelectionListener(cherry::ISelectionListener::Pointer(this));
 }
 
-void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer part , cherry::ISelection::ConstPointer selection )
+void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer  /*part*/ , cherry::ISelection::ConstPointer selection )
 {
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();

@@ -878,7 +878,7 @@ void PartSashContainer::SetBounds(const Rectangle& r)
 
 IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
     Object::Pointer draggedObject, const Point& position,
-    const Rectangle& dragRectangle)
+    const Rectangle&  /*dragRectangle*/)
 {
   if (!(draggedObject.Cast<PartStack> () != 0
       || draggedObject.Cast<PartPane> () != 0))
@@ -1168,7 +1168,7 @@ int PartSashContainer::GetVisibleChildrenCount(
 }
 
 float PartSashContainer::GetDockingRatio(Object::Pointer dragged,
-    IStackableContainer::Pointer target)
+    IStackableContainer::Pointer  /*target*/)
 {
   return 0.5f;
 }

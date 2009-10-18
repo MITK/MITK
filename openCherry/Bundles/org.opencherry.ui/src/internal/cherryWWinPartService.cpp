@@ -31,7 +31,7 @@ struct WWinListener: public IPartListener
   {
   }
 
-  void PartActivated(IWorkbenchPartReference::Pointer ref)
+  void PartActivated(IWorkbenchPartReference::Pointer  /*ref*/)
   {
     wwps->UpdateActivePart();
   }
@@ -46,7 +46,7 @@ struct WWinListener: public IPartListener
     wwps->partService.FirePartClosed(ref);
   }
 
-  void PartDeactivated(IWorkbenchPartReference::Pointer ref)
+  void PartDeactivated(IWorkbenchPartReference::Pointer  /*ref*/)
   {
     wwps->UpdateActivePart();
   }

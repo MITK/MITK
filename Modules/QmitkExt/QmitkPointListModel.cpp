@@ -103,7 +103,7 @@ void QmitkPointListModel::ObserveNewPointset( mitk::PointSet* pointSet )
 }
 
 
-void QmitkPointListModel::OnPointSetChanged( const itk::EventObject & e )
+void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
 {
   this->reset();
   emit QAbstractListModel::layoutChanged();
@@ -111,7 +111,7 @@ void QmitkPointListModel::OnPointSetChanged( const itk::EventObject & e )
 }
 
 
-void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject & e )
+void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
 {
   m_PointSet = NULL;
   m_PointSetModifiedObserverTag = 0;
@@ -120,7 +120,7 @@ void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject & e )
 }
 
 
-int QmitkPointListModel::rowCount( const QModelIndex& parent ) const
+int QmitkPointListModel::rowCount( const QModelIndex&  /*parent*/ ) const
 {
   if ( m_PointSet != NULL )
   {

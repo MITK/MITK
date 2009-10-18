@@ -34,8 +34,8 @@ struct AbstractTabItem {
     virtual void SetInfo(const PartInfo& info) = 0;
     virtual void Dispose() = 0;
 
-    virtual void SetBusy(bool busy) {}
-    virtual void SetBold(bool bold) {}
+    virtual void SetBusy(bool  /*busy*/) {}
+    virtual void SetBold(bool  /*bold*/) {}
 
     virtual Object::Pointer GetData() = 0;
     virtual void SetData(Object::Pointer data) = 0;

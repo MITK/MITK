@@ -160,7 +160,7 @@ static void TestSwapPointPositionDownwards(mitk::PointSet *pointSet)
     */
 }
 
-static void TestSwapPointPositionDownwardsNotPossible(mitk::PointSet *pointSet)
+static void TestSwapPointPositionDownwardsNotPossible(mitk::PointSet * /*pointSet*/)
 {
   mitk::PointSet::Pointer pointSet2 = mitk::PointSet::New();
 

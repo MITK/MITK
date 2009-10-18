@@ -26,7 +26,7 @@
 namespace cherry
 {
 
-EmptyTabFolder::EmptyTabFolder(QWidget* parent, bool showborder) :
+EmptyTabFolder::EmptyTabFolder(QWidget* parent, bool  /*showborder*/) :
   control(0), childControl(0)
 {
   control = new QFrame(parent);
@@ -51,13 +51,13 @@ EmptyTabFolder::EmptyTabFolder(QWidget* parent, bool showborder) :
   //        }
 }
 
-QSize EmptyTabFolder::ComputeSize(int widthHint, int heightHint)
+QSize EmptyTabFolder::ComputeSize(int  /*widthHint*/, int  /*heightHint*/)
 {
   QRect rect = control->layout()->contentsRect();
   return QSize(rect.x(), rect.y());
 }
 
-AbstractTabItem* EmptyTabFolder::Add(int index, int flags)
+AbstractTabItem* EmptyTabFolder::Add(int  /*index*/, int  /*flags*/)
 {
   return new EmptyTabItem();
 }
@@ -88,7 +88,7 @@ AbstractTabItem* EmptyTabFolder::GetSelection()
   return 0;
 }
 
-void EmptyTabFolder::SetSelection(AbstractTabItem* toSelect)
+void EmptyTabFolder::SetSelection(AbstractTabItem*  /*toSelect*/)
 {
 
 }
@@ -100,12 +100,12 @@ void EmptyTabFolder::Layout(bool flushCache)
   //control->layout->update();
 }
 
-void EmptyTabFolder::SetSelectedInfo(const PartInfo& info)
+void EmptyTabFolder::SetSelectedInfo(const PartInfo&  /*info*/)
 {
 
 }
 
-void EmptyTabFolder::EnablePaneMenu(bool enabled)
+void EmptyTabFolder::EnablePaneMenu(bool  /*enabled*/)
 {
 
 }

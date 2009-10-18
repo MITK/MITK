@@ -198,13 +198,13 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
   return data;
 }
 
-int QmitkPropertiesTableModel::rowCount(const QModelIndex& parent) const
+int QmitkPropertiesTableModel::rowCount(const QModelIndex&  /*parent*/) const
 {
   // return the number of properties in the properties list.
   return m_SelectedProperties.size();
 }
 
-int QmitkPropertiesTableModel::columnCount(const QModelIndex &parent)const
+int QmitkPropertiesTableModel::columnCount(const QModelIndex & /*parent*/)const
 {
   return 3;
 }
@@ -236,7 +236,7 @@ void QmitkPropertiesTableModel::SetPropertyList( mitk::PropertyList* _PropertyLi
   }
 }
 
-void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object *_PropertyList )
+void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object * /*_PropertyList*/ )
 {
   if(!m_BlockEvents)
   {
@@ -246,7 +246,7 @@ void QmitkPropertiesTableModel::PropertyListDelete( const itk::Object *_Property
   }
 }
 
-void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject &event )
+void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(!m_BlockEvents)
   {
@@ -260,7 +260,7 @@ void QmitkPropertiesTableModel::PropertyModified( const itk::Object *caller, con
   }
 }
 
-void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const itk::EventObject &event )
+void QmitkPropertiesTableModel::PropertyDelete( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(!m_BlockEvents)
   {

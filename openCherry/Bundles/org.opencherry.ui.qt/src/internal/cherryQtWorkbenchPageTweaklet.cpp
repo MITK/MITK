@@ -63,7 +63,7 @@ Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(void* parent, const st
   return Object::Pointer(0);
 }
 
-IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const std::string& partName, const std::string& msg)
+IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const std::string&  /*partName*/, const std::string&  /*msg*/)
 {
   return IEditorPart::Pointer(0);
 }

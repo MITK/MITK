@@ -39,13 +39,13 @@ GuiTk::IControlListener::Events::Types PresentablePartFolder::ContentProxyListen
 }
 
 void PresentablePartFolder::ContentProxyListener::ControlMoved(
-    GuiTk::ControlEvent::Pointer e)
+    GuiTk::ControlEvent::Pointer  /*e*/)
 {
   folder->LayoutContent();
 }
 
 void PresentablePartFolder::ContentProxyListener::ControlResized(
-    GuiTk::ControlEvent::Pointer e)
+    GuiTk::ControlEvent::Pointer  /*e*/)
 {
 }
 
@@ -54,13 +54,13 @@ PresentablePartFolder::ShellListener::ShellListener(AbstractTabFolder* _folder) 
 {
 }
 
-void PresentablePartFolder::ShellListener::ShellActivated(ShellEvent::Pointer e)
+void PresentablePartFolder::ShellListener::ShellActivated(ShellEvent::Pointer  /*e*/)
 {
   folder->ShellActive(true);
 }
 
 void PresentablePartFolder::ShellListener::ShellDeactivated(
-    ShellEvent::Pointer e)
+    ShellEvent::Pointer  /*e*/)
 {
   folder->ShellActive(false);
 }

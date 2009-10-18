@@ -236,7 +236,7 @@ void InternalJob::AddJobChangeListener(IJobChangeListener::Pointer listener)
   jobEvents.AddListener(listener);
 }
 
-bool InternalJob::BelongsTo(Object::Pointer family)
+bool InternalJob::BelongsTo(Object::Pointer  /*family*/)
 {
   return false;
 }

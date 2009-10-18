@@ -43,7 +43,7 @@ QmitkDataTreeNodeSelectionProvider::GetDataTreeNodeSelection() const
 }
 
 void QmitkDataTreeNodeSelectionProvider::FireSelectionChanged(
-    const QItemSelection& selected, const QItemSelection& deselected)
+    const QItemSelection&  /*selected*/, const QItemSelection&  /*deselected*/)
 {
   cherry::ISelection::ConstPointer sel(this->GetDataTreeNodeSelection());
   cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(

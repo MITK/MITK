@@ -173,7 +173,7 @@ void QmitkMeasurement::Reset()
   }
 }
 
-void QmitkMeasurement::ActionDrawLineTriggered( bool checked )
+void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
 {
   this->Reset();
 
@@ -191,7 +191,7 @@ void QmitkMeasurement::ActionDrawLineTriggered( bool checked )
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
-void QmitkMeasurement::ActionDrawPathTriggered( bool checked )
+void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
 {
   this->Reset();
 
@@ -211,7 +211,7 @@ void QmitkMeasurement::ActionDrawPathTriggered( bool checked )
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
-void QmitkMeasurement::ActionDrawAngleTriggered( bool checked )
+void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
 {
   this->Reset();
 
@@ -229,22 +229,22 @@ void QmitkMeasurement::ActionDrawAngleTriggered( bool checked )
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
-void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool checked )
+void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
 {
 
 }
 
-void QmitkMeasurement::ActionDrawEllipseTriggered( bool checked )
+void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
 {
 
 }
 
-void QmitkMeasurement::ActionDrawRectangleTriggered( bool checked )
+void QmitkMeasurement::ActionDrawRectangleTriggered( bool  /*checked*/ )
 {
 
 }
 
-void QmitkMeasurement::ActionDrawPolygonTriggered( bool checked )
+void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
 {
   this->Reset();
 
@@ -264,12 +264,12 @@ void QmitkMeasurement::ActionDrawPolygonTriggered( bool checked )
   mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
 }
 
-void QmitkMeasurement::ActionDrawArrowTriggered( bool checked )
+void QmitkMeasurement::ActionDrawArrowTriggered( bool  /*checked*/ )
 {
 
 }
 
-void QmitkMeasurement::ActionDrawTextTriggered( bool checked )
+void QmitkMeasurement::ActionDrawTextTriggered( bool  /*checked*/ )
 {
 
 }

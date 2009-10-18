@@ -57,7 +57,7 @@ mitk::EnhancedPointSetVtkMapper3D::EnhancedPointSetVtkMapper3D()
   m_PropAssembly = vtkAssembly::New();
 }
 
-vtkProp* mitk::EnhancedPointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+vtkProp* mitk::EnhancedPointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
 {
   return m_PropAssembly;
 }
@@ -342,7 +342,7 @@ void mitk::EnhancedPointSetVtkMapper3D::GenerateData( mitk::BaseRenderer * rende
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   // TODO: apply new transform if time step changed
 

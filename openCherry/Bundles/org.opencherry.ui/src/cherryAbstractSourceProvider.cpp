@@ -69,7 +69,7 @@ void AbstractSourceProvider::RemoveSourceProviderListener(
   sourceEvents.RemoveListener(listener);
 }
 
-void AbstractSourceProvider::Initialize(IServiceLocator::ConstPointer locator)
+void AbstractSourceProvider::Initialize(IServiceLocator::ConstPointer  /*locator*/)
 {
 }
 

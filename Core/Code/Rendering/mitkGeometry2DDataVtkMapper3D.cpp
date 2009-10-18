@@ -189,7 +189,7 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 }
 
 
-vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   if ( (this->GetDataTreeNode() != NULL )
     && (m_ImageAssembly != NULL) )
@@ -204,7 +204,7 @@ vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 }
 
 
-void Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   m_ImageAssembly->SetUserTransform(
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );

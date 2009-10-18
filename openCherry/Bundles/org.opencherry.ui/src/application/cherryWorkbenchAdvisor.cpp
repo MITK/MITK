@@ -41,7 +41,7 @@ void WorkbenchAdvisor::InternalBasicInitialize(IWorkbenchConfigurer::Pointer con
   this->Initialize(configurer);
 }
 
-void WorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
+void WorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer  /*configurer*/)
 {
   // do nothing
 }
@@ -71,7 +71,7 @@ void WorkbenchAdvisor::PostShutdown()
   // do nothing
 }
 
-void WorkbenchAdvisor::OpenIntro(IWorkbenchWindowConfigurer::Pointer configurer)
+void WorkbenchAdvisor::OpenIntro(IWorkbenchWindowConfigurer::Pointer  /*configurer*/)
 {
 //  if (introOpened)
 //  {
@@ -185,12 +185,12 @@ bool WorkbenchAdvisor::OpenWindows()
   return true;
 }
 
-bool WorkbenchAdvisor::SaveState(IMemento::Pointer memento)
+bool WorkbenchAdvisor::SaveState(IMemento::Pointer  /*memento*/)
 {
   return true;
 }
 
-bool WorkbenchAdvisor::RestoreState(IMemento::Pointer memento)
+bool WorkbenchAdvisor::RestoreState(IMemento::Pointer  /*memento*/)
 {
   return true;
 }

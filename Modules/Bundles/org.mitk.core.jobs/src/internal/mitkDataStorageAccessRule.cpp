@@ -150,7 +150,7 @@ bool
 
  bool 
    mitk::DataStorageAccessRule
-   ::TestDataTreeNode(mitk::DataTreeNode::Pointer dataTreeToBeStored) const 
+   ::TestDataTreeNode(mitk::DataTreeNode::Pointer  /*dataTreeToBeStored*/) const 
   {
    mitk::DataStorage::SetOfObjects::ConstPointer tempAllNodes = m_sptrMyDataStorage->GetAll(); 
    for(mitk::DataStorage::SetOfObjects::const_iterator it = tempAllNodes->begin(); it !=tempAllNodes->end(); ++ it){

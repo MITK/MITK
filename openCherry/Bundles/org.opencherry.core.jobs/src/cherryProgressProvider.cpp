@@ -36,7 +36,7 @@ IProgressMonitor::Pointer ProgressProvider::GetDefaultMonitor()
 }
 
 IProgressMonitor::Pointer ProgressProvider::CreateMonitor(Job::Pointer job,
-    IProgressMonitor::Pointer group, int ticks)
+    IProgressMonitor::Pointer  /*group*/, int  /*ticks*/)
 {
   //TODO SubProgressMonitor class
   // not implemented yet ( because the subProgressMonitor class is not implemented )returns a dummy null IProgressMonitor

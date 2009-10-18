@@ -71,7 +71,7 @@ void QtShell::SetLocation(int x, int y)
   widget->move(x, y);
 }
 
-Point QtShell::ComputeSize(int wHint, int hHint, bool changed)
+Point QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
 {
   if (changed) widget->updateGeometry();
   QSize size(widget->size());
@@ -101,7 +101,7 @@ void* QtShell::GetControl()
   return widget;
 }
 
-void QtShell::SetImages(const std::vector<void*>& images)
+void QtShell::SetImages(const std::vector<void*>&  /*images*/)
 {
 }
 

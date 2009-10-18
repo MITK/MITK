@@ -166,7 +166,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   this->CreateDefaultTransferFunctions();
 }
 
-vtkProp *mitk::VolumeDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp *mitk::VolumeDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_VolumeLOD;
 }
@@ -679,7 +679,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
 }
 
 
-bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer *renderer ) const
+bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*/ ) const
 {
   return false;
   

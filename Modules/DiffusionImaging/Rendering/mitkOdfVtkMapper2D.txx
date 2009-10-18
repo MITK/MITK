@@ -1002,7 +1002,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
-::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer*  /*renderer*/, bool  /*overwrite*/)
 {
   node->SetProperty( "ShowMaxNumber", mitk::IntProperty::New( 150 ) );
   node->SetProperty( "Scaling", mitk::FloatProperty::New( 1.0 ) );

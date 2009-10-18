@@ -496,13 +496,13 @@ const mitk::PropertyList* mitk::SceneIO::GetFailedProperties()
   return m_FailedProperties; 
 }
 
-void mitk::SceneIO::OnUnzipError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
+void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
 {
   ++m_UnzipErrors;
   LOG_ERROR << "Error while unzipping: " << info.second;
 }
 
-void mitk::SceneIO::OnUnzipOk(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
+void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
 {
   LOG_INFO << "Unzipped ok: " << info.second.toString();
 }

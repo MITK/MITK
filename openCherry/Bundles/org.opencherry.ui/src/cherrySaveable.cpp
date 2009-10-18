@@ -23,7 +23,7 @@
 namespace cherry
 {
 
-bool Saveable::Show(IWorkbenchPage::Pointer page)
+bool Saveable::Show(IWorkbenchPage::Pointer  /*page*/)
 {
   return false;
 }
@@ -36,7 +36,7 @@ bool Saveable::Show(IWorkbenchPage::Pointer page)
 }
 
 void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& parts,
-    bool closing)
+    bool  /*closing*/)
 {
   //TODO Saveable DisableUI
   //    for (int i = 0; i < parts.length; i++) {
@@ -54,7 +54,7 @@ void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& parts,
   //    }
 }
 
-void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>& parts)
+void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>&  /*parts*/)
 {
   //TODO Saveable EnableUI
   //    for (unsigned int i = 0; i < parts.size(); i++) {
@@ -72,7 +72,7 @@ void Saveable::EnableUI(std::vector<IWorkbenchPart::Pointer>& parts)
   //    }
 }
 
-Poco::Any Saveable::GetAdapter(const std::string& adapter)
+Poco::Any Saveable::GetAdapter(const std::string&  /*adapter*/)
 {
   return Poco::Any();
 }

@@ -565,7 +565,7 @@ bool EditorSashContainer::IsPaneType(StackablePart::Pointer toTest)
       != 0);
 }
 
-bool EditorSashContainer::RestorePresentationState(IMemento::Pointer areaMem)
+bool EditorSashContainer::RestorePresentationState(IMemento::Pointer  /*areaMem*/)
 {
   std::list<PartStack::Pointer> workbooks = this->GetEditorWorkbooks();
   for (std::list<PartStack::Pointer>::iterator iter = workbooks.begin();

@@ -30,7 +30,7 @@ PartPlaceholder::PartPlaceholder(const std::string& id) :
 
 }
 
-void PartPlaceholder::CreateControl(void* parent)
+void PartPlaceholder::CreateControl(void*  /*parent*/)
 {
   // do nothing
 }

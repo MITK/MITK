@@ -302,12 +302,12 @@ bool QtWidgetsTweakletImpl::IsReparentable(QWidget* /*widget*/)
   return true;
 }
 
-void QtWidgetsTweakletImpl::MoveAbove(QWidget* widgetToMove, QWidget* widget)
+void QtWidgetsTweakletImpl::MoveAbove(QWidget* widgetToMove, QWidget*  /*widget*/)
 {
   widgetToMove->raise();
 }
 
-void QtWidgetsTweakletImpl::MoveBelow(QWidget* widgetToMove, QWidget* widget)
+void QtWidgetsTweakletImpl::MoveBelow(QWidget* widgetToMove, QWidget*  /*widget*/)
 {
   widgetToMove->lower();
 }

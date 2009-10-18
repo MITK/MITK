@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace cherry {
 
-QtShowViewDialog::QtShowViewDialog(IViewRegistry* registry, QWidget* parent, Qt::WindowFlags f)
+QtShowViewDialog::QtShowViewDialog(IViewRegistry*  /*registry*/, QWidget* parent, Qt::WindowFlags f)
 : QDialog(parent, f)
 {
   m_UserInterface.setupUi(this);

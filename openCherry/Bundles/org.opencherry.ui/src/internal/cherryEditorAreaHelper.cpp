@@ -140,7 +140,7 @@ IEditorReference::Pointer EditorAreaHelper::GetVisibleEditor()
   return IEditorReference::Pointer(0);
 }
 
-void EditorAreaHelper::MoveEditor(IEditorPart::Pointer part, int position)
+void EditorAreaHelper::MoveEditor(IEditorPart::Pointer  /*part*/, int  /*position*/)
 {
 
   ///*EditorPane pane = (EditorPane)*/((EditorSite) part.getSite()).getPane();

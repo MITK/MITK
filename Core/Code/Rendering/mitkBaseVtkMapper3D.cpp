@@ -228,7 +228,7 @@ void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, 
 }
 */
 
-void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow *renWin)
+void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
 {
 /*
   if(m_Prop3D)

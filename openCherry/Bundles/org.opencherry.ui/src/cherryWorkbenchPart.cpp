@@ -265,7 +265,7 @@ std::string WorkbenchPart::GetTitleToolTip() const
 }
 
 void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const std::string& propertyName, Object::Pointer data)
+    const std::string&  /*propertyName*/, Object::Pointer  /*data*/)
 {
   // Save config element.
   m_ConfigElement = cfig;

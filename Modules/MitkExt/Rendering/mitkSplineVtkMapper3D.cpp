@@ -48,12 +48,12 @@ mitk::SplineVtkMapper3D::~SplineVtkMapper3D()
 }
 
 vtkProp*
-mitk::SplineVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+mitk::SplineVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_SplineAssembly;
 }
 
-void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());

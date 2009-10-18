@@ -110,12 +110,12 @@ QVariant QmitkDataStorageListModel::data(const QModelIndex& index, int role) con
   return QVariant();
 }
 
-QVariant QmitkDataStorageListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkDataStorageListModel::headerData(int  /*section*/, Qt::Orientation  /*orientation*/, int  /*role*/) const
 {
   return QVariant("Nodes");
 }
 
-int QmitkDataStorageListModel::rowCount(const QModelIndex& parent) const
+int QmitkDataStorageListModel::rowCount(const QModelIndex&  /*parent*/) const
 {
   return m_DataNodes.size();
 }
@@ -235,7 +235,7 @@ void QmitkDataStorageListModel::NodeRemoved( const mitk::DataTreeNode* node )
   }
 }
 
-void QmitkDataStorageListModel::OnModified( const itk::Object *caller, const itk::EventObject &event )
+void QmitkDataStorageListModel::OnModified( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(m_BlockEvents) return;
 
@@ -249,7 +249,7 @@ void QmitkDataStorageListModel::OnModified( const itk::Object *caller, const itk
   }
 }
 
-void QmitkDataStorageListModel::OnDelete( const itk::Object *caller, const itk::EventObject &event )
+void QmitkDataStorageListModel::OnDelete( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(m_BlockEvents) return;
 

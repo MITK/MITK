@@ -66,7 +66,7 @@ void PresentablePart::FirePropertyChange(int propId)
   this->FirePropertyChange(event);
 }
 
-PresentablePart::PresentablePart(PartPane::Pointer part, void* parent)
+PresentablePart::PresentablePart(PartPane::Pointer part, void*  /*parent*/)
 {
   enableInputs = true;
   enableOutputs = true;

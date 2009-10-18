@@ -40,7 +40,7 @@ const IJobManager* Job::GetJobManager()
 }
 
 
-bool Job::BelongsTo(Object::Pointer family)
+bool Job::BelongsTo(Object::Pointer  /*family*/)
 {
   return false;
 }

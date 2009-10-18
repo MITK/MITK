@@ -42,7 +42,7 @@ SmartPointer<ImageDescriptor> QtImageTweaklet::GetMissingImageDescriptor()
   return descriptor;
 }
 
-void QtImageTweaklet::DestroyImage(const void* img)
+void QtImageTweaklet::DestroyImage(const void*  /*img*/)
 {
 
 }

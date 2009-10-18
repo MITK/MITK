@@ -82,7 +82,7 @@ struct CHERRY_UI IWorkbenchListener : public virtual Object {
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    *   <code>false</code> to veto a non-forced shutdown
    */
-  virtual bool PreShutdown(IWorkbench* workbench, bool forced) { return true; };
+  virtual bool PreShutdown(IWorkbench*  /*workbench*/, bool  /*forced*/) { return true; };
 
   /**
    * Performs arbitrary finalization after the workbench stops running.
@@ -93,7 +93,7 @@ struct CHERRY_UI IWorkbenchListener : public virtual Object {
    *
    * @param workbench the workbench
    */
-  virtual void PostShutdown(IWorkbench* workbench) {};
+  virtual void PostShutdown(IWorkbench*  /*workbench*/) {};
 
 };
 

@@ -127,15 +127,15 @@ void AbstractTabFolder::SetState(int state)
   this->state = state;
 }
 
-void AbstractTabFolder::ShellActive(bool isActive)
+void AbstractTabFolder::ShellActive(bool  /*isActive*/)
 {
 }
 
-void AbstractTabFolder::Layout(bool flushCache)
+void AbstractTabFolder::Layout(bool  /*flushCache*/)
 {
 }
 
-void AbstractTabFolder::SetTabPosition(int tabPosition)
+void AbstractTabFolder::SetTabPosition(int  /*tabPosition*/)
 {
 }
 
@@ -149,7 +149,7 @@ int AbstractTabFolder::GetState()
   return state;
 }
 
-bool AbstractTabFolder::IsOnBorder(const QPoint& toTest)
+bool AbstractTabFolder::IsOnBorder(const QPoint&  /*toTest*/)
 {
   return false;
 }
@@ -159,7 +159,7 @@ void AbstractTabFolder::SetVisible(bool visible)
   this->GetControl()->setVisible(visible);
 }
 
-void AbstractTabFolder::ShowMinMax(bool show)
+void AbstractTabFolder::ShowMinMax(bool  /*show*/)
 {
 }
 
@@ -198,7 +198,7 @@ void AbstractTabFolder::HandleContextMenu(const QPoint& displayPos)
   this->FireEvent(TabFolderEvent::EVENT_SYSTEM_MENU, tab, displayPos);
 }
 
-void AbstractTabFolder::HandleMousePress(const QPoint& displayPos)
+void AbstractTabFolder::HandleMousePress(const QPoint&  /*displayPos*/)
 {
   this->FireEvent(TabFolderEvent::EVENT_GIVE_FOCUS_TO_PART);
 }

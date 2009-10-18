@@ -684,7 +684,7 @@ void Perspective::OnDeactivate()
 //  setEditorAreaTrimVisibility(false);
 }
 
-void Perspective::PartActivated(IWorkbenchPart::Pointer activePart)
+void Perspective::PartActivated(IWorkbenchPart::Pointer  /*activePart*/)
 {
 //  // If a fastview is open close it.
 //  if (activeFastView != 0
@@ -694,7 +694,7 @@ void Perspective::PartActivated(IWorkbenchPart::Pointer activePart)
 //  }
 }
 
-void Perspective::PerformedShowIn(const std::string& partId)
+void Perspective::PerformedShowIn(const std::string&  /*partId*/)
 {
   //showInTimes.insert(std::make_pair(partId, new Long(System.currentTimeMillis())));
 }
@@ -1143,7 +1143,7 @@ void Perspective::SaveDesc()
   this->SaveDescAs(descriptor);
 }
 
-void Perspective::SaveDescAs(IPerspectiveDescriptor::Pointer desc)
+void Perspective::SaveDescAs(IPerspectiveDescriptor::Pointer  /*desc*/)
 {
   //TODO Perspective SaveDescAs
 //  PerspectiveDescriptor::Pointer realDesc = desc.Cast<PerspectiveDescriptor>();

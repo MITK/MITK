@@ -17,7 +17,7 @@
 #include <QMessageBox>
 #include <QPen>
 
-QmitkPropertyDelegate::QmitkPropertyDelegate(QObject *parent)
+QmitkPropertyDelegate::QmitkPropertyDelegate(QObject * /*parent*/)
 {
 }
 
@@ -294,7 +294,7 @@ void QmitkPropertyDelegate::commitAndCloseEditor()
 
 void QmitkPropertyDelegate::updateEditorGeometry(QWidget *editor,
                                                     const QStyleOptionViewItem &option,
-                                                    const QModelIndex &index) const
+                                                    const QModelIndex & /*index*/) const
 {
 /*
   QRect rect = option.rect;
@@ -314,7 +314,7 @@ void QmitkPropertyDelegate::updateEditorGeometry(QWidget *editor,
   editor->setGeometry(option.rect);
 }
 
-void QmitkPropertyDelegate::ComboBoxCurrentIndexChanged( int index )
+void QmitkPropertyDelegate::ComboBoxCurrentIndexChanged( int  /*index*/ )
 {
   if(QComboBox *comboBox = qobject_cast<QComboBox *>(sender()))
   {
@@ -323,7 +323,7 @@ void QmitkPropertyDelegate::ComboBoxCurrentIndexChanged( int index )
   }
 }
 
-void QmitkPropertyDelegate::SpinBoxValueChanged( const QString& value )
+void QmitkPropertyDelegate::SpinBoxValueChanged( const QString&  /*value*/ )
 {
   QAbstractSpinBox *spinBox = 0;
   if((spinBox = qobject_cast<QSpinBox *>(sender()))

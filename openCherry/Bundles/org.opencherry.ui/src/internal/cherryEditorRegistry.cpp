@@ -67,7 +67,7 @@ EditorRegistry::EditorRegistry() :
 void EditorRegistry::AddEditorFromPlugin(EditorDescriptor::Pointer editor,
     const std::vector<std::string>& extensions,
     const std::vector<std::string>& filenames,
-    const std::vector<std::string>& contentTypeVector, bool bDefault)
+    const std::vector<std::string>&  /*contentTypeVector*/, bool bDefault)
 {
 
   //PlatformUI.getWorkbench().getExtensionTracker().registerObject(editor.getConfigurationElement().getDeclaringExtension(), editor, IExtensionTracker.REF_WEAK);
@@ -224,7 +224,7 @@ IEditorDescriptor::Pointer EditorRegistry::GetEditorForContentType(
 
 std::list<IEditorDescriptor::Pointer> EditorRegistry::FindRelatedObjects(
     /*IContentType type,*/const std::string& fileName,
-    RelatedRegistry& registry)
+    RelatedRegistry&  /*registry*/)
 {
   std::list<IEditorDescriptor::Pointer> allRelated;
   std::list<IEditorDescriptor::Pointer> nonDefaultFileEditors;
@@ -534,7 +534,7 @@ void EditorRegistry::SetProductDefaults(const std::string& defaultEditors)
 }
 
 bool EditorRegistry::ReadEditors(
-    std::map<std::string, EditorDescriptor::Pointer>& editorTable)
+    std::map<std::string, EditorDescriptor::Pointer>&  /*editorTable*/)
 {
   //Get the workbench plugin's working directory
   Poco::Path workbenchStatePath;
@@ -639,7 +639,7 @@ bool EditorRegistry::ReadEditors(
 
 void EditorRegistry::ReadResources(
     std::map<std::string, EditorDescriptor::Pointer>& editorTable,
-    std::ostream& reader)
+    std::ostream&  /*reader*/)
 {
   //      XMLMemento memento = XMLMemento.createReadRoot(reader);
   //      String versionString = memento.getString(IWorkbenchConstants.TAG_VERSION);
@@ -781,7 +781,7 @@ bool EditorRegistry::Contains(
 }
 
 bool EditorRegistry::ReadResources(
-    std::map<std::string, EditorDescriptor::Pointer>& editorTable)
+    std::map<std::string, EditorDescriptor::Pointer>&  /*editorTable*/)
 {
   //Get the workbench plugin's working directory
   Poco::Path workbenchStatePath;
@@ -1117,14 +1117,14 @@ std::vector<FileEditorMapping::Pointer> EditorRegistry::EditorMap::UserMappings(
   return result;
 }
 
-bool EditorRegistry::IsSystemInPlaceEditorAvailable(const std::string& filename)
+bool EditorRegistry::IsSystemInPlaceEditorAvailable(const std::string&  /*filename*/)
 {
   //return ComponentSupport.inPlaceEditorAvailable(filename);
   return false;
 }
 
 bool EditorRegistry::IsSystemExternalEditorAvailable(
-    const std::string& filename)
+    const std::string&  /*filename*/)
 {
   //      std::string::size_type nDot = filename.find_last_of('.');
   //      if (nDot != std::string::npos)

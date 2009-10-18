@@ -41,12 +41,12 @@ const mitk::Mesh* mitk::MeshVtkMapper3D::GetInput()
   return static_cast<const mitk::Mesh * > ( GetData() );
 }
 
-vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_PropAssembly;
 }
 
-void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());

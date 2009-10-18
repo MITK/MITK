@@ -43,7 +43,7 @@ Point StackPresentation::ComputeMinimumSize()
   return Point(0, 0);
 }
 
-int StackPresentation::GetSizeFlags(bool width)
+int StackPresentation::GetSizeFlags(bool  /*width*/)
 {
   bool hasMaximumSize = this->GetSite()->GetState()
       == IStackPresentationSite::STATE_MINIMIZED;
@@ -52,7 +52,7 @@ int StackPresentation::GetSizeFlags(bool width)
 }
 
 int StackPresentation::ComputePreferredSize(bool width, int availableParallel,
-    int availablePerpendicular, int preferredResult)
+    int  /*availablePerpendicular*/, int preferredResult)
 {
   Point p = this->ComputeMinimumSize();
   int minSize = width ? p.x : p.y;
@@ -79,12 +79,12 @@ void StackPresentation::MovePart(IPresentablePart::Pointer toMove,
   }
 }
 
-void StackPresentation::SaveState(IPresentationSerializer* context, IMemento::Pointer memento)
+void StackPresentation::SaveState(IPresentationSerializer*  /*context*/, IMemento::Pointer  /*memento*/)
 {
 
 }
 
-void StackPresentation::RestoreState(IPresentationSerializer* context, IMemento::Pointer memento)
+void StackPresentation::RestoreState(IPresentationSerializer*  /*context*/, IMemento::Pointer  /*memento*/)
 {
 
 }

@@ -462,12 +462,12 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 }
 
-vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_PointsAssembly;
 }
 
-void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());

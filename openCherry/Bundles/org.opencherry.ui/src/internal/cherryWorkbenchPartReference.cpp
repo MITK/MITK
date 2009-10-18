@@ -153,7 +153,7 @@ void WorkbenchPartReference::SetToolTip(const std::string& newToolTip)
   this->FirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
 }
 
-void WorkbenchPartReference::PropertyChanged(Object::Pointer source, int propId)
+void WorkbenchPartReference::PropertyChanged(Object::Pointer  /*source*/, int propId)
 {
 
   // We handle these properties directly (some of them may be transformed
@@ -673,7 +673,7 @@ void WorkbenchPartReference::CreatePartProperties(
 }
 
 int WorkbenchPartReference::ComputePreferredSize(bool width,
-    int availableParallel, int availablePerpendicular, int preferredResult)
+    int  /*availableParallel*/, int  /*availablePerpendicular*/, int preferredResult)
 {
   //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
   //  if (sizeProvider != null)
@@ -685,7 +685,7 @@ int WorkbenchPartReference::ComputePreferredSize(bool width,
   return preferredResult;
 }
 
-int WorkbenchPartReference::GetSizeFlags(bool width)
+int WorkbenchPartReference::GetSizeFlags(bool  /*width*/)
 {
   //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
   //  if (sizeProvider != null)

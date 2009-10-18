@@ -58,7 +58,7 @@ const std::map<QAction*, unsigned int> QmitkSlicesInterpolator::createActionToSl
 }
 
 
-QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char* name)
+QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /*name*/)
 :QWidget(parent),
  ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
  m_Interpolator( mitk::SegmentationInterpolationController::New() ),

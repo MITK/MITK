@@ -62,7 +62,7 @@ QmitkDataManagerView::~QmitkDataManagerView()
 
 }
 
-void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
+void QmitkDataManagerView::CreateQtPartControl(QWidget*  /*parent*/)
 {
   //# Preferences
   cherry::IPreferencesService::Pointer prefService 
@@ -188,12 +188,12 @@ void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences
   }
 }
 
-void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
+void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint &  /*pos*/ )
 {
   m_NodeMenu->popup(QCursor::pos());
 }
 
-void QmitkDataManagerView::SaveSelectedNodes( bool checked /*= false */ )
+void QmitkDataManagerView::SaveSelectedNodes( bool  /*checked*/ /*= false */ )
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
 
@@ -212,7 +212,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool checked /*= false */ )
   }
 }
 
-void QmitkDataManagerView::ReinitSelectedNodes( bool checked /*= false */ )
+void QmitkDataManagerView::ReinitSelectedNodes( bool  /*checked*/ /*= false */ )
 {
   std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
 
@@ -231,7 +231,7 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool checked /*= false */ )
   }
 }
 
-void QmitkDataManagerView::RemoveSelectedNodes( bool checked /*= false */ )
+void QmitkDataManagerView::RemoveSelectedNodes( bool  /*checked*/ /*= false */ )
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTableView->selectionModel()->selectedRows();
   std::vector<mitk::DataTreeNode*> selectedNodes;
@@ -273,7 +273,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool checked /*= false */ )
   }
 }
 
-void QmitkDataManagerView::MakeAllNodesInvisible( bool checked /*= false */ )
+void QmitkDataManagerView::MakeAllNodesInvisible( bool  /*checked*/ /*= false */ )
 {
   std::vector<mitk::DataTreeNode*> nodes = m_NodeTableModel->GetNodeSet();
 
@@ -285,7 +285,7 @@ void QmitkDataManagerView::MakeAllNodesInvisible( bool checked /*= false */ )
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkDataManagerView::ShowOnlySelectedNodes( bool checked )
+void QmitkDataManagerView::ShowOnlySelectedNodes( bool  /*checked*/ )
 {
   std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
   std::vector<mitk::DataTreeNode*> allNodes = m_NodeTableModel->GetNodeSet();
@@ -303,7 +303,7 @@ void QmitkDataManagerView::ShowOnlySelectedNodes( bool checked )
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool checked /*= false */ )
+void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool  /*checked*/ /*= false */ )
 {
   std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
 
@@ -320,7 +320,7 @@ void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool checked /*= fal
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool checked /*= false */ )
+void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool  /*checked*/ /*= false */ )
 {
   std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
 
@@ -328,7 +328,7 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool checked /*= fals
   _QmitkInfoDialog.exec();
 }
 
-void QmitkDataManagerView::Load( bool checked )
+void QmitkDataManagerView::Load( bool  /*checked*/ )
 {
   QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
@@ -370,7 +370,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
   QApplication::restoreOverrideCursor();
 }
 
-void QmitkDataManagerView::GlobalReinit( bool checked /*= false */ )
+void QmitkDataManagerView::GlobalReinit( bool  /*checked*/ /*= false */ )
 {
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNOT::Pointer pred 

@@ -51,12 +51,12 @@ LayoutTree::LayoutTree(LayoutPart::Pointer part)
 }
 
 LayoutPart::Pointer LayoutTree::ComputeRelation(
-    std::list<PartSashContainer::RelationshipInfo>& relations)
+    std::list<PartSashContainer::RelationshipInfo>&  /*relations*/)
 {
   return part;
 }
 
-LayoutPart::Pointer LayoutTree::FindPart(const Point& toFind)
+LayoutPart::Pointer LayoutTree::FindPart(const Point&  /*toFind*/)
 {
   return part;
 }
@@ -88,7 +88,7 @@ LayoutPart::Pointer LayoutTree::FindBottomRight()
   return part;
 }
 
-LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer sash)
+LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer  /*sash*/)
 {
   return LayoutTreeNode::Pointer(0);
 }
@@ -465,7 +465,7 @@ std::string LayoutTree::ToString()
   return "(" + part->ToString() + ")";//$NON-NLS-2$//$NON-NLS-1$
 }
 
-void LayoutTree::CreateControl(void* parent)
+void LayoutTree::CreateControl(void*  /*parent*/)
 {
 }
 

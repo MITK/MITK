@@ -71,23 +71,23 @@ struct CHERRY_OSGI IDebugObjectListener: public Object
 
   virtual Events::Types GetEventTypes() const = 0;
 
-  virtual void ObjectCreated(const Object* obj)
+  virtual void ObjectCreated(const Object*  /*obj*/)
   {
   }
 
-  virtual void ObjectDestroyed(const Object* obj)
+  virtual void ObjectDestroyed(const Object*  /*obj*/)
   {
   }
 
-  virtual void ObjectTracingChanged(unsigned int traceId, bool enabled = true, const Object* obj = 0)
+  virtual void ObjectTracingChanged(unsigned int  /*traceId*/, bool  /*enabled*/ = true, const Object*  /*obj*/ = 0)
   {
   }
 
-  virtual void SmartPointerCreated(unsigned int id, const Object* obj)
+  virtual void SmartPointerCreated(unsigned int  /*id*/, const Object*  /*obj*/)
   {
   }
 
-  virtual void SmartPointerDestroyed(unsigned int id, const Object* obj)
+  virtual void SmartPointerDestroyed(unsigned int  /*id*/, const Object*  /*obj*/)
   {
   }
 

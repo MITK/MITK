@@ -67,12 +67,12 @@ PagePartSelectionTracker::PagePartSelectionTracker(
 }
 
 void PagePartSelectionTracker::PartActivated(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 }
 
 void PagePartSelectionTracker::PartBroughtToTop(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 }
 
@@ -86,7 +86,7 @@ void PagePartSelectionTracker::PartClosed(
 }
 
 void PagePartSelectionTracker::PartDeactivated(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 }
 
@@ -100,31 +100,31 @@ void PagePartSelectionTracker::PartOpened(
 }
 
 void PagePartSelectionTracker::PartHidden(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 
 }
 
 void PagePartSelectionTracker::PartVisible(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 
 }
 
 void PagePartSelectionTracker::PartInputChanged(
-    IWorkbenchPartReference::Pointer partRef)
+    IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 
 }
 
 void PagePartSelectionTracker::PerspectiveActivated(
-    IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective)
+    IWorkbenchPage::Pointer  /*page*/, IPerspectiveDescriptor::Pointer  /*perspective*/)
 {
   // nothing to do
 }
 
 void PagePartSelectionTracker::PerspectiveChanged(IWorkbenchPage::Pointer page,
-    IPerspectiveDescriptor::Pointer perspective, const std::string& changeId)
+    IPerspectiveDescriptor::Pointer  /*perspective*/, const std::string&  /*changeId*/)
 {
   // nothing to do
 }

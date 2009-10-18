@@ -364,7 +364,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
 
 
 
-void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, vtkFloatingPointType *spacing )
+void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2D* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, vtkFloatingPointType *spacing )
 {
 
   vtkPoints * points = glyphs->GetPoints();

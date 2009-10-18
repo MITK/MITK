@@ -136,13 +136,13 @@ void ObjectBrowserView::RestoreGuiState(IMemento::Pointer memento)
   }
 }
 
-void ObjectBrowserView::ResetAction(bool checked)
+void ObjectBrowserView::ResetAction(bool  /*checked*/)
 {
   m_ObjectModel->ResetData();
 }
 
 void ObjectBrowserView::SelectionChanged(const QItemSelection& selected,
-    const QItemSelection& deselected)
+    const QItemSelection&  /*deselected*/)
 {
   QList<QModelIndex> indexes = selected.indexes();
   if (indexes.empty())

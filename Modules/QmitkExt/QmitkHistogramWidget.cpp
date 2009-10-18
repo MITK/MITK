@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <iostream>
 
-QmitkHistogramWidget::QmitkHistogramWidget(QWidget *parent, bool showreport)
+QmitkHistogramWidget::QmitkHistogramWidget(QWidget * /*parent*/, bool showreport)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 

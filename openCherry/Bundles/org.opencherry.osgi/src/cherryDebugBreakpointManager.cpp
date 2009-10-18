@@ -92,7 +92,7 @@ bool DebugBreakpointManager::BreakAtSmartpointer(int spId) const
       != m_SmartPointerBreakpoints.end();
 }
 
-void DebugBreakpointManager::SaveState(const Poco::Path& path) const
+void DebugBreakpointManager::SaveState(const Poco::Path&  /*path*/) const
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   Poco::XML::Document* doc = new Poco::XML::Document();
@@ -144,7 +144,7 @@ void DebugBreakpointManager::SaveState(const Poco::Path& path) const
 #endif
 }
 
-void DebugBreakpointManager::RestoreState(const Poco::Path& path)
+void DebugBreakpointManager::RestoreState(const Poco::Path&  /*path*/)
 {
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   try

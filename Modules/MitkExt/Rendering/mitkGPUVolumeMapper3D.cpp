@@ -115,7 +115,7 @@ mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
   m_DefaultGradientTransferFunction->Delete();
 }
 
-vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
+vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   return m_VolumeLOD;
 }
@@ -200,7 +200,7 @@ void mitk::GPUVolumeMapper3D::CreateDefaultTransferFunctions()
   m_DefaultColorTransferFunction->ClampingOn();
 }
 
-void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *renderer )
+void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * /*renderer*/ )
 {
   GPU_LOG << "UpdateTransferFunctions";
 
@@ -289,7 +289,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
 }
 
 
-bool mitk::GPUVolumeMapper3D::IsLODEnabled( mitk::BaseRenderer *renderer ) const
+bool mitk::GPUVolumeMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*/ ) const
 {
  GPU_LOG << "IsLODEnabled";
  return false;

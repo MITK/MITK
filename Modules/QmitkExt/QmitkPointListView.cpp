@@ -108,7 +108,7 @@ void QmitkPointListView::OnPointSetSelectionChanged()
 }
 
 
-void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection&  /*deselected*/)
 {
   if (m_SelfCall) 
     return;

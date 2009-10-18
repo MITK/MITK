@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
-void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::CuboidObjectCutter* cutter, int boTimeStep, TOutputPixel* dummy )
+void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::CuboidObjectCutter* cutter, int  /*boTimeStep*/, TOutputPixel*  /*dummy*/ )
 {
 //  Cuboid *cuboid = static_cast<Cuboid*>(const_cast<BoundingObject*>(cutter->GetBoundingObject()));
 

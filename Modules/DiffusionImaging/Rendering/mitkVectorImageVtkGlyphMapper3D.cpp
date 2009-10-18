@@ -27,7 +27,7 @@ mitk::VectorImageVtkGlyphMapper3D::VectorImageVtkGlyphMapper3D()
   m_Glyph3DActor = vtkActor::New();
 }
 
-vtkProp* mitk::VectorImageVtkGlyphMapper3D::GetVtkProp(mitk::BaseRenderer* renderer)
+vtkProp* mitk::VectorImageVtkGlyphMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
 {
   return m_Glyph3DActor;
 }

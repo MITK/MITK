@@ -65,7 +65,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes
   return _SetOfObjects.GetPointer();
 }
 
-const bool QmitkDataStorageComboBox::GetAutoSelectNewItems()
+bool QmitkDataStorageComboBox::GetAutoSelectNewItems()
 {
   return m_AutoSelectNewNodes;
 }
@@ -236,12 +236,12 @@ void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataTreeNode::Pointer item)
 }
 
 //#PROTECTED GETTER
-const bool QmitkDataStorageComboBox::HasIndex(unsigned int index) const
+bool QmitkDataStorageComboBox::HasIndex(unsigned int index) const
 {
   return (m_Nodes.size() > 0 && index < m_Nodes.size());
 }
 
-const int QmitkDataStorageComboBox::Find( const mitk::DataTreeNode* _DataTreeNode ) const
+int QmitkDataStorageComboBox::Find( const mitk::DataTreeNode* _DataTreeNode ) const
 {
   int index = -1;
 

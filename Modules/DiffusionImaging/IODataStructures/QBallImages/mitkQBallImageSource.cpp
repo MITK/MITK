@@ -29,7 +29,7 @@ mitk::QBallImageSource::QBallImageSource()
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
-mitk::QBallImageSource::DataObjectPointer mitk::QBallImageSource::MakeOutput( unsigned int idx )
+mitk::QBallImageSource::DataObjectPointer mitk::QBallImageSource::MakeOutput( unsigned int  /*idx*/ )
 {
   return static_cast<itk::DataObject*>(OutputImageType::New().GetPointer());
 }

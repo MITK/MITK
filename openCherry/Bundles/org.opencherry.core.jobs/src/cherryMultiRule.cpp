@@ -21,12 +21,12 @@ namespace cherry
 {
 
 // this is just a dummy implementation of a MultiRule. 
-bool MultiRule::IsConflicting(ISchedulingRule::Pointer sptr_myRule) const
+bool MultiRule::IsConflicting(ISchedulingRule::Pointer  /*sptr_myRule*/) const
 {
   return false;
 }
 
-bool MultiRule::Contains(ISchedulingRule::Pointer sptr_myrule) const
+bool MultiRule::Contains(ISchedulingRule::Pointer  /*sptr_myrule*/) const
 {
   return false;
 }

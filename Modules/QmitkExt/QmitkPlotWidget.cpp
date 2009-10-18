@@ -3,7 +3,7 @@
 
 #include "QmitkPlotWidget.h"
 
-QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char* name, Qt::WindowFlags f): QWidget(parent, f) 
+QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*  /*name*/, Qt::WindowFlags f): QWidget(parent, f) 
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
@@ -83,7 +83,7 @@ void QmitkPlotWidget::SetCurveBrush( unsigned int curveId, const QBrush& brush )
 }
 
 
-void QmitkPlotWidget::SetCurveTitle( unsigned int curveId, const char* title )
+void QmitkPlotWidget::SetCurveTitle( unsigned int  /*curveId*/, const char* title )
 {
   m_Plot->setTitle( title );
 }

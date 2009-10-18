@@ -296,7 +296,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
 
 }
 
-void QmitkRenderWindowMenu::paintEvent( QPaintEvent* e )
+void QmitkRenderWindowMenu::paintEvent( QPaintEvent*  /*e*/ )
 {
   QPainter painter(this);
   QColor semiTransparentColor = Qt::black;
@@ -311,19 +311,19 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
 }
 
 /// \brief
-void QmitkRenderWindowMenu::OnHoriSplitButton( bool checked )
+void QmitkRenderWindowMenu::OnHoriSplitButton( bool  /*checked*/ )
 {
   std::cout << "Split widget horizontal. not implemented yet... " << std::endl;
 }
 
 /// \brief
-void QmitkRenderWindowMenu::OnVertiSplitButton( bool checked )
+void QmitkRenderWindowMenu::OnVertiSplitButton( bool  /*checked*/ )
 {
   std::cout << "Split widget vertical. not implemented yet... " << std::endl;
 }
 
 /// \brief
-void QmitkRenderWindowMenu::OnFullScreenButton( bool checked )
+void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
 {
   if( !m_FullScreenMode )
   {
@@ -372,7 +372,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool checked )
 
 
 /// \brief
-void QmitkRenderWindowMenu::OnSettingsButton( bool checked )
+void QmitkRenderWindowMenu::OnSettingsButton( bool  /*checked*/ )
 {
   if( m_Settings == NULL )
     this->CreateSettingsWidget();
@@ -383,7 +383,7 @@ void QmitkRenderWindowMenu::OnSettingsButton( bool checked )
 }
 
 /// \brief
-void QmitkRenderWindowMenu::OnCloseButton( bool checked )
+void QmitkRenderWindowMenu::OnCloseButton( bool  /*checked*/ )
 {
   std::cout << "Close widget. not implemented yet... " << std::endl;
 }

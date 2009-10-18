@@ -95,7 +95,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    *
    * @param event the event details
    */
-  virtual void AboutToRun(const IJobChangeEvent::ConstPointer event)
+  virtual void AboutToRun(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;
@@ -106,7 +106,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    *
    * @param event the event details
    */
-  virtual void Awake(const IJobChangeEvent::ConstPointer event)
+  virtual void Awake(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;
@@ -118,7 +118,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    *
    * @param event the event details
    */
-  virtual void Done(const IJobChangeEvent::ConstPointer event)
+  virtual void Done(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;
@@ -128,7 +128,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    *
    * @param event the event details
    */
-  virtual void Running(const IJobChangeEvent::ConstPointer event)
+  virtual void Running(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;
@@ -141,7 +141,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    * @param event the event details, including the job instance and the scheduling
    * delay
    */
-  virtual void Scheduled(const IJobChangeEvent::ConstPointer event)
+  virtual void Scheduled(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;
@@ -152,7 +152,7 @@ cherryInterfaceMacro(IJobChangeListener, cherry)
    *
    * @param event the event details
    */
-  virtual void Sleeping(const IJobChangeEvent::ConstPointer event)
+  virtual void Sleeping(const IJobChangeEvent::ConstPointer /*event*/)
   {
   }
   ;

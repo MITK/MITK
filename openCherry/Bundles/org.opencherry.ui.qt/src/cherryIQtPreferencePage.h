@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryIPreferencePage.h"
 
+#include "cherryUiQtDll.h"
+
 namespace cherry 
 {
 
@@ -36,7 +38,7 @@ namespace cherry
  * \ingroup org_opencherry_ui
  *
  */
-struct CHERRY_UI IQtPreferencePage : public IPreferencePage
+struct CHERRY_UI_QT IQtPreferencePage : public IPreferencePage
 {
 
   cherryInterfaceMacro(IQtPreferencePage, cherry);

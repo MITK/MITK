@@ -26,6 +26,7 @@ SET(INTERNAL_CPP_FILES
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
   
+  cherryIQtPreferencePage.cpp
   cherryQtControlWidget.cpp
   cherryQtDisplay.cpp
   cherryQtDnDTweaklet.cpp

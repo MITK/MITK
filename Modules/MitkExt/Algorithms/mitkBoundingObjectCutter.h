@@ -66,6 +66,9 @@ public:
   itkGetMacro(InsidePixelCount, unsigned int);
   itkGetMacro(OutsidePixelCount, unsigned int);
 
+  itkSetMacro(UseWholeInputRegion,  bool);
+  itkGetMacro(UseWholeInputRegion,  bool);
+
 protected:
   BoundingObjectCutter();
   virtual ~BoundingObjectCutter();
@@ -121,6 +124,8 @@ protected:
 
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
   mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
+
+  bool m_UseWholeInputRegion;
 };
 } // namespace mitk
 

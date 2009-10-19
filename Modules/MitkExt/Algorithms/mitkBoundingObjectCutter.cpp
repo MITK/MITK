@@ -47,7 +47,7 @@ const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const
 
 BoundingObjectCutter::BoundingObjectCutter() 
   : m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
-    m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0)
+    m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0), m_UseWholeInputRegion(false)
 {
   this->SetNumberOfInputs(2);
   this->SetNumberOfRequiredInputs(2);
@@ -124,15 +124,18 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   mitk::SlicedData::RegionType boRegion(index, size);
   
-  // crop input-requested-region with region of bounding-object
-  if(m_InputRequestedRegion.Crop(boRegion)==false)
+  if(m_UseWholeInputRegion == false)
   {
-    // crop not possible => do nothing: set time size to 0.
-    size.Fill(0);
-    m_InputRequestedRegion.SetSize(size);
-    boRegion.SetSize(size);
-    m_BoundingObject->SetRequestedRegion(&boRegion);
-    return;
+	  // crop input-requested-region with region of bounding-object
+	  if(m_InputRequestedRegion.Crop(boRegion)==false)
+	  {
+		// crop not possible => do nothing: set time size to 0.
+		size.Fill(0);
+		m_InputRequestedRegion.SetSize(size);
+		boRegion.SetSize(size);
+		m_BoundingObject->SetRequestedRegion(&boRegion);
+		return;
+	  }
   }
 
   // set input-requested-region, because we access it later in

@@ -56,9 +56,7 @@ protected:
 
     void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection);
 
-    void ReinitializeToImage();
     void CreateNewSegmentation();
-    void SetReferenceImagePixelSmoothing(bool on);
 
     void OnToolSelected(int id);
     void OnReferenceNodeSelected(const mitk::DataTreeNode*);

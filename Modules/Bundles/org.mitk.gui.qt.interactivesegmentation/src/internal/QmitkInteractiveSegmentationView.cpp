@@ -93,15 +93,12 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls->m_ToolSelectionBox->SetToolGUIArea( m_Controls->m_ToolGUIContainer );
 
-  m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
-  m_Controls->m_AutoSegmentationToolSelectionBox->setFlat( true );
   m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");         // display only tools of group "autoSegmentation"
   m_Controls->m_AutoSegmentationToolSelectionBox->SetToolGUIArea( m_Controls->m_AutoSegmentationToolGUIContainer );
   m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );  // be enabled whenever there is a reference data object selected
 
-  m_Controls->m_PostProcessingToolSelectionBox->setTitle("");
   m_Controls->m_PostProcessingToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_PostProcessingToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_PostProcessingToolSelectionBox->SetDisplayedToolGroups("segmentationProcessing");    // show only tools which are marked with "segmentationProcessing"

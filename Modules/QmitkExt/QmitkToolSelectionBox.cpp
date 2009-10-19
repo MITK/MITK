@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qapplication.h>
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
-:QGroupBox("Tools", parent),
+:QWidget(parent),
  m_SelfCall(false),
  m_Enabled(true),
  m_DisplayedGroups("default"),
@@ -39,9 +39,9 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
  m_ButtonLayout(NULL),
  m_EnabledMode(EnabledWithReferenceAndWorkingData)
 {
-  QFont currentFont = QGroupBox::font();
+  QFont currentFont = QWidget::font();
   currentFont.setBold(true);
-  QGroupBox::setFont( currentFont );
+  QWidget::setFont( currentFont );
 
   m_ToolManager = mitk::ToolManager::New( storage );
 
@@ -52,6 +52,12 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   m_ToolButtonGroup->setExclusive( false ); // mutually exclusive toggle buttons
 
   RecreateButtons();
+
+  QWidget::setContentsMargins(0, 0, 0, 0);
+  if ( layout() != NULL )
+  {
+    layout()->setContentsMargins(0, 0, 0, 0);
+  }
 
   // reactions to signals
   connect( m_ToolButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(toolButtonClicked(int)) );
@@ -65,7 +71,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   // show active tool
   SetOrUnsetButtonForActiveTool();
 
-  QGroupBox::setEnabled( false );
+  QWidget::setEnabled( false );
 }
 
 QmitkToolSelectionBox::~QmitkToolSelectionBox()
@@ -94,7 +100,7 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 
-  if ( QGroupBox::isEnabled() )
+  if ( QWidget::isEnabled() )
   {
     m_ToolManager->UnregisterClient();
   }
@@ -107,7 +113,7 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
 
-  if ( QGroupBox::isEnabled() )
+  if ( QWidget::isEnabled() )
   {
     m_ToolManager->RegisterClient();
   }
@@ -118,7 +124,7 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
 
 void QmitkToolSelectionBox::toolButtonClicked(int id)
 {
-  if ( !QGroupBox::isEnabled() ) return; // this method could be triggered from the constructor, when we are still disabled
+  if ( !QWidget::isEnabled() ) return; // this method could be triggered from the constructor, when we are still disabled
 
   //QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
   QToolButton* toolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->buttons().at(id) );
@@ -296,9 +302,9 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
       break;
   }
 
-  if ( QGroupBox::isEnabled() == enabled ) return; // nothing to change
+  if ( QWidget::isEnabled() == enabled ) return; // nothing to change
 
-  QGroupBox::setEnabled( enabled );
+  QWidget::setEnabled( enabled );
   if (enabled)
   {
     m_ToolManager->RegisterClient();
@@ -544,29 +550,18 @@ void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
 
 void QmitkToolSelectionBox::setTitle( const QString& title )
 {
-  // if "" hide frame, set minimal margin
-  QGroupBox::setTitle(title);
-
-  if (title.isEmpty())
-  {
-    QWidget::setContentsMargins(0, 0, 0, 0);
-    if ( layout() != NULL )
-    {
-      layout()->setContentsMargins(0, 0, 0, 0);
-    }
-  }
 }
 
 void QmitkToolSelectionBox::showEvent( QShowEvent* e )
 {
-  QGroupBox::showEvent(e);
+  QWidget::showEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
 }
 
 
 void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
 {
-  QGroupBox::hideEvent(e);
+  QWidget::hideEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
 }
 

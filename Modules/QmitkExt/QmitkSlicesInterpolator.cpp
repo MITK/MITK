@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QPushButton>
 #include <QMenu>
 #include <QCursor>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -69,14 +69,14 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
  m_LastSliceIndex(0),
  m_InterpolationEnabled(false)
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
+  QHBoxLayout* layout = new QHBoxLayout(this);
 
-  m_BtnAcceptInterpolation = new QPushButton("Accept", this);
+  m_BtnAcceptInterpolation = new QPushButton("Accept...", this);
   m_BtnAcceptInterpolation->setEnabled( false );
   connect( m_BtnAcceptInterpolation, SIGNAL(clicked()), this, SLOT(OnAcceptInterpolationClicked()) );
-  layout->addWidget( m_BtnAcceptInterpolation );
+  layout->addWidget( m_BtnAcceptInterpolation, 1 );
 
-  m_BtnAcceptAllInterpolations = new QPushButton("Accept all interpolations", this);
+  m_BtnAcceptAllInterpolations = new QPushButton("... for all slices", this);
   m_BtnAcceptAllInterpolations->setEnabled( false );
   connect( m_BtnAcceptAllInterpolations, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()) );
   layout->addWidget( m_BtnAcceptAllInterpolations );
@@ -98,6 +98,12 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_FeedbackNode->SetProperty( "name", mitk::StringProperty::New("Interpolation feedback") );
   m_FeedbackNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
   m_FeedbackNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
+
+  QWidget::setContentsMargins(0, 0, 0, 0);
+  if ( QWidget::layout() != NULL )
+  {
+    QWidget::layout()->setContentsMargins(0, 0, 0, 0);
+  }
 }
 
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage& storage )

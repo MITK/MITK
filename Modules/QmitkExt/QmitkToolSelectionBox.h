@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 
-#include <QGroupBox>
+#include <QWidget>
 #include <QButtonGroup>
 #include <QGridLayout>
 
@@ -53,7 +53,7 @@ class QmitkToolGUI;
 
   Last contributor: $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkToolSelectionBox : public QGroupBox
+class QMITKEXT_EXPORT QmitkToolSelectionBox : public QWidget
 //!
 {
   Q_OBJECT

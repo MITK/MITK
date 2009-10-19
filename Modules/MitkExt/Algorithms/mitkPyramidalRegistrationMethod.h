@@ -73,6 +73,10 @@ namespace mitk
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
 
+    virtual void SetFixedMask( Image::Pointer fixedMask);
+
+    virtual void SetMovingMask( Image::Pointer movingMask);
+
     void SetOptimizerParameters(OptimizerParameters::Pointer optimizerParameters)
     {
       m_OptimizerParameters = optimizerParameters;
@@ -126,6 +130,8 @@ namespace mitk
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;
     Image::Pointer m_ReferenceImage;
+    Image::Pointer m_FixedMask;
+    Image::Pointer m_MovingMask;
 
     void GenerateOutputInformation(){};
     

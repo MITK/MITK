@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkImageToImageMetric.h"
 #include "itkImage.h"
+#include "itkImageMaskSpatialObject.h"
 
 namespace mitk {
 
@@ -52,7 +53,11 @@ namespace mitk {
     itkNewMacro(Self);
 
     typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
+    typedef typename itk::Image< unsigned char, VImageDimension >  FixedMaskImageType;
+    typedef typename itk::ImageMaskSpatialObject< VImageDimension > FixedImageMaskType;
     typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
+    typedef typename itk::Image< unsigned char, VImageDimension >  MovingMaskImageType;
+    typedef typename itk::ImageMaskSpatialObject< VImageDimension > MovingImageMaskType;
 
     typedef typename itk::ImageToImageMetric< FixedImageType, MovingImageType >    MetricType;
     typedef typename MetricType::Pointer                MetricPointer;
@@ -71,6 +76,10 @@ namespace mitk {
       m_MetricParameters = metricParameters;
     }
 
+    void SetMovingImageMask( MovingImageType* movingMaskImage );
+    
+    void SetFixedImageMask( FixedImageType* fixedMaskImage );
+
     /**
     \brief Returns the instance to the metric parameters class which holds all parameters for the new metric.
     */
@@ -84,6 +93,11 @@ namespace mitk {
     ~MetricFactory() {};
 
     MetricParameters::Pointer m_MetricParameters;
+    typename const MovingImageType * m_movingMaskImage;
+    typename const FixedImageType * m_fixedMaskImage;
+    
+    typename MovingImageMaskType::Pointer m_movingMask;
+    typename FixedImageMaskType::Pointer m_fixedMask;
   };
 
 } // namespace mitk

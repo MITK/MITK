@@ -46,8 +46,10 @@ public:
   
   public slots:    
     void SetFixedNode( mitk::DataTreeNode * fixedNode );
+    void SetFixedMaskNode(mitk::DataTreeNode * fixedMaskNode );
     void SetFixedDimension( int dimension );
     void SetMovingNode( mitk::DataTreeNode * movingNode );
+    void SetMovingMaskNode(mitk::DataTreeNode * movingMaskNode );
     void SetMovingDimension(int dimension );
     int GetSelectedTransform();
     void CalculateTransformation(unsigned int timestep = 0);
@@ -95,7 +97,9 @@ protected:
 
   Ui::QmitkRigidRegistrationSelector m_Controls;
   mitk::DataTreeNode* m_FixedNode;
+  mitk::DataTreeNode* m_FixedMaskNode;
   mitk::DataTreeNode* m_MovingNode;
+  mitk::DataTreeNode* m_MovingMaskNode;
   mitk::OptimizerParameters::Pointer m_OptimizerParameters;
   mitk::TransformParameters::Pointer m_TransformParameters;
   mitk::MetricParameters::Pointer m_MetricParameters;

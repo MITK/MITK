@@ -37,6 +37,52 @@ namespace mitk {
   template < class TPixelType, unsigned int VImageDimension >
   MetricFactory<TPixelType, VImageDimension>::MetricFactory() : m_MetricParameters(NULL)
   {
+    m_movingMask = MovingImageMaskType::New();
+    m_fixedMask = FixedImageMaskType::New();
+  }
+
+  template < class TPixelType, unsigned int VImageDimension >
+  void MetricFactory< TPixelType, VImageDimension >::SetMovingImageMask(MovingImageType* movingMaskImage)
+  {
+    m_movingMaskImage = movingMaskImage;
+
+    itk::CastImageFilter<MovingImageType, MovingMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MovingMaskImageType>::New();
+    maskImageCaster->SetInput(m_movingMaskImage);
+    try
+    {
+      maskImageCaster->UpdateLargestPossibleRegion();
+    } 
+    catch ( itk::ExceptionObject & err ) 
+    {
+      std::cout<<"ExceptionObject caught";
+      std::cout<<err.GetDescription();
+    }
+
+    MovingMaskImageType* test = maskImageCaster->GetOutput();
+
+    m_movingMask->SetImage( test );
+  }
+
+  template < class TPixelType, unsigned int VImageDimension >
+  void MetricFactory< TPixelType, VImageDimension >::SetFixedImageMask(FixedImageType* fixedMaskImage)
+  {
+    m_fixedMaskImage = fixedMaskImage;
+
+    itk::CastImageFilter<FixedImageType, FixedMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, FixedMaskImageType>::New();
+    maskImageCaster->SetInput(m_fixedMaskImage);
+    try
+    {
+      maskImageCaster->UpdateLargestPossibleRegion();
+    } 
+    catch ( itk::ExceptionObject & err ) 
+    {
+      std::cout<<"ExceptionObject caught";
+      std::cout<<err.GetDescription();
+    }
+
+    FixedMaskImageType* test = maskImageCaster->GetOutput();
+
+    m_fixedMask->SetImage( test );
   }
 
   template < class TPixelType, unsigned int VImageDimension >
@@ -49,6 +95,11 @@ namespace mitk {
     {
       typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New();
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
+      if(m_movingMask.IsNotNull() && m_fixedMask.IsNotNull() )
+      {
+        MetricPointer->SetMovingImageMask(m_movingMask);
+  	    MetricPointer->SetFixedImageMask(m_fixedMask);
+      }
       return MetricPointer.GetPointer();
     }
     else if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)

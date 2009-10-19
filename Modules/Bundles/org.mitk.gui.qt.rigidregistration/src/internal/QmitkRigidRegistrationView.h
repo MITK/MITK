@@ -128,6 +128,20 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     void MovingSelected(int = 0);
 
     /*!
+    * \brief sets the moving Mask Image according to TreeNodeSelector widget
+    */
+    void MovingMaskSelected(int = 0);
+
+    void MovingMaskImageChanged();
+
+    /*!
+    * \brief sets the fixed Mask Image according to TreeNodeSelector widget
+    */
+    void FixedMaskSelected(int = 0);
+
+    void FixedMaskImageChanged();
+
+    /*!
     * checks if registration is possible
     */
     bool CheckCalculate();
@@ -285,7 +299,9 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     */  
     Ui::QmitkRigidRegistrationViewControls m_Controls;
     mitk::DataTreeNode* m_MovingNode;
+    mitk::DataTreeNode* m_MovingMaskNode;
     mitk::DataTreeNode* m_FixedNode;
+    mitk::DataTreeNode* m_FixedMaskNode;
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
     bool m_ShowRedGreen;

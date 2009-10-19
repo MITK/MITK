@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0)
+  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0), m_MovingMask(NULL), m_FixedMask(NULL)
   {
     m_OptimizerParameters = OptimizerParameters::New();
     m_TransformParameters = TransformParameters::New();
@@ -71,7 +71,17 @@ namespace mitk {
     Modified();
   }
 
+  void ImageRegistrationMethod::SetMovingMask(Image::Pointer movingMask)
+  {
+    m_MovingMask = movingMask;
+    SetNthInput(3, m_MovingMask);
+    Modified();
+  }
 
- 
-
+  void ImageRegistrationMethod::SetFixedMask(Image::Pointer FixedMask)
+  {
+    m_FixedMask = FixedMask;
+    SetNthInput(4, m_FixedMask);
+    Modified();
+  }
 } // end namespace

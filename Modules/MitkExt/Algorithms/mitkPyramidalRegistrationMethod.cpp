@@ -27,6 +27,8 @@ namespace mitk {
     m_TransformParameters = TransformParameters::New();
     m_MetricParameters = MetricParameters::New();
     m_ReferenceImage = Image::New();
+    m_MovingMask = Image::New();
+    m_FixedMask = Image::New();
 
     m_Preset = new mitk::RigidRegistrationPreset();
 
@@ -161,7 +163,19 @@ namespace mitk {
     return optimizerParameters;    
   }
 
+  void PyramidalRegistrationMethod::SetMovingMask(Image::Pointer movingMask)
+  {
+    m_MovingMask = movingMask;
+    SetNthInput(3, m_MovingMask);
+    Modified();
+  }
 
+  void PyramidalRegistrationMethod::SetFixedMask(Image::Pointer FixedMask)
+  {
+    m_FixedMask = FixedMask;
+    SetNthInput(4, m_FixedMask);
+    Modified();
+  }
  
 
 } // end namespace

@@ -67,12 +67,26 @@ namespace mitk {
 
       // the fixed and the moving image
       typename FixedImageType::Pointer fixedImage = FixedImageType::New();
+      typename FixedImageType::Pointer fixedMask = FixedImageType::New();
+      typename MovingImageType::Pointer movingMask = MovingImageType::New();
+
       typename MovingImageType::Pointer movingImage = itkImage1;
       mitk::CastToItkImage(m_ReferenceImage, fixedImage); 
+
+      if(m_MovingMask.IsNotNull() && m_FixedMask.IsNotNull() )
+      {
+        mitk::CastToItkImage(m_MovingMask, movingMask); 
+        mitk::CastToItkImage(m_FixedMask, fixedMask);
+      }
 
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
+      if(movingMask.IsNotNull() && fixedMask.IsNotNull() )
+      {
+        metFac->SetMovingImageMask(movingMask);
+  	    metFac->SetFixedImageMask(fixedMask);
+      }
 
       // the transform
       typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
@@ -174,6 +188,8 @@ namespace mitk {
       typedef itk::Image< InternalPixelType,  VImageDimension> InternalImageType;
       typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
       typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
+      typedef typename itk::Image<InternalPixelType, VImageDimension> FixedMaskType;
+   	  typedef typename itk::Image<InternalPixelType, VImageDimension> MovingMaskType;
       typedef typename itk::Transform<double, VImageDimension, VImageDimension> TransformType;
       typedef typename itk::LinearInterpolateImageFunction<InternalImageType, double> InterpolatorType;
       typedef itk::NearestNeighborInterpolateImageFunction<InternalImageType, double> InterpolatorType2;
@@ -184,8 +200,15 @@ namespace mitk {
 
       // the images
       typename FixedImageType::Pointer fixedImage = FixedImageType::New();
+      typename FixedMaskType::Pointer fixedMask = FixedMaskType::New();
+      typename MovingMaskType::Pointer movingMask = MovingMaskType::New();
       typename MovingImageType::Pointer movingImage = itkImage1;
-      mitk::CastToItkImage(m_ReferenceImage, fixedImage);      
+      mitk::CastToItkImage(m_ReferenceImage, fixedImage);
+      if(m_MovingMask.IsNotNull() && m_FixedMask.IsNotNull() )
+      {
+        mitk::CastToItkImage(m_MovingMask, movingMask); 
+  	    mitk::CastToItkImage(m_FixedMask, fixedMask);
+      }
 
       // normalize moving image
       typedef typename itk::NormalizeImageFilter<FixedImageType, InternalImageType> FixedNormalizeFilterType;
@@ -211,6 +234,11 @@ namespace mitk {
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
+      if(m_MovingMask.IsNotNull() && m_FixedMask.IsNotNull() )
+      {
+        metFac->SetMovingImageMask(movingMask);
+    	  metFac->SetFixedImageMask(fixedMask);
+      }
 
       // the transform
       typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();

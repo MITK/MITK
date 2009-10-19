@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPyramidalRegistrationMethod.h"
 
 QmitkRigidRegistrationSelectorView::QmitkRigidRegistrationSelectorView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_MovingNode(NULL), m_OptimizerParameters(NULL), m_TransformParameters(NULL), m_MetricParameters(NULL),
+m_FixedNode(NULL), m_FixedMaskNode(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_OptimizerParameters(NULL), m_TransformParameters(NULL), m_MetricParameters(NULL),
 m_FixedDimension(0), m_MovingDimension(0), m_StopOptimization(false), m_GeometryItkPhysicalToWorldTransform(NULL),
 m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeometry(NULL)
 {
@@ -310,6 +310,13 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+    mitk::Image::Pointer mmimage = NULL;
+    mitk::Image::Pointer fmimage = NULL;
+    if (m_MovingMaskNode != NULL && m_FixedMaskNode != NULL)
+    {
+      mmimage = dynamic_cast<mitk::Image*>(m_MovingMaskNode->GetData());
+      fmimage = dynamic_cast<mitk::Image*>(m_FixedMaskNode->GetData());
+    }
 
     mitk::ImageTimeSelector::Pointer its = mitk::ImageTimeSelector::New();
     
@@ -426,6 +433,11 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
       registration->SetReferenceImage(fimage);
       registration->SetInput(mimage);
+      if (mmimage.IsNotNull() && fmimage.IsNotNull())
+      {
+        registration->SetMovingMask(mmimage);
+        registration->SetFixedMask(fmimage);
+      }
 
       // m_Transform is needed for the initial transform
       registration->SetTransformParameters(m_TransformParameters); 
@@ -462,6 +474,11 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());
       registration->SetReferenceImage(fimage);
       registration->SetInput(mimage);    
+      if (mmimage.IsNotNull() && fmimage.IsNotNull())
+      {
+        registration->SetMovingMask(mmimage);
+        registration->SetFixedMask(fmimage);
+      }
       registration->SetTransformParameters(m_TransformParameters);
       registration->SetMetricParameters(m_MetricParameters);
       registration->SetOptimizerParameters(m_OptimizerParameters);
@@ -3036,4 +3053,16 @@ void QmitkRigidRegistrationSelectorView::StopOptimization(bool stopOptimization)
 int QmitkRigidRegistrationSelectorView::GetSelectedTransform()
 {
   return m_Controls.m_TransformBox->currentIndex();
+}
+
+void QmitkRigidRegistrationSelectorView::SetFixedMaskNode( mitk::DataTreeNode * fixedMaskNode )
+{
+  m_FixedMaskNode = fixedMaskNode;
+  this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
+}
+
+void QmitkRigidRegistrationSelectorView::SetMovingMaskNode( mitk::DataTreeNode * movingMaskNode )
+{
+  m_MovingMaskNode = movingMaskNode;
+  this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
 }

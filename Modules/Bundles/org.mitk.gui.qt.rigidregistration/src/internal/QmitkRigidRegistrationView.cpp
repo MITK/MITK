@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateNOT.h"
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), 
+: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL), 
   m_ShowRedGreen(false), m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0),
   m_NewMovingLayer(0), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
 {
@@ -66,6 +66,13 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   // define data type for fixed image combobox
   m_Controls.m_FixedSelector->SetDataStorage( this->GetDefaultDataStorage() );
   m_Controls.m_FixedSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
+  // define data type for fixed mask image combobox
+  m_Controls.m_FixedMaskSelector->SetDataStorage( this->GetDefaultDataStorage() );
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  m_Controls.m_FixedMaskSelector->SetPredicate( isBinary );
+  // define data type for moving mask image combobox
+  m_Controls.m_MovingMaskSelector->SetDataStorage( this->GetDefaultDataStorage() );
+  m_Controls.m_MovingMaskSelector->SetPredicate( isBinary );
 
   // define data type for moving image combobox
   m_Controls.m_MovingSelector->SetDataStorage( this->GetDefaultDataStorage() );
@@ -101,6 +108,8 @@ void QmitkRigidRegistrationView::CreateConnections()
 {
   connect( m_Controls.m_FixedSelector, SIGNAL(activated(int)), this, SLOT(FixedSelected(int)));
   connect( m_Controls.m_MovingSelector, SIGNAL(activated(int)), this, SLOT(MovingSelected(int)));
+  connect( m_Controls.m_MovingMaskSelector, SIGNAL(activated(int)), this, SLOT(MovingMaskSelected(int)) );
+  connect( m_Controls.m_FixedMaskSelector, SIGNAL(activated(int)), this, SLOT(FixedMaskSelected(int)) );
   connect(m_Controls.m_ShowBothImages, SIGNAL(clicked()), this, SLOT(ShowBothImages()));
   connect(m_Controls.m_ShowFixedImage, SIGNAL(clicked()), this, SLOT(ShowFixedImage()));
   connect(m_Controls.m_ShowMovingImage, SIGNAL(clicked()), this, SLOT(ShowMovingImage()));
@@ -184,6 +193,8 @@ void QmitkRigidRegistrationView::Activated()
   QmitkFunctionality::Activated();
   this->FixedSelected();
   this->MovingSelected();
+  this->FixedMaskSelected();
+  this->MovingMaskSelected();
   this->OpacityUpdate(m_Opacity);  
   //m_Controls->FixedImageChanged();
   //this->MovingImageChanged();
@@ -396,6 +407,74 @@ void QmitkRigidRegistrationView::MovingSelected(int)
     m_Controls.m_ShowMovingImage->setEnabled(false);
   }
   this->CheckCalculateEnabled();
+}
+
+void QmitkRigidRegistrationView::MovingMaskSelected(int)
+{
+  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
+  {
+    if (m_MovingMaskNode != m_Controls.m_MovingSelector->GetSelectedNode())
+    {
+      if (m_MovingMaskNode != NULL)
+      {
+        if (m_MovingMaskNode != m_FixedNode || m_MovingMaskNode != m_MovingNode)
+        {
+          m_MovingNode->SetVisibility(false);
+        }
+      }
+      m_MovingMaskNode = m_Controls.m_MovingSelector->GetSelectedNode();
+      if (m_ShowBothImages)
+      {
+        this->ShowBothImages();
+      }
+      if (m_ShowFixedImage)
+      {
+        this->ShowFixedImage();
+      }
+      if (m_ShowMovingImage)
+      {
+        this->ShowMovingImage();
+      }
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      this->ClearTransformationLists();
+      this->OpacityUpdate(m_Opacity);
+    }
+    this->MovingMaskImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationView::FixedMaskSelected(int)
+{
+  if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
+  {
+    if (m_FixedMaskNode != m_Controls.m_FixedSelector->GetSelectedNode())
+    {
+      if (m_FixedMaskNode != NULL)
+      {
+        if (m_FixedMaskNode != m_FixedNode || m_FixedMaskNode != m_MovingNode || m_FixedMaskNode != m_MovingMaskNode )
+        {
+          m_FixedMaskNode->SetVisibility(false);
+        }
+      }
+      m_FixedMaskNode = m_Controls.m_FixedSelector->GetSelectedNode();
+      if (m_ShowBothImages)
+      {
+        this->ShowBothImages();
+      }
+      if (m_ShowFixedImage)
+      {
+        this->ShowFixedImage();
+      }
+      if (m_ShowMovingImage)
+      {
+        this->ShowMovingImage();
+      }
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      this->ClearTransformationLists();
+      this->OpacityUpdate(m_Opacity);
+    }
+    this->FixedMaskImageChanged();
+  }
 }
 
 void QmitkRigidRegistrationView::reinitFixedClicked()
@@ -634,8 +713,10 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
     m_TranslateSliderPos[2] = translateVector[2];
 
     m_MovingNode->GetData()->GetGeometry()->Translate( translateVec );
+    m_MovingMaskNode->GetData()->GetGeometry()->Translate( translateVec );
 
     m_MovingNode->GetData()->Modified();
+    m_MovingMaskNode->GetData()->Modified();
     m_RedoGeometryList.clear();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -672,6 +753,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
+    m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
 
     double radianX = rotateVec[0] * vnl_math::pi / 180;
     double radianY = rotateVec[1] * vnl_math::pi / 180;
@@ -700,12 +782,15 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     }
 
     m_MovingNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+    m_MovingMaskNode->GetData()->GetGeometry()->Compose( rotationMatrix );
     
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
+    m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
 
     m_MovingNode->GetData()->Modified();
+    m_MovingMaskNode->GetData()->Modified();
     m_RedoGeometryList.clear();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -902,10 +987,24 @@ void QmitkRigidRegistrationView::MovingImageChanged()
   }
 }
 
+void QmitkRigidRegistrationView::MovingMaskImageChanged()
+{
+  m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_Controls.m_MovingMaskSelector->GetSelectedNode());
+  this->CheckCalculateEnabled();
+}
+
+void QmitkRigidRegistrationView::FixedMaskImageChanged()
+{
+  m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_Controls.m_FixedMaskSelector->GetSelectedNode());
+  this->CheckCalculateEnabled();
+}
+
 void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
+  m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_Controls.m_FixedMaskSelector->GetSelectedNode());
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
+  m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_Controls.m_MovingMaskSelector->GetSelectedNode());
   m_Controls.frame4->setEnabled(false);
   m_Controls.m_StopOptimization->setEnabled(true);
   m_Controls.m_SaveModel->setEnabled(false);

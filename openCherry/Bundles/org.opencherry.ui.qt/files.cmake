@@ -39,7 +39,7 @@ SET(INTERNAL_CPP_FILES
   cherryQtMainWindowControl.cpp
   cherryQtMessageDialogTweaklet.cpp
   cherryQtMissingImageDescriptor.cpp
-  cherryQtOpenPerspectiveAction.cpp
+  #cherryQtOpenPerspectiveAction.cpp
   cherryQtPluginActivator.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp

@@ -72,7 +72,21 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
     CLASS_NAME ## Factory(const Self&); /* purposely not implemented */ \
     void operator=(const Self&);    /* purposely not implemented */ \
  \
-};
+}; \
+   \
+class CLASS_NAME ## RegistrationMethod \
+  { \
+    public: \
+ \
+    CLASS_NAME ## RegistrationMethod() \
+    { \
+      std::cout << "(II) Register " #CLASS_NAME << std::endl; \
+      itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
+    } \
+  }; \
+ \
+static mitk::CLASS_NAME ## RegistrationMethod somestaticinitializer_ ## CLASS_NAME ;
+
 
 #define MITK_EXTERNAL_TOOL_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
 extern "C" { \

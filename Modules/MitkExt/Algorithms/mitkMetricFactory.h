@@ -93,8 +93,8 @@ namespace mitk {
     ~MetricFactory() {};
 
     MetricParameters::Pointer m_MetricParameters;
-    typename const MovingImageType * m_movingMaskImage;
-    typename const FixedImageType * m_fixedMaskImage;
+    typename MovingImageType * m_movingMaskImage;
+    typename FixedImageType * m_fixedMaskImage;
     
     typename MovingImageMaskType::Pointer m_movingMask;
     typename FixedImageMaskType::Pointer m_fixedMask;

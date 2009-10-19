@@ -46,7 +46,7 @@ namespace mitk {
   {
     m_movingMaskImage = movingMaskImage;
 
-    itk::CastImageFilter<MovingImageType, MovingMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MovingMaskImageType>::New();
+    typename itk::CastImageFilter<MovingImageType, MovingMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MovingMaskImageType>::New();
     maskImageCaster->SetInput(m_movingMaskImage);
     try
     {
@@ -68,7 +68,7 @@ namespace mitk {
   {
     m_fixedMaskImage = fixedMaskImage;
 
-    itk::CastImageFilter<FixedImageType, FixedMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, FixedMaskImageType>::New();
+    typename itk::CastImageFilter<FixedImageType, FixedMaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, FixedMaskImageType>::New();
     maskImageCaster->SetInput(m_fixedMaskImage);
     try
     {

@@ -66,7 +66,7 @@ SET(MOC_H_FILES
   src/internal/cherryQtDisplay.h
   src/internal/cherryQtGlobalEventFilter.h
   src/internal/cherryQtMainWindowControl.h
-  src/internal/cherryQtOpenPerspectiveAction.h
+  #src/internal/cherryQtOpenPerspectiveAction.h
   src/internal/cherryQtSash.h
   src/internal/cherryQtShowViewAction.h
   src/internal/cherryQtStylePreferencePage.h

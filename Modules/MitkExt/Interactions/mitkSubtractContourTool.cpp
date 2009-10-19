@@ -19,6 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSubtractContourTool.xpm"
 
+namespace mitk {
+  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, SubtractContourTool, "Subtract tool");
+}
+
 mitk::SubtractContourTool::SubtractContourTool()
 :ContourTool(0)
 {

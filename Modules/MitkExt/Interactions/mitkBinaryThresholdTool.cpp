@@ -37,6 +37,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 
+namespace mitk {
+  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, BinaryThresholdTool, "Thresholding tool");
+}
+
 mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
  m_SensibleMaximumThresholdValue(+100),

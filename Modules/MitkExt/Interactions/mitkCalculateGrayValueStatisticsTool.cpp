@@ -30,6 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkHistogram.h>
 
+namespace mitk {
+  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
+}
+
 mitk::CalculateGrayValueStatisticsTool::CalculateGrayValueStatisticsTool()
 {
 }

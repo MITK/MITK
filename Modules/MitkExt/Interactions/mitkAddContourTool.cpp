@@ -19,6 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAddContourTool.xpm"
 
+namespace mitk {
+  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, AddContourTool, "Add tool");
+}
+
 mitk::AddContourTool::AddContourTool()
 :ContourTool(1)
 {

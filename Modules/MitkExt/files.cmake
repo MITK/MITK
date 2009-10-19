@@ -143,6 +143,19 @@ SET(CPP_FILES
   Interactions/mitkSurfaceDeformationInteractor3D.cpp
   Interactions/mitkSurfaceInteractor.cpp
   Interactions/mitkTool.cpp
+  Interactions/mitkAddContourTool.cpp
+  Interactions/mitkAutoCropTool.cpp
+  Interactions/mitkBinaryThresholdTool.cpp
+  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
+  Interactions/mitkCalculateVolumetryTool.cpp
+  Interactions/mitkCorrectorTool2D.cpp
+  Interactions/mitkCreateSurfaceTool.cpp
+  Interactions/mitkEraseRegionTool.cpp
+  Interactions/mitkFillRegionTool.cpp
+  Interactions/mitkRegionGrowingTool.cpp
+  Interactions/mitkSubtractContourTool.cpp
+  Interactions/mitkDrawPaintbrushTool.cpp
+  Interactions/mitkErasePaintbrushTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

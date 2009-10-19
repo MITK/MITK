@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRegionGrowingTool.xpm"
 
+namespace mitk {
+  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, RegionGrowingTool, "Region growing tool");
+}
+
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 mitk::RegionGrowingTool::RegionGrowingTool()

@@ -17,6 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/ClassLibrary.h"
 
+#include <cherryIBundleActivator.h>
+#include "src/internal/cherryQtPluginActivator.h"
+
 #include "src/internal/cherryQtWorkbenchTweaklet.h"
 #include "src/internal/cherryQtWorkbenchPageTweaklet.h"
 #include "src/internal/cherryQtDnDTweaklet.h"
@@ -25,6 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/internal/cherryQtMessageDialogTweaklet.h"
 #include "src/internal/defaultpresentation/cherryQtWorkbenchPresentationFactory.h"
 
+#include "src/internal/cherryQtStylePreferencePage.h"
+
+//****  Activator ****************
+
+POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+  POCO_EXPORT_CLASS(cherry::QtPluginActivator)
+POCO_END_MANIFEST
 
 //****  Tweaklets  ****************
 
@@ -56,4 +66,9 @@ POCO_END_MANIFEST
 //**** Presentation Factories *********
 POCO_BEGIN_NAMED_MANIFEST(cherryIPresentationFactory, cherry::IPresentationFactory)
   POCO_EXPORT_CLASS(cherry::QtWorkbenchPresentationFactory)
+POCO_END_MANIFEST
+
+//**** Preference Pages *****
+POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)
+  POCO_EXPORT_CLASS(cherry::QtStylePreferencePage)
 POCO_END_MANIFEST

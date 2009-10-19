@@ -19,7 +19,8 @@
 
 namespace cherry {
 
-const std::string QtPreferences::QT_SKINS_NODE = "/qtskins";
-const std::string QtPreferences::QT_SKIN_NAME = "skinname";
+const std::string QtPreferences::QT_STYLES_NODE = "qtstyles";
+const std::string QtPreferences::QT_STYLE_NAME = "stylename";
+const std::string QtPreferences::QT_STYLE_SEARCHPATHS = "searchpaths";
 
 }

@@ -15,22 +15,10 @@
  
  =========================================================================*/
 
-
-#ifndef CHERRYQTPREFERENCES_H_
-#define CHERRYQTPREFERENCES_H_
-
-#include "cherryUiQtDll.h"
-
-#include <string>
+#include "cherryIQtStyleManager.h"
 
 namespace cherry {
 
-struct CHERRY_UI_QT QtPreferences
-{
-  static const std::string QT_STYLES_NODE; // = "qtstyles";
-  static const std::string QT_STYLE_NAME; // = "stylename";
-  static const std::string QT_STYLE_SEARCHPATHS; // = "searchpaths";
-};
-}
+const std::string IQtStyleManager::ID = "org.opencherry.service.qtstylemanager";
 
-#endif /* CHERRYQTPREFERENCES_H_ */
+}

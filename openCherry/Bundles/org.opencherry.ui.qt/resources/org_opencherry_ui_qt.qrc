@@ -10,5 +10,9 @@
      <file>icon_missing.png</file>
      <file>tab_close_icon.png</file>
      <file>tab_close_icon-active.png</file>
+     
+     <file>defaultstyle.qss</file>
+     <file>defaultstyle-activetab.qss</file>
+     <file>defaultstyle-tab.qss</file>
  </qresource>
  </RCC>

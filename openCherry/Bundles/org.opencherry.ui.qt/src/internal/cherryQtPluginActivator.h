@@ -16,21 +16,20 @@
  =========================================================================*/
 
 
-#ifndef CHERRYQTPREFERENCES_H_
-#define CHERRYQTPREFERENCES_H_
+#ifndef CHERRYQTPLUGINACTIVATOR_H_
+#define CHERRYQTPLUGINACTIVATOR_H_
 
-#include "cherryUiQtDll.h"
-
-#include <string>
+#include <cherryAbstractUIPlugin.h>
 
 namespace cherry {
 
-struct CHERRY_UI_QT QtPreferences
+class QtPluginActivator : public AbstractUIPlugin
 {
-  static const std::string QT_STYLES_NODE; // = "qtstyles";
-  static const std::string QT_STYLE_NAME; // = "stylename";
-  static const std::string QT_STYLE_SEARCHPATHS; // = "searchpaths";
+public:
+
+  void Start(IBundleContext::Pointer context);
 };
+
 }
 
-#endif /* CHERRYQTPREFERENCES_H_ */
+#endif /* CHERRYQTPLUGINACTIVATOR_H_ */

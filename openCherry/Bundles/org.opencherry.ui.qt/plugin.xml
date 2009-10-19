@@ -54,4 +54,15 @@
             id="org.opencherry.ui.presentations.default">
       </factory>
    </extension>
+   
+   <extension point="org.opencherry.ui.preferencePages">
+     <page id="org.opencherry.ui.qt.stylepreferencepage" name="Themes" class="cherry::QtStylePreferencePage">
+       <keywordreference id="org.opencherry.ui.qt.styleprefpagekeywords"/>
+     </page>
+   </extension>
+
+   <extension point="org.opencherry.ui.keywords">
+     <keyword id="org.opencherry.ui.qt.styleprefpagekeywords" label="theme skin style"></keyword>
+   </extension>
+  
 </plugin>

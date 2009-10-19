@@ -23,6 +23,7 @@
 
 #include <cherryShell.h>
 #include <cherryConstants.h>
+#include <cherryPlatform.h>
 
 #include <QFrame>
 #include <QVBoxLayout>
@@ -122,6 +123,8 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   //        title = new CLabel(viewForm, SWT.LEFT);
   //        attachListeners(title, false);
   //        viewForm.setTopLeft(title);
+
+  skinManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
 }
 
 NativeTabFolder::~NativeTabFolder()
@@ -144,13 +147,11 @@ bool NativeTabFolder::eventFilter(QObject* watched, QEvent* event)
 
 void NativeTabFolder::UpdateColors()
 {
-  std::string activeColor = this->GetActive() == 1 ? "highlight" : "window";
-  tabControl->setStyleSheet(QString::fromStdString("QTabBar::tab:selected {"
-      "background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-      "                            stop:0 palette(light), stop:1 palette(" + activeColor + ")); }"));
+  QString tabStyle = this->GetActive() == 1 ? skinManager->GetActiveTabStylesheet() : skinManager->GetTabStylesheet();
 
-  contentFrame->setStyleSheet(QString::fromStdString("QFrame#ViewFormContentFrame {"
-      "border: 2px solid palette(" + activeColor + ") }"));
+  //tabControl->setStyleSheet(tabSkin);
+  //contentFrame->setStyleSheet(tabSkin);
+  viewForm->setStyleSheet(tabStyle);
 }
 
 void NativeTabFolder::SetActive(int activeState)

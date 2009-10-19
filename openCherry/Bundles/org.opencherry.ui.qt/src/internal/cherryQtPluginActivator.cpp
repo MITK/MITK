@@ -15,22 +15,17 @@
  
  =========================================================================*/
 
+#include "cherryQtPluginActivator.h"
 
-#ifndef CHERRYQTPREFERENCES_H_
-#define CHERRYQTPREFERENCES_H_
-
-#include "cherryUiQtDll.h"
-
-#include <string>
+#include "internal/cherryQtStyleManager.h"
 
 namespace cherry {
 
-struct CHERRY_UI_QT QtPreferences
+void
+QtPluginActivator::Start(IBundleContext::Pointer context)
 {
-  static const std::string QT_STYLES_NODE; // = "qtstyles";
-  static const std::string QT_STYLE_NAME; // = "stylename";
-  static const std::string QT_STYLE_SEARCHPATHS; // = "searchpaths";
-};
+  IQtStyleManager::Pointer skinManager(new QtStyleManager());
+  context->RegisterService(IQtStyleManager::ID, skinManager);
 }
 
-#endif /* CHERRYQTPREFERENCES_H_ */
+}

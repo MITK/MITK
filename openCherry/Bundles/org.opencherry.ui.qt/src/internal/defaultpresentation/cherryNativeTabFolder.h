@@ -20,6 +20,8 @@
 
 #include "../util/cherryAbstractTabFolder.h"
 
+#include <cherryIQtStyleManager.h>
+
 #include <QObject>
 
 class QFrame;
@@ -63,6 +65,7 @@ private:
   //
   //    };
 
+  IQtStyleManager::Pointer skinManager;
 
   /**
    * @param item

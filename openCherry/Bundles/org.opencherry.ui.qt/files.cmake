@@ -1,8 +1,10 @@
 SET(SRC_CPP_FILES
   cherryIQtPreferencePage.cpp
+  cherryIQtStyleManager.cpp
   cherryQModelIndexObject.cpp
   cherryQtEditorPart.cpp
   cherryQtItemSelection.cpp
+  cherryQtPreferences.cpp
   cherryQtSelectionProvider.cpp
   cherryQtViewPart.cpp
   
@@ -37,10 +39,14 @@ SET(INTERNAL_CPP_FILES
   cherryQtMainWindowControl.cpp
   cherryQtMessageDialogTweaklet.cpp
   cherryQtMissingImageDescriptor.cpp
+  cherryQtOpenPerspectiveAction.cpp
+  cherryQtPluginActivator.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp
   cherryQtShowViewAction.cpp
   cherryQtShowViewDialog.cpp
+  cherryQtStyleManager.cpp
+  cherryQtStylePreferencePage.cpp
   cherryQtTracker.cpp
   cherryQtWidgetController.cpp
   cherryQtWidgetsTweaklet.cpp
@@ -60,14 +66,17 @@ SET(MOC_H_FILES
   src/internal/cherryQtDisplay.h
   src/internal/cherryQtGlobalEventFilter.h
   src/internal/cherryQtMainWindowControl.h
+  src/internal/cherryQtOpenPerspectiveAction.h
   src/internal/cherryQtSash.h
   src/internal/cherryQtShowViewAction.h
+  src/internal/cherryQtStylePreferencePage.h
   src/internal/cherryQtTracker.h
   src/internal/cherryQtWidgetsTweakletImpl.h
 )
 
 SET(UI_FILES
   src/internal/cherryQtShowViewDialog.ui
+  src/internal/cherryQtStylePreferencePage.ui
   src/internal/cherryQtStatusPart.ui
 )
 

@@ -1,4 +1,5 @@
 SET(SRC_CPP_FILES
+  cherryIQtPreferencePage.cpp
   cherryQModelIndexObject.cpp
   cherryQtEditorPart.cpp
   cherryQtItemSelection.cpp
@@ -26,7 +27,6 @@ SET(INTERNAL_CPP_FILES
   util/cherryTabbedStackPresentation.cpp
   util/cherryTabFolderEvent.cpp
   
-  cherryIQtPreferencePage.cpp
   cherryQtControlWidget.cpp
   cherryQtDisplay.cpp
   cherryQtDnDTweaklet.cpp

@@ -36,6 +36,11 @@ namespace mitk {
   //##
   //## superior statemachine, that spreads the events to all other interactors
   //##
+  //## Initialization
+  //## Attention: GlobalInteraction <strong>must</strong> be initialized by one of the both Initialize()
+  //## methods before usage via an XML scheme. Possibilities are giving it the filename of the XML file or
+  //## its content as std::string.
+  //##
   //## Concept of sending events:
   //## In this concept of interaction, the statemachines can be divided into two main statemachines:
   //## Listeners and interactors.
@@ -153,12 +158,12 @@ namespace mitk {
 
     //##Documentation
     //## @brief Initializes the global (singleton) instance of
-    //## GlobalInteraction. Can be done only once.
+    //## GlobalInteraction via an XML string. Must! be done before usage. Can be done only once.
     bool Initialize(const char* globalInteractionName, std::string XMLbehaviourString);
 
     //##Documentation
     //## @brief Initializes the global (singleton) instance of
-    //## GlobalInteraction. Can be done only once.
+    //## GlobalInteraction via an XML file. Must! be done before usage. Can be done only once.
     bool Initialize(const char* globalInteractionName, const char* XMLbehaviorFile);
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
@@ -210,7 +215,7 @@ namespace mitk {
     //##Documentation
     //##@brief filling m_JurisdictionMap 
     //##
-    //## @ params swell: if the calculated jurisdictionvalue is above swell, then add it to the map
+    //## @ params swell: if the calculated jurisdiction value is above swell, then add it to the map
     void FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
 
     void RemoveFlaggedListeners();

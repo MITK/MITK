@@ -397,11 +397,10 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, std:
       return false;
     }
 
+    //now instantiate what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+
     // (Re-) Initialize Superclass (StateMachine), because type was not given at time of construction
     m_Type = globalInteractionName;
-    Superclass::InitializeStartStates(1);
-
-    //now instantiate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
 
     //get the start state of the pattern
     State::Pointer startState = m_StateMachineFactory->GetStartState(globalInteractionName);
@@ -449,7 +448,10 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
       return false;
     }
 
-    //now instantiate what what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+    //now instantiate what could not be done in InitializeStateStates because StateMachineFactory was not up yet:
+
+    // (Re-) Initialize Superclass (StateMachine), because type was not given at time of construction
+    m_Type = globalInteractionName;
 
     //get the start state of the pattern
     State::Pointer startState = m_StateMachineFactory->GetStartState(globalInteractionName);
@@ -458,10 +460,6 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
     m_CurrentStateVector.clear();
     //add the start state pointer for the first time step to the list
     m_CurrentStateVector.push_back(startState);
-
-    // (Re-) Initialize Superclass (StateMachine), because type was not given at time of construction
-    m_Type = globalInteractionName;
-    Superclass::InitializeStartStates(1);
 
     m_IsInitialized = true;
     return true;

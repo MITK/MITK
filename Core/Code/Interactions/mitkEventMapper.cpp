@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /**
 *   EventMapping:
-*       This class mapps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
+*       This class maps the Events, usually given by the OS or here by QT, to a MITK internal EventId.
 *       It loads all information from the xml-file (possible, understandable Events with the mitkEventID).
 *       If an event appears, the method MapEvent is called with the event params.
 *       This Method looks up the event params, and tries to find an mitkEventId to it.
@@ -34,10 +34,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
 #include "mitkOperationEvent.h"
-#include "mitkStateMachine.h"
-
+// #include "mitkStateMachine.h"
 #include "mitkGlobalInteraction.h"
-#include <mitkStandardFileLocations.h>
+
+#include "mitkStandardFileLocations.h"
 
 //#include <mitkInteractionDebugger.h>
 #include <mitkConfig.h>
@@ -71,8 +71,6 @@ const std::string mitk::EventMapper::KEY = "KEY";
 const std::string mitk::EventMapper::EVENTS = "events";
 
 const std::string mitk::EventMapper::EVENT = "event";
-
-mitk::StateMachine *mitk::EventMapper::s_GlobalStateMachine(NULL);
 
 mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
 
@@ -438,38 +436,11 @@ mitk::EventMapper::~EventMapper()
 }
 
 //##Documentation
-//## set the global StateMachine. If temporaryly changed,
-//## then copy the old statemachine with GetStateMachine()
-void mitk::EventMapper::SetGlobalStateMachine(StateMachine *stateMachine)
-{
-  itkGenericOutputMacro(<< "Use of mitk::EventMapper::SetGlobalStateMachine. "
-    << "This method may be important in the future. Has the future "
-    << "already begun?");
-  if((s_GlobalStateMachine != NULL) && (s_GlobalStateMachine != stateMachine))
-  {
-    itkGenericOutputMacro(<< "replacing an existing global state machine");
-  }
-  s_GlobalStateMachine = stateMachine;
-}
-
-mitk::StateMachine* mitk::EventMapper::GetGlobalStateMachine()
-{
-  if(s_GlobalStateMachine == NULL)
-  {
-    return mitk::GlobalInteraction::GetInstance();
-  }
-  return s_GlobalStateMachine;
-}
-
-//##Documentation
 //## searches the Event in m_EventDescription
 //##  
 bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
 {
   int eventID = mitkPostedEventID;
-
-  if (GetGlobalStateMachine() == NULL)
-    return false;
 
   if( mitkPostedEventID == 0 )
   {
@@ -500,8 +471,6 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
 
   A user interaction with the mouse is started by a mousePressEvent, continues with a MouseMove and finishes with a MouseReleaseEvent
   */
-  bool ok;
-
   switch (event->GetType())
   {
   case mitk::Type_MouseButtonPress://Increase
@@ -529,9 +498,8 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
 #endif //MBI_INTERNAL_CONFERENCE
 
   mitk::OperationEvent::ExecuteIncrement();
-  ok = GetGlobalStateMachine()->HandleEvent(&m_StateEvent);
-
-  return ok;
+  
+  return mitk::GlobalInteraction::GetInstance()->HandleEvent(&m_StateEvent);
 }
 
 //##Documentation

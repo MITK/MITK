@@ -69,13 +69,6 @@ namespace mitk {
     typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
     //##Documentation
-    //## set the global StateMachine. If temporarily changed,
-    //## then copy the old statemachine with GetStateMachine()
-    static void SetGlobalStateMachine(StateMachine* stateMachine);
-
-    static StateMachine* GetGlobalStateMachine();
-
-    //##Documentation
     //## searches the Event in m_EventDescription
     //## and if included transmits the event to globalInteraction
     //## the optional parameter should be used in a conference to avoid a
@@ -154,8 +147,6 @@ namespace mitk {
     //## @brief stores the information for the connection between QT-Events and the internal EventId.
     //## gets this information from xml-File
     static EventDescriptionVec m_EventDescriptions;
-
-    static StateMachine *s_GlobalStateMachine;
 
     static StateEvent m_StateEvent;
 

@@ -240,9 +240,6 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
 
 void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
 {
-  if (mitk::GlobalInteraction::GetInstance() == NULL)
-    return;
-  
   //get the startstate of the pattern
   State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState(m_Type.c_str());
 

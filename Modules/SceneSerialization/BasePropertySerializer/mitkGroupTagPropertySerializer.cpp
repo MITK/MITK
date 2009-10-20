@@ -35,7 +35,7 @@ class SceneSerialization_EXPORT GroupTagPropertySerializer : public BaseProperty
 
     virtual TiXmlElement* Serialize()
     {
-      if (const GroupTagProperty* prop = dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()))
+      if (dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()) != NULL)
       {
         TiXmlElement* element = new TiXmlElement("GroupTag");
         return element;

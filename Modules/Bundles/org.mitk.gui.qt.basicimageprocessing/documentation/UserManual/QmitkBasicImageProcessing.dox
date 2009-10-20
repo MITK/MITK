@@ -1,0 +1,94 @@
+/**
+\page QmitkBasicImageProcessingUserManual The Basic Image Processing Module in MITK
+
+\image html Lena_64_64.png "Icon of the Module"
+
+Available sections:
+  - \ref QmitkBasicImageProcessingUserManualOverview 
+  - \ref QmitkBasicImageProcessingUserManualFilters 
+  - \ref QmitkBasicImageProcessingUserManualUsage 
+
+
+\section QmitkBasicImageProcessingUserManualOverview Overview
+
+This module allows has been designed to provide an easy interface to fundamental image preprocessing and image enhancement filters.
+It provides a variety of image operations in the areas of noise suppression, morphological operations, edge detection and image arithmetics.
+In the moment, the module can handle all 3D and 4D image types loadable by MITK. 2D image support will be added in the future. 
+All offered filters are encapsulated from the ITK toolkit (www.itk.org).  
+
+\image html BIP_Overview.png "MITK with the QmitkBasicImageProcessing functionality"
+
+This document will tell you how to use this functionality, but it is assumed that you already know how to use MITK in general.
+
+\section QmitkBasicImageProcessingUserManualFilters Filters
+
+This section will not describe the fundamental functioning of the single filters in detail, though.
+If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html 
+or in any good digital image processing book.
+
+Available filters are:
+
+\a Single image operations
+
+<ul>
+<li> <b>Noise Suppression</b>
+  <ul>
+  <li> Gaussian Denoising
+  <li> Median Filtering
+  <li> Total Variation Denoising
+  </ul>
+  
+<li> <b>Morphological Operations</b>
+  <ul>
+  <li> Dilation
+  <li> Erosion
+  <li> Opening
+  <li> Closing
+  </ul>
+  
+<li> <b>Edge Detection</b>
+  <ul>
+  <li> Gradient Image
+  <li> Laplacian Operator (Second Derivative)
+  <li> Sobel Operator
+  </ul>
+  
+<li> <b>Other</b>
+  <ul>
+  <li> Image Inversion
+  <li> Downsampling (isotropic, factor 2)  
+  
+</ul>
+  
+\a Dual image operations
+
+<ul>  
+<li> <b>Image Arithmetics</b>
+  <ul>
+  <li> Add two images
+  <li> Subtract two images
+  <li> Multiply two images
+  <li> Divide two images
+  </ul>
+</ul> 
+
+\section QmitkBasicImageProcessingUserManualUsage Usage
+
+All you have to do to use a filter is to:
+<ul>
+<li> Load an image into MITK
+<li> Select which filter you want to use via the drop down list
+<li> Press the execute button
+</ul>
+A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
+(If the  checkbox "Hide original image" is not selected, you will maybe not se the filter result imideately, 
+because your filtered image is supposedly hidden by the original.)
+
+For two image operations, please make sure that the correct second image is selected in the drop down menu, and the direction of the operation is correct.
+For sure, direction only plays a role for image subtraction and division. 
+
+Please Note: When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.
+The 3D image at this time step is extracted and processed. The result is also a 3D image.
+This means, a true 4D filtering is not supported by now.
+ 
+*/

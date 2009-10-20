@@ -1,0 +1,164 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 10185 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#if !defined(QmitkBasicImageProcessingView_H__INCLUDED)
+#define QmitkBasicImageProcessingView_H__INCLUDED
+
+#include "QmitkFunctionality.h"
+#include "../BasicimageprocessingDll.h"
+#include "ui_QmitkBasicImageProcessingViewControls.h"
+
+#include "QmitkStepperAdapter.h"
+
+
+/*!
+\brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes 
+
+Several basic ITK image processing filters, like denoising, morphological and edge detection  
+are encapsulated in this module and can be selected via a list and an intuitive parameter input.
+The selected filter will be applied on the image, and a new image showing the output is displayed
+as result. 
+Also, some image arithmetic operations are available.  
+
+Images can be 3D or 4D. 
+In the 4D case, the filters work on the 3D image selected via the
+time slider. The result is also a 3D image.
+
+\sa QmitkFunctionality, QObject
+
+\class QmitkBasicImageProcessing
+\author Tobias Schwarz
+\version 1.0 (3M3)
+\date 2009-05-10
+\ingroup Bundles
+*/
+
+class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QObject, public QmitkFunctionality
+{  
+  Q_OBJECT
+
+public:
+
+  /*!  
+  \brief default constructor  
+  */  
+  QmitkBasicImageProcessing(QObject *parent=0, const char *name=0);
+
+  /*!  
+  \brief default destructor  
+  */  
+  virtual ~QmitkBasicImageProcessing();
+
+  /*!  
+  \brief method for creating the widget containing the application controls, like sliders, buttons etc.  
+  */  
+  virtual void CreateQtPartControl(QWidget *parent);
+
+  /*!  
+  \brief method for creating the connections of main and control widget  
+  */  
+  virtual void CreateConnections();
+
+  virtual void Activated();
+
+  protected slots:  
+
+    /*
+    * When an image is selected through one of the data tree combo boxes.
+    */
+    void onImageSelected (const mitk::DataTreeNode* item);
+    void onImage2Selected(const mitk::DataTreeNode* item);
+
+    /*
+    * When the time slider has changed (different time step selected)
+    */
+    void UpdateTimestep();
+
+    /*
+    * When an action is selected in the "one image ops" list box
+    */
+    void SelectAction(int action);
+
+    /*
+    * When an action is selected in the "two image ops" list box
+    */
+    void SelectAction2(int operation);
+
+    /*
+    * The "Execute" button in the "one image ops" box was triggered
+    */
+    void StartButtonClicked();
+
+    /*
+    * "The Execute" button in the "two image ops" box was triggered
+    */
+    void StartButton2Clicked();
+
+private: 
+
+  /*
+  * After a one image operation, reset the "one image ops" panel
+  */
+  void ResetOneImageOpPanel();
+
+  /*
+  * After a two image operation, reset the "two image ops" panel
+  */
+  void ResetTwoImageOpPanel();
+
+  /*
+  * After a two image operation, reset the "two image ops" panel
+  */
+  void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
+
+  /*!  
+  * controls containing sliders for scrolling through the slices  
+  */  
+  Ui::QmitkBasicImageProcessingViewControls *m_Controls;
+
+  mitk::Image*              m_SelectedImage;
+  QmitkStepperAdapter*      m_TimeStepperAdapter;
+  unsigned int              m_CurrentTime;
+
+  enum ActionType {
+    GAUSSIAN,
+    MEDIAN,	
+    TOTALVARIATION,
+    DILATION,
+    EROSION,
+    OPENING,
+    CLOSING,
+    GRADIENT,
+    LAPLACIAN,
+    SOBEL,	
+    INVERSION,
+    DOWNSAMPLING,
+  } m_SelectedAction; 
+
+  enum OperationType{
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE
+  } m_SelectedOperation;
+
+};
+
+#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)
+
+

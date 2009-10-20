@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#define MBILOG_ENABLE_DEBUG 1
+//#define MBILOG_ENABLE_DEBUG 1
 
 #include "QmitkToolSelectionBox.h"
 #include "QmitkToolGUI.h"

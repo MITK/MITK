@@ -26,11 +26,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class SceneSerialization_EXPORT Vector3dPropertyDeserializer : public BasePropertyDeserializer
+class SceneSerialization_EXPORT Vector3DPropertyDeserializer : public BasePropertyDeserializer
 {
   public:
     
-    mitkClassMacro( Vector3dPropertyDeserializer, BasePropertyDeserializer );
+    mitkClassMacro( Vector3DPropertyDeserializer, BasePropertyDeserializer );
     itkNewMacro(Self);
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
@@ -47,14 +47,14 @@ class SceneSerialization_EXPORT Vector3dPropertyDeserializer : public BaseProper
 
   protected:
 
-    Vector3dPropertyDeserializer() {}
-    virtual ~Vector3dPropertyDeserializer() {}
+    Vector3DPropertyDeserializer() {}
+    virtual ~Vector3DPropertyDeserializer() {}
 };
 
 } // namespace
 
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
-MITK_REGISTER_SERIALIZER(Vector3dPropertyDeserializer);
+MITK_REGISTER_SERIALIZER(Vector3DPropertyDeserializer);
 
 #endif
 

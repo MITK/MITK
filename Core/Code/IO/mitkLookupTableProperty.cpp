@@ -24,7 +24,6 @@ mitk::LookupTableProperty::LookupTableProperty()
 
 mitk::LookupTableProperty::LookupTableProperty(const mitk::LookupTable::Pointer lut)
 {
-    LOG_INFO << "created mitk::LookupTableProperty::New..." << std::endl;
     this->SetLookupTable(lut);
 }
 

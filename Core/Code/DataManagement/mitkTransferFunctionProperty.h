@@ -46,7 +46,7 @@ namespace mitk {
         if(other==NULL) 
           return false;
         else
-        return (other->m_Value==m_Value);
+          return *(m_Value.GetPointer()) == *(other->m_Value.GetPointer());
       }
 
       /**

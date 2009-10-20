@@ -44,7 +44,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkStringProperty.h>
-#include <mitkDelegateProperty.h>
 #include <mitkTransferFunctionProperty.h>
 
 #include "mitkPropertyList.h"
@@ -140,10 +139,9 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   lt->ChangeOpacity(17, 0.88);
   propList->SetProperty("LookupTableProperty", mitk::LookupTableProperty::New(lt));
   propList->SetProperty("StringProperty", mitk::StringProperty::New("Oh why, gruel world"));
-  propList->SetProperty("DelegateProperty", mitk::DelegateProperty::New("Do it!"));
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-  tf->SetTransferFunctionMode(1);
-  propList->SetProperty("TransferFunctionProperty", mitk::TransferFunctionProperty::New(tf));
+  //mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+  //tf->SetTransferFunctionMode(1);
+  //propList->SetProperty("TransferFunctionProperty", mitk::TransferFunctionProperty::New(tf));
 
 
   MITK_TEST_CONDITION_REQUIRED(propList->GetMap()->size() > 0, "Initialize PropertyList");

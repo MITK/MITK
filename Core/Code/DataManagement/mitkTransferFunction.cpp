@@ -45,6 +45,61 @@ TransferFunction::~TransferFunction()
   m_GradientOpacityFunction->Delete();
 }
 
+bool TransferFunction::operator==(Self& other)
+{
+  if ((m_Min != other.m_Min) || (m_Max != other.m_Max))
+    return false;
+  
+  bool sizes = (m_ScalarOpacityFunction->GetSize() == other.m_ScalarOpacityFunction->GetSize())
+            && (m_GradientOpacityFunction->GetSize() == other.m_GradientOpacityFunction->GetSize())
+            && (m_ColorTransferFunction->GetSize() == other.m_ColorTransferFunction->GetSize());
+  if (sizes == false)
+    return false;
+
+  for (int i = 0; i < m_ScalarOpacityFunction->GetSize(); i++ )
+  {
+    double myVal[4];
+    double otherVal[4];
+    m_ScalarOpacityFunction->GetNodeValue(i, myVal);
+    other.m_ScalarOpacityFunction->GetNodeValue(i, otherVal);
+    bool equal = (myVal[0] == otherVal[0])
+              && (myVal[1] == otherVal[1])
+              && (myVal[2] == otherVal[2])
+              && (myVal[3] == otherVal[3]);
+    if (equal == false)
+      return false;
+  }
+  for (int i = 0; i < m_GradientOpacityFunction->GetSize(); i++ )
+  {
+    double myVal[4];
+    double otherVal[4];
+    m_GradientOpacityFunction->GetNodeValue(i, myVal);
+    other.m_GradientOpacityFunction->GetNodeValue(i, otherVal);
+    bool equal = (myVal[0] == otherVal[0])
+      && (myVal[1] == otherVal[1])
+      && (myVal[2] == otherVal[2])
+      && (myVal[3] == otherVal[3]);
+    if (equal == false)
+      return false;
+  }
+  for (int i = 0; i < m_ColorTransferFunction->GetSize(); i++ )
+  {
+    double myVal[6];
+    double otherVal[6];
+    m_ColorTransferFunction->GetNodeValue(i, myVal);
+    other.m_ColorTransferFunction->GetNodeValue(i, otherVal);
+    bool equal = (myVal[0] == otherVal[0]) // X
+      && (myVal[1] == otherVal[1])  // R
+      && (myVal[2] == otherVal[2])  // G
+      && (myVal[3] == otherVal[3])  // B
+      && (myVal[4] == otherVal[4])  // midpoint
+      && (myVal[5] == otherVal[5]); // sharpness
+    if (equal == false)
+      return false;
+  }
+  return true;
+}
+
 
 void TransferFunction::SetScalarOpacityPoints(TransferFunction::ControlPoints points)
 {
@@ -710,15 +765,10 @@ void TransferFunction::SetTransferFunctionMode( int mode )
     m_GradientOpacityFunction->AddPoint((m_Max*0.2),1.0);
     m_GradientOpacityFunction->AddPoint((m_Max*0.25),1.0);
     m_GradientOpacityFunction->AddPoint(m_Max,1.0);
-
     break;
-
   default:
-
     break;
   }
 #endif
-
 }
-
 } // namespace

@@ -154,6 +154,8 @@ public:
 
   /** \brief Removes all control points from the color transfer function. */
   void ClearRGBPoints();
+
+  bool operator==(Self& other);
   
 
 protected:

@@ -38,7 +38,7 @@ class SceneSerialization_EXPORT StringLookupTablePropertySerializer : public Bas
       const StringLookupTableProperty* prop = dynamic_cast<const StringLookupTableProperty*>(m_Property.GetPointer());
       if (prop == NULL)
         return NULL;
-      StringLookupTable& lut = prop->GetValue();
+      StringLookupTable lut = prop->GetValue();
       //if (lut.IsNull()) 
       //  return NULL; // really?
       const StringLookupTable::LookupTableType& map = lut.GetLookupTable();

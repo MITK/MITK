@@ -38,7 +38,7 @@ class SceneSerialization_EXPORT BoolLookupTablePropertySerializer : public BaseP
       const BoolLookupTableProperty* prop = dynamic_cast<const BoolLookupTableProperty*>(m_Property.GetPointer());
       if (prop == NULL)
         return NULL;
-      BoolLookupTable& lut = prop->GetValue();
+      BoolLookupTable lut = prop->GetValue();
       //if (lut.IsNull()) 
       //  return NULL; // really?
       const BoolLookupTable::LookupTableType& map = lut.GetLookupTable();

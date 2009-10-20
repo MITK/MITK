@@ -38,7 +38,7 @@ class SceneSerialization_EXPORT FloatLookupTablePropertySerializer : public Base
       const FloatLookupTableProperty* prop = dynamic_cast<const FloatLookupTableProperty*>(m_Property.GetPointer());
       if (prop == NULL)
         return NULL;
-      FloatLookupTable& lut = prop->GetValue();
+      FloatLookupTable lut = prop->GetValue();
       //if (lut.IsNull()) 
       //  return NULL; // really?
       const FloatLookupTable::LookupTableType& map = lut.GetLookupTable();

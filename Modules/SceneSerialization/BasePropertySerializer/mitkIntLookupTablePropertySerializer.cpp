@@ -38,7 +38,7 @@ class SceneSerialization_EXPORT IntLookupTablePropertySerializer : public BasePr
       const IntLookupTableProperty* prop = dynamic_cast<const IntLookupTableProperty*>(m_Property.GetPointer());
       if (prop == NULL)
         return NULL;
-      IntLookupTable& lut = prop->GetValue();
+      IntLookupTable lut = prop->GetValue();
       //if (lut.IsNull()) 
       //  return NULL; // really?
       const IntLookupTable::LookupTableType& map = lut.GetLookupTable();

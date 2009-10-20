@@ -1,4 +1,5 @@
 #include <cherryISelectionProvider.h>
+#include <cherryISelectionService.h>
 #include <cherryIWorkbenchWindow.h>
 #include <cherryISelectionService.h>
 #include "QmitkPropertyListView.h"
@@ -10,13 +11,16 @@
 const std::string QmitkPropertyListView::VIEW_ID = "org.mitk.views.propertylistview";
 
 QmitkPropertyListView::QmitkPropertyListView()
+: m_SelectionListener(0)
 {
 }
 
 QmitkPropertyListView::~QmitkPropertyListView()
 {
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()
-    ->RemoveSelectionListener(cherry::ISelectionListener::Pointer(this));
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelectionListener);
+
 }
 
 void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
@@ -28,8 +32,8 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
 
   parent->setLayout(layout);
 
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()
-    ->AddSelectionListener(cherry::ISelectionListener::Pointer(this));
+  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkPropertyListView>
+    (this, &QmitkPropertyListView::SelectionChanged);
 }
 
 void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer  /*part*/ , cherry::ISelection::ConstPointer selection )

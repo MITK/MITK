@@ -46,7 +46,14 @@ private:
   /// \brief The properties table editor.
   ///
   QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
-
+  ///
+  /// A selection listener for datatreenode events
+  ///
+  cherry::ISelectionListener::Pointer m_SelectionListener;
+  ///
+  /// 
+  ///
+  friend struct cherry::SelectionChangedAdapter<QmitkPropertyListView>;
 };
 
 #endif /*QmitkPropertyListView_H_*/

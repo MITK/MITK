@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkVtkVolumeRenderingProperty.h"
+#include "mitkModalityProperty.h"
 
 
 #define MITK_REGISTER_ENUM_SUB_DESERIALIZER(classname) \
@@ -78,6 +79,5 @@ MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkResliceInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkScalarModeProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkVolumeRenderingProperty);
-
+MITK_REGISTER_ENUM_SUB_DESERIALIZER(ModalityProperty);
 #endif
-

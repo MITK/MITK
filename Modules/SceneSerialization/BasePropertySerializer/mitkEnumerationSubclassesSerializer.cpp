@@ -53,6 +53,7 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkResliceInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkScalarModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkVolumeRenderingProperty);
+MITK_REGISTER_ENUM_SUB_SERIALIZER(ModalityProperty);
 
 #endif
 

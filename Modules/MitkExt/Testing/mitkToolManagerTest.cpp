@@ -65,7 +65,7 @@ int mitkToolManagerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ToolManager")
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // instantiation
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();

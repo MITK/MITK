@@ -116,37 +116,58 @@ mitk::LookupTable::RawLookupTableType * mitk::LookupTable::GetRawLookupTable() c
 /*!
 * \brief equality operator inplementation
 */
-bool mitk::LookupTable::operator==( const mitk::LookupTable& LookupTable ) const
+bool mitk::LookupTable::operator==( const mitk::LookupTable& other ) const
 {
-  if ( m_LookupTable == LookupTable.GetVtkLookupTable() )
-  {
+  if ( m_LookupTable == other.GetVtkLookupTable()) 
     return true;
-  }
-  else
-  {
+  vtkLookupTable* olut = other.GetVtkLookupTable();
+  if (olut == NULL)
     return false;
+  
+  bool equal = (m_LookupTable->GetNumberOfColors() == olut->GetNumberOfColors())
+            && (m_LookupTable->GetTableRange()[0] == olut->GetTableRange()[0])
+            && (m_LookupTable->GetTableRange()[1] == olut->GetTableRange()[1])
+            && (m_LookupTable->GetHueRange()[0] == olut->GetHueRange()[0])
+            && (m_LookupTable->GetHueRange()[1] == olut->GetHueRange()[1])
+            && (m_LookupTable->GetSaturationRange()[0] == olut->GetSaturationRange()[0])
+            && (m_LookupTable->GetSaturationRange()[1] == olut->GetSaturationRange()[1])
+            && (m_LookupTable->GetValueRange()[0] == olut->GetValueRange()[0])
+            && (m_LookupTable->GetValueRange()[1] == olut->GetValueRange()[1])
+            && (m_LookupTable->GetAlphaRange()[0] == olut->GetAlphaRange()[0])
+            && (m_LookupTable->GetAlphaRange()[1] == olut->GetAlphaRange()[1])
+            && (m_LookupTable->GetRamp() == olut->GetRamp())
+            && (m_LookupTable->GetScale() == olut->GetScale())
+            && (m_LookupTable->GetAlpha() == olut->GetAlpha())
+            && (m_LookupTable->GetTable()->GetNumberOfTuples() == olut->GetTable()->GetNumberOfTuples());
+  if (equal == false)
+    return false;
+  //for (vtkIdType i=0; i < m_LookupTable->GetTable()->GetNumberOfTuples(); i++)
+  //{
+  //  if (m_LookupTable->GetTable()->GetTuple(i) != olut->GetTable()->GetTuple(i))
+  //    return false;
+  //}
+  for (vtkIdType i=0; i < m_LookupTable->GetNumberOfTableValues(); i++)
+  {
+    bool tvequal = (m_LookupTable->GetTableValue(i)[0] == olut->GetTableValue(i)[0])
+                && (m_LookupTable->GetTableValue(i)[1] == olut->GetTableValue(i)[1])
+                && (m_LookupTable->GetTableValue(i)[2] == olut->GetTableValue(i)[2])
+                && (m_LookupTable->GetTableValue(i)[3] == olut->GetTableValue(i)[3]);
+    if (tvequal == false)
+      return false;
   }
+  return true;
 }
 
 /*!
-* \brief equality operator inplementation
+* \brief un-equality operator implementation
 */
-bool mitk::LookupTable::operator!=( const mitk::LookupTable& LookupTable ) const
+bool mitk::LookupTable::operator!=( const mitk::LookupTable& other ) const
 {
-
-  if ( m_LookupTable == ( LookupTable.GetVtkLookupTable() ) )
-  {
-    return false;
-  }
-  else
-  {
-    return true;
-  }
-
+  return !(*this == other);
 }
 
 /*!
-* \brief non equality operator inplementation
+* \brief assignment operator implementation
 */
 mitk::LookupTable& mitk::LookupTable::operator=( const mitk::LookupTable& LookupTable )
 {

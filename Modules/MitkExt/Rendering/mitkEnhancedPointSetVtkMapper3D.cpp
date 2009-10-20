@@ -232,18 +232,18 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
     mitk::BoolLookupTableProperty* visLTProp = dynamic_cast<mitk::BoolLookupTableProperty*>(visProp);
     if (visLTProp != NULL)
     {
-      mitk::BoolLookupTable* visLookupTable = visLTProp->GetValue();
-      if (visLookupTable != NULL)
-      {
+      mitk::BoolLookupTable visLookupTable = visLTProp->GetValue();
+      //if (visLookupTable != NULL)
+      //{
         try
         {
-          pointVisibility = visLookupTable->GetTableValue(pointID);
+          pointVisibility = visLookupTable.GetTableValue(pointID);
           visValueFound = true;
         }
         catch (...)
         {
         }
-      }
+      //}
     }
     if (visValueFound == false)
     {
@@ -258,18 +258,18 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
     mitk::FloatLookupTableProperty* opLTProp = dynamic_cast<mitk::FloatLookupTableProperty*>(opProp);
     if (opLTProp != NULL)
     {
-      mitk::FloatLookupTable* opLookupTable = opLTProp->GetValue();
-      if (opLookupTable != NULL)
-      {
+      mitk::FloatLookupTable opLookupTable = opLTProp->GetValue();
+      //if (opLookupTable != NULL)
+      //{
         try
         {
-          opacity = opLookupTable->GetTableValue(pointID);
+          opacity = opLookupTable.GetTableValue(pointID);
           opValueFound = true;
         }
         catch (...)
         {
         }
-      }
+      //}
     }
     if (opValueFound == false)
     {

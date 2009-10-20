@@ -45,16 +45,25 @@ namespace mitk {
  * tables to mappers to configure the rendering process.
  */
 template <typename T>
-class GenericLookupTable : public itk::DataObject
+class GenericLookupTable
 {
   public:
     typedef unsigned int IdentifierType;
     typedef T ValueType;
     typedef std::map< IdentifierType, ValueType > LookupTableType;
 
-    mitkClassMacro(GenericLookupTable, itk::DataObject);
-    itkNewMacro(Self);
-    
+    typedef GenericLookupTable        Self;
+
+    GenericLookupTable() {}
+    virtual ~GenericLookupTable() 
+    {
+    }
+
+    virtual const char *GetNameOfClass() const 
+    {
+      return "GenericLookupTable";
+    } 
+
     void SetTableValue( IdentifierType id, ValueType value )
     {
       m_LookupTable[id] = value;
@@ -75,17 +84,21 @@ class GenericLookupTable : public itk::DataObject
         throw std::range_error("id does not exist in the lookup table");
     }
 
-    //const LookupTableType& GetLookupTable() const
-    //{
-    //  return m_LookupTable;
-    //}
+    const LookupTableType& GetLookupTable() const
+    {
+      return m_LookupTable;
+    }
 
     bool operator==( const Self& lookupTable ) const
     {
       return (m_LookupTable == lookupTable.m_LookupTable);
     }
+    bool operator!=( const Self& lookupTable ) const
+    {
+      return !(m_LookupTable == lookupTable.m_LookupTable);
+    }
 
-    virtual Self& operator=(const Self& other)
+    virtual Self& operator=(const Self& other)  // \TODO: this needs to be unit tested!
     {
       if ( this == &other )
       {
@@ -93,17 +106,12 @@ class GenericLookupTable : public itk::DataObject
       }
       else
       {
-        //TODO: implement copying of values
+        m_LookupTable.clear();
+        m_LookupTable = other.m_LookupTable;
         return *this;
       }
     }
-
   protected:
-    GenericLookupTable() {}
-    virtual ~GenericLookupTable() 
-    {
-    }
-
     LookupTableType m_LookupTable;
 };
 } // namespace mitk
@@ -119,11 +127,23 @@ class GenericLookupTable : public itk::DataObject
 class MITK_CORE_EXPORT LookupTableName: public GenericLookupTable< Type >    \
 {                                                               \
 public:                                                         \
-  mitkClassMacro(LookupTableName, GenericLookupTable< Type >);  \
-  itkNewMacro(LookupTableName);                                 \
-protected:                                                      \
+typedef LookupTableName Self;                                   \
+  typedef GenericLookupTable< Type >   Superclass;              \
+  virtual const char *GetNameOfClass() const                    \
+  {return #LookupTableName;}                                    \
   LookupTableName() {}                                          \
   virtual ~LookupTableName() {}                                 \
-};
+}; \
+std::ostream& operator<<(std::ostream& stream, const LookupTableName& l);
 
+/**
+* Generates the ostream << operator for the lookuptable. This definition
+* of a global function must be in a cpp file, therefore it is split from the
+* class declaration macro mitkSpecializeGenericLookupTable.
+*/
+#define mitkSpecializeGenericLookupTableOperator(LookupTableName)              \
+std::ostream& mitk::operator<<(std::ostream& stream, const LookupTableName& l) \
+{                                                                              \
+  return stream;                                                               \
+};
 #endif

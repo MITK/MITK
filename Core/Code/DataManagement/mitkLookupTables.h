@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * This file contains specializations of mitk::GenericLookupTable 
 * for bool, float, int and std::string lookuptables
+* \WARN: you have to call the mitkSpecializeGenericLookupTableOperator macro
+* in mitkLookupTables.cpp with each specialization to add an ostream << operator
+* for that lookuptable specialization.
 */
 namespace mitk {
    mitkSpecializeGenericLookupTable(BoolLookupTable, bool);

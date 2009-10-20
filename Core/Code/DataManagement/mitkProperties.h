@@ -41,11 +41,10 @@ namespace mitk {
 
    mitkSpecializeGenericProperty(Point3iProperty,Point3I,Point3I::BaseArray::Filled(0).GetDataPointer() );
    
-   mitkSpecializeGenericProperty(FloatLookupTableProperty,  FloatLookupTable::Pointer ,  FloatLookupTable::New());
-   mitkSpecializeGenericProperty(BoolLookupTableProperty,   BoolLookupTable::Pointer ,   BoolLookupTable::New());
-   mitkSpecializeGenericProperty(IntLookupTableProperty,    IntLookupTable::Pointer ,    IntLookupTable::New());
-   mitkSpecializeGenericProperty(StringLookupTableProperty, StringLookupTable::Pointer , StringLookupTable::New());
-
+   mitkSpecializeGenericProperty(FloatLookupTableProperty,  FloatLookupTable,  FloatLookupTable());
+   mitkSpecializeGenericProperty(BoolLookupTableProperty,   BoolLookupTable,   BoolLookupTable());
+   mitkSpecializeGenericProperty(IntLookupTableProperty,    IntLookupTable,    IntLookupTable());
+   mitkSpecializeGenericProperty(StringLookupTableProperty, StringLookupTable, StringLookupTable());
    /**
    * \warning If you add more specialization of GenericProperty, you must also add these to the
    * templated GetPropertyValue() method in mitkPropertyList.cpp!

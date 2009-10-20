@@ -26,7 +26,7 @@ template class mitk::GenericProperty<mitk::Point3D>;
 template class mitk::GenericProperty<itk::Point<int, 3> >;
 template class mitk::GenericProperty<mitk::Point4D>;
 
-template class mitk::GenericProperty<mitk::FloatLookupTable::Pointer>;
-template class mitk::GenericProperty<mitk::BoolLookupTable::Pointer>;
-template class mitk::GenericProperty<mitk::IntLookupTable::Pointer>;
-template class mitk::GenericProperty<mitk::StringLookupTable::Pointer>;
+template class mitk::GenericProperty<mitk::FloatLookupTable>;
+template class mitk::GenericProperty<mitk::BoolLookupTable>;
+template class mitk::GenericProperty<mitk::IntLookupTable>;
+template class mitk::GenericProperty<mitk::StringLookupTable>;

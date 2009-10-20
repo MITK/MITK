@@ -57,7 +57,7 @@ namespace mitk {
     *((unsigned long*) wb) = (unsigned long) GetHashValue();
     wb += sizeof(long);
     
-    int size = strlen( m_FileName );
+    size_t size = strlen( m_FileName );
 
     *((unsigned long*) wb) = (unsigned long) size;
     wb += sizeof(long);
@@ -84,7 +84,7 @@ namespace mitk {
     wb += sizeof(long);
 
     // Length of the name
-    int size = strlen(name);
+    size_t size = strlen(name);
 
     *((unsigned long*) wb) = (unsigned long) size;
     wb += sizeof(long);
@@ -138,7 +138,7 @@ namespace mitk {
     wb += sizeof(long);
 
     // transitionName
-    unsigned long size = strlen( transitionName );
+    unsigned long size = static_cast<unsigned long>(strlen( transitionName ));
     *((unsigned long*) wb) = size;
 
     wb += sizeof(long);
@@ -167,7 +167,7 @@ namespace mitk {
     wb += sizeof(long);
 
     // transitionName
-    unsigned long size = strlen( transitionName );
+    unsigned long size = static_cast<unsigned long>(strlen( transitionName ));
     *((unsigned long*) wb) = size;
 
     wb += sizeof(long);
@@ -219,7 +219,7 @@ namespace mitk {
     */
   void InteractionDebug::SetXMLFileName( const char* fileName )
   {
-    int size = strlen(fileName) + 1;
+    size_t size = strlen(fileName) + 1;
     m_FileName = new char[size];
     strcpy(m_FileName,fileName);
   }

@@ -15,10 +15,7 @@ SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt mbilog glew)
 
 # mbilog is independent of mitk, and cant use mitk macros
 # configuring happens through mbilog/mbilogConfig.cmake.in
-SET(mbilog_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/mbilog")
-IF(MBILOG_ENABLE_DEBUG_MESSAGES)
-  SET(MBILOG_DEFINITIONS "-DMBILOG_ENABLE_DEBUG")
-ENDIF(MBILOG_ENABLE_DEBUG_MESSAGES)
+SET(mbilog_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/mbilog" "${CMAKE_CURRENT_BINARY_DIR}/mbilog")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/mbilog/mbilogConfig.cmake.in"
 "${MITK_MODULES_CONF_DIR}/mbilogConfig.cmake")
 

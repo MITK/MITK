@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <sstream>
 
+#include <mbilogConfig.h>
+
 #ifndef MBILOG_MODULENAME
   #if defined(_CMAKE_MODULENAME)
     #define MBILOG_MODULENAME _CMAKE_MODULENAME

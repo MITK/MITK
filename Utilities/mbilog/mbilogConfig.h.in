@@ -1,0 +1,20 @@
+/*=========================================================================
+
+Program:   mbilog - logging for mitk / openCherry
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#ifndef _MBILOG_CONFIG_H_
+#define _MBILOG_CONFIG_H_
+
+@_define_enable_debug@
+
+#endif /* _MBILOG_CONFIG_H_ */

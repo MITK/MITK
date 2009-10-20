@@ -37,9 +37,10 @@ namespace mitk {
   //## superior statemachine, that spreads the events to all other interactors
   //##
   //## Initialization
-  //## Attention: GlobalInteraction <strong>must</strong> be initialized by one of the both Initialize()
-  //## methods before usage via an XML scheme. Possibilities are giving it the filename of the XML file or
-  //## its content as std::string.
+  //## Attention: GlobalInteraction <strong>must</strong> be initialized by the Initialize() method
+  //## before usage by giving it an XML scheme. Possibilities are giving it an empty string (default),
+  //## the filename of an XML file or the actual XML content as std::string. If an empty string is given,
+  //## the content is tried to be loaded from the default file location.
   //##
   //## Concept of sending events:
   //## In this concept of interaction, the statemachines can be divided into two main statemachines:
@@ -159,12 +160,8 @@ namespace mitk {
     //##Documentation
     //## @brief Initializes the global (singleton) instance of
     //## GlobalInteraction via an XML string. Must! be done before usage. Can be done only once.
-    bool Initialize(const char* globalInteractionName, std::string XMLbehaviourString);
-
-    //##Documentation
-    //## @brief Initializes the global (singleton) instance of
-    //## GlobalInteraction via an XML file. Must! be done before usage. Can be done only once.
-    bool Initialize(const char* globalInteractionName, const char* XMLbehaviorFile);
+    //## Can be used with an empty string (default), a file name with path, or the actual XML content as string.
+    bool Initialize(const char* globalInteractionName, const std::string XMLBehaviorInput = "");
 
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;

@@ -34,9 +34,13 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
 
   m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkPropertyListView>
     (this, &QmitkPropertyListView::SelectionChanged);
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->AddSelectionListener(m_SelectionListener);
+
 }
 
-void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer  /*part*/ , cherry::ISelection::ConstPointer selection )
+void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 {
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();

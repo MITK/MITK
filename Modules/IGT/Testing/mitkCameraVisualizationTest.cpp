@@ -37,7 +37,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   mitk::CameraVisualization::Pointer myFilter = mitk::CameraVisualization::New();
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
   
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since

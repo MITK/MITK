@@ -34,7 +34,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   mitk::DataTreeNode::Pointer node;
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   contourMapper = mitk::ContourMapper2D::New();
   node = mitk::DataTreeNode::New();

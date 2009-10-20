@@ -27,7 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::GlobalInteraction::GlobalInteraction()
 : StateMachine(NULL), 
-  m_CurrentlyInInformListenersLoop(false), m_IsInitialized(false)
+  m_CurrentlyInInformListenersLoop(false), m_FocusManager(NULL),
+  m_StateMachineFactory(NULL), m_EventMapper(NULL),
+  m_IsInitialized(false)
 {
 }
 
@@ -38,13 +40,10 @@ mitk::GlobalInteraction::~GlobalInteraction()
   m_FocusManager = NULL;
 
   // StateMachineFactory and EventMapper have to be deleted explicitly, as they inherit from Vtk
-  if (m_StateMachineFactory)
+  if (this->IsInitialized())
   {
     m_StateMachineFactory->Delete();
     m_StateMachineFactory = NULL;
-  }
-  if (m_EventMapper)
-  {
     m_EventMapper->Delete();
     m_EventMapper = NULL;
   }

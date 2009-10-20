@@ -39,10 +39,10 @@ class SceneSerialization_EXPORT Point4dPropertySerializer : public BasePropertyS
       {
         TiXmlElement* element = new TiXmlElement("point");
         Point4D point = prop->GetValue();
-        element->SetAttribute("x", point[0]);
-        element->SetAttribute("y", point[1]);
-        element->SetAttribute("z", point[2]);
-        element->SetAttribute("t", point[3]);
+        element->SetDoubleAttribute("x", point[0]);
+        element->SetDoubleAttribute("y", point[1]);
+        element->SetDoubleAttribute("z", point[2]);
+        element->SetDoubleAttribute("t", point[3]);
         return element;
       }
       else return NULL;

@@ -39,9 +39,9 @@ class SceneSerialization_EXPORT Vector3DPropertySerializer : public BaseProperty
       {
         TiXmlElement* element = new TiXmlElement("vector");
         Vector3D point = prop->GetValue();
-        element->SetAttribute("x", point[0]);
-        element->SetAttribute("y", point[1]);
-        element->SetAttribute("z", point[2]);
+        element->SetDoubleAttribute("x", point[0]);
+        element->SetDoubleAttribute("y", point[1]);
+        element->SetDoubleAttribute("z", point[2]);
         return element;
       }
       else return NULL;

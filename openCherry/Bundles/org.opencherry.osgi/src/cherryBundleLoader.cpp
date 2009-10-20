@@ -206,7 +206,7 @@ BundleLoader::ListLibraries(IBundle::Pointer bundle, std::vector<std::string>& l
   std::vector<std::string> tmpList;
   bundle->GetStorage().List(baseDir, tmpList);
 
-  int suf = Poco::SharedLibrary::suffix().size();
+  std::string::size_type suf = Poco::SharedLibrary::suffix().size();
   std::vector<std::string>::iterator iter;
   for (iter = tmpList.begin(); iter != tmpList.end(); )
   {
@@ -274,7 +274,7 @@ BundleLoader::InstallLibraries(IBundle::Pointer bundle, bool copy)
         for (std::vector<std::string>::iterator fileName = files.begin();
              fileName != files.end(); ++fileName)
         {
-          int size = std::min<int>(libFileName.size(), fileName->size());
+          std::size_t size = std::min<std::size_t>(libFileName.size(), fileName->size());
           if (fileName->compare(0, size, libFileName) != 0) continue;
 
           std::istream* istr = bundle->GetResource(libDir + *fileName);

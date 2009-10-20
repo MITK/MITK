@@ -419,7 +419,7 @@ void DebugUtil::RestoreState()
       for (std::size_t i = 0; i < elementList->length(); i++)
       {
         Poco::XML::Element* elem =
-        dynamic_cast<Poco::XML::Element*> (elementList->item(i));
+        dynamic_cast<Poco::XML::Element*> (elementList->item(static_cast<unsigned long>(i)));
 
         if (!elem->hasAttribute(ID_ATTR)) continue;
 
@@ -444,7 +444,7 @@ void DebugUtil::RestoreState()
       for (std::size_t i = 0; i < elementList->length(); i++)
       {
         Poco::XML::Element* elem =
-        dynamic_cast<Poco::XML::Element*> (elementList->item(i));
+        dynamic_cast<Poco::XML::Element*> (elementList->item(static_cast<unsigned long>(i)));
 
         if (!elem->hasAttribute(NAME_ATTR)) continue;
 

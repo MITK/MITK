@@ -33,7 +33,7 @@ namespace cherry {
 
 class Object;
 class DebugBreakpointManager;
-class IDebugObjectListener;
+struct IDebugObjectListener;
 template <class T> class SmartPointer;
 
 class CHERRY_OSGI DebugUtil

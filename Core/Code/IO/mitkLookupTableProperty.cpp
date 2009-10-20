@@ -43,7 +43,7 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 
     if(other==NULL) return false;
 
-    return other->m_LookupTable==m_LookupTable;
+    return *(other->m_LookupTable.GetPointer())==*(m_LookupTable.GetPointer());
 
 }
 

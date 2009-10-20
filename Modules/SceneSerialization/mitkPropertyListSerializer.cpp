@@ -109,19 +109,19 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   std::string serializername(property->GetNameOfClass());
   serializername += "Serializer";
   
-  std::list<itk::LightObject::Pointer> thingsThatCanSerializeThis = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
-  if (thingsThatCanSerializeThis.size() < 1)
+  std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
+  if (allSerializers.size() < 1)
   {
     LOG_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
     m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
   }
-  if (thingsThatCanSerializeThis.size() > 1)
+  if (allSerializers.size() > 1)
   {
-    LOG_ERROR << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrary first one.";
+    LOG_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
   }
 
-  for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
-        iter != thingsThatCanSerializeThis.end();
+  for ( std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin();
+        iter != allSerializers.end();
         ++iter )
   {
     if (BasePropertySerializer* serializer = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
@@ -133,6 +133,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
         if (valueelement)
         {
           keyelement->LinkEndChild( valueelement );
+          // \TODO: put 'return keyelement;' here?
         }
         else
         {
@@ -143,11 +144,11 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
       {
         LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
         m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
+        // \TODO: log only if all potential serializers fail?
       }
       break;
     }
   }
-
   return keyelement;
 }
 

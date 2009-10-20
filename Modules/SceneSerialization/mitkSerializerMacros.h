@@ -70,7 +70,6 @@ class classname ## Factory : public ::itk::ObjectFactoryBase \
  \
     classname ## RegistrationMethod() \
     { \
-      std::cout << "(II) Register " #classname << std::endl; \
       itk::ObjectFactoryBase::RegisterFactory( classname ## Factory::New() ); \
     } \
   }; \

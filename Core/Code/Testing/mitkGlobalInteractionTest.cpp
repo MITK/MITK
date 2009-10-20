@@ -26,7 +26,7 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
   mitk::GlobalInteraction::Pointer globalInteraction = mitk::GlobalInteraction::GetInstance();
 
   // Initialize with default values
-  globalInteraction->Initialize("global", "");
+  globalInteraction->Initialize("global");
 
   //create Interactors
   mitk::PointSetInteractor::Pointer firstInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 1);

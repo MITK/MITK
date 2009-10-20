@@ -471,7 +471,7 @@ int mitkDataTreeNodeTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("DataTreeNode")
 
   // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // let's create an object of our class  
   mitk::DataTreeNode::Pointer myDataTreeNode = mitk::DataTreeNode::New();

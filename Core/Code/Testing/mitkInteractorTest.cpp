@@ -31,7 +31,7 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("Interactor")
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   //create interactor; use pattern InteractorTestPattern
   mitk::Interactor::Pointer interactor = mitk::Interactor::New("InteractorTestPattern", NULL);

@@ -40,7 +40,7 @@ int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
   std::string name("global"); //respectively "global"
 
   // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize(name.c_str(), NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize(name.c_str());
 
   // let's create an object of our class  
   mitk::StateMachine::Pointer myStateMachine = mitk::StateMachine::New(name.c_str());

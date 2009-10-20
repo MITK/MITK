@@ -27,7 +27,7 @@ int mitkEventTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("Event")
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);

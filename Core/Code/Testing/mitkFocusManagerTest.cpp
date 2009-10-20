@@ -26,7 +26,7 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("FocusManager");
 
   // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global", NULL);
+  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   //building up necessary objects
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();

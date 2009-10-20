@@ -60,7 +60,7 @@ const char** mitk::RegionGrowingTool::GetXPM() const
 
 const char* mitk::RegionGrowingTool::GetName() const
 {
-  return "Region growing";
+  return "Region Growing";
 }
 
 void mitk::RegionGrowingTool::Activated()

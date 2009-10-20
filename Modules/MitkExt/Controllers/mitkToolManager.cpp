@@ -389,3 +389,18 @@ void mitk::ToolManager::UnregisterClient()
   }
 }
 
+int mitk::ToolManager::GetToolID( const Tool* tool )
+{
+  int id(0);
+  for ( ToolVectorType::iterator iter = m_Tools.begin();
+        iter != m_Tools.end();
+        ++iter, ++id )
+  {
+    if ( tool == iter->GetPointer() )
+    {
+      return id;
+    }
+  }
+  return -1;
+}
+

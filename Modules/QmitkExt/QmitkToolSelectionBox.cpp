@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define MBILOG_ENABLE_DEBUG 1
+
 #include "QmitkToolSelectionBox.h"
 #include "QmitkToolGUI.h"
 
@@ -24,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include <qlayout.h>
 #include <qapplication.h>
+
+#include <queue>
 
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
@@ -125,6 +129,8 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
 void QmitkToolSelectionBox::toolButtonClicked(int id)
 {
   if ( !QWidget::isEnabled() ) return; // this method could be triggered from the constructor, when we are still disabled
+
+  LOG_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
   //QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
   QToolButton* toolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->buttons().at(id) );
@@ -371,7 +377,54 @@ void QmitkToolSelectionBox::RecreateButtons()
   }
   // end mmueller Qt4 impl
 
-  const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
+  mitk::ToolManager::ToolVectorTypeConst allPossibleTools = m_ToolManager->GetTools();
+  mitk::ToolManager::ToolVectorTypeConst allTools;
+
+  typedef std::pair< std::string::size_type, const mitk::Tool* > SortPairType;
+  typedef std::priority_queue< SortPairType > SortedToolQueueType;
+  SortedToolQueueType toolPositions;
+
+  // clear and sort all tools
+  // step one: find name/group of all tools in m_DisplayedGroups string. remember these positions for all tools.
+  for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allPossibleTools.begin();
+        iter != allPossibleTools.end();
+        ++iter)
+  {
+    const mitk::Tool* tool = *iter;
+
+    std::string::size_type namePos =  m_DisplayedGroups.find( std::string("'") + tool->GetName() + "'" );
+    std::string::size_type groupPos = m_DisplayedGroups.find( std::string("'") + tool->GetGroup() + "'" );
+
+    if ( !m_DisplayedGroups.empty() && namePos == std::string::npos && groupPos == std::string::npos ) continue; // skip
+
+    if ( m_DisplayedGroups.empty() && std::string(tool->GetName()).length() > 0 )
+    {
+      namePos = static_cast<std::string::size_type> (tool->GetName()[0]);
+    }
+
+    SortPairType thisPair = std::make_pair( namePos < groupPos ? namePos : groupPos, *iter );
+    toolPositions.push( thisPair );
+  }
+
+  // step two: sort tools according to previously found positions in m_DisplayedGroups
+  LOG_DEBUG << "Sorting order of tools (lower number --> earlier in button group)";
+  while ( !toolPositions.empty() )
+  {
+    SortPairType thisPair = toolPositions.top();
+    LOG_DEBUG << "Position " << thisPair.first << " : " << thisPair.second->GetName();
+    
+    allTools.push_back( thisPair.second );
+    toolPositions.pop();
+  }
+  std::reverse( allTools.begin(), allTools.end() );
+
+  LOG_DEBUG << "Sorted tools:";
+  for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
+        iter != allTools.end();
+        ++iter)
+  {
+    LOG_DEBUG << (*iter)->GetName();
+  }
 
   // try to change layout... bad?
   //Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
@@ -386,101 +439,101 @@ void QmitkToolSelectionBox::RecreateButtons()
   int column(-1);
 
   int currentButtonID(0);
-  int currentToolID(0);
   m_ButtonIDForToolID.clear();
   m_ToolIDForButtonID.clear();
   QToolButton* button = 0;
 
+  LOG_DEBUG << "Creating buttons for tools";
   // fill group box with buttons
   for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
         iter != allTools.end();
         ++iter)
   {
     const mitk::Tool* tool = *iter;
+    int currentToolID( m_ToolManager->GetToolID( tool ) );
 
-    if ( (m_DisplayedGroups.empty()) || ( m_DisplayedGroups.find( tool->GetGroup() ) != std::string::npos ) ||
-                                        ( m_DisplayedGroups.find( tool->GetName() ) != std::string::npos )
-       )
+    ++column;
+    // new line if we are at the maximum columns
+    if(column == m_LayoutColumns)
     {
-      ++column;
-      // new line if we are at the maximum columns
-      if(column == m_LayoutColumns)
-      {
-        ++row;
-        column = 0;
-      }
-
-      button = new QToolButton;
-      button->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-      // add new button to the group
-      m_ToolButtonGroup->addButton(button, currentButtonID);
-      // ... and to the layout
-      m_ButtonLayout->addWidget(button, row, column);
-
-      if (m_LayoutColumns == 1)
-      {
-        //button->setTextPosition( QToolButton::BesideIcon );
-        // mmueller
-        button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
-      }
-      else
-      {
-        //button->setTextPosition( QToolButton::BelowIcon );
-        // mmueller
-        button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
-      }
-
-      //button->setToggleButton( true );
-      // mmueller
-      button->setCheckable ( true );
-
-      QString label;
-      if (m_GenerateAccelerators)
-      {
-        label += "&";
-      }
-      label += tool->GetName();
-      QString tooltip = tool->GetName();
-
-      if ( m_ShowNames )
-      {
-        /*
-        button->setUsesTextLabel(true);
-        button->setTextLabel( label );              // a label
-        QToolTip::add( button, tooltip );
-        */
-        // mmueller Qt4
-        button->setText( label );              // a label
-        button->setToolTip( tooltip );
-        // mmueller
-
-        QFont currentFont = button->font();
-        currentFont.setBold(false);
-        button->setFont( currentFont );
-      }
-
-      //button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
-      // mmueller
-      button->setIcon( QIcon( QPixmap( tool->GetXPM() ) ) );       // an icon
-
-      if (m_GenerateAccelerators)
-      {
-        QString firstLetter = QString( tool->GetName() );
-        firstLetter.truncate( 1 );
-        button->setShortcut( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
-      }
-
-      m_ButtonIDForToolID[currentToolID] = currentButtonID;
-      m_ToolIDForButtonID[currentButtonID] = currentToolID;
-
-      tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
-      tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
-      tool->GeneralMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
-
-      ++currentButtonID;
+      ++row;
+      column = 0;
     }
 
-    ++currentToolID;
+    button = new QToolButton;
+    button->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+    // add new button to the group
+    LOG_DEBUG << "Adding button with ID " << currentToolID;
+    m_ToolButtonGroup->addButton(button, currentButtonID);
+    // ... and to the layout
+    LOG_DEBUG << "Adding button in row/column " << row << "/" << column;
+    m_ButtonLayout->addWidget(button, row, column);
+
+    if (m_LayoutColumns == 1)
+    {
+      //button->setTextPosition( QToolButton::BesideIcon );
+      // mmueller
+      button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+    }
+    else
+    {
+      //button->setTextPosition( QToolButton::BelowIcon );
+      // mmueller
+      button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+    }
+
+    //button->setToggleButton( true );
+    // mmueller
+    button->setCheckable ( true );
+
+    QString label;
+    if (m_GenerateAccelerators)
+    {
+      label += "&";
+    }
+    label += tool->GetName();
+    QString tooltip = tool->GetName();
+    LOG_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
+
+    if ( m_ShowNames )
+    {
+      /*
+      button->setUsesTextLabel(true);
+      button->setTextLabel( label );              // a label
+      QToolTip::add( button, tooltip );
+      */
+      // mmueller Qt4
+      button->setText( label );              // a label
+      button->setToolTip( tooltip );
+      // mmueller
+
+      QFont currentFont = button->font();
+      currentFont.setBold(false);
+      button->setFont( currentFont );
+    }
+
+    //button->setPixmap( QPixmap( tool->GetXPM() ) );       // an icon
+    // mmueller
+    button->setIcon( QIcon( QPixmap( tool->GetXPM() ) ) );       // an icon
+
+    if (m_GenerateAccelerators)
+    {
+      QString firstLetter = QString( tool->GetName() );
+      firstLetter.truncate( 1 );
+      button->setShortcut( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
+    }
+
+    m_ButtonIDForToolID[currentToolID] = currentButtonID;
+    m_ToolIDForButtonID[currentButtonID] = currentToolID;
+
+    LOG_DEBUG << "m_ButtonIDForToolID[" << currentToolID << "] == " << currentButtonID;
+    LOG_DEBUG << "m_ToolIDForButtonID[" << currentButtonID << "] == " << currentToolID;
+
+    tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
+    tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
+    tool->GeneralMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
+
+    ++currentButtonID;
   }
   // setting grid layout for this groupbox
   this->setLayout(m_ButtonLayout);
@@ -508,7 +561,14 @@ void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups
 {
   if (m_DisplayedGroups != toolGroups)
   {
-    m_DisplayedGroups = toolGroups;
+    QString q_DisplayedGroups = toolGroups.c_str();
+    // quote all unquoted single words
+    q_DisplayedGroups = q_DisplayedGroups.replace( QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'" );
+    LOG_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
+
+    m_DisplayedGroups = q_DisplayedGroups.toLocal8Bit().constData();
+    LOG_DEBUG << "m_DisplayedGroups is \"" << m_DisplayedGroups << "\"";
+
     RecreateButtons();
     SetOrUnsetButtonForActiveTool();
   }

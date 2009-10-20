@@ -109,6 +109,8 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
      */
     const ToolVectorTypeConst GetTools();
 
+    int GetToolID( const Tool* tool );
+
     /*
       \param id The tool of interest.
       Counting starts with 0.

@@ -92,6 +92,7 @@ void QmitkInteractiveSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls->m_ToolSelectionBox->SetToolGUIArea( m_Controls->m_ToolGUIContainer );
+  m_Controls->m_ToolSelectionBox->SetDisplayedToolGroups("Add Subtract Paint Wipe 'Region Growing' Correction Fill Erase");
 
   m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
   m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );

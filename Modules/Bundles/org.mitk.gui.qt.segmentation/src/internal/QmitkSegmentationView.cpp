@@ -79,24 +79,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->m_ManualToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer );
+  m_Controls->m_ManualToolSelectionBox->SetDisplayedToolGroups("Add Subtract Paint Wipe 'Region Growing' Correction Fill Erase");
+  m_Controls->m_ManualToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
+  m_Controls->m_OrganToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_OrganToolSelectionBox->SetToolGUIArea( m_Controls->m_OrganToolGUIContainer );
-  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("ShapeModelTool");
+  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("organ_segmentation");
+  m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
+  m_Controls->m_LesionToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
-  m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("lymphnode_volumetry tumor_segmentation correction");
-
-
-
-/*
-  m_Controls->m_AutoSegmentationToolSelectionBox->setTitle("");
-  m_Controls->m_AutoSegmentationToolSelectionBox->setFlat( true );
-  m_Controls->m_AutoSegmentationToolSelectionBox->SetLayoutColumns(1);
-  m_Controls->m_AutoSegmentationToolSelectionBox->SetToolManager( *toolManager );
-  m_Controls->m_AutoSegmentationToolSelectionBox->SetDisplayedToolGroups("autoSegmentation");         // display only tools of group "autoSegmentation"
-  m_Controls->m_AutoSegmentationToolSelectionBox->SetToolGUIArea( m_Controls->m_AutoSegmentationToolGUIContainer );
-  m_Controls->m_AutoSegmentationToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );  // be enabled whenever there is a reference data object selected
-*/
+  m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction' 'Homogeneous Tumor' 'Tumor Correction'");
+  m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
   if(this->GetActiveStdMultiWidget())
   {

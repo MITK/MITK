@@ -58,20 +58,30 @@ class SceneSerialization_EXPORT LookupTablePropertyDeserializer : public BasePro
       {
         lut->SetNumberOfTableValues( numberOfColors );
       }
+      else
+        return NULL;
       if ( element->QueryIntAttribute( "Scale", &scale ) == TIXML_SUCCESS )
       {
         lut->SetScale( scale );
       }
+      else
+        return NULL;
       if ( element->QueryIntAttribute( "Ramp", &ramp ) == TIXML_SUCCESS )
       {
         lut->SetRamp( ramp );
       }
+      else
+        return NULL;
 
       TiXmlElement* child = element->FirstChildElement("HueRange");
       if (child) 
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return NULL; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) 
+          return NULL; 
+        range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) 
+          return NULL; 
+        range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetHueRange( range );
       }
 

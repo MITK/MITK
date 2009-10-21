@@ -73,8 +73,6 @@ private:
    */
   AbstractTabItem* GetTab(int index);
 
-  void UpdateColors();
-
 private slots:
 
   void TabSelectionChanged(int index);
@@ -85,6 +83,8 @@ public:
   NativeTabFolder(QWidget* parent);
 
   ~NativeTabFolder();
+
+  void UpdateColors();
 
   void SetActive(int activeState);
 

@@ -50,6 +50,7 @@ void NativeTabFolder::DragStarted(const QPoint& location)
 }
 
 NativeTabFolder::NativeTabFolder(QWidget* parent)
+: QObject(parent)
 {
   content = 0;
   viewForm = new QtControlWidget(parent, Shell::Pointer(0));

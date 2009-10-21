@@ -380,6 +380,11 @@ struct CHERRY_UI IWorkbench : public IServiceLocator {
    */
   virtual bool IsClosing() = 0;
 
+  /**
+   * Applies changes of the current theme to the user interface.
+   */
+  virtual void UpdateTheme() = 0;
+
 };
 
 }

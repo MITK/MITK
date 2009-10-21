@@ -74,6 +74,8 @@ public:
 
   int GetSashSize(int style);
 
+  void UpdateTheme();
+
 };
 
 }

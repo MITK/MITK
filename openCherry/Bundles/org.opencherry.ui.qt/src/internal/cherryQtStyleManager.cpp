@@ -26,6 +26,7 @@
 
 #include <cherryLog.h>
 #include <cherryPlatform.h>
+#include <cherryPlatformUI.h>
 #include <cherryIPreferencesService.h>
 #include <cherryIPreferences.h>
 
@@ -84,12 +85,15 @@ void QtStyleManager::AddDefaultStyle()
 
 void QtStyleManager::ClearStyles()
 {
-  for (FileNameToStyleMap::const_iterator i = styles.begin(); i != styles.end(); ++i)
+  for (FileNameToStyleMap::iterator i = styles.begin(); i != styles.end(); )
   {
-    delete i.value();
+    if (!i.value()->fileName.startsWith(':'))
+    {
+      delete i.value();
+      i = styles.erase(i);
+    }
+    else ++i;
   }
-  styles.clear();
-  AddDefaultStyle();
   SetDefaultStyle();
 }
 
@@ -264,6 +268,7 @@ void QtStyleManager::SetStyle(const QString& fileName)
 
   ReadStyleData(style);
   qApp->setStyleSheet(currentStyle->stylesheet);
+  PlatformUI::GetWorkbench()->UpdateTheme();
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const

@@ -26,14 +26,15 @@
 #include "../cherryQtSash.h"
 #include "../cherryQtControlWidget.h"
 
+#include <QApplication>
+
 namespace cherry
 {
 
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentation(
     void* parent, IStackPresentationSite::Pointer site)
 {
-  NativeTabFolder* folder =
-          new NativeTabFolder(static_cast<QWidget*>(parent));
+  NativeTabFolder* folder = new NativeTabFolder(static_cast<QWidget*> (parent));
 
   //    /*
   //     * Set the minimum characters to display, if the preference is something
@@ -54,16 +55,16 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentat
 
   PresentablePartFolder* partFolder = new PresentablePartFolder(folder);
 
-  StackPresentation::Pointer result(
-          new TabbedStackPresentation(site, partFolder)); //, new StandardEditorSystemMenu(site));
+  StackPresentation::Pointer result(new TabbedStackPresentation(site,
+      partFolder)); //, new StandardEditorSystemMenu(site));
 
-//  DefaultThemeListener themeListener =
-//      new DefaultThemeListener(folder, result.getTheme());
-//  result.getTheme().addListener(themeListener);
-//
-//  new DefaultMultiTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, folder);
-//
-//  new DefaultSimpleTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, folder);
+  //  DefaultThemeListener themeListener =
+  //      new DefaultThemeListener(folder, result.getTheme());
+  //  result.getTheme().addListener(themeListener);
+  //
+  //  new DefaultMultiTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_MULTIPLE_EDITOR_TABS, folder);
+  //
+  //  new DefaultSimpleTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, folder);
 
   return result;
 }
@@ -72,8 +73,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
     void* parent, IStackPresentationSite::Pointer site)
 {
 
-  NativeTabFolder* folder =
-          new NativeTabFolder(static_cast<QWidget*>(parent));
+  NativeTabFolder* folder = new NativeTabFolder(static_cast<QWidget*> (parent));
 
   //    final IPreferenceStore store = PlatformUI.getPreferenceStore();
   //    final int minimumCharacters = store
@@ -87,14 +87,14 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
   //folder->SetUnselectedCloseVisible(false);
   //folder->SetUnselectedImageVisible(true);
 
-  StackPresentation::Pointer result(
-          new TabbedStackPresentation(site, partFolder)); //, new StandardViewSystemMenu(site));
+  StackPresentation::Pointer result(new TabbedStackPresentation(site,
+      partFolder)); //, new StandardViewSystemMenu(site));
 
-//  DefaultThemeListener themeListener =
-//      new DefaultThemeListener(folder, result.getTheme());
-//  result.getTheme().addListener(themeListener);
-//
-//  new DefaultSimpleTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, folder);
+  //  DefaultThemeListener themeListener =
+  //      new DefaultThemeListener(folder, result.getTheme());
+  //  result.getTheme().addListener(themeListener);
+  //
+  //  new DefaultSimpleTabListener(result.getApiPreferences(), IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, folder);
 
   return result;
 }
@@ -107,9 +107,10 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateStandaloneViewP
   {
     return this->CreateViewPresentation(parent, site);
   }
-  EmptyTabFolder* folder = new EmptyTabFolder(static_cast<QWidget*>(parent), true);
-  StackPresentation::Pointer presentation(
-          new TabbedStackPresentation(site, folder)); //, new StandardViewSystemMenu(site));
+  EmptyTabFolder* folder = new EmptyTabFolder(static_cast<QWidget*> (parent),
+      true);
+  StackPresentation::Pointer presentation(new TabbedStackPresentation(site,
+      folder)); //, new StandardViewSystemMenu(site));
 
   return presentation;
 }
@@ -121,8 +122,9 @@ std::string QtWorkbenchPresentationFactory::GetId()
 
 void* QtWorkbenchPresentationFactory::CreateSash(void* parent, int style)
 {
-  Qt::Orientation orientation = style & SASHORIENTATION_HORIZONTAL ? Qt::Horizontal : Qt::Vertical;
-  QWidget* sash = new QtSash(orientation, static_cast<QWidget*>(parent));
+  Qt::Orientation orientation =
+      style & SASHORIENTATION_HORIZONTAL ? Qt::Horizontal : Qt::Vertical;
+  QWidget* sash = new QtSash(orientation, static_cast<QWidget*> (parent));
   sash->setObjectName("Sash widget");
   if (orientation == Qt::Horizontal)
     sash->setFixedHeight(this->GetSashSize(style));
@@ -132,9 +134,26 @@ void* QtWorkbenchPresentationFactory::CreateSash(void* parent, int style)
   return sash;
 }
 
-int QtWorkbenchPresentationFactory::GetSashSize(int  /*style*/)
+int QtWorkbenchPresentationFactory::GetSashSize(int /*style*/)
 {
   return 3;
+}
+
+void QtWorkbenchPresentationFactory::UpdateTheme()
+{
+  QWidgetList topLevels = QApplication::topLevelWidgets();
+  QListIterator<QWidget*> topIt(topLevels);
+  while (topIt.hasNext())
+  {
+    QWidget* topWidget = topIt.next();
+    QList<NativeTabFolder*> folders =
+        topWidget->findChildren<NativeTabFolder*> ();
+    QListIterator<NativeTabFolder*> i(folders);
+    while (i.hasNext())
+    {
+      i.next()->UpdateColors();
+    }
+  }
 }
 
 }

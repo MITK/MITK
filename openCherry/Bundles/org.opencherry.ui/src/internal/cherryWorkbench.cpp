@@ -777,6 +777,11 @@ std::string Workbench::GetPresentationId()
   return factoryID;
 }
 
+void Workbench::UpdateTheme()
+{
+  WorkbenchPlugin::GetDefault()->GetPresentationFactory()->UpdateTheme();
+}
+
 void Workbench::LargeUpdateStart()
 {
   if (largeUpdates++ == 0)

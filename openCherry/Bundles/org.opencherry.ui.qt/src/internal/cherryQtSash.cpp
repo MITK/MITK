@@ -22,6 +22,8 @@
 #include <cherryConstants.h>
 
 #include <QMouseEvent>
+#include <QStyleOption>
+#include <QPainter>
 
 namespace cherry
 {
@@ -41,7 +43,6 @@ QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool opaque) :
 
 QtSash::~QtSash()
 {
-  CHERRY_INFO << "DELETING Sash Widget\n";
 }
 
 void QtSash::AddSelectionListener(GuiTk::ISelectionListener::Pointer listener)
@@ -287,6 +288,14 @@ void QtSash::drawRubberBand(int x, int y, int width, int height)
   this->rubberBand->setGeometry(x, y, width, height);
   if (!this->rubberBand->isVisible())
     this->rubberBand->show();
+}
+
+void QtSash::paintEvent(QPaintEvent*)
+{
+  QStyleOption opt;
+  opt.init(this);
+  QPainter p(this);
+  style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
 }

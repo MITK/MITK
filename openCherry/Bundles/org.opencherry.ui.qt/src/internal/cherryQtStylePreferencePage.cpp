@@ -72,9 +72,9 @@ void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
 {
   if (!controls.m_PathList->findItems(path, Qt::MatchCaseSensitive).isEmpty()) return;
 
-
-
   new QListWidgetItem(path, controls.m_PathList);
+
+  styleManager->AddStyles(path);
 
   if (updateCombo)
     FillStyleCombo(oldStyle);
@@ -175,15 +175,12 @@ bool QtStylePreferencePage::PerformOk()
 
 void QtStylePreferencePage::PerformCancel()
 {
-  if (oldStyle.fileName != controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString())
-    styleManager->SetStyle(oldStyle.fileName);
+  Update();
 }
 
 void QtStylePreferencePage::Update()
 {
-  std::string name = m_StylePref->Get(cherry::QtPreferences::QT_STYLE_NAME, "");
-  styleManager->SetStyle(QString::fromStdString(name));
-  oldStyle = styleManager->GetStyle();
+  styleManager->RemoveStyles();
 
   QString paths = QString::fromStdString(m_StylePref->Get(cherry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
   QStringList pathList = paths.split(";", QString::SkipEmptyParts);
@@ -192,6 +189,10 @@ void QtStylePreferencePage::Update()
   {
     AddPath(it.next(), false);
   }
+
+  std::string name = m_StylePref->Get(cherry::QtPreferences::QT_STYLE_NAME, "");
+  styleManager->SetStyle(QString::fromStdString(name));
+  oldStyle = styleManager->GetStyle();
 
   FillStyleCombo(oldStyle);
 }

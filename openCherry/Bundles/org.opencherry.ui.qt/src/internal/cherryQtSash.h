@@ -50,6 +50,9 @@ protected:
 
     void drawRubberBand(int x, int y, int width, int height);
 
+    // needed for stylesheet support
+    void paintEvent(QPaintEvent*);
+
     //void moveSplitter(int p);
     //int closestLegalPosition(int p);
 

@@ -172,6 +172,11 @@ public:
      * @since 3.4
      */
     virtual int GetSashSize(int style) = 0;
+
+    /**
+     * Applies changes of the current theme to the user interface.
+     */
+    virtual void UpdateTheme() = 0;
 };
 
 }

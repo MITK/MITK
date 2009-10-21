@@ -226,6 +226,8 @@ public:
    */
   std::string GetPresentationId();
 
+  void UpdateTheme();
+
   /**
    * <p>
    * Indicates the start of a large update within the workbench. This is used

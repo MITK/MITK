@@ -79,7 +79,6 @@ SET(CPP_FILES
   DataManagement/mitkCuboid.cpp
   DataManagement/mitkCylinder.cpp
   DataManagement/mitkDelegateManager.cpp
-  DataManagement/mitkDelegateProperty.cpp
   DataManagement/mitkDrawOperation.cpp
   DataManagement/mitkEllipsoid.cpp
   DataManagement/mitkExternAbstractTransformGeometry.cpp

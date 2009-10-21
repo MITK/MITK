@@ -640,13 +640,6 @@ void* WorkbenchWindow::GetPageComposite()
   return pageComposite;
 }
 
-void* WorkbenchWindow::CreatePageComposite(void* parent)
-{
-  pageComposite = Tweaklets::Get(WorkbenchTweaklet::KEY)->CreatePageComposite(
-      parent);
-  return pageComposite;
-}
-
 void* WorkbenchWindow::CreateContents(Shell::Pointer parent)
 {
   // we know from Window.create that the parent is a Shell.

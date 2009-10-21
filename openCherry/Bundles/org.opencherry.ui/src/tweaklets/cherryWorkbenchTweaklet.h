@@ -42,22 +42,7 @@ struct CHERRY_UI WorkbenchTweaklet : public Object
 
   virtual bool IsRunning() = 0;
 
-  /**
-   * Creates the default contents and layout of the workbench window shell.
-   * Returns the GUI dependent parent widget under which the workbench pages
-   * create their contents.
-   *
-   * @param shell
-   *            the shell
-   */
-  //virtual void* CreateDefaultWindowContents(Shell::Pointer shell) = 0;
-
-  /**
-   * Creates the client composite, under which workbench pages
-   * create their controls.
-   *
-   */
-  virtual void* CreatePageComposite(void* parent) = 0;
+  virtual SmartPointer<WorkbenchWindow> CreateWorkbenchWindow(int number) = 0;
 
   virtual IDialog::Pointer CreateStandardDialog(const std::string& id) = 0;
 

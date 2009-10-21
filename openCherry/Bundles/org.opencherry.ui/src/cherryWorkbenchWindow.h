@@ -51,7 +51,7 @@ class Workbench;
  * \ingroup org_opencherry_ui
  *
  */
-class WorkbenchWindow: public Window, public IWorkbenchWindow
+class CHERRY_UI WorkbenchWindow: public Window, public IWorkbenchWindow
 {
 public:
   cherryObjectMacro(WorkbenchWindow)
@@ -183,7 +183,7 @@ protected:
    *
    * @since 3.0
    */
-  void* CreatePageComposite(void* parent);
+  virtual void* CreatePageComposite(void* parent) = 0;
 
   /**
    * Creates the contents of the workbench window, including trim controls and
@@ -200,7 +200,7 @@ protected:
    * @param shell
    *            the shell
    */
-  void CreateDefaultContents(Shell::Pointer shell);
+  virtual void CreateDefaultContents(Shell::Pointer shell);
 
   /**
    * Returns the unique object that applications use to configure this window.
@@ -262,6 +262,13 @@ protected:
 
   bool ClosePage(SmartPointer<IWorkbenchPage> in, bool save);
 
+  /**
+   * The composite under which workbench pages create their controls.
+   *
+   * @since 3.0
+   */
+  void* pageComposite;
+
 private:
 
   /**
@@ -270,13 +277,6 @@ private:
    * @since 3.0
    */
   static const int FILL_ALL_ACTION_BARS;
-
-  /**
-   * The composite under which workbench pages create their controls.
-   *
-   * @since 3.0
-   */
-  void* pageComposite;
 
   ShellPool::Pointer detachedWindowShells;
 

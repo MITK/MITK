@@ -1389,7 +1389,8 @@ void Workbench::SetActivatedWindow(WorkbenchWindow::Pointer window)
 
 WorkbenchWindow::Pointer Workbench::NewWorkbenchWindow()
 {
-  WorkbenchWindow::Pointer wbw(new WorkbenchWindow(this->GetNewWindowNumber()));
+  WorkbenchWindow::Pointer wbw =
+      Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateWorkbenchWindow(this->GetNewWindowNumber());
   //wbw->Init();
   return wbw;
 }

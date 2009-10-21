@@ -39,7 +39,8 @@ SET(INTERNAL_CPP_FILES
   cherryQtMainWindowControl.cpp
   cherryQtMessageDialogTweaklet.cpp
   cherryQtMissingImageDescriptor.cpp
-  #cherryQtOpenPerspectiveAction.cpp
+  cherryQtOpenPerspectiveAction.cpp
+  cherryQtPerspectiveSwitcher.cpp
   cherryQtPluginActivator.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp
@@ -53,6 +54,7 @@ SET(INTERNAL_CPP_FILES
   cherryQtWidgetsTweakletImpl.cpp
   cherryQtWorkbenchPageTweaklet.cpp
   cherryQtWorkbenchTweaklet.cpp
+  cherryQtWorkbenchWindow.cpp
 )
 
 SET(MOC_H_FILES
@@ -66,7 +68,8 @@ SET(MOC_H_FILES
   src/internal/cherryQtDisplay.h
   src/internal/cherryQtGlobalEventFilter.h
   src/internal/cherryQtMainWindowControl.h
-  #src/internal/cherryQtOpenPerspectiveAction.h
+  src/internal/cherryQtOpenPerspectiveAction.h
+  src/internal/cherryQtPerspectiveSwitcher.h
   src/internal/cherryQtSash.h
   src/internal/cherryQtShowViewAction.h
   src/internal/cherryQtStylePreferencePage.h

@@ -258,7 +258,7 @@ protected:
      * @param desc
      */
     /* package */
-    bool HasCustomDefinition(PerspectiveDescriptor::Pointer desc);
+    bool HasCustomDefinition(PerspectiveDescriptor::ConstPointer desc) const;
 
 private:
 

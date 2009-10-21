@@ -45,35 +45,35 @@ namespace cherry {
  * extension point (named <code>"org.opencherry.ui.perspectives"</code>).  For example,
  * the plug-in's XML markup might contain:
  * <pre>
- * &LT;extension point="org.opencherry.ui.perspectives"&GT;
- *   &LT;perspective
- *       id="com.example.javaplugin.perspective"
- *       name="Java"
- *       class="com.example.javaplugin.JavaPerspective"&GT;
- *   &LT;/perspective&GT;
- * &LT;/extension&GT;
+ * &lt;extension point="org.opencherry.ui.perspectives"&gt;
+ *   &lt;perspective
+ *       id="com.example.plugin.perspective"
+ *       name="My Perspective"
+ *       class="namespaze::MyPerspective"&gt;
+ *   &lt;/perspective&gt;
+ * &lt;/extension&gt;
  * </pre>
  * </p><p>
  * Example of populating a page with standard workbench views:
  * <pre>
- * public void createInitialLayout(IPageLayout layout) {
+ * public: void CreateInitialLayout(IPageLayout layout) {
  *    // Get the editor area.
- *    String editorArea = layout.getEditorArea();
+ *    std::string editorArea = layout->GetEditorArea();
  *
  *    // Top left: Resource Navigator view and Bookmarks view placeholder
- *    IFolderLayout topLeft = layout.createFolder("topLeft", IPageLayout.LEFT, 0.25f,
+ *    IFolderLayout::Pointer topLeft = layout->CreateFolder("topLeft", IPageLayout::LEFT, 0.25f,
  *      editorArea);
- *    topLeft.addView(IPageLayout.ID_RES_NAV);
- *    topLeft.addPlaceholder(IPageLayout.ID_BOOKMARKS);
+ *    topLeft->AddView(IPageLayout::ID_RES_NAV);
+ *    topLeft->AddPlaceholder(IPageLayout::ID_BOOKMARKS);
  *
  *    // Bottom left: Outline view and Property Sheet view
- *    IFolderLayout bottomLeft = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.50f,
+ *    IFolderLayout::Pointer bottomLeft = layout->CreateFolder("bottomLeft", IPageLayout::BOTTOM, 0.50f,
  *      "topLeft");
- *    bottomLeft.addView(IPageLayout.ID_OUTLINE);
- *    bottomLeft.addView(IPageLayout.ID_PROP_SHEET);
+ *    bottomLeft->AddView(IPageLayout::ID_OUTLINE);
+ *    bottomLeft->AddView(IPageLayout::ID_PROP_SHEET);
  *
  *    // Bottom right: Task List view
- *    layout.addView(IPageLayout.ID_TASK_LIST, IPageLayout.BOTTOM, 0.66f, editorArea);
+ *    layout->AddView(IPageLayout::ID_TASK_LIST, IPageLayout::BOTTOM, 0.66f, editorArea);
  *  }
  * </pre>
  * </p><p>

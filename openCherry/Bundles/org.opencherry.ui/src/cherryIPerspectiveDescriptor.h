@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryUiDll.h"
 
+#include "cherryImageDescriptor.h"
+
 namespace cherry {
 
 /**
@@ -72,7 +74,7 @@ struct CHERRY_UI IPerspectiveDescriptor : public Object {
      * @return the description
      * @since 3.0
      */
-    virtual std::string GetDescription() = 0;
+    virtual std::string GetDescription() const = 0;
 
     /**
      * Returns this perspective's id. For perspectives declared via an extension,
@@ -80,7 +82,7 @@ struct CHERRY_UI IPerspectiveDescriptor : public Object {
      *
      * @return the perspective id
      */
-    virtual std::string GetId() = 0;
+    virtual std::string GetId() const = 0;
 
     /**
      * Returns the descriptor of the image to show for this perspective.
@@ -89,7 +91,7 @@ struct CHERRY_UI IPerspectiveDescriptor : public Object {
      *
      * @return the descriptor of the image to show for this perspective
      */
-    //virtual ImageDescriptor GetImageDescriptor() = 0;
+    virtual ImageDescriptor::Pointer GetImageDescriptor() const = 0;
 
     /**
      * Returns this perspective's label. For perspectives declared via an extension,
@@ -97,7 +99,7 @@ struct CHERRY_UI IPerspectiveDescriptor : public Object {
      *
      * @return the label
      */
-    virtual std::string GetLabel() = 0;
+    virtual std::string GetLabel() const = 0;
 };
 
 }

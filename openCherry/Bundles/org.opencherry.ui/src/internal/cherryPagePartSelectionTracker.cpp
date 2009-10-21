@@ -66,6 +66,12 @@ PagePartSelectionTracker::PagePartSelectionTracker(
   }
 }
 
+IPerspectiveListener::Events::Types
+PagePartSelectionTracker::GetPerspectiveEventTypes() const
+{
+  return IPerspectiveListener::Events::PART_CHANGED;
+}
+
 void PagePartSelectionTracker::PartActivated(
     IWorkbenchPartReference::Pointer  /*partRef*/)
 {
@@ -115,18 +121,6 @@ void PagePartSelectionTracker::PartInputChanged(
     IWorkbenchPartReference::Pointer  /*partRef*/)
 {
 
-}
-
-void PagePartSelectionTracker::PerspectiveActivated(
-    IWorkbenchPage::Pointer  /*page*/, IPerspectiveDescriptor::Pointer  /*perspective*/)
-{
-  // nothing to do
-}
-
-void PagePartSelectionTracker::PerspectiveChanged(IWorkbenchPage::Pointer page,
-    IPerspectiveDescriptor::Pointer  /*perspective*/, const std::string&  /*changeId*/)
-{
-  // nothing to do
 }
 
 void PagePartSelectionTracker::PerspectiveChanged(IWorkbenchPage::Pointer page,

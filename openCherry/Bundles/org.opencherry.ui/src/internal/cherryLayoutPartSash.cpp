@@ -162,6 +162,7 @@ void LayoutPartSash::Dispose()
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(sash);
   }
   sash = 0;
+  isVisible = false;
 }
 
 Rectangle LayoutPartSash::GetBounds()

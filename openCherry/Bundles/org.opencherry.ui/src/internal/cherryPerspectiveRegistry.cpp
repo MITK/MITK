@@ -294,7 +294,7 @@ void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer 
 
 }
 
-bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::Pointer  /*desc*/)
+bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer  /*desc*/) const
 {
   //TODO Preferences
   //IPreferenceStore store = WorkbenchPlugin::GetDefault()->GetPreferenceStore();

@@ -1,19 +1,19 @@
 /*=========================================================================
 
-Program:   openCherry Platform
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   openCherry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #include "cherryPerspectiveDescriptor.h"
 
@@ -33,7 +33,7 @@ PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
   if (originalDescriptor != 0)
   {
     this->originalId = originalDescriptor->GetOriginalId();
-    //this.image = originalDescriptor.image;
+    this->imageDescriptor = originalDescriptor->imageDescriptor;
 
     // This perspective is based on a perspective in some bundle -- if
     // that
@@ -76,10 +76,11 @@ PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
   this->configElement = configElement;
   this->id = id;
   // Sanity check.
-  if ((this->GetId() == "") || (this->GetLabel() == "") || (this->GetClassName() == ""))
+  if ((this->GetId() == "") || (this->GetLabel() == "")
+      || (this->GetFactoryClassName() == ""))
   {
-    throw CoreException(
-        "Invalid extension (missing label, id or class name): " + this->GetId());
+    throw CoreException("Invalid extension (missing label, id or class name): "
+        + this->GetId());
   }
 }
 
@@ -90,11 +91,13 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
   {
     // Get the original descriptor to create the factory. If the
     // original is gone then nothing can be done.
-    IPerspectiveDescriptor::Pointer target = dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin
-        ::GetDefault()->GetPerspectiveRegistry())
-    ->FindPerspectiveWithId(originalId);
+    IPerspectiveDescriptor::Pointer
+        target =
+            dynamic_cast<PerspectiveRegistry*> (WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()) ->FindPerspectiveWithId(
+                originalId);
 
-    return target == 0 ? IPerspectiveFactory::Pointer(0) : target.Cast<PerspectiveDescriptor>()->CreateFactory();
+    return target == 0 ? IPerspectiveFactory::Pointer(0) : target.Cast<
+        PerspectiveDescriptor> ()->CreateFactory();
   }
 
   // otherwise try to create the executable extension
@@ -102,11 +105,11 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
   {
     try
     {
-      IPerspectiveFactory::Pointer factory(configElement
-      ->CreateExecutableExtension<IPerspectiveFactory>(WorkbenchRegistryConstants::ATT_CLASS));
+      IPerspectiveFactory::Pointer factory(
+          configElement ->CreateExecutableExtension<IPerspectiveFactory> (
+              WorkbenchRegistryConstants::ATT_CLASS));
       return factory;
-    }
-    catch (CoreException& /*e*/)
+    } catch (CoreException& /*e*/)
     {
       // do nothing
     }
@@ -117,45 +120,72 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
 
 void PerspectiveDescriptor::DeleteCustomDefinition()
 {
-  dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
-      ->GetPerspectiveRegistry())->DeleteCustomDefinition(PerspectiveDescriptor::Pointer(this));
+  dynamic_cast<PerspectiveRegistry*> (WorkbenchPlugin::GetDefault() ->GetPerspectiveRegistry())->DeleteCustomDefinition(
+      PerspectiveDescriptor::Pointer(this));
 }
 
-std::string PerspectiveDescriptor::GetDescription()
+std::string PerspectiveDescriptor::GetDescription() const
 {
-  return configElement == 0 ? description : RegistryReader
-  ::GetDescription(configElement);
+  return configElement == 0 ? description : RegistryReader::GetDescription(
+      configElement);
 }
 
-bool PerspectiveDescriptor::GetFixed()
+bool PerspectiveDescriptor::GetFixed() const
 {
-  if (configElement == 0) return fixed;
+  if (configElement == 0)
+    return fixed;
 
   bool val = false;
   configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_FIXED, val);
   return val;
 }
 
-std::string PerspectiveDescriptor::GetId()
+std::string PerspectiveDescriptor::GetId() const
 {
   return id;
 }
 
-std::string PerspectiveDescriptor::GetPluginId()
+std::string PerspectiveDescriptor::GetPluginId() const
 {
   return configElement == 0 ? pluginId : configElement->GetContributor();
 }
 
-std::string PerspectiveDescriptor::GetLabel()
+ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
 {
-  if (configElement == 0) return label;
+  if (imageDescriptor)
+    return imageDescriptor;
+
+  if (configElement)
+  {
+    std::string icon;
+    configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, icon);
+    if (!icon.empty())
+    {
+      imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+          configElement->GetContributor(), icon);
+    }
+
+  }
+
+  if (!imageDescriptor)
+  {
+    imageDescriptor = ImageDescriptor::GetMissingImageDescriptor();
+  }
+
+  return imageDescriptor;
+}
+
+std::string PerspectiveDescriptor::GetLabel() const
+{
+  if (configElement == 0)
+    return label;
 
   std::string val;
   configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME, val);
   return val;
 }
 
-std::string PerspectiveDescriptor::GetOriginalId()
+std::string PerspectiveDescriptor::GetOriginalId() const
 {
   if (originalId == "")
   {
@@ -164,13 +194,13 @@ std::string PerspectiveDescriptor::GetOriginalId()
   return originalId;
 }
 
-bool PerspectiveDescriptor::HasCustomDefinition()
+bool PerspectiveDescriptor::HasCustomDefinition() const
 {
-  return dynamic_cast<PerspectiveRegistry*>(WorkbenchPlugin::GetDefault()
-      ->GetPerspectiveRegistry())->HasCustomDefinition(PerspectiveDescriptor::Pointer(this));
+  return dynamic_cast<PerspectiveRegistry*> (WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry())->HasCustomDefinition(
+      PerspectiveDescriptor::ConstPointer(this));
 }
 
-bool PerspectiveDescriptor::HasDefaultFlag()
+bool PerspectiveDescriptor::HasDefaultFlag() const
 {
   if (configElement == 0)
   {
@@ -182,24 +212,26 @@ bool PerspectiveDescriptor::HasDefaultFlag()
   return val;
 }
 
-bool PerspectiveDescriptor::IsPredefined()
+bool PerspectiveDescriptor::IsPredefined() const
 {
-  return this->GetClassName() != "" && configElement != 0;
+  return this->GetFactoryClassName() != "" && configElement != 0;
 }
 
-bool PerspectiveDescriptor::IsSingleton()
+bool PerspectiveDescriptor::IsSingleton() const
 {
   if (configElement == 0)
     return singleton;
 
   bool val = false;
-  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_SINGLETON, val);
+  configElement->GetBoolAttribute(WorkbenchRegistryConstants::ATT_SINGLETON,
+      val);
   return val;
 }
 
 bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
 {
-  IMemento::Pointer childMem(memento->GetChild(WorkbenchConstants::TAG_DESCRIPTOR));
+  IMemento::Pointer childMem(memento->GetChild(
+      WorkbenchConstants::TAG_DESCRIPTOR));
   if (childMem)
   {
     childMem->GetString(WorkbenchConstants::TAG_ID, id);
@@ -207,18 +239,19 @@ bool PerspectiveDescriptor::RestoreState(IMemento::Pointer memento)
     childMem->GetString(WorkbenchConstants::TAG_LABEL, label);
     childMem->GetString(WorkbenchConstants::TAG_CLASS, className);
     int singletonVal;
-    singleton
-        = childMem->GetInteger(WorkbenchConstants::TAG_SINGLETON, singletonVal);
+    singleton = childMem->GetInteger(WorkbenchConstants::TAG_SINGLETON,
+        singletonVal);
 
     // Find a descriptor in the registry.
-    IPerspectiveDescriptor::Pointer descriptor = WorkbenchPlugin::GetDefault()
-    ->GetPerspectiveRegistry()->FindPerspectiveWithId(this->GetOriginalId());
+    IPerspectiveDescriptor::Pointer
+        descriptor =
+            WorkbenchPlugin::GetDefault() ->GetPerspectiveRegistry()->FindPerspectiveWithId(
+                this->GetOriginalId());
 
     if (descriptor)
     {
       // Copy the state from the registred descriptor.
-      //TODO Perspective image descriptor
-      //image = descriptor->GetImageDescriptor();
+      imageDescriptor = descriptor->GetImageDescriptor();
     }
   }
   //return new Status(IStatus.OK, PlatformUI.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
@@ -235,14 +268,15 @@ void PerspectiveDescriptor::RevertToPredefined()
 
 bool PerspectiveDescriptor::SaveState(IMemento::Pointer memento)
 {
-  IMemento::Pointer childMem(memento->CreateChild(WorkbenchConstants::TAG_DESCRIPTOR));
+  IMemento::Pointer childMem(memento->CreateChild(
+      WorkbenchConstants::TAG_DESCRIPTOR));
   childMem->PutString(WorkbenchConstants::TAG_ID, GetId());
   if (!originalId.empty())
   {
     childMem->PutString(WorkbenchConstants::TAG_DESCRIPTOR, originalId);
   }
   childMem->PutString(WorkbenchConstants::TAG_LABEL, GetLabel());
-  childMem->PutString(WorkbenchConstants::TAG_CLASS, GetClassName());
+  childMem->PutString(WorkbenchConstants::TAG_CLASS, GetFactoryClassName());
   if (singleton)
   {
     childMem->PutInteger(WorkbenchConstants::TAG_SINGLETON, 1);
@@ -251,15 +285,15 @@ bool PerspectiveDescriptor::SaveState(IMemento::Pointer memento)
   return true;
 }
 
-IConfigurationElement::Pointer PerspectiveDescriptor::GetConfigElement()
+IConfigurationElement::Pointer PerspectiveDescriptor::GetConfigElement() const
 {
   return configElement;
 }
 
-std::string PerspectiveDescriptor::GetClassName()
+std::string PerspectiveDescriptor::GetFactoryClassName() const
 {
-  return configElement == 0 ? className : RegistryReader
-  ::GetClassValue(configElement, WorkbenchRegistryConstants::ATT_CLASS);
+  return configElement == 0 ? className : RegistryReader::GetClassValue(
+      configElement, WorkbenchRegistryConstants::ATT_CLASS);
 }
 
 }

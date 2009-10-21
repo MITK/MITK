@@ -24,9 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "cherryQtShowViewDialog.h"
 #include "cherryQtDisplay.h"
+#include "cherryQtWorkbenchWindow.h"
 
 #include <cherryPlatform.h>
 #include <cherryPlatformUI.h>
+#include <cherryWorkbenchWindow.h>
 
 namespace cherry {
 
@@ -40,23 +42,11 @@ bool QtWorkbenchTweaklet::IsRunning()
   return QApplication::instance() != 0;
 }
 
-void* QtWorkbenchTweaklet::CreatePageComposite(void* p)
+WorkbenchWindow::Pointer QtWorkbenchTweaklet::CreateWorkbenchWindow(int number)
 {
-  QWidget* parent = static_cast<QWidget*>(p);
-  QtControlWidget* pageArea = new QtControlWidget(parent, Shell::Pointer(0));
-  pageArea->setObjectName("Page Composite");
-  new QHBoxLayout(pageArea);
-  if (qobject_cast<QMainWindow*>(parent) != 0)
-    qobject_cast<QMainWindow*>(parent)->setCentralWidget(pageArea);
-  else
-    parent->layout()->addWidget(pageArea);
-
-  // we have to enable visibility to get a proper layout (see bug #1654)
-  pageArea->setVisible(true);
-
-  return pageArea;
+  WorkbenchWindow::Pointer wnd(new QtWorkbenchWindow(number));
+  return wnd;
 }
-
 
 IDialog::Pointer
 QtWorkbenchTweaklet::CreateStandardDialog(const std::string& dialogid)

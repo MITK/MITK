@@ -68,7 +68,7 @@ private:
 
    bool fixed;
 
-   //ImageDescriptor image;
+   mutable ImageDescriptor::Pointer imageDescriptor;
 
    IConfigurationElement::Pointer configElement;
 
@@ -117,73 +117,57 @@ private:
    *
    * @see org.opencherry.ui.IPerspectiveDescriptor#getDescription()
    */
-  public: std::string GetDescription();
+  public: std::string GetDescription() const;
 
   /**
    * Returns whether or not this perspective is fixed.
    *
    * @return whether or not this perspective is fixed
    */
-  public: bool GetFixed();
+  public: bool GetFixed() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.IPerspectiveDescriptor#getId()
    */
-  public: std::string GetId();
+  public: std::string GetId() const;
 
-  public: std::string GetPluginId();
+  public: std::string GetPluginId() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.IPerspectiveDescriptor#getImageDescriptor()
    */
-//  public: ImageDescriptor getImageDescriptor() {
-//    if (image == null) {
-//      if (configElement != null) {
-//        String icon = configElement
-//            .getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
-//        if (icon != null) {
-//          image = AbstractUIPlugin.imageDescriptorFromPlugin(
-//              configElement.getNamespace(), icon);
-//        }
-//        if (image == null) {
-//          image = WorkbenchImages
-//              .getImageDescriptor(ISharedImages.IMG_ETOOL_DEF_PERSPECTIVE);
-//        }
-//      }
-//    }
-//    return image;
-//  }
+  public: ImageDescriptor::Pointer GetImageDescriptor() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.opencherry.ui.IPerspectiveDescriptor#getLabel()
    */
-  public: std::string GetLabel();
+  public: std::string GetLabel() const;
   /**
    * Return the original id of this descriptor.
    *
    * @return the original id of this descriptor
    */
-  public: std::string GetOriginalId();
+  public: std::string GetOriginalId() const;
 
   /**
    * Returns <code>true</code> if this perspective has a custom definition.
    *
    * @return whether this perspective has a custom definition
    */
-  public: bool HasCustomDefinition();
+  public: bool HasCustomDefinition() const;
 
   /**
    * Returns <code>true</code> if this perspective wants to be default.
    *
    * @return whether this perspective wants to be default
    */
-  public: bool HasDefaultFlag();
+  public: bool HasDefaultFlag() const;
 
   /**
    * Returns <code>true</code> if this perspective is predefined by an
@@ -191,14 +175,14 @@ private:
    *
    * @return boolean whether this perspective is predefined by an extension
    */
-  public: bool IsPredefined();
+  public: bool IsPredefined() const;
 
   /**
    * Returns <code>true</code> if this perspective is a singleton.
    *
    * @return whether this perspective is a singleton
    */
-  public: bool IsSingleton();
+  public: bool IsSingleton() const;
 
   /**
    * Restore the state of a perspective from a memento.
@@ -233,7 +217,7 @@ private:
    * @return the configuration element used to create this perspective
    * @since 3.0
    */
-  public: IConfigurationElement::Pointer GetConfigElement();
+  public: IConfigurationElement::Pointer GetConfigElement() const;
 
   /**
    * Returns the factory class name for this descriptor.
@@ -241,7 +225,7 @@ private:
    * @return the factory class name for this descriptor
    * @since 3.1
    */
-  public: std::string GetClassName();
+  public: std::string GetFactoryClassName() const;
 
 };
 

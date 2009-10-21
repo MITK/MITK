@@ -73,6 +73,8 @@ public:
 
   ISelectionService::SelectionEvents& GetSelectionEvents();
 
+  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const;
+
   /**
    * Constructs a part selection tracker for the part with the given id.
    *
@@ -120,11 +122,6 @@ public:
    * @see IPartListener#PartInputChanged(IWorkbenchPart)
    */
   void PartInputChanged(IWorkbenchPartReference::Pointer partRef);
-
-  void PerspectiveActivated(IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective);
-
-  void PerspectiveChanged(IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective,
-      const std::string& changeId);
 
   void PerspectiveChanged(IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective,
       IWorkbenchPartReference::Pointer partRef, const std::string& changeId);

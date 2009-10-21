@@ -44,6 +44,22 @@ struct CHERRY_UI IPerspectiveListener : public virtual Object {
 
   struct Events {
 
+    enum Type {
+      NONE           = 0x00000000,
+      ACTIVATED      = 0x00000001,
+      CHANGED        = 0x00000002,
+      PART_CHANGED   = 0x00000004,
+      OPENED         = 0x00000008,
+      CLOSED         = 0x00000010,
+      DEACTIVATED    = 0x00000020,
+      SAVED_AS       = 0x00000040,
+      PRE_DEACTIVATE = 0x00000080,
+
+      ALL            = 0xffffffff
+    };
+
+    CHERRY_DECLARE_FLAGS(Types, Type)
+
     Message2<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer> perspectiveActivated;
     Message3<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, const std::string&> perspectiveChanged;
     Message4<SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const std::string&> perspectivePartChanged;
@@ -64,6 +80,8 @@ struct CHERRY_UI IPerspectiveListener : public virtual Object {
     typedef MessageDelegate4<IPerspectiveListener, SmartPointer<IWorkbenchPage>, IPerspectiveDescriptor::Pointer, IWorkbenchPartReference::Pointer, const std::string&> PerspPartChangedDelegate;
 
   };
+
+  virtual Events::Types GetPerspectiveEventTypes() const = 0;
 
   /**
    * Notifies this listener that a perspective in the given page
@@ -177,5 +195,7 @@ struct CHERRY_UI IPerspectiveListener : public virtual Object {
 };
 
 }
+
+CHERRY_DECLARE_OPERATORS_FOR_FLAGS(cherry::IPerspectiveListener::Events::Types)
 
 #endif /* CHERRYIPERSPECTIVELISTENER_H_ */

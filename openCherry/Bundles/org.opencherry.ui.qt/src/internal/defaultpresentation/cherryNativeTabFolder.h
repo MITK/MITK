@@ -82,8 +82,6 @@ public:
 
   NativeTabFolder(QWidget* parent);
 
-  ~NativeTabFolder();
-
   void UpdateColors();
 
   void SetActive(int activeState);

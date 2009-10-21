@@ -128,12 +128,6 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   skinManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
 }
 
-NativeTabFolder::~NativeTabFolder()
-{
-  //std::cout << "NativeTabFolder: DESTROYED\n";
-  delete viewForm;
-}
-
 bool NativeTabFolder::eventFilter(QObject* watched, QEvent* event)
 {
   if (event->type() == QEvent::MouseButtonPress)

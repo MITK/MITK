@@ -46,7 +46,7 @@ Available filters are:
   <li> Closing
   </ul>
   
-<li> <b>Edge Detection</b>
+<li> <b>%Edge Detection</b>
   <ul>
   <li> Gradient Image
   <li> Laplacian Operator (Second Derivative)

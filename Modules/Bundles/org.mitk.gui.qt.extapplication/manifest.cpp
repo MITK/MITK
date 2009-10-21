@@ -26,6 +26,6 @@ POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
   POCO_EXPORT_CLASS(QmitkExtApplication)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIQtPreferencePage, cherry::IQtPreferencePage)
+POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)
   POCO_EXPORT_CLASS(QmitkGeneralPreferencePage)
 POCO_END_MANIFEST

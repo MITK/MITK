@@ -93,6 +93,8 @@ SET(CPP_FILES
   DataManagement/mitkMesh.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
+  DataManagement/mitkPlanarCircle.cpp
+  DataManagement/mitkPlanarFigure.cpp
   DataManagement/mitkPlane.cpp
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp
@@ -132,6 +134,7 @@ SET(CPP_FILES
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
   Interactions/mitkPaintbrushTool.cpp
+  Interactions/mitkPlanarFigureInteractor.cpp
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
@@ -167,6 +170,7 @@ SET(CPP_FILES
   Rendering/mitkMeshMapper2D.cpp
   Rendering/mitkMeshVtkMapper3D.cpp
   Rendering/mitkNativeRenderWindowInteractor.cpp
+  Rendering/mitkPlanarFigureMapper2D.cpp
   Rendering/mitkPointDataVtkMapper3D.cpp
   Rendering/mitkSplineMapper2D.cpp
   Rendering/mitkSplineVtkMapper3D.cpp

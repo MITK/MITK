@@ -51,7 +51,8 @@ m_FullScreenMode(false)
 {
   //Create Menu Widget
   this->CreateMenuWidget();
-  this->setMinimumWidth(122);
+  this->setMinimumWidth(61); //DIRTY.. If you add or remove a button, you need to change the size.
+  this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
   this->hide();
   
@@ -83,8 +84,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   if ( !crosshairModesMenu )
   {
     crosshairModesMenu = new QMenu(NULL); // is shared by all menubars TODO should be deleted somehow
-    //crosshairModesMenu->setTearOffEnabled(true);
-
+    
     QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
     showHideCrosshairVisibilityAction->setText("Show crosshair");
     showHideCrosshairVisibilityAction->setCheckable(true);
@@ -145,22 +145,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_CrosshairModeButton->setIcon( QIcon( iconCrosshairMode_xpm ) );
   layout->addWidget( m_CrosshairModeButton );
 
-  //HoriSplitButton
-  m_HoriSplitButton = new QPushButton();
-  m_HoriSplitButton->setMaximumSize(15, 15);
-  m_HoriSplitButton->setIconSize(size);
-  m_HoriSplitButton->setFlat( true );
-  m_HoriSplitButton->setIcon( QIcon( iconHoriSplit_xpm ));
-  layout->addWidget( m_HoriSplitButton );
-
-  //VertiSplitButton
-  m_VertiSplitButton = new QPushButton();
-  m_VertiSplitButton->setMaximumSize(15, 15);
-  m_VertiSplitButton->setIconSize(size);
-  m_VertiSplitButton->setFlat( true );
-  m_VertiSplitButton->setIcon( QIcon( iconVertiSplit_xpm ));
-  layout->addWidget( m_VertiSplitButton );
-
   //fullScreenButton
   m_FullScreenButton = new QPushButton();
   m_FullScreenButton->setMaximumSize(15, 15);
@@ -177,46 +161,15 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_SettingsButton->setIcon( QIcon( iconSettings_xpm ));
   layout->addWidget( m_SettingsButton );
 
-  //closeButton
-  m_CloseButton = new QPushButton();
-  m_CloseButton->setMaximumSize(15, 15);
-  m_CloseButton->setIconSize(size);
-  m_CloseButton->setFlat( true );
-  m_CloseButton->setIcon( QIcon( iconClose_xpm ));
-  layout->addWidget( m_CloseButton );
-
   //Create Connections -- coming soon?
-  connect( m_HoriSplitButton, SIGNAL( clicked(bool) ), this, SLOT(OnHoriSplitButton(bool)) );
-  connect( m_VertiSplitButton, SIGNAL( clicked(bool) ), this, SLOT(OnVertiSplitButton(bool)) );
   connect( m_FullScreenButton, SIGNAL( clicked(bool) ), this, SLOT(OnFullScreenButton(bool)) );
   connect( m_SettingsButton, SIGNAL( clicked(bool) ), this, SLOT(OnSettingsButton(bool)) );
-  connect( m_CloseButton, SIGNAL( clicked(bool) ), this, SLOT(OnCloseButton(bool)) );
-  
-  //set unused Actions disable
-  m_HoriSplitButton->setDisabled( true );
-  m_VertiSplitButton->setDisabled( true );
-  m_CloseButton->setDisabled( true );
-
 }
 
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
 {
   m_Settings = new QMenu(this);
-
-  m_TransversalAction = new QAction( "Transversal", m_Settings );
-  m_TransversalAction->setDisabled( true );
-
-  m_SagittalAction = new QAction("Sagittal", m_Settings);
-  m_SagittalAction->setDisabled( true );
-
-  m_CoronalAction = new QAction("Coronal", m_Settings);
-  m_CoronalAction->setDisabled( true );
-
-  m_ThreeDAction = new QAction("3D", m_Settings);
-  m_ThreeDAction->setDisabled( true );
-
-
 
   m_DefaultLayoutAction = new QAction( "standard layout", m_Settings );
   m_DefaultLayoutAction->setDisabled( true );
@@ -254,11 +207,6 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Left2Dand3DRight2DLayoutAction = new QAction( "Transversal n 3D left, Sagittal right", m_Settings );
   m_Left2Dand3DRight2DLayoutAction->setDisabled( false );
 
-  m_Settings->addAction(m_TransversalAction);
-  m_Settings->addAction(m_SagittalAction);
-  m_Settings->addAction(m_CoronalAction);
-  m_Settings->addAction(m_ThreeDAction);
-  m_Settings->addSeparator();
   m_Settings->addAction(m_DefaultLayoutAction);
   m_Settings->addAction(m_2DImagesUpLayoutAction);
   m_Settings->addAction(m_2DImagesLeftLayoutAction);
@@ -273,13 +221,6 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   m_Settings->addAction(m_Left2Dand3DRight2DLayoutAction);
 
   m_Settings->setVisible( false );
-
-  //Create Connections.
-  connect( m_TransversalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToTransversal(bool)) );
-  connect( m_SagittalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToSagittal(bool)) );
-  connect( m_CoronalAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToCoronal(bool)) );
-  connect( m_ThreeDAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeDirectionToThreeD(bool)) );
-
 
   connect( m_DefaultLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToDefault(bool)) );
   connect( m_2DImagesUpLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutTo2DImagesUp(bool)) );
@@ -307,19 +248,6 @@ void QmitkRenderWindowMenu::paintEvent( QPaintEvent*  /*e*/ )
 void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
 {
   m_Layout = layoutIndex;
-  this->UpdateLayoutList();
-}
-
-/// \brief
-void QmitkRenderWindowMenu::OnHoriSplitButton( bool  /*checked*/ )
-{
-  std::cout << "Split widget horizontal. not implemented yet... " << std::endl;
-}
-
-/// \brief
-void QmitkRenderWindowMenu::OnVertiSplitButton( bool  /*checked*/ )
-{
-  std::cout << "Split widget vertical. not implemented yet... " << std::endl;
 }
 
 /// \brief
@@ -354,6 +282,8 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
         break;
       }
     }
+
+    //Move Widget and show again
     this->MoveWidgetToCorrectPos();
 
     //change icon
@@ -364,6 +294,9 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
   {
     m_FullScreenMode = false;
     emit SignalChangeLayoutDesign( m_OldLayoutDesign );
+
+    //Move Widget and show again
+    this->MoveWidgetToCorrectPos();
 
     //change icon
     this->ChangeFullScreenIcon();
@@ -381,108 +314,6 @@ void QmitkRenderWindowMenu::OnSettingsButton( bool  /*checked*/ )
   m_Settings->setVisible( true );
   m_Settings->exec( point );
 }
-
-/// \brief
-void QmitkRenderWindowMenu::OnCloseButton( bool  /*checked*/ )
-{
-  std::cout << "Close widget. not implemented yet... " << std::endl;
-}
-
-void QmitkRenderWindowMenu::UpdateLayoutList()
-{
-  if( m_Settings == NULL )
-    this->CreateSettingsWidget();
-
-  QFont bold, normal;
-  bold.setBold( true );
-  normal.setBold( false );
-
-
-  switch( m_Layout )
-  {
-  case TRANSVERSAL:
-    {
-      m_TransversalAction->setFont( bold );
-      m_SagittalAction->setFont( normal );
-      m_CoronalAction->setFont( normal );
-      m_ThreeDAction->setFont( normal );
-      
-      m_TransversalAction->setEnabled( false );
-      m_SagittalAction->setEnabled( true );
-      m_CoronalAction->setEnabled( true );
-      m_ThreeDAction->setEnabled( true );
-      break;
-    }
-
-  case SAGITTAL:
-    {
-      m_TransversalAction->setFont( normal );
-      m_SagittalAction->setFont( bold );
-      m_CoronalAction->setFont( normal );
-      m_ThreeDAction->setFont( normal );
-
-      m_TransversalAction->setEnabled( true );
-      m_SagittalAction->setEnabled( false );
-      m_CoronalAction->setEnabled( true );
-      m_ThreeDAction->setEnabled( true );
-      break;
-    }
-  case CORONAL:
-    {
-      m_TransversalAction->setFont( normal );
-      m_SagittalAction->setFont( normal );
-      m_CoronalAction->setFont( bold );
-      m_ThreeDAction->setFont( normal );
-
-      m_TransversalAction->setEnabled( true );
-      m_SagittalAction->setEnabled( true );
-      m_CoronalAction->setEnabled( false );
-      m_ThreeDAction->setEnabled( true );
-      break;
-    }
-  case THREE_D:
-    {
-      m_TransversalAction->setFont( normal );
-      m_SagittalAction->setFont( normal );
-      m_CoronalAction->setFont( normal );
-      m_ThreeDAction->setFont( bold );
-
-      m_TransversalAction->setEnabled( true );
-      m_SagittalAction->setEnabled( true );
-      m_CoronalAction->setEnabled( true );
-      m_ThreeDAction->setEnabled( false );
-      break;
-    }
-  }
-
-
-	//set all to disable, because the actions aren't working now.
-	m_TransversalAction->setEnabled( false );
-	m_SagittalAction->setEnabled( false );
-	m_CoronalAction->setEnabled( false );
-	m_ThreeDAction->setEnabled( false );
-}
-
-void QmitkRenderWindowMenu::OnChangeDirectionToTransversal(bool)
-{
-  std::cout << "Change Widget Direction to Transversal. not implemented yet... " << std::endl;
-}
-
-void QmitkRenderWindowMenu::OnChangeDirectionToSagittal(bool)
-{
-  std::cout << "Change Widget Direction to Sagittal. not implemented yet... " << std::endl;
-}
-
-void QmitkRenderWindowMenu::OnChangeDirectionToCoronal(bool)
-{
-  std::cout << "Change Widget Direction to Coronal. not implemented yet... " << std::endl;
-}
-
-void QmitkRenderWindowMenu::OnChangeDirectionToThreeD(bool)
-{
-  std::cout << "Change Widget Direction to 3D. not implemented yet... " << std::endl;
-}
-
 
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
 {

@@ -116,14 +116,6 @@ protected slots:
 
   void OnCrosshairRotationModeSelected(QAction*); 
 
-  /*! slot for horizontal splitting of the current widget. The slot is connected to the clicked() event of m_HoriSplitButton. 
-  The method is not implemented yet. */
-  void OnHoriSplitButton( bool checked );
-
-  /*! slot for vertical splitting of the current widget. The slot is connected to the clicked() event of m_VertiSplitButton. 
-  The method is not implemented yet. */
-  void OnVertiSplitButton( bool checked );
-  
   /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of m_FullScreenButton. 
   Activating the full-screen maximize the current widget, deactivating restore If layout design changed by the settings menu, 
   the full-Screen mode is automatically switch to false. */
@@ -133,26 +125,6 @@ protected slots:
   The settings menu includes differen layout directions (transversal, coronal, saggital and 3D) as well all layout design 
   (standard layout, 2D images top, 3D bottom ..)*/
   void OnSettingsButton( bool checked );
-
-  /*! Slot for closing widget. The slot is connected to the clicked() event of m_CloseButton.
-  The method is not implemented yet.*/
-  void OnCloseButton( bool checked );
-
-  /*! Slot for changing layout diretion to transversal. The slot is conntect to the triggered() signal of m_TransversalAction.
-  The method is not implemented yet.*/
-  void OnChangeDirectionToTransversal(bool);
-
-  /*! Slot for changing layout diretion to sagittal. The slot is conntect to the triggered() signal of m_SagittalAction.
-  The method is not implemented yet.*/
-  void OnChangeDirectionToSagittal(bool);
-
-  /*! Slot for changing layout diretion to coronal. The slot is conntect to the triggered() signal of m_CoronalAction.
-  The method is not implemented yet.*/
-  void OnChangeDirectionToCoronal(bool);
-
-  /*! Slot for changing layout diretion to 3D. The slot is conntect to the triggered() signal of m_ThreeDAction.
-  The method is not implemented yet.*/
-  void OnChangeDirectionToThreeD(bool);
 
   /*! Slot for changing layout design to standard layout. The slot is connected to the triggered() signal of m_DefaultLayoutAction. */
   void OnChangeLayoutToDefault(bool);
@@ -221,33 +193,13 @@ public:
 
 protected:
 
-  /*! QPushButton for split widget horizontal*/
   QPushButton*        m_CrosshairModeButton;
-  QPushButton*        m_HoriSplitButton;
-  
-  /*! QPushButton for split widget vertical*/
-  QPushButton*        m_VertiSplitButton;
 
   /*! QPushButton for activating/deactivating full-screen mode*/
   QPushButton*        m_FullScreenButton;
 
   /*! QPushButton for open the settings menu*/
   QPushButton*        m_SettingsButton;
-
-  /*! QPushButton for closing the widget*/
-  QPushButton*        m_CloseButton;
-  
-  /*! QAction for transversal view (layout direction) */
-  QAction*            m_TransversalAction;
-
-  /*! QAction for saggital view (layout direction) */
-  QAction*            m_SagittalAction;
-
-  /*! QAction for coronal view (layout direction) */
-  QAction*            m_CoronalAction;
-
-  /*! QAction for 3D view (layout direction) */
-  QAction*            m_ThreeDAction;
 
   /*! QAction for Default layout design */
   QAction*            m_DefaultLayoutAction;

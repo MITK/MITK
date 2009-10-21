@@ -80,7 +80,7 @@ SET(OPENCHERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source 
 SET(OPENCHERRY_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
 
 IF (Eclipse_DIR)
-  SET(OPENCHERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation" FORCE)
+  SET(OPENCHERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")
 ELSE ()
   SET(OPENCHERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
 ENDIF ()

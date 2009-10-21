@@ -1,19 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkSegmentationView.h"
@@ -177,7 +177,7 @@ void QmitkSegmentationView::OnToolSelected(int id)
 void QmitkSegmentationView::CheckImageAlignment()
 {
   LOG_INFO << "Updating alignment warning";
-    
+
   bool wrongAlignment(false);
   mitk::DataTreeNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
@@ -261,6 +261,29 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
 
   if (node)
   {
+  	/*
+  	 * Other images are set invisible.
+  	 */
+  	mitk::DataStorage::SetOfObjects::ConstPointer image_set = this->GetDefaultDataStorage()->GetSubset(
+  			mitk::NodePredicateAND::New(
+  					mitk::TNodePredicateDataType<mitk::Image>::New(),
+  					mitk::NodePredicateProperty::New("binary", mitk::GenericProperty<bool>::New(false))));
+  	const unsigned int size = image_set->Size();
+
+  	for (unsigned int i = 0u; i < size; ++i)
+  	{
+  		mitk::DataTreeNode* act_node = image_set->GetElement(i);
+
+  		if (act_node != node)
+  		{
+  			act_node->SetVisibility(false);
+  		}
+  		else
+  		{
+  			act_node->SetVisibility(true);
+  		}
+  	}
+
     m_Controls->lblReferenceImageSelectionWarning->hide();
     patientImageText = QString("Patient image '%1'").arg( node->GetName().c_str() );
     // TODO show this image, hide all other images. example code maybe in QmitkToolReferenceDataSelectionBox
@@ -269,9 +292,9 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
   {
     m_Controls->lblReferenceImageSelectionWarning->show();
   }
-    
+
   //m_Controls->grpReferenceData->setTitle( patientImageText );
-    
+
   // check, wheter image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
   CheckImageAlignment();
 }
@@ -283,6 +306,29 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
 
   if (node)
   {
+  	/*
+  	 * Other segmentations are set invisible.
+  	 */
+  	mitk::DataStorage::SetOfObjects::ConstPointer segmentation_set = this->GetDefaultDataStorage()->GetSubset(
+  			mitk::NodePredicateAND::New(
+  					mitk::TNodePredicateDataType<mitk::Image>::New(),
+  					mitk::NodePredicateProperty::New("segmentation", mitk::GenericProperty<bool>::New(true))));
+  	const unsigned int size = segmentation_set->Size();
+
+  	for (unsigned int i = 0u; i < size; ++i)
+  	{
+  		mitk::DataTreeNode* act_node = segmentation_set->GetElement(i);
+
+  		if (act_node != node)
+  		{
+  			act_node->SetVisibility(false);
+  		}
+  		else
+  		{
+  			act_node->SetVisibility(true);
+  		}
+  	}
+
     m_Controls->lblWorkingImageSelectionWarning->hide();
     //m_Controls->grpReferenceData->setTitle( QString("Patient image '%1'").arg( node->GetName().c_str() ) );
     // TODO show this image, hide all other images. example code maybe in QmitkToolReferenceDataSelectionBox
@@ -291,7 +337,7 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
   {
     m_Controls->lblWorkingImageSelectionWarning->show();
   }
-    
+
   m_Controls->m_SlicesInterpolator->EnableInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 }
 
@@ -329,7 +375,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
   if(m_MultiWidget)
     m_Controls->m_SlicesInterpolator->Initialize( m_Controls->m_ManualToolSelectionBox->GetToolManager(), m_MultiWidget );
 }
-  
+
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
 //  if ( sourcepart.IsNull() || sourcepart->GetPartName() != "Datamanager" ) return;
@@ -339,26 +385,29 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
     return; // otherwise we get "null selection" events each time the view is activated/focussed
   }
 
-  std::cout << "selection chagned" << std::endl;
+  std::cout << "selection changed" << std::endl;
   // save current selection in member variable
   m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
 
   bool newReferenceImageSelected(false);
   bool newWorkingImageSelected(false);
+  mitk::DataTreeNode::Pointer working_data = 0u, reference_data = 0u;
 
   // TODO warning when two images are selected
   // do something with the selected items
-  if(m_CurrentSelection)
+  if(m_CurrentSelection && (m_CurrentSelection->Size() < 3u))
   {
+  	bool error = false;
+
     // iterate selection
-    for (cherry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
+    for (cherry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); !error && (i != m_CurrentSelection->End()); ++i)
     {
       // extract datatree node
       if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
       {
         mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
         LOG_INFO << "Node '" << node->GetName() << "' selected";
-        
+
         bool isImage(false);
         if (node->GetData())
         {
@@ -370,19 +419,48 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
         node->GetBoolProperty("segmentation", isSegmentation);
         //node->GetBoolProperty("visible", isVisible);
 
-        if ( isImage && !isSegmentation )
-        {
-          LOG_INFO << "Reference image '" << node->GetName() << "' selected";
-          newReferenceImageSelected = true;
-          OnReferenceNodeSelected(node);
-        }
-        else if ( isImage && isSegmentation )
-        {
-          LOG_INFO << "Working image '" << node->GetName() << "' selected";
-          newWorkingImageSelected = true;
-          OnWorkingDataSelectionChanged(node);
-        }
+				if (isImage)
+				{
+					if ( isSegmentation )
+					{
+						if (!newWorkingImageSelected)
+						{
+							LOG_INFO << "Working image '" << node->GetName() << "' selected";
+							newWorkingImageSelected = true;
+							working_data = node;
+						}
+						else
+						{
+							error = true;
+						}
+					}
+					else
+					{
+						if (!newReferenceImageSelected)
+						{
+							LOG_INFO << "Reference image '" << node->GetName() << "' selected";
+							newReferenceImageSelected = true;
+							reference_data = node;
+						}
+						else
+						{
+							error = true;
+						}
+					}
+				}
       }
+    }
+
+    if (error)
+    {
+    	newWorkingImageSelected = false;
+    	newReferenceImageSelected = false;
+    	LOG_INFO << "WARNING: No image or too many (>2) were selected.";
+    }
+    else
+    {
+    	OnWorkingDataSelectionChanged(working_data);
+    	OnReferenceNodeSelected(reference_data);
     }
   }
 
@@ -395,7 +473,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
     mitk::NodePredicateNOT::Pointer isNotBinary = mitk::NodePredicateNOT::New( isBinary );
     mitk::NodePredicateAND::Pointer isNormalImage = mitk::NodePredicateAND::New( isImage, isNotBinary );
 
-    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = 
+    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents =
       m_DataStorage->GetSources( m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0), isNormalImage );
 
     if (possibleParents->size() > 0)
@@ -420,11 +498,42 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 
   if (!newWorkingImageSelected)
   {
+    // if an normal image is chosen, all child segmentations are visible
+  	// if nothing is chosen all segmentations are visible
+  	mitk::NodePredicateAND::Pointer and_predicate = mitk::NodePredicateAND::New(
+				mitk::TNodePredicateDataType<mitk::Image>::New(),
+				mitk::NodePredicateProperty::New("segmentation", mitk::GenericProperty<bool>::New(true)));
+  	mitk::DataStorage::SetOfObjects::ConstPointer segmentation_set = this->GetDefaultDataStorage()->GetSubset(and_predicate);
+  	const unsigned int size = segmentation_set->Size();
+
+  	if (newReferenceImageSelected)
+  	{
+    	mitk::DataStorage::SetOfObjects::ConstPointer child_segmentation_set = this->GetDefaultDataStorage()->GetDerivations(reference_data, and_predicate);
+    	const unsigned int child_size = child_segmentation_set->Size();
+
+			for (unsigned int i = 0u; i < size; ++i)
+			{
+				segmentation_set->GetElement(i)->SetVisibility(false);
+			}
+
+			for (unsigned int i = 0u; i < child_size; ++i)
+			{
+				child_segmentation_set->GetElement(i)->SetVisibility(true);
+			}
+  	}
+  	else
+  	{
+			for (unsigned int i = 0u; i < size; ++i)
+			{
+				segmentation_set->GetElement(i)->SetVisibility(true);
+			}
+  	}
+
     LOG_INFO << "NO working image selected";
     OnWorkingDataSelectionChanged(NULL);
   }
 }
-    
+
 void QmitkSegmentationView::PartHidden(cherry::IWorkbenchPartReference::Pointer)
 {
   m_Controls->m_ManualToolSelectionBox->setEnabled( false );

@@ -50,7 +50,7 @@ QmitkExtAppWorkbenchWindowAdvisorHack* QmitkExtAppWorkbenchWindowAdvisorHack::un
 QmitkExtAppWorkbenchWindowAdvisor::QmitkExtAppWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
 : cherry::WorkbenchWindowAdvisor(configurer)
 {
-
+  configurer->SetShowPerspectiveBar(true);
 }
 
 cherry::ActionBarAdvisor::Pointer
@@ -67,6 +67,8 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
   cherry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
 
+
+  // ==== Application menu ============================
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("&File");
@@ -97,7 +99,9 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
     std::pair<std::string, cherry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
     VDMap.insert(p);
   }
+  // ==================================================
 
+  // ==== View Toolbar ==================================
   QToolBar* qToolbar = new QToolBar;
   
   std::map<std::string, cherry::IViewDescriptor::Pointer>::const_iterator MapIter;
@@ -110,6 +114,8 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
   }
   
   mainWindow->addToolBar(qToolbar);
+  // ====================================================
+
 
   QStatusBar* qStatusBar = new QStatusBar();
 

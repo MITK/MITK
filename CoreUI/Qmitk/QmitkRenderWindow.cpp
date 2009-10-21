@@ -144,6 +144,33 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
   QVTKWidget::mouseMoveEvent(me);
 
   if (m_ResendQtEvents) me->ignore();
+
+  //Show/Hide Menu Widget
+  if( m_MenuWidgetActivated )
+  {
+    //Show Menu Widget when mouse is inside of the define region of the top right corner
+    if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
+      && me->pos().x() >= 0
+      && me->pos().y() <= m_MenuWidget->height() + 20 )
+    {
+      m_MenuWidget->MoveWidgetToCorrectPos();
+      m_MenuWidget->show();
+      m_MenuWidget->update();
+    }
+    else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
+      && me->pos().x() >= this->width() - m_MenuWidget->width() - 20 
+      && me->pos().y() <= m_MenuWidget->height() + 20 )
+    {
+      m_MenuWidget->MoveWidgetToCorrectPos();
+      m_MenuWidget->show();
+      m_MenuWidget->update();
+    }
+    //Hide Menu Widget when mouse is outside of the define region of the the right corner
+    else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
+    {
+      m_MenuWidget->hide();
+    }    
+  }
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -200,12 +227,12 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 void QmitkRenderWindow::enterEvent( QEvent *e )
 {
   //show Menu Widget
-  if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
-  {
-    m_MenuWidget->MoveWidgetToCorrectPos();
-    m_MenuWidget->show();
-    m_MenuWidget->update();
-  }
+  //if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
+  //{
+  //  m_MenuWidget->MoveWidgetToCorrectPos();
+  //  m_MenuWidget->show();
+  //  m_MenuWidget->update();
+  //}
 
   QVTKWidget::enterEvent(e);
 }
@@ -274,6 +301,7 @@ mitk::BaseController * QmitkRenderWindow::GetController()
 
 void QmitkRenderWindow::OnChangeLayoutDesign( int layoutDesignIndex )
 {
+  
   emit SignalLayoutDesignChanged( layoutDesignIndex );
 }
 

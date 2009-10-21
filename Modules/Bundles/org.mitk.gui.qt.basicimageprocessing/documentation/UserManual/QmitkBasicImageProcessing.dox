@@ -28,7 +28,7 @@ or in any good digital image processing book.
 
 Available filters are:
 
-\a Single image operations
+<H1>\a Single image operations</H1>
 
 <ul>
 <li> <b>Noise Suppression</b>
@@ -57,10 +57,10 @@ Available filters are:
   <ul>
   <li> Image Inversion
   <li> Downsampling (isotropic, factor 2)  
-  
+  </ul>
 </ul>
   
-\a Dual image operations
+<H1>\a Dual image operations</H1>
 
 <ul>  
 <li> <b>Image Arithmetics</b>

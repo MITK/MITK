@@ -1,21 +1,21 @@
 SET(CPP_FILES 
   # DicomImport
-  DicomImport/mitkDicomDiffusionVolumesReader.cpp
+  DicomImport/mitkDicomDiffusionImageReader.cpp
   DicomImport/mitkGroupDiffusionHeadersFilter.cpp
-  DicomImport/mitkDicomDiffusionVolumeHeaderReader.cpp
-  DicomImport/mitkGEDicomDiffusionVolumeHeaderReader.cpp
-  DicomImport/mitkPhilipsDicomDiffusionVolumeHeaderReader.cpp
-  DicomImport/mitkSiemensDicomDiffusionVolumeHeaderReader.cpp
-  DicomImport/mitkSiemensMosaicDicomDiffusionVolumeHeaderReader.cpp
+  DicomImport/mitkDicomDiffusionImageHeaderReader.cpp
+  DicomImport/mitkGEDicomDiffusionImageHeaderReader.cpp
+  DicomImport/mitkPhilipsDicomDiffusionImageHeaderReader.cpp
+  DicomImport/mitkSiemensDicomDiffusionImageHeaderReader.cpp
+  DicomImport/mitkSiemensMosaicDicomDiffusionImageHeaderReader.cpp
   # DataStructures
   IODataStructures/mitkDiffusionImagingObjectFactory.cpp
   # DataStructures -> DWI
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumeHeaderInformation.cpp
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumesSource.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesReader.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriter.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesIOFactory.cpp
-  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionVolumesWriterFactory.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSource.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageReader.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
+  IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
   IODataStructures/QBallImages/mitkNrrdQBallImageReader.cpp
@@ -47,7 +47,7 @@ SET(H_FILES
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionVolumes.h 
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h 
   Rendering/mitkOdfVtkMapper2D.h
 )
 

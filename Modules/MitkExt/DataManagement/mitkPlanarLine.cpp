@@ -32,31 +32,31 @@ mitk::PlanarLine::~PlanarLine()
 }
 
 
-void mitk::PlanarLine::Initialize()
-{
-  // Default initialization of line control points
-
-  mitk::Geometry2D *geometry2D = 
-    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-
-  if ( geometry2D == NULL )
-  {
-    LOG_ERROR << "Missing Geometry2D for PlanarLine";
-    return;
-  }
-
-  mitk::ScalarType width = geometry2D->GetBounds()[1];
-  mitk::ScalarType height = geometry2D->GetBounds()[3];
-  
-  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
-  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
-
-  startPoint[0] = width / 2.0;
-  startPoint[1] = height / 2.0;
-
-  endPoint[0] = startPoint[0] + 20.0;
-  endPoint[1] = startPoint[1] + 20.0;
-}
+//void mitk::PlanarLine::Initialize()
+//{
+//  // Default initialization of line control points
+//
+//  mitk::Geometry2D *geometry2D = 
+//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
+//
+//  if ( geometry2D == NULL )
+//  {
+//    LOG_ERROR << "Missing Geometry2D for PlanarLine";
+//    return;
+//  }
+//
+//  mitk::ScalarType width = geometry2D->GetBounds()[1];
+//  mitk::ScalarType height = geometry2D->GetBounds()[3];
+//  
+//  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
+//  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
+//
+//  startPoint[0] = width / 2.0;
+//  startPoint[1] = height / 2.0;
+//
+//  endPoint[0] = startPoint[0] + 20.0;
+//  endPoint[1] = startPoint[1] + 20.0;
+//}
 
 
 void mitk::PlanarLine::GeneratePolyLine()

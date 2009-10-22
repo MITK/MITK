@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarFigure::PlanarFigure()
+: m_FigurePlaced( false ),
+  m_SelectedControlPoint( -1 )
 {
   m_ControlPoints = VertexContainerType::New();
   m_PolyLine = VertexContainerType::New();
@@ -41,13 +43,92 @@ void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 }
 
 
+void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D &point )
+{
+  VertexContainerType::Iterator it;
+  for ( it = m_ControlPoints->Begin(); it != m_ControlPoints->End(); ++it )
+  {
+    it->Value() = point;
+  }
+
+  m_FigurePlaced = true;
+  m_SelectedControlPoint = 1;
+}
+
+
+bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
+{
+  int currentNumberOfControlPoints = m_ControlPoints->Size();
+
+  LOG_INFO << "AddControlPoint()";
+  LOG_INFO << "currentNumberOfControlPoints: " << currentNumberOfControlPoints;
+  LOG_INFO << "maxNumber: " << this->GetMaximumNumberOfControlPoints();
+  LOG_INFO << "selected point: " << m_SelectedControlPoint;
+  if ( currentNumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
+  {
+    m_ControlPoints->InsertElement( currentNumberOfControlPoints, point );
+    ++m_SelectedControlPoint;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &point )
+{
+  if ( index < m_ControlPoints->Size() )
+  {
+    m_ControlPoints->ElementAt( index ) = point;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D &point )
+{
+  if ( (m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= m_ControlPoints->Size()) )
+  {
+    return false;
+  }
+
+  m_ControlPoints->ElementAt( m_SelectedControlPoint ) = point;
+  return true;
+}
+
+
 unsigned int mitk::PlanarFigure::GetNumberOfControlPoints() const
 {
   return m_ControlPoints->Size();
 }
 
 
-/** \brief Returns 2D control points vector. */
+bool mitk::PlanarFigure::SelectControlPoint( unsigned int index )
+{
+  if ( index < this->GetNumberOfControlPoints() )
+  {
+    m_SelectedControlPoint = index;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+void mitk::PlanarFigure::DeselectControlPoint()
+{
+  m_SelectedControlPoint = -1;
+}
+
+
 const mitk::PlanarFigure::VertexContainerType *
 mitk::PlanarFigure::GetControlPoints() const
 {
@@ -55,7 +136,6 @@ mitk::PlanarFigure::GetControlPoints() const
 }
 
 
-/** \brief Returns 2D control points vector. */
 mitk::PlanarFigure::VertexContainerType *
 mitk::PlanarFigure::GetControlPoints()
 {

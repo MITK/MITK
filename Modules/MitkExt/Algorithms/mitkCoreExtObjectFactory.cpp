@@ -45,6 +45,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUnstructuredGrid.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
 #include "mitkPolyDataGLMapper2D.h"
+#include "mitkPlanarFigure.h"
+#include "mitkPlanarFigureMapper2D.h"
 
 #include "mitkVolumeDataVtkMapper3D.h"
 
@@ -130,6 +132,11 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridMapper2D::New();
+      newMapper->SetDataTreeNode(node);
+    }
+    else if((dynamic_cast<PlanarFigure*>(data)!=NULL))
+    {
+      newMapper = mitk::PlanarFigureMapper2D::New();
       newMapper->SetDataTreeNode(node);
     }
   }

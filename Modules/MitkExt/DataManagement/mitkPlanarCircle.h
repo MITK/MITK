@@ -34,11 +34,9 @@ class Geometry2D;
 class MITKEXT_CORE_EXPORT PlanarCircle : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarCircle, BaseData );
+  mitkClassMacro( PlanarCircle, PlanarFigure );
 
   itkNewMacro( Self );
-
-  typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
 
 
   virtual bool IsClosed() const { return true; };
@@ -48,7 +46,22 @@ public:
    *
    * Must be implemented in sub-classes.
    */
-  virtual void Initialize();
+  //virtual void Initialize();
+
+
+  /** \brief Circle has 2 control points per definition. */
+  unsigned int GetMinimumNumberOfControlPoints() const
+  {
+    return 2;
+  }
+
+
+  /** \brief Circle has 2 control points per definition. */
+  unsigned int GetMaximumNumberOfControlPoints() const
+  {
+    return 2;
+  }
+
 
   
 protected:

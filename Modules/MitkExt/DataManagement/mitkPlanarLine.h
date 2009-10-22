@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_CIRCLE_H_
-#define _MITK_PLANAR_CIRCLE_H_
+#ifndef _MITK_PLANAR_LINE_H_
+#define _MITK_PLANAR_LINE_H_
 
 #include "mitkPlanarFigure.h"
 
@@ -28,29 +28,41 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure representing a circle
+ * \brief Implementation of PlanarFigure representing a line
  * through two control points
  */
 class MITKEXT_CORE_EXPORT PlanarLine : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarLine, BaseData );
+  mitkClassMacro( PlanarLine, PlanarFigure );
 
   itkNewMacro( Self );
 
-  //typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
 
-
-  virtual bool IsClosed() const { return true; };
+  virtual bool IsClosed() const { return false; };
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
    *
    * Must be implemented in sub-classes.
    */
-  virtual void Initialize();
+  //virtual void Initialize();
 
   
+  /** \brief Line has 2 control points per definition. */
+  unsigned int GetMinimumNumberOfControlPoints() const
+  {
+    return 2;
+  }
+
+
+  /** \brief Line has 2 control points per definition. */
+  unsigned int GetMaximumNumberOfControlPoints() const
+  {
+    return 2;
+  }
+
+
 protected:
   PlanarLine();
   virtual ~PlanarLine();
@@ -67,4 +79,4 @@ private:
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CIRCLE_H_
+#endif //_MITK_PLANAR_LINE_H_

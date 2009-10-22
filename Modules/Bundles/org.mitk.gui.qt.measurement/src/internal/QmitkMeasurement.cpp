@@ -25,6 +25,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkIDataStorageService.h>
 
+#include "mitkPlanarCircle.h"
+#include "mitkPlanarPolygon.h"
+#include "mitkPlanarAngle.h"
+#include "mitkPlanarLine.h"
+#include "mitkPlanarFigureInteractor.h"
+
 #include "QmitkMeasurement.h"
 
 #include <QGridLayout>
@@ -175,58 +181,118 @@ void QmitkMeasurement::Reset()
 
 void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
 {
-  this->Reset();
+  //this->Reset();
 
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  //mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataTreeNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
-  m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode = mitk::DataTreeNode::New();
+  //m_CurrentPointSetNode->SetData(pointSet);
+  //m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
+  //m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
 
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  //this->GetDataStorage()->Add(m_CurrentPointSetNode);
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 2);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  //m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 2);
+  //mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
+
+  mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+  figureNode->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
+
+  this->GetDataStorage()->Add( figureNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarLine initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
 void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
 {
-  this->Reset();
+  //this->Reset();
 
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  //mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataTreeNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
-  m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode = mitk::DataTreeNode::New();
+  //m_CurrentPointSetNode->SetData(pointSet);
+  //m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
+  //m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
-  //m_DataTreeIterator->Add(m_CurrentPointSetNode);
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  ////m_DataTreeIterator->Add(m_CurrentPointSetNode);
+  //this->GetDataStorage()->Add(m_CurrentPointSetNode);
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  //m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode);
+  //mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
+
+  mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+  figureNode->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
+
+  this->GetDataStorage()->Add( figureNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarPolygon initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
 void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
 {
-  this->Reset();
+  //this->Reset();
 
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  //mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataTreeNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
-  m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode = mitk::DataTreeNode::New();
+  //m_CurrentPointSetNode->SetData(pointSet);
+  //m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
+  //m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  //this->GetDataStorage()->Add(m_CurrentPointSetNode);
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 3);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  //m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 3);
+  //mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
+
+  mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+  figureNode->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
+
+  this->GetDataStorage()->Add( figureNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarAngle initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
 void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
@@ -236,7 +302,25 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
 
 void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
 {
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
 
+  mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+  figureNode->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
+
+  this->GetDataStorage()->Add( figureNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarCircle initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
 void QmitkMeasurement::ActionDrawRectangleTriggered( bool  /*checked*/ )
@@ -246,23 +330,44 @@ void QmitkMeasurement::ActionDrawRectangleTriggered( bool  /*checked*/ )
 
 void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
 {
-  this->Reset();
+  //this->Reset();
 
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  //mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataTreeNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
-  m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode = mitk::DataTreeNode::New();
+  //m_CurrentPointSetNode->SetData(pointSet);
+  //m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
+  //m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  //m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
-  //m_DataTreeIterator->Add(m_CurrentPointSetNode);
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  ////m_DataTreeIterator->Add(m_CurrentPointSetNode);
+  //this->GetDataStorage()->Add(m_CurrentPointSetNode);
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  //m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode);
+  //mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
+
+  mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+  figureNode->SetProperty( "layer", mitk::IntProperty::New( 1 ) );
+
+  this->GetDataStorage()->Add( figureNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarPolygon initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
+
 
 void QmitkMeasurement::ActionDrawArrowTriggered( bool  /*checked*/ )
 {

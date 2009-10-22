@@ -49,6 +49,12 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   mitk::PlanarFigure *planarFigure = const_cast< mitk::PlanarFigure * >(
     static_cast< const mitk::PlanarFigure * >( this->GetData() ) );
 
+  // Check if PlanarFigure has already been placed; otherwise, do nothing
+  if ( !planarFigure->IsPlaced() )
+  {
+    return;
+  }
+
   // Get 2D geometry frame of PlanarFigure
   mitk::Geometry2D *planarFigureGeometry2D = 
     dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
@@ -119,11 +125,13 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   glEnd();
 
+
+  // Draw markers at control points (selected control point will be colored)
   const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
   for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
   {
-    // Draw markers at control points
     this->DrawMarker( it->Value(),
+      (it->Index() == planarFigure->GetSelectedControlPoint()),
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 
@@ -151,6 +159,7 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
 
 void mitk::PlanarFigureMapper2D::DrawMarker(
   const mitk::Point2D &point,
+  bool selected,
   const mitk::Geometry2D *objectGeometry,
   const mitk::Geometry2D *rendererGeometry,
   const mitk::DisplayGeometry *displayGeometry )
@@ -161,13 +170,21 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     point, displayPoint,
     objectGeometry, rendererGeometry, displayGeometry );
 
-  glBegin( GL_LINE_LOOP );
-
-  glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
-  glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
-  glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
-  glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
-
-  glEnd();
-
+  if ( selected )
+  {
+    glColor4f( 1.0, 0.8, 0.2, 1.0 );
+    glRectf(
+      displayPoint[0] - 4, displayPoint[1] - 4, 
+      displayPoint[0] + 4, displayPoint[1] + 4 );
+  }
+  else
+  {
+    glColor4f( 1.0, 1.0, 1.0, 1.0 );
+    glBegin( GL_LINE_LOOP );
+    glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
+    glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
+    glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
+    glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
+    glEnd();
+  }
 }

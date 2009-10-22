@@ -27,6 +27,9 @@ namespace mitk
 {
 
 class DataTreeNode;
+class Geometry2D;
+class DisplayGeometry;
+class PlanarFigure;
 
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
@@ -66,9 +69,18 @@ protected:
     **/
   virtual ~PlanarFigureInteractor();
 
-  virtual bool ExecuteAction( Action* action, 
-    mitk::StateEvent const* stateEvent );
+  virtual bool ExecuteAction( Action *action, 
+    mitk::StateEvent const *stateEvent );
 
+  bool TransformPositionEventToIndex( const StateEvent *stateEvent,
+    Point2D &indexPoint2D,
+    const Geometry2D *planarFigureGeometry );
+
+  int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+    const StateEvent *StateEvent, const PlanarFigure *planarFigure,
+    const Geometry2D *planarFigureGeometry,
+    const Geometry2D *rendererGeometry,
+    const DisplayGeometry *displayGeometry ) const;
 
 private:
 

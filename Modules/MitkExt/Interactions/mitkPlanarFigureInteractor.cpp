@@ -55,7 +55,7 @@ void mitk::PlanarFigureInteractor::SetPrecision( mitk::ScalarType precision )
 float mitk::PlanarFigureInteractor
 ::CalculateJurisdiction(StateEvent const* stateEvent) const
 {
-  float returnValue = 0.0;
+  float returnValue = 0.5;
   
 
   // If it is a key event that can be handled in the current state,
@@ -84,10 +84,10 @@ float mitk::PlanarFigureInteractor
   //}
 
   //if the event can be understood and if there is a transition waiting for that event
-  if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
-  {
-    returnValue = 0.5;//it can be understood
-  }
+  //if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
+  //{
+  //  returnValue = 0.5;//it can be understood
+  //}
 
   int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
@@ -96,6 +96,12 @@ float mitk::PlanarFigureInteractor
 
   if ( planarFigure != NULL )
   {
+    // Give higher priority if this figure is currently selected
+    if ( planarFigure->GetSelectedControlPoint() >= 0 )
+    {
+      return 1.0;
+    }
+
     // Get the Geometry2D of the window the user interacts with (for 2D point 
     // projection)
     mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
@@ -176,6 +182,10 @@ bool mitk::PlanarFigureInteractor
     }
   }
 
+  // Get Geometry2D of PlanarFigure
+  mitk::Geometry2D *planarFigureGeometry =
+    dynamic_cast< mitk::Geometry2D * >( planarFigure->GetGeometry( timeStep ) );
+
   // Get the Geometry2D of the window the user interacts with (for 2D point 
   // projection)
   mitk::BaseRenderer *renderer = NULL;
@@ -186,6 +196,8 @@ bool mitk::PlanarFigureInteractor
     projectionPlane = renderer->GetCurrentWorldGeometry2D();
   }
 
+  // TODO: Check if display and PlanarFigure geometries are parallel (if they are PlaneGeometries)
+
 
   switch (action->GetActionId())
   {
@@ -193,23 +205,162 @@ bool mitk::PlanarFigureInteractor
     ok = true;
     break;
 
+  case AcCHECKOBJECT:
+    {
+      if ( planarFigure->IsPlaced() )
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+      }
+      ok = false;
+      break;
+    }
+
+  case AcADD:
+    {
+      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // PlanarFigure)
+      Point2D indexPoint2D;
+      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+        planarFigureGeometry ) )
+      {
+        ok = false;
+        break;
+      }
+
+      // Place PlanarFigure at this point
+      planarFigure->PlaceFigure( indexPoint2D );
+
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      ok = true;
+      break;
+    }
+
+  case AcMOVEPOINT:
+    {
+      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // PlanarFigure)
+      Point2D indexPoint2D;
+      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+        planarFigureGeometry ) )
+      {
+        ok = false;
+        break;
+      }
+
+      // Move current control point to this point
+      planarFigure->SetCurrentControlPoint( indexPoint2D );
+
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      ok = true;
+      break;
+    }
+
+
+  case AcCHECKNMINUS1:
+    {
+      if ( planarFigure->GetNumberOfControlPoints() >=
+           planarFigure->GetMaximumNumberOfControlPoints() )
+      {
+        planarFigure->DeselectControlPoint();
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+      }
+
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      ok = true;
+      break;
+    }
+
+
+  case AcCHECKEQUALS1:
+    {
+      // NOTE: Action name is a bit misleading; this action checks whether
+      // the figure has already the minimum number of required points to
+      // be finished.
+
+      if ( planarFigure->GetNumberOfControlPoints() >=
+        planarFigure->GetMinimumNumberOfControlPoints() )
+      {
+        planarFigure->DeselectControlPoint();
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+      }
+
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      ok = true;
+      break;
+    }
+
+
+  case AcADDPOINT:
+    {
+      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // PlanarFigure)
+      Point2D indexPoint2D;
+      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+        planarFigureGeometry ) )
+      {
+        ok = false;
+        break;
+      }
+
+      // Add point as new control point
+      planarFigure->AddControlPoint( indexPoint2D );
+
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      ok = true;
+      break;
+    }
+
 
   case AcCHECKPOINT:
     {
-      mitk::PositionEvent const  *posEvent = 
-        dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
+      int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+        stateEvent, planarFigure,
+        planarFigureGeometry,
+        renderer->GetCurrentWorldGeometry2D(),
+        renderer->GetDisplayGeometry() );
 
-      if (posEvent != NULL)
+      if ( pointIndex >= 0 )
       {
-        mitk::Point3D worldPoint = posEvent->GetWorldPosition();
+        planarFigure->SelectControlPoint( pointIndex );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+
+        // Return true: only this interactor is eligible to react on this event
+        ok = true;
+      }
+      else
+      {
+        planarFigure->DeselectControlPoint();
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+
+        // Return false so that other (PlanarFigure) Interactors may react on this
+        // event as well
+        ok = false;
       }
 
-      // In all other cases: new Event with information NO
-      mitk::StateEvent *newStateEvent = 
-        new mitk::StateEvent(EIDNO, posEvent);
-      this->HandleEvent(newStateEvent );
-      ok = true;
-
+      // Update rendered scene
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
     }
 
@@ -221,25 +372,30 @@ bool mitk::PlanarFigureInteractor
 
   case AcDESELECTALL:
     {
-      ok = true;
-      break;
-    }
+      planarFigure->DeselectControlPoint();
 
-  //case AcMOVEPOINT:
-  case AcMOVESELECTED:
-    {
-      // Update the display
+      // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
       ok = true;
       break;
     }
 
-  case AcFINISHMOVE:
-    {
-      ok = true;
-      break;
-    }
+  //case AcMOVEPOINT:
+  //case AcMOVESELECTED:
+  //  {
+  //    // Update the display
+  //    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  //    ok = true;
+  //    break;
+  //  }
+
+  //case AcFINISHMOVE:
+  //  {
+  //    ok = true;
+  //    break;
+  //  }
 
 
 
@@ -250,3 +406,87 @@ bool mitk::PlanarFigureInteractor
 
   return ok;
 }
+
+bool mitk::PlanarFigureInteractor::TransformPositionEventToIndex(
+  const StateEvent *stateEvent, Point2D &indexPoint2D,
+  const Geometry2D *planarFigureGeometry )
+{
+  // Extract world position, and from this position on geometry, if
+  // available
+  const mitk::PositionEvent *positionEvent = 
+    dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+  if ( positionEvent == NULL )
+  {
+    return false;
+  }
+
+  mitk::Point3D worldPoint3D = positionEvent->GetWorldPosition();
+
+  // TODO: proper handling of distance tolerance
+  if ( planarFigureGeometry->Distance( worldPoint3D ) > 0.1 )
+  {
+    return false;
+  }
+
+  // Project point onto plane of this PlanarFigure
+  planarFigureGeometry->Map( worldPoint3D, indexPoint2D );
+  planarFigureGeometry->WorldToIndex( indexPoint2D, indexPoint2D );
+
+  return true;
+}
+
+int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+  const StateEvent *stateEvent, const PlanarFigure *planarFigure,
+  const Geometry2D *planarFigureGeometry,
+  const Geometry2D *rendererGeometry,
+  const DisplayGeometry *displayGeometry ) const
+{
+  // Extract display position
+  const mitk::PositionEvent *positionEvent = 
+    dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+  if ( positionEvent == NULL )
+  {
+    return -1;
+  }
+
+  //mitk::Point2D displayPosition;
+  //mitk::Point3D cursorWorldPosition = positionEvent->GetWorldPosition();
+
+  //displayGeometry->Project( cursorWorldPosition, cursorWorldPosition );
+  //displayGeometry->Map( cursorWorldPosition, displayPosition );
+
+  mitk::Point2D displayPosition = positionEvent->GetDisplayPosition();
+
+
+  // Iterate over all control points of planar figure, and check if
+  // any one is close to the current display position
+  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
+  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
+
+  mitk::Point2D worldPoint2D, displayControlPoint;
+  mitk::Point3D worldPoint3D;
+
+  VertexContainerType::ConstIterator it;
+  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
+  {
+    planarFigureGeometry->IndexToWorld( it->Value(), worldPoint2D );
+    planarFigureGeometry->Map( worldPoint2D, worldPoint3D );
+
+    // TODO: proper handling of distance tolerance
+    if ( displayGeometry->Distance( worldPoint3D ) < 0.1 )
+    {
+      rendererGeometry->Map( worldPoint3D, displayControlPoint );
+      displayGeometry->WorldToDisplay( displayControlPoint, displayControlPoint );
+
+      // TODO: variable size of markers
+      if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
+        && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
+      {
+        return it->Index();
+      }
+    }
+  }
+
+  return -1;
+}
+

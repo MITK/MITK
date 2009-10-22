@@ -32,31 +32,31 @@ mitk::PlanarCircle::~PlanarCircle()
 }
 
 
-void mitk::PlanarCircle::Initialize()
-{
-  // Default initialization of circle control points
-
-  mitk::Geometry2D *geometry2D = 
-    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-
-  if ( geometry2D == NULL )
-  {
-    LOG_ERROR << "Missing Geometry2D for PlanarCircle";
-    return;
-  }
-
-  mitk::ScalarType width = geometry2D->GetBounds()[1];
-  mitk::ScalarType height = geometry2D->GetBounds()[3];
-  
-  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
-
-  centerPoint[0] = width / 2.0;
-  centerPoint[1] = height / 2.0;
-
-  boundaryPoint[0] = centerPoint[0] + 20.0;
-  boundaryPoint[1] = centerPoint[1];
-}
+//void mitk::PlanarCircle::Initialize()
+//{
+//  // Default initialization of circle control points
+//
+//  mitk::Geometry2D *geometry2D = 
+//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
+//
+//  if ( geometry2D == NULL )
+//  {
+//    LOG_ERROR << "Missing Geometry2D for PlanarCircle";
+//    return;
+//  }
+//
+//  mitk::ScalarType width = geometry2D->GetBounds()[1];
+//  mitk::ScalarType height = geometry2D->GetBounds()[3];
+//  
+//  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
+//  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
+//
+//  centerPoint[0] = width / 2.0;
+//  centerPoint[1] = height / 2.0;
+//
+//  boundaryPoint[0] = centerPoint[0] + 20.0;
+//  boundaryPoint[1] = centerPoint[1];
+//}
 
 
 void mitk::PlanarCircle::GeneratePolyLine()

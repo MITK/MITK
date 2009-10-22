@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_CIRCLE_H_
-#define _MITK_PLANAR_CIRCLE_H_
+#ifndef _MITK_PLANAR_POLYGON_H_
+#define _MITK_PLANAR_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
 
@@ -28,17 +28,15 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure representing a circle
- * through two control points
+ * \brief Implementation of PlanarFigure representing a polygon
+ * with two or more control points
  */
 class MITKEXT_CORE_EXPORT PlanarPolygon : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarPolygon, BaseData );
+  mitkClassMacro( PlanarPolygon, PlanarFigure );
 
   itkNewMacro( Self );
-
-  //typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
 
 
   virtual bool IsClosed() const { return true; };
@@ -48,7 +46,21 @@ public:
    *
    * Must be implemented in sub-classes.
    */
-  virtual void Initialize();
+  //virtual void Initialize();
+
+
+  /** \brief Polygon has 2 control points per definition. */
+  unsigned int GetMinimumNumberOfControlPoints() const
+  {
+    return 2;
+  }
+
+
+  /** \brief Polygon maximum number of control points is principally not limited. */
+  unsigned int GetMaximumNumberOfControlPoints() const
+  {
+    return 1000;
+  }
 
   
 protected:
@@ -67,4 +79,4 @@ private:
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CIRCLE_H_
+#endif //_MITK_PLANAR_POLYGON_H_

@@ -51,6 +51,11 @@ public:
   virtual bool IsClosed() const = 0;
 
 
+  /** \brief True if the planar figure has been placed (and can be
+   * displayed/interacted with). */
+  virtual bool IsPlaced() const { return m_FigurePlaced; };
+
+
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
    * In most cases, this is a Geometry already owned by another object, e.g.
@@ -60,16 +65,58 @@ public:
   virtual void SetGeometry2D( mitk::Geometry2D *geometry );
 
 
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
+  /** \brief Place figure at the given point (in 2D index coordinates) onto
+   * the given 2D geometry.
+   *
+   * By default, the first two control points of the figure are set to the
+   * passed point. Further points can be set via AddControlPoint(), if the
+   * current number of control points is below the maximum number of control
+   * points.
+   *
+   * Can be re-implemented in sub-classes as needed.
+   */
+  virtual void PlaceFigure( const Point2D &point );
+
+
+  virtual bool AddControlPoint( const Point2D &point );
+
+  virtual bool SetControlPoint( unsigned int index, const Point2D &point );
+
+  virtual bool SetCurrentControlPoint( const Point2D &point );
+
+
+  
+  /** \brief Returns the current number of 2D control points defining this figure. */
+  unsigned int GetNumberOfControlPoints() const;
+
+
+  /** \brief Returns the minimum number of control points needed to represent
+   * this figure.
    *
    * Must be implemented in sub-classes.
    */
-  virtual void Initialize() = 0;
+  virtual unsigned int GetMinimumNumberOfControlPoints() const = 0;
+
+
+  /** \brief Returns the maximum number of control points allowed for
+  * this figure (e.g. 3 for triangles).
+  *
+  * Must be implemented in sub-classes.
+  */
+  virtual unsigned int GetMaximumNumberOfControlPoints() const = 0;
+
+
+  /** \brief Selects currently active control points. */
+  virtual bool SelectControlPoint( unsigned int index );
 
   
-  /** \brief Returns the number of 2D control points defining this figure. */
-  unsigned int GetNumberOfControlPoints() const;
+  /** \brief Deselect control point; no control point active. */
+  virtual void DeselectControlPoint();
+
+
+  /** \brief Return currently selected control point. */
+  virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
+
 
   
   /** \brief Returns 2D control points vector. */
@@ -117,6 +164,11 @@ protected:
   VertexContainerType::Pointer m_ControlPoints;
 
   VertexContainerType::Pointer m_PolyLine;
+
+  bool m_FigurePlaced;
+
+  // Currently selected control point; -1 means no point selected
+  int m_SelectedControlPoint;
 
 private:
 

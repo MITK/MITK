@@ -64,6 +64,7 @@ protected:
 
   void DrawMarker(
     const mitk::Point2D &point,
+    bool selected,
     const mitk::Geometry2D *objectGeometry,
     const mitk::Geometry2D *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );

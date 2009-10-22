@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_CIRCLE_H_
-#define _MITK_PLANAR_CIRCLE_H_
+#ifndef _MITK_PLANAR_ANGLE_H_
+#define _MITK_PLANAR_ANGLE_H_
 
 #include "mitkPlanarFigure.h"
 
@@ -34,22 +34,32 @@ class Geometry2D;
 class MITKEXT_CORE_EXPORT PlanarAngle : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarAngle, BaseData );
+  mitkClassMacro( PlanarAngle, PlanarFigure );
 
   itkNewMacro( Self );
 
-//  typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
 
-
-  virtual bool IsClosed() const { return true; };
+  virtual bool IsClosed() const { return false; };
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
    *
    * Must be implemented in sub-classes.
    */
-  virtual void Initialize();
+  //virtual void Initialize();
 
+  /** \brief Angle has 3 control points per definition. */
+  unsigned int GetMinimumNumberOfControlPoints() const
+  {
+    return 3;
+  }
+
+
+  /** \brief Angle has 3 control points per definition. */
+  unsigned int GetMaximumNumberOfControlPoints() const
+  {
+    return 3;
+  }
   
 protected:
   PlanarAngle();
@@ -67,4 +77,4 @@ private:
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CIRCLE_H_
+#endif //_MITK_PLANAR_ANGLE_H_

@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStepperAdapter.h"
 
+#include <cherryISelectionListener.h>
+
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes 
@@ -76,18 +78,19 @@ public:
 
   virtual void Activated();
 
+  /*!  
+  \brief Invoked when the DataManager selection changed
+  */
+  virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
+    , cherry::ISelection::ConstPointer selection);
+
+
   protected slots:  
 
     /*
-    * When an image is selected through one of the data tree combo boxes.
+    * When an image is selected through the data tree combo box.
     */
-    void onImageSelected (const mitk::DataTreeNode* item);
     void onImage2Selected(const mitk::DataTreeNode* item);
-
-    /*
-    * When the time slider has changed (different time step selected)
-    */
-    void UpdateTimestep();
 
     /*
     * When an action is selected in the "one image ops" list box
@@ -105,9 +108,19 @@ public:
     void StartButtonClicked();
 
     /*
-    * "The Execute" button in the "two image ops" box was triggered
+    * The "Execute" button in the "two image ops" box was triggered
     */
     void StartButton2Clicked();
+
+    /*
+    * The time slider has been moved.
+    */
+    void UpdateTimeStep();
+
+    /*
+    *  Switch between the one and the two image operations GUI
+    */
+    void ChangeGUI();
 
 private: 
 
@@ -115,6 +128,11 @@ private:
   * After a one image operation, reset the "one image ops" panel
   */
   void ResetOneImageOpPanel();
+
+  /*
+  * Helper method to reset the parameter set panel
+  */
+  void ResetParameterPanel();
 
   /*
   * After a two image operation, reset the "two image ops" panel
@@ -131,9 +149,11 @@ private:
   */  
   Ui::QmitkBasicImageProcessingViewControls *m_Controls;
 
-  mitk::Image*              m_SelectedImage;
+  mitk::DataTreeNode*       m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
   unsigned int              m_CurrentTime;
+
+  cherry::ISelectionListener::Pointer m_SelectionListener;
 
   enum ActionType {
     GAUSSIAN,

@@ -30,6 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK includes (GUI)
 #include "QmitkStdMultiWidget.h"
 #include "QmitkSliderNavigatorWidget.h"
+#include <cherryISelectionService.h>
+#include <cherryISelectionProvider.h>
+#include <cherryISelectionService.h>
+#include <cherryIWorkbenchWindow.h>
+#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <mitkDataTreeNodeObject.h>
 
 // MITK includes (general)
 #include "mitkNodePredicateDataType.h"
@@ -110,14 +116,18 @@ typedef itk::TotalVariationDenoisingImageFilter<FloatImageType, FloatImageType> 
 typedef itk::TotalVariationDenoisingImageFilter<VectorImageType, VectorImageType>       VectorTotalVariationFilterType;
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing(QObject *parent, const char *name)
-: QmitkFunctionality(), m_Controls(NULL)
+: QmitkFunctionality(), m_Controls(NULL), m_SelectionListener(0)
 {
   m_TimeStepperAdapter = NULL;
-  m_SelectedImage = NULL;
+  m_SelectedImageNode = NULL;
 }
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
-{}
+{
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelectionListener);
+}
 
 void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
 {
@@ -127,27 +137,35 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_ImageSelector1->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->m_ImageSelector1->SetPredicate(mitk::NodePredicateDataType::New("Image"));
+    //     m_Controls->m_ImageSelector1->SetDataStorage(this->GetDefaultDataStorage());
+    //     m_Controls->m_ImageSelector1->SetPredicate(mitk::NodePredicateDataType::New("Image"));
     m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
     m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
+  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkBasicImageProcessing>
+    (this, &QmitkBasicImageProcessing::SelectionChanged);
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->AddSelectionListener(m_SelectionListener);
+
+  m_Controls->gbTwoImageOps->hide();
 }
 
 void QmitkBasicImageProcessing::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ImageSelector1, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), 
-      this, SLOT(onImageSelected(const mitk::DataTreeNode*)) );
     connect( m_Controls->m_ImageSelector2, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), 
-      this, SLOT(onImageSelected(const mitk::DataTreeNode*)) );
+      this, SLOT(onImage2Selected(const mitk::DataTreeNode*)) );
 
     connect( (QObject*)(m_Controls->cbWhat1), SIGNAL( activated(int) ), this, SLOT( SelectAction(int) ) );
     connect( (QObject*)(m_Controls->btnDoIt), SIGNAL(clicked()),(QObject*) this, SLOT(StartButtonClicked()));
 
     connect( (QObject*)(m_Controls->cbWhat2), SIGNAL( activated(int) ), this, SLOT( SelectAction2(int) ) );
     connect( (QObject*)(m_Controls->btnDoIt2), SIGNAL(clicked()),(QObject*) this, SLOT(StartButton2Clicked()));
+
+    connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
+    connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
   }
 }
 
@@ -155,8 +173,8 @@ void QmitkBasicImageProcessing::StdMultiWidgetAvailable( QmitkStdMultiWidget& st
 {
   QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, stdMultiWidget.GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromShapeBasedSegmentation");
-  connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
-  this->UpdateTimestep();
+  connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimeStep() ) );
+  this->UpdateTimeStep();
 }
 
 void QmitkBasicImageProcessing::Activated()
@@ -164,37 +182,61 @@ void QmitkBasicImageProcessing::Activated()
   QmitkFunctionality::Activated();
 }
 
-void QmitkBasicImageProcessing::onImageSelected(const mitk::DataTreeNode* item)
+void QmitkBasicImageProcessing::UpdateTimeStep()
 {
-  if (item == NULL) return;
-  std::string name;
-  if (item->GetData())
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
+{
+  if (selection == NULL) return;
+
+  this->ResetOneImageOpPanel();
+  m_Controls->sliceNavigatorTime->setEnabled(false);
+  m_Controls->leImage1->setText("");
+
+  mitk::DataTreeNodeSelection::ConstPointer dtns 
+    = selection.Cast<const mitk::DataTreeNodeSelection>();
+
+  if(dtns.IsNotNull() && !(dtns->IsEmpty()) )
   {
-    try
-    {
-      if ( item->GetName(name) )
-        std::cout << "Image selected with name '" << name << "'" << std::endl;
-      mitk::BaseData::Pointer data = item->GetData();
-      m_SelectedImage = dynamic_cast<mitk::Image*> (data.GetPointer());
-      if( m_SelectedImage == NULL ||  m_SelectedImage->IsInitialized() == false ) return;
+    mitk::DataTreeNodeObject* dtno = 
+      dynamic_cast<mitk::DataTreeNodeObject*>( dtns->GetFirstElement().GetPointer() ) ;
 
-      this->UpdateTimestep();
-    }
-    catch ( const std::exception & e )
+    m_SelectedImageNode = dtno->GetDataTreeNode();
+
+    mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
+
+    if( tempImage.IsNull() || (tempImage->IsInitialized() == false) ) 
     {
-      itkGenericOutputMacro( << e.what() );
+      m_Controls->leImage1->setText("Not an image.");
+      return;
     }
+
+    m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetName().c_str()));
+
     // button coding
-    this->ResetOneImageOpPanel();
-    m_Controls->sliceNavigatorTime->setEnabled(false);
-
-    m_Controls->gbTwoImageOps->setEnabled(true);
-    m_Controls->gbTwoImageOps->setEnabled(true);
-    if ( m_SelectedImage->GetDimension() > 3 ) 
+    if ( tempImage->GetDimension() > 3 ) 
     {
       m_Controls->sliceNavigatorTime->setEnabled(true);
       m_Controls->tlTime->setEnabled(true);
     }
+    m_Controls->tlWhat1->setEnabled(true);
+    m_Controls->cbWhat1->setEnabled(true);
+  }
+}
+
+void QmitkBasicImageProcessing::ChangeGUI()
+{
+  if(m_Controls->rBOneImOp->isChecked())
+  {
+    m_Controls->gbTwoImageOps->hide();
+    m_Controls->gbOneImageOps->show();
+  }
+  else if(m_Controls->rBTwoImOp->isChecked())
+  {
+    m_Controls->gbOneImageOps->hide();
+    m_Controls->gbTwoImageOps->show();
   }
 }
 
@@ -204,11 +246,20 @@ void QmitkBasicImageProcessing::ResetOneImageOpPanel()
   m_Controls->tlParam2->setText("Param2");
 
   m_Controls->cbWhat1->setCurrentIndex(0);
-
-  m_Controls->cbWhat1->setEnabled(true);
-  m_Controls->tlWhat->setEnabled(true);
+  m_Controls->cbWhat1->setEnabled(false);
+  m_Controls->tlWhat1->setEnabled(false);
 
   m_Controls->tlTime->setEnabled(false);
+
+  this->ResetParameterPanel();
+
+  m_Controls->tlDoIt->setEnabled(false);
+  m_Controls->btnDoIt->setEnabled(false);
+  m_Controls->cbHideOrig->setEnabled(false);
+}
+
+void QmitkBasicImageProcessing::ResetParameterPanel()
+{
   m_Controls->tlParam->setEnabled(false);
   m_Controls->tlParam1->setEnabled(false);
   m_Controls->tlParam2->setEnabled(false);
@@ -218,34 +269,41 @@ void QmitkBasicImageProcessing::ResetOneImageOpPanel()
   m_Controls->sbParam1->setValue(0);
   m_Controls->sbParam2->setValue(0);
 
-  m_Controls->tlDoIt->setEnabled(false);
-  m_Controls->btnDoIt->setEnabled(false);
-  m_Controls->cbHideOrig->setEnabled(false);
 }
 
 void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
 {
   m_Controls->cbWhat2->setCurrentIndex(0);
+  m_Controls->cbWhat2->setEnabled(false);
+  m_Controls->tlWhat2->setEnabled(false);
+
+  m_Controls->tlDirection->setEnabled(false);
+  m_Controls->rbDirection1->setEnabled(false);
+  m_Controls->rbDirection2->setEnabled(false);
+  m_Controls->btnDoIt2->setEnabled(false);
 }
 
 void QmitkBasicImageProcessing::onImage2Selected(const mitk::DataTreeNode* item)
 {
-}
+  this->ResetTwoImageOpPanel();
 
-void QmitkBasicImageProcessing::UpdateTimestep()
-{
-  if ( m_SelectedImage )
+  if(item && item->GetData())
   {
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_Controls->tlWhat2->setEnabled(true);
+    m_Controls->cbWhat2->setEnabled(true);
   }
 }
 
 void QmitkBasicImageProcessing::SelectAction(int action)
 {
-  if ( ! m_SelectedImage ) return;
+  if ( ! m_SelectedImageNode ) return;
+
+  this->ResetParameterPanel();
 
   QString text1 = "No Parameters";
   QString text2 = "No Parameters";
+
+  m_Controls->tlParam->setEnabled(true);
 
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (action)
@@ -375,7 +433,6 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   case 16:
     {
       m_SelectedAction = DOWNSAMPLING;
-      //    text1 = "Downsampling by factor 2";
       break;
     }
 
@@ -392,22 +449,21 @@ void QmitkBasicImageProcessing::SelectAction(int action)
 
 void QmitkBasicImageProcessing::StartButtonClicked() 
 {
-  if(!m_SelectedImage) return;
+  if(!m_SelectedImageNode) return;
 
   this->BusyCursorOn();
 
-  mitk::Image::Pointer newImage = mitk::Image::New();
+  mitk::Image::Pointer newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
 
   // check if operation is done on 4D a image time step
-  if(m_SelectedImage->GetDimension() > 3)
+  if(newImage->GetDimension() > 3)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-    timeSelector->SetInput(m_SelectedImage);
+    timeSelector->SetInput(newImage);
     timeSelector->SetTimeNr( ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos() );
     timeSelector->Update();
     newImage = timeSelector->GetOutput();
   }
-  else newImage = m_SelectedImage;
 
   // check if input image is valid
   if ( (! newImage) || (newImage->IsInitialized() == false) ) 
@@ -637,7 +693,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   levWinProp->SetLevelWindow( levelwindow );
 
   // compose new image name 
-  std::string name = m_Controls->m_ImageSelector1->GetSelectedNode()->GetProperty("name")->GetValueAsString();
+  std::string name = m_SelectedImageNode->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
     name = name.substr(0,name.size() -7);
@@ -664,8 +720,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   // add new image to data storage and set as active to ease further processing
   GetDefaultDataStorage()->Add( result );
   if ( m_Controls->cbHideOrig->isChecked() == true )
-    m_Controls->m_ImageSelector1->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
-  m_Controls->m_ImageSelector1->SetSelectedNode(result);
+    m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
+  // TODO!! m_Controls->m_ImageSelector1->SetSelectedNode(result);
 
   // show the results
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -674,8 +730,6 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
 void QmitkBasicImageProcessing::SelectAction2(int operation)
 {
-  if ( ! m_SelectedImage ) return;
-
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (operation)
   {
@@ -693,13 +747,16 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
     break;
   default: return;
   }
+  m_Controls->tlDirection->setEnabled(true);
+  m_Controls->rbDirection1->setEnabled(true);
+  m_Controls->rbDirection2->setEnabled(true);
   m_Controls->btnDoIt2->setEnabled(true);
 }
 
 void QmitkBasicImageProcessing::StartButton2Clicked() 
 {
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
-    (m_Controls->m_ImageSelector1->GetSelectedNode()->GetData());
+    (m_SelectedImageNode->GetData());
   mitk::Image::Pointer newImage2 = dynamic_cast<mitk::Image*>
     (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
 
@@ -711,6 +768,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   this->BusyCursorOn();
+  this->ResetTwoImageOpPanel();
 
   // check if 4D image and use filter on correct time step
   {
@@ -736,12 +794,12 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();
 
-  if( m_Controls->radioButton1->isChecked() )
+  if( m_Controls->rbDirection1->isChecked() )
   {
     CastToItkImage( newImage1, itkImage1 );
     CastToItkImage( newImage2, itkImage2 );
   }
-  else if ( m_Controls->radioButton2->isChecked() )
+  else if ( m_Controls->rbDirection2->isChecked() )
   {
     CastToItkImage( newImage2, itkImage1 );
     CastToItkImage( newImage1, itkImage2 );
@@ -811,7 +869,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   levelwindow.SetAuto( newImage1 );
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   levWinProp->SetLevelWindow( levelwindow );
-  std::string name = m_Controls->m_ImageSelector1->GetSelectedNode()->GetProperty("name")->GetValueAsString();
+  std::string name = m_SelectedImageNode->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
     name = name.substr(0,name.size() -7);
@@ -825,7 +883,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   GetDefaultDataStorage()->Add( result );
 
   // show only the newly created image
-  m_Controls->m_ImageSelector1->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
+  m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
   m_Controls->m_ImageSelector2->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
 
   // reset GUI for better usability

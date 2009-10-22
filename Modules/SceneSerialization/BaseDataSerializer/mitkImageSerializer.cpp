@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageSerializer.h"
 
 #include "mitkImageWriter.h"
+#include <Poco/Path.h>
 
 MITK_REGISTER_SERIALIZER(ImageSerializer)
 
@@ -34,8 +35,8 @@ std::string mitk::ImageSerializer::Serialize()
 {
   LOG_INFO << this->GetNameOfClass() 
            << " is asked to serialize an object " << (const void*) this->m_Data
-           << " into a directory " << m_WorkingDirectory
-           << " using a filename hint " << m_FilenameHint;
+           << " into a directory '" << m_WorkingDirectory
+           << "' using a filename hint '" << m_FilenameHint << "'";
 
   const Image* image = dynamic_cast<const Image*>( m_Data.GetPointer() );
   if (!image)
@@ -51,7 +52,7 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
   filename += m_FilenameHint;
 
   std::string fullname(m_WorkingDirectory);
-  fullname += "/";
+  fullname += Poco::Path::separator();
   fullname += filename;
 
   try
@@ -61,6 +62,7 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
     writer->SetExtension(".pic");
     writer->SetInput( const_cast<Image*>(image) ); // bad writer design??
     writer->Write();
+    fullname = writer->GetFileName();
   }
   catch (std::exception& e)
   {
@@ -71,7 +73,5 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
               << e.what();
     return "";
   }
-
-  return filename + ".pic";
+  return Poco::Path(fullname).getFileName();// + ".pic";
 }
-

@@ -66,6 +66,8 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
+  // setup the basic GUI of this view
+
   m_Parent = parent;
 
   m_Controls = new Ui::QmitkSegmentationControls;
@@ -98,13 +100,26 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_SlicesInterpolator->SetDataStorage( *m_DataStorage );
   }
 
-  this->CreateConnections();
+  // create signal/slot connections
+  connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
+  connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
 
+  // register as listener for openCherry selection events (mainly from DataManager)
   m_SelectionListener = cherry::ISelectionListener::Pointer(new cherry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
   m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+
+  // register a couple of additional actions for DataManager's context menu
+  /*
+  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image mask");
+
+  m_OtsuFilterAction = imageDataTreeNodeDescriptor->AddAction("Apply Otsu Filter");
+  QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
+    , this, SLOT( OtsuFilter(bool) ) );
+*/
 }
 
 void QmitkSegmentationView::SetFocus()
@@ -119,11 +134,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
 
 void QmitkSegmentationView::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
-    connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
-  }
 }
 
 void QmitkSegmentationView::CreateNewSegmentation()
@@ -443,7 +453,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   if (tooManySelection)
   {
     // TODO visible warning when two images are selected
-    LOG_WARNING << "WARNING: No image or too many (>2) were selected.";
+    LOG_WARN << "WARNING: No image or too many (>2) were selected.";
     referenceData = NULL;
     workingData = NULL;
   }

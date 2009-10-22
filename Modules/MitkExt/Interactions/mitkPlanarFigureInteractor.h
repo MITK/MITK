@@ -76,7 +76,7 @@ protected:
     Point2D &indexPoint2D,
     const Geometry2D *planarFigureGeometry );
 
-  int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+  int IsPositionInsideMarker(
     const StateEvent *StateEvent, const PlanarFigure *planarFigure,
     const Geometry2D *planarFigureGeometry,
     const Geometry2D *rendererGeometry,

@@ -183,6 +183,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
   QMimeData * ret = new QMimeData;
   long a = reinterpret_cast<long>(indexes.at(0).internalPointer());
+  
   QString result;
   QTextStream(&result) << a;
   ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));

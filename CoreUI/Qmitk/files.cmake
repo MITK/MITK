@@ -14,6 +14,8 @@ QmitkLineEditLevelWindowWidget.cpp
 # QmitkMaterialEditor.cpp
 # QmitkMaterialShowcase.cpp
 QmitkMemoryUsageIndicatorView.cpp
+QmitkNodeDescriptor.cpp
+QmitkNodeDescriptorManager.cpp
 QmitkRenderWindowMenu.cpp
 QmitkPropertiesTableEditor.cpp
 QmitkPropertiesTableModel.cpp
@@ -36,6 +38,8 @@ QmitkLineEditLevelWindowWidget.h
 # QmitkMaterialEditor.h
 # QmitkMaterialShowcase.h
 QmitkMemoryUsageIndicatorView.h
+QmitkNodeDescriptor.h
+QmitkNodeDescriptorManager.h
 QmitkRenderWindowMenu.h
 QmitkPropertiesTableEditor.h
 QmitkPropertyDelegate.h
@@ -51,6 +55,6 @@ QmitkLevelWindowRangeChange.ui
 QmitkMemoryUsageIndicator.ui
 )
 
-SET(RES_FILES
-  #icon/Rendering.qrc
+SET(QRC_FILES
+  Qmitk.qrc  
 )

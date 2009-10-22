@@ -2,28 +2,31 @@
 #define QMITKDATAMANAGERVIEW_H_
 
 // Own includes
-#include "cherryIPartListener.h"
-#include "cherryISelection.h"
-#include "cherryISelectionProvider.h"
-#include "cherryIPreferencesService.h"
-#include "cherryICherryPreferences.h"
+#include <cherryIPartListener.h>
+#include <cherryISelection.h>
+#include <cherryISelectionProvider.h>
+#include <cherryIPreferencesService.h>
+#include <cherryICherryPreferences.h>
+#include <cherryISelectionListener.h>
 
 /// Qmitk
-#include "QmitkFunctionality.h"
-#include "QmitkDataTreeNodeSelectionProvider.h"
+#include <QmitkFunctionality.h>
+#include <QmitkDataTreeNodeSelectionProvider.h>
 // #include "QmitkStandardViews.h"
 #include "mitkQtDataManagerDll.h"
 
 // Forward declarations
 class QMenu;
 class QAction;
+class QWidgetAction;
+class QSlider;
 class QModelIndex;
-class QTableView;
+class QTreeView;
 class QPushButton;
 class QToolBar;
 class QMenu;
 
-class QmitkDataStorageTableModel;
+class QmitkDataStorageTreeModel;
 ///
 /// \ingroup org_mitk_gui_qt_datamanager_internal
 ///
@@ -49,6 +52,15 @@ public:
   ///
   std::vector<mitk::DataTreeNode*> GetSelectedNodes() const;
 public slots:
+  ///
+  /// Invoked when the opacity slider changed
+  ///
+  void OpactiyChanged(int value);
+  ///
+  /// Invoked when the opacity action changed
+  /// In this function the the opacity slider is set to the selected nodes opacity value
+  ///
+  void OpactiyActionChanged();
   ///
   /// \brief Shows a node context menu.
   ///
@@ -93,6 +105,16 @@ public slots:
   /// Invoked when the preferences were changed
   ///
   void OnPreferencesChanged(const cherry::ICherryPreferences*);
+
+  ///
+  /// Invoked when the DataManager selection changed
+  ///
+  virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
+    , cherry::ISelection::ConstPointer selection);
+
+  /// Invoked when the median action is invoked
+  void OtsuFilter( bool checked = false );
+
 protected:
   ///
   /// \brief Create the view here.
@@ -106,7 +128,7 @@ protected:
   ///
   /// \brief A plain widget as the base pane.
   ///
-  QmitkDataStorageTableModel* m_NodeTableModel;
+  QmitkDataStorageTreeModel* m_NodeTreeModel;
   ///
   /// \brief The openCherry selection provider
   ///
@@ -118,11 +140,31 @@ protected:
   ///
   /// \brief The Table view to show the selected nodes.
   ///
-  QTableView* m_NodeTableView;
+  QTreeView* m_NodeTreeView;
   ///
   /// \brief The context menu that shows up when right clicking on a node.
   ///
   QMenu* m_NodeMenu;
+
+  ///# Actions for the Context Menu
+  /// Global Reinit Action
+  QAction* m_GlobalReinitAction;
+  /// Save Action
+  QAction* m_SaveAction;
+  /// Remove Action
+  QAction* m_RemoveAction;
+  /// Reinit Action
+  QAction* m_ReinitAction;
+  /// A Slider widget to change the opacity of a node
+  QSlider* m_OpacitySlider;
+  /// Opacity action
+  QWidgetAction* m_OpacityAction;
+  /// Special filter action for images
+  QAction* m_OtsuFilterAction;
+  /// A selection listener for datatreenode events
+  cherry::ISelectionListener::Pointer m_SelectionListener;
+  /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
+  friend struct cherry::SelectionChangedAdapter<QmitkDataManagerView>;
 
 };
 

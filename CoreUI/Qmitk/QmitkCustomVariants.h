@@ -22,5 +22,6 @@
 #include <mitkDataTreeNode.h>
 
 Q_DECLARE_METATYPE(mitk::DataTreeNode::Pointer)
+Q_DECLARE_METATYPE(mitk::DataTreeNode*)
 
 #endif /* QMITKCUSTOMVARIANTS_H_ */

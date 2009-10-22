@@ -84,16 +84,26 @@ void mitk::DataTreeNode::SetInteractor(mitk::Interactor* interactor)
   m_Interactor->SetDataTreeNode(this);
 }
 
-mitk::DataTreeNode::DataTreeNode() : m_Data(NULL)
+mitk::DataTreeNode::DataTreeNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
 
   m_PropertyList = PropertyList::New();
+
+  // subscribe for modified event
+  itk::MemberCommand<mitk::DataTreeNode>::Pointer _PropertyListModifiedCommand =
+    itk::MemberCommand<mitk::DataTreeNode>::New();
+  _PropertyListModifiedCommand->SetCallbackFunction(this, &mitk::DataTreeNode::PropertyListModified);
+  m_PropertyListModifiedObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), _PropertyListModifiedCommand);
 }
 
 
 mitk::DataTreeNode::~DataTreeNode()
 {
+  if(m_PropertyList.IsNotNull())
+    // remove modified event listener
+    m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
+
   Interactor* interactor = this->GetInteractor();
 
   if ( interactor )
@@ -533,6 +543,10 @@ bool mitk::DataTreeNode::IsInteractorEnabled() const
   return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
 }
 
+void mitk::DataTreeNode::PropertyListModified( const itk::Object *caller, const itk::EventObject &event )
+{
+  Modified();
+}
 
 #ifndef _MSC_VER
 template <typename T>

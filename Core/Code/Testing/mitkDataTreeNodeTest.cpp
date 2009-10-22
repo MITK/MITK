@@ -461,7 +461,10 @@ static void TestGetMTime(mitk::DataTreeNode::Pointer dataTreeNode)
   //less or equal because dataTreeNode timestamp is little later then the basedata timestamp
   MITK_TEST_CONDITION( pointSet->GetMTime() <= dataTreeNode->GetMTime(), "Testing if the node timestamp is updated after base data was modified" )
 
-
+  // testing if changing anything in the property list also sets the node in a modified state
+  unsigned long lastModified = dataTreeNode->GetMTime();
+  dataTreeNode->SetIntProperty("testIntProp", 2344);
+  MITK_TEST_CONDITION( lastModified <= dataTreeNode->GetMTime(), "Testing if the node timestamp is updated after property list was modified" )
 
 }
 }; //mitkDataTreeNodeTestClass

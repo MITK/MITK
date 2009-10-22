@@ -474,6 +474,10 @@ protected:
 
   virtual ~DataTreeNode();
 
+  //##
+  //## Invoked when the property list was modified. Calls Modified() of the DataTreeNode
+  virtual void PropertyListModified(const itk::Object *caller, const itk::EventObject &event);
+
   //##Documentation
   //## @brief Mapper-slots
   mutable MapperVector m_Mappers;
@@ -501,6 +505,8 @@ protected:
   //##Documentation
   //## @brief Timestamp of the last change of m_Data
   itk::TimeStamp m_DataReferenceChangedTime;
+
+  unsigned long m_PropertyListModifiedObserverTag;
 };
 
 

@@ -10,6 +10,7 @@
 //# Toolkit includes
 #include <itkCommand.h>
 #include <QIcon>
+#include "qmitknodedescriptormanager.h"
 
 //#CTORS/DTOR
 QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage
@@ -139,46 +140,20 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
     }
     else if (index.column() == 1)
     {
-      // Get DataType
-      mitk::BaseData* mitkData = node->GetData();
-      std::string className;
-      if(mitkData)
-      {
-        className = node->GetData()->GetNameOfClass();
-        bool isSegmentation = false;
-        node->GetBoolProperty("segmentation", isSegmentation);
-        // if we have a binary image, call it image mask
-        if(className == "Image" && isSegmentation)
-          className = "Image Mask";
-      }
-      else
-        className = "unknown";
+
+      QmitkNodeDescriptor* nodeDescriptor 
+        = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(node);
 
       // get type property of mitk::BaseData
       if (role == Qt::DisplayRole)
       {
 
-        data = QString::fromStdString(className);
+        data = nodeDescriptor->GetClassName();
       }
       // show some nice icons for datatype
       else if(role == Qt::DecorationRole)
       {
-        if(className == "Image")
-          data = QIcon(":/datamanager/data-type-image-24.png");
-        else if(className == "Image Mask")
-          data = QIcon(":/datamanager/data-type-image-mask-24.png");
-        else if(className == "Surface")
-          data = QIcon(":/datamanager/data-type-mesh-24.png");
-        else if(className == "PointSet")
-          data = QIcon(":/datamanager/data-type-pointset-24.png");
-        else if(className == "Geometry2DData" && nodeName == "widget1Plane")
-          data = QIcon(":/datamanager/data-type-planegeometry1-24.png");
-        else if(className == "Geometry2DData" && nodeName == "widget2Plane")
-          data = QIcon(":/datamanager/data-type-planegeometry2-24.png");
-        else if(className == "Geometry2DData" && nodeName == "widget3Plane")
-          data = QIcon(":/datamanager/data-type-planegeometry3-24.png");
-        else
-          data = QIcon(":/datamanager/data-type-unknown-24.png");
+        data = nodeDescriptor->GetIcon();
       }
     }
     else if (index.column() == 2)

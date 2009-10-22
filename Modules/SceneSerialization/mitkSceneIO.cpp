@@ -133,11 +133,11 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  LOG_INFO << "Reading " << m_WorkingDirectory << "/index.xml" << std::endl;
-  TiXmlDocument document( m_WorkingDirectory + "/index.xml" );
+  LOG_INFO << "Reading " << m_WorkingDirectory << Poco::Path::separator() + "index.xml" << std::endl;
+  TiXmlDocument document( m_WorkingDirectory + Poco::Path::separator() + "index.xml" );
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    LOG_ERROR << "Could not open/read/parse " << m_WorkingDirectory << Poco::Path::separator() + "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return NULL;
   }
       
@@ -358,9 +358,9 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
   } // end if sceneNodes
 
-  if ( !document.SaveFile( m_WorkingDirectory + "/index.xml" ) )
+  if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
   {
-    LOG_ERROR << "Could not write scene to " << filename << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    LOG_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
     return false;
   }
   else
@@ -506,4 +506,3 @@ void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zi
 {
   LOG_INFO << "Unzipped ok: " << info.second.toString();
 }
-

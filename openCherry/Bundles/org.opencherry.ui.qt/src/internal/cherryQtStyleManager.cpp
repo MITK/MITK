@@ -67,6 +67,16 @@ void QtStyleManager::ReadPreferences()
   {
     AddStyles(it.next());
   }
+
+  QString styleName = QString::fromStdString(stylePref->Get(QtPreferences::QT_STYLE_NAME, ""));
+  // if a style is contributed via the Qt resource mechanism, it may not be
+  // registered yet.
+  if (Contains(styleName))
+    // do not update the style in the QApplication instance,
+    // since it might not be created yet
+    SetStyle(styleName, false);
+  else
+    SetDefaultStyle(false);
 }
 
 QtStyleManager::~QtStyleManager()
@@ -246,6 +256,11 @@ void QtStyleManager::GetStyles(StyleList& styleNames) const
 
 void QtStyleManager::SetStyle(const QString& fileName)
 {
+  SetStyle(fileName, true);
+}
+
+void QtStyleManager::SetStyle(const QString& fileName, bool update)
+{
   if (fileName.isEmpty())
   {
     SetDefaultStyle();
@@ -267,8 +282,12 @@ void QtStyleManager::SetStyle(const QString& fileName)
   currentStyle = style;
 
   ReadStyleData(style);
-  qApp->setStyleSheet(currentStyle->stylesheet);
-  PlatformUI::GetWorkbench()->UpdateTheme();
+
+  if (update)
+  {
+    qApp->setStyleSheet(currentStyle->stylesheet);
+    PlatformUI::GetWorkbench()->UpdateTheme();
+  }
 }
 
 QtStyleManager::Style QtStyleManager::GetDefaultStyle() const
@@ -278,7 +297,12 @@ QtStyleManager::Style QtStyleManager::GetDefaultStyle() const
 
 void QtStyleManager::SetDefaultStyle()
 {
-  SetStyle(defaultStyle->fileName);
+  SetDefaultStyle(true);
+}
+
+void QtStyleManager::SetDefaultStyle(bool update)
+{
+  SetStyle(defaultStyle->fileName, update);
 }
 
 bool QtStyleManager::Contains(const QString& fileName) const

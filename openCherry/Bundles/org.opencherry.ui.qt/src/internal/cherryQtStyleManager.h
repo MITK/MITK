@@ -60,6 +60,9 @@ private:
   void ClearStyles();
   void ReadPreferences();
 
+  void SetStyle(const QString& fileName, bool update);
+  void SetDefaultStyle(bool update);
+
   struct ExtStyle : public Style
   {
     QString stylesheet;

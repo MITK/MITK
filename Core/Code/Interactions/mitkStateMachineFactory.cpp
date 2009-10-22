@@ -150,10 +150,10 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
   //nextStatesSet is empty, so deadlock!
   if ( nextStatesSet.empty() )
   {
-    //StatusBar::GetInstance()->DisplayText("Warnung: Ein inkonsistenter Zustand (oder ein Endzustand) wird erzeugt!");    
+    LOG_INFO<<std::endl<<"Warning! An inconsistent state or a dead end was produced. Check pattern "<< m_AktStateMachineName<<". Continuing anyway."<<std::endl;
     return true;//but it is allowed as an end-state
   }
-  bool ok = false;
+  bool ok = true;
   //go through all Transitions of thisState and look if we have allready been in this state
   for (std::set<int>::iterator i = nextStatesSet.begin(); i != nextStatesSet.end();  i++)
   {
@@ -162,8 +162,7 @@ bool mitk::StateMachineFactory::RParse(mitk::State::StateMap* states, mitk::Stat
       mitk::State::StateMapIter nextState = states->find(*i);//search the iterator for our nextState
       if (nextState == states->end())
       {
-        LOG_INFO<<std::endl<<"Didn't find a state in StateMap! Check your statemachine behavior file!"<<std::endl;
-        //you don't really see the warning in output! itkWarningMacro not possible due to this pointer!
+        LOG_INFO<<std::endl<<"Didn't find a state in StateMap! Check pattern "<< m_AktStateMachineName<<"!"<<std::endl;
         ok = false;
       }
       else
@@ -193,7 +192,8 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     else //ether !ok or sizeA!=sizeB
     {
       delete history;
-      //mitk::StatusBar::GetInstance()->DisplayText("Warning: An unreachable state was produced! Please check the StateMachinePattern-File.");    
+      LOG_INFO<<std::endl;
+      LOG_INFO<<"Warning: An unreachable state was produced! Please check pattern "<< m_AktStateMachineName<<" inside StateMachinePattern-File. Continuing anyway!"<<std::endl;
       //return false;//better go on and build/ connect the states than quit
     }
   }
@@ -204,7 +204,8 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
     bool tempbool = ( ( tempState->second )->ConnectTransitions( states ) );
     if ( tempbool == false )
     {
-      //mitk::StatusBar::GetInstance()->DisplayText("Warning: The connection of the states was not successful!");    
+      LOG_INFO<<std::endl;
+      LOG_INFO<<"Warning: Connection of states was not successful in pattern "<< m_AktStateMachineName<<"!"<<std::endl;
       return false;//abort!
     }
   }
@@ -238,7 +239,7 @@ void  mitk::StateMachineFactory::StartElement (const char* elementName, const ch
     if ( ok.second == false ) 
     { 
       LOG_INFO<<std::endl;
-      LOG_INFO<<"Warning from StateMachineFactory: STATE_ID was not unique or something else didn't work in insert!"<<std::endl;
+      LOG_INFO<<"Warning from StateMachineFactory: STATE_ID was not unique in pattern "<< m_AktStateMachineName<<"!"<<std::endl;
       return; //STATE_ID was not unique or something else didn't work in insert! EXITS the process
     }
     if ( ReadXMLBooleanAttribut( START_STATE, atts ) )

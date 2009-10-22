@@ -385,7 +385,8 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="drag">
+<!--  obsolete state machine pattern to be removed in future releases
+ <stateMachine NAME="drag">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="232" Y_POS="131" WIDTH="100" HEIGHT="50">
       <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="80" />
@@ -414,6 +415,7 @@
       </transition>
     </state>
   </stateMachine>
+-->
   <stateMachine NAME="dragWithCtrl">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="439" Y_POS="166" WIDTH="100" HEIGHT="50">
       <transition NAME="check picked" NEXT_STATE_ID="1" EVENT_ID="5">
@@ -422,10 +424,6 @@
       <transition NAME="continue" NEXT_STATE_ID="1" EVENT_ID="534">
         <action ID="90" />
       </transition>
-      <!--            <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="505">
-        <action ID="42" />
-      </transition>
--->
       <transition NAME="exit" NEXT_STATE_ID="1" EVENT_ID="537">
         <action ID="42" />
       </transition>
@@ -438,6 +436,7 @@
         </action>
       </transition>
     </state>
+<!-- not reached so removed!
     <state NAME="picked guard" ID="2" X_POS="141" Y_POS="427" WIDTH="100" HEIGHT="50">
       <transition NAME="yes" NEXT_STATE_ID="3" EVENT_ID="1004">
         <action ID="0" />
@@ -457,6 +456,7 @@
         <action ID="42" />
       </transition>
     </state>
+-->
   </stateMachine>
   <stateMachine NAME="focus">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="250" Y_POS="191" WIDTH="100" HEIGHT="50">
@@ -862,6 +862,54 @@
         </action>
       </transition>
     </state>
+  </stateMachine>
+    <!-- state machine for vessel TREE interaction with multiple selection -->  
+    <stateMachine NAME="YetAnotherVesselTreeInteractorMultipleSelection">
+      <state NAME="no-vessel-picked" ID="0" START_STATE="TRUE" X_POS="282" Y_POS="146" WIDTH="100" HEIGHT="50">
+        <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="5">
+          <action ID="30">
+          <!--AcCHECKELEMENT-->
+          </action>
+        </transition>
+        <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="8">
+          <action ID="30">
+          <!--AcCHECKELEMENT-->
+          </action>
+        </transition>
+      </state>
+      <state NAME="CheckPicked-GuardState" ID="1" X_POS="91" Y_POS="347" WIDTH="100" HEIGHT="50">
+        <transition NAME="picked-vessel" NEXT_STATE_ID="2" EVENT_ID="1004">
+          <action ID="65">
+          <!--AcSELECT-->
+          </action>
+        </transition>
+        <transition NAME="no-vessel-picked" NEXT_STATE_ID="0" EVENT_ID="1003">
+          <action ID="75">
+          <!--AcDESELECT-->
+          </action>
+        </transition>
+      </state>
+      <state NAME="vessel-selected" ID="2" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+        <transition NAME="checkpicked" NEXT_STATE_ID="3" EVENT_ID="5">
+          <action ID="30">
+          <!--AcCHECKELEMENT-->
+          </action>
+        </transition>
+        <transition NAME="checkpicked" NEXT_STATE_ID="1" EVENT_ID="8">
+          <action ID="30">
+          <!--AcCHECKELEMENT-->
+          </action>
+        </transition>
+      </state>
+      <state NAME="guard-add-vessel2selection" ID="3" X_POS="419" Y_POS="340" WIDTH="100" HEIGHT="50">
+        <transition NAME="vessel-picked" NEXT_STATE_ID="2" EVENT_ID="1004">
+          <action ID="61">
+          <!--AcSELECTANOTHEROBJECT-->
+          </action>
+        </transition>
+        <transition NAME="no-vessel-picked" NEXT_STATE_ID="2" EVENT_ID="1003">
+        </transition>
+      </state>
   </stateMachine>
   <stateMachine NAME="AriadneAssistent">
     <!-- Behaviour of the AriadneAssistent -->

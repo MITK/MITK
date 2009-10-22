@@ -51,11 +51,11 @@ void QtPlatformLogModel::slotFlushLogEntries()
   m_Active=m_Pending; m_Pending=tmp;
   m_Mutex.unlock();
 
-  int num = m_Pending->size();
+  std::list<ExtendedLogMessage>::size_type num = m_Pending->size();
   
-  if(num>0)
+  if (num > 0)
   {
-    int row = m_Entries.size();
+    int row = static_cast<int>(m_Entries.size());
     this->beginInsertRows(QModelIndex(), row, row+num-1);
     do {
       m_Entries.push_back(m_Pending->front());
@@ -114,7 +114,7 @@ QtPlatformLogModel::~QtPlatformLogModel()
 int
 QtPlatformLogModel::rowCount(const QModelIndex&) const
 {
-  return m_Entries.size();
+  return static_cast<int>(m_Entries.size());
 }
 
 int

@@ -57,8 +57,8 @@ void QtSelectionListenerWrapper::AddListener(GuiTk::ISelectionListener::Pointer 
 int QtSelectionListenerWrapper::RemoveListener(GuiTk::ISelectionListener::Pointer listener)
 {
   selectionEvents.RemoveListener(listener);
-  return std::max<int>(selectionEvents.selected.GetListeners().size(),
-                  selectionEvents.defaultSelected.GetListeners().size());
+  return static_cast<int>(std::max<std::size_t>(selectionEvents.selected.GetListeners().size(),
+                  selectionEvents.defaultSelected.GetListeners().size()));
 }
 
 void QtSelectionListenerWrapper::QAbstractButtonClicked(bool /*checked*/)

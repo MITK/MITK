@@ -184,10 +184,9 @@ void mitk::ImageWriter::GenerateData()
       //if Extension not in Filename
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
-      picWriter->SetFileName( filename.str().c_str() );
+      m_FileName = filename.str().c_str();
     }
-    else
-      picWriter->SetFileName( m_FileName.c_str() );
+    picWriter->SetFileName( m_FileName.c_str() );
     picWriter->SetInput( input );
     picWriter->Write();
   }

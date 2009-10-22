@@ -6,11 +6,11 @@
 #include "mitkRenderingManager.h"
 #include "QmitkEnums.h"
 #include "QmitkCustomVariants.h"
+#include <QmitkNodeDescriptorManager.h>
 
 //# Toolkit includes
 #include <itkCommand.h>
 #include <QIcon>
-#include "qmitknodedescriptormanager.h"
 
 //#CTORS/DTOR
 QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage

@@ -4,6 +4,7 @@
 #include <mitkNodePredicateAND.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
+#include <QList>
 
 
 QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()

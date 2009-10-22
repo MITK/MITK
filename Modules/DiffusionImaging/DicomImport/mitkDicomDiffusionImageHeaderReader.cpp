@@ -16,12 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkDicomDiffusionVolumeHeaderReader.h"
+#include "mitkDicomDiffusionImageHeaderReader.h"
 
-#include "mitkGEDicomDiffusionVolumeHeaderReader.h"
-#include "mitkPhilipsDicomDiffusionVolumeHeaderReader.h"
-#include "mitkSiemensDicomDiffusionVolumeHeaderReader.h"
-#include "mitkSiemensMosaicDicomDiffusionVolumeHeaderReader.h"
+#include "mitkGEDicomDiffusionImageHeaderReader.h"
+#include "mitkPhilipsDicomDiffusionImageHeaderReader.h"
+#include "mitkSiemensDicomDiffusionImageHeaderReader.h"
+#include "mitkSiemensMosaicDicomDiffusionImageHeaderReader.h"
 
 void InsertUnique( std::vector<float> & vec, float value )
 {
@@ -46,18 +46,18 @@ void InsertUnique( std::vector<float> & vec, float value )
 
 }
 
-mitk::DicomDiffusionVolumeHeaderReader::DicomDiffusionVolumeHeaderReader()
+mitk::DicomDiffusionImageHeaderReader::DicomDiffusionImageHeaderReader()
 {
   m_SliceOrderIS = true;
   m_SingleSeries = true;
 }
 
-mitk::DicomDiffusionVolumeHeaderReader::~DicomDiffusionVolumeHeaderReader()
+mitk::DicomDiffusionImageHeaderReader::~DicomDiffusionImageHeaderReader()
 {
 }
 
-mitk::DicomDiffusionVolumeHeaderReader::SupportedVendors 
-mitk::DicomDiffusionVolumeHeaderReader::GetVendorID()
+mitk::DicomDiffusionImageHeaderReader::SupportedVendors 
+mitk::DicomDiffusionImageHeaderReader::GetVendorID()
 {
   // adapted from namic-sandbox
   // DicomToNrrdConverter.cxx
@@ -123,14 +123,14 @@ mitk::DicomDiffusionVolumeHeaderReader::GetVendorID()
 }
 
 // do the work
-void mitk::DicomDiffusionVolumeHeaderReader::Update()
+void mitk::DicomDiffusionImageHeaderReader::Update()
 {
 
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
 
-    m_Output = mitk::DiffusionVolumeHeaderInformation::New();
+    m_Output = mitk::DiffusionImageHeaderInformation::New();
     m_Output->m_DicomFilenames = m_DicomFilenames;
 
     // create correct reader
@@ -138,8 +138,8 @@ void mitk::DicomDiffusionVolumeHeaderReader::Update()
     {
     case(SV_GE):
       {
-        GEDicomDiffusionVolumeHeaderReader::Pointer reader
-          = GEDicomDiffusionVolumeHeaderReader::New();
+        GEDicomDiffusionImageHeaderReader::Pointer reader
+          = GEDicomDiffusionImageHeaderReader::New();
         reader->SetSeriesDicomFilenames(this->m_DicomFilenames);
         reader->SetGdcmIO(this->m_GdcmIO);
         reader->SetVolumeReader(this->m_VolumeReader);
@@ -150,8 +150,8 @@ void mitk::DicomDiffusionVolumeHeaderReader::Update()
       }
     case(SV_SIEMENS):
       {
-        SiemensDicomDiffusionVolumeHeaderReader::Pointer reader
-          = SiemensDicomDiffusionVolumeHeaderReader::New();
+        SiemensDicomDiffusionImageHeaderReader::Pointer reader
+          = SiemensDicomDiffusionImageHeaderReader::New();
         reader->SetSeriesDicomFilenames(this->m_DicomFilenames);
         reader->SetGdcmIO(this->m_GdcmIO);
         reader->SetVolumeReader(this->m_VolumeReader);
@@ -163,8 +163,8 @@ void mitk::DicomDiffusionVolumeHeaderReader::Update()
     case(SV_SIEMENS_MOSAIC):
       {
 
-        SiemensMosaicDicomDiffusionVolumeHeaderReader::Pointer reader
-          = SiemensMosaicDicomDiffusionVolumeHeaderReader::New();
+        SiemensMosaicDicomDiffusionImageHeaderReader::Pointer reader
+          = SiemensMosaicDicomDiffusionImageHeaderReader::New();
         reader->SetSeriesDicomFilenames(this->m_DicomFilenames);
         reader->SetGdcmIO(this->m_GdcmIO);
         reader->SetVolumeReader(this->m_VolumeReader);
@@ -176,8 +176,8 @@ void mitk::DicomDiffusionVolumeHeaderReader::Update()
     case(SV_PHILIPS):
       {
 
-        PhilipsDicomDiffusionVolumeHeaderReader::Pointer reader
-          = PhilipsDicomDiffusionVolumeHeaderReader::New();
+        PhilipsDicomDiffusionImageHeaderReader::Pointer reader
+          = PhilipsDicomDiffusionImageHeaderReader::New();
         reader->SetSeriesDicomFilenames(this->m_DicomFilenames);
         reader->SetGdcmIO(this->m_GdcmIO);
         reader->SetVolumeReader(this->m_VolumeReader);
@@ -196,13 +196,13 @@ void mitk::DicomDiffusionVolumeHeaderReader::Update()
 }
 
 // return output
-mitk::DiffusionVolumeHeaderInformation::Pointer 
-mitk::DicomDiffusionVolumeHeaderReader::GetOutput()
+mitk::DiffusionImageHeaderInformation::Pointer 
+mitk::DicomDiffusionImageHeaderReader::GetOutput()
 {
   return m_Output;
 }
 
-void mitk::DicomDiffusionVolumeHeaderReader::ReadPublicTags()
+void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags()
 {
   VolumeReaderType::DictionaryArrayRawPointer inputDict 
     = m_VolumeReader->GetMetaDataDictionaryArray();
@@ -311,7 +311,7 @@ void mitk::DicomDiffusionVolumeHeaderReader::ReadPublicTags()
 //  zRow, xCol,yCol, zCol, xSlice, ySlice, zSlice,bValues[0], DiffusionVectors[0], 
 //  vendor,SliceMosaic
 
-void mitk::DicomDiffusionVolumeHeaderReader::ReadPublicTags2()
+void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags2()
 {
 
   if (!m_SliceOrderIS)
@@ -334,7 +334,7 @@ void mitk::DicomDiffusionVolumeHeaderReader::ReadPublicTags2()
 
 }
 
-void mitk::DicomDiffusionVolumeHeaderReader::TransformGradients()
+void mitk::DicomDiffusionImageHeaderReader::TransformGradients()
 {
   // transform gradient directions into RAS frame 
     if ( !m_SliceOrderIS )

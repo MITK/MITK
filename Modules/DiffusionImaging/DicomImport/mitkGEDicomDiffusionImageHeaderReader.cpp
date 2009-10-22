@@ -16,11 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkGEDicomDiffusionVolumeHeaderReader.h"
+#include "mitkGEDicomDiffusionImageHeaderReader.h"
 
-#include "gdcm.h"
 #include "gdcmGlobal.h"
 
+#ifndef DGDCM2
+
+#include "gdcm.h"
 // relevant Siemens private tags
 // relevant GE private tags
 const gdcm::DictEntry GEDictBValue( 0x0043, 0x1039, "IS", "1", "B Value of diffusion weighting" );
@@ -28,16 +30,33 @@ const gdcm::DictEntry GEDictXGradient( 0x0019, 0x10bb, "DS", "1", "X component o
 const gdcm::DictEntry GEDictYGradient( 0x0019, 0x10bc, "DS", "1", "Y component of gradient direction" );
 const gdcm::DictEntry GEDictZGradient( 0x0019, 0x10bd, "DS", "1", "Z component of gradient direction" );
 
-mitk::GEDicomDiffusionVolumeHeaderReader::GEDicomDiffusionVolumeHeaderReader()
+#else
+
+#include "gdcmDict.h"
+#include "gdcmDicts.h"
+#include "gdcmDictEntry.h"
+#include "gdcmDictEntry.h"
+#include "gdcmDict.h"
+#include "gdcmFile.h"
+#include "gdcmSerieHelper.h"
+const gdcm::DictEntry GEDictBValue( "0043,1039", gdcm::VR::IS, gdcm::VM::VM1, "B Value of diffusion weighting" );
+const gdcm::DictEntry GEDictXGradient( "0019,10bb", gdcm::VR::DS, gdcm::VM::VM1 , "X component of gradient direction" );
+const gdcm::DictEntry GEDictYGradient( "0019,10bc", gdcm::VR::DS, gdcm::VM::VM1 , "Y component of gradient direction" );
+const gdcm::DictEntry GEDictZGradient( "0019,10bd", gdcm::VR::DS, gdcm::VM::VM1 , "Z component of gradient direction" );
+
+#endif
+
+
+mitk::GEDicomDiffusionImageHeaderReader::GEDicomDiffusionImageHeaderReader()
 {
 }
 
-mitk::GEDicomDiffusionVolumeHeaderReader::~GEDicomDiffusionVolumeHeaderReader()
+mitk::GEDicomDiffusionImageHeaderReader::~GEDicomDiffusionImageHeaderReader()
 {
 }
 
 // do the work
-void mitk::GEDicomDiffusionVolumeHeaderReader::Update()
+void mitk::GEDicomDiffusionImageHeaderReader::Update()
 {
 
   // check if there are filenames
@@ -49,6 +68,7 @@ void mitk::GEDicomDiffusionVolumeHeaderReader::Update()
     VolumeReaderType::DictionaryArrayRawPointer inputDict 
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
+#ifndef DGDCM2
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictBValue.GetKey()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictBValue);
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictXGradient.GetKey()) == 0)
@@ -57,6 +77,7 @@ void mitk::GEDicomDiffusionVolumeHeaderReader::Update()
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictYGradient);
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictZGradient.GetKey()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictZGradient);
+#endif
 
     ReadPublicTags();
 

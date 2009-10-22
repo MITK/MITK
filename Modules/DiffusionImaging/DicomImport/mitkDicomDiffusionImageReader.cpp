@@ -14,10 +14,10 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkDicomDiffusionVolumesReader_cpp
-#define __mitkDicomDiffusionVolumesReader_cpp
+#ifndef __mitkDicomDiffusionImageReader_cpp
+#define __mitkDicomDiffusionImageReader_cpp
 
-#include "mitkDicomDiffusionVolumesReader.h"
+#include "mitkDicomDiffusionImageReader.h"
 
 #include "itkImageSeriesReader.h"
 //#include "itkImageFileReader.h"
@@ -35,8 +35,8 @@ namespace mitk
 
 // Destructor
   //template <class TPixelType, int TDimension>
-  //DicomDiffusionVolumesReader<TPixelType, TDimension>
-  //  ::~DicomDiffusionVolumesReader()
+  //DicomDiffusionImageReader<TPixelType, TDimension>
+  //  ::~DicomDiffusionImageReader()
   //{
   //  //// Clear the eventual previous content of the MetaDictionary array
   //  //if( m_MetaDataDictionaryArray.size() )
@@ -52,7 +52,7 @@ namespace mitk
 
 
 template <class TPixelType, const int TDimension>
-void DicomDiffusionVolumesReader<TPixelType, TDimension>
+void DicomDiffusionImageReader<TPixelType, TDimension>
 ::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -60,7 +60,7 @@ void DicomDiffusionVolumesReader<TPixelType, TDimension>
 
 
 template <class TPixelType, const int TDimension>
-void DicomDiffusionVolumesReader<TPixelType, TDimension>
+void DicomDiffusionImageReader<TPixelType, TDimension>
 ::GenerateOutputInformation(void)
 {
   typename OutputImageType::Pointer output = this->GetOutput();
@@ -97,7 +97,7 @@ void DicomDiffusionVolumesReader<TPixelType, TDimension>
 
 template <class TPixelType, const int TDimension>
   void
-    DicomDiffusionVolumesReader<TPixelType, TDimension>
+    DicomDiffusionImageReader<TPixelType, TDimension>
     ::EnlargeOutputRequestedRegion(itk::DataObject *output)
   {
     typename OutputImageType::Pointer out = dynamic_cast<OutputImageType*>(output);
@@ -106,7 +106,7 @@ template <class TPixelType, const int TDimension>
 
 
 template <class TPixelType, const int TDimension>
-void DicomDiffusionVolumesReader<TPixelType, TDimension>
+void DicomDiffusionImageReader<TPixelType, TDimension>
 ::GenerateData()
 {
   typedef itk::ImageSeriesReader<InputImageType> ReaderType;

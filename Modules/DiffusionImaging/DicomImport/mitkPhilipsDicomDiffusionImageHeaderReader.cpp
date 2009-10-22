@@ -16,18 +16,18 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkPhilipsDicomDiffusionVolumeHeaderReader.h"
+#include "mitkPhilipsDicomDiffusionImageHeaderReader.h"
 
-mitk::PhilipsDicomDiffusionVolumeHeaderReader::PhilipsDicomDiffusionVolumeHeaderReader()
+mitk::PhilipsDicomDiffusionImageHeaderReader::PhilipsDicomDiffusionImageHeaderReader()
 {
 }
 
-mitk::PhilipsDicomDiffusionVolumeHeaderReader::~PhilipsDicomDiffusionVolumeHeaderReader()
+mitk::PhilipsDicomDiffusionImageHeaderReader::~PhilipsDicomDiffusionImageHeaderReader()
 {
 }
 
 // do the work
-void mitk::PhilipsDicomDiffusionVolumeHeaderReader::Update()
+void mitk::PhilipsDicomDiffusionImageHeaderReader::Update()
 {
 
   // check if there are filenames

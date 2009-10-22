@@ -14,12 +14,12 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkDicomDiffusionVolumesReader_h
-#define __mitkDicomDiffusionVolumesReader_h
+#ifndef __mitkDicomDiffusionImageReader_h
+#define __mitkDicomDiffusionImageReader_h
 
 #include "itkImageSource.h"
 #include "itkVectorImage.h"
-#include "mitkDiffusionVolumeHeaderInformation.h"
+#include "mitkDiffusionImageHeaderInformation.h"
 #include "itkDataObject.h"
 #include "mitkCommon.h"
 
@@ -38,7 +38,7 @@ namespace mitk
  */
 
 template <class TPixelType, const int TDimension>
-class DicomDiffusionVolumesReader : public itk::ImageSource< itk::VectorImage< TPixelType, TDimension > >
+class DicomDiffusionImageReader : public itk::ImageSource< itk::VectorImage< TPixelType, TDimension > >
 {
 public:
 
@@ -46,7 +46,7 @@ public:
   typedef itk::Image<TPixelType, TDimension >         InputImageType;
   typedef itk::ImageSource< OutputImageType > ImageSourceType;
   
-  mitkClassMacro( DicomDiffusionVolumesReader, ImageSourceType );
+  mitkClassMacro( DicomDiffusionImageReader, ImageSourceType );
   itkNewMacro(Self);
 
 
@@ -62,7 +62,7 @@ public:
   //typedef std::vector< DictionaryRawPointer >  DictionaryArrayType;
   //typedef const DictionaryArrayType *          DictionaryArrayRawPointer;
   
-  typedef  std::vector<DiffusionVolumeHeaderInformation::Pointer> HeaderContainer;
+  typedef  std::vector<DiffusionImageHeaderInformation::Pointer> HeaderContainer;
 
   /** Set the vector of strings that contains the file names. Files
    * are processed in sequential order. */
@@ -94,8 +94,8 @@ public:
   //DictionaryArrayRawPointer GetMetaDataDictionaryArray() const;
   
 protected:
-  //DicomDiffusionVolumesReader();
-  //~DicomDiffusionVolumesReader();
+  //DicomDiffusionImageReader();
+  //~DicomDiffusionImageReader();
 
   void PrintSelf(std::ostream& os, itk::Indent indent) const;
   
@@ -114,12 +114,12 @@ protected:
   //DictionaryArrayType m_MetaDataDictionaryArray;
 
 private:
-  //DicomDiffusionVolumesReader(const Self&); //purposely not implemented
+  //DicomDiffusionImageReader(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
 
 } //namespace MITK
 
-#include "mitkDicomDiffusionVolumesReader.cpp"
+#include "mitkDicomDiffusionImageReader.cpp"
 
-#endif // __mitkDicomDiffusionVolumesReader_h
+#endif // __mitkDicomDiffusionImageReader_h

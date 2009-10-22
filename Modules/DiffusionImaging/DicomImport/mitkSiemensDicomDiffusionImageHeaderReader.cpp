@@ -16,10 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkSiemensDicomDiffusionVolumeHeaderReader.h"
+#include "mitkSiemensDicomDiffusionImageHeaderReader.h"
+#include "gdcmGlobal.h"
+
+#ifndef DGDCM2
 
 #include "gdcm.h"
-#include "gdcmGlobal.h"
 
 // relevant Siemens private tags
 const gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );       
@@ -27,17 +29,24 @@ const gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", 
 const gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );       
 const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );       
 
-mitk::SiemensDicomDiffusionVolumeHeaderReader::SiemensDicomDiffusionVolumeHeaderReader()
+#else
+
+#include "gdcmFile.h"
+#include "gdcmImageReader.h"
+
+#endif
+
+mitk::SiemensDicomDiffusionImageHeaderReader::SiemensDicomDiffusionImageHeaderReader()
 {
 }
 
-mitk::SiemensDicomDiffusionVolumeHeaderReader::~SiemensDicomDiffusionVolumeHeaderReader()
+mitk::SiemensDicomDiffusionImageHeaderReader::~SiemensDicomDiffusionImageHeaderReader()
 {
 }
 
-int mitk::SiemensDicomDiffusionVolumeHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
+int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray, int startPos )
 {
-  unsigned int atPosition = tagString.find( nameString );
+  unsigned int atPosition = tagString.find( nameString, startPos );
   if ( atPosition == std::string::npos)
   {
     return 0;
@@ -66,8 +75,24 @@ int mitk::SiemensDicomDiffusionVolumeHeaderReader::ExtractSiemensDiffusionInform
   }
 }
 
+int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
+{
+  int nItems = 0; 
+  int pos = -1;
+  while(nItems != 3)
+  {
+    nItems = ExtractSiemensDiffusionInformation( tagString, nameString, valueArray, pos+1 );  
+    pos = tagString.find( nameString, pos+1 );
+    if ( pos == std::string::npos)
+    {
+      break;
+    }
+  }
+  return nItems;
+}
+
 // do the work
-void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
+void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 {
 
   // check if there are filenames
@@ -76,8 +101,10 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
     // adapted from slicer
     // DicomToNrrdConverter.cxx
 
-    VolumeReaderType::DictionaryArrayRawPointer inputDict 
-      = m_VolumeReader->GetMetaDataDictionaryArray();
+    VolumeReaderType::DictionaryArrayRawPointer 
+      inputDict = m_VolumeReader->GetMetaDataDictionaryArray();
+
+#ifndef DGDCM2
 
     //if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensMosiacParameters.GetKey()) == 0)
     //  gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensMosiacParameters);
@@ -91,6 +118,8 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetKey()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
+
+#endif
 
     ReadPublicTags();
 
@@ -137,8 +166,10 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
 
     for (int k = 0; k < m_nSlice; k += nStride )
     {
-
       gdcm::File *header0 = new gdcm::File;
+
+#ifndef DGDCM2
+
       gdcm::BinEntry* binEntry;
 
       header0->SetMaxSizeLoadEntry(65536);
@@ -166,13 +197,39 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
         docEntry = header0->GetNextEntry();
       }
 
+#else
+
+      gdcm::ImageReader reader;
+      reader.SetFileName( m_DicomFilenames[k].c_str() );
+      if( !reader.Read() )
+      {
+        itkExceptionMacro(<< "Cannot read requested file");
+      }
+      const gdcm::File &f = reader.GetFile();
+      const gdcm::DataSet &ds = f.GetDataSet();
+
+      //    gdcm::DataSet ds = header0->GetDataSet();
+      gdcm::DataSet::ConstIterator it = ds.Begin();
+
+      // Copy of the header->content
+      // copy information stored in 0029,1010 into a string for parsing
+      for(; it != ds.End(); ++it)
+      {
+        const gdcm::DataElement &ref = *it;
+        if (ref.GetTag() == gdcm::Tag(0x0029,0x1010)) {    
+          tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
+        }
+      }
+
+#endif
+
       // parse B_value from 0029,1010 tag
       std::vector<double> valueArray(0);
       vnl_vector_fixed<double, 3> vect3d;
       int nItems = ExtractSiemensDiffusionInformation(tag, "B_value", valueArray);
       if (nItems != 1 || valueArray[0] == 0)  // did not find enough information
       {
-        //std::cout << "Warning: Cannot find complete information on B_value in 0029|1010\n";
+        std::cout << "Warning: No B_value in " << m_DicomFilenames[0] << std::endl;
         this->m_Output->bValue = 0.0;
         vect3d.fill( 0.0 );
         this->m_Output->DiffusionVector = vect3d;  
@@ -181,14 +238,17 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
       else 
       {
         this->m_Output->bValue = valueArray[0];
+        std::cout << "BV: " << this->m_Output->bValue;
       }
 
       // parse DiffusionGradientDirection from 0029,1010 tag
       valueArray.resize(0);
-      nItems = ExtractSiemensDiffusionInformation(tag, "DiffusionGradientDirection", valueArray);
+      nItems = ExtractSiemensDiffusionGradientInformation(tag, "DiffusionGradientDirection", valueArray);
       if (nItems != 3)  // did not find enough information
       {
         //std::cout << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
+        std::cout << "Warning: No gradient direction in " << m_DicomFilenames[0] << std::endl;
+
         vect3d.fill( 0 );
         this->m_Output->DiffusionVector = vect3d;
       }
@@ -199,10 +259,10 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
         vect3d[2] = valueArray[2];
         vect3d.normalize();
         this->m_Output->DiffusionVector = vect3d;
-        std::cout << "BV: " << this->m_Output->bValue << " GD: " << this->m_Output->DiffusionVector;
+        std::cout << " GD: " << this->m_Output->DiffusionVector;
       }
     }
-    
+
     TransformGradients();
 
   }
@@ -216,7 +276,7 @@ void mitk::SiemensDicomDiffusionVolumeHeaderReader::Update()
 
 //
 //// do the work
-//void DicomDiffusionVolumeHeaderReader::Update()
+//void DicomDiffusionImageHeaderReader::Update()
 //{
 //
 //  // check if there are filenames

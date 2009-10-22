@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef __mitkDicomDiffusionVolumeHeaderReader_h__
-#define __mitkDicomDiffusionVolumeHeaderReader_h__
+#ifndef __mitkDicomDiffusionImageHeaderReader_h__
+#define __mitkDicomDiffusionImageHeaderReader_h__
 
 #include "MitkDiffusionImagingExports.h"
 
@@ -26,16 +26,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageFileReader.h"
 #include "itkOrientedImage.h"
 #include "itkGDCMImageIO.h"
-#include "mitkDiffusionVolumeHeaderInformation.h"
+#include "mitkDiffusionImageHeaderInformation.h"
 
 namespace mitk
 {
 
-  class MitkDiffusionImaging_EXPORT DicomDiffusionVolumeHeaderReader : public itk::Object
+  class MitkDiffusionImaging_EXPORT DicomDiffusionImageHeaderReader : public itk::Object
   {
   public:
 
-    mitkClassMacro( DicomDiffusionVolumeHeaderReader, itk::Object );
+    mitkClassMacro( DicomDiffusionImageHeaderReader, itk::Object );
     itkNewMacro(Self);
 
     enum SupportedVendors{ 
@@ -65,14 +65,14 @@ namespace mitk
     void SetVolumeReader(VolumeReaderType::Pointer volumeReader)
     { this->m_VolumeReader = volumeReader; }
 
-    void SetOutputPointer(DiffusionVolumeHeaderInformation::Pointer output)
+    void SetOutputPointer(DiffusionImageHeaderInformation::Pointer output)
     { this->m_Output = output; }
 
     // do the work
     virtual void Update();
 
     // return output
-    DiffusionVolumeHeaderInformation::Pointer GetOutput();
+    DiffusionImageHeaderInformation::Pointer GetOutput();
 
     // identify vendor
     SupportedVendors GetVendorID();
@@ -86,15 +86,15 @@ namespace mitk
 
   protected:
 
-    DicomDiffusionVolumeHeaderReader();
-    virtual ~DicomDiffusionVolumeHeaderReader();
+    DicomDiffusionImageHeaderReader();
+    virtual ~DicomDiffusionImageHeaderReader();
 
     void ReadPublicTags();
     void ReadPublicTags2();
     void TransformGradients();
 
     FileNamesContainer m_DicomFilenames;
-    DiffusionVolumeHeaderInformation::Pointer m_Output;
+    DiffusionImageHeaderInformation::Pointer m_Output;
 
     ImageIOType::Pointer m_GdcmIO;
     VolumeReaderType::Pointer m_VolumeReader;

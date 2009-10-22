@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkSiemensMosaicDicomDiffusionVolumeHeaderReader.h"
+#include "mitkSiemensMosaicDicomDiffusionImageHeaderReader.h"
 
 #include "gdcm.h"
 #include "gdcmGlobal.h"
@@ -29,15 +29,15 @@ const gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", 
 const gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );       
 const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );       
 
-mitk::SiemensMosaicDicomDiffusionVolumeHeaderReader::SiemensMosaicDicomDiffusionVolumeHeaderReader()
+mitk::SiemensMosaicDicomDiffusionImageHeaderReader::SiemensMosaicDicomDiffusionImageHeaderReader()
 {
 }
 
-mitk::SiemensMosaicDicomDiffusionVolumeHeaderReader::~SiemensMosaicDicomDiffusionVolumeHeaderReader()
+mitk::SiemensMosaicDicomDiffusionImageHeaderReader::~SiemensMosaicDicomDiffusionImageHeaderReader()
 {
 }
 
-int mitk::SiemensMosaicDicomDiffusionVolumeHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
+int mitk::SiemensMosaicDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
 {
   int atPosition = tagString.find( nameString );
   if ( atPosition == std::string::npos)
@@ -69,7 +69,7 @@ int mitk::SiemensMosaicDicomDiffusionVolumeHeaderReader::ExtractSiemensDiffusion
 }
 
 // do the work
-void mitk::SiemensMosaicDicomDiffusionVolumeHeaderReader::Update()
+void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
 {
 
   // check if there are filenames

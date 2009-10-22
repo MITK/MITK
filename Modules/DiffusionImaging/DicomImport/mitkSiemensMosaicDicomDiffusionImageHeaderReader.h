@@ -16,18 +16,18 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef __mitkSiemensDicomDiffusionVolumeHeaderReader_h__
-#define __mitkSiemensDicomDiffusionVolumeHeaderReader_h_
+#ifndef __mitkSiemensMosaicDicomDiffusionImageHeaderReader_h__
+#define __mitkSiemensMosaicDicomDiffusionImageHeaderReader_h__
 
-#include "mitkDicomDiffusionVolumeHeaderReader.h"
+#include "mitkDicomDiffusionImageHeaderReader.h"
 
 namespace mitk
 {
-  class SiemensDicomDiffusionVolumeHeaderReader : public DicomDiffusionVolumeHeaderReader 
+  class SiemensMosaicDicomDiffusionImageHeaderReader : public DicomDiffusionImageHeaderReader 
   {
   public:
 
-    mitkClassMacro( SiemensDicomDiffusionVolumeHeaderReader, DicomDiffusionVolumeHeaderReader );
+    mitkClassMacro( SiemensMosaicDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
     itkNewMacro(Self);
 
     int ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray );
@@ -36,8 +36,8 @@ namespace mitk
 
   protected:
 
-    SiemensDicomDiffusionVolumeHeaderReader();
-    virtual ~SiemensDicomDiffusionVolumeHeaderReader();
+    SiemensMosaicDicomDiffusionImageHeaderReader();
+    virtual ~SiemensMosaicDicomDiffusionImageHeaderReader();
 
   };
 

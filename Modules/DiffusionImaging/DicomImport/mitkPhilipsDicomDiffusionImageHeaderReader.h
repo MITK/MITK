@@ -16,26 +16,26 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef __mitkPhilipsDicomDiffusionVolumeHeaderReader_h__
-#define __mitkPhilipsDicomDiffusionVolumeHeaderReader_h__
+#ifndef __mitkPhilipsDicomDiffusionImageHeaderReader_h__
+#define __mitkPhilipsDicomDiffusionImageHeaderReader_h__
 
-#include "mitkDicomDiffusionVolumeHeaderReader.h"
+#include "mitkDicomDiffusionImageHeaderReader.h"
 
 namespace mitk
 {
-  class PhilipsDicomDiffusionVolumeHeaderReader : public DicomDiffusionVolumeHeaderReader 
+  class PhilipsDicomDiffusionImageHeaderReader : public DicomDiffusionImageHeaderReader 
   {
   public:
 
-    mitkClassMacro( PhilipsDicomDiffusionVolumeHeaderReader, DicomDiffusionVolumeHeaderReader );
+    mitkClassMacro( PhilipsDicomDiffusionImageHeaderReader, DicomDiffusionImageHeaderReader );
     itkNewMacro(Self);
 
     virtual void Update();
 
   protected:
 
-    PhilipsDicomDiffusionVolumeHeaderReader();
-    virtual ~PhilipsDicomDiffusionVolumeHeaderReader();
+    PhilipsDicomDiffusionImageHeaderReader();
+    virtual ~PhilipsDicomDiffusionImageHeaderReader();
 
   };
 

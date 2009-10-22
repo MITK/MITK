@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkDiffusionImagingExports.h"
 
 #include "mitkBaseProcess.h"
-#include "mitkDiffusionVolumeHeaderInformation.h"
+#include "mitkDiffusionImageHeaderInformation.h"
 
 namespace mitk
 {
@@ -38,7 +38,7 @@ namespace mitk
 
     itkNewMacro( Self );
 
-    typedef mitk::DiffusionVolumeHeaderInformation HeaderType;
+    typedef mitk::DiffusionImageHeaderInformation HeaderType;
     typedef HeaderType::Pointer HeaderPointer;
     typedef std::vector<HeaderPointer> InputType;
 

@@ -125,7 +125,7 @@ mitk::QBallImage* mitk::NrrdQBallImageWriter::GetInput()
 std::vector<std::string> mitk::NrrdQBallImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".qball");
-  possibleFileExtensions.push_back(".hqball");
+  possibleFileExtensions.push_back(".qbi");
+  possibleFileExtensions.push_back(".hqbi");
   return possibleFileExtensions;
 }

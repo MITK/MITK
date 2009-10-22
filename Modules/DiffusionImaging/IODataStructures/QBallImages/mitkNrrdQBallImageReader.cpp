@@ -146,7 +146,7 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".hqball" || ext == ".qball")
+    if (ext == ".hqbi" || ext == ".qbi")
     {
       return true;
     }

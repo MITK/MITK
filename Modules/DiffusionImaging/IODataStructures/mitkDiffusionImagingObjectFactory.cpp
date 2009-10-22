@@ -21,10 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkDataTreeNode.h"
 
-#include "mitkNrrdDiffusionVolumesIOFactory.h"
-#include "mitkNrrdDiffusionVolumesWriterFactory.h"
-#include "mitkNrrdDiffusionVolumesWriter.h"
-#include "mitkDiffusionVolumes.h"
+#include "mitkNrrdDiffusionImageIOFactory.h"
+#include "mitkNrrdDiffusionImageWriterFactory.h"
+#include "mitkNrrdDiffusionImageWriter.h"
+#include "mitkDiffusionImage.h"
 
 #include "mitkNrrdQBallImageIOFactory.h"
 #include "mitkNrrdQBallImageWriterFactory.h"
@@ -38,18 +38,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCompositeMapper.h"
 
 typedef short DiffusionPixelType;
-typedef mitk::DiffusionVolumes<DiffusionPixelType> DiffusionVolumesShort;
+typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 
 mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
 :CoreObjectFactoryBase()
 {
   m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_ExternalFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
+  m_ExternalFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
   m_ExternalFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
   
   m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_SaveFileExtensions.append(";;Q-Ball Images (*.qball *.hqball)");
-  m_SaveFileExtensions.append(";;Q-Ball Images (*.dti *.hdti)");
+  m_SaveFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
+  m_SaveFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -57,15 +57,15 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     LOG_INFO << "DiffusionImagingObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
-    itk::ObjectFactoryBase::RegisterFactory( NrrdDiffusionVolumesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( NrrdDiffusionImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( NrrdQBallImageIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( NrrdTensorImageIOFactory::New() );
 
-    mitk::NrrdDiffusionVolumesWriterFactory::RegisterOneFactory();
+    mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
     
-    //m_FileWriters.push_back( NrrdDiffusionVolumesWriter<DiffusionPixelType>::New().GetPointer() );
+    //m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     //m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     //m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
 
@@ -93,7 +93,7 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
   /*
   if ( className == "" )
     return NULL;
-    CREATE_ITK( DiffusionVolumesShort, "DiffusionVolumes" )
+    CREATE_ITK( DiffusionImageShort, "DiffusionImage" )
     CREATE_ITK( QBallImage, "QBallImage" )
 //  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
   else

@@ -424,7 +424,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   }
   if (thingsThatCanSerializeThis.size() > 1)
   {
-    LOG_ERROR << "Multiple serializers found for " << data->GetNameOfClass() << "Using arbitrary first one.";
+    LOG_INFO << "Multiple serializers found for " << data->GetNameOfClass() << "Using arbitrary first one.";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();

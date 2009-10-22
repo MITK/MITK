@@ -92,8 +92,11 @@ SET(CPP_FILES
   DataManagement/mitkMesh.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
+  DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarCircle.cpp
   DataManagement/mitkPlanarFigure.cpp
+  DataManagement/mitkPlanarLine.cpp
+  DataManagement/mitkPlanarPolygon.cpp
   DataManagement/mitkPlane.cpp
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp

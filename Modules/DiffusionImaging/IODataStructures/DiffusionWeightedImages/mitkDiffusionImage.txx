@@ -19,40 +19,40 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageRegionIterator.h"
 
 template<typename TPixelType>
-mitk::DiffusionVolumes<TPixelType>::DiffusionVolumes()
+mitk::DiffusionImage<TPixelType>::DiffusionImage()
 {
 }
 
 template<typename TPixelType>
-mitk::DiffusionVolumes<TPixelType>::~DiffusionVolumes()
+mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 {
 
 }
 
 template<typename TPixelType>
-bool mitk::DiffusionVolumes<TPixelType>::RequestedRegionIsOutsideOfTheBufferedRegion()
+bool mitk::DiffusionImage<TPixelType>::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
   return false;
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumes<TPixelType>::SetRequestedRegion(itk::DataObject * /*data*/)
+void mitk::DiffusionImage<TPixelType>::SetRequestedRegion(itk::DataObject * /*data*/)
 {
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumes<TPixelType>::SetRequestedRegionToLargestPossibleRegion()
+void mitk::DiffusionImage<TPixelType>::SetRequestedRegionToLargestPossibleRegion()
 {
 }
 
 template<typename TPixelType>
-bool mitk::DiffusionVolumes<TPixelType>::VerifyRequestedRegion()
+bool mitk::DiffusionImage<TPixelType>::VerifyRequestedRegion()
 {
   return true;
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumes<TPixelType>::DuplicateIfSingleSlice()
+void mitk::DiffusionImage<TPixelType>::DuplicateIfSingleSlice()
 {
   // new image
   typename ImageType::Pointer oldImage = m_Image;
@@ -90,10 +90,19 @@ void mitk::DiffusionVolumes<TPixelType>::DuplicateIfSingleSlice()
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumes<TPixelType>::AverageRedundantGradients()
+bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1, 
+                                                  GradientDirectionType g2, 
+                                                  double precision)
+{
+  GradientDirectionType diff = g1 - g2;
+  return diff.two_norm() < precision;
+}
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precision)
 {
 
-  // new direction container
+  // save old and construct new direction container
   GradientDirectionContainerType::Pointer oldDirections = m_Directions;
   m_Directions = GradientDirectionContainerType::New();
 
@@ -106,7 +115,7 @@ void mitk::DiffusionVolumes<TPixelType>::AverageRedundantGradients()
     for(GradientDirectionContainerType::ConstIterator gdcitNew = m_Directions->Begin();
       gdcitNew != m_Directions->End(); ++gdcitNew)
     {
-      if(gdcitNew.Value() == gdcitOld.Value())
+      if(AreAlike(gdcitNew.Value(), gdcitOld.Value(), precision))
       {
         found = true;
         break;
@@ -154,7 +163,7 @@ void mitk::DiffusionVolumes<TPixelType>::AverageRedundantGradients()
     for(GradientDirectionContainerType::ConstIterator gdcitOld = oldDirections->Begin();
       gdcitOld != oldDirections->End(); ++gdcitOld)
     {
-      if(gdcitNew.Value() == gdcitOld.Value())
+      if(AreAlike(gdcitNew.Value(), gdcitOld.Value(), precision))
       {
         dirIndices[gdcitNew.Index()].push_back(gdcitOld.Index());
       }

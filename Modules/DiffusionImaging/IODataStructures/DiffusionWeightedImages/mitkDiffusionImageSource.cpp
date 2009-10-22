@@ -18,72 +18,72 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
 #define __MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__
 
-#include "mitkDiffusionVolumesSource.h"
-#include "mitkDiffusionVolumes.h"
+#include "mitkDiffusionImageSource.h"
+#include "mitkDiffusionImage.h"
 
 template<typename TPixelType>
-mitk::DiffusionVolumesSource<TPixelType>::DiffusionVolumesSource()
+mitk::DiffusionImageSource<TPixelType>::DiffusionImageSource()
 {
   // Create the output. We use static_cast<> here because we know the default
-  // output must be of type DiffusionVolumes
-  typename mitk::DiffusionVolumes<TPixelType>::Pointer output
-    = static_cast<typename mitk::DiffusionVolumes<TPixelType>*>(this->MakeOutput(0).GetPointer());
+  // output must be of type DiffusionImage
+  typename mitk::DiffusionImage<TPixelType>::Pointer output
+    = static_cast<typename mitk::DiffusionImage<TPixelType>*>(this->MakeOutput(0).GetPointer());
 
   Superclass::SetNumberOfRequiredOutputs(1);
   Superclass::SetNthOutput(0, output.GetPointer());
 }
 
 template<typename TPixelType>
-mitk::DiffusionVolumesSource<TPixelType>::~DiffusionVolumesSource()
+mitk::DiffusionImageSource<TPixelType>::~DiffusionImageSource()
 {
 }
 
 
 template<typename TPixelType>
-itk::DataObject::Pointer mitk::DiffusionVolumesSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( unsigned int /*idx*/ )
 {
-  return static_cast<itk::DataObject*>(mitk::DiffusionVolumes<TPixelType>::New().GetPointer());
+  return static_cast<itk::DataObject*>(mitk::DiffusionImage<TPixelType>::New().GetPointer());
 }
 
 
 template<typename TPixelType>
-mitk::DiffusionVolumes<TPixelType>* mitk::DiffusionVolumesSource<TPixelType>::GetOutput()
+mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput()
 {
   if (this->GetNumberOfOutputs() < 1)
   {
     return 0;
   }
 
-  return static_cast<mitk::DiffusionVolumes<TPixelType>*>
+  return static_cast<mitk::DiffusionImage<TPixelType>*>
     (this->BaseProcess::GetOutput(0));
 }
 
 template<typename TPixelType>
-mitk::DiffusionVolumes<TPixelType>* mitk::DiffusionVolumesSource<TPixelType>::GetOutput(unsigned int idx)
+mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput(unsigned int idx)
 {
-  return static_cast<mitk::DiffusionVolumes<TPixelType>*>
+  return static_cast<mitk::DiffusionImage<TPixelType>*>
     (this->ProcessObject::GetOutput(idx));
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumesSource<TPixelType>::SetOutput(mitk::DiffusionVolumes<TPixelType>* output)
+void mitk::DiffusionImageSource<TPixelType>::SetOutput(mitk::DiffusionImage<TPixelType>* output)
 {
   itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
   BaseProcess::SetNthOutput(0, output);
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumesSource<TPixelType>::GraftOutput(mitk::DiffusionVolumes<TPixelType>* graft)
+void mitk::DiffusionImageSource<TPixelType>::GraftOutput(mitk::DiffusionImage<TPixelType>* graft)
 {
   this->GraftNthOutput(0, graft);
 }
 
 template<typename TPixelType>
-void mitk::DiffusionVolumesSource<TPixelType>::GraftNthOutput(unsigned int idx, mitk::DiffusionVolumes<TPixelType> *graft)
+void mitk::DiffusionImageSource<TPixelType>::GraftNthOutput(unsigned int idx, mitk::DiffusionImage<TPixelType> *graft)
 {
   if (idx < this->GetNumberOfOutputs())
   {
-    mitk::DiffusionVolumes<TPixelType> * output = this->GetOutput(idx);
+    mitk::DiffusionImage<TPixelType> * output = this->GetOutput(idx);
 
     if (output && graft)
     {

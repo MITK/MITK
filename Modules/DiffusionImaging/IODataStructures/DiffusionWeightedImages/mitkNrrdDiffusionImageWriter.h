@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
-#include <mitkDiffusionVolumes.h>
+#include <mitkDiffusionImage.h>
 
 
 namespace mitk
@@ -31,17 +31,17 @@ namespace mitk
  * @ingroup Process
  */
 template < class TPixelType >
-class NrrdDiffusionVolumesWriter : public mitk::FileWriterWithInformation
+class NrrdDiffusionImageWriter : public mitk::FileWriterWithInformation
 {
 public:
 
-    mitkClassMacro( NrrdDiffusionVolumesWriter, mitk::FileWriterWithInformation );
+    mitkClassMacro( NrrdDiffusionImageWriter, mitk::FileWriterWithInformation );
 
     mitkWriterMacro;
 
     itkNewMacro( Self );
     
-    typedef mitk::DiffusionVolumes<TPixelType> InputType;
+    typedef mitk::DiffusionImage<TPixelType> InputType;
     
     /**
      * Sets the filename of the file to write.
@@ -99,19 +99,19 @@ public:
     virtual const char * GetDefaultFilename() { return "DiffusionWeightedImages.dwi"; }
     virtual const char * GetFileDialogPattern() { return "Diffusion Weighted Images (*.dwi *.hdwi)"; }
     virtual const char * GetDefaultExtension() { return ".dwi"; }
-    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::DiffusionVolumes<TPixelType>*>(data.GetPointer()) != NULL); };  
+    virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer()) != NULL); };  
     virtual void DoWrite(BaseData::Pointer data) { 
       if (CanWriteDataType(data)) {
-        this->SetInput(dynamic_cast<mitk::DiffusionVolumes<TPixelType>*>(data.GetPointer())); 
+        this->SetInput(dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer())); 
         this->Update(); 
       }
     };
 
 protected:
         
-    NrrdDiffusionVolumesWriter();
+    NrrdDiffusionImageWriter();
 
-    virtual ~NrrdDiffusionVolumesWriter();
+    virtual ~NrrdDiffusionImageWriter();
 
     virtual void GenerateData();
     
@@ -128,6 +128,6 @@ protected:
 
 } // end of namespace mitk
 
-#include "mitkNrrdDiffusionVolumesWriter.cpp"
+#include "mitkNrrdDiffusionImageWriter.cpp"
 
 #endif

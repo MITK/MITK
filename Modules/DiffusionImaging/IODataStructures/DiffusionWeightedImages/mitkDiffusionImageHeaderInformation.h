@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef MITK_DiffusionVolumeHeaderInformation_H
-#define MITK_DiffusionVolumeHeaderInformation_H
+#ifndef MITK_DiffusionImageHeaderInformation_H
+#define MITK_DiffusionImageHeaderInformation_H
 
 #include <itkObject.h>
 #include "vnl/vnl_vector_fixed.h"
@@ -34,17 +34,17 @@ namespace mitk
     DHG_Other,
   };
 
-  class DiffusionVolumeHeaderInformation : public itk::Object
+  class DiffusionImageHeaderInformation : public itk::Object
   {
 
   public:
 
-    mitkClassMacro( DiffusionVolumeHeaderInformation, itk::Object );
+    mitkClassMacro( DiffusionImageHeaderInformation, itk::Object );
     itkNewMacro(Self);
 
     typedef std::vector< std::string > FileNamesContainer;
 
-    //DiffusionVolumeHeaderInformation(int nRows, int nCols, float xRes, float yRes, float xOrigin,
+    //DiffusionImageHeaderInformation(int nRows, int nCols, float xRes, float yRes, float xOrigin,
     //  float yOrigin, float zOrigin, float sliceThickness, float sliceSpacing,
     //  int nSliceInVolume, float xRow, float yRow, float zRow, float xCol,
     //  float yCol, float zCol, float xSlice, float ySlice, float zSlice,
@@ -88,7 +88,7 @@ namespace mitk
 
     FileNamesContainer m_DicomFilenames;
 
-    inline bool isIdentical(const DiffusionVolumeHeaderInformation::Pointer other) const {
+    inline bool isIdentical(const DiffusionImageHeaderInformation::Pointer other) const {
       return nRows == other->nRows &&
         nCols == other->nCols &&
         xRes == other->xRes &&
@@ -112,13 +112,13 @@ namespace mitk
 
   protected:
 
-    DiffusionVolumeHeaderInformation();
-    virtual ~DiffusionVolumeHeaderInformation();
+    DiffusionImageHeaderInformation();
+    virtual ~DiffusionImageHeaderInformation();
 
   };
 
 } // namespace
 
-#endif // MITK_DiffusionVolumeHeaderInformation_H
+#endif // MITK_DiffusionImageHeaderInformation_H
 
 

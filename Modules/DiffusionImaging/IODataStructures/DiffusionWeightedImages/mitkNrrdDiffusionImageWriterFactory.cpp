@@ -15,23 +15,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNrrdDiffusionVolumesWriterFactory.h"
+#include "mitkNrrdDiffusionImageWriterFactory.h"
 
 #include "itkCreateObjectFunction.h"
 #include "itkVersion.h"
 
-#include <mitkNrrdDiffusionVolumesWriter.h>
+#include <mitkNrrdDiffusionImageWriter.h>
 
 namespace mitk
 {
 
 template <class T>
-class CreateNrrdDiffusionVolumesWriter : public itk::CreateObjectFunctionBase
+class CreateNrrdDiffusionImageWriter : public itk::CreateObjectFunctionBase
 {
 public:
 
   /** Standard class typedefs. */
-  typedef CreateNrrdDiffusionVolumesWriter  Self;
+  typedef CreateNrrdDiffusionImageWriter  Self;
   typedef itk::SmartPointer<Self>    Pointer;
 
   /** Methods from itk:LightObject. */
@@ -42,36 +42,36 @@ public:
   }
 
 protected:
-  CreateNrrdDiffusionVolumesWriter() {}
-  ~CreateNrrdDiffusionVolumesWriter() {}
+  CreateNrrdDiffusionImageWriter() {}
+  ~CreateNrrdDiffusionImageWriter() {}
 
 private:
-  CreateNrrdDiffusionVolumesWriter(const Self&); //purposely not implemented
+  CreateNrrdDiffusionImageWriter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 };
 
-NrrdDiffusionVolumesWriterFactory::NrrdDiffusionVolumesWriterFactory()
+NrrdDiffusionImageWriterFactory::NrrdDiffusionImageWriterFactory()
 {
   typedef short DiffusionPixelType;
   this->RegisterOverride("IOWriter",
-                         "NrrdDiffusionVolumesWriter",
-                         "NrrdDiffusionVolumes Writer",
+                         "NrrdDiffusionImageWriter",
+                         "NrrdDiffusionImage Writer",
                          1,
-                         mitk::CreateNrrdDiffusionVolumesWriter< mitk::NrrdDiffusionVolumesWriter<DiffusionPixelType> >::New());
+                         mitk::CreateNrrdDiffusionImageWriter< mitk::NrrdDiffusionImageWriter<DiffusionPixelType> >::New());
 }
 
-NrrdDiffusionVolumesWriterFactory::~NrrdDiffusionVolumesWriterFactory()
+NrrdDiffusionImageWriterFactory::~NrrdDiffusionImageWriterFactory()
 {
 }
 
-const char* NrrdDiffusionVolumesWriterFactory::GetITKSourceVersion() const
+const char* NrrdDiffusionImageWriterFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;
 }
 
-const char* NrrdDiffusionVolumesWriterFactory::GetDescription() const
+const char* NrrdDiffusionImageWriterFactory::GetDescription() const
 {
-  return "NrrdDiffusionVolumesWriterFactory";
+  return "NrrdDiffusionImageWriterFactory";
 }
 
 } // end namespace mitk

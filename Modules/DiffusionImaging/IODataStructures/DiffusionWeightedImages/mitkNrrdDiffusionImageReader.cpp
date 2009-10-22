@@ -14,10 +14,10 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkNrrdDiffusionVolumesReader_cpp
-#define __mitkNrrdDiffusionVolumesReader_cpp
+#ifndef __mitkNrrdDiffusionImageReader_cpp
+#define __mitkNrrdDiffusionImageReader_cpp
 
-#include "mitkNrrdDiffusionVolumesReader.h"
+#include "mitkNrrdDiffusionImageReader.h"
 
 #include "itkImageFileReader.h"
 #include "itkMetaDataObject.h"
@@ -27,7 +27,7 @@ namespace mitk
 {
 
   template <class TPixelType>
-  void NrrdDiffusionVolumesReader<TPixelType>
+  void NrrdDiffusionImageReader<TPixelType>
     ::GenerateData()
   {
 
@@ -56,7 +56,7 @@ namespace mitk
   }
 
   template <class TPixelType>
-  void NrrdDiffusionVolumesReader<TPixelType>::GenerateOutputInformation()
+  void NrrdDiffusionImageReader<TPixelType>::GenerateOutputInformation()
   {
     typename OutputType::Pointer outputForCache = OutputType::New();
     if ( m_FileName == "") 
@@ -151,49 +151,49 @@ namespace mitk
 
 
   template <class TPixelType>
-  const char* NrrdDiffusionVolumesReader<TPixelType>
+  const char* NrrdDiffusionImageReader<TPixelType>
     ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
   template <class TPixelType>
-  void NrrdDiffusionVolumesReader<TPixelType>
+  void NrrdDiffusionImageReader<TPixelType>
     ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
   template <class TPixelType>
-  const char* NrrdDiffusionVolumesReader<TPixelType>
+  const char* NrrdDiffusionImageReader<TPixelType>
     ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
   template <class TPixelType>
-  void NrrdDiffusionVolumesReader<TPixelType>
+  void NrrdDiffusionImageReader<TPixelType>
     ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
   template <class TPixelType>
-  const char* NrrdDiffusionVolumesReader<TPixelType>
+  const char* NrrdDiffusionImageReader<TPixelType>
     ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
   template <class TPixelType>
-  void NrrdDiffusionVolumesReader<TPixelType>
+  void NrrdDiffusionImageReader<TPixelType>
     ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
   template <class TPixelType>
-  bool NrrdDiffusionVolumesReader<TPixelType>
+  bool NrrdDiffusionImageReader<TPixelType>
     ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
   {
     // First check the extension

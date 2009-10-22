@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef __mitkDiffusionVolumes__h
-#define __mitkDiffusionVolumes__h
+#ifndef __mitkDiffusionImage__h
+#define __mitkDiffusionImage__h
 
 #include "mitkBaseData.h"
 #include "itkVectorImage.h"
@@ -31,7 +31,7 @@ namespace mitk
   * yet supported by mitkImage)
   */
   template<class TPixelType>
-  class DiffusionVolumes : public BaseData
+  class DiffusionImage : public BaseData
   {
 
   public:
@@ -41,7 +41,7 @@ namespace mitk
     typedef itk::VectorContainer< unsigned int, 
       GradientDirectionType >                  GradientDirectionContainerType;
 
-    mitkClassMacro( DiffusionVolumes, BaseData );
+    mitkClassMacro( DiffusionImage, BaseData );
     itkNewMacro(Self);
 
     void SetRequestedRegionToLargestPossibleRegion();
@@ -49,7 +49,7 @@ namespace mitk
     virtual bool VerifyRequestedRegion();
     void SetRequestedRegion(itk::DataObject *data);
 
-    void AverageRedundantGradients();
+    void AverageRedundantGradients(double precision);
 
     void DuplicateIfSingleSlice();
 
@@ -66,9 +66,11 @@ namespace mitk
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 
+    bool AreAlike(GradientDirectionType g1, GradientDirectionType g2, double precision);
+
   protected:
-    DiffusionVolumes();
-    virtual ~DiffusionVolumes();
+    DiffusionImage();
+    virtual ~DiffusionImage();
 
     typename ImageType::Pointer m_Image;
 
@@ -80,6 +82,6 @@ namespace mitk
 
 } // namespace mitk
 
-#include "mitkDiffusionVolumes.txx"
+#include "mitkDiffusionImage.txx"
 
-#endif /* __mitkDiffusionVolumes__h */
+#endif /* __mitkDiffusionImage__h */

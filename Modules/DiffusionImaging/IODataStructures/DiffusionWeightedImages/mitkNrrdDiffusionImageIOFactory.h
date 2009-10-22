@@ -28,14 +28,14 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 //##Documentation
-//## @brief Create instances of NrrdDiffusionVolumesReader objects using an object factory.
+//## @brief Create instances of NrrdDiffusionImageReader objects using an object factory.
 //##
 //## @ingroup IO
-class MitkDiffusionImaging_EXPORT NrrdDiffusionVolumesIOFactory : public itk::ObjectFactoryBase
+class MitkDiffusionImaging_EXPORT NrrdDiffusionImageIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */
-  typedef NrrdDiffusionVolumesIOFactory   Self;
+  typedef NrrdDiffusionImageIOFactory   Self;
   typedef itk::ObjectFactoryBase  Superclass;
   typedef itk::SmartPointer<Self>  Pointer;
   typedef itk::SmartPointer<const Self>  ConstPointer;
@@ -46,23 +46,23 @@ public:
     
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
-  static NrrdDiffusionVolumesIOFactory* FactoryNew() { return new NrrdDiffusionVolumesIOFactory;}
+  static NrrdDiffusionImageIOFactory* FactoryNew() { return new NrrdDiffusionImageIOFactory;}
   /** Run-time type information (and related methods). */
-  itkTypeMacro(NrrdDiffusionVolumesIOFactory, ObjectFactoryBase);
+  itkTypeMacro(NrrdDiffusionImageIOFactory, ObjectFactoryBase);
 
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
   {
-    NrrdDiffusionVolumesIOFactory::Pointer NrrdDiffusionVolumesIOFactory = NrrdDiffusionVolumesIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(NrrdDiffusionVolumesIOFactory);
+    NrrdDiffusionImageIOFactory::Pointer NrrdDiffusionImageIOFactory = NrrdDiffusionImageIOFactory::New();
+    ObjectFactoryBase::RegisterFactory(NrrdDiffusionImageIOFactory);
   }
   
 protected:
-  NrrdDiffusionVolumesIOFactory();
-  ~NrrdDiffusionVolumesIOFactory();
+  NrrdDiffusionImageIOFactory();
+  ~NrrdDiffusionImageIOFactory();
 
 private:
-  NrrdDiffusionVolumesIOFactory(const Self&); //purposely not implemented
+  NrrdDiffusionImageIOFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };

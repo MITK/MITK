@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_DIFFUSION_VOLUMES_DATA_SOURCE_H_HEADER_
-#define _MITK_DIFFUSION_VOLUMES_DATA_SOURCE_H_HEADER_
+#ifndef _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
+#define _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 
 #include "mitkBaseProcess.h"
 #include "MitkDiffusionImagingExports.h"
@@ -25,31 +25,31 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   template<typename TPixelType>
-  class DiffusionVolumes;
-  /*class DiffusionVolumes<double>;
-  class DiffusionVolumes<int>;
-  class DiffusionVolumes<unsigned int>;
-  class DiffusionVolumes<short>;
-  class DiffusionVolumes<unsigned short>;
-  class DiffusionVolumes<char>;
-  class DiffusionVolumes<unsigned char>;
-  class DiffusionVolumes<long>;
-  class DiffusionVolumes<unsigned long>;*/
+  class DiffusionImage;
+  /*class DiffusionImage<double>;
+  class DiffusionImage<int>;
+  class DiffusionImage<unsigned int>;
+  class DiffusionImage<short>;
+  class DiffusionImage<unsigned short>;
+  class DiffusionImage<char>;
+  class DiffusionImage<unsigned char>;
+  class DiffusionImage<long>;
+  class DiffusionImage<unsigned long>;*/
 
 //##Documentation
 //## @brief Superclass of all classes generating diffusion volumes (instances 
-//## of class DiffusionVolumes) as output. 
+//## of class DiffusionImage) as output. 
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class MitkDiffusionImaging_EXPORT DiffusionVolumesSource : public BaseProcess
+class MitkDiffusionImaging_EXPORT DiffusionImageSource : public BaseProcess
 {
 public:
-  mitkClassMacro(DiffusionVolumesSource, BaseProcess);
+  mitkClassMacro(DiffusionImageSource, BaseProcess);
 
   itkNewMacro(Self);  
 
-  typedef DiffusionVolumes<TPixelType> OutputType;
+  typedef DiffusionImage<TPixelType> OutputType;
   typedef itk::DataObject::Pointer DataObjectPointer;
 
   virtual DataObjectPointer MakeOutput(unsigned int idx);
@@ -66,14 +66,14 @@ public:
   virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
-  DiffusionVolumesSource();
+  DiffusionImageSource();
 
-  virtual ~DiffusionVolumesSource();
+  virtual ~DiffusionImageSource();
 };
 
 } // namespace mitk
 
-#include "mitkDiffusionVolumesSource.cpp"
+#include "mitkDiffusionImageSource.cpp"
 
 
-#endif /* _MITK_DIFFUSION_VOLUMES_DATA_SOURCE_H_HEADER_ */
+#endif /* _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_ */

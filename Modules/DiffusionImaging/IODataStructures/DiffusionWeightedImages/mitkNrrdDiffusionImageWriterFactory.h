@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef NRRDDIFFVOLUMES_WRITERFACTORY_H_HEADER_INCLUDED
-#define NRRDDIFFVOLUMES_WRITERFACTORY_H_HEADER_INCLUDED
+#ifndef NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
+#define NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
@@ -25,11 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class MitkDiffusionImaging_EXPORT NrrdDiffusionVolumesWriterFactory : public itk::ObjectFactoryBase
+class MitkDiffusionImaging_EXPORT NrrdDiffusionImageWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
-  mitkClassMacro( mitk::NrrdDiffusionVolumesWriterFactory, itk::ObjectFactoryBase )
+  mitkClassMacro( mitk::NrrdDiffusionImageWriterFactory, itk::ObjectFactoryBase )
 
   /** Class methods used to interface with the registered factories. */
   virtual const char* GetITKSourceVersion(void) const;
@@ -44,25 +44,25 @@ public:
     static bool IsRegistered = false;
     if ( !IsRegistered )
     {
-      NrrdDiffusionVolumesWriterFactory::Pointer ugVtkWriterFactory = NrrdDiffusionVolumesWriterFactory::New();
+      NrrdDiffusionImageWriterFactory::Pointer ugVtkWriterFactory = NrrdDiffusionImageWriterFactory::New();
       ObjectFactoryBase::RegisterFactory( ugVtkWriterFactory );
       IsRegistered = true;
     }
   }
 
 protected:
-  NrrdDiffusionVolumesWriterFactory();
-  ~NrrdDiffusionVolumesWriterFactory();
+  NrrdDiffusionImageWriterFactory();
+  ~NrrdDiffusionImageWriterFactory();
 
 private:
-  NrrdDiffusionVolumesWriterFactory(const Self&); //purposely not implemented
+  NrrdDiffusionImageWriterFactory(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 };
 
 } // end namespace mitk
 
-#endif // NRRDDIFFVOLUMES_WRITERFACTORY_H_HEADER_INCLUDED
+#endif // NRRDDIFFIMAGE_WRITERFACTORY_H_HEADER_INCLUDED
 
 
 

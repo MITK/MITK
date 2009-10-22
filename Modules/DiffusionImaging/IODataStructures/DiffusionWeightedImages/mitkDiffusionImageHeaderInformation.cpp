@@ -15,14 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkDiffusionVolumeHeaderInformation.h"
+#include "mitkDiffusionImageHeaderInformation.h"
 
-mitk::DiffusionVolumeHeaderInformation::DiffusionVolumeHeaderInformation()
+mitk::DiffusionImageHeaderInformation::DiffusionImageHeaderInformation()
 {
 
 }
 
-mitk::DiffusionVolumeHeaderInformation::~DiffusionVolumeHeaderInformation()
+mitk::DiffusionImageHeaderInformation::~DiffusionImageHeaderInformation()
 {
 
 }

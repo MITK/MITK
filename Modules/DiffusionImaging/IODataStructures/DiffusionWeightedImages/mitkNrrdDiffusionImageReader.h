@@ -14,14 +14,14 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __mitkNrrdDiffusionVolumesReader_h
-#define __mitkNrrdDiffusionVolumesReader_h
+#ifndef __mitkNrrdDiffusionImageReader_h
+#define __mitkNrrdDiffusionImageReader_h
 
 #include "mitkCommon.h"
 #include "itkVectorContainer.h"
 #include "mitkFileReader.h"
 #include "vnl/vnl_vector_fixed.h"
-#include "mitkDiffusionVolumesSource.h"
+#include "mitkDiffusionImageSource.h"
 #include "itkVectorImage.h"
 
 namespace mitk
@@ -31,18 +31,18 @@ namespace mitk
   */
 
   template < class TPixelType >
-  class NrrdDiffusionVolumesReader : public mitk::DiffusionVolumesSource<TPixelType>, public FileReader
+  class NrrdDiffusionImageReader : public mitk::DiffusionImageSource<TPixelType>, public FileReader
   {
   public:
 
-    typedef mitk::DiffusionVolumes<TPixelType> OutputType;
+    typedef mitk::DiffusionImage<TPixelType> OutputType;
     typedef itk::VectorImage<TPixelType,3>     ImageType;
-    typedef DiffusionVolumesSource<TPixelType> DiffVolSourceType;
+    typedef DiffusionImageSource<TPixelType> DiffVolSourceType;
     typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, 
       GradientDirectionType >                  GradientDirectionContainerType;
 
-    mitkClassMacro( NrrdDiffusionVolumesReader, DiffVolSourceType );
+    mitkClassMacro( NrrdDiffusionImageReader, DiffVolSourceType );
     itkNewMacro(Self);
 
     const char* GetFileName() const;
@@ -76,6 +76,6 @@ namespace mitk
 
 } //namespace MITK
 
-#include "mitkNrrdDiffusionVolumesReader.cpp"
+#include "mitkNrrdDiffusionImageReader.cpp"
 
-#endif // __mitkNrrdDiffusionVolumesReader_h
+#endif // __mitkNrrdDiffusionImageReader_h

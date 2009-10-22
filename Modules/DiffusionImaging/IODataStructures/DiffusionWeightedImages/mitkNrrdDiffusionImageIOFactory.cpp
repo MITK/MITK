@@ -15,9 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNrrdDiffusionVolumesIOFactory.h"
+#include "mitkNrrdDiffusionImageIOFactory.h"
 #include "mitkIOAdapter.h"
-#include "mitkNrrdDiffusionVolumesReader.h"
+#include "mitkNrrdDiffusionImageReader.h"
 
 #include "itkVersion.h"
 
@@ -25,30 +25,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-NrrdDiffusionVolumesIOFactory::NrrdDiffusionVolumesIOFactory()
+NrrdDiffusionImageIOFactory::NrrdDiffusionImageIOFactory()
 {
   typedef short DiffusionPixelType;
   typedef itk::VectorImage< DiffusionPixelType, 3 >   DiffusionImageType;
-  typedef NrrdDiffusionVolumesReader<DiffusionPixelType> NrrdDiffVolReaderType;
+  typedef NrrdDiffusionImageReader<DiffusionPixelType> NrrdDiffVolReaderType;
   this->RegisterOverride("mitkIOAdapter",
-                         "mitkNrrdDiffusionVolumesReader",
-                         "mitk Diffusion Volumes IO",
+                         "mitkNrrdDiffusionImageReader",
+                         "mitk Diffusion Image IO",
                          1,
                          itk::CreateObjectFunction<IOAdapter<NrrdDiffVolReaderType> >::New());
 }
   
-NrrdDiffusionVolumesIOFactory::~NrrdDiffusionVolumesIOFactory()
+NrrdDiffusionImageIOFactory::~NrrdDiffusionImageIOFactory()
 {
 }
 
-const char* NrrdDiffusionVolumesIOFactory::GetITKSourceVersion() const
+const char* NrrdDiffusionImageIOFactory::GetITKSourceVersion() const
 {
   return ITK_SOURCE_VERSION;
 }
 
-const char* NrrdDiffusionVolumesIOFactory::GetDescription() const
+const char* NrrdDiffusionImageIOFactory::GetDescription() const
 {
-  return "NrrdDiffusionVolumes IO Factory, allows the loading of NRRD DWI data";
+  return "NrrdDiffusionImage IO Factory, allows the loading of NRRD DWI data";
 }
 
 } // end namespace mitk

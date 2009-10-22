@@ -15,34 +15,34 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef __mitkNrrdDiffusionVolumesWriter__cpp
-#define __mitkNrrdDiffusionVolumesWriter__cpp
+#ifndef __mitkNrrdDiffusionImageWriter__cpp
+#define __mitkNrrdDiffusionImageWriter__cpp
 
-#include "mitkNrrdDiffusionVolumesWriter.h"
+#include "mitkNrrdDiffusionImageWriter.h"
 #include "itkMetaDataDictionary.h"
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
 
 template<typename TPixelType>
-mitk::NrrdDiffusionVolumesWriter<TPixelType>::NrrdDiffusionVolumesWriter()
+mitk::NrrdDiffusionImageWriter<TPixelType>::NrrdDiffusionImageWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
 
 template<typename TPixelType>
-mitk::NrrdDiffusionVolumesWriter<TPixelType>::~NrrdDiffusionVolumesWriter()
+mitk::NrrdDiffusionImageWriter<TPixelType>::~NrrdDiffusionImageWriter()
 {}
 
 template<typename TPixelType>
-void mitk::NrrdDiffusionVolumesWriter<TPixelType>::GenerateData()
+void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
 {
     m_Success = false;
     InputType* input = this->GetInput();
     if (input == NULL)
     {
-        itkWarningMacro(<<"Sorry, input to NrrdDiffusionVolumesWriter is NULL!");    
+        itkWarningMacro(<<"Sorry, input to NrrdDiffusionImageWriter is NULL!");    
         return;
     }
     if ( m_FileName == "" )
@@ -110,13 +110,13 @@ void mitk::NrrdDiffusionVolumesWriter<TPixelType>::GenerateData()
 }
 
 template<typename TPixelType>
-void mitk::NrrdDiffusionVolumesWriter<TPixelType>::SetInput( InputType* diffVolumes )
+void mitk::NrrdDiffusionImageWriter<TPixelType>::SetInput( InputType* diffVolumes )
 {
     this->ProcessObject::SetNthInput( 0, diffVolumes );
 }
 
 template<typename TPixelType>
-mitk::DiffusionVolumes<TPixelType>* mitk::NrrdDiffusionVolumesWriter<TPixelType>::GetInput()
+mitk::DiffusionImage<TPixelType>* mitk::NrrdDiffusionImageWriter<TPixelType>::GetInput()
 {
     if ( this->GetNumberOfInputs() < 1 )
     {
@@ -129,7 +129,7 @@ mitk::DiffusionVolumes<TPixelType>* mitk::NrrdDiffusionVolumesWriter<TPixelType>
 }
 
 template<typename TPixelType>
-std::vector<std::string> mitk::NrrdDiffusionVolumesWriter<TPixelType>::GetPossibleFileExtensions()
+std::vector<std::string> mitk::NrrdDiffusionImageWriter<TPixelType>::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".dwi");
@@ -137,4 +137,4 @@ std::vector<std::string> mitk::NrrdDiffusionVolumesWriter<TPixelType>::GetPossib
   return possibleFileExtensions;
 }
 
-#endif //__mitkNrrdDiffusionVolumesWriter__cpp
+#endif //__mitkNrrdDiffusionImageWriter__cpp

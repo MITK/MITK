@@ -91,7 +91,7 @@ void mitk::EnumerationProperty::Clear()
 }
 
 
-unsigned int mitk::EnumerationProperty::Size() const
+mitk::EnumerationProperty::EnumIdsContainerType::size_type mitk::EnumerationProperty::Size() const
 {
   return GetEnumIds().size();
 }

@@ -128,7 +128,7 @@ public:
    * @returns the number of enumeration values associated with this Enumeration
    * Property
    */
-  virtual unsigned int Size() const;
+  virtual EnumIdsContainerType::size_type Size() const;
 
   /**
    * Provides access to the set of known enumeration values. The string representation

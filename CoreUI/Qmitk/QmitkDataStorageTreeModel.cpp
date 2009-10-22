@@ -146,7 +146,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
   if(data->hasFormat("application/x-qabstractitemmodeldatalist"))
   {
     QString arg = QString(data->data("application/x-qabstractitemmodeldatalist").data());
-    int val = arg.toInt();
+    long val = arg.toLong();
     TreeItem* draggedItem = static_cast<TreeItem *>((void*)val);
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
     TreeItem* parentItem = dropItem->GetParent();
@@ -182,7 +182,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
 QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
   QMimeData * ret = new QMimeData;
-  int a = static_cast<int>(indexes.at(0).internalPointer());
+  long a = reinterpret_cast<long>(indexes.at(0).internalPointer());
   QString result;
   QTextStream(&result) << a;
   ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));

@@ -60,9 +60,11 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
     // compatible? then use operator= to assign value
     if (it->second.first->Assignable( *property ))
     {
+      bool changed = (it->second.first->GetValueAsString() != property->GetValueAsString());
       *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
       // muellerm,20.10: added modified event
-      this->Modified();
+      if(changed)
+        this->Modified();
       return;
     }
     

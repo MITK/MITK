@@ -104,7 +104,7 @@ static mitk::PointSet::Pointer CreatePointSet()
   //ps->SetPoint(1, p, 1); // ID 1 in timestep 1
   //mitk::FillVector3D(p, 1000.0, 1000.0, 1122.22);
   //ps->SetPoint(11, p, mitk::PTCORNER, 2); // ID 11, point spec, timestep 2
-  //return ps;
+  return ps;
 }
 
 static void FillStorage(mitk::DataStorage* storage)

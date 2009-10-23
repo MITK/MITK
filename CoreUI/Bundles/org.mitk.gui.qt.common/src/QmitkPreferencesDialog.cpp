@@ -342,7 +342,7 @@ void QmitkPreferencesDialog::OnKeywordEditingFinished()
 
 bool QmitkPreferencesDialog::eventFilter( QObject *obj, QEvent *event )
 {
-  if(obj = m_Keyword)
+  if(obj == m_Keyword)
   {
     if(event->type() == QEvent::FocusIn && m_Keyword->text() == "search ...")
     {

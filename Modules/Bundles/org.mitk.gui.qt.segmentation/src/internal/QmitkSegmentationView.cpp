@@ -610,8 +610,10 @@ void QmitkSegmentationView::CreateSurface(bool)
         surfaceFilter->SetPointerParameter("Input", image);
         surfaceFilter->SetPointerParameter("Group node", nodepointer);
         surfaceFilter->SetParameter("Smooth", true );
+        surfaceFilter->SetParameter("Apply median", true );
         surfaceFilter->SetParameter("Median kernel size", 3u );
         surfaceFilter->SetParameter("Gaussian SD", 1.5f );
+        surfaceFilter->SetParameter("Decimate mesh", true );
         surfaceFilter->SetParameter("Decimation rate", 0.8f );
         surfaceFilter->SetParameter("Show result", true );
         surfaceFilter->SetParameter("Sync visibility", false );

@@ -98,7 +98,9 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   float reductionRate(0.8);
   GetParameter("Decimation rate", reductionRate );
 
-  LOG_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD << " reductionRate " << reductionRate;
+  LOG_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD 
+                                         << " median " << applyMedian << " median kernel " << medianKernelSize 
+                                         << " mesh reduction " << decimateMesh << " reductionRate " << reductionRate;
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( image );
@@ -116,11 +118,14 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
     surfaceFilter->SetMedianKernelSize(medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
   }
   
-  surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
   if (decimateMesh)
   {
     surfaceFilter->SetDecimate( ImageToSurfaceFilter::DecimatePro );
     surfaceFilter->SetTargetReduction( reductionRate );
+  }
+  else
+  {
+    surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
   }
 
   surfaceFilter->UpdateLargestPossibleRegion();
@@ -135,7 +140,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   polyData->SetVerts(0);
   polyData->SetLines(0);
 
-  if (smooth || applyMedian || decimateMesh)
+  if ( smooth || applyMedian || decimateMesh)
   {
     vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
 

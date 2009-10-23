@@ -1098,10 +1098,8 @@ IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(
 
 IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(IAdaptable* input)
 {
-  //TODO perspective work
-  //    return this->OpenWorkbenchWindow(this->GetPerspectiveRegistry()
-  //            ->GetDefaultPerspective(), input);
-  return this->OpenWorkbenchWindow("", input);
+  return this->OpenWorkbenchWindow(this->GetPerspectiveRegistry()
+              ->GetDefaultPerspective(), input);
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(

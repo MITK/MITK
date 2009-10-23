@@ -51,7 +51,7 @@ void QtPlatformLogModel::slotFlushLogEntries()
   m_Active=m_Pending; m_Pending=tmp;
   m_Mutex.unlock();
 
-  std::list<ExtendedLogMessage>::size_type num = m_Pending->size();
+  int num = static_cast<int>(m_Pending->size());
   
   if (num > 0)
   {

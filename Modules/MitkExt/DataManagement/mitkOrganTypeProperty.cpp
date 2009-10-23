@@ -56,7 +56,7 @@ mitk::OrganTypeProperty::~OrganTypeProperty()
     
 void mitk::OrganTypeProperty::AddEnumerationTypes()
 {
-  IdType newId = EnumerationProperty::Size();
+  IdType newId = static_cast<IdType>(EnumerationProperty::Size());
 
   // On changes, please also change mitk::DataTreeNodeFactory::DefaultColorForOrgan()
 
@@ -113,5 +113,3 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
   AddEnum( "Vertebra", newId++ );
   AddEnum( "Wrist", newId++ );
 }
-
-

@@ -102,6 +102,10 @@ protected:
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *m_DefaultColorTransferFunction;
+
+  vtkPiecewiseFunction *m_BinaryOpacityTransferFunction;
+  vtkPiecewiseFunction *m_BinaryGradientTransferFunction;
+  vtkColorTransferFunction *m_BinaryColorTransferFunction;
 };
 
 } // namespace mitk

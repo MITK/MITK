@@ -121,6 +121,9 @@ mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
   m_DefaultColorTransferFunction->Delete();
   m_DefaultOpacityTransferFunction->Delete();
   m_DefaultGradientTransferFunction->Delete();
+  m_BinaryColorTransferFunction->Delete();
+  m_BinaryOpacityTransferFunction->Delete();
+  m_BinaryGradientTransferFunction->Delete();
 }
 
 vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
@@ -206,9 +209,18 @@ void mitk::GPUVolumeMapper3D::CreateDefaultTransferFunctions()
   m_DefaultColorTransferFunction->AddRGBPoint( 127.5, 1, 1, 0.0 );
   m_DefaultColorTransferFunction->AddRGBPoint( 255.0, 0.8, 0.2, 0 );
   m_DefaultColorTransferFunction->ClampingOn();
+
+  m_BinaryOpacityTransferFunction = vtkPiecewiseFunction::New();
+  m_BinaryOpacityTransferFunction->AddPoint( 0, 0.0 );
+  m_BinaryOpacityTransferFunction->AddPoint( 1, 1.0 );
+
+  m_BinaryGradientTransferFunction = vtkPiecewiseFunction::New();
+  m_BinaryGradientTransferFunction->AddPoint( 0.0, 1.0 );
+
+  m_BinaryColorTransferFunction = vtkColorTransferFunction::New();
 }
 
-void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * /*renderer*/ )
+void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * renderer )
 {
   GPU_LOG << "UpdateTransferFunctions";
 
@@ -216,17 +228,35 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * /*re
   vtkPiecewiseFunction *gradientTransferFunction = m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *colorTransferFunction = m_DefaultColorTransferFunction;
 
-  mitk::TransferFunctionProperty::Pointer transferFunctionProp = 
-    dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction"));
+  bool isBinary = false;
 
-  if( transferFunctionProp.IsNotNull() )   
+  GetDataTreeNode()->GetBoolProperty("binary", isBinary, renderer);
+
+  if(isBinary)
   {
+    opacityTransferFunction = m_BinaryOpacityTransferFunction;
+    gradientTransferFunction = m_BinaryGradientTransferFunction;
+    colorTransferFunction = m_BinaryColorTransferFunction;
 
-    opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
-    gradientTransferFunction = transferFunctionProp->GetValue()->GetGradientOpacityFunction();
-    colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
+    colorTransferFunction->RemoveAllPoints();
+    float rgb[3];
+    if( !GetDataTreeNode()->GetColor( rgb,renderer ) )
+       rgb[0]=rgb[1]=rgb[2]=1;
+    colorTransferFunction->AddRGBPoint( 0,rgb[0],rgb[1],rgb[2] );
+    colorTransferFunction->Modified();
   }
+  else
+  {
+    mitk::TransferFunctionProperty::Pointer transferFunctionProp = 
+      dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction",renderer));
 
+    if( transferFunctionProp.IsNotNull() )   
+    {
+      opacityTransferFunction = transferFunctionProp->GetValue()->GetScalarOpacityFunction();
+      gradientTransferFunction = transferFunctionProp->GetValue()->GetGradientOpacityFunction();
+      colorTransferFunction = transferFunctionProp->GetValue()->GetColorTransferFunction();
+    }
+  }
 
   m_VolumePropertyLow->SetColor( colorTransferFunction );
   m_VolumePropertyLow->SetScalarOpacity( opacityTransferFunction );

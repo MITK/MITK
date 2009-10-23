@@ -53,15 +53,7 @@ public:
   ///
   /// Create and return an action with this descriptor as owner
   ///
-  virtual QAction * AddAction ( const QString & text, bool isBatchAction=true );
-  ///
-  /// Create and return an action with this descriptor as owner
-  ///
-  virtual QAction * AddAction ( const QIcon & icon, const QString & text, bool isBatchAction=true );
-  ///
-  /// Create and return an action with this descriptor as owner
-  ///
-  virtual QWidgetAction * AddWidgetAction( bool isBatchAction=true );
+  virtual void AddAction ( QAction * action, bool isBatchAction=true );
   ///
   /// Remove and delete (!) an action
   ///
@@ -75,6 +67,10 @@ public:
   /// (no priot knowledge abpout the node is required)
   ///
   virtual QList<QAction*> GetBatchActions() const;
+
+public slots:
+  /// Called when an action was destroyed
+  void ActionDestroyed ( QObject * obj = 0 );
 protected:
   QString m_ClassName;
   QIcon m_Icon;

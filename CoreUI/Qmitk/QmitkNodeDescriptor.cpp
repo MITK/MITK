@@ -38,34 +38,17 @@ bool QmitkNodeDescriptor::CheckNode( const mitk::DataTreeNode* node ) const
   return false;
 }
 
-QAction * QmitkNodeDescriptor::AddAction( const QString & text, bool isBatchAction )
+void QmitkNodeDescriptor::AddAction( QAction* action, bool isBatchAction )
 {
-  QAction* action = new QAction(text, this);
-  if(isBatchAction)
-    m_BatchActions.push_back(action);
-  else
-    m_Actions.push_back(action);
-  return action;
-}
+  if(!action)
+    return;
 
-QAction * QmitkNodeDescriptor::AddAction( const QIcon & icon, const QString & text, bool isBatchAction )
-{
-  QAction* action = new QAction(icon, text, this);
   if(isBatchAction)
     m_BatchActions.push_back(action);
   else
     m_Actions.push_back(action);
-  return action;
-}
-
-QWidgetAction * QmitkNodeDescriptor::AddWidgetAction( bool isBatchAction )
-{
-  QWidgetAction* action = new QWidgetAction(this);
-  if(isBatchAction)
-    m_BatchActions.push_back(action);
-  else
-    m_Actions.push_back(action);
-  return action;
+  QObject::connect( action, SIGNAL( destroyed(QObject *) )
+    , this, SLOT( ActionDestroyed(QObject *) ) );
 }
 
 void QmitkNodeDescriptor::RemoveAction( QAction* _Action )
@@ -76,15 +59,14 @@ void QmitkNodeDescriptor::RemoveAction( QAction* _Action )
   if(index != -1)
   {
     m_Actions.removeAt(index);
-    _Action->setParent(0);
-    delete _Action;
   }
   else if(indexOfWidgetAction != -1)
   {
     m_BatchActions.removeAt(indexOfWidgetAction);
-    _Action->setParent(0);
-    delete _Action;
   }
+
+  QObject::disconnect( _Action, SIGNAL( destroyed(QObject *) )
+    , this, SLOT( ActionDestroyed(QObject *) ) );
 }
 
 QmitkNodeDescriptor::~QmitkNodeDescriptor()
@@ -100,4 +82,9 @@ QAction* QmitkNodeDescriptor::GetSeparator() const
 QList<QAction*> QmitkNodeDescriptor::GetBatchActions() const
 {
   return m_BatchActions;
+}
+
+void QmitkNodeDescriptor::ActionDestroyed( QObject * obj /*= 0 */ )
+{
+  this->RemoveAction( qobject_cast<QAction*>(obj) );
 }

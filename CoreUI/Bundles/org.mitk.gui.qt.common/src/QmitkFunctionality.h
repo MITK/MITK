@@ -66,6 +66,14 @@ public:
   ///
   virtual void Deactivated();
   ///
+  /// Called when this functionality becomes visible
+  ///
+  virtual void Visible();
+  ///
+  /// Called when this functionality is hidden
+  ///
+  virtual void Hidden();
+  ///
   /// Called when a StdMultiWidget is available.
   ///
   virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);

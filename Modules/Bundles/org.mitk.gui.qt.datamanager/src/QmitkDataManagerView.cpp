@@ -74,21 +74,6 @@ QmitkDataManagerView::~QmitkDataManagerView()
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
-
-  QmitkNodeDescriptor* unknownDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataTreeNodeDescriptor();
-
-  unknownDataTreeNodeDescriptor->RemoveAction(m_GlobalReinitAction);
-  unknownDataTreeNodeDescriptor->RemoveAction(m_SaveAction);
-  unknownDataTreeNodeDescriptor->RemoveAction(m_RemoveAction);
-  unknownDataTreeNodeDescriptor->RemoveAction(m_ReinitAction);
-  unknownDataTreeNodeDescriptor->RemoveAction(m_OpacityAction);
-
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
-
-  imageDataTreeNodeDescriptor->RemoveAction(m_OtsuFilterAction);
-
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -131,28 +116,25 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* unknownDataTreeNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataTreeNodeDescriptor();
 
-  m_GlobalReinitAction = unknownDataTreeNodeDescriptor->AddAction(QIcon(":/datamanager/refresh.xpm"), "Global Reinit");
+  m_GlobalReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Global Reinit", this);
   QObject::connect( m_GlobalReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( GlobalReinit(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_GlobalReinitAction);
 
-  m_SaveAction = unknownDataTreeNodeDescriptor->AddAction(QIcon(":/datamanager/save.xpm"), "Save selected nodes");
+  m_SaveAction = new QAction(QIcon(":/datamanager/save.xpm"), "Save selected nodes", this);
   QObject::connect( m_SaveAction, SIGNAL( triggered(bool) )
     , this, SLOT( SaveSelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_SaveAction);
 
-  m_RemoveAction = unknownDataTreeNodeDescriptor->AddAction(QIcon(":/datamanager/remove.xpm"), "Remove selected nodes");
+  m_RemoveAction = new QAction(QIcon(":/datamanager/remove.xpm"), "Remove selected nodes", this);
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( RemoveSelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_RemoveAction);
 
-  m_ReinitAction = unknownDataTreeNodeDescriptor->AddAction(QIcon(":/datamanager/refresh.xpm"), "Reinit selected nodes");
+  m_ReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Reinit selected nodes", this);
   QObject::connect( m_ReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( ReinitSelectedNodes(bool) ) );
-
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
-
-  m_OtsuFilterAction = imageDataTreeNodeDescriptor->AddAction("Apply Otsu Filter");
-  QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
-    , this, SLOT( OtsuFilter(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_ReinitAction);
 
   m_OpacitySlider = new QSlider;
   m_OpacitySlider->setMinimum(0);
@@ -168,37 +150,40 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QWidget* _OpacityWidget = new QWidget;
   _OpacityWidget->setLayout(_OpacityWidgetLayout);
 
-  m_OpacityAction = unknownDataTreeNodeDescriptor->AddWidgetAction(false);
+  m_OpacityAction = new QWidgetAction(this);
   m_OpacityAction->setDefaultWidget(_OpacityWidget);
   QObject::connect( m_OpacityAction, SIGNAL( changed() )
     , this, SLOT( OpactiyActionChanged() ) );
-// 
-//   QAction* _ShowOnlySelectedNodes 
-//     = m_NodeMenu->addAction(QIcon(":/datamanager/data-type-image-mask-visible-24.png")
-//     , "Show only selected nodes");
-//   QObject::connect( _ShowOnlySelectedNodes, SIGNAL( triggered(bool) )
-//     , this, SLOT( ShowOnlySelectedNodes(bool) ) );
-// 
-//   QAction* _ToggleSelectedVisibility 
-//     = m_NodeMenu->addAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png")
-//     , "Toggle visibility of selected nodes");
-//   QObject::connect( _ToggleSelectedVisibility, SIGNAL( triggered(bool) )
-//     , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
-// 
-//   QAction* _ActionShowInfoDialog 
-//     = m_NodeMenu->addAction(QIcon(":/datamanager/show-data-info.png")
-//     , "Show additional information for selected nodes");
-//   QObject::connect( _ActionShowInfoDialog, SIGNAL( triggered(bool) )
-//     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_OpacityAction, false);
 
-//   QToolBar* _NodeToolbar = new QToolBar;
-//   _NodeToolbar->setIconSize(QSize(16, 16));
-//   _NodeToolbar->addAction(_SaveAction);
-//   _NodeToolbar->addAction(_RemoveAction);
-//   _NodeToolbar->addAction(_ReinitAction);
-//   _NodeToolbar->addAction(_ShowOnlySelectedNodes);
-//   _NodeToolbar->addAction(_ToggleSelectedVisibility);
-//   _NodeToolbar->addAction(_ActionShowInfoDialog);
+  m_ShowOnlySelectedNodes 
+    = new QAction(QIcon(":/datamanager/data-type-image-mask-visible-24.png")
+    , "Show only selected nodes", this);
+  QObject::connect( m_ShowOnlySelectedNodes, SIGNAL( triggered(bool) )
+    , this, SLOT( ShowOnlySelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_ShowOnlySelectedNodes);
+
+  m_ToggleSelectedVisibility 
+    = new QAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png")
+    , "Toggle visibility of selected nodes", this);
+  QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
+    , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
+
+  m_ActionShowInfoDialog 
+    = new QAction(QIcon(":/datamanager/show-data-info.png")
+    , "Show additional information for selected nodes", this);
+  QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
+    , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_ActionShowInfoDialog);
+
+  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
+
+  m_OtsuFilterAction = new QAction("Apply Otsu Filter", this);
+  QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
+    , this, SLOT( OtsuFilter(bool) ) );
+  imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
 
   QGridLayout* _ParentLayout = new QGridLayout;
   _ParentLayout->addWidget(m_NodeTreeView, 0, 0);

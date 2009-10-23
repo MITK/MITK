@@ -207,12 +207,20 @@ void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer  /
 {
 }
 
-void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
+void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
 {
+  if(partRef->GetPart(false) == this)
+  {
+    this->Hidden();
+  }
 }
 
-void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
+void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  partRef )
 {
+  if(partRef->GetPart(false) == this)
+  {
+    this->Visible();
+  }
 }
 
 void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
@@ -345,4 +353,14 @@ cherry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
   std::string id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
   return prefService.IsNotNull() ? prefService->GetSystemPreferences()->Node(id): cherry::IPreferences::Pointer(0);
+}
+
+void QmitkFunctionality::Visible()
+{
+
+}
+
+void QmitkFunctionality::Hidden()
+{
+
 }

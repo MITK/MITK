@@ -159,6 +159,13 @@ protected:
   QSlider* m_OpacitySlider;
   /// Opacity action
   QWidgetAction* m_OpacityAction;
+  /// Show only selected nodes
+  QAction* m_ShowOnlySelectedNodes;
+  /// Toggles visibility of selected nodes
+  QAction* m_ToggleSelectedVisibility;
+  /// Shows infos for selected nodes
+  QAction* m_ActionShowInfoDialog;
+  
   /// Special filter action for images
   QAction* m_OtsuFilterAction;
   /// A selection listener for datatreenode events

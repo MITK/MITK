@@ -155,6 +155,13 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingLabel->hide();
   
   this->CheckCalculateEnabled();
+
+  m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  cherry::ISelection::ConstPointer sel(
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
 }
 
 

@@ -121,7 +121,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   if (binaryImageDataTreeNodeDescriptor)
   {
-    m_CreateSurfaceAction = binaryImageDataTreeNodeDescriptor->AddAction("Create polygon model");
+    m_CreateSurfaceAction = new QAction("Create polygon model", parent);
+    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSurfaceAction);
     connect( m_CreateSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
   }
   else

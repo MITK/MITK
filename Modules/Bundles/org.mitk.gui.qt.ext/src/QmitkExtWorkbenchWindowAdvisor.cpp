@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkExtAppWorkbenchWindowAdvisor.h"
-#include "QmitkExtAppActionBarAdvisor.h"
+#include "QmitkExtWorkbenchWindowAdvisor.h"
+#include "QmitkExtActionBarAdvisor.h"
 
 
 #include <QMenu>
@@ -27,9 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryPlatform.h>
 #include <cherryPlatformUI.h>
 #include <cherryIWorkbenchWindow.h>
+#include <cherryIWorkbenchPage.h>
 #include <cherryIPreferencesService.h>
+#include <cherryIPerspectiveRegistry.h>
+#include <cherryIPerspectiveDescriptor.h>
 
 #include <internal/cherryQtShowViewAction.h>
+#include <internal/cherryQtOpenPerspectiveAction.h>
 
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileExitAction.h>
@@ -40,28 +44,34 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 // UGLYYY
-#include "internal/QmitkExtAppWorkbenchWindowAdvisorHack.h"
+#include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
 
-QmitkExtAppWorkbenchWindowAdvisorHack* QmitkExtAppWorkbenchWindowAdvisorHack::undohack = new QmitkExtAppWorkbenchWindowAdvisorHack();
+QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack = new QmitkExtWorkbenchWindowAdvisorHack();
 
-QmitkExtAppWorkbenchWindowAdvisor::QmitkExtAppWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
-: cherry::WorkbenchWindowAdvisor(configurer)
+QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
+: cherry::WorkbenchWindowAdvisor(configurer),
+showViewToolbar(true)
 {
   configurer->SetShowPerspectiveBar(true);
 }
 
 cherry::ActionBarAdvisor::Pointer
-QmitkExtAppWorkbenchWindowAdvisor::CreateActionBarAdvisor(
+QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
   cherry::IActionBarConfigurer::Pointer configurer)
 {
-  cherry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkExtAppActionBarAdvisor(configurer));
+  cherry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkExtActionBarAdvisor(configurer));
   return actionBarAdvisor;
 }
 
-void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
+void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
+{
+  showViewToolbar = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
   cherry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
@@ -82,13 +92,32 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
 
   // another bad hack to get an edit/undo menu... 
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  QAction* undoAction = editMenu->addAction("&Undo", QmitkExtAppWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()), QKeySequence("CTRL+Z"));
-  QAction* redoAction = editMenu->addAction("&Redo", QmitkExtAppWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()), QKeySequence("CTRL+Y"));
-  editMenu->addSeparator();
-  QAction* preferencesAction = editMenu->addAction("&Preferences...", QmitkExtAppWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()), QKeySequence("CTRL+P"));
+  QAction* undoAction = editMenu->addAction("&Undo", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()), QKeySequence("CTRL+Z"));
+  QAction* redoAction = editMenu->addAction("&Redo", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()), QKeySequence("CTRL+Y"));
 
+  // ==== Window Menu ==========================
+  QMenu* windowMenu = menuBar->addMenu("Window");
+  QAction* newWindowAction = windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+  windowMenu->addSeparator();
+  QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
+  QMenu* viewMenu = windowMenu->addMenu("Show &View");
+  windowMenu->addSeparator();
+  QAction* resetPerspectiveAction = windowMenu->addAction("&Reset Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
+  QAction* closePerspectiveAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+  windowMenu->addSeparator();
+  QAction* preferencesAction = windowMenu->addAction("&Preferences...", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()), QKeySequence("CTRL+P"));
 
-  QMenu* viewMenu = menuBar->addMenu("Show &View");
+  // fill perspective menu
+  cherry::IPerspectiveRegistry* perspRegistry = window->GetWorkbench()->GetPerspectiveRegistry();
+  QActionGroup* perspGroup = new QActionGroup(menuBar);
+
+  std::vector<cherry::IPerspectiveDescriptor::Pointer> perspectives(perspRegistry->GetPerspectives());
+  for (std::vector<cherry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+      perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
+  {
+    QAction* perspAction = new cherry::QtOpenPerspectiveAction(window, *perspIt, perspGroup);
+  }
+  perspMenu->addActions(perspGroup->actions());
 
   // sort elements (converting vector to map...)
   std::vector<cherry::IViewDescriptor::Pointer>::const_iterator iter;
@@ -110,10 +139,17 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
     cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window, (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
-    qToolbar->addAction(viewAction);
+    if (showViewToolbar)
+    {
+      qToolbar->addAction(viewAction);
+    }
   }
   
-  mainWindow->addToolBar(qToolbar);
+  if (showViewToolbar)
+  {
+    mainWindow->addToolBar(qToolbar);
+  }
+  else delete qToolbar;
   // ====================================================
 
 
@@ -138,12 +174,12 @@ void QmitkExtAppWorkbenchWindowAdvisor::PostWindowCreate()
 // and undo buttons are done.
 //--------------------------------------------------------------------------------
 
-QmitkExtAppWorkbenchWindowAdvisorHack::QmitkExtAppWorkbenchWindowAdvisorHack()
+QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack()
 :QObject()
 {
 }
     
-void QmitkExtAppWorkbenchWindowAdvisorHack::onUndo()
+void QmitkExtWorkbenchWindowAdvisorHack::onUndo()
 {
   mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
   if (model)
@@ -164,7 +200,7 @@ void QmitkExtAppWorkbenchWindowAdvisorHack::onUndo()
   }
 }
 
-void QmitkExtAppWorkbenchWindowAdvisorHack::onRedo()
+void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 {
   mitk::UndoModel* model = mitk::UndoController::GetCurrentUndoModel();
   if (model)
@@ -185,13 +221,29 @@ void QmitkExtAppWorkbenchWindowAdvisorHack::onRedo()
   }
 }
 
-void QmitkExtAppWorkbenchWindowAdvisorHack::onEditPreferences()
+void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
 {
   QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
   _PreferencesDialog.exec();
 }
 
-void QmitkExtAppWorkbenchWindowAdvisorHack::onQuit()
+void QmitkExtWorkbenchWindowAdvisorHack::onQuit()
 {
   cherry::PlatformUI::GetWorkbench()->Close();
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onResetPerspective()
+{
+  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
+{
+  cherry::IWorkbenchPage::Pointer page = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+  page->ClosePerspective(page->GetPerspective(), true, true);
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
+{
+  cherry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
 }

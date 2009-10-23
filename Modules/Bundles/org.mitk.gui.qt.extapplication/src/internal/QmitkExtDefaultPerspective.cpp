@@ -15,9 +15,14 @@
 
  =========================================================================*/
 
-#include "QmitkDefaultPerspective.h"
+#include "QmitkExtDefaultPerspective.h"
 
-void QmitkDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
+
+void QmitkExtDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
 {
+  std::string editorArea = layout->GetEditorArea();
 
+  layout->AddView("org.mitk.views.datamanager", cherry::IPageLayout::LEFT, 0.3f, editorArea);
+  layout->AddView("org.mitk.views.propertylistview", cherry::IPageLayout::BOTTOM, 0.3f, "org.mitk.views.datamanager");
+  layout->AddView("org.opencherry.views.logview", cherry::IPageLayout::BOTTOM, 0.7f, editorArea);
 }

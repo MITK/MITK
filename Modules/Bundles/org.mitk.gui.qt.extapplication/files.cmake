@@ -1,16 +1,14 @@
 SET(SRC_CPP_FILES
-  QmitkExtAppActionBarAdvisor.cpp
   QmitkExtApplication.cpp
   QmitkExtAppWorkbenchAdvisor.cpp
-  QmitkExtAppWorkbenchWindowAdvisor.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  
+  QmitkExtDefaultPerspective.cpp
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkExtAppWorkbenchWindowAdvisorHack.h
+ 
 )
 
 SET(CPP_FILES manifest.cpp)

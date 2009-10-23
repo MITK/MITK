@@ -1,7 +1,7 @@
 SET(SRC_CPP_FILES
   QmitkApplication.cpp
-  QmitkDefaultPerspective.cpp
   QmitkActionBarAdvisor.cpp
+  QmitkDefaultPerspective.cpp
   QmitkWorkbenchAdvisor.cpp
   QmitkWorkbenchWindowAdvisor.cpp
 )

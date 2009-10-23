@@ -6,4 +6,12 @@
       <run class="QmitkExtApplication"/>
     </application>
   </extension>
+  
+  <extension point="org.opencherry.ui.perspectives">
+    <perspective
+      id="org.mitk.extapp.defaultperspective"
+      name="Research"
+      class="QmitkExtDefaultPerspective">
+    </perspective>
+  </extension>
 </plugin>

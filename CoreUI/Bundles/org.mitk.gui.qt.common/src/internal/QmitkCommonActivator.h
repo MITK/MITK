@@ -16,12 +16,10 @@
  =========================================================================*/
 
 
-#ifndef MBISTATEMACHINETACTIVATOR_H_ 
-#define MBISTATEMACHINETACTIVATOR_H_ 
+#ifndef QMITKCOMMONACTIVATOR_H_
+#define QMITKCOMMONACTIVATOR_H_
 
 #include <cherryPlugin.h>
-
-#include <mitkQtCommonDll.h>
 
 /**
  * \ingroup org_mitk_core_ext_internal
@@ -31,7 +29,7 @@
  * When the plug-in is started by the framework, it initializes StateMachine
  * specific things.
  */
-class MITK_QT_COMMON QmitkStateMachineActivator : public cherry::Plugin
+class QmitkCommonActivator : public cherry::Plugin
 {
 
 public:
@@ -43,5 +41,5 @@ public:
 
 };
 
-#endif /* MBISTATEMACHINETACTIVATOR_H_ */
+#endif /* QMITKCOMMONACTIVATOR_H_ */
 

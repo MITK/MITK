@@ -20,11 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QApplication>
 
-#include <QmitkRegisterClasses.h>
-
 #include "QmitkWorkbenchWindowAdvisor.h"
 
-const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSP_ID = "org.mitk.perspectives.default";
+const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.coreapp.defaultperspective";
 
 void
 QmitkWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)
@@ -32,7 +30,6 @@ QmitkWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configur
   cherry::QtWorkbenchAdvisor::Initialize(configurer);
 
   configurer->SetSaveAndRestore(true);
-  QmitkRegisterClasses();
 }
 
 cherry::WorkbenchWindowAdvisor*
@@ -42,9 +39,8 @@ QmitkWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
   return new QmitkWorkbenchWindowAdvisor(configurer);
 }
 
-std::string
-QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+std::string QmitkWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
-  return DEFAULT_PERSP_ID;
+  return DEFAULT_PERSPECTIVE_ID;
 }
 

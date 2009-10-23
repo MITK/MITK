@@ -9,8 +9,8 @@
   
   <extension point="org.opencherry.ui.perspectives">
     <perspective
-      id="org.mitk.perspectives.default"
-      name="Default Perspective"
+      id="org.mitk.coreapp.defaultperspective"
+      name="Core App Home"
       class="QmitkDefaultPerspective">
     </perspective>
   </extension>

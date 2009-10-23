@@ -1,19 +1,19 @@
 /*=========================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
+ Program:   Medical Imaging & Interaction Toolkit
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-=========================================================================*/
+ =========================================================================*/
 
 #ifndef QMITKEXTAPPWORKBENCHADVISOR_H_
 #define QMITKEXTAPPWORKBENCHADVISOR_H_
@@ -25,18 +25,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <windows.h>
 #endif
 
-#include <QmitkWorkbenchAdvisor.h>
+#include <cherryQtWorkbenchAdvisor.h>
 
 #include "mitkQtExtAppDll.h"
 
-class MITK_QT_EXTAPP QmitkExtAppWorkbenchAdvisor : public QmitkWorkbenchAdvisor
+class MITK_QT_EXTAPP QmitkExtAppWorkbenchAdvisor: public cherry::QtWorkbenchAdvisor
 {
 public:
+
+  static const std::string DEFAULT_PERSPECTIVE_ID; // = "org.mitk.extapp.defaultperspective"
 
   void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
 
   cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-        cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+      cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+
+  std::string GetInitialWindowPerspectiveId();
 
 };
 

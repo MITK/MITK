@@ -4,7 +4,4 @@ Bundle-SymbolicName: org.mitk.gui.qt.common
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
 Require-Bundle: org.mitk.gui.common, org.opencherry.ui.qt
-Bundle-Activator: QmitkStateMachineActivator
-Bundle-ActivationPolicy: eager
-Bundle-Activator: QmitkStateMachineActivator
-Bundle-ActivationPolicy: eager
+Bundle-Activator: QmitkCommonActivator

@@ -15,16 +15,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkStateMachineActivator.h"
+#include "QmitkCommonActivator.h"
 
-#include "mitkGlobalInteraction.h"
+#include <mitkGlobalInteraction.h>
+#include <QmitkRegisterClasses.h>
 
 #include <QFile>
 
 
 void
-QmitkStateMachineActivator::Start(cherry::IBundleContext::Pointer)
+QmitkCommonActivator::Start(cherry::IBundleContext::Pointer)
 { 
+  QmitkRegisterClasses();
+
   QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
   if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )
   {

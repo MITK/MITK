@@ -33,7 +33,7 @@ class MITK_QT_APP QmitkWorkbenchAdvisor : public cherry::QtWorkbenchAdvisor
 {
 public:
 
-  static const std::string DEFAULT_PERSP_ID;
+  static const std::string DEFAULT_PERSPECTIVE_ID; // = org.mitk.coreapp.defaultperspective
 
   void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
 
@@ -41,6 +41,7 @@ public:
         cherry::IWorkbenchWindowConfigurer::Pointer configurer);
 
   std::string GetInitialWindowPerspectiveId();
+
 };
 
 #endif /*QMITKWORKBENCHADVISOR_H_*/

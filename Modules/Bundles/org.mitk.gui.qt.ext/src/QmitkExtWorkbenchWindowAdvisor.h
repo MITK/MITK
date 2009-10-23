@@ -15,16 +15,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkExtAppActionBarAdvisor.h"
+#ifndef QMITKEXTWORKBENCHWINDOWADVISOR_H_
+#define QMITKEXTWORKBENCHWINDOWADVISOR_H_
 
+#include <cherryWorkbenchWindowAdvisor.h>
 
-QmitkExtAppActionBarAdvisor::QmitkExtAppActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer)
- : cherry::ActionBarAdvisor(configurer)
+#include "mitkQtCommonExtDll.h"
+
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
 {
+public:
 
-}
+    QmitkExtWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-void QmitkExtAppActionBarAdvisor::FillMenuBar(void* )
-{
+    cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
+        cherry::IActionBarConfigurer::Pointer configurer);
 
-}
+    void PostWindowCreate();
+
+    void ShowViewToolbar(bool show);
+
+private:
+
+    bool showViewToolbar;
+};
+
+#endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

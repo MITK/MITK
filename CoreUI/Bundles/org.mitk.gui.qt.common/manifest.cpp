@@ -21,7 +21,7 @@
 #include <cherryIBundleActivator.h>
 
 #include "src/QmitkStdMultiWidgetEditor.h"
-#include "src/internal/QmitkStateMachineActivator.h"
+#include "src/internal/QmitkCommonActivator.h"
 #include "src/QmitkGeneralPreferencePage.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
@@ -29,7 +29,7 @@ POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
 POCO_END_MANIFEST
 
 POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(QmitkStateMachineActivator)
+  POCO_EXPORT_CLASS(QmitkCommonActivator)
 POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)

@@ -17,15 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIApplication.h>
-
 #include "src/QmitkExtApplication.h"
-#include <QmitkGeneralPreferencePage.h>
+#include "src/internal/QmitkExtDefaultPerspective.h"
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
   POCO_EXPORT_CLASS(QmitkExtApplication)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)
-  POCO_EXPORT_CLASS(QmitkGeneralPreferencePage)
+POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
+  POCO_EXPORT_CLASS(QmitkExtDefaultPerspective)
 POCO_END_MANIFEST

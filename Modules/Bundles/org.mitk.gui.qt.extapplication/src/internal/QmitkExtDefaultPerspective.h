@@ -15,9 +15,17 @@
 
  =========================================================================*/
 
-#include "QmitkDefaultPerspective.h"
 
-void QmitkDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
+#ifndef QMITKEXTDEFAULTPERSPECTIVE_H_
+#define QMITKEXTDEFAULTPERSPECTIVE_H_
+
+#include <cherryIPerspectiveFactory.h>
+
+struct QmitkExtDefaultPerspective : public cherry::IPerspectiveFactory
 {
 
-}
+  void CreateInitialLayout(cherry::IPageLayout::Pointer layout);
+
+};
+
+#endif /* QMITKEXTDEFAULTPERSPECTIVE_H_ */

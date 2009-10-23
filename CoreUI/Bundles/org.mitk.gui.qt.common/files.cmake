@@ -13,7 +13,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkDataTreeNodeSelection.cpp
   QmitkDnDFrameWidget.cpp
-  QmitkStateMachineActivator.cpp
+  QmitkCommonActivator.cpp
 )
 
 SET(MOC_H_FILES

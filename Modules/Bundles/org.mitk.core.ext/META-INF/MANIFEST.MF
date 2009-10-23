@@ -5,4 +5,3 @@ Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
 Require-Bundle: org.opencherry.osgi
 Bundle-Activator: mitk::CoreExtActivator
-Bundle-ActivationPolicy: eager

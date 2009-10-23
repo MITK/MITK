@@ -15,22 +15,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QMITKEXTAPPACTIONBARADVISOR_H_
-#define QMITKEXTAPPACTIONBARADVISOR_H_
+#ifndef QMITKEXTACTIONBARADVISOR_H_
+#define QMITKEXTACTIONBARADVISOR_H_
 
 #include <cherryActionBarAdvisor.h>
 
-#include "mitkQtExtAppDll.h"
+#include "mitkQtCommonExtDll.h"
 
-class MITK_QT_EXTAPP QmitkExtAppActionBarAdvisor : public cherry::ActionBarAdvisor
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtActionBarAdvisor : public cherry::ActionBarAdvisor
 {
 public:
 
-  QmitkExtAppActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
+  QmitkExtActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
 
 protected:
 
   void FillMenuBar(void* menuBar);
 };
 
-#endif /*QMITKEXTAPPACTIONBARADVISOR_H_*/
+#endif /*QMITKEXTACTIONBARADVISOR_H_*/

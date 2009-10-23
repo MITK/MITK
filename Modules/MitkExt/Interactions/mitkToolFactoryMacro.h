@@ -88,6 +88,35 @@ class CLASS_NAME ## RegistrationMethod \
 static mitk::CLASS_NAME ## RegistrationMethod somestaticinitializer_ ## CLASS_NAME ;
 
 
+
+
+#define MITK_DERIVED_SM_TOOL_MACRO(EXPORT_SPEC, BASE_CLASS, CLASS_NAME, DESCRIPTION) \
+ \
+class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
+{ \
+  public:   \
+ \
+    /* ITK typedefs */ \
+    typedef CLASS_NAME ## Tool  Self; \
+    typedef BASE_CLASS  Superclass; \
+    typedef itk::SmartPointer<Self>  Pointer; \
+    typedef itk::SmartPointer<const Self>  ConstPointer; \
+ \
+    itkNewMacro(CLASS_NAME ## Tool); \
+ \
+  protected: \
+ \
+    CLASS_NAME ## Tool() \
+    { \
+      m_SegmentationGenerator = CLASS_NAME ## ::New(); \
+    } \
+ \
+    ~CLASS_NAME ## Tool() \
+    { \
+    } \
+}; \
+MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME ## Tool, DESCRIPTION);
+
 #define MITK_EXTERNAL_TOOL_HEADER_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION) \
 extern "C" { \
 EXPORT_SPEC itk::ObjectFactoryBase* itkLoad(); \

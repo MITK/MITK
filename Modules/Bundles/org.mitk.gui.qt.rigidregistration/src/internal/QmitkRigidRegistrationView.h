@@ -238,11 +238,6 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!  
-    \brief List that holds all invisible data tree nodes. 
-    */  
-    typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
-
-    /*!  
     * default main widget containing 4 windows showing 3   
     * orthogonal slices of the volume and a 3d render window  
     */  
@@ -259,15 +254,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
     bool m_ShowRedGreen;
-    bool m_ShowFixedImage;
-    bool m_ShowMovingImage;
-    bool m_ShowBothImages;
     float m_Opacity;
     float m_OriginalOpacity;
-    int m_OldMovingLayer;
-    int m_NewMovingLayer;
-    bool m_OldMovingLayerSet;
-    bool m_NewMovingLayerSet;
     bool m_Deactivated;
     int m_FixedDimension;
     int m_MovingDimension;
@@ -275,7 +263,6 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     int * rotationParams;
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
-    invisibleNodesList m_InvisibleNodesList;
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
 

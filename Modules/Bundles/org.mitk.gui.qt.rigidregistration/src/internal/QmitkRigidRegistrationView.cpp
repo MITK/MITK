@@ -123,9 +123,8 @@ struct SelListenerRigidRegistration : ISelectionListener
 };
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_MultiWidget(NULL), /*m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL),*/ 
-  m_ShowRedGreen(false), m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0),
-  m_NewMovingLayer(0), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
+: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL), 
+  m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
 {
   m_TranslateSliderPos[0] = 0;
   m_TranslateSliderPos[1] = 0;
@@ -219,15 +218,6 @@ void QmitkRigidRegistrationView::Deactivated()
 {
   m_Deactivated = true;
   this->SetImageColor(false);
-  if (m_MovingNode.IsNotNull())
-  {
-    m_MovingNode->SetOpacity(m_OriginalOpacity);
-    if (m_OldMovingLayerSet)
-    {
-      m_MovingNode->SetIntProperty("layer", m_OldMovingLayer);
-      m_OldMovingLayerSet = false;
-    }
-  }
   m_FixedNode = NULL;
   m_MovingNode = NULL;
   this->ClearTransformationLists();
@@ -245,7 +235,7 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixed
   if (m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetVisibility(true);
-    m_Controls.TextLabelFixed->setText("Fixed Image: " + QString::fromStdString(m_FixedNode->GetName()));
+    m_Controls.TextLabelFixed->setText(QString::fromStdString(m_FixedNode->GetName()));
     m_Controls.m_FixedLabel->show();
     m_Controls.TextLabelFixed->show();
     mitk::ColorProperty::Pointer colorProperty;
@@ -287,7 +277,7 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movi
   if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetVisibility(true);
-    m_Controls.TextLabelMoving->setText("Moving Image: " + QString::fromStdString(m_MovingNode->GetName()));
+    m_Controls.TextLabelMoving->setText(QString::fromStdString(m_MovingNode->GetName()));
     m_Controls.m_MovingLabel->show();
     m_Controls.TextLabelMoving->show();
     mitk::ColorProperty::Pointer colorProperty;

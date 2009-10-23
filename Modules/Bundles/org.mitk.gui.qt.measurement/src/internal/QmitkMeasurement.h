@@ -18,20 +18,25 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QMITK_MEASUREMENT_H__INCLUDED)
 #define QMITK_MEASUREMENT_H__INCLUDED
 
-#include "QmitkFunctionality.h"
-#include "QmitkStandardViews.h"
-#include "QmitkStdMultiWidgetEditor.h"
-#include "mitkPointSetInteractor.h"
-#include "mitkDataTreeNodeSelection.h"
-
+#include <cherryIPartListener.h>
+#include <cherryISelection.h>
+#include <cherryISelectionProvider.h>
+#include <cherryIPreferencesService.h>
+#include <cherryICherryPreferences.h>
 #include <cherryISelectionListener.h>
 #include <cherryIStructuredSelection.h>
 
+#include <QmitkFunctionality.h>
+#include <QmitkStandardViews.h>
+#include <QmitkStdMultiWidgetEditor.h>
+#include <mitkPointSetInteractor.h>
 
+class QmitkDataStorageTableModel;
 class QGridLayout;
 class QMainWindow;
 class QToolBar;
-class QTableWidget;
+class QLabel;
+class QTableView;
 
 /*!
 \brief Measurement
@@ -52,12 +57,17 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void CreateQtPartControl(QWidget* parent);
     virtual void Activated();
     virtual void Deactivated();
+    virtual void Visible();
+    virtual void Hidden();
+
+    ///
+    /// Invoked when the DataManager selection changed
+    ///
+    virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
+      , cherry::ISelection::ConstPointer selection);
   
     ///# draw actions
   protected slots:
-    void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, 
-      cherry::ISelection::ConstPointer selection);
-
     void ActionDrawLineTriggered( bool checked = false );
     void ActionDrawPathTriggered( bool checked = false );
     void ActionDrawAngleTriggered( bool checked = false );
@@ -67,7 +77,6 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void ActionDrawPolygonTriggered( bool checked = false );
     void ActionDrawArrowTriggered( bool checked = false );
     void ActionDrawTextTriggered( bool checked = false ); 
-
   // fields
   protected:
     ///
@@ -82,11 +91,17 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
 
   // widgets
   protected:
+    QLabel* m_SelectedImage;
+    QPushButton* m_CopyToClipboard;
     QMainWindow* m_MainWindow;
     QGridLayout* m_Layout;
     QToolBar* m_DrawActionsToolBar;
     QToolBar* m_DrawActionsMainWindowToolBar;
-    QTableWidget* m_DrawItemsTableWidget;
+    QTableView* m_PlanarFiguresTable;
+    QmitkDataStorageTableModel* m_PlanarFiguresModel;
+
+    /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
+    friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;
 
 
     // Selection service

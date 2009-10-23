@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkIDataStorageService.h"
 #include "mitkDataTreeNodeObject.h"
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateAND.h>
 
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarPolygon.h"
@@ -37,8 +40,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QGridLayout>
 #include <QMainWindow>
 #include <QToolBar>
-#include <QTableWidget>
-
+#include <QLabel>
+#include <QTableView>
+#include <QmitkDataStorageTableModel.h>
+#include "mitkNodePredicateDataType.h"
+#include "mitkPlanarFigure.h"
 
 QmitkMeasurement::QmitkMeasurement()
 : m_PointSetInteractor(0)
@@ -46,7 +52,6 @@ QmitkMeasurement::QmitkMeasurement()
 , m_MainWindow(0)
 , m_Layout(0)
 , m_DrawActionsToolBar(0)
-, m_DrawItemsTableWidget(0)
 {
 }
 
@@ -86,7 +91,7 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
-  currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/ellipse.png"), "Draw Ellipse");
+  currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Ellipse");
   m_DrawActionsMainWindowToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
@@ -111,11 +116,40 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawTextTriggered(bool) ) );
 
-  m_DrawItemsTableWidget = new QTableWidget;
+  //# m_NodeTableModel
+  mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object"
+    , mitk::BoolProperty::New(true));
+
+  mitk::NodePredicateNOT::Pointer isNotHelperObject 
+    = mitk::NodePredicateNOT::New(isHelperObject);// Show only nodes that really contain dat
+
+  mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
+
+  mitk::NodePredicateAND::Pointer dataIsPlanarFigureAndIsNotHelperObject = mitk::NodePredicateAND::New(isPlanarFigure,
+    isNotHelperObject);
+
+  m_PlanarFiguresModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), dataIsPlanarFigureAndIsNotHelperObject);
+
+  QLabel* selectedImageLabel = new QLabel("Selected Image: ");
+  m_SelectedImage = new QLabel("None selected!");
+
+  //# m_PlanarFiguresTable
+  m_PlanarFiguresTable = new QTableView;
+  //m_PlanarFiguresTable->setContextMenuPolicy(Qt::CustomContextMenu);
+  m_PlanarFiguresTable->setSelectionMode( QAbstractItemView::ExtendedSelection );
+  m_PlanarFiguresTable->setSelectionBehavior( QAbstractItemView::SelectRows );
+  m_PlanarFiguresTable->horizontalHeader()->setStretchLastSection(true);
+  m_PlanarFiguresTable->setAlternatingRowColors(true);
+  m_PlanarFiguresTable->setSortingEnabled(true);
+  m_PlanarFiguresTable->setModel(m_PlanarFiguresModel);
 
   m_Layout = new QGridLayout;
   //m_Layout->addWidget(m_DrawActionsToolBar, 0, 0, 1, 1);
-  m_Layout->addWidget(m_DrawItemsTableWidget, 0, 0, 1, 1);
+  m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
+  m_Layout->addWidget(m_SelectedImage, 0, 1, 1, 1);
+  m_Layout->addWidget(m_PlanarFiguresTable, 1, 0, 1, 2);
+  m_Layout->setRowStretch(0, 1);
+  m_Layout->setRowStretch(1, 10);
 
   parent->setLayout(m_Layout);
 
@@ -143,35 +177,19 @@ void QmitkMeasurement::Activated()
 {
   m_PointSetInteractor = 0;
   m_CurrentPointSetNode = 0;
-
-  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
-  this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
-
-  if(m_MainWindow)
-  {
-    m_DrawActionsMainWindowToolBar->setVisible(true);
-  }
 }
 
 void QmitkMeasurement::Deactivated()
 {
-  if (m_PointSetInteractor.IsNotNull())
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-  }
-
-  if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
-  {
-    this->GetDataStorage()->Remove(m_CurrentPointSetNode);
-  }
-
-  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-  this->GetActiveStdMultiWidget()->changeLayoutToDefault();
-
-  if(m_MainWindow)
-  {
-    m_DrawActionsMainWindowToolBar->setVisible(false);
-  }
+//   if (m_PointSetInteractor.IsNotNull())
+//   {
+//     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+//   }
+// 
+//   if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
+//   {
+//     this->GetDataStorage()->Remove(m_CurrentPointSetNode);
+//   }
 }
 
 
@@ -210,10 +228,12 @@ void QmitkMeasurement::SelectionChanged( cherry::IWorkbenchPart::Pointer sourcep
   {
     // YES: node becomes new selected image node
     m_SelectedImageNode = node;
+    m_SelectedImage->setText(QString::fromStdString(m_SelectedImageNode->GetName()));
   }
   else
   {
     m_SelectedImageNode = NULL;
+    m_SelectedImage->setText("None selected!");
   }
 }
 
@@ -386,4 +406,30 @@ void QmitkMeasurement::ActionDrawTextTriggered( bool  /*checked*/ )
   {
     return;
   }
+}
+
+void QmitkMeasurement::Visible()
+{
+
+
+  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
+  this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
+
+  if(m_MainWindow)
+  {
+    m_DrawActionsMainWindowToolBar->setVisible(true);
+  }
+}
+
+void QmitkMeasurement::Hidden()
+{
+
+  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
+  this->GetActiveStdMultiWidget()->changeLayoutToDefault();
+
+  if(m_MainWindow)
+  {
+    m_DrawActionsMainWindowToolBar->setVisible(false);
+  }
+
 }

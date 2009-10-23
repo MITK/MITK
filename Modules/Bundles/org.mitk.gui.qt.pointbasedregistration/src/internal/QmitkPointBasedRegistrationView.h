@@ -132,18 +132,6 @@ public:
   //     void ClearPointSetDialogFound(QWidget* widget){}
   // #endif
 
-signals:
-
-  /*!  
-  \brief Signal that informs about that the fixed image should be reinitialized in the multi-widget.
-  */
-  void reinitFixed(const mitk::Geometry3D *);
-
-  /*!  
-  \brief Signal that informs about that the moving image should be reinitialized in the multi-widget.
-  */
-  void reinitMoving(const mitk::Geometry3D *);
-
   protected slots:  
 
     /*!  
@@ -250,13 +238,6 @@ signals:
     void transformationChanged(int transform);
 
     /*!  
-    \brief Sets whether all other data tree nodes except the two selected should be invisible or not.
-
-    True = all nodes invisible, false = all nodes visible.
-    */
-    void setInvisible(bool invisible);
-
-    /*!  
     \brief Checks whether the registration can be performed.
     */
     bool checkCalculateEnabled();
@@ -272,11 +253,6 @@ protected:
 
   cherry::ISelectionListener::Pointer m_SelListener;
   cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-  /*!  
-  \brief List that holds all invisible data tree nodes. 
-  */
-  typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
 
   /*!  
   * default main widget containing 4 windows showing 3   
@@ -298,17 +274,11 @@ protected:
   std::list<mitk::Geometry3D::Pointer> m_UndoPointsGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_RedoPointsGeometryList;
-  bool m_SetInvisible;
   bool m_ShowRedGreen;
   float m_Opacity;
   float m_OriginalOpacity;
-  int m_OldMovingLayer;
-  int m_NewMovingLayer;
-  bool m_OldMovingLayerSet;
-  bool m_NewMovingLayerSet;
   mitk::Color m_FixedColor;
   mitk::Color m_MovingColor;
-  invisibleNodesList m_InvisibleNodesList;
   int m_Transformation;
   bool m_HideFixedImage;
   bool m_HideMovingImage;

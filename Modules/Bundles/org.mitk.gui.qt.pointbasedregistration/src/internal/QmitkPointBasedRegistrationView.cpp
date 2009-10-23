@@ -163,8 +163,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject * /*parent*/, const char * /*name*/)
 : QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
-m_FixedNode(NULL), m_SetInvisible(true), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_OldMovingLayer(0), m_NewMovingLayer(0),
-m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
+m_FixedNode(NULL), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
 m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0)
 {
   m_FixedLandmarksChangedCommand = itk::SimpleMemberCommand<QmitkPointBasedRegistrationView>::New();
@@ -984,25 +983,6 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
       this->checkLandmarkError();
     }
   }
-}
-
-void QmitkPointBasedRegistrationView::setInvisible(bool invisible)
-{
-  m_SetInvisible = invisible;
-  if (m_SetInvisible)
-  {
-    this->DataStorageChanged();
-  }
-  else
-  {
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      nodeIt->Value()->SetVisibility(true);
-    }
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 bool QmitkPointBasedRegistrationView::checkCalculateEnabled()

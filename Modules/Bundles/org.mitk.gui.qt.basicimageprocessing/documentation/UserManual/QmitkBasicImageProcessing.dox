@@ -28,47 +28,47 @@ or in any good digital image processing book.
 
 Available filters are:
 
-<H1>\a Single image operations</H1>
+<H2>\a Single image operations</H2>
 
 <ul>
-<li> <b>Noise Suppression</b>
+<li><b>Noise Suppression</b></li>
   <ul>
-  <li> Gaussian Denoising
-  <li> Median Filtering
-  <li> Total Variation Denoising
+  <li> Gaussian Denoising</li>
+  <li> Median Filtering</li>
+  <li> Total Variation Denoising</li>
   </ul>
   
-<li> <b>Morphological Operations</b>
+<li><b>Morphological Operations</b></li>
   <ul>
-  <li> Dilation
-  <li> Erosion
-  <li> Opening
-  <li> Closing
+  <li> Dilation</li>
+  <li> Erosion</li>
+  <li> Opening</li>
+  <li> Closing</li>
   </ul>
   
-<li> <b>%Edge Detection</b>
+<li><b>%Edge Detection</b></li>
   <ul>
-  <li> Gradient Image
-  <li> Laplacian Operator (Second Derivative)
-  <li> Sobel Operator
+  <li> Gradient Image</li>
+  <li> Laplacian Operator (Second Derivative)</li>
+  <li> Sobel Operator</li>
   </ul>
   
-<li> <b>Other</b>
+<li><b>Other</b></li>
   <ul>
-  <li> Image Inversion
-  <li> Downsampling (isotropic, factor 2)  
+  <li> Image Inversion</li>
+  <li> Downsampling (isotropic, factor 2)</li>  
   </ul>
 </ul>
   
-<H1>\a Dual image operations</H1>
+<H2>\a Dual image operations</H2>
 
 <ul>  
-<li> <b>Image Arithmetics</b>
+<li><b>Image Arithmetics</b></li>
   <ul>
-  <li> Add two images
-  <li> Subtract two images
-  <li> Multiply two images
-  <li> Divide two images
+  <li> Add two images</li>
+  <li> Subtract two images</li>
+  <li> Multiply two images</li>
+  <li> Divide two images</li>
   </ul>
 </ul> 
 
@@ -76,9 +76,9 @@ Available filters are:
 
 All you have to do to use a filter is to:
 <ul>
-<li> Load an image into MITK
-<li> Select which filter you want to use via the drop down list
-<li> Press the execute button
+<li> Load an image into MITK</li>
+<li> Select which filter you want to use via the drop down list</li>
+<li> Press the execute button</li>
 </ul>
 A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
 (If the  checkbox "Hide original image" is not selected, you will maybe not se the filter result imideately, 

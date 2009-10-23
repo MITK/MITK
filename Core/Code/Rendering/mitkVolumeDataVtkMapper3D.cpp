@@ -609,68 +609,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node,
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-
-      /* //old Transfer Function Version
-      float m_Min = image->GetScalarValueMin();
-      float m_Max = image->GetScalarValueMax();
-
-      tf->GetScalarOpacityFunction()->Initialize();
-      tf->GetScalarOpacityFunction()->AddPoint ( m_Min, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint ( m_Max, 1 );
-      tf->GetColorTransferFunction()->AddRGBPoint(m_Min,1,0,0);
-      tf->GetColorTransferFunction()->AddRGBPoint(m_Max,1,1,0);
-      tf->GetGradientOpacityFunction()->Initialize();
-      tf->GetGradientOpacityFunction()->AddPoint(m_Min,1.0);
-      tf->GetGradientOpacityFunction()->AddPoint(0.0,1.0);
-      tf->GetGradientOpacityFunction()->AddPoint((m_Max*0.25),1.0);
-      tf->GetGradientOpacityFunction()->AddPoint(m_Max,1.0);
-      */
-
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION >= 2)  )
-      
-      //CT_AAA for VTK Version >= 5.2
-      tf->GetColorTransferFunction()->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 143.556, 0.615686, 0.356863, 0.184314, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 166.222, 0.882353, 0.603922, 0.290196, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 214.389, 1, 1, 1, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 419.736, 1, 0.937033, 0.954531, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 3071, 0.827451, 0.658824, 1, 0.5, 0 );
-
-      tf->GetScalarOpacityFunction()->Initialize();
-      tf->GetScalarOpacityFunction()->AddPoint( -3024, 0, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 143.556, 0, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 166.222, 0.686275, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 214.389, 0.696078, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 419.736, 0.833333, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 3071, 0.803922, 0.5, 0 );
-
-      tf->GetGradientOpacityFunction()->Initialize();
-      tf->GetGradientOpacityFunction()->AddPoint( 0, 1, 0.5, 0 );
-      tf->GetGradientOpacityFunction()->AddPoint( 255, 1, 0.5, 0);
-
-#else
-      //CT_AAA for VTK Version < 5.2
-      tf->GetColorTransferFunction()->AddRGBPoint( -3024, 0, 0, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 143.556, 0.615686, 0.356863, 0.184314 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 166.222, 0.882353, 0.603922, 0.290196 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 214.389, 1, 1, 1 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 419.736, 1, 0.937033, 0.954531 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 3071, 0.827451, 0.658824, 1 );
-
-      tf->GetScalarOpacityFunction()->Initialize();
-      tf->GetScalarOpacityFunction()->AddPoint( -3024, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 143.556, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 166.222, 0.686275 );
-      tf->GetScalarOpacityFunction()->AddPoint( 214.389, 0.696078 );
-      tf->GetScalarOpacityFunction()->AddPoint( 419.736, 0.833333 );
-      tf->GetScalarOpacityFunction()->AddPoint( 3071, 0.803922 );
-
-      tf->GetGradientOpacityFunction()->Initialize();
-      tf->GetGradientOpacityFunction()->AddPoint( 0, 1 );
-      tf->GetGradientOpacityFunction()->AddPoint( 255, 1 );
-
-#endif
-
+      tf->SetTransferFunctionMode(0);
       node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
     }
   }

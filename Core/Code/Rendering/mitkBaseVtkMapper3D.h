@@ -48,12 +48,12 @@ public:
 
   static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
-  void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
-  void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
-  void MitkRenderOverlay(mitk::BaseRenderer* renderer);
+  virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
+  virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
+  virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
   
   #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-    void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
   #endif
   //##Documentation
   //## @brief Set the vtkTransform of the m_Prop3D for

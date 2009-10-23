@@ -246,17 +246,8 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
   {
     if((dynamic_cast<Image*>(data) != NULL))
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
-      if (image->GetPixelType().GetNumberOfComponents() <= 1)
-      {
-        newMapper = mitk::VolumeDataVtkMapper3D::New();
-        newMapper->SetDataTreeNode(node);
-      }
-      else
-      {
-        //newMapper = mitk::VectorImageVtkGlyphMapper3D::New();
-        //newMapper->SetDataTreeNode(node);
-      }
+      newMapper = mitk::VolumeDataVtkMapper3D::New();
+      newMapper->SetDataTreeNode(node);
     }
     else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
     {

@@ -39,7 +39,12 @@ public:
   itkNewMacro( Self );
 
 
-  virtual bool IsClosed() const { return true; };
+  virtual bool IsClosed() const { return m_Closed; };
+
+  itkSetMacro( Closed, bool );
+  itkGetMacro( Closed, bool );
+  itkBooleanMacro( Closed );
+
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -71,6 +76,8 @@ protected:
   virtual void GeneratePolyLine();
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+
+  bool m_Closed;
 
 
 private:

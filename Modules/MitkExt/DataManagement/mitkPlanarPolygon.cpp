@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarPolygon::PlanarPolygon()
+: m_Closed( true )
 {
   // Polygon has at least two control points
   m_ControlPoints->Reserve( 2 );

@@ -135,7 +135,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
 };
 
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality() , m_MultiWidget(NULL), m_ShowRedGreen(false), m_FixedNode(NULL), m_MovingNode(NULL),
+: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false), 
   m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false)
 {
 }

@@ -18,65 +18,48 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 
 #include "mitkOrganTypeProperty.h"
+#include "mitkColorProperty.h"
 
 #include <Q3ListBox>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
 #include <qlabel.h>
+#include <QColorDialog>
 
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 :QDialog(parent), // true, modal
  selectedOrgan("undefined"),
  newOrganEntry(false)
 {
-  QDialog::setMinimumSize(250, 300);
+  QDialog::setMinimumSize(250, 200);
 
   QBoxLayout * verticalLayout = new QVBoxLayout( this );
   verticalLayout->setMargin(5);
   verticalLayout->setSpacing(5);
 
-  // list of all known organs
-  lblPrompt = new QLabel( "What do you want to segment?", this );
-  verticalLayout->addWidget( lblPrompt );
-  lstOrgans = new Q3ListBox( this, "lstOrgans" );
-  verticalLayout->addWidget( lstOrgans );
-
   mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
-  for ( mitk::EnumerationProperty::EnumConstIterator iter = organTypes->Begin();
-        iter != organTypes->End();
-        ++iter )
-  {
-    std::string organ = iter->second;
-
-    if (organ != "undefined")
-    {
-      lstOrgans->insertItem( organ.c_str() );
-    }
-  }
-
-  lstOrgans->setSelected(0, true); // select first Item by default (might turn out to be a stupid descision)
-
-  // one special item for new organs
-  lstOrgans->insertItem( "Other organ..." );
-
-  connect( lstOrgans, SIGNAL(selected(const QString&)), this, SLOT(onOrganImmediatelySelected(const QString&)) );
-  connect( lstOrgans, SIGNAL(highlighted(const QString&)), this, SLOT(onOrganSelected(const QString&)) );
-  connect( lstOrgans, SIGNAL(highlighted(int)), this, SLOT(onOrganSelected(int)) );
-
-  // to enter the definition of a new organ 
-  edtNewOrgan = new QLineEdit( "Enter organ name here", this, "edtNewOrgan" );
-  edtNewOrgan->setPaletteForegroundColor( Qt::red );
-  verticalLayout->addWidget( edtNewOrgan );
-  edtNewOrgan->hide();
-  connect( edtNewOrgan, SIGNAL(textChanged(const QString&)), this, SLOT(onNewOrganNameChanged(const QString&)) );
-
 
   // to enter a name for the segmentation
-  verticalLayout->addWidget( new QLabel( "Visible name of the segmentation", this ) );
-  QString firstOrgan( lstOrgans->currentText() );
-  edtName = new QLineEdit( firstOrgan, this, "edtName" );
-  verticalLayout->addWidget( edtName );
+  verticalLayout->addWidget( new QLabel( "Name and color of the segmentation", this ) );
+
+  // to choose a color
+  btnColor = new QPushButton( tr("Color"), this, "btnColor" );
+
+  connect( btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()) );
+//  QColorDialog::getColor();
+
+
+
+  edtName = new QLineEdit( "", this, "edtName" );
+
+  QBoxLayout * horizontalLayout2 = new QHBoxLayout(verticalLayout);
+  horizontalLayout2->setSpacing(5);
+  horizontalLayout2->addStretch();
+  horizontalLayout2->addWidget( btnColor );
+  horizontalLayout2->addWidget( edtName );
+
+
 
   // buttons for closing the dialog
   btnOk = new QPushButton( tr("Ok"), this, "btnOk" );
@@ -92,7 +75,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   horizontalLayout->addWidget( btnOk );
   horizontalLayout->addWidget( btnCancel );
 
-  edtNewOrgan->setFocus();
+  edtName->setFocus();
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
@@ -160,6 +143,12 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString& newText)
 
   selectedOrgan = newText;
   edtName->setText( newText );
+}
+
+void QmitkNewSegmentationDialog::onColorBtnClicked()
+{
+  color = QColorDialog::getColor();
+  // in progress
 }
     
 void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )

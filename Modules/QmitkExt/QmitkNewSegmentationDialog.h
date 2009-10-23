@@ -64,6 +64,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     void onOrganSelected(const QString& organ);
     void onOrganSelected(int index);
     void onNewOrganNameChanged(const QString&);
+    void onColorBtnClicked();
 
   protected:
 
@@ -71,6 +72,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     Q3ListBox*  lstOrgans;
     QLineEdit* edtName;
 
+    QPushButton* btnColor;
     QPushButton* btnOk;
 
     QLineEdit* edtNewOrgan;
@@ -78,6 +80,8 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     QString selectedOrgan;
 
     bool newOrganEntry;
+
+    QColor color;
 };
 
 #endif

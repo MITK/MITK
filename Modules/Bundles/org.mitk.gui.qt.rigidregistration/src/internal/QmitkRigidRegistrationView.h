@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "ui_QmitkRigidRegistrationViewControls.h"
 
+#include "cherryISelectionListener.h"
+#include "cherryIStructuredSelection.h"
+
 #include "../RigidregistrationDll.h"
 
 // Time Slider related
@@ -44,9 +47,14 @@ Registration results will directly be applied to the Moving Image.
 
 class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
 {  
+
+  friend struct SelListenerRigidRegistration;
+
   Q_OBJECT
   
   public:  
+
+    static const std::string VIEW_ID;
 
     /*!  
     \brief default constructor  
@@ -90,42 +98,17 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
   signals:
 
-    /*!  
-    \brief Signal that informs about that the fixed image should be reinitialized in the multi-widget.
-    */
-    void reinitFixed(const mitk::Geometry3D *);
-
-    /*!  
-    \brief Signal that informs about that the moving image should be reinitialized in the multi-widget.
-    */
-    void reinitMoving(const mitk::Geometry3D *);
-
-    /*!  
-    \brief Signal that informs about that the Demons registration should be performed.
-    */
-    void calculateDemonsRegistration();
-
   protected slots:  
-    
-    /*!
-    \brief Called whenever the data storage has changed. 
-    */
-    virtual void DataStorageChanged();
-
-    /*!  
-    \brief Returns the predication for the nodes shown in the DataStorageComboBoxes.
-    */
-    mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
     
     /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(int = 0);
+    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
 
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(int = 0);
+    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
 
     /*!
     * \brief sets the moving Mask Image according to TreeNodeSelector widget
@@ -145,11 +128,6 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * checks if registration is possible
     */
     bool CheckCalculate();
-
-    /*!
-    * \brief Saves the moving image, intended to be done after a registration.
-    */
-    void SaveModel();
     
     /*!
     * \brief Undo the last registration.
@@ -192,6 +170,12 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     void ShowRedGreen(bool show);
 
     /*!
+    * \brief Changes the visibility of the manual registration methods accordingly to the checkbox "Manual Registration" in GUI
+    * @param show if true, then manual registration methods will be shown
+    */
+    void ShowManualRegistrationFrame(bool show);
+
+    /*!
     * \brief Sets the selected opacity for moving image
     * @param opacity the selected opacity
     */
@@ -214,39 +198,6 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * \brief Clears the undo and redo lists and sets the undo and redo buttons to disabled.
     */
     void ClearTransformationLists();
-
-    /*!
-    * \brief Only shows the fixed image in the render windows.
-    * Only shows the fixed image in the render windows.  All other data tree nodes are invisible.
-    */
-    void ShowFixedImage();
-
-    /*!
-    * \brief Only shows the moving image in the render windows.
-    * Only shows the moving image in the render windows. All other data tree nodes are invisible.
-    */
-    void ShowMovingImage();
-
-    /*!
-    * \brief Shows the fixed and the moving image in the render windows.
-    * Shows the fixed and the moving image in the render windows. All other data tree nodes are invisible.
-    */
-    void ShowBothImages();
-
-    /*!  
-    \brief Reinitializes the fixed image in the multi-widget.
-    */
-    void reinitFixedClicked();
-
-    /*!  
-    \brief Reinitializes the moving image in the multi-widget.
-    */
-    void reinitMovingClicked();
-
-    /*!  
-    \brief Reinitializes all visible images in the multi-widget.
-    */
-    void globalReinitClicked();
 
     void SetUndoEnabled( bool enable );
 
@@ -275,13 +226,16 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void SetOptimizerValue( double value );
 
-    void registrationTabChanged( int );
-
     void StopOptimizationClicked();
 
     void UpdateTimestep();
 
+    void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+
   protected:
+
+    cherry::ISelectionListener::Pointer m_SelListener;
+    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!  
     \brief List that holds all invisible data tree nodes. 
@@ -298,10 +252,10 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * control widget to make all changes for Deformable registration 
     */  
     Ui::QmitkRigidRegistrationViewControls m_Controls;
-    mitk::DataTreeNode* m_MovingNode;
-    mitk::DataTreeNode* m_MovingMaskNode;
-    mitk::DataTreeNode* m_FixedNode;
-    mitk::DataTreeNode* m_FixedMaskNode;
+    mitk::DataTreeNode::Pointer m_MovingNode;
+    mitk::DataTreeNode::Pointer m_MovingMaskNode;
+    mitk::DataTreeNode::Pointer m_FixedNode;
+    mitk::DataTreeNode::Pointer m_FixedMaskNode;
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
     bool m_ShowRedGreen;

@@ -259,6 +259,8 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
 {
   if(index >= 0 && index < this->count())
     emit OnSelectionChanged(this->GetSelectedNode());
+  if(index == -1)
+    emit OnSelectionChanged(NULL);
 }
 
 void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _DataTreeNode)

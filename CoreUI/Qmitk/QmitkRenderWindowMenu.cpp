@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
 :QWidget(parent,f),
 m_Settings(NULL),
-m_Layout(NULL),
+m_Layout(0),
 m_LayoutDesign(0),
 m_OldLayoutDesign(0),
 m_FullScreenMode(false)

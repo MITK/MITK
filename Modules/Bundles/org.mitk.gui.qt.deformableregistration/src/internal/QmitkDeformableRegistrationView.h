@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../DeformableregistrationDll.h"
 
+#include "cherryISelectionListener.h"
+#include "cherryIStructuredSelection.h"
+
 /*!
 \brief The DeformableRegistration functionality is used to perform deformable registration.
 
@@ -42,9 +45,14 @@ For more informations see: \ref QmitkDeformableRegistrationUserManual
 
 class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QObject, public QmitkFunctionality
 {  
+
+  friend struct SelListenerDeformableRegistration;
+
   Q_OBJECT
-  
+
   public:  
+
+    static const std::string VIEW_ID; 
 
     /*!  
     \brief default constructor  
@@ -111,24 +119,14 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
   protected slots:  
     
     /*!
-    \brief Called whenever the data storage has changed. 
-    */
-    virtual void DataStorageChanged();
-
-    /*!  
-    \brief Returns the predication for the nodes shown in the DataStorageComboBoxes.
-    */
-    mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
-    
-    /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(int = 0);
+    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
     
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(int = 0);
+    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
 
     /*!
     * checks if registration is possible
@@ -160,36 +158,6 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     */
     void SetImageColor(bool redGreen);
 
-    /*!
-    * sets all other images except the fixed image to invisible
-    */
-    void ShowFixedImage();
-
-    /*!
-    * sets all other images except the moving image to invisible
-    */
-    void ShowMovingImage();
-
-    /*!
-    * sets all other images except the fixed and moving images to invisible
-    */
-    void ShowBothImages();
-
-    /*!  
-    \brief Reinitializes the fixed image in the multi-widget.
-    */
-    void reinitFixedClicked();
-
-    /*!  
-    \brief Reinitializes the moving image in the multi-widget.
-    */
-    void reinitMovingClicked();
-
-    /*!  
-    \brief Reinitializes all visible images in the multi-widget.
-    */
-    void globalReinitClicked();
-
     /*!  
     \brief Checks whether the registration can be performed.
     */
@@ -200,18 +168,17 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     */
     void Calculate();
 
-
      /*!
      * Prints the values of the deformationfield 
      */
     void ApplyDeformationField();
 
+    void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+
   protected:
 
-    /*!  
-    \brief List that holds all invisible data tree nodes. 
-    */  
-    typedef std::set<mitk::DataTreeNode*> invisibleNodesList;
+    cherry::ISelectionListener::Pointer m_SelListener;
+    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!  
     * default main widget containing 4 windows showing 3   
@@ -223,21 +190,13 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     * control widget to make all changes for Deformable registration 
     */  
     Ui::QmitkDeformableRegistrationViewControls m_Controls;
-    mitk::DataTreeNode* m_MovingNode;
-    mitk::DataTreeNode* m_FixedNode;
+    mitk::DataTreeNode::Pointer m_MovingNode;
+    mitk::DataTreeNode::Pointer m_FixedNode;
     bool m_ShowRedGreen;
-    bool m_ShowFixedImage;
-    bool m_ShowMovingImage;
-    bool m_ShowBothImages;
     float m_Opacity;
     float m_OriginalOpacity;
-    int m_OldMovingLayer;
-    int m_NewMovingLayer;
-    bool m_OldMovingLayerSet;
-    bool m_NewMovingLayerSet;
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
-    invisibleNodesList m_InvisibleNodesList;
     bool m_Deactivated;
 };
 

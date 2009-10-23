@@ -38,15 +38,105 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageFileReader.h"
 #include "itkWarpImageFilter.h"
 
+#include "mitkDataTreeNodeObject.h"
+
+#include "cherryIWorkbenchWindow.h"
+#include "cherryISelectionService.h"
+
 typedef itk::Vector< float, 3 >       VectorType;
 typedef itk::Image< VectorType, 3 >   DeformationFieldType;
 
 typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
 
+const std::string QmitkDeformableRegistrationView::VIEW_ID = "org.mitk.views.deformableregistration";
+
+using namespace cherry;
+
+struct SelListenerDeformableRegistration : ISelectionListener
+{
+  cherryObjectMacro(SelListenerDeformableRegistration);
+
+  SelListenerDeformableRegistration(QmitkDeformableRegistrationView* view)
+  {
+    m_View = view;
+  }
+
+  void DoSelectionChanged(ISelection::ConstPointer selection)
+  {
+    // save current selection in member variable
+    m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
+    m_View->m_Controls.TextLabelFixed->hide();
+    m_View->m_Controls.m_FixedLabel->hide();
+    m_View->m_Controls.TextLabelMoving->hide();
+    m_View->m_Controls.m_MovingLabel->hide();
+
+    // do something with the selected items
+    if(m_View->m_CurrentSelection)
+    {
+      m_View->SetImagesVisible(selection);
+      if (m_View->m_CurrentSelection->Size() != 2)
+      {
+        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+        m_View->m_Controls.m_StatusLabel->show();
+        m_View->FixedSelected(NULL);
+        m_View->FixedSelected(NULL);
+      }
+      else
+      {
+        m_View->m_Controls.m_StatusLabel->hide();
+        bool foundFixedImage = false;
+        // iterate selection
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+          i != m_View->m_CurrentSelection->End(); ++i)
+        {
+          // extract datatree node
+          if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+          {
+            mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+            // only look at interesting types
+            if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
+            {
+              if (foundFixedImage == false)
+              {
+                m_View->FixedSelected(node);
+                foundFixedImage = true;
+              }
+              else
+                m_View->MovingSelected(node);
+            }
+            else
+            {
+              m_View->FixedSelected(NULL);
+              m_View->FixedSelected(NULL);
+              m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  {
+    // check, if selection comes from datamanager
+    if (part)
+    {
+      QString partname(part->GetPartName().c_str());
+      if(partname.compare("Datamanager")==0)
+      {
+        // apply selection
+        DoSelectionChanged(selection);
+      }
+    }
+  }
+
+  QmitkDeformableRegistrationView* m_View;
+};
+
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
-  m_ShowFixedImage(false), m_ShowMovingImage(false), m_ShowBothImages(true), m_Opacity(0.5), m_OriginalOpacity(1.0), 
-  m_OldMovingLayer(0), m_NewMovingLayer(0), m_OldMovingLayerSet(false), m_NewMovingLayerSet(false), m_Deactivated(false)
+: QmitkFunctionality() , m_MultiWidget(NULL), m_ShowRedGreen(false), m_FixedNode(NULL), m_MovingNode(NULL),
+  m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false)
 {
 }
 
@@ -58,24 +148,11 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls.setupUi(parent);
   m_Parent->setEnabled(false);
-  this->CreateConnections();
-
-  // define data type for fixed image combobox
-  m_Controls.m_FixedSelector->SetDataStorage( this->GetDefaultDataStorage() );
-  m_Controls.m_FixedSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
-
-  // define data type for moving image combobox
-  m_Controls.m_MovingSelector->SetDataStorage( this->GetDefaultDataStorage() );
-  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
-  connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));
-  connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
-  
-  
-  QObject::connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
-              SIGNAL(clicked()), 
-              (QObject*) this,
-              SLOT(ApplyDeformationField()) );
-  
+  this->CreateConnections(); 
+  m_Controls.TextLabelFixed->hide();
+  m_Controls.m_FixedLabel->hide();
+  m_Controls.TextLabelMoving->hide();
+  m_Controls.m_MovingLabel->hide();
   
   this->CheckCalculateEnabled();
 }
@@ -90,8 +167,6 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
       
   DeformationFieldType::Pointer deformationField = reader->GetOutput();
 
-  m_MovingNode = m_Controls.m_MovingSelector->GetSelectedNode();
-  m_FixedNode = m_Controls.m_FixedSelector->GetSelectedNode();
   mitk::Image * mimage = dynamic_cast<mitk::Image*> (m_MovingNode->GetData());
   mitk::Image * fimage = dynamic_cast<mitk::Image*> (m_FixedNode->GetData());
   
@@ -142,15 +217,6 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   
 }
 
-mitk::NodePredicateBase::Pointer QmitkDeformableRegistrationView::GetMovingImagePredicate()
-{
-  mitk::NodePredicateProperty::Pointer isFixedImage = mitk::NodePredicateProperty::New("selectedFixedImage", mitk::BoolProperty::New(true));
-  mitk::NodePredicateNOT::Pointer notFixedImage = mitk::NodePredicateNOT::New(isFixedImage);
-  mitk::NodePredicateDataType::Pointer isImage(mitk::NodePredicateDataType::New("Image"));
-  mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( notFixedImage, isImage );
-  return predicate.GetPointer();
-}
-
 void QmitkDeformableRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_Parent->setEnabled(true);
@@ -168,109 +234,32 @@ void QmitkDeformableRegistrationView::StdMultiWidgetNotAvailable()
 
 void QmitkDeformableRegistrationView::CreateConnections()
 {
-  connect( m_Controls.m_FixedSelector, SIGNAL(activated(int)), this, SLOT(FixedSelected(int)));
-  connect( m_Controls.m_MovingSelector, SIGNAL(activated(int)), this, SLOT(MovingSelected(int)));
-  connect(m_Controls.m_ShowBothImages, SIGNAL(clicked()), this, SLOT(ShowBothImages()));
-  connect(m_Controls.m_ShowFixedImage, SIGNAL(clicked()), this, SLOT(ShowFixedImage()));
-  connect(m_Controls.m_ShowMovingImage, SIGNAL(clicked()), this, SLOT(ShowMovingImage()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
-
-  connect(m_Controls.m_FixedReinit, SIGNAL(clicked()), this, SLOT(reinitFixedClicked()));
-  connect(m_Controls.m_MovingReinit, SIGNAL(clicked()), this, SLOT(reinitMovingClicked()));
-  connect(m_Controls.m_GlobalReinit, SIGNAL(clicked()), this, SLOT(globalReinitClicked()));
-}
-
-
-void QmitkDeformableRegistrationView::DataStorageChanged()
-{
-  if (!m_Deactivated)
-  {
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-      {
-        nodeIt->Value()->SetVisibility(false);
-      }
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    this->FixedSelected();
-    this->MovingSelected();
-  }
+  connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));
+  connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
+  connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
+    SIGNAL(clicked()), 
+    (QObject*) this,
+    SLOT(ApplyDeformationField()) );
 }
 
 void QmitkDeformableRegistrationView::Activated()
 {
   m_Deactivated = false;
-  bool visible = false;
-  bool selectedFixedImage = false;
-  m_InvisibleNodesList.clear();
-  mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-    ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-  {
-    if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-    {
-      nodeIt->Value()->GetBoolProperty("visible", visible);
-      // safe all previous invisible nodes in a set
-      if (visible == false)
-      {
-        m_InvisibleNodesList.insert(nodeIt->Value());
-      }
-      else
-      {
-        nodeIt->Value()->SetVisibility(false);
-      }
-      // reset m_FixedNode
-      nodeIt->Value()->GetBoolProperty("selectedFixedImage", selectedFixedImage);
-      if (selectedFixedImage == true)
-      {
-        m_FixedNode = nodeIt->Value();
-      }
-    }
-  }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  this->FixedSelected();
-  this->MovingSelected();
   this->OpacityUpdate(m_Opacity);
 }
 
 void QmitkDeformableRegistrationView::Deactivated()
 {
   m_Deactivated = true;
-  // reset previous invisible nodes to invisible and previous visible nodes to visible
-  std::set<mitk::DataTreeNode*>::iterator setIter;
-  mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-    ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-  {
-    if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-    {
-      setIter = m_InvisibleNodesList.find(nodeIt->Value());
-      if (setIter != m_InvisibleNodesList.end())
-      {
-        nodeIt->Value()->SetVisibility(false);
-      }
-      else
-      {
-        nodeIt->Value()->SetVisibility(true);
-      }
-    }
-  }
-  m_InvisibleNodesList.clear();
   this->SetImageColor(false);
-  if (m_MovingNode != NULL)
+  if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
-    if (m_OldMovingLayerSet)
-    {
-      m_MovingNode->SetIntProperty("layer", m_OldMovingLayer);
-      m_OldMovingLayerSet = false;
-    }
   }
   m_FixedNode = NULL;
   m_MovingNode = NULL;
@@ -278,22 +267,24 @@ void QmitkDeformableRegistrationView::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
-void QmitkDeformableRegistrationView::FixedSelected(int)
+void QmitkDeformableRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)
 {
-  if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
+  if (fixedImage.IsNotNull())
   {
-    m_Controls.m_ShowFixedImage->setEnabled(true);
-    if (m_FixedNode != m_Controls.m_FixedSelector->GetSelectedNode())
+    if (m_FixedNode != fixedImage)
     {
       // remove changes on previous selected node
-      if (m_FixedNode != NULL)
+      if (m_FixedNode.IsNotNull())
       {
         this->SetImageColor(false);
         m_FixedNode->SetVisibility(false);
         m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(false));
       }
       // get selected node
-      m_FixedNode = m_Controls.m_FixedSelector->GetSelectedNode();
+      m_FixedNode = fixedImage;
+      m_Controls.TextLabelFixed->setText(QString::fromStdString(m_FixedNode->GetName()));
+      m_Controls.m_FixedLabel->show();
+      m_Controls.TextLabelFixed->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_FixedNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -301,80 +292,34 @@ void QmitkDeformableRegistrationView::FixedSelected(int)
         m_FixedColor = colorProperty->GetColor();
       }
       this->SetImageColor(m_ShowRedGreen);
-      m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(true));
-
-      if (m_MovingNode != NULL)
-      {
-        // safe MovingLayer only if we do not overwrite original MovingLayer
-        if (!m_OldMovingLayerSet)
-        {
-          m_MovingNode->GetIntProperty("layer", m_OldMovingLayer);
-          m_OldMovingLayerSet = true;
-        }
-        m_FixedNode->GetIntProperty("layer", m_NewMovingLayer);
-        m_NewMovingLayer += 1;
-        m_MovingNode->SetIntProperty("layer", m_NewMovingLayer);
-      }
-      if (m_ShowBothImages)
-      {
-        this->ShowBothImages();
-      }
-      if (m_ShowFixedImage)
-      {
-        this->ShowFixedImage();
-      }
-      if (m_ShowMovingImage)
-      {
-        this->ShowMovingImage();
-      }
+      m_FixedNode->SetVisibility(true);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-    else
-    {
-      if (m_ShowFixedImage || m_ShowBothImages)
-      {
-        if (m_FixedNode != NULL)
-        {
-          m_FixedNode->SetVisibility(true);
-        }
-      }
     }
   }
   else
   {
-    if (m_ShowFixedImage)
-    {
-      m_Controls.m_ShowBothImages->setChecked(true);
-      this->ShowBothImages();
-    }
-    m_Controls.m_ShowFixedImage->setEnabled(false);
+    m_FixedNode = fixedImage;
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.TextLabelFixed->hide();
   }
-  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
   this->CheckCalculateEnabled();
 }
 
-void QmitkDeformableRegistrationView::MovingSelected(int)
+void QmitkDeformableRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movingImage)
 {
-  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
+  if (movingImage.IsNotNull())
   {
-    m_Controls.m_ShowMovingImage->setEnabled(true);
-    if (m_MovingNode != m_Controls.m_MovingSelector->GetSelectedNode())
+    if (m_MovingNode != movingImage)
     {
-      if (m_MovingNode != NULL)
+      if (m_MovingNode.IsNotNull())
       {
         m_MovingNode->SetOpacity(m_OriginalOpacity);
         this->SetImageColor(false);
-        if (m_MovingNode != m_FixedNode)
-        {
-          m_MovingNode->SetVisibility(false);
-        }
-        if (m_OldMovingLayerSet)
-        {
-          m_MovingNode->SetIntProperty("layer", m_OldMovingLayer);
-          m_OldMovingLayerSet = false;
-        }
       }
-      m_MovingNode = m_Controls.m_MovingSelector->GetSelectedNode();
+      m_MovingNode = movingImage;
+      m_Controls.TextLabelMoving->setText(QString::fromStdString(m_MovingNode->GetName()));
+      m_Controls.m_MovingLabel->show();
+      m_Controls.TextLabelMoving->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -384,50 +329,15 @@ void QmitkDeformableRegistrationView::MovingSelected(int)
       this->SetImageColor(m_ShowRedGreen);
       m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
       this->OpacityUpdate(m_Opacity);
-      // safe MovingLayer only if we do not overwrite original MovingLayer
-      m_MovingNode->GetIntProperty("layer", m_OldMovingLayer);
-      m_OldMovingLayerSet = true;
-      // change MovingLayer to be one higher than FixedLayer -> MovingImage will be the upper image
-      if (m_FixedNode != NULL)
-      {
-        m_FixedNode->GetIntProperty("layer", m_NewMovingLayer);
-        m_NewMovingLayer += 1;
-        m_MovingNode->SetIntProperty("layer", m_NewMovingLayer);
-      }
-      if (m_ShowBothImages)
-      {
-        this->ShowBothImages();
-      }
-      if (m_ShowFixedImage)
-      {
-        this->ShowFixedImage();
-      }
-      if (m_ShowMovingImage)
-      {
-        this->ShowMovingImage();
-      }
+      m_MovingNode->SetVisibility(true);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      this->OpacityUpdate(m_Opacity);
-    }
-    else
-    {
-      if (m_ShowMovingImage || m_ShowBothImages)
-      {
-        if (m_MovingNode != NULL)
-        {
-          m_MovingNode->SetVisibility(true);
-        }
-      }
     }
   }
   else
   {
-    if (m_ShowMovingImage)
-    {
-      m_Controls.m_ShowBothImages->setChecked(true);
-      this->ShowBothImages();
-    }
-    m_Controls.m_ShowMovingImage->setEnabled(false);
+    m_MovingNode = NULL;
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.TextLabelMoving->hide();
   }
   this->CheckCalculateEnabled();
 }
@@ -445,69 +355,21 @@ void QmitkDeformableRegistrationView::ShowRedGreen(bool redGreen)
   this->SetImageColor(m_ShowRedGreen);
 }
 
-void QmitkDeformableRegistrationView::ShowFixedImage()
-{
-  m_ShowBothImages = false;
-  m_ShowFixedImage = true;
-  m_ShowMovingImage = false;
-  if(m_FixedNode != NULL)
-  {
-    m_FixedNode->SetVisibility(true);
-  }
-  if(m_MovingNode != NULL)
-  {
-    m_MovingNode->SetVisibility(false);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkDeformableRegistrationView::ShowMovingImage()
-{
-  m_ShowBothImages = false;
-  m_ShowFixedImage = false;
-  m_ShowMovingImage = true;
-  if(m_FixedNode != NULL)
-  {
-    m_FixedNode->SetVisibility(false);
-  }
-  if(m_MovingNode != NULL)
-  {
-    m_MovingNode->SetVisibility(true);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkDeformableRegistrationView::ShowBothImages()
-{
-  m_ShowBothImages = true;
-  m_ShowFixedImage = false;
-  m_ShowMovingImage = false;
-  if(m_FixedNode != NULL)
-  {
-    m_FixedNode->SetVisibility(true);
-  }
-  if(m_MovingNode != NULL)
-  {
-    m_MovingNode->SetVisibility(true);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
 void QmitkDeformableRegistrationView::SetImageColor(bool redGreen)
 {
-  if (!redGreen && m_FixedNode != NULL)
+  if (!redGreen && m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetColor(m_FixedColor);
   }
-  if (!redGreen && m_MovingNode != NULL)
+  if (!redGreen && m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetColor(m_MovingColor);
   }
-  if (redGreen && m_FixedNode != NULL)
+  if (redGreen && m_FixedNode.IsNotNull())
   {
     m_FixedNode->SetColor(1.0f, 0.0f, 0.0f);
   }
-  if (redGreen && m_MovingNode != NULL)
+  if (redGreen && m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetColor(0.0f, 1.0f, 0.0f);
   }
@@ -517,7 +379,7 @@ void QmitkDeformableRegistrationView::SetImageColor(bool redGreen)
 void QmitkDeformableRegistrationView::OpacityUpdate(float opacity)
 {
   m_Opacity = opacity;
-  if (m_MovingNode != NULL)
+  if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_Opacity);
   }
@@ -530,48 +392,9 @@ void QmitkDeformableRegistrationView::OpacityUpdate(int opacity)
   this->OpacityUpdate(fValue);
 }
 
-void QmitkDeformableRegistrationView::reinitFixedClicked()
-{
-  if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
-  {
-    mitk::DataTreeNode* node = m_Controls.m_FixedSelector->GetSelectedNode();
-    if (node != NULL )
-    {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      emit reinitFixed( basedata->GetTimeSlicedGeometry() );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-void QmitkDeformableRegistrationView::reinitMovingClicked()
-{
-  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
-  {
-    mitk::DataTreeNode* node = m_Controls.m_MovingSelector->GetSelectedNode();
-    if (node != NULL )
-    {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      emit reinitMoving( basedata->GetTimeSlicedGeometry() );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-void QmitkDeformableRegistrationView::globalReinitClicked()
-{
-  /* get all nodes that have not set "includeInBoundingBox" to false */
-  mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  /* calculate bounding geometry of these nodes */
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
-  /* initialize the views to the bounding geometry */
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-}
-
 void QmitkDeformableRegistrationView::CheckCalculateEnabled()
 {
-  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull() && m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
   {
     m_Controls.m_CalculateTransformation->setEnabled(true);
   }
@@ -583,19 +406,48 @@ void QmitkDeformableRegistrationView::CheckCalculateEnabled()
 
 void QmitkDeformableRegistrationView::Calculate()
 {
- 
- 
   if (m_Controls.m_DeformableTransform->tabText(m_Controls.m_DeformableTransform->currentIndex()) == "Demons")
   {
-    m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
-    m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
+    m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_FixedNode);
+    m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_MovingNode);
     emit calculateDemonsRegistration();
   }
 
   else if (m_Controls.m_DeformableTransform->tabText(m_Controls.m_DeformableTransform->currentIndex()) == "B-Spline")
   {
-    m_Controls.m_QmitkBSplineRegistrationViewControls->SetFixedNode(m_Controls.m_FixedSelector->GetSelectedNode());
-    m_Controls.m_QmitkBSplineRegistrationViewControls->SetMovingNode(m_Controls.m_MovingSelector->GetSelectedNode());
+    m_Controls.m_QmitkBSplineRegistrationViewControls->SetFixedNode(m_FixedNode);
+    m_Controls.m_QmitkBSplineRegistrationViewControls->SetMovingNode(m_MovingNode);
     emit calculateBSplineRegistration();
   }
 }
+
+void QmitkDeformableRegistrationView::SetImagesVisible(cherry::ISelection::ConstPointer selection)
+{
+  if (this->m_CurrentSelection->Size() == 0)
+  {
+    // show all images
+    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
+    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
+      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+    {
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      {
+        nodeIt->Value()->SetVisibility(true);
+      }
+    }
+  }
+  else
+  {
+    // hide all images
+    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
+    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
+      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+    {
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      {
+        nodeIt->Value()->SetVisibility(false);
+      }
+    }
+  }
+}
+

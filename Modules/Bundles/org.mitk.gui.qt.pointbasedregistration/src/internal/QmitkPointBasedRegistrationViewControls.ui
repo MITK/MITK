@@ -1,462 +1,456 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>QmitkPointBasedRegistrationControls</class>
-  <widget class="QWidget" name="QmitkPointBasedRegistrationControls">
-    <property name="geometry">
-      <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>451</width>
-        <height>1200</height>
-      </rect>
-    </property>
-    <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-      </sizepolicy>
-    </property>
-    <property name="minimumSize">
-      <size>
-        <width>300</width>
-        <height>1200</height>
-      </size>
-    </property>
-    <property name="windowTitle">
-      <string>PointBasedRegistration</string>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+ <class>QmitkPointBasedRegistrationControls</class>
+ <widget class="QWidget" name="QmitkPointBasedRegistrationControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>451</width>
+    <height>1200</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>1200</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>PointBasedRegistration</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5">
+   <item>
+    <widget class="QLabel" name="m_StatusLabel">
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="WindowText">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>118</red>
+           <green>116</green>
+           <blue>108</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="text">
+      <string>You have to select two images from Datamanager for Registration!</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_FixedData">
+     <property name="title">
+      <string>Fixed Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-        <widget class="QGroupBox" name="m_FixedData">
-          <property name="title">
-            <string>Fixed Data</string>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="TextLabelFixed">
+          <property name="text">
+           <string>Dataset:</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-              <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                  <widget class="QLabel" name="TextLabelFixed">
-                    <property name="text">
-                      <string>Dataset:</string>
-                    </property>
-                    <property name="wordWrap">
-                      <bool>false</bool>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QmitkDataStorageComboBox" name="m_FixedSelector"/>
-                </item>
-                <item>
-                  <widget class="QToolButton" name="m_ReinitFixedButton">
-                    <property name="toolTip">
-                      <string>Reinit Fixed Image</string>
-                    </property>
-                    <property name="text">
-                      <string/>
-                    </property>
-                    <property name="icon">
-                      <iconset resource="../../resources/QmitkPointBasedRegistrationView.qrc">
-                        <normaloff>:/QmitkPointBasedRegistrationView/btnReinit.xpm</normaloff>:/QmitkPointBasedRegistrationView/btnReinit.xpm
-                      </iconset>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <widget class="Line" name="line2">
-                <property name="frameShape">
-                  <enum>QFrame::HLine</enum>
-                </property>
-                <property name="frameShadow">
-                  <enum>QFrame::Sunken</enum>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QmitkPointListWidget" name="m_FixedPointListWidget" native="true">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                  <size>
-                    <width>0</width>
-                    <height>300</height>
-                  </size>
-                </property>
-              </widget>
-            </item>
-          </layout>
-        </widget>
+          <property name="wordWrap">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="m_FixedLabel">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-        <widget class="QGroupBox" name="m_MovingData">
-          <property name="title">
-            <string>Moving Data</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-            <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-                <item>
-                  <widget class="QLabel" name="TextLabelMoving">
-                    <property name="text">
-                      <string>Dataset:</string>
-                    </property>
-                    <property name="wordWrap">
-                      <bool>false</bool>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QmitkDataStorageComboBox" name="m_MovingSelector"/>
-                </item>
-                <item>
-                  <widget class="QToolButton" name="m_ReinitMovingButton">
-                    <property name="toolTip">
-                      <string>Reinit Moving Image</string>
-                    </property>
-                    <property name="text">
-                      <string/>
-                    </property>
-                    <property name="icon">
-                      <iconset resource="../../resources/QmitkPointBasedRegistrationView.qrc">
-                        <normaloff>:/QmitkPointBasedRegistrationView/btnReinit.xpm</normaloff>:/QmitkPointBasedRegistrationView/btnReinit.xpm
-                      </iconset>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <layout class="QHBoxLayout" name="_3">
-                <item>
-                  <widget class="QLabel" name="m_OpacityLabel">
-                    <property name="text">
-                      <string>Opacity:</string>
-                    </property>
-                    <property name="wordWrap">
-                      <bool>false</bool>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QSlider" name="m_OpacitySlider">
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <property name="maximum">
-                      <number>100</number>
-                    </property>
-                    <property name="value">
-                      <number>50</number>
-                    </property>
-                    <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <widget class="Line" name="line1">
-                <property name="frameShape">
-                  <enum>QFrame::HLine</enum>
-                </property>
-                <property name="frameShadow">
-                  <enum>QFrame::Sunken</enum>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QmitkPointListWidget" name="m_MovingPointListWidget" native="true">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                  <size>
-                    <width>0</width>
-                    <height>300</height>
-                  </size>
-                </property>
-              </widget>
-            </item>
-          </layout>
-        </widget>
+       <widget class="Line" name="line2">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
       </item>
       <item>
-        <widget class="QGroupBox" name="groupBox4">
-          <property name="title">
-            <string>Display Options</string>
+       <widget class="QmitkPointListWidget" name="m_FixedPointListWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>300</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_MovingData">
+     <property name="title">
+      <string>Moving Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="TextLabelMoving">
+          <property name="text">
+           <string>Dataset:</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-              <widget class="QCheckBox" name="m_SetInvisible">
-                <property name="text">
-                  <string>Set All Other Invisible</string>
-                </property>
-                <property name="checked">
-                  <bool>true</bool>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <widget class="QCheckBox" name="m_ShowRedGreenValues">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="text">
-                  <string>Show Images Red/Green</string>
-                </property>
-              </widget>
-            </item>
-          </layout>
-        </widget>
+          <property name="wordWrap">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="m_MovingLabel">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-        <widget class="QGroupBox" name="groupBox3">
-          <property name="title">
-            <string>Registration</string>
+       <layout class="QHBoxLayout" name="_3">
+        <item>
+         <widget class="QLabel" name="m_OpacityLabel">
+          <property name="text">
+           <string>Opacity:</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-              <layout class="QHBoxLayout" name="_5">
-                <item>
-                  <widget class="QLabel" name="textLabel1">
-                    <property name="text">
-                      <string>Method:</string>
-                    </property>
-                    <property name="wordWrap">
-                      <bool>false</bool>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QComboBox" name="m_SelectedTransformationClass">
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <item>
-                      <property name="text">
-                        <string>Rigid with ICP</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>Similarity with ICP</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>Affine with ICP</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>Rigid</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>Similarity</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>Affine</string>
-                      </property>
-                    </item>
-                    <item>
-                      <property name="text">
-                        <string>LandmarkWarping</string>
-                      </property>
-                    </item>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <widget class="QPushButton" name="m_Calculate">
-                <property name="enabled">
-                  <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                  <size>
-                    <width>150</width>
-                    <height>0</height>
-                  </size>
-                </property>
-                <property name="text">
-                  <string>Register</string>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <layout class="QHBoxLayout" name="_6">
-                <item>
-                  <widget class="QLabel" name="m_MeanError">
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <property name="text">
-                      <string>Error between Landmarks (RMS):</string>
-                    </property>
-                    <property name="wordWrap">
-                      <bool>false</bool>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QLCDNumber" name="m_MeanErrorLCD">
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <property name="frameShape">
-                      <enum>QFrame::NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                      <enum>QFrame::Raised</enum>
-                    </property>
-                    <property name="smallDecimalPoint">
-                      <bool>false</bool>
-                    </property>
-                    <property name="numDigits">
-                      <number>9</number>
-                    </property>
-                    <property name="segmentStyle">
-                      <enum>QLCDNumber::Flat</enum>
-                    </property>
-                    <property name="value" stdset="0">
-                      <double>0.000000000000000</double>
-                    </property>
-                    <property name="intValue" stdset="0">
-                      <number>0</number>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-            <item>
-              <widget class="QPushButton" name="m_SaveModel">
-                <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                  </sizepolicy>
-                </property>
-                <property name="text">
-                  <string>Save Transformed Data</string>
-                </property>
-              </widget>
-            </item>
-            <item>
-              <layout class="QHBoxLayout" name="_7">
-                <item>
-                  <widget class="QPushButton" name="m_UndoTransformation">
-                    <property name="enabled">
-                      <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <property name="text">
-                      <string>Undo Transformation</string>
-                    </property>
-                  </widget>
-                </item>
-                <item>
-                  <widget class="QPushButton" name="m_RedoTransformation">
-                    <property name="enabled">
-                      <bool>false</bool>
-                    </property>
-                    <property name="sizePolicy">
-                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                      </sizepolicy>
-                    </property>
-                    <property name="text">
-                      <string>Redo Transformation</string>
-                    </property>
-                  </widget>
-                </item>
-              </layout>
-            </item>
-          </layout>
-        </widget>
-      </item>
-      <item>
-        <spacer name="spacer2">
+          <property name="wordWrap">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="m_OpacitySlider">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-            <size>
-              <width>20</width>
-              <height>16</height>
-            </size>
-          </property>
-        </spacer>
+         </widget>
+        </item>
+       </layout>
       </item>
-    </layout>
-  </widget>
-  <layoutdefault spacing="6" margin="11"/>
-  <customwidgets>
-    <customwidget>
-      <class>QmitkPointListWidget</class>
-      <extends>QWidget</extends>
-      <header>QmitkPointListWidget.h</header>
-    </customwidget>
-    <customwidget>
-      <class>QmitkDataStorageComboBox</class>
-      <extends>QComboBox</extends>
-      <header>QmitkDataStorageComboBox.h</header>
-    </customwidget>
-  </customwidgets>
-  <includes>
-    <include location="local">mitkDataTreeNode.h</include>
-    <include location="local">mitkPointSet.h</include>
-    <include location="local">mitkStateEvent.h</include>
-    <include location="local">mitkEventMapper.h</include>
-    <include location="local">mitkInteractionConst.h</include>
-    <include location="local">mitkBaseData.h</include>
-    <include location="global">mitkDataTree.h</include>
-  </includes>
-  <resources>
-    <include location="../../resources/QmitkPointBasedRegistrationView.qrc"/>
-  </resources>
-  <connections/>
+      <item>
+       <widget class="Line" name="line1">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkPointListWidget" name="m_MovingPointListWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>300</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox4">
+     <property name="title">
+      <string>Display Options</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="m_ShowRedGreenValues">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Show Images Red/Green</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox3">
+     <property name="title">
+      <string>Registration</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="_5">
+        <item>
+         <widget class="QLabel" name="textLabel1">
+          <property name="text">
+           <string>Method:</string>
+          </property>
+          <property name="wordWrap">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="m_SelectedTransformationClass">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <item>
+           <property name="text">
+            <string>Rigid with ICP</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Similarity with ICP</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Affine with ICP</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Rigid</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Similarity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Affine</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LandmarkWarping</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_Calculate">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Register</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="_6">
+        <item>
+         <widget class="QLabel" name="m_MeanError">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Error between Landmarks (RMS):</string>
+          </property>
+          <property name="wordWrap">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="m_MeanErrorLCD">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>false</bool>
+          </property>
+          <property name="numDigits">
+           <number>9</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="intValue" stdset="0">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="_7">
+        <item>
+         <widget class="QPushButton" name="m_UndoTransformation">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Undo Transformation</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="m_RedoTransformation">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Redo Transformation</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="spacer2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>16</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkPointListWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkPointListWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="local">mitkDataTreeNode.h</include>
+  <include location="local">mitkPointSet.h</include>
+  <include location="local">mitkStateEvent.h</include>
+  <include location="local">mitkEventMapper.h</include>
+  <include location="local">mitkInteractionConst.h</include>
+  <include location="local">mitkBaseData.h</include>
+  <include location="global">mitkDataTree.h</include>
+ </includes>
+ <resources>
+  <include location="../../resources/QmitkPointBasedRegistrationView.qrc"/>
+ </resources>
+ <connections/>
 </ui>

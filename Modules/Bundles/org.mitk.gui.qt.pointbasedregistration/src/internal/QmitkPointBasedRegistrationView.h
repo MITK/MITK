@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkFunctionality.h"
 
+#include "cherryISelectionListener.h"
+#include "cherryIStructuredSelection.h"
+
 //#include "mitkTestingConfig.h" // IMPORTANT: this defines or undefines BUILD_TESTING !
 
 #include <mitkPointSetInteractor.h>
@@ -51,9 +54,14 @@ For more informations see: \ref QmitkPointBasedRegistrationUserManual
 
 class POINTBASEDREGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QObject, public QmitkFunctionality
 {  
+
+  friend struct SelListenerPointBasedRegistration;
+
   Q_OBJECT
 
 public:  
+
+  static const std::string VIEW_ID;
 
   /*!  
   \brief Default constructor  
@@ -138,25 +146,15 @@ signals:
 
   protected slots:  
 
-    /*!
-    \brief Called whenever the data storage has changed. 
-    */
-    virtual void DataStorageChanged();
-
-    /*!  
-    \brief Returns the predication for the nodes shown in the DataStorageComboBoxes.
-    */
-    mitk::NodePredicateBase::Pointer GetMovingImagePredicate();
-
     /*!  
     \brief Sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(int = 0);
+    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
 
     /*!  
     \brief Sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(int = 0);
+    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
 
     /*!  
     \brief Calculates registration with vtkLandmarkTransform
@@ -187,11 +185,6 @@ signals:
     \brief Checks if registration is possible
     */
     bool CheckCalculate();
-
-    /*!  
-    \brief Saves the registration result.
-    */
-    void SaveModel();
 
     /*!  
     \brief Performs an undo for the last transform.
@@ -264,21 +257,6 @@ signals:
     void setInvisible(bool invisible);
 
     /*!  
-    \brief Reinitializes the fixed image in the multi-widget.
-    */
-    void reinitFixedClicked();
-
-    /*!  
-    \brief Reinitializes the moving image in the multi-widget.
-    */
-    void reinitMovingClicked();
-
-    /*!  
-    \brief Reinitializes all visible images in the multi-widget.
-    */
-    void globalReinitClicked();
-
-    /*!  
     \brief Checks whether the registration can be performed.
     */
     bool checkCalculateEnabled();
@@ -288,7 +266,12 @@ signals:
     */
     void calculate();
 
+    void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+
 protected:
+
+  cherry::ISelectionListener::Pointer m_SelListener;
+  cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
   /*!  
   \brief List that holds all invisible data tree nodes. 

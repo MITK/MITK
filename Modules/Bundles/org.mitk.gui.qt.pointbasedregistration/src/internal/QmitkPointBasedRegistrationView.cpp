@@ -47,6 +47,119 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateNOT.h"
 
+#include "mitkDataTreeNodeObject.h"
+
+#include "cherryIWorkbenchWindow.h"
+#include "cherryISelectionService.h"
+
+
+const std::string QmitkPointBasedRegistrationView::VIEW_ID = "org.mitk.views.pointbasedregistration";
+
+using namespace cherry;
+
+struct SelListenerPointBasedRegistration : ISelectionListener
+{
+  cherryObjectMacro(SelListenerPointBasedRegistration);
+
+  SelListenerPointBasedRegistration(QmitkPointBasedRegistrationView* view)
+  {
+    m_View = view;
+  }
+
+  void DoSelectionChanged(ISelection::ConstPointer selection)
+  {
+    // save current selection in member variable
+    m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
+    m_View->m_Controls.TextLabelFixed->hide();
+    m_View->m_Controls.m_FixedLabel->hide();
+    m_View->m_Controls.TextLabelMoving->hide();
+    m_View->m_Controls.m_MovingLabel->hide();
+
+    // do something with the selected items
+    if(m_View->m_CurrentSelection)
+    {
+      m_View->SetImagesVisible(selection);
+      if (m_View->m_CurrentSelection->Size() != 2)
+      {
+        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+        m_View->m_Controls.m_StatusLabel->show();
+        m_View->FixedSelected(NULL);
+        m_View->FixedSelected(NULL);
+      }
+      else
+      {
+        m_View->m_Controls.m_StatusLabel->hide();
+        bool foundFixedImage = false;
+        bool foundMovingImage = false;
+        // iterate selection
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+          i != m_View->m_CurrentSelection->End(); ++i)
+        {
+          // extract datatree node
+          if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+          {
+            mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
+            mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
+            mitk::NodePredicateNOT::Pointer notPointSet = mitk::NodePredicateNOT::New(isPointSet);
+            mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
+            mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
+            mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
+            mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( isBaseData, notPointSetAndNotGeometry2DData );
+
+
+            mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = m_View->GetDataStorage()->GetSubset(predicate);
+            
+            mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+            
+            // only look at interesting types
+            for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
+              ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+            {
+              if(nodeIt->Value().GetPointer() == node.GetPointer())
+              {
+                if (foundFixedImage == false)
+                {
+                  m_View->FixedSelected(node);
+                  foundFixedImage = true;
+                }
+                else
+                {
+                  m_View->MovingSelected(node);
+                  foundMovingImage = true;
+                }
+              }
+            }
+          }
+        }
+        if (!(foundFixedImage && foundMovingImage))
+        {
+          m_View->FixedSelected(NULL);
+          m_View->FixedSelected(NULL);
+          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+          return;
+        }
+        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+      }
+    }
+  }
+
+  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  {
+    // check, if selection comes from datamanager
+    if (part)
+    {
+      QString partname(part->GetPartName().c_str());
+      if(partname.compare("Datamanager")==0)
+      {
+        // apply selection
+        DoSelectionChanged(selection);
+      }
+    }
+  }
+
+  QmitkPointBasedRegistrationView* m_View;
+};
+
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject * /*parent*/, const char * /*name*/)
 : QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
@@ -64,11 +177,12 @@ QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
   if (m_FixedPointSetNode.IsNotNull())
   {
-    m_Controls.m_FixedPointListWidget->SetPointSetNode(NULL);
+    m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);
     m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
   }
   if (m_MovingPointSetNode.IsNotNull())
   {
+    m_Controls.m_MovingPointListWidget->DeactivateInteractor(true);
     m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
   }
   m_Controls.m_FixedPointListWidget->SetPointSetNode(NULL);
@@ -81,41 +195,23 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Parent->setEnabled(false);
   m_Controls.m_MeanErrorLCD->hide();
   m_Controls.m_MeanError->hide();
+  m_Controls.TextLabelFixed->hide();
+  m_Controls.m_FixedLabel->hide();
+  m_Controls.TextLabelMoving->hide();
+  m_Controls.m_MovingLabel->hide();
+
+  m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  cherry::ISelection::ConstPointer sel(
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+  m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
+
   this->CreateConnections();
-
-  // define data type for fixed image combobox
-  m_Controls.m_FixedSelector->SetDataStorage( this->GetDefaultDataStorage() );
-  mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
-  mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
-  mitk::NodePredicateNOT::Pointer notPointSet = mitk::NodePredicateNOT::New(isPointSet);
-  mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
-  mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
-  mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
-  mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( isBaseData, notPointSetAndNotGeometry2DData );
-  m_Controls.m_FixedSelector->SetPredicate( predicate );
-
-  // define data type for moving image combobox
-  m_Controls.m_MovingSelector->SetDataStorage( this->GetDefaultDataStorage() );
-  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
 
   // let the point set widget know about the multi widget (cross hair updates)
   m_Controls.m_FixedPointListWidget->SetMultiWidget( m_MultiWidget );
   m_Controls.m_MovingPointListWidget->SetMultiWidget( m_MultiWidget );
-}
-
-mitk::NodePredicateBase::Pointer QmitkPointBasedRegistrationView::GetMovingImagePredicate()
-{
-  mitk::NodePredicateProperty::Pointer isFixedImage = mitk::NodePredicateProperty::New("selectedFixedImage", mitk::BoolProperty::New(true));
-  mitk::NodePredicateNOT::Pointer notFixedImage = mitk::NodePredicateNOT::New(isFixedImage);
-  mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
-  mitk::NodePredicateAND::Pointer notFixedAndBaseData = mitk::NodePredicateAND::New( notFixedImage, isBaseData );
-  mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
-  mitk::NodePredicateNOT::Pointer notPointSet = mitk::NodePredicateNOT::New(isPointSet);
-  mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
-  mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
-  mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
-  mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( notFixedAndBaseData, notPointSetAndNotGeometry2DData );
-  return predicate.GetPointer();
 }
 
 void QmitkPointBasedRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -141,85 +237,25 @@ void QmitkPointBasedRegistrationView::CreateConnections()
 {
   connect( (QObject*)(m_Controls.m_FixedPointListWidget), SIGNAL(EditPointSets(bool)), (QObject*)(m_Controls.m_MovingPointListWidget), SLOT(DeactivateInteractor(bool)));
   connect( (QObject*)(m_Controls.m_MovingPointListWidget), SIGNAL(EditPointSets(bool)), (QObject*)(m_Controls.m_FixedPointListWidget), SLOT(DeactivateInteractor(bool)));
-  connect( (QObject*)(m_Controls.m_FixedSelector), SIGNAL(activated(int)),(QObject*) this, SLOT(FixedSelected(int)) );
-  connect( (QObject*)(m_Controls.m_MovingSelector), SIGNAL(activated(int)),(QObject*) this, SLOT(MovingSelected(int)) );
   connect( (QObject*)(m_Controls.m_FixedPointListWidget), SIGNAL(EditPointSets(bool)), this, SLOT(HideMovingImage(bool)));
   connect( (QObject*)(m_Controls.m_MovingPointListWidget), SIGNAL(EditPointSets(bool)), this, SLOT(HideFixedImage(bool)));
   connect( (QObject*)(m_Controls.m_FixedPointListWidget), SIGNAL(PointListChanged()), this, SLOT(updateFixedLandmarksList()));
   connect( (QObject*)(m_Controls.m_MovingPointListWidget), SIGNAL(PointListChanged()), this, SLOT(updateMovingLandmarksList()));
   connect((QObject*)(m_Controls.m_Calculate),SIGNAL(clicked()),this,SLOT(calculate()));
-  connect((QObject*)(m_Controls.m_SaveModel),SIGNAL(clicked()),this,SLOT(SaveModel()));
   connect((QObject*)(m_Controls.m_UndoTransformation),SIGNAL(clicked()),this,SLOT(UndoTransformation()));
   connect((QObject*)(m_Controls.m_RedoTransformation),SIGNAL(clicked()),this,SLOT(RedoTransformation()));
   connect((QObject*)(m_Controls.m_ShowRedGreenValues),SIGNAL(toggled(bool)),this,SLOT(showRedGreen(bool)));
-  connect((QObject*)(m_Controls.m_SetInvisible),SIGNAL(toggled(bool)),this,SLOT(setInvisible(bool)));
   connect((QObject*)(m_Controls.m_OpacitySlider),SIGNAL(sliderMoved(int)),this,SLOT(OpacityUpdate(int)));
   connect((QObject*)(m_Controls.m_SelectedTransformationClass),SIGNAL(activated(int)), this,SLOT(transformationChanged(int)));
-  connect((QObject*)(m_Controls.m_ReinitFixedButton),SIGNAL(clicked()), this,SLOT(reinitFixedClicked()));
-  connect((QObject*)(m_Controls.m_ReinitMovingButton),SIGNAL(clicked()), this,SLOT(reinitMovingClicked()));
 }
 
 void QmitkPointBasedRegistrationView::Activated()
 {
   m_Deactivated = false;
-  if (m_SetInvisible == true)
-  {
-    bool visible = false;
-    bool selectedFixedImage = false;
-    m_InvisibleNodesList.clear();
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-      {
-        nodeIt->Value()->GetBoolProperty("visible", visible);
-        // safe all previous invisible nodes in a set
-        if (visible == false)
-        {
-          m_InvisibleNodesList.insert(nodeIt->Value());
-        }
-        else
-        {
-          nodeIt->Value()->SetVisibility(false);
-        }
-        // reset m_FixedNode
-        nodeIt->Value()->GetBoolProperty("selectedFixedImage", selectedFixedImage);
-        if (selectedFixedImage == true)
-        {
-          m_FixedNode = nodeIt->Value();
-        }
-      }
-    }
-  }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  this->FixedSelected();
-  this->MovingSelected();
   this->clearTransformationLists();
   this->OpacityUpdate(m_Opacity);
-}
-
-void QmitkPointBasedRegistrationView::DataStorageChanged()
-{
-  if (!m_Deactivated)
-  {
-    if (m_SetInvisible == true)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-      for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-        ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-      {
-        if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-        {
-          nodeIt->Value()->SetVisibility(false);
-        }
-      }
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    this->FixedSelected();
-    this->MovingSelected();
-  }
 }
 
 void QmitkPointBasedRegistrationView::Deactivated()
@@ -233,38 +269,10 @@ void QmitkPointBasedRegistrationView::Deactivated()
     m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
   m_Controls.m_MovingPointListWidget->SetPointSetNode(NULL);
   m_Controls.m_MovingPointListWidget->DeactivateInteractor(true);
-  // reset previous invisible nodes to invisible and previous visible nodes to visible
-  if (m_SetInvisible == true)
-  {
-    std::set<mitk::DataTreeNode*>::iterator setIter;
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
-    {
-      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
-      {
-        setIter = m_InvisibleNodesList.find(nodeIt->Value());
-        if (setIter != m_InvisibleNodesList.end())
-        {
-          nodeIt->Value()->SetVisibility(false);
-        }
-        else
-        {
-          nodeIt->Value()->SetVisibility(true);
-        }
-      }
-    }
-  }
-  m_InvisibleNodesList.clear();
   this->setImageColor(false);
   if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
-    if (m_OldMovingLayerSet)
-    {
-      m_MovingNode->SetIntProperty("layer", m_OldMovingLayer);
-      m_OldMovingLayerSet = false;
-    }
   }
   this->clearTransformationLists();
   if (m_FixedPointSetNode.IsNotNull() && m_FixedLandmarks.IsNotNull() && m_FixedLandmarks->GetSize() == 0)
@@ -290,29 +298,29 @@ void QmitkPointBasedRegistrationView::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
-void QmitkPointBasedRegistrationView::FixedSelected(int)
+void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)
 {
   if(m_FixedLandmarks.IsNotNull())
     m_FixedLandmarks->RemoveObserver(m_CurrentFixedLandmarksObserverID);
-  if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
+  if (fixedImage.IsNotNull())
   {
-    if (m_FixedNode != m_Controls.m_FixedSelector->GetSelectedNode())
+    if (m_FixedNode != fixedImage)
     {
       // remove changes on previous selected node
       if (m_FixedNode.IsNotNull())
       {
         this->setImageColor(false);
-        m_FixedNode->SetVisibility(false);
-        m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(false));
         if (m_FixedPointSetNode.IsNotNull())
         {
-          m_FixedPointSetNode->SetVisibility(false);
           m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
-          m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(false));
         }
       }
       // get selected node
-      m_FixedNode = m_Controls.m_FixedSelector->GetSelectedNode();
+      m_FixedNode = fixedImage;
+      m_FixedNode->SetVisibility(true);
+      m_Controls.m_FixedLabel->setText(QString::fromStdString(m_FixedNode->GetName()));
+      m_Controls.m_FixedLabel->show();
+      m_Controls.TextLabelFixed->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_FixedNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -320,20 +328,6 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
         m_FixedColor = colorProperty->GetColor();
       }
       this->setImageColor(m_ShowRedGreen);
-      m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(true));
-
-      if (m_MovingNode.IsNotNull())
-      {
-        // safe MovingLayer only if we do not overwrite original MovingLayer
-        if (!m_OldMovingLayerSet)
-        {
-          m_MovingNode->GetIntProperty("layer", m_OldMovingLayer);
-          m_OldMovingLayerSet = true;
-        }
-        m_FixedNode->GetIntProperty("layer", m_NewMovingLayer);
-        m_NewMovingLayer += 1;
-        m_MovingNode->SetIntProperty("layer", m_NewMovingLayer);
-      }
 
       bool hasPointSetNode = false;
       mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
@@ -361,54 +355,10 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
       m_FixedPointSetNode->GetStringProperty("label", m_OldFixedLabel);
       m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New("F "));
       m_FixedPointSetNode->SetProperty("color", mitk::ColorProperty::New(0.0f, 1.0f, 1.0f));
+      m_FixedPointSetNode->SetVisibility(true);
       m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
       this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-
-    if (!m_HideFixedImage && m_FixedNode.IsNotNull())
-    {
-      if (m_FixedNode.IsNotNull())
-        m_FixedNode->SetVisibility(true);
-      if (m_FixedPointSetNode.IsNotNull())
-        m_FixedPointSetNode->SetVisibility(true);
-      else
-      {
-        bool hasPointSetNode = false;
-        mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
-        unsigned long size;
-        size = children->Size();
-        for (unsigned long i = 0; i < size; ++i)
-        {
-          mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(children->GetElement(i)->GetProperty("name"));
-          if(nameProp.IsNotNull() && nameProp->GetValueAsString()=="PointBasedRegistrationNode")
-          {
-            m_FixedPointSetNode=children->GetElement(i);
-            m_FixedLandmarks = dynamic_cast<mitk::PointSet*> (m_FixedPointSetNode->GetData());
-            this->GetDataStorage()->Remove(m_FixedPointSetNode);
-            hasPointSetNode = true;
-            break;
-          }
-        }
-        if (!hasPointSetNode)
-        {
-          m_FixedLandmarks = mitk::PointSet::New();
-          m_FixedPointSetNode = mitk::DataTreeNode::New();
-          m_FixedPointSetNode->SetData(m_FixedLandmarks);
-          m_FixedPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
-        }
-        m_FixedPointSetNode->GetStringProperty("label", m_OldFixedLabel);
-        m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New("F "));
-        m_FixedPointSetNode->SetProperty("color", mitk::ColorProperty::New(0.0f, 1.0f, 1.0f));
-        m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
-        this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-    }
-    else
-    {
-      if (m_FixedNode.IsNotNull())
-        m_FixedNode->SetVisibility(false);
     }
   }
   else
@@ -419,20 +369,20 @@ void QmitkPointBasedRegistrationView::FixedSelected(int)
     m_FixedPointSetNode = NULL;
     m_FixedLandmarks = NULL;
     m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.TextLabelFixed->hide();
   }
   if(m_FixedLandmarks.IsNotNull())
     m_CurrentFixedLandmarksObserverID = m_FixedLandmarks->AddObserver(itk::ModifiedEvent(), m_FixedLandmarksChangedCommand);
-
-  m_Controls.m_MovingSelector->SetPredicate( this->GetMovingImagePredicate() );
 }
 
-void QmitkPointBasedRegistrationView::MovingSelected(int)
+void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movingImage)
 {
   if(m_MovingLandmarks.IsNotNull())
     m_MovingLandmarks->RemoveObserver(m_CurrentMovingLandmarksObserverID);
-  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
+  if (movingImage.IsNotNull())
   {
-    if (m_MovingNode != m_Controls.m_MovingSelector->GetSelectedNode())
+    if (m_MovingNode != movingImage)
     {
       if (m_MovingNode.IsNotNull())
       {
@@ -440,19 +390,20 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
         this->setImageColor(false);
         if (m_MovingNode != m_FixedNode)
         {
-          m_MovingNode->SetVisibility(false);
           m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
-          m_MovingPointSetNode->SetVisibility(false);
         }
-        if (m_OldMovingLayerSet)
+        else
         {
-          m_MovingNode->SetIntProperty("layer", m_OldMovingLayer);
-          m_OldMovingLayerSet = false;
+          m_OldFixedLabel = m_OldMovingLabel;
         }
       }
       if (m_MovingPointSetNode.IsNotNull())
         m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
-      m_MovingNode = m_Controls.m_MovingSelector->GetSelectedNode();
+      m_MovingNode = movingImage;
+      m_MovingNode->SetVisibility(true);
+      m_Controls.m_MovingLabel->setText(QString::fromStdString(m_MovingNode->GetName()));
+      m_Controls.m_MovingLabel->show();
+      m_Controls.TextLabelMoving->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -462,16 +413,6 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
       this->setImageColor(m_ShowRedGreen);
       m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
       this->OpacityUpdate(m_Opacity);
-      // safe MovingLayer only if we do not overwrite original MovingLayer
-      m_MovingNode->GetIntProperty("layer", m_OldMovingLayer);
-      m_OldMovingLayerSet = true;
-      // change MovingLayer to be one higher than FixedLayer -> MovingImage will be the upper image
-      if (m_FixedNode.IsNotNull())
-      {
-        m_FixedNode->GetIntProperty("layer", m_NewMovingLayer);
-        m_NewMovingLayer += 1;
-        m_MovingNode->SetIntProperty("layer", m_NewMovingLayer);
-      }
       bool hasPointSetNode = false;
       mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
       unsigned long size;
@@ -496,29 +437,14 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
         m_MovingPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
       }
       this->GetDataStorage()->Add(m_MovingPointSetNode, m_MovingNode);
-      m_MovingPointSetNode->SetVisibility(true);
       m_MovingPointSetNode->GetStringProperty("label", m_OldMovingLabel);
       m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New("M "));
       m_MovingPointSetNode->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f));
-      m_MovingPointSetNode->SetProperty("layer",mitk::IntProperty::New(m_NewMovingLayer+1));
-      if (m_FixedPointSetNode.IsNotNull())
-        m_FixedPointSetNode->SetProperty("layer",mitk::IntProperty::New(m_NewMovingLayer+1));
+      m_MovingPointSetNode->SetVisibility(true);
       m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       this->clearTransformationLists();
       this->OpacityUpdate(m_Opacity);
-    }
-    if (!m_HideMovingImage)
-    {
-      if (m_MovingNode.IsNotNull())
-        m_MovingNode->SetVisibility(true);
-      if (m_MovingPointSetNode.IsNotNull())
-        m_MovingPointSetNode->SetVisibility(true);
-    }
-    else
-    {
-      if (m_MovingNode.IsNotNull())
-        m_MovingNode->SetVisibility(false);
     }
   }
   else
@@ -529,11 +455,13 @@ void QmitkPointBasedRegistrationView::MovingSelected(int)
     m_MovingPointSetNode = NULL;
     m_MovingLandmarks = NULL;
     m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.TextLabelMoving->hide();
   }
   if(m_MovingLandmarks.IsNotNull())
     m_CurrentMovingLandmarksObserverID = m_MovingLandmarks->AddObserver(itk::ModifiedEvent(), m_MovingLandmarksChangedCommand);
 }
-
+ 
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
   m_MovingLandmarks = (mitk::PointSet*)m_MovingPointSetNode->GetData();
@@ -593,18 +521,6 @@ bool QmitkPointBasedRegistrationView::CheckCalculate()
   return this->checkCalculateEnabled();
 }
 
-void QmitkPointBasedRegistrationView::SaveModel()
-{
-  if(m_MovingNode.IsNotNull())
-  {
-    mitk::BaseData::Pointer data=m_MovingNode->GetData();
-    if (data.IsNotNull())
-    {
-      CommonFunctionality::SaveBaseData( data.GetPointer(), "RegistrationResult");
-    }
-  }
-}
-
 void QmitkPointBasedRegistrationView::UndoTransformation()
 {
   if(!m_UndoPointsGeometryList.empty())
@@ -636,12 +552,10 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
   if(!m_UndoPointsGeometryList.empty())
   {
     m_Controls.m_UndoTransformation->setEnabled(true);
-    m_Controls.m_SaveModel->setEnabled(true);
   }
   else
   {
     m_Controls.m_UndoTransformation->setEnabled(false);
-    m_Controls.m_SaveModel->setEnabled(false);
   }
 }
 
@@ -670,7 +584,6 @@ void QmitkPointBasedRegistrationView::RedoTransformation()
     movingData->GetTimeSlicedGeometry()->UpdateInformation();
     m_MovingLandmarks->GetTimeSlicedGeometry()->UpdateInformation();
     m_Controls.m_UndoTransformation->setEnabled(true);
-    m_Controls.m_SaveModel->setEnabled(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     this->checkLandmarkError();
   }
@@ -734,7 +647,6 @@ void QmitkPointBasedRegistrationView::OpacityUpdate(int opacity)
 void QmitkPointBasedRegistrationView::clearTransformationLists()
 {
   m_Controls.m_UndoTransformation->setEnabled(false);
-  m_Controls.m_SaveModel->setEnabled(false);
   m_Controls.m_RedoTransformation->setEnabled(false);
   m_Controls.m_MeanErrorLCD->hide();
   m_Controls.m_MeanError->hide();
@@ -901,7 +813,6 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
     movingGeometry->Compose(matrix);
     movingData->GetTimeSlicedGeometry()->UpdateInformation();
     m_Controls.m_UndoTransformation->setEnabled(true);
-    m_Controls.m_SaveModel->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();
     m_RedoPointsGeometryList.clear();
@@ -989,7 +900,6 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
     movingGeometry->Compose(matrix);
     movingData->GetTimeSlicedGeometry()->UpdateInformation();
     m_Controls.m_UndoTransformation->setEnabled(true);
-    m_Controls.m_SaveModel->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();
     m_RedoPointsGeometryList.clear();
@@ -1095,45 +1005,6 @@ void QmitkPointBasedRegistrationView::setInvisible(bool invisible)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkPointBasedRegistrationView::reinitFixedClicked()
-{
-  if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
-  {
-    mitk::DataTreeNode* node = m_Controls.m_FixedSelector->GetSelectedNode();
-    if (node != NULL )
-    {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      emit reinitFixed( basedata->GetTimeSlicedGeometry() );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-void QmitkPointBasedRegistrationView::reinitMovingClicked()
-{
-  if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
-  {
-    mitk::DataTreeNode* node = m_Controls.m_MovingSelector->GetSelectedNode();
-    if (node != NULL )
-    {
-      mitk::BaseData::Pointer basedata = node->GetData();
-      emit reinitMoving( basedata->GetTimeSlicedGeometry() );
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-void QmitkPointBasedRegistrationView::globalReinitClicked()
-{
-  /* get all nodes that have not set "includeInBoundingBox" to false */
-  mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
-  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
-  /* calculate bounding geometry of these nodes */
-  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
-  /* initialize the views to the bounding geometry */
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-}
-
 bool QmitkPointBasedRegistrationView::checkCalculateEnabled()
 {
   int fixedPoints = m_FixedLandmarks->GetSize();
@@ -1193,3 +1064,35 @@ void QmitkPointBasedRegistrationView::calculate()
     this->calculateLandmarkWarping();
   }
 }
+
+void QmitkPointBasedRegistrationView::SetImagesVisible(cherry::ISelection::ConstPointer selection)
+{
+  if (this->m_CurrentSelection->Size() == 0)
+  {
+    // show all images
+    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
+    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
+      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+    {
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      {
+        nodeIt->Value()->SetVisibility(true);
+      }
+    }
+  }
+  else
+  {
+    // hide all images
+    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = this->GetDataStorage()->GetAll();
+    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
+      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
+    {
+      if ( (nodeIt->Value().IsNotNull()) && (nodeIt->Value()->GetProperty("visible")) && dynamic_cast<mitk::Geometry2DData*>(nodeIt->Value()->GetData())==NULL)
+      {
+        nodeIt->Value()->SetVisibility(false);
+      }
+    }
+  }
+}
+
+

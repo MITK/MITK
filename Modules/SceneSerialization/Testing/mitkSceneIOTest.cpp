@@ -27,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkImage.h"
 #include "mitkSurface.h"
+#include "mitkPointSet.h"
+#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 
 class SceneIOTestClass
 {
@@ -84,6 +87,26 @@ static mitk::Surface::Pointer LoadSurface(const std::string& filename)
   return surface;
 }
 
+static mitk::PointSet::Pointer CreatePointSet()
+{
+  
+  mitk::PointSet::Pointer ps = mitk::PointSet::New();
+  mitk::PointSet::PointType p;
+  mitk::FillVector3D(p, 1.1, -2.22, 33.33);
+  ps->SetPoint(0, p);
+  mitk::FillVector3D(p, 100.1, -200.22, 3300.33);
+  ps->SetPoint(1, p);
+  mitk::FillVector3D(p, 2.0, -3.0, 22.22);
+  ps->SetPoint(2, p, mitk::PTCORNER); // add point spec
+  //mitk::FillVector3D(p, -2.0, -2.0, -2.22);
+  //ps->SetPoint(0, p, 1); // ID 0 in timestep 1
+  //mitk::FillVector3D(p, -1.0, -1.0, -11.22);
+  //ps->SetPoint(1, p, 1); // ID 1 in timestep 1
+  //mitk::FillVector3D(p, 1000.0, 1000.0, 1122.22);
+  //ps->SetPoint(11, p, mitk::PTCORNER, 2); // ID 11, point spec, timestep 2
+  //return ps;
+}
+
 static void FillStorage(mitk::DataStorage* storage)
 {
   mitk::Image::Pointer image = LoadImage( LocateFile("Pic3D.pic.gz") );
@@ -107,6 +130,13 @@ static void FillStorage(mitk::DataStorage* storage)
   surfacenode->SetData( surface );
   surfacenode->SetName( "binary" );
   storage->Add( surfacenode );
+
+  mitk::PointSet::Pointer ps = CreatePointSet();
+  mitk::DataTreeNode::Pointer psenode = mitk::DataTreeNode::New();
+  surfacenode->SetData( ps );
+  surfacenode->SetName( "points" );
+  storage->Add( psenode );
+
 }
 
 }; // end test helper class
@@ -125,8 +155,8 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 
   SceneIOTestClass::FillStorage(storage);
 
-  MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, "scene.zip" ),
-                                "Saving scene file" );
+  std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
+  MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
 
   mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
   if (failedNodes.IsNotNull())

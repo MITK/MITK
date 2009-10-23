@@ -18,10 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QMITK_MEASUREMENT_H__INCLUDED)
 #define QMITK_MEASUREMENT_H__INCLUDED
 
-#include <QmitkFunctionality.h>
-#include <QmitkStandardViews.h>
-#include <QmitkStdMultiWidgetEditor.h>
-#include <mitkPointSetInteractor.h>
+#include "QmitkFunctionality.h"
+#include "QmitkStandardViews.h"
+#include "QmitkStdMultiWidgetEditor.h"
+#include "mitkPointSetInteractor.h"
+#include "mitkDataTreeNodeSelection.h"
+
+#include <cherryISelectionListener.h>
+#include <cherryIStructuredSelection.h>
+
 
 class QGridLayout;
 class QMainWindow;
@@ -48,14 +53,11 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual void Activated();
     virtual void Deactivated();
   
-  protected:
-    ///
-    /// Clears m_PointSetInteractor and m_CurrentPointSetNode
-    ///
-    void Reset();
-
     ///# draw actions
   protected slots:
+    void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, 
+      cherry::ISelection::ConstPointer selection);
+
     void ActionDrawLineTriggered( bool checked = false );
     void ActionDrawPathTriggered( bool checked = false );
     void ActionDrawAngleTriggered( bool checked = false );
@@ -85,6 +87,16 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     QToolBar* m_DrawActionsToolBar;
     QToolBar* m_DrawActionsMainWindowToolBar;
     QTableWidget* m_DrawItemsTableWidget;
+
+
+    // Selection service
+    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    cherry::ISelectionListener::Pointer m_SelectionListener;
+
+
+    // Selected image on which measurements will be performed
+    mitk::DataTreeNode::Pointer m_SelectedImageNode;
+
 };
 
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
+#include "QmitkNodeDescriptorManager.h"
 
 #include "mitkToolManager.h"
 #include "mitkDataTreeNodeFactory.h"
@@ -33,6 +34,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOrganTypeProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkSegTool2D.h"
+#include "mitkShowSegmentationAsSurface.h"
+#include "mitkProgressBar.h"
+#include "mitkStatusBar.h"
 
 #include <QPushButton>
 #include <QDockWidget>
@@ -112,14 +116,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
 
   // register a couple of additional actions for DataManager's context menu
-  /*
   QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image mask");
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
-  m_OtsuFilterAction = imageDataTreeNodeDescriptor->AddAction("Apply Otsu Filter");
-  QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
-    , this, SLOT( OtsuFilter(bool) ) );
-*/
+  if (binaryImageDataTreeNodeDescriptor)
+  {
+    m_CreateSurfaceAction = binaryImageDataTreeNodeDescriptor->AddAction("Create polygon model");
+    connect( m_CreateSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
+  }
+  else
+  {
+    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+  }
 }
 
 void QmitkSegmentationView::SetFocus()
@@ -128,6 +136,19 @@ void QmitkSegmentationView::SetFocus()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  // unregister a couple of additional actions for DataManager's context menu
+  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
+
+  if (binaryImageDataTreeNodeDescriptor)
+  {
+    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSurfaceAction );
+  }
+  else
+  {
+    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+  }
+
   this->Deactivated();
   delete m_Controls;
 }
@@ -161,6 +182,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
           firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
         if (!emptySegmentation) return; // could be aborted by user
+        //emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
 
         this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
@@ -553,5 +575,88 @@ void QmitkSegmentationView::Activated()
 
 void QmitkSegmentationView::Deactivated()
 {
+}
+
+void QmitkSegmentationView::CreateSurface(bool)
+{
+  LOG_INFO << "CreateSurface for:";
+
+  NodeList selection = this->GetSelectedNodes();
+
+  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
+  {
+    mitk::DataTreeNode* node = *iter;
+
+    if (node)
+    {
+      LOG_INFO << "   " << (*iter)->GetName();
+
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      if (image.IsNull()) return;
+        
+      try
+      {
+        mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
+
+        // attach observer to get notified about result
+        itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+        goodCommand->SetCallbackFunction(this, &QmitkSegmentationView::OnSurfaceCalculationDone);
+        surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
+        itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer badCommand = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+        badCommand->SetCallbackFunction(this, &QmitkSegmentationView::OnSurfaceCalculationDone);
+        surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
+
+        mitk::DataTreeNode::Pointer nodepointer = node;
+        surfaceFilter->SetPointerParameter("Input", image);
+        surfaceFilter->SetPointerParameter("Group node", nodepointer);
+        surfaceFilter->SetParameter("Smooth", true );
+        surfaceFilter->SetParameter("Median kernel size", 3u );
+        surfaceFilter->SetParameter("Gaussian SD", 1.5f );
+        surfaceFilter->SetParameter("Decimation rate", 0.8f );
+        surfaceFilter->SetParameter("Show result", true );
+        surfaceFilter->SetParameter("Sync visibility", false );
+        surfaceFilter->SetDataStorage( *m_DataStorage );
+        
+        mitk::ProgressBar::GetInstance()->AddStepsToDo(1);
+        mitk::StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
+        surfaceFilter->StartAlgorithm();
+      }
+      catch(...)
+      {
+        LOG_ERROR << "surface creation filter had an error";
+      }
+    }
+    else
+    {
+      LOG_INFO << "   a NULL node selected";
+    }
+  }
+ 
+  LOG_INFO << "That's all..";
+}
+
+QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
+{
+  NodeList result;
+  if (m_CurrentSelection)
+  {
+    // iterate selection
+    for (cherry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
+    {
+      // extract datatree node
+      if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+      {
+        mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+        result.push_back( node );
+      }
+    }
+  }
+
+  return result;
+}
+
+void QmitkSegmentationView::OnSurfaceCalculationDone()
+{
+  mitk::ProgressBar::GetInstance()->Progress();
 }
 

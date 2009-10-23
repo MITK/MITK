@@ -95,7 +95,6 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
       gaussian->SetInput(vtkimagethreshold->GetOutput()); 
-      vtkimagethreshold->Delete();
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
@@ -104,6 +103,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->Update();
       vtkimage = gaussian->GetOutput(); //->Out
       gaussian->Delete();
+      vtkimagethreshold->Delete();
     }
 
     // Create sureface for t-Slice

@@ -49,7 +49,12 @@ void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
   }
 
   SetParameter("Sync visibility", syncVisibility );
+  SetParameter("Median kernel size", 3u);
+  SetParameter("Apply median", true );
   SetParameter("Smooth", true );
+  SetParameter("Gaussian SD", 1.5f );
+  SetParameter("Decimate mesh", true );
+  SetParameter("Decimation rate", 0.8f );
   SetParameter("Wireframe", false );
 }
 
@@ -77,32 +82,60 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
  
   bool smooth(true);
   GetParameter("Smooth", smooth);
+  
+  bool applyMedian(true);
+  GetParameter("Apply median", applyMedian);
+  
+  bool decimateMesh(true);
+  GetParameter("Decimate mesh", decimateMesh);
+
+  unsigned int medianKernelSize(3);
+  GetParameter("Median kernel size", medianKernelSize);
+  
+  float gaussianSD(1.5);
+  GetParameter("Gaussian SD", gaussianSD );
+  
+  float reductionRate(0.8);
+  GetParameter("Decimation rate", reductionRate );
+
+  LOG_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD << " reductionRate " << reductionRate;
 
   ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
   surfaceFilter->SetInput( image );
   surfaceFilter->SetThreshold( 1 ); //expects binary image with zeros and ones
 
+  surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
   if (smooth)
   {
-    surfaceFilter->SetMedianKernelSize(3, 3, 3); // apply median to segmentation before marching cubes
-    surfaceFilter->SetGaussianStandardDeviation( 1.5 ); 
-    surfaceFilter->SetDecimate( ImageToSurfaceFilter::DecimatePro );
-    surfaceFilter->SetTargetReduction( 0.8 );
+    surfaceFilter->SetGaussianStandardDeviation( gaussianSD ); 
+  }
+
+  surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?
+  if (applyMedian)
+  {
+    surfaceFilter->SetMedianKernelSize(medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
   }
   
-  surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
-  surfaceFilter->SetMedianFilter3D(smooth); // apply median to segmentation before marching cubes ?
-  surfaceFilter->SetSmooth(smooth); // smooth wireframe ?
+  surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
+  if (decimateMesh)
+  {
+    surfaceFilter->SetDecimate( ImageToSurfaceFilter::DecimatePro );
+    surfaceFilter->SetTargetReduction( reductionRate );
+  }
+
   surfaceFilter->UpdateLargestPossibleRegion();
 
   // calculate normals for nicer display
   m_Surface = surfaceFilter->GetOutput();
 
   vtkPolyData* polyData = m_Surface->GetVtkPolyData();
+
+  if (!polyData) throw std::logic_error("Could not create polygon model");
+
   polyData->SetVerts(0);
   polyData->SetLines(0);
 
-  if (smooth)
+  if (smooth || applyMedian || decimateMesh)
   {
     vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
 

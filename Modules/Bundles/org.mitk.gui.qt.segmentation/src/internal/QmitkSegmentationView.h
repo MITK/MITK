@@ -24,6 +24,8 @@ public:
 
   QmitkSegmentationView();
   virtual ~QmitkSegmentationView();
+    
+  void OnSurfaceCalculationDone();
 
 protected:
 
@@ -65,7 +67,15 @@ protected:
     void PartHidden(cherry::IWorkbenchPartReference::Pointer);
     void PartVisible(cherry::IWorkbenchPartReference::Pointer);
 
+  protected slots:
+
+    void CreateSurface(bool);
+
   protected:
+
+    typedef std::vector<mitk::DataTreeNode*> NodeList;
+    NodeList GetSelectedNodes() const;
+
     void CheckImageAlignment();
 
     QmitkStdMultiWidget * m_MultiWidget;
@@ -79,6 +89,8 @@ protected:
     cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
     cherry::ISelectionListener::Pointer m_SelectionListener;
     friend class cherry::SelectionChangedAdapter<QmitkSegmentationView>;
+  
+    QAction* m_CreateSurfaceAction;
 
   /// from QmitkSegmentation
 

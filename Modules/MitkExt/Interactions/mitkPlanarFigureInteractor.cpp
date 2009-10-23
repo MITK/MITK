@@ -333,6 +333,13 @@ bool mitk::PlanarFigureInteractor
     }
 
 
+  case AcDESELECTPOINT:
+    {
+      planarFigure->DeselectControlPoint();
+
+      // falls through
+    }
+
   case AcCHECKPOINT:
     {
       int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
@@ -367,17 +374,6 @@ bool mitk::PlanarFigureInteractor
   case AcSELECTPOINT:
     {
       ok = true;  
-      break;
-    }
-
-  case AcDESELECTALL:
-    {
-      planarFigure->DeselectControlPoint();
-
-      // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-      ok = true;
       break;
     }
 

@@ -59,6 +59,7 @@ SET(CPP_FILES
  QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
+ QmitkCrossWidget.cpp
   #QmitkLevelWindowRangeChangeDialog.cpp
 
  #QmitkLevelWindowPresetDefinitionDialog.cpp
@@ -66,6 +67,7 @@ SET(CPP_FILES
  QmitkSliceWidget.cpp
  # QmitkStdMultiWidget.cpp
  QmitkTransferFunctionWidget.cpp
+ QmitkTransferFunctionGeneratorWidget.cpp
  QmitkSelectableGLWidget.cpp
  QmitkToolReferenceDataSelectionBox.cpp
  QmitkToolGUIArea.cpp
@@ -134,7 +136,9 @@ SET(MOC_H_FILES
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
+ QmitkCrossWidget.h
  QmitkTransferFunctionWidget.h
+ QmitkTransferFunctionGeneratorWidget.h
  QmitkToolGUIArea.h
  QmitkToolGUI.h
  QmitkToolReferenceDataSelectionBox.h
@@ -160,6 +164,7 @@ SET(UI_FILES
   # QmitkLevelWindowWidget.ui
   QmitkSliceWidget.ui
   QmitkTransferFunctionWidget.ui
+  QmitkTransferFunctionGeneratorWidget.ui
   QmitkSelectableGLWidget.ui
   QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkFunctionalityComponentContainerControls.ui

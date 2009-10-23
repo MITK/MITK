@@ -1,7 +1,8 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="/qmitk">
-  <file>QmitkStandardViews.png</file>
-  <file>play.xpm</file>
-  <file>stop.xpm</file>
-</qresource>
+<RCC>
+  <qresource prefix="/qmitk" >
+    <file>cross.png</file>
+    <file>QmitkStandardViewsDialogBar.xpm</file>
+    <file>play.xpm</file>
+    <file>stop.xpm</file>
+  </qresource>
 </RCC>

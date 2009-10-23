@@ -109,7 +109,7 @@ public:
   virtual float GetFunctionY(int index) = 0;
   virtual int GetFunctionSize() = 0;
   int m_GrabbedHandle;
-  std::pair<int,int> m_MoveStart;
+
   vtkFloatingPointType m_Lower, m_Upper, m_Min, m_Max;
   std::pair<int,int> FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType>);
   std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);

@@ -44,6 +44,9 @@ class SceneSerialization_EXPORT TransferFunctionPropertyDeserializer : public Ba
       TiXmlElement* scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
       if (scalarOpacityPointlist == NULL)
         return NULL;
+        
+      tf->ClearScalarOpacityPoints();  
+        
       for( TiXmlElement* pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
       {
         double x;
@@ -58,6 +61,9 @@ class SceneSerialization_EXPORT TransferFunctionPropertyDeserializer : public Ba
       TiXmlElement* gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
       if (gradientOpacityPointlist == NULL)
         return NULL;
+      
+      tf->ClearGradientOpacityPoints();
+      
       for( TiXmlElement* pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
       {
         double x;
@@ -75,6 +81,9 @@ class SceneSerialization_EXPORT TransferFunctionPropertyDeserializer : public Ba
       vtkColorTransferFunction* ctf = tf->GetColorTransferFunction();
       if (ctf == NULL)
         return NULL;
+      
+      ctf->RemoveAllPoints();
+      
       for( TiXmlElement* pointElement = rgbPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
       {
         double x;
@@ -101,6 +110,51 @@ class SceneSerialization_EXPORT TransferFunctionPropertyDeserializer : public Ba
     TransferFunctionPropertyDeserializer() {}
     virtual ~TransferFunctionPropertyDeserializer() {}
 };
+
+TransferFunction::Pointer SceneSerialization_EXPORT DeserializeTransferFunction( const char *filePath )
+{
+  TiXmlDocument document( filePath );
+  
+  if (!document.LoadFile())
+  {
+    LOG_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    return NULL;
+  }
+      
+  // find version node --> note version in some variable
+  int fileVersion = 1;
+  TiXmlElement* versionObject = document.FirstChildElement("Version");
+  if (versionObject)
+  {
+    if ( versionObject->QueryIntAttribute( "TransferfunctionVersion", &fileVersion ) != TIXML_SUCCESS )
+    {
+      LOG_WARN << "Transferfunction file " << filePath << " does not contain version information! Trying version 1 format.";
+    }
+    else
+    {
+      LOG_INFO << "Transferfunction file " << filePath << " is of version " << fileVersion;
+    }
+  }
+  
+  TiXmlElement* input =  document.FirstChildElement("TransferFunction");
+  
+  TransferFunctionPropertyDeserializer::Pointer tfpd=TransferFunctionPropertyDeserializer::New();
+  
+  BaseProperty::Pointer bp = tfpd->Deserialize(input);
+  
+  TransferFunctionProperty::Pointer tfp = dynamic_cast<TransferFunctionProperty*>(bp.GetPointer());
+  
+  if(tfp.IsNotNull())
+  {
+    TransferFunction::Pointer tf = tfp->GetValue();
+    return tf;
+  }
+
+  LOG_WARN << "Can't deserialize transferfunction";
+  
+  return NULL;
+}
+
 
 } // namespace
 

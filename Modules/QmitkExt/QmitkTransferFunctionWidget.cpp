@@ -7,25 +7,19 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   QWidget(parent, f)
 {
   this->setupUi(this);
-
-  //insert Transfer Function Combo Box
-  m_TransferFunctionComboBox->addItem( " choose Transferfunction ..");
-  m_TransferFunctionComboBox->addItem( "Ramp between 25% & 50%, Tan");
-  m_TransferFunctionComboBox->addItem( "Ramp between 25% & 75%, Tan");
-  m_TransferFunctionComboBox->addItem( "CT AAA");
-  m_TransferFunctionComboBox->addItem( "CT Bone");
-  m_TransferFunctionComboBox->addItem( "CT Cardiac");
-  m_TransferFunctionComboBox->addItem( "CT Coronary arteries");
-  m_TransferFunctionComboBox->addItem( "MR Default");
-  m_TransferFunctionComboBox->addItem( "MR MIP");
-  m_TransferFunctionComboBox->addItem( "MITK Default");
-
+                                                
   // signals and slots connections
-  connect(m_XEdit, SIGNAL(returnPressed()), this, SLOT(SetXValue()));
-  connect(m_YEdit, SIGNAL(returnPressed()), this, SLOT(SetYValue()));
+  connect(m_XEditScalarOpacity, SIGNAL(returnPressed()), this, SLOT(SetXValueScalar()));
+  connect(m_YEditScalarOpacity, SIGNAL(returnPressed()), this, SLOT(SetYValueScalar()));
 
-  // !!! Transfer Function Changed
-  connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT( OnChangeTransferFunctionMode( int ) ) );
+  connect(m_XEditGradientOpacity, SIGNAL(returnPressed()), this, SLOT(SetXValueGradient()));
+  connect(m_YEditGradientOpacity, SIGNAL(returnPressed()), this, SLOT(SetYValueGradient()));
+
+  connect(m_XEditColor, SIGNAL(returnPressed()), this, SLOT(SetXValueColor()));
+
+  m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEditScalarOpacity, m_YEditScalarOpacity);
+  m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
+  m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, 0);
 }
 
 QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
@@ -36,832 +30,119 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
   if (node)
   {
-    if (mitk::TransferFunctionProperty::Pointer tfp = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction")))
+    tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
+    
+    if(!tfpToChange)
     {
-      if (tfp)
+      if (! dynamic_cast<mitk::Image*>(node->GetData()))
       {
-        //generate Initiale Histogram
-        mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-        if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
-          tf->InitializeHistogram( image );
-
-        //Get TransferFunction Parameter from the DataTreeNode
-        m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tfp->GetValue()->GetScalarOpacityFunction() );
-        m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
-        m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
-        m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
-
-        m_GradientOpacityCanvas->SetPiecewiseFunction( tfp->GetValue()->GetGradientOpacityFunction() );
-        m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
-        m_GradientOpacityCanvas->SetMin( tf->GetMin() );
-        m_GradientOpacityCanvas->SetMax( tf->GetMax() );
-
-        m_ColorTransferFunctionCanvas->SetColorTransferFunction( tfp->GetValue()->GetColorTransferFunction() );
-        UpdateMinMaxLabels();
+        LOG_WARN << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node";
+        goto turnOff;
       }
+      
+      node->SetProperty("TransferFunction", tfpToChange = mitk::TransferFunctionProperty::New() );
+      dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
     }
-    else
-    {
-      mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-      if (mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData()))
-      {
-        tf->InitializeByMitkImage(image);
-        m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction(tf->GetScalarOpacityFunction());
-        m_ScalarOpacityFunctionCanvas->SetHistogram(tf->GetHistogram());
-        m_GradientOpacityCanvas->SetPiecewiseFunctionGO(tf->GetGradientOpacityFunction());
-        m_GradientOpacityCanvas->SetHistogram(tf->GetHistogram());
-        m_ColorTransferFunctionCanvas->SetColorTransferFunction(tf->GetColorTransferFunction());
-        UpdateMinMaxLabels();
-        node->SetProperty("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
-      }
-      else
-      {
-        std::cerr << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node" << std::endl;
-      }
-    }
+
+    mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
+
+    if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
+      tf->InitializeByItkHistogram( image->GetScalarHistogram() );
+          
+    OnUpdateCanvas();
+
     m_ScalarOpacityFunctionCanvas->setEnabled(true);
-    m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEdit, m_YEdit);
     m_GradientOpacityCanvas->setEnabled(true);
-    m_GradientOpacityCanvas->SetQLineEdits(m_XEdit, m_YEdit);
     m_ColorTransferFunctionCanvas->setEnabled(true);
-    m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEdit, m_YEdit);
-    m_ScalarOpacityFunctionCanvas->update();
-    m_GradientOpacityCanvas->update();
-    m_ColorTransferFunctionCanvas->update();
-  }
-  else
-  {
-    // called with null-node
-    //
-    m_ScalarOpacityFunctionCanvas->setEnabled(false);
-    m_GradientOpacityCanvas->setEnabled(false);
-    m_ColorTransferFunctionCanvas->setEnabled(false);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
+    return; 
+  }
+
+  turnOff:
+
+  m_ScalarOpacityFunctionCanvas->setEnabled(false);
+  m_GradientOpacityCanvas->setEnabled(false);
+  m_ColorTransferFunctionCanvas->setEnabled(false);
+  tfpToChange = 0;
 }
 
-void QmitkTransferFunctionWidget::UpdateMinMaxLabels()
+
+void QmitkTransferFunctionWidget::OnUpdateCanvas()
 {
+  if(tfpToChange.IsNull())
+    return;
+
+  mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
+
+  if(tf.IsNull())
+    return;
+
   if (m_ScalarOpacityFunctionCanvas)
   {
-    m_MinLabel->setText(
-        QString::number(m_ScalarOpacityFunctionCanvas->GetMin()));
-    m_MinLabel_2->setText(QString::number(
-        m_ScalarOpacityFunctionCanvas->GetMin()));
-    m_MaxLabel->setText(
-        QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
-    m_MaxLabel_2->setText(QString::number(
-        m_ScalarOpacityFunctionCanvas->GetMax()));
+    m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tf->GetScalarOpacityFunction() );
+    m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
+    m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
+    m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
+
+    m_MinLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMin()));
+    m_MaxLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
   }
   if (m_GradientOpacityCanvas)
   {
+    m_GradientOpacityCanvas->SetPiecewiseFunction( tf->GetGradientOpacityFunction() );
+    m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
+    m_GradientOpacityCanvas->SetMin( tf->GetMin() );
+    m_GradientOpacityCanvas->SetMax( tf->GetMax() );
+
     m_MinLabelGO->setText(QString::number(m_GradientOpacityCanvas->GetMin()));
     m_MaxLabelGO->setText(QString::number(m_GradientOpacityCanvas->GetMax()));
   }
-}
-
-void QmitkTransferFunctionWidget::ChooseTF(int choice)
-{
-
-  if (choice == 1)
-  { //bone + soft-tissue
-    ResetTF();
-
-    number_s = 4;
-    scalar_pointsX[0] = 18;
-    scalar_pointsY[0] = 0;
-    scalar_pointsX[1] = 20;
-    scalar_pointsY[1] = 0.3;
-    scalar_pointsX[2] = 70;
-    scalar_pointsY[2] = 0.3;
-    scalar_pointsX[3] = 72;
-    scalar_pointsY[3] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 2)
-  { //soft-tissue
-    ResetTF();
-
-    number_s = 5;
-    scalar_pointsX[0] = 18;
-    scalar_pointsY[0] = 0;
-    scalar_pointsX[1] = 20;
-    scalar_pointsY[1] = 1;
-    scalar_pointsX[2] = 70;
-    scalar_pointsY[2] = 1;
-    scalar_pointsX[3] = 72;
-    scalar_pointsY[3] = 0;
-    scalar_pointsX[4] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[4] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 3)
-  { //bones
-    ResetTF();
-
-    number_s = 4;
-    scalar_pointsX[0] = 170;
-    scalar_pointsY[0] = 0;
-    scalar_pointsX[1] = 175;
-    scalar_pointsY[1] = 1;
-    scalar_pointsX[2] = 1455;
-    scalar_pointsY[2] = 0;
-    scalar_pointsX[3] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[3] = 0;
-
-    AddPoints();
-
-  }
-
-  if (choice == 101)
-  { //Preset 1
-    ResetTF();
-
-    number_s = 2;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[0] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.20) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[0] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.20;
-    }
-    scalar_pointsY[0] = 0;
-    scalar_pointsX[1] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[1] = 1;
-
-    AddPoints();
-
-  }
-  if (choice == 102)
-  { //Preset 2
-    ResetTF();
-
-    number_s = 3;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[1] = 1;
-    scalar_pointsX[2] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[2] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 103)
-  { //Preset 3
-    ResetTF();
-
-    number_s = 3;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0.5;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[1] = 0.5;
-    scalar_pointsX[2] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[2] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 104)
-  { //Preset 4
-    ResetTF();
-
-    number_s = 5;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.25) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.25;
-    }
-    scalar_pointsY[1] = 0.5;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[2] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[2] = 0;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[3] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.75) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[3] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.75;
-    }
-    scalar_pointsY[3] = 1;
-
-    scalar_pointsX[4] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[4] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 105)
-  { //Preset 5
-    ResetTF();
-
-    number_s = 3;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[0] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[0] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[0] = 0;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.75) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.75;
-    }
-    scalar_pointsY[1] = 1;
-
-    scalar_pointsX[2] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[2] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 106)
-  { //Preset 6
-    ResetTF();
-
-    number_s = 2;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[0] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[0] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[0] = 0;
-    scalar_pointsX[1] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[1] = 1;
-
-    AddPoints();
-  }
-
-  if (choice == 107)
-  { //Preset 7
-    ResetTF();
-
-    number_s = 11;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[0] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.005) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[0] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.005;
-    }
-    scalar_pointsY[0] = 0;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.05) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.05;
-    }
-    scalar_pointsY[1] = 0.85;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.1) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[2] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.1;
-    }
-    scalar_pointsY[2] = 0.90;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[3] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.15) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[3] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.15;
-    }
-    scalar_pointsY[3] = 0.95;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[4] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.2) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[4] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.2;
-    }
-    scalar_pointsY[4] = 0.975;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[5] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.25) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[5] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.25;
-    }
-    scalar_pointsY[5] = 1;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[6] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.3) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[6] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.3;
-    }
-    scalar_pointsY[6] = 0.975;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[7] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.35) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[7] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.35;
-    }
-    scalar_pointsY[7] = 0.95;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[8] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.4) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[8] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.4;
-    }
-    scalar_pointsY[8] = 0.9;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[9] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.45) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[9] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.45;
-    }
-    scalar_pointsY[9] = 0.85;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[9] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.495) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[9] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.495;
-    }
-    scalar_pointsY[9] = 0;
-
-    scalar_pointsX[10] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[10] = 0;
-
-    AddPoints();
-  }
-  if (choice == 108)
-  { //Preset 8
-    ResetTF();
-
-    number_s = 4;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[1] = 1;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin()) + 0.01;
-    }
-    else
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + 0.01;
-    }
-    scalar_pointsY[2] = 0;
-    scalar_pointsX[3] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[3] = 0;
-
-    AddPoints();
-  }
-  if (choice == 109)
-  { //Preset 9
-    ResetTF();
-
-    number_s = 4;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[1] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50;
-    }
-    scalar_pointsY[1] = 0;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin()) + 0.01;
-    }
-    else
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.50) + 0.01;
-    }
-    scalar_pointsY[2] = 1;
-
-    scalar_pointsX[3] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[3] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 110)
-  { //Preset 10
-    ResetTF();
-
-    number_s = 6;
-    scalar_pointsX[0] = m_ScalarOpacityFunctionCanvas->GetFunctionMin();
-    scalar_pointsY[0] = 0;
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.40) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin()) - 0.01;
-    }
-    else
-    {
-      scalar_pointsX[1] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.40) - 0.01;
-    }
-    scalar_pointsY[1] = 0;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[2] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.40) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[2] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.40;
-    }
-    scalar_pointsY[2] = 1;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[3] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.60) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin());
-    }
-    else
-    {
-      scalar_pointsX[3] = (m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.60;
-    }
-    scalar_pointsY[3] = 1;
-
-    if ((m_ScalarOpacityFunctionCanvas->GetFunctionMin()) < 0)
-    {
-      scalar_pointsX[4] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.60) + (m_ScalarOpacityFunctionCanvas->GetFunctionMin()) + 0.01;
-    }
-    else
-    {
-      scalar_pointsX[4] = ((m_ScalarOpacityFunctionCanvas->GetFunctionRange())
-          * 0.60) + 0.01;
-    }
-    scalar_pointsY[4] = 0;
-
-    scalar_pointsX[5] = m_ScalarOpacityFunctionCanvas->GetFunctionMax();
-    scalar_pointsY[5] = 0;
-
-    AddPoints();
-  }
-
-  if (choice == 999)
-  { //Reset
-    ResetTF();
-    ResetCS();
-    m_GradientOpacityCanvas->ResetGO();
-  }
-}
-void QmitkTransferFunctionWidget::AddPoints()
-{
-
-  for (int i = 0; i < number_s; i++)
+  if (m_ColorTransferFunctionCanvas)
   {
-    m_ScalarOpacityFunctionCanvas->AddFunctionPoint(scalar_pointsX[i],
-        scalar_pointsY[i]);
-    std::cout << "Added scalar point at(" << scalar_pointsX[i] << "/"
-        << scalar_pointsY[i] << ")\n";
+    m_ColorTransferFunctionCanvas->SetColorTransferFunction( tf->GetColorTransferFunction() );
+    m_ColorTransferFunctionCanvas->SetMin( tf->GetMin() );
+    m_ColorTransferFunctionCanvas->SetMax( tf->GetMax() );
+
+    m_MinLabel  ->setText(QString::number(m_ColorTransferFunctionCanvas->GetMin()));
+    m_MaxLabel  ->setText(QString::number(m_ColorTransferFunctionCanvas->GetMax()));
   }
 
   m_ScalarOpacityFunctionCanvas->update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-}
-
-void QmitkTransferFunctionWidget::ResetTF()
-{
-
-  /*
-   for(int i=0; i<number_c;i++){
-   m_ColorTransferFunctionCanvas->RemoveFunctionPoint(color_pointsX[i]);
-   std::cout<<"Removed color point at "<<color_pointsX[i]<<"\n";
-   }
-
-   for(int i=0; i<number_s;i++){
-   m_ScalarOpacityFunctionCanvas->RemoveFunctionPoint(scalar_pointsX[i]);
-   std::cout<<"Removed scalar point at ("<<scalar_pointsX[i]<<"/"<<scalar_pointsY[i]<<")\n";
-   }
-   */
-  m_ScalarOpacityFunctionCanvas->RemoveAllFunctionPoints();
-  m_ScalarOpacityFunctionCanvas->update();
-  //m_GradientOpacityCanvas->ResetGO();
   m_GradientOpacityCanvas->update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-}
-
-/*** Color ***/
-void QmitkTransferFunctionWidget::ChooseCS(int cstyle)
-{
-
-  if (cstyle == 1)
-  {//bone - natural
-    ResetCS();
-    number_c = 2;
-    color_pointsX[0] = m_ColorTransferFunctionCanvas->GetFunctionMin();
-    color_pointsR[0] = 0.4;
-    color_pointsG[0] = 0.37;
-    color_pointsB[0] = 0.29;
-
-    color_pointsX[1] = m_ColorTransferFunctionCanvas->GetFunctionMax();
-    color_pointsR[1] = 0.97;
-    color_pointsG[1] = 1;
-    color_pointsB[1] = 0.6;
-    AddCS();
-  }
-
-  if (cstyle == 2)
-  {//bone - high contrast
-    ResetCS();
-    number_c = 4;
-    color_pointsX[0] = 140;
-    color_pointsR[0] = 0;
-    color_pointsG[0] = 1;
-    color_pointsB[0] = 0;
-
-    color_pointsX[1] = 300;
-    color_pointsR[1] = 1;
-    color_pointsG[1] = 0;
-    color_pointsB[1] = 0;
-
-    color_pointsX[2] = 500;
-    color_pointsR[2] = 0;
-    color_pointsG[2] = 0;
-    color_pointsB[2] = 1;
-
-    color_pointsX[3] = 700;
-    color_pointsR[3] = 1;
-    color_pointsG[3] = 1;
-    color_pointsB[3] = 0;
-    AddCS();
-  }
-
-  if (cstyle == 3)
-  {//soft tissue - natural
-    ResetCS();
-    number_c = 4;
-    color_pointsX[0] = 18;
-    color_pointsR[0] = 0.93;
-    color_pointsG[0] = 0.5;
-    color_pointsB[0] = 0.4;
-    color_pointsX[1] = 45;
-    color_pointsR[1] = 0.79;
-    color_pointsG[1] = 0.6;
-    color_pointsB[1] = 0.52;
-    color_pointsX[2] = 70;
-    color_pointsR[2] = 0.82;
-    color_pointsG[2] = 0.57;
-    color_pointsB[2] = 0.53;
-    color_pointsX[3] = m_ColorTransferFunctionCanvas->GetFunctionMax();
-    color_pointsR[3] = 0.82;
-    color_pointsG[3] = 0.57;
-    color_pointsB[3] = 0.53;
-    AddCS();
-  }
-
-  if (cstyle == 4)
-  {//muscles-bones
-    ResetCS();
-
-    double step = (m_ColorTransferFunctionCanvas->GetFunctionRange()) / 256.0;
-
-    number_c = 9;
-    color_pointsX[0] = m_ColorTransferFunctionCanvas->GetFunctionMin();
-    color_pointsR[0] = 0;
-    color_pointsG[0] = 0;
-    color_pointsB[0] = 0;
-    std::cout << "Point 1 x= " << color_pointsX[0] << "\n";
-
-    color_pointsX[1] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 10
-        * step;
-    color_pointsR[1] = 26 / 255.0;
-    color_pointsG[1] = 2 / 255.0;
-    color_pointsB[1] = 2 / 255.0;
-
-    color_pointsX[2] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 20
-        * step;
-    color_pointsR[2] = 53 / 255.0;
-    color_pointsG[2] = 4 / 255.0;
-    color_pointsB[2] = 5 / 255.0;
-
-    color_pointsX[3] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 40
-        * step;
-    color_pointsR[3] = 107 / 255.0;
-    color_pointsG[3] = 9 / 255.0;
-    color_pointsB[3] = 11 / 255.0;
-
-    color_pointsX[4] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 60
-        * step;
-    color_pointsR[4] = 161 / 255.0;
-    color_pointsG[4] = 13 / 255.0;
-    color_pointsB[4] = 17 / 255.0;
-
-    color_pointsX[5] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 100
-        * step;
-    color_pointsR[5] = 255 / 255.0;
-    color_pointsG[5] = 36 / 255.0;
-    color_pointsB[5] = 26 / 255.0;
-
-    color_pointsX[6] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 150
-        * step;
-    color_pointsR[6] = 255 / 255.0;
-    color_pointsG[6] = 180 / 255.0;
-    color_pointsB[6] = 11 / 255.0;
-
-    color_pointsX[7] = (m_ColorTransferFunctionCanvas->GetFunctionMin()) + 200
-        * step;
-    color_pointsR[7] = 255 / 255.0;
-    color_pointsG[7] = 240 / 255.0;
-    color_pointsB[7] = 38 / 255.0;
-
-    color_pointsX[8] = (m_ColorTransferFunctionCanvas->GetFunctionMax());
-    color_pointsR[8] = 255 / 255.0;
-    color_pointsG[8] = 254 / 255.0;
-    color_pointsB[8] = 251 / 255.0;
-
-    AddCS();
-  }
-
-}
-
-void QmitkTransferFunctionWidget::ResetCS()
-{
-  m_ColorTransferFunctionCanvas->RemoveAllFunctionPoints();
   m_ColorTransferFunctionCanvas->update();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
 
-void QmitkTransferFunctionWidget::AddCS()
+void QmitkTransferFunctionWidget::SetXValueScalar()
 {
-  for (int i = 0; i < number_c; i++)
-  {
-    m_ColorTransferFunctionCanvas->AddRGB(color_pointsX[i], color_pointsR[i],
-        color_pointsG[i], color_pointsB[i]);
-    std::cout << "Added color point at " << color_pointsX[i] << " RGB: "
-        << color_pointsR[i] << color_pointsG[i] << color_pointsB[i] << "\n";
-  }
-  m_ColorTransferFunctionCanvas->update();
+  m_ScalarOpacityFunctionCanvas->SetX(m_XEditScalarOpacity->text().toFloat());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkTransferFunctionWidget::ImmediateUpdate(bool state)
+void QmitkTransferFunctionWidget::SetYValueScalar()
 {
-  m_ScalarOpacityFunctionCanvas->SetImmediateUpdate(state);
-  m_ColorTransferFunctionCanvas->SetImmediateUpdate(state);
-  m_GradientOpacityCanvas->SetImmediateUpdate(state);
-}
-
-void QmitkTransferFunctionWidget::SetXValue()
-{
-  m_ScalarOpacityFunctionCanvas->SetX(m_XEdit->text().toFloat());
-  m_ColorTransferFunctionCanvas->SetX(m_XEdit->text().toFloat());
-  m_GradientOpacityCanvas->SetX(m_XEdit->text().toFloat());
-  mitk::RenderingManager::GetInstance()->SetNextLOD(2);
+  m_ScalarOpacityFunctionCanvas->SetY(m_YEditScalarOpacity->text().toFloat());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkTransferFunctionWidget::SetYValue()
+void QmitkTransferFunctionWidget::SetXValueGradient()
 {
-  m_ScalarOpacityFunctionCanvas->SetY(m_YEdit->text().toFloat());
-  m_GradientOpacityCanvas->SetY(m_YEdit->text().toFloat());
-  mitk::RenderingManager::GetInstance()->SetNextLOD(2);
+  m_GradientOpacityCanvas->SetX(m_XEditGradientOpacity->text().toFloat());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkTransferFunctionWidget::OnChangeTransferFunctionMode( int mode )
+void QmitkTransferFunctionWidget::SetYValueGradient()
 {
-  //first item is nothing
-  if( mode == 0 )
-    return;
-  else //subract 1 for correct TransferFunction order ( mode = 0 = TF_SKIN_50 )
-    mode -= 1;
-
-  //send Signal
-  emit SignalTransferFunctionModeChanged( mode );
+  m_GradientOpacityCanvas->SetY(m_YEditGradientOpacity->text().toFloat());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+void QmitkTransferFunctionWidget::SetXValueColor()
+{
+  m_ColorTransferFunctionCanvas->SetX(m_XEditColor->text().toFloat());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+
+
+
 

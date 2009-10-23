@@ -34,7 +34,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
 
   QPainter painter(this);
   painter.save();
-  painter.setPen(Qt::green);
+  painter.setPen(Qt::gray);
 
   QRect contentsRect = this->contentsRect();
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
@@ -69,7 +69,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
         if (m_LineEditAvailable)
         {
           m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
-          m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
+          //m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
         }
       }
     }

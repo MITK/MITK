@@ -165,6 +165,8 @@ public:
   // than with uncompressed textures.
   vtkSetMacro(UseCompressedTexture,bool);
   vtkGetMacro(UseCompressedTexture,bool);
+
+  void UpdateMTime();
   
 protected:
   vtkMitkVolumeTextureMapper3D();

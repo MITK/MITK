@@ -266,8 +266,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
   this->SupportsCompressedTexture=false;
   this->SupportsNonPowerOfTwoTextures=false;
 
-  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
-
   this->Modified();
 }
 

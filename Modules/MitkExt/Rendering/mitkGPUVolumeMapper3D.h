@@ -81,6 +81,8 @@ public:
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
   virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+  
+  virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
 protected:
 

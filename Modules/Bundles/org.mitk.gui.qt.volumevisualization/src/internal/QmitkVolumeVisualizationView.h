@@ -46,38 +46,15 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation of the connections of main and control widget
-  virtual void CreateConnections();
-
-
 protected slots:
 
   void OnImageSelected(const mitk::DataTreeNode* item);
   
   void OnEnableRendering( bool state );
 
-  //TF Stlye Tab
-  void OnTransferFunctionModeChanged( int mode );
-
-  //Preferences Tab
-  void OnEnableClippingPlane( bool state );
-
-  void OnEnableShadingLow( bool );
-  void OnEnableShadingMed( bool );
-  void OnEnableShadingHigh( bool );
-
-  void OnSetShadingValuesClicked();
-
-  void OnSetDefaultShadingValuesClicked();
-
-
 protected:
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
-
-
-  bool image_ok;
-
 
 };
 

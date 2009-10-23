@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define GPU_LOG LOG_INFO(false)("VR")
+
 #include "mitkGPUVolumeMapper3D.h"
 
 #include "mitkDataTreeNode.h"
@@ -64,11 +66,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 
 
-#define GPU_LOG LOG_INFO(false)("VR")
 
 const mitk::Image* mitk::GPUVolumeMapper3D::GetInput()
 {
   return static_cast<const mitk::Image*> ( GetData() );
+}
+
+void mitk::GPUVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer)
+{
+  BaseVtkMapper3D::MitkRenderVolumetricGeometry(renderer);
+  if(m_T2DMapper)
+    m_T2DMapper->UpdateMTime();
 }
 
 mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
@@ -262,20 +270,20 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
 
-      tf->GetColorTransferFunction()->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0 );
+     // tf->GetColorTransferFunction()->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0 );
       tf->GetColorTransferFunction()->AddRGBPoint( 143.556, 0.615686, 0.356863, 0.184314, 0.5, 0 );
       tf->GetColorTransferFunction()->AddRGBPoint( 166.222, 0.882353, 0.603922, 0.290196, 0.5, 0 );
       tf->GetColorTransferFunction()->AddRGBPoint( 214.389, 1, 1, 1, 0.5, 0 );
       tf->GetColorTransferFunction()->AddRGBPoint( 419.736, 1, 0.937033, 0.954531, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 3071, 0.827451, 0.658824, 1, 0.5, 0 );
+    //  tf->GetColorTransferFunction()->AddRGBPoint( 3071, 0.827451, 0.658824, 1, 0.5, 0 );
 
       tf->GetScalarOpacityFunction()->Initialize();
-      tf->GetScalarOpacityFunction()->AddPoint( -3024, 0, 0.5, 0 );
+   //   tf->GetScalarOpacityFunction()->AddPoint( -3024, 0, 0.5, 0 );
       tf->GetScalarOpacityFunction()->AddPoint( 143.556, 0, 0.5, 0 );
       tf->GetScalarOpacityFunction()->AddPoint( 166.222, 0.686275, 0.5, 0 );
       tf->GetScalarOpacityFunction()->AddPoint( 214.389, 0.696078, 0.5, 0 );
       tf->GetScalarOpacityFunction()->AddPoint( 419.736, 0.833333, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 3071, 0.803922, 0.5, 0 );
+   //   tf->GetScalarOpacityFunction()->AddPoint( 3071, 0.803922, 0.5, 0 );
 
       tf->GetGradientOpacityFunction()->Initialize();
       tf->GetGradientOpacityFunction()->AddPoint( 0, 1, 0.5, 0 );

@@ -1059,6 +1059,12 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
     }
 }
 
+void vtkMitkVolumeTextureMapper3D::UpdateMTime()
+{
+  this->SavedTextureMTime.Modified();
+}
+
+
 //-----------------------------------------------------------------------------
 int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
 {

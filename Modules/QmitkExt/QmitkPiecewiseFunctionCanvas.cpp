@@ -41,34 +41,49 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
     PaintHistogram(painter);
   }
   painter.save();
-  painter.setPen(Qt::green);
+  
+  painter.setPen(Qt::gray);
 
   QRect contentsRect = this->contentsRect();
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
   if (m_PiecewiseFunction)
   {
     vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
+
+    // Render lines
+
+    painter.setPen(Qt::black);
+    
+    for (int i = -1; i < m_PiecewiseFunction->GetSize(); i++)
+    {
+      std::pair<int,int> left;
+      std::pair<int,int> right;
+      
+      if(i < 0)
+        left = this->FunctionToCanvas(std::make_pair(-32768, dp[0 * 2 + 1]));
+      else
+        left = this->FunctionToCanvas(std::make_pair(dp[i * 2], dp[i * 2 + 1]));    
+
+      if(i+1 >= m_PiecewiseFunction->GetSize())
+        right = this->FunctionToCanvas(std::make_pair(32768, dp[(i  ) * 2 + 1]));    
+      else
+        right = this->FunctionToCanvas(std::make_pair(dp[(i+1) * 2], dp[(i+1) * 2 + 1]));    
+
+      painter.drawLine(left.first, left.second, right.first, right.second);
+    }
+
+    // Render Points
+    
     for (int i = 0; i < m_PiecewiseFunction->GetSize(); i++)
     {
-      //converts values (X/Y)of the TF-point to pixel locations on the canvas-point
       std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(
           dp[i * 2], dp[i * 2 + 1]));
-      if (i + 1 < m_PiecewiseFunction->GetSize())
-      {
-        std::pair<int,int> nextPoint = this->FunctionToCanvas(std::make_pair(
-            dp[(i + 1) * 2], dp[(i + 1) * 2 + 1]));
-        painter.setPen(Qt::black);
-        painter.drawLine(point.first, point.second, nextPoint.first,
-            nextPoint.second);
-      }
 
       if (i == m_GrabbedHandle)
       {
         painter.setBrush(QBrush(Qt::red));
-
         if (m_LineEditAvailable)
         {
-          //inserts X/Y values of the grabbed function point into QLineEdit
           m_XEdit->setText(QString::number(GetFunctionX(m_GrabbedHandle)));
           m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
         }
@@ -79,12 +94,13 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
       }
       painter.drawEllipse(point.first - 4, point.second - 4, 8, 8);
     }
+    
     painter.setBrush(Qt::NoBrush);
   }
   else
   {
-    painter.setPen(Qt::red);
-    painter.drawRect(1, 1, contentsRect.width()-1, contentsRect.height()-1);
+    //painter.setPen(Qt::red);
+    //painter.drawRect(1, 1, contentsRect.width()-1, contentsRect.height()-1);
   }
   painter.restore();
 }

@@ -71,21 +71,21 @@ int QmitkTransferFunctionCanvas::GetNearHandle(int /*x*/, int /*y*/,
   return -1;
 }
 
+
 void QmitkTransferFunctionCanvas::mousePressEvent(QMouseEvent* mouseEvent)
 {
 
   if (m_LineEditAvailable)
   {
     m_XEdit->clear();
-    m_YEdit->clear();
+    if(m_YEdit)
+      m_YEdit->clear();
   }
 
   m_GrabbedHandle = GetNearHandle(mouseEvent->pos().x(), mouseEvent->pos().y());
 
-  if ((mouseEvent->modifiers() & Qt::ShiftModifier) && (mouseEvent->button()
-      & Qt::LeftButton) && m_GrabbedHandle == -1)
+  if ( (mouseEvent->button() & Qt::LeftButton) && m_GrabbedHandle == -1)
   {
-    // mode = add
     this->AddFunctionPoint(
         this->CanvasToFunction(std::make_pair(mouseEvent->pos().x(),
             mouseEvent->pos().y())).first,
@@ -94,23 +94,11 @@ void QmitkTransferFunctionCanvas::mousePressEvent(QMouseEvent* mouseEvent)
         mouseEvent->pos().y());
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
-  else if ((mouseEvent->button() & Qt::LeftButton) || (mouseEvent->button()
-      & Qt::MidButton))
+  else if ((mouseEvent->button() & Qt::RightButton) && m_GrabbedHandle != -1 && this->GetFunctionSize() > 1)
   {
-    if (m_GrabbedHandle != -1)
-    {
-      m_MoveStart
-          = std::make_pair(mouseEvent->pos().x(), mouseEvent->pos().y());
-    }
-    /* if ((mouseEvent->button() & Qt::MidButton)  &&
-     (mouseEvent->state() & Qt::ShiftButton) &&
-     m_GrabbedHandle != -1 && this->GetFunctionSize() >2 )
-     {
-     // mode = delete
-     this->RemoveFunctionPoint(this->GetFunctionX(nearHandle));
+     this->RemoveFunctionPoint(this->GetFunctionX(m_GrabbedHandle));
      m_GrabbedHandle = -1;
-
-     } */
+     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   update();
 
@@ -124,34 +112,37 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
     std::pair<vtkFloatingPointType,vtkFloatingPointType>
         newPos = this->CanvasToFunction(std::make_pair(mouseEvent->x(),
             mouseEvent->y()));
-    if (GetFunctionX(m_GrabbedHandle) <= m_Min)
+    
+    // X Clamping
     {
-      // left-most point -> x is fixed
-      newPos.first = m_Min;
+      // Check with predecessor
+      if( m_GrabbedHandle > 0 )
+        if (newPos.first <= this->GetFunctionX(m_GrabbedHandle - 1))
+          newPos.first = this->GetFunctionX(m_GrabbedHandle);
+
+      // Check with sucessor      
+      if( m_GrabbedHandle < this->GetFunctionSize()-1 )
+        if (newPos.first >= this->GetFunctionX(m_GrabbedHandle + 1))
+          newPos.first = this->GetFunctionX(m_GrabbedHandle);
+      
+      // Clamping to histogramm
+           if (newPos.first < m_Min) newPos.first = m_Min;
+      else if (newPos.first > m_Max) newPos.first = m_Max;
     }
-    else if (GetFunctionX(m_GrabbedHandle) >= m_Max)
+        
+    // Y Clamping
     {
-      // right-most point -> x is fixed
-      newPos.first = m_Max;
+           if (newPos.second < 0.0) newPos.second = 0.0;
+      else if (newPos.second > 1.0) newPos.second = 1.0;
     }
-    else
-    {
-      // todo: add checks for lower/upper bounds in zoom mode
-      //std::cout << "before:" << newPos.first << "/" << newPos.second;
-      if (newPos.first <= this->GetFunctionX(m_GrabbedHandle - 1))
-        newPos.first = this->GetFunctionX(m_GrabbedHandle);
-      if (newPos.first >= this->GetFunctionX(m_GrabbedHandle + 1))
-        newPos.first = this->GetFunctionX(m_GrabbedHandle);
-    }
-    if (newPos.second < 0.0)
-      newPos.second = 0.0;
-    if (newPos.second > 1.0)
-      newPos.second = 1.0;
-    //std::cout << " after:" << newPos.first << "/" << newPos.second << std::endl;
-    //this->RemoveFunctionPoint(this->GetFunctionX(m_GrabbedHandle));
+    
+    // Move selected point    
     this->MoveFunctionPoint(m_GrabbedHandle, newPos);
+    
+    /*
+    // Search again selected point ??????? should not be required, seems like a legacy workaround/bugfix
+    // and no longer required
     m_GrabbedHandle = -1;
-    //this->AddFunctionPoint(newPos.first,newPos.second);
     for (int i = 0; i < this->GetFunctionSize(); i++)
     {
       if (this->GetFunctionX(i) == newPos.first)
@@ -160,10 +151,13 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
         break;
       }
     }
-    assert(m_GrabbedHandle != -1);
+    */
+    
     update();
-    if (m_ImmediateUpdate)
+    
+    //if (m_ImmediateUpdate)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
   }
 }
 
@@ -171,7 +165,6 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent*)
 {
   // m_GrabbedHandle = -1;
   update();
-  mitk::RenderingManager::GetInstance()->SetNextLOD(2);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -180,7 +173,7 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
   if (m_Histogram.IsNotNull())
   {
     p.save();
-    p.setPen(Qt::blue);
+    p.setPen(Qt::gray);
     float scaleFactor = (float) (this->GetHistogram()->GetSize()[0]) / contentsRect().width();
     float maxFreqLog = vcl_log(
         mitk::HistogramGenerator::CalculateMaximumFrequency(
@@ -197,7 +190,7 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
         //std::cout<<" y: "<<y<<std::endl;
         //p.drawLine(x-width()*0.5,height(),x-width()*0.5,y);
 
-        p.setPen(Qt::blue);
+        p.setPen(Qt::gray);
         p.drawLine(x, contentsRect().height(), x, y);
 
       }
@@ -223,8 +216,7 @@ void QmitkTransferFunctionCanvas::keyPressEvent(QKeyEvent * e)
     m_Range = m_Min + m_Max;
   }
 
-  if (e->key() == Qt::Key_Delete && m_GrabbedHandle != -1 && m_GrabbedHandle
-      != 0 && m_GrabbedHandle != this->GetFunctionSize() - 1)
+  if (e->key() == Qt::Key_Delete && m_GrabbedHandle != -1 && this->GetFunctionSize() > 1 )
   {
     this->RemoveFunctionPoint(GetFunctionX(m_GrabbedHandle));
     m_GrabbedHandle = -1;

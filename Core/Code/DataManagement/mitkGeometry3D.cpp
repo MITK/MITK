@@ -142,7 +142,12 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &p
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
-  pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
+  mitk::Point3D temp = pt_units;
+  if(m_ImageGeometry)
+  {
+    temp -= 0.5;
+  }
+  pt_mm = m_IndexToWorldTransform->TransformPoint(temp);
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
@@ -350,6 +355,11 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     {
       ++nans;
     }
+  }
+
+  if(m_ImageGeometry)
+  {
+    out+=0.5;
   }
   
   if (nans > 0)
@@ -563,7 +573,11 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
   case 5: FillVector3D(cornerpoint, bounds[1],bounds[2],bounds[5]); break;
   case 6: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[4]); break;
   case 7: FillVector3D(cornerpoint, bounds[1],bounds[3],bounds[5]); break;
-  default: assert(id < 8);
+  default: 
+    {
+      itkExceptionMacro(<<"A cube only has 8 corners. These are labeled 0-7.");
+      return NULL;
+    }
   }
   if(m_ImageGeometry)
   {

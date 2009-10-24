@@ -191,9 +191,14 @@ void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointe
 {
   if (selection == NULL) return;
 
+  // reset GUI
   this->ResetOneImageOpPanel();
   m_Controls->sliceNavigatorTime->setEnabled(false);
   m_Controls->leImage1->setText("");
+  m_Controls->tlWhat1->setEnabled(false);
+  m_Controls->cbWhat1->setEnabled(false);
+  m_Controls->tlWhat2->setEnabled(false);
+  m_Controls->cbWhat2->setEnabled(false);
 
   mitk::DataTreeNodeSelection::ConstPointer dtns 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
@@ -223,6 +228,8 @@ void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointe
     }
     m_Controls->tlWhat1->setEnabled(true);
     m_Controls->cbWhat1->setEnabled(true);
+    m_Controls->tlWhat2->setEnabled(true);
+    m_Controls->cbWhat2->setEnabled(true);
   }
 }
 
@@ -246,8 +253,6 @@ void QmitkBasicImageProcessing::ResetOneImageOpPanel()
   m_Controls->tlParam2->setText("Param2");
 
   m_Controls->cbWhat1->setCurrentIndex(0);
-  m_Controls->cbWhat1->setEnabled(false);
-  m_Controls->tlWhat1->setEnabled(false);
 
   m_Controls->tlTime->setEnabled(false);
 
@@ -274,23 +279,19 @@ void QmitkBasicImageProcessing::ResetParameterPanel()
 void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
 {
   m_Controls->cbWhat2->setCurrentIndex(0);
-  m_Controls->cbWhat2->setEnabled(false);
-  m_Controls->tlWhat2->setEnabled(false);
 
-  m_Controls->tlDirection->setEnabled(false);
-  m_Controls->rbDirection1->setEnabled(false);
-  m_Controls->rbDirection2->setEnabled(false);
+  m_Controls->tlImage2->setEnabled(false);
+  m_Controls->m_ImageSelector2->setCurrentIndex(0);
+  m_Controls->m_ImageSelector2->setEnabled(false);
+
   m_Controls->btnDoIt2->setEnabled(false);
 }
 
 void QmitkBasicImageProcessing::onImage2Selected(const mitk::DataTreeNode* item)
 {
-  this->ResetTwoImageOpPanel();
-
   if(item && item->GetData())
   {
-    m_Controls->tlWhat2->setEnabled(true);
-    m_Controls->cbWhat2->setEnabled(true);
+    m_Controls->btnDoIt2->setEnabled(true);
   }
 }
 
@@ -316,7 +317,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       text1 = "&Variance:";
 
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 2 );
       break;
     }
@@ -328,7 +329,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       text1 = "Radius:";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 3 );
       break;
     }
@@ -358,7 +359,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       text1 = "&Radius:";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 3 );
       break;
     }
@@ -370,7 +371,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       text1 = "&Radius:";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 3 );
       break;
     }
@@ -382,7 +383,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       text1 = "&Radius:";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 3 );
       break;
     }
@@ -395,7 +396,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->tlParam2->setEnabled(false);
       text1 = "&Radius:";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 15 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 3 );
       break;
     }
@@ -407,7 +408,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->sbParam1->setEnabled(true);
       text1 = "Sigma of Gaussian Kernel:\n(in Image Spacing Units)";
       m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 20 );
+      m_Controls->sbParam1->setMaximum( 50 );
       m_Controls->sbParam1->setValue( 2 );
       break; 
     }
@@ -718,7 +719,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   this->ResetOneImageOpPanel();
 
   // add new image to data storage and set as active to ease further processing
-  GetDefaultDataStorage()->Add( result );
+  GetDefaultDataStorage()->Add( result, m_SelectedImageNode );
   if ( m_Controls->cbHideOrig->isChecked() == true )
     m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
   // TODO!! m_Controls->m_ImageSelector1->SetSelectedNode(result);
@@ -747,10 +748,8 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
     break;
   default: return;
   }
-  m_Controls->tlDirection->setEnabled(true);
-  m_Controls->rbDirection1->setEnabled(true);
-  m_Controls->rbDirection2->setEnabled(true);
-  m_Controls->btnDoIt2->setEnabled(true);
+  m_Controls->tlImage2->setEnabled(true);
+  m_Controls->m_ImageSelector2->setEnabled(true);
 }
 
 void QmitkBasicImageProcessing::StartButton2Clicked() 
@@ -791,20 +790,14 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
     }
   }
 
+  // reset GUI for better usability
+  this->ResetTwoImageOpPanel();
+
   ImageType::Pointer itkImage1 = ImageType::New();
   ImageType::Pointer itkImage2 = ImageType::New();
 
-  if( m_Controls->rbDirection1->isChecked() )
-  {
-    CastToItkImage( newImage1, itkImage1 );
-    CastToItkImage( newImage2, itkImage2 );
-  }
-  else if ( m_Controls->rbDirection2->isChecked() )
-  {
-    CastToItkImage( newImage2, itkImage1 );
-    CastToItkImage( newImage1, itkImage2 );
-  }
-  else return;
+  CastToItkImage( newImage1, itkImage1 );
+  CastToItkImage( newImage2, itkImage2 );
 
   std::string nameAddition = "";
 
@@ -880,14 +873,11 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
   result->SetData( newImage1 );
-  GetDefaultDataStorage()->Add( result );
+  GetDefaultDataStorage()->Add( result, m_SelectedImageNode );
 
   // show only the newly created image
   m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
   m_Controls->m_ImageSelector2->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
-
-  // reset GUI for better usability
-  this->ResetTwoImageOpPanel();
 
   // show the newly created image
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

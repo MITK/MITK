@@ -9,8 +9,8 @@ QmitkNodeDescriptor::QmitkNodeDescriptor( const QString& _ClassName, const QIcon
                                                    , mitk::NodePredicateBase* _Predicate, QObject* parent )
 : QObject(parent)
 , m_ClassName(_ClassName)
-, m_Predicate(_Predicate)
 , m_Icon(_Icon)
+, m_Predicate(_Predicate)
 , m_Separator(new QAction(this))
 {
   m_Separator->setSeparator(true);

@@ -552,7 +552,7 @@ int QmitkDataStorageTreeModel::TreeItem::IndexOfChild( const TreeItem* item ) co
 
 QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::GetChild( int index ) const
 {
-  return (m_Children.size() > 0 && index >= 0 && index < m_Children.size())? m_Children.at(index): 0;
+  return (m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size())? m_Children.at(index): 0;
 }
 
 void QmitkDataStorageTreeModel::TreeItem::AddChild( TreeItem* item )
@@ -598,7 +598,7 @@ void QmitkDataStorageTreeModel::TreeItem::InsertChild( TreeItem* item, int index
   std::vector<TreeItem*>::iterator it = std::find(m_Children.begin(), m_Children.end(), item);
   if(it == m_Children.end())
   {
-    if(m_Children.size() > 0 && index >= 0 && index < m_Children.size())
+    if(m_Children.size() > 0 && index >= 0 && index < (int)m_Children.size())
     {
       it = m_Children.begin();
       std::advance(it, index);

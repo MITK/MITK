@@ -59,7 +59,7 @@ public:
   /*!  
   \brief default constructor  
   */  
-  QmitkBasicImageProcessing(QObject *parent=0, const char *name=0);
+  QmitkBasicImageProcessing();
 
   /*!  
   \brief default destructor  
@@ -113,11 +113,6 @@ public:
     void StartButton2Clicked();
 
     /*
-    * The time slider has been moved.
-    */
-    void UpdateTimeStep();
-
-    /*
     *  Switch between the one and the two image operations GUI
     */
     void ChangeGUI();
@@ -151,7 +146,6 @@ private:
 
   mitk::DataTreeNode*       m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
-  unsigned int              m_CurrentTime;
 
   cherry::ISelectionListener::Pointer m_SelectionListener;
 

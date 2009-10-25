@@ -1,0 +1,253 @@
+/**
+\page org_mitk_gui_qt_segmentationUserManual The Segmentation Perspective
+
+Available sections:
+  - \ref org_mitk_gui_qt_segmentationUserManualOverview 
+  - \ref org_mitk_gui_qt_segmentationUserManualFeatures 
+  - \ref org_mitk_gui_qt_segmentationUserManualUsage 
+    - \ref org_mitk_gui_qt_segmentationUserManualUsageUserInterface
+    - \ref org_mitk_gui_qt_segmentationUserManualUsageOriginalImage
+    - \ref org_mitk_gui_qt_segmentationUserManualUsageWorkingImage
+    - \ref org_mitk_gui_qt_segmentationUserManualUsageTools
+    - \ref org_mitk_gui_qt_segmentationUserManualUsageInterpolation
+
+\section org_mitk_gui_qt_segmentationUserManualOverview Overview
+
+The <b>Segmentation<b> perspective allows you to create segmentations of anatomical and pathological structures in medical images of the human body.
+The perspective groups a number of tools for
+<ul>
+  <li> (semi-)automatic segmentation of organs on CT or MR image volumes
+  <li> semi-automatic segmentation of lesions such as enlarged lymph nodes or tumors
+  <li> manual segmentation of any strucutures you might want to delineate
+</ul>
+
+TODO small screenshot here
+
+If you wonder what segmentations are good for, we shortly revisit the concept of a segmentation here.
+A CT or MR image is made up of volume of physical measurements (volume elements are called voxels). 
+In CT images, for example, the gray value of each voxel corresponds to the mass absorbtion coefficient for X-rays in this voxel, which is similar for many parts of the human body.
+The gray value does not contain any further information, so the computer does not know whether a given voxel is part of the body or the background, nor can it tell a brain from a liver.
+However, the distinction between a foreground and a background structure is required when 
+you want to know the volume of a given organ (the computer needs to know which parts of the image belong to this organ), 
+when you want to create 3D polygon visualizations (the computer needs to know the surfaces of structures that should be drawn), 
+or as a necessary pre-processing step for therapy planning, therappy support, and therapy monitoring.
+Creating this distinction between foreground and background is called <i>segmentation</i>. 
+The Segmentation perspective of MITKApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background. 
+This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two parts.
+
+The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
+
+\section org_mitk_gui_qt_segmentationUserManualTechnical Technical issues
+
+The Segmentation perspective makes a number of assumptions. To know what this module can be used for, it will help you to know that:
+<ul>
+  <li> Images must be 2D, 3D, or 3D+t
+  <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are not supported
+  <li> Segmentations are handled as binary images of the same extent as the original image
+</ul>
+
+\section org_mitk_gui_qt_segmentationUserManualImageSelection Image selection
+
+The Segmentation perspective makes use of the Data Manager view to give you an overview of all images and segmentations.
+
+TODO screenshot here of the tree widget (with multiple selection?)
+Use this hierarchical view to select the original CT/MR image and segmentations for manual editing.
+Some items of the graphical user interface might be disabled when no image is selected. 
+In any case the application will give you hints if a selection is needed.
+
+\section org_mitk_gui_qt_segmentationUserManualManualKringeling Manual contouring
+
+With manual contouring you have absolute control over which voxels are part of the segmentation and which are not.
+This allows you to create segmentations of any structeres that you may find in an image, even if they are not part of the human body.
+You might also use manual contouring to correct segmentations that result from sub-optimal automatic methods.
+The drawback of manual contouring is that might need to manually define contours on many 2D slices. 
+However, this is mildered (TODO: wort) by the interpolation feature, which will make suggestions for a segmentation.
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling1 Creating new segmentations
+
+Unless you want to edit existing segmentations, you have to create a new, empty segmentation before you can edit it.
+To do so, click the "New manual segmentation" button. 
+Input fields will appear where you can choose a name for the new segmentation and a color for its display. 
+Click the checkmark button to confirm or the X button to cancel the new segmentation.
+Notice that the name input suggests names once you start typing and that it also suggests colors for known organ names. 
+If you use names that are not yet known to the application, it will automatically remember these and consider them the next time you create a new segmentation.
+
+Once you created a new segmentation, you can notice a new item with the "binary mask" icon in the Data Manager tree view. 
+This item is automatically selected for you, so that you can start editing the new segmentation right away.
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling2 Selecting segmentations for editing
+
+As you might want to have segmentations of multiple structures in a single patient image, the application needs to know which of them to use for editing.
+You select a segmenation by clicking it in the tree view of Data Manager. Note that usually segmentations are displayed as sub-items of "their" patient image. 
+In the rare case where you need to edit a segmentation that is not displayed as a a sub-item, you can click both the original image AND the segmentation while holding down CTRL on the keyboard.
+
+When a selection is made, the Segmentation view will hide all but the selected segmentation and the corresponding original image.
+When there are multiple segmentations, the unselected ones will remain in Data Manager, you can make them visible at any time by selecting them.
+If you want to see all segmenations at the same time, just clear the selection by clicking outside all the tree items in Data Manager.
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling3 Selecting editing tools
+
+If you are familiar with MITKApp, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
+This behavior is disabled while any of the manual segmentation tools are active -- otherwise you might have a hard time concentrating on the contour you are drawing.
+
+To start using one of the editing tools, click its button the the displayed toolbox. 
+The selected editing tool will be active and its corresponding button will stay pressed until you click the button again.
+Selecting a different tool also deactivates the previous one.
+
+If you have to delineate a lot of images, you should try using shortcuts to switch tools. Just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling4 Using editing tools
+
+All of the editing tools work by the same principle: you press the mouse (left button) anywhere in a 2D window (any of the orientations transversal, sagittal, or frontal), move the mouse while holding the mouse button and release to finish the editing action.
+All tools work on the original slices of the patient image, i.e. with some rotated/tilted MR image volumes you need to perform a "reinit" option in Data Manger before you are able to use editing tools.
+
+Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous actions.
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling41 Editing tools in detail
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling411 Add / Subtract
+TODO show icon 
+
+Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed from (Subtract tool) the current segmentation.
+Hold down the CTRL key to invert the operation (this will switch tools temporarily to allow you quick corrections).
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling413 Paint / Wipe
+TODO show icon 
+
+Use the slider below the toolbox to change the radius of these round paintbrush tools. Move the mouse in any 2D window and press the left button to draw or erase pixels.
+As the Add/Subtract tools, holding CTRL while drawing will invert the current tool's behavior.
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling414 Region Growing
+TODO show icon , TODO let Daniel/Philipp describe the current up/down behavior
+
+Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor. 
+This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue, e.g. the lungs.
+The tool will select more or less pixels (corresponding to a changing gray value interval width) when you move the mouse up or down while holding down the left mouse button.
+
+A common issue with region growing is so called "leakage", which happens when the structure of interest is connected to other pixels of similar gray values through a narrow "bridge" at the border of the structure.
+The Region Growing tool comes with "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling415 Correction
+TODO show icon 
+
+The user does not have to draw a closed contour to use the Correction tool and does not need to switch between the Add and Substract tool to perform
+small corrective changes. The following figure shows the usage of this tool:
+<ul>
+<li> if the user draws a line which starts and ends outside the segmenation a part of it is cut off (a)
+<li> if the line is drawn fully inside the segmentation the marked region is added to the segmentation (b)
+<li> if more complex contours are drawn, (a) and/or (b) operations are applied (c)
+</ul>
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling416 Fill
+TODO show icon 
+
+Left-click inside a segmentation with holes to completely fill all holes.
+
+\subsubsection org_mitk_gui_qt_segmentationUserManualManualKringeling417 Erase
+TODO show icon 
+
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (hold CTRL while clicking).
+
+\subsection org_mitk_gui_qt_segmentationUserManualManualKringeling5 Interpolation
+
+Creating segmentations for modern CT volumes is very time-consuming because strucutres of interest can easily cover a range of 50 or more slices.
+The Segmentation view offers a helpful feature for these cases: "Interpolation" creates suggestions for a segmentation whenever you have a slice that
+<ul>
+<li> has neighboring slices which have segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
+<li> is completly clear of a manual segmentation -- i.e. you will not get a suggestion if there is even only a single pixel of segmentation in the current slice.
+</ul>
+
+Interpolated suggestions are displayed in different way than manual segmentations until you "accept" them as part of the segmentation.
+To accept single slices, click the "Accept" button below the toolbox.
+If you have segmented a whole organ in a every-x-slices way, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
+
+\section org_mitk_gui_qt_segmentationUserManualOrganSegmentation Organ segmentation
+
+The manual contouring described above is a fallback option that will work for any kind of images and structures of interest.
+However, manual contouring is very time-consuming and tedious.
+This is why a major part of image analysis research is working towards automatic segmentation methods.
+The Segmentation view comprises a number of easy-to-use tools for segmentation of CT images (Liver) and MR image (left ventricle and wall, left and right lung).
+
+\section org_mitk_gui_qt_segmentationUserManualOrganSegmentation1 Liver on CT images
+
+On CT image volumes, preferrably with contrast agent in the portal venous phase, the Liver tool will fully automatically analyze and segment the image.
+All you have to do is load and select the image, then click the "Liver" button. 
+During the process, which takes a minute or two, you will get visual progress feedback by means of a green contour that moves closer and closer to the real liver boundaries.
+
+\section org_mitk_gui_qt_segmentationUserManualOrganSegmentation2 Heart and lung on MRI
+
+While liver segmentation is performed fully automatic, the following tools for segmentation of the heart and the lungs need a minimum amount of guidance.
+Click one of the MR to add an average model of the respective organ to the image.
+This model can be dragged to the right position by using the left mouse button while holding down the CTRL key. 
+You can also use CTRL+middle mouse button to rotate or CTRL+right mouse button to scale the model.
+
+Before starting the then-automatic segmentation process by clicking the "Run" button, try placing the model closely to the organ in the MR image 
+(in most cases, you do not need to rotate or scale the model).
+During the segmentation process, a green contour that moves closer and closer to the real liver boundaries will provide you visual feedback of the segmentation progress.
+
+The algorithms used for segmentation of the heart and lung are method which need training by a number of example images.
+They will not work well with other kind of images, so here is a list of the image types that were used for training:
+<ul>
+<li> Left heart ventricle and left ventricle outer wall: 
+<li> Left and right lung: 
+</ul>
+
+\section org_mitk_gui_qt_segmentationUserManualOrganSegmentation99 Other organs
+
+As mentioned in the Heart/Lung section, most of the underlying methods are based on "training". 
+The basic algorithm is versatile and can be applied on all kind of segmentation problems where the structure of interest is topologically like a sphere (and not like a torus etc.).
+If you are interested in other organs than offereed by the current version of the Segmentation view,
+please contact the research team where these algorithms were developed. They are helpful and always welcome new research cooperation:
+
+German Cancer Research Center<br>
+Division of Medical and Biological Informatics<br>
+Head: Prof. H.-P. Meinzer<br>
+Im Neuenheimer Feld 280<br>
+69120 Heidelberg, Germany
+
+\section org_mitk_gui_qt_segmentationUserManualLesionSegmentation Lesion segmentation
+
+Lesion segmentation is a little differnt from organ segmentation in that lesions are not part of the healthy body, sometimes having a diffuse border, 
+and oftenly they are found if varying places all over the body.
+The tools in this section offer efficient ways to create 3D segmentations of such lesions.
+
+The Segmentation view currently offers supoprt for two types of lesions: enlarged lymph nodes and isodense lesions (both hypodense and hpyerdense).
+
+\subsection org_mitk_gui_qt_segmentationUserManualLesionSegmentationLN Lymph node segmentation on CT images
+
+To segment an enlarged lymph node, find a more or less central slice of it, activate the "Lymph Node" tool and draw a rough contour on the inside of the lymph node.
+When releaseing the mouse button, a segmentation algorithm is started in a background task. The result will become visible after a couple of seconds, but you do not have to wait for it.
+If you need to segment several lymph nodes, you can continue to inspect the image right after closing the drawn contour.
+
+If the lymph node segmentation is not to your content, you can select the "Lymph Node Correction" tool and drag parts of the lymph node surface towards the right position (works in 3D, not slice-by-slice). 
+This kind of correction helps in many cases.
+If nothing else helps, you can still use the pure manual tools as a fallback.
+
+\subsection org_mitk_gui_qt_segmentationUserManualLesionSegmentationIL Segmentation of hypodense or hyperdense lesions on CT images
+
+Segmentation of hypodense or hyperdense lesions works similar to lymph node segmentation.
+You search through the image, find a more or less central slice of a lesion, activate the "Hypodense lesion" tool and draw a rough contour along the border of the lesion.
+A segmentation algorithm will use the contour to create a segmentation of the marked lesion. After a couple of seconds you can inspect this segmentation.
+
+If you need to correct the segmentation, there are two ways to do so using the Correction tool:
+<ul>
+<li> the algorithms has automatically created a bounding box around the lesion which becomes visible when the correction tool is active. If this box des not contain the whole lesion, drag its borders wide enough around the lesion. When the box is wide enough, hit Escape or Enter to restart the segmentation algorithm.
+<li> if the box is large enough but the segmentation is not correct, you can draw lines crossing the segmentation border just as described under \ref org_mitk_gui_qt_segmentationUserManualManualKringeling415
+</ul>
+
+\section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
+
+As mentioned in the introduction, segmentations are never an end in themselves.
+Consequently, the Segmentation view adds a couple of "post-processing" actions to Data Manager. 
+These actions are accessible through the context-menu of segmentations in Data Manager's list view
+
+<ul>
+<li> <b>Create polygon model<b> applies the marching cubes algorithms to the segmentation. This polygon model can be used for visualization in 3D or other things such as stereolithography (3D printing).
+<li> <b>Create smooted polygon model<b> uses smoothing in addition to the marching cubes algorithms, which creates models that do not follow the exact outlines of the segmentation, but look smoother.
+<li> <b>Statistics<b> goes through all the voxels in the patient image that are part of the segmentation and calculates some statistical measures (minumum, maximum, median, histogram, etc.). Note that the statistics are ALWAYS calculated for the parent element of the segmentation as shown in Data Manager.
+<li> <b>Autocrop<b> can save memory. Manual segmentations have the same extent as the patient image, even if the segmentation comprises only a small sub-volume. This invisible and meaningless margin is removed by autocropping.
+<li>
+</ul>
+
+*/
+

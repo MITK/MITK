@@ -92,9 +92,9 @@ bool DebugBreakpointManager::BreakAtSmartpointer(int spId) const
       != m_SmartPointerBreakpoints.end();
 }
 
-void DebugBreakpointManager::SaveState(const Poco::Path&  /*path*/) const
-{
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugBreakpointManager::SaveState(const Poco::Path& path) const
+{
   Poco::XML::Document* doc = new Poco::XML::Document();
   Poco::XML::Element* breakpoints = doc->createElement(BREAKPOINTS_TAG);
   doc->appendChild(breakpoints)->release();
@@ -141,12 +141,15 @@ void DebugBreakpointManager::SaveState(const Poco::Path&  /*path*/) const
   out.writeNode(writer, doc);
 
   doc->release();
-#endif
 }
+#else
+void DebugBreakpointManager::SaveState(const Poco::Path& /*path*/) const
+{}
+#endif
 
-void DebugBreakpointManager::RestoreState(const Poco::Path&  /*path*/)
-{
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugBreakpointManager::RestoreState(const Poco::Path& path)
+{
   try
   {
     Poco::XML::DOMParser parser;
@@ -219,7 +222,11 @@ void DebugBreakpointManager::RestoreState(const Poco::Path&  /*path*/)
   {
     CHERRY_WARN << e.displayText();
   }
-#endif
 }
+#else
+void DebugBreakpointManager::RestoreState(const Poco::Path& /*path*/)
+{
+}
+#endif
 
 }

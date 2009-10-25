@@ -91,18 +91,22 @@ DebugBreakpointManager* DebugUtil::GetBreakpointManager()
   return &breakpointManager;
 }
 
-void DebugUtil::TraceObject(const Object*  /*object*/)
-{
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::TraceObject(const Object* object)
+{
   CHERRY_INFO << "Tracing enabled for: " << object->GetTraceId() << std::endl;
   m_TracedObjects.insert(object->GetTraceId());
   _G_ObjectEvents.objTracingEvent(object->GetTraceId(), true, object);
-#endif
 }
-
-void DebugUtil::TraceObject(unsigned int  /*traceId*/)
+#else
+void DebugUtil::TraceObject(const Object*  /*object*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::TraceObject(unsigned int traceId)
+{
   CHERRY_INFO << "Tracing enabled for: " << traceId << std::endl;
   m_TracedObjects.insert(traceId);
   TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.find(traceId);
@@ -110,21 +114,30 @@ void DebugUtil::TraceObject(unsigned int  /*traceId*/)
   _G_ObjectEvents.objTracingEvent(traceId, true, i->second);
   else
   _G_ObjectEvents.objTracingEvent(traceId, true, 0);
-#endif
 }
-
-void DebugUtil::TraceClass(const std::string&  /*className*/)
+#else
+void DebugUtil::TraceObject(unsigned int /*traceId*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::TraceClass(const std::string& className)
+{
   CHERRY_INFO << "Tracing enabled for: " << className << std::endl;
   m_TracedClasses.insert(className);
   //_G_ObjectEvents.objTracingEvent(object->GetTraceId(), true, object);
-#endif
 }
-
-void DebugUtil::StopTracing(unsigned int  /*traceId*/)
+#else
+void DebugUtil::TraceClass(const std::string&  /*className*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::StopTracing(unsigned int traceId)
+{
+
   CHERRY_INFO << "Tracing stopped for: " << traceId << std::endl;
   m_TracedObjects.erase(traceId);
   TraceIdToObjectType::ConstIterator i = m_TraceIdToObjectMap.find(traceId);
@@ -132,53 +145,74 @@ void DebugUtil::StopTracing(unsigned int  /*traceId*/)
   _G_ObjectEvents.objTracingEvent(traceId, false, i->second);
   else
   _G_ObjectEvents.objTracingEvent(traceId, false, 0);
-#endif
 }
-
-void DebugUtil::StopTracing(const Object*  /*obj*/)
+#else
+void DebugUtil::StopTracing(unsigned int /*traceId*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::StopTracing(const Object* obj)
+{
   CHERRY_INFO << "Tracing stopped for: " << obj->GetTraceId() << std::endl;
   m_TracedObjects.erase(obj->GetTraceId());
   _G_ObjectEvents.objTracingEvent(obj->GetTraceId(), false, obj);
-#endif
 }
-
-void DebugUtil::StopTracing(const std::string&  /*className*/)
+#else
+void DebugUtil::StopTracing(const Object* /*obj*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::StopTracing(const std::string& className)
+{
   CHERRY_INFO << "Tracing stopped for: " << className << std::endl;
   m_TracedClasses.erase(className);
   //_G_ObjectEvents.objTracingEvent(obj->GetTraceId(), false, obj);
-#endif
 }
+#else
+void DebugUtil::StopTracing(const std::string& /*className*/)
+{
+}
+#endif
 
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+bool DebugUtil::IsTraced(const Object* object)
+{
+  return m_TracedObjects.find(object->GetTraceId()) != m_TracedObjects.end();
+}
+#else
 bool DebugUtil::IsTraced(const Object*  /*object*/)
 {
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  return m_TracedObjects.find(object->GetTraceId()) != m_TracedObjects.end();
-#else
   return false;
-#endif
 }
+#endif
 
-bool DebugUtil::IsTraced(unsigned int  /*traceId*/)
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+bool DebugUtil::IsTraced(unsigned int traceId)
 {
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   return m_TracedObjects.find(traceId) != m_TracedObjects.end();
-#else
-  return false;
-#endif
 }
+#else
+bool DebugUtil::IsTraced(unsigned int /*traceId*/)
+{
+  return false;
+}
+#endif
 
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+bool DebugUtil::IsTraced(const std::string& className)
+{
+  return m_TracedClasses.find(className) != m_TracedClasses.end();
+}
+#else
 bool DebugUtil::IsTraced(const std::string&  /*className*/)
 {
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  return m_TracedClasses.find(className) != m_TracedClasses.end();
-#else
   return false;
-#endif
 }
+#endif
 
 const std::set<unsigned int>& DebugUtil::GetTracedObjects()
 {
@@ -190,20 +224,24 @@ const Object* DebugUtil::GetObject(unsigned int traceId)
   return m_TraceIdToObjectMap[traceId];
 }
 
+#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
 std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
-    const Object* objectPointer, const std::list<unsigned int>&  /*excludeList*/)
+    const Object* objectPointer, const std::list<unsigned int>& excludeList)
 {
   poco_assert(objectPointer != 0);
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
   std::list<unsigned int> ids = m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()];
   for (std::list<unsigned int>::const_iterator iter = excludeList.begin();
       iter != excludeList.end(); ++iter)
   ids.remove(*iter);
   return ids;
-#else
-  return std::list<unsigned int>();
-#endif
 }
+#else
+std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
+    const Object* objectPointer, const std::list<unsigned int>&  /*excludeList*/)
+{
+  return std::list<unsigned int>();
+}
+#endif
 
 void DebugUtil::GetRegisteredObjects(std::vector<const Object*>& list)
 {
@@ -294,19 +332,23 @@ unsigned int& DebugUtil::GetSmartPointerCounter()
   return counter;
 }
 
-void DebugUtil::UnregisterSmartPointer(unsigned int  /*smartPointerId*/, const Object*  /*objectPointer*/)
-{
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::UnregisterSmartPointer(unsigned int smartPointerId, const Object* objectPointer)
+{
   poco_assert(objectPointer != 0);
 
   m_TraceIdToSmartPointerMap[objectPointer->GetTraceId()].remove(smartPointerId);
   _G_ObjectEvents.spDestroyedEvent(smartPointerId, objectPointer);
-#endif
 }
-
-void DebugUtil::RegisterSmartPointer(unsigned int  /*smartPointerId*/, const Object*  /*objectPointer*/, bool /*recordStack*/)
+#else
+void DebugUtil::UnregisterSmartPointer(unsigned int  /*smartPointerId*/, const Object*  /*objectPointer*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::RegisterSmartPointer(unsigned int  smartPointerId, const Object* objectPointer, bool recordStack)
+{
   poco_assert(objectPointer != 0);
 
   if (m_TracedClasses.find(objectPointer->GetClassName()) != m_TracedClasses.end() ||
@@ -318,27 +360,39 @@ void DebugUtil::RegisterSmartPointer(unsigned int  /*smartPointerId*/, const Obj
 
   if (GetBreakpointManager()->BreakAtSmartpointer(smartPointerId))
   poco_debugger_msg("SmartPointer Breakpoint reached");
-#endif
 }
-
-void DebugUtil::RegisterObject(const Object*  /*objectPointer*/)
+#else
+void DebugUtil::RegisterSmartPointer(unsigned int  /*smartPointerId*/, const Object*  /*objectPointer*/, bool /*recordStack*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::RegisterObject(const Object* objectPointer)
+{
   m_TraceIdToObjectMap.insert(std::make_pair(objectPointer->GetTraceId(), objectPointer));
   _G_ObjectEvents.objCreatedEvent(objectPointer);
 
   if (GetBreakpointManager()->BreakAtObject(objectPointer->GetTraceId()))
   poco_debugger_msg("SmartPointer Breakpoint reached");
-#endif
 }
-
-void DebugUtil::UnregisterObject(const Object*  /*objectPointer*/)
+#else
+void DebugUtil::RegisterObject(const Object* /*objectPointer*/)
 {
+}
+#endif
+
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+void DebugUtil::UnregisterObject(const Object* objectPointer)
+{
   m_TraceIdToObjectMap.erase(objectPointer->GetTraceId());
   _G_ObjectEvents.objDestroyedEvent(objectPointer);
-#endif
 }
+#else
+void DebugUtil::UnregisterObject(const Object* /*objectPointer*/)
+{
+}
+#endif
 
 bool DebugUtil::GetPersistencePath(Poco::Path& path)
 {

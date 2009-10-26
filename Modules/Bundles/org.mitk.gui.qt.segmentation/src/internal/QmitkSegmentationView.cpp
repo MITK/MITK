@@ -183,12 +183,14 @@ void QmitkSegmentationView::CreateNewSegmentation()
           firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
         if (!emptySegmentation) return; // could be aborted by user
-        //emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
+        emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
 
         this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
         // TODO select this new segmentation in data manager
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+        SendSelectedEvent( node, emptySegmentation );
+
+        //m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
       }
     }
   }
@@ -656,6 +658,18 @@ QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
   }
 
   return result;
+}
+        
+void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode )
+{
+  // should select both nodes and also make them visible (expand tree view if necessary)
+  LOG_INFO << "Marking as selected: reference node '" << (referenceNode ? referenceNode->GetName() : "NULL") << " and working node " << (workingNode ? workingNode->GetName() : "NULL");
+
+  std::vector<mitk::DataTreeNode::Pointer > nodes;
+  if (referenceNode) nodes.push_back( referenceNode );
+  if (workingNode)   nodes.push_back( workingNode );
+
+  mitk::DataTreeNodeSelection selection( nodes );
 }
 
 void QmitkSegmentationView::OnSurfaceCalculationDone()

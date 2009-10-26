@@ -67,7 +67,7 @@ protected:
     void PartHidden(cherry::IWorkbenchPartReference::Pointer);
     void PartVisible(cherry::IWorkbenchPartReference::Pointer);
 
-  protected slots:
+    void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 
     void CreateSurface(bool);
 

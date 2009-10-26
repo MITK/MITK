@@ -195,6 +195,14 @@ void QmitkSegmentationView::CreateNewSegmentation()
           firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
 
         if (!emptySegmentation) return; // could be aborted by user
+
+        QColor color = dialog.GetColorProperty();
+        mitk::Color colorProperty;
+        colorProperty.SetRed(color.redF());
+        colorProperty.SetGreen(color.greenF());
+        colorProperty.SetBlue(color.blueF());
+
+        emptySegmentation->SetColor(colorProperty,NULL,"color");
         emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
 
         this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original

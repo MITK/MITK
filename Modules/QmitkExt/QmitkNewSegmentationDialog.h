@@ -50,6 +50,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     const char* GetSegmentationName();
     const char* GetOrganType();
+    QColor GetColorProperty();
 
   signals:
 

@@ -124,6 +124,18 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     m_CreateSurfaceAction = new QAction("Create polygon model", parent);
     binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSurfaceAction);
     connect( m_CreateSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
+
+    m_CreateSmoothSurfaceAction = new QAction("Create smoothed polygon model", parent);
+    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
+    connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
+
+    m_StatisticsAction = new QAction("Statistics", parent);
+    binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
+    connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
+   
+    m_AutocropAction = new QAction("Autocrop", parent);
+    binaryImageDataTreeNodeDescriptor->AddAction(m_AutocropAction);
+    connect( m_AutocropAction, SIGNAL( triggered(bool) ) , this, SLOT( AutocropSelected(bool) ) );
   }
   else
   {
@@ -190,7 +202,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
         // TODO select this new segmentation in data manager
         SendSelectedEvent( node, emptySegmentation );
 
-        //m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
       }
     }
   }
@@ -677,3 +689,10 @@ void QmitkSegmentationView::OnSurfaceCalculationDone()
   mitk::ProgressBar::GetInstance()->Progress();
 }
 
+void QmitkSegmentationView::ImageStatistics(bool)
+{
+}
+
+void QmitkSegmentationView::AutocropSelected(bool)
+{
+}

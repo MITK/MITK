@@ -70,6 +70,8 @@ protected:
     void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 
     void CreateSurface(bool);
+    void ImageStatistics(bool);
+    void AutocropSelected(bool);
 
   protected:
 
@@ -91,6 +93,9 @@ protected:
     friend class cherry::SelectionChangedAdapter<QmitkSegmentationView>;
   
     QAction* m_CreateSurfaceAction;
+    QAction* m_CreateSmoothSurfaceAction;
+    QAction* m_StatisticsAction;
+    QAction* m_AutocropAction;
 
   /// from QmitkSegmentation
 

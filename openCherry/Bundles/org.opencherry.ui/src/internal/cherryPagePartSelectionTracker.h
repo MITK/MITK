@@ -35,8 +35,7 @@ namespace cherry
  *
  * Provides per-part selection tracking for the selection service.
  */
-class PagePartSelectionTracker : public AbstractPartSelectionTracker, public IPartListener,
- public IPerspectiveListener, public ISelectionChangedListener
+class PagePartSelectionTracker : public AbstractPartSelectionTracker
 {
 
 public:
@@ -64,16 +63,16 @@ private:
   };
 
   friend struct PostSelectionListener;
+  friend class SelTrackerPartListener;
+  friend class SelTrackerPerspectiveListener;
+  friend class SelTrackerSelectionChangedListener;
 
   ISelectionChangedListener::Pointer postSelectionListener;
+  IPerspectiveListener::Pointer perspListener;
+  ISelectionChangedListener::Pointer selChangedListener;
+  IPartListener::Pointer partListener;
 
 public:
-
-  void SelectionChanged(SelectionChangedEvent::Pointer event);
-
-  ISelectionService::SelectionEvents& GetSelectionEvents();
-
-  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const;
 
   /**
    * Constructs a part selection tracker for the part with the given id.
@@ -83,48 +82,6 @@ public:
   PagePartSelectionTracker(IWorkbenchPage::Pointer page,
       const std::string& partId);
 
-  /*
-   * @see IPartListener#partActivated(IWorkbenchPart)
-   */
-  void PartActivated(IWorkbenchPartReference::Pointer partRef);
-
-  /*
-   * @see IPartListener#partBroughtToTop(IWorkbenchPart)
-   */
-  void PartBroughtToTop(IWorkbenchPartReference::Pointer partRef);
-
-  /**
-   * @see IPartListener#partClosed(IWorkbenchPart)
-   */
-  void PartClosed(IWorkbenchPartReference::Pointer partRef);
-
-  /*
-   * @see IPartListener#partDeactivated(IWorkbenchPart)
-   */
-  void PartDeactivated(IWorkbenchPartReference::Pointer partRef);
-
-  /**
-   * @see IPartListener#partOpened(IWorkbenchPart)
-   */
-  void PartOpened(IWorkbenchPartReference::Pointer partRef);
-
-  /**
-   * @see IPartListener#PartHidden(IWorkbenchPart)
-   */
-  void PartHidden(IWorkbenchPartReference::Pointer partRef);
-
-  /**
-   * @see IPartListener#PartVisible(IWorkbenchPart)
-   */
-  void PartVisible(IWorkbenchPartReference::Pointer partRef);
-
-  /**
-   * @see IPartListener#PartInputChanged(IWorkbenchPart)
-   */
-  void PartInputChanged(IWorkbenchPartReference::Pointer partRef);
-
-  void PerspectiveChanged(IWorkbenchPage::Pointer page, IPerspectiveDescriptor::Pointer perspective,
-      IWorkbenchPartReference::Pointer partRef, const std::string& changeId);
 
   /**
    * Returns the selection from the part being tracked,
@@ -179,6 +136,7 @@ private:
    * @param notify whether to send notification that the selection has changed.
    */
   void SetPart(IWorkbenchPart::Pointer part, bool notify);
+
 };
 
 }

@@ -152,6 +152,7 @@ SET(INTERNAL_CPP_FILES
   cherryPerspectiveRegistry.cpp
   cherryPerspectiveRegistryReader.cpp
   cherryPlaceholderFolderLayout.cpp
+  cherryPreferenceConstants.cpp
   cherryPresentablePart.cpp
   cherryPresentationFactoryUtil.cpp
   cherryPresentationSerializer.cpp

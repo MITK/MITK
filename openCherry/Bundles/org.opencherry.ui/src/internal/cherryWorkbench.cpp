@@ -27,6 +27,9 @@
 #include "cherryViewRegistry.h"
 #include "cherryEditorRegistry.h"
 #include "cherryServiceLocatorCreator.h"
+#include "cherryWorkbenchPage.h"
+#include "cherryPerspective.h"
+#include "cherryPreferenceConstants.h"
 #include "../dialogs/cherryMessageDialog.h"
 #include "../cherryWorkbenchWindow.h"
 #include "../cherryImageDescriptor.h"
@@ -366,8 +369,8 @@ bool Workbench::RestoreState()
   if (result && windowManager.GetWindowCount() == 0)
   {
     std::string msg = "No windows restored.";
-//    result[0] = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
-//        IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, null);
+    //    result[0] = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
+    //        IWorkbenchConfigurer.RESTORE_CODE_RESET, msg, null);
     result &= false;
   }
   return result;
@@ -1099,128 +1102,138 @@ IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(
 IWorkbenchWindow::Pointer Workbench::OpenWorkbenchWindow(IAdaptable* input)
 {
   return this->OpenWorkbenchWindow(this->GetPerspectiveRegistry()
-              ->GetDefaultPerspective(), input);
+      ->GetDefaultPerspective(), input);
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
-    const std::string&  /*perspectiveId*/, IWorkbenchWindow::Pointer window)
+    const std::string& perspectiveId, IWorkbenchWindow::Pointer window)
 {
   // If the specified window has the requested perspective open, then the
   // window
   // is given focus and the perspective is shown. The page's input is
   // ignored.
   WorkbenchWindow::Pointer win = window.Cast<WorkbenchWindow> ();
-  if (win.IsNotNull())
+  if (win)
   {
-    IWorkbenchPage::Pointer page = win->GetActivePage(); //GetActiveWorkbenchPage();
-    if (page.IsNotNull())
+    IWorkbenchPage::Pointer page = win->GetActivePage();
+    if (page)
     {
-      //        IPerspectiveDescriptor perspectives[] = page
-      //            .getOpenPerspectives();
-      //        for (int i = 0; i < perspectives.length; i++) {
-      //          IPerspectiveDescriptor persp = perspectives[i];
-      //          if (perspectiveId.equals(persp.getId())) {
-      //            win.makeVisible();
-      //            page.setPerspective(persp);
-      return page;
-      //          }
-      //        }
+      std::vector<IPerspectiveDescriptor::Pointer> perspectives(page
+          ->GetOpenPerspectives());
+      for (std::size_t i = 0; i < perspectives.size(); i++)
+      {
+        IPerspectiveDescriptor::Pointer persp = perspectives[i];
+        if (perspectiveId == persp->GetId())
+        {
+          win->MakeVisible();
+          page->SetPerspective(persp);
+          return page;
+        }
+      }
     }
   }
-
-  return IWorkbenchPage::Pointer(0);
 
   // If another window that has the workspace root as input and the
   // requested
   // perpective open and active, then the window is given focus.
-
-  // TODO showPerspective
-  //    IAdaptable input = getDefaultPageInput();
-  //    IWorkbenchWindow[] windows = getWorkbenchWindows();
-  //    for (int i = 0; i < windows.length; i++) {
-  //      win = (WorkbenchWindow) windows[i];
-  //      if (window != win) {
-  //        WorkbenchPage page = win.getActiveWorkbenchPage();
-  //        if (page != null) {
-  //          boolean inputSame = false;
-  //          if (input == null) {
-  //            inputSame = (page.getInput() == null);
-  //          } else {
-  //            inputSame = input.equals(page.getInput());
-  //          }
-  //          if (inputSame) {
-  //            Perspective persp = page.getActivePerspective();
-  //            if (persp != null) {
-  //              IPerspectiveDescriptor desc = persp.getDesc();
-  //              if (desc != null) {
-  //                if (perspectiveId.equals(desc.getId())) {
-  //                  Shell shell = win.getShell();
-  //                  shell.open();
-  //                  if (shell.getMinimized()) {
-  //                    shell.setMinimized(false);
-  //                  }
-  //                  return page;
-  //                }
-  //              }
-  //            }
-  //          }
-  //        }
-  //      }
-  //    }
+  IAdaptable* input = GetDefaultPageInput();
+  std::vector<IWorkbenchWindow::Pointer> windows(GetWorkbenchWindows());
+  for (std::size_t i = 0; i < windows.size(); i++)
+  {
+    win = windows[i].Cast<WorkbenchWindow>();
+    if (window != win)
+    {
+      WorkbenchPage::Pointer page = win->GetActivePage().Cast<WorkbenchPage>();
+      if (page)
+      {
+        bool inputSame = false;
+        if (input == 0)
+        {
+          inputSame = (page->GetInput() == 0);
+        }
+        else
+        {
+          inputSame = input == page->GetInput();
+        }
+        if (inputSame)
+        {
+          Perspective::Pointer persp = page->GetActivePerspective();
+          if (persp)
+          {
+            IPerspectiveDescriptor::Pointer desc = persp->GetDesc();
+            if (desc)
+            {
+              if (perspectiveId == desc->GetId())
+              {
+                Shell::Pointer shell = win->GetShell();
+                shell->Open();
+                if (shell->GetMinimized())
+                {
+                  shell->SetMinimized(false);
+                }
+                return page;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   // Otherwise the requested perspective is opened and shown in the
   // specified
   // window or in a new window depending on the current user preference
   // for opening
   // perspectives, and that window is given focus.
+  win = window.Cast<WorkbenchWindow>();
+  if (win)
+  {
+    IPreferencesService::Pointer store = WorkbenchPlugin::GetDefault()
+    ->GetPreferencesService();
+    int mode = store->GetSystemPreferences()->GetInt(PreferenceConstants::OPEN_PERSP_MODE, PreferenceConstants::OPM_ACTIVE_PAGE);
+    IWorkbenchPage::Pointer page = win->GetActivePage();
+    IPerspectiveDescriptor::Pointer persp;
+    if (page)
+    {
+      persp = page->GetPerspective();
+    }
 
-  //TODO showPerspective
-  //    win = (WorkbenchWindow) window;
-  //    if (win != null) {
-  //      IPreferenceStore store = WorkbenchPlugin.getDefault()
-  //          .getPreferenceStore();
-  //      int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
-  //      IWorkbenchPage page = win.getActiveWorkbenchPage();
-  //      IPerspectiveDescriptor persp = null;
-  //      if (page != null) {
-  //        persp = page.getPerspective();
-  //      }
-  //
-  //      // Only open a new window if user preference is set and the window
-  //      // has an active perspective.
-  //      if (IPreferenceConstants.OPM_NEW_WINDOW == mode && persp != null) {
-  //        IWorkbenchWindow newWindow = openWorkbenchWindow(perspectiveId,
-  //            input);
-  //        return newWindow.getActivePage();
-  //      }
-  //
-  //      IPerspectiveDescriptor desc = getPerspectiveRegistry()
-  //          .findPerspectiveWithId(perspectiveId);
-  //      if (desc == null) {
-  //        throw new WorkbenchException(
-  //            NLS
-  //                .bind(
-  //                    WorkbenchMessages.WorkbenchPage_ErrorCreatingPerspective,
-  //                    perspectiveId));
-  //      }
-  //      win.getShell().open();
-  //      if (page == null) {
-  //        page = win.openPage(perspectiveId, input);
-  //      } else {
-  //        page.setPerspective(desc);
-  //      }
-  //      return page;
-  //    }
-  //
-  //    // Just throw an exception....
-  //    throw new WorkbenchException(NLS
-  //        .bind(WorkbenchMessages.Workbench_showPerspectiveError,
-  //            perspectiveId));
+    // Only open a new window if user preference is set and the window
+    // has an active perspective.
+    if (PreferenceConstants::OPM_NEW_WINDOW == mode && persp)
+    {
+      IWorkbenchWindow::Pointer newWindow = OpenWorkbenchWindow(perspectiveId,
+          input);
+      return newWindow->GetActivePage();
+    }
+
+    IPerspectiveDescriptor::Pointer desc = GetPerspectiveRegistry()
+    ->FindPerspectiveWithId(perspectiveId);
+    if (desc == 0)
+    {
+      throw WorkbenchException(
+          "Unable to create perspective \"" + perspectiveId + "\". There is no corresponding perspective extension.");
+    }
+    win->GetShell()->Open();
+    if (page == 0)
+    {
+      page = win->OpenPage(perspectiveId, input);
+    }
+    else
+    {
+      page->SetPerspective(desc);
+    }
+    return page;
+  }
+
+  // Just throw an exception....
+  throw WorkbenchException("Problems opening perspective \"" +
+      perspectiveId + "\"");
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
     const std::string& perspectiveId, IWorkbenchWindow::Pointer window,
-    IAdaptable*  /*input*/)
+    IAdaptable* /*input*/)
 {
   return IWorkbenchPage::Pointer(0);
   //    // If the specified window has the requested perspective open and the
@@ -1351,7 +1364,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   //    return newWindow.getActivePage();
 }
 
-bool Workbench::SaveAllEditors(bool  /*confirm*/)
+bool Workbench::SaveAllEditors(bool /*confirm*/)
 {
   return true;
 }
@@ -1388,7 +1401,7 @@ void Workbench::SetActivatedWindow(WorkbenchWindow::Pointer window)
 WorkbenchWindow::Pointer Workbench::NewWorkbenchWindow()
 {
   WorkbenchWindow::Pointer wbw =
-      Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateWorkbenchWindow(this->GetNewWindowNumber());
+  Tweaklets::Get(WorkbenchTweaklet::KEY)->CreateWorkbenchWindow(this->GetNewWindowNumber());
   //wbw->Init();
   return wbw;
 }

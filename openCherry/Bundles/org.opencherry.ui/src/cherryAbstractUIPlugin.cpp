@@ -48,15 +48,16 @@ AbstractUIPlugin::AbstractUIPlugin()
 //    }
 
 
-//    IPreferenceStore getPreferenceStore() {
-//        // Create the preference store lazily.
-//        if (preferenceStore == null) {
-//            preferenceStore = new ScopedPreferenceStore(new InstanceScope(),getBundle().getSymbolicName());
-//
-//        }
-//        return preferenceStore;
-//    }
-
+IPreferencesService::Pointer AbstractUIPlugin::GetPreferencesService()
+{
+  // Create the preference store lazily.
+  if (preferencesService == 0)
+  {
+    preferencesService = Platform::GetServiceRegistry().GetServiceById<
+        IPreferencesService> (IPreferencesService::ID);
+  }
+  return preferencesService;
+}
 
 IWorkbench* AbstractUIPlugin::GetWorkbench()
 {

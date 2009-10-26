@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define CHERRYABSTRACTUIPLUGIN_H_
 
 #include <cherryPlugin.h>
+#include <cherryIPreferencesService.h>
 
 #include "cherryIWorkbench.h"
 
@@ -116,7 +117,7 @@ private:
     /**
      * Storage for preferences.
      */
-    //ScopedPreferenceStore preferenceStore;
+    IPreferencesService::Pointer preferencesService;
 
     /**
      * The registry for all graphic images; <code>null</code> if not yet
@@ -187,24 +188,18 @@ public:
 //    ImageRegistry getImageRegistry();
 
     /**
-     * Returns the preference store for this UI plug-in.
-     * This preference store is used to hold persistent settings for this plug-in in
+     * Returns the preferences service for this UI plug-in.
+     * This preferences service is used to hold persistent settings for this plug-in in
      * the context of a workbench. Some of these settings will be user controlled,
      * whereas others may be internal setting that are never exposed to the user.
      * <p>
-     * If an error occurs reading the preference store, an empty preference store is
+     * If an error occurs reading the preferences service, an empty preference service is
      * quietly created, initialized with defaults, and returned.
      * </p>
-     * <p>
-     * <strong>NOTE:</strong> As of Eclipse 3.1 this method is
-     * no longer referring to the core runtime compatibility layer and so
-     * plug-ins relying on Plugin#initializeDefaultPreferences
-     * will have to access the compatibility layer themselves.
-     * </p>
      *
-     * @return the preference store
+     * @return the preferences service
      */
-//    IPreferenceStore getPreferenceStore();
+    IPreferencesService::Pointer GetPreferencesService();
 
     /**
      * Returns the Platform UI workbench.

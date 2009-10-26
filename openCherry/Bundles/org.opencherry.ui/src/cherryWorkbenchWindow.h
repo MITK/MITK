@@ -53,9 +53,10 @@ class Workbench;
  */
 class CHERRY_UI WorkbenchWindow: public Window, public IWorkbenchWindow
 {
+
 public:
-  cherryObjectMacro(WorkbenchWindow)
-  ;
+
+  cherryObjectMacro(WorkbenchWindow);
 
   WorkbenchWindow(int number);
 
@@ -261,6 +262,11 @@ protected:
       IAdaptable* input);
 
   bool ClosePage(SmartPointer<IWorkbenchPage> in, bool save);
+
+  /**
+   * Makes the window visible and frontmost.
+   */
+  void MakeVisible();
 
   /**
    * The composite under which workbench pages create their controls.

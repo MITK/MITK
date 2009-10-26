@@ -21,6 +21,7 @@
 #include <cherryObjects.h>
 
 #include "cherryWorkbenchPlugin.h"
+#include "cherryUtil.h"
 #include "../cherryPartPane.h"
 #include "../cherryIWorkbenchPartSite.h"
 #include "../cherryIEditorPart.h"
@@ -673,25 +674,26 @@ void WorkbenchPartReference::CreatePartProperties(
 }
 
 int WorkbenchPartReference::ComputePreferredSize(bool width,
-    int  /*availableParallel*/, int  /*availablePerpendicular*/, int preferredResult)
+    int availableParallel, int availablePerpendicular, int preferredResult)
 {
-  //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
-  //  if (sizeProvider != null)
-  //  {
-  //    return sizeProvider.computePreferredSize(width, availableParallel,
-  //        availablePerpendicular, preferredResult);
-  //  }
+  ISizeProvider* sizeProvider = Util::GetAdapter<ISizeProvider>(part);
+  if (sizeProvider)
+  {
+    return sizeProvider->ComputePreferredSize(width, availableParallel,
+        availablePerpendicular, preferredResult);
+  }
 
   return preferredResult;
 }
 
-int WorkbenchPartReference::GetSizeFlags(bool  /*width*/)
+int WorkbenchPartReference::GetSizeFlags(bool width)
 {
-  //  ISizeProvider sizeProvider = (ISizeProvider) Util.getAdapter(part, ISizeProvider.class);
-  //  if (sizeProvider != null)
-  //  {
-  //    return sizeProvider.getSizeFlags(width);
-  //  }
+  ISizeProvider* sizeProvider = Util::GetAdapter<ISizeProvider>(part);
+  if (sizeProvider)
+  {
+    return sizeProvider->GetSizeFlags(width);
+  }
+
   return 0;
 }
 

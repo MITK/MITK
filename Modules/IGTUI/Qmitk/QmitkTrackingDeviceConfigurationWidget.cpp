@@ -192,18 +192,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-  switch (m_Controls->m_comPortSpinBoxPolaris->value()) //set the com port
-    {                                                   //@mbi: Do anyone know how to do this in a better way? Please tell me... (Alfred)
-    case 1: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1); break;
-    case 2: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2); break;
-    case 3: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3); break;
-    case 4: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4); break;
-    case 5: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5); break;
-    case 6: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6); break;
-    case 7: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7); break;
-    case 8: tempTrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8); break;
-    }
-
+  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(m_Controls->m_comPortSpinBoxPolaris->value())); //set the com port
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
   }

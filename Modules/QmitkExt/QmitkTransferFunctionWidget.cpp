@@ -7,6 +7,8 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   QWidget(parent, f)
 {
   this->setupUi(this);
+
+
                                                 
   // signals and slots connections
   connect(m_XEditScalarOpacity, SIGNAL(returnPressed()), this, SLOT(SetXValueScalar()));
@@ -20,6 +22,10 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEditScalarOpacity, m_YEditScalarOpacity);
   m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
   m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, 0);
+
+  m_ScalarOpacityFunctionCanvas->SetTitle("Grayvalue -> Opacity");
+  m_GradientOpacityCanvas->SetTitle("Grayvalue/Gradient -> Opacity");  
+  m_ColorTransferFunctionCanvas->SetTitle("Grayvalue -> Color");
 }
 
 QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()

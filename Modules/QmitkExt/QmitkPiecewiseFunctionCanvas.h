@@ -30,6 +30,7 @@ public:
 
   QmitkPiecewiseFunctionCanvas( QWidget * parent=0,  Qt::WindowFlags f = 0 );
   virtual void paintEvent( QPaintEvent* e );
+  void SetTitle(std::string title);
   int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
 
   void SetPiecewiseFunction(vtkPiecewiseFunction* piecewiseFunction)
@@ -135,8 +136,10 @@ public:
     }
 
   protected:
+  
     vtkPiecewiseFunction* m_PiecewiseFunction;
     bool m_IsGradientOpacityFunction;
+	  std::string m_Title;
 
   };
 #endif

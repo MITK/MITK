@@ -31,6 +31,7 @@ public:
   QmitkColorTransferFunctionCanvas( QWidget* parent = 0, Qt::WindowFlags f = 0 )  ;
   virtual void paintEvent( QPaintEvent* e );
   int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
+  void SetTitle(std::string title);
 
   void SetColorTransferFunction(vtkColorTransferFunction* colorTransferFunction)
   {
@@ -108,7 +109,9 @@ public:
   }
 
 protected:
+  
   vtkColorTransferFunction* m_ColorTransferFunction;
+	std::string m_Title;
 
 };
 #endif

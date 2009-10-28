@@ -48,6 +48,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="m_EnableLOD">
+        <property name="text">
+         <string>Enable LOD</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

@@ -29,15 +29,23 @@ QmitkColorTransferFunctionCanvas::QmitkColorTransferFunctionCanvas(
   setContentsMargins(1,1,1,1);
 }
 
+void QmitkColorTransferFunctionCanvas::SetTitle(std::string title)
+{
+  m_Title=title;
+}
+
+
 void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
 {
 
   QPainter painter(this);
   painter.save();
-  painter.setPen(Qt::gray);
 
+  // Render gray background
   QRect contentsRect = this->contentsRect();
+  painter.setPen(Qt::gray);
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
+
   if (m_ColorTransferFunction)
   {
     for (int x = contentsRect.x(); x < contentsRect.x() + contentsRect.width(); x++)
@@ -50,6 +58,18 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       painter.setPen(col);
       painter.drawLine(x, 1, x, contentsRect.height());
     }
+  }
+ 
+  if (m_Title.size()>0)
+  {
+    painter.setPen(Qt::black);
+    painter.drawText(QPoint(11,21),QString( m_Title.c_str() ));
+    painter.setPen(Qt::white);
+    painter.drawText(QPoint(10,20),QString( m_Title.c_str() ));
+  }
+  
+  if (m_ColorTransferFunction)
+  {
     // now paint the handles
     painter.setBrush(Qt::black);
     painter.setPen(Qt::black);
@@ -72,6 +92,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
           //m_YEdit->setText(QString::number(GetFunctionY(m_GrabbedHandle)));
         }
       }
+      
     }
   }
   painter.restore();

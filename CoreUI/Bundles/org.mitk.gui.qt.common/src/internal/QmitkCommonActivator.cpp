@@ -26,8 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 void
 QmitkCommonActivator::Start(cherry::IBundleContext::Pointer)
 { 
-  QmitkRegisterClasses();
-
   QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
   if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )
   {
@@ -37,5 +35,8 @@ QmitkCommonActivator::Start(cherry::IBundleContext::Pointer)
     mitk::GlobalInteraction::GetInstance()->Initialize("global", string.toStdString());
   }
   else throw std::exception();
+
+  QmitkRegisterClasses();
+
 }
 

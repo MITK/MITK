@@ -230,7 +230,18 @@ namespace mitk {
 		{ 
 		  std::cout << "ExceptionObject caught !" << std::endl; 
 		  std::cout << err << std::endl; 				
-		}    
+		}
+    if (m_Observer.IsNotNull())
+    {
+      optimizer->RemoveAllObservers();
+      registration->RemoveAllObservers();
+      transform->RemoveAllObservers();
+      m_Observer->SetRemainingProgress(15);
+    }
+    if (m_Observer.IsNotNull())
+    {
+      m_Observer->SetRemainingProgress(5);
+    }
 
   } 
 

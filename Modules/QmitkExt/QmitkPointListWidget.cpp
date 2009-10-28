@@ -40,39 +40,48 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
  m_BtnSave(NULL), m_PointSetNode(NULL), m_Interactor(NULL), m_EditAllowed(true),
  m_NodeObserverTag(0)
 {
-  QGridLayout* layout = new QGridLayout;
+  QVBoxLayout* layout = new QVBoxLayout;
   layout->setContentsMargins( 0, 0, 0, 0 );
+  
   this->setLayout( layout );
-  this->setContentsMargins( 0, 0, 0, 0 );
   
   m_ListView = new QmitkPointListView( this );
-  layout->addWidget( m_ListView, 0, 0, 1, 4 ); // span 4 cols
+  layout->addWidget(m_ListView);
   m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down");
   connect( m_ListView, SIGNAL(PointSelectionChanged()), this, SIGNAL(PointSelectionChanged()) );  // forward signal from list view
+  
+  
+  QWidget* buttonWidget = new QWidget;
+  layout->addWidget( buttonWidget );
+
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
+  buttonWidget->setLayout( buttonLayout );
+  buttonLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+
   const QIcon iconEdit( btnSetPoints_xpm ); // installs/removes pointset interactor
   m_BtnEdit = new QPushButton( iconEdit, "", this );
   m_BtnEdit->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");
   connect( m_BtnEdit, SIGNAL(toggled(bool)), this, SLOT(OnEditPointSetButtonToggled(bool)) ); 
   m_BtnEdit->setCheckable( true ); 
-  layout->addWidget( m_BtnEdit, 1, 0 );
+  buttonLayout->addWidget( m_BtnEdit );
 
   const QIcon iconClear( btnClear_xpm ); // clears whole point set
   m_BtnClear = new QPushButton( iconClear, "", this );
   m_BtnClear->setToolTip("Erase all points from list. Use the delete key to delete the selected point.");
   connect( m_BtnClear, SIGNAL(clicked()), this, SLOT(OnClearPointSetButtonClicked()) );
-  layout->addWidget( m_BtnClear, 1, 1 ); 
+  buttonLayout->addWidget(m_BtnClear);
 
   const QIcon iconLoad( btnLoad_xpm ); // loads a point set from file
   m_BtnLoad = new QPushButton( iconLoad, "", this );
   m_BtnLoad->setToolTip("Load list of points from file (REPLACES current content)");
   connect( m_BtnLoad, SIGNAL(clicked()), this, SLOT(OnLoadPointSetButtonClicked()) );
-  layout->addWidget( m_BtnLoad, 1, 2 );
+  buttonLayout->addWidget(m_BtnLoad);
 
   const QIcon iconSave( btnSave_xpm ); // saves point set to file
   m_BtnSave = new QPushButton( iconSave, "", this );
   m_BtnSave->setToolTip("Save points to file");
   connect( m_BtnSave, SIGNAL(clicked()), this, SLOT(OnSavePointSetButtonClicked()) );
-  layout->addWidget( m_BtnSave, 1, 3 );
+  buttonLayout->addWidget(m_BtnSave);
 
   ObserveNewNode(NULL);
 }

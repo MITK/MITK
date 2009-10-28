@@ -40,6 +40,11 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
   QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
   QListView::setSelectionMode( QAbstractItemView::SingleSelection );
 
+  //Define Size
+  this->setMinimumHeight(40);
+  //horizontal, vertical
+  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
   connect( m_PointListModel, SIGNAL(UpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
   connect( QListView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
            this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );

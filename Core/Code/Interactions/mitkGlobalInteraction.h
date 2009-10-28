@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateMachineFactory.h"
 #include "mitkEventMapper.h"
 #include "mitkInteractor.h"
-#include <string>
-#include <vector>
 
 namespace mitk {
 
@@ -163,6 +161,11 @@ namespace mitk {
     //## Can be used with an empty string (default), a file name with path, or the actual XML content as string.
     bool Initialize(const char* globalInteractionName, const std::string XMLBehaviorInput = "");
 
+    //##Documentation
+    //## @brief Check if GlobalInteraction has already been initialized. Init must! be done before usage.
+    bool IsInitialized() {return m_IsInitialized;};
+
+
     //so that the interactors can call AddToSelectedInteractors() and RemoveFromSelectedInteractors()
     friend class Interactor;
 
@@ -216,8 +219,6 @@ namespace mitk {
     void FillJurisdictionMap(mitk::StateEvent const* stateEvent, float threshold);
 
     void RemoveFlaggedListeners();
-
-    bool IsInitialized() {return m_IsInitialized;};
 
     StateMachineCPointerList m_ListenersFlaggedForRemoval;
 

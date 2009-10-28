@@ -55,13 +55,13 @@ void mitk::StandaloneDataStorage::Add(mitk::DataTreeNode* node, const mitk::Data
   {
     itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
     if (!IsInitialized())
-      throw 1;  // insert exception handling here
+      throw std::logic_error("DataStorage not initialized");
     /* check if node is in its own list of sources */
     if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
-      throw 3;
+      throw std::invalid_argument("Node is it's own parent"); 
     /* check if node already exists in StandaloneDataStorage */
     if (m_SourceNodes.find(node) != m_SourceNodes.end())
-      throw 4; // node already in StandaloneDataStorage! insert exception handling here
+      throw std::invalid_argument("Node is already in DataStorage");
 
     /* create parent list if it does not exist */
     mitk::DataStorage::SetOfObjects::ConstPointer sp;
@@ -100,7 +100,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataTreeNode* node, const mitk::Data
 void mitk::StandaloneDataStorage::Remove(const mitk::DataTreeNode* node)
 {
   if (!IsInitialized())
-    throw 1;  // insert exception handling here
+    throw std::logic_error("DataStorage not initialized");
   if (node == NULL)
     return;
 
@@ -145,7 +145,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock > locked(m_Mutex);
   if (!IsInitialized())
-    throw 1;  // insert exception handling here
+    throw std::logic_error("DataStorage not initialized");
     
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the StandaloneDataStorage object */
@@ -163,7 +163,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRelations(const mitk::DataTreeNode* node, const AdjacencyList& relation, const NodePredicateBase* condition, bool onlyDirectlyRelated) const
 {
   if (node == NULL)
-    throw 1;
+    throw std::invalid_argument("invalid node");
 
   /* Either read direct relations directly from adjacency list */
   if (onlyDirectlyRelated)  

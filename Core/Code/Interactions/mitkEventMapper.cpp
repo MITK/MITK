@@ -28,26 +28,26 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 #include "mitkEventMapper.h"
-#include <itkOutputWindow.h>
-#include <itkMacro.h>
-//#include "mitkStatusBar.h"
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
 #include "mitkOperationEvent.h"
-// #include "mitkStateMachine.h"
 #include "mitkGlobalInteraction.h"
 
 #include "mitkStandardFileLocations.h"
 
 //#include <mitkInteractionDebugger.h>
-#include <mitkConfig.h>
-#include <itksys/SystemTools.hxx>
+#include "mitkConfig.h"
 #include "mitkCoreObjectFactory.h"
 
+#include <itkOutputWindow.h>
+#include <itkMacro.h>
+
 #include <vtkObjectFactory.h>
+
+
 namespace mitk
 {
-vtkStandardNewMacro(EventMapper);
+  vtkStandardNewMacro(EventMapper);
 }
 
 #ifdef MBI_INTERNAL_CONFERENCE
@@ -531,7 +531,7 @@ bool mitk::EventMapper::LoadStandardBehavior()
   // Search for StateMachine.xml, bypass relative path in mitkSourceTree for additional search
 
   std::string xmlFileName = mitk::StandardFileLocations::GetInstance()->FindFile("StateMachine.xml", "Core/Code/Interactions");
-  if(itksys::SystemTools::FileExists(xmlFileName.c_str()))
+  if(xmlFileName != "")
     return LoadBehavior(xmlFileName);
 
   return false;

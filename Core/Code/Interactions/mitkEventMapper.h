@@ -16,16 +16,14 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef EVENTMAPPER_H_HEADER_INCLUDED_C187864A
-#define EVENTMAPPER_H_HEADER_INCLUDED_C187864A
+#ifndef EVENTMAPPER_H_HEADER_INCLUDED
+#define EVENTMAPPER_H_HEADER_INCLUDED
 
 #include "mitkEvent.h"
 #include "mitkCommon.h"
 #include "mitkEventDescription.h"
 #include <vtkXMLParser.h>
-#include <vector>
-#include <string>
-#include <map>
+
 
 namespace mitk {
   struct ltstr

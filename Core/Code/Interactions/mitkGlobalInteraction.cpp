@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
-#include "mitkEvent.h"
-#include "mitkAction.h"
 #include "mitkStateEvent.h"
 #include "mitkPositionEvent.h"
 

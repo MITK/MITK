@@ -108,9 +108,9 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
 
             mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = m_View->GetDataStorage()->GetSubset(predicate);
-            
+
             mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
-            
+
             // only look at interesting types
             for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
               ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each node
@@ -174,6 +174,9 @@ m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixed
 
 QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelListener);
   if (m_FixedPointSetNode.IsNotNull())
   {
     m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);
@@ -220,8 +223,6 @@ void QmitkPointBasedRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidg
   m_MultiWidget->SetWidgetPlanesVisibility(true);
   m_Controls.m_FixedPointListWidget->SetMultiWidget( m_MultiWidget );
   m_Controls.m_MovingPointListWidget->SetMultiWidget( m_MultiWidget );
-  connect(this, SIGNAL( reinitFixed(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
-  connect(this, SIGNAL( reinitMoving(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
 }
 
 void QmitkPointBasedRegistrationView::StdMultiWidgetNotAvailable()
@@ -246,6 +247,8 @@ void QmitkPointBasedRegistrationView::CreateConnections()
   connect((QObject*)(m_Controls.m_ShowRedGreenValues),SIGNAL(toggled(bool)),this,SLOT(showRedGreen(bool)));
   connect((QObject*)(m_Controls.m_OpacitySlider),SIGNAL(sliderMoved(int)),this,SLOT(OpacityUpdate(int)));
   connect((QObject*)(m_Controls.m_SelectedTransformationClass),SIGNAL(activated(int)), this,SLOT(transformationChanged(int)));
+  connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkCalculateEnabled()));
+  connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkLandmarkError()));
 }
 
 void QmitkPointBasedRegistrationView::Activated()
@@ -460,7 +463,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
   if(m_MovingLandmarks.IsNotNull())
     m_CurrentMovingLandmarksObserverID = m_MovingLandmarks->AddObserver(itk::ModifiedEvent(), m_MovingLandmarksChangedCommand);
 }
- 
+
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
   m_MovingLandmarks = (mitk::PointSet*)m_MovingPointSetNode->GetData();
@@ -662,36 +665,61 @@ void QmitkPointBasedRegistrationView::checkLandmarkError()
   double p1[3], p2[3];
   if(m_Transformation < 3)
   {
-    if (m_MovingLandmarks.IsNotNull() && m_FixedLandmarks.IsNotNull()&& m_MovingLandmarks->GetSize() != 0 && m_FixedLandmarks->GetSize() != 0)
+    if (m_Controls.m_UseICP->isChecked())
     {
-      for(int pointId = 0; pointId < m_MovingLandmarks->GetSize(); ++pointId)
+      if (m_MovingLandmarks.IsNotNull() && m_FixedLandmarks.IsNotNull()&& m_MovingLandmarks->GetSize() != 0 && m_FixedLandmarks->GetSize() != 0)
       {
-        point1 = m_MovingLandmarks->GetPoint(pointId);
-        point2 = m_FixedLandmarks->GetPoint(0);
-        p1[0] = point1[0]; p1[1] = point1[1]; p1[2] = point1[2];
-        p2[0] = point2[0]; p2[1] = point2[1]; p2[2] = point2[2];
-        dist = vtkMath::Distance2BetweenPoints(p1, p2);
-        for(int pointId2 = 1; pointId2 < m_FixedLandmarks->GetSize(); ++pointId2)
+        for(int pointId = 0; pointId < m_MovingLandmarks->GetSize(); ++pointId)
         {
-          point2 = m_FixedLandmarks->GetPoint(pointId2);
-          p1[0] = point1[0]; p1[1] = point1[1]; p1[2] = p1[2];
-          p2[0] = point2[0]; p2[1] = point2[1]; p2[2] = p2[2];
-          dist2 = vtkMath::Distance2BetweenPoints(p1, p2);
-          if (dist2 < dist)
+          point1 = m_MovingLandmarks->GetPoint(pointId);
+          point2 = m_FixedLandmarks->GetPoint(0);
+          p1[0] = point1[0]; p1[1] = point1[1]; p1[2] = point1[2];
+          p2[0] = point2[0]; p2[1] = point2[1]; p2[2] = point2[2];
+          dist = vtkMath::Distance2BetweenPoints(p1, p2);
+          for(int pointId2 = 1; pointId2 < m_FixedLandmarks->GetSize(); ++pointId2)
           {
-            dist = dist2;
+            point2 = m_FixedLandmarks->GetPoint(pointId2);
+            p1[0] = point1[0]; p1[1] = point1[1]; p1[2] = p1[2];
+            p2[0] = point2[0]; p2[1] = point2[1]; p2[2] = p2[2];
+            dist2 = vtkMath::Distance2BetweenPoints(p1, p2);
+            if (dist2 < dist)
+            {
+              dist = dist2;
+            }
           }
+          totalDist += dist;
         }
-        totalDist += dist;
+        m_Controls.m_MeanErrorLCD->display(sqrt(totalDist/m_FixedLandmarks->GetSize()));
+        m_Controls.m_MeanErrorLCD->show();
+        m_Controls.m_MeanError->show();
       }
-      m_Controls.m_MeanErrorLCD->display(sqrt(totalDist/m_FixedLandmarks->GetSize()));
-      m_Controls.m_MeanErrorLCD->show();
-      m_Controls.m_MeanError->show();
+      else
+      {
+        m_Controls.m_MeanErrorLCD->hide();
+        m_Controls.m_MeanError->hide();
+      }
     }
     else
     {
-      m_Controls.m_MeanErrorLCD->hide();
-      m_Controls.m_MeanError->hide();
+      if (m_MovingLandmarks.IsNotNull() && m_FixedLandmarks.IsNotNull() && m_MovingLandmarks->GetSize() != 0 && m_FixedLandmarks->GetSize() != 0 && m_MovingLandmarks->GetSize() == m_FixedLandmarks->GetSize())
+      {
+        for(int pointId = 0; pointId < m_MovingLandmarks->GetSize(); ++pointId)
+        {
+          point1 = m_MovingLandmarks->GetPoint(pointId);
+          point2 = m_FixedLandmarks->GetPoint(pointId);
+          p1[0] = point1[0]; p1[1] = point1[1]; p1[2] = point1[2];
+          p2[0] = point2[0]; p2[1] = point2[1]; p2[2] = point2[2];
+          totalDist += vtkMath::Distance2BetweenPoints(p1, p2);
+        }
+        m_Controls.m_MeanErrorLCD->display(sqrt(totalDist/m_FixedLandmarks->GetSize()));
+        m_Controls.m_MeanErrorLCD->show();
+        m_Controls.m_MeanError->show();
+      }
+      else
+      {
+        m_Controls.m_MeanErrorLCD->hide();
+        m_Controls.m_MeanError->hide();
+      }
     }
   }
   else
@@ -856,21 +884,9 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
     }
     if(m_Transformation==1)
     {
-      transform->SetModeToRigidBody();
-    }
-    if(m_Transformation==2)
-    {
-      transform->SetModeToRigidBody();
-    }
-    if(m_Transformation==3)
-    {
-      transform->SetModeToRigidBody();
-    }
-    if(m_Transformation==4)
-    {
       transform->SetModeToSimilarity();
     }
-    if(m_Transformation==5)
+    if(m_Transformation==2)
     {
       transform->SetModeToAffine();
     }
@@ -987,38 +1003,48 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
 
 bool QmitkPointBasedRegistrationView::checkCalculateEnabled()
 {
-  int fixedPoints = m_FixedLandmarks->GetSize();
-  int movingPoints = m_MovingLandmarks->GetSize();
-  if (m_Transformation == 0 || m_Transformation == 1 || m_Transformation == 2)
+  if (m_FixedLandmarks.IsNotNull() && m_MovingLandmarks.IsNotNull())
   {
-    if((movingPoints > 0 && fixedPoints > 0))
+    int fixedPoints = m_FixedLandmarks->GetSize();
+    int movingPoints = m_MovingLandmarks->GetSize();
+    if (m_Transformation == 0 || m_Transformation == 1 || m_Transformation == 2)
     {
-      m_Controls.m_Calculate->setEnabled(true);
-      return true;
+      if (m_Controls.m_UseICP->isChecked())
+      {
+        if((movingPoints > 0 && fixedPoints > 0))
+        {
+          m_Controls.m_Calculate->setEnabled(true);
+          return true;
+        }
+        else
+        {
+          m_Controls.m_Calculate->setEnabled(false);
+          return false;
+        }
+      }
+      else
+      {
+        if ((movingPoints == fixedPoints) && movingPoints > 0)
+        {
+          m_Controls.m_Calculate->setEnabled(true);
+          return true;
+        }
+        else
+        {
+          m_Controls.m_Calculate->setEnabled(false);
+          return false;
+        }
+      }
     }
     else
     {
-      m_Controls.m_Calculate->setEnabled(false);
-      return false;
-    }
-  }
-  else if (m_Transformation == 3 || m_Transformation == 4 || m_Transformation == 5)
-  {
-    if ((movingPoints == fixedPoints) && movingPoints > 0)
-    {
       m_Controls.m_Calculate->setEnabled(true);
       return true;
-    }
-    else
-    {
-      m_Controls.m_Calculate->setEnabled(false);
-      return false;
     }
   }
   else
   {
-    m_Controls.m_Calculate->setEnabled(true);
-    return true;
+    return false;
   }
 }
 
@@ -1026,18 +1052,21 @@ void QmitkPointBasedRegistrationView::calculate()
 {
   if (m_Transformation == 0 || m_Transformation == 1 || m_Transformation == 2)
   {
-    if (m_MovingLandmarks->GetSize() == 1 && m_FixedLandmarks->GetSize() == 1)
+    if (m_Controls.m_UseICP->isChecked())
     {
-      this->calculateLandmarkbased();
+      if (m_MovingLandmarks->GetSize() == 1 && m_FixedLandmarks->GetSize() == 1)
+      {
+        this->calculateLandmarkbased();
+      }
+      else
+      {
+        this->calculateLandmarkbasedWithICP();
+      }
     }
     else
     {
-      this->calculateLandmarkbasedWithICP();
+      this->calculateLandmarkbased();
     }
-  }
-  else if (m_Transformation == 3 || m_Transformation == 4 || m_Transformation == 5)
-  {
-    this->calculateLandmarkbased();
   }
   else
   {

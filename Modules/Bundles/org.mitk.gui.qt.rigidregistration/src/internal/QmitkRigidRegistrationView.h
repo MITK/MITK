@@ -111,20 +111,6 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
 
     /*!
-    * \brief sets the moving Mask Image according to TreeNodeSelector widget
-    */
-    void MovingMaskSelected(int = 0);
-
-    void MovingMaskImageChanged();
-
-    /*!
-    * \brief sets the fixed Mask Image according to TreeNodeSelector widget
-    */
-    void FixedMaskSelected(int = 0);
-
-    void FixedMaskImageChanged();
-
-    /*!
     * checks if registration is possible
     */
     bool CheckCalculate();
@@ -231,6 +217,10 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     void UpdateTimestep();
 
     void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+
+    void CheckForMaskImages();
+
+    void UseMaskImagesChecked(bool checked);
 
   protected:
 

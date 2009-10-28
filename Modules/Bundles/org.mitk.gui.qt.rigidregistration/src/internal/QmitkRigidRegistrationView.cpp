@@ -53,10 +53,6 @@ struct SelListenerRigidRegistration : ISelectionListener
   {
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
-    m_View->m_Controls.TextLabelFixed->hide();
-    m_View->m_Controls.m_FixedLabel->hide();
-    m_View->m_Controls.TextLabelMoving->hide();
-    m_View->m_Controls.m_MovingLabel->hide();
 
     // do something with the selected items
     if(m_View->m_CurrentSelection)
@@ -64,15 +60,21 @@ struct SelListenerRigidRegistration : ISelectionListener
       m_View->SetImagesVisible(selection);
       if (m_View->m_CurrentSelection->Size() != 2)
       {
-        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
-        m_View->m_Controls.m_StatusLabel->show();
-        m_View->FixedSelected(NULL);
-        m_View->FixedSelected(NULL);
+        if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+        {
+          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+          m_View->m_Controls.m_StatusLabel->show();
+          m_View->m_Controls.TextLabelFixed->hide();
+          m_View->m_Controls.m_FixedLabel->hide();
+          m_View->m_Controls.TextLabelMoving->hide();
+          m_View->m_Controls.m_MovingLabel->hide();
+        }
       }
       else
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
+        mitk::DataTreeNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
@@ -86,16 +88,17 @@ struct SelListenerRigidRegistration : ISelectionListener
             {
               if (foundFixedImage == false)
               {
-                m_View->FixedSelected(node);
+                fixedNode = node;
                 foundFixedImage = true;
               }
               else
+              {
+                m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
+              }
             }
             else
             {
-              m_View->FixedSelected(NULL);
-              m_View->FixedSelected(NULL);
               m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
               return;
             }
@@ -141,6 +144,9 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelListener);
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -152,6 +158,7 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
+  m_Controls.m_UseImageMasks->hide();
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
   this->CreateConnections();
@@ -169,8 +176,6 @@ void QmitkRigidRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &s
   m_Parent->setEnabled(true);
   m_MultiWidget = &stdMultiWidget;
   m_MultiWidget->SetWidgetPlanesVisibility(true);
-  connect(this, SIGNAL( reinitFixed(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
-  connect(this, SIGNAL( reinitMoving(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
 }
 
 void QmitkRigidRegistrationView::StdMultiWidgetNotAvailable()
@@ -183,6 +188,7 @@ void QmitkRigidRegistrationView::CreateConnections()
 {
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
+  connect(m_Controls.m_UseImageMasks, SIGNAL(toggled(bool)), this, SLOT(UseMaskImagesChecked(bool)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
@@ -207,8 +213,6 @@ void QmitkRigidRegistrationView::Activated()
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  this->FixedMaskSelected();
-  this->MovingMaskSelected();
   this->OpacityUpdate(m_Opacity);
   this->ClearTransformationLists();
   this->CheckCalculateEnabled();
@@ -252,6 +256,27 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixed
       m_Controls.qmitkRigidRegistrationSelector1->SetFixedDimension(m_FixedDimension);
       m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
     }
+
+    bool hasMask = false;
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_FixedNode);
+    unsigned long size;
+    size = children->Size();
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      mitk::BoolProperty::Pointer isMaskProp = dynamic_cast<mitk::BoolProperty*>(children->GetElement(i)->GetProperty("binary"));
+      if(isMaskProp.IsNotNull() && isMaskProp->GetValue() == true)
+      {
+        m_FixedMaskNode = children->GetElement(i);
+        hasMask = true;
+        this->CheckForMaskImages();
+        break;
+      }
+    }
+    if (!hasMask)
+    {
+      this->CheckForMaskImages();
+      m_FixedMaskNode = NULL;
+    }
   }
   else
   {
@@ -289,6 +314,27 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movi
     this->SetImageColor(m_ShowRedGreen);
     m_MovingNode->GetFloatProperty("opacity", m_OriginalOpacity);
     this->OpacityUpdate(m_Opacity);
+
+    bool hasMask = false;
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    unsigned long size;
+    size = children->Size();
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      mitk::BoolProperty::Pointer isMaskProp = dynamic_cast<mitk::BoolProperty*>(children->GetElement(i)->GetProperty("binary"));
+      if(isMaskProp.IsNotNull() && isMaskProp->GetValue() == true)
+      {
+        m_MovingMaskNode = children->GetElement(i);
+        hasMask = true;
+        this->CheckForMaskImages();
+        break;
+      }
+    }
+    if (!hasMask)
+    {
+      m_MovingMaskNode = NULL;
+      this->CheckForMaskImages();
+    }
   }
   else
   {
@@ -298,74 +344,6 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movi
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->MovingImageChanged();
   this->CheckCalculateEnabled();
-}
-
-void QmitkRigidRegistrationView::MovingMaskSelected(int)
-{
-//   if (m_Controls.m_MovingSelector->GetSelectedNode().IsNotNull())
-//   {
-//     if (m_MovingMaskNode != m_Controls.m_MovingSelector->GetSelectedNode())
-//     {
-//       if (m_MovingMaskNode != NULL)
-//       {
-//         if (m_MovingMaskNode != m_FixedNode || m_MovingMaskNode != m_MovingNode)
-//         {
-//           m_MovingNode->SetVisibility(false);
-//         }
-//       }
-//       m_MovingMaskNode = m_Controls.m_MovingSelector->GetSelectedNode();
-//       if (m_ShowBothImages)
-//       {
-//         this->ShowBothImages();
-//       }
-//       if (m_ShowFixedImage)
-//       {
-//         this->ShowFixedImage();
-//       }
-//       if (m_ShowMovingImage)
-//       {
-//         this->ShowMovingImage();
-//       }
-//       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//       this->ClearTransformationLists();
-//       this->OpacityUpdate(m_Opacity);
-//     }
-//     this->MovingMaskImageChanged();
-//   }
-}
-
-void QmitkRigidRegistrationView::FixedMaskSelected(int)
-{
-//   if (m_Controls.m_FixedSelector->GetSelectedNode().IsNotNull())
-//   {
-//     if (m_FixedMaskNode != m_Controls.m_FixedSelector->GetSelectedNode())
-//     {
-//       if (m_FixedMaskNode != NULL)
-//       {
-//         if (m_FixedMaskNode != m_FixedNode || m_FixedMaskNode != m_MovingNode || m_FixedMaskNode != m_MovingMaskNode )
-//         {
-//           m_FixedMaskNode->SetVisibility(false);
-//         }
-//       }
-//       m_FixedMaskNode = m_Controls.m_FixedSelector->GetSelectedNode();
-//       if (m_ShowBothImages)
-//       {
-//         this->ShowBothImages();
-//       }
-//       if (m_ShowFixedImage)
-//       {
-//         this->ShowFixedImage();
-//       }
-//       if (m_ShowMovingImage)
-//       {
-//         this->ShowMovingImage();
-//       }
-//       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//       this->ClearTransformationLists();
-//       this->OpacityUpdate(m_Opacity);
-//     }
-//     this->FixedMaskImageChanged();
-//   }
 }
 
 bool QmitkRigidRegistrationView::CheckCalculate()
@@ -783,22 +761,15 @@ void QmitkRigidRegistrationView::MovingImageChanged()
   }
 }
 
-void QmitkRigidRegistrationView::MovingMaskImageChanged()
-{
-//   m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_Controls.m_MovingMaskSelector->GetSelectedNode());
-//   this->CheckCalculateEnabled();
-}
-
-void QmitkRigidRegistrationView::FixedMaskImageChanged()
-{
-//   m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_Controls.m_FixedMaskSelector->GetSelectedNode());
-//   this->CheckCalculateEnabled();
-}
-
 void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);
+  if (m_FixedMaskNode.IsNotNull() && m_MovingMaskNode.IsNotNull() && m_Controls.m_UseImageMasks->isChecked())
+  {
+    m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
+    m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
+  }
   m_Controls.frame4->setEnabled(false);
   m_Controls.m_StopOptimization->setEnabled(true);
   m_Controls.qmitkRigidRegistrationSelector1->CalculateTransformation(((QmitkSliderNavigatorWidget*)m_Controls.timeSlider)->GetPos());
@@ -861,5 +832,31 @@ void QmitkRigidRegistrationView::SetImagesVisible(cherry::ISelection::ConstPoint
         nodeIt->Value()->SetVisibility(false);
       }
     }
+  }
+}
+
+void QmitkRigidRegistrationView::CheckForMaskImages()
+{
+  if (m_FixedMaskNode.IsNotNull() && m_MovingMaskNode.IsNotNull())
+  {
+    m_Controls.m_UseImageMasks->show();
+  }
+  else
+  {
+    m_Controls.m_UseImageMasks->hide();
+  }
+}
+
+void QmitkRigidRegistrationView::UseMaskImagesChecked(bool checked)
+{
+  if (checked)
+  {
+    m_FixedMaskNode->SetVisibility(true);
+    m_MovingMaskNode->SetVisibility(true);
+  }
+  else
+  {
+    m_FixedMaskNode->SetVisibility(false);
+    m_MovingMaskNode->SetVisibility(false);
   }
 }

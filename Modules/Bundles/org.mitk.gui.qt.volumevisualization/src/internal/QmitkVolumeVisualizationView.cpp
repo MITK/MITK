@@ -19,6 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QComboBox>
 
+#include <cherryISelectionProvider.h>
+#include <cherryISelectionService.h>
+#include <cherryIWorkbenchWindow.h>
+#include <cherryISelectionService.h>
+#include <mitkDataTreeNodeObject.h>
+
 #include <mitkProperties.h>
 #include <mitkNodePredicateDataType.h>
 
@@ -35,11 +41,14 @@ QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
   m_Controls(NULL)
 {
-
 }
 
 QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelectionListener);
+
 
 }
 
@@ -51,51 +60,97 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
     m_Controls->setupUi(parent);
 
-    m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
-
-    m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
-
-    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(OnImageSelected(const mitk::DataTreeNode*)) );
-    
     connect( m_Controls->m_EnableRenderingCB, SIGNAL( toggled(bool) ),this, SLOT( OnEnableRendering(bool) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
 
+    m_Controls->m_EnableRenderingCB->setEnabled(false);
+    m_Controls->m_TransferFunctionWidget->setEnabled(false);
+    m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+
   }
+  
+  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
+    (this, &QmitkVolumeVisualizationView::SelectionChanged);
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->AddSelectionListener(m_SelectionListener);
 }
 
-void QmitkVolumeVisualizationView::OnImageSelected(const mitk::DataTreeNode* item)
+
+void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 {
-  mitk::DataTreeNode::Pointer node = const_cast<mitk::DataTreeNode*>(item);
 
-  if( node )
+  LOG_INFO <<"Selection Changed";
+  
+  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
+    = selection.Cast<const mitk::DataTreeNodeSelection>();
+
+  if(_DataTreeNodeSelection.IsNotNull())
   {
-    bool enabled = false;
-    node->GetBoolProperty("volumerendering",enabled);
-    m_Controls->m_EnableRenderingCB->setChecked(enabled);
+    std::vector<mitk::DataTreeNode*> selectedNodes;
+    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
 
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(node);
-  }
-  else
-  {
-    m_Controls->m_EnableRenderingCB->setChecked(false);
+    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
+      it != _DataTreeNodeSelection->End(); ++it)
+    {
+      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
+      if(_DataTreeNodeObject)
+        selectedNodes.push_back( _DataTreeNodeObject->GetDataTreeNode() );
+    }
 
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    mitk::DataTreeNode::Pointer node;
+
+    if(selectedNodes.size() > 0)
+      node=selectedNodes.back();
+
+
+    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+    {
+      std::string  infoText = std::string("Selected Image: ") + node->GetName();
+      m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+      m_SelectedNode = node;
+    
+      bool enabled = false;
+      node->GetBoolProperty("volumerendering",enabled);
+      m_Controls->m_EnableRenderingCB->setEnabled(true);
+      m_Controls->m_EnableRenderingCB->setChecked(enabled);
+
+      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
+      m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(node);
+
+      m_Controls->m_TransferFunctionWidget->setEnabled(true);
+      m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
+    }
+    else
+    {
+      std::string infoText = "Selected Image: [None]";
+      m_SelectedNode = 0;
+      
+      m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+
+      m_Controls->m_EnableRenderingCB->setChecked(false);
+      m_Controls->m_EnableRenderingCB->setEnabled(false);
+    
+      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
+      m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+
+      m_Controls->m_TransferFunctionWidget->setEnabled(false);
+      m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+      
+    }
+
+
   }
+
 }
-
 
 void QmitkVolumeVisualizationView::OnEnableRendering(bool state) 
 {
-  mitk::DataTreeNode::Pointer node = m_Controls->m_ImageSelector->GetSelectedNode();
-
-  if(node.IsNull())
+  if(m_SelectedNode.IsNull())
     return;
 
-  node->SetProperty("volumerendering",mitk::BoolProperty::New(state));
-
+  m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

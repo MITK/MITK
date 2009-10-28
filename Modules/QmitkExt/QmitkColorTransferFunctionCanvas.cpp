@@ -46,6 +46,9 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
   painter.setPen(Qt::gray);
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
 
+  if( ! this->isEnabled() )
+    return;
+ 
   if (m_ColorTransferFunction)
   {
     for (int x = contentsRect.x(); x < contentsRect.x() + contentsRect.width(); x++)

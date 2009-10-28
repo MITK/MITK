@@ -111,6 +111,7 @@ public:
   int m_GrabbedHandle;
 
   vtkFloatingPointType m_Lower, m_Upper, m_Min, m_Max;
+    
   std::pair<int,int> FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType>);
   std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);
   mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram;

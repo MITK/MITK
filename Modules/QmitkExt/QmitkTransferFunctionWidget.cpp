@@ -34,6 +34,10 @@ QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
 
 void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
+
+  LOG_INFO << "TransW called with" << (1&&node);
+  
+
   if (node)
   {
     tfpToChange = dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
@@ -47,7 +51,6 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
       }
       
       node->SetProperty("TransferFunction", tfpToChange = mitk::TransferFunctionProperty::New() );
-      dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
     }
 
     mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
@@ -56,11 +59,6 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
       tf->InitializeByItkHistogram( image->GetScalarHistogram() );
           
     OnUpdateCanvas();
-
-    m_ScalarOpacityFunctionCanvas->setEnabled(true);
-    m_GradientOpacityCanvas->setEnabled(true);
-    m_ColorTransferFunctionCanvas->setEnabled(true);
-
     return; 
   }
 
@@ -89,9 +87,7 @@ void QmitkTransferFunctionWidget::OnUpdateCanvas()
     m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
     m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
     m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
-
-    m_MinLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMin()));
-    m_MaxLabel_2->setText(QString::number(m_ScalarOpacityFunctionCanvas->GetMax()));
+    m_ScalarOpacityFunctionCanvas->update();
   }
   if (m_GradientOpacityCanvas)
   {
@@ -99,23 +95,16 @@ void QmitkTransferFunctionWidget::OnUpdateCanvas()
     m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
     m_GradientOpacityCanvas->SetMin( tf->GetMin() );
     m_GradientOpacityCanvas->SetMax( tf->GetMax() );
-
-    m_MinLabelGO->setText(QString::number(m_GradientOpacityCanvas->GetMin()));
-    m_MaxLabelGO->setText(QString::number(m_GradientOpacityCanvas->GetMax()));
+    m_GradientOpacityCanvas->update();
   }
   if (m_ColorTransferFunctionCanvas)
   {
     m_ColorTransferFunctionCanvas->SetColorTransferFunction( tf->GetColorTransferFunction() );
     m_ColorTransferFunctionCanvas->SetMin( tf->GetMin() );
     m_ColorTransferFunctionCanvas->SetMax( tf->GetMax() );
-
-    m_MinLabel  ->setText(QString::number(m_ColorTransferFunctionCanvas->GetMin()));
-    m_MaxLabel  ->setText(QString::number(m_ColorTransferFunctionCanvas->GetMax()));
+    m_ColorTransferFunctionCanvas->update();
   }
 
-  m_ScalarOpacityFunctionCanvas->update();
-  m_GradientOpacityCanvas->update();
-  m_ColorTransferFunctionCanvas->update();
 }
 
 void QmitkTransferFunctionWidget::SetXValueScalar()

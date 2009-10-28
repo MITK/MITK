@@ -166,6 +166,10 @@ IF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
   CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/qtresources.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
 ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
 
+IF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/icon.xpm ${PLUGIN_DIR}/resources/icon.xpm @ONLY)
+ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
+
 # -------------------- BundleDllTemplate.h -------------------------------
 IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
   IF(BUNDLE_NAMESPACE)
@@ -215,7 +219,8 @@ IF(VIEW_CLASS)
   SET(XP_VIEW "  <extension point=\"org.opencherry.ui.views\">
     <view id=\"${VIEW_ID}\"
           name=\"${VIEW_NAME}\"
-          class=\"${BUNDLE_NAMESPACE}::${VIEW_CLASS}\" />
+          class=\"${BUNDLE_NAMESPACE}::${VIEW_CLASS}\" 
+          icon=\"resources/icon.xpm\" />
   </extension>"
 )
 ENDIF(VIEW_CLASS)

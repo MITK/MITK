@@ -15,7 +15,7 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/icon.xpm
+  @PLUGIN_RESOURCE_FILES@
 )
 
 SET(RES_FILES

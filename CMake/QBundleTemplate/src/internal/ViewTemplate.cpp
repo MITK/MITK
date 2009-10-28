@@ -15,7 +15,6 @@ const std::string @VIEW_CLASS@::VIEW_ID = "@VIEW_ID@";
 
 @VIEW_CLASS@::@VIEW_CLASS@()
 : @VIEW_BASE_CLASS@(),
-  m_Controls(NULL),
   m_MultiWidget(NULL)
 {
 }
@@ -26,17 +25,14 @@ const std::string @VIEW_CLASS@::VIEW_ID = "@VIEW_ID@";
 
 void @VIEW_CLASS@::CreateQtPartControl(QWidget *parent)
 {
-  if (!m_Controls)
-  {
-    // create GUI widgets
-    m_Controls = new Ui::@VIEW_CONTROLS_CLASS@;
-    m_Controls->setupUi(parent);
-    this->CreateConnections();
 
-    // define data type for combobox
-    m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
-    m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
-  }
+  // create GUI widgets
+  m_Controls.setupUi(parent);
+  this->CreateConnections();
+
+  // define data type for combobox
+  m_Controls.m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
+  m_Controls.m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Image") );
 }
 
 void @VIEW_CLASS@::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -51,10 +47,7 @@ void @VIEW_CLASS@::StdMultiWidgetNotAvailable()
 
 void @VIEW_CLASS@::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    connect( (QObject*)(m_Controls->m_Button), SIGNAL(clicked()), this, SLOT(DoSomething()) );
-  }
+  connect( (QObject*)(m_Controls.m_Button), SIGNAL(clicked()), this, SLOT(DoSomething()) );
 }
 
 void @VIEW_CLASS@::Activated()
@@ -69,7 +62,7 @@ void @VIEW_CLASS@::Deactivated()
 
 void @VIEW_CLASS@::DoSomething()
 {
-  mitk::DataTreeNode* node = m_Controls->m_ImageSelector->GetSelectedNode();
+  mitk::DataTreeNode* node = m_Controls.m_ImageSelector->GetSelectedNode();
   if (!node)
   {
     // Nothing selected. Inform the user and return

@@ -53,7 +53,7 @@ protected slots:
 
 protected:
 
-  Ui::@VIEW_CONTROLS_CLASS@* m_Controls;
+  Ui::@VIEW_CONTROLS_CLASS@ m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 };

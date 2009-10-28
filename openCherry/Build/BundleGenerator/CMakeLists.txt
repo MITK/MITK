@@ -66,6 +66,14 @@ SET(REQUIRED_PLUGINS ${_required_bundles} CACHE STRING "a semicolon-separated li
 
 IF(ACTIVATOR_CLASS)
 	SET(FULLY_QUALIFIED_ACTIVATOR "${BUNDLE_NAMESPACE}::${ACTIVATOR_CLASS}")
+    STRING(TOUPPER ${ACTIVATOR_CLASS} UACTIVATOR_CLASS)
+    IF(GUI_SUPPORT)
+      SET(ACTIVATOR_BASE_CLASS "cherry::AbstractUIPlugin")
+      SET(ACTIVATOR_BASE_CLASS_H "cherryAbstractUIPlugin.h")
+    ELSE()
+      SET(ACTIVATOR_BASE_CLASS "cherry::Plugin")
+      SET(ACTIVATOR_BASE_CLASS_H "cherryPlugin.h")
+    ENDIF()
 ELSE(ACTIVATOR_CLASS)
 	SET(FULLY_QUALIFIED_ACTIVATOR "")
 ENDIF(ACTIVATOR_CLASS)
@@ -145,10 +153,6 @@ STRING(TOUPPER ${LAST_PART_PLUGIN_ID} ULAST_PART_PLUGIN_ID)
 
 
 # --------------------- META-INF/MANIFEST_TEMPLATE.MF ---------------------
-IF(ACTIVATOR_CLASS)
-  SET(FQ_ACTIVATOR_CLASS "${BUNDLE_NAMESPACE}::${ACTIVATOR_CLASS}")
-ENDIF(ACTIVATOR_CLASS)
-
 SET(REQUIRED_PLUGINS_MF "${REQUIRED_PLUGINS}")
 STRING(REPLACE ";" "," REQUIRED_PLUGINS_MF "${REQUIRED_PLUGINS_MF}" )
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/META-INF/MANIFEST_TEMPLATE.MF ${PLUGIN_DIR}/META-INF/MANIFEST.MF @ONLY)
@@ -161,14 +165,17 @@ CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox
                ${PLUGIN_DIR}/documentation/doxygen/modules.dox @ONLY)
 
 # ----------------- resources directory ---------------------------------
-FILE(MAKE_DIRECTORY ${PLUGIN_DIR}/resources)
-IF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/qtresources.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
-ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
+IF(GUI_SUPPORT)
+  FILE(MAKE_DIRECTORY ${PLUGIN_DIR}/resources)
+  IF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
+    CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/qtresources.qrc ${PLUGIN_DIR}/resources/${VIEW_CLASS}.qrc @ONLY)
+  ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/qtresources.qrc)
 
-IF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/icon.xpm ${PLUGIN_DIR}/resources/icon.xpm @ONLY)
-ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
+  IF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
+    CONFIGURE_FILE(${PLUGIN_TEMPLATE}/resources/icon.xpm ${PLUGIN_DIR}/resources/icon.xpm @ONLY)
+  ENDIF(EXISTS ${PLUGIN_TEMPLATE}/resources/icon.xpm)
+ENDIF()
+
 
 # -------------------- BundleDllTemplate.h -------------------------------
 IF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
@@ -188,23 +195,21 @@ ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/BundleDllTemplate.h)
 
 
 # --------------------- src/internal/ViewTemplateControls.ui ----------------------------
-IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
-  SET(VIEW_CONTROLS "${VIEW_CLASS}Controls")
-  SET(VIEW_CONTROLS_UI "${VIEW_CONTROLS}.ui")
-  SET(VIEW_CONTROLS_FILE "ui_${VIEW_CONTROLS}.h")
-  SET(VIEW_CONTROLS_CLASS "${VIEW_CONTROLS}")
+IF (GUI_SUPPORT)
+  IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+    SET(VIEW_CONTROLS "${VIEW_CLASS}Controls")
+    SET(VIEW_CONTROLS_UI "${VIEW_CONTROLS}.ui")
+    SET(VIEW_CONTROLS_FILE "ui_${VIEW_CONTROLS}.h")
+    SET(VIEW_CONTROLS_CLASS "${VIEW_CONTROLS}")
 
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui ${PLUGIN_DIR}/src/internal/${VIEW_CONTROLS_UI} @ONLY)
-ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
-
+    CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui ${PLUGIN_DIR}/src/internal/${VIEW_CONTROLS_UI} @ONLY)
+  ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+ENDIF()
 
 # --------------------- src/internal/ViewTemplate[.h,.cpp] ----------------------------
 IF(VIEW_CLASS)
   SET(VIEW_CLASS_H "${BUNDLE_NAMESPACE}${VIEW_CLASS}.h")
   SET(VIEW_CLASS_CPP "${BUNDLE_NAMESPACE}${VIEW_CLASS}.cpp")
-  IF(Dll_HEADER)
-    SET(INCLUDE_DLL_H "#include \"${Dll_HEADER}\"")
-  ENDIF(Dll_HEADER)
 
   IF(BUNDLE_NAMESPACE)
     SET(BEGIN_NAMESPACE "namespace ${BUNDLE_NAMESPACE} {")
@@ -226,11 +231,41 @@ IF(VIEW_CLASS)
 ENDIF(VIEW_CLASS)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/pluginTemplate.xml ${PLUGIN_DIR}/plugin.xml @ONLY)
 
+# ----------------------- ActivatorTemplate[.h,.cpp] ------------------------
+IF(ACTIVATOR_CLASS)
+  SET(ACTIVATOR_CLASS_H "${BUNDLE_NAMESPACE}${ACTIVATOR_CLASS}.h")
+  SET(ACTIVATOR_CLASS_CPP "${BUNDLE_NAMESPACE}${ACTIVATOR_CLASS}.cpp")
+  
+  IF(BUNDLE_NAMESPACE)
+    SET(BEGIN_NAMESPACE "namespace ${BUNDLE_NAMESPACE} {")
+    SET(END_NAMESPACE "} //namespace ${BUNDLE_NAMESPACE}")
+  ENDIF(BUNDLE_NAMESPACE)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ActivatorTemplate.h ${PLUGIN_DIR}/src/internal/${ACTIVATOR_CLASS_H} @ONLY)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/src/internal/ActivatorTemplate.cpp ${PLUGIN_DIR}/src/internal/${ACTIVATOR_CLASS_CPP} @ONLY)
+ENDIF()
+
 # ----------------------- manifestTemplate.cpp ----------------------------
 IF(VIEW_CLASS)
   SET(SET_MANIFEST_SRC "SET(CPP_FILES manifest.cpp)")
-  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/manifestTemplate.cpp ${PLUGIN_DIR}/manifest.cpp @ONLY)
+  SET(MANIFEST_VIEW_ENTRY "#include \"src/internal/${VIEW_CLASS_H}\"
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+  POCO_EXPORT_CLASS(${BUNDLE_NAMESPACE}::${VIEW_CLASS})
+POCO_END_MANIFEST")
 ENDIF(VIEW_CLASS)
+
+IF(ACTIVATOR_CLASS)
+  SET(SET_MANIFEST_SRC "SET(CPP_FILES manifest.cpp)")
+  SET(MANIFEST_ACTIVATOR_ENTRY "#include \"src/internal/${ACTIVATOR_CLASS_H}\"
+
+POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+  POCO_EXPORT_CLASS(${BUNDLE_NAMESPACE}::${ACTIVATOR_CLASS})
+POCO_END_MANIFEST")
+ENDIF()
+
+IF(VIEW_CLASS OR ACTIVATOR_CLASS)
+  CONFIGURE_FILE(${PLUGIN_TEMPLATE}/manifestTemplate.cpp ${PLUGIN_DIR}/manifest.cpp @ONLY)
+ENDIF()
 
 # ---------------------- CMakeListsTemplate.txt -----------------------------
 SET(CREATE_PLUGIN_MACRO "${DEFAULT_CREATE_PLUGIN_MACRO}")
@@ -244,13 +279,17 @@ CONFIGURE_FILE(${PLUGIN_TEMPLATE}/CMakeListsTemplate.txt ${PLUGIN_DIR}/CMakeList
 SET(PLUGIN_SOURCES "")
 SET(PLUGIN_INTERNAL_SOURCES "")
 IF(VIEW_CLASS)
-  SET(PLUGIN_INTERNAL_SOURCES "${VIEW_CLASS_CPP}\n")
+  SET(PLUGIN_INTERNAL_SOURCES "${PLUGIN_INTERNAL_SOURCES}${VIEW_CLASS_CPP}\n")
 ENDIF(VIEW_CLASS)
-IF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+IF(ACTIVATOR_CLASS)
+  SET(PLUGIN_INTERNAL_SOURCES "${PLUGIN_INTERNAL_SOURCES}${ACTIVATOR_CLASS_CPP}\n")
+ENDIF(ACTIVATOR_CLASS)
+IF(GUI_SUPPORT AND EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+  SET(PLUGIN_RESOURCE_FILES "resources/icon.xpm")
   SET(PLUGIN_RES_FILES "resources/${VIEW_CLASS}.qrc")
   SET(PLUGIN_UI_FILES "src/internal/${VIEW_CONTROLS_UI}")
   SET(PLUGIN_MOC_H_FILES "src/internal/${VIEW_CLASS}.h")
-ENDIF(EXISTS ${PLUGIN_TEMPLATE}/src/internal/ControlsTemplate.ui)
+ENDIF()
 
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/filesTemplate.cmake ${PLUGIN_DIR}/files.cmake @ONLY)
 

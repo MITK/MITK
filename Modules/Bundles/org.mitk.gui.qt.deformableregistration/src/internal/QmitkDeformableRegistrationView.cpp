@@ -142,6 +142,9 @@ QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*par
 
 QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 {
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelListener);
 }
 
 void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -229,8 +232,6 @@ void QmitkDeformableRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidg
   m_Parent->setEnabled(true);
   m_MultiWidget = &stdMultiWidget;
   m_MultiWidget->SetWidgetPlanesVisibility(true);
-  connect(this, SIGNAL( reinitFixed(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
-  connect(this, SIGNAL( reinitMoving(const mitk::Geometry3D*) ), m_MultiWidget, SLOT( InitializeStandardViews(const mitk::Geometry3D*) ));
 }
 
 void QmitkDeformableRegistrationView::StdMultiWidgetNotAvailable()

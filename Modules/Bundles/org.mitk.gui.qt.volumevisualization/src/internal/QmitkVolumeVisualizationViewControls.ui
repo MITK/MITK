@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
+    <width>219</width>
     <height>679</height>
    </rect>
   </property>
@@ -58,18 +58,38 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Enable</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="m_EnableRenderingCB">
         <property name="text">
-         <string>Enable volume rendering</string>
+         <string>Volumerendering</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="m_EnableLOD">
         <property name="text">
-         <string>Enable LOD</string>
+         <string>LOD</string>
         </property>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

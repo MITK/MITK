@@ -33,7 +33,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
    
   // Presets Tab
   {
-    m_TransferFunctionComboBox->insertItem( "choose a Transferfunction preset ...");
+    m_TransferFunctionComboBox->insertItem( "choose an internal transferfunction preset");
     
     m_TransferFunctionComboBox->insertItem( "CT Generic");
     m_TransferFunctionComboBox->insertItem( "CT Black & White");
@@ -188,7 +188,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)
     return;
 
   thPos += dx;
-  thDelta += dy;
+  thDelta -= dy;
   
   if(thDelta < 1)
     thDelta = 1;

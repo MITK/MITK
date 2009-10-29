@@ -73,8 +73,8 @@ void mitk::PlanarLine::GeneratePolyLine()
 void mitk::PlanarLine::EvaluateFeaturesInternal()
 {
   // Calculate line length
-  Point3D &p0 = this->GetWorldControlPoint( 0 );
-  Point3D &p1 = this->GetWorldControlPoint( 1 );
+  const Point3D &p0 = this->GetWorldControlPoint( 0 );
+  const Point3D &p1 = this->GetWorldControlPoint( 1 );
   double length = p0.EuclideanDistanceTo( p1 );
 
   this->SetQuantity( FEATURE_ID_LENGTH, length );

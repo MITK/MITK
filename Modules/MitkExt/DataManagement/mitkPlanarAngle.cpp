@@ -75,9 +75,9 @@ void mitk::PlanarAngle::GeneratePolyLine()
 void mitk::PlanarAngle::EvaluateFeaturesInternal()
 {
   // Calculate angle between lines
-  Point2D &p0 = this->GetControlPoint( 0 );
-  Point2D &p1 = this->GetControlPoint( 1 );
-  Point2D &p2 = this->GetControlPoint( 2 );
+  const Point2D &p0 = this->GetControlPoint( 0 );
+  const Point2D &p1 = this->GetControlPoint( 1 );
+  const Point2D &p2 = this->GetControlPoint( 2 );
 
   Vector2D v0 = p1 - p0;
   Vector2D v1 = p1 - p2;

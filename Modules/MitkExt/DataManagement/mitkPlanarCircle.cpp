@@ -65,8 +65,8 @@ void mitk::PlanarCircle::GeneratePolyLine()
 {
   // TODO: start circle at specified boundary point...
 
-  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
+  const Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
+  const Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPoint );
 
@@ -85,8 +85,8 @@ void mitk::PlanarCircle::GeneratePolyLine()
 void mitk::PlanarCircle::EvaluateFeaturesInternal()
 {
   // Calculate circle radius and area
-  Point3D &p0 = this->GetWorldControlPoint( 0 );
-  Point3D &p1 = this->GetWorldControlPoint( 1 );
+  const Point3D &p0 = this->GetWorldControlPoint( 0 );
+  const Point3D &p1 = this->GetWorldControlPoint( 1 );
 
   double radius = p0.EuclideanDistanceTo( p1 );
   double area = vnl_math::pi * radius * radius;

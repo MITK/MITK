@@ -18,6 +18,7 @@
 #include "QmitkCrossWidget.h"
 
 #include <QMouseEvent>
+#include <QCursor>
 
 QmitkCrossWidget::QmitkCrossWidget(QWidget * parent, Qt::WindowFlags f) :
   QLabel(parent, f)
@@ -27,22 +28,27 @@ QmitkCrossWidget::QmitkCrossWidget(QWidget * parent, Qt::WindowFlags f) :
   setFocusPolicy(Qt::ClickFocus);
 }
 
-void QmitkCrossWidget::mousePressEvent(QMouseEvent* mouseEvent)
+void QmitkCrossWidget::mousePressEvent(QMouseEvent * )
 {
-  lastX = mouseEvent->x();
-  lastY = mouseEvent->y();
+  QPoint p = QCursor::pos();
+
+  lastX = p.x();
+  lastY = p.y();
+
+  emit SignalDeltaMove( 0 , 0 );
 }
 
-void QmitkCrossWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
+void QmitkCrossWidget::mouseMoveEvent(QMouseEvent * )
 {
-  int newX = mouseEvent->x();
-  int newY = mouseEvent->y();
+  QPoint p = QCursor::pos();
+
+  int newX = p.x();
+  int newY = p.y();
   
   int deltaX = newX-lastX;
   int deltaY = newY-lastY;
 
-  lastX = newX;
-  lastY = newY;
+  QCursor::setPos( lastX,lastY );
 
   emit SignalDeltaMove( deltaX , deltaY );
 }

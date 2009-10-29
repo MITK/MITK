@@ -73,6 +73,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="m_EnableLOD">
+        <property name="toolTip">
+         <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity</string>
+        </property>
         <property name="text">
          <string>LOD</string>
         </property>

@@ -602,8 +602,6 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
 
 void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
 {
-  LOG_INFO << "internal initializing views " << (int)baseRenderer;
-
   mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
   // Re-initialize view direction

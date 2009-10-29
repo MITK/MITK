@@ -39,7 +39,7 @@ RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 RenderingManager
 ::RenderingManager()
 : m_UpdatePending( false ),
-  m_MaxLOD( 0 ),
+  m_MaxLOD( 1 ),
   m_LODIncreaseBlocked( false ),
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
@@ -330,6 +330,8 @@ bool
 RenderingManager
 ::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
+  LOG_INFO << "initializing views";
+
   bool boundingBoxInitialized = false;
 
   Geometry3D::ConstPointer geometry = dataGeometry;
@@ -600,6 +602,8 @@ bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow )
 
 void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer, const mitk::Geometry3D *geometry, bool boundingBoxInitialized, int mapperID )
 {
+  LOG_INFO << "internal initializing views " << (int)baseRenderer;
+
   mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
   // Re-initialize view direction
@@ -622,14 +626,7 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
     baseRenderer->GetDisplayGeometry()->Fit();
 
     vtkRenderer *renderer = baseRenderer->GetVtkRenderer();
-
-    /*
-      the LocalizerWidget's camera must not be resetted, because it's interaction is disabled and the cameraposition cannot be changed manually
-    */
-    if ( (std::string) renderer->GetRenderWindow()->GetWindowName() != "LocalizerRenderWindow")
-    {
-      if ( renderer != NULL ) renderer->ResetCamera();
-    }
+    if ( renderer != NULL ) renderer->ResetCamera();
   }
   else
   {

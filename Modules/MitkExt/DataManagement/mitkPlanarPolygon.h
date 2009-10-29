@@ -75,10 +75,16 @@ protected:
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();
 
+  /** \brief Calculates feature quantities of the planar figure. */
+  virtual void EvaluateFeaturesInternal();
+
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-  bool m_Closed;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
+  const unsigned int FEATURE_ID_AREA;
 
+
+  bool m_Closed;
 
 private:
 

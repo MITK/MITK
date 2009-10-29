@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarFigure::PlanarFigure()
 : m_FigurePlaced( false ),
-  m_SelectedControlPoint( -1 )
+  m_SelectedControlPoint( -1 ),
+  m_Geometry2D( NULL ),
+  m_FeaturesMTime( 0 )
 {
   m_ControlPoints = VertexContainerType::New();
   m_PolyLine = VertexContainerType::New();
@@ -40,6 +42,13 @@ mitk::PlanarFigure::~PlanarFigure()
 void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 {
   this->SetGeometry( geometry );
+  m_Geometry2D = geometry;
+}
+
+
+const mitk::Geometry2D *mitk::PlanarFigure::GetGeometry2D() const
+{
+  return m_Geometry2D;
 }
 
 
@@ -143,6 +152,59 @@ mitk::PlanarFigure::GetControlPoints()
 }
 
 
+mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
+{
+  Point2D point2D;
+
+  if ( index < m_ControlPoints->Size() )
+  {
+    point2D = m_ControlPoints->ElementAt( index );
+  }
+  else
+  {
+    point2D.Fill( 0.0 );
+  }
+
+  return point2D;
+}
+
+
+mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) const
+{
+  Point3D point3D;
+
+  if ( (m_Geometry2D != NULL) && (index < m_ControlPoints->Size()) )
+  {
+    Point2D point2D;
+    m_Geometry2D->IndexToWorld( m_ControlPoints->ElementAt( index ), point2D );
+    m_Geometry2D->Map( point2D, point3D );
+  }
+  else
+  {
+    point3D.Fill( 0.0 );
+  }
+
+  return point3D;
+}
+
+
+mitk::Point2D mitk::PlanarFigure::GetWorldControlPoint2D( unsigned int index ) const
+{
+  Point2D point2D;
+
+  if ( (m_Geometry2D != NULL) && (index < m_ControlPoints->Size()) )
+  {
+    m_Geometry2D->IndexToWorld( m_ControlPoints->ElementAt( index ), point2D );
+  }
+  else
+  {
+    point2D.Fill( 0.0 );
+  }
+
+  return point2D;
+}
+
+
 const mitk::PlanarFigure::VertexContainerType *
 mitk::PlanarFigure::GetPolyLine()
 {
@@ -152,6 +214,68 @@ mitk::PlanarFigure::GetPolyLine()
   }
 
   return m_PolyLine;
+}
+
+
+/** \brief Returns the number of features available for this PlanarFigure
+* (such as, radius, area, ...). */
+unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
+{
+  return m_Features.size();
+}
+
+
+/** \brief Returns the name (identifier) of the specified features. */
+const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Name.c_str();
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+
+/** \brief Returns the physical unit of the specified features. */
+const char *mitk::PlanarFigure::GetFeatureUnit( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Unit.c_str();
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+
+/** Returns quantity of the specified feature (e.g., length, radius,
+* area, ... ) */
+double mitk::PlanarFigure::GetQuantity( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Quantity;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+
+void mitk::PlanarFigure::EvaluateFeatures()
+{
+  if ( m_FeaturesMTime < m_ControlPoints->GetMTime() )
+  {
+    this->EvaluateFeaturesInternal();
+
+    m_FeaturesMTime = m_ControlPoints->GetMTime();
+  }
 }
 
 
@@ -183,6 +307,26 @@ bool mitk::PlanarFigure::VerifyRequestedRegion()
 void mitk::PlanarFigure::SetRequestedRegion( itk::DataObject * /*data*/ )
 {
 
+}
+
+
+unsigned int mitk::PlanarFigure::AddFeature( const char *featureName, const char *unitName )
+{
+  unsigned int index = m_Features.size();
+  
+  Feature newFeature( featureName, unitName );
+  m_Features.push_back( newFeature );
+
+  return index;
+}
+
+
+void mitk::PlanarFigure::SetQuantity( unsigned int index, double quantity )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Quantity = quantity;
+  }
 }
 
 

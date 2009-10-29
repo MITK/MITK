@@ -65,6 +65,10 @@ public:
   virtual void SetGeometry2D( mitk::Geometry2D *geometry );
 
 
+  /** \brief Returns (previously set) 2D geometry of this figure. */
+  virtual const Geometry2D *GetGeometry2D() const;
+
+
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.
    *
@@ -127,9 +131,40 @@ public:
   VertexContainerType *GetControlPoints();
 
 
+  /** \brief Returns specified control point in (2D) index coordinates. */
+  Point2D GetControlPoint( unsigned int index ) const;
+
+  /** \brief Returns specified control point in world coordinates. */
+  Point3D GetWorldControlPoint( unsigned int index ) const;
+
+  /** \brief Returns specified control point in 2D world coordinates. */
+  Point2D GetWorldControlPoint2D( unsigned int index ) const;
+
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
   const VertexContainerType *GetPolyLine();
+
+
+  /** \brief Returns the number of features available for this PlanarFigure
+   * (such as, radius, area, ...). */
+  unsigned int GetNumberOfFeatures() const;
+
+
+  /** \brief Returns the name (identifier) of the specified features. */
+  const char *GetFeatureName( unsigned int index ) const;
+
+
+  /** \brief Returns the physical unit of the specified features. */
+  const char *GetFeatureUnit( unsigned int index ) const;
+
+
+  /** Returns quantity of the specified feature (e.g., length, radius,
+   * area, ... ) */
+  double GetQuantity( unsigned int index ) const;
+
+
+  /** \brief Calculates quantities of all features of this planar figure. */
+  virtual void EvaluateFeatures();
 
 
   /** \brief Intherited from parent */
@@ -151,15 +186,28 @@ protected:
   PlanarFigure();
   virtual ~PlanarFigure();
 
+  /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
+   * of a planar figure object and returns integer ID for the feature element.
+   * Should be called in sub-class constructors. */
+  virtual unsigned int AddFeature( const char *featureName, const char *unitName );
+
+  /** Sets quantity of the specified feature. INTERNAL METHOD. */
+  void SetQuantity( unsigned int index, double quantity );
+
   /** \brief Generates the poly-line representation of the planar figure.
-   * Must be implemented by sub-classes. */
+   * Must be implemented in sub-classes. */
   virtual void GeneratePolyLine() = 0;
+
+  /** \brief Calculates quantities of all features of this planar figure.
+   * Must be implemented in sub-classes. */
+  virtual void EvaluateFeaturesInternal() = 0;
 
   /** \brief Initializes the TimeSlicedGeometry describing the (time-resolved)
    * geometry of this figure. Note that each time step holds one Geometry2D. */
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+
 
   VertexContainerType::Pointer m_ControlPoints;
 
@@ -170,7 +218,28 @@ protected:
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
 
+
 private:
+
+  struct Feature
+  {
+    Feature( const char *name, const char *unit ) : Name( name ), Unit( unit)
+    {
+    };
+
+    std::string Name;
+    std::string Unit;
+    double Quantity;
+  };
+
+  Geometry2D *m_Geometry2D;
+
+
+  // Vector of features available for this geometric figure
+  typedef std::vector< Feature > FeatureVectorType;
+  FeatureVectorType m_Features;
+
+  unsigned long m_FeaturesMTime;
 
 };
 

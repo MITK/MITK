@@ -234,6 +234,10 @@ bool mitk::PlanarFigureInteractor
       // Place PlanarFigure at this point
       planarFigure->PlaceFigure( indexPoint2D );
 
+      // Re-evaluate features
+      planarFigure->EvaluateFeatures();
+      this->LogPrintPlanarFigureQuantities( planarFigure );
+
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -255,6 +259,10 @@ bool mitk::PlanarFigureInteractor
 
       // Move current control point to this point
       planarFigure->SetCurrentControlPoint( indexPoint2D );
+
+      // Re-evaluate features
+      planarFigure->EvaluateFeatures();
+      this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -324,6 +332,10 @@ bool mitk::PlanarFigureInteractor
 
       // Add point as new control point
       planarFigure->AddControlPoint( indexPoint2D );
+
+      // Re-evaluate features
+      planarFigure->EvaluateFeatures();
+      this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -486,3 +498,14 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   return -1;
 }
 
+
+void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities( 
+  const PlanarFigure *planarFigure )
+{
+  LOG_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();
+  for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
+  {
+    LOG_INFO << "* " << planarFigure->GetFeatureName( i ) << ": "
+      << planarFigure->GetQuantity( i ) << " " << planarFigure->GetFeatureUnit( i );
+  }
+}

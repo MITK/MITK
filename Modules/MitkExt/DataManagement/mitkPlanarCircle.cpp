@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarCircle::PlanarCircle()
+: FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
 {
   // Circle has two control points
   m_ControlPoints->Reserve( 2 );
@@ -77,6 +79,20 @@ void mitk::PlanarCircle::GeneratePolyLine()
     m_PolyLine->ElementAt( t )[0] = centerPoint[0] + radius * cos( alpha );
     m_PolyLine->ElementAt( t )[1] = centerPoint[1] + radius * sin( alpha );
   }
+}
+
+
+void mitk::PlanarCircle::EvaluateFeaturesInternal()
+{
+  // Calculate circle radius and area
+  Point3D &p0 = this->GetWorldControlPoint( 0 );
+  Point3D &p1 = this->GetWorldControlPoint( 1 );
+
+  double radius = p0.EuclideanDistanceTo( p1 );
+  double area = vnl_math::pi * radius * radius;
+
+  this->SetQuantity( FEATURE_ID_RADIUS, radius );
+  this->SetQuantity( FEATURE_ID_AREA, area );
 }
 
 

@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarPolygon::PlanarPolygon()
-: m_Closed( true )
+: FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
+  m_Closed( true )
 {
   // Polygon has at least two control points
   m_ControlPoints->Reserve( 2 );
@@ -68,6 +70,47 @@ void mitk::PlanarPolygon::GeneratePolyLine()
   {
     m_PolyLine->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
   }
+}
+
+
+void mitk::PlanarPolygon::EvaluateFeaturesInternal()
+{
+  const unsigned long &numberOfControlPoints = m_ControlPoints->Size();
+
+  // Calculate circumference
+  double circumference = 0.0;
+  unsigned int i;
+  for ( i = 0; i < numberOfControlPoints - 1; ++i )
+  {
+    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
+      this->GetWorldControlPoint( i + 1 ) );
+  }
+
+  if ( this->IsClosed() )
+  {
+    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo(
+      this->GetWorldControlPoint( 0 ) );
+  }
+
+  this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
+
+
+  // Calculate polygon area (if closed)
+  double area = 0.0;
+  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
+  {
+    for ( i = 0; i < numberOfControlPoints; ++i )
+    {
+      Point2D p0 = this->GetWorldControlPoint2D( i );
+      Point2D p1 = this->GetWorldControlPoint2D( (i + 1) % numberOfControlPoints );
+
+      area += p0[0] * p1[1] - p1[0] * p0[1];
+    }
+    area /= 2.0;
+  }
+  
+  this->SetQuantity( FEATURE_ID_AREA, area );
+
 }
 
 

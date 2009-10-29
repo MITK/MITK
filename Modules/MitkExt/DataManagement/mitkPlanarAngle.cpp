@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarAngle::PlanarAngle()
+: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "°" ) )
 {
   // Start with two control points
   m_ControlPoints->Reserve( 2 );
@@ -68,6 +69,24 @@ void mitk::PlanarAngle::GeneratePolyLine()
   {
     m_PolyLine->ElementAt( i ) = m_ControlPoints->ElementAt( i );
   }
+}
+
+
+void mitk::PlanarAngle::EvaluateFeaturesInternal()
+{
+  // Calculate angle between lines
+  Point2D &p0 = this->GetControlPoint( 0 );
+  Point2D &p1 = this->GetControlPoint( 1 );
+  Point2D &p2 = this->GetControlPoint( 2 );
+
+  Vector2D v0 = p1 - p0;
+  Vector2D v1 = p1 - p2;
+
+  v0.Normalize();
+  v1.Normalize();
+  double angle = acos( v0 * v1 );
+
+  this->SetQuantity( FEATURE_ID_ANGLE, angle );
 }
 
 

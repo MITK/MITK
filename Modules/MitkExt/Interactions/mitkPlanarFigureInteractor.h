@@ -82,6 +82,8 @@ protected:
     const Geometry2D *rendererGeometry,
     const DisplayGeometry *displayGeometry ) const;
 
+  void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
+
 private:
 
   /** \brief to store the value of precision to pick a point */

@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarLine::PlanarLine()
+: FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
 {
   // Line has two control points
   m_ControlPoints->Reserve( 2 );
@@ -66,6 +67,17 @@ void mitk::PlanarLine::GeneratePolyLine()
   m_PolyLine->Reserve( 2 );
   m_PolyLine->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
   m_PolyLine->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
+}
+
+  
+void mitk::PlanarLine::EvaluateFeaturesInternal()
+{
+  // Calculate line length
+  Point3D &p0 = this->GetWorldControlPoint( 0 );
+  Point3D &p1 = this->GetWorldControlPoint( 1 );
+  double length = p0.EuclideanDistanceTo( p1 );
+
+  this->SetQuantity( FEATURE_ID_LENGTH, length );
 }
 
 

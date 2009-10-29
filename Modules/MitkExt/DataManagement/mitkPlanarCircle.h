@@ -71,8 +71,15 @@ protected:
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();
 
+  /** \brief Calculates feature quantities of the planar figure. */
+  virtual void EvaluateFeaturesInternal();
+
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
+
+  // Feature identifiers
+  const unsigned int FEATURE_ID_RADIUS;
+  const unsigned int FEATURE_ID_AREA;
 
 private:
 

@@ -59,13 +59,16 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
  
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = workingSlice->GetGeometry();
-  itk::Index<2> projectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
-  if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
+  Point3D mprojectedPointIn2D;
+  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D );
+  if ( !sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
     LOG_ERROR << "point apparently not inside segmentation slice" << std::endl;
     return false; // can't use that as a seed point
   }
+  itk::Index<2> projectedPointIn2D;
+  projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+  projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
     // Convert to ipMITKSegmentationTYPE (because ipMITKSegmentationGetContour8N relys on that data type)
     itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
@@ -188,7 +191,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
     }
 
     m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
@@ -206,14 +209,14 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     Contour::Pointer contourInImageIndexCoordinates = Contour::New();
     contourInImageIndexCoordinates->Initialize();
     Point3D newPoint;
-    newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
-    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = 0; newPoint[2] = 0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
-    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
-    newPoint[0] = 0; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0;
-    contourInImageIndexCoordinates->AddVertex( newPoint );
+    newPoint[0] = 0; newPoint[1] = 0; newPoint[2] = 0.5;
+    contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
+    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = 0; newPoint[2] = 0.5;
+    contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
+    newPoint[0] = originalPicSlice->n[0]; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0.5;
+    contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
+    newPoint[0] = 0; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0.5;
+    contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
 
     m_WholeImageContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 

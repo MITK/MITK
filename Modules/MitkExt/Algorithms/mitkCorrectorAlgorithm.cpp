@@ -155,8 +155,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
-    _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 1.0 );
-    _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 1.0 );
+    _points[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] - 0.5);
+    _points[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] - 0.5);
   }
  
   // store ofsets of the drawn line in array

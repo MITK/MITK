@@ -109,8 +109,11 @@ bool mitk::RegionGrowingTool::OnMousePressed (Action* action, const StateEvent* 
 
         // 2. Determine if the user clicked inside or outside of the segmentation
           const Geometry3D* workingSliceGeometry = m_WorkingSlice->GetGeometry();
+          Point3D mprojectedPointIn2D;
+          workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D);
           itk::Index<2> projectedPointInWorkingSlice2D;
-          workingSliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointInWorkingSlice2D);
+          projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+          projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
           if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
           {
@@ -205,9 +208,9 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       {
         newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ];
         newPoint[1] = cutContour.deleteCurve[ 2 * index + 1];
-        newPoint[2] = 0;
+        newPoint[2] = 0.0;
 
-          contourInImageIndexCoordinates->AddVertex( newPoint );
+        contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
       }
 
       free(cutContour.traceline);
@@ -250,12 +253,15 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
 
   // if click was outside the image, don't continue
   const Geometry3D* sliceGeometry = m_ReferenceSlice->GetGeometry();
+  Point3D mprojectedPointIn2D;
+  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D );
   itk::Index<2> projectedPointIn2D;
-  sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), projectedPointIn2D );
+  projectedPointIn2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+  projectedPointIn2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
 
-  if ( sliceGeometry->IsIndexInside( projectedPointIn2D ) )
+  if ( sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
-    LOG_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << projectedPointIn2D << ") IS in reference slice" << std::endl;
+    LOG_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
     m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
@@ -524,7 +530,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
       newPoint[1] = contourPoints[ 2 * index + 1];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
     }
 
     free(contourPoints);

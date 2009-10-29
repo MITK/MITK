@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+//#include "mitkProperties.h"
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
@@ -108,10 +109,10 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
+  if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
     // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-    Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
+    Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
     if ( slice.IsNull() )
     {
@@ -119,9 +120,30 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
       return false;
     }
 
+    /*
+    DataTreeNode::Pointer debugNode = DataTreeNode::New();
+    debugNode->SetData( slice );
+    debugNode->SetProperty( "name", StringProperty::New("extracted slice") );
+    debugNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
+    debugNode->SetProperty( "layer", FloatProperty::New(100) );
+    m_ToolManager->GetDataStorage()->Add( debugNode );
+    */
+
     Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
     Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
                                                                                                                    // false: don't constrain the contour to the image's inside
+    /*
+    Contour::Pointer back = FeedbackContourTool::BackProjectContourFrom2DSlice( slice, projectedContour, true ); // true: actually no idea why this is neccessary, but it works :-(
+    for (unsigned int idx = 0; idx < back->GetNumberOfPoints(); ++idx)
+    {
+      Point3D before = feedbackContour->GetPoints()->ElementAt(idx);
+      Point3D inbtw = projectedContour->GetPoints()->ElementAt(idx);
+      Point3D after = back->GetPoints()->ElementAt(idx);
+
+      LOG_DEBUG << "before " << before << " zwischen " << inbtw << " after " << after;
+    }
+  */
+
     if (projectedContour.IsNull()) return false;
 
     FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );

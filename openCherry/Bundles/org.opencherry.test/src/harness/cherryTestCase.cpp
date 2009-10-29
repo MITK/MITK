@@ -18,6 +18,7 @@
 #include "cherryTestCase.h"
 
 #include <cherryConfig.h>
+#include <cherryLog.h>
 
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
 #include <cherryDebugUtil.h>
@@ -37,6 +38,7 @@ void cherry::TestCase::LeakDetailsOn()
 
 void cherry::TestCase::IgnoreLeakingObjects()
 {
+  CHERRY_WARN << "Ignoring Leaking Objects!!";
   m_IgnoreLeakage = true;
 }
 

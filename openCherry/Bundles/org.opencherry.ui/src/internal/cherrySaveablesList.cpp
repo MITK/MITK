@@ -33,7 +33,7 @@ bool SaveablesList::AddModel(Object::Pointer source, Saveable::Pointer model)
     return false;
   }
   bool result = false;
-  Saveable::Set& modelsForSource = modelMap[source];
+  Saveable::Set& modelsForSource = modelMap[source.GetPointer()];
 
   if (modelsForSource.find(model) == modelsForSource.end())
   {
@@ -82,7 +82,7 @@ bool SaveablesList::DecrementRefCount(
 bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
 {
   bool result = false;
-  std::map<Object::Pointer, Saveable::Set>::iterator it = modelMap.find(source);
+  std::map<Object*, Saveable::Set>::iterator it = modelMap.find(source.GetPointer());
   if (it == modelMap.end())
   {
     this->LogWarning(
@@ -97,7 +97,7 @@ bool SaveablesList::RemoveModel(Object::Pointer source, Saveable::Pointer model)
       result = this->DecrementRefCount(modelRefCounts, model);
       if (modelsForSource.empty())
       {
-        modelMap.erase(source);
+        modelMap.erase(source.GetPointer());
       }
     }
     else
@@ -258,7 +258,7 @@ std::vector<Saveable::Pointer> SaveablesList::GetSaveables(
 Saveable::Set SaveablesList::GetOpenModels()
 {
   Saveable::Set allDistinctModels;
-  for (std::map<Object::Pointer, Saveable::Set>::iterator it = modelMap.begin();
+  for (std::map<Object*, Saveable::Set>::iterator it = modelMap.begin();
        it != modelMap.end(); ++it)
     allDistinctModels.insert(it->second.begin(), it->second.end());
 
@@ -559,7 +559,7 @@ void SaveablesList::PostClose(PostCloseInfo::Pointer postCloseInfo)
       it != postCloseInfo->partsClosing.end(); ++it)
   {
     IWorkbenchPart::Pointer part = *it;
-    std::map<Object::Pointer, Saveable::Set>::iterator it2 = modelMap.find(part);
+    std::map<Object*, Saveable::Set>::iterator it2 = modelMap.find(part.GetPointer());
     if (it2 != modelMap.end()) {
       // make a copy to avoid a ConcurrentModificationException - we
       // will remove from the original set as we iterate
@@ -622,14 +622,14 @@ std::vector<IWorkbenchPart::Pointer> SaveablesList::GetPartsForSaveable(
     Saveable::Pointer model)
 {
   std::vector<IWorkbenchPart::Pointer> result;
-  for (std::map<Object::Pointer, Saveable::Set>::iterator it = modelMap.begin(); it
+  for (std::map<Object*, Saveable::Set>::iterator it = modelMap.begin(); it
       != modelMap.end(); ++it)
   {
     Saveable::Set& values = it->second;
-    if (values.find(model) != values.end() && it->first.Cast<IWorkbenchPart> ()
-        != 0)
+    IWorkbenchPart::Pointer part(dynamic_cast<IWorkbenchPart*>(it->first));
+    if (values.find(model) != values.end() && part)
     {
-      result.push_back(it->first.Cast<IWorkbenchPart> ());
+      result.push_back(part);
     }
   }
   return result;

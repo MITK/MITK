@@ -33,15 +33,16 @@ DefaultSaveable::DefaultSaveable(IWorkbenchPart::Pointer _part) :
 
 void DefaultSaveable::DoSave(/*IProgressMonitor monitor*/)
 {
-  if (part.Cast<ISaveablePart> () != 0)
+  IWorkbenchPart::Pointer _part(part);
+  if (_part.Cast<ISaveablePart> () != 0)
   {
-    part.Cast<ISaveablePart> ()->DoSave(/*monitor*/);
+    _part.Cast<ISaveablePart> ()->DoSave(/*monitor*/);
   }
 }
 
 std::string DefaultSaveable::GetName() const
 {
-  return part->GetPartName();
+  return part.Lock()->GetPartName();
 }
 
 ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
@@ -58,14 +59,15 @@ ImageDescriptor::Pointer DefaultSaveable::GetImageDescriptor() const
 
 std::string DefaultSaveable::GetToolTipText() const
 {
-  return part->GetTitleToolTip();
+  return part.Lock()->GetTitleToolTip();
 }
 
 bool DefaultSaveable::IsDirty() const
 {
-  if (part.Cast<ISaveablePart> () != 0)
+  IWorkbenchPart::Pointer _part(part);
+  if (_part.Cast<ISaveablePart> () != 0)
   {
-    return part.Cast<ISaveablePart> ()->IsDirty();
+    return _part.Cast<ISaveablePart> ()->IsDirty();
   }
   return false;
 }
@@ -78,9 +80,9 @@ bool DefaultSaveable::operator<(const Saveable* obj) const
     return true;
 
   const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*> (obj);
-  if (part == 0)
+  if (part.Expired())
   {
-    return other->part != 0;
+    return !other->part.Expired();
   }
   else
     return part < other->part;
@@ -88,15 +90,16 @@ bool DefaultSaveable::operator<(const Saveable* obj) const
 
 bool DefaultSaveable::Show(IWorkbenchPage::Pointer page)
 {
-  IWorkbenchPartReference::Pointer reference = page->GetReference(part);
+  IWorkbenchPart::Pointer _part(part);
+  IWorkbenchPartReference::Pointer reference = page->GetReference(_part);
   if (reference != 0)
   {
-    page->Activate(part);
+    page->Activate(_part);
     return true;
   }
-  if (part.Cast<IViewPart> () != 0)
+  if (_part.Cast<IViewPart> () != 0)
   {
-    IViewPart::Pointer viewPart = part.Cast<IViewPart> ();
+    IViewPart::Pointer viewPart = _part.Cast<IViewPart> ();
     try
     {
       page->ShowView(viewPart->GetViewSite()->GetId(),

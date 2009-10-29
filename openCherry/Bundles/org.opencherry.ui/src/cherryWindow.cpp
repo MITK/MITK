@@ -40,7 +40,6 @@ Window::WindowShellListener::WindowShellListener(Window* wnd)
 
 void Window::WindowShellListener::ShellClosed(ShellEvent::Pointer event)
 {
-  std::cout << "window shell listener: ShellClosed" << std::endl;
   event->doit = false; // don't close now
   if (window->CanHandleShellCloseEvent())
   {

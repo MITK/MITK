@@ -319,7 +319,7 @@ TabbedStackPresentation::~TabbedStackPresentation()
 //  // Dispose the tab folder's widgetry
 //  folder.getTabFolder().getControl().dispose();
 
-  CHERRY_INFO << "DELETING TabbedStackPresentation\n";
+  CHERRY_DEBUG << "DELETING TabbedStackPresentation\n";
 
   delete tabs;
   delete dragBehavior;

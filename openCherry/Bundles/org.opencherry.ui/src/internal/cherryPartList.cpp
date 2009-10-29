@@ -16,8 +16,6 @@ void PartList::PropertyChange(Object::Pointer source, int propId)
   WorkbenchPartReference::Pointer ref = source.Cast<
       WorkbenchPartReference> ();
 
-  poco_assert(ref != 0);
-
   if (propId == IWorkbenchPartConstants::PROP_OPENED)
   {
     this->PartOpened(ref);

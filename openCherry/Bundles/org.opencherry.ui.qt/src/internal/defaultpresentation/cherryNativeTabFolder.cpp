@@ -24,6 +24,9 @@
 #include <cherryShell.h>
 #include <cherryConstants.h>
 #include <cherryPlatform.h>
+#include <cherryPlatformUI.h>
+
+#include <cherryLog.h>
 
 #include <QFrame>
 #include <QVBoxLayout>
@@ -126,6 +129,15 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   //        viewForm.setTopLeft(title);
 
   skinManager = Platform::GetServiceRegistry().GetServiceById<IQtStyleManager>(IQtStyleManager::ID);
+}
+
+NativeTabFolder::~NativeTabFolder()
+{
+  if (!PlatformUI::GetWorkbench()->IsClosing())
+  {
+    CHERRY_DEBUG << "Deleting viewForm";
+    viewForm->deleteLater();
+  }
 }
 
 bool NativeTabFolder::eventFilter(QObject* watched, QEvent* event)

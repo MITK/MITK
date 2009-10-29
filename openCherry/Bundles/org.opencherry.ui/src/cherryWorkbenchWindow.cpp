@@ -388,8 +388,6 @@ bool WorkbenchWindow::Close()
 
 bool WorkbenchWindow::BusyClose()
 {
-  std::cout << "WorkbenchWindow::BusyClose()" << std::endl;
-
   // Whether the window was actually closed or not
   bool windowClosed = false;
 

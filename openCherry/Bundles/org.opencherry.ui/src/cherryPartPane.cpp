@@ -81,10 +81,13 @@ PartPane::~PartPane()
 {
 //  super.dispose();
 //
+  this->Register();
+
   if (control != 0)
   {
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, GuiTk::IControlListener::Pointer(this));
 //    control.removeTraverseListener(traverseListener);
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(control);
     control = 0;
   }
 //  if ((paneMenuManager != null))
@@ -95,6 +98,8 @@ PartPane::~PartPane()
 //
   partReference->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
 //  partReference.removePartPropertyListener(this);
+
+  this->UnRegister(false);
 }
 
 void PartPane::DoHide()

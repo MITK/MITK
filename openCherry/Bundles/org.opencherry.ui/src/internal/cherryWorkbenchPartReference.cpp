@@ -569,6 +569,8 @@ void WorkbenchPartReference::Dispose()
     //JFaceResources.getResources().destroy(oldDescriptor);
     oldDescriptor->DestroyImage(oldImage);
   }
+
+  pane = 0;
 }
 
 void WorkbenchPartReference::DoDisposePart()

@@ -262,6 +262,12 @@ void ObjectBrowserView::SaveState(IMemento::Pointer memento)
   IMemento::Pointer splitter = memento->CreateChild("splitter");
   splitter->PutInteger("first", sizes[0]);
   splitter->PutInteger("second", sizes[1]);
+
+  // delete the tree view here in order to delete the underlying model
+  // which in turn unregisters the object listener. Otherwise, we get
+  // notifications of deleted objects during workbench shutdown which
+  // leads to segmentation faults
+  m_Controls.m_TreeView->deleteLater();
 }
 
 } //namespace cherry

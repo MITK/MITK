@@ -55,8 +55,7 @@ QtShell::~QtShell()
 
 void QtShell::SetBounds(const Rectangle& bounds)
 {
-  widget->resize(bounds.width, bounds.height);
-  widget->move(bounds.x, bounds.y);
+  widget->setGeometry(bounds.x, bounds.y, bounds.width, bounds.height);
 }
 
 Rectangle QtShell::GetBounds() const

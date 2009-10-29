@@ -181,7 +181,13 @@ void DebugUtil::StopTracing(const std::string& /*className*/)
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
 bool DebugUtil::IsTraced(const Object* object)
 {
-  return m_TracedObjects.find(object->GetTraceId()) != m_TracedObjects.end();
+  if (m_TracedObjects.find(object->GetTraceId()) != m_TracedObjects.end())
+    return true;
+
+  if (m_TracedClasses.find(object->GetClassName()) != m_TracedClasses.end())
+      return true;
+
+  return false;
 }
 #else
 bool DebugUtil::IsTraced(const Object*  /*object*/)
@@ -193,7 +199,17 @@ bool DebugUtil::IsTraced(const Object*  /*object*/)
 #ifdef OPENCHERRY_DEBUG_SMARTPOINTER
 bool DebugUtil::IsTraced(unsigned int traceId)
 {
-  return m_TracedObjects.find(traceId) != m_TracedObjects.end();
+  if (m_TracedObjects.find(traceId) != m_TracedObjects.end())
+    return true;
+
+  TraceIdToObjectType::Iterator it = m_TraceIdToObjectMap.find(traceId);
+  if (it != m_TraceIdToObjectMap.end())
+  {
+    if (m_TracedClasses.find(it->second->GetClassName()) != m_TracedClasses.end())
+      return true;
+  }
+
+  return false;
 }
 #else
 bool DebugUtil::IsTraced(unsigned int /*traceId*/)
@@ -255,11 +271,18 @@ void DebugUtil::GetRegisteredObjects(std::vector<const Object*>& list)
 void DebugUtil::PrintSmartPointerIDs(const Object* objectPointer, std::ostream& stream, const std::list<unsigned int>& excludeList)
 {
   stream << "SmartPointer IDs [ ";
-  std::list<unsigned int> ids = GetSmartPointerIDs(objectPointer, excludeList);
-  for (std::list<unsigned int>::const_iterator iter = ids.begin();
-      iter != ids.end(); ++iter)
+  if (IsTraced(objectPointer))
   {
-    stream << *iter << " ";
+    std::list<unsigned int> ids = GetSmartPointerIDs(objectPointer, excludeList);
+    for (std::list<unsigned int>::const_iterator iter = ids.begin();
+        iter != ids.end(); ++iter)
+    {
+      stream << *iter << " ";
+    }
+  }
+  else
+  {
+    stream << "n/a ";
   }
   stream << "]\n";
 }
@@ -320,6 +343,7 @@ bool DebugUtil::PrintObjectSummary(const std::string& className, bool details)
     if (details)
     {
       std::cout << *(iter->second);
+      PrintSmartPointerIDs(iter->second, std::cout);
     }
   }
   std::cout << " (" << count << " instances)" << std::endl;

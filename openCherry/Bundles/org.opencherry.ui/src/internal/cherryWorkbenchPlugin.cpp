@@ -258,7 +258,6 @@ void WorkbenchPlugin::Start(IBundleContext::Pointer context)
 {
   //context.addBundleListener(getBundleListener());
   AbstractUIPlugin::Start(context);
-  CHERRY_INFO << "\nStarting WorkbenchPlugin...\n\n";
   bundleContext = context;
 
 

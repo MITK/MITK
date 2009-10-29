@@ -141,6 +141,12 @@ public:
     return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
   }
 
+  /** Comparison of pointers. Less than comparison.  */
+  bool operator <(const WeakPointer &r) const
+  {
+    return (void*) m_Pointer < (void*) r.m_Pointer;
+  }
+
   /** lock method is used to access the referring object  */
   SmartPointer<ObjectType> Lock() const
   {

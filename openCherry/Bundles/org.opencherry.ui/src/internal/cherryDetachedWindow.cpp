@@ -97,9 +97,6 @@ void DetachedWindow::Create()
   windowShell
       = page->GetWorkbenchWindow().Cast<WorkbenchWindow> () ->GetDetachedWindowPool()->AllocateShell(
           shellListener);
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-  CHERRY_INFO << "Creating detached shell: " << windowShell->GetTraceId() << std::endl;
-#endif
   windowShell->SetData(Object::Pointer(this));
   windowShell->SetText(""); //$NON-NLS-1$
 
@@ -279,12 +276,15 @@ int DetachedWindow::Open()
   }
 
   Rectangle bounds = this->GetShell()->GetBounds();
-  this->GetShell()->SetVisible(true);
 
   if (!(bounds == this->GetShell()->GetBounds()))
   {
     this->GetShell()->SetBounds(bounds);
   }
+
+  this->GetShell()->SetVisible(true);
+
+  folder->SetBounds(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetClientArea(this->GetShell()->GetControl()));
 
   return 0;
 }

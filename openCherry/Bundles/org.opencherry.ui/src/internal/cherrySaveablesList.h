@@ -54,7 +54,7 @@ private:
   ISaveablesLifecycleListener::Events events;
 
   // event source (mostly ISaveablesSource) -> Set of Saveable
-  std::map<Object::Pointer, Saveable::Set> modelMap;
+  std::map<Object*, Saveable::Set> modelMap;
 
   // reference counting map, Saveable -> Integer
   std::map<Saveable::Pointer, int> modelRefCounts;

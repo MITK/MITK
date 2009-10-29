@@ -222,6 +222,14 @@ void DebugBreakpointManager::RestoreState(const Poco::Path& path)
   {
     CHERRY_WARN << e.displayText();
   }
+  catch (Poco::FileNotFoundException& e)
+  {
+
+  }
+  catch (Poco::FileException& e)
+  {
+    CHERRY_WARN << e.displayText();
+  }
 }
 #else
 void DebugBreakpointManager::RestoreState(const Poco::Path& /*path*/)

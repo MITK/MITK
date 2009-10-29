@@ -176,7 +176,7 @@ PresentablePartFolder::~PresentablePartFolder()
     (*iter)->RemovePropertyListener(childPropertyChangeListener);
   }
 
-  CHERRY_INFO << "DELETING PresentablePartFolder and contentProxy\n";
+  CHERRY_DEBUG << "DELETING PresentablePartFolder and contentProxy\n";
 
   delete folder;
 }

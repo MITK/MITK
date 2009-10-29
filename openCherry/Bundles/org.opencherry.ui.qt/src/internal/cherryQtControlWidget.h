@@ -27,7 +27,6 @@ namespace cherry {
 
 class QtControlWidget : public QFrame
 {
-  Q_OBJECT
 
 public:
 
@@ -47,9 +46,6 @@ protected:
   void moveEvent(QMoveEvent* event);
   void resizeEvent(QResizeEvent* event);
 
-protected slots:
-
-  void ObjectDestroyed(QObject*);
 
 private:
 

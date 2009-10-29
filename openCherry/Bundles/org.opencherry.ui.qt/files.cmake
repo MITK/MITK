@@ -64,7 +64,6 @@ SET(MOC_H_FILES
   src/internal/defaultpresentation/cherryNativeTabItem.h
   src/internal/defaultpresentation/cherryQCTabBar.h
   
-  src/internal/cherryQtControlWidget.h
   src/internal/cherryQtDisplay.h
   src/internal/cherryQtGlobalEventFilter.h
   src/internal/cherryQtMainWindowControl.h

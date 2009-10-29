@@ -33,7 +33,7 @@ class DefaultSaveable : public Saveable {
 
 private:
 
-  SmartPointer<IWorkbenchPart> part;
+  WeakPointer<IWorkbenchPart> part;
 
 
 public:

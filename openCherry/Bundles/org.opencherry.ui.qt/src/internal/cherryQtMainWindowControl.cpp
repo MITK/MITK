@@ -113,8 +113,6 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 
   ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
 
-  std::cout << "Main window close event" << std::endl;
-
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();
        listener != closedListeners.end(); ++listener)

@@ -96,7 +96,6 @@ QtSelectionProvider
 
 void QtSelectionProvider::SetItemSelectionModel(QItemSelectionModel* selModel)
 {
-  CHERRY_INFO << "Setting item selection model for provider: " << selModel << std::endl;
   if (qSelectionModel)
   {
     qSelectionModel->disconnect(this);

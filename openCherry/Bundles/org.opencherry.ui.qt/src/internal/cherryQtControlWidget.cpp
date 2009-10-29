@@ -43,7 +43,8 @@ QtControlWidget::QtControlWidget(QWidget* parent, Shell::Pointer shell, Qt::Wind
 
 QtControlWidget::~QtControlWidget()
 {
-  CHERRY_INFO << "DELETING control widget: " << qPrintable(this->objectName()) << std::endl;
+  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this)));
+  controller->controlEvents.destroyedEvent(controlEvent);
 }
 
 void QtControlWidget::changeEvent(QEvent* event)
@@ -157,10 +158,5 @@ void QtControlWidget::FireActivateEvent()
   controller->controlEvents.activatedEvent(controlEvent);
 }
 
-void QtControlWidget::ObjectDestroyed(QObject*)
-{
-  GuiTk::ControlEvent::Pointer controlEvent(new GuiTk::ControlEvent(static_cast<QWidget*>(this)));
-  controller->controlEvents.destroyedEvent(controlEvent);
-}
 
 }

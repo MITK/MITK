@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>235</width>
-    <height>518</height>
+    <width>289</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
         </font>
        </property>
        <property name="text">
-        <string>234234</string>
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -145,6 +145,9 @@
         <font>
          <pointsize>7</pointsize>
         </font>
+       </property>
+       <property name="text">
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -329,6 +332,9 @@
         <font>
          <pointsize>7</pointsize>
         </font>
+       </property>
+       <property name="text">
+        <string/>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

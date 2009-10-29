@@ -12,6 +12,16 @@ extern bool SceneSerialization_EXPORT SerializeTransferFunction( const char * , 
 extern TransferFunction::Pointer  SceneSerialization_EXPORT DeserializeTransferFunction( const char * );
  };
  
+
+static char* presetNames[] = {  "choose an internal transferfunction preset",
+                              "CT Generic",
+                              "CT Black & White",
+                              "CT Cardiac",
+                              "CT Bone",
+                              "CT Bone (with Gradient)" };
+
+static int numPresetNames = sizeof( presetNames ) / sizeof( char * );
+
 QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidget* parent,
     Qt::WindowFlags f) :
   QWidget(parent, f)
@@ -33,13 +43,9 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
    
   // Presets Tab
   {
-    m_TransferFunctionComboBox->insertItem( "choose an internal transferfunction preset");
+    for(int r=0; r< numPresetNames; r++)
+        m_TransferFunctionComboBox->insertItem( presetNames[r]);
     
-    m_TransferFunctionComboBox->insertItem( "CT Generic");
-    m_TransferFunctionComboBox->insertItem( "CT Black & White");
-    m_TransferFunctionComboBox->insertItem( "CT Cardiac");
-    m_TransferFunctionComboBox->insertItem( "CT Bone");
-    m_TransferFunctionComboBox->insertItem( "CT Bone (with Gradient)");
     
     connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT( OnMitkInternalPreset( int ) ) );
 
@@ -48,7 +54,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
     connect( m_LoadPreset, SIGNAL( clicked() ), this, SLOT( OnLoadPreset() ) );
   }
   
-  
+  presetFileName = ".";
 }
 
 
@@ -61,14 +67,17 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
 
   std::string fileName;
 
-  QString fileNames = QFileDialog::getSaveFileName( this,"Choose a filename to save the transferfunction",".", "Transferfunction (*.xml)" );
+  presetFileName = QFileDialog::getSaveFileName( this,"Choose a filename to save the transferfunction",presetFileName, "Transferfunction (*.xml)" );
   
 
-  fileName=fileNames.ascii();
+  fileName=presetFileName.ascii();
  
   LOG_INFO << "Saving Transferfunction under path: " << fileName;
 
-  mitk::SerializeTransferFunction( fileName.c_str(),  tf );
+  if ( mitk::SerializeTransferFunction( fileName.c_str(),  tf ))
+    m_InfoPreset->setText( QString( (std::string("saved ")+ fileName).c_str() ) );
+  else
+    m_InfoPreset->setText( QString( std::string("saving failed").c_str() ) );
                                            /*
   FILE *f=fopen("c:\\temp.txt","w");
   
@@ -127,10 +136,9 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   std::string fileName;
 
-  QString fileNames = QFileDialog::getOpenFileName( this,"Choose a file to open the transferfunction from",".", "Transferfunction (*.xml)"  );
-  
+  presetFileName = QFileDialog::getOpenFileName( this,"Choose a file to open the transferfunction from",presetFileName, "Transferfunction (*.xml)"  );
 
-  fileName=fileNames.ascii();
+  fileName=presetFileName.ascii();
 
   LOG_INFO << "Loading Transferfunction from path: " << fileName;
 
@@ -143,6 +151,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
     tfpToChange->SetValue( tf );
     
+    m_InfoPreset->setText( QString( (std::string("loaded ")+ fileName).c_str() ) );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
 
@@ -175,9 +184,34 @@ void QmitkTransferFunctionGeneratorWidget::OnMitkInternalPreset( int mode )
   tfpToChange->GetValue()->SetTransferFunctionMode( mode );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalUpdateCanvas();
+  m_InfoPreset->setText( QString( (std::string("selected ")+ std::string(presetNames[mode+1])).c_str() ) );
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)
+
+static double transformationGlocke ( double x )
+{
+  double z = 0.1;
+  
+  double a = 2 - 2 * z;
+  
+  double b = 2 * z - 1;
+  
+  x = a * x + b;
+  
+  return x;
+}
+
+static double stepFunctionGlocke ( double x )
+{
+  x = 1-(2*x -1.0); // map [0.5;1] to [0,1]
+  x = x * ( 3*x - 2*x*x ); // apply smoothing function
+  
+  x = x * x;
+  
+  return x;
+}
+
+void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)      // GLOCKE
 {
   //std::string infoText;
   
@@ -193,29 +227,36 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)
   if(thDelta < 1)
     thDelta = 1;
     
-  if(thDelta > 256)
-    thDelta = 256;
+  if(thDelta > 1024)
+    thDelta = 1024;
     
   if(thPos < histoMinimum)
     thPos = histoMinimum;
     
   if(thPos > histoMaximum)
     thPos = histoMaximum;
-                                                      /*
-  LOG_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
 
-  LOG_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
-                                                        */
+  std::stringstream ss;
+  
+  ss << "center at " << thPos << "\n"
+     << "width " << thDelta * 2;
+     
+  m_InfoLevelWindow->setText( QString( ss.str().c_str() ) );
+
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
   
   // grayvalue->opacity
   {   
     vtkPiecewiseFunction *f=tf->GetScalarOpacityFunction();
     f->RemoveAllPoints();
-    f->AddPoint(thPos-thDelta,0);
-    f->AddPoint(thPos-thDelta+1,1);
-    f->AddPoint(thPos+thDelta-1,1);
-    f->AddPoint(thPos+thDelta,0);
+    
+    for( int r = 0; r<= 6; r++)
+    {
+      double relPos = (r / 6.0) * 0.5 + 0.5;
+      f->AddPoint(thPos+thDelta*(-transformationGlocke(relPos)),stepFunctionGlocke(relPos));
+      f->AddPoint(thPos+thDelta*( transformationGlocke(relPos)),stepFunctionGlocke(relPos));
+    }
+
     f->Modified();
   }  
 
@@ -223,6 +264,8 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)
   {  
     vtkPiecewiseFunction *f=tf->GetGradientOpacityFunction();
     f->RemoveAllPoints();
+    
+    
     f->AddPoint( 0, 1.0 );
     f->Modified();
   }
@@ -241,12 +284,18 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)
   emit SignalUpdateCanvas();
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)
+static double stepFunctionThreshold ( double x )
 {
-  //std::string infoText;
-  
-  
-//  m_InfoThreshold->setText( QString( x.c_str() ) );
+  x = 0.5*x + 0.5; // map [-1;1] to [0,1]
+  x = x * ( 3*x - 2*x*x ); // apply smoothing function
+
+  x = x * x;
+
+  return x;
+}
+
+void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   // LEVELWINDOW
+{
 
   if(tfpToChange.IsNull())
     return;
@@ -257,8 +306,8 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)
   if(thDelta < 1)
     thDelta = 1;
     
-  if(thDelta > 256)
-    thDelta = 256;
+  if(thDelta > 1024)
+    thDelta = 1024;
     
   if(thPos < histoMinimum)
     thPos = histoMinimum;
@@ -270,16 +319,28 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)
 
   LOG_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
             */
+ 
+
+  std::stringstream ss;
+  
+  ss << "threshold at " << thPos << "\n"
+     << "width " << thDelta * 2;
+     
+  m_InfoThreshold->setText( QString( ss.str().c_str() ) );
+
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
   
   // grayvalue->opacity
   {   
     vtkPiecewiseFunction *f=tf->GetScalarOpacityFunction();
     f->RemoveAllPoints();
-    f->AddPoint(thPos-    thDelta,0);
-    //f->AddPoint(thPos-0.5*thDelta,0);
-    //f->AddPoint(thPos+0.5*thDelta,1);
-    f->AddPoint(thPos+    thDelta,1);
+    
+    for( int r = 1; r<= 4; r++)
+    {
+      double relPos = r / 4.0;
+      f->AddPoint(thPos+thDelta*(-relPos),stepFunctionThreshold(-relPos));
+      f->AddPoint(thPos+thDelta*( relPos),stepFunctionThreshold( relPos));
+    }
     f->Modified();
   }  
 

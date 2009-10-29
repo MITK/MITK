@@ -48,5 +48,8 @@ class QMITKEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
     int thDelta;
     
     const mitk::Image::HistogramType *histoGramm;
+    
+    QString presetFileName;
+    
 };
 #endif

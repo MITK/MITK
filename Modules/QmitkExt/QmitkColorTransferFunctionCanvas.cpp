@@ -63,6 +63,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
     }
   }
  
+ //paint title
   if (m_Title.size()>0)
   {
     painter.setPen(Qt::black);
@@ -70,6 +71,33 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
     painter.setPen(Qt::white);
     painter.drawText(QPoint(10,20),QString( m_Title.c_str() ));
   }
+  
+  //paint min and max
+  QString qs_min = QString::number( m_Min );
+  QString qs_max = QString::number( m_Max );
+  
+  QRect qr_min = painter.fontMetrics().boundingRect( qs_min );
+  QRect qr_max = painter.fontMetrics().boundingRect( qs_max );
+  
+  int y,x;
+    
+  y=this->contentsRect().height()-qr_min.height()+5; 
+  x=10; 
+  
+  painter.setPen(Qt::black);
+  painter.drawText(QPoint(x+1,y+1),qs_min);
+  painter.setPen(Qt::white);
+  painter.drawText(QPoint(x  ,y  ),qs_min);
+
+  y=this->contentsRect().height()-qr_max.height()+5; 
+  x=this->contentsRect().width()-qr_max.width()-6; 
+
+  painter.setPen(Qt::black);
+  painter.drawText(QPoint(x,y+1),qs_max);
+  painter.setPen(Qt::white);
+  painter.drawText(QPoint(x,y  ),qs_max);
+  
+  
   
   if (m_ColorTransferFunction)
   {

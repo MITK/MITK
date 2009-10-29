@@ -74,7 +74,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
     
     int y,x;
       
-    y=this->contentsRect().height()-qr_min.height(); 
+    y=this->contentsRect().height()-qr_min.height()+5; 
     x=10; 
     
     painter.setPen(Qt::black);
@@ -82,7 +82,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
     painter.setPen(Qt::white);
     painter.drawText(QPoint(x  ,y  ),qs_min);
 
-    y=this->contentsRect().height()-qr_max.height(); 
+    y=this->contentsRect().height()-qr_max.height()+5; 
     x=this->contentsRect().width()-qr_max.width()-6; 
   
     painter.setPen(Qt::black);

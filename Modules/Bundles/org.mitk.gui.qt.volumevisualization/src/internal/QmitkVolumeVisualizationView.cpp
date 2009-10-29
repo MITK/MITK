@@ -56,7 +56,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 {
   if (!m_Controls)
   {
-    // create GUI widgets
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
     m_Controls->setupUi(parent);
 
@@ -69,7 +68,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
-
   }
   
   m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
@@ -82,9 +80,6 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 {
-
-  LOG_INFO <<"Selection Changed";
-  
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 
@@ -105,7 +100,6 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
     if(selectedNodes.size() > 0)
       node=selectedNodes.back();
-
 
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
@@ -149,10 +143,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
       m_Controls->m_TransferFunctionWidget->setEnabled(false);
       m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
-      
     }
-
-
   }
 
 }

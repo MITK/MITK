@@ -105,7 +105,7 @@ class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
  \
   protected: \
  \
-    CLASS_NAME ## Tool():BASE_CLASS ##() \
+    CLASS_NAME ## Tool() \
     { \
       m_SegmentationGenerator = CLASS_NAME::New(); \
     } \

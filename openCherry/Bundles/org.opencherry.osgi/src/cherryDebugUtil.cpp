@@ -302,7 +302,6 @@ void DebugUtil::ResetObjectSummary()
   m_TraceIdToObjectMap.clear();
   m_TraceIdToSmartPointerMap.clear();
   m_TracedObjects.clear();
-  m_TracedClasses.clear();
 }
 
 bool DebugUtil::PrintObjectSummary(bool details)
@@ -531,8 +530,6 @@ void DebugUtil::RestoreState()
         DebugUtil::TraceClass(traceClass);
       }
       elementList->release();
-
-      debugutil->release();
     }
 
     doc->release();

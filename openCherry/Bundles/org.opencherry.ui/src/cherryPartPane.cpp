@@ -85,6 +85,7 @@ PartPane::~PartPane()
 
   if (control != 0)
   {
+    CHERRY_DEBUG << "Deleting PartPane control";
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, GuiTk::IControlListener::Pointer(this));
 //    control.removeTraverseListener(traverseListener);
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(control);

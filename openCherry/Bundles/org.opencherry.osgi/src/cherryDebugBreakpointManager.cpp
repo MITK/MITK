@@ -213,8 +213,6 @@ void DebugBreakpointManager::RestoreState(const Poco::Path& path)
         DebugUtil::GetBreakpointManager()->AddSmartpointerBreakpoint(spId);
       }
       elementList->release();
-
-      breakpoints->release();
     }
 
     doc->release();

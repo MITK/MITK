@@ -136,7 +136,11 @@ NativeTabFolder::~NativeTabFolder()
   if (!PlatformUI::GetWorkbench()->IsClosing())
   {
     CHERRY_DEBUG << "Deleting viewForm";
-    viewForm->deleteLater();
+    if (content != 0)
+    {
+      content->setParent(0);
+    }
+    delete viewForm;
   }
 }
 
@@ -300,7 +304,6 @@ void NativeTabFolder::SetContent(QWidget* newContent)
   if (content != 0)
   {
     contentFrame->layout()->removeWidget(content);
-    delete content;
   }
   content = newContent;
   content->installEventFilter(this);

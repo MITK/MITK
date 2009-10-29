@@ -96,7 +96,6 @@ class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
 { \
   public:   \
  \
-    /* ITK typedefs */ \
     typedef CLASS_NAME ## Tool  Self; \
     typedef BASE_CLASS  Superclass; \
     typedef itk::SmartPointer<Self>  Pointer; \
@@ -106,9 +105,16 @@ class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
  \
   protected: \
  \
-    CLASS_NAME ## Tool() \
+    CLASS_NAME ## Tool():BASE_CLASS ##() \
     { \
       m_SegmentationGenerator = CLASS_NAME::New(); \
+    } \
+ \
+    void RegisterProgressObserver() \
+    { \
+      itk::ReceptorMemberCommand< CLASS_NAME ## Tool >::Pointer command = itk::ReceptorMemberCommand< CLASS_NAME ## Tool >::New(); \
+      command->SetCallbackFunction(this, &CLASS_NAME ## Tool::OnProgressEvent); \
+      m_SegmentationGenerator->AddSegmentationProgressObserver< CLASS_NAME ## Tool >( command ); \
     } \
  \
     ~CLASS_NAME ## Tool() \

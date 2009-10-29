@@ -170,6 +170,24 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
+  if(IsLODEnabled(renderer))
+  {
+    switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
+    {
+      case 0:
+        m_T2DMapper->SetSampleDistance(2.0); 
+        break;
+
+      default: case 1:
+        m_T2DMapper->SetSampleDistance(1.0); 
+        break;
+    }
+  }
+  else
+  {
+    m_T2DMapper->SetSampleDistance(1.0); 
+  }
+
   int timestep=0;
   ScalarType time = worldgeometry->GetTimeBounds()[0];
   if (time> ScalarTypeNumericTraits::NonpositiveMin())
@@ -272,7 +290,6 @@ void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * rend
 void mitk::GPUVolumeMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* /*renderer*/)
 {
   GPU_LOG << "ApplyProperties";
-
 }
 
 void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -280,7 +297,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
   GPU_LOG << "SetDefaultProperties";
 
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "volumerendering configuration", mitk::VtkVolumeRenderingProperty::New( 1 ), renderer, overwrite );
+  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -299,26 +316,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-
-     // tf->GetColorTransferFunction()->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 143.556, 0.615686, 0.356863, 0.184314, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 166.222, 0.882353, 0.603922, 0.290196, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 214.389, 1, 1, 1, 0.5, 0 );
-      tf->GetColorTransferFunction()->AddRGBPoint( 419.736, 1, 0.937033, 0.954531, 0.5, 0 );
-    //  tf->GetColorTransferFunction()->AddRGBPoint( 3071, 0.827451, 0.658824, 1, 0.5, 0 );
-
-      tf->GetScalarOpacityFunction()->Initialize();
-   //   tf->GetScalarOpacityFunction()->AddPoint( -3024, 0, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 143.556, 0, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 166.222, 0.686275, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 214.389, 0.696078, 0.5, 0 );
-      tf->GetScalarOpacityFunction()->AddPoint( 419.736, 0.833333, 0.5, 0 );
-   //   tf->GetScalarOpacityFunction()->AddPoint( 3071, 0.803922, 0.5, 0 );
-
-      tf->GetGradientOpacityFunction()->Initialize();
-      tf->GetGradientOpacityFunction()->AddPoint( 0, 1, 0.5, 0 );
-      tf->GetGradientOpacityFunction()->AddPoint( 255, 1, 0.5, 0);
-
+      tf->SetTransferFunctionMode(0);
       node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
     }
   }
@@ -327,10 +325,11 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
 }
 
 
-bool mitk::GPUVolumeMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*/ ) const
+bool mitk::GPUVolumeMapper3D::IsLODEnabled( mitk::BaseRenderer * renderer ) const
 {
- GPU_LOG << "IsLODEnabled";
- return false;
+  return
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.uselod",renderer)) != NULL &&
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.uselod",renderer))->GetValue() == true;
 }
 
 

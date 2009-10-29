@@ -61,10 +61,12 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->setupUi(parent);
 
     connect( m_Controls->m_EnableRenderingCB, SIGNAL( toggled(bool) ),this, SLOT( OnEnableRendering(bool) ));
+    connect( m_Controls->m_EnableLOD, SIGNAL( toggled(bool) ),this, SLOT( OnEnableLOD(bool) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
 
     m_Controls->m_EnableRenderingCB->setEnabled(false);
+    m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
 
@@ -112,9 +114,16 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       m_SelectedNode = node;
     
       bool enabled = false;
+      
       node->GetBoolProperty("volumerendering",enabled);
       m_Controls->m_EnableRenderingCB->setEnabled(true);
       m_Controls->m_EnableRenderingCB->setChecked(enabled);
+
+      enabled = false;
+
+      node->GetBoolProperty("volumerendering.uselod",enabled);
+      m_Controls->m_EnableLOD->setEnabled(true);
+      m_Controls->m_EnableLOD->setChecked(enabled);
 
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
       m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(node);
@@ -131,6 +140,9 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
       m_Controls->m_EnableRenderingCB->setChecked(false);
       m_Controls->m_EnableRenderingCB->setEnabled(false);
+    
+      m_Controls->m_EnableLOD->setChecked(false);
+      m_Controls->m_EnableLOD->setEnabled(false);
     
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
       m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
@@ -151,6 +163,15 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
     return;
 
   m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkVolumeVisualizationView::OnEnableLOD(bool state) 
+{
+  if(m_SelectedNode.IsNull())
+    return;
+
+  m_SelectedNode->SetProperty("volumerendering.uselod",mitk::BoolProperty::New(state));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

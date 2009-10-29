@@ -61,6 +61,7 @@ public:
 protected slots:
 
   void OnEnableRendering( bool state );
+  void OnEnableLOD( bool state );
 
 protected:
 

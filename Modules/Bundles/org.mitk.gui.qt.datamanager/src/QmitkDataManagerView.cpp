@@ -200,7 +200,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
 void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )
 {
-  if(prefs->GetBool("Single click property editing", true))
+  m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+
+  /*if(prefs->GetBool("Single click property editing", true))
   {
     m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
       QAbstractItemView::EditKeyPressed);
@@ -208,7 +210,7 @@ void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences
   else
   {
     m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
-  }
+  }*/
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )

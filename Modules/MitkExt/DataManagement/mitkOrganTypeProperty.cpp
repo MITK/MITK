@@ -78,6 +78,7 @@ void mitk::OrganTypeProperty::AddEnumerationTypes()
   AddEnum( "Hand", newId++ );
   AddEnum( "Heart", newId++ );
   AddEnum( "Hip", newId++ );
+  AddEnum( "Hippocampus", newId++ );
   AddEnum( "Kidney", newId++ );
   AddEnum( "Knee", newId++ );
   AddEnum( "Larynx", newId++ );

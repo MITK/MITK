@@ -91,6 +91,9 @@
        <property name="font">
         <font/>
        </property>
+       <property name="toolTip">
+        <string>edit x-coordinate (grayvalue) of selected point</string>
+       </property>
        <property name="text">
         <string>Grayvalue</string>
        </property>
@@ -109,6 +112,9 @@
        </property>
        <property name="font">
         <font/>
+       </property>
+       <property name="toolTip">
+        <string>edit y-coordinate (opacity) of selected point</string>
        </property>
        <property name="text">
         <string>Opacity</string>
@@ -173,6 +179,9 @@
      <property name="font">
       <font/>
      </property>
+     <property name="toolTip">
+      <string>change colour with a double click on a point</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -214,6 +223,9 @@
       <widget class="QLabel" name="m_textLabelX_3">
        <property name="font">
         <font/>
+       </property>
+       <property name="toolTip">
+        <string>edit x-coordinate (grayvalue) of selected point</string>
        </property>
        <property name="text">
         <string>Grayvalue</string>
@@ -284,6 +296,9 @@
        <property name="font">
         <font/>
        </property>
+       <property name="toolTip">
+        <string>edit x-coordinate (grayvalue) of selected point</string>
+       </property>
        <property name="text">
         <string>Grayvalue</string>
        </property>
@@ -296,6 +311,9 @@
       <widget class="QLabel" name="m_textLabelY_2">
        <property name="font">
         <font/>
+       </property>
+       <property name="toolTip">
+        <string>edit y-coordinate (opacity) of selected point</string>
        </property>
        <property name="text">
         <string>Opacity</string>

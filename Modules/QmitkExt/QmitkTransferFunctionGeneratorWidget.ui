@@ -5,8 +5,8 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>91</y>
-    <width>233</width>
+    <y>92</y>
+    <width>501</width>
     <height>136</height>
    </rect>
   </property>
@@ -230,6 +230,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>steep the curve</string>
+            </property>
             <property name="text">
              <string>Steep</string>
             </property>
@@ -246,6 +249,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>make curve flatter</string>
+            </property>
             <property name="text">
              <string>Flat</string>
             </property>
@@ -256,6 +262,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_7">
+            <property name="toolTip">
+             <string>move the curve to the left</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
             </property>
@@ -269,6 +278,9 @@
           </item>
           <item row="1" column="2">
            <widget class="QLabel" name="label_8">
+            <property name="toolTip">
+             <string>move the curve to the right</string>
+            </property>
             <property name="text">
              <string>Right</string>
             </property>
@@ -334,6 +346,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>makes bell wider</string>
+            </property>
             <property name="text">
              <string>Expand</string>
             </property>
@@ -349,6 +364,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>moves center of the bell to the left</string>
             </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
@@ -406,6 +424,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>moves center of the bell to the right</string>
+            </property>
             <property name="text">
              <string>Right</string>
             </property>
@@ -418,6 +439,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>makes bell slimmer</string>
             </property>
             <property name="text">
              <string>Shrink</string>

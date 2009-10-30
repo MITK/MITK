@@ -18,7 +18,8 @@ static char* presetNames[] = {  "choose an internal transferfunction preset",
                               "CT Black & White",
                               "CT Cardiac",
                               "CT Bone",
-                              "CT Bone (with Gradient)" };
+                              "CT Bone (with Gradient)",
+                              "MR Generic" };
 
 static int numPresetNames = sizeof( presetNames ) / sizeof( char * );
 
@@ -238,7 +239,9 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)   
 
   std::stringstream ss;
   
-  ss << "center at " << thPos << "\n"
+  ss << "Click and hold left mouse button on the cross to interactively generate a bell transfer function"<<"\n"
+     <<"\n"
+     << "center at " << thPos << "\n"
      << "width " << thDelta * 2;
      
   m_InfoLevelWindow->setText( QString( ss.str().c_str() ) );
@@ -323,7 +326,9 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
 
   std::stringstream ss;
   
-  ss << "threshold at " << thPos << "\n"
+  ss << "Click and hold left mouse button on the cross to interactively generate a threshold transfer function"<<"\n"
+     <<"\n"
+     << "threshold at " << thPos << "\n"
      << "width " << thDelta * 2;
      
   m_InfoThreshold->setText( QString( ss.str().c_str() ) );

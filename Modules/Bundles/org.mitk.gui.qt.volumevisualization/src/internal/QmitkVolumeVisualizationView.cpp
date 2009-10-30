@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryISelectionProvider.h>
 #include <cherryISelectionService.h>
 #include <cherryIWorkbenchWindow.h>
-#include <cherryISelectionService.h>
+//#include <cherryISelectionService.h>
 #include <mitkDataTreeNodeObject.h>
 
 #include <mitkProperties.h>
@@ -36,6 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseRenderer.h"
 #include "mitkGPUVolumeMapper3D.h"
+
+#include <QToolTip>
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
@@ -88,8 +90,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
     std::vector<mitk::DataTreeNode*> selectedNodes;
     mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
 
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
-      it != _DataTreeNodeSelection->End(); ++it)
+    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();it != _DataTreeNodeSelection->End(); ++it)
     {
       _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
       if(_DataTreeNodeObject)
@@ -108,7 +109,14 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
     if( node.IsNotNull() )
     {
-      std::string  infoText = std::string("Selected Image: ") + node->GetName();
+      std::string  infoText;
+      
+      if (node->GetName().empty())
+        infoText = std::string("Selected Image: unnamed");
+        
+      else
+        infoText = std::string("Selected Image: ") + node->GetName();
+       
       m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
       m_SelectedNode = node;
     

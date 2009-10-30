@@ -35,7 +35,7 @@ QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
 void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
 
-  LOG_INFO << "TransW called with" << (1&&node);
+  //LOG_INFO << "TransW called with" << (1&&node);
   
 
   if (node)

@@ -308,7 +308,8 @@ void TransferFunction::SetTransferFunctionMode( int mode )
     TF_CT_BLACK_WHITE, 
     TF_CT_CARDIAC, 
     TF_CT_BONE, 
-    TF_CT_BONE_GRADIENT, 
+    TF_CT_BONE_GRADIENT,
+    TF_MR_GENERIC 
   };
 
   //remove all old points
@@ -445,6 +446,31 @@ void TransferFunction::SetTransferFunctionMode( int mode )
     m_GradientOpacityFunction->AddPoint( 246.862069, 0.215827 );
 
     break;
+    
+  case ( TF_MR_GENERIC ):
+
+    //Set Opacity
+    m_ScalarOpacityFunction->AddPoint( 0, 0 );
+    m_ScalarOpacityFunction->AddPoint( 20, 0 );
+    m_ScalarOpacityFunction->AddPoint( 40, 0.15 );
+    m_ScalarOpacityFunction->AddPoint( 120, 0.3 );
+    m_ScalarOpacityFunction->AddPoint( 220, 0.375 );
+    m_ScalarOpacityFunction->AddPoint( 1024, 0.5);
+
+    //Set Color
+    m_ColorTransferFunction->AddRGBPoint( 0, 0, 0, 0 );
+    m_ColorTransferFunction->AddRGBPoint( 20, 0.168627, 0, 0 );
+    m_ColorTransferFunction->AddRGBPoint( 40, 0.403922, 0.145098, 0.0784314  );
+    m_ColorTransferFunction->AddRGBPoint( 120, 0.780392, 0.607843, 0.380392  );
+    m_ColorTransferFunction->AddRGBPoint( 220, 0.847059, 0.835294, 0.788235  );
+    m_ColorTransferFunction->AddRGBPoint( 1024, 1, 1, 1  );
+
+    //Set Gradient
+    m_GradientOpacityFunction->AddPoint( 0, 1 );
+    m_GradientOpacityFunction->AddPoint( 255, 1);
+
+    break;
+
 
   default:
 

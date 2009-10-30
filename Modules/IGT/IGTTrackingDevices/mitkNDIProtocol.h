@@ -80,7 +80,7 @@ namespace mitk
     NDIErrorCode TX(bool trackIndividualMarkers = false, MarkerPointContainerType* markerPositions = NULL); ///< Report transformations in text mode. Optionally, individual markers can be tracked
     NDIErrorCode BX();                            ///< Report transformations in binary mode.
     NDIErrorCode POS3D(MarkerPointContainerType* markerPositions); ///< Report 3D Positions of single markers. can only be used in diagnostics mode
-
+    NDIErrorCode VER(mitk::TrackingDeviceType& t);                 ///< returns if the tracking device is a Polaris or an Aurora system
     NDIErrorCode TX1000(MarkerPointContainerType* markerPositions);    ///< Report transformations in text mode.
     unsigned int ByteToNbBitsOn(char& c) const; ///<
     itkGetConstMacro(UseCRC, bool); ///< Get whether to append a CRC16 checksum to each message

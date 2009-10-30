@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNDIProtocol.h"
 #include "mitkNDITrackingDevice.h"
 #include <string>
+#include <algorithm>
 #include <sstream>
 #include <itksys/SystemTools.hxx>
 #include <stdio.h>
@@ -1153,11 +1154,72 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
 }
 
 
-
 mitk::NDIErrorCode mitk::NDIProtocol::BX()
 {
   std::cout << "BX() not implemented yet, using TX() instead." << std::endl;
   return this->TX();
+}
+
+
+mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
+{
+  if (m_TrackingDevice == NULL)
+    return TRACKINGDEVICENOTSET;
+
+  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
+  /* send command */
+  std::string fullcommand;
+  if (m_UseCRC == true)
+    fullcommand = "VER:4";          // command string format 1: with crc
+  else
+    fullcommand = "VER 4";          // command string format 2: without crc
+
+  returnValue = m_TrackingDevice->Send(&fullcommand, m_UseCRC);
+  if (returnValue != NDIOKAY)
+  {
+    /* cleanup and return */   
+    m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
+    return returnValue;
+  }
+  /* read number of handles returned */
+  std::string reply;
+  m_TrackingDevice->Receive(&reply, 5);       // read first 5 characters of reply (error beginning of version information)  
+  static const std::string error("ERROR");
+  if (error.compare(0, 6, reply) == 0) // ERROR case
+  { 
+    std::string errorcode;
+    m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
+    reply += errorcode;                       // build complete reply string
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
+    std::string readCRC;                      // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+      returnValue = this->GetErrorCode(&errorcode);
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+  else // no error, valid reply
+  {
+    std::string s;
+    m_TrackingDevice->ReceiveLine(&s);       // read until first LF character
+    reply += s;
+    std::string upperCaseReply;
+    upperCaseReply.resize(reply.size());
+    std::transform (reply.begin(), reply.end(), upperCaseReply.begin(), toupper);  // convert reply to uppercase to ease finding 
+    if (upperCaseReply.find("POLARIS") != std::string::npos)
+      t = mitk::NDIPolaris;
+    else if (upperCaseReply.find("AURORA") != std::string::npos)
+      t = mitk::NDIAurora;
+    else
+      t = mitk::TrackingSystemNotSpecified;
+    // check for "VICRA", "SPECTRA", "ACCEDO"
+    /* do not check for remaining reply, do not check for CRC, just delete remaining reply */
+    itksys::SystemTools::Delay(500); // wait until reply should be finished
+    m_TrackingDevice->ClearReceiveBuffer();
+    returnValue = NDIOKAY;
+  }
+  return returnValue;
 }
 
 
@@ -1167,7 +1229,6 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
 
   if (m_TrackingDevice == NULL)
   {
-    std::cout << "ERROR: no tracking device present" << std::endl;
     return TRACKINGDEVICENOTSET;
   }
   if (markerPositions == NULL)

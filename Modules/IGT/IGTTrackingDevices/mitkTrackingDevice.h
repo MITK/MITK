@@ -114,7 +114,7 @@ namespace mitk {
       /**
       * \brief  change object state
       */
-      itkSetMacro(Mode,TrackingDeviceMode);
+      void SetMode(TrackingDeviceMode m);
 
 
       TrackingDevice();

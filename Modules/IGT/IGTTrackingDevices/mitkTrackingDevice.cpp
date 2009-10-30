@@ -32,11 +32,13 @@ mitk::TrackingDevice::TrackingDevice() :
   m_TrackingFinishedMutex->Lock();  // execution rights are owned by the application thread at the beginning
 }
 
+
 mitk::TrackingDevice::~TrackingDevice()
 {
   m_TrackingFinishedMutex = NULL;
   m_StopTrackingMutex = NULL;
 }
+
 
 mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
 {
@@ -45,6 +47,15 @@ mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
   this->m_ModeMutex->Unlock();
   return result;
 }
+
+
+void mitk::TrackingDevice::SetMode( TrackingDeviceMode m )
+{
+  this->m_ModeMutex->Lock();
+  m_Mode = m;
+  this->m_ModeMutex->Unlock();
+}
+
 
 bool mitk::TrackingDevice::StopTracking()
 {

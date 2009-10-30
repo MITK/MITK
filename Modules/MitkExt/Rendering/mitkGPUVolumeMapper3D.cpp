@@ -91,10 +91,10 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
   m_VolumePropertyLow = vtkVolumeProperty::New();
 
   m_VolumePropertyLow->ShadeOn();
-  m_VolumePropertyLow->SetAmbient(0.2f);
-  m_VolumePropertyLow->SetDiffuse(0.5f);
-  m_VolumePropertyLow->SetSpecular(0.3f);
-  m_VolumePropertyLow->SetSpecularPower(10.0f);
+  m_VolumePropertyLow->SetAmbient (0.05f);
+  m_VolumePropertyLow->SetDiffuse (0.45f);
+  m_VolumePropertyLow->SetSpecular(0.50f);
+  m_VolumePropertyLow->SetSpecularPower(6.0f);
   m_VolumePropertyLow->SetInterpolationTypeToLinear();
     
   m_VolumeLOD = vtkVolume::New();

@@ -175,6 +175,8 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
 
     void SetImagesVisible(cherry::ISelection::ConstPointer selection);
 
+    void TabChanged(int index);
+
   protected:
 
     cherry::ISelectionListener::Pointer m_SelListener;

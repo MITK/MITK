@@ -65,26 +65,27 @@ struct SelListenerDeformableRegistration : ISelectionListener
   {
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
-    m_View->m_Controls.TextLabelFixed->hide();
-    m_View->m_Controls.m_FixedLabel->hide();
-    m_View->m_Controls.TextLabelMoving->hide();
-    m_View->m_Controls.m_MovingLabel->hide();
 
     // do something with the selected items
     if(m_View->m_CurrentSelection)
     {
-      m_View->SetImagesVisible(selection);
       if (m_View->m_CurrentSelection->Size() != 2)
       {
         m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
         m_View->m_Controls.m_StatusLabel->show();
-        m_View->FixedSelected(NULL);
-        m_View->FixedSelected(NULL);
+        m_View->m_Controls.TextLabelFixed->hide();
+        m_View->m_Controls.m_FixedLabel->hide();
+        m_View->m_Controls.TextLabelMoving->hide();
+        m_View->m_Controls.m_MovingLabel->hide();
+        m_View->m_Controls.m_OpacityLabel->setEnabled(false);
+        m_View->m_Controls.m_OpacitySlider->setEnabled(false);
+        m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
       }
       else
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
+        mitk::DataTreeNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
@@ -98,17 +99,23 @@ struct SelListenerDeformableRegistration : ISelectionListener
             {
               if (foundFixedImage == false)
               {
-                m_View->FixedSelected(node);
+                fixedNode = node;
                 foundFixedImage = true;
               }
               else
+              {
+                m_View->SetImagesVisible(selection);
+                m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
+                m_View->m_Controls.m_OpacityLabel->setEnabled(true);
+                m_View->m_Controls.m_OpacitySlider->setEnabled(true);
+                m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
+              }
             }
             else
             {
-              m_View->FixedSelected(NULL);
-              m_View->FixedSelected(NULL);
               m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+              m_View->m_Controls.m_StatusLabel->show();
               return;
             }
           }
@@ -156,6 +163,19 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
+  m_Controls.m_OpacityLabel->setEnabled(false);
+  m_Controls.m_OpacitySlider->setEnabled(false);
+  m_Controls.m_ShowRedGreenValues->setEnabled(false);
+  if (m_Controls.m_DeformableTransform->currentIndex() == 0)
+  {
+    m_Controls.m_QmitkDemonsRegistrationViewControls->show();
+    m_Controls.m_QmitkBSplineRegistrationViewControls->hide();
+  }
+  else
+  {
+    m_Controls.m_QmitkDemonsRegistrationViewControls->hide();
+    m_Controls.m_QmitkBSplineRegistrationViewControls->show();
+  }
   
   this->CheckCalculateEnabled();
 
@@ -243,6 +263,7 @@ void QmitkDeformableRegistrationView::StdMultiWidgetNotAvailable()
 void QmitkDeformableRegistrationView::CreateConnections()
 {
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
+  connect(m_Controls.m_DeformableTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(bool)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));
@@ -459,3 +480,16 @@ void QmitkDeformableRegistrationView::SetImagesVisible(cherry::ISelection::Const
   }
 }
 
+void QmitkDeformableRegistrationView::TabChanged(int index)
+{
+  if (index == 0)
+  {
+    m_Controls.m_QmitkDemonsRegistrationViewControls->show();
+    m_Controls.m_QmitkBSplineRegistrationViewControls->hide();
+  }
+  else
+  {
+    m_Controls.m_QmitkDemonsRegistrationViewControls->hide();
+    m_Controls.m_QmitkBSplineRegistrationViewControls->show();
+  }
+}

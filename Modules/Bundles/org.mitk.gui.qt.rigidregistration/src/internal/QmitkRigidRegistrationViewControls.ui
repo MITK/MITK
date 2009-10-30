@@ -704,38 +704,28 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QScrollArea" name="frame">
+        <widget class="QFrame" name="frame">
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::StyledPanel</enum>
          </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents_2">
+         <widget class="QmitkRigidRegistrationSelectorView" name="qmitkRigidRegistrationSelector1" native="true">
           <property name="geometry">
            <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>244</width>
-            <height>517</height>
+            <x>10</x>
+            <y>10</y>
+            <width>505</width>
+            <height>712</height>
            </rect>
           </property>
-          <widget class="QmitkRigidRegistrationSelectorView" name="qmitkRigidRegistrationSelector1" native="true">
-           <property name="geometry">
-            <rect>
-             <x>9</x>
-             <y>9</y>
-             <width>367</width>
-             <height>717</height>
-            </rect>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
          </widget>
         </widget>
        </item>

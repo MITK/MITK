@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "cherryUiDll.h"
+
 namespace cherry
 {
 
@@ -15,7 +17,7 @@ namespace cherry
  * @since 3.0
  * @noimplement This interface is not intended to be implemented by clients.
  */
-struct IWorkbenchPartConstants {
+struct CHERRY_UI IWorkbenchPartConstants {
 
   /**
    * Used in a PropertyChangeEvent as the property string to signal

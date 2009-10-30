@@ -53,7 +53,7 @@ struct CHERRY_UI IPropertyChangeListener: public virtual Object
   {
   }
 
-  struct Events {
+  struct CHERRY_UI Events {
 
     typedef Message1<PropertyChangeEvent::Pointer> EventType;
 

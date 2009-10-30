@@ -22,6 +22,8 @@
 #include <cherryMacros.h>
 #include <cherryObject.h>
 
+#include "cherryUiDll.h"
+
 namespace cherry {
 
 /**
@@ -41,7 +43,7 @@ namespace cherry {
  *
  * @see IPropertyChangeListener
  */
-class PropertyChangeEvent : public Object {
+class CHERRY_UI PropertyChangeEvent : public Object {
 
 public:
 

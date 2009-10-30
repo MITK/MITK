@@ -17,29 +17,22 @@ multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more informatio
 
 \section QmitkDeformableRegistrationUserManualDetails Details
 
-First of all you have to open the data sets which you want to register and select them in the "Fixed:" and "Moving:" combo boxes.
+First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
+first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. While 
+there aren't two images for registration a message is viewed on top of the module saying that registration needs two images. If two images are selected the message disappears and the interaction 
+areas for the fixed and moving data appears. On default only the fixed and moving image are shown in the render windows. If you want to have other images visible you have to set the visibility 
+via the Data Manager. Also if you want to perform a reinit on a specific node or a global reinit for all nodes you have to use the Data Manager.
 
 \image html ImageSelectionDeformable.png "The Image area"
 
-The upper area is the "Image" area. It is used for image selection, changing the colour of the images between grey values and red/green and changing the opacity of the moving image.
+The upper area is the "Image" area. The selected images are shown here. It is used for changing the colour of the images between grey values and red/green and changing the opacity of the moving image.
 With the "Moving Image Opacity:" slider you can change the opacity of the moving dataset. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, 
 the fixed dataset will be displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
 both datasets will be displayed in greyvalues.
 
-\image html ImageViewsDeformable.png "The Image Views area"
+\image html RegistrationDeformable.png "The Registration area for Demons based registration"
 
-In the next area, the "Image Views", there are three buttons to reinitialize the QmitkStdMultiWidget to let the views fit exactly the desired images. This can be done for the fixed image only with the 
-"Reinit Fixed" button, for the moving image only with the "Reinit Moving" button or with the "Global Reinit" button to let the QmitkStdMultiWidget adapt the view to show all images. 
-
-\image html SelectShownImageDeformable.png "The Select Shown Image area"
-
-The "Select Shown Image" area defines, which image is shown in the QmitkStdMultiWidget. If "Fixed Image" is selected only the fixed image is rendered in the QmitkStdMultiWidget. If "Moving Image" 
-is selected only the moving image is rendered. If "Both Images" is selected the fixed image as well as the moving image is shown. In all cases all other images within the current data tree will be 
-set to invisible. 
-
-\image html RegistrationDeformable.png "The Registration area"
-
-In the "Registration" area you have the choice between different deformable registration algorithms. Currently there are available:
+In the "Registration" area you have the choice between different deformable registration algorithms. On the first tab called "Demons" there are available:
 
 \li <b>Demons Registration</b>
 
@@ -53,5 +46,15 @@ For the registration method itself you have to specify the "Number of Iterations
 
 If all this is done, you can perform the registration by clicking the "Calculate Transformation" button. Finally, you will be asked where you want the result image and the resulting deformation field 
 to be saved. Therefore you have to select the folder and enter a filename.
+
+\image html RegistrationDeformable2.png "The Registration area for B-Spline registration"
+
+On the second tab called "B-Spline" there is a:
+
+\li <b>B-Spline Registration</b>
+
+
+
+The results will be added in the DataStorage and can be saved in the Data Manager.
 
 */

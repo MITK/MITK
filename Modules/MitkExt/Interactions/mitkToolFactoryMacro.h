@@ -117,6 +117,13 @@ class EXPORT_SPEC CLASS_NAME ## Tool : public BASE_CLASS \
       m_SegmentationGenerator->AddSegmentationProgressObserver< CLASS_NAME ## Tool >( command ); \
     } \
  \
+    void RegisterFinishedSegmentationObserver() \
+    { \
+      itk::ReceptorMemberCommand< CLASS_NAME ## Tool >::Pointer command = itk::ReceptorMemberCommand< CLASS_NAME ## Tool >::New(); \
+      command->SetCallbackFunction(this, &CLASS_NAME ## Tool::OnSegmentationFinished); \
+      m_SegmentationGenerator->AddSegmentationFinishedObserver< CLASS_NAME ## Tool >( command ); \
+    } \
+ \
     ~CLASS_NAME ## Tool() \
     { \
     } \

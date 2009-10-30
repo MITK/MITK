@@ -70,27 +70,34 @@ struct SelListenerPointBasedRegistration : ISelectionListener
   {
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
-    m_View->m_Controls.TextLabelFixed->hide();
-    m_View->m_Controls.m_FixedLabel->hide();
-    m_View->m_Controls.TextLabelMoving->hide();
-    m_View->m_Controls.m_MovingLabel->hide();
 
     // do something with the selected items
     if(m_View->m_CurrentSelection)
     {
-      m_View->SetImagesVisible(selection);
       if (m_View->m_CurrentSelection->Size() != 2)
       {
-        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
-        m_View->m_Controls.m_StatusLabel->show();
-        m_View->FixedSelected(NULL);
-        m_View->FixedSelected(NULL);
+        if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+        {
+          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+          m_View->m_Controls.m_StatusLabel->show();
+          m_View->m_Controls.TextLabelFixed->hide();
+          m_View->m_Controls.m_FixedLabel->hide();
+          m_View->m_Controls.line2->hide();
+          m_View->m_Controls.m_FixedPointListWidget->hide();
+          m_View->m_Controls.TextLabelMoving->hide();
+          m_View->m_Controls.m_MovingLabel->hide();
+          m_View->m_Controls.line1->hide();
+          m_View->m_Controls.m_MovingPointListWidget->hide();
+          m_View->m_Controls.m_OpacityLabel->hide();
+          m_View->m_Controls.m_OpacitySlider->hide();
+          m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
+        }
       }
       else
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
-        bool foundMovingImage = false;
+        mitk::DataTreeNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
@@ -119,26 +126,25 @@ struct SelListenerPointBasedRegistration : ISelectionListener
               {
                 if (foundFixedImage == false)
                 {
-                  m_View->FixedSelected(node);
+                  fixedNode = node;
                   foundFixedImage = true;
                 }
                 else
                 {
+                  m_View->SetImagesVisible(selection);
+                  m_View->FixedSelected(fixedNode);
                   m_View->MovingSelected(node);
-                  foundMovingImage = true;
+                  m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
                 }
               }
             }
+            if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+            {
+              m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+              m_View->m_Controls.m_StatusLabel->show();
+            }
           }
         }
-        if (!(foundFixedImage && foundMovingImage))
-        {
-          m_View->FixedSelected(NULL);
-          m_View->FixedSelected(NULL);
-          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
-          return;
-        }
-        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
       }
     }
   }
@@ -198,9 +204,16 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MeanErrorLCD->hide();
   m_Controls.m_MeanError->hide();
   m_Controls.TextLabelFixed->hide();
+  m_Controls.line2->hide();
+  m_Controls.m_FixedPointListWidget->hide();
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
+  m_Controls.line1->hide();
+  m_Controls.m_MovingPointListWidget->hide();
+  m_Controls.m_OpacityLabel->hide();
+  m_Controls.m_OpacitySlider->hide();
+  m_Controls.m_ShowRedGreenValues->setEnabled(false);
 
   m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
@@ -323,6 +336,8 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
       m_Controls.m_FixedLabel->setText(QString::fromStdString(m_FixedNode->GetName()));
       m_Controls.m_FixedLabel->show();
       m_Controls.TextLabelFixed->show();
+      m_Controls.line2->show();
+      m_Controls.m_FixedPointListWidget->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_FixedNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -373,6 +388,8 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
     m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
     m_Controls.m_FixedLabel->hide();
     m_Controls.TextLabelFixed->hide();
+    m_Controls.line2->hide();
+    m_Controls.m_FixedPointListWidget->hide();
   }
   if(m_FixedLandmarks.IsNotNull())
     m_CurrentFixedLandmarksObserverID = m_FixedLandmarks->AddObserver(itk::ModifiedEvent(), m_FixedLandmarksChangedCommand);
@@ -406,6 +423,10 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
       m_Controls.m_MovingLabel->setText(QString::fromStdString(m_MovingNode->GetName()));
       m_Controls.m_MovingLabel->show();
       m_Controls.TextLabelMoving->show();
+      m_Controls.line1->show();
+      m_Controls.m_MovingPointListWidget->show();
+      m_Controls.m_OpacityLabel->show();
+      m_Controls.m_OpacitySlider->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -459,6 +480,10 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
     m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
     m_Controls.m_MovingLabel->hide();
     m_Controls.TextLabelMoving->hide();
+    m_Controls.line1->hide();
+    m_Controls.m_MovingPointListWidget->hide();
+    m_Controls.m_OpacityLabel->hide();
+    m_Controls.m_OpacitySlider->hide();
   }
   if(m_MovingLandmarks.IsNotNull())
     m_CurrentMovingLandmarksObserverID = m_MovingLandmarks->AddObserver(itk::ModifiedEvent(), m_MovingLandmarksChangedCommand);

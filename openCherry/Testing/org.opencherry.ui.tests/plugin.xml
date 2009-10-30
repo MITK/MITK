@@ -4,4 +4,38 @@
   <extension point="org.opencherry.tests">
     <test id="UiTestSuite" class="cherry::UiTestSuite" uitest="true"/>
   </extension>
+  
+  <extension point="org.opencherry.ui.views">
+  
+      <view
+            name="Mock View 1"
+            icon="icons\view.gif"
+            class="cherry::MockViewPart"
+            id="org.opencherry.ui.tests.api.MockViewPart">
+      </view>
+      <view
+            name="Mock View 2"
+            icon="icons\view.gif"
+            class="cherry::MockViewPart"
+            id="org.opencherry.ui.tests.api.MockViewPart2">
+      </view>
+      <view
+            name="Mock View 3"
+            icon="icons\view.gif"
+            class="cherry::MockViewPart"
+            id="org.opencherry.ui.tests.api.MockViewPart3">
+      </view>
+      <view
+            name="Mock View 4"
+            icon="icons\view.gif"
+            class="cherry::MockViewPart"
+            id="org.opencherry.ui.tests.api.MockViewPart4">
+      </view>
+      <view
+            name="Saveable Mock View"
+            icon="icons\view.gif"
+            class="cherry::SaveableMockViewPart"
+            id="org.opencherry.ui.tests.api.SaveableMockViewPart">
+      </view>
+   </extension>
 </plugin>

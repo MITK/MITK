@@ -21,6 +21,8 @@
 
 #include <cherryUITestCase.h>
 
+#include <CppUnit/TestCaller.h>
+
 namespace cherry {
 
 /**
@@ -31,6 +33,8 @@ namespace cherry {
 class IPageLayoutTest : public UITestCase {
 
 public:
+
+  friend class CppUnit::TestCaller<IPageLayoutTest>;
 
   IPageLayoutTest(const std::string& testName);
 

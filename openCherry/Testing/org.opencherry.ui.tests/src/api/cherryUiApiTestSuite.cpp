@@ -19,14 +19,16 @@
 
 #include "cherryXMLMementoTest.h"
 #include "cherryIPageLayoutTest.h"
+#include "cherryIViewPartTest.h"
 
 namespace cherry {
 
 UiApiTestSuite::UiApiTestSuite()
 : CppUnit::TestSuite("UiApiTestSuite")
 {
-  addTest(XMLMementoTest::Suite());
   addTest(IPageLayoutTest::Suite());
+  addTest(IViewPartTest::Suite());
+  addTest(XMLMementoTest::Suite());
 }
 
 }

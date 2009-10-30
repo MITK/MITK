@@ -18,7 +18,7 @@
 #include "cherryIPageLayoutTest.h"
 
 #include <CppUnit/TestSuite.h>
-#include <cherryUITestCaller.h>
+#include <CppUnit/TestCaller.h>
 
 #include <cherryEmptyPerspective.h>
 
@@ -35,13 +35,16 @@ CppUnit::Test* IPageLayoutTest::Suite()
 {
   CppUnit::TestSuite* suite = new CppUnit::TestSuite("IPageLayoutTest");
 
-  CppUnit_addUITest(suite, IPageLayoutTest, TestGetDescriptor);
+  CppUnit_addTest(suite, IPageLayoutTest, TestGetDescriptor);
 
   return suite;
 }
 
 void IPageLayoutTest::TestGetDescriptor()
 {
+  this->IgnoreLeakingObjects();
+  //this->LeakDetailsOn();
+
   EmptyPerspective::SetLastPerspective("");
   OpenTestWindow(EmptyPerspective::PERSP_ID);
   assertEqual(EmptyPerspective::PERSP_ID, EmptyPerspective::GetLastPerspective());

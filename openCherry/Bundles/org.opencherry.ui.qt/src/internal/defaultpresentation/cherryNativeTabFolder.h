@@ -77,6 +77,7 @@ private slots:
 
   void TabSelectionChanged(int index);
   void DragStarted(const QPoint& location);
+  void ViewFormDestroyed(QObject* obj);
 
 public:
 

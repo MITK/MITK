@@ -52,6 +52,12 @@ void NativeTabFolder::DragStarted(const QPoint& location)
   this->HandleDragStarted(location);
 }
 
+void NativeTabFolder::ViewFormDestroyed(QObject* obj)
+{
+  viewForm = 0;
+  content = 0;
+}
+
 NativeTabFolder::NativeTabFolder(QWidget* parent)
 : QObject(parent)
 {
@@ -63,6 +69,8 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   viewForm->setLayout(layout);
+
+  connect(viewForm, SIGNAL(destroyed(QObject*)), this, SLOT(ViewFormDestroyed(QObject*)));
 
   QWidget* topControls = new QWidget(viewForm);
   topControls->setMinimumSize(0, 24);
@@ -304,6 +312,7 @@ void NativeTabFolder::SetContent(QWidget* newContent)
   if (content != 0)
   {
     contentFrame->layout()->removeWidget(content);
+    disconnect(content);
   }
   content = newContent;
   content->installEventFilter(this);

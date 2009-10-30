@@ -43,30 +43,32 @@ void QtMainWindowControl::changeEvent(QEvent* event)
   ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
   switch (event->type())
   {
-  case QEvent::WindowActivate:
+  case QEvent::ActivationChange:
   {
-    ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
-    for (ListenerList::iterator listener = activatedListeners.begin();
-         listener != activatedListeners.end(); ++listener)
+    if (isActiveWindow())
     {
-      (*listener)->Execute(shellEvent);
-      if (!shellEvent->doit) {
-        event->accept();
-        return;
+      ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
+      for (ListenerList::iterator listener = activatedListeners.begin();
+           listener != activatedListeners.end(); ++listener)
+      {
+        (*listener)->Execute(shellEvent);
+        if (!shellEvent->doit) {
+          event->accept();
+          return;
+        }
       }
     }
-  }
-    break;
-  case QEvent::WindowDeactivate:
-  {
-    ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
-    for (ListenerList::iterator listener = deactivatedListeners.begin();
-         listener != deactivatedListeners.end(); ++listener)
+    else
     {
-      (*listener)->Execute(shellEvent);
-      if (!shellEvent->doit) {
-        event->accept();
-        return;
+      ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
+      for (ListenerList::iterator listener = deactivatedListeners.begin();
+           listener != deactivatedListeners.end(); ++listener)
+      {
+        (*listener)->Execute(shellEvent);
+        if (!shellEvent->doit) {
+          event->accept();
+          return;
+        }
       }
     }
   }

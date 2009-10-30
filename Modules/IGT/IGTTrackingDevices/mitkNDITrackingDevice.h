@@ -133,15 +133,23 @@ namespace mitk
     virtual bool UpdateTool(mitk::TrackingTool* tool);
 
     virtual void SetPortNumber(const PortNumber _arg); ///< set port number for serial communication
+    itkGetConstMacro(PortNumber, PortNumber);          ///< returns the port number for serial communication
     virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
+    itkGetStringMacro(DeviceName);                     ///< returns the device name for serial communication
     virtual void SetBaudRate(const BaudRate _arg);     ///< set baud rate for serial communication
+    itkGetConstMacro(BaudRate, BaudRate);              ///< returns the baud rate for serial communication
     virtual void SetDataBits(const DataBits _arg);     ///< set number of data bits
+    itkGetConstMacro(DataBits, DataBits);              ///< returns the data bits for serial communication
     virtual void SetParity(const Parity _arg);         ///< set parity mode
+    itkGetConstMacro(Parity, Parity);                  ///< returns the parity mode
     virtual void SetStopBits(const StopBits _arg);     ///< set number of stop bits
+    itkGetConstMacro(StopBits, StopBits);              ///< returns the number of stop bits
     virtual void SetHardwareHandshake(const HardwareHandshake _arg);  ///< set use hardware handshake for serial communication
+    itkGetConstMacro(HardwareHandshake, HardwareHandshake);              ///< returns the hardware handshake setting
     virtual void SetIlluminationActivationRate(const IlluminationActivationRate _arg); ///< set activation rate of IR illumator for polaris
+    itkGetConstMacro(IlluminationActivationRate, IlluminationActivationRate);          ///< returns the activation rate of IR illumator for polaris
     virtual void SetDataTransferMode(const DataTransferMode _arg);    ///< set data transfer mode to text (TX) or binary (BX). \warning: only TX is supportet at the moment
-
+    itkGetConstMacro(DataTransferMode, DataTransferMode);              ///< returns the data transfer mode
     virtual bool Beep(unsigned char count);   ///< Beep the tracking device 1 to 9 times
 
     NDIErrorCode GetErrorCode(const std::string* input);  ///< returns the error code for a string that contains an error code in hexadecimal format
@@ -169,6 +177,7 @@ namespace mitk
     NDIErrorCode Send(const std::string* message, bool addCRC = true);      ///< Send message to tracking device
     NDIErrorCode Receive(std::string* answer, unsigned int numberOfBytes);  ///< receive numberOfBytes bytes from tracking device
     NDIErrorCode ReceiveByte(char* answer);   ///< lightweight receive function, that reads just one byte
+    NDIErrorCode ReceiveLine(std::string* answer); ///< receive characters until the first LF (The LF is included in the answer string)
     void ClearSendBuffer();                   ///< empty send buffer of serial communication interface
     void ClearReceiveBuffer();                ///< empty receive buffer of serial communication interface
     const std::string CalcCRC(const std::string* input);  ///< returns the CRC16 for input as a std::string
@@ -213,7 +222,6 @@ public://TODO
     * \brief set current error message
     */
     itkSetStringMacro(ErrorMessage);
-
   protected:
     std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number

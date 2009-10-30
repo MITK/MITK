@@ -21,8 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
+#include <itkMutexLockHolder.h>
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
+
 
 const unsigned char CR = 0xD; // == '\r' - carriage return
+const unsigned char LF = 0xA; // == '\n' - line feed
 
 
 mitk::NDITrackingDevice::NDITrackingDevice() :
@@ -33,7 +38,7 @@ m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_Tools
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
 m_ErrorMessage(""), m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
-  this->m_Type = NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
+  this->m_Type = TrackingSystemNotSpecified; //NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -242,9 +247,8 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
   // Clear send buffer
   this->ClearSendBuffer();
   // Send the date to the device
-  m_SerialCommunicationMutex->Lock();
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
   long returnvalue = m_SerialCommunication->Send(message);
-  m_SerialCommunicationMutex->Unlock();
 
   if (returnvalue == 0)
     return SERIALSENDERROR;
@@ -258,9 +262,8 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Receive(std::string* answer, unsigne
   if (answer == NULL)
     return SERIALRECEIVEERROR;
 
-  this->m_SerialCommunicationMutex->Lock();
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
   long returnvalue = m_SerialCommunication->Receive(*answer, numberOfBytes);  // never read more bytes than the device has send, the function will block until enough bytes are send...
-  this->m_SerialCommunicationMutex->Unlock();
 
   if (returnvalue == 0)
     return SERIALRECEIVEERROR;
@@ -275,9 +278,10 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
     return SERIALRECEIVEERROR;
 
   std::string m;
-  m_SerialCommunicationMutex->Lock();
+
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex  
+  
   long returnvalue = m_SerialCommunication->Receive(m, 1);
-  m_SerialCommunicationMutex->Unlock();
 
   if ((returnvalue == 0) ||(m.size() != 1))
     return SERIALRECEIVEERROR;
@@ -287,14 +291,36 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
 }
 
 
+mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
+{
+  if (answer == NULL)
+    return SERIALRECEIVEERROR;
+
+  std::string m;
+
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex  
+
+  do
+  {
+    long returnvalue = m_SerialCommunication->Receive(m, 1);
+    if ((returnvalue == 0) ||(m.size() != 1))
+      return SERIALRECEIVEERROR;
+    *answer += m;
+  } while (m.at(0) != LF);
+  return NDIOKAY;
+}
+
+
 void mitk::NDITrackingDevice::ClearSendBuffer()
 {
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
   m_SerialCommunication->ClearSendBuffer();
 }
 
 
 void mitk::NDITrackingDevice::ClearReceiveBuffer()
 {
+  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
@@ -332,13 +358,15 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
 
 bool mitk::NDITrackingDevice::OpenConnection()
 {
-  this->m_ModeMutex->Lock();
-  if (this->m_Mode != Setup)
+  
+  //this->m_ModeMutex->Lock();
+  if (this->GetMode() != Setup)
   {
     this->SetErrorMessage("Can only try to open the connection if in setup mode");
-    this->m_ModeMutex->Unlock();
     return false;
   }
+
+  MutexLockHolder lock(*m_ModeMutex); // lock and unlock the mutex
 
   m_SerialCommunication = mitk::SerialCommunication::New();
 
@@ -368,7 +396,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (reset.compare(answer) != 0)  // check for RESETBE6F
   {
     this->SetErrorMessage("Hardware Reset of tracking device did not work");
-    this->m_ModeMutex->Unlock();
     if (m_SerialCommunication.IsNotNull())
     {
       m_SerialCommunication->CloseConnection();
@@ -386,7 +413,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
   {
     this->SetErrorMessage("Could not set comm settings in trackingdevice");
-    this->m_ModeMutex->Unlock();
     return false;
   }
 
@@ -408,8 +434,19 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
   {
     this->SetErrorMessage("Could not initialize the tracking device");
-    this->m_ModeMutex->Unlock();
     return false;
+  }
+
+  if (this->GetType() == mitk::TrackingSystemNotSpecified)  // if the type of tracking device is not specified, try to query the connected device
+  {
+    mitk::TrackingDeviceType deviceType;
+    returnvalue = m_DeviceProtocol->VER(deviceType);
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
+    {
+      this->SetErrorMessage("Could not determine tracking device type. Please set manually and try again.");
+      return false;
+    }
+    this->SetType(deviceType);
   }
 
   /****  Optional Polaris specific code, Work in progress
@@ -460,7 +497,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
   {
     this->SetErrorMessage("Could not obtain a list of port handles that need to be freed");
-    this->m_ModeMutex->Unlock();
     return false;     // ToDo: Is this a fatal error?
   }
 
@@ -484,51 +520,46 @@ bool mitk::NDITrackingDevice::OpenConnection()
   /**
   * POLARIS: initialize the tools that were added manually
   **/
-  m_ToolsMutex->Lock();
-  portHandle.clear();
-  Tool6DContainerType::iterator endIt = m_6DTools.end();
-  for(Tool6DContainerType::iterator it = m_6DTools.begin(); it != endIt; ++it)
   {
-    /* get a port handle for the tool */
-    returnvalue = m_DeviceProtocol->PHRQ(&portHandle);
-    if (returnvalue == NDIOKAY)
+    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+    portHandle.clear();
+    Tool6DContainerType::iterator endIt = m_6DTools.end();
+    for(Tool6DContainerType::iterator it = m_6DTools.begin(); it != endIt; ++it)
     {
-      (*it)->SetPortHandle(portHandle.c_str());
-      /* now write the SROM file of the tool to the tracking system using PVWR */
-      if (this->m_Type == NDIPolaris)
+      /* get a port handle for the tool */
+      returnvalue = m_DeviceProtocol->PHRQ(&portHandle);
+      if (returnvalue == NDIOKAY)
       {
-        returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
-        if (returnvalue != NDIOKAY)
+        (*it)->SetPortHandle(portHandle.c_str());
+        /* now write the SROM file of the tool to the tracking system using PVWR */
+        if (this->m_Type == NDIPolaris)
         {
-          this->SetErrorMessage((std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str());
-          this->m_ModeMutex->Unlock();
-          this->m_ToolsMutex->Unlock();
-          return false;
-        }
-        returnvalue = m_DeviceProtocol->PINIT(&portHandle);
-        if (returnvalue != NDIOKAY)
-        {
-          this->SetErrorMessage((std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str());
-          this->m_ModeMutex->Unlock();
-          this->m_ToolsMutex->Unlock();
-          return false;
-        }
-        if ((*it)->IsEnabled() == true)
-        {
-          returnvalue = m_DeviceProtocol->PENA(&portHandle, (*it)->GetTrackingPriority()); // Enable tool
+          returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
           {
-            this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
-              std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str());
-            this->m_ModeMutex->Unlock();
-            this->m_ToolsMutex->Unlock();
+            this->SetErrorMessage((std::string("Could not write SROM file for tool '") + (*it)->GetToolName() + std::string("' to tracking device")).c_str());
             return false;
+          }
+          returnvalue = m_DeviceProtocol->PINIT(&portHandle);
+          if (returnvalue != NDIOKAY)
+          {
+            this->SetErrorMessage((std::string("Could not initialize tool '") + (*it)->GetToolName()).c_str());
+            return false;
+          }
+          if ((*it)->IsEnabled() == true)
+          {
+            returnvalue = m_DeviceProtocol->PENA(&portHandle, (*it)->GetTrackingPriority()); // Enable tool
+            if (returnvalue != NDIOKAY)
+            {
+              this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
+                std::string("' for tool '")+ (*it)->GetToolName() + std::string("'")).c_str());
+              return false;
+            }
           }
         }
       }
-    }
-  }
-  m_ToolsMutex->Unlock();
+    }  
+  } // end of toolsmutexlockholder scope
 
   /**
   * Polaris active tools or Aurora sensors: get the list of all ports/sensors that are connected and have to be initialized
@@ -539,7 +570,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
   {
     this->SetErrorMessage("Could not obtain a list of port handles that are connected");
-    this->m_ModeMutex->Unlock();
     return false;     // ToDo: Is this a fatal error?
   }
 
@@ -555,7 +585,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     //newTool->SetDataValid(false); not valid by default so doesn't have to be set
 
     //set a name for identification
-    std::string sumString = std::string("Port") + ph;
+    std::string sumString = std::string("Port ") + ph;
     newTool->SetToolName(sumString.c_str());
 
     returnvalue = m_DeviceProtocol->PINIT(&ph);
@@ -565,7 +595,6 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         this->SetErrorMessage((std::string("Could not initialize port '") + ph +
           std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        this->m_ModeMutex->Unlock();
         return false;
       }
       /* enable the port handle */
@@ -574,12 +603,11 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         this->SetErrorMessage((std::string("Could not enable port '") + ph +
           std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        this->m_ModeMutex->Unlock();
         return false;
       }
     }
 
-    //we have to unlock here to avoid a deadlock with another try to lock this mutex
+    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
     m_ModeMutex->Unlock();
     if (this->InternalAddTool(newTool) == false)
       this->SetErrorMessage("Error while adding new tool");
@@ -593,23 +621,19 @@ bool mitk::NDITrackingDevice::OpenConnection()
     if (returnvalue != NDIOKAY)
     {
       this->SetErrorMessage("Could not set the illuminator activation rate");
-      this->m_ModeMutex->Unlock();
       return false;
     }
   }
-  /* finish  - now all tools should be added, initalized and enabled, so that tracking can be started */
+  /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
   this->SetMode(Ready);
   this->SetErrorMessage("");
-  this->m_ModeMutex->Unlock();
-
   return true;
 }
 
 
 bool mitk::NDITrackingDevice::CloseConnection()
 {
-  this->m_ModeMutex->Lock();
-  if (this->m_Mode != Setup)
+  if (this->GetMode() != Setup)
   {
     //init before closing to force the field generator from aurora to switch itself off
     m_DeviceProtocol->INIT();
@@ -622,7 +646,6 @@ bool mitk::NDITrackingDevice::CloseConnection()
     this->SetErrorMessage("");
     m_SerialCommunication = NULL;
   }
-  m_ModeMutex->Unlock();
   return true;
 }
 
@@ -660,12 +683,9 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
 
 bool mitk::NDITrackingDevice::StartTracking()
 {
-  this->m_ModeMutex->Lock();
-  if (m_Mode != Ready)
-  {
-    this->m_ModeMutex->Unlock();
+  if (this->GetMode() != Ready)
     return false;
-  }
+
   this->SetMode(Tracking);      // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
@@ -675,8 +695,6 @@ bool mitk::NDITrackingDevice::StartTracking()
 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
   mitk::TimeStamp::GetInstance()->Start(this);
-
-  this->m_ModeMutex->Unlock();
   return true;
 }
 
@@ -692,7 +710,7 @@ void mitk::NDITrackingDevice::TrackTools()
     return;
 
   /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-  m_TrackingFinishedMutex->Lock();
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -722,12 +740,10 @@ void mitk::NDITrackingDevice::TrackTools()
   returnvalue = m_DeviceProtocol->TSTOP();
   if (returnvalue != NDIOKAY)
   {
-    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
-    return;     // how can this thread tell the application, that an error has occurred?
+    /* insert error handling/notification here */ 
+    ; // how can this thread tell the application, that an error has occurred? 
   }
-
-  m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
-  return;       // returning from this function (and ThreadStartTracking()) this will end the thread
+  return;       // returning from this function (and ThreadStartTracking()) this will end the thread and transfer control back to main thread by releasing trackingFinishedLockHolder
 }
 
 
@@ -736,7 +752,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (m_OperationMode == ToolTracking6D)
     return;
 
-  if (GetMode() != Tracking)
+  if (this->GetMode() != Tracking)
     return;
 
   NDIErrorCode returnvalue;
@@ -768,9 +784,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occured?
 
-  this->m_ModeMutex->Lock();
-  this->m_Mode = Ready;
-  this->m_ModeMutex->Unlock();
+  this->SetMode(Ready);
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
@@ -810,51 +824,35 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occurred?
 
-  this->m_ModeMutex->Lock();
-  this->m_Mode = Ready;
-  this->m_ModeMutex->Unlock();
+  this->SetMode(Ready);
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
 
 mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  mitk::TrackingTool* t = NULL;
-
-  m_ToolsMutex->Lock();
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   if (toolNumber < m_6DTools.size())
-    t = m_6DTools.at(toolNumber);
-  m_ToolsMutex->Unlock();
-  return t;
+    return m_6DTools.at(toolNumber);
+  return NULL;
 }
 
 
 mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string handle)
 {
-  mitk::NDIPassiveTool* t = NULL;
-
-  m_ToolsMutex->Lock();
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   Tool6DContainerType::iterator end = m_6DTools.end();
   for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
-  {
     if (handle.compare((*iterator)->GetPortHandle()) == 0)
-    {
-      t = *iterator;
-      break;
-    }
-  }
-  m_ToolsMutex->Unlock();
-  return t;
+      return *iterator;
+  return NULL;
 }
 
 
 unsigned int mitk::NDITrackingDevice::GetToolCount() const
 {
-  unsigned int s = 0;
-  m_ToolsMutex->Lock();
-  s = m_6DTools.size();
-  m_ToolsMutex->Unlock();
-  return s;
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  return m_6DTools.size();
 }
 
 
@@ -963,33 +961,33 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
     if (returnvalue != NDIOKAY)
       return false;
     /* Now that the tool is removed from the tracking device, remove it from our tool list too */
-    m_ToolsMutex->Lock();
+    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex (scope is inside the if-block
     Tool6DContainerType::iterator end = m_6DTools.end();
     for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
-      if ((*iterator).GetPointer() == ndiTool)
+    {
+      if (iterator->GetPointer() == ndiTool)
       {
         m_6DTools.erase(iterator);
         this->Modified();
-        m_ToolsMutex->Unlock();
         return true;
       }
-      m_ToolsMutex->Unlock();
-      return false;
+    }
+    return false;
   }
   else if (this->GetMode() == Setup)  // in Setup Mode, we are not connected to the tracking device, so we can just remove the tool from the tool list
   {
-    m_ToolsMutex->Lock();
+    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
     Tool6DContainerType::iterator end = m_6DTools.end();
     for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
+    {
       if ((*iterator).GetPointer() == ndiTool)
       {
         m_6DTools.erase(iterator);
         this->Modified();
-        m_ToolsMutex->Unlock();
         return true;
       }
-      m_ToolsMutex->Unlock();
-      return false;
+    }
+    return false;
   }
   return false;
 }
@@ -997,11 +995,10 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
 
 void mitk::NDITrackingDevice::InvalidateAll()
 {
-  m_ToolsMutex->Lock();
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   Tool6DContainerType::iterator end = m_6DTools.end();
   for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
     (*iterator)->SetDataValid(false);
-  m_ToolsMutex->Unlock();
 }
 
 
@@ -1024,13 +1021,7 @@ mitk::OperationMode mitk::NDITrackingDevice::GetOperationMode()
 bool mitk::NDITrackingDevice::GetMarkerPositions(MarkerPointContainerType* markerpositions)
 {
   m_MarkerPointsMutex->Lock();
-  *markerpositions=m_MarkerPoints;  // copy the internal vector to the one provided
+  *markerpositions = m_MarkerPoints;  // copy the internal vector to the one provided
   m_MarkerPointsMutex->Unlock();
-  if(markerpositions->size() == 0)
-  {
-    std::cout << "INFO: no markers found!" << std::endl;
-    return false;
-  } else {
-    return true;
-  }
+  return (markerpositions->size() != 0)  ;
 }

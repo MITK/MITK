@@ -153,7 +153,7 @@ protected:
 
   // Description:
   // Common code for setting up interpolation / clamping on 3D textures
-  void Setup3DTextureParameters( vtkVolumeProperty *property );
+  void Setup3DTextureParameters( bool linear );
 
 private:
   vtkMitkOpenGLVolumeTextureMapper3D(const vtkMitkOpenGLVolumeTextureMapper3D&);  // Not implemented.

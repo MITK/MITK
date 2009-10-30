@@ -45,7 +45,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 //# We need some temporary variables		
 "TEMP index, normal, finalColor;\n"
-"TEMP temp1, temp2, temp3; \n"
+"TEMP temp,temp1, temp2, temp3,temp4; \n"
 "TEMP sampleColor;\n"
 "TEMP ndotl, ndoth, ndotv; \n"
 "TEMP lightInfo, lightResult;\n"
@@ -77,7 +77,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 //# This normal is stored 0 to 1, change to -1 to 1
 //# by multiplying by 2.0 then adding -1.0.	
 "MAD normal, temp2, constants.x, constants.y;\n"
-	
+
 //# Swizzle this to use (a,r) as texture
 //# coordinates	
 "SWZ index, temp1, a, r, 1, 1;\n"
@@ -86,6 +86,13 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 //# final color in the third texture
 //# (this is a 2D texture)			
 "TEX sampleColor, index, texture[1], 2D;\n"
+
+"DP3 temp4, normal, normal;\n"
+
+"RSQ temp, temp4.x;\n"
+"MUL normal, normal, temp;\n"
+
+"MUL sampleColor.w,sampleColor.w,temp4.x;\n"
 
 //# Take the dot product of the light
 //# direction and the normal
@@ -96,7 +103,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "DP3 ndoth, normal, halfwayVector;\n"
 
 "DP3 ndotv, normal, viewVector;\n"
-	 
+
 //# flip if necessary for two sided lighting
 "MUL temp3, ndotl, constants.y; \n"
 "CMP ndotl, ndotv, ndotl, temp3;\n"
@@ -110,6 +117,8 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 
 //# compute the lighting	
 "LIT lightResult, lightInfo;\n"
+
+//# COLOR FIX
 "MUL lightResult, lightResult, 4.0;\n"
 
 //# This is the ambient contribution	
@@ -696,13 +705,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
     // Loop over the polygons
     for ( i = 0; i < this->NumberOfPolygons; i++ )
       {
-      /*
-      if ( i%64 == 1 )
-        {
-        glFlush();
-        glFinish();
-        }
-        */
+      
       if ( renWin->CheckAbortStatus() )
         {
         return;
@@ -735,20 +738,21 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
     }
 }
 
-void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( vtkVolumeProperty *property )
+void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( bool linear )
 {
   GPU_LOG << "Setup3DTextureParameters";
   
-  if ( property->GetInterpolationType() == VTK_NEAREST_INTERPOLATION )
-    {
-    glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    }
-  else
-    {
+  if( linear )
+  {
     glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    }
+  }
+  else
+  {
+    glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+  }
+
   glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP );
   glTexParameterf( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 }
@@ -756,7 +760,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( vtkVolumeProp
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRenderer *vtkNotUsed(ren),
                     vtkVolume *vol )
 { 
-  GPU_LOG << "SetupOneIndependentTextures";
+ // LOG_INFO << "SetupOneIndependentTextures";
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
@@ -790,44 +794,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
     
     
-    
-    GPU_LOG << "UPLOADING TEXTURE VOLUME1 " << dim[0] << "/" << dim[1] << "/" << dim[2];
-
-      
-    GPU_LOG << (this->Volume1?"jo":"no") ;
-        
-
-    if( glGetError() != GL_NO_ERROR )
-      GPU_LOG << "Shit-1";
-    
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalLA,dim[0],dim[1],
                       dim[2],0,GL_LUMINANCE_ALPHA,GL_UNSIGNED_BYTE,
                       this->Volume1);
                       
-    if( glGetError() != GL_NO_ERROR )
-      GPU_LOG << "Shit";
-                      
-    GPU_LOG << "STEP2";                      
-    /*
-    unsigned int sliceSize = dim[0]*dim[1];
-    
-    for(int slice = 0; slice < dim[2]; slice ++ )
-    {
-      GPU_LOG << "uploading slice " << slice;
-      
-      vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,slice,dim[0],dim[1],1
-                        ,GL_LUMINANCE_ALPHA,GL_UNSIGNED_BYTE,
-                        this->Volume1 + slice * sliceSize * 2);
-    }
-*/
-    if( glGetError() != GL_NO_ERROR )
-      GPU_LOG << "Shit2";
-                      
-    GPU_LOG << "Finished";
-    
-    
-    //vtkgl::TexSubImage3D();
-
     vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
     glBindTexture(vtkgl::TEXTURE_3D,0);
     this->DeleteTextureIndex(&this->Volume2Index);
@@ -837,27 +807,15 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalRGB,dim[0],dim[1],
                       dim[2],0,GL_RGB,GL_UNSIGNED_BYTE,this->Volume2);
 
-/*
-    for(int slice = 0; slice < dim[2]; slice ++ )
-    {
-      GPU_LOG << "uploading slice " << slice;
-      
-      vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,slice,dim[0],dim[1],1
-                        ,GL_RGB,GL_UNSIGNED_BYTE,
-                        this->Volume2 );
-    }
-    GPU_LOG << "Finished";
-*/
-
     }
   
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glEnable( GL_TEXTURE_2D );
@@ -1231,7 +1189,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
   vtkRenderer *vtkNotUsed(ren),
   vtkVolume *vol )
 {
-  GPU_LOG << "SetupTwoDependentTextures";
+  LOG_INFO << "SetupTwoDependentTextures";
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
@@ -1277,11 +1235,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
   
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
     
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glEnable( GL_TEXTURE_2D );
@@ -1382,7 +1340,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   vtkRenderer *vtkNotUsed(ren),
   vtkVolume *vol )
 {
-  GPU_LOG << "SetupFourDependentTextures";
+  LOG_INFO << "SetupFourDependentTextures";
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
@@ -1446,15 +1404,15 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glBindTexture(vtkgl::TEXTURE_3D_EXT, this->Volume3Index);   
-  this->Setup3DTextureParameters( vol->GetProperty() );
+  this->Setup3DTextureParameters( true );
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
   glEnable( GL_TEXTURE_2D );

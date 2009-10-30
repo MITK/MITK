@@ -222,6 +222,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void UseMaskImagesChecked(bool checked);
 
+    void TabChanged(int index);
+
   protected:
 
     cherry::ISelectionListener::Pointer m_SelListener;

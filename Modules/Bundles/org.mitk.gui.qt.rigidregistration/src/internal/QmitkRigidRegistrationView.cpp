@@ -57,7 +57,6 @@ struct SelListenerRigidRegistration : ISelectionListener
     // do something with the selected items
     if(m_View->m_CurrentSelection)
     {
-      m_View->SetImagesVisible(selection);
       if (m_View->m_CurrentSelection->Size() != 2)
       {
         if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
@@ -68,6 +67,9 @@ struct SelListenerRigidRegistration : ISelectionListener
           m_View->m_Controls.m_FixedLabel->hide();
           m_View->m_Controls.TextLabelMoving->hide();
           m_View->m_Controls.m_MovingLabel->hide();
+          m_View->m_Controls.m_OpacityLabel->setEnabled(false);
+          m_View->m_Controls.m_OpacitySlider->setEnabled(false);
+          m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
         }
       }
       else
@@ -93,13 +95,18 @@ struct SelListenerRigidRegistration : ISelectionListener
               }
               else
               {
+                m_View->SetImagesVisible(selection);
                 m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
+                m_View->m_Controls.m_OpacityLabel->setEnabled(true);
+                m_View->m_Controls.m_OpacitySlider->setEnabled(true);
+                m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
               }
             }
             else
             {
               m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+              m_View->m_Controls.m_StatusLabel->show();
               return;
             }
           }
@@ -159,6 +166,17 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
   m_Controls.m_UseImageMasks->hide();
+  m_Controls.m_OpacityLabel->setEnabled(false);
+  m_Controls.m_OpacitySlider->setEnabled(false);
+  m_Controls.m_ShowRedGreenValues->setEnabled(false);
+  if (m_Controls.m_RigidTransform->currentIndex() == 1)
+  {
+    m_Controls.frame->show();
+  }
+  else
+  {
+    m_Controls.frame->hide();
+  }
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
   this->CreateConnections();
@@ -189,6 +207,7 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
   connect(m_Controls.m_UseImageMasks, SIGNAL(toggled(bool)), this, SLOT(UseMaskImagesChecked(bool)));
+  connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(m_Controls.m_UndoTransformation,SIGNAL(clicked()),this,SLOT(UndoTransformation()));
@@ -858,5 +877,17 @@ void QmitkRigidRegistrationView::UseMaskImagesChecked(bool checked)
   {
     m_FixedMaskNode->SetVisibility(false);
     m_MovingMaskNode->SetVisibility(false);
+  }
+}
+
+void QmitkRigidRegistrationView::TabChanged(int index)
+{
+  if (index == 0)
+  {
+    m_Controls.frame->hide();
+  }
+  else
+  {
+    m_Controls.frame->show();
   }
 }

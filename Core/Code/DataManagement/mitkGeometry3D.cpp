@@ -145,7 +145,10 @@ void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D
   mitk::Point3D temp = pt_units;
   if(m_ImageGeometry)
   {
-    temp -= 0.5;
+    for (int i = 0; i < 3; i++)
+    {
+      temp[i] -= 0.5;
+    }
   }
   pt_mm = m_IndexToWorldTransform->TransformPoint(temp);
 }
@@ -359,7 +362,10 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
 
   if(m_ImageGeometry)
   {
-    out+=0.5;
+    for (i = 0; i < 3; i++)
+    {
+      out[i] += 0.5;
+    }
   }
   
   if (nans > 0)

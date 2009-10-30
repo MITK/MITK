@@ -107,6 +107,11 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
 
       try {
           dragStart = folder->IndexOf(part);
+          // hold on to this TabbedStackPresentation instance, because
+          // in this->GetSite()->DragStart() all reference may be deleted
+          // and this instance is destroyed, leading to a seg fault when
+          // trying to write to dragStart
+          StackPresentation::Pointer tabbedStackPresentation(this);
           this->GetSite()->DragStart(part, initialLocation, false);
           dragStart = -1;
       } catch(std::exception& exc) {

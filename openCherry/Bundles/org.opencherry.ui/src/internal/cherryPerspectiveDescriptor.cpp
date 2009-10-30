@@ -27,6 +27,7 @@ namespace cherry
 
 PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     const std::string& label, PerspectiveDescriptor::Pointer originalDescriptor)
+ : singleton(false), fixed(false)
 {
   this->id = id;
   this->label = label;
@@ -72,6 +73,7 @@ PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
 
 PerspectiveDescriptor::PerspectiveDescriptor(const std::string& id,
     IConfigurationElement::Pointer configElement)
+ : singleton(false), fixed(false)
 {
   this->configElement = configElement;
   this->id = id;

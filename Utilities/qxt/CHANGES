@@ -1,0 +1,105 @@
+LibQxt 0.5.1 contains bug fixes to the 0.5.x series. For more details, see the
+the documentation included in this package or online at http://doc.libqxt.org.
+
+0.5.1
+-----
+
+- Bug fixes
+    * #3 [Vista/Qt 4.5.0] - static build issue
+    * #9 QxtCheckComboBox display is inconsistent
+    * #10 qxtwindowsystem_win.cpp(105) : error C2065: 'LASTINPUTINFO': undeclared identifier
+    * #16 Static lib linkage problem in Qt Creator
+    * #17 QxtPushButton::minimumSizeHint returns wrong value
+    * Fixed QxtGlobalShortcut to allow NumLock on X11
+    * Fixed compilation problems with the GCC-4.4.X series
+    * Fixed QxtGlobalShortcut::shortcut()
+
+0.5.0
+-----
+
+- General
+    * Added LGPL license option
+    * Run Krazy checks and fixed found issues
+    * Improved configure.bat
+    * Added missing export macros
+    * Added missing convenience headers
+    * Improved compatibility
+        - QT_FORWARD_DECLARE_CLASS
+        - Q_SLOTS, Q_SIGNALS & Q_FOREACH in headers
+        - interface
+
+- QxtCore
+    * Revised QxtFifo
+    * Added QxtAlgorithms
+    * Added QxtSerialDevice
+    * Added QxtSlotMapper
+    
+- QxtCrypto
+    * Revised QxtBlowfish
+
+- QxtGui
+    * Added QxtWindowSystem::idleTime()
+    * Added QxtCrumbView
+    * Improved QxtScheduleView
+    * Added QxtSortFilterProxyModel
+    * Improved QxtSpanSlider
+        - Added QxtSpanSlider::HandleMovementMode
+    * Improved QxtItemDelegate
+        - Added ProgressMinimumRole & ProgressMaximumRole
+        - Added support for busy indicator mode
+    * Improved QxtLetterBoxWidget
+        - Added QxtLetterBoxWidget::margin
+        - Added QxtLetterBoxWidget::resizeWidget 
+
+- QxtWeb
+    * Added QxtWebCgiService
+
+0.4.0
+-----
+
+- QxtCore
+    * Added QxtDeplex
+    * Added QxtLocale
+    * Added QxtPointerList
+    * Added QxtMultiSignalWaiter
+    * Added QxtSignalGroup
+    * Added QxtCommandOptions
+    * Added QxtLogger
+    * Added QxtAbstractConnectionManager
+    * Added QxtDataStreamSignalSerializer
+    * Added QxtAbstractSignalSerializer
+
+- QxtCrypto
+    * Added QxtHmac
+
+- QxtGui
+    * Added QxtItemEditorCreatorBase
+    * Added QxtStandardItemEditorCreator
+    * Added QxtItemEditorCreator
+    * Added QxtBaseSpinBox
+    * Added QxtCountryComboBox
+    * Added QxtCountryModel
+    * Added QxtLanguageComboBox
+    * Added QxtScheduleView
+    * Added QxtTabBar
+    * Added QxtFlowView
+    * Added QxtLetterBoxWidget
+    * Improved QxtTabWidget
+        - Added QxtTabWidget::alwaysShowTabBar
+        - Added QxtTabWidget::tabAnimation
+        - Added QxtTabWidget::tabMovementMode
+    * Improved QxtConfirmationMessage
+        - Added QxtConfirmationMessage::settingsFormat
+        - Added QxtConfirmationMessage::rememberOnReject
+        - Added QxtConfirmationMessage::overrideSettingsApplication
+        - Added QxtConfirmationMessage::overrideSettingsKey
+        - Added QxtConfirmationMessage::overrideSettingsOrganization
+
+- QxtBerkeley
+    * Added QxtBdbTree
+
+- QxtWeb
+    * Revised the whole module
+
+- QxtNetwork
+    * Added QxtTcpConnectionManager

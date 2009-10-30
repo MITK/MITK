@@ -11,7 +11,7 @@ LINK_DIRECTORIES(${ITK_LIBRARY_DIRS})
 # like #include <ipPic/mitkIpPic.h>
 INCLUDE_DIRECTORIES(.)
 
-SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt mbilog glew)
+SUBDIRS(ann ipSegmentation IIL4MITK pic2vtk tinyxml Poco qwt qxt mbilog glew)
 
 # mbilog is independent of mitk, and cant use mitk macros
 # configuring happens through mbilog/mbilogConfig.cmake.in

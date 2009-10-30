@@ -1,0 +1,39 @@
+1) configure
+
+	make sure qmake is in your PATH and run ./configure  or configure.bat on windows.
+
+    	see configure --help for more information
+
+    	(for msvc you could try  ./configure.bat -msvc and open 
+    		the solution file in msvc, we recomend compiling on
+    		commandline though)
+
+2) build
+	
+	type make or nmake when using msvc
+	then don't forget to make install 
+	Note: This will also install qxt.prf to your qtdir/mkspecs/features directory.
+
+
+
+3) use
+
+	Add the following lines to your qmake project file:
+	CONFIG  += qxt
+	QXT     += core gui
+
+	The QXT variable should contain the modules you want. (In this example core and gui are used.)
+	Note: Some modules depend on other modules. The required modules are added automatically.
+
+	if you have an existing msvc project and can't swtich to qmake you can use zbenjamins solution:
+	
+	     Howto use libqxt in a existing Visual Studio Project:
+	      1.  create and install libqxt. (See install instructions)
+	      2.  add {libqxtinstalldir}\include\qxt\QxtCore to your include path
+	      3.  add {libqxtinstalldir}\lib to your library search path
+	      4.  to add a specific libqxt module (f.e QxtSql) you have to:
+	           - add {libqxtinstalldir}\include\qxt\QxtSql to your include path
+	           - add the library QxtSql.lib to your project
+	          Most of the times you have also to include the QxtCore and QxtKit modules.
+	          It's done the same way like the example above.
+

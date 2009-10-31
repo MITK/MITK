@@ -12,7 +12,7 @@ PointSets. Register means to align two datasets, so that they become as similar 
 Therefore you have to set corresponding points in both datasets, which will be matched. The movement, which has to be 
 performed on the points to align them, will be performed on the moving data as well. The result is shown in the multi-widget. 
 
-\image html PointBasedRegistration.png "MITK with the QmitkPointBasedRegistration functionality"
+\image html PointBasedRegistration_small.png "MITK with the QmitkPointBasedRegistration functionality"
 
 This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through 
 the slices of a dataset using the multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.

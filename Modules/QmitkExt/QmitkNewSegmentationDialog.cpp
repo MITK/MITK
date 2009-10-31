@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 
 #include "mitkOrganTypeProperty.h"
-#include "mitkColorProperty.h"
 
 #include <itkRGBPixel.h>
 
@@ -34,7 +33,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
  selectedOrgan("undefined"),
  newOrganEntry(false)
 {
-  QDialog::setMinimumSize(250, 105);
+  QDialog::setFixedSize(250, 105);
 
   QBoxLayout * verticalLayout = new QVBoxLayout( this );
   verticalLayout->setMargin(5);
@@ -46,16 +45,16 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   verticalLayout->addWidget( new QLabel( "Name and color of the segmentation", this ) );
 
   // to choose a color
-  btnColor = new QPushButton( tr("Color"), this, "btnColor" );
-  btnColor->setFixedWidth(45);
+  btnColor = new QPushButton( tr(""), this, "btnColor" );
+  btnColor->setFixedWidth(25);
+  btnColor->setAutoFillBackground(true);
+  btnColor->setStyleSheet("background-color:rgb(255,0,0)");
 
   connect( btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()) );
 
   edtName = new QLineEdit( "", this, "edtName" );
 
   QBoxLayout * horizontalLayout2 = new QHBoxLayout(verticalLayout);
-//  horizontalLayout2->setSpacing(5);
-//  horizontalLayout2->addStretch();
   horizontalLayout2->addWidget( btnColor );
   horizontalLayout2->addWidget( edtName );
 
@@ -148,6 +147,13 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString& newText)
 void QmitkNewSegmentationDialog::onColorBtnClicked()
 {
   color = QColorDialog::getColor();
+  if (color.spec() == 0)
+  {
+    color.setRed(255);
+    color.setGreen(0);
+    color.setBlue(0);
+  }
+  btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
 }
     
 void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )
@@ -160,7 +166,20 @@ void QmitkNewSegmentationDialog::setSegmentationName( const QString& name )
   edtName->setText( name );
 }
 
-QColor QmitkNewSegmentationDialog::GetColorProperty()
+mitk::Color QmitkNewSegmentationDialog::GetColorProperty()
 {
-  return color;
+  mitk::Color colorProperty;
+  if (color.spec() == 0)
+  {
+    colorProperty.SetRed(1);
+    colorProperty.SetGreen(0);
+    colorProperty.SetBlue(0);
+  }
+  else
+  {
+    colorProperty.SetRed(color.redF());
+    colorProperty.SetGreen(color.greenF());
+    colorProperty.SetBlue(color.blueF());
+  }
+  return colorProperty;
 }

@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkNewSegmentationDialog_h_Included
 #define QmitkNewSegmentationDialog_h_Included
 
+#include "mitkColorProperty.h"
+
 #include <qdialog.h>
 
 class QLabel;
@@ -50,7 +52,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     const char* GetSegmentationName();
     const char* GetOrganType();
-    QColor GetColorProperty();
+    mitk::Color GetColorProperty();
 
   signals:
 

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 #define _MITK_DIFFUSION_IMAGE_DATA_SOURCE_H_HEADER_
 
-#include "mitkBaseProcess.h"
+#include "mitkImageSource.h"
 #include "MitkDiffusionImagingExports.h"
 
 namespace mitk {
@@ -42,11 +42,10 @@ namespace mitk {
 //##
 //## @ingroup Process
 template<typename TPixelType>
-class MitkDiffusionImaging_EXPORT DiffusionImageSource : public BaseProcess
+class MitkDiffusionImaging_EXPORT DiffusionImageSource : public ImageSource
 {
 public:
   mitkClassMacro(DiffusionImageSource, BaseProcess);
-
   itkNewMacro(Self);  
 
   typedef DiffusionImage<TPixelType> OutputType;
@@ -55,15 +54,16 @@ public:
   virtual DataObjectPointer MakeOutput(unsigned int idx);
 
 
-  void SetOutput(OutputType* output);
+  //void SetOutput(OutputType* output);
 
-  OutputType* GetOutput();
+  //OutputType* GetOutput()
+  //{return Superclass::GetOutput();}
 
-  OutputType* GetOutput(unsigned int idx);
+  //OutputType* GetOutput(unsigned int idx);
 
-  virtual void GraftOutput(OutputType* graft);
+  //virtual void GraftOutput(OutputType* graft);
 
-  virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
+  //virtual void GraftNthOutput(unsigned int idx, OutputType *graft);
 
 protected:
   DiffusionImageSource();

@@ -55,20 +55,20 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     char valbuffer[512];
     std::string tmp;
 
-    itk::VectorImage<short,3>::Pointer img = input->GetImage();
+    itk::VectorImage<short,3>::Pointer img = input->GetVectorImage();
     img->GetMetaDataDictionary();
 
     //itk::MetaDataDictionary dic = input->GetImage()->GetMetaDataDictionary();
     sprintf( valbuffer, "(%1f,%1f,%1f) (%1f,%1f,%1f) (%1f,%1f,%1f)", 1.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f);
-    itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
+    itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
 
     sprintf( valbuffer, "DWMRI");
-    itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
+    itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
 
     if(input->GetDirections()->Size())
     {
       sprintf( valbuffer, "%1f", input->GetB_Value() );
-      itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
+      itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
     }
 
     for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
@@ -82,7 +82,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       sprintf( valbuffer, "%1f %1f %1f", input->GetDirections()->ElementAt(i).get(0),
         input->GetDirections()->ElementAt(i).get(1), input->GetDirections()->ElementAt(i).get(2));
 
-      itk::EncapsulateMetaData<std::string>(input->GetImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
+      itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
     }
 
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
@@ -93,7 +93,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     typedef itk::ImageFileWriter<ImageType> WriterType;
     typename WriterType::Pointer nrrdWriter = WriterType::New();
     nrrdWriter->UseInputMetaDataDictionaryOn();
-    nrrdWriter->SetInput( input->GetImage() );
+    nrrdWriter->SetInput( input->GetVectorImage() );
     nrrdWriter->SetImageIO(io);
     nrrdWriter->SetFileName(m_FileName);
 

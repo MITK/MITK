@@ -48,11 +48,14 @@ namespace mitk
       itkWarningMacro("Tree cache is empty!");    
     }
 
-    typename OutputType::Pointer output = this->GetOutput();
-    output->SetImage(m_OutputCache->GetImage());
-    output->SetB_Value(m_OutputCache->GetB_Value());
-    output->SetDirections(m_OutputCache->GetDirections());
-
+    static_cast<OutputType*>(this->GetOutput())
+      ->SetVectorImage(m_OutputCache->GetVectorImage());
+    static_cast<OutputType*>(this->GetOutput())
+      ->SetB_Value(m_OutputCache->GetB_Value());
+    static_cast<OutputType*>(this->GetOutput())
+      ->SetDirections(m_OutputCache->GetDirections());
+    static_cast<OutputType*>(this->GetOutput())
+      ->InitializeFromVectorImage();
   }
 
   template <class TPixelType>
@@ -129,9 +132,10 @@ namespace mitk
         }
 
         // This call updates the output information of the associated VesselTreeData
-        outputForCache->SetImage(img);
+        outputForCache->SetVectorImage(img);
         outputForCache->SetB_Value(m_B_Value);
         outputForCache->SetDirections(m_DiffusionVectors);
+        outputForCache->InitializeFromVectorImage();
 
         // Since we have already read the tree, we can store it in a cache variable
         // so that it can be assigned to the DataObject in GenerateData();

@@ -17,9 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "itkImageRegionIterator.h"
+#include "itkImageRegionConstIterator.h"
+#include "mitkImageCast.h"
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
+: m_VectorImage(0), m_Directions(0), m_B_Value(-1.0), m_VectorImageAdaptor(0)
 {
 }
 
@@ -30,64 +33,144 @@ mitk::DiffusionImage<TPixelType>::~DiffusionImage()
 }
 
 template<typename TPixelType>
-bool mitk::DiffusionImage<TPixelType>::RequestedRegionIsOutsideOfTheBufferedRegion()
+void mitk::DiffusionImage<TPixelType>
+::InitializeFromVectorImage()
 {
-  return false;
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::SetRequestedRegion(itk::DataObject * /*data*/)
-{
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::SetRequestedRegionToLargestPossibleRegion()
-{
-}
-
-template<typename TPixelType>
-bool mitk::DiffusionImage<TPixelType>::VerifyRequestedRegion()
-{
-  return true;
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImage<TPixelType>::DuplicateIfSingleSlice()
-{
-  // new image
-  typename ImageType::Pointer oldImage = m_Image;
-  m_Image = ImageType::New();
-  m_Image->SetSpacing( oldImage->GetSpacing() );   // Set the image spacing
-  m_Image->SetOrigin( oldImage->GetOrigin() );     // Set the image origin
-  m_Image->SetDirection( oldImage->GetDirection() );  // Set the image direction
-  typename ImageType::RegionType region = oldImage->GetLargestPossibleRegion();
-  if(region.GetSize(0) == 1)
-    region.SetSize(0,3);
-  if(region.GetSize(1) == 1)
-    region.SetSize(1,3);
-  if(region.GetSize(2) == 1)
-    region.SetSize(2,3);
-  m_Image->SetLargestPossibleRegion( region );
-  m_Image->SetVectorLength( m_Directions->size() );
-  m_Image->SetBufferedRegion( region );
-  m_Image->Allocate();
-
-  // average image data that corresponds to identical directions
-  itk::ImageRegionIterator< ImageType > newIt(m_Image, region);
-  newIt.GoToBegin();
-  itk::ImageRegionIterator< ImageType > oldIt(oldImage, oldImage->GetLargestPossibleRegion());
-  oldIt.GoToBegin();
-
-  while(!newIt.IsAtEnd())
+  if(!m_VectorImage || !m_Directions || m_B_Value==-1.0)
   {
-    newIt.Set(oldIt.Get());
-    ++newIt;
-    ++oldIt;
-    if(oldIt.IsAtEnd())
-      oldIt.GoToBegin();
+    std::cout << "DiffusionImage could not be initialized. Set all members first!" << std::endl;
+    return;
   }
 
+  // find bzero index
+  int firstZeroIndex = -1;
+  for(GradientDirectionContainerType::ConstIterator it = m_Directions->Begin();
+    it != m_Directions->End(); ++it)
+  {
+    firstZeroIndex++;
+    GradientDirectionType g = it.Value();
+    if(g[0] == 0 && g[3] == 0 && g[2] == 0 )
+      break;
+  }
+  
+  typedef itk::Image<TPixelType,3> ImgType;
+  ImgType::Pointer img = ImgType::New();
+  img->SetSpacing( m_VectorImage->GetSpacing() );   // Set the image spacing
+  img->SetOrigin( m_VectorImage->GetOrigin() );     // Set the image origin
+  img->SetDirection( m_VectorImage->GetDirection() );  // Set the image direction
+  img->SetLargestPossibleRegion( m_VectorImage->GetLargestPossibleRegion());
+  img->SetBufferedRegion( m_VectorImage->GetLargestPossibleRegion() );
+  img->Allocate();
+  
+  int vecLength = m_VectorImage->GetVectorLength();
+  InitializeByItk( img.GetPointer(), 1, vecLength );
+
+  for(int i=0; i<vecLength; i++)
+  {
+    itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
+    itw = itw.Begin();
+
+    itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
+    itr = itr.Begin();
+
+    while(!itr.IsAtEnd())
+    {
+      itw.Set(itr.Get().GetElement(i));
+      ++itr;
+      ++itw;
+    }
+
+    // init
+    SetImportVolume(img->GetBufferPointer(), i, 0, CopyMemory);
+    //SetVolume( img->GetBufferPointer(), i );
+  }
+
+  std::cout << "Image initialized." << std::endl;
+
 }
+
+template<typename TPixelType>
+void mitk::DiffusionImage<TPixelType>
+::SetDisplayIndexForRendering(int displayIndex)
+{
+  typedef itk::Image<TPixelType,3> ImgType;
+  ImgType::Pointer img = ImgType::New();
+  CastToItkImage<ImgType>(this, img);
+
+  itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
+  itw = itw.Begin();
+
+  itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
+  itr = itr.Begin();
+
+  while(!itr.IsAtEnd())
+  {
+    itw.Set(itr.Get().GetElement(displayIndex));
+    ++itr;
+    ++itw;
+  }
+}
+
+
+//template<typename TPixelType>
+//bool mitk::DiffusionImage<TPixelType>::RequestedRegionIsOutsideOfTheBufferedRegion()
+//{
+//  return false;
+//}
+//
+//template<typename TPixelType>
+//void mitk::DiffusionImage<TPixelType>::SetRequestedRegion(itk::DataObject * /*data*/)
+//{
+//}
+//
+//template<typename TPixelType>
+//void mitk::DiffusionImage<TPixelType>::SetRequestedRegionToLargestPossibleRegion()
+//{
+//}
+//
+//template<typename TPixelType>
+//bool mitk::DiffusionImage<TPixelType>::VerifyRequestedRegion()
+//{
+//  return true;
+//}
+
+//template<typename TPixelType>
+//void mitk::DiffusionImage<TPixelType>::DuplicateIfSingleSlice()
+//{
+//  // new image
+//  typename ImageType::Pointer oldImage = m_Image;
+//  m_Image = ImageType::New();
+//  m_Image->SetSpacing( oldImage->GetSpacing() );   // Set the image spacing
+//  m_Image->SetOrigin( oldImage->GetOrigin() );     // Set the image origin
+//  m_Image->SetDirection( oldImage->GetDirection() );  // Set the image direction
+//  typename ImageType::RegionType region = oldImage->GetLargestPossibleRegion();
+//  if(region.GetSize(0) == 1)
+//    region.SetSize(0,3);
+//  if(region.GetSize(1) == 1)
+//    region.SetSize(1,3);
+//  if(region.GetSize(2) == 1)
+//    region.SetSize(2,3);
+//  m_Image->SetLargestPossibleRegion( region );
+//  m_Image->SetVectorLength( m_Directions->size() );
+//  m_Image->SetBufferedRegion( region );
+//  m_Image->Allocate();
+//
+//  // average image data that corresponds to identical directions
+//  itk::ImageRegionIterator< ImageType > newIt(m_Image, region);
+//  newIt.GoToBegin();
+//  itk::ImageRegionIterator< ImageType > oldIt(oldImage, oldImage->GetLargestPossibleRegion());
+//  oldIt.GoToBegin();
+//
+//  while(!newIt.IsAtEnd())
+//  {
+//    newIt.Set(oldIt.Get());
+//    ++newIt;
+//    ++oldIt;
+//    if(oldIt.IsAtEnd())
+//      oldIt.GoToBegin();
+//  }
+//
+//}
 
 template<typename TPixelType>
 bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1, 
@@ -134,18 +217,18 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     return;
 
   // new image
-  typename ImageType::Pointer oldImage = m_Image;
-  m_Image = ImageType::New();
-  m_Image->SetSpacing( oldImage->GetSpacing() );   // Set the image spacing
-  m_Image->SetOrigin( oldImage->GetOrigin() );     // Set the image origin
-  m_Image->SetDirection( oldImage->GetDirection() );  // Set the image direction
-  m_Image->SetLargestPossibleRegion( oldImage->GetLargestPossibleRegion() );
-  m_Image->SetVectorLength( m_Directions->size() );
-  m_Image->SetBufferedRegion( oldImage->GetLargestPossibleRegion() );
-  m_Image->Allocate();
+  typename ImageType::Pointer oldImage = m_VectorImage;
+  m_VectorImage = ImageType::New();
+  m_VectorImage->SetSpacing( oldImage->GetSpacing() );   // Set the image spacing
+  m_VectorImage->SetOrigin( oldImage->GetOrigin() );     // Set the image origin
+  m_VectorImage->SetDirection( oldImage->GetDirection() );  // Set the image direction
+  m_VectorImage->SetLargestPossibleRegion( oldImage->GetLargestPossibleRegion() );
+  m_VectorImage->SetVectorLength( m_Directions->size() );
+  m_VectorImage->SetBufferedRegion( oldImage->GetLargestPossibleRegion() );
+  m_VectorImage->Allocate();
 
   // average image data that corresponds to identical directions
-  itk::ImageRegionIterator< ImageType > newIt(m_Image, m_Image->GetLargestPossibleRegion());
+  itk::ImageRegionIterator< ImageType > newIt(m_VectorImage, m_VectorImage->GetLargestPossibleRegion());
   newIt.GoToBegin();
   itk::ImageRegionIterator< ImageType > oldIt(oldImage, oldImage->GetLargestPossibleRegion());
   oldIt.GoToBegin();

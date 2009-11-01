@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdTensorImageWriter.h"
 
 #include "mitkCompositeMapper.h"
+#include "mitkDiffusionImageMapper.h"
 
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -43,11 +44,11 @@ typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
 :CoreObjectFactoryBase()
 {
-  m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_ExternalFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
   m_ExternalFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
   m_ExternalFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
   
-  m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_SaveFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
   m_SaveFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
   m_SaveFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
 
@@ -64,7 +65,7 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
-    
+
     //m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
     //m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
     //m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
@@ -109,18 +110,24 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
 
   if ( id == mitk::BaseRenderer::Standard2D )
   {
-    std::string qballclassname("QBallImage");
-    if(node->GetData() && qballclassname.compare(node->GetData()->GetNameOfClass())==0)
+    std::string classname("QBallImage");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataTreeNode(node);
     }
-    std::string tensorclassname("TensorImage");
-    if(node->GetData() && tensorclassname.compare(node->GetData()->GetNameOfClass())==0)
+    classname = "TensorImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataTreeNode(node);
     }
+    //classname = "DiffusionImage";
+    //if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    //{
+    //  newMapper = mitk::DiffusionImageMapper<short>::New();
+    //  newMapper->SetDataTreeNode(node);
+    //}
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -132,13 +139,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
 
 void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
 {
-  std::string classname("DiffusionImages");
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    // do nothing
-  }
-
-  classname = "QBallImage";
+  std::string classname = "QBallImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::CompositeMapper::SetDefaultProperties(node);
@@ -149,6 +150,12 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNod
   {
     mitk::CompositeMapper::SetDefaultProperties(node);
   }
+
+  //std::string classname("DiffusionImage");
+  //if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  //{
+  //  mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
+  //}
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions() 

@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __mitkDiffusionImage__h
 #define __mitkDiffusionImage__h
 
-#include "mitkBaseData.h"
+#include "mitkImage.h"
 #include "itkVectorImage.h"
+#include "itkVectorImageToImageAdaptor.h"
 
 namespace mitk 
 {
@@ -31,32 +32,36 @@ namespace mitk
   * yet supported by mitkImage)
   */
   template<class TPixelType>
-  class DiffusionImage : public BaseData
+  class DiffusionImage : public Image
   {
 
   public:
 
-    typedef typename itk::VectorImage<TPixelType, 3> ImageType;
-    typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
+    typedef typename itk::VectorImage<TPixelType, 3> 
+                                                ImageType;
+    typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;
     typedef itk::VectorContainer< unsigned int, 
-      GradientDirectionType >                  GradientDirectionContainerType;
+      GradientDirectionType >                   GradientDirectionContainerType;
+    typedef itk::VectorImageToImageAdaptor< TPixelType, 3 > 
+                                                AdaptorType;
 
-    mitkClassMacro( DiffusionImage, BaseData );
+    mitkClassMacro( DiffusionImage, Image );
     itkNewMacro(Self);
 
-    void SetRequestedRegionToLargestPossibleRegion();
-    bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    void SetRequestedRegion(itk::DataObject *data);
+    //void SetRequestedRegionToLargestPossibleRegion();
+    //bool RequestedRegionIsOutsideOfTheBufferedRegion();
+    //virtual bool VerifyRequestedRegion();
+    //void SetRequestedRegion(itk::DataObject *data);
 
     void AverageRedundantGradients(double precision);
 
-    void DuplicateIfSingleSlice();
+    typename ImageType::Pointer GetVectorImage()
+    { return m_VectorImage; }
+    void SetVectorImage(typename ImageType::Pointer image )
+    { this->m_VectorImage = image; }
 
-    typename ImageType::Pointer GetImage()
-    { return m_Image; }
-    void SetImage(typename ImageType::Pointer image )
-    { this->m_Image = image; }
+    void InitializeFromVectorImage();
+    void SetDisplayIndexForRendering(int displayIndex);
 
     GradientDirectionContainerType::Pointer GetDirections()
     { return m_Directions; }
@@ -72,11 +77,10 @@ namespace mitk
     DiffusionImage();
     virtual ~DiffusionImage();
 
-    typename ImageType::Pointer m_Image;
-
-    GradientDirectionContainerType::Pointer m_Directions;
-
-    float m_B_Value;
+    typename ImageType::Pointer               m_VectorImage;
+    GradientDirectionContainerType::Pointer   m_Directions;
+    float                                     m_B_Value;
+    typename AdaptorType::Pointer             m_VectorImageAdaptor;
 
   };
 

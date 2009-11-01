@@ -46,59 +46,59 @@ itk::DataObject::Pointer mitk::DiffusionImageSource<TPixelType>::MakeOutput( uns
 }
 
 
-template<typename TPixelType>
-mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput()
-{
-  if (this->GetNumberOfOutputs() < 1)
-  {
-    return 0;
-  }
-
-  return static_cast<mitk::DiffusionImage<TPixelType>*>
-    (this->BaseProcess::GetOutput(0));
-}
-
-template<typename TPixelType>
-mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput(unsigned int idx)
-{
-  return static_cast<mitk::DiffusionImage<TPixelType>*>
-    (this->ProcessObject::GetOutput(idx));
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImageSource<TPixelType>::SetOutput(mitk::DiffusionImage<TPixelType>* output)
-{
-  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
-  BaseProcess::SetNthOutput(0, output);
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImageSource<TPixelType>::GraftOutput(mitk::DiffusionImage<TPixelType>* graft)
-{
-  this->GraftNthOutput(0, graft);
-}
-
-template<typename TPixelType>
-void mitk::DiffusionImageSource<TPixelType>::GraftNthOutput(unsigned int idx, mitk::DiffusionImage<TPixelType> *graft)
-{
-  if (idx < this->GetNumberOfOutputs())
-  {
-    mitk::DiffusionImage<TPixelType> * output = this->GetOutput(idx);
-
-    if (output && graft)
-    {
-      // grab a handle to the bulk data of the specified data object
-      //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
-
-      // copy the region ivars of the specified data object
-      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
-      //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
-      //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
-
-      // copy the meta-information
-      output->CopyInformation( graft );
-    }
-  }
-}
+//template<typename TPixelType>
+//mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput()
+//{
+//  if (this->GetNumberOfOutputs() < 1)
+//  {
+//    return 0;
+//  }
+//
+//  return static_cast<mitk::DiffusionImage<TPixelType>*>
+//    (this->BaseProcess::GetOutput(0));
+//}
+//
+//template<typename TPixelType>
+//mitk::DiffusionImage<TPixelType>* mitk::DiffusionImageSource<TPixelType>::GetOutput(unsigned int idx)
+//{
+//  return static_cast<mitk::DiffusionImage<TPixelType>*>
+//    (this->ProcessObject::GetOutput(idx));
+//}
+//
+//template<typename TPixelType>
+//void mitk::DiffusionImageSource<TPixelType>::SetOutput(mitk::DiffusionImage<TPixelType>* output)
+//{
+//  itkWarningMacro(<< "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
+//  BaseProcess::SetNthOutput(0, output);
+//}
+//
+//template<typename TPixelType>
+//void mitk::DiffusionImageSource<TPixelType>::GraftOutput(mitk::DiffusionImage<TPixelType>* graft)
+//{
+//  this->GraftNthOutput(0, graft);
+//}
+//
+//template<typename TPixelType>
+//void mitk::DiffusionImageSource<TPixelType>::GraftNthOutput(unsigned int idx, mitk::DiffusionImage<TPixelType> *graft)
+//{
+//  if (idx < this->GetNumberOfOutputs())
+//  {
+//    mitk::DiffusionImage<TPixelType> * output = this->GetOutput(idx);
+//
+//    if (output && graft)
+//    {
+//      // grab a handle to the bulk data of the specified data object
+//      //      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
+//
+//      // copy the region ivars of the specified data object
+//      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
+//      //      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
+//      //      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
+//
+//      // copy the meta-information
+//      output->CopyInformation( graft );
+//    }
+//  }
+//}
 
 #endif //__MITK_NRRD_DIFFUSION_VOULMES_IO_FACTORY_CPP__

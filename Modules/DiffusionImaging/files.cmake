@@ -44,6 +44,7 @@ SET(CPP_FILES
 )
 
 SET(H_FILES 
+  Rendering/mitkDiffusionImageMapper.h
   Reconstruction/itkDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h

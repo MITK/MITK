@@ -54,7 +54,7 @@ void mitk::DiffusionImage<TPixelType>
   }
   
   typedef itk::Image<TPixelType,3> ImgType;
-  ImgType::Pointer img = ImgType::New();
+  typename ImgType::Pointer img = ImgType::New();
   img->SetSpacing( m_VectorImage->GetSpacing() );   // Set the image spacing
   img->SetOrigin( m_VectorImage->GetOrigin() );     // Set the image origin
   img->SetDirection( m_VectorImage->GetDirection() );  // Set the image direction
@@ -94,7 +94,7 @@ void mitk::DiffusionImage<TPixelType>
 ::SetDisplayIndexForRendering(int displayIndex)
 {
   typedef itk::Image<TPixelType,3> ImgType;
-  ImgType::Pointer img = ImgType::New();
+  typename ImgType::Pointer img = ImgType::New();
   CastToItkImage<ImgType>(this, img);
 
   itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );

@@ -46,6 +46,30 @@ namespace mitk {
   template<class TPixelType, int NrOdfDirections>
   class OdfVtkMapper2D : public BaseVtkMapper2D
   {
+    struct OdfDisplayGeometry {
+      vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
+      Vector3D normal;
+      double d, d1, d2;
+      mitk::Point3D M3D, L3D, O3D;
+      
+      vtkFloatingPointType vp_original[ 3 ], vnormal_original[ 3 ];
+      mitk::Vector2D size, origin;
+
+      bool Equals(OdfDisplayGeometry* other)
+      {
+        return other->vp_original[0] == vp[0] &&
+        other->vp_original[1] == vp[1] &&
+        other->vp_original[2] == vp[2] &&
+        other->vnormal_original[0] == vnormal[0] &&
+        other->vnormal_original[1] == vnormal[1] &&
+        other->vnormal_original[2] == vnormal[2] &&
+        other->size[0] == size[0] &&
+        other->size[1] == size[1] &&
+        other->origin[0] == origin[0] &&
+        other->origin[1] == origin[1];
+      }
+    };
+
   public:
 
     mitkClassMacro(OdfVtkMapper2D,BaseVtkMapper2D);
@@ -60,14 +84,22 @@ namespace mitk {
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){};
 #endif
-
-    virtual void Slice(mitk::BaseRenderer* renderer);
+    
+    OdfDisplayGeometry* MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
+    void AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo );
+    void AdaptOdfScalingToImageSpacing( int index );
+    void SetRendererLightSources( mitk::BaseRenderer *renderer );
+    void ApplyPropertySettings();
+    virtual void Slice(mitk::BaseRenderer* renderer,
+      OdfDisplayGeometry* dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
 
     static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
+
+    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return true; }
 
   protected:
     OdfVtkMapper2D();
@@ -109,6 +141,8 @@ namespace mitk {
     vtkImageData* m_VtkImage ;
 
     mitk::Image* GetInput();
+
+    OdfDisplayGeometry* m_LastDisplayGeometry;
   };
 
 } // namespace mitk

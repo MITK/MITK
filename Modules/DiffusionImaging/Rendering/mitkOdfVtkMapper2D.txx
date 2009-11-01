@@ -137,6 +137,7 @@ mitk::OdfVtkMapper2D<T,N>
 ::OdfVtkMapper2D()
 {
   m_VtkBased = true;
+  m_LastDisplayGeometry = 0;
 
   m_PropAssemblies.push_back(vtkPropAssembly::New());
   m_PropAssemblies.push_back(vtkPropAssembly::New());
@@ -306,7 +307,9 @@ void  mitk::OdfVtkMapper2D<T,N>
     *pfilter=(vtkMaskedProgrammableGlyphFilter*)arg;
 
   double point[3];
+  double debugpoint[3];
   pfilter->GetPoint(point);
+  pfilter->GetPoint(debugpoint);
 
   itk::Point<double,3> p(point);
   Point3D origin = pfilter->GetGeometry()->GetOrigin();
@@ -380,15 +383,59 @@ void  mitk::OdfVtkMapper2D<T,N>
   for(int i=0; i<N; i++)
     m_OdfVals->SetComponent(0,i,0.5*odf[i]*m_Scaling);
 
+    double max = -100000;
+    double min = 100000;
+    for( unsigned int i=0; i<N; i++) 
+    {
+      max = odf[i] > max ? odf[i] : max;
+      min = odf[i] < min ? odf[i] : min;
+    }
+    
   m_OdfSource->Modified();
 }
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
-::Slice(mitk::BaseRenderer* renderer)
+::AdaptCameraPosition(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo )
 {
-  int index = GetIndex(renderer);
 
+  double viewAngle = renderer->GetVtkRenderer()->GetActiveCamera()->GetViewAngle();
+  viewAngle = viewAngle * (ODF_MAPPER_PI/180.0);
+  viewAngle /= 2;
+  double dist = dispGeo->d/tan(viewAngle);
+
+  mitk::Point3D mfoc; 
+  mfoc[0]=dispGeo->M3D[0];
+  mfoc[1]=dispGeo->M3D[1];
+  mfoc[2]=dispGeo->M3D[2];
+
+  mitk::Point3D mpos; 
+  mpos[0]=mfoc[0]+dist*dispGeo->normal[0];
+  mpos[1]=mfoc[1]+dist*dispGeo->normal[1];
+  mpos[2]=mfoc[2]+dist*dispGeo->normal[2];
+
+  mitk::Point3D mup; 
+  mup[0]=dispGeo->O3D[0]-dispGeo->M3D[0];
+  mup[1]=dispGeo->O3D[1]-dispGeo->M3D[1];
+  mup[2]=dispGeo->O3D[2]-dispGeo->M3D[2];
+
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(dist/3.74);
+
+  vtkCamera*   camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  if (camera)
+  {
+    camera->SetPosition(mpos[0],mpos[1],mpos[2]);
+    camera->SetFocalPoint(mfoc[0], mfoc[1],mfoc[2]);
+    camera->SetViewUp(mup[0],mup[1],mup[2]);
+  }  
+  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+}
+
+template<class T, int N>
+typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
+::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
+{
   vtkLinearTransform * vtktransform = 
     this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
   Geometry2D::ConstPointer worldGeometry = 
@@ -451,38 +498,51 @@ void  mitk::OdfVtkMapper2D<T,N>
   double d = d1>d2 ? d1 : d2;
   d = d2;
 
-  double viewAngle = renderer->GetVtkRenderer()->GetActiveCamera()->GetViewAngle();
-  viewAngle = viewAngle * (ODF_MAPPER_PI/180.0);
-  viewAngle /= 2;
-  double dist = d/tan(viewAngle);
+  OdfDisplayGeometry* retval = new OdfDisplayGeometry();
+  retval->vp[0] = vp[0];
+  retval->vp[1] = vp[1];
+  retval->vp[2] = vp[2];
+  retval->vnormal[0] = vnormal[0];
+  retval->vnormal[1] = vnormal[1];
+  retval->vnormal[2] = vnormal[2];
+  retval->normal[0] = normal[0];
+  retval->normal[1] = normal[1];
+  retval->normal[2] = normal[2];
+  retval->d = d;
+  retval->d1 = d1;
+  retval->d2 = d2;
+  retval->M3D[0] = M3D[0];
+  retval->M3D[1] = M3D[1];
+  retval->M3D[2] = M3D[2];
+  retval->L3D[0] = L3D[0];
+  retval->L3D[1] = L3D[1];
+  retval->L3D[2] = L3D[2];
+  retval->O3D[0] = O3D[0];
+  retval->O3D[1] = O3D[1];
+  retval->O3D[2] = O3D[2];
 
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(dist/3.74);
+  retval->vp_original[0] = vp[0];
+  retval->vp_original[1] = vp[1];
+  retval->vp_original[2] = vp[2];
+  retval->vnormal_original[0] = vnormal[0];
+  retval->vnormal_original[1] = vnormal[1];
+  retval->vnormal_original[2] = vnormal[2];
+  retval->size[0] = size[0];
+  retval->size[1] = size[1];
+  retval->origin[0] = origin[0];
+  retval->origin[1] = origin[1];
+  return retval;
 
-  mitk::Point3D mfoc; 
-  mfoc[0]=M3D[0];
-  mfoc[1]=M3D[1];
-  mfoc[2]=M3D[2];
+}
 
-  mitk::Point3D mpos; 
-  mpos[0]=mfoc[0]+dist*normal[0];
-  mpos[1]=mfoc[1]+dist*normal[1];
-  mpos[2]=mfoc[2]+dist*normal[2];
+template<class T, int N>
+void  mitk::OdfVtkMapper2D<T,N>
+::Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo)
+{
+  vtkLinearTransform * vtktransform = 
+    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
 
-  mitk::Point3D mup; 
-  mup[0]=O3D[0]-M3D[0];
-  mup[1]=O3D[1]-M3D[1];
-  mup[2]=O3D[2]-M3D[2];
-
-  
-  vtkCamera*   camera = renderer->GetVtkRenderer()->GetActiveCamera();
-  if (camera)
-  {
-    camera->SetPosition(mpos[0],mpos[1],mpos[2]);
-    camera->SetFocalPoint(mfoc[0], mfoc[1],mfoc[2]);
-    camera->SetViewUp(mup[0],mup[1],mup[2]);
-  }  
-  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+  int index = GetIndex(renderer);
 
   vtkTransform* inversetransform = vtkTransform::New();
   inversetransform->Identity();
@@ -491,12 +551,8 @@ void  mitk::OdfVtkMapper2D<T,N>
   ((vtkTransform*)vtktransform)->GetScale(myscale);
   inversetransform->PostMultiply();
   inversetransform->Scale(1*myscale[0],1*myscale[1],1*myscale[2]);
-  //inversetransform->GetScale(myscale);
-  //inversetransform->PostMultiply();
-  //inversetransform->Scale(1/myscale[0],1/myscale[1],1/myscale[2]);
-
-  inversetransform->TransformPoint( vp, vp );
-  inversetransform->TransformNormalAtPoint( vp, vnormal, vnormal );
+  inversetransform->TransformPoint( dispGeo->vp, dispGeo->vp );
+  inversetransform->TransformNormalAtPoint( dispGeo->vp, dispGeo->vnormal, dispGeo->vnormal );
 
   // vtk works in axis align coords
   // thus the normal also must be axis align, since 
@@ -509,50 +565,51 @@ void  mitk::OdfVtkMapper2D<T,N>
   m_VtkImage->GetDimensions(dims);
   double spac[3];
   m_VtkImage->GetSpacing(spac);
-  if(fabs(vnormal[0]) > fabs(vnormal[1]) && fabs(vnormal[0]) > fabs(vnormal[2]) )
+  if(fabs(dispGeo->vnormal[0]) > fabs(dispGeo->vnormal[1]) 
+    && fabs(dispGeo->vnormal[0]) > fabs(dispGeo->vnormal[2]) )
   {
-    if(fabs(vp[0]/spac[0]) < 0.4)
-      vp[0] = 0.4*spac[0];
-    if(fabs(vp[0]/spac[0]) > (dims[0]-1)-0.4)
-      vp[0] = ((dims[0]-1)-0.4)*spac[0];
-    vnormal[1] = 0;
-    vnormal[2] = 0;
+    if(fabs(dispGeo->vp[0]/spac[0]) < 0.4)
+      dispGeo->vp[0] = 0.4*spac[0];
+    if(fabs(dispGeo->vp[0]/spac[0]) > (dims[0]-1)-0.4)
+      dispGeo->vp[0] = ((dims[0]-1)-0.4)*spac[0];
+    dispGeo->vnormal[1] = 0;
+    dispGeo->vnormal[2] = 0;
   }
 
-  if(fabs(vnormal[1]) > fabs(vnormal[0]) && fabs(vnormal[1]) > fabs(vnormal[2]) )
+  if(fabs(dispGeo->vnormal[1]) > fabs(dispGeo->vnormal[0]) && fabs(dispGeo->vnormal[1]) > fabs(dispGeo->vnormal[2]) )
   {
-    if(fabs(vp[1]/spac[1]) < 0.4)
-      vp[1] = 0.4*spac[1];
-    if(fabs(vp[1]/spac[1]) > (dims[1]-1)-0.4)
-      vp[1] = ((dims[1]-1)-0.4)*spac[1];
-    vnormal[0] = 0;
-    vnormal[2] = 0;
+    if(fabs(dispGeo->vp[1]/spac[1]) < 0.4)
+      dispGeo->vp[1] = 0.4*spac[1];
+    if(fabs(dispGeo->vp[1]/spac[1]) > (dims[1]-1)-0.4)
+      dispGeo->vp[1] = ((dims[1]-1)-0.4)*spac[1];
+    dispGeo->vnormal[0] = 0;
+    dispGeo->vnormal[2] = 0;
   }
 
-  if(fabs(vnormal[2]) > fabs(vnormal[1]) && fabs(vnormal[2]) > fabs(vnormal[0]) )
+  if(fabs(dispGeo->vnormal[2]) > fabs(dispGeo->vnormal[1]) && fabs(dispGeo->vnormal[2]) > fabs(dispGeo->vnormal[0]) )
   {
-    if(fabs(vp[2]/spac[2]) < 0.4)
-      vp[2] = 0.4*spac[2];
-    if(fabs(vp[2]/spac[2]) > (dims[2]-1)-0.4)
-      vp[2] = ((dims[2]-1)-0.4)*spac[2];
-    vnormal[0] = 0;
-    vnormal[1] = 0;
+    if(fabs(dispGeo->vp[2]/spac[2]) < 0.4)
+      dispGeo->vp[2] = 0.4*spac[2];
+    if(fabs(dispGeo->vp[2]/spac[2]) > (dims[2]-1)-0.4)
+      dispGeo->vp[2] = ((dims[2]-1)-0.4)*spac[2];
+    dispGeo->vnormal[0] = 0;
+    dispGeo->vnormal[1] = 0;
   }
 
 
   m_Planes[index]->SetTransform( (vtkAbstractTransform*)NULL );
-  m_Planes[index]->SetOrigin( vp );
-  m_Planes[index]->SetNormal( vnormal );
-  
+  m_Planes[index]->SetOrigin( dispGeo->vp );
+  m_Planes[index]->SetNormal( dispGeo->vnormal );
+
   vtkPoints* points = NULL;
   vtkPoints* tmppoints = NULL;
   vtkPolyData* polydata = NULL;
   vtkFloatArray* pointdata = NULL;
   vtkDelaunay2D *delaunay = NULL;
   vtkPolyData* cuttedPlane = NULL;
-  if(!( (dims[0] == 1 && vnormal[0] != 0) || 
-        (dims[1] == 1 && vnormal[1] != 0) ||
-        (dims[2] == 1 && vnormal[2] != 0) ))
+  if(!( (dims[0] == 1 && dispGeo->vnormal[0] != 0) || 
+    (dims[1] == 1 && dispGeo->vnormal[1] != 0) ||
+    (dims[2] == 1 && dispGeo->vnormal[2] != 0) ))
   {
     m_Cutters[index]->SetCutFunction( m_Planes[index] );
     m_Cutters[index]->SetInput( m_VtkImage );
@@ -622,42 +679,42 @@ void  mitk::OdfVtkMapper2D<T,N>
     ((vtkTransform*)vtktransform)->GetScale(myscale);
     inversetransform->PostMultiply();
     inversetransform->Scale(1*myscale[0],1*myscale[1],1*myscale[2]);
-    
-    vnormal[0] = M3D[0]-O3D[0];
-    vnormal[1] = M3D[1]-O3D[1];
-    vnormal[2] = M3D[2]-O3D[2];
-    vtkMath::Normalize(vnormal);
-    vp[0] = M3D[0];
-    vp[1] = M3D[1];
-    vp[2] = M3D[2];
 
-    inversetransform->TransformPoint( vp, vp );
-    inversetransform->TransformNormalAtPoint( vp, vnormal, vnormal );
+    dispGeo->vnormal[0] = dispGeo->M3D[0]-dispGeo->O3D[0];
+    dispGeo->vnormal[1] = dispGeo->M3D[1]-dispGeo->O3D[1];
+    dispGeo->vnormal[2] = dispGeo->M3D[2]-dispGeo->O3D[2];
+    vtkMath::Normalize(dispGeo->vnormal);
+    dispGeo->vp[0] = dispGeo->M3D[0];
+    dispGeo->vp[1] = dispGeo->M3D[1];
+    dispGeo->vp[2] = dispGeo->M3D[2];
+
+    inversetransform->TransformPoint( dispGeo->vp, dispGeo->vp );
+    inversetransform->TransformNormalAtPoint( dispGeo->vp, dispGeo->vnormal, dispGeo->vnormal );
 
     m_ThickPlanes1[index]->count = 0;
     m_ThickPlanes1[index]->SetTransform((vtkAbstractTransform*)NULL );
-    m_ThickPlanes1[index]->SetPose( vnormal, vp );
-    m_ThickPlanes1[index]->SetThickness(d2);
+    m_ThickPlanes1[index]->SetPose( dispGeo->vnormal, dispGeo->vp );
+    m_ThickPlanes1[index]->SetThickness(dispGeo->d2);
     m_Clippers1[index]->SetClipFunction( m_ThickPlanes1[index] );
     m_Clippers1[index]->SetInput( cuttedPlane );
     m_Clippers1[index]->SetInsideOut(1);
     m_Clippers1[index]->Update();
 
-    vnormal[0] = M3D[0]-L3D[0];
-    vnormal[1] = M3D[1]-L3D[1];
-    vnormal[2] = M3D[2]-L3D[2];
-    vtkMath::Normalize(vnormal);
-    vp[0] = M3D[0];
-    vp[1] = M3D[1];
-    vp[2] = M3D[2];
+    dispGeo->vnormal[0] = dispGeo->M3D[0]-dispGeo->L3D[0];
+    dispGeo->vnormal[1] = dispGeo->M3D[1]-dispGeo->L3D[1];
+    dispGeo->vnormal[2] = dispGeo->M3D[2]-dispGeo->L3D[2];
+    vtkMath::Normalize(dispGeo->vnormal);
+    dispGeo->vp[0] = dispGeo->M3D[0];
+    dispGeo->vp[1] = dispGeo->M3D[1];
+    dispGeo->vp[2] = dispGeo->M3D[2];
 
-    inversetransform->TransformPoint( vp, vp );
-    inversetransform->TransformNormalAtPoint( vp, vnormal, vnormal );
+    inversetransform->TransformPoint( dispGeo->vp, dispGeo->vp );
+    inversetransform->TransformNormalAtPoint( dispGeo->vp, dispGeo->vnormal, dispGeo->vnormal );
 
     m_ThickPlanes2[index]->count = 0;
     m_ThickPlanes2[index]->SetTransform((vtkAbstractTransform*)NULL );
-    m_ThickPlanes2[index]->SetPose( vnormal, vp );
-    m_ThickPlanes2[index]->SetThickness(d1);
+    m_ThickPlanes2[index]->SetPose( dispGeo->vnormal, dispGeo->vp );
+    m_ThickPlanes2[index]->SetThickness(dispGeo->d1);
     m_Clippers2[index]->SetClipFunction( m_ThickPlanes2[index] );
     m_Clippers2[index]->SetInput( m_Clippers1[index]->GetOutput() );
     m_Clippers2[index]->SetInsideOut(1);
@@ -750,6 +807,11 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   if ( this->GetProp(renderer)->GetVisibility() )
   {
+
+    // adapt cam pos
+    OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
+    AdaptCameraPosition(renderer, dispGeo);
+
     if(this->GetDataTreeNode()->IsOn("DoRefresh",NULL))
     {
       glMatrixMode( GL_PROJECTION );  
@@ -875,16 +937,8 @@ void  mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
-::GenerateData( mitk::BaseRenderer *renderer )
+::AdaptOdfScalingToImageSpacing( int index )
 {
-  if(!m_VtkImage)
-  {
-    itkWarningMacro( << "m_VtkImage is NULL!" );
-    return ;
-  }
-
-  int index = GetIndex(renderer);
-    
   // Spacing adapted scaling
   double spacing[3];
   m_VtkImage->GetSpacing(spacing);
@@ -905,15 +959,20 @@ void  mitk::OdfVtkMapper2D<T,N>
     min = min > spacing[2] ? spacing[2] : min;
   }
   m_OdfSource->SetScale(min);
+}
 
+template<class T, int N>
+void  mitk::OdfVtkMapper2D<T,N>
+::SetRendererLightSources( mitk::BaseRenderer *renderer )
+{
   // Light Sources
   vtkCollectionSimpleIterator sit;
   vtkLight* light;
   for(renderer->GetVtkRenderer()->GetLights()->InitTraversal(sit); 
-      (light = renderer->GetVtkRenderer()->GetLights()->GetNextLight(sit)); )
-    {
-      renderer->GetVtkRenderer()->RemoveLight(light);
-    }
+    (light = renderer->GetVtkRenderer()->GetLights()->GetNextLight(sit)); )
+  {
+    renderer->GetVtkRenderer()->RemoveLight(light);
+  }
 
   light = vtkLight::New();
   light->SetFocalPoint(0,0,0);
@@ -923,6 +982,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   light->PositionalOff();
 
   itk::Point<float> p;
+  int index = GetIndex(renderer);
   if(index==0)
   {
     p[0] = 0; p[1] = 0; p[2] = 10000;
@@ -940,10 +1000,15 @@ void  mitk::OdfVtkMapper2D<T,N>
   this->GetInput()->GetGeometry()->IndexToWorld(p,p2);
   light->SetPosition(p2[0],p2[1],p2[2]);
   renderer->GetVtkRenderer()->AddLight(light);
+}
 
+template<class T, int N>
+void  mitk::OdfVtkMapper2D<T,N>
+::ApplyPropertySettings()
+{
   this->GetDataTreeNode()->GetFloatProperty( "Scaling", m_Scaling );
   this->GetDataTreeNode()->GetIntProperty( "ShowMaxNumber", m_ShowMaxNumber );
-  
+
   OdfNormalizationMethodProperty* nmp = dynamic_cast
     <OdfNormalizationMethodProperty*>(
     this->GetDataTreeNode()->GetProperty( "Normalization" ));
@@ -959,10 +1024,23 @@ void  mitk::OdfVtkMapper2D<T,N>
   {
     m_ScaleBy = sbp->GetScaleBy();
   }
-  
+
   this->GetDataTreeNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
   this->GetDataTreeNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
-  
+}
+
+template<class T, int N>
+void  mitk::OdfVtkMapper2D<T,N>
+::GenerateData( mitk::BaseRenderer *renderer )
+{
+  if(!m_VtkImage)
+  {
+    itkWarningMacro( << "m_VtkImage is NULL!" );
+    return ;
+  }
+
+  int index = GetIndex(renderer);
+
   if(IsVisible(renderer, "VisibleOdfs")==false)
   {
     m_OdfsActors[0]->VisibilityOff();
@@ -975,7 +1053,19 @@ void  mitk::OdfVtkMapper2D<T,N>
     m_OdfsActors[0]->VisibilityOn();
     m_OdfsActors[1]->VisibilityOn();
     m_OdfsActors[2]->VisibilityOn();
-    Slice(renderer);
+
+    OdfDisplayGeometry* dispGeo = 
+      MeasureDisplayedGeometry( renderer);
+    
+    if(!m_LastDisplayGeometry || !dispGeo->Equals(m_LastDisplayGeometry))
+    {
+      AdaptOdfScalingToImageSpacing(index);
+      SetRendererLightSources(renderer);
+      ApplyPropertySettings();
+      AdaptCameraPosition(renderer, dispGeo);
+      Slice(renderer, dispGeo);
+      m_LastDisplayGeometry = dispGeo;
+    }
   }
 
   // Get the TimeSlicedGeometry of the input object
@@ -1011,7 +1101,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   node->SetProperty( "IndexParam1", mitk::FloatProperty::New(2));
   node->SetProperty( "IndexParam2", mitk::FloatProperty::New(1));
   node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "VisibleOdfs", mitk::BoolProperty::New( true ) );
+  node->SetProperty( "VisibleOdfs", mitk::BoolProperty::New( false ) );
   node->SetProperty ("layer", mitk::IntProperty::New(100));
   node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
   //node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );

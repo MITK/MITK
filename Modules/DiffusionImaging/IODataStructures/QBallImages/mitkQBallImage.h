@@ -25,7 +25,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "MitkDiffusionImagingExports.h"
 
-
+// generate by n-fold subdivisions of an icosahedron
+// 1 - 12
+// 2 - 42
+// 3 - 92
+// 4 - 162
+// 5 - 252
+// 6 - 362
+// 7 - 492
+// 8 - 642
+// 9 - 812
+// 10 - 1002
 #define QBALL_ODFSIZE 252
 
 namespace mitk 

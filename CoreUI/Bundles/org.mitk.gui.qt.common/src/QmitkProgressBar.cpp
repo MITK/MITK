@@ -38,7 +38,7 @@ void QmitkProgressBar::Reset()
  */
 void QmitkProgressBar::SetPercentageVisible(bool visible)
 {
-  this->setTextVisible(visible);
+  emit SignalSetPercentageVisible(visible);
 }
 
 /**
@@ -47,14 +47,7 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
  */
 void QmitkProgressBar::AddStepsToDo(unsigned int steps)
 {
-  m_TotalSteps += steps;
-  this->setMaximum(m_TotalSteps);
-  this->setValue(m_Progress);
-  if (m_TotalSteps > 0)
-  {
-    this->show();
-  }
-  qApp->processEvents();
+  emit SignalAddStepsToDo(steps);
 }
 
 /**
@@ -63,6 +56,30 @@ void QmitkProgressBar::AddStepsToDo(unsigned int steps)
  * @param steps the number of steps done since last Progress(int steps) call.
  */
 void QmitkProgressBar::Progress(unsigned int steps)
+{
+  emit SignalProgress(steps);
+}
+
+
+QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
+:QProgressBar(parent), ProgressBarImplementation()
+{
+  m_TotalSteps = 0; m_Progress = 0;
+  this->hide();
+  this->SetPercentageVisible(true);
+
+  connect( this, SIGNAL(SignalAddStepsToDo(unsigned int)), this, SLOT(SlotAddStepsToDo(unsigned int)) );
+  connect( this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)) );
+  connect( this, SIGNAL(SignalSetPercentageVisible(bool)), this, SLOT(SlotSetPercentageVisible(bool)) );
+
+  mitk::ProgressBar::SetImplementationInstance(this);
+}
+
+QmitkProgressBar::~QmitkProgressBar()
+{
+}
+
+void QmitkProgressBar::SlotProgress(unsigned int steps)
 {
   m_Progress += steps;
   this->setValue(m_Progress);
@@ -74,17 +91,21 @@ void QmitkProgressBar::Progress(unsigned int steps)
   qApp->processEvents();
 }
 
-
-QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
-:QProgressBar(parent), ProgressBarImplementation()
+void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
 {
-    m_TotalSteps = 0;
-    m_Progress = 0;
-    this->hide();
-    this->SetPercentageVisible(true);
-    mitk::ProgressBar::SetImplementationInstance(this);
+  m_TotalSteps += steps;
+  this->setMaximum(m_TotalSteps);
+  this->setValue(m_Progress);
+  if (m_TotalSteps > 0)
+  {
+    this->show();
+  }
+  qApp->processEvents();
 }
 
-QmitkProgressBar::~QmitkProgressBar()
+void QmitkProgressBar::SlotSetPercentageVisible(bool visible)
 {
+  this->setTextVisible(visible);
 }
+
+

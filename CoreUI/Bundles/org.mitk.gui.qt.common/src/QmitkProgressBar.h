@@ -57,6 +57,18 @@ public:
   //## @brief Sets the current amount of progress to current progress + steps.
   //## @param: steps the number of steps done since last Progress(int steps) call.
   virtual void Progress(unsigned int steps);
+
+signals:
+  
+  void SignalAddStepsToDo(unsigned int steps);
+  void SignalProgress(unsigned int steps);
+  void SignalSetPercentageVisible(bool visible);
+
+protected slots:
+
+  virtual void SlotAddStepsToDo(unsigned int steps);
+  virtual void SlotProgress(unsigned int steps);
+  virtual void SlotSetPercentageVisible(bool visible);
     
 private:
 

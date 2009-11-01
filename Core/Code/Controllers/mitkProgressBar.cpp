@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProgressBar.h"
 #include "mitkCallbackFromGUIThread.h"
+#include "mitkProgressBarImplementation.h"
 #include <itkObjectFactory.h>
 #include <itkOutputWindow.h>
 #include <itkCommand.h>
@@ -31,58 +32,22 @@ namespace mitk
    * Sets the current amount of progress to current progress + steps.
    * @param steps the number of steps done since last Progress(int steps) call.
    */
-  void ProgressBar::Progress(unsigned int steps, bool callFromThread)
+  void ProgressBar::Progress(unsigned int steps)
   {
-    if (callFromThread)
+    if (m_Implementation != NULL)
     {
-      if (m_Implementation != NULL)
-      {
-        // what to do
-        itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
-        command->SetCallbackFunction(this, &ProgressBar::Progress);
-
-        // what parameters
-        CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
-
-        // make sure to proceed in GUI thread
-        CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
-      }
-    }
-    else
-    {
-      if (m_Implementation != NULL)
-      {
-        m_Implementation->Progress(steps);
-      }
+      m_Implementation->Progress(steps);
     }
   }
 
   /**
    * Adds steps to totalSteps.
    */
-  void ProgressBar::AddStepsToDo(unsigned int steps, bool callFromThread)
+  void ProgressBar::AddStepsToDo(unsigned int steps)
   {
-    if (callFromThread)
+    if (m_Implementation)
     {
-      if (m_Implementation != NULL)
-      {
-        // what to do
-        itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
-        command->SetCallbackFunction(this, &ProgressBar::AddStepsToDo);
-
-        // what parameters
-        CallbackEventOneParameter<unsigned int>* event = new CallbackEventOneParameter<unsigned int>(steps);
-
-        // make sure to proceed in GUI thread
-        CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
-      }
-    }
-    else
-    {
-      if (m_Implementation)
-      {
-        m_Implementation->AddStepsToDo(steps);
-      }
+      m_Implementation->AddStepsToDo(steps);
     }
   }
 
@@ -93,15 +58,7 @@ namespace mitk
   {
     if (m_Implementation != NULL)
     {
-      // what to do
-      itk::ReceptorMemberCommand<ProgressBar>::Pointer command = itk::ReceptorMemberCommand<ProgressBar>::New();
-      command->SetCallbackFunction(this, &ProgressBar::AddStepsToDo);
-
-      // what parameters
-      CallbackEventOneParameter<bool>* event = new CallbackEventOneParameter<bool>(visible);
-
-      // make sure to proceed in GUI thread
-      CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command, event);
+      m_Implementation->SetPercentageVisible(visible);
     }
   }
 
@@ -138,56 +95,5 @@ namespace mitk
   {
   }
 
-  void ProgressBar::AddStepsToDo(const itk::EventObject& e)
-  {
-    if (m_Implementation)
-    {
-      try
-      {
-        const CallbackEventOneParameter<unsigned int>& event = dynamic_cast<const CallbackEventOneParameter<unsigned int>&>(e);
-        int steps = event.GetData();
-        m_Implementation->AddStepsToDo(steps);
-      }
-      catch(std::bad_cast)
-      {
-        // panic, but don't tell anybody
-      }
-    }
-  }
-
-  void ProgressBar::Progress(const itk::EventObject& e)
-  {
-    if (m_Implementation)
-    {
-      try
-      {
-        const CallbackEventOneParameter<unsigned int>& event = dynamic_cast<const CallbackEventOneParameter<unsigned int>&>(e);
-        int steps = event.GetData();
-        m_Implementation->Progress(steps);
-      }
-      catch(std::bad_cast)
-      {
-        // panic, but don't tell anybody
-      }
-    }
-  }
-
-  void ProgressBar::SetPercentageVisible(const itk::EventObject& e)
-  {
-    if (m_Implementation)
-    {
-      try
-      {
-        const CallbackEventOneParameter<bool>& event = dynamic_cast<const CallbackEventOneParameter<bool>&>(e);
-        bool on = event.GetData();
-        m_Implementation->SetPercentageVisible(on);
-      }
-      catch(std::bad_cast)
-      {
-        // panic, but don't tell anybody
-      }
-    }
-  }
-
-
 }//end namespace mitk
+

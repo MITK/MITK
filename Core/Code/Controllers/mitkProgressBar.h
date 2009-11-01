@@ -21,11 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include "mitkCommon.h"
 
-#include "mitkProgressBarImplementation.h"
-
 
 namespace mitk 
 {
+
+  class ProgressBarImplementation;
 
   //##Documentation
   //## @brief Sending a message to the applications ProgressBar
@@ -53,21 +53,17 @@ namespace mitk
 
     //##Documentation
     //## @brief Adds steps to totalSteps.
-    void AddStepsToDo(unsigned int steps, bool callFromThread = false);
+    void AddStepsToDo(unsigned int steps);
   
     //##Documentation
     //## @brief Sets the current amount of progress to current progress + steps.
     //## @param: steps the number of steps done since last Progress(int steps) call.
-    void Progress(unsigned int steps = 1, bool callFromThread = false);
+    void Progress(unsigned int steps = 1);
 
     //##Documentation
     //## @brief Sets whether the current progress value is displayed.
     void SetPercentageVisible (bool visible);
     
-    void AddStepsToDo(const itk::EventObject&);
-    void Progress(const itk::EventObject&);
-    void SetPercentageVisible(const itk::EventObject&);
-
   protected:
   
     ProgressBar();
@@ -82,3 +78,4 @@ namespace mitk
 }// end namespace mitk
 
 #endif /* define MITKPROGRESSBAR_H */
+

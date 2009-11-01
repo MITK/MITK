@@ -52,41 +52,14 @@ void mitk::NrrdTensorImageWriter::GenerateData()
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileType( itk::ImageIOBase::Binary );
 
-    typedef itk::VectorImage<float, 3> VecImgType;
-
-    typedef itk::Image<itk::Vector<float,TENSOR_NUM_ELEMENTS>,3> ImageType;
-    typedef itk::ImageFileWriter<VecImgType> WriterType;
+    typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
+    typedef itk::ImageFileWriter<ImageType> WriterType;
     WriterType::Pointer nrrdWriter = WriterType::New();
     
     ImageType::Pointer outimage = ImageType::New();
     CastToItkImage(input, outimage);
 
-    VecImgType::Pointer vecImg = VecImgType::New();
-    vecImg->SetSpacing( outimage->GetSpacing() );   // Set the image spacing
-    vecImg->SetOrigin( outimage->GetOrigin() );     // Set the image origin
-    vecImg->SetDirection( outimage->GetDirection() );  // Set the image direction
-    vecImg->SetLargestPossibleRegion( outimage->GetLargestPossibleRegion());
-    vecImg->SetBufferedRegion( outimage->GetLargestPossibleRegion() );
-    vecImg->SetVectorLength(TENSOR_NUM_ELEMENTS);
-    vecImg->Allocate();
-
-    itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
-    ot = ot.Begin();
-
-    itk::ImageRegionIterator<ImageType> it (outimage, outimage->GetLargestPossibleRegion() );
-
-    typedef ImageType::PixelType VecPixType;
-    typedef VecImgType::PixelType VarVecType;
-
-    for (it = it.Begin(); !it.IsAtEnd(); ++it)
-    {
-      VecPixType vec = it.Get();
-      VarVecType varVec(vec.GetVnlVector().data_block(), TENSOR_NUM_ELEMENTS);
-      ot.Set(varVec);
-      ++ot;
-    }
-
-    nrrdWriter->SetInput( vecImg );
+    nrrdWriter->SetInput( outimage );
     nrrdWriter->SetImageIO(io);
     nrrdWriter->SetFileName(m_FileName);
 

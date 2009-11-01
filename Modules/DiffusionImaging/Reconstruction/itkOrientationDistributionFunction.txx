@@ -366,6 +366,8 @@ namespace itk
       (*this)[i] = g0 * (t0*g0+t1*g1+t2*g2) 
         + g1 * (t1*g0+t3*g1+t4*g2) 
         + g2 * (t2*g0+t4*g1+t5*g2);
+
+      (*this)[i] = (*this)[i] < 0 ? 0 : (*this)[i];
     }
   }
 

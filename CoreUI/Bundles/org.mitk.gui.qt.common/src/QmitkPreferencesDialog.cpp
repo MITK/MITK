@@ -179,7 +179,7 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   m_ExportButton->setDefault(false);
 
   //# m_ApplyButton
-  m_ApplyButton = new QPushButton(QString(tr("Apply")), this);
+  m_ApplyButton = new QPushButton(QString(tr("OK")), this);
   QObject::connect(m_ApplyButton, SIGNAL(clicked(bool)), this, SLOT(OnApplyButtonClicked(bool)));
   m_ApplyButton->setIcon(QIcon(":/org.mitk.gui.qt.common/document-save.png"));
   m_ApplyButton->setFlat(true);
@@ -314,10 +314,17 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
 
 void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
 {  
-  cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
-  if(prefPage)
-    if(prefPage->PerformOk())
-      this->done(QDialog::Accepted);
+  cherry::IQtPreferencePage* prefPage = 0;
+
+  for(vector<PrefPage>::iterator it = m_PrefPages.begin();
+    it != m_PrefPages.end(); ++it, ++m_CurrentPage)
+  {
+    prefPage = it->prefPage;
+    if(prefPage)
+      prefPage->PerformOk();
+  }
+  
+  this->done(QDialog::Accepted);
 }
 
 void QmitkPreferencesDialog::OnCloseButtonClicked( bool  /*triggered*/ )

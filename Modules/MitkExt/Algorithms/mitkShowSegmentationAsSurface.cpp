@@ -109,6 +109,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
   if (smooth)
   {
+    surfaceFilter->InterpolationOn();
     surfaceFilter->SetGaussianStandardDeviation( gaussianSD ); 
   }
 

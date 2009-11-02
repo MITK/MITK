@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkDecimate.h>
 #endif
 
+#include "mitkProgressBar.h"
+
 mitk::ImageToSurfaceFilter::ImageToSurfaceFilter(): 
   m_Smooth(false),
   m_Decimate( NoDecimation),
@@ -78,6 +80,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Register(NULL);//RC++
     smoother->Delete();
   }
+  ProgressBar::GetInstance()->Progress();
 
 //#if (VTK_MAJOR_VERSION >= 5)
 //  if (m_Decimate == Decimate )
@@ -124,6 +127,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 #endif
 
   polydata->Update();
+  ProgressBar::GetInstance()->Progress();
 
   polydata->SetSource(NULL);
 
@@ -152,6 +156,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     }
     vtkmatrix->Delete();
   }
+  ProgressBar::GetInstance()->Progress();
 
   surface->SetVtkPolyData(polydata, time);
   polydata->UnRegister(NULL);
@@ -167,11 +172,18 @@ void mitk::ImageToSurfaceFilter::GenerateData()
   int tstart=outputRegion.GetIndex(3);
   int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
 
+  if ((tmax-tstart) > 0)
+  {
+    ProgressBar::GetInstance()->AddStepsToDo( 4 * (tmax - tstart)  );
+  }
+
+
   int t;
   for( t=tstart; t < tmax; ++t)
   {
     vtkImageData *vtkimagedata =  image->GetVtkImageData(t);
     CreateSurface(t,vtkimagedata,surface,m_Threshold);
+    ProgressBar::GetInstance()->Progress();
   }
 }
 

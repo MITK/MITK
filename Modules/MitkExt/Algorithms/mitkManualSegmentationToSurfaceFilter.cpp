@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSmartPointer.h>
 
+#include "mitkProgressBar.h"
+
 mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter() 
 {
   m_MedianFilter3D = false;
@@ -47,12 +49,18 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   ScalarType thresholdExpanded = this->m_Threshold;
 
+  if ((tmax-tstart) > 0)
+  {
+    ProgressBar::GetInstance()->AddStepsToDo( 4 * (tmax - tstart)  );
+  }
+
   for( int t=tstart; t<tmax; t++ )
   {
 
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D 
+    LOG_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
@@ -64,23 +72,27 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimage = median->GetOutput(); //->Out
       median->Delete();
     }
+    ProgressBar::GetInstance()->Progress();
 
     //Interpolate image spacing 
+    LOG_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
       imageresample->SetInput(vtkimage);
 
       //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)      
-      imageresample->SetAxisOutputSpacing(0, m_MedianKernelSizeX);
-      imageresample->SetAxisOutputSpacing(1, m_MedianKernelSizeY);
-      imageresample->SetAxisOutputSpacing(2, m_MedianKernelSizeZ);
+      imageresample->SetAxisOutputSpacing(0, m_InterpolationX);
+      imageresample->SetAxisOutputSpacing(1, m_InterpolationY);
+      imageresample->SetAxisOutputSpacing(2, m_InterpolationZ);
       imageresample->UpdateInformation();
       imageresample->Update();
       vtkimage=imageresample->GetOutput();//->Output
       imageresample->Delete();
     }
+    ProgressBar::GetInstance()->Progress();
 
+    LOG_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
     if(m_UseGaussianImageSmooth)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();
@@ -105,9 +117,11 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->Delete();
       vtkimagethreshold->Delete();
     }
+    ProgressBar::GetInstance()->Progress();
 
     // Create sureface for t-Slice
     CreateSurface(t, vtkimage, surface, thresholdExpanded);
+    ProgressBar::GetInstance()->Progress();
   }
 };
 

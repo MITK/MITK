@@ -27,10 +27,11 @@ class QWidget;
 class QCheckBox;
 class QRadioButton;
 
-struct MITK_QT_INTERACTIVESEGMENTATION QmitkSegmentationPreferencePage : public cherry::IQtPreferencePage
+class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public cherry::IQtPreferencePage
 {
 
 public:
+
   QmitkSegmentationPreferencePage();
 
   void Init(cherry::IWorkbench::Pointer workbench);

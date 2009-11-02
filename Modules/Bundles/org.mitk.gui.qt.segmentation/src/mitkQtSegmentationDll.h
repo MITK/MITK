@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef MITKQTINTERACTIVESEGMENTATIONDLL_H_
-#define MITKQTINTERACTIVESEGMENTATIONDLL_H_
+#ifndef MITKQTSEGMENTATIONDLL_H_
+#define MITKQTSEGMENTATIONDLL_H_
 
 //
 // The following block is the standard way of creating macros which make exporting 
@@ -27,15 +27,15 @@ PURPOSE.  See the above copyright notices for more information.
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org_mitk_gui_qt_interactivesegmentation_EXPORTS)
-    #define MITK_QT_INTERACTIVESEGMENTATION __declspec(dllexport)
+  #if defined(org_mitk_gui_qt_segmentation_EXPORTS)
+    #define MITK_QT_SEGMENTATION __declspec(dllexport)
   #else
-    #define MITK_QT_INTERACTIVESEGMENTATION __declspec(dllimport)  
+    #define MITK_QT_SEGMENTATION __declspec(dllimport)  
   #endif
 #endif
 
-#if !defined(MITK_QT_INTERACTIVESEGMENTATION)
-  #define MITK_QT_INTERACTIVESEGMENTATION
+#if !defined(MITK_QT_SEGMENTATION)
+  #define MITK_QT_SEGMENTATION
 #endif
 
-#endif /*MITKQTINTERACTIVESEGMENTATIONDLL_H_*/
+#endif /*MITKQTSEGMENTATIONDLL_H_*/

@@ -42,7 +42,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
 
   // to enter a name for the segmentation
-  verticalLayout->addWidget( new QLabel( "Name and color of the segmentation", this ) );
+  lblPrompt = new QLabel( "Name and color of the segmentation", this );
+  verticalLayout->addWidget( lblPrompt );
 
   // to choose a color
   btnColor = new QPushButton( tr(""), this, "btnColor" );

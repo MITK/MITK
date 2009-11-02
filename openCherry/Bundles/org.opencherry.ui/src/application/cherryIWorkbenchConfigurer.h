@@ -174,7 +174,7 @@ struct CHERRY_UI IWorkbenchConfigurer : public Object {
      * @return the data, or <code>null</code> if there is no data at the given
      * key
      */
-    //virtual Object getData(String key);
+    virtual Object::Pointer GetData(const std::string& key) const = 0;
 
     /**
      * Sets the data associated with the workbench at the given key.
@@ -182,7 +182,7 @@ struct CHERRY_UI IWorkbenchConfigurer : public Object {
      * @param key the key
      * @param data the data, or <code>null</code> to delete existing data
      */
-    //virtual void setData(String key, Object data);
+    virtual void SetData(const std::string& key, Object::Pointer data) = 0;
 
     /**
      * Restores the workbench state saved from the previous session, if any.

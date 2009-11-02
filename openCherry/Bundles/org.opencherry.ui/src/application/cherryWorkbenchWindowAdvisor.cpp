@@ -19,7 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/Bugcheck.h>
 
+#include <cherryWorkbenchPreferenceConstants.h>
+#include <cherryObjects.h>
+#include <cherryIPreferences.h>
+
 #include "../internal/cherryWorkbenchWindowConfigurer.h"
+#include "../internal/cherryWorkbenchPlugin.h"
 
 namespace cherry
 {
@@ -62,31 +67,33 @@ void WorkbenchWindowAdvisor::OpenIntro()
   // TODO: Refactor this into an IIntroManager.openIntro(IWorkbenchWindow) call
 
   // introOpened flag needs to be global
-//  IWorkbenchConfigurer wbConfig = getWindowConfigurer().getWorkbenchConfigurer();
-//  final String key = "introOpened"; //$NON-NLS-1$
-//  Boolean introOpened = (Boolean) wbConfig.getData(key);
-//  if (introOpened != null && introOpened.booleanValue())
-//  {
-//    return;
-//  }
-//
-//  wbConfig.setData(key, Boolean.TRUE);
-//
-//  boolean showIntro = PrefUtil.getAPIPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.SHOW_INTRO);
-//
-//  IIntroManager introManager = wbConfig.getWorkbench().getIntroManager();
-//
-//  boolean hasIntro = introManager.hasIntro();
-//  boolean isNewIntroContentAvailable = introManager.isNewContentAvailable();
-//
-//  if (hasIntro && (showIntro || isNewIntroContentAvailable))
-//  {
-//    introManager
-//    .showIntro(getWindowConfigurer().getWindow(), false);
-//
-//    PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_INTRO, false);
-//    PrefUtil.saveAPIPrefs();
-//  }
+  IWorkbenchConfigurer::Pointer wbConfig = GetWindowConfigurer()->GetWorkbenchConfigurer();
+  std::string key = "introOpened"; //$NON-NLS-1$
+  ObjectBool::Pointer introOpened = wbConfig->GetData(key).Cast<ObjectBool>();
+  if (introOpened && introOpened->GetValue())
+  {
+    return;
+  }
+
+  wbConfig->SetData(key, ObjectBool::Pointer(new ObjectBool(true)));
+
+  IPreferences::Pointer workbenchPrefs = WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+
+  bool showIntro = workbenchPrefs->GetBool(WorkbenchPreferenceConstants::SHOW_INTRO, true);
+
+  IIntroManager* introManager = wbConfig->GetWorkbench()->GetIntroManager();
+
+  bool hasIntro = introManager->HasIntro();
+  bool isNewIntroContentAvailable = introManager->IsNewContentAvailable();
+
+  if (hasIntro && (showIntro || isNewIntroContentAvailable))
+  {
+    introManager
+    ->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
+
+    workbenchPrefs->PutBool(WorkbenchPreferenceConstants::SHOW_INTRO, false);
+    workbenchPrefs->Flush();
+  }
 }
 
 void WorkbenchWindowAdvisor::PostWindowCreate()

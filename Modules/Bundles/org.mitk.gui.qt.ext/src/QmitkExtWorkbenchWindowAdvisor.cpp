@@ -125,6 +125,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
+    if ((*iter)->GetId() == "org.opencherry.ui.internal.introview") continue;
     std::pair<std::string, cherry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
     VDMap.insert(p);
   }

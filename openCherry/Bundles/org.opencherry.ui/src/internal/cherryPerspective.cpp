@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryPartSite.h"
 #include "cherryViewSite.h"
 #include "cherryEditorAreaHelper.h"
+#include "intro/cherryIntroConstants.h"
 #include "../dialogs/cherryMessageDialog.h"
 #include "../cherryWorkbenchWindow.h"
 
@@ -96,6 +97,7 @@ Perspective::~Perspective()
   // Get rid of presentation.
   if (presentation == 0)
   {
+    DisposeViewRefs();
     return;
   }
 
@@ -110,6 +112,36 @@ Perspective::~Perspective()
 
   mapIDtoViewLayoutRec.clear();
 }
+
+void Perspective::DisposeViewRefs() {
+    if (!memento) {
+      return;
+    }
+    std::vector<IMemento::Pointer> views(memento->GetChildren(WorkbenchConstants::TAG_VIEW));
+    for (std::size_t x = 0; x < views.size(); x++) {
+      // Get the view details.
+      IMemento::Pointer childMem = views[x];
+      std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
+      // skip creation of the intro reference - it's handled elsewhere.
+      if (id == IntroConstants::INTRO_VIEW_ID) {
+        continue;
+      }
+
+      std::string secondaryId = ViewFactory::ExtractSecondaryId(id);
+      if (!secondaryId.empty()) {
+        id = ViewFactory::ExtractPrimaryId(id);
+      }
+
+      std::string removed;
+      childMem->GetString(WorkbenchConstants::TAG_REMOVED, removed);
+      if (removed != "true") {
+        IViewReference::Pointer ref = viewFactory->GetView(id, secondaryId);
+        if (ref) {
+          viewFactory->ReleaseView(ref);
+        }
+      }
+    }
+  }
 
 IViewReference::Pointer Perspective::FindView(const std::string& viewId)
 {
@@ -747,10 +779,10 @@ bool Perspective::CreateReferences(const std::vector<IMemento::Pointer>& views)
     IMemento::Pointer childMem = views[x];
     std::string id; childMem->GetString(WorkbenchConstants::TAG_ID, id);
     // skip creation of the intro reference -  it's handled elsewhere.
-//    if (id == IIntroConstants::INTRO_VIEW_ID)
-//    {
-//      continue;
-//    }
+    if (id == IntroConstants::INTRO_VIEW_ID)
+    {
+      continue;
+    }
 
     std::string secondaryId(ViewFactory::ExtractSecondaryId(id));
     if (!secondaryId.empty())
@@ -858,11 +890,11 @@ bool Perspective::RestoreState()
       id = ViewFactory::ExtractPrimaryId(id);
     }
 
-//    // skip the intro as it is restored higher up in workbench.
-//    if (id == IIntroConstants::INTRO_VIEW_ID))
-//    {
-//      continue;
-//    }
+    // skip the intro as it is restored higher up in workbench.
+    if (id == IntroConstants::INTRO_VIEW_ID)
+    {
+      continue;
+    }
 
     // Create and open the view.
     IViewReference::Pointer viewRef = viewFactory->GetView(id, secondaryId);
@@ -1289,9 +1321,9 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
       itr != viewPanes.end(); ++itr)
   {
     IWorkbenchPartReference::Pointer ref((*itr)->GetPartReference());
-    bool restorable = page->GetViewFactory()->GetViewRegistry()->Find(
-        ref->GetId())->IsRestorable();
-    if(restorable)
+    IViewDescriptor::Pointer desc = page->GetViewFactory()->GetViewRegistry()
+          ->Find(ref->GetId());
+    if(desc && desc->IsRestorable())
     {
       IMemento::Pointer viewMemento = memento
       ->CreateChild(WorkbenchConstants::TAG_VIEW);

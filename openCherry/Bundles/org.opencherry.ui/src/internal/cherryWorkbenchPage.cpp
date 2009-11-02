@@ -30,6 +30,7 @@
 #include "cherryWorkbench.h"
 #include "cherryWorkbenchConstants.h"
 #include "cherryPartService.h"
+#include "intro/cherryIntroConstants.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "../tweaklets/cherryWorkbenchPageTweaklet.h"
@@ -932,8 +933,8 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
 void WorkbenchPage::BusyResetPerspective()
 {
 
-  //  ViewIntroAdapterPart introViewAdapter = ((WorkbenchIntroManager) getWorkbenchWindow()
-  //      .getWorkbench().getIntroManager()).getViewIntroAdapterPart();
+  ViewIntroAdapterPart::Pointer introViewAdapter = dynamic_cast<WorkbenchIntroManager*>(GetWorkbenchWindow()
+        ->GetWorkbench()->GetIntroManager())->GetViewIntroAdapterPart();
   //  PartPane introPane = 0;
   //  boolean introFullScreen = false;
   //  if (introViewAdapter != 0)
@@ -1008,29 +1009,30 @@ void WorkbenchPage::BusyResetPerspective()
   // Update the Coolbar layout.
   this->ResetToolBarLayout();
 
-  //    // restore the maximized intro
-  //    if (introViewAdapter != 0)
-  //    {
-  //      try
-  //      {
-  //        // ensure that the intro is visible in the new perspective
-  //        showView(IIntroConstants.INTRO_VIEW_ID);
-  //        if (introFullScreen)
-  //        {
-  //          toggleZoom(introPane.getPartReference());
-  //        }
-  //      }
-  //      catch (PartInitException& e)
-  //      {
-  //        WorkbenchPlugin.log("Could not restore intro", //$NON-NLS-1$
-  //            WorkbenchPlugin.getStatus(e));
-  //      }
-  ////      finally
-  ////      {
-  ////        // we want the intro back to a normal state before we fire the event
-  ////        introViewAdapter.setHandleZoomEvents(true);
-  ////      }
-  //    }
+  // restore the maximized intro
+  if (introViewAdapter)
+  {
+    try
+    {
+      // ensure that the intro is visible in the new perspective
+      ShowView(IntroConstants::INTRO_VIEW_ID);
+//      if (introFullScreen)
+//      {
+//        toggleZoom(introPane.getPartReference());
+//      }
+    }
+    catch (PartInitException& e)
+    {
+      //TODO IStatus
+      WorkbenchPlugin::Log("Could not restore intro", e);
+          // WorkbenchPlugin.getStatus(e));
+    }
+//      finally
+//      {
+//        // we want the intro back to a normal state before we fire the event
+//        introViewAdapter.setHandleZoomEvents(true);
+//      }
+  }
   // Notify listeners that we have completed our reset.
   window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET_COMPLETE);
   //  }

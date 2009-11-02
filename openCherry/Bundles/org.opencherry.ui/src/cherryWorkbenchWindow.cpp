@@ -21,6 +21,7 @@
 #include "cherryUIException.h"
 #include "cherryConstants.h"
 
+#include "internal/intro/cherryIntroConstants.h"
 #include "internal/cherryWorkbenchPlugin.h"
 #include "internal/cherryWorkbenchPage.h"
 #include "internal/cherryWorkbench.h"
@@ -1114,24 +1115,18 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
   //  }});
 
 
-  //  final IMemento introMem = memento.getChild(IWorkbenchConstants.TAG_INTRO);
-  //  if (introMem != null) {
-  //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
-  //
-  //      public void runWithException() throws Throwable {
-  //        getWorkbench()
-  //            .getIntroManager()
-  //            .showIntro(
-  //                WorkbenchWindow.this,
-  //                Boolean
-  //                    .valueOf(
-  //                        introMem
-  //                            .getString(IWorkbenchConstants.TAG_STANDBY))
-  //                    .booleanValue());
-  //      }
-  //    });
-  //
-  //  }
+  IMemento::Pointer introMem = memento->GetChild(WorkbenchConstants::TAG_INTRO);
+  if (introMem) {
+//    StartupThreading.runWithoutExceptions(new StartupRunnable() {
+//
+//      public void runWithException() throws Throwable {
+    bool isStandby = false;
+    introMem->GetBoolean(WorkbenchConstants::TAG_STANDBY, isStandby);
+        GetWorkbench()->GetIntroManager()->ShowIntro(
+                IWorkbenchWindow::Pointer(this), isStandby);
+//      }
+//    });
+  }
   //
   //  // Only restore the trim state if we're using the default layout
   //  if (defaultLayout != null) {
@@ -1308,17 +1303,16 @@ bool WorkbenchWindow::SaveState(IMemento::Pointer memento)
   memento->PutInteger(WorkbenchConstants::TAG_WIDTH, normalBounds.width);
   memento->PutInteger(WorkbenchConstants::TAG_HEIGHT, normalBounds.height);
 
-  //  IWorkbenchPage::Pointer activePage = GetActivePage();
-  //  if (activePage
-  //      && activePage->FindView(IIntroConstants.INTRO_VIEW_ID) != null) {
-  //    IMemento introMem = memento
-  //        .createChild(IWorkbenchConstants.TAG_INTRO);
-  //    boolean isStandby = getWorkbench()
-  //        .getIntroManager()
-  //        .isIntroStandby(getWorkbench().getIntroManager().getIntro());
-  //    introMem.putString(IWorkbenchConstants.TAG_STANDBY, String
-  //        .valueOf(isStandby));
-  //  }
+  IWorkbenchPage::Pointer activePage = GetActivePage();
+  if (activePage
+      && activePage->FindView(IntroConstants::INTRO_VIEW_ID))
+  {
+    IMemento::Pointer introMem = memento
+        ->CreateChild(WorkbenchConstants::TAG_INTRO);
+    bool isStandby = GetWorkbench()->GetIntroManager()
+        ->IsIntroStandby(GetWorkbench()->GetIntroManager()->GetIntro());
+    introMem->PutBoolean(WorkbenchConstants::TAG_STANDBY, isStandby);
+  }
 
   //  // save the width of the perspective bar
   //  IMemento persBarMem = memento

@@ -95,6 +95,12 @@ void QtShell::SetVisible(bool visible)
   widget->setVisible(visible);
 }
 
+void QtShell::SetActive()
+{
+  widget->activateWindow();
+  widget->raise();
+}
+
 void* QtShell::GetControl()
 {
   return widget;

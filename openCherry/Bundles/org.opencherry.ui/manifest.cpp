@@ -23,3 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
   POCO_EXPORT_CLASS(cherry::WorkbenchPlugin)
 POCO_END_MANIFEST
+
+#include "src/internal/intro/cherryViewIntroAdapterPart.h"
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+  POCO_EXPORT_CLASS(cherry::ViewIntroAdapterPart)
+POCO_END_MANIFEST

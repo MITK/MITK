@@ -228,7 +228,7 @@ void Workbench::ServiceLocatorOwner::Dispose()
 
 Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor) :
   progressCount(-1), serviceLocatorOwner(new ServiceLocatorOwner(this)),
-      largeUpdates(0), isStarting(true), isClosing(false)
+      largeUpdates(0), introManager(0), isStarting(true), isClosing(false)
 {
   poco_check_ptr(display)
 ;  poco_check_ptr(advisor);
@@ -290,6 +290,17 @@ bool Workbench::Init()
 
   // create workbench window manager
   //windowManager = new WindowManager();
+
+  IIntroRegistry* introRegistry = WorkbenchPlugin::GetDefault()
+        ->GetIntroRegistry();
+    if (introRegistry->GetIntroCount() > 0) {
+      //TODO Product support
+      //IProduct product = Platform.getProduct();
+      //if (product != null) {
+        introDescriptor = introRegistry
+            ->GetIntroForProduct("").Cast<IntroDescriptor>(); //product.getId());
+      //}
+    }
 
   // TODO Correctly order service initialization
   // there needs to be some serious consideration given to
@@ -1367,6 +1378,34 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
 bool Workbench::SaveAllEditors(bool /*confirm*/)
 {
   return true;
+}
+
+IIntroManager* Workbench::GetIntroManager()
+{
+  return GetWorkbenchIntroManager();
+}
+
+WorkbenchIntroManager* Workbench::GetWorkbenchIntroManager()
+{
+  if (introManager == 0)
+  {
+    introManager = new WorkbenchIntroManager(this);
+  }
+  return introManager;
+}
+
+IntroDescriptor::Pointer Workbench::GetIntroDescriptor() const
+{
+  return introDescriptor;
+}
+
+void Workbench::SetIntroDescriptor(IntroDescriptor::Pointer descriptor)
+{
+  if (GetIntroManager()->GetIntro())
+  {
+    GetIntroManager()->CloseIntro(GetIntroManager()->GetIntro());
+  }
+  introDescriptor = descriptor;
 }
 
 bool Workbench::IsRunning()

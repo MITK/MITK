@@ -40,6 +40,7 @@ SET(SRC_CPP_FILES
   cherryViewPart.cpp
   cherryWindow.cpp
   cherryWorkbenchPart.cpp
+  cherryWorkbenchPreferenceConstants.cpp
   cherryWorkbenchWindow.cpp
   cherryXMLMemento.cpp
   
@@ -83,6 +84,9 @@ SET(SRC_CPP_FILES
   handlers/cherryIHandlerActivation.cpp
   handlers/cherryShowViewHandler.cpp
   
+  #src
+  intro/cherryIntroPart.cpp
+  
   #tweaklets
   tweaklets/cherryDnDTweaklet.cpp
   tweaklets/cherryGuiWidgetsTweaklet.cpp
@@ -108,6 +112,15 @@ SET(SRC_CPP_FILES
 
 
 SET(INTERNAL_CPP_FILES
+
+  #intro
+  intro/cherryIntroConstants.cpp
+  intro/cherryIntroDescriptor.cpp
+  intro/cherryIntroRegistry.cpp
+  intro/cherryViewIntroAdapterPart.cpp
+  intro/cherryViewIntroAdapterSite.cpp
+  intro/cherryWorkbenchIntroManager.cpp
+  
   cherryAbstractPartSelectionTracker.cpp
   cherryAbstractSelectionService.cpp
   cherryBundleUtility.cpp

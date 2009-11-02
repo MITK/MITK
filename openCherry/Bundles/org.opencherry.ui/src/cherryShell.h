@@ -263,6 +263,15 @@ public:
   virtual void Close() = 0;
 
   /**
+   * If the receiver is visible, moves it to the top of the
+   * drawing order for the display on which it was created
+   * (so that all other shells on that display, which are not
+   *  the receiver's children will be drawn behind it) and
+   *  asks the window manager to make the shell active.
+   */
+  virtual void SetActive() = 0;
+
+  /**
     * Returns an array containing all shells which are
     * descendants of the receiver.
     * <p>

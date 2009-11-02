@@ -44,12 +44,15 @@ WorkbenchPlugin::WorkbenchPlugin()
   editorRegistry = 0;
   viewRegistry = 0;
   perspRegistry = 0;
+  introRegistry = 0;
 }
 
 WorkbenchPlugin::~WorkbenchPlugin()
 {
   delete editorRegistry;
   delete viewRegistry;
+  delete perspRegistry;
+  delete introRegistry;
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
@@ -194,6 +197,14 @@ IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry() {
 //        return sharedImages;
 //    }
 
+IIntroRegistry* WorkbenchPlugin::GetIntroRegistry()
+{
+  if (introRegistry == 0)
+  {
+    introRegistry = new IntroRegistry();
+  }
+  return introRegistry;
+}
 
 IViewRegistry* WorkbenchPlugin::GetViewRegistry()
 {

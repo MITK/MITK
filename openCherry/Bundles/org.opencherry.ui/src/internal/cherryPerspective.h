@@ -155,6 +155,8 @@ public: Perspective(PerspectiveDescriptor::Pointer desc, WorkbenchPage::Pointer 
      */
     public: ~Perspective();
 
+    private: void DisposeViewRefs();
+
     /**
      * Finds the view with the given ID that is open in this page, or <code>null</code>
      * if not found.

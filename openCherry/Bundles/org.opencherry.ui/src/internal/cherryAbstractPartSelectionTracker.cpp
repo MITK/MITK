@@ -33,13 +33,20 @@ public:
   cherryObjectMacro(SafeSelectionRunnable)
 
   ISelectionService::SelectionEvents::SelectionEvent::AbstractDelegate* l;
-  IWorkbenchPart::Pointer p;
-  ISelection::ConstPointer s;
+
+  SafeSelectionRunnable(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel)
+  : p(part), s(sel)
+  {}
 
   void Run()
   {
     l->Execute(p, s);
   }
+
+private:
+
+  IWorkbenchPart::Pointer p;
+  ISelection::ConstPointer s;
 };
 
 AbstractPartSelectionTracker::AbstractPartSelectionTracker(
@@ -88,12 +95,10 @@ void AbstractPartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
   typedef ISelectionService::SelectionEvents::SelectionEvent::ListenerList ListType;
   ListType listeners(selectionEvents.selectionChanged.GetListeners());
 
-  SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable());
+  SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
   for (ListType::iterator i = listeners.begin(); i != listeners.end(); ++i)
   {
     runnable->l = *i;
-    runnable->p = part;
-    runnable->s = sel;
     SafeRunner::Run(runnable);
   }
 }
@@ -104,12 +109,10 @@ void AbstractPartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer par
   typedef ISelectionService::SelectionEvents::SelectionEvent::ListenerList ListType;
   ListType listeners(selectionEvents.postSelectionChanged.GetListeners());
 
-  SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable());
+  SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
   for (ListType::iterator i = listeners.begin(); i != listeners.end(); ++i)
   {
     runnable->l = *i;
-    runnable->p = part;
-    runnable->s = sel;
     SafeRunner::Run(runnable);
   }
 }

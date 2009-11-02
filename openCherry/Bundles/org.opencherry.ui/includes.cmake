@@ -4,6 +4,7 @@ SET(ADDITIONAL_INCLUDE_DIRECTORIES
   src/dialogs
   src/guitk
   src/handlers
+  src/intro
   src/presentations
   src/services
   src/testing

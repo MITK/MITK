@@ -50,6 +50,8 @@ public:
   bool IsVisible();
   void SetVisible(bool visible);
 
+  void SetActive();
+
   void* GetControl();
 
   void SetImages(const std::vector<void*>& images);

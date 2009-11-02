@@ -19,6 +19,8 @@
 
 #include "cherryIWorkbenchPartConstants.h"
 #include "cherryImageDescriptor.h"
+#include "cherrySafeRunner.h"
+#include "util/cherrySafeRunnable.h"
 
 #include "internal/cherryWorkbenchPlugin.h"
 
@@ -27,6 +29,28 @@
 
 namespace cherry
 {
+
+class PropChangedRunnable : public SafeRunnable
+{
+public:
+
+  cherryObjectMacro(PropChangedRunnable)
+
+  IPropertyChangeListener::Events::EventType::AbstractDelegate* delegate;
+
+  PropChangedRunnable(PropertyChangeEvent::Pointer event)
+  : event(event)
+  {}
+
+  void Run()
+  {
+    delegate->Execute(event);
+  }
+
+private:
+
+  PropertyChangeEvent::Pointer event;
+};
 
 WorkbenchPart::~WorkbenchPart()
 {
@@ -152,18 +176,15 @@ void WorkbenchPart::FirePropertyChanged(const std::string& key,
   PropertyChangeEvent::Pointer event(
       new PropertyChangeEvent(source, key, objOldVal, objNewVal));
   typedef IPropertyChangeListener::Events::EventType::ListenerList ListenerList;
+  PropChangedRunnable::Pointer runnable(new PropChangedRunnable(event));
+
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();
   for (ListenerList::const_iterator iter = listeners.begin(); iter
       != listeners.end(); ++iter)
   {
-    try
-    {
-      (*iter)->Execute(event);
-    } catch (Poco::RuntimeException& e)
-    {
-      WorkbenchPlugin::Log(e);
-    }
+    runnable->delegate = *iter;
+    SafeRunner::Run(runnable);
   }
 }
 
@@ -175,18 +196,15 @@ void WorkbenchPart::FirePropertyChange(int propertyId)
   PropertyChangeEvent::Pointer event(
       new PropertyChangeEvent(source, IWorkbenchPartConstants::INTEGER_PROPERTY, val, val));
   typedef IPropertyChangeListener::Events::EventType::ListenerList ListenerList;
+  PropChangedRunnable::Pointer runnable(new PropChangedRunnable(event));
+
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();
   for (ListenerList::const_iterator iter = listeners.begin(); iter
       != listeners.end(); ++iter)
   {
-    try
-    {
-      (*iter)->Execute(event);
-    } catch (Poco::RuntimeException& e)
-    {
-      WorkbenchPlugin::Log(e);
-    }
+    runnable->delegate = *iter;
+    SafeRunner::Run(runnable);
   }
 }
 

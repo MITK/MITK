@@ -82,6 +82,58 @@ struct CHERRY_UI IPropertyChangeListener: public virtual Object
   virtual void PropertyChange(Object::Pointer /*source*/, int /*propId*/) {}
 };
 
+template<typename R>
+struct PropertyChangeAdapter: public IPropertyChangeListener
+{
+
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(PropertyChangeEvent::Pointer);
+
+  PropertyChangeAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  void PropertyChange(PropertyChangeEvent::Pointer event)
+  {
+    (listener->*callback)(event);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
+};
+
+template<typename R>
+struct PropertyChangeIntAdapter: public IPropertyChangeListener
+{
+
+  typedef R Listener;
+  typedef void
+      (R::*Callback)(Object::Pointer, int);
+
+  PropertyChangeIntAdapter(R* l, Callback c) :
+    listener(l), callback(c)
+  {
+    poco_assert(listener);
+    poco_assert(callback);
+  }
+
+  void PropertyChange(Object::Pointer source, int propId)
+  {
+    (listener->*callback)(source, propId);
+  }
+
+private:
+
+  Listener* listener;
+  Callback callback;
+};
+
 }
 
 #endif /* CHERRYIPROPERTYCHANGELISTENER_H_ */

@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../application/cherryIWorkbenchConfigurer.h"
 
+#include <Poco/HashMap.h>
+
 namespace cherry
 {
 
@@ -44,11 +46,10 @@ public:
 private:
 
     /**
-     * Table to hold arbitrary key-data settings (key type: <code>String</code>,
-     * value type: <code>Object</code>).
-     * @see #setData
+     * Table to hold arbitrary key-data settings.
+     * @see #SetData
      */
-    //Map extraData = new HashMap();
+    Poco::HashMap<std::string, Object::Pointer> extraData;
 
     /**
      * Indicates whether workbench state should be saved on close and
@@ -118,26 +119,12 @@ public:
     /* (non-Javadoc)
      * @see org.opencherry.ui.application.IWorkbenchConfigurer#getData
      */
-//    Object getData(String key) {
-//        if (key == null) {
-//            throw new IllegalArgumentException();
-//        }
-//        return extraData.get(key);
-//    }
+    Object::Pointer GetData(const std::string& key) const;
 
     /* (non-Javadoc)
      * @see org.opencherry.ui.application.IWorkbenchConfigurer#setData(String, Object)
      */
-//    void setData(String key, Object data) {
-//        if (key == null) {
-//            throw new IllegalArgumentException();
-//        }
-//        if (data != null) {
-//            extraData.put(key, data);
-//        } else {
-//            extraData.remove(key);
-//        }
-//    }
+    void SetData(const std::string& key, Object::Pointer data);
 
     /* (non-Javadoc)
      * @see org.opencherry.ui.application.IWorkbenchConfigurer#emergencyClose()

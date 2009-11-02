@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryViewRegistry.h"
 #include "cherryEditorRegistry.h"
 #include "cherryPerspectiveRegistry.h"
+#include "intro/cherryIntroRegistry.h"
 
 namespace cherry {
 
@@ -80,6 +81,8 @@ private:
     ViewRegistry* viewRegistry;
 
     PerspectiveRegistry* perspRegistry;
+
+    IntroRegistry* introRegistry;
 
     //SharedImages sharedImages;
 
@@ -323,6 +326,14 @@ public:
      */
     IPerspectiveRegistry* GetPerspectiveRegistry();
 
+
+    /**
+     * Returns the introduction registry.
+     *
+     * @return the introduction registry.
+     * @since 3.0
+     */
+    IIntroRegistry* GetIntroRegistry();
 
     /**
      * Get the preference manager.

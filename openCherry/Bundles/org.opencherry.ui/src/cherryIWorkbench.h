@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "dialogs/cherryIDialog.h"
 #include "cherryIViewRegistry.h"
 #include "cherryIEditorRegistry.h"
+#include "intro/cherryIIntroManager.h"
 #include "cherryIPerspectiveRegistry.h"
 #include "cherryIWorkbenchWindow.h"
 #include "cherryIWorkbenchListener.h"
@@ -369,6 +370,14 @@ struct CHERRY_UI IWorkbench : public IServiceLocator {
    *         an error occurred while saving
    */
   virtual bool SaveAllEditors(bool confirm) = 0;
+
+  /**
+   * Return the intro manager for this workbench.
+   *
+   * @return the intro manager for this workbench. Guaranteed not to be
+   *         <code>null</code>.
+   */
+  virtual IIntroManager* GetIntroManager() = 0;
 
   /**
    * Returns a boolean indicating whether the workbench is in the process of

@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryWorkbenchConfigurer.h"
 #include "../application/cherryWorkbenchAdvisor.h"
 #include "cherryWorkbenchTestable.h"
+#include "intro/cherryIntroDescriptor.h"
+#include "intro/cherryWorkbenchIntroManager.h"
 
 #include "cherryIStackableContainer.h"
 
@@ -183,6 +185,27 @@ public:
         IWorkbenchWindow::Pointer window, IAdaptable* input);
 
   bool SaveAllEditors(bool confirm);
+
+  IIntroManager* GetIntroManager();
+
+  /**
+   * @return the workbench intro manager
+   */
+  WorkbenchIntroManager* GetWorkbenchIntroManager();
+
+  /**
+   * @return the intro extension for this workbench.
+   */
+  IntroDescriptor::Pointer GetIntroDescriptor() const;
+
+  /**
+   * This method exists as a test hook. This method should <strong>NEVER</strong>
+   * be called by clients.
+   *
+   * @param descriptor
+   *            The intro descriptor to use.
+   */
+  void SetIntroDescriptor(IntroDescriptor::Pointer descriptor);
 
   /**
    * Returns <code>true</code> if the workbench is running,
@@ -468,6 +491,14 @@ private:
 
   WindowManager windowManager;
   SmartPointer<WorkbenchWindow> activatedWindow;
+
+  WorkbenchIntroManager* introManager;
+
+  /**
+   * The descriptor for the intro extension that is valid for this workspace,
+   * <code>null</code> if none.
+   */
+  IntroDescriptor::Pointer introDescriptor;
 
   bool isStarting;
   bool isClosing;

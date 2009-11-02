@@ -1,4 +1,4 @@
-/*=========================================================================
+/*========================================================================= 
 
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
@@ -67,12 +67,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
+,m_ShowSegmentationsAsOutline(true)
+,m_ShowSegmentationsAsVolumeRendering(true)
 {
 }
 
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
+  //# Preferences
+  cherry::IPreferencesService::Pointer prefService 
+    = cherry::Platform::GetServiceRegistry()
+    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+
+  m_SegmentationPreferencesNode = (prefService->GetSystemPreferences()->Node("/Segmentation")).Cast<cherry::ICherryPreferences>();
+  if(m_SegmentationPreferencesNode.IsNotNull())
+    m_SegmentationPreferencesNode->OnChanged
+      .AddListener(cherry::MessageDelegate1<QmitkSegmentationView, const cherry::ICherryPreferences*>(this, &QmitkSegmentationView::OnPreferencesChanged));
+
   // setup the basic GUI of this view
 
   m_Parent = parent;
@@ -159,6 +171,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   {
     LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
+  
+  // call preferences changed for initialization
+  this->OnPreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
 }
 
 void QmitkSegmentationView::SetFocus()
@@ -230,7 +245,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
         if (!emptySegmentation) return; // could be aborted by user
 
-        emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
+        ApplyDisplayOptions(emptySegmentation);
 
         this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
@@ -399,6 +414,7 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
     {
       mitk::DataTreeNode* currentNode = segmentationSet->GetElement(i);
 
+      ApplyDisplayOptions(currentNode);
       currentNode->SetVisibility(currentNode == node);
     }
 
@@ -573,6 +589,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 
     for (unsigned int i = 0u; i < size; ++i)
     {
+      ApplyDisplayOptions(segmentationSet->GetElement(i));
       segmentationSet->GetElement(i)->SetVisibility(true);
     }
   }
@@ -588,6 +605,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
     const unsigned int size = segmentationSet->Size();
     for (unsigned int i = 0u; i < size; ++i)
     {
+      ApplyDisplayOptions(segmentationSet->GetElement(i));
       segmentationSet->GetElement(i)->SetVisibility(false);
     }
 
@@ -595,6 +613,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
     const unsigned int child_size = childSegmentationSet->Size();
     for (unsigned int i = 0u; i < child_size; ++i)
     {
+      ApplyDisplayOptions(segmentationSet->GetElement(i));
       childSegmentationSet->GetElement(i)->SetVisibility(true);
     }
   }
@@ -880,5 +899,26 @@ void QmitkSegmentationView::OnThresholdingToolManagerToolModified()
   {
     m_ThresholdingDialog->accept();
   }
+}
+
+void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
+{
+  if (!node) return;
+
+  node->SetProperty( "outline binary", mitk::BoolProperty::New( m_ShowSegmentationsAsOutline ) );
+  node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
+  node->SetProperty( "opacity", mitk::FloatProperty::New( m_ShowSegmentationsAsOutline ? 1.0 : 0.3 ) );
+  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_ShowSegmentationsAsOutline ) );
+}
+
+void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )
+{
+  m_ShowSegmentationsAsOutline = m_SegmentationPreferencesNode->GetBool("draw outline", true);
+  m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", true);
+  
+  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
+  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+
 }
 

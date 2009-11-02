@@ -1,4 +1,5 @@
 SET(SRC_CPP_FILES
+  QmitkSegmentationPreferencePage.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -10,6 +11,7 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/QmitkSegmentationPreferencePage.h
   src/internal/QmitkSegmentationView.h
 )
 

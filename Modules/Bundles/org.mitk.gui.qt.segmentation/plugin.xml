@@ -14,4 +14,15 @@
       class="QmitkSegmentationView" />
   </extension>
   
+  <extension point="org.opencherry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.SegmentationPreferencePage" name="Segmentation" class="QmitkSegmentationPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
+
+   <extension point="org.opencherry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords" label="data manager"></keyword>
+  </extension>
+
+ 
 </plugin>

@@ -10,6 +10,7 @@
 #include "ui_QmitkSegmentationControls.h"
 #include <cherryISelectionListener.h>
 #include <cherryIStructuredSelection.h>
+#include <cherryICherryPreferences.h>
 
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
@@ -55,6 +56,8 @@ protected:
     virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 
     void OnThresholdingToolManagerToolModified();
+  
+    void OnPreferencesChanged(const cherry::ICherryPreferences*);
   protected slots:
 
     void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection);
@@ -85,6 +88,10 @@ protected:
     void CheckImageAlignment();
     void CreateASurface(bool smoothed);
 
+    void ApplyDisplayOptions(mitk::DataTreeNode* node);
+  
+    cherry::ICherryPreferences::Pointer m_SegmentationPreferencesNode;
+
     QmitkStdMultiWidget * m_MultiWidget;
 
     QWidget* m_Parent;
@@ -105,6 +112,9 @@ protected:
 
     QDialog* m_ThresholdingDialog;
     mitk::ToolManager::Pointer m_ThresholdingToolManager;
+
+    bool m_ShowSegmentationsAsOutline;
+    bool m_ShowSegmentationsAsVolumeRendering;
 
   /// from QmitkSegmentation
 

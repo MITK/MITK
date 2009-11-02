@@ -103,8 +103,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setModel(m_NodeTreeModel);
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
-  QObject::connect( m_NodeTreeView, SIGNAL(rowsInserted ( const QModelIndex &, int, int ))
-    , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex &  int, int )) );
+  QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
+    , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
 
   //# m_NodeMenu
   m_NodeMenu = new QMenu(m_NodeTreeView);
@@ -185,6 +185,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_OtsuFilterAction = new QAction("Apply Otsu Filter", this);
   QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
     , this, SLOT( OtsuFilter(bool) ) );
+  // Otsu filter does not work properly, remove it temporarily
   imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
 
   QGridLayout* _ParentLayout = new QGridLayout;

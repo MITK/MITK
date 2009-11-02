@@ -53,7 +53,7 @@ namespace cherry
  * </ul>
  * </p>
  */
-class IntroPart: public IIntroPart, public IExecutableExtension
+class CHERRY_UI IntroPart: public IIntroPart, public IExecutableExtension
 {
 
 private:

@@ -63,13 +63,16 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 
     connect( m_Controls->m_EnableRenderingCB, SIGNAL( toggled(bool) ),this, SLOT( OnEnableRendering(bool) ));
     connect( m_Controls->m_EnableLOD, SIGNAL( toggled(bool) ),this, SLOT( OnEnableLOD(bool) ));
+    connect( m_Controls->m_EnableGPU, SIGNAL( toggled(bool) ),this, SLOT( OnEnableGPU(bool) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
 
     m_Controls->m_EnableRenderingCB->setEnabled(false);
     m_Controls->m_EnableLOD->setEnabled(false);
+    m_Controls->m_EnableGPU->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    
   }
   
   m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
@@ -127,10 +130,15 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       m_Controls->m_EnableRenderingCB->setChecked(enabled);
 
       enabled = false;
-
+ 
       node->GetBoolProperty("volumerendering.uselod",enabled);
       m_Controls->m_EnableLOD->setEnabled(true);
       m_Controls->m_EnableLOD->setChecked(enabled);
+      
+      enabled=false;
+      
+      m_Controls->m_EnableGPU->setEnabled(true);
+      m_Controls->m_EnableRenderingCB->setChecked(enabled);
 
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
       m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(node);
@@ -150,6 +158,8 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
     
       m_Controls->m_EnableLOD->setChecked(false);
       m_Controls->m_EnableLOD->setEnabled(false);
+    
+      m_Controls->m_EnableGPU->setEnabled(false);
     
       m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
       m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
@@ -177,6 +187,11 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
 
   m_SelectedNode->SetProperty("volumerendering.uselod",mitk::BoolProperty::New(state));
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkVolumeVisualizationView::OnEnableGPU(bool state) 
+{
+  //not implemented yet
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

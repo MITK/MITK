@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>219</width>
+    <width>301</width>
     <height>679</height>
    </rect>
   </property>
@@ -66,6 +66,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="m_EnableRenderingCB">
+        <property name="toolTip">
+         <string>With volumerendering the image is display in 3D.</string>
+        </property>
         <property name="text">
          <string>Volumerendering</string>
         </property>
@@ -74,10 +77,17 @@
       <item>
        <widget class="QCheckBox" name="m_EnableLOD">
         <property name="toolTip">
-         <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity</string>
+         <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity.</string>
         </property>
         <property name="text">
          <string>LOD</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="m_EnableGPU">
+        <property name="text">
+         <string>GPU</string>
         </property>
        </widget>
       </item>
@@ -98,7 +108,20 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkTransferFunctionGeneratorWidget" name="m_TransferFunctionGeneratorWidget" native="true"/>
+    <widget class="QmitkTransferFunctionGeneratorWidget" name="m_TransferFunctionGeneratorWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>64</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QmitkTransferFunctionWidget" name="m_TransferFunctionWidget" native="true"/>

@@ -239,7 +239,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)   
 
   std::stringstream ss;
   
-  ss << "Click and hold left mouse button on the cross to interactively generate a bell transfer function"<<"\n"
+  ss << "Click on the cross and move the mouse"<<"\n"
      <<"\n"
      << "center at " << thPos << "\n"
      << "width " << thDelta * 2;
@@ -326,7 +326,7 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
 
   std::stringstream ss;
   
-  ss << "Click and hold left mouse button on the cross to interactively generate a threshold transfer function"<<"\n"
+  ss << "Click on the cross and move the mouse"<<"\n"
      <<"\n"
      << "threshold at " << thPos << "\n"
      << "width " << thDelta * 2;

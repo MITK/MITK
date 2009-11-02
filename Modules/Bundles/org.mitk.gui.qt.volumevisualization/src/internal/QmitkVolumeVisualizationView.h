@@ -62,6 +62,7 @@ protected slots:
 
   void OnEnableRendering( bool state );
   void OnEnableLOD( bool state );
+  void OnEnableGPU( bool state );
 
 protected:
 

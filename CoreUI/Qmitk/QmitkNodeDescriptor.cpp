@@ -5,11 +5,11 @@
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
 
-QmitkNodeDescriptor::QmitkNodeDescriptor( const QString& _ClassName, const QIcon& _Icon
+QmitkNodeDescriptor::QmitkNodeDescriptor( const QString& _ClassName, const QString& _PathToIcon
                                                    , mitk::NodePredicateBase* _Predicate, QObject* parent )
 : QObject(parent)
 , m_ClassName(_ClassName)
-, m_Icon(_Icon)
+, m_PathToIcon(_PathToIcon)
 , m_Predicate(_Predicate)
 , m_Separator(new QAction(this))
 {
@@ -23,7 +23,7 @@ QString QmitkNodeDescriptor::GetClassName() const
 
 QIcon QmitkNodeDescriptor::GetIcon() const
 {
-  return m_Icon;
+  return QIcon(m_PathToIcon);
 }
 
 QList<QAction*> QmitkNodeDescriptor::GetActions() const

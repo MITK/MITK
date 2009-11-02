@@ -103,6 +103,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setModel(m_NodeTreeModel);
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
+  QObject::connect( m_NodeTreeView, SIGNAL(rowsInserted ( const QModelIndex &, int, int ))
+    , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex &  int, int )) );
 
   //# m_NodeMenu
   m_NodeMenu = new QMenu(m_NodeTreeView);
@@ -521,7 +523,7 @@ void QmitkDataManagerView::OtsuFilter( bool checked /*= false */ )
     {
       // get selected mitk image
       const unsigned short dim = 3;
-      typedef int InputPixelType;
+      typedef short InputPixelType;
       typedef unsigned char OutputPixelType;
 
       typedef itk::Image< InputPixelType, dim > InputImageType;
@@ -556,4 +558,9 @@ void QmitkDataManagerView::OtsuFilter( bool checked /*= false */ )
     }
 
   }
+}
+
+void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int start, int end )
+{
+  m_NodeTreeView->setExpanded(parent, true);
 }

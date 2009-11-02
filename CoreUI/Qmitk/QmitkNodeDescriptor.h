@@ -28,7 +28,7 @@ public:
   ///
   /// Creates a new QmitkNodeQmitkNodeDescriptor
   ///
-  QmitkNodeDescriptor(const QString& _ClassName, const QIcon& _Icon
+  QmitkNodeDescriptor(const QString& _ClassName, const QString& _PathToIcon
     , mitk::NodePredicateBase* _Predicate, QObject* parent);
   ///
   /// Deletes all actions
@@ -40,7 +40,7 @@ public:
   virtual QString GetClassName() const;
   ///
   /// Returns an Icon for this class of DataTreeNodes
-  ///
+  /// 
   virtual QIcon GetIcon() const;
   ///
   /// Returns an Icon for this class of DataTreeNodes
@@ -73,7 +73,7 @@ public slots:
   void ActionDestroyed ( QObject * obj = 0 );
 protected:
   QString m_ClassName;
-  QIcon m_Icon;
+  QString m_PathToIcon;
   mitk::NodePredicateBase::Pointer m_Predicate;
   QList<QAction*> m_Actions;
   QList<QAction*> m_BatchActions;

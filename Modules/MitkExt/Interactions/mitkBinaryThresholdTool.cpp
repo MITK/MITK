@@ -49,12 +49,12 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
   m_ThresholdFeedbackNode = DataTreeNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
 
-  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.2, 1.0, 0.2) );
+  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
   m_ThresholdFeedbackNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
-  m_ThresholdFeedbackNode->SetProperty( "layer", IntProperty::New( 20 ) );
+  m_ThresholdFeedbackNode->SetProperty( "layer", IntProperty::New( 100 ) );
   m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(100, 1) ) );
   m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
-  m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.2) );
+  m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
   m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
@@ -94,6 +94,7 @@ void mitk::BinaryThresholdTool::Deactivated()
     if (DataStorage* storage = m_ToolManager->GetDataStorage())
     {
       storage->Remove( m_ThresholdFeedbackNode );
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
   catch(...)
@@ -113,12 +114,17 @@ void mitk::BinaryThresholdTool::SetThresholdValue(int value)
   }
 }
 
-void mitk::BinaryThresholdTool::AcceptCurrentThresholdValue(const std::string& organType, const std::string& organName)
+void mitk::BinaryThresholdTool::AcceptCurrentThresholdValue(const std::string& organName, const Color& color)
 {
 
-  CreateNewSegmentationFromThreshold(m_NodeForThresholding, organType, organName );
+  CreateNewSegmentationFromThreshold(m_NodeForThresholding, organName, color );
 
   RenderingManager::GetInstance()->RequestUpdateAll();
+  m_ToolManager->ActivateTool(-1);
+}
+    
+void mitk::BinaryThresholdTool::CancelThresholding()
+{
   m_ToolManager->ActivateTool(-1);
 }
 
@@ -160,7 +166,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataTreeNode* nodeForThresh
   }
 }
 
-void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organType, const std::string& organName)
+void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organName, const Color& color)
 {
   if (node)
   {
@@ -168,7 +174,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode*
     if (image.IsNotNull())
     {
       // create a new image of the same dimensions and smallest possible pixel type
-      DataTreeNode::Pointer emptySegmentation = Tool::CreateEmptySegmentationNode( image, organType, organName );
+      DataTreeNode::Pointer emptySegmentation = Tool::CreateEmptySegmentationNode( image, organName, color );
 
       if (emptySegmentation)
       {

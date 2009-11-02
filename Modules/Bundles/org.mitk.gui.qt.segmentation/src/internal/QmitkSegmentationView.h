@@ -54,6 +54,7 @@ protected:
     ///
     virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 
+    void OnThresholdingToolManagerToolModified();
   protected slots:
 
     void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection);
@@ -70,8 +71,11 @@ protected:
     void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 
     void CreateSurface(bool);
+    void CreateSmoothedSurface(bool);
     void ImageStatistics(bool);
     void AutocropSelected(bool);
+    void ThresholdImage(bool);
+    void ThresholdingDone(int);
 
   protected:
 
@@ -79,6 +83,7 @@ protected:
     NodeList GetSelectedNodes() const;
 
     void CheckImageAlignment();
+    void CreateASurface(bool smoothed);
 
     QmitkStdMultiWidget * m_MultiWidget;
 
@@ -96,6 +101,10 @@ protected:
     QAction* m_CreateSmoothSurfaceAction;
     QAction* m_StatisticsAction;
     QAction* m_AutocropAction;
+    QAction* m_ThresholdAction;
+
+    QDialog* m_ThresholdingDialog;
+    mitk::ToolManager::Pointer m_ThresholdingToolManager;
 
   /// from QmitkSegmentation
 

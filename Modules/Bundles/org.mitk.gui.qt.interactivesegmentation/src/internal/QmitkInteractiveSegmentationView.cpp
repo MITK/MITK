@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
-#include "mitkOrganTypeProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkSegTool2D.h"
 
@@ -200,7 +199,7 @@ void QmitkInteractiveSegmentationView::CreateNewSegmentation()
       if (firstTool)
       {
         mitk::DataTreeNode::Pointer emptySegmentation =
-          firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
+          firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
         if (!emptySegmentation) return; // could be aborted by user
 
@@ -310,7 +309,7 @@ void QmitkInteractiveSegmentationView::LoadSegmentation()
         if (firstTool)
         {
           mitk::DataTreeNode::Pointer segmentationNode =
-            firstTool->CreateSegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
+            firstTool->CreateSegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
           mitk::DataTreeNode::Pointer parentNode = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->GetReferenceData(0);
           this->GetDefaultDataStorage()->Add( segmentationNode, parentNode ); // add as a child of the currently active reference image

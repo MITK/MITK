@@ -144,8 +144,8 @@ class MITKEXT_CORE_EXPORT Tool : public StateMachine
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
 
-    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName );
-    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organType, const std::string& organName );
+    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
+    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
 
 
   protected:

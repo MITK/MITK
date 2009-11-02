@@ -99,14 +99,18 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
     dialog->setPrompt("What did you just segment?");
     int dialogReturnValue = dialog->exec();
 
-    std::string organType = dialog->GetOrganType();
     std::string organName = dialog->GetSegmentationName();
+    mitk::Color color     = dialog->GetColorProperty();
 
     delete dialog;
 
     if ( dialogReturnValue != QDialog::Rejected ) // user clicked cancel or pressed Esc or something similar
     {
-      m_BinaryThresholdTool->AcceptCurrentThresholdValue( organType, organName );
+      m_BinaryThresholdTool->AcceptCurrentThresholdValue( organName, color );
+    }
+    else
+    {
+      m_BinaryThresholdTool->CancelThresholding();
     }
   }
 }

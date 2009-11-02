@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTool.h"
 #include "mitkDataTreeNodeFactory.h"
-#include "mitkOrganTypeProperty.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -112,7 +111,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
   return m_IsSegmentationPredicate.GetPointer();
 }
 
-mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organType, const std::string& organName )
+mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
 {
   // we NEED a reference image for size etc.
   if (!original) return NULL;
@@ -120,7 +119,6 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* orig
   // actually create a new empty segmentation
   PixelType pixelType( typeid(DefaultSegmentationDataType) );
   Image::Pointer segmentation = Image::New();
-  segmentation->SetProperty( "organ type", OrganTypeProperty::New( organType ) );
  
   segmentation->Initialize( pixelType, original->GetDimension(), original->GetDimensions() );
 
@@ -143,10 +141,10 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* orig
     return NULL;
   }
 
-  return CreateSegmentationNode( segmentation, organType, organName );
+  return CreateSegmentationNode( segmentation, organName, color );
 }
 
-mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organType, const std::string& organName )
+mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organName, const mitk::Color& color )
 {
   if (!image) return NULL;
 
@@ -157,17 +155,9 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, co
   // name
   segmentationNode->SetProperty( "name", StringProperty::New( organName ) );
 
-  // organ type
-  OrganTypeProperty::Pointer organTypeProperty = OrganTypeProperty::New( organType );
-  if ( !organTypeProperty->IsValidEnumerationValue( organType ) )
-  {
-    organTypeProperty->AddEnum( organType, organTypeProperty->Size() ); // add a new organ type
-    organTypeProperty->SetValue( organType );
-  }
-
   // visualization properties
   segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
-  segmentationNode->SetProperty( "color", DataTreeNodeFactory::DefaultColorForOrgan( organType ) );
+  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
   segmentationNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   segmentationNode->SetProperty( "layer", IntProperty::New(10) );
   segmentationNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(0.5, 1) ) );

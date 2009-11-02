@@ -54,7 +54,8 @@ class MITKEXT_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
     virtual void Deactivated();
 
     virtual void SetThresholdValue(int value);
-    virtual void AcceptCurrentThresholdValue(const std::string& organType, const std::string& organName);
+    virtual void AcceptCurrentThresholdValue(const std::string& organName, const Color& color);
+    virtual void CancelThresholding();
 
   protected:
     
@@ -63,7 +64,7 @@ class MITKEXT_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
 
     void SetupPreviewNodeFor( DataTreeNode* nodeForThresholding );
 
-    void CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organType, const std::string& organName);
+    void CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organType, const Color& color);
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );

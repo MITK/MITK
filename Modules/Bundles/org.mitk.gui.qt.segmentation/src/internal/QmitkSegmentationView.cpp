@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
 #include "QmitkNodeDescriptorManager.h"
+#include "QmitkToolGUI.h"
 
 #include "mitkToolManager.h"
 #include "mitkDataTreeNodeFactory.h"
@@ -37,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
+#include "mitkAutoCropImageFilter.h"
+#include "mitkBinaryThresholdTool.h"
 
 #include <QPushButton>
 #include <QDockWidget>
@@ -116,6 +119,21 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
 
   // register a couple of additional actions for DataManager's context menu
+  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
+
+  if (imageDataTreeNodeDescriptor)
+  {
+    m_ThresholdAction = new QAction("Threshold..", parent);
+    imageDataTreeNodeDescriptor->AddAction(m_ThresholdAction);
+    connect( m_ThresholdAction, SIGNAL( triggered(bool) ) , this, SLOT( ThresholdImage(bool) ) );
+  }
+  else
+  {
+    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+  }
+
+  // register a couple of additional actions for DataManager's context menu
   QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
@@ -127,7 +145,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
     m_CreateSmoothSurfaceAction = new QAction("Create smoothed polygon model", parent);
     binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
-    connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
+    connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSmoothedSurface(bool) ) );
 
     m_StatisticsAction = new QAction("Statistics", parent);
     binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
@@ -150,12 +168,28 @@ void QmitkSegmentationView::SetFocus()
 QmitkSegmentationView::~QmitkSegmentationView()
 {
   // unregister a couple of additional actions for DataManager's context menu
+  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
+
+  if (imageDataTreeNodeDescriptor)
+  {
+    imageDataTreeNodeDescriptor->RemoveAction( m_ThresholdAction );
+  }
+  else
+  {
+    LOG_WARN << "Could not get datamanager's node descriptor for 'Image'";
+  }
+
+  // unregister a couple of additional actions for DataManager's context menu
   QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
   if (binaryImageDataTreeNodeDescriptor)
   {
     binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSurfaceAction );
+    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSmoothSurfaceAction );
+    binaryImageDataTreeNodeDescriptor->RemoveAction( m_StatisticsAction );
+    binaryImageDataTreeNodeDescriptor->RemoveAction( m_AutocropAction );
   }
   else
   {
@@ -192,13 +226,10 @@ void QmitkSegmentationView::CreateNewSegmentation()
       if (firstTool)
       {
         mitk::DataTreeNode::Pointer emptySegmentation =
-          firstTool->CreateEmptySegmentationNode( image, dialog.GetOrganType(), dialog.GetSegmentationName() );
+          firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
         if (!emptySegmentation) return; // could be aborted by user
 
-        mitk::Color color = dialog.GetColorProperty();
-
-        emptySegmentation->SetColor(color,NULL,"color");
         emptySegmentation->SetProperty("volumerendering", mitk::BoolProperty::New(true) );
 
         this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
@@ -596,7 +627,17 @@ void QmitkSegmentationView::Deactivated()
 {
 }
 
+void QmitkSegmentationView::CreateSmoothedSurface(bool)
+{
+  CreateASurface(true);
+}
+
 void QmitkSegmentationView::CreateSurface(bool)
+{
+  CreateASurface(false);
+}
+
+void QmitkSegmentationView::CreateASurface(bool smoothed)
 {
   LOG_INFO << "CreateSurface for:";
 
@@ -628,17 +669,31 @@ void QmitkSegmentationView::CreateSurface(bool)
         mitk::DataTreeNode::Pointer nodepointer = node;
         surfaceFilter->SetPointerParameter("Input", image);
         surfaceFilter->SetPointerParameter("Group node", nodepointer);
-        surfaceFilter->SetParameter("Smooth", true );
-        surfaceFilter->SetParameter("Apply median", true );
-        surfaceFilter->SetParameter("Median kernel size", 3u );
-        surfaceFilter->SetParameter("Gaussian SD", 1.5f );
-        surfaceFilter->SetParameter("Decimate mesh", true );
-        surfaceFilter->SetParameter("Decimation rate", 0.8f );
         surfaceFilter->SetParameter("Show result", true );
         surfaceFilter->SetParameter("Sync visibility", false );
         surfaceFilter->SetDataStorage( *m_DataStorage );
+
+        if (smoothed)
+        {
+          surfaceFilter->SetParameter("Smooth", true );
+          surfaceFilter->SetParameter("Apply median", true );
+          surfaceFilter->SetParameter("Median kernel size", 3u );
+          surfaceFilter->SetParameter("Gaussian SD", 1.5f );
+          surfaceFilter->SetParameter("Decimate mesh", true );
+          surfaceFilter->SetParameter("Decimation rate", 0.8f );
+        }
+        else
+        {
+          surfaceFilter->SetParameter("Smooth", false );
+          surfaceFilter->SetParameter("Apply median", false );
+          surfaceFilter->SetParameter("Median kernel size", 3u );
+          surfaceFilter->SetParameter("Gaussian SD", 1.5f );
+          surfaceFilter->SetParameter("Decimate mesh", true );
+          surfaceFilter->SetParameter("Decimation rate", 0.8f );
+        }
         
-        mitk::ProgressBar::GetInstance()->AddStepsToDo(1);
+        mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+        mitk::ProgressBar::GetInstance()->Progress(2);
         mitk::StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
         surfaceFilter->StartAlgorithm();
       }
@@ -652,8 +707,6 @@ void QmitkSegmentationView::CreateSurface(bool)
       LOG_INFO << "   a NULL node selected";
     }
   }
- 
-  LOG_INFO << "That's all..";
 }
 
 QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
@@ -690,13 +743,142 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
 
 void QmitkSegmentationView::OnSurfaceCalculationDone()
 {
-  mitk::ProgressBar::GetInstance()->Progress();
+  mitk::ProgressBar::GetInstance()->Progress(8);
 }
 
 void QmitkSegmentationView::ImageStatistics(bool)
 {
+  LOG_INFO << "Statistics for all these nodes:";
+
+  NodeList selection = this->GetSelectedNodes();
+
+  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
+  {
+    mitk::DataTreeNode* node = *iter;
+
+    if (node)
+    {
+      LOG_INFO << "   " << (*iter)->GetName();
+
+      // TODO: do something to display a statisics/histogram dialog
+    }
+  }
 }
 
 void QmitkSegmentationView::AutocropSelected(bool)
 {
+  LOG_INFO << "Autocrop for:";
+
+  NodeList selection = this->GetSelectedNodes();
+
+  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
+  {
+    mitk::DataTreeNode* node = *iter;
+
+    if (node)
+    {
+      LOG_INFO << "   " << (*iter)->GetName();
+
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      if (image.IsNull()) return;
+
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+      mitk::ProgressBar::GetInstance()->Progress(2);
+
+      qApp->processEvents();
+
+      mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+      cropFilter->SetInput( image );
+      cropFilter->SetBackgroundValue( 0 );
+      try
+      {
+        cropFilter->Update();
+
+        image = cropFilter->GetOutput();
+        if (image.IsNotNull())
+        {
+          node->SetData( image );
+        }
+      }
+      catch(...)
+      {
+        LOG_ERROR << "Cropping image failed...";
+      }
+      mitk::ProgressBar::GetInstance()->Progress(8);
+    }
+    else
+    {
+      LOG_INFO << "   a NULL node selected";
+    }
+  }
 }
+
+void QmitkSegmentationView::ThresholdImage(bool)
+{
+  LOG_INFO << "Thresholding all this node:";
+
+  NodeList selection = this->GetSelectedNodes();
+
+  m_ThresholdingToolManager = mitk::ToolManager::New( this->GetDefaultDataStorage() );
+  m_ThresholdingToolManager->RegisterClient();
+  m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnThresholdingToolManagerToolModified );
+
+  m_ThresholdingDialog = new QDialog(m_Parent);
+  connect( m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)) );
+
+  QVBoxLayout* layout = new QVBoxLayout;
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  mitk::Tool* tool = m_ThresholdingToolManager->GetToolById( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
+  if (tool)
+  {
+    itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI");
+    QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
+    if (gui)
+    {
+      gui->SetTool(tool);
+      gui->setParent(m_ThresholdingDialog);
+      layout->addWidget(gui);
+      m_ThresholdingDialog->setLayout(layout);
+      layout->activate();
+      m_ThresholdingDialog->setFixedSize(m_ThresholdingDialog->width()+100, m_ThresholdingDialog->height());
+      m_ThresholdingDialog->open();
+    }
+  }
+
+  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
+  {
+    mitk::DataTreeNode* node = *iter;
+
+    if (node)
+    {
+      LOG_INFO << "   " << (*iter)->GetName();
+
+      m_ThresholdingToolManager->SetReferenceData( node );
+      m_ThresholdingToolManager->ActivateTool( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
+    }
+  }
+}
+
+void QmitkSegmentationView::ThresholdingDone(int)
+{
+  LOG_INFO << "Thresholding done, cleaning up";
+  m_ThresholdingDialog->deleteLater();
+  m_ThresholdingDialog = NULL;
+  m_ThresholdingToolManager = NULL;
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSegmentationView::OnThresholdingToolManagerToolModified()
+{
+  if ( m_ThresholdingToolManager.IsNull() ) return;
+
+  LOG_INFO << "Not got tool " << m_ThresholdingToolManager->GetActiveToolID();
+
+  if ( m_ThresholdingToolManager->GetActiveToolID() < 0)
+  {
+    m_ThresholdingDialog->accept();
+  }
+}
+

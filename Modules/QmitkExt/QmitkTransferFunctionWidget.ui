@@ -41,7 +41,9 @@
       <font/>
      </property>
      <property name="toolTip">
-      <string>Click left mouse to add a point. click right mouse on a selected point to delete the point.</string>
+      <string>Left-click to select a point or add a new point.
+ Hold left mouse button to move selected point.
+Click right mouse button to delete a point.</string>
      </property>
     </widget>
    </item>
@@ -76,7 +78,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>edit x-coordinate (grayvalue) of selected point.</string>
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
        </property>
        <property name="text">
         <string/>
@@ -98,7 +100,7 @@
         <font/>
        </property>
        <property name="toolTip">
-        <string>edit x-coordinate (grayvalue) of selected point.</string>
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
        </property>
        <property name="text">
         <string>Grayvalue</string>
@@ -120,7 +122,7 @@
         <font/>
        </property>
        <property name="toolTip">
-        <string>edit y-coordinate (opacity) of selected point.</string>
+        <string>Edit y-coordinate (opacity) of currently selected point.</string>
        </property>
        <property name="text">
         <string>Opacity</string>
@@ -159,7 +161,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>edit y-coordinate (opacity) of selected point.</string>
+        <string>Edit y-coordinate (opacity) of currently selected point.</string>
        </property>
        <property name="text">
         <string/>
@@ -189,7 +191,10 @@
       <font/>
      </property>
      <property name="toolTip">
-      <string>Change colour with a double click on a point.</string>
+      <string>Left-click to select a point or add a new point.
+ Hold left mouse button to move selected point.
+Click right mouse button to delete a point.
+Double-click left mouse button to change color of a point.</string>
      </property>
     </widget>
    </item>
@@ -221,7 +226,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>edit x-coordinate (grayvalue) of selected point.</string>
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
        </property>
        <property name="text">
         <string/>
@@ -237,7 +242,7 @@
         <font/>
        </property>
        <property name="toolTip">
-        <string>edit x-coordinate (grayvalue) of selected point.</string>
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
        </property>
        <property name="text">
         <string>Grayvalue</string>
@@ -267,7 +272,9 @@
       <font/>
      </property>
      <property name="toolTip">
-      <string>Click left mouse to add a point. click right mouse on a selected point to delete the point.</string>
+      <string>Left-click to select a point or add a new point.
+ Hold left mouse button to move selected point.
+Click right mouse button to delete a point.</string>
      </property>
     </widget>
    </item>
@@ -298,6 +305,9 @@
          <pointsize>7</pointsize>
         </font>
        </property>
+       <property name="toolTip">
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -312,7 +322,7 @@
         <font/>
        </property>
        <property name="toolTip">
-        <string>edit x-coordinate (grayvalue) of selected point.</string>
+        <string>Edit x-coordinate (grayvalue) of currently selected point.</string>
        </property>
        <property name="text">
         <string>Grayvalue</string>
@@ -328,7 +338,7 @@
         <font/>
        </property>
        <property name="toolTip">
-        <string>edit y-coordinate (opacity) of selected point.</string>
+        <string>Edit y-coordinate (opacity) of currently selected point.</string>
        </property>
        <property name="text">
         <string>Opacity</string>
@@ -367,7 +377,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>edit y-coordinate (opacity) of selected point.</string>
+        <string>Edit y-coordinate (opacity) of currently selected point.</string>
        </property>
        <property name="text">
         <string/>

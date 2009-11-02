@@ -66,7 +66,8 @@
        <string>Presets</string>
       </attribute>
       <attribute name="toolTip">
-       <string notr="true">Load MITK internal or costumer presets. Or save your own created transfer function in a folder in XML format</string>
+       <string notr="true">Apply internal MITK transferfunction presets.
+Or save and load your own created transferfunctions in a folder in XML format.</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -105,7 +106,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>choose one MITK internal preset to improve the look of the selected image.</string>
+             <string>Choose one of generic MITK internal presets to apply on standard CT data or MR data.</string>
             </property>
             <property name="statusTip">
              <string>Load a MITK internal preset</string>
@@ -199,7 +200,8 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Load a transferfunction in xml-format from the filesystem. The load includes all functions: grayvalue, color and gradient.</string>
+             <string>Load a transferfunction in xml-format from the filesystem.
+The load includes all transferfunctions: grayvalue, color and gradient.</string>
             </property>
             <property name="text">
              <string>Load</string>
@@ -221,7 +223,8 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Save a transferfunction in xml-format in the filesystem. The save includes all functions: grayvalue, color and gradient.</string>
+             <string>Save a transferfunction in xml-format in the filesystem.
+The save includes all transferfunctions: grayvalue, color and gradient.</string>
             </property>
             <property name="text">
              <string>Save</string>
@@ -241,10 +244,13 @@
        </sizepolicy>
       </property>
       <attribute name="title">
-       <string>Levelwindow</string>
+       <string>Threshold</string>
       </attribute>
       <attribute name="toolTip">
-       <string>Generate a threshold transfer function interactively. Click on the cross and move the mouse. With a vertical move the function will be steeper or flatter and with a horizontal move the center of the function moves to the right or left.</string>
+       <string>Generate a threshold transfer function interactively.
+Click on the cross and move the mouse.
+With a vertical move the function will be steeper or flatter.
+With a horizontal move the center of the function left or right.</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
@@ -268,7 +274,11 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>click and hold left mouse button on the cross. Move the mouse to the top and the function will be flatter. Move the mouse to the  bottom and the function will be steeper. Move the mouse to the left and the function moves to the left. Move the mouse to the  right and the function moves to the right. </string>
+          <string>Click and hold left mouse button on the cross.
+Move the mouse to the top and the function will be flatter.
+Move the mouse to the  bottom and the function will be steeper.
+Move the mouse to the left and the function moves to the left.
+Move the mouse to the right and the function moves to the right. </string>
          </property>
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
@@ -313,7 +323,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Click and hold left mouse button on the cross to interactively generate a threshold transfer function</string>
+          <string>Click and hold left mouse button on the cross to interactively generate a threshold transferfunction</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -336,7 +346,10 @@
        <string>Bell</string>
       </attribute>
       <attribute name="toolTip">
-       <string>Generate a bell transfer function interactively. Click on the cross and move the mouse. With a vertical move the bell will be narrower or wider and with a horizontal move the center of the bell moves to the right or left.</string>
+       <string>Generate a bell transfer function interactively.
+Click on the cross and move the mouse.
+With a vertical move the bell will be narrower or wider.
+With a horizontal move the center of the bell moves to the left or right.</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
@@ -360,7 +373,11 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>click and hold left mouse button on the cross. Move the mouse to the top and the bell will be flatter. Move the mouse to the  bottom and the bell will be steeper. Move the mouse to the left and the center of the bell moves to the left. Move the mouse to the  right and the center of the bell moves to the right. </string>
+          <string>Click and hold left mouse button on the cross.
+Move the mouse to the top and the bell will be wider.
+Move the mouse to the  bottom and the bell will be flattened.
+Move the mouse to the left and the center of the bell moves to the left.
+Move the mouse to the  right and the center of the bell moves to the right.</string>
          </property>
          <property name="text">
           <string/>
@@ -393,7 +410,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Click and hold left mouse button on the cross to interactively generate a bell transfer function</string>
+          <string>Click and hold left mouse button on the cross to interactively generate a bell transferfunction</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

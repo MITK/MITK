@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
+    <width>270</width>
     <height>679</height>
    </rect>
   </property>
@@ -67,7 +67,7 @@
       <item>
        <widget class="QCheckBox" name="m_EnableRenderingCB">
         <property name="toolTip">
-         <string>With volumerendering the image is display in 3D.</string>
+         <string>Click this checkbox to enable volumerendering in the 3D view of the selected image.</string>
         </property>
         <property name="text">
          <string>Volumerendering</string>
@@ -86,6 +86,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="m_EnableGPU">
+        <property name="toolTip">
+         <string>If enabeld, use hardware-accelerated rendering (GPU) instead of software-rendering (CPU)</string>
+        </property>
         <property name="text">
          <string>GPU</string>
         </property>
@@ -121,6 +124,7 @@
        <height>64</height>
       </size>
      </property>
+     <zorder>m_SelectedImageLabel</zorder>
     </widget>
    </item>
    <item>

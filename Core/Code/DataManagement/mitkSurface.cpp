@@ -339,13 +339,22 @@ void mitk::Surface::PrintSelf( std::ostream& os, itk::Indent indent ) const
   Superclass::PrintSelf(os, indent);
 
   os << indent << "Number PolyDatas: " << m_PolyDataSeries.size() << "\n";
+  unsigned int count = 0;
   for (VTKPolyDataSeries::const_iterator it = m_PolyDataSeries.begin(); it != m_PolyDataSeries.end(); ++it)
   {
     vtkPolyData* pd = *it;
-    os << "\n";
-    os << indent << "Number of cells " << pd->GetNumberOfCells() << ": \n";
-    os << indent << "Number of points " << pd->GetNumberOfPoints() << ": \n\n";
-    os << indent << "VTKPolyData : \n";
-    pd->Print(os);
+    if(pd != NULL)
+    {
+      os << "\n";
+      os << indent << "PolyData at time step " << count << ". \n"
+      os << indent << "Number of cells " << pd->GetNumberOfCells() << ": \n";
+      os << indent << "Number of points " << pd->GetNumberOfPoints() << ": \n\n";
+      os << indent << "VTKPolyData : \n";
+      pd->Print(os);
+    }
+    else 
+      os << indent << "\nEmpty PolyData at time step " << count << ".\n";
+
+    count++;
   }
 }

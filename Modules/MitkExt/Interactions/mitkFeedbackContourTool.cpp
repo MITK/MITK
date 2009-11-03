@@ -40,6 +40,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("helper object", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
+  m_FeedbackContourNode->SetProperty("project", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("Width", FloatProperty::New(1)); // uppercase! Slim line looks very accurate :-)
 
   // set explicitly visible=false for all 3D renderer (that exist already ...)

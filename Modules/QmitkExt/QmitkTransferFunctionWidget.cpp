@@ -18,7 +18,11 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   connect(m_YEditGradientOpacity, SIGNAL(returnPressed()), this, SLOT(SetYValueGradient()));
 
   connect(m_XEditColor, SIGNAL(returnPressed()), this, SLOT(SetXValueColor()));
-
+  
+  m_RangeSlider->setMaximum(2048);
+  m_RangeSlider->setMinimum(-2048);
+  connect(m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
+  
   m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEditScalarOpacity, m_YEditScalarOpacity);
   m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
   m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, 0);
@@ -26,6 +30,7 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   m_ScalarOpacityFunctionCanvas->SetTitle("Grayvalue -> Opacity");
   m_GradientOpacityCanvas->SetTitle("Grayvalue/Gradient -> Opacity");  
   m_ColorTransferFunctionCanvas->SetTitle("Grayvalue -> Color");
+ 
 }
 
 QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
@@ -138,6 +143,21 @@ void QmitkTransferFunctionWidget::SetXValueColor()
 }
 
 
-
-
+void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper) 
+{
+  m_ScalarOpacityFunctionCanvas->SetMin(lower);
+  m_ScalarOpacityFunctionCanvas->SetMax(upper);
+  
+  m_GradientOpacityCanvas->SetMin(lower);
+  m_GradientOpacityCanvas->SetMax(upper);
+  
+  m_ColorTransferFunctionCanvas->SetMin(lower);
+  m_ColorTransferFunctionCanvas->SetMax(upper);
+  
+  m_GradientOpacityCanvas->update();
+  m_ColorTransferFunctionCanvas->update();
+  m_ScalarOpacityFunctionCanvas->update();
+  
+  //LOG_INFO << "m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
+}
 

@@ -11,6 +11,8 @@
 #include <mitkDataTreeNode.h>
 #include <mitkTransferFunctionProperty.h>
 
+#include <QSlider>
+
 class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
 
@@ -32,9 +34,15 @@ class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
 	  void SetXValueColor();
 	 
 	  void OnUpdateCanvas();
+	  
+	  void OnSpanChanged (int lower, int upper);
 
   protected:
   
     mitk::TransferFunctionProperty::Pointer tfpToChange;
+    
+    int m_RangeSliderMin;
+    int m_RangeSliderMax;
+    
 };
 #endif

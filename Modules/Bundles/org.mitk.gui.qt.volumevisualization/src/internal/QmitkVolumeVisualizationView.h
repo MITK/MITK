@@ -64,6 +64,7 @@ protected slots:
   void OnEnableLOD( bool state );
   void OnEnableGPU( bool state );
 
+
 protected:
 
   ///

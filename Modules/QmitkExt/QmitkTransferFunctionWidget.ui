@@ -24,6 +24,13 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QxtSpanSlider" name="m_RangeSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QmitkPiecewiseFunctionCanvas" name="m_ScalarOpacityFunctionCanvas" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -401,6 +408,11 @@ Click right mouse button to delete a point.</string>
    <class>QmitkColorTransferFunctionCanvas</class>
    <extends>QWidget</extends>
    <header>QmitkColorTransferFunctionCanvas.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QxtSpanSlider</class>
+   <extends>QSlider</extends>
+   <header location="global">qxtspanslider.h</header>
   </customwidget>
  </customwidgets>
  <resources>

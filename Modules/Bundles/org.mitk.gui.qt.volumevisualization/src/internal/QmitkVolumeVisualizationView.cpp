@@ -38,6 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGPUVolumeMapper3D.h"
 
 #include <QToolTip>
+#include <qxtspanslider.h>
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
@@ -66,12 +67,14 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     connect( m_Controls->m_EnableGPU, SIGNAL( toggled(bool) ),this, SLOT( OnEnableGPU(bool) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
-
+ 
     m_Controls->m_EnableRenderingCB->setEnabled(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_EnableGPU->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    
+    
     
   }
   
@@ -145,6 +148,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
       m_Controls->m_TransferFunctionWidget->setEnabled(true);
       m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
+      
     }
     else
     {

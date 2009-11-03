@@ -346,7 +346,7 @@ void mitk::Surface::PrintSelf( std::ostream& os, itk::Indent indent ) const
     if(pd != NULL)
     {
       os << "\n";
-      os << indent << "PolyData at time step " << count << ". \n"
+      os << indent << "PolyData at time step " << count << ". \n";
       os << indent << "Number of cells " << pd->GetNumberOfCells() << ": \n";
       os << indent << "Number of points " << pd->GetNumberOfPoints() << ": \n\n";
       os << indent << "VTKPolyData : \n";

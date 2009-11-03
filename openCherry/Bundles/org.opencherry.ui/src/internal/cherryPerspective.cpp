@@ -58,6 +58,7 @@ void Perspective::Init(WorkbenchPage::Pointer page)
 {
   editorHidden = false;
   editorAreaState = IStackPresentationSite::STATE_RESTORED;
+  presentation = 0;
   shouldHideEditorsOnActivate = false;
   this->page = page;
   this->editorArea = page->GetEditorPresentation()->GetLayoutPart();

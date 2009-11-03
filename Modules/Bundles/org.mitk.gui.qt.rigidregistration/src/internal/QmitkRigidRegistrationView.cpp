@@ -153,7 +153,7 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
-    s->RemoveSelectionListener(m_SelListener);
+    s->RemovePostSelectionListener(m_SelListener);
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -336,6 +336,7 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movi
 
     bool hasMask = false;
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    m_Controls.qmitkRigidRegistrationSelector1->SetMovingNodeChildren(children);
     unsigned long size;
     size = children->Size();
     for (unsigned long i = 0; i < size; ++i)
@@ -788,6 +789,11 @@ void QmitkRigidRegistrationView::Calculate()
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
+  }
+  else
+  {
+    m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(NULL);
+    m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
   m_Controls.frame4->setEnabled(false);
   m_Controls.m_StopOptimization->setEnabled(true);

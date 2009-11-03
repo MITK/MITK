@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkRigidRegistrationSelectorViewWidgetHIncluded
 
 #include "mitkDataTreeNode.h"
+#include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
 #include "qobject.h"
 #include "../RigidregistrationDll.h"
@@ -49,6 +50,7 @@ public:
     void SetFixedMaskNode(mitk::DataTreeNode * fixedMaskNode );
     void SetFixedDimension( int dimension );
     void SetMovingNode( mitk::DataTreeNode * movingNode );
+    void SetMovingNodeChildren(mitk::DataStorage::SetOfObjects::ConstPointer children);
     void SetMovingMaskNode(mitk::DataTreeNode * movingMaskNode );
     void SetMovingDimension(int dimension );
     int GetSelectedTransform();
@@ -96,10 +98,10 @@ public:
 protected:
 
   Ui::QmitkRigidRegistrationSelector m_Controls;
-  mitk::DataTreeNode* m_FixedNode;
-  mitk::DataTreeNode* m_FixedMaskNode;
-  mitk::DataTreeNode* m_MovingNode;
-  mitk::DataTreeNode* m_MovingMaskNode;
+  mitk::DataTreeNode::Pointer m_FixedNode;
+  mitk::DataTreeNode::Pointer m_FixedMaskNode;
+  mitk::DataTreeNode::Pointer m_MovingNode;
+  mitk::DataTreeNode::Pointer m_MovingMaskNode;
   mitk::OptimizerParameters::Pointer m_OptimizerParameters;
   mitk::TransformParameters::Pointer m_TransformParameters;
   mitk::MetricParameters::Pointer m_MetricParameters;
@@ -112,6 +114,9 @@ protected:
   mitk::Geometry3D* m_MovingGeometry;
   mitk::AffineGeometryFrame3D::Pointer m_ImageGeometry;
   mitk::RigidRegistrationObserver::Pointer m_Observer;
+  mitk::DataStorage::SetOfObjects::ConstPointer m_MovingNodeChildren;
+  std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
+  std::map<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer> m_ChildNodes2;
 
   itk::Array2D<unsigned int> ParseSchedule(std::string s);
   void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");

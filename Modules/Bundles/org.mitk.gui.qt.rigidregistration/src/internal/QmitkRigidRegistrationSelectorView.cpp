@@ -44,7 +44,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
 {
   m_Controls.setupUi(parent);
 
-  
+
 
   //// create connections
   connect( m_Controls.m_TransformGroup, SIGNAL(clicked(bool)), m_Controls.m_TransformFrame, SLOT(setVisible(bool)));
@@ -93,7 +93,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_LambdaMeanReciprocalSquareDifference->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfSpatialSamplesMutualInformation->setValidator(validatorLineEditInput);
   m_Controls.m_IterationsLBFGSB->setValidator(validatorLineEditInput);
-  
+
 
   QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_StepLengthExhaustive->setValidator(validatorLineEditInputFloat);
@@ -150,7 +150,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_GradientConvergenceToleranceLBFGSB->setValidator(validatorLineEditInputFloat);
   m_Controls.m_DefaultStepLengthLBFGSB->setValidator(validatorLineEditInputFloat);
   m_Controls.m_LineSearchAccuracyLBFGSB->setValidator(validatorLineEditInputFloat);
-  
+
 
   // for Transformations
   m_Controls.m_ScalesTranslationTransformTranslationX->setValidator(validatorLineEditInputFloat);
@@ -304,7 +304,7 @@ QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
 /// this method starts the registration process
 void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int timestep)
 {
-  if (m_FixedNode != NULL && m_MovingNode != NULL)
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
   {
     emit AddNewTransformationToUndoList();
 
@@ -312,14 +312,14 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
     mitk::Image::Pointer mmimage = NULL;
     mitk::Image::Pointer fmimage = NULL;
-    if (m_MovingMaskNode != NULL && m_FixedMaskNode != NULL)
+    if (m_MovingMaskNode.IsNotNull() && m_FixedMaskNode.IsNotNull())
     {
       mmimage = dynamic_cast<mitk::Image*>(m_MovingMaskNode->GetData());
       fmimage = dynamic_cast<mitk::Image*>(m_FixedMaskNode->GetData());
     }
 
     mitk::ImageTimeSelector::Pointer its = mitk::ImageTimeSelector::New();
-    
+
     if(fimage->GetDimension()>3)
     {
       its->SetInput(fimage);
@@ -347,27 +347,37 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     std::cout << std::endl;
 
     // Fixed image geometry
-    mitk::AffineGeometryFrame3D::Pointer m_FixedGeometryCopy = m_FixedNode->GetData()->GetGeometry()->Clone();
-    std::cout << "Fixed Image Geometry (IndexToWorldTransform)"  << std::endl;
-    std::cout << m_FixedGeometryCopy->GetIndexToWorldTransform()->GetMatrix();
-    center = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetCenter();
-    std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    offset = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    std::cout << std::endl;
+    //     mitk::AffineGeometryFrame3D::Pointer m_FixedGeometryCopy = m_FixedNode->GetData()->GetGeometry()->Clone();
+    //     std::cout << "Fixed Image Geometry (IndexToWorldTransform)"  << std::endl;
+    //     std::cout << m_FixedGeometryCopy->GetIndexToWorldTransform()->GetMatrix();
+    //     center = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetCenter();
+    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+    //     offset = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetOffset();
+    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+    //     std::cout << std::endl;
 
     // Calculate the World to ITK-Physical transform for the moving image
     m_MovingGeometry = m_MovingNode->GetData()->GetGeometry();
+
+    unsigned long size;
+    size = m_MovingNodeChildren->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      m_ChildNodes.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
+      m_ChildNodes2.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
+    }
+
     m_GeometryWorldToItkPhysicalTransform = mitk::Geometry3D::TransformType::New();
     GetWorldToItkPhysicalTransform(m_MovingGeometry, m_GeometryWorldToItkPhysicalTransform.GetPointer());
 
-    std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
-    std::cout << m_GeometryWorldToItkPhysicalTransform->GetMatrix();
-    center = m_GeometryWorldToItkPhysicalTransform->GetCenter();
-    std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    offset = m_GeometryWorldToItkPhysicalTransform->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    std::cout << std::endl;
+    //     std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
+    //     std::cout << m_GeometryWorldToItkPhysicalTransform->GetMatrix();
+    //     center = m_GeometryWorldToItkPhysicalTransform->GetCenter();
+    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+    //     offset = m_GeometryWorldToItkPhysicalTransform->GetOffset();
+    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+    //     std::cout << std::endl;
 
     // Calculate the ITK-Physical to World transform for the fixed image
     m_GeometryItkPhysicalToWorldTransform = mitk::Geometry3D::TransformType::New();
@@ -375,13 +385,13 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     GetWorldToItkPhysicalTransform(m_FixedNode->GetData()->GetGeometry(), fixedWorld2Phys.GetPointer());
     fixedWorld2Phys->GetInverse(m_GeometryItkPhysicalToWorldTransform);
 
-    std::cout << "Fixed Image: ITK-physical to World transform" << std::endl;
-    std::cout << m_GeometryItkPhysicalToWorldTransform->GetMatrix();
-    center = m_GeometryItkPhysicalToWorldTransform->GetCenter();
-    std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    offset = m_GeometryItkPhysicalToWorldTransform->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    std::cout << std::endl;
+    //     std::cout << "Fixed Image: ITK-physical to World transform" << std::endl;
+    //     std::cout << m_GeometryItkPhysicalToWorldTransform->GetMatrix();
+    //     center = m_GeometryItkPhysicalToWorldTransform->GetCenter();
+    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
+    //     offset = m_GeometryItkPhysicalToWorldTransform->GetOffset();
+    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
+    //     std::cout << std::endl;
 
     // init callback
     itk::ReceptorMemberCommand<QmitkRigidRegistrationSelectorView>::Pointer command = itk::ReceptorMemberCommand<QmitkRigidRegistrationSelectorView>::New();
@@ -391,8 +401,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
 
 
-    
-    
+
+
     // Actually not necessary, but depending on itk some initial transform might be necessary
     // which is passed to the registration method in transform parameters.
     this->setTransformParameters();  
@@ -401,7 +411,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     if( m_Controls.m_PyramidGroup->isChecked() ){
       mitk::PyramidalRegistrationMethod::Pointer registration = mitk::PyramidalRegistrationMethod::New();
-      
+
       // Set Presets
       std::string pre = m_Controls.m_Presets->text().toStdString();      
       Tokenize(pre, presets, ",");
@@ -418,14 +428,14 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       std::string fixedSchedule = m_Controls.m_FixedSchedule->text().toStdString();
       itk::Array2D<unsigned int> mSchedule = ParseSchedule(movingSchedule);
       itk::Array2D<unsigned int> fSchedule = ParseSchedule(fixedSchedule);      
-      
+
       if(m_Controls.m_MatchHistograms->isChecked())
       {
         registration->SetMatchHistograms(true);
       } else{
         registration->SetMatchHistograms(false);
       }
-      
+
 
       registration->SetMovingSchedule(mSchedule);
       registration->SetFixedSchedule(fSchedule);
@@ -461,7 +471,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
       //printOut of the Time
       LOG_INFO << "Registration Time: " << time;
-     
+
 
     }
     else{
@@ -482,14 +492,14 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       registration->SetTransformParameters(m_TransformParameters);
       registration->SetMetricParameters(m_MetricParameters);
       registration->SetOptimizerParameters(m_OptimizerParameters);
-      
-      
-      
-      
+
+
+
+
       double time(0.0);
       double tstart(0.0);
       tstart = clock();
-     
+
       try
       {
         registration->Update();
@@ -499,17 +509,17 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
         std::cout<<"Caught exception: "<<e<<std::endl;
         LOG_INFO << "Caught exception: "<<e;
       }
-      
+
       time += clock() - tstart;
       time = time / CLOCKS_PER_SEC;
 
       //printOut of the Time
       LOG_INFO << "Registration Time: " << time;
     }
-     
-    
 
-    
+
+
+
 
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -518,8 +528,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
 itk::Array2D<unsigned int> QmitkRigidRegistrationSelectorView::ParseSchedule(std::string s)
 {
-  
-   // READ OUT THE SCHEDULE: First separate every level of the schedule 
+
+  // READ OUT THE SCHEDULE: First separate every level of the schedule 
   std::vector<std::string> tokens;
   std::string delimiter = ";";
   Tokenize(s, tokens, delimiter);
@@ -537,7 +547,7 @@ itk::Array2D<unsigned int> QmitkRigidRegistrationSelectorView::ParseSchedule(std
 
   // Build up the schedule
   itk::Array2D<unsigned int> schedule;   
-  
+
   schedule.SetSize(levels.size(), levels[0].size());
   for(unsigned int i=0; i<levels.size(); i++)
   {
@@ -553,7 +563,7 @@ itk::Array2D<unsigned int> QmitkRigidRegistrationSelectorView::ParseSchedule(std
 
 void QmitkRigidRegistrationSelectorView::Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
 {
-  
+
   std::string::size_type lastPos = str.find_first_not_of(delimiters, 0);      
   std::string::size_type pos     = str.find_first_of(delimiters, lastPos);
 
@@ -662,7 +672,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     m_StopOptimization = false;
   }
 
-  
+
 
   // retreive optimizer value for the current transformation
   double value = m_Observer->GetCurrentOptimizerValue();
@@ -678,7 +688,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
   // init a transform that will be initialized with the vtkmatrix later
   vtkTransform* vtktransform = vtkTransform::New();
 
-  if (m_MovingNode != NULL)
+  if (m_MovingNode.IsNotNull())
   {
     if (m_TransformParameters->GetTransform() == mitk::TransformParameters::TRANSLATIONTRANSFORM)
     {
@@ -998,7 +1008,7 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
       vtktransform->PreMultiply();
     }
 
-    // the retreived transform goes from fixed to moving space.
+    // the retrieved transform goes from fixed to moving space.
     // invert the transform in order to go from moving to fixed space.
     vtkMatrix4x4* vtkmatrix_inv = vtkMatrix4x4::New();
     vtktransform->GetInverse(vtkmatrix_inv);
@@ -1011,38 +1021,73 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     // set moving image geometry to registration result
     m_MovingGeometry->SetIndexToWorldTransformByVtkMatrix(vtkmatrix_inv);
 
-    std::cout << std::endl;
+    /*std::cout << std::endl;
     std::cout << m_MovingGeometry->GetIndexToWorldTransform()->GetMatrix();
     mitk::Geometry3D::TransformType::OutputVectorType offset = m_MovingGeometry->GetIndexToWorldTransform()->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-
-  
-    m_MovingGeometry->GetIndexToWorldTransform()->SetIdentity();
-    // Set moving image geometry to registration result
-    m_MovingGeometry->SetIndexToWorldTransformByVtkMatrix(vtkmatrix_inv);
-    
-   
-    #if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
-      // the next few lines: Phi(Phys2World)*Phi(Result)*Phi(World2Phy)*Phi(Initial)
-      // go to itk physical space before applying the registration result
-      m_MovingGeometry->Compose(m_GeometryWorldToItkPhysicalTransform, 1);
-
-      // right in the beginning, transform by initial moving image geometry
-      m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
-
-      // in the end, go back to world space
-      m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
-        
-    #else     
-      m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
-    #endif
+    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;*/
 
 
-    std::cout << std::endl << m_MovingGeometry->GetIndexToWorldTransform()->GetMatrix();
+#if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
+    // the next few lines: Phi(Phys2World)*Phi(Result)*Phi(World2Phy)*Phi(Initial)
+    // go to itk physical space before applying the registration result
+    m_MovingGeometry->Compose(m_GeometryWorldToItkPhysicalTransform, 1);
+
+    // right in the beginning, transform by initial moving image geometry
+    m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
+
+    // in the end, go back to world space
+    m_MovingGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
+
+#else     
+    m_MovingGeometry->Compose(m_ImageGeometry->GetIndexToWorldTransform(), 1);
+#endif
+
+
+    /*std::cout << std::endl << m_MovingGeometry->GetIndexToWorldTransform()->GetMatrix();
     offset = m_MovingGeometry->GetIndexToWorldTransform()->GetOffset();
-    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl << std::endl;
+    std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl << std::endl;*/
 
-    //m_MovingGeometry->Print(std::cout, 0);
+
+    // now adapt all children geometries accordingly if children exist
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    std::map<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
+    mitk::DataTreeNode::Pointer childNode;
+    for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ ) 
+    {
+      childNode = (*iter).first;
+      if (childNode.IsNotNull())
+      {
+        mitk::Geometry3D* childGeometry;
+        mitk::AffineGeometryFrame3D::Pointer childImageGeometry;
+        // Calculate the World to ITK-Physical transform for the moving mask
+        childGeometry = (*iter).second;
+        iter2 = m_ChildNodes2.find(childNode);
+        childImageGeometry = (*iter2).second;
+
+        childGeometry->GetIndexToWorldTransform()->SetIdentity();
+
+        // the next view lines: Phi(Phys2World)*Phi(Result)*Phi(World2Phy)*Phi(Initial)
+
+        // set moving mask geometry to registration result
+        childGeometry->SetIndexToWorldTransformByVtkMatrix(vtkmatrix_inv);
+   
+#if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
+        // the next few lines: Phi(Phys2World)*Phi(Result)*Phi(World2Phy)*Phi(Initial)
+        // go to itk physical space before applying the registration result
+        childGeometry->Compose(m_GeometryWorldToItkPhysicalTransform, 1);
+
+        // right in the beginning, transform by initial moving image geometry
+        childGeometry->Compose(childImageGeometry->GetIndexToWorldTransform(), 1);
+
+        // in the end, go back to world space
+        childGeometry->Compose(m_GeometryItkPhysicalToWorldTransform, 0);  
+
+#else     
+        childGeometry->Compose(childImageGeometry->GetIndexToWorldTransform(), 1);
+#endif
+      }
+    }
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   emit OptimizerChanged(value);
@@ -1055,7 +1100,7 @@ void QmitkRigidRegistrationSelectorView::TransformSelected( int transform )
   this->hideAllTransformFrames();
   this->SetSimplexDeltaVisible();
   emit TransformChanged();
-  if (m_FixedNode == NULL || m_MovingNode == NULL)
+  if (m_FixedNode.IsNull() || m_MovingNode.IsNull())
   {
     return;
   }
@@ -1454,14 +1499,14 @@ void QmitkRigidRegistrationSelectorView::setTransformParameters()
 
     m_TransformParameters->SetTransformInitializerOn(m_Controls.m_CenterForInitializerAffine->isChecked());
 
-    #if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
-      mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
-      initialTransform->SetIdentity();
-      initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
-      initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
-      m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());  
-    #endif
-    
+#if !defined(ITK_IMAGE_BEHAVES_AS_ORIENTED_IMAGE)
+    mitk::Geometry3D::TransformType::Pointer initialTransform = mitk::Geometry3D::TransformType::New();
+    initialTransform->SetIdentity();
+    initialTransform->Compose(m_GeometryItkPhysicalToWorldTransform);
+    initialTransform->Compose(m_GeometryWorldToItkPhysicalTransform, 0); 
+    m_TransformParameters->SetInitialParameters(initialTransform->GetParameters());  
+#endif
+
     m_TransformParameters->SetMomentsOn(m_Controls.m_MomentsAffine->isChecked());
   }
   else if (m_Controls.m_TransformBox->currentIndex() == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
@@ -1983,7 +2028,7 @@ void QmitkRigidRegistrationSelectorView::SetSimplexDeltaVisible()
   m_Controls.m_SimplexDeltaAmoeba13->hide();
   m_Controls.m_SimplexDeltaAmoeba14->hide();
   m_Controls.m_SimplexDeltaAmoeba15->hide();
-  if (m_FixedNode == NULL || m_MovingNode == NULL)
+  if (m_FixedNode.IsNull() || m_MovingNode.IsNull())
   {
     return;
   }
@@ -3020,7 +3065,7 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
     }
     else if (m_Controls.m_OptimizerBox->currentIndex() == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
     {
-     /* optimizerValues[2] = m_Controls.m_GradientConvergenceToleranceLBFGSB->text().toFloat();
+      /* optimizerValues[2] = m_Controls.m_GradientConvergenceToleranceLBFGSB->text().toFloat();
       optimizerValues[3] = m_Controls.m_MinimumStepLengthVersorRigid3DTransform->text().toFloat();
       optimizerValues[4] = m_Controls.m_MaximumStepLengthVersorRigid3DTransform->text().toFloat();
       optimizerValues[5] = m_Controls.m_IterationsVersorRigid3DTransform->text().toInt();*/
@@ -3065,4 +3110,9 @@ void QmitkRigidRegistrationSelectorView::SetMovingMaskNode( mitk::DataTreeNode *
 {
   m_MovingMaskNode = movingMaskNode;
   this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
+}
+
+void QmitkRigidRegistrationSelectorView::SetMovingNodeChildren(mitk::DataStorage::SetOfObjects::ConstPointer children)
+{
+  m_MovingNodeChildren = children;
 }

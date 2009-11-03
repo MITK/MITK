@@ -151,7 +151,7 @@ QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 {
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
-    s->RemoveSelectionListener(m_SelListener);
+    s->RemovePostSelectionListener(m_SelListener);
 }
 
 void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -263,7 +263,7 @@ void QmitkDeformableRegistrationView::StdMultiWidgetNotAvailable()
 void QmitkDeformableRegistrationView::CreateConnections()
 {
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
-  connect(m_Controls.m_DeformableTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(bool)));
+  connect(m_Controls.m_DeformableTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
   connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));

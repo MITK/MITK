@@ -48,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
+#include <QMessageBox>
 
 QmitkExtWorkbenchWindowAdvisorHack* QmitkExtWorkbenchWindowAdvisorHack::undohack = new QmitkExtWorkbenchWindowAdvisorHack();
 
@@ -153,6 +154,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   else delete qToolbar;
   // ====================================================
 
+  // ===== Help menu ====================================
+  QMenu* helpMenu = menuBar->addMenu("Help");
+  QAction* welcomeAction = helpMenu->addAction("&Welcome", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
+  // =====================================================
+
 
   QStatusBar* qStatusBar = new QStatusBar();
 
@@ -247,4 +253,18 @@ void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
 void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 {
   cherry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
+{
+  bool hasIntro = cherry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
+  if (!hasIntro)
+  {
+    QMessageBox::information(0, "No Welcome Content Found", "There is no welcome content suitable for display in this application.");
+  }
+  else
+  {
+    cherry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
+       cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
+  }
 }

@@ -446,6 +446,11 @@ struct WorkbenchRegistryConstants {
 	static const std::string ATT_RETURN_TYPE_ID; // "returnTypeId"; //$NON-NLS-1$
 
 	/**
+	 * Role attribue. Value <code>role</code>.
+	 */
+	static const std::string ATT_ROLE; // "role";
+
+	/**
 	 * The name of the attribute storing the identifier for the active scheme.
 	 * This is called a 'keyConfigurationId' for legacy reasons.
 	 */

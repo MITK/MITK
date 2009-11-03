@@ -29,3 +29,9 @@ POCO_END_MANIFEST
 POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
   POCO_EXPORT_CLASS(cherry::ViewIntroAdapterPart)
 POCO_END_MANIFEST
+
+#include "src/internal/intro/cherryEditorIntroAdapterPart.h"
+
+POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
+  POCO_EXPORT_CLASS(cherry::EditorIntroAdapterPart)
+POCO_END_MANIFEST

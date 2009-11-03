@@ -44,6 +44,12 @@ struct IIntroDescriptor : public Object {
   virtual IIntroPart::Pointer CreateIntro() throw(CoreException) = 0;
 
   /**
+   * Returns the role of the intro part (view or editor)
+   * @return the role of the part
+   */
+  virtual int GetRole() const = 0;
+
+  /**
    * Returns the part id.
    *
    * @return the id of the part

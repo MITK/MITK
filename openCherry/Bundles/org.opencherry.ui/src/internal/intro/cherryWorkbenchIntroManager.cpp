@@ -23,6 +23,7 @@
 #include "../cherryWorkbenchPage.h"
 #include "../cherryWorkbenchPlugin.h"
 #include "../cherryPerspective.h"
+#include "../cherryNullEditorInput.h"
 
 namespace cherry
 {
@@ -30,7 +31,8 @@ namespace cherry
 void WorkbenchIntroManager::CreateIntro(
     SmartPointer<IWorkbenchWindow> preferredWindow)
 {
-  if (!this->workbench->GetIntroDescriptor())
+  IIntroDescriptor::Pointer descr = this->workbench->GetIntroDescriptor();
+  if (!descr)
   {
     return;
   }
@@ -42,7 +44,15 @@ void WorkbenchIntroManager::CreateIntro(
   }
   try
   {
-    workbenchPage->ShowView(IntroConstants::INTRO_VIEW_ID);
+    if (IntroIsView())
+    {
+      workbenchPage->ShowView(IntroConstants::INTRO_VIEW_ID);
+    }
+    else
+    {
+      IEditorInput::Pointer input(new NullEditorInput());
+      workbenchPage->OpenEditor(input, IntroConstants::INTRO_EDITOR_ID);
+    }
   } catch (PartInitException& e)
   {
     //TODO IStatus
@@ -51,6 +61,16 @@ void WorkbenchIntroManager::CreateIntro(
 //        IntroMessages.Intro_could_not_create_part, e));
     WorkbenchPlugin::Log("Could not create intro part.", e);
   }
+}
+
+bool WorkbenchIntroManager::IntroIsView() const
+{
+  IIntroDescriptor::Pointer descr = this->workbench->GetIntroDescriptor();
+  if (descr)
+  {
+    return descr->GetRole() == IntroConstants::INTRO_ROLE_VIEW;
+  }
+  return true;
 }
 
 WorkbenchIntroManager::WorkbenchIntroManager(Workbench* workbench)
@@ -86,21 +106,38 @@ bool WorkbenchIntroManager::CloseIntro(IIntroPart::Pointer part)
     return false;
   }
 
-  IViewPart::Pointer introView = GetViewIntroAdapterPart();
+  IWorkbenchPart::Pointer introView = GetIntroAdapterPart();
   if (introView)
   {
     //assumption is that there is only ever one intro per workbench
     //if we ever support one per window then this will need revisiting
     IWorkbenchPage::Pointer page = introView->GetSite()->GetPage();
-    IViewReference::Pointer reference = page->FindViewReference(
-        IntroConstants::INTRO_VIEW_ID);
-    page->HideView(introView);
-    if (!reference || reference->GetPart(false) == 0)
+    if (IntroIsView())
     {
-      introPart = 0;
-      return true;
+      IViewReference::Pointer reference = page->FindViewReference(
+          IntroConstants::INTRO_VIEW_ID);
+      page->HideView(introView.Cast<IViewPart>());
+      if (!reference || reference->GetPart(false) == 0)
+      {
+        introPart = 0;
+        return true;
+      }
+      return false;
     }
-    return false;
+    else
+    {
+      std::vector<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      poco_assert(references.size() < 2);
+      if (references.empty())
+        return false;
+
+      if (page->CloseEditors(std::list<IEditorReference::Pointer>(references.begin(), references.end()), false))
+      {
+        introPart = 0;
+        return true;
+      }
+      return false;
+    }
   }
 
   // if there is no part then null our reference
@@ -122,8 +159,8 @@ IIntroPart::Pointer WorkbenchIntroManager::ShowIntro(SmartPointer<
     return IIntroPart::Pointer(0);
   }
 
-  ViewIntroAdapterPart::Pointer viewPart = GetViewIntroAdapterPart();
-  if (!viewPart)
+  IWorkbenchPart::Pointer part = GetIntroAdapterPart();
+  if (!part)
   {
     CreateIntro(preferredWindow);
   }
@@ -131,14 +168,21 @@ IIntroPart::Pointer WorkbenchIntroManager::ShowIntro(SmartPointer<
   {
     try
     {
-      IWorkbenchPage::Pointer page = viewPart->GetSite()->GetPage();
+      IWorkbenchPage::Pointer page = part->GetSite()->GetPage();
       IWorkbenchWindow::Pointer window = page->GetWorkbenchWindow();
       if (window != preferredWindow)
       {
         window->GetShell()->SetActive();
       }
 
-      page->ShowView(IntroConstants::INTRO_VIEW_ID);
+      if (IntroIsView())
+      {
+        page->ShowView(IntroConstants::INTRO_VIEW_ID);
+      }
+      else
+      {
+        page->OpenEditor(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID);
+      }
     } catch (PartInitException& e)
     {
       //TODO IStatus
@@ -155,13 +199,13 @@ IIntroPart::Pointer WorkbenchIntroManager::ShowIntro(SmartPointer<
 bool WorkbenchIntroManager::IsIntroInWindow(
     SmartPointer<IWorkbenchWindow> testWindow) const
 {
-  ViewIntroAdapterPart::Pointer viewPart = GetViewIntroAdapterPart();
-  if (!viewPart)
+  IWorkbenchPart::Pointer part = GetIntroAdapterPart();
+  if (!part)
   {
     return false;
   }
 
-  IWorkbenchWindow::Pointer window = viewPart->GetSite()->GetWorkbenchWindow();
+  IWorkbenchWindow::Pointer window = part->GetSite()->GetWorkbenchWindow();
   if (window == testWindow)
   {
     return true;
@@ -177,8 +221,8 @@ void WorkbenchIntroManager::SetIntroStandby(IIntroPart::Pointer part,
     return;
   }
 
-  ViewIntroAdapterPart::Pointer viewIntroAdapterPart = GetViewIntroAdapterPart();
-  if (!viewIntroAdapterPart)
+  IWorkbenchPart::Pointer introPart = GetIntroAdapterPart();
+  if (!introPart)
   {
     return;
   }
@@ -202,13 +246,13 @@ bool WorkbenchIntroManager::IsIntroStandby(IIntroPart::Pointer part) const
     return false;
   }
 
-  ViewIntroAdapterPart::Pointer viewIntroAdapterPart = GetViewIntroAdapterPart();
-  if (!viewIntroAdapterPart)
+  IWorkbenchPart::Pointer introPart = GetIntroAdapterPart();
+  if (!introPart)
   {
     return false;
   }
 
-  //return !((PartSite) viewIntroAdapterPart.getSite()).getPane().isZoomed();
+  //return !((PartSite) introPart.getSite()).getPane().isZoomed();
   return false;
 }
 
@@ -217,7 +261,7 @@ IIntroPart::Pointer WorkbenchIntroManager::GetIntro() const
   return introPart;
 }
 
-ViewIntroAdapterPart::Pointer WorkbenchIntroManager::GetViewIntroAdapterPart() const
+IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
 {
   std::vector<IWorkbenchWindow::Pointer> windows(this->workbench->GetWorkbenchWindows());
   for (std::size_t i = 0; i < windows.size(); i++)
@@ -228,23 +272,30 @@ ViewIntroAdapterPart::Pointer WorkbenchIntroManager::GetViewIntroAdapterPart() c
     {
       continue;
     }
-    std::vector<IPerspectiveDescriptor::Pointer> perspDescs(page->GetOpenPerspectives());
-    for (std::size_t j = 0; j < perspDescs.size(); j++)
+
+    if (IntroIsView())
     {
-      IPerspectiveDescriptor::Pointer descriptor = perspDescs[j];
-      IViewReference::Pointer reference = page->FindPerspective(descriptor)->FindView(
-          IntroConstants::INTRO_VIEW_ID);
-      if (reference)
+      std::vector<IPerspectiveDescriptor::Pointer> perspDescs(page->GetOpenPerspectives());
+      for (std::size_t j = 0; j < perspDescs.size(); j++)
       {
-        IViewPart::Pointer part = reference->GetView(false);
-        if (part && part.Cast<ViewIntroAdapterPart>())
+        IPerspectiveDescriptor::Pointer descriptor = perspDescs[j];
+        IViewReference::Pointer reference = page->FindPerspective(descriptor)->FindView(
+            IntroConstants::INTRO_VIEW_ID);
+        if (reference)
         {
-          return part.Cast<ViewIntroAdapterPart>();
+          return reference->GetView(false);
         }
       }
     }
+    else
+    {
+      std::vector<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      poco_assert(references.size() < 2);
+      if (references.size() == 1)
+        return references.front()->GetEditor(false);
+    }
   }
-  return ViewIntroAdapterPart::Pointer(0);
+  return IWorkbenchPart::Pointer(0);
 }
 
 IIntroPart::Pointer WorkbenchIntroManager::CreateNewIntroPart()

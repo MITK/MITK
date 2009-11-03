@@ -31,6 +31,7 @@
 #include "cherryWorkbenchConstants.h"
 #include "cherryPartService.h"
 #include "intro/cherryIntroConstants.h"
+#include "intro/cherryViewIntroAdapterPart.h"
 
 #include "../tweaklets/cherryGuiWidgetsTweaklet.h"
 #include "../tweaklets/cherryWorkbenchPageTweaklet.h"
@@ -934,7 +935,7 @@ void WorkbenchPage::BusyResetPerspective()
 {
 
   ViewIntroAdapterPart::Pointer introViewAdapter = dynamic_cast<WorkbenchIntroManager*>(GetWorkbenchWindow()
-        ->GetWorkbench()->GetIntroManager())->GetViewIntroAdapterPart();
+        ->GetWorkbench()->GetIntroManager())->GetIntroAdapterPart().Cast<ViewIntroAdapterPart>();
   //  PartPane introPane = 0;
   //  boolean introFullScreen = false;
   //  if (introViewAdapter != 0)

@@ -30,15 +30,25 @@ namespace cherry {
  */
 struct IntroConstants {
 
-    /**
-     * The id of the view that is used as the intro host.
-     */
-    static const std::string INTRO_VIEW_ID; // = "org.opencherry.ui.internal.introview";
+  /**
+   * The id of the view that is used as the intro host.
+   */
+  static const std::string INTRO_VIEW_ID; // = "org.opencherry.ui.internal.introview";
 
-    /**
-     * The id of the editor that is used as the intro host.
-     */
-    static const std::string INTRO_EDITOR_ID; // = "org.opencherry.ui.internal.introeditor";
+  /**
+   * The id of the editor that is used as the intro host.
+   */
+  static const std::string INTRO_EDITOR_ID; // = "org.opencherry.ui.internal.introeditor";
+
+  /**
+   * Constant defining the realization of the intro part as a view.
+   */
+  static const int INTRO_ROLE_VIEW; // = 0x01;
+
+  /**
+   * Constant defining the realization of the intro part as an editor.
+   */
+  static const int INTRO_ROLE_EDITOR; // = 0x02;
 
 };
 

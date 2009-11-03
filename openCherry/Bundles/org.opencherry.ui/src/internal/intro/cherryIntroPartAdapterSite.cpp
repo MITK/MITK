@@ -15,7 +15,7 @@
  
  =========================================================================*/
 
-#include "cherryViewIntroAdapterSite.h"
+#include "cherryIntroPartAdapterSite.h"
 
 #include <cherryIWorkbenchPage.h>
 #include <cherryISelectionProvider.h>
@@ -23,52 +23,52 @@
 namespace cherry
 {
 
-ViewIntroAdapterSite::ViewIntroAdapterSite(IViewSite::Pointer viewSite,
+IntroPartAdapterSite::IntroPartAdapterSite(IWorkbenchPartSite::Pointer site,
     IntroDescriptor::Pointer descriptor) :
-  descriptor(descriptor), viewSite(viewSite)
+  descriptor(descriptor), partSite(site)
 {
 
 }
 
-Object::Pointer ViewIntroAdapterSite::GetService(const std::string& key)
+Object::Pointer IntroPartAdapterSite::GetService(const std::string& key)
 {
-  return viewSite->GetService(key);
+  return partSite->GetService(key);
 }
 
-bool ViewIntroAdapterSite::HasService(const std::string& key) const
+bool IntroPartAdapterSite::HasService(const std::string& key) const
 {
-  return viewSite->HasService(key);
+  return partSite->HasService(key);
 }
 
-std::string ViewIntroAdapterSite::GetId() const
+std::string IntroPartAdapterSite::GetId() const
 {
   return descriptor->GetId();
 }
 
-SmartPointer<IWorkbenchPage> ViewIntroAdapterSite::GetPage()
+SmartPointer<IWorkbenchPage> IntroPartAdapterSite::GetPage()
 {
-  return viewSite->GetPage();
+  return partSite->GetPage();
 }
 
-std::string ViewIntroAdapterSite::GetPluginId() const
+std::string IntroPartAdapterSite::GetPluginId() const
 {
   return descriptor->GetPluginId();
 }
 
-SmartPointer<ISelectionProvider> ViewIntroAdapterSite::GetSelectionProvider()
+SmartPointer<ISelectionProvider> IntroPartAdapterSite::GetSelectionProvider()
 {
-  return viewSite->GetSelectionProvider();
+  return partSite->GetSelectionProvider();
 }
 
-SmartPointer<IWorkbenchWindow> ViewIntroAdapterSite::GetWorkbenchWindow()
+SmartPointer<IWorkbenchWindow> IntroPartAdapterSite::GetWorkbenchWindow()
 {
-  return viewSite->GetWorkbenchWindow();
+  return partSite->GetWorkbenchWindow();
 }
 
-void ViewIntroAdapterSite::SetSelectionProvider(
+void IntroPartAdapterSite::SetSelectionProvider(
     SmartPointer<ISelectionProvider> provider)
 {
-  viewSite->SetSelectionProvider(provider);
+  partSite->SetSelectionProvider(provider);
 }
 
 }

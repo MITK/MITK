@@ -114,11 +114,12 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
 
   #intro
+  intro/cherryEditorIntroAdapterPart.cpp
   intro/cherryIntroConstants.cpp
   intro/cherryIntroDescriptor.cpp
+  intro/cherryIntroPartAdapterSite.cpp
   intro/cherryIntroRegistry.cpp
   intro/cherryViewIntroAdapterPart.cpp
-  intro/cherryViewIntroAdapterSite.cpp
   intro/cherryWorkbenchIntroManager.cpp
   
   cherryAbstractPartSelectionTracker.cpp

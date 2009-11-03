@@ -17,6 +17,7 @@
 
 #include "cherryIntroDescriptor.h"
 
+#include "cherryIntroConstants.h"
 #include "../cherryWorkbenchRegistryConstants.h"
 
 #include <cherryAbstractUIPlugin.h>
@@ -62,6 +63,18 @@ IntroContentDetector::Pointer IntroDescriptor::GetIntroContentDetector()
     element->CreateExecutableExtension<IntroContentDetector>(
       WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR));
   return detector;
+}
+
+int IntroDescriptor::GetRole() const
+{
+  std::string role;
+  if (!element->GetAttribute(WorkbenchRegistryConstants::ATT_ROLE, role))
+  {
+    return IntroConstants::INTRO_ROLE_VIEW;
+  }
+
+  if (role == "editor") return IntroConstants::INTRO_ROLE_EDITOR;
+  else return IntroConstants::INTRO_ROLE_VIEW;
 }
 
 std::string IntroDescriptor::GetId() const

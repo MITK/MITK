@@ -179,6 +179,8 @@ namespace cherry {
 
   const std::string WorkbenchRegistryConstants::ATT_RETURN_TYPE_ID = "returnTypeId"; //$NON-NLS-1$
 
+  const std::string WorkbenchRegistryConstants::ATT_ROLE = "role";
+
   const std::string WorkbenchRegistryConstants::ATT_SCHEME_ID = "schemeId"; //$NON-NLS-1$
 
   const std::string WorkbenchRegistryConstants::ATT_SCOPE = "scope"; //$NON-NLS-1$

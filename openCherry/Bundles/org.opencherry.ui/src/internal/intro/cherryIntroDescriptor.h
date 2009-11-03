@@ -58,6 +58,8 @@ public:
 
   IntroContentDetector::Pointer GetIntroContentDetector() throw (CoreException);
 
+  int GetRole() const;
+
   /*
    * @see IIntroDescriptor#GetId()
    */

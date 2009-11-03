@@ -23,7 +23,7 @@
 
 #include "cherryIntroDescriptor.h"
 
-#include <cherryIViewSite.h>
+#include <cherryIWorkbenchPartSite.h>
 
 namespace cherry {
 
@@ -32,17 +32,17 @@ namespace cherry {
  * <code>ViewIntroAdapterPart</code>.
  *
  */
-class ViewIntroAdapterSite : public IIntroSite {
+class IntroPartAdapterSite : public IIntroSite {
 
 private:
 
   IntroDescriptor::Pointer descriptor;
 
-  IViewSite::Pointer viewSite;
+  IWorkbenchPartSite::Pointer partSite;
 
 public:
 
-    ViewIntroAdapterSite(IViewSite::Pointer viewSite, IntroDescriptor::Pointer descriptor);
+    IntroPartAdapterSite(IWorkbenchPartSite::Pointer viewSite, IntroDescriptor::Pointer descriptor);
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroSite#getActionBars()

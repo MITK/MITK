@@ -138,12 +138,12 @@ struct SelListenerPointBasedRegistration : ISelectionListener
                 }
               }
             }
-            if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
-            {
-              m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
-              m_View->m_Controls.m_StatusLabel->show();
-            }
-          }
+          } 
+        }
+        if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+        {
+          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+          m_View->m_Controls.m_StatusLabel->show();
         }
       }
     }
@@ -168,7 +168,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
+: QmitkFunctionality(), m_SelListener(0), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
 m_FixedNode(NULL), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
 m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0)
 {
@@ -182,7 +182,7 @@ QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
-    s->RemoveSelectionListener(m_SelListener);
+    s->RemovePostSelectionListener(m_SelListener);
   if (m_FixedPointSetNode.IsNotNull())
   {
     m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);

@@ -44,9 +44,6 @@
 
 #define QXT_DLLEXPORT DO_NOT_USE_THIS_ANYMORE
 
-#define BUILD_QXT_GUI
-#define BUILD_QXT_CORE
-
 #if defined(QXT_SHARED)
 #    if defined(BUILD_QXT_CORE)
 #        define QXT_CORE_EXPORT Q_DECL_EXPORT

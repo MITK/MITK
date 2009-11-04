@@ -88,11 +88,6 @@ public:
   protected slots:  
 
     /*
-    * When an image is selected through the data tree combo box.
-    */
-    void onImage2Selected(const mitk::DataTreeNode* item);
-
-    /*
     * When an action is selected in the "one image ops" list box
     */
     void SelectAction(int action);

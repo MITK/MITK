@@ -294,11 +294,12 @@ void EditorManager::FindEditors(
   if (((matchFlags & IWorkbenchPage::MATCH_ID) != 0) && !editorId.empty())
   {
     for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
-         i != editorList.end(); ++i)
+      i != editorList.end(); ++i)
     {
       if (editorId != (*i)->GetId())
       {
         i = editorList.erase(i);
+        if(editorList.size() == 0) break;
         continue;
       }
     }

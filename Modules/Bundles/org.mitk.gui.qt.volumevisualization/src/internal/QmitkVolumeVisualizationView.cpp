@@ -118,62 +118,77 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       std::string  infoText;
       
       if (node->GetName().empty())
-        infoText = std::string("Selected Image: unnamed");
-        
+        infoText = std::string("Selected Image: [currently selected image has no name]");
       else
         infoText = std::string("Selected Image: ") + node->GetName();
        
       m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
       m_SelectedNode = node;
-    
-      bool enabled = false;
-      
-      node->GetBoolProperty("volumerendering",enabled);
-      m_Controls->m_EnableRenderingCB->setEnabled(true);
-      m_Controls->m_EnableRenderingCB->setChecked(enabled);
-
-      enabled = false;
- 
-      node->GetBoolProperty("volumerendering.uselod",enabled);
-      m_Controls->m_EnableLOD->setEnabled(true);
-      m_Controls->m_EnableLOD->setChecked(enabled);
-      
-      enabled=false;
-      
-      m_Controls->m_EnableGPU->setEnabled(true);
-      m_Controls->m_EnableRenderingCB->setChecked(enabled);
-
-      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(node);
-      m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(node);
-
-      m_Controls->m_TransferFunctionWidget->setEnabled(true);
-      m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
-      
     }
     else
     {
-      std::string infoText = "Selected Image: [None]";
+      std::string infoText = "Selected Image: [none]";
       m_SelectedNode = 0;
-      
       m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
-
-      m_Controls->m_EnableRenderingCB->setChecked(false);
-      m_Controls->m_EnableRenderingCB->setEnabled(false);
-    
-      m_Controls->m_EnableLOD->setChecked(false);
-      m_Controls->m_EnableLOD->setEnabled(false);
-    
-      m_Controls->m_EnableGPU->setEnabled(false);
-    
-      m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-      m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
-
-      m_Controls->m_TransferFunctionWidget->setEnabled(false);
-      m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     }
+
+    UpdateInterface();
   }
 
 }
+
+void QmitkVolumeVisualizationView::UpdateInterface()
+{
+  if(m_SelectedNode.IsNull())
+  {
+    // turnoff all
+    m_Controls->m_EnableRenderingCB->setChecked(false);
+    m_Controls->m_EnableRenderingCB->setEnabled(false);
+    m_Controls->m_EnableLOD->setChecked(false);
+    m_Controls->m_EnableLOD->setEnabled(false);
+    m_Controls->m_EnableGPU->setEnabled(false);
+    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->setEnabled(false);
+    m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    return;
+  }
+  
+  bool enabled = false;
+      
+  m_SelectedNode->GetBoolProperty("volumerendering",enabled);
+  m_Controls->m_EnableRenderingCB->setEnabled(true);
+  m_Controls->m_EnableRenderingCB->setChecked(enabled);
+
+  if(!enabled)
+  {
+    // turnoff all except volumerendering checkbox
+    m_Controls->m_EnableLOD->setChecked(false);
+    m_Controls->m_EnableLOD->setEnabled(false);
+    m_Controls->m_EnableGPU->setEnabled(false);
+    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->setEnabled(false);
+    m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    return;
+  }
+
+  // otherwise we can activate em all
+  enabled = false;
+  m_SelectedNode->GetBoolProperty("volumerendering.uselod",enabled);
+  m_Controls->m_EnableLOD->setEnabled(true);
+  m_Controls->m_EnableLOD->setChecked(enabled);
+    
+  enabled=false;
+  m_Controls->m_EnableGPU->setEnabled(true);
+  m_Controls->m_EnableGPU->setChecked(enabled);
+
+  m_Controls->m_TransferFunctionWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionWidget->setEnabled(true);
+  m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
+}
+
 
 void QmitkVolumeVisualizationView::OnEnableRendering(bool state) 
 {
@@ -181,6 +196,7 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
     return;
 
   m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
+  UpdateInterface();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

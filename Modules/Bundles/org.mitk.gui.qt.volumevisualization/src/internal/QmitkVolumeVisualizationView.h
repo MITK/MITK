@@ -77,6 +77,8 @@ protected:
 private:
 
   mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
+  
+  void UpdateInterface();
 
 };
 

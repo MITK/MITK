@@ -39,6 +39,10 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
   } 
 
+  std::cout << "Testing mitk::Surface::PrintSelf() for empty surface: ";
+  surface->PrintSelf();
+  std::cout<<"[PASSED]"<<std::endl;
+
   vtkSphereSource* sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);
   sphereSource->SetRadius(5.0);

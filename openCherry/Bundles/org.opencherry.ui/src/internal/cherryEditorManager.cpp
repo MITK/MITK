@@ -294,14 +294,14 @@ void EditorManager::FindEditors(
   if (((matchFlags & IWorkbenchPage::MATCH_ID) != 0) && !editorId.empty())
   {
     for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
-      i != editorList.end(); ++i)
+      i != editorList.end();)
     {
       if (editorId != (*i)->GetId())
       {
         i = editorList.erase(i);
-        if(editorList.size() == 0) break;
         continue;
       }
+      ++i;
     }
   }
 
@@ -315,7 +315,7 @@ void EditorManager::FindEditors(
 
   // Phase 1: check editors that have their own matching strategy
   for (std::list<IEditorReference::Pointer>::iterator i = editorList.begin();
-       i != editorList.end(); ++i)
+       i != editorList.end();)
   {
     EditorReference::Pointer editor = i->Cast<EditorReference>();
     IEditorDescriptor::Pointer desc = editor->GetDescriptor();
@@ -334,6 +334,7 @@ void EditorManager::FindEditors(
         continue;
       }
     }
+    ++i;
   }
 
   // Phase 2: check materialized editors (without their own matching

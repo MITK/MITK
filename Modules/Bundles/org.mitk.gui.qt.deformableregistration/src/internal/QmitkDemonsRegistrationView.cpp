@@ -27,9 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qmessagebox.h>
 #include "QmitkDemonsRegistrationView.h"
 #include "ui_QmitkDemonsRegistrationViewControls.h"
+#include "mitkITKImageImport.h"
 
 QmitkDemonsRegistrationView::QmitkDemonsRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_MovingNode(NULL)
+m_FixedNode(NULL), m_MovingNode(NULL), m_ResultImage(NULL), m_ResultDeformationField(NULL)
 {
   m_Controls.setupUi(parent);
 
@@ -61,107 +62,27 @@ float QmitkDemonsRegistrationView::GetStandardDeviation()
   return atof(m_Controls.m_StandardDeviation->text().toLatin1());
 }
 
+mitk::Image::Pointer QmitkDemonsRegistrationView::GetResultImage()
+{
+  return m_ResultImage;
+}
+
+mitk::Image::Pointer QmitkDemonsRegistrationView::GetResultDeformationfield()
+{
+  return m_ResultDeformationField;
+}
+
 void QmitkDemonsRegistrationView::CalculateTransformation()
 {
-  if (m_FixedNode != NULL && m_MovingNode != NULL)
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
   {
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
     if ( m_Controls.m_RegistrationSelection->currentIndex() == 0)
     {
-      QString deformationFieldname;
-      QString resultImagename;
       mitk::DemonsRegistration::Pointer registration = mitk::DemonsRegistration::New();
-      int saveResult = QMessageBox::question(this, "Save results", "Do you want to save the results?",QMessageBox::Yes,QMessageBox::No);
-      if(saveResult == QMessageBox::Yes)
-      {
-        // ask for filenames to save deformation field and result image
-        bool isValid = false;
-        while(!isValid)
-        {
-          deformationFieldname = QFileDialog::getSaveFileName(this, "Where do you want to save the deformation field?",
-            "deformationField.mhd",
-            "*.mhd"
-            );
-          if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) 
-          {
-            deformationFieldname += ".mhd";
-          }
-          else if (deformationFieldname.isEmpty())
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
-            isValid = false;
-          }
-          //check if file exists
-          if(QFile::exists( deformationFieldname ))
-          {
-            //ask the user whether the file shall be overwritten
-            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
-            if(overwrite == QMessageBox::Yes)
-            {
-              isValid = true;
-            } 
-            else
-            {
-              isValid  = false;
-            }
-          }
-          else
-          {
-            isValid = true;
-          }
-        }        
-        isValid = false;
-        while(!isValid)
-        {
-          resultImagename = QFileDialog::getSaveFileName(this, "Where do you want to save the result image?",
-            "resultImage.mhd",
-            "*.mhd"
-            );
-          if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) 
-          {
-            resultImagename += ".mhd";
-          }
-          else if (resultImagename.isEmpty())
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
-            isValid = false;
-          }
-          //check if file exists
-          if (resultImagename == deformationFieldname)
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a different file name than for the deformation field!",QMessageBox::Ok);
-            isValid = false;
-          }
-          else if(QFile::exists( resultImagename ))
-          {
-            //ask the user whether the file shall be overwritten
-            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
-            if(overwrite == QMessageBox::Yes)
-            {
-              isValid = true;
-            } 
-            else 
-            {
-              isValid  = false;
-            }
-          }
-          else
-          {
-            isValid = true;
-          }
-        }        
-        registration->SetSaveDeformationField(true);
-        registration->SetSaveResult(true);
-        registration->SetDeformationFieldFileName(deformationFieldname.toLatin1());
-        registration->SetResultFileName(resultImagename.toLatin1());
-      }
-      else
-      {
-        registration->SetSaveDeformationField(false);
-        registration->SetSaveResult(false);
-      }
-
+      registration->SetSaveDeformationField(false);
+      registration->SetSaveResult(false);
       registration->SetReferenceImage(fimage);
       registration->SetNumberOfIterations(atoi(m_Controls.m_Iterations->text().toLatin1()));
       registration->SetStandardDeviation(atof(m_Controls.m_StandardDeviation->text().toLatin1()));
@@ -196,112 +117,16 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       {
         QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
       }
-      mitk::Image::Pointer image = registration->GetOutput();
-      if (image.IsNotNull())
-      {
-        m_MovingNode->SetData(image);
-        mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-        mitk::LevelWindow levelWindow;
-        levelWindow.SetAuto( image );
-        levWinProp->SetLevelWindow(levelWindow);
-        m_MovingNode->GetPropertyList()->SetProperty("levelwindow",levWinProp);
-      }
+      m_ResultImage = registration->GetOutput();
+      typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
+      VectorImageType::Pointer deformationField = registration->GetDeformationField();
+      m_ResultDeformationField = mitk::ImportItkImage(deformationField);
     }
     else if(m_Controls.m_RegistrationSelection->currentIndex() == 1)
     {
-      QString deformationFieldname;
-      QString resultImagename;
       mitk::SymmetricForcesDemonsRegistration::Pointer registration = mitk::SymmetricForcesDemonsRegistration::New();
-      int saveResult = QMessageBox::question(this, "Save results", "Do you want to save the results?",QMessageBox::Yes,QMessageBox::No);
-      if(saveResult == QMessageBox::Yes)
-      {
-        // ask for filenames to save deformation field and result image
-        bool isValid = false;
-        while(!isValid)
-        {
-          deformationFieldname = QFileDialog::getSaveFileName(this, "Where do you want to save the deformation field?",
-            "deformationField.mhd",
-            "*.mhd"
-            );
-          if ( !deformationFieldname.isEmpty() && deformationFieldname.right(4) != ".mhd" ) 
-          {
-            deformationFieldname += ".mhd";
-          }
-          else if (deformationFieldname.isEmpty())
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
-            isValid = false;
-          }
-          //check if file exists
-          if(QFile::exists( deformationFieldname ))
-          {
-            //ask the user whether the file shall be overwritten
-            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
-            if(overwrite == QMessageBox::Yes)
-            {
-              isValid = true;
-            } 
-            else
-            {
-              isValid  = false;
-            }
-          }
-          else
-          {
-            isValid = true;
-          }
-        }        
-        isValid = false;
-        while(!isValid)
-        {
-          resultImagename = QFileDialog::getSaveFileName(this, "Where do you want to save the result image?",
-            "resultImage.mhd",
-            "*.mhd"
-            );
-          if ( !resultImagename.isEmpty() && resultImagename.right(4) != ".mhd" ) 
-          {
-            resultImagename += ".mhd";
-          }
-          else if (resultImagename.isEmpty())
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a file name!",QMessageBox::Ok);
-            isValid = false;
-          }
-          //check if file exists
-          if (resultImagename == deformationFieldname)
-          {
-            QMessageBox::information(this, "Save file", "You have to specify a different file name than for the deformation field!",QMessageBox::Ok);
-            isValid = false;
-          }
-          else if(QFile::exists( resultImagename ))
-          {
-            //ask the user whether the file shall be overwritten
-            int overwrite = QMessageBox::question(this, "Save file", "File already exists. Shall the file be overwritten?",QMessageBox::Yes,QMessageBox::No);
-            if(overwrite == QMessageBox::Yes)
-            {
-              isValid = true;
-            } 
-            else 
-            {
-              isValid  = false;
-            }
-          }
-          else
-          {
-            isValid = true;
-          }
-        }        
-        registration->SetSaveDeformationField(true);
-        registration->SetSaveResult(true);
-        registration->SetDeformationFieldFileName(deformationFieldname.toLatin1());
-        registration->SetResultFileName(resultImagename.toLatin1());
-      }
-      else
-      {
-        registration->SetSaveDeformationField(false);
-        registration->SetSaveResult(false);
-      }
-
+      registration->SetSaveDeformationField(false);
+      registration->SetSaveResult(false);
       registration->SetReferenceImage(fimage);
       registration->SetNumberOfIterations(atoi(m_Controls.m_Iterations->text().toLatin1()));
       registration->SetStandardDeviation(atof(m_Controls.m_StandardDeviation->text().toLatin1()));
@@ -328,19 +153,19 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       {
         registration->SetInput(mimage);
       }
-      registration->Update();
-      mitk::Image::Pointer image = registration->GetOutput();
-      if (image.IsNotNull())
+      try
       {
-        m_MovingNode->SetData(image);
-        mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-        mitk::LevelWindow levelWindow;
-        levelWindow.SetAuto( image );
-        levWinProp->SetLevelWindow(levelWindow);
-        m_MovingNode->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+        registration->Update();
       }
+      catch (itk::ExceptionObject& excpt)
+      {
+        QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+      }
+      m_ResultImage = registration->GetOutput();
+      typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
+      VectorImageType::Pointer deformationField = registration->GetDeformationField();
+      m_ResultDeformationField = mitk::ImportItkImage(deformationField);
     }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

@@ -80,7 +80,7 @@ namespace mitk
     /*!  
     * \brief Returns the deformation field, which results by the registration. 
     */
-    itk::Image<class itk::Vector<float, 3>,3>::Pointer GetDeformationField();
+    itk::Image<itk::Vector<float, 3>,3>::Pointer GetDeformationField();
     
     /*!  
     * \brief Starts the demons registration. 

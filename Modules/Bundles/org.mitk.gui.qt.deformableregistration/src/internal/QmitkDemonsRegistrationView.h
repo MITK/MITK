@@ -45,12 +45,17 @@ public:
   void SetFixedNode( mitk::DataTreeNode * fixedNode );
   void SetMovingNode( mitk::DataTreeNode * movingNode );
   void UseHistogramMatching( bool useHM );
+  mitk::Image::Pointer GetResultImage();
+  mitk::Image::Pointer GetResultDeformationfield();
+
 public slots:
   void CalculateTransformation();
 protected:
   Ui::QmitkDemonsRegistrationViewControls m_Controls;
-  mitk::DataTreeNode* m_FixedNode;
-  mitk::DataTreeNode* m_MovingNode;
+  mitk::DataTreeNode::Pointer m_FixedNode;
+  mitk::DataTreeNode::Pointer m_MovingNode;
+  mitk::Image::Pointer m_ResultImage;
+  mitk::Image::Pointer m_ResultDeformationField;
 };
 
 #endif

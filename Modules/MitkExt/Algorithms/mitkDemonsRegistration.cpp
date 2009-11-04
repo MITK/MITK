@@ -69,7 +69,7 @@ namespace mitk {
     m_ResultName = resultName;
   }
 
-  itk::Image<class itk::Vector<float, 3>,3>::Pointer DemonsRegistration::GetDeformationField()
+  itk::Image<itk::Vector<float, 3>,3>::Pointer DemonsRegistration::GetDeformationField()
   {
     return m_DeformationField;
   }
@@ -252,7 +252,7 @@ namespace mitk {
         typename FieldWriterType::Pointer      fieldwriter =  FieldWriterType::New();
         fieldwriter->SetFileName(m_FieldName);
         fieldwriter->SetInput( filter->GetOutput() );
-        //m_DeformationField = filter->GetOutput();
+        m_DeformationField = (itk::Image<itk::Vector<float, 3>,3> *)(filter->GetOutput());
         if(m_SaveField)
         {
           fieldwriter->Update();

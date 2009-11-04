@@ -107,11 +107,6 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     void reinitMoving(const mitk::Geometry3D *);
 
     /*!  
-    \brief Signal that informs about that the Demons registration should be performed.
-    */
-    void calculateDemonsRegistration();
-
-    /*!  
     \brief Signal that informs about that the BSpline registration should be performed.
     */
     void calculateBSplineRegistration();

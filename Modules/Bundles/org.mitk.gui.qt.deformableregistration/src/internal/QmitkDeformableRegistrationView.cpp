@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateNOT.h"
+#include "mitkVectorImageMapper2D.h"
 
 #include "itkImageFileReader.h"
 #include "itkWarpImageFilter.h"
@@ -266,7 +267,6 @@ void QmitkDeformableRegistrationView::CreateConnections()
   connect(m_Controls.m_DeformableTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
-  connect(this,SIGNAL(calculateDemonsRegistration()),m_Controls.m_QmitkDemonsRegistrationViewControls,SLOT(CalculateTransformation()));
   connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
   connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
     SIGNAL(clicked()), 
@@ -439,7 +439,35 @@ void QmitkDeformableRegistrationView::Calculate()
   {
     m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_FixedNode);
     m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_MovingNode);
-    emit calculateDemonsRegistration();
+    m_Controls.m_QmitkDemonsRegistrationViewControls->CalculateTransformation();
+    mitk::Image::Pointer resultImage = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultImage();
+    mitk::Image::Pointer resultDeformationField = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultDeformationfield();   
+    if (resultImage.IsNotNull())
+    {
+      mitk::DataTreeNode::Pointer resultImageNode = mitk::DataTreeNode::New();
+      resultImageNode->SetData(resultImage);
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetAuto( resultImage );
+      levWinProp->SetLevelWindow(levelWindow);
+      resultImageNode->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+      resultImageNode->SetStringProperty("name", "DeformableRegistrationResultImage");
+      this->GetDataStorage()->Add(resultImageNode, m_MovingNode);
+    }
+    if (resultDeformationField.IsNotNull())
+    {
+      mitk::DataTreeNode::Pointer resultDeformationFieldNode = mitk::DataTreeNode::New();
+      resultDeformationFieldNode->SetData(resultDeformationField);
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+      mitk::LevelWindow levelWindow;
+      levelWindow.SetAuto( resultDeformationField );
+      levWinProp->SetLevelWindow(levelWindow);
+      resultDeformationFieldNode->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+      resultDeformationFieldNode->SetStringProperty("name", "DeformableRegistrationResultDeformationField");
+      mitk::VectorImageMapper2D::Pointer mapper = mitk::VectorImageMapper2D::New();
+      resultDeformationFieldNode->SetMapper(1, mapper);
+      this->GetDataStorage()->Add(resultDeformationFieldNode, m_MovingNode);
+    }
   }
 
   else if (m_Controls.m_DeformableTransform->tabText(m_Controls.m_DeformableTransform->currentIndex()) == "B-Spline")

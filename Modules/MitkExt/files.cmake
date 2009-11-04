@@ -95,6 +95,7 @@ SET(CPP_FILES
   DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarCircle.cpp
   DataManagement/mitkPlanarFigure.cpp
+  DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarPolygon.cpp
   DataManagement/mitkPlane.cpp

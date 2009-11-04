@@ -150,9 +150,6 @@ void QmitkBasicImageProcessing::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ImageSelector2, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), 
-      this, SLOT(onImage2Selected(const mitk::DataTreeNode*)) );
-
     connect( (QObject*)(m_Controls->cbWhat1), SIGNAL( activated(int) ), this, SLOT( SelectAction(int) ) );
     connect( (QObject*)(m_Controls->btnDoIt), SIGNAL(clicked()),(QObject*) this, SLOT(StartButtonClicked()));
 
@@ -270,14 +267,6 @@ void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
   m_Controls->m_ImageSelector2->setEnabled(false);
 
   m_Controls->btnDoIt2->setEnabled(false);
-}
-
-void QmitkBasicImageProcessing::onImage2Selected(const mitk::DataTreeNode* item)
-{
-  if(item && item->GetData())
-  {
-    m_Controls->btnDoIt2->setEnabled(true);
-  }
 }
 
 void QmitkBasicImageProcessing::SelectAction(int action)
@@ -731,10 +720,13 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   case 4: 
     m_SelectedOperation = DIVIDE;
     break;
-  default: return;
+  default: 
+    this->ResetTwoImageOpPanel();
+    return;
   }
   m_Controls->tlImage2->setEnabled(true);
   m_Controls->m_ImageSelector2->setEnabled(true);
+  m_Controls->btnDoIt2->setEnabled(true);
 }
 
 void QmitkBasicImageProcessing::StartButton2Clicked() 

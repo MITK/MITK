@@ -46,7 +46,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkITKImageImport.h"
 
 // ITK includes (general)
-#include <itkMacro.h>
 #include <itkVectorImage.h>
 
 // Morphological Operations
@@ -101,8 +100,7 @@ typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType, ImageType
 typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >                     LaplacianFilterType;
 typedef itk::SobelEdgeDetectionImageFilter< FloatImageType, FloatImageType >            SobelFilterType;
 
-typedef itk::BSplineResampleImageFilterBase<ImageType, ImageType>						            ResamplerType;
-typedef itk::BSplineDownsampleImageFilter<ImageType, ImageType, ResamplerType>			    DownsamplerType;
+typedef itk::BSplineDownsampleImageFilter< ImageType, ImageType >			                  DownsamplerType;
 
 typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                          AddFilterType;
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;

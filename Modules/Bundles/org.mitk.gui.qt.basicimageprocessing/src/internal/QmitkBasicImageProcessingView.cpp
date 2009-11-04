@@ -159,12 +159,9 @@ void QmitkBasicImageProcessing::CreateConnections()
     connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
   }
-}
 
-void QmitkBasicImageProcessing::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
-{
-  QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
-  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, stdMultiWidget.GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromShapeBasedSegmentation");
+  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, 
+    GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
 }
 
 void QmitkBasicImageProcessing::Activated()

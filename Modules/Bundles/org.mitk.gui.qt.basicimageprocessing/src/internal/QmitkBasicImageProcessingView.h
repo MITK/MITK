@@ -129,11 +129,6 @@ private:
   */
   void ResetTwoImageOpPanel();
 
-  /*
-  * After a two image operation, reset the "two image ops" panel
-  */
-  void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
-
   /*!  
   * controls containing sliders for scrolling through the slices  
   */  

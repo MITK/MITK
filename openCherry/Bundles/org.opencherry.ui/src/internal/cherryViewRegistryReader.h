@@ -64,6 +64,11 @@ protected:
   bool ReadElement(IConfigurationElement::Pointer element);
 
   /**
+   * Reads the sticky view element.
+   */
+  void ReadSticky(IConfigurationElement::Pointer element);
+
+  /**
    * Reads the view element.
    */
   void ReadView(IConfigurationElement::Pointer element);

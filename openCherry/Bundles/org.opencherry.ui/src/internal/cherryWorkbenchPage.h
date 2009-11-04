@@ -26,6 +26,7 @@
 #include "../cherryIReusableEditor.h"
 
 #include "cherryIStackableContainer.h"
+#include "cherryIStickyViewManager.h"
 #include "cherryWorkbenchPagePartList.h"
 #include "cherryWorkbenchPartReference.h"
 #include "cherryPageSelectionService.h"
@@ -381,6 +382,7 @@ private:
 
   //NavigationHistory navigationHistory = new NavigationHistory(this);
 
+  IStickyViewManager::Pointer stickyViewMan;
 
   /**
    * If we're in the process of activating a part, this points to the new part.

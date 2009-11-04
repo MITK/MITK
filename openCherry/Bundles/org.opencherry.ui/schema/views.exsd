@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.ui">
+<schema targetNamespace="org.opencherry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.opencherry.ui" id="views" name="Views"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          This extension point is used to define additional views 
 for the workbench.  A view is a visual component 
@@ -20,10 +20,16 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="category"/>
             <element ref="view"/>
+            <element ref="stickyView"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -44,20 +50,15 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
                <documentation>
                   an optional name of the extension instance
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <element name="category">
-      <annotation>
-         <appInfo>
-            <meta.element labelAttribute="name"/>
-         </appInfo>
-      </annotation>
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -71,9 +72,9 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
                <documentation>
                   a translatable name that will be used in the UI for this category
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="parentCategory" type="string">
@@ -82,17 +83,15 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
                   an optional path composed of category IDs separated by &apos;/&apos;. This
 allows the creation of a hierarchy of categories.
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/category/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <element name="view">
-      <annotation>
-         <appInfo>
-            <meta.element labelAttribute="name" icon="icon"/>
-         </appInfo>
-      </annotation>
       <complexType>
          <sequence>
             <element ref="description" minOccurs="0" maxOccurs="1"/>
@@ -109,9 +108,9 @@ allows the creation of a hierarchy of categories.
                <documentation>
                   a translatable name that will be used in the UI for this view
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute translatable="true"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="category" type="string">
@@ -120,19 +119,22 @@ allows the creation of a hierarchy of categories.
                   an optional attribute that is composed of the category IDs separated
 by &apos;/&apos;. Each referenced category must be declared in a corresponding category element.
                </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/category/@id"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
                   a fully qualified name of the class that implements 
-&lt;samp&gt;org.opencherry.ui/cherry::IViewPart&lt;/samp&gt;. A common practice 
-is to subclass &lt;samp&gt;org.opencherry.ui/cherry::ViewPart&lt;/samp&gt; 
+&lt;samp&gt;cherry::IViewPart&lt;/samp&gt;. A common practice 
+is to subclass &lt;samp&gt;cherry::ViewPart&lt;/samp&gt; or &lt;samp&gt;cherry::QtViewPart&lt;/samp&gt;
 in order to inherit the default functionality.
                </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.ui.part.ViewPart"/>
-               </appInfo>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="cherryViewPart:"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="icon" type="string">
@@ -141,15 +143,24 @@ in order to inherit the default functionality.
                   a relative name of the icon that will 
 be associated with the view.
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="resource"/>
-               </appInfo>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="fastViewWidthRatio" type="string">
+            <annotation>
+               <documentation>
+                  the percentage of the width of the workbench that the view will take up as an active fast view.
+This must be defined as a floating point value and lie between 0.05 and 0.95.
+If no value is supplied, a default ratio will be used.
+               </documentation>
             </annotation>
          </attribute>
          <attribute name="allowMultiple" type="boolean">
             <annotation>
                <documentation>
-                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(const std::string&amp; id, const std::string&amp; secondaryId).  The default is false.
+                  flag indicating whether this view allows multiple instances to be created using IWorkbenchPage::ShowView(std::string id, std::string secondaryId).  The default is false.
                </documentation>
             </annotation>
          </attribute>
@@ -157,9 +168,6 @@ be associated with the view.
             <annotation>
                <documentation>
                   flag indicating whether this view allows to be restored upon workbench restart. If set to false, the view will not be open after a workbench restart. The default is true.
-&lt;p&gt;
-Since: 3.4
-&lt;/p&gt;
                </documentation>
             </annotation>
          </attribute>
@@ -168,19 +176,72 @@ Since: 3.4
 
    <element name="description" type="string">
       <annotation>
-         <appInfo>
+         <appinfo>
             <meta.element translatable="true"/>
-         </appInfo>
+         </appinfo>
          <documentation>
             an optional subelement whose body should contain text providing a short description of the view.
          </documentation>
       </annotation>
    </element>
 
+   <element name="stickyView">
+      <annotation>
+         <documentation>
+            A sticky view is a view that will appear by default across all perspectives in a window once it is opened.  Its initial placement is governemed by the location attribute, but nothing prevents it from being moved or closed by the user.  Use of this element will only cause a placeholder for the view to be created, it will not show the view.  Please note that usage of this element should be done with great care and should only be applied to views that truely have a need to live across perspectives.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the id of the view to be made sticky.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/view/@id"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="location">
+            <annotation>
+               <documentation>
+                  optional attribute that specifies the location of the sticky view relative to the editor area.  If absent, the view will be docked to the right of the editor area.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="RIGHT">
+                  </enumeration>
+                  <enumeration value="LEFT">
+                  </enumeration>
+                  <enumeration value="TOP">
+                  </enumeration>
+                  <enumeration value="BOTTOM">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="closeable" type="boolean">
+            <annotation>
+               <documentation>
+                  optional attribute that specifies wether the view should be closeable.  If absent it will be closeable.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="moveable" type="boolean">
+            <annotation>
+               <documentation>
+                  optional attribute that specifies wether the view should be moveable.  If absent it will be moveable.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          The following is an example of the extension point: 
 &lt;p&gt;
@@ -193,8 +254,17 @@ Since: 3.4
          id=&quot;com.xyz.views.XYZView&quot; 
          name=&quot;XYZ View&quot; 
          category=&quot;com.xyz.views.XYZviews&quot; 
-         class=&quot;cherry::XYZView&quot; 
+         class=&quot;ns::XYZView&quot; 
          icon=&quot;icons/XYZ.gif&quot;/&gt;
+   &lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
+The following is an example of a sticky view declaration:
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension point=&quot;org.opencherry.ui.views&quot;&gt; 
+      &lt;stickyView
+         id=&quot;com.xyz.views.XYZView&quot; /&gt;
    &lt;/extension&gt; 
 &lt;/pre&gt;
 &lt;/p&gt;
@@ -202,37 +272,38 @@ Since: 3.4
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="apiInfo"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a 
 fully qualified name of the class that implements 
-&lt;samp&gt;org.opencherry.ui/cherry::IViewPart&lt;/samp&gt;.  It is common 
-practice to subclass &lt;samp&gt;org.opencherry.ui/cherry::ViewPart&lt;/samp&gt;
- when developing a new view.
+&lt;samp&gt;cherry::IViewPart&lt;/samp&gt;.  It is common 
+practice to subclass &lt;samp&gt;cherry::ViewPart&lt;/samp&gt;
+or &lt;samp&gt;cherry::QtViewPart&lt;samp&gt; when developing a new view.
       </documentation>
    </annotation>
 
+
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="implementation"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         The openCherry Platform provides a number of standard views including Properties and Log View. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
+         The openCherry Platform provides a number of standard views. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
-         Copyright (c) 2009 German Cancer Research Center.&lt;br&gt;
+         Copyright (c) 2002, 2005 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
-available under the terms of a BSD-style license which accompanies
+available under the terms of the Eclipse Public License v1.0 which accompanies
 this distribution, and is available at &lt;a 
-href=&quot;http://www.mitk.org/wiki/License&quot;&gt;http://www.mitk.org/wiki/License&lt;/a&gt;
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
       </documentation>
    </annotation>
 

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryCategory.h"
 #include "cherryViewDescriptor.h"
 #include "cherryViewRegistryReader.h"
+#include "cherryStickyViewDescriptor.h"
 
 #include "service/cherryIExtensionPoint.h"
 
@@ -117,6 +118,8 @@ private:
   //      return id1.compareTo(id2);
   //    }});
 
+  std::vector<IStickyViewDescriptor::Pointer> sticky;
+
   std::vector<IViewDescriptorCategoryPtr> categories;
 
   IViewDescriptorCategoryPtr miscCategory;
@@ -160,6 +163,13 @@ public:
   void Add(ViewDescriptor::Pointer desc);
 
   /**
+   * Add a sticky descriptor to the registry.
+   *
+   * @param desc the descriptor to add
+   */
+  void Add(StickyViewDescriptor::Pointer desc);
+
+  /**
    * Find a descriptor in the registry.
    */
   IViewDescriptor::Pointer Find(const std::string& id) const;
@@ -176,6 +186,12 @@ public:
    * Get the list of view categories.
    */
   std::vector<IViewCategory::Pointer> GetCategories();
+
+  /**
+   * Get the list of sticky views minus the sticky views which failed the
+   * Expressions check.
+   */
+  std::vector<IStickyViewDescriptor::Pointer> GetStickyViews() const;
 
   /**
    * Returns the Misc category. This may be <code>null</code> if there are

@@ -60,19 +60,41 @@ void ViewRegistryReader::ReadCategory(IConfigurationElement::Pointer element)
 
 bool ViewRegistryReader::ReadElement(IConfigurationElement::Pointer element)
 {
-  if (element->GetName() == WorkbenchRegistryConstants::TAG_VIEW)
+  std::string elementName = element->GetName();
+  if (elementName == WorkbenchRegistryConstants::TAG_VIEW)
   {
     this->ReadView(element);
     return true;
   }
-  if (element->GetName() == WorkbenchRegistryConstants::TAG_CATEGORY)
+  if (elementName == WorkbenchRegistryConstants::TAG_CATEGORY)
   {
     this->ReadCategory(element);
     this->ReadElementChildren(element);
     return true;
   }
+  if (elementName == WorkbenchRegistryConstants::TAG_STICKYVIEW)
+  {
+    this->ReadSticky(element);
+    return true;
+  }
 
   return false;
+}
+
+void ViewRegistryReader::ReadSticky(IConfigurationElement::Pointer element)
+{
+  try
+  {
+    viewRegistry->Add(StickyViewDescriptor::Pointer(new StickyViewDescriptor(element)));
+  }
+  catch (CoreException& e)
+  {
+    //TODO IStatus
+    // log an error since its not safe to open a dialog here
+//    WorkbenchPlugin.log(
+//       "Unable to create sticky view descriptor.", e.getStatus());//$NON-NLS-1$
+    WorkbenchPlugin::Log("Unable to create sticky view descriptor.", e);
+  }
 }
 
 void ViewRegistryReader::ReadView(IConfigurationElement::Pointer element)

@@ -426,62 +426,64 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   layout->SetFixed(descriptor->GetFixed());
 
 //  // add the placeholders for the sticky folders and their contents
-//  IPlaceholderFolderLayout::Pointer stickyFolderRight, stickyFolderLeft, stickyFolderTop, stickyFolderBottom;
-//
-//  std::vector<IStickyViewDescriptor::Pointer> descs = WorkbenchPlugin.getDefault()
-//  .getViewRegistry().getStickyViews();
-//  for (int i = 0; i < descs.length; i++)
-//  {
-//    IStickyViewDescriptor stickyViewDescriptor = descs[i];
-//    String id = stickyViewDescriptor.getId();
-//    switch (stickyViewDescriptor.getLocation())
-//    {
-//      case IPageLayout.RIGHT:
-//      if (stickyFolderRight == 0)
-//      {
-//        stickyFolderRight = layout
-//        .createPlaceholderFolder(
-//            StickyViewDescriptor.STICKY_FOLDER_RIGHT,
-//            IPageLayout.RIGHT, .75f,
-//            IPageLayout.ID_EDITOR_AREA);
-//      }
-//      stickyFolderRight.addPlaceholder(id);
-//      break;
-//      case IPageLayout.LEFT:
-//      if (stickyFolderLeft == 0)
-//      {
-//        stickyFolderLeft = layout.createPlaceholderFolder(
-//            StickyViewDescriptor.STICKY_FOLDER_LEFT,
-//            IPageLayout.LEFT, .25f, IPageLayout.ID_EDITOR_AREA);
-//      }
-//      stickyFolderLeft.addPlaceholder(id);
-//      break;
-//      case IPageLayout.TOP:
-//      if (stickyFolderTop == 0)
-//      {
-//        stickyFolderTop = layout.createPlaceholderFolder(
-//            StickyViewDescriptor.STICKY_FOLDER_TOP,
-//            IPageLayout.TOP, .25f, IPageLayout.ID_EDITOR_AREA);
-//      }
-//      stickyFolderTop.addPlaceholder(id);
-//      break;
-//      case IPageLayout.BOTTOM:
-//      if (stickyFolderBottom == 0)
-//      {
-//        stickyFolderBottom = layout.createPlaceholderFolder(
-//            StickyViewDescriptor.STICKY_FOLDER_BOTTOM,
-//            IPageLayout.BOTTOM, .75f,
-//            IPageLayout.ID_EDITOR_AREA);
-//      }
-//      stickyFolderBottom.addPlaceholder(id);
-//      break;
-//    }
-//
-//    //should never be 0 as we've just added the view above
-//    IViewLayout viewLayout = layout.getViewLayout(id);
-//    viewLayout.setCloseable(stickyViewDescriptor.isCloseable());
-//    viewLayout.setMoveable(stickyViewDescriptor.isMoveable());
-//  }
+  IPlaceholderFolderLayout::Pointer stickyFolderRight, stickyFolderLeft, stickyFolderTop, stickyFolderBottom;
+
+  std::vector<IStickyViewDescriptor::Pointer> descs(WorkbenchPlugin::GetDefault()
+  ->GetViewRegistry()->GetStickyViews());
+  for (std::size_t i = 0; i < descs.size(); i++)
+  {
+    IStickyViewDescriptor::Pointer stickyViewDescriptor = descs[i];
+    std::string id = stickyViewDescriptor->GetId();
+    int location = stickyViewDescriptor->GetLocation();
+    if (location == IPageLayout::RIGHT)
+    {
+      if (stickyFolderRight == 0)
+      {
+        stickyFolderRight = layout
+        ->CreatePlaceholderFolder(
+            StickyViewDescriptor::STICKY_FOLDER_RIGHT,
+            IPageLayout::RIGHT, .75f,
+            IPageLayout::ID_EDITOR_AREA);
+      }
+      stickyFolderRight->AddPlaceholder(id);
+    }
+    else if (location == IPageLayout::LEFT)
+    {
+      if (stickyFolderLeft == 0)
+      {
+        stickyFolderLeft = layout->CreatePlaceholderFolder(
+            StickyViewDescriptor::STICKY_FOLDER_LEFT,
+            IPageLayout::LEFT, .25f, IPageLayout::ID_EDITOR_AREA);
+      }
+      stickyFolderLeft->AddPlaceholder(id);
+    }
+    else if (location == IPageLayout::TOP)
+    {
+      if (stickyFolderTop == 0)
+      {
+        stickyFolderTop = layout->CreatePlaceholderFolder(
+            StickyViewDescriptor::STICKY_FOLDER_TOP,
+            IPageLayout::TOP, .25f, IPageLayout::ID_EDITOR_AREA);
+      }
+      stickyFolderTop->AddPlaceholder(id);
+    }
+    else if (location == IPageLayout::BOTTOM)
+    {
+      if (stickyFolderBottom == 0)
+      {
+        stickyFolderBottom = layout->CreatePlaceholderFolder(
+            StickyViewDescriptor::STICKY_FOLDER_BOTTOM,
+            IPageLayout::BOTTOM, .75f,
+            IPageLayout::ID_EDITOR_AREA);
+      }
+      stickyFolderBottom->AddPlaceholder(id);
+    }
+
+    //should never be 0 as we've just added the view above
+    IViewLayout::Pointer viewLayout = layout->GetViewLayout(id);
+    viewLayout->SetCloseable(stickyViewDescriptor->IsCloseable());
+    viewLayout->SetMoveable(stickyViewDescriptor->IsMoveable());
+  }
 
   // Run layout engine.
   factory->CreateInitialLayout(layout);

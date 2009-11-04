@@ -30,6 +30,7 @@
 #include "cherryWorkbench.h"
 #include "cherryWorkbenchConstants.h"
 #include "cherryPartService.h"
+#include "cherryStickyViewManager.h"
 #include "intro/cherryIntroConstants.h"
 #include "intro/cherryViewIntroAdapterPart.h"
 
@@ -1860,7 +1861,7 @@ void WorkbenchPage::DisposePerspective(Perspective::Pointer persp, bool notify)
   }
   //persp->Dispose();
 
-  //stickyViewMan.remove(persp.getDesc().getId());
+  stickyViewMan->Remove(persp->GetDesc()->GetId());
 }
 
 Perspective::Pointer WorkbenchPage::FindPerspective(
@@ -2251,6 +2252,7 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
 
   this->selectionService = new PageSelectionService(IWorkbenchPage::Pointer(this));
   this->partList = new WorkbenchPagePartList(this->selectionService);
+  this->stickyViewMan = new StickyViewManager(this);
 
   //actionSets = new ActionSetManager(w);
 
@@ -3057,8 +3059,8 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
 //        navigationHistory.markEditor(getActiveEditor());
 //      }
 //
-//      // restore sticky view state
-//      stickyViewMan.restore(memento);
+      // restore sticky view state
+      stickyViewMan->Restore(memento);
 
 //      std::string blame = activeDescriptor == 0 ? pageName
 //          : activeDescriptor.getId();
@@ -3244,8 +3246,8 @@ bool WorkbenchPage::SaveState(IMemento::Pointer memento)
 //  navigationHistory.saveState(memento .createChild(
 //      IWorkbenchConstants.TAG_NAVIGATION_HISTORY));
 //
-//  // save the sticky activation state
-//  stickyViewMan.save(memento);
+  // save the sticky activation state
+  stickyViewMan->Save(memento);
 
   return result;
 }
@@ -3444,8 +3446,8 @@ void WorkbenchPage::SetPerspective(Perspective::Pointer newPersp)
     //TODO action sets
     //window->UpdateActionSets();
 
-    //    // Update sticky views
-    //    stickyViewMan.update(oldPersp, newPersp);
+    // Update sticky views
+    stickyViewMan->Update(oldPersp, newPersp);
 
   }
   catch (std::exception& e)

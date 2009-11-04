@@ -144,6 +144,17 @@ void ViewRegistry::Add(ViewDescriptor::Pointer desc)
   //desc.activateHandler();
 }
 
+void ViewRegistry::Add(StickyViewDescriptor::Pointer desc)
+{
+  if (std::find(sticky.begin(), sticky.end(), desc) == sticky.end())
+  {
+    sticky.push_back(desc);
+//    PlatformUI::GetWorkbench()->GetExtensionTracker()
+//  .registerObject(desc.getConfigurationElement().getDeclaringExtension(),
+//      desc, IExtensionTracker.REF_WEAK);
+  }
+}
+
 IViewDescriptor::Pointer ViewRegistry::Find(const std::string& id) const
 {
   for (std::vector<IViewDescriptor::Pointer>::const_iterator itr = views.begin();
@@ -179,6 +190,11 @@ std::vector<IViewCategory::Pointer> ViewRegistry::GetCategories()
     retArray.push_back(IViewCategory::Pointer(new ViewCategoryProxy(*itr)));
   }
   return retArray;
+}
+
+std::vector<IStickyViewDescriptor::Pointer> ViewRegistry::GetStickyViews() const
+{
+  return sticky;
 }
 
 Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::GetMiscCategory() const

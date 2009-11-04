@@ -177,6 +177,8 @@ SET(INTERNAL_CPP_FILES
   cherryShellPool.cpp
   cherrySourcePriorityNameMapping.cpp
   cherryStackablePart.cpp
+  cherryStickyViewDescriptor.cpp
+  cherryStickyViewManager.cpp
   cherryTweaklets.cpp
   cherryViewDescriptor.cpp
   cherryViewFactory.cpp

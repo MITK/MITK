@@ -27,7 +27,8 @@ mitk::PlanarFigure::PlanarFigure()
   m_FeaturesMTime( 0 )
 {
   m_ControlPoints = VertexContainerType::New();
-  m_PolyLine = VertexContainerType::New();
+  m_PolyLines = VertexContainerVectorType::New();
+  m_HelperPolyLines = VertexContainerVectorType::New();
 
   // Currently only single-time-step geometries are supported
   this->InitializeTimeSlicedGeometry( 1 );
@@ -206,14 +207,14 @@ mitk::Point2D mitk::PlanarFigure::GetWorldControlPoint2D( unsigned int index ) c
 
 
 const mitk::PlanarFigure::VertexContainerType *
-mitk::PlanarFigure::GetPolyLine()
+mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
-  if ( m_PolyLine->GetMTime() < m_ControlPoints->GetMTime() )
+  if ((m_PolyLines->ElementAt( index )) && (m_PolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
   {
     this->GeneratePolyLine();
   }
 
-  return m_PolyLine;
+  return m_PolyLines->ElementAt( index );
 }
 
 
@@ -366,4 +367,9 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
   {
     os << indent << indent << i << ": " << it.Value() << std::endl;
   }
+}
+
+unsigned short mitk::PlanarFigure::GetPolyLinesSize()
+{
+  return m_PolyLines->size();
 }

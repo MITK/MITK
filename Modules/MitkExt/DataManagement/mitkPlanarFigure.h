@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
+#include <itkSmartPointerVectorContainer.h>
 
 
 namespace mitk 
@@ -44,6 +45,7 @@ public:
 
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
+  typedef itk::SmartPointerVectorContainer< unsigned long, VertexContainerType> VertexContainerVectorType;
 
 
   /** \brief True if the planar figure is closed. Must be implemented in
@@ -142,7 +144,7 @@ public:
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
-  const VertexContainerType *GetPolyLine();
+  const VertexContainerType *GetPolyLine(unsigned int index);
 
 
   /** \brief Returns the number of features available for this PlanarFigure
@@ -181,6 +183,9 @@ public:
 
   /** \brief Intherited from parent */
   virtual void SetRequestedRegion(itk::DataObject *data);
+ 
+  /**  Returns the current number of polylines  */
+  virtual unsigned short GetPolyLinesSize();
 
 protected:
   PlanarFigure();
@@ -211,7 +216,9 @@ protected:
 
   VertexContainerType::Pointer m_ControlPoints;
 
-  VertexContainerType::Pointer m_PolyLine;
+  VertexContainerVectorType::Pointer m_PolyLines;
+  VertexContainerVectorType::Pointer m_HelperPolyLines;
+
 
   bool m_FigurePlaced;
 

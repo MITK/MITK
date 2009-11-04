@@ -25,6 +25,7 @@ mitk::PlanarAngle::PlanarAngle()
 {
   // Start with two control points
   m_ControlPoints->Reserve( 2 );
+  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -63,11 +64,11 @@ mitk::PlanarAngle::~PlanarAngle()
 void mitk::PlanarAngle::GeneratePolyLine()
 {
   // Generate poly-line for angle
-  m_PolyLine->Reserve( m_ControlPoints->Size() );
+  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
 
   for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
   {
-    m_PolyLine->ElementAt( i ) = m_ControlPoints->ElementAt( i );
+    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
   }
 }
 

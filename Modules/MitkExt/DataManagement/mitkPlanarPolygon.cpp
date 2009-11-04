@@ -27,6 +27,7 @@ mitk::PlanarPolygon::PlanarPolygon()
 {
   // Polygon has at least two control points
   m_ControlPoints->Reserve( 2 );
+  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -65,10 +66,10 @@ mitk::PlanarPolygon::~PlanarPolygon()
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
   // TODO: start polygon at specified initalize point...
-  m_PolyLine->Reserve( m_ControlPoints->Size() );
+  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
   for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
   {
-    m_PolyLine->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
+    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
   }
 }
 

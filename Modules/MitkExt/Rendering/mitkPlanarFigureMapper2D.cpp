@@ -98,33 +98,35 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   //if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width")) != NULL)
   //  lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width"))->GetValue();
   //glLineWidth(lineWidth);
-
-  if ( planarFigure->IsClosed() )
-  {
-    glBegin( GL_LINE_LOOP );
-  }
-  else 
-  {
-    glBegin( GL_LINE_STRIP );
-  }
-
   typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
-  const VertexContainerType *polyLine = planarFigure->GetPolyLine();
-
   VertexContainerType::ConstIterator it;
-  for ( it = polyLine->Begin(); it != polyLine->End(); ++it )
+
+  for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
-    // Draw this 2D point as OpenGL vertex
-    mitk::Point2D displayPoint;
-    this->TransformObjectToDisplay( it->Value(), displayPoint,
-      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+    if ( planarFigure->IsClosed() )
+    {
+      glBegin( GL_LINE_LOOP );
+    }
+    else 
+    {
+      glBegin( GL_LINE_STRIP );
+    }
+    
+    const VertexContainerType *polyLine = planarFigure->GetPolyLine(loop);
+  
+    for ( it = polyLine->Begin(); it != polyLine->End(); ++it )
+    {
+      // Draw this 2D point as OpenGL vertex
+      mitk::Point2D displayPoint;
+      this->TransformObjectToDisplay( it->Value(), displayPoint,
+        planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
-    glVertex2f( displayPoint[0], displayPoint[1] );
+      glVertex2f( displayPoint[0], displayPoint[1] );
 
+    }
+
+    glEnd();
   }
-
-  glEnd();
-
 
   // Draw markers at control points (selected control point will be colored)
   const VertexContainerType *controlPoints = planarFigure->GetControlPoints();

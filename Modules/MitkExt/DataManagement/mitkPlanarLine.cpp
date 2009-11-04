@@ -25,6 +25,7 @@ mitk::PlanarLine::PlanarLine()
 {
   // Line has two control points
   m_ControlPoints->Reserve( 2 );
+  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -64,9 +65,9 @@ void mitk::PlanarLine::GeneratePolyLine()
 {
   // TODO: start line at specified start point...
   // Generate poly-line 
-  m_PolyLine->Reserve( 2 );
-  m_PolyLine->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
-  m_PolyLine->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
+  m_PolyLines->ElementAt( 0 )->Reserve( 2 );
+  m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
+  m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
 }
 
   

@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarAngle.h"
 #include "mitkPlanarLine.h"
+#include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
 
 #include "QmitkMeasurement.h"
@@ -326,6 +327,24 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
   {
     return;
   }
+  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
+
+  mitk::PlanarFourPointAngle::Pointer figure = mitk::PlanarFourPointAngle::New();
+  figure->SetGeometry2D( planeGeometry );
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetData( figure );
+
+  this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarFourPointAngle initialized...";
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )

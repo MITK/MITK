@@ -21,7 +21,11 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
   
   m_RangeSlider->setMaximum(2048);
   m_RangeSlider->setMinimum(-2048);
+  m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
   connect(m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
+  
+  //reset button
+  connect(m_RangeSliderReset, SIGNAL(pressed()), this, SLOT(OnResetSlider()));
   
   m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEditScalarOpacity, m_YEditScalarOpacity);
   m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
@@ -63,7 +67,18 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
     if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
       tf->InitializeByItkHistogram( image->GetScalarHistogram() );
           
+    m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
+    m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
+
+    m_RangeSliderMin= tf->GetMin();
+    m_RangeSliderMax= tf->GetMax();
+
     OnUpdateCanvas();
+
+    m_RangeSlider->setSpan( m_RangeSliderMin, m_RangeSliderMax);
+
+    UpdateRanges();
+
     return; 
   }
 
@@ -78,6 +93,7 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 
 void QmitkTransferFunctionWidget::OnUpdateCanvas()
 {
+  
   if(tfpToChange.IsNull())
     return;
 
@@ -86,30 +102,15 @@ void QmitkTransferFunctionWidget::OnUpdateCanvas()
   if(tf.IsNull())
     return;
 
-  if (m_ScalarOpacityFunctionCanvas)
-  {
-    m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tf->GetScalarOpacityFunction() );
-    m_ScalarOpacityFunctionCanvas->SetHistogram( tf->GetHistogram() );
-    m_ScalarOpacityFunctionCanvas->SetMin( tf->GetMin() );
-    m_ScalarOpacityFunctionCanvas->SetMax( tf->GetMax() );
-    m_ScalarOpacityFunctionCanvas->update();
-  }
-  if (m_GradientOpacityCanvas)
-  {
-    m_GradientOpacityCanvas->SetPiecewiseFunction( tf->GetGradientOpacityFunction() );
-    m_GradientOpacityCanvas->SetHistogram( tf->GetHistogram() );
-    m_GradientOpacityCanvas->SetMin( tf->GetMin() );
-    m_GradientOpacityCanvas->SetMax( tf->GetMax() );
-    m_GradientOpacityCanvas->update();
-  }
-  if (m_ColorTransferFunctionCanvas)
-  {
-    m_ColorTransferFunctionCanvas->SetColorTransferFunction( tf->GetColorTransferFunction() );
-    m_ColorTransferFunctionCanvas->SetMin( tf->GetMin() );
-    m_ColorTransferFunctionCanvas->SetMax( tf->GetMax() );
-    m_ColorTransferFunctionCanvas->update();
-  }
+  m_ScalarOpacityFunctionCanvas->SetPiecewiseFunction( tf->GetScalarOpacityFunction() );
+  m_GradientOpacityCanvas->SetPiecewiseFunction( tf->GetGradientOpacityFunction() );
+  m_ColorTransferFunctionCanvas->SetColorTransferFunction( tf->GetColorTransferFunction() );
 
+    UpdateRanges();
+
+  m_ScalarOpacityFunctionCanvas->update();
+  m_GradientOpacityCanvas->update();
+  m_ColorTransferFunctionCanvas->update();
 }
 
 void QmitkTransferFunctionWidget::SetXValueScalar()
@@ -143,8 +144,13 @@ void QmitkTransferFunctionWidget::SetXValueColor()
 }
 
 
-void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper) 
+void QmitkTransferFunctionWidget::UpdateRanges() 
 {
+  int lower =  m_RangeSlider->lowerValue();
+  int upper =  m_RangeSlider->upperValue();
+
+  //LOG_INFO << "UpdateRanges: lower: " << lower << " upper: " << upper;
+
   m_ScalarOpacityFunctionCanvas->SetMin(lower);
   m_ScalarOpacityFunctionCanvas->SetMax(upper);
   
@@ -153,11 +159,29 @@ void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper)
   
   m_ColorTransferFunctionCanvas->SetMin(lower);
   m_ColorTransferFunctionCanvas->SetMax(upper);
+}  
+
+
+void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper) 
+{
+  //LOG_INFO << "OnSpanChanged, m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
+
+  UpdateRanges();
   
   m_GradientOpacityCanvas->update();
   m_ColorTransferFunctionCanvas->update();
   m_ScalarOpacityFunctionCanvas->update();
   
-  //LOG_INFO << "m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
+  
 }
 
+void QmitkTransferFunctionWidget::OnResetSlider() 
+{
+  m_RangeSlider->setUpperValue(m_RangeSliderMax);
+  m_RangeSlider->setLowerValue(m_RangeSliderMin);
+  
+  UpdateRanges();
+  m_GradientOpacityCanvas->update();
+  m_ColorTransferFunctionCanvas->update();
+  m_ScalarOpacityFunctionCanvas->update();
+}

@@ -12,6 +12,8 @@
 #include <mitkTransferFunctionProperty.h>
 
 #include <QSlider>
+#include <QPushButton>
+
 
 class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
@@ -34,8 +36,11 @@ class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
 	  void SetXValueColor();
 	 
 	  void OnUpdateCanvas();
+	  void UpdateRanges();
+	  void OnResetSlider();
 	  
 	  void OnSpanChanged (int lower, int upper);
+	  
 
   protected:
   

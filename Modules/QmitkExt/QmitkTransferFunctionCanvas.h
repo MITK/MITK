@@ -99,7 +99,6 @@ public:
   void mouseReleaseEvent( QMouseEvent* mouseEvent );
   void mouseDoubleClickEvent( QMouseEvent* mouseEvent );
   void PaintHistogram(QPainter &p);
-  void PaintHistogramGO(QPainter &p);
 
   virtual int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) = 0;
   virtual void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val) = 0;
@@ -119,11 +118,20 @@ public:
 
   void SetImmediateUpdate(bool state);
 
+  static std::pair<vtkFloatingPointType,vtkFloatingPointType> ValidateCoord( std::pair<vtkFloatingPointType,vtkFloatingPointType> x )
+  {
+    if( x.first < -2048 ) x.first = -2048;
+    if( x.first >  2048 ) x.first =  2048;
+    if( x.second < 0 ) x.second = 0;
+    if( x.second > 1 ) x.second = 1;
+    return x;
+  }
+
   void SetX(float x)
   {
-    if (m_GrabbedHandle != -1 && GetFunctionX(m_GrabbedHandle) != m_Min && GetFunctionX(m_GrabbedHandle) != m_Max)
+    if (m_GrabbedHandle != -1)
     {
-      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(x,GetFunctionY(m_GrabbedHandle)));
+      this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(x,GetFunctionY(m_GrabbedHandle))));
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -131,9 +139,9 @@ public:
 
   void SetY(float y)
   {
-    if (m_GrabbedHandle != -1 && y>=0 && y<=1)
+    if (m_GrabbedHandle != -1)
     {
-      this->MoveFunctionPoint(m_GrabbedHandle, std::make_pair(GetFunctionX(m_GrabbedHandle),y));
+      this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair(GetFunctionX(m_GrabbedHandle),y)));
       update();
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }

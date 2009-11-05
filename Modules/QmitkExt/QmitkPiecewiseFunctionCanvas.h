@@ -40,26 +40,9 @@ public:
     this->SetMax(m_PiecewiseFunction->GetRange()[1]);
     setEnabled(true);
 
-    m_IsGradientOpacityFunction = false;
-
     update();
 
   };
-
-  void SetPiecewiseFunctionGO(vtkPiecewiseFunction* piecewiseFunction)
-  {
-    this->m_PiecewiseFunction = piecewiseFunction;
-    this->SetMin(m_PiecewiseFunction->GetRange()[0]);
-    this->SetMax((m_PiecewiseFunction->GetRange()[1]));
-    //this->SetMin(0);
-      //this->SetMax((m_PiecewiseFunction->GetRange()[1])*0.25);
-      setEnabled(true);
-
-      m_IsGradientOpacityFunction = true;
-
-      update();
-
-    };
 
     void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType val)
     {
@@ -138,7 +121,6 @@ public:
   protected:
   
     vtkPiecewiseFunction* m_PiecewiseFunction;
-    bool m_IsGradientOpacityFunction;
 	  std::string m_Title;
 
   };

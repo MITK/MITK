@@ -151,7 +151,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
       tf->InitializeByItkHistogram( histoGramm );
 
     tfpToChange->SetValue( tf );
-    
+   
     m_InfoPreset->setText( QString( (std::string("loaded ")+ fileName).c_str() ) );
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
@@ -212,10 +212,9 @@ static double stepFunctionGlocke ( double x )
   return x;
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)      // GLOCKE
+void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)      // bell
 {
   //std::string infoText;
-  
   
 //  m_InfoThreshold->setText( QString( x.c_str() ) );
 

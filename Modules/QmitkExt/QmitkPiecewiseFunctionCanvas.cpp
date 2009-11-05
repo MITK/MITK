@@ -45,15 +45,8 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
     return;
   }
  
+  PaintHistogram(painter);
 
-  if (m_IsGradientOpacityFunction)
-  {
-    PaintHistogramGO(painter);
-  }
-  else
-  {
-    PaintHistogram(painter);
-  }
   painter.save();
 
   

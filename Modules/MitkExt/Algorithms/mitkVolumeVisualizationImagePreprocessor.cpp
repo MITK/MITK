@@ -364,6 +364,7 @@ int mitk::VolumeVisualizationImagePreprocessor::GetHistogrammValueFromBottom( do
   for( int r = -32768 ; r <= 32767 ; r++ )
     if( (unteren -= histogramm[32768+(int)r]) <= 0 )
       return r;
+  return 0; // will be never reached
 }
 
 
@@ -373,6 +374,7 @@ int mitk::VolumeVisualizationImagePreprocessor::GetHistogrammValueFromTop( doubl
   for( int r = 32767 ; r >= -32768 ; r-- )
     if( (oberen -= histogramm[32768+(int)r]) <= 0 )
       return r;
+  return 0; // will be never reached
 }
 
 
